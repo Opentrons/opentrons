@@ -1,8 +1,10 @@
 import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
+import { resetAllWhenMocks, when } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
+import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
+import { useCurrentRunStatus } from '../../../RunTimeControl/hooks'
 import { MagneticModuleData } from '../MagneticModuleData'
 import { TemperatureModuleData } from '../TemperatureModuleData'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
@@ -21,11 +23,21 @@ import type {
   MagneticModule,
 } from '../../../../redux/modules/types'
 
+const mockPush = jest.fn()
+
 jest.mock('../MagneticModuleData')
 jest.mock('../TemperatureModuleData')
 jest.mock('../ThermocyclerModuleData')
 jest.mock('../HeaterShakerModuleData')
 jest.mock('../ModuleOverflowMenu')
+jest.mock('../../../RunTimeControl/hooks')
+jest.mock('react-router-dom', () => {
+  const reactRouterDom = jest.requireActual('react-router-dom')
+  return {
+    ...reactRouterDom,
+    useHistory: () => ({ push: mockPush } as any),
+  }
+})
 
 const mockMagneticModuleData = MagneticModuleData as jest.MockedFunction<
   typeof MagneticModuleData
@@ -41,6 +53,9 @@ const mockThermocyclerModuleData = ThermocyclerModuleData as jest.MockedFunction
 >
 const mockHeaterShakerModuleData = HeaterShakerModuleData as jest.MockedFunction<
   typeof HeaterShakerModuleData
+>
+const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
+  typeof useCurrentRunStatus
 >
 
 const mockMagneticModuleHub = {
@@ -98,8 +113,11 @@ describe('ModuleCard', () => {
       <div>Mock Heater Shaker Module Data</div>
     )
     mockModuleOverflowMenu.mockReturnValue(<div>mock module overflow menu</div>)
-  })
 
+    when(mockUseCurrentRunStatus)
+      .calledWith(expect.any(Object))
+      .mockReturnValue(RUN_STATUS_IDLE)
+  })
   afterEach(() => {
     jest.resetAllMocks()
   })
@@ -173,6 +191,21 @@ describe('ModuleCard', () => {
     fireEvent.click(overflowButton)
     expect(overflowButton).not.toBeDisabled()
     getByText('mock module overflow menu')
+  })
+
+  it('renders kebab icon and it is disabled when run is in progress', () => {
+    when(mockUseCurrentRunStatus)
+      .calledWith(expect.any(Object))
+      .mockReturnValue(RUN_STATUS_RUNNING)
+
+    const { getByRole, getByText } = render({
+      module: mockMagneticModule,
+    })
+    const overflowButton = getByRole('button', {
+      name: /overflow/i,
+    })
+    getByText('Magnetic Module GEN1')
+    expect(overflowButton).toBeDisabled()
   })
 
   it('renders information for a heater shaker module when it is hot, showing the too hot banner', () => {

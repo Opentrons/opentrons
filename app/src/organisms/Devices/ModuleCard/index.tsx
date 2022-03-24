@@ -5,14 +5,10 @@ import {
   Flex,
   Text,
   DIRECTION_ROW,
-  SPACING_2,
   ALIGN_START,
   DIRECTION_COLUMN,
-  SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
-  SPACING_1,
   SPACING,
-  C_BRIGHT_GRAY,
   C_HARBOR_GRAY,
   FONT_WEIGHT_REGULAR,
   FONT_SIZE_CAPTION,
@@ -21,6 +17,9 @@ import {
   Btn,
   TEXT_DECORATION_UNDERLINE,
   IconProps,
+  Tooltip,
+  useHoverTooltip,
+  COLORS,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -29,8 +28,11 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import { useHistory } from 'react-router-dom'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { Banner } from '../../../atoms/Banner'
+import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import { ModuleIcon } from '../ModuleIcon'
 import { HeaterShakerWizard } from '../HeaterShakerWizard'
 import { MagneticModuleData } from './MagneticModuleData'
@@ -69,7 +71,19 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showTestShake, setShowTestShake] = React.useState(false)
   const [showBanner, setShowBanner] = React.useState<boolean>(true)
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
+  const [targetProps, tooltipProps] = useHoverTooltip()
+  const history = useHistory()
+  const runStatus = useCurrentRunStatus({
+    onSettled: data => {
+      if (data == null) {
+        history.push('/upload')
+      }
+    },
+  })
   const hotToTouch: IconProps = { name: 'ot-hot-to-touch' }
+
+  const isOverflowBtnDisabled =
+    runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
 
   const moduleOverflowWrapperRef = useOnClickOutside({
     onClickOutside: () => setShowOverflowMenu(false),
@@ -171,10 +185,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   return (
     <React.Fragment>
       <Flex
-        backgroundColor={C_BRIGHT_GRAY}
-        borderRadius={SPACING_1}
-        marginBottom={SPACING_2}
-        marginLeft={SPACING_2}
+        backgroundColor={COLORS.background}
+        borderRadius={SPACING.spacing2}
+        marginBottom={SPACING.spacing3}
+        marginLeft={SPACING.spacing2}
         width={'20rem'}
         data-testid={`module_card_${module.serial}`}
       >
@@ -204,12 +218,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           />
         )}
         <Box
-          padding={`${SPACING_3} ${SPACING_2} ${SPACING_3} ${SPACING_2}`}
+          padding={`${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing3}`}
           width="100%"
         >
-          <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING_2}>
+          <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
             <img src={image} alt={module.model} />
-            <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_2}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              paddingLeft={SPACING.spacing3}
+            >
               {module.hasAvailableUpdate && showBanner ? (
                 <Flex paddingBottom={SPACING.spacing2} width="12.4rem">
                   <Banner
@@ -289,10 +306,17 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         >
           <OverflowBtn
             aria-label="overflow"
+            disabled={isOverflowBtnDisabled}
+            {...targetProps}
             onClick={() => {
               setShowOverflowMenu(prevShowOverflowMenu => !prevShowOverflowMenu)
             }}
           />
+          {isOverflowBtnDisabled && (
+            <Tooltip {...tooltipProps} key={`tooltip_${module.serial}`}>
+              {t('module_actions_unavailable')}
+            </Tooltip>
+          )}
         </Box>
         {showOverflowMenu && (
           <div

@@ -62,5 +62,6 @@
   "input_out_of_range": "Input out of range",
   "module_status_range": "Between {{min}} - {{max}} {{unit}}",
   "module_controls": "Module Controls",
-  "hot_to_the_touch": "<block>Module is <bold>hot</bold> to the touch</block>"
+  "hot_to_the_touch": "<block>Module is <bold>hot</bold> to the touch</block>",
+  "module_actions_unavailable": "Module actions unavailable while protocol is running"
 }

@@ -45,33 +45,31 @@ export const ModuleOverflowMenu = (
       <Flex position={POSITION_RELATIVE}>
         <MenuList
           buttons={[
-            menuOverflowItemsByModuleType[module.type].map(
-              (item: any, index: any) => {
-                return (
-                  <>
-                    <MenuItem
-                      minWidth="10rem"
-                      key={`${index}_${module.model}`}
-                      onClick={() => item.onClick(item.isSecondary)}
-                      data-testid={`module_setting_${module.model}`}
-                      disabled={item.disabledReason}
-                      {...targetProps}
+            menuOverflowItemsByModuleType[module.type].map((item, index) => {
+              return (
+                <>
+                  <MenuItem
+                    minWidth="10rem"
+                    key={`${index}_${module.model}`}
+                    onClick={() => item.onClick(item.isSecondary)}
+                    data-testid={`module_setting_${module.model}`}
+                    disabled={item.disabledReason}
+                    {...targetProps}
+                  >
+                    {item.setSetting}
+                  </MenuItem>
+                  {item.disabledReason && (
+                    <Tooltip
+                      {...tooltipProps}
+                      key={`tooltip_${index}_${module.model}`}
                     >
-                      {item.setSetting}
-                    </MenuItem>
-                    {item.disabledReason && (
-                      <Tooltip
-                        {...tooltipProps}
-                        key={`tooltip_${index}_${module.model}`}
-                      >
-                        {t('cannot_shake', { ns: 'heater_shaker' })}
-                      </Tooltip>
-                    )}
-                    {item.menuButtons}
-                  </>
-                )
-              }
-            ),
+                      {t('cannot_shake', { ns: 'heater_shaker' })}
+                    </Tooltip>
+                  )}
+                  {item.menuButtons}
+                </>
+              )
+            }),
           ]}
         />
       </Flex>
