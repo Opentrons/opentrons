@@ -95,7 +95,6 @@ async def test_send(
     )
 
 
-
 async def test_listen_messages(
     subject: CanMessenger, incoming_messages: Queue[CanMessage]
 ) -> None:
@@ -166,7 +165,12 @@ async def test_filter_messages(
     # Set up a listener
     listener = Mock(spec=MessageListenerCallback)
     # Add a filter that rejects all but the message in there queue
-    subject.add_listener(listener, lambda arbitration_id: arbitration_id.parts.message_id != MessageId.get_move_group_request)
+    subject.add_listener(
+        listener,
+        lambda arbitration_id: bool(
+            arbitration_id.parts.message_id != MessageId.get_move_group_request
+        ),
+    )
 
     # Start the listener
     subject.start()
@@ -194,7 +198,10 @@ async def test_waitable_callback_context() -> None:
 async def test_waitable_callback_context_with_filter() -> None:
     """It should add itself and remove itself using context manager."""
     mock_messenger = Mock(spec=CanMessenger)
-    some_func = lambda x: True
+
+    def some_func(a: ArbitrationId) -> bool:
+        return False
+
     with WaitableCallback(mock_messenger, some_func) as callback:
         mock_messenger.add_listener.assert_called_once_with(callback, some_func)
     mock_messenger.remove_listener.assert_called_once_with(callback)

@@ -2,7 +2,7 @@
 from __future__ import annotations
 import asyncio
 from inspect import Traceback
-from typing import List, Optional, Callable, Tuple, Dict
+from typing import Optional, Callable, Tuple, Dict
 import logging
 
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
@@ -45,7 +45,10 @@ class CanMessenger:
             driver: The can bus driver to use.
         """
         self._drive = driver
-        self._listeners: Dict[MessageListenerCallback, Tuple[MessageListenerCallback, MessageListenerCallbackFilter]] = {}
+        self._listeners: Dict[
+            MessageListenerCallback,
+            Tuple[MessageListenerCallback, Optional[MessageListenerCallbackFilter]],
+        ] = {}
         self._task: Optional[asyncio.Task[None]] = None
 
     async def send(self, node_id: NodeId, message: MessageDefinition) -> None:
@@ -86,13 +89,18 @@ class CanMessenger:
         else:
             log.warning("task not running.")
 
-    def add_listener(self, listener: MessageListenerCallback, filter: Optional[MessageListenerCallbackFilter] = None) -> None:
+    def add_listener(
+        self,
+        listener: MessageListenerCallback,
+        filter: Optional[MessageListenerCallbackFilter] = None,
+    ) -> None:
         """Add a message listener."""
         self._listeners[listener] = listener, filter
 
     def remove_listener(self, listener: MessageListenerCallback) -> None:
         """Remove a message listener."""
-        del self._listeners[listener]
+        if listener in self._listeners:
+            del self._listeners[listener]
 
     async def _read_task_shield(self) -> None:
         try:
@@ -129,7 +137,11 @@ class CanMessenger:
 class WaitableCallback:
     """MessageListenerCallback that can be awaited or iterated."""
 
-    def __init__(self, messenger: CanMessenger, filter: Optional[MessageListenerCallbackFilter] = None) -> None:
+    def __init__(
+        self,
+        messenger: CanMessenger,
+        filter: Optional[MessageListenerCallbackFilter] = None,
+    ) -> None:
         """Constructor.
 
         Args:

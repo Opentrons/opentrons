@@ -1,5 +1,5 @@
 """Pytest shared fixtures."""
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from typing_extensions import Protocol
 
 import pytest
@@ -9,7 +9,10 @@ from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings import NodeId
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
-from opentrons_hardware.drivers.can_bus.can_messenger import MessageListenerCallback
+from opentrons_hardware.drivers.can_bus.can_messenger import (
+    MessageListenerCallback,
+    MessageListenerCallbackFilter,
+)
 
 
 class MockCanMessageNotifier:
@@ -19,7 +22,11 @@ class MockCanMessageNotifier:
         """Constructor."""
         self._listeners: List[MessageListenerCallback] = []
 
-    def add_listener(self, listener: MessageListenerCallback) -> None:
+    def add_listener(
+        self,
+        listener: MessageListenerCallback,
+        filter: Optional[MessageListenerCallbackFilter],
+    ) -> None:
         """Add listener."""
         self._listeners.append(listener)
 
