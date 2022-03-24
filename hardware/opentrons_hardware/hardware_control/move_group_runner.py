@@ -46,6 +46,7 @@ class MoveGroupRunner:
 
         Args:
             move_groups: The move groups to run.
+            start_at_index: The index the MoveGroupManager will start at
         """
         self._move_groups = move_groups
         self._start_at_index = start_at_index
