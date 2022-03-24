@@ -139,7 +139,7 @@ class ProtocolSchemaV6(BaseModel):
         ...,
         alias="$otSharedSchema",
         description="The path to a valid Opentrons shared schema relative to "
-                    "the shared-data directory, without its extension."
+        "the shared-data directory, without its extension.",
     )
     schemaVersion: Literal[6]
     metadata: Metadata
@@ -154,5 +154,5 @@ class ProtocolSchemaV6(BaseModel):
     designerApplication: Optional[DesignerApplication]
 
     class Config:
-        # added for constructing the class with field name instead of alias (otSharedSchema)
+        # added for constructing the class with field name instead of alias
         allow_population_by_field_name = True
