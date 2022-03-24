@@ -10,13 +10,19 @@ const log = createLogger('python')
 function findPython(): string | undefined {
   const pathToPythonOverride: string | null = getConfig('python')
     .pathToPythonOverride
+
   let possiblePythonPaths = [
     path.join(process.resourcesPath, 'python'),
     path.join(process.resourcesPath, 'python', 'bin', 'python3'),
   ]
+
   log.debug('IN FIND PYTHON', { pathToPythonOverride })
   if (pathToPythonOverride != null) {
-    possiblePythonPaths = [pathToPythonOverride, ...possiblePythonPaths]
+    possiblePythonPaths = [
+      pathToPythonOverride,
+      path.join(pathToPythonOverride, 'bin/python3'),
+      ...possiblePythonPaths,
+    ]
   }
 
   if (process.env.NODE_ENV !== 'production') {
@@ -27,8 +33,15 @@ function findPython(): string | undefined {
   }
 
   for (const path of possiblePythonPaths) {
-    if (fs.existsSync(path)) {
-      return path
+    try {
+      fs.accessSync(path, fs.constants.X_OK)
+      const stats = fs.statSync(path)
+      if (stats.isFile()) {
+        log.debug('Python candidate selected', { path })
+        return path
+      }
+    } catch (error) {
+      log.debug('Python candidate not executable, skipping', { path, error })
     }
   }
 }

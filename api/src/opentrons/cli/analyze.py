@@ -7,9 +7,8 @@ import tempfile
 from anyio import run
 from pathlib import Path
 from pydantic.json import pydantic_encoder
-from typing import Any, Callable, IO, Iterator, List, Sequence, Tuple
+from typing import Callable, Iterator, List, Sequence, Tuple
 
-from opentrons.types import MountType
 from opentrons.protocol_reader import ProtocolReader, InputFile
 from opentrons.protocol_runner import ProtocolRunData, create_simulating_runner
 from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
@@ -27,7 +26,7 @@ from opentrons.protocol_engine import (
     "files",
     nargs=-1,
     required=True,
-    type=click.Path(exists=True, path_type=Path, file_okay=True, dir_okay=False),
+    type=click.Path(exists=True, path_type=Path, file_okay=True, dir_okay=True),
 )
 @click.option(
     "--json/--no-json",
@@ -45,7 +44,15 @@ def analyze(files: Sequence[Path], json: bool) -> None:
 
 async def _analyze(files: Sequence[Path], json_mode: bool) -> None:
     protocol_dir = Path(tempfile.gettempdir()) / "opentrons-protocols"
-    source_files = [InputFile.from_path(p) for p in files]
+    source_files = []
+
+    for p in files:
+        if p.is_dir():
+            dir_files = p.glob("**/*")
+            for sub_p in dir_files:
+                source_files.append(InputFile.from_path(sub_p))
+        else:
+            source_files.append(InputFile.from_path(p))
 
     reader = ProtocolReader(directory=protocol_dir)
     protocol_source = await reader.read("protocol", source_files)
