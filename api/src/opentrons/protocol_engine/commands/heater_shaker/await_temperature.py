@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 from opentrons.hardware_control import HardwareControlAPI
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from opentrons.protocol_engine.errors import NoTargetTemperatureSetError
 
 
 if TYPE_CHECKING:
@@ -44,6 +45,11 @@ class AwaitTemperatureImpl(
         hs_module_view = self._state_view.modules.get_heater_shaker_module_view(
             module_id=params.moduleId
         )
+        if not hs_module_view.parent_module_view.is_target_temperature_set(
+            module_id=params.moduleId
+        ):
+            raise NoTargetTemperatureSetError("No target temperature to wait for.")
+
         hs_hardware_module = hs_module_view.find_hardware(
             attached_modules=self._hardware_api.attached_modules
         )

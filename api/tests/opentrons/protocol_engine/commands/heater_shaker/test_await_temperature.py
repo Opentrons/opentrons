@@ -1,9 +1,11 @@
 """Test Heater Shaker await temperature command implementation."""
+import pytest
 from decoy import Decoy
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import HeaterShaker, AbstractModule
 
+from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.state.modules import HeaterShakerModuleView
 from opentrons.protocol_engine.commands import heater_shaker
@@ -27,6 +29,12 @@ async def test_await_temperature(
         state_view.modules.get_heater_shaker_module_view(module_id="heater-shaker-id")
     ).then_return(hs_module_view)
 
+    decoy.when(
+        hs_module_view.parent_module_view.is_target_temperature_set(
+            module_id="heater-shaker-id"
+        )
+    ).then_return(True)
+
     # Get attached hardware modules
     attached = [decoy.mock(cls=AbstractModule), decoy.mock(cls=AbstractModule)]
     match = decoy.mock(cls=HeaterShaker)
@@ -40,3 +48,20 @@ async def test_await_temperature(
     result = await subject.execute(data)
     decoy.verify(await match.await_temperature(), times=1)
     assert result == heater_shaker.AwaitTemperatureResult()
+
+
+async def test_raises_without_target_temp(
+    decoy: Decoy, state_view: StateView, hardware_api: HardwareControlAPI
+) -> None:
+    """It should raise an error when executing command without a target temperature."""
+    subject = AwaitTemperatureImpl(state_view=state_view, hardware_api=hardware_api)
+    data = heater_shaker.AwaitTemperatureParams(moduleId="heater-shaker-id")
+
+    # Get module view
+    hs_module_view = decoy.mock(cls=HeaterShakerModuleView)
+    decoy.when(
+        state_view.modules.get_heater_shaker_module_view(module_id="heater-shaker-id")
+    ).then_return(hs_module_view)
+
+    with pytest.raises(errors.NoTargetTemperatureSetError):
+        await subject.execute(data)

@@ -25,6 +25,8 @@ from .exceptions import (
     ThermocyclerNotOpenError,
     RobotDoorOpenError,
     EngageHeightOutOfRangeError,
+    NoTargetTemperatureSetError,
+    NoTargetSpeedSetError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -55,6 +57,8 @@ __all__ = [
     "ThermocyclerNotOpenError",
     "RobotDoorOpenError",
     "EngageHeightOutOfRangeError",
+    "NoTargetTemperatureSetError",
+    "NoTargetSpeedSetError",
     # error occurrence models
     "ErrorOccurrence",
 ]
