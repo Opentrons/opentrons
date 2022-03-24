@@ -1,13 +1,24 @@
 [[source]]
+
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
+
 [requires]
+
 python_version = "3.7"
 
+
 [dev-packages]
+
 robot-server = {editable = true, path = "."}
+
+# pytest dependencies on windows, spec'd here to force lockfile inclusion
+# https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
+atomicwrites = {version="==1.4.0", sys_platform="== 'win32'"}
+colorama = {version="==0.4.4", sys_platform="== 'win32'"}
+
 pytest = "~=6.1"
 pytest-aiohttp = "==0.3.0"
 pytest-cov = "==2.10.1"
@@ -24,14 +35,13 @@ flake8-noqa = "~=1.1.0"
 decoy = "~=1.10.0"
 httpx = "==0.18.*"
 black = "==22.1.0"
-# pytest dependencies on windows, spec'd here to force lockfile inclusion
-# https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
-atomicwrites = {version="==1.4.0", sys_platform="== 'win32'"}
-colorama = {version="==0.4.4", sys_platform="== 'win32'"}
 types-requests = "==2.25.6"
 types-mock = "==4.0.1"
+sqlalchemy2-stubs = "==0.0.2a21"
+
 
 [packages]
+
 opentrons = {editable = true, path = "../api"}
 opentrons-shared-data = {editable = true, path = "../shared-data/python"}
 notify-server = {editable = true, path = "../notify-server"}
