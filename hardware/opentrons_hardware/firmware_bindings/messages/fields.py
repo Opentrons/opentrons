@@ -2,7 +2,11 @@
 import enum
 
 from opentrons_hardware.firmware_bindings import utils, ErrorCode
-from opentrons_hardware.firmware_bindings.constants import ToolType, SensorType
+from opentrons_hardware.firmware_bindings.constants import (
+    ToolType,
+    SensorType,
+    PipetteName,
+)
 
 
 class FirmwareShortSHADataField(utils.BinaryFieldBase[bytes]):
@@ -85,3 +89,27 @@ class SensorTypeField(utils.UInt8Field):
         except ValueError:
             sensor_val = str(self.value)
         return f"{self.__class__.__name__}(value={sensor_val})"
+
+
+class PipetteNameField(utils.UInt16Field):
+    """high-level pipette name field."""
+
+    def __repr__(self) -> str:
+        """Print pipette."""
+        try:
+            pipette_val = PipetteName(self.value).name
+        except ValueError:
+            pipette_val = str(self.value)
+        return f"{self.__class__.__name__}(value={pipette_val})"
+
+
+class PipetteSerialField(utils.BinaryFieldBase[bytes]):
+    """The serial number of a pipette.
+
+    This is sized to handle only the datecode part of the serial
+    number; the full field can be synthesized from this, the
+    model number, and the name.
+    """
+
+    NUM_BYTES = 12
+    FORMAT = f"{NUM_BYTES}s"

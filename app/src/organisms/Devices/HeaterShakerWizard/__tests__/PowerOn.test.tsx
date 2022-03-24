@@ -13,7 +13,6 @@ const render = (props: React.ComponentProps<typeof PowerOn>) => {
 describe('PowerOn', () => {
   let props: React.ComponentProps<typeof PowerOn>
 
-  // TODO(jr, 2022-02-18): fix module model to heater shaker when it exists
   beforeEach(() => {
     props = {
       attachedModule: mockHeaterShaker,
@@ -33,7 +32,7 @@ describe('PowerOn', () => {
   it('renders heater shaker SVG with info with module connected', () => {
     const { getByText } = render(props)
     getByText('Connected')
-    getByText('Magnetic Module GEN2')
+    getByText('Heater Shaker Module GEN1')
     getByText('USB Port 1 via hub')
   })
 
@@ -43,7 +42,7 @@ describe('PowerOn', () => {
     }
     const { getByText } = render(props)
     getByText('Not connected')
-    getByText('Magnetic Module GEN2')
+    getByText('Heater Shaker Module GEN1')
     getByText('No USB Port Yet')
   })
 })

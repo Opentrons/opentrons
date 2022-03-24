@@ -10,18 +10,17 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
   SPACING,
-  PrimaryBtn,
   COLORS,
-  TEXT_TRANSFORM_NONE,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  AlertItem,
   TEXT_DECORATION_UNDERLINE,
   Btn,
-  SPACING_3,
+  ALIGN_START,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
+import { SecondaryButton } from '../../../atoms/Buttons'
 import { Slideout } from '../../../atoms/Slideout'
+import { Banner } from '../../../atoms/Banner'
 import { updateModule } from '../../../redux/modules'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
@@ -49,6 +48,7 @@ export const AboutModuleSlideout = (
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const runStatus = useCurrentRunStatus()
   const dispatch = useDispatch<Dispatch>()
+  const [showBanner, setShowBanner] = React.useState<boolean>(true)
   const isDisabled =
     runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
 
@@ -61,28 +61,32 @@ export const AboutModuleSlideout = (
       title={t('about_module', { name: moduleName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      height={`calc(100vh - ${SPACING_3})`} // subtract breadcrumb strip
+      height={`calc(100vh - ${SPACING.spacing4})`}
     >
-      {/* TODO(jr, 2/22/22): update AlertItem to match new designs and wire up the link */}
-      {module.hasAvailableUpdate ? (
-        <AlertItem
-          data-testid={`alert_item_firmware_update_${module.model}`}
-          css={ALERT_ITEM_STYLE}
-          type="warning"
-          title={
-            <>
-              {t('firmware_update_available')}
-              <Btn
-                paddingLeft={SPACING.spacing2}
-                fontSize={TYPOGRAPHY.fontSizeP}
-                textDecoration={TEXT_DECORATION_UNDERLINE}
-                onClick={() => console.log('firmware update!')}
-              >
-                {t('view_update')}
-              </Btn>
-            </>
-          }
-        />
+      {module.hasAvailableUpdate && showBanner ? (
+        <Flex paddingBottom={SPACING.spacing4}>
+          <Banner
+            data-testid={`alert_item_firmware_update_${module.model}`}
+            css={ALERT_ITEM_STYLE}
+            type="warning"
+            onCloseClick={() => setShowBanner(false)}
+            title={
+              <>
+                {t('firmware_update_available')}
+                <Btn
+                  textAlign={ALIGN_START}
+                  paddingLeft={SPACING.spacing2}
+                  fontSize={TYPOGRAPHY.fontSizeP}
+                  textDecoration={TEXT_DECORATION_UNDERLINE}
+                  //  TODO(jr, 3/21/22): wire up the link
+                  onClick={() => console.log('firmware update!')}
+                >
+                  {t('view_update')}
+                </Btn>
+              </>
+            }
+          />
+        </Flex>
       ) : null}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -100,21 +104,17 @@ export const AboutModuleSlideout = (
               {t('version', { version: module.fwVersion })}
             </Text>
           </Flex>
-          {module.hasAvailableUpdate ? (
-            <PrimaryBtn
+          {module.hasAvailableUpdate && showBanner ? (
+            <SecondaryButton
               data-testid={`firmware_update_btn_${module.model}`}
-              padding="6px 12px 6px 12px"
-              backgroundColor={COLORS.blue}
-              borderRadius={SPACING.spacingM}
-              textTransform={TEXT_TRANSFORM_NONE}
-              css={TYPOGRAPHY.labelRegular}
+              textTransform={TEXT_TRANSFORM_UPPERCASE}
               alignItems={ALIGN_CENTER}
-              marginRight={SPACING.spacing3}
               onClick={handleClick}
               disabled={isDisabled}
+              color={COLORS.blue}
             >
               {t('link_firmware_update')}
-            </PrimaryBtn>
+            </SecondaryButton>
           ) : null}
         </Flex>
         <Text

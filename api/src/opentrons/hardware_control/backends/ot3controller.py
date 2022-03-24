@@ -16,6 +16,7 @@ from typing import (
     cast,
     Set,
     TypeVar,
+    Iterator,
 )
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
@@ -49,7 +50,10 @@ from opentrons_hardware.hardware_control.current_settings import (
     set_hold_current,
     set_currents,
 )
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    PipetteName as FirmwarePipetteName,
+)
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SetupRequest,
     EnableMotorRequest,
@@ -67,6 +71,7 @@ from opentrons.hardware_control.types import (
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control.types import NodeMap
+from opentrons_hardware.hardware_control.tools import detector, types as ohc_tool_types
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
@@ -78,11 +83,6 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-_FIXED_PIPETTE_ID: str = "P1KSV3120211118A01"
-_FIXED_PIPETTE_NAME: PipetteName = "p1000_single_gen3"
-_FIXED_PIPETTE_MODEL: PipetteModel = cast("PipetteModel", "p1000_single_v3.0")
-
-
 MapPayload = TypeVar("MapPayload")
 
 
@@ -91,6 +91,7 @@ class OT3Controller:
 
     _messenger: CanMessenger
     _position: Dict[NodeId, float]
+    _tool_detector: detector.OneshotToolDetector
 
     @classmethod
     async def build(cls, config: OT3Config) -> OT3Controller:
@@ -117,6 +118,7 @@ class OT3Controller:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
+        self._tool_detector = detector.OneshotToolDetector(self._messenger)
         self._position = self._get_home_position()
         try:
             self._event_watcher = self._build_event_watcher()
@@ -316,18 +318,40 @@ class OT3Controller:
         Returns:
             A map of mount to pipette name.
         """
-        if (
-            expected.get(OT3Mount.RIGHT)
-            and expected.get(OT3Mount.RIGHT) != _FIXED_PIPETTE_NAME
-        ):
-            raise RuntimeError(f"only support {_FIXED_PIPETTE_NAME}  right now")
+        await self._probe_core()
+        attached = await self._tool_detector.detect()
 
-        return {
-            OT3Mount.RIGHT: {
-                "config": pipette_config.load(_FIXED_PIPETTE_MODEL, _FIXED_PIPETTE_ID),
-                "id": _FIXED_PIPETTE_ID,
+        def _synthesize_model_name(
+            name: FirmwarePipetteName, model: int
+        ) -> "PipetteModel":
+            return cast("PipetteModel", name.name + "_v3." + str(model))
+
+        def _build_attached_instr(
+            attached: ohc_tool_types.PipetteInformation,
+        ) -> AttachedInstrument:
+            return {
+                "config": pipette_config.load(
+                    _synthesize_model_name(attached.name, attached.model)
+                ),
+                "id": attached.serial,
             }
-        }
+
+        def _generate_attached_instrs(
+            attached: ohc_tool_types.ToolSummary,
+        ) -> Iterator[Tuple[OT3Mount, AttachedInstrument]]:
+            if attached.left:
+                yield (OT3Mount.LEFT, _build_attached_instr(attached.left))
+            if attached.right:
+                yield (OT3Mount.RIGHT, _build_attached_instr(attached.right))
+
+        current_tools = dict(_generate_attached_instrs(attached))
+        self._present_nodes -= set(
+            axis_to_node(OT3Axis.of_main_tool_actuator(mount))
+            for mount in (OT3Mount.RIGHT, OT3Mount.LEFT)
+        )
+        for mount in current_tools.keys():
+            self._present_nodes.add(axis_to_node(OT3Axis.of_main_tool_actuator(mount)))
+        return current_tools
 
     async def set_default_currents(self) -> None:
         """Set both run and hold currents from robot config to each node."""
@@ -513,6 +537,45 @@ class OT3Controller:
             node_to_axis(k): v for k, v in OT3Controller._get_home_position().items()
         }
 
+    @staticmethod
+    def _replace_head_node(nodes: Set[NodeId]) -> Set[NodeId]:
+        """Replace the head core node with its two sides.
+
+        The node ID for the head central controller is what shows up in a network probe,
+        but what we actually send commands to an overwhelming majority of the time is
+        the head_l and head_r synthetic node IDs, and those are what we want in the
+        network map.
+        """
+        if NodeId.head in nodes:
+            nodes.remove(NodeId.head)
+            nodes.add(NodeId.head_r)
+            nodes.add(NodeId.head_l)
+        return nodes
+
+    @staticmethod
+    def _filter_probed_core_nodes(
+        current_set: Set[NodeId], probed_set: Set[NodeId]
+    ) -> Set[NodeId]:
+        probed_set = OT3Controller._replace_head_node(probed_set)
+        core_replaced: Set[NodeId] = set(
+            [NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l, NodeId.head_r]
+        )
+        current_set -= core_replaced
+        current_set |= probed_set
+        return current_set
+
+    async def _probe_core(self, timeout: float = 5.0) -> None:
+        """Update the list of core nodes present on the network.
+
+        Unlike probe_network, this always waits for the nodes that must be present for
+        a working machine, and no more.
+        """
+        core_nodes = set([NodeId.gantry_x, NodeId.gantry_y, NodeId.head])
+        core_present = await probe(self._messenger, core_nodes, timeout)
+        self._present_nodes = self._filter_probed_core_nodes(
+            self._present_nodes, core_present
+        )
+
     async def probe_network(self, timeout: float = 5.0) -> None:
         """Update the list of nodes present on the network.
 
@@ -534,11 +597,7 @@ class OT3Controller:
         ):
             expected.add(NodeId.pipette_right)
         present = await probe(self._messenger, expected, timeout)
-        if NodeId.head in present:
-            present.remove(NodeId.head)
-            present.add(NodeId.head_r)
-            present.add(NodeId.head_l)
-        self._present_nodes = present
+        self._present_nodes = self._replace_head_node(present)
 
     def _axis_is_present(self, axis: OT3Axis) -> bool:
         try:

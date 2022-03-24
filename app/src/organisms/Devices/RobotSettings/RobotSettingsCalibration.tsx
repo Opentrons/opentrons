@@ -89,15 +89,7 @@ export function RobotSettingsCalibration({
               {t('see_how_robot_calibration_works')}
             </Link>
           </Box>
-          <TertiaryButton
-            boxShadow="none"
-            color={COLORS.background}
-            css={TYPOGRAPHY.h6SemiBold}
-            padding="0.375rem 0.75rem"
-            textTransform={TYPOGRAPHY.textTransformNone}
-            whiteSpace="nowrap"
-            onClick={onClickSaveAs}
-          >
+          <TertiaryButton onClick={onClickSaveAs}>
             {t('download_calibration_data')}
           </TertiaryButton>
         </Flex>

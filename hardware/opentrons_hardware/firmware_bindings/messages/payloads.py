@@ -12,6 +12,8 @@ from .fields import (
     FirmwareUpdateDataField,
     ErrorCodeField,
     SensorTypeField,
+    PipetteNameField,
+    PipetteSerialField,
 )
 from .. import utils
 
@@ -326,3 +328,12 @@ class SensorThresholdResponsePayload(utils.BinarySerializable):
 
     sensor: SensorTypeField
     threshold: utils.Int32Field
+
+
+@dataclass
+class PipetteInfoResponsePayload(utils.BinarySerializable):
+    """A response carrying data about an attached pipette."""
+
+    pipette_name: PipetteNameField
+    pipette_model: utils.UInt16Field
+    pipette_serial: PipetteSerialField

@@ -39,6 +39,7 @@ import {
   useCreateRun,
   useCloseCurrentRun,
   useIsProtocolRunLoaded,
+  useCurrentRunId,
 } from './hooks'
 import { loadProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
@@ -69,6 +70,7 @@ export function ProtocolUpload(): JSX.Element {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const protocolRecord = useCurrentProtocol()
+  const runId = useCurrentRunId()
   const {
     createProtocolRun,
     isCreatingProtocolRun,
@@ -241,7 +243,10 @@ export function ProtocolUpload(): JSX.Element {
         <ConfirmExitProtocolUploadModal exit={confirmExit} back={cancelExit} />
       )}
       {showConfirmCancelModal && (
-        <ConfirmCancelModal onClose={() => setShowConfirmCancelModal(false)} />
+        <ConfirmCancelModal
+          onClose={() => setShowConfirmCancelModal(false)}
+          runId={runId}
+        />
       )}
       <Page titleBarProps={titleBarProps}>
         {uploadError != null && (

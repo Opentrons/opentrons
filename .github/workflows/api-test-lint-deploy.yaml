@@ -97,7 +97,7 @@ jobs:
           OT_VIRTUALENV_VERSION: ${{ matrix.python }}
       - if: ${{ matrix.with-ot-hardware == 'true' }}
         name: Test with opentrons_hardware
-        run: make -C api test
+        run: make -C api test-cov
       - if: ${{ matrix.with-ot-hardware == 'true' }}
         uses: 'codecov/codecov-action@v2'
         with:
