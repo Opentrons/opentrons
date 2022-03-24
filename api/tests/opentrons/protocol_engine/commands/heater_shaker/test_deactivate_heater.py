@@ -38,5 +38,5 @@ async def test_deactivate_heater(
     )
 
     result = await subject.execute(data)
-    decoy.verify(await match.set_temperature(celsius=0), times=1)
+    decoy.verify(await match.start_set_temperature(celsius=0), times=1)
     assert result == heater_shaker.DeactivateHeaterResult()

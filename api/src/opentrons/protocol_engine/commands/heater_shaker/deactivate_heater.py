@@ -48,7 +48,7 @@ class DeactivateHeaterImpl(
             attached_modules=self._hardware_api.attached_modules
         )
         if hs_hardware_module is not None:
-            await hs_hardware_module.set_temperature(celsius=0)
+            await hs_hardware_module.start_set_temperature(celsius=0)
         return DeactivateHeaterResult()
 
 
