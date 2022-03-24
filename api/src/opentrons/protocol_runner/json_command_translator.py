@@ -1,11 +1,8 @@
 """Translation of JSON protocol commands into ProtocolEngine commands."""
-from typing import cast, List, Any
+from typing import cast, List
 from pydantic import parse_obj_as
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6, Command
-from opentrons.protocol_engine import (
-    commands as pe_commands,
-    LabwareLocation
-)
+from opentrons.protocol_engine import commands as pe_commands, LabwareLocation
 
 
 class CommandTranslatorError(Exception):
@@ -14,18 +11,23 @@ class CommandTranslatorError(Exception):
     pass
 
 
-def get_labware_command(protocol: ProtocolSchemaV6, labware_id : str, command: Command) -> pe_commands.LoadLabwareCreate:
+def _get_labware_command(
+    protocol: ProtocolSchemaV6, labware_id: str, command: Command
+) -> pe_commands.LoadLabwareCreate:
     definition_id = protocol.labware[labware_id].definitionId
     assert definition_id is not None
-    labware_command = pe_commands.LoadLabwareCreate(params=pe_commands.LoadLabwareParams(
-        labwareId=command.params.labwareId,
-        displayName=protocol.labware[labware_id].displayName,
-        version=protocol.labwareDefinitions[definition_id].version,
-        namespace=protocol.labwareDefinitions[definition_id].namespace,
-        loadName=protocol.labwareDefinitions[definition_id].parameters.loadName,
-        location=parse_obj_as(LabwareLocation,  # type: ignore[arg-type]
-                              command.params.location)
-    ))
+    labware_command = pe_commands.LoadLabwareCreate(
+        params=pe_commands.LoadLabwareParams(
+            labwareId=command.params.labwareId,
+            displayName=protocol.labware[labware_id].displayName,
+            version=protocol.labwareDefinitions[definition_id].version,
+            namespace=protocol.labwareDefinitions[definition_id].namespace,
+            loadName=protocol.labwareDefinitions[definition_id].parameters.loadName,
+            location=parse_obj_as(
+                LabwareLocation, command.params.location  # type: ignore[arg-type]
+            ),
+        )
+    )
     return labware_command
 
 
@@ -33,9 +35,10 @@ class JsonCommandTranslator:
     """Class that translates commands from PD/JSON to ProtocolEngine."""
 
     def translate(
-            self,
-            protocol: ProtocolSchemaV6,
+        self,
+        protocol: ProtocolSchemaV6,
     ) -> List[pe_commands.CommandCreate]:
+        """Takes json protocol v6 and translates commands->protocol engine commands."""
         commands_list: List[pe_commands.CommandCreate] = []
         exclude_commands = [
             "loadLiquid",
@@ -52,7 +55,9 @@ class JsonCommandTranslator:
             if command.commandType == "loadPipette":
                 pipette_id = command.params.pipetteId
                 assert pipette_id is not None
-                dict_command["params"].update(dict(pipetteName=protocol.pipettes[pipette_id].name))
+                dict_command["params"].update(
+                    dict(pipetteName=protocol.pipettes[pipette_id].name)
+                )
             elif command.commandType == "loadModule":
                 module_id = command.params.moduleId
                 modules = protocol.modules
@@ -62,7 +67,7 @@ class JsonCommandTranslator:
             elif command.commandType == "loadLabware":
                 labware_id = command.params.labwareId
                 assert labware_id is not None
-                labware_command = get_labware_command(protocol, labware_id, command)
+                labware_command = _get_labware_command(protocol, labware_id, command)
                 commands_list.append(labware_command)
                 continue
                 print(dict_command)
@@ -72,8 +77,7 @@ class JsonCommandTranslator:
                     # https://github.com/samuelcolvin/pydantic/issues/1847
                     pe_commands.CommandCreate,  # type: ignore[arg-type]
                     dict_command,
-                )
+                ),
             )
             commands_list.append(translated_obj)
         return commands_list
-
