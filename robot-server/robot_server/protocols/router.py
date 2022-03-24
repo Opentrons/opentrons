@@ -133,7 +133,7 @@ async def create_protocol(
     )
 
     log.info(
-        f'Created protocol "{protocol_id}"' f' and started analysis "{analysis_id}".'
+        f'Created protocol "{protocol_id}" and started analysis "{analysis_id}".'
     )
 
     return await PydanticResponse.create(
