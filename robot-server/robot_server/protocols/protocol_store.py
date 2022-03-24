@@ -102,6 +102,9 @@ class ProtocolRecord:
 # TODO: Make all methods async, probably.
 class ProtocolRecordStore:
     def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
+        # TODO:
+        # 1) As a first step, spin up an isolated in-memory DB and make the table in it
+        # 2) Make that a FastAPI dependency, probably
         self._sql_engine = sql_engine
 
     def insert(self, protocol_record: ProtocolRecord) -> None:
@@ -110,8 +113,7 @@ class ProtocolRecordStore:
             created_at=protocol_record.created_at
         )
         with self._sql_engine.begin() as transaction:
-            # TODO: If I wanted to catch an ID-already-used conflict here,
-            #       how would I do that?
+            # TODO: How do we catch an ID-already-used conflict here?
             # TODO: Will this raise if there was a problem with the insert, or do I
             #       have to inspect the result somehow?
             transaction.execute(statement)
@@ -136,7 +138,7 @@ class ProtocolRecordStore:
         return [self._to_record(result) for result in results]
 
     def _to_record(self, sql_result: sqlalchemy.engine.Row) -> ProtocolRecord:
-        # TODO: Any way these types can be inferred? Investigate sqlalchemy-stubs,
+        # TODO: Any way these types can be inferred? Investigate sqlalchemy[2]-stubs,
         # reconsider if light ORM use would be good for us.
         protocol_id = sql_result.id
         assert isinstance(protocol_id, str)
