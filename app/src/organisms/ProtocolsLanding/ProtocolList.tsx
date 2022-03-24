@@ -33,11 +33,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
       >
         <StyledText as="h1">{t('protocols')}</StyledText>
         {/* TODO - Add text filter dropdown overflow menu component */}
-        <SecondaryButton
-          onClick={() => {
-            setShowSlideout(true)
-          }}
-        >
+        <SecondaryButton onClick={() => setShowSlideout(true)}>
           {t('import')}
         </SecondaryButton>
       </Flex>
