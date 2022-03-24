@@ -69,20 +69,19 @@ def mock_present_nodes(controller: OT3Controller):
     finally:
         controller._present_nodes = old_pn
 
-
-@pytest.mark.parametrize(
-    "axes",
-    [
+home_test_params = [
         [OT3Axis.X],
         [OT3Axis.Y],
         [OT3Axis.Z_L],
         [OT3Axis.Z_R],
         [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_R],
-        # all contained in (mock_move_group_run.call_args_list[0][0][0]._move_groups)
         [OT3Axis.X, OT3Axis.Z_R, OT3Axis.P_R, OT3Axis.Y, OT3Axis.Z_L],
         [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.P_L, OT3Axis.P_R],
         [OT3Axis.P_R],
-    ],
+]
+
+@pytest.mark.parametrize(
+    "axes", home_test_params
 )
 async def test_home_execute(
     controller: OT3Controller, mock_move_group_run, axes, mock_present_nodes
@@ -94,22 +93,9 @@ async def test_home_execute(
             assert step.move_type == MoveType.home
             assert step.stop_condition == MoveStopCondition.limit_switch
 
-    # make sure position gets set to 0 for appropriate axes
-
 
 @pytest.mark.parametrize(
-    "axes",
-    [
-        [OT3Axis.X],
-        [OT3Axis.Y],
-        [OT3Axis.Z_L],
-        [OT3Axis.Z_R],
-        [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_R],
-        # all contained in (mock_move_group_run.call_args_list[0][0][0]._move_groups)
-        [OT3Axis.X, OT3Axis.Z_R, OT3Axis.P_R, OT3Axis.Y, OT3Axis.Z_L],
-        [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.P_L, OT3Axis.P_R],
-        [OT3Axis.P_R],
-    ],
+    "axes", home_test_params
 )
 async def test_home_prioritize_mount(
     controller: OT3Controller, mock_move_group_run, axes, mock_present_nodes
@@ -121,7 +107,6 @@ async def test_home_prioritize_mount(
     if has_xy and has_mount:
         assert len(run) > 1
         for node in run[0][0]:
-            # breakpoint()
             assert node_to_axis(node) in OT3Axis.mount_axes()
         for node in run[1][0]:
             assert node in [NodeId.gantry_x, NodeId.gantry_y]
@@ -130,18 +115,7 @@ async def test_home_prioritize_mount(
 
 
 @pytest.mark.parametrize(
-    "axes",
-    [
-        [OT3Axis.X],
-        [OT3Axis.Y],
-        [OT3Axis.Z_L],
-        [OT3Axis.Z_R],
-        [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_R],
-        # all contained in (mock_move_group_run.call_args_list[0][0][0]._move_groups)
-        [OT3Axis.X, OT3Axis.Z_R, OT3Axis.P_R, OT3Axis.Y, OT3Axis.Z_L],
-        [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.P_L, OT3Axis.P_R],
-        [OT3Axis.P_R],
-    ],
+    "axes", home_test_params
 )
 async def test_home_build_runners(
     controller: OT3Controller, mock_move_group_run, axes, mock_present_nodes
@@ -152,15 +126,12 @@ async def test_home_build_runners(
 
     if has_pipette and has_gantry:
         assert len(mock_move_group_run.call_args_list) == 2
-        # check that there two runners, both get called ??
         run_gantry = mock_move_group_run.call_args_list[0][0][0]._move_groups
         run_pipette = mock_move_group_run.call_args_list[1][0][0]._move_groups
         for group in run_gantry:
             for node in group[0]:
-                # breakpoint()
                 assert node_to_axis(node) in OT3Axis.gantry_axes()
         for node in run_pipette[0][0]:
-            # breakpoint()
             assert node_to_axis(node) in OT3Axis.pipette_axes()
 
     if not has_pipette or not has_gantry:
@@ -169,18 +140,7 @@ async def test_home_build_runners(
 
 
 @pytest.mark.parametrize(
-    "axes",
-    [
-        [OT3Axis.X],
-        [OT3Axis.Y],
-        [OT3Axis.Z_L],
-        [OT3Axis.Z_R],
-        [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_R],
-        # all contained in (mock_move_group_run.call_args_list[0][0][0]._move_groups)
-        [OT3Axis.X, OT3Axis.Z_R, OT3Axis.P_R, OT3Axis.Y, OT3Axis.Z_L],
-        [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.P_L, OT3Axis.P_R],
-        [OT3Axis.P_R],
-    ],
+    "axes", home_test_params
 )
 async def test_home_only_present_nodes(
     controller: OT3Controller, mock_move_group_run, axes
