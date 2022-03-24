@@ -46,7 +46,6 @@ export const ModuleOverflowMenu = (
         <MenuList
           buttons={[
             menuOverflowItemsByModuleType[module.type].map((item, index) => {
-              console.log(item)
               return (
                 <>
                   <MenuItem

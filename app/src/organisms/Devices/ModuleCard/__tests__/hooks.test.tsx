@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { act } from 'react-test-renderer'
-import { fireEvent, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react-hooks'
@@ -17,107 +16,12 @@ import {
 } from '../../../../redux/modules/__fixtures__'
 
 import type { Store } from 'redux'
-import type { MenuItemsByModuleType } from '../hooks'
 
 jest.mock('@opentrons/react-api-client')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
-
-const mockMenuItemsByModuleTypeHeaterShakerNotIdle = {
-  thermocyclerModuleType: [
-    {
-      setSetting: 'Set lid temperature',
-      isSecondary: true,
-      disabledReason: false,
-      menuButtons: null,
-      onClick: jest.fn(),
-    },
-    {
-      setSetting: 'Set block temperature',
-      isSecondary: false,
-      disabledReason: false,
-      menuButtons: <div>menu button</div>,
-      onClick: jest.fn(),
-    },
-  ],
-  magneticModuleType: [
-    {
-      setSetting: 'Set engage height',
-      isSecondary: false,
-      disabledReason: false,
-      menuButtons: <div>menu button</div>,
-      onClick: jest.fn(),
-    },
-  ],
-  temperatureModuleType: [
-    {
-      setSetting: 'Set module temperature',
-      isSecondary: false,
-      disabledReason: false,
-      menuButtons: <div>menu button</div>,
-      onClick: jest.fn(),
-    },
-  ],
-  heaterShakerModuleType: [
-    {
-      setSetting: 'Deactivate',
-      isSecondary: false,
-      disabledReason: false,
-      menuButtons: null,
-      onClick: jest.fn(),
-    },
-    {
-      setSetting: 'Stop Shaking',
-      isSecondary: true,
-      disabledReason: true,
-      menuButtons: <div>menu button</div>,
-      onClick: jest.fn(),
-    },
-  ],
-} as MenuItemsByModuleType
-
-// const mockMenuItemsByModuleType = {
-//   thermocyclerModuleType: [
-//     {
-//       setSetting: 'Set lid temperature',
-//       isSecondary: true,
-//       disabledReason: false,
-//     },
-//     {
-//       setSetting: 'Set block temperature',
-//       isSecondary: false,
-//       disabledReason: false,
-//     },
-//   ],
-//   magneticModuleType: [
-//     {
-//       setSetting: 'Set engage height',
-//       isSecondary: false,
-//       disabledReason: false,
-//     },
-//   ],
-//   temperatureModuleType: [
-//     {
-//       setSetting: 'Set module temperature',
-//       isSecondary: false,
-//       disabledReason: false,
-//     },
-//   ],
-//   heaterShakerModuleType: [
-//     {
-//       setSetting: 'Set module temperature',
-//       isSecondary: false,
-//       disabledReason: false,
-//     },
-//     {
-//       setSetting: 'Stop Shaking',
-//       isSecondary: true,
-//       disabledReason: false,
-//     },
-//   ],
-// } as MenuItemsByModuleType
 
 const mockCloseLatchHeaterShaker = {
   model: 'heaterShakerModuleV1',
@@ -329,7 +233,7 @@ describe('useModuleOverflowMenu', () => {
   afterEach(() => {
     jest.restoreAllMocks()
   })
-  it.only('should return everything for menuItemsByModuleType and create deactive heater command', () => {
+  it('should return everything for menuItemsByModuleType and create deactive heater command', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
@@ -349,24 +253,18 @@ describe('useModuleOverflowMenu', () => {
       }
     )
     const { menuOverflowItemsByModuleType } = result.current
-    console.log(menuOverflowItemsByModuleType)
-    console.log(mockMenuItemsByModuleTypeHeaterShakerNotIdle)
+    const heaterShakerMenu =
+      menuOverflowItemsByModuleType.heaterShakerModuleType
 
-    // expect(menuOverflowItemsByModuleType).toEqual(
-    //   mockMenuItemsByModuleTypeHeaterShakerNotIdle
-    // )
-
-    // act(() =>
-    //   menuOverflowItemsByModuleType.heaterShakerModuleType.onClick(false)
-    // )
-    // expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-    //   command: {
-    //     commandType: 'heaterShakerModule/deactivateHeater',
-    //     params: {
-    //       moduleId: mockDeactivateHeatHeaterShaker.id,
-    //     },
-    //   },
-    // })
+    act(() => heaterShakerMenu[0].onClick(false))
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'heaterShakerModule/deactivateHeater',
+        params: {
+          moduleId: mockHeatHeaterShaker.id,
+        },
+      },
+    })
   })
   it('should render heater shaker module and create deactive shaker command', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
@@ -387,7 +285,10 @@ describe('useModuleOverflowMenu', () => {
         wrapper,
       }
     )
-    act(() => result.current.getOnClickCommand(true))
+    const { menuOverflowItemsByModuleType } = result.current
+    const heaterShakerMenu =
+      menuOverflowItemsByModuleType.heaterShakerModuleType
+    act(() => heaterShakerMenu[1].onClick(true))
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
         commandType: 'heaterShakerModule/stopShake',
@@ -420,13 +321,12 @@ describe('useModuleOverflowMenu', () => {
         wrapper,
       }
     )
-    const { menuButtons, getOnClickCommand } = result.current
+    const { menuOverflowItemsByModuleType } = result.current
+    const heaterShakerMenu =
+      menuOverflowItemsByModuleType.heaterShakerModuleType
 
-    act(() => getOnClickCommand(false))
+    act(() => heaterShakerMenu[1].onClick(true))
     expect(mockHandleClick).toHaveBeenCalled()
-    const aboutModule = screen.getByTestId('about_module_heaterShakerModuleV1')
-    fireEvent.click(aboutModule)
-    expect(mockAboutClick).toHaveBeenCalled()
   })
 
   it('should return only 1 menu button when module is a magnetic module and calls handleClick when module is disengaged', () => {
@@ -449,11 +349,13 @@ describe('useModuleOverflowMenu', () => {
         wrapper,
       }
     )
-    const { menuItemsByModuleType, getOnClickCommand } = result.current
-    act(() => getOnClickCommand(false))
-    expect(menuItemsByModuleType).toStrictEqual(mockMenuItemsByModuleType)
+    const { menuOverflowItemsByModuleType } = result.current
+    const magMenu = menuOverflowItemsByModuleType.magneticModuleType
+
+    act(() => magMenu[0].onClick(false))
     expect(mockHandleClick).toHaveBeenCalled()
   })
+
   it('should render magnetic module and create disengage command', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <I18nextProvider i18n={i18n}>
@@ -473,7 +375,10 @@ describe('useModuleOverflowMenu', () => {
         wrapper,
       }
     )
-    act(() => result.current.getOnClickCommand(false))
+    const { menuOverflowItemsByModuleType } = result.current
+    const magMenu = menuOverflowItemsByModuleType.magneticModuleType
+
+    act(() => magMenu[0].onClick(false))
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
         commandType: 'magneticModule/disengageMagnet',
@@ -483,6 +388,7 @@ describe('useModuleOverflowMenu', () => {
       },
     })
   })
+
   it('should render temperature module and call handleClick when module is idle', () => {
     const mockHandleClick = jest.fn()
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
@@ -503,9 +409,12 @@ describe('useModuleOverflowMenu', () => {
         wrapper,
       }
     )
-    act(() => result.current.getOnClickCommand(false))
+    const { menuOverflowItemsByModuleType } = result.current
+    const tempMenu = menuOverflowItemsByModuleType.temperatureModuleType
+    act(() => tempMenu[0].onClick(false))
     expect(mockHandleClick).toHaveBeenCalled()
   })
+
   it('should render temp module and create deactivate temp command', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <I18nextProvider i18n={i18n}>
@@ -525,7 +434,9 @@ describe('useModuleOverflowMenu', () => {
         wrapper,
       }
     )
-    act(() => result.current.getOnClickCommand(false))
+    const { menuOverflowItemsByModuleType } = result.current
+    const tempMenu = menuOverflowItemsByModuleType.temperatureModuleType
+    act(() => tempMenu[0].onClick(false))
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
         commandType: 'temperatureModule/deactivate',
@@ -535,6 +446,7 @@ describe('useModuleOverflowMenu', () => {
       },
     })
   })
+
   it('should render TC module and call handleClick when module is idle', () => {
     const mockHandleClick = jest.fn()
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
@@ -555,9 +467,12 @@ describe('useModuleOverflowMenu', () => {
         wrapper,
       }
     )
-    act(() => result.current.getOnClickCommand(false))
+    const { menuOverflowItemsByModuleType } = result.current
+    const tcMenu = menuOverflowItemsByModuleType.thermocyclerModuleType
+    act(() => tcMenu[0].onClick(false))
     expect(mockHandleClick).toHaveBeenCalled()
   })
+
   it('should render TC module and create deactivate temp command', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <I18nextProvider i18n={i18n}>
@@ -577,7 +492,10 @@ describe('useModuleOverflowMenu', () => {
         wrapper,
       }
     )
-    act(() => result.current.getOnClickCommand(false))
+    const { menuOverflowItemsByModuleType } = result.current
+    const tcMenu = menuOverflowItemsByModuleType.thermocyclerModuleType
+    act(() => tcMenu[1].onClick(false))
+
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
         commandType: 'thermocycler/deactivateBlock',
