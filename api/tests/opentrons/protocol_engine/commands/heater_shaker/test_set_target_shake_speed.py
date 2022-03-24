@@ -19,7 +19,9 @@ async def test_set_target_shake_speed(
 ) -> None:
     """It should be able to set the module's shake speed."""
     subject = SetTargetShakeSpeedImpl(state_view=state_view, hardware_api=hardware_api)
-    data = heater_shaker.SetTargetShakeSpeedParams(moduleId="shake-shaker-id", rpm=1234)
+    data = heater_shaker.SetTargetShakeSpeedParams(
+        moduleId="shake-shaker-id", rpm=1234.56
+    )
 
     # Get module view
     hs_module_view = decoy.mock(cls=HeaterShakerModuleView)
@@ -28,7 +30,7 @@ async def test_set_target_shake_speed(
     ).then_return(hs_module_view)
 
     # Stub speed validation from hs module view
-    decoy.when(hs_module_view.is_target_speed_valid(rpm=1234)).then_return(True)
+    decoy.when(hs_module_view.validate_target_speed(rpm=1234.56)).then_return(1234)
 
     # Get attached hardware modules
     attached = [decoy.mock(cls=AbstractModule), decoy.mock(cls=AbstractModule)]
@@ -41,5 +43,5 @@ async def test_set_target_shake_speed(
     )
 
     result = await subject.execute(data)
-
+    decoy.verify(await match.set_speed(rpm=1234), times=1)
     assert result == heater_shaker.SetTargetShakeSpeedResult()

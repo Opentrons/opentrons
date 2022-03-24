@@ -24,7 +24,7 @@ async def test_start_set_target_temperature(
 
     data = heater_shaker.StartSetTargetTemperatureParams(
         moduleId="heater-shaker-id",
-        temperature=42,
+        temperature=42.3,
     )
 
     # Get module view
@@ -35,7 +35,9 @@ async def test_start_set_target_temperature(
     ).then_return(hs_module_view)
 
     # Stub temperature validation from hs module view
-    decoy.when(hs_module_view.is_target_temperature_valid(celsius=42)).then_return(True)
+    decoy.when(hs_module_view.validate_target_temperature(celsius=42.3)).then_return(
+        42.3
+    )
 
     # Get attached hardware modules
     attached = [decoy.mock(cls=AbstractModule), decoy.mock(cls=AbstractModule)]
@@ -48,5 +50,5 @@ async def test_start_set_target_temperature(
     )
 
     result = await subject.execute(data)
-    decoy.verify(await match.start_set_temperature(celsius=42), times=1)
+    decoy.verify(await match.start_set_temperature(celsius=42.3), times=1)
     assert result == heater_shaker.StartSetTargetTemperatureResult()

@@ -287,11 +287,11 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self.wait_for_is_running()
         await self._driver.set_temperature(celsius)
 
-    async def await_temperature(self) -> None:
-        """Wait until target temperature has reached.
+    async def await_temperature(self, awaiting_temperature: float) -> None:
+        """Await temperature in degree Celsius.
 
         Polls temperature module's current temperature until
-        the target temperature is reached.
+        the specified temperature is reached.
         """
         if self.is_simulated:
             return
@@ -300,13 +300,11 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self.wait_next_poll()
 
         async def _await_temperature() -> None:
-            if self.target_temperature is None:
-                raise Exception("No target temperature to wait for.")
             if self.temperature_status == TemperatureStatus.HEATING:
-                while self.temperature < self.target_temperature:
+                while self.temperature < awaiting_temperature:
                     await self.wait_next_poll()
             elif self.temperature_status == TemperatureStatus.COOLING:
-                while self.temperature > self.target_temperature:
+                while self.temperature > awaiting_temperature:
                     await self.wait_next_poll()
 
         t = self._loop.create_task(_await_temperature())
@@ -353,10 +351,10 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self.wait_for_is_running()
         await self._driver.set_rpm(rpm)
 
-    async def await_speed(self) -> None:
-        """Wait until target speed is reached.
+    async def await_speed(self, awaiting_speed: int) -> None:
+        """Wait until specified RPM speed is reached.
 
-        Polls heater/shaker module's current speed until target speed is achieved.
+        Polls heater/shaker module's current speed until awaiting_speed is achieved.
         """
         if self.is_simulated:
             return
@@ -365,27 +363,26 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self.wait_next_poll()
 
         async def _await_speed() -> None:
-            if self.target_speed is None:
-                raise Exception("No target speed to wait for.")
-
             if self.speed_status == SpeedStatus.ACCELERATING:
-                while self.speed < self.target_speed:
+                while self.speed < awaiting_speed:
                     await self.wait_next_poll()
             elif self.speed_status == SpeedStatus.DECELERATING:
-                while self.speed > self.target_speed:
+                while self.speed > awaiting_speed:
                     await self.wait_next_poll()
 
         t = self._loop.create_task(_await_speed())
         await self.make_cancellable(t)
         await t
 
-    async def await_speed_and_temperature(self) -> None:
+    async def await_speed_and_temperature(self, temperature: float, speed: int) -> None:
         """Wait for previously-started speed and temperature commands to complete.
 
         To set speed, use start_set_speed. To set temperature,
         use start_set_temperature.
         """
-        await asyncio.gather(self.await_speed(), self.await_temperature())
+        await asyncio.gather(
+            self.await_speed(speed), self.await_temperature(temperature)
+        )
 
     async def _wait_for_labware_latch(
         self, status: HeaterShakerLabwareLatchStatus
@@ -398,8 +395,7 @@ class HeaterShaker(mod_abc.AbstractModule):
     async def deactivate(self) -> None:
         """Stop heating/cooling; stop shaking and home the plate"""
         await self.wait_for_is_running()
-        # TODO (spp, 2022-3-22): Talk to embedded about using a separate gcode
-        #  for deactivating heatpad/ stopping heating
+        # TODO (spp, 2022-3-22): Use a separate gcode for deactivating heating
         await self._driver.set_temperature(0)
         await self._driver.home()
 

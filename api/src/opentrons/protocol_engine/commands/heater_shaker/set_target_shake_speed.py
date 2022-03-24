@@ -52,7 +52,7 @@ class SetTargetShakeSpeedImpl(
         )
 
         # Verify speed from hs module view
-        assert hs_module_view.is_target_speed_valid(int(params.rpm))
+        validated_speed = hs_module_view.validate_target_speed(params.rpm)
 
         # Allow propagation of ModuleNotAttachedError.
         hs_hardware_module = hs_module_view.find_hardware(
@@ -60,7 +60,7 @@ class SetTargetShakeSpeedImpl(
         )
 
         if hs_hardware_module is not None:
-            await hs_hardware_module.set_speed(rpm=int(params.rpm))
+            await hs_hardware_module.set_speed(rpm=validated_speed)
         return SetTargetShakeSpeedResult()
 
 

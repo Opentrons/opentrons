@@ -58,7 +58,7 @@ def test_load_module(tempdeck_v2_def: ModuleDefinition) -> None:
 
 # TODO (spp, 2022-03-24): parametrize this test as other heating modules are added
 def test_handle_temperature_commands(heater_shaker_v1_def: ModuleDefinition) -> None:
-    """It should update `target_temperature_set` correctly."""
+    """It should update `plate_target_temperature` correctly."""
     load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
         params=commands.LoadModuleParams(
             model=ModuleModel.HEATER_SHAKER_MODULE_V1,
@@ -89,7 +89,7 @@ def test_handle_temperature_commands(heater_shaker_v1_def: ModuleDefinition) -> 
         DeckSlotName.SLOT_1: HardwareModule(
             serial_number="serial-number",
             definition=heater_shaker_v1_def,
-            target_temperature_set=True,
+            plate_target_temperature=42,
         )
     }
     subject.handle_action(actions.UpdateCommandAction(command=deactivate_cmd))
@@ -97,6 +97,6 @@ def test_handle_temperature_commands(heater_shaker_v1_def: ModuleDefinition) -> 
         DeckSlotName.SLOT_1: HardwareModule(
             serial_number="serial-number",
             definition=heater_shaker_v1_def,
-            target_temperature_set=False,
+            plate_target_temperature=None,
         )
     }

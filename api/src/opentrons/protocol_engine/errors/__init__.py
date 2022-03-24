@@ -26,6 +26,8 @@ from .exceptions import (
     RobotDoorOpenError,
     EngageHeightOutOfRangeError,
     NoTargetTemperatureSetError,
+    InvalidTargetSpeedError,
+    InvalidTargetTemperatureError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -57,6 +59,8 @@ __all__ = [
     "RobotDoorOpenError",
     "EngageHeightOutOfRangeError",
     "NoTargetTemperatureSetError",
+    "InvalidTargetTemperatureError",
+    "InvalidTargetSpeedError",
     # error occurrence models
     "ErrorOccurrence",
 ]

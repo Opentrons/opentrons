@@ -30,10 +30,10 @@ async def test_await_temperature(
     ).then_return(hs_module_view)
 
     decoy.when(
-        hs_module_view.parent_module_view.is_target_temperature_set(
+        hs_module_view.parent_module_view.get_plate_target_temperature(
             module_id="heater-shaker-id"
         )
-    ).then_return(True)
+    ).then_return(123.45)
 
     # Get attached hardware modules
     attached = [decoy.mock(cls=AbstractModule), decoy.mock(cls=AbstractModule)]
@@ -46,7 +46,7 @@ async def test_await_temperature(
     )
 
     result = await subject.execute(data)
-    decoy.verify(await match.await_temperature(), times=1)
+    decoy.verify(await match.await_temperature(awaiting_temperature=123.45), times=1)
     assert result == heater_shaker.AwaitTemperatureResult()
 
 

@@ -87,7 +87,7 @@ class HardwareModule:
 
     serial_number: str
     definition: ModuleDefinition
-    target_temperature_set: Optional[bool] = None
+    plate_target_temperature: Optional[float] = None
 
 
 @dataclass
@@ -140,13 +140,13 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 self._state.hardware_module_by_slot[slot_name] = HardwareModule(
                     serial_number=hardware_module.serial_number,
                     definition=hardware_module.definition,
-                    target_temperature_set=True,
+                    plate_target_temperature=command.params.temperature,
                 )
             elif isinstance(command.result, DeactivateHeaterResult):
                 self._state.hardware_module_by_slot[slot_name] = HardwareModule(
                     serial_number=hardware_module.serial_number,
                     definition=hardware_module.definition,
-                    target_temperature_set=False,
+                    plate_target_temperature=None,
                 )
 
 
@@ -223,10 +223,10 @@ class ModuleView(HasState[ModuleState]):
                 f"{module_id} is a {model}, not a Heater-Shaker Module."
             )
 
-    def is_target_temperature_set(self, module_id: str) -> Optional[bool]:
-        """Get whether a module has its target temperature set."""
+    def get_plate_target_temperature(self, module_id: str) -> Optional[float]:
+        """Get the module's target plate temperature."""
         slot_name = self._state.slot_by_module_id[module_id]
-        return self.state.hardware_module_by_slot[slot_name].target_temperature_set
+        return self.state.hardware_module_by_slot[slot_name].plate_target_temperature
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
         """Get the slot location of the given module."""
@@ -625,15 +625,30 @@ class HeaterShakerModuleView:
             )
 
     @staticmethod
-    def is_target_temperature_valid(celsius: float) -> bool:
+    def validate_target_temperature(celsius: float) -> float:
         """Verify that the target temperature being set is valid for heater-shaker."""
-        return (
+        if (
             HEATER_SHAKER_TEMPERATURE_RANGE.min
             <= celsius
             <= HEATER_SHAKER_TEMPERATURE_RANGE.max
-        )
+        ):
+            return celsius
+        else:
+            raise errors.InvalidTargetTemperatureError(
+                f"Heater-Shaker got an invalid temperature {celsius} degree Celsius."
+                f"Valid range is {HEATER_SHAKER_TEMPERATURE_RANGE}."
+            )
 
     @staticmethod
-    def is_target_speed_valid(rpm: int) -> bool:
-        """Verify that the target speed being set is valid for heater-shaker."""
-        return HEATER_SHAKER_SPEED_RANGE.min <= rpm <= HEATER_SHAKER_SPEED_RANGE.max
+    def validate_target_speed(rpm: float) -> int:
+        """Verify that the target speed is valid for heater-shaker & convert to int."""
+        rpm_int = rpm.__trunc__()
+        if HEATER_SHAKER_SPEED_RANGE.min <= rpm <= HEATER_SHAKER_SPEED_RANGE.max:
+            # Typecasting to int gives inconsistent conversion result.
+            # Truncating is more reliable.
+            return rpm_int
+        else:
+            raise errors.InvalidTargetSpeedError(
+                f"Heater-Shaker got invalid speed of {rpm}RPM. Valid range is "
+                f"{HEATER_SHAKER_SPEED_RANGE}."
+            )

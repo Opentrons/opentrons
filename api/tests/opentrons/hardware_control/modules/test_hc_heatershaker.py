@@ -78,7 +78,7 @@ async def test_sim_update(simulating_module):
 async def test_await_both(simulating_module):
     await simulating_module.start_set_temperature(10)
     await simulating_module.start_set_speed(2000)
-    await simulating_module.await_speed_and_temperature()
+    await simulating_module.await_speed_and_temperature(speed=2000, temperature=10)
     assert simulating_module.temperature_status == TemperatureStatus.HOLDING
     assert simulating_module.speed_status == SpeedStatus.HOLDING
 

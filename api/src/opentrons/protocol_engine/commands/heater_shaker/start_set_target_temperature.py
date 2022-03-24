@@ -54,7 +54,7 @@ class StartSetTargetTemperatureImpl(
         )
 
         # Verify temperature from hs module view
-        assert hs_module_view.is_target_temperature_valid(params.temperature)
+        validated_temp = hs_module_view.validate_target_temperature(params.temperature)
 
         # Allow propagation of ModuleNotAttachedError.
         hs_hardware_module = hs_module_view.find_hardware(
@@ -62,7 +62,7 @@ class StartSetTargetTemperatureImpl(
         )
 
         if hs_hardware_module is not None:
-            await hs_hardware_module.start_set_temperature(params.temperature)
+            await hs_hardware_module.start_set_temperature(validated_temp)
         return StartSetTargetTemperatureResult()
 
 

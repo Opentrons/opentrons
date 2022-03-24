@@ -45,16 +45,18 @@ class AwaitTemperatureImpl(
         hs_module_view = self._state_view.modules.get_heater_shaker_module_view(
             module_id=params.moduleId
         )
-        if not hs_module_view.parent_module_view.is_target_temperature_set(
+        target_temp = hs_module_view.parent_module_view.get_plate_target_temperature(
             module_id=params.moduleId
-        ):
+        )
+
+        if target_temp is None:
             raise NoTargetTemperatureSetError("No target temperature to wait for.")
 
         hs_hardware_module = hs_module_view.find_hardware(
             attached_modules=self._hardware_api.attached_modules
         )
         if hs_hardware_module is not None:
-            await hs_hardware_module.await_temperature()
+            await hs_hardware_module.await_temperature(awaiting_temperature=target_temp)
         return AwaitTemperatureResult()
 
 

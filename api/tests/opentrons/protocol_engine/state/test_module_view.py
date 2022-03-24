@@ -282,9 +282,9 @@ def test_get_properties_by_id(
     )
 
 
-@pytest.mark.parametrize("temperature_set", [True, False, None])
+@pytest.mark.parametrize("target", [123.45, None])
 def test_get_is_target_temperature_set(
-    temperature_set: bool, thermocycler_v1_def: ModuleDefinition
+    target: Optional[float], thermocycler_v1_def: ModuleDefinition
 ) -> None:
     """It should return whether target temperature is set."""
     subject = make_module_view(
@@ -293,11 +293,11 @@ def test_get_is_target_temperature_set(
             DeckSlotName.SLOT_1: HardwareModule(
                 serial_number="serial-number",
                 definition=thermocycler_v1_def,
-                target_temperature_set=temperature_set,
+                plate_target_temperature=target,
             )
         },
     )
-    assert subject.is_target_temperature_set("module-id") is temperature_set
+    assert subject.get_plate_target_temperature("module-id") == target
 
 
 def test_get_magnet_home_to_base_offset() -> None:
@@ -816,7 +816,7 @@ def test_magnetic_module_view_calculate_magnet_hardware_height(
         (95.1, False),
     ],
 )
-def test_is_target_temperature_valid(
+def test_validate_target_temperature(
     heater_shaker_v1_def: ModuleDefinition,
     target_temp: float,
     expected_valid: bool,
@@ -832,15 +832,17 @@ def test_is_target_temperature_valid(
         },
     )
     subject = parent.get_heater_shaker_module_view("module-id")
-    assert subject.is_target_temperature_valid(target_temp) == expected_valid
+    if not expected_valid:
+        with pytest.raises(errors.InvalidTargetTemperatureError):
+            subject.validate_target_temperature(target_temp)
 
 
 @pytest.mark.parametrize(
-    argnames=["target_rpm", "expected_valid"],
-    argvalues=[(199, False), (200, True), (3000, True), (3001, False)],
+    argnames=["rpm_param", "validated_param"],
+    argvalues=[(200.1, 200), (250.6, 250), (300.9, 300)],
 )
-def test_is_heater_shaker_target_speed_valid(
-    target_rpm: int, expected_valid: bool, heater_shaker_v1_def: ModuleDefinition
+def test_validate_heater_shaker_target_speed_converts_to_int(
+    rpm_param: float, validated_param: bool, heater_shaker_v1_def: ModuleDefinition
 ) -> None:
     """It should validate heater-shaker target rpm."""
     parent = make_module_view(
@@ -853,4 +855,27 @@ def test_is_heater_shaker_target_speed_valid(
         },
     )
     subject = parent.get_heater_shaker_module_view("module-id")
-    assert subject.is_target_speed_valid(target_rpm) == expected_valid
+    assert subject.validate_target_speed(rpm_param) == validated_param
+
+
+@pytest.mark.parametrize(
+    argnames=["rpm_param", "expected_valid"],
+    argvalues=[(199.9, False), (200.1, True), (3000.7, True), (3001, False)],
+)
+def test_validate_heater_shaker_target_speed_raises_error(
+    rpm_param: float, expected_valid: bool, heater_shaker_v1_def: ModuleDefinition
+) -> None:
+    """It should validate heater-shaker target rpm."""
+    parent = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_module_by_slot={
+            DeckSlotName.SLOT_1: HardwareModule(
+                serial_number="serial-number",
+                definition=heater_shaker_v1_def,
+            )
+        },
+    )
+    subject = parent.get_heater_shaker_module_view("module-id")
+    if not expected_valid:
+        with pytest.raises(errors.InvalidTargetSpeedError):
+            subject.validate_target_speed(rpm_param)
