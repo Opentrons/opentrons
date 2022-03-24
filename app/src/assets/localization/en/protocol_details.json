@@ -1,0 +1,17 @@
+{
+  "creation_method": "creation method",
+  "deck_setup": "deck setup",
+  "description": "description",
+  "labware": "labware",
+  "last_analyzed": "last analyzed",
+  "last_updated": "last updated",
+  "left_mount": "left mount",
+  "liquids": "liquids",
+  "org_or_author": "org/author",
+  "modules": "modules",
+  "read_more": "read more",
+  "right_mount": "right mount",
+  "robot": "robot",
+  "robot_configuration": "robot configuration",
+  "run_protocol": "run protocol"
+}
