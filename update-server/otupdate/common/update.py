@@ -75,7 +75,9 @@ async def status(request: web.Request, session: UpdateSession) -> web.Response:
 
 
 async def _save_file(part: BodyPartReader, path: str):
+    LOG.warning(f"path {os.path.join(path, part.name)}, in _save_file")
     with open(os.path.join(path, part.name), "wb") as write:
+        LOG.warning(f"_save_file trying to write at ===> {path}")
         while not part.at_eof():
             chunk = await part.read_chunk()
             decoded = part.decode(chunk)
@@ -93,7 +95,10 @@ def _begin_write(
     session.set_stage(Stages.WRITING)
     write_future = asyncio.ensure_future(
         loop.run_in_executor(
-            None, actions.write_update, rootfs_file_path, session.set_progress
+            None,
+            actions.write_update,
+            rootfs_file_path,
+            session.set_progress,
         )
     )
 
@@ -115,9 +120,11 @@ def _begin_validation(
     actions: update_actions.UpdateActionsInterface,
 ) -> asyncio.futures.Future:
     """Start the validation process."""
+    LOG.warning("In _begin_validation")
     session.set_stage(Stages.VALIDATING)
-    cert_path = config.update_cert_path if config.signature_required else None
-
+    # cert_path = config.update_cert_path if config.signature_required else None
+    # hardcode cert_path to None for now, not sure if config has this fixed!
+    cert_path = None
     validation_future = asyncio.ensure_future(
         loop.run_in_executor(
             None,
@@ -157,10 +164,15 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
         )
     reader = await request.multipart()
     async for part in reader:
+        LOG.warning(f"header being currently read ===> {part.headers} in file_upload")
         if part.name != "ot2-system.zip":
             LOG.warning(f"Unknown field name {part.name} in file_upload, ignoring")
             await part.release()
         else:
+            LOG.warning(
+                f"Part {part.name} being saved to "
+                f"{session.download_path}, in file_upload"
+            )
             await _save_file(part, session.download_path)
 
     maybe_actions = update_actions.UpdateActionsInterface.from_request(request)

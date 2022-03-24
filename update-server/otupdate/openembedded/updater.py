@@ -6,7 +6,19 @@ from typing import Callable, Optional
 import enum
 import subprocess
 
+from otupdate.common.file_actions import (
+    unzip_update,
+    hash_file,
+    verify_signature,
+    HashMismatch,
+)
+
 import logging
+
+ROOTFS_SIG_NAME = "rootfs.ext4.hash.sig"
+ROOTFS_HASH_NAME = "rootfs.ext4.hash"
+ROOTFS_NAME = "rootfs.ext4"
+UPDATE_FILES = [ROOTFS_NAME, ROOTFS_SIG_NAME, ROOTFS_HASH_NAME]
 
 LOG = logging.getLogger(__name__)
 
@@ -24,13 +36,12 @@ class PartitionManager:
         # fw_printenv -n root_part gives the currently
         # active root_fs partition, find that, and
         # set other partition as unused partition!
-        sp = subprocess.Popen("fw_printenv -n root_part", shell=True, stdout=subprocess.PIPE)
-        which = sp.stdout.read().strip()
+        which = subprocess.check_output(["fw_printenv", "-n", "root_part"])
         return {
             b"2": RootPartitions.THREE.value,
             b"3": RootPartitions.TWO.value,
             # if output is empty, current part is 2, set unused to 3!
-            b"": RootPartitions.THREE.value,
+            b"\n": RootPartitions.THREE.value,
         }[which]
 
     def switch_partition(self):
@@ -109,9 +120,53 @@ class Updater(UpdateActionsInterface):
         cert_path: Optional[str],
     ):
         """
-        Validate that the object is correct in some system-dependent way
+        Worker for validation. Call in an executor (so it can return things)
+
+        -Unzips filepath to directory
+        -Hashes the rootfs inside
+        -If requested, checks the signature of the hash
+        :param filepath: The path to update zip file
+        :param progress_callback: The function call with progress between 0
+                                  and 1.0. May never reach precisely 1.0, best
+                                  only for user information
+        :param cert_path: Path to an x.509 certificate to check the signature
+                          against. If ``None``, signature checking is disabled
+        :return str: Path to the rootfs file ti update
+
+        Will also raise an exception if validation fails
         """
-        pass
+
+        def zip_callback(progress):
+            progress_callback(progress / 2.0)
+
+        required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
+        if cert_path:
+            required.append(ROOTFS_SIG_NAME)
+        files, sizes = unzip_update(filepath, zip_callback, UPDATE_FILES, required)
+
+        def hash_callback(progress):
+            progress_callback(progress / 2.0 + 0.5)
+
+        rootfs = files.get(ROOTFS_NAME)
+        assert rootfs
+        rootfs_hash = hash_file(rootfs, hash_callback, file_size=sizes[ROOTFS_NAME])
+        hashfile = files.get(ROOTFS_HASH_NAME)
+        assert hashfile
+        packaged_hash = open(hashfile, "rb").read().strip()
+        if packaged_hash != rootfs_hash:
+            msg = (
+                f"Hash mismatched: calculated {rootfs_hash!r} != "
+                f"packaged {packaged_hash!r}"
+            )
+            LOG.error(msg)
+            raise HashMismatch(msg)
+
+        if cert_path:
+            sigfile = files.get(ROOTFS_SIG_NAME)
+            assert sigfile
+            verify_signature(hashfile, sigfile, cert_path)
+
+        return rootfs
 
     def write_machine_id(self, current_root: str, new_root: str) -> None:
         """Copy the machine id over to the new partition"""

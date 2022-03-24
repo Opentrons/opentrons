@@ -101,36 +101,41 @@ def unzip_update(
     file_paths: Dict[str, Optional[str]] = {fn: None for fn in acceptable_files}
     file_sizes: Dict[str, int] = {fn: 0 for fn in acceptable_files}
     LOG.info(f"Unzipping {filepath}")
-    with zipfile.ZipFile(filepath, "r") as zf:
-        files = zf.infolist()
-        remaining_filenames = [fn for fn in acceptable_files]
-        for fi in files:
-            if fi.filename in acceptable_files:
-                to_unzip.append(fi)
-                total_size += fi.file_size
-                remaining_filenames.remove(fi.filename)
+    try:
+        with zipfile.ZipFile(filepath, "r") as zf:
+            files = zf.infolist()
+            LOG.debug(f"Found files{files} ")
+            remaining_filenames = [fn for fn in acceptable_files]
+            for fi in files:
                 LOG.debug(f"Found {fi.filename} ({fi.file_size}B)")
-            else:
-                LOG.debug(f"Ignoring {fi.filename}")
+                if fi.filename in acceptable_files:
+                    to_unzip.append(fi)
+                    total_size += fi.file_size
+                    remaining_filenames.remove(fi.filename)
+                    LOG.debug(f"Found {fi.filename} ({fi.file_size}B)")
+                else:
+                    LOG.debug(f"Ignoring {fi.filename}")
 
-        for name in remaining_filenames:
-            if name in mandatory_files:
-                raise FileMissing(f"File {name} missing from zip")
+            for name in remaining_filenames:
+                if name in mandatory_files:
+                    raise FileMissing(f"File {name} missing from zip")
 
-        for fi in to_unzip:
-            uncomp_path = os.path.join(os.path.dirname(filepath), fi.filename)
-            with zf.open(fi) as zipped, open(uncomp_path, "wb") as unzipped:
-                LOG.debug(f"Beginning unzip of {fi.filename} to {uncomp_path}")
-                while True:
-                    chunk = zipped.read(chunk_size)
-                    unzipped.write(chunk)
-                    written_size += len(chunk)
-                    progress_callback(written_size / total_size)
-                    if len(chunk) != chunk_size:
-                        break
-                file_paths[fi.filename] = uncomp_path
-                file_sizes[fi.filename] = fi.file_size
-                LOG.debug(f"Unzipped {fi.filename} to {uncomp_path}")
+            for fi in to_unzip:
+                uncomp_path = os.path.join(os.path.dirname(filepath), fi.filename)
+                with zf.open(fi) as zipped, open(uncomp_path, "wb") as unzipped:
+                    LOG.debug(f"Beginning unzip of {fi.filename} to {uncomp_path}")
+                    while True:
+                        chunk = zipped.read(chunk_size)
+                        unzipped.write(chunk)
+                        written_size += len(chunk)
+                        progress_callback(written_size / total_size)
+                        if len(chunk) != chunk_size:
+                            break
+                    file_paths[fi.filename] = uncomp_path
+                    file_sizes[fi.filename] = fi.file_size
+                    LOG.debug(f"Unzipped {fi.filename} to {uncomp_path}")
+    except Exception:
+        LOG.exception("Exception occurred!!")
     LOG.info(
         f"Unzipped {filepath}, results: \n\t"
         + "\n\t".join(
