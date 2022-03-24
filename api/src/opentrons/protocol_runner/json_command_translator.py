@@ -3,7 +3,8 @@ from typing import cast, List, Any
 from pydantic import parse_obj_as
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6, Command
 from opentrons.protocol_engine import (
-    commands as pe_commands
+    commands as pe_commands,
+    LabwareLocation
 )
 
 
@@ -17,13 +18,14 @@ def get_labware_command(protocol: ProtocolSchemaV6, labware_id : str, command: C
     definition_id = protocol.labware[labware_id].definitionId
     assert definition_id is not None
     labware_command = pe_commands.LoadLabwareCreate(params=pe_commands.LoadLabwareParams(
-        labware_id=command.params.labwareId,
+        labwareId=command.params.labwareId,
         displayName=protocol.labware[labware_id].displayName,
         version=protocol.labwareDefinitions[definition_id].version,
         namespace=protocol.labwareDefinitions[definition_id].namespace,
-        loadName=protocol.labwareDefinitions[definition_id].parameters.loadName),
-        location=pe_commands.LabwareLocation.parse_obj(command.params.location)
-    )
+        loadName=protocol.labwareDefinitions[definition_id].parameters.loadName,
+        location=parse_obj_as(LabwareLocation,  # type: ignore[arg-type]
+                              command.params.location)
+    ))
     return labware_command
 
 
@@ -60,7 +62,7 @@ class JsonCommandTranslator:
             elif command.commandType == "loadLabware":
                 labware_id = command.params.labwareId
                 assert labware_id is not None
-                labware_command = get_labware_command(protocol, labware_id, dict_command)
+                labware_command = get_labware_command(protocol, labware_id, command)
                 commands_list.append(labware_command)
                 continue
                 print(dict_command)
