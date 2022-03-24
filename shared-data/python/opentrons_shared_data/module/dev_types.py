@@ -8,23 +8,33 @@ from typing_extensions import Literal, TypedDict
 
 SchemaV1 = Literal["1"]
 SchemaV2 = Literal["2"]
-SchemaVersions = Union[SchemaV1, SchemaV2]
+SchemaV3 = Literal["3"]
+SchemaVersions = Union[SchemaV1, SchemaV2, SchemaV3]
 
 ModuleSchema = Dict[str, Any]
 
 MagneticModuleType = Literal["magneticModuleType"]
 TemperatureModuleType = Literal["temperatureModuleType"]
 ThermocyclerModuleType = Literal["thermocyclerModuleType"]
+HeaterShakerModuleType = Literal["heaterShakerModuleType"]
 
-ModuleType = Union[MagneticModuleType, TemperatureModuleType, ThermocyclerModuleType]
-
-MagneticModuleModel = Union[Literal["magneticModuleV1"], Literal["magneticModuleV2"]]
-TemperatureModuleModel = Union[
-    Literal["temperatureModuleV1"], Literal["temperatureModuleV2"]
+ModuleType = Union[
+    MagneticModuleType,
+    TemperatureModuleType,
+    ThermocyclerModuleType,
+    HeaterShakerModuleType,
 ]
-ThermocyclerModuleModel = Union[Literal["thermocyclerModuleV1"]]
+
+MagneticModuleModel = Literal["magneticModuleV1", "magneticModuleV2"]
+TemperatureModuleModel = Literal["temperatureModuleV1", "temperatureModuleV2"]
+ThermocyclerModuleModel = Literal["thermocyclerModuleV1"]
+HeaterShakerModuleModel = Literal["heaterShakerModuleV1"]
+
 ModuleModel = Union[
-    MagneticModuleModel, TemperatureModuleModel, ThermocyclerModuleModel
+    MagneticModuleModel,
+    TemperatureModuleModel,
+    ThermocyclerModuleModel,
+    HeaterShakerModuleModel,
 ]
 
 ModuleSlotTransform = TypedDict(
@@ -70,3 +80,7 @@ ModuleDefinitionV1 = TypedDict(
         "quirks": List[str],
     },
 )
+
+# TODO(mc, 2022-03-18): flesh this out; also potentially move
+# from typed-dict to Pydantic
+ModuleDefinitionV3 = ModuleDefinitionV2

@@ -10,7 +10,7 @@ import { useProtocolDetails } from '../hooks'
 import type {
   RunTimeCommand,
   LabwareDefinition2,
-  ProtocolFile,
+  ProtocolAnalysisFile,
 } from '@opentrons/shared-data'
 
 jest.mock('../hooks')
@@ -23,7 +23,7 @@ const mockUseCurrentRunPipetteInfoByMount = useCurrentRunPipetteInfoByMount as j
   typeof useCurrentRunPipetteInfoByMount
 >
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile
 
 const TEMP_ID = 'temperature_module_gen2'
 const TC_ID = 'thermocycler'

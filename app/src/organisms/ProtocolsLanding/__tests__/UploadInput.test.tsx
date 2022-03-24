@@ -44,10 +44,10 @@ describe('UploadInput', () => {
     fireEvent.click(button)
     expect(input.click).toHaveBeenCalled()
   })
-  it('calls create session on choose file', () => {
+  it('calls onUpload callback on choose file', () => {
     const { getByTestId } = render()
     const input = getByTestId('file_input')
-    fireEvent.change(input, { target: { files: ['dummyFile'] } })
-    expect(onUpload).toHaveBeenCalledWith('dummyFile')
+    fireEvent.change(input, { target: { files: [{ path: 'dummyFile' }] } })
+    expect(onUpload).toHaveBeenCalled()
   })
 })

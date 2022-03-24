@@ -181,6 +181,7 @@ class OT3API(
         return self._gantry_load
 
     async def set_gantry_load(self, gantry_load: GantryLoad) -> None:
+        mod_log.info(f"Setting gantry load to {gantry_load}")
         self._gantry_load = gantry_load
         self._move_manager.update_constraints(
             get_system_constraints(self._config.motion_settings, gantry_load)
@@ -222,7 +223,14 @@ class OT3API(
             checked_config = config
         backend = await OT3Controller.build(checked_config)
         await backend.setup_motors()
-        return cls(backend, loop=checked_loop, config=checked_config)
+        api_instance = cls(backend, loop=checked_loop, config=checked_config)
+        await api_instance.cache_instruments()
+        module_controls = await AttachedModulesControl.build(
+            api_instance, board_revision=backend.board_revision
+        )
+        backend.module_controls = module_controls
+        checked_loop.create_task(backend.watch(loop=checked_loop))
+        return api_instance
 
     @classmethod
     async def build_hardware_simulator(
@@ -359,6 +367,29 @@ class OT3API(
             firmware_file, checked_loop, explicit_modeset
         )
 
+    @staticmethod
+    def _gantry_load_from_instruments(
+        instruments: Dict[OT3Mount, PipetteDict]
+    ) -> GantryLoad:
+        """Compute the gantry load based on attached instruments."""
+        left = instruments.get(OT3Mount.LEFT)
+        right = instruments.get(OT3Mount.RIGHT)
+        if left and right:
+            # Only low-throughputs can have the two-instrument case
+            return GantryLoad.TWO_LOW_THROUGHPUT
+        if left:
+            # only a low-throughput pipette can be on the left mount
+            return GantryLoad.LOW_THROUGHPUT
+        if right:
+            # as good a measure as any to define low vs high throughput, though
+            # we'll want to touch this up as we get pipette definitions for HT
+            # pipettes
+            if right["channels"] <= 8:
+                return GantryLoad.LOW_THROUGHPUT
+            else:
+                return GantryLoad.HIGH_THROUGHPUT
+        return GantryLoad.NONE
+
     async def cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
     ) -> None:
@@ -404,8 +435,11 @@ class OT3API(
             )
             await self._backend.configure_mount(mount, hw_config)
         await self._backend.probe_network()
-        # TODO: (AA, 2022-02-09) Set correct pipette kind based on attached instr
-        await self.set_gantry_load(GantryLoad.TWO_LOW_THROUGHPUT)
+        await self.set_gantry_load(
+            self._gantry_load_from_instruments(
+                self._instrument_handler.attached_instruments
+            )
+        )
 
     # Global actions API
     def pause(self, pause_type: PauseType) -> None:
@@ -533,16 +567,30 @@ class OT3API(
                     self._transforms.carriage_offset,
                     OT3Axis,
                 )
-            offset = offset_for_mount(
-                mount, self._config.left_mount_offset, self._config.right_mount_offset
+            ot3pos = self._effector_pos_from_carriage_pos(
+                OT3Mount.from_mount(mount), self._current_position, critical_point
             )
-            cp = self.critical_point_for(mount, critical_point)
-            return {
-                Axis.X: self._current_position[OT3Axis.X] + offset[0] + cp.x,
-                Axis.Y: self._current_position[OT3Axis.Y] + offset[1] + cp.y,
-                z_ax.to_axis(): self._current_position[z_ax] + offset[2] + cp.z,
-                plunger_ax.to_axis(): self._current_position[plunger_ax],
-            }
+            return {ot3ax.to_axis(): value for ot3ax, value in ot3pos.items()}
+
+    def _effector_pos_from_carriage_pos(
+        self,
+        mount: OT3Mount,
+        carriage_position: OT3AxisMap[float],
+        critical_point: Optional[CriticalPoint],
+    ) -> OT3AxisMap[float]:
+        offset = offset_for_mount(
+            mount, self._config.left_mount_offset, self._config.right_mount_offset
+        )
+        cp = self.critical_point_for(mount, critical_point)
+        z_ax = OT3Axis.by_mount(mount)
+        plunger_ax = OT3Axis.of_main_tool_actuator(mount)
+
+        return {
+            OT3Axis.X: carriage_position[OT3Axis.X] + offset[0] + cp.x,
+            OT3Axis.Y: carriage_position[OT3Axis.Y] + offset[1] + cp.y,
+            z_ax: carriage_position[z_ax] + offset[2] + cp.z,
+            plunger_ax: carriage_position[plunger_ax],
+        }
 
     async def gantry_position(
         self,
@@ -859,7 +907,7 @@ class OT3API(
         )
 
         try:
-            self._backend.set_active_current(
+            await self._backend.set_active_current(
                 {OT3Axis.from_axis(aspirate_spec.axis): aspirate_spec.current}
             )
 
@@ -896,7 +944,7 @@ class OT3API(
         )
 
         try:
-            self._backend.set_active_current(
+            await self._backend.set_active_current(
                 {OT3Axis.from_axis(dispense_spec.axis): dispense_spec.current}
             )
             await self._move(
@@ -918,7 +966,9 @@ class OT3API(
         """
         realmount = OT3Mount.from_mount(mount)
         blowout_spec = self._instrument_handler.plan_check_blow_out(realmount)
-        self._backend.set_active_current({blowout_spec.axis: blowout_spec.current})
+        await self._backend.set_active_current(
+            {blowout_spec.axis: blowout_spec.current}
+        )
         target_pos = target_position_from_plunger(
             realmount,
             blowout_spec.plunger_distance,
@@ -950,7 +1000,7 @@ class OT3API(
         spec, _add_tip_to_instrs = self._instrument_handler.plan_check_pick_up_tip(
             realmount, tip_length, presses, increment
         )
-        self._backend.set_active_current(
+        await self._backend.set_active_current(
             {axis: current for axis, current in spec.plunger_currents.items()}
         )
         target_absolute = target_position_from_plunger(
@@ -962,18 +1012,18 @@ class OT3API(
         )
 
         for press in spec.presses:
-            with self._backend.save_current():
-                self._backend.set_active_current(
+            async with self._backend.restore_current():
+                await self._backend.set_active_current(
                     {axis: current for axis, current in press.current.items()}
                 )
                 target_down = target_position_from_relative(
                     realmount, press.relative_down, self._current_position
                 )
                 await self._move(target_down, speed=press.speed)
-                target_up = target_position_from_relative(
-                    realmount, press.relative_up, self._current_position
-                )
-                await self._move(target_up)
+            target_up = target_position_from_relative(
+                realmount, press.relative_up, self._current_position
+            )
+            await self._move(target_up)
 
         _add_tip_to_instrs()
 
@@ -1015,7 +1065,7 @@ class OT3API(
             realmount, home_after
         )
         for move in spec.drop_moves:
-            self._backend.set_active_current(
+            await self._backend.set_active_current(
                 {
                     OT3Axis.from_axis(axis): current
                     for axis, current in move.current.items()
@@ -1044,7 +1094,7 @@ class OT3API(
         for shake in spec.shake_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
 
-        self._backend.set_active_current(
+        await self._backend.set_active_current(
             {
                 OT3Axis.from_axis(axis): current
                 for axis, current in spec.ending_current.items()
@@ -1065,15 +1115,6 @@ class OT3API(
     async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""
         await self._backend.clean_up()
-
-    def get_instrument_max_height(
-        self,
-        mount: Union[top_types.Mount, OT3Mount],
-        critical_point: Optional[CriticalPoint] = None,
-    ) -> float:
-        return self._instrument_handler.instrument_max_height(
-            OT3Mount.from_mount(mount), self._config.z_retract_distance, critical_point
-        )
 
     def critical_point_for(
         self,
@@ -1158,15 +1199,22 @@ class OT3API(
             OT3Mount.from_mount(mount), aspirate, dispense, blow_out
         )
 
-    def instrument_max_height(
+    def get_instrument_max_height(
         self,
         mount: Union[top_types.Mount, OT3Mount],
-        retract_distance: float,
-        critical_point: Optional[CriticalPoint],
+        critical_point: Optional[CriticalPoint] = None,
     ) -> float:
-        return self._instrument_handler.instrument_max_height(
-            OT3Mount.from_mount(mount), retract_distance, critical_point
+        carriage_pos = deck_from_machine(
+            self._backend.home_position(),
+            self._transforms.deck_calibration.attitude,
+            self._transforms.carriage_offset,
+            OT3Axis,
         )
+        pos_at_home = self._effector_pos_from_carriage_pos(
+            OT3Mount.from_mount(mount), carriage_pos, critical_point
+        )
+
+        return pos_at_home[OT3Axis.by_mount(mount)] - self._config.z_retract_distance
 
     async def add_tip(
         self, mount: Union[top_types.Mount, OT3Mount], tip_length: float

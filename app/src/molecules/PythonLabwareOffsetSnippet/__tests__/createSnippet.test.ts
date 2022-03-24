@@ -1,8 +1,8 @@
 import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/6/transferSettings.json'
 import { createSnippet } from '../createSnippet'
-import { ModuleModel, ProtocolFile } from '@opentrons/shared-data'
+import { ModuleModel, ProtocolAnalysisFile } from '@opentrons/shared-data'
 
-const protocolWithMagTempTC = (_protocolWithMagTempTC as unknown) as ProtocolFile<{}>
+const protocolWithMagTempTC = (_protocolWithMagTempTC as unknown) as ProtocolAnalysisFile
 
 // module ids come from the fixture protocol, they are just here for readability
 const TIPRACK_DEF_URI = 'opentrons/opentrons_96_tiprack_1000ul/1'

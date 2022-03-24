@@ -23,6 +23,7 @@ from opentrons.hardware_control.modules.types import (
     MagneticModuleModel,
     TemperatureModuleModel,
     ThermocyclerModuleModel,
+    HeaterShakerModuleModel,
 )
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
@@ -47,10 +48,11 @@ def module_model_from_string(model_string: str) -> ModuleModel:
         MagneticModuleModel,
         TemperatureModuleModel,
         ThermocyclerModuleModel,
+        HeaterShakerModuleModel,
     }:
         try:
-            return model_enum.from_str(model_string)  # type: ignore
-        except AttributeError:
+            return model_enum(model_string)
+        except ValueError:
             pass
     raise AttributeError(f"No such module model {model_string}")
 
@@ -426,7 +428,7 @@ def _load_from_v2(
             overall_height=definition["dimensions"]["bareOverallHeight"],
             height_over_labware=definition["dimensions"]["overLabwareHeight"],
             model=module_model_from_string(definition["model"]),
-            module_type=ModuleType.from_str(definition["moduleType"]),
+            module_type=ModuleType(definition["moduleType"]),
             display_name=definition["displayName"],
         )
     elif definition["moduleType"] == ModuleType.THERMOCYCLER.value:
@@ -437,7 +439,7 @@ def _load_from_v2(
             overall_height=definition["dimensions"]["bareOverallHeight"],
             height_over_labware=definition["dimensions"]["overLabwareHeight"],
             model=module_model_from_string(definition["model"]),
-            module_type=ModuleType.from_str(definition["moduleType"]),
+            module_type=ModuleType(definition["moduleType"]),
             display_name=definition["displayName"],
             lid_height=definition["dimensions"]["lidHeight"],
             configuration=configuration,
@@ -633,7 +635,7 @@ def resolve_module_model(module_model_or_load_name: str) -> ModuleModel:
 
 
 def resolve_module_type(module_model: ModuleModel) -> ModuleType:
-    return ModuleType.from_str(_load_v2_module_def(module_model)["moduleType"])
+    return ModuleType(_load_v2_module_def(module_model)["moduleType"])
 
 
 def models_compatible(model_a: ModuleModel, model_b: ModuleModel) -> bool:

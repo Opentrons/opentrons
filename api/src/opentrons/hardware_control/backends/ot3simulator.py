@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 import asyncio
-from contextlib import contextmanager
+from contextlib import asynccontextmanager
 import logging
 from typing import (
     Dict,
@@ -10,7 +10,7 @@ from typing import (
     Optional,
     Tuple,
     Sequence,
-    Generator,
+    AsyncIterator,
     cast,
     Set,
 )
@@ -23,6 +23,7 @@ from .ot3utils import (
     axis_convert,
     create_move_group,
     get_current_settings,
+    node_to_axis,
 )
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
@@ -285,7 +286,7 @@ class OT3Simulator:
             for mount in OT3Mount
         }
 
-    def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
+    async def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the active current.
 
         Args:
@@ -296,8 +297,8 @@ class OT3Simulator:
         """
         return None
 
-    @contextmanager
-    def save_current(self) -> Generator[None, None, None]:
+    @asynccontextmanager
+    async def restore_current(self) -> AsyncIterator[None]:
         """Save the current."""
         yield
 
@@ -391,6 +392,12 @@ class OT3Simulator:
             NodeId.gantry_y: 0,
             NodeId.pipette_left: 0,
             NodeId.pipette_right: 0,
+        }
+
+    @staticmethod
+    def home_position() -> OT3AxisMap[float]:
+        return {
+            node_to_axis(k): v for k, v in OT3Simulator._get_home_position().items()
         }
 
     async def probe_network(self) -> None:

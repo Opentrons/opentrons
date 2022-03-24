@@ -304,7 +304,12 @@ def test_command_failure_clears_queue() -> None:
     expected_failed_1 = commands.Pause(
         id="command-id-1",
         key="command-key-1",
-        errorId="error-id",
+        error=errors.ErrorOccurrence(
+            id="error-id",
+            errorType="ProtocolEngineError",
+            detail="oh no",
+            createdAt=datetime(year=2023, month=3, day=3),
+        ),
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
         completedAt=datetime(year=2023, month=3, day=3),
@@ -314,7 +319,7 @@ def test_command_failure_clears_queue() -> None:
     expected_failed_2 = commands.Pause(
         id="command-id-2",
         key="command-key-2",
-        errorId="error-id",
+        error=None,
         createdAt=datetime(year=2021, month=1, day=1),
         completedAt=datetime(year=2023, month=3, day=3),
         params=commands.PauseParams(),
@@ -598,9 +603,17 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
 def test_command_store_handles_command_failed() -> None:
     """It should store an error and mark the command if it fails."""
     command = create_running_command(command_id="command-id")
+
+    expected_error_occurrence = errors.ErrorOccurrence(
+        id="error-id",
+        errorType="ProtocolEngineError",
+        createdAt=datetime(year=2022, month=2, day=2),
+        detail="oh no",
+    )
+
     expected_failed_command = create_failed_command(
         command_id="command-id",
-        error_id="error-id",
+        error=expected_error_occurrence,
         completed_at=datetime(year=2022, month=2, day=2),
     )
 
@@ -626,14 +639,7 @@ def test_command_store_handles_command_failed() -> None:
         commands_by_id={
             "command-id": CommandEntry(index=0, command=expected_failed_command),
         },
-        errors_by_id={
-            "error-id": errors.ErrorOccurrence(
-                id="error-id",
-                errorType="ProtocolEngineError",
-                createdAt=datetime(year=2022, month=2, day=2),
-                detail="oh no",
-            )
-        },
+        errors_by_id={},
     )
 
 
