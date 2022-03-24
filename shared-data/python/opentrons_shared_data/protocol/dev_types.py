@@ -353,6 +353,7 @@ PipetteCommand = Union[
     PickUpTipCommand,
     DropTipCommand,
     MoveToSlotCommand,
+    MoveToWellCommand,
 ]
 PipetteCommandId = Union[
     AspirateCommandId,
