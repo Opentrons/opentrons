@@ -23,7 +23,6 @@ import { TertiaryButton } from '../../atoms/Buttons'
 import type { MapDispatchToProps } from 'react-redux'
 import type { State } from '../../redux/types'
 import type { DiscoveryCandidates } from '../../redux/config/types'
-import { restartAfterCommitEpic } from '../../redux/buildroot/epic'
 
 interface SP {
   candidates: DiscoveryCandidates
@@ -31,6 +30,7 @@ interface SP {
 
 interface DP {
   addManualIp: (ip: string) => unknown
+  checkManualIp: () => unknown
 }
 
 type Props = SP & DP
@@ -38,7 +38,7 @@ type Props = SP & DP
 export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
   const { t } = useTranslation('app_settings')
   const [showSpinner, setShowSpinner] = React.useState(false)
-  const [showRefreshBtn, setShowRefreshBtn] = React.useState(false)
+  const [showRefreshBtn, setShowRefreshBtn] = React.useState(true)
   const [showTryBtn, setShowTryBtn] = React.useState(false)
 
   const formik = useFormik({
@@ -63,16 +63,14 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
     },
   })
 
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  const displayLinkBtn = (btnLabel: string) => {
-    const ip = formik.values.ip.trim()
+  const displayLinkBtn = (btnLabel: string): JSX.Element => {
     return (
       <Link
         role="button"
         css={TYPOGRAPHY.pSemiBold}
         color={COLORS.blue}
-        onClick={() => props.addManualIp(ip)}
-        id="GeneralSettings_previousVersionLink"
+        onClick={props.checkManualIp}
+        id="AppSettings_ManualIpSearch_btn"
       >
         {btnLabel}
       </Link>
@@ -141,6 +139,9 @@ const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
   return {
     addManualIp: ip => {
       dispatch(addManualIp(ip))
+      dispatch(startDiscovery())
+    },
+    checkManualIp: () => {
       dispatch(startDiscovery())
     },
   }
