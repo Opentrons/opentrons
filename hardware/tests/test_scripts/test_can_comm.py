@@ -79,18 +79,19 @@ def test_prompt_message_with_payload(
     argnames=["user_input"],
     argvalues=[
         # Not a number
-        [["b"]],
+        [["b", "2"]],
         # Out of range
-        [["1000000000"]],
+        [["1000000000", "2"]],
     ],
 )
 def test_prompt_enum_bad_input(
     user_input: List[str], mock_get_input: MagicMock, mock_output: MagicMock
 ) -> None:
-    """It should raise on bad input."""
+    """It should not raise on bad input but wait until input is good."""
     mock_get_input.side_effect = user_input
-    with pytest.raises(can_comm.InvalidInput):
-        can_comm.prompt_enum(MessageId, mock_get_input, mock_output)
+    parsed_id = can_comm.prompt_enum(MessageId, mock_get_input, mock_output)
+    assert mock_get_input.call_count == 2
+    assert parsed_id == MessageId.device_info_request
 
 
 @pytest.mark.parametrize(
