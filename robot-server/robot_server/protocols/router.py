@@ -111,7 +111,7 @@ async def create_protocol(
         source=source,
     )
 
-    protocol_store.upsert(protocol_resource)
+    protocol_store.insert(protocol_resource)
 
     task_runner.run(
         protocol_analyzer.analyze,

@@ -281,7 +281,7 @@ async def test_create_protocol(
     assert result.status_code == 201
 
     decoy.verify(
-        protocol_store.upsert(protocol_resource),
+        protocol_store.insert(protocol_resource),
         task_runner.run(
             protocol_analyzer.analyze,
             analysis_id="analysis-id",
