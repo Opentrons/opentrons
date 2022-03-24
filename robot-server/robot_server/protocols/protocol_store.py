@@ -12,14 +12,11 @@ from opentrons.protocol_reader import ProtocolSource
 log = getLogger(__name__)
 
 
-# TODO: Exposing metadata from this module won't scale when we have multiple store
-# classes each with their own table. We'll need a way of merging every store's
-# Table into a single MetaData, I think?
-metadata = sqlalchemy.MetaData()
+_metadata = sqlalchemy.MetaData()
 
 _protocol_table = sqlalchemy.Table(
     "protocol",
-    metadata,
+    _metadata,
     sqlalchemy.Column(
         "id",
         sqlalchemy.String,
@@ -31,6 +28,26 @@ _protocol_table = sqlalchemy.Table(
         nullable=False,
     )
 )
+
+
+# TODO: This won't scale when we have multiple store
+# classes each with their own table. We'll need a way of merging every store's
+# Table into a single MetaData, I think?
+# TODO: Make async, probably.
+def create_memory_db() -> sqlalchemy.engine.Engine:
+    # https://docs.sqlalchemy.org/en/14/core/engines.html#sqlite
+    # TODO: I want this to make a new in-memory DB every time it's called.
+    # Multiple calls shouldn't reuse the same in-memory DB.
+    # Is this what actually happens?
+    return sqlalchemy.create_engine("sqlite://")
+
+
+# TODO: Make async, probably.
+# TODO: What happens if the database already has tables?
+#       Trying to recreate them should probably be an error.
+#       Can we detect the conflict?
+def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
+    _metadata.create_all(sql_engine)
 
 
 @dataclass(frozen=True)
@@ -55,47 +72,65 @@ class ProtocolStore:
 
     def __init__(self) -> None:
         """Initialize the ProtocolStore."""
-        self._protocols_by_id: Dict[str, ProtocolResource] = {}
+
+        # TODO: This leaks the SQL engine. We should probably have it passed in
+        # instead of creating it ourselves.
+        sql_engine = create_memory_db()
+        add_tables_to_db(sql_engine)
+        self._record_store = ProtocolRecordStore(sql_engine=sql_engine)
+
+        # TODO: Upon cold boot, when rehydrating the list of protocol records,
+        # find a way to reassociate their source files.
+        self._source_by_id: Dict[str, ProtocolSource] = {}
 
     def insert(self, resource: ProtocolResource) -> None:
         """Insert a protocol resource into the store."""
-        id = resource.protocol_id
-        if id in self._protocols_by_id:
-            # TODO: Add a test for this.
-            raise KeyError(f"A protocol already exists with ID {id}.")
-        else:
-            self._protocols_by_id[id] = resource
+        # TODO: Handle ID conflicts, somehow, and add a test for them.
+        self._record_store.insert(ProtocolRecord(protocol_id=resource.protocol_id, created_at=resource.created_at))
+        self._source_by_id[resource.protocol_id] = resource.source
 
     def get(self, protocol_id: str) -> ProtocolResource:
         """Get a single protocol by ID."""
-        try:
-            return self._protocols_by_id[protocol_id]
-        except KeyError as e:
-            raise ProtocolNotFoundError(protocol_id) from e
+        record = self._record_store.get(protocol_id=protocol_id)
+        return ProtocolResource(
+            protocol_id=record.protocol_id,
+            created_at=record.created_at,
+            source=self._source_by_id[record.protocol_id]
+        )
 
     def get_all(self) -> List[ProtocolResource]:
         """Get all protocols currently saved in this store."""
-        return list(self._protocols_by_id.values())
+        all_records = self._record_store.get_all()
+        return [
+            ProtocolResource(
+                protocol_id=record.protocol_id,
+                created_at=record.created_at,
+                source=self._source_by_id[record.protocol_id]
+            )
+            for record in all_records
+        ]
+
 
     def remove(self, protocol_id: str) -> ProtocolResource:
         """Remove a protocol from the store."""
-        try:
-            entry = self._protocols_by_id.pop(protocol_id)
-        except KeyError as e:
-            raise ProtocolNotFoundError(protocol_id) from e
+        raise NotImplementedError()
+        # try:
+        #     entry = self._protocols_by_id.pop(protocol_id)
+        # except KeyError as e:
+        #     raise ProtocolNotFoundError(protocol_id) from e
 
-        try:
-            protocol_dir = entry.source.directory
-            for file_path in entry.source.files:
-                (protocol_dir / file_path.name).unlink()
-            protocol_dir.rmdir()
-        except Exception as e:
-            log.warning(
-                f"Unable to delete all files for protocol {protocol_id}",
-                exc_info=e,
-            )
+        # try:
+        #     protocol_dir = entry.source.directory
+        #     for file_path in entry.source.files:
+        #         (protocol_dir / file_path.name).unlink()
+        #     protocol_dir.rmdir()
+        # except Exception as e:
+        #     log.warning(
+        #         f"Unable to delete all files for protocol {protocol_id}",
+        #         exc_info=e,
+        #     )
 
-        return entry
+        # return entry
 
 
 @dataclass(frozen=True)
@@ -134,7 +169,7 @@ class ProtocolRecordStore:
                 raise ProtocolNotFoundError(protocol_id=protocol_id) from e
         return self._to_record(sql_result=result)
 
-    def get_all(self, protocol_id: str) -> List[ProtocolRecord]:
+    def get_all(self) -> List[ProtocolRecord]:
         statement = sqlalchemy.select(_protocol_table)
         with self._sql_engine.begin() as transaction:
             results = transaction.execute(statement).all()
@@ -150,9 +185,4 @@ class ProtocolRecordStore:
         created_at = sql_result.created_at
         assert isinstance(created_at, datetime)
         return ProtocolRecord(protocol_id=protocol_id, created_at=created_at)
-
-
-class ProtocolFileStore:
-    pass
-
 
