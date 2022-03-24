@@ -30,13 +30,12 @@ import { Divider } from '../../../atoms/structure'
 import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'
 import { InputField } from '../../../atoms/InputField'
 import { HeaterShakerWizard } from '../HeaterShakerWizard'
+import { useLatchCommand } from './hooks'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
   HeaterShakerSetTargetShakeSpeedCreateCommand,
   HeaterShakerStopShakeCreateCommand,
-  HeaterShakerOpenLatchCreateCommand,
-  HeaterShakerCloseLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface TestShakeSlideoutProps {
@@ -53,25 +52,12 @@ export const TestShakeSlideout = (
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const name = getModuleDisplayName(module.model)
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const { handleLatch, isLatchClosed } = useLatchCommand(module)
 
   const [showCollapsed, setShowCollapsed] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const isShaking = module.data.speedStatus !== 'idle'
-  const isLatchOpen =
-    module.data.labwareLatchStatus === 'idle_open' ||
-    module.data.labwareLatchStatus === 'opening'
-
-  const setLatchCommand:
-    | HeaterShakerOpenLatchCreateCommand
-    | HeaterShakerCloseLatchCreateCommand = {
-    commandType: isLatchOpen
-      ? 'heaterShakerModule/closeLatch'
-      : 'heaterShakerModule/openLatch',
-    params: {
-      moduleId: module.id,
-    },
-  }
 
   const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
     commandType: 'heaterShakerModule/setTargetShakeSpeed',
@@ -86,16 +72,6 @@ export const TestShakeSlideout = (
     params: {
       moduleId: module.id,
     },
-  }
-
-  const handleLatchCommand = (): void => {
-    createLiveCommand({
-      command: setLatchCommand,
-    }).catch((e: Error) => {
-      console.error(
-        `error setting module status with command type ${setLatchCommand.commandType}: ${e.message}`
-      )
-    })
   }
 
   const handleShakeCommand = (): void => {
@@ -197,11 +173,11 @@ export const TestShakeSlideout = (
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
             paddingX={SPACING.spacing4}
-            onClick={handleLatchCommand}
+            onClick={handleLatch}
             disabled={isShaking}
             {...targetProps}
           >
-            {isLatchOpen
+            {!isLatchClosed
               ? t('close', { ns: 'shared' })
               : t('open', { ns: 'shared' })}
           </TertiaryButton>
@@ -250,14 +226,14 @@ export const TestShakeSlideout = (
             marginTop={SPACING.spacing3}
             paddingX={SPACING.spacing4}
             onClick={handleShakeCommand}
-            disabled={isLatchOpen}
+            disabled={!isLatchClosed}
             {...targetProps}
           >
             {isShaking
               ? t('stop', { ns: 'shared' })
               : t('start', { ns: 'shared' })}
           </TertiaryButton>
-          {isLatchOpen ? (
+          {!isLatchClosed ? (
             <Tooltip {...tooltipProps}>
               {t('cannot_shake', { ns: 'heater_shaker' })}
             </Tooltip>

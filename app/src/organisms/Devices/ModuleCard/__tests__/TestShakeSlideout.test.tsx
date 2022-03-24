@@ -6,15 +6,20 @@ import { renderWithProviders } from '@opentrons/components'
 import { TestShakeSlideout } from '../TestShakeSlideout'
 import { HeaterShakerModuleCard } from '../../HeaterShakerWizard/HeaterShakerModuleCard'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
+import { useLatchCommand } from '../hooks'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../HeaterShakerWizard/HeaterShakerModuleCard')
+jest.mock('../hooks')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
 const mockHeaterShakerModuleCard = HeaterShakerModuleCard as jest.MockedFunction<
   typeof HeaterShakerModuleCard
+>
+const mockUseLatchCommand = useLatchCommand as jest.MockedFunction<
+  typeof useLatchCommand
 >
 
 const render = (props: React.ComponentProps<typeof TestShakeSlideout>) => {
@@ -98,6 +103,10 @@ describe('TestShakeSlideout', () => {
       onCloseClick: jest.fn(),
       isExpanded: true,
     }
+    mockUseLatchCommand.mockReturnValue({
+      handleLatch: jest.fn(),
+      isLatchClosed: true,
+    } as any)
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     mockUseLiveCommandMutation.mockReturnValue({
@@ -161,6 +170,10 @@ describe('TestShakeSlideout', () => {
       onCloseClick: jest.fn(),
       isExpanded: true,
     }
+    mockUseLatchCommand.mockReturnValue({
+      handleLatch: jest.fn(),
+      isLatchClosed: false,
+    })
 
     const { getByRole } = render(props)
     const button = getByRole('button', { name: /Start/i })
@@ -189,14 +202,7 @@ describe('TestShakeSlideout', () => {
     const { getByRole } = render(props)
     const button = getByRole('button', { name: /Open/i })
     fireEvent.click(button)
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'heaterShakerModule/openLatch',
-        params: {
-          moduleId: mockCloseLatchHeaterShaker.id,
-        },
-      },
-    })
+    expect(mockUseLatchCommand).toHaveBeenCalled()
   })
 
   it('entering an input for shake speed and clicking start should begin shaking', () => {

@@ -32,6 +32,7 @@ import {
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { Banner } from '../../../atoms/Banner'
 import { ModuleIcon } from '../ModuleIcon'
+import { HeaterShakerWizard } from '../HeaterShakerWizard'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
@@ -67,6 +68,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showAboutModule, setShowAboutModule] = React.useState(false)
   const [showTestShake, setShowTestShake] = React.useState(false)
   const [showBanner, setShowBanner] = React.useState<boolean>(true)
+  const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const hotToTouch: IconProps = { name: 'ot-hot-to-touch' }
 
   const moduleOverflowWrapperRef = useOnClickOutside({
@@ -159,6 +161,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     setShowSlideout(false)
   }
 
+  const handleWizardClick = (): void => {
+    setShowWizard(true)
+    setShowTestShake(false)
+    setShowOverflowMenu(false)
+    setShowSlideout(false)
+  }
+
   return (
     <React.Fragment>
       <Flex
@@ -169,6 +178,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         width={'20rem'}
         data-testid={`module_card_${module.serial}`}
       >
+        {showWizard && (
+          <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
+        )}
         {showSlideout && (
           <ModuleSlideout
             module={module}
@@ -292,6 +304,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               module={module}
               handleClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}
+              handleWizardClick={handleWizardClick}
             />
           </div>
         )}
