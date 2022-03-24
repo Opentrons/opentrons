@@ -282,6 +282,42 @@ def test_get_properties_by_id(
     )
 
 
+@pytest.mark.parametrize("temperature_set", [True, False, None])
+def test_get_is_target_temperature_set(
+    temperature_set: bool, thermocycler_v1_def: ModuleDefinition
+) -> None:
+    """It should return whether target temperature is set."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_module_by_slot={
+            DeckSlotName.SLOT_1: HardwareModule(
+                serial_number="serial-number",
+                definition=thermocycler_v1_def,
+                target_temperature_set=temperature_set,
+            )
+        },
+    )
+    assert subject.is_target_temperature_set("module-id") is temperature_set
+
+
+@pytest.mark.parametrize("speed_set", [True, False, None])
+def test_get_is_target_speed_set(
+    speed_set: bool, thermocycler_v1_def: ModuleDefinition
+) -> None:
+    """It should return whether shake speed has been set for given module."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_module_by_slot={
+            DeckSlotName.SLOT_1: HardwareModule(
+                serial_number="serial-number",
+                definition=thermocycler_v1_def,
+                target_speed_set=speed_set,
+            )
+        },
+    )
+    assert subject.is_target_speed_set("module-id") is speed_set
+
+
 def test_get_magnet_home_to_base_offset() -> None:
     """It should return the model-specific offset to bottom."""
     subject = make_module_view()
