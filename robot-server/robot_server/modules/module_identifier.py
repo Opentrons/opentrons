@@ -1,4 +1,5 @@
 """Identify hardware modules in the robot server."""
+import hashlib
 from dataclasses import dataclass
 from typing import Mapping
 
@@ -36,4 +37,7 @@ class ModuleIdentifier:
 
     @staticmethod
     def _generate_id(serial_number: str, hardware_revision: str) -> str:
-        return f"module{hash((serial_number, hardware_revision))}"
+        hasher = hashlib.blake2s(digest_size=20)
+        hasher.update(serial_number.encode())
+        hasher.update(hardware_revision.encode())
+        return hasher.hexdigest()
