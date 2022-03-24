@@ -11,15 +11,18 @@ on:
       - 'hardware/**'
       - '.github/workflows/hardware-lint-test.yaml'
       - '.github/actions/python/**'
-    branches-ignore: # ignore any release-related thing (handled elsewhere)
-      - 'release'
-      - 'chore_release-**'
+    branches:  # non-release only - release handled elsewhere
+      - 'edge'
     tags-ignore:
       - '*'
   pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
     paths:
       - 'Makefile'
       - 'hardware/**'
+      - '.github/workflows/hardware-lint-test.yaml'
+      - '.github/actions/python/**'
+
   workflow_dispatch:
 
 defaults:

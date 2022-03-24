@@ -12,13 +12,20 @@ on:
       - '.github/actions/python/**/*'
       - '.github/workflows/utils.js'
     branches:
-      - '*'
+      - 'edge'
+      - '*release*'
+      - '*bump*'
+      - '*hotfix*'
     tags:
       - 'v*'
   pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
     paths:
       - 'Makefile'
       - 'shared-data/*/**'
+      - '.github/workflows/shared-data-test-lint-deploy.yaml'
+      - '.github/actions/python/**/*'
+      - '.github/workflows/utils.js'
   workflow_dispatch:
 
 defaults:

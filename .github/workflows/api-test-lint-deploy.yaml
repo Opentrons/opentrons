@@ -6,12 +6,16 @@ name: 'API test/lint/deploy'
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
     paths:
       - 'api/**/*'
       - 'Makefile'
       - 'shared-data/**/*'
       - '!shared-data/js/**'
       - 'hardware/**/*'
+      - '.github/workflows/api-test-lint-deploy.yaml'
+      - '.github/actions/python/**/*'
+      - '.github/workflows/utils.js'
   push:
     paths:
       - 'api/**'
@@ -23,10 +27,14 @@ on:
       - '.github/actions/python/**/*'
       - '.github/workflows/utils.js'
     branches:
-      - '*'
+      - 'edge'
+      - '*release*'
+      - '*bump*'
+      - '*hotfix*'
     tags:
       - 'v*'
   workflow_dispatch:
+
 
 defaults:
   run:
@@ -67,6 +75,8 @@ jobs:
             with-ot-hardware: 'true'
           - os: 'macos-latest'
             with-ot-hardware: 'true'
+          - os: 'macos-latest'
+            python: '3.7'
           - python: '3.10'
             with-ot-hardware: 'true'
     runs-on: '${{ matrix.os }}'
