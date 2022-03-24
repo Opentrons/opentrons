@@ -11,12 +11,12 @@ on:
       - 'hardware/**'
       - '.github/workflows/hardware-lint-test.yaml'
       - '.github/actions/python/**'
-    branches:  # non-release only - release handled elsewhere
+    branches:
       - 'edge'
+      - 'release'
     tags-ignore:
       - '*'
   pull_request:
-    types: [opened, reopened, synchronize, ready_for_review]
     paths:
       - 'Makefile'
       - 'hardware/**'

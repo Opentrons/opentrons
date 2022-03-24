@@ -15,13 +15,11 @@ on:
       - '.github/actions/python/**/*'
     branches:
       - 'edge'
-      - '*release*'
-      - '*bump*'
+      - 'release'
       - '*hotfix*'
     tags-ignore:
       - '*'
   pull_request:
-    types: [opened, reopened, synchronize, ready_for_review]
     paths:
       - 'Makefile'
       - 'notify-server/**/*'

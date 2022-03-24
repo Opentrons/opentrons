@@ -13,13 +13,11 @@ on:
       - '.github/workflows/utils.js'
     branches:
       - 'edge'
-      - '*release*'
-      - '*bump*'
+      - 'release'
       - '*hotfix*'
     tags:
       - 'v*'
   pull_request:
-    types: [opened, reopened, synchronize, ready_for_review]
     paths:
       - 'Makefile'
       - 'shared-data/*/**'

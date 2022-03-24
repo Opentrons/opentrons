@@ -6,7 +6,6 @@ name: 'API test/lint/deploy'
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   pull_request:
-    types: [opened, reopened, synchronize, ready_for_review]
     paths:
       - 'api/**/*'
       - 'Makefile'
@@ -28,8 +27,7 @@ on:
       - '.github/workflows/utils.js'
     branches:
       - 'edge'
-      - '*release*'
-      - '*bump*'
+      - 'release'
       - '*hotfix*'
     tags:
       - 'v*'
