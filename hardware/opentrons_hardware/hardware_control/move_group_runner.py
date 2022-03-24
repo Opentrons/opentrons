@@ -41,13 +41,14 @@ log = logging.getLogger(__name__)
 class MoveGroupRunner:
     """A move command scheduler."""
 
-    def __init__(self, move_groups: MoveGroups) -> None:
+    def __init__(self, move_groups: MoveGroups, start_at_index: int = 0) -> None:
         """Constructor.
 
         Args:
             move_groups: The move groups to run.
         """
         self._move_groups = move_groups
+        self._start_at_index = start_at_index
 
     async def run(self, can_messenger: CanMessenger) -> None:
         """Run the move group.
@@ -81,7 +82,9 @@ class MoveGroupRunner:
                 for node, step in sequence.items():
                     await can_messenger.send(
                         node_id=node,
-                        message=self._get_message_type(step, group_i, seq_i),
+                        message=self._get_message_type(
+                            step, group_i + self._start_at_index, seq_i
+                        ),
                     )
 
     def _convert_velocity(self, velocity: float, interrupts: int) -> Int32Field:

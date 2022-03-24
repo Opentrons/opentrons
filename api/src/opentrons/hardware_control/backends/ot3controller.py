@@ -65,7 +65,10 @@ from opentrons.hardware_control.types import (
     OT3AxisMap,
     CurrentConfig,
 )
-from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_hardware.hardware_control.motion import (
+    MoveStopCondition,
+    MoveGroup,
+)
 from opentrons_hardware.hardware_control.types import NodeMap
 
 if TYPE_CHECKING:
@@ -262,26 +265,30 @@ class OT3Controller:
         move_group_gantry_z = []
         move_group_pipette = []
         if distances_z and velocities_z:
-            z_move = create_home_group(distances_z, velocities_z)
+            z_move = self._filter_move_group(
+                create_home_group(distances_z, velocities_z)
+            )
             move_group_gantry_z.append(z_move)
         if distances_gantry and velocities_gantry:
-            gantry_move = create_home_group(distances_gantry, velocities_gantry)
+            gantry_move = self._filter_move_group(
+                create_home_group(distances_gantry, velocities_gantry)
+            )
             move_group_gantry_z.append(gantry_move)
         if distances_pipette and velocities_pipette:
-            pipette_move = create_home_group(distances_pipette, velocities_pipette)
-            move_group_pipette.append(pipette_move)
-
-        runner_gantry_z = MoveGroupRunner(move_groups=move_group_gantry_z)
-        runner_pipette = MoveGroupRunner(move_groups=move_group_pipette)
-        if move_group_pipette and move_group_gantry_z:
-            await asyncio.gather(
-                runner_gantry_z.run(can_messenger=self._messenger),
-                runner_pipette.run(can_messenger=self._messenger),
+            pipette_move = self._filter_move_group(
+                create_home_group(distances_pipette, velocities_pipette)
             )
-        elif not move_group_pipette:
-            await runner_gantry_z.run(can_messenger=self._messenger)
-        elif not move_group_gantry_z:
-            await runner_pipette.run(can_messenger=self._messenger)
+            move_group_pipette.append(pipette_move)
+        runner_gantry_z = MoveGroupRunner(move_groups=move_group_gantry_z)
+        runner_pipette = MoveGroupRunner(
+            move_groups=move_group_pipette, start_at_index=2
+        )
+        coros = []
+        if move_group_gantry_z:
+            coros.append(runner_gantry_z.run(can_messenger=self._messenger))
+        if move_group_pipette:
+            coros.append(runner_pipette.run(can_messenger=self._messenger))
+        await asyncio.gather(*coros)
 
         axis_positions = {
             axis_to_node(ax): self._get_home_position()[axis_to_node(ax)]
@@ -290,6 +297,18 @@ class OT3Controller:
         self._position.update(axis_positions)
 
         return axis_convert(self._position, 0.0)
+
+    def _filter_move_group(self, move_group: MoveGroup) -> MoveGroup:
+        new_group: MoveGroup = []
+        for step in move_group:
+            new_group.append(
+                {
+                    node: axis_step
+                    for node, axis_step in step.items()
+                    if node in self._present_nodes
+                }
+            )
+        return new_group
 
     async def fast_home(
         self, axes: Sequence[OT3Axis], margin: float
