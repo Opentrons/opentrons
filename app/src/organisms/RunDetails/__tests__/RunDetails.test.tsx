@@ -24,13 +24,15 @@ import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import {
   useCurrentRunStatus,
   useCurrentRunControls,
+  useRunControls,
 } from '../../RunTimeControl/hooks'
 import { ProtocolLoader } from '../../ProtocolUpload'
 import {
   useCloseCurrentRun,
+  useCurrentRunId,
   useIsProtocolRunLoaded,
 } from '../../ProtocolUpload/hooks'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 const mockPush = jest.fn()
 
@@ -58,8 +60,14 @@ const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
 const mockUseCurrentRunControls = useCurrentRunControls as jest.MockedFunction<
   typeof useCurrentRunControls
 >
+const mockUseRunControls = useRunControls as jest.MockedFunction<
+  typeof useRunControls
+>
 const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
   typeof useCloseCurrentRun
+>
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
 >
 const mockUseIsProtocolRunLoaded = useIsProtocolRunLoaded as jest.MockedFunction<
   typeof useIsProtocolRunLoaded
@@ -68,7 +76,7 @@ const mockGetConnectedRobotName = getConnectedRobotName as jest.MockedFunction<
   typeof getConnectedRobotName
 >
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile
 
 const render = () => {
   return renderWithProviders(
@@ -97,6 +105,17 @@ describe('RunDetails', () => {
       } as any)
     when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(true)
     when(mockUseCurrentRunControls).calledWith().mockReturnValue({
+      play: jest.fn(),
+      pause: jest.fn(),
+      stop: jest.fn(),
+      reset: jest.fn(),
+      isPlayRunActionLoading: false,
+      isPauseRunActionLoading: false,
+      isStopRunActionLoading: false,
+      isResetRunLoading: false,
+    })
+    when(mockUseCurrentRunId).calledWith().mockReturnValue('mockRunId')
+    when(mockUseRunControls).calledWith('mockRunId').mockReturnValue({
       play: jest.fn(),
       pause: jest.fn(),
       stop: jest.fn(),

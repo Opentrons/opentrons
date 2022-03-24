@@ -6,8 +6,7 @@ import { getPrimaryPipetteId } from '../utils/getPrimaryPipetteId'
 import { getPipetteWorkflow } from '../utils/getPipetteWorkflow'
 import { getOnePipettePositionCheckSteps } from '../utils/getOnePipettePositionCheckSteps'
 import { getTwoPipettePositionCheckSteps } from '../utils/getTwoPipettePositionCheckSteps'
-
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 const protocolWithOnePipette = ({
   ..._uncasted_v6ProtocolWithTwoPipettes,
@@ -15,8 +14,8 @@ const protocolWithOnePipette = ({
     _uncasted_v6ProtocolWithTwoPipettes.pipettes,
     Object.keys(_uncasted_v6ProtocolWithTwoPipettes.pipettes)[0]
   ),
-} as unknown) as ProtocolFile<any>
-const protocolWithTwoPipettes = (_uncasted_v6ProtocolWithTwoPipettes as unknown) as ProtocolFile<any>
+} as unknown) as ProtocolAnalysisFile
+const protocolWithTwoPipettes = (_uncasted_v6ProtocolWithTwoPipettes as unknown) as ProtocolAnalysisFile
 
 jest.mock('../utils/getPrimaryPipetteId')
 jest.mock('../utils/getPipetteWorkflow')
@@ -89,7 +88,7 @@ describe('getLabwarePositionCheckSteps', () => {
       commands: commandsWithoutLeftPipettePickupTipCommand,
     }
 
-    const pipettesBeingUsedInProtocol: ProtocolFile<any>['pipettes'] = {
+    const pipettesBeingUsedInProtocol: ProtocolAnalysisFile['pipettes'] = {
       [rightPipetteId]: rightPipette,
     }
 

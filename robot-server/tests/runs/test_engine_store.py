@@ -86,7 +86,7 @@ async def test_clear_engine_not_stopped_or_idle(subject: EngineStore) -> None:
         await subject.clear()
 
 
-async def test_clear_idle_engine(decoy: Decoy, subject: EngineStore) -> None:
+async def test_clear_idle_engine(subject: EngineStore) -> None:
     """It should successfully clear engine if idle (not started)."""
     await subject.create(run_id="run-id")
     assert subject.engine is not None
@@ -99,3 +99,20 @@ async def test_clear_idle_engine(decoy: Decoy, subject: EngineStore) -> None:
         subject.engine
     with pytest.raises(EngineMissingError, match="Runner not yet created."):
         subject.runner
+
+
+async def test_get_default_engine(subject: EngineStore) -> None:
+    """It should create and retrieve a default ProtocolEngine."""
+    result = await subject.get_default_engine()
+    repeated_result = await subject.get_default_engine()
+
+    assert isinstance(result, ProtocolEngine)
+    assert repeated_result is result
+
+
+async def test_get_default_engine_conflict(subject: EngineStore) -> None:
+    """It should not allow a default engine if another engine is active."""
+    await subject.create(run_id="run-id")
+
+    with pytest.raises(EngineConflictError):
+        await subject.get_default_engine()

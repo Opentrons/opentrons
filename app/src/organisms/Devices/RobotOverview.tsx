@@ -25,12 +25,8 @@ import {
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { ToggleBtn } from '../../atoms/ToggleBtn'
-import {
-  useLights,
-  useRobot,
-  useIsProtocolRunning,
-  useIsRobotViewable,
-} from './hooks'
+import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
+import { useLights, useRobot, useIsRobotViewable } from './hooks'
 import { RobotStatusBanner } from './RobotStatusBanner'
 
 interface RobotOverviewProps {
@@ -47,7 +43,7 @@ export function RobotOverview({
 
   const { lightsOn, toggleLights } = useLights(robotName)
 
-  const isProtocolRunning = useIsProtocolRunning()
+  const currentRunId = useCurrentRunId()
 
   return robot != null ? (
     <Flex
@@ -91,7 +87,7 @@ export function RobotOverview({
           >
             <NewPrimaryBtn
               textTransform={TEXT_TRANSFORM_NONE}
-              disabled={isProtocolRunning || !isRobotViewable}
+              disabled={currentRunId != null || !isRobotViewable}
             >
               {t('run_a_protocol')}
             </NewPrimaryBtn>

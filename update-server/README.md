@@ -1,6 +1,6 @@
 # Opentrons Update Server
 
-An HTTP server for updating software, firmware, and configration files
+An HTTP server for updating software, firmware, and configuration files
 on Opentrons robots
 
 ## Design considerations
@@ -19,7 +19,7 @@ server takes effect.
 This test is optional (though preferred) for updating configuration
 files and other applications, such as the API server.
 
-## Developement Environment and Testing
+## Development Environment and Testing
 
 To set up the development environment, see the contributing guide in the
 root of the [Opentrons/opentrons repository](https://github.com/Opentrons/opentrons).

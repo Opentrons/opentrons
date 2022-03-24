@@ -22,7 +22,8 @@ sdist_file = dist/$(call python_get_sdistname,hardware,opentrons_hardware)
 # make test tests=tests/opentrons/tools/test_pipette_memory.py would run only the
 # specified test
 tests ?= tests
-test_opts ?=  --cov=opentrons_hardware --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+cov_opts ?= --cov=opentrons_hardware --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+test_opts ?=
 
 # These variables must be overridden when make deploy or make deploy-staging is run
 # to set the auth details for pypi
@@ -80,6 +81,10 @@ sdist: $(sdist_file)
 .PHONY: test
 test:
 	$(pytest) -m 'not requires_emulator' $(tests) $(test_opts)
+
+.PHONY: test-cov
+test-cov:
+	$(pytest) -m 'not requires_emulator' $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: test-with-emulator
 test-with-emulator:

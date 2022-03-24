@@ -1,23 +1,26 @@
 import * as React from 'react'
-// import { useTranslation } from 'react-i18next'
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  fetchProtocols,
+  getStoredProtocols,
+} from '../../../redux/protocol-storage'
 import { ProtocolsEmptyState } from '../../../organisms/ProtocolsLanding/ProtocolsEmptyState'
-import { ProtocolsList } from '../../../organisms/ProtocolsLanding/ProtocolsList'
+import { ProtocolList } from '../../../organisms/ProtocolsLanding/ProtocolList'
 
-import { Box } from '@opentrons/components'
+import type { Dispatch, State } from '../../../redux/types'
 
 export function ProtocolsLanding(): JSX.Element {
-  const [protocolsLoaded, setProtocolsLoaded] = React.useState(false)
-  return (
-    <Box>
-      <PrimaryButton
-        onClick={() => setProtocolsLoaded(!protocolsLoaded)}
-        position="absolute"
-        bottom="100px"
-      >
-        {protocolsLoaded ? 'Hide Loaded Protocols' : 'Show Loaded Protocols'}
-      </PrimaryButton>
-      {protocolsLoaded ? <ProtocolsList /> : <ProtocolsEmptyState />}
-    </Box>
+  const dispatch = useDispatch<Dispatch>()
+  const storedProtocols = useSelector((state: State) =>
+    getStoredProtocols(state)
+  )
+  React.useEffect(() => {
+    dispatch(fetchProtocols())
+  }, [])
+
+  return storedProtocols.length > 0 ? (
+    <ProtocolList storedProtocols={storedProtocols} />
+  ) : (
+    <ProtocolsEmptyState />
   )
 }

@@ -287,7 +287,7 @@ export const mockHeaterShaker: Types.HeaterShakerModule = {
   id: 'heatershaker_id',
   model: 'heaterShakerModuleV1',
   type: 'heaterShakerModuleType',
-  port: '/dev/ot_module_thermocycler0',
+  port: '/dev/ot_module_heatershaker0',
   serial: 'jkl123',
   revision: 'heatershaker_v4.0',
   fwVersion: 'v2.0.0',

@@ -4,10 +4,11 @@ export const white = '#ffffff'
 export const lightBlue = '#f1f8ff'
 export const medGrey = '#e3e3e3'
 export const black = '#000000'
+export const transparent = 'transparent'
 
 // colors with states
 export const blueFocus = '#deecff'
-export const blue = '#006fff'
+export const blue = '#006cfa'
 export const blueHover = '#0061e0'
 export const bluePressed = '#0050b8'
 
@@ -27,6 +28,8 @@ export const darkGreyEnabled = '#707075'
 export const greyHover = '#acacaf'
 export const greyPressed = '#8d8d91'
 export const greyDisabled = '#eaeaeb'
+
+export const lightGrey = '#f8f8f8'
 
 export const yellow = '#f2b53c'
 export const yellowHover = '#eca20f'

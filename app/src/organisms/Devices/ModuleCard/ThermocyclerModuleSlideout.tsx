@@ -5,7 +5,7 @@ import {
   getModuleDisplayName,
   TEMP_LID_MAX,
   TEMP_LID_MIN,
-  TEMP_MAX,
+  TEMP_BLOCK_MAX,
   TEMP_MIN,
 } from '@opentrons/shared-data'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -56,7 +56,7 @@ export const ThermocyclerModuleSlideout = (
   } else {
     errorMessage =
       tempValue != null &&
-      (parseInt(tempValue) < TEMP_MIN || parseInt(tempValue) > TEMP_MAX)
+      (parseInt(tempValue) < TEMP_MIN || parseInt(tempValue) > TEMP_BLOCK_MAX)
         ? t('input_out_of_range')
         : null
   }
@@ -162,6 +162,6 @@ const getTCTempRange = (isSecondaryTemp = false): TemperatureRanges => {
   if (isSecondaryTemp) {
     return { min: TEMP_LID_MIN, max: TEMP_LID_MAX }
   } else {
-    return { min: TEMP_MIN, max: TEMP_MAX }
+    return { min: TEMP_MIN, max: TEMP_BLOCK_MAX }
   }
 }
