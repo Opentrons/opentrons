@@ -13,6 +13,10 @@ on:
       - 'api/**/*'
       - 'hardware/**/*'
       - '.github/actions/python/**/*'
+    branches:
+      - 'edge'
+      - 'release'
+      - '*hotfix*'
     tags-ignore:
       - '*'
   pull_request:

@@ -12,6 +12,9 @@ on:
       - 'shared-data/**/*'
       - '!shared-data/js/**'
       - 'hardware/**/*'
+      - '.github/workflows/api-test-lint-deploy.yaml'
+      - '.github/actions/python/**/*'
+      - '.github/workflows/utils.js'
   push:
     paths:
       - 'api/**'
@@ -23,10 +26,13 @@ on:
       - '.github/actions/python/**/*'
       - '.github/workflows/utils.js'
     branches:
-      - '*'
+      - 'edge'
+      - 'release'
+      - '*hotfix*'
     tags:
       - 'v*'
   workflow_dispatch:
+
 
 defaults:
   run:
@@ -67,6 +73,8 @@ jobs:
             with-ot-hardware: 'true'
           - os: 'macos-latest'
             with-ot-hardware: 'true'
+          - os: 'macos-latest'
+            python: '3.10'
           - python: '3.10'
             with-ot-hardware: 'true'
     runs-on: '${{ matrix.os }}'
