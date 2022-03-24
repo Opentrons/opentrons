@@ -80,7 +80,7 @@ export function Toast(props: ToastProps): JSX.Element {
         <StyledText as="p">{message}</StyledText>
       </Flex>
       {closeButton === true && (
-        <Link onClick={() => onClose()} height={SPACING.spacing5}>
+        <Link onClick={() => onClose()} role="button" height={SPACING.spacing5}>
           <Icon
             name="close"
             width={SPACING.spacing5}
