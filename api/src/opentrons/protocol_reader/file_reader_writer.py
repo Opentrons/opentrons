@@ -38,7 +38,10 @@ class FileReaderWriter:
 
     @staticmethod
     async def read(files: Sequence[AbstractInputFile]) -> List[BufferedFile]:
-        """Read a set of input files into memory."""
+        """Read a set of input files into memory.
+
+        The input files are closed, when done.
+        """
         results: List[Optional[BufferedFile]] = [None for f in files]
 
         async def _read_file(input_file: AbstractInputFile, index: int) -> None:
