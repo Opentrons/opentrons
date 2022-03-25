@@ -8,9 +8,9 @@ export const thermocyclerDeactivateLid: CommandCreator<ModuleOnlyParams> = (
   return {
     commands: [
       {
-        command: 'thermocycler/deactivateLid',
+        commandType: 'thermocycler/deactivateLid',
         params: {
-          module: args.module,
+          moduleId: args.module,
         },
       },
     ],

@@ -8,9 +8,9 @@ export const thermocyclerAwaitBlockTemperature: CommandCreator<TemperatureParams
   return {
     commands: [
       {
-        command: 'thermocycler/awaitBlockTemperature',
+        commandType: 'thermocycler/awaitBlockTemperature',
         params: {
-          module: args.module,
+          moduleId: args.module,
           temperature: args.temperature,
         },
       },

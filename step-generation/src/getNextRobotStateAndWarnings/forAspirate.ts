@@ -10,14 +10,14 @@ import {
   getLocationTotalVolume,
 } from '../utils/misc'
 import * as warningCreators from '../warningCreators'
-import type { AspirateParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 export function forAspirate(
-  params: AspirateParams,
+  params: AspDispAirgapParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  const { pipette: pipetteId, volume, labware: labwareId } = params
+  const { pipetteId, volume, labwareId } = params
   const { robotState, warnings } = robotStateAndWarnings
   const { liquidState } = robotState
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
@@ -25,7 +25,7 @@ export function forAspirate(
   const { allWellsShared, wellsForTips } = getWellsForTips(
     pipetteSpec.channels,
     labwareDef,
-    params.well
+    params.wellName
   )
   assert(
     // @ts-expect-error (sa, 2021-05-03): this assert is unnecessary

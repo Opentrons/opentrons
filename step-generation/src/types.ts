@@ -6,6 +6,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type {
+  CreateCommand,
   LabwareDefinition2,
   ModuleType,
   ModuleModel,
@@ -477,7 +478,7 @@ export interface CommandCreatorWarning {
 }
 
 export interface CommandsAndRobotState {
-  commands: Command[]
+  commands: CreateCommand[]
   robotState: RobotState
   warnings?: CommandCreatorWarning[]
 }
@@ -488,7 +489,7 @@ export interface CommandCreatorErrorResponse {
 }
 
 export interface CommandsAndWarnings {
-  commands: Command[]
+  commands: CreateCommand[]
   warnings?: CommandCreatorWarning[]
 }
 export type CommandCreatorResult =

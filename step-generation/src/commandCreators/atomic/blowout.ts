@@ -1,6 +1,7 @@
 import * as errorCreators from '../../errorCreators'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { Command, CommandCreatorError, CommandCreator } from '../../types'
+import { CreateCommand } from '@opentrons/shared-data'
 
 export const blowout: CommandCreator<BlowoutParams> = (
   args,
@@ -51,15 +52,20 @@ export const blowout: CommandCreator<BlowoutParams> = (
     }
   }
 
-  const commands: Command[] = [
+  const commands: CreateCommand[] = [
     {
-      command: 'blowout',
+      commandType: 'blowout',
       params: {
-        pipette,
-        labware,
-        well,
+        pipetteId: pipette,
+        labwareId: labware,
+        wellName: well,
         flowRate,
-        offsetFromBottomMm,
+        wellLocation: {
+          origin: 'bottom',
+          offset: {
+            z: offsetFromBottomMm,
+          },
+        },
       },
     },
   ]

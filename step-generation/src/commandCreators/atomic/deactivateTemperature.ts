@@ -22,14 +22,14 @@ export const deactivateTemperature: CommandCreator<DeactivateTemperatureArgs> = 
 
   const moduleType = invariantContext.moduleEntities[module]?.type
   const params = {
-    module,
+    moduleId: module,
   }
 
   if (moduleType === TEMPERATURE_MODULE_TYPE) {
     return {
       commands: [
         {
-          command: 'temperatureModule/deactivate',
+          commandType: 'temperatureModule/deactivate',
           params,
         },
       ],
@@ -38,11 +38,11 @@ export const deactivateTemperature: CommandCreator<DeactivateTemperatureArgs> = 
     return {
       commands: [
         {
-          command: 'thermocycler/deactivateLid',
+          commandType: 'thermocycler/deactivateLid',
           params,
         },
         {
-          command: 'thermocycler/deactivateBlock',
+          commandType: 'thermocycler/deactivateBlock',
           params,
         },
       ],
@@ -51,7 +51,7 @@ export const deactivateTemperature: CommandCreator<DeactivateTemperatureArgs> = 
     return {
       commands: [
         {
-          command: 'heaterShakerModule/deactivateHeater',
+          commandType: 'heaterShakerModule/deactivateHeater',
           params,
         },
       ],

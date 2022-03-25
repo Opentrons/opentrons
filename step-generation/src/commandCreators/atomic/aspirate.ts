@@ -4,8 +4,8 @@ import {
   modulePipetteCollision,
   thermocyclerPipetteCollision,
 } from '../../utils'
+import type { CreateCommand } from '@opentrons/shared-data'
 import type { AspirateParams } from '@opentrons/shared-data/protocol/types/schemaV3'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5Addendum'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
 /** Aspirate with given args. Requires tip. */
@@ -99,15 +99,20 @@ export const aspirate: CommandCreator<AspirateParams> = (
     }
   }
 
-  const commands: Command[] = [
+  const commands: CreateCommand[] = [
     {
-      command: 'aspirate',
+      commandType: 'aspirate',
       params: {
-        pipette,
+        pipetteId: pipette,
         volume,
-        labware,
-        well,
-        offsetFromBottomMm,
+        labwareId: labware,
+        wellName: well,
+        wellLocation: {
+          origin: 'bottom',
+          offset: {
+            z: offsetFromBottomMm,
+          },
+        },
         flowRate,
       },
     },

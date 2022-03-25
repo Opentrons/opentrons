@@ -26,11 +26,11 @@ beforeEach(() => {
   invariantContext = makeContext()
   dispenseSingleCh150ToA1Args = {
     invariantContext,
-    pipette: DEFAULT_PIPETTE,
+    pipetteId: DEFAULT_PIPETTE,
     volume: 150,
     useFullVolume: false,
-    labware: SOURCE_LABWARE,
-    well: 'A1',
+    labwareId: SOURCE_LABWARE,
+    wellName: 'A1',
   }
 })
 
@@ -389,11 +389,11 @@ describe('...8-channel pipette', () => {
         const result = getUpdatedLiquidState(
           {
             invariantContext: customInvariantContext,
-            labware: SOURCE_LABWARE,
-            pipette: 'p300MultiId',
+            labwareId: SOURCE_LABWARE,
+            pipetteId: 'p300MultiId',
             useFullVolume: false,
             volume: 150,
-            well: 'A1',
+            wellName: 'A1',
           },
           initialLiquidState
         )

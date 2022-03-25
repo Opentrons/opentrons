@@ -25,7 +25,7 @@ export const setShakeSpeed: CommandCreator<SetShakeSpeedArgs> = (
   return {
     commands: [
       {
-        command: 'heaterShakerModule/setTargetShakeSpeed',
+        commandType: 'heaterShakerModule/setTargetShakeSpeed',
         params: {
           moduleId,
           rpm,

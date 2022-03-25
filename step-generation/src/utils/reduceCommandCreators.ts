@@ -1,5 +1,5 @@
 import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5Addendum'
+import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
@@ -10,7 +10,7 @@ import type {
 } from '../types'
 interface CCReducerAcc {
   robotState: RobotState
-  commands: Command[]
+  commands: CreateCommand[]
   errors: CommandCreatorError[]
   warnings: CommandCreatorWarning[]
 }

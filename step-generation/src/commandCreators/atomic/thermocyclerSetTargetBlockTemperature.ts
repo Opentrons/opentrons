@@ -14,9 +14,9 @@ export const thermocyclerSetTargetBlockTemperature: CommandCreator<ThermocyclerS
   return {
     commands: [
       {
-        command: 'thermocycler/setTargetBlockTemperature',
+        commandType: 'thermocycler/setTargetBlockTemperature',
         params: {
-          module: args.module,
+          moduleId: args.module,
           temperature: args.temperature, // NOTE(IL, 2020-05-11): 'volume' param supported in schema but not implemented, so don't use it
         },
       },

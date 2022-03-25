@@ -82,7 +82,7 @@ interface MoveToSlotParams {
   forceDirect?: boolean
 }
 
-interface MoveToWellParams {
+export interface MoveToWellParams {
   pipetteId: string
   labwareId: string
   wellName: string

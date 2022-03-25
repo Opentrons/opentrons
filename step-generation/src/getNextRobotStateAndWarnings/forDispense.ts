@@ -1,20 +1,20 @@
 import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
-import type { DispenseParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 export function forDispense(
-  params: DispenseParams,
+  params: AspDispAirgapParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  const { labware, pipette, volume, well } = params
+  const { labwareId, pipetteId, volume, wellName } = params
   const { robotState } = robotStateAndWarnings
   dispenseUpdateLiquidState({
     invariantContext,
-    labware,
-    pipette,
+    labwareId,
+    pipetteId,
     prevLiquidState: robotState.liquidState,
     useFullVolume: false,
     volume,
-    well,
+    wellName,
   })
 }

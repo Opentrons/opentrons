@@ -1,29 +1,39 @@
 import { _stripNoOpMixCommands } from '../utils/stripNoOpCommands'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5Addendum'
+import type { CreateCommand } from '@opentrons/shared-data'
 
 describe('_stripNoOpMixCommands', () => {
   it('should remove pairs of aspirate+dispense commands when they result in no liquid changes', () => {
-    const commands: Command[] = [
+    const commands: CreateCommand[] = [
       {
-        command: 'aspirate',
+        commandType: 'aspirate',
         params: {
-          pipette: 'pipetteId',
+          pipetteId: 'pipetteId',
           volume: 3,
-          labware: 'labwareId',
-          well: 'A1',
-          offsetFromBottomMm: 1,
+          labwareId: 'labwareId',
+          wellName: 'A1',
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              z: 1,
+            },
+          },
           flowRate: 3.75,
         },
       },
       {
-        command: 'dispense',
+        commandType: 'dispense',
         params: {
-          pipette: 'pipetteId',
+          pipetteId: 'pipetteId',
           volume: 3,
-          labware: 'labwareId',
-          well: 'A1',
+          labwareId: 'labwareId',
+          wellName: 'A1',
           //   NOTE: offsetFromBottomMm and flowRate can differ
-          offsetFromBottomMm: 1.5,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              z: 1.5,
+            },
+          },
           flowRate: 2.5,
         },
       },
@@ -34,27 +44,37 @@ describe('_stripNoOpMixCommands', () => {
     expect(result).toEqual([])
   })
   it('should NOT remove pairs of aspirate+dispense commands when they result in liquid changes', () => {
-    const commands: Command[] = [
+    const commands: CreateCommand[] = [
       {
-        command: 'aspirate',
+        commandType: 'aspirate',
         params: {
-          pipette: 'pipetteId',
+          pipetteId: 'pipetteId',
           volume: 3,
-          labware: 'labwareId',
-          well: 'A1',
-          offsetFromBottomMm: 1,
+          labwareId: 'labwareId',
+          wellName: 'A1',
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              z: 1,
+            },
+          },
           flowRate: 3.75,
         },
       },
       {
-        command: 'dispense',
+        commandType: 'dispense',
         params: {
-          pipette: 'pipetteId',
+          pipetteId: 'pipetteId',
           // dispense different volume than aspirate
           volume: 4,
-          labware: 'labwareId',
-          well: 'A1',
-          offsetFromBottomMm: 1,
+          labwareId: 'labwareId',
+          wellName: 'A1',
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              z: 1,
+            },
+          },
           flowRate: 3.75,
         },
       },

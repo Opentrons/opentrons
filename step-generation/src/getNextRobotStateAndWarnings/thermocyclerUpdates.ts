@@ -5,8 +5,8 @@ import type {
   ModuleOnlyParams,
   TCProfileParams,
   TemperatureParams,
-  ThermocyclerSetTargetBlockTemperatureArgs,
-} from '@opentrons/shared-data/protocol/types/schemaV4'
+  ThermocyclerSetTargetBlockTemperatureParams,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type {
   InvariantContext,
   RobotStateAndWarnings,
@@ -33,14 +33,14 @@ const _getThermocyclerModuleState = (
 }
 
 export const forThermocyclerSetTargetBlockTemperature = (
-  params: ThermocyclerSetTargetBlockTemperatureArgs,
+  params: ThermocyclerSetTargetBlockTemperatureParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { module, temperature } = params
+  const { moduleId, temperature } = params
   const { robotState } = robotStateAndWarnings
 
-  const moduleState = _getThermocyclerModuleState(robotState, module)
+  const moduleState = _getThermocyclerModuleState(robotState, moduleId)
 
   moduleState.blockTargetTemp = temperature
 }
@@ -49,10 +49,10 @@ export const forThermocyclerSetTargetLidTemperature = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { module, temperature } = params
+  const { moduleId, temperature } = params
   const { robotState } = robotStateAndWarnings
 
-  const moduleState = _getThermocyclerModuleState(robotState, module)
+  const moduleState = _getThermocyclerModuleState(robotState, moduleId)
 
   moduleState.lidTargetTemp = temperature
 }
@@ -82,10 +82,10 @@ export const forThermocyclerDeactivateBlock = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { module } = params
+  const { moduleId } = params
   const { robotState } = robotStateAndWarnings
 
-  const moduleState = _getThermocyclerModuleState(robotState, module)
+  const moduleState = _getThermocyclerModuleState(robotState, moduleId)
 
   moduleState.blockTargetTemp = null
 }
@@ -94,10 +94,10 @@ export const forThermocyclerDeactivateLid = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { module } = params
+  const { moduleId } = params
   const { robotState } = robotStateAndWarnings
 
-  const moduleState = _getThermocyclerModuleState(robotState, module)
+  const moduleState = _getThermocyclerModuleState(robotState, moduleId)
 
   moduleState.lidTargetTemp = null
 }
@@ -106,10 +106,10 @@ export const forThermocyclerCloseLid = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { module } = params
+  const { moduleId } = params
   const { robotState } = robotStateAndWarnings
 
-  const moduleState = _getThermocyclerModuleState(robotState, module)
+  const moduleState = _getThermocyclerModuleState(robotState, moduleId)
 
   moduleState.lidOpen = false
 }
@@ -118,10 +118,10 @@ export const forThermocyclerOpenLid = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { module } = params
+  const { moduleId } = params
   const { robotState } = robotStateAndWarnings
 
-  const moduleState = _getThermocyclerModuleState(robotState, module)
+  const moduleState = _getThermocyclerModuleState(robotState, moduleId)
 
   moduleState.lidOpen = true
 }
@@ -130,10 +130,10 @@ export const forThermocyclerRunProfile = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { module, profile } = params
+  const { moduleId, profile } = params
   const { robotState } = robotStateAndWarnings
 
-  const moduleState = _getThermocyclerModuleState(robotState, module)
+  const moduleState = _getThermocyclerModuleState(robotState, moduleId)
 
   if (profile.length > 0) {
     // @ts-expect-error (sa, 2021-05-03): last might return undefined

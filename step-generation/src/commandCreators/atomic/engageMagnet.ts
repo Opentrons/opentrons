@@ -9,8 +9,8 @@ export const engageMagnet: CommandCreator<EngageMagnetArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { module, engageHeight } = args
-  const command = 'magneticModule/engageMagnet'
+  const { module: moduleId, engageHeight } = args
+  const commandType = 'magneticModule/engageMagnet'
 
   if (module === null) {
     return {
@@ -19,15 +19,15 @@ export const engageMagnet: CommandCreator<EngageMagnetArgs> = (
   }
 
   assert(
-    invariantContext.moduleEntities[module]?.type === MAGNETIC_MODULE_TYPE,
-    `expected module ${module} to be magdeck, got ${invariantContext.moduleEntities[module]?.type}`
+    invariantContext.moduleEntities[moduleId]?.type === MAGNETIC_MODULE_TYPE,
+    `expected module ${moduleId} to be magdeck, got ${invariantContext.moduleEntities[moduleId]?.type}`
   )
   return {
     commands: [
       {
-        command: command,
+        commandType,
         params: {
-          module,
+          moduleId,
           engageHeight,
         },
       },

@@ -20,13 +20,13 @@ export const dropTip: CommandCreator<DropTipArgs> = (
     }
   }
 
-  const commands: Command[] = [
+  const commands = [
     {
-      command: 'dropTip',
+      commandType: 'dropTip' as const,
       params: {
-        pipette,
-        labware: FIXED_TRASH_ID,
-        well: 'A1', // TODO: Is 'A1' of the trash always the right place to drop tips?
+        pipetteId: pipette,
+        labwareId: FIXED_TRASH_ID,
+        wellName: 'A1',
       },
     },
   ]

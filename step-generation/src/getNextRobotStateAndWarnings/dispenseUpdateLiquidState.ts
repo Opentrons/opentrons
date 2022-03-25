@@ -17,9 +17,9 @@ type LiquidState = RobotState['liquidState']
 export interface DispenseUpdateLiquidStateArgs {
   invariantContext: InvariantContext
   prevLiquidState: LiquidState
-  labware: string
-  pipette: string
-  well: string
+  labwareId: string
+  pipetteId: string
+  wellName: string
   volume?: number
   // volume value is required when useFullVolume is false
   useFullVolume: boolean
@@ -31,15 +31,15 @@ export function dispenseUpdateLiquidState(
 ): void {
   const {
     invariantContext,
-    labware,
-    pipette,
+    labwareId,
+    pipetteId,
     prevLiquidState,
     useFullVolume,
     volume,
-    well,
+    wellName,
   } = args
-  const pipetteSpec = invariantContext.pipetteEntities[pipette].spec
-  const labwareDef = invariantContext.labwareEntities[labware].def
+  const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
+  const labwareDef = invariantContext.labwareEntities[labwareId].def
   assert(
     !(useFullVolume && typeof volume === 'number'),
     'dispenseUpdateLiquidState takes either `volume` or `useFullVolume`, but got both'
@@ -51,14 +51,14 @@ export function dispenseUpdateLiquidState(
   const { wellsForTips, allWellsShared } = getWellsForTips(
     pipetteSpec.channels,
     labwareDef,
-    well
+    wellName
   )
-  const liquidLabware = prevLiquidState.labware[labware]
+  const liquidLabware = prevLiquidState.labware[labwareId]
   // remove liquid from pipette tips,
   // create intermediate object where sources are updated tip liquid states
   // and dests are "droplets" that need to be merged to dest well contents
   const splitLiquidStates: Record<string, SourceAndDest> = mapValues(
-    prevLiquidState.pipettes[pipette],
+    prevLiquidState.pipettes[pipetteId],
     (prevTipLiquidState: LocationLiquidState): SourceAndDest => {
       if (useFullVolume) {
         const totalTipVolume = getLocationTotalVolume(prevTipLiquidState)
@@ -74,13 +74,13 @@ export function dispenseUpdateLiquidState(
     }
   )
   const mergeLiquidtoSingleWell = {
-    [well]: reduce(
+    [wellName]: reduce(
       splitLiquidStates,
       (wellLiquidStateAcc, splitLiquidStateForTip: SourceAndDest) => {
         const res = mergeLiquid(wellLiquidStateAcc, splitLiquidStateForTip.dest)
         return res
       },
-      liquidLabware[well]
+      liquidLabware[wellName]
     ),
   }
   const mergeTipLiquidToOwnWell = wellsForTips.reduce(
@@ -99,8 +99,8 @@ export function dispenseUpdateLiquidState(
   const labwareLiquidState = allWellsShared
     ? mergeLiquidtoSingleWell
     : mergeTipLiquidToOwnWell
-  prevLiquidState.pipettes[pipette] = mapValues(splitLiquidStates, 'source')
-  prevLiquidState.labware[labware] = Object.assign(
+  prevLiquidState.pipettes[pipetteId] = mapValues(splitLiquidStates, 'source')
+  prevLiquidState.labware[labwareId] = Object.assign(
     liquidLabware,
     labwareLiquidState
   )

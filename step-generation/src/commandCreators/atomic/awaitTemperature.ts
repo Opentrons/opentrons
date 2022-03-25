@@ -47,7 +47,7 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
 
   const moduleType = invariantContext.moduleEntities[module]?.type
   const params = {
-    module,
+    moduleId: module,
     temperature,
   }
 
@@ -56,7 +56,7 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
       return {
         commands: [
           {
-            command: 'temperatureModule/awaitTemperature',
+            commandType: 'temperatureModule/awaitTemperature',
             params,
           },
         ],
@@ -64,9 +64,9 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
 
     case HEATERSHAKER_MODULE_TYPE:
       return {
-        command: [
+        commands: [
           {
-            command: 'heaterShakerModule/awaitTemperature',
+            commandType: 'heaterShakerModule/awaitTemperature',
             params,
           },
         ],

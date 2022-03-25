@@ -74,7 +74,7 @@ export interface TouchTipRunTimeCommand
 }
 export interface PickUpTipCreateCommand {
   commandType: 'pickUpTip'
-  params: PipetteAccessParams & WellLocationParam
+  params: PickUpTipParams
 }
 export interface PickUpTipRunTimeCommand
   extends CommonCommandRunTimeInfo,
@@ -83,7 +83,7 @@ export interface PickUpTipRunTimeCommand
 }
 export interface DropTipCreateCommand {
   commandType: 'dropTip'
-  params: PipetteAccessParams & WellLocationParam
+  params: DropTipParams
 }
 export interface DropTipRunTimeCommand
   extends CommonCommandRunTimeInfo,
@@ -91,12 +91,14 @@ export interface DropTipRunTimeCommand
   result: any
 }
 
-type AspDispAirgapParams = FlowRateParams &
+export type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &
   VolumeParams &
   WellLocationParam
-type BlowoutParams = FlowRateParams & PipetteAccessParams & WellLocationParam
-type TouchTipParams = PipetteAccessParams & WellLocationParam
+export type BlowoutParams = FlowRateParams & PipetteAccessParams & WellLocationParam
+export type TouchTipParams = PipetteAccessParams & WellLocationParam
+export type DropTipParams = TouchTipParams
+export type PickUpTipParams = TouchTipParams
 
 interface FlowRateParams {
   flowRate: number // µL/s

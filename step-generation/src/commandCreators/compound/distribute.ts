@@ -6,11 +6,9 @@ import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
-  airGap,
   aspirate,
   delay,
   dispense,
-  dispenseAirGap,
   dropTip,
   moveToWell,
   replaceTip,
@@ -132,7 +130,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         getWellDepth(destLabwareDef, firstDestWell) + AIR_GAP_OFFSET_FROM_TOP
       const airGapAfterAspirateCommands = aspirateAirGapVolume
         ? [
-            curryCommandCreator(airGap, {
+            curryCommandCreator(aspirate, {
               pipette: args.pipette,
               volume: aspirateAirGapVolume,
               labware: args.sourceLabware,
@@ -151,7 +149,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                   }),
                 ]
               : []),
-            curryCommandCreator(dispenseAirGap, {
+            curryCommandCreator(dispense, {
               pipette: args.pipette,
               volume: aspirateAirGapVolume,
               labware: args.destLabware,
@@ -252,7 +250,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       const airGapAfterDispenseCommands =
         dispenseAirGapVolume && !willReuseTip
           ? [
-              curryCommandCreator(airGap, {
+              curryCommandCreator(aspirate, {
                 pipette: args.pipette,
                 volume: dispenseAirGapVolume,
                 labware: dispenseAirGapLabware,
