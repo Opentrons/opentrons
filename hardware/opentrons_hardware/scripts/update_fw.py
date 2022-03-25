@@ -9,20 +9,16 @@ from typing_extensions import Final
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.build import build_driver
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    FirmwareUpdateStartApp,
-)
+from opentrons_hardware.firmware_update.run import run_update
 from .can_args import add_can_args, build_settings
 from opentrons_hardware.firmware_update import (
-    FirmwareUpdateDownloader,
-    FirmwareUpdateInitiator,
     head,
     gantry_x,
     gantry_y,
     pipette_left,
     pipette_right,
+    gripper,
     HexRecordProcessor,
-    FirmwareUpdateEraser,
 )
 
 logger = logging.getLogger(__name__)
@@ -54,12 +50,16 @@ TARGETS: Final = {
     "gantry-y": gantry_y,
     "pipette-left": pipette_left,
     "pipette-right": pipette_right,
+    "gripper": gripper,
 }
 
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     target = TARGETS[args.target]
+    retry_count = args.retry_count
+    timeout_seconds = args.timeout_seconds
+    erase = not args.no_erase
 
     hex_processor = HexRecordProcessor.from_file(Path(args.file))
 
@@ -68,38 +68,8 @@ async def run(args: argparse.Namespace) -> None:
     messenger = CanMessenger(driver)
     messenger.start()
 
-    initiator = FirmwareUpdateInitiator(messenger)
-    downloader = FirmwareUpdateDownloader(messenger)
-
-    logger.info(f"Initiating FW Update on {target}.")
-    await initiator.run(
-        target=target,
-        retry_count=args.retry_count,
-        ready_wait_time_sec=args.timeout_seconds,
-    )
-
-    if not args.no_erase:
-        eraser = FirmwareUpdateEraser(messenger)
-        logger.info(f"Erasing existing FW Update on {target}.")
-        await eraser.run(
-            node_id=target.bootloader_node,
-            timeout_sec=args.timeout_seconds,
-        )
-    else:
-        logger.info("Skipping erase step.")
-
-    logger.info(f"Downloading FW to {target.bootloader_node}.")
-    await downloader.run(
-        node_id=target.bootloader_node,
-        hex_processor=hex_processor,
-        ack_wait_seconds=args.timeout_seconds,
-    )
-
-    logger.info(f"Restarting FW on {target.system_node}.")
-    await messenger.send(
-        node_id=target.bootloader_node,
-        message=FirmwareUpdateStartApp(),
-    )
+    await run_update(messenger=messenger, target=target, hex_processor=hex_processor,
+                     retry_count=retry_count, timeout_seconds=timeout_seconds, erase=erase)
 
     await messenger.stop()
 

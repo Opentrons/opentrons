@@ -152,6 +152,11 @@ class HexRecordProcessor:
         """Construct from file."""
         return HexRecordProcessor(from_hex_file_path(file_path))
 
+    @classmethod
+    def from_content(cls, file_path: Path) -> HexRecordProcessor:
+        """Construct from file."""
+        return HexRecordProcessor(from_hex_file_path(file_path))
+
     @property
     def start_address(self) -> int:
         """Get the start address.

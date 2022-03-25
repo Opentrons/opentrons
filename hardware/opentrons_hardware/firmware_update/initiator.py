@@ -36,6 +36,9 @@ gantry_x: Final = Target(
 gantry_y: Final = Target(
     system_node=NodeId.gantry_y, bootloader_node=NodeId.gantry_y_bootloader
 )
+gripper: Final = Target(
+    system_node=NodeId.gripper, bootloader_node=NodeId.gripper_bootloader
+)
 
 
 class FirmwareUpdateInitiator:
