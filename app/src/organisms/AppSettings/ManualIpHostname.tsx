@@ -72,14 +72,6 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
     },
   })
 
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  const checkIpAndHostname = () => {
-    // setShowRefreshBtn(false)
-    // setShowSpinner(true)
-    props.checkManualIp()
-    // setShowSpinner(false)
-  }
-
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}

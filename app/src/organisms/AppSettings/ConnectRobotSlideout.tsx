@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import React, { useState, useEffect } from 'react'
+import { useSelector, connect } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -19,29 +19,37 @@ import { Slideout } from '../../atoms/Slideout'
 import { PrimaryButton } from '../../atoms/Buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
-import { getScanning } from '../../redux/discovery'
+import { getScanning, startDiscovery } from '../../redux/discovery'
+import { getConfig } from '../../redux/config'
 
 import type { State } from '../../redux/types'
+import type { MapDispatchToProps } from 'react-redux'
+import type { DiscoveryCandidates } from '../../redux/config/types'
 
 const SUPPORT_PAGE_LINK =
   'https://support.opentrons.com/en/articles/2934336-manually-adding-a-robot-s-ip-address'
 
-interface ConnectRobotSlideoutProps {
-  isExpanded: boolean
-  onCloseClick: () => unknown
+interface SP {
+  candidates: DiscoveryCandidates
 }
 
-export function ConnectRobotSlideout(
+interface DP {
+  checkIpAndHostnam: () => unknown
+}
+type ConnectRobotSlideoutProps = SP &
+  DP & {
+    isExpanded: boolean
+    onCloseClick: () => unknown
+  }
+
+export function ConnectRobotSlideoutComponent(
   props: ConnectRobotSlideoutProps
 ): JSX.Element | null {
-  const [mostRecentAddition, setMostRecentAddition] = React.useState<
-    string | null
-  >(null)
-
-  console.log('ConnectRobotSlideout')
+  const [mostRecentAddition, setMostRecentAddition] = useState<string | null>(
+    null
+  )
   const { onCloseClick, isExpanded } = props
   const { t } = useTranslation('app_settings')
-
   const scanning = useSelector<State>(getScanning)
 
   const displayLinkButton = (buttonLable: string): JSX.Element => {
@@ -50,7 +58,7 @@ export function ConnectRobotSlideout(
         role="button"
         css={TYPOGRAPHY.pSemiBold}
         color={COLORS.blue}
-        // onClick={null}
+        onClick={props.checkIpAndHostnam}
         id="AppSettings_Connection_Button"
       >
         {buttonLable}
@@ -128,3 +136,22 @@ export function ConnectRobotSlideout(
     </Slideout>
   )
 }
+
+const mapStateToProps = (state: State): SP => {
+  return {
+    candidates: getConfig(state)?.discovery.candidates ?? [],
+  }
+}
+
+const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
+  return {
+    checkIpAndHostnam: () => {
+      dispatch(startDiscovery())
+    },
+  }
+}
+
+export const ConnectRobotSlideout = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ConnectRobotSlideoutComponent)
