@@ -16,6 +16,7 @@ def _get_labware_command(
         protocol: ProtocolSchemaV6, command: Command
 ) -> pe_commands.LoadLabwareCreate:
     labware_id = command.params.labwareId
+    # asserting labware_id and definition_id to raise an error in case they do not exist in the v6 model
     assert labware_id is not None
     definition_id = protocol.labware[labware_id].definitionId
     assert definition_id is not None
@@ -50,6 +51,7 @@ def _get_command(command: Command) -> pe_commands.CommandCreate:
 def _get_module_command(protocol: ProtocolSchemaV6, command: Command) -> pe_commands.CommandCreate:
     module_id = command.params.moduleId
     modules = protocol.modules
+    # asserting module_id and modules to raise an error in case they do not exist in the v6 model
     assert module_id is not None
     assert modules is not None
     translated_obj = pe_commands.LoadModuleCreate(params=pe_commands.LoadModuleParams(
@@ -62,6 +64,7 @@ def _get_module_command(protocol: ProtocolSchemaV6, command: Command) -> pe_comm
 
 def _get_pipette_command(protocol: ProtocolSchemaV6, command: Command) -> pe_commands.CommandCreate:
     pipette_id = command.params.pipetteId
+    # asserting pipette_id to raise an error in case it does not exist in the v6 model
     assert pipette_id is not None
     translated_obj = pe_commands.LoadPipetteCreate(params=pe_commands.LoadPipetteParams(
         pipetteName=PipetteName(protocol.pipettes[pipette_id].name),
