@@ -115,3 +115,15 @@ class RobotDoorOpenError(ProtocolEngineError):
 
 class EngageHeightOutOfRangeError(ProtocolEngineError):
     """An error raised when a Magnetic Module engage height is out of bounds."""
+
+
+class NoTargetTemperatureSetError(ProtocolEngineError):
+    """An error raised when awaiting temperature when no target was set."""
+
+
+class InvalidTargetTemperatureError(ProtocolEngineError):
+    """An error raised when attampting to set an invalid target temperature."""
+
+
+class InvalidTargetSpeedError(ProtocolEngineError):
+    """An error raised when attempting to set an invalid target speed."""

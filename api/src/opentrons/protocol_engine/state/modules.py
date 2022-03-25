@@ -8,7 +8,7 @@ from typing import Dict, List, NamedTuple, Optional, Sequence, overload
 from typing_extensions import Final
 from numpy import array, dot
 
-from opentrons.hardware_control.modules import AbstractModule, MagDeck
+from opentrons.hardware_control.modules import AbstractModule, MagDeck, HeaterShaker
 from opentrons.hardware_control.modules.magdeck import (
     engage_height_is_in_range,
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -27,6 +27,10 @@ from ..types import (
 )
 from .. import errors
 from ..commands import Command, LoadModuleResult
+from ..commands.heater_shaker import (
+    StartSetTargetTemperatureResult,
+    DeactivateHeaterResult,
+)
 from ..actions import Action, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
 
@@ -56,12 +60,32 @@ _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
 ]
 
 
+class SpeedRange(NamedTuple):
+    """Class defining minimum and maximum allowed speeds for a shaking module."""
+
+    min: int
+    max: int
+
+
+class TemperatureRange(NamedTuple):
+    """Class defining minimum and maximum allowed temperatures for a heating module."""
+
+    min: float
+    max: float
+
+
+# TODO (spp, 2022-03-22): Move these values to heater-shaker module definition.
+HEATER_SHAKER_TEMPERATURE_RANGE = TemperatureRange(min=37, max=95)
+HEATER_SHAKER_SPEED_RANGE = SpeedRange(min=200, max=3000)
+
+
 @dataclass(frozen=True)
 class HardwareModule:
     """Data describing an actually connected module."""
 
     serial_number: str
     definition: ModuleDefinition
+    plate_target_temperature: Optional[float] = None
 
 
 @dataclass
@@ -98,6 +122,28 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 serial_number=serial_number,
                 definition=definition,
             )
+
+        if isinstance(
+            command.result,
+            (
+                StartSetTargetTemperatureResult,
+                DeactivateHeaterResult,
+            ),
+        ):
+            slot_name = self._state.slot_by_module_id[command.params.moduleId]
+            hardware_module = self._state.hardware_module_by_slot[slot_name]
+            if isinstance(command.result, StartSetTargetTemperatureResult):
+                self._state.hardware_module_by_slot[slot_name] = HardwareModule(
+                    serial_number=hardware_module.serial_number,
+                    definition=hardware_module.definition,
+                    plate_target_temperature=command.params.temperature,
+                )
+            elif isinstance(command.result, DeactivateHeaterResult):
+                self._state.hardware_module_by_slot[slot_name] = HardwareModule(
+                    serial_number=hardware_module.serial_number,
+                    definition=hardware_module.definition,
+                    plate_target_temperature=None,
+                )
 
 
 class ModuleView(HasState[ModuleState]):
@@ -156,6 +202,27 @@ class ModuleView(HasState[ModuleState]):
             raise errors.WrongModuleTypeError(
                 f"{module_id} is a {model}, not a Magnetic Module."
             )
+
+    def get_heater_shaker_module_view(self, module_id: str) -> HeaterShakerModuleView:
+        """Return a `HeaterShakerModuleView` for the given Heater-Shaker Module.
+
+        Raises:
+           ModuleNotLoadedError: If module_id has not been loaded.
+           WrongModuleTypeError: If module_id has been loaded,
+               but it's not a Heater-Shaker Module.
+        """
+        model = self.get_model(module_id=module_id)  # Propagate ModuleNotLoadedError
+        if model == ModuleModel.HEATER_SHAKER_MODULE_V1:
+            return HeaterShakerModuleView(parent_module_view=self, module_id=module_id)
+        else:
+            raise errors.WrongModuleTypeError(
+                f"{module_id} is a {model}, not a Heater-Shaker Module."
+            )
+
+    def get_plate_target_temperature(self, module_id: str) -> Optional[float]:
+        """Get the module's target plate temperature."""
+        slot_name = self._state.slot_by_module_id[module_id]
+        return self.state.hardware_module_by_slot[slot_name].plate_target_temperature
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
         """Get the slot location of the given module."""
@@ -495,3 +562,87 @@ class MagneticModuleView:
                 f" 0 - {MAGNETIC_MODULE_MAX_ENGAGE_HEIGHT[model]}."
             )
         return hardware_units_from_home
+
+
+class HeaterShakerModuleView:
+    """A Heater-Shaker Module view.
+
+    Provides calculations and read-only state access
+    for an individual loaded Heater-Shaker Module.
+    """
+
+    def __init__(self, parent_module_view: ModuleView, module_id: str) -> None:
+        """Initialize the `HeaterShakerModuleView`.
+
+        Do not use this initializer directly, except in tests.
+        Use `ModuleView.get_heater_shaker_module_view()` instead.
+        """
+        self.parent_module_view: Final = parent_module_view
+        self.module_id: Final = module_id
+
+    def find_hardware(
+        self, attached_modules: List[AbstractModule]
+    ) -> Optional[HeaterShaker]:
+        """Find the matching attached hardware module.
+
+        Params:
+            attached_modules: The list of attached hardware modules,
+                from the `HardwareControlAPI`, to search.
+                If the Protocol Engine is using virtual modules,
+                there are no meaningful "attached hardware modules,"
+                so this list is ignored.
+
+        Returns:
+            If the Protocol Engine is using virtual modules, returns ``None``.
+            If not, returns the element of attached_modules that corresponds to
+            the same individual module as this `HeaterShakerModuleView`.
+
+        Raises:
+            ModuleNotAttachedError: If no match was found in ``attached_modules``,
+                and the Protocol Engine is *not* using virtual modules.
+        """
+        if self.parent_module_view.is_virtualizing_modules():
+            return None
+        else:
+            serial_number = self.parent_module_view.get_serial_number(
+                module_id=self.module_id
+            )
+            for candidate in attached_modules:
+                if candidate.device_info["serial"] == serial_number and isinstance(
+                    candidate, HeaterShaker
+                ):
+                    return candidate
+            # This will report a mismatched module type as ModuleNotAttachedError
+            # instead of WrongModuleTypeError, but that's fine because that
+            # shouldn't be possible anyway. (It should be caught at module load.)
+            raise errors.ModuleNotAttachedError(
+                f'No module attached with serial number "{serial_number}'
+                f' for Protocol Engine module ID "{self.module_id}".'
+            )
+
+    @staticmethod
+    def validate_target_temperature(celsius: float) -> float:
+        """Verify that the target temperature being set is valid for heater-shaker."""
+        if (
+            HEATER_SHAKER_TEMPERATURE_RANGE.min
+            <= celsius
+            <= HEATER_SHAKER_TEMPERATURE_RANGE.max
+        ):
+            return celsius
+        else:
+            raise errors.InvalidTargetTemperatureError(
+                f"Heater-Shaker got an invalid temperature {celsius} degree Celsius."
+                f"Valid range is {HEATER_SHAKER_TEMPERATURE_RANGE}."
+            )
+
+    @staticmethod
+    def validate_target_speed(rpm: float) -> int:
+        """Verify that the target speed is valid for heater-shaker & convert to int."""
+        rpm_int = int(round(rpm, 0))
+        if HEATER_SHAKER_SPEED_RANGE.min <= rpm <= HEATER_SHAKER_SPEED_RANGE.max:
+            return rpm_int
+        else:
+            raise errors.InvalidTargetSpeedError(
+                f"Heater-Shaker got invalid speed of {rpm}RPM. Valid range is "
+                f"{HEATER_SHAKER_SPEED_RANGE}."
+            )
