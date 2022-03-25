@@ -2,6 +2,7 @@
 # TODO (amit, 2022-01-26): Figure out why using annotations import ruins
 #  dataclass fields interpretation.
 #  from __future__ import annotations
+from ctypes import util
 from dataclasses import dataclass
 
 from .fields import (
@@ -337,3 +338,18 @@ class PipetteInfoResponsePayload(utils.BinarySerializable):
     pipette_name: PipetteNameField
     pipette_model: utils.UInt16Field
     pipette_serial: PipetteSerialField
+
+
+@dataclass
+class BrushedMotorVrefPayload(utils.BinarySerializable):
+    """A request to set the reference voltage of a brushed motor."""
+
+    v_ref: utils.UInt32Field
+
+
+@dataclass
+class BrushedMotorPwmPayload(utils.BinarySerializable):
+    """A request to set the pwm of a brushed motor."""
+
+    freq: utils.UInt8Field
+    duty_cycle: utils.UInt8Field

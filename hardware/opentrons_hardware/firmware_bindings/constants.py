@@ -92,6 +92,9 @@ class MessageId(int, Enum):
     read_motor_current_request = 0x34
     read_motor_current_response = 0x35
 
+    set_brushed_motor_vref_request = 0x40
+    set_brushed_motor_pwm_request = 0x41
+
     read_presence_sensing_voltage_request = 0x600
     read_presence_sensing_voltage_response = 0x601
 

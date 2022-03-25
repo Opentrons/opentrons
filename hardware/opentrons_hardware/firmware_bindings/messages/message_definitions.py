@@ -405,3 +405,21 @@ class PipetteInfoResponse:  # noqa: D101
     message_id: Literal[
         MessageId.pipette_info_response
     ] = MessageId.pipette_info_response
+
+
+@dataclass
+class SetBrushedMotorVrefRequest:  # noqa: D101
+    payload: payloads.BrushedMotorVrefPayload
+    payload_type: Type[BinarySerializable] = payloads.BrushedMotorVrefPayload
+    message_id: Literal[
+        MessageId.set_brushed_motor_vref_request
+    ] = MessageId.set_brushed_motor_vref_request
+
+
+@dataclass
+class SetBrushedMotorPwmRequest:  # noqa: D101
+    payload: payloads.BrushedMotorPwmPayload
+    payload_type: Type[BinarySerializable] = payloads.BrushedMotorPwmPayload
+    message_id: Literal[
+        MessageId.set_brushed_motor_pwm_request
+    ] = MessageId.set_brushed_motor_pwm_request
