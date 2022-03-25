@@ -102,9 +102,7 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             lineHeight={TYPOGRAPHY.lineHeight12}
             marginLeft={SPACING.spacing3}
-            // marginTop={SPACING.spacing2}
-            // margin={`${SPCING.spacingSM} 0`}
-            // padding={`6px 12px}`}
+            padding={`6px 12px}`}
             type="submit"
           >
             {t('add_ip_button')}
