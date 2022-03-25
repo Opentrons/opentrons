@@ -67,6 +67,8 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
       const ip = values.ip.trim()
       if (!ip) {
         errors.ip = t('add_ip_error')
+        const inputForm = document.getElementById('ip')
+        if (inputForm) inputForm.style.border = '1px solid red'
       }
       return errors
     },
@@ -81,54 +83,53 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
   }
 
   return (
-    <>
-      <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          // paddingRight={SPACING.spacing3}
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      // paddingRight={SPACING.spacing3}
+      // marginTop={SPACING.spacing2}
+      margin={`${SPACING.spacing2} 0`}
+      height={SPACING.spacing6}
+      width="100%"
+      // alignContent={ALIGN_CENTER}
+    >
+      <Form onSubmit={formik.handleSubmit}>
+        <input
+          id="ip"
+          name="ip"
+          type="text"
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          value={formik.values.ip}
+          height={SPACING.spacing5}
+          // width="100%"
+          style={{ flex: 1 }}
+        />
+        <TertiaryButton
+          fontSize={TYPOGRAPHY.fontSizeH6}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          lineHeight={TYPOGRAPHY.lineHeight12}
           // marginTop={SPACING.spacing2}
-          margin={`${SPACING.spacing2} 0`}
-          height={SPACING.spacing6}
-          width="100%"
-          // alignContent={ALIGN_CENTER}
+          // margin={`${SPACING.spacingSM} 0`}
+          // width="75%"
+          padding={`6px 12px}`}
+          type="submit"
         >
-          <Form onSubmit={formik.handleSubmit}>
-            <input
-              id="ip"
-              name="ip"
-              type="text"
-              onChange={formik.handleChange}
-              value={formik.values.ip}
-              height={SPACING.spacing5}
-              width="100%"
-            />
-            <TertiaryButton
-              fontSize={TYPOGRAPHY.fontSizeH6}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              lineHeight={TYPOGRAPHY.lineHeight12}
-              // marginTop={SPACING.spacing2}
-              // margin={`${SPACING.spacingSM} 0`}
-              // width="75%"
-              padding={`6px 12px}`}
-              type="submit"
-            >
-              {t('add_ip_button')}
-            </TertiaryButton>
-          </Form>
-        </Flex>
-        {formik.errors.ip && (
-          <Text
-            fontSize={TYPOGRAPHY.fontSizeH6}
-            lineHeight={TYPOGRAPHY.lineHeight12}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-            fontStyle={TYPOGRAPHY.fontStyleNormal}
-            color={COLORS.error}
-          >
-            {formik.errors.ip}
-          </Text>
-        )}
-      </Flex>
-    </>
+          {t('add_ip_button')}
+        </TertiaryButton>
+      </Form>
+      {formik.errors.ip && (
+        <Text
+          marginTop={SPACING.spacing2}
+          fontSize={TYPOGRAPHY.fontSizeH6}
+          lineHeight={TYPOGRAPHY.lineHeight12}
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
+          fontStyle={TYPOGRAPHY.fontStyleNormal}
+          color={COLORS.error}
+        >
+          {formik.errors.ip}
+        </Text>
+      )}
+    </Flex>
   )
 }
 
