@@ -59,7 +59,7 @@ stages:
           metadata:
             tags:
             - unitTest
-            created: !anystr
+            created: !anyint
             description: A short test protocol
             author: engineering <engineering@opentrons.com>
             protocolName: Simple test protocol
@@ -98,10 +98,10 @@ stages:
               location:
                 slotName: '12'
             commands:
-            - id: a935790e-403f-48f8-aa14-0eaa38b55be2
-              createdAt: '2022-03-24T20:20:13.506293+00:00'
+            - id: !anystr
+              createdAt: !anystr
               commandType: home
-              key: a935790e-403f-48f8-aa14-0eaa38b55be2
+              key: !anystr
               status: succeeded
               params: {}
               result: {}
@@ -110,7 +110,7 @@ stages:
             - id: !anystr
               createdAt: !anystr
               commandType: home
-              key: 5f285901-f302-41d2-afd2-feda7126cb10
+              key: !anystr
               status: succeeded
               params:
                 axes:
@@ -121,12 +121,12 @@ stages:
                 - leftPlunger
                 - rightPlunger
               result: {}
-              startedAt: '2022-03-24T20:20:13.579297+00:00'
-              completedAt: '2022-03-24T20:20:13.579894+00:00'
-            - id: 9d67feb5-fb57-4a52-a4df-a26002508f8f
-              createdAt: '2022-03-24T20:20:13.507600+00:00'
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: loadPipette
-              key: 9d67feb5-fb57-4a52-a4df-a26002508f8f
+              key: !anystr
               status: succeeded
               params:
                 pipetteName: p10_single
@@ -134,12 +134,12 @@ stages:
                 pipetteId: pipetteId
               result:
                 pipetteId: pipetteId
-              startedAt: '2022-03-24T20:20:13.579944+00:00'
-              completedAt: '2022-03-24T20:20:13.580704+00:00'
-            - id: c010aa51-d780-4f39-af0f-c28d6dadbed7
-              createdAt: '2022-03-24T20:20:13.507640+00:00'
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: loadModule
-              key: c010aa51-d780-4f39-af0f-c28d6dadbed7
+              key: !anystr
               status: succeeded
               params:
                 model: magneticModuleV2
@@ -235,13 +235,13 @@ stages:
                           - 1
                   compatibleWith: []
                 model: magneticModuleV2
-                serialNumber: fake-serial-number-1b25854b-5f6f-4793-b68b-768d63778e91
-              startedAt: '2022-03-24T20:20:13.580779+00:00'
-              completedAt: '2022-03-24T20:20:13.582107+00:00'
-            - id: b43dc36c-cf52-4d06-a996-6587faeeec91
-              createdAt: '2022-03-24T20:20:13.507675+00:00'
+                serialNumber: !anystr
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: loadModule
-              key: b43dc36c-cf52-4d06-a996-6587faeeec91
+              key: !anystr
               status: succeeded
               params:
                 model: temperatureModuleV2
@@ -338,13 +338,13 @@ stages:
                   compatibleWith:
                   - temperatureModuleV1
                 model: temperatureModuleV2
-                serialNumber: fake-serial-number-89aa4432-083f-4260-ab5c-a119fdad03f6
-              startedAt: '2022-03-24T20:20:13.582233+00:00'
-              completedAt: '2022-03-24T20:20:13.583384+00:00'
-            - id: ee5c7474-33e0-4be7-990a-c308846aced2
-              createdAt: '2022-03-24T20:20:13.507698+00:00'
+                serialNumber: !anystr
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: loadLabware
-              key: ee5c7474-33e0-4be7-990a-c308846aced2
+              key: !anystr
               status: succeeded
               params:
                 location:
@@ -464,12 +464,12 @@ stages:
                     - B2
                     - C2
                     metadata: {}
-              startedAt: '2022-03-24T20:20:13.583490+00:00'
-              completedAt: '2022-03-24T20:20:13.583622+00:00'
-            - id: ba1a9169-ea9b-4bef-bdbb-0ce2ac9f6ec5
-              createdAt: '2022-03-24T20:20:13.507732+00:00'
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: loadLabware
-              key: ba1a9169-ea9b-4bef-bdbb-0ce2ac9f6ec5
+              key: !anystr
               status: succeeded
               params:
                 location:
@@ -589,12 +589,12 @@ stages:
                     - B2
                     - C2
                     metadata: {}
-              startedAt: '2022-03-24T20:20:13.583713+00:00'
-              completedAt: '2022-03-24T20:20:13.583771+00:00'
-            - id: c2a72df0-c4a5-411d-9fe8-7b8852583886
-              createdAt: '2022-03-24T20:20:13.507753+00:00'
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: loadLabware
-              key: c2a72df0-c4a5-411d-9fe8-7b8852583886
+              key: !anystr
               status: succeeded
               params:
                 location:
@@ -1600,12 +1600,12 @@ stages:
                     - G12
                     - H12
                     metadata: {}
-              startedAt: '2022-03-24T20:20:13.583824+00:00'
-              completedAt: '2022-03-24T20:20:13.583887+00:00'
-            - id: 0dcf39da-ccf3-439f-b469-0b248e62cbce
-              createdAt: '2022-03-24T20:20:13.507775+00:00'
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: loadLabware
-              key: 0dcf39da-ccf3-439f-b469-0b248e62cbce
+              key: !anystr
               status: succeeded
               params:
                 location:
@@ -1660,12 +1660,12 @@ stages:
                   - wells:
                     - A1
                     metadata: {}
-              startedAt: '2022-03-24T20:20:13.583929+00:00'
-              completedAt: '2022-03-24T20:20:13.583975+00:00'
-            - id: 1e2ea863-40a3-4834-abea-2ff8771bdac8
-              createdAt: '2022-03-24T20:20:13.507796+00:00'
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: pickUpTip
-              key: 1e2ea863-40a3-4834-abea-2ff8771bdac8
+              key: !anystr
               status: succeeded
               params:
                 pipetteId: pipetteId
@@ -1678,12 +1678,12 @@ stages:
                     y: 0
                     z: 0
               result: {}
-              startedAt: '2022-03-24T20:20:13.584022+00:00'
-              completedAt: '2022-03-24T20:20:13.621366+00:00'
-            - id: 17778344-6380-4348-8712-ad07bb66803a
-              createdAt: '2022-03-24T20:20:13.507827+00:00'
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: aspirate
-              key: 17778344-6380-4348-8712-ad07bb66803a
+              key: !anystr
               status: succeeded
               params:
                 pipetteId: pipetteId
@@ -1698,12 +1698,12 @@ stages:
                 volume: 5
               result:
                 volume: 5
-              startedAt: '2022-03-24T20:20:13.621734+00:00'
-              completedAt: '2022-03-24T20:20:13.624681+00:00'
-            - id: 20919a78-620b-46d9-907a-7fb47c9d8041
-              createdAt: '2022-03-24T20:20:13.517797+00:00'
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: dispense
-              key: 20919a78-620b-46d9-907a-7fb47c9d8041
+              key: !anystr
               status: succeeded
               params:
                 pipetteId: pipetteId
@@ -1718,12 +1718,12 @@ stages:
                 volume: 4.5
               result:
                 volume: 4.5
-              startedAt: '2022-03-24T20:20:13.625155+00:00'
-              completedAt: '2022-03-24T20:20:13.626989+00:00'
-            - id: e5f76ce7-d764-446e-a128-1d1209d3c1c8
-              createdAt: '2022-03-24T20:20:13.527333+00:00'
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: moveToWell
-              key: e5f76ce7-d764-446e-a128-1d1209d3c1c8
+              key: !anystr
               status: succeeded
               params:
                 pipetteId: pipetteId
@@ -1736,12 +1736,12 @@ stages:
                     y: 0
                     z: 0
               result: {}
-              startedAt: '2022-03-24T20:20:13.627538+00:00'
-              completedAt: '2022-03-24T20:20:13.628903+00:00'
-            - id: b7997f13-49df-4898-bd2a-b15ee81a955e
-              createdAt: '2022-03-24T20:20:13.527434+00:00'
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: moveToWell
-              key: b7997f13-49df-4898-bd2a-b15ee81a955e
+              key: !anystr
               status: succeeded
               params:
                 pipetteId: pipetteId
@@ -1754,12 +1754,12 @@ stages:
                     y: 3
                     z: 10
               result: {}
-              startedAt: '2022-03-24T20:20:13.629136+00:00'
-              completedAt: '2022-03-24T20:20:13.630662+00:00'
-            - id: aee4d544-8fe1-49b1-af43-7f0deb17a09a
-              createdAt: '2022-03-24T20:20:13.527465+00:00'
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: dropTip
-              key: aee4d544-8fe1-49b1-af43-7f0deb17a09a
+              key: !anystr
               status: succeeded
               params:
                 pipetteId: pipetteId
@@ -1772,73 +1772,73 @@ stages:
                     y: 0
                     z: 0
               result: {}
-              startedAt: '2022-03-24T20:20:13.630926+00:00'
-              completedAt: '2022-03-24T20:20:13.635004+00:00'
-            - id: 96999b5c-2fd3-45db-a5c8-072bee669434
-              createdAt: '2022-03-24T20:20:13.527503+00:00'
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: pause
-              key: 96999b5c-2fd3-45db-a5c8-072bee669434
+              key: !anystr
               status: succeeded
               params:
                 message: pause command
               result: {}
-              startedAt: '2022-03-24T20:20:13.635314+00:00'
-              completedAt: '2022-03-24T20:20:13.635455+00:00'
-            - id: aa259e25-2cb0-438b-9bc8-92c3c261e4e2
-              createdAt: '2022-03-24T20:20:13.527538+00:00'
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: moveRelative
-              key: aa259e25-2cb0-438b-9bc8-92c3c261e4e2
+              key: !anystr
               status: succeeded
               params:
                 pipetteId: pipetteId
                 axis: x
                 distance: 1
               result: {}
-              startedAt: '2022-03-24T20:20:13.635683+00:00'
-              completedAt: '2022-03-24T20:20:13.636358+00:00'
-            - id: da089a1d-438d-4206-858d-f5c6bd9865ce
-              createdAt: '2022-03-24T20:20:13.527573+00:00'
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: moveRelative
-              key: da089a1d-438d-4206-858d-f5c6bd9865ce
+              key: !anystr
               status: succeeded
               params:
                 pipetteId: pipetteId
                 axis: y
                 distance: 0.1
               result: {}
-              startedAt: '2022-03-24T20:20:13.636671+00:00'
-              completedAt: '2022-03-24T20:20:13.637225+00:00'
-            - id: '029ade15-7f6e-4d95-b10a-bc87807ad78e'
-              createdAt: '2022-03-24T20:20:13.527599+00:00'
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: savePosition
-              key: '029ade15-7f6e-4d95-b10a-bc87807ad78e'
+              key: !anystr
               status: failed
               params:
                 pipetteId: pipetteId
               error:
-                id: 33e6c727-15cd-4ac8-9ba6-773b9c4eb23d
+                id: !anystr
                 errorType: MustHomeError
-                createdAt: '2022-03-24T20:20:13.663364+00:00'
+                createdAt: !anystr
                 detail: Current position of LEFT pipette is unknown, please home.
-              startedAt: '2022-03-24T20:20:13.637301+00:00'
-              completedAt: '2022-03-24T20:20:13.663364+00:00'
-            - id: b9507820-0792-4ba6-8504-6a1db7537e70
-              createdAt: '2022-03-24T20:20:13.527636+00:00'
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: moveRelative
-              key: b9507820-0792-4ba6-8504-6a1db7537e70
+              key: !anystr
               status: failed
               params:
                 pipetteId: pipetteId
                 axis: z
                 distance: 10
-              completedAt: '2022-03-24T20:20:13.663364+00:00'
-            - id: fe0a4e9e-e721-4483-8a85-addf03fd3812
-              createdAt: '2022-03-24T20:20:13.527660+00:00'
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
               commandType: savePosition
-              key: fe0a4e9e-e721-4483-8a85-addf03fd3812
+              key: !anystr
               status: failed
               params:
                 pipetteId: pipetteId
                 positionId: positionId
-              completedAt: '2022-03-24T20:20:13.663364+00:00'
+              completedAt: !anystr
             errors: []

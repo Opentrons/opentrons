@@ -2,7 +2,8 @@
 import pytest
 from typing import Dict, List
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Parameters, Metadata, DisplayCategory, BrandData, CornerOffsetFromSlot, Dimensions, Group, Metadata1, WellDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Parameters, Metadata, DisplayCategory, \
+    BrandData, CornerOffsetFromSlot, Dimensions, Group, Metadata1, WellDefinition
 import opentrons_shared_data.protocol.models as json_v6_models
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_runner.json_command_translator import JsonCommandTranslator
@@ -323,28 +324,36 @@ def subject() -> JsonCommandTranslator:
     return JsonCommandTranslator()
 
 
+def _load_labware_definition_data() -> json_v6_models.LabwareDefinition:
+    return json_v6_models.LabwareDefinition(version=1, namespace="example",
+                                            schemaVersion=2,
+                                            ordering=[
+                                                ["A1", "B1", "C1", "D1"],
+                                                ["A2", "B2", "C2", "D2"]
+                                            ],
+                                            groups=[Group(wells=["A1"], metadata=Metadata1())],
+                                            wells={'A1': WellDefinition(depth=25, x=18.21, y=75.43, z=75,
+                                                                        totalLiquidVolume=1100000,
+                                                                        shape="rectangular")},
+                                            dimensions=Dimensions(yDimension=85.5, zDimension=100, xDimension=127.75,
+                                                                  depth=25, totalLiquidVolume=33, shape="circular"),
+                                            cornerOffsetFromSlot=CornerOffsetFromSlot(x=0, y=0, z=0),
+                                            brand=BrandData(brand="foo"),
+                                            metadata=Metadata(displayName="Foo 8 Well Plate 33uL",
+                                                              displayCategory=DisplayCategory("wellPlate"),
+                                                              displayVolumeUnits="µL"),
+                                            parameters=Parameters(
+                                                loadName="foo_8_plate_33ul", isTiprack=False,
+                                                isMagneticModuleCompatible=False, format="irregular"))
+
+
 def _make_json_protocol(
         *,
         pipettes: Dict[str, json_v6_models.Pipette] = {
             "pipetteId": json_v6_models.Pipette(name="p10_single")
         },
         labware_definitions: Dict[str, LabwareDefinition] = {
-            "example/plate/1": json_v6_models.LabwareDefinition(version=1, namespace="example",
-                                                                schemaVersion=2,
-                                                                ordering=[
-                                                                    ["A1", "B1", "C1", "D1"],
-                                                                    ["A2", "B2", "C2", "D2"]
-                                                                  ],
-                                                                groups=[Group(wells=["A1"], metadata=Metadata1())],
-                                                                wells={'A1': WellDefinition(depth=25, x=18.21, y=75.43, z=75, totalLiquidVolume=1100000, shape="rectangular")},
-                                                                dimensions=Dimensions(yDimension=85.5, zDimension=100, xDimension=127.75, depth=25, totalLiquidVolume=33, shape="circular"),
-                                                                cornerOffsetFromSlot=CornerOffsetFromSlot(x=0, y=0, z=0),
-                                                                brand=BrandData(brand="foo"),
-                                                                metadata=Metadata(displayName="Foo 8 Well Plate 33uL",
-                                                                                  displayCategory=DisplayCategory("wellPlate"), displayVolumeUnits="µL"),
-                                                                parameters=Parameters(
-                                                                    loadName="foo_8_plate_33ul", isTiprack=False,
-                                                                    isMagneticModuleCompatible=False, format="irregular"))},
+            "example/plate/1": _load_labware_definition_data()},
         labware: Dict[str, json_v6_models.Labware] = {
             "sourcePlateId": json_v6_models.Labware(displayName="Source Plate", definitionId="example/plate/1")},
         commands: List[json_v6_models.Command] = [],
