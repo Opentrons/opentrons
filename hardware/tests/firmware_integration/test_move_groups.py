@@ -1,6 +1,7 @@
 """Tests for move groups."""
 import asyncio
-from typing import Iterator
+import numpy as np  # type: ignore
+from typing import Iterator, List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -21,6 +22,8 @@ from opentrons_hardware.firmware_bindings.utils import (
 )
 
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
+from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
+from opentrons_hardware.hardware_control.motion import create_step, create_home_step
 
 
 @pytest.fixture(
@@ -80,3 +83,71 @@ async def test_add_moves(
     assert isinstance(response, GetMoveGroupResponse)
     assert response.payload.num_moves.value == len(durations)
     assert response.payload.total_duration.value == sum(durations)
+
+
+@pytest.mark.requires_emulator
+async def test_move_integration(
+    loop: asyncio.BaseEventLoop,
+    can_messenger: CanMessenger,
+    can_messenger_queue: WaitableCallback,
+    all_motor_nodes: List[NodeId],
+) -> None:
+    """Test that moving returns correct positions."""
+
+    # First, we should test homing. We have to home because the emulator stack is long-lived
+    # beyond each test, so we might as well make sure we're homing from a non-zero position
+    prep_move = [create_step(
+            distance={motor_node: motor_node.value for motor_node in all_motor_nodes},
+            velocity={
+                motor_node: motor_node.value / 10 for motor_node in all_motor_nodes
+            },
+            acceleration={motor_node: 0 for motor_node in all_motor_nodes},
+            duration=np.float64(1),
+            present_nodes=all_motor_nodes,
+        )]
+    prep_runner = MoveGroupRunner([prep_move])
+    # throw away this position - it may change depending on previous state of simulators
+    await prep_runner.run(can_messenger)
+
+    home_move = [create_home_step(
+        distance={motor_node: 10 for motor_node in all_motor_nodes},
+        velocity={motor_node: 40 for motor_node in all_motor_nodes})]
+    home_runner = MoveGroupRunner([home_move])
+    position = await home_runner.run(can_messenger)
+    assert position == {motor_node: 0 for motor_node in all_motor_nodes}
+    moves = [
+        create_step(
+            distance={motor_node: motor_node.value for motor_node in all_motor_nodes},
+            velocity={
+                motor_node: motor_node.value for motor_node in all_motor_nodes
+            },
+            acceleration={motor_node: 0 for motor_node in all_motor_nodes},
+            duration=np.float64(1),
+            present_nodes=all_motor_nodes,
+        ),
+        create_step(
+            distance={motor_node: motor_node.value for motor_node in all_motor_nodes},
+            velocity={
+                motor_node: motor_node.value for motor_node in all_motor_nodes
+            },
+            acceleration={motor_node: 0 for motor_node in all_motor_nodes},
+            duration=np.float64(1),
+            present_nodes=all_motor_nodes,
+        ),
+        create_step(
+            distance={motor_node: -motor_node.value for motor_node in all_motor_nodes},
+            velocity={
+                motor_node: -motor_node.value for motor_node in all_motor_nodes
+            },
+            acceleration={motor_node: 0 for motor_node in all_motor_nodes},
+            duration=np.float64(1),
+            present_nodes=all_motor_nodes,
+        ),
+    ]
+    runner = MoveGroupRunner([moves])
+    await runner.run(can_messenger)
+
+    position = await runner.run(can_messenger)
+    assert position == {
+        motor_node: pytest.approx(motor_node.value) for motor_node in all_motor_nodes
+    }

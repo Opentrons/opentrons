@@ -2,7 +2,7 @@
 from __future__ import annotations
 import pytest
 import asyncio
-from typing import AsyncGenerator, Iterator, AsyncIterator
+from typing import AsyncGenerator, Iterator, AsyncIterator, List
 
 from _pytest.fixtures import FixtureRequest
 
@@ -65,16 +65,24 @@ def subsystem_node_id(request: FixtureRequest) -> Iterator[constants.NodeId]:
     yield request.param  # type: ignore[attr-defined]
 
 
+_motor_nodes = [
+    constants.NodeId.head_l,
+    constants.NodeId.head_r,
+    constants.NodeId.pipette_left,
+    constants.NodeId.gantry_x,
+    constants.NodeId.gantry_y,
+]
+
+
 @pytest.fixture(
     scope="session",
-    params=[
-        constants.NodeId.head_l,
-        constants.NodeId.head_r,
-        constants.NodeId.pipette_left,
-        constants.NodeId.gantry_x,
-        constants.NodeId.gantry_y,
-    ],
+    params=_motor_nodes,
 )
 def motor_node_id(request: FixtureRequest) -> Iterator[constants.NodeId]:
     """Each motor's node id as a fixture."""
     yield request.param  # type: ignore[attr-defined]
+
+
+@pytest.fixture(scope="session")
+def all_motor_nodes() -> List[constants.NodeId]:
+    return _motor_nodes
