@@ -30,11 +30,13 @@ import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 
-type ProtocolCardProps = StoredProtocolData
+interface ProtocolCardProps extends StoredProtocolData {
+  handleRunProtocol: () => void
+}
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const { t } = useTranslation('protocol_list')
-  const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
+  const { handleRunProtocol, protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
 
   // TODO: IMMEDIATELY clean up and move these protocol data selectors into api_client as
   // pure functions of RunTimeCommand[]
@@ -139,7 +141,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
         </Flex>
 
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <ProtocolOverflowMenu protocolKey={protocolKey} />
+          <ProtocolOverflowMenu protocolKey={protocolKey} handleRunProtocol={handleRunProtocol} />
           <StyledText
             as="label"
             position="absolute"

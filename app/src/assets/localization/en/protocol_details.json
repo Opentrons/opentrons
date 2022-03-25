@@ -1,4 +1,5 @@
 {
+  "choose_robot_to_run": "Choose Robot to Run\n{{protocol_name}}",
   "creation_method": "creation method",
   "deck_setup": "deck setup",
   "description": "description",

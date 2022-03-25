@@ -64,8 +64,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               ? initialLoadedLabwareByModuleId[moduleInSlot.result.moduleId]
               : null
 
-          console.log(labwareInModule)
-
           return (
             <React.Fragment key={slotId}>
               {moduleInSlot != null ? (

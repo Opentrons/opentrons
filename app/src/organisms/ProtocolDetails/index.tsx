@@ -39,7 +39,7 @@ import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
-import { ChooseRobotSlideout } from './ChooseRobotSlideout'
+import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 
 const defaultTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -184,7 +184,8 @@ export function ProtocolDetails(
       <ChooseRobotSlideout
         onCloseClick={() => setShowSlideout(false)}
         showSlideout={showSlideout}
-        protocolKey={protocolKey}
+        storedProtocolData={props}
+        height={`calc(100vh - ${SPACING.spacing4})`} // account for the breadcrumbs bar
       />
       <Card marginBottom={SPACING.spacing4} padding={SPACING.spacing4}>
         <Flex
