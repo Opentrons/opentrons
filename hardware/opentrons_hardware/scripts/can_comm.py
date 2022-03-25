@@ -236,7 +236,7 @@ async def run(args: argparse.Namespace) -> None:
 
 
 def in_red(s: str) -> str:
-    """"Return string formatted in red"""
+    """Return string formatted in red."""
     return f"\033[1;31;40m{str(s)}\033[0m"
 
 
