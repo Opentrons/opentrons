@@ -7,7 +7,6 @@ import {
   Flex,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
-  WRAP,
   TYPOGRAPHY,
   SPACING,
   Text,
@@ -39,9 +38,12 @@ type Props = SP &
     setMostRecentAddition: (ip: string) => void
   }
 
-const Form = styled.form`
-  display: inline-block;
-  height: 100%;
+const FlexForm = styled.form`
+  display: flex;
+  /* flex: 1;
+   */
+  width: 100%;
+  align-items: center;
 `
 export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
   const { t } = useTranslation('app_settings')
@@ -75,12 +77,11 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      flexWrap={WRAP}
       margin={`${SPACING.spacing2} 0`}
       height={SPACING.spacing6}
     >
       <Flex flexDirection={DIRECTION_ROW}>
-        <Form onSubmit={formik.handleSubmit}>
+        <FlexForm onSubmit={formik.handleSubmit}>
           <input
             id="ip"
             name="ip"
@@ -91,7 +92,7 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
             height={SPACING.spacing5}
             width="100%"
             style={{
-              flex: 5,
+              flex: 6,
               margin: `${SPACING.spacing2} 0`,
               border: `1px solid ${COLORS.medGrey}`,
             }}
@@ -100,16 +101,15 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
             fontSize={TYPOGRAPHY.fontSizeH6}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             lineHeight={TYPOGRAPHY.lineHeight12}
+            marginLeft={SPACING.spacing3}
             // marginTop={SPACING.spacing2}
             // margin={`${SPCING.spacingSM} 0`}
-            // width="75%"
             // padding={`6px 12px}`}
-            style={{ flex: 1 }}
             type="submit"
           >
             {t('add_ip_button')}
           </TertiaryButton>
-        </Form>
+        </FlexForm>
       </Flex>
       {formik.errors.ip && (
         <Text
