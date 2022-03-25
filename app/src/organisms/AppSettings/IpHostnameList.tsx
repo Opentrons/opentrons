@@ -17,7 +17,7 @@ interface DP {
   removeManualIp: (ip: string) => unknown
 }
 
-type Props = SP & DP
+type Props = SP & DP & { mostRecentAddition: string | null }
 
 function IpHostnameListComponent(props: Props): JSX.Element {
   const { candidates, removeManualIp, robots } = props
@@ -35,9 +35,10 @@ function IpHostnameListComponent(props: Props): JSX.Element {
         .map(([candidate, discovered], index) => (
           <IpHostnameItem
             candidate={candidate}
-            key={index}
+            key={`ip-${index}`}
             removeIp={removeManualIp}
             discovered={discovered}
+            justAdded={candidate === props.mostRecentAddition}
           />
         ))}
     </>

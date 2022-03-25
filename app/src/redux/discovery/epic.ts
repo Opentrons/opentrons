@@ -33,7 +33,7 @@ export const startDiscoveryEpic: Epic = action$ =>
     })
   )
 
-// TODO(bc, 2021-05-17): nuke this epic, it is now dead code, functionality is covered by resartEpic in robot-admin
+// TODO(bc, 2021-05-17): nuke this epic, it is now dead code, functionality is covered by restartEpic in robot-admin
 // TODO(mc, 2019-08-01): handle restart requests using robot-api actions
 export const startDiscoveryOnRestartEpic: Epic = action$ =>
   action$.pipe(

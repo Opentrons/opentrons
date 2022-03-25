@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { getConfig, addManualIp } from '../../redux/config'
-import { startDiscovery } from '../../redux/discovery'
+import { useTranslation } from 'react-i18next'
 import { useFormik } from 'formik'
-// import { IpHostnameField } from './IpHostnameField'
+import styled from 'styled-components'
 import {
   Flex,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
   ALIGN_FLEX_START,
+  ALIGN_CENTER,
   TYPOGRAPHY,
   SPACING,
   Icon,
@@ -17,8 +17,9 @@ import {
   Link,
   COLORS,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
 import { TertiaryButton } from '../../atoms/Buttons'
+import { getConfig, addManualIp } from '../../redux/config'
+import { startDiscovery } from '../../redux/discovery'
 
 import type { MapDispatchToProps } from 'react-redux'
 import type { State } from '../../redux/types'
@@ -33,28 +34,36 @@ interface DP {
   checkManualIp: () => unknown
 }
 
-type Props = SP & DP
+interface FormikErrors {
+  ip?: string
+}
 
+type Props = SP &
+  DP & {
+    setMostRecentAddition: (ip: string) => void
+  }
+
+const Form = styled.form`
+  display: inline-block;
+  height: 100%;
+`
 export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
   const { t } = useTranslation('app_settings')
-  const [showSpinner, setShowSpinner] = React.useState(false)
-  const [showRefreshBtn, setShowRefreshBtn] = React.useState(true)
-  const [showTryBtn, setShowTryBtn] = React.useState(false)
-
   const formik = useFormik({
     initialValues: {
       ip: '',
     },
     onSubmit: (values, { resetForm }) => {
       console.log('values', values)
-      setShowSpinner(true)
+      // setShowSpinner(true)
       const ip = values.ip.trim()
       props.addManualIp(ip)
+      props.setMostRecentAddition(ip)
       resetForm({ values: undefined })
-      setShowSpinner(false)
+      // setShowSpinner(false)
     },
     validate: values => {
-      let errors
+      const errors: FormikErrors = {}
       const ip = values.ip.trim()
       if (!ip) {
         errors.ip = t('add_ip_error')
@@ -63,18 +72,12 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
     },
   })
 
-  const displayLinkBtn = (btnLabel: string): JSX.Element => {
-    return (
-      <Link
-        role="button"
-        css={TYPOGRAPHY.pSemiBold}
-        color={COLORS.blue}
-        onClick={props.checkManualIp}
-        id="AppSettings_ManualIpSearch_btn"
-      >
-        {btnLabel}
-      </Link>
-    )
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  const checkIpAndHostname = () => {
+    // setShowRefreshBtn(false)
+    // setShowSpinner(true)
+    props.checkManualIp()
+    // setShowSpinner(false)
   }
 
   return (
@@ -82,29 +85,36 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          paddingRight={SPACING.spacing3}
-          marginTop={SPACING.spacing2}
+          // paddingRight={SPACING.spacing3}
+          // marginTop={SPACING.spacing2}
+          margin={`${SPACING.spacing2} 0`}
+          height={SPACING.spacing6}
+          width="100%"
+          // alignContent={ALIGN_CENTER}
         >
-          <form onSubmit={formik.handleSubmit}>
+          <Form onSubmit={formik.handleSubmit}>
             <input
               id="ip"
               name="ip"
               type="text"
               onChange={formik.handleChange}
               value={formik.values.ip}
+              height={SPACING.spacing5}
+              width="100%"
             />
             <TertiaryButton
               fontSize={TYPOGRAPHY.fontSizeH6}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               lineHeight={TYPOGRAPHY.lineHeight12}
-              marginTop={SPACING.spacing2}
-              // onClick={null} // call startDiscovery
-              width="100%"
+              // marginTop={SPACING.spacing2}
+              // margin={`${SPACING.spacingSM} 0`}
+              // width="75%"
+              padding={`6px 12px}`}
               type="submit"
             >
               {t('add_ip_button')}
             </TertiaryButton>
-          </form>
+          </Form>
         </Flex>
         {formik.errors.ip && (
           <Text
@@ -117,13 +127,6 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
             {formik.errors.ip}
           </Text>
         )}
-        {showSpinner && (
-          <Flex marginTop={SPACING.spacing5} marginBottom={SPACING.spacing4}>
-            <Icon name="ot-spinner" size={SIZE_2} spin />
-          </Flex>
-        )}
-        {showRefreshBtn && displayLinkBtn(t('ip_refresh_button'))}
-        {showTryBtn && displayLinkBtn(t('ip_reconnect_button'))}
       </Flex>
     </>
   )
