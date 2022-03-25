@@ -22,17 +22,17 @@ export function parseInitialPipetteNamesByMount(
   analysis: ProtocolFile<{}>
 ): PipetteNamesByMount {
   const { commands, pipettes } = analysis
-  const rightPipetteId = commands.find(
+  const rightPipetteName = commands.find(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'right'
-  )?.result.pipetteId
-  const leftPipetteId = commands.find(
+  )?.params.pipetteName
+  const leftPipetteName = commands.find(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'left'
-  )?.result.pipetteId
+  )?.params.pipetteName
   return {
-    left: leftPipetteId != null ? pipettes[leftPipetteId].name : null,
-    right: rightPipetteId != null ? pipettes[rightPipetteId].name : null,
+    left: leftPipetteName ?? null,
+    right: rightPipetteName ?? null,
   }
 }
 

@@ -64,63 +64,31 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
 
           return (
             <React.Fragment key={slotId}>
-              {['1', '3'].includes(slotId) &&
-              <Module
-                  x={slot.position[0]}
-                  y={slot.position[1]}
-                  orientation={inferModuleOrientationFromXCoordinate(
-                    slot.position[0]
-                  )}
-                  def={getModuleDef2('temperatureModuleV2')}
-                />
-              }
-            {['7'].includes(slotId) &&
-              <Module
-                  x={slot.position[0]}
-                  y={slot.position[1]}
-                  orientation={inferModuleOrientationFromXCoordinate(
-                    slot.position[0]
-                  )}
-                  def={getModuleDef2('thermocyclerModuleV1')}
-                />
-              }
-              {/* {moduleInSlot != null ? (
+              {moduleInSlot != null ? (
                 <Module
                   x={slot.position[0]}
                   y={slot.position[1]}
                   orientation={inferModuleOrientationFromXCoordinate(
                     slot.position[0]
                   )}
-                  def={getModuleDef2(
-                    analysis.modules[moduleInSlot.result.moduleId].model
-                  )}
+                  def={getModuleDef2(moduleInSlot.params.model)}
                   innerProps={
-                    analysis.modules[moduleInSlot.result.moduleId].model
-                      ? { lidMotorState: 'open' }
-                      : {}
+                    moduleInSlot.params.model ? { lidMotorState: 'open' } : {}
                   }
                 >
                   {labwareInModule != null ? (
                     <LabwareRender
-                      definition={
-                        analysis.labwareDefinitions[
-                          analysis.labware[labwareInModule.result.labwareId]
-                            .definitionId
-                        ]
-                      }
+                      definition={labwareInModule.result.definition}
                     />
                   ) : null}
                 </Module>
-              ) : null} */}
+              ) : null}
               {labwareInSlot != null ? (
-                <LabwareRender
-                  definition={
-                    analysis.labwareDefinitions[
-                      analysis.labware[labwareInSlot.result.labwareId]
-                        .definitionId
-                    ]
-                  }
-                />
+                <g
+                  transform={`translate(${slot.position[0]},${slot.position[1]})`}
+                >
+                  <LabwareRender definition={labwareInSlot.result.definition} />
+                </g>
               ) : null}
             </React.Fragment>
           )
@@ -129,4 +97,3 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
     </RobotWorkSpace>
   )
 }
-

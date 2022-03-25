@@ -30,40 +30,28 @@ import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
-
 type ProtocolCardProps = StoredProtocolData
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const { t } = useTranslation('protocol_list')
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
 
-  const [
-    protocolData,
-    setProtocolData,
-  ] = React.useState<ProtocolAnalysisFile<{}> | null>(null)
-
-  React.useEffect(() => {
-    if (mostRecentAnalysis != null) {
-      setProtocolData(
-        schemaV6Adapter(JSON.parse(mostRecentAnalysis)?.analyses[0])
-      )
-    }
-  }, [modified])
-
-
   // TODO: IMMEDIATELY clean up and move these protocol data selectors into api_client as
   // pure functions of RunTimeCommand[]
-  const robotModel = protocolData?.robot?.model ?? 'OT-2'
+  const robotModel = mostRecentAnalysis?.robot?.model ?? 'OT-2'
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
-    protocolData != null ? parseInitialPipetteNamesByMount(protocolData) : {}
+    mostRecentAnalysis != null
+      ? parseInitialPipetteNamesByMount(mostRecentAnalysis)
+      : {}
   const requiredModuleTypes =
-    protocolData != null
-      ? parseAllRequiredModuleModels(protocolData).map(getModuleType)
+    mostRecentAnalysis != null
+      ? parseAllRequiredModuleModels(mostRecentAnalysis).map(getModuleType)
       : []
 
   const protocolName =
-    protocolData?.metadata?.protocolName ?? first(srcFileNames) ?? protocolKey
+    mostRecentAnalysis?.metadata?.protocolName ??
+    first(srcFileNames) ??
+    protocolKey
 
   return (
     <Link to={`/protocols/${protocolKey}`} style={{ color: 'inherit' }}>
@@ -86,8 +74,8 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
           >
-            {protocolData != null ? (
-              <DeckThumbnail analysis={protocolData} />
+            {mostRecentAnalysis != null ? (
+              <DeckThumbnail analysis={mostRecentAnalysis} />
             ) : null}
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>

@@ -37,9 +37,9 @@ import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/Buttons'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
+import { ChooseRobotSlideout } from './ChooseRobotSlideout'
 
 const defaultTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -74,16 +74,20 @@ const currentTabStyle = css`
 interface RoundTabProps extends React.ComponentProps<typeof Btn> {
   isCurrent: boolean
 }
-function RoundTab({isCurrent, children, ...restProps}: RoundTabProps): JSX.Element {
+function RoundTab({
+  isCurrent,
+  children,
+  ...restProps
+}: RoundTabProps): JSX.Element {
   return (
     <Btn
       {...restProps}
       css={
         isCurrent
           ? css`
-            ${defaultTabStyle}
-            ${currentTabStyle}
-          `
+              ${defaultTabStyle}
+              ${currentTabStyle}
+            `
           : defaultTabStyle
       }
     >
@@ -99,97 +103,77 @@ export function ProtocolDetails(
 ): JSX.Element | null {
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t } = useTranslation('protocol_details')
-  const [
-    protocolData,
-    setProtocolData,
-  ] = React.useState<ProtocolAnalysisFile<{}> | null>(null)
   const [currentTab, setCurrentTab] = React.useState<
     'robot_config' | 'labware'
   >('robot_config')
+  const [showSlideout, setShowSlideout] = React.useState(false)
 
-  React.useEffect(() => {
-    if (mostRecentAnalysis != null) {
-      setProtocolData(
-        schemaV6Adapter(JSON.parse(mostRecentAnalysis)?.analyses[0])
-      )
-    }
-  }, [modified])
-
-  if (protocolData == null) return null
+  if (mostRecentAnalysis == null) return null
   // TODO: IMMEDIATELY clean up and move these protocol data selectors into api_client as
   // pure functions of RunTimeCommand[]
-  const robotModel = protocolData?.robot?.model ?? 'OT-2'
+
+  const robotModel = mostRecentAnalysis?.robot?.model ?? 'OT-2'
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
-    protocolData != null ? parseInitialPipetteNamesByMount(protocolData) : {}
+    mostRecentAnalysis != null
+      ? parseInitialPipetteNamesByMount(mostRecentAnalysis)
+      : {}
   const requiredModuleTypes =
-    protocolData != null
-      ? parseAllRequiredModuleModels(protocolData).map(getModuleType)
+    mostRecentAnalysis != null
+      ? parseAllRequiredModuleModels(mostRecentAnalysis).map(getModuleType)
       : []
 
   const protocolName =
-    protocolData?.metadata?.protocolName ?? first(srcFileNames) ?? protocolKey
+    mostRecentAnalysis?.metadata?.protocolName ??
+    first(srcFileNames) ??
+    protocolKey
 
   const creationMethod = ''
   const lastAnalyzed = ''
   const author = ''
   const description = ''
 
-
-  const getTabContents = () => (
-    currentTab === 'labware'
-    ?  <Box>TODO: labware tab contents</Box>
-    : (
-    <Flex flexDirection={DIRECTION_COLUMN}>
-              <Flex
-                flexDirection={DIRECTION_ROW}
-                marginRight={SPACING.spacing4}
-              >
-                <StyledText as="h6">{t('robot')}</StyledText>
-                <StyledText as="p">{robotModel}</StyledText>
-              </Flex>
-              <Flex
-                flexDirection={DIRECTION_ROW}
-                marginRight={SPACING.spacing4}
-              >
-                <StyledText as="h6">{t('left_mount')}</StyledText>
-                <StyledText as="p">
-                  {leftMountPipetteName != null
-                    ? getPipetteNameSpecs(leftMountPipetteName)?.displayName
-                    : t('empty')}
-                </StyledText>
-              </Flex>
-              <Flex
-                flexDirection={DIRECTION_ROW}
-                marginRight={SPACING.spacing4}
-              >
-                <StyledText as="h6">{t('right_mount')}</StyledText>
-                <StyledText as="p">
-                  {rightMountPipetteName != null
-                    ? getPipetteNameSpecs(rightMountPipetteName)?.displayName
-                    : t('empty')}
-                </StyledText>
-              </Flex>
-              {requiredModuleTypes.length > 0 ? (
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  marginRight={SPACING.spacing4}
-                >
-                  <StyledText as="h6">{t('modules')}</StyledText>
-                  <Flex>
-                    {requiredModuleTypes.map((moduleType, index) => (
-                      <ModuleIcon
-                        key={index}
-                        moduleType={moduleType}
-                        height="1rem"
-                        marginRight={SPACING.spacing3}
-                      />
-                    ))}
-                  </Flex>
-                </Flex>
-              ) : null}
+  const getTabContents = (): JSX.Element =>
+    currentTab === 'labware' ? (
+      <Box>TODO: labware tab contents</Box>
+    ) : (
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_ROW} marginRight={SPACING.spacing4}>
+          <StyledText as="h6">{t('robot')}</StyledText>
+          <StyledText as="p">{robotModel}</StyledText>
+        </Flex>
+        <Flex flexDirection={DIRECTION_ROW} marginRight={SPACING.spacing4}>
+          <StyledText as="h6">{t('left_mount')}</StyledText>
+          <StyledText as="p">
+            {leftMountPipetteName != null
+              ? getPipetteNameSpecs(leftMountPipetteName)?.displayName
+              : t('empty')}
+          </StyledText>
+        </Flex>
+        <Flex flexDirection={DIRECTION_ROW} marginRight={SPACING.spacing4}>
+          <StyledText as="h6">{t('right_mount')}</StyledText>
+          <StyledText as="p">
+            {rightMountPipetteName != null
+              ? getPipetteNameSpecs(rightMountPipetteName)?.displayName
+              : t('empty')}
+          </StyledText>
+        </Flex>
+        {requiredModuleTypes.length > 0 ? (
+          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
+            <StyledText as="h6">{t('modules')}</StyledText>
+            <Flex>
+              {requiredModuleTypes.map((moduleType, index) => (
+                <ModuleIcon
+                  key={index}
+                  moduleType={moduleType}
+                  height="1rem"
+                  marginRight={SPACING.spacing3}
+                />
+              ))}
             </Flex>
+          </Flex>
+        ) : null}
+      </Flex>
     )
-  )
 
   return (
     <Flex
@@ -197,6 +181,11 @@ export function ProtocolDetails(
       padding={SPACING.spacing4}
       width="100%"
     >
+      <ChooseRobotSlideout
+        onCloseClick={() => setShowSlideout(false)}
+        showSlideout={showSlideout}
+        protocolKey={protocolKey}
+      />
       <Card marginBottom={SPACING.spacing4} padding={SPACING.spacing4}>
         <Flex
           flexDirection={DIRECTION_ROW}
@@ -228,7 +217,7 @@ export function ProtocolDetails(
             <StyledText as="p">{lastAnalyzed}</StyledText>
           </Flex>
           <PrimaryButton
-            onClick={() => console.log('TODO: open run on a robot slideout')}
+            onClick={() => setShowSlideout(true)}
           >
             {t('run_protocol')}
           </PrimaryButton>
@@ -278,16 +267,22 @@ export function ProtocolDetails(
           </StyledText>
           <Divider />
           <Box padding={SPACING.spacing4}>
-            <DeckThumbnail analysis={protocolData} />
+            <DeckThumbnail analysis={mostRecentAnalysis} />
           </Box>
         </Card>
         <Box height="100%" width={SPACING.spacing4} />
         <Card flex="1">
           <Flex>
-            <RoundTab isCurrent={currentTab === 'robot_config'} onClick={() => setCurrentTab('robot_config')}>
+            <RoundTab
+              isCurrent={currentTab === 'robot_config'}
+              onClick={() => setCurrentTab('robot_config')}
+            >
               {t('robot_configuration')}
             </RoundTab>
-            <RoundTab isCurrent={currentTab === 'labware'} onClick={() => setCurrentTab('labware')}>
+            <RoundTab
+              isCurrent={currentTab === 'labware'}
+              onClick={() => setCurrentTab('labware')}
+            >
               {t('labware')}
             </RoundTab>
           </Flex>

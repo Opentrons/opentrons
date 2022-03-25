@@ -64,7 +64,7 @@ export function runFileWithPython(
     ])
       .then(output => {
         log.info('python out', output)
-        fs.writeJSON(destFilePath, JSON.stringify(output.stdout))
+        fs.writeFile(destFilePath, output.stdout)
       })
       .catch(log.error)
   } else {
