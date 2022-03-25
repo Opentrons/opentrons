@@ -8,14 +8,9 @@ import {
   DIRECTION_ROW,
   DIRECTION_COLUMN,
   WRAP,
-  ALIGN_FLEX_START,
-  ALIGN_CENTER,
   TYPOGRAPHY,
   SPACING,
-  Icon,
-  SIZE_2,
   Text,
-  Link,
   COLORS,
 } from '@opentrons/components'
 import { TertiaryButton } from '../../atoms/Buttons'

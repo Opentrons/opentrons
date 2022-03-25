@@ -3,12 +3,9 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
-  // DIRECTION_ROW,
-  // ALIGN_FLEX_START,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   SPACING,
-  // SIZE_AUTO,
   Text,
   TYPOGRAPHY,
   COLORS,
