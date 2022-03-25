@@ -2,7 +2,8 @@
 from typing import cast, List
 from pydantic import parse_obj_as
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6, Command
-from opentrons.protocol_engine import commands as pe_commands, LabwareLocation
+from opentrons.protocol_engine import commands as pe_commands, LabwareLocation, ModuleModel, DeckSlotLocation, PipetteName
+from opentrons.types import MountType
 
 
 class CommandTranslatorError(Exception):
@@ -12,8 +13,10 @@ class CommandTranslatorError(Exception):
 
 
 def _get_labware_command(
-    protocol: ProtocolSchemaV6, labware_id: str, command: Command
+        protocol: ProtocolSchemaV6, command: Command
 ) -> pe_commands.LoadLabwareCreate:
+    labware_id = command.params.labwareId
+    assert labware_id is not None
     definition_id = protocol.labware[labware_id].definitionId
     assert definition_id is not None
     labware_command = pe_commands.LoadLabwareCreate(
@@ -24,19 +27,56 @@ def _get_labware_command(
             namespace=protocol.labwareDefinitions[definition_id].namespace,
             loadName=protocol.labwareDefinitions[definition_id].parameters.loadName,
             location=parse_obj_as(
-                LabwareLocation, command.params.location  # type: ignore[arg-type]
+                LabwareLocation, command.params.location
             ),
         )
     )
     return labware_command
 
 
+def _get_command(command: Command) -> pe_commands.CommandCreate:
+    dict_command = command.dict(exclude_none=True)
+    translated_obj = cast(
+        pe_commands.CommandCreate,
+        parse_obj_as(
+            # https://github.com/samuelcolvin/pydantic/issues/1847
+            pe_commands.CommandCreate,  # type: ignore[arg-type]
+            dict_command,
+        ),
+    )
+    return translated_obj
+
+
+def _get_module_command(protocol: ProtocolSchemaV6, command: Command) -> pe_commands.CommandCreate:
+    module_id = command.params.moduleId
+    modules = protocol.modules
+    assert module_id is not None
+    assert modules is not None
+    translated_obj = pe_commands.LoadModuleCreate(params=pe_commands.LoadModuleParams(
+        model=ModuleModel(modules[module_id].model),
+        location=DeckSlotLocation.parse_obj(command.params.location),
+        moduleId=command.params.moduleId
+    ))
+    return translated_obj
+
+
+def _get_pipette_command(protocol: ProtocolSchemaV6, command: Command) -> pe_commands.CommandCreate:
+    pipette_id = command.params.pipetteId
+    assert pipette_id is not None
+    translated_obj = pe_commands.LoadPipetteCreate(params=pe_commands.LoadPipetteParams(
+        pipetteName=PipetteName(protocol.pipettes[pipette_id].name),
+        mount=MountType(command.params.mount),
+        pipetteId=command.params.pipetteId
+    ))
+    return translated_obj
+
+
 class JsonCommandTranslator:
     """Class that translates commands from PD/JSON to ProtocolEngine."""
 
     def translate(
-        self,
-        protocol: ProtocolSchemaV6,
+            self,
+            protocol: ProtocolSchemaV6,
     ) -> List[pe_commands.CommandCreate]:
         """Takes json protocol v6 and translates commands->protocol engine commands."""
         commands_list: List[pe_commands.CommandCreate] = []
@@ -50,32 +90,13 @@ class JsonCommandTranslator:
         ]
         commands_to_parse = [command for command in protocol.commands if command.commandType not in exclude_commands]
         for command in commands_to_parse:
-            dict_command = command.dict(exclude_none=True)
             if command.commandType == "loadPipette":
-                pipette_id = command.params.pipetteId
-                assert pipette_id is not None
-                dict_command["params"].update(
-                    dict(pipetteName=protocol.pipettes[pipette_id].name)
-                )
+                translated_obj = _get_pipette_command(protocol, command)
             elif command.commandType == "loadModule":
-                module_id = command.params.moduleId
-                modules = protocol.modules
-                assert module_id is not None
-                assert modules is not None
-                dict_command["params"].update({"model": modules[module_id].model})
+                translated_obj = _get_module_command(protocol, command)
             elif command.commandType == "loadLabware":
-                labware_id = command.params.labwareId
-                assert labware_id is not None
-                labware_command = _get_labware_command(protocol, labware_id, command)
-                commands_list.append(labware_command)
-                continue
-            translated_obj = cast(
-                pe_commands.CommandCreate,
-                parse_obj_as(
-                    # https://github.com/samuelcolvin/pydantic/issues/1847
-                    pe_commands.CommandCreate,  # type: ignore[arg-type]
-                    dict_command,
-                ),
-            )
+                translated_obj = _get_labware_command(protocol, command)
+            else:
+                translated_obj = _get_command(command)
             commands_list.append(translated_obj)
         return commands_list
