@@ -37,7 +37,7 @@ async def can_messenger(
 
 @pytest.fixture
 def can_messenger_queue(
-    request,
+    request: FixtureRequest,
     can_messenger: CanMessenger,
 ) -> Iterator[WaitableCallback]:
     """Create WaitableCallback for the CAN Messenger."""

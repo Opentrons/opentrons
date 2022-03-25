@@ -18,7 +18,8 @@ from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 
 
 def filter_func(arb: ArbitrationId) -> bool:
-    return arb.parts.message_id == ReadMotorDriverResponse.message_id
+    """Message filtering function."""
+    return bool(arb.parts.message_id == ReadMotorDriverResponse.message_id)
 
 
 @pytest.mark.requires_emulator

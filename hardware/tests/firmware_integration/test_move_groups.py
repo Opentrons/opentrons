@@ -33,6 +33,7 @@ def group_id(request: FixtureRequest) -> Iterator[int]:
 
 
 def filter_func(arb: ArbitrationId) -> bool:
+    """Message filtering function."""
     return bool(arb.parts.message_id == GetMoveGroupResponse.message_id)
 
 

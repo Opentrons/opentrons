@@ -5,7 +5,8 @@ import pytest
 
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    DeviceInfoRequest, DeviceInfoResponse,
+    DeviceInfoRequest,
+    DeviceInfoResponse,
 )
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 from opentrons_hardware.firmware_bindings.constants import NodeId, MessageId
@@ -13,7 +14,10 @@ from opentrons_hardware.firmware_bindings.constants import NodeId, MessageId
 
 def filter_func(arb: ArbitrationId) -> bool:
     """Filtering function for device info tests."""
-    return bool(arb.parts.message_id == MessageId.device_info_response and arb.parts.node_id == NodeId.host)
+    return bool(
+        arb.parts.message_id == MessageId.device_info_response
+        and arb.parts.node_id == NodeId.host
+    )
 
 
 @pytest.mark.requires_emulator

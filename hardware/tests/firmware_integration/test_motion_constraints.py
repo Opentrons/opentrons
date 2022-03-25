@@ -17,6 +17,7 @@ from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 
 
 def filter_func(arb: ArbitrationId) -> bool:
+    """Message filtering function."""
     return bool(arb.parts.message_id == GetMotionConstraintsResponse.message_id)
 
 

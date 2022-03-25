@@ -16,6 +16,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
 
 
 def filter_func(arb: ArbitrationId) -> bool:
+    """Message filtering function."""
     return bool(arb.parts.message_id == PushToolsDetectedNotification.message_id)
 
 
