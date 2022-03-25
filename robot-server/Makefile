@@ -125,6 +125,13 @@ dev-with-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator.env
 dev-with-emulator:
 	$(pipenv) run $(run_dev)
 
+
+.PHONY: dev-with-ot3-emulator
+dev-with-ot3-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator_ot3.env
+dev-with-ot3-emulator:
+	$(pipenv) run $(run_dev)
+
+
 .PHONY: local-shell
 local-shell:
 	$(pipenv) shell

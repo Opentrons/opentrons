@@ -37,10 +37,17 @@ async def can_messenger(
 
 @pytest.fixture
 def can_messenger_queue(
+    request: FixtureRequest,
     can_messenger: CanMessenger,
 ) -> Iterator[WaitableCallback]:
     """Create WaitableCallback for the CAN Messenger."""
-    with WaitableCallback(can_messenger) as wc:
+    # Get optional filtering function.
+    mark = request.node.get_closest_marker("can_filter_func")
+    if not mark:
+        filter_func = None
+    else:
+        filter_func = mark.args[0]
+    with WaitableCallback(messenger=can_messenger, filter=filter_func) as wc:
         yield wc
 
 
