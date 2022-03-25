@@ -7,6 +7,7 @@ import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/
 import {
   inferModuleOrientationFromXCoordinate,
   getModuleDef2,
+  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
   parseInitialLoadedLabwareBySlot,
@@ -58,9 +59,12 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               ? initialLoadedLabwareBySlot[slotId]
               : null
           const labwareInModule =
-            slotId in initialLoadedLabwareByModuleId
-              ? initialLoadedLabwareByModuleId[slotId]
+            moduleInSlot &&
+            moduleInSlot.result.moduleId in initialLoadedLabwareByModuleId
+              ? initialLoadedLabwareByModuleId[moduleInSlot.result.moduleId]
               : null
+
+          console.log(labwareInModule)
 
           return (
             <React.Fragment key={slotId}>
@@ -73,7 +77,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                   )}
                   def={getModuleDef2(moduleInSlot.params.model)}
                   innerProps={
-                    moduleInSlot.params.model ? { lidMotorState: 'open' } : {}
+                    moduleInSlot.params.model === THERMOCYCLER_MODULE_V1 ? { lidMotorState: 'open' } : {}
                   }
                 >
                   {labwareInModule != null ? (
