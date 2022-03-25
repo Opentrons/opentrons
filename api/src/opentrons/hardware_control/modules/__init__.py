@@ -13,6 +13,11 @@ from .types import (
     ModuleAtPort,
     ModuleType,
     ModuleModel,
+    TemperatureStatus,
+    MagneticStatus,
+    HeaterShakerStatus,
+    SpeedStatus,
+    LiveData,
 )
 
 __all__ = [
@@ -31,4 +36,10 @@ __all__ = [
     "HeaterShaker",
     "ModuleType",
     "ModuleModel",
+    "TemperatureStatus",
+    "MagneticStatus",
+    "HeaterShakerStatus",
+    "SpeedStatus",
+    "ThermocyclerLidStatus",
+    "LiveData",
 ]
