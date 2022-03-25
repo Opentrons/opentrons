@@ -48,7 +48,8 @@ async def get_input(
             None, prompt_message, prompt_with_io, write_with_newline, brief_prompt
         )
     except InvalidInput as e:
-        write_with_newline(str(e))
+        # Write error in red.
+        write_with_newline(f"\033[1;31;40m{str(e)}\033[0m")
     return None
 
 
