@@ -1,0 +1,122 @@
+test_name: setRailLights standalone command
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: Delete all runs # Ensure there is no active run
+    request:
+      url: '{host:s}:{port:d}/runs'
+      method: GET
+    response:
+      status_code: 200
+      verify_response_with:
+        - function: 'tests.integration.fixtures:delete_all_runs'
+          extra_kwargs:
+            host: '{host:s}'
+            port: '{port:d}'
+  - name: issue setRailLights Command on = true
+    request:
+      url: '{host:s}:{port:d}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: setRailLights
+          params:
+            'on': true
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: succeeded
+      save:
+        json:
+          command_id_on: data.id
+  - name: issue setRailLights Command on = false
+    request:
+      url: '{host:s}:{port:d}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: setRailLights
+          params:
+            'on': false
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: succeeded
+      save:
+        json:
+          command_id_off: data.id
+  - name: Get command by id
+    request:
+      url: '{host:s}:{port:d}/commands/{command_id_off}'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          id: '{command_id_off}'
+          status: succeeded
+  - name: Get commands
+    request:
+      url: '{host:s}:{port:d}/commands'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:  # order is enforced on this check!
+          - id: '{command_id_on}'
+          - id: '{command_id_off}'
+  - name: Create Empty Run
+    request:
+      url: '{host:s}:{port:d}/runs'
+      json:
+        data: {}
+      method: POST
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          status: idle
+          current: true
+      save:
+        json:
+          run_id: data.id
+  - name: issue setRailLights Command on = true is blocked
+    request:
+      url: '{host:s}:{port:d}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: setRailLights
+          params:
+            'on': true
+    response:
+      strict:
+        - json:off
+      status_code: 409
+      json:
+        errors:
+          - id: RunActive
+            title: Run Active
+            detail: There is an active run. Close the current run to issue commands via POST /commands.
