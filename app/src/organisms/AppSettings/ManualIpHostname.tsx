@@ -91,7 +91,7 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
             height={SPACING.spacing5}
             width="100%"
             style={{
-              flex: 2,
+              flex: 5,
               margin: `${SPACING.spacing2} 0`,
               border: `1px solid ${COLORS.medGrey}`,
             }}
