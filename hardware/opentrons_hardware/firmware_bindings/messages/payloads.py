@@ -2,7 +2,6 @@
 # TODO (amit, 2022-01-26): Figure out why using annotations import ruins
 #  dataclass fields interpretation.
 #  from __future__ import annotations
-from ctypes import util
 from dataclasses import dataclass
 
 from .fields import (
