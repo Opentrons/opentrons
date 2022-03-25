@@ -2,14 +2,22 @@
 import asyncio
 
 import pytest
+
+from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    DeviceInfoRequest,
+    DeviceInfoRequest, DeviceInfoResponse,
 )
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 from opentrons_hardware.firmware_bindings.constants import NodeId, MessageId
 
 
+def filter_func(arb: ArbitrationId) -> bool:
+    """Filtering function for device info tests."""
+    return bool(arb.parts.message_id == MessageId.device_info_response and arb.parts.node_id == NodeId.host)
+
+
 @pytest.mark.requires_emulator
+@pytest.mark.can_filter_func.with_args(filter_func)
 async def test_broadcast(
     loop: asyncio.BaseEventLoop,
     can_messenger: CanMessenger,
@@ -37,6 +45,7 @@ async def test_broadcast(
 
 
 @pytest.mark.requires_emulator
+@pytest.mark.can_filter_func.with_args(filter_func)
 async def test_each_node(
     loop: asyncio.BaseEventLoop,
     can_messenger: CanMessenger,
@@ -49,3 +58,4 @@ async def test_each_node(
     message, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
     assert arbitration_id.parts.message_id == MessageId.device_info_response
     assert arbitration_id.parts.originating_node_id == subsystem_node_id
+    assert isinstance(message, DeviceInfoResponse)

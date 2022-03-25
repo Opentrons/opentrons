@@ -4,7 +4,7 @@ from typing import Iterator
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings import NodeId, ArbitrationId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddLinearMoveRequest,
     GetMoveGroupRequest,
@@ -32,7 +32,12 @@ def group_id(request: FixtureRequest) -> Iterator[int]:
     yield request.param  # type: ignore[attr-defined]
 
 
+def filter_func(arb: ArbitrationId) -> bool:
+    return bool(arb.parts.message_id == GetMoveGroupResponse.message_id)
+
+
 @pytest.mark.requires_emulator
+@pytest.mark.can_filter_func.with_args(filter_func)
 async def test_add_moves(
     loop: asyncio.BaseEventLoop,
     can_messenger: CanMessenger,

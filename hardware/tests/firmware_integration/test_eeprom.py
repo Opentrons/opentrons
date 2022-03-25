@@ -2,7 +2,7 @@
 import asyncio
 
 import pytest
-from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings import NodeId, ArbitrationId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ReadFromEEPromRequest,
     ReadFromEEPromResponse,
@@ -16,8 +16,13 @@ from opentrons_hardware.firmware_bindings.utils import UInt16Field
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 
 
+def filter_func(arb: ArbitrationId) -> bool:
+    return bool(arb.parts.message_id == ReadFromEEPromResponse.message_id)
+
+
 @pytest.mark.skip("eeprom simulator is broken")
 @pytest.mark.requires_emulator
+@pytest.mark.can_filter_func.with_args(filter_func)
 async def test_read_write(
     loop: asyncio.BaseEventLoop,
     can_messenger: CanMessenger,
