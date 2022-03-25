@@ -1,7 +1,8 @@
 """Class that schedules motion on can bus."""
 import asyncio
+from collections import defaultdict
 import logging
-from typing import List, Set, Tuple
+from typing import List, Set, Tuple, Iterator
 
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import NodeId
@@ -34,8 +35,12 @@ from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
 )
+from .types import NodeMap
 
 log = logging.getLogger(__name__)
+
+_CompletionPacket = Tuple[ArbitrationId, MoveCompleted]
+_Completions = List[_CompletionPacket]
 
 
 class MoveGroupRunner:
@@ -51,19 +56,48 @@ class MoveGroupRunner:
         self._move_groups = move_groups
         self._start_at_index = start_at_index
 
-    async def run(self, can_messenger: CanMessenger) -> None:
+    async def run(self, can_messenger: CanMessenger) -> NodeMap[float]:
         """Run the move group.
 
         Args:
             can_messenger: a can messenger
+
+        Returns:
+            The current position after the move for all the axes that
+            acknowledged completing moves.
         """
         if not self._move_groups:
             log.debug("No moves. Nothing to do.")
-            return
+            return {}
 
         await self._clear_groups(can_messenger)
         await self._send_groups(can_messenger)
-        await self._move(can_messenger)
+        move_completion_data = await self._move(can_messenger)
+        return self._accumulate_move_completions(move_completion_data)
+
+    @staticmethod
+    def _accumulate_move_completions(completions: _Completions) -> NodeMap[float]:
+        position: NodeMap[List[Tuple[Tuple[int, int], float]]] = defaultdict(list)
+        for arbid, completion in completions:
+            position[NodeId(arbid.parts.originating_node_id)].append(
+                (
+                    (
+                        completion.payload.group_id.value,
+                        completion.payload.seq_id.value,
+                    ),
+                    float(completion.payload.current_position_um.value) / 1000.0,
+                )
+            )
+        # for each node, pull the position from the completion with the largest
+        # combination of group id and sequence id
+        return {
+            node: next(
+                reversed(
+                    sorted(poslist, key=lambda position_element: position_element[0])
+                )
+            )[1]
+            for node, poslist in position.items()
+        }
 
     async def _clear_groups(self, can_messenger: CanMessenger) -> None:
         """Send commands to clear the message groups.
@@ -128,14 +162,15 @@ class MoveGroupRunner:
             )
             return AddLinearMoveRequest(payload=linear_payload)
 
-    async def _move(self, can_messenger: CanMessenger) -> None:
+    async def _move(self, can_messenger: CanMessenger) -> _Completions:
         """Run all the move groups."""
         scheduler = MoveScheduler(self._move_groups)
         try:
             can_messenger.add_listener(scheduler)
-            await scheduler.run(can_messenger)
+            completions = await scheduler.run(can_messenger)
         finally:
             can_messenger.remove_listener(scheduler)
+        return completions
 
 
 class MoveScheduler:
@@ -159,7 +194,7 @@ class MoveScheduler:
             self._moves.append(move_set)
             self._durations.append(duration)
         log.info(f"Move scheduler running for groups {move_groups}")
-
+        self._completion_queue: asyncio.Queue[_CompletionPacket] = asyncio.Queue()
         self._event = asyncio.Event()
 
     def __call__(
@@ -178,6 +213,7 @@ class MoveScheduler:
                 " in group"
             )
             self._moves[group_id].remove((node_id, seq_id))
+            self._completion_queue.put_nowait((arbitration_id, message))
             if not self._moves[group_id]:
                 log.info(f"Move group {group_id} has completed.")
                 self._event.set()
@@ -189,7 +225,7 @@ class MoveScheduler:
                     log.warning(f"Homing failed. Condition: {condition}")
                     raise MoveConditionNotMet()
 
-    async def run(self, can_messenger: CanMessenger) -> None:
+    async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""
         for group_id in range(len(self._moves)):
             self._event.clear()
@@ -214,3 +250,9 @@ class MoveScheduler:
                 )
             except asyncio.TimeoutError:
                 log.warning("Move set timed out")
+
+        def _reify_queue_iter() -> Iterator[_CompletionPacket]:
+            while not self._completion_queue.empty():
+                yield self._completion_queue.get_nowait()
+
+        return list(_reify_queue_iter())
