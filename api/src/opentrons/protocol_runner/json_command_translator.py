@@ -48,10 +48,9 @@ class JsonCommandTranslator:
             "moveToSlot",
             "moveToCoordinates",
         ]
-        for command in protocol.commands:
+        commands_to_parse = [command for command in protocol.commands if command.commandType not in exclude_commands]
+        for command in commands_to_parse:
             dict_command = command.dict(exclude_none=True)
-            if command.commandType in exclude_commands:
-                continue
             if command.commandType == "loadPipette":
                 pipette_id = command.params.pipetteId
                 assert pipette_id is not None
@@ -70,7 +69,6 @@ class JsonCommandTranslator:
                 labware_command = _get_labware_command(protocol, labware_id, command)
                 commands_list.append(labware_command)
                 continue
-                print(dict_command)
             translated_obj = cast(
                 pe_commands.CommandCreate,
                 parse_obj_as(

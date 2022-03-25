@@ -11,6 +11,7 @@ from .protocol_schema_v6 import (
     WellLocation,
     Module,
     Location,
+    LabwareDefinition
 )
 
 
@@ -27,4 +28,5 @@ __all__ = [
     "WellLocation",
     "Module",
     "Location",
+    "LabwareDefinition"
 ]
