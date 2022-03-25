@@ -151,6 +151,32 @@ const mockTCBlockHeating = {
   usbPort: { hub: 1, port: 1 },
 } as any
 
+const mockTCLidHeating = {
+  id: 'thermocycler_id',
+  model: 'thermocyclerModuleV1',
+  type: 'thermocyclerModuleType',
+  port: '/dev/ot_module_thermocycler0',
+  serial: 'ghi789',
+  revision: 'thermocycler_v4.0',
+  fwVersion: 'v2.0.0',
+  status: 'heating',
+  hasAvailableUpdate: true,
+  data: {
+    lid: 'open',
+    lidTarget: 50,
+    lidTemp: 40,
+    currentTemp: null,
+    targetTemp: null,
+    holdTime: null,
+    rampRate: null,
+    currentCycleIndex: null,
+    totalCycleCount: null,
+    currentStepIndex: null,
+    totalStepCount: null,
+  },
+  usbPort: { hub: 1, port: 1 },
+} as any
+
 describe('useLatchCommand', () => {
   const store: Store<any> = createStore(jest.fn(), {})
   let mockCreateLiveCommand = jest.fn()
@@ -501,6 +527,39 @@ describe('useModuleOverflowMenu', () => {
         commandType: 'thermocycler/deactivateBlock',
         params: {
           moduleId: mockTCBlockHeating.id,
+        },
+      },
+    })
+  })
+
+  it('should render TC module and create deactivate lid command', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <I18nextProvider i18n={i18n}>
+        <Provider store={store}>{children}</Provider>
+      </I18nextProvider>
+    )
+    const { result } = renderHook(
+      () =>
+        useModuleOverflowMenu(
+          mockTCLidHeating,
+          jest.fn(),
+          jest.fn(),
+          jest.fn(),
+          jest.fn()
+        ),
+      {
+        wrapper,
+      }
+    )
+    const { menuOverflowItemsByModuleType } = result.current
+    const tcMenu = menuOverflowItemsByModuleType.thermocyclerModuleType
+    act(() => tcMenu[0].onClick(true))
+
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'thermocycler/deactivateLid',
+        params: {
+          moduleId: mockTCLidHeating.id,
         },
       },
     })

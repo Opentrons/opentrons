@@ -116,9 +116,9 @@ export function useModuleOverflowMenu(
     }
     case 'thermocyclerModuleType': {
       commandType =
-        module.status !== 'idle'
-          ? 'thermocycler/deactivateBlock'
-          : 'thermocycler/deactivateLid'
+        module.data.lidTarget !== null && module.status !== 'idle'
+          ? 'thermocycler/deactivateLid'
+          : 'thermocycler/deactivateBlock'
       break
     }
     case 'heaterShakerModuleType': {
