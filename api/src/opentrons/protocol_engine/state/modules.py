@@ -28,10 +28,8 @@ from ..types import (
 from .. import errors
 from ..commands import Command, LoadModuleResult
 from ..commands.heater_shaker import (
-    SetTargetShakeSpeedResult,
     StartSetTargetTemperatureResult,
     DeactivateHeaterResult,
-    StopShakeResult,
 )
 from ..actions import Action, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
@@ -128,10 +126,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         if isinstance(
             command.result,
             (
-                SetTargetShakeSpeedResult,
                 StartSetTargetTemperatureResult,
                 DeactivateHeaterResult,
-                StopShakeResult,
             ),
         ):
             slot_name = self._state.slot_by_module_id[command.params.moduleId]
@@ -642,10 +638,8 @@ class HeaterShakerModuleView:
     @staticmethod
     def validate_target_speed(rpm: float) -> int:
         """Verify that the target speed is valid for heater-shaker & convert to int."""
-        rpm_int = rpm.__trunc__()
+        rpm_int = int(round(rpm, 0))
         if HEATER_SHAKER_SPEED_RANGE.min <= rpm <= HEATER_SHAKER_SPEED_RANGE.max:
-            # Typecasting to int gives inconsistent conversion result.
-            # Truncating is more reliable.
             return rpm_int
         else:
             raise errors.InvalidTargetSpeedError(

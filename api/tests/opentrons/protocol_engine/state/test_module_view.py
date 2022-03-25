@@ -283,7 +283,7 @@ def test_get_properties_by_id(
 
 
 @pytest.mark.parametrize("target", [123.45, None])
-def test_get_is_target_temperature_set(
+def test_get_plate_target_temperature(
     target: Optional[float], thermocycler_v1_def: ModuleDefinition
 ) -> None:
     """It should return whether target temperature is set."""
@@ -839,7 +839,7 @@ def test_validate_target_temperature(
 
 @pytest.mark.parametrize(
     argnames=["rpm_param", "validated_param"],
-    argvalues=[(200.1, 200), (250.6, 250), (300.9, 300)],
+    argvalues=[(200.1, 200), (250.6, 251), (300.9, 301)],
 )
 def test_validate_heater_shaker_target_speed_converts_to_int(
     rpm_param: float, validated_param: bool, heater_shaker_v1_def: ModuleDefinition
@@ -860,7 +860,7 @@ def test_validate_heater_shaker_target_speed_converts_to_int(
 
 @pytest.mark.parametrize(
     argnames=["rpm_param", "expected_valid"],
-    argvalues=[(199.9, False), (200.1, True), (3000.7, True), (3001, False)],
+    argvalues=[(199.4, False), (199.5, True), (3000.7, False), (3000.4, True)],
 )
 def test_validate_heater_shaker_target_speed_raises_error(
     rpm_param: float, expected_valid: bool, heater_shaker_v1_def: ModuleDefinition
