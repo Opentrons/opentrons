@@ -5,7 +5,6 @@ import { useFormik } from 'formik'
 import styled from 'styled-components'
 import {
   Flex,
-  DIRECTION_ROW,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   SPACING,
@@ -40,8 +39,7 @@ type Props = SP &
 
 const FlexForm = styled.form`
   display: flex;
-  /* flex: 1;
-   */
+  flex-direction: row;
   width: 100%;
   align-items: center;
 `
@@ -80,35 +78,33 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
       margin={`${SPACING.spacing2} 0`}
       height={SPACING.spacing6}
     >
-      <Flex flexDirection={DIRECTION_ROW}>
-        <FlexForm onSubmit={formik.handleSubmit}>
-          <input
-            id="ip"
-            name="ip"
-            type="text"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.ip}
-            height={SPACING.spacing5}
-            width="100%"
-            style={{
-              flex: 6,
-              margin: `${SPACING.spacing2} 0`,
-              border: `1px solid ${COLORS.medGrey}`,
-            }}
-          />
-          <TertiaryButton
-            fontSize={TYPOGRAPHY.fontSizeH6}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            lineHeight={TYPOGRAPHY.lineHeight12}
-            marginLeft={SPACING.spacing3}
-            padding={`6px 12px}`}
-            type="submit"
-          >
-            {t('add_ip_button')}
-          </TertiaryButton>
-        </FlexForm>
-      </Flex>
+      <FlexForm onSubmit={formik.handleSubmit}>
+        <input
+          id="ip"
+          name="ip"
+          type="text"
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          value={formik.values.ip}
+          height={SPACING.spacing5}
+          width="100%"
+          style={{
+            flex: 6,
+            margin: `${SPACING.spacing2} 0`,
+            border: `1px solid ${COLORS.medGrey}`,
+          }}
+        />
+        <TertiaryButton
+          fontSize={TYPOGRAPHY.fontSizeH6}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          lineHeight={TYPOGRAPHY.lineHeight12}
+          marginLeft={SPACING.spacing3}
+          padding={`6px 12px}`}
+          type="submit"
+        >
+          {t('add_ip_button')}
+        </TertiaryButton>
+      </FlexForm>
       {formik.errors.ip && (
         <Text
           marginTop={SPACING.spacing2}
