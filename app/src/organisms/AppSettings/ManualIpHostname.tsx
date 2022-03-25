@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useFormik } from 'formik'
@@ -7,6 +7,7 @@ import {
   Flex,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
+  WRAP,
   ALIGN_FLEX_START,
   ALIGN_CENTER,
   TYPOGRAPHY,
@@ -87,6 +88,7 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
+      flexWrap={WRAP}
       margin={`${SPACING.spacing2} 0`}
       height={SPACING.spacing6}
     >
@@ -102,7 +104,7 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
             height={SPACING.spacing5}
             width="100%"
             style={{
-              flex: 5,
+              flex: 2,
               margin: `${SPACING.spacing2} 0`,
               border: `1px solid ${COLORS.medGrey}`,
             }}

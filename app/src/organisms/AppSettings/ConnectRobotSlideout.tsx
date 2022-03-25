@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -61,7 +61,7 @@ export function ConnectRobotSlideout(
     )
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!scanning) {
       setMostRecentAddition(null)
     }
@@ -74,7 +74,7 @@ export function ConnectRobotSlideout(
       isExpanded={isExpanded}
       height="100vh"
       footer={
-        <PrimaryButton onClick={null} width="100%">
+        <PrimaryButton onClick={onCloseClick} width="100%">
           {t('connect_ip_button')}
         </PrimaryButton>
       }
