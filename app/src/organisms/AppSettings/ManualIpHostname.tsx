@@ -57,6 +57,8 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
       console.log('values', values)
       // setShowSpinner(true)
       const ip = values.ip.trim()
+      const inputForm = document.getElementById('ip')
+      if (inputForm) inputForm.style.border = `1px solid ${COLORS.medGrey}`
       props.addManualIp(ip)
       props.setMostRecentAddition(ip)
       resetForm({ values: undefined })
@@ -68,7 +70,7 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
       if (!ip) {
         errors.ip = t('add_ip_error')
         const inputForm = document.getElementById('ip')
-        if (inputForm) inputForm.style.border = '1px solid red'
+        if (inputForm) inputForm.style.border = `1px solid ${COLORS.error}`
       }
       return errors
     },
@@ -85,38 +87,41 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      // paddingRight={SPACING.spacing3}
-      // marginTop={SPACING.spacing2}
       margin={`${SPACING.spacing2} 0`}
       height={SPACING.spacing6}
-      width="100%"
-      // alignContent={ALIGN_CENTER}
     >
-      <Form onSubmit={formik.handleSubmit}>
-        <input
-          id="ip"
-          name="ip"
-          type="text"
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.ip}
-          height={SPACING.spacing5}
-          // width="100%"
-          style={{ flex: 1 }}
-        />
-        <TertiaryButton
-          fontSize={TYPOGRAPHY.fontSizeH6}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight={TYPOGRAPHY.lineHeight12}
-          // marginTop={SPACING.spacing2}
-          // margin={`${SPACING.spacingSM} 0`}
-          // width="75%"
-          padding={`6px 12px}`}
-          type="submit"
-        >
-          {t('add_ip_button')}
-        </TertiaryButton>
-      </Form>
+      <Flex flexDirection={DIRECTION_ROW}>
+        <Form onSubmit={formik.handleSubmit}>
+          <input
+            id="ip"
+            name="ip"
+            type="text"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.ip}
+            height={SPACING.spacing5}
+            width="100%"
+            style={{
+              flex: 5,
+              margin: `${SPACING.spacing2} 0`,
+              border: `1px solid ${COLORS.medGrey}`,
+            }}
+          />
+          <TertiaryButton
+            fontSize={TYPOGRAPHY.fontSizeH6}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            lineHeight={TYPOGRAPHY.lineHeight12}
+            // marginTop={SPACING.spacing2}
+            // margin={`${SPCING.spacingSM} 0`}
+            // width="75%"
+            // padding={`6px 12px}`}
+            style={{ flex: 1 }}
+            type="submit"
+          >
+            {t('add_ip_button')}
+          </TertiaryButton>
+        </Form>
+      </Flex>
       {formik.errors.ip && (
         <Text
           marginTop={SPACING.spacing2}
