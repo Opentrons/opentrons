@@ -1,0 +1,1844 @@
+test_name: Upload, analyze, delete basic_transfer_standalone protocol.
+
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload simple v6 protocol
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/simpleV6.json'
+    response:
+      strict:
+        - json:off
+      save:
+        json:
+          protocol_id: data.id
+          analyses_id: data.analyses[0].id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolType: json
+          analyses:
+            - id: !anystr
+              status: pending
+  - name: Retry until analyses status is completed and result is ok.
+    max_retries: 20
+    delay_after: 2
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{protocol_id}'
+            analyses:
+              - id: '{analyses_id}'
+                status: completed
+                result: ok
+  - name: Get protocol by ID
+    request:
+      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          id: '{protocol_id}'
+          createdAt: !anystr
+          files:
+          - name: simpleV6.json
+            role: main
+          protocolType: json
+          metadata:
+            tags:
+            - unitTest
+            created: !anystr
+            description: A short test protocol
+            author: engineering <engineering@opentrons.com>
+            protocolName: Simple test protocol
+          analyses:
+          - id: '{analyses_id}'
+            status: completed
+            result: ok
+            pipettes:
+            - id: pipetteId
+              pipetteName: p10_single
+              mount: left
+            labware:
+            - id: fixedTrash
+              loadName: opentrons_1_trash_1100ml_fixed
+              definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+              location:
+                slotName: '12'
+            - id: sourcePlateId
+              loadName: foo_8_plate_33ul
+              definitionUri: example/foo_8_plate_33ul/1
+              location:
+                moduleId: temperatureModuleId
+            - id: destPlateId
+              loadName: foo_8_plate_33ul
+              definitionUri: example/foo_8_plate_33ul/1
+              location:
+                moduleId: magneticModuleId
+            - id: tipRackId
+              loadName: opentrons_96_tiprack_10ul
+              definitionUri: opentrons/opentrons_96_tiprack_10ul/1
+              location:
+                slotName: '8'
+            - id: trashId
+              loadName: opentrons_1_trash_1100ml_fixed
+              definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+              location:
+                slotName: '12'
+            commands:
+            - id: a935790e-403f-48f8-aa14-0eaa38b55be2
+              createdAt: '2022-03-24T20:20:13.506293+00:00'
+              commandType: home
+              key: a935790e-403f-48f8-aa14-0eaa38b55be2
+              status: succeeded
+              params: {}
+              result: {}
+              startedAt: !anystr
+              completedAt: !anystr
+            - id: !anystr
+              createdAt: !anystr
+              commandType: home
+              key: 5f285901-f302-41d2-afd2-feda7126cb10
+              status: succeeded
+              params:
+                axes:
+                - x
+                - y
+                - leftZ
+                - rightZ
+                - leftPlunger
+                - rightPlunger
+              result: {}
+              startedAt: '2022-03-24T20:20:13.579297+00:00'
+              completedAt: '2022-03-24T20:20:13.579894+00:00'
+            - id: 9d67feb5-fb57-4a52-a4df-a26002508f8f
+              createdAt: '2022-03-24T20:20:13.507600+00:00'
+              commandType: loadPipette
+              key: 9d67feb5-fb57-4a52-a4df-a26002508f8f
+              status: succeeded
+              params:
+                pipetteName: p10_single
+                mount: left
+                pipetteId: pipetteId
+              result:
+                pipetteId: pipetteId
+              startedAt: '2022-03-24T20:20:13.579944+00:00'
+              completedAt: '2022-03-24T20:20:13.580704+00:00'
+            - id: c010aa51-d780-4f39-af0f-c28d6dadbed7
+              createdAt: '2022-03-24T20:20:13.507640+00:00'
+              commandType: loadModule
+              key: c010aa51-d780-4f39-af0f-c28d6dadbed7
+              status: succeeded
+              params:
+                model: magneticModuleV2
+                location:
+                  slotName: '3'
+                moduleId: magneticModuleId
+              result:
+                moduleId: magneticModuleId
+                definition:
+                  otSharedSchema: module/schemas/2
+                  moduleType: magneticModuleType
+                  model: magneticModuleV2
+                  labwareOffset:
+                    x: -1.175
+                    y: -0.125
+                    z: 82.25
+                  dimensions:
+                    bareOverallHeight: 110.152
+                    overLabwareHeight: 4.052
+                  calibrationPoint:
+                    x: 124.875
+                    y: 2.75
+                  displayName: Magnetic Module GEN2
+                  quirks: []
+                  slotTransforms:
+                    ot2_standard:
+                      '3':
+                        labwareOffset:
+                        - - -1
+                          - 0
+                          - 0.25
+                        - - 0
+                          - 1
+                          - 0
+                        - - 0
+                          - 0
+                          - 1
+                      '6':
+                        labwareOffset:
+                        - - -1
+                          - 0
+                          - 0.25
+                        - - 0
+                          - 1
+                          - 0
+                        - - 0
+                          - 0
+                          - 1
+                      '9':
+                        labwareOffset:
+                        - - -1
+                          - 0
+                          - 0.25
+                        - - 0
+                          - 1
+                          - 0
+                        - - 0
+                          - 0
+                          - 1
+                    ot2_short_trash:
+                      '3':
+                        labwareOffset:
+                        - - -1
+                          - 0
+                          - 0.25
+                        - - 0
+                          - 1
+                          - 0
+                        - - 0
+                          - 0
+                          - 1
+                      '6':
+                        labwareOffset:
+                        - - -1
+                          - 0
+                          - 0.25
+                        - - 0
+                          - 1
+                          - 0
+                        - - 0
+                          - 0
+                          - 1
+                      '9':
+                        labwareOffset:
+                        - - -1
+                          - 0
+                          - 0.25
+                        - - 0
+                          - 1
+                          - 0
+                        - - 0
+                          - 0
+                          - 1
+                  compatibleWith: []
+                model: magneticModuleV2
+                serialNumber: fake-serial-number-1b25854b-5f6f-4793-b68b-768d63778e91
+              startedAt: '2022-03-24T20:20:13.580779+00:00'
+              completedAt: '2022-03-24T20:20:13.582107+00:00'
+            - id: b43dc36c-cf52-4d06-a996-6587faeeec91
+              createdAt: '2022-03-24T20:20:13.507675+00:00'
+              commandType: loadModule
+              key: b43dc36c-cf52-4d06-a996-6587faeeec91
+              status: succeeded
+              params:
+                model: temperatureModuleV2
+                location:
+                  slotName: '1'
+                moduleId: temperatureModuleId
+              result:
+                moduleId: temperatureModuleId
+                definition:
+                  otSharedSchema: module/schemas/2
+                  moduleType: temperatureModuleType
+                  model: temperatureModuleV2
+                  labwareOffset:
+                    x: -1.45
+                    y: -0.15
+                    z: 80.09
+                  dimensions:
+                    bareOverallHeight: 84
+                    overLabwareHeight: 0
+                  calibrationPoint:
+                    x: 11.7
+                    y: 8.75
+                  displayName: Temperature Module GEN2
+                  quirks: []
+                  slotTransforms:
+                    ot2_standard:
+                      '3':
+                        labwareOffset:
+                        - - -1
+                          - 0
+                          - -0.3
+                        - - 0
+                          - 1
+                          - 0
+                        - - 0
+                          - 0
+                          - 1
+                      '6':
+                        labwareOffset:
+                        - - -1
+                          - 0
+                          - -0.3
+                        - - 0
+                          - 1
+                          - 0
+                        - - 0
+                          - 0
+                          - 1
+                      '9':
+                        labwareOffset:
+                        - - -1
+                          - 0
+                          - -0.3
+                        - - 0
+                          - 1
+                          - 0
+                        - - 0
+                          - 0
+                          - 1
+                    ot2_short_trash:
+                      '3':
+                        labwareOffset:
+                        - - -1
+                          - 0
+                          - -0.15
+                        - - 0
+                          - 1
+                          - 0
+                        - - 0
+                          - 0
+                          - 1
+                      '6':
+                        labwareOffset:
+                        - - -1
+                          - 0
+                          - -0.15
+                        - - 0
+                          - 1
+                          - 0
+                        - - 0
+                          - 0
+                          - 1
+                      '9':
+                        labwareOffset:
+                        - - -1
+                          - 0
+                          - -0.15
+                        - - 0
+                          - 1
+                          - 0
+                        - - 0
+                          - 0
+                          - 1
+                  compatibleWith:
+                  - temperatureModuleV1
+                model: temperatureModuleV2
+                serialNumber: fake-serial-number-89aa4432-083f-4260-ab5c-a119fdad03f6
+              startedAt: '2022-03-24T20:20:13.582233+00:00'
+              completedAt: '2022-03-24T20:20:13.583384+00:00'
+            - id: ee5c7474-33e0-4be7-990a-c308846aced2
+              createdAt: '2022-03-24T20:20:13.507698+00:00'
+              commandType: loadLabware
+              key: ee5c7474-33e0-4be7-990a-c308846aced2
+              status: succeeded
+              params:
+                location:
+                  moduleId: temperatureModuleId
+                loadName: foo_8_plate_33ul
+                namespace: example
+                version: 1
+                labwareId: sourcePlateId
+                displayName: Source Plate
+              result:
+                labwareId: sourcePlateId
+                definition:
+                  schemaVersion: 2
+                  version: 1
+                  namespace: example
+                  metadata:
+                    displayName: Foo 8 Well Plate 33uL
+                    displayCategory: wellPlate
+                    displayVolumeUnits: µL
+                  brand:
+                    brand: foo
+                    brandId: []
+                  parameters:
+                    format: irregular
+                    quirks: []
+                    isTiprack: false
+                    loadName: foo_8_plate_33ul
+                    isMagneticModuleCompatible: false
+                  ordering:
+                  - - A1
+                    - B1
+                    - C1
+                    - D1
+                  - - A2
+                    - B2
+                    - C2
+                    - D2
+                  cornerOffsetFromSlot:
+                    x: 0
+                    y: 0
+                    z: 0
+                  dimensions:
+                    yDimension: 85.5
+                    zDimension: 100
+                    xDimension: 127.75
+                  wells:
+                    A1:
+                      depth: 25
+                      x: 18.21
+                      y: 75.43
+                      z: 75
+                      totalLiquidVolume: 33
+                      diameter: 10
+                      shape: circular
+                    B1:
+                      depth: 25
+                      x: 18.21
+                      y: 56.15
+                      z: 75
+                      totalLiquidVolume: 33
+                      diameter: 10
+                      shape: circular
+                    C1:
+                      depth: 25
+                      x: 18.21
+                      y: 36.87
+                      z: 75
+                      totalLiquidVolume: 33
+                      diameter: 10
+                      shape: circular
+                    D1:
+                      depth: 25
+                      x: 18.21
+                      y: 17.59
+                      z: 75
+                      totalLiquidVolume: 33
+                      diameter: 10
+                      shape: circular
+                    A2:
+                      depth: 25
+                      x: 38.1
+                      y: 75.43
+                      z: 75
+                      totalLiquidVolume: 33
+                      diameter: 10
+                      shape: circular
+                    B2:
+                      depth: 25
+                      x: 38.1
+                      y: 56.15
+                      z: 75
+                      totalLiquidVolume: 33
+                      diameter: 10
+                      shape: circular
+                    C2:
+                      depth: 25
+                      x: 38.1
+                      y: 36.87
+                      z: 75
+                      totalLiquidVolume: 33
+                      diameter: 10
+                      shape: circular
+                    D2:
+                      depth: 25
+                      x: 38.1
+                      y: 17.59
+                      z: 75
+                      totalLiquidVolume: 33
+                      diameter: 10
+                      shape: circular
+                  groups:
+                  - wells:
+                    - A1
+                    - B1
+                    - C1
+                    - A2
+                    - B2
+                    - C2
+                    metadata: {}
+              startedAt: '2022-03-24T20:20:13.583490+00:00'
+              completedAt: '2022-03-24T20:20:13.583622+00:00'
+            - id: ba1a9169-ea9b-4bef-bdbb-0ce2ac9f6ec5
+              createdAt: '2022-03-24T20:20:13.507732+00:00'
+              commandType: loadLabware
+              key: ba1a9169-ea9b-4bef-bdbb-0ce2ac9f6ec5
+              status: succeeded
+              params:
+                location:
+                  moduleId: magneticModuleId
+                loadName: foo_8_plate_33ul
+                namespace: example
+                version: 1
+                labwareId: destPlateId
+                displayName: Sample Collection Plate
+              result:
+                labwareId: destPlateId
+                definition:
+                  schemaVersion: 2
+                  version: 1
+                  namespace: example
+                  metadata:
+                    displayName: Foo 8 Well Plate 33uL
+                    displayCategory: wellPlate
+                    displayVolumeUnits: µL
+                  brand:
+                    brand: foo
+                    brandId: []
+                  parameters:
+                    format: irregular
+                    quirks: []
+                    isTiprack: false
+                    loadName: foo_8_plate_33ul
+                    isMagneticModuleCompatible: false
+                  ordering:
+                  - - A1
+                    - B1
+                    - C1
+                    - D1
+                  - - A2
+                    - B2
+                    - C2
+                    - D2
+                  cornerOffsetFromSlot:
+                    x: 0
+                    y: 0
+                    z: 0
+                  dimensions:
+                    yDimension: 85.5
+                    zDimension: 100
+                    xDimension: 127.75
+                  wells:
+                    A1:
+                      depth: 25
+                      x: 18.21
+                      y: 75.43
+                      z: 75
+                      totalLiquidVolume: 33
+                      diameter: 10
+                      shape: circular
+                    B1:
+                      depth: 25
+                      x: 18.21
+                      y: 56.15
+                      z: 75
+                      totalLiquidVolume: 33
+                      diameter: 10
+                      shape: circular
+                    C1:
+                      depth: 25
+                      x: 18.21
+                      y: 36.87
+                      z: 75
+                      totalLiquidVolume: 33
+                      diameter: 10
+                      shape: circular
+                    D1:
+                      depth: 25
+                      x: 18.21
+                      y: 17.59
+                      z: 75
+                      totalLiquidVolume: 33
+                      diameter: 10
+                      shape: circular
+                    A2:
+                      depth: 25
+                      x: 38.1
+                      y: 75.43
+                      z: 75
+                      totalLiquidVolume: 33
+                      diameter: 10
+                      shape: circular
+                    B2:
+                      depth: 25
+                      x: 38.1
+                      y: 56.15
+                      z: 75
+                      totalLiquidVolume: 33
+                      diameter: 10
+                      shape: circular
+                    C2:
+                      depth: 25
+                      x: 38.1
+                      y: 36.87
+                      z: 75
+                      totalLiquidVolume: 33
+                      diameter: 10
+                      shape: circular
+                    D2:
+                      depth: 25
+                      x: 38.1
+                      y: 17.59
+                      z: 75
+                      totalLiquidVolume: 33
+                      diameter: 10
+                      shape: circular
+                  groups:
+                  - wells:
+                    - A1
+                    - B1
+                    - C1
+                    - A2
+                    - B2
+                    - C2
+                    metadata: {}
+              startedAt: '2022-03-24T20:20:13.583713+00:00'
+              completedAt: '2022-03-24T20:20:13.583771+00:00'
+            - id: c2a72df0-c4a5-411d-9fe8-7b8852583886
+              createdAt: '2022-03-24T20:20:13.507753+00:00'
+              commandType: loadLabware
+              key: c2a72df0-c4a5-411d-9fe8-7b8852583886
+              status: succeeded
+              params:
+                location:
+                  slotName: '8'
+                loadName: opentrons_96_tiprack_10ul
+                namespace: opentrons
+                version: 1
+                labwareId: tipRackId
+                displayName: Opentrons 96 Tip Rack 10 µL
+              result:
+                labwareId: tipRackId
+                definition:
+                  schemaVersion: 2
+                  version: 1
+                  namespace: opentrons
+                  metadata:
+                    displayName: Opentrons 96 Tip Rack 10 µL
+                    displayCategory: tipRack
+                    displayVolumeUnits: µL
+                    tags: []
+                  brand:
+                    brand: Opentrons
+                    brandId: []
+                    links:
+                    - https://shop.opentrons.com/collections/opentrons-tips/products/opentrons-10ul-tips
+                  parameters:
+                    format: 96Standard
+                    isTiprack: true
+                    tipLength: 39.2
+                    tipOverlap: 3.29
+                    loadName: opentrons_96_tiprack_10ul
+                    isMagneticModuleCompatible: false
+                  ordering:
+                  - - A1
+                    - B1
+                    - C1
+                    - D1
+                    - E1
+                    - F1
+                    - G1
+                    - H1
+                  - - A2
+                    - B2
+                    - C2
+                    - D2
+                    - E2
+                    - F2
+                    - G2
+                    - H2
+                  - - A3
+                    - B3
+                    - C3
+                    - D3
+                    - E3
+                    - F3
+                    - G3
+                    - H3
+                  - - A4
+                    - B4
+                    - C4
+                    - D4
+                    - E4
+                    - F4
+                    - G4
+                    - H4
+                  - - A5
+                    - B5
+                    - C5
+                    - D5
+                    - E5
+                    - F5
+                    - G5
+                    - H5
+                  - - A6
+                    - B6
+                    - C6
+                    - D6
+                    - E6
+                    - F6
+                    - G6
+                    - H6
+                  - - A7
+                    - B7
+                    - C7
+                    - D7
+                    - E7
+                    - F7
+                    - G7
+                    - H7
+                  - - A8
+                    - B8
+                    - C8
+                    - D8
+                    - E8
+                    - F8
+                    - G8
+                    - H8
+                  - - A9
+                    - B9
+                    - C9
+                    - D9
+                    - E9
+                    - F9
+                    - G9
+                    - H9
+                  - - A10
+                    - B10
+                    - C10
+                    - D10
+                    - E10
+                    - F10
+                    - G10
+                    - H10
+                  - - A11
+                    - B11
+                    - C11
+                    - D11
+                    - E11
+                    - F11
+                    - G11
+                    - H11
+                  - - A12
+                    - B12
+                    - C12
+                    - D12
+                    - E12
+                    - F12
+                    - G12
+                    - H12
+                  cornerOffsetFromSlot:
+                    x: 0
+                    y: 0
+                    z: 0
+                  dimensions:
+                    yDimension: 85.48
+                    zDimension: 64.69
+                    xDimension: 127.76
+                  wells:
+                    A1:
+                      depth: 39.2
+                      x: 14.38
+                      y: 74.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    B1:
+                      depth: 39.2
+                      x: 14.38
+                      y: 65.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    C1:
+                      depth: 39.2
+                      x: 14.38
+                      y: 56.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    D1:
+                      depth: 39.2
+                      x: 14.38
+                      y: 47.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    E1:
+                      depth: 39.2
+                      x: 14.38
+                      y: 38.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    F1:
+                      depth: 39.2
+                      x: 14.38
+                      y: 29.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    G1:
+                      depth: 39.2
+                      x: 14.38
+                      y: 20.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    H1:
+                      depth: 39.2
+                      x: 14.38
+                      y: 11.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    A2:
+                      depth: 39.2
+                      x: 23.38
+                      y: 74.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    B2:
+                      depth: 39.2
+                      x: 23.38
+                      y: 65.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    C2:
+                      depth: 39.2
+                      x: 23.38
+                      y: 56.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    D2:
+                      depth: 39.2
+                      x: 23.38
+                      y: 47.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    E2:
+                      depth: 39.2
+                      x: 23.38
+                      y: 38.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    F2:
+                      depth: 39.2
+                      x: 23.38
+                      y: 29.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    G2:
+                      depth: 39.2
+                      x: 23.38
+                      y: 20.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    H2:
+                      depth: 39.2
+                      x: 23.38
+                      y: 11.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    A3:
+                      depth: 39.2
+                      x: 32.38
+                      y: 74.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    B3:
+                      depth: 39.2
+                      x: 32.38
+                      y: 65.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    C3:
+                      depth: 39.2
+                      x: 32.38
+                      y: 56.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    D3:
+                      depth: 39.2
+                      x: 32.38
+                      y: 47.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    E3:
+                      depth: 39.2
+                      x: 32.38
+                      y: 38.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    F3:
+                      depth: 39.2
+                      x: 32.38
+                      y: 29.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    G3:
+                      depth: 39.2
+                      x: 32.38
+                      y: 20.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    H3:
+                      depth: 39.2
+                      x: 32.38
+                      y: 11.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    A4:
+                      depth: 39.2
+                      x: 41.38
+                      y: 74.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    B4:
+                      depth: 39.2
+                      x: 41.38
+                      y: 65.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    C4:
+                      depth: 39.2
+                      x: 41.38
+                      y: 56.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    D4:
+                      depth: 39.2
+                      x: 41.38
+                      y: 47.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    E4:
+                      depth: 39.2
+                      x: 41.38
+                      y: 38.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    F4:
+                      depth: 39.2
+                      x: 41.38
+                      y: 29.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    G4:
+                      depth: 39.2
+                      x: 41.38
+                      y: 20.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    H4:
+                      depth: 39.2
+                      x: 41.38
+                      y: 11.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    A5:
+                      depth: 39.2
+                      x: 50.38
+                      y: 74.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    B5:
+                      depth: 39.2
+                      x: 50.38
+                      y: 65.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    C5:
+                      depth: 39.2
+                      x: 50.38
+                      y: 56.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    D5:
+                      depth: 39.2
+                      x: 50.38
+                      y: 47.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    E5:
+                      depth: 39.2
+                      x: 50.38
+                      y: 38.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    F5:
+                      depth: 39.2
+                      x: 50.38
+                      y: 29.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    G5:
+                      depth: 39.2
+                      x: 50.38
+                      y: 20.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    H5:
+                      depth: 39.2
+                      x: 50.38
+                      y: 11.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    A6:
+                      depth: 39.2
+                      x: 59.38
+                      y: 74.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    B6:
+                      depth: 39.2
+                      x: 59.38
+                      y: 65.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    C6:
+                      depth: 39.2
+                      x: 59.38
+                      y: 56.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    D6:
+                      depth: 39.2
+                      x: 59.38
+                      y: 47.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    E6:
+                      depth: 39.2
+                      x: 59.38
+                      y: 38.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    F6:
+                      depth: 39.2
+                      x: 59.38
+                      y: 29.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    G6:
+                      depth: 39.2
+                      x: 59.38
+                      y: 20.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    H6:
+                      depth: 39.2
+                      x: 59.38
+                      y: 11.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    A7:
+                      depth: 39.2
+                      x: 68.38
+                      y: 74.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    B7:
+                      depth: 39.2
+                      x: 68.38
+                      y: 65.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    C7:
+                      depth: 39.2
+                      x: 68.38
+                      y: 56.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    D7:
+                      depth: 39.2
+                      x: 68.38
+                      y: 47.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    E7:
+                      depth: 39.2
+                      x: 68.38
+                      y: 38.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    F7:
+                      depth: 39.2
+                      x: 68.38
+                      y: 29.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    G7:
+                      depth: 39.2
+                      x: 68.38
+                      y: 20.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    H7:
+                      depth: 39.2
+                      x: 68.38
+                      y: 11.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    A8:
+                      depth: 39.2
+                      x: 77.38
+                      y: 74.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    B8:
+                      depth: 39.2
+                      x: 77.38
+                      y: 65.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    C8:
+                      depth: 39.2
+                      x: 77.38
+                      y: 56.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    D8:
+                      depth: 39.2
+                      x: 77.38
+                      y: 47.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    E8:
+                      depth: 39.2
+                      x: 77.38
+                      y: 38.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    F8:
+                      depth: 39.2
+                      x: 77.38
+                      y: 29.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    G8:
+                      depth: 39.2
+                      x: 77.38
+                      y: 20.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    H8:
+                      depth: 39.2
+                      x: 77.38
+                      y: 11.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    A9:
+                      depth: 39.2
+                      x: 86.38
+                      y: 74.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    B9:
+                      depth: 39.2
+                      x: 86.38
+                      y: 65.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    C9:
+                      depth: 39.2
+                      x: 86.38
+                      y: 56.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    D9:
+                      depth: 39.2
+                      x: 86.38
+                      y: 47.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    E9:
+                      depth: 39.2
+                      x: 86.38
+                      y: 38.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    F9:
+                      depth: 39.2
+                      x: 86.38
+                      y: 29.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    G9:
+                      depth: 39.2
+                      x: 86.38
+                      y: 20.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    H9:
+                      depth: 39.2
+                      x: 86.38
+                      y: 11.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    A10:
+                      depth: 39.2
+                      x: 95.38
+                      y: 74.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    B10:
+                      depth: 39.2
+                      x: 95.38
+                      y: 65.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    C10:
+                      depth: 39.2
+                      x: 95.38
+                      y: 56.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    D10:
+                      depth: 39.2
+                      x: 95.38
+                      y: 47.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    E10:
+                      depth: 39.2
+                      x: 95.38
+                      y: 38.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    F10:
+                      depth: 39.2
+                      x: 95.38
+                      y: 29.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    G10:
+                      depth: 39.2
+                      x: 95.38
+                      y: 20.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    H10:
+                      depth: 39.2
+                      x: 95.38
+                      y: 11.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    A11:
+                      depth: 39.2
+                      x: 104.38
+                      y: 74.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    B11:
+                      depth: 39.2
+                      x: 104.38
+                      y: 65.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    C11:
+                      depth: 39.2
+                      x: 104.38
+                      y: 56.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    D11:
+                      depth: 39.2
+                      x: 104.38
+                      y: 47.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    E11:
+                      depth: 39.2
+                      x: 104.38
+                      y: 38.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    F11:
+                      depth: 39.2
+                      x: 104.38
+                      y: 29.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    G11:
+                      depth: 39.2
+                      x: 104.38
+                      y: 20.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    H11:
+                      depth: 39.2
+                      x: 104.38
+                      y: 11.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    A12:
+                      depth: 39.2
+                      x: 113.38
+                      y: 74.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    B12:
+                      depth: 39.2
+                      x: 113.38
+                      y: 65.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    C12:
+                      depth: 39.2
+                      x: 113.38
+                      y: 56.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    D12:
+                      depth: 39.2
+                      x: 113.38
+                      y: 47.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    E12:
+                      depth: 39.2
+                      x: 113.38
+                      y: 38.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    F12:
+                      depth: 39.2
+                      x: 113.38
+                      y: 29.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    G12:
+                      depth: 39.2
+                      x: 113.38
+                      y: 20.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                    H12:
+                      depth: 39.2
+                      x: 113.38
+                      y: 11.24
+                      z: 25.49
+                      totalLiquidVolume: 10
+                      diameter: 3.27
+                      shape: circular
+                  groups:
+                  - wells:
+                    - A1
+                    - B1
+                    - C1
+                    - D1
+                    - E1
+                    - F1
+                    - G1
+                    - H1
+                    - A2
+                    - B2
+                    - C2
+                    - D2
+                    - E2
+                    - F2
+                    - G2
+                    - H2
+                    - A3
+                    - B3
+                    - C3
+                    - D3
+                    - E3
+                    - F3
+                    - G3
+                    - H3
+                    - A4
+                    - B4
+                    - C4
+                    - D4
+                    - E4
+                    - F4
+                    - G4
+                    - H4
+                    - A5
+                    - B5
+                    - C5
+                    - D5
+                    - E5
+                    - F5
+                    - G5
+                    - H5
+                    - A6
+                    - B6
+                    - C6
+                    - D6
+                    - E6
+                    - F6
+                    - G6
+                    - H6
+                    - A7
+                    - B7
+                    - C7
+                    - D7
+                    - E7
+                    - F7
+                    - G7
+                    - H7
+                    - A8
+                    - B8
+                    - C8
+                    - D8
+                    - E8
+                    - F8
+                    - G8
+                    - H8
+                    - A9
+                    - B9
+                    - C9
+                    - D9
+                    - E9
+                    - F9
+                    - G9
+                    - H9
+                    - A10
+                    - B10
+                    - C10
+                    - D10
+                    - E10
+                    - F10
+                    - G10
+                    - H10
+                    - A11
+                    - B11
+                    - C11
+                    - D11
+                    - E11
+                    - F11
+                    - G11
+                    - H11
+                    - A12
+                    - B12
+                    - C12
+                    - D12
+                    - E12
+                    - F12
+                    - G12
+                    - H12
+                    metadata: {}
+              startedAt: '2022-03-24T20:20:13.583824+00:00'
+              completedAt: '2022-03-24T20:20:13.583887+00:00'
+            - id: 0dcf39da-ccf3-439f-b469-0b248e62cbce
+              createdAt: '2022-03-24T20:20:13.507775+00:00'
+              commandType: loadLabware
+              key: 0dcf39da-ccf3-439f-b469-0b248e62cbce
+              status: succeeded
+              params:
+                location:
+                  slotName: '12'
+                loadName: opentrons_1_trash_1100ml_fixed
+                namespace: opentrons
+                version: 1
+                labwareId: trashId
+                displayName: Trash
+              result:
+                labwareId: trashId
+                definition:
+                  schemaVersion: 2
+                  version: 1
+                  namespace: opentrons
+                  metadata:
+                    displayName: Opentrons Fixed Trash
+                    displayCategory: trash
+                    displayVolumeUnits: mL
+                    tags: []
+                  brand:
+                    brand: Opentrons
+                  parameters:
+                    format: trash
+                    quirks:
+                    - fixedTrash
+                    - centerMultichannelOnWells
+                    isTiprack: false
+                    loadName: opentrons_1_trash_1100ml_fixed
+                    isMagneticModuleCompatible: false
+                  ordering:
+                  - - A1
+                  cornerOffsetFromSlot:
+                    x: 0
+                    y: 0
+                    z: 0
+                  dimensions:
+                    yDimension: 165.86
+                    zDimension: 82
+                    xDimension: 172.86
+                  wells:
+                    A1:
+                      depth: 77
+                      x: 82.84
+                      y: 53.56
+                      z: 5
+                      totalLiquidVolume: 1100000
+                      xDimension: 107.11
+                      yDimension: 165.67
+                      shape: rectangular
+                  groups:
+                  - wells:
+                    - A1
+                    metadata: {}
+              startedAt: '2022-03-24T20:20:13.583929+00:00'
+              completedAt: '2022-03-24T20:20:13.583975+00:00'
+            - id: 1e2ea863-40a3-4834-abea-2ff8771bdac8
+              createdAt: '2022-03-24T20:20:13.507796+00:00'
+              commandType: pickUpTip
+              key: 1e2ea863-40a3-4834-abea-2ff8771bdac8
+              status: succeeded
+              params:
+                pipetteId: pipetteId
+                labwareId: tipRackId
+                wellName: B1
+                wellLocation:
+                  origin: top
+                  offset:
+                    x: 0
+                    y: 0
+                    z: 0
+              result: {}
+              startedAt: '2022-03-24T20:20:13.584022+00:00'
+              completedAt: '2022-03-24T20:20:13.621366+00:00'
+            - id: 17778344-6380-4348-8712-ad07bb66803a
+              createdAt: '2022-03-24T20:20:13.507827+00:00'
+              commandType: aspirate
+              key: 17778344-6380-4348-8712-ad07bb66803a
+              status: succeeded
+              params:
+                pipetteId: pipetteId
+                labwareId: sourcePlateId
+                wellName: A1
+                wellLocation:
+                  origin: bottom
+                  offset:
+                    x: 0
+                    y: 0
+                    z: 2
+                volume: 5
+              result:
+                volume: 5
+              startedAt: '2022-03-24T20:20:13.621734+00:00'
+              completedAt: '2022-03-24T20:20:13.624681+00:00'
+            - id: 20919a78-620b-46d9-907a-7fb47c9d8041
+              createdAt: '2022-03-24T20:20:13.517797+00:00'
+              commandType: dispense
+              key: 20919a78-620b-46d9-907a-7fb47c9d8041
+              status: succeeded
+              params:
+                pipetteId: pipetteId
+                labwareId: destPlateId
+                wellName: B1
+                wellLocation:
+                  origin: bottom
+                  offset:
+                    x: 0
+                    y: 0
+                    z: 1
+                volume: 4.5
+              result:
+                volume: 4.5
+              startedAt: '2022-03-24T20:20:13.625155+00:00'
+              completedAt: '2022-03-24T20:20:13.626989+00:00'
+            - id: e5f76ce7-d764-446e-a128-1d1209d3c1c8
+              createdAt: '2022-03-24T20:20:13.527333+00:00'
+              commandType: moveToWell
+              key: e5f76ce7-d764-446e-a128-1d1209d3c1c8
+              status: succeeded
+              params:
+                pipetteId: pipetteId
+                labwareId: destPlateId
+                wellName: B2
+                wellLocation:
+                  origin: top
+                  offset:
+                    x: 0
+                    y: 0
+                    z: 0
+              result: {}
+              startedAt: '2022-03-24T20:20:13.627538+00:00'
+              completedAt: '2022-03-24T20:20:13.628903+00:00'
+            - id: b7997f13-49df-4898-bd2a-b15ee81a955e
+              createdAt: '2022-03-24T20:20:13.527434+00:00'
+              commandType: moveToWell
+              key: b7997f13-49df-4898-bd2a-b15ee81a955e
+              status: succeeded
+              params:
+                pipetteId: pipetteId
+                labwareId: destPlateId
+                wellName: B2
+                wellLocation:
+                  origin: bottom
+                  offset:
+                    x: 2
+                    y: 3
+                    z: 10
+              result: {}
+              startedAt: '2022-03-24T20:20:13.629136+00:00'
+              completedAt: '2022-03-24T20:20:13.630662+00:00'
+            - id: aee4d544-8fe1-49b1-af43-7f0deb17a09a
+              createdAt: '2022-03-24T20:20:13.527465+00:00'
+              commandType: dropTip
+              key: aee4d544-8fe1-49b1-af43-7f0deb17a09a
+              status: succeeded
+              params:
+                pipetteId: pipetteId
+                labwareId: trashId
+                wellName: A1
+                wellLocation:
+                  origin: top
+                  offset:
+                    x: 0
+                    y: 0
+                    z: 0
+              result: {}
+              startedAt: '2022-03-24T20:20:13.630926+00:00'
+              completedAt: '2022-03-24T20:20:13.635004+00:00'
+            - id: 96999b5c-2fd3-45db-a5c8-072bee669434
+              createdAt: '2022-03-24T20:20:13.527503+00:00'
+              commandType: pause
+              key: 96999b5c-2fd3-45db-a5c8-072bee669434
+              status: succeeded
+              params:
+                message: pause command
+              result: {}
+              startedAt: '2022-03-24T20:20:13.635314+00:00'
+              completedAt: '2022-03-24T20:20:13.635455+00:00'
+            - id: aa259e25-2cb0-438b-9bc8-92c3c261e4e2
+              createdAt: '2022-03-24T20:20:13.527538+00:00'
+              commandType: moveRelative
+              key: aa259e25-2cb0-438b-9bc8-92c3c261e4e2
+              status: succeeded
+              params:
+                pipetteId: pipetteId
+                axis: x
+                distance: 1
+              result: {}
+              startedAt: '2022-03-24T20:20:13.635683+00:00'
+              completedAt: '2022-03-24T20:20:13.636358+00:00'
+            - id: da089a1d-438d-4206-858d-f5c6bd9865ce
+              createdAt: '2022-03-24T20:20:13.527573+00:00'
+              commandType: moveRelative
+              key: da089a1d-438d-4206-858d-f5c6bd9865ce
+              status: succeeded
+              params:
+                pipetteId: pipetteId
+                axis: y
+                distance: 0.1
+              result: {}
+              startedAt: '2022-03-24T20:20:13.636671+00:00'
+              completedAt: '2022-03-24T20:20:13.637225+00:00'
+            - id: '029ade15-7f6e-4d95-b10a-bc87807ad78e'
+              createdAt: '2022-03-24T20:20:13.527599+00:00'
+              commandType: savePosition
+              key: '029ade15-7f6e-4d95-b10a-bc87807ad78e'
+              status: failed
+              params:
+                pipetteId: pipetteId
+              error:
+                id: 33e6c727-15cd-4ac8-9ba6-773b9c4eb23d
+                errorType: MustHomeError
+                createdAt: '2022-03-24T20:20:13.663364+00:00'
+                detail: Current position of LEFT pipette is unknown, please home.
+              startedAt: '2022-03-24T20:20:13.637301+00:00'
+              completedAt: '2022-03-24T20:20:13.663364+00:00'
+            - id: b9507820-0792-4ba6-8504-6a1db7537e70
+              createdAt: '2022-03-24T20:20:13.527636+00:00'
+              commandType: moveRelative
+              key: b9507820-0792-4ba6-8504-6a1db7537e70
+              status: failed
+              params:
+                pipetteId: pipetteId
+                axis: z
+                distance: 10
+              completedAt: '2022-03-24T20:20:13.663364+00:00'
+            - id: fe0a4e9e-e721-4483-8a85-addf03fd3812
+              createdAt: '2022-03-24T20:20:13.527660+00:00'
+              commandType: savePosition
+              key: fe0a4e9e-e721-4483-8a85-addf03fd3812
+              status: failed
+              params:
+                pipetteId: pipetteId
+                positionId: positionId
+              completedAt: '2022-03-24T20:20:13.663364+00:00'
+            errors: []
