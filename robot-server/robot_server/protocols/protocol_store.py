@@ -1,12 +1,17 @@
 """Methods for saving and retrieving protocol files."""
+from __future__ import annotations
+
 from dataclasses import dataclass
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict, List
+from pathlib import Path
+from typing import Dict, List
 
+from anyio import Path as AsyncPath, wrap_file as wrap_file
+from fastapi import UploadFile
 import sqlalchemy
 
-from opentrons.protocol_reader import ProtocolSource
+from opentrons.protocol_reader import InputFile, ProtocolReader, ProtocolSource
 
 
 log = getLogger(__name__)
@@ -87,7 +92,7 @@ class ProtocolStore:
         # instead of creating it ourselves.
         sql_engine = create_memory_db()
         add_tables_to_db(sql_engine)
-        self._record_store = ProtocolRecordStore(sql_engine=sql_engine)
+        self._record_store = ProtocolDataStore(sql_engine=sql_engine)
 
         # TODO: Upon cold boot, when rehydrating the list of protocol records,
         # find a way to reassociate their source files.
@@ -156,8 +161,116 @@ class ProtocolRecord:
     created_at: datetime
 
 
+class _ProtocolSourceStore:
+    def __init__(self, *, _directory: Path, _protocol_reader: ProtocolReader) -> None:
+        """Do not call directly. Use `create_or_rehydrate()` instead."""
+        self._directory = _directory
+        self._protocol_reader = _protocol_reader
+        self._protocol_sources_by_id: Dict[str, ProtocolSource] = {}
+
+    @classmethod
+    async def create_or_rehydrate(
+        cls, directory: Path, protocol_ids: List[str], protocol_reader: ProtocolReader
+    ) -> _ProtocolSourceStore:
+        """
+        Params:
+            directory: A place on the filesystem that's set aside for this store
+                to keep its files. It must already exist. It should either be empty,
+                or the same directory used by a former `_ProtocolSourceStore`.
+
+                The new store will assume that it has exclusive control over
+                this directory. Nothing else may modify it or its contents.
+
+            protocol_ids: The IDs of all protocols that are expected to already exist
+                inside ``directory``, from former stores.
+                To be robust against stray files and interrupted uploads,
+                the new store will not scan ``directory`` on its own;
+                it relies fully on this list.
+
+            protocol_reader: An interface for the new store to use to derive
+                structured `ProtocolSource` information from raw files.
+        """
+        result = cls(_directory=directory, _protocol_reader=protocol_reader)
+        for protocol_id in protocol_ids:
+            # We assume that the number of pre-existing protocols is relatively small
+            # and the time to ingest each one is relatively short.
+            await result._update_self_given_new_files(protocol_id=protocol_id)
+        return result
+
+    async def add(
+        self, protocol_id: str, uploaded_protocol_files: List[UploadFile]
+    ) -> ProtocolSource:
+        """
+        Params:
+            protocol_id: Must be unique across all stores that have ever used this
+                directory.
+
+                If there is an error, stray files may be left over.
+
+        Returns:
+            The `ProtocolSource` of the just-added protocol. See `get()`.
+        """
+        subdirectory = self._get_protocol_subdirectory(protocol_id=protocol_id)
+        await subdirectory.mkdir()
+
+        for uploaded_file in uploaded_protocol_files:
+            # FIXME(mm, 2022-03-25): This saves a file based on an untrusted filename
+            # from an HTTP request. This is insecure because it can contain special
+            # characters like "/" and "..".
+            new_file_path = subdirectory / uploaded_file.filename
+
+            async_wrapped_file = wrap_file(uploaded_file.file)
+
+            # For simplicity, assume each file is reasonably small.
+            # Load the whole thing into memory before writing it.
+            await new_file_path.write_bytes(await async_wrapped_file.read())
+
+        await self._update_self_given_new_files(protocol_id=protocol_id)
+        return await self.get(protocol_id)
+
+    async def get(self, protocol_id: str) -> ProtocolSource:
+        """Return the `ProtocolSource` of a previously-added protocol.
+
+        You can use the result as input to a `ProtocolRunner`,
+        or inspect it for basic information like the protocol's metadata.
+
+        Raises:
+            ProtocolNotFoundError: If ``protocol_id`` does not point to
+                a previously-added protocol.
+        """
+        try:
+            return self._protocol_sources_by_id[protocol_id]
+        except KeyError:
+            raise ProtocolNotFoundError(protocol_id=protocol_id)
+
+    def _get_protocol_subdirectory(self, protocol_id: str) -> AsyncPath:
+        return AsyncPath(self._directory / protocol_id)
+
+    async def _update_self_given_new_files(self, protocol_id: str) -> None:
+        subdirectory = self._get_protocol_subdirectory(protocol_id=protocol_id)
+
+        input_to_reader: List[InputFile] = []
+
+        async for path in subdirectory.iterdir():
+            if await path.is_file():
+                input_to_reader.append(
+                    # Rely on ProtocolReader to close this open().
+                    InputFile(filename=path.name, file=open(path, mode="b"))
+                )
+            else:
+                log.warning(
+                    f"{path} is not a file. Ignoring it for protocol {protocol_id}."
+                )
+
+        protocol_source = await self._protocol_reader.read(
+            name=protocol_id, files=input_to_reader
+        )
+
+        self._protocol_sources_by_id[protocol_id] = protocol_source
+
+
 # TODO: Make all methods async, probably.
-class ProtocolRecordStore:
+class ProtocolDataStore:
     def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
         # TODO:
         # 1) As a first step, spin up an isolated in-memory DB and make the table in it
