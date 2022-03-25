@@ -3,22 +3,29 @@ import logging
 from typing import Optional
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
-from opentrons_hardware.firmware_bindings.messages.message_definitions import \
-    FirmwareUpdateStartApp
-from opentrons_hardware.firmware_update import FirmwareUpdateInitiator, \
-    FirmwareUpdateDownloader, FirmwareUpdateEraser, HexRecordProcessor, Target
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    FirmwareUpdateStartApp,
+)
+from opentrons_hardware.firmware_update import (
+    FirmwareUpdateInitiator,
+    FirmwareUpdateDownloader,
+    FirmwareUpdateEraser,
+    HexRecordProcessor,
+    Target,
+)
 
 
 logger = logging.getLogger(__name__)
 
 
 async def run_update(
-        messenger: CanMessenger,
-        target: Target,
-        hex_processor: HexRecordProcessor,
-        retry_count: int,
-        timeout_seconds: float,
-        erase: Optional[bool] = True) -> None:
+    messenger: CanMessenger,
+    target: Target,
+    hex_processor: HexRecordProcessor,
+    retry_count: int,
+    timeout_seconds: float,
+    erase: Optional[bool] = True,
+) -> None:
     """Perform a firmware update on a node target.
 
     Args:

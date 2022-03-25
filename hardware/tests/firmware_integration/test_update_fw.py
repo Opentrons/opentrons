@@ -5,7 +5,12 @@ from pathlib import Path
 import pytest
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
-from opentrons_hardware.firmware_update import HexRecordProcessor, run_update, pipette_left, Target
+from opentrons_hardware.firmware_update import (
+    HexRecordProcessor,
+    run_update,
+    pipette_left,
+    Target,
+)
 
 
 @pytest.fixture
@@ -24,8 +29,7 @@ def hex_file_path() -> Path:
 
 @pytest.mark.requires_emulator
 async def test_update(
-    can_messenger: CanMessenger, target: Target,
-    hex_file_path: Path
+    can_messenger: CanMessenger, target: Target, hex_file_path: Path
 ) -> None:
     """It should complete the download."""
     await run_update(
@@ -34,5 +38,5 @@ async def test_update(
         hex_processor=HexRecordProcessor.from_file(hex_file_path),
         retry_count=3,
         timeout_seconds=60,
-        erase=True
+        erase=True,
     )

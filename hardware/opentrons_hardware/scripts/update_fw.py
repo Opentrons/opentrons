@@ -68,8 +68,14 @@ async def run(args: argparse.Namespace) -> None:
     messenger = CanMessenger(driver)
     messenger.start()
 
-    await run_update(messenger=messenger, target=target, hex_processor=hex_processor,
-                     retry_count=retry_count, timeout_seconds=timeout_seconds, erase=erase)
+    await run_update(
+        messenger=messenger,
+        target=target,
+        hex_processor=hex_processor,
+        retry_count=retry_count,
+        timeout_seconds=timeout_seconds,
+        erase=erase,
+    )
 
     await messenger.stop()
 
