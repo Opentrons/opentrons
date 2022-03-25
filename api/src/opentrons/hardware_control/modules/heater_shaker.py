@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from anyio import create_task_group
 from dataclasses import dataclass
 from typing import Optional, Mapping, Callable
 from typing_extensions import Final
@@ -380,9 +381,9 @@ class HeaterShaker(mod_abc.AbstractModule):
         To set speed, use start_set_speed. To set temperature,
         use start_set_temperature.
         """
-        await asyncio.gather(
-            self.await_speed(speed), self.await_temperature(temperature)
-        )
+        async with create_task_group() as tg:  # Does task cleanup
+            tg.start_soon(self.await_speed, speed)
+            tg.start_soon(self.await_temperature, temperature)
 
     async def _wait_for_labware_latch(
         self, status: HeaterShakerLabwareLatchStatus
