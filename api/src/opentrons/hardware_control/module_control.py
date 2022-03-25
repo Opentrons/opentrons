@@ -42,11 +42,11 @@ class AttachedModulesControl:
         if not api_instance.is_simulator:
             # Do an initial scan of modules.
             await mc_instance.register_modules(mc_instance.scan())
-            if not IS_ROBOT:
-                # Start task that registers emulated modules.
-                api_instance.loop.create_task(
-                    listen_module_connection(mc_instance.register_modules)
-                )
+            # if not IS_ROBOT:
+            #     # Start task that registers emulated modules.
+            #     api_instance.loop.create_task(
+            #         listen_module_connection(mc_instance.register_modules)
+            #     )
 
         return mc_instance
 
