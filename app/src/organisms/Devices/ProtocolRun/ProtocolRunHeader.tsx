@@ -14,6 +14,7 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
+import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   AlertItem,
   Box,
@@ -52,6 +53,7 @@ import {
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 
 import {
+  useAttachedModules,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useUnmatchedModulesForProtocol,
@@ -59,6 +61,8 @@ import {
 import { formatTimestamp } from '../utils'
 
 import type { Run } from '@opentrons/api-client'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
+import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 
 interface ProtocolRunHeaderProps {
   robotName: string
@@ -149,6 +153,23 @@ export function ProtocolRunHeader({
   const currentRunId = useCurrentRunId()
   const isRobotBusy = currentRunId != null && currentRunId !== runId
 
+  const [showIsShakingModal, setShowIsShakingModal] = React.useState<boolean>(
+    false
+  )
+  const attachedModules = useAttachedModules(robotName)
+  const heaterShaker = (attachedModules.find(
+    module => module.type === HEATERSHAKER_MODULE_TYPE
+  ) as unknown) as HeaterShakerModule
+  const isShaking = heaterShaker?.data?.speedStatus !== 'idle'
+
+  const handlePlayButtonClick = (): void => {
+    if (isShaking) {
+      setShowIsShakingModal(true)
+    } else {
+      play()
+    }
+  }
+
   const isRunControlButtonDisabled =
     !isSetupComplete ||
     isMutationLoading ||
@@ -170,7 +191,7 @@ export function ProtocolRunHeader({
       buttonIconName = 'play'
       buttonText =
         runStatus === RUN_STATUS_IDLE ? t('start_run') : t('resume_run')
-      handleButtonClick = play
+      handleButtonClick = handlePlayButtonClick
       break
     case RUN_STATUS_RUNNING:
       buttonIconName = 'pause'
@@ -402,6 +423,13 @@ export function ProtocolRunHeader({
               completedAt={completedAt}
             />
           </Box>
+          {showIsShakingModal && (
+            <HeaterShakerIsRunningModal
+              closeModal={() => setShowIsShakingModal(false)}
+              module={heaterShaker}
+              startRun={play}
+            />
+          )}
           <PrimaryButton
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
