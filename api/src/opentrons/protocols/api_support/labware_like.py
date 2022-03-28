@@ -1,3 +1,4 @@
+import functools
 from enum import Enum, auto
 from typing import TYPE_CHECKING, Optional, Union, cast, Tuple, List, Set
 
@@ -21,48 +22,41 @@ class LabwareLikeType(int, Enum):
 
 class LabwareLike:
     """A wrapper for a labware like object."""
-
     def __init__(self, labware_like: WrappableLabwareLike):
         """
         Create a labware like object. Used by Location object's labware field.
         """
-        # Import locally to avoid circular dependency
-        from opentrons.protocol_api.labware import Labware, Well
-        from opentrons.protocols.geometry.module_geometry import ModuleGeometry
-
         self._labware_like = labware_like
-        self._type = LabwareLikeType.NONE
-
-        if isinstance(self._labware_like, Well):
-            self._type = LabwareLikeType.WELL
-            self._as_str = repr(self._labware_like)
-        elif isinstance(self._labware_like, Labware):
-            self._type = LabwareLikeType.LABWARE
-            self._as_str = repr(self._labware_like)
-        elif isinstance(self._labware_like, str):
-            self._type = LabwareLikeType.SLOT
-            self._as_str = self._labware_like
-        elif isinstance(self._labware_like, ModuleGeometry):
-            self._type = LabwareLikeType.MODULE
-            self._as_str = repr(self._labware_like)
-        elif isinstance(self._labware_like, LabwareLike):
-            self._type = self._labware_like._type
-            self._as_str = self._labware_like._as_str
-            self._labware_like = self._labware_like.object
-        else:
-            self._as_str = ""
 
     @property
     def object(self) -> WrappableLabwareLike:
         return self._labware_like
 
     @property
+    @functools.lru_cache(1)
     def object_type(self) -> LabwareLikeType:
-        return self._type
+        # Import locally to avoid circular dependency
+        from opentrons.protocol_api.labware import Labware, Well
+        from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+
+        _type = LabwareLikeType.NONE
+
+        if isinstance(self._labware_like, Well):
+            _type = LabwareLikeType.WELL
+        elif isinstance(self._labware_like, Labware):
+            _type = LabwareLikeType.LABWARE
+        elif isinstance(self._labware_like, str):
+            _type = LabwareLikeType.SLOT
+        elif isinstance(self._labware_like, ModuleGeometry):
+            _type = LabwareLikeType.MODULE
+        elif isinstance(self._labware_like, LabwareLike):
+            _type = self._labware_like.object_type
+
+        return _type
 
     @property
     def has_parent(self) -> bool:
-        return self._type in {
+        return self.object_type in {
             LabwareLikeType.LABWARE,
             LabwareLikeType.WELL,
             LabwareLikeType.MODULE,
@@ -114,6 +108,7 @@ class LabwareLike:
 
         return cast(ModuleGeometry, self.object)
 
+    @functools.lru_cache(None)
     def get_parent_labware_and_well(
         self,
     ) -> Tuple[Optional["Labware"], Optional["Well"]]:
@@ -128,6 +123,7 @@ class LabwareLike:
         else:
             return None, None
 
+    @functools.lru_cache(None)
     def first_parent(self) -> Optional[str]:
         """Return the topmost parent of this location. It should be
         either a string naming a slot or a None if the location isn't
@@ -150,6 +146,7 @@ class LabwareLike:
 
         return _fp_recurse(self)
 
+    @functools.lru_cache(None)
     def module_parent(self) -> Optional["ModuleGeometry"]:
         """
         Return the closest parent of this LabwareLike (including, possibly,
@@ -169,6 +166,7 @@ class LabwareLike:
             return None
         return recursive_get_module_parent(self)
 
+    @functools.lru_cache(None)
     def quirks_from_any_parent(self) -> Set[str]:
         """Walk the tree of wells and labwares and extract quirks"""
 
@@ -191,7 +189,11 @@ class LabwareLike:
         return "centerMultichannelOnWells" in self.quirks_from_any_parent()
 
     def __str__(self) -> str:
-        return self._as_str
+        if self.is_slot:
+            return self._labware_like
+        elif self.is_empty:
+            return ""
+        return repr(self._labware_like)
 
     def __repr__(self) -> str:
         return str(self)

@@ -34,7 +34,7 @@ def max_many(*args):
     return functools.reduce(max, args[1:], args[0])
 
 
-BAD_PAIRS = [
+BAD_PAIRS = set([
     ("1", "12"),
     ("12", "1"),
     ("4", "12"),
@@ -49,7 +49,7 @@ BAD_PAIRS = [
     ("11", "4"),
     ("1", "11"),
     ("11", "1"),
-]
+])
 
 
 def should_dodge_thermocycler(
@@ -61,7 +61,7 @@ def should_dodge_thermocycler(
 
     Returns True if we need to dodge, False otherwise
     """
-    if any([isinstance(item, ThermocyclerGeometry) for item in deck.values()]):
+    if deck.thermocycler_present:
         transit = (from_loc.labware.first_parent(), to_loc.labware.first_parent())
         # mypy doesn't like this because transit could be none, but it's
         # checked by value in BAD_PAIRS which has only strings
