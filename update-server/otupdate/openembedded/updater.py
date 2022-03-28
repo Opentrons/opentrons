@@ -68,6 +68,8 @@ class RootFSInterface:
             files = zf.infolist()
             LOG.debug(f"Found files {files}, in RootFSInterface::unzip")
             for fi in files:
+                total_size = total_size + fi.file_size
+            for fi in files:
                 uncomp_path = os.path.join(
                     os.path.dirname(downloaded_update_path), fi.filename
                 )
