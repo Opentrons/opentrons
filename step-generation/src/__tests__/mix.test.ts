@@ -187,7 +187,12 @@ describe('mix: advanced options', () => {
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
         blowoutHelper(blowoutLabwareId, {
-          offsetFromBottomMm: BLOWOUT_OFFSET_ANY,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              z: BLOWOUT_OFFSET_ANY,
+            },
+          },
         }),
       ])
     )
@@ -216,7 +221,12 @@ describe('mix: advanced options', () => {
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
         blowoutHelper(blowoutLabwareId, {
-          offsetFromBottomMm: BLOWOUT_OFFSET_ANY,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              z: BLOWOUT_OFFSET_ANY,
+            },
+          },
         }),
         touchTipHelper(well),
       ])
@@ -301,7 +311,12 @@ describe('mix: advanced options', () => {
           dispenseHelper(well, volume),
           delayCommand(12),
           blowoutHelper(blowoutLabwareId, {
-            offsetFromBottomMm: BLOWOUT_OFFSET_ANY,
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: BLOWOUT_OFFSET_ANY,
+              },
+            },
           }),
           touchTipHelper(well),
         ])

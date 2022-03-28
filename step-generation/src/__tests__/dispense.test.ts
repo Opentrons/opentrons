@@ -11,7 +11,6 @@ import {
 import { dispense } from '../commandCreators/atomic/dispense'
 import { InvariantContext, RobotState } from '../types'
 import type { AspDispAirgapParams as V3AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
-import type { AspDispAirgapParams as V6AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 
 jest.mock('../utils/thermocyclerPipetteCollision')
 const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
@@ -45,7 +44,7 @@ describe('dispense', () => {
       const result = dispense(params, invariantContext, robotStateWithTip)
       expect(getSuccessResult(result).commands).toEqual([
         {
-          command: 'dispense',
+          commandType: 'dispense',
           params: {
             pipetteId: DEFAULT_PIPETTE,
             volume: 50,

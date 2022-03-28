@@ -29,7 +29,7 @@ export function forPickUpTip(
       throw new Error('Invalid primary well for tip pickup: ' + wellName)
     }
 
-    allWells.forEach(function (well) {
+    allWells.forEach(function (wellName) {
       tipState.tipracks[labwareId][wellName] = false
     })
   }

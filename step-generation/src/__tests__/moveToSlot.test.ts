@@ -54,17 +54,14 @@ describe('moveToSlot', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       {
-        command: 'moveToSlot',
+        commandType: 'moveToSlot',
         params: {
           pipetteId: DEFAULT_PIPETTE,
           slotName: '1',
-          wellLocation: {
-            origin: 'bottom',
-            offset: {
-              x: 1,
-              y: 2,
-              z: 3,
-            },
+          offset: {
+            x: 1,
+            y: 2,
+            z: 3,
           },
           minimumZHeight: 1,
           forceDirect: true,

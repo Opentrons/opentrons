@@ -34,7 +34,7 @@ describe('moveToWell', () => {
     const result = moveToWell(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
       {
-        command: 'moveToWell',
+        commandType: 'moveToWell',
         params: {
           pipetteId: DEFAULT_PIPETTE,
           labwareId: SOURCE_LABWARE,
@@ -59,7 +59,7 @@ describe('moveToWell', () => {
     const result = moveToWell(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
       {
-        command: 'moveToWell',
+        commandType: 'moveToWell',
         params: {
           pipetteId: DEFAULT_PIPETTE,
           labwareId: SOURCE_LABWARE,
