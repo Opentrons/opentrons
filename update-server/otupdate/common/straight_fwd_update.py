@@ -34,11 +34,16 @@ def _begin_straight_fwd_unzip(
     def unzip_done(fut):
         exc = fut.exception()
         if exc:
+            LOG.exception(exc)
+            LOG.warning("exception in unzip")
             session.set_error(getattr(exc, "short", str(type(exc))), str(exc))
         else:
+            LOG.warning(f"unzip successful {fut.result()}")
             files, sizes = fut.result()
             loop.call_soon_threadsafe(
-                _begin_straight_fwd_write(session, config, loop, files["rootfs.etx4"], actions)
+                _begin_straight_fwd_write(
+                    session, config, loop, "/var/lib/otupdate/downloads/rootfs.ext4", actions
+                )
             )
 
     unzip_future.add_done_callback(unzip_done)
@@ -73,6 +78,7 @@ def _begin_straight_fwd_write(
             session.set_stage(Stages.DONE)
 
     write_future.add_done_callback(write_done)
+
 
 @require_session
 async def file_upload(request: web.Request, session: UpdateSession) -> web.Response:

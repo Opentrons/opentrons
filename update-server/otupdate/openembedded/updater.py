@@ -64,8 +64,10 @@ class RootFSInterface:
         total_size = 0
         file_paths: Dict[str, Optional[str]] = {}
         file_sizes: Dict[str, int] = {}
-        LOG.debug(f"downloaded_update path: {downloaded_update_path}, "
-                  f"in RootFSInterface::update ")
+        LOG.debug(
+            f"downloaded_update path: {downloaded_update_path}, "
+            f"in RootFSInterface::update "
+        )
         with zipfile.ZipFile(downloaded_update_path, "r") as zf:
             files = zf.infolist()
             LOG.debug(f"Found files {files}, in RootFSInterface::unzip")
@@ -258,8 +260,10 @@ class Updater(UpdateActionsInterface):
         total_size = 0
         file_paths: Dict[str, Optional[str]] = {}
         file_sizes: Dict[str, int] = {}
-        LOG.warning(f"downloaded_update path: {downloaded_update_path}, "
-                  f"in RootFSInterface::update ")
+        LOG.warning(
+            f"downloaded_update path: {downloaded_update_path}, "
+            f"in RootFSInterface::update "
+        )
         with zipfile.ZipFile(downloaded_update_path, "r") as zf:
             files = zf.infolist()
             LOG.warning(f"Found files {files}, in RootFSInterface::unzip")
