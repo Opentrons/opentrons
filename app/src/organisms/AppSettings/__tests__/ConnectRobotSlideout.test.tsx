@@ -31,6 +31,12 @@ describe('ConnectRobotSlideout', () => {
 
   beforeEach(() => {
     mockGetScanning.mockReturnValue(true)
+    props = {
+      candidates: [],
+      checkIpAndHostname: jest.fn(),
+      isExpanded: true,
+      onCloseClick: jest.fn(),
+    }
   })
 
   afterEach(() => {
@@ -108,25 +114,13 @@ describe('ConnectRobotSlideout', () => {
   //   })
 
   it('Clicking Add button with an IP address/hostname should display the IP address/hostname', async () => {
-    props = {
-      candidates: [],
-      checkIpAndHostname: jest.fn(),
-      isExpanded: true,
-      onCloseClick: jest.fn(),
-    }
     const { getByRole, getByText } = render(props)
     const newIpAddress = '1.1.1.1'
-
-    // export interface Robot extends BaseRobot {
-    //     status: typeof CONNECTABLE
-    //     health: HealthResponse
-    //     ip: string
-    //     port: number
-    //     healthStatus: typeof HEALTH_STATUS_OK
-    //     serverHealthStatus: HealthStatus
-    //   }
-
     const availableStatus: DiscoveredRobot = {
+      displayName: 'test',
+      connected: true,
+      local: null,
+      seen: true,
       status: 'connectable',
       health: {
         name: 'opentrons-dev',
