@@ -133,7 +133,7 @@ INVALID_TEST_PARAMS = [
     (
         json_v6_models.Command(
             id="load-pipette-command-id-666",
-            commandType="loadPipette",  # used to be delay but is expecting pause
+            commandType="loadPipette",
             params=json_v6_models.Params(pipetteId="pipetteId", mount="left"),
         ),
         pe_commands.LoadPipetteCreate(
@@ -147,7 +147,7 @@ INVALID_TEST_PARAMS = [
     (
         json_v6_models.Command(
             id="load-module-command-id-666",
-            commandType="loadModule",  # used to be delay but is expecting pause
+            commandType="loadModule",
             params=json_v6_models.Params(
                 moduleId="magneticModuleId",
                 location=json_v6_models.Location(slotName="3"),
@@ -266,7 +266,7 @@ VALID_TEST_PARAMS = [
     (
         json_v6_models.Command(
             id="delay-command-id-666",
-            commandType="pause",  # used to be delay but is expecting pause
+            commandType="pause",
             params=json_v6_models.Params(
                 wait=True,
                 message="hello world",
@@ -277,7 +277,7 @@ VALID_TEST_PARAMS = [
     (
         json_v6_models.Command(
             id="load-pipette-command-id-666",
-            commandType="loadPipette",  # used to be delay but is expecting pause
+            commandType="loadPipette",
             params=json_v6_models.Params(pipetteId="pipetteId", mount="left"),
         ),
         pe_commands.LoadPipetteCreate(
@@ -291,7 +291,7 @@ VALID_TEST_PARAMS = [
     (
         json_v6_models.Command(
             id="load-module-command-id-666",
-            commandType="loadModule",  # used to be delay but is expecting pause
+            commandType="loadModule",
             params=json_v6_models.Params(
                 moduleId="magneticModuleId",
                 location=json_v6_models.Location(slotName="3"),
@@ -308,7 +308,7 @@ VALID_TEST_PARAMS = [
     (
         json_v6_models.Command(
             id="load-labware-command-id-666",
-            commandType="loadLabware",  # used to be delay but is expecting pause
+            commandType="loadLabware",
             params=json_v6_models.Params(
                 labwareId="sourcePlateId",
                 location=json_v6_models.Location(moduleId="temperatureModuleId"),

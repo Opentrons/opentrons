@@ -18,12 +18,12 @@ class CommandTranslatorError(Exception):
     pass
 
 
-def _get_labware_command(
+def _translate_labware_command(
     protocol: ProtocolSchemaV6, command: Command
 ) -> pe_commands.LoadLabwareCreate:
     labware_id = command.params.labwareId
-    # asserting labware_id and definition_id to raise an
-    # error in case they do not exist in the v6 model
+    # v6 data model supports all commands and therefor most props are optional.
+    # load labware command must contain labware_id and definition_id.
     assert labware_id is not None
     definition_id = protocol.labware[labware_id].definitionId
     assert definition_id is not None
@@ -44,26 +44,13 @@ def _get_labware_command(
     return labware_command
 
 
-def _get_command(command: Command) -> pe_commands.CommandCreate:
-    dict_command = command.dict(exclude_none=True)
-    translated_obj = cast(
-        pe_commands.CommandCreate,
-        parse_obj_as(
-            # https://github.com/samuelcolvin/pydantic/issues/1847
-            pe_commands.CommandCreate,  # type: ignore[arg-type]
-            dict_command,
-        ),
-    )
-    return translated_obj
-
-
-def _get_module_command(
+def _translate_module_command(
     protocol: ProtocolSchemaV6, command: Command
 ) -> pe_commands.CommandCreate:
     module_id = command.params.moduleId
     modules = protocol.modules
-    # asserting module_id and modules to raise an error in case
-    # they do not exist in the v6 model
+    # v6 data model supports all commands and therefor most props are optional.
+    # load module command must contain module_id. modules cannot be None.
     assert module_id is not None
     assert modules is not None
     translated_obj = pe_commands.LoadModuleCreate(
@@ -76,11 +63,12 @@ def _get_module_command(
     return translated_obj
 
 
-def _get_pipette_command(
+def _translate_pipette_command(
     protocol: ProtocolSchemaV6, command: Command
 ) -> pe_commands.CommandCreate:
     pipette_id = command.params.pipetteId
-    # asserting pipette_id to raise an error in case it does not exist in the v6 model
+    # v6 data model supports all commands and therefor most props are optional.
+    # load pipette command must contain pipette_id.
     assert pipette_id is not None
     translated_obj = pe_commands.LoadPipetteCreate(
         params=pe_commands.LoadPipetteParams(
@@ -88,6 +76,19 @@ def _get_pipette_command(
             mount=MountType(command.params.mount),
             pipetteId=command.params.pipetteId,
         )
+    )
+    return translated_obj
+
+
+def _translate_simple_command(command: Command) -> pe_commands.CommandCreate:
+    dict_command = command.dict(exclude_none=True)
+    translated_obj = cast(
+        pe_commands.CommandCreate,
+        parse_obj_as(
+            # https://github.com/samuelcolvin/pydantic/issues/1847
+            pe_commands.CommandCreate,  # type: ignore[arg-type]
+            dict_command,
+        ),
     )
     return translated_obj
 
@@ -116,12 +117,12 @@ class JsonCommandTranslator:
         ]
         for command in commands_to_parse:
             if command.commandType == "loadPipette":
-                translated_obj = _get_pipette_command(protocol, command)
+                translated_obj = _translate_pipette_command(protocol, command)
             elif command.commandType == "loadModule":
-                translated_obj = _get_module_command(protocol, command)
+                translated_obj = _translate_module_command(protocol, command)
             elif command.commandType == "loadLabware":
-                translated_obj = _get_labware_command(protocol, command)
+                translated_obj = _translate_labware_command(protocol, command)
             else:
-                translated_obj = _get_command(command)
+                translated_obj = _translate_simple_command(command)
             commands_list.append(translated_obj)
         return commands_list
