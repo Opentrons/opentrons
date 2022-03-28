@@ -35,8 +35,9 @@ def _get_labware_command(
             namespace=protocol.labwareDefinitions[definition_id].namespace,
             loadName=protocol.labwareDefinitions[definition_id].parameters.loadName,
             location=parse_obj_as(
-                LabwareLocation, command.params.location  # type: ignore[arg-type]
                 # https://github.com/samuelcolvin/pydantic/issues/1847
+                LabwareLocation,  # type: ignore[arg-type]
+                command.params.location,
             ),
         )
     )
@@ -61,7 +62,8 @@ def _get_module_command(
 ) -> pe_commands.CommandCreate:
     module_id = command.params.moduleId
     modules = protocol.modules
-    # asserting module_id and modules to raise an error in case they do not exist in the v6 model
+    # asserting module_id and modules to raise an error in case
+    # they do not exist in the v6 model
     assert module_id is not None
     assert modules is not None
     translated_obj = pe_commands.LoadModuleCreate(
