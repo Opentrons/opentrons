@@ -124,15 +124,6 @@ export function ConnectRobotSlideoutComponent(
                   >
                     {t('ip_connect_timeout')}
                   </StyledText>
-                  {/* <Text
-                    fontSize={TYPOGRAPHY.fontSizeP}
-                    lineHeight={TYPOGRAPHY.lineHeight16}
-                    fontStyle={TYPOGRAPHY.fontStyleNormal}
-                    color={COLORS.darkGreyEnabled}
-                    margin={`0 ${SPACING.spacing2}`}
-                  >
-                    {t('ip_connect_timeout')}
-                  </Text> */}
                   {displayLinkButton(t('ip_reconnect_button'))}
                 </>
               ),
