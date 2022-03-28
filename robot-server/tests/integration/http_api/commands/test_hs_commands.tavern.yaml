@@ -1,0 +1,137 @@
+test_name: Heater Shaker standalone command
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: Delete all runs # Ensure there is no active run
+    request:
+      url: '{host:s}:{port:d}/runs'
+      method: GET
+    response:
+      status_code: 200
+      verify_response_with:
+        - function: 'tests.integration.fixtures:delete_all_runs'
+          extra_kwargs:
+            host: '{host:s}'
+            port: '{port:d}'
+  - name: Get the HS id
+    request:
+      url: '{host:s}:{port:d}/modules'
+      method: GET
+    response:
+      status_code: 200
+      save:
+        $ext:
+          function: 'tests.integration.fixtures:get_module_id'
+          extra_kwargs:
+            module_model: heaterShakerModuleV1
+  - name: issue Heater Shaker heaterShakerModule/deactivateHeater Command
+    request:
+      url: '{host:s}:{port:d}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: 'heaterShakerModule/deactivateHeater'
+          params:
+            moduleId: '{heaterShakerModuleV1_id}'
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: succeeded
+      save:
+        json:
+          command_id_hs_deactivate_heater: data.id
+  - name: issue Heater Shaker heaterShakerModule/openLatch Command
+    request:
+      url: '{host:s}:{port:d}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: 'heaterShakerModule/openLatch'
+          params:
+            moduleId: '{heaterShakerModuleV1_id}'
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: succeeded
+      save:
+        json:
+          command_id_hs_open_latch: data.id
+  - name: issue Heater Shaker heaterShakerModule/closeLatch Command
+    request:
+      url: '{host:s}:{port:d}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: 'heaterShakerModule/closeLatch'
+          params:
+            moduleId: '{heaterShakerModuleV1_id}'
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: succeeded
+      save:
+        json:
+          command_id_hs_close_latch: data.id
+  - name: issue Heater Shaker heaterShakerModule/stopShake Command
+    request:
+      url: '{host:s}:{port:d}/commands'
+      method: POST
+      json:
+        data:
+          commandType: 'heaterShakerModule/stopShake'
+          params:
+            moduleId: '{heaterShakerModuleV1_id}'
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: queued
+      save:
+        json:
+          command_id_hs_stop_shake: data.id
+  - name: Get command by id
+    request:
+      url: '{host:s}:{port:d}/commands/{command_id_hs_stop_shake}'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          id: '{command_id_hs_stop_shake}'
+          status: running
+  - name: Get commands
+    request:
+      url: '{host:s}:{port:d}/commands'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:  # order is enforced on this check!
+          - id: '{command_id_hs_deactivate_heater}'
+          - id: '{command_id_hs_open_latch}'
+          - id: '{command_id_hs_close_latch}'
+          - id: '{command_id_hs_stop_shake}'
