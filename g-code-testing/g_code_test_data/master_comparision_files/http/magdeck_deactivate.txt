@@ -1,0 +1,3 @@
+magdeck: G28.2 -> Homing the magdeck ->
+magdeck: G0 Z0.0 -> Setting magnet height to 0.0mm ->
+magdeck: M114.2 -> Reading current position of magnets -> Current height of magnets are 0.0mm
