@@ -2,7 +2,13 @@
 from typing import cast, List
 from pydantic import parse_obj_as
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6, Command
-from opentrons.protocol_engine import commands as pe_commands, LabwareLocation, ModuleModel, DeckSlotLocation, PipetteName
+from opentrons.protocol_engine import (
+    commands as pe_commands,
+    LabwareLocation,
+    ModuleModel,
+    DeckSlotLocation,
+    PipetteName,
+)
 from opentrons.types import MountType
 
 
@@ -13,10 +19,11 @@ class CommandTranslatorError(Exception):
 
 
 def _get_labware_command(
-        protocol: ProtocolSchemaV6, command: Command
+    protocol: ProtocolSchemaV6, command: Command
 ) -> pe_commands.LoadLabwareCreate:
     labware_id = command.params.labwareId
-    # asserting labware_id and definition_id to raise an error in case they do not exist in the v6 model
+    # asserting labware_id and definition_id to raise an
+    # error in case they do not exist in the v6 model
     assert labware_id is not None
     definition_id = protocol.labware[labware_id].definitionId
     assert definition_id is not None
@@ -28,7 +35,8 @@ def _get_labware_command(
             namespace=protocol.labwareDefinitions[definition_id].namespace,
             loadName=protocol.labwareDefinitions[definition_id].parameters.loadName,
             location=parse_obj_as(
-                LabwareLocation, command.params.location
+                LabwareLocation, command.params.location  # type: ignore[arg-type]
+                # https://github.com/samuelcolvin/pydantic/issues/1847
             ),
         )
     )
@@ -48,29 +56,37 @@ def _get_command(command: Command) -> pe_commands.CommandCreate:
     return translated_obj
 
 
-def _get_module_command(protocol: ProtocolSchemaV6, command: Command) -> pe_commands.CommandCreate:
+def _get_module_command(
+    protocol: ProtocolSchemaV6, command: Command
+) -> pe_commands.CommandCreate:
     module_id = command.params.moduleId
     modules = protocol.modules
     # asserting module_id and modules to raise an error in case they do not exist in the v6 model
     assert module_id is not None
     assert modules is not None
-    translated_obj = pe_commands.LoadModuleCreate(params=pe_commands.LoadModuleParams(
-        model=ModuleModel(modules[module_id].model),
-        location=DeckSlotLocation.parse_obj(command.params.location),
-        moduleId=command.params.moduleId
-    ))
+    translated_obj = pe_commands.LoadModuleCreate(
+        params=pe_commands.LoadModuleParams(
+            model=ModuleModel(modules[module_id].model),
+            location=DeckSlotLocation.parse_obj(command.params.location),
+            moduleId=command.params.moduleId,
+        )
+    )
     return translated_obj
 
 
-def _get_pipette_command(protocol: ProtocolSchemaV6, command: Command) -> pe_commands.CommandCreate:
+def _get_pipette_command(
+    protocol: ProtocolSchemaV6, command: Command
+) -> pe_commands.CommandCreate:
     pipette_id = command.params.pipetteId
     # asserting pipette_id to raise an error in case it does not exist in the v6 model
     assert pipette_id is not None
-    translated_obj = pe_commands.LoadPipetteCreate(params=pe_commands.LoadPipetteParams(
-        pipetteName=PipetteName(protocol.pipettes[pipette_id].name),
-        mount=MountType(command.params.mount),
-        pipetteId=command.params.pipetteId
-    ))
+    translated_obj = pe_commands.LoadPipetteCreate(
+        params=pe_commands.LoadPipetteParams(
+            pipetteName=PipetteName(protocol.pipettes[pipette_id].name),
+            mount=MountType(command.params.mount),
+            pipetteId=command.params.pipetteId,
+        )
+    )
     return translated_obj
 
 
@@ -78,8 +94,8 @@ class JsonCommandTranslator:
     """Class that translates commands from PD/JSON to ProtocolEngine."""
 
     def translate(
-            self,
-            protocol: ProtocolSchemaV6,
+        self,
+        protocol: ProtocolSchemaV6,
     ) -> List[pe_commands.CommandCreate]:
         """Takes json protocol v6 and translates commands->protocol engine commands."""
         commands_list: List[pe_commands.CommandCreate] = []
@@ -91,7 +107,11 @@ class JsonCommandTranslator:
             "moveToSlot",
             "moveToCoordinates",
         ]
-        commands_to_parse = [command for command in protocol.commands if command.commandType not in exclude_commands]
+        commands_to_parse = [
+            command
+            for command in protocol.commands
+            if command.commandType not in exclude_commands
+        ]
         for command in commands_to_parse:
             if command.commandType == "loadPipette":
                 translated_obj = _get_pipette_command(protocol, command)
