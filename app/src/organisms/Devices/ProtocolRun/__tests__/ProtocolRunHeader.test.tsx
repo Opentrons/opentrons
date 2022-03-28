@@ -53,7 +53,7 @@ import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
-import { fireEvent, getByText } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 
 const mockPush = jest.fn()
 
