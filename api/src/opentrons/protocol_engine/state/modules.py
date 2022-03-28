@@ -396,6 +396,7 @@ class ModuleView(HasState[ModuleState]):
         for mod_id, slot in self._state.slot_by_module_id.items():
             if slot == location.slotName:
                 existing_mod_in_slot = self._state.hardware_by_module_id.get(mod_id)
+                break
 
         if existing_mod_in_slot:
             existing_def = existing_mod_in_slot.definition
