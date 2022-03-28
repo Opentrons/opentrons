@@ -4,15 +4,7 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from decoy import Decoy
 
 from contextlib import nullcontext
-from typing import (
-    ContextManager,
-    Dict,
-    NamedTuple,
-    Optional,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import ContextManager, Dict, NamedTuple, Optional, Type, TypeVar, Union
 
 from opentrons_shared_data import load_shared_data
 from opentrons.hardware_control.modules import (
@@ -37,14 +29,14 @@ from opentrons.protocol_engine.state.modules import (
 
 
 def make_module_view(
-    slot_by_module_id: Optional[Dict[str, DeckSlotName]] = None,
-    hardware_module_by_slot: Optional[Dict[DeckSlotName, HardwareModule]] = None,
+    slot_by_module_id: Optional[Dict[str, Optional[DeckSlotName]]] = None,
+    hardware_by_module_id: Optional[Dict[str, HardwareModule]] = None,
     virtualize_modules: bool = False,
 ) -> ModuleView:
     """Get a module view test subject with the specified state."""
     state = ModuleState(
         slot_by_module_id=slot_by_module_id or {},
-        hardware_module_by_slot=hardware_module_by_slot or {},
+        hardware_by_module_id=hardware_by_module_id or {},
     )
 
     return ModuleView(state=state, virtualize_modules=virtualize_modules)
@@ -77,16 +69,16 @@ def get_sample_parent_module_view(
     magdeck_def = ModuleDefinition.parse_raw(definition)
 
     return make_module_view(
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "id-non-matching": HardwareModule(
                 serial_number="serial-non-matching",
                 definition=magdeck_def,
             ),
-            DeckSlotName.SLOT_2: HardwareModule(
+            matching_module_id: HardwareModule(
                 serial_number="serial-matching",
                 definition=matching_module_def,
             ),
-            DeckSlotName.SLOT_3: HardwareModule(
+            "id-another-non-matching": HardwareModule(
                 serial_number="serial-another-non-matching",
                 definition=magdeck_def,
             ),
@@ -139,8 +131,8 @@ def test_get_module_data(tempdeck_v1_def: ModuleDefinition) -> None:
     """It should get module data from state by ID."""
     subject = make_module_view(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "module-id": HardwareModule(
                 serial_number="serial-number",
                 definition=tempdeck_v1_def,
             )
@@ -156,6 +148,33 @@ def test_get_module_data(tempdeck_v1_def: ModuleDefinition) -> None:
     )
 
 
+def test_get_location(tempdeck_v1_def: ModuleDefinition) -> None:
+    """It should return the module's location or raise."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "module-1": DeckSlotName.SLOT_1,
+            "module-2": None,
+        },
+        hardware_by_module_id={
+            "module-1": HardwareModule(
+                serial_number="serial-1",
+                definition=tempdeck_v1_def,
+            ),
+            "module-2": HardwareModule(
+                serial_number="serial-2",
+                definition=tempdeck_v1_def,
+            ),
+        },
+    )
+
+    assert subject.get_location("module-1") == DeckSlotLocation(
+        slotName=DeckSlotName.SLOT_1
+    )
+
+    with pytest.raises(errors.ModuleNotOnDeckError):
+        assert subject.get_location("module-2")
+
+
 def test_get_all_modules(
     tempdeck_v1_def: ModuleDefinition,
     tempdeck_v2_def: ModuleDefinition,
@@ -166,12 +185,12 @@ def test_get_all_modules(
             "module-1": DeckSlotName.SLOT_1,
             "module-2": DeckSlotName.SLOT_2,
         },
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "module-1": HardwareModule(
                 serial_number="serial-1",
                 definition=tempdeck_v1_def,
             ),
-            DeckSlotName.SLOT_2: HardwareModule(
+            "module-2": HardwareModule(
                 serial_number="serial-2",
                 definition=tempdeck_v2_def,
             ),
@@ -208,16 +227,16 @@ def test_get_magnetic_module_view(
             "magnetic-module-gen2-id": DeckSlotName.SLOT_2,
             "temperature-module-id": DeckSlotName.SLOT_3,
         },
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "magnetic-module-gen1-id": HardwareModule(
                 serial_number="magnetic-module-gen1-serial",
                 definition=magdeck_v1_def,
             ),
-            DeckSlotName.SLOT_2: HardwareModule(
+            "magnetic-module-gen2-id": HardwareModule(
                 serial_number="magnetic-module-gen2-serial",
                 definition=magdeck_v2_def,
             ),
-            DeckSlotName.SLOT_3: HardwareModule(
+            "temperature-module-id": HardwareModule(
                 serial_number="temperature-module-serial",
                 definition=tempdeck_v1_def,
             ),
@@ -253,12 +272,12 @@ def test_get_properties_by_id(
             "module-1": DeckSlotName.SLOT_1,
             "module-2": DeckSlotName.SLOT_2,
         },
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "module-1": HardwareModule(
                 serial_number="serial-1",
                 definition=tempdeck_v1_def,
             ),
-            DeckSlotName.SLOT_2: HardwareModule(
+            "module-2": HardwareModule(
                 serial_number="serial-2",
                 definition=tempdeck_v2_def,
             ),
@@ -289,8 +308,8 @@ def test_get_plate_target_temperature(
     """It should return whether target temperature is set."""
     subject = make_module_view(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "module-id": HardwareModule(
                 serial_number="serial-number",
                 definition=thermocycler_v1_def,
                 plate_target_temperature=target,
@@ -391,8 +410,8 @@ def test_thermocycler_dodging(
     """
     subject = make_module_view(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "module-id": HardwareModule(
                 serial_number="serial-number",
                 definition=thermocycler_v1_def,
             )
@@ -476,8 +495,8 @@ def test_select_hardware_module_to_load_skips_already_loaded(
 ) -> None:
     """It should skip over already assigned modules."""
     subject = make_module_view(
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "module-1": HardwareModule(
                 serial_number="serial-1",
                 definition=magdeck_v1_def,
             )
@@ -503,12 +522,15 @@ def test_select_hardware_module_to_load_reuses_already_loaded(
 ) -> None:
     """It should reuse over already assigned modules in the same location."""
     subject = make_module_view(
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        slot_by_module_id={
+            "module-1": DeckSlotName.SLOT_1,
+        },
+        hardware_by_module_id={
+            "module-1": HardwareModule(
                 serial_number="serial-1",
                 definition=magdeck_v1_def,
             )
-        }
+        },
     )
 
     attached_modules = [
@@ -531,12 +553,15 @@ def test_select_hardware_module_to_load_rejects_location_reassignment(
 ) -> None:
     """It should raise if a non-matching module is already present in the slot."""
     subject = make_module_view(
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        slot_by_module_id={
+            "module-1": DeckSlotName.SLOT_1,
+        },
+        hardware_by_module_id={
+            "module-1": HardwareModule(
                 serial_number="serial-1",
                 definition=magdeck_v1_def,
             )
-        }
+        },
     )
 
     attached_modules = [
@@ -556,15 +581,44 @@ def test_magnetic_module_view_find_hardware(
     decoy: Decoy,
     magdeck_v1_def: ModuleDefinition,
 ) -> None:
-    """It should return the matching hardware magnetic module."""
-    attached = get_attached_modules(decoy=decoy, matching_module_type=MagDeck)
-    parent = get_sample_parent_module_view(
-        matching_module_def=magdeck_v1_def, matching_module_id="id-matching"
+    """It should return the matching hardware module."""
+    matching = make_hardware_module(
+        decoy=decoy, type=MagDeck, serial_number="serial-matching"
+    )
+    non_matching = make_hardware_module(
+        decoy=decoy, type=MagDeck, serial_number="serial-non-matching"
+    )
+    another_non_matching = make_hardware_module(
+        decoy=decoy, type=TempDeck, serial_number="serial-another-non-matching"
+    )
+
+    attached = [non_matching, matching, another_non_matching]
+
+    parent = make_module_view(
+        hardware_by_module_id={
+            "id-non-matching": HardwareModule(
+                serial_number="serial-non-matching",
+                definition=magdeck_v1_def,
+            ),
+            "id-matching": HardwareModule(
+                serial_number="serial-matching",
+                definition=magdeck_v1_def,
+            ),
+            "id-another-non-matching": HardwareModule(
+                serial_number="serial-another-non-matching",
+                definition=magdeck_v1_def,
+            ),
+        },
+        slot_by_module_id={
+            "id-non-matching": DeckSlotName.SLOT_1,
+            "id-matching": DeckSlotName.SLOT_2,
+            "id-another-non-matching": DeckSlotName.SLOT_3,
+        },
     )
     subject = parent.get_magnetic_module_view(module_id="id-matching")
 
-    result = subject.find_hardware(attached_modules=list(attached.values()))
-    assert result == attached["matching"]
+    result = subject.find_hardware(attached_modules=attached)
+    assert result is matching
 
 
 def test_heater_shaker_module_view_find_hardware(
@@ -598,8 +652,8 @@ def test_magnetic_module_view_find_hardware_returns_none_if_virtualizing(
     This means ignoreing attached_modules and returning None.
     """
     parent = make_module_view(
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "id-to-match": HardwareModule(
                 serial_number="serial-to-match",
                 definition=module_definition,
             ),
@@ -630,8 +684,8 @@ def test_magnetic_module_view_find_hardware_raises_if_no_match_attached(
 ) -> None:
     """It should raise if nothing with a matching serial is in the attached list."""
     parent = make_module_view(
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "id-to-match": HardwareModule(
                 serial_number="serial-to-match",
                 definition=module_definition,
             ),
@@ -677,8 +731,8 @@ def test_magnetic_module_view_find_hardware_raises_if_match_is_wrong_type(
         serial_number="serial-to-match",
     )
     parent = make_module_view(
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "id-to-match": HardwareModule(
                 serial_number="serial-to-match",
                 definition=module_definition,
             ),
@@ -788,8 +842,8 @@ def test_magnetic_module_view_calculate_magnet_hardware_height(
     """It should return the expected height or raise the expected exception."""
     parent = make_module_view(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "module-id": HardwareModule(
                 serial_number="serial-number",
                 definition=definition,
             )
@@ -824,8 +878,8 @@ def test_validate_target_temperature(
     """It should verify if a target temperature is valid for the specified module."""
     parent = make_module_view(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "module-id": HardwareModule(
                 serial_number="serial-number",
                 definition=heater_shaker_v1_def,
             )
@@ -847,8 +901,8 @@ def test_validate_heater_shaker_target_speed_converts_to_int(
     """It should validate heater-shaker target rpm."""
     parent = make_module_view(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "module-id": HardwareModule(
                 serial_number="serial-number",
                 definition=heater_shaker_v1_def,
             )
@@ -868,8 +922,8 @@ def test_validate_heater_shaker_target_speed_raises_error(
     """It should validate heater-shaker target rpm."""
     parent = make_module_view(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "module-id": HardwareModule(
                 serial_number="serial-number",
                 definition=heater_shaker_v1_def,
             )
