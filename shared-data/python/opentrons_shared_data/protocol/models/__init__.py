@@ -10,7 +10,7 @@ from .protocol_schema_v6 import (
     OffsetVector,
     WellLocation,
     Module,
-    Location
+    Location,
 )
 
 
@@ -26,5 +26,5 @@ __all__ = [
     "OffsetVector",
     "WellLocation",
     "Module",
-    "Location"
+    "Location",
 ]
