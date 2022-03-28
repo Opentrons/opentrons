@@ -6,10 +6,11 @@ from typing_extensions import Literal, Type
 from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from opentrons.hardware_control import HardwareControlAPI
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
+    from opentrons.protocol_engine.execution import EquipmentHandler
+
 
 CloseLatchCommandType = Literal["heaterShakerModule/closeLatch"]
 
@@ -30,11 +31,11 @@ class CloseLatchImpl(AbstractCommandImpl[CloseLatchParams, CloseLatchResult]):
     def __init__(
         self,
         state_view: StateView,
-        hardware_api: HardwareControlAPI,
+        equipment: EquipmentHandler,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
-        self._hardware_api = hardware_api
+        self._equipment = equipment
 
     async def execute(self, params: CloseLatchParams) -> CloseLatchResult:
         """Close a Heater-Shaker's latch."""
@@ -44,12 +45,13 @@ class CloseLatchImpl(AbstractCommandImpl[CloseLatchParams, CloseLatchResult]):
         )
 
         # Allow propagation of ModuleNotAttachedError.
-        hs_hardware_module = hs_module_view.find_hardware(
-            attached_modules=self._hardware_api.attached_modules
+        hs_hardware_module = self._equipment.get_module_hardware_api(
+            hs_module_view.module_id
         )
 
         if hs_hardware_module is not None:
             await hs_hardware_module.close_labware_latch()
+
         return CloseLatchResult()
 
 
