@@ -256,10 +256,7 @@ def test_get_properties_by_id(
     )
 
 
-@pytest.mark.parametrize("target", [123.45, None])
-def test_get_plate_target_temperature(
-    target: Optional[float], thermocycler_v1_def: ModuleDefinition
-) -> None:
+def test_get_plate_target_temperature(thermocycler_v1_def: ModuleDefinition) -> None:
     """It should return whether target temperature is set."""
     subject = make_module_view(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
@@ -267,11 +264,40 @@ def test_get_plate_target_temperature(
             "module-id": HardwareModule(
                 serial_number="serial-number",
                 definition=thermocycler_v1_def,
-                plate_target_temperature=target,
+                plate_target_temperature=12.3,
             )
         },
     )
-    assert subject.get_plate_target_temperature("module-id") == target
+    assert subject.get_plate_target_temperature("module-id") == 12.3
+
+
+def test_get_plate_target_temperature_no_target(
+    thermocycler_v1_def: ModuleDefinition,
+) -> None:
+    """It should raise if no target temperature is set."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=thermocycler_v1_def,
+                plate_target_temperature=None,
+            )
+        },
+    )
+
+    with pytest.raises(errors.NoTargetTemperatureSetError):
+        subject.get_plate_target_temperature("module-id")
+
+
+def test_get_plate_target_temperature_no_module(
+    thermocycler_v1_def: ModuleDefinition,
+) -> None:
+    """It should raise if no target temperature is set."""
+    subject = make_module_view()
+
+    with pytest.raises(errors.ModuleNotLoadedError):
+        subject.get_plate_target_temperature("module-id")
 
 
 def test_get_magnet_home_to_base_offset() -> None:

@@ -218,9 +218,22 @@ class ModuleView(HasState[ModuleState]):
                 f"{module_id} is a {model}, not a Heater-Shaker Module."
             )
 
-    def get_plate_target_temperature(self, module_id: str) -> Optional[float]:
+    # TODO(mc, 2022-03-28): move to heater shaker view
+    def get_plate_target_temperature(self, module_id: str) -> float:
         """Get the module's target plate temperature."""
-        return self._state.hardware_by_module_id[module_id].plate_target_temperature
+        try:
+            target = self._state.hardware_by_module_id[
+                module_id
+            ].plate_target_temperature
+        except KeyError as e:
+            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+
+        if target is None:
+            raise errors.NoTargetTemperatureSetError(
+                f"Module {module_id} does not have a target temperature set."
+            )
+
+        return target
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
         """Get the slot location of the given module."""
