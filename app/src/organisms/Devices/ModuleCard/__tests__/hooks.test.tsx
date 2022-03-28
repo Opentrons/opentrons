@@ -206,7 +206,7 @@ describe('useLatchCommand', () => {
     const { isLatchClosed } = result.current
 
     expect(isLatchClosed).toBe(false)
-    act(() => result.current.handleLatch())
+    act(() => result.current.toggleLatch())
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
         commandType: 'heaterShakerModule/closeLatch',
@@ -231,7 +231,7 @@ describe('useLatchCommand', () => {
     const { isLatchClosed } = result.current
 
     expect(isLatchClosed).toBe(true)
-    act(() => result.current.handleLatch())
+    act(() => result.current.toggleLatch())
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
         commandType: 'heaterShakerModule/openLatch',
@@ -325,7 +325,7 @@ describe('useModuleOverflowMenu', () => {
     })
   })
   it('should render heater shaker module and calls handleClick when module is idle and calls other handles when button is selected', () => {
-    const mockHandleClick = jest.fn()
+    const mockHandleSlideoutClick = jest.fn()
     const mockAboutClick = jest.fn()
     const mockTestShakeClick = jest.fn()
     const mockHandleWizard = jest.fn()
@@ -341,7 +341,7 @@ describe('useModuleOverflowMenu', () => {
           mockAboutClick,
           mockTestShakeClick,
           mockHandleWizard,
-          mockHandleClick
+          mockHandleSlideoutClick
         ),
       {
         wrapper,
@@ -352,7 +352,7 @@ describe('useModuleOverflowMenu', () => {
       menuOverflowItemsByModuleType.heaterShakerModuleType
 
     act(() => heaterShakerMenu[1].onClick(true))
-    expect(mockHandleClick).toHaveBeenCalled()
+    expect(mockHandleSlideoutClick).toHaveBeenCalled()
   })
 
   it('should return only 1 menu button when module is a magnetic module and calls handleClick when module is disengaged', () => {

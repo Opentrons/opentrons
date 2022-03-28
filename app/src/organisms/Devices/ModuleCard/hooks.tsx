@@ -24,7 +24,7 @@ import type {
 import type { AttachedModule } from '../../../redux/modules/types'
 
 interface LatchCommand {
-  handleLatch: () => void
+  toggleLatch: () => void
   isLatchClosed: boolean
 }
 
@@ -45,7 +45,7 @@ export function useLatchCommand(module: AttachedModule): LatchCommand {
     params: { moduleId: module.id },
   }
 
-  const handleLatch = (): void => {
+  const toggleLatch = (): void => {
     createLiveCommand({
       command: latchCommand,
     }).catch((e: Error) => {
@@ -54,7 +54,7 @@ export function useLatchCommand(module: AttachedModule): LatchCommand {
       )
     })
   }
-  return { handleLatch, isLatchClosed }
+  return { toggleLatch, isLatchClosed }
 }
 
 export interface MenuItemsByModuleType {
@@ -62,21 +62,21 @@ export interface MenuItemsByModuleType {
     setSetting: string
     isSecondary: boolean
     disabledReason: boolean
-    menuButtons: JSX.Element | null
+    menuButtons: JSX.Element[] | null
     onClick: (isSecondary: boolean) => void
   }>
   magneticModuleType: Array<{
     setSetting: string
     isSecondary: boolean
     disabledReason: boolean
-    menuButtons: JSX.Element
+    menuButtons: JSX.Element[] | null
     onClick: (isSecondary: boolean) => void
   }>
   temperatureModuleType: Array<{
     setSetting: string
     isSecondary: boolean
     disabledReason: boolean
-    menuButtons: JSX.Element
+    menuButtons: JSX.Element[] | null
     onClick: (isSecondary: boolean) => void
   }>
   heaterShakerModuleType: Array<{
@@ -97,32 +97,32 @@ export function useModuleOverflowMenu(
   handleAboutClick: () => void,
   handleTestShakeClick: () => void,
   handleWizardClick: () => void,
-  handleClick: (isSecondary: boolean) => void
+  handleSlideoutClick: (isSecondary: boolean) => void
 ): ModuleOverflowMenu {
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { handleLatch, isLatchClosed } = useLatchCommand(module)
+  const { toggleLatch, isLatchClosed } = useLatchCommand(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
 
-  let commandType: CreateCommand['commandType']
+  let deactivateModuleCommandType: CreateCommand['commandType']
   switch (module.type) {
     case 'temperatureModuleType': {
-      commandType = 'temperatureModule/deactivate'
+      deactivateModuleCommandType = 'temperatureModule/deactivate'
       break
     }
     case 'magneticModuleType': {
-      commandType = 'magneticModule/disengageMagnet'
+      deactivateModuleCommandType = 'magneticModule/disengageMagnet'
       break
     }
     case 'thermocyclerModuleType': {
-      commandType =
+      deactivateModuleCommandType =
         module.data.lidTarget !== null && module.status !== 'idle'
           ? 'thermocycler/deactivateLid'
           : 'thermocycler/deactivateBlock'
       break
     }
     case 'heaterShakerModuleType': {
-      commandType =
+      deactivateModuleCommandType =
         module.data.speedStatus !== 'idle'
           ? 'heaterShakerModule/stopShake'
           : 'heaterShakerModule/deactivateHeater'
@@ -137,7 +137,7 @@ export function useModuleOverflowMenu(
     | TCDeactivateLidCreateCommand
     | TCDeactivateBlockCreateCommand
     | HeaterShakerStopShakeCreateCommand = {
-    commandType: commandType,
+    commandType: deactivateModuleCommandType,
     params: { moduleId: module.id },
   }
 
@@ -151,7 +151,7 @@ export function useModuleOverflowMenu(
         minWidth="10rem"
         key={`hs_labware_latch_${module.model}`}
         data-testid={`hs_labware_latch_${module.model}`}
-        onClick={handleLatch}
+        onClick={toggleLatch}
         disabled={isLatchDisabled}
         {...targetProps}
       >
@@ -213,7 +213,7 @@ export function useModuleOverflowMenu(
   const onClick =
     module.status !== 'idle'
       ? () => handleDeactivationCommand()
-      : () => handleClick(false)
+      : () => handleSlideoutClick(false)
 
   const menuOverflowItemsByModuleType = {
     thermocyclerModuleType: [
@@ -230,7 +230,7 @@ export function useModuleOverflowMenu(
           module.type === THERMOCYCLER_MODULE_TYPE &&
           module.data.lidTarget !== null
             ? () => handleDeactivationCommand()
-            : () => handleClick(true),
+            : () => handleSlideoutClick(true),
       },
       {
         setSetting:
@@ -239,7 +239,7 @@ export function useModuleOverflowMenu(
             : t('overflow_menu_set_block_temp'),
         isSecondary: false,
         disabledReason: false,
-        menuButtons: aboutModuleBtn,
+        menuButtons: [aboutModuleBtn],
         onClick: onClick,
       },
     ],
@@ -251,7 +251,7 @@ export function useModuleOverflowMenu(
             : t('overflow_menu_mod_temp'),
         isSecondary: false,
         disabledReason: false,
-        menuButtons: aboutModuleBtn,
+        menuButtons: [aboutModuleBtn],
         onClick: onClick,
       },
     ],
@@ -264,11 +264,11 @@ export function useModuleOverflowMenu(
 
         isSecondary: false,
         disabledReason: false,
-        menuButtons: aboutModuleBtn,
+        menuButtons: [aboutModuleBtn],
         onClick:
           module.status !== 'disengaged'
             ? () => handleDeactivationCommand()
-            : () => handleClick(false),
+            : () => handleSlideoutClick(false),
       },
     ],
     heaterShakerModuleType: [
@@ -302,7 +302,7 @@ export function useModuleOverflowMenu(
           module.type === HEATERSHAKER_MODULE_TYPE &&
           module.data.speedStatus !== 'idle'
             ? () => handleDeactivationCommand()
-            : () => handleClick(true),
+            : () => handleSlideoutClick(true),
       },
     ],
   }

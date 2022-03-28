@@ -8,13 +8,14 @@ import {
 } from '@opentrons/components'
 import { MenuList } from '../../../atoms/MenuList'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
-import { useModuleOverflowMenu } from './hooks'
+import { MenuItemsByModuleType, useModuleOverflowMenu } from './hooks'
 
 import type { AttachedModule } from '../../../redux/modules/types'
+import type { ModuleType } from '@opentrons/shared-data'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
-  handleClick: () => void
+  handleSlideoutClick: () => void
   handleAboutClick: () => void
   handleTestShakeClick: () => void
   handleWizardClick: () => void
@@ -26,7 +27,7 @@ export const ModuleOverflowMenu = (
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const {
     module,
-    handleClick,
+    handleSlideoutClick,
     handleAboutClick,
     handleTestShakeClick,
     handleWizardClick,
@@ -37,7 +38,7 @@ export const ModuleOverflowMenu = (
     handleAboutClick,
     handleTestShakeClick,
     handleWizardClick,
-    handleClick
+    handleSlideoutClick
   )
 
   return (
@@ -45,31 +46,35 @@ export const ModuleOverflowMenu = (
       <Flex position={POSITION_RELATIVE}>
         <MenuList
           buttons={[
-            menuOverflowItemsByModuleType[module.type].map((item, index) => {
-              return (
-                <>
-                  <MenuItem
-                    minWidth="10rem"
-                    key={`${index}_${module.model}`}
-                    onClick={() => item.onClick(item.isSecondary)}
-                    data-testid={`module_setting_${module.model}`}
-                    disabled={item.disabledReason}
-                    {...targetProps}
-                  >
-                    {item.setSetting}
-                  </MenuItem>
-                  {item.disabledReason && (
-                    <Tooltip
-                      {...tooltipProps}
-                      key={`tooltip_${index}_${module.model}`}
+            (menuOverflowItemsByModuleType[
+              module.type
+            ] as MenuItemsByModuleType[ModuleType]).map(
+              (item: any, index: number) => {
+                return (
+                  <>
+                    <MenuItem
+                      minWidth="10rem"
+                      key={`${index}_${module.model}`}
+                      onClick={() => item.onClick}
+                      data-testid={`module_setting_${module.model}`}
+                      disabled={item.disabledReason}
+                      {...targetProps}
                     >
-                      {t('cannot_shake', { ns: 'heater_shaker' })}
-                    </Tooltip>
-                  )}
-                  {item.menuButtons}
-                </>
-              )
-            }),
+                      {item.setSetting}
+                    </MenuItem>
+                    {item.disabledReason && (
+                      <Tooltip
+                        {...tooltipProps}
+                        key={`tooltip_${index}_${module.model}`}
+                      >
+                        {t('cannot_shake', { ns: 'heater_shaker' })}
+                      </Tooltip>
+                    )}
+                    {item.menuButtons}
+                  </>
+                )
+              }
+            ),
           ]}
         />
       </Flex>

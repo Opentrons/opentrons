@@ -170,7 +170,7 @@ describe('ModuleOverflowMenu', () => {
   beforeEach(() => {
     props = {
       module: mockMagneticModule,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
@@ -190,7 +190,7 @@ describe('ModuleOverflowMenu', () => {
   it('renders the correct temperature module menu', () => {
     props = {
       module: mockTemperatureModuleGen2,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
@@ -200,7 +200,7 @@ describe('ModuleOverflowMenu', () => {
       name: 'Set module temperature',
     })
     fireEvent.click(buttonSetting)
-    expect(props.handleClick).toHaveBeenCalled()
+    expect(props.handleSlideoutClick).toHaveBeenCalled()
     const buttonAbout = getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
     expect(props.handleAboutClick).toHaveBeenCalled()
@@ -208,7 +208,7 @@ describe('ModuleOverflowMenu', () => {
   it('renders the correct TC module menu', () => {
     props = {
       module: mockThermocycler,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
@@ -218,7 +218,7 @@ describe('ModuleOverflowMenu', () => {
       name: 'Set lid temperature',
     })
     fireEvent.click(buttonSettingLid)
-    expect(props.handleClick).toHaveBeenCalled()
+    expect(props.handleSlideoutClick).toHaveBeenCalled()
     const buttonAbout = getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
     expect(props.handleAboutClick).toHaveBeenCalled()
@@ -226,12 +226,12 @@ describe('ModuleOverflowMenu', () => {
       name: 'Set block temperature',
     })
     fireEvent.click(buttonSettingBlock)
-    expect(props.handleClick).toHaveBeenCalled()
+    expect(props.handleSlideoutClick).toHaveBeenCalled()
   })
   it('renders the correct Heater Shaker module menu', () => {
     props = {
       module: mockHeaterShaker,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
@@ -257,7 +257,7 @@ describe('ModuleOverflowMenu', () => {
   it('renders heater shaker see how to attach to deck button and when clicked, launches hs wizard', () => {
     props = {
       module: mockHeaterShaker,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
@@ -271,7 +271,7 @@ describe('ModuleOverflowMenu', () => {
   it('renders heater shaker labware latch button and is disabled when status is not idle', () => {
     props = {
       module: mockMovingHeaterShaker,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
@@ -287,7 +287,7 @@ describe('ModuleOverflowMenu', () => {
   it('renders heater shaker shake button and is disabled when latch is opened', () => {
     props = {
       module: mockOpenLatchHeaterShaker,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
@@ -303,7 +303,7 @@ describe('ModuleOverflowMenu', () => {
   it('renders heater shaker labware latch button and when clicked, moves labware latch open', () => {
     props = {
       module: mockCloseLatchHeaterShaker,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
@@ -321,7 +321,7 @@ describe('ModuleOverflowMenu', () => {
   it('renders heater shaker labware latch button and when clicked, moves labware latch close', () => {
     props = {
       module: mockHeaterShaker,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
@@ -338,7 +338,7 @@ describe('ModuleOverflowMenu', () => {
   it('renders heater shaker overflow menu and deactivates heater when status changes', () => {
     props = {
       module: mockDeactivateHeatHeaterShaker,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
@@ -356,7 +356,7 @@ describe('ModuleOverflowMenu', () => {
   it('renders temperature module overflow menu and deactivates heat when status changes', () => {
     props = {
       module: mockTemperatureModuleHeating,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
@@ -374,7 +374,7 @@ describe('ModuleOverflowMenu', () => {
   it('renders magnetic module overflow menu and disengages when status changes', () => {
     props = {
       module: mockMagDeckEngaged,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
@@ -392,7 +392,7 @@ describe('ModuleOverflowMenu', () => {
   it('renders thermocycler overflow menu and deactivates block when status changes', () => {
     props = {
       module: mockTCBlockHeating,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),

@@ -52,7 +52,7 @@ export const TestShakeSlideout = (
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const name = getModuleDisplayName(module.model)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { handleLatch, isLatchClosed } = useLatchCommand(module)
+  const { toggleLatch, isLatchClosed } = useLatchCommand(module)
 
   const [showCollapsed, setShowCollapsed] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
@@ -173,7 +173,7 @@ export const TestShakeSlideout = (
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
             paddingX={SPACING.spacing4}
-            onClick={handleLatch}
+            onClick={toggleLatch}
             disabled={isShaking}
             {...targetProps}
           >

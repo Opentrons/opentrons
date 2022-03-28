@@ -171,7 +171,7 @@ describe('TestShakeSlideout', () => {
       isExpanded: true,
     }
     mockUseLatchCommand.mockReturnValue({
-      handleLatch: jest.fn(),
+      toggleLatch: jest.fn(),
       isLatchClosed: false,
     })
 
