@@ -392,7 +392,6 @@ the overall speed of the gantry. Its default is 400 mm/s.
 
     def run(protocol: protocol_api.ProtocolContext):
         pipette = protocol.load_instrument('p300_single', 'right')
-        pipette.pick_up_tip()
         # Move to 50mm above the front left of slot 5, very quickly
         pipette.move_to(protocol.deck.position_for('5').move(types.Point(z=50)))
         # Slow down the pipette
