@@ -48,5 +48,5 @@ jobs:
         with:
           project: 'g-code-testing'
 
-      - name: 'Run & Compare to master files'
+      - name: 'Run & Compare to comparison files'
         run: make -C g-code-testing test-g-code-${{ matrix.command }}
