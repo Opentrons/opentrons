@@ -1,7 +1,7 @@
 """Translation of JSON protocol commands into ProtocolEngine commands."""
 from typing import cast, List
 from pydantic import parse_obj_as
-from opentrons_shared_data.protocol.models import ProtocolSchemaV6, Command
+from opentrons_shared_data.protocol.models import ProtocolSchemaV6, protocol_schema_v6
 from opentrons.protocol_engine import (
     commands as pe_commands,
     LabwareLocation,
@@ -19,7 +19,7 @@ class CommandTranslatorError(Exception):
 
 
 def _translate_labware_command(
-    protocol: ProtocolSchemaV6, command: Command
+    protocol: ProtocolSchemaV6, command: protocol_schema_v6.Command
 ) -> pe_commands.LoadLabwareCreate:
     labware_id = command.params.labwareId
     # v6 data model supports all commands and therefor most props are optional.
@@ -45,7 +45,7 @@ def _translate_labware_command(
 
 
 def _translate_module_command(
-    protocol: ProtocolSchemaV6, command: Command
+    protocol: ProtocolSchemaV6, command: protocol_schema_v6.Command
 ) -> pe_commands.CommandCreate:
     module_id = command.params.moduleId
     modules = protocol.modules
@@ -64,7 +64,7 @@ def _translate_module_command(
 
 
 def _translate_pipette_command(
-    protocol: ProtocolSchemaV6, command: Command
+    protocol: ProtocolSchemaV6, command: protocol_schema_v6.Command
 ) -> pe_commands.CommandCreate:
     pipette_id = command.params.pipetteId
     # v6 data model supports all commands and therefor most props are optional.
@@ -80,7 +80,7 @@ def _translate_pipette_command(
     return translated_obj
 
 
-def _translate_simple_command(command: Command) -> pe_commands.CommandCreate:
+def _translate_simple_command(command: protocol_schema_v6.Command) -> pe_commands.CommandCreate:
     dict_command = command.dict(exclude_none=True)
     translated_obj = cast(
         pe_commands.CommandCreate,
