@@ -75,7 +75,6 @@ async def create_protocol(
     files: List[UploadFile] = File(...),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-    protocol_reader: ProtocolReader = Depends(get_protocol_reader),
     protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
     task_runner: TaskRunner = Depends(TaskRunner),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
@@ -96,22 +95,16 @@ async def create_protocol(
         created_at: Timestamp to attach to the new resource.
     """
     try:
-        source = await protocol_reader.read(
-            name=protocol_id,
-            files=files,
+        protocol_resource = await protocol_store.insert(
+            id=protocol_id,
+            created_at=created_at,
+            uploaded_protocol_files=files,
         )
     except ProtocolFilesInvalidError as e:
         raise ProtocolFilesInvalid(detail=str(e)).as_error(
             status.HTTP_422_UNPROCESSABLE_ENTITY
         )
-
-    protocol_resource = ProtocolResource(
-        protocol_id=protocol_id,
-        created_at=created_at,
-        source=source,
-    )
-
-    protocol_store.insert(protocol_resource)
+    source = protocol_resource.source
 
     task_runner.run(
         protocol_analyzer.analyze,

@@ -33,12 +33,17 @@ def get_protocol_reader(
     return ProtocolReader(directory=protocol_dir)
 
 
-def get_protocol_store(app_state: AppState = Depends(get_app_state)) -> ProtocolStore:
+async def get_protocol_store(
+    app_state: AppState = Depends(get_app_state),
+    protocol_reader: ProtocolReader = Depends(get_protocol_reader),
+) -> ProtocolStore:
     """Get a singleton ProtocolStore to keep track of created protocols."""
     protocol_store = _protocol_store.get_from(app_state)
 
     if protocol_store is None:
-        protocol_store = ProtocolStore()
+        protocol_store = await ProtocolStore.create_or_rehydrate(
+            protocol_reader=protocol_reader
+        )
         _protocol_store.set_on(app_state, protocol_store)
 
     return protocol_store
