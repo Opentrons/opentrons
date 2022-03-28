@@ -25,7 +25,7 @@ interface SP {
 
 interface DP {
   addManualIp: (ip: string) => unknown
-  checkManualIp: () => unknown
+  // checkManualIp: () => unknown
 }
 
 interface FormikErrors {
@@ -132,9 +132,9 @@ const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
       dispatch(addManualIp(ip))
       dispatch(startDiscovery())
     },
-    checkManualIp: () => {
-      dispatch(startDiscovery())
-    },
+    // checkManualIp: () => {
+    //   dispatch(startDiscovery())
+    // },
   }
 }
 

@@ -35,7 +35,7 @@ interface SP {
 }
 
 interface DP {
-  checkIpAndHostnam: () => unknown
+  checkIpAndHostname: () => unknown
 }
 type ConnectRobotSlideoutProps = SP &
   DP & {
@@ -59,7 +59,7 @@ export function ConnectRobotSlideoutComponent(
         role="button"
         css={TYPOGRAPHY.pSemiBold}
         color={COLORS.blue}
-        onClick={props.checkIpAndHostnam}
+        onClick={props.checkIpAndHostname}
         id="AppSettings_Connection_Button"
       >
         {buttonLable}
@@ -153,7 +153,7 @@ const mapStateToProps = (state: State): SP => {
 
 const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
   return {
-    checkIpAndHostnam: () => {
+    checkIpAndHostname: () => {
       dispatch(startDiscovery())
     },
   }
