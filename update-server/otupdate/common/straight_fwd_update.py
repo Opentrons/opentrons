@@ -38,7 +38,7 @@ def _begin_straight_fwd_unzip(
         else:
             files, sizes = fut.result()
             loop.call_soon_threadsafe(
-                _begin_straight_fwd_write(session, loop, files["rootfs.etx4"], actions)
+                _begin_straight_fwd_write(session, config, loop, files["rootfs.etx4"], actions)
             )
 
     unzip_future.add_done_callback(unzip_done)
@@ -51,7 +51,7 @@ def _begin_straight_fwd_write(
     loop: asyncio.AbstractEventLoop,
     downloaded_update_path: str,
     actions: update_actions.UpdateActionsInterface,
-) -> asyncio.futures.Future:
+):
     """Start the write process!"""
     LOG.warning("In _begin_straight_fwd_write")
     LOG.warning(f"file path, {downloaded_update_path} .in _begin_straight_fwd_write")
@@ -73,8 +73,6 @@ def _begin_straight_fwd_write(
             session.set_stage(Stages.DONE)
 
     write_future.add_done_callback(write_done)
-    return write_future
-
 
 @require_session
 async def file_upload(request: web.Request, session: UpdateSession) -> web.Response:
@@ -117,7 +115,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             },
             status=500,
         )
-    LOG.warning("Entering straight fwd write!")
+
     # call unzip here now, first unzip then write.
     _begin_straight_fwd_unzip(
         session,

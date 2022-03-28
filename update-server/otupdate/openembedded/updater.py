@@ -64,6 +64,8 @@ class RootFSInterface:
         total_size = 0
         file_paths: Dict[str, Optional[str]] = {}
         file_sizes: Dict[str, int] = {}
+        LOG.debug(f"downloaded_update path: {downloaded_update_path}, "
+                  f"in RootFSInterface::update ")
         with zipfile.ZipFile(downloaded_update_path, "r") as zf:
             files = zf.infolist()
             LOG.debug(f"Found files {files}, in RootFSInterface::unzip")
@@ -251,10 +253,35 @@ class Updater(UpdateActionsInterface):
         self, downloaded_update_path: str, progress_callback: Callable[[float], None]
     ) -> Tuple[Mapping[str, Optional[str]], Mapping[str, int]]:
         LOG.warning("Entering unzip of Updater class!")
-        files, sizes = self.root_FS_intf.unzip(
-            downloaded_update_path, progress_callback
-        )
-        return files, sizes
+        LOG.warning(f"path passed to Updater::unzip {downloaded_update_path}")
+        written_size = 0
+        total_size = 0
+        file_paths: Dict[str, Optional[str]] = {}
+        file_sizes: Dict[str, int] = {}
+        LOG.warning(f"downloaded_update path: {downloaded_update_path}, "
+                  f"in RootFSInterface::update ")
+        with zipfile.ZipFile(downloaded_update_path, "r") as zf:
+            files = zf.infolist()
+            LOG.warning(f"Found files {files}, in RootFSInterface::unzip")
+            for fi in files:
+                total_size = total_size + fi.file_size
+            for fi in files:
+                uncomp_path = os.path.join(
+                    os.path.dirname(downloaded_update_path), fi.filename
+                )
+                with zf.open(fi) as zipped, open(uncomp_path, "wb") as unzipped:
+                    LOG.warning(f"Beginning unzip of {fi.filename} to {uncomp_path}")
+                    while True:
+                        chunk = zipped.read(1024)
+                        unzipped.write(chunk)
+                        written_size += len(chunk)
+                        progress_callback(written_size / total_size)
+                        if len(chunk) != 1024:
+                            break
+                    LOG.warning(f"Unzipped {fi.filename} to {uncomp_path}")
+                    file_paths[fi.filename] = uncomp_path
+                    file_sizes[fi.filename] = fi.file_size
+        return file_paths, file_sizes
 
     def verify_check_sum(self) -> bool:
         pass
