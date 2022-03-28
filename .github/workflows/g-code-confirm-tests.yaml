@@ -7,8 +7,6 @@ on:
       - 'api/**'
       - 'g-code-testing/**'
       - 'Makefile'
-    branches:
-      - '*'
   push:
     paths:
       - 'api/**'
@@ -16,7 +14,9 @@ on:
       - 'Makefile'
       - '.github/workflows/g-code-confirm-tests.yaml'
     branches:
-      - '*'
+      - 'edge'
+      - 'release'
+      - '*hotfix*'
   create:
     tags:
       - 'v*'
