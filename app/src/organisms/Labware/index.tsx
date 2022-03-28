@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import {
   Box,
   Flex,
-  Text,
   Link,
   SPACING,
   COLORS,
@@ -78,15 +77,22 @@ export function Labware(): JSX.Element {
           alignItems={ALIGN_CENTER}
           marginTop={SPACING.spacing6}
         >
-          <Text color={COLORS.black} css={TYPOGRAPHY.pSemiBold}>
+          <StyledText
+            as="p"
+            color={COLORS.black}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {t('create_new_def')}
-          </Text>
-          <Text css={TYPOGRAPHY.h6SemiBold} color={COLORS.darkGreyEnabled}>
+          </StyledText>
+          <StyledText
+            css={TYPOGRAPHY.h6SemiBold}
+            color={COLORS.darkGreyEnabled}
+          >
             <Link href={LABWARE_CREATOR_HREF} color={COLORS.darkGreyEnabled}>
               {t('open_labware_creator')}{' '}
               <Icon name="open-in-new" height="10px"></Icon>
             </Link>
-          </Text>
+          </StyledText>
         </Flex>
       </Box>
       {showAddLabwareSlideout && (

@@ -81,7 +81,6 @@ const copyLabware = (
     if (next.type !== CustomLabware.VALID_LABWARE_FILE) {
       return dispatch(CustomLabware.addCustomLabwareFailure(next))
     }
-    //
     return Definitions.addLabwareFile(next.filename, dir)
       .then(() =>
         fetchAndValidateCustomLabware(dispatch, CustomLabware.ADD_LABWARE)

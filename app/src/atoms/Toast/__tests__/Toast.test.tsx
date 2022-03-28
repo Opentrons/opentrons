@@ -7,7 +7,7 @@ const render = (props: React.ComponentProps<typeof Toast>) => {
   return renderWithProviders(<Toast {...props} />)[0]
 }
 
-describe('HeaterShakerSlideout', () => {
+describe('Toast', () => {
   let props: React.ComponentProps<typeof Toast>
   beforeEach(() => {
     props = {
