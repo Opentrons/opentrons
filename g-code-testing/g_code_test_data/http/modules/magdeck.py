@@ -12,6 +12,7 @@ MAGDECK_CALIBRATE = HTTPGCodeConfirmConfig(
         post_serial_command,
         command=SerialCommand(command_type='calibrate'),
         serial=HTTP_SETTINGS.magdeck.serial_number,
+        requested_version=2
     ),
     settings=HTTP_SETTINGS,
 )
@@ -23,6 +24,7 @@ MAGDECK_DEACTIVATE = HTTPGCodeConfirmConfig(
         post_serial_command,
         command=SerialCommand(command_type='deactivate'),
         serial=HTTP_SETTINGS.magdeck.serial_number,
+        requested_version=2
     ),
     settings=HTTP_SETTINGS,
 )
@@ -34,6 +36,7 @@ MAGDECK_ENGAGE = HTTPGCodeConfirmConfig(
         post_serial_command,
         command=SerialCommand(command_type='engage', args=[5.1]),
         serial=HTTP_SETTINGS.magdeck.serial_number,
+        requested_version=2
     ),
     settings=HTTP_SETTINGS,
 )
