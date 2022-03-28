@@ -11,7 +11,7 @@ from opentrons.hardware_control.emulation.settings import Settings, SmoothieSett
 from pydantic import BaseModel, constr
 
 BUCKET_NAME = "g-code-comparison"
-MASTER_FILES_FOLDER_PATH = os.path.join(os.path.dirname(__file__), 'master_comparision_files')
+MASTER_FILES_FOLDER_PATH = os.path.join(os.path.dirname(__file__), 'comparison_files')
 
 class SharedFunctionsMixin:
     """Functions that GCodeConfirmConfig classes share."""
@@ -20,22 +20,21 @@ class SharedFunctionsMixin:
         """Get the configuration file path."""
         return f'{self.driver}/{self.name}'
 
-    def get_master_file_path(self) -> str:
+    def get_comparison_file_path(self) -> str:
         """Get that path of the file in S3."""
         return self.results_path
 
-    def get_master_file(self) -> str:
+    def get_comparison_file(self) -> str:
         """Pull file from S3 and print it's content."""
-        file_path = os.path.join(MASTER_FILES_FOLDER_PATH, self.get_master_file_path())
+        file_path = os.path.join(MASTER_FILES_FOLDER_PATH, self.get_comparison_file_path())
         file = open(file_path, "r")
         return ''.join(file.readlines()).strip()
 
-    def upload(self) -> None:
+    def update_comparison(self) -> str:
         """Run config and upload it to S3."""
-        file_path = os.path.join(MASTER_FILES_FOLDER_PATH, self.get_master_file_path())
-        file = open(file_path, "w")
-        file.write(self.self.execute())
-        file.close()
+        with open(os.path.join(MASTER_FILES_FOLDER_PATH, self.get_comparison_file_path()), 'w') as file:
+            file.write(self.execute())
+        return "File uploaded successfully"
 
     def add_mark(self, user_mark: Mark) -> None:
         self.marks.append(user_mark)
