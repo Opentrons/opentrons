@@ -5,7 +5,7 @@ update actions
 
 import abc
 import contextlib
-from typing import NamedTuple, Optional, Callable, Iterator
+from typing import NamedTuple, Optional, Callable, Iterator, Mapping, Tuple
 from aiohttp import web
 
 from .constants import APP_VARIABLE_PREFIX
@@ -72,4 +72,11 @@ class UpdateActionsInterface:
     @abc.abstractmethod
     def write_machine_id(self, current_root: str, new_root: str) -> None:
         """Copy the machine id over to the new partition"""
+        ...
+
+    @abc.abstractmethod
+    def unzip(
+        self, downloaded_update_path: str, progress_callback: Callable[[float], None]
+    ) -> Tuple[Mapping[str, Optional[str]], Mapping[str, int]]:
+        """Unzip update file."""
         ...

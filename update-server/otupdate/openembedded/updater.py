@@ -1,8 +1,10 @@
 """OE Updater and dependency injection classes."""
 import contextlib
+import os
+import zipfile
 
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
-from typing import Callable, Optional
+from typing import Callable, Optional, Tuple, Mapping, Dict
 import enum
 import subprocess
 
@@ -55,6 +57,34 @@ class PartitionManager:
 class RootFSInterface:
     """RootFS interface class."""
 
+    def unzip(
+        self, downloaded_update_path: str, progress_callback: Callable[[float], None]
+    ) -> Tuple[Mapping[str, Optional[str]], Mapping[str, int]]:
+        written_size = 0
+        total_size = 0
+        file_paths: Dict[str, Optional[str]] = {}
+        file_sizes: Dict[str, int] = {}
+        with zipfile.ZipFile(downloaded_update_path, "r") as zf:
+            files = zf.infolist()
+            LOG.debug(f"Found files {files}, in RootFSInterface::unzip")
+            for fi in files:
+                uncomp_path = os.path.join(
+                    os.path.dirname(downloaded_update_path), fi.filename
+                )
+                with zf.open(fi) as zipped, open(uncomp_path, "wb") as unzipped:
+                    LOG.debug(f"Beginning unzip of {fi.filename} to {uncomp_path}")
+                    while True:
+                        chunk = zipped.read(1024)
+                        unzipped.write(chunk)
+                        written_size += len(chunk)
+                        progress_callback(written_size / total_size)
+                        if len(chunk) != 1024:
+                            break
+                        LOG.debug(f"Unzipped {fi.filename} to {uncomp_path}")
+                        file_paths[fi.filename] = uncomp_path
+                        file_sizes[fi.filename] = fi.file_size
+        return file_paths, file_sizes
+
     def write_file(
         self,
         infile: str,
@@ -75,6 +105,7 @@ class RootFSInterface:
                           ``seek``/``tell``.
         """
         total_written = 0
+
         with open(infile, "rb") as img, open(outfile, "wb") as part:
             if None is file_size:
                 file_size = img.seek(0, 2)
@@ -198,7 +229,13 @@ class Updater(UpdateActionsInterface):
         :returns: The root partition that the rootfs image was written to, e.g.
                   ``RootPartitions.TWO`` or ``RootPartitions.THREE``.
         """
+
+        LOG.warning("Entering write_update of Updater class!")
         unused_partition = self.part_mngr.find_unused_partition()
+        LOG.warning(f"Found unused partition: {unused_partition}")
+        LOG.warning(
+            f"rootf_fs roots fs being read from {rootfs_filepath}, in write_update"
+        )
         self.root_FS_intf.write_file(
             rootfs_filepath,
             unused_partition.path,
@@ -207,6 +244,15 @@ class Updater(UpdateActionsInterface):
             file_size,
         )
         return unused_partition
+
+    def unzip(
+        self, downloaded_update_path: str, progress_callback: Callable[[float], None]
+    ) -> Tuple[Mapping[str, Optional[str]], Mapping[str, int]]:
+        LOG.warning("Entering unzip of Updater class!")
+        files, sizes = self.root_FS_intf.unzip(
+            downloaded_update_path, progress_callback
+        )
+        return files, sizes
 
     def verify_check_sum(self) -> bool:
         pass

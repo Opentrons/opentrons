@@ -12,6 +12,7 @@ from otupdate.common import (
     ssh_key_management,
     name_management,
     update,
+    straight_fwd_update,
 )
 
 from otupdate.openembedded.updater import RootFSInterface, PartitionManager, Updater
@@ -92,7 +93,7 @@ def get_app(
             web.post("/server/update/begin", update.begin),
             web.post("/server/update/cancel", update.cancel),
             web.get("/server/update/{session}/status", update.status),
-            web.post("/server/update/{session}/file", update.file_upload),
+            web.post("/server/update/{session}/file", straight_fwd_update.file_upload),
             web.post("/server/update/{session}/commit", update.commit),
             web.post("/server/restart", control.restart),
             web.get("/server/ssh_keys", ssh_key_management.list_keys),

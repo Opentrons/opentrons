@@ -12,7 +12,7 @@ import os
 import re
 import subprocess
 import tempfile
-from typing import Callable, Optional
+from typing import Callable, Optional, Tuple, Mapping
 
 from otupdate.common.file_actions import (
     unzip_update,
@@ -35,6 +35,12 @@ class RootPartitions(enum.Enum):
 
 
 class OT2UpdateActions(UpdateActionsInterface):
+    def unzip(
+        self, downloaded_update_path: str, progress_callback: Callable[[float], None]
+    ) -> Tuple[Mapping[str, Optional[str]], Mapping[str, int]]:
+        """Unzip update file."""
+        pass
+
     def validate_update(
         self,
         filepath: str,
