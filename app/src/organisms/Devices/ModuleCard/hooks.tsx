@@ -56,30 +56,8 @@ export function useLatchCommand(module: AttachedModule): LatchCommand {
   }
   return { toggleLatch, isLatchClosed }
 }
-
-export interface MenuItemsByModuleType {
-  thermocyclerModuleType: Array<{
-    setSetting: string
-    isSecondary: boolean
-    disabledReason: boolean
-    menuButtons: JSX.Element[] | null
-    onClick: (isSecondary: boolean) => void
-  }>
-  magneticModuleType: Array<{
-    setSetting: string
-    isSecondary: boolean
-    disabledReason: boolean
-    menuButtons: JSX.Element[] | null
-    onClick: (isSecondary: boolean) => void
-  }>
-  temperatureModuleType: Array<{
-    setSetting: string
-    isSecondary: boolean
-    disabledReason: boolean
-    menuButtons: JSX.Element[] | null
-    onClick: (isSecondary: boolean) => void
-  }>
-  heaterShakerModuleType: Array<{
+export type MenuItemsByModuleType = {
+  [moduleType in AttachedModule['type']]: Array<{
     setSetting: string
     isSecondary: boolean
     disabledReason: boolean
@@ -87,7 +65,6 @@ export interface MenuItemsByModuleType {
     onClick: (isSecondary: boolean) => void
   }>
 }
-
 interface ModuleOverflowMenu {
   menuOverflowItemsByModuleType: MenuItemsByModuleType
 }
