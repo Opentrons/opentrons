@@ -50,7 +50,6 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
       ip: '',
     },
     onSubmit: (values, { resetForm }) => {
-      console.log('values', values)
       // setShowSpinner(true)
       const ip = values.ip.trim()
       const inputForm = document.getElementById('ip')

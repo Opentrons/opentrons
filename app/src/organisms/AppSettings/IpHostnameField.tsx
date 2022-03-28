@@ -32,6 +32,8 @@ export function IpHostnameField(props: IpHostnameFieldProps): JSX.Element {
         marginTop={SPACING.spacing2}
       >
         <input
+          id="ip"
+          name="ip"
           {...field}
           onBlur={event => {
             field.onBlur(event)

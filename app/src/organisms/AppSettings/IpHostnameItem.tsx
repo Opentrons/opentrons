@@ -52,7 +52,7 @@ export function IpHostnameItem(props: IpHostnameItemProps): JSX.Element {
   }
 
   return (
-    <React.Fragment>
+    <>
       <Flex justifyContent={JUSTIFY_FLEX_START} alignItems={JUSTIFY_CENTER}>
         <IpItem>
           <Text
@@ -61,6 +61,7 @@ export function IpHostnameItem(props: IpHostnameItemProps): JSX.Element {
             lineHeight={TYPOGRAPHY.lineHeight16}
             fontStyle={TYPOGRAPHY.fontStyleNormal}
             color={props.discovered ? COLORS.darkBlack : COLORS.successDisabled}
+            data-testid={`ip-hostname`}
           >
             {props.candidate}
           </Text>
@@ -81,6 +82,6 @@ export function IpHostnameItem(props: IpHostnameItemProps): JSX.Element {
         <IpTerminateButton name="close" onClick={remove} />
       </Flex>
       <Divider width="100%" />
-    </React.Fragment>
+    </>
   )
 }

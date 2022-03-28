@@ -19,6 +19,7 @@ import { Slideout } from '../../atoms/Slideout'
 import { PrimaryButton } from '../../atoms/Buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
 import { getScanning, startDiscovery } from '../../redux/discovery'
 import { getConfig } from '../../redux/config'
 
@@ -50,7 +51,7 @@ export function ConnectRobotSlideoutComponent(
   )
   const { onCloseClick, isExpanded } = props
   const { t } = useTranslation('app_settings')
-  const scanning = useSelector<State>(getScanning)
+  const isScanning = useSelector<State>(getScanning)
 
   const displayLinkButton = (buttonLable: string): JSX.Element => {
     return (
@@ -67,10 +68,10 @@ export function ConnectRobotSlideoutComponent(
   }
 
   useEffect(() => {
-    if (!scanning) {
+    if (!isScanning) {
       setMostRecentAddition(null)
     }
-  }, [scanning])
+  }, [isScanning])
 
   return (
     <Slideout
@@ -108,7 +109,7 @@ export function ConnectRobotSlideoutComponent(
           marginBottom={SPACING.spacing4}
           justifyContent={ALIGN_FLEX_END}
         >
-          {scanning ? (
+          {isScanning ? (
             <Icon name="ot-spinner" size={SIZE_2} spin />
           ) : (
             [
@@ -116,7 +117,14 @@ export function ConnectRobotSlideoutComponent(
                 displayLinkButton(t('ip_refresh_button'))
               ) : (
                 <>
-                  <Text
+                  <StyledText
+                    as="p"
+                    color={COLORS.darkGreyEnabled}
+                    margin={`0 ${SPACING.spacing2}`}
+                  >
+                    {t('ip_connect_timeout')}
+                  </StyledText>
+                  {/* <Text
                     fontSize={TYPOGRAPHY.fontSizeP}
                     lineHeight={TYPOGRAPHY.lineHeight16}
                     fontStyle={TYPOGRAPHY.fontStyleNormal}
@@ -124,7 +132,7 @@ export function ConnectRobotSlideoutComponent(
                     margin={`0 ${SPACING.spacing2}`}
                   >
                     {t('ip_connect_timeout')}
-                  </Text>
+                  </Text> */}
                   {displayLinkButton(t('ip_reconnect_button'))}
                 </>
               ),
