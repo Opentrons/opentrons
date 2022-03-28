@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, getByText } from '@testing-library/react'
 import { act } from 'react-dom/test-utils'
 import { i18n } from '../../../i18n'
 // import { AppSettings } from '..'
@@ -115,20 +115,21 @@ describe('ConnectRobotSlideout', () => {
       isExpanded: true,
       onCloseClick: jest.fn(),
     }
-    const { getByRole, getByTestId } = render(props)
+    const { getByRole, getByTestId, getByText } = render(props)
     // put ip address in input box 1.1.1.1
     // click add button
     // check that ip address is displayed
+    // no Available no Not Found
     const inputBox = getByRole('textbox')
     const addButton = getByRole('button', { name: 'Add' })
-    act(async () => {
+    await act(() => {
       fireEvent.change(inputBox, { target: { value: '1.1.1.1' } })
       fireEvent.click(addButton)
     })
-
-    const addedIpAddress = await getByTestId('ip-hostname')
-    // console.log('added value', addedIpAddress.textContent.values.ip)
-    expect(addedIpAddress.textContent).toBeInTheDocument()
+    expect(inputBox).toHaveValue('1.1.1.1')
+    expect(getByTestId('ip-address')).toHaveValue('1.1.1.1')
+    expect(getByText('Available')).not.toBeInTheDocument()
+    expect(getByText('Not Found')).not.toBeInTheDocument()
   })
 
   it('Clicking Add button with an IP address/hostname should display the IP address/hostname and Available label', () => {})
