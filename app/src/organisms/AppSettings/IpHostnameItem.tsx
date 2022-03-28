@@ -2,7 +2,8 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
-  IconButton,
+  Btn,
+  Icon,
   COLORS,
   Text,
   TYPOGRAPHY,
@@ -21,14 +22,6 @@ const IpItem = styled.div`
   outline: 0;
   line-height: 2rem;
 `
-
-// ToDo - at some point need to switch IconButton to a new component button
-const IpTerminateButton = styled(IconButton)`
-  padding: ${SPACING.spacing2};
-  flex: 0 0 ${SPACING.spacing6};
-  border-radius: 0;
-`
-
 export interface IpHostnameItemProps {
   candidate: string
   discovered: boolean
@@ -79,7 +72,15 @@ export function IpHostnameItem(props: IpHostnameItemProps): JSX.Element {
         >
           {getDiscoveryText()}
         </Text>
-        <IpTerminateButton name="close" onClick={remove} />
+        <Btn
+          size={TYPOGRAPHY.lineHeight20}
+          data-testid={`remove-close-button`}
+          color={COLORS.darkBlack}
+          onClick={remove}
+          marginLeft={SPACING.spacing4}
+        >
+          <Icon name={'close'} />
+        </Btn>
       </Flex>
       <Divider width="100%" />
     </>

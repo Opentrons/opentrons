@@ -3,11 +3,9 @@ import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { act } from 'react-dom/test-utils'
 import { i18n } from '../../../i18n'
-// import { AppSettings } from '..'
-import { getScanning, getDiscoveredRobots } from '../../../redux/discovery'
-// import { GeneralSettings } from '../GeneralSettings'
+import { getScanning, getViewableRobots } from '../../../redux/discovery'
+import { getConfig } from '../../../redux/config'
 import { ConnectRobotSlideoutComponent } from '../ConnectRobotSlideout'
-import type { DiscoveredRobot } from '../../../redux/discovery/types'
 
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/config')
@@ -21,15 +19,40 @@ const render = (
 }
 
 const mockGetScanning = getScanning as jest.MockedFunction<typeof getScanning>
-const mockGetConnectionStatus = getDiscoveredRobots as jest.MockedFunction<
-  typeof getDiscoveredRobots
+const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+const mockGetViewableRobots = getViewableRobots as jest.MockedFunction<
+  typeof getViewableRobots
 >
 
 describe('ConnectRobotSlideout', () => {
   let props: React.ComponentProps<typeof ConnectRobotSlideoutComponent>
-  //   let mockCreateLiveCommand = jest.fn()
 
   beforeEach(() => {
+    mockGetConfig.mockReturnValue({
+      discovery: {
+        candidates: ['192.168.1.1', '1.1.1.1', 'localhost'],
+      },
+    } as any)
+    mockGetViewableRobots.mockReturnValue([
+      {
+        name: 'other-robot-name',
+        host: '1.1.1.1',
+        port: 31950,
+      },
+      {
+        name: 'test-robot-name',
+        host: 'localhost',
+        port: 31950,
+      },
+      {
+        name: 'opentrons',
+        ip: '192.168.1.1',
+        port: 31950,
+        local: false,
+        ok: false,
+        serverOk: true,
+      },
+    ] as any[])
     mockGetScanning.mockReturnValue(true)
     props = {
       candidates: [],
@@ -114,68 +137,83 @@ describe('ConnectRobotSlideout', () => {
   //   })
 
   it('Clicking Add button with an IP address/hostname should display the IP address/hostname', async () => {
-    const { getByRole, getByText } = render(props)
-    const newIpAddress = '1.1.1.1'
-    const availableStatus: DiscoveredRobot = {
-      displayName: 'test',
-      connected: true,
-      local: null,
-      seen: true,
-      status: 'connectable',
-      health: {
-        name: 'opentrons-dev',
-        api_version: '5.0.2',
-        fw_version: 'Virtual Smoothie',
-        system_version: '0.0.0',
-        logs: [],
-        protocol_api_version: [0, 0],
-        minimum_protocol_api_version: [2, 0],
-        maximum_protocol_api_version: [2, 12],
+    mockGetConfig.mockReturnValue({
+      discovery: {
+        candidates: ['localhost'],
       },
-      ip: newIpAddress,
-      port: 8080,
-      healthStatus: 'ok',
-      serverHealthStatus: 'ok',
-    }
-
-    mockGetConnectionStatus.mockReturnValue([availableStatus])
-    // put ip address in input box 1.1.1.1
-    // click add button
-    // check that ip address is displayed
-    // no Available no Not Found
-
+    } as any)
+    mockGetViewableRobots.mockReturnValue([
+      {
+        name: 'test-robot-name',
+        host: 'localhost',
+        port: 31950,
+      },
+    ] as any[])
+    const { getByRole, getByText, queryByText } = render(props)
+    const newIpAddress = 'localhost'
     const inputBox = getByRole('textbox')
     const addButton = getByRole('button', { name: 'Add' })
-    await act(() => {
-      fireEvent.change(inputBox, { target: { value: newIpAddress } })
-      fireEvent.click(addButton)
+    await act(async () => {
+      await fireEvent.change(inputBox, { target: { value: newIpAddress } })
+      await fireEvent.click(addButton)
     })
 
     expect(getByText(newIpAddress)).toBeInTheDocument()
-    expect(getByText('Available')).not.toBeInTheDocument()
-    expect(getByText('Not Found')).not.toBeInTheDocument()
+    expect(queryByText('Available')).toBeFalsy()
+    expect(queryByText('Not Found')).toBeFalsy()
   })
 
-  //   it('Clicking Add button with an IP address/hostname should display the IP address/hostname and Available label', () => {
-  //     props = {
-  //       candidates: [],
-  //       checkIpAndHostname: jest.fn(),
-  //       isExpanded: true,
-  //       onCloseClick: jest.fn(),
-  //     }
-  //     const { getByText } = render(props)
-  //     const newIpAddress = '1.1.1.1'
-  //     mockGetConnectionStatus.mockReturnValue(newIpAddress)
-  //     // const newIpAddress = '1.1.1.1'
-  //     expect(getByText(newIpAddress)).toBeInTheDocument()
-  //     expect(getByText('Available')).toBeInTheDocument()
-  //     expect(getByText('Not Found')).not.toBeInTheDocument()
+  // ok
+  //   it('Clicking Add button with an IP address/hostname should display the IP address/hostname and Available label', async () => {
+  //     const { getByRole, getByText, queryByText } = render(props)
+  //     const availableIpAddress = '192.168.1.1'
+  //     const inputBox = getByRole('textbox')
+  //     const addButton = getByRole('button', { name: 'Add' })
+  //     await act(async () => {
+  //       await fireEvent.change(inputBox, {
+  //         target: { value: availableIpAddress },
+  //       })
+  //       await fireEvent.click(addButton)
+  //     })
+  //     expect(getByText(availableIpAddress)).toBeInTheDocument()
+  //     expect(queryByText('Available')).toBeTruthy()
   //   })
 
-  //   it('Clicking Add button with an IP address/hostname should display the IP address/hostname and Not Found label', () => {
-  //     const newIpAddress = '1.1.1.1'
-  //     expect(getByText('Available')).not.toBeInTheDocument()
+  // ok
+  //   it('Clicking Add button with an IP address/hostname should display the IP address/hostname and Not Found label', async () => {
+  //     const { getByRole, getByText } = render(props)
+  //     const notFoundIpAddress = '1.1.1.1'
+  //     const inputBox = getByRole('textbox')
+  //     const addButton = getByRole('button', { name: 'Add' })
+  //     await act(async () => {
+  //       await fireEvent.change(inputBox, {
+  //         target: { value: notFoundIpAddress },
+  //       })
+  //       await fireEvent.click(addButton)
+  //     })
+  //     expect(getByText(notFoundIpAddress)).toBeInTheDocument()
   //     expect(getByText('Not Found')).toBeInTheDocument()
+  //   })
+
+  //   it('Clicking Close button in a row should remove an IP address/hostname', async () => {
+  //     const { getByRole, queryByText, getByLabelText } = render(props)
+  //     const newIpAddress = '1.1.1.1'
+  //     const inputBox = getByRole('textbox')
+  //     const addButton = getByRole('button', { name: 'Add' })
+  //     // const removeButton = getByTestId('ip-remove-button')
+  //     await act(async () => {
+  //       await fireEvent.change(inputBox, { target: { value: newIpAddress } })
+  //       await fireEvent.click(addButton)
+  //     })
+
+  //     // const removeButton = getByRole('button', { name: /ip-close-button/i })
+  //     // const removeButton = await getByTestId('close-button')
+  //     const removeButton = await getByLabelText('close')
+  //     await fireEvent.click(removeButton)
+
+  //     expect(queryByText(newIpAddress)).toBeFalsy()
+  //     // expect(queryByText('Available')).toBeFalsy()
+  //     // expect(queryByText('Not Found')).toBeFalsy()
   //   })
 
   // OK
