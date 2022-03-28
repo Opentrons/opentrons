@@ -10,7 +10,9 @@ import {
 } from '../fixtures'
 import { dispense } from '../commandCreators/atomic/dispense'
 import { InvariantContext, RobotState } from '../types'
-import { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type { AspDispAirgapParams as V3AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type { AspDispAirgapParams as V6AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+
 jest.mock('../utils/thermocyclerPipetteCollision')
 const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
   typeof thermocyclerPipetteCollision
@@ -28,7 +30,7 @@ describe('dispense', () => {
     jest.resetAllMocks()
   })
   describe('tip tracking & commands:', () => {
-    let params: AspDispAirgapParams
+    let params: V3AspDispAirgapParams
     beforeEach(() => {
       params = {
         pipette: DEFAULT_PIPETTE,
@@ -44,7 +46,19 @@ describe('dispense', () => {
       expect(getSuccessResult(result).commands).toEqual([
         {
           command: 'dispense',
-          params,
+          params: {
+            pipetteId: DEFAULT_PIPETTE,
+            volume: 50,
+            labwareId: SOURCE_LABWARE,
+            wellName: 'A1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 5,
+              },
+            },
+            flowRate: 6,
+          },
         },
       ])
     })

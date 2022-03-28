@@ -2,11 +2,12 @@ import {
   SetTemperatureArgs,
   DeactivateTemperatureArgs,
 } from '@opentrons/step-generation'
+import type { HydratedHeaterShakerFormData } from '../../../form-types'
 
 type HeaterShakerArgs = SetTemperatureArgs | DeactivateTemperatureArgs
 
 export const heaterShakerFormToArgs = (
-  formData: FormData
+  formData: HydratedHeaterShakerFormData
 ): HeaterShakerArgs => {
   return {
     commandCreatorFnName: 'deactivateTemperature',

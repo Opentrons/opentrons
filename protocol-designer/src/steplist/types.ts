@@ -29,8 +29,8 @@ export type WellIngredientVolumeData =
     }
 
 export interface TipLocation {
-  labware: string
-  well: string
+  labwareId: string
+  wellName: string
 }
 export type SubstepIdentifier = {
   stepId: StepIdType
@@ -122,7 +122,8 @@ export interface HeaterShakerSubstepItem {
   targetHeaterShakerTemperature: number | null
   targetSpeed: number | null
   latchOpen: boolean
-  heaterShakerSetTimer: boolean
+  heaterShakerTimerMinutes: number | null 
+  heaterShakerTimerSeconds: number | null
 }
 
 export interface ThermocyclerProfileSubstepItem {

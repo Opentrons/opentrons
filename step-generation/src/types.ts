@@ -322,6 +322,17 @@ export type SetShakeSpeedArgs = ShakeSpeedParams & {
   message?: string
 }
 
+export interface HeaterShakerArgs {
+  module: string,
+  rpm: number | null
+  commandCreatorFnName: 'heaterShaker'
+  targetTemperature: number | null,
+  latchOpen: boolean
+  timerMinutes: number | null
+  timerSeconds: number | null
+  message?: string
+}
+
 const PROFILE_CYCLE: 'profileCycle' = 'profileCycle'
 const PROFILE_STEP: 'profileStep' = 'profileStep'
 
@@ -381,7 +392,8 @@ export type CommandCreatorArgs =
   | DeactivateTemperatureArgs
   | ThermocyclerProfileStepArgs
   | ThermocyclerStateStepArgs
-  | SetShakeSpeedArgs
+  | HeaterShakerArgs
+// | SetShakeSpeedArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }

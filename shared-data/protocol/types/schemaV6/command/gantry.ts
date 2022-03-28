@@ -89,9 +89,9 @@ export interface MoveToWellParams {
   wellLocation: {
     origin: 'top' | 'bottom'
     offset?: {
-      x: number
-      y: number
-      z: number
+      x?: number
+      y?: number
+      z?: number
     }
   }
   minimumZHeight?: number

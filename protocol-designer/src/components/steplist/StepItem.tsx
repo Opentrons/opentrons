@@ -330,7 +330,7 @@ export const StepItemContents = (
     )
   }
 
-  if (stepType === 'heaterShaker') {
+  if (substeps && substeps.substepType === 'heaterShaker') {
     return (
       <ModuleStepItems
         action={i18n.t(`modules.actions.go_to`)}

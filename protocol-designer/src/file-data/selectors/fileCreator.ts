@@ -31,7 +31,7 @@ import {
   FileLabware,
   FileModule,
 } from '@opentrons/shared-data/protocol/types/schemaV4'
-import { Command } from '@opentrons/shared-data/protocol/types/schemaV5Addendum'
+import { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import { Selector } from '../../types'
 import { PDProtocolFile } from '../../file-types'
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
@@ -73,15 +73,15 @@ export const getLabwareDefinitionsInUse = (
 
 // NOTE: V3 commands are a subset of V4 commands.
 // 'airGap' is specified in the V3 schema but was never implemented, so it doesn't count.
-const _isV3Command = (command: Command): boolean =>
-  command.command === 'aspirate' ||
-  command.command === 'dispense' ||
-  command.command === 'blowout' ||
-  command.command === 'touchTip' ||
-  command.command === 'pickUpTip' ||
-  command.command === 'dropTip' ||
-  command.command === 'moveToSlot' ||
-  command.command === 'delay'
+const _isV3Command = (command: CreateCommand): boolean =>
+  command.commandType === 'aspirate' ||
+  command.commandType === 'dispense' ||
+  command.commandType === 'blowout' ||
+  command.commandType === 'touchTip' ||
+  command.commandType === 'pickUpTip' ||
+  command.commandType === 'dropTip' ||
+  command.commandType === 'moveToSlot' ||
+  command.commandType === 'delay'
 
 // This is a HACK to allow PD to not have to export protocols under the not-yet-released
 // v6 schema with the dispenseAirGap command, by replacing all dispenseAirGaps with dispenses
@@ -93,9 +93,8 @@ export const getRobotStateTimelineWithoutAirGapDispenseCommand: Selector<Timelin
     const timeline = robotStateTimeline.timeline.map(frame => ({
       ...frame,
       commands: frame.commands.map(command => {
-        if (command.command === 'dispenseAirGap') {
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          return { ...command, command: 'dispense' } as Command
+        if (command.commandType === 'dispenseAirGap') {
+          return { ...command, commandType: 'dispense' as const }
         }
 
         return command
@@ -125,10 +124,9 @@ export const getRequiresAtLeastV4: Selector<boolean> = createSelector(
   }
 )
 
-// Note: though airGap is supported in the v4 executor, we want to simplify things
-// for users in terms of managing robot stack upgrades, so we will force v5
-const _requiresV5 = (command: Command): boolean =>
-  command.command === 'moveToWell' || command.command === 'airGap'
+// Delete these require functions for H/S Release, always export v6 protocols
+const _requiresV5 = (command: CreateCommand): boolean =>
+  command.commandType === 'moveToWell'
 
 export const getRequiresAtLeastV5: Selector<boolean> = createSelector(
   getRobotStateTimelineWithoutAirGapDispenseCommand,
@@ -227,7 +225,7 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
       pipetteEntities,
       labwareDefsByURI
     )
-    const commands: Command[] = flatMap(
+    const commands: CreateCommand[] = flatMap(
       robotStateTimeline.timeline,
       timelineFrame => timelineFrame.commands
     )

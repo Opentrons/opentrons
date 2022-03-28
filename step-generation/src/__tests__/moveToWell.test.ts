@@ -35,7 +35,11 @@ describe('moveToWell', () => {
     expect(getSuccessResult(result).commands).toEqual([
       {
         command: 'moveToWell',
-        params,
+        params: {
+          pipetteId: DEFAULT_PIPETTE,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+        },
       },
     ])
   })
@@ -56,7 +60,21 @@ describe('moveToWell', () => {
     expect(getSuccessResult(result).commands).toEqual([
       {
         command: 'moveToWell',
-        params,
+        params: {
+          pipetteId: DEFAULT_PIPETTE,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              x: 1,
+              y: 2,
+              z: 3,
+            },
+          },
+          minimumZHeight: 5,
+          forceDirect: true,
+        },
       },
     ])
   })

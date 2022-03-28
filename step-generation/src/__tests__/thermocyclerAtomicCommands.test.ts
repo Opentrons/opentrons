@@ -129,7 +129,7 @@ describe('thermocycler atomic commands', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         {
-          command: expectedType,
+          commandType: expectedType,
           params,
         },
       ])

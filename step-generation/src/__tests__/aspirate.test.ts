@@ -53,7 +53,19 @@ describe('aspirate', () => {
     expect(getSuccessResult(result).commands).toEqual([
       {
         command: 'aspirate',
-        params,
+        params: {
+          pipetteId: DEFAULT_PIPETTE,
+          volume: 50,
+          labwareId: SOURCE_LABWARE,
+          well: 'A1',
+          flowRate: 6,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              z: 5,
+            },
+          },
+        },
       },
     ])
   })

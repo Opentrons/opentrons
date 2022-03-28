@@ -445,13 +445,15 @@ export function generateSubstepItem(
     }
   }
 
-  if (stepArgs.commandCreatorFnName === 'setShakeSpeed') {
-    const rpm =
-      stepArgs.commandCreatorFnName === 'setShakeSpeed' ? stepArgs.rpm : null
+  if (stepArgs.commandCreatorFnName === 'heaterShaker') {
     return {
       substepType: 'heaterShaker',
       labwareNickname: labwareNames?.nickname,
-      targetSpeed: rpm,
+      targetSpeed: stepArgs.rpm,
+      targetHeaterShakerTemperature: stepArgs.targetTemperature,
+      latchOpen: stepArgs.latchOpen,
+      heaterShakerTimerMinutes: stepArgs.timerMinutes,
+      heaterShakerTimerSeconds: stepArgs.timerSeconds,
     }
   }
 
