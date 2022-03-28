@@ -9,6 +9,7 @@ import {
   TEMP_MAX,
   HS_RPM_MIN,
   TEMP_MIN,
+  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
 import {
@@ -28,6 +29,7 @@ import type {
   HeaterShakerStartSetTargetTemperatureCreateCommand,
   HeaterShakerSetTargetShakeSpeedCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 
 interface HeaterShakerSlideoutProps {
   module: AttachedModule
@@ -45,6 +47,10 @@ export const HeaterShakerSlideout = (
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const moduleName = getModuleDisplayName(module.model)
   const modulePart = isSetShake ? t('shake_speed') : t('temperature')
+  const [
+    showConfirmAttachModal,
+    setShowConfirmAttachModal,
+  ] = React.useState<boolean>(false)
 
   const handleSubmitCommand = (): void => {
     if (hsValue != null) {
@@ -72,6 +78,8 @@ export const HeaterShakerSlideout = (
         )
       })
     }
+    setShowConfirmAttachModal(true)
+
     setHsValue(null)
   }
 
@@ -95,62 +103,69 @@ export const HeaterShakerSlideout = (
   const unit = isSetShake ? RPM : CELSIUS
 
   return (
-    <Slideout
-      title={t('set_status_heater_shaker', {
-        part: modulePart,
-        name: moduleName,
-      })}
-      onCloseClick={onCloseClick}
-      isExpanded={isExpanded}
-      height={`calc(100vh - ${SPACING.spacing4})`}
-      footer={
-        <PrimaryButton
-          onClick={handleSubmitCommand}
-          disabled={hsValue === null || errorMessage !== null}
-          width="100%"
-          data-testid={`HeaterShakerSlideout_btn_${module.serial}`}
-        >
-          {t('set_temp_or_shake', { part: modulePart })}
-        </PrimaryButton>
-      }
-    >
-      <Text
-        fontWeight={FONT_WEIGHT_REGULAR}
-        fontSize={TYPOGRAPHY.fontSizeP}
-        paddingTop={SPACING.spacing2}
-        data-testid={`HeaterShakerSlideout_title_${module.serial}`}
-      >
-        {isSetShake ? t('set_shake_of_hs') : t('set_target_temp_of_hs')}
-      </Text>
-      <Flex
-        marginTop={SPACING.spacing4}
-        flexDirection={DIRECTION_COLUMN}
-        data-testid={`HeaterShakerSlideout_input_field_${module.serial}`}
+    <>
+      {showConfirmAttachModal && module.type === HEATERSHAKER_MODULE_TYPE && (
+        <ConfirmAttachmentModal
+          onCloseClick={() => setShowConfirmAttachModal(false)}
+        />
+      )}
+      <Slideout
+        title={t('set_status_heater_shaker', {
+          part: modulePart,
+          name: moduleName,
+        })}
+        onCloseClick={onCloseClick}
+        isExpanded={isExpanded}
+        height={`calc(100vh - ${SPACING.spacing4})`}
+        footer={
+          <PrimaryButton
+            onClick={handleSubmitCommand}
+            disabled={hsValue === null || errorMessage !== null}
+            width="100%"
+            data-testid={`HeaterShakerSlideout_btn_${module.serial}`}
+          >
+            {t('set_temp_or_shake', { part: modulePart })}
+          </PrimaryButton>
+        }
       >
         <Text
           fontWeight={FONT_WEIGHT_REGULAR}
-          fontSize={TYPOGRAPHY.fontSizeH6}
-          color={COLORS.darkGrey}
-          marginBottom={SPACING.spacing1}
+          fontSize={TYPOGRAPHY.fontSizeP}
+          paddingTop={SPACING.spacing2}
+          data-testid={`HeaterShakerSlideout_title_${module.serial}`}
         >
-          {isSetShake ? t('set_shake_speed') : t('set_block_temp')}
+          {isSetShake ? t('set_shake_of_hs') : t('set_target_temp_of_hs')}
         </Text>
-        <InputField
-          data-testid={`${module.model}_${isSetShake}`}
-          id={`${module.model}_${isSetShake}`}
-          autoFocus
-          units={unit}
-          value={hsValue}
-          onChange={e => setHsValue(e.target.value)}
-          type="number"
-          caption={t('module_status_range', {
-            min: inputMin,
-            max: inputMax,
-            unit: unit,
-          })}
-          error={errorMessage}
-        />
-      </Flex>
-    </Slideout>
+        <Flex
+          marginTop={SPACING.spacing4}
+          flexDirection={DIRECTION_COLUMN}
+          data-testid={`HeaterShakerSlideout_input_field_${module.serial}`}
+        >
+          <Text
+            fontWeight={FONT_WEIGHT_REGULAR}
+            fontSize={TYPOGRAPHY.fontSizeH6}
+            color={COLORS.darkGrey}
+            marginBottom={SPACING.spacing1}
+          >
+            {isSetShake ? t('set_shake_speed') : t('set_block_temp')}
+          </Text>
+          <InputField
+            data-testid={`${module.model}_${isSetShake}`}
+            id={`${module.model}_${isSetShake}`}
+            autoFocus
+            units={unit}
+            value={hsValue}
+            onChange={e => setHsValue(e.target.value)}
+            type="number"
+            caption={t('module_status_range', {
+              min: inputMin,
+              max: inputMax,
+              unit: unit,
+            })}
+            error={errorMessage}
+          />
+        </Flex>
+      </Slideout>
+    </>
   )
 }
