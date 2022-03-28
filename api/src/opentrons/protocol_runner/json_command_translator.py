@@ -80,7 +80,9 @@ def _translate_pipette_command(
     return translated_obj
 
 
-def _translate_simple_command(command: protocol_schema_v6.Command) -> pe_commands.CommandCreate:
+def _translate_simple_command(
+    command: protocol_schema_v6.Command,
+) -> pe_commands.CommandCreate:
     dict_command = command.dict(exclude_none=True)
     translated_obj = cast(
         pe_commands.CommandCreate,

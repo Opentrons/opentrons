@@ -14,7 +14,7 @@ from opentrons_shared_data.labware.labware_definition import (
     Metadata1,
     WellDefinition,
 )
-from opentrons_shared_data.protocol.models import protocol_schema_v6, ProtocolSchemaV6
+from opentrons_shared_data.protocol.models import protocol_schema_v6
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_runner.json_command_translator import JsonCommandTranslator
 from opentrons.protocol_engine import (
