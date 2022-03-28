@@ -1,4 +1,5 @@
 import * as React from 'react'
+import path from 'path'
 import first from 'lodash/first'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
@@ -18,15 +19,18 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   TEXT_TRANSFORM_CAPITALIZE,
+  JUSTIFY_CENTER,
+  SIZE_4,
+  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { Slideout } from '../../atoms/Slideout'
 import { PrimaryButton } from '../../atoms/Buttons'
-import { DevicesEmptyState } from '../../organisms/Devices/DevicesEmptyState'
 import {
   getConnectableRobots,
   getScanning,
+  getUnreachableRobots,
   startDiscovery,
 } from '../../redux/discovery'
 
@@ -36,6 +40,9 @@ import { StoredProtocolData } from '../../redux/protocol-storage'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { StyleProps } from '@opentrons/components'
+import { NavLink, useHistory } from 'react-router-dom'
+import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
+import { Robot } from '../../redux/discovery/types'
 
 interface ChooseRobotSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
@@ -47,21 +54,41 @@ export function ChooseRobotSlideout(
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_details', 'shared'])
   const { storedProtocolData, showSlideout, onCloseClick, ...restProps } = props
-  const { protocolKey, srcFileNames, mostRecentAnalysis } = storedProtocolData
+  const {
+    protocolKey,
+    srcFileNames,
+    srcFiles,
+    mostRecentAnalysis,
+  } = storedProtocolData
   const protocolDisplayName =
     mostRecentAnalysis?.metadata?.protocolName ??
     first(srcFileNames) ??
     protocolKey
-  const [selectedRobotIp, setSelectedRobotIp] = React.useState<string | null>(
+  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(
     null
   )
+
+  const srcFileObjects = srcFiles.map((srcFileBuffer, index) => {
+    const srcFilePath = srcFileNames[index]
+    return new File([srcFileBuffer], path.basename(srcFilePath))
+  })
   const dispatch = useDispatch<Dispatch>()
-
   const isScanning = useSelector((state: State) => getScanning(state))
-
-  const connectableRobots = useSelector((state: State) =>
-    getConnectableRobots(state)
-  )
+  const connectableRobots = useSelector<
+    State,
+    ReturnType<typeof getConnectableRobots>
+  >(getConnectableRobots)
+  const unavailableRobots = useSelector<
+    State,
+    ReturnType<typeof getUnreachableRobots>
+  >(getUnreachableRobots)
+  const availableRobots = connectableRobots.filter(robot => {
+    // TODO: filter out robots who have a current run that is in thie paused or running status
+    return robot
+  })
+  const unavailableOrBusyCount =
+    unavailableRobots.length +
+    (connectableRobots.length - availableRobots.length)
 
   return (
     <Slideout
@@ -73,25 +100,23 @@ export function ChooseRobotSlideout(
         protocol_name: protocolDisplayName,
       })}
       footer={
-        <ApiHostProvider hostname={selectedRobotIp}>
-          <PrimaryButton
-            onClick={() =>
-              console.log(
-                'TODO: create run on robot with protocol',
-                selectedRobotIp,
-                protocolKey
-              )
-            }
-            width="100%"
-          >
-            {t('proceed_to_setup')}
-          </PrimaryButton>
+        <ApiHostProvider hostname={selectedRobot != null ? selectedRobot.ip : null}>
+          <CreateRunButton
+            disabled={selectedRobot == null}
+            protocolKey={protocolKey}
+            srcFileObjects={srcFileObjects}
+            robotName={selectedRobot != null ? selectedRobot.name : ''}
+          />
         </ApiHostProvider>
       }
       {...restProps}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <Flex alignSelf={ALIGN_FLEX_END} marginY={SPACING.spacing3} height={SIZE_2}>
+        <Flex
+          alignSelf={ALIGN_FLEX_END}
+          marginY={SPACING.spacing3}
+          height={SIZE_2}
+        >
           {isScanning ? (
             <Icon name="ot-spinner" spin size={SIZE_1} />
           ) : (
@@ -105,7 +130,18 @@ export function ChooseRobotSlideout(
           )}
         </Flex>
         {!isScanning && connectableRobots.length === 0 ? (
-          <DevicesEmptyState />
+          <Flex
+            css={BORDERS.cardOutlineBorder}
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
+            alignItems={ALIGN_CENTER}
+            height={SIZE_4}
+          >
+            <Icon name="alert-circle" size={SIZE_1} />
+            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {t('no_available_robots_found')}
+            </StyledText>
+          </Flex>
         ) : (
           connectableRobots.map(robot => (
             <AvailableRobotOption
@@ -114,14 +150,31 @@ export function ChooseRobotSlideout(
               robotModel="OT-2"
               local={robot.local}
               onClick={() =>
-                setSelectedRobotIp(
-                  robot.ip === selectedRobotIp ? null : robot.ip
+                setSelectedRobot(
+                  robot.ip === selectedRobot.ip ? null : robot
                 )
               }
-              isSelected={selectedRobotIp === robot.ip}
+              isSelected={selectedRobot.ip === robot.ip}
             />
           ))
         )}
+        {!isScanning && unavailableOrBusyCount > 0 ? (
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            alignItems={ALIGN_CENTER}
+            textAlign={TEXT_ALIGN_CENTER}
+            marginTop={SPACING.spacing4}
+          >
+            <StyledText as="p">
+              {t('unavailable_or_busy_robot_not_listed', {
+                count: unavailableOrBusyCount,
+              })}
+            </StyledText>
+            <NavLink to="/devices">
+              <StyledText as="p">{t('view_all_robots')}</StyledText>
+            </NavLink>
+          </Flex>
+        ) : null}
       </Flex>
     </Slideout>
   )
@@ -179,5 +232,32 @@ function AvailableRobotOption(props: AvailableRobotOptionProps): JSX.Element {
         </Flex>
       </Flex>
     </Flex>
+  )
+}
+
+interface CreateRunButtonProps
+  extends React.ComponentProps<typeof PrimaryButton> {
+  srcFileObjects: File[]
+  protocolKey: string
+  robotName: string
+}
+function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
+  const { t } = useTranslation('protocol_details')
+  const history = useHistory()
+  const { protocolKey, srcFileObjects, robotName, ...buttonProps } = props
+  const { createRun } = useCreateRunFromProtocol({
+    onSuccess: ({data: runData}) => {
+      history.push(`/devices/${robotName}/protocol-runs/${runData.id}`)
+    }
+  })
+
+  const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
+    createRun(srcFileObjects)
+  }
+
+  return (
+    <PrimaryButton onClick={handleClick} width="100%" {...buttonProps}>
+      {t('proceed_to_setup')}
+    </PrimaryButton>
   )
 }

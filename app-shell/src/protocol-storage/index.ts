@@ -10,6 +10,7 @@ import * as FileSystem from './file-system'
 import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
 
 import type { Action, Dispatch } from '../types'
+import { lookup } from 'mime'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 
@@ -49,6 +50,10 @@ const fetchProtocols = (
           srcFileNames: storedProtocolDir.srcFilePaths.map(
             filePath => path.parse(filePath).base
           ),
+          srcFiles: storedProtocolDir.srcFilePaths.map(srcFilePath => {
+            const buffer = fse.readFileSync(srcFilePath)
+            return Buffer.from(buffer, buffer.byteOffset, buffer.byteLength)
+          }),
           mostRecentAnalysis:
             mostRecentAnalysisFilePath != null
               ? fse.readJsonSync(mostRecentAnalysisFilePath)
