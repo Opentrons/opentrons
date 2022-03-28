@@ -11,10 +11,8 @@ from g_code_test_data.http.http_configurations import HTTP_CONFIGURATIONS
     [conf.generate_pytest_param() for conf in HTTP_CONFIGURATIONS],
 )
 def test_http(g_code_configuration: HTTPGCodeConfirmConfig):
-    print(PROTOCOL_CONFIGURATIONS)
     expected_output = g_code_configuration.get_master_file()
     actual_output = g_code_configuration.execute()
-
     assert actual_output == expected_output, GCodeDiffer(
         actual_output, expected_output
     ).get_html_diff()
@@ -25,9 +23,8 @@ def test_http(g_code_configuration: HTTPGCodeConfirmConfig):
     [conf.generate_pytest_param() for conf in PROTOCOL_CONFIGURATIONS],
 )
 def test_protocols(g_code_configuration: ProtocolGCodeConfirmConfig):
-
-    actual_output = g_code_configuration.execute()
     expected_output = g_code_configuration.get_master_file()
+    actual_output = g_code_configuration.execute()
     assert actual_output == expected_output, GCodeDiffer(
         actual_output, expected_output
     ).get_html_diff()

@@ -1,5 +1,5 @@
 from functools import partial
-from g_code_test_data.http.http_settings import HTTP_SETTINGS, S3_BASE
+from g_code_test_data.http.http_settings import HTTP_SETTINGS, DIRECTORY
 from g_code_test_data.g_code_configuration import HTTPGCodeConfirmConfig
 from robot_server.service.legacy.routers.modules import post_serial_command
 from robot_server.service.legacy.models.modules import SerialCommand
@@ -7,7 +7,7 @@ from robot_server.service.legacy.models.modules import SerialCommand
 
 THERMOCYCLER_CLOSE = HTTPGCodeConfirmConfig(
         name='thermocycler_close',
-        s3_path=f"{S3_BASE}/thermocycler_close.txt",
+        results_path=f"{DIRECTORY}/thermocycler_close.txt",
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='close'),
@@ -18,7 +18,7 @@ THERMOCYCLER_CLOSE = HTTPGCodeConfirmConfig(
 
 THERMOCYCLER_OPEN = HTTPGCodeConfirmConfig(
         name='thermocycler_open',
-        s3_path=f"{S3_BASE}/thermocycler_open.txt",
+        results_path=f"{DIRECTORY}/thermocycler_open.txt",
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='open'),
@@ -29,7 +29,7 @@ THERMOCYCLER_OPEN = HTTPGCodeConfirmConfig(
 
 THERMOCYCLER_DEACTIVATE = HTTPGCodeConfirmConfig(
         name='thermocycler_deactivate',
-        s3_path=f"{S3_BASE}/thermocycler_deactivate.txt",
+        results_path=f"{DIRECTORY}/thermocycler_deactivate.txt",
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='deactivate'),
@@ -40,7 +40,7 @@ THERMOCYCLER_DEACTIVATE = HTTPGCodeConfirmConfig(
 
 THERMOCYCLER_DEACTIVATE_BLOCK = HTTPGCodeConfirmConfig(
         name='thermocycler_deactivate_block',
-        s3_path=f"{S3_BASE}/thermocycler_deactivate_block.txt",
+        results_path=f"{DIRECTORY}/thermocycler_deactivate_block.txt",
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='deactivate_block'),
@@ -51,7 +51,7 @@ THERMOCYCLER_DEACTIVATE_BLOCK = HTTPGCodeConfirmConfig(
 
 THERMOCYCLER_DEACTIVATE_LID = HTTPGCodeConfirmConfig(
         name='thermocycler_deactivate_lid',
-        s3_path=f"{S3_BASE}/thermocycler_deactivate_lid.txt",
+        results_path=f"{DIRECTORY}/thermocycler_deactivate_lid.txt",
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='deactivate_lid'),
@@ -62,7 +62,7 @@ THERMOCYCLER_DEACTIVATE_LID = HTTPGCodeConfirmConfig(
 
 THERMOCYCLER_CYCLE_TEMPERATURES = HTTPGCodeConfirmConfig(
         name='thermocycler_cycle_temperatures',
-        s3_path=f"{S3_BASE}/thermocycler_cycle_temperatures.txt",
+        results_path=f"{DIRECTORY}/thermocycler_cycle_temperatures.txt",
         executable=partial(
             post_serial_command,
             command=SerialCommand(
@@ -78,7 +78,7 @@ THERMOCYCLER_CYCLE_TEMPERATURES = HTTPGCodeConfirmConfig(
 
 THERMOCYCLER_SET_LID_TEMPERATURE = HTTPGCodeConfirmConfig(
         name='thermocycler_set_lid_temperature',
-        s3_path=f"{S3_BASE}/thermocycler_set_lid_temperature.txt",
+        results_path=f"{DIRECTORY}/thermocycler_set_lid_temperature.txt",
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='set_lid_temperature', args=[37.0]),
@@ -89,7 +89,7 @@ THERMOCYCLER_SET_LID_TEMPERATURE = HTTPGCodeConfirmConfig(
 
 THERMOCYCLER_SET_TEMPERATURE = HTTPGCodeConfirmConfig(
         name='thermocycler_set_temperature',
-        s3_path=f"{S3_BASE}/thermocycler_set_temperature.txt",
+        results_path=f"{DIRECTORY}/thermocycler_set_temperature.txt",
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='set_temperature', args=[1.0]),
