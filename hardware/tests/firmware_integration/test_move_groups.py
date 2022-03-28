@@ -1,7 +1,7 @@
 """Tests for move groups."""
 import asyncio
 import numpy as np  # type: ignore
-from typing import Iterator, List
+from typing import Iterator, List, Dict
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -91,12 +91,14 @@ async def test_move_integration(
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     all_motor_nodes: List[NodeId],
+    all_motor_node_step_sizes: Dict[NodeId, float],
 ) -> None:
     """Test that moving returns correct positions."""
-
-    # First, we should test homing. We have to home because the emulator stack is long-lived
-    # beyond each test, so we might as well make sure we're homing from a non-zero position
-    prep_move = [create_step(
+    # First, we should test homing. We have to home because the emulator stack is
+    # long-lived beyond each test, so we might as well make sure we're homing
+    # from a non-zero position
+    prep_move = [
+        create_step(
             distance={motor_node: motor_node.value for motor_node in all_motor_nodes},
             velocity={
                 motor_node: motor_node.value / 10 for motor_node in all_motor_nodes
@@ -104,50 +106,78 @@ async def test_move_integration(
             acceleration={motor_node: 0 for motor_node in all_motor_nodes},
             duration=np.float64(1),
             present_nodes=all_motor_nodes,
-        )]
+        )
+    ]
     prep_runner = MoveGroupRunner([prep_move])
-    # throw away this position - it may change depending on previous state of simulators
+    # throw away this position - it may change depending on previous state of
+    # simulators
     await prep_runner.run(can_messenger)
 
-    home_move = [create_home_step(
-        distance={motor_node: 10 for motor_node in all_motor_nodes},
-        velocity={motor_node: 40 for motor_node in all_motor_nodes})]
+    home_move = [
+        create_home_step(
+            distance={motor_node: 10 for motor_node in all_motor_nodes},
+            velocity={motor_node: 40 for motor_node in all_motor_nodes},
+        )
+    ]
     home_runner = MoveGroupRunner([home_move])
     position = await home_runner.run(can_messenger)
     assert position == {motor_node: 0 for motor_node in all_motor_nodes}
+    # these moves test position accumulation to reasonably realistic values
+    # and have to do it over a kind of long time so that the velocities are low
+    # enough that the pipettes, with their extremely high steps/mm values,
+    # can handle it. The exact time this takes will be dependent on the speed of
+    # the computer.
     moves = [
         create_step(
-            distance={motor_node: motor_node.value for motor_node in all_motor_nodes},
+            distance={
+                motor_node: motor_node.value / 4 for motor_node in all_motor_nodes
+            },
             velocity={
-                motor_node: motor_node.value for motor_node in all_motor_nodes
+                motor_node: motor_node.value / 4 for motor_node in all_motor_nodes
             },
             acceleration={motor_node: 0 for motor_node in all_motor_nodes},
-            duration=np.float64(1),
+            duration=np.float64(4),
             present_nodes=all_motor_nodes,
         ),
         create_step(
-            distance={motor_node: motor_node.value for motor_node in all_motor_nodes},
+            distance={
+                motor_node: motor_node.value / 4 for motor_node in all_motor_nodes
+            },
             velocity={
-                motor_node: motor_node.value for motor_node in all_motor_nodes
+                motor_node: motor_node.value / 4 for motor_node in all_motor_nodes
             },
             acceleration={motor_node: 0 for motor_node in all_motor_nodes},
-            duration=np.float64(1),
+            duration=np.float64(4),
             present_nodes=all_motor_nodes,
         ),
         create_step(
-            distance={motor_node: -motor_node.value for motor_node in all_motor_nodes},
+            distance={
+                motor_node: -motor_node.value / 4 for motor_node in all_motor_nodes
+            },
             velocity={
-                motor_node: -motor_node.value for motor_node in all_motor_nodes
+                motor_node: -motor_node.value / 4 for motor_node in all_motor_nodes
             },
             acceleration={motor_node: 0 for motor_node in all_motor_nodes},
-            duration=np.float64(1),
+            duration=np.float64(4),
             present_nodes=all_motor_nodes,
         ),
     ]
     runner = MoveGroupRunner([moves])
-    await runner.run(can_messenger)
-
     position = await runner.run(can_messenger)
-    assert position == {
-        motor_node: pytest.approx(motor_node.value) for motor_node in all_motor_nodes
+    # The numerical comparisons here are complicated because there are several unit
+    # conversions that involve losing precision:
+    # - velocities specified above in float mm/s are converted to fixed point sq0.31
+    #   mm/tick, a discretizing operation to (2**-31)*10e6 mm/s
+    # - in the firmware, that velocity is converted to steps/tick, which is a
+    #   discretizing operation to 2**-31 step
+    # - in the firmware, after velocity is accumulated to position, that position
+    #   is converted to micrometers which is a different discretizing conversion to
+    #   10e-3 mm
+    #  All of this lines up to mean you have to give some wiggle room for positions.
+    #  Also mypy doesn't like pytest.approx so we have to type ignore it
+    assert position == {  # type: ignore[comparison-overlap]
+        motor_node: pytest.approx(
+            motor_node.value, abs=all_motor_node_step_sizes[motor_node] * 3
+        )
+        for motor_node in all_motor_nodes
     }

@@ -35,7 +35,7 @@ from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
 )
-from .types import NodeMap
+from .types import NodeDict
 
 log = logging.getLogger(__name__)
 
@@ -56,7 +56,7 @@ class MoveGroupRunner:
         self._move_groups = move_groups
         self._start_at_index = start_at_index
 
-    async def run(self, can_messenger: CanMessenger) -> NodeMap[float]:
+    async def run(self, can_messenger: CanMessenger) -> NodeDict[float]:
         """Run the move group.
 
         Args:
@@ -76,8 +76,8 @@ class MoveGroupRunner:
         return self._accumulate_move_completions(move_completion_data)
 
     @staticmethod
-    def _accumulate_move_completions(completions: _Completions) -> NodeMap[float]:
-        position: NodeMap[List[Tuple[Tuple[int, int], float]]] = defaultdict(list)
+    def _accumulate_move_completions(completions: _Completions) -> NodeDict[float]:
+        position: NodeDict[List[Tuple[Tuple[int, int], float]]] = defaultdict(list)
         for arbid, completion in completions:
             position[NodeId(arbid.parts.originating_node_id)].append(
                 (
