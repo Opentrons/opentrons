@@ -42,7 +42,11 @@ def _begin_straight_fwd_unzip(
             files, sizes = fut.result()
             loop.call_soon_threadsafe(
                 _begin_straight_fwd_write(
-                    session, config, loop, "/var/lib/otupdate/downloads/rootfs.ext4", actions
+                    session,
+                    config,
+                    loop,
+                    "/var/lib/otupdate/downloads/rootfs.ext4",
+                    actions,
                 )
             )
 
