@@ -75,7 +75,7 @@ For instance, to aspirate from the first column of a 96-well plate you would wri
 
         # Load a P300 Multi GEN2 on the right mount
         right = protocol.load_instrument(
-            'p300_multi_gen2', 'right', tip_rack=tiprack1)
+            'p300_multi_gen2', 'right',  tip_racks=[tiprack1])
 
         # Specify well A1 for pick_up_tip. The backmost channel of the
         # pipette moves to A1, which means the rest of the wells are above the
@@ -391,8 +391,7 @@ the overall speed of the gantry. Its default is 400 mm/s.
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
-        pipette = protocol.load_instrument('p300_single', 'right', tip_racks = [tiprack])
+        pipette = protocol.load_instrument('p300_single', 'right')
         pipette.pick_up_tip()
         # Move to 50mm above the front left of slot 5, very quickly
         pipette.move_to(protocol.deck.position_for('5').move(types.Point(z=50)))
