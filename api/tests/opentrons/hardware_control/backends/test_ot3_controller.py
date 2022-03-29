@@ -158,7 +158,9 @@ async def test_home_build_runners(
 async def test_home_only_present_nodes(
     controller: OT3Controller, mock_move_group_run, axes
 ):
-    controller._present_nodes = set((NodeId.gantry_x, NodeId.gantry_y))
+    controller._present_nodes = set(
+        (NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l, NodeId.head_r)
+    )
     controller._position = {
         NodeId.head_l: 20,
         NodeId.head_r: 85,
@@ -170,9 +172,18 @@ async def test_home_only_present_nodes(
     start_pos = controller._position
 
     await controller.home(axes)
-    for group in mock_move_group_run.call_args_list:
-        for node in group[0][0]._move_groups[0][0]:
-            assert node in controller._present_nodes
+    for call in mock_move_group_run.call_args_list:
+        # pull the bound-self argument that is the runner instance out of
+        # the args list - we can do this because the mock here is the
+        # function definition in the class body
+        move_group_runner = call[0][0]
+        for move_group in move_group_runner._move_groups:
+            assert move_group  # don't pass in empty groups
+            for move_group_step in move_group:
+                assert move_group_step  # don't pass in empty moves
+                for node, step in move_group_step.items():
+                    assert node in controller._present_nodes
+                    assert step  # don't pass in empty steps
 
     for node in controller._position:
         if node_to_axis(node) in (axes and controller._present_nodes):
