@@ -122,6 +122,20 @@ describe('custom labware selectors', () => {
       expected: { file: Fixtures.mockInvalidLabware, errorMessage: 'AH' },
     },
     {
+      name: 'getAddNewLabwareName',
+      selector: selectors.getAddNewLabwareName,
+      state: {
+        labware: {
+          addFailureMessage: 'AH',
+          listFailureMessage: null,
+          filenames: [],
+          filesByName: {},
+          newLabwareName: 'mockLabwareName',
+        },
+      } as any,
+      expected: { filename: 'mockLabwareName' },
+    },
+    {
       name: 'getListLabwareErrorMessage',
       selector: selectors.getListLabwareErrorMessage,
       state: {

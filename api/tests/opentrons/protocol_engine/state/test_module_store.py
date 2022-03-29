@@ -21,7 +21,7 @@ def test_initial_state() -> None:
 
     assert subject.state == ModuleState(
         slot_by_module_id={},
-        hardware_module_by_slot={},
+        hardware_by_module_id={},
     )
 
 
@@ -47,8 +47,8 @@ def test_load_module(tempdeck_v2_def: ModuleDefinition) -> None:
 
     assert subject.state == ModuleState(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "module-id": HardwareModule(
                 serial_number="serial-number",
                 definition=tempdeck_v2_def,
             )
@@ -56,7 +56,29 @@ def test_load_module(tempdeck_v2_def: ModuleDefinition) -> None:
     )
 
 
-# TODO (spp, 2022-03-24): parametrize this test as other heating modules are added
+def test_add_module_action(tempdeck_v1_def: ModuleDefinition) -> None:
+    """It should be able to add attached modules directly into state."""
+    action = actions.AddModuleAction(
+        module_id="module-id",
+        serial_number="serial-number",
+        definition=tempdeck_v1_def,
+    )
+
+    subject = ModuleStore()
+    subject.handle_action(action)
+
+    assert subject.state == ModuleState(
+        slot_by_module_id={"module-id": None},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=tempdeck_v1_def,
+            )
+        },
+    )
+
+
+# TODO(spp, 2022-03-24): parametrize this test as other heating modules are added
 def test_handle_temperature_commands(heater_shaker_v1_def: ModuleDefinition) -> None:
     """It should update `plate_target_temperature` correctly."""
     load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
@@ -85,16 +107,16 @@ def test_handle_temperature_commands(heater_shaker_v1_def: ModuleDefinition) -> 
 
     subject.handle_action(actions.UpdateCommandAction(command=load_module_cmd))
     subject.handle_action(actions.UpdateCommandAction(command=set_temp_cmd))
-    assert subject.state.hardware_module_by_slot == {
-        DeckSlotName.SLOT_1: HardwareModule(
+    assert subject.state.hardware_by_module_id == {
+        "module-id": HardwareModule(
             serial_number="serial-number",
             definition=heater_shaker_v1_def,
             plate_target_temperature=42,
         )
     }
     subject.handle_action(actions.UpdateCommandAction(command=deactivate_cmd))
-    assert subject.state.hardware_module_by_slot == {
-        DeckSlotName.SLOT_1: HardwareModule(
+    assert subject.state.hardware_by_module_id == {
+        "module-id": HardwareModule(
             serial_number="serial-number",
             definition=heater_shaker_v1_def,
             plate_target_temperature=None,
