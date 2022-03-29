@@ -38,7 +38,7 @@ export function useHeaterShakerSlotNumber():
     standardDeckDef as any
   )
   const heaterShakerModule = protocolModulesInfo.find(
-    module => module.moduleDef.model === 'magneticModuleV1'
+    module => module.moduleDef.model === 'heaterShakerModuleV1'
   )
   if (heaterShakerModule === undefined) return null
   const slotNumber = heaterShakerModule.slotName
