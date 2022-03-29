@@ -74,7 +74,6 @@ export function IpHostnameItem(props: IpHostnameItemProps): JSX.Element {
         </Text>
         <Btn
           size={TYPOGRAPHY.lineHeight20}
-          data-testid="close-button"
           color={COLORS.darkBlack}
           onClick={remove}
           marginLeft={SPACING.spacing4}

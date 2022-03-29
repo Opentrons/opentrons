@@ -35,7 +35,7 @@ function IpHostnameListComponent(props: Props): JSX.Element {
         .map(([candidate, discovered], index) => (
           <IpHostnameItem
             candidate={candidate}
-            key={candidate}
+            key={index}
             removeIp={removeManualIp}
             discovered={discovered}
             justAdded={candidate === props.mostRecentAddition}

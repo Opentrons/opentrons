@@ -81,7 +81,7 @@ export function GeneralSettings(): JSX.Element {
 
       trackEvent({
         name: EVENT_APP_UPDATE_NOTIFICATIONS_TOGGLED,
-        // this looks wierd, but the control is a toggle, which makes the next
+        // this looks weird, but the control is a toggle, which makes the next
         // "enabled" setting `!enabled`. Therefore the next "ignored" setting is
         // `!!enabled`, or just `enabled`
         properties: { updatesIgnored: enabled },

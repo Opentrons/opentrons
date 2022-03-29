@@ -193,8 +193,6 @@ describe('ConnectRobotSlideout', () => {
 
   it('Clicking Close button in a row should remove an IP address/hostname', async () => {
     const { queryByText, getByRole, getAllByTestId } = render(props)
-    // const ipAddresses = getByTestId('ip-hostname')
-    // const
     const targetIpAddress = 'test'
     const inputBox = getByRole('textbox')
     const addButton = getByRole('button', { name: 'Add' })

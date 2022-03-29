@@ -25,7 +25,6 @@ interface SP {
 
 interface DP {
   addManualIp: (ip: string) => unknown
-  // checkManualIp: () => unknown
 }
 
 interface FormikErrors {
@@ -50,14 +49,12 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
       ip: '',
     },
     onSubmit: (values, { resetForm }) => {
-      // setShowSpinner(true)
       const ip = values.ip.trim()
       const inputForm = document.getElementById('ip')
       if (inputForm) inputForm.style.border = `1px solid ${COLORS.medGrey}`
       props.addManualIp(ip)
       props.setMostRecentAddition(ip)
       resetForm({ values: undefined })
-      // setShowSpinner(false)
     },
     validate: values => {
       const errors: FormikErrors = {}
@@ -132,9 +129,6 @@ const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
       dispatch(addManualIp(ip))
       dispatch(startDiscovery())
     },
-    // checkManualIp: () => {
-    //   dispatch(startDiscovery())
-    // },
   }
 }
 
