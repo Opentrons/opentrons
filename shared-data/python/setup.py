@@ -1,5 +1,9 @@
+import json
 import os
 import sys
+
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
 
 from setuptools.command import build_py, sdist
 from setuptools import setup, find_packages
@@ -18,30 +22,45 @@ if os.name == "posix":
 
 DATA_ROOT = ".."
 DATA_SUBDIRS = ["deck", "labware", "module", "pipette", "protocol"]
+DATA_TYPES = ["definitions", "schemas"]
 DEST_BASE_PATH = "data"
 
 
-def get_shared_data_files():
+def get_shared_data_files() -> List[Path]:
     to_include = []
+
     for subdir in DATA_SUBDIRS:
-        top = os.path.join(DATA_ROOT, subdir)
-        for dirpath, dirnames, filenames in os.walk(top):
-            from_source = os.path.relpath(dirpath, DATA_ROOT)
-            to_include.extend([os.path.join(from_source, fname) for fname in filenames])
+        for data_type in DATA_TYPES:
+            data_dir = Path(DATA_ROOT) / subdir / data_type
+            if data_dir.is_dir():
+                to_include.extend(data_dir.glob("**/*.json"))
+
     return to_include
+
+
+def _minimize_and_write_json(data_file: Path, target_file: Path) -> None:
+    contents = json.dumps(json.loads(data_file.read_text()))
+    target_file.write_text(contents)
 
 
 class SDistWithData(sdist.sdist):
     description = sdist.sdist.description + " Also, include data files."
 
-    def make_release_tree(self, base_dir, files):
+
+    def make_release_tree(self, base_dir, files) -> None:
         self.announce("adding data files to base dir {}".format(base_dir))
+
         for data_file in get_shared_data_files():
-            sdist_dest = os.path.join(base_dir, "opentrons_shared_data", DEST_BASE_PATH)
-            self.mkpath(os.path.join(sdist_dest, os.path.dirname(data_file)))
-            self.copy_file(
-                os.path.join(DATA_ROOT, data_file), os.path.join(sdist_dest, data_file)
+            sdist_data_dir = Path(base_dir) / "opentrons_shared_data" / DEST_BASE_PATH
+            target_file = sdist_data_dir / data_file.relative_to(DATA_ROOT)
+
+            self.mkpath(str(target_file.parent))
+            self.execute(
+                _minimize_and_write_json,
+                args=(data_file, target_file),
+                msg=f"copying and minimizing {data_file} -> {target_file}",
             )
+
         # also grab our package.json
         self.copy_file(
             os.path.join(HERE, "..", "package.json"),
