@@ -200,6 +200,7 @@ describe('ModuleOverflowMenu', () => {
       name: 'Set module temperature',
     })
     fireEvent.click(buttonSetting)
+    expect(props.handleSlideoutClick).toHaveBeenCalled()
     const buttonAbout = getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
     expect(props.handleAboutClick).toHaveBeenCalled()
@@ -217,12 +218,15 @@ describe('ModuleOverflowMenu', () => {
       name: 'Set lid temperature',
     })
     fireEvent.click(buttonSettingLid)
+    expect(props.handleSlideoutClick).toHaveBeenCalled()
     const buttonAbout = getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
     expect(props.handleAboutClick).toHaveBeenCalled()
-    getByRole('button', {
+    const buttonSettingBlock = getByRole('button', {
       name: 'Set block temperature',
     })
+    fireEvent.click(buttonSettingBlock)
+    expect(props.handleSlideoutClick).toHaveBeenCalled()
   })
   it('renders the correct Heater Shaker module menu', () => {
     props = {

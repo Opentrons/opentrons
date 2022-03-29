@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { NavLink } from 'react-router-dom'
-import { useModuleMatchResults, useProtocolCalibrationStatus } from './hooks'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -10,12 +9,17 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { useTrackEvent } from '../../../redux/analytics'
+import { ConfirmAttachmentModal } from '../../Devices/ModuleCard/ConfirmAttachmentModal'
+import { useHeaterShakerSlotNumber } from '../../Devices/ModuleCard/hooks'
+import { useModuleMatchResults, useProtocolCalibrationStatus } from './hooks'
 
 export const ProceedToRunCta = (): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')
   const [targetProps, tooltipProps] = useHoverTooltip()
   const moduleMatchResults = useModuleMatchResults()
   const trackEvent = useTrackEvent()
+  const heaterShakerSlot = useHeaterShakerSlotNumber()
+  const isHeaterShakerInProtocol = heaterShakerSlot !== null
   const isEverythingCalibrated = useProtocolCalibrationStatus().complete
   const { missingModuleIds } = moduleMatchResults
   const calibrationIncomplete =
@@ -24,6 +28,10 @@ export const ProceedToRunCta = (): JSX.Element | null => {
     missingModuleIds.length > 0 && isEverythingCalibrated
   const moduleAndCalibrationIncomplete =
     missingModuleIds.length > 0 && !isEverythingCalibrated
+  const [
+    showConfirmAttachModal,
+    setShowConfirmAttachmentModal,
+  ] = React.useState<boolean>(false)
 
   let proceedToRunDisabledReason = null
   if (moduleAndCalibrationIncomplete) {
@@ -35,18 +43,37 @@ export const ProceedToRunCta = (): JSX.Element | null => {
   } else if (moduleSetupIncomplete) {
     proceedToRunDisabledReason = t('run_disabled_modules_not_connected')
   }
+  const CTAbehaviorDifferentReason =
+    (proceedToRunDisabledReason != null && isHeaterShakerInProtocol) ||
+    (proceedToRunDisabledReason === null && isHeaterShakerInProtocol) ||
+    (proceedToRunDisabledReason != null && !isHeaterShakerInProtocol)
 
-  const LinkComponent = proceedToRunDisabledReason != null ? 'button' : NavLink
-  const linkProps = proceedToRunDisabledReason != null ? {} : { to: '/run' }
+  const LinkComponent = CTAbehaviorDifferentReason ? 'button' : NavLink
+  const linkProps = CTAbehaviorDifferentReason ? {} : { to: '/run' }
+
+  console.log(isHeaterShakerInProtocol)
+  console.log(proceedToRunDisabledReason)
+
   return (
     <Flex justifyContent={JUSTIFY_CENTER}>
+      {showConfirmAttachModal && (
+        <ConfirmAttachmentModal
+          onCloseClick={() => setShowConfirmAttachmentModal(false)}
+          isProceedToRunModal={true}
+          shakerValue={null}
+        />
+      )}
       <NewPrimaryBtn
         role="button"
         title={t('proceed_to_run')}
         disabled={proceedToRunDisabledReason != null}
         as={LinkComponent}
         id={'LabwareSetup_proceedToRunButton'}
-        onClick={() => trackEvent({ name: 'proceedToRun', properties: {} })}
+        onClick={
+          isHeaterShakerInProtocol
+            ? () => setShowConfirmAttachmentModal(true)
+            : () => trackEvent({ name: 'proceedToRun', properties: {} })
+        }
         {...linkProps}
         {...targetProps}
       >

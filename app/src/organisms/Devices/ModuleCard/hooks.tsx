@@ -9,6 +9,9 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import { getProtocolModulesInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
+import { useProtocolDetails } from '../../RunDetails/hooks'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 
 import type {
@@ -21,8 +24,27 @@ import type {
   TCDeactivateLidCreateCommand,
   TemperatureModuleDeactivateCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type { AttachedModule } from '../../../redux/modules/types'
 
+import type { AttachedModule } from '../../../redux/modules/types'
+import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
+
+export function useHeaterShakerSlotNumber():
+  | ProtocolModuleInfo['slotName']
+  | null {
+  const { protocolData } = useProtocolDetails()
+  if (protocolData == null) return null
+  const protocolModulesInfo = getProtocolModulesInfo(
+    protocolData,
+    standardDeckDef as any
+  )
+  const heaterShakerModule = protocolModulesInfo.find(
+    module => module.moduleDef.model === 'magneticModuleV1'
+  )
+  if (heaterShakerModule === undefined) return null
+  const slotNumber = heaterShakerModule.slotName
+
+  return slotNumber
+}
 interface LatchCommand {
   toggleLatch: () => void
   isLatchClosed: boolean

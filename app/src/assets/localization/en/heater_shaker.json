@@ -63,7 +63,7 @@
   "labware_latch": "Labware Latch",
   "set_shake_speed": "Set shake speed",
   "start_shaking": "Start Shaking",
-  "troubleshooting": "Troubleshooting",
+  "troubleshootingp": "Troubleshooting",
   "troubleshoot_step1_description": "Return to Step 1 to see instructions for securing the module to the deck.",
   "troubleshoot_step2_description": "Return to Step 2 to see instructions for securing the thermal adapter to the module.",
   "go_to_step_1": "Go to Step 1",
@@ -87,5 +87,6 @@
   "confirm_heater_shaker_modal_attachment": "Confirm Heater Shaker Module attachment to deck",
   "module_should_have_anchors": "<block>Module should have both anchors fully extended for a firm attachment to the deck.</block><block>The thermal adapter should be attached to the module.</block>",
   "module_anchors_extended": "<block>Before the run begins, module should have both anchors fully extended for a firm attachment to Slot {{slot}}.</block><block>The thermal adapter should be attached to the module.</block>",
-  "proceed_to_run": "Proceed to run"
+  "proceed_to_run": "Proceed to run",
+  "confirm_attachment": "Confirm attachment"
 }

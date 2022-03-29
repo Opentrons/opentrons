@@ -55,7 +55,7 @@ export const ModuleOverflowMenu = (
                     <MenuItem
                       minWidth="10rem"
                       key={`${index}_${module.model}`}
-                      onClick={() => item.onClick}
+                      onClick={() => item.onClick(item.isScondary)}
                       data-testid={`module_setting_${module.model}`}
                       disabled={item.disabledReason}
                       {...targetProps}
