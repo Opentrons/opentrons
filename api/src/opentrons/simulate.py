@@ -395,10 +395,7 @@ def format_runlog(runlog: List[Mapping[str, Any]]) -> str:
     """
     to_ret = []
     for command in runlog:
-        to_ret.append(
-            "\t" * command["level"]
-            + command["payload"].get("text", "").format(**command["payload"])
-        )
+        to_ret.append("\t" * command["level"] + command["payload"].get("text", ""))
         if command["logs"]:
             to_ret.append("\t" * command["level"] + "Logs from this command:")
             to_ret.extend(

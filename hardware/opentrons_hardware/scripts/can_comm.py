@@ -90,6 +90,7 @@ def prompt_enum(  # noqa: C901
         output_func: Function to output text to user.
         get_user_input: Function to get user input.
         enum_type: an enum type
+        brief_prompt: use succinct prompt
 
     Returns:
         The choice.
@@ -109,7 +110,6 @@ def prompt_enum(  # noqa: C901
 
     if not brief_prompt:
         write_choices()
-    user = ""
     while True:
         user = (
             get_user_input(f"choose {enum_type.__name__} (? for list): ")
@@ -124,7 +124,8 @@ def prompt_enum(  # noqa: C901
         try:
             return parse_input(user)
         except InvalidInput as e:
-            output_func(str(e) + "\n")
+            log.exception("Invalid Input")
+            output_func(in_red(str(e)) + "\n")
 
 
 def prompt_payload(
@@ -212,7 +213,8 @@ async def ui_task(can_driver: AbstractCanDriver) -> None:
             )
             await can_driver.send(can_message)
         except InvalidInput as e:
-            print(str(e))
+            log.exception("Invalid Input")
+            print(in_red(str(e)))
 
 
 async def run(args: argparse.Namespace) -> None:
@@ -231,6 +233,11 @@ async def run(args: argparse.Namespace) -> None:
         pass
     finally:
         driver.shutdown()
+
+
+def in_red(s: str) -> str:
+    """Return string formatted in red."""
+    return f"\033[1;31;40m{str(s)}\033[0m"
 
 
 LOG_CONFIG = {

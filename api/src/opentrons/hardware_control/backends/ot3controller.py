@@ -69,7 +69,10 @@ from opentrons.hardware_control.types import (
     OT3AxisMap,
     CurrentConfig,
 )
-from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_hardware.hardware_control.motion import (
+    MoveStopCondition,
+    MoveGroup,
+)
 from opentrons_hardware.hardware_control.types import NodeMap
 from opentrons_hardware.hardware_control.tools import detector, types as ohc_tool_types
 
@@ -227,19 +230,67 @@ class OT3Controller:
         checked_axes = [axis for axis in axes if self._axis_is_present(axis)]
         if not checked_axes:
             return {}
-        distances = {
-            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
-            for ax in checked_axes
-        }
         speed_settings = (
             self._configuration.motion_settings.max_speed_discontinuity.none
         )
-        velocities = {
-            ax: -1 * speed_settings[OT3Axis.to_kind(ax)] for ax in checked_axes
+
+        distances_gantry = {
+            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
+            for ax in axes
+            if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
         }
-        group = create_home_group(distances, velocities)
-        runner = MoveGroupRunner(move_groups=[group])
-        await runner.run(can_messenger=self._messenger)
+        velocities_gantry = {
+            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            for ax in axes
+            if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
+        }
+        distances_z = {
+            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
+            for ax in axes
+            if ax in OT3Axis.mount_axes()
+        }
+        velocities_z = {
+            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            for ax in axes
+            if ax in OT3Axis.mount_axes()
+        }
+        distances_pipette = {
+            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
+            for ax in axes
+            if ax in OT3Axis.pipette_axes()
+        }
+        velocities_pipette = {
+            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            for ax in axes
+            if ax in OT3Axis.pipette_axes()
+        }
+        move_group_gantry_z = []
+        move_group_pipette = []
+        if distances_z and velocities_z:
+            z_move = self._filter_move_group(
+                create_home_group(distances_z, velocities_z)
+            )
+            move_group_gantry_z.append(z_move)
+        if distances_gantry and velocities_gantry:
+            gantry_move = self._filter_move_group(
+                create_home_group(distances_gantry, velocities_gantry)
+            )
+            move_group_gantry_z.append(gantry_move)
+        if distances_pipette and velocities_pipette:
+            pipette_move = self._filter_move_group(
+                create_home_group(distances_pipette, velocities_pipette)
+            )
+            move_group_pipette.append(pipette_move)
+        runner_gantry_z = MoveGroupRunner(move_groups=move_group_gantry_z)
+        runner_pipette = MoveGroupRunner(
+            move_groups=move_group_pipette, start_at_index=2
+        )
+        coros = []
+        if move_group_gantry_z:
+            coros.append(runner_gantry_z.run(can_messenger=self._messenger))
+        if move_group_pipette:
+            coros.append(runner_pipette.run(can_messenger=self._messenger))
+        await asyncio.gather(*coros)
 
         axis_positions = {
             axis_to_node(ax): self._get_home_position()[axis_to_node(ax)]
@@ -248,6 +299,18 @@ class OT3Controller:
         self._position.update(axis_positions)
 
         return axis_convert(self._position, 0.0)
+
+    def _filter_move_group(self, move_group: MoveGroup) -> MoveGroup:
+        new_group: MoveGroup = []
+        for step in move_group:
+            new_group.append(
+                {
+                    node: axis_step
+                    for node, axis_step in step.items()
+                    if node in self._present_nodes
+                }
+            )
+        return new_group
 
     async def fast_home(
         self, axes: Sequence[OT3Axis], margin: float

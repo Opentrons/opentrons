@@ -1,3 +1,4 @@
+import requests
 from requests import Response
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MIN_SUPPORTED_VERSION
 from opentrons import __version__, config
@@ -27,3 +28,17 @@ def check_health_response(response: Response) -> None:
     }
 
     assert response.json() == expected
+
+
+def delete_all_runs(response: Response, host: str, port: str) -> None:
+    """Intake the response of a GET /runs and delete all runs if any exist."""
+    headers = {"Opentrons-Version": "*"}
+    base_url = f"{host}:{port}"
+    runs = response.json()["data"]
+    run_ids = [run["id"] for run in runs]
+    for run_id in run_ids:
+        delete_response = requests.delete(f"{base_url}/runs/{run_id}", headers=headers)
+        print(
+            f"Deleted run {run_id},"
+            f" response status code = {delete_response.status_code}"
+        )
