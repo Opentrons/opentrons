@@ -12,7 +12,7 @@ import os
 import re
 import subprocess
 import tempfile
-from typing import Callable, Optional, Tuple, Mapping
+from typing import Callable, Optional
 
 from otupdate.common.file_actions import (
     unzip_update,
@@ -35,7 +35,6 @@ class RootPartitions(enum.Enum):
 
 
 class OT2UpdateActions(UpdateActionsInterface):
-
     def untar_and_write(
         self, downloaded_update_path: str, progress_callback: Callable[[float], None]
     ) -> None:

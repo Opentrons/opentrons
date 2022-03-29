@@ -57,6 +57,7 @@ class PartitionManager:
 
 class RootFSInterface:
     """RootFS interface class."""
+
     def write_file(
         self,
         infile: str,

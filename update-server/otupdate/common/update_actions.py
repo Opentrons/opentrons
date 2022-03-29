@@ -5,7 +5,7 @@ update actions
 
 import abc
 import contextlib
-from typing import NamedTuple, Optional, Callable, Iterator, Mapping, Tuple
+from typing import NamedTuple, Optional, Callable, Iterator
 from aiohttp import web
 
 from .constants import APP_VARIABLE_PREFIX
