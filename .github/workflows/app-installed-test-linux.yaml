@@ -29,6 +29,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: "Opentrons/opentrons-emulation"
+          ref: v2.2.0
 
       - name: Check out repository code.
         uses: actions/checkout@v3
@@ -55,13 +56,13 @@ jobs:
           chromedriver --version
 
       - name: Setup opentrons-emulation project
-        uses: Opentrons/opentrons-emulation@main
+        uses: Opentrons/opentrons-emulation@v2.2.0
         with:
           input-file: ${{ github.workspace }}/opentrons/app-testing/ci-tools/ot2_with_all_modules.yaml
           command: setup
 
       - name: Run emulated system
-        uses: Opentrons/opentrons-emulation@main
+        uses: Opentrons/opentrons-emulation@v2.2.0
         with:
           input-file: ${{ github.workspace }}/opentrons/app-testing/ci-tools/ot2_with_all_modules.yaml
           command: run
