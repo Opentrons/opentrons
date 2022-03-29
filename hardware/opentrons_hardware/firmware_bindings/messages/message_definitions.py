@@ -394,6 +394,24 @@ class SensorThresholdResponse:  # noqa: D101
 
 
 @dataclass
+class SensorDiagnosticRequest:  # noqa: D101
+    payload: payloads.SensorDiagnosticRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.SensorDiagnosticRequestPayload
+    message_id: Literal[
+        MessageId.sensor_diagnostic_request
+    ] = MessageId.sensor_diagnostic_request
+
+
+@dataclass
+class SensorDiagnosticResponse:  # noqa: D101
+    payload: payloads.SensorDiagnosticResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.SensorDiagnosticResponsePayload
+    message_id: Literal[
+        MessageId.sensor_diagnostic_response
+    ] = MessageId.sensor_diagnostic_response
+
+
+@dataclass
 class PipetteInfoRequest(EmptyPayloadMessage):  # noqa: D101
     message_id: Literal[MessageId.pipette_info_request] = MessageId.pipette_info_request
 
