@@ -9,7 +9,6 @@ import {
   TEMP_MAX,
   HS_RPM_MIN,
   TEMP_MIN,
-  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
 import {
@@ -25,11 +24,11 @@ import { PrimaryButton } from '../../../atoms/Buttons'
 import { InputField } from '../../../atoms/InputField'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 
-import type { AttachedModule } from '../../../redux/modules/types'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type { HeaterShakerStartSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface HeaterShakerSlideoutProps {
-  module: AttachedModule
+  module: HeaterShakerModule
   onCloseClick: () => unknown
   isExpanded: boolean
   isSetShake: boolean
@@ -91,7 +90,7 @@ export const HeaterShakerSlideout = (
 
   return (
     <>
-      {showConfirmAttachModal && module.type === HEATERSHAKER_MODULE_TYPE && (
+      {showConfirmAttachModal && (
         <ConfirmAttachmentModal
           onCloseClick={() => setShowConfirmAttachModal(false)}
           onCloseSlideoutClick={onCloseClick}
