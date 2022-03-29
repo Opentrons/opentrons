@@ -296,6 +296,7 @@ class WriteToSensorRequestPayload(utils.BinarySerializable):
 
     sensor: SensorTypeField
     data: utils.UInt32Field
+    reg_address: utils.UInt8Field
 
 
 @dataclass

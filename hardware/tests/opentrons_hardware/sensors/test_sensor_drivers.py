@@ -143,6 +143,7 @@ async def test_receive_data_polling(
                 payload=WriteToSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.pressure),
                     data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
+                    reg_address=UInt8Field(0x0),
                 )
             ),
         ],
@@ -153,6 +154,7 @@ async def test_receive_data_polling(
                 payload=WriteToSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.capacitive),
                     data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
+                    reg_address=UInt8Field(0x0),
                 )
             ),
         ],
@@ -163,6 +165,7 @@ async def test_receive_data_polling(
                 payload=WriteToSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.temperature),
                     data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
+                    reg_address=UInt8Field(0x0),
                 )
             ),
         ],
@@ -173,6 +176,7 @@ async def test_receive_data_polling(
                 payload=WriteToSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.humidity),
                     data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
+                    reg_address=UInt8Field(0x0),
                 )
             ),
         ],
