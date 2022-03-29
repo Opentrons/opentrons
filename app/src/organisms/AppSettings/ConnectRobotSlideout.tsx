@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import * as React from 'react'
 import { useSelector, connect } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -46,9 +46,9 @@ type ConnectRobotSlideoutProps = SP &
 export function ConnectRobotSlideoutComponent(
   props: ConnectRobotSlideoutProps
 ): JSX.Element | null {
-  const [mostRecentAddition, setMostRecentAddition] = useState<string | null>(
-    null
-  )
+  const [mostRecentAddition, setMostRecentAddition] = React.useState<
+    string | null
+  >(null)
   const { onCloseClick, isExpanded } = props
   const { t } = useTranslation('app_settings')
   const isScanning = useSelector<State>(getScanning)
@@ -67,7 +67,7 @@ export function ConnectRobotSlideoutComponent(
     )
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!isScanning) {
       setMostRecentAddition(null)
     }

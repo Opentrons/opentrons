@@ -1,4 +1,4 @@
-import React from 'react'
+import * as React from 'react'
 import { connect } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useFormik } from 'formik'
