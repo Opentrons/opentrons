@@ -86,6 +86,7 @@ class InstrumentContextSimulation(AbstractInstrument):
         geometry = well.get_geometry()
         self._raise_if_tip("pick up tip")
         self._pipette_dict["has_tip"] = True
+        self._pipette_dict["tip_length"] = tip_length
         self._pipette_dict["current_volume"] = 0
         self._pipette_dict["working_volume"] = min(
             geometry.max_volume, self.get_max_volume()
@@ -95,6 +96,7 @@ class InstrumentContextSimulation(AbstractInstrument):
     def drop_tip(self, home_after: bool) -> None:
         self._raise_if_no_tip(HardwareAction.DROPTIP.name)
         self._pipette_dict["has_tip"] = False
+        self._pipette_dict["tip_length"] = 0.0
 
     def home(self) -> None:
         self._protocol_interface.set_last_location(None)
