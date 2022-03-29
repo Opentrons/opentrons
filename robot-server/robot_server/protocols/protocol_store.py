@@ -73,25 +73,6 @@ def _convert_resource_to_sql_values(resource: ProtocolResource) -> Dict[str, obj
 # classes each with their own table. We'll need a way of merging every store's
 # Table into a single MetaData, I think?
 # TODO: Make async, probably.
-def create_memory_db() -> sqlalchemy.engine.Engine:
-    # https://docs.sqlalchemy.org/en/14/core/engines.html#sqlite
-    # TODO: I want this to make a new in-memory DB every time it's called.
-    # Multiple calls shouldn't reuse the same in-memory DB.
-    # Is this what actually happens?
-    return sqlalchemy.create_engine(
-        "sqlite://",
-        # TODO: This feels like a hack. Can we avoid this by better controlling which
-        # thread this happens in? It's easy to avoid concurrent multithreaded requests
-        # to this DB (and we do), but it's hard to ensure that the thread that
-        # called this function is the same as the thread that runs the request, because
-        # of FastAPI depends.
-        connect_args={"check_same_thread": False},
-        # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#using-a-memory-database-in-multiple-threads
-        poolclass=sqlalchemy.pool.StaticPool,
-    )
-
-
-# TODO: Make async, probably.
 # TODO: What happens if the database already has tables?
 #       Trying to recreate them should probably be an error.
 #       Can we detect the conflict?
@@ -120,12 +101,16 @@ class ProtocolNotFoundError(KeyError):
 class ProtocolStore:
     """Methods for storing and retrieving protocol files."""
 
-    def __init__(self) -> None:
-        """Initialize the ProtocolStore."""
-        # TODO: This leaks the SQL engine. We should probably have it passed in
-        # instead of creating it ourselves.
-        self._sql_engine = create_memory_db()
-        add_tables_to_db(self._sql_engine)
+    def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
+        """Initialize the ProtocolStore.
+
+        Params:
+            sql_engine: A reference to the database that this ProtocolStore should
+                use as its backing storage.
+                This is expected to already have the proper tables set up;
+                see `add_tables_to_db()`.
+        """
+        self._sql_engine = sql_engine
 
     def insert(self, resource: ProtocolResource) -> None:
         """Insert a protocol resource into the store."""

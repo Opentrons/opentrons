@@ -2,6 +2,7 @@
 import pytest
 from datetime import datetime
 from pathlib import Path
+from typing import Generator
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_reader import (
@@ -12,17 +13,29 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
 )
 
+from robot_server.db import create_in_memory_db
 from robot_server.protocols.protocol_store import (
+    add_tables_to_db,
     ProtocolStore,
     ProtocolResource,
     ProtocolNotFoundError,
 )
 
+from sqlalchemy.engine import Engine as SQLEngine
+
 
 @pytest.fixture
-def subject() -> ProtocolStore:
+def in_memory_sql_engine() -> Generator[SQLEngine, None, None]:
+    """Return a set-up in-memory database to back the store."""
+    with create_in_memory_db() as sql_engine:
+        add_tables_to_db(sql_engine)
+        yield sql_engine
+
+
+@pytest.fixture
+def subject(in_memory_sql_engine: SQLEngine) -> ProtocolStore:
     """Get a ProtocolStore test subject."""
-    return ProtocolStore()
+    return ProtocolStore(sql_engine=in_memory_sql_engine)
 
 
 async def test_insert_and_get_protocol(tmp_path: Path, subject: ProtocolStore) -> None:
