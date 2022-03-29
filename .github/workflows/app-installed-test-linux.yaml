@@ -24,7 +24,7 @@ jobs:
         run: |
           pip install pipenv==2022.3.24
       - name: Check out repository code.
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install python dependencies
         working-directory: ./app-testing
         run: |
@@ -41,11 +41,10 @@ jobs:
           chmod +x ./app-testing/ci-tools/linux_get_chromedriver.sh
           ./app-testing/ci-tools/linux_get_chromedriver.sh ${{ github.event.inputs.electron-version }}
           chromedriver --version
-      #      - name: Checkout opentrons-emulation
-      #        uses: actions/checkout@v3
-      #        with:
-      #          repository: "Opentrons/opentrons-emulation"
-      #          path: opentrons-emulation
+      - name: Checkout opentrons-emulation
+        uses: actions/checkout@v3
+        with:
+          repository: "Opentrons/opentrons-emulation"
       - name: Setup opentrons-emulation project
         uses: Opentrons/opentrons-emulation@main
         with:
