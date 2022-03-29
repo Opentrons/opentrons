@@ -132,9 +132,7 @@ async def create_protocol(
         files=[ProtocolFile(name=f.name, role=f.role) for f in source.files],
     )
 
-    log.info(
-        f'Created protocol "{protocol_id}" and started analysis "{analysis_id}".'
-    )
+    log.info(f'Created protocol "{protocol_id}" and started analysis "{analysis_id}".')
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=data),
