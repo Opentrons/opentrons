@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, getByText } from '@testing-library/react'
 import { act } from 'react-dom/test-utils'
 import { i18n } from '../../../i18n'
 import { getScanning, getViewableRobots } from '../../../redux/discovery'
@@ -136,32 +136,33 @@ describe('ConnectRobotSlideout', () => {
   //     expect(errorMessage).toBeInTheDocument()
   //   })
 
-  it('Clicking Add button with an IP address/hostname should display the IP address/hostname', async () => {
-    mockGetConfig.mockReturnValue({
-      discovery: {
-        candidates: ['localhost'],
-      },
-    } as any)
-    mockGetViewableRobots.mockReturnValue([
-      {
-        name: 'test-robot-name',
-        host: 'localhost',
-        port: 31950,
-      },
-    ] as any[])
-    const { getByRole, getByText, queryByText } = render(props)
-    const newIpAddress = 'localhost'
-    const inputBox = getByRole('textbox')
-    const addButton = getByRole('button', { name: 'Add' })
-    await act(async () => {
-      await fireEvent.change(inputBox, { target: { value: newIpAddress } })
-      await fireEvent.click(addButton)
-    })
+  //ok
+  // it('Clicking Add button with an IP address/hostname should display the IP address/hostname', async () => {
+  //   mockGetConfig.mockReturnValue({
+  //     discovery: {
+  //       candidates: ['localhost'],
+  //     },
+  //   } as any)
+  //   mockGetViewableRobots.mockReturnValue([
+  //     {
+  //       name: 'test-robot-name',
+  //       host: 'localhost',
+  //       port: 31950,
+  //     },
+  //   ] as any[])
+  //   const { getByRole, getByText, queryByText } = render(props)
+  //   const newIpAddress = 'localhost'
+  //   const inputBox = getByRole('textbox')
+  //   const addButton = getByRole('button', { name: 'Add' })
+  //   await act(async () => {
+  //     await fireEvent.change(inputBox, { target: { value: newIpAddress } })
+  //     await fireEvent.click(addButton)
+  //   })
 
-    expect(getByText(newIpAddress)).toBeInTheDocument()
-    expect(queryByText('Available')).toBeFalsy()
-    expect(queryByText('Not Found')).toBeFalsy()
-  })
+  //   expect(getByText(newIpAddress)).toBeInTheDocument()
+  //   expect(queryByText('Available')).toBeFalsy()
+  //   expect(queryByText('Not Found')).toBeFalsy()
+  // })
 
   // ok
   //   it('Clicking Add button with an IP address/hostname should display the IP address/hostname and Available label', async () => {
@@ -195,26 +196,27 @@ describe('ConnectRobotSlideout', () => {
   //     expect(getByText('Not Found')).toBeInTheDocument()
   //   })
 
-  //   it('Clicking Close button in a row should remove an IP address/hostname', async () => {
-  //     const { getByRole, queryByText, getByLabelText } = render(props)
-  //     const newIpAddress = '1.1.1.1'
-  //     const inputBox = getByRole('textbox')
-  //     const addButton = getByRole('button', { name: 'Add' })
-  //     // const removeButton = getByTestId('ip-remove-button')
-  //     await act(async () => {
-  //       await fireEvent.change(inputBox, { target: { value: newIpAddress } })
-  //       await fireEvent.click(addButton)
-  //     })
+  it('Clicking Close button in a row should remove an IP address/hostname', () => {
+    const { getByRole, queryByText, getAllByTestId } = render(props)
+    // const ipAddresses = getByTestId('ip-hostname')
+    // const
+    // const targetIpAddress = '1.1.1.1'
+    // const inputBox = getByRole('textbox')
+    // const addButton = getByRole('button', { name: 'Add' })
+    // await act(async () => {
+    //   fireEvent.change(inputBox, { target: { value: targetIpAddress } })
+    //   fireEvent.click(addButton)
+    // })
+    let removeButtons = getAllByTestId('close-button')
+    console.log(removeButtons.length)
+    fireEvent.keyDown(removeButtons[0])
+    fireEvent.keyDown(removeButtons[1])
+    fireEvent.keyDown(removeButtons[2])
 
-  //     // const removeButton = getByRole('button', { name: /ip-close-button/i })
-  //     // const removeButton = await getByTestId('close-button')
-  //     const removeButton = await getByLabelText('close')
-  //     await fireEvent.click(removeButton)
-
-  //     expect(queryByText(newIpAddress)).toBeFalsy()
-  //     // expect(queryByText('Available')).toBeFalsy()
-  //     // expect(queryByText('Not Found')).toBeFalsy()
-  //   })
+    removeButtons = getAllByTestId('close-button')
+    console.log(expect(queryByText('localhost')).toBeInTheDocument())
+    console.log(removeButtons.length)
+  })
 
   // OK
   //   it('Clicking close button should close the slideout', async () => {
