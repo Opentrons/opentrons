@@ -48,12 +48,12 @@ jobs:
       - name: Setup opentrons-emulation project
         uses: Opentrons/opentrons-emulation@main
         with:
-          input-file: ${PWD}/app-testing/ci-tools/ot2_with_all_modules.yaml
+          input-file: ${{ github.workspace }}/app-testing/ci-tools/ot2_with_all_modules.yaml
           command: setup
       - name: Run emulated system
         uses: Opentrons/opentrons-emulation@main
         with:
-          input-file: ${PWD}/app-testing/ci-tools/ot2_with_all_modules.yaml
+          input-file: ${{ github.workspace }}/app-testing/ci-tools/ot2_with_all_modules.yaml
           command: run
       - name: Run Tests.
         working-directory: ./app-testing
