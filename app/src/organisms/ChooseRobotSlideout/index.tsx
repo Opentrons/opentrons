@@ -29,6 +29,7 @@ import { Slideout } from '../../atoms/Slideout'
 import { PrimaryButton } from '../../atoms/Buttons'
 import {
   getConnectableRobots,
+  getReachableRobots,
   getScanning,
   getUnreachableRobots,
   startDiscovery,
@@ -78,16 +79,20 @@ export function ChooseRobotSlideout(
     State,
     ReturnType<typeof getConnectableRobots>
   >(getConnectableRobots)
+  const reachableRobots = useSelector<
+    State,
+    ReturnType<typeof getReachableRobots>
+  >(getReachableRobots)
   const unavailableRobots = useSelector<
     State,
     ReturnType<typeof getUnreachableRobots>
   >(getUnreachableRobots)
   const availableRobots = connectableRobots.filter(robot => {
     // TODO: filter out robots who have a current run that is in thie paused or running status
-    return robot
+    return true
   })
   const unavailableOrBusyCount =
-    unavailableRobots.length +
+    unavailableRobots.length + reachableRobots.length +
     (connectableRobots.length - availableRobots.length)
 
   return (
@@ -95,7 +100,7 @@ export function ChooseRobotSlideout(
       isExpanded={showSlideout}
       onCloseClick={onCloseClick}
       zIndex="10"
-      height="100%"
+      height={`calc(100vh - ${SPACING.spacing4})`}
       title={t('choose_robot_to_run', {
         protocol_name: protocolDisplayName,
       })}
@@ -151,10 +156,10 @@ export function ChooseRobotSlideout(
               local={robot.local}
               onClick={() =>
                 setSelectedRobot(
-                  robot.ip === selectedRobot.ip ? null : robot
+                  (selectedRobot != null && robot.ip === selectedRobot.ip) ? null : robot
                 )
               }
-              isSelected={selectedRobot.ip === robot.ip}
+              isSelected={selectedRobot != null && selectedRobot.ip === robot.ip}
             />
           ))
         )}

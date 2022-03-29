@@ -6,8 +6,7 @@ import {
   Text,
   Flex,
   FONT_SIZE_CAPTION,
-  SPACING_2,
-  SPACING_3,
+  SPACING,
   C_MED_GRAY,
   Link,
   SPACING_1,
@@ -15,7 +14,6 @@ import {
   DIRECTION_ROW,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
-  POSITION_ABSOLUTE,
 } from '@opentrons/components'
 
 const PROTOCOL_LIBRARY_URL = 'https://protocols.opentrons.com'
@@ -33,12 +31,11 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
-      position={POSITION_ABSOLUTE}
-      bottom="0"
-      paddingBottom={SPACING_3}
+      marginY={SPACING.spacing6}
+      paddingBottom={SPACING.spacing3}
       width="96.5%"
     >
-      <Text role="complementary" as="h5" marginBottom={SPACING_2}>
+      <Text role="complementary" as="h5" marginBottom={SPACING.spacing2}>
         {props.title}
       </Text>
       <Flex justifyContent={JUSTIFY_START} flexDirection={DIRECTION_ROW}>
@@ -47,7 +44,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
           color={C_MED_GRAY}
           href={PROTOCOL_LIBRARY_URL}
           id={'EmptyStateLinks_protocolLibraryButton'}
-          marginRight={SPACING_3}
+          marginRight={SPACING.spacing3}
           external
         >
           {t('browse_protocol_library')}
@@ -56,7 +53,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
         <Link
           fontSize={FONT_SIZE_CAPTION}
           color={C_MED_GRAY}
-          marginRight={SPACING_3}
+          marginRight={SPACING.spacing3}
           href={PROTOCOL_DESIGNER_URL}
           id={'EmptyStateLinks_protocolDesignerButton'}
           external

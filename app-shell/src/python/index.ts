@@ -55,7 +55,7 @@ export function runFileWithPython(
   log.debug('IN RUN FILE WITH PYTHON', { pythonPath, srcFilePath })
   if (pythonPath != null) {
     log.debug('BEFORE PYTHON IS EXECUTED', pythonPath, srcFilePath)
-    execa(pythonPath, [
+    return execa(pythonPath, [
       '-m',
       'opentrons.cli.__init__',
       'analyze',
@@ -66,7 +66,9 @@ export function runFileWithPython(
         log.info('python out', output)
         fs.writeFile(destFilePath, output.stdout)
       })
-      .catch(log.error)
+      .catch(e => {
+        log.error(e)
+      })
   } else {
     return Promise.reject(new Error('Python interpreter could not be found'))
   }

@@ -5,11 +5,11 @@ import first from 'lodash/first'
 import {
   getModuleType,
   getPipetteNameSpecs,
-  schemaV6Adapter,
 } from '@opentrons/shared-data'
 
 import {
   Flex,
+  Icon,
   DIRECTION_ROW,
   COLORS,
   SPACING,
@@ -17,6 +17,7 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
+  SIZE_3,
 } from '@opentrons/components'
 import { Link } from 'react-router-dom'
 import {
@@ -38,8 +39,6 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const { t } = useTranslation('protocol_list')
   const { handleRunProtocol, protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
 
-  // TODO: IMMEDIATELY clean up and move these protocol data selectors into api_client as
-  // pure functions of RunTimeCommand[]
   const robotModel = mostRecentAnalysis?.robot?.model ?? 'OT-2'
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     mostRecentAnalysis != null
@@ -64,7 +63,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
         flexDirection={DIRECTION_ROW}
         marginBottom={SPACING.spacing3}
         padding={SPACING.spacing4}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
+       justifyContent={JUSTIFY_SPACE_BETWEEN}
         width="100%"
         position="relative"
       >
@@ -78,7 +77,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
           >
             {mostRecentAnalysis != null ? (
               <DeckThumbnail analysis={mostRecentAnalysis} />
-            ) : null}
+            ) : <Icon name="ot-spinner" spin size={SIZE_3}/>}
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
             <StyledText
