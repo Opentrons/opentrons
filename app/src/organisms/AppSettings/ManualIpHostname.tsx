@@ -42,6 +42,15 @@ const FlexForm = styled.form`
   width: 100%;
   align-items: center;
 `
+
+const StyledInput = styled.input`
+  height: ${SPACING.spacing5};
+  width: 100%;
+  flex: 6;
+  margin: ${SPACING.spacing2} 0;
+  border: 1px solid ${COLORS.medGrey};
+`
+
 export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
   const { t } = useTranslation('app_settings')
   const formik = useFormik({
@@ -75,20 +84,13 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
       height={SPACING.spacing6}
     >
       <FlexForm onSubmit={formik.handleSubmit}>
-        <input
+        <StyledInput
           id="ip"
           name="ip"
           type="text"
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           value={formik.values.ip}
-          height={SPACING.spacing5}
-          width="100%"
-          style={{
-            flex: 6,
-            margin: `${SPACING.spacing2} 0`,
-            border: `1px solid ${COLORS.medGrey}`,
-          }}
         />
         <TertiaryButton
           fontSize={TYPOGRAPHY.fontSizeH6}
