@@ -15,7 +15,7 @@ import {
 import { Divider } from '../../atoms/structure'
 
 const IpItem = styled.div`
-  flex: 1 1 calc(100% - 4rem);
+  flex: 1 1 auto;
   padding: 0 1rem;
   border: 0;
   border-radius: 0;
