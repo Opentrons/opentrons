@@ -18,7 +18,6 @@ from opentrons.motion_planning import (
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.module_geometry import (
-    ThermocyclerGeometry,
     ModuleGeometry,
 )
 
@@ -34,24 +33,22 @@ def max_many(*args):
     return functools.reduce(max, args[1:], args[0])
 
 
-BAD_PAIRS = set(
-    [
-        ("1", "12"),
-        ("12", "1"),
-        ("4", "12"),
-        ("12", "4"),
-        ("4", "9"),
-        ("9", "4"),
-        ("4", "8"),
-        ("8", "4"),
-        ("1", "8"),
-        ("8", "1"),
-        ("4", "11"),
-        ("11", "4"),
-        ("1", "11"),
-        ("11", "1"),
-    ]
-)
+BAD_PAIRS = {
+    ("1", "12"),
+    ("12", "1"),
+    ("4", "12"),
+    ("12", "4"),
+    ("4", "9"),
+    ("9", "4"),
+    ("4", "8"),
+    ("8", "4"),
+    ("1", "8"),
+    ("8", "1"),
+    ("4", "11"),
+    ("11", "4"),
+    ("1", "11"),
+    ("11", "1"),
+}
 
 
 def should_dodge_thermocycler(

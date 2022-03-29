@@ -900,6 +900,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
 class OT3InstrumentHandler(InstrumentHandlerProvider[OT3Mount]):
     """Override for correct plunger_position."""
 
+    @functools.lru_cache(10)
     def plunger_position(
         self, instr: Pipette, ul: float, action: "UlPerMmAction"
     ) -> float:
