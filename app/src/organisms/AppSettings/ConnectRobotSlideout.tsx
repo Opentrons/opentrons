@@ -53,7 +53,7 @@ export function ConnectRobotSlideoutComponent(
   const { t } = useTranslation('app_settings')
   const isScanning = useSelector<State>(getScanning)
 
-  const displayLinkButton = (buttonLable: string): JSX.Element => {
+  const displayLinkButton = (buttonLabel: string): JSX.Element => {
     return (
       <Link
         role="button"
@@ -62,7 +62,7 @@ export function ConnectRobotSlideoutComponent(
         onClick={props.checkIpAndHostname}
         id="AppSettings_Connection_Button"
       >
-        {buttonLable}
+        {buttonLabel}
       </Link>
     )
   }
