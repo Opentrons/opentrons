@@ -34,9 +34,9 @@ describe('deactivateTemperature', () => {
       expected: {
         commands: [
           {
-            command: 'temperatureModule/deactivate',
+            commandType: 'temperatureModule/deactivate',
             params: {
-              module: temperatureModuleId,
+              moduleId: temperatureModuleId,
             },
           },
         ],
@@ -58,7 +58,7 @@ describe('deactivateTemperature', () => {
     //   expected: {
     //     commands: [
     //       {
-    //         command: 'thermocycler/deactivateLid',
+    //         commandType: 'thermocycler/deactivateLid',
     //         params: {
     //           module: thermocyclerId,
     //         },

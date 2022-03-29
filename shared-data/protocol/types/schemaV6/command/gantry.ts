@@ -86,8 +86,8 @@ export interface MoveToWellParams {
   pipetteId: string
   labwareId: string
   wellName: string
-  wellLocation: {
-    origin: 'top' | 'bottom'
+  wellLocation?: {
+    origin?: 'top' | 'bottom'
     offset?: {
       x?: number
       y?: number

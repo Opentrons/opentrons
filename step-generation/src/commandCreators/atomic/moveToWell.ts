@@ -66,16 +66,24 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
     }
   }
 
-  const params: v6MoveToWellParams = {
+  const requiredParams: v6MoveToWellParams = {
     pipetteId: pipette,
     labwareId: labware,
     wellName: well,
+  }
+
+  const wellLocationParams: Pick<v6MoveToWellParams, 'wellLocation'> = {
     wellLocation: {
       origin: 'bottom',
       offset,
     },
   }
 
+  const params = {
+    ...requiredParams,
+    ...(offset != null && wellLocationParams),
+  }
+  
   // add optional fields only if specified
   if (forceDirect != null) {
     params.forceDirect = forceDirect

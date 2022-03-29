@@ -101,7 +101,12 @@ type MakeAspDispHelper<P> = (
 ) => (well: string, volume: number, params?: Partial<P>) => CreateCommand
 type MakeAirGapHelper<P> = (
   bakedParams: Partial<P> & {
-    offsetFromBottomMm: number
+    wellLocation: {
+      origin: 'bottom'
+      offset: {
+        z: number
+      }
+    }
   }
 ) => (well: string, volume: number, params?: Partial<P>) => CreateCommand
 type MakeDispenseAirGapHelper<P> = MakeAirGapHelper<P>
@@ -207,7 +212,12 @@ export const makeDispenseAirGapHelper: MakeDispenseAirGapHelper<AspDispAirgapPar
 const _defaultTouchTipParams = {
   pipetteId: DEFAULT_PIPETTE,
   labwareId: SOURCE_LABWARE,
-  offsetFromBottomMm: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
+  wellLocation: {
+    origin: 'bottom' as const,
+    offset: {
+      z: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
+    },
+  },
 }
 type MakeTouchTipHelper = (
   bakedParams?: Partial<TouchTipParams>
@@ -240,6 +250,8 @@ export const delayWithOffset = (
       wellLocation: {
         origin: 'bottom',
         offset: {
+          x: 0,
+          y: 0,
           z: zOffset || 14,
         },
       },
