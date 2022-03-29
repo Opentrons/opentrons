@@ -41,6 +41,12 @@ class OT2UpdateActions(UpdateActionsInterface):
         """Unzip update file."""
         pass
 
+    def untar_and_write(
+        self, downloaded_update_path: str, progress_callback: Callable[[float], None]
+    ) -> None:
+        """Untar update file."""
+        pass
+
     def validate_update(
         self,
         filepath: str,

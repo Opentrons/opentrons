@@ -47,6 +47,7 @@ def _begin_straight_fwd_unzip(
                     loop,
                     "/var/lib/otupdate/downloads"
                     "/Verdin-iMX8MM_opentrons-ot3-image.rootfs.ext4",
+                    # "/var/lib/otupdate/downloads/rootfs.ext4",
                     actions,
                 )
             )
@@ -85,6 +86,38 @@ def _begin_straight_fwd_write(
     write_future.add_done_callback(write_done)
 
 
+def _begin_straight_fwd_untar_and_write(
+    session: UpdateSession,
+    config: config.Config,
+    loop: asyncio.AbstractEventLoop,
+    downloaded_update_path: str,
+    actions: update_actions.UpdateActionsInterface,
+):
+    """Start the write process!"""
+    LOG.warning("In _begin_straight_fwd_untar_and_write")
+    LOG.warning(
+        f"file path, {downloaded_update_path} .in _begin_straight_fwd_untar_and_write"
+    )
+    session.set_stage(Stages.WRITING)
+    write_future = asyncio.ensure_future(
+        loop.run_in_executor(
+            None,
+            actions.untar_and_write,
+            downloaded_update_path,
+            session.set_progress,
+        )
+    )
+
+    def untar_and_write_done(fut):
+        exc = fut.exception()
+        if exc:
+            session.set_error(getattr(exc, "short", str(type(exc))), str(exc))
+        else:
+            session.set_stage(Stages.DONE)
+
+    write_future.add_done_callback(untar_and_write_done)
+
+
 @require_session
 async def file_upload(request: web.Request, session: UpdateSession) -> web.Response:
     """Serves /update/:session/file
@@ -107,7 +140,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             f"Part {part.name} being saved to "
             f"{session.download_path}, in file_upload"
         )
-        if part.name != "rootfs.zip":
+        if part.name != "rootfs.xz":
             LOG.warning(f"Unknown field name {part.name} in file_upload, ignoring")
             await part.release()
         else:
@@ -124,11 +157,11 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             status=500,
         )
 
-    _begin_straight_fwd_unzip(
+    _begin_straight_fwd_untar_and_write(
         session,
         config.config_from_request(request),
         asyncio.get_event_loop(),
-        os.path.join(session.download_path, "rootfs.zip"),
+        os.path.join(session.download_path, "rootfs.xz"),
         maybe_actions,
     )
 

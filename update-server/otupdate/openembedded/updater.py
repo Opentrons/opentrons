@@ -1,6 +1,8 @@
 """OE Updater and dependency injection classes."""
 import contextlib
 import os
+import lzma
+import shutil
 import zipfile
 
 
@@ -67,7 +69,7 @@ class RootFSInterface:
         file_sizes: Dict[str, int] = {}
         LOG.debug(
             f"downloaded_update path: {downloaded_update_path}, "
-            f"in RootFSInterface::update "
+            f"in RootFSInterface::unzip "
         )
         with zipfile.ZipFile(downloaded_update_path, "r") as zf:
             files = zf.infolist()
@@ -287,6 +289,16 @@ class Updater(UpdateActionsInterface):
                     file_paths[fi.filename] = uncomp_path
                     file_sizes[fi.filename] = fi.file_size
         return file_paths, file_sizes
+
+    def untar_and_write(
+        self, downloaded_update_path: str, progress_callback: Callable[[float], None]
+    ) -> None:
+
+        unused_partition = self.part_mngr.find_unused_partition()
+        with lzma.open(downloaded_update_path, "rb") as fsrc:
+            with open(unused_partition.path, "wb") as fdst:
+                shutil.copyfileobj(fsrc, fdst)
+                progress_callback(1)
 
     def verify_check_sum(self) -> bool:
         pass

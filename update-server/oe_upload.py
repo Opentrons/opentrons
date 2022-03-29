@@ -34,7 +34,7 @@ async def do_update(update_file: str, host: str, kind: UPDATE_KIND,
             root = host + '/server/update/migration'
         else:
             root = host + '/server/update'
-        filename = "rootfs.zip"
+        filename = "rootfs.xz"
         print(f"Starting update of {update_file.name} to {host}")
         begin_resp = await session.post(root + '/begin')
         if begin_resp.status == 409:
