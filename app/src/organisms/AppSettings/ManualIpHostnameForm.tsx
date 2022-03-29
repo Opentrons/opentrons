@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useFormik } from 'formik'
 import styled from 'styled-components'
@@ -12,29 +12,18 @@ import {
   COLORS,
 } from '@opentrons/components'
 import { TertiaryButton } from '../../atoms/Buttons'
-import { getConfig, addManualIp } from '../../redux/config'
+import { addManualIp } from '../../redux/config'
 import { startDiscovery } from '../../redux/discovery'
 
-import type { MapDispatchToProps } from 'react-redux'
-import type { State } from '../../redux/types'
-import type { DiscoveryCandidates } from '../../redux/config/types'
-
-interface SP {
-  candidates: DiscoveryCandidates
-}
-
-interface DP {
-  addManualIp: (ip: string) => unknown
-}
+import type { Dispatch } from '../../redux/types'
 
 interface FormikErrors {
   ip?: string
 }
 
-type Props = SP &
-  DP & {
-    setMostRecentAddition: (ip: string) => void
-  }
+interface Props {
+  setMostRecentAddition: (ip: string) => void
+}
 
 const FlexForm = styled.form`
   display: flex;
@@ -51,8 +40,13 @@ const StyledInput = styled.input`
   border: 1px solid ${COLORS.medGrey};
 `
 
-export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
+export function ManualIpHostnameForm(props: Props): JSX.Element {
   const { t } = useTranslation('app_settings')
+  const dispatch = useDispatch<Dispatch>()
+  const addManualIpAndHostname = (ip: string): void => {
+    dispatch(addManualIp(ip))
+    dispatch(startDiscovery())
+  }
   const formik = useFormik({
     initialValues: {
       ip: '',
@@ -61,7 +55,7 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
       const ip = values.ip.trim()
       const inputForm = document.getElementById('ip')
       if (inputForm) inputForm.style.border = `1px solid ${COLORS.medGrey}`
-      props.addManualIp(ip)
+      addManualIpAndHostname(ip)
       props.setMostRecentAddition(ip)
       resetForm({ values: undefined })
     },
@@ -118,23 +112,3 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
     </Flex>
   )
 }
-
-function mapStateToProps(state: State): SP {
-  return {
-    candidates: getConfig(state)?.discovery.candidates ?? [],
-  }
-}
-
-const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
-  return {
-    addManualIp: ip => {
-      dispatch(addManualIp(ip))
-      dispatch(startDiscovery())
-    },
-  }
-}
-
-export const ManualIpHostnameForm = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ManualIpHostnameFormComponent)

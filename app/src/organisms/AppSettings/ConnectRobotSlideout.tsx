@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector, connect } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -13,7 +13,7 @@ import {
   SIZE_2,
   Link,
 } from '@opentrons/components'
-import { ManualIpHostnameForm } from './ManualIpHostname'
+import { ManualIpHostnameForm } from './ManualIpHostnameForm'
 import { IpHostnameList } from './IpHostnameList'
 import { Slideout } from '../../atoms/Slideout'
 import { PrimaryButton } from '../../atoms/Buttons'
@@ -21,29 +21,18 @@ import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { getScanning, startDiscovery } from '../../redux/discovery'
-import { getConfig } from '../../redux/config'
 
-import type { State } from '../../redux/types'
-import type { MapDispatchToProps } from 'react-redux'
-import type { DiscoveryCandidates } from '../../redux/config/types'
+import type { Dispatch, State } from '../../redux/types'
 
 const SUPPORT_PAGE_LINK =
   'https://support.opentrons.com/en/articles/2934336-manually-adding-a-robot-s-ip-address'
 
-interface SP {
-  candidates: DiscoveryCandidates
+interface ConnectRobotSlideoutProps {
+  isExpanded: boolean
+  onCloseClick: () => void
 }
 
-interface DP {
-  checkIpAndHostname: () => unknown
-}
-type ConnectRobotSlideoutProps = SP &
-  DP & {
-    isExpanded: boolean
-    onCloseClick: () => unknown
-  }
-
-export function ConnectRobotSlideoutComponent(
+export function ConnectRobotSlideout(
   props: ConnectRobotSlideoutProps
 ): JSX.Element | null {
   const [mostRecentAddition, setMostRecentAddition] = React.useState<
@@ -51,6 +40,8 @@ export function ConnectRobotSlideoutComponent(
   >(null)
   const { onCloseClick, isExpanded } = props
   const { t } = useTranslation('app_settings')
+  const dispatch = useDispatch<Dispatch>()
+  const refreshDiscovery = (): unknown => dispatch(startDiscovery())
   const isScanning = useSelector<State>(getScanning)
 
   const displayLinkButton = (buttonLabel: string): JSX.Element => {
@@ -59,7 +50,7 @@ export function ConnectRobotSlideoutComponent(
         role="button"
         css={TYPOGRAPHY.pSemiBold}
         color={COLORS.blue}
-        onClick={props.checkIpAndHostname}
+        onClick={refreshDiscovery}
         id="AppSettings_Connection_Button"
       >
         {buttonLabel}
@@ -135,22 +126,3 @@ export function ConnectRobotSlideoutComponent(
     </Slideout>
   )
 }
-
-const mapStateToProps = (state: State): SP => {
-  return {
-    candidates: getConfig(state)?.discovery.candidates ?? [],
-  }
-}
-
-const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
-  return {
-    checkIpAndHostname: () => {
-      dispatch(startDiscovery())
-    },
-  }
-}
-
-export const ConnectRobotSlideout = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ConnectRobotSlideoutComponent)

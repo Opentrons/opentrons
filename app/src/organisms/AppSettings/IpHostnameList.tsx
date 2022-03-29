@@ -1,26 +1,21 @@
 import * as React from 'react'
-import { connect, MapDispatchToProps } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { getConfig, removeManualIp } from '../../redux/config'
 import { getViewableRobots } from '../../redux/discovery'
 import { IpHostnameItem } from './IpHostnameItem'
 
-import type { State } from '../../redux/types'
-import type { DiscoveryCandidates } from '../../redux/config/types'
-import type { Robot, ReachableRobot } from '../../redux/discovery/types'
+import type { State, Dispatch } from '../../redux/types'
 
-interface SP {
-  robots: Array<Robot | ReachableRobot>
-  candidates: DiscoveryCandidates
+interface Props {
+  mostRecentAddition: string | null
 }
 
-interface DP {
-  removeManualIp: (ip: string) => unknown
-}
-
-type Props = SP & DP & { mostRecentAddition: string | null }
-
-function IpHostnameListComponent(props: Props): JSX.Element {
-  const { candidates, removeManualIp, robots } = props
+export function IpHostnameList(props: Props): JSX.Element {
+  const candidates = useSelector(
+    (state: State) => getConfig(state)?.discovery.candidates ?? []
+  )
+  const robots = useSelector((state: State) => getViewableRobots(state))
+  const dispatch = useDispatch<Dispatch>()
 
   return (
     <>
@@ -36,7 +31,7 @@ function IpHostnameListComponent(props: Props): JSX.Element {
           <IpHostnameItem
             candidate={candidate}
             key={index}
-            removeIp={removeManualIp}
+            removeIp={() => dispatch(removeManualIp(candidate))}
             discovered={discovered}
             justAdded={candidate === props.mostRecentAddition}
             isLast={index === candidates.length - 1}
@@ -45,21 +40,3 @@ function IpHostnameListComponent(props: Props): JSX.Element {
     </>
   )
 }
-
-function mapStateToProps(state: State): SP {
-  return {
-    robots: getViewableRobots(state),
-    candidates: getConfig(state)?.discovery.candidates ?? [],
-  }
-}
-
-const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
-  return {
-    removeManualIp: ip => dispatch(removeManualIp(ip)),
-  }
-}
-
-export const IpHostnameList = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(IpHostnameListComponent)
