@@ -1,4 +1,4 @@
-test_name: MagDeck standalone commands
+test_name: magneticModuleV1 standalone commands
 
 marks:
   - usefixtures:
