@@ -78,12 +78,16 @@ export const substepTimelineSingleChannel = (
         acc.prevRobotState
       ).robotState
 
-      if (command.commandType === 'aspirate' || command.commandType === 'dispense') {
+      if (
+        command.commandType === 'aspirate' ||
+        command.commandType === 'dispense'
+      ) {
         const { wellName, volume, labwareId } = command.params
         const wellInfo = {
           labwareId,
           wells: [wellName],
-          preIngreds: acc.prevRobotState.liquidState.labware[labwareId][wellName],
+          preIngreds:
+            acc.prevRobotState.liquidState.labware[labwareId][wellName],
           postIngreds: nextRobotState.liquidState.labware[labwareId][wellName],
         }
         return {
@@ -132,7 +136,10 @@ export const substepTimelineMultiChannel = (
         acc.prevRobotState
       ).robotState
 
-      if (command.commandType === 'aspirate' || command.commandType === 'dispense') {
+      if (
+        command.commandType === 'aspirate' ||
+        command.commandType === 'dispense'
+      ) {
         const { wellName, volume, labwareId } = command.params
         const labwareDef = invariantContext.labwareEntities
           ? invariantContext.labwareEntities[labwareId].def

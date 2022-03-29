@@ -26,13 +26,6 @@ import {
 import { transfer } from '../commandCreators/compound/transfer'
 import type { InvariantContext, RobotState, TransferArgs } from '../types'
 
-// well depth for 96 plate is 10.54, so need to add 1mm to top of well
-// wellLocation: {
-//   origin: 'bottom',
-//   offset: {
-//     z: offsetFromBottomMm,
-//   },
-// },
 const airGapHelper = makeAirGapHelper({
   wellLocation: {
     origin: 'bottom',

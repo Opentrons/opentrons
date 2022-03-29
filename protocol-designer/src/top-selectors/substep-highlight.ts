@@ -193,7 +193,11 @@ function _getSelectedWellsForSubstep(
     } else {
       // single-channel
       const { activeTips } = substeps.rows[substepIndex]
-      if (activeTips && activeTips.labwareId === labwareId && activeTips.wellName)
+      if (
+        activeTips &&
+        activeTips.labwareId === labwareId &&
+        activeTips.wellName
+      )
         tipWellSet = [activeTips.wellName]
     }
 

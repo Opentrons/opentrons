@@ -45,9 +45,9 @@ describe('touchTip', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
-              z: 10
-            }
-          }
+              z: 10,
+            },
+          },
         },
       },
     ])

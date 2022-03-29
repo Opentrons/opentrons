@@ -122,7 +122,7 @@ export interface HeaterShakerSubstepItem {
   targetHeaterShakerTemperature: number | null
   targetSpeed: number | null
   latchOpen: boolean
-  heaterShakerTimerMinutes: number | null 
+  heaterShakerTimerMinutes: number | null
   heaterShakerTimerSeconds: number | null
 }
 
