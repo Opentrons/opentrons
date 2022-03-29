@@ -196,16 +196,6 @@ class InstrumentContextSimulation(AbstractInstrument):
         )
         self._update_flow_rate()
 
-    def _update_flow_rate(self):
-        p = self._protocol_interface.get_hardware().get_attached_instrument(
-            self.get_mount())
-        self._pipette_dict["aspirate_flow_rate"] = p["aspirate_flow_rate"]
-        self._pipette_dict["dispense_flow_rate"] = p["dispense_flow_rate"]
-        self._pipette_dict["blow_out_flow_rate"] = p["blow_out_flow_rate"]
-        self._pipette_dict["aspirate_speed"] = p["aspirate_speed"]
-        self._pipette_dict["dispense_speed"] = p["dispense_speed"]
-        self._pipette_dict["blow_out_speed"] = p["blow_out_speed"]
-
     def set_pipette_speed(
         self,
         aspirate: typing.Optional[float] = None,
@@ -219,6 +209,18 @@ class InstrumentContextSimulation(AbstractInstrument):
             blow_out=blow_out,
         )
         self._update_flow_rate()
+
+    def _update_flow_rate(self) -> None:
+        """Update cached speed and flow rates from hardware controller pipette."""
+        p = self._protocol_interface.get_hardware().get_attached_instrument(
+            self.get_mount()
+        )
+        self._pipette_dict["aspirate_flow_rate"] = p["aspirate_flow_rate"]
+        self._pipette_dict["dispense_flow_rate"] = p["dispense_flow_rate"]
+        self._pipette_dict["blow_out_flow_rate"] = p["blow_out_flow_rate"]
+        self._pipette_dict["aspirate_speed"] = p["aspirate_speed"]
+        self._pipette_dict["dispense_speed"] = p["dispense_speed"]
+        self._pipette_dict["blow_out_speed"] = p["blow_out_speed"]
 
     def _raise_if_no_tip(self, action: str) -> None:
         """Raise NoTipAttachedError if no tip."""
