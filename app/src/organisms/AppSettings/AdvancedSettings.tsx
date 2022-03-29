@@ -217,6 +217,29 @@ export function AdvancedSettings(): JSX.Element {
             <Text
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
+              id="AdvancedSettings_showLink"
+            >
+              {t('show_link_labware_data')}
+            </Text>
+            <Text css={TYPOGRAPHY.pRegular}>
+              {t('show_link_labware_data_description')}
+            </Text>
+          </Box>
+          <ToggleButton
+            label="display_unavailable_robots"
+            toggledOn={!displayUnavailRobots}
+            onClick={() =>
+              dispatch(Config.toggleConfigValue('discovery.disableCache'))
+            }
+            id="AdvancedSettings_showLinkToggleButton"
+          />
+        </Flex>
+        <Divider marginY={SPACING.spacing5} />
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Box width="70%">
+            <Text
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_clearRobots"
             >
               {t('clear_unavail_robots')}
