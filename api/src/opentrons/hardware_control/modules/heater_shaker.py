@@ -161,8 +161,7 @@ class HeaterShaker(mod_abc.AbstractModule):
     def model(self) -> str:
         return self._model_from_revision(self._device_info.get("model"))
 
-    @classmethod
-    def bootloader(cls) -> UploadFunction:
+    def bootloader(self) -> UploadFunction:
         return update.upload_via_dfu
 
     async def wait_next_poll(self) -> None:

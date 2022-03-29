@@ -28,6 +28,7 @@ class GCODE(str, Enum):
     DEACTIVATE_LID = "M108"
     DEACTIVATE_BLOCK = "M14"
     DEVICE_INFO = "M115"
+    ENTER_PROGRAMMING = "dfu"
 
 
 LID_TARGET_DEFAULT = 105  # Degree celsius (floats)
@@ -35,8 +36,6 @@ LID_TARGET_MIN = 37
 LID_TARGET_MAX = 110
 BLOCK_TARGET_MIN = 0
 BLOCK_TARGET_MAX = 99
-TEMP_UPDATE_RETRIES = 50
-TEMP_BUFFER_MAX_LEN = 10
 
 
 TC_BAUDRATE = 115200
@@ -50,17 +49,22 @@ TC_ACK = "ok" + SERIAL_ACK + "ok" + SERIAL_ACK
 DEFAULT_TC_TIMEOUT = 40
 DEFAULT_COMMAND_RETRIES = 3
 
+# The ACK for Gen2 will never contain a carriage return.
+TC_GEN2_SERIAL_ACK = "\n"
+TC_GEN2_ACK = " OK" + TC_GEN2_SERIAL_ACK
+TC_GEN2_ERROR_WORD = "ERR"
 
-class ThermocyclerDriver(AbstractThermocyclerDriver):
-    @classmethod
+
+class ThermocyclerDriverFactory:
+    @staticmethod
     async def create(
-        cls, port: str, loop: Optional[asyncio.AbstractEventLoop]
+        port: str, loop: Optional[asyncio.AbstractEventLoop]
     ) -> ThermocyclerDriver:
         """
-        Create a temp deck driver.
+        Create a thermocycler driver.
 
         Args:
-            port: port or url of temp deck
+            port: port or url of thermocycler
             loop: optional event loop
 
         Returns: driver
@@ -69,12 +73,43 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
             port=port,
             baud_rate=TC_BAUDRATE,
             timeout=DEFAULT_TC_TIMEOUT,
-            ack=TC_ACK,
+            ack=TC_GEN2_SERIAL_ACK,
             loop=loop,
             reset_buffer_before_write=False,
         )
-        return cls(connection=connection)
 
+        if await ThermocyclerDriverFactory.check_for_gen2_protocol(connection):
+            connection.set_ack(TC_GEN2_ACK)
+            connection.set_error_keyword(TC_GEN2_ERROR_WORD)
+            return ThermocyclerDriverV2(connection)
+        else:
+            connection.set_ack(TC_ACK)
+            # Must cycle the connection because the old setting of the ACK did
+            # not capture the entire response.
+            await connection.close()
+            await connection.open()
+            return ThermocyclerDriver(connection)
+
+    @staticmethod
+    async def check_for_gen2_protocol(connection: SerialConnection) -> bool:
+        """
+        Send a message through a connection to check if the connected
+        thermocycler is a Gen1 or Gen2 model
+        """
+
+        # The DEVICE_INFO response will disambiguate which version of
+        # TC is connected. Gen1 TC responses do not include the command code
+        c = CommandBuilder(terminator=TC_COMMAND_TERMINATOR).add_gcode(
+            gcode=GCODE.DEVICE_INFO
+        )
+        response = await connection.send_command(
+            command=c, retries=DEFAULT_COMMAND_RETRIES
+        )
+
+        return response.startswith(GCODE.DEVICE_INFO)
+
+
+class ThermocyclerDriver(AbstractThermocyclerDriver):
     def __init__(self, connection: SerialConnection) -> None:
         """
         Constructor
@@ -232,4 +267,44 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         )
         await asyncio.sleep(0.05)
         await trigger_connection.close()
+        await self._connection.close()
+
+
+class ThermocyclerDriverV2(ThermocyclerDriver):
+    """
+    This driver is for Thermocycler model Gen2.
+    """
+
+    def __init__(self, connection: SerialConnection) -> None:
+        """
+        Constructor
+
+        Args:
+            connection: SerialConnection to the thermocycler
+        """
+        super().__init__(connection)
+
+    async def set_ramp_rate(self, ramp_rate: float) -> None:
+        """Send a set ramp rate command"""
+        # This command is fully unsupported on TC Gen2
+        return None
+
+    async def get_device_info(self) -> Dict[str, str]:
+        """Send get device info command"""
+        c = CommandBuilder(terminator=TC_COMMAND_TERMINATOR).add_gcode(
+            gcode=GCODE.DEVICE_INFO
+        )
+        response = await self._connection.send_command(
+            command=c, retries=DEFAULT_COMMAND_RETRIES
+        )
+        return utils.parse_hs_device_information(device_info_string=response)
+
+    async def enter_programming_mode(self) -> None:
+        c = CommandBuilder(terminator=TC_COMMAND_TERMINATOR).add_gcode(
+            gcode=GCODE.ENTER_PROGRAMMING
+        )
+        # The timeout is overwritten because no response should ever come
+        await self._connection.send_command(
+            command=c, retries=DEFAULT_COMMAND_RETRIES, timeout=1
+        )
         await self._connection.close()

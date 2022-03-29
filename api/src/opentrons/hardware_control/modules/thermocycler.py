@@ -15,6 +15,8 @@ from opentrons.drivers.thermocycler import (
     AbstractThermocyclerDriver,
     SimulatingDriver,
     ThermocyclerDriver,
+    ThermocyclerDriverV2,
+    ThermocyclerDriverFactory,
 )
 
 
@@ -66,7 +68,7 @@ class Thermocycler(mod_abc.AbstractModule):
         polling_frequency = kwargs.get("polling_frequency")
         driver: AbstractThermocyclerDriver
         if not simulating:
-            driver = await ThermocyclerDriver.create(port=port, loop=loop)
+            driver = await ThermocyclerDriverFactory.create(port=port, loop=loop)
             polling_frequency = polling_frequency or POLLING_FREQUENCY_SEC
         else:
             driver = SimulatingDriver()
@@ -136,11 +138,16 @@ class Thermocycler(mod_abc.AbstractModule):
         return "thermocycler"
 
     def model(self) -> str:
-        return "thermocyclerModuleV1"
+        if isinstance(self._driver, ThermocyclerDriverV2):
+            return "thermocyclerModuleV2"
+        else:
+            return "thermocyclerModuleV1"
 
-    @classmethod
-    def bootloader(cls) -> types.UploadFunction:
-        return update.upload_via_bossa
+    def bootloader(self) -> types.UploadFunction:
+        if isinstance(self._driver, ThermocyclerDriverV2):
+            return update.upload_via_dfu
+        else:
+            return update.upload_via_bossa
 
     def _clear_cycle_counters(self) -> None:
         """Clear the cycle counters."""
