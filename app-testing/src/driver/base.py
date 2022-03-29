@@ -2,16 +2,22 @@
 
 Expose clear information upon failure.
 """
+from email import message
 import os
 import time
 from pathlib import Path
 from typing import Callable, Optional, Tuple
+from black import remove_trailing_semicolon
 
 from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.common.exceptions import (
+    StaleElementReferenceException,
+    NoSuchElementException,
+)
 
 
 class Element:
@@ -40,35 +46,36 @@ class Base:
 
     def apply_border(
         self,
-        element: WebElement,
-        effect_time_sec: float,
-        color: str,
-        border_size_px: int,
+        finder: Callable[..., WebElement],
+        effect_time_sec: float = float(os.getenv("HIGHLIGHT_SECONDS", "2")),
+        color: str = "magenta",
+        border_size_px: int = 3,
+        screenshot: bool = False,
+        screenshot_message: str = "",
     ) -> None:
         """Highlights (blinks) a Selenium Webdriver element."""
-        driver: WebDriver = element._parent
 
         def apply_style(argument: str) -> None:
             """Execute the javascript to apply the style."""
-            driver.execute_script(
-                "arguments[0].setAttribute('style', arguments[1]);", element, argument
+            self.driver.execute_script(
+                "arguments[0].setAttribute('style', arguments[1]);", finder(), argument
             )  # type: ignore
 
-        original_style = element.get_attribute("style")
+        original_style = finder().get_attribute("style")
         apply_style(f"border: {border_size_px}px solid {color};")
+        if screenshot:
+            self.take_screenshot(message=screenshot_message)
         time.sleep(effect_time_sec)
         apply_style(original_style)
 
-    def highlight_element(self, element: WebElement) -> None:
+    def highlight_element(self, finder: Callable[..., WebElement]) -> None:
         """Highlight an element."""
         slow_mo: Optional[str] = os.getenv("SLOWMO")
         if slow_mo:
             if slow_mo.lower() == "true":
-                self.apply_border(
-                    element, float(os.getenv("HIGHLIGHT_SECONDS", "2")), "magenta", 3
-                )
+                self.apply_border(finder)
 
-    def take_screenshot(self) -> None:
+    def take_screenshot(self, message: str = "") -> None:
         """Take a screenshot and place in the results directory."""
         directory_for_results: Path = Path(
             Path(__file__).resolve().parents[2], "results"
@@ -79,15 +86,29 @@ class Base:
             directory_for_results = Path(workspace, "test", "results")
         if not os.path.exists(directory_for_results):
             os.makedirs(directory_for_results)
+        note = "" if (message == "") else f"_{message}".replace(" ", "_")
         file_name = (
             f"{self.execution_id}_{time.time_ns()}".replace("/", "_")
             .replace("::", "__")
             .replace(".py", "")
+            + note
             + ".png"
         )
         screenshot_full_path: str = str(Path(directory_for_results, file_name))
-        self.console.print(f"screenshot full path: {screenshot_full_path}")
+        self.console.print(f"screenshot saved: {file_name}")
         self.driver.save_screenshot(screenshot_full_path)
+
+    def click(self, element: Element) -> None:
+        """Highlight the element to click.
+
+        screenshot when highlighted
+        un-highlight
+        click
+        screenshot after clicking"""
+        finder = self.create_finder(element, EC.element_to_be_clickable)
+        self.apply_border(finder, screenshot=True, screenshot_message="item to click")
+        finder().click()
+        self.take_screenshot(message="after click")
 
     def handle_exception(
         self, element: Element, current_exception: Exception, do_raise: bool
@@ -99,21 +120,58 @@ class Base:
             self.console.print(
                 "We are NOT raising an Exception.", style="bold red underline"
             )
+            self.console.print(current_exception)
         else:
             raise (current_exception)
 
+    def create_finder(
+        self,
+        element: Element,
+        expected_condition=EC.presence_of_element_located,
+        timeout_sec: int = 12,
+    ) -> Callable[..., WebElement]:
+        """Create finder function."""
+        ignored_exceptions = (
+            NoSuchElementException,
+            StaleElementReferenceException,
+        )
+
+        def finder() -> WebElement:
+            return WebDriverWait(
+                self.driver, timeout_sec, ignored_exceptions=ignored_exceptions
+            ).until(  # type: ignore
+                expected_condition(element.locator)  # type: ignore
+            )
+
+        return finder
+
     def clickable_wrapper(
-        self, element: Element, timeout_sec: int = 12, do_raise: bool = True
+        self,
+        element: Element,
+        timeout_sec: int = 12,
+        do_raise: bool = True,
     ) -> Optional[WebElement]:
         """Gracefully use the expected condition element_to_be_clickable."""
         try:
-            result: WebElement = WebDriverWait(
-                self.driver, timeout_sec
-            ).until(  # type: ignore
-                EC.element_to_be_clickable(element.locator)  # type: ignore
+            finder = self.create_finder(
+                element, EC.element_to_be_clickable, timeout_sec
             )
-            self.highlight_element(result)
-            return result
+            finder()
+            self.highlight_element(finder)
+            return finder()
+        except Exception as e:
+            self.handle_exception(element, e, do_raise)
+            return None
+
+    def present_wrapper(
+        self, element: Element, timeout_sec: int = 12, do_raise: bool = True
+    ) -> Optional[WebElement]:
+        """Gracefully use the expected condition presence_of_element_located."""
+        try:
+            finder = self.create_finder(element, timeout_sec=timeout_sec)
+            finder()
+            self.highlight_element(finder)
+            return finder()
         except Exception as e:
             self.handle_exception(element, e, do_raise)
             return None
@@ -123,9 +181,12 @@ class Base:
     ) -> Optional[WebElement]:
         """Gracefully use find_element."""
         try:
-            result: WebElement = self.driver.find_element(*element.locator)
-            self.highlight_element(result)
-            return result
+
+            def finder() -> WebElement:
+                return self.driver.find_element(*element.locator)
+
+            self.highlight_element(finder)
+            return finder()
         except Exception as e:
             self.handle_exception(element, e, do_raise)
             return None

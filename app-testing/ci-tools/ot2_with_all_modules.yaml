@@ -1,0 +1,43 @@
+######################
+# System Description #
+######################
+
+# This system builds an OT2 and 1 of each module.
+
+########################
+# Required Source Code #
+########################
+
+# All source code is pulled from the latest version in Github
+
+system-unique-id: ot2-with-all-modules
+robot:
+  id: otie
+  hardware: ot2
+  source-type: remote
+  source-location: latest
+  emulation-level: firmware
+  robot-server-source-type: remote
+  robot-server-source-location: latest
+  exposed-port: 31950
+modules:
+  - id: shakey-and-warm
+    hardware: heater-shaker-module
+    source-type: remote
+    source-location: latest
+    emulation_level: hardware
+  - id: t00-hot-to-handle
+    hardware: thermocycler-module
+    source-type: remote
+    source-location: latest
+    emulation_level: firmware
+  - id: fatal-attraction
+    hardware: magnetic-module
+    source-type: remote
+    source-location: latest
+    emulation_level: firmware
+  - id: temperamental
+    hardware: temperature-module
+    source-type: remote
+    source-location: latest
+    emulation_level: firmware
