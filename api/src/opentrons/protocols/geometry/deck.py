@@ -1,3 +1,4 @@
+import functools
 import logging
 from collections import UserDict
 from dataclasses import dataclass
@@ -68,6 +69,7 @@ class Deck(UserDict):
             self.__setitem__(slot_name, loaded_f)
 
     @staticmethod
+    @functools.lru_cache(20)
     def _assure_int(key: object) -> int:
         if isinstance(key, str):
             return int(key)
@@ -99,7 +101,9 @@ class Deck(UserDict):
         if old:
             self.recalculate_high_z()
             # Update the thermocycler present member
-            self._thermocycler_present = any(isinstance(item, ThermocyclerGeometry) for item in self.data.values())
+            self._thermocycler_present = any(
+                isinstance(item, ThermocyclerGeometry) for item in self.data.values()
+            )
 
     def __setitem__(self, key: types.DeckLocation, val: DeckItem) -> None:
         slot_key_int = self._check_name(key)
@@ -302,5 +306,5 @@ class Deck(UserDict):
 
     @property
     def thermocycler_present(self) -> bool:
-        """"""
+        """Is a thermocycler present on the deck."""
         return self._thermocycler_present

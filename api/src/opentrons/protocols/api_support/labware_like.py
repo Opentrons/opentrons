@@ -22,6 +22,7 @@ class LabwareLikeType(int, Enum):
 
 class LabwareLike:
     """A wrapper for a labware like object."""
+
     def __init__(self, labware_like: WrappableLabwareLike):
         """
         Create a labware like object. Used by Location object's labware field.
@@ -29,7 +30,10 @@ class LabwareLike:
         self._labware_like = labware_like
 
     @property
+    @functools.lru_cache(1)
     def object(self) -> WrappableLabwareLike:
+        if isinstance(self._labware_like, LabwareLike):
+            return self._labware_like.object
         return self._labware_like
 
     @property
@@ -39,20 +43,20 @@ class LabwareLike:
         from opentrons.protocol_api.labware import Labware, Well
         from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 
-        _type = LabwareLikeType.NONE
+        obj_type = LabwareLikeType.NONE
 
         if isinstance(self._labware_like, Well):
-            _type = LabwareLikeType.WELL
+            obj_type = LabwareLikeType.WELL
         elif isinstance(self._labware_like, Labware):
-            _type = LabwareLikeType.LABWARE
+            obj_type = LabwareLikeType.LABWARE
         elif isinstance(self._labware_like, str):
-            _type = LabwareLikeType.SLOT
+            obj_type = LabwareLikeType.SLOT
         elif isinstance(self._labware_like, ModuleGeometry):
-            _type = LabwareLikeType.MODULE
+            obj_type = LabwareLikeType.MODULE
         elif isinstance(self._labware_like, LabwareLike):
-            _type = self._labware_like.object_type
+            obj_type = self._labware_like.object_type
 
-        return _type
+        return obj_type
 
     @property
     def has_parent(self) -> bool:
@@ -146,7 +150,7 @@ class LabwareLike:
 
         return _fp_recurse(self)
 
-    @functools.lru_cache(None)
+    # @functools.lru_cache(None)
     def module_parent(self) -> Optional["ModuleGeometry"]:
         """
         Return the closest parent of this LabwareLike (including, possibly,
@@ -166,7 +170,7 @@ class LabwareLike:
             return None
         return recursive_get_module_parent(self)
 
-    @functools.lru_cache(None)
+    # @functools.lru_cache(None)
     def quirks_from_any_parent(self) -> Set[str]:
         """Walk the tree of wells and labwares and extract quirks"""
 
@@ -190,10 +194,10 @@ class LabwareLike:
 
     def __str__(self) -> str:
         if self.is_slot:
-            return self._labware_like
+            return self.object
         elif self.is_empty:
             return ""
-        return repr(self._labware_like)
+        return repr(self.object)
 
     def __repr__(self) -> str:
         return str(self)
