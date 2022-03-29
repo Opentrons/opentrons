@@ -16,7 +16,6 @@ function findPython(): string | undefined {
     path.join(process.resourcesPath, 'python', 'bin', 'python3'),
   ]
 
-  log.debug('IN FIND PYTHON', { pathToPythonOverride })
   if (pathToPythonOverride != null) {
     possiblePythonPaths = [
       pathToPythonOverride,
@@ -52,9 +51,7 @@ export function runFileWithPython(
 ): Promise<void> {
   const pythonPath = findPython()
 
-  log.debug('IN RUN FILE WITH PYTHON', { pythonPath, srcFilePath })
   if (pythonPath != null) {
-    log.debug('BEFORE PYTHON IS EXECUTED', pythonPath, srcFilePath)
     return execa(pythonPath, [
       '-m',
       'opentrons.cli.__init__',
@@ -63,7 +60,7 @@ export function runFileWithPython(
       srcFilePath,
     ])
       .then(output => {
-        log.info('python out', output)
+        log.debug('python output: ', output)
         fs.writeFile(destFilePath, output.stdout)
       })
       .catch(e => {
