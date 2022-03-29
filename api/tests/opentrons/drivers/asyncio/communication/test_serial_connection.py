@@ -96,6 +96,29 @@ async def test_send_command_response(
 
 
 @pytest.mark.parametrize(
+    argnames=["ack", "serial_response", "expected_response"],
+    argvalues=[
+        [" OK\n", "M104 OK\n", "M104"],
+        ["ok\r\nok\r\n", "sounds good\r\nok\r\nok\r\n", "sounds good"],
+        ["ACK\n", "ABCDACK\n", "ABCD"],
+    ],
+)
+async def test_change_ack(
+    mock_serial_port: AsyncMock,
+    subject: SerialConnection,
+    ack: str,
+    serial_response: str,
+    expected_response: str,
+) -> None:
+    """It should recognize the new ack in the message"""
+    mock_serial_port.read_until.return_value = serial_response.encode()
+
+    response = await subject.send_data(data="mock data")
+
+    assert response == expected_response
+
+
+@pytest.mark.parametrize(
     argnames=["response", "exception_type"],
     argvalues=[
         ["error", ErrorResponse],
@@ -114,6 +137,23 @@ def test_raise_on_error(
 ) -> None:
     """It should raise an exception on error/alarm responses."""
     with pytest.raises(expected_exception=exception_type, match=response):
+        subject.raise_on_error(response)
+
+
+@pytest.mark.parametrize(
+    argnames=["keyword", "response"],
+    argvalues=[
+        ["banana", "there is a banana"],
+        ["err", "err:301:critical error"],
+        ["err", "ERR:100"],
+    ],
+)
+def test_change_error_keyword(
+    subject: SerialConnection, keyword: str, response: str
+) -> None:
+    """It should raise an error due to the new error keyword"""
+    with pytest.raises(expected_exception=ErrorResponse, match=response):
+        subject.set_error_keyword(keyword)
         subject.raise_on_error(response)
 
 
