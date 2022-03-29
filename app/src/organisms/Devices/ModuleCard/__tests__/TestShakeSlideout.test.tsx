@@ -21,9 +21,12 @@ const mockHeaterShakerModuleCard = HeaterShakerModuleCard as jest.MockedFunction
 const mockUseLatchCommand = useLatchCommand as jest.MockedFunction<
   typeof useLatchCommand
 >
+
+const render = (props: React.ComponentProps<typeof TestShakeSlideout>) => {
   return renderWithProviders(<TestShakeSlideout {...props} />, {
     i18nInstance: i18n,
   })[0]
+}
 
 const mockOpenLatchHeaterShaker = {
   model: 'heaterShakerModuleV1',
