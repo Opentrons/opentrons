@@ -213,10 +213,10 @@ class OT3Controller:
             None
         """
         group = create_move_group(origin, moves, self._present_nodes, stop_condition)
-        move_group, final_positions = group
+        move_group, _ = group
         runner = MoveGroupRunner(move_groups=[move_group])
-        await runner.run(can_messenger=self._messenger)
-        self._position.update(final_positions)
+        positions = await runner.run(can_messenger=self._messenger)
+        self._position.update(positions)
 
     async def home(self, axes: Sequence[OT3Axis]) -> OT3AxisMap[float]:
         """Home each axis passed in, and reset the positions to 0.
@@ -236,32 +236,32 @@ class OT3Controller:
 
         distances_gantry = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
-            for ax in axes
+            for ax in checked_axes
             if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
         }
         velocities_gantry = {
             ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
-            for ax in axes
+            for ax in checked_axes
             if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
         }
         distances_z = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
-            for ax in axes
+            for ax in checked_axes
             if ax in OT3Axis.mount_axes()
         }
         velocities_z = {
             ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
-            for ax in axes
+            for ax in checked_axes
             if ax in OT3Axis.mount_axes()
         }
         distances_pipette = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
-            for ax in axes
+            for ax in checked_axes
             if ax in OT3Axis.pipette_axes()
         }
         velocities_pipette = {
             ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
-            for ax in axes
+            for ax in checked_axes
             if ax in OT3Axis.pipette_axes()
         }
         move_group_gantry_z = []
@@ -290,13 +290,9 @@ class OT3Controller:
             coros.append(runner_gantry_z.run(can_messenger=self._messenger))
         if move_group_pipette:
             coros.append(runner_pipette.run(can_messenger=self._messenger))
-        await asyncio.gather(*coros)
-
-        axis_positions = {
-            axis_to_node(ax): self._get_home_position()[axis_to_node(ax)]
-            for ax in checked_axes
-        }
-        self._position.update(axis_positions)
+        positions = await asyncio.gather(*coros)
+        for position in positions:
+            self._position.update(position)
 
         return axis_convert(self._position, 0.0)
 

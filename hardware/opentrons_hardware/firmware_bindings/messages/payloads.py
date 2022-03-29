@@ -140,7 +140,7 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
     """Notification of a completed move group."""
 
     seq_id: utils.UInt8Field
-    current_position: utils.UInt32Field
+    current_position_um: utils.UInt32Field
     ack_id: utils.UInt8Field
 
 
