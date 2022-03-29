@@ -125,6 +125,8 @@ class MessageId(int, Enum):
     set_sensor_threshold_response = 0x87
     sensor_diagnostic_request = 0x88
     sensor_diagnostic_response = 0x89
+    bind_sensor_output_request = 0x8a
+    bind_sensor_output_response = 0x8b
 
 
 @unique
@@ -170,3 +172,11 @@ class PipetteName(int, Enum):
 
     p1000_single = 0x00
     p1000_multi = 0x01
+
+
+@unique
+class SensorOutputBinding(int, Enum):
+    """Links sensor threshold triggers to pins."""
+
+    none = 0x00
+    sync = 0x01

@@ -14,6 +14,7 @@ from .fields import (
     SensorTypeField,
     PipetteNameField,
     PipetteSerialField,
+    SensorOutputBindingField,
 )
 from .. import utils
 
@@ -346,6 +347,22 @@ class SensorDiagnosticResponsePayload(utils.BinarySerializable):
     sensor: SensorTypeField
     reg_address: utils.UInt8Field
     data: utils.UInt32Field
+
+
+@dataclass
+class BindSensorOutputRequestPayload(utils.BinarySerializable):
+    """A request to link a GPIO pin output to a sensor threshold."""
+
+    sensor: SensorTypeField
+    binding: SensorOutputBindingField
+
+
+@dataclass
+class BindSensorOutputResponsePayload(utils.BinarySerializable):
+    """A response that sends back the current binding for a sensor."""
+
+    sensor: SensorTypeField
+    binding: SensorOutputBindingField
 
 
 @dataclass
