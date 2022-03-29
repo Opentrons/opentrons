@@ -188,12 +188,23 @@ class InstrumentContextSimulation(AbstractInstrument):
         dispense: typing.Optional[float] = None,
         blow_out: typing.Optional[float] = None,
     ) -> None:
-        if aspirate is not None:
-            self._pipette_dict["aspirate_flow_rate"] = aspirate
-        if dispense is not None:
-            self._pipette_dict["dispense_flow_rate"] = dispense
-        if blow_out is not None:
-            self._pipette_dict["blow_out_flow_rate"] = blow_out
+        self._protocol_interface.get_hardware().set_flow_rate(
+            mount=self._mount,
+            aspirate=aspirate,
+            dispense=dispense,
+            blow_out=blow_out,
+        )
+        self._update_flow_rate()
+
+    def _update_flow_rate(self):
+        p = self._protocol_interface.get_hardware().get_attached_instrument(
+            self.get_mount())
+        self._pipette_dict["aspirate_flow_rate"] = p["aspirate_flow_rate"]
+        self._pipette_dict["dispense_flow_rate"] = p["dispense_flow_rate"]
+        self._pipette_dict["blow_out_flow_rate"] = p["blow_out_flow_rate"]
+        self._pipette_dict["aspirate_speed"] = p["aspirate_speed"]
+        self._pipette_dict["dispense_speed"] = p["dispense_speed"]
+        self._pipette_dict["blow_out_speed"] = p["blow_out_speed"]
 
     def set_pipette_speed(
         self,
@@ -201,12 +212,13 @@ class InstrumentContextSimulation(AbstractInstrument):
         dispense: typing.Optional[float] = None,
         blow_out: typing.Optional[float] = None,
     ) -> None:
-        if aspirate is not None:
-            self._pipette_dict["aspirate_speed"] = aspirate
-        if dispense is not None:
-            self._pipette_dict["dispense_speed"] = dispense
-        if blow_out is not None:
-            self._pipette_dict["blow_out_speed"] = blow_out
+        self._protocol_interface.get_hardware().set_pipette_speed(
+            mount=self._mount,
+            aspirate=aspirate,
+            dispense=dispense,
+            blow_out=blow_out,
+        )
+        self._update_flow_rate()
 
     def _raise_if_no_tip(self, action: str) -> None:
         """Raise NoTipAttachedError if no tip."""
