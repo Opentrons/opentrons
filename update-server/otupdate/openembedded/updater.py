@@ -252,7 +252,6 @@ class Updater(UpdateActionsInterface):
         )
         return unused_partition
 
-
     def unzip(
         self, downloaded_update_path: str, progress_callback: Callable[[float], None]
     ) -> Tuple[Mapping[str, Optional[str]], Mapping[str, int]]:

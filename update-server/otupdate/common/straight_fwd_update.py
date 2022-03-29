@@ -45,7 +45,8 @@ def _begin_straight_fwd_unzip(
                     session,
                     config,
                     loop,
-                    "/var/lib/otupdate/downloads/Verdin-iMX8MM_opentrons-ot3-image.rootfs.ext4",
+                    "/var/lib/otupdate/downloads"
+                    "/Verdin-iMX8MM_opentrons-ot3-image.rootfs.ext4",
                     actions,
                 )
             )
@@ -107,9 +108,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             f"{session.download_path}, in file_upload"
         )
         if part.name != "rootfs.zip":
-            LOG.warning(
-                f"Unknown field name {part.name} in file_upload, ignoring"
-            )
+            LOG.warning(f"Unknown field name {part.name} in file_upload, ignoring")
             await part.release()
         else:
             LOG.warning("_save_file called from file_upload")
