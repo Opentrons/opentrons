@@ -23,6 +23,7 @@ import type { LabwareDefAndDate } from './hooks'
 
 export interface LabwareCardProps {
   labware: LabwareDefAndDate
+  onClick: () => void
 }
 
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
@@ -32,6 +33,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const displayName = definition?.metadata.displayName
   const displayCategory = startCase(definition.metadata.displayCategory)
   const isCustomDefinition = modified != null
+
   return (
     <Box
       backgroundColor={COLORS.white}
@@ -39,6 +41,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
       css={BORDERS.cardOutlineBorder}
       padding={SPACING.spacing4}
       height="7.375rem"
+      onClick={props.onClick}
     >
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} height="100%">
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>

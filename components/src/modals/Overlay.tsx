@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Flex, POSITION_ABSOLUTE } from '..'
+import { Flex, POSITION_FIXED } from '..'
 
 export interface OverlayProps {
   /** optional onClick handler */
@@ -19,8 +19,8 @@ export function Overlay(props: OverlayProps): JSX.Element {
 
   return (
     <Flex
-      position={POSITION_ABSOLUTE}
-      left="0"
+      position={POSITION_FIXED}
+      left="6rem"
       right="0"
       top="0"
       bottom="0"

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useParams, Route } from 'react-router-dom'
 import {
   Box,
   Flex,
@@ -13,18 +14,28 @@ import {
   ALIGN_CENTER,
   Icon,
 } from '@opentrons/components'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/Buttons'
 import { Toast } from '../../atoms/Toast'
 
 import { LabwareCard } from './LabwareCard'
 import { AddCustomLabware } from './AddCustomLabware'
-import { useGetAllLabware, useLabwareFailure, useNewLabwareName } from './hooks'
+import { LabwareDetails } from './LabwareDetails'
+import {
+  LabwareDefAndDate,
+  useGetAllLabware,
+  useLabwareFailure,
+  useNewLabwareName,
+} from './hooks'
+import type { NextGenRouteParams } from '../../App/NextGenApp'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 
 export function Labware(): JSX.Element {
   const { t } = useTranslation('labware_landing')
+  const { labwareUri } = useParams<NextGenRouteParams>()
+  console.log(labwareUri)
 
   const labware = useGetAllLabware()
   const { labwareFailureMessage, clearLabwareFailure } = useLabwareFailure()
@@ -34,6 +45,11 @@ export function Labware(): JSX.Element {
   )
   const [showSuccessToast, setShowSuccessToast] = React.useState(false)
   const [showFailureToast, setShowFailureToast] = React.useState(false)
+  const [
+    currentLabwareDef,
+    setCurrentLabwaredef,
+  ] = React.useState<null | LabwareDefAndDate>(null)
+
   React.useEffect(() => {
     if (labwareFailureMessage != null) {
       setShowAddLabwareSlideout(false)
@@ -68,6 +84,9 @@ export function Labware(): JSX.Element {
             <LabwareCard
               key={labware.definition.metadata.displayName}
               labware={labware}
+              onClick={() => {
+                setCurrentLabwaredef(labware)
+              }}
             />
           ))}
         </Flex>
@@ -125,6 +144,12 @@ export function Labware(): JSX.Element {
             setShowFailureToast(false)
             clearLabwareFailure()
           }}
+        />
+      )}
+      {currentLabwareDef != null && (
+        <LabwareDetails
+          labware={currentLabwareDef}
+          onClose={() => setCurrentLabwaredef(null)}
         />
       )}
     </>

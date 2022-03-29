@@ -15,6 +15,7 @@ import {
   TYPOGRAPHY,
   Overlay,
   StyleProps,
+  POSITION_FIXED,
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
@@ -81,7 +82,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
       ) : null}
       <Box
         css={isExpanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
-        position={POSITION_ABSOLUTE}
+        position={POSITION_FIXED}
         right="0"
         top="0"
         backgroundColor={COLORS.white}

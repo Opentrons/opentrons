@@ -1,0 +1,20 @@
+{
+  "tube": "Tube",
+  "tip": "tip",
+  "well": "Well",
+  "count": "Count",
+  "v": "V_Bottom",
+  "u": "U_Bottom",
+  "flat": "Flat_Bottom",
+  "well_count": "Well Count",
+  "max_volume": "max volume",
+  "shape": "shape",
+  "footprint": "Footprint (mm)",
+  "length": "length",
+  "width": "width",
+  "height": "height",
+  "well_measurements": "Well Measurements (mm)",
+  "depth": "depth",
+  "diameter": "diameter",
+  "various": "various"
+}
