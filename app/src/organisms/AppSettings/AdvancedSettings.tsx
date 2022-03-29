@@ -46,7 +46,7 @@ export function AdvancedSettings(): JSX.Element {
     Config.getUpdateChannelOptions
   )
   const labwarePath = useSelector(CustomLabware.getCustomLabwareDirectory)
-  const isLabwareOffsetCodeSnippetOn = useSelector(
+  const isLabwareOffsetCodeSnippetsOn = useSelector(
     Config.getIsLabwareOffsetCodeSnippetsOn
   )
   const dispatch = useDispatch<Dispatch>()
@@ -67,8 +67,8 @@ export function AdvancedSettings(): JSX.Element {
   const toggleLabwareOffsetData = (): unknown =>
     dispatch(
       Config.updateConfigValue(
-        'labwareOffsetCodeSnippets',
-        !isLabwareOffsetCodeSnippetOn
+        'labware.showLabwareOffsetCodeSnippets',
+        Boolean(!isLabwareOffsetCodeSnippetsOn)
       )
     )
   const toggleDevtools = (): unknown => dispatch(Config.toggleDevtools())
@@ -236,8 +236,9 @@ export function AdvancedSettings(): JSX.Element {
             </Text>
           </Box>
           <ToggleButton
-            label="display_unavailable_robots"
-            toggledOn={isLabwareOffsetCodeSnippetOn}
+            label="show_link_to_get_labware_offset_data"
+            toggledOn={isLabwareOffsetCodeSnippetsOn}
+            // onClick={() => toggleLabwareOffsetData}
             onClick={toggleLabwareOffsetData}
             id="AdvancedSettings_showLinkToggleButton"
           />
