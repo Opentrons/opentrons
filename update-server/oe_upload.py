@@ -28,7 +28,7 @@ async def poll_status(sess, token, root):
 
 async def do_update(update_file: str, host: str, kind: UPDATE_KIND,
                     pause_between_steps: bool = False):
-    timeout = aiohttp.ClientTimeout(total=3600)
+    timeout = aiohttp.ClientTimeout(total=7200)
     async with aiohttp.ClientSession(timeout=timeout) as session:
         if kind == UPDATE_KIND.MIGRATE:
             root = host + '/server/update/migration'

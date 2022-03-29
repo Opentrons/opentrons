@@ -3,6 +3,7 @@ import contextlib
 import os
 import zipfile
 
+
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
 from typing import Callable, Optional, Tuple, Mapping, Dict
 import enum
@@ -40,8 +41,8 @@ class PartitionManager:
         # set other partition as unused partition!
         which = subprocess.check_output(["fw_printenv", "-n", "root_part"])
         return {
-            b"2": RootPartitions.THREE.value,
-            b"3": RootPartitions.TWO.value,
+            b"2\n": RootPartitions.THREE.value,
+            b"3\n": RootPartitions.TWO.value,
             # if output is empty, current part is 2, set unused to 3!
             b"\n": RootPartitions.THREE.value,
         }[which]
@@ -80,11 +81,11 @@ class RootFSInterface:
                 with zf.open(fi) as zipped, open(uncomp_path, "wb") as unzipped:
                     LOG.debug(f"Beginning unzip of {fi.filename} to {uncomp_path}")
                     while True:
-                        chunk = zipped.read(1024)
+                        chunk = zipped.read(2048)
                         unzipped.write(chunk)
                         written_size += len(chunk)
                         progress_callback(written_size / total_size)
-                        if len(chunk) != 1024:
+                        if len(chunk) != 2048:
                             break
                         LOG.debug(f"Unzipped {fi.filename} to {uncomp_path}")
                         file_paths[fi.filename] = uncomp_path
@@ -250,6 +251,7 @@ class Updater(UpdateActionsInterface):
             file_size,
         )
         return unused_partition
+
 
     def unzip(
         self, downloaded_update_path: str, progress_callback: Callable[[float], None]
