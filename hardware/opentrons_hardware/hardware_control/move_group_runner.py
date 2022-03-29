@@ -56,6 +56,14 @@ class MoveGroupRunner:
         self._move_groups = move_groups
         self._start_at_index = start_at_index
 
+    @staticmethod
+    def _has_moves(move_groups: MoveGroups) -> bool:
+        for move_group in move_groups:
+            for move in move_group:
+                for node, step in move.items():
+                    return True
+        return False
+
     async def run(self, can_messenger: CanMessenger) -> NodeDict[float]:
         """Run the move group.
 
@@ -66,7 +74,7 @@ class MoveGroupRunner:
             The current position after the move for all the axes that
             acknowledged completing moves.
         """
-        if not self._move_groups:
+        if not self._has_moves(self._move_groups):
             log.debug("No moves. Nothing to do.")
             return {}
 

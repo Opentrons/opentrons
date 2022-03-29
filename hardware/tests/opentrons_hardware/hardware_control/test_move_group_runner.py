@@ -1,6 +1,6 @@
 """Tests for the move scheduler."""
 import pytest
-from typing import List, Tuple
+from typing import List, Tuple, Any
 from mock import AsyncMock, call, MagicMock
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 
@@ -635,3 +635,13 @@ def test_accumulate_move_completions(
 ) -> None:
     """Build correct move results."""
     assert MoveGroupRunner._accumulate_move_completions(completions) == position_map
+
+
+@pytest.mark.parametrize("empty_group", [[], [[]], [[{}]]])
+async def test_empty_groups(
+    mock_can_messenger: AsyncMock, empty_group: List[Any]
+) -> None:
+    """Test that various kinds of empty groups result in no calls."""
+    mg = MoveGroupRunner(empty_group)
+    await mg.run(mock_can_messenger)
+    mock_can_messenger.send.assert_not_called()
