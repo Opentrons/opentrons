@@ -77,9 +77,9 @@ export function IpHostnameItem(props: IpHostnameItemProps): JSX.Element {
           color={COLORS.darkBlack}
           onClick={remove}
           marginLeft={SPACING.spacing4}
-          data-testid={`close-button`}
+          data-testid="close-button"
         >
-          <Icon name={'close'} />
+          <Icon name="close" />
         </Btn>
       </Flex>
       <Divider width="100%" />
