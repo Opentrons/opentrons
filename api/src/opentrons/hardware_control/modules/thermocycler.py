@@ -71,7 +71,7 @@ class Thermocycler(mod_abc.AbstractModule):
             driver = await ThermocyclerDriverFactory.create(port=port, loop=loop)
             polling_frequency = polling_frequency or POLLING_FREQUENCY_SEC
         else:
-            driver = SimulatingDriver()
+            driver = SimulatingDriver(model=sim_model)
             polling_frequency = polling_frequency or SIM_POLLING_FREQUENCY_SEC
 
         mod = cls(
@@ -138,9 +138,12 @@ class Thermocycler(mod_abc.AbstractModule):
         return "thermocycler"
 
     def model(self) -> str:
-        if isinstance(self._driver, ThermocyclerDriverV2):
+        if isinstance(self._driver, SimulatingDriver):
+            return self._driver.model()
+        elif isinstance(self._driver, ThermocyclerDriverV2):
             return "thermocyclerModuleV2"
         else:
+            # Real module that is not a V2
             return "thermocyclerModuleV1"
 
     def bootloader(self) -> types.UploadFunction:
