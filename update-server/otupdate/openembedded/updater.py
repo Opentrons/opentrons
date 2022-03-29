@@ -1,13 +1,11 @@
 """OE Updater and dependency injection classes."""
 import contextlib
-import os
 import lzma
 import shutil
-import zipfile
 
 
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
-from typing import Callable, Optional, Tuple, Mapping, Dict
+from typing import Callable, Optional
 import enum
 import subprocess
 
@@ -59,41 +57,6 @@ class PartitionManager:
 
 class RootFSInterface:
     """RootFS interface class."""
-
-    def unzip(
-        self, downloaded_update_path: str, progress_callback: Callable[[float], None]
-    ) -> Tuple[Mapping[str, Optional[str]], Mapping[str, int]]:
-        written_size = 0
-        total_size = 0
-        file_paths: Dict[str, Optional[str]] = {}
-        file_sizes: Dict[str, int] = {}
-        LOG.debug(
-            f"downloaded_update path: {downloaded_update_path}, "
-            f"in RootFSInterface::unzip "
-        )
-        with zipfile.ZipFile(downloaded_update_path, "r") as zf:
-            files = zf.infolist()
-            LOG.debug(f"Found files {files}, in RootFSInterface::unzip")
-            for fi in files:
-                total_size = total_size + fi.file_size
-            for fi in files:
-                uncomp_path = os.path.join(
-                    os.path.dirname(downloaded_update_path), fi.filename
-                )
-                with zf.open(fi) as zipped, open(uncomp_path, "wb") as unzipped:
-                    LOG.debug(f"Beginning unzip of {fi.filename} to {uncomp_path}")
-                    while True:
-                        chunk = zipped.read(2048)
-                        unzipped.write(chunk)
-                        written_size += len(chunk)
-                        progress_callback(written_size / total_size)
-                        if len(chunk) != 2048:
-                            break
-                        LOG.debug(f"Unzipped {fi.filename} to {uncomp_path}")
-                        file_paths[fi.filename] = uncomp_path
-                        file_sizes[fi.filename] = fi.file_size
-        return file_paths, file_sizes
-
     def write_file(
         self,
         infile: str,
@@ -102,35 +65,7 @@ class RootFSInterface:
         chunk_size: int = 1024,
         file_size: int = None,
     ):
-        """Write a file to another file with progress callbacks.
-
-        :param infile: The input filepath
-        :param outfile: The output filepath
-        :param progress_callback: The callback to call for progress
-        :param chunk_size: The size of file chunks to copy in between progress
-                           notifications
-        :param file_size: The total size of the update file (for generating
-                          progress percentage). If ``None``, generated with
-                          ``seek``/``tell``.
-        """
-        total_written = 0
-
-        with open(infile, "rb") as img, open(outfile, "wb") as part:
-            if None is file_size:
-                file_size = img.seek(0, 2)
-                img.seek(0)
-                LOG.info(f"write_file: file size calculated as {file_size}B")
-            LOG.info(
-                f"write_file: writing {infile} ({file_size}B)"
-                f" to {outfile} in {chunk_size}B chunks"
-            )
-            while True:
-                chunk = img.read(chunk_size)
-                part.write(chunk)
-                total_written += len(chunk)
-                progress_callback(total_written / file_size)
-                if len(chunk) != chunk_size:
-                    break
+        pass
 
 
 class Updater(UpdateActionsInterface):
@@ -220,75 +155,9 @@ class Updater(UpdateActionsInterface):
         file_size: int = None,
     ) -> Partition:
 
-        """
-        Write the new rootfs to the next root partition
-
-        - Figure out, from the system, the correct root partition to write to
-        - Write the rootfs at ``rootfs_filepath`` there, with progress
-
-        :param rootfs_filepath: The path to a checked rootfs.ext4
-        :param progress_callback: A callback to call periodically with progress
-                                  between 0 and 1.0. May never reach precisely
-                                  1.0, best only for user information.
-        :param chunk_size: The size of file chunks to copy in between progress
-                           notifications
-        :param file_size: The total size of the update file (for generating
-                          progress percentage). If ``None``, generated with
-                          ``seek``/``tell``.
-        :returns: The root partition that the rootfs image was written to, e.g.
-                  ``RootPartitions.TWO`` or ``RootPartitions.THREE``.
-        """
-
         LOG.warning("Entering write_update of Updater class!")
         unused_partition = self.part_mngr.find_unused_partition()
-        LOG.warning(f"Found unused partition: {unused_partition}")
-        LOG.warning(
-            f"rootf_fs roots fs being read from {rootfs_filepath}, in write_update"
-        )
-        self.root_FS_intf.write_file(
-            rootfs_filepath,
-            unused_partition.path,
-            progress_callback,
-            chunk_size,
-            file_size,
-        )
         return unused_partition
-
-    def unzip(
-        self, downloaded_update_path: str, progress_callback: Callable[[float], None]
-    ) -> Tuple[Mapping[str, Optional[str]], Mapping[str, int]]:
-        LOG.warning("Entering unzip of Updater class!")
-        LOG.warning(f"path passed to Updater::unzip {downloaded_update_path}")
-        written_size = 0
-        total_size = 0
-        file_paths: Dict[str, Optional[str]] = {}
-        file_sizes: Dict[str, int] = {}
-        LOG.warning(
-            f"downloaded_update path: {downloaded_update_path}, "
-            f"in RootFSInterface::update "
-        )
-        with zipfile.ZipFile(downloaded_update_path, "r") as zf:
-            files = zf.infolist()
-            LOG.warning(f"Found files {files}, in RootFSInterface::unzip")
-            for fi in files:
-                total_size = total_size + fi.file_size
-            for fi in files:
-                uncomp_path = os.path.join(
-                    os.path.dirname(downloaded_update_path), fi.filename
-                )
-                with zf.open(fi) as zipped, open(uncomp_path, "wb") as unzipped:
-                    LOG.warning(f"Beginning unzip of {fi.filename} to {uncomp_path}")
-                    while True:
-                        chunk = zipped.read(1024)
-                        unzipped.write(chunk)
-                        written_size += len(chunk)
-                        progress_callback(written_size / total_size)
-                        if len(chunk) != 1024:
-                            break
-                    LOG.warning(f"Unzipped {fi.filename} to {uncomp_path}")
-                    file_paths[fi.filename] = uncomp_path
-                    file_sizes[fi.filename] = fi.file_size
-        return file_paths, file_sizes
 
     def untar_and_write(
         self, downloaded_update_path: str, progress_callback: Callable[[float], None]

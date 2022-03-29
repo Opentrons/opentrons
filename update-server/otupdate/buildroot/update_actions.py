@@ -35,11 +35,6 @@ class RootPartitions(enum.Enum):
 
 
 class OT2UpdateActions(UpdateActionsInterface):
-    def unzip(
-        self, downloaded_update_path: str, progress_callback: Callable[[float], None]
-    ) -> Tuple[Mapping[str, Optional[str]], Mapping[str, int]]:
-        """Unzip update file."""
-        pass
 
     def untar_and_write(
         self, downloaded_update_path: str, progress_callback: Callable[[float], None]

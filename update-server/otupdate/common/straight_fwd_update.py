@@ -11,51 +11,6 @@ from otupdate.common.update import require_session, _save_file
 LOG = logging.getLogger(__name__)
 
 
-def _begin_straight_fwd_unzip(
-    session: UpdateSession,
-    config: config.Config,
-    loop: asyncio.AbstractEventLoop,
-    downloaded_update_path: str,
-    actions: update_actions.UpdateActionsInterface,
-) -> asyncio.futures.Future:
-    """Start the unzip process!"""
-    LOG.warning("Entered _begin_straight_fwd_unzip")
-    LOG.warning(f"file path, {downloaded_update_path}, in _begin_straight_fwd_unzip")
-    session.set_stage(Stages.VALIDATING)
-    unzip_future = asyncio.ensure_future(
-        loop.run_in_executor(
-            None,
-            actions.unzip,
-            downloaded_update_path,
-            session.set_progress,
-        )
-    )
-
-    def unzip_done(fut):
-        exc = fut.exception()
-        if exc:
-            LOG.exception(exc)
-            LOG.warning("exception in unzip")
-            session.set_error(getattr(exc, "short", str(type(exc))), str(exc))
-        else:
-            LOG.warning(f"unzip successful {fut.result()}")
-            files, sizes = fut.result()
-            loop.call_soon_threadsafe(
-                _begin_straight_fwd_write(
-                    session,
-                    config,
-                    loop,
-                    "/var/lib/otupdate/downloads"
-                    "/Verdin-iMX8MM_opentrons-ot3-image.rootfs.ext4",
-                    # "/var/lib/otupdate/downloads/rootfs.ext4",
-                    actions,
-                )
-            )
-
-    unzip_future.add_done_callback(unzip_done)
-    return unzip_future
-
-
 def _begin_straight_fwd_write(
     session: UpdateSession,
     config: config.Config,

@@ -145,6 +145,7 @@ def main():
     parser.add_argument('-s', '--step-by-step', action='store_true',
                         help='Pause until the user hits enter in between each '
                         'stage. Useful for dev workflows')
+
     args = parser.parse_args()
     asyncio.get_event_loop().run_until_complete(
         do_update(
