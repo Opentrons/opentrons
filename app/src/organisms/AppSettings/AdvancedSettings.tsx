@@ -46,6 +46,9 @@ export function AdvancedSettings(): JSX.Element {
     Config.getUpdateChannelOptions
   )
   const labwarePath = useSelector(CustomLabware.getCustomLabwareDirectory)
+  const isLabwareOffsetCodeSnippetOn = useSelector(
+    Config.getIsLabwareOffsetCodeSnippetsOn
+  )
   const dispatch = useDispatch<Dispatch>()
 
   const handleUseTrashSelection = (selection: BlockSelection): void => {
@@ -61,6 +64,13 @@ export function AdvancedSettings(): JSX.Element {
         break
     }
   }
+  const toggleLabwareOffsetData = (): unknown =>
+    dispatch(
+      Config.updateConfigValue(
+        'labwareOffsetCodeSnippets',
+        !isLabwareOffsetCodeSnippetOn
+      )
+    )
   const toggleDevtools = (): unknown => dispatch(Config.toggleDevtools())
   const handleChannel: React.ChangeEventHandler<HTMLSelectElement> = event =>
     dispatch(Config.updateConfigValue('update.channel', event.target.value))
@@ -227,10 +237,8 @@ export function AdvancedSettings(): JSX.Element {
           </Box>
           <ToggleButton
             label="display_unavailable_robots"
-            toggledOn={!displayUnavailRobots}
-            onClick={() =>
-              dispatch(Config.toggleConfigValue('discovery.disableCache'))
-            }
+            toggledOn={isLabwareOffsetCodeSnippetOn}
+            onClick={toggleLabwareOffsetData}
             id="AdvancedSettings_showLinkToggleButton"
           />
         </Flex>
