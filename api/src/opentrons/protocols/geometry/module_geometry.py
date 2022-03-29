@@ -603,6 +603,7 @@ def resolve_module_model(module_model_or_load_name: str) -> ModuleModel:
         "temperatureModuleV1": TemperatureModuleModel.TEMPERATURE_V1,
         "temperatureModuleV2": TemperatureModuleModel.TEMPERATURE_V2,
         "thermocyclerModuleV1": ThermocyclerModuleModel.THERMOCYCLER_V1,
+        "thermocyclerModuleV2": ThermocyclerModuleModel.THERMOCYCLER_V2,
     }
 
     alias_map: Mapping[str, ModuleModel] = {
@@ -614,6 +615,7 @@ def resolve_module_model(module_model_or_load_name: str) -> ModuleModel:
         "temperature module gen2": TemperatureModuleModel.TEMPERATURE_V2,
         "thermocycler": ThermocyclerModuleModel.THERMOCYCLER_V1,
         "thermocycler module": ThermocyclerModuleModel.THERMOCYCLER_V1,
+        "thermocycler module gen2": ThermocyclerModuleModel.THERMOCYCLER_V2,
     }
 
     lower_name = module_model_or_load_name.lower()

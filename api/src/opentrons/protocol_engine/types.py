@@ -146,6 +146,7 @@ class ModuleModel(str, Enum):
     MAGNETIC_MODULE_V1 = "magneticModuleV1"
     MAGNETIC_MODULE_V2 = "magneticModuleV2"
     THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
+    THERMOCYCLER_MODULE_V2 = "thermocyclerModuleV2"
     HEATER_SHAKER_MODULE_V1 = "heaterShakerModuleV1"
 
     def as_type(self) -> ModuleType:
@@ -157,7 +158,10 @@ class ModuleModel(str, Enum):
             return ModuleType.TEMPERATURE
         elif self in [ModuleModel.MAGNETIC_MODULE_V1, ModuleModel.MAGNETIC_MODULE_V2]:
             return ModuleType.MAGNETIC
-        elif self == ModuleModel.THERMOCYCLER_MODULE_V1:
+        elif self in [
+            ModuleModel.THERMOCYCLER_MODULE_V1,
+            ModuleModel.THERMOCYCLER_MODULE_V2,
+        ]:
             return ModuleType.THERMOCYCLER
         elif self == ModuleModel.HEATER_SHAKER_MODULE_V1:
             return ModuleType.HEATER_SHAKER

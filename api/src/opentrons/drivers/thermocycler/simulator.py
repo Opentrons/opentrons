@@ -15,7 +15,7 @@ class SimulatingDriver(AbstractThermocyclerDriver):
             current=self.DEFAULT_TEMP, target=None, hold=None
         )
         self._model = model if model else "thermocyclerModuleV1"
-    
+
     def model(self) -> str:
         return self._model
 
