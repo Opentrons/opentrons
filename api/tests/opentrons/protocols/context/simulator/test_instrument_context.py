@@ -136,7 +136,7 @@ def _aspirate_dispense(i: AbstractInstrument) -> None:
 def _aspirate_blowout(i: AbstractInstrument) -> None:
     """pipette dict with tip fixture."""
     i.prepare_for_aspirate()
-    i.aspirate(112, 13)
+    i.aspirate(11, 13)
     i.blow_out()
 
 

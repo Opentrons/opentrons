@@ -97,6 +97,7 @@ class InstrumentContextSimulation(AbstractInstrument):
         self._raise_if_no_tip(HardwareAction.DROPTIP.name)
         self._pipette_dict["has_tip"] = False
         self._pipette_dict["tip_length"] = 0.0
+        self._update_volume(0)
 
     def home(self) -> None:
         self._protocol_interface.set_last_location(None)
