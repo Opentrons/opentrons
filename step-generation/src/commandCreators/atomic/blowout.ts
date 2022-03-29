@@ -1,6 +1,6 @@
 import * as errorCreators from '../../errorCreators'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
-import type { Command, CommandCreatorError, CommandCreator } from '../../types'
+import type { CommandCreatorError, CommandCreator } from '../../types'
 import { CreateCommand } from '@opentrons/shared-data'
 
 export const blowout: CommandCreator<BlowoutParams> = (
