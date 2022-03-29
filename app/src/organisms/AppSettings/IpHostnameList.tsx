@@ -39,6 +39,7 @@ function IpHostnameListComponent(props: Props): JSX.Element {
             removeIp={removeManualIp}
             discovered={discovered}
             justAdded={candidate === props.mostRecentAddition}
+            isLast={index === candidates.length - 1}
           />
         ))}
     </>

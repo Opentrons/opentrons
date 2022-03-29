@@ -27,6 +27,7 @@ export interface IpHostnameItemProps {
   discovered: boolean
   removeIp: (ip: string) => unknown
   justAdded: boolean
+  isLast: boolean
 }
 
 export function IpHostnameItem(props: IpHostnameItemProps): JSX.Element {
@@ -82,7 +83,7 @@ export function IpHostnameItem(props: IpHostnameItemProps): JSX.Element {
           <Icon name="close" />
         </Btn>
       </Flex>
-      <Divider width="100%" />
+      {!props.isLast && <Divider width="100%" />}
     </>
   )
 }
