@@ -76,13 +76,13 @@ run-g-code-configuration:
 	$(if $(name),,$(error name variable required))
 	$(pipenv) run python cli.py run ${name}
 
-.PHONY: load-g-code-configuration-comparision
-load-g-code-configuration-comparision:
+.PHONY: load-g-code-configuration-comparison
+load-g-code-configuration-comparison:
 	$(if $(name),,$(error name variable required))
 	$(pipenv) run python cli.py load-comparison ${name}
 
 
-.PHONY: update-g-code-configuration-comparision
-update-g-code-configuration-comparision:
+.PHONY: update-g-code-configuration-comparison
+update-g-code-configuration-comparison:
 	$(if $(name),,$(error name variable required))
 	$(pipenv) run python cli.py update-comparison ${name}

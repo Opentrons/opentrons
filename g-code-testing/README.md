@@ -114,11 +114,11 @@ These tests cover the functionality of all modules
 
 Use the various Make targets in the `Makefile` to run tests using pytest
 
-## Uploading new comparison files
+## Saving new comparison files
 
-To update comparison files override files in `g-code-testing/g_code_test_data/comparison_comparision_files` with the output of
+To update comparison files override files in `g-code-testing/g_code_test_data/comparison_files` with the output of
 the G-Code Parser
 
-You can do this by using `make update-g-code-configuration-comparision name=<comparision_name>`
+You can do this by using `make update-g-code-configuration-comparison name=<comparison_name>`
 
 To get a list of comparison names run `make get-g-code-configurations`
