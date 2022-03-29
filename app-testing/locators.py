@@ -42,9 +42,10 @@ def reimport() -> None:
 base = None
 kansas = None
 dev = None
+emulated_alpha = None
 device_landing = None
 left_menu5dot1 = None
-variables = ["base", "kansas", "dev", "device_landing", "left_menu5dot1"]
+variables = ["base", "kansas", "dev", "emulated_alpha", "device_landing", "left_menu5dot1"]
 
 
 def instantiate(driver, console) -> None:
@@ -57,6 +58,8 @@ def instantiate(driver, console) -> None:
     )
     global dev
     dev = src.resources.ot_robot5dot1.OtRobot(console, src.resources.robot_data.Dev())
+    global emulated_alpha
+    dev = src.resources.ot_robot5dot1.OtRobot(console, src.resources.robot_data.EmulatedAlpha())
     global device_landing
     device_landing = src.pages.device_landing.DeviceLanding(driver, console, "REPL")
     global left_menu5dot1

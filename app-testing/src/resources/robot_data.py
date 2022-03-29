@@ -26,6 +26,15 @@ class Dev:
     host: str = "localhost"
     port: str = "31950"
 
+@dataclass
+class EmulatedAlpha:
+    """Info about the robot brought up with emulation samples/ot2/ot2_with_all_modules.yaml
+
+    temperatureModuleV2, thermocyclerModuleV1, magneticModuleV2
+    """
+    display_name: str = "opentrons-dev"
+    host: str = "localhost"
+    port: str = "31950"
 
 @dataclass
 class Kansas:
@@ -36,5 +45,5 @@ class Kansas:
     port: str = "31950"
 
 
-RobotDataType = Dev | Kansas
-ROBOT_KEYS: dict[str, RobotDataType] = {"dev": Dev(), "kansas": Kansas()}
+RobotDataType = Dev | Kansas | EmulatedAlpha
+ROBOT_MAPPING: dict[str, RobotDataType] = {"dev": Dev(), "kansas": Kansas(), "emulated_alpha": EmulatedAlpha()}

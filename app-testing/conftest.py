@@ -10,7 +10,7 @@ from rich.console import Console
 from rich import pretty, traceback
 from selenium.webdriver.chrome.options import Options
 from src.resources.ot_robot5dot1 import OtRobot
-from src.resources.robot_data import ROBOT_KEYS, RobotDataType
+from src.resources.robot_data import ROBOT_MAPPING, RobotDataType
 
 collect_ignore_glob = ["files/**/*.py"]
 
@@ -86,6 +86,6 @@ def robots() -> List[RobotDataType]:
     robots = os.getenv("ROBOTS").lower().split(",")
     result = []
     for robot in robots:
-        robot_type = ROBOT_KEYS[robot]
+        robot_type = ROBOT_MAPPING[robot]
         result.append(robot_type)
     return result

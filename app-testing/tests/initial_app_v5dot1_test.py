@@ -90,3 +90,4 @@ def test_initial_load_robot_available_v5dot1(
                 else:
                     device_landing.click_module_actions_button(serial)
                     device_landing.click_mag_disengage()
+            device_landing.navigate("devices")

@@ -1,5 +1,5 @@
 """Model for the App page that displays info and settings for the app."""
-from typing import Optional
+from typing import Literal, Optional
 from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
@@ -7,7 +7,7 @@ from selenium.webdriver.remote.webelement import WebElement
 
 from src.driver.base import Base, Element
 
-
+PageName = Literal["devices","protocols", "labware", "app-settings/general"]
 class DeviceLanding:
     """Elements and actions for the Page that loads when the app is opened."""
 
@@ -150,3 +150,7 @@ class DeviceLanding:
             f"Button to disengage height slideout.'",
         )
         self.base.click(button)
+
+    def navigate(self, page_name: PageName) -> None:
+        base_url = self.base.driver.current_url.split("#")[0]
+        self.base.driver.get(f"{base_url}#/{page_name}")

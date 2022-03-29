@@ -14,9 +14,9 @@ from src.resources.robot_data import RobotDataType, Module
 class OtRobot:
     """Opentrons Robot."""
 
-    RETRIES = 5
+    RETRIES = 3
     BACK_OFF_FACTOR = 0.3
-    TIME_BETWEEN_RETRIES = 1000
+    TIME_BETWEEN_RETRIES = 500
     ERROR_CODES = (500, 502, 503, 504)
 
     def __init__(
