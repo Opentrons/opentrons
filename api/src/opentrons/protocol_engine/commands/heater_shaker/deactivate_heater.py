@@ -42,7 +42,8 @@ class DeactivateHeaterImpl(
     async def execute(self, params: DeactivateHeaterParams) -> DeactivateHeaterResult:
         """Unset a Heater-Shaker's target temperature."""
         hs_module_view = self._state_view.modules.get_heater_shaker_module_substate(
-            module_id=params.moduleId)
+            module_id=params.moduleId
+        )
 
         # Allow propagation of ModuleNotAttachedError.
         hs_hardware_module = self._equipment.get_module_hardware_api(

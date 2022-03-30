@@ -41,13 +41,14 @@ class AwaitTemperatureImpl(
 
     async def execute(self, params: AwaitTemperatureParams) -> AwaitTemperatureResult:
         """Wait for a Heater-Shaker's target temperature to be reached."""
-        hs_module_view = self._state_view.modules.get_heater_shaker_module_substate(
-            module_id=params.moduleId)
-        target_temp = self._state_view.modules.get_plate_target_temperature(
-            hs_module_view.module_id
+        hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
+            module_id=params.moduleId
         )
+
+        # Raises error if no target temperature
+        target_temp = hs_module_substate.get_plate_target_temperature()
         hs_hardware_module = self._equipment.get_module_hardware_api(
-            hs_module_view.module_id
+            hs_module_substate.module_id
         )
 
         if hs_hardware_module is not None:

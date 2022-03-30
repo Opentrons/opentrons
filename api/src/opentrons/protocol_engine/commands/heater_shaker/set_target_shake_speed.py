@@ -48,7 +48,8 @@ class SetTargetShakeSpeedImpl(
         """Set a Heater-Shaker's target shake speed."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         hs_module_view = self._state_view.modules.get_heater_shaker_module_substate(
-            module_id=params.moduleId)
+            module_id=params.moduleId
+        )
 
         # Verify speed from hs module view
         validated_speed = hs_module_view.validate_target_speed(params.rpm)

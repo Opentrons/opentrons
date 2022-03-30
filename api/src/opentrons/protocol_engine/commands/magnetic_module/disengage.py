@@ -60,7 +60,8 @@ class DisengageImplementation(AbstractCommandImpl[DisengageParams, DisengageResu
         """
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         magnetic_module_view = self._state_view.modules.get_magnetic_module_substate(
-            module_id=params.moduleId)
+            module_id=params.moduleId
+        )
         # Allow propagation of ModuleNotAttachedError.
         hardware_module = self._equipment.get_module_hardware_api(
             magnetic_module_view.module_id

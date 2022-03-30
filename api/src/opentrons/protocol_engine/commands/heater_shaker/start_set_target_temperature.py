@@ -51,7 +51,8 @@ class StartSetTargetTemperatureImpl(
         """Set a Heater-Shaker's target temperature."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         hs_module_view = self._state_view.modules.get_heater_shaker_module_substate(
-            module_id=params.moduleId)
+            module_id=params.moduleId
+        )
 
         # Verify temperature from hs module view
         validated_temp = hs_module_view.validate_target_temperature(params.temperature)

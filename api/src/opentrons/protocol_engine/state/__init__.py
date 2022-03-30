@@ -4,17 +4,13 @@ from .state import State, StateStore, StateView
 from .commands import CommandState, CommandView, CommandSlice, CurrentCommand
 from .labware import LabwareState, LabwareView
 from .pipettes import PipetteState, PipetteView, HardwarePipette, CurrentWell
-from .modules import (
-    ModuleState,
-    ModuleView,
-    HardwareModule
-)
+from .modules import ModuleState, ModuleView, HardwareModule
 from .module_substates import (
     MagneticModuleId,
     MagneticModuleSubState,
     HeaterShakerModuleSubState,
     HeaterShakerModuleId,
-    ModuleViewTypes
+    ModuleViewTypes,
 )
 from .geometry import GeometryView, TipGeometry
 from .motion import MotionView, PipetteLocationData

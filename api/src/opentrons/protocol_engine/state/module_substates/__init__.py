@@ -1,6 +1,11 @@
+"""Hardware Modules' substates."""
+
 from typing import Union
 from .magnetic_module_substate import MagneticModuleSubState, MagneticModuleId
-from .heater_shaker_module_substate import HeaterShakerModuleSubState, HeaterShakerModuleId
+from .heater_shaker_module_substate import (
+    HeaterShakerModuleSubState,
+    HeaterShakerModuleId,
+)
 
 ModuleViewTypes = Union[HeaterShakerModuleSubState, MagneticModuleSubState]
 

@@ -71,7 +71,9 @@ class ModuleState:
 
     slot_by_module_id: Dict[str, Optional[DeckSlotName]]
     hardware_by_module_id: Dict[str, HardwareModule]
-    substate_by_module_id: Dict[str, Union[HeaterShakerModuleSubState, MagneticModuleSubState]]
+    substate_by_module_id: Dict[
+        str, Union[HeaterShakerModuleSubState, MagneticModuleSubState]
+    ]
 
 
 class ModuleStore(HasState[ModuleState], HandlesActions):
@@ -81,9 +83,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
     def __init__(self) -> None:
         """Initialize a ModuleStore and its state."""
-        self._state = ModuleState(slot_by_module_id={},
-                                  hardware_by_module_id={},
-                                  substate_by_module_id={})
+        self._state = ModuleState(
+            slot_by_module_id={}, hardware_by_module_id={}, substate_by_module_id={}
+        )
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
@@ -100,13 +102,14 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             module_model = action.definition.model
             if ModuleModel.is_magnetic_module_model(module_model):
                 self._state.substate_by_module_id[module_id] = MagneticModuleSubState(
-                    module_id=MagneticModuleId(module_id),
-                    model=module_model
+                    module_id=MagneticModuleId(module_id), model=module_model
                 )
             elif ModuleModel.is_heater_shaker_module_model(module_model):
-                self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
+                self._state.substate_by_module_id[
+                    module_id
+                ] = HeaterShakerModuleSubState(
                     module_id=HeaterShakerModuleId(module_id),
-                    plate_target_temperature=None
+                    plate_target_temperature=None,
                 )
 
     def _handle_command(self, command: Command) -> None:
@@ -121,17 +124,18 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 serial_number=serial_number,
                 definition=definition,
             )
-            module_id = command.params.moduleId
+            module_id = command.result.moduleId
             module_model = command.result.definition.model
             if ModuleModel.is_magnetic_module_model(module_model):
                 self._state.substate_by_module_id[module_id] = MagneticModuleSubState(
-                    module_id=MagneticModuleId(module_id),
-                    model=module_model
+                    module_id=MagneticModuleId(module_id), model=module_model
                 )
             elif ModuleModel.is_heater_shaker_module_model(module_model):
-                self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
+                self._state.substate_by_module_id[
+                    module_id
+                ] = HeaterShakerModuleSubState(
                     module_id=HeaterShakerModuleId(module_id),
-                    plate_target_temperature=None
+                    plate_target_temperature=None,
                 )
         if isinstance(
             command.result,
@@ -142,20 +146,24 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         ):
             module_id = command.params.moduleId
             assert isinstance(
-                self._state.substate_by_module_id[module_id],
-                HeaterShakerModuleSubState), f"{module_id} is not heater-shaker."
+                self._state.substate_by_module_id[module_id], HeaterShakerModuleSubState
+            ), f"{module_id} is not heater-shaker."
 
             if isinstance(
                 command.result, heater_shaker.StartSetTargetTemperatureResult
             ):
-                self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
-                    module_id=module_id,
-                    plate_target_temperature=command.params.temperature
+                self._state.substate_by_module_id[
+                    module_id
+                ] = HeaterShakerModuleSubState(
+                    module_id=HeaterShakerModuleId(module_id),
+                    plate_target_temperature=command.params.temperature,
                 )
             elif isinstance(command.result, heater_shaker.DeactivateHeaterResult):
-                self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
-                    module_id=module_id,
-                    plate_target_temperature=None
+                self._state.substate_by_module_id[
+                    module_id
+                ] = HeaterShakerModuleSubState(
+                    module_id=HeaterShakerModuleId(module_id),
+                    plate_target_temperature=None,
                 )
 
 
@@ -202,16 +210,21 @@ class ModuleView(HasState[ModuleState]):
                 but it's not a Magnetic Module.
         """
         model = self.get_model(module_id=module_id)  # Propagate ModuleNotLoadedError
+
         if ModuleModel.is_magnetic_module_model(model):
-            return self._state.substate_by_module_id[module_id]
+            substate = self._state.substate_by_module_id[module_id]
+            assert isinstance(
+                substate, MagneticModuleSubState
+            ), f"Expected MagneticModuleSubState but got {substate}."
+            return substate
         else:
             raise errors.WrongModuleTypeError(
                 f"{module_id} is a {model}, not a Magnetic Module."
             )
 
     def get_heater_shaker_module_substate(
-            self, module_id: str
-        ) -> HeaterShakerModuleSubState:
+        self, module_id: str
+    ) -> HeaterShakerModuleSubState:
         """Return a `HeaterShakerModuleSubState` for the given Heater-Shaker Module.
 
         Raises:
@@ -221,7 +234,11 @@ class ModuleView(HasState[ModuleState]):
         """
         model = self.get_model(module_id=module_id)  # Propagate ModuleNotLoadedError
         if ModuleModel.is_heater_shaker_module_model(model):
-            return self._state.substate_by_module_id[module_id]
+            substate = self._state.substate_by_module_id[module_id]
+            assert isinstance(
+                substate, HeaterShakerModuleSubState
+            ), f"Expected HeaterShakerModuleSubState but got {substate}"
+            return substate
         else:
             raise errors.WrongModuleTypeError(
                 f"{module_id} is a {model}, not a Heater-Shaker Module."

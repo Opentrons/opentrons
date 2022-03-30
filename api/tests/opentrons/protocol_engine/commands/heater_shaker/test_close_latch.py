@@ -4,7 +4,7 @@ from decoy import Decoy
 from opentrons.hardware_control.modules import HeaterShaker
 
 from opentrons.protocol_engine.state import StateView
-from opentrons.protocol_engine.state.modules import (
+from opentrons.protocol_engine.state.module_substates import (
     HeaterShakerModuleSubState,
     HeaterShakerModuleId,
 )
@@ -16,7 +16,9 @@ from opentrons.protocol_engine.commands.heater_shaker.close_latch import (
 
 
 async def test_close_latch(
-    decoy: Decoy, state_view: StateView, equipment: EquipmentHandler,
+    decoy: Decoy,
+    state_view: StateView,
+    equipment: EquipmentHandler,
 ) -> None:
     """It should be able to close the module's labware latch."""
     subject = CloseLatchImpl(state_view=state_view, equipment=equipment)
@@ -27,7 +29,8 @@ async def test_close_latch(
 
     decoy.when(
         state_view.modules.get_heater_shaker_module_substate(
-            module_id="input-heater-shaker-id")
+            module_id="input-heater-shaker-id"
+        )
     ).then_return(hs_module_view)
 
     decoy.when(hs_module_view.module_id).then_return(
@@ -44,7 +47,9 @@ async def test_close_latch(
 
 
 async def test_close_latch_virtual(
-    decoy: Decoy, state_view: StateView, equipment: EquipmentHandler,
+    decoy: Decoy,
+    state_view: StateView,
+    equipment: EquipmentHandler,
 ) -> None:
     """It should no-op for virtual modules."""
     subject = CloseLatchImpl(state_view=state_view, equipment=equipment)
@@ -54,7 +59,8 @@ async def test_close_latch_virtual(
 
     decoy.when(
         state_view.modules.get_heater_shaker_module_substate(
-            module_id="input-heater-shaker-id")
+            module_id="input-heater-shaker-id"
+        )
     ).then_return(hs_module_view)
 
     decoy.when(hs_module_view.module_id).then_return(

@@ -1,3 +1,4 @@
+"""Heater-Shaker Module sub-state."""
 from dataclasses import dataclass
 from typing import NewType, NamedTuple, Optional
 
@@ -36,6 +37,7 @@ class HeaterShakerModuleSubState:
     Provides calculations and read-only state access
     for an individual loaded Heater-Shaker Module.
     """
+
     module_id: HeaterShakerModuleId
     plate_target_temperature: Optional[float]
 
