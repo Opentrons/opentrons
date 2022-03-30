@@ -24,6 +24,7 @@ import {
 import type { NextGenRouteParams } from '../../../App/NextGenApp'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
+import { useHeaterShaker } from '../ModuleCard/hooks'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
@@ -38,6 +39,7 @@ export const HeaterShakerWizard = (
   const [currentPage, setCurrentPage] = React.useState(0)
   const { robotName } = useParams<NextGenRouteParams>()
   const attachedModules = useAttachedModules(robotName)
+  const heaterShakerFromProtocol = useHeaterShaker()
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const heaterShaker =
@@ -51,6 +53,12 @@ export const HeaterShakerWizard = (
     isPrimaryCTAEnabled = Boolean(heaterShaker)
   }
 
+  const labwareDef =
+    heaterShakerFromProtocol != null
+      ? heaterShakerFromProtocol.nestedLabwareDef
+      : null
+
+  console.log(labwareDef)
   let buttonContent = null
   const getWizardDisplayPage = (): JSX.Element | null => {
     switch (currentPage) {
@@ -58,8 +66,8 @@ export const HeaterShakerWizard = (
         buttonContent = t('btn_continue_attachment_guide')
         return (
           <Introduction
-          //  TODO(jr, 2022-02-16): get labwareDefinition2 of labware on top of heater shaker (nestedLabwareDef from moduleRenderInfoById)
-          //  TODO(jr, 2022-02-16): get adapter name and image - would this be connected to nestedLabwareDefinition?
+            labwareDefinition={labwareDef}
+            //  TODO(jr, 2022-02-16): get adapter name and image - would this be connected to nestedLabwareDefinition?
           />
         )
       case 1:

@@ -41,6 +41,7 @@ export function useHeaterShakerFromProtocol(): ProtocolModuleInfo | null {
     module => module.moduleDef.model === 'heaterShakerModuleV1'
   )
   if (heaterShakerModule == null) return null
+
   return heaterShakerModule
 }
 interface LatchCommand {
