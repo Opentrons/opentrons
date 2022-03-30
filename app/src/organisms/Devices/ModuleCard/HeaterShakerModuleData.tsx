@@ -15,10 +15,16 @@ import {
 } from '@opentrons/components'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 
+import type {
+  LatchStatus,
+  SpeedStatus,
+  TemperatureStatus,
+} from '../../../redux/modules/api-types'
+
 interface HeaterShakerModuleDataProps {
-  heaterStatus: string
-  shakerStatus: string
-  latchStatus: string
+  heaterStatus: TemperatureStatus
+  shakerStatus: SpeedStatus
+  latchStatus: LatchStatus
   targetTemp: number | null
   currentTemp: number | null
   targetSpeed: number | null
@@ -39,7 +45,8 @@ export const HeaterShakerModuleData = (
     currentSpeed,
     showTemperatureData,
   } = props
-  const { t } = useTranslation(['device_details', 'heater_shaker'])
+  const { t } = useTranslation(['device_details', 'heater_shaker', 'shared'])
+  const isShaking = shakerStatus !== 'idle'
 
   const getStatusLabelProps = (
     status: string | null
@@ -66,6 +73,26 @@ export const HeaterShakerModuleData = (
       }
     }
     return StatusLabelProps
+  }
+
+  const getLatchStatus = (latchStatus: LatchStatus): string => {
+    switch (latchStatus) {
+      case 'opening':
+      case 'idle_open': {
+        return t('open', { ns: 'shared' })
+      }
+      case 'closing':
+      case 'idle_closed': {
+        if (isShaking) {
+          return t('closed_and_locked', { ns: 'heater_shaker' })
+        } else {
+          return t('closed', { ns: 'heater_shaker' })
+        }
+      }
+      // TODO(sh, 2022-03-30): potentially add cases for idle_unknown and unknown
+      default:
+        return latchStatus
+    }
   }
 
   return (
@@ -155,9 +182,14 @@ export const HeaterShakerModuleData = (
             alignItems={ALIGN_FLEX_START}
           >
             <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing2}>
-              {/* {TODO(sh, 2022-02-22): Conditionally render icon based on latch status} */}
-              <Icon name="closed-locked" size={'1rem'} />
-              {latchStatus}
+              {isShaking && (
+                <Icon
+                  name="closed-locked"
+                  data-testid="HeaterShakerModuleData_latch_lock"
+                  size={'1rem'}
+                />
+              )}
+              {getLatchStatus(latchStatus)}
             </Flex>
           </Text>
         </Flex>
