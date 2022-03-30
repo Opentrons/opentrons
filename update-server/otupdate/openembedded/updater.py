@@ -173,27 +173,32 @@ class Updater(UpdateActionsInterface):
     ) -> None:
         """Decompress and write update to partition
 
-        As this is method is currently not performing validations
-        on the update files, it's meant to be internal use.
+        As this method is currently not performing validation
+        on the update files, it's meant to be for
+        internal use.
 
-        The update file would be an .xz compressed file
+        Function expects the update file to be a .xz compressed file
 
-        .xz seems to work out best, rootfs size comes out at 223M,
+        with .xz rootfs size comes out at 223M,
         gz -> bz2 -> xz   is roughly the progression over time.
 
         gz compression makes things slightly different from zip.
         gz/xz/bz2 is just a compression stream. and not
-        a collection files. We can apply it either to a single file, or
+        a collection of files. We can apply it either to a single file, or
         something that contains many files (like a "tar" archive).
         In contrast, ZIP is both a collection + compression.
 
-        ZIP may make things like packaging the rootfs along with its
-        checksum in one file a little easier. We validate that all
-        essential files are present before decompressing, and then
-        compare checksums.
+        ZIP being a collection makes things like packaging the
+        rootfs along with its checksum in one file a little easier.
+        We validate that all essential files are present before decompressing,
+        and then compare checksums. With .xz like compression we get straight up
+        blobs, so rootfs.xz would give us the actual rootfs file structure:
+        rootfs.xz ===> /bin /var /etc .. ,
+        whereas zip gives a collection: rootfs.zip ===> rootfs.ext4
 
+        Note:
         Right now this function does a straight fwd, on the fly write to
-        the unused partition.
+        the unused partition. Checksum validation isn't being performed.
         """
 
         unused_partition = self.part_mngr.find_unused_partition()
