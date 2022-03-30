@@ -10,11 +10,15 @@ flake8:
 mypy:
 	pipenv run python -m mypy locators.py conftest.py src/ tests/
 
-.PHONY: check
-check:
+.PHONY: lint
+lint:
 	$(MAKE) black
 	$(MAKE) mypy
 	$(MAKE) flake8
+
+.PHONY: format
+format:
+	$(MAKE) black
 
 .PHONY: test
 test:

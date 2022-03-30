@@ -71,6 +71,10 @@ class ModuleNotLoadedError(ProtocolEngineError):
     """And error raised when referencing a module that has not been loaded."""
 
 
+class ModuleNotOnDeckError(ProtocolEngineError):
+    """And error raised when trying to use a module that is loaded off the deck."""
+
+
 class SlotDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a deck slot that does not exist."""
 
@@ -115,3 +119,15 @@ class RobotDoorOpenError(ProtocolEngineError):
 
 class EngageHeightOutOfRangeError(ProtocolEngineError):
     """An error raised when a Magnetic Module engage height is out of bounds."""
+
+
+class NoTargetTemperatureSetError(ProtocolEngineError):
+    """An error raised when awaiting temperature when no target was set."""
+
+
+class InvalidTargetTemperatureError(ProtocolEngineError):
+    """An error raised when attampting to set an invalid target temperature."""
+
+
+class InvalidTargetSpeedError(ProtocolEngineError):
+    """An error raised when attempting to set an invalid target speed."""

@@ -152,3 +152,7 @@ class ProtocolSchemaV6(BaseModel):
     liquids: Optional[Dict[str, Liquid]]
     commandAnnotations: Optional[List[CommandAnnotation]]
     designerApplication: Optional[DesignerApplication]
+
+    class Config:
+        # added for constructing the class with field name instead of alias
+        allow_population_by_field_name = True

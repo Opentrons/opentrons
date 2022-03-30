@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 class RobotPage:
     """Elements and actions for the robot detail page."""
 
-    experimental_protocol_engine_toggle_locator: Tuple[str, str] = (
+    experimental_ot3_hardware: Tuple[str, str] = (
         By.CSS_SELECTOR,
-        "button[aria-label='Enable experimental protocol engine']",
+        "button[aria-label='Enable experimental OT3 hardware controller']",
     )
 
     calibrate_deck_button_locator: Tuple[str, str] = (
@@ -50,12 +50,10 @@ class RobotPage:
         return header
 
     @highlight
-    def experimental_protocol_engine_toggle(self) -> WebElement:
+    def get_experimental_ot3_hardware_toggle(self) -> WebElement:
         """Toggle button element for the experimental protocol engine."""
         toggle: WebElement = WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                RobotPage.experimental_protocol_engine_toggle_locator
-            )
+            EC.element_to_be_clickable(RobotPage.experimental_ot3_hardware)
         )
         actions = ActionChains(self.driver)
         actions.move_to_element(toggle).perform()

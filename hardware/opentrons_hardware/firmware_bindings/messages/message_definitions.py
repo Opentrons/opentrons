@@ -394,6 +394,24 @@ class SensorThresholdResponse:  # noqa: D101
 
 
 @dataclass
+class SensorDiagnosticRequest:  # noqa: D101
+    payload: payloads.SensorDiagnosticRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.SensorDiagnosticRequestPayload
+    message_id: Literal[
+        MessageId.sensor_diagnostic_request
+    ] = MessageId.sensor_diagnostic_request
+
+
+@dataclass
+class SensorDiagnosticResponse:  # noqa: D101
+    payload: payloads.SensorDiagnosticResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.SensorDiagnosticResponsePayload
+    message_id: Literal[
+        MessageId.sensor_diagnostic_response
+    ] = MessageId.sensor_diagnostic_response
+
+
+@dataclass
 class PipetteInfoRequest(EmptyPayloadMessage):  # noqa: D101
     message_id: Literal[MessageId.pipette_info_request] = MessageId.pipette_info_request
 
@@ -405,3 +423,31 @@ class PipetteInfoResponse:  # noqa: D101
     message_id: Literal[
         MessageId.pipette_info_response
     ] = MessageId.pipette_info_response
+
+
+@dataclass
+class SetBrushedMotorVrefRequest:  # noqa: D101
+    payload: payloads.BrushedMotorVrefPayload
+    payload_type: Type[BinarySerializable] = payloads.BrushedMotorVrefPayload
+    message_id: Literal[
+        MessageId.set_brushed_motor_vref_request
+    ] = MessageId.set_brushed_motor_vref_request
+
+
+@dataclass
+class SetBrushedMotorPwmRequest:  # noqa: D101
+    payload: payloads.BrushedMotorPwmPayload
+    payload_type: Type[BinarySerializable] = payloads.BrushedMotorPwmPayload
+    message_id: Literal[
+        MessageId.set_brushed_motor_pwm_request
+    ] = MessageId.set_brushed_motor_pwm_request
+
+
+@dataclass
+class GripperGripRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[MessageId.gripper_grip_request] = MessageId.gripper_grip_request
+
+
+@dataclass
+class GripperHomeRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[MessageId.gripper_home_request] = MessageId.gripper_home_request

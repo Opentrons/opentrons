@@ -14,6 +14,8 @@ Slices of the tests will be selected as candidates for automation and then perfo
 2. Install the Opentrons application on your machine.
    1. https://opentrons.com/ot-app/
    2. This could also be done by building the installer on a branch and installing the App.
+      1. for Mac
+         1. `make -C app-shell dist-osx`
 3. Install Chromedriver
    1. in the app-testing directory
       1. `sudo ./ci-tools/mac_get_chromedriver.sh 13.1.8` per the version of electron in the root package.json for electron
@@ -56,8 +58,12 @@ Slices of the tests will be selected as candidates for automation and then perfo
 use xdist
 `pipenv run pytest -n3`
 
-run black, mypy, and flake8
-`make check`
+run black
+`make format`
+`make black`
+
+run lint
+`make lint`
 
 ## Tools
 
@@ -75,3 +81,10 @@ From the app-testing directory
 ```bash
 pipenv run python -i locators.py
 ```
+
+- `clean_exit()` should be used to exit the REPL.
+- when you add a new Page Object (PO) you must add it to the imports, list of POs, and reload method so that you can change it and then call `reload()` to use the changes without exiting and restarting the REPL.
+- `reload()` will allow the app to stay open but changes in your PO to be reflected.
+
+> sometimes chromedriver does not cleanly exit.
+> `pkill -x chromedriver`
