@@ -7,15 +7,19 @@ import { i18n } from '../../../../i18n'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
+import { RunLog } from '../../../../organisms/Devices/ProtocolRun/RunLog'
 import { ProtocolRunDetails } from '..'
 
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader')
+jest.mock('../../../../organisms/Devices/ProtocolRun/RunLog')
+jest.mock('../../../../organisms/Labware/helpers/getAllDefs')
 
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockProtocolRunHeader = ProtocolRunHeader as jest.MockedFunction<
   typeof ProtocolRunHeader
 >
+const mockRunLog = RunLog as jest.MockedFunction<typeof RunLog>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -34,6 +38,7 @@ describe('ProtocolRunDetails', () => {
   beforeEach(() => {
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     mockProtocolRunHeader.mockReturnValue(<div>Mock ProtocolRunHeader</div>)
+    mockRunLog.mockReturnValue(<div>Mock RunLog</div>)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -72,5 +77,16 @@ describe('ProtocolRunDetails', () => {
     )
 
     getByText('setup content')
+  })
+
+  it('renders a run log when the run log tab is clicked', () => {
+    const [{ getByText, queryByText }] = render(
+      '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
+    )
+
+    expect(queryByText('Mock RunLog')).toBeFalsy()
+    const runTab = getByText('Run Log')
+    runTab.click()
+    getByText('Mock RunLog')
   })
 })
