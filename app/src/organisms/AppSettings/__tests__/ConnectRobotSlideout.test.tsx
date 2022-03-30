@@ -5,15 +5,15 @@ import { act } from 'react-dom/test-utils'
 import { i18n } from '../../../i18n'
 import { getScanning, getViewableRobots } from '../../../redux/discovery'
 import { getConfig } from '../../../redux/config'
-import { ConnectRobotSlideoutComponent } from '../ConnectRobotSlideout'
+import { ConnectRobotSlideout } from '../ConnectRobotSlideout'
+
+import type { ConnectRobotSlideoutProps } from '../ConnectRobotSlideout'
 
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/config')
 
-const render = (
-  props: React.ComponentProps<typeof ConnectRobotSlideoutComponent>
-) => {
-  return renderWithProviders(<ConnectRobotSlideoutComponent {...props} />, {
+const render = (props: React.ComponentProps<typeof ConnectRobotSlideout>) => {
+  return renderWithProviders(<ConnectRobotSlideout {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
@@ -25,7 +25,7 @@ const mockGetViewableRobots = getViewableRobots as jest.MockedFunction<
 >
 
 describe('ConnectRobotSlideout', () => {
-  let props: React.ComponentProps<typeof ConnectRobotSlideoutComponent>
+  let props: React.ComponentProps<typeof ConnectRobotSlideout>
 
   beforeEach(() => {
     mockGetScanning.mockReturnValue(true)
@@ -61,7 +61,7 @@ describe('ConnectRobotSlideout', () => {
       checkIpAndHostname: jest.fn(),
       isExpanded: true,
       onCloseClick: jest.fn(),
-    }
+    } as ConnectRobotSlideoutProps
   })
 
   afterEach(() => {
@@ -69,14 +69,8 @@ describe('ConnectRobotSlideout', () => {
   })
 
   it('renders correct title, body, and footer for ConnectRobotSlideout', () => {
-    props = {
-      candidates: [],
-      checkIpAndHostname: jest.fn(),
-      isExpanded: true,
-      onCloseClick: jest.fn(),
-    }
     const { getByText } = render(props)
-    expect(getByText('Connect to Robot via IP Address')).toBeInTheDocument()
+    expect(getByText('Connect to a Robot via IP Address')).toBeInTheDocument()
     expect(
       getByText('Enter an IP address or hostname to connect to a robot.')
     ).toBeInTheDocument()
@@ -92,12 +86,6 @@ describe('ConnectRobotSlideout', () => {
   })
 
   it('renders the Add button, Done button, and input form', () => {
-    props = {
-      candidates: [],
-      checkIpAndHostname: jest.fn(),
-      isExpanded: true,
-      onCloseClick: jest.fn(),
-    }
     const { getByRole } = render(props)
     expect(getByRole('button', { name: 'Add' })).toBeInTheDocument()
     expect(getByRole('button', { name: 'Done' })).toBeInTheDocument()
@@ -105,12 +93,6 @@ describe('ConnectRobotSlideout', () => {
   })
 
   it('renders the link and it has the correct href attribute', () => {
-    props = {
-      candidates: [],
-      checkIpAndHostname: jest.fn(),
-      isExpanded: true,
-      onCloseClick: jest.fn(),
-    }
     const { getByText } = render(props)
     const targetLink =
       'https://support.opentrons.com/en/articles/2934336-manually-adding-a-robot-s-ip-address'
@@ -119,18 +101,11 @@ describe('ConnectRobotSlideout', () => {
   })
 
   it('Clicking Add button without IP address/hostname should display an error message', async () => {
-    props = {
-      candidates: [],
-      checkIpAndHostname: jest.fn(),
-      isExpanded: true,
-      onCloseClick: jest.fn(),
-    }
-
     const { getByRole, findByText } = render(props)
     const addButton = getByRole('button', { name: 'Add' })
     expect(addButton).toBeEnabled()
     await fireEvent.click(addButton)
-    const errorMessage = await findByText('Enter a IP Address or Hostname')
+    const errorMessage = await findByText('Enter an IP Address or Hostname')
     expect(errorMessage).toBeInTheDocument()
   })
 
@@ -207,28 +182,15 @@ describe('ConnectRobotSlideout', () => {
   })
 
   it('Clicking close button should close the slideout', async () => {
-    const handleClose = jest.fn()
-    props = {
-      candidates: [],
-      checkIpAndHostname: jest.fn(),
-      isExpanded: true,
-      onCloseClick: handleClose,
-    }
     const { getByTestId } = render(props)
     const closeButton = getByTestId(
-      'Slideout_icon_close_Connect to Robot via IP Address'
+      'Slideout_icon_close_Connect to a Robot via IP Address'
     )
     await fireEvent.click(closeButton)
-    expect(handleClose).toHaveBeenCalled()
+    expect(props.onCloseClick).toHaveBeenCalled()
   })
 
   it('Clicking Done button should close the slideout', async () => {
-    props = {
-      candidates: [],
-      checkIpAndHostname: jest.fn(),
-      isExpanded: true,
-      onCloseClick: jest.fn(),
-    }
     const { getByRole } = render(props)
     const doneButton = getByRole('button', { name: 'Done' })
     await fireEvent.click(doneButton)

@@ -14,7 +14,7 @@
   "versions_sync": "Learn more about keeping the Opentrons app and robot software in sync",
   "update_alerts": "Software Update Alerts",
   "receive_alert": "Receive an alert when an Opentrons software update is available",
-  "connect_ip": "Connect to Robot via IP Address",
+  "connect_ip": "Connect to a Robot via IP Address",
   "ip_description_first": "Enter an IP address or hostname to connect to a robot.",
   "ip_description_second": "Opentrons recommends working with your network administrator to assign a static IP address to the robot.",
   "connect_ip_link": "Learn more about connecting a robot manually",
