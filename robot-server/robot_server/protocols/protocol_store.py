@@ -1,4 +1,4 @@
-"""Methods for saving and retrieving protocol files."""
+"""Store and retrieve information about uploaded protocols."""
 
 
 from __future__ import annotations
@@ -16,73 +16,9 @@ from opentrons.protocol_reader import ProtocolSource
 _log = getLogger(__name__)
 
 
-_metadata = sqlalchemy.MetaData()
-
-# Column and table names here match:
-#   * _sql_row_to_resource()
-#   * _resource_to_sql_values()
-#   * Various .where() constructs inside ProtocolStore
-#
-# TODO: Any way these types can be inferred? Investigate sqlalchemy[2]-stubs,
-# reconsider if light ORM use would be good for us.
-_protocol_table = sqlalchemy.Table(
-    "protocol",
-    _metadata,
-    sqlalchemy.Column(
-        "id",
-        sqlalchemy.String,
-        primary_key=True,
-    ),
-    sqlalchemy.Column(
-        "created_at",
-        sqlalchemy.DateTime,
-        nullable=False,
-    ),
-    sqlalchemy.Column(
-        "source",
-        sqlalchemy.PickleType,
-        nullable=False,
-    ),
-)
-
-
-def _convert_sql_row_to_resource(sql_row: sqlalchemy.engine.Row) -> ProtocolResource:
-    protocol_id = sql_row.id
-    assert isinstance(protocol_id, str)
-
-    created_at = sql_row.created_at
-    assert isinstance(created_at, datetime)
-
-    source = sql_row.source
-    assert isinstance(source, ProtocolSource)
-
-    return ProtocolResource(
-        protocol_id=protocol_id, created_at=created_at, source=source
-    )
-
-
-def _convert_resource_to_sql_values(resource: ProtocolResource) -> Dict[str, object]:
-    return {
-        "id": resource.protocol_id,
-        "created_at": resource.created_at,
-        "source": resource.source,
-    }
-
-
-# TODO: This won't scale when we have multiple store
-# classes each with their own table. We'll need a way of merging every store's
-# Table into a single MetaData, I think?
-# TODO: Make async, probably.
-# TODO: What happens if the database already has tables?
-#       Trying to recreate them should probably be an error.
-#       Can we detect the conflict?
-def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
-    _metadata.create_all(sql_engine)
-
-
 @dataclass(frozen=True)
 class ProtocolResource:
-    """An entry in the protocol store, used to construct response models."""
+    """Represents an uploaded protocol."""
 
     protocol_id: str
     created_at: datetime
@@ -97,9 +33,11 @@ class ProtocolNotFoundError(KeyError):
         super().__init__(f"Protocol {protocol_id} was not found.")
 
 
-# TODO: Make all methods async, probably.
+# TODO(mm, 2022-03-29): When we confirm we can use SQLAlchemy 1.4 on the OT-2,
+# convert all methods to use an async engine.
+# https://docs.sqlalchemy.org/en/14/orm/extensions/asyncio.html
 class ProtocolStore:
-    """Methods for storing and retrieving protocol files."""
+    """Store and retrieve information about uploaded protocols."""
 
     def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
         """Initialize the ProtocolStore.
@@ -161,8 +99,8 @@ class ProtocolStore:
         )
         with self._sql_engine.begin() as transaction:
             try:
-                # SQLite <3.35.0 doesn't support a RETURNING clause,
-                # so we DIY it with a separate SELECT.
+                # SQLite <3.35.0 doesn't support the RETURNING clause,
+                # so we do it ourselves with a separate SELECT.
                 row_to_delete = transaction.execute(select_statement).one()
             except sqlalchemy.exc.NoResultFound as e:
                 raise ProtocolNotFoundError(protocol_id=protocol_id) from e
@@ -176,3 +114,57 @@ class ProtocolStore:
         protocol_dir.rmdir()
 
         return deleted_resource
+
+
+def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
+    """Create the necessary database tables to back a `ProtocolStore`.
+
+    Params:
+        sql_engine: An engine for a blank SQL database, to put the tables in.
+    """
+    _metadata.create_all(sql_engine)
+
+
+_metadata = sqlalchemy.MetaData()
+_protocol_table = sqlalchemy.Table(
+    "protocol",
+    _metadata,
+    sqlalchemy.Column(
+        "id",
+        sqlalchemy.String,
+        primary_key=True,
+    ),
+    sqlalchemy.Column(
+        "created_at",
+        sqlalchemy.DateTime,
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "source",
+        sqlalchemy.PickleType,
+        nullable=False,
+    ),
+)
+
+
+def _convert_sql_row_to_resource(sql_row: sqlalchemy.engine.Row) -> ProtocolResource:
+    protocol_id = sql_row.id
+    assert isinstance(protocol_id, str)
+
+    created_at = sql_row.created_at
+    assert isinstance(created_at, datetime)
+
+    source = sql_row.source
+    assert isinstance(source, ProtocolSource)
+
+    return ProtocolResource(
+        protocol_id=protocol_id, created_at=created_at, source=source
+    )
+
+
+def _convert_resource_to_sql_values(resource: ProtocolResource) -> Dict[str, object]:
+    return {
+        "id": resource.protocol_id,
+        "created_at": resource.created_at,
+        "source": resource.source,
+    }

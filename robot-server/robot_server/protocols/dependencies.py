@@ -27,7 +27,7 @@ _protocol_store = AppStateValue[ProtocolStore]("protocol_store")
 _analysis_store = AppStateValue[AnalysisStore]("analysis_store")
 
 
-def get_sql_engine(app_state: AppState = Depends(get_app_state)) -> SQLEngine:
+def _get_sql_engine(app_state: AppState = Depends(get_app_state)) -> SQLEngine:
     sql_engine = _sql_engine.get_from(app_state)
 
     if sql_engine is None:
@@ -64,7 +64,7 @@ def get_protocol_reader(
 
 def get_protocol_store(
     app_state: AppState = Depends(get_app_state),
-    sql_engine: SQLEngine = Depends(get_sql_engine),
+    sql_engine: SQLEngine = Depends(_get_sql_engine),
 ) -> ProtocolStore:
     """Get a singleton ProtocolStore to keep track of created protocols."""
     protocol_store = _protocol_store.get_from(app_state)
