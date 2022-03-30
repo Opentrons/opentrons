@@ -1,13 +1,8 @@
 // set of functions that parse details out of a protocol record and it's internals
-import sortedUniqBy from 'lodash/sortedUniqBy'
-import keyBy from 'lodash/keyBy'
 import reduce from 'lodash/reduce'
 
 import type { PipetteName, ModuleModel } from '@opentrons/shared-data'
-import type {
-  ProtocolFile,
-  RunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
   LoadLabwareRunTimeCommand,
   LoadModuleRunTimeCommand,
@@ -19,17 +14,17 @@ interface PipetteNamesByMount {
   right: PipetteName | null
 }
 export function parseInitialPipetteNamesByMount(
-  analysis: ProtocolFile<{}>
+  analysis: ProtocolAnalysisFile<{}>
 ): PipetteNamesByMount {
-  const { commands, pipettes } = analysis
+  const { commands } = analysis
   const rightPipetteName = commands.find(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'right'
-  )?.params.pipetteName
+  )?.params.pipetteName as PipetteName | undefined
   const leftPipetteName = commands.find(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'left'
-  )?.params.pipetteName
+  )?.params.pipetteName as PipetteName | undefined
   return {
     left: leftPipetteName ?? null,
     right: rightPipetteName ?? null,
@@ -37,7 +32,7 @@ export function parseInitialPipetteNamesByMount(
 }
 
 export function parseAllRequiredModuleModels(
-  analysis: ProtocolFile<{}>
+  analysis: ProtocolAnalysisFile<{}>
 ): ModuleModel[] {
   return Object.entries(analysis.modules).map(([_moduleId, { model }]) => model)
 }
@@ -46,7 +41,7 @@ interface LoadedLabwareBySlot {
   [slotName: string]: LoadLabwareRunTimeCommand
 }
 export function parseInitialLoadedLabwareBySlot(
-  analysis: ProtocolFile<{}>
+  analysis: ProtocolAnalysisFile<{}>
 ): LoadedLabwareBySlot {
   const loadLabwareCommandsReversed = analysis.commands
     .filter(
@@ -68,7 +63,7 @@ interface LoadedLabwareByModuleId {
   [moduleId: string]: LoadLabwareRunTimeCommand
 }
 export function parseInitialLoadedLabwareByModuleId(
-  analysis: ProtocolFile<{}>
+  analysis: ProtocolAnalysisFile<{}>
 ): LoadedLabwareByModuleId {
   const loadLabwareCommandsReversed = analysis.commands
     .filter(
@@ -89,7 +84,7 @@ interface LoadedModulesBySlot {
   [slotName: string]: LoadModuleRunTimeCommand
 }
 export function parseInitialLoadedModulesBySlot(
-  analysis: ProtocolFile<{}>
+  analysis: ProtocolAnalysisFile<{}>
 ): LoadedModulesBySlot {
   const loadLabwareCommandsReversed = analysis.commands
     .filter(

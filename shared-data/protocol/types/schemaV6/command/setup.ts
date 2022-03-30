@@ -10,7 +10,10 @@ export interface LoadPipetteCreateCommand {
 }
 export interface LoadPipetteRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    LoadPipetteCreateCommand {
+    Omit<LoadPipetteCreateCommand, 'params'> {
+  params: LoadPipetteParams & {
+    pipetteName: string
+  }
   result: LoadPipetteResult
 }
 export interface LoadLabwareCreateCommand {

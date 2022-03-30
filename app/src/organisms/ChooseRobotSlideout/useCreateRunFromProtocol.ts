@@ -27,13 +27,13 @@ export function useCreateRunFromProtocol(
 
   const { createRun, isLoading: isCreatingRun } = useCreateRunMutation({
     ...options,
-    onSuccess: data => {
+    onSuccess: (...args) => {
       queryClient
         .invalidateQueries([host, 'runs'])
         .catch((e: Error) =>
           console.error(`error invalidating runs query: ${e.message}`)
         )
-      options.onSuccess != null && options.onSuccess(data)
+      options.onSuccess?.(...args)
     },
     onError: error => {
       setRunCreationError(error.response?.data.errors[0].detail ?? null)
