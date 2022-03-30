@@ -350,5 +350,5 @@ class BrushedMotorVrefPayload(utils.BinarySerializable):
 class BrushedMotorPwmPayload(utils.BinarySerializable):
     """A request to set the pwm of a brushed motor."""
 
-    freq: utils.UInt8Field
-    duty_cycle: utils.UInt8Field
+    freq: utils.UInt32Field
+    duty_cycle: utils.UInt32Field

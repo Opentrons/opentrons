@@ -39,6 +39,8 @@ MessageDefinition = Union[
     defs.WriteMotorCurrentRequest,
     defs.SetBrushedMotorVrefRequest,
     defs.SetBrushedMotorPwmRequest,
+    defs.GripperGripRequest,
+    defs.GripperHomeRequest,
     defs.ReadPresenceSensingVoltageRequest,
     defs.ReadPresenceSensingVoltageResponse,
     defs.AttachedToolsRequest,
