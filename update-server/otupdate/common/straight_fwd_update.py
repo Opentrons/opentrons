@@ -10,6 +10,7 @@ from otupdate.common.update import require_session, _save_file
 
 LOG = logging.getLogger(__name__)
 
+
 def _begin_straight_fwd_untar_and_write(
     session: UpdateSession,
     config: config.Config,

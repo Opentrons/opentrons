@@ -172,7 +172,7 @@ class Updater(UpdateActionsInterface):
             with open(unused_partition.path, "wb") as fdst:
                 shutil.copyfileobj(fsrc, fdst, length=1024)
                 written_size += 1024
-                progress_callback(written_size/total_size)
+                progress_callback(written_size / total_size)
 
     def verify_check_sum(self) -> bool:
         pass

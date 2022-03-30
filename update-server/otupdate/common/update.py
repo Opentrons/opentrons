@@ -132,6 +132,8 @@ def _begin_validation(
 ) -> asyncio.futures.Future:
     """Start the validation process."""
     session.set_stage(Stages.VALIDATING)
+    cert_path = config.update_cert_path if config.signature_required else None
+    
     validation_future = asyncio.ensure_future(
         loop.run_in_executor(
             None,
