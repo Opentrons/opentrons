@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 import { useTrackEvent } from '../../../redux/analytics'
 import { ConfirmAttachmentModal } from '../../Devices/ModuleCard/ConfirmAttachmentModal'
-import { useHeaterShakerSlotNumber } from '../../Devices/ModuleCard/hooks'
+import { useHeaterShakerFromProtocol } from '../../Devices/ModuleCard/hooks'
 import { useModuleMatchResults, useProtocolCalibrationStatus } from './hooks'
 
 export const ProceedToRunCta = (): JSX.Element | null => {
@@ -18,8 +18,9 @@ export const ProceedToRunCta = (): JSX.Element | null => {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const moduleMatchResults = useModuleMatchResults()
   const trackEvent = useTrackEvent()
-  const heaterShakerSlot = useHeaterShakerSlotNumber()
-  const isHeaterShakerInProtocol = heaterShakerSlot !== null
+  const heaterShaker = useHeaterShakerFromProtocol()
+  const slotNumber = heaterShaker != null ? heaterShaker.slotName : null
+  const isHeaterShakerInProtocol = slotNumber !== null
   const isEverythingCalibrated = useProtocolCalibrationStatus().complete
   const { missingModuleIds } = moduleMatchResults
   const calibrationIncomplete =
@@ -52,8 +53,6 @@ export const ProceedToRunCta = (): JSX.Element | null => {
   const linkProps = CTAbehaviorDifferentReason ? {} : { to: '/run' }
 
   console.log(isHeaterShakerInProtocol)
-  console.log(proceedToRunDisabledReason)
-
   return (
     <Flex justifyContent={JUSTIFY_CENTER}>
       {showConfirmAttachModal && (

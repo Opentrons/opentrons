@@ -28,9 +28,7 @@ import type {
 import type { AttachedModule } from '../../../redux/modules/types'
 import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
 
-export function useHeaterShakerSlotNumber():
-  | ProtocolModuleInfo['slotName']
-  | null {
+export function useHeaterShakerFromProtocol(): ProtocolModuleInfo | null {
   const { protocolData } = useProtocolDetails()
   if (protocolData == null) return null
   const protocolModulesInfo = getProtocolModulesInfo(
@@ -40,10 +38,8 @@ export function useHeaterShakerSlotNumber():
   const heaterShakerModule = protocolModulesInfo.find(
     module => module.moduleDef.model === 'heaterShakerModuleV1'
   )
-  if (heaterShakerModule === undefined) return null
-  const slotNumber = heaterShakerModule.slotName
-
-  return slotNumber
+  if (heaterShakerModule == null) return null
+  return heaterShakerModule
 }
 interface LatchCommand {
   toggleLatch: () => void

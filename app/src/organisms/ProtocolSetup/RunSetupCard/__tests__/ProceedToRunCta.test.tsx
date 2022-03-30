@@ -6,10 +6,15 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { i18n } from '../../../../i18n'
+import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { ConfirmAttachmentModal } from '../../../Devices/ModuleCard/ConfirmAttachmentModal'
-import { useHeaterShakerSlotNumber } from '../../../Devices/ModuleCard/hooks'
+import { useHeaterShakerFromProtocol } from '../../../Devices/ModuleCard/hooks'
 import * as hooks from '../hooks'
 import { ProceedToRunCta } from '../ProceedToRunCta'
+
+import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
+
+import type { ProtocolModuleInfo } from '../../utils/getProtocolModulesInfo'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -39,8 +44,8 @@ const mockConfirmAttachmentModal = ConfirmAttachmentModal as jest.MockedFunction
   typeof ConfirmAttachmentModal
 >
 
-const mockUseHeaterShakerSlotNumber = useHeaterShakerSlotNumber as jest.MockedFunction<
-  typeof useHeaterShakerSlotNumber
+const mockUseHeaterShakerFromProtocol = useHeaterShakerFromProtocol as jest.MockedFunction<
+  typeof useHeaterShakerFromProtocol
 >
 
 const render = () => {
@@ -54,6 +59,19 @@ const render = () => {
   )[0]
 }
 
+const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
+  moduleId: 'heater_shaker_id',
+  x: 0,
+  y: 0,
+  z: 0,
+  moduleDef: mockHeaterShaker as any,
+  nestedLabwareDef: heaterShakerCommands.labwareDefinitions['example/plate/1'],
+  nestedLabwareDisplayName: null,
+  nestedLabwareId: null,
+  protocolLoadOrder: 1,
+  slotName: '1',
+} as ProtocolModuleInfo
+
 let mockTrackEvent: jest.Mock
 
 describe('ProceedToRunCta', () => {
@@ -64,7 +82,7 @@ describe('ProceedToRunCta', () => {
     mockConfirmAttachmentModal.mockReturnValue(
       <div>mock confirm attachment modal</div>
     )
-    mockUseHeaterShakerSlotNumber.mockReturnValue(null)
+    mockUseHeaterShakerFromProtocol.mockReturnValue(null)
     mockTrackEvent = jest.fn()
     when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
   })
@@ -140,7 +158,9 @@ describe('ProceedToRunCta', () => {
   })
 
   it('should be disabled with module not attached but heater shaker attached', async () => {
-    mockUseHeaterShakerSlotNumber.mockReturnValue('1')
+    mockUseHeaterShakerFromProtocol.mockReturnValue(
+      HEATER_SHAKER_PROTOCOL_MODULE_INFO
+    )
     mockUseModuleMatchResults.mockReturnValue({
       missingModuleIds: ['temperatureModuleV1'],
       remainingAttachedModules: [],
@@ -155,7 +175,9 @@ describe('ProceedToRunCta', () => {
   })
 
   it('should render cta enabled and go to heater shaker modal when clicked', async () => {
-    mockUseHeaterShakerSlotNumber.mockReturnValue('1')
+    mockUseHeaterShakerFromProtocol.mockReturnValue(
+      HEATER_SHAKER_PROTOCOL_MODULE_INFO
+    )
     mockUseModuleMatchResults.mockReturnValue({
       missingModuleIds: [],
       remainingAttachedModules: [],

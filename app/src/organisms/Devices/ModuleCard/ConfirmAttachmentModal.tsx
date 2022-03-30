@@ -17,7 +17,7 @@ import { SecondaryButton, PrimaryButton } from '../../../atoms/Buttons'
 import { Modal } from '../../../atoms/Modal'
 import { ProtocolRunDetails } from '../../../pages/Devices/ProtocolRunDetails'
 import { useTrackEvent } from '../../../redux/analytics'
-import { useHeaterShakerSlotNumber } from './hooks'
+import { useHeaterShakerFromProtocol } from './hooks'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type { HeaterShakerSetTargetShakeSpeedCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
@@ -42,7 +42,8 @@ export const ConfirmAttachmentModal = (
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [isDismissed, setIsDismissed] = React.useState<boolean>(false)
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const slotNumber = useHeaterShakerSlotNumber()
+  const heaterShaker = useHeaterShakerFromProtocol()
+  const slotNumber = heaterShaker != null ? heaterShaker.slotName : null
   const trackEvent = useTrackEvent()
   const [
     showProtocolRunDetails,

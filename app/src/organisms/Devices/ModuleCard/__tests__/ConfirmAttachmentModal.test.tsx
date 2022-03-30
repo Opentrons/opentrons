@@ -4,20 +4,23 @@ import { when } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
+import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { ProtocolRunDetails } from '../../../../pages/Devices/ProtocolRunDetails'
-import { useHeaterShakerSlotNumber } from '../hooks'
+import { useHeaterShakerFromProtocol } from '../hooks'
 import { ConfirmAttachmentModal } from '../ConfirmAttachmentModal'
 
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
+
+import type { ProtocolModuleInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
 
 jest.mock('../hooks')
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../pages/Devices/ProtocolRunDetails')
 jest.mock('@opentrons/react-api-client')
 
-const mockUseHeaterShakerSlotNumber = useHeaterShakerSlotNumber as jest.MockedFunction<
-  typeof useHeaterShakerSlotNumber
+const mockUseHeaterShakerFromProtocol = useHeaterShakerFromProtocol as jest.MockedFunction<
+  typeof useHeaterShakerFromProtocol
 >
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
@@ -34,6 +37,20 @@ const render = (props: React.ComponentProps<typeof ConfirmAttachmentModal>) => {
     i18nInstance: i18n,
   })[0]
 }
+
+const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
+  moduleId: 'heater_shaker_id',
+  x: 0,
+  y: 0,
+  z: 0,
+  moduleDef: mockHeaterShaker as any,
+  nestedLabwareDef: heaterShakerCommands.labwareDefinitions['example/plate/1'],
+  nestedLabwareDisplayName: null,
+  nestedLabwareId: null,
+  protocolLoadOrder: 1,
+  slotName: '1',
+} as ProtocolModuleInfo
+
 let mockTrackEvent: jest.Mock
 
 describe('ConfirmAttachmentBanner', () => {
@@ -54,7 +71,9 @@ describe('ConfirmAttachmentBanner', () => {
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
-    mockUseHeaterShakerSlotNumber.mockReturnValue('1')
+    mockUseHeaterShakerFromProtocol.mockReturnValue(
+      HEATER_SHAKER_PROTOCOL_MODULE_INFO
+    )
 
     mockTrackEvent = jest.fn()
     when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)

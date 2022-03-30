@@ -14,7 +14,7 @@ import { getProtocolModulesInfo } from '../../../ProtocolSetup/utils/getProtocol
 import {
   useLatchCommand,
   useModuleOverflowMenu,
-  useHeaterShakerSlotNumber,
+  useHeaterShakerFromProtocol,
 } from '../hooks'
 
 import {
@@ -621,10 +621,10 @@ describe('useProtocolMetadata', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
-    const { result } = renderHook(useHeaterShakerSlotNumber, { wrapper })
-    const slotNumber = result.current
+    const { result } = renderHook(useHeaterShakerFromProtocol, { wrapper })
+    const heaterShaker = result.current
 
-    expect(slotNumber).toBe('1')
+    expect(heaterShaker?.slotName).toBe('1')
   })
 
   it('should return undefined when heater shaker isnt in protocol', () => {
@@ -633,9 +633,9 @@ describe('useProtocolMetadata', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
-    const { result } = renderHook(useHeaterShakerSlotNumber, { wrapper })
-    const slotNumber = result.current
+    const { result } = renderHook(useHeaterShakerFromProtocol, { wrapper })
+    const heaterShaker = result.current
 
-    expect(slotNumber).toBe(null)
+    expect(heaterShaker?.slotName).toBe(undefined)
   })
 })
