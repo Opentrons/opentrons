@@ -45,9 +45,8 @@ class ProtocolReader:
 
         Arguments:
             name: Name of the directory to create and place files in.
-            files: List of files. This method will read and then close them.
-                Do not attempt to reuse any file-like objects in this list
-                after you've passed them to this method.
+            files: List of files. Do not attempt to reuse and file-like objects
+                in this list once they've been passed to the ProtocolReader.
 
         Returns:
             A validated ProtocolSource.
