@@ -56,7 +56,11 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
       </StyledText>
       <Flex flexDirection="column">
         {storedProtocols.map(storedProtocol => (
-          <ProtocolCard key={storedProtocol.protocolKey} handleRunProtocol={() => setSelectedProtocol(storedProtocol)} {...storedProtocol} />
+          <ProtocolCard
+            key={storedProtocol.protocolKey}
+            handleRunProtocol={() => setSelectedProtocol(storedProtocol)}
+            {...storedProtocol}
+          />
         ))}
       </Flex>
       <EmptyStateLinks title={t('create_or_download')} />

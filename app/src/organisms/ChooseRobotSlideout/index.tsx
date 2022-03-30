@@ -65,9 +65,7 @@ export function ChooseRobotSlideout(
     mostRecentAnalysis?.metadata?.protocolName ??
     first(srcFileNames) ??
     protocolKey
-  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(
-    null
-  )
+  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
 
   const srcFileObjects = srcFiles.map((srcFileBuffer, index) => {
     const srcFilePath = srcFileNames[index]
@@ -92,7 +90,8 @@ export function ChooseRobotSlideout(
     return true
   })
   const unavailableOrBusyCount =
-    unavailableRobots.length + reachableRobots.length +
+    unavailableRobots.length +
+    reachableRobots.length +
     (connectableRobots.length - availableRobots.length)
 
   return (
@@ -105,7 +104,9 @@ export function ChooseRobotSlideout(
         protocol_name: protocolDisplayName,
       })}
       footer={
-        <ApiHostProvider hostname={selectedRobot != null ? selectedRobot.ip : null}>
+        <ApiHostProvider
+          hostname={selectedRobot != null ? selectedRobot.ip : null}
+        >
           <CreateRunButton
             disabled={selectedRobot == null}
             protocolKey={protocolKey}
@@ -156,10 +157,14 @@ export function ChooseRobotSlideout(
               local={robot.local}
               onClick={() =>
                 setSelectedRobot(
-                  (selectedRobot != null && robot.ip === selectedRobot.ip) ? null : robot
+                  selectedRobot != null && robot.ip === selectedRobot.ip
+                    ? null
+                    : robot
                 )
               }
-              isSelected={selectedRobot != null && selectedRobot.ip === robot.ip}
+              isSelected={
+                selectedRobot != null && selectedRobot.ip === robot.ip
+              }
             />
           ))
         )}
@@ -251,9 +256,9 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
   const history = useHistory()
   const { protocolKey, srcFileObjects, robotName, ...buttonProps } = props
   const { createRun } = useCreateRunFromProtocol({
-    onSuccess: ({data: runData}) => {
+    onSuccess: ({ data: runData }) => {
       history.push(`/devices/${robotName}/protocol-runs/${runData.id}`)
-    }
+    },
   })
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {

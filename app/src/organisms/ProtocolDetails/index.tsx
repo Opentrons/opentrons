@@ -217,9 +217,7 @@ export function ProtocolDetails(
             <StyledText as="h6">{t('last_analyzed')}</StyledText>
             <StyledText as="p">{lastAnalyzed}</StyledText>
           </Flex>
-          <PrimaryButton
-            onClick={() => setShowSlideout(true)}
-          >
+          <PrimaryButton onClick={() => setShowSlideout(true)}>
             {t('run_protocol')}
           </PrimaryButton>
         </Flex>

@@ -75,7 +75,9 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                   )}
                   def={getModuleDef2(moduleInSlot.params.model)}
                   innerProps={
-                    moduleInSlot.params.model === THERMOCYCLER_MODULE_V1 ? { lidMotorState: 'open' } : {}
+                    moduleInSlot.params.model === THERMOCYCLER_MODULE_V1
+                      ? { lidMotorState: 'open' }
+                      : {}
                   }
                 >
                   {labwareInModule != null ? (

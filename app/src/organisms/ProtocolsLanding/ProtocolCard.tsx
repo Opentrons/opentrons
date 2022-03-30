@@ -2,10 +2,7 @@ import * as React from 'react'
 import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import first from 'lodash/first'
-import {
-  getModuleType,
-  getPipetteNameSpecs,
-} from '@opentrons/shared-data'
+import { getModuleType, getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import {
   Flex,
@@ -37,7 +34,13 @@ interface ProtocolCardProps extends StoredProtocolData {
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const { t } = useTranslation('protocol_list')
-  const { handleRunProtocol, protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
+  const {
+    handleRunProtocol,
+    protocolKey,
+    srcFileNames,
+    mostRecentAnalysis,
+    modified,
+  } = props
 
   const robotModel = mostRecentAnalysis?.robot?.model ?? 'OT-2'
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
@@ -63,7 +66,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
         flexDirection={DIRECTION_ROW}
         marginBottom={SPACING.spacing3}
         padding={SPACING.spacing4}
-       justifyContent={JUSTIFY_SPACE_BETWEEN}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
         width="100%"
         position="relative"
       >
@@ -77,7 +80,9 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
           >
             {mostRecentAnalysis != null ? (
               <DeckThumbnail analysis={mostRecentAnalysis} />
-            ) : <Icon name="ot-spinner" spin size={SIZE_3}/>}
+            ) : (
+              <Icon name="ot-spinner" spin size={SIZE_3} />
+            )}
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
             <StyledText
@@ -140,7 +145,10 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
         </Flex>
 
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <ProtocolOverflowMenu protocolKey={protocolKey} handleRunProtocol={handleRunProtocol} />
+          <ProtocolOverflowMenu
+            protocolKey={protocolKey}
+            handleRunProtocol={handleRunProtocol}
+          />
           <StyledText
             as="label"
             position="absolute"
