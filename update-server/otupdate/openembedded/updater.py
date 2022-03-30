@@ -50,10 +50,10 @@ class PartitionManager:
 
     def switch_partition(self):
         unused_partition = self.find_unused_partition()
-        if unused_partition.value.number == 2:
-            subprocess.check_output("fw_setenv root_part 2")
+        if unused_partition.number == 2:
+            subprocess.run(["fw_setenv", "root_part", "2"])
         else:
-            subprocess.check_output("fw_setenv root_part 3")
+            subprocess.run(["fw_setenv", "root_part", "3"])
 
 
 class RootFSInterface:
@@ -168,7 +168,7 @@ class Updater(UpdateActionsInterface):
         unused_partition = self.part_mngr.find_unused_partition()
         return unused_partition
 
-    def untar_and_write(
+    def decomp_and_write(
         self, downloaded_update_path: str, progress_callback: Callable[[float], None]
     ) -> None:
 
@@ -176,6 +176,8 @@ class Updater(UpdateActionsInterface):
         self.root_FS_intf.write_update(
             downloaded_update_path, unused_partition, progress_callback
         )
+        # switch to partion with the updated rootfs
+        self.part_mngr.switch_partition()
 
     def verify_check_sum(self) -> bool:
         pass

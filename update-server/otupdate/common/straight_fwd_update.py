@@ -11,7 +11,7 @@ from otupdate.common.update import require_session, _save_file
 LOG = logging.getLogger(__name__)
 
 
-def _begin_straight_fwd_untar_and_write(
+def _begin_straight_fwd_decomp_and_write(
     session: UpdateSession,
     config: config.Config,
     loop: asyncio.AbstractEventLoop,
@@ -19,29 +19,29 @@ def _begin_straight_fwd_untar_and_write(
     actions: update_actions.UpdateActionsInterface,
 ):
     """Start the write process!"""
-    LOG.info("In _begin_straight_fwd_untar_and_write")
+    LOG.info("In _begin_straight_fwd_decomp_and_write")
     LOG.info(
         f"file path, "
-        f"{downloaded_update_path}, in _begin_straight_fwd_untar_and_write"
+        f"{downloaded_update_path}, in _begin_straight_fwd_decomp_and_write"
     )
     session.set_stage(Stages.WRITING)
     write_future = asyncio.ensure_future(
         loop.run_in_executor(
             None,
-            actions.untar_and_write,
+            actions.decomp_and_write,
             downloaded_update_path,
             session.set_progress,
         )
     )
 
-    def untar_and_write_done(fut):
+    def decomp_and_write_done(fut):
         exc = fut.exception()
         if exc:
             session.set_error(getattr(exc, "short", str(type(exc))), str(exc))
         else:
             session.set_stage(Stages.DONE)
 
-    write_future.add_done_callback(untar_and_write_done)
+    write_future.add_done_callback(decomp_and_write_done)
 
 
 @require_session
@@ -83,7 +83,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             status=500,
         )
 
-    _begin_straight_fwd_untar_and_write(
+    _begin_straight_fwd_decomp_and_write(
         session,
         config.config_from_request(request),
         asyncio.get_event_loop(),

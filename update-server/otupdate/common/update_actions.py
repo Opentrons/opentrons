@@ -75,7 +75,7 @@ class UpdateActionsInterface:
         ...
 
     @abc.abstractmethod
-    def untar_and_write(
+    def decomp_and_write(
         self, downloaded_update_path: str, progress_callback: Callable[[float], None]
     ) -> None:
         """Untar update file."""
