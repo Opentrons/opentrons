@@ -426,18 +426,10 @@ class SetBrushedMotorPwmRequest:  # noqa: D101
 
 
 @dataclass
-class GripperGripRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
-    payload_type: Type[BinarySerializable] = payloads.EmptyPayload
-    message_id: Literal[
-        MessageId.gripper_grip_request
-    ] = MessageId.gripper_grip_request
+class GripperGripRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[MessageId.gripper_grip_request] = MessageId.gripper_grip_request
 
 
 @dataclass
-class GripperHomeRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
-    payload_type: Type[BinarySerializable] = payloads.EmptyPayload
-    message_id: Literal[
-        MessageId.gripper_home_request
-    ] = MessageId.gripper_home_request
+class GripperHomeRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[MessageId.gripper_home_request] = MessageId.gripper_home_request
