@@ -77,20 +77,19 @@ async def status(request: web.Request, session: UpdateSession) -> web.Response:
 
 
 async def _save_file(part: BodyPartReader, path: str):
-    LOG.warning(f"path {os.path.join(path, part.name)}, in _save_file")
+    LOG.info(f"path {os.path.join(path, part.name)}, in _save_file")
     # making sure directory exists first
     Path(path).mkdir(parents=True, exist_ok=True)
     with open(os.path.join(path, part.name), "wb") as write:
-        LOG.warning(f"_save_file trying to write at ===> {path}")
+        LOG.info(f"_save_file trying to write at ===> {path}")
         while not part.at_eof():
             chunk = await part.read_chunk()
             decoded = part.decode(chunk)
             write.write(decoded)
-            # LOG.warning("Stuck in _save_file?")
     try:
         for file in os.listdir(path):
             print(f"file written, {file} to path, {path}")
-            LOG.warning(f"file written, {file} to path, {path}")
+            LOG.info(f"file written, {file} to path, {path}")
     except Exception:
         LOG.exception("File not written")
 

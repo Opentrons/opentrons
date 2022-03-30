@@ -74,9 +74,3 @@ class UpdateActionsInterface:
         """Copy the machine id over to the new partition"""
         ...
 
-    @abc.abstractmethod
-    def decomp_and_write(
-        self, downloaded_update_path: str, progress_callback: Callable[[float], None]
-    ) -> None:
-        """Untar update file."""
-        ...

@@ -35,11 +35,6 @@ class RootPartitions(enum.Enum):
 
 
 class OT2UpdateActions(UpdateActionsInterface):
-    def decomp_and_write(
-        self, downloaded_update_path: str, progress_callback: Callable[[float], None]
-    ) -> None:
-        """Untar update file."""
-        pass
 
     def validate_update(
         self,

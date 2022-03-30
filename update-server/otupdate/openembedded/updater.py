@@ -3,7 +3,7 @@ import contextlib
 import lzma
 import os
 import shutil
-
+import tempfile
 
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
 from typing import Callable, Optional
@@ -20,8 +20,8 @@ from otupdate.common.file_actions import (
 import logging
 
 ROOTFS_SIG_NAME = "rootfs.ext4.hash.sig"
-ROOTFS_HASH_NAME = "rootfs.ext4.hash"
-ROOTFS_NAME = "rootfs.ext4"
+ROOTFS_HASH_NAME = "rootfs.xz.md5sum"
+ROOTFS_NAME = "rootfs.xz"
 UPDATE_FILES = [ROOTFS_NAME, ROOTFS_SIG_NAME, ROOTFS_HASH_NAME]
 
 LOG = logging.getLogger(__name__)
@@ -40,20 +40,31 @@ class PartitionManager:
         # fw_printenv -n root_part gives the currently
         # active root_fs partition, find that, and
         # set other partition as unused partition!
-        which = subprocess.check_output(["fw_printenv", "-n", "root_part"])
+        which = subprocess.check_output(["fw_printenv", "-n", "root_part"]).strip()
         return {
-            b"2\n": RootPartitions.THREE.value,
-            b"3\n": RootPartitions.TWO.value,
+            b"2": RootPartitions.THREE.value,
+            b"3": RootPartitions.TWO.value,
             # if output is empty, current part is 2, set unused to 3!
-            b"\n": RootPartitions.THREE.value,
+            b"": RootPartitions.THREE.value,
         }[which]
 
-    def switch_partition(self):
+    def switch_partition(self) -> Partition:
         unused_partition = self.find_unused_partition()
         if unused_partition.number == 2:
             subprocess.run(["fw_setenv", "root_part", "2"])
         else:
             subprocess.run(["fw_setenv", "root_part", "3"])
+        return {
+            2: RootPartitions.TWO.value,
+            3: RootPartitions.THREE.value,
+        }[unused_partition.number]
+
+    def mountpoint_root(self):
+        """provides mountpoint location for :py:meth:`mount_update`.
+
+        exists only for ease of mocking
+        """
+        return "/mnt"
 
 
 class RootFSInterface:
@@ -70,14 +81,13 @@ class RootFSInterface:
         total_size = os.path.getsize(rootfs_filepath)
         written_size = 0
         try:
-            with lzma.open(rootfs_filepath, "rb") as fsrc:
-                with open(part.path, "wb") as fdst:
-                    try:
-                        shutil.copyfileobj(fsrc, fdst, length=chunk_size)
-                        written_size += 1024
-                        progress_callback(written_size / total_size)
-                    except Exception:
-                        LOG.exception("RootFSInterface::write_update exception writing")
+            with lzma.open(rootfs_filepath, "rb") as fsrc, open(part.path, "wb") as fdst:
+                try:
+                    shutil.copyfileobj(fsrc, fdst, length=chunk_size)
+                    written_size += chunk_size
+                    progress_callback(written_size / total_size)
+                except Exception:
+                    LOG.exception("RootFSInterface::write_update exception writing")
         except Exception:
             LOG.exception("RootFSInterface::write_update exception reading")
 
@@ -90,17 +100,36 @@ class Updater(UpdateActionsInterface):
         self.part_mngr = part_mngr
 
     def commit_update(self) -> None:
-        """
-        Command the hardware to boot from the freshly-updated filesystem
-        """
-        pass
+        """Switch the target boot partition."""
+        unused = self.part_mngr.find_unused_partition()
+        new = self.part_mngr.switch_partition()
+        if new != unused:
+            msg = f"Bad switch: switched to {new} when {unused} was unused"
+            LOG.error(msg)
+            raise RuntimeError(msg)
+        else:
+            LOG.info(f"commit_update: committed to booting {new}")
 
     @contextlib.contextmanager
     def mount_update(self):
+        """Mount the freshly-written partition r/w (to update machine-id).
+
+        Should be used as a context manager, and the yielded value is the path
+        to the mount. When the context manager exits, the partition will be
+        unmounted again and its mountpoint removed.
+
+        :param mountpoint_in: The directory in which to create the mountpoint.
         """
-        Mount the fs to overwrite with the update
-        """
-        pass
+        unused = self.part_mngr.find_unused_partition()
+        part_path = unused.path
+        with tempfile.TemporaryDirectory(dir=self.part_mngr.mountpoint_root()) as mountpoint:
+            subprocess.check_output(["mount", part_path, mountpoint])
+            LOG.info(f"mounted {part_path} to {mountpoint}")
+            try:
+                yield mountpoint
+            finally:
+                subprocess.check_output(["umount", mountpoint])
+                LOG.info(f"Unmounted {part_path} from {mountpoint}")
 
     def validate_update(
         self,
@@ -108,19 +137,18 @@ class Updater(UpdateActionsInterface):
         progress_callback: Callable[[float], None],
         cert_path: Optional[str],
     ):
-        """
-        Worker for validation. Call in an executor (so it can return things)
+        """Worker for validation. Call in an executor (so it can return things)
 
-        -Unzips filepath to directory
-        -Hashes the rootfs inside
-        -If requested, checks the signature of the hash
-        :param filepath: The path to update zip file
-        :param progress_callback: The function call with progress between 0
+        - Unzips filepath to its directory
+        - Hashes the rootfs inside
+        - If requested, checks the signature of the hash
+        :param filepath: The path to the update zip file
+        :param progress_callback: The function to call with progress between 0
                                   and 1.0. May never reach precisely 1.0, best
                                   only for user information
         :param cert_path: Path to an x.509 certificate to check the signature
                           against. If ``None``, signature checking is disabled
-        :return str: Path to the rootfs file ti update
+        :returns str: Path to the rootfs file to update
 
         Will also raise an exception if validation fails
         """
@@ -138,13 +166,15 @@ class Updater(UpdateActionsInterface):
 
         rootfs = files.get(ROOTFS_NAME)
         assert rootfs
-        rootfs_hash = hash_file(rootfs, hash_callback, file_size=sizes[ROOTFS_NAME])
+        rootfs_hash = hash_file(
+            rootfs, hash_callback, file_size=sizes[ROOTFS_NAME], algo="md5"
+        )
         hashfile = files.get(ROOTFS_HASH_NAME)
         assert hashfile
-        packaged_hash = open(hashfile, "rb").read().strip()
+        packaged_hash = open(hashfile, "rb").read().strip().split()[0]
         if packaged_hash != rootfs_hash:
             msg = (
-                f"Hash mismatched: calculated {rootfs_hash!r} != "
+                f"Hash mismatch: calculated {rootfs_hash!r} != "
                 f"packaged {packaged_hash!r}"
             )
             LOG.error(msg)
@@ -168,7 +198,7 @@ class Updater(UpdateActionsInterface):
         chunk_size: int = 1024,
         file_size: int = None,
     ) -> Partition:
-
+        self.decomp_and_write(rootfs_filepath, progress_callback)
         LOG.warning("Entering write_update of Updater class!")
         unused_partition = self.part_mngr.find_unused_partition()
         return unused_partition
@@ -200,10 +230,6 @@ class Updater(UpdateActionsInterface):
         blobs, so rootfs.xz would give us the actual rootfs file structure:
         rootfs.xz ===> /bin /var /etc .. ,
         whereas zip gives a collection: rootfs.zip ===> rootfs.ext4
-
-        Note:
-        Right now this function does a straight fwd, on the fly write to
-        the unused partition. Checksum validation isn't being performed.
         """
 
         unused_partition = self.part_mngr.find_unused_partition()
@@ -211,7 +237,7 @@ class Updater(UpdateActionsInterface):
             downloaded_update_path, unused_partition, progress_callback
         )
         # switch to partition with the updated rootfs
-        self.part_mngr.switch_partition()
+        # self.part_mngr.switch_partition()
 
     def verify_check_sum(self) -> bool:
         pass
