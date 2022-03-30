@@ -20,7 +20,7 @@ export const disengageMagnet: CommandCreator<DisengageMagnetArgs> = (
 
   assert(
     invariantContext.moduleEntities[moduleId]?.type === MAGNETIC_MODULE_TYPE,
-    `expected module ${module} to be magdeck, got ${invariantContext.moduleEntities[moduleId]?.type}`
+    `expected module ${moduleId} to be magdeck, got ${invariantContext.moduleEntities[moduleId]?.type}`
   )
   return {
     commands: [

@@ -95,7 +95,9 @@ export type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &
   VolumeParams &
   WellLocationParam
-export type BlowoutParams = FlowRateParams & PipetteAccessParams & WellLocationParam
+export type BlowoutParams = FlowRateParams &
+  PipetteAccessParams &
+  WellLocationParam
 export type TouchTipParams = PipetteAccessParams & WellLocationParam
 export type DropTipParams = TouchTipParams
 export type PickUpTipParams = TouchTipParams

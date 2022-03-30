@@ -83,7 +83,7 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
     ...requiredParams,
     ...(offset != null && wellLocationParams),
   }
-  
+
   // add optional fields only if specified
   if (forceDirect != null) {
     params.forceDirect = forceDirect
