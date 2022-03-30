@@ -28,7 +28,7 @@ import {
 import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import { useAllCommandsQuery } from '@opentrons/react-api-client'
 
-import { NAV_BAR_WIDTH_SCALAR } from '../../../App/NextGenApp'
+import { NAV_BAR_WIDTH } from '../../../App/NextGenApp'
 import { PrimaryButton } from '../../../atoms/Buttons'
 import { StyledText } from '../../../atoms/text'
 import {
@@ -324,7 +324,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
     <PrimaryButton
       position={POSITION_FIXED}
       bottom="2.5rem" // 40px
-      left={`calc(50% + ${NAV_BAR_WIDTH_SCALAR / 2}rem)`} // add width of half of nav bar to center within run tab
+      left={`calc(calc(100% + ${NAV_BAR_WIDTH})/2)`} // add width of half of nav bar to center within run tab
       transform="translate(-50%)"
       borderRadius={SPACING.spacing6}
       display={

@@ -55,6 +55,7 @@ export const RunLogProtocolSetupInfo = ({
       />
     )
   } else if (setupCommand.commandType === 'loadModule') {
+    // TODO(bh, 2022-03-30): parse based on module model or type, not module id
     const moduleId = setupCommand.params.moduleId
     const moduleModel = protocolData.modules[moduleId]
     const moduleSlotNumber = moduleId.includes('thermocycler') ? 4 : 1
