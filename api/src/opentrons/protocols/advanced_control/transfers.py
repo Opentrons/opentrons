@@ -1,5 +1,4 @@
 import enum
-import warnings
 from typing import (
     Any,
     Dict,
@@ -495,8 +494,6 @@ class TransferPlan:
         )
         if self._api_version >= APIVersion(2, 12):
             # TODO: update https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/versioning.rst
-
-
             for step_vol, (src, dest) in plan_iter:
                     max_vol = (
                         self._max_volume
