@@ -50,16 +50,18 @@ class StartSetTargetTemperatureImpl(
     ) -> StartSetTargetTemperatureResult:
         """Set a Heater-Shaker's target temperature."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
-        hs_module_view = self._state_view.modules.get_heater_shaker_module_substate(
+        hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
             module_id=params.moduleId
         )
 
         # Verify temperature from hs module view
-        validated_temp = hs_module_view.validate_target_temperature(params.temperature)
+        validated_temp = hs_module_substate.validate_target_temperature(
+            params.temperature
+        )
 
         # Allow propagation of ModuleNotAttachedError.
         hs_hardware_module = self._equipment.get_module_hardware_api(
-            hs_module_view.module_id
+            hs_module_substate.module_id
         )
 
         if hs_hardware_module is not None:
