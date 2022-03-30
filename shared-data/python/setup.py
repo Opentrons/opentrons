@@ -3,7 +3,7 @@ import os
 import sys
 
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import List
 
 from setuptools.command import build_py, sdist
 from setuptools import setup, find_packages
@@ -45,7 +45,6 @@ def _minimize_and_write_json(data_file: Path, target_file: Path) -> None:
 
 class SDistWithData(sdist.sdist):
     description = sdist.sdist.description + " Also, include data files."
-
 
     def make_release_tree(self, base_dir, files) -> None:
         self.announce("adding data files to base dir {}".format(base_dir))
