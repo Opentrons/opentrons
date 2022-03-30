@@ -13,6 +13,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
 
 const IpItem = styled.div`
   flex: 1 1 auto;
@@ -49,16 +50,13 @@ export function IpHostnameItem(props: IpHostnameItemProps): JSX.Element {
     <>
       <Flex justifyContent={JUSTIFY_FLEX_START} alignItems={JUSTIFY_CENTER}>
         <IpItem>
-          <Text
-            fontSize={TYPOGRAPHY.fontSizeP}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-            lineHeight={TYPOGRAPHY.lineHeight16}
-            fontStyle={TYPOGRAPHY.fontStyleNormal}
-            color={props.discovered ? COLORS.darkBlack : COLORS.successDisabled}
+          <StyledText
+            as="p"
             data-testid={`ip-hostname`}
+            color={props.discovered ? COLORS.darkBlack : COLORS.successDisabled}
           >
             {props.candidate}
-          </Text>
+          </StyledText>
         </IpItem>
         <Text
           fontSize={TYPOGRAPHY.fontSizeH6}
