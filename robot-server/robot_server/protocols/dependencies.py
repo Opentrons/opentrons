@@ -31,10 +31,10 @@ def get_sql_engine(app_state: AppState = Depends(get_app_state)) -> SQLEngine:
     sql_engine = _sql_engine.get_from(app_state)
 
     if sql_engine is None:
-        # Rely on connections being cleaned up when the process dies.
-        # FastAPI doesn't give us a convenient way to properly tie
-        # the lifetime of a dependency to the lifetime of the server app.
-        # https://github.com/tiangolo/fastapi/issues/617
+        # It's important that create_in_memory_db_no_cleanup() returns
+        # a SQLEngine that's explicitly okay to pass between threads.
+        # FastAPI dependency may run this dependency function in a separate thread
+        # from the request handlers using this SQLEngine.
         sql_engine = create_in_memory_db_no_cleanup()
 
         add_protocol_store_tables_to_db(sql_engine)
@@ -42,6 +42,10 @@ def get_sql_engine(app_state: AppState = Depends(get_app_state)) -> SQLEngine:
         _sql_engine.set_on(app_state, sql_engine)
 
     return sql_engine
+    # Rely on connections being cleaned up automatically when the process dies.
+    # FastAPI doesn't give us a convenient way to properly tie
+    # the lifetime of a dependency to the lifetime of the server app.
+    # https://github.com/tiangolo/fastapi/issues/617
 
 
 def get_protocol_reader(
