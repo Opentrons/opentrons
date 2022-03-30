@@ -149,7 +149,7 @@ describe('getRequiresAtLeastV5', () => {
         {
           commands: [
             {
-              command: 'airGap',
+              commandType: 'aspirate',
               params: {
                 pipette: 'pipetteId',
                 volume: 1,
@@ -163,6 +163,7 @@ describe('getRequiresAtLeastV5', () => {
         },
       ],
     }
+
     // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     expect(getRequiresAtLeastV5.resultFunc(airGapTimeline)).toBe(true)
   })
@@ -172,7 +173,7 @@ describe('getRequiresAtLeastV5', () => {
         {
           commands: [
             {
-              command: 'moveToWell',
+              commandType: 'moveToWell',
               params: {
                 pipette: 'pipetteId',
                 labware: 'plateId',

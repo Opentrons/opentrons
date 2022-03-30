@@ -7,19 +7,25 @@ describe('getRobotStateTimelineWithoutAirGapDispenseCommand', () => {
       timeline: [
         {
           commands: [
-            { command: 'pickUpTip', params: 'fakePickUpTipParams' },
-            { command: 'aspirate', params: 'fakeAspirateParams' },
-            { command: 'dispenseAirGap', params: 'fakeDispenseAirGapParams' },
-            { command: 'dispense', params: 'fakeDispenseParams' },
+            { commandType: 'pickUpTip', params: 'fakePickUpTipParams' },
+            { commandType: 'aspirate', params: 'fakeAspirateParams' },
+            {
+              commandType: 'dispenseAirGap',
+              params: 'fakeDispenseAirGapParams',
+            },
+            { commandType: 'dispense', params: 'fakeDispenseParams' },
           ],
           robotState: 'fakeRobotState1',
         },
         {
           commands: [
-            { command: 'aspirate', params: 'fakeAspirateParams2' },
-            { command: 'dispenseAirGap', params: 'fakeDispenseAirGapParams2' },
-            { command: 'dispense', params: 'fakeDispenseParams2' },
-            { command: 'dropTip', params: 'fakeDropTipParams' },
+            { commandType: 'aspirate', params: 'fakeAspirateParams2' },
+            {
+              commandType: 'dispenseAirGap',
+              params: 'fakeDispenseAirGapParams2',
+            },
+            { commandType: 'dispense', params: 'fakeDispenseParams2' },
+            { commandType: 'dropTip', params: 'fakeDropTipParams' },
           ],
           robotState: 'fakeRobotState2',
         },
@@ -34,19 +40,19 @@ describe('getRobotStateTimelineWithoutAirGapDispenseCommand', () => {
       timeline: [
         {
           commands: [
-            { command: 'pickUpTip', params: 'fakePickUpTipParams' },
-            { command: 'aspirate', params: 'fakeAspirateParams' },
-            { command: 'dispense', params: 'fakeDispenseAirGapParams' }, // changed command.command
-            { command: 'dispense', params: 'fakeDispenseParams' },
+            { commandType: 'pickUpTip', params: 'fakePickUpTipParams' },
+            { commandType: 'aspirate', params: 'fakeAspirateParams' },
+            { commandType: 'dispense', params: 'fakeDispenseAirGapParams' }, // changed command.command
+            { commandType: 'dispense', params: 'fakeDispenseParams' },
           ],
           robotState: 'fakeRobotState1',
         },
         {
           commands: [
-            { command: 'aspirate', params: 'fakeAspirateParams2' },
-            { command: 'dispense', params: 'fakeDispenseAirGapParams2' }, // changed command.command
-            { command: 'dispense', params: 'fakeDispenseParams2' },
-            { command: 'dropTip', params: 'fakeDropTipParams' },
+            { commandType: 'aspirate', params: 'fakeAspirateParams2' },
+            { commandType: 'dispense', params: 'fakeDispenseAirGapParams2' }, // changed command.command
+            { commandType: 'dispense', params: 'fakeDispenseParams2' },
+            { commandType: 'dropTip', params: 'fakeDropTipParams' },
           ],
           robotState: 'fakeRobotState2',
         },
