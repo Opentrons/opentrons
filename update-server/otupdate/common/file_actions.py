@@ -12,7 +12,6 @@ from typing import Callable, Sequence, Mapping, Optional, Tuple, List, Dict
 import tempfile
 import zipfile
 
-
 LOG = logging.getLogger(__name__)
 
 
@@ -102,16 +101,15 @@ def unzip_update(
     file_paths: Dict[str, Optional[str]] = {fn: None for fn in acceptable_files}
     file_sizes: Dict[str, int] = {fn: 0 for fn in acceptable_files}
     LOG.info(f"Unzipping {filepath}")
-
     with zipfile.ZipFile(filepath, "r") as zf:
         files = zf.infolist()
-
         remaining_filenames = [fn for fn in acceptable_files]
         for fi in files:
             if fi.filename in acceptable_files:
                 to_unzip.append(fi)
                 total_size += fi.file_size
                 remaining_filenames.remove(fi.filename)
+                LOG.debug(f"Found {fi.filename} ({fi.file_size}B)")
             else:
                 LOG.debug(f"Ignoring {fi.filename}")
 
@@ -132,7 +130,7 @@ def unzip_update(
                         break
                 file_paths[fi.filename] = uncomp_path
                 file_sizes[fi.filename] = fi.file_size
-
+                LOG.debug(f"Unzipped {fi.filename} to {uncomp_path}")
     LOG.info(
         f"Unzipped {filepath}, results: \n\t"
         + "\n\t".join(
