@@ -52,14 +52,10 @@ class ProtocolStore:
 
     def insert(self, resource: ProtocolResource) -> None:
         """Insert a protocol resource into the store."""
-        # TODO: Handle ID conflicts, somehow, and add a test for them.
         statement = sqlalchemy.insert(_protocol_table).values(
             _convert_resource_to_sql_values(resource=resource)
         )
         with self._sql_engine.begin() as transaction:
-            # TODO: How do we catch an ID-already-used conflict here?
-            # TODO: Will this raise if there was a problem with the insert, or do I
-            #       have to inspect the result somehow?
             transaction.execute(statement)
 
     def get(self, protocol_id: str) -> ProtocolResource:

@@ -59,6 +59,44 @@ async def test_insert_and_get_protocol(tmp_path: Path, subject: ProtocolStore) -
     assert result == protocol_resource
 
 
+async def test_insert_with_duplicate_key_raises(
+    tmp_path: Path, subject: ProtocolStore
+) -> None:
+    """It should raise an error when the given protocol ID is not unique."""
+    protocol_resource_1 = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2021, month=1, day=1),
+        source=ProtocolSource(
+            directory=tmp_path,
+            main_file=(tmp_path / "abc.json"),
+            config=JsonProtocolConfig(schema_version=123),
+            files=[],
+            metadata={},
+            labware_definitions=[],
+        ),
+    )
+    protocol_resource_2 = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2022, month=2, day=2),
+        source=ProtocolSource(
+            directory=tmp_path,
+            main_file=(tmp_path / "def.json"),
+            config=JsonProtocolConfig(schema_version=456),
+            files=[],
+            metadata={},
+            labware_definitions=[],
+        ),
+    )
+    subject.insert(protocol_resource_1)
+
+    # Don't care what it raises. Exception type is not part of the public interface.
+    # We just care that it doesn't corrupt the database.
+    with pytest.raises(Exception):
+        subject.insert(protocol_resource_2)
+
+    assert subject.get_all() == [protocol_resource_1]  # No traces of the failed insert.
+
+
 async def test_get_missing_protocol_raises(subject: ProtocolStore) -> None:
     """It should raise an error when protocol not found."""
     with pytest.raises(ProtocolNotFoundError, match="protocol-id"):
