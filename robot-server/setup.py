@@ -65,6 +65,7 @@ INSTALL_REQUIRES = [
     # TODO(mc, 2022-03-23): uncomment when buildroot is ready
     # https://github.com/Opentrons/buildroot/issues/146
     # "sqlalchemy==1.4.32",
+    "alembic==1.7.7"
 ]
 
 
