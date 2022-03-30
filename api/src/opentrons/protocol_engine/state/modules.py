@@ -1,24 +1,19 @@
 """Basic modules data state and store."""
 
-
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, NamedTuple, NewType, Optional, Sequence, overload
-from typing_extensions import Final
+from typing import Dict, List, NamedTuple, Optional, Sequence, overload, Union
 from numpy import array, dot
 
 from opentrons.hardware_control.modules.magdeck import (
-    engage_height_is_in_range,
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
-    MAX_ENGAGE_HEIGHT as MAGNETIC_MODULE_MAX_ENGAGE_HEIGHT,
 )
 from opentrons.types import DeckSlotName
 
 from ..types import (
     LoadedModule,
     ModuleModel,
-    MagneticModuleModel,
     ModuleType,
     ModuleDefinition,
     DeckSlotLocation,
@@ -29,6 +24,12 @@ from .. import errors
 from ..commands import Command, LoadModuleResult, heater_shaker
 from ..actions import Action, UpdateCommandAction, AddModuleAction
 from .abstract_store import HasState, HandlesActions
+from .module_substates import (
+    MagneticModuleSubState,
+    HeaterShakerModuleSubState,
+    MagneticModuleId,
+    HeaterShakerModuleId,
+)
 
 
 class SlotTransit(NamedTuple):
@@ -56,32 +57,12 @@ _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
 ]
 
 
-class SpeedRange(NamedTuple):
-    """Class defining minimum and maximum allowed speeds for a shaking module."""
-
-    min: int
-    max: int
-
-
-class TemperatureRange(NamedTuple):
-    """Class defining minimum and maximum allowed temperatures for a heating module."""
-
-    min: float
-    max: float
-
-
-# TODO (spp, 2022-03-22): Move these values to heater-shaker module definition.
-HEATER_SHAKER_TEMPERATURE_RANGE = TemperatureRange(min=37, max=95)
-HEATER_SHAKER_SPEED_RANGE = SpeedRange(min=200, max=3000)
-
-
 @dataclass(frozen=True)
 class HardwareModule:
     """Data describing an actually connected module."""
 
     serial_number: str
     definition: ModuleDefinition
-    plate_target_temperature: Optional[float] = None
 
 
 @dataclass
@@ -90,6 +71,7 @@ class ModuleState:
 
     slot_by_module_id: Dict[str, Optional[DeckSlotName]]
     hardware_by_module_id: Dict[str, HardwareModule]
+    substate_by_module_id: Dict[str, Union[HeaterShakerModuleSubState, MagneticModuleSubState]]
 
 
 class ModuleStore(HasState[ModuleState], HandlesActions):
@@ -99,7 +81,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
     def __init__(self) -> None:
         """Initialize a ModuleStore and its state."""
-        self._state = ModuleState(slot_by_module_id={}, hardware_by_module_id={})
+        self._state = ModuleState(slot_by_module_id={},
+                                  hardware_by_module_id={},
+                                  substate_by_module_id={})
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
@@ -112,6 +96,18 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 serial_number=action.serial_number,
                 definition=action.definition,
             )
+            module_id = action.module_id
+            module_model = action.definition.model
+            if ModuleModel.is_magnetic_module_model(module_model):
+                self._state.substate_by_module_id[module_id] = MagneticModuleSubState(
+                    module_id=MagneticModuleId(module_id),
+                    model=module_model
+                )
+            elif ModuleModel.is_heater_shaker_module_model(module_model):
+                self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
+                    module_id=HeaterShakerModuleId(module_id),
+                    plate_target_temperature=None
+                )
 
     def _handle_command(self, command: Command) -> None:
         if isinstance(command.result, LoadModuleResult):
@@ -125,7 +121,18 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 serial_number=serial_number,
                 definition=definition,
             )
-
+            module_id = command.params.moduleId
+            module_model = command.result.definition.model
+            if ModuleModel.is_magnetic_module_model(module_model):
+                self._state.substate_by_module_id[module_id] = MagneticModuleSubState(
+                    module_id=MagneticModuleId(module_id),
+                    model=module_model
+                )
+            elif ModuleModel.is_heater_shaker_module_model(module_model):
+                self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
+                    module_id=HeaterShakerModuleId(module_id),
+                    plate_target_temperature=None
+                )
         if isinstance(
             command.result,
             (
@@ -134,21 +141,21 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             ),
         ):
             module_id = command.params.moduleId
-            hardware_module = self._state.hardware_by_module_id[module_id]
+            assert isinstance(
+                self._state.substate_by_module_id[module_id],
+                HeaterShakerModuleSubState), f"{module_id} is not heater-shaker."
 
             if isinstance(
                 command.result, heater_shaker.StartSetTargetTemperatureResult
             ):
-                self._state.hardware_by_module_id[module_id] = HardwareModule(
-                    serial_number=hardware_module.serial_number,
-                    definition=hardware_module.definition,
-                    plate_target_temperature=command.params.temperature,
+                self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
+                    module_id=module_id,
+                    plate_target_temperature=command.params.temperature
                 )
             elif isinstance(command.result, heater_shaker.DeactivateHeaterResult):
-                self._state.hardware_by_module_id[module_id] = HardwareModule(
-                    serial_number=hardware_module.serial_number,
-                    definition=hardware_module.definition,
-                    plate_target_temperature=None,
+                self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
+                    module_id=module_id,
+                    plate_target_temperature=None
                 )
 
 
@@ -186,8 +193,8 @@ class ModuleView(HasState[ModuleState]):
         """Get a list of all module entries in state."""
         return [self.get(mod_id) for mod_id in self._state.slot_by_module_id.keys()]
 
-    def get_magnetic_module_view(self, module_id: str) -> MagneticModuleView:
-        """Return a `MagneticModuleView` for the given Magnetic Module.
+    def get_magnetic_module_substate(self, module_id: str) -> MagneticModuleSubState:
+        """Return a `MagneticModuleSubState` for the given Magnetic Module.
 
         Raises:
             ModuleNotLoadedError: If module_id has not been loaded.
@@ -196,14 +203,16 @@ class ModuleView(HasState[ModuleState]):
         """
         model = self.get_model(module_id=module_id)  # Propagate ModuleNotLoadedError
         if ModuleModel.is_magnetic_module_model(model):
-            return MagneticModuleView(module_id=module_id, model=model)
+            return self._state.substate_by_module_id[module_id]
         else:
             raise errors.WrongModuleTypeError(
                 f"{module_id} is a {model}, not a Magnetic Module."
             )
 
-    def get_heater_shaker_module_view(self, module_id: str) -> HeaterShakerModuleView:
-        """Return a `HeaterShakerModuleView` for the given Heater-Shaker Module.
+    def get_heater_shaker_module_substate(
+            self, module_id: str
+        ) -> HeaterShakerModuleSubState:
+        """Return a `HeaterShakerModuleSubState` for the given Heater-Shaker Module.
 
         Raises:
            ModuleNotLoadedError: If module_id has not been loaded.
@@ -212,28 +221,11 @@ class ModuleView(HasState[ModuleState]):
         """
         model = self.get_model(module_id=module_id)  # Propagate ModuleNotLoadedError
         if ModuleModel.is_heater_shaker_module_model(model):
-            return HeaterShakerModuleView(module_id=module_id)
+            return self._state.substate_by_module_id[module_id]
         else:
             raise errors.WrongModuleTypeError(
                 f"{module_id} is a {model}, not a Heater-Shaker Module."
             )
-
-    # TODO(mc, 2022-03-28): move to heater shaker view
-    def get_plate_target_temperature(self, module_id: str) -> float:
-        """Get the module's target plate temperature."""
-        try:
-            target = self._state.hardware_by_module_id[
-                module_id
-            ].plate_target_temperature
-        except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
-
-        if target is None:
-            raise errors.NoTargetTemperatureSetError(
-                f"Module {module_id} does not have a target temperature set."
-            )
-
-        return target
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
         """Get the slot location of the given module."""
@@ -483,112 +475,3 @@ class ModuleView(HasState[ModuleState]):
                     return m
 
         raise errors.ModuleNotAttachedError(f"No available {model.value} found.")
-
-
-MagneticModuleId = NewType("MagneticModuleId", str)
-
-
-class MagneticModuleView:
-    """A Magnetic Module view.
-
-    Provides calculations and read-only state access
-    for an individual loaded Magnetic Module.
-    """
-
-    def __init__(
-        self,
-        module_id: str,
-        model: MagneticModuleModel,
-    ) -> None:
-        """Initialize the `MagneticModuleView`.
-
-        Do not use this initializer directly, except in tests.
-        Use `ModuleView.get_magnetic_module_view()` instead.
-        """
-        self.module_id: Final = MagneticModuleId(module_id)
-        self.model: Final = model
-
-    def calculate_magnet_hardware_height(self, mm_from_base: float) -> float:
-        """Convert a human-friendly magnet height to be hardware-friendly.
-
-        Args:
-            mm_from_base: The height to convert. Measured in how far the tops
-                of the magnets are above the labware base plane.
-
-        Returns:
-            The same height, with its units and origin point converted
-            so that it's suitable to pass to `MagDeck.engage()`.
-
-        Raises:
-            EngageHeightOutOfRangeError: If modules of the given model are
-                physically incapable of reaching the requested height.
-        """
-        hardware_units_from_base = (
-            mm_from_base * 2
-            if self.model == ModuleModel.MAGNETIC_MODULE_V1
-            else mm_from_base
-        )
-        home_to_base_offset = MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM[self.model]
-        hardware_units_from_home = home_to_base_offset + hardware_units_from_base
-
-        if not engage_height_is_in_range(
-            model=self.model,
-            height=hardware_units_from_home,
-        ):
-            # TODO(mm, 2022-03-02): This error message probably will not match how
-            # the user specified the height. (Hardware units versus mm,
-            # home as origin versus labware base as origin.) This may be confusing
-            # depending on how it propagates up.
-            raise errors.EngageHeightOutOfRangeError(
-                f"Invalid engage height for {self.model}:"
-                f" {hardware_units_from_home}. Must be"
-                f" 0 - {MAGNETIC_MODULE_MAX_ENGAGE_HEIGHT[self.model]}."
-            )
-
-        return hardware_units_from_home
-
-
-HeaterShakerModuleId = NewType("HeaterShakerModuleId", str)
-
-
-class HeaterShakerModuleView:
-    """A Heater-Shaker Module view.
-
-    Provides calculations and read-only state access
-    for an individual loaded Heater-Shaker Module.
-    """
-
-    def __init__(self, module_id: str) -> None:
-        """Initialize the `HeaterShakerModuleView`.
-
-        Do not use this initializer directly, except in tests.
-        Use `ModuleView.get_heater_shaker_module_view()` instead.
-        """
-        self.module_id: Final = HeaterShakerModuleId(module_id)
-
-    @staticmethod
-    def validate_target_temperature(celsius: float) -> float:
-        """Verify that the target temperature being set is valid for heater-shaker."""
-        if (
-            HEATER_SHAKER_TEMPERATURE_RANGE.min
-            <= celsius
-            <= HEATER_SHAKER_TEMPERATURE_RANGE.max
-        ):
-            return celsius
-        else:
-            raise errors.InvalidTargetTemperatureError(
-                f"Heater-Shaker got an invalid temperature {celsius} degree Celsius."
-                f"Valid range is {HEATER_SHAKER_TEMPERATURE_RANGE}."
-            )
-
-    @staticmethod
-    def validate_target_speed(rpm: float) -> int:
-        """Verify that the target speed is valid for heater-shaker & convert to int."""
-        rpm_int = int(round(rpm, 0))
-        if HEATER_SHAKER_SPEED_RANGE.min <= rpm <= HEATER_SHAKER_SPEED_RANGE.max:
-            return rpm_int
-        else:
-            raise errors.InvalidTargetSpeedError(
-                f"Heater-Shaker got invalid speed of {rpm}RPM. Valid range is "
-                f"{HEATER_SHAKER_SPEED_RANGE}."
-            )

@@ -5,7 +5,7 @@ from decoy import Decoy
 from opentrons.hardware_control.modules import MagDeck
 from opentrons.protocol_engine.state import (
     MagneticModuleId,
-    MagneticModuleView,
+    MagneticModuleSubState,
     StateView,
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
@@ -30,11 +30,11 @@ async def test_magnetic_module_engage_implementation(
     )
 
     verified_module_id = MagneticModuleId("module-id")
-    magnetic_module_view = decoy.mock(cls=MagneticModuleView)
+    magnetic_module_view = decoy.mock(cls=MagneticModuleSubState)
     magnetic_module_hw = decoy.mock(cls=MagDeck)
 
     decoy.when(
-        state_view.modules.get_magnetic_module_view("unverified-module-id")
+        state_view.modules.get_magnetic_module_substate("unverified-module-id")
     ).then_return(magnetic_module_view)
 
     decoy.when(

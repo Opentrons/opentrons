@@ -7,14 +7,19 @@ from .pipettes import PipetteState, PipetteView, HardwarePipette, CurrentWell
 from .modules import (
     ModuleState,
     ModuleView,
-    MagneticModuleView,
-    HardwareModule,
+    HardwareModule
+)
+from .module_substates import (
     MagneticModuleId,
+    MagneticModuleSubState,
+    HeaterShakerModuleSubState,
     HeaterShakerModuleId,
+    ModuleViewTypes
 )
 from .geometry import GeometryView, TipGeometry
 from .motion import MotionView, PipetteLocationData
 from .configs import EngineConfigs
+
 
 __all__ = [
     # top level state value and interfaces
@@ -37,9 +42,11 @@ __all__ = [
     # module state and values
     "ModuleState",
     "ModuleView",
-    "MagneticModuleView",
+    "ModuleViewTypes",
+    "MagneticModuleSubState",
     "HardwareModule",
     "MagneticModuleId",
+    "HeaterShakerModuleSubState",
     "HeaterShakerModuleId",
     # computed geometry state
     "GeometryView",

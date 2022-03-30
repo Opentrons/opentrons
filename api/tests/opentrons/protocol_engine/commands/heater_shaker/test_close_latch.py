@@ -5,7 +5,7 @@ from opentrons.hardware_control.modules import HeaterShaker
 
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.state.modules import (
-    HeaterShakerModuleView,
+    HeaterShakerModuleSubState,
     HeaterShakerModuleId,
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
@@ -22,13 +22,12 @@ async def test_close_latch(
     subject = CloseLatchImpl(state_view=state_view, equipment=equipment)
     data = heater_shaker.CloseLatchParams(moduleId="input-heater-shaker-id")
 
-    hs_module_view = decoy.mock(cls=HeaterShakerModuleView)
+    hs_module_view = decoy.mock(cls=HeaterShakerModuleSubState)
     heater_shaker_hardware = decoy.mock(cls=HeaterShaker)
 
     decoy.when(
-        state_view.modules.get_heater_shaker_module_view(
-            module_id="input-heater-shaker-id"
-        )
+        state_view.modules.get_heater_shaker_module_substate(
+            module_id="input-heater-shaker-id")
     ).then_return(hs_module_view)
 
     decoy.when(hs_module_view.module_id).then_return(
@@ -51,12 +50,11 @@ async def test_close_latch_virtual(
     subject = CloseLatchImpl(state_view=state_view, equipment=equipment)
     data = heater_shaker.CloseLatchParams(moduleId="input-heater-shaker-id")
 
-    hs_module_view = decoy.mock(cls=HeaterShakerModuleView)
+    hs_module_view = decoy.mock(cls=HeaterShakerModuleSubState)
 
     decoy.when(
-        state_view.modules.get_heater_shaker_module_view(
-            module_id="input-heater-shaker-id"
-        )
+        state_view.modules.get_heater_shaker_module_substate(
+            module_id="input-heater-shaker-id")
     ).then_return(hs_module_view)
 
     decoy.when(hs_module_view.module_id).then_return(

@@ -6,7 +6,7 @@ from opentrons.hardware_control.modules import MagDeck
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.state import (
     StateView,
-    MagneticModuleView,
+    MagneticModuleSubState,
     MagneticModuleId,
 )
 from opentrons.protocol_engine.commands.magnetic_module import (
@@ -29,11 +29,11 @@ async def test_magnetic_module_disengage_implementation(
     params = DisengageParams(moduleId="unverified-module-id")
 
     verified_module_id = MagneticModuleId("module-id")
-    magnetic_module_view = decoy.mock(cls=MagneticModuleView)
+    magnetic_module_view = decoy.mock(cls=MagneticModuleSubState)
     magnetic_module_hw = decoy.mock(cls=MagDeck)
 
     decoy.when(
-        state_view.modules.get_magnetic_module_view("unverified-module-id")
+        state_view.modules.get_magnetic_module_substate("unverified-module-id")
     ).then_return(magnetic_module_view)
 
     decoy.when(magnetic_module_view.module_id).then_return(verified_module_id)

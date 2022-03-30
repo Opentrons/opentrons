@@ -77,9 +77,8 @@ class EngageImplementation(AbstractCommandImpl[EngageParams, EngageResult]):
             EngageHeightOutOfRangeError: If the given height is unreachable.
         """
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
-        magnetic_module_view = self._state_view.modules.get_magnetic_module_view(
-            module_id=params.moduleId,
-        )
+        magnetic_module_view = self._state_view.modules.get_magnetic_module_substate(
+            module_id=params.moduleId)
         # Allow propagation of EngageHeightOutOfRangeError.
         hardware_height = magnetic_module_view.calculate_magnet_hardware_height(
             mm_from_base=params.engageHeight,

@@ -41,9 +41,8 @@ class AwaitTemperatureImpl(
 
     async def execute(self, params: AwaitTemperatureParams) -> AwaitTemperatureResult:
         """Wait for a Heater-Shaker's target temperature to be reached."""
-        hs_module_view = self._state_view.modules.get_heater_shaker_module_view(
-            module_id=params.moduleId
-        )
+        hs_module_view = self._state_view.modules.get_heater_shaker_module_substate(
+            module_id=params.moduleId)
         target_temp = self._state_view.modules.get_plate_target_temperature(
             hs_module_view.module_id
         )
