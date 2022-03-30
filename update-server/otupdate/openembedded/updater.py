@@ -59,15 +59,22 @@ class PartitionManager:
 class RootFSInterface:
     """RootFS interface class."""
 
-    def write_file(
+    def write_update(
         self,
-        infile: str,
-        outfile: str,
+        rootfs_filepath: str,
+        part: Partition,
         progress_callback: Callable[[float], None],
         chunk_size: int = 1024,
-        file_size: int = None,
-    ):
-        pass
+    ) -> None:
+
+        total_size = os.path.getsize(rootfs_filepath)
+        written_size = 0
+
+        with lzma.open(rootfs_filepath, "rb") as fsrc:
+            with open(part.path, "wb") as fdst:
+                shutil.copyfileobj(fsrc, fdst, length=chunk_size)
+                written_size += 1024
+                progress_callback(written_size / total_size)
 
 
 class Updater(UpdateActionsInterface):
@@ -165,14 +172,10 @@ class Updater(UpdateActionsInterface):
         self, downloaded_update_path: str, progress_callback: Callable[[float], None]
     ) -> None:
 
-        total_size = os.path.getsize(downloaded_update_path)
-        written_size = 0
         unused_partition = self.part_mngr.find_unused_partition()
-        with lzma.open(downloaded_update_path, "rb") as fsrc:
-            with open(unused_partition.path, "wb") as fdst:
-                shutil.copyfileobj(fsrc, fdst, length=1024)
-                written_size += 1024
-                progress_callback(written_size / total_size)
+        self.root_FS_intf.write_update(
+            downloaded_update_path, unused_partition, progress_callback
+        )
 
     def verify_check_sum(self) -> bool:
         pass

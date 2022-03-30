@@ -15,6 +15,6 @@ def test_update(mock_root_fs_interface: MagicMock, mock_partition_manager: Magic
         """Fake callable."""
         pass
 
-    updater.untar_and_write("/mmc/blk0p1", fake_callable(24), 24, 1024)
+    updater.untar_and_write("/mmc/blk0p1", fake_callable(24))
     mock_partition_manager.find_unused_partition.assert_called()
     # mock_root_fs_interface.write_file.assert_called()
