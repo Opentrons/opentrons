@@ -171,6 +171,30 @@ class Updater(UpdateActionsInterface):
     def decomp_and_write(
         self, downloaded_update_path: str, progress_callback: Callable[[float], None]
     ) -> None:
+        """Decompress and write update to partition
+
+        As this is method is currently not performing validations
+        on the update files, it's meant to be internal use.
+
+        The update file would be an .xz compressed file
+
+        .xz seems to work out best, rootfs size comes out at 223M,
+        gz -> bz2 -> xz   is roughly the progression over time.
+
+        gz compression makes things slightly different from zip.
+        gz/xz/bz2 is just a compression stream. and not
+        a collection files. We can apply it either to a single file, or
+        something that contains many files (like a "tar" archive).
+        In contrast, ZIP is both a collection + compression.
+
+        ZIP may make things like packaging the rootfs along with its
+        checksum in one file a little easier. We validate that all
+        essential files are present before decompressing, and then
+        compare checksums.
+
+        Right now this function does a straight fwd, on the fly write to
+        the unused partition.
+        """
 
         unused_partition = self.part_mngr.find_unused_partition()
         self.root_FS_intf.write_update(

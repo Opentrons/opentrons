@@ -17,4 +17,5 @@ def test_update(mock_root_fs_interface: MagicMock, mock_partition_manager: Magic
 
     updater.decomp_and_write("/mmc/blk0p1", fake_callable(24))
     mock_partition_manager.find_unused_partition.assert_called()
-    # mock_root_fs_interface.write_file.assert_called()
+    mock_root_fs_interface.write_update.assert_called()
+    mock_partition_manager.switch_partition.assert_called()
