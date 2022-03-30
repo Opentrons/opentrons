@@ -12,17 +12,12 @@ import { TertiaryButton } from '../../atoms/Buttons'
 
 export interface IpHostnameFieldProps {
   field: any
-  form: any
   inputRef: { current: null | HTMLInputElement }
 }
 
 export function IpHostnameField(props: IpHostnameFieldProps): JSX.Element {
   const { t } = useTranslation('app_settings')
-  const {
-    field,
-    form: { submitForm },
-    inputRef,
-  } = props
+  const { field, inputRef } = props
 
   return (
     <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
@@ -35,10 +30,6 @@ export function IpHostnameField(props: IpHostnameFieldProps): JSX.Element {
           id="ip"
           name="ip"
           {...field}
-          onBlur={event => {
-            field.onBlur(event)
-            if (field.value) submitForm()
-          }}
           type="text"
           ref={inputRef}
           height="100%"
