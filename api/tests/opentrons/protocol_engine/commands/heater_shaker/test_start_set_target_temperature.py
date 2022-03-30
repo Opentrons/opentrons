@@ -28,24 +28,23 @@ async def test_start_set_target_temperature(
         temperature=12.3,
     )
 
-    # Get module view
-    hs_module_view = decoy.mock(cls=HeaterShakerModuleSubState)
+    hs_module_substate = decoy.mock(cls=HeaterShakerModuleSubState)
     hs_hardware = decoy.mock(cls=HeaterShaker)
 
     decoy.when(
         state_view.modules.get_heater_shaker_module_substate(
             module_id="input-heater-shaker-id"
         )
-    ).then_return(hs_module_view)
+    ).then_return(hs_module_substate)
 
-    decoy.when(hs_module_view.module_id).then_return(
+    decoy.when(hs_module_substate.module_id).then_return(
         HeaterShakerModuleId("heater-shaker-id")
     )
 
     # Stub temperature validation from hs module view
-    decoy.when(hs_module_view.validate_target_temperature(celsius=12.3)).then_return(
-        45.6
-    )
+    decoy.when(
+        hs_module_substate.validate_target_temperature(celsius=12.3)
+    ).then_return(45.6)
 
     # Get attached hardware modules
     decoy.when(

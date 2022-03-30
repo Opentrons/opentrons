@@ -24,18 +24,16 @@ async def test_deactivate_heater(
     subject = DeactivateHeaterImpl(state_view=state_view, equipment=equipment)
     data = heater_shaker.DeactivateHeaterParams(moduleId="input-heater-shaker-id")
 
-    # Get module view
-    # Get module view
-    hs_module_view = decoy.mock(cls=HeaterShakerModuleSubState)
+    hs_module_substate = decoy.mock(cls=HeaterShakerModuleSubState)
     hs_hardware = decoy.mock(cls=HeaterShaker)
 
     decoy.when(
         state_view.modules.get_heater_shaker_module_substate(
             module_id="input-heater-shaker-id"
         )
-    ).then_return(hs_module_view)
+    ).then_return(hs_module_substate)
 
-    decoy.when(hs_module_view.module_id).then_return(
+    decoy.when(hs_module_substate.module_id).then_return(
         HeaterShakerModuleId("heater-shaker-id")
     )
 

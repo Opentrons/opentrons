@@ -25,7 +25,6 @@ async def test_await_temperature(
 
     data = heater_shaker.AwaitTemperatureParams(moduleId="heater-shaker-id")
 
-    # Get module view
     hs_module_substate = decoy.mock(cls=HeaterShakerModuleSubState)
     hs_hardware = decoy.mock(cls=HeaterShaker)
 

@@ -29,14 +29,14 @@ async def test_magnetic_module_disengage_implementation(
     params = DisengageParams(moduleId="unverified-module-id")
 
     verified_module_id = MagneticModuleId("module-id")
-    magnetic_module_view = decoy.mock(cls=MagneticModuleSubState)
+    magnetic_module_substate = decoy.mock(cls=MagneticModuleSubState)
     magnetic_module_hw = decoy.mock(cls=MagDeck)
 
     decoy.when(
         state_view.modules.get_magnetic_module_substate("unverified-module-id")
-    ).then_return(magnetic_module_view)
+    ).then_return(magnetic_module_substate)
 
-    decoy.when(magnetic_module_view.module_id).then_return(verified_module_id)
+    decoy.when(magnetic_module_substate.module_id).then_return(verified_module_id)
 
     decoy.when(equipment.get_module_hardware_api(verified_module_id)).then_return(
         magnetic_module_hw
