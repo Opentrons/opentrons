@@ -58,7 +58,7 @@ def test_app_settings_v5dot1(
         assert (
             app_settings.get_app_software_version_text().text == "App Software Version"
         )
-        assert app_settings.get_app_software_version_value().text == "5.0.2"
+        assert app_settings.get_app_software_version_value().is_displayed()
 
         assert app_settings.get_link_restore_previous_version().is_displayed()
         app_settings.click_link_restore_previous_version()
