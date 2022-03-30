@@ -1,10 +1,13 @@
 """Pause protocol command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import Optional, Type
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+
+if TYPE_CHECKING:
+    from ..execution import RunControlHandler
 
 
 PauseCommandType = Literal["pause"]
@@ -27,6 +30,9 @@ class PauseResult(BaseModel):
 
 class PauseImplementation(AbstractCommandImpl[PauseParams, PauseResult]):
     """Pause command implementation."""
+
+    def __init__(self, run_control: RunControlHandler, **kwargs: object) -> None:
+        self._run_control = run_control
 
     async def execute(self, params: PauseParams) -> PauseResult:
         """Dispatch a PauseAction to the store to pause the protocol."""

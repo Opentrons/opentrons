@@ -19,10 +19,10 @@ import {
   useCloneRun,
   useCurrentRun,
   useCurrentRunId,
-  useCurrentRunCommands,
+  useRunCommands,
 } from '../ProtocolUpload/hooks'
 import { UseQueryOptions } from 'react-query'
-import type { RunAction, RunStatus, Run } from '@opentrons/api-client'
+import type { RunAction, RunStatus, Run, RunData } from '@opentrons/api-client'
 
 interface RunControls {
   play: () => void
@@ -35,9 +35,10 @@ interface RunControls {
   isResetRunLoading: boolean
 }
 
-export function useRunControls(): RunControls {
-  const currentRunId = useCurrentRunId()
-
+export function useRunControls(
+  runId: string | null,
+  onCloneRunSuccess?: (createRunResponse: Run) => unknown
+): RunControls {
   const {
     playRun,
     pauseRun,
@@ -45,10 +46,11 @@ export function useRunControls(): RunControls {
     isPlayRunActionLoading,
     isPauseRunActionLoading,
     isStopRunActionLoading,
-  } = useRunActionMutations(currentRunId as string)
+  } = useRunActionMutations(runId as string)
 
   const { cloneRun, isLoading: isResetRunLoading } = useCloneRun(
-    currentRunId ?? null
+    runId ?? null,
+    onCloneRunSuccess
   )
 
   return {
@@ -63,12 +65,20 @@ export function useRunControls(): RunControls {
   }
 }
 
-const DEFAULT_STATUS_REFETCH_INTERVAL = 10000 // 10 seconds
-export function useRunStatus(options?: UseQueryOptions<Run>): RunStatus | null {
+export function useCurrentRunControls(): RunControls {
   const currentRunId = useCurrentRunId()
+
+  return useRunControls(currentRunId)
+}
+
+const DEFAULT_STATUS_REFETCH_INTERVAL = 10000 // 10 seconds
+export function useRunStatus(
+  runId: string | null,
+  options?: UseQueryOptions<Run>
+): RunStatus | null {
   const lastRunStatus = React.useRef<RunStatus | null>(null)
 
-  const { data } = useRunQuery(currentRunId ?? null, {
+  const { data } = useRunQuery(runId ?? null, {
     refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
     enabled:
       lastRunStatus.current == null ||
@@ -96,6 +106,14 @@ export function useRunStatus(options?: UseQueryOptions<Run>): RunStatus | null {
       : runStatus
 
   return adjustedRunStatus
+}
+
+export function useCurrentRunStatus(
+  options?: UseQueryOptions<Run>
+): RunStatus | null {
+  const currentRunId = useCurrentRunId()
+
+  return useRunStatus(currentRunId, options)
 }
 
 export function useRunStartTime(): string | null {
@@ -126,18 +144,24 @@ export function useRunStopTime(): string | null {
     : null
 }
 
-// TODO(bc, 2022-02-01): replace all usage of the above individual timestamp hooks with useRunTimestamps
+// TODO(bc, 2022-02-01): replace all usage of the above individual timestamp hooks with useCurrentRunTimestamps
 interface RunTimestamps {
   startedAt: string | null
   pausedAt: string | null
   stoppedAt: string | null
   completedAt: string | null
 }
-export function useRunTimestamps(): RunTimestamps {
-  const runStatus = useRunStatus()
-  const { actions = [], errors = [] } = useCurrentRun()?.data ?? {}
+
+const DEFAULT_RUN_QUERY_REFETCH_INTERVAL = 5000
+export function useRunTimestamps(runId: string | null): RunTimestamps {
+  const runStatus = useRunStatus(runId)
+  const { actions = [], errors = [] } =
+    useRunQuery(runId, {
+      refetchInterval: DEFAULT_RUN_QUERY_REFETCH_INTERVAL,
+    })?.data?.data ?? {}
   const runCommands =
-    useCurrentRunCommands(
+    useRunCommands(
+      runId,
       { cursor: null, pageLength: 1 },
       {
         enabled:
@@ -184,4 +208,24 @@ export function useRunTimestamps(): RunTimestamps {
     stoppedAt,
     completedAt,
   }
+}
+
+export function useCurrentRunTimestamps(): RunTimestamps {
+  const currentRunId = useCurrentRunId()
+
+  return useRunTimestamps(currentRunId)
+}
+
+export function useRunErrors(runId: string | null): RunData['errors'] {
+  const { data: runRecord } = useRunQuery(runId, {
+    refetchInterval: DEFAULT_RUN_QUERY_REFETCH_INTERVAL,
+  })
+
+  return runRecord?.data?.errors ?? []
+}
+
+export function useCurrentRunErrors(): RunData['errors'] {
+  const currentRunId = useCurrentRunId()
+
+  return useRunErrors(currentRunId)
 }

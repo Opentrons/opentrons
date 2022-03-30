@@ -4,17 +4,19 @@ import json
 import logging
 from logging.config import dictConfig
 import argparse
+import numpy as np  # type: ignore[import]
 
 from opentrons_hardware.hardware_control.motion_planning import move_manager
 from opentrons_hardware.hardware_control.motion_planning.types import (
-    Axis,
     AxisConstraints,
     SystemConstraints,
     MoveTarget,
+    vectorize,
     Coordinates,
 )
-from typing import Dict, Any
+from typing import Dict, Any, List, cast
 
+AXIS_NAMES = ["X", "Y", "Z", "A", "B", "C"]
 
 log = logging.getLogger(__name__)
 
@@ -85,12 +87,16 @@ def main() -> None:
     with open(args.params_file_path, "r") as f:
         params = json.load(f)
 
-    constraints: SystemConstraints = {
-        axis: AxisConstraints.build(**params["constraints"][axis.name]) for axis in Axis
+    constraints: SystemConstraints[str] = {
+        axis: AxisConstraints.build(**params["constraints"][axis])
+        for axis in AXIS_NAMES
     }
-    origin = Coordinates(*params["origin"])
+    origin_from_file: List[float] = cast(List[float], params["origin"])
+    origin: Coordinates[str, float] = dict(zip(AXIS_NAMES, origin_from_file))
     target_list = [
-        MoveTarget.build(Coordinates(*target["coordinates"]), target["max_speed"])
+        MoveTarget.build(
+            dict(zip(AXIS_NAMES, target["coordinates"])), target["max_speed"]
+        )
         for target in params["target_list"]
     ]
 
@@ -103,11 +109,18 @@ def main() -> None:
 
     output = {
         "moves": [v.to_dict() for v in blend_log[-1]],
-        "origin": list(origin.vectorize()),
+        "origin": list(vectorize(origin)),
     }
 
+    def myconverter(obj: Any) -> Any:
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        return obj
+
     with open(args.output, "w") as f:
-        json.dump(output, f, indent=2)
+        json.dump(output, f, indent=2, default=myconverter)
 
 
 if __name__ == "__main__":

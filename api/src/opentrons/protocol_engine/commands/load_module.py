@@ -1,11 +1,14 @@
 """Implementation, request models, and response models for the load module command."""
-
-from typing import Optional, Type
+from __future__ import annotations
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 from ..types import DeckSlotLocation, ModuleModel, ModuleDefinition
+
+if TYPE_CHECKING:
+    from ..execution import EquipmentHandler
 
 
 LoadModuleCommandType = Literal["loadModule"]
@@ -77,6 +80,9 @@ class LoadModuleResult(BaseModel):
 
 class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleResult]):
     """The implementation of the load module command."""
+
+    def __init__(self, equipment: EquipmentHandler, **kwargs: object) -> None:
+        self._equipment = equipment
 
     async def execute(self, params: LoadModuleParams) -> LoadModuleResult:
         """Check that the requested module is attached and assign its identifier."""

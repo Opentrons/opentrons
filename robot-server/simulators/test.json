@@ -36,6 +36,7 @@
         }
       }
     ],
+    "heatershaker": [],
     "tempdeck": [
       {
         "function_name": "set_temperature",

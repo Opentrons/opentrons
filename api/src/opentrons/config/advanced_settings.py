@@ -3,7 +3,17 @@ import logging
 import os
 import sys
 from functools import lru_cache
-from typing import Any, Dict, Mapping, Tuple, Union, Optional, TYPE_CHECKING, NamedTuple
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Mapping,
+    Tuple,
+    Union,
+    Optional,
+    NamedTuple,
+    cast,
+)
 
 from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 from opentrons.system import log_control
@@ -18,7 +28,7 @@ SettingsMap = Dict[str, Optional[bool]]
 
 
 class SettingException(Exception):
-    def __init__(self, message, error):
+    def __init__(self, message: str, error: str) -> None:
         super(Exception, self).__init__(message)
         self.error = error
 
@@ -34,9 +44,9 @@ class SettingDefinition:
         _id: str,
         title: str,
         description: str,
-        old_id: str = None,
+        old_id: Optional[str] = None,
         restart_required: bool = False,
-        show_if: Tuple[str, bool] = None,
+        show_if: Optional[Tuple[str, bool]] = None,
     ):
         self.id = _id
         #: The id of the setting for programmatic access through
@@ -53,7 +63,7 @@ class SettingDefinition:
         #: A tuple of (other setting id, setting value) that must match reality
         #: to show this setting in http endpoints
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{}: {}".format(self.__class__, self.id)
 
     def should_show(self) -> bool:
@@ -65,7 +75,7 @@ class SettingDefinition:
             return True
         return get_setting_with_env_overload(self.show_if[0]) == self.show_if[1]
 
-    async def on_change(self, value: Optional[bool]):
+    async def on_change(self, value: Optional[bool]) -> None:
         """
         An opportunity for side effects as a result of change a setting
         value
@@ -75,7 +85,7 @@ class SettingDefinition:
 
 
 class DisableLogIntegrationSettingDefinition(SettingDefinition):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(
             _id="disableLogAggregation",
             title="Disable Opentrons Log Collection",
@@ -84,7 +94,7 @@ class DisableLogIntegrationSettingDefinition(SettingDefinition):
             " troubleshoot robot issues and spot error trends.",
         )
 
-    async def on_change(self, value: Optional[bool]):
+    async def on_change(self, value: Optional[bool]) -> None:
         """Special side effect for this setting"""
         if ARCHITECTURE == SystemArchitecture.BUILDROOT:
             code, stdout, stderr = await log_control.set_syslog_level(
@@ -198,7 +208,7 @@ def get_all_adv_settings() -> Dict[str, Setting]:
     }
 
 
-async def set_adv_setting(_id: str, value: Optional[bool]):
+async def set_adv_setting(_id: str, value: Optional[bool]) -> None:
     _id = _clean_id(_id)
     settings_file = CONFIG["feature_flags_file"]
     setting_data = _read_settings_file(settings_file)
@@ -228,7 +238,7 @@ def _read_json_file(path: Union[str, "Path"]) -> Dict[str, Any]:
     except json.JSONDecodeError as e:
         sys.stderr.write(f"Could not load advanced settings file {path}: {e}\n")
         data = {}
-    return data
+    return cast(Dict[str, Any], data)
 
 
 def _read_settings_file(settings_file: "Path") -> SettingsData:
@@ -254,7 +264,11 @@ def _read_settings_file(settings_file: "Path") -> SettingsData:
     return SettingsData(settings_map=settings, version=version)
 
 
-def _write_settings_file(data: Mapping[str, Any], version: int, settings_file: "Path"):
+def _write_settings_file(
+    data: Mapping[str, Any],
+    version: int,
+    settings_file: "Path",
+) -> None:
     try:
         with settings_file.open("w") as fd:
             json.dump({**data, "_version": version}, fd)
@@ -489,7 +503,7 @@ def _ensure(data: Mapping[str, Any]) -> SettingsMap:
     return newdata
 
 
-def get_setting_with_env_overload(setting_name) -> bool:
+def get_setting_with_env_overload(setting_name: str) -> bool:
     env_name = "OT_API_FF_" + setting_name
     if env_name in os.environ:
         return os.environ[env_name].lower() in {"1", "true", "on"}

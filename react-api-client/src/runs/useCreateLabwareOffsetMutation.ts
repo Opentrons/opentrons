@@ -12,7 +12,7 @@ interface CreateLabwareOffsetParams {
   data: LabwareOffsetCreateData
 }
 
-export type UseCreateLabwareofMutationResult = UseMutationResult<
+export type UseCreateLabwareOffsetMutationResult = UseMutationResult<
   Run,
   unknown,
   CreateLabwareOffsetParams
@@ -24,7 +24,7 @@ export type UseCreateLabwareofMutationResult = UseMutationResult<
   >
 }
 
-export function useCreateLabwareOffsetMutation(): UseCreateLabwareofMutationResult {
+export function useCreateLabwareOffsetMutation(): UseCreateLabwareOffsetMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 

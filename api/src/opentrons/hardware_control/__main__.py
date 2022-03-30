@@ -11,6 +11,7 @@ _should_ only be run on an OT-2.
 import argparse
 import asyncio
 import logging
+from typing import Optional, Dict, Any
 
 from . import API
 from opentrons.config import robot_configs as rc
@@ -19,7 +20,7 @@ from opentrons.config.types import RobotConfig
 LOG = logging.getLogger("opentrons.hardware_control.__main__")
 
 
-def exception_handler(loop, context):
+def exception_handler(loop: asyncio.AbstractEventLoop, context: Dict[str, Any]) -> None:
     message = ""
     if "exception" in context:
         message += f'exception: {repr(context["exception"])}'
@@ -35,7 +36,9 @@ def exception_handler(loop, context):
     loop.default_exception_handler(context)
 
 
-async def arun(config: RobotConfig = None, port: str = None):
+async def arun(
+    config: Optional[RobotConfig] = None, port: Optional[str] = None
+) -> None:
     """Asynchronous entrypoint for the server
 
     :param config: Optional config override
@@ -45,7 +48,7 @@ async def arun(config: RobotConfig = None, port: str = None):
     hc = await API.build_hardware_controller(rconf, port)  # noqa: F841
 
 
-def run(config: RobotConfig = None, port: str = None):
+def run(config: Optional[RobotConfig] = None, port: Optional[str] = None) -> None:
     """Synchronous entrypoint for the server.
 
     Mostly builds a loop and calls arun.

@@ -1,20 +1,24 @@
 .PHONY: black
 black:
-	pipenv run python -m black conftest.py src/ tests/
+	pipenv run python -m black locators.py conftest.py src/ tests/
 
 .PHONY: flake8
 flake8:
-	pipenv run python -m flake8 conftest.py src/ tests/
+	pipenv run python -m flake8 locators.py conftest.py src/ tests/
 
 .PHONY: mypy
 mypy:
-	pipenv run python -m mypy conftest.py src/ tests/
+	pipenv run python -m mypy locators.py conftest.py src/ tests/
 
-.PHONY: check
-check:
+.PHONY: lint
+lint:
 	$(MAKE) black
 	$(MAKE) mypy
 	$(MAKE) flake8
+
+.PHONY: format
+format:
+	$(MAKE) black
 
 .PHONY: test
 test:

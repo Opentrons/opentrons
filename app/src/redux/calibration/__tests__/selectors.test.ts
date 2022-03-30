@@ -79,6 +79,34 @@ describe('calibration selectors', () => {
     })
   })
 })
+
+describe('getDeckCalibrationData', () => {
+  it('should return null if given a null robot name', () => {
+    const state: State = { calibration: {} } as any
+    expect(Selectors.getDeckCalibrationData(state, null)).toBe(null)
+  })
+
+  it('should return null if no robot in state', () => {
+    const state: State = { calibration: {} } as any
+    expect(Selectors.getDeckCalibrationData(state, 'robotName')).toBe(null)
+  })
+
+  it('should return deck calibration data if in state', () => {
+    const state: State = {
+      calibration: {
+        robotName: {
+          calibrationStatus: Fixtures.mockCalibrationStatus,
+          pipetteOffsetCalibrations: null,
+          tipLengthCalibrations: null,
+        },
+      },
+    } as any
+    expect(Selectors.getDeckCalibrationData(state, 'robotName')).toEqual(
+      Fixtures.mockCalibrationStatus.deckCalibration.data
+    )
+  })
+})
+
 describe('getProtocolCalibrationComplete without bad deck calibration', () => {
   beforeEach(() => {
     mockGetProtocolPipetteTipRackCalInfo.mockReturnValue({

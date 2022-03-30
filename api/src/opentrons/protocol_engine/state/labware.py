@@ -173,9 +173,13 @@ class LabwareView(HasState[LabwareState]):
         try:
             return self._state.labware_by_id[labware_id]
         except KeyError as e:
-            raise errors.LabwareDoesNotExistError(
+            raise errors.LabwareNotLoadedError(
                 f"Labware {labware_id} not found."
             ) from e
+
+    def get_id_by_module(self, module_id: str) -> Optional[str]:
+        """Return the ID of the labware loaded on the given module."""
+        raise NotImplementedError()
 
     def get_definition(self, labware_id: str) -> LabwareDefinition:
         """Get labware definition by the labware's unique identifier."""
@@ -307,6 +311,17 @@ class LabwareView(HasState[LabwareState]):
         """Get a labware's definition URI."""
         return self.get(labware_id).definitionUri
 
+    def get_uri_from_definition(
+        self,
+        labware_definition: LabwareDefinition,
+    ) -> LabwareUri:
+        """Get a definition URI from a full labware definition."""
+        return uri_from_details(
+            load_name=labware_definition.parameters.loadName,
+            namespace=labware_definition.namespace,
+            version=labware_definition.version,
+        )
+
     def is_tiprack(self, labware_id: str) -> bool:
         """Get whether labware is a tiprack."""
         definition = self.get_definition(labware_id)
@@ -327,6 +342,13 @@ class LabwareView(HasState[LabwareState]):
             y=dims.yDimension,
             z=dims.zDimension,
         )
+
+    def get_default_magnet_height(self, labware_id: str) -> Optional[float]:
+        """Return a labware's default Magnetic Module engage height.
+
+        The returned value is measured in millimeters above the labware base plane.
+        """
+        raise NotImplementedError()
 
     def get_labware_offset_vector(self, labware_id: str) -> LabwareOffsetVector:
         """Get the labware's calibration offset."""

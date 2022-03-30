@@ -6,6 +6,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   LabwareDefinition2,
   ModuleType,
+  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { LabwareDefByDefURI } from '../labware-defs'
 import { LabwareOnDeck } from '../step-forms'
@@ -50,6 +51,8 @@ const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
     'biorad_96_wellplate_200ul_pcr',
     'nest_96_wellplate_100ul_pcr_full_skirt',
   ],
+  // TODO(sh, 2022-02-28): add list of compatible labware for the heater shaker
+  [HEATERSHAKER_MODULE_TYPE]: [],
 }
 export const getLabwareIsCompatible = (
   def: LabwareDefinition2,

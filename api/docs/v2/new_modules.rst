@@ -292,9 +292,9 @@ The :py:meth:`.MagneticModuleContext.engage` function raises the magnets to indu
   .. versionadded:: 2.2
 
 .. note::
-    There is a +/- 1 mmm variance across magnetic module units, using ``height_from_base=0`` might not be able to get the magnets to completely flush with base of the labware. Please test before carrying out your experiment to ensure the desired engage height for your labware.
+    There is a +/- 1 mm variance across magnetic module units, using ``height_from_base=0`` might not be able to get the magnets to completely flush with base of the labware. Please test before carrying out your experiment to ensure the desired engage height for your labware.
 
-- You can also specify ``height``, which should be a distance in mm from the home position of the magnets.
+- You can also specify ``height``, which should be a distance from the home position of the magnets.
 
   .. code-block:: python
 

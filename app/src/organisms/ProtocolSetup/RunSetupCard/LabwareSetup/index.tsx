@@ -37,12 +37,16 @@ import {
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 
-import { useRunStatus } from '../../../RunTimeControl/hooks'
+import { useCurrentRunStatus } from '../../../RunTimeControl/hooks'
 import { LabwarePositionCheck } from '../../LabwarePositionCheck'
 import styles from '../../styles.css'
-import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { DownloadOffsetDataModal } from '../../../ProtocolUpload/DownloadOffsetDataModal'
+import {
+  useModuleRenderInfoById,
+  useLabwareRenderInfoById,
+  useLPCSuccessToast,
+} from '../../hooks'
 import { useModuleMatchResults, useProtocolCalibrationStatus } from '../hooks'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from './LabwareOffsetModal'
@@ -69,7 +73,7 @@ export const LabwareSetup = (): JSX.Element | null => {
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
-  const runStatus = useRunStatus()
+  const runStatus = useCurrentRunStatus()
   const { protocolData } = useProtocolDetails()
   const { t } = useTranslation('protocol_setup')
   const [
@@ -96,16 +100,22 @@ export const LabwareSetup = (): JSX.Element | null => {
   const moduleAndCalibrationIncomplete =
     missingModuleIds.length > 0 && !isEverythingCalibrated
 
-  const tipRackLoadedInProtocol: boolean = some(
-    protocolData?.labwareDefinitions,
-    def => def.parameters?.isTiprack
-  )
-
   const [downloadOffsetDataModal, showDownloadOffsetDataModal] = React.useState(
     false
   )
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     Config.getIsLabwareOffsetCodeSnippetsOn
+  )
+  const { setIsShowingLPCSuccessToast } = useLPCSuccessToast()
+
+  const tipRackLoadedInProtocol: boolean = some(
+    protocolData?.labwareDefinitions,
+    def => def.parameters?.isTiprack
+  )
+
+  const tipsArePickedUp: boolean = some(
+    protocolData?.commands,
+    command => command.commandType === 'pickUpTip'
   )
 
   let lpcDisabledReason: string | null = null
@@ -125,6 +135,8 @@ export const LabwareSetup = (): JSX.Element | null => {
     lpcDisabledReason = t('labware_position_check_not_available_empty_protocol')
   } else if (!tipRackLoadedInProtocol) {
     lpcDisabledReason = t('lpc_disabled_no_tipracks_loaded')
+  } else if (!tipsArePickedUp) {
+    lpcDisabledReason = t('lpc_disabled_no_tipracks_used')
   }
 
   return (
@@ -162,7 +174,14 @@ export const LabwareSetup = (): JSX.Element | null => {
               <React.Fragment>
                 {map(
                   moduleRenderInfoById,
-                  ({ x, y, moduleDef, nestedLabwareDef, nestedLabwareId }) => (
+                  ({
+                    x,
+                    y,
+                    moduleDef,
+                    nestedLabwareDef,
+                    nestedLabwareId,
+                    nestedLabwareDisplayName,
+                  }) => (
                     <Module
                       key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
                       x={x}
@@ -183,6 +202,7 @@ export const LabwareSetup = (): JSX.Element | null => {
                           <LabwareInfoOverlay
                             definition={nestedLabwareDef}
                             labwareId={nestedLabwareId}
+                            displayName={nestedLabwareDisplayName}
                           />
                         </React.Fragment>
                       ) : null}
@@ -191,7 +211,7 @@ export const LabwareSetup = (): JSX.Element | null => {
                 )}
                 {map(
                   labwareRenderInfoById,
-                  ({ x, y, labwareDef }, labwareId) => {
+                  ({ x, y, labwareDef, displayName }, labwareId) => {
                     return (
                       <React.Fragment
                         key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
@@ -201,6 +221,7 @@ export const LabwareSetup = (): JSX.Element | null => {
                           <LabwareInfoOverlay
                             definition={labwareDef}
                             labwareId={labwareId}
+                            displayName={displayName}
                           />
                         </g>
                       </React.Fragment>
@@ -254,7 +275,10 @@ export const LabwareSetup = (): JSX.Element | null => {
             <Flex justifyContent={JUSTIFY_CENTER}>
               <NewSecondaryBtn
                 title={t('run_labware_position_check')}
-                onClick={() => setShowLabwarePositionCheckModal(true)}
+                onClick={() => {
+                  setShowLabwarePositionCheckModal(true)
+                  setIsShowingLPCSuccessToast(false)
+                }}
                 id={'LabwareSetup_checkLabwarePositionsButton'}
                 {...targetProps}
                 disabled={lpcDisabledReason !== null}

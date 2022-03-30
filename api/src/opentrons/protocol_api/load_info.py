@@ -40,6 +40,9 @@ class LabwareLoadInfo:
     # if there was one.
     offset_id: Optional[str]
 
+    # user-specified label if present
+    labware_display_name: Optional[str]
+
 
 @dataclass(frozen=True)
 class InstrumentLoadInfo:

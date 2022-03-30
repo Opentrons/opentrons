@@ -8,7 +8,9 @@ import { renderWithProviders } from '@opentrons/components'
 import { Breadcrumbs } from '../../molecules/Breadcrumbs'
 import { DeviceDetails } from '../../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../../pages/Devices/DevicesLanding'
-import { AppSettings } from '../../pages/More/AppSettings'
+import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
+import { RobotSettings } from '../../pages/Devices/RobotSettings'
+import { GeneralSettings } from '../../organisms/AppSettings/GeneralSettings'
 import { usePathCrumbs } from '../hooks'
 import { NextGenApp } from '../NextGenApp'
 
@@ -16,7 +18,11 @@ jest.mock('../../molecules/Breadcrumbs')
 jest.mock('../../organisms/Devices/hooks')
 jest.mock('../../pages/Devices/DeviceDetails')
 jest.mock('../../pages/Devices/DevicesLanding')
-jest.mock('../../pages/More/AppSettings')
+jest.mock('../../pages/Devices/ProtocolRunDetails')
+jest.mock('../../pages/Devices/RobotSettings')
+jest.mock('../../organisms/Labware/helpers/getAllDefs')
+jest.mock('../../organisms/AppSettings/GeneralSettings')
+jest.mock('../../redux/config')
 jest.mock('../hooks')
 
 const mockDeviceDetails = DeviceDetails as jest.MockedFunction<
@@ -27,7 +33,17 @@ const mockDevicesLanding = DevicesLanding as jest.MockedFunction<
   typeof DevicesLanding
 >
 mockDevicesLanding.mockReturnValue(<div>Mock DevicesLanding</div>)
-const mockAppSettings = AppSettings as jest.MockedFunction<typeof AppSettings>
+const mockProtocolRunDetails = ProtocolRunDetails as jest.MockedFunction<
+  typeof ProtocolRunDetails
+>
+mockProtocolRunDetails.mockReturnValue(<div>Mock ProtocolRunDetails</div>)
+const mockRobotSettings = RobotSettings as jest.MockedFunction<
+  typeof RobotSettings
+>
+mockRobotSettings.mockReturnValue(<div>Mock RobotSettings</div>)
+const mockAppSettings = GeneralSettings as jest.MockedFunction<
+  typeof GeneralSettings
+>
 mockAppSettings.mockReturnValue(<div>Mock AppSettings</div>)
 const mockBreadcrumbs = Breadcrumbs as jest.MockedFunction<typeof Breadcrumbs>
 mockBreadcrumbs.mockReturnValue(<div>Mock Breadcrumbs</div>)
@@ -57,7 +73,7 @@ describe('NextGenApp', () => {
   })
 
   it('renders an AppSettings component', () => {
-    const [{ getByText }] = render('/app-settings/feature-flags')
+    const [{ getByText }] = render('/app-settings/general')
     getByText('Mock AppSettings')
   })
 
@@ -71,8 +87,15 @@ describe('NextGenApp', () => {
     getByText('Mock DeviceDetails')
   })
 
-  it('renders an AppSettings component from /more', () => {
-    const [{ getByText }] = render('/more')
-    getByText('Mock AppSettings')
+  it('renders a RobotSettings component from /robots/:robotName/robot-settings/:robotSettingsTab', () => {
+    const [{ getByText }] = render('/devices/otie/robot-settings/calibration')
+    getByText('Mock RobotSettings')
+  })
+
+  it('renders a ProtocolRunDetails component from /robots/:robotName/protocol-runs/:runId/:protocolRunDetailsTab', () => {
+    const [{ getByText }] = render(
+      '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/setup'
+    )
+    getByText('Mock ProtocolRunDetails')
   })
 })

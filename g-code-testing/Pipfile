@@ -8,6 +8,7 @@ opentrons = {editable = true, path = "./../api"}
 notify-server = {editable = true, path = "./../notify-server"}
 robot-server = {editable = true, path = "./../robot-server"}
 opentrons-shared-data = {editable = true, path = "../shared-data/python"}
+opentrons_hardware = {editable = true, path = "../hardware"}
 g-code-testing = {editable = true, path = "."}
 anyio = "==3.3.0"
 pydantic = "==1.8.2"
@@ -29,7 +30,7 @@ flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.1.0"
 black = "==22.1.0"
-decoy = "~=1.8.0"
+decoy = "~=1.10.0"
 
 [requires]
 python_version = "3.7"

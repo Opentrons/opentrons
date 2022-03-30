@@ -1,13 +1,17 @@
 """Load labware command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import Optional, Type
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from opentrons.protocols.models import LabwareDefinition
 
 from ..types import LabwareLocation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+
+if TYPE_CHECKING:
+    from ..execution import EquipmentHandler
+
 
 LoadLabwareCommandType = Literal["loadLabware"]
 
@@ -35,6 +39,14 @@ class LoadLabwareParams(BaseModel):
         None,
         description="An optional ID to assign to this labware. If None, an ID "
         "will be generated.",
+    )
+    displayName: Optional[str] = Field(
+        None,
+        description="An optional user-specified display name "
+        "or label for this labware.",
+        # NOTE: v4/5 JSON protocols will always have a displayName which will be the
+        #  user-specified label OR the displayName property of the labware's definition.
+        # TODO: Make sure v6 JSON protocols don't do that.
     )
 
 
@@ -64,6 +76,9 @@ class LoadLabwareImplementation(
     AbstractCommandImpl[LoadLabwareParams, LoadLabwareResult]
 ):
     """Load labware command implementation."""
+
+    def __init__(self, equipment: EquipmentHandler, **kwargs: object) -> None:
+        self._equipment = equipment
 
     async def execute(self, params: LoadLabwareParams) -> LoadLabwareResult:
         """Load definition and calibration data necessary for a labware."""

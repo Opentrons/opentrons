@@ -22,6 +22,10 @@ export interface TitleBarProps {
   backButtonLabel?: string
 }
 
+/**
+ * @deprecated Use `InterstitialTitleBar` instead
+ */
+
 export function TitleBar(props: TitleBarProps): JSX.Element {
   const {
     title,

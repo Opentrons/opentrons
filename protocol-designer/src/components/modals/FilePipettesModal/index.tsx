@@ -22,6 +22,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
+  HEATERSHAKER_MODULE_TYPE,
   ModuleType,
   ModuleModel,
 } from '@opentrons/shared-data'
@@ -94,6 +95,11 @@ const initialFormState: FormState = {
       onDeck: false,
       model: THERMOCYCLER_MODULE_V1, // Default to GEN1 for TC only
       slot: SPAN7_8_10_11_SLOT,
+    },
+    [HEATERSHAKER_MODULE_TYPE]: {
+      onDeck: false,
+      model: null,
+      slot: '6',
     },
   },
 }

@@ -64,5 +64,16 @@
   "closing_protocol": "Closing Protocol",
   "canceling_run": "Canceling Run",
   "door_open_pause": "Current Step - Paused - Door Open",
-  "close_door_to_resume": "Close robot door to resume run"
+  "close_door_to_resume": "Close robot door to resume run",
+  "module_controls": "Module Controls",
+  "protocol_start": "Protocol start",
+  "protocol_end": "Protocol end",
+  "total_elapsed_time": "Total elapsed time",
+  "run_log": "Run Log",
+  "run_record_id": "Run Record ID",
+  "setup": "Setup",
+  "status": "Status",
+  "setup_incomplete": "Complete required steps in Setup tab",
+  "robot_is_busy": "Robot is busy",
+  "close_run": "Close Run"
 }

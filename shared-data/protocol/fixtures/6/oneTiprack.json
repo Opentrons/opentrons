@@ -6,9 +6,6 @@
     "author": "engineering <engineering@opentrons.com>",
     "description": "A short test protocol",
     "created": 1223131231,
-    "lastModified": null,
-    "category": null,
-    "subcategory": null,
     "tags": ["unitTest"]
   },
   "robot": {
@@ -1292,9 +1289,9 @@
         "wellName": "A1",
         "volume": 5,
         "flowRate": 3,
-        "offsetFromBottomMm": 2,
         "wellLocation": {
-          "origin": "top"
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 2 }
         }
       }
     },
@@ -1314,9 +1311,9 @@
         "wellName": "B1",
         "volume": 4.5,
         "flowRate": 2.5,
-        "offsetFromBottomMm": 1,
         "wellLocation": {
-          "origin": "top"
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
         }
       }
     },
@@ -1327,9 +1324,9 @@
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
         "wellName": "B1",
-        "offsetFromBottomMm": 11,
         "wellLocation": {
-          "origin": "top"
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
         }
       }
     },
@@ -1341,9 +1338,9 @@
         "labwareId": "destPlateId",
         "wellName": "B1",
         "flowRate": 2,
-        "offsetFromBottomMm": 12,
         "wellLocation": {
-          "origin": "top"
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 12 }
         }
       }
     },

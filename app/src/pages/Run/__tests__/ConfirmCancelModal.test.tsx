@@ -13,7 +13,7 @@ const render = (props: React.ComponentProps<typeof ConfirmCancelModal>) => {
 describe('ConfirmCancelModal', () => {
   let props: React.ComponentProps<typeof ConfirmCancelModal>
   beforeEach(() => {
-    props = { onClose: jest.fn() }
+    props = { onClose: jest.fn(), runId: 'mockRunId' }
   })
 
   it('should render the correct title', () => {

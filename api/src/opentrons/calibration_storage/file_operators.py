@@ -19,7 +19,7 @@ EncoderType = typing.Type[json.JSONEncoder]
 
 def read_cal_file(
     filepath: StrPath, decoder: DecoderType = DateTimeDecoder
-) -> typing.Dict:
+) -> typing.Dict[str, typing.Any]:
     """
     Function used to read data from a file
 
@@ -35,7 +35,10 @@ def read_cal_file(
     # are refactored to grab tip length calibration
     # from the correct locations.
     with open(filepath, "r") as f:
-        calibration_data = json.load(f, cls=decoder)
+        calibration_data = typing.cast(
+            typing.Dict[str, typing.Any],
+            json.load(f, cls=decoder),
+        )
     if isinstance(calibration_data.values(), dict):
         for value in calibration_data.values():
             if value.get("lastModified"):
@@ -48,8 +51,10 @@ def read_cal_file(
 
 
 def save_to_file(
-    filepath: StrPath, data: typing.Mapping, encoder: EncoderType = DateTimeEncoder
-):
+    filepath: StrPath,
+    data: typing.Mapping[str, typing.Any],
+    encoder: EncoderType = DateTimeEncoder,
+) -> None:
     """
     Function used to save data to a file
 

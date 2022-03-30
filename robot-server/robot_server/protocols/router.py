@@ -169,7 +169,7 @@ async def get_protocols(
         )
         for r in protocol_resources
     ]
-    meta = MultiBodyMeta(cursor=0, pageLength=len(data), totalLength=len(data))
+    meta = MultiBodyMeta(cursor=0, totalLength=len(data))
 
     return await PydanticResponse.create(
         content=SimpleMultiBody.construct(data=data, meta=meta),

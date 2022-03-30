@@ -62,6 +62,8 @@ export const mockCommandsResponse: CommandsData = {
       meta: {
         runId: 'fake_run_id',
         commandId: 'fake_command_id',
+        key: 'fake_command_key',
+        createdAt: 'fake_command_created_at',
         index: 10,
       },
     },

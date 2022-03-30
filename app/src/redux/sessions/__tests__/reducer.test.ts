@@ -343,12 +343,9 @@ const SPECS: ReducerSpec[] = [
     },
   },
   {
-    name: 'handles sessions:CLEAR_ALL_SESSIONS',
+    name: 'handles robot:DISCONNECT',
     action: {
-      type: 'sessions:CLEAR_ALL_SESSIONS',
-      payload: {
-        robotName: 'blithering-idiot',
-      },
+      type: 'robot:DISCONNECT',
     },
     state: {
       'blithering-idiot': {
@@ -364,17 +361,15 @@ const SPECS: ReducerSpec[] = [
         },
       },
     },
-    expected: {
-      'blithering-idiot': {
-        robotSessions: null,
-      },
-    },
+    expected: {},
   },
 ]
 
 describe('robotSessionReducer', () => {
   SPECS.forEach(spec => {
     const { name, state, action, expected } = spec
-    it(name, () => expect(sessionReducer(state, action)).toEqual(expected))
+    it(`should handle ${name}`, () => {
+      expect(sessionReducer(state, action)).toEqual(expected)
+    })
   })
 })

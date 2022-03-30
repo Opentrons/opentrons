@@ -5,7 +5,8 @@ from typing import Union
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import extract_metadata as extract_python_metadata
-from opentrons.protocols.models import JsonProtocol
+from opentrons.protocols.models import JsonProtocol as ProtocolSchemaV5
+from opentrons_shared_data.protocol.models import ProtocolSchemaV6
 
 from .protocol_source import Metadata, PythonProtocolConfig, JsonProtocolConfig
 from .role_analyzer import RoleAnalysisFile
@@ -29,7 +30,7 @@ class ConfigAnalyzer:
     @staticmethod
     def analyze(main_file: RoleAnalysisFile) -> ConfigAnalysis:
         """Analyze the main file of a protocol to identify its config and metadata."""
-        if isinstance(main_file.data, JsonProtocol):
+        if isinstance(main_file.data, (ProtocolSchemaV5, ProtocolSchemaV6)):
             return ConfigAnalysis(
                 metadata=main_file.data.metadata.dict(exclude_none=True),
                 config=JsonProtocolConfig(schema_version=main_file.data.schemaVersion),
@@ -41,7 +42,7 @@ class ConfigAnalyzer:
 
 # todo(mm, 2021-09-13): Deduplicate with opentrons.protocols.parse.
 def _analyze_python(main_file: RoleAnalysisFile) -> ConfigAnalysis:  # noqa: C901
-    assert main_file.name.endswith(".py"), "Expected main_file to be Python"
+    assert main_file.name.lower().endswith(".py"), "Expected main_file to be Python"
 
     try:
         # todo(mm, 2021-09-13): Investigate whether it's really appropriate to leave

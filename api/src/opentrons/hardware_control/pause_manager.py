@@ -29,19 +29,19 @@ class PauseManager:
             return door_state is DoorState.OPEN
         return False
 
-    def set_door(self, door_state: DoorState):
+    def set_door(self, door_state: DoorState) -> None:
         self._blocked_by_door = self._evaluate_door_state(door_state)
 
-    def resume(self, pause_type: PauseType):
+    def resume(self, pause_type: PauseType) -> None:
         # door should be closed before a resume from the app can be received
         if self._blocked_by_door and pause_type is PauseType.PAUSE:
             raise PauseResumeError
         if pause_type in self.queue:
             self.queue.remove(pause_type)
 
-    def pause(self, pause_type: PauseType):
+    def pause(self, pause_type: PauseType) -> None:
         if pause_type not in self.queue:
             self.queue.append(pause_type)
 
-    def reset(self):
+    def reset(self) -> None:
         self.queue = []

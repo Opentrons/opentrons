@@ -160,7 +160,6 @@
     "webpack-dev-server": "^3.10.3",
     "webpack-merge": "^4.2.2",
     "webpack-node-externals": "^1.7.2",
-    "worker-plugin": "^5.0.0",
-    "ws": "7.1.2"
+    "worker-plugin": "^5.0.0"
   }
 }

@@ -1,8 +1,11 @@
 """Router for /runs commands endpoints."""
-from fastapi import APIRouter, Depends, status
-from pydantic import BaseModel, Field
+from anyio import move_on_after
+from datetime import datetime
 from typing import Optional, Union
 from typing_extensions import Final, Literal
+
+from fastapi import APIRouter, Depends, Query, status
+from pydantic import BaseModel, Field
 
 from opentrons.protocol_engine import commands as pe_commands, errors as pe_errors
 
@@ -21,8 +24,8 @@ from ..dependencies import get_engine_store
 from .base_router import RunNotFound, RunStopped, get_run_data_from_url
 
 
-_DEFAULT_COMMANDS_BEFORE: Final = 20
-_DEFAULT_COMMANDS_AFTER: Final = 30
+_DEFAULT_COMMAND_LIST_LENGTH: Final = 20
+_DEFAULT_COMMAND_WAIT_MS: Final = 30_000
 
 commands_router = APIRouter()
 
@@ -39,6 +42,12 @@ class CommandLinkMeta(BaseModel):
 
     runId: str = Field(..., description="The ID of the command's run.")
     commandId: str = Field(..., description="The ID of the command.")
+    index: int = Field(..., description="Index of the command in the overall list.")
+    key: str = Field(..., description="Value of the current command's `key` field.")
+    createdAt: datetime = Field(
+        ...,
+        description="When the current command was created.",
+    )
 
 
 class CommandLink(BaseModel):
@@ -57,7 +66,6 @@ class CommandCollectionLinks(BaseModel):
     )
 
 
-# todo(mm, 2021-09-23): Should this accept a list of commands, instead of just one?
 @commands_router.post(
     path="/runs/{runId}/commands",
     summary="Enqueue a protocol command",
@@ -74,6 +82,35 @@ class CommandCollectionLinks(BaseModel):
 )
 async def create_run_command(
     request_body: RequestModel[pe_commands.CommandCreate],
+    waitUntilComplete: bool = Query(
+        default=False,
+        description=(
+            "If `false`, return immediately, while the new command is still queued."
+            "\n\n"
+            "If `true`, only return once the new command succeeds or fails,"
+            " or when the timeout is reached. See the `timeout` query parameter."
+        ),
+    ),
+    timeout: int = Query(
+        default=_DEFAULT_COMMAND_WAIT_MS,
+        gt=0,
+        description=(
+            "If `waitUntilComplete` is `true`,"
+            " the maximum number of milliseconds to wait before returning."
+            "\n\n"
+            "Ignored if `waitUntilComplete` is `false`."
+            "\n\n"
+            "The timer starts when the new command is enqueued,"
+            " *not* when it starts running."
+            " So if a different command runs before the new command,"
+            " it may exhaust the timeout even if the new command on its own"
+            " would have completed in time."
+            "\n\n"
+            "If the timeout triggers, the command will still be returned"
+            " with a `201` HTTP status code."
+            " Inspect the returned command's `status` to detect the timeout."
+        ),
+    ),
     engine_store: EngineStore = Depends(get_engine_store),
     run: Run = Depends(get_run_data_from_url),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
@@ -82,6 +119,10 @@ async def create_run_command(
     Arguments:
         request_body: The request containing the command that the client wants
             to enqueue.
+        waitUntilComplete: If True, return only once the command is completed.
+            Else, return immediately. Comes from a query parameter in the URL.
+        timeout: The maximum time, in seconds, to wait before returning.
+            Comes from a query parameter in the URL.
         engine_store: Used to retrieve the `ProtocolEngine` on which the new
             command will be enqueued.
         run: Run response model, provided by the route handler for
@@ -93,10 +134,17 @@ async def create_run_command(
             status.HTTP_400_BAD_REQUEST
         )
 
-    command = engine_store.engine.add_command(request_body.data)
+    engine = engine_store.engine
+    command = engine.add_command(request_body.data)
+
+    if waitUntilComplete:
+        with move_on_after(timeout / 1000.0):
+            await engine.wait_for_command(command.id),
+
+    response_data = engine.state_view.commands.get(command.id)
 
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=command),
+        content=SimpleBody.construct(data=response_data),
         status_code=status.HTTP_201_CREATED,
     )
 
@@ -120,8 +168,18 @@ async def create_run_command(
 async def get_run_commands(
     engine_store: EngineStore = Depends(get_engine_store),
     run: Run = Depends(get_run_data_from_url),
-    cursor: Optional[int] = None,
-    pageLength: int = _DEFAULT_COMMANDS_BEFORE,
+    cursor: Optional[int] = Query(
+        None,
+        description=(
+            "The starting index of the desired first command in the list."
+            " If unspecicifed, a cursor will be selected automatically"
+            " based on the next queued or more recently executed command."
+        ),
+    ),
+    pageLength: int = Query(
+        _DEFAULT_COMMAND_LIST_LENGTH,
+        description="The maximum number of commands in the list to return.",
+    ),
 ) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
     """Get a summary of all commands in a run.
 
@@ -132,7 +190,7 @@ async def get_run_commands(
         pageLength: Maximum number of items to return.
     """
     state = engine_store.get_state(run.id)
-    current_command_id = state.commands.get_current()
+    current_command = state.commands.get_current()
     command_slice = state.commands.get_slice(cursor=cursor, length=pageLength)
 
     data = [
@@ -145,23 +203,28 @@ async def get_run_commands(
             startedAt=c.startedAt,
             completedAt=c.completedAt,
             params=c.params,
-            errorId=c.errorId,
+            error=c.error,
         )
         for c in command_slice.commands
     ]
 
     meta = MultiBodyMeta(
         cursor=command_slice.cursor,
-        pageLength=command_slice.length,
         totalLength=command_slice.total_length,
     )
 
     links = CommandCollectionLinks()
 
-    if current_command_id is not None:
+    if current_command is not None:
         links.current = CommandLink(
-            href=f"/runs/{run.id}/commands/{current_command_id}",
-            meta=CommandLinkMeta(runId=run.id, commandId=current_command_id),
+            href=f"/runs/{run.id}/commands/{current_command.command_id}",
+            meta=CommandLinkMeta(
+                runId=run.id,
+                commandId=current_command.command_id,
+                index=current_command.index,
+                key=current_command.command_key,
+                createdAt=current_command.created_at,
+            ),
         )
 
     return await PydanticResponse.create(

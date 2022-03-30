@@ -116,6 +116,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+-----------------------------+
 |     2.11    |          4.4.0              |
 +-------------+-----------------------------+
+|     2.12    |          5.0.0              |
++-------------+-----------------------------+
 
 
 Changes in API Versions
@@ -235,3 +237,6 @@ Version 2.12
 ++++++++++++
 
 - :py:meth:`.ProtocolContext.resume` has been deprecated.
+- :py:meth:`.ProtocolContext.set_offset` has been added to apply labware offsets to protocols run (exclusively) outside of the Opentrons app (Jupyter Notebook and SSH).
+
+

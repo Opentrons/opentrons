@@ -92,7 +92,7 @@ def thermocycler_execute_profile(
 ) -> command_types.ThermocyclerExecuteProfileCommand:
     text = (
         f"Thermocycler starting {repetitions} repetitions"
-        " of cycle composed of the following steps: {steps}"
+        f" of cycle composed of the following steps: {steps}"
     )
     return {
         "name": command_types.THERMOCYCLER_EXECUTE_PROFILE,

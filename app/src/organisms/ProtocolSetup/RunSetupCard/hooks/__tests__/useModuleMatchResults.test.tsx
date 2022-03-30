@@ -47,7 +47,7 @@ describe('useModuleMatchResults', () => {
   beforeEach(() => {
     store.dispatch = jest.fn()
 
-    when(mockGetConnectedRobot).mockReturnValue(mockConnectedRobot)
+    mockGetConnectedRobot.mockReturnValue(mockConnectedRobot)
 
     when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
 
@@ -90,6 +90,7 @@ describe('useModuleMatchResults', () => {
           moduleDef: mockMagneticModuleDef as any,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          nestedLabwareDisplayName: null,
           protocolLoadOrder: 0,
           attachedModuleMatch: null,
           slotName: '1',
@@ -119,6 +120,7 @@ describe('useModuleMatchResults', () => {
           moduleDef: mockTemperatureModuleDef as any,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          nestedLabwareDisplayName: null,
           protocolLoadOrder: 0,
           attachedModuleMatch: null,
           slotName: '1',
@@ -148,6 +150,7 @@ describe('useModuleMatchResults', () => {
           } as any,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          nestedLabwareDisplayName: null,
           protocolLoadOrder: 0,
           attachedModuleMatch: null,
           slotName: '1',

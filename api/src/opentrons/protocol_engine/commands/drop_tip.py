@@ -1,11 +1,15 @@
 """Drop tip command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel
-from typing import Optional, Type
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from .pipetting_common import BasePipettingParams
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+
+if TYPE_CHECKING:
+    from ..execution import PipettingHandler
+
 
 DropTipCommandType = Literal["dropTip"]
 
@@ -24,6 +28,9 @@ class DropTipResult(BaseModel):
 
 class DropTipImplementation(AbstractCommandImpl[DropTipParams, DropTipResult]):
     """Drop tip command implementation."""
+
+    def __init__(self, pipetting: PipettingHandler, **kwargs: object) -> None:
+        self._pipetting = pipetting
 
     async def execute(self, params: DropTipParams) -> DropTipResult:
         """Move to and drop a tip using the requested pipette."""

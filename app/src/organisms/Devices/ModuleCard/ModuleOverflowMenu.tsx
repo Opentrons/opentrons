@@ -2,94 +2,82 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
-  DIRECTION_COLUMN,
   POSITION_RELATIVE,
+  Tooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
-import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
-import { OverflowMenu } from '../../../atoms/OverflowMenu'
-import { OverflowMenuBtn } from '../../../atoms/OverflowMenu/OverflowMenuBtn'
-import { MagneticModuleSlideout } from './MagneticModuleSlideout'
-import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
+import { MenuList } from '../../../atoms/MenuList'
+import { MenuItem } from '../../../atoms/MenuList/MenuItem'
+import { MenuItemsByModuleType, useModuleOverflowMenu } from './hooks'
 
 import type { AttachedModule } from '../../../redux/modules/types'
+import type { ModuleType } from '@opentrons/shared-data'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
+  handleSlideoutClick: () => void
+  handleAboutClick: () => void
+  handleTestShakeClick: () => void
+  handleWizardClick: () => void
 }
 
 export const ModuleOverflowMenu = (
   props: ModuleOverflowMenuProps
 ): JSX.Element | null => {
-  const { t } = useTranslation('device_details')
-  const { module } = props
-  const [showSlideout, setShowSlideout] = React.useState(false)
+  const { t } = useTranslation(['device_details', 'heater_shaker'])
+  const {
+    module,
+    handleSlideoutClick,
+    handleAboutClick,
+    handleTestShakeClick,
+    handleWizardClick,
+  } = props
+  const [targetProps, tooltipProps] = useHoverTooltip()
+  const { menuOverflowItemsByModuleType } = useModuleOverflowMenu(
+    module,
+    handleAboutClick,
+    handleTestShakeClick,
+    handleWizardClick,
+    handleSlideoutClick
+  )
 
-  let setSetting: string = ''
-  let turnOffSetting: string = ''
-  let slideout = <div></div>
-
-  switch (module.type) {
-    case 'magneticModuleType': {
-      setSetting = t('overflow_menu_engage')
-      //  TODO immediately: add functionality to turnOffSetting once slideouts are complete
-      turnOffSetting = t('overflow_menu_disengage')
-      slideout = (
-        <MagneticModuleSlideout module={module} isExpanded={showSlideout} />
-      )
-      break
-    }
-    case 'temperatureModuleType': {
-      setSetting = t('overflow_menu_mod_temp')
-      turnOffSetting = t('overflow_menu_deactivate_temp')
-      slideout = (
-        <TemperatureModuleSlideout
-          model={module.model}
-          serial={module.serial}
-          isExpanded={showSlideout}
-        />
-      )
-      break
-    }
-    case 'thermocyclerModuleType': {
-      setSetting = t('overflow_menu_lid_temp')
-      turnOffSetting = t('overflow_menu_set_block_temp')
-      slideout = (
-        //  TODO immediately: attach actual slideout!
-        <div></div>
-      )
-      break
-    }
-  }
   return (
-    <React.Fragment>
-      {showSlideout && slideout}
+    <>
       <Flex position={POSITION_RELATIVE}>
-        <OverflowMenu>
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            <OverflowMenuBtn
-              onClick={() => setShowSlideout(true)}
-              data-testid={`module_setting_${module.model}`}
-            >
-              {setSetting ?? turnOffSetting}
-            </OverflowMenuBtn>
-            {module.type === THERMOCYCLER_MODULE_TYPE ? (
-              <OverflowMenuBtn
-                onClick={() => setShowSlideout(true)}
-                data-testid={`thermo_block_setting_${module.model}`}
-              >
-                {t('overflow_menu_set_block_temp')}
-              </OverflowMenuBtn>
-            ) : null}
-            <OverflowMenuBtn
-              data-testid={`about_module_${module.model}`}
-              //  TODO immediately - add actual module overflow menu
-              onClick={() => console.log('about module overflow menu')}
-            >
-              {t('overflow_menu_about')}
-            </OverflowMenuBtn>
-          </Flex>
-        </OverflowMenu>
+        <MenuList
+          buttons={[
+            (menuOverflowItemsByModuleType[
+              module.type
+            ] as MenuItemsByModuleType[ModuleType]).map(
+              (item: any, index: number) => {
+                return (
+                  <>
+                    <MenuItem
+                      minWidth="10rem"
+                      key={`${index}_${module.model}`}
+                      onClick={() => item.onClick}
+                      data-testid={`module_setting_${module.model}`}
+                      disabled={item.disabledReason}
+                      {...targetProps}
+                    >
+                      {item.setSetting}
+                    </MenuItem>
+                    {item.disabledReason && (
+                      <Tooltip
+                        {...tooltipProps}
+                        key={`tooltip_${index}_${module.model}`}
+                      >
+                        {t('cannot_shake', { ns: 'heater_shaker' })}
+                      </Tooltip>
+                    )}
+                    {item.menuButtons}
+                  </>
+                )
+              }
+            ),
+          ]}
+        />
       </Flex>
-    </React.Fragment>
+    </>
   )
 }

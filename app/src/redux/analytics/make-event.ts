@@ -1,6 +1,9 @@
 // redux action types to analytics events map
+// TODO(mc, 2022-03-04): large chunks of this module are commented
+// out because RPC-based analytics events were not replaced with
+// the switch to the HTTP APIs. Commented out code left to aid with
+// analytics replacement.
 import { createLogger } from '../../logger'
-import { selectors as robotSelectors } from '../robot'
 import { getConnectedRobot } from '../discovery'
 import * as CustomLabware from '../custom-labware'
 import * as SystemInfo from '../system-info'
@@ -36,7 +39,7 @@ export function makeEvent(
   state: State
 ): Promise<AnalyticsEvent | null> {
   switch (action.type) {
-    case 'robot:CONNECT_RESPONSE': {
+    case 'robot:CONNECT': {
       const robot = getConnectedRobot(state)
 
       if (!robot) {
@@ -50,9 +53,8 @@ export function makeEvent(
         name: 'robotConnect',
         properties: {
           ...data,
-          success: !action.payload.error,
           method: robot.local ? 'usb' : 'wifi',
-          error: (action.payload.error && action.payload.error.message) || '',
+          success: true,
         },
       })
     }
@@ -67,80 +69,80 @@ export function makeEvent(
       }))
     }
 
-    case 'robot:SESSION_RESPONSE':
-    case 'robot:SESSION_ERROR': {
-      // only fire event if we had a protocol upload in flight; we don't want
-      // to fire if user connects to robot with protocol already loaded
-      const { type: actionType, payload: actionPayload, meta } = action
-      if (!meta.freshUpload) return Promise.resolve(null)
+    // case 'robot:SESSION_RESPONSE':
+    // case 'robot:SESSION_ERROR': {
+    //   // only fire event if we had a protocol upload in flight; we don't want
+    //   // to fire if user connects to robot with protocol already loaded
+    //   const { type: actionType, payload: actionPayload, meta } = action
+    //   if (!meta.freshUpload) return Promise.resolve(null)
 
-      return getProtocolAnalyticsData(state).then(data => ({
-        name: 'protocolUploadResponse',
-        properties: {
-          ...getRobotAnalyticsData(state),
-          ...data,
-          success: actionType === 'robot:SESSION_RESPONSE',
-          // @ts-expect-error even if we used the in operator, TS cant narrow error to anything more specific than 'unknown' https://github.com/microsoft/TypeScript/issues/25720
-          error: (actionPayload.error && actionPayload.error.message) || '',
-        },
-      }))
-    }
+    //   return getProtocolAnalyticsData(state).then(data => ({
+    //     name: 'protocolUploadResponse',
+    //     properties: {
+    //       ...getRobotAnalyticsData(state),
+    //       ...data,
+    //       success: actionType === 'robot:SESSION_RESPONSE',
+    //       // @ts-expect-error even if we used the in operator, TS cant narrow error to anything more specific than 'unknown' https://github.com/microsoft/TypeScript/issues/25720
+    //       error: (actionPayload.error && actionPayload.error.message) || '',
+    //     },
+    //   }))
+    // }
 
-    case 'robot:RUN': {
-      return getProtocolAnalyticsData(state).then(data => ({
-        name: 'runStart',
-        properties: {
-          ...getRobotAnalyticsData(state),
-          ...data,
-        },
-      }))
-    }
+    // case 'robot:RUN': {
+    //   return getProtocolAnalyticsData(state).then(data => ({
+    //     name: 'runStart',
+    //     properties: {
+    //       ...getRobotAnalyticsData(state),
+    //       ...data,
+    //     },
+    //   }))
+    // }
 
     // TODO(mc, 2019-01-22): we only get this event if the user keeps their app
     // open for the entire run. Fixing this is blocked until we can fix
     // session.stop from triggering a run error
-    case 'robot:RUN_RESPONSE': {
-      const runTime = robotSelectors.getRunSeconds(state)
-      const success = !action.error
-      const error = action.error ? action.payload?.message || '' : ''
+    // case 'robot:RUN_RESPONSE': {
+    //   const runTime = robotSelectors.getRunSeconds(state)
+    //   const success = !action.error
+    //   const error = action.error ? action.payload?.message || '' : ''
 
-      return getProtocolAnalyticsData(state).then(data => ({
-        name: 'runFinish',
-        properties: {
-          ...getRobotAnalyticsData(state),
-          ...data,
-          runTime,
-          success,
-          error,
-        },
-      }))
-    }
+    //   return getProtocolAnalyticsData(state).then(data => ({
+    //     name: 'runFinish',
+    //     properties: {
+    //       ...getRobotAnalyticsData(state),
+    //       ...data,
+    //       runTime,
+    //       success,
+    //       error,
+    //     },
+    //   }))
+    // }
 
-    case 'robot:PAUSE': {
-      const runTime = robotSelectors.getRunSeconds(state)
+    // case 'robot:PAUSE': {
+    //   const runTime = robotSelectors.getRunSeconds(state)
 
-      return getProtocolAnalyticsData(state).then(data => ({
-        name: 'runPause',
-        properties: { ...data, runTime },
-      }))
-    }
+    //   return getProtocolAnalyticsData(state).then(data => ({
+    //     name: 'runPause',
+    //     properties: { ...data, runTime },
+    //   }))
+    // }
 
-    case 'robot:RESUME': {
-      const runTime = robotSelectors.getRunSeconds(state)
+    // case 'robot:RESUME': {
+    //   const runTime = robotSelectors.getRunSeconds(state)
 
-      return getProtocolAnalyticsData(state).then(data => ({
-        name: 'runResume',
-        properties: { ...data, runTime },
-      }))
-    }
+    //   return getProtocolAnalyticsData(state).then(data => ({
+    //     name: 'runResume',
+    //     properties: { ...data, runTime },
+    //   }))
+    // }
 
-    case 'robot:CANCEL':
-      const runTime = robotSelectors.getRunSeconds(state)
+    // case 'robot:CANCEL':
+    //   const runTime = robotSelectors.getRunSeconds(state)
 
-      return getProtocolAnalyticsData(state).then(data => ({
-        name: 'runCancel',
-        properties: { ...data, runTime },
-      }))
+    //   return getProtocolAnalyticsData(state).then(data => ({
+    //     name: 'runCancel',
+    //     properties: { ...data, runTime },
+    //   }))
 
     // buildroot update events
     case brActions.BR_SET_UPDATE_SEEN: {

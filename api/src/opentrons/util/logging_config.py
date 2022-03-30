@@ -112,7 +112,7 @@ def _config(arch: SystemArchitecture, level_value: int) -> Dict[str, Any]:
     }[arch](level_value)
 
 
-def log_init(level_name: str):
+def log_init(level_name: str) -> None:
     """
     Function that sets log levels and format strings. Checks for the
     OT_API_LOG_LEVEL environment variable otherwise defaults to INFO

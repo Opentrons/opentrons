@@ -35,7 +35,8 @@ simfile ?=
 # make test tests=tests/opentrons/tools/test_pipette_memory.py would run only the
 # specified test
 tests ?= tests
-test_opts ?=  --cov=src/opentrons --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+cov_opts ?= --cov=src/opentrons --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+test_opts ?=
 
 # These variables must be overridden when make deploy or make deploy-staging is run
 # to set the auth details for pypi
@@ -73,6 +74,12 @@ setup:
 	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip freeze
 
+.PHONY: setup-ot2
+setup-ot2:
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip uninstall -y opentrons_hardware
+	$(pipenv) run pip freeze
+
 .PHONY: clean
 clean: docs-clean
 	$(clean_cmd)
@@ -100,6 +107,14 @@ sdist: $(sdist_file)
 .PHONY: test
 test:
 	$(pytest) $(tests) $(test_opts)
+
+.PHONY: test-cov
+test-cov:
+	$(pytest) $(tests) $(test_opts) $(cov_opts)
+
+.PHONY: test-ot2
+test-ot2:
+	$(pytest) $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
 
 .PHONY: lint
 lint:
@@ -174,6 +189,8 @@ push: push-no-restart
 push-no-restart-ot3: $(sdist_file)
 	echo $(sdist_file)
 	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons,src)
+	ssh $(ssh_opts) root@$(host) "mkdir -p /usr/local/bin"
+	scp $(ssh_opts) ./src/opentrons/hardware_control/scripts/ot3repl root@$(host):/usr/local/bin/ot3repl
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3

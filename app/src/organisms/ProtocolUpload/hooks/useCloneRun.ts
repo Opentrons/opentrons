@@ -5,22 +5,28 @@ import {
   useCreateRunMutation,
 } from '@opentrons/react-api-client'
 
+import type { Run } from '@opentrons/api-client'
+
 interface UseCloneRunResult {
   cloneRun: () => void
   isLoading: boolean
 }
 
-export function useCloneRun(runId: string | null): UseCloneRunResult {
+export function useCloneRun(
+  runId: string | null,
+  onSuccessCallback?: (createRunResponse: Run) => unknown
+): UseCloneRunResult {
   const host = useHost()
   const queryClient = useQueryClient()
   const { data: runRecord } = useRunQuery(runId)
   const { createRun, isLoading } = useCreateRunMutation({
-    onSuccess: () => {
+    onSuccess: response => {
       queryClient
         .invalidateQueries([host, 'runs'])
         .catch((e: Error) =>
           console.error(`error invalidating runs query: ${e.message}`)
         )
+      if (onSuccessCallback != null) onSuccessCallback(response)
     },
   })
   const cloneRun = (): void => {

@@ -4,10 +4,7 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 
 import * as Fixtures from '../../../../redux/discovery/__fixtures__'
-import {
-  actions as RobotActions,
-  selectors as RobotSelectors,
-} from '../../../../redux/robot'
+import { connect, disconnect } from '../../../../redux/robot'
 import * as Buildroot from '../../../../redux/buildroot'
 import { RobotItem } from '../RobotItem'
 import { RobotListItem } from '../RobotListItem'
@@ -17,10 +14,6 @@ jest.mock('../../../../redux/robot/selectors')
 
 const getBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as jest.MockedFunction<
   typeof Buildroot.getBuildrootUpdateAvailable
->
-
-const getConnectRequest = RobotSelectors.getConnectRequest as jest.MockedFunction<
-  typeof RobotSelectors.getConnectRequest
 >
 
 describe('ConnectPanel RobotItem', () => {
@@ -57,11 +50,6 @@ describe('ConnectPanel RobotItem', () => {
 
   beforeEach(() => {
     getBuildrootUpdateAvailable.mockReturnValue(null)
-    getConnectRequest.mockReturnValue({
-      inProgress: false,
-      error: null,
-      name: '',
-    })
   })
 
   afterEach(() => {
@@ -150,9 +138,7 @@ describe('ConnectPanel RobotItem', () => {
 
     item.invoke('onToggleConnect')?.()
 
-    expect(store.dispatch).toHaveBeenCalledWith(
-      RobotActions.connect(robot.name)
-    )
+    expect(store.dispatch).toHaveBeenCalledWith(connect(robot.name))
   })
 
   it('dispatches disconnect on toggleConnect if connected', () => {
@@ -162,22 +148,6 @@ describe('ConnectPanel RobotItem', () => {
 
     item.invoke('onToggleConnect')?.()
 
-    expect(store.dispatch).toHaveBeenCalledWith(RobotActions.disconnect())
-  })
-
-  it('dispatches nothing on toggleConnect if connect request in flight', () => {
-    getConnectRequest.mockReturnValue({
-      inProgress: true,
-      error: null,
-      name: 'foo',
-    })
-
-    const robot = Fixtures.mockConnectedRobot
-    const wrapper = render(robot)
-    const item = wrapper.find(RobotListItem)
-
-    item.invoke('onToggleConnect')?.()
-
-    expect(store.dispatch).not.toHaveBeenCalled()
+    expect(store.dispatch).toHaveBeenCalledWith(disconnect())
   })
 })

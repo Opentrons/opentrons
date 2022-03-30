@@ -7,5 +7,5 @@ export type { Action } from './actions'
 
 export * from './types'
 export * from './reducer'
-export { actions, actionTypes } from './actions'
+export * from './actions'
 export { constants, selectors }

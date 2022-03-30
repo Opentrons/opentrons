@@ -30,7 +30,7 @@ import {
   restartRobotSuccess,
 } from '../robot-admin'
 
-import { actions as robotActions } from '../robot'
+import { disconnect } from '../robot'
 
 import {
   getBuildrootTargetVersion,
@@ -425,7 +425,7 @@ export const removeMigratedRobotsEpic: Epic = (_, state$) => {
 }
 
 export const disconnectRpcOnStartEpic: Epic = action$ => {
-  return action$.pipe(ofType(BR_START_UPDATE), mapTo(robotActions.disconnect()))
+  return action$.pipe(ofType(BR_START_UPDATE), mapTo(disconnect()))
 }
 
 export const buildrootEpic = combineEpics<Epic>(

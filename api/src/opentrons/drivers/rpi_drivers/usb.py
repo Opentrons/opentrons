@@ -8,10 +8,8 @@ more readable format.
 import subprocess
 import re
 import os
-from typing import List, Set, cast
+from typing import List
 
-from opentrons.algorithms.dfs import DFS
-from opentrons.algorithms.types import GenericNode
 from opentrons.hardware_control.modules.types import ModuleAtPort
 from opentrons.hardware_control.types import BoardRevision
 
@@ -31,12 +29,9 @@ USB_PORT_INFO = re.compile(PORT_PATTERN + DEVICE_PATH)
 class USBBus(USBDriverInterface):
     def __init__(self, board_revision: BoardRevision):
         self._board_revision = board_revision
-        self._usb_dev = self.read_usb_bus()
-        self._dfs: DFS[str] = DFS[str](cast(List[GenericNode[str]], self._usb_dev))
-        self._sorted = self._dfs.dfs()
 
     @staticmethod
-    def read_bus() -> List[str]:
+    def _read_bus() -> List[str]:
         """
         Read the USB Bus information.
 
@@ -55,7 +50,7 @@ class USBBus(USBDriverInterface):
         return read
 
     @staticmethod
-    def read_symlink(virtual_port: str) -> str:
+    def _read_symlink(virtual_port: str) -> str:
         """ """
         symlink = ""
         try:
@@ -64,49 +59,7 @@ class USBBus(USBDriverInterface):
             pass
         return symlink
 
-    @property
-    def board_revision(self) -> BoardRevision:
-        return self._board_revision
-
-    @property
-    def usb_dev(self) -> List[USBPort]:
-        """
-        USBBus property: usb_dev.
-
-        :returns: The list of ports found from
-        the usb bus.
-        """
-        return self._usb_dev
-
-    @usb_dev.setter
-    def usb_dev(self, ports: List[USBPort]) -> None:
-        """
-        USBBus setter: usb_dev.
-
-        :param ports: The list of ports found from
-        the usb bus.
-        """
-        self._usb_dev = ports
-
-    @property
-    def sorted_ports(self) -> Set[str]:
-        """
-        USBBus property: sorted_ports.
-
-        :returns: The set of sorted ports
-        """
-        return self._sorted
-
-    @sorted_ports.setter
-    def sorted_ports(self, sorted: Set[str]) -> None:
-        """
-        USBBus setter: sorted_ports.
-
-        :param sorted: The updated set of usb ports.
-        """
-        self._sorted = sorted
-
-    def read_usb_bus(self) -> List[USBPort]:
+    def _read_usb_bus(self) -> List[USBPort]:
         """
         Read usb bus
 
@@ -114,59 +67,19 @@ class USBBus(USBDriverInterface):
         the paths to the expected port paths for modules.
         :returns: A list of matching ports as dataclasses
         """
-        active_ports = self.read_bus()
+        active_ports = self._read_bus()
         port_matches = []
         for port in active_ports:
             match = USB_PORT_INFO.search(port)
             if match:
                 port_matches.append(
-                    USBPort.build(match.group(0).strip("/"), self.board_revision)
+                    USBPort.build(match.group(0).strip("/"), self._board_revision)
                 )
         return port_matches
 
-    def find_port(self, device_path: str) -> USBPort:
-        """
-        Find port.
-
-        Take the value returned from the USB bus and match
-        the paths to the expected port paths for modules.
-        :param device_path: The device path of a module, which
-        generally contains tty/tty* in its name.
-        :returns: The matching port, or an empty port dataclass
-        """
-        for s in self.sorted_ports:
-            vertex = self._dfs.graph.get_vertex(s)
-            port = cast(USBPort, vertex.vertex)
-            if port.device_path.find(device_path):
-                return port
-        return USBPort(
-            name="", sub_names=[], hub=None, port_number=None, device_path=device_path
-        )
-
-    def sort_ports(self) -> None:
-        """
-        Sort ports.
-
-        Check the cached bus read vs the new bus read. Update
-        graph and sorted ports accordingly.
-        :param device_path: The device path of a module, which
-        generally contains tty/tty* in its name.
-        :returns: The matching port, or an empty port dataclass
-        """
-        updated_bus = self.read_usb_bus()
-        remove_difference = set(self.usb_dev) - set(updated_bus)
-        add_difference = set(updated_bus) - set(self.usb_dev)
-
-        if remove_difference or add_difference:
-            for d in remove_difference:
-                self._dfs.graph.remove_vertex(d)
-            for d in add_difference:
-                self._dfs.graph.add_vertex(d)
-            self.sorted_ports = self._dfs.dfs()
-            self.usb_dev = updated_bus
-
     def match_virtual_ports(
-        self, virtual_ports: List[ModuleAtPort]
+        self,
+        virtual_ports: List[ModuleAtPort],
     ) -> List[ModuleAtPort]:
         """
         Match Virtual Ports
@@ -184,13 +97,15 @@ class USBBus(USBDriverInterface):
         dataclasses with the physical usb port
         information updated.
         """
-        self.sort_ports()
+        actual_ports = self._read_usb_bus()
         sorted_virtual_ports = []
-        for p in self.usb_dev:
+
+        for p in actual_ports:
             for vp in virtual_ports:
-                serial_port = self.read_symlink(vp.port)
+                serial_port = self._read_symlink(vp.port)
                 if serial_port in p.device_path:
                     vp.usb_port = p
                     sorted_virtual_ports.append(vp)
                     break
+
         return sorted_virtual_ports or virtual_ports

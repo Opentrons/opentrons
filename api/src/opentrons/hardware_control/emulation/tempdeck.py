@@ -34,7 +34,7 @@ class TempDeckEmulator(AbstractEmulator):
         joined = " ".join(r for r in results if r)
         return None if not joined else joined
 
-    def reset(self):
+    def reset(self) -> None:
         self._temperature = Temperature(
             per_tick=self._settings.temperature.degrees_per_tick,
             current=self._settings.temperature.starting,

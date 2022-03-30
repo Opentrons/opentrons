@@ -1,7 +1,7 @@
 // full-width labware details
 import * as React from 'react'
-
-import { Gallery, Tags, LoadName } from '../labware-ui'
+import { isNewLabware } from '../../definitions'
+import { Gallery, Tags, LoadName, NewLabwareAlert } from '../labware-ui'
 import { LabwareTitle } from './LabwareTitle'
 import { LabwareDetailsBox } from './LabwareDetailsBox'
 import styles from './styles.css'
@@ -25,8 +25,10 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       <div className={styles.gallery_container}>
         <Gallery definition={definition} />
         <Tags definition={definition} className={styles.tags_container} />
+        {isNewLabware(definition) && <NewLabwareAlert />}
         <LoadName loadName={loadName} />
       </div>
+
       <LabwareDetailsBox
         definition={definition}
         className={styles.details_box_container}

@@ -30,8 +30,9 @@ export const StepDetailText = (
   ] = React.useState<boolean>(false)
   if (protocolData == null) return null
   const labwareDefId = protocolData.labware[labwareId].definitionId
-  const displayName =
-    protocolData.labwareDefinitions[labwareDefId].metadata.displayName
+  const labwareDef = protocolData.labwareDefinitions[labwareDefId]
+  const { displayName } = labwareDef.metadata
+  const { isTiprack } = labwareDef.parameters
 
   return (
     <React.Fragment>
@@ -48,7 +49,7 @@ export const StepDetailText = (
         <Trans
           t={t}
           i18nKey={
-            displayName.includes('Tip Rack')
+            isTiprack
               ? 'labware_step_detail_tiprack'
               : 'labware_step_detail_labware'
           }

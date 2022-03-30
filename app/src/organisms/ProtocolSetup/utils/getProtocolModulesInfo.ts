@@ -6,7 +6,7 @@ import type {
   DeckDefinition,
   LabwareDefinition2,
   ModuleDefinition,
-  ProtocolFile,
+  ProtocolAnalysisFile,
   ModuleModel,
 } from '@opentrons/shared-data'
 
@@ -17,13 +17,14 @@ export interface ProtocolModuleInfo {
   z: number
   moduleDef: ModuleDefinition
   nestedLabwareDef: LabwareDefinition2 | null
+  nestedLabwareDisplayName: string | null
   nestedLabwareId: string | null
   protocolLoadOrder: number
   slotName: string
 }
 
 export const getProtocolModulesInfo = (
-  protocolData: ProtocolFile<{}>,
+  protocolData: ProtocolAnalysisFile<{}>,
   deckDef: DeckDefinition
 ): ProtocolModuleInfo[] => {
   if (protocolData != null && 'modules' in protocolData) {
@@ -52,6 +53,7 @@ export const getProtocolModulesInfo = (
           nestedLabware != null
             ? protocolData.labwareDefinitions[nestedLabware.definitionId]
             : null
+        const nestedLabwareDisplayName = nestedLabware?.displayName ?? null
         const moduleInitialLoadInfo = getModuleInitialLoadInfo(
           moduleId,
           protocolData.commands
@@ -79,6 +81,7 @@ export const getProtocolModulesInfo = (
             z: slotPosition[2] ?? 0,
             moduleDef,
             nestedLabwareDef,
+            nestedLabwareDisplayName,
             nestedLabwareId,
             protocolLoadOrder,
             slotName,

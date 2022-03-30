@@ -1,8 +1,9 @@
 // labware display card
 import * as React from 'react'
 import uniq from 'lodash/uniq'
-import { getPublicPath } from '../../public-path'
 import { Icon } from '@opentrons/components'
+import { getPublicPath } from '../../public-path'
+import { isNewLabware } from '../../definitions'
 import { Link } from '../ui'
 import {
   getWellLabel,
@@ -11,14 +12,15 @@ import {
   Tags,
   WellCount,
   AllWellProperties,
+  NewLabwareAlert,
 } from '../labware-ui'
 import {
   CATEGORY_LABELS_BY_CATEGORY,
   MANUFACTURER_VALUES,
 } from '../../localization'
-import styles from './styles.css'
 import type { LabwareDefinition } from '../../types'
 
+import styles from './styles.css'
 export interface LabwareCardProps {
   definition: LabwareDefinition
 }
@@ -46,6 +48,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         </div>
       </div>
       <Tags definition={definition} />
+      {isNewLabware(definition) && <NewLabwareAlert />}
       <LoadName loadName={definition.parameters.loadName} />
     </li>
   )

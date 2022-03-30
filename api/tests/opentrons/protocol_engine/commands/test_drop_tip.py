@@ -2,12 +2,7 @@
 from decoy import Decoy
 
 from opentrons.protocol_engine import WellLocation, WellOffset
-from opentrons.protocol_engine.execution import (
-    EquipmentHandler,
-    MovementHandler,
-    PipettingHandler,
-    RunControlHandler,
-)
+from opentrons.protocol_engine.execution import PipettingHandler
 
 from opentrons.protocol_engine.commands.drop_tip import (
     DropTipParams,
@@ -18,18 +13,10 @@ from opentrons.protocol_engine.commands.drop_tip import (
 
 async def test_drop_tip_implementation(
     decoy: Decoy,
-    equipment: EquipmentHandler,
-    movement: MovementHandler,
     pipetting: PipettingHandler,
-    run_control: RunControlHandler,
 ) -> None:
     """A DropTip command should have an execution implementation."""
-    subject = DropTipImplementation(
-        equipment=equipment,
-        movement=movement,
-        pipetting=pipetting,
-        run_control=run_control,
-    )
+    subject = DropTipImplementation(pipetting=pipetting)
 
     data = DropTipParams(
         pipetteId="abc",

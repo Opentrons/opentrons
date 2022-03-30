@@ -24,7 +24,7 @@ def clear_calibrations() -> None:
         pass
 
 
-def _remove_offset_from_index(calibration_id: local_types.CalibrationID):
+def _remove_offset_from_index(calibration_id: local_types.CalibrationID) -> None:
     """
     Helper function to remove an individual offset file.
 
@@ -40,7 +40,7 @@ def _remove_offset_from_index(calibration_id: local_types.CalibrationID):
     io.save_to_file(index_path, blob)
 
 
-def delete_offset_file(calibration_id: local_types.CalibrationID):
+def delete_offset_file(calibration_id: local_types.CalibrationID) -> None:
     """
     Given a labware's hash, delete the file and remove it from the index file.
 
@@ -55,7 +55,7 @@ def delete_offset_file(calibration_id: local_types.CalibrationID):
         pass
 
 
-def _remove_tip_length_from_index(tiprack: str, pipette: str):
+def _remove_tip_length_from_index(tiprack: str, pipette: str) -> None:
     """
     Remove tip length data from the index file
     """
@@ -68,7 +68,7 @@ def _remove_tip_length_from_index(tiprack: str, pipette: str):
         io.save_to_file(index_path, blob)
 
 
-def delete_tip_length_calibration(tiprack: str, pipette: str):
+def delete_tip_length_calibration(tiprack: str, pipette: str) -> None:
     """
     Delete tip length calibration based on tiprack hash and
     pipette serial number
@@ -89,7 +89,7 @@ def delete_tip_length_calibration(tiprack: str, pipette: str):
         _remove_tip_length_from_index(tiprack, pipette)
 
 
-def clear_tip_length_calibration():
+def clear_tip_length_calibration() -> None:
     """
     Delete all tip length calibration files.
     """
@@ -102,7 +102,7 @@ def clear_tip_length_calibration():
         pass
 
 
-def _remove_pipette_offset_from_index(pipette: str, mount: Mount):
+def _remove_pipette_offset_from_index(pipette: str, mount: Mount) -> None:
     """
     Helper function to remove an individual pipette offset file.
 
@@ -124,7 +124,7 @@ def _remove_pipette_offset_from_index(pipette: str, mount: Mount):
         pass
 
 
-def delete_pipette_offset_file(pipette: str, mount: Mount):
+def delete_pipette_offset_file(pipette: str, mount: Mount) -> None:
     """
     Delete pipette offset file based on mount and pipette serial number
 
@@ -141,12 +141,12 @@ def delete_pipette_offset_file(pipette: str, mount: Mount):
         pass
 
 
-def clear_pipette_offset_calibrations():
+def clear_pipette_offset_calibrations() -> None:
     """
     Delete all pipette offset calibration files.
     """
 
-    def _remove_json_files_in_directories(p: Path):
+    def _remove_json_files_in_directories(p: Path) -> None:
         for item in p.iterdir():
             if item.is_dir():
                 _remove_json_files_in_directories(item)
@@ -160,7 +160,7 @@ def clear_pipette_offset_calibrations():
         pass
 
 
-def delete_robot_deck_attitude():
+def delete_robot_deck_attitude() -> None:
     """
     Delete the robot deck attitude calibration.
     """

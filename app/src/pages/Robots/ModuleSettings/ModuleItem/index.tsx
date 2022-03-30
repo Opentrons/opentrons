@@ -17,7 +17,10 @@ import { ModuleImage } from './ModuleImage'
 import { ModuleUpdate } from './ModuleUpdate'
 import { ModuleControls } from '../../../../molecules/ModuleControls'
 import type { AttachedModule } from '../../../../redux/modules/types'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  getModuleDisplayName,
+  HEATERSHAKER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 interface Props {
   module: AttachedModule
@@ -43,10 +46,12 @@ export function ModuleItem(props: Props): JSX.Element {
       <Flex flexDirection={DIRECTION_ROW}>
         <ModuleImage model={module.model} />
         <Box width="60%">
-          <ModuleControls
-            module={module}
-            controlDisabledReason={controlDisabledReason}
-          />
+          {module.type !== HEATERSHAKER_MODULE_TYPE && (
+            <ModuleControls
+              module={module}
+              controlDisabledReason={controlDisabledReason}
+            />
+          )}
         </Box>
       </Flex>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>

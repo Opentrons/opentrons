@@ -1,6 +1,5 @@
 // full-width labware details
 import * as React from 'react'
-
 import { getUniqueWellProperties } from '../../labwareInference'
 import {
   getWellLabel,
@@ -8,6 +7,7 @@ import {
   WellProperties,
   ManufacturerStats,
 } from '../labware-ui'
+
 import { DetailsBox } from '../ui'
 import { InsertDetails } from './InsertDetails'
 import { Dimensions } from './Dimensions'

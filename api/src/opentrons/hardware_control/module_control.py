@@ -2,16 +2,20 @@ from __future__ import annotations
 import logging
 import asyncio
 import re
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Union, Awaitable, cast, TYPE_CHECKING
 from glob import glob
 
 from opentrons.config import IS_ROBOT, IS_LINUX
-from opentrons.drivers.rpi_drivers import types, usb, usb_simulator
+from opentrons.drivers.rpi_drivers import types, interfaces, usb, usb_simulator
 from opentrons.hardware_control.emulation.module_server.helpers import (
     listen_module_connection,
 )
 from .types import AionotifyEvent, BoardRevision
 from . import modules
+
+if TYPE_CHECKING:
+    from .api import API
+    from .ot3api import OT3API
 
 
 log = logging.getLogger(__name__)
@@ -25,20 +29,28 @@ class AttachedModulesControl:
     USB port information and finally building a module object.
     """
 
-    def __init__(self, api, board_revision: BoardRevision) -> None:
+    def __init__(
+        self,
+        api: Union["API", "OT3API"],
+        usb: interfaces.USBDriverInterface,
+    ) -> None:
         self._available_modules: List[modules.AbstractModule] = []
         self._api = api
-        self._usb = (
-            usb.USBBus(board_revision)
-            if not api.is_simulator and IS_ROBOT
-            else usb_simulator.USBBusSimulator(board_revision)
-        )
+        self._usb = usb
 
     @classmethod
     async def build(
-        cls, api_instance, board_revision: BoardRevision
+        cls,
+        api_instance: Union["API", "OT3API"],
+        board_revision: BoardRevision,
     ) -> AttachedModulesControl:
-        mc_instance = cls(api_instance, board_revision)
+        usb_instance = (
+            usb.USBBus(board_revision)
+            if not api_instance.is_simulator and IS_ROBOT
+            else usb_simulator.USBBusSimulator()
+        )
+        mc_instance = cls(api=api_instance, usb=usb_instance)
+
         if not api_instance.is_simulator:
             # Do an initial scan of modules.
             await mc_instance.register_modules(mc_instance.scan())
@@ -60,7 +72,7 @@ class AttachedModulesControl:
         usb_port: types.USBPort,
         model: str,
         loop: asyncio.AbstractEventLoop,
-        sim_model: str = None,
+        sim_model: Optional[str] = None,
     ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
@@ -97,11 +109,14 @@ class AttachedModulesControl:
                 f"Module {removed_mod.name()} detached" f" from port {removed_mod.port}"
             )
             await removed_mod.cleanup()
+        self._available_modules = sorted(
+            self._available_modules, key=modules.AbstractModule.sort_key
+        )
 
     async def register_modules(
         self,
-        new_mods_at_ports: List[modules.ModuleAtPort] = None,
-        removed_mods_at_ports: List[modules.ModuleAtPort] = None,
+        new_mods_at_ports: Optional[List[modules.ModuleAtPort]] = None,
+        removed_mods_at_ports: Optional[List[modules.ModuleAtPort]] = None,
     ) -> None:
         """
         Register Modules.
@@ -117,10 +132,10 @@ class AttachedModulesControl:
 
         # destroy removed mods
         await self.unregister_modules(removed_mods_at_ports)
-        sorted_mods_at_port = self._usb.match_virtual_ports(new_mods_at_ports)
+        unsorted_mods_at_port = self._usb.match_virtual_ports(new_mods_at_ports)
 
         # build new mods
-        for mod in sorted_mods_at_port:
+        for mod in unsorted_mods_at_port:
             new_instance = await self.build_module(
                 port=mod.port,
                 usb_port=mod.usb_port,
@@ -132,6 +147,9 @@ class AttachedModulesControl:
                 f"Module {mod.name} discovered and attached"
                 f" at port {mod.port}, new_instance: {new_instance}"
             )
+        self._available_modules = sorted(
+            self._available_modules, key=modules.AbstractModule.sort_key
+        )
 
     async def parse_modules(
         self,
@@ -163,13 +181,19 @@ class AttachedModulesControl:
                 "thermocycler": modules.Thermocycler.build,
             }[mod_type]
             if module_builder:
-                simulating_module = await module_builder(
-                    port="",
-                    usb_port=self._usb.find_port(""),
-                    simulating=True,
-                    loop=self._api.loop,
-                    execution_manager=self._api._execution_manager,
-                    sim_model=by_model.value,
+                # The dict stuff above somehow erases specifically the return type
+                # of the module builders instead of upcasting it so an explicit
+                # upcast here works without erasing the argument types
+                simulating_module = await cast(
+                    Awaitable[modules.AbstractModule],
+                    module_builder(
+                        port="",
+                        usb_port=types.USBPort(name="", port_number=0),
+                        simulating=True,
+                        loop=self._api.loop,
+                        execution_manager=self._api._execution_manager,
+                        sim_model=by_model.value,
+                    ),
                 )
                 simulated_module = simulating_module
         return matching_modules, simulated_module

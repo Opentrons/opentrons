@@ -1,12 +1,7 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
-import {
-  OVERLAY_GRAY_90,
-  OVERLAY_BLACK_90,
-  C_WHITE,
-  C_LIGHT_GRAY,
-} from '../../styles'
+import { OVERLAY_BLACK_90, C_WHITE, C_LIGHT_GRAY } from '../../styles'
 
 import { Box, Flex, Text, Btn } from '../../primitives'
 import { BaseModal } from '../BaseModal'
@@ -34,7 +29,7 @@ describe('BaseModal', () => {
     const wrapper = shallow(<BaseModal />)
     const box = wrapper.find(Flex).first()
 
-    expect(box.prop('backgroundColor')).toBe(OVERLAY_GRAY_90)
+    expect(box.prop('backgroundColor')).toBe('rgba(22, 33, 45, 0.35)')
 
     wrapper.setProps({ overlayColor: OVERLAY_BLACK_90 })
     expect(wrapper.find(Flex).first().prop('backgroundColor')).toBe(

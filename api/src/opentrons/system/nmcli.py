@@ -243,7 +243,7 @@ class EAP_TYPES(enum.Enum):
     PEAP_EAPMSCHAPV2 = (_EAP_OUTER_TYPES.PEAP, _EAP_PHASE2_TYPES.MSCHAP_V2)
     TLS = (_EAP_OUTER_TYPES.TLS, None)
 
-    def __init__(self, outer, inner):
+    def __init__(self, outer: _EAP_OUTER_TYPES, inner: _EAP_PHASE2_TYPES) -> None:
         self.outer = outer
         self.inner = inner
 
@@ -594,7 +594,10 @@ async def wifi_disconnect(ssid: str) -> Tuple[bool, str]:
         return False, err
 
 
-async def remove(ssid: str = None, name: str = None) -> Tuple[bool, str]:
+async def remove(
+    ssid: Optional[str] = None,
+    name: Optional[str] = None,
+) -> Tuple[bool, str]:
     """Remove a network. Depending on what is known, specify either ssid
     (in which case this function will call ``connection_exists`` to get the
     nmcli connection name) or the nmcli connection name directly.
@@ -725,7 +728,7 @@ def sanitize_args(cmd: List[str]) -> List[str]:
     sanitized = []
     for idx, fieldname in enumerate(cmd):
 
-        def _is_password(cmdstr):
+        def _is_password(cmdstr: str) -> bool:
             return "wifi-sec.psk" in cmdstr or "password" in cmdstr.lower()
 
         if idx > 0 and _is_password(cmd[idx - 1]):
@@ -823,7 +826,7 @@ def _get_resin_app_id() -> str:
     return app_id.group(1)
 
 
-def _rewrite_key_path_to_host_path(key_path) -> str:
+def _rewrite_key_path_to_host_path(key_path: str) -> str:
     resin_id = _get_resin_app_id()
     key_abspath = os.path.abspath(key_path)
     if key_abspath.startswith("/data"):
@@ -842,7 +845,7 @@ def _rewrite_key_path_to_host_path(key_path) -> str:
         return key_path
 
 
-def _make_host_symlink_if_necessary():
+def _make_host_symlink_if_necessary() -> None:
     host_data_prefix = _get_host_data_prefix()
     if not os.path.islink(_get_host_data_prefix()):
         parent = os.path.abspath(os.path.join(host_data_prefix, os.pardir))

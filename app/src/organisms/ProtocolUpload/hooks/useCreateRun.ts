@@ -30,6 +30,9 @@ export function useCreateRun(): UseCreateRun {
           console.error(`error invalidating runs query: ${e.message}`)
         )
     },
+    onError: error => {
+      setProtocolCreationError(error.response?.data.errors[0].detail ?? null)
+    },
   })
   const {
     createProtocol: createProtocolRun,

@@ -6,9 +6,6 @@
     "author": "engineering <engineering@opentrons.com>",
     "description": "A short test protocol",
     "created": 1223131231,
-    "lastModified": null,
-    "category": null,
-    "subcategory": null,
     "tags": ["unitTest"]
   },
   "robot": {
@@ -42,7 +39,7 @@
       "definitionId": "example/plate/1"
     },
     "destPlateId": {
-      "displayName": "Dest Plate",
+      "displayName": "Sample Collection Plate",
       "definitionId": "example/plate/1"
     }
   },
@@ -1256,7 +1253,7 @@
       "id": "0abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "mount": "leftMount"
+        "mount": "left"
       }
     },
     {
@@ -1292,7 +1289,8 @@
         "labwareId": "destPlateId",
         "location": {
           "moduleId": "magneticModuleId"
-        }
+        },
+        "displayName": "Sample Collection Plate"
       }
     },
     {

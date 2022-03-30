@@ -246,7 +246,7 @@ class ProtocolContext(CommandPublisher):
                 return
 
             if message["$"] == "before":
-                self._commands.append(text.format(**payload))
+                self._commands.append(text)
 
         self._unsubscribe_commands = self.broker.subscribe(
             cmd_types.COMMAND, on_command
@@ -304,6 +304,7 @@ class ProtocolContext(CommandPublisher):
                 deck_slot=types.DeckSlotName.from_primitive(location),
                 on_module=False,
                 offset_id=provided_labware_offset.offset_id,
+                labware_display_name=implementation.get_label(),
             )
         )
 
@@ -371,6 +372,7 @@ class ProtocolContext(CommandPublisher):
                 deck_slot=types.DeckSlotName.from_primitive(location),
                 on_module=False,
                 offset_id=provided_labware_offset.offset_id,
+                labware_display_name=implementation.get_label(),
             )
         )
 

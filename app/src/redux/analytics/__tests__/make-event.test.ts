@@ -1,9 +1,6 @@
 // events map tests
 import { makeEvent } from '../make-event'
-import {
-  actions as robotActions,
-  selectors as robotSelectors,
-} from '../../robot'
+import { connect } from '../../robot'
 import * as discoverySelectors from '../../discovery/selectors'
 import * as selectors from '../selectors'
 
@@ -16,9 +13,6 @@ jest.mock('../../calibration/selectors')
 
 const getConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
   typeof discoverySelectors.getConnectedRobot
->
-const getRunSeconds = robotSelectors.getRunSeconds as jest.MockedFunction<
-  typeof robotSelectors.getRunSeconds
 >
 const getAnalyticsSessionExitDetails = selectors.getAnalyticsSessionExitDetails as jest.MockedFunction<
   typeof selectors.getAnalyticsSessionExitDetails
@@ -47,7 +41,7 @@ describe('analytics events map', () => {
     jest.resetAllMocks()
   })
 
-  it('robot:CONNECT_RESPONSE -> robotConnected event', () => {
+  it('robot:CONNECT -> robotConnected event', () => {
     getConnectedRobot.mockImplementation((state: any): any => {
       if (state === 'wired') {
         return {
@@ -78,28 +72,17 @@ describe('analytics events map', () => {
       return null
     })
 
-    const success = robotActions.connectResponse(null)
-    const failure = robotActions.connectResponse(new Error('AH'))
-
     return Promise.all([
-      expect(makeEvent(success, 'wired' as any)).resolves.toEqual({
+      expect(makeEvent(connect('wired'), 'wired' as any)).resolves.toEqual({
         name: 'robotConnect',
-        properties: { method: 'usb', success: true, error: '' },
+        properties: { method: 'usb', success: true },
       }),
 
-      expect(makeEvent(failure, 'wired' as any)).resolves.toEqual({
+      expect(
+        makeEvent(connect('wireless'), 'wireless' as any)
+      ).resolves.toEqual({
         name: 'robotConnect',
-        properties: { method: 'usb', success: false, error: 'AH' },
-      }),
-
-      expect(makeEvent(success, 'wireless' as any)).resolves.toEqual({
-        name: 'robotConnect',
-        properties: { method: 'wifi', success: true, error: '' },
-      }),
-
-      expect(makeEvent(failure, 'wireless' as any)).resolves.toEqual({
-        name: 'robotConnect',
-        properties: { method: 'wifi', success: false, error: 'AH' },
+        properties: { method: 'wifi', success: true },
       }),
     ])
   })
@@ -118,141 +101,6 @@ describe('analytics events map', () => {
       return expect(makeEvent(success, nextState)).resolves.toEqual({
         name: 'protocolUploadRequest',
         properties: protocolData,
-      })
-    })
-
-    it('robot:SESSION_RESPONSE with upload in flight', () => {
-      const nextState = {} as any
-      const success = {
-        type: 'robot:SESSION_RESPONSE',
-        payload: {},
-        meta: { freshUpload: true },
-      } as any
-
-      return expect(makeEvent(success, nextState)).resolves.toEqual({
-        name: 'protocolUploadResponse',
-        properties: { success: true, error: '', ...protocolData },
-      })
-    })
-
-    it('robot:SESSION_ERROR with upload in flight', () => {
-      const nextState = {} as any
-      const failure = {
-        type: 'robot:SESSION_ERROR',
-        payload: { error: new Error('AH') },
-        meta: { freshUpload: true },
-      } as any
-
-      return expect(makeEvent(failure, nextState)).resolves.toEqual({
-        name: 'protocolUploadResponse',
-        properties: { success: false, error: 'AH', ...protocolData },
-      })
-    })
-
-    it('robot:SESSION_RESPONSE/ERROR with no upload in flight', () => {
-      const nextState = {} as any
-      const success = {
-        type: 'robot:SESSION_RESPONSE',
-        payload: {},
-        meta: { freshUpload: false },
-      } as any
-      const failure = {
-        type: 'robot:SESSION_ERROR',
-        payload: { error: new Error('AH') },
-        meta: { freshUpload: false },
-      } as any
-
-      return Promise.all([
-        expect(makeEvent(success, nextState)).resolves.toBeNull(),
-        expect(makeEvent(failure, nextState)).resolves.toBeNull(),
-      ])
-    })
-
-    it('robot:RUN -> runStart event', () => {
-      const state = {} as any
-      const action = { type: 'robot:RUN' } as any
-
-      return expect(makeEvent(action, state)).resolves.toEqual({
-        name: 'runStart',
-        properties: protocolData,
-      })
-    })
-
-    it('robot:RUN_RESPONSE success -> runFinish event', () => {
-      const state = {} as any
-      const action = { type: 'robot:RUN_RESPONSE', error: false } as any
-
-      getRunSeconds.mockReturnValue(4)
-
-      return expect(makeEvent(action, state)).resolves.toEqual({
-        name: 'runFinish',
-        properties: { ...protocolData, runTime: 4, success: true, error: '' },
-      })
-    })
-
-    it('robot:RUN_RESPONSE error -> runFinish event', () => {
-      const state = {} as any
-      const action = {
-        type: 'robot:RUN_RESPONSE',
-        error: true,
-        payload: new Error('AH'),
-      } as any
-
-      getRunSeconds.mockReturnValue(4)
-
-      return expect(makeEvent(action, state)).resolves.toEqual({
-        name: 'runFinish',
-        properties: {
-          ...protocolData,
-          runTime: 4,
-          success: false,
-          error: 'AH',
-        },
-      })
-    })
-
-    it('robot:PAUSE -> runPause event', () => {
-      const state = {} as any
-      const action = { type: 'robot:PAUSE' } as any
-
-      getRunSeconds.mockReturnValue(4)
-
-      return expect(makeEvent(action, state)).resolves.toEqual({
-        name: 'runPause',
-        properties: {
-          ...protocolData,
-          runTime: 4,
-        },
-      })
-    })
-
-    it('robot:RESUME -> runResume event', () => {
-      const state = {} as any
-      const action = { type: 'robot:RESUME' } as any
-
-      getRunSeconds.mockReturnValue(4)
-
-      return expect(makeEvent(action, state)).resolves.toEqual({
-        name: 'runResume',
-        properties: {
-          ...protocolData,
-          runTime: 4,
-        },
-      })
-    })
-
-    it('robot:CANCEL-> runCancel event', () => {
-      const state = {} as any
-      const action = { type: 'robot:CANCEL' } as any
-
-      getRunSeconds.mockReturnValue(4)
-
-      return expect(makeEvent(action, state)).resolves.toEqual({
-        name: 'runCancel',
-        properties: {
-          ...protocolData,
-          runTime: 4,
-        },
       })
     })
 

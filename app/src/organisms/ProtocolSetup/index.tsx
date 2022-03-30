@@ -25,7 +25,7 @@ import {
   C_NEAR_WHITE,
 } from '@opentrons/components'
 
-import { useRunStatus } from '../RunTimeControl/hooks'
+import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { RunSetupCard } from './RunSetupCard'
 import { MetadataCard } from './MetadataCard'
 import { LPCSuccessToastContext } from './hooks'
@@ -35,10 +35,12 @@ const feedbackFormLink =
   'https://docs.google.com/forms/d/e/1FAIpQLSd6oSV82IfgzSi5t_FP6n_pB_Y8wPGmAgFHsiiFho9qhxr-UQ/viewform'
 
 export function ProtocolSetup(): JSX.Element {
-  const [showLPCSuccessToast, setShowLPCSuccessToast] = React.useState(false)
+  const [showLPCSuccessToast, setIsShowingLPCSuccessToast] = React.useState(
+    false
+  )
   const { t } = useTranslation(['protocol_setup'])
 
-  const runStatus = useRunStatus()
+  const runStatus = useCurrentRunStatus()
 
   let alertType: AlertType | null = null
   let alertTitle: string = ''
@@ -82,12 +84,13 @@ export function ProtocolSetup(): JSX.Element {
       >
         <LPCSuccessToastContext.Provider
           value={{
-            setShowLPCSuccessToast: () => setShowLPCSuccessToast(true),
+            setIsShowingLPCSuccessToast: (isShowing: boolean) =>
+              setIsShowingLPCSuccessToast(isShowing),
           }}
         >
           {showLPCSuccessToast && (
             <LabwareOffsetSuccessToast
-              onCloseClick={() => setShowLPCSuccessToast(false)}
+              onCloseClick={() => setIsShowingLPCSuccessToast(false)}
             />
           )}
           <MetadataCard />

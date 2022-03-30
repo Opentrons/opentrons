@@ -8,12 +8,15 @@ class ModelUtils:
     """Common resource model utilities provider."""
 
     @staticmethod
-    def generate_id() -> str:
+    def generate_id(prefix: str = "") -> str:
         """Generate a unique identifier.
 
         Uses UUIDv4 for safety in a multiprocessing environment.
+
+        Params:
+            prefix: Prepended to the UUIDv4.
         """
-        return str(uuid4())
+        return prefix + str(uuid4())
 
     @staticmethod
     def ensure_id(maybe_id: Optional[str] = None) -> str:

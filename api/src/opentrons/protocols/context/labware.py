@@ -1,7 +1,7 @@
 """The interface that implements InstrumentContext."""
 
 from abc import abstractmethod
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.labware_geometry import AbstractLabwareGeometry
@@ -21,6 +21,10 @@ class AbstractLabware(DeckItem):
 
     @abstractmethod
     def get_display_name(self) -> str:
+        ...
+
+    @abstractmethod
+    def get_label(self) -> Optional[str]:
         ...
 
     @abstractmethod

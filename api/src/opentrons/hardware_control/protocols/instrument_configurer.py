@@ -82,7 +82,7 @@ class InstrumentConfigurer(Protocol):
         bottom: Optional[float] = None,
         blow_out: Optional[float] = None,
         drop_tip: Optional[float] = None,
-    ):
+    ) -> None:
         """
         Set calibration values for the pipette plunger.
         This can be called multiple times as the user sets each value,

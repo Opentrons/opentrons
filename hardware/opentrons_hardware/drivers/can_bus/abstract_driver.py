@@ -1,7 +1,7 @@
 """The can bus transport."""
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from opentrons_ot3_firmware import CanMessage
+from opentrons_hardware.firmware_bindings import CanMessage
 
 
 class AbstractCanDriver(ABC):

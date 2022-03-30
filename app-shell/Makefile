@@ -40,8 +40,7 @@ electron := electron . \
 	--log.level.console="debug" \
 	--disable_ui.webPreferences.webSecurity \
 	--ui.url.protocol="http:" \
-	--ui.url.path="localhost:$(PORT)" \
-	--discovery.candidates=localhost
+	--ui.url.path="localhost:$(PORT)"
 
 # standard targets
 #####################################################################
@@ -112,8 +111,8 @@ dist-ubuntu-latest: dist-linux
 .PHONY: dist-ubuntu-18.04
 dist-ubuntu-18.04: dist-linux
 
-.PHONY: dist-windows-latest
-dist-windows-latest: dist-win
+.PHONY: dist-windows-2019
+dist-windows-2019: dist-win
 
 # copy distributable artifacts to the publish directory
 # update files will not exist for all OSs, so noop if cp errors

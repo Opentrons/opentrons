@@ -1,10 +1,13 @@
 """Dispense command request, result, and implementation models."""
 from __future__ import annotations
-from typing import Optional, Type
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from .pipetting_common import BaseLiquidHandlingParams, BaseLiquidHandlingResult
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+
+if TYPE_CHECKING:
+    from ..execution import PipettingHandler
 
 
 DispenseCommandType = Literal["dispense"]
@@ -24,6 +27,9 @@ class DispenseResult(BaseLiquidHandlingResult):
 
 class DispenseImplementation(AbstractCommandImpl[DispenseParams, DispenseResult]):
     """Dispense command implementation."""
+
+    def __init__(self, pipetting: PipettingHandler, **kwargs: object) -> None:
+        self._pipetting = pipetting
 
     async def execute(self, params: DispenseParams) -> DispenseResult:
         """Move to and dispense to the requested well."""

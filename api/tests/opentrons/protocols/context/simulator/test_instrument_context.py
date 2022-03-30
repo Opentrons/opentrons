@@ -1,4 +1,6 @@
 """Test instrument context simulation."""
+from typing import Callable
+
 import pytest
 from pytest_lazyfixture import lazy_fixture
 
@@ -85,3 +87,96 @@ def test_aspirate_too_much(
         AssertionError, match="Cannot aspirate more than pipette max volume"
     ):
         subject.aspirate(subject.get_max_volume() + 1, rate=1)
+
+
+def test_working_volume(subject: AbstractInstrument, labware: AbstractLabware) -> None:
+    """It should have the correct working volume."""
+    subject.home()
+    assert subject.get_pipette()["working_volume"] == 300
+    subject.pick_up_tip(
+        well=labware.get_wells()[0], tip_length=1, presses=None, increment=None
+    )
+    assert subject.get_pipette()["working_volume"] == 100
+
+
+@pytest.mark.parametrize(
+    argnames=["side_effector"],
+    argvalues=[
+        [lambda i: None],
+        [lambda i: i.set_flow_rate(aspirate=212, dispense=44, blow_out=22)],
+        [lambda i: i.set_pipette_speed(aspirate=212, dispense=44, blow_out=22)],
+    ],
+)
+def test_pipette_dict(
+    side_effector: Callable[[AbstractInstrument], None],
+    instrument_context: AbstractInstrument,
+    simulating_instrument_context: AbstractInstrument,
+) -> None:
+    """It should be the same."""
+    side_effector(instrument_context)
+    side_effector(simulating_instrument_context)
+    assert (
+        instrument_context.get_pipette() == simulating_instrument_context.get_pipette()
+    )
+
+
+def _aspirate(i: AbstractInstrument) -> None:
+    """pipette dict with tip fixture."""
+    i.prepare_for_aspirate()
+    i.aspirate(12, 10)
+
+
+def _aspirate_dispense(i: AbstractInstrument) -> None:
+    """pipette dict with tip fixture."""
+    i.prepare_for_aspirate()
+    i.aspirate(12, 10)
+    i.dispense(2, 2)
+
+
+def _aspirate_blowout(i: AbstractInstrument) -> None:
+    """pipette dict with tip fixture."""
+    i.prepare_for_aspirate()
+    i.aspirate(11, 13)
+    i.blow_out()
+
+
+@pytest.mark.parametrize(
+    argnames=["side_effector"],
+    argvalues=[
+        [lambda i: None],
+        [_aspirate],
+        [_aspirate_dispense],
+        [_aspirate_blowout],
+    ],
+)
+def test_pipette_dict_with_tip(
+    side_effector: Callable[[AbstractInstrument], None],
+    instrument_context: AbstractInstrument,
+    simulating_instrument_context: AbstractInstrument,
+    labware: AbstractLabware,
+) -> None:
+    """It should be the same."""
+    # Home first
+    instrument_context.home()
+    simulating_instrument_context.home()
+    # Pickup tip
+    instrument_context.pick_up_tip(
+        well=labware.get_wells()[0], tip_length=2, presses=3, increment=4
+    )
+    simulating_instrument_context.pick_up_tip(
+        well=labware.get_wells()[0], tip_length=2, presses=3, increment=4
+    )
+
+    side_effector(instrument_context)
+    side_effector(simulating_instrument_context)
+    assert (
+        instrument_context.get_pipette() == simulating_instrument_context.get_pipette()
+    )
+
+    # Drop tip and compare again
+    instrument_context.drop_tip(home_after=False)
+    simulating_instrument_context.drop_tip(home_after=False)
+
+    assert (
+        instrument_context.get_pipette() == simulating_instrument_context.get_pipette()
+    )

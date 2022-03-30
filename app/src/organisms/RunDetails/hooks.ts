@@ -3,10 +3,10 @@ import last from 'lodash/last'
 import { schemaV6Adapter } from '@opentrons/shared-data'
 import { useCurrentProtocol, useCurrentRun } from '../ProtocolUpload/hooks'
 import { formatInterval } from '../RunTimeControl/utils'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 interface ProtocolDetails {
   displayName: string | null
-  protocolData: ProtocolFile<{}> | null
+  protocolData: ProtocolAnalysisFile<{}> | null
 }
 
 // TODO(sb, 2021-11-16) Figure out why this was causing a circular dependency and move out of this hooks file
@@ -43,7 +43,7 @@ function useNow(): string {
 }
 
 export function useProtocolDetails(): ProtocolDetails {
-  let protocolData: ProtocolFile<{}> | null = null
+  let protocolData: ProtocolAnalysisFile<{}> | null = null
   const protocolRecord = useCurrentProtocol()
   const protocolAnalysis = protocolRecord?.data.analyses
   if (protocolAnalysis != null) {

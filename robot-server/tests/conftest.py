@@ -20,12 +20,7 @@ from typing_extensions import NoReturn
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons import config
-from opentrons.hardware_control import (
-    API,
-    HardwareControlAPI,
-    ThreadedAsyncLock,
-    ThreadManagedHardware,
-)
+from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 from opentrons.calibration_storage import delete, modify, helpers
 from opentrons.protocol_api import labware
@@ -235,7 +230,7 @@ def set_up_deck_calibration_temp_directory(server_temp_directory: str) -> None:
 
 
 @pytest.fixture
-def session_manager(hardware: ThreadManagedHardware) -> SessionManager:
+def session_manager(hardware: HardwareControlAPI) -> SessionManager:
     return SessionManager(
         hardware=hardware,
         motion_lock=ThreadedAsyncLock(),

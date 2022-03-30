@@ -4,7 +4,6 @@ from numpy import isclose
 from typing import Any, Dict, Iterator
 
 import pytest
-from opentrons import types
 
 from opentrons.config import pipette_config, feature_flags as ff, CONFIG
 from opentrons_shared_data import load_shared_data
@@ -275,9 +274,10 @@ async def attached_pipettes(hardware, request):
     right_name = right_mod.split("_v")[0]
     left_id = marker_with_default("attach_left_id", "abc123")
     right_id = marker_with_default("attach_right_id", "abcd123")
+    mount_type = type(list(hardware._backend._attached_instruments.keys())[0])
     hardware._backend._attached_instruments = {
-        types.Mount.RIGHT: {"model": right_mod, "id": right_id, "name": right_name},
-        types.Mount.LEFT: {"model": left_mod, "id": left_id, "name": left_name},
+        mount_type.RIGHT: {"model": right_mod, "id": right_id, "name": right_name},
+        mount_type.LEFT: {"model": left_mod, "id": left_id, "name": left_name},
     }
     await hardware.cache_instruments()
     yield {

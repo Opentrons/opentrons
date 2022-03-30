@@ -10,9 +10,8 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 def usb_port() -> USBPort:
     return USBPort(
         name="",
-        sub_names=[],
         hub=None,
-        port_number=None,
+        port_number=0,
         device_path="/dev/ot_module_sim_thermocycler0",
     )
 
@@ -24,7 +23,7 @@ async def test_sim_initialization(loop, usb_port):
         which="thermocycler",
         simulating=True,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
     )
 
     assert isinstance(therm, modules.AbstractModule)
@@ -37,7 +36,7 @@ async def test_lid(loop, usb_port):
         which="thermocycler",
         simulating=True,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
     )
 
     await therm.open()
@@ -64,7 +63,7 @@ async def test_sim_state(loop, usb_port):
         which="thermocycler",
         simulating=True,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
     )
 
     assert therm.temperature is None
@@ -86,7 +85,7 @@ async def test_sim_update(loop, usb_port):
         which="thermocycler",
         simulating=True,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
     )
 
     await therm.set_temperature(
@@ -155,7 +154,7 @@ async def set_temperature_subject(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
         driver=simulator_set_plate_spy,
         device_info={},
         polling_interval_sec=0.001,

@@ -1,7 +1,7 @@
 import logging
 from typing import Optional, Tuple, Dict, Type
 
-from opentrons.hardware_control import ThreadManagedHardware, ThreadedAsyncLock
+from opentrons.hardware_control import HardwareControlAPI, ThreadedAsyncLock
 
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.session.errors import (
@@ -39,7 +39,7 @@ class SessionManager:
 
     def __init__(
         self,
-        hardware: ThreadManagedHardware,
+        hardware: HardwareControlAPI,
         motion_lock: ThreadedAsyncLock,
     ):
         """

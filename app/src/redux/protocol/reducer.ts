@@ -1,5 +1,3 @@
-import { filenameToType, parseProtocolData } from './protocol-data'
-
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { ProtocolState } from './types'
@@ -23,23 +21,8 @@ export const protocolReducer: Reducer<ProtocolState, Action> = (
     case 'protocol:UPLOAD':
       return { ...state, ...action.payload }
 
-    case 'robot:SESSION_RESPONSE': {
-      const { name, metadata, protocolText: contents } = action.payload
-      const file =
-        !state.file || name !== state.file.name
-          ? { name, type: filenameToType(name), lastModified: null }
-          : state.file
-      const data =
-        !state.data ||
-        (typeof contents === 'string' && contents !== state.contents)
-          ? parseProtocolData(file, contents, metadata)
-          : state.data
-
-      return { file, contents, data }
-    }
-
     case 'protocol:CLOSE':
-    case 'robot:DISCONNECT_RESPONSE':
+    case 'robot:DISCONNECT':
       return INITIAL_STATE
   }
 

@@ -43,11 +43,21 @@ export function DevicesEmptyState(): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
       padding={`${SPACING_5} 0`}
     >
-      <Text as="h3" fontWeight={FONT_WEIGHT_REGULAR} paddingBottom={SPACING_2}>
+      <Text
+        as="h3"
+        fontWeight={FONT_WEIGHT_REGULAR}
+        paddingBottom={SPACING_2}
+        id="DevicesEmptyState_noRobotsFound"
+      >
         {t('no_robots_found')}
       </Text>
       <Box paddingBottom={SPACING_3}>
-        <NewPrimaryBtn onClick={handleRefresh}>{t('refresh')}</NewPrimaryBtn>
+        <NewPrimaryBtn
+          onClick={handleRefresh}
+          id="DevicesEmptyState_refreshButton"
+        >
+          {t('refresh')}
+        </NewPrimaryBtn>
       </Box>
       <Link
         external
@@ -58,6 +68,7 @@ export function DevicesEmptyState(): JSX.Element {
         fontSize={FONT_SIZE_BODY_1}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         paddingBottom={SPACING_2}
+        id="DevicesEmptyState_settingUpNewRobot"
       >
         {t('setting_up_new_robot')}{' '}
         <Icon name="open-in-new" size="0.675rem" marginLeft={SPACING_1} />
@@ -70,6 +81,7 @@ export function DevicesEmptyState(): JSX.Element {
         color={C_BLUE}
         fontSize={FONT_SIZE_BODY_1}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
+        id="DevicesEmptyState_troubleshootingConnectionProblems"
       >
         {t('troubleshooting_connection_problems')}
         <Icon name="open-in-new" size="0.675rem" marginLeft={SPACING_1} />

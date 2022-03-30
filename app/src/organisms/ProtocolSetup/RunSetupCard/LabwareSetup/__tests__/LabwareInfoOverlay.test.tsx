@@ -66,6 +66,7 @@ describe('LabwareInfoOverlay', () => {
   beforeEach(() => {
     props = {
       definition: fixture_tiprack_300_ul as LabwareDefinition2,
+      displayName: 'fresh tips',
       labwareId: MOCK_LABWARE_ID,
     }
     labware = {
@@ -78,7 +79,7 @@ describe('LabwareInfoOverlay', () => {
     }
     when(mockGetLabwareDisplayName)
       .calledWith(props.definition)
-      .mockReturnValue('mock display name')
+      .mockReturnValue('mock definition display name')
 
     when(mockUseProtocolDetails)
       .calledWith()
@@ -108,9 +109,17 @@ describe('LabwareInfoOverlay', () => {
     jest.restoreAllMocks()
   })
 
-  it('should render the labware display name', () => {
+  it('should render the labware display name if present', () => {
     const { getByText } = render(props)
-    getByText('mock display name')
+    getByText('fresh tips')
+  })
+
+  it('should render the labware def display name if no user displayName present', () => {
+    const { getByText } = render({
+      ...props,
+      displayName: null,
+    })
+    getByText('mock definition display name')
   })
 
   it('should render NOT render the offset data label when offset data does not exist', () => {

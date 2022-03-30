@@ -1,15 +1,16 @@
 """ProtocolEngine class definition."""
-from typing import Optional
+from typing import Dict, Optional
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 
-from .resources import ModelUtils
+from .resources import ModelUtils, ModuleDataProvider
 from .commands import (
     Command,
     CommandCreate,
 )
-from .types import LabwareOffset, LabwareOffsetCreate
+from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri, ModuleModel
 from .execution import (
     QueueWorker,
     create_queue_worker,
@@ -29,6 +30,7 @@ from .actions import (
     QueueCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
+    AddModuleAction,
     HardwareStoppedAction,
 )
 
@@ -51,6 +53,7 @@ class ProtocolEngine:
         model_utils: Optional[ModelUtils] = None,
         hardware_stopper: Optional[HardwareStopper] = None,
         hardware_event_forwarder: Optional[HardwareEventForwarder] = None,
+        module_data_provider: Optional[ModuleDataProvider] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -84,6 +87,7 @@ class ProtocolEngine:
                 action_dispatcher=self._action_dispatcher,
             )
         )
+        self._module_data_provider = module_data_provider or ModuleDataProvider()
 
         self._queue_worker.start()
         self._hardware_event_forwarder.start()
@@ -135,6 +139,13 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(action)
         return self._state_store.commands.get(command_id)
 
+    async def wait_for_command(self, command_id: str) -> None:
+        """Wait for a command to be completed."""
+        await self._state_store.wait_for(
+            self._state_store.commands.get_is_complete,
+            command_id=command_id,
+        )
+
     async def add_and_execute_command(self, request: CommandCreate) -> Command:
         """Add a command to the queue and wait for it to complete.
 
@@ -149,10 +160,7 @@ class ProtocolEngine:
             The completed command, whether it succeeded or failed.
         """
         command = self.add_command(request)
-        await self._state_store.wait_for(
-            condition=self._state_store.commands.get_is_complete,
-            command_id=command.id,
-        )
+        await self.wait_for_command(command.id)
         return self._state_store.commands.get(command.id)
 
     async def stop(self) -> None:
@@ -168,7 +176,6 @@ class ProtocolEngine:
         self._queue_worker.cancel()
         await self._hardware_stopper.do_halt()
 
-    # TODO(mc, 2021-12-27): commands.get_all_complete not yet implemented
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
 
@@ -245,8 +252,28 @@ class ProtocolEngine:
             labware_offset_id=labware_offset_id
         )
 
-    def add_labware_definition(self, definition: LabwareDefinition) -> None:
+    def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a labware definition to the state for subsequent labware loads."""
         self._action_dispatcher.dispatch(
             AddLabwareDefinitionAction(definition=definition)
         )
+        return self._state_store.labware.get_uri_from_definition(definition)
+
+    async def use_attached_modules(
+        self,
+        modules_by_id: Dict[str, HardwareModuleAPI],
+    ) -> None:
+        """Load attached modules directly into state, without locations."""
+        actions = [
+            AddModuleAction(
+                module_id=module_id,
+                serial_number=mod.device_info["serial"],
+                definition=self._module_data_provider.get_definition(
+                    ModuleModel(mod.model())
+                ),
+            )
+            for module_id, mod in modules_by_id.items()
+        ]
+
+        for a in actions:
+            self._action_dispatcher.dispatch(a)

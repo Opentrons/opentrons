@@ -1,4 +1,5 @@
-from typing import Dict, Optional, Any, List
+import asyncio
+from typing import Dict, Optional, Any, List, cast
 from dataclasses import dataclass, asdict, field
 import json
 from pathlib import Path
@@ -27,7 +28,9 @@ class SimulatorSetup:
     strict_attached_instruments: bool = True
 
 
-async def create_simulator(setup: SimulatorSetup, loop=None) -> HardwareControlAPI:
+async def create_simulator(
+    setup: SimulatorSetup, loop: Optional[asyncio.AbstractEventLoop] = None
+) -> HardwareControlAPI:
     """Create a simulator"""
     simulator = await API.build_hardware_simulator(
         attached_instruments=setup.attached_instruments,
@@ -46,7 +49,9 @@ async def create_simulator(setup: SimulatorSetup, loop=None) -> HardwareControlA
     return simulator
 
 
-async def load_simulator(path: Path, loop=None) -> HardwareControlAPI:
+async def load_simulator(
+    path: Path, loop: Optional[asyncio.AbstractEventLoop] = None
+) -> HardwareControlAPI:
     """Create a simulator from a JSON file."""
     return await create_simulator(setup=load_simulator_setup(path), loop=loop)
 
@@ -74,7 +79,7 @@ async def load_simulator_thread_manager(
     return thread_manager
 
 
-def save_simulator_setup(simulator_setup: SimulatorSetup, path: Path):
+def save_simulator_setup(simulator_setup: SimulatorSetup, path: Path) -> None:
     """Write a simulator setup to a file."""
     as_dict = asdict(simulator_setup)
     as_dict = {k: _prepare_for_dict(k, v) for (k, v) in as_dict.items()}
@@ -91,19 +96,22 @@ def load_simulator_setup(path: Path) -> SimulatorSetup:
         )
 
 
-def _prepare_for_dict(key, value):
+def _prepare_for_dict(key: str, value: Dict[str, Any]) -> Dict[str, Any]:
     """Convert an element in SimulatorSetup to be a serializable dict"""
     if key == "attached_instruments" and value:
-        return {mount.name.lower(): data for (mount, data) in value.items()}
+        return {
+            mount.name.lower(): data
+            for (mount, data) in cast(Dict[Mount, Any], value).items()
+        }
     return value
 
 
-def _prepare_for_simulator_setup(key, value):
+def _prepare_for_simulator_setup(key: str, value: Dict[str, Any]) -> Any:
     """Convert value to a SimulatorSetup"""
     if key == "attached_instruments" and value:
         return {Mount[mount.upper()]: data for (mount, data) in value.items()}
     if key == "config" and value:
-        return robot_configs.build_config(value)
+        return robot_configs.build_config_ot2(value)
     if key == "attached_modules" and value:
         return {k: [ModuleCall(**data) for data in v] for (k, v) in value.items()}
     return value

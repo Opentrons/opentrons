@@ -11,14 +11,13 @@ import time
 
 from opentrons_hardware.drivers.can_bus import CanDriver
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_ot3_firmware.constants import NodeId
-from opentrons_ot3_firmware.messages.message_definitions import (
+from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     DeviceInfoRequest,
     DeviceInfoResponse,
 )
-from opentrons_ot3_firmware.arbitration_id import ArbitrationId
-from opentrons_ot3_firmware.messages import MessageDefinition
-from opentrons_ot3_firmware.messages.payloads import EmptyPayload
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.scripts.can_args import add_can_args
 
 
@@ -82,9 +81,7 @@ class BusProber:
 
     async def _stimulate(self, messenger: CanMessenger) -> None:
         self._done.clear()
-        await messenger.send(
-            node_id=NodeId.broadcast, message=DeviceInfoRequest(payload=EmptyPayload())
-        )
+        await messenger.send(node_id=NodeId.broadcast, message=DeviceInfoRequest())
         await self._done.wait()
 
     def __call__(
@@ -171,9 +168,7 @@ class BusLoader:
         then = time.time()
         while True:
             for node in self._targets:
-                await self._messenger.send(
-                    node_id=node, message=DeviceInfoRequest(payload=EmptyPayload())
-                )
+                await self._messenger.send(node_id=node, message=DeviceInfoRequest())
                 self._stats.messages_sent[node] += 1
             now = time.time()
             if now - then > self._period:

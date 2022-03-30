@@ -84,7 +84,7 @@ async def test_get_protocols_no_protocols(
     result = await get_protocols(protocol_store=protocol_store)
 
     assert result.content.data == []
-    assert result.content.meta == MultiBodyMeta(cursor=0, pageLength=0, totalLength=0)
+    assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=0)
     assert result.status_code == 200
 
 
@@ -152,7 +152,7 @@ async def test_get_protocols(
     )
 
     assert result.content.data == [expected_protocol_1, expected_protocol_2]
-    assert result.content.meta == MultiBodyMeta(cursor=0, pageLength=2, totalLength=2)
+    assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=2)
     assert result.status_code == 200
 
 

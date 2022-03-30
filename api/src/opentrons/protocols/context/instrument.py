@@ -61,10 +61,6 @@ class AbstractInstrument(ABC):
         ...
 
     @abstractmethod
-    def delay(self) -> None:
-        ...
-
-    @abstractmethod
     def move_to(
         self,
         location: types.Location,

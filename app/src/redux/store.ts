@@ -4,7 +4,6 @@ import thunk from 'redux-thunk'
 import { routerMiddleware } from 'connected-react-router'
 import { createEpicMiddleware } from 'redux-observable'
 
-import { apiClientMiddleware as robotApiMiddleware } from './robot/api-client'
 import { rootReducer, history } from './reducer'
 import { rootEpic } from './epic'
 
@@ -15,7 +14,6 @@ const epicMiddleware = createEpicMiddleware<Action, Action, State, any>()
 const middleware = applyMiddleware(
   thunk,
   epicMiddleware,
-  robotApiMiddleware(),
   routerMiddleware(history)
 )
 

@@ -3,12 +3,12 @@ import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/
 import { getLabwareOffsetLocation } from '../getLabwareOffsetLocation'
 import { getLabwareLocation } from '../getLabwareLocation'
 import { getModuleInitialLoadInfo } from '../getModuleInitialLoadInfo'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 jest.mock('../getLabwareLocation')
 jest.mock('../getModuleInitialLoadInfo')
 
-const protocolWithTC = (_uncastedProtocolWithTC as unknown) as ProtocolFile<{}>
+const protocolWithTC = (_uncastedProtocolWithTC as unknown) as ProtocolAnalysisFile
 
 const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
   typeof getLabwareLocation
@@ -19,8 +19,8 @@ const mockGetModuleInitialLoadInfo = getModuleInitialLoadInfo as jest.MockedFunc
 
 describe('getLabwareOffsetLocation', () => {
   let MOCK_LABWARE_ID: string
-  let MOCK_COMMANDS: ProtocolFile<{}>['commands']
-  let MOCK_MODULES: ProtocolFile<{}>['modules']
+  let MOCK_COMMANDS: ProtocolAnalysisFile['commands']
+  let MOCK_MODULES: ProtocolAnalysisFile['modules']
   beforeEach(() => {
     MOCK_LABWARE_ID = 'some_labware'
     MOCK_COMMANDS = protocolWithTC.commands

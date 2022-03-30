@@ -3,10 +3,6 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useRouteMatch, Route, Switch, Redirect } from 'react-router-dom'
 
-import {
-  selectors as robotSelectors,
-  actions as robotActions,
-} from '../../../redux/robot'
 import { CONNECTABLE, REACHABLE } from '../../../redux/discovery'
 import {
   UPGRADE,
@@ -29,7 +25,6 @@ import { SpinnerModalPage } from '@opentrons/components'
 import { CardContainer, CardRow } from '../../../atoms/layout'
 import { Page } from '../../../atoms/Page'
 import { ErrorModal } from '../../../molecules/modals'
-import { ConnectAlertModal } from './ConnectAlertModal'
 import { UpdateBuildroot } from './UpdateBuildroot'
 import { ConnectBanner } from './ConnectBanner'
 import { ReachableRobotBanner } from './ReachableRobotBanner'
@@ -75,9 +70,6 @@ export function RobotSettings(props: Props): JSX.Element {
   const homeError = useSelector((state: State) =>
     getMovementError(state, robotName)
   )
-  const connectRequest = useSelector((state: State) =>
-    robotSelectors.getConnectRequest(state)
-  )
 
   const buildrootUpdateSeen = useSelector((state: State) =>
     getBuildrootUpdateSeen(state)
@@ -93,8 +85,6 @@ export function RobotSettings(props: Props): JSX.Element {
   const resetUrl = `${url}/${RESET_FRAGMENT}`
   const pipettesPageUrl = `${url}/${INSTRUMENTS_FRAGMENT}`
   const titleBarProps = { title: robot.displayName }
-
-  const showConnectAlert = !connectRequest.inProgress && !!connectRequest.error
 
   const showUpdateModal = Boolean(
     updateInProgress ||
@@ -204,12 +194,6 @@ export function RobotSettings(props: Props): JSX.Element {
           }}
         />
       </Switch>
-
-      {showConnectAlert && (
-        <ConnectAlertModal
-          onCloseClick={() => dispatch(robotActions.clearConnectResponse())}
-        />
-      )}
     </>
   )
 }

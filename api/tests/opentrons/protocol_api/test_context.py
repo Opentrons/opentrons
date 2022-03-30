@@ -242,7 +242,7 @@ def test_pick_up_and_drop_tip(ctx, get_labware_def):
 
     instr = ctx.load_instrument("p300_single", mount, tip_racks=[tiprack])
 
-    pipette: Pipette = ctx._implementation.get_hardware()._attached_instruments[mount]
+    pipette: Pipette = ctx._implementation.get_hardware().hardware_instruments[mount]
     nozzle_offset = Point(*pipette.config.nozzle_offset)
     assert pipette.critical_point() == nozzle_offset
     target_location = tiprack["A1"].top()
@@ -280,7 +280,7 @@ def test_return_tip_old_version(loop, hardware, get_labware_def):
     with pytest.raises(TypeError):
         instr.return_tip()
 
-    pipette: Pipette = ctx._implementation.get_hardware()._attached_instruments[mount]
+    pipette: Pipette = ctx._implementation.get_hardware().hardware_instruments[mount]
 
     target_location = tiprack["A1"].top()
     instr.pick_up_tip(target_location)
@@ -306,7 +306,7 @@ def test_return_tip(ctx, get_labware_def):
     with pytest.raises(TypeError):
         instr.return_tip()
 
-    pipette: Pipette = ctx._implementation.get_hardware()._attached_instruments[mount]
+    pipette: Pipette = ctx._implementation.get_hardware().hardware_instruments[mount]
 
     target_location = tiprack["A1"].top()
     instr.pick_up_tip(target_location)
@@ -330,7 +330,7 @@ def test_use_filter_tips(ctx, get_labware_def):
     mount = Mount.LEFT
 
     instr = ctx.load_instrument("p300_single", mount, tip_racks=[tiprack])
-    pipette: Pipette = ctx._implementation.get_hardware()._attached_instruments[mount]
+    pipette: Pipette = ctx._implementation.get_hardware().hardware_instruments[mount]
 
     assert pipette.available_volume == pipette.config.max_volume
 
@@ -356,7 +356,7 @@ def test_pick_up_tip_no_location(ctx, get_labware_def, pipette_model, tiprack_ki
 
     instr = ctx.load_instrument(pipette_model, mount, tip_racks=[tiprack1, tiprack2])
 
-    pipette: Pipette = ctx._implementation.get_hardware()._attached_instruments[mount]
+    pipette: Pipette = ctx._implementation.get_hardware().hardware_instruments[mount]
     nozzle_offset = Point(*pipette.config.nozzle_offset)
     assert pipette.critical_point() == nozzle_offset
 
@@ -453,7 +453,7 @@ def test_aspirate(ctx, get_labware_def):
         ctx._implementation.get_hardware()._obj_to_adapt, "aspirate"
     ) as fake_hw_aspirate:
         hardware = ctx._implementation.get_hardware()
-        hardware._obj_to_adapt._attached_instruments[Mount.RIGHT]._current_volume = 1
+        hardware._obj_to_adapt.hardware_instruments[Mount.RIGHT]._current_volume = 1
 
         instr.aspirate(2.0)
         fake_move.assert_not_called()

@@ -11,6 +11,7 @@ from .equipment import (
 from .movement import MovementHandler, SavedPositionData
 from .pipetting import PipettingHandler
 from .queue_worker import QueueWorker
+from .rail_lights import RailLightsHandler
 from .run_control import RunControlHandler
 from .hardware_stopper import HardwareStopper
 from .hardware_event_forwarder import HardwareEventForwarder
@@ -32,4 +33,5 @@ __all__ = [
     "RunControlHandler",
     "HardwareStopper",
     "HardwareEventForwarder",
+    "RailLightsHandler",
 ]

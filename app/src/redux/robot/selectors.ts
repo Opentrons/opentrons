@@ -15,7 +15,6 @@ import type { State } from '../types'
 import type {
   Command,
   CommandNode,
-  ConnectionStatus,
   Labware,
   LabwareCalibrationStatus,
   LabwareType,
@@ -56,32 +55,9 @@ export function labwareType(labware: Labware): LabwareType {
   return labware.isTiprack ? 'tiprack' : 'labware'
 }
 
-export function getConnectRequest(
-  state: State
-): ConnectionState['connectRequest'] {
-  return connection(state).connectRequest
-}
-
 export function getConnectedRobotName(state: State): string | null {
-  return connection(state).connectedTo || null
+  return connection(state).connectedTo
 }
-
-export const getConnectionStatus: (
-  state: State
-) => ConnectionStatus = createSelector(
-  getConnectedRobotName,
-  state => getConnectRequest(state).inProgress,
-  state => connection(state).disconnectRequest.inProgress,
-  state => connection(state).unexpectedDisconnect,
-  (connectedTo, isConnecting, isDisconnecting, unexpectedDisconnect) => {
-    if (unexpectedDisconnect) return Constants.DISCONNECTED
-    if (!connectedTo && isConnecting) return Constants.CONNECTING
-    if (connectedTo && !isDisconnecting) return Constants.CONNECTED
-    if (connectedTo && isDisconnecting) return Constants.DISCONNECTING
-
-    return Constants.DISCONNECTED
-  }
-)
 
 export function getSessionCapabilities(state: State): string[] {
   return session(state).capabilities

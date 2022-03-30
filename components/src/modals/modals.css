@@ -16,6 +16,7 @@
 .modal {
   @apply --modal;
 
+  z-index: 1;
   padding: 4rem;
 }
 

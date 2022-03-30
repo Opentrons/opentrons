@@ -11,6 +11,8 @@ import {
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
   ModuleModel,
+  HEATERSHAKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_V1,
 } from '@opentrons/shared-data'
 
 interface Props {
@@ -35,6 +37,9 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
   },
   [THERMOCYCLER_MODULE_TYPE]: {
     [THERMOCYCLER_MODULE_V1]: require('../../images/modules/thermocycler.jpg'),
+  },
+  [HEATERSHAKER_MODULE_TYPE]: {
+    [HEATERSHAKER_MODULE_V1]: require('../../images/modules/heatershaker.png'),
   },
 }
 

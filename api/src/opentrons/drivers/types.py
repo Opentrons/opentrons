@@ -35,12 +35,12 @@ class RPM:
 class HeaterShakerLabwareLatchStatus(str, Enum):
     """Heater-shaker labware latch status"""
 
-    OPENING = "OPENING"
-    IDLE_OPEN = "IDLE_OPEN"
-    CLOSING = "CLOSING"
-    IDLE_CLOSED = "IDLE_CLOSED"
-    IDLE_UNKNOWN = "IDLE_UNKNOWN"
-    UNKNOWN = "UNKNOWN"
+    OPENING = "opening"
+    IDLE_OPEN = "idle_open"
+    CLOSING = "closing"
+    IDLE_CLOSED = "idle_closed"
+    IDLE_UNKNOWN = "idle_unknown"
+    UNKNOWN = "unknown"
 
 
 @dataclass

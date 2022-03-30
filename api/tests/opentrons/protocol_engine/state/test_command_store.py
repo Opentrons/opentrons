@@ -4,6 +4,7 @@ from collections import OrderedDict
 from datetime import datetime
 from typing import NamedTuple, Type
 
+from opentrons.ordered_set import OrderedSet
 from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.types import DoorStateNotification, DoorState
 
@@ -13,6 +14,7 @@ from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName, WellL
 from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandStore,
+    CommandEntry,
     RunResult,
     QueueStatus,
 )
@@ -49,7 +51,8 @@ def test_initial_state() -> None:
         is_door_blocking=False,
         run_result=None,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        queued_command_ids=OrderedSet(),
+        all_command_ids=[],
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -175,8 +178,11 @@ def test_command_store_queues_commands(
     subject = CommandStore()
     subject.handle_action(action)
 
-    assert subject.state.commands_by_id == OrderedDict({"command-id": expected_command})
-    assert subject.state.queued_command_ids == OrderedDict({"command-id": True})
+    assert subject.state.commands_by_id == {
+        "command-id": CommandEntry(index=0, command=expected_command),
+    }
+    assert subject.state.all_command_ids == ["command-id"]
+    assert subject.state.queued_command_ids == OrderedSet(["command-id"])
 
 
 def test_command_queue_and_unqueue() -> None:
@@ -203,18 +209,18 @@ def test_command_queue_and_unqueue() -> None:
     subject = CommandStore()
 
     subject.handle_action(queue_1)
-    assert subject.state.queued_command_ids == OrderedDict([("command-id-1", True)])
+    assert subject.state.queued_command_ids == OrderedSet(["command-id-1"])
 
     subject.handle_action(queue_2)
-    assert subject.state.queued_command_ids == OrderedDict(
-        [("command-id-1", True), ("command-id-2", True)]
+    assert subject.state.queued_command_ids == OrderedSet(
+        ["command-id-1", "command-id-2"]
     )
 
     subject.handle_action(update_2)
-    assert subject.state.queued_command_ids == OrderedDict([("command-id-1", True)])
+    assert subject.state.queued_command_ids == OrderedSet(["command-id-1"])
 
     subject.handle_action(update_1)
-    assert subject.state.queued_command_ids == OrderedDict([])
+    assert subject.state.queued_command_ids == OrderedSet()
 
 
 def test_running_command_id() -> None:
@@ -241,6 +247,26 @@ def test_running_command_id() -> None:
     assert subject.state.running_command_id == "command-id-1"
 
     subject.handle_action(completed_update)
+    assert subject.state.running_command_id is None
+
+
+def test_running_command_no_queue() -> None:
+    """It should add a running command to state, even if there was no queue action."""
+    running_update = UpdateCommandAction(
+        command=create_running_command(command_id="command-id-1"),
+    )
+    completed_update = UpdateCommandAction(
+        command=create_succeeded_command(command_id="command-id-1"),
+    )
+
+    subject = CommandStore()
+
+    subject.handle_action(running_update)
+    assert subject.state.all_command_ids == ["command-id-1"]
+    assert subject.state.running_command_id == "command-id-1"
+
+    subject.handle_action(completed_update)
+    assert subject.state.all_command_ids == ["command-id-1"]
     assert subject.state.running_command_id is None
 
 
@@ -278,7 +304,12 @@ def test_command_failure_clears_queue() -> None:
     expected_failed_1 = commands.Pause(
         id="command-id-1",
         key="command-key-1",
-        errorId="error-id",
+        error=errors.ErrorOccurrence(
+            id="error-id",
+            errorType="ProtocolEngineError",
+            detail="oh no",
+            createdAt=datetime(year=2023, month=3, day=3),
+        ),
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
         completedAt=datetime(year=2023, month=3, day=3),
@@ -288,7 +319,7 @@ def test_command_failure_clears_queue() -> None:
     expected_failed_2 = commands.Pause(
         id="command-id-2",
         key="command-key-2",
-        errorId="error-id",
+        error=None,
         createdAt=datetime(year=2021, month=1, day=1),
         completedAt=datetime(year=2023, month=3, day=3),
         params=commands.PauseParams(),
@@ -303,13 +334,12 @@ def test_command_failure_clears_queue() -> None:
     subject.handle_action(fail_1)
 
     assert subject.state.running_command_id is None
-    assert subject.state.queued_command_ids == OrderedDict([])
-    assert subject.state.commands_by_id == OrderedDict(
-        [
-            ("command-id-1", expected_failed_1),
-            ("command-id-2", expected_failed_2),
-        ]
-    )
+    assert subject.state.queued_command_ids == OrderedSet()
+    assert subject.state.all_command_ids == ["command-id-1", "command-id-2"]
+    assert subject.state.commands_by_id == {
+        "command-id-1": CommandEntry(index=0, command=expected_failed_1),
+        "command-id-2": CommandEntry(index=1, command=expected_failed_2),
+    }
 
 
 def test_command_store_preserves_handle_order() -> None:
@@ -320,23 +350,26 @@ def test_command_store_preserves_handle_order() -> None:
     command_c = create_succeeded_command(command_id="command-id-1")
 
     subject = CommandStore()
-    subject.handle_action(UpdateCommandAction(command=command_a))
-    subject.handle_action(UpdateCommandAction(command=command_b))
 
-    assert subject.state.commands_by_id == OrderedDict(
-        [
-            ("command-id-1", command_a),
-            ("command-id-2", command_b),
-        ]
-    )
+    subject.handle_action(UpdateCommandAction(command=command_a))
+    assert subject.state.all_command_ids == ["command-id-1"]
+    assert subject.state.commands_by_id == {
+        "command-id-1": CommandEntry(index=0, command=command_a),
+    }
+
+    subject.handle_action(UpdateCommandAction(command=command_b))
+    assert subject.state.all_command_ids == ["command-id-1", "command-id-2"]
+    assert subject.state.commands_by_id == {
+        "command-id-1": CommandEntry(index=0, command=command_a),
+        "command-id-2": CommandEntry(index=1, command=command_b),
+    }
 
     subject.handle_action(UpdateCommandAction(command=command_c))
-    assert subject.state.commands_by_id == OrderedDict(
-        [
-            ("command-id-1", command_c),
-            ("command-id-2", command_b),
-        ]
-    )
+    assert subject.state.all_command_ids == ["command-id-1", "command-id-2"]
+    assert subject.state.commands_by_id == {
+        "command-id-1": CommandEntry(index=0, command=command_c),
+        "command-id-2": CommandEntry(index=1, command=command_b),
+    }
 
 
 @pytest.mark.parametrize("pause_source", PauseSource)
@@ -351,7 +384,8 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
         is_hardware_stopped=False,
         is_door_blocking=False,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -370,7 +404,8 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         is_hardware_stopped=False,
         is_door_blocking=False,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -386,7 +421,8 @@ def test_command_store_handles_play_according_to_door_state() -> None:
         is_hardware_stopped=False,
         is_door_blocking=True,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -401,7 +437,8 @@ def test_command_store_handles_play_according_to_door_state() -> None:
         is_hardware_stopped=False,
         is_door_blocking=False,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -420,7 +457,8 @@ def test_command_store_handles_finish_action() -> None:
         is_hardware_stopped=False,
         is_door_blocking=False,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -439,7 +477,8 @@ def test_command_store_handles_stop_action() -> None:
         is_hardware_stopped=False,
         is_door_blocking=False,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -457,7 +496,8 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         is_hardware_stopped=False,
         is_door_blocking=False,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -480,7 +520,8 @@ def test_command_store_ignores_known_finish_error() -> None:
         is_hardware_stopped=False,
         is_door_blocking=False,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -503,7 +544,8 @@ def test_command_store_saves_unknown_finish_error() -> None:
         is_hardware_stopped=False,
         is_door_blocking=False,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={
             "error-id": errors.ErrorOccurrence(
@@ -530,7 +572,8 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         is_hardware_stopped=False,
         is_door_blocking=False,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -550,7 +593,8 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         is_hardware_stopped=False,
         is_door_blocking=False,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -559,9 +603,17 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
 def test_command_store_handles_command_failed() -> None:
     """It should store an error and mark the command if it fails."""
     command = create_running_command(command_id="command-id")
+
+    expected_error_occurrence = errors.ErrorOccurrence(
+        id="error-id",
+        errorType="ProtocolEngineError",
+        createdAt=datetime(year=2022, month=2, day=2),
+        detail="oh no",
+    )
+
     expected_failed_command = create_failed_command(
         command_id="command-id",
-        error_id="error-id",
+        error=expected_error_occurrence,
         completed_at=datetime(year=2022, month=2, day=2),
     )
 
@@ -582,16 +634,12 @@ def test_command_store_handles_command_failed() -> None:
         is_hardware_stopped=False,
         is_door_blocking=False,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
-        commands_by_id=OrderedDict([("command-id", expected_failed_command)]),
-        errors_by_id={
-            "error-id": errors.ErrorOccurrence(
-                id="error-id",
-                errorType="ProtocolEngineError",
-                createdAt=datetime(year=2022, month=2, day=2),
-                detail="oh no",
-            )
+        all_command_ids=["command-id"],
+        queued_command_ids=OrderedSet(),
+        commands_by_id={
+            "command-id": CommandEntry(index=0, command=expected_failed_command),
         },
+        errors_by_id={},
     )
 
 
@@ -606,7 +654,8 @@ def test_handles_hardware_stopped() -> None:
         is_hardware_stopped=True,
         is_door_blocking=False,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -628,7 +677,8 @@ def test_handles_door_open_and_close_event() -> None:
         is_hardware_stopped=False,
         is_door_blocking=True,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -642,7 +692,8 @@ def test_handles_door_open_and_close_event() -> None:
         is_hardware_stopped=False,
         is_door_blocking=False,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -662,7 +713,8 @@ def test_handles_door_event_during_idle_run() -> None:
         is_hardware_stopped=False,
         is_door_blocking=True,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -675,7 +727,8 @@ def test_handles_door_event_during_idle_run() -> None:
         is_hardware_stopped=False,
         is_door_blocking=False,
         running_command_id=None,
-        queued_command_ids=OrderedDict(),
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )

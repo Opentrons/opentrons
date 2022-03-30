@@ -39,13 +39,17 @@ import {
   useCreateRun,
   useCloseCurrentRun,
   useIsProtocolRunLoaded,
+  useCurrentRunId,
 } from './hooks'
 import { loadProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
 import { getValidCustomLabwareFiles } from '../../redux/custom-labware/selectors'
 import { ConfirmCancelModal } from '../RunDetails/ConfirmCancelModal'
-import { useRunStatus, useRunControls } from '../RunTimeControl/hooks'
+import {
+  useCurrentRunStatus,
+  useCurrentRunControls,
+} from '../RunTimeControl/hooks'
 import { useProtocolDetails } from '../RunDetails/hooks'
 
 import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal'
@@ -66,12 +70,13 @@ export function ProtocolUpload(): JSX.Element {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const protocolRecord = useCurrentProtocol()
+  const runId = useCurrentRunId()
   const {
     createProtocolRun,
     isCreatingProtocolRun,
     protocolCreationError,
   } = useCreateRun()
-  const runStatus = useRunStatus()
+  const runStatus = useCurrentRunStatus()
   const { displayName } = useProtocolDetails()
   const isProtocolRunLoaded = useIsProtocolRunLoaded()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
@@ -129,7 +134,7 @@ export function ProtocolUpload(): JSX.Element {
       }
     )
   }
-  const { pause } = useRunControls()
+  const { pause } = useCurrentRunControls()
 
   const handleCancelClick = (): void => {
     pause()
@@ -238,7 +243,10 @@ export function ProtocolUpload(): JSX.Element {
         <ConfirmExitProtocolUploadModal exit={confirmExit} back={cancelExit} />
       )}
       {showConfirmCancelModal && (
-        <ConfirmCancelModal onClose={() => setShowConfirmCancelModal(false)} />
+        <ConfirmCancelModal
+          onClose={() => setShowConfirmCancelModal(false)}
+          runId={runId}
+        />
       )}
       <Page titleBarProps={titleBarProps}>
         {uploadError != null && (

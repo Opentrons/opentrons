@@ -77,6 +77,7 @@ const LAYOUT_PROPS = [
   'overflow',
   'overflowX',
   'overflowY',
+  'whiteSpace',
   'wordSpacing',
 ] as const
 

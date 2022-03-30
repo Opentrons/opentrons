@@ -3,14 +3,8 @@ from decoy import Decoy
 
 from opentrons.types import MountType
 from opentrons.protocol_engine.types import PipetteName
+from opentrons.protocol_engine.execution import LoadedPipetteData, EquipmentHandler
 
-from opentrons.protocol_engine.execution import (
-    LoadedPipetteData,
-    EquipmentHandler,
-    MovementHandler,
-    PipettingHandler,
-    RunControlHandler,
-)
 from opentrons.protocol_engine.commands.load_pipette import (
     LoadPipetteParams,
     LoadPipetteResult,
@@ -21,17 +15,9 @@ from opentrons.protocol_engine.commands.load_pipette import (
 async def test_load_pipette_implementation(
     decoy: Decoy,
     equipment: EquipmentHandler,
-    movement: MovementHandler,
-    pipetting: PipettingHandler,
-    run_control: RunControlHandler,
 ) -> None:
     """A LoadPipette command should have an execution implementation."""
-    subject = LoadPipetteImplementation(
-        equipment=equipment,
-        movement=movement,
-        pipetting=pipetting,
-        run_control=run_control,
-    )
+    subject = LoadPipetteImplementation(equipment=equipment)
 
     data = LoadPipetteParams(
         pipetteName=PipetteName.P300_SINGLE,

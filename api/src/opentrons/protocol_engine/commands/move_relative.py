@@ -1,11 +1,14 @@
 """Move relative (jog) command payload, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import Optional, Type
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from ..types import MovementAxis
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+
+if TYPE_CHECKING:
+    from ..execution import MovementHandler
 
 
 MoveRelativeCommandType = Literal["moveRelative"]
@@ -33,6 +36,9 @@ class MoveRelativeImplementation(
     AbstractCommandImpl[MoveRelativeParams, MoveRelativeResult]
 ):
     """Move relative command implementation."""
+
+    def __init__(self, movement: MovementHandler, **kwargs: object) -> None:
+        self._movement = movement
 
     async def execute(self, params: MoveRelativeParams) -> MoveRelativeResult:
         """Move (jog) a given pipette a relative distance."""

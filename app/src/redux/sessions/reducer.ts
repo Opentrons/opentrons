@@ -1,5 +1,6 @@
 import omit from 'lodash/omit'
 
+import { DISCONNECT } from '../robot'
 import * as Constants from './constants'
 
 import type { Action } from '../types'
@@ -83,13 +84,8 @@ export const sessionReducer: Reducer<SessionState, Action> = (
       }
     }
 
-    case Constants.CLEAR_ALL_SESSIONS: {
-      const { robotName } = action.payload
-
-      return {
-        ...state,
-        [robotName]: INITIAL_PER_ROBOT_STATE,
-      }
+    case DISCONNECT: {
+      return INITIAL_STATE
     }
   }
 

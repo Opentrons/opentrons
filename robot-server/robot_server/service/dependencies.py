@@ -2,10 +2,10 @@ from datetime import datetime, timezone
 from uuid import uuid4
 from fastapi import Depends
 
-from opentrons.hardware_control import ThreadedAsyncLock, ThreadManagedHardware
+from opentrons.hardware_control import HardwareControlAPI, ThreadedAsyncLock
 
 from robot_server.util import call_once
-from robot_server.hardware import get_thread_manager
+from robot_server.hardware import get_hardware
 from robot_server.service.session.manager import SessionManager
 
 
@@ -21,12 +21,12 @@ async def get_motion_lock() -> ThreadedAsyncLock:
 
 @call_once
 async def get_session_manager(
-    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
+    hardware_api: HardwareControlAPI = Depends(get_hardware),
     motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
 ) -> SessionManager:
     """The single session manager instance"""
     return SessionManager(
-        hardware=thread_manager,
+        hardware=hardware_api,
         motion_lock=motion_lock,
     )
 

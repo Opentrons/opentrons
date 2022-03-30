@@ -81,10 +81,11 @@ const copyLabware = (
     if (next.type !== CustomLabware.VALID_LABWARE_FILE) {
       return dispatch(CustomLabware.addCustomLabwareFailure(next))
     }
-
-    return Definitions.addLabwareFile(next.filename, dir).then(() =>
-      fetchAndValidateCustomLabware(dispatch, CustomLabware.ADD_LABWARE)
-    )
+    return Definitions.addLabwareFile(next.filename, dir)
+      .then(() =>
+        fetchAndValidateCustomLabware(dispatch, CustomLabware.ADD_LABWARE)
+      )
+      .then(() => dispatch(CustomLabware.addNewLabwareName(newFile.filename)))
   })
 }
 
@@ -154,6 +155,14 @@ export function registerLabware(
           dispatch(CustomLabware.addCustomLabwareFailure(null, error.message))
         })
 
+        break
+      }
+
+      case CustomLabware.ADD_CUSTOM_LABWARE_FILE: {
+        const filePath = action.payload.filePath
+        copyLabware(dispatch, [filePath]).catch((error: Error) => {
+          dispatch(CustomLabware.addCustomLabwareFailure(null, error.message))
+        })
         break
       }
 

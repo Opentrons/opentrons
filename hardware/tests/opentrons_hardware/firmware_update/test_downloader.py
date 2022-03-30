@@ -1,18 +1,25 @@
 """Tests for the firmware downloader."""
+import binascii
 from typing import List
 
 import pytest
 from mock import AsyncMock, MagicMock, call
-from opentrons_ot3_firmware import NodeId, utils, ArbitrationId, ArbitrationIdParts
-from opentrons_ot3_firmware.constants import ErrorCode
-from opentrons_ot3_firmware.messages import MessageDefinition
-from opentrons_ot3_firmware.messages.message_definitions import (
+from opentrons_hardware.firmware_bindings import (
+    NodeId,
+    utils,
+    ArbitrationId,
+    ArbitrationIdParts,
+)
+from opentrons_hardware.firmware_bindings.constants import ErrorCode
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     FirmwareUpdateData,
     FirmwareUpdateComplete,
     FirmwareUpdateDataAcknowledge,
     FirmwareUpdateCompleteAcknowledge,
 )
-from opentrons_ot3_firmware.messages import payloads
+from opentrons_hardware.firmware_bindings.messages import payloads
+from opentrons_hardware.firmware_bindings.messages.fields import ErrorCodeField
 
 from opentrons_hardware.firmware_update import downloader
 from opentrons_hardware.firmware_update.errors import ErrorResponse, TimeoutResponse
@@ -37,6 +44,15 @@ def chunks() -> List[Chunk]:
 
 
 @pytest.fixture
+def crc32(chunks: List[Chunk]) -> int:
+    """crc32 of data chunks."""
+    val = 0
+    for c in chunks:
+        val = binascii.crc32(bytes(c.data), val)
+    return val
+
+
+@pytest.fixture
 def subject(mock_messenger: AsyncMock) -> downloader.FirmwareUpdateDownloader:
     """Test subject."""
     return downloader.FirmwareUpdateDownloader(mock_messenger)
@@ -48,6 +64,7 @@ async def test_messaging(
     mock_hex_processor: MagicMock,
     mock_messenger: AsyncMock,
     can_message_notifier: MockCanMessageNotifier,
+    crc32: int,
 ) -> None:
     """It should send all the chunks as CAN messages."""
     # TODO (amit, 2022-1-27): Replace this test with integration test.
@@ -58,7 +75,7 @@ async def test_messaging(
                 FirmwareUpdateDataAcknowledge(
                     payload=payloads.FirmwareUpdateDataAcknowledge(
                         address=message.payload.address,
-                        error_code=utils.UInt16Field(ErrorCode.ok),
+                        error_code=ErrorCodeField(ErrorCode.ok),
                     )
                 ),
                 ArbitrationId(
@@ -73,8 +90,8 @@ async def test_messaging(
         elif isinstance(message, FirmwareUpdateComplete):
             can_message_notifier.notify(
                 FirmwareUpdateCompleteAcknowledge(
-                    payload=payloads.FirmwareUpdateCompleteAcknowledge(
-                        error_code=utils.UInt16Field(ErrorCode.ok)
+                    payload=payloads.FirmwareUpdateAcknowledge(
+                        error_code=ErrorCodeField(ErrorCode.ok)
                     )
                 ),
                 ArbitrationId(
@@ -110,7 +127,8 @@ async def test_messaging(
                 node_id=NodeId.gantry_y_bootloader,
                 message=FirmwareUpdateComplete(
                     payload=payloads.FirmwareUpdateComplete(
-                        num_messages=utils.UInt32Field(len(chunks))
+                        num_messages=utils.UInt32Field(len(chunks)),
+                        crc32=utils.UInt32Field(crc32),
                     )
                 ),
             )
@@ -134,7 +152,7 @@ async def test_messaging_data_error_response(
                 FirmwareUpdateDataAcknowledge(
                     payload=payloads.FirmwareUpdateDataAcknowledge(
                         address=message.payload.address,
-                        error_code=utils.UInt16Field(ErrorCode.bad_checksum),
+                        error_code=ErrorCodeField(ErrorCode.bad_checksum),
                     )
                 ),
                 ArbitrationId(
@@ -171,7 +189,7 @@ async def test_messaging_complete_error_response(
                 FirmwareUpdateDataAcknowledge(
                     payload=payloads.FirmwareUpdateDataAcknowledge(
                         address=message.payload.address,
-                        error_code=utils.UInt16Field(ErrorCode.ok),
+                        error_code=ErrorCodeField(ErrorCode.ok),
                     )
                 ),
                 ArbitrationId(
@@ -186,8 +204,8 @@ async def test_messaging_complete_error_response(
         elif isinstance(message, FirmwareUpdateComplete):
             can_message_notifier.notify(
                 FirmwareUpdateCompleteAcknowledge(
-                    payload=payloads.FirmwareUpdateCompleteAcknowledge(
-                        error_code=utils.UInt16Field(ErrorCode.invalid_size)
+                    payload=payloads.FirmwareUpdateAcknowledge(
+                        error_code=ErrorCodeField(ErrorCode.invalid_size)
                     )
                 ),
                 ArbitrationId(
@@ -238,7 +256,7 @@ async def test_messaging_complete_no_response(
                 FirmwareUpdateDataAcknowledge(
                     payload=payloads.FirmwareUpdateDataAcknowledge(
                         address=message.payload.address,
-                        error_code=utils.UInt16Field(ErrorCode.ok),
+                        error_code=ErrorCodeField(ErrorCode.ok),
                     )
                 ),
                 ArbitrationId(

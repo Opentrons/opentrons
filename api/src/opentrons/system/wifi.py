@@ -124,7 +124,7 @@ def get_key_file(key: str) -> str:
     return os.path.join(keys_dir, key, files_in_dir[0])
 
 
-def _eap_check_no_extra_args(config: Dict[str, Any], options: Any):
+def _eap_check_no_extra_args(config: Dict[str, Any], options: Any) -> None:
     # options is an Any because the type annotation for EAP_CONFIG_SHAPE itself
     # can’t quite express the type properly because of the inference from the
     # dict annotation.
@@ -144,7 +144,7 @@ def _eap_check_no_extra_args(config: Dict[str, Any], options: Any):
             )
 
 
-def _eap_check_option_ok(opt: Dict[str, str], config: Dict[str, Any]):
+def _eap_check_option_ok(opt: Dict[str, str], config: Dict[str, Any]) -> None:
     """
     Check that a given EAP option is in the user config (if required)
     and, if specified, is the right type.

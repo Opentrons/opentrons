@@ -35,10 +35,10 @@ class TempDeck(mod_abc.AbstractModule):
         usb_port: USBPort,
         execution_manager: ExecutionManager,
         simulating: bool = False,
-        loop: asyncio.AbstractEventLoop = None,
-        sim_model: str = None,
-        **kwargs,
-    ):
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        sim_model: Optional[str] = None,
+        **kwargs: float,
+    ) -> "TempDeck":
         """
         Build a TempDeck
 
@@ -83,7 +83,7 @@ class TempDeck(mod_abc.AbstractModule):
         execution_manager: ExecutionManager,
         driver: AbstractTempDeckDriver,
         device_info: Mapping[str, str],
-        loop: asyncio.AbstractEventLoop = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
         polling_frequency: float = TEMP_POLL_INTERVAL_SECS,
     ) -> None:
         """Constructor"""
@@ -97,7 +97,6 @@ class TempDeck(mod_abc.AbstractModule):
             reader=PollerReader(driver=self._driver),
             interval_seconds=polling_frequency,
             listener=self._listener,
-            loop=loop,
         )
 
     async def cleanup(self) -> None:
@@ -132,7 +131,7 @@ class TempDeck(mod_abc.AbstractModule):
         await self._driver.set_temperature(celsius=celsius)
         await self.wait_next_poll()
 
-        async def _wait():
+        async def _wait() -> None:
             # Wait until we reach the target temperature.
             while self.status != TemperatureStatus.HOLDING:
                 await self.wait_next_poll()
@@ -141,7 +140,7 @@ class TempDeck(mod_abc.AbstractModule):
         await self.make_cancellable(task)
         await task
 
-    async def start_set_temperature(self, celsius) -> None:
+    async def start_set_temperature(self, celsius: float) -> None:
         """
         Set temperature in degree Celsius
         Range: 4 to 95 degree Celsius (QA tested).
@@ -164,7 +163,7 @@ class TempDeck(mod_abc.AbstractModule):
         await self.wait_for_is_running()
         await self.wait_next_poll()
 
-        async def _await_temperature():
+        async def _await_temperature() -> None:
             if self.status == TemperatureStatus.HEATING:
                 while self.temperature < awaiting_temperature:
                     await self.wait_next_poll()

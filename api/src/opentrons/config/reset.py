@@ -75,7 +75,7 @@ def reset(options: Set[ResetOptionId]) -> None:
         reset_tip_length_calibrations()
 
 
-def reset_boot_scripts():
+def reset_boot_scripts() -> None:
     if IS_ROBOT:
         if os.path.exists(DATA_BOOT_D):
             shutil.rmtree(DATA_BOOT_D)
@@ -83,19 +83,19 @@ def reset_boot_scripts():
         log.debug(f"Not on pi, not removing {DATA_BOOT_D}")
 
 
-def reset_deck_calibration():
+def reset_deck_calibration() -> None:
     delete.delete_robot_deck_attitude()
     delete.clear_pipette_offset_calibrations()
 
 
-def reset_pipette_offset():
+def reset_pipette_offset() -> None:
     delete.clear_pipette_offset_calibrations()
 
 
-def reset_tip_length_calibrations():
+def reset_tip_length_calibrations() -> None:
     delete.clear_tip_length_calibration()
     delete.clear_pipette_offset_calibrations()
 
 
-def reset_labware_calibration():
+def reset_labware_calibration() -> None:
     delete.clear_calibrations()

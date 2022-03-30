@@ -60,23 +60,23 @@ RESPONSE_SPECS = [
     ResponseSpec(
         subject=SimpleMultiBody(
             data=[_Resource(id="hello"), _Resource(id="goodbye")],
-            meta=MultiBodyMeta(cursor=1, pageLength=2, totalLength=3),
+            meta=MultiBodyMeta(cursor=1, totalLength=3),
         ),
         expected={
             "data": [{"id": "hello"}, {"id": "goodbye"}],
-            "meta": {"cursor": 1, "pageLength": 2, "totalLength": 3},
+            "meta": {"cursor": 1, "totalLength": 3},
         },
     ),
     ResponseSpec(
         subject=MultiBody(
             data=[_Resource(id="hello"), _Resource(id="goodbye")],
             links=_Links(sibling=ResourceLink(href="/bar")),
-            meta=MultiBodyMeta(cursor=1, pageLength=2, totalLength=3),
+            meta=MultiBodyMeta(cursor=1, totalLength=3),
         ),
         expected={
             "data": [{"id": "hello"}, {"id": "goodbye"}],
             "links": {"sibling": {"href": "/bar"}},
-            "meta": {"cursor": 1, "pageLength": 2, "totalLength": 3},
+            "meta": {"cursor": 1, "totalLength": 3},
         },
     ),
     ResponseSpec(
