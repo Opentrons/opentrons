@@ -210,7 +210,7 @@ class Updater(UpdateActionsInterface):
         self.root_FS_intf.write_update(
             downloaded_update_path, unused_partition, progress_callback
         )
-        # switch to partion with the updated rootfs
+        # switch to partition with the updated rootfs
         self.part_mngr.switch_partition()
 
     def verify_check_sum(self) -> bool:
