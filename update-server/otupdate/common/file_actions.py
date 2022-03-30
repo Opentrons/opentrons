@@ -105,15 +105,13 @@ def unzip_update(
 
     with zipfile.ZipFile(filepath, "r") as zf:
         files = zf.infolist()
-        LOG.debug(f"Found files{files} ")
+
         remaining_filenames = [fn for fn in acceptable_files]
         for fi in files:
-            LOG.debug(f"Found {fi.filename} ({fi.file_size}B)")
             if fi.filename in acceptable_files:
                 to_unzip.append(fi)
                 total_size += fi.file_size
                 remaining_filenames.remove(fi.filename)
-                LOG.debug(f"Found {fi.filename} ({fi.file_size}B)")
             else:
                 LOG.debug(f"Ignoring {fi.filename}")
 
@@ -134,7 +132,6 @@ def unzip_update(
                         break
                 file_paths[fi.filename] = uncomp_path
                 file_sizes[fi.filename] = fi.file_size
-                LOG.debug(f"Unzipped {fi.filename} to {uncomp_path}")
 
     LOG.info(
         f"Unzipped {filepath}, results: \n\t"

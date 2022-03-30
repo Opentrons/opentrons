@@ -1,6 +1,7 @@
 """OE Updater and dependency injection classes."""
 import contextlib
 import lzma
+import os
 import shutil
 
 
@@ -164,11 +165,14 @@ class Updater(UpdateActionsInterface):
         self, downloaded_update_path: str, progress_callback: Callable[[float], None]
     ) -> None:
 
+        total_size = os.path.getsize(downloaded_update_path)
+        written_size = 0
         unused_partition = self.part_mngr.find_unused_partition()
         with lzma.open(downloaded_update_path, "rb") as fsrc:
             with open(unused_partition.path, "wb") as fdst:
-                shutil.copyfileobj(fsrc, fdst)
-                progress_callback(1)
+                shutil.copyfileobj(fsrc, fdst, length=1024)
+                written_size += 1024
+                progress_callback(written_size/total_size)
 
     def verify_check_sum(self) -> bool:
         pass

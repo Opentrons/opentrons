@@ -10,37 +10,6 @@ from otupdate.common.update import require_session, _save_file
 
 LOG = logging.getLogger(__name__)
 
-
-def _begin_straight_fwd_write(
-    session: UpdateSession,
-    config: config.Config,
-    loop: asyncio.AbstractEventLoop,
-    downloaded_update_path: str,
-    actions: update_actions.UpdateActionsInterface,
-):
-    """Start the write process!"""
-    LOG.warning("In _begin_straight_fwd_write")
-    LOG.warning(f"file path, {downloaded_update_path} .in _begin_straight_fwd_write")
-    session.set_stage(Stages.WRITING)
-    write_future = asyncio.ensure_future(
-        loop.run_in_executor(
-            None,
-            actions.write_update,
-            downloaded_update_path,
-            session.set_progress,
-        )
-    )
-
-    def write_done(fut):
-        exc = fut.exception()
-        if exc:
-            session.set_error(getattr(exc, "short", str(type(exc))), str(exc))
-        else:
-            session.set_stage(Stages.DONE)
-
-    write_future.add_done_callback(write_done)
-
-
 def _begin_straight_fwd_untar_and_write(
     session: UpdateSession,
     config: config.Config,
@@ -49,9 +18,10 @@ def _begin_straight_fwd_untar_and_write(
     actions: update_actions.UpdateActionsInterface,
 ):
     """Start the write process!"""
-    LOG.warning("In _begin_straight_fwd_untar_and_write")
-    LOG.warning(
-        f"file path, {downloaded_update_path} .in _begin_straight_fwd_untar_and_write"
+    LOG.info("In _begin_straight_fwd_untar_and_write")
+    LOG.info(
+        f"file path, "
+        f"{downloaded_update_path}, in _begin_straight_fwd_untar_and_write"
     )
     session.set_stage(Stages.WRITING)
     write_future = asyncio.ensure_future(
