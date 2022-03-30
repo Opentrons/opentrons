@@ -238,7 +238,6 @@ export function AdvancedSettings(): JSX.Element {
           <ToggleButton
             label="show_link_to_get_labware_offset_data"
             toggledOn={isLabwareOffsetCodeSnippetsOn}
-            // onClick={() => toggleLabwareOffsetData}
             onClick={toggleLabwareOffsetData}
             id="AdvancedSettings_showLinkToggleButton"
           />
