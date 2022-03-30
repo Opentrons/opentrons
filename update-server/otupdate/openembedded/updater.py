@@ -69,12 +69,17 @@ class RootFSInterface:
 
         total_size = os.path.getsize(rootfs_filepath)
         written_size = 0
-
-        with lzma.open(rootfs_filepath, "rb") as fsrc:
-            with open(part.path, "wb") as fdst:
-                shutil.copyfileobj(fsrc, fdst, length=chunk_size)
-                written_size += 1024
-                progress_callback(written_size / total_size)
+        try:
+            with lzma.open(rootfs_filepath, "rb") as fsrc:
+                with open(part.path, "wb") as fdst:
+                    try:
+                        shutil.copyfileobj(fsrc, fdst, length=chunk_size)
+                        written_size += 1024
+                        progress_callback(written_size / total_size)
+                    except Exception:
+                        LOG.exception("RootFSInterface::write_update exception writing")
+        except Exception:
+            LOG.exception("RootFSInterface::write_update exception reading")
 
 
 class Updater(UpdateActionsInterface):
