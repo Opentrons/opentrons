@@ -118,6 +118,8 @@ class MessageId(int, Enum):
     read_sensor_response = 0x85
     set_sensor_threshold_request = 0x86
     set_sensor_threshold_response = 0x87
+    sensor_diagnostic_request = 0x88
+    sensor_diagnostic_response = 0x89
 
 
 @unique

@@ -13,6 +13,18 @@ stages:
     response:
       status_code: 200
       headers:
+        Opentrons-Version: '3'
+        Opentrons-Min-Version: '2'
+
+  - name: Successful request within range returns version headers
+    request:
+      url: '{host:s}:{port:d}/health'
+      method: GET
+      headers:
+        Opentrons-Version: '2'
+    response:
+      status_code: 200
+      headers:
         Opentrons-Version: '2'
         Opentrons-Min-Version: '2'
 
@@ -25,7 +37,7 @@ stages:
     response:
       status_code: 200
       headers:
-        Opentrons-Version: '2'
+        Opentrons-Version: '3'
         Opentrons-Min-Version: '2'
 
   - name: Latest version request contains version headers
@@ -37,7 +49,7 @@ stages:
     response:
       status_code: 200
       headers:
-        Opentrons-Version: '2'
+        Opentrons-Version: '3'
         Opentrons-Min-Version: '2'
 
   - name: Version too low request contains version headers
@@ -54,7 +66,7 @@ stages:
             title: 'Requested HTTP API version no longer supported'
             detail: The requested API version '1' is not supported. 'Opentrons-Version' must be at least '2'. Please upgrade your Opentrons App or other HTTP API client.
       headers:
-        Opentrons-Version: '2'
+        Opentrons-Version: '3'
         Opentrons-Min-Version: '2'
 
   - name: Version missing request contains version headers
@@ -66,5 +78,5 @@ stages:
     response:
       status_code: 422
       headers:
-        Opentrons-Version: '2'
+        Opentrons-Version: '3'
         Opentrons-Min-Version: '2'

@@ -71,11 +71,11 @@ For instance, to aspirate from the first column of a 96-well plate you would wri
         # Load a tiprack for 300uL tips
         tiprack1 = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
         # Load a wellplate
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat')
+        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 4)
 
         # Load a P300 Multi GEN2 on the right mount
         right = protocol.load_instrument(
-            'p300_multi_gen2', 'right', tip_rack=tiprack1)
+            'p300_multi_gen2', 'right',  tip_racks=[tiprack1])
 
         # Specify well A1 for pick_up_tip. The backmost channel of the
         # pipette moves to A1, which means the rest of the wells are above the
@@ -111,11 +111,11 @@ F, H, J, L, N, and P).
         # Load a tiprack for 300uL tips
         tiprack1 = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
         # Load a wellplate
-        plate = protocol.load_labware('corning_384_wellplate_112ul_flat')
+        plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 4)
 
         # Load a P300 Multi GEN2 on the right mount
         right = protocol.load_instrument(
-            'p300_multi_gen2', 'right', tip_rack=tiprack1)
+            'p300_multi_gen2', 'right', tip_racks=[tiprack1])
 
         # pick up a tip in preparation for aspiration
         right.pick_up_tip()
@@ -215,14 +215,14 @@ For instance, in this protocol you can see the effects of specifying tipracks:
 
         # You must specify the tip location for the left pipette, which was
         # loaded without specifying tip_racks
-        left_pipette.pick_up_tip(tiprack['A1'])
+        left_pipette.pick_up_tip(tiprack_left['A1'])
         left_pipette.drop_tip()
 
         # And you have to do it every time you call pick_up_tip, doing all
         # your own tip tracking
-        left_pipette.pick_up_tip(tiprack['A2'])
+        left_pipette.pick_up_tip(tiprack_left['A2'])
         left_pipette.drop_tip()
-        left_pipette.pick_up_tip(tiprack['A3'])
+        left_pipette.pick_up_tip(tiprack_left['A3'])
         left_pipette.drop_tip()
 
         # Since you specified tip_racks when loading the right pipette, it will
@@ -275,7 +275,7 @@ Each of these attributes can be altered without affecting the others.
         tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
         pipette = protocol.load_instrument(
             'p300_single', 'right', tip_racks=[tiprack])
-        plate = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
+        plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 3)
         pipette.pick_up_tip()
 
         # Aspirate at the default flowrate of 150 ul/s
@@ -344,8 +344,8 @@ executed as part of a transfer.
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
-        pipette = protocol.load_instrument('p300_single', 'right')
-        plate = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
+        pipette = protocol.load_instrument('p300_single', 'right', tip_racks = [tiprack])
+        plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 3)
         pipette.pick_up_tip()
 
         # Aspirate 1mm above the bottom of the well

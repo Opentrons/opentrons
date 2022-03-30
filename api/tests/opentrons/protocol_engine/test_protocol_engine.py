@@ -6,7 +6,8 @@ from decoy import Decoy
 from typing import Any
 
 from opentrons.types import DeckSlotName
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands
@@ -16,13 +17,15 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     LabwareOffsetLocation,
     LabwareUri,
+    ModuleDefinition,
+    ModuleModel,
 )
 from opentrons.protocol_engine.execution import (
     QueueWorker,
     HardwareStopper,
     HardwareEventForwarder,
 )
-from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
 
@@ -30,6 +33,7 @@ from opentrons.protocol_engine.actions import (
     ActionDispatcher,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
+    AddModuleAction,
     PlayAction,
     PauseAction,
     PauseSource,
@@ -72,9 +76,9 @@ def model_utils(decoy: Decoy) -> ModelUtils:
 
 
 @pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareAPI:
-    """Get a mock HardwareAPI."""
-    return decoy.mock(cls=HardwareAPI)
+def hardware_api(decoy: Decoy) -> HardwareControlAPI:
+    """Get a mock HardwareControlAPI."""
+    return decoy.mock(cls=HardwareControlAPI)
 
 
 @pytest.fixture
@@ -90,8 +94,14 @@ def hardware_event_forwarder(decoy: Decoy) -> HardwareEventForwarder:
 
 
 @pytest.fixture
+def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
+    """Get a mock ModuleDataProvider."""
+    return decoy.mock(cls=ModuleDataProvider)
+
+
+@pytest.fixture
 def subject(
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     plugin_starter: PluginStarter,
@@ -99,6 +109,7 @@ def subject(
     model_utils: ModelUtils,
     hardware_stopper: HardwareStopper,
     hardware_event_forwarder: HardwareEventForwarder,
+    module_data_provider: ModuleDataProvider,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
     return ProtocolEngine(
@@ -110,6 +121,7 @@ def subject(
         model_utils=model_utils,
         hardware_stopper=hardware_stopper,
         hardware_event_forwarder=hardware_event_forwarder,
+        module_data_provider=module_data_provider,
     )
 
 
@@ -264,7 +276,7 @@ async def test_finish(
     action_dispatcher: ActionDispatcher,
     plugin_starter: PluginStarter,
     queue_worker: QueueWorker,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
     drop_tips_and_home: bool,
@@ -287,7 +299,7 @@ async def test_finish_with_error(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     model_utils: ModelUtils,
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
@@ -318,7 +330,7 @@ async def test_finish_with_error(
 async def test_finish_stops_hardware_if_queue_worker_join_fails(
     decoy: Decoy,
     queue_worker: QueueWorker,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     hardware_stopper: HardwareStopper,
     hardware_event_forwarder: HardwareEventForwarder,
     action_dispatcher: ActionDispatcher,
@@ -358,7 +370,7 @@ async def test_stop(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
 ) -> None:
@@ -460,3 +472,53 @@ def test_add_labware_definition(
     result = subject.add_labware_definition(well_plate_def)
 
     assert result == "some/definition/uri"
+
+
+async def test_use_attached_modules(
+    decoy: Decoy,
+    module_data_provider: ModuleDataProvider,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+    tempdeck_v1_def: ModuleDefinition,
+    magdeck_v1_def: ModuleDefinition,
+) -> None:
+    """It should be able to load attached hardware modules directly into state."""
+    mod_1 = decoy.mock(cls=TempDeck)
+    mod_2 = decoy.mock(cls=MagDeck)
+
+    decoy.when(mod_1.device_info).then_return({"serial": "serial-1"})
+    decoy.when(mod_2.device_info).then_return({"serial": "serial-2"})
+    decoy.when(mod_1.model()).then_return("temperatureModuleV1")
+    decoy.when(mod_2.model()).then_return("magneticModuleV1")
+
+    decoy.when(
+        module_data_provider.get_definition(ModuleModel.TEMPERATURE_MODULE_V1)
+    ).then_return(tempdeck_v1_def)
+
+    decoy.when(
+        module_data_provider.get_definition(ModuleModel.MAGNETIC_MODULE_V1)
+    ).then_return(magdeck_v1_def)
+
+    await subject.use_attached_modules(
+        {
+            "module-1": mod_1,
+            "module-2": mod_2,
+        }
+    )
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            AddModuleAction(
+                module_id="module-1",
+                serial_number="serial-1",
+                definition=tempdeck_v1_def,
+            )
+        ),
+        action_dispatcher.dispatch(
+            AddModuleAction(
+                module_id="module-2",
+                serial_number="serial-2",
+                definition=magdeck_v1_def,
+            ),
+        ),
+    )

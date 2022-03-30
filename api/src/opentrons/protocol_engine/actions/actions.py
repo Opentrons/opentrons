@@ -13,7 +13,7 @@ from opentrons.hardware_control.types import HardwareEvent
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
-from ..types import LabwareOffsetCreate
+from ..types import LabwareOffsetCreate, ModuleDefinition
 
 
 @dataclass(frozen=True)
@@ -128,6 +128,15 @@ class AddLabwareDefinitionAction:
     definition: LabwareDefinition
 
 
+@dataclass(frozen=True)
+class AddModuleAction:
+    """Add an attached module directly to state without a location."""
+
+    module_id: str
+    serial_number: str
+    definition: ModuleDefinition
+
+
 Action = Union[
     PlayAction,
     PauseAction,
@@ -140,4 +149,5 @@ Action = Union[
     FailCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
+    AddModuleAction,
 ]

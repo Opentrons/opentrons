@@ -53,16 +53,23 @@ class InstrumentContextSimulation(AbstractInstrument):
         assert (
             new_volume <= self._pipette_dict["working_volume"]
         ), "Cannot aspirate more than pipette max volume"
-        self._pipette_dict["current_volume"] = new_volume
+        self._pipette_dict["ready_to_aspirate"] = True
+        self._update_volume(new_volume)
 
     def dispense(self, volume: float, rate: float) -> None:
         self._raise_if_no_tip(HardwareAction.DISPENSE.name)
-        self._pipette_dict["current_volume"] -= volume
+        self._update_volume(self.get_current_volume() - volume)
 
     def blow_out(self) -> None:
         self._raise_if_no_tip(HardwareAction.BLOWOUT.name)
-        self._pipette_dict["current_volume"] = 0
+        self._update_volume(0)
         self._pipette_dict["ready_to_aspirate"] = False
+
+    def _update_volume(self, vol: float) -> None:
+        self._pipette_dict["current_volume"] = vol
+        self._pipette_dict["available_volume"] = (
+            self._pipette_dict["working_volume"] - vol
+        )
 
     def touch_tip(
         self, location: WellImplementation, radius: float, v_offset: float, speed: float
@@ -76,13 +83,21 @@ class InstrumentContextSimulation(AbstractInstrument):
         presses: typing.Optional[int],
         increment: typing.Optional[float],
     ) -> None:
+        geometry = well.get_geometry()
         self._raise_if_tip("pick up tip")
         self._pipette_dict["has_tip"] = True
+        self._pipette_dict["tip_length"] = tip_length
         self._pipette_dict["current_volume"] = 0
+        self._pipette_dict["working_volume"] = min(
+            geometry.max_volume, self.get_max_volume()
+        )
+        self._pipette_dict["available_volume"] = self._pipette_dict["working_volume"]
 
     def drop_tip(self, home_after: bool) -> None:
         self._raise_if_no_tip(HardwareAction.DROPTIP.name)
         self._pipette_dict["has_tip"] = False
+        self._pipette_dict["tip_length"] = 0.0
+        self._update_volume(0)
 
     def home(self) -> None:
         self._protocol_interface.set_last_location(None)
@@ -173,12 +188,13 @@ class InstrumentContextSimulation(AbstractInstrument):
         dispense: typing.Optional[float] = None,
         blow_out: typing.Optional[float] = None,
     ) -> None:
-        if aspirate is not None:
-            self._pipette_dict["aspirate_flow_rate"] = aspirate
-        if dispense is not None:
-            self._pipette_dict["dispense_flow_rate"] = dispense
-        if blow_out is not None:
-            self._pipette_dict["blow_out_flow_rate"] = blow_out
+        self._protocol_interface.get_hardware().set_flow_rate(
+            mount=self._mount,
+            aspirate=aspirate,
+            dispense=dispense,
+            blow_out=blow_out,
+        )
+        self._update_flow_rate()
 
     def set_pipette_speed(
         self,
@@ -186,12 +202,25 @@ class InstrumentContextSimulation(AbstractInstrument):
         dispense: typing.Optional[float] = None,
         blow_out: typing.Optional[float] = None,
     ) -> None:
-        if aspirate is not None:
-            self._pipette_dict["aspirate_speed"] = aspirate
-        if dispense is not None:
-            self._pipette_dict["dispense_speed"] = dispense
-        if blow_out is not None:
-            self._pipette_dict["blow_out_speed"] = blow_out
+        self._protocol_interface.get_hardware().set_pipette_speed(
+            mount=self._mount,
+            aspirate=aspirate,
+            dispense=dispense,
+            blow_out=blow_out,
+        )
+        self._update_flow_rate()
+
+    def _update_flow_rate(self) -> None:
+        """Update cached speed and flow rates from hardware controller pipette."""
+        p = self._protocol_interface.get_hardware().get_attached_instrument(
+            self.get_mount()
+        )
+        self._pipette_dict["aspirate_flow_rate"] = p["aspirate_flow_rate"]
+        self._pipette_dict["dispense_flow_rate"] = p["dispense_flow_rate"]
+        self._pipette_dict["blow_out_flow_rate"] = p["blow_out_flow_rate"]
+        self._pipette_dict["aspirate_speed"] = p["aspirate_speed"]
+        self._pipette_dict["dispense_speed"] = p["dispense_speed"]
+        self._pipette_dict["blow_out_speed"] = p["blow_out_speed"]
 
     def _raise_if_no_tip(self, action: str) -> None:
         """Raise NoTipAttachedError if no tip."""

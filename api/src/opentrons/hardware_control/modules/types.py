@@ -8,10 +8,10 @@ from typing import (
     Any,
     Tuple,
     Awaitable,
-    Mapping,
     Union,
     TYPE_CHECKING,
 )
+from typing_extensions import TypedDict
 from pathlib import Path
 
 from opentrons.drivers.rpi_drivers.types import USBPort
@@ -28,7 +28,10 @@ ThermocyclerStep = Dict[str, float]
 
 UploadFunction = Callable[[str, str, Dict[str, Any]], Awaitable[Tuple[bool, str]]]
 
-LiveData = Mapping[str, Union[str, Mapping[str, Union[float, str, None]]]]
+
+class LiveData(TypedDict):
+    status: str
+    data: Dict[str, Union[float, str, bool, None]]
 
 
 class ModuleType(str, Enum):
@@ -86,8 +89,16 @@ class ModuleInfo(NamedTuple):
 
 # TODO(mc, 2022-01-18): replace with enum
 ModuleModel = Union[
-    MagneticModuleModel, TemperatureModuleModel, ThermocyclerModuleModel
+    MagneticModuleModel,
+    TemperatureModuleModel,
+    ThermocyclerModuleModel,
+    HeaterShakerModuleModel,
 ]
+
+
+class MagneticStatus(str, Enum):
+    ENGAGED = "engaged"
+    DISENGAGED = "disengaged"
 
 
 class TemperatureStatus(str, Enum):

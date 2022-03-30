@@ -72,6 +72,13 @@ export const getAddLabwareFailure: (
   (file, errorMessage) => ({ file, errorMessage })
 )
 
+export const getAddNewLabwareName: (
+  state: State
+) => { filename: string | null } = createSelector(
+  state => state.labware.newLabwareName,
+  filename => ({ filename })
+)
+
 export const getListLabwareErrorMessage = (state: State): null | string =>
   state.labware.listFailureMessage
 
