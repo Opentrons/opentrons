@@ -224,7 +224,7 @@ export function AdvancedSettings(): JSX.Element {
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
-            <Text
+            <StyledText as="h3" css={TYPOGRAPHY.fontWeightSemiBold}
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_showLink"
