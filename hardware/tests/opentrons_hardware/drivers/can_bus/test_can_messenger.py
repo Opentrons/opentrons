@@ -65,7 +65,7 @@ def subject(mock_driver: AsyncMock) -> CanMessenger:
                 payload=MoveCompletedPayload(
                     group_id=UInt8Field(1),
                     seq_id=UInt8Field(2),
-                    current_position=UInt32Field(3),
+                    current_position_um=UInt32Field(3),
                     ack_id=UInt8Field(4),
                 )
             ),

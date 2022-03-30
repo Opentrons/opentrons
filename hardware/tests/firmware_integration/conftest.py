@@ -2,7 +2,7 @@
 from __future__ import annotations
 import pytest
 import asyncio
-from typing import AsyncGenerator, Iterator, AsyncIterator
+from typing import AsyncGenerator, Iterator, AsyncIterator, List, Dict
 
 from _pytest.fixtures import FixtureRequest
 
@@ -65,16 +65,46 @@ def subsystem_node_id(request: FixtureRequest) -> Iterator[constants.NodeId]:
     yield request.param  # type: ignore[attr-defined]
 
 
+_motor_nodes = [
+    constants.NodeId.head_l,
+    constants.NodeId.head_r,
+    constants.NodeId.pipette_left,
+    constants.NodeId.gantry_x,
+    constants.NodeId.gantry_y,
+]
+
+# These unfortunately need to be manually kept up to date with the c++
+# configurations
+_motor_node_step_sizes = {
+    # for lead screw pitch 12, microstepping 16
+    constants.NodeId.head_l: 0.00375,
+    constants.NodeId.head_r: 0.00375,
+    # for pulley diameter 12, microstepping 32
+    constants.NodeId.gantry_x: 0.006234098,
+    # for pulley diameter 12.7254, microstepping 32
+    constants.NodeId.gantry_y: 0.006246566,
+    # for lead screw pitch 3.03, microstepping 32
+    constants.NodeId.pipette_left: 0.000473437,
+    constants.NodeId.pipette_right: 0.000473437,
+}
+
+
 @pytest.fixture(
     scope="session",
-    params=[
-        constants.NodeId.head_l,
-        constants.NodeId.head_r,
-        constants.NodeId.pipette_left,
-        constants.NodeId.gantry_x,
-        constants.NodeId.gantry_y,
-    ],
+    params=_motor_nodes,
 )
 def motor_node_id(request: FixtureRequest) -> Iterator[constants.NodeId]:
     """Each motor's node id as a fixture."""
     yield request.param  # type: ignore[attr-defined]
+
+
+@pytest.fixture(scope="session")
+def all_motor_nodes() -> List[constants.NodeId]:
+    """The full list of configured motor nodes."""
+    return _motor_nodes
+
+
+@pytest.fixture(scope="session")
+def all_motor_node_step_sizes() -> Dict[constants.NodeId, float]:
+    """Step sizes for all configured motor nodes."""
+    return _motor_node_step_sizes

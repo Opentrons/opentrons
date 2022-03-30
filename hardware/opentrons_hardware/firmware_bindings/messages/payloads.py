@@ -140,7 +140,7 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
     """Notification of a completed move group."""
 
     seq_id: utils.UInt8Field
-    current_position: utils.UInt32Field
+    current_position_um: utils.UInt32Field
     ack_id: utils.UInt8Field
 
 
@@ -328,6 +328,23 @@ class SensorThresholdResponsePayload(utils.BinarySerializable):
 
     sensor: SensorTypeField
     threshold: utils.Int32Field
+
+
+@dataclass
+class SensorDiagnosticRequestPayload(utils.BinarySerializable):
+    """A response that sends back the current threshold value of the sensor."""
+
+    sensor: SensorTypeField
+    reg_address: utils.UInt8Field
+
+
+@dataclass
+class SensorDiagnosticResponsePayload(utils.BinarySerializable):
+    """A response that sends back the current threshold value of the sensor."""
+
+    sensor: SensorTypeField
+    reg_address: utils.UInt8Field
+    data: utils.UInt32Field
 
 
 @dataclass
