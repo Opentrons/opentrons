@@ -65,8 +65,7 @@ export const HeaterShakerSlideout = (
         )
       })
     }
-    isSetShake && setShowConfirmAttachModal(true)
-    !isSetShake && setHsValue(null)
+    isSetShake ? setShowConfirmAttachModal(true) : setHsValue(null)
   }
 
   let errorMessage

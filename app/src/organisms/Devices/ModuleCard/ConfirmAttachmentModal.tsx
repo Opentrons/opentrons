@@ -76,97 +76,95 @@ export const ConfirmAttachmentModal = (
   }
 
   return (
-    <>
-      <Modal
-        title={t('confirm_heater_shaker_modal_attachment')}
-        onClose={onCloseClick}
+    <Modal
+      title={t('confirm_heater_shaker_modal_attachment')}
+      onClose={onCloseClick}
+    >
+      {showProtocolRunDetails && <ProtocolRunDetails />}
+      <Flex
+        data-testid={`confirmAttachmentModal_body_text_${
+          isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
+        }`}
+        flexDirection={DIRECTION_COLUMN}
       >
-        {showProtocolRunDetails && <ProtocolRunDetails />}
+        <Trans
+          t={t}
+          i18nKey={t(
+            isProceedToRunModal
+              ? 'module_anchors_extended'
+              : 'module_should_have_anchors',
+            { slot: slotNumber }
+          )}
+          components={{
+            block: (
+              <Text
+                fontSize={TYPOGRAPHY.fontSizeP}
+                paddingBottom={SPACING.spacing2}
+              />
+            ),
+          }}
+        />
+      </Flex>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        textAlign={TEXT_ALIGN_CENTER}
+        paddingTop={SPACING.spacing4}
+        data-testid={`confirmAttachmentModal_checkbox_field_${
+          isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
+        }`}
+      >
+        {/* TODO(jr, 3/29/22): wire up checkbox field, pending usage of Alerts */}
+        <CheckboxField
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setIsDismissed(e.currentTarget.checked)
+          }
+          value={isDismissed}
+        />
+        <Text
+          paddingTop={SPACING.spacingXXS}
+          paddingLeft={SPACING.spacing3}
+          fontSize={TYPOGRAPHY.fontSizeP}
+        >
+          {t('dont_show_me_again', { ns: 'shared' })}
+        </Text>
+      </Flex>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        paddingTop={SPACING.spacingXL}
+        justifyContent={JUSTIFY_FLEX_END}
+      >
         <Flex
-          data-testid={`confirmAttachmentModal_body_text_${
+          paddingRight={SPACING.spacing2}
+          data-testid={`confirmAttachmentModal_secondary_btn_${
             isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
           }`}
-          flexDirection={DIRECTION_COLUMN}
         >
-          <Trans
-            t={t}
-            i18nKey={t(
-              isProceedToRunModal
-                ? 'module_anchors_extended'
-                : 'module_should_have_anchors',
-              { slot: slotNumber }
-            )}
-            components={{
-              block: (
-                <Text
-                  fontSize={TYPOGRAPHY.fontSizeP}
-                  paddingBottom={SPACING.spacing2}
-                />
-              ),
-            }}
-          />
-        </Flex>
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          textAlign={TEXT_ALIGN_CENTER}
-          paddingTop={SPACING.spacing4}
-          data-testid={`confirmAttachmentModal_checkbox_field_${
-            isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
-          }`}
-        >
-          {/* TODO(jr, 3/29/22): wire up checkbox field, pending usage of Alerts */}
-          <CheckboxField
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setIsDismissed(e.currentTarget.checked)
-            }
-            value={isDismissed}
-          />
-          <Text
-            paddingTop={SPACING.spacingXXS}
-            paddingLeft={SPACING.spacing3}
-            fontSize={TYPOGRAPHY.fontSizeP}
+          <SecondaryButton
+            onClick={onCloseClick}
+            textTransform={TEXT_TRANSFORM_CAPITALIZE}
           >
-            {t('dont_show_me_again', { ns: 'shared' })}
-          </Text>
+            {t('shared:cancel')}
+          </SecondaryButton>
         </Flex>
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          paddingTop={SPACING.spacingXL}
-          justifyContent={JUSTIFY_FLEX_END}
-        >
-          <Flex
-            paddingRight={SPACING.spacing2}
-            data-testid={`confirmAttachmentModal_secondary_btn_${
-              isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
-            }`}
-          >
-            <SecondaryButton
-              onClick={onCloseClick}
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            >
-              {t('cancel', { ns: 'shared' })}
-            </SecondaryButton>
-          </Flex>
 
-          <Flex
-            data-testid={`confirmAttachmentModal_primary_btn_${
-              isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
-            }`}
+        <Flex
+          data-testid={`confirmAttachmentModal_primary_btn_${
+            isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
+          }`}
+        >
+          <PrimaryButton
+            onClick={
+              isProceedToRunModal
+                ? handleProceedToRunClick
+                : handleSetShakeClick
+            }
           >
-            <PrimaryButton
-              onClick={
-                isProceedToRunModal
-                  ? handleProceedToRunClick
-                  : handleSetShakeClick
-              }
-            >
-              {isProceedToRunModal
-                ? t('proceed_to_run')
-                : t('confirm_attachment')}
-            </PrimaryButton>
-          </Flex>
+            {isProceedToRunModal
+              ? t('proceed_to_run')
+              : t('confirm_attachment')}
+          </PrimaryButton>
         </Flex>
-      </Modal>
-    </>
+      </Flex>
+    </Modal>
   )
 }

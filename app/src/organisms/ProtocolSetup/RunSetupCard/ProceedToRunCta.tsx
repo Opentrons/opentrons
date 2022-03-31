@@ -19,8 +19,7 @@ export const ProceedToRunCta = (): JSX.Element | null => {
   const moduleMatchResults = useModuleMatchResults()
   const trackEvent = useTrackEvent()
   const heaterShaker = useHeaterShakerFromProtocol()
-  const slotNumber = heaterShaker != null ? heaterShaker.slotName : null
-  const isHeaterShakerInProtocol = slotNumber !== null
+  const isHeaterShakerInProtocol = heaterShaker != null
   const isEverythingCalibrated = useProtocolCalibrationStatus().complete
   const { missingModuleIds } = moduleMatchResults
   const calibrationIncomplete =
@@ -44,15 +43,12 @@ export const ProceedToRunCta = (): JSX.Element | null => {
   } else if (moduleSetupIncomplete) {
     proceedToRunDisabledReason = t('run_disabled_modules_not_connected')
   }
-  const CTAbehaviorDifferentReason =
-    (proceedToRunDisabledReason != null && isHeaterShakerInProtocol) ||
-    (proceedToRunDisabledReason === null && isHeaterShakerInProtocol) ||
-    (proceedToRunDisabledReason != null && !isHeaterShakerInProtocol)
+  const buttonInsteadOfNavLink =
+    isHeaterShakerInProtocol || proceedToRunDisabledReason != null
 
-  const LinkComponent = CTAbehaviorDifferentReason ? 'button' : NavLink
-  const linkProps = CTAbehaviorDifferentReason ? {} : { to: '/run' }
+  const LinkComponent = buttonInsteadOfNavLink ? 'button' : NavLink
+  const linkProps = buttonInsteadOfNavLink ? {} : { to: '/run' }
 
-  console.log(isHeaterShakerInProtocol)
   return (
     <Flex justifyContent={JUSTIFY_CENTER}>
       {showConfirmAttachModal && (
