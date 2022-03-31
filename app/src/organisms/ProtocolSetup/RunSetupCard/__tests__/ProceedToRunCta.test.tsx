@@ -6,15 +6,8 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { i18n } from '../../../../i18n'
-import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
-import { ConfirmAttachmentModal } from '../../../Devices/ModuleCard/ConfirmAttachmentModal'
-import { useHeaterShakerFromProtocol } from '../../../Devices/ModuleCard/hooks'
 import * as hooks from '../hooks'
 import { ProceedToRunCta } from '../ProceedToRunCta'
-
-import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
-
-import type { ProtocolModuleInfo } from '../../utils/getProtocolModulesInfo'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -26,8 +19,6 @@ jest.mock('@opentrons/components', () => {
 jest.mock('../../../../redux/protocol')
 jest.mock('../../../../redux/analytics')
 jest.mock('../hooks')
-jest.mock('../../../Devices/ModuleCard/ConfirmAttachmentModal')
-jest.mock('../../../Devices/ModuleCard/hooks')
 
 const mockUseModuleMatchResults = hooks.useModuleMatchResults as jest.MockedFunction<
   typeof hooks.useModuleMatchResults
@@ -38,14 +29,6 @@ const mockUseProtocolCalibrationStatus = hooks.useProtocolCalibrationStatus as j
 
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
->
-
-const mockConfirmAttachmentModal = ConfirmAttachmentModal as jest.MockedFunction<
-  typeof ConfirmAttachmentModal
->
-
-const mockUseHeaterShakerFromProtocol = useHeaterShakerFromProtocol as jest.MockedFunction<
-  typeof useHeaterShakerFromProtocol
 >
 
 const render = () => {
@@ -59,19 +42,6 @@ const render = () => {
   )[0]
 }
 
-const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
-  moduleId: 'heater_shaker_id',
-  x: 0,
-  y: 0,
-  z: 0,
-  moduleDef: mockHeaterShaker as any,
-  nestedLabwareDef: heaterShakerCommands.labwareDefinitions['example/plate/1'],
-  nestedLabwareDisplayName: null,
-  nestedLabwareId: null,
-  protocolLoadOrder: 1,
-  slotName: '1',
-} as ProtocolModuleInfo
-
 let mockTrackEvent: jest.Mock
 
 describe('ProceedToRunCta', () => {
@@ -79,10 +49,6 @@ describe('ProceedToRunCta', () => {
     mockUseProtocolCalibrationStatus.mockReturnValue({
       complete: true,
     })
-    mockConfirmAttachmentModal.mockReturnValue(
-      <div>mock confirm attachment modal</div>
-    )
-    mockUseHeaterShakerFromProtocol.mockReturnValue(null)
     mockTrackEvent = jest.fn()
     when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
   })
@@ -126,21 +92,7 @@ describe('ProceedToRunCta', () => {
     expect(button).toBeDisabled()
     getByText('Make sure all modules are connected before proceeding to run')
   })
-  it('should be disabled with modules not connected and calibration not completed tooltip if missing cal and moduleIds', async () => {
-    mockUseModuleMatchResults.mockReturnValue({
-      missingModuleIds: ['temperatureModuleV1'],
-      remainingAttachedModules: [],
-    })
-    mockUseProtocolCalibrationStatus.mockReturnValue({
-      complete: false,
-    } as any)
-    const { getByRole, getByText } = render()
-    const button = getByRole('button', { name: 'Proceed to Run' })
-    expect(button).toBeDisabled()
-    getByText(
-      'Make sure robot calibration is complete and all modules are connected before proceeding to run'
-    )
-  })
+
   it('should be disabled with calibration not complete tooltip', async () => {
     mockUseModuleMatchResults.mockReturnValue({
       missingModuleIds: [],
@@ -155,40 +107,5 @@ describe('ProceedToRunCta', () => {
     getByText(
       'Make sure robot calibration is complete before proceeding to run'
     )
-  })
-
-  it('should be disabled with module not attached but heater shaker attached', async () => {
-    mockUseHeaterShakerFromProtocol.mockReturnValue(
-      HEATER_SHAKER_PROTOCOL_MODULE_INFO
-    )
-    mockUseModuleMatchResults.mockReturnValue({
-      missingModuleIds: ['temperatureModuleV1'],
-      remainingAttachedModules: [],
-    })
-    mockUseProtocolCalibrationStatus.mockReturnValue({
-      complete: true,
-    } as any)
-    const { getByRole, getByText } = render()
-    const button = getByRole('button', { name: 'Proceed to Run' })
-    expect(button).toBeDisabled()
-    getByText('Make sure all modules are connected before proceeding to run')
-  })
-
-  it('should render cta enabled and go to heater shaker modal when clicked', async () => {
-    mockUseHeaterShakerFromProtocol.mockReturnValue(
-      HEATER_SHAKER_PROTOCOL_MODULE_INFO
-    )
-    mockUseModuleMatchResults.mockReturnValue({
-      missingModuleIds: [],
-      remainingAttachedModules: [],
-    })
-    mockUseProtocolCalibrationStatus.mockReturnValue({
-      complete: true,
-    } as any)
-    const { getByRole, getByText } = render()
-    const button = getByRole('button', { name: 'Proceed to Run' })
-    expect(button).not.toBeDisabled()
-    fireEvent.click(button)
-    getByText('mock confirm attachment modal')
   })
 })

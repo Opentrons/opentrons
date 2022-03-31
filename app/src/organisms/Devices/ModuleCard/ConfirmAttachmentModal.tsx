@@ -15,7 +15,6 @@ import {
 } from '@opentrons/components'
 import { SecondaryButton, PrimaryButton } from '../../../atoms/Buttons'
 import { Modal } from '../../../atoms/Modal'
-import { ProtocolRunDetails } from '../../../pages/Devices/ProtocolRunDetails'
 import { useTrackEvent } from '../../../redux/analytics'
 import { useHeaterShakerFromProtocol } from './hooks'
 
@@ -28,6 +27,7 @@ interface ConfirmAttachmentModalProps {
   isProceedToRunModal: boolean
   shakerValue: string | null
   moduleId?: HeaterShakerModule['id']
+  play?: () => void
 }
 export const ConfirmAttachmentModal = (
   props: ConfirmAttachmentModalProps
@@ -38,6 +38,7 @@ export const ConfirmAttachmentModal = (
     onCloseSlideoutClick,
     shakerValue,
     moduleId,
+    play,
   } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [isDismissed, setIsDismissed] = React.useState<boolean>(false)
@@ -45,14 +46,11 @@ export const ConfirmAttachmentModal = (
   const heaterShaker = useHeaterShakerFromProtocol()
   const slotNumber = heaterShaker != null ? heaterShaker.slotName : null
   const trackEvent = useTrackEvent()
-  const [
-    showProtocolRunDetails,
-    setShowProtocolRunDetails,
-  ] = React.useState<boolean>(false)
 
   const handleProceedToRunClick = (): void => {
     trackEvent({ name: 'proceedToRun', properties: {} })
-    setShowProtocolRunDetails(true) //  this doesn't work yet when testing in the environment since its hidden behind a feature flag
+    play != null && play()
+    onCloseClick()
   }
 
   const handleSetShakeClick = (): void => {
@@ -80,7 +78,6 @@ export const ConfirmAttachmentModal = (
       title={t('confirm_heater_shaker_modal_attachment')}
       onClose={onCloseClick}
     >
-      {showProtocolRunDetails && <ProtocolRunDetails />}
       <Flex
         data-testid={`confirmAttachmentModal_body_text_${
           isProceedToRunModal ? `on_start_protocol` : `on_set_shake`

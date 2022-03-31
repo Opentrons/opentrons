@@ -6,7 +6,6 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { useTrackEvent } from '../../../../redux/analytics'
-import { ProtocolRunDetails } from '../../../../pages/Devices/ProtocolRunDetails'
 import { useHeaterShakerFromProtocol } from '../hooks'
 import { ConfirmAttachmentModal } from '../ConfirmAttachmentModal'
 
@@ -16,7 +15,6 @@ import type { ProtocolModuleInfo } from '../../../ProtocolSetup/utils/getProtoco
 
 jest.mock('../hooks')
 jest.mock('../../../../redux/analytics')
-jest.mock('../../../../pages/Devices/ProtocolRunDetails')
 jest.mock('@opentrons/react-api-client')
 
 const mockUseHeaterShakerFromProtocol = useHeaterShakerFromProtocol as jest.MockedFunction<
@@ -28,10 +26,6 @@ const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFu
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
-const mockProtocolRunDetails = ProtocolRunDetails as jest.MockedFunction<
-  typeof ProtocolRunDetails
->
-
 const render = (props: React.ComponentProps<typeof ConfirmAttachmentModal>) => {
   return renderWithProviders(<ConfirmAttachmentModal {...props} />, {
     i18nInstance: i18n,
@@ -65,9 +59,6 @@ describe('ConfirmAttachmentBanner', () => {
     }
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
-    mockProtocolRunDetails.mockReturnValue(
-      <div>mock protocol run details page</div>
-    )
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
@@ -125,6 +116,7 @@ describe('ConfirmAttachmentBanner', () => {
       onCloseClick: jest.fn(),
       isProceedToRunModal: true,
       shakerValue: null,
+      play: jest.fn(),
     }
     const { getByText, getByRole } = render(props)
 
@@ -134,11 +126,12 @@ describe('ConfirmAttachmentBanner', () => {
     getByText('The thermal adapter should be attached to the module.')
     const btn = getByRole('button', { name: 'Proceed to run' })
     fireEvent.click(btn)
-    getByText('mock protocol run details page')
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'proceedToRun',
       properties: {},
     })
+    expect(props.onCloseClick).toHaveBeenCalled()
+    expect(props.play).toHaveBeenCalled()
   })
 
   it('renders cancel button and clicks it closing the modal', () => {

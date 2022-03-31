@@ -60,6 +60,8 @@ import {
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
+import { useHeaterShakerFromProtocol } from '../ModuleCard/hooks'
+import { ConfirmAttachmentModal } from '../ModuleCard/ConfirmAttachmentModal'
 
 import type { Run } from '@opentrons/api-client'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
@@ -105,6 +107,11 @@ export function ProtocolRunHeader({
   const { t } = useTranslation('run_details')
   const history = useHistory()
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const heaterShakerFromProtocol = useHeaterShakerFromProtocol()
+  const [
+    showConfirmAttachModal,
+    setShowConfirmAttachmentModal,
+  ] = React.useState<boolean>(false)
 
   const runRecord = useRunQuery(runId)
   const { displayName } = useProtocolDetailsForRun(runId)
@@ -165,9 +172,9 @@ export function ProtocolRunHeader({
   const handlePlayButtonClick = (): void => {
     if (isShaking) {
       setShowIsShakingModal(true)
-    } else {
-      play()
-    }
+    } else if (heaterShakerFromProtocol != null && !isShaking) {
+      setShowConfirmAttachmentModal(true)
+    } else play()
   }
 
   const isRunControlButtonDisabled =
@@ -348,6 +355,15 @@ export function ProtocolRunHeader({
       marginBottom={SPACING.spacing4}
       padding={SPACING.spacing4}
     >
+      {showConfirmAttachModal && (
+        <ConfirmAttachmentModal
+          onCloseClick={() => setShowConfirmAttachmentModal(false)}
+          isProceedToRunModal={true}
+          shakerValue={null}
+          play={() => play()}
+        />
+      )}
+
       <Flex>
         {/* TODO(bh, 2022-03-15) will update link to a protocol key stored locally when built */}
         <Link to={`/protocols/${runRecord?.data?.data.protocolId}`}>
