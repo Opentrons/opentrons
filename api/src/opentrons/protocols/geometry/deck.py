@@ -133,8 +133,7 @@ class Deck(UserDict):
         self.data[slot_key_int] = val
         self._highest_z = max(val.highest_z, self._highest_z)
         self._thermocycler_present = any(
-            isinstance(item, ThermocyclerGeometry) for item in
-            self.data.values()
+            isinstance(item, ThermocyclerGeometry) for item in self.data.values()
         )
 
     def __contains__(self, key: object) -> bool:

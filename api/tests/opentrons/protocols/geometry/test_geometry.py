@@ -482,8 +482,7 @@ def test_thermocycler_present() -> None:
 
     # Add a thermocycler
     deck[7] = module_geometry.load_module(
-        module_geometry.ThermocyclerModuleModel.THERMOCYCLER_V1,
-        deck.position_for(7)
+        module_geometry.ThermocyclerModuleModel.THERMOCYCLER_V1, deck.position_for(7)
     )
     assert deck.thermocycler_present
 
@@ -494,4 +493,3 @@ def test_thermocycler_present() -> None:
     # Remove thermocycler
     del deck[7]
     assert not deck.thermocycler_present
-

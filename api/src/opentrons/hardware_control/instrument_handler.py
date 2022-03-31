@@ -50,6 +50,8 @@ MOD_LOG = logging.getLogger(__name__)
 
 AxisType = TypeVar("AxisType", Axis, OT3Axis)
 
+PLUNGER_CACHE_LIMIT = 32
+
 
 @dataclass(frozen=True)
 class LiquidActionSpec(Generic[AxisType]):
@@ -394,7 +396,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
             raise RuntimeError("Pipette not ready to aspirate")
         self._ihp_log.debug(f"{action} on {target.name}")
 
-    @functools.lru_cache(10)
+    @functools.lru_cache(PLUNGER_CACHE_LIMIT)
     def plunger_position(
         self, instr: Pipette, ul: float, action: "UlPerMmAction"
     ) -> float:
@@ -402,14 +404,14 @@ class InstrumentHandlerProvider(Generic[MountType]):
         position = mm + instr.config.bottom
         return round(position, 6)
 
-    @functools.lru_cache(10)
+    @functools.lru_cache(PLUNGER_CACHE_LIMIT)
     def plunger_speed(
         self, instr: Pipette, ul_per_s: float, action: "UlPerMmAction"
     ) -> float:
         mm_per_s = ul_per_s / instr.ul_per_mm(instr.config.max_volume, action)
         return round(mm_per_s, 6)
 
-    @functools.lru_cache(10)
+    @functools.lru_cache(PLUNGER_CACHE_LIMIT)
     def plunger_flowrate(
         self, instr: Pipette, mm_per_s: float, action: "UlPerMmAction"
     ) -> float:
@@ -900,7 +902,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
 class OT3InstrumentHandler(InstrumentHandlerProvider[OT3Mount]):
     """Override for correct plunger_position."""
 
-    @functools.lru_cache(10)
+    @functools.lru_cache(PLUNGER_CACHE_LIMIT)
     def plunger_position(
         self, instr: Pipette, ul: float, action: "UlPerMmAction"
     ) -> float:
