@@ -3,7 +3,6 @@ import fs from 'fs-extra'
 import uuid from 'uuid/v4'
 
 import { app, shell } from 'electron'
-import stubbedAnalysis from './__fixtures__/analysisResult.json'
 
 import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storage'
 import type { Dirent } from 'fs'
@@ -34,7 +33,7 @@ export const PROTOCOLS_DIRECTORY_PATH = path.join(
 export const PROTOCOL_SRC_DIRECTORY_NAME = 'src'
 export const PROTOCOL_ANALYSIS_DIRECTORY_NAME = 'analysis'
 
-function makeAnalysisFilePath(analysisDirPath: string) {
+function makeAnalysisFilePath(analysisDirPath: string): string {
   return path.join(analysisDirPath, `${new Date().getTime()}.json`)
 }
 

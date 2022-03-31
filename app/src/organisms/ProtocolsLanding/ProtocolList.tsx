@@ -6,7 +6,6 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  SELECT_CX_PREFIX,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/Buttons'

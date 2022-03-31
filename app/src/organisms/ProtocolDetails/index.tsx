@@ -3,10 +3,7 @@ import first from 'lodash/first'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import {
-  getModuleType,
-  getPipetteNameSpecs,
-} from '@opentrons/shared-data'
+import { getModuleType, getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   Box,
   Btn,
@@ -110,10 +107,13 @@ export function ProtocolDetails(
   if (mostRecentAnalysis == null) return null
 
   const robotModel = mostRecentAnalysis?.robot?.model ?? 'OT-2'
-  const { left: leftMountPipetteName, right: rightMountPipetteName } =
-      parseInitialPipetteNamesByMount(mostRecentAnalysis)
-  const requiredModuleTypes =
-      parseAllRequiredModuleModels(mostRecentAnalysis).map(getModuleType)
+  const {
+    left: leftMountPipetteName,
+    right: rightMountPipetteName,
+  } = parseInitialPipetteNamesByMount(mostRecentAnalysis)
+  const requiredModuleTypes = parseAllRequiredModuleModels(
+    mostRecentAnalysis
+  ).map(getModuleType)
 
   const protocolName =
     mostRecentAnalysis?.metadata?.protocolName ??

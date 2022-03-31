@@ -10,7 +10,6 @@ import * as FileSystem from './file-system'
 import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
 
 import type { Action, Dispatch } from '../types'
-import { lookup } from 'mime'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 
