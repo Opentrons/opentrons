@@ -16,20 +16,20 @@ import modalStyles from '../modals/modal.css'
 import styles from './FileSidebar.css'
 
 import { HintKey } from '../../tutorial'
-import { PDProtocolFile } from '../../file-types'
 import {
   InitialDeckSetup,
   SavedStepFormState,
   ModuleOnDeck,
   PipetteOnDeck,
 } from '../../step-forms'
+import type { ProtocolFile } from '@opentrons/shared-data'
 
 export interface Props {
   loadFile: (event: React.ChangeEvent<HTMLInputElement>) => unknown
   createNewFile?: () => unknown
   canDownload: boolean
   onDownload: () => unknown
-  fileData?: PDProtocolFile | null
+  fileData?: ProtocolFile | null
   pipettesOnDeck: InitialDeckSetup['pipettes']
   modulesOnDeck: InitialDeckSetup['modules']
   savedStepForms: SavedStepFormState

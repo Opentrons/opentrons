@@ -2,6 +2,7 @@ import { createSelector } from 'reselect'
 import flatMap from 'lodash/flatMap'
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
+import map from 'lodash/map'
 import uniq from 'lodash/uniq'
 import { getFileMetadata } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
@@ -10,6 +11,7 @@ import {
   selectors as labwareDefSelectors,
   LabwareDefByDefURI,
 } from '../../labware-defs'
+import { uuid } from '../../utils'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
@@ -24,16 +26,18 @@ import {
   PipetteEntity,
   LabwareEntities,
   PipetteEntities,
-  Timeline,
 } from '@opentrons/step-generation'
-import {
-  FilePipette,
-  FileLabware,
-  FileModule,
-} from '@opentrons/shared-data/protocol/types/schemaV4'
-import { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type {
+  CreateCommand,
+  ProtocolFile,
+} from '@opentrons/shared-data/protocol/types/schemaV6'
 import { Selector } from '../../types'
-import { PDProtocolFile } from '../../file-types'
+import {
+  LoadLabwareCreateCommand,
+  LoadModuleCreateCommand,
+  LoadPipetteCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import { OT2_STANDARD_DECKID, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
 if (isEmpty(process.env.OT_PD_VERSION))
@@ -71,89 +75,10 @@ export const getLabwareDefinitionsInUse = (
   )
 }
 
-// NOTE: V3 commands are a subset of V4 commands.
-// 'airGap' is specified in the V3 schema but was never implemented, so it doesn't count.
-const _isV3Command = (command: CreateCommand): boolean =>
-  command.commandType === 'aspirate' ||
-  command.commandType === 'dispense' ||
-  command.commandType === 'blowout' ||
-  command.commandType === 'touchTip' ||
-  command.commandType === 'pickUpTip' ||
-  command.commandType === 'dropTip' ||
-  command.commandType === 'moveToSlot' ||
-  command.commandType === 'delay'
-
-// This is a HACK to allow PD to not have to export protocols under the not-yet-released
-// v6 schema with the dispenseAirGap command, by replacing all dispenseAirGaps with dispenses
-// Once we have v6 in the wild, just use the ordinary getRobotStateTimeline and
-// delete this getRobotStateTimelineWithoutAirGapDispenseCommand.
-export const getRobotStateTimelineWithoutAirGapDispenseCommand: Selector<Timeline> = createSelector(
-  getRobotStateTimeline,
-  robotStateTimeline => {
-    const timeline = robotStateTimeline.timeline.map(frame => ({
-      ...frame,
-      commands: frame.commands.map(command => {
-        if (command.commandType === 'dispenseAirGap') {
-          return { ...command, commandType: 'dispense' as const }
-        }
-
-        return command
-      }),
-    }))
-    return { ...robotStateTimeline, timeline }
-  }
-)
-
-/** If there are any module entities or and v4-specific commands,
- ** export as a v4 protocol. Otherwise, export as v3.
- **
- ** NOTE: In real life, you shouldn't be able to have v4 atomic commands
- ** without having module entities b/c this will produce "no module for this step"
- ** form/timeline errors. Checking for v4 commands should be redundant,
- ** we do it just in case non-V3 commands somehow sneak in despite having no modules. */
-export const getRequiresAtLeastV4: Selector<boolean> = createSelector(
-  getRobotStateTimelineWithoutAirGapDispenseCommand,
-  stepFormSelectors.getModuleEntities,
-  (robotStateTimeline, moduleEntities) => {
-    const noModules = isEmpty(moduleEntities)
-    const hasOnlyV3Commands = robotStateTimeline.timeline.every(timelineFrame =>
-      timelineFrame.commands.every(command => _isV3Command(command))
-    )
-    const isV3 = noModules && hasOnlyV3Commands
-    return !isV3
-  }
-)
-
-// Delete these require functions for H/S Release, always export v6 protocols
-const _requiresV5 = (command: CreateCommand): boolean =>
-  command.commandType === 'moveToWell'
-
-export const getRequiresAtLeastV5: Selector<boolean> = createSelector(
-  getRobotStateTimelineWithoutAirGapDispenseCommand,
-  robotStateTimeline => {
-    return robotStateTimeline.timeline.some(timelineFrame =>
-      timelineFrame.commands.some(command => _requiresV5(command))
-    )
-  }
-)
-export const getExportedFileSchemaVersion: Selector<number> = createSelector(
-  getRequiresAtLeastV4,
-  getRequiresAtLeastV5,
-  (requiresV4, requiresV5) => {
-    if (requiresV5) {
-      return 5
-    } else if (requiresV4) {
-      return 4
-    } else {
-      return 3
-    }
-  }
-)
-// @ts-expect-error(IL, 2020-03-02): presence of non-v3 commands should make 'isV4Protocol' true
-export const createFile: Selector<PDProtocolFile> = createSelector(
+export const createFile: Selector<ProtocolFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
-  getRobotStateTimelineWithoutAirGapDispenseCommand,
+  getRobotStateTimeline,
   dismissSelectors.getAllDismissedWarnings,
   ingredSelectors.getLiquidGroupsById,
   ingredSelectors.getLiquidsByLabwareId,
@@ -164,8 +89,6 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
-  getRequiresAtLeastV4,
-  getRequiresAtLeastV5,
   (
     fileMetadata,
     initialRobotState,
@@ -179,40 +102,93 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
     moduleEntities,
     pipetteEntities,
     labwareNicknamesById,
-    labwareDefsByURI,
-    requiresAtLeastV4Protocol,
-    requiresAtLeastV5Protocol
+    labwareDefsByURI
   ) => {
     const { author, description, created } = fileMetadata
     const name = fileMetadata.protocolName || 'untitled'
     const lastModified = fileMetadata.lastModified
-    const pipettes = mapValues(
+
+    const pipettes: ProtocolFile['pipettes'] = mapValues(
       initialRobotState.pipettes,
       (
         pipette: typeof initialRobotState.pipettes[keyof typeof initialRobotState.pipettes],
         pipetteId: string
-      ): FilePipette => ({
-        mount: pipette.mount,
+      ) => ({
         name: pipetteEntities[pipetteId].name,
       })
     )
-    const labware: Record<string, FileLabware> = mapValues(
+
+    const loadPipetteCommands = map(
+      initialRobotState.pipettes,
+      (
+        pipette: typeof initialRobotState.pipettes[keyof typeof initialRobotState.pipettes],
+        pipetteId: string
+      ): LoadPipetteCreateCommand => {
+        const loadPipetteCommand = {
+          key: uuid(),
+          commandType: 'loadPipette' as const,
+          params: {
+            pipetteId: pipetteId,
+            mount: pipette.mount,
+          },
+        }
+        return loadPipetteCommand
+      }
+    )
+
+    const liquids = {}
+
+    const labware: ProtocolFile['labware'] = mapValues(
       initialRobotState.labware,
       (
         l: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
         labwareId: string
-      ): FileLabware => ({
-        slot: l.slot,
+      ) => ({
         displayName: labwareNicknamesById[labwareId],
         definitionId: labwareEntities[labwareId].labwareDefURI,
       })
     )
-    const modules: Record<string, FileModule> = mapValues(
+
+    const loadLabwareCommands = map(
+      initialRobotState.labware,
+      (
+        labware: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
+        labwareId: string
+      ): LoadLabwareCreateCommand => {
+        const loadLabwareCommand = {
+          key: uuid(),
+          commandType: 'loadLabware' as const,
+          params: {
+            labwareId: labwareId,
+            location: { slotName: labware.slot },
+          },
+        }
+        return loadLabwareCommand
+      }
+    )
+    const modules: ProtocolFile['modules'] = mapValues(
       moduleEntities,
-      (moduleEntity: ModuleEntity, moduleId: string): FileModule => ({
-        slot: initialRobotState.modules[moduleId].slot,
+      (moduleEntity: ModuleEntity, moduleId: string) => ({
         model: moduleEntity.model,
       })
+    )
+
+    const loadModuleCommands = map(
+      initialRobotState.modules,
+      (
+        module: typeof initialRobotState.modules[keyof typeof initialRobotState.modules],
+        moduleId: string
+      ): LoadModuleCreateCommand => {
+        const loadModuleCommand = {
+          key: uuid(),
+          commandType: 'loadModule' as const,
+          params: {
+            moduleId: moduleId,
+            location: { slotName: module.slot },
+          },
+        }
+        return loadModuleCommand
+      }
     )
     // TODO: Ian 2018-07-10 allow user to save steps in JSON file, even if those
     // step never have saved forms.
@@ -225,10 +201,19 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
       pipetteEntities,
       labwareDefsByURI
     )
-    const commands: CreateCommand[] = flatMap(
+    const loadCommands: CreateCommand[] = [
+      ...loadPipetteCommands,
+      ...loadLabwareCommands,
+      ...loadModuleCommands,
+    ]
+
+    const nonLoadCommands: CreateCommand[] = flatMap(
       robotStateTimeline.timeline,
       timelineFrame => timelineFrame.commands
     )
+
+    const commands = [...loadCommands, ...nonLoadCommands]
+
     const protocolFile = {
       metadata: {
         protocolName: name,
@@ -269,31 +254,20 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
         },
       },
       robot: {
-        model: 'OT-2 Standard',
+        model: OT2_STANDARD_MODEL,
+        deckId: OT2_STANDARD_DECKID,
       },
       pipettes,
       labware,
+      liquids,
       labwareDefinitions,
     }
-
-    if (requiresAtLeastV5Protocol) {
-      return {
-        ...protocolFile,
-        $otSharedSchema: '#/protocol/schemas/5',
-        schemaVersion: 5,
-        modules,
-        commands,
-      }
-    } else if (requiresAtLeastV4Protocol) {
-      return {
-        ...protocolFile,
-        $otSharedSchema: '#/protocol/schemas/4',
-        schemaVersion: 4,
-        modules,
-        commands,
-      }
-    } else {
-      return { ...protocolFile, schemaVersion: 3, commands }
+    return {
+      ...protocolFile,
+      $otSharedSchema: '#/protocol/schemas/6',
+      schemaVersion: 6,
+      modules,
+      commands,
     }
   }
 )
