@@ -157,7 +157,7 @@ export const getRobotByName = (
 
 export const getDiscoverableRobotByName = (
   state: State,
-  robotName: string
+  robotName: string | null
 ): DiscoveredRobot | null => {
   return getAllRobots(state).find(r => r.name === robotName) || null
 }
