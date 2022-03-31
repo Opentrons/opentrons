@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from typing import Generator
 
 from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.pool import StaticPool
 
 
@@ -13,7 +13,7 @@ from sqlalchemy.pool import StaticPool
 # convert these to return an async engine.
 # https://docs.sqlalchemy.org/en/14/orm/extensions/asyncio.html
 @contextmanager
-def create_in_memory_db() -> Generator[Engine, None, None]:
+def create_in_memory_db() -> Generator[SQLEngine, None, None]:
     """Return an Engine for a new in-memory SQLite database.
 
     Clean up the database and its connections when the context manager exits.
@@ -30,7 +30,7 @@ def create_in_memory_db() -> Generator[Engine, None, None]:
         new_engine.dispose()
 
 
-def create_in_memory_db_no_cleanup() -> Engine:
+def create_in_memory_db_no_cleanup() -> SQLEngine:
     """Like `create_in_memory_db()`, except without automatic cleanup."""
     # fmt: off
     return create_engine(
