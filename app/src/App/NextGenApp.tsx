@@ -64,7 +64,6 @@ export function TempNavBar({ routes }: { routes: RouteProps[] }): JSX.Element {
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
-  console.log('RERENDERED')
   return (
     <Flex
       backgroundColor={COLORS.darkBlack}

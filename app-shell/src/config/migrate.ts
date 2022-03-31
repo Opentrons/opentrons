@@ -148,10 +148,6 @@ const toVersion5 = (prevConfig: ConfigV4): ConfigV5 => {
   const nextConfig = {
     ...prevConfig,
     version: 5 as const,
-    discovery: {
-      ...prevConfig.discovery,
-      hidden: [],
-    },
     python: {
       pathToPythonOverride: null,
     },

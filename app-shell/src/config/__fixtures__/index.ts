@@ -106,8 +106,4 @@ export const MOCK_CONFIG_V5: ConfigV5 = {
   python: {
     pathToPythonOverride: null,
   },
-  discovery: {
-    ...MOCK_CONFIG_V4.discovery,
-    hidden: [],
-  },
 }

@@ -114,11 +114,8 @@ export interface ConfigV4 extends Omit<ConfigV3, 'version' | 'labware'> {
   }
 }
 
-export interface ConfigV5 extends Omit<ConfigV4, 'version' | 'discovery'> {
+export interface ConfigV5 extends Omit<ConfigV4, 'version'> {
   version: 5
-  discovery: ConfigV4['discovery'] & {
-    hidden: string[]
-  }
   python: {
     pathToPythonOverride: string | null
   }
