@@ -130,9 +130,12 @@ class Deck(UserDict):
                 "is obscured by "
                 f'{", ".join(flattened_overlappers)}'
             )
-        self._thermocycler_present = isinstance(val, ThermocyclerGeometry)
         self.data[slot_key_int] = val
         self._highest_z = max(val.highest_z, self._highest_z)
+        self._thermocycler_present = any(
+            isinstance(item, ThermocyclerGeometry) for item in
+            self.data.values()
+        )
 
     def __contains__(self, key: object) -> bool:
         try:
