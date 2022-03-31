@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   CheckboxField,
@@ -86,24 +86,17 @@ export const ConfirmAttachmentModal = (
           isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
         }`}
         flexDirection={DIRECTION_COLUMN}
+        fontSize={TYPOGRAPHY.fontSizeP}
       >
-        <Trans
-          t={t}
-          i18nKey={t(
+        <Text paddingBottom={SPACING.spacing2}>
+          {t(
             isProceedToRunModal
               ? 'module_anchors_extended'
               : 'module_should_have_anchors',
             { slot: slotNumber }
           )}
-          components={{
-            block: (
-              <Text
-                fontSize={TYPOGRAPHY.fontSizeP}
-                paddingBottom={SPACING.spacing2}
-              />
-            ),
-          }}
-        />
+        </Text>
+        <Text>{t('thermal_adapter_attached_to_module')}</Text>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}

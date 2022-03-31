@@ -85,8 +85,9 @@
   "stop_shaking_start_run": "Stop shaking and start run",
   "keep_shaking_start_run": "Keep shaking and start run",
   "confirm_heater_shaker_modal_attachment": "Confirm Heater Shaker Module attachment to deck",
-  "module_should_have_anchors": "<block>Module should have both anchors fully extended for a firm attachment to the deck.</block><block>The thermal adapter should be attached to the module.</block>",
-  "module_anchors_extended": "<block>Before the run begins, module should have both anchors fully extended for a firm attachment to Slot {{slot}}.</block><block>The thermal adapter should be attached to the module.</block>",
+  "module_should_have_anchors": "Module should have both anchors fully extended for a firm attachment to the deck.",
+  "module_anchors_extended": "Before the run begins, module should have both anchors fully extended for a firm attachment to Slot {{slot}}.",
+  "thermal_adapter_attached_to_module": "The thermal adapter should be attached to the module.",
   "proceed_to_run": "Proceed to run",
   "confirm_attachment": "Confirm attachment"
 }
