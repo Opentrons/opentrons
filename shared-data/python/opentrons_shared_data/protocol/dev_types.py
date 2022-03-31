@@ -228,7 +228,7 @@ class TemperatureModuleDeactivateCommand(TypedDict):
     params: ModuleIDParams
 
 
-class ThermocyclerSetTargetBlockParams(TemperatureParams):
+class ThermocyclerSetTargetBlockParams(TemperatureParams, total=False):
     volume: float
 
 
@@ -353,6 +353,7 @@ PipetteCommand = Union[
     PickUpTipCommand,
     DropTipCommand,
     MoveToSlotCommand,
+    MoveToWellCommand,
 ]
 PipetteCommandId = Union[
     AspirateCommandId,
@@ -431,4 +432,5 @@ class JsonProtocolV3(TypedDict, total=False):
     designerApplication: DesignerApplication
 
 
+# todo(mm, 2022-03-18): Should this include JsonProtocolV5?
 JsonProtocol = Union[JsonProtocolV4, JsonProtocolV3]

@@ -902,3 +902,12 @@ class OT3InstrumentHandler(InstrumentHandlerProvider[OT3Mount]):
         mm = ul / instr.ul_per_mm(ul, action)
         position = instr.config.bottom - mm
         return round(position, 6)
+
+    def critical_point_for(
+        self, mount: MountType, cp_override: Optional[CriticalPoint] = None
+    ) -> top_types.Point:
+        pip = self._attached_instruments[OT3Mount.from_mount(mount)]
+        if pip is not None and cp_override != CriticalPoint.MOUNT:
+            return pip.critical_point(cp_override)
+        else:
+            return top_types.Point(0, 0, 0)

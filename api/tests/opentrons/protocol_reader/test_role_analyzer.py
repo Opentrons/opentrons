@@ -3,7 +3,9 @@ import pytest
 from decoy import matchers
 from typing import List, NamedTuple
 
-from opentrons.protocols.models import JsonProtocol, LabwareDefinition
+from opentrons_shared_data.protocol.models import ProtocolSchemaV6
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons.protocols.models import JsonProtocol
 from opentrons.protocol_reader.file_reader_writer import BufferedFile
 
 from opentrons.protocol_reader.role_analyzer import (
@@ -130,6 +132,32 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             main_file=MainFile(name="PROTOCOL.PY", contents=b""),
             labware_files=[],
             labware_definitions=[],
+        ),
+    ),
+    RoleAnalyzerSpec(
+        files=[
+            BufferedFile(
+                name="protocol.json",
+                contents=b"",
+                data=ProtocolSchemaV6.construct(  # type: ignore[call-arg]
+                    labwareDefinitions={
+                        "uri": LabwareDefinition.construct()  # type: ignore[call-arg]
+                    },
+                ),
+            ),
+        ],
+        expected=RoleAnalysis(
+            main_file=MainFile(
+                name="protocol.json",
+                contents=b"",
+                data=ProtocolSchemaV6.construct(  # type: ignore[call-arg]
+                    labwareDefinitions=matchers.Anything()
+                ),
+            ),
+            labware_files=[],
+            labware_definitions=[
+                LabwareDefinition.construct()  # type: ignore[call-arg]
+            ],
         ),
     ),
 ]

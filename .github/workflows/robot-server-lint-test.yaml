@@ -16,9 +16,10 @@ on:
       - 'notify-server/**/*'
       - '.github/workflows/robot-server-test-lint.yaml'
       - '.github/actions/python/**'
-    branches-ignore: # ignore any release-related thing (handled elsewhere)
+    branches:
+      - 'edge'
       - 'release'
-      - 'chore_release-**'
+      - '*hotfix*'
     tags-ignore:
       - '*'
   pull_request:
@@ -69,10 +70,10 @@ jobs:
         name: Test without opentrons_hardware
         run: |
           make -C robot-server setup-ot2
-          make -C robot-server test
+          make -C robot-server test-cov
       - if: ${{ matrix.with-ot-hardware == 'true' }}
         name: Test with opentrons_hardware
-        run: make -C robot-server test
+        run: make -C robot-server test-cov
       - if: ${{ matrix.with-ot-hardware == 'true' }}
         uses: 'codecov/codecov-action@v2'
         with:

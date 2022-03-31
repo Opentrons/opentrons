@@ -98,41 +98,6 @@ describe('fetchModulesEpic', () => {
     })
   })
 
-  it('maps successful legacy response to FETCH_MODULES_SUCCESS', () => {
-    testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
-        cold<RobotApiResponse>('r', {
-          r: Fixtures.mockLegacyFetchModulesSuccess,
-        })
-      )
-
-      const action$ = hot<Action>('--a', { a: action })
-      const state$ = hot<State>('a-a', { a: {} } as any)
-      const output$ = modulesEpic(action$, state$)
-
-      expectObservable(output$).toBe('--a', {
-        a: Actions.fetchModulesSuccess(
-          mockRobot.name,
-          [
-            {
-              ...Fixtures.mockMagneticModule,
-              usbPort: { hub: null, port: null },
-            },
-            {
-              ...Fixtures.mockTemperatureModule,
-              usbPort: { hub: null, port: null },
-            },
-            {
-              ...Fixtures.mockThermocycler,
-              usbPort: { hub: null, port: null },
-            },
-          ],
-          { ...meta, response: Fixtures.mockFetchModulesSuccessMeta }
-        ),
-      })
-    })
-  })
-
   it('maps failed response to FETCH_MODULES_FAILURE', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(

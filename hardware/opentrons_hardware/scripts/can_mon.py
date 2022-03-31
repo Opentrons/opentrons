@@ -3,8 +3,12 @@ import asyncio
 import dataclasses
 import logging
 import argparse
+import atexit
+import sys
 from datetime import datetime
 from logging.config import dictConfig
+from typing import List, TextIO
+
 
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
@@ -21,29 +25,91 @@ from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 log = logging.getLogger(__name__)
 
 
-async def task(messenger: CanMessenger) -> None:
+@dataclasses.dataclass
+class StyledOutput:
+    """Dataclass bundling style and content for terminal output."""
+
+    style: str
+    content: str
+
+
+class Writer:
+    """Class that knows where to write and how to safely style output."""
+
+    RESET_STYLE = "\033[0m"
+
+    def __init__(self, destination: TextIO) -> None:
+        """Build a writer with a destination.
+
+        Args:
+            destination: A TextIO to write to. If this is a canonical output
+                         fd (e.g. stdout, stderr) styled output will be used;
+                         otherwise (for instance, if destination is a pipe)
+                         there will be no output styling.
+        """
+        self._dest = destination
+        self._do_style = self._dest in (sys.stdout, sys.stderr)
+        if self._do_style:
+            atexit.register(self._reset_shell_style)
+
+    def write(self, output: List[StyledOutput]) -> None:
+        """Write styled output to the destination.
+
+        Elements are joined with spaces and the styling is reset after all prints.
+        """
+        for elem in output:
+            if self._do_style:
+                self._dest.write(elem.style)
+            self._dest.write(elem.content)
+            if self._do_style:
+                self._dest.write(self.RESET_STYLE)
+            self._dest.write(" ")
+        self._dest.flush()
+
+    def _reset_shell_style(self) -> None:
+        self._dest.write(self.RESET_STYLE)
+        self._dest.flush()
+
+
+async def task(
+    messenger: CanMessenger,
+    write_to: TextIO,
+) -> None:
     """A task that listens for can messages.
 
     Args:
         messenger: Messenger
+        write_to: Destination to write to
 
     Returns: Nothing.
     """
+    writer = Writer(write_to)
     label_style = "\033[0;37;40m"
     header_style = "\033[0;36;40m"
     data_style = "\033[1;36;40m"
+
     with WaitableCallback(messenger) as cb:
         async for message, arbitration_id in cb:
             try:
                 msg_name = MessageId(arbitration_id.parts.message_id).name
                 from_node = NodeId(arbitration_id.parts.originating_node_id).name
                 to_node = NodeId(arbitration_id.parts.node_id).name
-                arb_id_str = f"{data_style}{msg_name} ({from_node}->{to_node})"
+                arb_id_str = f"{msg_name} ({from_node}->{to_node})"
             except ValueError:
-                arb_id_str = f"{data_style}0x{arbitration_id.id:x}"
-            print(f"{header_style}{datetime.now()} {arb_id_str}")
+                arb_id_str = f"0x{arbitration_id.id:x}"
+            writer.write(
+                [
+                    StyledOutput(style=header_style, content=str(datetime.now())),
+                    StyledOutput(style=data_style, content=arb_id_str + "\n"),
+                ]
+            )
             for name, value in dataclasses.asdict(message.payload).items():
-                print(f"\t{label_style}{name}: {data_style}{value}")
+                writer.write(
+                    [
+                        StyledOutput(style=label_style, content=f"\t{name}:"),
+                        StyledOutput(style=data_style, content=str(value) + "\n"),
+                    ]
+                )
 
 
 async def run(args: argparse.Namespace) -> None:
@@ -54,7 +120,7 @@ async def run(args: argparse.Namespace) -> None:
     messenger.start()
 
     loop = asyncio.get_event_loop()
-    fut = loop.create_task(task(messenger))
+    fut = loop.create_task(task(messenger, args.output))
     try:
         await fut
     except KeyboardInterrupt:
@@ -78,14 +144,14 @@ LOG_CONFIG = {
             "formatter": "basic",
             "filename": "can_mon.log",
             "maxBytes": 5000000,
-            "level": logging.INFO,
+            "level": logging.WARNING,
             "backupCount": 3,
         },
     },
     "loggers": {
         "": {
             "handlers": ["file_handler"],
-            "level": logging.INFO,
+            "level": logging.WARNING,
         },
     },
 }
@@ -96,6 +162,13 @@ def main() -> None:
     dictConfig(LOG_CONFIG)
 
     parser = argparse.ArgumentParser(description="CAN bus monitoring.")
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="Where to write monitored canbus output to",
+        type=argparse.FileType("w"),
+        default="-",
+    )
     add_can_args(parser)
 
     args = parser.parse_args()

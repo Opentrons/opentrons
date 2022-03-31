@@ -1,5 +1,6 @@
 """Tests for the move scheduler."""
 import pytest
+from typing import List, Tuple, Any
 from mock import AsyncMock, call, MagicMock
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 
@@ -7,11 +8,14 @@ from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import MessageListenerCallback
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddLinearMoveRequest,
+    HomeRequest,
+    MoveCompleted,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
     MoveCompletedPayload,
     ExecuteMoveGroupRequestPayload,
+    HomeRequestPayload,
 )
 from opentrons_hardware.hardware_control.constants import (
     interrupts_per_sec,
@@ -19,11 +23,14 @@ from opentrons_hardware.hardware_control.constants import (
 from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
+    MoveType,
+    MoveStopCondition,
 )
 from opentrons_hardware.hardware_control.move_group_runner import (
     MoveGroupRunner,
     MoveScheduler,
 )
+from opentrons_hardware.hardware_control.types import NodeMap
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions as md,
     MessageDefinition,
@@ -48,8 +55,28 @@ def move_group_single() -> MoveGroups:
         [
             {
                 NodeId.head: MoveGroupSingleAxisStep(
-                    distance_mm=0, velocity_mm_sec=2, duration_sec=123
+                    distance_mm=246, velocity_mm_sec=2, duration_sec=123
                 )
+            }
+        ]
+    ]
+
+
+@pytest.fixture
+def move_group_home_single() -> MoveGroups:
+    """Home Request."""
+    return [
+        # Group 0
+        [
+            {
+                NodeId.head: MoveGroupSingleAxisStep(
+                    distance_mm=0,
+                    velocity_mm_sec=235,
+                    duration_sec=2142,
+                    acceleration_mm_sec_sq=1000,
+                    stop_condition=MoveStopCondition.limit_switch,
+                    move_type=MoveType.home,
+                ),
             }
         ]
     ]
@@ -63,7 +90,7 @@ def move_group_multiple() -> MoveGroups:
         [
             {
                 NodeId.head: MoveGroupSingleAxisStep(
-                    distance_mm=0,
+                    distance_mm=229,
                     velocity_mm_sec=235,
                     duration_sec=2142,
                     acceleration_mm_sec_sq=1000,
@@ -74,13 +101,13 @@ def move_group_multiple() -> MoveGroups:
         [
             {
                 NodeId.gantry_x: MoveGroupSingleAxisStep(
-                    distance_mm=0,
+                    distance_mm=522,
                     velocity_mm_sec=22,
                     duration_sec=1,
                     acceleration_mm_sec_sq=1000,
                 ),
                 NodeId.gantry_y: MoveGroupSingleAxisStep(
-                    distance_mm=0,
+                    distance_mm=25,
                     velocity_mm_sec=23,
                     duration_sec=0,
                     acceleration_mm_sec_sq=1000,
@@ -112,8 +139,9 @@ def move_group_multiple() -> MoveGroups:
 async def test_no_groups_do_nothing(mock_can_messenger: AsyncMock) -> None:
     """It should not send any commands if there are no moves."""
     subject = MoveGroupRunner(move_groups=[])
-    await subject.run(mock_can_messenger)
+    position = await subject.run(mock_can_messenger)
     mock_can_messenger.send.assert_not_called()
+    assert position == {}
 
 
 async def test_single_group_clear(
@@ -137,6 +165,36 @@ async def test_multi_group_clear(
     mock_can_messenger.send.assert_called_once_with(
         node_id=NodeId.broadcast,
         message=md.ClearAllMoveGroupsRequest(),
+    )
+
+
+async def test_home(
+    mock_can_messenger: AsyncMock, move_group_home_single: MoveGroups
+) -> None:
+    """Test Home Request Functionality."""
+    subject = MoveGroupRunner(move_groups=move_group_home_single)
+    await subject._send_groups(can_messenger=mock_can_messenger)
+    mock_can_messenger.send.assert_any_call(
+        node_id=NodeId.head,
+        message=HomeRequest(
+            payload=HomeRequestPayload(
+                group_id=UInt8Field(0),
+                seq_id=UInt8Field(0),
+                velocity=Int32Field(
+                    int(
+                        move_group_home_single[0][0][NodeId.head].velocity_mm_sec
+                        / interrupts_per_sec
+                        * (2**31)
+                    )
+                ),
+                duration=UInt32Field(
+                    int(
+                        move_group_home_single[0][0][NodeId.head].duration_sec
+                        * interrupts_per_sec
+                    )
+                ),
+            )
+        ),
     )
 
 
@@ -389,12 +447,12 @@ class MockSendMoveCompleter:
             for seq_id, moves in enumerate(
                 self._move_groups[message.payload.group_id.value]
             ):
-                for node in moves.keys():
+                for node, move in moves.items():
                     payload = MoveCompletedPayload(
                         group_id=message.payload.group_id,
                         seq_id=UInt8Field(seq_id),
-                        current_position=UInt32Field(0),
-                        ack_id=UInt8Field(0),
+                        current_position_um=UInt32Field(int(move.distance_mm * 1000)),
+                        ack_id=UInt8Field(1),
                     )
                     arbitration_id = ArbitrationId(
                         parts=ArbitrationIdParts(originating_node_id=node)
@@ -409,7 +467,7 @@ async def test_single_move(
     subject = MoveScheduler(move_groups=move_group_single)
     mock_sender = MockSendMoveCompleter(move_group_single, subject)
     mock_can_messenger.send.side_effect = mock_sender.mock_send
-    await subject.run(can_messenger=mock_can_messenger)
+    position = await subject.run(can_messenger=mock_can_messenger)
 
     mock_can_messenger.send.assert_has_calls(
         calls=[
@@ -425,6 +483,8 @@ async def test_single_move(
             )
         ]
     )
+    assert len(position) == 1
+    assert position[0][1].payload.current_position_um.value == 246000
 
 
 async def test_multi_group_move(
@@ -434,7 +494,7 @@ async def test_multi_group_move(
     subject = MoveScheduler(move_groups=move_group_multiple)
     mock_sender = MockSendMoveCompleter(move_group_multiple, subject)
     mock_can_messenger.send.side_effect = mock_sender.mock_send
-    await subject.run(can_messenger=mock_can_messenger)
+    position = await subject.run(can_messenger=mock_can_messenger)
 
     mock_can_messenger.send.assert_has_calls(
         calls=[
@@ -470,3 +530,118 @@ async def test_multi_group_move(
             ),
         ]
     )
+    assert len(position) == 5
+    assert position[0][1].payload.current_position_um.value == 229000
+    assert position[1][1].payload.current_position_um.value == 522000
+    assert position[2][1].payload.current_position_um.value == 25000
+    assert position[3][1].payload.current_position_um.value == 12000
+    assert position[4][1].payload.current_position_um.value == 12000
+
+
+def _build_arb(from_node: NodeId) -> ArbitrationId:
+    return ArbitrationId(ArbitrationIdParts(originating_node_id=from_node))
+
+
+@pytest.mark.parametrize(
+    "completions,position_map",
+    [
+        (
+            # one axis, completions reversed compared to execution order
+            [
+                (
+                    _build_arb(NodeId.gantry_x),
+                    MoveCompleted(
+                        payload=MoveCompletedPayload(
+                            ack_id=UInt8Field(0),
+                            group_id=UInt8Field(2),
+                            seq_id=UInt8Field(2),
+                            current_position_um=UInt32Field(10000),
+                        )
+                    ),
+                ),
+                (
+                    _build_arb(NodeId.gantry_x),
+                    MoveCompleted(
+                        payload=MoveCompletedPayload(
+                            ack_id=UInt8Field(0),
+                            group_id=UInt8Field(2),
+                            seq_id=UInt8Field(1),
+                            current_position_um=UInt32Field(20000),
+                        )
+                    ),
+                ),
+                (
+                    _build_arb(NodeId.gantry_x),
+                    MoveCompleted(
+                        payload=MoveCompletedPayload(
+                            ack_id=UInt8Field(0),
+                            group_id=UInt8Field(1),
+                            seq_id=UInt8Field(2),
+                            current_position_um=UInt32Field(30000),
+                        )
+                    ),
+                ),
+            ],
+            {NodeId.gantry_x: 10},
+        ),
+        (
+            # multiple axes with different numbers of completions
+            [
+                (
+                    _build_arb(NodeId.gantry_x),
+                    MoveCompleted(
+                        payload=MoveCompletedPayload(
+                            ack_id=UInt8Field(0),
+                            group_id=UInt8Field(2),
+                            seq_id=UInt8Field(2),
+                            current_position_um=UInt32Field(10000),
+                        )
+                    ),
+                ),
+                (
+                    _build_arb(NodeId.gantry_x),
+                    MoveCompleted(
+                        payload=MoveCompletedPayload(
+                            ack_id=UInt8Field(0),
+                            group_id=UInt8Field(2),
+                            seq_id=UInt8Field(1),
+                            current_position_um=UInt32Field(20000),
+                        )
+                    ),
+                ),
+                (
+                    _build_arb(NodeId.gantry_y),
+                    MoveCompleted(
+                        payload=MoveCompletedPayload(
+                            ack_id=UInt8Field(0),
+                            group_id=UInt8Field(1),
+                            seq_id=UInt8Field(2),
+                            current_position_um=UInt32Field(30000),
+                        )
+                    ),
+                ),
+            ],
+            {NodeId.gantry_x: 10, NodeId.gantry_y: 30},
+        ),
+        (
+            # empty base case
+            [],
+            {},
+        ),
+    ],
+)
+def test_accumulate_move_completions(
+    completions: List[Tuple[ArbitrationId, MoveCompleted]], position_map: NodeMap[float]
+) -> None:
+    """Build correct move results."""
+    assert MoveGroupRunner._accumulate_move_completions(completions) == position_map
+
+
+@pytest.mark.parametrize("empty_group", [[], [[]], [[{}]]])
+async def test_empty_groups(
+    mock_can_messenger: AsyncMock, empty_group: List[Any]
+) -> None:
+    """Test that various kinds of empty groups result in no calls."""
+    mg = MoveGroupRunner(empty_group)
+    await mg.run(mock_can_messenger)
+    mock_can_messenger.send.assert_not_called()

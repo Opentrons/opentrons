@@ -2,10 +2,10 @@ import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/6/t
 import _protocolWithMultipleTemps from '@opentrons/shared-data/protocol/fixtures/6/multipleTempModules.json'
 import _standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
-import { getModuleDef2, ProtocolFile } from '@opentrons/shared-data'
+import { getModuleDef2, ProtocolAnalysisFile } from '@opentrons/shared-data'
 
-const protocolWithMagTempTC = (_protocolWithMagTempTC as unknown) as ProtocolFile<{}>
-const protocolWithMultipleTemps = (_protocolWithMultipleTemps as unknown) as ProtocolFile<{}>
+const protocolWithMagTempTC = (_protocolWithMagTempTC as unknown) as ProtocolAnalysisFile
+const protocolWithMultipleTemps = (_protocolWithMultipleTemps as unknown) as ProtocolAnalysisFile
 const standardDeckDef = _standardDeckDef as any
 
 describe('getProtocolModulesInfo', () => {

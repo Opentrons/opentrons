@@ -170,7 +170,7 @@ describe('StepCreationButton', () => {
       const disabledModuleSteps = stepButtonItems.find({ disabled: true })
       expect(disabledModuleSteps).toHaveLength(3)
       // enabled temperature module step tooltip
-      const enabledButtonTooltip = stepButtonItems.at(4).find(Tooltip)
+      const enabledButtonTooltip = stepButtonItems.at(5).find(Tooltip)
       expect(enabledButtonTooltip.prop('children')).toBe(
         'Set temperature command for Temperature module.'
       )

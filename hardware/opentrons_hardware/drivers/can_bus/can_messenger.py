@@ -2,7 +2,7 @@
 from __future__ import annotations
 import asyncio
 from inspect import Traceback
-from typing import List, Optional, Callable, Tuple
+from typing import Optional, Callable, Tuple, Dict
 import logging
 
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
@@ -26,6 +26,10 @@ MessageListenerCallback = Callable[[MessageDefinition, ArbitrationId], None]
 """Incoming message listener."""
 
 
+MessageListenerCallbackFilter = Callable[[ArbitrationId], bool]
+"""A function used to filter incoming messages. Returns true to accept message."""
+
+
 class CanMessenger:
     """High level can messaging class wrapping a CanDriver.
 
@@ -41,7 +45,10 @@ class CanMessenger:
             driver: The can bus driver to use.
         """
         self._drive = driver
-        self._listeners: List[MessageListenerCallback] = []
+        self._listeners: Dict[
+            MessageListenerCallback,
+            Tuple[MessageListenerCallback, Optional[MessageListenerCallbackFilter]],
+        ] = {}
         self._task: Optional[asyncio.Task[None]] = None
 
     async def send(self, node_id: NodeId, message: MessageDefinition) -> None:
@@ -82,13 +89,18 @@ class CanMessenger:
         else:
             log.warning("task not running.")
 
-    def add_listener(self, listener: MessageListenerCallback) -> None:
+    def add_listener(
+        self,
+        listener: MessageListenerCallback,
+        filter: Optional[MessageListenerCallbackFilter] = None,
+    ) -> None:
         """Add a message listener."""
-        self._listeners.append(listener)
+        self._listeners[listener] = listener, filter
 
     def remove_listener(self, listener: MessageListenerCallback) -> None:
         """Remove a message listener."""
-        self._listeners.remove(listener)
+        if listener in self._listeners:
+            del self._listeners[listener]
 
     async def _read_task_shield(self) -> None:
         try:
@@ -112,7 +124,9 @@ class CanMessenger:
                         f"Received <--\n\tarbitration_id: {message.arbitration_id},\n\t"
                         f"payload: {build}"
                     )
-                    for listener in self._listeners:
+                    for listener, filter in self._listeners.values():
+                        if filter and not filter(message.arbitration_id):
+                            continue
                         listener(message_definition(payload=build), message.arbitration_id)  # type: ignore[arg-type]  # noqa: E501
                 except BinarySerializableException:
                     log.exception(f"Failed to build from {message}")
@@ -123,13 +137,19 @@ class CanMessenger:
 class WaitableCallback:
     """MessageListenerCallback that can be awaited or iterated."""
 
-    def __init__(self, messenger: CanMessenger) -> None:
+    def __init__(
+        self,
+        messenger: CanMessenger,
+        filter: Optional[MessageListenerCallbackFilter] = None,
+    ) -> None:
         """Constructor.
 
         Args:
             messenger: Messenger to listen on.
+            filter: Optional message filtering function
         """
         self._messenger = messenger
+        self._filter = filter
         self._queue: asyncio.Queue[
             Tuple[MessageDefinition, ArbitrationId]
         ] = asyncio.Queue()
@@ -142,7 +162,7 @@ class WaitableCallback:
 
     def __enter__(self) -> WaitableCallback:
         """Enter context manager."""
-        self._messenger.add_listener(self)
+        self._messenger.add_listener(self, self._filter)
         return self
 
     def __exit__(

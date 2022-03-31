@@ -5,7 +5,7 @@ import logging
 import argparse
 from enum import Enum
 from logging.config import dictConfig
-from typing import Type, Sequence, Callable, cast
+from typing import Type, Sequence, Callable, TypeVar
 
 from opentrons_hardware.firmware_bindings.constants import (
     MessageId,
@@ -75,28 +75,57 @@ def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
     return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]  # type: ignore[var-annotated]  # noqa: E501
 
 
-def prompt_enum(
-    enum_type: Type[Enum], get_user_input: GetInputFunc, output_func: OutputFunc
-) -> Type[Enum]:
+PromptedEnum = TypeVar("PromptedEnum", bound=Enum, covariant=True)
+
+
+def prompt_enum(  # noqa: C901
+    enum_type: Type[PromptedEnum],
+    get_user_input: GetInputFunc,
+    output_func: OutputFunc,
+    brief_prompt: bool = False,
+) -> PromptedEnum:
     """Prompt to choose a member of the enum.
 
     Args:
         output_func: Function to output text to user.
         get_user_input: Function to get user input.
         enum_type: an enum type
+        brief_prompt: use succinct prompt
 
     Returns:
         The choice.
 
     """
-    output_func(f"choose {enum_type.__name__}:")
-    for row in create_choices(enum_type):
-        output_func(f"\t{row}")
 
-    try:
-        return list(enum_type)[int(get_user_input("enter choice: "))]
-    except (ValueError, IndexError) as e:
-        raise InvalidInput(str(e))
+    def write_choices() -> None:
+        output_func(f"choose {enum_type.__name__}:")
+        for row in create_choices(enum_type):
+            output_func(f"\t{row}")
+
+    def parse_input(userstr: str) -> PromptedEnum:
+        try:
+            return list(enum_type)[int(userstr)]
+        except (ValueError, IndexError) as e:
+            raise InvalidInput(str(e))
+
+    if not brief_prompt:
+        write_choices()
+    while True:
+        user = (
+            get_user_input(f"choose {enum_type.__name__} (? for list): ")
+            .lower()
+            .strip()
+        )
+        if not user:
+            continue
+        if "?" in user:
+            write_choices()
+            continue
+        try:
+            return parse_input(user)
+        except InvalidInput as e:
+            log.exception("Invalid Input")
+            output_func(in_red(str(e)) + "\n")
 
 
 def prompt_payload(
@@ -127,20 +156,25 @@ def prompt_payload(
     return payload_type(**i)  # type: ignore[call-arg]
 
 
-def prompt_message(get_user_input: GetInputFunc, output_func: OutputFunc) -> CanMessage:
+def prompt_message(
+    get_user_input: GetInputFunc,
+    output_func: OutputFunc,
+    brief_prompt: bool = False,
+) -> CanMessage:
     """Prompt user to create a message.
 
     Args:
         get_user_input: Function to get user input.
         output_func: Function to output text to user.
+        brief_prompt: True to only write prompts if the user enters ?
 
     Returns: a CanMessage
     """
-    message_id = prompt_enum(MessageId, get_user_input, output_func)
-    node_id = prompt_enum(NodeId, get_user_input, output_func)
+    message_id = prompt_enum(MessageId, get_user_input, output_func, brief_prompt)
+    node_id = prompt_enum(NodeId, get_user_input, output_func, brief_prompt)
     # TODO (amit, 2021-10-01): Get function code when the time comes.
     function_code = FunctionCode.network_management
-    message_def = get_definition(cast(MessageId, message_id))
+    message_def = get_definition(message_id)
     if message_def is None:
         raise InvalidInput(f"No message definition found for {message_id}")
     payload = prompt_payload(message_def.payload_type, get_user_input)
@@ -179,7 +213,8 @@ async def ui_task(can_driver: AbstractCanDriver) -> None:
             )
             await can_driver.send(can_message)
         except InvalidInput as e:
-            print(str(e))
+            log.exception("Invalid Input")
+            print(in_red(str(e)))
 
 
 async def run(args: argparse.Namespace) -> None:
@@ -198,6 +233,11 @@ async def run(args: argparse.Namespace) -> None:
         pass
     finally:
         driver.shutdown()
+
+
+def in_red(s: str) -> str:
+    """Return string formatted in red."""
+    return f"\033[1;31;40m{str(s)}\033[0m"
 
 
 LOG_CONFIG = {

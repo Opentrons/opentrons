@@ -158,11 +158,12 @@ class OT3Axis(enum.Enum):
 
     @classmethod
     def pipette_axes(cls) -> Tuple["OT3Axis", "OT3Axis"]:
-        """The axes which are used for moving pipettes up and down."""
-        return cls.Z_L, cls.Z_R
+        """The axes which are used for moving plunger motors."""
+        return cls.P_L, cls.P_R
 
     @classmethod
     def mount_axes(cls) -> Tuple["OT3Axis", "OT3Axis"]:
+        """The axes which are used for moving pipettes up and down."""
         return cls.Z_L, cls.Z_R
 
     @classmethod
@@ -185,19 +186,20 @@ class OT3Axis(enum.Enum):
         pm = {OT3Mount.LEFT: cls.P_L, OT3Mount.RIGHT: cls.P_R, OT3Mount.GRIPPER: cls.G}
         return pm[checked_mount]
 
-    def to_kind(self) -> OT3AxisKind:
-        kind_map: Dict[int, OT3AxisKind] = {
-            self.P_L: OT3AxisKind.P,
-            self.P_R: OT3AxisKind.P,
-            self.X: OT3AxisKind.X,
-            self.Y: OT3AxisKind.Y,
-            self.Z_L: OT3AxisKind.Z,
-            self.Z_R: OT3AxisKind.Z,
-            self.Z_G: OT3AxisKind.Z,
-            self.Q: OT3AxisKind.OTHER,
-            self.G: OT3AxisKind.OTHER,
+    @classmethod
+    def to_kind(cls, axis: "OT3Axis") -> OT3AxisKind:
+        kind_map: Dict[OT3Axis, OT3AxisKind] = {
+            cls.P_L: OT3AxisKind.P,
+            cls.P_R: OT3AxisKind.P,
+            cls.X: OT3AxisKind.X,
+            cls.Y: OT3AxisKind.Y,
+            cls.Z_L: OT3AxisKind.Z,
+            cls.Z_R: OT3AxisKind.Z,
+            cls.Z_G: OT3AxisKind.Z,
+            cls.Q: OT3AxisKind.OTHER,
+            cls.G: OT3AxisKind.OTHER,
         }
-        return kind_map[self.value]
+        return kind_map[axis]
 
     @classmethod
     def of_kind(cls, kind: OT3AxisKind) -> List["OT3Axis"]:

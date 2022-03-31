@@ -40,8 +40,7 @@ electron := electron . \
 	--log.level.console="debug" \
 	--disable_ui.webPreferences.webSecurity \
 	--ui.url.protocol="http:" \
-	--ui.url.path="localhost:$(PORT)" \
-	--discovery.candidates=localhost
+	--ui.url.path="localhost:$(PORT)"
 
 # standard targets
 #####################################################################

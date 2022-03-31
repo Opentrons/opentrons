@@ -92,3 +92,11 @@ opentrons_update_fw [-h] --interface INTERFACE [--bitrate BITRATE]
 ```
 
 The FILE argument is a `.hex` file built by our ot3-firmware repo.
+
+### opentrons_can_control
+
+A fusion of opentrons_can_mon's colorized prettyprint output monitoring and opentronscan_comm's command generation capability.
+
+#### Usage
+
+The usage is the same as `opentrons_can_comm`.

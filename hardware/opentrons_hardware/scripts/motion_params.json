@@ -31,7 +31,7 @@
       "max_direction_change_speed_discont": 30
     }
   },
-  "origin": [0, 0, 0, 0, 0, 0],
+  "origin": [200, 200, 200, 0, 0, 0],
   "target_list": [
     {
       "coordinates": [100, 0, 0, 0, 0, 0],

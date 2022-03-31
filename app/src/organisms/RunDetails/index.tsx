@@ -34,13 +34,17 @@ import { CommandList } from './CommandList'
 import { ConfirmCancelModal } from './ConfirmCancelModal'
 
 import styles from '../ProtocolUpload/styles.css'
-import { useIsProtocolRunLoaded } from '../ProtocolUpload/hooks'
+import {
+  useCurrentRunId,
+  useIsProtocolRunLoaded,
+} from '../ProtocolUpload/hooks'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
 import type { State } from '../../redux/types'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
   const robotName = useSelector<State>(getConnectedRobotName)
+  const runId = useCurrentRunId()
   const { displayName } = useProtocolDetails()
   const history = useHistory()
   const runStatus = useCurrentRunStatus({
@@ -152,6 +156,7 @@ export function RunDetails(): JSX.Element | null {
         {showConfirmCancelModal ? (
           <ConfirmCancelModal
             onClose={() => setShowConfirmCancelModal(false)}
+            runId={runId}
           />
         ) : null}
         <CommandList />

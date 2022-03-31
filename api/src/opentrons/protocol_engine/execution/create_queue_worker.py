@@ -49,6 +49,7 @@ def create_queue_worker(
     )
 
     command_executor = CommandExecutor(
+        hardware_api=hardware_api,
         state_store=state_store,
         action_dispatcher=action_dispatcher,
         equipment=equipment_handler,

@@ -13,5 +13,5 @@ class ModuleDataProvider:
     def get_definition(model: ModuleModel) -> ModuleDefinition:
         """Get the module definition."""
         model_name = cast(ModuleModelStr, model.value)
-        data = load_definition(model_or_loadname=model_name, version="2")
+        data = load_definition(model_or_loadname=model_name, version="3")
         return ModuleDefinition.parse_obj(data)

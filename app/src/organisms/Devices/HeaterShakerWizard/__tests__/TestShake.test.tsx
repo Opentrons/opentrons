@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../../i18n'
 import { TestShake } from '../TestShake'
 import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
-import { fireEvent } from '@testing-library/react'
+import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 
 jest.mock('../HeaterShakerModuleCard')
 
@@ -22,6 +23,7 @@ describe('TestShake', () => {
   beforeEach(() => {
     props = {
       setCurrentPage: jest.fn(),
+      module: mockHeaterShaker,
     }
     mockHeaterShakerModuleCard.mockReturnValue(
       <div>Mock Heater Shaker Module Card</div>

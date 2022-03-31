@@ -1,7 +1,7 @@
 import { getLabwareLocation } from './getLabwareLocation'
 import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
 import type { LabwareOffsetLocation } from '@opentrons/api-client'
-import { ProtocolFile } from '@opentrons/shared-data'
+import { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 // this logic to derive the LabwareOffsetLocation from the LabwareLocation
 // is required because the backend needs to know a module's model (not its ID)
@@ -9,8 +9,8 @@ import { ProtocolFile } from '@opentrons/shared-data'
 // accept a module id as a labware's location (to match the LabwareLocation interface)
 export const getLabwareOffsetLocation = (
   labwareId: string,
-  commands: ProtocolFile<{}>['commands'],
-  modules: ProtocolFile<{}>['modules']
+  commands: ProtocolAnalysisFile['commands'],
+  modules: ProtocolAnalysisFile['modules']
 ): LabwareOffsetLocation => {
   let location: LabwareOffsetLocation
   const labwareLocation = getLabwareLocation(labwareId, commands)

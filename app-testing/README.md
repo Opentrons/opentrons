@@ -7,7 +7,6 @@ Slices of the tests will be selected as candidates for automation and then perfo
 ## Notes
 
 - This folder is not plugged into the global Make ecosystem of the Opentrons mono repository. This is intentional, the tools in this folder are independent and will likely be used by only a few and are in no way a dependency of any other part of this repository.
-- Tests may be run against the linux github runner. Linux is by far the fastest and can use docker-compose to run the robot emulator.
 
 ## Steps
 
@@ -15,6 +14,8 @@ Slices of the tests will be selected as candidates for automation and then perfo
 2. Install the Opentrons application on your machine.
    1. https://opentrons.com/ot-app/
    2. This could also be done by building the installer on a branch and installing the App.
+      1. for Mac
+         1. `make -C app-shell dist-osx`
 3. Install Chromedriver
    1. in the app-testing directory
       1. `sudo ./ci-tools/mac_get_chromedriver.sh 13.1.8` per the version of electron in the root package.json for electron
@@ -50,17 +51,40 @@ Slices of the tests will be selected as candidates for automation and then perfo
 - Define steps for a VM locally for windows runs?
 - Better injection of dependencies to relieve import bloat?
 - Test case objects describing setup, "test data", test case meta data for tracking?
-- Test execution tracking, analysis, links to Zephyr?
+- Test execution history into DataDog
 
 ## commands
 
 use xdist
 `pipenv run pytest -n3`
 
-run black, mypy, and flake8
-`make check`
+run black
+`make format`
+`make black`
+
+run lint
+`make lint`
 
 ## Tools
 
-python 3.7 - it is a good idea to manage python with [pyenv](https://realpython.com/intro-to-pyenv)
+python 3.10.2 - manage python with [pyenv](https://realpython.com/intro-to-pyenv)
 [pipenv](https://pipenv.pypa.io/en/latest/)
+
+## Locator Tool
+
+Using the python REPL we can launch the app and in real time compose element locator strategies.
+Then we can execute them, proving they work.
+This alleviates having to run tests over and over to validate element locator strategies.
+
+From the app-testing directory
+
+```bash
+pipenv run python -i locators.py
+```
+
+- `clean_exit()` should be used to exit the REPL.
+- when you add a new Page Object (PO) you must add it to the imports, list of POs, and reload method so that you can change it and then call `reload()` to use the changes without exiting and restarting the REPL.
+- `reload()` will allow the app to stay open but changes in your PO to be reflected.
+
+> sometimes chromedriver does not cleanly exit.
+> `pkill -x chromedriver`

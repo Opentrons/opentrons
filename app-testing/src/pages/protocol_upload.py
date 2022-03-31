@@ -78,7 +78,7 @@ class ProtocolUpload:
 
     @highlight
     def get_enable_developer_tool_toggle(self) -> WebElement:
-        """Locating the toggle button."""
+        """Locating the dev tool toggle button."""
         toggle: WebElement = WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(ProtocolUpload.enable_developer_tool_toggle)
         )
@@ -91,6 +91,7 @@ class ProtocolUpload:
 
     @highlight
     def get_enable_protocol_flow_toggle(self) -> WebElement:
+        """Locator for enable protocol flow toggle"""
         toggle: WebElement = WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(
                 ProtocolUpload.enable_pre_protocol_flow_without_rpc_toggle
@@ -105,6 +106,7 @@ class ProtocolUpload:
 
     @highlight
     def get_robot_page(self) -> WebElement:
+        """Locator to get robot page."""
         return WebDriverWait(self.driver, 100).until(
             EC.element_to_be_clickable(ProtocolUpload.click_robot)
         )
@@ -114,6 +116,7 @@ class ProtocolUpload:
 
     @highlight
     def get_protocol_upload_button(self) -> WebElement:
+        """Locator for file upload button."""
         return WebDriverWait(self.driver, 100).until(
             EC.element_to_be_clickable(ProtocolUpload.file_upload_button_locator)
         )
@@ -123,6 +126,7 @@ class ProtocolUpload:
 
     @highlight
     def get_protocol_button(self) -> WebElement:
+        """Locator for protocol button."""
         return WebDriverWait(self.driver, 100).until(
             EC.element_to_be_clickable(ProtocolUpload.protocol)
         )

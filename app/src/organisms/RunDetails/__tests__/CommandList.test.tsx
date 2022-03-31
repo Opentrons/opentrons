@@ -18,7 +18,7 @@ import { CommandList } from '../CommandList'
 import fixtureAnalysis from '../__fixtures__/analysis.json'
 import runRecord from '../__fixtures__/runRecord.json'
 import { CommandItemComponent as CommandItem } from '../CommandItem'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 jest.mock('../hooks')
 jest.mock('../ProtocolSetupInfo')
@@ -49,7 +49,7 @@ const mockCommandItem = CommandItem as jest.MockedFunction<typeof CommandItem>
 
 const mockAlertItem = AlertItem as jest.MockedFunction<typeof AlertItem>
 
-const _fixtureAnalysis = (fixtureAnalysis as unknown) as ProtocolFile<{}>
+const _fixtureAnalysis = (fixtureAnalysis as unknown) as ProtocolAnalysisFile
 
 const render = () => {
   return renderWithProviders(<CommandList />, {

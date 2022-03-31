@@ -164,6 +164,7 @@ const normalizeModuleResponse = (
 ): AttachedModule => {
   return {
     ...normalizeModuleInfo(response),
+    id: response.id,
     revision: response.revision ? response.revision : response.model,
     port: response.port,
     serial: response.serial,

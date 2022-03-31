@@ -20,6 +20,10 @@ import type { DiscoveryState, DiscoveryAction } from './discovery/types'
 import type { NetworkingState, NetworkingAction } from './networking/types'
 import type { ProtocolState, ProtocolAction } from './protocol/types'
 import type {
+  ProtocolStorageState,
+  ProtocolStorageAction,
+} from './protocol-storage/types'
+import type {
   CustomLabwareState,
   CustomLabwareAction,
 } from './custom-labware/types'
@@ -58,6 +62,7 @@ export interface State {
   readonly alerts: AlertsState
   readonly sessions: SessionState
   readonly calibration: CalibrationState
+  readonly protocolStorage: ProtocolStorageState
   readonly router: RouterState
 }
 
@@ -75,6 +80,7 @@ export type Action =
   | RouterAction
   | DiscoveryAction
   | ProtocolAction
+  | ProtocolStorageAction
   | CustomLabwareAction
   | NetworkingAction
   | SystemInfoAction

@@ -116,10 +116,10 @@ export const StepCreationButton = (): JSX.Element => {
         'moveLiquid',
         'mix',
         'pause',
+        'heaterShaker',
         'magnet',
         'temperature',
         'thermocycler',
-        'heaterShaker',
       ]
     } else {
       return [

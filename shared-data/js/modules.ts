@@ -44,8 +44,7 @@ export const getModuleDef2 = (moduleModel: ModuleModel): ModuleDefinition => {
       return thermocyclerModuleV1 as ModuleDefinition
 
     case HEATERSHAKER_MODULE_V1:
-      // @ts-expect-error: remove this once 2D render key is added to heatershaker module definition
-      return heaterShakerModuleV1 as ModuleDefinition
+      return (heaterShakerModuleV1 as unknown) as ModuleDefinition
 
     default:
       throw new Error(`Invalid module model ${moduleModel as string}`)

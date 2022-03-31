@@ -24,6 +24,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     WriteToSensorRequestPayload,
     BaselineSensorRequestPayload,
 )
+from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
 
 from opentrons_hardware.sensors.utils import (
     ReadSensorInformation,
@@ -35,6 +36,7 @@ from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
     UInt16Field,
     UInt32Field,
+    Int32Field,
 )
 
 
@@ -54,9 +56,8 @@ class SensorScheduler:
                 node_id=sensor.node_id,
                 message=BaselineSensorRequest(
                     payload=BaselineSensorRequestPayload(
-                        sensor=UInt8Field(sensor.sensor_type),
+                        sensor=SensorTypeField(sensor.sensor_type),
                         sample_rate=UInt16Field(sensor.poll_for),
-                        offset_update=UInt8Field(sensor.offset),
                     )
                 ),
             )
@@ -77,8 +78,10 @@ class SensorScheduler:
             node_id=sensor.node_id,
             message=WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
-                    sensor=UInt8Field(sensor.sensor_type),
+                    sensor=SensorTypeField(sensor.sensor_type),
                     data=UInt32Field(sensor.data.to_int),
+                    # TODO(lc, 03-29-2022, actually pass in a register value)
+                    reg_address=UInt8Field(0x0),
                 )
             ),
         )
@@ -93,8 +96,8 @@ class SensorScheduler:
                 node_id=sensor.node_id,
                 message=ReadFromSensorRequest(
                     payload=ReadFromSensorRequestPayload(
-                        sensor=UInt8Field(sensor.sensor_type),
-                        offset_reading=UInt8Field(sensor.offset),
+                        sensor=SensorTypeField(sensor.sensor_type),
+                        offset_reading=UInt8Field(int(sensor.offset)),
                     )
                 ),
             )
@@ -117,8 +120,8 @@ class SensorScheduler:
                 node_id=sensor.node_id,
                 message=SetSensorThresholdRequest(
                     payload=SetSensorThresholdRequestPayload(
-                        sensor=UInt8Field(sensor.sensor_type),
-                        threshold=UInt32Field(sensor.data.to_int),
+                        sensor=SensorTypeField(sensor.sensor_type),
+                        threshold=Int32Field(sensor.data.to_int),
                     )
                 ),
             )

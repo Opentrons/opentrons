@@ -1,93 +1,83 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Flex, POSITION_RELATIVE } from '@opentrons/components'
+import {
+  Flex,
+  POSITION_RELATIVE,
+  Tooltip,
+  useHoverTooltip,
+} from '@opentrons/components'
 import { MenuList } from '../../../atoms/MenuList'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
+import { MenuItemsByModuleType, useModuleOverflowMenu } from './hooks'
 
 import type { AttachedModule } from '../../../redux/modules/types'
+import type { ModuleType } from '@opentrons/shared-data'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
-  handleClick: (isSecondary: boolean) => void
+  handleSlideoutClick: () => void
   handleAboutClick: () => void
+  handleTestShakeClick: () => void
+  handleWizardClick: () => void
 }
 
 export const ModuleOverflowMenu = (
   props: ModuleOverflowMenuProps
 ): JSX.Element | null => {
-  const { t } = useTranslation('device_details')
-  const { module, handleClick, handleAboutClick } = props
-
-  const menuItems = {
-    thermocyclerModuleType: [
-      {
-        setSetting: t('overflow_menu_lid_temp'),
-        turnOffSetting: t('overflow_menu_deactivate_block'),
-        isSecondary: true,
-      },
-      {
-        setSetting: t('overflow_menu_set_block_temp'),
-        turnOffSetting: t('overflow_menu_deactivate_block'),
-        isSecondary: false,
-      },
-    ],
-    temperatureModuleType: [
-      {
-        setSetting: t('overflow_menu_mod_temp'),
-        turnOffSetting: t('overflow_menu_deactivate_temp'),
-        isSecondary: false,
-      },
-    ],
-    magneticModuleType: [
-      {
-        setSetting: t('overflow_menu_engage'),
-        turnOffSetting: t('overflow_menu_deactivate_temp'),
-        isSecondary: false,
-      },
-    ],
-    // TODO(sh, 2022-02-28): add heater shaker menu items
-    heaterShakerModuleType: [
-      {
-        setSetting: 'Start',
-        turnOffSetting: 'Deactivate',
-        isSecondary: true,
-      },
-    ],
-  }
-
-  const AboutModuleBtn = (
-    <MenuItem
-      minWidth="10rem"
-      key={`about_module_${module.model}`}
-      data-testid={`about_module_${module.model}`}
-      onClick={() => handleAboutClick()}
-    >
-      {t('overflow_menu_about')}
-    </MenuItem>
+  const { t } = useTranslation(['device_details', 'heater_shaker'])
+  const {
+    module,
+    handleSlideoutClick,
+    handleAboutClick,
+    handleTestShakeClick,
+    handleWizardClick,
+  } = props
+  const [targetProps, tooltipProps] = useHoverTooltip()
+  const { menuOverflowItemsByModuleType } = useModuleOverflowMenu(
+    module,
+    handleAboutClick,
+    handleTestShakeClick,
+    handleWizardClick,
+    handleSlideoutClick
   )
 
   return (
-    <React.Fragment>
+    <>
       <Flex position={POSITION_RELATIVE}>
         <MenuList
           buttons={[
-            menuItems[module.type].map((item, index) => {
-              return (
-                <MenuItem
-                  minWidth="10rem"
-                  key={index}
-                  onClick={() => handleClick(item.isSecondary)}
-                  data-testid={`module_setting_${module.model}`}
-                >
-                  {/* TODO(sh, 2022-02-11): conditionally render deactivate setting based on module status and pass the required commands. */}
-                  {item.setSetting}
-                </MenuItem>
-              )
-            }),
-            AboutModuleBtn,
+            (menuOverflowItemsByModuleType[
+              module.type
+            ] as MenuItemsByModuleType[ModuleType]).map(
+              (item: any, index: number) => {
+                return (
+                  <>
+                    <MenuItem
+                      minWidth="10rem"
+                      key={`${index}_${module.model}`}
+                      onClick={() => item.onClick}
+                      data-testid={`module_setting_${module.model}`}
+                      disabled={item.disabledReason}
+                      {...targetProps}
+                    >
+                      {item.setSetting}
+                    </MenuItem>
+                    {item.disabledReason && (
+                      <Tooltip
+                        {...tooltipProps}
+                        key={`tooltip_${index}_${module.model}`}
+                      >
+                        {t('cannot_shake', { ns: 'heater_shaker' })}
+                      </Tooltip>
+                    )}
+                    {item.menuButtons}
+                  </>
+                )
+              }
+            ),
           ]}
         />
       </Flex>
-    </React.Fragment>
+    </>
   )
 }

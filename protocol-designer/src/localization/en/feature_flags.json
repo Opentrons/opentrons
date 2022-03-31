@@ -15,5 +15,9 @@
   "OT_PD_ENABLE_HEATER_SHAKER": {
     "title": "Enable heater shaker module",
     "description": "Allow adding heater shaker module and steps to protocols"
+  },
+  "OT_PD_ENABLE_SCHEMA_V6": {
+    "title": "Enable schema v6 support",
+    "description": "Allow users to migrate older protocols to schema v6"
   }
 }

@@ -2,6 +2,7 @@
 import pytest
 from decoy import Decoy
 
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
     MovementHandler,
@@ -9,6 +10,19 @@ from opentrons.protocol_engine.execution import (
     RunControlHandler,
     RailLightsHandler,
 )
+from opentrons.protocol_engine.state import StateView
+
+
+@pytest.fixture
+def state_view(decoy: Decoy) -> StateView:
+    """Get a mocked out StateView."""
+    return decoy.mock(cls=StateView)
+
+
+@pytest.fixture
+def hardware_api(decoy: Decoy) -> HardwareControlAPI:
+    """Get a mocked out HardwareControlAPI."""
+    return decoy.mock(cls=HardwareControlAPI)
 
 
 @pytest.fixture

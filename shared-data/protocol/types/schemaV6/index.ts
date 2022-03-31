@@ -1,11 +1,11 @@
 import { PipetteName } from '../../../js'
-import type { RunTimeCommand } from './command'
+import type { CreateCommand, RunTimeCommand } from './command'
 import type { LabwareDefinition2, ModuleModel } from '../../../js/types'
 
 export * from './command'
 
 // NOTE: must be kept in sync with '../schemas/6.json'
-export interface ProtocolFile<DesignerApplicationData> {
+export interface ProtocolFile<DesignerApplicationData = {}> {
   $otSharedSchema: '#/protocol/schemas/6'
   schemaVersion: 6
   metadata: {
@@ -50,10 +50,22 @@ export interface ProtocolFile<DesignerApplicationData> {
       description: string
     }
   }
-  commands: RunTimeCommand[]
+  commands: CreateCommand[]
   commandAnnotations?: {
     commandIds: string[]
     annotationType: string
     params?: { [key: string]: any }
   }
+}
+
+/**
+ * This type should not be used, any time you want a function/hook/component to take in
+ * a protocol file with run time commands, split your function signature to take in each param
+ * separately, and import the RunTimeCommand type separately. RunTimeCommand is a server concept
+ * and should not be mixed with our Protocol types
+ * @deprecated Use {@link ProtocolFile}
+ */
+export interface ProtocolAnalysisFile<DesignerApplicationData = {}>
+  extends Omit<ProtocolFile<DesignerApplicationData>, 'commands'> {
+  commands: RunTimeCommand[]
 }

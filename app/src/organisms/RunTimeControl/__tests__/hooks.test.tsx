@@ -1,17 +1,6 @@
 import { when, resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
 import { act, renderHook } from '@testing-library/react-hooks'
-import {
-  RUN_ACTION_TYPE_PLAY,
-  RUN_ACTION_TYPE_PAUSE,
-  RUN_ACTION_TYPE_STOP,
-  RUN_STATUS_IDLE,
-  RUN_STATUS_PAUSED,
-  RUN_STATUS_RUNNING,
-  RUN_STATUS_SUCCEEDED,
-  RUN_STATUS_FAILED,
-  RUN_STATUS_STOPPED,
-} from '@opentrons/api-client'
 import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
 
 import {
@@ -35,7 +24,20 @@ import {
   useCurrentRunErrors,
 } from '../hooks'
 
-import type { Run, RunData, CommandDetail } from '@opentrons/api-client'
+import {
+  RUN_ID_1,
+  RUN_ID_2,
+  mockPausedRun,
+  mockRunningRun,
+  mockFailedRun,
+  mockStoppedRun,
+  mockSucceededRun,
+  mockIdleUnstartedRun,
+  mockIdleStartedRun,
+  mockCommand,
+} from '../__fixtures__'
+
+import type { Run } from '@opentrons/api-client'
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../ProtocolUpload/hooks')
 
@@ -53,205 +55,6 @@ const mockUseRunActionMutations = useRunActionMutations as jest.MockedFunction<
   typeof useRunActionMutations
 >
 const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
-
-const PROTOCOL_ID = '1'
-const RUN_ID_1 = '1'
-const RUN_ID_2 = '2'
-const COMMAND_ID = '4'
-
-const mockPausedRun: RunData = {
-  id: RUN_ID_1,
-  createdAt: '2021-10-07T18:44:49.366581+00:00',
-  current: true,
-  status: RUN_STATUS_PAUSED,
-  protocolId: PROTOCOL_ID,
-  actions: [
-    {
-      id: '1',
-      createdAt: '2021-10-25T12:54:53.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PLAY,
-    },
-    {
-      id: '2',
-      createdAt: '2021-10-25T13:23:31.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PAUSE,
-    },
-  ],
-  errors: [],
-  pipettes: [],
-  labware: [],
-}
-
-const mockRunningRun: RunData = {
-  id: RUN_ID_2,
-  createdAt: '2021-10-07T18:44:49.366581+00:00',
-  current: true,
-  status: RUN_STATUS_RUNNING,
-  protocolId: PROTOCOL_ID,
-  actions: [
-    {
-      id: '1',
-      createdAt: '2021-10-25T12:54:53.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PLAY,
-    },
-    {
-      id: '2',
-      createdAt: '2021-10-25T13:23:31.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PAUSE,
-    },
-    {
-      id: '3',
-      createdAt: '2021-10-25T13:26:42.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PLAY,
-    },
-  ],
-  errors: [],
-  pipettes: [],
-  labware: [],
-}
-
-const mockFailedRun: RunData = {
-  id: RUN_ID_2,
-  createdAt: '2021-10-07T18:44:49.366581+00:00',
-  current: true,
-  status: RUN_STATUS_FAILED,
-  protocolId: PROTOCOL_ID,
-  actions: [
-    {
-      id: '1',
-      createdAt: '2021-10-25T12:54:53.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PLAY,
-    },
-    {
-      id: '2',
-      createdAt: '2021-10-25T13:23:31.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PAUSE,
-    },
-    {
-      id: '3',
-      createdAt: '2021-10-25T13:26:42.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PLAY,
-    },
-  ],
-  errors: [
-    {
-      id: '5',
-      errorType: 'RuntimeError',
-      createdAt: 'noon forty-five',
-      detail: 'this run failed',
-    },
-  ],
-  pipettes: [],
-  labware: [],
-}
-
-const mockStoppedRun: RunData = {
-  id: RUN_ID_2,
-  createdAt: '2021-10-07T18:44:49.366581+00:00',
-  current: true,
-  status: RUN_STATUS_STOPPED,
-  protocolId: PROTOCOL_ID,
-  actions: [
-    {
-      id: '1',
-      createdAt: '2021-10-25T12:54:53.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PLAY,
-    },
-    {
-      id: '2',
-      createdAt: '2021-10-25T13:23:31.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PAUSE,
-    },
-    {
-      id: '3',
-      createdAt: '2021-10-25T13:26:42.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PLAY,
-    },
-    {
-      id: '4',
-      createdAt: '2021-10-25T13:58:22.366581+00:00',
-      actionType: RUN_ACTION_TYPE_STOP,
-    },
-  ],
-  errors: [],
-  pipettes: [],
-  labware: [],
-}
-
-const mockSucceededRun: RunData = {
-  id: RUN_ID_2,
-  createdAt: '2021-10-07T18:44:49.366581+00:00',
-  current: true,
-  status: RUN_STATUS_SUCCEEDED,
-  protocolId: PROTOCOL_ID,
-  actions: [
-    {
-      id: '1',
-      createdAt: '2021-10-25T12:54:53.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PLAY,
-    },
-    {
-      id: '2',
-      createdAt: '2021-10-25T13:23:31.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PAUSE,
-    },
-    {
-      id: '3',
-      createdAt: '2021-10-25T13:26:42.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PLAY,
-    },
-  ],
-  errors: [],
-  pipettes: [],
-  labware: [],
-}
-
-const mockIdleUnstartedRun: RunData = {
-  id: RUN_ID_2,
-  createdAt: '2021-10-07T18:44:49.366581+00:00',
-  current: true,
-  status: RUN_STATUS_IDLE,
-  protocolId: PROTOCOL_ID,
-  actions: [],
-  errors: [],
-  pipettes: [],
-  labware: [],
-}
-
-const mockIdleStartedRun: RunData = {
-  id: RUN_ID_2,
-  createdAt: '2021-10-07T18:44:49.366581+00:00',
-  current: true,
-  status: RUN_STATUS_IDLE,
-  protocolId: PROTOCOL_ID,
-  actions: [
-    {
-      id: '1',
-      createdAt: '2021-10-25T12:54:53.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PLAY,
-    },
-    {
-      id: '2',
-      createdAt: '2021-10-25T13:23:31.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PAUSE,
-    },
-    {
-      id: '3',
-      createdAt: '2021-10-25T13:26:42.366581+00:00',
-      actionType: RUN_ACTION_TYPE_PLAY,
-    },
-  ],
-  errors: [],
-  pipettes: [],
-  labware: [],
-}
-
-const mockCommand = {
-  data: {
-    id: COMMAND_ID,
-    completedAt: 'noon thirty',
-  },
-} as CommandDetail
 
 describe('useRunControls hook', () => {
   afterEach(() => {

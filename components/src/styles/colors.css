@@ -1,7 +1,7 @@
 :root {
   /* ot brand */
   --c-mustard: #ffd252;
-  --c-blue: #006fff;
+  --c-blue: #006cfa;
   --c-light-blue: color-mod(var(--c-blue) lightness(85%));
 
   /*

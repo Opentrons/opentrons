@@ -215,7 +215,9 @@ class StateStore(StateView, ActionHandler):
         self._commands = CommandView(state.commands)
         self._labware = LabwareView(state.labware)
         self._pipettes = PipetteView(state.pipettes)
-        self._modules = ModuleView(state.modules)
+        self._modules = ModuleView(
+            state.modules, virtualize_modules=self._configs.use_virtual_modules
+        )
 
         # Derived states
         self._geometry = GeometryView(

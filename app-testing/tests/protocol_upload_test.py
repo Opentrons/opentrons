@@ -20,6 +20,7 @@ from src.pages.labware_setup import LabwareSetup
 from src.menus.robots_list import RobotsList
 from src.pages.moam_pur import MoamPur
 from src.pages.gen1_pipette_pur import Gen1PipettePur
+from src.pages.labware_position_check import LabwarePositionCheck
 from src.menus.protocol_file import ProtocolFile
 from src.driver.drag_drop import drag_and_drop_file
 
@@ -51,12 +52,7 @@ def test_protocol_upload(
         if not robots_list.is_robot_toggle_active(RobotsList.DEV):
             robots_list.get_robot_toggle(RobotsList.DEV).click()
         left_menu = LeftMenu(driver)
-        left_menu.click_more_button()
         protocol_upload = ProtocolUpload(driver)
-        protocol_upload.click_app_left_panel()
-        protocol_upload.click_enable_developer_toggle()
-        protocol_upload.click_enable_pur_feature()
-        protocol_upload.goto_robots_page()
         # Instantiate the page object for the RobotsList.
         robots_list = RobotsList(driver)
         # toggle the DEV robot
@@ -74,11 +70,12 @@ def test_protocol_upload(
         driver.save_screenshot(
             f"results/{request.node.originalname}.before_start_calibration.png"
         )
-        robot_page.start_calibration()
-        calibrate.calibrate_deck()
-        assert robot_page.wait_for_deck_to_show_calibrated()
-        left_menu = LeftMenu(driver)
+        if not robot_page.is_calibrated():
+            robot_page.start_calibration()
+            calibrate.calibrate_deck()
+            assert robot_page.wait_for_deck_to_show_calibrated()
         left_menu.click_protocol_upload_button()
+        labware_setup = LabwareSetup(driver)
         protocol_file = ProtocolFile(driver)
         logger.info(
             f"uploading protocol: {test_protocols['protocoluploadjson'].resolve()}"
@@ -114,11 +111,10 @@ def test_protocol_upload(
         module_setup.click_proceed_to_module_setup()
         assert module_setup.get_module_setup_text_locator().text == "Module Setup"
         assert module_setup.get_thermocycler_module().text == "Thermocycler Module"
-        assert module_setup.get_magetic_module().text == "Magnetic Module GEN2"
-        assert module_setup.get_temperature_module().text == "Temperature Module GEN2"
+        assert module_setup.get_magetic_module().text == "Magnetic Module GEN1"
+        assert module_setup.get_temperature_module().text == "Temperature Module GEN1"
         assert module_setup.get_proceed_to_labware_setup().is_displayed()
         module_setup.click_proceed_to_labware_setup()
-        labware_setup = LabwareSetup(driver)
         assert labware_setup.get_labware_setup_text().is_displayed()
         assert labware_setup.get_magnetic_module_link().is_displayed()
         assert labware_setup.get_thermocycler_link().is_displayed()
@@ -128,8 +124,14 @@ def test_protocol_upload(
         assert labware_setup.get_thermocycler_link().is_displayed()
         labware_setup.click_thermocycler_module_link()
         assert labware_setup.get_thermocycler_module_modal_text().is_displayed()
+        labware_setup = LabwareSetup(driver)
         labware_setup.click_close_button()
         labware_setup.click_proceed_to_run_button()
+        labware_setup.click_start_run_button()
+        assert labware_setup.get_protocol_complete_banner().is_displayed()
+        assert labware_setup.get_run_again_button().is_displayed
+        labware_setup.click_protocol_close_button()
+        labware_setup.click_confirmation_close_button()
 
 
 def test_moam_pur(
@@ -155,18 +157,11 @@ def test_moam_pur(
         if not robots_list.is_robot_toggle_active(RobotsList.DEV):
             robots_list.get_robot_toggle(RobotsList.DEV).click()
         left_menu = LeftMenu(driver)
-        left_menu.click_more_button()
-        protocol_upload = ProtocolUpload(driver)
-        protocol_upload.click_app_left_panel()
-        protocol_upload.click_enable_developer_toggle()
-        protocol_upload.click_enable_pur_feature()
-        protocol_upload.goto_robots_page()
         # Instantiate the page object for the RobotsList.
         robots_list = RobotsList(driver)
         # toggle the DEV robot
         if not robots_list.is_robot_toggle_active(RobotsList.DEV):
             robots_list.get_robot_toggle(RobotsList.DEV).click()
-        left_menu = LeftMenu(driver)
         left_menu.click_protocol_upload_button()
         protocol_file = ProtocolFile(driver)
         logger.info(f"uploading protocol: {test_protocols['moamjson'].resolve()}")
@@ -180,7 +175,6 @@ def test_moam_pur(
         )
         assert moam_pur.get_description_text().text == "Description\nModule - PUR"
         # Verify that the Pipette missing text is available
-        assert moam_pur.get_attach_pipette_button().is_displayed()
         module_setup = ModuleSetup(driver)
         module_setup.click_module_setup_text()
         assert moam_pur.get_moam_link().is_displayed()
@@ -190,6 +184,125 @@ def test_moam_pur(
         labware_setup.click_close_button()
         moam_pur.click_protocol_close_button()
         moam_pur.click_confirmation_close_button()
+
+
+def test_LPC_flow(
+    chrome_options: Options,
+    test_protocols: Dict[str, Path],
+    request: FixtureRequest,
+) -> None:
+    """Upload a protocol."""
+    robot = OtRobot()
+    # expecting docker emulated robot
+    assert robot.is_alive(), "is a robot available?"
+    os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"
+    os.environ["OT_APP_ANALYTICS__SEEN_OPT_IN"] = "true"
+    with webdriver.Chrome(options=chrome_options) as driver:
+        logger.debug(f"driver capabilities {driver.capabilities}")
+        ot_application = OtApplication(
+            Path(f"{driver.capabilities['chrome']['userDataDir']}/config.json")
+        )
+        # ignore updates.
+        ot_application.config["alerts"]["ignored"] = ["appUpdateAvailable"]
+        ot_application.write_config()
+        robots_list = RobotsList(driver)
+        if not robots_list.is_robot_toggle_active(RobotsList.DEV):
+            robots_list.get_robot_toggle(RobotsList.DEV).click()
+        left_menu = LeftMenu(driver)
+        # Instantiate the page object for the RobotsList.
+        robots_list = RobotsList(driver)
+        # toggle the DEV robot
+        if not robots_list.is_robot_toggle_active(RobotsList.DEV):
+            robots_list.get_robot_toggle(RobotsList.DEV).click()
+        left_menu.click_protocol_upload_button()
+        protocol_file = ProtocolFile(driver)
+        logger.info(
+            f"uploading protocol: {test_protocols['protocoluploadjson'].resolve()}"
+        )
+        input = protocol_file.get_drag_json_protocol()
+        drag_and_drop_file(input, test_protocols["protocoluploadjson"])
+        robot_calibrate = RobotCalibration(driver)
+        labware_setup = LabwareSetup(driver)
+        labware_setup.click_labware_setup_text()
+        labware_position_check = LabwarePositionCheck(driver)
+        labware_position_check.click_labware_position_button()
+        assert (
+            labware_position_check.get_introScreen_labware_position_check_overview().is_displayed()
+        )
+        labware_position_check.click_begin_labware_position_check_button()
+        assert (
+            labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
+        )
+        labware_position_check.click_how_to_tell_pipette_is_centered_link()
+        labware_setup.click_close_button()
+        labware_position_check.click_reveal_all_jog_controls()
+        labware_position_check.click_back_jog_button()
+        labware_position_check.click_down_jog_button()
+        labware_position_check.click_right_jog_button()
+        labware_position_check.click_forward_jog_button()
+        labware_position_check.click_confirm_position_moveto_slot_2()
+        assert (
+            labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
+        )
+        labware_position_check.click_reveal_all_jog_controls()
+        labware_position_check.click_back_jog_button()
+        labware_position_check.click_down_jog_button()
+        labware_position_check.click_right_jog_button()
+        labware_position_check.click_forward_jog_button()
+        labware_position_check.click_confirm_position_button_pickup_tip()
+        labware_position_check.click_confirm_position_moveto_slot_5()
+        assert (
+            labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
+        )
+        labware_position_check.click_reveal_all_jog_controls()
+        labware_position_check.click_back_jog_button()
+        labware_position_check.click_down_jog_button()
+        labware_position_check.click_right_jog_button()
+        labware_position_check.click_forward_jog_button()
+        labware_position_check.click_confirm_position_moveto_slot_6()
+        labware_position_check.click_confirm_position_returntip_slot_home()
+        assert (
+            labware_position_check.get_labware_position_check_complete().is_displayed()
+        )
+        assert (
+            labware_position_check.get_deckmap_labware_check_complete().is_displayed()
+        )
+        assert labware_position_check.get_section_list_step0().is_displayed()
+        assert labware_position_check.get_section_list_step1().is_displayed()
+        assert labware_position_check.get_section_list_step2().is_displayed()
+        assert (
+            labware_position_check.get_close_and_apply_labware_offset_data_button().is_displayed()
+        )
+        labware_position_check.click_get_close_and_apply_labware_offset_data_button()
+        assert labware_position_check.get_labware_success_toast().is_displayed()
+        assert (
+            labware_position_check.get_labware_display_name_slot_4().text
+            == "Opentrons 96 Tip Rack 300 µL"
+        )
+        assert labware_position_check.get_labware_offsetbox_slot_4().is_displayed()
+        assert labware_position_check.get_labware_slot_4_offset_x_text().is_displayed()
+        assert labware_position_check.get_labware_slot_4_offset_x_value().text == "0.1"
+        assert labware_position_check.get_labware_slot_4_offset_y_text().is_displayed()
+        assert labware_position_check.get_labware_slot_4_offset_y_value().text == "0.0"
+        assert labware_position_check.get_labware_slot_4_offset_z_text().is_displayed()
+        assert labware_position_check.get_labware_slot_4_offset_z_value().text == "-0.1"
+        assert labware_position_check.get_labware_display_name_slot_5().text == "A1"
+        assert labware_position_check.get_labware_slot_5_offset_x_text().is_displayed()
+        assert labware_position_check.get_labware_slot_5_offset_x_value().text == "0.1"
+        assert labware_position_check.get_labware_slot_5_offset_y_text().is_displayed()
+        assert labware_position_check.get_labware_slot_5_offset_y_value().text == "0.0"
+        assert labware_position_check.get_labware_slot_5_offset_z_text().is_displayed()
+        assert labware_position_check.get_labware_slot_5_offset_z_value().text == "-0.1"
+        assert (
+            labware_position_check.get_labware_display_name_slot_2().text
+            == "Opentrons 96 Tip Rack 10 µL"
+        )
+        assert labware_position_check.get_labware_slot_2_offset_x_text().is_displayed()
+        assert labware_position_check.get_labware_slot_2_offset_x_value().text == "0.1"
+        assert labware_position_check.get_labware_slot_2_offset_y_text().is_displayed()
+        assert labware_position_check.get_labware_slot_2_offset_y_value().text == "0.0"
+        assert labware_position_check.get_labware_slot_2_offset_z_text().is_displayed()
+        assert labware_position_check.get_labware_slot_2_offset_z_value().text == "-0.1"
 
 
 def test_gen1_pipette(
@@ -215,18 +328,11 @@ def test_gen1_pipette(
         if not robots_list.is_robot_toggle_active(RobotsList.DEV):
             robots_list.get_robot_toggle(RobotsList.DEV).click()
         left_menu = LeftMenu(driver)
-        left_menu.click_more_button()
-        protocol_upload = ProtocolUpload(driver)
-        protocol_upload.click_app_left_panel()
-        protocol_upload.click_enable_developer_toggle()
-        protocol_upload.click_enable_pur_feature()
-        protocol_upload.goto_robots_page()
         # Instantiate the page object for the RobotsList.
         robots_list = RobotsList(driver)
         # toggle the DEV robot
         if not robots_list.is_robot_toggle_active(RobotsList.DEV):
             robots_list.get_robot_toggle(RobotsList.DEV).click()
-        left_menu = LeftMenu(driver)
         left_menu.click_protocol_upload_button()
         protocol_file = ProtocolFile(driver)
         logger.info(f"uploading protocol: {test_protocols['gen1pipette'].resolve()}")
@@ -237,8 +343,6 @@ def test_gen1_pipette(
         gen1_pipette = Gen1PipettePur(driver)
         assert gen1_pipette.get_gen1_pipette_mismatch_text().is_displayed()
         assert gen1_pipette.get_link_pipette_compatibility().is_displayed()
-        # Assert that Calibrate Now button is displayed in Tip length calibrations
-        assert gen1_pipette.get_tip_length_calibrate_now().is_displayed()
         # Assert that no modules are available and step2 is labware setup
         assert gen1_pipette.get_step2_text_locator().is_displayed()
         gen1_pipette.click_on_step2()

@@ -40,6 +40,7 @@ import {
   useCurrentProtocol,
   useCloseCurrentRun,
   useIsProtocolRunLoaded,
+  useCurrentRunId,
 } from '../hooks'
 import { UploadInput } from '../UploadInput'
 import { ProtocolUpload, ProtocolLoader } from '..'
@@ -87,6 +88,9 @@ const mockUseCreateRun = useCreateRun as jest.MockedFunction<
 >
 const mockUseIsProtocolRunLoaded = useIsProtocolRunLoaded as jest.MockedFunction<
   typeof useIsProtocolRunLoaded
+>
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
 >
 const mockUseCloseProtocolRun = useCloseCurrentRun as jest.MockedFunction<
   typeof useCloseCurrentRun
@@ -155,6 +159,7 @@ describe('ProtocolUpload', () => {
       isClosingCurrentRun: false,
     })
     when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(true)
+    when(mockUseCurrentRunId).calledWith().mockReturnValue('mockRunId')
     when(mockUseCurrentRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
     when(mockUseCurrentRunControls)
       .calledWith()

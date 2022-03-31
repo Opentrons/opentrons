@@ -11,6 +11,7 @@ import { registerRobotLogs } from './robot-logs'
 import { registerUpdate } from './update'
 import { registerBuildrootUpdate } from './buildroot'
 import { registerSystemInfo } from './system-info'
+import { registerProtocolStorage } from './protocol-storage'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
 
 import type { BrowserWindow } from 'electron'
@@ -77,6 +78,7 @@ function startUp(): void {
     registerBuildrootUpdate(dispatch),
     registerLabware(dispatch, mainWindow),
     registerSystemInfo(dispatch),
+    registerProtocolStorage(dispatch),
   ]
 
   ipcMain.on('dispatch', (_, action) => {
