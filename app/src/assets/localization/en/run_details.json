@@ -75,5 +75,9 @@
   "status": "Status",
   "setup_incomplete": "Complete required steps in Setup tab",
   "robot_is_busy": "Robot is busy",
-  "close_run": "Close Run"
+  "close_run": "Close Run",
+  "download_run_log": "Download run log",
+  "jump_to_current_step": "Jump to current step",
+  "run_has_diverged_from_predicted": "Run has diverged from predicted state. Cannot anticipate new steps.",
+  "unable_to_determine_steps": "Unable to determine steps"
 }
