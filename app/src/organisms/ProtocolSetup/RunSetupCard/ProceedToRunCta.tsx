@@ -24,6 +24,7 @@ export const ProceedToRunCta = (): JSX.Element | null => {
     missingModuleIds.length > 0 && isEverythingCalibrated
   const moduleAndCalibrationIncomplete =
     missingModuleIds.length > 0 && !isEverythingCalibrated
+
   let proceedToRunDisabledReason = null
   if (moduleAndCalibrationIncomplete) {
     proceedToRunDisabledReason = t(
@@ -37,7 +38,6 @@ export const ProceedToRunCta = (): JSX.Element | null => {
 
   const LinkComponent = proceedToRunDisabledReason != null ? 'button' : NavLink
   const linkProps = proceedToRunDisabledReason != null ? {} : { to: '/run' }
-
   return (
     <Flex justifyContent={JUSTIFY_CENTER}>
       <NewPrimaryBtn

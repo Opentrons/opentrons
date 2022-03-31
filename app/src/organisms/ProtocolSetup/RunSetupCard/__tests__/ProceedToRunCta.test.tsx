@@ -8,7 +8,6 @@ import { useTrackEvent } from '../../../../redux/analytics'
 import { i18n } from '../../../../i18n'
 import * as hooks from '../hooks'
 import { ProceedToRunCta } from '../ProceedToRunCta'
-
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -92,7 +91,21 @@ describe('ProceedToRunCta', () => {
     expect(button).toBeDisabled()
     getByText('Make sure all modules are connected before proceeding to run')
   })
-
+  it('should be disabled with modules not connected and calibration not completed tooltip if missing cal and moduleIds', async () => {
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: ['temperatureModuleV1'],
+      remainingAttachedModules: [],
+    })
+    mockUseProtocolCalibrationStatus.mockReturnValue({
+      complete: false,
+    } as any)
+    const { getByRole, getByText } = render()
+    const button = getByRole('button', { name: 'Proceed to Run' })
+    expect(button).toBeDisabled()
+    getByText(
+      'Make sure robot calibration is complete and all modules are connected before proceeding to run'
+    )
+  })
   it('should be disabled with calibration not complete tooltip', async () => {
     mockUseModuleMatchResults.mockReturnValue({
       missingModuleIds: [],
