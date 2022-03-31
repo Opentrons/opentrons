@@ -22,6 +22,7 @@ import * as CustomLabware from '../../redux/custom-labware'
 import { clearDiscoveryCache } from '../../redux/discovery'
 import { Divider } from '../../atoms/structure'
 import { TertiaryButton, ToggleButton } from '../../atoms/Buttons'
+import { StyledText } from '../../atoms/text'
 
 import type { Dispatch, State } from '../../redux/types'
 import type { DropdownOption } from '@opentrons/components'
@@ -224,16 +225,17 @@ export function AdvancedSettings(): JSX.Element {
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
-            <StyledText as="h3" css={TYPOGRAPHY.fontWeightSemiBold}
+            <StyledText
+              as="h3"
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_showLink"
             >
               {t('show_link_labware_data')}
-            </Text>
-            <Text css={TYPOGRAPHY.pRegular}>
+            </StyledText>
+            <StyledText as="p">
               {t('show_link_labware_data_description')}
-            </Text>
+            </StyledText>
           </Box>
           <ToggleButton
             label="show_link_to_get_labware_offset_data"
