@@ -24,14 +24,14 @@ from opentrons.protocol_engine.state.modules import (
 from opentrons.protocol_engine.state.module_substates import (
     HeaterShakerModuleSubState,
     MagneticModuleSubState,
-    ModuleViewTypes,
+    ModuleSubStateType,
 )
 
 
 def make_module_view(
     slot_by_module_id: Optional[Dict[str, Optional[DeckSlotName]]] = None,
     hardware_by_module_id: Optional[Dict[str, HardwareModule]] = None,
-    substate_by_module_id: Optional[Dict[str, ModuleViewTypes]] = None,
+    substate_by_module_id: Optional[Dict[str, ModuleSubStateType]] = None,
     virtualize_modules: bool = False,
 ) -> ModuleView:
     """Get a module view test subject with the specified state."""

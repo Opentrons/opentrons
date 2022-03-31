@@ -12,14 +12,14 @@ HeaterShakerModuleId = NewType("HeaterShakerModuleId", str)
 
 
 class SpeedRange(NamedTuple):
-    """Class defining minimum and maximum allowed speeds for a shaking module."""
+    """Minimum and maximum allowed speeds for a shaking module."""
 
     min: int
     max: int
 
 
 class TemperatureRange(NamedTuple):
-    """Class defining minimum and maximum allowed temperatures for a heating module."""
+    """Minimum and maximum allowed temperatures for a heating module."""
 
     min: float
     max: float
@@ -63,7 +63,7 @@ class HeaterShakerModuleSubState:
         else:
             raise InvalidTargetTemperatureError(
                 f"Heater-Shaker got an invalid temperature {celsius} degree Celsius."
-                f"Valid range is {HEATER_SHAKER_TEMPERATURE_RANGE}."
+                f" Valid range is {HEATER_SHAKER_TEMPERATURE_RANGE}."
             )
 
     @staticmethod

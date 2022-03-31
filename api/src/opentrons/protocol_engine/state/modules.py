@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, NamedTuple, Optional, Sequence, overload, Union
+from typing import Dict, List, NamedTuple, Optional, Sequence, overload
 from numpy import array, dot
 
 from opentrons.hardware_control.modules.magdeck import (
@@ -29,6 +29,7 @@ from .module_substates import (
     HeaterShakerModuleSubState,
     MagneticModuleId,
     HeaterShakerModuleId,
+    ModuleSubStateType,
 )
 
 
@@ -71,9 +72,7 @@ class ModuleState:
 
     slot_by_module_id: Dict[str, Optional[DeckSlotName]]
     hardware_by_module_id: Dict[str, HardwareModule]
-    substate_by_module_id: Dict[
-        str, Union[HeaterShakerModuleSubState, MagneticModuleSubState]
-    ]
+    substate_by_module_id: Dict[str, ModuleSubStateType]
 
 
 class ModuleStore(HasState[ModuleState], HandlesActions):

@@ -7,12 +7,12 @@ from .heater_shaker_module_substate import (
     HeaterShakerModuleId,
 )
 
-ModuleViewTypes = Union[HeaterShakerModuleSubState, MagneticModuleSubState]
+ModuleSubStateType = Union[HeaterShakerModuleSubState, MagneticModuleSubState]
 
 __all__ = [
     "MagneticModuleSubState",
     "MagneticModuleId",
     "HeaterShakerModuleSubState",
     "HeaterShakerModuleId",
-    "ModuleViewTypes",
+    "ModuleSubStateType",
 ]

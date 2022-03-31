@@ -10,7 +10,7 @@ from .module_substates import (
     MagneticModuleSubState,
     HeaterShakerModuleId,
     HeaterShakerModuleSubState,
-    ModuleViewTypes,
+    ModuleSubStateType,
 )
 from .geometry import GeometryView, TipGeometry
 from .motion import MotionView, PipetteLocationData
@@ -43,7 +43,7 @@ __all__ = [
     "MagneticModuleSubState",
     "HeaterShakerModuleId",
     "HeaterShakerModuleSubState",
-    "ModuleViewTypes",
+    "ModuleSubStateType",
     # computed geometry state
     "GeometryView",
     "TipGeometry",
