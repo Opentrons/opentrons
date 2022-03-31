@@ -9,8 +9,9 @@ import { i18n } from '../../../../i18n'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { ModuleDefinition } from '@opentrons/shared-data'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
-import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { getProtocolModulesInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
+import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
+import { useProtocolDetailsForRun } from '../../hooks'
 import {
   useLatchCommand,
   useModuleOverflowMenu,
@@ -28,11 +29,12 @@ import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../RunDetails/hooks')
 jest.mock('../../../ProtocolSetup/utils/getProtocolModulesInfo')
+jest.mock('../../../ProtocolUpload/hooks')
+jest.mock('../../hooks')
 
-const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
-  typeof useProtocolDetails
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
 >
 const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
   typeof getProtocolModulesInfo
@@ -40,6 +42,9 @@ const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
+>
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
 >
 
 const mockCloseLatchHeaterShaker = {
@@ -601,16 +606,16 @@ const HEATER_SHAKER_MODULE_INFO = {
 describe('useProtocolMetadata', () => {
   const store: Store<State> = createStore(jest.fn(), {})
 
-  when(mockUseProtocolDetails)
-    .calledWith()
-    .mockReturnValue({
-      protocolData: heaterShakerCommands,
-    } as any)
-
   beforeEach(() => {
+    when(mockUseCurrentRunId).calledWith().mockReturnValue('1')
     store.dispatch = jest.fn()
-
     mockGetProtocolModulesInfo.mockReturnValue([HEATER_SHAKER_MODULE_INFO])
+
+    when(mockUseProtocolDetailsForRun)
+      .calledWith('1')
+      .mockReturnValue({
+        protocolData: heaterShakerCommands,
+      } as any)
   })
 
   afterEach(() => {

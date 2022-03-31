@@ -11,8 +11,9 @@ import {
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { getProtocolModulesInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
-import { useProtocolDetails } from '../../RunDetails/hooks'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { useProtocolDetailsForRun } from '../hooks'
 
 import type {
   HeaterShakerCloseLatchCreateCommand,
@@ -29,7 +30,8 @@ import type { AttachedModule } from '../../../redux/modules/types'
 import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
 
 export function useHeaterShakerFromProtocol(): ProtocolModuleInfo | null {
-  const { protocolData } = useProtocolDetails()
+  const currentRunId = useCurrentRunId()
+  const { protocolData } = useProtocolDetailsForRun(currentRunId)
   if (protocolData == null) return null
   const protocolModulesInfo = getProtocolModulesInfo(
     protocolData,
