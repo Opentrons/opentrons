@@ -3,6 +3,7 @@ import flatMap from 'lodash/flatMap'
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import map from 'lodash/map'
+import reduce from 'lodash/reduce'
 import uniq from 'lodash/uniq'
 import { getFileMetadata } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
@@ -136,7 +137,19 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       }
     )
 
-    const liquids = {}
+    const liquids: ProtocolFile['liquids'] = reduce(
+      ingredients,
+      (acc, liquidData, liquidId) => {
+        return {
+          ...acc,
+          [liquidId]: {
+            displayName: liquidData.name,
+            description: liquidData.description,
+          },
+        }
+      },
+      {}
+    )
 
     const labware: ProtocolFile['labware'] = mapValues(
       initialRobotState.labware,
@@ -205,6 +218,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       ...loadPipetteCommands,
       ...loadLabwareCommands,
       ...loadModuleCommands,
+      // TODO: generate load liquid commands https://github.com/Opentrons/opentrons/issues/9702
     ]
 
     const nonLoadCommands: CreateCommand[] = flatMap(
