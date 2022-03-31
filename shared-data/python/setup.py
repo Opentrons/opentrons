@@ -25,9 +25,12 @@ DATA_SUBDIRS = ["deck", "labware", "module", "pipette", "protocol"]
 DATA_TYPES = ["definitions", "schemas"]
 DEST_BASE_PATH = "data"
 
-
-def get_shared_data_files() -> List[Path]:
+def get_shared_data_files(add_fixtures=False) -> List[Path]:
     to_include = []
+
+    data_types = DATA_TYPES
+    if add_fixtures:
+        data_types.append("fixtures")
 
     for subdir in DATA_SUBDIRS:
         for data_type in DATA_TYPES:
@@ -48,8 +51,11 @@ class SDistWithData(sdist.sdist):
 
     def make_release_tree(self, base_dir, files) -> None:
         self.announce("adding data files to base dir {}".format(base_dir))
-
-        for data_file in get_shared_data_files():
+        include_fixtures = (
+            "INCLUDE_FIXTURES" in os.environ
+            and os.environ["INCLUDE_FIXTURES"].lower() == "true"
+        )
+        for data_file in get_shared_data_files(include_fixtures):
             sdist_data_dir = Path(base_dir) / "opentrons_shared_data" / DEST_BASE_PATH
             target_file = sdist_data_dir / data_file.relative_to(DATA_ROOT)
 
