@@ -104,7 +104,12 @@ export function ModuleRow(props: Props): JSX.Element {
   return (
     <div>
       <h4 className={styles.row_title}>
-        <ModuleIcon moduleType={type} />
+        <ModuleIcon
+          moduleType={type}
+          size="1rem"
+          color="#6F6F6F"
+          marginRight="0.25rem"
+        />
         {i18n.t(`modules.module_display_names.${type}`)}
       </h4>
       <div className={styles.module_row}>
