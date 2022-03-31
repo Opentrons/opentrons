@@ -8,8 +8,8 @@ from .modules import ModuleState, ModuleView, HardwareModule
 from .module_substates import (
     MagneticModuleId,
     MagneticModuleSubState,
-    HeaterShakerModuleSubState,
     HeaterShakerModuleId,
+    HeaterShakerModuleSubState,
     ModuleViewTypes,
 )
 from .geometry import GeometryView, TipGeometry
@@ -38,12 +38,12 @@ __all__ = [
     # module state and values
     "ModuleState",
     "ModuleView",
-    "ModuleViewTypes",
-    "MagneticModuleSubState",
     "HardwareModule",
     "MagneticModuleId",
-    "HeaterShakerModuleSubState",
+    "MagneticModuleSubState",
     "HeaterShakerModuleId",
+    "HeaterShakerModuleSubState",
+    "ModuleViewTypes",
     # computed geometry state
     "GeometryView",
     "TipGeometry",
