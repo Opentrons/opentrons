@@ -87,6 +87,22 @@ describe('customLabwareReducer', () => {
       },
     },
     {
+      name: 'handles ADD_CUSTOM_LABWARE_FILE',
+      state: {
+        addFailureFile: Fixtures.mockInvalidLabware,
+        addFailureMessage: 'AH',
+      },
+      action: {
+        type: 'labware:ADD_CUSTOM_LABWARE_FILE',
+        payload: { filePath: 'mockFilePath' },
+        meta: { shell: true },
+      },
+      expected: {
+        addFailureFile: null,
+        addFailureMessage: null,
+      },
+    },
+    {
       name: 'handles ADD_CUSTOM_LABWARE_FAILURE',
       state: INITIAL_STATE,
       action: {
@@ -112,6 +128,30 @@ describe('customLabwareReducer', () => {
       expected: {
         addFailureFile: null,
         addFailureMessage: null,
+      },
+    },
+    {
+      name: 'handles ADD_NEW_LABWARE_NAME',
+      state: INITIAL_STATE,
+      action: {
+        type: 'labware:ADD_NEW_LABWARE_NAME',
+        payload: {
+          filename: 'mockFileName',
+        },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        newLabwareName: 'mockFileName',
+      },
+    },
+    {
+      name: 'handles CLEAR_NEW_LABWARE_NAME',
+      state: {
+        newLabwareName: 'mockFileName',
+      },
+      action: { type: 'labware:CLEAR_NEW_LABWARE_NAME' },
+      expected: {
+        newLabwareName: null,
       },
     },
   ]

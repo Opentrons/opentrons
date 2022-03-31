@@ -140,7 +140,7 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
     """Notification of a completed move group."""
 
     seq_id: utils.UInt8Field
-    current_position: utils.UInt32Field
+    current_position_um: utils.UInt32Field
     ack_id: utils.UInt8Field
 
 
@@ -296,6 +296,7 @@ class WriteToSensorRequestPayload(utils.BinarySerializable):
 
     sensor: SensorTypeField
     data: utils.UInt32Field
+    reg_address: utils.UInt8Field
 
 
 @dataclass
@@ -331,9 +332,41 @@ class SensorThresholdResponsePayload(utils.BinarySerializable):
 
 
 @dataclass
+class SensorDiagnosticRequestPayload(utils.BinarySerializable):
+    """A response that sends back the current threshold value of the sensor."""
+
+    sensor: SensorTypeField
+    reg_address: utils.UInt8Field
+
+
+@dataclass
+class SensorDiagnosticResponsePayload(utils.BinarySerializable):
+    """A response that sends back the current threshold value of the sensor."""
+
+    sensor: SensorTypeField
+    reg_address: utils.UInt8Field
+    data: utils.UInt32Field
+
+
+@dataclass
 class PipetteInfoResponsePayload(utils.BinarySerializable):
     """A response carrying data about an attached pipette."""
 
     pipette_name: PipetteNameField
     pipette_model: utils.UInt16Field
     pipette_serial: PipetteSerialField
+
+
+@dataclass
+class BrushedMotorVrefPayload(utils.BinarySerializable):
+    """A request to set the reference voltage of a brushed motor."""
+
+    v_ref: utils.UInt32Field
+
+
+@dataclass
+class BrushedMotorPwmPayload(utils.BinarySerializable):
+    """A request to set the pwm of a brushed motor."""
+
+    freq: utils.UInt32Field
+    duty_cycle: utils.UInt32Field

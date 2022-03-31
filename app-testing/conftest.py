@@ -2,14 +2,22 @@
 import logging
 import os
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 import pytest
+from _pytest.config.argparsing import Parser
 from dotenv import load_dotenv, find_dotenv
+from rich.console import Console
+from rich import pretty, traceback
 from selenium.webdriver.chrome.options import Options
+from src.resources.ot_robot5dot1 import OtRobot
+from src.resources.robot_data import ROBOT_MAPPING, RobotDataType
 
 collect_ignore_glob = ["files/**/*.py"]
 
-logger = logging.getLogger(__name__)
+_console = Console(log_time=True)
+pretty.install(console=_console)
+traceback.install(console=_console)
+
 
 # Check to see if we have a dotenv file and use it
 if find_dotenv():
@@ -23,7 +31,7 @@ def _chrome_options() -> Options:
     assert (
         executable_path is not None
     ), "EXECUTABLE_PATH environment variable must be set"
-    logger.info(f"EXECUTABLE_PATH is {executable_path}")
+    _console.print(f"EXECUTABLE_PATH is {executable_path}")
     options.binary_location = executable_path
     options.add_argument("whitelisted-ips=''")  # type: ignore
     options.add_argument("disable-xss-auditor")  # type: ignore
@@ -65,3 +73,19 @@ def test_protocols() -> Dict[str, Path]:
             "files/protocol/json/gen1_pipette.json",
         ),
     }
+
+
+@pytest.fixture(scope="session")
+def console() -> Console:
+    return _console
+
+
+@pytest.fixture(scope="session")
+def robots() -> List[RobotDataType]:
+    # read from .env for what robots to load for a test
+    robots = os.getenv("ROBOTS").lower().split(",")
+    result = []
+    for robot in robots:
+        robot_type = ROBOT_MAPPING[robot]
+        result.append(robot_type)
+    return result

@@ -15,7 +15,6 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     PipetteName,
     LoadedPipette,
-    LoadedModule,
     LabwareOffset,
     LabwareOffsetVector,
     LabwareOffsetLocation,
@@ -268,14 +267,11 @@ async def test_load_labware_on_module(
         state_store.labware.get_definition_by_uri(matchers.IsA(str))
     ).then_return(minimal_labware_def)
 
-    decoy.when(state_store.modules.get("module-id")).then_return(
-        LoadedModule(
-            id="module-id",
-            model=ModuleModel.THERMOCYCLER_MODULE_V1,
-            serialNumber="module-serial",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-            definition=tempdeck_v1_def,
-        )
+    decoy.when(state_store.modules.get_model("module-id")).then_return(
+        ModuleModel.THERMOCYCLER_MODULE_V1
+    )
+    decoy.when(state_store.modules.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
     )
 
     decoy.when(

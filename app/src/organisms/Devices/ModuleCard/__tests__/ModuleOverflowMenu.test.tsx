@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { COLORS, renderWithProviders } from '@opentrons/components'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../../i18n'
 import {
@@ -9,19 +8,7 @@ import {
   mockThermocycler,
   mockHeaterShaker,
 } from '../../../../redux/modules/__fixtures__'
-import { HeaterShakerWizard } from '../../HeaterShakerWizard'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
-
-jest.mock('../../HeaterShakerWizard')
-jest.mock('@opentrons/react-api-client')
-
-const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
-  typeof useCreateLiveCommandMutation
->
-
-const mockHeaterShakerWizard = HeaterShakerWizard as jest.MockedFunction<
-  typeof HeaterShakerWizard
->
 
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
   return renderWithProviders(<ModuleOverflowMenu {...props} />, {
@@ -180,63 +167,39 @@ const mockTCBlockHeating = {
 
 describe('ModuleOverflowMenu', () => {
   let props: React.ComponentProps<typeof ModuleOverflowMenu>
-  let mockCreateLiveCommand = jest.fn()
   beforeEach(() => {
-    mockCreateLiveCommand = jest.fn()
-    mockCreateLiveCommand.mockResolvedValue(null)
     props = {
       module: mockMagneticModule,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
     }
-    mockHeaterShakerWizard.mockReturnValue(<div>Mock Heater Shaker Wizard</div>)
-    mockUseLiveCommandMutation.mockReturnValue({
-      createLiveCommand: mockCreateLiveCommand,
-    } as any)
   })
+
   afterEach(() => {
     jest.resetAllMocks()
   })
 
   it('renders the correct magnetic module menu', () => {
-    const { getByRole, getByText } = render(props)
-    const buttonSetting = getByRole('button', { name: 'Set engage height' })
-    expect(buttonSetting).toBeEnabled()
-    expect(buttonSetting).toHaveStyle(`
-      background-color: transparent;
-    `)
-    fireEvent.click(buttonSetting)
-    expect(props.handleClick).toHaveBeenCalled()
-    const buttonAbout = getByRole('button', { name: 'About module' })
-    fireEvent.click(buttonAbout)
-    expect(props.handleAboutClick).toHaveBeenCalled()
-    expect(getByText('About module')).toHaveStyle('color: #16212D')
+    const { getByText } = render(props)
+    getByText('Set engage height')
+    getByText('About module')
   })
-  it('renders hover state color correctly', () => {
-    const { getByRole } = render(props)
-    const buttonSetting = getByRole('button', { name: 'Set engage height' })
-    expect(buttonSetting).toHaveStyleRule(
-      'background-color',
-      COLORS.lightBlue,
-      {
-        modifier: ':hover',
-      }
-    )
-  })
+
   it('renders the correct temperature module menu', () => {
     props = {
       module: mockTemperatureModuleGen2,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
     }
     const { getByRole } = render(props)
     const buttonSetting = getByRole('button', {
       name: 'Set module temperature',
     })
     fireEvent.click(buttonSetting)
-    expect(props.handleClick).toHaveBeenCalled()
     const buttonAbout = getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
     expect(props.handleAboutClick).toHaveBeenCalled()
@@ -244,33 +207,31 @@ describe('ModuleOverflowMenu', () => {
   it('renders the correct TC module menu', () => {
     props = {
       module: mockThermocycler,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
     }
     const { getByRole } = render(props)
     const buttonSettingLid = getByRole('button', {
       name: 'Set lid temperature',
     })
     fireEvent.click(buttonSettingLid)
-    expect(props.handleClick).toHaveBeenCalled()
     const buttonAbout = getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
     expect(props.handleAboutClick).toHaveBeenCalled()
-    const buttonSettingBlock = getByRole('button', {
+    getByRole('button', {
       name: 'Set block temperature',
     })
-    fireEvent.click(buttonSettingBlock)
-    expect(props.handleClick).toHaveBeenCalled()
   })
   it('renders the correct Heater Shaker module menu', () => {
     props = {
       module: mockHeaterShaker,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
     }
-    // TODO(sh, 2022-03-08): extend tests when menu component is wired up
     const { getByRole } = render(props)
     getByRole('button', {
       name: 'Set module temperature',
@@ -281,29 +242,35 @@ describe('ModuleOverflowMenu', () => {
     getByRole('button', {
       name: 'Close Labware Latch',
     })
-    getByRole('button', { name: 'About module' })
+    const aboutButton = getByRole('button', { name: 'About module' })
     getByRole('button', { name: 'See how to attach to deck' })
-    getByRole('button', { name: 'Test shake' })
+    const testButton = getByRole('button', { name: 'Test shake' })
+    fireEvent.click(testButton)
+    expect(props.handleTestShakeClick).toHaveBeenCalled()
+    fireEvent.click(aboutButton)
+    expect(props.handleAboutClick).toHaveBeenCalled()
   })
   it('renders heater shaker see how to attach to deck button and when clicked, launches hs wizard', () => {
     props = {
       module: mockHeaterShaker,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
     }
-    const { getByRole, getByText } = render(props)
+    const { getByRole } = render(props)
     const btn = getByRole('button', { name: 'See how to attach to deck' })
     fireEvent.click(btn)
-    getByText('Mock Heater Shaker Wizard')
+    expect(props.handleWizardClick).toHaveBeenCalled()
   })
 
   it('renders heater shaker labware latch button and is disabled when status is not idle', () => {
     props = {
       module: mockMovingHeaterShaker,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
     }
     const { getByRole } = render(props)
     expect(
@@ -316,9 +283,10 @@ describe('ModuleOverflowMenu', () => {
   it('renders heater shaker shake button and is disabled when latch is opened', () => {
     props = {
       module: mockOpenLatchHeaterShaker,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
     }
     const { getByRole } = render(props)
     expect(
@@ -331,9 +299,10 @@ describe('ModuleOverflowMenu', () => {
   it('renders heater shaker labware latch button and when clicked, moves labware latch open', () => {
     props = {
       module: mockCloseLatchHeaterShaker,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
     }
 
     const { getByRole } = render(props)
@@ -343,22 +312,15 @@ describe('ModuleOverflowMenu', () => {
     })
     expect(btn).not.toBeDisabled()
     fireEvent.click(btn)
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'heaterShakerModule/openLatch',
-        params: {
-          moduleId: mockCloseLatchHeaterShaker.id,
-        },
-      },
-    })
   })
 
   it('renders heater shaker labware latch button and when clicked, moves labware latch close', () => {
     props = {
       module: mockHeaterShaker,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
     }
     const { getByRole } = render(props)
 
@@ -367,22 +329,15 @@ describe('ModuleOverflowMenu', () => {
     })
 
     fireEvent.click(btn)
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'heaterShakerModule/closeLatch',
-        params: {
-          moduleId: 'heatershaker_id',
-        },
-      },
-    })
   })
 
   it('renders heater shaker overflow menu and deactivates heater when status changes', () => {
     props = {
       module: mockDeactivateHeatHeaterShaker,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
     }
 
     const { getByRole } = render(props)
@@ -392,23 +347,15 @@ describe('ModuleOverflowMenu', () => {
     })
     expect(btn).not.toBeDisabled()
     fireEvent.click(btn)
-
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'heaterShakerModule/deactivateHeater',
-        params: {
-          moduleId: mockDeactivateHeatHeaterShaker.id,
-        },
-      },
-    })
   })
 
   it('renders temperature module overflow menu and deactivates heat when status changes', () => {
     props = {
       module: mockTemperatureModuleHeating,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
     }
 
     const { getByRole } = render(props)
@@ -418,23 +365,15 @@ describe('ModuleOverflowMenu', () => {
     })
     expect(btn).not.toBeDisabled()
     fireEvent.click(btn)
-
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'temperatureModule/deactivate',
-        params: {
-          moduleId: mockTemperatureModuleHeating.id,
-        },
-      },
-    })
   })
 
   it('renders magnetic module overflow menu and disengages when status changes', () => {
     props = {
       module: mockMagDeckEngaged,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
     }
 
     const { getByRole } = render(props)
@@ -444,23 +383,15 @@ describe('ModuleOverflowMenu', () => {
     })
     expect(btn).not.toBeDisabled()
     fireEvent.click(btn)
-
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'magneticModule/disengageMagnet',
-        params: {
-          moduleId: mockMagDeckEngaged.id,
-        },
-      },
-    })
   })
 
   it('renders thermocycler overflow menu and deactivates block when status changes', () => {
     props = {
       module: mockTCBlockHeating,
-      handleClick: jest.fn(),
+      handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
     }
 
     const { getByRole } = render(props)
@@ -470,14 +401,5 @@ describe('ModuleOverflowMenu', () => {
     })
     expect(btn).not.toBeDisabled()
     fireEvent.click(btn)
-
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'thermocycler/deactivateBlock',
-        params: {
-          moduleId: mockTCBlockHeating.id,
-        },
-      },
-    })
   })
 })
