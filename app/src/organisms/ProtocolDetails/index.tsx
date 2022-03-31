@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next'
 import {
   getModuleType,
   getPipetteNameSpecs,
-  schemaV6Adapter,
 } from '@opentrons/shared-data'
 import {
   Box,
@@ -102,35 +101,30 @@ export function ProtocolDetails(
   props: ProtocolDetailsProps
 ): JSX.Element | null {
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
-  const { t } = useTranslation('protocol_details')
+  const { t } = useTranslation(['protocol_details', 'shared'])
   const [currentTab, setCurrentTab] = React.useState<
     'robot_config' | 'labware'
   >('robot_config')
   const [showSlideout, setShowSlideout] = React.useState(false)
 
   if (mostRecentAnalysis == null) return null
-  // TODO: IMMEDIATELY clean up and move these protocol data selectors into api_client as
-  // pure functions of RunTimeCommand[]
 
   const robotModel = mostRecentAnalysis?.robot?.model ?? 'OT-2'
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
-    mostRecentAnalysis != null
-      ? parseInitialPipetteNamesByMount(mostRecentAnalysis)
-      : {}
+      parseInitialPipetteNamesByMount(mostRecentAnalysis)
   const requiredModuleTypes =
-    mostRecentAnalysis != null
-      ? parseAllRequiredModuleModels(mostRecentAnalysis).map(getModuleType)
-      : []
+      parseAllRequiredModuleModels(mostRecentAnalysis).map(getModuleType)
 
   const protocolName =
     mostRecentAnalysis?.metadata?.protocolName ??
     first(srcFileNames) ??
     protocolKey
 
-  const creationMethod = ''
-  const lastAnalyzed = ''
-  const author = ''
-  const description = ''
+  // TODO: IMMEDIATELY parse real values out of analysis file for these with fallback to no data
+  const creationMethod = t('no_data')
+  const author = t('no_data')
+  const description = t('no_data')
+  const lastAnalyzed = t('no_data')
 
   const getTabContents = (): JSX.Element =>
     currentTab === 'labware' ? (

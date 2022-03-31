@@ -1,5 +1,7 @@
 // common types
 
+import { ProtocolAnalysisFile } from '@opentrons/shared-data'
+
 export interface StoredProtocolDir {
   dirPath: string
   modified: number
@@ -12,7 +14,7 @@ export interface StoredProtocolData {
   modified: number
   srcFileNames: string[]
   srcFiles: Buffer[]
-  mostRecentAnalysis: string | null
+  mostRecentAnalysis: ProtocolAnalysisFile<{}>
 }
 
 // state types
