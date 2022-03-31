@@ -7,6 +7,7 @@ import {
   SlotMap,
   Tooltip,
   useHoverTooltip,
+  ModuleIcon,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { actions as stepFormActions, ModuleOnDeck } from '../../step-forms'
@@ -15,7 +16,6 @@ import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
 } from '../../constants'
 import { ModuleDiagram } from './ModuleDiagram'
-import { ModuleIcon } from './ModuleIcon'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 

@@ -18,10 +18,10 @@ import {
   SPACING_2,
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
+  ModuleIcon,
 } from '@opentrons/components'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import { ModuleIcon } from './ModuleIcon'
 import { useAttachedModules, useAttachedPipettes } from './hooks'
 import { RobotStatusBanner } from './RobotStatusBanner'
 

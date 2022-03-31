@@ -13,11 +13,11 @@ import {
   SPACING,
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
+  ModuleIcon,
 } from '@opentrons/components'
 import { Link } from 'react-router-dom'
 
 import { StyledText } from '../../atoms/text'
-import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 
 import { StoredProtocolData } from '../../redux/protocol-storage'
