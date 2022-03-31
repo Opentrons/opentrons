@@ -45,6 +45,7 @@ import {
   useCurrentRunId,
 } from '../../../organisms/ProtocolUpload/hooks'
 import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
+import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 import {
   useRunControls,
   useRunStatus,
@@ -62,7 +63,6 @@ import { formatTimestamp } from '../utils'
 
 import type { Run } from '@opentrons/api-client'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 
 interface ProtocolRunHeaderProps {
   robotName: string
