@@ -59,6 +59,8 @@
   "prompt": "Always show the prompt to choose calibration block or trash bin",
   "display_unavail_robots": "Display Unavailable Robots",
   "display_unavail_robots_description": "Disabling this may improve overall networking performance in environments with many robots, but it may be slower to find robots when opening the app.",
+  "show_link_labware_data": "Show link to get Labware Offset data",
+  "show_link_labware_data_description": "If you need to access Labware Offset data outside of the Opentrons App, enabling this setting will display a link to get Offset Data in the Recent Runs overflow menu and in the Labware Setup section of the Protocol page.",
   "clear_unavail_robots": "Clear Unavailable Robots",
   "clear_robots_description": "Clear the list of unavailable robots on the Devices page. This action cannot be undone.",
   "clear_robots_button": "Clear unavailable robots list",
