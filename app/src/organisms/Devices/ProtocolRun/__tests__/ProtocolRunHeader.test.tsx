@@ -491,6 +491,7 @@ describe('ProtocolRunHeader', () => {
     const button = getByRole('button', { name: 'Start Run' })
     fireEvent.click(button)
     getByText('Mock HeaterShakerIsRunningModal')
+  })
 
   it('renders the confirm attachment modal when there is a heater shaker in the protocol and the heater shaker is idle status', () => {
     mockUseAttachedModules.mockReturnValue([mockHeaterShaker])
