@@ -25,6 +25,7 @@ DATA_SUBDIRS = ["deck", "labware", "module", "pipette", "protocol"]
 DATA_TYPES = ["definitions", "schemas"]
 DEST_BASE_PATH = "data"
 
+
 def get_shared_data_files(add_fixtures=False) -> List[Path]:
     to_include = []
 
