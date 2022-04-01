@@ -119,6 +119,7 @@ def thermocycler_v2_def() -> ModuleDefinition:
     """Get the definition of a V2 thermocycler."""
     definition = load_shared_data("module/definitions/2/thermocyclerModuleV2.json")
 
+
 @pytest.fixture(scope="session")
 def heater_shaker_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 heater-shaker."""
