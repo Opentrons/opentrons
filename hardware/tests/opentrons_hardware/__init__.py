@@ -1,1 +1,0 @@
-"""Opentrons hardware tests."""

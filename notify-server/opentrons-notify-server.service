@@ -1,9 +1,0 @@
-[Unit]
-Description=Opentrons Notification Server
-
-[Service]
-ExecStart=python -m notify_server.main
-Restart=on-failure
-
-[Install]
-WantedBy=opentrons-robot-server.service

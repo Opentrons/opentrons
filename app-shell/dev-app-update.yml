@@ -1,4 +1,0 @@
-provider: s3
-bucket: opentrons-app
-path: builds
-channel: latest

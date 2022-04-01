@@ -1,8 +1,0 @@
-[paths]
-source =
-    robot_server
-
-[report]
-exclude_lines =
-    @overload
-    if TYPE_CHECKING:

@@ -1,1 +1,0 @@
-"""ProtocolEngine command model tests."""

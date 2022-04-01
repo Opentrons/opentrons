@@ -1,3 +1,0 @@
-# always validate the PR title, and ignore the commits
-# https://github.com/probot/semantic-pull-requests
-titleOnly: true
