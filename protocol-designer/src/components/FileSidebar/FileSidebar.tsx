@@ -22,7 +22,7 @@ import {
   ModuleOnDeck,
   PipetteOnDeck,
 } from '../../step-forms'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { CreateCommand, ProtocolFile } from '@opentrons/shared-data'
 
 export interface Props {
   loadFile: (event: React.ChangeEvent<HTMLInputElement>) => unknown
@@ -46,6 +46,13 @@ interface MissingContent {
   pipettesWithoutStep: PipetteOnDeck[]
   modulesWithoutStep: ModuleOnDeck[]
 }
+
+const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
+  'loadLabware',
+  'loadModule',
+  'loadPipette',
+  'loadLiquid',
+]
 
 function getWarningContent({
   noCommands,
@@ -174,7 +181,12 @@ export function FileSidebar(props: Props): JSX.Element {
 
   const cancelModal = (): void => setShowExportWarningModal(false)
 
-  const noCommands = fileData ? fileData.commands.length === 0 : true
+  const nonLoadCommands =
+    fileData?.commands.filter(
+      command => !LOAD_COMMANDS.includes(command.commandType)
+    ) ?? []
+
+  const noCommands = fileData ? nonLoadCommands.length === 0 : true
   const pipettesWithoutStep = getUnusedEntities(
     pipettesOnDeck,
     savedStepForms,
