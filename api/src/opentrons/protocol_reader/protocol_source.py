@@ -90,7 +90,11 @@ Metadata must be a simple JSON-serializable dictionary.
 
 @dataclass(frozen=True)
 class ProtocolSource:
-    """A value object representing a protocol and its files on disk.
+    """A value object representing a protocol and its source files on disk.
+
+    This includes pointers to the files,
+    plus some basic information that can be readily inferred from those files.
+    (Excluding information that would require in-depth simulation of the protocol.)
 
     Attributes:
         directory: The directory location of the protocol on disk.
@@ -100,6 +104,8 @@ class ProtocolSource:
         config: Protocol execution configuration.
         labware_definitions: Labware definitions provided by separate
             labware files or the main JSON protocol file, if present.
+            This is not necessarily the same set of labware definitions
+            that the protocol will actually attempt to load.
     """
 
     directory: Path

@@ -12,7 +12,26 @@ ValueT = TypeVar("ValueT")
 
 
 class AppStateValue(Generic[ValueT]):
-    """A wrapper for a value to be placed in AppState."""
+    """A helper to get and set values on `AppState` in a type-safe way.
+
+    Normally, `AppState` is a loosely-typed bag of attributes,
+    which opens the door to silly mistakes:
+
+    .. code-block::
+        app_state.my_field = 123
+
+        x = app_state.my_fild  # Typo, but not caught by type-checker.
+        y: str = app_state.my_field  # Wrong type, but not caught by type-checker.
+
+    With this class, this becomes:
+
+    .. code-block::
+        my_field = AppStateValue[int]("my_field")
+        my_field.set_on(app_state, 123)
+
+        x = my_fild.get_from(app_state)  # Type-checking error: misspelled variable.
+        y: str = my_field.get_from(app_state)  # Type-checking error: not a str.
+    """
 
     def __init__(self, key: str) -> None:
         """Initialize the value wrapper with a key in state.
