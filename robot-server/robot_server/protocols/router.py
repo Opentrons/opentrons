@@ -132,6 +132,7 @@ async def create_protocol(
         metadata=Metadata.parse_obj(source.metadata),
         analyses=analyses,
         files=[ProtocolFile(name=f.name, role=f.role) for f in source.files],
+        protocol_key=protocol_key
     )
 
     log.info(f'Created protocol "{protocol_id}" and started analysis "{analysis_id}".')
