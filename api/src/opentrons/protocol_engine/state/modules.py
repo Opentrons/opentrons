@@ -208,18 +208,17 @@ class ModuleView(HasState[ModuleState]):
             WrongModuleTypeError: If module_id has been loaded,
                 but it's not a Magnetic Module.
         """
-        model = self.get_model(module_id=module_id)  # Propagate ModuleNotLoadedError
-
-        if ModuleModel.is_magnetic_module_model(model):
+        try:
             substate = self._state.substate_by_module_id[module_id]
-            assert isinstance(
-                substate, MagneticModuleSubState
-            ), f"Expected MagneticModuleSubState but got {substate}."
-            return substate
+        except KeyError as e:
+            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
         else:
-            raise errors.WrongModuleTypeError(
-                f"{module_id} is a {model}, not a Magnetic Module."
-            )
+            if isinstance(substate, MagneticModuleSubState):
+                return substate
+            else:
+                raise errors.WrongModuleTypeError(
+                    f"{module_id} is not a Magnetic Module."
+                )
 
     def get_heater_shaker_module_substate(
         self, module_id: str
@@ -231,17 +230,17 @@ class ModuleView(HasState[ModuleState]):
            WrongModuleTypeError: If module_id has been loaded,
                but it's not a Heater-Shaker Module.
         """
-        model = self.get_model(module_id=module_id)  # Propagate ModuleNotLoadedError
-        if ModuleModel.is_heater_shaker_module_model(model):
+        try:
             substate = self._state.substate_by_module_id[module_id]
-            assert isinstance(
-                substate, HeaterShakerModuleSubState
-            ), f"Expected HeaterShakerModuleSubState but got {substate}"
-            return substate
+        except KeyError as e:
+            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
         else:
-            raise errors.WrongModuleTypeError(
-                f"{module_id} is a {model}, not a Heater-Shaker Module."
-            )
+            if isinstance(substate, HeaterShakerModuleSubState):
+                return substate
+            else:
+                raise errors.WrongModuleTypeError(
+                    f"{module_id} is not a Heater-Shaker Module."
+                )
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
         """Get the slot location of the given module."""

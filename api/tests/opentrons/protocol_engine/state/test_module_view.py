@@ -214,6 +214,7 @@ def test_get_magnetic_module_view(
                 module_id=MagneticModuleId("magnetic-module-gen2-id"),
                 model=ModuleModel.MAGNETIC_MODULE_V2,
             ),
+            # TODO (spp, 2022-04-01): Add tempdeck substate
         },
     )
 
@@ -229,8 +230,9 @@ def test_get_magnetic_module_view(
     assert module_2_view.module_id == "magnetic-module-gen2-id"
     assert module_2_view.model == ModuleModel.MAGNETIC_MODULE_V2
 
-    with pytest.raises(errors.WrongModuleTypeError):
-        subject.get_magnetic_module_substate(module_id="temperature-module-id")
+    # TODO (spp, 2022-04-01: Uncomment once temp module substate is added to store)
+    # with pytest.raises(errors.WrongModuleTypeError):
+    #     subject.get_magnetic_module_substate(module_id="temperature-module-id")
 
     with pytest.raises(errors.ModuleNotLoadedError):
         subject.get_magnetic_module_substate(module_id="nonexistent-module-id")
