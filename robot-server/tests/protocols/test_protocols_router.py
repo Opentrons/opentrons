@@ -264,6 +264,7 @@ async def test_create_protocol(
 
     result = await create_protocol(
         files=[protocol_file],
+        protocol_key="dummy-key-111", 
         protocol_store=protocol_store,
         analysis_store=analysis_store,
         protocol_reader=protocol_reader,

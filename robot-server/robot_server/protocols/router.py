@@ -3,8 +3,8 @@ import logging
 import textwrap
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, File, UploadFile, status
-from typing import List
+from fastapi import APIRouter, Depends, File, UploadFile, status, Form
+from typing import List, Optional
 from typing_extensions import Literal
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
@@ -73,6 +73,7 @@ protocols_router = APIRouter()
 )
 async def create_protocol(
     files: List[UploadFile] = File(...),
+    protocol_key: Optional[str] = Form(...),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
     protocol_reader: ProtocolReader = Depends(get_protocol_reader),
@@ -109,7 +110,7 @@ async def create_protocol(
         protocol_id=protocol_id,
         created_at=created_at,
         source=source,
-        protocol_key="dummy-key-111"
+        protocol_key=protocol_key
     )
 
     protocol_store.insert(protocol_resource)
