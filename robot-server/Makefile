@@ -60,7 +60,7 @@ clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__p
 run_dev ?= uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --lifespan on --reload
 
 .PHONY: all
-all: clean wheel
+all: clean sdist wheel
 
 .PHONY: setup
 setup:
