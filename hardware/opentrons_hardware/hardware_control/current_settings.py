@@ -1,17 +1,17 @@
 """Utilities for updating the current settings on the OT3."""
-from typing import Dict, Tuple
+from typing import Tuple
 
-from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import payloads
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     WriteMotorCurrentRequest,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt32Field
+from .types import NodeMap
 
 
-CompleteCurrentSettings = Dict[NodeId, Tuple[float, float]]
-PartialCurrentSettings = Dict[NodeId, float]
+CompleteCurrentSettings = NodeMap[Tuple[float, float]]
+PartialCurrentSettings = NodeMap[float]
 
 
 async def set_currents(

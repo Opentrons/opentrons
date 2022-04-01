@@ -111,7 +111,7 @@ async def create_protocol(
         source=source,
     )
 
-    protocol_store.upsert(protocol_resource)
+    protocol_store.insert(protocol_resource)
 
     task_runner.run(
         protocol_analyzer.analyze,
@@ -132,9 +132,7 @@ async def create_protocol(
         files=[ProtocolFile(name=f.name, role=f.role) for f in source.files],
     )
 
-    log.info(
-        f'Created protocol "{protocol_id}"' f' and started analysis "{analysis_id}".'
-    )
+    log.info(f'Created protocol "{protocol_id}" and started analysis "{analysis_id}".')
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=data),

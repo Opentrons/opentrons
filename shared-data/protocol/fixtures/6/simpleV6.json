@@ -6,9 +6,6 @@
     "author": "engineering <engineering@opentrons.com>",
     "description": "A short test protocol",
     "created": 1223131231,
-    "lastModified": null,
-    "category": null,
-    "subcategory": null,
     "tags": ["unitTest"]
   },
   "robot": {
@@ -1256,7 +1253,7 @@
       "id": "0abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "mount": "leftMount"
+        "mount": "left"
       }
     },
     {

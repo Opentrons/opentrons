@@ -144,7 +144,7 @@ describe('Btn primitive component', () => {
     it('should render an app primary button variant', () => {
       const wrapper = shallow(<NewPrimaryBtn />)
 
-      expect(wrapper).toHaveStyleRule('background-color', '#006fff')
+      expect(wrapper).toHaveStyleRule('background-color', '#006cfa')
       expect(wrapper).toHaveStyleRule('border-radius', '2px')
       expect(wrapper).toHaveStyleRule('color', '#ffffff')
       expect(wrapper).toHaveStyleRule('font-size', '0.875rem')
@@ -157,11 +157,11 @@ describe('Btn primitive component', () => {
       expect(wrapper).toHaveStyleRule('text-transform', 'uppercase')
 
       // focus
-      expect(wrapper).toHaveStyleRule('background-color', '#006fff', {
+      expect(wrapper).toHaveStyleRule('background-color', '#006cfa', {
         modifier: ':focus',
       })
       // hover
-      expect(wrapper).toHaveStyleRule('background-color', '#006fff', {
+      expect(wrapper).toHaveStyleRule('background-color', '#006cfa', {
         modifier: ':focus',
       })
 
@@ -179,7 +179,7 @@ describe('Btn primitive component', () => {
     it('should render an app secondary button variant', () => {
       const wrapper = shallow(<NewSecondaryBtn />)
 
-      expect(wrapper).toHaveStyleRule('color', '#006fff')
+      expect(wrapper).toHaveStyleRule('color', '#006cfa')
       expect(wrapper).toHaveStyleRule('border-radius', '2px')
       expect(wrapper).toHaveStyleRule('background-color', '#ffffff')
       expect(wrapper).toHaveStyleRule('font-size', '0.875rem')
@@ -192,12 +192,12 @@ describe('Btn primitive component', () => {
       expect(wrapper).toHaveStyleRule('text-transform', 'uppercase')
 
       // focus
-      expect(wrapper).toHaveStyleRule('color', '#006fff', {
+      expect(wrapper).toHaveStyleRule('color', '#006cfa', {
         modifier: ':focus',
       })
 
       // hover
-      expect(wrapper).toHaveStyleRule('color', '#006fff', {
+      expect(wrapper).toHaveStyleRule('color', '#006cfa', {
         modifier: ':focus',
       })
 

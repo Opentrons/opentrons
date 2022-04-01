@@ -27,6 +27,7 @@ const Crumb = styled(Flex)`
   align-items: ${ALIGN_CENTER};
   color: ${COLORS.blue};
   padding-right: ${SPACING.spacing2};
+  text-transform: ${TYPOGRAPHY.textTransformNone};
   &:hover {
     opacity: 0.8;
   }
@@ -65,7 +66,11 @@ export function Breadcrumbs({
             </Crumb>
           </Link>
         ) : (
-          <Box key={crumb.pathSegment} color={COLORS.darkGreyEnabled}>
+          <Box
+            key={crumb.pathSegment}
+            color={COLORS.darkGreyEnabled}
+            textTransform={TYPOGRAPHY.textTransformNone}
+          >
             {crumb.crumbName}
           </Box>
         )

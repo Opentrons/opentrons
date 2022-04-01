@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Flex,
   Text,
@@ -15,13 +16,23 @@ import {
 import heaterShakerModule from '../../../assets/images/heatershaker_module_transparent.svg'
 import { HeaterShakerModuleData } from '../ModuleCard/HeaterShakerModuleData'
 
-export const HeaterShakerModuleCard = (): JSX.Element | null => {
+import type { HeaterShakerModule } from '../../../redux/modules/types'
+
+interface HeaterShakerModuleCardProps {
+  module: HeaterShakerModule
+}
+
+export const HeaterShakerModuleCard = (
+  props: HeaterShakerModuleCardProps
+): JSX.Element | null => {
+  const { module } = props
+  const { t } = useTranslation('device_details')
+
   return (
     <Flex
       backgroundColor={COLORS.background}
       borderRadius={SPACING.spacing2}
       marginBottom={SPACING.spacing3}
-      marginLeft={SPACING.spacing3}
       padding={`${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing3}`}
       width={'20rem'}
     >
@@ -39,7 +50,9 @@ export const HeaterShakerModuleCard = (): JSX.Element | null => {
             fontSize={TYPOGRAPHY.fontSizeCaption}
             paddingBottom={SPACING.spacing2}
           >
-            {'USB Port'}
+            {t(module?.usbPort.port === null ? 'usb_hub' : 'usb_port', {
+              port: module?.usbPort.hub ?? module?.usbPort.port,
+            })}
           </Text>
           <Flex paddingBottom={SPACING.spacing2}>
             <Icon
@@ -51,14 +64,13 @@ export const HeaterShakerModuleCard = (): JSX.Element | null => {
             <Text fontSize={TYPOGRAPHY.fontSizeP}>{'Heater/Shaker GENX'}</Text>
           </Flex>
           <HeaterShakerModuleData
-            // TODO(sh, 2022-02-22): replace stubbed out props with actual module values
-            heaterStatus={'idle'}
-            shakerStatus={'shaking'}
-            latchStatus={'Closed and locked'}
-            targetTemp={0}
-            currentTemp={0}
-            targetSpeed={0}
-            currentSpeed={0}
+            heaterStatus={module.data.temperatureStatus}
+            shakerStatus={module.data.speedStatus}
+            latchStatus={module.data.labwareLatchStatus}
+            targetTemp={module.data.targetTemp}
+            currentTemp={module.data.currentTemp}
+            targetSpeed={module.data.targetSpeed}
+            currentSpeed={module.data.currentSpeed}
             showTemperatureData={false}
           />
         </Flex>

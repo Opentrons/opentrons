@@ -10,6 +10,7 @@ import {
   TOOLTIP_FIXED,
 } from '@opentrons/components'
 import {
+  HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -26,6 +27,7 @@ import {
 } from './modals/ConfirmDeleteModal'
 import { Portal } from './portals/MainPageModalPortal'
 import { stepIconsByType, StepType } from '../form-types'
+import { selectors as featureFlagSelectors } from '../feature-flags'
 import styles from './listButtons.css'
 
 interface StepButtonComponentProps {
@@ -36,9 +38,6 @@ interface StepButtonComponentProps {
 }
 
 // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
-const getSupportedSteps = (): Array<
-  Exclude<StepType, 'manualIntervention'>
-> => ['moveLiquid', 'mix', 'pause', 'magnet', 'temperature', 'thermocycler']
 
 export const StepCreationButtonComponent = (
   props: StepButtonComponentProps
@@ -105,6 +104,34 @@ export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
 }
 
 export const StepCreationButton = (): JSX.Element => {
+  const enableHeaterShaker = useSelector(
+    featureFlagSelectors.getEnabledHeaterShaker
+  )
+
+  const getSupportedSteps = (): Array<
+    Exclude<StepType, 'manualIntervention'>
+  > => {
+    if (enableHeaterShaker) {
+      return [
+        'moveLiquid',
+        'mix',
+        'pause',
+        'heaterShaker',
+        'magnet',
+        'temperature',
+        'thermocycler',
+      ]
+    } else {
+      return [
+        'moveLiquid',
+        'mix',
+        'pause',
+        'magnet',
+        'temperature',
+        'thermocycler',
+      ]
+    }
+  }
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
@@ -123,6 +150,7 @@ export const StepCreationButton = (): JSX.Element => {
     magnet: getIsModuleOnDeck(modules, MAGNETIC_MODULE_TYPE),
     temperature: getIsModuleOnDeck(modules, TEMPERATURE_MODULE_TYPE),
     thermocycler: getIsModuleOnDeck(modules, THERMOCYCLER_MODULE_TYPE),
+    heaterShaker: getIsModuleOnDeck(modules, HEATERSHAKER_MODULE_TYPE),
   }
 
   const [expanded, setExpanded] = React.useState<boolean>(false)

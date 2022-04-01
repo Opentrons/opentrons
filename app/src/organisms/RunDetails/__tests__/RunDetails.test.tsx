@@ -21,13 +21,18 @@ import { i18n } from '../../../i18n'
 import { CommandList } from '../CommandList'
 import { useProtocolDetails } from '../hooks'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
-import { useRunStatus, useRunControls } from '../../RunTimeControl/hooks'
+import {
+  useCurrentRunStatus,
+  useCurrentRunControls,
+  useRunControls,
+} from '../../RunTimeControl/hooks'
 import { ProtocolLoader } from '../../ProtocolUpload'
 import {
   useCloseCurrentRun,
+  useCurrentRunId,
   useIsProtocolRunLoaded,
 } from '../../ProtocolUpload/hooks'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 const mockPush = jest.fn()
 
@@ -49,14 +54,20 @@ const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
 >
 const mockCommandList = CommandList as jest.MockedFunction<typeof CommandList>
 
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
+const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
+  typeof useCurrentRunStatus
+>
+const mockUseCurrentRunControls = useCurrentRunControls as jest.MockedFunction<
+  typeof useCurrentRunControls
 >
 const mockUseRunControls = useRunControls as jest.MockedFunction<
   typeof useRunControls
 >
 const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
   typeof useCloseCurrentRun
+>
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
 >
 const mockUseIsProtocolRunLoaded = useIsProtocolRunLoaded as jest.MockedFunction<
   typeof useIsProtocolRunLoaded
@@ -65,7 +76,7 @@ const mockGetConnectedRobotName = getConnectedRobotName as jest.MockedFunction<
   typeof getConnectedRobotName
 >
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile
 
 const render = () => {
   return renderWithProviders(
@@ -93,7 +104,18 @@ describe('RunDetails', () => {
         closeCurrentRun: jest.fn(),
       } as any)
     when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(true)
-    when(mockUseRunControls).calledWith().mockReturnValue({
+    when(mockUseCurrentRunControls).calledWith().mockReturnValue({
+      play: jest.fn(),
+      pause: jest.fn(),
+      stop: jest.fn(),
+      reset: jest.fn(),
+      isPlayRunActionLoading: false,
+      isPauseRunActionLoading: false,
+      isStopRunActionLoading: false,
+      isResetRunLoading: false,
+    })
+    when(mockUseCurrentRunId).calledWith().mockReturnValue('mockRunId')
+    when(mockUseRunControls).calledWith('mockRunId').mockReturnValue({
       play: jest.fn(),
       pause: jest.fn(),
       stop: jest.fn(),
@@ -127,7 +149,7 @@ describe('RunDetails', () => {
   })
 
   it('renders the cancel button, button is clickable, and cancel modal is rendered', () => {
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_RUNNING)
     const { getByRole, getByText } = render()
@@ -150,7 +172,7 @@ describe('RunDetails', () => {
   })
 
   it('renders a cancel run button when the status is finishing', () => {
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_FINISHING)
     const { getByRole } = render()
@@ -159,7 +181,7 @@ describe('RunDetails', () => {
   })
 
   it('renders a cancel run button when the status is paused', () => {
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_PAUSED)
     const { getByRole } = render()
@@ -168,7 +190,7 @@ describe('RunDetails', () => {
   })
 
   it('renders a cancel run button when the status is pause requested', () => {
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
     const { getByRole } = render()
@@ -177,7 +199,7 @@ describe('RunDetails', () => {
   })
 
   it('renders a cancel run button when the status is paused by door open', () => {
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     const { getByRole } = render()
@@ -186,7 +208,7 @@ describe('RunDetails', () => {
   })
 
   it('renders the protocol close button, button is clickable, and confirm close protocol modal is rendered when status is succeeded', () => {
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_SUCCEEDED)
     const { getByRole, getByText } = render()
@@ -201,7 +223,7 @@ describe('RunDetails', () => {
   })
 
   it('renders the protocol close button, button is clickable, and confirm close protocol modal is rendered when status is failed', () => {
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_FAILED)
     const { getByRole, getByText } = render()
@@ -216,7 +238,7 @@ describe('RunDetails', () => {
   })
 
   it('renders the protocol close button, button is clickable, and confirm close protocol modal is rendered when status is stopped', () => {
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_STOPPED)
     const { getByRole, getByText } = render()
@@ -231,7 +253,7 @@ describe('RunDetails', () => {
   })
 
   it('renders no button in the titlebar when the run status is stop requested', () => {
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
     const { queryByRole } = render()

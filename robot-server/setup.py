@@ -58,10 +58,11 @@ INSTALL_REQUIRES = [
     "python-dotenv==0.19.0",
     "python-multipart==0.0.5",
     "pydantic==1.8.2",
-    "typing-extensions==3.10.0.0",
+    "typing-extensions>=4.0.0,<5",
     "uvicorn==0.14.0",
     "wsproto==1.0.0",
     "systemd-python==234; sys_platform=='linux'",
+    "sqlalchemy==1.4.32",
 ]
 
 

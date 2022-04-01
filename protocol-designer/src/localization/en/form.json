@@ -111,7 +111,8 @@
       "moduleLabwarePrefix": {
         "magneticModuleType": "MAG",
         "temperatureModuleType": "TEMP",
-        "thermocyclerModuleType": "THERMO"
+        "thermocyclerModuleType": "THERMO",
+        "heaterShakerModuleType": "HS"
       },
       "magnetAction": {
         "label": "Magnet action",
@@ -160,6 +161,26 @@
         "lid_closed": "Closed",
         "add_cycle_button": "+ Cycle",
         "add_step_button": "+ Step"
+      },
+      "heaterShaker": {
+        "temperature": {
+          "setTemperature": "Set temperature",
+          "toggleOff": "Deactivated",
+          "toggleOn": "Active"
+        },
+        "shaker": {
+          "setShake": "Set shake speed",
+          "toggleOff": "Deactivated",
+          "toggleOn": "Active"
+        },
+        "latch": {
+          "setLatch": "Labware Latch",
+          "toggleOff": "Closed & Locked",
+          "toggleOn": "Open"
+        },
+        "timer": {
+          "heaterShakerSetTimer": "Set timer"
+        }
       }
     }
   },

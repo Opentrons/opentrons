@@ -17,6 +17,7 @@ import type { NavLocation } from '../../redux/nav/types'
 
 jest.mock('react-router-dom', () => ({ NavLink: 'a' }))
 jest.mock('../hooks')
+jest.mock('../../organisms/Labware/helpers/getAllDefs')
 
 const mockUseNavLocation = useNavLocations as jest.MockedFunction<
   typeof useNavLocations

@@ -12,10 +12,10 @@ from src.driver.highlight import highlight
 
 logger = logging.getLogger(__name__)
 
-"""All elements and actions for the Module Setup."""
-
 
 class ModuleSetup:
+    """All elements and actions for the Module Setup."""
+
     def __init__(self, driver: WebDriver) -> None:
         """Initialize with driver."""
         self.driver: WebDriver = driver
@@ -32,11 +32,11 @@ class ModuleSetup:
         "//p[text()='Thermocycler Module']",
     )
 
-    magetic_module: Tuple[str, str] = (By.XPATH, "//p[text()='Magnetic Module GEN2']")
+    magetic_module: Tuple[str, str] = (By.XPATH, "//p[text()='Magnetic Module GEN1']")
 
     temperature_module: Tuple[str, str] = (
         By.XPATH,
-        "//p[text()='Temperature Module GEN2']",
+        "//p[text()='Temperature Module GEN1']",
     )
 
     proceed_to_labware_setup: Tuple[str, str] = (
@@ -46,48 +46,54 @@ class ModuleSetup:
 
     @highlight
     def get_proceed_to_module_setup(self) -> WebElement:
+        """Locator for proceed to module setup."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(ModuleSetup.proceed_to_module_setup)
         )
 
     @highlight
     def get_thermocycler_module(self) -> WebElement:
+        """Locator for thermocycler module on deckmap."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(ModuleSetup.thermocycler_module)
         )
 
     @highlight
     def get_temperature_module(self) -> WebElement:
+        """Locator for temperature module on deckmap."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(ModuleSetup.temperature_module)
         )
 
     @highlight
     def get_module_setup_text_locator(self) -> WebElement:
-        scroll: WebElement = WebDriverWait(self.driver, 2).until(
+        """Locator for module setup text."""
+        toggle: WebElement = WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(ModuleSetup.module_setup_text_locator)
         )
         actions = ActionChains(self.driver)
-        actions.move_to_element(scroll).perform()
-        return scroll
+        actions.move_to_element(toggle).perform()
+        return toggle
 
     @highlight
     def get_magetic_module(self) -> WebElement:
-        scroll: WebElement = WebDriverWait(self.driver, 2).until(
+        """Locator for magnetic module on deckmap."""
+        toggle: WebElement = WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(ModuleSetup.magetic_module)
         )
         actions = ActionChains(self.driver)
-        actions.move_to_element(scroll).perform()
-        return scroll
+        actions.move_to_element(toggle).perform()
+        return toggle
 
     @highlight
     def get_proceed_to_labware_setup(self) -> WebElement:
-        scroll: WebElement = WebDriverWait(self.driver, 2).until(
+        """Locator for proceed to labware setup."""
+        toggle: WebElement = WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(ModuleSetup.proceed_to_labware_setup)
         )
         actions = ActionChains(self.driver)
-        actions.move_to_element(scroll).perform()
-        return scroll
+        actions.move_to_element(toggle).perform()
+        return toggle
 
     def click_proceed_to_labware_setup(self) -> None:
         self.get_proceed_to_labware_setup().click()

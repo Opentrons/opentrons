@@ -1,7 +1,11 @@
 """Simulating ProtocolRunner factory."""
 
 from opentrons.config import feature_flags
-from opentrons.hardware_control import API as HardwareAPI, SynchronousAdapter
+from opentrons.hardware_control import (
+    API as HardwareAPI,
+    SynchronousAdapter,
+    HardwareControlAPI,
+)
 from opentrons.protocol_engine import EngineConfigs, create_protocol_engine
 
 from .legacy_wrappers import LegacySimulatingContextCreator
@@ -32,7 +36,15 @@ async def create_simulating_runner() -> ProtocolRunner:
         commands: List[Command] = await runner.run(protocol)
         ```
     """
-    simulating_hardware_api = await HardwareAPI.build_hardware_simulator()
+    if feature_flags.enable_ot3_hardware_controller():
+        # Inline import because OT3API is not safe to import on an OT2 system
+        from opentrons.hardware_control.ot3api import OT3API
+
+        simulating_hardware_api: HardwareControlAPI = (
+            await OT3API.build_hardware_simulator()
+        )
+    else:
+        simulating_hardware_api = await HardwareAPI.build_hardware_simulator()
 
     # TODO(mc, 2021-08-25): move initial home to protocol engine
     await simulating_hardware_api.home()

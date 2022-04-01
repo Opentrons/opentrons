@@ -2,7 +2,7 @@ import {
   DeckDefinition,
   getSlotHasMatingSurfaceUnitVector,
   LabwareDefinition2,
-  ProtocolFile,
+  ProtocolAnalysisFile,
 } from '@opentrons/shared-data'
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
@@ -41,7 +41,7 @@ export interface LabwareRenderInfoById {
 }
 
 export const getLabwareRenderInfo = (
-  protocolData: ProtocolFile<{}>,
+  protocolData: ProtocolAnalysisFile<{}>,
   deckDef: DeckDefinition
 ): LabwareRenderInfoById =>
   protocolData.commands

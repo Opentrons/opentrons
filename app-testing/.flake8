@@ -1,9 +1,5 @@
 [flake8]
 
-# set line-length for compatibility with black
-# https://github.com/psf/black/blob/master/docs/compatible_configs.md
-max-line-length = 88
-
 # max cyclomatic complexity
 max-complexity = 9
 
@@ -14,11 +10,8 @@ extend-ignore =
     ANN101,
     ANN102
 
-# configure flake8-docstrings
-# https://pypi.org/project/flake8-docstrings/
-docstring-convention = google
-
 noqa-require-code = true
 
 per-file-ignores =
-    src/driver/drag_drop.py:E501
+    src/driver/drag_drop.py:E501,
+    locators.py:F401

@@ -37,7 +37,7 @@ import {
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 
-import { useRunStatus } from '../../../RunTimeControl/hooks'
+import { useCurrentRunStatus } from '../../../RunTimeControl/hooks'
 import { LabwarePositionCheck } from '../../LabwarePositionCheck'
 import styles from '../../styles.css'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
@@ -73,7 +73,7 @@ export const LabwareSetup = (): JSX.Element | null => {
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
-  const runStatus = useRunStatus()
+  const runStatus = useCurrentRunStatus()
   const { protocolData } = useProtocolDetails()
   const { t } = useTranslation('protocol_setup')
   const [

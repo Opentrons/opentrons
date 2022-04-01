@@ -8,7 +8,7 @@ import {
 } from '@opentrons/components'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { i18n } from '../../../../../i18n'
-import { useRunStatus } from '../../../../RunTimeControl/hooks'
+import { useCurrentRunStatus } from '../../../../RunTimeControl/hooks'
 import { TipLengthCalibration } from '../TipLengthCalibration'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -21,8 +21,8 @@ jest.mock('../../../../RunTimeControl/hooks')
 const mockUseConditionalConfirm = useConditionalConfirm as jest.MockedFunction<
   typeof useConditionalConfirm
 >
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
+const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
+  typeof useCurrentRunStatus
 >
 
 const mockConfirm = jest.fn()
@@ -53,7 +53,7 @@ describe('TipLengthCalibration', () => {
   }
 
   beforeEach(() => {
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
+    mockUseCurrentRunStatus.mockReturnValue(RUN_STATUS_IDLE)
     mockUseConditionalConfirm.mockReturnValue({
       confirm: mockConfirm,
       showConfirmation: true,
@@ -78,7 +78,7 @@ describe('TipLengthCalibration', () => {
   })
 
   it('disables the recalibrate link if tip length calibrated and run started', () => {
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
+    mockUseCurrentRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
     const { getByText } = render({ hasCalibrated: true })
     const recalibrate = getByText('Recalibrate')
     fireEvent.click(recalibrate)

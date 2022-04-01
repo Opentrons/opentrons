@@ -13,6 +13,7 @@ import {
 
 import * as stepFormSelectors from '../../step-forms/selectors'
 import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
+import { selectors } from '../../feature-flags'
 
 import { PrimaryButton, Tooltip } from '@opentrons/components'
 import {
@@ -23,6 +24,7 @@ import {
 
 jest.mock('../../step-forms/selectors')
 jest.mock('../../ui/steps/selectors')
+jest.mock('../../feature-flags')
 
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
@@ -31,12 +33,17 @@ const getCurrentFormHasUnsavedChangesMock =
   stepFormSelectors.getCurrentFormHasUnsavedChanges
 const getInitialDeckSetupMock = stepFormSelectors.getInitialDeckSetup
 const getIsMultiSelectModeMock = getIsMultiSelectMode
+const getEnabledHeaterShaker = selectors.getEnabledHeaterShaker
 
 describe('StepCreationButton', () => {
   let store: any
 
   beforeEach(() => {
     store = mockStore()
+
+    when(getEnabledHeaterShaker)
+      .calledWith(expect.anything())
+      .mockReturnValue(true)
 
     when(getCurrentFormIsPresavedMock)
       .calledWith(expect.anything())
@@ -120,10 +127,10 @@ describe('StepCreationButton', () => {
       const updatedAddStepButton = wrapper.find(StepCreationButtonComponent)
       // all 6 step button items render as children
       const stepButtonItems = updatedAddStepButton.find(StepButtonItem)
-      expect(stepButtonItems).toHaveLength(6)
+      expect(stepButtonItems).toHaveLength(7)
       // modules are disabled since there are no modules on deck
       const disabledModuleSteps = stepButtonItems.find({ disabled: true })
-      expect(disabledModuleSteps).toHaveLength(3)
+      expect(disabledModuleSteps).toHaveLength(4)
       // enabled button tooltip
       const mixTooltip = stepButtonItems.at(1).find(Tooltip)
       expect(mixTooltip.prop('children')).toBe('Mix contents of wells/tubes.')
@@ -161,9 +168,9 @@ describe('StepCreationButton', () => {
 
       // temperature step enabled since it is on the deck
       const disabledModuleSteps = stepButtonItems.find({ disabled: true })
-      expect(disabledModuleSteps).toHaveLength(2)
+      expect(disabledModuleSteps).toHaveLength(3)
       // enabled temperature module step tooltip
-      const enabledButtonTooltip = stepButtonItems.at(4).find(Tooltip)
+      const enabledButtonTooltip = stepButtonItems.at(5).find(Tooltip)
       expect(enabledButtonTooltip.prop('children')).toBe(
         'Set temperature command for Temperature module.'
       )

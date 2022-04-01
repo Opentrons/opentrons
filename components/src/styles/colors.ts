@@ -14,7 +14,7 @@ export const C_TRANSPARENT = 'transparent'
 export const C_DARK_BLACK = '#16212d'
 
 // brand colors
-export const C_BLUE = '#006fff'
+export const C_BLUE = '#006cfa'
 export const C_MINT = '#00bfa8'
 export const C_AQUAMARINE = '#eefff8'
 export const C_POWDER_BLUE = '#f1f8ff'

@@ -56,12 +56,13 @@ def test_prompt_message_with_payload(
     mock_get_input: MagicMock, mock_output: MagicMock
 ) -> None:
     """It should send a message with payload."""
-    message_id = MessageId.device_info_response
+    message_id = MessageId.write_motor_current_request
     node_id = NodeId.pipette_left
     mock_get_input.side_effect = [
         str(list(MessageId).index(message_id)),
         str(list(NodeId).index(node_id)),
         str(0xFF00FF00),
+        str(0xAA00BB00),
     ]
     r = can_comm.prompt_message(mock_get_input, mock_output)
     assert r == CanMessage(
@@ -70,7 +71,7 @@ def test_prompt_message_with_payload(
                 message_id=message_id, node_id=node_id, originating_node_id=NodeId.host
             )
         ),
-        data=b"\xff\x00\xff\x00",
+        data=b"\xff\x00\xff\x00\xAA\00\xBB\x00",
     )
 
 
@@ -78,18 +79,19 @@ def test_prompt_message_with_payload(
     argnames=["user_input"],
     argvalues=[
         # Not a number
-        [["b"]],
+        [["b", "2"]],
         # Out of range
-        [["1000000000"]],
+        [["1000000000", "2"]],
     ],
 )
 def test_prompt_enum_bad_input(
     user_input: List[str], mock_get_input: MagicMock, mock_output: MagicMock
 ) -> None:
-    """It should raise on bad input."""
+    """It should not raise on bad input but wait until input is good."""
     mock_get_input.side_effect = user_input
-    with pytest.raises(can_comm.InvalidInput):
-        can_comm.prompt_enum(MessageId, mock_get_input, mock_output)
+    parsed_id = can_comm.prompt_enum(MessageId, mock_get_input, mock_output)
+    assert mock_get_input.call_count == 2
+    assert parsed_id == MessageId.device_info_request
 
 
 @pytest.mark.parametrize(

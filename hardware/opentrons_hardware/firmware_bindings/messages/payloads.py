@@ -4,6 +4,17 @@
 #  from __future__ import annotations
 from dataclasses import dataclass
 
+from .fields import (
+    FirmwareShortSHADataField,
+    VersionFlagsField,
+    TaskNameDataField,
+    ToolField,
+    FirmwareUpdateDataField,
+    ErrorCodeField,
+    SensorTypeField,
+    PipetteNameField,
+    PipetteSerialField,
+)
 from .. import utils
 
 
@@ -19,13 +30,8 @@ class DeviceInfoResponsePayload(utils.BinarySerializable):
     """Device info response."""
 
     version: utils.UInt32Field
-
-
-class TaskNameDataField(utils.BinaryFieldBase[bytes]):
-    """The name field of TaskInfoResponsePayload."""
-
-    NUM_BYTES = 12
-    FORMAT = f"{NUM_BYTES}s"
+    flags: VersionFlagsField
+    shortsha: FirmwareShortSHADataField
 
 
 @dataclass
@@ -101,9 +107,9 @@ class AddToMoveGroupRequestPayload(MoveGroupRequestPayload):
 class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
     """Add a linear move request to a message group."""
 
-    request_stop_condition: utils.UInt8Field
     acceleration: utils.Int32Field
     velocity: utils.Int32Field
+    request_stop_condition: utils.UInt8Field
 
 
 @dataclass
@@ -134,7 +140,7 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
     """Notification of a completed move group."""
 
     seq_id: utils.UInt8Field
-    current_position: utils.UInt32Field
+    current_position_um: utils.UInt32Field
     ack_id: utils.UInt8Field
 
 
@@ -194,9 +200,9 @@ class ToolsDetectedNotificationPayload(utils.BinarySerializable):
     """Tool detection notification."""
 
     # Tools are mapped to an enum
-    z_motor: utils.UInt8Field
-    a_motor: utils.UInt8Field
-    gripper: utils.UInt8Field
+    z_motor: ToolField
+    a_motor: ToolField
+    gripper: ToolField
 
 
 @dataclass
@@ -204,13 +210,6 @@ class FirmwareUpdateWithAddress(utils.BinarySerializable):
     """A FW update payload with an address."""
 
     address: utils.UInt32Field
-
-
-class FirmwareUpdateDataField(utils.BinaryFieldBase[bytes]):
-    """The data field of FirmwareUpdateData."""
-
-    NUM_BYTES = 56
-    FORMAT = f"{NUM_BYTES}s"
 
 
 @dataclass
@@ -251,7 +250,7 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
 class FirmwareUpdateDataAcknowledge(FirmwareUpdateWithAddress):
     """A FW update data acknowledge payload."""
 
-    error_code: utils.UInt16Field
+    error_code: ErrorCodeField
 
 
 @dataclass
@@ -266,7 +265,7 @@ class FirmwareUpdateComplete(utils.BinarySerializable):
 class FirmwareUpdateAcknowledge(utils.BinarySerializable):
     """A response to a firmware update message with an error code."""
 
-    error_code: utils.UInt16Field
+    error_code: ErrorCodeField
 
 
 @dataclass
@@ -287,7 +286,7 @@ class GetLimitSwitchResponse(utils.BinarySerializable):
 class ReadFromSensorRequestPayload(utils.BinarySerializable):
     """Take a single reading from a sensor request payload."""
 
-    sensor: utils.UInt8Field
+    sensor: SensorTypeField
     offset_reading: utils.UInt8Field
 
 
@@ -295,38 +294,79 @@ class ReadFromSensorRequestPayload(utils.BinarySerializable):
 class WriteToSensorRequestPayload(utils.BinarySerializable):
     """Write a piece of data to a sensor request payload."""
 
-    sensor: utils.UInt8Field
-    data: utils.UInt16Field
+    sensor: SensorTypeField
+    data: utils.UInt32Field
+    reg_address: utils.UInt8Field
 
 
 @dataclass
 class BaselineSensorRequestPayload(utils.BinarySerializable):
     """Take a specified amount of readings from a sensor request payload."""
 
-    sensor: utils.UInt8Field
-    sample_rate: utils.UInt8Field
-    offset_update: utils.UInt8Field
+    sensor: SensorTypeField
+    sample_rate: utils.UInt16Field
 
 
 @dataclass
 class ReadFromSensorResponsePayload(utils.BinarySerializable):
     """A response for either a single reading or an averaged reading of a sensor."""
 
-    sensor: utils.UInt8Field
-    sensor_data: utils.UInt32Field
+    sensor: SensorTypeField
+    sensor_data: utils.Int32Field
 
 
 @dataclass
 class SetSensorThresholdRequestPayload(utils.BinarySerializable):
     """A request to set the threshold value of a sensor."""
 
-    sensor: utils.UInt8Field
-    threshold: utils.UInt32Field
+    sensor: SensorTypeField
+    threshold: utils.Int32Field
 
 
 @dataclass
 class SensorThresholdResponsePayload(utils.BinarySerializable):
     """A response that sends back the current threshold value of the sensor."""
 
-    sensor: utils.UInt8Field
-    threshold: utils.UInt32Field
+    sensor: SensorTypeField
+    threshold: utils.Int32Field
+
+
+@dataclass
+class SensorDiagnosticRequestPayload(utils.BinarySerializable):
+    """A response that sends back the current threshold value of the sensor."""
+
+    sensor: SensorTypeField
+    reg_address: utils.UInt8Field
+
+
+@dataclass
+class SensorDiagnosticResponsePayload(utils.BinarySerializable):
+    """A response that sends back the current threshold value of the sensor."""
+
+    sensor: SensorTypeField
+    reg_address: utils.UInt8Field
+    data: utils.UInt32Field
+
+
+@dataclass
+class PipetteInfoResponsePayload(utils.BinarySerializable):
+    """A response carrying data about an attached pipette."""
+
+    pipette_name: PipetteNameField
+    pipette_model: utils.UInt16Field
+    pipette_serial: PipetteSerialField
+
+
+@dataclass
+class BrushedMotorVrefPayload(utils.BinarySerializable):
+    """A request to set the reference voltage of a brushed motor."""
+
+    v_ref: utils.UInt32Field
+
+
+@dataclass
+class BrushedMotorPwmPayload(utils.BinarySerializable):
+    """A request to set the pwm of a brushed motor."""
+
+    freq: utils.UInt32Field
+    duty_cycle: utils.UInt32Field

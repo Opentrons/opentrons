@@ -1,7 +1,7 @@
 """Can bus drivers package."""
 
 from .driver import CanDriver
-from .can_messenger import CanMessenger
+from .can_messenger import CanMessenger, WaitableCallback
 from opentrons_hardware.firmware_bindings.message import CanMessage
 from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationId,
@@ -25,4 +25,5 @@ __all__ = [
     "ArbitrationIdParts",
     "CanMessenger",
     "DriverSettings",
+    "WaitableCallback",
 ]

@@ -4,7 +4,11 @@ import { Portal } from '../../../App/portal'
 import { useSelector } from 'react-redux'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
-import { getAttachedModules } from '../../../redux/modules'
+import {
+  getAttachedModules,
+  HEATERSHAKER_MODULE_TYPE,
+} from '../../../redux/modules'
+import { PrimaryButton, SecondaryButton } from '../../../atoms/Buttons'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
 import { AttachModule } from './AttachModule'
@@ -12,21 +16,16 @@ import { AttachAdapter } from './AttachAdapter'
 import { PowerOn } from './PowerOn'
 import { TestShake } from './TestShake'
 import {
-  ALIGN_CENTER,
-  COLORS,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  PrimaryBtn,
-  SecondaryBtn,
-  SPACING,
-  TEXT_TRANSFORM_NONE,
   JUSTIFY_FLEX_END,
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 
 import type { State } from '../../../redux/types'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
@@ -44,10 +43,9 @@ export const HeaterShakerWizard = (
   )
   const [targetProps, tooltipProps] = useHoverTooltip()
 
-  const heaterShaker = attachedModules.find(
-    //  TODO(jr, 2022-02-18): get heaterShaker module when model exists
-    module => module.model === 'magneticModuleV2'
-  )
+  const heaterShaker = (attachedModules.find(
+    module => module.type === HEATERSHAKER_MODULE_TYPE
+  ) as unknown) as HeaterShakerModule
   let isPrimaryCTAEnabled: boolean = true
 
   if (currentPage === 4) {
@@ -76,10 +74,12 @@ export const HeaterShakerWizard = (
         return <AttachAdapter />
       case 4:
         buttonContent = t('btn_test_shake')
-        return <PowerOn attachedModule={heaterShaker ?? null} />
+        return <PowerOn attachedModule={heaterShaker} />
       case 5:
         buttonContent = t('complete')
-        return <TestShake setCurrentPage={setCurrentPage} />
+        return (
+          <TestShake module={heaterShaker} setCurrentPage={setCurrentPage} />
+        )
       default:
         return null
     }
@@ -105,25 +105,17 @@ export const HeaterShakerWizard = (
           }
         >
           {currentPage > 0 ? (
-            <SecondaryBtn
-              alignItems={ALIGN_CENTER}
-              color={COLORS.blue}
-              borderRadius={SPACING.spacingS}
-              textTransform={TEXT_TRANSFORM_NONE}
+            <SecondaryButton
               data-testid={`wizard_back_btn`}
               onClick={() => setCurrentPage(currentPage => currentPage - 1)}
             >
               {t('back')}
-            </SecondaryBtn>
+            </SecondaryButton>
           ) : null}
           {currentPage <= 5 ? (
-            <PrimaryBtn
-              alignItems={ALIGN_CENTER}
+            <PrimaryButton
               disabled={!isPrimaryCTAEnabled}
               {...targetProps}
-              backgroundColor={COLORS.blue}
-              borderRadius={SPACING.spacingS}
-              textTransform={TEXT_TRANSFORM_NONE}
               data-testid={`wizard_next_btn`}
               onClick={
                 currentPage === 5
@@ -137,7 +129,7 @@ export const HeaterShakerWizard = (
                   {t('module_is_not_connected')}
                 </Tooltip>
               ) : null}
-            </PrimaryBtn>
+            </PrimaryButton>
           ) : null}
         </Flex>
       </Interstitial>

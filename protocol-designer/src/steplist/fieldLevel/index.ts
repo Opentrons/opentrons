@@ -21,12 +21,18 @@ import {
 import {
   MIN_TEMP_MODULE_TEMP,
   MAX_TEMP_MODULE_TEMP,
+  MIN_HEATER_SHAKER_MODULE_TEMP,
+  MAX_HEATER_SHAKER_MODULE_TEMP,
   MIN_TC_BLOCK_TEMP,
   MAX_TC_BLOCK_TEMP,
   MIN_TC_LID_TEMP,
   MAX_TC_LID_TEMP,
   MIN_TC_DURATION_SECONDS,
   MAX_TC_DURATION_SECONDS,
+  MIN_HEATER_SHAKER_MODULE_RPM,
+  MAX_HEATER_SHAKER_MODULE_RPM,
+  MIN_HEATER_SHAKER_DURATION_SECONDS,
+  MAX_HEATER_SHAKER_DURATION_SECONDS,
 } from '../../constants'
 import {
   LabwareEntity,
@@ -192,6 +198,34 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     getErrors: composeErrors(
       minFieldValue(MIN_TEMP_MODULE_TEMP),
       maxFieldValue(MAX_TEMP_MODULE_TEMP)
+    ),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
+    castValue: Number,
+  },
+  targetHeaterShakerTemperature: {
+    getErrors: composeErrors(
+      minFieldValue(MIN_HEATER_SHAKER_MODULE_TEMP),
+      maxFieldValue(MAX_HEATER_SHAKER_MODULE_TEMP)
+    ),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
+    castValue: Number,
+  },
+  targetSpeed: {
+    getErrors: composeErrors(
+      minFieldValue(MIN_HEATER_SHAKER_MODULE_RPM),
+      maxFieldValue(MAX_HEATER_SHAKER_MODULE_RPM)
+    ),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
+    castValue: Number,
+  },
+  heaterShakerTimerMinutes: {
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
+    castValue: Number,
+  },
+  heaterShakerTimerSeconds: {
+    getErrors: composeErrors(
+      minFieldValue(MIN_HEATER_SHAKER_DURATION_SECONDS),
+      maxFieldValue(MAX_HEATER_SHAKER_DURATION_SECONDS)
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,

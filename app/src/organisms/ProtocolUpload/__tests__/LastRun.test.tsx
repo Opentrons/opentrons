@@ -19,7 +19,7 @@ import { useMostRecentRunId } from '../hooks/useMostRecentRunId'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { RerunningProtocolModal } from '../RerunningProtocolModal'
 import { useCloneRun } from '../hooks'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
@@ -57,7 +57,7 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile
 
 const render = () => {
   return renderWithProviders(

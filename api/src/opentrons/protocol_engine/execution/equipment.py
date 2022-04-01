@@ -114,9 +114,10 @@ class EquipmentHandler:
             slot_name = location.slotName
             module_model = None
         else:
-            module = self._state_store.modules.get(location.moduleId)
-            slot_name = module.location.slotName
-            module_model = module.model
+            module_id = location.moduleId
+            module_model = self._state_store.modules.get_model(module_id)
+            module_location = self._state_store.modules.get_location(module_id)
+            slot_name = module_location.slotName
 
         offset = self._state_store.labware.find_applicable_labware_offset(
             definition_uri=definition_uri,
@@ -208,7 +209,7 @@ class EquipmentHandler:
                 for hw_mod in self._hardware_api.attached_modules
             ]
 
-            attached_module = self._state_store.modules.find_attached_module(
+            attached_module = self._state_store.modules.select_hardware_module_to_load(
                 model=model,
                 location=location,
                 attached_modules=attached_modules,
@@ -216,9 +217,9 @@ class EquipmentHandler:
 
         else:
             attached_module = HardwareModule(
-                # TODO(mc, 2022-02-14): use something a little more obvious
-                # than an opaque UUID for the virtual serial number
-                serial_number=self._model_utils.generate_id(),
+                serial_number=self._model_utils.generate_id(
+                    prefix="fake-serial-number-"
+                ),
                 definition=self._module_data_provider.get_definition(model),
             )
 

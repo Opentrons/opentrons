@@ -69,7 +69,7 @@ async def test_register_modules(
     ]
 
     module = decoy.mock(cls=AbstractModule)
-    module.usb_port = USBPort(name="baz", port_number=0)  # type: ignore[misc]
+    decoy.when(module.usb_port).then_return(USBPort(name="baz", port_number=0))
 
     decoy.when(usb_bus.match_virtual_ports(new_mods_at_ports)).then_return(actual_ports)
     decoy.when(
@@ -96,16 +96,16 @@ async def test_register_modules_sort(
 ) -> None:
     """It should sort modules by port and hub, in ascending order."""
     module_1 = decoy.mock(cls=AbstractModule)
-    module_1.usb_port = USBPort(name="a", port_number=5, hub=1)  # type: ignore[misc]
+    decoy.when(module_1.usb_port).then_return(USBPort(name="a", port_number=5, hub=1))
 
     module_2 = decoy.mock(cls=AbstractModule)
-    module_2.usb_port = USBPort(name="b", port_number=4, hub=1)  # type: ignore[misc]
+    decoy.when(module_2.usb_port).then_return(USBPort(name="b", port_number=4, hub=1))
 
     module_3 = decoy.mock(cls=AbstractModule)
-    module_3.usb_port = USBPort(name="c", port_number=3)  # type: ignore[misc]
+    decoy.when(module_3.usb_port).then_return(USBPort(name="c", port_number=3))
 
     module_4 = decoy.mock(cls=AbstractModule)
-    module_4.usb_port = USBPort(name="x", port_number=2)  # type: ignore[misc]
+    decoy.when(module_4.usb_port).then_return(USBPort(name="x", port_number=2))
 
     new_mods_at_ports = [ModuleAtPort(port="/dev/foo", name="bar")]
     actual_ports = [

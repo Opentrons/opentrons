@@ -15,17 +15,16 @@ import {
 } from '@opentrons/components'
 import { ModuleInfo } from '../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
 
-import type { AttachedModule } from '../../../redux/modules/types'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
 
 const VIEW_BOX = '-150 -40 440 128'
 interface PowerOnProps {
-  attachedModule: AttachedModule | null
+  attachedModule: HeaterShakerModule | null
 }
 
 export function PowerOn(props: PowerOnProps): JSX.Element {
   const { t } = useTranslation('heater_shaker')
-  //  TODO(jr, 2022-02-18): change this to heater shaker model when it exists
-  const moduleDef = getModuleDef2('magneticModuleV2')
+  const moduleDef = getModuleDef2('heaterShakerModuleV1')
 
   return (
     <React.Fragment>

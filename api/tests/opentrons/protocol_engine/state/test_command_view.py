@@ -1,9 +1,10 @@
 """Labware state store tests."""
 import pytest
-from collections import OrderedDict
 from contextlib import nullcontext as does_not_raise
 from datetime import datetime
 from typing import Dict, List, NamedTuple, Optional, Sequence, Type
+
+from opentrons.ordered_set import OrderedSet
 
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 
@@ -48,7 +49,7 @@ def get_command_view(
         is_door_blocking=is_door_blocking,
         run_result=run_result,
         running_command_id=running_command_id,
-        queued_command_ids=OrderedDict((i, True) for i in queued_command_ids),
+        queued_command_ids=OrderedSet(queued_command_ids),
         errors_by_id=errors_by_id or {},
         all_command_ids=all_command_ids,
         commands_by_id=commands_by_id,
@@ -157,26 +158,23 @@ def test_get_is_complete() -> None:
     assert subject.get_is_complete("command-id-4") is False
 
 
-@pytest.mark.xfail(strict=True, raises=NotImplementedError)
 def test_get_all_complete() -> None:
-    """It should return true if all commands completed or any failed."""
+    """It should return true if no commands queued or running."""
     running_command = create_running_command(command_id="command-id-2")
 
     subject = get_command_view(queued_command_ids=[])
     assert subject.get_all_complete() is True
 
-    subject = get_command_view(queued_command_ids=["command-id-1"])
+    subject = get_command_view(queued_command_ids=["queued-command-id"])
     assert subject.get_all_complete() is False
 
     subject = get_command_view(
-        queued_command_ids=[],
-        commands=[running_command],
+        queued_command_ids=[], running_command_id="running-command-id"
     )
     assert subject.get_all_complete() is False
 
     subject = get_command_view(
         queued_command_ids=[],
-        is_hardware_stopped=True,
         commands=[running_command],
     )
     assert subject.get_all_complete() is True

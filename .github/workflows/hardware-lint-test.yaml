@@ -11,15 +11,18 @@ on:
       - 'hardware/**'
       - '.github/workflows/hardware-lint-test.yaml'
       - '.github/actions/python/**'
-    branches-ignore: # ignore any release-related thing (handled elsewhere)
+    branches:
+      - 'edge'
       - 'release'
-      - 'chore_release-**'
     tags-ignore:
       - '*'
   pull_request:
     paths:
       - 'Makefile'
       - 'hardware/**'
+      - '.github/workflows/hardware-lint-test.yaml'
+      - '.github/actions/python/**'
+
   workflow_dispatch:
 
 defaults:
@@ -50,25 +53,28 @@ jobs:
         with:
           project: 'hardware'
 
-      - name: Setup SocketCan
-        run: |
-          sudo apt-get update
-          sudo apt-get install linux-modules-extra-$(uname -r)
-          sudo modprobe vcan
-
-      - name: Run OT-3 Emulator
-        uses: Opentrons/opentrons-emulation@v1.3
-        with:
-          ot3-firmware-commit-id: latest
-          modules-commit-id: latest
+# TODO(amit, 2022-03-08): Enable once ot3 emulation is ready
+#      - name: Setup SocketCan
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install linux-modules-extra-$(uname -r)
+#          sudo modprobe vcan
+#
+#      - name: Run OT-3 Emulator
+#        uses: Opentrons/opentrons-emulation@v1.3
+#        with:
+#          ot3-firmware-commit-id: latest
+#          modules-commit-id: latest
 
       - name: Lint
         run: make -C hardware lint
 
       - name: Test
-        env:
-          CAN_CHANNEL: vcan0
-        run: make -C hardware test-with-emulator
+        run: make -C hardware test-cov
+# TODO(amit, 2022-03-08): Enable once ot3 emulation is ready
+#        env:
+#          CAN_CHANNEL: vcan0
+#        run: make -C hardware test-with-emulator
 
       - name: Code Coverage
         uses: 'codecov/codecov-action@v2'

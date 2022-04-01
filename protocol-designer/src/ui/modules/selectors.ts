@@ -4,6 +4,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import mapValues from 'lodash/mapValues'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
@@ -57,6 +58,20 @@ export const getTemperatureLabwareOptions: Selector<Options> = createSelector(
       TEMPERATURE_MODULE_TYPE
     )
     return temperatureModuleOptions
+  }
+)
+
+/** Returns dropdown option for labware placed on heater shaker module */
+export const getHeaterShakerLabwareOptions: Selector<Options> = createSelector(
+  getInitialDeckSetup,
+  getLabwareNicknamesById,
+  (initialDeckSetup, nicknamesById) => {
+    const heaterShakerModuleOptions = getModuleLabwareOptions(
+      initialDeckSetup,
+      nicknamesById,
+      HEATERSHAKER_MODULE_TYPE
+    )
+    return heaterShakerModuleOptions
   }
 )
 

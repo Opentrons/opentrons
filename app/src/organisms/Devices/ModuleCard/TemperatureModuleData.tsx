@@ -60,7 +60,11 @@ export const TemperatureModuleData = (
         textColor={textColor}
         pulse={pulse}
       />
-      <Flex fontSize={FONT_SIZE_CAPTION} flexDirection={DIRECTION_COLUMN}>
+      <Flex
+        fontSize={FONT_SIZE_CAPTION}
+        flexDirection={DIRECTION_COLUMN}
+        data-testid={`temp_module_data`}
+      >
         <Text marginBottom={SPACING.spacing1}>
           {t(targetTemp === null ? 'na_temp' : 'target_temp', {
             temp: targetTemp,

@@ -23,6 +23,8 @@ make setup
 make -C app dev
 ```
 
+NOTE: if you would like to interact with a virtual robot-server being served at `localhost`, you will need to manually add `localhost` to the discovery candidates list. This can be done through the app's GUI settings for "Connect to a robot via IP address / Add Manual IP Address"
+
 At this point, the Electron app will be running with [HMR][] and various Chrome devtools enabled. The app and dev server look for the following environment variables (defaults set in Makefile):
 
 | variable             | default      | description                                   |

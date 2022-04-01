@@ -23,6 +23,17 @@ MAX_ENGAGE_HEIGHT = {
 OFFSET_TO_LABWARE_BOTTOM = {"magneticModuleV1": 5, "magneticModuleV2": 2.5}
 
 
+def engage_height_is_in_range(model: str, height: float) -> bool:
+    """Return whether or not a height would be valid to pass to `MagDeck.engage()`.
+
+    Args:
+        model: The model of Magnetic Module for which you want to check
+            the engage height.
+        height: A height that you would provide to `MagDeck.engage()`.
+    """
+    return 0 <= height <= MAX_ENGAGE_HEIGHT[model]
+
+
 class MagDeck(mod_abc.AbstractModule):
 
     FIRST_GEN2_REVISION = 20
@@ -103,7 +114,7 @@ class MagDeck(mod_abc.AbstractModule):
         For GEN2, it's millimeters.
         """
         await self.wait_for_is_running()
-        if height > MAX_ENGAGE_HEIGHT[self.model()] or height < 0:
+        if not engage_height_is_in_range(self.model(), height):
             raise ValueError(
                 f"Invalid engage height for {self.model()}: {height}. "
                 f"Must be 0 - {MAX_ENGAGE_HEIGHT[self.model()]}."

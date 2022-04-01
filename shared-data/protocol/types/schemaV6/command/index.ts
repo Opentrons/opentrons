@@ -26,6 +26,9 @@ export interface CommonCommandRunTimeInfo {
   startedAt: string | null
   completedAt: string | null
 }
+export interface CommonCommandCreateInfo {
+  key?: string
+}
 
 export type CreateCommand =
   | PipettingCreateCommand // involves the pipettes plunger motor
@@ -34,10 +37,10 @@ export type CreateCommand =
   | SetupCreateCommand // only effecting robot's equipment setup (pipettes, labware, modules, liquid), no hardware side-effects
   | TimingCreateCommand // effecting the timing of command execution
   | PauseCreateCommand // effecting the timing of command execution
-  | {
+  | ({
       commandType: 'custom'
       params: { [key: string]: any }
-    } // allows for experimentation between schema versions with no expectation of system support
+    } & CommonCommandCreateInfo) // allows for experimentation between schema versions with no expectation of system support
 
 // commands will be required to have a key, but will not be created with one
 export type RunTimeCommand =

@@ -23,7 +23,8 @@ sdist_file = dist/$(call python_get_sdistname,robot-server,robot_server)
 # make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
 # specified test
 tests ?= tests
-test_opts ?= --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+cov_opts ?= --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+test_opts ?=
 
 # Host key location for buildroot robot
 br_ssh_key ?= $(default_ssh_key)
@@ -59,7 +60,7 @@ clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__p
 run_dev ?= uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --lifespan on --reload
 
 .PHONY: all
-all: clean wheel
+all: clean sdist wheel
 
 .PHONY: setup
 setup:
@@ -100,6 +101,10 @@ sdist: $(sdist_file)
 test:
 	$(pytest) $(tests) $(test_opts)
 
+.PHONY: test-cov
+test-cov:
+	$(pytest) $(tests) $(test_opts) $(cov_opts)
+
 .PHONY: lint
 lint:
 	$(python) -m mypy $(SRC_PATH) $(tests)
@@ -119,6 +124,13 @@ dev:
 dev-with-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator.env
 dev-with-emulator:
 	$(pipenv) run $(run_dev)
+
+
+.PHONY: dev-with-ot3-emulator
+dev-with-ot3-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator_ot3.env
+dev-with-ot3-emulator:
+	$(pipenv) run $(run_dev)
+
 
 .PHONY: local-shell
 local-shell:

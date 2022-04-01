@@ -6,24 +6,21 @@ name: 'Update Server test/lint'
 on:
   push:
     paths:
-      - 'update-server/**'
+      - 'update-server/**/*'
       - 'Makefile'
       - '.github/workflows/update-server-lint-test.yaml'
       - '.github/actions/python/**'
-    branches-ignore: # ignore any release-related thing (handled elsewhere)
-      - 'release'
-      - 'chore_release-*'
+    branches: # ignore any release-related thing (handled elsewhere)
+      - 'edge'
     tags-ignore:
       - '*'
   pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
     paths:
-      - 'update-server/**'
+      - 'update-server/**/*'
       - 'Makefile'
       - '.github/workflows/update-server-lint-test.yaml'
       - '.github/actions/python/**'
-    branches-ignore: # ignore any release-related thing (handled elsewhere)
-      - 'release'
-      - 'chore_release-*'
   workflow_dispatch:
 
 defaults:

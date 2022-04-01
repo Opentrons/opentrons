@@ -5,16 +5,18 @@ import json
 import os
 from typing import Optional
 
-logger = logging.getLogger(__name__)
+from rich.console import Console
 
 
 class OtApplication:
     """Describe and manage the Opentrons application."""
 
-    def __init__(self, config_path: Path) -> None:
+    def __init__(self, config_path: Path, console: Console = Console()) -> None:
         """Initialize the Application."""
         self.config_path: Path = config_path
-        logger.info(f"config path = {self.config_path}")
+        self.console = console
+        self.console.print("config path")
+        self.console.print(self.config_path)
         self.start_modtime: Optional[float] = None
         self.read_config()
 
@@ -24,9 +26,10 @@ class OtApplication:
             with open(self.config_path, encoding="utf-8") as config_file:
                 self.config = json.load(config_file)
         except Exception as exception:
-            logger.exception(exception)
+            self.console.print_exception()
         self.start_modtime = os.path.getmtime(self.config_path)
-        logger.info(f"config.json for the application\n{self.config}")
+        self.console.print("config.json for the application")
+        self.console.print(self.config)
 
     def is_config_modified(self) -> bool:
         """Has the config file been modified since the last time we loaded it?"""
@@ -43,5 +46,5 @@ class OtApplication:
                 data = json.dumps(self.config, indent=4).replace("    ", "\t")
                 config_file.write(data)
         except Exception as exception:
-            logger.exception(exception)
+            self.console.print_exception()
         self.read_config()

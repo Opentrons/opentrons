@@ -12,6 +12,9 @@ on:
       - 'shared-data/**/*'
       - '!shared-data/js/**'
       - 'hardware/**/*'
+      - '.github/workflows/api-test-lint-deploy.yaml'
+      - '.github/actions/python/**/*'
+      - '.github/workflows/utils.js'
   push:
     paths:
       - 'api/**'
@@ -23,7 +26,9 @@ on:
       - '.github/actions/python/**/*'
       - '.github/workflows/utils.js'
     branches:
-      - '*'
+      - 'edge'
+      - 'release'
+      - '*hotfix*'
     tags:
       - 'v*'
   workflow_dispatch:
@@ -67,6 +72,8 @@ jobs:
             with-ot-hardware: 'true'
           - os: 'macos-latest'
             with-ot-hardware: 'true'
+          - os: 'macos-latest'
+            python: '3.10'
           - python: '3.10'
             with-ot-hardware: 'true'
     runs-on: '${{ matrix.os }}'
@@ -87,15 +94,21 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
+          python-version: ${{ matrix.python }}
+      - if: ${{ matrix.with-ot-hardware == 'false' }}
+        name: Remove OT-3 hardware package
+        run: make -C api setup-ot2
+        env:
+          OT_VIRTUALENV_VERSION: ${{ matrix.python }}
       - if: ${{ matrix.with-ot-hardware == 'false' }}
         name: Test without opentrons_hardware
-        run: |
-          make -C api setup-ot2
-          make -C api test-ot2
+        run: make -C api test-ot2
       - if: ${{ matrix.with-ot-hardware == 'true' }}
         name: Test with opentrons_hardware
-        run: make -C api test
-      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        run: make -C api test-cov
+      - name: Ensure assets build
+        run: make -C api sdist wheel
+      - name: Upload coverage report
         uses: 'codecov/codecov-action@v2'
         with:
           files: ./api/coverage.xml

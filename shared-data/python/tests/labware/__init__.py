@@ -4,16 +4,10 @@ from pathlib import Path
 
 
 def get_ot_defs() -> List[Tuple[str, int]]:
-    loadnames = [
-        deffile
-        for deffile in (
-            Path(__file__).parent / ".." / ".." / ".." / "labware" / "definitions" / "2"
-        ).iterdir()
-    ]
+    def_files = (
+        Path(__file__).parent / ".." / ".." / ".." / "labware" / "definitions" / "2"
+    ).glob("**/*.json")
 
-    def yielder():
-        for dirpath in loadnames:
-            for fname in dirpath.iterdir():
-                yield dirpath.name, fname.stem
-
-    return list(yielder())
+    # example filename
+    # shared-data/labware/definitions/2/opentrons_96_tiprack_300ul/1.json
+    return [(f.parent.name, int(f.stem)) for f in def_files]

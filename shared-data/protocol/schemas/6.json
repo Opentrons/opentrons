@@ -545,7 +545,7 @@
                 "required": ["moduleId", "engageHeight"],
                 "properties": {
                   "engageHeight": {
-                    "description": "Height in mm(*) from bottom plane of labware (above if positive, below if negative). *NOTE: for magneticModuleV1 (aka GEN1), these are not true mm but an arbitrary unit equal to 0.5mm. So `engageHeight: 2` means 1mm above the labware plane if the command is for a GEN1 magnetic module, but would mean 2mm above the labware plane for GEN2 module",
+                    "description": "How high, in millimeters, to raise the magnets.\n\nZero means the tops of the magnets are level with the ledge that the labware rests on. This will be slightly above the magnets' minimum height, the hardware home position. Negative values are allowed, to put the magnets below the ledge.\n\nUnits are always true millimeters. This is unlike certain labware definitions, engage commands in the Python Protocol API, and engage commands in older versions of the JSON protocol schema. Take care to convert properly.",
                     "type": "number"
                   },
                   "moduleId": {

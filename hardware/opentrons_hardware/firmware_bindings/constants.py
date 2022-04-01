@@ -20,11 +20,13 @@ class NodeId(int, Enum):
     head = 0x50
     head_l = 0x51
     head_r = 0x52
+    gripper = 0x20
     pipette_left_bootloader = pipette_left | 0xF
     pipette_right_bootloader = pipette_right | 0xF
     gantry_x_bootloader = gantry_x | 0xF
     gantry_y_bootloader = gantry_y | 0xF
     head_bootloader = head | 0xF
+    gripper_bootloader = gripper | 0xF
 
 
 @unique
@@ -52,6 +54,8 @@ class MessageId(int, Enum):
     device_info_response = 0x303
     task_info_request = 0x304
     task_info_response = 0x305
+    pipette_info_request = 0x306
+    pipette_info_response = 0x307
 
     stop_request = 0x00
 
@@ -88,6 +92,11 @@ class MessageId(int, Enum):
     read_motor_current_request = 0x34
     read_motor_current_response = 0x35
 
+    set_brushed_motor_vref_request = 0x40
+    set_brushed_motor_pwm_request = 0x41
+    gripper_grip_request = 0x42
+    gripper_home_request = 0x43
+
     read_presence_sensing_voltage_request = 0x600
     read_presence_sensing_voltage_response = 0x601
 
@@ -114,6 +123,8 @@ class MessageId(int, Enum):
     read_sensor_response = 0x85
     set_sensor_threshold_request = 0x86
     set_sensor_threshold_response = 0x87
+    sensor_diagnostic_request = 0x88
+    sensor_diagnostic_response = 0x89
 
 
 @unique
@@ -149,3 +160,13 @@ class SensorType(int, Enum):
     capacitive = 0x01
     humidity = 0x02
     temperature = 0x03
+    pressure = 0x04
+    pressure_temperature = 0x05
+
+
+@unique
+class PipetteName(int, Enum):
+    """High-level type of pipette."""
+
+    p1000_single = 0x00
+    p1000_multi = 0x01

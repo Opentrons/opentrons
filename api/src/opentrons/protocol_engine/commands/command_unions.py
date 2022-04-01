@@ -137,6 +137,7 @@ Command = Union[
     heater_shaker.StopShake,
     heater_shaker.OpenLatch,
     heater_shaker.CloseLatch,
+    magnetic_module.Disengage,
     magnetic_module.Engage,
     SetRailLights,
 ]
@@ -162,6 +163,7 @@ CommandParams = Union[
     heater_shaker.StopShakeParams,
     heater_shaker.OpenLatchParams,
     heater_shaker.CloseLatchParams,
+    magnetic_module.DisengageParams,
     magnetic_module.EngageParams,
     SetRailLightsParams,
 ]
@@ -187,6 +189,7 @@ CommandType = Union[
     heater_shaker.StopShakeCommandType,
     heater_shaker.OpenLatchCommandType,
     heater_shaker.CloseLatchCommandType,
+    magnetic_module.DisengageCommandType,
     magnetic_module.EngageCommandType,
     SetRailLightsCommandType,
 ]
@@ -211,6 +214,7 @@ CommandCreate = Union[
     heater_shaker.StopShakeCreate,
     heater_shaker.OpenLatchCreate,
     heater_shaker.CloseLatchCreate,
+    magnetic_module.DisengageCreate,
     magnetic_module.EngageCreate,
     SetRailLightsCreate,
 ]
@@ -236,6 +240,7 @@ CommandResult = Union[
     heater_shaker.StopShakeResult,
     heater_shaker.OpenLatchResult,
     heater_shaker.CloseLatchResult,
+    magnetic_module.DisengageResult,
     magnetic_module.EngageResult,
     SetRailLightsResult,
 ]

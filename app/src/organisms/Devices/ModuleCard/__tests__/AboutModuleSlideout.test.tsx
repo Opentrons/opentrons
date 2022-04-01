@@ -8,7 +8,7 @@ import {
 } from '@opentrons/api-client'
 import { i18n } from '../../../../i18n'
 import { getConnectedRobotName } from '../../../../redux/robot/selectors'
-import { useRunStatus } from '../../../RunTimeControl/hooks'
+import { useCurrentRunStatus } from '../../../RunTimeControl/hooks'
 import {
   mockMagneticModule,
   mockMagneticModuleGen2,
@@ -24,8 +24,8 @@ jest.mock('../../../RunTimeControl/hooks')
 const mockGetConnectedRobotName = getConnectedRobotName as jest.MockedFunction<
   typeof getConnectedRobotName
 >
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
+const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
+  typeof useCurrentRunStatus
 >
 
 const render = (props: React.ComponentProps<typeof AboutModuleSlideout>) => {
@@ -43,7 +43,7 @@ describe('AboutModuleSlideout', () => {
       onCloseClick: jest.fn(),
     }
     mockGetConnectedRobotName.mockReturnValue('Mock Robot Name')
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
+    mockUseCurrentRunStatus.mockReturnValue(RUN_STATUS_IDLE)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -63,14 +63,14 @@ describe('AboutModuleSlideout', () => {
   })
 
   it('renders firmware button disabled when run is running', () => {
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
+    mockUseCurrentRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
     const { getByRole } = render(props)
     const button = getByRole('button', { name: 'View Firmware Update' })
     expect(button).toBeDisabled()
   })
 
   it('renders firmware button disabled when run is finishing', () => {
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_FINISHING)
+    mockUseCurrentRunStatus.mockReturnValue(RUN_STATUS_FINISHING)
     const { getByRole } = render(props)
     const button = getByRole('button', { name: 'View Firmware Update' })
     expect(button).toBeDisabled()
@@ -127,7 +127,7 @@ describe('AboutModuleSlideout', () => {
       isExpanded: true,
       onCloseClick: jest.fn(),
     }
-    const { getByText, getByRole } = render(props)
+    const { getByText, getByRole, getByLabelText } = render(props)
 
     getByText('About Thermocycler Module')
     getByText('ghi789')
@@ -141,6 +141,9 @@ describe('AboutModuleSlideout', () => {
     const viewUpdate = getByRole('button', { name: 'View Update' })
     fireEvent.click(viewUpdate)
     expect(viewUpdate).toBeEnabled()
+    const exit = getByLabelText('close_icon')
+    fireEvent.click(exit)
+    expect(exit).not.toBeVisible()
     //  TODO(jr, 2/23/22): expect button to open a modal when this is properly wired up
   })
 })

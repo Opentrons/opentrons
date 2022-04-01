@@ -12,13 +12,14 @@ import { useRunControls } from '../RunTimeControl/hooks'
 
 export interface ConfirmCancelModalProps {
   onClose: () => unknown
+  runId: string | null
 }
 
 export function ConfirmCancelModal(
   props: ConfirmCancelModalProps
 ): JSX.Element {
-  const { onClose } = props
-  const { stop } = useRunControls()
+  const { onClose, runId } = props
+  const { stop } = useRunControls(runId)
   const { t } = useTranslation('run_details')
 
   const cancel = (): void => {

@@ -85,6 +85,7 @@ if __name__ == "__main__":
                 "opentrons_can_comm = opentrons_hardware.scripts.can_comm:main",
                 "opentrons_can_mon = opentrons_hardware.scripts.can_mon:main",
                 "opentrons_sim_can_bus = opentrons_hardware.scripts.sim_socket_can:main",  # noqa: E501
+                "opentrons_can_control = opentrons_hardware.scripts.can_control:main",
             ]
         },
     )

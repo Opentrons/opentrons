@@ -19,10 +19,10 @@ interface HeaterShakerModuleDataProps {
   heaterStatus: string
   shakerStatus: string
   latchStatus: string
-  targetTemp: number
-  currentTemp: number
-  targetSpeed: number
-  currentSpeed: number
+  targetTemp: number | null
+  currentTemp: number | null
+  targetSpeed: number | null
+  currentSpeed: number | null
   showTemperatureData?: boolean
 }
 
@@ -39,7 +39,7 @@ export const HeaterShakerModuleData = (
     currentSpeed,
     showTemperatureData,
   } = props
-  const { t } = useTranslation('device_details')
+  const { t } = useTranslation(['device_details', 'heater_shaker'])
 
   const getStatusLabelProps = (
     status: string | null
@@ -72,7 +72,11 @@ export const HeaterShakerModuleData = (
     <>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         {showTemperatureData && (
-          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing6}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            marginRight={SPACING.spacing6}
+            data-testid={`heater_shaker_module_data_temp`}
+          >
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               color={COLORS.darkGreyEnabled}
@@ -100,7 +104,10 @@ export const HeaterShakerModuleData = (
             </Text>
           </Flex>
         )}
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          data-testid={`heater_shaker_module_data_shaker`}
+        >
           <Text
             textTransform={TEXT_TRANSFORM_UPPERCASE}
             color={COLORS.darkGreyEnabled}
@@ -128,7 +135,10 @@ export const HeaterShakerModuleData = (
           </Text>
         </Flex>
       </Flex>
-      <Flex flexDirection={DIRECTION_ROW}>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        data-testid={`heater_shaker_module_data_latch`}
+      >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Text
             textTransform={TEXT_TRANSFORM_UPPERCASE}
@@ -137,16 +147,20 @@ export const HeaterShakerModuleData = (
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginTop={SPACING.spacing3}
           >
-            {'Labware Latch'}
+            {t('labware_latch', { ns: 'heater_shaker' })}
           </Text>
           <Text
             title="latch_status"
             fontSize={TYPOGRAPHY.fontSizeH6}
             alignItems={ALIGN_FLEX_START}
           >
-            <Flex flexDirection={DIRECTION_ROW}>
+            <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing2}>
               {/* {TODO(sh, 2022-02-22): Conditionally render icon based on latch status} */}
-              <Icon name="closed-locked" size={'1rem'} />
+              <Icon
+                name="closed-locked"
+                size={'1rem'}
+                color={COLORS.darkGreyEnabled}
+              />
               {latchStatus}
             </Flex>
           </Text>

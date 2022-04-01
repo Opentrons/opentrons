@@ -15,11 +15,9 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteFusedSpec,
 )
 
-# TODO(mc, 2022-02-17): investigate and resolve failures in Python 3.10
 pytestmark = pytest.mark.xfail(
-    sys.version_info >= (3, 8),
-    reason="Tests fail on later Python versions",
-    strict=False,
+    condition=sys.version_info >= (3, 10),
+    reason="https://github.com/agronholm/typeguard/issues/242",
 )
 
 

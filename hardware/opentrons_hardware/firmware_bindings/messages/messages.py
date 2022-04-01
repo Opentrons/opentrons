@@ -37,6 +37,10 @@ MessageDefinition = Union[
     defs.ReadMotorDriverRequest,
     defs.ReadMotorDriverResponse,
     defs.WriteMotorCurrentRequest,
+    defs.SetBrushedMotorVrefRequest,
+    defs.SetBrushedMotorPwmRequest,
+    defs.GripperGripRequest,
+    defs.GripperHomeRequest,
     defs.ReadPresenceSensingVoltageRequest,
     defs.ReadPresenceSensingVoltageResponse,
     defs.AttachedToolsRequest,
@@ -59,7 +63,11 @@ MessageDefinition = Union[
     defs.SetSensorThresholdRequest,
     defs.ReadFromSensorResponse,
     defs.SensorThresholdResponse,
+    defs.SensorDiagnosticRequest,
+    defs.SensorDiagnosticResponse,
     defs.HomeRequest,
+    defs.PipetteInfoRequest,
+    defs.PipetteInfoResponse,
 ]
 
 
