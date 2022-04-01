@@ -29,6 +29,7 @@ import {
 import { Divider } from '../../atoms/structure'
 import { TertiaryButton, ToggleButton } from '../../atoms/Buttons'
 import { StyledText } from '../../atoms/text'
+import { Toast } from '../../atoms/Toast'
 
 import type { Dispatch, State } from '../../redux/types'
 import type { DropdownOption } from '@opentrons/components'
@@ -283,7 +284,7 @@ export function AdvancedSettings(): JSX.Element {
                 <StyledText as="p">
                   {device?.windowsDriverVersion
                     ? device.windowsDriverVersion
-                    : 'unknown'}
+                    : t('usb_to_ethernet_adapter_no_driver_version')}
                 </StyledText>
               </Flex>
             </Flex>
