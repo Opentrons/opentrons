@@ -1,4 +1,5 @@
 """Test the Labware Landing of the page."""
+from distutils.command.config import LANG_EXT
 import os
 from pathlib import Path
 import time
@@ -58,3 +59,11 @@ def test_labware_landing_v5dot1(
         # Labware Landing Page
         left_menu.click_labware_button()
         assert left_menu.get_labware_button().is_displayed()
+        assert labware_landing.get_labware_header().text == "Labware"
+        assert labware_landing.get_labware_image().is_displayed()
+        assert labware_landing.get_labware_name().is_displayed()
+        assert labware_landing.get_api_name().is_displayed()
+        assert labware_landing.get_overflow_menu().is_displayed()
+        assert labware_landing.get_import_button().is_displayed()
+
+        labware_landing.click_import_button()
