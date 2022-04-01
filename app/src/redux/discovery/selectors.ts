@@ -2,7 +2,8 @@ import isIp from 'is-ip'
 import concat from 'lodash/concat'
 import find from 'lodash/find'
 import head from 'lodash/head'
-import { createSelector } from 'reselect'
+import isEqual from 'lodash/isEqual'
+import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect'
 import semver from 'semver'
 
 import {
@@ -36,6 +37,9 @@ type GetUnreachableRobots = (state: State) => UnreachableRobot[]
 type GetAllRobots = (state: State) => DiscoveredRobot[]
 type GetViewableRobots = (state: State) => ViewableRobot[]
 type GetConnectedRobot = (state: State) => Robot | null
+
+// from https://github.com/reduxjs/reselect#customize-equalitycheck-for-defaultmemoize
+const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual)
 
 const makeDisplayName = (name: string): string => name.replace('opentrons-', '')
 
@@ -155,12 +159,14 @@ export const getRobotByName = (
   return getViewableRobots(state).find(r => r.name === robotName) || null
 }
 
-export const getDiscoverableRobotByName = (
+export const getDiscoverableRobotByName: (
   state: State,
   robotName: string | null
-): DiscoveredRobot | null => {
-  return getAllRobots(state).find(r => r.name === robotName) || null
-}
+) => DiscoveredRobot | null = createDeepEqualSelector(
+  getAllRobots,
+  (state: State, robotName: string | null) => robotName,
+  (robots, robotName) => robots.find(r => r.name === robotName) ?? null
+)
 
 export const getRobotApiVersion = (robot: DiscoveredRobot): string | null =>
   (robot.health && semver.valid(robot.health.api_version)) ??
