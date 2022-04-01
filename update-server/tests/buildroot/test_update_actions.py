@@ -26,16 +26,17 @@ from otupdate.buildroot.update_actions import (
 def test_validate_hash_only(downloaded_update_file):
     updater = update_actions.OT2UpdateActions()
     cb = mock.Mock()
-    assert updater.validate_update(downloaded_update_file,
-                                   cb,
-                                   None,
-                                   ROOTFS_NAME,
-                                   ROOTFS_HASH_NAME,
-                                   ROOTFS_SIG_NAME,
-                                   UPDATE_FILES,
-                                   lambda file_path: open(file_path, "rb").read().strip(),
-                                   "sha256",
-                                   )
+    assert updater.validate_update(
+        downloaded_update_file,
+        cb,
+        None,
+        ROOTFS_NAME,
+        ROOTFS_HASH_NAME,
+        ROOTFS_SIG_NAME,
+        UPDATE_FILES,
+        lambda file_path: open(file_path, "rb").read().strip(),
+        "sha256",
+    )
     # We should have a callback call for
     # - the unzips (see test_unzip for calculation)
     with zipfile.ZipFile(downloaded_update_file) as zf:
@@ -55,16 +56,17 @@ def test_validate(downloaded_update_file, testing_cert):
     cb = mock.Mock()
     updater = update_actions.OT2UpdateActions()
     cert_path = testing_cert
-    assert updater.validate_update(downloaded_update_file,
-                                   cb,
-                                   cert_path,
-                                   ROOTFS_NAME,
-                                   ROOTFS_HASH_NAME,
-                                   ROOTFS_SIG_NAME,
-                                   UPDATE_FILES,
-                                   lambda file_path: open(file_path, "rb").read().strip(),
-                                   "sha256",
-                                   )
+    assert updater.validate_update(
+        downloaded_update_file,
+        cb,
+        cert_path,
+        ROOTFS_NAME,
+        ROOTFS_HASH_NAME,
+        ROOTFS_SIG_NAME,
+        UPDATE_FILES,
+        lambda file_path: open(file_path, "rb").read().strip(),
+        "sha256",
+    )
     # We should have a callback call for
     # - the unzips (see test_unzip for calculation)
     with zipfile.ZipFile(downloaded_update_file) as zf:
@@ -84,16 +86,17 @@ def test_validate_catches_bad_hash(downloaded_update_file):
     cb = mock.Mock()
     updater = update_actions.OT2UpdateActions()
     with pytest.raises(file_actions.HashMismatch):
-        updater.validate_update(downloaded_update_file,
-                                cb,
-                                None,
-                                ROOTFS_NAME,
-                                ROOTFS_HASH_NAME,
-                                ROOTFS_SIG_NAME,
-                                UPDATE_FILES,
-                                lambda file_path: open(file_path, "rb").read().strip(),
-                                "sha256",
-                                )
+        updater.validate_update(
+            downloaded_update_file,
+            cb,
+            None,
+            ROOTFS_NAME,
+            ROOTFS_HASH_NAME,
+            ROOTFS_SIG_NAME,
+            UPDATE_FILES,
+            lambda file_path: open(file_path, "rb").read().strip(),
+            "sha256",
+        )
 
 
 @pytest.mark.bad_sig
@@ -101,16 +104,17 @@ def test_validate_catches_bad_sig(downloaded_update_file, testing_cert):
     cb = mock.Mock()
     updater = update_actions.OT2UpdateActions()
     with pytest.raises(file_actions.SignatureMismatch):
-        updater.validate_update(downloaded_update_file,
-                                cb,
-                                testing_cert,
-                                ROOTFS_NAME,
-                                ROOTFS_HASH_NAME,
-                                ROOTFS_SIG_NAME,
-                                UPDATE_FILES,
-                                lambda file_path: open(file_path, "rb").read().strip(),
-                                "sha256",
-                                )
+        updater.validate_update(
+            downloaded_update_file,
+            cb,
+            testing_cert,
+            ROOTFS_NAME,
+            ROOTFS_HASH_NAME,
+            ROOTFS_SIG_NAME,
+            UPDATE_FILES,
+            lambda file_path: open(file_path, "rb").read().strip(),
+            "sha256",
+        )
 
 
 @pytest.mark.exclude_rootfs_ext4_hash_sig
@@ -118,16 +122,17 @@ def test_validate_catches_missing_sig(downloaded_update_file, testing_cert):
     cb = mock.Mock()
     updater = update_actions.OT2UpdateActions()
     with pytest.raises(file_actions.FileMissing):
-        updater.validate_update(downloaded_update_file,
-                                cb,
-                                testing_cert,
-                                ROOTFS_NAME,
-                                ROOTFS_HASH_NAME,
-                                ROOTFS_SIG_NAME,
-                                UPDATE_FILES,
-                                lambda file_path: open(file_path, "rb").read().strip(),
-                                "sha256",
-                                )
+        updater.validate_update(
+            downloaded_update_file,
+            cb,
+            testing_cert,
+            ROOTFS_NAME,
+            ROOTFS_HASH_NAME,
+            ROOTFS_SIG_NAME,
+            UPDATE_FILES,
+            lambda file_path: open(file_path, "rb").read().strip(),
+            "sha256",
+        )
 
 
 @pytest.mark.exclude_rootfs_ext4_hash
@@ -135,16 +140,17 @@ def test_validate_catches_missing_hash(downloaded_update_file, testing_cert):
     cb = mock.Mock()
     updater = update_actions.OT2UpdateActions()
     with pytest.raises(file_actions.FileMissing):
-        updater.validate_update(downloaded_update_file,
-                                cb,
-                                testing_cert,
-                                ROOTFS_NAME,
-                                ROOTFS_HASH_NAME,
-                                ROOTFS_SIG_NAME,
-                                UPDATE_FILES,
-                                lambda file_path: open(file_path, "rb").read().strip(),
-                                "sha256",
-                                )
+        updater.validate_update(
+            downloaded_update_file,
+            cb,
+            testing_cert,
+            ROOTFS_NAME,
+            ROOTFS_HASH_NAME,
+            ROOTFS_SIG_NAME,
+            UPDATE_FILES,
+            lambda file_path: open(file_path, "rb").read().strip(),
+            "sha256",
+        )
 
 
 @pytest.mark.exclude_rootfs_ext4
@@ -152,16 +158,17 @@ def test_validate_catches_missing_image(downloaded_update_file, testing_cert):
     cb = mock.Mock()
     updater = update_actions.OT2UpdateActions()
     with pytest.raises(file_actions.FileMissing):
-        updater.validate_update(downloaded_update_file,
-                                cb,
-                                testing_cert,
-                                ROOTFS_NAME,
-                                ROOTFS_HASH_NAME,
-                                ROOTFS_SIG_NAME,
-                                UPDATE_FILES,
-                                lambda file_path: open(file_path, "rb").read().strip(),
-                                "sha256",
-                                )
+        updater.validate_update(
+            downloaded_update_file,
+            cb,
+            testing_cert,
+            ROOTFS_NAME,
+            ROOTFS_HASH_NAME,
+            ROOTFS_SIG_NAME,
+            UPDATE_FILES,
+            lambda file_path: open(file_path, "rb").read().strip(),
+            "sha256",
+        )
 
 
 def test_write_update(extracted_update_file, testing_partition):

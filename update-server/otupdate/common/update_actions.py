@@ -49,9 +49,8 @@ class UpdateActionsInterface:
         rootfs_hash_name: str,
         rootfs_sig_name: str,
         update_files: List[str],
-        hash_func: Callable[[str], str],
+        hash_func: Callable[[str], bytes],
         algo: str = "sha256",
-
     ):
         """Worker for validation. Call in an executor (so it can return things)
 
