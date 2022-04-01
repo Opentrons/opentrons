@@ -86,8 +86,7 @@ class ThermocyclerDriverFactory:
             connection.set_ack(TC_ACK)
             # Must cycle the connection because the old setting of the ACK did
             # not capture the entire response.
-            await connection.close()
-            await connection.open()
+            connection.reset_input_buffer()
             return ThermocyclerDriver(connection)
 
     @staticmethod

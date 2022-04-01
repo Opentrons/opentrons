@@ -163,3 +163,11 @@ async def test_on_retry(mock_serial_port: AsyncMock, subject: SerialConnection) 
 
     mock_serial_port.close.assert_called_once()
     mock_serial_port.open.assert_called_once()
+
+
+def test_reset_input_buffer(
+    mock_serial_port: AsyncMock, subject: SerialConnection
+) -> None:
+    """It should call the underlying serial port's Reset function"""
+    subject.reset_input_buffer()
+    mock_serial_port.reset_input_buffer.assert_called_once()

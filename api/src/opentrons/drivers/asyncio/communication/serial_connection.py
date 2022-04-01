@@ -237,6 +237,9 @@ class SerialConnection:
         await self._serial.close()
         await self._serial.open()
 
+    def reset_input_buffer(self) -> None:
+        self._serial.reset_input_buffer()
+
     def process_raw_response(self, command: str, response: str) -> str:
         """
         Opportunity for derived classes to process the raw response. Default
