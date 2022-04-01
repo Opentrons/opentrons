@@ -1,4 +1,7 @@
 """Module state store tests."""
+import pytest
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import commands, actions
 from opentrons.protocol_engine.commands import heater_shaker as hs_commands
@@ -19,6 +22,7 @@ from opentrons.protocol_engine.state.module_substates import (
     MagneticModuleSubState,
     HeaterShakerModuleId,
     HeaterShakerModuleSubState,
+    ModuleSubStateType,
 )
 
 
@@ -33,19 +37,44 @@ def test_initial_state() -> None:
     )
 
 
-def test_load_module(magdeck_v2_def: ModuleDefinition) -> None:
+@pytest.mark.parametrize(
+    argnames=["module_definition", "model", "expected_substate"],
+    argvalues=[
+        (
+            lazy_fixture("magdeck_v2_def"),
+            ModuleModel.MAGNETIC_MODULE_V2,
+            MagneticModuleSubState(
+                module_id=MagneticModuleId("module-id"),
+                model=ModuleModel.MAGNETIC_MODULE_V2,
+            ),
+        ),
+        (
+            lazy_fixture("heater_shaker_v1_def"),
+            ModuleModel.HEATER_SHAKER_MODULE_V1,
+            HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("module-id"),
+                plate_target_temperature=None,
+            ),
+        ),
+    ],
+)
+def test_load_module(
+    module_definition: ModuleDefinition,
+    model: ModuleModel,
+    expected_substate: ModuleSubStateType,
+) -> None:
     """It should handle a successful LoadModule command."""
     action = actions.UpdateCommandAction(
         command=commands.LoadModule.construct(  # type: ignore[call-arg]
             params=commands.LoadModuleParams(
-                model=ModuleModel.MAGNETIC_MODULE_V2,
+                model=model,
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             ),
             result=commands.LoadModuleResult(
                 moduleId="module-id",
-                model=ModuleModel.MAGNETIC_MODULE_V2,
+                model=model,
                 serialNumber="serial-number",
-                definition=magdeck_v2_def,
+                definition=module_definition,
             ),
         )
     )
@@ -58,24 +87,41 @@ def test_load_module(magdeck_v2_def: ModuleDefinition) -> None:
         hardware_by_module_id={
             "module-id": HardwareModule(
                 serial_number="serial-number",
-                definition=magdeck_v2_def,
+                definition=module_definition,
             )
         },
-        substate_by_module_id={
-            "module-id": MagneticModuleSubState(
-                module_id=MagneticModuleId("module-id"),
-                model=ModuleModel.MAGNETIC_MODULE_V2,
-            )
-        },
+        substate_by_module_id={"module-id": expected_substate},
     )
 
 
-def test_add_module_action(magdeck_v1_def: ModuleDefinition) -> None:
+@pytest.mark.parametrize(
+    argnames=["module_definition", "expected_substate"],
+    argvalues=[
+        (
+            lazy_fixture("magdeck_v2_def"),
+            MagneticModuleSubState(
+                module_id=MagneticModuleId("module-id"),
+                model=ModuleModel.MAGNETIC_MODULE_V2,
+            ),
+        ),
+        (
+            lazy_fixture("heater_shaker_v1_def"),
+            HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("module-id"),
+                plate_target_temperature=None,
+            ),
+        ),
+    ],
+)
+def test_add_module_action(
+    module_definition: ModuleDefinition,
+    expected_substate: ModuleSubStateType,
+) -> None:
     """It should be able to add attached modules directly into state."""
     action = actions.AddModuleAction(
         module_id="module-id",
         serial_number="serial-number",
-        definition=magdeck_v1_def,
+        definition=module_definition,
     )
 
     subject = ModuleStore()
@@ -86,15 +132,10 @@ def test_add_module_action(magdeck_v1_def: ModuleDefinition) -> None:
         hardware_by_module_id={
             "module-id": HardwareModule(
                 serial_number="serial-number",
-                definition=magdeck_v1_def,
+                definition=module_definition,
             )
         },
-        substate_by_module_id={
-            "module-id": MagneticModuleSubState(
-                module_id=MagneticModuleId("module-id"),
-                model=ModuleModel.MAGNETIC_MODULE_V1,
-            )
-        },
+        substate_by_module_id={"module-id": expected_substate},
     )
 
 

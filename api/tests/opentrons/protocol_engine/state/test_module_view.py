@@ -730,6 +730,8 @@ def test_validate_target_temperature(
     if not expected_valid:
         with pytest.raises(errors.InvalidTargetTemperatureError):
             subject.validate_target_temperature(target_temp)
+    else:
+        assert subject.validate_target_temperature(target_temp) == target_temp
 
 
 @pytest.mark.parametrize(
