@@ -13,7 +13,7 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
 )
 
-from robot_server.db import create_in_memory_db
+from robot_server.db import opened_db
 from robot_server.protocols.protocol_store import (
     add_tables_to_db,
     ProtocolStore,

@@ -2,6 +2,7 @@
 
 
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Generator
 
 from sqlalchemy import create_engine
@@ -13,49 +14,24 @@ from sqlalchemy.pool import StaticPool
 # convert these to return an async engine.
 # https://docs.sqlalchemy.org/en/14/orm/extensions/asyncio.html
 @contextmanager
-def create_in_memory_db() -> Generator[SQLEngine, None, None]:
-    """Return an Engine for a new in-memory SQLite database.
+def opened_db(db_file_path: Path) -> Generator[SQLEngine, None, None]:
+    """Return an Engine for a SQLite database on hte filesystem.
 
-    Clean up the database and its connections when the context manager exits.
-
-    Different threads may open connections through the returned `Engine`.
-    They will connect to the same underlying database.
+    Clean up the engine when the context manager exits.
 
     The new database will be totally blank--no tables.
     """
-    new_engine = create_in_memory_db_no_cleanup()
+    new_engine = open_db_no_cleanup(db_file_path=db_file_path)
     try:
         yield new_engine
     finally:
         new_engine.dispose()
 
 
-def create_in_memory_db_no_cleanup() -> SQLEngine:
+def open_db_no_cleanup(db_file_path: Path) -> SQLEngine:
     """Like `create_in_memory_db()`, except without automatic cleanup."""
-    # fmt: off
     return create_engine(
-        # Per https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#connect-strings:
-        #   "The sqlite :memory: identifier is the default if no filepath is present".
-        # And, per https://www.sqlite.org/inmemorydb.html:
-        #   "Every :memory: database is distinct from every other".
-        "sqlite://",
-
-        # Trickery endorsed by docs.sqlalchemy.org/en/14/dialects/sqlite.html:
-
-        # The default, SingletonThreadPool, gives each accessing thread
-        # its own dedicated connection. This would cause problems for us.
-        # Because SQLite in-memory databases are connection-specific,
-        # each thread that connects through this Engine would access a different
-        # database. But we want them to all hit the same one.
-        #
-        # Using StaticPool fixes this by funneling everything through
-        # a single connection.
-        poolclass=StaticPool,
-
-        # pysqlite, which SQLAlchemy uses internally,
-        # apparently blocks us from sharing the single static connection
-        # across multiple threads for obsolete reasons.
-        # Disable this enforcement.
-        connect_args={'check_same_thread': False}
+        # sqlite://<hostname>/<path>
+        # where <hostname> is empty.
+        f"sqlite:///{db_file_path}",
     )
-    # fmt: on

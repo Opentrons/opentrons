@@ -1,7 +1,10 @@
-"""Protocol router dependency wire-up."""
+"""FastAPI dependencies for protocol endpoints."""
+
+
 import logging
 from pathlib import Path
 from tempfile import gettempdir
+from typing_extensions import Final
 
 from anyio import Path as AsyncPath
 from fastapi import Depends
@@ -10,7 +13,7 @@ from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
 
 from robot_server.app_state import AppState, AppStateValue, get_app_state
-from robot_server.db import create_in_memory_db_no_cleanup
+from robot_server.db import open_db_no_cleanup
 from robot_server.settings import get_settings
 
 from .protocol_store import (
@@ -23,10 +26,15 @@ from .analysis_store import AnalysisStore
 from sqlalchemy.engine import Engine as SQLEngine
 
 
-log = logging.getLogger(__name__)
+# Relative to our root persistence directory.
+_PROTOCOL_FILES_SUBDIRECTORY: Final[str] = "protocols"
+_DATABASE_FILE: Final[str] = "i_do_not_know_what_to_name_this.db"
+
+
+_log = logging.getLogger(__name__)
 
 _sql_engine = AppStateValue[SQLEngine]("sql_engine")
-_persistence_directory = AppStateValue[AsyncPath]("persistence_directory")
+_persistence_directory = AppStateValue[Path]("persistence_directory")
 _protocol_directory = AppStateValue[Path]("protocol_directory")
 _protocol_store = AppStateValue[ProtocolStore]("protocol_store")
 _analysis_store = AppStateValue[AnalysisStore]("analysis_store")
@@ -34,7 +42,7 @@ _analysis_store = AppStateValue[AnalysisStore]("analysis_store")
 
 async def _get_persistence_directory(
     app_state: AppState = Depends(get_app_state)
-) -> AsyncPath:
+) -> Path:
     """Return the root persistence directory, creating it if necessary."""
     result = _persistence_directory.get_from(app_state)
 
@@ -42,32 +50,32 @@ async def _get_persistence_directory(
         setting = get_settings().persistence_directory
 
         if setting == "automatically_make_temporary":
-            result = AsyncPath(gettempdir())
-            log.info(
+            # Blocking I/O because we don't have an async gettempdir(). :(
+            result = Path(gettempdir())
+            _log.info(
                 f"Using auto-created temporary directory {result} for persistence."
             )
         else:
-            result = AsyncPath(setting)
-            await result.mkdir(parents=True, exist_ok=True)
-            log.info(f"Using directory {result} for persistence.")
+            result = setting
+            await AsyncPath(result).mkdir(parents=True, exist_ok=True)
+            _log.info(f"Using directory {result} for persistence.")
 
         _persistence_directory.set_on(app_state, result)
 
     return result
 
 
-def _get_sql_engine(app_state: AppState = Depends(get_app_state)) -> SQLEngine:
+def _get_sql_engine(
+    app_state: AppState = Depends(get_app_state),
+    persistence_directory: Path = Depends(_get_persistence_directory)
+) -> SQLEngine:
     sql_engine = _sql_engine.get_from(app_state)
 
     if sql_engine is None:
-        # It's important that create_in_memory_db_no_cleanup() returns
-        # a SQLEngine that's explicitly okay to pass between threads.
-        # FastAPI dependency may run this dependency function in a separate thread
-        # from the request handlers using this SQLEngine.
-        sql_engine = create_in_memory_db_no_cleanup()
-
+        sql_engine = open_db_no_cleanup(
+            db_file_path=persistence_directory / _DATABASE_FILE
+        )
         add_protocol_store_tables_to_db(sql_engine)
-
         _sql_engine.set_on(app_state, sql_engine)
 
     return sql_engine
@@ -78,11 +86,12 @@ def _get_sql_engine(app_state: AppState = Depends(get_app_state)) -> SQLEngine:
 
 
 def get_protocol_reader(
-    persistence_directory: AsyncPath = Depends(_get_persistence_directory)
+    persistence_directory: Path = Depends(_get_persistence_directory)
 ) -> ProtocolReader:
     """Get a ProtocolReader to read and save uploaded protocol files."""
-    protocol_directory = persistence_directory / "protocols"
-    return ProtocolReader(directory=Path(protocol_directory))
+    return ProtocolReader(
+        directory=persistence_directory / _PROTOCOL_FILES_SUBDIRECTORY
+    )
 
 
 def get_protocol_store(
