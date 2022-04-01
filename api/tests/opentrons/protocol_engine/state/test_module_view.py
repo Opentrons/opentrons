@@ -216,8 +216,8 @@ def test_get_magnetic_module_substate(
             ),
             "heatshake-module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("heatshake-module-id"),
-                plate_target_temperature=None
-            )
+                plate_target_temperature=None,
+            ),
         },
     )
 
@@ -267,8 +267,8 @@ def test_get_heater_shaker_module_substate(
             ),
             "heatshake-module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("heatshake-module-id"),
-                plate_target_temperature=432
-            )
+                plate_target_temperature=432,
+            ),
         },
     )
 
@@ -745,9 +745,7 @@ def test_magnetic_module_view_calculate_magnet_hardware_height(
         assert result == expected_result
 
 
-@pytest.mark.parametrize(
-    "target_temp", [36.8, 95.1]
-)
+@pytest.mark.parametrize("target_temp", [36.8, 95.1])
 def test_validate_target_temperature_raises(
     heater_shaker_v1_def: ModuleDefinition,
     target_temp: float,
