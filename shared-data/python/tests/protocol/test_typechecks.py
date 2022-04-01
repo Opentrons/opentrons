@@ -1,5 +1,5 @@
 import json
-
+import sys
 import pytest
 import typeguard
 
@@ -10,6 +10,12 @@ from opentrons_shared_data.protocol.dev_types import (
     JsonProtocolV5,
 )
 from . import list_fixtures
+
+
+pytestmark = pytest.mark.xfail(
+    condition=sys.version_info >= (3, 10),
+    reason="https://github.com/agronholm/typeguard/issues/242",
+)
 
 
 @pytest.mark.parametrize("defpath", list_fixtures(3))

@@ -31,6 +31,10 @@ const getChannelOptions = Config.getUpdateChannelOptions as jest.MockedFunction<
   typeof Config.getUpdateChannelOptions
 >
 
+const mockGetIsLabwareOffsetCodeSnippetsOn = Config.getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
+  typeof Config.getIsLabwareOffsetCodeSnippetsOn
+>
+
 describe('AdvancedSettings', () => {
   beforeEach(() => {
     getCustomLabwarePath.mockReturnValue('')
@@ -93,6 +97,24 @@ describe('AdvancedSettings', () => {
       'Disabling this may improve overall networking performance in environments with many robots, but it may be slower to find robots when opening the app.'
     )
     getByRole('switch', { name: 'display_unavailable_robots' })
+  })
+
+  it('renders the display show link to get labware offset data section', () => {
+    const [{ getByText, getByRole }] = render()
+    getByText('Show link to get Labware Offset data')
+    getByText(
+      'If you need to access Labware Offset data outside of the Opentrons App, enabling this setting will display a link to get Offset Data in the Recent Runs overflow menu and in the Labware Setup section of the Protocol page.'
+    )
+    getByRole('switch', { name: 'show_link_to_get_labware_offset_data' })
+  })
+
+  it('renders the toggle button on when show link to labware offset data setting is true', () => {
+    mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(true)
+    const [{ getByRole }] = render()
+    const toggleButton = getByRole('switch', {
+      name: 'show_link_to_get_labware_offset_data',
+    })
+    expect(toggleButton.getAttribute('aria-checked')).toBe('true')
   })
 
   it('renders the clear unavailable robots section', () => {
