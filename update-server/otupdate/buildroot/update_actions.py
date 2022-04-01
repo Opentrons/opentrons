@@ -35,7 +35,6 @@ class RootPartitions(enum.Enum):
 
 
 class OT2UpdateActions(UpdateActionsInterface):
-
     def validate_update(
         self,
         filepath: str,

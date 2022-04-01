@@ -81,7 +81,9 @@ class RootFSInterface:
         total_size = os.path.getsize(rootfs_filepath)
         written_size = 0
         try:
-            with lzma.open(rootfs_filepath, "rb") as fsrc, open(part.path, "wb") as fdst:
+            with lzma.open(rootfs_filepath, "rb") as fsrc, open(
+                part.path, "wb"
+            ) as fdst:
                 try:
                     shutil.copyfileobj(fsrc, fdst, length=chunk_size)
                     written_size += chunk_size
@@ -122,7 +124,9 @@ class Updater(UpdateActionsInterface):
         """
         unused = self.part_mngr.find_unused_partition()
         part_path = unused.path
-        with tempfile.TemporaryDirectory(dir=self.part_mngr.mountpoint_root()) as mountpoint:
+        with tempfile.TemporaryDirectory(
+            dir=self.part_mngr.mountpoint_root()
+        ) as mountpoint:
             subprocess.check_output(["mount", part_path, mountpoint])
             LOG.info(f"mounted {part_path} to {mountpoint}")
             try:
