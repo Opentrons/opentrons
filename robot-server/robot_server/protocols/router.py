@@ -166,6 +166,7 @@ async def get_protocols(
             metadata=Metadata.parse_obj(r.source.metadata),
             analyses=analysis_store.get_by_protocol(r.protocol_id),
             files=[ProtocolFile(name=f.name, role=f.role) for f in r.source.files],
+            protocol_key=r.protocol_key
         )
         for r in protocol_resources
     ]
@@ -211,6 +212,7 @@ async def get_protocol_by_id(
         metadata=Metadata.parse_obj(resource.source.metadata),
         analyses=analyses,
         files=[ProtocolFile(name=f.name, role=f.role) for f in resource.source.files],
+        protocol_key=resource.protocol_key
     )
 
     return await PydanticResponse.create(

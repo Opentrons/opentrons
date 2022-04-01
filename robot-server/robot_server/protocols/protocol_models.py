@@ -1,7 +1,7 @@
 """Protocol file models."""
 from datetime import datetime
 from pydantic import BaseModel, Extra, Field
-from typing import Sequence
+from typing import Sequence, Optional
 
 from opentrons.protocol_reader import (
     ProtocolType as ProtocolType,
@@ -78,3 +78,5 @@ class Protocol(ResourceModel):
         ...,
         description="An analysis of how the protocol is expected to run.",
     )
+
+    protocol_key: Optional[str] = None
