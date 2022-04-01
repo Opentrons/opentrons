@@ -220,7 +220,7 @@
     },
 
     "labware": {
-      "description": "All instances of labware used in this protocol, and references to their definitionslabwareId, keyed by a unique identifier (labwareId)",
+      "description": "All instances of labware used in this protocol, and references to their definitions' labwareId, keyed by a unique identifier (labwareId)",
       "patternProperties": {
         ".+": {
           "description": "Fields describing a single labware",
