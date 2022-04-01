@@ -2,6 +2,8 @@
 import logging
 from pathlib import Path
 from tempfile import gettempdir
+
+from anyio import Path as AsyncPath
 from fastapi import Depends
 
 from opentrons.protocol_reader import ProtocolReader
@@ -9,6 +11,8 @@ from opentrons.protocol_runner import create_simulating_runner
 
 from robot_server.app_state import AppState, AppStateValue, get_app_state
 from robot_server.db import create_in_memory_db_no_cleanup
+from robot_server.settings import get_settings
+
 from .protocol_store import (
     ProtocolStore,
     add_tables_to_db as add_protocol_store_tables_to_db,
@@ -22,9 +26,34 @@ from sqlalchemy.engine import Engine as SQLEngine
 log = logging.getLogger(__name__)
 
 _sql_engine = AppStateValue[SQLEngine]("sql_engine")
+_persistence_directory = AppStateValue[AsyncPath]("persistence_directory")
 _protocol_directory = AppStateValue[Path]("protocol_directory")
 _protocol_store = AppStateValue[ProtocolStore]("protocol_store")
 _analysis_store = AppStateValue[AnalysisStore]("analysis_store")
+
+
+async def _get_persistence_directory(
+    app_state: AppState = Depends(get_app_state)
+) -> AsyncPath:
+    """Return the root persistence directory, creating it if necessary."""
+    result = _persistence_directory.get_from(app_state)
+
+    if result is None:
+        setting = get_settings().persistence_directory
+
+        if setting == "automatically_make_temporary":
+            result = AsyncPath(gettempdir())
+            log.info(
+                f"Using auto-created temporary directory {result} for persistence."
+            )
+        else:
+            result = AsyncPath(setting)
+            await result.mkdir(parents=True, exist_ok=True)
+            log.info(f"Using directory {result} for persistence.")
+
+        _persistence_directory.set_on(app_state, result)
+
+    return result
 
 
 def _get_sql_engine(app_state: AppState = Depends(get_app_state)) -> SQLEngine:
@@ -49,17 +78,11 @@ def _get_sql_engine(app_state: AppState = Depends(get_app_state)) -> SQLEngine:
 
 
 def get_protocol_reader(
-    app_state: AppState = Depends(get_app_state),
+    persistence_directory: AsyncPath = Depends(_get_persistence_directory)
 ) -> ProtocolReader:
     """Get a ProtocolReader to read and save uploaded protocol files."""
-    protocol_dir = _protocol_directory.get_from(app_state)
-
-    if protocol_dir is None:
-        protocol_dir = Path(gettempdir()) / "opentrons-protocols"
-        _protocol_directory.set_on(app_state, protocol_dir)
-        log.info(f"Storing protocols in {protocol_dir}")
-
-    return ProtocolReader(directory=protocol_dir)
+    protocol_directory = persistence_directory / "protocols"
+    return ProtocolReader(directory=Path(protocol_directory))
 
 
 def get_protocol_store(
