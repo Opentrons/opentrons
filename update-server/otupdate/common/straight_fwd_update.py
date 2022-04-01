@@ -45,6 +45,7 @@ def _begin_unzip_update_package(
             ROOTFS_HASH_NAME,
             ROOTFS_SIG_NAME,
             UPDATE_FILES,
+            lambda file_path: open(file_path, "rb").read().strip().split()[0],
             "md5",
         )
     )

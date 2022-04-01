@@ -49,7 +49,9 @@ class UpdateActionsInterface:
         rootfs_hash_name: str,
         rootfs_sig_name: str,
         update_files: List[str],
+        hash_func: Callable[[str], str],
         algo: str = "sha256",
+
     ):
         """Worker for validation. Call in an executor (so it can return things)
 
@@ -68,6 +70,7 @@ class UpdateActionsInterface:
         :param rootfs_sig_name: name of root FS sig
         :param algo: hash algo to use (md5/sha256)
         :param update_files: list of update files
+        :param hash_func: callable to extract hash
         :returns str: Path to the rootfs file to update
 
         Will also raise an exception if validation fails
@@ -87,11 +90,12 @@ class UpdateActionsInterface:
         rootfs = files.get(rootfs_name)
         assert rootfs
         rootfs_hash = hash_file(
-            rootfs, hash_callback, file_size=sizes[rootfs_name], algo="md5"
+            rootfs, hash_callback, file_size=sizes[rootfs_name], algo=algo
         )
         hashfile = files.get(rootfs_hash_name)
         assert hashfile
-        packaged_hash = open(hashfile, "rb").read().strip().split()[0]
+        packaged_hash = hash_func(hashfile)
+
         if packaged_hash != rootfs_hash:
             msg = (
                 f"Hash mismatch: calculated {rootfs_hash!r} != "
