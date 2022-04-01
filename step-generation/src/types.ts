@@ -393,7 +393,6 @@ export type CommandCreatorArgs =
   | ThermocyclerProfileStepArgs
   | ThermocyclerStateStepArgs
   | HeaterShakerArgs
-// | SetShakeSpeedArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
