@@ -108,6 +108,7 @@ async def test_get_protocols(
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-key-111"
     )
     resource_2 = ProtocolResource(
         protocol_id="123",
@@ -120,6 +121,7 @@ async def test_get_protocols(
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-key-222"
     )
 
     analysis_1 = PendingAnalysis(id="analysis-id-abc")
@@ -173,6 +175,7 @@ async def test_get_protocol_by_id(
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-key-111"
     )
 
     analysis = PendingAnalysis(id="analysis-id")
@@ -243,6 +246,7 @@ async def test_create_protocol(
         protocol_id="protocol-id",
         created_at=datetime(year=2021, month=1, day=1),
         source=protocol_source,
+        protocol_key="dummy-key-111"
     )
 
     analysis = PendingAnalysis(id="analysis-id")

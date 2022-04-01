@@ -51,6 +51,7 @@ async def test_insert_and_get_protocol(tmp_path: Path, subject: ProtocolStore) -
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-data-111"
     )
 
     subject.insert(protocol_resource)
@@ -74,6 +75,7 @@ async def test_insert_with_duplicate_key_raises(
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-data-111"
     )
     protocol_resource_2 = ProtocolResource(
         protocol_id="protocol-id",
@@ -86,6 +88,7 @@ async def test_insert_with_duplicate_key_raises(
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-data-222"
     )
     subject.insert(protocol_resource_1)
 
@@ -119,6 +122,7 @@ async def test_get_all_protocols(tmp_path: Path, subject: ProtocolStore) -> None
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-data-111"
     )
     resource_2 = ProtocolResource(
         protocol_id="123",
@@ -131,6 +135,7 @@ async def test_get_all_protocols(tmp_path: Path, subject: ProtocolStore) -> None
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-data-222"
     )
 
     subject.insert(resource_1)
@@ -158,6 +163,7 @@ async def test_remove_protocol(tmp_path: Path, subject: ProtocolStore) -> None:
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-data-111"
     )
 
     subject.insert(protocol_resource)

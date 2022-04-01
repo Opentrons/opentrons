@@ -6,7 +6,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from logging import getLogger
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import sqlalchemy
 
@@ -23,6 +23,7 @@ class ProtocolResource:
     protocol_id: str
     created_at: datetime
     source: ProtocolSource
+    protocol_key: Optional[str] = None
 
 
 class ProtocolNotFoundError(KeyError):
@@ -143,6 +144,11 @@ _protocol_table = sqlalchemy.Table(
         sqlalchemy.PickleType,
         nullable=False,
     ),
+    sqlalchemy.Column(
+        "protocol_key",
+        sqlalchemy.String,
+        nullable=True
+    )
 )
 
 
@@ -156,8 +162,11 @@ def _convert_sql_row_to_resource(sql_row: sqlalchemy.engine.Row) -> ProtocolReso
     source = sql_row.source
     assert isinstance(source, ProtocolSource)
 
+    protocol_key = sql_row.protocol_key
+    assert isinstance(protocol_key, str)
+
     return ProtocolResource(
-        protocol_id=protocol_id, created_at=created_at, source=source
+        protocol_id=protocol_id, created_at=created_at, source=source, protocol_key=protocol_key
     )
 
 
@@ -166,4 +175,5 @@ def _convert_resource_to_sql_values(resource: ProtocolResource) -> Dict[str, obj
         "id": resource.protocol_id,
         "created_at": resource.created_at,
         "source": resource.source,
+        "protocol_key": resource.protocol_key
     }

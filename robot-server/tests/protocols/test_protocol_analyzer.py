@@ -60,6 +60,7 @@ async def test_analyze(
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-data-111"
     )
 
     analysis_command = pe_commands.Pause(

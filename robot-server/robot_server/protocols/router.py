@@ -109,6 +109,7 @@ async def create_protocol(
         protocol_id=protocol_id,
         created_at=created_at,
         source=source,
+        protocol_key="dummy-key-111"
     )
 
     protocol_store.insert(protocol_resource)
