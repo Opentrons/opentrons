@@ -1,14 +1,10 @@
 """ oe_update.py: client script for running OE updates
 
-Straight forward client script to update OT3/OE.
-Straight forward because it doesn't check for checksums or key signing!
-
 This requires aiohttp
 """
 
 import argparse
 import asyncio
-import enum
 import json
 import sys
 
