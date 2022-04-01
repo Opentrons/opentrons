@@ -67,7 +67,7 @@ clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__p
 plot_type ?=
 
 .PHONY: all
-all: clean wheel
+all: clean sdist wheel
 
 .PHONY: setup
 setup:

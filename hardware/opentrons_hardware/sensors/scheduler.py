@@ -80,6 +80,8 @@ class SensorScheduler:
                 payload=WriteToSensorRequestPayload(
                     sensor=SensorTypeField(sensor.sensor_type),
                     data=UInt32Field(sensor.data.to_int),
+                    # TODO(lc, 03-29-2022, actually pass in a register value)
+                    reg_address=UInt8Field(0x0),
                 )
             ),
         )

@@ -80,6 +80,10 @@
   "shake_speed": "Shake speed",
   "test_shake_troubleshooting_slideout_description": "Revisit instructions for attaching the module to the deck as well as attaching the thermal adapter.",
   "go_to_attachment_instructions": "Go to attachment instructions",
+  "heater_shaker_is_shaking": "Heater Shaker Module is currently shaking",
+  "continue_shaking_protocol_start_prompt": "Continue shaking while the protocol starts?",
+  "stop_shaking_start_run": "Stop shaking and start run",
+  "keep_shaking_start_run": "Keep shaking and start run",
   "closed": "Closed",
   "closed_and_locked": "Closed and Locked"
 }
