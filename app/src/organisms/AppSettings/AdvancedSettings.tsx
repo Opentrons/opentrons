@@ -15,6 +15,7 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import * as Config from '../../redux/config'
 import * as Calibration from '../../redux/calibration'
@@ -221,6 +222,58 @@ export function AdvancedSettings(): JSX.Element {
             }
             id="AdvancedSettings_unavailableRobotsToggleButton"
           />
+        </Flex>
+        <Divider marginY={SPACING.spacing5} />
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Box width="70%">
+            <StyledText
+              as="h3"
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
+              id="AdvancedSettings_u2eInformation"
+            >
+              {t('usb_to_ethernet_adapter_info')}
+            </StyledText>
+            <StyledText as="p">
+              {t('usb_to_ethernet_adapter_info_description')}
+            </StyledText>
+            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                paddingRight={SPACING.spacing4}
+              >
+                <StyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('usb_to_ethernet_adapter_description')}
+                </StyledText>
+                <StyledText as="p">dummy text</StyledText>
+              </Flex>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                paddingRight={SPACING.spacing4}
+              >
+                <StyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('usb_to_ethernet_adapter_manufacturer')}
+                </StyledText>
+                <StyledText as="p">Opentrons</StyledText>
+              </Flex>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                paddingRight={SPACING.spacing4}
+              >
+                <StyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('usb_to_ethernet_adapter_driver_version')}
+                </StyledText>
+                <StyledText as="p">11.111.111</StyledText>
+              </Flex>
+            </Flex>
+          </Box>
+
+          {/* <ToggleButton
+            label="show_link_to_get_labware_offset_data"
+            toggledOn={isLabwareOffsetCodeSnippetsOn}
+            onClick={toggleLabwareOffsetData}
+            id="AdvancedSettings_showLinkToggleButton"
+          /> */}
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
