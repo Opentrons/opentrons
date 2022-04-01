@@ -140,22 +140,12 @@ function getWarningContent({
   return null
 }
 
-export const v4WarningContent: JSX.Element = (
+export const v6WarningContent: JSX.Element = (
   <div>
     <p>
-      {i18n.t(`alert.hint.export_v4_protocol_3_18.body1`)}{' '}
-      <strong>{i18n.t(`alert.hint.export_v4_protocol_3_18.body2`)}</strong>
-      {i18n.t(`alert.hint.export_v4_protocol_3_18.body3`)}
-    </p>
-  </div>
-)
-
-export const v5WarningContent: JSX.Element = (
-  <div>
-    <p>
-      {i18n.t(`alert.hint.export_v5_protocol_3_20.body1`)}{' '}
-      <strong>{i18n.t(`alert.hint.export_v5_protocol_3_20.body2`)}</strong>
-      {i18n.t(`alert.hint.export_v5_protocol_3_20.body3`)}
+      {i18n.t(`alert.hint.export_v6_protocol_5_10.body1`)}{' '}
+      <strong>{i18n.t(`alert.hint.export_v6_protocol_5_10.body2`)}</strong>
+      {i18n.t(`alert.hint.export_v6_protocol_5_10.body3`)}
     </p>
   </div>
 )
@@ -214,11 +204,8 @@ export function FileSidebar(props: Props): JSX.Element {
     content: React.ReactNode
   } => {
     return {
-      hintKey:
-        schemaVersion === 5
-          ? 'export_v5_protocol_3_20'
-          : 'export_v4_protocol_3_18',
-      content: schemaVersion === 5 ? v5WarningContent : v4WarningContent,
+      hintKey: 'export_v6_protocol_5_10',
+      content: v6WarningContent,
     }
   }
 
