@@ -14,7 +14,6 @@ from . import types, update, mod_abc
 from opentrons.drivers.thermocycler import (
     AbstractThermocyclerDriver,
     SimulatingDriver,
-    ThermocyclerDriver,
     ThermocyclerDriverV2,
     ThermocyclerDriverFactory,
 )
