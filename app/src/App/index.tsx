@@ -35,11 +35,11 @@ import type { State } from '../redux/types'
 const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
 export const AppComponent = (): JSX.Element => {
-  // const connectedRobot = useSelector((state: State) => getConnectedRobot(state))
+  const connectedRobot = useSelector((state: State) => getConnectedRobot(state))
   const isNextGenApp = useFeatureFlag('hierarchyReorganization')
 
   return (
-    <ApiHostProvider hostname={null}>
+    <ApiHostProvider hostname={connectedRobot?.ip ?? null}>
       <GlobalStyle />
       <Flex
         position={POSITION_FIXED}
