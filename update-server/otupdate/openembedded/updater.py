@@ -6,20 +6,14 @@ import shutil
 import tempfile
 
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
-from typing import Callable, Optional
+from typing import Callable
 import enum
 import subprocess
 
-from otupdate.common.file_actions import (
-    unzip_update,
-    hash_file,
-    verify_signature,
-    HashMismatch,
-)
-
 import logging
 
-ROOTFS_SIG_NAME = "rootfs.ext4.hash.sig"
+UPDATE_PKG = "ot3-system.zip"
+ROOTFS_SIG_NAME = "rootfs.xz.hash.sig"
 ROOTFS_HASH_NAME = "rootfs.xz.md5sum"
 ROOTFS_NAME = "rootfs.xz"
 UPDATE_FILES = [ROOTFS_NAME, ROOTFS_SIG_NAME, ROOTFS_HASH_NAME]
@@ -135,62 +129,6 @@ class Updater(UpdateActionsInterface):
                 subprocess.check_output(["umount", mountpoint])
                 LOG.info(f"Unmounted {part_path} from {mountpoint}")
 
-    def validate_update(
-        self,
-        filepath: str,
-        progress_callback: Callable[[float], None],
-        cert_path: Optional[str],
-    ):
-        """Worker for validation. Call in an executor (so it can return things)
-
-        - Unzips filepath to its directory
-        - Hashes the rootfs inside
-        - If requested, checks the signature of the hash
-        :param filepath: The path to the update zip file
-        :param progress_callback: The function to call with progress between 0
-                                  and 1.0. May never reach precisely 1.0, best
-                                  only for user information
-        :param cert_path: Path to an x.509 certificate to check the signature
-                          against. If ``None``, signature checking is disabled
-        :returns str: Path to the rootfs file to update
-
-        Will also raise an exception if validation fails
-        """
-
-        def zip_callback(progress):
-            progress_callback(progress / 2.0)
-
-        required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
-        if cert_path:
-            required.append(ROOTFS_SIG_NAME)
-        files, sizes = unzip_update(filepath, zip_callback, UPDATE_FILES, required)
-
-        def hash_callback(progress):
-            progress_callback(progress / 2.0 + 0.5)
-
-        rootfs = files.get(ROOTFS_NAME)
-        assert rootfs
-        rootfs_hash = hash_file(
-            rootfs, hash_callback, file_size=sizes[ROOTFS_NAME], algo="md5"
-        )
-        hashfile = files.get(ROOTFS_HASH_NAME)
-        assert hashfile
-        packaged_hash = open(hashfile, "rb").read().strip().split()[0]
-        if packaged_hash != rootfs_hash:
-            msg = (
-                f"Hash mismatch: calculated {rootfs_hash!r} != "
-                f"packaged {packaged_hash!r}"
-            )
-            LOG.error(msg)
-            raise HashMismatch(msg)
-
-        if cert_path:
-            sigfile = files.get(ROOTFS_SIG_NAME)
-            assert sigfile
-            verify_signature(hashfile, sigfile, cert_path)
-
-        return rootfs
-
     def write_machine_id(self, current_root: str, new_root: str) -> None:
         """Copy the machine id over to the new partition"""
         pass
@@ -212,28 +150,8 @@ class Updater(UpdateActionsInterface):
     ) -> None:
         """Decompress and write update to partition
 
-        As this method is currently not performing validation
-        on the update files, it's meant to be for
-        internal use.
-
         Function expects the update file to be a .xz compressed file
 
-        with .xz rootfs size comes out at 223M,
-        gz -> bz2 -> xz   is roughly the progression over time.
-
-        gz compression makes things slightly different from zip.
-        gz/xz/bz2 is just a compression stream. and not
-        a collection of files. We can apply it either to a single file, or
-        something that contains many files (like a "tar" archive).
-        In contrast, ZIP is both a collection + compression.
-
-        ZIP being a collection makes things like packaging the
-        rootfs along with its checksum in one file a little easier.
-        We validate that all essential files are present before decompressing,
-        and then compare checksums. With .xz like compression we get straight up
-        blobs, so rootfs.xz would give us the actual rootfs file structure:
-        rootfs.xz ===> /bin /var /etc .. ,
-        whereas zip gives a collection: rootfs.zip ===> rootfs.ext4
         """
 
         unused_partition = self.part_mngr.find_unused_partition()

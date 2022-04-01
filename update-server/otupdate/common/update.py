@@ -20,6 +20,13 @@ from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
 from . import config, update_actions
 from .session import UpdateSession, Stages
 
+from otupdate.buildroot.update_actions import (
+    ROOTFS_SIG_NAME,
+    ROOTFS_HASH_NAME,
+    ROOTFS_NAME,
+    UPDATE_FILES,
+)
+
 SESSION_VARNAME = APP_VARIABLE_PREFIX + "session"
 LOG = logging.getLogger(__name__)
 
@@ -88,7 +95,6 @@ async def _save_file(part: BodyPartReader, path: str):
             write.write(decoded)
     try:
         for file in os.listdir(path):
-            print(f"file written, {file} to path, {path}")
             LOG.info(f"file written, {file} to path, {path}")
     except Exception:
         LOG.exception("File not written")
@@ -140,6 +146,11 @@ def _begin_validation(
             downloaded_update_path,
             session.set_progress,
             cert_path,
+            ROOTFS_NAME,
+            ROOTFS_HASH_NAME,
+            ROOTFS_SIG_NAME,
+            UPDATE_FILES,
+            "sha256",
         )
     )
 

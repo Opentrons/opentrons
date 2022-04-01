@@ -8,6 +8,14 @@ from otupdate.common import config, update_actions
 from otupdate.common.session import UpdateSession, Stages
 from otupdate.common.update import require_session, _save_file
 
+from otupdate.openembedded.updater import (
+    UPDATE_PKG,
+    ROOTFS_SIG_NAME,
+    ROOTFS_HASH_NAME,
+    ROOTFS_NAME,
+    UPDATE_FILES,
+)
+
 LOG = logging.getLogger(__name__)
 
 
@@ -33,6 +41,11 @@ def _begin_unzip_update_package(
             downloaded_update_path,
             session.set_progress,
             None,
+            ROOTFS_NAME,
+            ROOTFS_HASH_NAME,
+            ROOTFS_SIG_NAME,
+            UPDATE_FILES,
+            "md5",
         )
     )
 
@@ -110,7 +123,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             f"Part {part.name} being saved to "
             f"{session.download_path}, in file_upload"
         )
-        if part.name != "ot3_update.zip":
+        if part.name != UPDATE_PKG:
             LOG.info(f"Unknown field name {part.name} in file_upload, ignoring")
             await part.release()
         else:
@@ -131,7 +144,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
         session,
         config.config_from_request(request),
         asyncio.get_event_loop(),
-        os.path.join(session.download_path, "ot3_update.zip"),
+        os.path.join(session.download_path, UPDATE_PKG),
         maybe_actions,
     )
 
