@@ -156,7 +156,11 @@ export const HeaterShakerModuleData = (
           >
             <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing2}>
               {/* {TODO(sh, 2022-02-22): Conditionally render icon based on latch status} */}
-              <Icon name="closed-locked" size={'1rem'} />
+              <Icon
+                name="closed-locked"
+                size={'1rem'}
+                color={COLORS.darkGreyEnabled}
+              />
               {latchStatus}
             </Flex>
           </Text>

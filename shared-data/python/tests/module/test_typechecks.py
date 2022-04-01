@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 import typeguard
 
@@ -5,6 +7,12 @@ from opentrons_shared_data import module
 from opentrons_shared_data.module import dev_types
 
 from . import list_v2_defs
+
+
+pytestmark = pytest.mark.xfail(
+    condition=sys.version_info >= (3, 10),
+    reason="https://github.com/agronholm/typeguard/issues/242",
+)
 
 
 @pytest.mark.parametrize("defname", list_v2_defs())

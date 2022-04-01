@@ -22,6 +22,7 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { useRobot } from '../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
+import { RunLog } from '../../../organisms/Devices/ProtocolRun/RunLog'
 
 import type {
   NextGenRouteParams,
@@ -60,6 +61,7 @@ const RoundNavLink = styled(NavLink)`
 `
 
 interface RoundTabProps {
+  id: string
   to: string
   tabName: string
 }
@@ -82,15 +84,22 @@ export function ProtocolRunDetails(): JSX.Element | null {
 
   const robot = useRobot(robotName)
 
+  interface ProtocolRunDetailsTabProps {
+    robotName: string
+    runId: string
+  }
+
   const protocolRunDetailsContentByTab: {
-    [K in ProtocolRunDetailsTab]: () => JSX.Element
+    [K in ProtocolRunDetailsTab]: ({
+      robotName,
+      runId,
+    }: ProtocolRunDetailsTabProps) => JSX.Element | null
   } = {
     // TODO: setup tab content
     setup: () => <div>setup content</div>,
     // TODO: module controls tab content
     'module-controls': () => <div>module controls content</div>,
-    // TODO: run log tab content
-    'run-log': () => <div>run log content</div>,
+    'run-log': () => <RunLog robotName={robotName} runId={runId} />,
   }
 
   const ProtocolRunDetailsContent =
@@ -116,14 +125,17 @@ export function ProtocolRunDetails(): JSX.Element | null {
           <ProtocolRunHeader robotName={robot.name} runId={runId} />
           <Flex>
             <RoundTab
+              id="ProtocolRunDetails_setupTab"
               to={`/devices/${robotName}/protocol-runs/${runId}/setup`}
               tabName={t('setup')}
             />
             <RoundTab
+              id="ProtocolRunDetails_moduleControlsTab"
               to={`/devices/${robotName}/protocol-runs/${runId}/module-controls`}
               tabName={t('module_controls')}
             />
             <RoundTab
+              id="ProtocolRunDetails_runLogTab"
               to={`/devices/${robotName}/protocol-runs/${runId}/run-log`}
               tabName={t('run_log')}
             />
@@ -139,9 +151,8 @@ export function ProtocolRunDetails(): JSX.Element | null {
             } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
               BORDERS.radiusSoftCorners
             }`}
-            padding={`${SPACING.spacing5} ${SPACING.spacing4}`}
           >
-            <ProtocolRunDetailsContent />
+            <ProtocolRunDetailsContent robotName={robotName} runId={runId} />
           </Box>
         </Flex>
       </Box>
