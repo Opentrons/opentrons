@@ -24,6 +24,7 @@ from opentrons_hardware.hardware_control.gripper_settings import (
 GetInputFunc = Callable[[str], str]
 OutputFunc = Callable[[str], None]
 
+
 class InvalidInput(Exception):
     """Invalid input exception."""
 
@@ -31,15 +32,15 @@ class InvalidInput(Exception):
 
 
 def prompt_int_input(prompt_name: str) -> int:
-    """Configure int intput"""
+    """Configure int intput."""
     try:
         return int(input(f"{prompt_name}: "))
     except (ValueError, IndexError) as e:
         raise InvalidInput(e)
 
 
-def prompt_float_input(prompt_name: str) -> int:
-    """Configure float intput"""
+def prompt_float_input(prompt_name: str) -> float:
+    """Configure float intput."""
     try:
         return float(input(f"{prompt_name}: "))
     except ValueError as e:
@@ -49,7 +50,7 @@ def prompt_float_input(prompt_name: str) -> int:
 def in_green(s: str) -> str:
     """Return string formatted in red."""
     return f"\033[92m{str(s)}\033[0m"
-    
+
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
@@ -58,7 +59,9 @@ async def run(args: argparse.Namespace) -> None:
 
     print("Gripper testing beings... \n")
     print("Hints: \033[96mdefaults values\033[0m \n")
-    v_ref = prompt_float_input("Set reference voltage in A (float, \033[96m0.5A\033[0m)")
+    v_ref = prompt_float_input(
+        "Set reference voltage in A (float, \033[96m0.5A\033[0m)"
+    )
     pwm_freq = prompt_int_input("Set PWM frequency in Hz (int, \033[96m32000Hz\033[0m)")
 
     driver = await build_driver(build_settings(args))
