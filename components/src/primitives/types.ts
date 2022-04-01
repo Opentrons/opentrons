@@ -86,6 +86,7 @@ export interface PositionProps {
   right?: string | number
   bottom?: string | number
   left?: string | number
+  transform?: string
 }
 
 export interface TransitionProps {
