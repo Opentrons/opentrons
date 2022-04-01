@@ -15,11 +15,6 @@ import sys
 import aiohttp
 
 
-class UPDATE_KIND(enum.Enum):
-    UPDATE = enum.auto()
-    MIGRATE = enum.auto()
-
-
 async def poll_status(sess, token, root):
     await asyncio.sleep(1.0)
     resp = await sess.get(root + '/' + token + '/status')
