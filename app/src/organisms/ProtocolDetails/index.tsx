@@ -121,10 +121,10 @@ export function ProtocolDetails(
     protocolKey
 
   // TODO: IMMEDIATELY parse real values out of analysis file for these with fallback to no data
-  const creationMethod = t('no_data')
-  const author = t('no_data')
-  const description = t('no_data')
-  const lastAnalyzed = t('no_data')
+  const creationMethod = t('shared:no_data')
+  const author = t('shared:no_data')
+  const description = t('shared:no_data')
+  const lastAnalyzed = t('shared:no_data')
 
   const getTabContents = (): JSX.Element =>
     currentTab === 'labware' ? (
@@ -140,7 +140,7 @@ export function ProtocolDetails(
           <StyledText as="p">
             {leftMountPipetteName != null
               ? getPipetteNameSpecs(leftMountPipetteName)?.displayName
-              : t('empty')}
+              : t('shared:empty')}
           </StyledText>
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} marginRight={SPACING.spacing4}>
@@ -148,7 +148,7 @@ export function ProtocolDetails(
           <StyledText as="p">
             {rightMountPipetteName != null
               ? getPipetteNameSpecs(rightMountPipetteName)?.displayName
-              : t('empty')}
+              : t('shared:empty')}
           </StyledText>
         </Flex>
         {requiredModuleTypes.length > 0 ? (
