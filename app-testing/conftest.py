@@ -76,6 +76,22 @@ def test_protocols() -> Dict[str, Path]:
 
 
 @pytest.fixture(scope="session")
+def test_labwares() -> Dict[str, Path]:
+    """Provide a fixture with a dictionary of test protocol files."""
+    # build this manually for now
+    return {
+        "validlabware": Path(
+            Path(__file__).resolve().parent,
+            "files/protocol/json/sample_labware.json",
+        ),
+        "invalidlabware": Path(
+            Path(__file__).resolve().parent,
+            "files/protocol/json/invalid_labware.json",
+        ),
+    }
+
+
+@pytest.fixture(scope="session")
 def console() -> Console:
     return _console
 

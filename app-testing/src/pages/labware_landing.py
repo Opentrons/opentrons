@@ -51,10 +51,10 @@ class LabwareLanding:
     def get_import_button(self) -> Optional[WebElement]:
         """Get the import button on the labware landing page."""
         button: Element = Element(
-            (By.XPATH, f'//button[text()="Import"])'),
+            (By.TAG_NAME, f"button"),
             "the import button on the labware landing page",
         )
-        return self.base.present_wrapper(button, 2)
+        return self.base.present_wrapper(button, 5)
 
     def get_labware_header(self) -> Optional[WebElement]:
         """Get the labware heading on the labware landing page."""
@@ -66,6 +66,25 @@ class LabwareLanding:
 
     def click_import_button(self) -> None:
         """Click on the import button to labware landing page to import a labware file"""
-        button: Optional[WebElement] = self.get_labware_header()
+        button: Optional[WebElement] = self.get_import_button()
         if button:
             button.click()
+
+    def get_import_custom_labware_definition_header(self) -> Optional[WebElement]:
+        """Get the labware Slideout_title_Import a Custom Labware Definition."""
+        header: Element = Element(
+            (
+                By.XPATH,
+                f"//p[@data-testid='Slideout_title_Import a Custom Labware Definition']",
+            ),
+            "Slideout_title_Import a Custom Labware Definition",
+        )
+        return self.base.present_wrapper(header, 2)
+
+    def get_choose_file_button(self) -> Optional[WebElement]:
+        """Get the choose file button on the labware slideout."""
+        header: Element = Element(
+            (By.ID, f"UploadInput_protocolUploadButton"),
+            "the choose file button on the labware slideout",
+        )
+        return self.base.present_wrapper(header, 2)

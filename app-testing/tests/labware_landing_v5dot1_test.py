@@ -1,9 +1,11 @@
 """Test the Labware Landing of the page."""
 from distutils.command.config import LANG_EXT
+import logging
 import os
 from pathlib import Path
 import time
 from turtle import left
+from typing import Dict
 from typing import Generic, List, Union
 import pytest
 
@@ -18,14 +20,18 @@ from src.resources.ot_application import OtApplication
 from src.pages.labware_landing import LabwareLanding
 from src.menus.left_menu_v5dot1 import LeftMenu
 from src.resources.robot_data import Dev, Kansas, RobotDataType
+from src.menus.protocol_file import ProtocolFile
+from src.driver.drag_drop import drag_and_drop_file
 
 style = Style(color="#ac0505", bgcolor="yellow", bold=True)
+logger = logging.getLogger(__name__)
 
 
 @pytest.mark.v5dot1
 def test_labware_landing_v5dot1(
     chrome_options: Options,
     console: Console,
+    test_labwares: Dict[str, Path],
     robots: List[RobotDataType],
     request: pytest.FixtureRequest,
 ) -> None:
@@ -67,3 +73,24 @@ def test_labware_landing_v5dot1(
         assert labware_landing.get_import_button().is_displayed()
 
         labware_landing.click_import_button()
+        assert (
+            labware_landing.get_import_custom_labware_definition_header().is_displayed()
+        )
+        assert labware_landing.get_choose_file_button().is_displayed()
+        protocol_file = ProtocolFile(driver)
+        logger.info(f"uploading labware: {test_labwares['validlabware'].resolve()}")
+        input = protocol_file.get_drag_json_protocol()
+        drag_and_drop_file(input, test_labwares["validlabware"])
+        time.sleep(2)
+
+        ## uploading an invalid labware
+        labware_landing.click_import_button()
+        assert (
+            labware_landing.get_import_custom_labware_definition_header().is_displayed()
+        )
+        assert labware_landing.get_choose_file_button().is_displayed()
+        protocol_file = ProtocolFile(driver)
+        logger.info(f"uploading labware: {test_labwares['invalidlabware'].resolve()}")
+        input = protocol_file.get_drag_json_protocol()
+        drag_and_drop_file(input, test_labwares["invalidlabware"])
+        time.sleep(2)
