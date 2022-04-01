@@ -105,9 +105,11 @@ class ProtocolStore:
         deleted_resource = _convert_sql_row_to_resource(sql_row=row_to_delete)
 
         protocol_dir = deleted_resource.source.directory
-        for file_path in deleted_resource.source.files:
-            (protocol_dir / file_path.name).unlink()
-        protocol_dir.rmdir()
+
+        for source_file in deleted_resource.source.files:
+            source_file.path.unlink()
+        if protocol_dir:
+            protocol_dir.rmdir()
 
         return deleted_resource
 
