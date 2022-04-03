@@ -97,13 +97,14 @@ describe('ChooseRobotSlideout', () => {
     expect(queryByText('mock Available Robot Option')).toBeInTheDocument()
     expect(queryByText('2 unavailable or busy robots are not listed')).toBeInTheDocument()
   })
-  it('if scanning do not show link to devices', () => {
+  it('if scanning, show robots, but do not show link to other devices', () => {
     mockGetScanning.mockReturnValue(true)
     const { queryByText } = render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
+    expect(queryByText('mock Available Robot Option')).toBeInTheDocument()
     expect(queryByText('2 unavailable or busy robots are not listed')).not.toBeInTheDocument()
   })
 })

@@ -61,6 +61,7 @@ export function AvailableRobotOption(props: AvailableRobotOptionProps): JSX.Elem
           </StyledText>
           <Icon
             // local boolean corresponds to a wired usb connection
+            aria-label={local ? 'usb' : 'wifi'}
             name={local ? 'usb' : 'wifi'}
             size={SIZE_1}
             marginLeft={SPACING.spacing3}
