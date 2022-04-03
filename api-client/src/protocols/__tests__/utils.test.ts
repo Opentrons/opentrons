@@ -7,9 +7,9 @@ import {
   parseInitialLoadedModulesBySlot,
 } from '../utils'
 
-import analysisFixture from '../__fixtures__/simpleAnalysisFile.json'
+import { simpleAnalysisFileFixture } from '../__fixtures__'
 
-const protocolAnalysisFile: ProtocolAnalysisFile<{}> = analysisFixture as any
+const protocolAnalysisFile: ProtocolAnalysisFile<{}> = simpleAnalysisFileFixture as any
 
 describe('parseInitialPipetteNamesByMount', () => {
   it('returns pipette names for each mount if loaded and null if nothing loaded', () => {

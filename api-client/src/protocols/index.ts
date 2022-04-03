@@ -5,3 +5,4 @@ export { getProtocols } from './getProtocols'
 
 export * from './types'
 export * from './utils'
+export * from './__fixtures__'
