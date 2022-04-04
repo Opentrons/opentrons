@@ -6,7 +6,7 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from '../fixtures'
-import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { InvariantContext, RobotState } from '../types'
 
 const forBlowout = makeImmutableStateUpdater(_forBlowout)
@@ -17,11 +17,16 @@ beforeEach(() => {
   invariantContext = makeContext()
   robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
   params = {
-    pipette: DEFAULT_PIPETTE,
-    labware: SOURCE_LABWARE,
-    well: 'A1',
+    pipetteId: DEFAULT_PIPETTE,
+    labwareId: SOURCE_LABWARE,
+    wellName: 'A1',
     flowRate: 21.1,
-    offsetFromBottomMm: 1.3,
+    wellLocation: {
+      origin: 'bottom',
+      offset: {
+        z: 1.3,
+      },
+    },
   }
 })
 describe('Blowout command', () => {

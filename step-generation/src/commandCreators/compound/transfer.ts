@@ -11,11 +11,9 @@ import {
   reduceCommandCreators,
 } from '../../utils'
 import {
-  airGap,
   aspirate,
   delay,
   dispense,
-  dispenseAirGap,
   dropTip,
   replaceTip,
   touchTip,
@@ -288,7 +286,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               : []
           const airGapAfterAspirateCommands = aspirateAirGapVolume
             ? [
-                curryCommandCreator(airGap, {
+                curryCommandCreator(aspirate, {
                   pipette: args.pipette,
                   volume: aspirateAirGapVolume,
                   labware: args.sourceLabware,
@@ -307,7 +305,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                       }),
                     ]
                   : []),
-                curryCommandCreator(dispenseAirGap, {
+                curryCommandCreator(dispense, {
                   pipette: args.pipette,
                   volume: aspirateAirGapVolume,
                   labware: args.destLabware,
@@ -360,7 +358,7 @@ export const transfer: CommandCreator<TransferArgs> = (
           const airGapAfterDispenseCommands =
             dispenseAirGapVolume && !willReuseTip
               ? [
-                  curryCommandCreator(airGap, {
+                  curryCommandCreator(aspirate, {
                     pipette: args.pipette,
                     volume: dispenseAirGapVolume,
                     labware: dispenseAirGapLabware,

@@ -17,7 +17,7 @@ import { Divider } from '../structure'
 
 interface ModalProps extends BaseModalProps {
   onClose?: () => void
-  title?: string
+  title?: React.ReactNode
   children?: React.ReactNode
 }
 

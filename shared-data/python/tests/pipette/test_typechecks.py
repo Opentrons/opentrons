@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 import typeguard
 
@@ -11,6 +13,11 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteModelSpecs,
     PipetteNameSpecs,
     PipetteFusedSpec,
+)
+
+pytestmark = pytest.mark.xfail(
+    condition=sys.version_info >= (3, 10),
+    reason="https://github.com/agronholm/typeguard/issues/242",
 )
 
 

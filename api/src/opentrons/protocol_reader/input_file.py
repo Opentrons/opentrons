@@ -1,5 +1,5 @@
 """Input file value objects."""
-from dataclasses import dataclass
+from __future__ import annotations
 from typing import IO
 from typing_extensions import Protocol as InterfaceShape
 
@@ -12,14 +12,6 @@ class AbstractInputFile(InterfaceShape):
         file: A [file](https://docs.python.org/3/glossary.html#term-file-object)
             providing the contents of the protocol to be read.
     """
-
-    filename: str
-    file: IO[bytes]
-
-
-@dataclass(frozen=True)
-class InputFile(AbstractInputFile):
-    """Concrete input file data model."""
 
     filename: str
     file: IO[bytes]

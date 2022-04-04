@@ -445,6 +445,18 @@ export function generateSubstepItem(
     }
   }
 
+  if (stepArgs.commandCreatorFnName === 'heaterShaker') {
+    return {
+      substepType: 'heaterShaker',
+      labwareNickname: labwareNames?.nickname,
+      targetSpeed: stepArgs.rpm,
+      targetHeaterShakerTemperature: stepArgs.targetTemperature,
+      latchOpen: stepArgs.latchOpen,
+      heaterShakerTimerMinutes: stepArgs.timerMinutes,
+      heaterShakerTimerSeconds: stepArgs.timerSeconds,
+    }
+  }
+
   console.warn(
     "generateSubsteps doesn't support commandCreatorFnName: ",
     // @ts-expect-error(sa, 2021-6-14): I don't think this case can ever happen, so stepArgs.commandCreatorFnName gets never typed

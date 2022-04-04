@@ -42,9 +42,9 @@ describe('engageMagnet', () => {
     expect(result).toEqual({
       commands: [
         {
-          command: 'magneticModule/engageMagnet',
+          commandType: 'magneticModule/engageMagnet',
           params: {
-            module,
+            moduleId: module,
             engageHeight,
           },
         },
