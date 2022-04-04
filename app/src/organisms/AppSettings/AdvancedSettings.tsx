@@ -16,6 +16,8 @@ import {
   SPACING,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
+  BORDER_STYLE_SOLID,
+  BORDERS,
 } from '@opentrons/components'
 import * as Config from '../../redux/config'
 import * as Calibration from '../../redux/calibration'
@@ -29,7 +31,6 @@ import {
 import { Divider } from '../../atoms/structure'
 import { TertiaryButton, ToggleButton } from '../../atoms/Buttons'
 import { StyledText } from '../../atoms/text'
-import { Toast } from '../../atoms/Toast'
 
 import type { Dispatch, State } from '../../redux/types'
 import type { DropdownOption } from '@opentrons/components'
@@ -43,7 +44,10 @@ type BlockSelection =
   | typeof ALWAYS_TRASH
   | typeof ALWAYS_PROMPT
 
+const REALTEK_URL = 'https://www.realtek.com/en/'
+
 export function AdvancedSettings(): JSX.Element {
+  const [isShowToast, setIsShowToast] = React.useState(true)
   const { t } = useTranslation('app_settings')
   const useTrashSurfaceForTipCal = useSelector((state: State) =>
     Config.getUseTrashSurfaceForTipCal(state)
@@ -240,7 +244,7 @@ export function AdvancedSettings(): JSX.Element {
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
+          <Box>
             <StyledText
               as="h3"
               css={TYPOGRAPHY.h3SemiBold}
@@ -252,6 +256,39 @@ export function AdvancedSettings(): JSX.Element {
             <StyledText as="p">
               {t('usb_to_ethernet_adapter_info_description')}
             </StyledText>
+            {/* toast */}
+            {isShowToast && (
+              <Flex
+                backgroundColor={COLORS.warningBg}
+                paddingTop={SPACING.spacing3}
+                paddingBottom={SPACING.spacing3}
+                marginTop={SPACING.spacing4}
+                borderColor={COLORS.warning}
+                border={BORDER_STYLE_SOLID}
+                borderRadius={BORDERS.radiusSoftCorners}
+              >
+                <Flex flexDirection="row">
+                  <Icon
+                    name="alert-circle"
+                    color={COLORS.warning}
+                    width={SPACING.spacing4}
+                    marginLeft={SPACING.spacing3}
+                    marginRight={SPACING.spacing3}
+                  />
+                  <StyledText as="p" color={COLORS.darkBlack}>
+                    {t('usb_to_ethernet_adapter_toast_message')}
+                  </StyledText>
+                  <StyledText
+                    as="p"
+                    color={COLORS.darkBlack}
+                    position="absolute"
+                    right={SPACING.spacingXL}
+                  >
+                    {t('usb_to_ethernet_adapter_link')}
+                  </StyledText>
+                </Flex>
+              </Flex>
+            )}
             <Flex
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               marginTop={SPACING.spacing4}
@@ -289,13 +326,6 @@ export function AdvancedSettings(): JSX.Element {
               </Flex>
             </Flex>
           </Box>
-
-          {/* <ToggleButton
-            label="show_link_to_get_labware_offset_data"
-            toggledOn={isLabwareOffsetCodeSnippetsOn}
-            onClick={toggleLabwareOffsetData}
-            id="AdvancedSettings_showLinkToggleButton"
-          /> */}
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
