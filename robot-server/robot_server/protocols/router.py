@@ -219,7 +219,7 @@ async def get_protocol_by_id(
         protocolType=resource.source.config.protocol_type,
         metadata=Metadata.parse_obj(resource.source.metadata),
         analyses=analyses,
-        protocol_key=resource.protocol_key,
+        key=resource.protocol_key,
         files=[
             ProtocolFile(name=f.path.name, role=f.role) for f in resource.source.files
         ],
