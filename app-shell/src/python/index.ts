@@ -54,7 +54,7 @@ export function runFileWithPython(
   if (pythonPath != null) {
     return execa(pythonPath, [
       '-m',
-      'opentrons.cli.__init__',
+      'opentrons.cli',
       'analyze',
       '--json',
       srcFilePath,
