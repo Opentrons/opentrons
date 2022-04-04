@@ -46,12 +46,12 @@ export function ManufacturerDetails(
               </StyledText>
             ))}
         </Flex>
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="h6">{t('manufacturer_number')}</StyledText>
-          {brandId != null && brandId.length > 0 && (
+        {brandId != null && brandId.length > 0 && (
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <StyledText as="h6">{t('manufacturer_number')}</StyledText>
             <StyledText as="p">{brandId.join(', ')}</StyledText>
-          )}
-        </Flex>
+          </Flex>
+        )}
       </Flex>
     </Box>
   )

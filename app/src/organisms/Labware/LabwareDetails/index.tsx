@@ -19,6 +19,7 @@ import { Dimensions } from './Dimensions'
 import { WellDimensions } from './WellDimensions'
 import { WellSpacing } from './WellSpacing'
 import { ManufacturerDetails } from './ManufacturerDetails'
+import { InsertDetails } from './InsertDetails'
 import type { LabwareDefAndDate } from '../hooks'
 
 export interface LabwareDetailsProps {
@@ -50,6 +51,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         backgroundColor={COLORS.lightGrey}
         padding={SPACING.spacing4}
         marginBottom={SPACING.spacing5}
+        css={{ 'word-wrap': 'break-word' }}
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
         <Link
@@ -122,6 +124,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         </Box>
         <ManufacturerDetails brand={brand} />
       </Box>
+      {hasInserts && <InsertDetails definition={labwareDef} />}
     </Slideout>
   )
 }
