@@ -1,7 +1,9 @@
 """Runs' in-memory store."""
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional
+
+from sqlalchemy.sql.coercions import sqltypes
 
 from .action_models import RunAction
 
@@ -55,7 +57,7 @@ class RunStore:
             transaction.execute(statement)
 
         if run.is_current is True:
-            update_statement = sqlalchemy.update(_run_table).where(id != run.id).values(active_run=False)
+            update_statement = sqlalchemy.update(_run_table).where(_run_table.c.id != run.id, _run_table.c.active_run == True).values(active_run=False)
             transaction.execute(update_statement)
 
         return run
@@ -67,12 +69,17 @@ class RunStore:
             run_id: Unique identifier of run entry to retrieve.
 
         Returns:
-            The retrieved run entry from the store.
+            The retrieved run entry from the db.
         """
-        try:
-            return self._runs_by_id[run_id]
-        except KeyError as e:
-            raise RunNotFoundError(run_id) from e
+        statement = sqlalchemy.select(_run_table).where(
+            id == run_id
+        )
+        with self._sql_engine.begin() as transaction:
+            try:
+                row_run = transaction.execute(statement).one()
+            except sqlalchemy.exc.NoResultFound as e:
+                raise RunNotFoundError(run_id) from e
+        return _convert_run_to_sql_values(row_run)
 
     def get_all(self) -> List[RunResource]:
         """Get all known run resources.
@@ -80,7 +87,10 @@ class RunStore:
         Returns:
             All stored run entries.
         """
-        return list(self._runs_by_id.values())
+        statement = sqlalchemy.select(_run_table)
+        with self._sql_engine.begin() as transaction:
+            all_rows = transaction.execute(statement).all()
+        return [_convert_sql_row_to_run(sql_row=row) for row in all_rows]
 
     def remove(self, run_id: str) -> RunResource:
         """Remove a run by its unique identifier.
@@ -94,10 +104,22 @@ class RunStore:
         Raises:
             RunNotFoundError: The specified run ID was not found.
         """
-        try:
-            return self._runs_by_id.pop(run_id)
-        except KeyError as e:
-            raise RunNotFoundError(run_id) from e
+        select_statement = sqlalchemy.select(_run_table).where(
+            id == run_id
+        )
+        delete_statement = sqlalchemy.delete(_run_table).where(
+            id == run_id
+        )
+        with self._sql_engine.begin() as transaction:
+            try:
+                # SQLite <3.35.0 doesn't support the RETURNING clause,
+                # so we do it ourselves with a separate SELECT.
+                row_to_delete = transaction.execute(select_statement).one()
+            except sqlalchemy.exc.NoResultFound as e:
+                raise RunNotFoundError(run_id) from e
+            transaction.execute(delete_statement)
+
+        return _convert_sql_row_to_run(row_to_delete)
 
 
 def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
@@ -138,7 +160,7 @@ _run_table = sqlalchemy.Table(
 )
 
 
-def _convert_sql_row_to_resource(sql_row: sqlalchemy.engine.Row) -> RunResource:
+def _convert_sql_row_to_run(sql_row: sqlalchemy.engine.Row) -> RunResource:
     run_id = sql_row.id
     assert isinstance(run_id, str)
 
