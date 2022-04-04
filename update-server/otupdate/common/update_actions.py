@@ -51,7 +51,7 @@ class UpdateActionsInterface:
         update_files: List[str],
         hash_func: Callable[[str], bytes],
         algo: str = "sha256",
-    ):
+    ) -> Optional[str]:
         """Worker for validation. Call in an executor (so it can return things)
 
         - Unzips filepath to its directory
@@ -63,13 +63,12 @@ class UpdateActionsInterface:
                                   only for user information
         :param cert_path: Path to an x.509 certificate to check the signature
                           against. If ``None``, signature checking is disabled
-
-        :param rootfs_name: name of the root FS
-        :param rootfs_hash_name: name of the root FS hash
-        :param rootfs_sig_name: name of root FS sig
-        :param algo: hash algo to use (md5/sha256)
+        :param rootfs_name: Root FS filename
+        :param rootfs_hash_name: Root FS hash filename
+        :param rootfs_sig_name: root FS sig filename
         :param update_files: list of update files
         :param hash_func: callable to extract hash
+        :param algo: Hash algo to use (md5/sha256)
         :returns str: Path to the rootfs file to update
 
         Will also raise an exception if validation fails
