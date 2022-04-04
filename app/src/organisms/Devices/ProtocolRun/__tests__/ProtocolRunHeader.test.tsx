@@ -42,6 +42,7 @@ import {
 } from '../../../../organisms/RunTimeControl/__fixtures__'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
+import { useTrackEvent } from '../../../../redux/analytics'
 
 import {
   useProtocolDetailsForRun,
@@ -84,6 +85,7 @@ jest.mock('../../hooks')
 jest.mock('../../HeaterShakerIsRunningModal')
 jest.mock('../../ModuleCard/ConfirmAttachmentModal')
 jest.mock('../../ModuleCard/hooks')
+jest.mock('../../../../redux/analytics')
 
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
@@ -124,6 +126,9 @@ const mockUseHeaterShakerFromProtocol = useHeaterShakerFromProtocol as jest.Mock
 >
 const mockConfirmAttachmentModal = ConfirmAttachmentModal as jest.MockedFunction<
   typeof ConfirmAttachmentModal
+>
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
 >
 
 const ROBOT_NAME = 'otie'
@@ -182,9 +187,12 @@ const render = () => {
     { i18nInstance: i18n }
   )
 }
+let mockTrackEvent: jest.Mock
 
 describe('ProtocolRunHeader', () => {
   beforeEach(() => {
+    mockTrackEvent = jest.fn()
+    when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
     mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
     mockMockHeaterShakerIsRunningModal.mockReturnValue(
       <div>Mock HeaterShakerIsRunningModal</div>

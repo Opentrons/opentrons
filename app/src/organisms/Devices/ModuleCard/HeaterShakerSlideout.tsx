@@ -19,13 +19,17 @@ import {
   SPACING,
   Text,
   TYPOGRAPHY,
+  useConditionalConfirm,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../../atoms/Buttons'
 import { InputField } from '../../../atoms/InputField'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import type { HeaterShakerStartSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type {
+  HeaterShakerSetTargetShakeSpeedCreateCommand,
+  HeaterShakerStartSetTargetTemperatureCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface HeaterShakerSlideoutProps {
   module: HeaterShakerModule
@@ -43,10 +47,30 @@ export const HeaterShakerSlideout = (
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const moduleName = getModuleDisplayName(module.model)
   const modulePart = isSetShake ? t('shake_speed') : t('temperature')
-  const [
-    showConfirmAttachModal,
-    setShowConfirmAttachModal,
-  ] = React.useState<boolean>(false)
+
+  const setShakeSpeedCommand = (): void => {
+    if (hsValue != null && isSetShake) {
+      const saveShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
+        commandType: 'heaterShakerModule/setTargetShakeSpeed',
+        params: {
+          moduleId: module.id,
+          rpm: parseInt(hsValue),
+        },
+      }
+      createLiveCommand({
+        command: saveShakeCommand,
+      }).catch((e: Error) => {
+        console.error(`error setting heater shaker shake speed: ${e.message}`)
+      })
+    }
+    onCloseClick()
+    setHsValue(null)
+  }
+  const {
+    confirm: confirmAttachment,
+    showConfirmation: showConfirmationModal,
+    cancel: cancelExit,
+  } = useConditionalConfirm(setShakeSpeedCommand, true)
 
   const handleSubmitCommand = (): void => {
     if (hsValue != null && !isSetShake) {
@@ -65,7 +89,7 @@ export const HeaterShakerSlideout = (
         )
       })
     }
-    isSetShake ? setShowConfirmAttachModal(true) : setHsValue(null)
+    isSetShake ? confirmAttachment() : setHsValue(null)
   }
 
   let errorMessage
@@ -89,13 +113,11 @@ export const HeaterShakerSlideout = (
 
   return (
     <>
-      {showConfirmAttachModal && (
+      {showConfirmationModal && (
         <ConfirmAttachmentModal
-          onCloseClick={() => setShowConfirmAttachModal(false)}
-          onCloseSlideoutClick={onCloseClick}
+          onCloseClick={cancelExit}
+          onConfirmClick={confirmAttachment}
           isProceedToRunModal={false}
-          shakerValue={hsValue}
-          moduleId={module.id}
         />
       )}
       <Slideout

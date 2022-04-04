@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   CheckboxField,
   DIRECTION_ROW,
@@ -15,63 +14,21 @@ import {
 } from '@opentrons/components'
 import { SecondaryButton, PrimaryButton } from '../../../atoms/Buttons'
 import { Modal } from '../../../atoms/Modal'
-import { useTrackEvent } from '../../../redux/analytics'
 import { useHeaterShakerFromProtocol } from './hooks'
-
-import type { HeaterShakerModule } from '../../../redux/modules/types'
-import type { HeaterShakerSetTargetShakeSpeedCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface ConfirmAttachmentModalProps {
   onCloseClick: () => void
-  onCloseSlideoutClick?: () => unknown
+  onConfirmClick: () => unknown
   isProceedToRunModal: boolean
-  shakerValue: string | null
-  moduleId?: HeaterShakerModule['id']
-  play?: () => void
 }
 export const ConfirmAttachmentModal = (
   props: ConfirmAttachmentModalProps
 ): JSX.Element | null => {
-  const {
-    isProceedToRunModal,
-    onCloseClick,
-    onCloseSlideoutClick,
-    shakerValue,
-    moduleId,
-    play,
-  } = props
+  const { isProceedToRunModal, onCloseClick, onConfirmClick } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [isDismissed, setIsDismissed] = React.useState<boolean>(false)
-  const { createLiveCommand } = useCreateLiveCommandMutation()
   const heaterShaker = useHeaterShakerFromProtocol()
   const slotNumber = heaterShaker != null ? heaterShaker.slotName : null
-  const trackEvent = useTrackEvent()
-
-  const handleProceedToRunClick = (): void => {
-    trackEvent({ name: 'proceedToRun', properties: {} })
-    play != null && play()
-    onCloseClick()
-  }
-
-  const handleSetShakeClick = (): void => {
-    if (shakerValue != null && moduleId != null) {
-      const saveShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
-        commandType: 'heaterShakerModule/setTargetShakeSpeed',
-        params: {
-          moduleId: moduleId,
-          rpm: parseInt(shakerValue),
-        },
-      }
-      createLiveCommand({
-        command: saveShakeCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${saveShakeCommand.commandType}: ${e.message}`
-        )
-      })
-    }
-    onCloseSlideoutClick != null && onCloseSlideoutClick()
-  }
 
   return (
     <Modal
@@ -79,7 +36,7 @@ export const ConfirmAttachmentModal = (
       onClose={onCloseClick}
     >
       <Flex
-        data-testid={`confirmAttachmentModal_body_text_${
+        data-testid={`ConfirmAttachmentModal_body_text_${
           isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
         }`}
         flexDirection={DIRECTION_COLUMN}
@@ -99,7 +56,7 @@ export const ConfirmAttachmentModal = (
         flexDirection={DIRECTION_ROW}
         textAlign={TEXT_ALIGN_CENTER}
         paddingTop={SPACING.spacing4}
-        data-testid={`confirmAttachmentModal_checkbox_field_${
+        data-testid={`ConfirmAttachmentModal_checkbox_field_${
           isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
         }`}
       >
@@ -125,7 +82,7 @@ export const ConfirmAttachmentModal = (
       >
         <Flex
           paddingRight={SPACING.spacing2}
-          data-testid={`confirmAttachmentModal_secondary_btn_${
+          data-testid={`ConfirmAttachmentModal_secondary_btn_${
             isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
           }`}
         >
@@ -138,17 +95,11 @@ export const ConfirmAttachmentModal = (
         </Flex>
 
         <Flex
-          data-testid={`confirmAttachmentModal_primary_btn_${
+          data-testid={`ConfirmAttachmentModal_primary_btn_${
             isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
           }`}
         >
-          <PrimaryButton
-            onClick={
-              isProceedToRunModal
-                ? handleProceedToRunClick
-                : handleSetShakeClick
-            }
-          >
+          <PrimaryButton onClick={onConfirmClick}>
             {isProceedToRunModal
               ? t('proceed_to_run')
               : t('confirm_attachment')}

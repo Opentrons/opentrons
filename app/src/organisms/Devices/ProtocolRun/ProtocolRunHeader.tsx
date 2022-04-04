@@ -35,6 +35,7 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  useConditionalConfirm,
 } from '@opentrons/components'
 import { useRunQuery } from '@opentrons/react-api-client'
 
@@ -65,6 +66,7 @@ import { ConfirmAttachmentModal } from '../ModuleCard/ConfirmAttachmentModal'
 
 import type { Run } from '@opentrons/api-client'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
+import { useTrackEvent } from '../../../redux/analytics'
 
 interface ProtocolRunHeaderProps {
   robotName: string
@@ -107,12 +109,8 @@ export function ProtocolRunHeader({
   const { t } = useTranslation('run_details')
   const history = useHistory()
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const trackEvent = useTrackEvent()
   const heaterShakerFromProtocol = useHeaterShakerFromProtocol()
-  const [
-    showConfirmAttachModal,
-    setShowConfirmAttachmentModal,
-  ] = React.useState<boolean>(false)
-
   const runRecord = useRunQuery(runId)
   const { displayName } = useProtocolDetailsForRun(runId)
 
@@ -169,11 +167,22 @@ export function ProtocolRunHeader({
   ) as unknown) as HeaterShakerModule
   const isShaking = heaterShaker?.data?.speedStatus !== 'idle'
 
+  const handleProceedToRunClick = (): void => {
+    trackEvent({ name: 'proceedToRun', properties: {} })
+    play()
+  }
+
+  const {
+    confirm: confirmAttachment,
+    showConfirmation: showConfirmationModal,
+    cancel: cancelExit,
+  } = useConditionalConfirm(handleProceedToRunClick, true)
+
   const handlePlayButtonClick = (): void => {
     if (isShaking) {
       setShowIsShakingModal(true)
     } else if (heaterShakerFromProtocol != null && !isShaking) {
-      setShowConfirmAttachmentModal(true)
+      confirmAttachment()
     } else play()
   }
 
@@ -355,12 +364,11 @@ export function ProtocolRunHeader({
       marginBottom={SPACING.spacing4}
       padding={SPACING.spacing4}
     >
-      {showConfirmAttachModal && (
+      {showConfirmationModal && (
         <ConfirmAttachmentModal
-          onCloseClick={() => setShowConfirmAttachmentModal(false)}
+          onCloseClick={cancelExit}
           isProceedToRunModal={true}
-          shakerValue={null}
-          play={() => play()}
+          onConfirmClick={confirmAttachment}
         />
       )}
 
