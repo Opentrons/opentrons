@@ -256,7 +256,6 @@ export function AdvancedSettings(): JSX.Element {
             <StyledText as="p">
               {t('usb_to_ethernet_adapter_info_description')}
             </StyledText>
-            {/* toast */}
             {isShowToast && (
               <Flex
                 backgroundColor={COLORS.warningBg}
@@ -278,14 +277,17 @@ export function AdvancedSettings(): JSX.Element {
                   <StyledText as="p" color={COLORS.darkBlack}>
                     {t('usb_to_ethernet_adapter_toast_message')}
                   </StyledText>
-                  <StyledText
-                    as="p"
+                  <Link
+                    href={REALTEK_URL}
+                    css={TYPOGRAPHY.pRegular}
                     color={COLORS.darkBlack}
                     position="absolute"
                     right={SPACING.spacingXL}
+                    textDecoration="underline"
+                    id="AdvancedSettings_realtekLink"
                   >
                     {t('usb_to_ethernet_adapter_link')}
-                  </StyledText>
+                  </Link>
                 </Flex>
               </Flex>
             )}
