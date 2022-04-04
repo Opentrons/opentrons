@@ -5,6 +5,8 @@ from typing import Dict, List, Optional
 
 from .action_models import RunAction
 
+import sqlalchemy
+
 
 @dataclass(frozen=True)
 class RunResource:
@@ -32,11 +34,11 @@ class RunNotFoundError(ValueError):
 class RunStore:
     """Methods for storing and retrieving run resources."""
 
-    def __init__(self) -> None:
+    def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
         """Initialize a RunStore and its in-memory storage."""
-        self._runs_by_id: Dict[str, RunResource] = {}
+        self._sql_engine = sql_engine
 
-    def upsert(self, run: RunResource) -> RunResource:
+    def insert(self, run: RunResource) -> RunResource:
         """Insert or update a run resource in the store.
 
         Arguments:
@@ -46,12 +48,15 @@ class RunStore:
         Returns:
             The resource that was added to the store.
         """
-        if run.is_current is True:
-            for target_id, target in self._runs_by_id.items():
-                if target.is_current and target_id != run.run_id:
-                    self._runs_by_id[target_id] = replace(target, is_current=False)
+        statement = sqlalchemy.insert(_run_table).values(
+            _convert_run_to_sql_values(run=run)
+        )
+        with self._sql_engine.begin() as transaction:
+            transaction.execute(statement)
 
-        self._runs_by_id[run.run_id] = run
+        if run.is_current is True:
+            update_statement = sqlalchemy.update(_run_table).where(id != run.id).values(active_run=False)
+            transaction.execute(update_statement)
 
         return run
 
@@ -93,3 +98,70 @@ class RunStore:
             return self._runs_by_id.pop(run_id)
         except KeyError as e:
             raise RunNotFoundError(run_id) from e
+
+
+def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
+    """Create the necessary database tables to back a `ProtocolStore`.
+
+    Params:
+        sql_engine: An engine for a blank SQL database, to put the tables in.
+    """
+    _metadata.create_all(sql_engine)
+
+
+_metadata = sqlalchemy.MetaData()
+_run_table = sqlalchemy.Table(
+    "protocol_run",
+    _metadata,
+    sqlalchemy.Column(
+        "id",
+        sqlalchemy.String,
+        primary_key=True,
+    ),
+    sqlalchemy.Column(
+        "created_at",
+        sqlalchemy.DateTime,
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "protocol_id",
+        sqlalchemy.String,
+        forigen_key="protocol.id",
+        nullable=True
+    ),
+    sqlalchemy.Column(
+        "active_run",
+        sqlalchemy.Boolean,
+        nullable=False,
+        default=False
+    )
+)
+
+
+def _convert_sql_row_to_resource(sql_row: sqlalchemy.engine.Row) -> RunResource:
+    run_id = sql_row.id
+    assert isinstance(run_id, str)
+
+    created_at = sql_row.created_at
+    assert isinstance(created_at, datetime)
+
+    protocol_id = sql_row.protocol_id
+    # key is optional in DB. If its not None assert type as string
+    if protocol_id is not None:
+        assert isinstance(protocol_id, str)
+
+    is_current = sql_row.active_run
+    assert isinstance(is_current, bool)
+
+    return RunResource(
+        run_id=run_id, created_at=created_at, protocol_id=protocol_id, is_current=is_current
+    )
+
+
+def _convert_run_to_sql_values(run: RunResource) -> Dict[str, object]:
+    return {
+        "id": run.run_id,
+        "created_at": run.created_at,
+        "protocol_id": run.protocol_id,
+        "active_run": run.is_current
+    }

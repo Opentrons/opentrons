@@ -10,8 +10,6 @@ from typing import Dict, List, Optional
 
 import sqlalchemy
 
-import sqlalchemy
-
 from opentrons.protocol_reader import ProtocolSource
 
 
