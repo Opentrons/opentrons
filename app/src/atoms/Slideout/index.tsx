@@ -3,12 +3,10 @@ import { css } from 'styled-components'
 import {
   Box,
   Flex,
-  Text,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
   Btn,
   Icon,
-  FONT_WEIGHT_SEMIBOLD,
   SPACING_3,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
