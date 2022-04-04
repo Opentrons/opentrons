@@ -138,7 +138,7 @@ async def create_protocol(
         protocolType=source.config.protocol_type,
         metadata=Metadata.parse_obj(source.metadata),
         analyses=analyses,
-        protocol_key=protocol_key,
+        key=key,
         files=[ProtocolFile(name=f.path.name, role=f.role) for f in source.files],
     )
 
