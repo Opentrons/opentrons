@@ -3,7 +3,7 @@ import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import { CommandCreator, SetShakeSpeedArgs } from '../../types'
 import * as errorCreators from '../../errorCreators'
 
-export const setShakeSpeed: CommandCreator<SetShakeSpeedArgs> = (
+export const heaterShakerSetTargetShakeSpeed: CommandCreator<SetShakeSpeedArgs> = (
   args,
   invariantContext,
   prevRobotState
