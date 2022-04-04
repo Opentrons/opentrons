@@ -32,6 +32,7 @@ describe('LabwareCard', () => {
       labware: {
         definition: mockDefinition,
       },
+      onClick: jest.fn(),
     }
   })
 
