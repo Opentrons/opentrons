@@ -102,7 +102,6 @@ if __name__ == "__main__":
             "console_scripts": [
                 "opentrons_simulate = opentrons.simulate:main",
                 "opentrons_execute = opentrons.execute:main",
-                "opentrons = opentrons.cli:main",
             ]
         },
         project_urls={

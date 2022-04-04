@@ -34,7 +34,13 @@ export function parseInitialPipetteNamesByMount(
 export function parseAllRequiredModuleModels(
   analysis: ProtocolAnalysisFile<{}>
 ): ModuleModel[] {
-  return Object.entries(analysis.modules).map(([_moduleId, { model }]) => model)
+  return analysis.commands.reduce<ModuleModel[]>(
+    (acc, command) =>
+      command.commandType === 'loadModule'
+        ? [...acc, command.params.model]
+        : acc,
+    []
+  )
 }
 
 interface LoadedLabwareBySlot {
