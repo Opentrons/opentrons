@@ -33,8 +33,19 @@ describe('blowout', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       {
-        command: 'blowout',
-        params,
+        commandType: 'blowout',
+        params: {
+          pipetteId: DEFAULT_PIPETTE,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+          flowRate: 21.1,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              z: 1.3,
+            },
+          },
+        },
       },
     ])
   })

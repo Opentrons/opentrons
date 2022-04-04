@@ -2,7 +2,9 @@ import 'cypress-file-upload'
 import cloneDeep from 'lodash/cloneDeep'
 import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
 
-describe('Protocol fixtures migrate and match snapshots', () => {
+// TODO: (sa 2022-03-31: change these migration fixtures to v6 protocols once the liquids key is added to PD protocols
+// https://github.com/Opentrons/opentrons/issues/9852
+describe.skip('Protocol fixtures migrate and match snapshots', () => {
   beforeEach(() => {
     cy.visit('/')
     cy.closeAnnouncementModal()

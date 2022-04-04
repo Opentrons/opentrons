@@ -37,12 +37,17 @@ describe('touchTip', () => {
 
     expect(res.commands).toEqual([
       {
-        command: 'touchTip',
+        commandType: 'touchTip',
         params: {
-          pipette: DEFAULT_PIPETTE,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
-          offsetFromBottomMm: 10,
+          pipetteId: DEFAULT_PIPETTE,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              z: 10,
+            },
+          },
         },
       },
     ])

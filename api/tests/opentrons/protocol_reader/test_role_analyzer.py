@@ -1,6 +1,7 @@
 """Tests for opentrons.protocol_reader.role_analyzer.RoleAnalyzer."""
 import pytest
 from decoy import matchers
+from pathlib import Path
 from typing import List, NamedTuple
 
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6
@@ -34,10 +35,10 @@ class RoleAnalyzerErrorSpec(NamedTuple):
 ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
     RoleAnalyzerSpec(
         files=[
-            BufferedFile(name="protocol.py", contents=b"", data=None),
+            BufferedFile(name="protocol.py", path=None, contents=b"", data=None),
         ],
         expected=RoleAnalysis(
-            main_file=MainFile(name="protocol.py", contents=b""),
+            main_file=MainFile(name="protocol.py", contents=b"", path=None),
             labware_files=[],
             labware_definitions=[],
         ),
@@ -47,6 +48,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             BufferedFile(
                 name="protocol.json",
                 contents=b"",
+                path=Path("/dev/null/protocol.json"),
                 data=JsonProtocol.construct(  # type: ignore[call-arg]
                     labwareDefinitions={
                         "uri": LabwareDefinition.construct()  # type: ignore[call-arg]
@@ -58,6 +60,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             main_file=MainFile(
                 name="protocol.json",
                 contents=b"",
+                path=Path("/dev/null/protocol.json"),
                 data=JsonProtocol.construct(  # type: ignore[call-arg]
                     labwareDefinitions=matchers.Anything()
                 ),
@@ -70,19 +73,28 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
     ),
     RoleAnalyzerSpec(
         files=[
-            BufferedFile(name="protocol.py", contents=b"", data=None),
+            BufferedFile(
+                name="protocol.py",
+                contents=b"",
+                path=Path("/dev/null/protocol.py"),
+                data=None,
+            ),
             BufferedFile(
                 name="labware.json",
                 contents=b"",
+                path=Path("/dev/null/labware.json"),
                 data=LabwareDefinition.construct(),  # type: ignore[call-arg]
             ),
         ],
         expected=RoleAnalysis(
-            main_file=MainFile(name="protocol.py", contents=b""),
+            main_file=MainFile(
+                name="protocol.py", contents=b"", path=Path("/dev/null/protocol.py")
+            ),
             labware_files=[
                 LabwareFile(
                     name="labware.json",
                     contents=b"",
+                    path=Path("/dev/null/labware.json"),
                     data=LabwareDefinition.construct(),  # type: ignore[call-arg]
                 )
             ],
@@ -96,6 +108,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             BufferedFile(
                 name="protocol.json",
                 contents=b"",
+                path=None,
                 data=JsonProtocol.construct(  # type: ignore[call-arg]
                     labwareDefinitions={
                         "uri": LabwareDefinition.construct(  # type: ignore[call-arg]
@@ -107,6 +120,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             BufferedFile(
                 name="labware.json",
                 contents=b"",
+                path=None,
                 data=LabwareDefinition.construct(version=2),  # type: ignore[call-arg]
             ),
         ],
@@ -114,6 +128,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             main_file=MainFile(
                 name="protocol.json",
                 contents=b"",
+                path=None,
                 data=JsonProtocol.construct(  # type: ignore[call-arg]
                     labwareDefinitions=matchers.Anything()
                 ),
@@ -126,10 +141,10 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
     ),
     RoleAnalyzerSpec(
         files=[
-            BufferedFile(name="PROTOCOL.PY", contents=b"", data=None),
+            BufferedFile(name="PROTOCOL.PY", contents=b"", data=None, path=None),
         ],
         expected=RoleAnalysis(
-            main_file=MainFile(name="PROTOCOL.PY", contents=b""),
+            main_file=MainFile(name="PROTOCOL.PY", contents=b"", path=None),
             labware_files=[],
             labware_definitions=[],
         ),
@@ -139,6 +154,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             BufferedFile(
                 name="protocol.json",
                 contents=b"",
+                path=None,
                 data=ProtocolSchemaV6.construct(  # type: ignore[call-arg]
                     labwareDefinitions={
                         "uri": LabwareDefinition.construct()  # type: ignore[call-arg]
@@ -150,6 +166,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             main_file=MainFile(
                 name="protocol.json",
                 contents=b"",
+                path=None,
                 data=ProtocolSchemaV6.construct(  # type: ignore[call-arg]
                     labwareDefinitions=matchers.Anything()
                 ),
@@ -169,30 +186,31 @@ ROLE_ANALYZER_ERROR_SPECS: List[RoleAnalyzerErrorSpec] = [
         expected_message="No files were provided.",
     ),
     RoleAnalyzerErrorSpec(
-        files=[BufferedFile(name="foo.txt", contents=b"", data=None)],
+        files=[BufferedFile(name="foo.txt", contents=b"", data=None, path=None)],
         expected_message='"foo.txt" is not a valid protocol file.',
     ),
     RoleAnalyzerErrorSpec(
         files=[
-            BufferedFile(name="hello.py", contents=b"", data=None),
-            BufferedFile(name="world.py", contents=b"", data=None),
+            BufferedFile(name="hello.py", contents=b"", data=None, path=None),
+            BufferedFile(name="world.py", contents=b"", data=None, path=None),
         ],
         expected_message='Could not pick single main file from "hello.py", "world.py"',
     ),
     RoleAnalyzerErrorSpec(
         files=[
-            BufferedFile(name="hello.txt", contents=b"", data=None),
-            BufferedFile(name="world.txt", contents=b"", data=None),
+            BufferedFile(name="hello.txt", contents=b"", data=None, path=None),
+            BufferedFile(name="world.txt", contents=b"", data=None, path=None),
         ],
         expected_message='No valid protocol file found in "hello.txt", "world.txt"',
     ),
     RoleAnalyzerErrorSpec(
         files=[
-            BufferedFile(name="hello.py", contents=b"", data=None),
+            BufferedFile(name="hello.py", contents=b"", data=None, path=None),
             BufferedFile(
                 name="world.json",
                 contents=b"",
                 data=JsonProtocol.construct(),  # type: ignore[call-arg]
+                path=None,
             ),
         ],
         expected_message=(

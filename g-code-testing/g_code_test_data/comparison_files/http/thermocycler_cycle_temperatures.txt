@@ -1,0 +1,3 @@
+thermocycler: M104 S1.0 H0.0 -> Setting thermocycler plate temp to 1.0C ->
+thermocycler: M104 S2.0 H0.0 -> Setting thermocycler plate temp to 2.0C ->
+thermocycler: M104 S1.0 H0.0 -> Setting thermocycler plate temp to 1.0C ->

@@ -52,8 +52,20 @@ describe('aspirate', () => {
     const result = aspirate(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
       {
-        command: 'aspirate',
-        params,
+        commandType: 'aspirate',
+        params: {
+          pipetteId: DEFAULT_PIPETTE,
+          volume: 50,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+          flowRate: 6,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              z: 5,
+            },
+          },
+        },
       },
     ])
   })

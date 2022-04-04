@@ -2,7 +2,6 @@
 import logging
 from typing import Optional
 
-from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 from opentrons.hardware_control import HardwareControlAPI
 from ..state import StateStore
 from ..types import MotorAxis, WellLocation
@@ -13,6 +12,10 @@ from .pipetting import PipettingHandler
 
 
 log = logging.getLogger(__name__)
+
+# TODO(mc, 2022-03-07): this constant dup'd from opentrons.protocols.geometry.deck
+# to avoid a circular dependency that needs to be figured out.
+FIXED_TRASH_ID = "fixedTrash"
 
 
 class HardwareStopper:
