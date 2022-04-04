@@ -75,9 +75,9 @@ protocols_router = APIRouter()
 )
 async def create_protocol(
     files: List[UploadFile] = File(...),
-    # optional protocol_key to track protocols by the UI.
-    # needs to be Form type because its formData
-    protocol_key: Optional[str] = Form(None),
+    # use Form because request is multipart/form-data
+    # https://fastapi.tiangolo.com/tutorial/request-forms-and-files/
+    key: Optional[str] = Form(None),
     protocol_directory: Path = Depends(get_protocol_directory),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
