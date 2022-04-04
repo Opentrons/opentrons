@@ -2,6 +2,7 @@
 import logging
 import textwrap
 from datetime import datetime
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, UploadFile, status, Form
 from typing import List, Optional
@@ -25,6 +26,7 @@ from .protocol_analyzer import ProtocolAnalyzer
 from .analysis_store import AnalysisStore
 from .protocol_store import ProtocolStore, ProtocolResource, ProtocolNotFoundError
 from .dependencies import (
+    get_protocol_directory,
     get_protocol_reader,
     get_protocol_store,
     get_analysis_store,
@@ -76,6 +78,7 @@ async def create_protocol(
     # optional protocol_key to track protocols by the UI.
     # needs to be Form type because its formData
     protocol_key: Optional[str] = Form(None),
+    protocol_directory: Path = Depends(get_protocol_directory),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
     protocol_reader: ProtocolReader = Depends(get_protocol_reader),
@@ -90,6 +93,7 @@ async def create_protocol(
     Arguments:
         files: List of uploaded files, from form-data.
         protocol_key: Optional key for tracking protocols by the UI
+        protocol_directory: Location to store uploaded files.
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
         protocol_reader: Protocol file reading interface.
@@ -101,8 +105,8 @@ async def create_protocol(
     """
     try:
         source = await protocol_reader.read(
-            name=protocol_id,
             files=files,
+            directory=protocol_directory / protocol_id,
         )
     except ProtocolFilesInvalidError as e:
         raise ProtocolFilesInvalid(detail=str(e)).as_error(
@@ -134,8 +138,8 @@ async def create_protocol(
         protocolType=source.config.protocol_type,
         metadata=Metadata.parse_obj(source.metadata),
         analyses=analyses,
-        files=[ProtocolFile(name=f.name, role=f.role) for f in source.files],
-        protocol_key=protocol_key
+        protocol_key=protocol_key,
+        files=[ProtocolFile(name=f.path.name, role=f.role) for f in source.files],
     )
 
     log.info(f'Created protocol "{protocol_id}" and started analysis "{analysis_id}".')
@@ -169,8 +173,8 @@ async def get_protocols(
             protocolType=r.source.config.protocol_type,
             metadata=Metadata.parse_obj(r.source.metadata),
             analyses=analysis_store.get_by_protocol(r.protocol_id),
-            files=[ProtocolFile(name=f.name, role=f.role) for f in r.source.files],
-            protocol_key=r.protocol_key
+            protocol_key=r.protocol_key,
+            files=[ProtocolFile(name=f.path.name, role=f.role) for f in r.source.files]
         )
         for r in protocol_resources
     ]
@@ -215,8 +219,10 @@ async def get_protocol_by_id(
         protocolType=resource.source.config.protocol_type,
         metadata=Metadata.parse_obj(resource.source.metadata),
         analyses=analyses,
-        files=[ProtocolFile(name=f.name, role=f.role) for f in resource.source.files],
-        protocol_key=resource.protocol_key
+        protocol_key=resource.protocol_key,
+        files=[
+            ProtocolFile(name=f.path.name, role=f.role) for f in resource.source.files
+        ],
     )
 
     return await PydanticResponse.create(

@@ -48,10 +48,10 @@ def _get_sql_engine(app_state: AppState = Depends(get_app_state)) -> SQLEngine:
     # https://github.com/tiangolo/fastapi/issues/617
 
 
-def get_protocol_reader(
+def get_protocol_directory(
     app_state: AppState = Depends(get_app_state),
-) -> ProtocolReader:
-    """Get a ProtocolReader to read and save uploaded protocol files."""
+) -> Path:
+    """Get the root directory where protocols will be saved."""
     protocol_dir = _protocol_directory.get_from(app_state)
 
     if protocol_dir is None:
@@ -59,7 +59,12 @@ def get_protocol_reader(
         _protocol_directory.set_on(app_state, protocol_dir)
         log.info(f"Storing protocols in {protocol_dir}")
 
-    return ProtocolReader(directory=protocol_dir)
+    return protocol_dir
+
+
+def get_protocol_reader() -> ProtocolReader:
+    """Get a ProtocolReader to read and save uploaded protocol files."""
+    return ProtocolReader()
 
 
 def get_protocol_store(

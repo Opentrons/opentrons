@@ -1,10 +1,11 @@
 """Public protocol engine value types and models."""
-
+from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field
 from typing import Optional, Union, List, Dict, Any
+from typing_extensions import Literal, TypeGuard
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.modules import ModuleType as ModuleType
@@ -136,8 +137,6 @@ class MotorAxis(str, Enum):
 
 
 # TODO(mc, 2022-01-18): use opentrons_shared_data.module.dev_types.ModuleModel
-
-
 class ModuleModel(str, Enum):
     """All available modules' models."""
 
@@ -150,19 +149,54 @@ class ModuleModel(str, Enum):
 
     def as_type(self) -> ModuleType:
         """Get the ModuleType of this model."""
-        if self in [
-            ModuleModel.TEMPERATURE_MODULE_V1,
-            ModuleModel.TEMPERATURE_MODULE_V2,
-        ]:
+        if ModuleModel.is_temperature_module_model(self):
             return ModuleType.TEMPERATURE
-        elif self in [ModuleModel.MAGNETIC_MODULE_V1, ModuleModel.MAGNETIC_MODULE_V2]:
+        elif ModuleModel.is_magnetic_module_model(self):
             return ModuleType.MAGNETIC
-        elif self == ModuleModel.THERMOCYCLER_MODULE_V1:
+        elif ModuleModel.is_thermocycler_module_model(self):
             return ModuleType.THERMOCYCLER
-        elif self == ModuleModel.HEATER_SHAKER_MODULE_V1:
+        elif ModuleModel.is_heater_shaker_module_model(self):
             return ModuleType.HEATER_SHAKER
 
         assert False, f"Invalid ModuleModel {self}"
+
+    @classmethod
+    def is_temperature_module_model(
+        cls, model: ModuleModel
+    ) -> TypeGuard[TemperatureModuleModel]:
+        """Whether a given model is a Temperature Module."""
+        return model in [cls.TEMPERATURE_MODULE_V1, cls.TEMPERATURE_MODULE_V2]
+
+    @classmethod
+    def is_magnetic_module_model(
+        cls, model: ModuleModel
+    ) -> TypeGuard[MagneticModuleModel]:
+        """Whether a given model is a Magnetic Module."""
+        return model in [cls.MAGNETIC_MODULE_V1, cls.MAGNETIC_MODULE_V2]
+
+    @classmethod
+    def is_thermocycler_module_model(
+        cls, model: ModuleModel
+    ) -> TypeGuard[ThermocyclerModuleModel]:
+        """Whether a given model is a Thermocyler Module."""
+        return model == cls.THERMOCYCLER_MODULE_V1
+
+    @classmethod
+    def is_heater_shaker_module_model(
+        cls, model: ModuleModel
+    ) -> TypeGuard[HeaterShakerModuleModel]:
+        """Whether a given model is a Heater-Shaker Module."""
+        return model == cls.HEATER_SHAKER_MODULE_V1
+
+
+TemperatureModuleModel = Literal[
+    ModuleModel.TEMPERATURE_MODULE_V1, ModuleModel.TEMPERATURE_MODULE_V2
+]
+MagneticModuleModel = Literal[
+    ModuleModel.MAGNETIC_MODULE_V1, ModuleModel.MAGNETIC_MODULE_V2
+]
+ThermocyclerModuleModel = Literal[ModuleModel.THERMOCYCLER_MODULE_V1]
+HeaterShakerModuleModel = Literal[ModuleModel.HEATER_SHAKER_MODULE_V1]
 
 
 class ModuleDimensions(BaseModel):
