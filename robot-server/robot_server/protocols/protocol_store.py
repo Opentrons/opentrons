@@ -163,6 +163,7 @@ def _convert_sql_row_to_resource(sql_row: sqlalchemy.engine.Row) -> ProtocolReso
     assert isinstance(source, ProtocolSource)
 
     protocol_key = sql_row.protocol_key
+    # key is optional in DB. If its not None assert type as string
     if protocol_key is not None:
         assert isinstance(protocol_key, str)
 

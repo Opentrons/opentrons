@@ -73,7 +73,7 @@ protocols_router = APIRouter()
 )
 async def create_protocol(
     files: List[UploadFile] = File(...),
-    protocol_key: Optional[str] = Form(None),
+    protocol_key: Optional[str] = Form(None),   # optional protocol_key to track protocols by the front end
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
     protocol_reader: ProtocolReader = Depends(get_protocol_reader),
