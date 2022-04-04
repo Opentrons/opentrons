@@ -92,7 +92,7 @@ async def create_protocol(
 
     Arguments:
         files: List of uploaded files, from form-data.
-        protocol_key: Optional key for tracking protocols by the UI
+        key: Optional key for client-side tracking
         protocol_directory: Location to store uploaded files.
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
