@@ -38,13 +38,12 @@ import type { DropdownOption } from '@opentrons/components'
 const ALWAYS_BLOCK: 'always-block' = 'always-block'
 const ALWAYS_TRASH: 'always-trash' = 'always-trash'
 const ALWAYS_PROMPT: 'always-prompt' = 'always-prompt'
+const REALTEK_URL = 'https://www.realtek.com/en/'
 
 type BlockSelection =
   | typeof ALWAYS_BLOCK
   | typeof ALWAYS_TRASH
   | typeof ALWAYS_PROMPT
-
-const REALTEK_URL = 'https://www.realtek.com/en/'
 
 export function AdvancedSettings(): JSX.Element {
   const { t } = useTranslation('app_settings')
