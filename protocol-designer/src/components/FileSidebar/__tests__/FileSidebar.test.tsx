@@ -11,7 +11,7 @@ import {
   fixtureP300Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import { FileSidebar, v4WarningContent, v5WarningContent } from '../FileSidebar'
+import { FileSidebar, v6WarningContent } from '../FileSidebar'
 import { useBlockingHint } from '../../Hints/useBlockingHint'
 
 jest.mock('../../Hints/useBlockingHint')
@@ -39,10 +39,10 @@ describe('FileSidebar', () => {
         labwareDefinitions: {},
         metadata: {},
         pipettes: {},
-        robot: { model: 'OT-2 Standard' },
-        schemaVersion: 3,
+        robot: { model: 'OT-2 Standard', deckId: 'ot2_standard' },
+        schemaVersion: 6,
         commands: [],
-      },
+      } as any,
       pipettesOnDeck: {},
       modulesOnDeck: {},
       savedStepForms: {},
@@ -217,54 +217,7 @@ describe('FileSidebar', () => {
     expect(props.onDownload).toHaveBeenCalled()
   })
 
-  it('blocking hint is shown when protocol is v4', () => {
-    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
-    props.fileData.commands = commands
-    props.pipettesOnDeck = {
-      pipetteLeftId: {
-        // @ts-expect-error(sa, 2021-6-22): not a valid pipette name
-        name: 'string',
-        id: pipetteLeftId,
-        tiprackDefURI: 'test',
-        tiprackLabwareDef: fixture_tiprack_10_ul as LabwareDefinition2,
-        spec: fixtureP10Single,
-        mount: 'left',
-      },
-    }
-    props.savedStepForms = savedStepForms
-
-    const MockHintComponent = () => {
-      return <div></div>
-    }
-
-    mockUseBlockingHint.mockReturnValue(<MockHintComponent />)
-
-    const wrapper = mount(<FileSidebar {...props} schemaVersion={4} />)
-
-    expect(wrapper.exists(MockHintComponent)).toEqual(true)
-    // Before save button is clicked, enabled should be false
-    expect(mockUseBlockingHint).toHaveBeenNthCalledWith(1, {
-      enabled: false,
-      hintKey: 'export_v4_protocol_3_18',
-      content: v4WarningContent,
-      handleCancel: expect.any(Function),
-      handleContinue: expect.any(Function),
-    })
-
-    const downloadButton = wrapper.find(PrimaryButton).at(0)
-    downloadButton.simulate('click')
-
-    // After save button is clicked, enabled should be true
-    expect(mockUseBlockingHint).toHaveBeenLastCalledWith({
-      enabled: true,
-      hintKey: 'export_v4_protocol_3_18',
-      content: v4WarningContent,
-      handleCancel: expect.any(Function),
-      handleContinue: expect.any(Function),
-    })
-  })
-
-  it('blocking hint is shown when protocol is v5', () => {
+  it('blocking hint is shown', () => {
     // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
     props.fileData.commands = commands
     props.savedStepForms = savedStepForms
@@ -281,8 +234,8 @@ describe('FileSidebar', () => {
     // Before save button is clicked, enabled should be false
     expect(mockUseBlockingHint).toHaveBeenNthCalledWith(1, {
       enabled: false,
-      hintKey: 'export_v5_protocol_3_20',
-      content: v5WarningContent,
+      hintKey: 'export_v6_protocol_5_10',
+      content: v6WarningContent,
       handleCancel: expect.any(Function),
       handleContinue: expect.any(Function),
     })
@@ -293,8 +246,8 @@ describe('FileSidebar', () => {
     // After save button is clicked, enabled should be true
     expect(mockUseBlockingHint).toHaveBeenLastCalledWith({
       enabled: true,
-      hintKey: 'export_v5_protocol_3_20',
-      content: v5WarningContent,
+      hintKey: 'export_v6_protocol_5_10',
+      content: v6WarningContent,
       handleCancel: expect.any(Function),
       handleContinue: expect.any(Function),
     })

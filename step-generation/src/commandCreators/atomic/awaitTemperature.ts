@@ -1,4 +1,7 @@
-import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  HEATERSHAKER_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import { TEMPERATURE_AT_TARGET, TEMPERATURE_DEACTIVATED } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import type { CommandCreator, AwaitTemperatureArgs } from '../../types'
@@ -44,7 +47,7 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
 
   const moduleType = invariantContext.moduleEntities[module]?.type
   const params = {
-    module,
+    moduleId: module,
     temperature,
   }
 
@@ -53,7 +56,17 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
       return {
         commands: [
           {
-            command: 'temperatureModule/awaitTemperature',
+            commandType: 'temperatureModule/awaitTemperature',
+            params,
+          },
+        ],
+      }
+
+    case HEATERSHAKER_MODULE_TYPE:
+      return {
+        commands: [
+          {
+            commandType: 'heaterShakerModule/awaitTemperature',
             params,
           },
         ],
@@ -61,7 +74,7 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
 
     default:
       console.error(
-        `awaitTemperature expected module ${module} to be ${TEMPERATURE_MODULE_TYPE}, got ${moduleType}`
+        `awaitTemperature expected module ${module} to be ${TEMPERATURE_MODULE_TYPE} or ${HEATERSHAKER_MODULE_TYPE}, got ${moduleType}`
       )
       return {
         errors: [errorCreators.missingModuleError()],

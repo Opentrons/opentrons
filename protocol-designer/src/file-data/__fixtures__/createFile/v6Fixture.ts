@@ -34,173 +34,217 @@ export const robotStateTimeline: Timeline = {
     {
       commands: [
         {
-          command: 'pickUpTip',
+          commandType: 'pickUpTip',
           params: {
-            pipette: 'pipetteId',
-            labware: 'tiprackId',
-            well: 'A1',
+            pipetteId: 'pipetteId',
+            labwareId: 'tiprackId',
+            wellName: 'A1',
           },
         },
         {
-          command: 'aspirate',
+          commandType: 'aspirate',
           params: {
-            pipette: 'pipetteId',
+            pipetteId: 'pipetteId',
             volume: 5,
-            labware: 'plateId',
-            well: 'A1',
-            offsetFromBottomMm: 1,
+            labwareId: 'plateId',
+            wellName: 'A1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 1,
+              },
+            },
             flowRate: 3.78,
           },
         },
         {
-          command: 'moveToWell',
+          commandType: 'moveToWell',
           params: {
-            pipette: 'pipetteId',
-            labware: 'plateId',
-            well: 'A1',
-            offset: {
-              x: 0,
-              y: 0,
-              z: 1,
+            pipetteId: 'pipetteId',
+            labwareId: 'plateId',
+            wellName: 'A1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                x: 0,
+                y: 0,
+                z: 1,
+              },
             },
           },
         },
         {
-          command: 'delay',
+          commandType: 'delay',
           params: {
             wait: 1,
           },
         },
         {
-          command: 'airGap',
+          commandType: 'aspirate',
           params: {
-            pipette: 'pipetteId',
+            pipetteId: 'pipetteId',
             volume: 1,
-            labware: 'plateId',
-            well: 'A1',
-            offsetFromBottomMm: 15.81,
+            labwareId: 'plateId',
+            wellName: 'A1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 15.81,
+              },
+            },
             flowRate: 3.78,
           },
         },
         {
-          command: 'delay',
+          commandType: 'delay',
           params: {
             wait: 1,
           },
         },
         {
-          command: 'dispense',
+          commandType: 'dispense',
           params: {
-            pipette: 'pipetteId',
+            pipetteId: 'pipetteId',
             volume: 1,
-            labware: 'plateId',
-            well: 'A12',
-            offsetFromBottomMm: 15.81,
+            labwareId: 'plateId',
+            wellName: 'A12',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 15.81,
+              },
+            },
             flowRate: 3.78,
           },
         },
         {
-          command: 'dispense',
+          commandType: 'dispense',
           params: {
-            pipette: 'pipetteId',
+            pipetteId: 'pipetteId',
             volume: 5,
-            labware: 'plateId',
-            well: 'A12',
-            offsetFromBottomMm: 0.5,
+            labwareId: 'plateId',
+            wellName: 'A12',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 0.5,
+              },
+            },
             flowRate: 3.78,
           },
         },
         {
-          command: 'dropTip',
+          commandType: 'dropTip',
           params: {
-            pipette: 'pipetteId',
-            labware: 'trashId',
-            well: 'A1',
+            pipetteId: 'pipetteId',
+            labwareId: 'trashId',
+            wellName: 'A1',
           },
         },
         {
-          command: 'pickUpTip',
+          commandType: 'pickUpTip',
           params: {
-            pipette: 'pipetteId',
-            labware: 'tiprackId',
-            well: 'B1',
+            pipetteId: 'pipetteId',
+            labwareId: 'tiprackId',
+            wellName: 'B1',
           },
         },
         {
-          command: 'aspirate',
+          commandType: 'aspirate',
           params: {
-            pipette: 'pipetteId',
+            pipetteId: 'pipetteId',
             volume: 5,
-            labware: 'plateId',
-            well: 'B1',
-            offsetFromBottomMm: 1,
+            labwareId: 'plateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 1,
+              },
+            },
             flowRate: 3.78,
           },
         },
         {
-          command: 'moveToWell',
+          commandType: 'moveToWell',
           params: {
-            pipette: 'pipetteId',
-            labware: 'plateId',
-            well: 'B1',
-            offset: {
-              x: 0,
-              y: 0,
-              z: 1,
+            pipetteId: 'pipetteId',
+            labwareId: 'plateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 0.5,
+              },
             },
           },
         },
         {
-          command: 'delay',
+          commandType: 'delay',
           params: {
             wait: 1,
           },
         },
         {
-          command: 'airGap',
+          commandType: 'aspirate',
           params: {
-            pipette: 'pipetteId',
+            pipetteId: 'pipetteId',
             volume: 1,
-            labware: 'plateId',
-            well: 'B1',
-            offsetFromBottomMm: 15.81,
+            labwareId: 'plateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 15.81,
+              },
+            },
             flowRate: 3.78,
           },
         },
         {
-          command: 'delay',
+          commandType: 'delay',
           params: {
             wait: 1,
           },
         },
         {
-          command: 'dispense',
+          commandType: 'dispense',
           params: {
-            pipette: 'pipetteId',
+            pipetteId: 'pipetteId',
             volume: 1,
-            labware: 'plateId',
-            well: 'B12',
-            offsetFromBottomMm: 15.81,
+            labwareId: 'plateId',
+            wellName: 'B12',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 15.81,
+              },
+            },
             flowRate: 3.78,
           },
         },
         {
-          command: 'dispense',
+          commandType: 'dispense',
           params: {
-            pipette: 'pipetteId',
+            pipetteId: 'pipetteId',
             volume: 5,
-            labware: 'plateId',
-            well: 'B12',
-            offsetFromBottomMm: 0.5,
+            labwareId: 'plateId',
+            wellName: 'B12',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 0.5,
+              },
+            },
             flowRate: 3.78,
           },
         },
         {
-          command: 'dropTip',
+          commandType: 'dropTip',
           params: {
-            pipette: 'pipetteId',
-            labware: 'trashId',
-            well: 'A1',
+            pipetteId: 'pipetteId',
+            labwareId: 'trashId',
+            wellName: 'A1',
           },
         },
       ],
@@ -229,13 +273,13 @@ export const savedStepForms: SavedStepFormState = {
     stepType: 'moveLiquid',
     stepName: 'transfer',
     stepDetails: '',
-    pipette: 'pipetteId',
+    pipetteId: 'pipetteId',
     volume: '5',
     changeTip: 'always',
     path: 'single',
     aspirate_wells_grouped: false,
     aspirate_flowRate: null,
-    aspirate_labware: 'plateId',
+    aspirate_labwareId: 'plateId',
     aspirate_wells: ['A1', 'B1'],
     aspirate_wellOrder_first: 't2b',
     aspirate_wellOrder_second: 'l2r',
@@ -245,7 +289,7 @@ export const savedStepForms: SavedStepFormState = {
     aspirate_mmFromBottom: '1',
     aspirate_touchTip_checkbox: false,
     dispense_flowRate: null,
-    dispense_labware: 'plateId',
+    dispense_labwareId: 'plateId',
     dispense_wells: ['A12', 'B12'],
     dispense_wellOrder_first: 't2b',
     dispense_wellOrder_second: 'l2r',

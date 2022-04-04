@@ -28,9 +28,9 @@ beforeEach(() => {
 describe('tip tracking', () => {
   it('single-channel', () => {
     const params = {
-      pipette: p300SingleId,
-      labware: tiprack1Id,
-      well: 'A1',
+      pipetteId: p300SingleId,
+      labwareId: tiprack1Id,
+      wellName: 'A1',
     }
     const result = forPickUpTip(params, invariantContext, initialRobotState)
     expect(result.warnings).toEqual([])
@@ -51,9 +51,9 @@ describe('tip tracking', () => {
   })
   it('multi-channel', () => {
     const params = {
-      pipette: p300MultiId,
-      labware: 'tiprack1Id',
-      well: 'A1',
+      pipetteId: p300MultiId,
+      labwareId: 'tiprack1Id',
+      wellName: 'A1',
     }
     const result = forPickUpTip(params, invariantContext, initialRobotState)
     expect(result.warnings).toEqual([])

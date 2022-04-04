@@ -5,7 +5,7 @@ import {
   getStateAndContextTempTCModules,
   getSuccessResult,
 } from '../fixtures'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV4'
+import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
   ThermocyclerModuleState,
   ThermocyclerProfileStepArgs,
@@ -19,7 +19,7 @@ describe('thermocyclerProfileStep', () => {
     testName: string
     initialThermocyclerModuleState?: ThermocyclerModuleState
     args: ThermocyclerProfileStepArgs
-    expected: Command[]
+    expected: CreateCommand[]
   }> = [
     {
       testName: 'should generate expected commands',
@@ -35,63 +35,63 @@ describe('thermocyclerProfileStep', () => {
       },
       expected: [
         {
-          command: 'thermocycler/closeLid',
+          commandType: 'thermocycler/closeLid',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
           },
         },
         {
-          command: 'thermocycler/setTargetLidTemperature',
+          commandType: 'thermocycler/setTargetLidTemperature',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
             temperature: 55,
           },
         },
         {
-          command: 'thermocycler/awaitLidTemperature',
+          commandType: 'thermocycler/awaitLidTemperature',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
             temperature: 55,
           },
         },
         {
-          command: 'thermocycler/runProfile',
+          commandType: 'thermocycler/runProfile',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
             profile: [],
             volume: 42,
           },
         },
         {
-          command: 'thermocycler/awaitProfileComplete',
+          commandType: 'thermocycler/awaitProfileComplete',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
           },
         },
         {
-          command: 'thermocycler/openLid',
+          commandType: 'thermocycler/openLid',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
           },
         },
         {
-          command: 'thermocycler/setTargetBlockTemperature',
+          commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
             temperature: 4,
           },
         },
         {
-          command: 'thermocycler/awaitBlockTemperature',
+          commandType: 'thermocycler/awaitBlockTemperature',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
             temperature: 4,
           },
         },
         {
-          command: 'thermocycler/deactivateLid',
+          commandType: 'thermocycler/deactivateLid',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
           },
         },
       ],
@@ -117,43 +117,43 @@ describe('thermocyclerProfileStep', () => {
       },
       expected: [
         {
-          command: 'thermocycler/runProfile',
+          commandType: 'thermocycler/runProfile',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
             profile: [{ temperature: 61, holdTime: 99 }],
             volume: 42,
           },
         },
         {
-          command: 'thermocycler/awaitProfileComplete',
+          commandType: 'thermocycler/awaitProfileComplete',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
           },
         },
         {
-          command: 'thermocycler/openLid',
+          commandType: 'thermocycler/openLid',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
           },
         },
         {
-          command: 'thermocycler/setTargetBlockTemperature',
+          commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
             temperature: 4,
           },
         },
         {
-          command: 'thermocycler/awaitBlockTemperature',
+          commandType: 'thermocycler/awaitBlockTemperature',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
             temperature: 4,
           },
         },
         {
-          command: 'thermocycler/deactivateLid',
+          commandType: 'thermocycler/deactivateLid',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
           },
         },
       ],
@@ -179,49 +179,49 @@ describe('thermocyclerProfileStep', () => {
       },
       expected: [
         {
-          command: 'thermocycler/closeLid',
+          commandType: 'thermocycler/closeLid',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
           },
         },
         {
-          command: 'thermocycler/runProfile',
+          commandType: 'thermocycler/runProfile',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
             profile: [{ temperature: 61, holdTime: 99 }],
             volume: 42,
           },
         },
         {
-          command: 'thermocycler/awaitProfileComplete',
+          commandType: 'thermocycler/awaitProfileComplete',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
           },
         },
         {
-          command: 'thermocycler/openLid',
+          commandType: 'thermocycler/openLid',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
           },
         },
         {
-          command: 'thermocycler/setTargetBlockTemperature',
+          commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
             temperature: 4,
           },
         },
         {
-          command: 'thermocycler/awaitBlockTemperature',
+          commandType: 'thermocycler/awaitBlockTemperature',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
             temperature: 4,
           },
         },
         {
-          command: 'thermocycler/deactivateLid',
+          commandType: 'thermocycler/deactivateLid',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
           },
         },
       ],
@@ -247,43 +247,43 @@ describe('thermocyclerProfileStep', () => {
       },
       expected: [
         {
-          command: 'thermocycler/runProfile',
+          commandType: 'thermocycler/runProfile',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
             profile: [{ temperature: 61, holdTime: 99 }],
             volume: 42,
           },
         },
         {
-          command: 'thermocycler/awaitProfileComplete',
+          commandType: 'thermocycler/awaitProfileComplete',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
           },
         },
         {
-          command: 'thermocycler/openLid',
+          commandType: 'thermocycler/openLid',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
           },
         },
         {
-          command: 'thermocycler/setTargetBlockTemperature',
+          commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
             temperature: 4,
           },
         },
         {
-          command: 'thermocycler/awaitBlockTemperature',
+          commandType: 'thermocycler/awaitBlockTemperature',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
             temperature: 4,
           },
         },
         {
-          command: 'thermocycler/deactivateLid',
+          commandType: 'thermocycler/deactivateLid',
           params: {
-            module: 'thermocyclerId',
+            moduleId: 'thermocyclerId',
           },
         },
       ],
