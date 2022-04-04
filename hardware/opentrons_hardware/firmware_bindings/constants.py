@@ -125,8 +125,8 @@ class MessageId(int, Enum):
     set_sensor_threshold_response = 0x87
     sensor_diagnostic_request = 0x88
     sensor_diagnostic_response = 0x89
-    bind_sensor_output_request = 0x8a
-    bind_sensor_output_response = 0x8b
+    bind_sensor_output_request = 0x8A
+    bind_sensor_output_response = 0x8B
 
 
 @unique
@@ -180,3 +180,5 @@ class SensorOutputBinding(int, Enum):
 
     none = 0x00
     sync = 0x01
+    report = 0x02
+    sync_and_report = 0x03
