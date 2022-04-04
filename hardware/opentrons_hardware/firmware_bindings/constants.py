@@ -178,7 +178,5 @@ class PipetteName(int, Enum):
 class SensorOutputBinding(int, Enum):
     """Links sensor threshold triggers to pins."""
 
-    none = 0x00
     sync = 0x01
     report = 0x02
-    sync_and_report = 0x03
