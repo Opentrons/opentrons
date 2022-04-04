@@ -7,7 +7,7 @@ name = "pypi"
 python-can = "==3.3.4"
 pyserial = "==3.5"
 typing-extensions = ">=4.0.0,<5"
-numpy = "==1.17.4"
+numpy = "==1.21.2"
 pydantic = "==1.8.2"
 
 [dev-packages]
