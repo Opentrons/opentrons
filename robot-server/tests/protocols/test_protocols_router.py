@@ -108,7 +108,7 @@ async def test_get_protocols(
             metadata={},
             labware_definitions=[],
         ),
-        protocol_key="dummy-key-111"
+        protocol_key="dummy-key-111",
     )
     resource_2 = ProtocolResource(
         protocol_id="123",
@@ -121,7 +121,7 @@ async def test_get_protocols(
             metadata={},
             labware_definitions=[],
         ),
-        protocol_key="dummy-key-222"
+        protocol_key="dummy-key-222",
     )
 
     analysis_1 = PendingAnalysis(id="analysis-id-abc")
@@ -134,7 +134,7 @@ async def test_get_protocols(
         metadata=Metadata(),
         analyses=[analysis_1],
         files=[],
-        protocol_key="dummy-key-111"
+        protocol_key="dummy-key-111",
     )
     expected_protocol_2 = Protocol(
         id="123",
@@ -143,7 +143,7 @@ async def test_get_protocols(
         metadata=Metadata(),
         analyses=[analysis_2],
         files=[],
-        protocol_key="dummy-key-222"
+        protocol_key="dummy-key-222",
     )
 
     decoy.when(protocol_store.get_all()).then_return([resource_1, resource_2])
@@ -177,7 +177,7 @@ async def test_get_protocol_by_id(
             metadata={},
             labware_definitions=[],
         ),
-        protocol_key="dummy-key-111"
+        protocol_key="dummy-key-111",
     )
 
     analysis = PendingAnalysis(id="analysis-id")
@@ -200,7 +200,7 @@ async def test_get_protocol_by_id(
         metadata=Metadata(),
         analyses=[analysis],
         files=[],
-        protocol_key="dummy-key-111"
+        protocol_key="dummy-key-111",
     )
     assert result.status_code == 200
 
@@ -256,7 +256,7 @@ async def test_create_protocol(
         protocol_id="protocol-id",
         created_at=datetime(year=2021, month=1, day=1),
         source=protocol_source,
-        protocol_key="dummy-key-111"
+        protocol_key="dummy-key-111",
     )
 
     analysis = PendingAnalysis(id="analysis-id")
@@ -293,7 +293,7 @@ async def test_create_protocol(
         metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
         analyses=[analysis],
         files=[ProtocolFile(name="foo.json", role=ProtocolFileRole.MAIN)],
-        protocol_key="dummy-key-111"
+        protocol_key="dummy-key-111",
     )
     assert result.status_code == 201
 

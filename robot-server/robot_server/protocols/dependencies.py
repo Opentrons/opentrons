@@ -48,7 +48,6 @@ def _get_sql_engine(app_state: AppState = Depends(get_app_state)) -> SQLEngine:
     # https://github.com/tiangolo/fastapi/issues/617
 
 
-
 def get_protocol_directory(
     app_state: AppState = Depends(get_app_state),
 ) -> Path:
