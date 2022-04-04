@@ -23,6 +23,8 @@ def test_update(mock_root_fs_interface: MagicMock, mock_partition_manager: Magic
         2, "/dev/mmcblk0p2"
     )
 
+    mock_partition_manager.mountpoint_root.return_value = "/mnt"
+
     updater.decomp_and_write("/mmc/blk0p1", fake_callable(24))
     mock_partition_manager.find_unused_partition.assert_called()
     mock_root_fs_interface.write_update.assert_called()
@@ -32,4 +34,7 @@ def test_update(mock_root_fs_interface: MagicMock, mock_partition_manager: Magic
     mock_partition_manager.switch_partition.assert_called()
 
     updater.write_update("/mmc/blk0p1", fake_callable(24))
+    mock_partition_manager.find_unused_partition.assert_called()
+
+    updater.mount_update()
     mock_partition_manager.find_unused_partition.assert_called()
