@@ -94,7 +94,10 @@ export function AttachAdapter(): JSX.Element {
         >
           {t('2b')}
         </Text>
-        <Flex border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}>
+        <Flex
+          border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}
+          width="100%"
+        >
           <Flex
             padding={`${SPACING.spacingM} 2.5rem ${SPACING.spacingXL} ${SPACING.spacingXL}`}
             data-testid={`attach_adapter_alignment_image`}

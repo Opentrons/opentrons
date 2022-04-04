@@ -1,7 +1,37 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import {
+  componentPropsMatcher,
+  LabwareRender,
+  partialComponentPropsMatcher,
+  renderWithProviders,
+  RobotWorkSpace,
+} from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { Introduction } from '../Introduction'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import { mockDefinition } from '../../../../redux/custom-labware/__fixtures__'
+import { when } from 'jest-when'
+
+jest.mock('@opentrons/components', () => {
+  const actualComponents = jest.requireActual('@opentrons/components')
+  return {
+    ...actualComponents,
+    RobotWorkSpace: jest.fn(() => <div>mock RobotWorkSpace</div>),
+    LabwareRender: jest.fn(() => <div>mock LabwareRender</div>),
+  }
+})
+
+const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
+  typeof RobotWorkSpace
+>
+const mockLabwareRender = LabwareRender as jest.MockedFunction<
+  typeof LabwareRender
+>
+
+const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
+  (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
+  {}
+)
 
 const render = (props: React.ComponentProps<typeof Introduction>) => {
   return renderWithProviders(<Introduction {...props} />, {
@@ -13,7 +43,7 @@ describe('Introduction', () => {
   let props: React.ComponentProps<typeof Introduction>
   beforeEach(() => {
     props = {
-      labwareDefinition: undefined,
+      labwareDefinition: null,
       thermalAdapterName: undefined,
     }
   })
@@ -39,6 +69,38 @@ describe('Introduction', () => {
     getByAltText('heater_shaker_image')
     getByAltText('screwdriver_image')
   })
-  //  TODO immediately: add test when the labware def and thermal adapter can be plugged in
-  it.todo('renders the correct body when protocol has been uploaded')
+  it('renders the correct body when protocol has been uploaded', () => {
+    props = {
+      labwareDefinition: mockDefinition,
+      thermalAdapterName: undefined,
+    }
+    when(mockRobotWorkSpace)
+      .mockReturnValue(<div></div>)
+      .calledWith(
+        partialComponentPropsMatcher({
+          deckDef: standardDeckDef,
+          children: expect.anything(),
+        })
+      )
+      .mockImplementation(({ children }) => (
+        <svg>
+          {/* @ts-expect-error children won't be null since we checked for expect.anything() above */}
+          {children({
+            deckSlotsById,
+            getRobotCoordsFromDOMCoords: {} as any,
+          })}
+        </svg>
+      ))
+
+    when(mockLabwareRender)
+      .mockReturnValue(<div></div>)
+      .calledWith(
+        componentPropsMatcher({
+          definition: mockDefinition,
+        })
+      )
+
+    const { getByText } = render(props)
+    getByText('Mock Definition')
+  })
 })

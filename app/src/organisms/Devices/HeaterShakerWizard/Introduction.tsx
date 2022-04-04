@@ -88,12 +88,29 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
 }
 interface IntroductionProps {
   labwareDefinition: LabwareDefinition2 | null
-  thermalAdapterName?: string
+  thermalAdapterName: string | null
 }
 
 export function Introduction(props: IntroductionProps): JSX.Element {
   const { labwareDefinition, thermalAdapterName } = props
   const { t } = useTranslation('heater_shaker')
+
+  //  TODO(jr, 2022-04-03): plus in real thermal adapter images
+  let adapterImage: string = ''
+  switch (thermalAdapterName) {
+    case 'PCR Adapter':
+      adapterImage = heaterShaker
+      break
+    case 'Universal Flat Adapter':
+      adapterImage = heaterShaker
+      break
+    case 'Deep Well Adapter':
+      adapterImage = heaterShaker
+      break
+    case '96 Flat Bottom Adapter':
+      adapterImage = heaterShaker
+      break
+  }
 
   return (
     <Flex
@@ -105,20 +122,22 @@ export function Introduction(props: IntroductionProps): JSX.Element {
     >
       <Text
         fontSize={TYPOGRAPHY.lineHeight16}
-        width="39.625rem"
         data-testid={`introduction_title`}
       >
         {t('use_this_heater_shaker_guide')}
       </Text>
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <Text
-          paddingTop={TYPOGRAPHY.fontSizeH6}
-          fontSize={TYPOGRAPHY.fontSizeH4}
-          paddingLeft={'8rem'}
-          data-testid={`introduction_subtitle`}
-        >
-          {t('you_will_need')}
-        </Text>
+        <Flex justifyContent={JUSTIFY_CENTER}>
+          <Text
+            paddingTop={TYPOGRAPHY.fontSizeH6}
+            fontSize={TYPOGRAPHY.fontSizeH4}
+            flexDirection={DIRECTION_ROW}
+            width={'21.5rem'}
+            data-testid={`introduction_subtitle`}
+          >
+            {t('you_will_need')}
+          </Text>
+        </Flex>
         <Flex
           justifyContent={JUSTIFY_CENTER}
           data-testid={`introduction_item_adapter`}
@@ -130,11 +149,10 @@ export function Introduction(props: IntroductionProps): JSX.Element {
                 : t('unknown_adapter_and_screw')
             }
             subtext={t('screw_may_be_in_module')}
-            //  TODO(jr, 2022-02-16): plus in thermal adapter image
             image={
               thermalAdapterName != null ? (
                 <Flex width={'6.25rem'} height={'4.313rem'}>
-                  <div>{'thermal adapter image'}</div>
+                  <img src={adapterImage} alt={'introduction_adapter_image'} />
                 </Flex>
               ) : undefined
             }
@@ -156,7 +174,9 @@ export function Introduction(props: IntroductionProps): JSX.Element {
                   <RobotWorkSpace viewBox={VIEW_BOX}>
                     {() => {
                       return (
-                        <React.Fragment>
+                        <React.Fragment
+                          data-testid={`introduction_labwareRender_${labwareDefinition.namespace}`}
+                        >
                           <LabwareRender definition={labwareDefinition} />
                         </React.Fragment>
                       )

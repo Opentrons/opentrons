@@ -6,6 +6,7 @@ import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
 import { HEATERSHAKER_MODULE_TYPE } from '../../../redux/modules'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/Buttons'
 import { useAttachedModules } from '../hooks'
+import { useHeaterShakerFromProtocol } from '../ModuleCard/hooks'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
 import { AttachModule } from './AttachModule'
@@ -24,7 +25,6 @@ import {
 import type { NextGenRouteParams } from '../../../App/NextGenApp'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
-import { useHeaterShaker } from '../ModuleCard/hooks'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
@@ -39,7 +39,6 @@ export const HeaterShakerWizard = (
   const [currentPage, setCurrentPage] = React.useState(0)
   const { robotName } = useParams<NextGenRouteParams>()
   const attachedModules = useAttachedModules(robotName)
-  const heaterShakerFromProtocol = useHeaterShaker()
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const heaterShaker =
@@ -47,6 +46,8 @@ export const HeaterShakerWizard = (
       (module): module is HeaterShakerModule =>
         module.type === HEATERSHAKER_MODULE_TYPE
     ) ?? null
+  const heaterShakerFromProtocol = useHeaterShakerFromProtocol()
+
   let isPrimaryCTAEnabled: boolean = true
 
   if (currentPage === 4) {
@@ -58,7 +59,19 @@ export const HeaterShakerWizard = (
       ? heaterShakerFromProtocol.nestedLabwareDef
       : null
 
-  console.log(labwareDef)
+  let adapterName: string | null = null
+  if (labwareDef != null) {
+    if (labwareDef.parameters.loadName.includes('pcradapter')) {
+      adapterName = 'PCR Adapter'
+    } else if (labwareDef.parameters.loadName.includes('universalflat')) {
+      adapterName = 'Universal Flat Adapter'
+    } else if (labwareDef.parameters.loadName.includes('deepwelladapter')) {
+      adapterName = 'Deep Well Adapter'
+    } else if (labwareDef.parameters.loadName.includes('96flatbottomadapter')) {
+      adapterName = '96 Flat Bottom Adapter'
+    } else adapterName = null
+  }
+
   let buttonContent = null
   const getWizardDisplayPage = (): JSX.Element | null => {
     switch (currentPage) {
@@ -67,7 +80,7 @@ export const HeaterShakerWizard = (
         return (
           <Introduction
             labwareDefinition={labwareDef}
-            //  TODO(jr, 2022-02-16): get adapter name and image - would this be connected to nestedLabwareDefinition?
+            thermalAdapterName={adapterName}
           />
         )
       case 1:

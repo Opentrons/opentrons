@@ -5,6 +5,8 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useAttachedModules } from '../../hooks'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
+import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
+import { useHeaterShakerFromProtocol } from '../../ModuleCard/hooks'
 import { HeaterShakerWizard } from '..'
 import { Introduction } from '../Introduction'
 import { KeyParts } from '../KeyParts'
@@ -14,6 +16,8 @@ import { PowerOn } from '../PowerOn'
 import { TestShake } from '../TestShake'
 
 jest.mock('../../hooks')
+import type { ProtocolModuleInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
+
 jest.mock('../Introduction')
 jest.mock('../KeyParts')
 jest.mock('../AttachModule')
@@ -24,6 +28,9 @@ jest.mock('../TestShake')
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
 >
+jest.mock('../../../../redux/modules')
+jest.mock('../../ModuleCard/hooks')
+
 const mockIntroduction = Introduction as jest.MockedFunction<
   typeof Introduction
 >
@@ -50,6 +57,19 @@ const render = (
     }
   )[0]
 }
+
+const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
+  moduleId: 'heater_shaker_id',
+  x: 0,
+  y: 0,
+  z: 0,
+  moduleDef: mockHeaterShaker as any,
+  nestedLabwareDef: heaterShakerCommands.labwareDefinitions['example/plate/1'],
+  nestedLabwareDisplayName: null,
+  nestedLabwareId: null,
+  protocolLoadOrder: 1,
+  slotName: '1',
+} as ProtocolModuleInfo
 
 describe('HeaterShakerWizard', () => {
   const props: React.ComponentProps<typeof HeaterShakerWizard> = {
