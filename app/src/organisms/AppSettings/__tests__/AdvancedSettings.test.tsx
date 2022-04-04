@@ -5,13 +5,17 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import * as CustomLabware from '../../../redux/custom-labware'
 import * as Config from '../../../redux/config'
+import * as SystemInfo from '../../../redux/system-info'
+import * as Fixtures from '../../../redux/system-info/__fixtures__'
 
 import { AdvancedSettings } from '../AdvancedSettings'
+import { NOT_APPLICABLE } from '../../../redux/system-info'
 
 jest.mock('../../../redux/config')
 jest.mock('../../../redux/calibration')
 jest.mock('../../../redux/custom-labware')
 jest.mock('../../../redux/discovery')
+jest.mock('../../../redux/system-info')
 
 const render = () => {
   return renderWithProviders(
@@ -35,6 +39,14 @@ const mockGetIsLabwareOffsetCodeSnippetsOn = Config.getIsLabwareOffsetCodeSnippe
   typeof Config.getIsLabwareOffsetCodeSnippetsOn
 >
 
+const mockGetU2EAdapterDevice = SystemInfo.getU2EAdapterDevice as jest.MockedFunction<
+  typeof SystemInfo.getU2EAdapterDevice
+>
+
+const mockGetU2EWindowsDriverStatus = SystemInfo.getU2EWindowsDriverStatus as jest.MockedFunction<
+  typeof SystemInfo.getU2EWindowsDriverStatus
+>
+
 describe('AdvancedSettings', () => {
   beforeEach(() => {
     getCustomLabwarePath.mockReturnValue('')
@@ -46,6 +58,8 @@ describe('AdvancedSettings', () => {
       { name: 'Beta', value: 'beta' },
       { name: 'Alpha', value: 'alpha' },
     ])
+    mockGetU2EAdapterDevice.mockReturnValue(Fixtures.mockWindowsRealtekDevice)
+    mockGetU2EWindowsDriverStatus.mockReturnValue(SystemInfo.OUTDATED)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -97,6 +111,48 @@ describe('AdvancedSettings', () => {
       'Disabling this may improve overall networking performance in environments with many robots, but it may be slower to find robots when opening the app.'
     )
     getByRole('switch', { name: 'display_unavailable_robots' })
+  })
+
+  it('render the usb-to-ethernet adapter information', () => {
+    const [{ getByText }] = render()
+    getByText('USB-to-Ethernet Adapter Information')
+    getByText(
+      'Some OT-2’s have an internal USB-to-Ethernet adapter. If your OT-2 uses this adapter, it will be added to your computer’s device list when you make a wired connection. If you have a Realtek adapter, it is essential that the driver is up to date.'
+    )
+    getByText('Description')
+    getByText('Manufacturer')
+    getByText('Driver Version')
+  })
+
+  it('renders the test data of the usb-to-ethernet adapter information with mac', () => {
+    mockGetU2EAdapterDevice.mockReturnValue({
+      ...Fixtures.mockWindowsRealtekDevice,
+      windowsDriverVersion: null,
+    })
+    mockGetU2EWindowsDriverStatus.mockReturnValue(SystemInfo.NOT_APPLICABLE)
+    const [{ getByText, queryByText }] = render()
+    getByText('Realtek USB FE Family Controller')
+    getByText('Realtek')
+    getByText('Unknown')
+    expect(
+      queryByText(
+        'An update is available for Realtek USB-to-Ethernet adapter driver'
+      )
+    ).not.toBeInTheDocument()
+    expect(queryByText('go to Realtek.com')).not.toBeInTheDocument()
+  })
+
+  it('renders the test data of the usb-to-ethernet adapter information with window', () => {
+    const [{ getByText }] = render()
+    getByText('Realtek USB FE Family Controller')
+    getByText('Realtek')
+    getByText('1.2.3')
+    getByText(
+      'An update is available for Realtek USB-to-Ethernet adapter driver'
+    )
+    const targetLink = 'https://www.realtek.com/en/'
+    const link = getByText('go to Realtek.com')
+    expect(link.closest('a')).toHaveAttribute('href', targetLink)
   })
 
   it('renders the display show link to get labware offset data section', () => {
