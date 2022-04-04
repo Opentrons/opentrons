@@ -5,7 +5,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
+import { StyledText } from '../../../../atoms/text'
 
 export interface LabeledValueProps {
   label: string

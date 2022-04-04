@@ -28,7 +28,6 @@ export interface WellPropertiesProps {
   wellProperties: LabwareWellGroupProperties
   wellLabel: string
   displayVolumeUnits: LabwareVolumeUnits
-  hideTitle?: boolean
 }
 
 const BOTTOM_SHAPE_TO_ICON = {
@@ -49,7 +48,7 @@ export function WellProperties(props: WellPropertiesProps): JSX.Element {
     <Box
       border={BORDERS.lineBorder}
       padding={SPACING.spacing4}
-      marginBottom={SPACING.spacing5}
+      marginBottom={SPACING.spacing4}
     >
       <Flex
         flexDirection={DIRECTION_ROW}

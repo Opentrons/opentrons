@@ -1,6 +1,6 @@
 {
   "tube": "Tube",
-  "tip": "tip",
+  "tip": "Tip",
   "well": "Well",
   "count": "Count",
   "v": "V_Bottom",
@@ -13,8 +13,21 @@
   "length": "length",
   "width": "width",
   "height": "height",
-  "well_measurements": "Well Measurements (mm)",
+  "measurements": "Measurements (mm)",
   "depth": "depth",
   "diameter": "diameter",
-  "various": "various"
+  "various": "various",
+  "x_size": "x-size",
+  "y_size": "y-size",
+  "total_length": "total length",
+  "x_offset": "x-offset",
+  "y_offset": "y-offset",
+  "x_spacing": "x-spacing",
+  "y_spacing": "y-spacing",
+  "na": "n/a",
+  "spacing": "Spacing (mm)",
+  "manufacturer": "manufacturer",
+  "manufacturer_number": "manufacturer / catalog #",
+  "all": "all",
+  "generic": "generic"
 }

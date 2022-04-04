@@ -15,6 +15,10 @@ import { getWellLabel } from '../helpers/labels'
 import { getUniqueWellProperties } from '../helpers/labwareInference'
 import { WellCount } from './WellCount'
 import { WellProperties } from './WellProperties'
+import { Dimensions } from './Dimensions'
+import { WellDimensions } from './WellDimensions'
+import { WellSpacing } from './WellSpacing'
+import { ManufacturerDetails } from './ManufacturerDetails'
 import type { LabwareDefAndDate } from '../hooks'
 
 export interface LabwareDetailsProps {
@@ -56,23 +60,67 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           {apiName} <Icon height=".7rem" name="ot-copy-text" />
         </Link>
       </Box>
-      <Box
-        border={BORDERS.lineBorder}
-        padding={SPACING.spacing4}
-        marginBottom={SPACING.spacing5}
-      >
-        <WellCount
-          wellLabel={getWellLabel(labwareDef)}
-          count={Object.keys(wells).length}
-        />
-        {!hasInserts && !irregular && (
-          <WellProperties
-            wellProperties={wellGroups[0]}
-            wellLabel={wellLabel}
-            displayVolumeUnits={displayVolumeUnits}
-            hideTitle
+      <Box border={BORDERS.lineBorder}>
+        <Box padding={SPACING.spacing4}>
+          <WellCount
+            wellLabel={getWellLabel(labwareDef)}
+            count={Object.keys(wells).length}
           />
-        )}
+          {!hasInserts && !irregular && (
+            <WellProperties
+              wellProperties={wellGroups[0]}
+              wellLabel={wellLabel}
+              displayVolumeUnits={displayVolumeUnits}
+            />
+          )}
+          <Dimensions
+            definition={labwareDef}
+            irregular={irregular}
+            insertCategory={insertCategory}
+          />
+          {wellGroups.map((wellProps, i) => {
+            const { metadata: groupMetadata } = wellProps
+            const wellLabel = getWellLabel(wellProps, labwareDef)
+            const groupDisplaySuffix =
+              groupMetadata.displayName != null
+                ? ` - ${groupMetadata.displayName}`
+                : ''
+
+            return (
+              <React.Fragment key={i}>
+                {groupMetadata.displayCategory == null && irregular && (
+                  <>
+                    <WellCount
+                      count={wellProps.wellCount}
+                      wellLabel={wellLabel}
+                    />
+                    <WellProperties
+                      wellProperties={wellProps}
+                      wellLabel={wellLabel}
+                      displayVolumeUnits={displayVolumeUnits}
+                    />
+                  </>
+                )}
+                {groupMetadata.displayCategory == null && (
+                  <WellDimensions
+                    labwareParams={parameters}
+                    category={labwareDef.metadata.displayCategory}
+                    wellProperties={wellProps}
+                    wellLabel={wellLabel}
+                    labelSuffix={groupDisplaySuffix}
+                  />
+                )}
+                <WellSpacing
+                  category={labwareDef.metadata.displayCategory}
+                  wellProperties={wellProps}
+                  isMultiRow={isMultiRow}
+                  labelSuffix={groupDisplaySuffix}
+                />
+              </React.Fragment>
+            )
+          })}
+        </Box>
+        <ManufacturerDetails brand={brand} />
       </Box>
     </Slideout>
   )
