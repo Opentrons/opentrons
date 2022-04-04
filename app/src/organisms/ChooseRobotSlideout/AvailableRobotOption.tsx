@@ -36,7 +36,9 @@ const selectedOptionStyles = css`
   background-color: ${COLORS.lightBlue};
 `
 
-export function AvailableRobotOption(props: AvailableRobotOptionProps): JSX.Element {
+export function AvailableRobotOption(
+  props: AvailableRobotOptionProps
+): JSX.Element {
   const { robotName, robotModel, local, onClick, isSelected } = props
   return (
     <Flex

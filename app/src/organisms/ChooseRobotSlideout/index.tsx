@@ -130,6 +130,7 @@ export function ChooseRobotSlideout(
               color={COLORS.blue}
               onClick={() => dispatch(startDiscovery())}
               textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              role="button"
             >
               {t('shared:refresh')}
             </Link>

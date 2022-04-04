@@ -2,7 +2,6 @@ import * as React from 'react'
 import { render, fireEvent } from '@testing-library/react'
 import { AvailableRobotOption } from '../AvailableRobotOption'
 
-
 const robotName = 'fakeRobotName'
 const robotModel = 'OT-2'
 describe('AvailableRobotOption', () => {

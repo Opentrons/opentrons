@@ -20,6 +20,7 @@ import {
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
+import { StyledText } from '../text'
 
 interface Props extends StyleProps {
   title: string
@@ -37,6 +38,7 @@ const EXPANDED_STYLE = css`
   width: 19.5rem;
   max-width: 19.5rem;
   height: 100%;
+  visibility: visible;
 
   @keyframes slidein {
     from {
@@ -53,6 +55,7 @@ const COLLAPSED_STYLE = css`
   animation-direction: alternate;
   overflow: hidden;
   max-width: 0rem;
+  visibility: hidden;
 
   @keyframes slideout {
     from {
@@ -100,13 +103,9 @@ export const Slideout = (props: Props): JSX.Element | null => {
               paddingX={SPACING_3}
               marginBottom={SPACING_3}
             >
-              <Text
-                fontSize={TYPOGRAPHY.fontSizeH2}
-                fontWeight={FONT_WEIGHT_SEMIBOLD}
-                data-testid={`Slideout_title_${title}`}
-              >
+              <StyledText as="h2" data-testid={`Slideout_title_${title}`}>
                 {title}
-              </Text>
+              </StyledText>
               <Flex alignItems={ALIGN_CENTER}>
                 <Btn
                   size={TYPOGRAPHY.lineHeight24}
