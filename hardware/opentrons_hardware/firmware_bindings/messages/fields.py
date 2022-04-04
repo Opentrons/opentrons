@@ -120,9 +120,8 @@ class SensorOutputBindingField(utils.UInt8Field):
     """sensor type."""
 
     def __repr__(self) -> str:
-        """Print sensor."""
-        try:
-            binding_val = SensorOutputBinding(self.value).name
-        except ValueError:
-            binding_val = str(self.value)
-        return f"{self.__class__.__name__}(value={binding_val})"
+        """Print version flags."""
+        flags_list = [
+            flag.name for flag in SensorOutputBinding if bool(self.value & flag.value)
+        ]
+        return f"{self.__class__.__name__}(value={','.join(flags_list)})"
