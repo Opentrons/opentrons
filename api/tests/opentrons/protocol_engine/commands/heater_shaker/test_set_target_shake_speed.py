@@ -1,11 +1,14 @@
 """Test Heater Shaker set shake speed command implementation."""
 from decoy import Decoy
 
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import AbstractModule, HeaterShaker
+from opentrons.hardware_control.modules import HeaterShaker
 
 from opentrons.protocol_engine.state import StateView
-from opentrons.protocol_engine.state.modules import HeaterShakerModuleView
+from opentrons.protocol_engine.state.module_substates import (
+    HeaterShakerModuleSubState,
+    HeaterShakerModuleId,
+)
+from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
 from opentrons.protocol_engine.commands.heater_shaker.set_target_shake_speed import (
     SetTargetShakeSpeedImpl,
@@ -15,33 +18,36 @@ from opentrons.protocol_engine.commands.heater_shaker.set_target_shake_speed imp
 async def test_set_target_shake_speed(
     decoy: Decoy,
     state_view: StateView,
-    hardware_api: HardwareControlAPI,
+    equipment: EquipmentHandler,
 ) -> None:
     """It should be able to set the module's shake speed."""
-    subject = SetTargetShakeSpeedImpl(state_view=state_view, hardware_api=hardware_api)
+    subject = SetTargetShakeSpeedImpl(state_view=state_view, equipment=equipment)
     data = heater_shaker.SetTargetShakeSpeedParams(
-        moduleId="shake-shaker-id", rpm=1234.56
+        moduleId="input-heater-shaker-id",
+        rpm=1234.56,
     )
 
-    # Get module view
-    hs_module_view = decoy.mock(cls=HeaterShakerModuleView)
+    hs_module_substate = decoy.mock(cls=HeaterShakerModuleSubState)
+    hs_hardware = decoy.mock(cls=HeaterShaker)
+
     decoy.when(
-        state_view.modules.get_heater_shaker_module_view(module_id="shake-shaker-id")
-    ).then_return(hs_module_view)
+        state_view.modules.get_heater_shaker_module_substate(
+            module_id="input-heater-shaker-id"
+        )
+    ).then_return(hs_module_substate)
+
+    decoy.when(hs_module_substate.module_id).then_return(
+        HeaterShakerModuleId("heater-shaker-id")
+    )
 
     # Stub speed validation from hs module view
-    decoy.when(hs_module_view.validate_target_speed(rpm=1234.56)).then_return(1234)
+    decoy.when(hs_module_substate.validate_target_speed(rpm=1234.56)).then_return(1234)
 
     # Get attached hardware modules
-    attached = [decoy.mock(cls=AbstractModule), decoy.mock(cls=AbstractModule)]
-    match = decoy.mock(cls=HeaterShaker)
-    decoy.when(hardware_api.attached_modules).then_return(attached)
-
-    # Get stubbed hardware module from hs module view
-    decoy.when(hs_module_view.find_hardware(attached_modules=attached)).then_return(
-        match
-    )
+    decoy.when(
+        equipment.get_module_hardware_api(HeaterShakerModuleId("heater-shaker-id"))
+    ).then_return(hs_hardware)
 
     result = await subject.execute(data)
-    decoy.verify(await match.set_speed(rpm=1234), times=1)
+    decoy.verify(await hs_hardware.set_speed(rpm=1234), times=1)
     assert result == heater_shaker.SetTargetShakeSpeedResult()

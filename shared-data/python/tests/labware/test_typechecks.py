@@ -1,4 +1,4 @@
-from pathlib import Path
+import sys
 
 import pytest
 import typeguard
@@ -9,7 +9,10 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from . import get_ot_defs
 
 
-otdefs = Path()
+pytestmark = pytest.mark.xfail(
+    condition=sys.version_info >= (3, 10),
+    reason="https://github.com/agronholm/typeguard/issues/242",
+)
 
 
 @pytest.mark.parametrize("loadname,version", get_ot_defs())

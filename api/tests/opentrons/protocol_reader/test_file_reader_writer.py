@@ -1,14 +1,15 @@
 """Tests for opentrons.protocol_reader.file_reader_writer.FileReaderWriter."""
 import io
 import pytest
+from dataclasses import dataclass
 from pathlib import Path
 from decoy import matchers
-from typing import Any, Type
+from typing import Any, IO, Type
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6
 from opentrons.protocols.models import JsonProtocol, LabwareDefinition
-from opentrons.protocol_reader.input_file import InputFile
+from opentrons.protocol_reader.input_file import AbstractInputFile
 from opentrons.protocol_reader.file_reader_writer import (
     FileReaderWriter,
     FileReadError,
@@ -21,6 +22,14 @@ SIMPLE_LABWARE_DEF = load_shared_data("labware/fixtures/2/fixture_96_plate.json"
 SIMPLE_V6_JSON_PROTOCOL = load_shared_data("protocol/fixtures/6/simpleV6.json")
 
 
+@dataclass(frozen=True)
+class InputFile(AbstractInputFile):
+    """Concrete input file data model."""
+
+    filename: str
+    file: IO[bytes]
+
+
 async def test_read() -> None:
     """It should read file-likes."""
     file_1 = InputFile(filename="hello.txt", file=io.BytesIO(b"# hello"))
@@ -30,8 +39,25 @@ async def test_read() -> None:
     result = await subject.read([file_1, file_2])
 
     assert result == [
-        BufferedFile(name="hello.txt", contents=b"# hello", data=None),
-        BufferedFile(name="world.txt", contents=b"# world", data=None),
+        BufferedFile(name="hello.txt", contents=b"# hello", data=None, path=None),
+        BufferedFile(name="world.txt", contents=b"# world", data=None, path=None),
+    ]
+
+
+async def test_read_with_path(tmp_path: Path) -> None:
+    """It should read paths."""
+    path_1 = tmp_path / "hello.txt"
+    path_2 = tmp_path / "world.txt"
+
+    path_1.write_text("# hello")
+    path_2.write_text("# world")
+
+    subject = FileReaderWriter()
+    result = await subject.read([path_1, path_2])
+
+    assert result == [
+        BufferedFile(name="hello.txt", contents=b"# hello", data=None, path=path_1),
+        BufferedFile(name="world.txt", contents=b"# world", data=None, path=path_2),
     ]
 
 
@@ -59,6 +85,7 @@ async def test_read_opentrons_json(
             name="hello.json",
             contents=input_file_contents,
             data=matchers.Anything(),
+            path=None,
         ),
     ]
 
@@ -99,8 +126,8 @@ async def test_read_opentrons_json_bad_validate() -> None:
 async def test_write(tmp_path: Path) -> None:
     """It should write buffered files to disk."""
     directory = tmp_path / "target"
-    file_1 = BufferedFile(name="hello.txt", contents=b"# hello", data=None)
-    file_2 = BufferedFile(name="world.txt", contents=b"# world", data=None)
+    file_1 = BufferedFile(name="hello.txt", contents=b"# hello", data=None, path=None)
+    file_2 = BufferedFile(name="world.txt", contents=b"# world", data=None, path=None)
 
     subject = FileReaderWriter()
     await subject.write(

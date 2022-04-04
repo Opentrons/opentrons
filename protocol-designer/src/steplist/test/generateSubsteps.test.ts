@@ -198,9 +198,9 @@ describe('generateSubstepItem', () => {
           rows: [
             {
               activeTips: {
-                pipette: pipetteId,
-                labware: tiprackId,
-                well: 'A1',
+                pipetteId: pipetteId,
+                labwareId: tiprackId,
+                wellName: 'A1',
               },
               source: { well: 'A1', preIngreds: {}, postIngreds: {} },
               dest: undefined,
@@ -210,9 +210,9 @@ describe('generateSubstepItem', () => {
               volume: 50,
               source: { well: 'A2', preIngreds: {}, postIngreds: {} },
               activeTips: {
-                pipette: pipetteId,
-                labware: tiprackId,
-                well: 'A1',
+                pipetteId: pipetteId,
+                labwareId: tiprackId,
+                wellName: 'A1',
               },
               dest: {
                 postIngreds: {
@@ -247,9 +247,9 @@ describe('generateSubstepItem', () => {
           rows: [
             {
               activeTips: {
-                labware: tiprackId,
-                pipette: pipetteId,
-                well: 'A1',
+                labwareId: tiprackId,
+                pipetteId: pipetteId,
+                wellName: 'A1',
               },
               dest: {
                 postIngreds: {
@@ -269,9 +269,9 @@ describe('generateSubstepItem', () => {
             },
             {
               activeTips: {
-                labware: tiprackId,
-                pipette: pipetteId,
-                well: 'A1',
+                labwareId: tiprackId,
+                pipetteId: pipetteId,
+                wellName: 'A1',
               },
               dest: {
                 postIngreds: {
@@ -309,9 +309,9 @@ describe('generateSubstepItem', () => {
           rows: [
             {
               activeTips: {
-                pipette: pipetteId,
-                labware: tiprackId,
-                well: 'A1',
+                pipetteId: pipetteId,
+                labwareId: tiprackId,
+                wellName: 'A1',
               },
               source: { well: 'A1', preIngreds: {}, postIngreds: {} },
               dest: {
@@ -329,9 +329,9 @@ describe('generateSubstepItem', () => {
               volume: 50,
               source: { well: 'A2', preIngreds: {}, postIngreds: {} },
               activeTips: {
-                pipette: pipetteId,
-                labware: tiprackId,
-                well: 'A1',
+                pipetteId: pipetteId,
+                labwareId: tiprackId,
+                wellName: 'A1',
               },
               dest: {
                 postIngreds: {
@@ -409,9 +409,9 @@ describe('generateSubstepItem', () => {
       rows: [
         {
           activeTips: {
-            labware: 'tiprack1Id',
-            pipette: 'p300SingleId',
-            well: 'A1',
+            labwareId: 'tiprack1Id',
+            pipetteId: 'p300SingleId',
+            wellName: 'A1',
           },
           dest: {
             postIngreds: {
@@ -431,9 +431,9 @@ describe('generateSubstepItem', () => {
         },
         {
           activeTips: {
-            labware: 'tiprack1Id',
-            pipette: 'p300SingleId',
-            well: 'A1',
+            labwareId: 'tiprack1Id',
+            pipetteId: 'p300SingleId',
+            wellName: 'A1',
           },
           dest: {
             postIngreds: {
@@ -465,9 +465,9 @@ describe('generateSubstepItem', () => {
         },
         {
           activeTips: {
-            labware: 'tiprack1Id',
-            pipette: 'p300SingleId',
-            well: 'B1',
+            labwareId: 'tiprack1Id',
+            pipetteId: 'p300SingleId',
+            wellName: 'B1',
           },
           dest: {
             postIngreds: {
@@ -487,9 +487,9 @@ describe('generateSubstepItem', () => {
         },
         {
           activeTips: {
-            labware: 'tiprack1Id',
-            pipette: 'p300SingleId',
-            well: 'B1',
+            labwareId: 'tiprack1Id',
+            pipetteId: 'p300SingleId',
+            wellName: 'B1',
           },
           dest: {
             postIngreds: {

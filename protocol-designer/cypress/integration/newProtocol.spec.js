@@ -115,7 +115,7 @@ describe('Desktop Navigation', () => {
     })
 
     describe('exporting what we have got', () => {
-      it('displays a warning modal', () => {
+      it('displays a warning modal saying the protocol has no steps', () => {
         cy.get('button').contains('Export').click()
         // We are shown a warning modal
         cy.contains('Your protocol has no steps').should('exist')
@@ -138,9 +138,18 @@ describe('Desktop Navigation', () => {
         cy.contains('Your protocol has no steps').should('not.exist')
       })
 
-      it('downloads a file when we continue', () => {
+      it('displays a warning modal saying the protocol needs to be run on robot stack version 5.1 or higher', () => {
         cy.get('button').contains('Export').click()
+        // skip the first modal we checked for (your protocol has no steps)
         cy.get('button').contains('CONTINUE WITH EXPORT').click()
+        // check that the robot stack version modal starts
+        cy.contains(
+          'This protocol uses settings that can only run on app and robot server version 5.1 or higher'
+        ).should('exist')
+      })
+
+      it('downloads a file when we continue', () => {
+        cy.get('button').contains('Continue').click()
         //
         // TODO Cypress doesn't handle file downloads very well.
         // Perhaps the app can be modified to react more directly

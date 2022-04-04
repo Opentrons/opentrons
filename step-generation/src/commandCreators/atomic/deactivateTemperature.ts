@@ -1,6 +1,7 @@
 import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import type { CommandCreator, DeactivateTemperatureArgs } from '../../types'
@@ -21,14 +22,14 @@ export const deactivateTemperature: CommandCreator<DeactivateTemperatureArgs> = 
 
   const moduleType = invariantContext.moduleEntities[module]?.type
   const params = {
-    module,
+    moduleId: module,
   }
 
   if (moduleType === TEMPERATURE_MODULE_TYPE) {
     return {
       commands: [
         {
-          command: 'temperatureModule/deactivate',
+          commandType: 'temperatureModule/deactivate',
           params,
         },
       ],
@@ -37,18 +38,27 @@ export const deactivateTemperature: CommandCreator<DeactivateTemperatureArgs> = 
     return {
       commands: [
         {
-          command: 'thermocycler/deactivateLid',
+          commandType: 'thermocycler/deactivateLid',
           params,
         },
         {
-          command: 'thermocycler/deactivateBlock',
+          commandType: 'thermocycler/deactivateBlock',
+          params,
+        },
+      ],
+    }
+  } else if (moduleType === HEATERSHAKER_MODULE_TYPE) {
+    return {
+      commands: [
+        {
+          commandType: 'heaterShakerModule/deactivateHeater',
           params,
         },
       ],
     }
   } else {
     console.error(
-      `setTemperature expected module ${module} to be ${TEMPERATURE_MODULE_TYPE} or ${THERMOCYCLER_MODULE_TYPE}, got ${moduleType}`
+      `setTemperature expected module ${module} to be ${TEMPERATURE_MODULE_TYPE}, ${THERMOCYCLER_MODULE_TYPE} or ${HEATERSHAKER_MODULE_TYPE}, got ${moduleType}`
     )
     // NOTE: "missing module" isn't exactly the right error here, but better than a whitescreen!
     // This should never be shown.

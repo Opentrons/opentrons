@@ -254,6 +254,18 @@ export interface HydratedTemperatureFormData {
   setTemperature: 'true' | 'false'
   targetTemperature: string | null
 }
+export interface HydratedHeaterShakerFormData {
+  id: string
+  stepType: 'heaterShaker'
+  stepDetails: string | null
+  moduleId: string | null
+  setTemperature: 'true' | 'false'
+  latchOpen: 'true' | 'false'
+  targetTemperature: string | null
+  targetSpeed: string | null
+  timerMinutes: string | null
+  timerSeconds: string | null
+}
 // TODO: Ian 2019-01-17 Moving away from this and towards nesting all form fields
 // inside `fields` key, but deprecating transfer/consolidate/distribute is a pre-req
 export type HydratedMoveLiquidFormDataLegacy = AnnotationFields &

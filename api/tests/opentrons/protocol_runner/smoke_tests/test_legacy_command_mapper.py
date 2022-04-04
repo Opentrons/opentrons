@@ -3,14 +3,14 @@
 Legacy ProtocolContext objects are prohibitively difficult to instansiate
 and mock in an isolated unit test environment.
 """
-import io
 import pytest
 import textwrap
 from datetime import datetime
 from decoy import matchers
+from pathlib import Path
 
 from opentrons.protocol_engine import commands
-from opentrons.protocol_reader import ProtocolReader, InputFile
+from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
 
 
@@ -54,24 +54,21 @@ PICK_UP_TIP_PROTOCOL = textwrap.dedent(
             location=tip_rack_1.wells_by_name()["A1"]
         )
     """
-).encode()
+)
 
 
 @pytest.fixture
-def pick_up_tip_protocol_file() -> InputFile:
+def pick_up_tip_protocol_file(tmp_path: Path) -> Path:
     """Put the pick up tip mapping test protocol on disk."""
-    return InputFile(filename="protocol-name.py", file=io.BytesIO(PICK_UP_TIP_PROTOCOL))
+    path = tmp_path / "protocol-name.py"
+    path.write_text(PICK_UP_TIP_PROTOCOL)
+    return path
 
 
-async def test_legacy_pick_up_tip(
-    protocol_reader: ProtocolReader,
-    pick_up_tip_protocol_file: InputFile,
-) -> None:
+async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
     """It should map legacy pick up tip commands."""
-    protocol_source = await protocol_reader.read(
-        name="test_protocol",
-        files=[pick_up_tip_protocol_file],
-    )
+    protocol_reader = ProtocolReader()
+    protocol_source = await protocol_reader.read([pick_up_tip_protocol_file])
 
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)

@@ -60,6 +60,9 @@ const LogoImg = styled('img')`
   align-self: ${ALIGN_CENTER};
   margin: ${SPACING.spacing4} 0;
 `
+// defines a constant for the nav bar width - used in run log component to calculate centering
+export const NAV_BAR_WIDTH = '5.625rem'
+
 /**
  * a temp nav bar to facilitate app navigation during development until breadcrumbs are implemented
  * @param routes
@@ -75,7 +78,7 @@ export function TempNavBar({ routes }: { routes: RouteProps[] }): JSX.Element {
       css={TYPOGRAPHY.h3Regular}
       flexDirection={DIRECTION_COLUMN}
       flex={FLEX_NONE}
-      width="6rem"
+      width={NAV_BAR_WIDTH}
       padding={SPACING.spacing4}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
