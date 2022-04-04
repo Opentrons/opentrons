@@ -73,7 +73,9 @@ protocols_router = APIRouter()
 )
 async def create_protocol(
     files: List[UploadFile] = File(...),
-    protocol_key: Optional[str] = Form(None),   # optional protocol_key to track protocols by the front end
+    # optional protocol_key to track protocols by the UI.
+    # needs to be Form type because its formData
+    protocol_key: Optional[str] = Form(None),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
     protocol_reader: ProtocolReader = Depends(get_protocol_reader),
@@ -87,6 +89,7 @@ async def create_protocol(
 
     Arguments:
         files: List of uploaded files, from form-data.
+        protocol_key: Optional key for tracking protocols by the UI
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
         protocol_reader: Protocol file reading interface.
