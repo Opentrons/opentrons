@@ -9,7 +9,6 @@ import * as SystemInfo from '../../../redux/system-info'
 import * as Fixtures from '../../../redux/system-info/__fixtures__'
 
 import { AdvancedSettings } from '../AdvancedSettings'
-import { NOT_APPLICABLE } from '../../../redux/system-info'
 
 jest.mock('../../../redux/config')
 jest.mock('../../../redux/calibration')
