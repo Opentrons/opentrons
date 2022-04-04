@@ -22,6 +22,8 @@ from opentrons.protocol_engine.state.module_substates import (
     MagneticModuleSubState,
     HeaterShakerModuleId,
     HeaterShakerModuleSubState,
+    TemperatureModuleId,
+    TemperatureModuleSubState,
     ModuleSubStateType,
 )
 
@@ -56,6 +58,14 @@ def test_initial_state() -> None:
                 plate_target_temperature=None,
             ),
         ),
+        (
+            lazy_fixture("tempdeck_v1_def"),
+            ModuleModel.TEMPERATURE_MODULE_V1,
+            TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                model=ModuleModel.TEMPERATURE_MODULE_V1,
+            ),
+        )
     ],
 )
 def test_load_module(
@@ -111,6 +121,13 @@ def test_load_module(
                 plate_target_temperature=None,
             ),
         ),
+        (
+            lazy_fixture("tempdeck_v2_def"),
+            TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                model=ModuleModel.TEMPERATURE_MODULE_V2
+            )
+        )
     ],
 )
 def test_add_module_action(

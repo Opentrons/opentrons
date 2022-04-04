@@ -27,8 +27,10 @@ from .abstract_store import HasState, HandlesActions
 from .module_substates import (
     MagneticModuleSubState,
     HeaterShakerModuleSubState,
+    TemperatureModuleSubState,
     MagneticModuleId,
     HeaterShakerModuleId,
+    TemperatureModuleId,
     ModuleSubStateType,
 )
 
@@ -110,6 +112,12 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                     module_id=HeaterShakerModuleId(module_id),
                     plate_target_temperature=None,
                 )
+            elif ModuleModel.is_temperature_module_model(module_model):
+                self._state.substate_by_module_id[
+                    module_id
+                ] = TemperatureModuleSubState(
+                    module_id=TemperatureModuleId(module_id), model=module_model
+                )
 
     def _handle_command(self, command: Command) -> None:
         if isinstance(command.result, LoadModuleResult):
@@ -135,6 +143,12 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 ] = HeaterShakerModuleSubState(
                     module_id=HeaterShakerModuleId(module_id),
                     plate_target_temperature=None,
+                )
+            elif ModuleModel.is_temperature_module_model(module_model):
+                self._state.substate_by_module_id[
+                    module_id
+                ] = TemperatureModuleSubState(
+                    module_id=TemperatureModuleId(module_id), model=module_model
                 )
         if isinstance(
             command.result,
@@ -240,6 +254,28 @@ class ModuleView(HasState[ModuleState]):
             else:
                 raise errors.WrongModuleTypeError(
                     f"{module_id} is not a Heater-Shaker Module."
+                )
+
+    def get_temperature_module_substate(
+            self, module_id: str
+    ) -> TemperatureModuleSubState:
+        """Return a `TemperatureModuleSubState` for the given Temperature Module.
+
+        Raises:
+           ModuleNotLoadedError: If module_id has not been loaded.
+           WrongModuleTypeError: If module_id has been loaded,
+               but it's not a Heater-Shaker Module.
+        """
+        try:
+            substate = self._state.substate_by_module_id[module_id]
+        except KeyError as e:
+            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+        else:
+            if isinstance(substate, TemperatureModuleSubState):
+                return substate
+            else:
+                raise errors.WrongModuleTypeError(
+                    f"{module_id} is not a Temperature Module."
                 )
 
     def get_location(self, module_id: str) -> DeckSlotLocation:

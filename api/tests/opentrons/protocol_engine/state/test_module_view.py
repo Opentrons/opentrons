@@ -1,6 +1,5 @@
 """Tests for module state accessors in the protocol engine state store."""
 import pytest
-from opentrons.protocol_engine.state import MagneticModuleId, HeaterShakerModuleId
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
 from contextlib import nullcontext
@@ -23,7 +22,11 @@ from opentrons.protocol_engine.state.modules import (
 
 from opentrons.protocol_engine.state.module_substates import (
     HeaterShakerModuleSubState,
+    HeaterShakerModuleId,
     MagneticModuleSubState,
+    MagneticModuleId,
+    TemperatureModuleSubState,
+    TemperatureModuleId,
     ModuleSubStateType,
 )
 
@@ -283,6 +286,67 @@ def test_get_heater_shaker_module_substate(
 
     with pytest.raises(errors.ModuleNotLoadedError):
         subject.get_heater_shaker_module_substate(module_id="nonexistent-module-id")
+
+
+def test_get_temperature_module_substate(
+    tempdeck_v1_def: ModuleDefinition,
+    tempdeck_v2_def: ModuleDefinition,
+    heater_shaker_v1_def: ModuleDefinition,
+) -> None:
+    """It should return a substate for the given Temperature Module, if valid."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "temp-module-gen1-id": DeckSlotName.SLOT_1,
+            "temp-module-gen2-id": DeckSlotName.SLOT_2,
+            "heatshake-module-id": DeckSlotName.SLOT_3,
+        },
+        hardware_by_module_id={
+            "temp-module-gen1-id": HardwareModule(
+                serial_number="temp-module-gen1-serial",
+                definition=tempdeck_v1_def,
+            ),
+            "temp-module-gen2-id": HardwareModule(
+                serial_number="temp-module-gen2-serial",
+                definition=tempdeck_v2_def,
+            ),
+            "heatshake-module-id": HardwareModule(
+                serial_number="heatshake-module-serial",
+                definition=heater_shaker_v1_def,
+            ),
+        },
+        substate_by_module_id={
+            "temp-module-gen1-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("temp-module-gen1-id"),
+                model=ModuleModel.TEMPERATURE_MODULE_V1,
+            ),
+            "temp-module-gen2-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("temp-module-gen2-id"),
+                model=ModuleModel.TEMPERATURE_MODULE_V2,
+            ),
+            "heatshake-module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("heatshake-module-id"),
+                plate_target_temperature=None,
+            ),
+        },
+    )
+
+    module_1_substate = subject.get_temperature_module_substate(
+        module_id="temp-module-gen1-id"
+    )
+    assert module_1_substate.module_id == "temp-module-gen1-id"
+    assert module_1_substate.model == ModuleModel.TEMPERATURE_MODULE_V1
+
+    module_2_substate = subject.get_temperature_module_substate(
+        module_id="temp-module-gen2-id"
+    )
+    assert module_2_substate.module_id == "temp-module-gen2-id"
+    assert module_2_substate.model == ModuleModel.TEMPERATURE_MODULE_V2
+
+    with pytest.raises(errors.WrongModuleTypeError):
+        subject.get_temperature_module_substate(module_id="heatshake-module-id")
+
+    with pytest.raises(errors.ModuleNotLoadedError):
+        subject.get_temperature_module_substate(module_id="nonexistent-module-id")
 
 
 def test_get_properties_by_id(
