@@ -54,6 +54,7 @@ export function AttachAdapter(): JSX.Element {
               marginTop={SPACING.spacing3}
               backgroundColor={COLORS.background}
               paddingTop={SPACING.spacing4}
+              paddingRight={SPACING.spacing4}
               paddingLeft={SPACING.spacing4}
               flexDirection={DIRECTION_ROW}
               marginRight={SPACING.spacingSM}

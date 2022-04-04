@@ -60,14 +60,17 @@ export const HeaterShakerWizard = (
       : null
 
   let adapterName: string | null = null
-  if (labwareDef != null) {
-    if (labwareDef.parameters.loadName.includes('pcradapter')) {
+  if (
+    labwareDef != null &&
+    labwareDef.parameters.loadName.includes('adapter')
+  ) {
+    if (labwareDef.parameters.loadName.includes('pcr')) {
       adapterName = 'PCR Adapter'
     } else if (labwareDef.parameters.loadName.includes('universalflat')) {
       adapterName = 'Universal Flat Adapter'
-    } else if (labwareDef.parameters.loadName.includes('deepwelladapter')) {
+    } else if (labwareDef.parameters.loadName.includes('deepwell')) {
       adapterName = 'Deep Well Adapter'
-    } else if (labwareDef.parameters.loadName.includes('96flatbottomadapter')) {
+    } else if (labwareDef.parameters.loadName.includes('96flatbottom')) {
       adapterName = '96 Flat Bottom Adapter'
     } else adapterName = null
   }

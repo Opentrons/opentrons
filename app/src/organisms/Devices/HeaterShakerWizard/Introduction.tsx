@@ -152,7 +152,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
             image={
               thermalAdapterName != null ? (
                 <Flex width={'6.25rem'} height={'4.313rem'}>
-                  <img src={adapterImage} alt={'introduction_adapter_image'} />
+                  <img src={adapterImage} alt={`${thermalAdapterName}`} />
                 </Flex>
               ) : undefined
             }
@@ -174,9 +174,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
                   <RobotWorkSpace viewBox={VIEW_BOX}>
                     {() => {
                       return (
-                        <React.Fragment
-                          data-testid={`introduction_labwareRender_${labwareDefinition.namespace}`}
-                        >
+                        <React.Fragment>
                           <LabwareRender definition={labwareDefinition} />
                         </React.Fragment>
                       )

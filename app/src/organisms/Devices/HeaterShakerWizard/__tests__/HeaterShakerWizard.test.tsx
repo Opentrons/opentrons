@@ -1,12 +1,10 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useAttachedModules } from '../../hooks'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
-import { useHeaterShakerFromProtocol } from '../../ModuleCard/hooks'
 import { HeaterShakerWizard } from '..'
 import { Introduction } from '../Introduction'
 import { KeyParts } from '../KeyParts'
@@ -15,21 +13,22 @@ import { AttachAdapter } from '../AttachAdapter'
 import { PowerOn } from '../PowerOn'
 import { TestShake } from '../TestShake'
 
-jest.mock('../../hooks')
 import type { ProtocolModuleInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
 
+jest.mock('../../../../redux/robot/selectors')
 jest.mock('../Introduction')
 jest.mock('../KeyParts')
 jest.mock('../AttachModule')
 jest.mock('../AttachAdapter')
 jest.mock('../PowerOn')
 jest.mock('../TestShake')
+jest.mock('../../hooks')
+jest.mock('../../../../redux/modules')
+jest.mock('../../ModuleCard/hooks')
 
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
 >
-jest.mock('../../../../redux/modules')
-jest.mock('../../ModuleCard/hooks')
 
 const mockIntroduction = Introduction as jest.MockedFunction<
   typeof Introduction
@@ -44,18 +43,10 @@ const mockAttachAdapter = AttachAdapter as jest.MockedFunction<
 const mockPowerOn = PowerOn as jest.MockedFunction<typeof PowerOn>
 const mockTestShake = TestShake as jest.MockedFunction<typeof TestShake>
 
-const render = (
-  props: React.ComponentProps<typeof HeaterShakerWizard>,
-  path = '/'
-) => {
-  return renderWithProviders(
-    <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <HeaterShakerWizard {...props} />
-    </MemoryRouter>,
-    {
-      i18nInstance: i18n,
-    }
-  )[0]
+const render = (props: React.ComponentProps<typeof HeaterShakerWizard>) => {
+  return renderWithProviders(<HeaterShakerWizard {...props} />, {
+    i18nInstance: i18n,
+  })[0]
 }
 
 const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {

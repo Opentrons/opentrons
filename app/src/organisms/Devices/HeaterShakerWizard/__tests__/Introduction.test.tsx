@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { when } from 'jest-when'
 import {
   componentPropsMatcher,
   LabwareRender,
@@ -7,10 +8,9 @@ import {
   RobotWorkSpace,
 } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-import { Introduction } from '../Introduction'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { mockDefinition } from '../../../../redux/custom-labware/__fixtures__'
-import { when } from 'jest-when'
+import { Introduction } from '../Introduction'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -44,7 +44,7 @@ describe('Introduction', () => {
   beforeEach(() => {
     props = {
       labwareDefinition: null,
-      thermalAdapterName: undefined,
+      thermalAdapterName: null,
     }
   })
   afterEach(() => {
@@ -69,10 +69,10 @@ describe('Introduction', () => {
     getByAltText('heater_shaker_image')
     getByAltText('screwdriver_image')
   })
-  it('renders the correct body when protocol has been uploaded', () => {
+  it('renders the correct body when protocol has been uploaded with PCR adapter', () => {
     props = {
       labwareDefinition: mockDefinition,
-      thermalAdapterName: undefined,
+      thermalAdapterName: 'PCR Adapter',
     }
     when(mockRobotWorkSpace)
       .mockReturnValue(<div></div>)
@@ -100,7 +100,39 @@ describe('Introduction', () => {
         })
       )
 
-    const { getByText } = render(props)
+    const { getByText, getByAltText } = render(props)
     getByText('Mock Definition')
+    getByText('PCR Adapter + Screw')
+    getByAltText('PCR Adapter')
+  })
+  it('renders the correct thermal adapter info when name is Universal Flat Adapter', () => {
+    props = {
+      labwareDefinition: null,
+      thermalAdapterName: 'Universal Flat Adapter',
+    }
+
+    const { getByText, getByAltText } = render(props)
+    getByText('Universal Flat Adapter + Screw')
+    getByAltText('Universal Flat Adapter')
+  })
+  it('renders the correct thermal adapter info when name is Deep Well Adapter', () => {
+    props = {
+      labwareDefinition: null,
+      thermalAdapterName: 'Deep Well Adapter',
+    }
+
+    const { getByText, getByAltText } = render(props)
+    getByText('Deep Well Adapter + Screw')
+    getByAltText('Deep Well Adapter')
+  })
+  it('renders the correct thermal adapter info when name is 96 Flat Bottom Adapter', () => {
+    props = {
+      labwareDefinition: null,
+      thermalAdapterName: '96 Flat Bottom Adapter',
+    }
+
+    const { getByText, getByAltText } = render(props)
+    getByText('96 Flat Bottom Adapter + Screw')
+    getByAltText('96 Flat Bottom Adapter')
   })
 })
