@@ -40,9 +40,9 @@ describe('dropTip', () => {
         multiHasTips: true,
       })
       const params = {
-        pipette: DEFAULT_PIPETTE,
-        labware: FIXED_TRASH_ID,
-        well: 'A1',
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: FIXED_TRASH_ID,
+        wellName: 'A1',
       }
       const result = forDropTip(params, invariantContext, prevRobotState)
       expect(result).toEqual({
@@ -63,9 +63,9 @@ describe('dropTip', () => {
         multiHasTips: true,
       })
       const params = {
-        pipette: 'p300MultiId',
-        labware: FIXED_TRASH_ID,
-        well: 'A1',
+        pipetteId: 'p300MultiId',
+        labwareId: FIXED_TRASH_ID,
+        wellName: 'A1',
       }
       const result = forDropTip(params, invariantContext, prevRobotState)
       expect(result).toEqual({
@@ -84,9 +84,9 @@ describe('dropTip', () => {
         multiHasTips: true,
       })
       const params = {
-        pipette: 'p300MultiId',
-        labware: FIXED_TRASH_ID,
-        well: 'A1',
+        pipetteId: 'p300MultiId',
+        labwareId: FIXED_TRASH_ID,
+        wellName: 'A1',
       }
       prevRobotState.liquidState.pipettes.p300MultiId['0'] = {
         ingred1: {

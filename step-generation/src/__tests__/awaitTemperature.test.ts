@@ -57,9 +57,9 @@ describe('awaitTemperature', () => {
     const expected = {
       commands: [
         {
-          command: 'temperatureModule/awaitTemperature',
+          commandType: 'temperatureModule/awaitTemperature',
           params: {
-            module: temperatureModuleId,
+            moduleId: temperatureModuleId,
             temperature: 20,
           },
         },
@@ -104,9 +104,9 @@ describe('awaitTemperature', () => {
     const expected = {
       commands: [
         {
-          command: 'temperatureModule/awaitTemperature',
+          commandType: 'temperatureModule/awaitTemperature',
           params: {
-            module: temperatureModuleId,
+            moduleId: temperatureModuleId,
             temperature: 42,
           },
         },

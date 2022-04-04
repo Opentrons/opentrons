@@ -40,7 +40,7 @@ beforeEach(() => {
 describe('forEngageMagnet', () => {
   it('engages magnetic module when it was unengaged', () => {
     const params = {
-      module: moduleId,
+      moduleId,
       engageHeight: 10,
     }
     const result = forEngageMagnet(
@@ -55,7 +55,7 @@ describe('forEngageMagnet', () => {
   })
   it('no effect on magnetic module "engaged" state when already engaged', () => {
     const params = {
-      module: moduleId,
+      moduleId,
       engageHeight: 11,
     }
     const result = forEngageMagnet(params, invariantContext, engagedRobotState)
@@ -68,7 +68,7 @@ describe('forEngageMagnet', () => {
 describe('forDisengageMagnet', () => {
   it('unengages magnetic module when it was engaged', () => {
     const params = {
-      module: moduleId,
+      moduleId,
     }
     const result = forDisengageMagnet(
       params,
@@ -82,7 +82,7 @@ describe('forDisengageMagnet', () => {
   })
   it('no effect on magnetic module "engaged" state when already disengaged', () => {
     const params = {
-      module: moduleId,
+      moduleId,
     }
     const result = forDisengageMagnet(
       params,

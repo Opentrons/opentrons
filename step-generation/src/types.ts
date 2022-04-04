@@ -6,6 +6,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type {
+  CreateCommand,
   LabwareDefinition2,
   ModuleType,
   ModuleModel,
@@ -23,6 +24,7 @@ import type {
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_APPROACHING_TARGET,
 } from './constants'
+import { ShakeSpeedParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 export type { Command }
 
@@ -314,6 +316,23 @@ export interface DeactivateTemperatureArgs {
   message?: string
 }
 
+export type SetShakeSpeedArgs = ShakeSpeedParams & {
+  module: string
+  commandCreatorFnName: 'setShakeSpeed'
+  message?: string
+}
+
+export interface HeaterShakerArgs {
+  module: string
+  rpm: number | null
+  commandCreatorFnName: 'heaterShaker'
+  targetTemperature: number | null
+  latchOpen: boolean
+  timerMinutes: number | null
+  timerSeconds: number | null
+  message?: string
+}
+
 const PROFILE_CYCLE: 'profileCycle' = 'profileCycle'
 const PROFILE_STEP: 'profileStep' = 'profileStep'
 
@@ -373,6 +392,7 @@ export type CommandCreatorArgs =
   | DeactivateTemperatureArgs
   | ThermocyclerProfileStepArgs
   | ThermocyclerStateStepArgs
+  | HeaterShakerArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
@@ -469,7 +489,7 @@ export interface CommandCreatorWarning {
 }
 
 export interface CommandsAndRobotState {
-  commands: Command[]
+  commands: CreateCommand[]
   robotState: RobotState
   warnings?: CommandCreatorWarning[]
 }
@@ -480,7 +500,7 @@ export interface CommandCreatorErrorResponse {
 }
 
 export interface CommandsAndWarnings {
-  commands: Command[]
+  commands: CreateCommand[]
   warnings?: CommandCreatorWarning[]
 }
 export type CommandCreatorResult =

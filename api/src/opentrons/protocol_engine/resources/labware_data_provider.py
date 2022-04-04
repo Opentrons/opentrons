@@ -77,5 +77,5 @@ class LabwareDataProvider:
             ).tip_length
 
         except TipLengthCalNotFound as e:
-            log.warn("No calibrated tip length found", exc_info=e)
+            log.debug("No calibrated tip length found for {pipette_serial}", exc_info=e)
             return None
