@@ -20,6 +20,7 @@ import { WellDimensions } from './WellDimensions'
 import { WellSpacing } from './WellSpacing'
 import { ManufacturerDetails } from './ManufacturerDetails'
 import { InsertDetails } from './InsertDetails'
+import { Gallery } from './Gallery'
 import type { LabwareDefAndDate } from '../hooks'
 
 export interface LabwareDetailsProps {
@@ -47,6 +48,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       title={props.labware.definition.metadata.displayName}
       isExpanded
     >
+      <Gallery definition={labwareDef} />
       <Box
         backgroundColor={COLORS.lightGrey}
         padding={SPACING.spacing4}
