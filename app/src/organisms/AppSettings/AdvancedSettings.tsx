@@ -47,7 +47,6 @@ type BlockSelection =
 const REALTEK_URL = 'https://www.realtek.com/en/'
 
 export function AdvancedSettings(): JSX.Element {
-  const [isShowToast, setIsShowToast] = React.useState(true)
   const { t } = useTranslation('app_settings')
   const useTrashSurfaceForTipCal = useSelector((state: State) =>
     Config.getUseTrashSurfaceForTipCal(state)
@@ -77,8 +76,6 @@ export function AdvancedSettings(): JSX.Element {
     }
   }
 
-  // u2e adapter info
-  // ToDo toast
   const device = useSelector(getU2EAdapterDevice)
   const driverOutdated = useSelector((state: State) => {
     const status = getU2EWindowsDriverStatus(state)
@@ -256,7 +253,7 @@ export function AdvancedSettings(): JSX.Element {
             <StyledText as="p">
               {t('usb_to_ethernet_adapter_info_description')}
             </StyledText>
-            {isShowToast && (
+            {driverOutdated && (
               <Flex
                 backgroundColor={COLORS.warningBg}
                 paddingTop={SPACING.spacing3}
