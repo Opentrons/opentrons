@@ -11,8 +11,10 @@ on:
       - 'g-code-testing/**'
       - '.github/workflows/g-code-testing-lint-test.yaml'
       - '.github/actions/python/**'
-    tags-ignore:
-      - '*'
+    branches:
+      - 'edge'
+      - 'release'
+      - '*hotfix*'
   pull_request:
     paths:
       - 'Makefile'

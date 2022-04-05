@@ -29,7 +29,5 @@ def test_v6_types(defpath):
 # https://github.com/Opentrons/opentrons/issues/9701
 def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
     for command_object_dict in protocol_fixture["commands"]:
-        try:
-            command_object_dict.pop("result")
-        except KeyError:
-            pass
+        command_object_dict.pop("result", None)
+        command_object_dict.pop("id", None)

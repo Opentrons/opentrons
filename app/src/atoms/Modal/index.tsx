@@ -36,8 +36,8 @@ export const Modal = (props: ModalProps): JSX.Element => {
             <Box onClick={props.onClose}>
               <Icon
                 name={'close'}
-                width={SPACING.spacing4}
-                height={SPACING.spacing4}
+                width={SPACING.spacing5}
+                height={SPACING.spacing5}
               />
             </Box>
           )}

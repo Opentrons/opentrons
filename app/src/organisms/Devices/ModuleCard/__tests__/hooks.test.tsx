@@ -1,12 +1,22 @@
 import * as React from 'react'
 import { act } from 'react-test-renderer'
 import { Provider } from 'react-redux'
+import { when } from 'jest-when'
+import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react-hooks'
 import { i18n } from '../../../../i18n'
-import { createStore } from 'redux'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { useLatchCommand, useModuleOverflowMenu } from '../hooks'
+import { ModuleDefinition } from '@opentrons/shared-data'
+import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
+import { getProtocolModulesInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
+import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
+import { useProtocolDetailsForRun } from '../../hooks'
+import {
+  useLatchCommand,
+  useModuleOverflowMenu,
+  useHeaterShakerFromProtocol,
+} from '../hooks'
 
 import {
   mockHeaterShaker,
@@ -16,11 +26,25 @@ import {
 } from '../../../../redux/modules/__fixtures__'
 
 import type { Store } from 'redux'
+import type { State } from '../../../../redux/types'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../ProtocolSetup/utils/getProtocolModulesInfo')
+jest.mock('../../../ProtocolUpload/hooks')
+jest.mock('../../hooks')
+
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
+>
+const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
+  typeof getProtocolModulesInfo
+>
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
+>
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
 >
 
 const mockCloseLatchHeaterShaker = {
@@ -563,5 +587,60 @@ describe('useModuleOverflowMenu', () => {
         },
       },
     })
+  })
+})
+
+const HEATER_SHAKER_MODULE_INFO = {
+  moduleId: 'heaterShakerModuleId',
+  x: 0,
+  y: 0,
+  z: 0,
+  moduleDef: (mockHeaterShaker as unknown) as ModuleDefinition,
+  nestedLabwareDef: null,
+  nestedLabwareId: null,
+  nestedLabwareDisplayName: null,
+  protocolLoadOrder: 0,
+  slotName: '1',
+}
+
+describe('useProtocolMetadata', () => {
+  const store: Store<State> = createStore(jest.fn(), {})
+
+  beforeEach(() => {
+    when(mockUseCurrentRunId).calledWith().mockReturnValue('1')
+    store.dispatch = jest.fn()
+    mockGetProtocolModulesInfo.mockReturnValue([HEATER_SHAKER_MODULE_INFO])
+
+    when(mockUseProtocolDetailsForRun)
+      .calledWith('1')
+      .mockReturnValue({
+        protocolData: heaterShakerCommands,
+      } as any)
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it('should return heater shaker slot number', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <Provider store={store}>{children}</Provider>
+    )
+    const { result } = renderHook(useHeaterShakerFromProtocol, { wrapper })
+    const heaterShaker = result.current
+
+    expect(heaterShaker?.slotName).toBe('1')
+  })
+
+  it('should return undefined when heater shaker isnt in protocol', () => {
+    mockGetProtocolModulesInfo.mockReturnValue([])
+
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <Provider store={store}>{children}</Provider>
+    )
+    const { result } = renderHook(useHeaterShakerFromProtocol, { wrapper })
+    const heaterShaker = result.current
+
+    expect(heaterShaker?.slotName).toBe(undefined)
   })
 })

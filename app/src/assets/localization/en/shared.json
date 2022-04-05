@@ -16,5 +16,6 @@
   "starting": "starting",
   "stop": "stop",
   "try_again": "try again",
-  "unknown": "unknown"
+  "unknown": "unknown",
+  "dont_show_me_again": "Don’t show me again"
 }

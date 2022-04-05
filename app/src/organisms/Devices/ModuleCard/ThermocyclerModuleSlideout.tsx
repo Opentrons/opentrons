@@ -22,14 +22,14 @@ import {
 } from '@opentrons/components'
 import { PrimaryButton } from '../../../atoms/Buttons'
 
-import type { AttachedModule } from '../../../redux/modules/types'
+import type { ThermocyclerModule } from '../../../redux/modules/types'
 import type {
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface ThermocyclerModuleSlideoutProps {
-  module: AttachedModule
+  module: ThermocyclerModule
   onCloseClick: () => unknown
   isExpanded: boolean
   isSecondaryTemp?: boolean

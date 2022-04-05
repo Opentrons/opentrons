@@ -2,7 +2,7 @@
 from enum import Enum
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 from typing_extensions import Literal
 
 from opentrons.protocols.api_support.types import APIVersion
@@ -37,11 +37,11 @@ class ProtocolSourceFile:
     """A single file in a protocol.
 
     Attributes:
-        name: The file's basename, with extension.
+        path: The file's path on disk.
         role: The file's purpose in the protocol.
     """
 
-    name: str
+    path: Path
     role: ProtocolFileRole
 
 
@@ -97,7 +97,8 @@ class ProtocolSource:
     (Excluding information that would require in-depth simulation of the protocol.)
 
     Attributes:
-        directory: The directory location of the protocol on disk.
+        directory: The directory of the protocol files, if a directory
+            was created by the ProtocolReader.
         main_file: The location of the protocol's main file on disk.
         files: Descriptions of all files that make up the protocol.
         metadata: Arbitrary metadata specified by the protocols.
@@ -108,7 +109,7 @@ class ProtocolSource:
             that the protocol will actually attempt to load.
     """
 
-    directory: Path
+    directory: Optional[Path]
     main_file: Path
     files: List[ProtocolSourceFile]
     metadata: Metadata
