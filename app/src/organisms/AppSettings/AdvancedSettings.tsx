@@ -80,6 +80,7 @@ export function AdvancedSettings(): JSX.Element {
     const status = getU2EWindowsDriverStatus(state)
     return status === OUTDATED
   })
+  console.log('device', device)
 
   const toggleLabwareOffsetData = (): unknown =>
     dispatch(
@@ -287,42 +288,48 @@ export function AdvancedSettings(): JSX.Element {
                 </Flex>
               </Flex>
             )}
-            <Flex
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              marginTop={SPACING.spacing4}
-            >
+            {device === null ? (
+              <StyledText as="p" marginTop={SPACING.spacing4}>
+                {t('usb_to_ethernet_not_connected')}
+              </StyledText>
+            ) : (
               <Flex
-                flexDirection={DIRECTION_COLUMN}
-                paddingRight={SPACING.spacing4}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+                marginTop={SPACING.spacing4}
               >
-                <StyledText css={TYPOGRAPHY.pSemiBold}>
-                  {t('usb_to_ethernet_adapter_description')}
-                </StyledText>
-                <StyledText as="p">{device?.deviceName}</StyledText>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  paddingRight={SPACING.spacing4}
+                >
+                  <StyledText css={TYPOGRAPHY.pSemiBold}>
+                    {t('usb_to_ethernet_adapter_description')}
+                  </StyledText>
+                  <StyledText as="p">{device?.deviceName}</StyledText>
+                </Flex>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  paddingRight={SPACING.spacing4}
+                >
+                  <StyledText css={TYPOGRAPHY.pSemiBold}>
+                    {t('usb_to_ethernet_adapter_manufacturer')}
+                  </StyledText>
+                  <StyledText as="p">{device?.manufacturer}</StyledText>
+                </Flex>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  paddingRight={SPACING.spacing4}
+                >
+                  <StyledText css={TYPOGRAPHY.pSemiBold}>
+                    {t('usb_to_ethernet_adapter_driver_version')}
+                  </StyledText>
+                  <StyledText as="p">
+                    {device?.windowsDriverVersion
+                      ? device.windowsDriverVersion
+                      : t('usb_to_ethernet_adapter_no_driver_version')}
+                  </StyledText>
+                </Flex>
               </Flex>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                paddingRight={SPACING.spacing4}
-              >
-                <StyledText css={TYPOGRAPHY.pSemiBold}>
-                  {t('usb_to_ethernet_adapter_manufacturer')}
-                </StyledText>
-                <StyledText as="p">{device?.manufacturer}</StyledText>
-              </Flex>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                paddingRight={SPACING.spacing4}
-              >
-                <StyledText css={TYPOGRAPHY.pSemiBold}>
-                  {t('usb_to_ethernet_adapter_driver_version')}
-                </StyledText>
-                <StyledText as="p">
-                  {device?.windowsDriverVersion
-                    ? device.windowsDriverVersion
-                    : t('usb_to_ethernet_adapter_no_driver_version')}
-                </StyledText>
-              </Flex>
-            </Flex>
+            )}
           </Box>
         </Flex>
         <Divider marginY={SPACING.spacing5} />

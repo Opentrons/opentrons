@@ -67,6 +67,7 @@
   "usb_to_ethernet_adapter_no_driver_version": "Unknown",
   "usb_to_ethernet_adapter_toast_message": "An update is available for Realtek USB-to-Ethernet adapter driver",
   "usb_to_ethernet_adapter_link": "go to Realtek.com",
+  "usb_to_ethernet_not_connected": "No USB-to-Ethernet adapter connected",
   "show_link_labware_data": "Show link to get Labware Offset data",
   "show_link_labware_data_description": "If you need to access Labware Offset data outside of the Opentrons App, enabling this setting will display a link to get Offset Data in the Recent Runs overflow menu and in the Labware Setup section of the Protocol page.",
   "clear_unavail_robots": "Clear Unavailable Robots",
