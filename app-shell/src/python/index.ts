@@ -12,8 +12,8 @@ function findPython(): string | undefined {
     .pathToPythonOverride
 
   let possiblePythonPaths = [
-    path.join(process.resourcesPath, 'python'),
-    path.join(process.resourcesPath, 'python', 'bin', 'python3'),
+    path.join(process.resourcesPath ?? './', 'python'),
+    path.join(process.resourcesPath ?? './', 'python', 'bin', 'python3'),
   ]
 
   if (pathToPythonOverride != null) {
