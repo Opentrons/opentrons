@@ -3,6 +3,34 @@ import datetime
 
 metadata = sqlalchemy.MetaData()
 
+protocol_table = sqlalchemy.Table(
+    "protocol",
+    metadata,
+    sqlalchemy.Column(
+        "id",
+        sqlalchemy.String,
+        primary_key=True,
+    ),
+    sqlalchemy.Column(
+        "created_at",
+        sqlalchemy.DateTime,
+        nullable=False,
+    ),
+    # TODO(mm, 2022-03-29):
+    # Storing pickled Python objects, especially of an internal class,
+    # will cause migration and compatibility problems.
+    sqlalchemy.Column(
+        "source",
+        sqlalchemy.PickleType,
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "protocol_key",
+        sqlalchemy.String,
+        nullable=True
+    )
+)
+
 run_table = sqlalchemy.Table(
     "protocol_run",
     metadata,
