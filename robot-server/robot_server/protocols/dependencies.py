@@ -44,25 +44,27 @@ async def _get_persistence_directory(
     app_state: AppState = Depends(get_app_state),
 ) -> Path:
     """Return the root persistence directory, creating it if necessary."""
-    result = _persistence_directory.get_from(app_state)
+    persistence_dir = _persistence_directory.get_from(app_state)
 
-    if result is None:
+    if persistence_dir is None:
         setting = get_settings().persistence_directory
 
         if setting == "automatically_make_temporary":
-            # Blocking I/O because we don't have an async gettempdir(). :(
-            result = Path(gettempdir())
+            # It's bad for this blocking I/O to be in this async function,
+            # but we don't have an async gettempdir().
+            persistence_dir = Path(gettempdir())
             _log.info(
-                f"Using auto-created temporary directory {result} for persistence."
+                f"Using auto-created temporary directory {persistence_dir}"
+                f" for persistence."
             )
         else:
-            result = setting
-            await AsyncPath(result).mkdir(parents=True, exist_ok=True)
-            _log.info(f"Using directory {result} for persistence.")
+            persistence_dir = setting
+            await AsyncPath(persistence_dir).mkdir(parents=True, exist_ok=True)
+            _log.info(f"Using directory {persistence_dir} for persistence.")
 
-        _persistence_directory.set_on(app_state, result)
+        _persistence_directory.set_on(app_state, persistence_dir)
 
-    return result
+    return persistence_dir
 
 
 def _get_sql_engine(
