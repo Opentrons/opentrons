@@ -28,7 +28,7 @@ import {
 import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import { useAllCommandsQuery } from '@opentrons/react-api-client'
 
-import { NAV_BAR_WIDTH } from '../../../App/NextGenApp'
+import { NAV_BAR_WIDTH } from '../../../App/constants'
 import { PrimaryButton } from '../../../atoms/Buttons'
 import { StyledText } from '../../../atoms/text'
 import {

@@ -24,7 +24,7 @@ import type {
 } from '../types'
 
 const aspirateHelper = makeAspirateHelper()
-const dispenseHelper = makeDispenseHelper({ labware: SOURCE_LABWARE })
+const dispenseHelper = makeDispenseHelper({ labwareId: SOURCE_LABWARE })
 const touchTipHelper = makeTouchTipHelper()
 // TODO: Ian 2019-06-14 more elegant way to test the blowout offset calculation
 const BLOWOUT_OFFSET_ANY: any = expect.any(Number)
@@ -187,7 +187,12 @@ describe('mix: advanced options', () => {
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
         blowoutHelper(blowoutLabwareId, {
-          offsetFromBottomMm: BLOWOUT_OFFSET_ANY,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              z: BLOWOUT_OFFSET_ANY,
+            },
+          },
         }),
       ])
     )
@@ -216,7 +221,12 @@ describe('mix: advanced options', () => {
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
         blowoutHelper(blowoutLabwareId, {
-          offsetFromBottomMm: BLOWOUT_OFFSET_ANY,
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              z: BLOWOUT_OFFSET_ANY,
+            },
+          },
         }),
         touchTipHelper(well),
       ])
@@ -301,7 +311,12 @@ describe('mix: advanced options', () => {
           dispenseHelper(well, volume),
           delayCommand(12),
           blowoutHelper(blowoutLabwareId, {
-            offsetFromBottomMm: BLOWOUT_OFFSET_ANY,
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: BLOWOUT_OFFSET_ANY,
+              },
+            },
           }),
           touchTipHelper(well),
         ])

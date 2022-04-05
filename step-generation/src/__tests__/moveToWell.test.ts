@@ -34,8 +34,12 @@ describe('moveToWell', () => {
     const result = moveToWell(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
       {
-        command: 'moveToWell',
-        params,
+        commandType: 'moveToWell',
+        params: {
+          pipetteId: DEFAULT_PIPETTE,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+        },
       },
     ])
   })
@@ -55,8 +59,22 @@ describe('moveToWell', () => {
     const result = moveToWell(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
       {
-        command: 'moveToWell',
-        params,
+        commandType: 'moveToWell',
+        params: {
+          pipetteId: DEFAULT_PIPETTE,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              x: 1,
+              y: 2,
+              z: 3,
+            },
+          },
+          minimumZHeight: 5,
+          forceDirect: true,
+        },
       },
     ])
   })

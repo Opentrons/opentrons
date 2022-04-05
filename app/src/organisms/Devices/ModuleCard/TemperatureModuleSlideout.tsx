@@ -21,10 +21,10 @@ import { PrimaryButton } from '../../../atoms/Buttons'
 import { InputField } from '../../../atoms/InputField'
 import { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
-import type { AttachedModule } from '../../../redux/modules/types'
+import type { TemperatureModule } from '../../../redux/modules/types'
 
 interface TemperatureModuleSlideoutProps {
-  module: AttachedModule
+  module: TemperatureModule
   onCloseClick: () => unknown
   isExpanded: boolean
 }

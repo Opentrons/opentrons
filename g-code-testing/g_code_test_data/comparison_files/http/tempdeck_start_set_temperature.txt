@@ -1,0 +1,1 @@
+tempdeck: M104 S40.0 -> Setting temperature values to the following: Temperature: 40.0C ->

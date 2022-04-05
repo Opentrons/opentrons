@@ -41,7 +41,7 @@ _analysis_store = AppStateValue[AnalysisStore]("analysis_store")
 
 
 async def _get_persistence_directory(
-    app_state: AppState = Depends(get_app_state)
+    app_state: AppState = Depends(get_app_state),
 ) -> Path:
     """Return the root persistence directory, creating it if necessary."""
     result = _persistence_directory.get_from(app_state)
@@ -67,7 +67,7 @@ async def _get_persistence_directory(
 
 def _get_sql_engine(
     app_state: AppState = Depends(get_app_state),
-    persistence_directory: Path = Depends(_get_persistence_directory)
+    persistence_directory: Path = Depends(_get_persistence_directory),
 ) -> SQLEngine:
     sql_engine = _sql_engine.get_from(app_state)
 
@@ -85,13 +85,24 @@ def _get_sql_engine(
     # https://github.com/tiangolo/fastapi/issues/617
 
 
-def get_protocol_reader(
-    persistence_directory: Path = Depends(_get_persistence_directory)
-) -> ProtocolReader:
+async def get_protocol_directory(
+    app_state: AppState = Depends(get_app_state),
+    persistence_directory: Path = Depends(_get_persistence_directory),
+) -> Path:
+    """Get the directory to save protocol files, creating it if needed."""
+    protocol_directory = _protocol_directory.get_from(app_state)
+
+    if protocol_directory is None:
+        protocol_directory = persistence_directory / _PROTOCOL_FILES_SUBDIRECTORY
+        await AsyncPath(protocol_directory).mkdir(exist_ok=True)
+        _protocol_directory.set_on(app_state, protocol_directory)
+
+    return protocol_directory
+
+
+def get_protocol_reader() -> ProtocolReader:
     """Get a ProtocolReader to read and save uploaded protocol files."""
-    return ProtocolReader(
-        directory=persistence_directory / _PROTOCOL_FILES_SUBDIRECTORY
-    )
+    return ProtocolReader()
 
 
 def get_protocol_store(

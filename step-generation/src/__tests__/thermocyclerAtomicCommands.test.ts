@@ -127,10 +127,15 @@ describe('thermocycler atomic commands', () => {
       const robotInitialState = getRobotInitialState()
       const result = commandCreator(params, invariantContext, robotInitialState)
       const res = getSuccessResult(result)
+      // delete this once params are changed to conform to v6 params
+      // @ts-expect-error
+      const v6Params = { ...params, moduleId: params.module }
+      // @ts-expect-error
+      delete v6Params.module
       expect(res.commands).toEqual([
         {
-          command: expectedType,
-          params,
+          commandType: expectedType,
+          params: v6Params,
         },
       ])
     })

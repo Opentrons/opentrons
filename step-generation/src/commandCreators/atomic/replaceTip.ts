@@ -21,11 +21,11 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
   return {
     commands: [
       {
-        command: 'pickUpTip',
+        commandType: 'pickUpTip',
         params: {
-          pipette: args.pipette,
-          labware: args.tiprack,
-          well: args.well,
+          pipetteId: args.pipette,
+          labwareId: args.tiprack,
+          wellName: args.well,
         },
       },
     ],

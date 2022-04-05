@@ -51,6 +51,7 @@ async def test_insert_and_get_protocol(tmp_path: Path, subject: ProtocolStore) -
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-data-111",
     )
 
     subject.insert(protocol_resource)
@@ -74,6 +75,7 @@ async def test_insert_with_duplicate_key_raises(
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-data-111",
     )
     protocol_resource_2 = ProtocolResource(
         protocol_id="protocol-id",
@@ -86,6 +88,7 @@ async def test_insert_with_duplicate_key_raises(
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-data-222",
     )
     subject.insert(protocol_resource_1)
 
@@ -119,6 +122,7 @@ async def test_get_all_protocols(tmp_path: Path, subject: ProtocolStore) -> None
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-data-111",
     )
     resource_2 = ProtocolResource(
         protocol_id="123",
@@ -131,6 +135,7 @@ async def test_get_all_protocols(tmp_path: Path, subject: ProtocolStore) -> None
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-data-222",
     )
 
     subject.insert(resource_1)
@@ -144,8 +149,10 @@ async def test_remove_protocol(tmp_path: Path, subject: ProtocolStore) -> None:
     """It should remove specified protocol's files from store."""
     directory = tmp_path
     main_file = tmp_path / "protocol.json"
+    other_file = tmp_path / "labware.json"
 
     main_file.touch()
+    other_file.touch()
 
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
@@ -154,10 +161,14 @@ async def test_remove_protocol(tmp_path: Path, subject: ProtocolStore) -> None:
             directory=directory,
             main_file=main_file,
             config=JsonProtocolConfig(schema_version=123),
-            files=[ProtocolSourceFile(name=main_file.name, role=ProtocolFileRole.MAIN)],
+            files=[
+                ProtocolSourceFile(path=main_file, role=ProtocolFileRole.MAIN),
+                ProtocolSourceFile(path=other_file, role=ProtocolFileRole.LABWARE),
+            ],
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-data-111",
     )
 
     subject.insert(protocol_resource)
@@ -165,6 +176,7 @@ async def test_remove_protocol(tmp_path: Path, subject: ProtocolStore) -> None:
 
     assert directory.exists() is False
     assert main_file.exists() is False
+    assert other_file.exists() is False
 
     with pytest.raises(ProtocolNotFoundError, match="protocol-id"):
         subject.get("protocol-id")

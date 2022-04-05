@@ -21,4 +21,5 @@ export {
   replaceTip,
   setTemperature,
   touchTip,
+  setShakeSpeed,
 } from './atomic'

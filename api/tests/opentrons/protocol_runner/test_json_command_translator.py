@@ -32,7 +32,6 @@ INVALID_TEST_PARAMS = [
     (
         protocol_schema_v6.Command(
             commandType="aspirate",
-            id="command-id-ddd-666",
             params=protocol_schema_v6.Params(
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
@@ -60,7 +59,6 @@ INVALID_TEST_PARAMS = [
     ),
     (
         protocol_schema_v6.Command(
-            id="dispense-command-id-666",
             commandType="dispense",
             params=protocol_schema_v6.Params(
                 pipetteId="pipette-id-abc123",
@@ -86,7 +84,6 @@ INVALID_TEST_PARAMS = [
     ),
     (
         protocol_schema_v6.Command(
-            id="dropTip-command-id-666",
             commandType="dropTip",
             params=protocol_schema_v6.Params(
                 pipetteId="pipette-id-abc123",
@@ -109,7 +106,6 @@ INVALID_TEST_PARAMS = [
     ),
     (
         protocol_schema_v6.Command(
-            id="pickUpTip-command-id-666",
             commandType="pickUpTip",
             params=protocol_schema_v6.Params(
                 pipetteId="pipette-id-abc123",
@@ -132,7 +128,6 @@ INVALID_TEST_PARAMS = [
     ),
     (
         protocol_schema_v6.Command(
-            id="load-pipette-command-id-666",
             commandType="loadPipette",
             params=protocol_schema_v6.Params(pipetteId="pipetteId", mount="left"),
         ),
@@ -146,7 +141,6 @@ INVALID_TEST_PARAMS = [
     ),
     (
         protocol_schema_v6.Command(
-            id="load-module-command-id-666",
             commandType="loadModule",
             params=protocol_schema_v6.Params(
                 moduleId="magneticModuleId",
@@ -167,7 +161,6 @@ VALID_TEST_PARAMS = [
     (
         protocol_schema_v6.Command(
             commandType="aspirate",
-            id="command-id-ddd-666",
             params=protocol_schema_v6.Params(
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
@@ -198,7 +191,6 @@ VALID_TEST_PARAMS = [
     ),
     (
         protocol_schema_v6.Command(
-            id="dispense-command-id-666",
             commandType="dispense",
             params=protocol_schema_v6.Params(
                 pipetteId="pipette-id-abc123",
@@ -227,7 +219,6 @@ VALID_TEST_PARAMS = [
     ),
     (
         protocol_schema_v6.Command(
-            id="dropTip-command-id-666",
             commandType="dropTip",
             params=protocol_schema_v6.Params(
                 pipetteId="pipette-id-abc123",
@@ -246,7 +237,6 @@ VALID_TEST_PARAMS = [
     ),
     (
         protocol_schema_v6.Command(
-            id="pickUpTip-command-id-666",
             commandType="pickUpTip",
             params=protocol_schema_v6.Params(
                 pipetteId="pipette-id-abc123",
@@ -265,7 +255,6 @@ VALID_TEST_PARAMS = [
     ),
     (
         protocol_schema_v6.Command(
-            id="delay-command-id-666",
             commandType="pause",
             params=protocol_schema_v6.Params(
                 wait=True,
@@ -276,7 +265,6 @@ VALID_TEST_PARAMS = [
     ),
     (
         protocol_schema_v6.Command(
-            id="load-pipette-command-id-666",
             commandType="loadPipette",
             params=protocol_schema_v6.Params(pipetteId="pipetteId", mount="left"),
         ),
@@ -290,7 +278,6 @@ VALID_TEST_PARAMS = [
     ),
     (
         protocol_schema_v6.Command(
-            id="load-module-command-id-666",
             commandType="loadModule",
             params=protocol_schema_v6.Params(
                 moduleId="magneticModuleId",
@@ -307,7 +294,6 @@ VALID_TEST_PARAMS = [
     ),
     (
         protocol_schema_v6.Command(
-            id="load-labware-command-id-666",
             commandType="loadLabware",
             params=protocol_schema_v6.Params(
                 labwareId="sourcePlateId",

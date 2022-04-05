@@ -1,3 +1,4 @@
+import os
 from typing import Callable, List, Type
 from typing_extensions import Final
 
@@ -7,11 +8,10 @@ from g_code_parsing.g_code_engine import GCodeEngine
 from g_code_parsing.g_code_program.supported_text_modes import SupportedTextModes
 from opentrons.hardware_control.emulation.settings import Settings, SmoothieSettings
 
-import boto3
 from pydantic import BaseModel, constr
 
 BUCKET_NAME = "g-code-comparison"
-
+MASTER_FILES_FOLDER_PATH = os.path.join(os.path.dirname(__file__), 'comparison_files')
 
 class SharedFunctionsMixin:
     """Functions that GCodeConfirmConfig classes share."""
@@ -20,35 +20,21 @@ class SharedFunctionsMixin:
         """Get the configuration file path."""
         return f'{self.driver}/{self.name}'
 
-    def get_master_file_path(self) -> str:
+    def get_comparison_file_path(self) -> str:
         """Get that path of the file in S3."""
-        return self.s3_path
+        return self.results_path
 
-    def get_master_file(self) -> str:
+    def get_comparison_file(self) -> str:
         """Pull file from S3 and print it's content."""
-        s3 = boto3.resource("s3")
-        master_file = (
-            s3.Object(BUCKET_NAME, self.get_master_file_path())
-            .get()
-            .get("Body")
-            .read()
-            .decode("utf-8")
-        )
-        return master_file.strip()
+        file_path = os.path.join(MASTER_FILES_FOLDER_PATH, self.get_comparison_file_path())
+        file = open(file_path, "r")
+        return ''.join(file.readlines()).strip()
 
-    def upload(self) -> None:
+    def update_comparison(self) -> str:
         """Run config and upload it to S3."""
-        s3 = boto3.resource("s3")
-        file_name = self.get_master_file_path()
-        g_code_object = s3.Object(BUCKET_NAME, file_name)
-        result = g_code_object.put(Body=self.execute())
-
-        res = result.get('ResponseMetadata')
-
-        if res.get('HTTPStatusCode') == 200:
-            print(f'{file_name} Uploaded Successfully')
-        else:
-            print(f'{file_name} Not Uploaded')
+        with open(os.path.join(MASTER_FILES_FOLDER_PATH, self.get_comparison_file_path()), 'w') as file:
+            file.write(self.execute())
+        return "File uploaded successfully"
 
     def add_mark(self, user_mark: Mark) -> None:
         self.marks.append(user_mark)
@@ -75,7 +61,7 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     name: constr(regex=r'^[a-z0-9_]*$')
     path: str
     settings: Settings
-    s3_path: str
+    results_path: str
     driver: str = 'protocol'
     marks: List[Mark] = [pytest.mark.g_code_confirm]
 
@@ -91,7 +77,7 @@ class HTTPGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     name: constr(regex=r'^[a-z0-9_]*$')
     executable: Callable
     settings: Settings
-    s3_path: str
+    results_path: str
     driver: str = 'http'
     marks: List[Mark] = [pytest.mark.g_code_confirm]
 
