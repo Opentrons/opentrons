@@ -8,13 +8,12 @@ from otupdate.openembedded.updater import Updater, PartitionManager
 
 
 # test valid partition switch
-# root fs not being written to unused partition
 
 
 def test_update_valid_part_switch(
     mock_root_fs_interface: MagicMock, mock_partition_manager_valid_switch: MagicMock
 ):
-    """Test Updater class member function decomp_and_write()."""
+    """Test root fs being written to unused partition."""
 
     updater = Updater(
         root_FS_intf=mock_root_fs_interface,
@@ -78,3 +77,21 @@ def test_unused_partition(mock_root_fs_interface, test_input, expected):
     pm = PartitionManager()
     updater = Updater(root_FS_intf=mock_root_fs_interface, part_mngr=pm)
     assert updater.part_mngr.find_unused_partition(test_input) == expected
+
+
+def test_decomp_and_write(
+    mock_root_fs_interface: MagicMock, mock_partition_manager_valid_switch: MagicMock
+):
+    """Test helper functions get called as expected in decomp_and_write"""
+    updater = Updater(
+        root_FS_intf=mock_root_fs_interface,
+        part_mngr=mock_partition_manager_valid_switch,
+    )
+
+    def fake_callable(fake_val: float):
+        """Fake callable."""
+        pass
+
+    updater.decomp_and_write("test_path", fake_callable)
+    mock_partition_manager_valid_switch.find_unused_partition.assert_called()
+    mock_root_fs_interface.write_update.assert_called()

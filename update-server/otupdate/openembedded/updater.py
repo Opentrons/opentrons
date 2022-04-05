@@ -165,6 +165,3 @@ class Updater(UpdateActionsInterface):
         self.root_FS_intf.write_update(
             downloaded_update_path, unused_partition, progress_callback
         )
-
-    def verify_check_sum(self) -> bool:
-        pass
