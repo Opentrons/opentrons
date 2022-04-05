@@ -1,5 +1,5 @@
 import React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
@@ -17,7 +17,10 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { RPM, HS_RPM_MAX, HS_RPM_MIN } from '@opentrons/shared-data'
-import { useLatchCommand } from '../ModuleCard/hooks'
+import {
+  useHeaterShakerFromProtocol,
+  useLatchCommand,
+} from '../ModuleCard/hooks'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 import { TertiaryButton } from '../../../atoms/Buttons'
 import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'
@@ -33,17 +36,18 @@ import type {
 interface TestShakeProps {
   module: HeaterShakerModule
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
+  hasProtocol: boolean | undefined
 }
 
 export function TestShake(props: TestShakeProps): JSX.Element {
-  const { module, setCurrentPage } = props
+  const { module, setCurrentPage, hasProtocol } = props
   const { t } = useTranslation(['heater_shaker', 'device_details'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const heaterShakerFromProtocol = useHeaterShakerFromProtocol()
   const [isExpanded, setExpanded] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { toggleLatch, isLatchClosed } = useLatchCommand(module)
-
   const isShaking = module.data.speedStatus !== 'idle'
 
   const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
@@ -114,8 +118,26 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           paddingBottom={SPACING.spacing4}
         >
           <Text fontWeight={TYPOGRAPHY.fontWeightRegular}>
-            {/* TODO(sh, 2022-02-22): Dynamically render this text if a labware/protocol exists */}
-            {t('test_shake_banner_information')}
+            <Trans
+              t={t}
+              i18nKey={
+                hasProtocol && heaterShakerFromProtocol !== null
+                  ? 'test_shake_banner_labware_information'
+                  : 'test_shake_banner_information'
+              }
+              values={{
+                labware: heaterShakerFromProtocol?.nestedLabwareDisplayName,
+              }}
+              components={{
+                bold: <strong />,
+                block: (
+                  <Text
+                    fontSize={TYPOGRAPHY.fontSizeH2}
+                    marginBottom={SPACING.spacing5}
+                  />
+                ),
+              }}
+            />
           </Text>
         </Flex>
       </Flex>

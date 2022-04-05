@@ -3,8 +3,6 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-// import { getAttachedModules } from '../../../../redux/modules'
-// import { getConnectedRobotName } from '../../../../redux/robot/selectors'
 import { useAttachedModules } from '../../hooks'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { HeaterShakerWizard } from '..'
@@ -15,7 +13,6 @@ import { AttachAdapter } from '../AttachAdapter'
 import { PowerOn } from '../PowerOn'
 import { TestShake } from '../TestShake'
 
-// jest.mock('../../../../redux/robot/selectors')
 jest.mock('../../hooks')
 jest.mock('../Introduction')
 jest.mock('../KeyParts')
@@ -23,11 +20,6 @@ jest.mock('../AttachModule')
 jest.mock('../AttachAdapter')
 jest.mock('../PowerOn')
 jest.mock('../TestShake')
-// jest.mock('../../../../redux/modules')
-
-// const mockGetConnectedRobotName = getConnectedRobotName as jest.MockedFunction<
-//   typeof getConnectedRobotName
-// >
 
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
@@ -44,9 +36,6 @@ const mockAttachAdapter = AttachAdapter as jest.MockedFunction<
 >
 const mockPowerOn = PowerOn as jest.MockedFunction<typeof PowerOn>
 const mockTestShake = TestShake as jest.MockedFunction<typeof TestShake>
-// const mockGetAttachedModules = getAttachedModules as jest.MockedFunction<
-//   typeof getAttachedModules
-// >
 
 const render = (
   props: React.ComponentProps<typeof HeaterShakerWizard>,
@@ -67,7 +56,6 @@ describe('HeaterShakerWizard', () => {
     onCloseClick: jest.fn(),
   }
   beforeEach(() => {
-    // mockGetConnectedRobotName.mockReturnValue('Mock Robot')
     mockUseAttachedModules.mockReturnValue([mockHeaterShaker])
     mockIntroduction.mockReturnValue(<div>Mock Introduction</div>)
     mockKeyParts.mockReturnValue(<div>Mock Key Parts</div>)
@@ -75,12 +63,11 @@ describe('HeaterShakerWizard', () => {
     mockAttachAdapter.mockReturnValue(<div>Mock Attach Adapter</div>)
     mockPowerOn.mockReturnValue(<div>Mock Power On</div>)
     mockTestShake.mockReturnValue(<div>Mock Test Shake</div>)
-    // mockGetAttachedModules.mockReturnValue([mockHeaterShaker])
   })
 
   it('renders the main modal component of the wizard', () => {
     const { getByText } = render(props)
-    getByText(/Attach Heater Shaker Module/s)
+    getByText(/Attach Heater Shaker Module/i)
     getByText('Mock Introduction')
   })
 

@@ -26,12 +26,13 @@ import { useAttachedModules } from '../hooks'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
+  hasProtocol?: boolean
 }
 
 export const HeaterShakerWizard = (
   props: HeaterShakerWizardProps
 ): JSX.Element | null => {
-  const { onCloseClick } = props
+  const { onCloseClick, hasProtocol } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
   const { robotName } = useParams<NextGenRouteParams>()
@@ -73,7 +74,11 @@ export const HeaterShakerWizard = (
       case 5:
         buttonContent = t('complete')
         return (
-          <TestShake module={heaterShaker} setCurrentPage={setCurrentPage} />
+          <TestShake
+            module={heaterShaker}
+            setCurrentPage={setCurrentPage}
+            hasProtocol={hasProtocol}
+          />
         )
       default:
         return null
