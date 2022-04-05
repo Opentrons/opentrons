@@ -160,6 +160,52 @@ async def handle_capacitive_sensor(
         csv.write(text_end_time)
 
 
+async def read_temp_from_pressure_sensor(
+    command: SensorRun,
+    driver: AbstractCanDriver,
+    pipette_mount: NodeId,
+    include_csv: bool,
+    log: logging.Logger,
+) -> None:
+    """Function to read temperature from the pressure sensor."""
+    start_time = datetime.now()
+    csv = None
+    pressure = mmr920C04.PressureSensor()
+    if include_csv:
+        metadata = CSVMetaData(
+            command.pipette_serial_number,
+            command.sensor_type.name,
+            command.minutes,
+            command.auto_zero,
+            start_time.strftime("%H:%M:%S"),
+        )
+        csv = CSVFormatter.build(metadata, list(metadata.to_dict().keys()))
+    delta = timedelta(minutes=command.minutes)
+    while datetime.now() - start_time < delta:
+        messenger = CanMessenger(driver=driver)
+        messenger.start()
+        data = await pressure.read(
+            messenger,
+            pipette_mount,
+            offset=False,
+            timeout=10,
+            sensor=SensorType.pressure_temperature,
+        )
+        curr_time = datetime.now().strftime("%H:%M:%S")
+        if isinstance(data, SensorDataType):
+            log.info(f"Temperature data: {data.to_float()} at: {curr_time}")
+            if csv:
+                csv.write_dict({"time": curr_time, "data": data.to_float()})
+        else:
+            log.info(f"Temperature data not found at: {curr_time}")
+
+    end_time = datetime.now().strftime("%H:%M:%S")
+    text_end_time = f"Test ended at: {end_time}"
+    log.info(text_end_time)
+    if csv:
+        csv.write(text_end_time)
+
+
 async def handle_environment_sensor(
     command: SensorRun,
     driver: AbstractCanDriver,
