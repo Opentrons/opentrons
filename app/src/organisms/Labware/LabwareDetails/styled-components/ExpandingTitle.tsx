@@ -33,12 +33,14 @@ export function ExpandingTitle(props: ExpandingTitleProps): JSX.Element {
         <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {label}
         </StyledText>
-        <Link role="button" onClick={toggleDiagramVisible}>
-          <Icon
-            name={diagramVisible ? 'chevron-up' : 'chevron-down'}
-            width={SPACING.spacingSM}
-          />
-        </Link>
+        {diagram != null && (
+          <Link role="button" onClick={toggleDiagramVisible}>
+            <Icon
+              name={diagramVisible ? 'chevron-up' : 'chevron-down'}
+              width={SPACING.spacingSM}
+            />
+          </Link>
+        )}
       </Flex>
       {diagramVisible && <Box>{diagram}</Box>}
       <Divider />

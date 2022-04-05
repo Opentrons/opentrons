@@ -33,12 +33,12 @@ export function Gallery(props: GalleryProps): JSX.Element {
       </RobotWorkSpace>
     </Box>
   )
-
-  const staticImages = labwareImages[params.loadName].map((src, key) => (
+  const staticImages = labwareImages[params.loadName]?.map((src, key) => (
     <img key={key} src={src} width="100%" />
   ))
 
-  const images = [render, ...staticImages]
+  const images = staticImages != null ? [render, ...staticImages] : [render]
+
   return (
     <Box>
       <Box

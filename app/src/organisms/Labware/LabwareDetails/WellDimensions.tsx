@@ -57,15 +57,15 @@ export function WellDimensions(props: WellDimensionsProps): JSX.Element {
     guideType: 'measurements',
     shape: shape?.shape,
     wellBottomShape: wellBottomShape,
-  }).map((src, index) => <img width="250px" src={src} key={index} />)
+  })?.map((src, index) => <img width="250px" src={src} key={index} />)
 
   return (
     <Box marginBottom={SPACING.spacing4}>
       <ExpandingTitle
-        label={`${wellLabel} ${t('measurements')} ${
+        label={`${t(wellLabel)} ${t('measurements')} ${
           labelSuffix != null ? labelSuffix : ''
         }`}
-        diagram={diagram}
+        diagram={diagram.length > 0 ? diagram : null}
       />
       {dimensions.map(d => (
         <LabeledValue key={d.value} label={d.label} value={d.value} />
