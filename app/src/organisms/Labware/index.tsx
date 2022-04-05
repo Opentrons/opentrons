@@ -107,6 +107,7 @@ export function Labware(): JSX.Element {
         <Toast
           message={t('imported', { filename: newLabwareName })}
           type="success"
+          data-testid="LabwareIndex_successToast"
           closeButton
           onClose={() => {
             setShowSuccessToast(false)
@@ -118,6 +119,7 @@ export function Labware(): JSX.Element {
         <Toast
           message={labwareFailureMessage}
           type="error"
+          data-testid="LabwareIndex_errorToast"
           closeButton
           onClose={() => {
             setShowFailureToast(false)

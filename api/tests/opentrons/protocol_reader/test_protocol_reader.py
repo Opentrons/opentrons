@@ -1,8 +1,10 @@
 """Tests for the ProtocolReader interface."""
 import pytest
 import io
+from dataclasses import dataclass
 from decoy import Decoy
 from pathlib import Path
+from typing import IO
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.models import LabwareDefinition
@@ -16,7 +18,7 @@ from opentrons.protocol_reader import (
     ProtocolFilesInvalidError,
 )
 
-from opentrons.protocol_reader.input_file import InputFile
+from opentrons.protocol_reader.input_file import AbstractInputFile
 from opentrons.protocol_reader.file_reader_writer import (
     FileReaderWriter,
     FileReadError,
@@ -34,6 +36,14 @@ from opentrons.protocol_reader.config_analyzer import (
     ConfigAnalysis,
     ConfigAnalysisError,
 )
+
+
+@dataclass(frozen=True)
+class InputFile(AbstractInputFile):
+    """Concrete input file data model."""
+
+    filename: str
+    file: IO[bytes]
 
 
 @pytest.fixture
@@ -56,14 +66,12 @@ def config_analyzer(decoy: Decoy) -> ConfigAnalyzer:
 
 @pytest.fixture
 def subject(
-    tmp_path: Path,
     file_reader_writer: FileReaderWriter,
     role_analyzer: RoleAnalyzer,
     config_analyzer: ConfigAnalyzer,
 ) -> ProtocolReader:
     """Create a ProtocolReader test subject."""
     return ProtocolReader(
-        directory=tmp_path,
         file_reader_writer=file_reader_writer,
         role_analyzer=role_analyzer,
         config_analyzer=config_analyzer,
@@ -87,10 +95,17 @@ async def test_read_files(
         name="protocol.py",
         contents=b"# hello world",
         data=None,
+        path=None,
     )
-    main_file = MainFile(name="protocol.py", contents=b"# hello world")
+    main_file = MainFile(
+        name="protocol.py",
+        contents=b"# hello world",
+        path=None,
+    )
     labware_data = LabwareDefinition.construct()  # type: ignore[call-arg]
-    labware_file = LabwareFile(name="labware.json", contents=b"", data=labware_data)
+    labware_file = LabwareFile(
+        name="labware.json", contents=b"", data=labware_data, path=None
+    )
     analyzed_roles = RoleAnalysis(
         main_file=main_file,
         labware_files=[labware_file],
@@ -105,14 +120,20 @@ async def test_read_files(
     decoy.when(role_analyzer.analyze([buffered_file])).then_return(analyzed_roles)
     decoy.when(config_analyzer.analyze(main_file)).then_return(analyzed_config)
 
-    result = await subject.read(name="protocol-name", files=[input_file])
+    result = await subject.read(files=[input_file], directory=tmp_path)
 
     assert result == ProtocolSource(
-        directory=tmp_path / "protocol-name",
-        main_file=tmp_path / "protocol-name" / "protocol.py",
+        directory=tmp_path,
+        main_file=tmp_path / "protocol.py",
         files=[
-            ProtocolSourceFile(name="protocol.py", role=ProtocolFileRole.MAIN),
-            ProtocolSourceFile(name="labware.json", role=ProtocolFileRole.LABWARE),
+            ProtocolSourceFile(
+                path=tmp_path / "protocol.py",
+                role=ProtocolFileRole.MAIN,
+            ),
+            ProtocolSourceFile(
+                path=tmp_path / "labware.json",
+                role=ProtocolFileRole.LABWARE,
+            ),
         ],
         metadata={"hey": "there"},
         config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
@@ -121,7 +142,7 @@ async def test_read_files(
 
     decoy.verify(
         await file_reader_writer.write(
-            directory=tmp_path / "protocol-name",
+            directory=tmp_path,
             files=[main_file, labware_file],
         )
     )
@@ -144,7 +165,7 @@ async def test_read_error(
     )
 
     with pytest.raises(ProtocolFilesInvalidError, match="oh no"):
-        await subject.read(name="protocol-name", files=[input_file])
+        await subject.read(directory=tmp_path, files=[input_file])
 
 
 async def test_role_error(
@@ -163,6 +184,7 @@ async def test_role_error(
         name="protocol.py",
         contents=b"# hello world",
         data=None,
+        path=None,
     )
 
     decoy.when(await file_reader_writer.read([input_file])).then_return([buffered_file])
@@ -171,7 +193,7 @@ async def test_role_error(
     )
 
     with pytest.raises(ProtocolFilesInvalidError, match="oh no"):
-        await subject.read(name="protocol-name", files=[input_file])
+        await subject.read(directory=tmp_path, files=[input_file])
 
 
 async def test_config_error(
@@ -191,10 +213,12 @@ async def test_config_error(
         name="protocol.py",
         contents=b"# hello world",
         data=None,
+        path=None,
     )
     main_file = MainFile(
         name="protocol.py",
         contents=b"# hello world",
+        path=None,
     )
     analyzed_roles = RoleAnalysis(
         main_file=main_file,
@@ -209,4 +233,62 @@ async def test_config_error(
     )
 
     with pytest.raises(ProtocolFilesInvalidError, match="oh no"):
-        await subject.read(name="protocol-name", files=[input_file])
+        await subject.read(directory=tmp_path, files=[input_file])
+
+
+async def test_read_files_no_copy(
+    decoy: Decoy,
+    tmp_path: Path,
+    file_reader_writer: FileReaderWriter,
+    role_analyzer: RoleAnalyzer,
+    config_analyzer: ConfigAnalyzer,
+    subject: ProtocolReader,
+) -> None:
+    """It should read a single file protocol source without copying elsewhere."""
+    input_file = Path("/dev/null/protocol.py")
+
+    buffered_file = BufferedFile(
+        name="protocol.py",
+        contents=b"# hello world",
+        data=None,
+        path=Path("/dev/null/protocol.py"),
+    )
+    main_file = MainFile(
+        name="protocol.py",
+        contents=b"# hello world",
+        path=Path("/dev/null/protocol.py"),
+    )
+
+    analyzed_roles = RoleAnalysis(
+        main_file=main_file, labware_files=[], labware_definitions=[]
+    )
+    analyzed_config = ConfigAnalysis(
+        metadata={"hey": "there"},
+        config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
+    )
+
+    decoy.when(await file_reader_writer.read([input_file])).then_return([buffered_file])
+    decoy.when(role_analyzer.analyze([buffered_file])).then_return(analyzed_roles)
+    decoy.when(config_analyzer.analyze(main_file)).then_return(analyzed_config)
+
+    result = await subject.read(files=[input_file])
+
+    assert result == ProtocolSource(
+        directory=None,
+        main_file=Path("/dev/null/protocol.py"),
+        files=[
+            ProtocolSourceFile(
+                path=Path("/dev/null/protocol.py"),
+                role=ProtocolFileRole.MAIN,
+            ),
+        ],
+        metadata={"hey": "there"},
+        config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
+        labware_definitions=[],
+    )
+
+    decoy.verify(
+        await file_reader_writer.write(),  # type: ignore[call-arg]
+        ignore_extra_args=True,
+        times=0,
+    )

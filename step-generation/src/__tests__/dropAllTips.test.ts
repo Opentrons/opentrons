@@ -61,7 +61,7 @@ describe('drop all tips', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toHaveLength(1)
     expect(res.commands[0].params).toMatchObject({
-      pipette: p300SingleId,
+      pipetteId: p300SingleId,
     })
     expectNoTipsRemaining(initialRobotState, invariantContext, res)
   })

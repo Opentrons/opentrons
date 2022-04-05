@@ -24,7 +24,7 @@ import {
   forSetTemperature,
   forDeactivateTemperature,
 } from './temperatureUpdates'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5Addendum'
+import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
@@ -33,13 +33,13 @@ import type {
 
 // WARNING this will mutate the prevRobotState
 function _getNextRobotStateAndWarningsSingleCommand(
-  command: Command,
+  command: CreateCommand,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   assert(command, 'undefined command passed to getNextRobotStateAndWarning')
 
-  switch (command.command) {
+  switch (command.commandType) {
     case 'aspirate':
       forAspirate(command.params, invariantContext, robotStateAndWarnings)
       break
@@ -74,7 +74,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'touchTip':
     case 'delay':
-    case 'airGap':
     case 'dispenseAirGap':
     case 'moveToWell':
       // these commands don't have any effects on the state
@@ -183,13 +182,13 @@ function _getNextRobotStateAndWarningsSingleCommand(
     default:
       assert(
         false,
-        `unknown command: ${command.command} passed to getNextRobotStateAndWarning`
+        `unknown command: ${command.commandType} passed to getNextRobotStateAndWarning`
       )
   }
 }
 
 export function getNextRobotStateAndWarningsSingleCommand(
-  command: Command,
+  command: CreateCommand,
   invariantContext: InvariantContext,
   prevRobotState: RobotState
 ): RobotStateAndWarnings {
@@ -203,7 +202,7 @@ export function getNextRobotStateAndWarningsSingleCommand(
 }
 // Get next state after multiple commands
 export function getNextRobotStateAndWarnings(
-  commands: Command[],
+  commands: CreateCommand[],
   invariantContext: InvariantContext,
   initialRobotState: RobotState
 ): RobotStateAndWarnings {

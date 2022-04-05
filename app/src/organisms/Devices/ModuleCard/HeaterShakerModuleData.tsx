@@ -12,6 +12,7 @@ import {
   Icon,
   DIRECTION_ROW,
   TYPOGRAPHY,
+  C_SKY_BLUE,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { StatusLabel } from '../../../atoms/StatusLabel'
@@ -64,6 +65,12 @@ export const HeaterShakerModuleData = (
         StatusLabelProps.backgroundColor = COLORS.medGrey
         StatusLabelProps.iconColor = COLORS.darkGrey
         StatusLabelProps.textColor = COLORS.darkBlack
+        break
+      }
+      case 'holding at target': {
+        StatusLabelProps.backgroundColor = C_SKY_BLUE
+        StatusLabelProps.iconColor = COLORS.blue
+
         break
       }
       case 'heating':

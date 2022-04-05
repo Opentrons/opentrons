@@ -2,9 +2,10 @@
 import logging
 import textwrap
 from datetime import datetime
+from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, UploadFile, status
-from typing import List
+from fastapi import APIRouter, Depends, File, UploadFile, status, Form
+from typing import List, Optional
 from typing_extensions import Literal
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
@@ -25,6 +26,7 @@ from .protocol_analyzer import ProtocolAnalyzer
 from .analysis_store import AnalysisStore
 from .protocol_store import ProtocolStore, ProtocolResource, ProtocolNotFoundError
 from .dependencies import (
+    get_protocol_directory,
     get_protocol_reader,
     get_protocol_store,
     get_analysis_store,
@@ -73,6 +75,10 @@ protocols_router = APIRouter()
 )
 async def create_protocol(
     files: List[UploadFile] = File(...),
+    # use Form because request is multipart/form-data
+    # https://fastapi.tiangolo.com/tutorial/request-forms-and-files/
+    key: Optional[str] = Form(None),
+    protocol_directory: Path = Depends(get_protocol_directory),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
     protocol_reader: ProtocolReader = Depends(get_protocol_reader),
@@ -86,6 +92,8 @@ async def create_protocol(
 
     Arguments:
         files: List of uploaded files, from form-data.
+        key: Optional key for client-side tracking
+        protocol_directory: Location to store uploaded files.
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
         protocol_reader: Protocol file reading interface.
@@ -97,8 +105,8 @@ async def create_protocol(
     """
     try:
         source = await protocol_reader.read(
-            name=protocol_id,
             files=files,
+            directory=protocol_directory / protocol_id,
         )
     except ProtocolFilesInvalidError as e:
         raise ProtocolFilesInvalid(detail=str(e)).as_error(
@@ -109,9 +117,10 @@ async def create_protocol(
         protocol_id=protocol_id,
         created_at=created_at,
         source=source,
+        protocol_key=key,
     )
 
-    protocol_store.upsert(protocol_resource)
+    protocol_store.insert(protocol_resource)
 
     task_runner.run(
         protocol_analyzer.analyze,
@@ -129,12 +138,11 @@ async def create_protocol(
         protocolType=source.config.protocol_type,
         metadata=Metadata.parse_obj(source.metadata),
         analyses=analyses,
-        files=[ProtocolFile(name=f.name, role=f.role) for f in source.files],
+        key=key,
+        files=[ProtocolFile(name=f.path.name, role=f.role) for f in source.files],
     )
 
-    log.info(
-        f'Created protocol "{protocol_id}"' f' and started analysis "{analysis_id}".'
-    )
+    log.info(f'Created protocol "{protocol_id}" and started analysis "{analysis_id}".')
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=data),
@@ -165,7 +173,8 @@ async def get_protocols(
             protocolType=r.source.config.protocol_type,
             metadata=Metadata.parse_obj(r.source.metadata),
             analyses=analysis_store.get_by_protocol(r.protocol_id),
-            files=[ProtocolFile(name=f.name, role=f.role) for f in r.source.files],
+            key=r.protocol_key,
+            files=[ProtocolFile(name=f.path.name, role=f.role) for f in r.source.files],
         )
         for r in protocol_resources
     ]
@@ -210,7 +219,10 @@ async def get_protocol_by_id(
         protocolType=resource.source.config.protocol_type,
         metadata=Metadata.parse_obj(resource.source.metadata),
         analyses=analyses,
-        files=[ProtocolFile(name=f.name, role=f.role) for f in resource.source.files],
+        key=resource.protocol_key,
+        files=[
+            ProtocolFile(name=f.path.name, role=f.role) for f in resource.source.files
+        ],
     )
 
     return await PydanticResponse.create(
