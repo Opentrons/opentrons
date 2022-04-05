@@ -13,6 +13,7 @@ from opentrons_hardware.firmware_bindings.utils import UInt32Field
 
 from opentrons_hardware.firmware_update import initiator
 from opentrons_hardware.firmware_update.errors import BootloaderNotReady
+from opentrons_hardware.firmware_update.target import Target
 from tests.conftest import MockCanMessageNotifier
 
 
@@ -51,7 +52,7 @@ async def test_messaging(
                 ),
             )
 
-    target = initiator.head
+    target = Target(system_node=NodeId.head)
 
     mock_messenger.send.side_effect = responder
 
@@ -109,7 +110,7 @@ async def test_retry(
                     ),
                 )
 
-    target = initiator.head
+    target = Target(system_node=NodeId.head)
 
     mock_messenger.send.side_effect = responder
 
@@ -142,7 +143,7 @@ async def test_bootloader_not_ready(
     mock_messenger: AsyncMock,
 ) -> None:
     """It should raise an error when bootloader never responds."""
-    target = initiator.head
+    target =  Target(system_node=NodeId.head)
 
     retry_count = 3
     with pytest.raises(BootloaderNotReady):

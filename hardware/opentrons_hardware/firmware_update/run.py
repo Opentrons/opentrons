@@ -3,6 +3,7 @@ import logging
 from typing import Optional
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
+from opentrons_hardware.firmware_bindings import NodeId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     FirmwareUpdateStartApp,
 )
@@ -11,16 +12,15 @@ from opentrons_hardware.firmware_update import (
     FirmwareUpdateDownloader,
     FirmwareUpdateEraser,
     HexRecordProcessor,
-    Target,
 )
-
+from opentrons_hardware.firmware_update.target import Target
 
 logger = logging.getLogger(__name__)
 
 
 async def run_update(
     messenger: CanMessenger,
-    target: Target,
+    node_id: NodeId,
     hex_processor: HexRecordProcessor,
     retry_count: int,
     timeout_seconds: float,
@@ -30,7 +30,7 @@ async def run_update(
 
     Args:
         messenger: The can messenger to use
-        target: The node being updated
+        node_id: The node being updated
         hex_processor: The producer of
         retry_count: Number of times to retry.
         timeout_seconds: How much to wait for responses.
@@ -41,6 +41,8 @@ async def run_update(
     """
     initiator = FirmwareUpdateInitiator(messenger)
     downloader = FirmwareUpdateDownloader(messenger)
+
+    target = Target(system_node=node_id)
 
     logger.info(f"Initiating FW Update on {target}.")
 

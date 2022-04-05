@@ -5,6 +5,7 @@ import mock
 import pytest
 from mock import AsyncMock, MagicMock
 
+from opentrons_hardware.firmware_bindings import NodeId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     FirmwareUpdateStartApp,
 )
@@ -13,8 +14,8 @@ from opentrons_hardware.firmware_update import (
     FirmwareUpdateDownloader,
     FirmwareUpdateEraser,
     run_update,
-    head,
 )
+from opentrons_hardware.firmware_update.target import Target
 
 
 @pytest.fixture
@@ -48,10 +49,10 @@ async def test_run_update(
     """It should call all the functions."""
     mock_messenger = AsyncMock()
     mock_hex = MagicMock()
-    target = head
+    target = Target(system_node=NodeId.head)
     await run_update(
         messenger=mock_messenger,
-        target=target,
+        node_id=target.system_node,
         hex_processor=mock_hex,
         retry_count=12,
         timeout_seconds=11,
@@ -70,5 +71,5 @@ async def test_run_update(
         node_id=target.bootloader_node, hex_processor=mock_hex, ack_wait_seconds=11
     )
     mock_messenger.send.assert_called_once_with(
-        node_id=head.bootloader_node, message=FirmwareUpdateStartApp()
+        node_id=target.bootloader_node, message=FirmwareUpdateStartApp()
     )

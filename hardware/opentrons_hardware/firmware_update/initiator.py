@@ -2,43 +2,15 @@
 
 import asyncio
 import logging
-from typing_extensions import Final
-from dataclasses import dataclass
 
-from opentrons_hardware.firmware_bindings import NodeId
 from opentrons_hardware.firmware_bindings.messages import message_definitions
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
+from opentrons_hardware.firmware_update.target import Target
 from opentrons_hardware.firmware_update.errors import BootloaderNotReady
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass(frozen=True)
-class Target:
-    """Pair of a sub-system's node id with its bootloader's node id."""
-
-    system_node: NodeId
-    bootloader_node: NodeId
-
-
-head: Final = Target(system_node=NodeId.head, bootloader_node=NodeId.head_bootloader)
-pipette_left: Final = Target(
-    system_node=NodeId.pipette_left, bootloader_node=NodeId.pipette_left_bootloader
-)
-pipette_right: Final = Target(
-    system_node=NodeId.pipette_right, bootloader_node=NodeId.pipette_right_bootloader
-)
-gantry_x: Final = Target(
-    system_node=NodeId.gantry_x, bootloader_node=NodeId.gantry_x_bootloader
-)
-gantry_y: Final = Target(
-    system_node=NodeId.gantry_y, bootloader_node=NodeId.gantry_y_bootloader
-)
-gripper: Final = Target(
-    system_node=NodeId.gripper, bootloader_node=NodeId.gripper_bootloader
-)
 
 
 class FirmwareUpdateInitiator:
