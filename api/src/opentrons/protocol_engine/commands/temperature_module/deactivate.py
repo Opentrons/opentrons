@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-DeactivateTemperatureCommandType = Literal["temperatureModule/deactivateTemperature"]
+DeactivateTemperatureCommandType = Literal["temperatureModule/deactivate"]
 
 
 class DeactivateTemperatureParams(BaseModel):

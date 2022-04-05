@@ -1244,7 +1244,7 @@
       "id": "0abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "mount": "leftMount"
+        "mount": "left"
       }
     },
     {
@@ -1366,6 +1366,14 @@
       "params": {
         "moduleId": "heaterShakerId",
         "rpm": 2000
+      }
+    },
+    {
+      "commandType": "heaterShakerModule/startSetTargetTemperature",
+      "id": "14abc123",
+      "params": {
+        "moduleId": "heaterShakerId",
+        "temperature": 42
       }
     },
     {
