@@ -63,3 +63,29 @@ run_table = sqlalchemy.Table(
         default=False
     )
 )
+
+action_runs_table = sqlalchemy.Table(
+    "run_action",
+    metadata,
+    sqlalchemy.Column(
+        "id",
+        sqlalchemy.String,
+        primary_key=True,
+    ),
+    sqlalchemy.Column(
+        "created_at",
+        sqlalchemy.DateTime,
+        nullable=False
+    ),
+    sqlalchemy.Column(
+        "action_type",
+        sqlalchemy.String,
+        nullable=False
+    ),
+    sqlalchemy.Column(
+        "run_id",
+        sqlalchemy.String,
+        forigen_key="protocol_run.id",
+        nullable=True
+    ),
+)
