@@ -113,10 +113,10 @@ class RunStore:
             RunNotFoundError: The specified run ID was not found.
         """
         select_statement = sqlalchemy.select(run_table).where(
-            id == run_id
+            run_table.c.id == run_id
         )
         delete_statement = sqlalchemy.delete(run_table).where(
-            id == run_id
+            run_table.c.id == run_id
         )
         with self._sql_engine.begin() as transaction:
             try:
