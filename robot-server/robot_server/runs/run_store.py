@@ -86,7 +86,7 @@ class RunStore:
             run_table.c.id == run_id
         )
         try:
-            row_run = get_row(statement)
+            row_run = get_row(self._sql_engine, statement=statement)
         except sqlalchemy.exc.NoResultFound as e:
             raise RunNotFoundError(run_id) from e
         return _convert_sql_row_to_run(row_run)
@@ -97,7 +97,7 @@ class RunStore:
         Returns:
             All stored run entries.
         """
-        runs = get_all(run_table)
+        runs = get_all(self._sql_engine, query_table=run_table)
         return [_convert_sql_row_to_run(sql_row=row) for row in runs]
 
     def remove(self, run_id: str) -> RunResource:
