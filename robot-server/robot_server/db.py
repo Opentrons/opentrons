@@ -20,11 +20,11 @@ def opened_db(db_file_path: Path) -> Generator[SQLEngine, None, None]:
 
     The new database will be totally blank--no tables.
     """
-    new_engine = open_db_no_cleanup(db_file_path=db_file_path)
+    sql_engine = open_db_no_cleanup(db_file_path=db_file_path)
     try:
-        yield new_engine
+        yield sql_engine
     finally:
-        new_engine.dispose()
+        sql_engine.dispose()
 
 
 def open_db_no_cleanup(db_file_path: Path) -> SQLEngine:
