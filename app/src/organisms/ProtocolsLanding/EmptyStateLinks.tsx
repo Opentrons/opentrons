@@ -3,7 +3,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Icon,
-  Text,
   Flex,
   FONT_SIZE_CAPTION,
   SPACING,
