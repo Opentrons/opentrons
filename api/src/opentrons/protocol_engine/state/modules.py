@@ -21,7 +21,7 @@ from ..types import (
     LabwareOffsetVector,
 )
 from .. import errors
-from ..commands import Command, LoadModuleResult, heater_shaker
+from ..commands import Command, LoadModuleResult, heater_shaker, temperature_module
 from ..actions import Action, UpdateCommandAction, AddModuleAction
 from .abstract_store import HasState, HandlesActions
 from .module_substates import (
@@ -117,6 +117,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                     module_id
                 ] = TemperatureModuleSubState(
                     module_id=TemperatureModuleId(module_id),
+                    plate_target_temperature=None
                 )
 
     def _handle_command(self, command: Command) -> None:
@@ -149,6 +150,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                     module_id
                 ] = TemperatureModuleSubState(
                     module_id=TemperatureModuleId(module_id),
+                    plate_target_temperature=None,
                 )
         if isinstance(
             command.result,
@@ -177,6 +179,26 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 ] = HeaterShakerModuleSubState(
                     module_id=HeaterShakerModuleId(module_id),
                     plate_target_temperature=None,
+                )
+        if isinstance(
+            command.result,
+                (
+                    temperature_module.SetTargetTemperatureResult
+                )
+        ):
+            module_id = command.params.moduleId
+            assert isinstance(
+                self._state.substate_by_module_id[module_id], TemperatureModuleSubState
+            ), f"{module_id} is not a temperature module."
+
+            if isinstance(
+                    command.result, temperature_module.SetTargetTemperatureResult
+            ):
+                self._state.substate_by_module_id[
+                    module_id
+                ] = TemperatureModuleSubState(
+                    module_id=TemperatureModuleId(module_id),
+                    plate_target_temperature=int(round(command.params.temperature, 0)),
                 )
 
 

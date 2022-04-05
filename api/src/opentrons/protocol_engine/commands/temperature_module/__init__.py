@@ -8,6 +8,13 @@ from .set_target_temperature import (
     SetTargetTemperatureCommandType
 )
 
+from .await_temperature import (
+    AwaitTemperature,
+    AwaitTemperatureCreate,
+    AwaitTemperatureParams,
+    AwaitTemperatureResult,
+    AwaitTemperatureCommandType
+)
 
 __all__ = [
     # temperatureModule/setTargetTemperature
@@ -16,4 +23,10 @@ __all__ = [
     "SetTargetTemperatureParams",
     "SetTargetTemperatureResult",
     "SetTargetTemperatureCommandType",
+    # temperatureModule/awaitTemperature
+    "AwaitTemperature",
+    "AwaitTemperatureCreate",
+    "AwaitTemperatureParams",
+    "AwaitTemperatureResult",
+    "AwaitTemperatureCommandType",
 ]

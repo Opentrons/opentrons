@@ -1,10 +1,13 @@
 """Temperature module sub-state."""
 
 from dataclasses import dataclass
-from typing import NewType, NamedTuple
+from typing import NewType, NamedTuple, Optional
 
 from opentrons.protocol_engine.types import TemperatureModuleModel
-from opentrons.protocol_engine.errors import InvalidTargetTemperatureError
+from opentrons.protocol_engine.errors import (
+    InvalidTargetTemperatureError,
+    NoTargetTemperatureSetError
+)
 
 TemperatureModuleId = NewType("TemperatureModuleId", str)
 
@@ -29,6 +32,7 @@ class TemperatureModuleSubState:
     """
 
     module_id: TemperatureModuleId
+    plate_target_temperature: Optional[int]
 
     @staticmethod
     def validate_target_temperature(celsius: float) -> int:
@@ -44,3 +48,13 @@ class TemperatureModuleSubState:
                 f"Temperature module got an invalid temperature {celsius} °C."
                 f" Valid range is {TEMP_MODULE_TEMPERATURE_RANGE}."
             )
+
+    def get_plate_target_temperature(self) -> int:
+        """Get the module's target plate temperature."""
+        target = self.plate_target_temperature
+
+        if target is None:
+            raise NoTargetTemperatureSetError(
+                f"Module {self.module_id} does not have a target temperature set."
+            )
+        return target
