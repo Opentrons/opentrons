@@ -15,11 +15,11 @@ from opentrons.protocol_reader import (
 
 from robot_server.db import create_in_memory_db
 from robot_server.protocols.protocol_store import (
-    add_tables_to_db,
     ProtocolStore,
     ProtocolResource,
     ProtocolNotFoundError,
 )
+from robot_server.data_access.data_access import add_tables_to_db
 
 from sqlalchemy.engine import Engine as SQLEngine
 

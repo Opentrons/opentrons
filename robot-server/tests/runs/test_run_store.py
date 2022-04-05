@@ -1,11 +1,28 @@
 """Tests for robot_server.runs.run_store."""
 import pytest
 from datetime import datetime
-
+from typing import Generator
 from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError
+from sqlalchemy.engine import Engine as SQLEngine
+from robot_server.db import create_in_memory_db
+from robot_server.data_access.data_access import add_tables_to_db
 
 
-def test_add_run() -> None:
+@pytest.fixture
+def in_memory_sql_engine() -> Generator[SQLEngine, None, None]:
+    """Return a set-up in-memory database to back the store."""
+    with create_in_memory_db() as sql_engine:
+        add_tables_to_db(sql_engine)
+        yield sql_engine
+
+
+@pytest.fixture
+def subject(in_memory_sql_engine: SQLEngine) -> RunStore:
+    """Get a RunStore test subject."""
+    return RunStore(sql_engine=in_memory_sql_engine)
+
+
+def test_add_run(subject: RunStore) -> None:
     """It should be able to add a new run to the store."""
     run = RunResource(
         run_id="run-id",
@@ -14,14 +31,12 @@ def test_add_run() -> None:
         actions=[],
         is_current=True,
     )
-
-    subject = RunStore()
     result = subject.upsert(run)
 
     assert result == run
 
 
-def test_update_run() -> None:
+def test_update_run(subject: RunStore) -> None:
     """It should be able to update a run in the store."""
     run = RunResource(
         run_id="identical-run-id",
@@ -38,7 +53,6 @@ def test_update_run() -> None:
         is_current=True,
     )
 
-    subject = RunStore()
     subject.upsert(run)
 
     result = subject.upsert(updated_run)
@@ -46,7 +60,7 @@ def test_update_run() -> None:
     assert result == updated_run
 
 
-def test_get_run() -> None:
+def test_get_run(subject: RunStore) -> None:
     """It can get a previously stored run entry."""
     run = RunResource(
         run_id="run-id",
@@ -56,7 +70,6 @@ def test_get_run() -> None:
         is_current=False,
     )
 
-    subject = RunStore()
     subject.upsert(run)
 
     result = subject.get(run_id="run-id")
@@ -64,15 +77,13 @@ def test_get_run() -> None:
     assert result == run
 
 
-def test_get_run_missing() -> None:
+def test_get_run_missing(subject: RunStore) -> None:
     """It raises if the run does not exist."""
-    subject = RunStore()
-
     with pytest.raises(RunNotFoundError, match="run-id"):
         subject.get(run_id="run-id")
 
 
-def test_get_all_runs() -> None:
+def test_get_all_runs(subject: RunStore) -> None:
     """It can get all created runs."""
     run_1 = RunResource(
         run_id="run-id-1",
@@ -89,7 +100,6 @@ def test_get_all_runs() -> None:
         is_current=True,
     )
 
-    subject = RunStore()
     subject.upsert(run_1)
     subject.upsert(run_2)
 
@@ -98,7 +108,7 @@ def test_get_all_runs() -> None:
     assert result == [run_1, run_2]
 
 
-def test_remove_run() -> None:
+def test_remove_run(subject: RunStore) -> None:
     """It can remove and return a previously stored run entry."""
     run = RunResource(
         run_id="run-id",
@@ -108,7 +118,6 @@ def test_remove_run() -> None:
         is_current=True,
     )
 
-    subject = RunStore()
     subject.upsert(run)
 
     result = subject.remove(run_id="run-id")
@@ -117,15 +126,13 @@ def test_remove_run() -> None:
     assert subject.get_all() == []
 
 
-def test_remove_run_missing_id() -> None:
+def test_remove_run_missing_id(subject: RunStore) -> None:
     """It raises if the run does not exist."""
-    subject = RunStore()
-
     with pytest.raises(RunNotFoundError, match="run-id"):
         subject.remove(run_id="run-id")
 
 
-def test_add_run_current_run_deactivates() -> None:
+def test_add_run_current_run_deactivates(subject: RunStore) -> None:
     """Adding a current run should mark all others as not current."""
     run_1 = RunResource(
         run_id="run-id-1",
@@ -143,7 +150,6 @@ def test_add_run_current_run_deactivates() -> None:
         is_current=True,
     )
 
-    subject = RunStore()
     subject.upsert(run_1)
     subject.upsert(run_2)
 
