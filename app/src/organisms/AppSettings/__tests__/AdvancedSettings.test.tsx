@@ -167,6 +167,15 @@ describe('AdvancedSettings', () => {
     expect(queryByText('go to Realtek.com')).not.toBeInTheDocument()
   })
 
+  it('renders the not connected message and not display item titles when USB-to-Ethernet is not connected', () => {
+    mockGetU2EAdapterDevice.mockReturnValue(null)
+    const [{ getByText, queryByText }] = render()
+    expect(queryByText('Description')).not.toBeInTheDocument()
+    expect(queryByText('Manufacturer')).not.toBeInTheDocument()
+    expect(queryByText('Driver Version')).not.toBeInTheDocument()
+    getByText('No USB-to-Ethernet adapter connected')
+  })
+
   it('renders the display show link to get labware offset data section', () => {
     const [{ getByText, getByRole }] = render()
     getByText('Show link to get Labware Offset data')
