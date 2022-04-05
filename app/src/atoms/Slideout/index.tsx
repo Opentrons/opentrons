@@ -36,7 +36,11 @@ const EXPANDED_STYLE = css`
   overflow-x: hidden;
   width: 19.5rem;
   max-width: 19.5rem;
+<<<<<<< Updated upstream
   height: 100%;
+=======
+  visibility: visible;
+>>>>>>> Stashed changes
 
   @keyframes slidein {
     from {
