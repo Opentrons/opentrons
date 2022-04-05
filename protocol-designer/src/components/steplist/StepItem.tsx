@@ -339,7 +339,6 @@ export const StepItemContents = (
     const temperature = makeTemperatureText(
       substeps.targetHeaterShakerTemperature
     )
-    console.log(substeps.targetHeaterShakerTemperature)
     const shakerValue = makeSpeedText(substeps.targetSpeed)
     const timer = makeTimerText(
       substeps.heaterShakerTimerMinutes,

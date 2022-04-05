@@ -120,9 +120,9 @@ export type PauseForm = AnnotationFields & {
   stepType: 'pause'
   id: StepIdType
   pauseAction?:
-    | typeof PAUSE_UNTIL_RESUME
-    | typeof PAUSE_UNTIL_TIME
-    | typeof PAUSE_UNTIL_TEMP
+  | typeof PAUSE_UNTIL_RESUME
+  | typeof PAUSE_UNTIL_TIME
+  | typeof PAUSE_UNTIL_TEMP
   pauseHour?: string
   pauseMinute?: string
   pauseSecond?: string
@@ -258,14 +258,16 @@ export interface HydratedHeaterShakerFormData {
   id: string
   stepType: 'heaterShaker'
   stepDetails: string | null
-  moduleId: string | null
+  moduleId: string
+  heaterShakerSetTimer: 'true' | 'false' | null
   setTemperature: 'true' | 'false'
   setSpeed: 'true' | 'false'
+  setShake: 'true' | 'false'
   latchOpen: 'true' | 'false'
-  targetTemperature: string | null
+  targetHeaterShakerTemperature: string | null
   targetSpeed: string | null
-  timerMinutes: string | null
-  timerSeconds: string | null
+  heaterShakerTimerMinutes: string | null
+  heaterShakerTimerSeconds: string | null
 }
 // TODO: Ian 2019-01-17 Moving away from this and towards nesting all form fields
 // inside `fields` key, but deprecating transfer/consolidate/distribute is a pre-req

@@ -4,25 +4,20 @@ import type { HydratedHeaterShakerFormData } from '../../../form-types'
 
 export const heaterShakerFormToArgs = (
   formData: HydratedHeaterShakerFormData
-): HeaterShakerArgs | null => {
-  const { moduleId } = formData
-
-  const setTemp = formData.setTemperature === 'true'
-  //  @ts-expect-error(jr, 2022/4/5): null check targetTemperature
-  const targetTemperature = parseFloat(formData.targetTemperature)
+): HeaterShakerArgs => {
+  const { moduleId, setTemperature, targetHeaterShakerTemperature, targetSpeed, setSpeed } = formData
   assert(
-    setTemp ? !Number.isNaN(targetTemperature) : true,
-    'heaterShakerFormToArgs expected targetTemp to be a number when stTemp is true'
+    setTemperature ? !Number.isNaN(targetHeaterShakerTemperature) : true,
+    'heaterShakerFormToArgs expected targetTemp to be a number when setTemp is true'
   )
-  const setShake = formData.setSpeed === 'true'
-  //  @ts-expect-error(jr, 2022/4/5): null check targetSpeed
-  const targetShake = parseFloat(formData.targetSpeed)
   assert(
-    setShake ? !Number.isNaN(targetShake) : true,
-    'heaterShakerFormToArgs expected targeShake to be a number when setShake is true'
+    setSpeed ? !Number.isNaN(targetSpeed) : true,
+    'heaterShakerFormToArgs expected targeShake to be a number when setSpeed is true'
   )
 
-  if (moduleId == null) return null
+  const targetTemperature = setTemperature === 'true' && targetHeaterShakerTemperature != null ? parseFloat(targetHeaterShakerTemperature) : null
+  const targetShake = setSpeed === 'true' && targetSpeed ? parseFloat(targetSpeed) : null
+
 
   return {
     commandCreatorFnName: 'heaterShaker',
@@ -31,8 +26,8 @@ export const heaterShakerFormToArgs = (
     rpm: targetShake,
     latchOpen: formData.latchOpen === 'true' ? true : false,
     timerMinutes:
-      formData.timerMinutes != null ? parseInt(formData.timerMinutes) : null,
+      formData.heaterShakerTimerMinutes != null ? parseInt(formData.heaterShakerTimerMinutes) : null,
     timerSeconds:
-      formData.timerSeconds != null ? parseInt(formData.timerSeconds) : null,
+      formData.heaterShakerTimerSeconds != null ? parseInt(formData.heaterShakerTimerSeconds) : null,
   }
 }
