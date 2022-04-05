@@ -1,0 +1,2 @@
+magdeck: G0 Z5.1 -> Setting magnet height to 5.1mm ->
+magdeck: M114.2 -> Reading current position of magnets -> Current height of magnets are 5.1mm

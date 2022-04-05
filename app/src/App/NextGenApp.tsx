@@ -30,6 +30,7 @@ import { AppSettings } from '../organisms/AppSettings'
 import { Labware } from '../organisms/Labware'
 import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
 import logoSvg from '../assets/images/logo_nav.svg'
+import { NAV_BAR_WIDTH } from './constants'
 
 export interface RouteProps {
   /**
@@ -60,8 +61,6 @@ const LogoImg = styled('img')`
   align-self: ${ALIGN_CENTER};
   margin: ${SPACING.spacing4} 0;
 `
-// defines a constant for the nav bar width - used in run log component to calculate centering
-export const NAV_BAR_WIDTH = '5.625rem'
 
 /**
  * a temp nav bar to facilitate app navigation during development until breadcrumbs are implemented
