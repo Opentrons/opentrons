@@ -9,6 +9,7 @@ from rich.console import Console
 from rich.style import Style
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from api.src.opentrons.hardware_control.emulation import app
 
 
 from src.resources.ot_robot5dot1 import OtRobot
@@ -58,7 +59,7 @@ def test_app_settings_v5dot1(
         assert (
             app_settings.get_app_software_version_text().text == "App Software Version"
         )
-        assert app_settings.get_app_software_version_value().is_displayed()
+        """assert app_settings.get_app_software_version_value().is_displayed()
 
         assert app_settings.get_link_restore_previous_version().is_displayed()
         app_settings.click_link_restore_previous_version()
@@ -76,8 +77,19 @@ def test_app_settings_v5dot1(
         app_settings.click_software_update_alert_toggle()
 
         assert app_settings.get_connect_robot_via_IP_header().is_displayed()
-        assert app_settings.get_connect_to_robot_via_IP_address_button().is_displayed()
+        assert app_settings.get_connect_to_robot_via_IP_address_button().is_displayed()"""
         app_settings.click_connect_to_robot_via_IP_address_button()
+        assert (
+            app_settings.get_connect_to_robot_via_IP_address_slideout_header().is_displayed()
+        )
+        assert (
+            app_settings.get_link_learn_more_about_connecting_a_robot_manually().is_displayed()
+        )
+        assert app_settings.get_textbox_to_enter_the_ip().is_displayed()
+        app_settings.click_add_ip_or_hostname()
+        assert app_settings.get_add_button().is_displayed()
+
+        time.sleep(3)
 
         ## Privacy Tab verification
         app_settings.click_privacy_tab()
