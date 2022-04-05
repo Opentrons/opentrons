@@ -36,7 +36,7 @@ async def test_await_temperature(
         TemperatureModuleId("tempdeck-id")
     )
 
-    # Get stubbed hardware module from hs module view
+    # Get stubbed hardware module
     decoy.when(
         equipment.get_module_hardware_api(TemperatureModuleId("tempdeck-id"))
     ).then_return(tempdeck_hardware)

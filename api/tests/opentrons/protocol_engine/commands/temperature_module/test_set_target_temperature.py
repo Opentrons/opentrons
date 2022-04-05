@@ -41,7 +41,8 @@ async def test_set_target_temperature(
 
     # Stub temperature validation
     decoy.when(module_substate.validate_target_temperature(celsius=1.23)).then_return(1)
-    # Get attached hardware modules
+
+    # Get stubbed hardware module
     decoy.when(
         equipment.get_module_hardware_api(TemperatureModuleId("tempdeck-id"))
     ).then_return(tempdeck_hardware)

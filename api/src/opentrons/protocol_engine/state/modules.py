@@ -210,7 +210,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 # Not sure if a float conversion here is a good idea.
                 # But it won't be right to let target_temperature be a float
                 # since it might lead to problems with await command.
-                # Should we add the converted target to result?
+                # Should we add the converted target to SetTargetTemperatureResult?
                 plate_target_temperature=int(round(command.params.temperature, 0)),
             )
         elif isinstance(command.result, temperature_module.DeactivateTemperatureResult):
