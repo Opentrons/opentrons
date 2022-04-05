@@ -25,6 +25,7 @@ const render = (props: React.ComponentProps<typeof TestShake>) => {
 }
 
 const mockOpenLatchHeaterShaker = {
+  id: 'heatershaker_id',
   model: 'heaterShakerModuleV1',
   type: 'heaterShakerModuleType',
   port: '/dev/ot_module_heatershaker0',
@@ -47,6 +48,7 @@ const mockOpenLatchHeaterShaker = {
 } as any
 
 const mockCloseLatchHeaterShaker = {
+  id: 'heatershaker_id',
   model: 'heaterShakerModuleV1',
   type: 'heaterShakerModuleType',
   port: '/dev/ot_module_heatershaker0',
@@ -58,6 +60,29 @@ const mockCloseLatchHeaterShaker = {
   data: {
     labwareLatchStatus: 'idle_closed',
     speedStatus: 'idle',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemp: null,
+    targetSpeed: null,
+    targetTemp: null,
+    errorDetails: null,
+  },
+  usbPort: { hub: 1, port: 1 },
+} as any
+
+const mockMovingHeaterShaker = {
+  id: 'heatershaker_id',
+  model: 'heaterShakerModuleV1',
+  type: 'heaterShakerModuleType',
+  port: '/dev/ot_module_thermocycler0',
+  serial: 'jkl123',
+  revision: 'heatershaker_v4.0',
+  fwVersion: 'v2.0.0',
+  status: 'idle',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_closed',
+    speedStatus: 'speeding up',
     temperatureStatus: 'idle',
     currentSpeed: null,
     currentTemp: null,
@@ -105,12 +130,22 @@ describe('TestShake', () => {
   })
 
   it('renders the open labware latch button and is enabled', () => {
+    props = {
+      module: mockCloseLatchHeaterShaker,
+      setCurrentPage: jest.fn(),
+    }
+
     const { getByRole } = render(props)
     const button = getByRole('button', { name: /Open Labware Latch/i })
     expect(button).toBeEnabled()
   })
 
   it('renders the start shaking button and is enabled', () => {
+    props = {
+      module: mockCloseLatchHeaterShaker,
+      setCurrentPage: jest.fn(),
+    }
+
     const { getByRole } = render(props)
     const button = getByRole('button', { name: /Start Shaking/i })
     expect(button).toBeEnabled()
@@ -195,12 +230,12 @@ describe('TestShake', () => {
 
   it('entering an input for shake speed and clicking start should begin shaking', () => {
     props = {
-      module: mockHeaterShaker,
+      module: mockCloseLatchHeaterShaker,
       setCurrentPage: jest.fn(),
     }
 
     const { getByRole } = render(props)
-    const button = getByRole('button', { name: /Start/i })
+    const button = getByRole('button', { name: /Start Shaking/i })
     const input = getByRole('spinbutton')
     fireEvent.change(input, { target: { value: '300' } })
     fireEvent.click(button)
@@ -211,6 +246,28 @@ describe('TestShake', () => {
         params: {
           moduleId: 'heatershaker_id',
           rpm: 300,
+        },
+      },
+    })
+  })
+
+  it('when the heater shaker is shaking clicking stop should deactivate the shaking', () => {
+    props = {
+      module: mockMovingHeaterShaker,
+      setCurrentPage: jest.fn(),
+    }
+
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: /Stop Shaking/i })
+    const input = getByRole('spinbutton')
+    fireEvent.change(input, { target: { value: '0' } })
+    fireEvent.click(button)
+
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'heaterShakerModule/stopShake',
+        params: {
+          moduleId: mockHeaterShaker.id,
         },
       },
     })

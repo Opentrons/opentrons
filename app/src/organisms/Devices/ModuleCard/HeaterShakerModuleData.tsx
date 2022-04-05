@@ -12,6 +12,7 @@ import {
   Icon,
   DIRECTION_ROW,
   TYPOGRAPHY,
+  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 
@@ -75,21 +76,33 @@ export const HeaterShakerModuleData = (
     return StatusLabelProps
   }
 
-  const getLatchStatus = (latchStatus: LatchStatus): string => {
+  const getLatchStatus = (latchStatus: LatchStatus): JSX.Element | string => {
     switch (latchStatus) {
       case 'opening':
-      case 'idle_open': {
-        return t('open', { ns: 'shared' })
+      case 'idle_open':
+      case 'idle_unknown': {
+        return (
+          <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+            {t('open', { ns: 'shared' })}
+          </Text>
+        )
       }
       case 'closing':
       case 'idle_closed': {
         if (isShaking) {
-          return t('closed_and_locked', { ns: 'heater_shaker' })
+          return (
+            <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+              {t('closed_and_locked', { ns: 'heater_shaker' })}
+            </Text>
+          )
         } else {
-          return t('closed', { ns: 'heater_shaker' })
+          return (
+            <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+              {t('closed', { ns: 'heater_shaker' })}
+            </Text>
+          )
         }
       }
-      // TODO(sh, 2022-03-30): potentially add cases for idle_unknown and unknown
       default:
         return latchStatus
     }

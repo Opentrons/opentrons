@@ -17,6 +17,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { RPM, HS_RPM_MAX, HS_RPM_MIN } from '@opentrons/shared-data'
+import { useLatchCommand } from '../ModuleCard/hooks'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 import { TertiaryButton } from '../../../atoms/Buttons'
 import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'
@@ -27,8 +28,6 @@ import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
   HeaterShakerSetTargetShakeSpeedCreateCommand,
   HeaterShakerStopShakeCreateCommand,
-  HeaterShakerOpenLatchCreateCommand,
-  HeaterShakerCloseLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface TestShakeProps {
@@ -43,22 +42,9 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   const [isExpanded, setExpanded] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const { toggleLatch, isLatchClosed } = useLatchCommand(module)
 
   const isShaking = module.data.speedStatus !== 'idle'
-  const isLatchOpen =
-    module.data.labwareLatchStatus === 'idle_open' ||
-    module.data.labwareLatchStatus === 'opening'
-
-  const setLatchCommand:
-    | HeaterShakerOpenLatchCreateCommand
-    | HeaterShakerCloseLatchCreateCommand = {
-    commandType: isLatchOpen
-      ? 'heaterShakerModule/closeLatch'
-      : 'heaterShakerModule/openLatch',
-    params: {
-      moduleId: module.id,
-    },
-  }
 
   const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
     commandType: 'heaterShakerModule/setTargetShakeSpeed',
@@ -73,16 +59,6 @@ export function TestShake(props: TestShakeProps): JSX.Element {
     params: {
       moduleId: module.id,
     },
-  }
-
-  const handleLatchCommand = (): void => {
-    createLiveCommand({
-      command: setLatchCommand,
-    }).catch((e: Error) => {
-      console.error(
-        `error setting module status with command type ${setLatchCommand.commandType}: ${e.message}`
-      )
-    })
   }
 
   const handleShakeCommand = (): void => {
@@ -152,11 +128,11 @@ export function TestShake(props: TestShakeProps): JSX.Element {
         <TertiaryButton
           marginLeft={SIZE_AUTO}
           marginTop={SPACING.spacing4}
-          onClick={handleLatchCommand}
+          onClick={toggleLatch}
           disabled={isShaking}
           {...targetProps}
         >
-          {isLatchOpen ? t('close_labware_latch') : t('open_labware_latch')}
+          {isLatchClosed ? t('open_labware_latch') : t('close_labware_latch')}
         </TertiaryButton>
         {isShaking ? (
           <Tooltip {...tooltipProps}>
@@ -194,12 +170,12 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             marginLeft={SIZE_AUTO}
             marginTop={SPACING.spacing4}
             onClick={handleShakeCommand}
-            disabled={isLatchOpen}
+            disabled={!isLatchClosed}
             {...targetProps}
           >
             {isShaking ? t('stop_shaking') : t('start_shaking')}
           </TertiaryButton>
-          {isLatchOpen ? (
+          {!isLatchClosed ? (
             <Tooltip {...tooltipProps}>
               {t('cannot_shake', { ns: 'heater_shaker' })}
             </Tooltip>
