@@ -125,12 +125,11 @@ describe('AdvancedSettings', () => {
 
   it('renders the test data of the usb-to-ethernet adapter information with mac', () => {
     mockGetU2EAdapterDevice.mockReturnValue({
-      ...Fixtures.mockWindowsRealtekDevice,
-      windowsDriverVersion: null,
+      ...Fixtures.mockRealtekDevice,
     })
     mockGetU2EWindowsDriverStatus.mockReturnValue(SystemInfo.NOT_APPLICABLE)
     const [{ getByText, queryByText }] = render()
-    getByText('Realtek USB FE Family Controller')
+    getByText('USB 10/100 LAN')
     getByText('Realtek')
     getByText('Unknown')
     expect(
@@ -141,7 +140,7 @@ describe('AdvancedSettings', () => {
     expect(queryByText('go to Realtek.com')).not.toBeInTheDocument()
   })
 
-  it('renders the test data of the usb-to-ethernet adapter information with window', () => {
+  it('renders the test data of the outdated usb-to-ethernet adapter information with windows', () => {
     const [{ getByText }] = render()
     getByText('Realtek USB FE Family Controller')
     getByText('Realtek')
@@ -152,6 +151,20 @@ describe('AdvancedSettings', () => {
     const targetLink = 'https://www.realtek.com/en/'
     const link = getByText('go to Realtek.com')
     expect(link.closest('a')).toHaveAttribute('href', targetLink)
+  })
+
+  it('renders the test data of the updated usb-to-ethernet adapter information with windows', () => {
+    mockGetU2EWindowsDriverStatus.mockReturnValue(SystemInfo.UP_TO_DATE)
+    const [{ getByText, queryByText }] = render()
+    getByText('Realtek USB FE Family Controller')
+    getByText('Realtek')
+    getByText('1.2.3')
+    expect(
+      queryByText(
+        'An update is available for Realtek USB-to-Ethernet adapter driver'
+      )
+    ).not.toBeInTheDocument()
+    expect(queryByText('go to Realtek.com')).not.toBeInTheDocument()
   })
 
   it('renders the display show link to get labware offset data section', () => {
