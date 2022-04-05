@@ -110,3 +110,14 @@ class LabwareLanding:
             "the success toast message after an invalid labware definition is uploaded",
         )
         return self.base.present_wrapper(header, 2)
+
+    def get_dublicate_error_toast_message(self) -> Optional[WebElement]:
+        """Get the dublicate error toast message after an invalid labware definition is uploaded."""
+        header: Element = Element(
+            (
+                By.XPATH,
+                f"//p[text()='Error importing /Users/nehaojha/opentrons/app-testing/files/protocol/json/sample_labware.json. Duplicate labware definition']",
+            ),
+            "the dublicate error toast message after an invalid labware definition is uploaded",
+        )
+        return self.base.present_wrapper(header, 2)

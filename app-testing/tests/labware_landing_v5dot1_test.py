@@ -69,7 +69,6 @@ def test_labware_landing_v5dot1(
         assert labware_landing.get_labware_image().is_displayed()
         assert labware_landing.get_labware_name().is_displayed()
         assert labware_landing.get_api_name().is_displayed()
-        assert labware_landing.get_overflow_menu().is_displayed()
         assert labware_landing.get_import_button().is_displayed()
 
         labware_landing.click_import_button()
@@ -96,3 +95,15 @@ def test_labware_landing_v5dot1(
         drag_and_drop_file(input, test_labwares["invalidlabware"])
         assert labware_landing.get_error_toast_message().is_displayed()
         time.sleep(2)
+
+        ## uploading a duplicate labware and verifying the error toast
+        labware_landing.click_import_button()
+        assert (
+            labware_landing.get_import_custom_labware_definition_header().is_displayed()
+        )
+        assert labware_landing.get_choose_file_button().is_displayed()
+        protocol_file = ProtocolFile(driver)
+        logger.info(f"uploading labware: {test_labwares['validlabware'].resolve()}")
+        input = protocol_file.get_drag_json_protocol()
+        drag_and_drop_file(input, test_labwares["validlabware"])
+        assert labware_landing.get_dublicate_error_toast_message().is_displayed()
