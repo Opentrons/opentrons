@@ -8,6 +8,7 @@ from sqlalchemy.sql.coercions import sqltypes
 from .action_models import RunAction
 
 import sqlalchemy
+from ..data_access.models import run_table, add_tables_to_db
 
 
 @dataclass(frozen=True)
@@ -50,14 +51,14 @@ class RunStore:
         Returns:
             The resource that was added to the store.
         """
-        statement = sqlalchemy.insert(_run_table).values(
+        statement = sqlalchemy.insert(run_table).values(
             _convert_run_to_sql_values(run=run)
         )
         with self._sql_engine.begin() as transaction:
             transaction.execute(statement)
 
         if run.is_current is True:
-            update_statement = sqlalchemy.update(_run_table).where(_run_table.c.id != run.id, _run_table.c.active_run == True).values(active_run=False)
+            update_statement = sqlalchemy.update(run_table).where(run_table.c.id != run.id, run_table.c.active_run == True).values(active_run=False)
             transaction.execute(update_statement)
 
         return run
@@ -71,7 +72,7 @@ class RunStore:
         Returns:
             The retrieved run entry from the db.
         """
-        statement = sqlalchemy.select(_run_table).where(
+        statement = sqlalchemy.select(run_table).where(
             id == run_id
         )
         with self._sql_engine.begin() as transaction:
@@ -87,7 +88,7 @@ class RunStore:
         Returns:
             All stored run entries.
         """
-        statement = sqlalchemy.select(_run_table)
+        statement = sqlalchemy.select(run_table)
         with self._sql_engine.begin() as transaction:
             all_rows = transaction.execute(statement).all()
         return [_convert_sql_row_to_run(sql_row=row) for row in all_rows]
@@ -104,10 +105,10 @@ class RunStore:
         Raises:
             RunNotFoundError: The specified run ID was not found.
         """
-        select_statement = sqlalchemy.select(_run_table).where(
+        select_statement = sqlalchemy.select(run_table).where(
             id == run_id
         )
-        delete_statement = sqlalchemy.delete(_run_table).where(
+        delete_statement = sqlalchemy.delete(run_table).where(
             id == run_id
         )
         with self._sql_engine.begin() as transaction:
@@ -120,44 +121,6 @@ class RunStore:
             transaction.execute(delete_statement)
 
         return _convert_sql_row_to_run(row_to_delete)
-
-
-def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
-    """Create the necessary database tables to back a `ProtocolStore`.
-
-    Params:
-        sql_engine: An engine for a blank SQL database, to put the tables in.
-    """
-    _metadata.create_all(sql_engine)
-
-
-_metadata = sqlalchemy.MetaData()
-_run_table = sqlalchemy.Table(
-    "protocol_run",
-    _metadata,
-    sqlalchemy.Column(
-        "id",
-        sqlalchemy.String,
-        primary_key=True,
-    ),
-    sqlalchemy.Column(
-        "created_at",
-        sqlalchemy.DateTime,
-        nullable=False,
-    ),
-    sqlalchemy.Column(
-        "protocol_id",
-        sqlalchemy.String,
-        forigen_key="protocol.id",
-        nullable=True
-    ),
-    sqlalchemy.Column(
-        "active_run",
-        sqlalchemy.Boolean,
-        nullable=False,
-        default=False
-    )
-)
 
 
 def _convert_sql_row_to_run(sql_row: sqlalchemy.engine.Row) -> RunResource:
