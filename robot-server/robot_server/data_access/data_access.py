@@ -1,11 +1,12 @@
 import sqlalchemy
-from typing import Any
+from sqlalchemy.engine import Engine as SQLEngine
+from typing import Any, Dict
 from fastapi import Depends
 from ..app_state import AppState, AppStateValue, get_app_state
 from .models import metadata
 from robot_server.db import create_in_memory_db_no_cleanup
 
-_sql_engine = AppStateValue[sqlalchemy]("sql_engine")
+_sql_engine = AppStateValue[SQLEngine]("sql_engine")
 
 
 def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
@@ -38,7 +39,18 @@ def get_sql_engine(app_state: AppState = Depends(get_app_state)) -> SQLEngine:
     # https://github.com/tiangolo/fastapi/issues/617
 
 
-def get_all(self, query_table: sqlalchemy.sql.Select) -> Any:
+#TODO tz: change retured type to generics or Row type
+def get(self, statement: sqlalchemy.sql.Select) -> Any: #sqlalchemy.engine.Row:
+    with self._sql_engine.begin() as transaction:
+        try:
+            row_run = transaction.execute(statement).one()
+        except sqlalchemy.exc.NoResultFound as e:
+            raise sqlalchemy.exc.NoResultFound
+    return row_run
+
+
+#TODO tz: change retured type to generics or Row type
+def get_all(self, query_table: sqlalchemy.Table) -> Any: #Dict[str, object]:
     """Get all known run resources.
 
     Returns:

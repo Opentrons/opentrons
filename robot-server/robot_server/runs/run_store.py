@@ -3,13 +3,14 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional
 
+from sqlalchemy.sql import Select
 from sqlalchemy.sql.coercions import sqltypes
 
 from .action_models import RunAction
 
 import sqlalchemy
-from ..data_access.models import run_table, add_tables_to_db
-from ..data_access.data_access import get_all
+from ..data_access.models import run_table
+from ..data_access.data_access import get_all, get as get_row
 
 
 @dataclass(frozen=True)
@@ -52,7 +53,8 @@ class RunStore:
         Returns:
             The resource that was added to the store.
         """
-        update_statement = sqlalchemy.update(run_table).where(run_table.c.id == run.run_id).values(active_run=run.is_current)
+        update_statement = sqlalchemy.update(run_table).where(run_table.c.id == run.run_id).values(
+            active_run=run.is_current)
         with self._sql_engine.begin() as transaction:
             try:
                 transaction.execute(update_statement)
@@ -64,7 +66,9 @@ class RunStore:
                     insert_transaction.execute(statement)
 
         if run.is_current is True:
-            update_statement = sqlalchemy.update(run_table).where(run_table.c.id != run.run_id, run_table.c.active_run == True).values(active_run=False)
+            update_statement = sqlalchemy.update(run_table).where(run_table.c.id != run.run_id,
+                                                                  run_table.c.active_run == True).values(
+                active_run=False)
             transaction.execute(update_statement)
 
         return run
@@ -81,12 +85,11 @@ class RunStore:
         statement = sqlalchemy.select(run_table).where(
             run_table.c.id == run_id
         )
-        with self._sql_engine.begin() as transaction:
-            try:
-                row_run = transaction.execute(statement).one()
-            except sqlalchemy.exc.NoResultFound as e:
-                raise RunNotFoundError(run_id) from e
-        return _convert_run_to_sql_values(row_run)
+        try:
+            row_run = get_row(statement)
+        except sqlalchemy.exc.NoResultFound as e:
+            raise RunNotFoundError(run_id) from e
+        return _convert_sql_row_to_run(row_run)
 
     def get_all(self) -> List[RunResource]:
         """Get all known run resources.
