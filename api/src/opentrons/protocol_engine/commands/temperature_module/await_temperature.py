@@ -72,7 +72,7 @@ class AwaitTemperature(
     """A command to set a Temperature Module's target temperature."""
 
     commandType: AwaitTemperatureCommandType = (
-        "temperatureModule/AwaitTemperature"
+        "temperatureModule/awaitTemperature"
     )
     params: AwaitTemperatureParams
     result: Optional[AwaitTemperatureResult]

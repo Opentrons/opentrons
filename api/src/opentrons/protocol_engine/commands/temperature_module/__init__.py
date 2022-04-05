@@ -16,6 +16,14 @@ from .await_temperature import (
     AwaitTemperatureCommandType
 )
 
+from .deactivate import (
+    DeactivateTemperature,
+    DeactivateTemperatureCreate,
+    DeactivateTemperatureParams,
+    DeactivateTemperatureResult,
+    DeactivateTemperatureCommandType
+)
+
 __all__ = [
     # temperatureModule/setTargetTemperature
     "SetTargetTemperature",
@@ -29,4 +37,10 @@ __all__ = [
     "AwaitTemperatureParams",
     "AwaitTemperatureResult",
     "AwaitTemperatureCommandType",
+    # temperatureModule/deactivateTemperature
+    "DeactivateTemperature",
+    "DeactivateTemperatureCreate",
+    "DeactivateTemperatureParams",
+    "DeactivateTemperatureResult",
+    "DeactivateTemperatureCommandType",
 ]

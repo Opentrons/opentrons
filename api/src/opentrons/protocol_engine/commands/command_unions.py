@@ -141,6 +141,8 @@ Command = Union[
     magnetic_module.Disengage,
     magnetic_module.Engage,
     temperature_module.SetTargetTemperature,
+    temperature_module.AwaitTemperature,
+    temperature_module.DeactivateTemperature,
     SetRailLights,
 ]
 
@@ -168,6 +170,8 @@ CommandParams = Union[
     magnetic_module.DisengageParams,
     magnetic_module.EngageParams,
     temperature_module.SetTargetTemperatureParams,
+    temperature_module.AwaitTemperatureParams,
+    temperature_module.DeactivateTemperatureParams,
     SetRailLightsParams,
 ]
 
@@ -195,6 +199,8 @@ CommandType = Union[
     magnetic_module.DisengageCommandType,
     magnetic_module.EngageCommandType,
     temperature_module.SetTargetTemperatureCommandType,
+    temperature_module.AwaitTemperatureCommandType,
+    temperature_module.DeactivateTemperatureCommandType,
     SetRailLightsCommandType,
 ]
 
@@ -221,6 +227,8 @@ CommandCreate = Union[
     magnetic_module.DisengageCreate,
     magnetic_module.EngageCreate,
     temperature_module.SetTargetTemperatureCreate,
+    temperature_module.AwaitTemperatureCreate,
+    temperature_module.DeactivateTemperatureCreate,
     SetRailLightsCreate,
 ]
 
@@ -248,5 +256,7 @@ CommandResult = Union[
     magnetic_module.DisengageResult,
     magnetic_module.EngageResult,
     temperature_module.SetTargetTemperatureResult,
+    temperature_module.AwaitTemperatureResult,
+    temperature_module.DeactivateTemperatureResult,
     SetRailLightsResult,
 ]

@@ -222,10 +222,10 @@ def test_handle_tempdeck_temperature_commands(
         ),
         result=temp_commands.SetTargetTemperatureResult(),
     )
-    # deactivate_cmd = hs_commands.DeactivateHeater.construct(  # type: ignore[call-arg]
-    #     params=hs_commands.DeactivateHeaterParams(moduleId="module-id"),
-    #     result=hs_commands.DeactivateHeaterResult(),
-    # )
+    deactivate_cmd = temp_commands.DeactivateTemperature.construct(  # type: ignore[call-arg]
+        params=temp_commands.DeactivateTemperatureParams(moduleId="module-id"),
+        result=temp_commands.DeactivateTemperatureResult(),
+    )
     subject = ModuleStore()
 
     subject.handle_action(actions.UpdateCommandAction(command=load_module_cmd))
@@ -235,9 +235,9 @@ def test_handle_tempdeck_temperature_commands(
             module_id=TemperatureModuleId("module-id"), plate_target_temperature=42
         )
     }
-    # subject.handle_action(actions.UpdateCommandAction(command=deactivate_cmd))
-    # assert subject.state.substate_by_module_id == {
-    #     "module-id": HeaterShakerModuleSubState(
-    #         module_id=HeaterShakerModuleId("module-id"), plate_target_temperature=None
-    #     )
-    # }
+    subject.handle_action(actions.UpdateCommandAction(command=deactivate_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": TemperatureModuleSubState(
+            module_id=TemperatureModuleId("module-id"), plate_target_temperature=None
+        )
+    }
