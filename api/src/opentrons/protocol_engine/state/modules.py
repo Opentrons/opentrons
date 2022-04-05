@@ -207,11 +207,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         if isinstance(command.result, temperature_module.SetTargetTemperatureResult):
             self._state.substate_by_module_id[module_id] = TemperatureModuleSubState(
                 module_id=TemperatureModuleId(module_id),
-                # Not sure if a float conversion here is a good idea.
-                # But it won't be right to let target_temperature be a float
-                # since it might lead to problems with await command.
-                # Should we add the converted target to SetTargetTemperatureResult?
-                plate_target_temperature=int(round(command.params.temperature, 0)),
+                plate_target_temperature=command.result.targetTemperature,
             )
         elif isinstance(command.result, temperature_module.DeactivateTemperatureResult):
             self._state.substate_by_module_id[module_id] = TemperatureModuleSubState(

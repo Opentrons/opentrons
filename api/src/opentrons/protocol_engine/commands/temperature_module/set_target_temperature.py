@@ -24,6 +24,12 @@ class SetTargetTemperatureParams(BaseModel):
 class SetTargetTemperatureResult(BaseModel):
     """Result data from setting a Temperature Module's target temperature."""
 
+    targetTemperature: float = Field(
+        ...,
+        description="The target temperature that was set after validation "
+        "and type conversion (if any).",
+    )
+
 
 class SetTargetTemperatureImpl(
     AbstractCommandImpl[SetTargetTemperatureParams, SetTargetTemperatureResult]
@@ -58,7 +64,7 @@ class SetTargetTemperatureImpl(
 
         if temp_hardware_module is not None:
             await temp_hardware_module.start_set_temperature(celsius=validated_temp)
-        return SetTargetTemperatureResult()
+        return SetTargetTemperatureResult(targetTemperature=validated_temp)
 
 
 class SetTargetTemperature(

@@ -218,9 +218,9 @@ def test_handle_tempdeck_temperature_commands(
     )
     set_temp_cmd = temp_commands.SetTargetTemperature.construct(  # type: ignore[call-arg]  # noqa: E501
         params=temp_commands.SetTargetTemperatureParams(
-            moduleId="module-id", temperature=42
+            moduleId="module-id", temperature=42.4
         ),
-        result=temp_commands.SetTargetTemperatureResult(),
+        result=temp_commands.SetTargetTemperatureResult(targetTemperature=42),
     )
     deactivate_cmd = temp_commands.DeactivateTemperature.construct(  # type: ignore[call-arg]  # noqa: E501
         params=temp_commands.DeactivateTemperatureParams(moduleId="module-id"),

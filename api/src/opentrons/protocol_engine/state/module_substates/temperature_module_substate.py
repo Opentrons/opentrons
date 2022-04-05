@@ -24,11 +24,12 @@ class TemperatureModuleSubState:
     """
 
     module_id: TemperatureModuleId
-    plate_target_temperature: Optional[int]
+    plate_target_temperature: Optional[float]
 
     @staticmethod
     def validate_target_temperature(celsius: float) -> int:
-        """Verify target temperature is within range and convert to int."""
+        """Verify target temperature is within range and of correct type."""
+        # Both Gen1 & 2 Temperature modules use 0 decimal precision.
         celsius_int = int(round(celsius, 0))
         if (
             TEMP_MODULE_TEMPERATURE_RANGE.min
@@ -42,7 +43,7 @@ class TemperatureModuleSubState:
                 f" Valid range is {TEMP_MODULE_TEMPERATURE_RANGE}."
             )
 
-    def get_plate_target_temperature(self) -> int:
+    def get_plate_target_temperature(self) -> float:
         """Get the module's target plate temperature."""
         target = self.plate_target_temperature
 
