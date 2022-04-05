@@ -5,15 +5,12 @@ import { Link } from 'react-router-dom'
 import {
   Box,
   Flex,
-  Icon,
   ALIGN_CENTER,
   ALIGN_START,
-  C_BLUE,
   C_MED_LIGHT_GRAY,
   C_WHITE,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  SIZE_2,
   SPACING_2,
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
@@ -93,7 +90,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
         <OverflowBtn
           id={`RobotCard_${name}_overflowMenu`}
           alignSelf={ALIGN_START}
-          onClick={e => {
+          onClick={(e: MouseEvent) => {
             e.preventDefault()
             console.log('TODO set show overflow menu')
           }}
