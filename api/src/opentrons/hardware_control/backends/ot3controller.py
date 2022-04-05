@@ -29,6 +29,7 @@ from .ot3utils import (
     get_current_settings,
     create_home_group,
     node_to_axis,
+    sub_system_to_node_id,
 )
 
 try:
@@ -68,7 +69,7 @@ from opentrons.hardware_control.types import (
     AionotifyEvent,
     OT3Mount,
     OT3AxisMap,
-    CurrentConfig,
+    CurrentConfig, OT3SubSystem,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -474,11 +475,11 @@ class OT3Controller:
         """Get the firmware version."""
         return None
 
-    async def update_firmware(self, filename: str, target: NodeId) -> None:
+    async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
         """Update the firmware."""
         await firmware_update.run_update(
             messenger=self._messenger,
-            node_id=target,
+            node_id=sub_system_to_node_id(target),
             hex_processor=firmware_update.HexRecordProcessor.from_file(Path(filename)),
             # TODO (amit, 2022-04-05): Fill in retry_count and timeout_seconds from
             #  config values.
@@ -579,9 +580,8 @@ class OT3Controller:
         current_set: Set[NodeId], probed_set: Set[NodeId]
     ) -> Set[NodeId]:
         probed_set = OT3Controller._replace_head_node(probed_set)
-        core_replaced: Set[NodeId] = set(
-            [NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l, NodeId.head_r]
-        )
+        core_replaced: Set[NodeId] = {NodeId.gantry_x, NodeId.gantry_y,
+                                      NodeId.head_l, NodeId.head_r}
         current_set -= core_replaced
         current_set |= probed_set
         return current_set
@@ -592,7 +592,7 @@ class OT3Controller:
         Unlike probe_network, this always waits for the nodes that must be present for
         a working machine, and no more.
         """
-        core_nodes = set([NodeId.gantry_x, NodeId.gantry_y, NodeId.head])
+        core_nodes = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
         core_present = await probe(self._messenger, core_nodes, timeout)
         self._present_nodes = self._filter_probed_core_nodes(
             self._present_nodes, core_present
@@ -609,7 +609,7 @@ class OT3Controller:
         # see if we should expect instruments to be present, which should be removed
         # when that method actually does canbus stuff
         instrs = await self.get_attached_instruments({})
-        expected = set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head))
+        expected = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
         if instrs.get(OT3Mount.LEFT, cast("AttachedInstrument", {})).get(
             "config", None
         ):

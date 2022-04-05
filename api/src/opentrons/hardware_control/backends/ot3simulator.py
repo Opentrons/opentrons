@@ -39,7 +39,7 @@ from opentrons.hardware_control.types import (
     OT3Axis,
     OT3Mount,
     OT3AxisMap,
-    CurrentConfig,
+    CurrentConfig, OT3SubSystem,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
@@ -331,7 +331,7 @@ class OT3Simulator:
         """Get the firmware version."""
         return None
 
-    async def update_firmware(self, filename: str, target: NodeId) -> None:
+    async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
         """Update the firmware."""
         pass
 

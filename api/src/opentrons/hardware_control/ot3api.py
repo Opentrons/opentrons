@@ -54,7 +54,7 @@ from .types import (
     PauseType,
     OT3Axis,
     OT3Mount,
-    OT3AxisMap,
+    OT3AxisMap, OT3SubSystem,
 )
 from . import modules
 from .robot_calibration import (
@@ -355,7 +355,7 @@ class OT3API(
     async def update_firmware(
         self,
         firmware_file: str,
-        target: NodeId,
+        target: OT3SubSystem,
     ) -> None:
         """Update the firmware on the hardware."""
         await self._backend.update_firmware(firmware_file, target)

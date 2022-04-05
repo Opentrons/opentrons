@@ -5,7 +5,7 @@ from opentrons.hardware_control.types import (
     OT3Axis,
     OT3AxisKind,
     OT3AxisMap,
-    CurrentConfig,
+    CurrentConfig, OT3SubSystem,
 )
 import numpy as np
 
@@ -104,6 +104,19 @@ def axis_is_node(axis: OT3Axis) -> bool:
         return True
     except KeyError:
         return False
+
+
+def sub_system_to_node_id(sub_sys: OT3SubSystem) -> "NodeId":
+    """Convert a sub system to a NodeId."""
+    nam = {
+        OT3SubSystem.gantry_x: NodeId.gantry_x,
+        OT3SubSystem.gantry_y: NodeId.gantry_y,
+        OT3SubSystem.head: NodeId.head,
+        OT3SubSystem.pipette_left: NodeId.pipette_left,
+        OT3SubSystem.pipette_right: NodeId.pipette_right,
+        OT3SubSystem.gripper: NodeId.gripper,
+    }
+    return nam[sub_sys]
 
 
 def get_current_settings(
