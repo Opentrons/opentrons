@@ -1,6 +1,6 @@
 """Heater-Shaker Module sub-state."""
 from dataclasses import dataclass
-from typing import NewType, NamedTuple, Optional
+from typing import NewType, Optional
 
 from opentrons.protocol_engine.types import TemperatureRange, SpeedRange
 from opentrons.protocol_engine.errors import (

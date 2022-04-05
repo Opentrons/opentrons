@@ -10,7 +10,7 @@ from opentrons.hardware_control.modules import (
     AbstractModule,
     MagDeck,
     HeaterShaker,
-    TempDeck
+    TempDeck,
 )
 from opentrons.protocol_engine.state.module_substates import (
     MagneticModuleId,

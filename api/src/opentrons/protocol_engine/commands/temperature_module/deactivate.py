@@ -11,9 +11,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-DeactivateTemperatureCommandType = Literal[
-    "temperatureModule/deactivateTemperature"
-]
+DeactivateTemperatureCommandType = Literal["temperatureModule/deactivateTemperature"]
 
 
 class DeactivateTemperatureParams(BaseModel):
@@ -27,9 +25,7 @@ class DeactivateTemperatureResult(BaseModel):
 
 
 class DeactivateTemperatureImpl(
-    AbstractCommandImpl[
-        DeactivateTemperatureParams, DeactivateTemperatureResult
-    ]
+    AbstractCommandImpl[DeactivateTemperatureParams, DeactivateTemperatureResult]
 ):
     """Execution implementation of a Temperature Module's deactivate command."""
 
@@ -43,8 +39,7 @@ class DeactivateTemperatureImpl(
         self._equipment = equipment
 
     async def execute(
-        self,
-        params: DeactivateTemperatureParams
+        self, params: DeactivateTemperatureParams
     ) -> DeactivateTemperatureResult:
         """Deactivate a Temperature Module."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
@@ -76,9 +71,7 @@ class DeactivateTemperature(
     _ImplementationCls: Type[DeactivateTemperatureImpl] = DeactivateTemperatureImpl
 
 
-class DeactivateTemperatureCreate(
-    BaseCommandCreate[DeactivateTemperatureParams]
-):
+class DeactivateTemperatureCreate(BaseCommandCreate[DeactivateTemperatureParams]):
     """A request to deactivate a Temperature Module."""
 
     commandType: DeactivateTemperatureCommandType

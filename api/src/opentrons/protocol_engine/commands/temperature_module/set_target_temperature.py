@@ -11,9 +11,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-SetTargetTemperatureCommandType = Literal[
-    "temperatureModule/setTargetTemperature"
-]
+SetTargetTemperatureCommandType = Literal["temperatureModule/setTargetTemperature"]
 
 
 class SetTargetTemperatureParams(BaseModel):
@@ -28,9 +26,7 @@ class SetTargetTemperatureResult(BaseModel):
 
 
 class SetTargetTemperatureImpl(
-    AbstractCommandImpl[
-        SetTargetTemperatureParams, SetTargetTemperatureResult
-    ]
+    AbstractCommandImpl[SetTargetTemperatureParams, SetTargetTemperatureResult]
 ):
     """Execution implementation of a Temperature Module's set temperature command."""
 
@@ -44,8 +40,7 @@ class SetTargetTemperatureImpl(
         self._equipment = equipment
 
     async def execute(
-        self,
-        params: SetTargetTemperatureParams
+        self, params: SetTargetTemperatureParams
     ) -> SetTargetTemperatureResult:
         """Set a Temperature Module's target temperature."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
@@ -80,9 +75,7 @@ class SetTargetTemperature(
     _ImplementationCls: Type[SetTargetTemperatureImpl] = SetTargetTemperatureImpl
 
 
-class SetTargetTemperatureCreate(
-    BaseCommandCreate[SetTargetTemperatureParams]
-):
+class SetTargetTemperatureCreate(BaseCommandCreate[SetTargetTemperatureParams]):
     """A request to create a Temperature Module's set temperature command."""
 
     commandType: SetTargetTemperatureCommandType

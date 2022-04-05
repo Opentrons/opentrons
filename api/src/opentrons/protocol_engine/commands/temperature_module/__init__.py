@@ -5,7 +5,7 @@ from .set_target_temperature import (
     SetTargetTemperatureCreate,
     SetTargetTemperatureParams,
     SetTargetTemperatureResult,
-    SetTargetTemperatureCommandType
+    SetTargetTemperatureCommandType,
 )
 
 from .await_temperature import (
@@ -13,7 +13,7 @@ from .await_temperature import (
     AwaitTemperatureCreate,
     AwaitTemperatureParams,
     AwaitTemperatureResult,
-    AwaitTemperatureCommandType
+    AwaitTemperatureCommandType,
 )
 
 from .deactivate import (
@@ -21,7 +21,7 @@ from .deactivate import (
     DeactivateTemperatureCreate,
     DeactivateTemperatureParams,
     DeactivateTemperatureResult,
-    DeactivateTemperatureCommandType
+    DeactivateTemperatureCommandType,
 )
 
 __all__ = [

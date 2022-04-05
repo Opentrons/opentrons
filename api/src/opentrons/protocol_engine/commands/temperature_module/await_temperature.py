@@ -11,9 +11,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-AwaitTemperatureCommandType = Literal[
-    "temperatureModule/awaitTemperature"
-]
+AwaitTemperatureCommandType = Literal["temperatureModule/awaitTemperature"]
 
 
 class AwaitTemperatureParams(BaseModel):
@@ -27,9 +25,7 @@ class AwaitTemperatureResult(BaseModel):
 
 
 class AwaitTemperatureImpl(
-    AbstractCommandImpl[
-        AwaitTemperatureParams, AwaitTemperatureResult
-    ]
+    AbstractCommandImpl[AwaitTemperatureParams, AwaitTemperatureResult]
 ):
     """Execution implementation of a Temperature Module's await temperature command."""
 
@@ -42,10 +38,7 @@ class AwaitTemperatureImpl(
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(
-        self,
-        params: AwaitTemperatureParams
-    ) -> AwaitTemperatureResult:
+    async def execute(self, params: AwaitTemperatureParams) -> AwaitTemperatureResult:
         """Wait for a Temperature Module's target temperature."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         module_substate = self._state_view.modules.get_temperature_module_substate(
@@ -62,27 +55,22 @@ class AwaitTemperatureImpl(
 
         if temp_hardware_module is not None:
             await temp_hardware_module.await_temperature(
-                awaiting_temperature=target_temp)
+                awaiting_temperature=target_temp
+            )
         return AwaitTemperatureResult()
 
 
-class AwaitTemperature(
-    BaseCommand[AwaitTemperatureParams, AwaitTemperatureResult]
-):
+class AwaitTemperature(BaseCommand[AwaitTemperatureParams, AwaitTemperatureResult]):
     """A command to set a Temperature Module's target temperature."""
 
-    commandType: AwaitTemperatureCommandType = (
-        "temperatureModule/awaitTemperature"
-    )
+    commandType: AwaitTemperatureCommandType = "temperatureModule/awaitTemperature"
     params: AwaitTemperatureParams
     result: Optional[AwaitTemperatureResult]
 
     _ImplementationCls: Type[AwaitTemperatureImpl] = AwaitTemperatureImpl
 
 
-class AwaitTemperatureCreate(
-    BaseCommandCreate[AwaitTemperatureParams]
-):
+class AwaitTemperatureCreate(BaseCommandCreate[AwaitTemperatureParams]):
     """A request to create a Temperature Module's set temperature command."""
 
     commandType: AwaitTemperatureCommandType

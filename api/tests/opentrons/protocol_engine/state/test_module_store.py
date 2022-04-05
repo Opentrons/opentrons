@@ -6,7 +6,7 @@ from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import commands, actions
 from opentrons.protocol_engine.commands import (
     heater_shaker as hs_commands,
-    temperature_module as temp_commands
+    temperature_module as temp_commands,
 )
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
@@ -66,9 +66,9 @@ def test_initial_state() -> None:
             ModuleModel.TEMPERATURE_MODULE_V1,
             TemperatureModuleSubState(
                 module_id=TemperatureModuleId("module-id"),
-                plate_target_temperature=None
+                plate_target_temperature=None,
             ),
-        )
+        ),
     ],
 )
 def test_load_module(
@@ -128,9 +128,9 @@ def test_load_module(
             lazy_fixture("tempdeck_v2_def"),
             TemperatureModuleSubState(
                 module_id=TemperatureModuleId("module-id"),
-                plate_target_temperature=None
-            )
-        )
+                plate_target_temperature=None,
+            ),
+        ),
     ],
 )
 def test_add_module_action(
@@ -201,7 +201,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
 
 
 def test_handle_tempdeck_temperature_commands(
-        tempdeck_v2_def: ModuleDefinition
+    tempdeck_v2_def: ModuleDefinition,
 ) -> None:
     """It should update Tempdeck's `plate_target_temperature` correctly."""
     load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
@@ -222,7 +222,7 @@ def test_handle_tempdeck_temperature_commands(
         ),
         result=temp_commands.SetTargetTemperatureResult(),
     )
-    deactivate_cmd = temp_commands.DeactivateTemperature.construct(  # type: ignore[call-arg]
+    deactivate_cmd = temp_commands.DeactivateTemperature.construct(  # type: ignore[call-arg]  # noqa: E501
         params=temp_commands.DeactivateTemperatureParams(moduleId="module-id"),
         result=temp_commands.DeactivateTemperatureResult(),
     )

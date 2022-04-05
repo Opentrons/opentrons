@@ -317,11 +317,11 @@ def test_get_temperature_module_substate(
         substate_by_module_id={
             "temp-module-gen1-id": TemperatureModuleSubState(
                 module_id=TemperatureModuleId("temp-module-gen1-id"),
-                plate_target_temperature=None
+                plate_target_temperature=None,
             ),
             "temp-module-gen2-id": TemperatureModuleSubState(
                 module_id=TemperatureModuleId("temp-module-gen2-id"),
-                plate_target_temperature=123
+                plate_target_temperature=123,
             ),
             "heatshake-module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("heatshake-module-id"),
@@ -877,7 +877,7 @@ def test_validate_temp_module_target_temperature_raises(
         substate_by_module_id={
             "module-id": TemperatureModuleSubState(
                 module_id=TemperatureModuleId("module-id"),
-                plate_target_temperature=None
+                plate_target_temperature=None,
             )
         },
     )
@@ -886,12 +886,11 @@ def test_validate_temp_module_target_temperature_raises(
         subject.validate_target_temperature(target_temp)
 
 
-@pytest.mark.parametrize(["target_temp", "validated_temp"],
-                         [(-9.431, -9), (0, 0), (99.1, 99)])
+@pytest.mark.parametrize(
+    ["target_temp", "validated_temp"], [(-9.431, -9), (0, 0), (99.1, 99)]
+)
 def test_validate_temp_module_target_temperature(
-    tempdeck_v2_def: ModuleDefinition,
-    target_temp: float,
-    validated_temp: int
+    tempdeck_v2_def: ModuleDefinition, target_temp: float, validated_temp: int
 ) -> None:
     """It should verify if a target temperature is valid for the specified module."""
     module_view = make_module_view(
@@ -905,7 +904,7 @@ def test_validate_temp_module_target_temperature(
         substate_by_module_id={
             "module-id": TemperatureModuleSubState(
                 module_id=TemperatureModuleId("module-id"),
-                plate_target_temperature=None
+                plate_target_temperature=None,
             )
         },
     )
@@ -970,7 +969,7 @@ def test_validate_heater_shaker_target_speed_raises_error(
 
 
 def test_tempdeck_get_plate_target_temperature(
-        tempdeck_v2_def: ModuleDefinition
+    tempdeck_v2_def: ModuleDefinition,
 ) -> None:
     """It should return whether target temperature is set."""
     module_view = make_module_view(
