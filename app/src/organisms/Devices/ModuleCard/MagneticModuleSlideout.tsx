@@ -28,8 +28,8 @@ import { InputField } from '../../../atoms/InputField'
 import { PrimaryButton } from '../../../atoms/Buttons'
 
 import type { TFunctionResult } from 'i18next'
-import type { AttachedModule } from '../../../redux/modules/types'
-import type { ModuleModel } from '@opentrons/shared-data'
+import type { MagneticModule } from '../../../redux/modules/types'
+import type { MagneticModuleModel } from '@opentrons/shared-data'
 import type { MagneticModuleEngageMagnetCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface ModelContents {
@@ -40,7 +40,7 @@ interface ModelContents {
   disengagedHeight: number
 }
 
-const getInfoByModel = (model: ModuleModel): ModelContents => {
+const getInfoByModel = (model: MagneticModuleModel): ModelContents => {
   if (model === MAGNETIC_MODULE_V1) {
     return {
       version: 'GEN 1',
@@ -61,7 +61,7 @@ const getInfoByModel = (model: ModuleModel): ModelContents => {
 }
 
 interface MagneticModuleSlideoutProps {
-  module: AttachedModule
+  module: MagneticModule
   onCloseClick: () => unknown
   isExpanded: boolean
 }
