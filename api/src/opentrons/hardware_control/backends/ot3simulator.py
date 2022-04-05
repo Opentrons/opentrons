@@ -332,10 +332,10 @@ class OT3Simulator:
         return None
 
     async def update_firmware(
-        self, filename: str, loop: asyncio.AbstractEventLoop, modeset: bool
-    ) -> str:
+        self, filename: str, target: NodeId
+    ) -> None:
         """Update the firmware."""
-        return "Done"
+        pass
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""

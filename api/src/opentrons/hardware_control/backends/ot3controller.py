@@ -5,6 +5,7 @@ import asyncio
 from contextlib import asynccontextmanager
 import logging
 from copy import deepcopy
+from pathlib import Path
 from typing import (
     Dict,
     List,
@@ -58,7 +59,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SetupRequest,
     EnableMotorRequest,
 )
-from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
+from opentrons_hardware import firmware_update
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
@@ -159,11 +160,11 @@ class OT3Controller:
         """Set up the motors."""
         await self._messenger.send(
             node_id=NodeId.broadcast,
-            message=SetupRequest(payload=EmptyPayload()),
+            message=SetupRequest(),
         )
         await self._messenger.send(
             node_id=NodeId.broadcast,
-            message=EnableMotorRequest(payload=EmptyPayload()),
+            message=EnableMotorRequest(),
         )
 
     @property
@@ -204,10 +205,9 @@ class OT3Controller:
         """Move to a position.
 
         Args:
-            target_position: Map of axis to position.
-            home_flagged_axes: Whether to home afterwords.
-            speed: Optional speed
-            axis_max_speeds: Optional map of axis to speed.
+            origin: The starting point of the move
+            moves: List of moves.
+            stop_condition: The stop condition.
 
         Returns:
             None
@@ -475,10 +475,17 @@ class OT3Controller:
         return None
 
     async def update_firmware(
-        self, filename: str, loop: asyncio.AbstractEventLoop, modeset: bool
-    ) -> str:
+        self, filename: str, target: NodeId
+    ) -> None:
         """Update the firmware."""
-        return "Done"
+        await firmware_update.run_update(
+            messenger=self._messenger,
+            node_id=target,
+            hex_processor=firmware_update.HexRecordProcessor.from_file(Path(filename)),
+            retry_count=3,
+            timeout_seconds=20,
+            erase=True
+        )
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""

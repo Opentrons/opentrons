@@ -27,6 +27,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
     MoveTarget,
     ZeroLengthMoveError,
 )
+from opentrons_hardware.firmware_bindings.constants import NodeId
 
 
 from .util import use_or_initialize_loop, check_motion_bounds
@@ -354,16 +355,11 @@ class OT3API(
     async def update_firmware(
         self,
         firmware_file: str,
-        loop: Optional[asyncio.AbstractEventLoop] = None,
-        explicit_modeset: bool = True,
-    ) -> str:
+        target: NodeId,
+    ) -> None:
         """Update the firmware on the hardware."""
-        if None is loop:
-            checked_loop = self._loop
-        else:
-            checked_loop = loop
-        return await self._backend.update_firmware(
-            firmware_file, checked_loop, explicit_modeset
+        await self._backend.update_firmware(
+            firmware_file, target
         )
 
     @staticmethod
