@@ -57,7 +57,12 @@ class RobotServerSettings(BaseSettings):
         typing_extensions.Literal["automatically_make_temporary"],
         Path,
     ] = Field(
-        ...,
+        # TODO(mm, 2022-04-05): This should not have a default value.
+        # It only does now because our code has some deep calls to get_settings(),
+        # and it's difficult to override this settings object for our unit tests.
+        # Making this non-defaultable breaks tests that hit code with deep calls to
+        # get_settings().
+        "automatically_make_temporary",
         description=(
             "A directory for the server to store things persistently across boots."
             " If this directory doesn't already exist, the server will create it."
