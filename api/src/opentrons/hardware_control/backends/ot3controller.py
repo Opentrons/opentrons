@@ -480,6 +480,8 @@ class OT3Controller:
             messenger=self._messenger,
             node_id=target,
             hex_processor=firmware_update.HexRecordProcessor.from_file(Path(filename)),
+            # TODO (amit, 2022-04-05): Fill in retry_count and timeout_seconds from
+            #  config values.
             retry_count=3,
             timeout_seconds=20,
             erase=True,

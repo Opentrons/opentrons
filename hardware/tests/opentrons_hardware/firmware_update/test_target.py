@@ -44,5 +44,6 @@ def test_make_target(system_node_id: NodeId) -> None:
             == NodeId.gripper_bootloader
         )
     else:
+        # Every other node id should raise an exception.
         with pytest.raises(AssertionError):
             Target(system_node=system_node_id)
