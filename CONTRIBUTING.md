@@ -135,54 +135,18 @@ If you'd like to contribute (or maybe just run the very latest and greatest vers
 
 Individual projects may have additional instructions, so be sure to check out the various project `README`s, too.
 
-### Environment and Repository
+### Sytem and Repository Setup
 
-Your computer will need the following tools installed to be able to develop with the Opentrons platform:
+You will need the following tools installed to develop on the Opentrons platform.
 
-- macOS 10.11+, Linux, or Windows 10
-  - On Windows, please configure Git’s `core.autocrlf` setting (see the [Git config docs](https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration)) to `input` so that shell scripts required for the robot’s boot process in `api/opentrons/resources` do not have carriage returns inserted.
-- Python 3.7 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended for macOS / Linux. If `pyenv` is not available for your system or you do not want to use it, you can set the environment variable `OT_PYTHON` to the full path to the Python 3.7 executable)
-- If you wish to use `pyenv` but are experiencing issues with macOS Mojave please see the [common build problems section](https://github.com/pyenv/pyenv/wiki/Common-build-problems) of `pyenv` documentation.
+- make
+- git
+- curl
+- ssh
+- Python v3.7
+- Node.js v14
 
-  ```shell
-  pyenv install 3.7.6
-  ```
-
-  **MacOS Big Sur Note:** due to this [known issue](https://github.com/pyenv/pyenv/issues/1737) we recommend using:
-
-  ```shell
-  pyenv install 3.7.10
-  ```
-
-- Node v14 - [nvm][] is optional, but recommended
-
-  ```shell
-  nvm install 14
-  nvm use 14
-  ```
-
-- [yarn][yarn-install] - JavaScript package manager
-
-- [commitizen][] - Commit message formatter
-
-  ```shell
-  yarn global add commitizen
-  ```
-
-- GNU Make - we use [Makefiles][] to manage our builds
-
-- cURL - used to push development updates to robots
-- On Linux, you will need libsystemd and headers. On Ubuntu, install `libsystemd-dev` and `python3-dev` before running `make setup`.
-
-Once you're set up, clone the repository and install all project dependencies:
-
-```shell
-git clone https://github.com/Opentrons/opentrons.git
-cd opentrons
-make setup
-```
-
-In addition, if (and only if) you want to build a PDF version of the Opentrons API documentation, you must install a latex distribution that includes a callable pdflatex. If that is installed, you can do `make -C api docs-pdf`.
+See [DEV_SETUP.md](./DEV_SETUP.md) for our recommended development setup guides for macOS, Windows, and Linux.
 
 ### Testing
 
