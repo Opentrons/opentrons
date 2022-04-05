@@ -474,9 +474,7 @@ class OT3Controller:
         """Get the firmware version."""
         return None
 
-    async def update_firmware(
-        self, filename: str, target: NodeId
-    ) -> None:
+    async def update_firmware(self, filename: str, target: NodeId) -> None:
         """Update the firmware."""
         await firmware_update.run_update(
             messenger=self._messenger,
@@ -484,7 +482,7 @@ class OT3Controller:
             hex_processor=firmware_update.HexRecordProcessor.from_file(Path(filename)),
             retry_count=3,
             timeout_seconds=20,
-            erase=True
+            erase=True,
         )
 
     def engaged_axes(self) -> OT3AxisMap[bool]:

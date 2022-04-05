@@ -358,9 +358,7 @@ class OT3API(
         target: NodeId,
     ) -> None:
         """Update the firmware on the hardware."""
-        await self._backend.update_firmware(
-            firmware_file, target
-        )
+        await self._backend.update_firmware(firmware_file, target)
 
     @staticmethod
     def _gantry_load_from_instruments(

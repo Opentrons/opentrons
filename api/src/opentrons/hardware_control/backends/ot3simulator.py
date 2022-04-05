@@ -331,9 +331,7 @@ class OT3Simulator:
         """Get the firmware version."""
         return None
 
-    async def update_firmware(
-        self, filename: str, target: NodeId
-    ) -> None:
+    async def update_firmware(self, filename: str, target: NodeId) -> None:
         """Update the firmware."""
         pass
 
