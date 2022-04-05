@@ -70,7 +70,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
             protocolDisplayName={protocolDisplayName}
           />
         ) : (
-          <StyledText>{t('loading_data')}</StyledText>
+          <StyledText as="p">{t('loading_data')}</StyledText>
         )}
         <Flex flexDirection={DIRECTION_COLUMN}>
           <ProtocolOverflowMenu

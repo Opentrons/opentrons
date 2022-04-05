@@ -9,12 +9,12 @@ import {
   SPACING,
   C_MED_GRAY,
   Link,
-  SPACING_1,
   JUSTIFY_START,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import { StyledText } from '../../atoms/text'
 
 const PROTOCOL_LIBRARY_URL = 'https://protocols.opentrons.com'
 const PROTOCOL_DESIGNER_URL = 'https://designer.opentrons.com'
@@ -35,9 +35,9 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
       paddingBottom={SPACING.spacing3}
       width="96.5%"
     >
-      <Text role="complementary" as="h5" marginBottom={SPACING.spacing2}>
+      <StyledText role="complementary" as="h5" marginBottom={SPACING.spacing3}>
         {props.title}
-      </Text>
+      </StyledText>
       <Flex justifyContent={JUSTIFY_START} flexDirection={DIRECTION_ROW}>
         <Link
           fontSize={FONT_SIZE_CAPTION}
@@ -48,7 +48,11 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
           external
         >
           {t('browse_protocol_library')}
-          <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
+          <Icon
+            name={'open-in-new'}
+            marginLeft={SPACING.spacing2}
+            size="10px"
+          />
         </Link>
         <Link
           fontSize={FONT_SIZE_CAPTION}
@@ -59,7 +63,11 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
           external
         >
           {t('launch_protocol_designer')}
-          <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
+          <Icon
+            name={'open-in-new'}
+            marginLeft={SPACING.spacing2}
+            size="10px"
+          />
         </Link>
         <Link
           fontSize={FONT_SIZE_CAPTION}
@@ -69,7 +77,11 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
           external
         >
           {t('open_api_docs')}
-          <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
+          <Icon
+            name={'open-in-new'}
+            marginLeft={SPACING.spacing2}
+            size="10px"
+          />
         </Link>
       </Flex>
     </Flex>

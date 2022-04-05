@@ -3,6 +3,7 @@ import path from 'path'
 import first from 'lodash/first'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
+import { NavLink, useHistory } from 'react-router-dom'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import {
@@ -37,7 +38,6 @@ import {
 import { StyledText } from '../../atoms/text'
 import { StoredProtocolData } from '../../redux/protocol-storage'
 
-import { NavLink, useHistory } from 'react-router-dom'
 import { Robot } from '../../redux/discovery/types'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 import { AvailableRobotOption } from './AvailableRobotOption'

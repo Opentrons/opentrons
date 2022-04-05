@@ -8,7 +8,7 @@ import {
 
 import type { UseMutateFunction } from 'react-query'
 import type { Protocol } from '@opentrons/api-client'
-import { UseCreateRunMutationOptions } from '@opentrons/react-api-client/src/runs/useCreateRunMutation'
+import type { UseCreateRunMutationOptions } from '@opentrons/react-api-client/src/runs/useCreateRunMutation'
 
 export interface UseCreateRun {
   createRun: UseMutateFunction<Protocol, unknown, File[], unknown>
