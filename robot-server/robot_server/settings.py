@@ -60,7 +60,7 @@ class RobotServerSettings(BaseSettings):
         ...,
         description=(
             "A directory for the server to store things persistently across boots."
-            " If the directory doesn't already exist, it will be created."
+            " If this directory doesn't already exist, the server will create it."
             " If this is the string `automatically_make_temporary`,"
             " the server will use a fresh temporary directory"
             " (effectively not persisting anything)."

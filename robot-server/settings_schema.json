@@ -22,7 +22,7 @@
     },
     "persistence_directory": {
       "title": "Persistence Directory",
-      "description": "A directory for the server to store things persistently across boots. If the directory doesn't already exist, it will be created. If this is the string `automatically_make_temporary`, the server will use a fresh temporary directory (effectively not persisting anything).\n\nNote that the `opentrons` library is also responsible for persisting certain things, and it has its own configuration.",
+      "description": "A directory for the server to store things persistently across boots. If this directory doesn't already exist, the server will create it. If this is the string `automatically_make_temporary`, the server will use a fresh temporary directory (effectively not persisting anything).\n\nNote that the `opentrons` library is also responsible for persisting certain things, and it has its own configuration.",
       "env_names": [
         "ot_robot_server_persistence_directory"
       ],
