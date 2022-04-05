@@ -8,7 +8,7 @@ from sqlalchemy.sql.coercions import sqltypes
 from .action_models import RunAction
 
 import sqlalchemy
-from ..data_access.models import run_table, add_tables_to_db
+from ..data_access.models import run_table, add_tables_to_db, get_all
 
 
 @dataclass(frozen=True)
@@ -88,10 +88,8 @@ class RunStore:
         Returns:
             All stored run entries.
         """
-        statement = sqlalchemy.select(run_table)
-        with self._sql_engine.begin() as transaction:
-            all_rows = transaction.execute(statement).all()
-        return [_convert_sql_row_to_run(sql_row=row) for row in all_rows]
+        runs = get_all(run_table)
+        return [_convert_sql_row_to_run(sql_row=row) for row in runs]
 
     def remove(self, run_id: str) -> RunResource:
         """Remove a run by its unique identifier.
