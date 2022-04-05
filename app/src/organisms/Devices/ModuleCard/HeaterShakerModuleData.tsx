@@ -14,6 +14,7 @@ import {
   TYPOGRAPHY,
   C_SKY_BLUE,
   TEXT_TRANSFORM_CAPITALIZE,
+  SIZE_1,
 } from '@opentrons/components'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 
@@ -206,7 +207,7 @@ export const HeaterShakerModuleData = (
                 <Icon
                   name="closed-locked"
                   data-testid="HeaterShakerModuleData_latch_lock"
-                  size={'1rem'}
+                  size={SIZE_1}
                 />
               )}
               {getLatchStatus(latchStatus)}
