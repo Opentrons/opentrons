@@ -32,10 +32,23 @@ class PressureSensor(AbstractAdvancedSensor):
         node_id: NodeId,
         poll_for_ms: int,
         timeout: int = 1,
-        sensor: SensorType = SensorType.pressure,
     ) -> Optional[SensorDataType]:
         """Poll the pressure sensor."""
-        poll = PollSensorInformation(sensor, node_id, poll_for_ms)
+        poll = PollSensorInformation(self._sensor_type, node_id, poll_for_ms)
+        scheduler = SensorScheduler()
+        return await scheduler.run_poll(poll, can_messenger, timeout)
+
+    async def poll_temperature(
+        self,
+        can_messenger: CanMessenger,
+        node_id: NodeId,
+        poll_for_ms: int,
+        timeout: int = 1,
+    ) -> Optional[SensorDataType]:
+        """Poll the pressure sensor."""
+        poll = PollSensorInformation(
+            SensorType.pressure_temperature, node_id, poll_for_ms
+        )
         scheduler = SensorScheduler()
         return await scheduler.run_poll(poll, can_messenger, timeout)
 
@@ -45,10 +58,21 @@ class PressureSensor(AbstractAdvancedSensor):
         node_id: NodeId,
         offset: bool,
         timeout: int = 1,
-        sensor: SensorType = SensorType.pressure,
     ) -> Optional[SensorDataType]:
         """Poll the read sensor."""
-        read = ReadSensorInformation(sensor, node_id, offset)
+        read = ReadSensorInformation(self._sensor_type, node_id, offset)
+        scheduler = SensorScheduler()
+        return await scheduler.send_read(read, can_messenger, timeout)
+
+    async def read_temperature(
+        self,
+        can_messenger: CanMessenger,
+        node_id: NodeId,
+        offset: bool,
+        timeout: int = 1,
+    ) -> Optional[SensorDataType]:
+        """Poll the read sensor."""
+        read = ReadSensorInformation(SensorType.pressure_temperature, node_id, offset)
         scheduler = SensorScheduler()
         return await scheduler.send_read(read, can_messenger, timeout)
 
@@ -57,10 +81,9 @@ class PressureSensor(AbstractAdvancedSensor):
         can_messenger: CanMessenger,
         node_id: NodeId,
         data: SensorDataType,
-        sensor: SensorType = SensorType.pressure,
     ) -> None:
         """Write to a register of the pressure sensor."""
-        write = WriteSensorInformation(sensor, node_id, data)
+        write = WriteSensorInformation(self._sensor_type, node_id, data)
         scheduler = SensorScheduler()
         await scheduler.send_write(write, can_messenger)
 

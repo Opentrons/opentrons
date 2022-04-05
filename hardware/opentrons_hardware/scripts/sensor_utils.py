@@ -184,12 +184,11 @@ async def read_temp_from_pressure_sensor(
     while datetime.now() - start_time < delta:
         messenger = CanMessenger(driver=driver)
         messenger.start()
-        data = await pressure.read(
+        data = await pressure.read_temperature(
             messenger,
             pipette_mount,
             offset=False,
             timeout=10,
-            sensor=SensorType.pressure_temperature,
         )
         curr_time = datetime.now().strftime("%H:%M:%S")
         if isinstance(data, SensorDataType):
