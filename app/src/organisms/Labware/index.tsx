@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useParams, Route } from 'react-router-dom'
 import {
   Box,
   Flex,
@@ -14,7 +13,6 @@ import {
   ALIGN_CENTER,
   Icon,
 } from '@opentrons/components'
-import { getLabwareDefURI } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/Buttons'
 import { Toast } from '../../atoms/Toast'
@@ -28,14 +26,11 @@ import {
   useLabwareFailure,
   useNewLabwareName,
 } from './hooks'
-import type { NextGenRouteParams } from '../../App/NextGenApp'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 
 export function Labware(): JSX.Element {
   const { t } = useTranslation('labware_landing')
-  const { labwareUri } = useParams<NextGenRouteParams>()
-  console.log(labwareUri)
 
   const labware = useGetAllLabware()
   const { labwareFailureMessage, clearLabwareFailure } = useLabwareFailure()
