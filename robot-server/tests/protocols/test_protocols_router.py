@@ -134,7 +134,7 @@ async def test_get_protocols(
         metadata=Metadata(),
         analyses=[analysis_1],
         files=[],
-        protocol_key="dummy-key-111",
+        key="dummy-key-111",
     )
     expected_protocol_2 = Protocol(
         id="123",
@@ -143,7 +143,7 @@ async def test_get_protocols(
         metadata=Metadata(),
         analyses=[analysis_2],
         files=[],
-        protocol_key="dummy-key-222",
+        key="dummy-key-222",
     )
 
     decoy.when(protocol_store.get_all()).then_return([resource_1, resource_2])
@@ -200,7 +200,7 @@ async def test_get_protocol_by_id(
         metadata=Metadata(),
         analyses=[analysis],
         files=[],
-        protocol_key="dummy-key-111",
+        key="dummy-key-111",
     )
     assert result.status_code == 200
 
@@ -274,7 +274,7 @@ async def test_create_protocol(
 
     result = await create_protocol(
         files=[protocol_file],
-        protocol_key="dummy-key-111",
+        key="dummy-key-111",
         protocol_directory=protocol_directory,
         protocol_store=protocol_store,
         analysis_store=analysis_store,
@@ -293,7 +293,7 @@ async def test_create_protocol(
         metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
         analyses=[analysis],
         files=[ProtocolFile(name="foo.json", role=ProtocolFileRole.MAIN)],
-        protocol_key="dummy-key-111",
+        key="dummy-key-111",
     )
     assert result.status_code == 201
 
