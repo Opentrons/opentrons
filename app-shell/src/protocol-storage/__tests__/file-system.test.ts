@@ -20,7 +20,7 @@ import { getConfig } from '../../config'
 
 jest.mock('uuid/v4')
 jest.mock('electron')
-jest.mock('../config')
+jest.mock('../../config')
 
 const trashItem = Electron.shell.trashItem as jest.MockedFunction<
   typeof Electron.shell.trashItem
