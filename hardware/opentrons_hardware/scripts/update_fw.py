@@ -9,15 +9,10 @@ from typing_extensions import Final
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.firmware_bindings import NodeId
 from opentrons_hardware.firmware_update.run import run_update
 from .can_args import add_can_args, build_settings
 from opentrons_hardware.firmware_update import (
-    head,
-    gantry_x,
-    gantry_y,
-    pipette_left,
-    pipette_right,
-    gripper,
     HexRecordProcessor,
 )
 
@@ -45,12 +40,12 @@ LOG_CONFIG = {
 }
 
 TARGETS: Final = {
-    "head": head,
-    "gantry-x": gantry_x,
-    "gantry-y": gantry_y,
-    "pipette-left": pipette_left,
-    "pipette-right": pipette_right,
-    "gripper": gripper,
+    "head": NodeId.head,
+    "gantry-x": NodeId.gantry_x,
+    "gantry-y": NodeId.gantry_y,
+    "pipette-left": NodeId.pipette_left,
+    "pipette-right": NodeId.pipette_right,
+    "gripper": NodeId.gripper,
 }
 
 
@@ -70,7 +65,7 @@ async def run(args: argparse.Namespace) -> None:
 
     await run_update(
         messenger=messenger,
-        target=target,
+        node_id=target,
         hex_processor=hex_processor,
         retry_count=retry_count,
         timeout_seconds=timeout_seconds,

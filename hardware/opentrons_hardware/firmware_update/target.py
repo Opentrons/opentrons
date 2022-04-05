@@ -11,7 +11,7 @@ BootloaderNodeIdMap: Final = {
     NodeId.pipette_right: NodeId.pipette_right_bootloader,
     NodeId.gantry_x: NodeId.gantry_x_bootloader,
     NodeId.gantry_y: NodeId.gantry_y_bootloader,
-    NodeId.gripper: NodeId.gripper_bootloader
+    NodeId.gripper: NodeId.gripper_bootloader,
 }
 
 

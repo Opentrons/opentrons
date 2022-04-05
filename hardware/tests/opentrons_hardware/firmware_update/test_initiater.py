@@ -143,7 +143,7 @@ async def test_bootloader_not_ready(
     mock_messenger: AsyncMock,
 ) -> None:
     """It should raise an error when bootloader never responds."""
-    target =  Target(system_node=NodeId.head)
+    target = Target(system_node=NodeId.head)
 
     retry_count = 3
     with pytest.raises(BootloaderNotReady):
