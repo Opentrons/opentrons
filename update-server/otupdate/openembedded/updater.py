@@ -29,12 +29,15 @@ class RootPartitions(enum.Enum):
 class PartitionManager:
     """Partition manager class."""
 
-    def find_unused_partition(self) -> Partition:
+    def used_partition(self) -> bytes:
+        """Find used partition"""
+        return subprocess.check_output(["fw_printenv", "-n", "root_part"]).strip()
+
+    def find_unused_partition(self, which: bytes) -> Partition:
         """Find unused partition"""
         # fw_printenv -n root_part gives the currently
         # active root_fs partition, find that, and
         # set other partition as unused partition!
-        which = subprocess.check_output(["fw_printenv", "-n", "root_part"]).strip()
         return {
             b"2": RootPartitions.THREE.value,
             b"3": RootPartitions.TWO.value,
@@ -43,7 +46,7 @@ class PartitionManager:
         }[which]
 
     def switch_partition(self) -> Partition:
-        unused_partition = self.find_unused_partition()
+        unused_partition = self.find_unused_partition(self.used_partition())
         if unused_partition.number == 2:
             subprocess.run(["fw_setenv", "root_part", "2"])
         else:
@@ -97,7 +100,7 @@ class Updater(UpdateActionsInterface):
 
     def commit_update(self) -> None:
         """Switch the target boot partition."""
-        unused = self.part_mngr.find_unused_partition()
+        unused = self.part_mngr.find_unused_partition(self.part_mngr.used_partition())
         new = self.part_mngr.switch_partition()
         if new != unused:
             msg = f"Bad switch: switched to {new} when {unused} was unused"
@@ -142,7 +145,9 @@ class Updater(UpdateActionsInterface):
     ) -> Partition:
         self.decomp_and_write(rootfs_filepath, progress_callback)
         LOG.warning("Entering write_update of Updater class!")
-        unused_partition = self.part_mngr.find_unused_partition()
+        unused_partition = self.part_mngr.find_unused_partition(
+            self.part_mngr.used_partition()
+        )
         return unused_partition
 
     def decomp_and_write(
@@ -154,7 +159,9 @@ class Updater(UpdateActionsInterface):
 
         """
 
-        unused_partition = self.part_mngr.find_unused_partition()
+        unused_partition = self.part_mngr.find_unused_partition(
+            self.part_mngr.used_partition()
+        )
         self.root_FS_intf.write_update(
             downloaded_update_path, unused_partition, progress_callback
         )
