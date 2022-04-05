@@ -73,6 +73,8 @@ def override_hardware(hardware: MagicMock) -> None:
         return hardware
 
     app.dependency_overrides[get_hardware] = get_hardware_override
+    yield
+    del app.dependency_overrides[get_hardware]
 
 
 @pytest.fixture
