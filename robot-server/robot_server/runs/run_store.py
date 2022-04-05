@@ -8,7 +8,8 @@ from sqlalchemy.sql.coercions import sqltypes
 from .action_models import RunAction
 
 import sqlalchemy
-from ..data_access.models import run_table, add_tables_to_db, get_all
+from ..data_access.models import run_table, add_tables_to_db
+from ..data_access.data_access import get_all
 
 
 @dataclass(frozen=True)
@@ -41,7 +42,7 @@ class RunStore:
         """Initialize a RunStore and its in-memory storage."""
         self._sql_engine = sql_engine
 
-    def insert(self, run: RunResource) -> RunResource:
+    def upsert(self, run: RunResource) -> RunResource:
         """Insert or update a run resource in the store.
 
         Arguments:
@@ -51,14 +52,19 @@ class RunStore:
         Returns:
             The resource that was added to the store.
         """
-        statement = sqlalchemy.insert(run_table).values(
-            _convert_run_to_sql_values(run=run)
-        )
+        update_statement = sqlalchemy.update(run_table).where(run_table.c.id == run.run_id).values(active_run=run.is_current)
         with self._sql_engine.begin() as transaction:
-            transaction.execute(statement)
+            try:
+                transaction.execute(update_statement)
+            except sqlalchemy.exc.NoResultFound:
+                statement = sqlalchemy.insert(run_table).values(
+                    _convert_run_to_sql_values(run=run)
+                )
+                with self._sql_engine.begin() as insert_transaction:
+                    insert_transaction.execute(statement)
 
         if run.is_current is True:
-            update_statement = sqlalchemy.update(run_table).where(run_table.c.id != run.id, run_table.c.active_run == True).values(active_run=False)
+            update_statement = sqlalchemy.update(run_table).where(run_table.c.id != run.run_id, run_table.c.active_run == True).values(active_run=False)
             transaction.execute(update_statement)
 
         return run
@@ -73,7 +79,7 @@ class RunStore:
             The retrieved run entry from the db.
         """
         statement = sqlalchemy.select(run_table).where(
-            id == run_id
+            run_table.c.id == run_id
         )
         with self._sql_engine.begin() as transaction:
             try:
