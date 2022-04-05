@@ -5,7 +5,8 @@ from opentrons.hardware_control.types import (
     OT3Axis,
     OT3AxisKind,
     OT3AxisMap,
-    CurrentConfig, OT3SubSystem,
+    CurrentConfig,
+    OT3SubSystem,
 )
 import numpy as np
 

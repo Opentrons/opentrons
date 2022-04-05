@@ -39,7 +39,8 @@ from opentrons.hardware_control.types import (
     OT3Axis,
     OT3Mount,
     OT3AxisMap,
-    CurrentConfig, OT3SubSystem,
+    CurrentConfig,
+    OT3SubSystem,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 

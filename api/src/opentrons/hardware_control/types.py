@@ -232,6 +232,7 @@ class OT3SubSystem(enum.Enum):
 
     This is a complete list of unique firmware nodes in the ot3.
     """
+
     gantry_x = 0
     gantry_y = 1
     head = 2

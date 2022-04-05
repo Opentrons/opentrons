@@ -69,7 +69,8 @@ from opentrons.hardware_control.types import (
     AionotifyEvent,
     OT3Mount,
     OT3AxisMap,
-    CurrentConfig, OT3SubSystem,
+    CurrentConfig,
+    OT3SubSystem,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -580,8 +581,12 @@ class OT3Controller:
         current_set: Set[NodeId], probed_set: Set[NodeId]
     ) -> Set[NodeId]:
         probed_set = OT3Controller._replace_head_node(probed_set)
-        core_replaced: Set[NodeId] = {NodeId.gantry_x, NodeId.gantry_y,
-                                      NodeId.head_l, NodeId.head_r}
+        core_replaced: Set[NodeId] = {
+            NodeId.gantry_x,
+            NodeId.gantry_y,
+            NodeId.head_l,
+            NodeId.head_r,
+        }
         current_set -= core_replaced
         current_set |= probed_set
         return current_set

@@ -27,7 +27,6 @@ from opentrons_hardware.hardware_control.motion_planning import (
     MoveTarget,
     ZeroLengthMoveError,
 )
-from opentrons_hardware.firmware_bindings.constants import NodeId
 
 
 from .util import use_or_initialize_loop, check_motion_bounds
@@ -54,7 +53,8 @@ from .types import (
     PauseType,
     OT3Axis,
     OT3Mount,
-    OT3AxisMap, OT3SubSystem,
+    OT3AxisMap,
+    OT3SubSystem,
 )
 from . import modules
 from .robot_calibration import (
