@@ -81,6 +81,7 @@ def test_labware_landing_v5dot1(
         logger.info(f"uploading labware: {test_labwares['validlabware'].resolve()}")
         input = protocol_file.get_drag_json_protocol()
         drag_and_drop_file(input, test_labwares["validlabware"])
+        assert labware_landing.get_success_toast_message().is_displayed()
         time.sleep(2)
 
         ## uploading an invalid labware
@@ -93,5 +94,5 @@ def test_labware_landing_v5dot1(
         logger.info(f"uploading labware: {test_labwares['invalidlabware'].resolve()}")
         input = protocol_file.get_drag_json_protocol()
         drag_and_drop_file(input, test_labwares["invalidlabware"])
-        # assert labware_landing.get_error_toast_message().is_displayed()
+        assert labware_landing.get_error_toast_message().is_displayed()
         time.sleep(2)
