@@ -28,7 +28,7 @@ from sqlalchemy.engine import Engine as SQLEngine
 
 # Relative to our root persistence directory.
 _PROTOCOL_FILES_SUBDIRECTORY: Final[str] = "protocols"
-_DATABASE_FILE: Final[str] = "i_do_not_know_what_to_name_this.db"
+_DATABASE_FILE: Final[str] = "robot_server.db"
 
 
 _log = logging.getLogger(__name__)
