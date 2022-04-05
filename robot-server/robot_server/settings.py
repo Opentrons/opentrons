@@ -67,7 +67,7 @@ class RobotServerSettings(BaseSettings):
             "\n\n"
             "Note that the `opentrons` library is also responsible for persisting"
             " certain things, and it has its own configuration."
-        )
+        ),
     )
 
     class Config:

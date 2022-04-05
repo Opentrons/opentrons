@@ -7,7 +7,6 @@ from typing import Generator
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine as SQLEngine
-from sqlalchemy.pool import StaticPool
 
 
 # TODO(mm, 2022-03-29): When we confirm we can use SQLAlchemy 1.4 on the OT-2,
