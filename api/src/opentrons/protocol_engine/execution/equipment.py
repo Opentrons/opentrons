@@ -6,15 +6,24 @@ from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import MountType
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import AbstractModule, MagDeck, HeaterShaker
-
+from opentrons.hardware_control.modules import (
+    AbstractModule,
+    MagDeck,
+    HeaterShaker,
+    TempDeck
+)
+from opentrons.protocol_engine.state.module_substates import (
+    MagneticModuleId,
+    HeaterShakerModuleId,
+    TemperatureModuleId,
+)
 from ..errors import (
     FailedToLoadPipetteError,
     LabwareDefinitionDoesNotExistError,
     ModuleNotAttachedError,
 )
 from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
-from ..state import StateStore, HardwareModule, MagneticModuleId, HeaterShakerModuleId
+from ..state import StateStore, HardwareModule
 from ..types import (
     LabwareLocation,
     PipetteName,
@@ -246,6 +255,13 @@ class EquipmentHandler:
         self,
         module_id: HeaterShakerModuleId,
     ) -> Optional[HeaterShaker]:
+        ...
+
+    @overload
+    def get_module_hardware_api(
+        self,
+        module_id: TemperatureModuleId,
+    ) -> Optional[TempDeck]:
         ...
 
     def get_module_hardware_api(self, module_id: str) -> Optional[AbstractModule]:

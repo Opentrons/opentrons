@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from typing import NewType, NamedTuple, Optional
 
+from opentrons.protocol_engine.types import TemperatureRange, SpeedRange
 from opentrons.protocol_engine.errors import (
     InvalidTargetTemperatureError,
     InvalidTargetSpeedError,
@@ -9,20 +10,6 @@ from opentrons.protocol_engine.errors import (
 )
 
 HeaterShakerModuleId = NewType("HeaterShakerModuleId", str)
-
-
-class SpeedRange(NamedTuple):
-    """Minimum and maximum allowed speeds for a shaking module."""
-
-    min: int
-    max: int
-
-
-class TemperatureRange(NamedTuple):
-    """Minimum and maximum allowed temperatures for a heating module."""
-
-    min: float
-    max: float
 
 
 # TODO (spp, 2022-03-22): Move these values to heater-shaker module definition.

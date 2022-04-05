@@ -116,7 +116,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 self._state.substate_by_module_id[
                     module_id
                 ] = TemperatureModuleSubState(
-                    module_id=TemperatureModuleId(module_id), model=module_model
+                    module_id=TemperatureModuleId(module_id),
                 )
 
     def _handle_command(self, command: Command) -> None:
@@ -148,7 +148,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 self._state.substate_by_module_id[
                     module_id
                 ] = TemperatureModuleSubState(
-                    module_id=TemperatureModuleId(module_id), model=module_model
+                    module_id=TemperatureModuleId(module_id),
                 )
         if isinstance(
             command.result,

@@ -810,7 +810,7 @@ def test_magnetic_module_view_calculate_magnet_hardware_height(
 
 
 @pytest.mark.parametrize("target_temp", [36.8, 95.1])
-def test_validate_target_temperature_raises(
+def test_validate_heater_shaker_target_temperature_raises(
     heater_shaker_v1_def: ModuleDefinition,
     target_temp: float,
 ) -> None:
@@ -836,7 +836,7 @@ def test_validate_target_temperature_raises(
 
 
 @pytest.mark.parametrize("target_temp", [37, 94.8])
-def test_validate_target_temperature(
+def test_validate_heater_shaker_target_temperature(
     heater_shaker_v1_def: ModuleDefinition,
     target_temp: float,
 ) -> None:
@@ -858,6 +858,57 @@ def test_validate_target_temperature(
     )
     subject = module_view.get_heater_shaker_module_substate("module-id")
     assert subject.validate_target_temperature(target_temp) == target_temp
+
+
+@pytest.mark.parametrize("target_temp", [-10, 99.9])
+def test_validate_temp_module_target_temperature_raises(
+    tempdeck_v1_def: ModuleDefinition,
+    target_temp: float,
+) -> None:
+    """It should verify if a target temperature is valid for the specified module."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=tempdeck_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+            )
+        },
+    )
+    subject = module_view.get_temperature_module_substate("module-id")
+    with pytest.raises(errors.InvalidTargetTemperatureError):
+        subject.validate_target_temperature(target_temp)
+
+
+@pytest.mark.parametrize(["target_temp", "validated_temp"],
+                         [(-9.431, -9), (0, 0), (99.1, 99)])
+def test_validate_temp_module_target_temperature(
+    tempdeck_v2_def: ModuleDefinition,
+    target_temp: float,
+    validated_temp: int
+) -> None:
+    """It should verify if a target temperature is valid for the specified module."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=tempdeck_v2_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+            )
+        },
+    )
+    subject = module_view.get_temperature_module_substate("module-id")
+    assert subject.validate_target_temperature(target_temp) == validated_temp
 
 
 @pytest.mark.parametrize(

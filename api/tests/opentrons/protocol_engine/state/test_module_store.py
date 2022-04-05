@@ -63,7 +63,6 @@ def test_initial_state() -> None:
             ModuleModel.TEMPERATURE_MODULE_V1,
             TemperatureModuleSubState(
                 module_id=TemperatureModuleId("module-id"),
-                model=ModuleModel.TEMPERATURE_MODULE_V1,
             ),
         )
     ],
@@ -125,7 +124,6 @@ def test_load_module(
             lazy_fixture("tempdeck_v2_def"),
             TemperatureModuleSubState(
                 module_id=TemperatureModuleId("module-id"),
-                model=ModuleModel.TEMPERATURE_MODULE_V2
             )
         )
     ],
