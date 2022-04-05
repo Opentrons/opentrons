@@ -62,9 +62,8 @@ class DeactivateTemperature(
 ):
     """A command to deactivate a Temperature Module."""
 
-    commandType: DeactivateTemperatureCommandType = (
-        "temperatureModule/deactivateTemperature"
-    )
+    commandType: DeactivateTemperatureCommandType = "temperatureModule/deactivate"
+
     params: DeactivateTemperatureParams
     result: Optional[DeactivateTemperatureResult]
 
