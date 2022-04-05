@@ -5,7 +5,14 @@ import type { HydratedHeaterShakerFormData } from '../../../form-types'
 export const heaterShakerFormToArgs = (
   formData: HydratedHeaterShakerFormData
 ): HeaterShakerArgs => {
-  const { moduleId, setTemperature, targetHeaterShakerTemperature, targetSpeed, setShake, latchOpen } = formData
+  const {
+    moduleId,
+    setTemperature,
+    targetHeaterShakerTemperature,
+    targetSpeed,
+    setShake,
+    latchOpen,
+  } = formData
   assert(
     setTemperature ? !Number.isNaN(targetHeaterShakerTemperature) : true,
     'heaterShakerFormToArgs expected targetTemp to be a number when setTemp is true'
@@ -15,10 +22,13 @@ export const heaterShakerFormToArgs = (
     'heaterShakerFormToArgs expected targeShake to be a number when setShake is true'
   )
 
-  const targetTemperature = setTemperature && targetHeaterShakerTemperature != null ? parseFloat(targetHeaterShakerTemperature) : null
-  const targetShake = setShake && targetSpeed != null ? parseFloat(targetSpeed) : null
+  const targetTemperature =
+    setTemperature && targetHeaterShakerTemperature != null
+      ? parseFloat(targetHeaterShakerTemperature)
+      : null
+  const targetShake =
+    setShake && targetSpeed != null ? parseFloat(targetSpeed) : null
 
-  console.log('targetShake', targetShake)
   return {
     commandCreatorFnName: 'heaterShaker',
     module: moduleId,
@@ -26,8 +36,12 @@ export const heaterShakerFormToArgs = (
     rpm: targetShake,
     latchOpen: latchOpen,
     timerMinutes:
-      formData.heaterShakerTimerMinutes != null ? parseInt(formData.heaterShakerTimerMinutes) : null,
+      formData.heaterShakerTimerMinutes != null
+        ? parseInt(formData.heaterShakerTimerMinutes)
+        : null,
     timerSeconds:
-      formData.heaterShakerTimerSeconds != null ? parseInt(formData.heaterShakerTimerSeconds) : null,
+      formData.heaterShakerTimerSeconds != null
+        ? parseInt(formData.heaterShakerTimerSeconds)
+        : null,
   }
 }

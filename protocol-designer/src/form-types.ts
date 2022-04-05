@@ -120,9 +120,9 @@ export type PauseForm = AnnotationFields & {
   stepType: 'pause'
   id: StepIdType
   pauseAction?:
-  | typeof PAUSE_UNTIL_RESUME
-  | typeof PAUSE_UNTIL_TIME
-  | typeof PAUSE_UNTIL_TEMP
+    | typeof PAUSE_UNTIL_RESUME
+    | typeof PAUSE_UNTIL_TIME
+    | typeof PAUSE_UNTIL_TEMP
   pauseHour?: string
   pauseMinute?: string
   pauseSecond?: string

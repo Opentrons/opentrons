@@ -24,14 +24,7 @@ import {
   forSetTemperature,
   forDeactivateTemperature,
 } from './temperatureUpdates'
-import type { CreateCommand } from '@opentrons/shared-data'
-import type {
-  InvariantContext,
-  RobotState,
-  RobotStateAndWarnings,
-} from '../types'
 import {
-  forHeaterShakerAwaitTemperature,
   forHeaterShakerCloseLatch,
   forHeaterShakerDeactivateHeater,
   forHeaterShakerOpenLatch,
@@ -39,6 +32,12 @@ import {
   forHeaterShakerSetTargetTemperature,
   forHeaterShakerStopShake,
 } from './heaterShakerUpdates'
+import type { CreateCommand } from '@opentrons/shared-data'
+import type {
+  InvariantContext,
+  RobotState,
+  RobotStateAndWarnings,
+} from '../types'
 
 // WARNING this will mutate the prevRobotState
 function _getNextRobotStateAndWarningsSingleCommand(
