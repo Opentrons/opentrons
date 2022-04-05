@@ -80,7 +80,6 @@ export function AdvancedSettings(): JSX.Element {
     const status = getU2EWindowsDriverStatus(state)
     return status === OUTDATED
   })
-  console.log('device', device)
 
   const toggleLabwareOffsetData = (): unknown =>
     dispatch(
