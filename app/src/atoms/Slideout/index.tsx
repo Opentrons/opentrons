@@ -11,7 +11,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   COLORS,
-  POSITION_ABSOLUTE,
   TYPOGRAPHY,
   Overlay,
   StyleProps,
@@ -22,7 +21,7 @@ import { Divider } from '../structure'
 import { StyledText } from '../text'
 
 interface Props extends StyleProps {
-  title: string
+  title: string | React.ReactElement
   children: React.ReactNode
   onCloseClick: () => unknown
   //  isExpanded is for collapse and expand animation
@@ -97,32 +96,40 @@ export const Slideout = (props: Props): JSX.Element | null => {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Flex flex="1 1 auto" flexDirection={DIRECTION_COLUMN}>
-            <Flex
-              flexDirection={DIRECTION_ROW}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              alignItems={ALIGN_CENTER}
-              paddingX={SPACING.spacing4}
-              marginBottom={SPACING.spacing4}
-            >
-              <StyledText as="h2" data-testid={`Slideout_title_${title}`}>
-                {title}
-              </StyledText>
-              <Flex alignItems={ALIGN_CENTER}>
-                <Btn
-                  size={TYPOGRAPHY.lineHeight24}
-                  onClick={onCloseClick}
-                  aria-label="exit"
-                  data-testid={`Slideout_icon_close_${title}`}
-                >
-                  <Icon name={'close'} />
-                </Btn>
+            {typeof title === 'string' ? (
+              <Flex
+                flexDirection={DIRECTION_ROW}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+                alignItems={ALIGN_CENTER}
+                paddingX={SPACING.spacing4}
+                marginBottom={SPACING.spacing4}
+              >
+                <StyledText as="h2" data-testid={`Slideout_title_${title}`}>
+                  {title}
+                </StyledText>
+                <Flex alignItems={ALIGN_CENTER}>
+                  <Btn
+                    size={TYPOGRAPHY.lineHeight24}
+                    onClick={onCloseClick}
+                    aria-label="exit"
+                    data-testid={`Slideout_icon_close_${
+                      typeof title === 'string' ? title : ''
+                    }`}
+                  >
+                    <Icon name={'close'} />
+                  </Btn>
+                </Flex>
               </Flex>
-            </Flex>
+            ) : (
+              title
+            )}
             <Divider marginY={0} color={COLORS.medGrey} />
             <Box
               padding={SPACING.spacing4}
               flex="1 1 auto"
-              data-testid={`Slideout_body_${title}`}
+              data-testid={`Slideout_body_${
+                typeof title === 'string' ? title : ''
+              }`}
             >
               {children}
             </Box>

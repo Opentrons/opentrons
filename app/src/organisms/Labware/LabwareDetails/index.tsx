@@ -1,13 +1,19 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { format } from 'date-fns'
 import {
   Box,
   Link,
+  Icon,
+  Flex,
+  Btn,
   SPACING,
   COLORS,
   TYPOGRAPHY,
-  Icon,
   BORDERS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 import { Slideout } from '../../../atoms/Slideout'
@@ -30,25 +36,70 @@ export interface LabwareDetailsProps {
 
 export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const { t } = useTranslation('labware_landing')
-  const labwareDef = props.labware.definition
-  const { metadata, parameters, brand, wells, ordering } = labwareDef
-  const apiName = labwareDef.parameters.loadName
+  const { definition, modified } = props.labware
+  const { metadata, parameters, brand, wells, ordering } = definition
+  const apiName = definition.parameters.loadName
   const { displayVolumeUnits } = metadata
-  const wellGroups = getUniqueWellProperties(labwareDef)
-  const wellLabel = getWellLabel(labwareDef)
+  const wellGroups = getUniqueWellProperties(definition)
+  const wellLabel = getWellLabel(definition)
   const hasInserts = wellGroups.some(g => g.metadata.displayCategory)
   const insert = wellGroups.find(g => g.metadata.displayCategory)
   const insertCategory = insert?.metadata.displayCategory
   const irregular = wellGroups.length > 1
   const isMultiRow = ordering.some(row => row.length > 1)
 
-  return (
-    <Slideout
-      onCloseClick={props.onClose}
-      title={props.labware.definition.metadata.displayName}
-      isExpanded
+  const slideoutHeader = (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing2}
+      paddingX={SPACING.spacing4}
+      marginBottom={SPACING.spacing4}
     >
-      <Gallery definition={labwareDef} />
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      >
+        <StyledText css={TYPOGRAPHY.h2SemiBold}>
+          {props.labware.definition.metadata.displayName}
+        </StyledText>
+        <Link onClick={props.onClose} role="button">
+          <Icon name={'close'} height={SPACING.spacing5} />
+        </Link>
+      </Flex>
+      {definition.brand.brand === 'Opentrons' && (
+        <>
+          <StyledText as="label" id="LabwareDetails_opentronsDef">
+            <Icon color={COLORS.blue} name="check-decagram" height=".7rem" />{' '}
+            {t('opentrons_def')}
+          </StyledText>
+        </>
+      )}
+      {modified != null && (
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          paddingRight={SPACING.spacing1}
+        >
+          <StyledText
+            as="label"
+            color={COLORS.darkGreyEnabled}
+            id="LabwareDetails_dateAdded"
+          >
+            {t('last_updated')} {format(new Date(modified), 'MM/dd/yyyy')}
+          </StyledText>
+          <Icon
+            name="dots-vertical"
+            height={SPACING.spacing4}
+            id="LabwareDetails_overflowMenu"
+          />
+        </Flex>
+      )}
+    </Flex>
+  )
+
+  return (
+    <Slideout onCloseClick={props.onClose} title={slideoutHeader} isExpanded>
+      <Gallery definition={definition} />
       <Box
         backgroundColor={COLORS.lightGrey}
         padding={SPACING.spacing4}
@@ -67,7 +118,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       <Box border={BORDERS.lineBorder}>
         <Box padding={SPACING.spacing4}>
           <WellCount
-            wellLabel={getWellLabel(labwareDef)}
+            wellLabel={getWellLabel(definition)}
             count={Object.keys(wells).length}
           />
           {!hasInserts && !irregular && (
@@ -78,13 +129,13 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
             />
           )}
           <Dimensions
-            definition={labwareDef}
+            definition={definition}
             irregular={irregular}
             insertCategory={insertCategory}
           />
           {wellGroups.map((wellProps, i) => {
             const { metadata: groupMetadata } = wellProps
-            const wellLabel = getWellLabel(wellProps, labwareDef)
+            const wellLabel = getWellLabel(wellProps, definition)
             const groupDisplaySuffix =
               groupMetadata.displayName != null
                 ? ` - ${groupMetadata.displayName}`
@@ -108,14 +159,14 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
                 {groupMetadata.displayCategory == null && (
                   <WellDimensions
                     labwareParams={parameters}
-                    category={labwareDef.metadata.displayCategory}
+                    category={definition.metadata.displayCategory}
                     wellProperties={wellProps}
                     wellLabel={wellLabel}
                     labelSuffix={groupDisplaySuffix}
                   />
                 )}
                 <WellSpacing
-                  category={labwareDef.metadata.displayCategory}
+                  category={definition.metadata.displayCategory}
                   wellProperties={wellProps}
                   isMultiRow={isMultiRow}
                   labelSuffix={groupDisplaySuffix}
@@ -126,7 +177,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         </Box>
         <ManufacturerDetails brand={brand} />
       </Box>
-      {hasInserts && <InsertDetails definition={labwareDef} />}
+      {hasInserts && <InsertDetails definition={definition} />}
     </Slideout>
   )
 }

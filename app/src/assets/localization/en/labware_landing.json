@@ -18,5 +18,6 @@
   "imported": "{{filename}} imported.",
   "create_new_def": "Create a new labware definition",
   "open_labware_creator": "Open Labware Creator",
-  "drag_and_drop": "Drag and drop or <a>browse</a> your files"
+  "drag_and_drop": "Drag and drop or <a>browse</a> your files",
+  "last_updated": "Last updated"
 }
