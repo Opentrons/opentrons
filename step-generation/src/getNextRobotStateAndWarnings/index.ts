@@ -30,6 +30,15 @@ import type {
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
+import {
+  forHeaterShakerAwaitTemperature,
+  forHeaterShakerCloseLatch,
+  forHeaterShakerDeactivateHeater,
+  forHeaterShakerOpenLatch,
+  forHeaterShakerSetTargetShakeSpeed,
+  forHeaterShakerSetTargetTemperature,
+  forHeaterShakerStopShake,
+} from './heaterShakerUpdates'
 
 // WARNING this will mutate the prevRobotState
 function _getNextRobotStateAndWarningsSingleCommand(
@@ -178,7 +187,51 @@ function _getNextRobotStateAndWarningsSingleCommand(
         robotStateAndWarnings
       )
       break
-
+    case 'heaterShakerModule/deactivateHeater':
+      forHeaterShakerDeactivateHeater(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'heaterShakerModule/startSetTargetTemperature':
+      forHeaterShakerSetTargetTemperature(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'heaterShakerModule/setTargetShakeSpeed':
+      forHeaterShakerSetTargetShakeSpeed(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'heaterShakerModule/stopShake':
+      forHeaterShakerStopShake(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'heaterShakerModule/openLatch':
+      forHeaterShakerOpenLatch(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'heaterShakerModule/closeLatch':
+      forHeaterShakerCloseLatch(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    //  no state updates required
+    case 'heaterShakerModule/awaitTemperature':
+      break
     default:
       assert(
         false,
