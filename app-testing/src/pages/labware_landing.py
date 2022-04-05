@@ -88,3 +88,14 @@ class LabwareLanding:
             "the choose file button on the labware slideout",
         )
         return self.base.present_wrapper(header, 2)
+
+    def get_error_toast_message(self) -> Optional[WebElement]:
+        """Get the error toast message after an invalid labware definition is uploaded."""
+        header: Element = Element(
+            (
+                By.XPATH,
+                f"//Toast[@data-testid='LabwareIndex_errorToast']",
+            ),
+            "the error toast message after an invalid labware definition is uploaded",
+        )
+        return self.base.present_wrapper(header, 2)
