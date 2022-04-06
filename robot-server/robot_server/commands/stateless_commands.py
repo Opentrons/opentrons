@@ -7,9 +7,9 @@ StatelessCommandCreate = Union[
     commands.SetRailLightsCreate,
     commands.magnetic_module.EngageCreate,
     commands.magnetic_module.DisengageCreate,
+    commands.temperature_module.SetTargetTemperatureCreate,
+    commands.temperature_module.DeactivateTemperatureCreate,
     # TODO(mc, 2022-03-18): implement these commands
-    # commands.temperature_module.SetTargetTemperatureCreate,
-    # commands.temperature_module.DeactivateCreate,
     # commands.thermocycler.SetTargetBlockTemperatureCreate,
     # commands.thermocycler.SetTargetLidTemperatureCreate,
     # commands.thermocycler.DeactivateBlockCreate,
@@ -29,9 +29,9 @@ StatelessCommand = Union[
     commands.SetRailLights,
     commands.magnetic_module.Engage,
     commands.magnetic_module.Disengage,
+    commands.temperature_module.SetTargetTemperature,
+    commands.temperature_module.DeactivateTemperature,
     # TODO(mc, 2022-03-18): implement these commands
-    # commands.temperature_module.SetTargetTemperature,
-    # commands.temperature_module.Deactivate,
     # commands.thermocycler.SetTargetBlockTemperature,
     # commands.thermocycler.SetTargetLidTemperature,
     # commands.thermocycler.DeactivateBlock,

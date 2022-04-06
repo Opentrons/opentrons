@@ -4,6 +4,7 @@ from typing import Union
 
 from . import heater_shaker
 from . import magnetic_module
+from . import temperature_module
 
 from .set_rail_lights import (
     SetRailLights,
@@ -139,6 +140,9 @@ Command = Union[
     heater_shaker.CloseLatch,
     magnetic_module.Disengage,
     magnetic_module.Engage,
+    temperature_module.SetTargetTemperature,
+    temperature_module.AwaitTemperature,
+    temperature_module.DeactivateTemperature,
     SetRailLights,
 ]
 
@@ -165,6 +169,9 @@ CommandParams = Union[
     heater_shaker.CloseLatchParams,
     magnetic_module.DisengageParams,
     magnetic_module.EngageParams,
+    temperature_module.SetTargetTemperatureParams,
+    temperature_module.AwaitTemperatureParams,
+    temperature_module.DeactivateTemperatureParams,
     SetRailLightsParams,
 ]
 
@@ -191,6 +198,9 @@ CommandType = Union[
     heater_shaker.CloseLatchCommandType,
     magnetic_module.DisengageCommandType,
     magnetic_module.EngageCommandType,
+    temperature_module.SetTargetTemperatureCommandType,
+    temperature_module.AwaitTemperatureCommandType,
+    temperature_module.DeactivateTemperatureCommandType,
     SetRailLightsCommandType,
 ]
 
@@ -216,6 +226,9 @@ CommandCreate = Union[
     heater_shaker.CloseLatchCreate,
     magnetic_module.DisengageCreate,
     magnetic_module.EngageCreate,
+    temperature_module.SetTargetTemperatureCreate,
+    temperature_module.AwaitTemperatureCreate,
+    temperature_module.DeactivateTemperatureCreate,
     SetRailLightsCreate,
 ]
 
@@ -242,5 +255,8 @@ CommandResult = Union[
     heater_shaker.CloseLatchResult,
     magnetic_module.DisengageResult,
     magnetic_module.EngageResult,
+    temperature_module.SetTargetTemperatureResult,
+    temperature_module.AwaitTemperatureResult,
+    temperature_module.DeactivateTemperatureResult,
     SetRailLightsResult,
 ]
