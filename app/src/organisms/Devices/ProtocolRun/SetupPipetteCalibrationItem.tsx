@@ -117,6 +117,7 @@ export function SetupPipetteCalibrationItem({
         <TertiaryButton
           as={RRDLink}
           to={deviceDetailsUrl}
+          padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
           id={'PipetteCalibration_attachPipetteButton'}
         >
           {t('attach_pipette_cta')}

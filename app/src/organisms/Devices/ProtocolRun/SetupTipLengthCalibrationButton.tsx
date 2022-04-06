@@ -251,15 +251,11 @@ export function SetupTipLengthCalibrationButton({
             >
               {t('calibrate_now_cta')}
             </TertiaryButton>
-            {disabled || !isDeckCalibrated ? (
+            {!isDeckCalibrated ? (
               <Tooltip {...tooltipProps}>
                 {
                   <Box width={SIZE_4}>
-                    {isDeckCalibrated
-                      ? t('recalibrating_tip_length_not_available')
-                      : t(
-                          'calibrate_deck_to_proceed_to_tip_length_calibration'
-                        )}
+                    {t('calibrate_deck_to_proceed_to_tip_length_calibration')}
                   </Box>
                 }
               </Tooltip>
