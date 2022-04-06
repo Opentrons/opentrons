@@ -27,7 +27,7 @@ The setup below is compatible with both Intel and ARM (e.g. M1) machines. It ass
 
 #### 0. Install `brew` and general dependencies
 
-[Homebrew][] is a package manager for macOS, and it is useful to install language-agnostic development tools. Installing the `brew` command will also install the [Xcode Command Line tools][], which are required for development on macOS.
+[Homebrew][brew] is a package manager for macOS, and it is useful to install language-agnostic development tools. Installing the `brew` command will also install the [Xcode Command Line tools][], which are required for development on macOS.
 
 1. Go to [https://brew.sh][brew]
 2. Copy and run the install script
@@ -59,7 +59,9 @@ brew install git
 
 If you haven't used `git` before, be sure to run through [first-time Git setup][].
 
-#### 1. Install `nvs` and Node.js
+#### 1. Install Node.js
+
+##### Intel Mac
 
 On macOS, we recommend [nvs][] to install Node.js because it works well and is compatible with macOS, Windows, and Linux.
 
@@ -83,6 +85,29 @@ Now we can use nvs to install Node.js v14 and switch on `auto` mode, which will 
 ```shell
 nvs add 14
 nvs auto on
+```
+
+##### ARM Mac (M1)
+
+If you are running an ARM (M1) Mac, you cannot should not use nvs (nor nvm) because those tools do not have access to Node.js v14 for the ARM architecture. Until we upgrade to version 16 or higher, you need to use an alternative installation method for Node.js.
+
+Fortunately, you can use `brew` to install an ARM version of Node v14.
+
+```shell
+brew install node@14
+```
+
+Once `brew` finishes installing Node, it will print one additional step to complete the installation to ensure your system selects the proper Node executable to use.
+
+```shell
+echo 'export PATH="/opt/homebrew/opt/node@14/bin:$PATH"' >> ~/.zshrc
+```
+
+Close and re-open your terminal to confirm that the correct version of Node is installed for the correct architecture.
+
+```shell
+node -e "console.log(process.version, process.arch)"
+# > v14.19.1 arm64
 ```
 
 #### 2. Install `pyenv` and Python
