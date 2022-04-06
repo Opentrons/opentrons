@@ -1,5 +1,7 @@
 // common types
 
+import { ProtocolAnalysisFile } from '@opentrons/shared-data'
+
 export interface StoredProtocolDir {
   dirPath: string
   modified: number
@@ -11,7 +13,8 @@ export interface StoredProtocolData {
   protocolKey: string
   modified: number
   srcFileNames: string[]
-  mostRecentAnalysis: string | null
+  srcFiles: Buffer[]
+  mostRecentAnalysis: ProtocolAnalysisFile<{}>
 }
 
 // state types
@@ -77,6 +80,12 @@ export interface OpenProtocolDirectoryAction {
   meta: { shell: true }
 }
 
+export interface AnalyzeProtocolAction {
+  type: 'protocolStorage:ANALYZE_PROTOCOL'
+  payload: { protocolKey: string }
+  meta: { shell: true }
+}
+
 export type ProtocolStorageAction =
   | FetchProtocolsAction
   | UpdateProtocolListAction
@@ -86,3 +95,4 @@ export type ProtocolStorageAction =
   | AddProtocolFailureAction
   | ClearAddProtocolFailureAction
   | OpenProtocolDirectoryAction
+  | AnalyzeProtocolAction

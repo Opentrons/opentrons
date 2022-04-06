@@ -24,6 +24,7 @@ export function Overlay(props: OverlayProps): JSX.Element {
       right="0"
       top="0"
       bottom="0"
+      zIndex="1"
       backgroundColor={
         alertOverlay != null && alertOverlay
           ? alertOverlayBackgroundColor

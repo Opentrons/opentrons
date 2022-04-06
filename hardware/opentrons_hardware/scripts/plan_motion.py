@@ -4,7 +4,7 @@ import json
 import logging
 from logging.config import dictConfig
 import argparse
-import numpy as np  # type: ignore[import]
+import numpy as np
 
 from opentrons_hardware.hardware_control.motion_planning import move_manager
 from opentrons_hardware.hardware_control.motion_planning.types import (
@@ -92,7 +92,9 @@ def main() -> None:
         for axis in AXIS_NAMES
     }
     origin_from_file: List[float] = cast(List[float], params["origin"])
-    origin: Coordinates[str, float] = dict(zip(AXIS_NAMES, origin_from_file))
+    origin: Coordinates[str, np.float64] = dict(
+        zip(AXIS_NAMES, (np.float64(c) for c in origin_from_file))
+    )
     target_list = [
         MoveTarget.build(
             dict(zip(AXIS_NAMES, target["coordinates"])), target["max_speed"]

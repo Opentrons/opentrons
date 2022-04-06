@@ -85,8 +85,7 @@ export const schemaV6Adapter = (
       )
       .reduce((acc, command: LoadModuleRunTimeCommand) => {
         const moduleId = command.result?.moduleId ?? ''
-        // @ts-expect-error at the time this adapter is being used model is not a part of params yet, only moduleId
-        const moduleModel = command.params?.model
+        const moduleModel = command.params.model
 
         return {
           ...acc,

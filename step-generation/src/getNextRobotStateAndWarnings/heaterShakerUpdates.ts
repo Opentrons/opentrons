@@ -43,7 +43,7 @@ export const forHeaterShakerSetTargetTemperature = (
 }
 
 export const forHeaterShakerAwaitTemperature = (
-  params: TemperatureParams,
+  params: ModuleOnlyParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
@@ -51,7 +51,7 @@ export const forHeaterShakerAwaitTemperature = (
 }
 
 export const forHeaterShakerDeactivateHeater = (
-  params: TemperatureParams,
+  params: ModuleOnlyParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
@@ -75,7 +75,7 @@ export const forHeaterShakerSetTargetShakeSpeed = (
 }
 
 export const forHeaterShakerStopShake = (
-  params: ShakeSpeedParams,
+  params: ModuleOnlyParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {

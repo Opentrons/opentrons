@@ -65,3 +65,24 @@ lint:
 .PHONY: format
 format:
 	$(python) -m black g_code_parsing tests setup.py
+
+
+.PHONY: get-g-code-configurations
+get-g-code-configurations:
+	$(pipenv) run python cli.py configurations
+
+.PHONY: run-g-code-configuration
+run-g-code-configuration:
+	$(if $(name),,$(error name variable required))
+	$(pipenv) run python cli.py run ${name}
+
+.PHONY: load-g-code-configuration-comparison
+load-g-code-configuration-comparison:
+	$(if $(name),,$(error name variable required))
+	$(pipenv) run python cli.py load-comparison ${name}
+
+
+.PHONY: update-g-code-configuration-comparison
+update-g-code-configuration-comparison:
+	$(if $(name),,$(error name variable required))
+	$(pipenv) run python cli.py update-comparison ${name}

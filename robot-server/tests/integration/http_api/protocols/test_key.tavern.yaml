@@ -1,0 +1,135 @@
+test_name: Verify protocol key.
+
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload basic_transfer_standalone protocol with key
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/basic_transfer_standalone.py'
+      data:
+        key: protocol_key
+    response:
+      save:
+        json:
+          protocol_id: data.id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolType: python
+          files:
+            - name: basic_transfer_standalone.py
+              role: main
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          metadata:
+            apiLevel: '2.6'
+            protocolName: basic_transfer_standalone
+            author: engineer@opentrons.com
+          analyses:
+            - id: !anystr
+              status: pending
+          key: protocol_key
+  - name: Verify the key in GET /protocols
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{protocol_id}'
+            key: protocol_key
+
+  - name: Verify the key in GET /protocols/{id}
+    request:
+      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          id: '{protocol_id}'
+          key: protocol_key
+
+---
+test_name: Protocols may have a duplicate key.
+
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload basic_transfer_standalone protocol with key
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/basic_transfer_standalone.py'
+      data:
+        key: duplicate_key
+    response:
+      strict:
+        - json:off
+      save:
+        json:
+          protocol_id1: data.id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolType: python
+          files:
+            - name: basic_transfer_standalone.py
+              role: main
+          metadata:
+            apiLevel: '2.6'
+            protocolName: basic_transfer_standalone
+            author: engineer@opentrons.com
+          key: duplicate_key
+  - name: Upload basic_transfer_standalone protocol with key
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/basic_transfer_standalone.py'
+      data:
+        key: duplicate_key
+    response:
+      strict:
+        - json:off
+      save:
+        json:
+          protocol_id2: data.id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolType: python
+          files:
+            - name: basic_transfer_standalone.py
+              role: main
+          metadata:
+            apiLevel: '2.6'
+            protocolName: basic_transfer_standalone
+            author: engineer@opentrons.com
+          key: duplicate_key
+  - name: Get protocols and validate id and key
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: GET
+    response:
+      strict:
+        - json:off
+      json:
+        data:
+          - id: '{protocol_id1}'
+            key: duplicate_key
+          - id: '{protocol_id2}'
+            key: duplicate_key

@@ -5,6 +5,7 @@ export {
   distribute,
   thermocyclerProfileStep,
   thermocyclerStateStep,
+  heaterShaker,
 } from './compound'
 
 export {
@@ -21,5 +22,4 @@ export {
   replaceTip,
   setTemperature,
   touchTip,
-  setShakeSpeed,
 } from './atomic'

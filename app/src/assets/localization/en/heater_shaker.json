@@ -83,5 +83,11 @@
   "heater_shaker_is_shaking": "Heater Shaker Module is currently shaking",
   "continue_shaking_protocol_start_prompt": "Continue shaking while the protocol starts?",
   "stop_shaking_start_run": "Stop shaking and start run",
-  "keep_shaking_start_run": "Keep shaking and start run"
+  "keep_shaking_start_run": "Keep shaking and start run",
+  "confirm_heater_shaker_modal_attachment": "Confirm Heater Shaker Module attachment to deck",
+  "module_should_have_anchors": "Module should have both anchors fully extended for a firm attachment to the deck.",
+  "module_anchors_extended": "Before the run begins, module should have both anchors fully extended for a firm attachment to Slot {{slot}}.",
+  "thermal_adapter_attached_to_module": "The thermal adapter should be attached to the module.",
+  "proceed_to_run": "Proceed to run",
+  "confirm_attachment": "Confirm attachment"
 }
