@@ -29,7 +29,7 @@ describe('BaseModal', () => {
     const wrapper = shallow(<BaseModal />)
     const box = wrapper.find(Flex).first()
 
-    expect(box.prop('backgroundColor')).toBe('rgba(22, 33, 45, 0.35)')
+    expect(box.prop('backgroundColor')).toBe('#16212D59')
 
     wrapper.setProps({ overlayColor: OVERLAY_BLACK_90 })
     expect(wrapper.find(Flex).first().prop('backgroundColor')).toBe(

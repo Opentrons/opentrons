@@ -1,22 +1,21 @@
 import * as React from 'react'
-import { COLORS, Flex, POSITION_ABSOLUTE } from '..'
+import { Flex, POSITION_ABSOLUTE } from '..'
 
 export interface OverlayProps {
   /** optional onClick handler */
   onClick?: React.MouseEventHandler
-  alertOverlay?: boolean | null | undefined
+  alertOverlay?: boolean | null
   backgroundColor?: string
 }
 
 export function Overlay(props: OverlayProps): JSX.Element {
-  const { alertOverlay, onClick } = props
+  const {
+    alertOverlay,
+    backgroundColor = 'rgba(0, 0, 0, 0.9)',
+    onClick,
+  } = props
 
-  let backgroundColor: string = COLORS.darkBlack + '59'
-  if (alertOverlay === true) {
-    backgroundColor = 'rgba(115, 115, 115, 0.9)'
-  } else if (props.backgroundColor != null) {
-    backgroundColor = props.backgroundColor
-  }
+  const alertOverlayBackgroundColor = 'rgba(115, 115, 115, 0.9)'
 
   return (
     <Flex
@@ -26,7 +25,11 @@ export function Overlay(props: OverlayProps): JSX.Element {
       top="0"
       bottom="0"
       zIndex="1"
-      backgroundColor={backgroundColor}
+      backgroundColor={
+        alertOverlay != null && alertOverlay
+          ? alertOverlayBackgroundColor
+          : backgroundColor
+      }
       onClick={onClick}
     />
   )

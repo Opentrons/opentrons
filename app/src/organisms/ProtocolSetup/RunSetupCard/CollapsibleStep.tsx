@@ -38,7 +38,7 @@ const EXPANDED_STYLE = css`
   overflow: hidden;
 `
 const COLLAPSED_STYLE = css`
-  transition: max-height 500ms ease-out;
+  transition: max-height 500ms ease-out, visibility 600ms ease;
   visibility: hidden;
   max-height: 0vh;
   overflow: hidden;

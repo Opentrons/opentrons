@@ -15,13 +15,15 @@ import {
   mockPipetteOffsetCalibration3,
 } from '../../../../redux/calibration/pipette-offset/__fixtures__'
 import { useDispatchApiRequest } from '../../../../redux/robot-api'
-
+import { useRobot } from '../useRobot'
 import { usePipetteOffsetCalibrations } from '..'
 
+import type { DiscoveredRobot } from '../../../../redux/discovery/types'
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 
 jest.mock('../../../../redux/calibration')
 jest.mock('../../../../redux/robot-api')
+jest.mock('../useRobot')
 
 const mockFetchPipetteOffsetCalibrations = fetchPipetteOffsetCalibrations as jest.MockedFunction<
   typeof fetchPipetteOffsetCalibrations
@@ -32,8 +34,11 @@ const mockGetPipetteOffsetCalibrations = getPipetteOffsetCalibrations as jest.Mo
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
 >
+const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
 const store: Store<any> = createStore(jest.fn(), {})
+
+const ROBOT_NAME = 'otie'
 
 describe('usePipetteOffsetCalibrations hook', () => {
   let dispatchApiRequest: DispatchApiRequestType
@@ -49,6 +54,9 @@ describe('usePipetteOffsetCalibrations hook', () => {
       </Provider>
     )
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
+    when(mockUseRobot)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(({ status: 'chill' } as unknown) as DiscoveredRobot)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -70,16 +78,19 @@ describe('usePipetteOffsetCalibrations hook', () => {
 
   it('returns pipette offset calibrations when given a robot name', () => {
     when(mockGetPipetteOffsetCalibrations)
-      .calledWith(undefined as any, 'otie')
+      .calledWith(undefined as any, ROBOT_NAME)
       .mockReturnValue([
         mockPipetteOffsetCalibration1,
         mockPipetteOffsetCalibration2,
         mockPipetteOffsetCalibration3,
       ])
 
-    const { result } = renderHook(() => usePipetteOffsetCalibrations('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => usePipetteOffsetCalibrations(ROBOT_NAME),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current).toEqual([
       mockPipetteOffsetCalibration1,
@@ -87,7 +98,7 @@ describe('usePipetteOffsetCalibrations hook', () => {
       mockPipetteOffsetCalibration3,
     ])
     expect(dispatchApiRequest).toBeCalledWith(
-      mockFetchPipetteOffsetCalibrations('otie')
+      mockFetchPipetteOffsetCalibrations(ROBOT_NAME)
     )
   })
 })
