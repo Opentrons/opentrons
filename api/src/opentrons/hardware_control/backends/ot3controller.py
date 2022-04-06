@@ -5,7 +5,6 @@ import asyncio
 from contextlib import asynccontextmanager
 import logging
 from copy import deepcopy
-from pathlib import Path
 from typing import (
     Dict,
     List,
@@ -478,16 +477,17 @@ class OT3Controller:
 
     async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
         """Update the firmware."""
-        await firmware_update.run_update(
-            messenger=self._messenger,
-            node_id=sub_system_to_node_id(target),
-            hex_processor=firmware_update.HexRecordProcessor.from_file(Path(filename)),
-            # TODO (amit, 2022-04-05): Fill in retry_count and timeout_seconds from
-            #  config values.
-            retry_count=3,
-            timeout_seconds=20,
-            erase=True,
-        )
+        with open(filename, "r") as f:
+            await firmware_update.run_update(
+                messenger=self._messenger,
+                node_id=sub_system_to_node_id(target),
+                hex_file=f,
+                # TODO (amit, 2022-04-05): Fill in retry_count and timeout_seconds from
+                #  config values.
+                retry_count=3,
+                timeout_seconds=20,
+                erase=True,
+            )
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
