@@ -20,11 +20,15 @@ export function InsertDetails(props: InsertDetailsProps): JSX.Element {
   const wellGroups = getUniqueWellProperties(definition)
   return (
     <>
-      {wellGroups.map((wellProps, i) => {
+      {wellGroups.map((wellProps, index) => {
         const wellLabel = getWellLabel(wellProps, definition)
 
         return (
-          <Box border={BORDERS.lineBorder} key={i} marginY={SPACING.spacing4}>
+          <Box
+            border={BORDERS.lineBorder}
+            key={index}
+            marginY={SPACING.spacing4}
+          >
             <Box padding={SPACING.spacing4}>
               <StyledText
                 css={TYPOGRAPHY.h2SemiBold}

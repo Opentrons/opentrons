@@ -20,7 +20,7 @@ export function Overlay(props: OverlayProps): JSX.Element {
   return (
     <Flex
       position={POSITION_FIXED}
-      left="6rem"
+      left="0"
       right="0"
       top="0"
       bottom="0"

@@ -22,7 +22,7 @@ export interface GalleryProps {
 export function Gallery(props: GalleryProps): JSX.Element {
   const { definition } = props
   const { parameters: params, dimensions: dims } = definition
-  const [currentImage, setCurrentImage] = React.useState(0)
+  const [currentImage, setCurrentImage] = React.useState<number>(0)
   const render = (
     <Box width="100%">
       <RobotWorkSpace
@@ -33,8 +33,8 @@ export function Gallery(props: GalleryProps): JSX.Element {
       </RobotWorkSpace>
     </Box>
   )
-  const staticImages = labwareImages[params.loadName]?.map((src, key) => (
-    <img key={key} src={src} width="100%" />
+  const staticImages = labwareImages[params.loadName]?.map((src, index) => (
+    <img key={index} src={src} width="100%" />
   ))
 
   const images = staticImages != null ? [render, ...staticImages] : [render]

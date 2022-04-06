@@ -24,6 +24,7 @@ interface Props extends StyleProps {
   title: string | React.ReactElement
   children: React.ReactNode
   onCloseClick: () => unknown
+  closeOnOutsideClick?: boolean
   //  isExpanded is for collapse and expand animation
   isExpanded?: boolean
   footer?: React.ReactNode
@@ -71,6 +72,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
     isExpanded,
     title,
     onCloseClick,
+    closeOnOutsideClick,
     children,
     footer,
     ...styleProps
@@ -78,7 +80,10 @@ export const Slideout = (props: Props): JSX.Element | null => {
   return (
     <>
       {isExpanded ? (
-        <Overlay backgroundColor={COLORS.backgroundOverlay} />
+        <Overlay
+          onClick={closeOnOutsideClick === true ? onCloseClick : undefined}
+          backgroundColor={COLORS.backgroundOverlay}
+        />
       ) : null}
       <Box
         css={isExpanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
@@ -117,7 +122,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
                       typeof title === 'string' ? title : ''
                     }`}
                   >
-                    <Icon name={'close'} />
+                    <Icon name="close" />
                   </Btn>
                 </Flex>
               </Flex>

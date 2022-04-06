@@ -28,7 +28,6 @@ import { ManufacturerDetails } from './ManufacturerDetails'
 import { InsertDetails } from './InsertDetails'
 import { Gallery } from './Gallery'
 import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
-import { useCloseOnOutsideClick } from '../hooks'
 import type { LabwareDefAndDate } from '../hooks'
 
 export interface LabwareDetailsProps {
@@ -50,8 +49,6 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const irregular = wellGroups.length > 1
   const isMultiRow = ordering.some(row => row.length > 1)
   const isCustomDefinition = modified != null
-  const labwareDetailsSlideoutRef = React.useRef(null)
-  useCloseOnOutsideClick(labwareDetailsSlideoutRef, props.onClose)
 
   const slideoutHeader = (
     <Flex
@@ -59,7 +56,6 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       gridGap={SPACING.spacing2}
       paddingX={SPACING.spacing4}
       marginBottom={SPACING.spacing4}
-      ref={labwareDetailsSlideoutRef}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -69,7 +65,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           {props.labware.definition.metadata.displayName}
         </StyledText>
         <Link onClick={props.onClose} role="button">
-          <Icon name={'close'} height={SPACING.spacing5} />
+          <Icon name="close" height={SPACING.spacing5} />
         </Link>
       </Flex>
       {!isCustomDefinition && (
@@ -101,7 +97,12 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   )
 
   return (
-    <Slideout onCloseClick={props.onClose} title={slideoutHeader} isExpanded>
+    <Slideout
+      onCloseClick={props.onClose}
+      closeOnOutsideClick
+      title={slideoutHeader}
+      isExpanded
+    >
       <Gallery definition={definition} />
       <Box
         backgroundColor={COLORS.lightGrey}
@@ -136,7 +137,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
             irregular={irregular}
             insertCategory={insertCategory}
           />
-          {wellGroups.map((wellProps, i) => {
+          {wellGroups.map((wellProps, index) => {
             const { metadata: groupMetadata } = wellProps
             const wellLabel = getWellLabel(wellProps, definition)
             const groupDisplaySuffix =
@@ -145,7 +146,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
                 : ''
 
             return (
-              <React.Fragment key={i}>
+              <React.Fragment key={index}>
                 {groupMetadata.displayCategory == null && irregular && (
                   <>
                     <WellCount

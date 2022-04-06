@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
-import { useTranslation, Trans } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import {
   Flex,
   Icon,
@@ -87,7 +87,7 @@ export function CustomLabwareOverflowMenu(
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
-          top="2rem"
+          top={SPACING.spacing6}
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
@@ -99,7 +99,7 @@ export function CustomLabwareOverflowMenu(
           <MenuItem onClick={handleClickLabwareCreator}>
             <StyledText color={COLORS.blue}>
               {t('open_labware_creator')}
-              <Icon name="open-in-new" height="10px"></Icon>
+              <Icon name="open-in-new" height={SPACING.spacingSM}></Icon>
             </StyledText>
           </MenuItem>
         </Flex>
@@ -136,8 +136,9 @@ export function CustomLabwareOverflowMenu(
             ]}
             alertOverlay
           >
+            <StyledText as="p">{t('def_moved_to_trash')}</StyledText>
             <StyledText as="p">
-              <Trans t={t} i18nKey={'delete_labware_description'} />
+              {t('cannot-run-python-missing-labware')}
             </StyledText>
           </AlertModal>
         </Portal>

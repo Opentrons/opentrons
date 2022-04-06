@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
-import { LabeledValue } from './styled-components/LabeledValue'
-import { ExpandingTitle } from './styled-components/ExpandingTitle'
-import { getSpacingDiagram } from './measurement-guide'
+import { LabeledValue } from './StyledComponents/LabeledValue'
+import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
+import { getSpacingDiagram } from './measurementGuide'
 
 import type { LabwareWellGroupProperties } from '../types'
 
