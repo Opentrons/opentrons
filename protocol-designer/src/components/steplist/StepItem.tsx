@@ -19,7 +19,12 @@ import {
   ProfileStepItem,
 } from '../../form-types'
 import { i18n } from '../../localization'
-import { makeLidLabelText, makeTemperatureText } from '../../utils'
+import {
+  makeLidLabelText,
+  makeSpeedText,
+  makeTemperatureText,
+  makeTimerText,
+} from '../../utils'
 import { PDListItem, TitledStepList } from '../lists'
 import { TitledListNotes } from '../TitledListNotes'
 import { AspirateDispenseHeader } from './AspirateDispenseHeader'
@@ -331,16 +336,42 @@ export const StepItemContents = (
   }
 
   if (substeps && substeps.substepType === 'heaterShaker') {
+    const temperature = makeTemperatureText(
+      substeps.targetHeaterShakerTemperature
+    )
+    const shakerValue = makeSpeedText(substeps.targetSpeed)
+    const timer = makeTimerText(
+      substeps.heaterShakerTimerMinutes,
+      substeps.heaterShakerTimerSeconds
+    )
+
     return (
       <ModuleStepItems
         action={i18n.t(`modules.actions.go_to`)}
-        actionText={'50 C'}
+        actionText={temperature}
         moduleType={HEATERSHAKER_MODULE_TYPE}
-        labwareNickname={'Labware Name'}
+        labwareNickname={substeps.labwareNickname}
       >
-        <ModuleStepItemRow label={'Labware Latch'} value={'Closed'} />
-        <ModuleStepItemRow label={'Shaker'} value={'1800 RPM'} />
-        <ModuleStepItemRow label={'Deactivate after'} value={'10 min timer'} />
+        <ModuleStepItemRow
+          label={i18n.t(`modules.labware_latch`)}
+          value={
+            substeps.latchOpen
+              ? i18n.t(`modules.actions.open`)
+              : i18n.t(`modules.actions.closed_and_locked`)
+          }
+        />
+        <ModuleStepItemRow
+          label={i18n.t(`modules.shaker_label`)}
+          value={shakerValue}
+        />
+        {timer == null ? null : (
+          <ModuleStepItemRow
+            label={
+              timer == null ? null : i18n.t(`modules.actions.deactivate_after`)
+            }
+            value={timer}
+          />
+        )}
       </ModuleStepItems>
     )
   }

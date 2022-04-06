@@ -197,12 +197,6 @@ __all__ = [
     "LoadPipetteParams",
     "LoadPipetteResult",
     "LoadPipetteCommandType",
-    # magnetic module engage command models
-    "MagneticModuleEngage",
-    "MagneticModuleEngageCreate",
-    "MagneticModuleEngageParams",
-    "MagneticModuleEngageResult",
-    "MagneticModuleEngageCommandType",
     # move relative command models
     "MoveRelative",
     "MoveRelativeParams",

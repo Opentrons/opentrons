@@ -317,7 +317,7 @@ export interface DeactivateTemperatureArgs {
 }
 
 export type SetShakeSpeedArgs = ShakeSpeedParams & {
-  module: string
+  moduleId: string
   commandCreatorFnName: 'setShakeSpeed'
   message?: string
 }

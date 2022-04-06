@@ -1,6 +1,5 @@
 """Tests for module state accessors in the protocol engine state store."""
 import pytest
-from opentrons.protocol_engine.state import MagneticModuleId, HeaterShakerModuleId
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
 from contextlib import nullcontext
@@ -23,7 +22,11 @@ from opentrons.protocol_engine.state.modules import (
 
 from opentrons.protocol_engine.state.module_substates import (
     HeaterShakerModuleSubState,
+    HeaterShakerModuleId,
     MagneticModuleSubState,
+    MagneticModuleId,
+    TemperatureModuleSubState,
+    TemperatureModuleId,
     ModuleSubStateType,
 )
 
@@ -283,6 +286,67 @@ def test_get_heater_shaker_module_substate(
 
     with pytest.raises(errors.ModuleNotLoadedError):
         subject.get_heater_shaker_module_substate(module_id="nonexistent-module-id")
+
+
+def test_get_temperature_module_substate(
+    tempdeck_v1_def: ModuleDefinition,
+    tempdeck_v2_def: ModuleDefinition,
+    heater_shaker_v1_def: ModuleDefinition,
+) -> None:
+    """It should return a substate for the given Temperature Module, if valid."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "temp-module-gen1-id": DeckSlotName.SLOT_1,
+            "temp-module-gen2-id": DeckSlotName.SLOT_2,
+            "heatshake-module-id": DeckSlotName.SLOT_3,
+        },
+        hardware_by_module_id={
+            "temp-module-gen1-id": HardwareModule(
+                serial_number="temp-module-gen1-serial",
+                definition=tempdeck_v1_def,
+            ),
+            "temp-module-gen2-id": HardwareModule(
+                serial_number="temp-module-gen2-serial",
+                definition=tempdeck_v2_def,
+            ),
+            "heatshake-module-id": HardwareModule(
+                serial_number="heatshake-module-serial",
+                definition=heater_shaker_v1_def,
+            ),
+        },
+        substate_by_module_id={
+            "temp-module-gen1-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("temp-module-gen1-id"),
+                plate_target_temperature=None,
+            ),
+            "temp-module-gen2-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("temp-module-gen2-id"),
+                plate_target_temperature=123,
+            ),
+            "heatshake-module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("heatshake-module-id"),
+                plate_target_temperature=None,
+            ),
+        },
+    )
+
+    module_1_substate = subject.get_temperature_module_substate(
+        module_id="temp-module-gen1-id"
+    )
+    assert module_1_substate.module_id == "temp-module-gen1-id"
+    assert module_1_substate.plate_target_temperature is None
+
+    module_2_substate = subject.get_temperature_module_substate(
+        module_id="temp-module-gen2-id"
+    )
+    assert module_2_substate.module_id == "temp-module-gen2-id"
+    assert module_2_substate.plate_target_temperature == 123
+
+    with pytest.raises(errors.WrongModuleTypeError):
+        subject.get_temperature_module_substate(module_id="heatshake-module-id")
+
+    with pytest.raises(errors.ModuleNotLoadedError):
+        subject.get_temperature_module_substate(module_id="nonexistent-module-id")
 
 
 def test_get_properties_by_id(
@@ -746,7 +810,7 @@ def test_magnetic_module_view_calculate_magnet_hardware_height(
 
 
 @pytest.mark.parametrize("target_temp", [36.8, 95.1])
-def test_validate_target_temperature_raises(
+def test_validate_heater_shaker_target_temperature_raises(
     heater_shaker_v1_def: ModuleDefinition,
     target_temp: float,
 ) -> None:
@@ -772,7 +836,7 @@ def test_validate_target_temperature_raises(
 
 
 @pytest.mark.parametrize("target_temp", [37, 94.8])
-def test_validate_target_temperature(
+def test_validate_heater_shaker_target_temperature(
     heater_shaker_v1_def: ModuleDefinition,
     target_temp: float,
 ) -> None:
@@ -794,6 +858,58 @@ def test_validate_target_temperature(
     )
     subject = module_view.get_heater_shaker_module_substate("module-id")
     assert subject.validate_target_temperature(target_temp) == target_temp
+
+
+@pytest.mark.parametrize("target_temp", [-10, 99.9])
+def test_validate_temp_module_target_temperature_raises(
+    tempdeck_v1_def: ModuleDefinition,
+    target_temp: float,
+) -> None:
+    """It should verify if a target temperature is valid for the specified module."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=tempdeck_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                plate_target_temperature=None,
+            )
+        },
+    )
+    subject = module_view.get_temperature_module_substate("module-id")
+    with pytest.raises(errors.InvalidTargetTemperatureError):
+        subject.validate_target_temperature(target_temp)
+
+
+@pytest.mark.parametrize(
+    ["target_temp", "validated_temp"], [(-9.431, -9), (0, 0), (99.1, 99)]
+)
+def test_validate_temp_module_target_temperature(
+    tempdeck_v2_def: ModuleDefinition, target_temp: float, validated_temp: int
+) -> None:
+    """It should verify if a target temperature is valid for the specified module."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=tempdeck_v2_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                plate_target_temperature=None,
+            )
+        },
+    )
+    subject = module_view.get_temperature_module_substate("module-id")
+    assert subject.validate_target_temperature(target_temp) == validated_temp
 
 
 @pytest.mark.parametrize(
@@ -850,3 +966,51 @@ def test_validate_heater_shaker_target_speed_raises_error(
     if not expected_valid:
         with pytest.raises(errors.InvalidTargetSpeedError):
             subject.validate_target_speed(rpm_param)
+
+
+def test_tempdeck_get_plate_target_temperature(
+    tempdeck_v2_def: ModuleDefinition,
+) -> None:
+    """It should return whether target temperature is set."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=tempdeck_v2_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                plate_target_temperature=12,
+            )
+        },
+    )
+    subject = module_view.get_temperature_module_substate("module-id")
+    assert subject.get_plate_target_temperature() == 12
+
+
+def test_tempdeck_get_plate_target_temperature_no_target(
+    tempdeck_v2_def: ModuleDefinition,
+) -> None:
+    """It should raise if no target temperature is set."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=tempdeck_v2_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                plate_target_temperature=None,
+            )
+        },
+    )
+    subject = module_view.get_temperature_module_substate("module-id")
+
+    with pytest.raises(errors.NoTargetTemperatureSetError):
+        subject.get_plate_target_temperature()

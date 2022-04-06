@@ -9,6 +9,7 @@ import labware_position_check from './labware_position_check.json'
 import more_network_and_system from './more_network_and_system.json'
 import more_panel from './more_panel.json'
 import protocol_calibration from './protocol_calibration.json'
+import protocol_details from './protocol_details.json'
 import protocol_info from './protocol_info.json'
 import protocol_list from './protocol_list.json'
 import protocol_setup from './protocol_setup.json'
@@ -32,6 +33,7 @@ export const en = {
   more_network_and_system,
   more_panel,
   protocol_calibration,
+  protocol_details,
   protocol_info,
   protocol_list,
   protocol_setup,

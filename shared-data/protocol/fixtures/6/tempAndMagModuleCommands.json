@@ -1241,7 +1241,7 @@
       "id": "0abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "mount": "leftMount"
+        "mount": "left"
       }
     },
     {
@@ -1392,7 +1392,7 @@
       "commandType": "magneticModule/disengageMagnet",
       "id": "16abc123",
       "params": {
-        "moduleId": "temperatureModuleId"
+        "moduleId": "magneticModuleId"
       }
     }
   ],

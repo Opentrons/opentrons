@@ -1,6 +1,6 @@
 """Tests for move util functions."""
 import pytest
-import numpy as np  # type: ignore[import]
+import numpy as np
 from typing import Iterator, List
 from hypothesis import given, strategies as st, assume
 
