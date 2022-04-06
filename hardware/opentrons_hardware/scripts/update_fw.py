@@ -3,7 +3,6 @@ import argparse
 import asyncio
 import logging
 from logging.config import dictConfig
-from pathlib import Path
 
 from typing_extensions import Final
 
@@ -12,9 +11,7 @@ from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.firmware_bindings import NodeId
 from opentrons_hardware.firmware_update.run import run_update
 from .can_args import add_can_args, build_settings
-from opentrons_hardware.firmware_update import (
-    HexRecordProcessor,
-)
+
 
 logger = logging.getLogger(__name__)
 
@@ -56,23 +53,22 @@ async def run(args: argparse.Namespace) -> None:
     timeout_seconds = args.timeout_seconds
     erase = not args.no_erase
 
-    hex_processor = HexRecordProcessor.from_file(Path(args.file))
-
     driver = await build_driver(build_settings(args))
 
     messenger = CanMessenger(driver)
     messenger.start()
 
-    await run_update(
-        messenger=messenger,
-        node_id=target,
-        hex_processor=hex_processor,
-        retry_count=retry_count,
-        timeout_seconds=timeout_seconds,
-        erase=erase,
-    )
-
-    await messenger.stop()
+    try:
+        await run_update(
+            messenger=messenger,
+            node_id=target,
+            hex_file=args.file,
+            retry_count=retry_count,
+            timeout_seconds=timeout_seconds,
+            erase=erase,
+        )
+    finally:
+        await messenger.stop()
 
     logger.info("Done")
 
@@ -94,7 +90,7 @@ def main() -> None:
     parser.add_argument(
         "--file",
         help="Path to hex file containing the FW executable.",
-        type=str,
+        type=argparse.FileType("r"),
         required=True,
     )
     parser.add_argument(

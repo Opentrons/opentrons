@@ -6,10 +6,7 @@ import pytest
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.firmware_bindings import NodeId
-from opentrons_hardware.firmware_update import (
-    HexRecordProcessor,
-    run_update,
-)
+from opentrons_hardware.firmware_update import run_update
 
 
 @pytest.fixture
@@ -31,11 +28,12 @@ async def test_update(
     can_messenger: CanMessenger, system_node_id: NodeId, hex_file_path: Path
 ) -> None:
     """It should complete the download."""
-    await run_update(
-        messenger=can_messenger,
-        node_id=system_node_id,
-        hex_processor=HexRecordProcessor.from_file(hex_file_path),
-        retry_count=3,
-        timeout_seconds=60,
-        erase=True,
-    )
+    with hex_file_path.open("r") as f:
+        await run_update(
+            messenger=can_messenger,
+            node_id=system_node_id,
+            hex_file=f,
+            retry_count=3,
+            timeout_seconds=60,
+            erase=True,
+        )
