@@ -25,6 +25,7 @@ import {
 import type { NextGenRouteParams } from '../../../App/NextGenApp'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
+import type { ThermalAdapterName } from '@opentrons/shared-data'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
@@ -59,7 +60,7 @@ export const HeaterShakerWizard = (
       ? heaterShakerFromProtocol.nestedLabwareDef
       : null
 
-  let adapterName: string | null = null
+  let adapterName: ThermalAdapterName | null = null
   if (
     labwareDef != null &&
     labwareDef.parameters.loadName.includes('adapter')
@@ -70,7 +71,9 @@ export const HeaterShakerWizard = (
       adapterName = 'Deep Well Adapter'
     } else if (labwareDef.parameters.loadName.includes('96flatbottom')) {
       adapterName = '96 Flat Bottom Adapter'
-    } else adapterName = 'Universal Flat Adapter'
+    }
+  } else if (labwareDef != null) {
+    adapterName = 'Universal Flat Adapter'
   }
 
   let buttonContent = null

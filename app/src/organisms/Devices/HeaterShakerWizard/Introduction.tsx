@@ -18,7 +18,10 @@ import {
 import heaterShaker from '@opentrons/app/src/assets/images/heater_shaker_empty.png'
 import screwdriver from '@opentrons/app/src/assets/images/t10_torx_screwdriver.png'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  ThermalAdapterName,
+} from '@opentrons/shared-data'
 
 const VIEW_BOX = '-20 -10 160 100'
 
@@ -88,7 +91,7 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
 }
 interface IntroductionProps {
   labwareDefinition: LabwareDefinition2 | null
-  thermalAdapterName: string | null
+  thermalAdapterName: ThermalAdapterName | null
 }
 
 export function Introduction(props: IntroductionProps): JSX.Element {

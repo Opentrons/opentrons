@@ -29,6 +29,7 @@ import type {
 import type { AttachedModule } from '../../../redux/modules/types'
 import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
 
+//  TODO(jr, 4/6/22): refactor hook to account for MoAM
 export function useHeaterShakerFromProtocol(): ProtocolModuleInfo | null {
   const currentRunId = useCurrentRunId()
   const { protocolData } = useProtocolDetailsForRun(currentRunId)

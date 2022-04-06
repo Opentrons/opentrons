@@ -11,6 +11,7 @@ import { i18n } from '../../../../i18n'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { mockDefinition } from '../../../../redux/custom-labware/__fixtures__'
 import { Introduction } from '../Introduction'
+import type { ThermalAdapterName } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -72,7 +73,7 @@ describe('Introduction', () => {
   it('renders the correct body when protocol has been uploaded with PCR adapter', () => {
     props = {
       labwareDefinition: mockDefinition,
-      thermalAdapterName: 'PCR Adapter',
+      thermalAdapterName: 'PCR Adapter' as ThermalAdapterName,
     }
     when(mockRobotWorkSpace)
       .mockReturnValue(<div></div>)
