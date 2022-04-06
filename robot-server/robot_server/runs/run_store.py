@@ -3,13 +3,10 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from sqlalchemy.sql import Select
-from sqlalchemy.sql.coercions import sqltypes
-
-from .action_models import RunAction
+from .action_models import RunAction, RunActionType
 
 import sqlalchemy
-from ..data_access.models import run_table
+from ..data_access.models import run_table, action_runs_table
 from ..data_access.data_access import get_all, get as get_row
 
 
@@ -43,6 +40,29 @@ class RunStore:
         """Initialize a RunStore and its in-memory storage."""
         self._sql_engine = sql_engine
 
+    def upsert_actions(self, run_id: str, actions: List[RunAction]) -> None:
+        """Insert or update a run actions resource in the db.
+
+        Arguments:
+            run_id: current run id to get
+            actions: a list of actions to store in the db
+        """
+        insert_actions = []
+        for action in actions:
+            insert_actions.append(_convert_action_to_sql_values(action, run_id))
+        select_statement = action_runs_table.select().where(action_runs_table.c.run_id == run_id)
+        with self._sql_engine.begin() as transaction:
+            try:
+                transaction.execute(select_statement)
+                merge_statement = action_runs_table.update().values(insert_actions)
+                transaction.execute(merge_statement)
+            except sqlalchemy.exc.NoResultFound:
+                statement = sqlalchemy.insert(run_table).values(
+                    insert_actions
+                )
+                with self._sql_engine.begin() as insert_transaction:
+                    insert_transaction.execute(statement)
+
     def upsert(self, run: RunResource) -> RunResource:
         """Insert or update a run resource in the store.
 
@@ -71,6 +91,7 @@ class RunStore:
                 active_run=False)
             transaction.execute(update_statement)
 
+        self.upsert_actions(run_id=run.run_id, actions=run.actions)
         return run
 
     def get(self, run_id: str) -> RunResource:
@@ -156,4 +177,28 @@ def _convert_run_to_sql_values(run: RunResource) -> Dict[str, object]:
         "created_at": run.created_at,
         "protocol_id": run.protocol_id,
         "active_run": run.is_current
+    }
+
+
+def _convert_sql_row_to_action(sql_row: sqlalchemy.engine.Row) -> RunAction:
+    action_id = sql_row.id
+    assert isinstance(action_id, str)
+
+    created_at = sql_row.created_at
+    assert isinstance(created_at, datetime)
+
+    action_type = sql_row.action_type
+    assert isinstance(action_type, str)
+
+    return RunAction(
+        id=action_id, createdAt=created_at, actionType=RunActionType(action_type)
+    )
+
+
+def _convert_action_to_sql_values(action: RunAction, run_id: str) -> Dict[str, object]:
+    return {
+        "id": action.id,
+        "created_at": action.createdAt,
+        "action_type": action.actionType,
+        "run_id" : run_id
     }
