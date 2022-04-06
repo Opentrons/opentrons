@@ -20,6 +20,7 @@ import { AlertPrimaryButton, SecondaryButton } from '../../atoms/Buttons'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { Portal } from '../../App/portal'
+import { useCloseOnOutsideClick } from './hooks'
 import {
   deleteCustomLabwareFile,
   openCustomLabwareDirectory,
@@ -39,6 +40,8 @@ export function CustomLabwareOverflowMenu(
   const { t } = useTranslation(['labware_landing'])
   const dispatch = useDispatch<Dispatch>()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
+  const overflowMenuRef = React.useRef(null)
+  useCloseOnOutsideClick(overflowMenuRef, () => setShowOverflowMenu(false))
 
   const {
     confirm: confirmDeleteLabware,
@@ -77,6 +80,7 @@ export function CustomLabwareOverflowMenu(
       <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
       {showOverflowMenu && (
         <Flex
+          ref={overflowMenuRef}
           width="10rem"
           zIndex={10}
           borderRadius={'4px 4px 0px 0px'}
