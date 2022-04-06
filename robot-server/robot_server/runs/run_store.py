@@ -40,7 +40,7 @@ class RunStore:
         """Initialize a RunStore and its in-memory storage."""
         self._sql_engine = sql_engine
 
-    def upsert_actions(self, run_id: str, actions: List[RunAction]) -> None:
+    def insert_actions(self, run_id: str, actions: List[RunAction]) -> None:
         """Insert or update a run actions resource in the db.
 
         Arguments:
@@ -50,18 +50,15 @@ class RunStore:
         insert_actions = []
         for action in actions:
             insert_actions.append(_convert_action_to_sql_values(action, run_id))
-        select_statement = action_runs_table.select().where(action_runs_table.c.run_id == run_id)
+        print(insert_actions)
+        statement = sqlalchemy.insert(run_table).values(
+            insert_actions
+        )
         with self._sql_engine.begin() as transaction:
             try:
-                transaction.execute(select_statement)
-                merge_statement = action_runs_table.update().values(insert_actions)
-                transaction.execute(merge_statement)
-            except sqlalchemy.exc.NoResultFound:
-                statement = sqlalchemy.insert(run_table).values(
-                    insert_actions
-                )
-                with self._sql_engine.begin() as insert_transaction:
-                    insert_transaction.execute(statement)
+                transaction.execute(statement)
+            except sqlalchemy.exc.NoResultFound as e:
+                raise e
 
     def update_active_runs(self, run_id: str) -> None:
         with self._sql_engine.begin() as transaction:
@@ -91,12 +88,14 @@ class RunStore:
             try:
                 transaction.execute(statement)
             except sqlalchemy.exc.NoResultFound as e:
+                print(e)
                 raise RunNotFoundError(run.run_id) from e
 
         if run.is_current is True:
             self.update_active_runs(run.run_id)
 
-        self.upsert_actions(run_id=run.run_id, actions=run.actions)
+        if run.actions:
+            self.insert_actions(run_id=run.run_id, actions=run.actions)
         return run
 
     def update(self, run: RunResource) -> RunResource:

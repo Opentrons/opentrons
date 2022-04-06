@@ -44,12 +44,12 @@ run_table = sqlalchemy.Table(
         sqlalchemy.DateTime,
         nullable=False,
     ),
-    sqlalchemy.Column(
-        "updated_at",
-        sqlalchemy.DateTime,
-        nullable=False,
-        onupdate=datetime.datetime.now
-    ),
+    # sqlalchemy.Column(
+    #     "updated_at",
+    #     sqlalchemy.DateTime,
+    #     nullable=False,
+    #     onupdate=datetime.datetime.now
+    # ),
     sqlalchemy.Column(
         "protocol_id",
         sqlalchemy.String,
@@ -85,7 +85,7 @@ action_runs_table = sqlalchemy.Table(
     sqlalchemy.Column(
         "run_id",
         sqlalchemy.String,
-        forigen_key="protocol_run.id",
+        sqlalchemy.ForeignKey("protocol_run.id"),
         nullable=True
     ),
 )
