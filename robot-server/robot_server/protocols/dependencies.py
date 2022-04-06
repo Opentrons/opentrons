@@ -3,7 +3,7 @@
 
 import logging
 from pathlib import Path
-from tempfile import gettempdir
+from tempfile import mkdtemp
 from typing_extensions import Final
 
 from anyio import Path as AsyncPath
@@ -26,15 +26,15 @@ from .analysis_store import AnalysisStore
 from sqlalchemy.engine import Engine as SQLEngine
 
 
-# Relative to our root persistence directory.
-_PROTOCOL_FILES_SUBDIRECTORY: Final[str] = "protocols"
-_DATABASE_FILE: Final[str] = "robot_server.db"
+_TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-robot-server-"
+_PROTOCOL_FILES_SUBDIRECTORY: Final = "protocols"
+_DATABASE_FILE: Final = "robot_server.db"
 
 
 _log = logging.getLogger(__name__)
 
-_sql_engine = AppStateValue[SQLEngine]("sql_engine")
 _persistence_directory = AppStateValue[Path]("persistence_directory")
+_sql_engine = AppStateValue[SQLEngine]("sql_engine")
 _protocol_directory = AppStateValue[Path]("protocol_directory")
 _protocol_store = AppStateValue[ProtocolStore]("protocol_store")
 _analysis_store = AppStateValue[AnalysisStore]("analysis_store")
@@ -51,8 +51,8 @@ async def _get_persistence_directory(
 
         if setting == "automatically_make_temporary":
             # It's bad for this blocking I/O to be in this async function,
-            # but we don't have an async gettempdir().
-            persistence_dir = Path(gettempdir())
+            # but we don't have an async mkdtemp().
+            persistence_dir = Path(mkdtemp(prefix=_TEMP_PERSISTENCE_DIR_PREFIX))
             _log.info(
                 f"Using auto-created temporary directory {persistence_dir}"
                 f" for persistence."
