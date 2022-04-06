@@ -81,7 +81,6 @@ def test_labware_landing_v5dot1(
         input = protocol_file.get_drag_json_protocol()
         drag_and_drop_file(input, test_labwares["validlabware"])
         assert labware_landing.get_success_toast_message().is_displayed()
-        time.sleep(2)
 
         ## uploading an invalid labware
         labware_landing.click_import_button()
@@ -94,7 +93,6 @@ def test_labware_landing_v5dot1(
         input = protocol_file.get_drag_json_protocol()
         drag_and_drop_file(input, test_labwares["invalidlabware"])
         assert labware_landing.get_error_toast_message().is_displayed()
-        time.sleep(2)
 
         ## uploading a duplicate labware and verifying the error toast
         labware_landing.click_import_button()

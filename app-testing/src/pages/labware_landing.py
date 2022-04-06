@@ -9,7 +9,7 @@ from src.driver.base import Base, Element
 
 
 class LabwareLanding:
-    """Elements and actions for the App Settings Page that loads when the app is opened."""
+    """Elements and actions for the Labware Landing Page that loads when the app is opened."""
 
     def __init__(self, driver: WebDriver, console: Console, execution_id: str) -> None:
         """Initialize with driver."""
