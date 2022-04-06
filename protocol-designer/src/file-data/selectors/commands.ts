@@ -148,6 +148,7 @@ export const commandCreatorFromStepArgs = (
         StepGeneration.thermocyclerStateStep,
         args
       )
+
     case 'heaterShaker':
       return StepGeneration.curryCommandCreator(
         StepGeneration.heaterShaker,
@@ -164,6 +165,7 @@ export const getTimelineIsBeingComputed: Selector<boolean> = state =>
 // exposes errors and last valid robotState
 export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = state =>
   state.fileData.computedRobotStateTimeline
+
 export const getSubsteps: Selector<Substeps> = state =>
   state.fileData.computedSubsteps
 type WarningsPerStep = {
