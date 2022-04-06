@@ -13,6 +13,8 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
+  ALIGN_FLEX_END,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 import { Slideout } from '../../../atoms/Slideout'
@@ -26,6 +28,7 @@ import { WellSpacing } from './WellSpacing'
 import { ManufacturerDetails } from './ManufacturerDetails'
 import { InsertDetails } from './InsertDetails'
 import { Gallery } from './Gallery'
+import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
 import type { LabwareDefAndDate } from '../hooks'
 
 export interface LabwareDetailsProps {
@@ -35,7 +38,7 @@ export interface LabwareDetailsProps {
 
 export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const { t } = useTranslation('labware_landing')
-  const { definition, modified } = props.labware
+  const { definition, modified, filename } = props.labware
   const { metadata, parameters, brand, wells, ordering } = definition
   const apiName = definition.parameters.loadName
   const { displayVolumeUnits } = metadata
@@ -46,6 +49,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const insertCategory = insert?.metadata.displayCategory
   const irregular = wellGroups.length > 1
   const isMultiRow = ordering.some(row => row.length > 1)
+  const isCustomDefinition = modified != null
 
   const slideoutHeader = (
     <Flex
@@ -65,7 +69,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           <Icon name={'close'} height={SPACING.spacing5} />
         </Link>
       </Flex>
-      {definition.brand.brand === 'Opentrons' && (
+      {!isCustomDefinition && (
         <>
           <StyledText as="label" id="LabwareDetails_opentronsDef">
             <Icon color={COLORS.blue} name="check-decagram" height=".7rem" />{' '}
@@ -73,11 +77,12 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           </StyledText>
         </>
       )}
-      {modified != null && (
+      {modified != null && filename != null && (
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           paddingRight={SPACING.spacing1}
+          alignItems={ALIGN_CENTER}
         >
           <StyledText
             as="label"
@@ -86,11 +91,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           >
             {t('last_updated')} {format(new Date(modified), 'MM/dd/yyyy')}
           </StyledText>
-          <Icon
-            name="dots-vertical"
-            height={SPACING.spacing4}
-            id="LabwareDetails_overflowMenu"
-          />
+          <CustomLabwareOverflowMenu filename={filename} />
         </Flex>
       )}
     </Flex>

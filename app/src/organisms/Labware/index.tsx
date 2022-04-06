@@ -102,7 +102,11 @@ export function Labware(): JSX.Element {
             css={TYPOGRAPHY.h6SemiBold}
             color={COLORS.darkGreyEnabled}
           >
-            <Link href={LABWARE_CREATOR_HREF} color={COLORS.darkGreyEnabled}>
+            <Link
+              href={LABWARE_CREATOR_HREF}
+              color={COLORS.darkGreyEnabled}
+              external
+            >
               {t('open_labware_creator')}{' '}
               <Icon name="open-in-new" height="10px"></Icon>
             </Link>

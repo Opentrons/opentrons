@@ -19,6 +19,7 @@ import {
   ALIGN_FLEX_END,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
+import { CustomLabwareOverflowMenu } from './LabwareDetails/CustomLabwareOverflowMenu'
 import type { LabwareDefAndDate } from './hooks'
 
 export interface LabwareCardProps {
@@ -28,7 +29,7 @@ export interface LabwareCardProps {
 
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const { t } = useTranslation('labware_landing')
-  const { definition, modified } = props.labware
+  const { definition, modified, filename } = props.labware
   const apiName = definition.parameters.loadName
   const displayName = definition?.metadata.displayName
   const displayCategory = startCase(definition.metadata.displayCategory)
@@ -63,7 +64,15 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               <StyledText as="h3" id="LabwareCard_labwareName">
                 {displayName}
               </StyledText>
-              {definition.brand.brand === 'Opentrons' && (
+              {isCustomDefinition ? (
+                <StyledText
+                  as="h6"
+                  color={COLORS.darkGreyEnabled}
+                  id="LabwareCard_customDef"
+                >
+                  {t('custom_def')}
+                </StyledText>
+              ) : (
                 <>
                   <StyledText as="h6" id="LabwareCard_opentronsDef">
                     <Icon
@@ -74,15 +83,6 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                     {t('opentrons_def')}
                   </StyledText>
                 </>
-              )}
-              {isCustomDefinition && (
-                <StyledText
-                  as="h6"
-                  color={COLORS.darkGreyEnabled}
-                  id="LabwareCard_customDef"
-                >
-                  {t('custom_def')}
-                </StyledText>
               )}
             </Box>
             <Box paddingTop={SPACING.spacing4}>
@@ -104,17 +104,13 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             </Box>
           </Flex>
         </Flex>
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          alignItems={ALIGN_FLEX_END}
-        >
-          <Icon
-            name="dots-vertical"
-            height="1rem"
-            id="LabwareCard_overflowMenu"
-          />
-          {modified != null && (
+        {modified != null && filename != null && (
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            alignItems={ALIGN_FLEX_END}
+          >
+            <CustomLabwareOverflowMenu filename={filename} />
             <StyledText
               as="h6"
               color={COLORS.darkGreyEnabled}
@@ -122,8 +118,8 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             >
               {t('date_added')} {format(new Date(modified), 'MM/dd/yyyy')}
             </StyledText>
-          )}
-        </Flex>
+          </Flex>
+        )}
       </Flex>
     </Box>
   )
