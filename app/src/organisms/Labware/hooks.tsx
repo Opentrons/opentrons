@@ -23,7 +23,7 @@ export function useGetAllLabware(): LabwareDefAndDate[] {
   const labwareDefinitons = getAllDefinitions()
   labwareDefinitons.map(def => fullLabwareList.push({ definition: def }))
   const customLabwareList = useSelector(getCustomLabware)
-  console.log(customLabwareList)
+
   customLabwareList.map(customLabware =>
     'definition' in customLabware
       ? fullLabwareList.push({

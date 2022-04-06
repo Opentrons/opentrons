@@ -60,10 +60,12 @@ export function WellProperties(props: WellPropertiesProps): JSX.Element {
         >
           <StyledText as="h6">{t('max_volume')}</StyledText>
           <StyledText as="p">
-            {vol ? `${getDisplayVolume(vol, units, 2)} ${units}` : t('various')}
+            {vol != null
+              ? `${getDisplayVolume(vol, units, 2)} ${units}`
+              : t('various')}
           </StyledText>
         </Flex>
-        {wellBottomShape && wellBottomValue && (
+        {wellBottomShape != null && wellBottomValue && (
           <Flex flexDirection={DIRECTION_ROW}>
             <Flex
               flexDirection={DIRECTION_COLUMN}

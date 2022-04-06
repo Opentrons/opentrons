@@ -13,7 +13,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_FLEX_END,
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
@@ -28,7 +27,7 @@ import { WellSpacing } from './WellSpacing'
 import { ManufacturerDetails } from './ManufacturerDetails'
 import { InsertDetails } from './InsertDetails'
 import { Gallery } from './Gallery'
-import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
+import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
 import type { LabwareDefAndDate } from '../hooks'
 
 export interface LabwareDetailsProps {

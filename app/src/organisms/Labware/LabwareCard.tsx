@@ -19,7 +19,7 @@ import {
   ALIGN_FLEX_END,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { CustomLabwareOverflowMenu } from './LabwareDetails/CustomLabwareOverflowMenu'
+import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
 import type { LabwareDefAndDate } from './hooks'
 
 export interface LabwareCardProps {

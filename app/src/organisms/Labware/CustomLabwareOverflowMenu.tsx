@@ -14,17 +14,17 @@ import {
   ALIGN_FLEX_END,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
-import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../../atoms/MenuList/MenuItem'
-import { AlertPrimaryButton, SecondaryButton } from '../../../atoms/Buttons'
-import { StyledText } from '../../../atoms/text'
-import { Divider } from '../../../atoms/structure'
-import { Portal } from '../../../App/portal'
+import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { AlertPrimaryButton, SecondaryButton } from '../../atoms/Buttons'
+import { StyledText } from '../../atoms/text'
+import { Divider } from '../../atoms/structure'
+import { Portal } from '../../App/portal'
 import {
   deleteCustomLabwareFile,
   openCustomLabwareDirectory,
-} from '../../../redux/custom-labware'
-import type { Dispatch } from '../../../redux/types'
+} from '../../redux/custom-labware'
+import type { Dispatch } from '../../redux/types'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 
