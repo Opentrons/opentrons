@@ -106,7 +106,7 @@ async def create_run_action(
     except ProtocolEngineStoppedError as e:
         raise RunActionNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
-    run_store.upsert(run=next_run)
+    run_store.update(run=next_run)
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=action),

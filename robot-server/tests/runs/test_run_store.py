@@ -31,7 +31,7 @@ def test_add_run(subject: RunStore) -> None:
         actions=[],
         is_current=True,
     )
-    result = subject.upsert(run)
+    result = subject.insert(run)
 
     assert result == run
 
@@ -53,9 +53,9 @@ def test_update_run(subject: RunStore) -> None:
         is_current=True,
     )
 
-    subject.upsert(run)
+    subject.insert(run)
 
-    result = subject.upsert(updated_run)
+    result = subject.update(updated_run)
 
     assert result == updated_run
 
@@ -70,7 +70,7 @@ def test_get_run(subject: RunStore) -> None:
         is_current=False,
     )
 
-    subject.upsert(run)
+    subject.insert(run)
 
     result = subject.get(run_id="run-id")
 
@@ -100,8 +100,8 @@ def test_get_all_runs(subject: RunStore) -> None:
         is_current=True,
     )
 
-    subject.upsert(run_1)
-    subject.upsert(run_2)
+    subject.insert(run_1)
+    subject.insert(run_2)
 
     result = subject.get_all()
 
@@ -118,7 +118,7 @@ def test_remove_run(subject: RunStore) -> None:
         is_current=True,
     )
 
-    subject.upsert(run)
+    subject.insert(run)
 
     result = subject.remove(run_id="run-id")
 
@@ -150,8 +150,8 @@ def test_add_run_current_run_deactivates(subject: RunStore) -> None:
         is_current=True,
     )
 
-    subject.upsert(run_1)
-    subject.upsert(run_2)
+    subject.insert(run_1)
+    subject.insert(run_2)
 
     assert subject.get("run-id-1").is_current is False
     assert subject.get("run-id-2").is_current is True

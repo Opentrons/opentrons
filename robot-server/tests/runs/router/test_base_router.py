@@ -141,7 +141,7 @@ async def test_create_run(
         # It should have added each requested labware offset to the engine,
         # in the exact order they appear in the request.
         *[engine_store.engine.add_labware_offset(r) for r in LABWARE_OFFSET_REQUESTS],
-        run_store.upsert(run=expected_run),
+        run_store.insert(run=expected_run),
     )
 
 
@@ -227,7 +227,7 @@ async def test_create_protocol_run(
         # in the exact order they appear in the request.
         *[engine_store.engine.add_labware_offset(r) for r in LABWARE_OFFSET_REQUESTS],
         engine_store.runner.load(protocol_resource.source),
-        run_store.upsert(run=run),
+        run_store.insert(run=run),
     )
 
 
@@ -650,7 +650,7 @@ async def test_update_run_to_not_current(
 
     decoy.verify(
         await engine_store.clear(),
-        run_store.upsert(updated_resource),
+        run_store.update(updated_resource),
     )
 
 
@@ -712,7 +712,7 @@ async def test_update_current_to_current_noop(
     assert result.content == SimpleBody(data=expected_response)
     assert result.status_code == 200
 
-    decoy.verify(run_store.upsert(run_resource), times=0)
+    decoy.verify(run_store.update(run_resource), times=0)
     decoy.verify(await engine_store.clear(), times=0)
 
 

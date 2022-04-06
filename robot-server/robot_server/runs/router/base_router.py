@@ -175,7 +175,7 @@ async def create_run(
         actions=[],
     )
 
-    run_store.upsert(run=run)
+    run_store.insert(run=run)
     log.info(f'Created protocol run "{run_id}" from protocol "{protocol_id}".')
 
     data = Run.construct(
@@ -347,7 +347,7 @@ async def update_run(
         except EngineConflictError:
             raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
 
-        run_store.upsert(run)
+        run_store.update(run)
         log.info(f'Marked run "{runId}" as not current.')
 
     engine_state = engine_store.get_state(run.run_id)

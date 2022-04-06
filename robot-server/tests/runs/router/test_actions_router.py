@@ -97,7 +97,7 @@ async def test_create_play_action_to_start_run(
 
     decoy.verify(
         task_runner.run(engine_store.runner.run),
-        run_store.upsert(run=next_run),
+        run_store.update(run=next_run),
     )
 
 
@@ -149,7 +149,7 @@ async def test_create_play_action_to_resume_run(
 
     decoy.verify(
         engine_store.runner.play(),
-        run_store.upsert(run=next_run),
+        run_store.update(run=next_run),
     )
 
 
@@ -230,7 +230,7 @@ async def test_create_play_action_not_allowed(
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunActionNotAllowed"
 
-    decoy.verify(run_store.upsert(run=matchers.Anything()), times=0)
+    decoy.verify(run_store.update(run=matchers.Anything()), times=0)
 
 
 async def test_create_run_action_not_current(
@@ -262,7 +262,7 @@ async def test_create_run_action_not_current(
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
 
-    decoy.verify(run_store.upsert(run=matchers.Anything()), times=0)
+    decoy.verify(run_store.update(run=matchers.Anything()), times=0)
 
 
 async def test_create_pause_action(
@@ -311,7 +311,7 @@ async def test_create_pause_action(
 
     decoy.verify(
         engine_store.runner.pause(),
-        run_store.upsert(run=next_run),
+        run_store.insert(run=next_run),
     )
 
 
@@ -363,5 +363,5 @@ async def test_create_stop_action(
 
     decoy.verify(
         task_runner.run(engine_store.runner.stop),
-        run_store.upsert(run=next_run),
+        run_store.update(run=next_run),
     )

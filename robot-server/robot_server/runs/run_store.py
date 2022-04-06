@@ -63,7 +63,43 @@ class RunStore:
                 with self._sql_engine.begin() as insert_transaction:
                     insert_transaction.execute(statement)
 
-    def upsert(self, run: RunResource) -> RunResource:
+    def update_active_runs(self, run_id: str) -> None:
+        with self._sql_engine.begin() as transaction:
+            try:
+                update_statement = sqlalchemy.update(run_table).where(run_table.c.id != run_id,
+                                                                      run_table.c.active_run == True).values(
+                    active_run=False)
+                transaction.execute(update_statement)
+            except sqlalchemy.exc.NoResultFound as e:
+                raise e
+
+    def insert(self, run: RunResource) -> RunResource:
+        """Insert run resource in the db.
+
+        Arguments:
+            run: Run resource to store. Reads `run.id` to
+                determine identity in storage.
+
+        Returns:
+            The resource that was added to the store.
+        """
+
+        statement = sqlalchemy.insert(run_table).values(
+            _convert_run_to_sql_values(run=run)
+        )
+        with self._sql_engine.begin() as transaction:
+            try:
+                transaction.execute(statement)
+            except sqlalchemy.exc.NoResultFound as e:
+                raise RunNotFoundError(run.run_id) from e
+
+        if run.is_current is True:
+            self.update_active_runs(run.run_id)
+
+        self.upsert_actions(run_id=run.run_id, actions=run.actions)
+        return run
+
+    def update(self, run: RunResource) -> RunResource:
         """Insert or update a run resource in the store.
 
         Arguments:
@@ -73,6 +109,7 @@ class RunStore:
         Returns:
             The resource that was added to the store.
         """
+
         update_statement = sqlalchemy.update(run_table).where(run_table.c.id == run.run_id).values(
             active_run=run.is_current)
         with self._sql_engine.begin() as transaction:
@@ -86,10 +123,7 @@ class RunStore:
                     insert_transaction.execute(statement)
 
         if run.is_current is True:
-            update_statement = sqlalchemy.update(run_table).where(run_table.c.id != run.run_id,
-                                                                  run_table.c.active_run == True).values(
-                active_run=False)
-            transaction.execute(update_statement)
+            self.update_active_runs(run.run_id)
 
         self.upsert_actions(run_id=run.run_id, actions=run.actions)
         return run
@@ -200,5 +234,5 @@ def _convert_action_to_sql_values(action: RunAction, run_id: str) -> Dict[str, o
         "id": action.id,
         "created_at": action.createdAt,
         "action_type": action.actionType,
-        "run_id" : run_id
+        "run_id": run_id
     }
