@@ -126,7 +126,7 @@ export interface NextGenRouteParams {
   appSettingsTab: AppSettingsTab
   robotName: string
   protocolKey: string
-  labwareUri: string
+  labwareId: string
   robotSettingsTab: RobotSettingsTab
   runId: string
   protocolRunDetailsTab: ProtocolRunDetailsTab
@@ -180,7 +180,7 @@ export const nextGenRoutes: RouteProps[] = [
     name: 'Labware',
     navLinkTo: '/labware',
     // labwareId param is for details slideout
-    path: '/labware/:labwareUri?',
+    path: '/labware/:labwareId?',
   },
   {
     component: DevicesLanding,
