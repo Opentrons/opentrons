@@ -169,6 +169,7 @@ async def read_temp_from_pressure_sensor(
 ) -> None:
     """Function to read temperature from the pressure sensor."""
     start_time = datetime.now()
+    start_time_strf = start_time.strftime("%H:%M:%S")
     csv = None
     pressure = mmr920C04.PressureSensor()
     if include_csv:
@@ -177,11 +178,11 @@ async def read_temp_from_pressure_sensor(
             command.sensor_type.name,
             command.minutes,
             command.auto_zero,
-            start_time.strftime("%H:%M:%S"),
+            start_time_strf,
         )
         csv = CSVFormatter.build(metadata, list(metadata.to_dict().keys()))
-    delta = timedelta(minutes=command.minutes)
-    while datetime.now() - start_time < delta:
+    end_time = datetime.now + timedelta(minutes=command.minutes)
+    while datetime.now() < end_time:
         messenger = CanMessenger(driver=driver)
         messenger.start()
         data = await pressure.read_temperature(
