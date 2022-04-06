@@ -26,7 +26,7 @@ import { ConnectPanel } from '../pages/Robots/ConnectPanel'
 import { RunPanel } from '../pages/Run/RunPanel'
 import { MorePanel } from '../pages/More/MorePanel'
 
-import { Navbar } from './Navbar'
+import { LegacyNavbar } from './LegacyNavbar'
 import { NextGenApp } from './NextGenApp'
 import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
 
@@ -53,7 +53,7 @@ export const AppComponent = (): JSX.Element => {
           <NextGenApp />
         ) : (
           <>
-            <Navbar />
+            <LegacyNavbar />
             <Switch>
               <Route path="/robots/:name?" component={ConnectPanel} />
               <Route path="/more" component={MorePanel} />

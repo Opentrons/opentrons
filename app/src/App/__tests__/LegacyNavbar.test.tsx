@@ -9,7 +9,7 @@ import {
   FLEX_NONE,
   SIZE_3,
 } from '@opentrons/components'
-import { Navbar } from '../Navbar'
+import { LegacyNavbar } from '../LegacyNavbar'
 import { NavbarLink } from '../../molecules/NavbarLink'
 import { useNavLocations } from '../hooks'
 
@@ -37,7 +37,7 @@ describe('Navbar component', () => {
   }
 
   const render = (): ReturnType<typeof mount> => {
-    return mount(<Navbar />, {
+    return mount(<LegacyNavbar />, {
       wrappingComponent: Provider,
       wrappingComponentProps: { store },
     })
