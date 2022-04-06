@@ -28,6 +28,7 @@ import { ManufacturerDetails } from './ManufacturerDetails'
 import { InsertDetails } from './InsertDetails'
 import { Gallery } from './Gallery'
 import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
+import { useCloseOnOutsideClick } from '../hooks'
 import type { LabwareDefAndDate } from '../hooks'
 
 export interface LabwareDetailsProps {
@@ -49,6 +50,8 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const irregular = wellGroups.length > 1
   const isMultiRow = ordering.some(row => row.length > 1)
   const isCustomDefinition = modified != null
+  const labwareDetailsSlideoutRef = React.useRef(null)
+  useCloseOnOutsideClick(labwareDetailsSlideoutRef, props.onClose)
 
   const slideoutHeader = (
     <Flex
@@ -56,6 +59,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       gridGap={SPACING.spacing2}
       paddingX={SPACING.spacing4}
       marginBottom={SPACING.spacing4}
+      ref={labwareDetailsSlideoutRef}
     >
       <Flex
         flexDirection={DIRECTION_ROW}

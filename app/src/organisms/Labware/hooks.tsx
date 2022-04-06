@@ -88,7 +88,6 @@ export function useCloseOnOutsideClick(
   const handleClick = (e: MouseEvent): void => {
     // @ts-expect-error node and event target types are mismatched
     if (ref.current != null && !ref.current.contains(e.target)) {
-      e.stopPropagation()
       onClose()
     }
   }

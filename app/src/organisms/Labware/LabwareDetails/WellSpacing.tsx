@@ -54,8 +54,8 @@ export function WellSpacing(props: WellSpacingProps): JSX.Element {
         label={`${t('spacing')} ${labelSuffix != null ? labelSuffix : ''}`}
         diagram={diagram}
       />
-      {spacing.map(s => (
-        <LabeledValue key={s.value} label={s.label} value={s.value} />
+      {spacing.map((s, index) => (
+        <LabeledValue key={index} label={s.label} value={s.value} />
       ))}
     </>
   )
