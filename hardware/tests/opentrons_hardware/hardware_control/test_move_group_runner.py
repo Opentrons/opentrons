@@ -452,6 +452,7 @@ class MockSendMoveCompleter:
                         group_id=message.payload.group_id,
                         seq_id=UInt8Field(seq_id),
                         current_position_um=UInt32Field(int(move.distance_mm * 1000)),
+                        encoder_position = UInt32Field(int(move.distance_mm * 4000)),
                         ack_id=UInt8Field(1),
                     )
                     arbitration_id = ArbitrationId(
@@ -556,6 +557,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(10000),
+                            encoder_position=UInt32Field(10000*4),
                         )
                     ),
                 ),
@@ -567,6 +569,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(1),
                             current_position_um=UInt32Field(20000),
+                            encoder_position=UInt32Field(10000*4),
                         )
                     ),
                 ),
@@ -578,6 +581,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(1),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(30000),
+                            encoder_position=UInt32Field(10000*4),
                         )
                     ),
                 ),
@@ -595,6 +599,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(10000),
+                            encoder_position=UInt32Field(10000*4),
                         )
                     ),
                 ),
@@ -606,6 +611,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(1),
                             current_position_um=UInt32Field(20000),
+                            encoder_position=UInt32Field(10000*4),
                         )
                     ),
                 ),
@@ -617,6 +623,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(1),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(30000),
+                            encoder_position=UInt32Field(10000*4),
                         )
                     ),
                 ),
