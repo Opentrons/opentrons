@@ -76,7 +76,9 @@ export const Slideout = (props: Props): JSX.Element | null => {
   } = props
   return (
     <>
-      {isExpanded ? <Overlay /> : null}
+      {isExpanded ? (
+        <Overlay backgroundColor={COLORS.backgroundOverlay} />
+      ) : null}
       <Box
         css={isExpanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
         position={POSITION_ABSOLUTE}

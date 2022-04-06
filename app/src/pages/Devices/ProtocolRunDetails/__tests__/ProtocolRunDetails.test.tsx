@@ -7,11 +7,13 @@ import { i18n } from '../../../../i18n'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
+import { ProtocolRunSetup } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { RunLog } from '../../../../organisms/Devices/ProtocolRun/RunLog'
 import { ProtocolRunDetails } from '..'
 
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader')
+jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup')
 jest.mock('../../../../organisms/Devices/ProtocolRun/RunLog')
 jest.mock('../../../../organisms/Labware/helpers/getAllDefs')
 
@@ -20,6 +22,9 @@ const mockProtocolRunHeader = ProtocolRunHeader as jest.MockedFunction<
   typeof ProtocolRunHeader
 >
 const mockRunLog = RunLog as jest.MockedFunction<typeof RunLog>
+const mockProtocolRunSetup = ProtocolRunSetup as jest.MockedFunction<
+  typeof ProtocolRunSetup
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -39,6 +44,7 @@ describe('ProtocolRunDetails', () => {
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     mockProtocolRunHeader.mockReturnValue(<div>Mock ProtocolRunHeader</div>)
     mockRunLog.mockReturnValue(<div>Mock RunLog</div>)
+    mockProtocolRunSetup.mockReturnValue(<div>Mock ProtocolRunSetup</div>)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -76,7 +82,7 @@ describe('ProtocolRunDetails', () => {
       '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/this-is-not-a-real-tab'
     )
 
-    getByText('setup content')
+    getByText('Mock ProtocolRunSetup')
   })
 
   it('renders a run log when the run log tab is clicked', () => {
@@ -88,5 +94,19 @@ describe('ProtocolRunDetails', () => {
     const runTab = getByText('Run Log')
     runTab.click()
     getByText('Mock RunLog')
+  })
+
+  it('renders protocol run setup when the setup tab is clicked', () => {
+    const [{ getByText, queryByText }] = render(
+      '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
+    )
+
+    const setupTab = getByText('Setup')
+    const runTab = getByText('Run Log')
+    runTab.click()
+    getByText('Mock RunLog')
+    expect(queryByText('Mock ProtocolRunSetup')).toBeFalsy()
+    setupTab.click()
+    getByText('Mock ProtocolRunSetup')
   })
 })

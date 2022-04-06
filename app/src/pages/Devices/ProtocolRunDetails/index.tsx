@@ -23,6 +23,7 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import { useRobot } from '../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { RunLog } from '../../../organisms/Devices/ProtocolRun/RunLog'
+import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 
 import type {
   NextGenRouteParams,
@@ -95,8 +96,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
       runId,
     }: ProtocolRunDetailsTabProps) => JSX.Element | null
   } = {
-    // TODO: setup tab content
-    setup: () => <div>setup content</div>,
+    setup: () => <ProtocolRunSetup robotName={robotName} runId={runId} />,
     // TODO: module controls tab content
     'module-controls': () => <div>module controls content</div>,
     'run-log': () => <RunLog robotName={robotName} runId={runId} />,
