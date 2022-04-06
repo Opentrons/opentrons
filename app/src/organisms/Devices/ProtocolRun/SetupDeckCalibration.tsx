@@ -56,7 +56,9 @@ export function SetupDeckCalibration({
       </Flex>
       <SetupCalibrationItem
         calibratedDate={
-          isDeckCalibrated && deckCalibrationData != null
+          isDeckCalibrated &&
+          deckCalibrationData != null &&
+          'lastModified' in deckCalibrationData
             ? deckCalibrationData.lastModified
             : null
         }
