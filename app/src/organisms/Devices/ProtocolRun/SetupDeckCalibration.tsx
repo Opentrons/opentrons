@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
+
 import {
   Flex,
   ALIGN_CENTER,
@@ -11,6 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { TertiaryButton } from '../../../atoms/Buttons'
 import { StyledText } from '../../../atoms/text'
 import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
@@ -24,16 +27,17 @@ export function SetupDeckCalibration({
 }: SetupDeckCalibrationProps): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
 
-  const deckCalData = useDeckCalibrationData(robotName)
+  const { deckCalibrationData, isDeckCalibrated } = useDeckCalibrationData(
+    robotName
+  )
 
-  // this component should never be rendered if there is no deckCalData
-  if (
-    deckCalData == null ||
-    !('lastModified' in deckCalData) ||
-    typeof deckCalData.lastModified !== 'string'
-  ) {
-    return null
-  }
+  const calibrateNowButton = (
+    <Link to={`/devices/${robotName}/robot-settings/calibration`}>
+      <TertiaryButton padding={`${SPACING.spacing3} ${SPACING.spacing4}`}>
+        {t('calibrate_now_cta')}
+      </TertiaryButton>
+    </Link>
+  )
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
@@ -50,7 +54,14 @@ export function SetupDeckCalibration({
           {t('deck_calibration_title')}
         </StyledText>
       </Flex>
-      <SetupCalibrationItem calibratedDate={deckCalData.lastModified} />
+      <SetupCalibrationItem
+        calibratedDate={
+          isDeckCalibrated && deckCalibrationData != null
+            ? deckCalibrationData.lastModified
+            : null
+        }
+        button={isDeckCalibrated ? undefined : calibrateNowButton}
+      />
     </Flex>
   )
 }

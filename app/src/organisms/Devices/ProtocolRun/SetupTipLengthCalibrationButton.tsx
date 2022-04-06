@@ -12,12 +12,14 @@ import {
   useConditionalConfirm,
   useHoverTooltip,
   ALIGN_CENTER,
-  SIZE_5,
+  SIZE_4,
   TEXT_ALIGN_CENTER,
   TOOLTIP_LEFT,
   COLORS,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { Portal } from '../../../App/portal'
 import { TertiaryButton } from '../../../atoms/Buttons'
@@ -38,6 +40,7 @@ import * as RobotApi from '../../../redux/robot-api'
 import * as Sessions from '../../../redux/sessions'
 import { getPipetteOffsetCalibrationSession } from '../../../redux/sessions/pipette-offset-calibration/selectors'
 import { getTipLengthCalibrationSession } from '../../../redux/sessions/tip-length-calibration/selectors'
+import { useDeckCalibrationData } from '../hooks'
 
 import type { Mount } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -48,9 +51,6 @@ import type {
   TipLengthCalibrationSession,
 } from '../../../redux/sessions/types'
 import type { State } from '../../../redux/types'
-
-const TIP_LENGTH_CALIBRATION = 'tip length calibration'
-const EXIT = 'exit'
 
 export interface SetupTipLengthCalibrationButtonProps {
   robotName: string
@@ -80,14 +80,13 @@ export function SetupTipLengthCalibrationButton({
   const trackedRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
   const dispatch = useDispatch()
-  const { t } = useTranslation('protocol_setup')
+  const { t } = useTranslation(['protocol_setup', 'shared'])
+
+  const { isDeckCalibrated } = useDeckCalibrationData(robotName)
 
   const sessionType = isExtendedPipOffset
     ? Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
     : Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
-
-  const uriFromDef = (definition: LabwareDefinition2): string =>
-    `${definition.namespace}/${definition.parameters.loadName}/${definition.version}`
 
   const dispatchAnalyticsEvent = isExtendedPipOffset
     ? (calBlock: boolean): void => {
@@ -97,7 +96,7 @@ export function SetupTipLengthCalibrationButton({
             mount,
             calBlock,
             true,
-            uriFromDef(tipRackDefinition)
+            getLabwareDefURI(tipRackDefinition)
           )
         )
       }
@@ -107,7 +106,7 @@ export function SetupTipLengthCalibrationButton({
             INTENT_TIP_LENGTH_IN_PROTOCOL,
             mount,
             calBlock,
-            uriFromDef(tipRackDefinition)
+            getLabwareDefURI(tipRackDefinition)
           )
         )
       }
@@ -200,7 +199,8 @@ export function SetupTipLengthCalibrationButton({
   )
 
   const runStatus = useRunStatus(runId)
-  const disableRecalibrate = runStatus != null && runStatus !== RUN_STATUS_IDLE
+  const disableRecalibrate =
+    (runStatus != null && runStatus !== RUN_STATUS_IDLE) || !isDeckCalibrated
 
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
@@ -217,8 +217,10 @@ export function SetupTipLengthCalibrationButton({
       </Box>
       <Tooltip {...tooltipProps}>
         {
-          <Box width={SIZE_5} textAlign={TEXT_ALIGN_CENTER}>
-            {t('recalibrating_tip_length_not_available')}
+          <Box width={SIZE_4} textAlign={TEXT_ALIGN_CENTER}>
+            {isDeckCalibrated
+              ? t('recalibrating_tip_length_not_available')
+              : t('calibrate_deck_to_proceed_to_tip_length_calibration')}
           </Box>
         }
       </Tooltip>
@@ -239,13 +241,30 @@ export function SetupTipLengthCalibrationButton({
         {hasCalibrated ? (
           recalibrateLink
         ) : (
-          <TertiaryButton
-            onClick={() => handleStart()}
-            id={'TipRackCalibration_calibrateTipRackButton'}
-            disabled={disabled}
-          >
-            {t('calibrate_now_cta')}
-          </TertiaryButton>
+          <>
+            <TertiaryButton
+              padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
+              onClick={() => handleStart()}
+              id={'TipRackCalibration_calibrateTipRackButton'}
+              disabled={disabled || !isDeckCalibrated}
+              {...targetProps}
+            >
+              {t('calibrate_now_cta')}
+            </TertiaryButton>
+            {disabled || !isDeckCalibrated ? (
+              <Tooltip {...tooltipProps}>
+                {
+                  <Box width={SIZE_4}>
+                    {isDeckCalibrated
+                      ? t('recalibrating_tip_length_not_available')
+                      : t(
+                          'calibrate_deck_to_proceed_to_tip_length_calibration'
+                        )}
+                  </Box>
+                }
+              </Tooltip>
+            ) : null}
+          </>
         )}
       </Flex>
       {showConfirmation && (
@@ -261,18 +280,18 @@ export function SetupTipLengthCalibrationButton({
         {showCalBlockModal ? (
           <AskForCalibrationBlockModal
             onResponse={handleStart}
-            titleBarTitle={TIP_LENGTH_CALIBRATION}
+            titleBarTitle={t('tip_length_calibration')}
             closePrompt={() => setShowCalBlockModal(false)}
           />
         ) : null}
         {startingSession ? (
           <SpinnerModalPage
             titleBar={{
-              title: TIP_LENGTH_CALIBRATION,
+              title: t('tip_length_calibration'),
               back: {
                 disabled: true,
-                title: EXIT,
-                children: EXIT,
+                title: t('shared:exit'),
+                children: t('shared:exit'),
               },
             }}
           />

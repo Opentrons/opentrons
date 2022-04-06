@@ -12,6 +12,7 @@ import {
 
 import { PrimaryButton } from '../../../atoms/Buttons'
 import { useTrackEvent } from '../../../redux/analytics'
+import { useDeckCalibrationData } from '../hooks'
 import { SetupDeckCalibration } from './SetupDeckCalibration'
 import { SetupPipetteCalibration } from './SetupPipetteCalibration'
 import { SetupTipLengthCalibration } from './SetupTipLengthCalibration'
@@ -42,6 +43,11 @@ export function SetupRobotCalibration({
   const [targetProps, tooltipProps] = useHoverTooltip()
   const trackEvent = useTrackEvent()
 
+  const { isDeckCalibrated } = useDeckCalibrationData(robotName)
+
+  const toolTipCalibrationStatusReasonText =
+    calibrationStatus.reason != null ? t(calibrationStatus.reason) : null
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
       <Flex
@@ -55,7 +61,7 @@ export function SetupRobotCalibration({
         <SetupTipLengthCalibration robotName={robotName} runId={runId} />
       </Flex>
       <PrimaryButton
-        disabled={!calibrationStatus.complete}
+        disabled={!calibrationStatus.complete || !isDeckCalibrated}
         onClick={() => {
           expandStep(nextStep)
           trackEvent({
@@ -68,9 +74,13 @@ export function SetupRobotCalibration({
       >
         {t(nextStepButtonKey)}
       </PrimaryButton>
-      {calibrationStatus.reason != null && (
-        <Tooltip {...tooltipProps}>{t(calibrationStatus.reason)}</Tooltip>
-      )}
+      {calibrationStatus.reason != null || !isDeckCalibrated ? (
+        <Tooltip {...tooltipProps}>
+          {!isDeckCalibrated
+            ? t('calibrate_deck_to_proceed_to_next_step')
+            : toolTipCalibrationStatusReasonText}
+        </Tooltip>
+      ) : null}
     </Flex>
   )
 }

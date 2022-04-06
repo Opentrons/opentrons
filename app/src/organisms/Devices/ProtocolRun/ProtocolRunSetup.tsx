@@ -7,6 +7,7 @@ import { protocolHasModules } from '@opentrons/shared-data'
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import {
+  useDeckCalibrationData,
   useProtocolDetailsForRun,
   useRobot,
   useRunCalibrationStatus,
@@ -38,6 +39,7 @@ export function ProtocolRunSetup({
   const { protocolData } = useProtocolDetailsForRun(runId)
   const robot = useRobot(robotName)
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
+  const { isDeckCalibrated } = useDeckCalibrationData(robotName)
 
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     null
@@ -57,7 +59,7 @@ export function ProtocolRunSetup({
       ]
     }
     let initialExpandedStepKey: StepKey = ROBOT_CALIBRATION_STEP_KEY
-    if (calibrationStatus.complete) {
+    if (calibrationStatus.complete && isDeckCalibrated) {
       initialExpandedStepKey =
         nextStepKeysInOrder[
           nextStepKeysInOrder.findIndex(v => v === ROBOT_CALIBRATION_STEP_KEY) +
@@ -139,7 +141,7 @@ export function ProtocolRunSetup({
             }
             calibrationStatusComplete={
               stepKey === ROBOT_CALIBRATION_STEP_KEY
-                ? calibrationStatus.complete
+                ? calibrationStatus.complete && isDeckCalibrated
                 : null
             }
           >

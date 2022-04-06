@@ -3,12 +3,18 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Link as RRDLink } from 'react-router-dom'
 import {
+  Box,
   Flex,
+  Tooltip,
+  useHoverTooltip,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_CENTER,
+  SIZE_4,
+  TOOLTIP_LEFT,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -21,6 +27,7 @@ import { useCalibratePipetteOffset } from '../../../organisms/CalibratePipetteOf
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import { getHasCalibrationBlock } from '../../../redux/config'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
+import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 
 import type { PipetteInfo } from '../hooks'
@@ -44,6 +51,12 @@ export function SetupPipetteCalibrationItem({
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
   const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
   const deviceDetailsUrl = `/devices/${robotName}`
+
+  const { isDeckCalibrated } = useDeckCalibrationData(robotName)
+
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_LEFT,
+  })
 
   const [
     startPipetteOffsetCalibration,
@@ -116,11 +129,21 @@ export function SetupPipetteCalibrationItem({
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
           {pipetteMismatchInfo}
           <TertiaryButton
+            padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
             onClick={() => startPipetteOffsetCalibrationBlockModal(null)}
+            disabled={!isDeckCalibrated}
             id={'PipetteCalibration_calibratePipetteButton'}
+            {...targetProps}
           >
             {t('calibrate_now_cta')}
           </TertiaryButton>
+          {!isDeckCalibrated ? (
+            <Tooltip {...tooltipProps}>
+              <Box width={SIZE_4}>
+                {t('calibrate_deck_to_proceed_to_pipette_calibration')}
+              </Box>
+            </Tooltip>
+          ) : null}
         </Flex>
         {PipetteOffsetCalibrationWizard}
         {showCalBlockModal && (
