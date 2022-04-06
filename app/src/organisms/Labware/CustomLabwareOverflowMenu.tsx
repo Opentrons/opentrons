@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 import {
   Flex,
   Icon,
@@ -136,7 +136,9 @@ export function CustomLabwareOverflowMenu(
             ]}
             alertOverlay
           >
-            <StyledText as="p">{t('delete_labware_description')}</StyledText>
+            <StyledText as="p">
+              <Trans t={t} i18nKey={'delete_labware_description'} />
+            </StyledText>
           </AlertModal>
         </Portal>
       )}
