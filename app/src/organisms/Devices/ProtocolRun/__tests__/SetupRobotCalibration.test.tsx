@@ -6,12 +6,15 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { useTrackEvent } from '../../../../redux/analytics'
+import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
+import { useDeckCalibrationData } from '../../hooks'
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
 import { SetupPipetteCalibration } from '../SetupPipetteCalibration'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 
 jest.mock('../../../../redux/analytics')
+jest.mock('../../hooks')
 jest.mock('../SetupDeckCalibration')
 jest.mock('../SetupPipetteCalibration')
 jest.mock('../SetupTipLengthCalibration')
@@ -27,6 +30,9 @@ const mockSetupPipetteCalibration = SetupPipetteCalibration as jest.MockedFuncti
 >
 const mockSetupTipLengthCalibration = SetupTipLengthCalibration as jest.MockedFunction<
   typeof SetupTipLengthCalibration
+>
+const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
+  typeof useDeckCalibrationData
 >
 
 const ROBOT_NAME = 'otie'
@@ -68,6 +74,10 @@ describe('SetupRobotCalibration', () => {
     when(mockSetupTipLengthCalibration).mockReturnValue(
       <div>Mock SetupTipLengthCalibration</div>
     )
+    when(mockUseDeckCalibrationData).calledWith(ROBOT_NAME).mockReturnValue({
+      deckCalibrationData: mockDeckCalData,
+      isDeckCalibrated: true,
+    })
   })
   afterEach(() => {
     jest.resetAllMocks()

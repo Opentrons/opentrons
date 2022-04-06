@@ -10,8 +10,10 @@ import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simple
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
 import { i18n } from '../../../../i18n'
+import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import {
+  useDeckCalibrationData,
   useProtocolDetailsForRun,
   useRobot,
   useRunCalibrationStatus,
@@ -24,6 +26,9 @@ import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 jest.mock('../../hooks')
 jest.mock('../SetupRobotCalibration')
 
+const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
+  typeof useDeckCalibrationData
+>
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
 >
@@ -49,6 +54,10 @@ const render = () => {
 
 describe('ProtocolRunSetup', () => {
   beforeEach(() => {
+    when(mockUseDeckCalibrationData).calledWith(ROBOT_NAME).mockReturnValue({
+      deckCalibrationData: mockDeckCalData,
+      isDeckCalibrated: true,
+    })
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue({

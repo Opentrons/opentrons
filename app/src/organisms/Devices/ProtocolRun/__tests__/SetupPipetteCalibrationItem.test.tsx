@@ -6,8 +6,10 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useCalibratePipetteOffset } from '../../../../organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
 import { AskForCalibrationBlockModal } from '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
+import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { getHasCalibrationBlock } from '../../../../redux/config'
 import { mockPipetteInfo } from '../../../../redux/pipettes/__fixtures__'
+import { useDeckCalibrationData } from '../../hooks'
 import { SetupPipetteCalibrationItem } from '../SetupPipetteCalibrationItem'
 
 jest.mock(
@@ -17,6 +19,7 @@ jest.mock(
   '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 )
 jest.mock('../../../../redux/config')
+jest.mock('../../hooks')
 
 const mockGetHasCalibrationBlock = getHasCalibrationBlock as jest.MockedFunction<
   typeof getHasCalibrationBlock
@@ -27,13 +30,18 @@ const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFu
 const mockAskForCalibrationBlockModal = AskForCalibrationBlockModal as jest.MockedFunction<
   typeof AskForCalibrationBlockModal
 >
+const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
+  typeof useDeckCalibrationData
+>
+
+const ROBOT_NAME = 'otie'
 
 describe('SetupPipetteCalibrationItem', () => {
   const render = ({
     pipetteInfo = mockPipetteInfo,
     index = 1,
     mount = 'left',
-    robotName = 'robot name',
+    robotName = ROBOT_NAME,
   }: Partial<
     React.ComponentProps<typeof SetupPipetteCalibrationItem>
   > = {}) => {
@@ -59,6 +67,10 @@ describe('SetupPipetteCalibrationItem', () => {
     when(mockAskForCalibrationBlockModal).mockReturnValue(
       <div>Mock AskForCalibrationBlockModal</div>
     )
+    when(mockUseDeckCalibrationData).calledWith(ROBOT_NAME).mockReturnValue({
+      deckCalibrationData: mockDeckCalData,
+      isDeckCalibrated: true,
+    })
   })
   afterEach(() => {
     resetAllWhenMocks()

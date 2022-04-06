@@ -11,7 +11,9 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import { i18n } from '../../../../i18n'
 import { AskForCalibrationBlockModal } from '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import { useRunStatus } from '../../../../organisms/RunTimeControl/hooks'
+import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { getHasCalibrationBlock } from '../../../../redux/config'
+import { useDeckCalibrationData } from '../../hooks'
 import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -23,6 +25,7 @@ jest.mock(
 jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../../redux/config/selectors')
 jest.mock('../../../../redux/sessions/selectors')
+jest.mock('../../hooks')
 
 const mockUseConditionalConfirm = useConditionalConfirm as jest.MockedFunction<
   typeof useConditionalConfirm
@@ -35,6 +38,9 @@ const mockGetHasCalibrationBlock = getHasCalibrationBlock as jest.MockedFunction
 >
 const mockAskForCalibrationBlockModal = AskForCalibrationBlockModal as jest.MockedFunction<
   typeof AskForCalibrationBlockModal
+>
+const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
+  typeof useDeckCalibrationData
 >
 
 const mockConfirm = jest.fn()
@@ -82,6 +88,10 @@ describe('SetupTipLengthCalibrationButton', () => {
     when(mockAskForCalibrationBlockModal).mockReturnValue(
       <div>Mock AskForCalibrationBlockModal</div>
     )
+    when(mockUseDeckCalibrationData).calledWith(ROBOT_NAME).mockReturnValue({
+      deckCalibrationData: mockDeckCalData,
+      isDeckCalibrated: true,
+    })
   })
 
   afterEach(() => {
