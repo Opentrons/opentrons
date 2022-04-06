@@ -1049,6 +1049,7 @@ in sidebar #} {%- block relbar1 %}{% endblock %} {%- block relbar2 %}{% endblock
     <div class="bodywrapper">
       {%- endif %}
       <div class="body" role="main">
+<!-- 
         {% if pagename == 'index' %}
         <div class="banner_wrapper">
           <h2 id="heading_v2">
@@ -1070,7 +1071,8 @@ in sidebar #} {%- block relbar1 %}{% endblock %} {%- block relbar2 %}{% endblock
             version 1 of the API, <a href="../v1/index.html">click here</a>.
           </p>
         </div>
-        {%- endif %} {% block body %}{% endblock %}
+        {%- endif %}
+ --> {% block body %}{% endblock %}
       </div>
       {%- if render_sidebar %}
     </div>
