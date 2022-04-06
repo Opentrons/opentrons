@@ -51,14 +51,14 @@ class RunStore:
         for action in actions:
             insert_actions.append(_convert_action_to_sql_values(action, run_id))
         print(insert_actions)
-        statement = sqlalchemy.insert(run_table).values(
-            insert_actions
-        )
+        # statement = sqlalchemy.insert(run_table).values(
+        #     insert_actions
+        # )
         with self._sql_engine.begin() as transaction:
             try:
-                transaction.execute(statement)
+                transaction.execute(run_table.insert(), insert_actions)
             except sqlalchemy.exc.NoResultFound as e:
-                raise e
+                raise 'insert actions ' + e
 
     def update_active_runs(self, run_id: str) -> None:
         with self._sql_engine.begin() as transaction:
@@ -237,6 +237,6 @@ def _convert_action_to_sql_values(action: RunAction, run_id: str) -> Dict[str, o
     return {
         "id": action.id,
         "created_at": action.createdAt,
-        "action_type": action.actionType,
+        "action_type": action.actionType.value,
         "run_id": run_id
     }
