@@ -13,3 +13,9 @@ export const getStoredProtocols: (
       .map(protocolKey => filesByProtocolKey[protocolKey])
       .filter((file): file is StoredProtocolData => file != null)
 )
+
+export const getStoredProtocol: (
+  state: State,
+  protocolKey: string
+) => StoredProtocolData | null = (state, protocolKey) =>
+  state.protocolStorage.filesByProtocolKey[protocolKey] ?? null

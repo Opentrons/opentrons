@@ -3,13 +3,11 @@ import { css } from 'styled-components'
 import {
   Box,
   Flex,
-  Text,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
   Btn,
   Icon,
-  FONT_WEIGHT_SEMIBOLD,
-  SPACING_3,
+  SPACING,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   COLORS,
@@ -20,6 +18,7 @@ import {
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
+import { StyledText } from '../text'
 
 interface Props extends StyleProps {
   title: string
@@ -37,6 +36,7 @@ const EXPANDED_STYLE = css`
   width: 19.5rem;
   max-width: 19.5rem;
   height: 100%;
+  visibility: visible;
 
   @keyframes slidein {
     from {
@@ -53,6 +53,7 @@ const COLLAPSED_STYLE = css`
   animation-direction: alternate;
   overflow: hidden;
   max-width: 0rem;
+  visibility: hidden;
 
   @keyframes slideout {
     from {
@@ -86,7 +87,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
         {...styleProps}
       >
         <Flex
-          paddingY={SPACING_3}
+          paddingY={SPACING.spacing4}
           width="19.5rem"
           height="100%"
           flexDirection={DIRECTION_COLUMN}
@@ -97,16 +98,12 @@ export const Slideout = (props: Props): JSX.Element | null => {
               flexDirection={DIRECTION_ROW}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               alignItems={ALIGN_CENTER}
-              paddingX={SPACING_3}
-              marginBottom={SPACING_3}
+              paddingX={SPACING.spacing4}
+              marginBottom={SPACING.spacing4}
             >
-              <Text
-                fontSize={TYPOGRAPHY.fontSizeH2}
-                fontWeight={FONT_WEIGHT_SEMIBOLD}
-                data-testid={`Slideout_title_${title}`}
-              >
+              <StyledText as="h2" data-testid={`Slideout_title_${title}`}>
                 {title}
-              </Text>
+              </StyledText>
               <Flex alignItems={ALIGN_CENTER}>
                 <Btn
                   size={TYPOGRAPHY.lineHeight24}
@@ -120,7 +117,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
             </Flex>
             <Divider marginY={0} color={COLORS.medGrey} />
             <Box
-              padding={SPACING_3}
+              padding={SPACING.spacing4}
               flex="1 1 auto"
               data-testid={`Slideout_body_${title}`}
             >
@@ -128,7 +125,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
             </Box>
           </Flex>
           {footer != null ? (
-            <Box paddingX={SPACING_3} flex="0 0 auto">
+            <Box paddingX={SPACING.spacing4} flex="0 0 auto">
               {footer}
             </Box>
           ) : null}
