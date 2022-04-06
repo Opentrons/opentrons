@@ -1,8 +1,8 @@
 # Development Environment Setup
 
-This guide provides a set of opinionated instructions for setting up your computer to work on the software in Opentrons/opentrons. You can choose to set up your machine in a different way with different tools if you desire, but this setup is tested and recommened.
+This guide provides a set of opinionated instructions for setting up your computer to work on the software in Opentrons/opentrons. You can choose to set up your machine in a different way with different tools if you desire, but this setup is tested and recommended.
 
-If you notice a discrepency between these instructions and any instructions in the documentation of tools we reference below, please [file an issue][] or [open a pull request][]!
+If you notice a discrepancy between these instructions and any instructions in the documentation of tools we reference below, please [file an issue][] or [open a pull request][]!
 
 ## System Setup
 
@@ -19,13 +19,15 @@ You will need the following tools installed to develop on the Opentrons platform
 
 On macOS, we rely on:
 
-- [Homebrew][brew] to install general dependecies, like `git`
+- [Homebrew][brew] to install general dependencies, like `git`
 - [Node Version Switcher][nvs] to install and manage Node.js
 - [pyenv][] to install and manage Python
 
 The setup below is compatible with both Intel and ARM (e.g. M1) machines. It assumes you are using the system default shell of `zsh`.
 
 #### 0. Install `brew` and general dependencies
+
+[Homebrew][] is a package manager for macOS, and it is useful to install language-agnostic development tools. Installing the `brew` command will also install the [Xcode Command Line tools][], which are required for development on macOS.
 
 1. Go to [https://brew.sh][brew]
 2. Copy and run the install script
@@ -106,7 +108,7 @@ Close and re-open your terminal to verify that `pyenv` is installed
 pyenv --version
 ```
 
-Now, install the required version of Python. Use the latest available version of `3.7.x`, which is `3.7.13` at the time or writing.
+Now, install the required version of Python. Use the latest available version of `3.7.x`, which is `3.7.13` at the time of writing.
 
 ```shell
 pyenv install 3.7.13
@@ -114,7 +116,7 @@ pyenv install 3.7.13
 
 #### Verify environment
 
-You should also have created or modified your `~/.zprofile` and `~/.zshrc` dotfiles. If you see anything missing (or perhaps duplicated, due to running setup commands more than once), fix them up to include the output below.
+You should also have created or modified your `~/.zprofile` and `~/.zshrc` dot-files. If you see anything missing (or perhaps duplicated, due to running setup commands more than once), fix them up to include the output below.
 
 ```shell
 # ~/.zprofile
@@ -199,17 +201,10 @@ pyenv local 3.7.13
 python --version
 ```
 
-Once you've confirmed you're running the correct versions of Node.js and Python, you must install two additional tools:
-
-- [yarn] to manage JavaScript depenencies
-- [pipenv] to manage Python dependencies
+Once you've confirmed you're running the correct versions of Node.js and Python, you must install [yarn][] to manage JavaScript dependencies.
 
 ```shell
-# install yarn v1
 npm install --global yarn@1
-
-# install pipenv v2021.5.29
-pip install pipenv==2021.5.29
 ```
 
 Finally, you need to download and install all of our various development dependencies. **This step will take several minutes** the first time you run it!
@@ -218,14 +213,13 @@ Finally, you need to download and install all of our various development depende
 make setup
 ```
 
-Once `make setup` completes, you're ready to start developing! Check out our general [contributing guide]() for more information.
-
-If you ever need to remove (or recreate) the steps run in `make setup`, you can use `make teardown` to remove the installed dependencies.
+Once `make setup` completes, you're ready to start developing! Check out our general [contributing guide][] for more information. If you ever need to remove (or recreate) the steps run in `make setup`, you can use `make teardown` to remove the installed dependencies.
 
 [file an issue]: https://github.com/Opentrons/opentrons/issues
 [open a pull request]: https://github.com/Opentrons/opentrons/pulls
 [first-time git setup]: https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
 [brew]: https://brew.sh
+[xcode command line tools]: https://developer.apple.com/xcode/resources/
 [scoop]: https://scoop.sh/
 [nvs]: https://github.com/jasongin/nvs
 [pyenv]: https://github.com/pyenv/pyenv
