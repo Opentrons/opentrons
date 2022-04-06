@@ -186,6 +186,16 @@ class AppSettings:
         )
         return self.base.present_wrapper(button, 2)
 
+    def get_try_again_link(
+        self,
+    ) -> Optional[WebElement]:
+        """Get the try again link."""
+        button: Element = Element(
+            (By.ID, f"AppSettings_Connection_Button"),
+            "the try again link",
+        )
+        return self.base.present_wrapper(button, 30)
+
     def click_add_ip_or_hostname(self) -> None:
         """Click on text box to add ip or hsotname"""
         button: Optional[WebElement] = self.get_textbox_to_enter_the_ip()
@@ -201,6 +211,38 @@ class AppSettings:
             "the add button",
         )
         return self.base.present_wrapper(button, 2)
+
+    def click_add_button(self) -> None:
+        """Click on add button"""
+        button: Optional[WebElement] = self.get_add_button()
+        if button:
+            button.click()
+
+    def enter_hostname(self, hostname: str) -> None:
+        input: Element = Element(
+            (By.ID, f"ip"),
+            f"Input hostname to the slideout.'",
+        )
+        element = self.base.clickable_wrapper(input)
+        if element:
+            element.clear()
+            element.send_keys(hostname)
+
+    def get_done_button(
+        self,
+    ) -> Optional[WebElement]:
+        """Get the done button."""
+        button: Element = Element(
+            (By.XPATH, f"//button[text()='Done']"),
+            "the done button",
+        )
+        return self.base.present_wrapper(button, 2)
+
+    def click_done_button(self) -> None:
+        """Click on add button"""
+        button: Optional[WebElement] = self.get_done_button()
+        if button:
+            button.click()
 
     # Privacy Tab elements
     def get_privacy_tab(self) -> Optional[WebElement]:
