@@ -136,14 +136,19 @@ class RunStore:
         Returns:
             The retrieved run entry from the db.
         """
-        statement = sqlalchemy.select(run_table).where(
+        statement = sqlalchemy.select(run_table).join(action_runs_table, action_runs_table.c.run_id == run_table.c.id,
+                                                      isouter=True).where(
             run_table.c.id == run_id
         )
         try:
             row_run = get_row(self._sql_engine, statement=statement)
+            print(row_run)
+            run = _convert_sql_row_to_run(row_run)
+            for action in row_run:
+                run.actions.append(_convert_sql_row_to_action(action))
         except sqlalchemy.exc.NoResultFound as e:
             raise RunNotFoundError(run_id) from e
-        return _convert_sql_row_to_run(row_run)
+        return run
 
     def get_all(self) -> List[RunResource]:
         """Get all known run resources.
@@ -200,7 +205,7 @@ def _convert_sql_row_to_run(sql_row: sqlalchemy.engine.Row) -> RunResource:
     assert isinstance(is_current, bool)
 
     return RunResource(
-        run_id=run_id, created_at=created_at, protocol_id=protocol_id, is_current=is_current
+        run_id=run_id, created_at=created_at, actions=[],protocol_id=protocol_id, is_current=is_current
     )
 
 
