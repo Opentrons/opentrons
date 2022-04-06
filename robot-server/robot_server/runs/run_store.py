@@ -141,11 +141,13 @@ class RunStore:
             run_table.c.id == run_id
         )
         try:
-            row_run = get_row(self._sql_engine, statement=statement)
-            print(row_run)
-            run = _convert_sql_row_to_run(row_run)
-            for action in row_run:
-                run.actions.append(_convert_sql_row_to_action(action))
+            # row_run = get_row(self._sql_engine, statement=statement)
+            with self._sql_engine.begin() as transaction:
+                row_run = transaction.execute(statement)
+                print(row_run)
+                run = _convert_sql_row_to_run(row_run)
+                for action in row_run:
+                    run.actions.append(_convert_sql_row_to_action(action))
         except sqlalchemy.exc.NoResultFound as e:
             raise RunNotFoundError(run_id) from e
         return run
