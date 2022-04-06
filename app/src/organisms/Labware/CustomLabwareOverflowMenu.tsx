@@ -51,11 +51,13 @@ export function CustomLabwareOverflowMenu(
   const handleOpenInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
+    setShowOverflowMenu(false)
     dispatch(openCustomLabwareDirectory())
   }
   const handleClickDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
+    setShowOverflowMenu(false)
     confirmDeleteLabware()
   }
   const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
@@ -66,6 +68,7 @@ export function CustomLabwareOverflowMenu(
   const handleClickLabwareCreator: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
+    setShowOverflowMenu(false)
     window.open(LABWARE_CREATOR_HREF, '_blank')
   }
 
@@ -107,6 +110,7 @@ export function CustomLabwareOverflowMenu(
                   <SecondaryButton
                     onClick={(e: React.MouseEvent) => {
                       e.preventDefault()
+                      e.stopPropagation()
                       cancelDeleteLabware()
                     }}
                     textTransform={TEXT_TRANSFORM_CAPITALIZE}
