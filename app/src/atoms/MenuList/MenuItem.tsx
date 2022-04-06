@@ -22,8 +22,7 @@ export const MenuItem: BtnComponent = styled(Btn)`
     background-color: ${COLORS.lightBlue};
   }
 
-  &:focus,
-  &:active {
+  &:focus {
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   }
 

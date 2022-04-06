@@ -9,7 +9,6 @@ import {
   DIRECTION_COLUMN,
   TEXT_TRANSFORM_UPPERCASE,
   SPACING,
-  C_HARBOR_GRAY,
   FONT_WEIGHT_REGULAR,
   FONT_SIZE_CAPTION,
   TYPOGRAPHY,
@@ -189,7 +188,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         borderRadius={SPACING.spacing2}
         marginBottom={SPACING.spacing3}
         marginLeft={SPACING.spacing2}
-        width={'20rem'}
+        width={'100%'}
         data-testid={`module_card_${module.serial}`}
       >
         {showWizard && (
@@ -222,7 +221,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           width="100%"
         >
           <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
-            <img src={image} alt={module.model} />
+            <Flex alignItems={ALIGN_START}>
+              <img width="60px" height="54px" src={image} alt={module.model} />
+            </Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}
               paddingLeft={SPACING.spacing3}
@@ -275,7 +276,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               ) : null}
               <Text
                 textTransform={TEXT_TRANSFORM_UPPERCASE}
-                color={C_HARBOR_GRAY}
+                color={COLORS.darkGrey}
                 fontWeight={FONT_WEIGHT_REGULAR}
                 fontSize={FONT_SIZE_CAPTION}
                 paddingBottom={SPACING.spacing2}

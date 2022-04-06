@@ -15,6 +15,8 @@ import {
   SPACING_2,
   SPACING_3,
   WRAP,
+  JUSTIFY_FLEX_START,
+  JUSTIFY_START,
 } from '@opentrons/components'
 
 import { ModuleCard } from './ModuleCard'
@@ -48,13 +50,19 @@ export function PipettesAndModules({
       </Text>
       <Flex
         alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_CENTER}
         minHeight={SIZE_3}
         padding={SPACING_2}
         width="100%"
       >
         {isRobotViewable ? (
-          <Flex flexWrap={WRAP} width="100%">
+          <Flex
+            justifyContent={JUSTIFY_START}
+            flexWrap={WRAP}
+            width={attachedModules.length > 1 ? '100%' : undefined}
+            maxWidth={attachedModules.length === 1 ? '100%' : undefined}
+            flexDirection={DIRECTION_COLUMN}
+            maxHeight="25rem"
+          >
             {attachedModules.map((module, index) => {
               return (
                 <Flex key={`moduleCard_${module.type}_${index}`}>
@@ -64,7 +72,11 @@ export function PipettesAndModules({
             })}
           </Flex>
         ) : (
-          <Text fontSize={FONT_SIZE_BODY_1} id="PipettesAndModules_offline">
+          <Text
+            justifyContent={JUSTIFY_CENTER}
+            fontSize={FONT_SIZE_BODY_1}
+            id="PipettesAndModules_offline"
+          >
             {t('offline_pipettes_and_modules')}
           </Text>
         )}
