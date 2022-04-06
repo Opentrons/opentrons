@@ -17,11 +17,11 @@ import { Scanning } from '../../../organisms/Devices/Scanning'
 import { CollapsibleSection } from '../../../molecules/CollapsibleSection'
 import { getScanning } from '../../../redux/discovery'
 
-import type { State } from '../../../redux/types'
 import { Divider } from '../../../atoms/structure'
-import { useAvailableAndUnavailableDevices } from './hooks'
 import { StyledText } from '../../../atoms/text'
+import { useAvailableAndUnavailableDevices } from './hooks'
 import { NewRobotSetupHelp } from './NewRobotSetupHelp'
+import type { State } from '../../../redux/types'
 
 export function DevicesLanding(): JSX.Element {
   const { t } = useTranslation('devices_landing')

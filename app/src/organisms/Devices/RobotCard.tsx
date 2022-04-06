@@ -11,8 +11,7 @@ import {
   C_WHITE,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  SPACING_2,
-  SPACING_3,
+  SPACING,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 
@@ -42,8 +41,8 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
         border={`1px solid ${C_MED_LIGHT_GRAY}`}
         borderRadius="4px"
         flexDirection={DIRECTION_ROW}
-        marginBottom={SPACING_2}
-        padding={SPACING_2}
+        marginBottom={SPACING.spacing3}
+        padding={SPACING.spacing3}
         width="100%"
       >
         <img
@@ -51,10 +50,13 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
           style={{ width: '6rem' }}
           id={`RobotCard_${name}_robotImage`}
         />
-        <Box padding={SPACING_2} width="100%">
+        <Box padding={SPACING.spacing3} width="100%">
           <RobotStatusBanner name={name} local={local} />
           <Flex>
-            <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING_3}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              paddingRight={SPACING.spacing4}
+            >
               <StyledText as="h6" textTransform={TEXT_TRANSFORM_UPPERCASE}>
                 {t('left_mount')}
               </StyledText>
@@ -62,7 +64,10 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
                 {attachedPipettes?.left?.modelSpecs.displayName ?? t('empty')}
               </StyledText>
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING_3}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              paddingRight={SPACING.spacing4}
+            >
               <StyledText as="h6" textTransform={TEXT_TRANSFORM_UPPERCASE}>
                 {t('right_mount')}
               </StyledText>
@@ -70,7 +75,10 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
                 {attachedPipettes?.right?.modelSpecs.displayName ?? t('empty')}
               </StyledText>
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING_3}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              paddingRight={SPACING.spacing4}
+            >
               <StyledText as="h6" textTransform={TEXT_TRANSFORM_UPPERCASE}>
                 {t('modules')}
               </StyledText>
