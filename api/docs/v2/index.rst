@@ -8,8 +8,6 @@ As a bench scientist, you should be able to code your protocols in a way that re
 
 As a programmer, you can leverage the full power of Python for advanced automation in your protocols. Perform calculations, manage external data, use built-in and imported Python modules, and more to implement your custom lab workflow.
 
-.. Version 2 of the API is a new way to write Python protocols. It is more reliable, simpler, and better able to be supported. Unlike version 1, it has support for new modules like the Thermocycler. While version 1 will still recieve bug fixes, new features and improvements will land in version 2. For a guide on transitioning your protocols from version 1 to version 2 of the API, see `this article on migration <http://support.opentrons.com/en/articles/3425727-switching-your-protocols-from-api-version-1-to-version-2>`_. For a more in-depth discussion of why version 2 of the API was developed and what is different about it compared to version 1, see `this article on why we wrote API V2 <http://support.opentrons.com/en/articles/3418212-opentrons-protocol-api-version-2>`_.
-
 
 Getting Started
 ---------------
