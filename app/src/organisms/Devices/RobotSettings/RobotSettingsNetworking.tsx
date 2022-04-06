@@ -26,9 +26,9 @@ import {
   postWifiDisconnect,
 } from '../../../redux/networking'
 import * as RobotApi from '../../../redux/robot-api'
+import { NetworkingSlideout } from './NetworkingSlideout'
 
-import { State, Dispatch } from '../../../redux/types'
-
+import type { State, Dispatch } from '../../../redux/types'
 interface NetworkingProps {
   robotName: string
 }
@@ -41,6 +41,9 @@ const LIST_REFRESH_MS = 10000
 export function RobotSettingsNetworking({
   robotName,
 }: NetworkingProps): JSX.Element {
+  const [showNetworkingSlideout, setShowNetworkingSlideout] = React.useState(
+    false
+  )
   const robot = useRobot(robotName)
   const { t } = useTranslation('device_settings')
   const [dispatchApi] = RobotApi.useDispatchApiRequest()
@@ -85,6 +88,13 @@ export function RobotSettingsNetworking({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
+      {showNetworkingSlideout && (
+        <NetworkingSlideout
+          isExpanded={showNetworkingSlideout}
+          onCloseClick={() => setShowNetworkingSlideout(false)}
+          robotName={robotName}
+        />
+      )}
       <Flex marginBottom={SPACING.spacing4}>
         {wifi !== null && wifi.ipAddress !== null ? (
           <Icon
@@ -99,65 +109,69 @@ export function RobotSettingsNetworking({
         <Icon
           width={SPACING.spacing4}
           name="ot-wifi-3"
-          marginRight={SPACING.spacing4}
+          marginRight={SPACING.spacing3}
         ></Icon>
         <StyledText as="h3">
           {t('wireless_network')}
           {activeNetwork?.ssid && ` - ${activeNetwork.ssid}`}
         </StyledText>
       </Flex>
-      {wifi !== null && wifi.ipAddress !== null ? (
-        <Box paddingLeft="3.5rem">
-          <Flex>
-            <SecondaryButton marginRight={SPACING.spacing2}>
-              {t('wireless_network_change_network_button')}
-            </SecondaryButton>
-            <SecondaryButton onClick={handleDisconnect}>
-              {t('wireless_network_disconnect_button')}
-            </SecondaryButton>
+      <Box paddingLeft={SPACING.spacing7} marginBottom={SPACING.spacing4}>
+        {wifi != null && wifi.ipAddress != null ? (
+          <>
+            <Flex>
+              <SecondaryButton marginRight={SPACING.spacing2}>
+                {t('wireless_network_change_network_button')}
+              </SecondaryButton>
+              <SecondaryButton onClick={handleDisconnect}>
+                {t('wireless_network_disconnect_button')}
+              </SecondaryButton>
+            </Flex>
+            <Flex marginTop={SPACING.spacing4} marginBottom={SPACING.spacing4}>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                paddingRight={SPACING.spacing4}
+              >
+                <StyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('wireless_ip')}
+                </StyledText>
+                <StyledText as="p">{wifi?.ipAddress}</StyledText>
+              </Flex>
+
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                paddingRight={SPACING.spacing4}
+              >
+                <StyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('wireless_subnet')}
+                </StyledText>
+                <StyledText as="p">{wifi?.subnetMask}</StyledText>
+              </Flex>
+
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                paddingRight={SPACING.spacing4}
+              >
+                <StyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('wireless_mac')}
+                </StyledText>
+                <StyledText as="p">{wifi?.macAddress}</StyledText>
+              </Flex>
+            </Flex>
+          </>
+        ) : (
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <StyledText as="p" marginBottom={SPACING.spacing4}>
+              {t('wireless_network_not_connected')}
+            </StyledText>
+            <Flex>
+              <SecondaryButton onClick={() => setShowNetworkingSlideout(true)}>
+                {t('wireless_connect_button')}
+              </SecondaryButton>
+            </Flex>
           </Flex>
-          <Flex marginTop={SPACING.spacing4} marginBottom={SPACING.spacing4}>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              paddingRight={SPACING.spacing4}
-            >
-              <StyledText css={TYPOGRAPHY.pSemiBold}>
-                {t('wireless_ip')}
-              </StyledText>
-              <StyledText as="p">{wifi?.ipAddress}</StyledText>
-            </Flex>
-
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              paddingRight={SPACING.spacing4}
-            >
-              <StyledText css={TYPOGRAPHY.pSemiBold}>
-                {t('wireless_subnet')}
-              </StyledText>
-              <StyledText as="p">{wifi?.subnetMask}</StyledText>
-            </Flex>
-
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              paddingRight={SPACING.spacing4}
-            >
-              <StyledText css={TYPOGRAPHY.pSemiBold}>
-                {t('wireless_mac')}
-              </StyledText>
-              <StyledText as="p">{wifi?.macAddress}</StyledText>
-            </Flex>
-          </Flex>
-        </Box>
-      ) : (
-        <Flex>
-          <SecondaryButton
-            onClick={null} // open slideout
-          >
-            {t('wireless_network_connect_button')}
-          </SecondaryButton>
-        </Flex>
-      )}
-
+        )}
+      </Box>
       <Divider />
       <Flex marginBottom={SPACING.spacing4}>
         {ethernet !== null && ethernet.ipAddress !== null ? (
