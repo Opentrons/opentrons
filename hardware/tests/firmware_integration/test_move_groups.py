@@ -1,6 +1,6 @@
 """Tests for move groups."""
 import asyncio
-import numpy as np  # type: ignore
+import numpy as np
 from typing import Iterator, List, Dict
 
 import pytest
@@ -99,11 +99,15 @@ async def test_move_integration(
     # from a non-zero position
     prep_move = [
         create_step(
-            distance={motor_node: motor_node.value for motor_node in all_motor_nodes},
-            velocity={
-                motor_node: motor_node.value / 10 for motor_node in all_motor_nodes
+            distance={
+                motor_node: np.float64(motor_node.value)
+                for motor_node in all_motor_nodes
             },
-            acceleration={motor_node: 0 for motor_node in all_motor_nodes},
+            velocity={
+                motor_node: np.float64(motor_node.value / 10)
+                for motor_node in all_motor_nodes
+            },
+            acceleration={motor_node: np.float64(0) for motor_node in all_motor_nodes},
             duration=np.float64(1),
             present_nodes=all_motor_nodes,
         )
@@ -115,13 +119,13 @@ async def test_move_integration(
 
     home_move = [
         create_home_step(
-            distance={motor_node: 10 for motor_node in all_motor_nodes},
-            velocity={motor_node: 40 for motor_node in all_motor_nodes},
+            distance={motor_node: np.float64(10) for motor_node in all_motor_nodes},
+            velocity={motor_node: np.float64(40) for motor_node in all_motor_nodes},
         )
     ]
     home_runner = MoveGroupRunner([home_move])
     position = await home_runner.run(can_messenger)
-    assert position == {motor_node: 0 for motor_node in all_motor_nodes}
+    assert position == {motor_node: 0.0 for motor_node in all_motor_nodes}
     # these moves test position accumulation to reasonably realistic values
     # and have to do it over a kind of long time so that the velocities are low
     # enough that the pipettes, with their extremely high steps/mm values,
@@ -130,34 +134,40 @@ async def test_move_integration(
     moves = [
         create_step(
             distance={
-                motor_node: motor_node.value / 4 for motor_node in all_motor_nodes
+                motor_node: np.float64(motor_node.value / 4)
+                for motor_node in all_motor_nodes
             },
             velocity={
-                motor_node: motor_node.value / 4 for motor_node in all_motor_nodes
+                motor_node: np.float64(motor_node.value / 4)
+                for motor_node in all_motor_nodes
             },
-            acceleration={motor_node: 0 for motor_node in all_motor_nodes},
+            acceleration={motor_node: np.float64(0) for motor_node in all_motor_nodes},
             duration=np.float64(4),
             present_nodes=all_motor_nodes,
         ),
         create_step(
             distance={
-                motor_node: motor_node.value / 4 for motor_node in all_motor_nodes
+                motor_node: np.float64(motor_node.value / 4)
+                for motor_node in all_motor_nodes
             },
             velocity={
-                motor_node: motor_node.value / 4 for motor_node in all_motor_nodes
+                motor_node: np.float64(motor_node.value / 4)
+                for motor_node in all_motor_nodes
             },
-            acceleration={motor_node: 0 for motor_node in all_motor_nodes},
+            acceleration={motor_node: np.float64(0) for motor_node in all_motor_nodes},
             duration=np.float64(4),
             present_nodes=all_motor_nodes,
         ),
         create_step(
             distance={
-                motor_node: -motor_node.value / 4 for motor_node in all_motor_nodes
+                motor_node: np.float64(-motor_node.value / 4)
+                for motor_node in all_motor_nodes
             },
             velocity={
-                motor_node: -motor_node.value / 4 for motor_node in all_motor_nodes
+                motor_node: np.float64(-motor_node.value / 4)
+                for motor_node in all_motor_nodes
             },
-            acceleration={motor_node: 0 for motor_node in all_motor_nodes},
+            acceleration={motor_node: np.float64(0) for motor_node in all_motor_nodes},
             duration=np.float64(4),
             present_nodes=all_motor_nodes,
         ),
