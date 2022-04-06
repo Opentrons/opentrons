@@ -47,8 +47,8 @@ describe('LabwareCard', () => {
   })
 
   it('renders additonal info for custom labware card', () => {
-    props.labware.definition.brand.brand = 'custom'
     props.labware.modified = 123
+    props.labware.filename = 'mock/filename'
     const [{ getByText }] = render(props)
     getByText('Custom Definition')
     getByText(nestedTextMatcher('Date added'))
