@@ -36,10 +36,9 @@ const EXPANDED_STYLE = css`
   visibility: visible;
   max-height: 100vh;
   overflow: hidden;
-  margin-left: ${SPACING.spacing4};
 `
 const COLLAPSED_STYLE = css`
-  transition: max-height 500ms ease-out;
+  transition: max-height 500ms ease-out, visibility 600ms ease;
   visibility: hidden;
   max-height: 0vh;
   overflow: hidden;
@@ -134,7 +133,12 @@ export function SetupStep({
           </Flex>
         </Flex>
       </Btn>
-      <Box css={expanded ? EXPANDED_STYLE : COLLAPSED_STYLE}>{children}</Box>
+      <Box
+        css={expanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
+        marginLeft={SPACING.spacing4}
+      >
+        {children}
+      </Box>
     </Flex>
   )
 }
