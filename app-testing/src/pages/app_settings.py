@@ -152,6 +152,56 @@ class AppSettings:
         if button:
             button.click()
 
+    # connect to IP address object
+    def get_connect_to_robot_via_IP_address_slideout_header(
+        self,
+    ) -> Optional[WebElement]:
+        """Get the connect to robot via IP address slideout header."""
+        header: Element = Element(
+            (
+                By.XPATH,
+                "//p[@data-testid='Slideout_title_Connect to a Robot via IP Address']",
+            ),
+            "connect to robot via IP address slideout header text",
+        )
+        return self.base.present_wrapper(header, 2)
+
+    def get_link_learn_more_about_connecting_a_robot_manually(
+        self,
+    ) -> Optional[WebElement]:
+        """Get the link to connect to robot manually."""
+        button: Element = Element(
+            (By.ID, f"ConnectIPAddressSupportPage"),
+            "the link to connect to robot manually",
+        )
+        return self.base.present_wrapper(button, 2)
+
+    def get_textbox_to_enter_the_ip(
+        self,
+    ) -> Optional[WebElement]:
+        """Get the textbox to enter the IP address."""
+        button: Element = Element(
+            (By.ID, f"ip"),
+            "the textbox to enter the IP address",
+        )
+        return self.base.present_wrapper(button, 2)
+
+    def click_add_ip_or_hostname(self) -> None:
+        """Click on text box to add ip or hsotname"""
+        button: Optional[WebElement] = self.get_textbox_to_enter_the_ip()
+        if button:
+            button.click()
+
+    def get_add_button(
+        self,
+    ) -> Optional[WebElement]:
+        """Get the add button."""
+        button: Element = Element(
+            (By.XPATH, f"//button[text()='Add']"),
+            "the add button",
+        )
+        return self.base.present_wrapper(button, 2)
+
     # Privacy Tab elements
     def get_privacy_tab(self) -> Optional[WebElement]:
         """Search for the privacy tab in app-settings."""
