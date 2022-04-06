@@ -148,6 +148,11 @@ export const commandCreatorFromStepArgs = (
         StepGeneration.thermocyclerStateStep,
         args
       )
+    case 'heaterShaker':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.heaterShaker,
+        args
+      )
   }
   console.warn(`unhandled commandCreatorFnName: ${args.commandCreatorFnName}`)
   return null
