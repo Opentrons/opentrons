@@ -89,6 +89,12 @@ const copyLabware = (
   })
 }
 
+const deleteLabware = (dispatch: Dispatch, filePath: string): Promise<void> => {
+  return Definitions.removeLabwareFile(filePath).then(() =>
+    fetchAndValidateCustomLabware(dispatch, CustomLabware.DELETE_LABWARE)
+  )
+}
+
 export function registerLabware(
   dispatch: Dispatch,
   mainWindow: BrowserWindow
@@ -162,6 +168,14 @@ export function registerLabware(
         const filePath = action.payload.filePath
         copyLabware(dispatch, [filePath]).catch((error: Error) => {
           dispatch(CustomLabware.addCustomLabwareFailure(null, error.message))
+        })
+        break
+      }
+
+      case CustomLabware.DELETE_CUSTOM_LABWARE_FILE: {
+        const filePath = action.payload.filePath
+        deleteLabware(dispatch, filePath).catch((error: Error) => {
+          console.error(error)
         })
         break
       }

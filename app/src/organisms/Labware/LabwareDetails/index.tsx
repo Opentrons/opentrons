@@ -6,7 +6,6 @@ import {
   Link,
   Icon,
   Flex,
-  Btn,
   SPACING,
   COLORS,
   TYPOGRAPHY,

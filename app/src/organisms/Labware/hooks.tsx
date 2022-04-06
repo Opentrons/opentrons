@@ -15,6 +15,7 @@ import type { LabwareDefinition2 as LabwareDefiniton } from '@opentrons/shared-d
 export interface LabwareDefAndDate {
   definition: LabwareDefiniton
   modified?: number
+  filename?: string
 }
 
 export function useGetAllLabware(): LabwareDefAndDate[] {
@@ -22,12 +23,13 @@ export function useGetAllLabware(): LabwareDefAndDate[] {
   const labwareDefinitons = getAllDefinitions()
   labwareDefinitons.map(def => fullLabwareList.push({ definition: def }))
   const customLabwareList = useSelector(getCustomLabware)
-
+  console.log(customLabwareList)
   customLabwareList.map(customLabware =>
     'definition' in customLabware
       ? fullLabwareList.push({
           modified: customLabware.modified,
           definition: customLabware.definition,
+          filename: customLabware.filename,
         })
       : null
   )
