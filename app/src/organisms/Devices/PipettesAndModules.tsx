@@ -15,7 +15,6 @@ import {
   SPACING_2,
   SPACING_3,
   WRAP,
-  JUSTIFY_FLEX_START,
   JUSTIFY_START,
 } from '@opentrons/components'
 

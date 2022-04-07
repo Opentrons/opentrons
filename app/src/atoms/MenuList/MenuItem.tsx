@@ -22,10 +22,6 @@ export const MenuItem: BtnComponent = styled(Btn)`
     background-color: ${COLORS.lightBlue};
   }
 
-  &:focus {
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  }
-
   &:disabled,
   &.disabled {
     color: ${COLORS.greyDisabled};

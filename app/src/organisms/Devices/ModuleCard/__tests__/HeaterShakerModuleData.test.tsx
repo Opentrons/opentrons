@@ -91,7 +91,7 @@ describe('HeaterShakerModuleData', () => {
 
   it('renders correct information when status is idle', () => {
     const { getByText } = render(props)
-    getByText('Target: N/A RPM')
+    getByText('Target: N/A')
     getByText('Labware Latch')
     getByText(/Open/i)
   })

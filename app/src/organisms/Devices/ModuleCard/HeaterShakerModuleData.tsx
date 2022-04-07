@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import {
   Flex,
   Text,
-  JUSTIFY_SPACE_BETWEEN,
   TEXT_TRANSFORM_UPPERCASE,
   COLORS,
   DIRECTION_COLUMN,
@@ -19,8 +19,6 @@ import {
   DISPLAY_INLINE,
 } from '@opentrons/components'
 import { StatusLabel } from '../../../atoms/StatusLabel'
-import { css } from 'styled-components'
-
 import type {
   LatchStatus,
   SpeedStatus,
@@ -37,6 +35,19 @@ interface HeaterShakerModuleDataProps {
   currentSpeed: number | null
   showTemperatureData?: boolean
 }
+
+const MODULE_STATUS_STYLING = css`
+  display: grid;
+  @media {
+    grid-template-columns: repeat(1, 1fr);
+  }
+  @media (min-width: 800px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 900px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+`
 
 export const HeaterShakerModuleData = (
   props: HeaterShakerModuleDataProps
@@ -55,7 +66,8 @@ export const HeaterShakerModuleData = (
   const isShaking = shakerStatus !== 'idle'
 
   const getStatusLabelProps = (
-    status: string | null
+    speedStatus: SpeedStatus | null,
+    tempStatus: TemperatureStatus | null
   ): { backgroundColor: string; iconColor: string; textColor: string } => {
     const StatusLabelProps = {
       backgroundColor: COLORS.medGrey,
@@ -64,7 +76,7 @@ export const HeaterShakerModuleData = (
       pulse: false,
     }
 
-    switch (status) {
+    switch (speedStatus) {
       case 'idle': {
         StatusLabelProps.backgroundColor = COLORS.medGrey
         StatusLabelProps.iconColor = COLORS.darkGrey
@@ -72,18 +84,46 @@ export const HeaterShakerModuleData = (
         break
       }
       case 'holding at target': {
-        StatusLabelProps.backgroundColor = C_SKY_BLUE
+        StatusLabelProps.backgroundColor = COLORS.medBlue
         StatusLabelProps.iconColor = COLORS.blue
 
         break
       }
-      case 'heating':
-      case 'shaking': {
+      case 'error': {
+        StatusLabelProps.backgroundColor = COLORS.warningBg
+        StatusLabelProps.iconColor = COLORS.warning
+        StatusLabelProps.textColor = COLORS.warningText
+
+        break
+      }
+      case 'slowing down':
+      case 'speeding up': {
         StatusLabelProps.backgroundColor = COLORS.blue + '1A'
         StatusLabelProps.pulse = true
         break
       }
     }
+    switch (tempStatus) {
+      case 'idle': {
+        StatusLabelProps.backgroundColor = COLORS.medGrey
+        StatusLabelProps.iconColor = COLORS.darkGrey
+        StatusLabelProps.textColor = COLORS.darkBlack
+        break
+      }
+      case 'holding at target': {
+        StatusLabelProps.backgroundColor = COLORS.medBlue
+        StatusLabelProps.iconColor = COLORS.blue
+
+        break
+      }
+      case 'heating':
+      case 'cooling': {
+        StatusLabelProps.backgroundColor = COLORS.blue + '1A'
+        StatusLabelProps.pulse = true
+        break
+      }
+    }
+
     return StatusLabelProps
   }
 
@@ -126,12 +166,7 @@ export const HeaterShakerModuleData = (
   `
   return (
     <>
-      <Flex display="grid" gridTemplateColumns={'repeat(auto-fill, [col] 1fr'}>
-        {/* <Flex
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          flexWrap={WRAP}
-          flexDirection={DIRECTION_COLUMN}
-        > */}
+      <div css={MODULE_STATUS_STYLING}>
         {showTemperatureData && (
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -149,7 +184,7 @@ export const HeaterShakerModuleData = (
             </Text>
             <StatusLabel
               status={heaterStatus}
-              {...getStatusLabelProps(heaterStatus)}
+              {...getStatusLabelProps(null, heaterStatus)}
             />
             <Text
               title="heater_target_temp"
@@ -180,8 +215,9 @@ export const HeaterShakerModuleData = (
           </Text>
           <StatusLabel
             status={shakerStatus}
-            {...getStatusLabelProps(shakerStatus)}
+            {...getStatusLabelProps(shakerStatus, null)}
           />
+
           <Text
             title="shaker_target_speed"
             fontSize={TYPOGRAPHY.fontSizeH6}
@@ -195,7 +231,6 @@ export const HeaterShakerModuleData = (
             {t('current_speed', { speed: currentSpeed })}
           </Text>
         </Flex>
-        {/* </Flex> */}
         <Flex
           flexDirection={DIRECTION_ROW}
           data-testid={`heater_shaker_module_data_latch`}
@@ -245,6 +280,8 @@ export const HeaterShakerModuleData = (
           <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing2}>
             {isShaking && (
               <Icon
+                paddingBottom="3px"
+                paddingRight={SPACING.spacing2}
                 name="closed-locked"
                 data-testid="HeaterShakerModuleData_latch_lock"
                 size={SIZE_1}
@@ -280,7 +317,7 @@ export const HeaterShakerModuleData = (
             </Flex>
           </Flex>
         </Flex>
-      </Flex>
+      </div>
     </>
   )
 }
