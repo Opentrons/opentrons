@@ -6,7 +6,7 @@ export interface RouteProps {
   component: () => JSX.Element | null
   exact?: boolean
   /**
-   * a route/page name to render in the temp nav bar
+   * a route/page name to render in the nav bar
    */
   name: string
   /**

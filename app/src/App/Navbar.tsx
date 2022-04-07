@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { NavLink, Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
@@ -102,7 +102,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         alignItems={ALIGN_FLEX_START}
         alignSelf={ALIGN_STRETCH}
       >
-        <LogoImg src={logoSvg} />
+        <LogoImg src={logoSvg} alt="opentrons logo" />
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
           <NavbarLink key={name} to={navLinkTo as string}>
             <StyledText
@@ -119,10 +119,13 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         alignSelf={ALIGN_STRETCH}
         justifyContent={JUSTIFY_SPACE_EVENLY}
       >
-        <NavIconLink to="/app-settings/general">
+        <NavIconLink
+          data-testid="Navbar_settingsLink"
+          to="/app-settings/general"
+        >
           <NavbarIcon name="gear" />
         </NavIconLink>
-        <NavbarIcon name="question-mark-circle" />
+        <NavbarIcon data-testid="Navbar_helpLink" name="question-mark-circle" />
       </Flex>
     </Flex>
   )
