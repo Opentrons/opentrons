@@ -22,6 +22,7 @@ import {
   Card,
   JUSTIFY_SPACE_BETWEEN,
   TEXT_TRANSFORM_CAPITALIZE,
+  ModuleIcon,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
@@ -31,7 +32,6 @@ import {
 import { StoredProtocolData } from '../../redux/protocol-storage'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/Buttons'
-import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
