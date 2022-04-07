@@ -148,7 +148,14 @@ export const commandCreatorFromStepArgs = (
         StepGeneration.thermocyclerStateStep,
         args
       )
+    case 'heaterShaker':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.heaterShaker,
+        args
+      )
   }
+  // @ts-expect-error we've exhausted all command creators, but keeping this console warn
+  // for when we impelement the next command creator
   console.warn(`unhandled commandCreatorFnName: ${args.commandCreatorFnName}`)
   return null
 }
