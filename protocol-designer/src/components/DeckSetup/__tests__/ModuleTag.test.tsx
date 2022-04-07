@@ -75,7 +75,7 @@ describe('ModuleTag', () => {
         }
         const component = render(<ModuleStatus moduleState={moduleState} />)
         expect(component.text()).toBe(
-          'Heater:40 °CShaker:400 RPMLabware Latch:closed'
+          'Heater:40 °CShaker:400 RPM Labware Latch:closed'
         )
       })
       it('displays a speed, and latch status when module is at target', () => {
@@ -87,7 +87,7 @@ describe('ModuleTag', () => {
         }
         const component = render(<ModuleStatus moduleState={moduleState} />)
         expect(component.text()).toBe(
-          'Heater:deactivatedShaker:deactivatedLabware Latch:open'
+          'Heater:deactivatedShaker:deactivated Labware Latch:open'
         )
       })
     })
