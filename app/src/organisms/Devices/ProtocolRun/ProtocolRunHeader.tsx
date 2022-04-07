@@ -162,9 +162,10 @@ export function ProtocolRunHeader({
     false
   )
   const attachedModules = useAttachedModules(robotName)
-  const heaterShaker = (attachedModules.find(
-    module => module.type === HEATERSHAKER_MODULE_TYPE
-  ) as unknown) as HeaterShakerModule
+  const heaterShaker = attachedModules.find(
+    (module): module is HeaterShakerModule =>
+      module.type === HEATERSHAKER_MODULE_TYPE
+  )
   const isShaking = heaterShaker?.data?.speedStatus !== 'idle'
 
   const handleProceedToRunClick = (): void => {
@@ -447,7 +448,7 @@ export function ProtocolRunHeader({
               completedAt={completedAt}
             />
           </Box>
-          {showIsShakingModal && (
+          {showIsShakingModal && heaterShaker != null && (
             <HeaterShakerIsRunningModal
               closeModal={() => setShowIsShakingModal(false)}
               module={heaterShaker}
