@@ -48,7 +48,7 @@ class RunStore:
             actions: a list of actions to store in the db
         """
         stmt = action_runs_table.update().\
-            where(action_runs_table.c.run_id == run_id, action_runs_table.c.id == sqlalchemy.bindparam('id')). \
+            where(action_runs_table.c.run_id == run_id). \
             values({
             'action_type': sqlalchemy.bindparam('action_type')
         })

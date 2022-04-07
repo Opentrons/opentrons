@@ -38,18 +38,28 @@ def test_add_run(subject: RunStore) -> None:
 
 def test_update_run(subject: RunStore) -> None:
     """It should be able to update a run in the store."""
+    actions = RunAction(
+        actionType=RunActionType.PLAY,
+        createdAt=datetime(year=2022, month=2, day=2),
+        id="action-id",
+    )
+    actions_update = RunAction(
+        actionType=RunActionType.PAUSE,
+        createdAt=datetime(year=2022, month=2, day=2),
+        id="action-id",
+    )
     run = RunResource(
         run_id="identical-run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, hour=1, minute=1, second=1),
-        actions=[],
+        actions=[actions],
         is_current=True,
     )
     updated_run = RunResource(
         run_id="identical-run-id",
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2, hour=2, minute=2, second=2),
-        actions=[],
+        actions=[actions_update],
         is_current=True,
     )
 
