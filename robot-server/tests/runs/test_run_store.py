@@ -2,7 +2,7 @@
 import pytest
 from datetime import datetime
 from typing import Generator
-from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError
+from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError, RunAction, RunActionType
 from sqlalchemy.engine import Engine as SQLEngine
 from robot_server.db import create_in_memory_db
 from robot_server.data_access.data_access import add_tables_to_db
@@ -134,11 +134,16 @@ def test_remove_run_missing_id(subject: RunStore) -> None:
 
 def test_add_run_current_run_deactivates(subject: RunStore) -> None:
     """Adding a current run should mark all others as not current."""
+    actions = RunAction(
+        actionType=RunActionType.PLAY,
+        createdAt=datetime(year=2022, month=2, day=2),
+        id="action-id",
+    )
     run_1 = RunResource(
         run_id="run-id-1",
         protocol_id=None,
         created_at=datetime.now(),
-        actions=[],
+        actions=[actions],
         is_current=True,
     )
 

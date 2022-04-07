@@ -50,13 +50,9 @@ class RunStore:
         insert_actions = []
         for action in actions:
             insert_actions.append(_convert_action_to_sql_values(action, run_id))
-        print(insert_actions)
-        # statement = sqlalchemy.insert(run_table).values(
-        #     insert_actions
-        # )
         with self._sql_engine.begin() as transaction:
             try:
-                transaction.execute(run_table.insert(), insert_actions)
+                transaction.execute(action_runs_table.insert(), insert_actions)
             except sqlalchemy.exc.NoResultFound as e:
                 raise 'insert actions ' + e
 
@@ -136,8 +132,9 @@ class RunStore:
         Returns:
             The retrieved run entry from the db.
         """
-        statement = sqlalchemy.select(run_table).join(action_runs_table, action_runs_table.c.run_id == run_table.c.id,
-                                                      isouter=True).where(
+        run: RunResource = {}
+        statement = sqlalchemy.select(run_table, action_runs_table).join(action_runs_table,
+                                                                         isouter=True).where(
             run_table.c.id == run_id
         )
         try:
@@ -145,9 +142,12 @@ class RunStore:
             with self._sql_engine.begin() as transaction:
                 row_run = transaction.execute(statement)
                 print(row_run)
-                run = _convert_sql_row_to_run(row_run)
+                # run = _convert_sql_row_to_run(row_run.one())
                 for action in row_run:
-                    run.actions.append(_convert_sql_row_to_action(action))
+                    run = _convert_sql_row_to_run(action)
+                    # run.actions.append(
+                    _convert_sql_row_to_action(action)
+                    # )
         except sqlalchemy.exc.NoResultFound as e:
             raise RunNotFoundError(run_id) from e
         return run
@@ -192,6 +192,7 @@ class RunStore:
 
 
 def _convert_sql_row_to_run(sql_row: sqlalchemy.engine.Row) -> RunResource:
+    print(sql_row)
     run_id = sql_row.id
     assert isinstance(run_id, str)
 
@@ -207,7 +208,7 @@ def _convert_sql_row_to_run(sql_row: sqlalchemy.engine.Row) -> RunResource:
     assert isinstance(is_current, bool)
 
     return RunResource(
-        run_id=run_id, created_at=created_at, actions=[],protocol_id=protocol_id, is_current=is_current
+        run_id=run_id, created_at=created_at, actions=[], protocol_id=protocol_id, is_current=is_current
     )
 
 
@@ -221,6 +222,7 @@ def _convert_run_to_sql_values(run: RunResource) -> Dict[str, object]:
 
 
 def _convert_sql_row_to_action(sql_row: sqlalchemy.engine.Row) -> RunAction:
+    print(sql_row)
     action_id = sql_row.id
     assert isinstance(action_id, str)
 
