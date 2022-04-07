@@ -25,11 +25,13 @@ interface SP {
   formHasChanges: boolean
   isNewStep: boolean
   isPristineSetTempForm: boolean
+  isPristineSetHeaterShakerTempForm: boolean
 }
 interface DP {
   deleteStep: (stepId: string) => unknown
   handleClose: () => unknown
   saveSetTempFormWithAddedPauseUntilTemp: () => unknown
+  saveSetTempFormWithAddedPauseUntilHeaterShakerTemp: () => unknown
   saveStepForm: () => unknown
   handleChangeFormInput: (name: string, value: unknown) => void
 }
@@ -47,7 +49,9 @@ const StepEditFormManager = (
     handleClose,
     isNewStep,
     isPristineSetTempForm,
+    isPristineSetHeaterShakerTempForm,
     saveSetTempFormWithAddedPauseUntilTemp,
+    saveSetTempFormWithAddedPauseUntilHeaterShakerTemp,
     saveStepForm,
   } = props
 
@@ -107,6 +111,14 @@ const StepEditFormManager = (
     isPristineSetTempForm
   )
 
+  const {
+    confirm: confirmAddPauseUntilHeaterShakerTempStep,
+    showConfirmation: showAddPauseUntilHeaterShakerTempStepModal,
+  } = useConditionalConfirm(
+    saveSetTempFormWithAddedPauseUntilHeaterShakerTemp,
+    isPristineSetHeaterShakerTempForm
+  )
+
   // no form selected
   if (formData == null) {
     return null
@@ -124,13 +136,10 @@ const StepEditFormManager = (
     formData,
     handleChangeFormInput
   )
-
-  let displayTemp: string | null = null
-  if (formData?.stepType === 'temperature') {
-    displayTemp = formData?.targetTemperature
-  } else if (formData?.stepType === 'heaterShaker') {
-    displayTemp = formData?.targetHeaterShakerTemperature
-  }
+  console.log(formData)
+  console.log(formData?.targetHeaterShakerTemperature)
+  console.log(showAddPauseUntilHeaterShakerTempStepModal)
+  console.log(isPristineSetHeaterShakerTempForm)
   return (
     <>
       {showConfirmDeleteModal && (
@@ -149,11 +158,18 @@ const StepEditFormManager = (
           onContinueClick={confirmClose}
         />
       )}
-      {showAddPauseUntilTempStepModal && (
+      {/* {showAddPauseUntilTempStepModal && (
         <AutoAddPauseUntilTempStepModal
-          displayTemperature={displayTemp ?? '?'}
+          displayTemperature={formData?.targetTemperature ?? '?'}
           handleCancelClick={saveStepForm}
           handleContinueClick={confirmAddPauseUntilTempStep}
+        />
+      )} */}
+      {showAddPauseUntilHeaterShakerTempStepModal && (
+        <AutoAddPauseUntilTempStepModal
+          displayTemperature={formData?.targetHeaterShakerTemperature ?? '?'}
+          handleCancelClick={saveStepForm}
+          handleContinueClick={confirmAddPauseUntilHeaterShakerTempStep}
         />
       )}
       <StepEditFormComponent
@@ -167,6 +183,8 @@ const StepEditFormManager = (
           handleDelete: confirmDelete,
           handleSave: isPristineSetTempForm
             ? confirmAddPauseUntilTempStep
+            : isPristineSetHeaterShakerTempForm
+            ? confirmAddPauseUntilHeaterShakerTempStep
             : saveStepForm,
           propsForFields,
           showMoreOptionsModal,
@@ -183,6 +201,9 @@ const mapStateToProps = (state: BaseState): SP => {
     formData: stepFormSelectors.getUnsavedForm(state),
     formHasChanges: stepFormSelectors.getCurrentFormHasUnsavedChanges(state),
     isNewStep: stepFormSelectors.getCurrentFormIsPresaved(state),
+    isPristineSetHeaterShakerTempForm: stepFormSelectors.getUnsavedFormIsPrestineSetHeaterShakerTempForm(
+      state
+    ),
     isPristineSetTempForm: stepFormSelectors.getUnsavedFormIsPristineSetTempForm(
       state
     ),
@@ -193,6 +214,8 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DP => {
   const deleteStep = (stepId: StepIdType): void =>
     dispatch(actions.deleteStep(stepId))
   const handleClose = (): void => dispatch(actions.cancelStepForm())
+  const saveSetTempFormWithAddedPauseUntilHeaterShakerTemp = (): void =>
+    dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilHeaterShakerTemp())
   const saveSetTempFormWithAddedPauseUntilTemp = (): void =>
     dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilTemp())
   const saveStepForm = (): void => dispatch(stepsActions.saveStepForm())
@@ -208,6 +231,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DP => {
     handleClose,
     saveSetTempFormWithAddedPauseUntilTemp,
     saveStepForm,
+    saveSetTempFormWithAddedPauseUntilHeaterShakerTemp,
   }
 }
 
