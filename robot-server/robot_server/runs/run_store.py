@@ -145,9 +145,10 @@ class RunStore:
                 # run = _convert_sql_row_to_run(row_run.one())
                 for action in row_run:
                     run = _convert_sql_row_to_run(action)
-                    # run.actions.append(
-                    _convert_sql_row_to_action(action)
-                    # )
+                    if action.id_1:
+                        run.actions.append(
+                            _convert_sql_row_to_action(action)
+                        )
         except sqlalchemy.exc.NoResultFound as e:
             raise RunNotFoundError(run_id) from e
         return run
@@ -222,11 +223,10 @@ def _convert_run_to_sql_values(run: RunResource) -> Dict[str, object]:
 
 
 def _convert_sql_row_to_action(sql_row: sqlalchemy.engine.Row) -> RunAction:
-    print(sql_row)
-    action_id = sql_row.id
+    action_id = sql_row.id_1
     assert isinstance(action_id, str)
 
-    created_at = sql_row.created_at
+    created_at = sql_row.created_at_1
     assert isinstance(created_at, datetime)
 
     action_type = sql_row.action_type
