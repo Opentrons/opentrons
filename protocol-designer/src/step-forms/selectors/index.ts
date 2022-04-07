@@ -638,8 +638,10 @@ export const getUnsavedFormIsPristineSetTempForm: Selector<
   getCurrentFormIsPresaved,
   (unsavedForm, isPresaved) => {
     const isSetTempForm =
-      unsavedForm?.stepType === 'temperature' &&
-      unsavedForm?.setTemperature === 'true'
+      (unsavedForm?.stepType === 'temperature' &&
+        unsavedForm?.setTemperature === 'true') ||
+      (unsavedForm?.stepType === 'heaterShaker' &&
+        unsavedForm?.setTemperature === 'true')
     return isPresaved && isSetTempForm
   }
 )

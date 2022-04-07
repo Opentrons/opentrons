@@ -125,6 +125,12 @@ const StepEditFormManager = (
     handleChangeFormInput
   )
 
+  let displayTemp: string | null = null
+  if (formData?.stepType === 'temperature') {
+    displayTemp = formData?.targetTemperature
+  } else if (formData?.stepType === 'heaterShaker') {
+    displayTemp = formData?.targetHeaterShakerTemperature
+  }
   return (
     <>
       {showConfirmDeleteModal && (
@@ -145,7 +151,7 @@ const StepEditFormManager = (
       )}
       {showAddPauseUntilTempStepModal && (
         <AutoAddPauseUntilTempStepModal
-          displayTemperature={formData?.targetTemperature ?? '?'}
+          displayTemperature={displayTemp ?? '?'}
           handleCancelClick={saveStepForm}
           handleContinueClick={confirmAddPauseUntilTempStep}
         />
