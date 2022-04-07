@@ -16,11 +16,9 @@ import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
 import { SecondaryButton } from '../../../atoms/Buttons'
-import { useRobot } from '../hooks/useRobot'
 import {
   fetchStatus,
   fetchWifiList,
-  getInternetStatus,
   getNetworkInterfaces,
   getWifiList,
   postWifiDisconnect,
@@ -41,18 +39,13 @@ const LIST_REFRESH_MS = 10000
 export function RobotSettingsNetworking({
   robotName,
 }: NetworkingProps): JSX.Element {
-  const [showNetworkingSlideout, setShowNetworkingSlideout] = React.useState(
-    true
-  )
-  const robot = useRobot(robotName)
+  const [
+    showNetworkingSlideout,
+    setShowNetworkingSlideout,
+  ] = React.useState<boolean>(false)
   const { t } = useTranslation('device_settings')
   const [dispatchApi] = RobotApi.useDispatchApiRequest()
   const dispatch = useDispatch<Dispatch>()
-
-  const internetStatus = useSelector((state: State) =>
-    getInternetStatus(state, robotName)
-  )
-
   const { wifi, ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
   )
@@ -60,31 +53,19 @@ export function RobotSettingsNetworking({
   const list = useSelector((state: State) => getWifiList(state, robotName))
   const activeNetwork = list.find(wifi => wifi.active)
 
+  useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
+  useInterval(() => dispatch(fetchWifiList(robotName)), LIST_REFRESH_MS, true)
+
+  React.useEffect(() => {
+    dispatch(fetchStatus(robotName))
+    dispatch(fetchWifiList(robotName))
+  })
+
   const handleDisconnect = (): void => {
     if (activeNetwork != null) {
       dispatchApi(postWifiDisconnect(robotName, activeNetwork.ssid))
     }
   }
-
-  // for debugging
-  console.log('internetStatus', internetStatus)
-  console.log('robot', robot)
-  console.log('===============================')
-  console.log('wifi', wifi)
-  console.log('===============================')
-  console.log('ethernet', ethernet)
-  console.log('===============================')
-  console.log('list', list)
-  console.log('networkName', activeNetwork?.ssid)
-
-  // ToDo loading issue
-  //   React.useEffect(() => {
-  //     console.log('called')
-  //     dispatch(fetchStatus(robotName))
-  //   }, [])
-
-  useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
-  useInterval(() => dispatch(fetchWifiList(robotName)), LIST_REFRESH_MS, true)
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
