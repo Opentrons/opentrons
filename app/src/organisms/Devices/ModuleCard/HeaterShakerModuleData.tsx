@@ -13,13 +13,21 @@ import {
   DIRECTION_ROW,
   TYPOGRAPHY,
   C_SKY_BLUE,
+  TEXT_TRANSFORM_CAPITALIZE,
+  SIZE_1,
 } from '@opentrons/components'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 
+import type {
+  LatchStatus,
+  SpeedStatus,
+  TemperatureStatus,
+} from '../../../redux/modules/api-types'
+
 interface HeaterShakerModuleDataProps {
-  heaterStatus: string
-  shakerStatus: string
-  latchStatus: string
+  heaterStatus: TemperatureStatus
+  shakerStatus: SpeedStatus
+  latchStatus: LatchStatus
   targetTemp: number | null
   currentTemp: number | null
   targetSpeed: number | null
@@ -40,7 +48,8 @@ export const HeaterShakerModuleData = (
     currentSpeed,
     showTemperatureData,
   } = props
-  const { t } = useTranslation(['device_details', 'heater_shaker'])
+  const { t } = useTranslation(['device_details', 'heater_shaker', 'shared'])
+  const isShaking = shakerStatus !== 'idle'
 
   const getStatusLabelProps = (
     status: string | null
@@ -73,6 +82,38 @@ export const HeaterShakerModuleData = (
       }
     }
     return StatusLabelProps
+  }
+
+  const getLatchStatus = (latchStatus: LatchStatus): JSX.Element | string => {
+    switch (latchStatus) {
+      case 'opening':
+      case 'idle_open':
+      case 'idle_unknown': {
+        return (
+          <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+            {t('open', { ns: 'shared' })}
+          </Text>
+        )
+      }
+      case 'closing':
+      case 'idle_closed': {
+        if (isShaking) {
+          return (
+            <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+              {t('closed_and_locked', { ns: 'heater_shaker' })}
+            </Text>
+          )
+        } else {
+          return (
+            <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+              {t('closed', { ns: 'heater_shaker' })}
+            </Text>
+          )
+        }
+      }
+      default:
+        return latchStatus
+    }
   }
 
   return (
@@ -162,13 +203,14 @@ export const HeaterShakerModuleData = (
             alignItems={ALIGN_FLEX_START}
           >
             <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing2}>
-              {/* {TODO(sh, 2022-02-22): Conditionally render icon based on latch status} */}
-              <Icon
-                name="closed-locked"
-                size={'1rem'}
-                color={COLORS.darkGreyEnabled}
-              />
-              {latchStatus}
+              {isShaking && (
+                <Icon
+                  name="closed-locked"
+                  data-testid="HeaterShakerModuleData_latch_lock"
+                  size={SIZE_1}
+                />
+              )}
+              {getLatchStatus(latchStatus)}
             </Flex>
           </Text>
         </Flex>

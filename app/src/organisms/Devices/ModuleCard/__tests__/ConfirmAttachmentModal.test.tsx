@@ -70,7 +70,7 @@ describe('ConfirmAttachmentBanner', () => {
     expect(props.onCloseClick).toHaveBeenCalled()
   })
 
-  it('renders the correct modal info when accessed through proceed to run CTA and clicks proceed to run button ', () => {
+  it('renders the correct modal info when accessed through proceed to run CTA and clicks proceed to run button', () => {
     props = {
       onCloseClick: jest.fn(),
       isProceedToRunModal: true,
