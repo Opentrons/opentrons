@@ -4,21 +4,13 @@ These fixtures consist of two "matching" JSON and Python protocols,
 saved to disk.
 """
 import pytest
-import io
 import json
 import textwrap
 from pathlib import Path
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.labware import load_definition
-from opentrons.protocol_reader import ProtocolReader, InputFile
 from opentrons.protocol_engine import ModuleDefinition
-
-
-@pytest.fixture
-def protocol_reader(tmp_path: Path) -> ProtocolReader:
-    """Get a ProtocolReader configured to write to a temporary directory."""
-    return ProtocolReader(directory=tmp_path)
 
 
 @pytest.fixture(scope="session")
@@ -28,24 +20,24 @@ def tempdeck_v1_def() -> ModuleDefinition:
     return ModuleDefinition.parse_raw(definition)
 
 
-# TODO(mc, 2021-09-13): update to schema v6
-@pytest.fixture
-def json_protocol_file() -> InputFile:
+@pytest.fixture()
+def json_protocol_file(tmp_path: Path) -> Path:
     """Get minimal JSON protocol input "file"."""
     tip_rack_def = load_definition("opentrons_96_tiprack_300ul", version=1)
-    filename = "protocol-name.json"
-    contents = io.BytesIO(
+    path = tmp_path / "protocol-name.json"
+
+    path.write_text(
         json.dumps(
             {
+                "$otSharedSchema": "#/protocol/schemas/6",
                 "schemaVersion": 6,
                 "metadata": {},
-                "robot": {"model": "OT-2 Standard"},
+                "robot": {"model": "OT-2 Standard", "deckId": "ot2_standard"},
                 "pipettes": {
-                    "pipette-id": {"mount": "left", "name": "p300_single"},
+                    "pipette-id": {"name": "p300_single"},
                 },
                 "labware": {
                     "labware-id": {
-                        "slot": "1",
                         "displayName": "Opentrons 96 Tip Rack 300 µL",
                         "definitionId": "opentrons/opentrons_96_tiprack_300ul/1",
                     },
@@ -55,26 +47,47 @@ def json_protocol_file() -> InputFile:
                 },
                 "commands": [
                     {
-                        "command": "pickUpTip",
+                        "id": "command-id-1",
+                        "commandType": "loadLabware",
                         "params": {
-                            "pipette": "pipette-id",
-                            "labware": "labware-id",
-                            "well": "A1",
+                            "labwareId": "labware-id",
+                            "loadName": "opentrons_96_tiprack_300ul",
+                            "namespace": "opentrons",
+                            "version": 1,
+                            "location": {"slotName": "1"},
+                        },
+                    },
+                    {
+                        "id": "command-id-2",
+                        "commandType": "loadPipette",
+                        "params": {
+                            "pipetteId": "pipette-id",
+                            "pipetteName": "p300_single",
+                            "mount": "left",
+                        },
+                    },
+                    {
+                        "id": "command-id-3",
+                        "commandType": "pickUpTip",
+                        "params": {
+                            "pipetteId": "pipette-id",
+                            "labwareId": "labware-id",
+                            "wellName": "A1",
                         },
                     },
                 ],
             }
-        ).encode()
+        )
     )
 
-    return InputFile(filename=filename, file=contents)
+    return path
 
 
-@pytest.fixture
-def python_protocol_file() -> InputFile:
+@pytest.fixture()
+def python_protocol_file(tmp_path: Path) -> Path:
     """Get minimal Python protocol input "file"."""
-    filename = "protocol-name.py"
-    contents = io.BytesIO(
+    path = tmp_path / "protocol-name.py"
+    path.write_text(
         textwrap.dedent(
             """
             # my protocol
@@ -98,17 +111,17 @@ def python_protocol_file() -> InputFile:
                     location=tip_rack.wells_by_name()["A1"],
                 )
             """
-        ).encode()
+        )
     )
 
-    return InputFile(filename=filename, file=contents)
+    return path
 
 
-@pytest.fixture
-def legacy_python_protocol_file() -> InputFile:
+@pytest.fixture()
+def legacy_python_protocol_file(tmp_path: Path) -> Path:
     """Get an on-disk, minimal Python protocol fixture."""
-    filename = "protocol-name.py"
-    contents = io.BytesIO(
+    path = tmp_path / "protocol-name.py"
+    path.write_text(
         textwrap.dedent(
             """
             # my protocol
@@ -128,18 +141,18 @@ def legacy_python_protocol_file() -> InputFile:
                     location=tip_rack.wells_by_name()["A1"],
                 )
             """
-        ).encode()
+        )
     )
 
-    return InputFile(filename=filename, file=contents)
+    return path
 
 
-@pytest.fixture
-def legacy_json_protocol_file() -> InputFile:
+@pytest.fixture()
+def legacy_json_protocol_file(tmp_path: Path) -> Path:
     """Get an on-disk, minimal JSON protocol fixture."""
     tip_rack_def = load_definition("opentrons_96_tiprack_300ul", version=1)
-    filename = "protocol-name.json"
-    contents = io.BytesIO(
+    path = tmp_path / "protocol-name.json"
+    path.write_text(
         json.dumps(
             {
                 "$otSharedSchema": "#/protocol/schemas/5",
@@ -171,7 +184,7 @@ def legacy_json_protocol_file() -> InputFile:
                     },
                 ],
             }
-        ).encode()
+        )
     )
 
-    return InputFile(filename=filename, file=contents)
+    return path

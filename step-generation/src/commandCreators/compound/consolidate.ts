@@ -15,7 +15,6 @@ import {
   reduceCommandCreators,
 } from '../../utils'
 import {
-  airGap,
   aspirate,
   delay,
   dispense,
@@ -101,7 +100,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             getWellDepth(sourceLabwareDef, sourceWell) + AIR_GAP_OFFSET_FROM_TOP
           const airGapAfterAspirateCommands = aspirateAirGapVolume
             ? [
-                curryCommandCreator(airGap, {
+                curryCommandCreator(aspirate, {
                   pipette: args.pipette,
                   volume: aspirateAirGapVolume,
                   labware: args.sourceLabware,
@@ -266,7 +265,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       const airGapAfterDispenseCommands =
         dispenseAirGapVolume && !willReuseTip
           ? [
-              curryCommandCreator(airGap, {
+              curryCommandCreator(aspirate, {
                 pipette: args.pipette,
                 volume: dispenseAirGapVolume,
                 labware: args.destLabware,

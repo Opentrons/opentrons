@@ -3,7 +3,7 @@ import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import type {
   EngageMagnetParams,
   ModuleOnlyParams,
-} from '@opentrons/shared-data/protocol/types/schemaV4'
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type {
   InvariantContext,
   ModuleTemporalProperties,
@@ -24,9 +24,9 @@ export function forEngageMagnet(
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  const { module } = params
+  const { moduleId } = params
   const { robotState } = robotStateAndWarnings
-  const moduleState = getModuleState(robotState, module)
+  const moduleState = getModuleState(robotState, moduleId)
 
   _setMagnet(moduleState, true)
 }
@@ -35,9 +35,9 @@ export function forDisengageMagnet(
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  const { module } = params
+  const { moduleId } = params
   const { robotState } = robotStateAndWarnings
-  const moduleState = getModuleState(robotState, module)
+  const moduleState = getModuleState(robotState, moduleId)
 
   _setMagnet(moduleState, false)
 }

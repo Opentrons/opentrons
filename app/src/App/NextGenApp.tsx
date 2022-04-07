@@ -29,6 +29,8 @@ import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { AppSettings } from '../organisms/AppSettings'
 import { Labware } from '../organisms/Labware'
 import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
+import logoSvg from '../assets/images/logo_nav.svg'
+import { NAV_BAR_WIDTH } from './constants'
 
 export interface RouteProps {
   /**
@@ -55,8 +57,10 @@ const TempNavBarLink = styled(NavLink)<{ lastRoute: boolean }>`
   margin-top: ${props => (props.lastRoute ? 'auto' : SPACING.spacing4)};
 `
 
-// defines a constant for the nav bar width - used in run log component to calculate centering
-export const NAV_BAR_WIDTH = '5.625rem'
+const LogoImg = styled('img')`
+  align-self: ${ALIGN_CENTER};
+  margin: ${SPACING.spacing4} 0;
+`
 
 /**
  * a temp nav bar to facilitate app navigation during development until breadcrumbs are implemented
@@ -83,6 +87,7 @@ export function TempNavBar({ routes }: { routes: RouteProps[] }): JSX.Element {
         flex={FLEX_NONE}
         alignItems={ALIGN_FLEX_START}
       >
+        <LogoImg src={logoSvg} />
         {navRoutes.map(({ name, navLinkTo }: RouteProps, i: number) => (
           <TempNavBarLink
             key={name}

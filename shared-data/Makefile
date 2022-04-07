@@ -42,7 +42,7 @@ setup-py:
 
 .PHONY: dist-py
 dist-py:
-	$(MAKE) -C python wheel
+	$(MAKE) -C python sdist wheel
 
 .PHONY: clean-py
 clean-py:

@@ -67,12 +67,14 @@ def hardware() -> MagicMock:
 
 
 @pytest.fixture
-def override_hardware(hardware: MagicMock) -> None:
+def override_hardware(hardware: MagicMock) -> Iterator[None]:
     async def get_hardware_override() -> HardwareControlAPI:
         """Override for get_hardware dependency"""
         return hardware
 
     app.dependency_overrides[get_hardware] = get_hardware_override
+    yield
+    del app.dependency_overrides[get_hardware]
 
 
 @pytest.fixture

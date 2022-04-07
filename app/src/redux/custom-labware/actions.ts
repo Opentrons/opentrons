@@ -38,11 +38,14 @@ export const CLEAR_NEW_LABWARE_NAME: 'labware:CLEAR_NEW_LABWARE_NAME' =
 export const OPEN_CUSTOM_LABWARE_DIRECTORY: 'labware:OPEN_CUSTOM_LABWARE_DIRECTORY' =
   'labware:OPEN_CUSTOM_LABWARE_DIRECTORY'
 
+export const DELETE_CUSTOM_LABWARE_FILE: 'labware:DELETE_CUSTOM_LABWARE_FILE' =
+  'labware:DELETE_CUSTOM_LABWARE_FILE'
 // action meta literals
 
 export const POLL: 'poll' = 'poll'
 export const INITIAL: 'initial' = 'initial'
 export const ADD_LABWARE: 'addLabware' = 'addLabware'
+export const DELETE_LABWARE: 'deleteLabware' = 'deleteLabware'
 export const OVERWRITE_LABWARE: 'overwriteLabware' = 'overwriteLabware'
 export const CHANGE_DIRECTORY: 'changeDirectory' = 'changeDirectory'
 
@@ -92,6 +95,14 @@ export const addCustomLabwareFile = (
   filePath: string
 ): Types.AddCustomLabwareFileAction => ({
   type: ADD_CUSTOM_LABWARE_FILE,
+  payload: { filePath },
+  meta: { shell: true },
+})
+
+export const deleteCustomLabwareFile = (
+  filePath: string
+): Types.DeleteCustomLabwareFileAction => ({
+  type: DELETE_CUSTOM_LABWARE_FILE,
   payload: { filePath },
   meta: { shell: true },
 })

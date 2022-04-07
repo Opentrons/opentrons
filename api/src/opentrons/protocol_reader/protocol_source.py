@@ -2,7 +2,7 @@
 from enum import Enum
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 from typing_extensions import Literal
 
 from opentrons.protocols.api_support.types import APIVersion
@@ -37,11 +37,11 @@ class ProtocolSourceFile:
     """A single file in a protocol.
 
     Attributes:
-        name: The file's basename, with extension.
+        path: The file's path on disk.
         role: The file's purpose in the protocol.
     """
 
-    name: str
+    path: Path
     role: ProtocolFileRole
 
 
@@ -90,19 +90,26 @@ Metadata must be a simple JSON-serializable dictionary.
 
 @dataclass(frozen=True)
 class ProtocolSource:
-    """A value object representing a protocol and its files on disk.
+    """A value object representing a protocol and its source files on disk.
+
+    This includes pointers to the files,
+    plus some basic information that can be readily inferred from those files.
+    (Excluding information that would require in-depth simulation of the protocol.)
 
     Attributes:
-        directory: The directory location of the protocol on disk.
+        directory: The directory of the protocol files, if a directory
+            was created by the ProtocolReader.
         main_file: The location of the protocol's main file on disk.
         files: Descriptions of all files that make up the protocol.
         metadata: Arbitrary metadata specified by the protocols.
         config: Protocol execution configuration.
         labware_definitions: Labware definitions provided by separate
             labware files or the main JSON protocol file, if present.
+            This is not necessarily the same set of labware definitions
+            that the protocol will actually attempt to load.
     """
 
-    directory: Path
+    directory: Optional[Path]
     main_file: Path
     files: List[ProtocolSourceFile]
     metadata: Metadata

@@ -116,6 +116,5 @@ export const NEW_LABWARE_DEFS = [
 
 export function isNewLabware(definition: LabwareDefinition): boolean {
   const { loadName } = definition.parameters
-  console.log('HERE')
   return NEW_LABWARE_DEFS.includes(loadName)
 }

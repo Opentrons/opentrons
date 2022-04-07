@@ -31,7 +31,7 @@ describe('delay indefinitely', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       {
-        command: 'delay',
+        commandType: 'delay',
         params: {
           wait: true,
           message,
@@ -52,7 +52,7 @@ describe('delay for a given time', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       {
-        command: 'delay',
+        commandType: 'delay',
         params: {
           wait: 95.5,
           message,

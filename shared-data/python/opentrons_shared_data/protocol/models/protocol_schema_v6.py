@@ -11,9 +11,9 @@ class CommandAnnotation(BaseModel):
 
 
 class OffsetVector(BaseModel):
-    x: float
-    y: float
-    z: float
+    x: Optional[float]
+    y: Optional[float]
+    z: Optional[float]
 
 
 class Location(BaseModel):
@@ -57,9 +57,9 @@ class Params(BaseModel):
 
 
 class Command(BaseModel):
-    id: str
     commandType: str
     params: Params
+    key: Optional[str]
 
 
 class Labware(BaseModel):
