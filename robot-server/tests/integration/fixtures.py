@@ -1,6 +1,6 @@
-import requests
 from box import Box
 from requests import Response
+from tests.integration.http_robot import HttpRobot
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MIN_SUPPORTED_VERSION
 from opentrons import __version__, config
 from opentrons_shared_data.module.dev_types import ModuleModel
@@ -34,12 +34,11 @@ def check_health_response(response: Response) -> None:
 
 def delete_all_runs(response: Response, host: str, port: str) -> None:
     """Intake the response of a GET /runs and delete all runs if any exist."""
-    headers = {"Opentrons-Version": "*"}
-    base_url = f"{host}:{port}"
+    robot = HttpRobot(host, port)
     runs = response.json()["data"]
     run_ids = [run["id"] for run in runs]
     for run_id in run_ids:
-        delete_response = requests.delete(f"{base_url}/runs/{run_id}", headers=headers)
+        delete_response = robot.delete_run(run_id)
         print(
             f"Deleted run {run_id},"
             f" response status code = {delete_response.status_code}"
