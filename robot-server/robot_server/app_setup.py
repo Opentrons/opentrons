@@ -6,10 +6,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from opentrons import __version__
 
-from .router import router
 from .errors import exception_handlers
 from .hardware import initialize_hardware, cleanup_hardware
+from .router import router
 from .service import initialize_logging
+from .settings import get_settings
 
 log = logging.getLogger(__name__)
 
@@ -43,6 +44,10 @@ app.include_router(router=router)
 @app.on_event("startup")
 async def on_startup() -> None:
     """Handle app startup."""
+    # Load settings and (throw away the result) so that we detect errors early
+    # on in startup, instead of the first time someone happens to use a setting.
+    get_settings()
+
     initialize_logging()
     initialize_hardware(app.state)
 
