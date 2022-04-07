@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
-import { Flex, RobotCoordsForeignDiv } from '@opentrons/components'
+import { RobotCoordsForeignDiv, Text } from '@opentrons/components'
 import {
   getModuleVizDims,
   MAGNETIC_MODULE_TYPE,
@@ -126,16 +126,16 @@ export const ModuleStatus = ({
       return (
         <>
           <div className={styles.module_status_line}>
-            <Flex paddingBottom="2px">{i18n.t('modules.heater_label')}:</Flex>
-            <Flex>{makeTemperatureText(moduleState.targetTemp)}</Flex>
+            <Text paddingBottom="2px">{i18n.t('modules.heater_label')}:</Text>
+            <Text>{makeTemperatureText(moduleState.targetTemp)}</Text>
           </div>
           <div className={styles.module_status_line}>
-            <Flex paddingBottom="2px">{i18n.t('modules.shaker_label')}:</Flex>
-            <Flex>{makeSpeedText(moduleState.targetSpeed)}</Flex>
+            <Text paddingBottom="2px">{i18n.t('modules.shaker_label')}:</Text>
+            <Text>{makeSpeedText(moduleState.targetSpeed)}</Text>
           </div>
           <div className={styles.module_status_line}>
-            <Flex paddingBottom="2px"> {i18n.t('modules.labware_latch')}:</Flex>
-            <Flex>{latchStatus}</Flex>
+            <Text paddingBottom="2px"> {i18n.t('modules.labware_latch')}:</Text>
+            <Text>{latchStatus}</Text>
           </div>
           <div />
         </>
