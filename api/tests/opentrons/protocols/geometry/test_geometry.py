@@ -471,3 +471,25 @@ def test_get_non_fixture_slots():
     deck[4] = trough
 
     assert deck.get_non_fixture_slots() == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+
+
+def test_thermocycler_present() -> None:
+    """It should change when thermocycler is added/removed"""
+    deck = Deck()
+
+    # Empty deck. No thermocycler
+    assert not deck.thermocycler_present
+
+    # Add a thermocycler
+    deck[7] = module_geometry.load_module(
+        module_geometry.ThermocyclerModuleModel.THERMOCYCLER_V1, deck.position_for(7)
+    )
+    assert deck.thermocycler_present
+
+    # Add another labware
+    deck[4] = labware.load(trough_name, deck.position_for(4))
+    assert deck.thermocycler_present
+
+    # Remove thermocycler
+    del deck[7]
+    assert not deck.thermocycler_present

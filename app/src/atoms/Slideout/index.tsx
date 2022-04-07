@@ -11,19 +11,20 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   COLORS,
-  POSITION_ABSOLUTE,
   TYPOGRAPHY,
   Overlay,
   StyleProps,
+  POSITION_FIXED,
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
 import { StyledText } from '../text'
 
 interface Props extends StyleProps {
-  title: string
+  title: string | React.ReactElement
   children: React.ReactNode
   onCloseClick: () => unknown
+  closeOnOutsideClick?: boolean
   //  isExpanded is for collapse and expand animation
   isExpanded?: boolean
   footer?: React.ReactNode
@@ -36,6 +37,7 @@ const EXPANDED_STYLE = css`
   width: 19.5rem;
   max-width: 19.5rem;
   visibility: visible;
+  z-index: 2;
 
   @keyframes slidein {
     from {
@@ -69,16 +71,22 @@ export const Slideout = (props: Props): JSX.Element | null => {
     isExpanded,
     title,
     onCloseClick,
+    closeOnOutsideClick,
     children,
     footer,
     ...styleProps
   } = props
   return (
     <>
-      {isExpanded ? <Overlay /> : null}
+      {isExpanded ? (
+        <Overlay
+          onClick={closeOnOutsideClick === true ? onCloseClick : undefined}
+          backgroundColor={COLORS.backgroundOverlay}
+        />
+      ) : null}
       <Box
         css={isExpanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
-        position={POSITION_ABSOLUTE}
+        position={POSITION_FIXED}
         right="0"
         top="0"
         backgroundColor={COLORS.white}
@@ -93,32 +101,40 @@ export const Slideout = (props: Props): JSX.Element | null => {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Flex flex="1 1 auto" flexDirection={DIRECTION_COLUMN}>
-            <Flex
-              flexDirection={DIRECTION_ROW}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              alignItems={ALIGN_CENTER}
-              paddingX={SPACING.spacing4}
-              marginBottom={SPACING.spacing4}
-            >
-              <StyledText as="h2" data-testid={`Slideout_title_${title}`}>
-                {title}
-              </StyledText>
-              <Flex alignItems={ALIGN_CENTER}>
-                <Btn
-                  size={TYPOGRAPHY.lineHeight24}
-                  onClick={onCloseClick}
-                  aria-label="exit"
-                  data-testid={`Slideout_icon_close_${title}`}
-                >
-                  <Icon name={'close'} />
-                </Btn>
+            {typeof title === 'string' ? (
+              <Flex
+                flexDirection={DIRECTION_ROW}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+                alignItems={ALIGN_CENTER}
+                paddingX={SPACING.spacing4}
+                marginBottom={SPACING.spacing4}
+              >
+                <StyledText as="h2" data-testid={`Slideout_title_${title}`}>
+                  {title}
+                </StyledText>
+                <Flex alignItems={ALIGN_CENTER}>
+                  <Btn
+                    size={TYPOGRAPHY.lineHeight24}
+                    onClick={onCloseClick}
+                    aria-label="exit"
+                    data-testid={`Slideout_icon_close_${
+                      typeof title === 'string' ? title : ''
+                    }`}
+                  >
+                    <Icon name="close" />
+                  </Btn>
+                </Flex>
               </Flex>
-            </Flex>
+            ) : (
+              title
+            )}
             <Divider marginY={0} color={COLORS.medGrey} />
             <Box
               padding={SPACING.spacing4}
               flex="1 1 auto"
-              data-testid={`Slideout_body_${title}`}
+              data-testid={`Slideout_body_${
+                typeof title === 'string' ? title : ''
+              }`}
             >
               {children}
             </Box>

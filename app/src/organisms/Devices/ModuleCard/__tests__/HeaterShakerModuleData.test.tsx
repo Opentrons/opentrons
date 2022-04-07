@@ -73,8 +73,8 @@ describe('HeaterShakerModuleData', () => {
 
   it('renders a shaking status', () => {
     props = {
-      heaterStatus: 'shaking',
-      shakerStatus: 'idle',
+      heaterStatus: 'idle',
+      shakerStatus: 'speeding up',
       latchStatus: 'idle_unknown',
       targetTemp: null,
       currentTemp: null,
@@ -93,6 +93,6 @@ describe('HeaterShakerModuleData', () => {
     const { getByText } = render(props)
     getByText('Target: N/A RPM')
     getByText('Labware Latch')
-    getByText('idle_unknown')
+    getByText(/Open/i)
   })
 })

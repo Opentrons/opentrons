@@ -20,6 +20,7 @@ import {
   Tooltip,
   useHoverTooltip,
   COLORS,
+  ModuleIcon,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -33,7 +34,6 @@ import { useHistory } from 'react-router-dom'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { Banner } from '../../../atoms/Banner'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
-import { ModuleIcon } from '../ModuleIcon'
 import { HeaterShakerWizard } from '../HeaterShakerWizard'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
@@ -289,7 +289,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 paddingBottom={SPACING.spacing2}
                 data-testid={`module_card_display_name_${module.serial}`}
               >
-                <ModuleIcon moduleType={module.type} />
+                <ModuleIcon
+                  moduleType={module.type}
+                  size="1rem"
+                  marginRight={SPACING.spacing1}
+                  color={COLORS.darkGreyEnabled}
+                />
                 <Text fontSize={TYPOGRAPHY.fontSizeP}>
                   {getModuleDisplayName(module.model)}
                 </Text>

@@ -19,6 +19,7 @@ import {
   JUSTIFY_CENTER,
   ALIGN_CENTER,
   SIZE_3,
+  ModuleIcon,
 } from '@opentrons/components'
 import { Link } from 'react-router-dom'
 import {
@@ -28,7 +29,6 @@ import {
 
 import { StoredProtocolData } from '../../redux/protocol-storage'
 import { StyledText } from '../../atoms/text'
-import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 
