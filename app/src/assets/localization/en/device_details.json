@@ -63,5 +63,6 @@
   "module_status_range": "Between {{min}} - {{max}} {{unit}}",
   "module_controls": "Module Controls",
   "hot_to_the_touch": "<block>Module is <bold>hot</bold> to the touch</block>",
-  "module_actions_unavailable": "Module actions unavailable while protocol is running"
+  "module_actions_unavailable": "Module actions unavailable while protocol is running",
+  "choose_protocol_to_run": "Choose protocol to Run on {{name}}"
 }

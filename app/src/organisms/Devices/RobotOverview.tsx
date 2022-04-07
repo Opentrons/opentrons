@@ -24,7 +24,8 @@ import {
 } from '@opentrons/components'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import { ToggleBtn } from '../../atoms/ToggleBtn'
+import { ToggleButton, PrimaryButton } from '../../atoms/Buttons'
+import { StyledText } from '../../atoms/text'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useLights, useRobot, useIsRobotViewable } from './hooks'
 import { RobotStatusBanner } from './RobotStatusBanner'
@@ -41,6 +42,7 @@ export function RobotOverview({
   const robot = useRobot(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
 
+  const [showChooseProtocolSlideout, setShowChooseProtocolSlideout] = React.useState<boolean>(false)
   const { lightsOn, toggleLights } = useLights(robotName)
 
   const currentRunId = useCurrentRunId()
@@ -64,11 +66,11 @@ export function RobotOverview({
         <RobotStatusBanner name={robot.name} local={robot.local} />
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING_3}>
-            <Text textTransform={TEXT_TRANSFORM_UPPERCASE}>
+            <StyledText as="h6" textTransform={TEXT_TRANSFORM_UPPERCASE}>
               {t('controls')}
-            </Text>
+            </StyledText>
             <Flex alignItems={ALIGN_CENTER}>
-              <ToggleBtn
+              <ToggleButton
                 label={t('lights')}
                 toggledOn={lightsOn != null ? lightsOn : false}
                 disabled={lightsOn === null}
@@ -77,21 +79,16 @@ export function RobotOverview({
                 marginRight={SPACING_2}
                 id={`RobotOverview_lightsToggle`}
               />
-              <Text as="span">{t('lights')}</Text>
+              <StyledText as="p">{t('lights')}</StyledText>
             </Flex>
           </Flex>
-          {/* this link will change once protocol selection designs are finalized and functionality built out */}
-          <Link
-            to={`/devices/${robot.name}/protocol-runs/run`}
-            id={`RobotOverview_runAProtocol`}
+          <PrimaryButton
+            textTransform={TEXT_TRANSFORM_NONE}
+            disabled={currentRunId != null || !isRobotViewable}
+            onClick={() => setShowChooseProtocolSlideout(true)}
           >
-            <NewPrimaryBtn
-              textTransform={TEXT_TRANSFORM_NONE}
-              disabled={currentRunId != null || !isRobotViewable}
-            >
-              {t('run_a_protocol')}
-            </NewPrimaryBtn>
-          </Link>
+            {t('run_a_protocol')}
+          </PrimaryButton>
         </Flex>
       </Box>
       <Box alignSelf={ALIGN_START}>
