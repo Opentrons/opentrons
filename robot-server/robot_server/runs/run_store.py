@@ -47,20 +47,20 @@ class RunStore:
             run_id: current run id to get
             actions: a list of actions to store in the db
         """
-        stmt = action_runs_table.update().\
-            where(action_runs_table.c.run_id == run_id). \
-            values({
-            'action_type': sqlalchemy.bindparam('action_type')
-        })
-        update_actions = []
-        for action in actions:
-            update_actions.append(_convert_action_to_sql_values(action, run_id))
+        # stmt = action_runs_table.update().\
+        #     where(action_runs_table.c.run_id == run_id). \
+        #     values({
+        #     'action_type': sqlalchemy.bindparam('action_type')
+        # })
+
         with self._sql_engine.begin() as transaction:
             try:
-                print(update_actions)
-                transaction.execute(stmt, update_actions)
+                transaction.execute(sqlalchemy.delete(action_runs_table).where(
+                    action_runs_table.c.run_id == run_id
+                ))
+                self.insert_actions(run_id, actions)
             except sqlalchemy.exc.NoResultFound as e:
-                raise 'insert actions ' + e
+                raise 'update actions ' + e
 
     def insert_actions(self, run_id: str, actions: List[RunAction]) -> None:
         """Insert or update a run actions resource in the db.
