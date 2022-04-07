@@ -7,7 +7,7 @@ exports[`modals AlertModal renders correctly 1`] = `
   display: -ms-flexbox;
   display: flex;
   background-color: rgba(0,0,0,0.9);
-  position: absolute;
+  position: fixed;
   z-index: 1;
   top: 0;
   right: 0;
@@ -91,7 +91,7 @@ exports[`modals ContinueModal renders correctly 1`] = `
   display: -ms-flexbox;
   display: flex;
   background-color: rgba(0,0,0,0.9);
-  position: absolute;
+  position: fixed;
   z-index: 1;
   top: 0;
   right: 0;
@@ -145,7 +145,7 @@ exports[`modals Modal renders correctly 1`] = `
   display: -ms-flexbox;
   display: flex;
   background-color: rgba(0,0,0,0.9);
-  position: absolute;
+  position: fixed;
   z-index: 1;
   top: 0;
   right: 0;
@@ -181,7 +181,7 @@ exports[`modals Modal renders correctly with optional heading 1`] = `
   display: -ms-flexbox;
   display: flex;
   background-color: rgba(0,0,0,0.9);
-  position: absolute;
+  position: fixed;
   z-index: 1;
   top: 0;
   right: 0;
@@ -226,7 +226,7 @@ exports[`modals ModalPage renders correctly 1`] = `
   display: -ms-flexbox;
   display: flex;
   background-color: rgba(0,0,0,0.9);
-  position: absolute;
+  position: fixed;
   z-index: 1;
   top: 0;
   right: 0;
@@ -303,7 +303,7 @@ exports[`modals Overlay renders correctly 1`] = `
   display: -ms-flexbox;
   display: flex;
   background-color: rgba(0,0,0,0.9);
-  position: absolute;
+  position: fixed;
   z-index: 1;
   top: 0;
   right: 0;
@@ -324,7 +324,7 @@ exports[`modals SpinnerModalPage renders correctly 1`] = `
   display: -ms-flexbox;
   display: flex;
   background-color: rgba(0,0,0,0.9);
-  position: absolute;
+  position: fixed;
   z-index: 1;
   top: 0;
   right: 0;

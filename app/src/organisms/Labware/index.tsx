@@ -19,7 +19,13 @@ import { Toast } from '../../atoms/Toast'
 
 import { LabwareCard } from './LabwareCard'
 import { AddCustomLabware } from './AddCustomLabware'
-import { useGetAllLabware, useLabwareFailure, useNewLabwareName } from './hooks'
+import { LabwareDetails } from './LabwareDetails'
+import {
+  LabwareDefAndDate,
+  useGetAllLabware,
+  useLabwareFailure,
+  useNewLabwareName,
+} from './hooks'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 
@@ -34,6 +40,11 @@ export function Labware(): JSX.Element {
   )
   const [showSuccessToast, setShowSuccessToast] = React.useState(false)
   const [showFailureToast, setShowFailureToast] = React.useState(false)
+  const [
+    currentLabwareDef,
+    setCurrentLabwaredef,
+  ] = React.useState<null | LabwareDefAndDate>(null)
+
   React.useEffect(() => {
     if (labwareFailureMessage != null) {
       setShowAddLabwareSlideout(false)
@@ -68,6 +79,9 @@ export function Labware(): JSX.Element {
             <LabwareCard
               key={labware.definition.metadata.displayName}
               labware={labware}
+              onClick={() => {
+                setCurrentLabwaredef(labware)
+              }}
             />
           ))}
         </Flex>
@@ -88,7 +102,11 @@ export function Labware(): JSX.Element {
             css={TYPOGRAPHY.h6SemiBold}
             color={COLORS.darkGreyEnabled}
           >
-            <Link href={LABWARE_CREATOR_HREF} color={COLORS.darkGreyEnabled}>
+            <Link
+              href={LABWARE_CREATOR_HREF}
+              color={COLORS.darkGreyEnabled}
+              external
+            >
               {t('open_labware_creator')}{' '}
               <Icon name="open-in-new" height="10px"></Icon>
             </Link>
@@ -125,6 +143,12 @@ export function Labware(): JSX.Element {
             setShowFailureToast(false)
             clearLabwareFailure()
           }}
+        />
+      )}
+      {currentLabwareDef != null && (
+        <LabwareDetails
+          labware={currentLabwareDef}
+          onClose={() => setCurrentLabwaredef(null)}
         />
       )}
     </>
