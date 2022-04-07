@@ -1,0 +1,1 @@
+magdeck: G38.2 -> Magdeck probing attached labware to get height in mm ->

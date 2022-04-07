@@ -8,11 +8,10 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from opentrons.hardware_control import HardwareControlAPI
-
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
+    from opentrons.protocol_engine.execution import EquipmentHandler
     from opentrons.protocol_engine.state import StateView
 
 
@@ -43,11 +42,11 @@ class DisengageImplementation(AbstractCommandImpl[DisengageParams, DisengageResu
     def __init__(
         self,
         state_view: StateView,
-        hardware_api: HardwareControlAPI,
+        equipment: EquipmentHandler,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
-        self._hardware_api = hardware_api
+        self._equipment = equipment
 
     async def execute(self, params: DisengageParams) -> DisengageResult:
         """Execute a Magnetic Module disengage command.
@@ -60,15 +59,17 @@ class DisengageImplementation(AbstractCommandImpl[DisengageParams, DisengageResu
                 Magnetic Module, but that module's hardware wasn't found attached.
         """
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
-        magnetic_module_view = self._state_view.modules.get_magnetic_module_view(
+        mag_module_substate = self._state_view.modules.get_magnetic_module_substate(
             module_id=params.moduleId
         )
         # Allow propagation of ModuleNotAttachedError.
-        hardware_module = magnetic_module_view.find_hardware(
-            self._hardware_api.attached_modules
+        hardware_module = self._equipment.get_module_hardware_api(
+            mag_module_substate.module_id
         )
+
         if hardware_module is not None:  # Not virtualizing modules.
             await hardware_module.deactivate()
+
         return DisengageResult()
 
 

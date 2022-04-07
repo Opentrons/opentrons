@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
-import { RobotCoordsForeignDiv } from '@opentrons/components'
+import { RobotCoordsForeignDiv, Text } from '@opentrons/components'
 import {
   getModuleVizDims,
   MAGNETIC_MODULE_TYPE,
@@ -24,7 +24,7 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import { STD_SLOT_X_DIM, STD_SLOT_Y_DIM } from '../../constants'
 import * as uiSelectors from '../../ui/steps'
 import { getLabwareOnModule } from '../../ui/modules/utils'
-import { makeTemperatureText } from '../../utils'
+import { makeSpeedText, makeTemperatureText } from '../../utils'
 import styles from './ModuleTag.css'
 
 export interface ModuleTagProps {
@@ -112,20 +112,30 @@ export const ModuleStatus = ({
         </>
       )
     case HEATERSHAKER_MODULE_TYPE:
+      let latchStatus = null
+      switch (moduleState.latchOpen) {
+        case true:
+          latchStatus = i18n.t('modules.lid_open')
+          break
+        case false:
+          latchStatus = i18n.t('modules.lid_closed')
+          break
+        default:
+          latchStatus = i18n.t('modules.lid_undefined')
+      }
       return (
-        // TODO(sh, 2022-03-07): wire up heater shaker status values in follow up
         <>
           <div className={styles.module_status_line}>
-            <div>{i18n.t('modules.latch_label')}:</div>
-            <div>Undefined</div>
+            <Text paddingBottom="2px">{i18n.t('modules.heater_label')}:</Text>
+            <Text>{makeTemperatureText(moduleState.targetTemp)}</Text>
           </div>
           <div className={styles.module_status_line}>
-            <div>{i18n.t('modules.heater_label')}:</div>
-            <div>Deactivated</div>
+            <Text paddingBottom="2px">{i18n.t('modules.shaker_label')}:</Text>
+            <Text>{makeSpeedText(moduleState.targetSpeed)}</Text>
           </div>
           <div className={styles.module_status_line}>
-            <div>{i18n.t('modules.shaker_label')}:</div>
-            <div>Deactivated</div>
+            <Text paddingBottom="2px"> {i18n.t('modules.labware_latch')}:</Text>
+            <Text>{latchStatus}</Text>
           </div>
           <div />
         </>
@@ -138,7 +148,6 @@ export const ModuleStatus = ({
       return null
   }
 }
-
 const ModuleTagComponent = (props: ModuleTagProps): JSX.Element | null => {
   const timelineFrame = useSelector(timelineFrameBeforeActiveItem)
   const moduleEntity = useSelector(stepFormSelectors.getModuleEntities)[

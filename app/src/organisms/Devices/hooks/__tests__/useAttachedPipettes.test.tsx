@@ -11,13 +11,15 @@ import {
   mockRightProtoPipette,
 } from '../../../../redux/pipettes/__fixtures__'
 import { useDispatchApiRequest } from '../../../../redux/robot-api'
-
-import type { DispatchApiRequestType } from '../../../../redux/robot-api'
-
+import { useRobot } from '../useRobot'
 import { useAttachedPipettes } from '..'
+
+import type { DiscoveredRobot } from '../../../../redux/discovery/types'
+import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 
 jest.mock('../../../../redux/pipettes')
 jest.mock('../../../../redux/robot-api')
+jest.mock('../useRobot')
 
 const mockFetchPipettes = fetchPipettes as jest.MockedFunction<
   typeof fetchPipettes
@@ -28,8 +30,11 @@ const mockGetAttachedPipettes = getAttachedPipettes as jest.MockedFunction<
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
 >
+const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
 const store: Store<any> = createStore(jest.fn(), {})
+
+const ROBOT_NAME = 'otie'
 
 describe('useAttachedPipettes hook', () => {
   let dispatchApiRequest: DispatchApiRequestType
@@ -45,6 +50,9 @@ describe('useAttachedPipettes hook', () => {
       </Provider>
     )
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
+    when(mockUseRobot)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(({ status: 'chill' } as unknown) as DiscoveredRobot)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -64,13 +72,13 @@ describe('useAttachedPipettes hook', () => {
 
   it('returns attached pipettes when given a robot name', () => {
     when(mockGetAttachedPipettes)
-      .calledWith(undefined as any, 'otie')
+      .calledWith(undefined as any, ROBOT_NAME)
       .mockReturnValue({
         left: mockLeftProtoPipette,
         right: mockRightProtoPipette,
       })
 
-    const { result } = renderHook(() => useAttachedPipettes('otie'), {
+    const { result } = renderHook(() => useAttachedPipettes(ROBOT_NAME), {
       wrapper,
     })
 
@@ -78,6 +86,6 @@ describe('useAttachedPipettes hook', () => {
       left: mockLeftProtoPipette,
       right: mockRightProtoPipette,
     })
-    expect(dispatchApiRequest).toBeCalledWith(mockFetchPipettes('otie'))
+    expect(dispatchApiRequest).toBeCalledWith(mockFetchPipettes(ROBOT_NAME))
   })
 })

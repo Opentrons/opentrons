@@ -8,9 +8,9 @@ export const thermocyclerAwaitProfileComplete: CommandCreator<ModuleOnlyParams> 
   return {
     commands: [
       {
-        command: 'thermocycler/awaitProfileComplete',
+        commandType: 'thermocycler/awaitProfileComplete',
         params: {
-          module: args.module,
+          moduleId: args.module,
         },
       },
     ],

@@ -2,6 +2,8 @@ import {
   CommonCommandRunTimeInfo,
   LabwareDefinition2,
   LabwareOffset,
+  PipetteName,
+  ModuleModel,
 } from '../../../../js'
 
 export interface LoadPipetteCreateCommand {
@@ -10,7 +12,10 @@ export interface LoadPipetteCreateCommand {
 }
 export interface LoadPipetteRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    LoadPipetteCreateCommand {
+    Omit<LoadPipetteCreateCommand, 'params'> {
+  params: LoadPipetteParams & {
+    pipetteName: PipetteName
+  }
   result: LoadPipetteResult
 }
 export interface LoadLabwareCreateCommand {
@@ -28,7 +33,10 @@ export interface LoadModuleCreateCommand {
 }
 export interface LoadModuleRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    LoadModuleCreateCommand {
+    Omit<LoadModuleCreateCommand, 'params'> {
+  params: LoadModuleParams & {
+    model: ModuleModel
+  }
   result: LoadModuleResult
 }
 export interface LoadLiquidCreateCommand {

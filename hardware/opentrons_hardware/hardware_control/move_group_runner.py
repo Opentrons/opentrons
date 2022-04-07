@@ -2,7 +2,8 @@
 import asyncio
 from collections import defaultdict
 import logging
-from typing import List, Set, Tuple, Iterator
+from typing import List, Set, Tuple, Iterator, Union
+import numpy as np
 
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import NodeId
@@ -130,7 +131,9 @@ class MoveGroupRunner:
                         ),
                     )
 
-    def _convert_velocity(self, velocity: float, interrupts: int) -> Int32Field:
+    def _convert_velocity(
+        self, velocity: Union[float, np.float64], interrupts: int
+    ) -> Int32Field:
         return Int32Field(int((velocity / interrupts) * (2**31)))
 
     def _get_message_type(
@@ -195,7 +198,7 @@ class MoveScheduler:
             duration = 0.0
             for seq_id, move in enumerate(move_group):
                 move_set.update(set((k.value, seq_id) for k in move.keys()))
-                duration += list(move.values())[0].duration_sec
+                duration += float(list(move.values())[0].duration_sec)
                 for step in move_group[seq_id]:
                     self._stop_condition.append(move_group[seq_id][step].stop_condition)
 

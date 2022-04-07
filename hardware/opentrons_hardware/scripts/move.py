@@ -2,6 +2,7 @@
 import argparse
 import asyncio
 import logging
+from numpy import float64
 from logging.config import dictConfig
 from typing import Optional
 
@@ -60,12 +61,16 @@ async def run(interface: str, bitrate: int, channel: Optional[str] = None) -> No
         [
             {
                 NodeId.gantry_x: MoveGroupSingleAxisStep(
-                    distance_mm=0, velocity_mm_sec=5000.5, duration_sec=3
+                    distance_mm=float64(0),
+                    velocity_mm_sec=float64(5000.5),
+                    duration_sec=float64(3),
                 ),
             },
             {
                 NodeId.gantry_y: MoveGroupSingleAxisStep(
-                    distance_mm=0, velocity_mm_sec=5000.5, duration_sec=3
+                    distance_mm=float64(0),
+                    velocity_mm_sec=float64(5000.5),
+                    duration_sec=float64(3),
                 ),
             },
         ],
@@ -73,12 +78,16 @@ async def run(interface: str, bitrate: int, channel: Optional[str] = None) -> No
         [
             {
                 NodeId.gantry_x: MoveGroupSingleAxisStep(
-                    distance_mm=0, velocity_mm_sec=2000.25, duration_sec=3
+                    distance_mm=float64(0),
+                    velocity_mm_sec=float64(2000.25),
+                    duration_sec=float64(3),
                 ),
             },
             {
                 NodeId.gantry_y: MoveGroupSingleAxisStep(
-                    distance_mm=0, velocity_mm_sec=1000.5, duration_sec=3
+                    distance_mm=float64(0),
+                    velocity_mm_sec=float64(1000.5),
+                    duration_sec=float64(3),
                 ),
             },
         ],

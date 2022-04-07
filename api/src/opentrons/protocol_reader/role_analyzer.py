@@ -69,12 +69,14 @@ class RoleAnalyzer:
                     else None
                 )
                 main_file_candidates.append(
-                    MainFile(name=f.name, contents=f.contents, data=data)
+                    MainFile(name=f.name, contents=f.contents, data=data, path=f.path)
                 )
 
             elif isinstance(f.data, LabwareDefinition):
                 labware_files.append(
-                    LabwareFile(name=f.name, contents=f.contents, data=f.data)
+                    LabwareFile(
+                        name=f.name, contents=f.contents, data=f.data, path=f.path
+                    )
                 )
 
         if len(main_file_candidates) == 0:

@@ -108,6 +108,7 @@ async def test_get_protocols(
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-key-111",
     )
     resource_2 = ProtocolResource(
         protocol_id="123",
@@ -120,6 +121,7 @@ async def test_get_protocols(
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-key-222",
     )
 
     analysis_1 = PendingAnalysis(id="analysis-id-abc")
@@ -132,6 +134,7 @@ async def test_get_protocols(
         metadata=Metadata(),
         analyses=[analysis_1],
         files=[],
+        key="dummy-key-111",
     )
     expected_protocol_2 = Protocol(
         id="123",
@@ -140,6 +143,7 @@ async def test_get_protocols(
         metadata=Metadata(),
         analyses=[analysis_2],
         files=[],
+        key="dummy-key-222",
     )
 
     decoy.when(protocol_store.get_all()).then_return([resource_1, resource_2])
@@ -173,6 +177,7 @@ async def test_get_protocol_by_id(
             metadata={},
             labware_definitions=[],
         ),
+        protocol_key="dummy-key-111",
     )
 
     analysis = PendingAnalysis(id="analysis-id")
@@ -195,6 +200,7 @@ async def test_get_protocol_by_id(
         metadata=Metadata(),
         analyses=[analysis],
         files=[],
+        key="dummy-key-111",
     )
     assert result.status_code == 200
 
@@ -228,12 +234,19 @@ async def test_create_protocol(
     task_runner: TaskRunner,
 ) -> None:
     """It should store an uploaded protocol file."""
+    protocol_directory = Path("/dev/null")
+
     protocol_file = UploadFile(filename="foo.json")
 
     protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/foo.json"),
-        files=[ProtocolSourceFile(name="foo.json", role=ProtocolFileRole.MAIN)],
+        files=[
+            ProtocolSourceFile(
+                path=Path("/dev/null/foo.json"),
+                role=ProtocolFileRole.MAIN,
+            )
+        ],
         metadata={"this_is_fake_metadata": True},
         config=JsonProtocolConfig(schema_version=123),
         labware_definitions=[],
@@ -243,14 +256,15 @@ async def test_create_protocol(
         protocol_id="protocol-id",
         created_at=datetime(year=2021, month=1, day=1),
         source=protocol_source,
+        protocol_key="dummy-key-111",
     )
 
     analysis = PendingAnalysis(id="analysis-id")
 
     decoy.when(
         await protocol_reader.read(
-            name="protocol-id",
             files=[protocol_file],
+            directory=protocol_directory / "protocol-id",
         )
     ).then_return(protocol_source)
 
@@ -260,6 +274,8 @@ async def test_create_protocol(
 
     result = await create_protocol(
         files=[protocol_file],
+        key="dummy-key-111",
+        protocol_directory=protocol_directory,
         protocol_store=protocol_store,
         analysis_store=analysis_store,
         protocol_reader=protocol_reader,
@@ -277,6 +293,7 @@ async def test_create_protocol(
         metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
         analyses=[analysis],
         files=[ProtocolFile(name="foo.json", role=ProtocolFileRole.MAIN)],
+        key="dummy-key-111",
     )
     assert result.status_code == 201
 
@@ -297,7 +314,7 @@ async def test_create_protocol_not_readable(
     """It should 400 if the protocol is rejected by the pre-analyzer."""
     decoy.when(
         await protocol_reader.read(
-            name=matchers.Anything(),
+            directory=matchers.Anything(),
             files=matchers.Anything(),
         )
     ).then_raise(ProtocolFilesInvalidError("oh no"))
@@ -305,7 +322,9 @@ async def test_create_protocol_not_readable(
     with pytest.raises(ApiError) as exc_info:
         await create_protocol(
             files=[],
+            protocol_directory=Path("/dev/null"),
             protocol_reader=protocol_reader,
+            protocol_id="protocol-id",
         )
 
     assert exc_info.value.status_code == 422

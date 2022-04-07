@@ -1,4 +1,7 @@
-import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  HEATERSHAKER_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import { TEMPERATURE_AT_TARGET, TEMPERATURE_DEACTIVATED } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import type { CommandCreator, AwaitTemperatureArgs } from '../../types'
@@ -11,17 +14,19 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
   prevRobotState
 ) => {
   const { module, temperature } = args
-  const tempModState = module ? getModuleState(prevRobotState, module) : null
+  const moduleState = module ? getModuleState(prevRobotState, module) : null
 
-  if (module === null || !tempModState) {
+  if (module === null || !moduleState) {
     return {
       errors: [errorCreators.missingModuleError()],
     }
   }
-
-  if (tempModState.type !== TEMPERATURE_MODULE_TYPE) {
+  if (
+    moduleState.type !== TEMPERATURE_MODULE_TYPE &&
+    moduleState.type !== HEATERSHAKER_MODULE_TYPE
+  ) {
     console.error(
-      `expected module to be ${TEMPERATURE_MODULE_TYPE} but got ${tempModState.type}`
+      `expected module to be ${TEMPERATURE_MODULE_TYPE} but got ${moduleState.type}`
     )
     return {
       errors: [errorCreators.missingModuleError()],
@@ -33,10 +38,14 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
   //  this means the temp mod will not change its temp, since it is already
   //  at the target temp, so the new await temp will never be reached
   const unreachableTemp =
-    tempModState.status === TEMPERATURE_AT_TARGET &&
-    tempModState.targetTemperature !== temperature
+    'status' in moduleState &&
+    moduleState.status === TEMPERATURE_AT_TARGET &&
+    moduleState.targetTemperature !== temperature
 
-  if (unreachableTemp || tempModState.status === TEMPERATURE_DEACTIVATED) {
+  if (
+    unreachableTemp ||
+    ('status' in moduleState && moduleState.status === TEMPERATURE_DEACTIVATED)
+  ) {
     return {
       errors: [errorCreators.missingTemperatureStep()],
     }
@@ -44,7 +53,7 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
 
   const moduleType = invariantContext.moduleEntities[module]?.type
   const params = {
-    module,
+    moduleId: module,
     temperature,
   }
 
@@ -53,7 +62,17 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
       return {
         commands: [
           {
-            command: 'temperatureModule/awaitTemperature',
+            commandType: 'temperatureModule/awaitTemperature',
+            params,
+          },
+        ],
+      }
+
+    case HEATERSHAKER_MODULE_TYPE:
+      return {
+        commands: [
+          {
+            commandType: 'heaterShakerModule/awaitTemperature',
             params,
           },
         ],
@@ -61,7 +80,7 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
 
     default:
       console.error(
-        `awaitTemperature expected module ${module} to be ${TEMPERATURE_MODULE_TYPE}, got ${moduleType}`
+        `awaitTemperature expected module ${module} to be ${TEMPERATURE_MODULE_TYPE} or ${HEATERSHAKER_MODULE_TYPE}, got ${moduleType}`
       )
       return {
         errors: [errorCreators.missingModuleError()],

@@ -89,7 +89,6 @@
 
 .module_substep_value {
   text-align: right;
-  flex: 0.5;
   text-transform: capitalize;
 }
 

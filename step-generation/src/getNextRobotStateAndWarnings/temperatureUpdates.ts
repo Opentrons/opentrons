@@ -8,7 +8,7 @@ import {
 import type {
   TemperatureParams,
   ModuleOnlyParams,
-} from '@opentrons/shared-data/protocol/types/schemaV4'
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type {
   InvariantContext,
   RobotStateAndWarnings,
@@ -33,8 +33,8 @@ export function forSetTemperature(
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { robotState } = robotStateAndWarnings
-  const { module, temperature } = params
-  const moduleState = getModuleState(robotState, module)
+  const { moduleId, temperature } = params
+  const moduleState = getModuleState(robotState, moduleId)
 
   _setTemperatureAndStatus(
     moduleState,
@@ -48,8 +48,8 @@ export function forAwaitTemperature(
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { robotState } = robotStateAndWarnings
-  const { module, temperature } = params
-  const moduleState = getModuleState(robotState, module)
+  const { moduleId, temperature } = params
+  const moduleState = getModuleState(robotState, moduleId)
 
   if (moduleState.type === TEMPERATURE_MODULE_TYPE) {
     if (temperature === moduleState.targetTemperature) {
@@ -63,8 +63,8 @@ export function forDeactivateTemperature(
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { robotState } = robotStateAndWarnings
-  const { module } = params
-  const moduleState = getModuleState(robotState, module)
+  const { moduleId } = params
+  const moduleState = getModuleState(robotState, moduleId)
   const temperature = null
 
   _setTemperatureAndStatus(moduleState, temperature, TEMPERATURE_DEACTIVATED)

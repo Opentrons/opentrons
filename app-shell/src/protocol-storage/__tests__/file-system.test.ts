@@ -16,14 +16,22 @@ import {
   PROTOCOLS_DIRECTORY_NAME,
   PROTOCOLS_DIRECTORY_PATH,
 } from '../file-system'
+import { getConfig } from '../../config'
+import { runFileWithPython } from '../../python'
 
 jest.mock('uuid/v4')
 jest.mock('electron')
+jest.mock('../../config')
+jest.mock('../../python')
 
 const trashItem = Electron.shell.trashItem as jest.MockedFunction<
   typeof Electron.shell.trashItem
 >
 const mockUuid = uuid as jest.MockedFunction<typeof uuid>
+const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+const mockRunFileWithPython = runFileWithPython as jest.MockedFunction<
+  typeof runFileWithPython
+>
 
 describe('protocol storage directory utilities', () => {
   let protocolsDir: string
@@ -35,6 +43,10 @@ describe('protocol storage directory utilities', () => {
   }
   beforeEach(() => {
     protocolsDir = makeEmptyDir()
+    mockGetConfig.mockReturnValue({
+      python: { pathToPythonOverride: null },
+    } as any)
+    mockRunFileWithPython.mockReturnValue(Promise.resolve())
   })
 
   afterAll(() => {
@@ -197,7 +209,7 @@ describe('protocol storage directory utilities', () => {
               srcFilePaths: [
                 path.join(expectedProtocolDirPath, 'src', 'source.py'),
               ],
-              analysisFilePaths: [expect.any(String)],
+              analysisFilePaths: [],
               modified: expect.any(Number),
             },
           ])

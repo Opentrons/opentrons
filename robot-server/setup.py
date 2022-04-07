@@ -63,6 +63,7 @@ INSTALL_REQUIRES = [
     "wsproto==1.0.0",
     "systemd-python==234; sys_platform=='linux'",
     "sqlalchemy==1.4.32",
+    "aiosqlite==0.17.0",
 ]
 
 

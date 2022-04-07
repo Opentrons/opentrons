@@ -21,14 +21,14 @@ export type UseCreateRunMutationResult = UseMutationResult<
   createRun: UseMutateFunction<Run, AxiosError, CreateRunData>
 }
 
-export type UseCreateProtocolMutationOptions = UseMutationOptions<
+export type UseCreateRunMutationOptions = UseMutationOptions<
   Run,
   AxiosError,
   CreateRunData
 >
 
 export function useCreateRunMutation(
-  options: UseCreateProtocolMutationOptions = {}
+  options: UseCreateRunMutationOptions = {}
 ): UseCreateRunMutationResult {
   const host = useHost()
   const mutation = useMutation<Run, AxiosError, CreateRunData>(

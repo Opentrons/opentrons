@@ -50,7 +50,8 @@ def sessions_api_client(mock_session_manager, api_client):
         return mock_session_manager
 
     api_client.app.dependency_overrides[get_session_manager] = get
-    return api_client
+    yield api_client
+    del api_client.app.dependency_overrides[get_session_manager]
 
 
 def test_get_session(mock_session_manager):

@@ -7,14 +7,18 @@
   "disabled_connect_to_robot": "Connect to robot to control",
   "disabled_no_pipette_attached": "Attach a pipette to proceed",
   "disabled_protocol_is_running": "Protocol is running",
+  "empty": "empty",
   "ending": "ending",
   "exit": "exit",
+  "no_data": "no data",
   "ok": "ok",
   "open": "open",
+  "refresh": "refresh",
   "refresh_list": "refresh list",
   "start": "start",
   "starting": "starting",
   "stop": "stop",
   "try_again": "try again",
-  "unknown": "unknown"
+  "unknown": "unknown",
+  "dont_show_me_again": "Don’t show me again"
 }

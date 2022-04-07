@@ -33,11 +33,11 @@ export const Modal = (props: ModalProps): JSX.Element => {
         >
           <Text css={TYPOGRAPHY.h3SemiBold}>{props.title}</Text>
           {props.onClose != null && (
-            <Box onClick={props.onClose}>
+            <Box onClick={props.onClose} role="button">
               <Icon
                 name={'close'}
-                width={SPACING.spacing4}
-                height={SPACING.spacing4}
+                width={SPACING.spacing5}
+                height={SPACING.spacing5}
               />
             </Box>
           )}
