@@ -4,7 +4,10 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import commands, actions
-from opentrons.protocol_engine.commands import heater_shaker as hs_commands
+from opentrons.protocol_engine.commands import (
+    heater_shaker as hs_commands,
+    temperature_module as temp_commands,
+)
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleDefinition,
@@ -22,6 +25,8 @@ from opentrons.protocol_engine.state.module_substates import (
     MagneticModuleSubState,
     HeaterShakerModuleId,
     HeaterShakerModuleSubState,
+    TemperatureModuleId,
+    TemperatureModuleSubState,
     ModuleSubStateType,
 )
 
@@ -53,6 +58,14 @@ def test_initial_state() -> None:
             ModuleModel.HEATER_SHAKER_MODULE_V1,
             HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
+                plate_target_temperature=None,
+            ),
+        ),
+        (
+            lazy_fixture("tempdeck_v1_def"),
+            ModuleModel.TEMPERATURE_MODULE_V1,
+            TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
                 plate_target_temperature=None,
             ),
         ),
@@ -111,6 +124,13 @@ def test_load_module(
                 plate_target_temperature=None,
             ),
         ),
+        (
+            lazy_fixture("tempdeck_v2_def"),
+            TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                plate_target_temperature=None,
+            ),
+        ),
     ],
 )
 def test_add_module_action(
@@ -139,7 +159,7 @@ def test_add_module_action(
     )
 
 
-def test_handle_temperature_commands(heater_shaker_v1_def: ModuleDefinition) -> None:
+def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) -> None:
     """It should update `plate_target_temperature` correctly."""
     load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
         params=commands.LoadModuleParams(
@@ -176,5 +196,48 @@ def test_handle_temperature_commands(heater_shaker_v1_def: ModuleDefinition) -> 
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"), plate_target_temperature=None
+        )
+    }
+
+
+def test_handle_tempdeck_temperature_commands(
+    tempdeck_v2_def: ModuleDefinition,
+) -> None:
+    """It should update Tempdeck's `plate_target_temperature` correctly."""
+    load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
+        params=commands.LoadModuleParams(
+            model=ModuleModel.TEMPERATURE_MODULE_V2,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        ),
+        result=commands.LoadModuleResult(
+            moduleId="module-id",
+            model=ModuleModel.TEMPERATURE_MODULE_V2,
+            serialNumber="serial-number",
+            definition=tempdeck_v2_def,
+        ),
+    )
+    set_temp_cmd = temp_commands.SetTargetTemperature.construct(  # type: ignore[call-arg]  # noqa: E501
+        params=temp_commands.SetTargetTemperatureParams(
+            moduleId="module-id", temperature=42.4
+        ),
+        result=temp_commands.SetTargetTemperatureResult(targetTemperature=42),
+    )
+    deactivate_cmd = temp_commands.DeactivateTemperature.construct(  # type: ignore[call-arg]  # noqa: E501
+        params=temp_commands.DeactivateTemperatureParams(moduleId="module-id"),
+        result=temp_commands.DeactivateTemperatureResult(),
+    )
+    subject = ModuleStore()
+
+    subject.handle_action(actions.UpdateCommandAction(command=load_module_cmd))
+    subject.handle_action(actions.UpdateCommandAction(command=set_temp_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": TemperatureModuleSubState(
+            module_id=TemperatureModuleId("module-id"), plate_target_temperature=42
+        )
+    }
+    subject.handle_action(actions.UpdateCommandAction(command=deactivate_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": TemperatureModuleSubState(
+            module_id=TemperatureModuleId("module-id"), plate_target_temperature=None
         )
     }

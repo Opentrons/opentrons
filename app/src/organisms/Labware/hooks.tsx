@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -15,6 +16,7 @@ import type { LabwareDefinition2 as LabwareDefiniton } from '@opentrons/shared-d
 export interface LabwareDefAndDate {
   definition: LabwareDefiniton
   modified?: number
+  filename?: string
 }
 
 export function useGetAllLabware(): LabwareDefAndDate[] {
@@ -28,6 +30,7 @@ export function useGetAllLabware(): LabwareDefAndDate[] {
       ? fullLabwareList.push({
           modified: customLabware.modified,
           definition: customLabware.definition,
+          filename: customLabware.filename,
         })
       : null
   )
@@ -76,4 +79,23 @@ export function useNewLabwareName(): {
   const clearLabwareName = (): unknown => dispatch(clearNewLabwareName())
 
   return { newLabwareName, clearLabwareName }
+}
+
+export function useCloseOnOutsideClick(
+  ref: React.RefObject<HTMLInputElement>,
+  onClose: () => void
+): void {
+  const handleClick = (e: MouseEvent): void => {
+    // @ts-expect-error node and event target types are mismatched
+    if (ref.current != null && !ref.current.contains(e.target)) {
+      onClose()
+    }
+  }
+
+  React.useEffect(() => {
+    document.addEventListener('click', handleClick)
+    return () => {
+      document.removeEventListener('click', handleClick)
+    }
+  })
 }

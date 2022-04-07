@@ -2,83 +2,54 @@ import * as React from 'react'
 import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import first from 'lodash/first'
-import map from 'lodash/map'
-import { getModuleType, schemaV6Adapter } from '@opentrons/shared-data'
+import {
+  getModuleType,
+  getPipetteNameSpecs,
+  ProtocolAnalysisFile,
+} from '@opentrons/shared-data'
 
 import {
-  Box,
   Flex,
+  Icon,
   DIRECTION_ROW,
   COLORS,
   SPACING,
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
+  JUSTIFY_CENTER,
+  ALIGN_CENTER,
+  SIZE_3,
+  ModuleIcon,
 } from '@opentrons/components'
 import { Link } from 'react-router-dom'
-
-import { StyledText } from '../../atoms/text'
-import { ModuleIcon } from '../../molecules/ModuleIcon'
-import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
+import {
+  parseInitialPipetteNamesByMount,
+  parseAllRequiredModuleModels,
+} from '@opentrons/api-client'
 
 import { StoredProtocolData } from '../../redux/protocol-storage'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import { StyledText } from '../../atoms/text'
+import { DeckThumbnail } from '../../molecules/DeckThumbnail'
+import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 
-type ProtocolCardProps = StoredProtocolData
+interface ProtocolCardProps extends StoredProtocolData {
+  handleRunProtocol: () => void
+}
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const { t } = useTranslation('protocol_list')
-  const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
+  const {
+    handleRunProtocol,
+    protocolKey,
+    srcFileNames,
+    mostRecentAnalysis,
+    modified,
+  } = props
 
-  const [
-    protocolData,
-    setProtocolData,
-  ] = React.useState<ProtocolAnalysisFile<{}> | null>(null)
-
-  React.useEffect(() => {
-    if (mostRecentAnalysis != null) {
-      setProtocolData(
-        schemaV6Adapter(JSON.parse(mostRecentAnalysis)?.analyses[0])
-      )
-    }
-  }, [modified])
-
-  const { metadata, robot, pipettes, commands, modules } = protocolData ?? {}
-
-  // TODO: IMMEDIATELY clean up and move these protocol data selectors into api_client as
-  // pure functions of RunTimeCommand[]
-  const robotModel = robot?.model ?? 'OT-2'
-  const leftMountPipetteName =
-    pipettes != null
-      ? pipettes[
-          Object.keys(pipettes ?? {}).find(pipetteId => {
-            return commands?.find(
-              command =>
-                command.commandType === 'loadPipette' &&
-                command.result.pipetteId === pipetteId &&
-                command.params.mount === 'left'
-            )
-          }) ?? ''
-        ]?.name ?? ''
-      : ''
-  const rightMountPipetteName =
-    pipettes != null
-      ? pipettes[
-          Object.keys(pipettes ?? {}).find(pipetteId => {
-            commands?.find(
-              command =>
-                command.commandType === 'loadPipette' &&
-                command.params.pipetteId === pipetteId &&
-                command.params.mount === 'right'
-            )
-          }) ?? ''
-        ]?.name ?? ''
-      : ''
-  const requiredModuleTypes = map(modules, ({ model }, _moduleId) =>
-    getModuleType(model)
-  )
-
-  const protocolName =
-    metadata?.protocolName ?? first(srcFileNames) ?? protocolKey
+  const protocolDisplayName =
+    mostRecentAnalysis?.metadata?.protocolName ??
+    first(srcFileNames) ??
+    protocolKey
 
   return (
     <Link to={`/protocols/${protocolKey}`} style={{ color: 'inherit' }}>
@@ -93,69 +64,19 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
         width="100%"
         position="relative"
       >
-        <Flex>
-          <Box
-            flex="0 0 96px"
-            height="86px"
-            backgroundColor={COLORS.medGrey}
-            marginRight={SPACING.spacing4}
-          >
-            DECKMAP TODO
-          </Box>
-          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
-            <StyledText
-              as="h3"
-              marginBottom={SPACING.spacing4}
-              height="2.75rem"
-            >
-              {protocolName}
-            </StyledText>
-            <Flex>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                marginRight={SPACING.spacing4}
-              >
-                <StyledText as="h6">{t('robot')}</StyledText>
-                <StyledText as="p">{robotModel}</StyledText>
-              </Flex>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                marginRight={SPACING.spacing4}
-              >
-                <StyledText as="h6">{t('left_mount')}</StyledText>
-                <StyledText as="p">{leftMountPipetteName}</StyledText>
-              </Flex>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                marginRight={SPACING.spacing4}
-              >
-                <StyledText as="h6">{t('right_mount')}</StyledText>
-                <StyledText as="p">{rightMountPipetteName}</StyledText>
-              </Flex>
-              {requiredModuleTypes.length > 0 ? (
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  marginRight={SPACING.spacing4}
-                >
-                  <StyledText as="h6">{t('modules')}</StyledText>
-                  <Flex>
-                    {requiredModuleTypes.map((moduleType, index) => (
-                      <ModuleIcon
-                        key={index}
-                        moduleType={moduleType}
-                        height="1rem"
-                        marginRight={SPACING.spacing3}
-                      />
-                    ))}
-                  </Flex>
-                </Flex>
-              ) : null}
-            </Flex>
-          </Flex>
-        </Flex>
-
+        {mostRecentAnalysis != null ? (
+          <AnalysisInfo
+            mostRecentAnalysis={mostRecentAnalysis}
+            protocolDisplayName={protocolDisplayName}
+          />
+        ) : (
+          <StyledText as="p">{t('loading_data')}</StyledText>
+        )}
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <ProtocolOverflowMenu protocolKey={protocolKey} />
+          <ProtocolOverflowMenu
+            protocolKey={protocolKey}
+            handleRunProtocol={handleRunProtocol}
+          />
           <StyledText
             as="label"
             position="absolute"
@@ -163,11 +84,91 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
             right={SPACING.spacing4}
           >
             {t('last_updated_at', {
-              date: format(new Date(modified), 'MMMM dd, yyyy HH:mm'),
+              date: format(new Date(modified), 'MM/dd/yy HH:mm:ss'),
             })}
           </StyledText>
         </Flex>
       </Flex>
     </Link>
+  )
+}
+
+interface AnalysisInfoProps {
+  protocolDisplayName: string
+  mostRecentAnalysis: ProtocolAnalysisFile<{}>
+}
+function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
+  const { protocolDisplayName, mostRecentAnalysis } = props
+  const { t } = useTranslation(['protocol_list', 'shared'])
+  const robotModel = mostRecentAnalysis?.robot?.model ?? t('shared:no_data')
+  const {
+    left: leftMountPipetteName,
+    right: rightMountPipetteName,
+  } = parseInitialPipetteNamesByMount(mostRecentAnalysis)
+  const requiredModuleTypes = parseAllRequiredModuleModels(
+    mostRecentAnalysis
+  ).map(getModuleType)
+
+  return (
+    <Flex>
+      <Flex
+        marginRight={SPACING.spacing4}
+        height="6rem"
+        width="6rem"
+        justifyContent={JUSTIFY_CENTER}
+        alignItems={ALIGN_CENTER}
+      >
+        {mostRecentAnalysis != null ? (
+          <DeckThumbnail analysis={mostRecentAnalysis} />
+        ) : (
+          <Icon name="ot-spinner" spin size={SIZE_3} />
+        )}
+      </Flex>
+      <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
+        <StyledText as="h3" marginBottom={SPACING.spacing4} height="2.75rem">
+          {protocolDisplayName}
+        </StyledText>
+        <Flex>
+          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
+            <StyledText as="h6">{t('robot')}</StyledText>
+            <StyledText as="p">{robotModel}</StyledText>
+          </Flex>
+          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
+            <StyledText as="h6">{t('left_mount')}</StyledText>
+            <StyledText as="p">
+              {leftMountPipetteName != null
+                ? getPipetteNameSpecs(leftMountPipetteName)?.displayName
+                : t('empty')}
+            </StyledText>
+          </Flex>
+          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
+            <StyledText as="h6">{t('right_mount')}</StyledText>
+            <StyledText as="p">
+              {rightMountPipetteName != null
+                ? getPipetteNameSpecs(rightMountPipetteName)?.displayName
+                : t('empty')}
+            </StyledText>
+          </Flex>
+          {requiredModuleTypes.length > 0 ? (
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              marginRight={SPACING.spacing4}
+            >
+              <StyledText as="h6">{t('modules')}</StyledText>
+              <Flex>
+                {requiredModuleTypes.map((moduleType, index) => (
+                  <ModuleIcon
+                    key={index}
+                    moduleType={moduleType}
+                    height="1rem"
+                    marginRight={SPACING.spacing3}
+                  />
+                ))}
+              </Flex>
+            </Flex>
+          ) : null}
+        </Flex>
+      </Flex>
+    </Flex>
   )
 }

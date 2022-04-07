@@ -7,7 +7,24 @@ Thanks for your interest in contributing to the Opentrons platform! This Contrib
 - [Commit Guidelines](#commit-guidelines)
 - [Project and Repository Structure](#project-and-repository-structure)
 - [Development Setup](#development-setup)
-- [Prior Art](#prior-art)
+- [Robot Environment](#robot-environment)
+
+Other important reading not included in this document:
+
+- [Release processes][]
+- [Recommended system setup guide][]
+
+This Contributing Guide was influenced by a lot of work done on existing Contributing Guides. They're great reads if you have the time!
+
+- [React.js Contributing Guide][react-contributing]
+- [Node.js Contributing Guide][node-contributing]
+- [Kibana Contributing Guide][kibana-contributing]
+
+[release processes]: ./RELEASING.md
+[recommended system setup guide]: ./DEV_SETUP.md
+[react-contributing]: https://reactjs.org/docs/how-to-contribute.html
+[node-contributing]: https://github.com/nodejs/node/blob/master/CONTRIBUTING.md
+[kibana-contributing]: https://github.com/elastic/kibana/blob/master/CONTRIBUTING.md
 
 ## Opening Issues
 
@@ -135,54 +152,18 @@ If you'd like to contribute (or maybe just run the very latest and greatest vers
 
 Individual projects may have additional instructions, so be sure to check out the various project `README`s, too.
 
-### Environment and Repository
+### System and Repository Setup
 
-Your computer will need the following tools installed to be able to develop with the Opentrons platform:
+You will need the following tools installed to develop on the Opentrons platform.
 
-- macOS 10.11+, Linux, or Windows 10
-  - On Windows, please configure Git’s `core.autocrlf` setting (see the [Git config docs](https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration)) to `input` so that shell scripts required for the robot’s boot process in `api/opentrons/resources` do not have carriage returns inserted.
-- Python 3.7 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended for macOS / Linux. If `pyenv` is not available for your system or you do not want to use it, you can set the environment variable `OT_PYTHON` to the full path to the Python 3.7 executable)
-- If you wish to use `pyenv` but are experiencing issues with macOS Mojave please see the [common build problems section](https://github.com/pyenv/pyenv/wiki/Common-build-problems) of `pyenv` documentation.
+- make
+- git
+- curl
+- ssh
+- Python v3.7
+- Node.js v14
 
-  ```shell
-  pyenv install 3.7.6
-  ```
-
-  **MacOS Big Sur Note:** due to this [known issue](https://github.com/pyenv/pyenv/issues/1737) we recommend using:
-
-  ```shell
-  pyenv install 3.7.10
-  ```
-
-- Node v14 - [nvm][] is optional, but recommended
-
-  ```shell
-  nvm install 14
-  nvm use 14
-  ```
-
-- [yarn][yarn-install] - JavaScript package manager
-
-- [commitizen][] - Commit message formatter
-
-  ```shell
-  yarn global add commitizen
-  ```
-
-- GNU Make - we use [Makefiles][] to manage our builds
-
-- cURL - used to push development updates to robots
-- On Linux, you will need libsystemd and headers. On Ubuntu, install `libsystemd-dev` and `python3-dev` before running `make setup`.
-
-Once you're set up, clone the repository and install all project dependencies:
-
-```shell
-git clone https://github.com/Opentrons/opentrons.git
-cd opentrons
-make setup
-```
-
-In addition, if (and only if) you want to build a PDF version of the Opentrons API documentation, you must install a latex distribution that includes a callable pdflatex. If that is installed, you can do `make -C api docs-pdf`.
+See [DEV_SETUP.md](./DEV_SETUP.md) for our recommended development setup guides for macOS, Windows, and Linux.
 
 ### Testing
 
@@ -291,9 +272,9 @@ make format
 
 Most, if not all, of the tools above have plugins available for your code editor that will run quality checks and formatting as you write and/or save. We **highly recommend** setting up your editor to format and check your code automatically.
 
-- Pylama - Search your editor's package manager
 - ESLint - <https://eslint.org/docs/user-guide/integrations#editors>
 - stylelint - <https://stylelint.io/user-guide/complementary-tools/#editor-plugins>
+- Flake8 - Search your editor's package manager
 - mypy - Search your editor's package manager
 - TypeScript - <https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support>
 - Prettier - <https://prettier.io/docs/en/editors.html>
@@ -342,6 +323,11 @@ After you have installed a dependency (development or project), you may find tha
 Not every JavaScript package has an available TypeScript definition. If you find yourself using such a library, you may need to create your own [ambient type declaration](https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html).
 
 #### Python
+
+**This section is a work in progress.**
+
+1. `cd` into the project directory
+2. Use `pipenv install [--dev] <package_name>` to add the dependency
 
 ### Opentrons API
 
@@ -401,37 +387,19 @@ make term br_ssh_key=/path/to/privkey
 
 If you create the key as `~/.ssh/robot_key` and `~/.ssh/robot_key.pub` then `make term` and `make install-key` will work without arguments.
 
-## Release Processes
-
-Note that all of our release process information for different projects can be found in [RELEASING.md](RELEASING.md).
-
 ## Robot Environment
-
-When you have sshd in to a robot using `make term`, its behavior depends on whether it is on balena or on buildroot. You can tell by doing `ps | head -n 2`; if pid 1 is `systemd`, you're on buildroot and if it is `tini` you're on balena.
 
 ### Log Locations
 
-#### Balena
-
-The files `/data/logs/api.log.*` and `/data/logs/serial.log.*` contain logs from the api server and serial system, respectively. Only things logged with python `logging` are here. To get logs printed to stdout by the api server, you can check balena. nginx logs are in `/var/log/nginx`. This system is inside a docker container; you can get a shell to the host from balena if you need deeper logging. However, things printed to stdout and stderr by the api server are only available in the balena log viewer and therefore are frequently lost.
-
-#### Buildroot
-
-Buildroot robots use [systemd-journald][] for log management. This is a single log manager for everything on the system. It is administrated using the [journalctl][] utility. You can view logs by just doing `journalctl` (it may be better to do `journalctl --no-pager | less` to get a better log viewer), or stream them by doing `journalctl -f`. Any command that displays logs can be narrowed down by using a syslog identifier: `journalctl -f SYSLOG_IDENTIFIER=opentrons-api` will only print logs from the api server's loggers, for instance. Our syslog identifiers are:
+OT-2 robots use [systemd-journald][] for log management. This is a single log manager for everything on the system. It is administrated using the [journalctl][] utility. You can view logs by just doing `journalctl` (it may be better to do `journalctl --no-pager | less` to get a better log viewer), or stream them by doing `journalctl -f`. Any command that displays logs can be narrowed down by using a syslog identifier: `journalctl -f SYSLOG_IDENTIFIER=opentrons-api` will only print logs from the api server's loggers, for instance. Our syslog identifiers are:
 
 - `opentrons-api`: The API server - anything sent to `logging` logs from the api server package, except the serial logs
-- `opentrons-update-server`: Anything sent to `logging` logs from the update server packate
+- `opentrons-update-server`: Anything sent to `logging` logs from the update server package
 - `opentrons-api-serial`: The serial logs
 
 ### State Management
 
-#### Balena (Deprecated after Robot Server Version 3.11.0)
-
-You can't really restart anything from inside a shell on balena, since it all runs in a docker container. Instead, you can do `restart` and restart the docker container, but this will disconnect you. Stop ongoing processes by doing `ps`, finding the pid, and then doing `kill (pid)`. This can be useful to temporarily run one of the servers directly, to see what it prints out on the command line. Note that when you do this the environment won't be quite the same as what the server sees when it is run directly by balena due to the implementation details of `docker run`, `tini`, and our start scripts.
-
-#### Buildroot
-
-Buildroot robots use `systemd` as their init system. Every process that we run has an associated systemd unit, which defines and configures its behavior when the robot starts. You can use the [systemctl][] utility to mess around with or inspect the system state. For instance, if you do `systemctl status opentrons-api-server` you will see whether the api server is running or not, and a dump of its logs. You can restart units with `systemctl restart (unitname)`, start and stop them with `systemctl start` and `systemctl stop`, and so on. Note that if you make changes to unit files, you have to run `systemctl daemon-reload` (no further arguments) for the init daemon to see the changes.
+OT-2 robots use `systemd` as their init system. Every process that we run has an associated systemd unit, which defines and configures its behavior when the robot starts. You can use the [systemctl][] utility to mess around with or inspect the system state. For instance, if you do `systemctl status opentrons-api-server` you will see whether the api server is running or not, and a dump of its logs. You can restart units with `systemctl restart (unitname)`, start and stop them with `systemctl start` and `systemctl stop`, and so on. Note that if you make changes to unit files, you have to run `systemctl daemon-reload` (no further arguments) for the init daemon to see the changes.
 
 Our systemd units are:
 
@@ -440,18 +408,8 @@ Our systemd units are:
 
 ### Other System Admin Notes
 
-#### Buildroot
-
-When a robot is running on buildroot, its filesystem is mounted from two separate locations. `/data`, `/var`, and `/home` are from the "data" partition, and everything else is from the root partition (or generated by the system). The root partition is what gets updated, by being overwritten. To make this work, the root partition is mounted readonly, which causes writes to files in that partition to fail with the error "readonly filesystem". To prevent this, you can remount the partition:
+An OT-2's filesystem is mounted from two separate locations. `/data`, `/var`, and `/home` are from the "data" partition, and everything else is from the root partition (or generated by the system). The root partition is what gets updated, by being overwritten. To make this work, the root partition is mounted readonly, which causes writes to files in that partition to fail with the error "readonly filesystem". To prevent this, you can remount the partition:
 `mount -o remount,rw /`
-
-## Prior Art
-
-This Contributing Guide was influenced by a lot of work done on existing Contributing Guides. They're great reads if you have the time!
-
-- [React.js Contributing Guide][react-contributing]
-- [Node.js Contributing Guide][node-contributing]
-- [Kibana Contributing Guide][kibana-contributing]
 
 [repo]: https://github.com/Opentrons/opentrons
 [api-readme]: ./api/README.rst
@@ -462,9 +420,6 @@ This Contributing Guide was influenced by a lot of work done on existing Contrib
 [unwritten-guide-to-pr]: https://www.atlassian.com/blog/git/written-unwritten-guide-pull-requests
 [art-of-pr]: https://ponyfoo.com/articles/art-of-pull-request
 [commit-message-how-to]: https://chris.beams.io/posts/git-commit/
-[react-contributing]: https://reactjs.org/docs/how-to-contribute.html
-[node-contributing]: https://github.com/nodejs/node/blob/master/CONTRIBUTING.md
-[kibana-contributing]: https://github.com/elastic/kibana/blob/master/CONTRIBUTING.md
 [makefiles]: https://en.wikipedia.org/wiki/Makefile
 [nvm]: https://github.com/creationix/nvm
 [yarn]: https://yarnpkg.com/

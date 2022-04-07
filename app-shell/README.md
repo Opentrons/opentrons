@@ -256,7 +256,7 @@ Email of app user to populate "Email" in support conversations.
 - JSON path: `discovery.candidates`
 - Default: `[]`
 
-`string` or `Array<string>` of extra IP address(es)/hosts for the discovery client to track. For example, to get the discovery client to find an instance of the API server running on your own computer, you could do `--discovery.candidates=localhost`.
+`Array<string>` of extra IP address(es)/hosts for the discovery client to track. For example, to get the discovery client to find an instance of the API server running on your own computer.
 
 ##### labware.directory
 

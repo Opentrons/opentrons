@@ -24,6 +24,14 @@ import {
   forSetTemperature,
   forDeactivateTemperature,
 } from './temperatureUpdates'
+import {
+  forHeaterShakerCloseLatch,
+  forHeaterShakerDeactivateHeater,
+  forHeaterShakerOpenLatch,
+  forHeaterShakerSetTargetShakeSpeed,
+  forHeaterShakerSetTargetTemperature,
+  forHeaterShakerStopShake,
+} from './heaterShakerUpdates'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
@@ -178,7 +186,51 @@ function _getNextRobotStateAndWarningsSingleCommand(
         robotStateAndWarnings
       )
       break
-
+    case 'heaterShakerModule/deactivateHeater':
+      forHeaterShakerDeactivateHeater(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'heaterShakerModule/startSetTargetTemperature':
+      forHeaterShakerSetTargetTemperature(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'heaterShakerModule/setTargetShakeSpeed':
+      forHeaterShakerSetTargetShakeSpeed(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'heaterShakerModule/stopShake':
+      forHeaterShakerStopShake(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'heaterShakerModule/openLatch':
+      forHeaterShakerOpenLatch(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'heaterShakerModule/closeLatch':
+      forHeaterShakerCloseLatch(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    //  no state updates required
+    case 'heaterShakerModule/awaitTemperature':
+      break
     default:
       assert(
         false,

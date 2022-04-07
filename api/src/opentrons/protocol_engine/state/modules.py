@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, NamedTuple, Optional, Sequence, overload
+from typing import Dict, List, NamedTuple, Optional, Sequence, overload, Union
 from numpy import array, dot
 
 from opentrons.hardware_control.modules.magdeck import (
@@ -21,14 +21,16 @@ from ..types import (
     LabwareOffsetVector,
 )
 from .. import errors
-from ..commands import Command, LoadModuleResult, heater_shaker
+from ..commands import Command, LoadModuleResult, heater_shaker, temperature_module
 from ..actions import Action, UpdateCommandAction, AddModuleAction
 from .abstract_store import HasState, HandlesActions
 from .module_substates import (
     MagneticModuleSubState,
     HeaterShakerModuleSubState,
+    TemperatureModuleSubState,
     MagneticModuleId,
     HeaterShakerModuleId,
+    TemperatureModuleId,
     ModuleSubStateType,
 )
 
@@ -110,6 +112,13 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                     module_id=HeaterShakerModuleId(module_id),
                     plate_target_temperature=None,
                 )
+            elif ModuleModel.is_temperature_module_model(module_model):
+                self._state.substate_by_module_id[
+                    module_id
+                ] = TemperatureModuleSubState(
+                    module_id=TemperatureModuleId(module_id),
+                    plate_target_temperature=None,
+                )
 
     def _handle_command(self, command: Command) -> None:
         if isinstance(command.result, LoadModuleResult):
@@ -136,6 +145,13 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                     module_id=HeaterShakerModuleId(module_id),
                     plate_target_temperature=None,
                 )
+            elif ModuleModel.is_temperature_module_model(module_model):
+                self._state.substate_by_module_id[
+                    module_id
+                ] = TemperatureModuleSubState(
+                    module_id=TemperatureModuleId(module_id),
+                    plate_target_temperature=None,
+                )
         if isinstance(
             command.result,
             (
@@ -143,27 +159,61 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 heater_shaker.DeactivateHeaterResult,
             ),
         ):
-            module_id = command.params.moduleId
-            assert isinstance(
-                self._state.substate_by_module_id[module_id], HeaterShakerModuleSubState
-            ), f"{module_id} is not heater-shaker."
+            self._handle_heater_shaker_commands(command)
 
-            if isinstance(
-                command.result, heater_shaker.StartSetTargetTemperatureResult
-            ):
-                self._state.substate_by_module_id[
-                    module_id
-                ] = HeaterShakerModuleSubState(
-                    module_id=HeaterShakerModuleId(module_id),
-                    plate_target_temperature=command.params.temperature,
-                )
-            elif isinstance(command.result, heater_shaker.DeactivateHeaterResult):
-                self._state.substate_by_module_id[
-                    module_id
-                ] = HeaterShakerModuleSubState(
-                    module_id=HeaterShakerModuleId(module_id),
-                    plate_target_temperature=None,
-                )
+        if isinstance(
+            command.result,
+            (
+                temperature_module.SetTargetTemperatureResult,
+                temperature_module.DeactivateTemperatureResult,
+            ),
+        ):
+            self._handle_temperature_module_commands(command)
+
+    def _handle_heater_shaker_commands(
+        self,
+        command: Union[
+            heater_shaker.StartSetTargetTemperature, heater_shaker.DeactivateHeater
+        ],
+    ) -> None:
+        module_id = command.params.moduleId
+        assert isinstance(
+            self._state.substate_by_module_id[module_id], HeaterShakerModuleSubState
+        ), f"{module_id} is not heater-shaker."
+
+        if isinstance(command.result, heater_shaker.StartSetTargetTemperatureResult):
+            self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId(module_id),
+                plate_target_temperature=command.params.temperature,
+            )
+        elif isinstance(command.result, heater_shaker.DeactivateHeaterResult):
+            self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId(module_id),
+                plate_target_temperature=None,
+            )
+
+    def _handle_temperature_module_commands(
+        self,
+        command: Union[
+            temperature_module.SetTargetTemperature,
+            temperature_module.DeactivateTemperature,
+        ],
+    ) -> None:
+        module_id = command.params.moduleId
+        assert isinstance(
+            self._state.substate_by_module_id[module_id], TemperatureModuleSubState
+        ), f"{module_id} is not a temperature module."
+
+        if isinstance(command.result, temperature_module.SetTargetTemperatureResult):
+            self._state.substate_by_module_id[module_id] = TemperatureModuleSubState(
+                module_id=TemperatureModuleId(module_id),
+                plate_target_temperature=command.result.targetTemperature,
+            )
+        elif isinstance(command.result, temperature_module.DeactivateTemperatureResult):
+            self._state.substate_by_module_id[module_id] = TemperatureModuleSubState(
+                module_id=TemperatureModuleId(module_id),
+                plate_target_temperature=None,
+            )
 
 
 class ModuleView(HasState[ModuleState]):
@@ -240,6 +290,28 @@ class ModuleView(HasState[ModuleState]):
             else:
                 raise errors.WrongModuleTypeError(
                     f"{module_id} is not a Heater-Shaker Module."
+                )
+
+    def get_temperature_module_substate(
+        self, module_id: str
+    ) -> TemperatureModuleSubState:
+        """Return a `TemperatureModuleSubState` for the given Temperature Module.
+
+        Raises:
+           ModuleNotLoadedError: If module_id has not been loaded.
+           WrongModuleTypeError: If module_id has been loaded,
+               but it's not a Heater-Shaker Module.
+        """
+        try:
+            substate = self._state.substate_by_module_id[module_id]
+        except KeyError as e:
+            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+        else:
+            if isinstance(substate, TemperatureModuleSubState):
+                return substate
+            else:
+                raise errors.WrongModuleTypeError(
+                    f"{module_id} is not a Temperature Module."
                 )
 
     def get_location(self, module_id: str) -> DeckSlotLocation:

@@ -18,7 +18,7 @@ export {
   thermocyclerStateStep,
   touchTip,
   transfer,
-  setShakeSpeed,
+  heaterShaker,
 } from './commandCreators'
 
 export * from './robotStateSelectors'

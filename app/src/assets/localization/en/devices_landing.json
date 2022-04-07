@@ -1,9 +1,12 @@
 {
   "active": "Active",
+  "available": "Available ({{count}})",
   "devices": "Devices",
   "empty": "Empty",
   "go_to_run": "Go to Run",
   "idle": "Idle",
+  "how_to_setup_a_robot": "How to setup a new robot",
+  "learn_more_about_new_robot_setup": "Learn more about setting up a new robot",
   "left_mount": "Left Mount",
   "looking_for_robots": "Looking for robots...",
   "modules": "Modules",
@@ -11,6 +14,9 @@
   "refresh": "Refresh",
   "running": "running",
   "right_mount": "Right Mount",
+  "see_how_to_setup_new_robot": "See how to set up a new robot",
   "setting_up_new_robot": "Learn about setting up a new robot",
-  "troubleshooting_connection_problems": "Learn more about troubleshooting connection problems"
+  "troubleshooting_connection_problems": "Learn more about troubleshooting connection problems",
+  "unavailable": "Unavailable ({{count}})",
+  "use_usb_cable_for_new_robot": "When setting up a new robot, use the included USB cable to connect for the first time."
 }

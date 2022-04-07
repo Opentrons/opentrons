@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field
-from typing import Optional, Union, List, Dict, Any
+from typing import Optional, Union, List, Dict, Any, NamedTuple
 from typing_extensions import Literal, TypeGuard
 
 from opentrons.types import MountType, DeckSlotName
@@ -341,3 +341,17 @@ class LoadedLabware(BaseModel):
             " so the default of (0, 0, 0) will be used."
         ),
     )
+
+
+class SpeedRange(NamedTuple):
+    """Minimum and maximum allowed speeds for a shaking module."""
+
+    min: int
+    max: int
+
+
+class TemperatureRange(NamedTuple):
+    """Minimum and maximum allowed temperatures for a heating module."""
+
+    min: float
+    max: float

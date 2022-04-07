@@ -100,5 +100,9 @@
   "lpc_disabled_no_tipracks_used": "Labware Position Check requires that the protocol has at least one pipette that picks up a tip",
   "get_labware_offset_data": "Get Labware Offset Data",
   "module_mismatch_title": "This robot has connected modules that are not specified in this protocol",
-  "module_mismatch_body": "If you’re having trouble connecting the modules specifed below, make sure the module’s generation (GEN1 vs GEN2) is correct."
+  "module_mismatch_body": "If you’re having trouble connecting the modules specifed below, make sure the module’s generation (GEN1 vs GEN2) is correct.",
+  "tip_length_calibration": "tip length calibration",
+  "calibrate_deck_to_proceed_to_next_step": "Calibrate your deck in order to proceed to the next step",
+  "calibrate_deck_to_proceed_to_pipette_calibration": "Calibrate your deck in order to proceed to pipette calibration",
+  "calibrate_deck_to_proceed_to_tip_length_calibration": "Calibrate your deck in order to proceed to tip length calibration"
 }
