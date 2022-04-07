@@ -13,7 +13,6 @@ from subprocess import CalledProcessError
 
 from typing import Optional
 
-
 from aiohttp import web, BodyPartReader
 
 from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
@@ -26,6 +25,9 @@ from otupdate.buildroot.update_actions import (
     ROOTFS_NAME,
     UPDATE_FILES,
 )
+
+from otupdate.openembedded.updater import UPDATE_PKG
+from .oe_update import _begin_unzip_update_package
 
 SESSION_VARNAME = APP_VARIABLE_PREFIX + "session"
 LOG = logging.getLogger(__name__)
@@ -184,7 +186,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
         )
     reader = await request.multipart()
     async for part in reader:
-        if part.name != "ot2-system.zip":
+        if part.name != "ot2-system.zip" or part.name != UPDATE_PKG:
             LOG.warning(f"Unknown field name {part.name} in file_upload, ignoring")
             await part.release()
         else:
@@ -199,14 +201,22 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             },
             status=500,
         )
-
-    _begin_validation(
-        session,
-        config.config_from_request(request),
-        asyncio.get_event_loop(),
-        os.path.join(session.download_path, "ot2-system.zip"),
-        maybe_actions,
-    )
+    if part.name == "ot2-system.zip":
+        _begin_validation(
+            session,
+            config.config_from_request(request),
+            asyncio.get_event_loop(),
+            os.path.join(session.download_path, "ot2-system.zip"),
+            maybe_actions,
+        )
+    if part.name == UPDATE_PKG:
+        _begin_unzip_update_package(
+            session,
+            config.config_from_request(request),
+            asyncio.get_event_loop(),
+            os.path.join(session.download_path, UPDATE_PKG),
+            maybe_actions,
+        )
 
     return web.json_response(data=session.state, status=201)
 
