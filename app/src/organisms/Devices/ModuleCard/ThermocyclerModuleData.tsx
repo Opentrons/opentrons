@@ -26,9 +26,8 @@ interface ThermocyclerModuleProps {
 
 const MODULE_STATUS_STYLING = css`
   display: grid;
-  @media {
-    grid-template-columns: repeat(1, 1fr);
-  }
+  grid-template-columns: repeat(1, 1fr);
+
   @media (min-width: 800px) {
     grid-template-columns: repeat(2, 1fr);
   }
