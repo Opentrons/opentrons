@@ -8,15 +8,11 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   SPACING,
-  ALIGN_FLEX_START,
   Icon,
   DIRECTION_ROW,
   TYPOGRAPHY,
-  C_SKY_BLUE,
   TEXT_TRANSFORM_CAPITALIZE,
   SIZE_1,
-  WRAP,
-  DISPLAY_INLINE,
 } from '@opentrons/components'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 import type {
@@ -159,11 +155,6 @@ export const HeaterShakerModuleData = (
     }
   }
 
-  const test = css`
-    @media all and (min-width: 50px') {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  `
   return (
     <>
       <div css={MODULE_STATUS_STYLING}>
@@ -231,89 +222,38 @@ export const HeaterShakerModuleData = (
             {t('current_speed', { speed: currentSpeed })}
           </Text>
         </Flex>
+
         <Flex
           flexDirection={DIRECTION_ROW}
           data-testid={`heater_shaker_module_data_latch`}
         >
-          <Text
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
-            color={COLORS.darkGreyEnabled}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-            fontSize={TYPOGRAPHY.fontSizeH6}
-            marginTop={SPACING.spacing3}
-          >
-            {t('shaker')}
-          </Text>
-          <StatusLabel
-            status={shakerStatus}
-            {...getStatusLabelProps(shakerStatus)}
-          />
-          <Text
-            title="shaker_target_speed"
-            fontSize={TYPOGRAPHY.fontSizeH6}
-            marginBottom={SPACING.spacing1}
-          >
-            {t(targetSpeed === null ? 'na_speed' : 'target_speed', {
-              speed: targetSpeed,
-            })}
-          </Text>
-          <Text title="shaker_current_speed" fontSize={TYPOGRAPHY.fontSizeH6}>
-            {t('current_speed', { speed: currentSpeed })}
-          </Text>
-        </Flex>
-      </Flex>
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        data-testid={`heater_shaker_module_data_latch`}
-      >
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <Text
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
-            color={COLORS.darkGreyEnabled}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-            fontSize={TYPOGRAPHY.fontSizeH6}
-            marginTop={SPACING.spacing3}
-            title="latch_status"
-          >
-            {t('labware_latch', { ns: 'heater_shaker' })}
-          </Text>
-          <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing2}>
-            {isShaking && (
-              <Icon
-                paddingBottom="3px"
-                paddingRight={SPACING.spacing2}
-                name="closed-locked"
-                data-testid="HeaterShakerModuleData_latch_lock"
-                size={SIZE_1}
-              />
-            )}
-            {getLatchStatus(latchStatus)}
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <Text
-                textTransform={TEXT_TRANSFORM_UPPERCASE}
-                color={COLORS.darkGreyEnabled}
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-                fontSize={TYPOGRAPHY.fontSizeH6}
-                marginTop={SPACING.spacing3}
-              >
-                {t('labware_latch', { ns: 'heater_shaker' })}
-              </Text>
-              <Flex
-                title="latch_status"
-                fontSize={TYPOGRAPHY.fontSizeH6}
-                alignItems={ALIGN_FLEX_START}
-                flexDirection={DIRECTION_ROW}
-                marginTop={SPACING.spacing2}
-              >
-                {/* {TODO(sh, 2022-02-22): Conditionally render icon based on latch status} */}
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <Text
+              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              color={COLORS.darkGreyEnabled}
+              fontWeight={TYPOGRAPHY.fontWeightRegular}
+              fontSize={TYPOGRAPHY.fontSizeH6}
+              marginTop={SPACING.spacing3}
+              title="latch_status"
+            >
+              {t('labware_latch', { ns: 'heater_shaker' })}
+            </Text>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              marginTop={SPACING.spacing2}
+              fontWeight={TYPOGRAPHY.fontWeightRegular}
+              fontSize={TYPOGRAPHY.fontSizeH6}
+            >
+              {isShaking && (
                 <Icon
-                  paddingBottom="2px"
+                  paddingBottom="3px"
+                  paddingRight={SPACING.spacing2}
                   name="closed-locked"
-                  size={'1rem'}
-                  color={COLORS.darkGreyEnabled}
+                  data-testid="HeaterShakerModuleData_latch_lock"
+                  size={SIZE_1}
                 />
-                {latchStatus}
-              </Flex>
+              )}
+              {getLatchStatus(latchStatus)}
             </Flex>
           </Flex>
         </Flex>
