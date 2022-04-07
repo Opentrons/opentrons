@@ -21,6 +21,8 @@ on:
       - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/pd-test-build-deploy.yaml'
+    branches:
+      - '**'
     tags:
       - 'protocol-designer*'
   workflow_dispatch:

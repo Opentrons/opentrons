@@ -19,6 +19,8 @@ on:
       - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/ll-test-build-deploy.yaml'
+    branches:
+      - '**'
     tags:
       - 'labware-library*'
   workflow_dispatch:

@@ -18,6 +18,8 @@ on:
       - 'yarn.lock'
       - '.github/workflows/app-test-build-deploy.yaml'
       - '.github/workflows/utils.js'
+    branches:
+      - '**'
     tags:
       - 'v*'
   pull_request:

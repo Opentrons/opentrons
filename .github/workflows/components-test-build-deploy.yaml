@@ -16,6 +16,8 @@ on:
       - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/components-test-build-deploy.yaml'
+    branches:
+      - '**'
     tags:
       - 'components*'
   workflow_dispatch:
