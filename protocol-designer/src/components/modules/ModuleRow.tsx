@@ -8,6 +8,9 @@ import {
   Tooltip,
   useHoverTooltip,
   ModuleIcon,
+  C_DARK_GRAY,
+  SIZE_1,
+  SPACING,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { actions as stepFormActions, ModuleOnDeck } from '../../step-forms'
@@ -106,9 +109,9 @@ export function ModuleRow(props: Props): JSX.Element {
       <h4 className={styles.row_title}>
         <ModuleIcon
           moduleType={type}
-          size="1rem"
-          color="#6F6F6F"
-          marginRight="0.25rem"
+          size={SIZE_1}
+          color={C_DARK_GRAY}
+          marginRight={SPACING.spacing2}
         />
         {i18n.t(`modules.module_display_names.${type}`)}
       </h4>
