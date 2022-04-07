@@ -36,7 +36,6 @@ const EXPANDED_STYLE = css`
   overflow-x: hidden;
   width: 19.5rem;
   max-width: 19.5rem;
-  height: 100%;
   visibility: visible;
   z-index: 2;
 
