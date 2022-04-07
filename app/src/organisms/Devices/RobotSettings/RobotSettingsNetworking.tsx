@@ -42,7 +42,7 @@ export function RobotSettingsNetworking({
   robotName,
 }: NetworkingProps): JSX.Element {
   const [showNetworkingSlideout, setShowNetworkingSlideout] = React.useState(
-    false
+    true
   )
   const robot = useRobot(robotName)
   const { t } = useTranslation('device_settings')
