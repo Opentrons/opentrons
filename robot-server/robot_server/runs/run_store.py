@@ -40,6 +40,28 @@ class RunStore:
         """Initialize a RunStore and its in-memory storage."""
         self._sql_engine = sql_engine
 
+    def update_actions(self, run_id: str, actions: List[RunAction]) -> None:
+        """Insert or update a run actions resource in the db.
+
+        Arguments:
+            run_id: current run id to get
+            actions: a list of actions to store in the db
+        """
+        stmt = action_runs_table.update().\
+            where(action_runs_table.c.run_id == run_id, action_runs_table.c.id == sqlalchemy.bindparam('id')). \
+            values({
+            'action_type': sqlalchemy.bindparam('action_type')
+        })
+        update_actions = []
+        for action in actions:
+            update_actions.append(_convert_action_to_sql_values(action, run_id))
+        with self._sql_engine.begin() as transaction:
+            try:
+                print(update_actions)
+                transaction.execute(stmt, update_actions)
+            except sqlalchemy.exc.NoResultFound as e:
+                raise 'insert actions ' + e
+
     def insert_actions(self, run_id: str, actions: List[RunAction]) -> None:
         """Insert or update a run actions resource in the db.
 
@@ -105,8 +127,7 @@ class RunStore:
             The resource that was added to the store.
         """
 
-        update_statement = sqlalchemy.update(run_table).where(run_table.c.id == run.run_id).values(
-            active_run=run.is_current)
+        update_statement = sqlalchemy.update(run_table).where(run_table.c.id == run.run_id).values(_convert_run_to_sql_values(run))
         with self._sql_engine.begin() as transaction:
             try:
                 transaction.execute(update_statement)
@@ -120,8 +141,10 @@ class RunStore:
         if run.is_current is True:
             self.update_active_runs(run.run_id)
 
-        self.upsert_actions(run_id=run.run_id, actions=run.actions)
+        if run.actions:
+            self.update_actions(run_id=run.run_id, actions=run.actions)
         return run
+
 
     def get(self, run_id: str) -> RunResource:
         """Get a specific run entry by its identifier.
@@ -138,11 +161,8 @@ class RunStore:
             run_table.c.id == run_id
         )
         try:
-            # row_run = get_row(self._sql_engine, statement=statement)
             with self._sql_engine.begin() as transaction:
                 row_run = transaction.execute(statement)
-                print(row_run)
-                # run = _convert_sql_row_to_run(row_run.one())
                 for action in row_run:
                     run = _convert_sql_row_to_run(action)
                     if action.id_1:
