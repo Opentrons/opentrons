@@ -62,8 +62,8 @@ def _robot_log_config(log_level: int) -> Dict[str, Any]:
                 # to see things below WARN.
                 # docs.sqlalchemy.org/en/14/core/engines.html#configuring-logging
                 "level": log_level,
-                "propagate": False
-            }
+                "propagate": False,
+            },
         },
     }
 
@@ -104,7 +104,7 @@ def _dev_log_config(log_level: int) -> Dict[str, Any]:
                 # to see things below WARN.
                 # docs.sqlalchemy.org/en/14/core/engines.html#configuring-logging
                 "level": log_level,
-                "propagate": False
-            }
+                "propagate": False,
+            },
         },
     }
