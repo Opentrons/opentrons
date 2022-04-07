@@ -39,9 +39,11 @@ export const HeaterShakerWizard = (
   const attachedModules = useAttachedModules(robotName)
   const [targetProps, tooltipProps] = useHoverTooltip()
 
-  const heaterShaker = (attachedModules.find(
-    module => module.type === HEATERSHAKER_MODULE_TYPE
-  ) as unknown) as HeaterShakerModule
+  const heaterShaker =
+    attachedModules.find(
+      (module): module is HeaterShakerModule =>
+        module.type === HEATERSHAKER_MODULE_TYPE
+    ) ?? null
   let isPrimaryCTAEnabled: boolean = true
 
   if (currentPage === 4) {
@@ -74,11 +76,14 @@ export const HeaterShakerWizard = (
       case 5:
         buttonContent = t('complete')
         return (
-          <TestShake
-            module={heaterShaker}
-            setCurrentPage={setCurrentPage}
-            hasProtocol={hasProtocol}
-          />
+          // heaterShaker should never be null because isPrimaryCTAEnabled would be disabled otherwise
+          heaterShaker != null ? (
+            <TestShake
+              module={heaterShaker}
+              setCurrentPage={setCurrentPage}
+              hasProtocol={hasProtocol}
+            />
+          ) : null
         )
       default:
         return null
