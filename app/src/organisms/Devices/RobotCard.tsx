@@ -13,11 +13,11 @@ import {
   DIRECTION_ROW,
   SPACING,
   TEXT_TRANSFORM_UPPERCASE,
+  ModuleIcon,
 } from '@opentrons/components'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { StyledText } from '../../atoms/text'
-import { ModuleIcon } from './ModuleIcon'
 import { useAttachedModules, useAttachedPipettes } from './hooks'
 import { RobotStatusBanner } from './RobotStatusBanner'
 
