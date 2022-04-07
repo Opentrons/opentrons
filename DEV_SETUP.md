@@ -57,13 +57,15 @@ Once `brew` is installed, you can use it to make sure you have the latest versio
 brew install git
 ```
 
-If you haven't used `git` before, be sure to run through [first-time Git setup][].
+If you haven't used `git` before, **be sure to complete [first-time Git setup][]**.
 
 #### 1. Install Node.js
 
-##### Intel Mac
+Our recommended installation instructions for Node.js differ between `x86_64` (Intel) and `ARM` (M1) Macs.
 
-On macOS, we recommend [nvs][] to install Node.js because it works well and is compatible with macOS, Windows, and Linux.
+##### x86-64 Mac (Intel)
+
+On x86, we recommend [nvs][] to install Node.js because it works well and is compatible with macOS, Windows, and Linux.
 
 1. Go to [https://github.com/jasongin/nvs][nvs]
 2. Follow the instructions for "Mac, Linux" setup
@@ -87,11 +89,21 @@ nvs add 14
 nvs auto on
 ```
 
+If the `nvs` command isn't working, confirm that your shell is set up properly. If you print out the contents of `~/.zshrc`, you should see something similar to the following:
+
+```shell
+# ~/.zshrc
+# ...
+export NVS_HOME="$HOME/.nvs"
+[ -s "$NVS_HOME/nvs.sh" ] && . "$NVS_HOME/nvs.sh"
+# ...
+```
+
 ##### ARM Mac (M1)
 
-If you are running an ARM (M1) Mac, you cannot should not use nvs (nor nvm) because those tools do not have access to Node.js v14 for the ARM architecture. Until we upgrade to version 16 or higher, you need to use an alternative installation method for Node.js.
+If you are running an ARM (M1) Mac, you **should not use `nvs` nor `nvm`**, because those tools do not have access to Node.js v14 for the ARM architecture. Until we upgrade to version 16 or higher, you need to use an alternative installation method for Node.js.
 
-Fortunately, you can use `brew` to install an ARM version of Node v14.
+Fortunately, you can use `brew` to install an ARM-native version of Node v14.
 
 ```shell
 brew install node@14
@@ -108,6 +120,15 @@ Close and re-open your terminal to confirm that the correct version of Node is i
 ```shell
 node -e "console.log(process.version, process.arch)"
 # > v14.19.1 arm64
+```
+
+If your `node` command isn't working or is printing the wrong information, confirm that your shell is set up properly. If you print out the contents of `~/.zshrc`, you should see something similar to the following:
+
+```shell
+# ~/.zshrc
+# ...
+export PATH="/opt/homebrew/opt/node@14/bin:$PATH"
+# ...
 ```
 
 #### 2. Install `pyenv` and Python
@@ -139,41 +160,22 @@ Now, install the required version of Python. Use the latest available version of
 pyenv install 3.7.13
 ```
 
-#### Verify environment
-
-You should also have created or modified your `~/.zprofile` and `~/.zshrc` dot-files. If you see anything missing (or perhaps duplicated, due to running setup commands more than once), fix them up to include the output below.
+If your `pyenv` command isn't working, confirm that your shell is set up properly. If you print out the contents of `~/.zprofile` and `~/.zshrc`, you should see something similar to the following:
 
 ```shell
 # ~/.zprofile
-eval "$(/opt/homebrew/bin/brew shellenv)"  # < NOTE: this is from an ARM Mac; an Intel Mac will look different
-
+# ...
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init --path)"
+# ...
 ```
 
 ```shell
 # ~/.zshrc
-export NVS_HOME="$HOME/.nvs"
-[ -s "$NVS_HOME/nvs.sh" ] && . "$NVS_HOME/nvs.sh"
+# ...
 eval "$(pyenv init -)"
-```
-
-You should be able to run the following commands, with similar output
-
-```shell
-make --version
-# > GNU Make 3.81
-
-git --version
-# > git version 2.35.1
-
-nvs list
-# >  node/14.19.1/x64 (Fermium)
-
-pyenv versions
-# > * system (set by /Users/username/.pyenv/version)
-# >  3.7.13
+# ...
 ```
 
 ### Windows
