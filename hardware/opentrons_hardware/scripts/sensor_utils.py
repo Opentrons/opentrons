@@ -181,7 +181,7 @@ async def read_temp_from_pressure_sensor(
             start_time.strftime(hms),
         )
         csv = CSVFormatter.build(metadata, list(metadata.to_dict().keys()))
-    end_time = datetime.now() + timedelta(minutes=command.minutes)
+    end_time = start_time + timedelta(minutes=command.minutes)
     while datetime.now() < end_time:
         messenger = CanMessenger(driver=driver)
         messenger.start()
