@@ -654,7 +654,7 @@ export const getUnsavedFormIsPrestineSetHeaterShakerTempForm: Selector<
   (unsavedForm, isPresaved) => {
     const isSetHsTempForm =
       unsavedForm?.stepType === 'heaterShaker' &&
-      unsavedForm?.setTemperature === 'true'
+      unsavedForm?.targetHeaterShakerTemperature !== null
 
     return isPresaved && isSetHsTempForm
   }

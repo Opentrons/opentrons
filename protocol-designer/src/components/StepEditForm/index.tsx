@@ -7,6 +7,7 @@ import { resetScrollElements } from '../../ui/steps/utils'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { maskField } from '../../steplist/fieldLevel'
 import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
+import { AutoAddPauseUntilHeaterShakerTempStepModal } from '../modals/AutoAddPauseUntilHeaterShakerTempStepModal'
 import {
   ConfirmDeleteModal,
   DELETE_STEP_FORM,
@@ -136,10 +137,7 @@ const StepEditFormManager = (
     formData,
     handleChangeFormInput
   )
-  console.log(formData)
-  console.log(formData?.targetHeaterShakerTemperature)
-  console.log(showAddPauseUntilHeaterShakerTempStepModal)
-  console.log(isPristineSetHeaterShakerTempForm)
+
   return (
     <>
       {showConfirmDeleteModal && (
@@ -158,15 +156,15 @@ const StepEditFormManager = (
           onContinueClick={confirmClose}
         />
       )}
-      {/* {showAddPauseUntilTempStepModal && (
+      {showAddPauseUntilTempStepModal && (
         <AutoAddPauseUntilTempStepModal
           displayTemperature={formData?.targetTemperature ?? '?'}
           handleCancelClick={saveStepForm}
           handleContinueClick={confirmAddPauseUntilTempStep}
         />
-      )} */}
+      )}
       {showAddPauseUntilHeaterShakerTempStepModal && (
-        <AutoAddPauseUntilTempStepModal
+        <AutoAddPauseUntilHeaterShakerTempStepModal
           displayTemperature={formData?.targetHeaterShakerTemperature ?? '?'}
           handleCancelClick={saveStepForm}
           handleContinueClick={confirmAddPauseUntilHeaterShakerTempStep}
@@ -181,11 +179,12 @@ const StepEditFormManager = (
           formData,
           handleClose: confirmClose,
           handleDelete: confirmDelete,
-          handleSave: isPristineSetTempForm
-            ? confirmAddPauseUntilTempStep
-            : isPristineSetHeaterShakerTempForm
-            ? confirmAddPauseUntilHeaterShakerTempStep
-            : saveStepForm,
+          handleSave:
+            isPristineSetTempForm === true
+              ? confirmAddPauseUntilTempStep
+              : isPristineSetHeaterShakerTempForm === true
+              ? confirmAddPauseUntilHeaterShakerTempStep
+              : saveStepForm,
           propsForFields,
           showMoreOptionsModal,
           toggleMoreOptionsModal,
