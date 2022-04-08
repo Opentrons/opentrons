@@ -26,12 +26,12 @@ from .protocol_analyzer import ProtocolAnalyzer
 from .analysis_store import AnalysisStore
 from .protocol_store import ProtocolStore, ProtocolResource, ProtocolNotFoundError
 from .dependencies import (
-    get_protocol_directory,
     get_protocol_reader,
     get_protocol_store,
     get_analysis_store,
     get_protocol_analyzer,
 )
+from ..data_access.data_access import get_protocol_directory
 
 
 log = logging.getLogger(__name__)

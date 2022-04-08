@@ -5,22 +5,23 @@ from typing import Generator
 from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError
 from robot_server.runs.action_models import RunAction, RunActionType
 from sqlalchemy.engine import Engine as SQLEngine
-from robot_server.db import create_in_memory_db
+from robot_server.db import opened_db
 from robot_server.data_access.data_access import add_tables_to_db
+from pathlib import Path
 
 
 @pytest.fixture
-def in_memory_sql_engine() -> Generator[SQLEngine, None, None]:
-    """Return a set-up in-memory database to back the store."""
-    with create_in_memory_db() as sql_engine:
-        add_tables_to_db(sql_engine)
-        yield sql_engine
+def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
+    """Return a set-up database to back the store."""
+    with opened_db(db_file_path=tmp_path / "test.db") as engine:
+        add_tables_to_db(engine)
+        yield engine
 
 
 @pytest.fixture
-def subject(in_memory_sql_engine: SQLEngine) -> RunStore:
-    """Get a RunStore test subject."""
-    return RunStore(sql_engine=in_memory_sql_engine)
+def subject(sql_engine: SQLEngine) -> RunStore:
+    """Get a ProtocolStore test subject."""
+    return RunStore(sql_engine=sql_engine)
 
 
 def test_add_run(subject: RunStore) -> None:

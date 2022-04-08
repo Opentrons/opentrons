@@ -46,16 +46,17 @@ class RunStore:
             run_id: current run id to get
             actions: a list of actions to store in the db
         """
-        with self._sql_engine.begin() as transaction:
-            try:
+        try:
+            with self._sql_engine.begin() as transaction:
                 transaction.execute(
                     sqlalchemy.delete(action_runs_table).where(
                         action_runs_table.c.run_id == run_id
                     )
                 )
-                self.insert_actions(run_id, actions)
-            except sqlalchemy.exc.NoResultFound as e:
-                raise e
+        except sqlalchemy.exc.NoResultFound as e:
+            raise e
+
+        self.insert_actions(run_id, actions)
 
     def insert_actions(self, run_id: str, actions: List[RunAction]) -> None:
         """Insert or update a run actions resource in the db.
@@ -67,11 +68,11 @@ class RunStore:
         insert_actions = []
         for action in actions:
             insert_actions.append(_convert_action_to_sql_values(action, run_id))
-        with self._sql_engine.begin() as transaction:
-            try:
+        try:
+            with self._sql_engine.begin() as transaction:
                 transaction.execute(action_runs_table.insert(), insert_actions)
-            except sqlalchemy.exc.NoResultFound as e:
-                raise e
+        except sqlalchemy.exc.NoResultFound as e:
+            raise e
 
     def update_active_runs(self, run_id: str) -> None:
         """Update all active runs to not active.
@@ -136,11 +137,7 @@ class RunStore:
             try:
                 transaction.execute(update_statement)
             except sqlalchemy.exc.NoResultFound:
-                statement = sqlalchemy.insert(run_table).values(
-                    _convert_run_to_sql_values(run=run)
-                )
-                with self._sql_engine.begin() as insert_transaction:
-                    insert_transaction.execute(statement)
+                raise RunNotFoundError(run.run_id) from e
 
         if run.is_current is True:
             self.update_active_runs(run.run_id)
