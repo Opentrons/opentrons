@@ -139,6 +139,7 @@ class SensorScheduler:
         """Listener for receiving messages back."""
         async for response, arbitration_id in reader:
             if arbitration_id.parts.originating_node_id == node_id:
+                # breakpoint()
                 if isinstance(response, ReadFromSensorResponse):
                     return SensorDataType.build(response.payload.sensor_data)
                 elif isinstance(response, SensorThresholdResponse):
