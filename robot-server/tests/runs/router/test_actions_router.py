@@ -23,24 +23,6 @@ from robot_server.runs.action_models import (
 )
 
 from robot_server.runs.router.actions_router import create_run_action
-from sqlalchemy.engine import Engine as SQLEngine
-from robot_server.db import create_in_memory_db
-from robot_server.data_access.data_access import add_tables_to_db
-from typing import Generator
-
-
-@pytest.fixture
-def in_memory_sql_engine() -> Generator[SQLEngine, None, None]:
-    """Return a set-up in-memory database to back the store."""
-    with create_in_memory_db() as sql_engine:
-        add_tables_to_db(sql_engine)
-        yield sql_engine
-
-
-@pytest.fixture
-def subject(in_memory_sql_engine: SQLEngine) -> RunStore:
-    """Get a RunStore test subject."""
-    return RunStore(sql_engine=in_memory_sql_engine)
 
 
 @pytest.fixture
@@ -50,7 +32,7 @@ def task_runner(decoy: Decoy) -> TaskRunner:
 
 
 @pytest.fixture
-def prev_run(decoy: Decoy, subject: RunStore) -> RunResource:
+def prev_run(decoy: Decoy, mock_run_store: RunStore) -> RunResource:
     """Get an existing run resource that's in the store."""
     run = RunResource(
         run_id="run-id",
@@ -59,17 +41,17 @@ def prev_run(decoy: Decoy, subject: RunStore) -> RunResource:
         actions=[],
         is_current=True,
     )
-    inserted_run = subject.insert(run=run)
-    # decoy.when(subject.get(run_id="run-id")).then_return(run)
 
-    return inserted_run
+    decoy.when(mock_run_store.get(run_id="run-id")).then_return(run)
+
+    return run
 
 
 async def test_create_play_action_to_start_run(
     decoy: Decoy,
-    run_view: RunView,
-    subject: RunStore,
-    engine_store: EngineStore,
+    mock_run_view: RunView,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
     prev_run: RunResource,
     task_runner: TaskRunner,
 ) -> None:
@@ -89,7 +71,7 @@ async def test_create_play_action_to_start_run(
     )
 
     decoy.when(
-        run_view.with_action(
+        mock_run_view.with_action(
             run=prev_run,
             action_id="action-id",
             action_data=RunActionCreate(actionType=RunActionType.PLAY),
@@ -97,14 +79,14 @@ async def test_create_play_action_to_start_run(
         ),
     ).then_return((action, next_run))
 
-    decoy.when(engine_store.runner.was_started()).then_return(False)
+    decoy.when(mock_engine_store.runner.was_started()).then_return(False)
 
     result = await create_run_action(
         runId="run-id",
         request_body=RequestModel(data=RunActionCreate(actionType=RunActionType.PLAY)),
-        run_view=run_view,
-        run_store=subject,
-        engine_store=engine_store,
+        run_view=mock_run_view,
+        run_store=mock_run_store,
+        engine_store=mock_engine_store,
         action_id="action-id",
         created_at=datetime(year=2022, month=2, day=2),
         task_runner=task_runner,
@@ -113,19 +95,17 @@ async def test_create_play_action_to_start_run(
     assert result.content.data == action
     assert result.status_code == 201
 
-    assert isinstance(subject.update(run=next_run), RunResource)
-
     decoy.verify(
-        task_runner.run(engine_store.runner.run),
-        subject.update(run=next_run),
+        task_runner.run(mock_engine_store.runner.run),
+        mock_run_store.update(run=next_run),
     )
 
 
 async def test_create_play_action_to_resume_run(
     decoy: Decoy,
-    run_view: RunView,
-    subject: RunStore,
-    engine_store: EngineStore,
+    mock_run_view: RunView,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
     prev_run: RunResource,
 ) -> None:
     """It should handle a play action that resumes the runner."""
@@ -144,7 +124,7 @@ async def test_create_play_action_to_resume_run(
     )
 
     decoy.when(
-        run_view.with_action(
+        mock_run_view.with_action(
             run=prev_run,
             action_id="action-id",
             action_data=RunActionCreate(actionType=RunActionType.PLAY),
@@ -152,14 +132,14 @@ async def test_create_play_action_to_resume_run(
         ),
     ).then_return((action, next_run))
 
-    decoy.when(engine_store.runner.was_started()).then_return(True)
+    decoy.when(mock_engine_store.runner.was_started()).then_return(True)
 
     result = await create_run_action(
         runId="run-id",
         request_body=RequestModel(data=RunActionCreate(actionType=RunActionType.PLAY)),
-        run_view=run_view,
-        run_store=subject,
-        engine_store=engine_store,
+        run_view=mock_run_view,
+        run_store=mock_run_store,
+        engine_store=mock_engine_store,
         action_id="action-id",
         created_at=datetime(year=2022, month=2, day=2),
     )
@@ -168,19 +148,19 @@ async def test_create_play_action_to_resume_run(
     assert result.status_code == 201
 
     decoy.verify(
-        engine_store.runner.play(),
-        subject.update(run=next_run),
+        mock_engine_store.runner.play(),
+        mock_run_store.update(run=next_run),
     )
 
 
 async def test_create_play_action_with_missing_id(
     decoy: Decoy,
-    subject: RunStore,
+    mock_run_store: RunStore,
 ) -> None:
     """It should 404 if the run ID does not exist."""
     not_found_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(subject.get(run_id="run-id")).then_raise(not_found_error)
+    decoy.when(mock_run_store.get(run_id="run-id")).then_raise(not_found_error)
 
     with pytest.raises(ApiError) as exc_info:
         await create_run_action(
@@ -188,7 +168,7 @@ async def test_create_play_action_with_missing_id(
             request_body=RequestModel(
                 data=RunActionCreate(actionType=RunActionType.PLAY)
             ),
-            run_store=subject,
+            run_store=mock_run_store,
         )
 
     assert exc_info.value.status_code == 404
@@ -197,9 +177,9 @@ async def test_create_play_action_with_missing_id(
 
 async def test_create_play_action_not_allowed(
     decoy: Decoy,
-    run_view: RunView,
-    subject: RunStore,
-    engine_store: EngineStore,
+    mock_run_view: RunView,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
     prev_run: RunResource,
     task_runner: TaskRunner,
 ) -> None:
@@ -219,7 +199,7 @@ async def test_create_play_action_not_allowed(
     )
 
     decoy.when(
-        run_view.with_action(
+        mock_run_view.with_action(
             run=prev_run,
             action_id="action-id",
             action_data=RunActionCreate(actionType=RunActionType.PLAY),
@@ -227,9 +207,9 @@ async def test_create_play_action_not_allowed(
         ),
     ).then_return((actions, next_run))
 
-    decoy.when(engine_store.runner.was_started()).then_return(True)
+    decoy.when(mock_engine_store.runner.was_started()).then_return(True)
 
-    decoy.when(engine_store.runner.play()).then_raise(
+    decoy.when(mock_engine_store.runner.play()).then_raise(
         ProtocolEngineStoppedError("oh no")
     )
 
@@ -239,9 +219,9 @@ async def test_create_play_action_not_allowed(
             request_body=RequestModel(
                 data=RunActionCreate(actionType=RunActionType.PLAY)
             ),
-            run_view=run_view,
-            run_store=subject,
-            engine_store=engine_store,
+            run_view=mock_run_view,
+            run_store=mock_run_store,
+            engine_store=mock_engine_store,
             task_runner=task_runner,
             action_id="action-id",
             created_at=datetime(year=2022, month=2, day=2),
@@ -250,14 +230,13 @@ async def test_create_play_action_not_allowed(
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunActionNotAllowed"
 
-    decoy.verify(subject.update(run=matchers.Anything()), times=0)
+    decoy.verify(mock_run_store.update(run=matchers.Anything()), times=0)
 
 
 async def test_create_run_action_not_current(
     decoy: Decoy,
-    run_view: RunView,
-    subject: RunStore,
-    engine_store: EngineStore,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
 ) -> None:
     """It should 409 if the run is not current."""
     prev_run = RunResource(
@@ -268,7 +247,7 @@ async def test_create_run_action_not_current(
         is_current=False,
     )
 
-    decoy.when(subject.get(run_id="run-id")).then_return(prev_run)
+    decoy.when(mock_run_store.get(run_id="run-id")).then_return(prev_run)
 
     with pytest.raises(ApiError) as exc_info:
         await create_run_action(
@@ -276,20 +255,20 @@ async def test_create_run_action_not_current(
             request_body=RequestModel(
                 data=RunActionCreate(actionType=RunActionType.PLAY)
             ),
-            run_store=subject,
+            run_store=mock_run_store,
         )
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
 
-    decoy.verify(subject.update(run=matchers.Anything()), times=0)
+    decoy.verify(mock_run_store.update(run=matchers.Anything()), times=0)
 
 
 async def test_create_pause_action(
     decoy: Decoy,
-    run_view: RunView,
-    subject: RunStore,
-    engine_store: EngineStore,
+    mock_run_view: RunView,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
     prev_run: RunResource,
 ) -> None:
     """It should handle a pause action."""
@@ -308,7 +287,7 @@ async def test_create_pause_action(
     )
 
     decoy.when(
-        run_view.with_action(
+        mock_run_view.with_action(
             run=prev_run,
             action_id="action-id",
             action_data=RunActionCreate(actionType=RunActionType.PAUSE),
@@ -319,9 +298,9 @@ async def test_create_pause_action(
     result = await create_run_action(
         runId="run-id",
         request_body=RequestModel(data=RunActionCreate(actionType=RunActionType.PAUSE)),
-        run_view=run_view,
-        run_store=subject,
-        engine_store=engine_store,
+        run_view=mock_run_view,
+        run_store=mock_run_store,
+        engine_store=mock_engine_store,
         action_id="action-id",
         created_at=datetime(year=2022, month=2, day=2),
     )
@@ -330,16 +309,16 @@ async def test_create_pause_action(
     assert result.status_code == 201
 
     decoy.verify(
-        engine_store.runner.pause(),
-        subject.insert(run=next_run),
+        mock_engine_store.runner.pause(),
+        mock_run_store.update(run=next_run),
     )
 
 
 async def test_create_stop_action(
     decoy: Decoy,
-    run_view: RunView,
-    subject: RunStore,
-    engine_store: EngineStore,
+    mock_run_view: RunView,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
     prev_run: RunResource,
     task_runner: TaskRunner,
 ) -> None:
@@ -359,7 +338,7 @@ async def test_create_stop_action(
     )
 
     decoy.when(
-        run_view.with_action(
+        mock_run_view.with_action(
             run=prev_run,
             action_id="action-id",
             action_data=RunActionCreate(actionType=RunActionType.STOP),
@@ -370,9 +349,9 @@ async def test_create_stop_action(
     result = await create_run_action(
         runId="run-id",
         request_body=RequestModel(data=RunActionCreate(actionType=RunActionType.STOP)),
-        run_view=run_view,
-        run_store=subject,
-        engine_store=engine_store,
+        run_view=mock_run_view,
+        run_store=mock_run_store,
+        engine_store=mock_engine_store,
         task_runner=task_runner,
         action_id="action-id",
         created_at=datetime(year=2022, month=2, day=2),
@@ -382,6 +361,6 @@ async def test_create_stop_action(
     assert result.status_code == 201
 
     decoy.verify(
-        task_runner.run(engine_store.runner.stop),
-        subject.update(run=next_run),
+        task_runner.run(mock_engine_store.runner.stop),
+        mock_run_store.update(run=next_run),
     )
