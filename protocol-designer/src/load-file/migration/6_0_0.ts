@@ -12,6 +12,9 @@ import { uuid } from '../../utils'
 //  and labware access parameters, renames AirGap to aspirate, and removes all temporal properties from labware, pipettes,
 //  and module keys such as slot, mount
 //  and renames well to wellName
+import {
+  LoadLiquidCreateCommand
+} from '../../../../shared-data/protocol/types/schemaV6/command/setup';
 import type {
   LoadPipetteCreateCommand,
   LoadModuleCreateCommand,
@@ -32,6 +35,7 @@ interface DesignerApplicationData {
       liquidGroupId: string
     }
   >
+  ingredLocations: { [labwareId: string]: { [wellName: string]: { [liquidId: string]: { volume: number } } } }
 }
 
 const PD_VERSION = '6.0.0'
@@ -85,7 +89,7 @@ const migrateCommands = (
 export const migrateFile = (
   appData: ProtocolFileV5<DesignerApplicationData>
 ): ProtocolFile => {
-  const { pipettes, labware, modules, commands } = appData
+  const { pipettes, labware, modules, commands, designerApplication } = appData
   const loadPipetteCommands: LoadPipetteCreateCommand[] = map(
     pipettes,
     (pipette, pipetteId) => {
@@ -131,25 +135,82 @@ export const migrateFile = (
     }
   )
 
+  let loadLiquidCommands: LoadLiquidCreateCommand[] = []
+
+  let labwareIdsByLiquidId: { [liquidId: string]: string[] } = {}
+
+  if (designerApplication?.data?.ingredLocations != null && designerApplication?.data?.ingredients != null) {
+    Object.keys(designerApplication?.data?.ingredients).forEach(liquidId => {
+      if (designerApplication?.data?.ingredLocations != null) {
+        for (const [labwareId, liquidsByWellName] of Object.entries(designerApplication?.data?.ingredLocations)) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          for (const [_wellName, volumeByLiquidId] of Object.entries(liquidsByWellName)) {
+            if (liquidId in volumeByLiquidId) {
+              if (labwareIdsByLiquidId[liquidId] == null) {
+                labwareIdsByLiquidId = {
+                  ...labwareIdsByLiquidId,
+                  [liquidId]: [labwareId]
+                }
+              } else if (!labwareIdsByLiquidId[liquidId].includes(labwareId)) {
+                labwareIdsByLiquidId = {
+                  ...labwareIdsByLiquidId,
+                  [liquidId]: [...labwareIdsByLiquidId[liquidId], labwareId]
+                }
+              }
+            }
+          }
+        }
+      }
+    })
+
+    loadLiquidCommands = reduce<{ [liquidId: string]: string[] }, LoadLiquidCreateCommand[]>(labwareIdsByLiquidId, (acc, labwareIds, liquidId) => {
+      const commands: LoadLiquidCreateCommand[] = labwareIds.map(labwareId => {
+        const volumeByWell = reduce(designerApplication.data?.ingredLocations[labwareId], (acc, volumesByLiquidId, wellName) => {
+          if (liquidId in volumesByLiquidId) {
+            return {
+              ...acc,
+              [wellName]: volumesByLiquidId[liquidId].volume
+            }
+          } else {
+            return { ...acc }
+          }
+        }, {})
+
+        const loadLiquidCommand: LoadLiquidCreateCommand = {
+          commandType: "loadLiquid",
+          key: uuid(),
+          params: {
+            liquidId,
+            labwareId,
+            volumeByWell
+          }
+        }
+        return loadLiquidCommand
+      })
+      return [...commands, ...acc]
+
+    }, [])
+  }
+
   const migratedV5Commands = migrateCommands(commands)
 
   const liquids: ProtocolFile['liquids'] =
     appData.designerApplication?.data?.ingredients != null
       ? reduce(
-          appData.designerApplication?.data?.ingredients,
-          (acc, liquidData, liquidId) => {
-            return {
-              ...acc,
-              [liquidId]: {
-                displayName: liquidData.name,
-                description: liquidData.description,
-              },
-            }
-          },
-          {}
-        )
+        appData.designerApplication?.data?.ingredients,
+        (acc, liquidData, liquidId) => {
+          return {
+            ...acc,
+            [liquidId]: {
+              displayName: liquidData.name,
+              description: liquidData.description,
+            },
+          }
+        },
+        {}
+      )
       : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        ({} as ProtocolFile['liquids'])
+      ({} as ProtocolFile['liquids'])
 
   return {
     ...appData,
@@ -168,7 +229,7 @@ export const migrateFile = (
     modules: migrateModules(appData.modules),
     liquids,
     commands: [
-      // TODO: generate load liquid commands https://github.com/Opentrons/opentrons/issues/9702
+      ...loadLiquidCommands,
       ...loadPipetteCommands,
       ...loadModuleCommands,
       ...loadLabwareCommands,

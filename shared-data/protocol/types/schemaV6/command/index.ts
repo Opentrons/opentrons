@@ -18,7 +18,7 @@ import type {
 
 export type CommandStatus = 'queued' | 'running' | 'succeeded' | 'failed'
 export interface CommonCommandRunTimeInfo {
-  key: string
+  key?: string
   id: string
   status: CommandStatus
   error: string | null

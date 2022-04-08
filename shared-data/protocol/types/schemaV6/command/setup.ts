@@ -1,51 +1,52 @@
-import {
+import type {
   CommonCommandRunTimeInfo,
+  CommonCommandCreateInfo,
   LabwareDefinition2,
   LabwareOffset,
   PipetteName,
   ModuleModel,
 } from '../../../../js'
 
-export interface LoadPipetteCreateCommand {
+export interface LoadPipetteCreateCommand extends CommonCommandCreateInfo {
   commandType: 'loadPipette'
   params: LoadPipetteParams
 }
 export interface LoadPipetteRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    Omit<LoadPipetteCreateCommand, 'params'> {
+  Omit<LoadPipetteCreateCommand, 'params'> {
   params: LoadPipetteParams & {
     pipetteName: PipetteName
   }
   result: LoadPipetteResult
 }
-export interface LoadLabwareCreateCommand {
+export interface LoadLabwareCreateCommand extends CommonCommandCreateInfo {
   commandType: 'loadLabware'
   params: LoadLabwareParams
 }
 export interface LoadLabwareRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    LoadLabwareCreateCommand {
+  LoadLabwareCreateCommand {
   result: LoadLabwareResult
 }
-export interface LoadModuleCreateCommand {
+export interface LoadModuleCreateCommand extends CommonCommandCreateInfo {
   commandType: 'loadModule'
   params: LoadModuleParams
 }
 export interface LoadModuleRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    Omit<LoadModuleCreateCommand, 'params'> {
+  Omit<LoadModuleCreateCommand, 'params'> {
   params: LoadModuleParams & {
     model: ModuleModel
   }
   result: LoadModuleResult
 }
-export interface LoadLiquidCreateCommand {
+export interface LoadLiquidCreateCommand extends CommonCommandCreateInfo {
   commandType: 'loadLiquid'
   params: LoadLiquidParams
 }
 export interface LoadLiquidRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    LoadLiquidCreateCommand {
+  LoadLiquidCreateCommand {
   result: LoadLiquidResult
 }
 
