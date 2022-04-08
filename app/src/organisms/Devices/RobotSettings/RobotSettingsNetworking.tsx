@@ -24,7 +24,7 @@ import {
   postWifiDisconnect,
 } from '../../../redux/networking'
 import * as RobotApi from '../../../redux/robot-api'
-import { NetworkingSlideout } from './NetworkingSlideout'
+import { NetworkingSlideout } from './ConnectNetwork/NetworkingSlideout'
 
 import type { State, Dispatch } from '../../../redux/types'
 interface NetworkingProps {
