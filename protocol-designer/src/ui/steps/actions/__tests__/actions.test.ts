@@ -4,11 +4,19 @@ import thunk from 'redux-thunk'
 import { when, resetAllWhenMocks } from 'jest-when'
 import * as utils from '../../../../utils'
 import * as stepFormSelectors from '../../../../step-forms/selectors'
+import { getRobotStateTimeline } from '../../../../file-data/selectors'
 import { getMultiSelectLastSelected } from '../../selectors'
 import { selectStep, selectAllSteps, deselectAllSteps } from '../actions'
-import { duplicateStep, duplicateMultipleSteps } from '../thunks'
+import {
+  duplicateStep,
+  duplicateMultipleSteps,
+  saveHeaterShakerFormWithAddedPauseUntilTemp,
+} from '../thunks'
+
 jest.mock('../../../../step-forms/selectors')
 jest.mock('../../selectors')
+jest.mock('../../../../file-data/selectors')
+
 const mockStore = configureMockStore([thunk])
 const mockGetSavedStepForms = stepFormSelectors.getSavedStepForms as jest.MockedFunction<
   typeof stepFormSelectors.getSavedStepForms
@@ -18,6 +26,16 @@ const mockGetOrderedStepIds = stepFormSelectors.getOrderedStepIds as jest.Mocked
 >
 const mockGetMultiSelectLastSelected = getMultiSelectLastSelected as jest.MockedFunction<
   typeof getMultiSelectLastSelected
+>
+
+const mockGetUnsavedForm = stepFormSelectors.getUnsavedForm as jest.MockedFunction<
+  typeof stepFormSelectors.getUnsavedForm
+>
+const mockGetUnsavedFormIsPristineHeaterShakerForm = stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm as jest.MockedFunction<
+  typeof stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm
+>
+const mockGetRobotStateTimeline = getRobotStateTimeline as jest.MockedFunction<
+  typeof getRobotStateTimeline
 >
 describe('steps actions', () => {
   describe('selectStep', () => {
@@ -254,6 +272,82 @@ describe('steps actions', () => {
         duplicateStepsAction,
         selectMultipleStepsAction,
       ])
+    })
+  })
+  describe('saveHeaterShakerFormWithAddedPauseUntilTemp', () => {
+    const mockRobotStateTimeline = {
+      commands: {
+        commandType: 'heaterShakerModule/awaitTemperature',
+      },
+    } as any
+
+    beforeEach(() => {
+      when(mockGetUnsavedForm)
+        .calledWith(expect.anything())
+        .mockReturnValue({
+          stepType: 'heaterShaker',
+          targetHeaterShakerTemperature: '10',
+        } as any)
+      mockGetUnsavedFormIsPristineHeaterShakerForm.mockReturnValue(true)
+      mockGetRobotStateTimeline.mockReturnValue(mockRobotStateTimeline)
+    })
+
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    it('should save heater shaker step with a pause until temp is reached', () => {
+      const HsStepWithPause = [
+        {
+          payload: {
+            stepType: 'heaterShaker',
+            targetHeaterShakerTemperature: '10',
+          },
+          type: 'SAVE_STEP_FORM',
+        },
+        {
+          meta: {
+            robotStateTimeline: {
+              commands: {
+                commandType: 'heaterShakerModule/awaitTemperature',
+              },
+            },
+          },
+          payload: {
+            id: '__presaved_step__',
+            stepType: 'pause',
+          },
+          type: 'ADD_STEP',
+        },
+        {
+          payload: {
+            update: {
+              pauseAction: 'untilTemperature',
+            },
+          },
+          type: 'CHANGE_FORM_INPUT',
+        },
+        {
+          payload: {
+            update: {
+              pauseTemperature: '10',
+            },
+          },
+          type: 'CHANGE_FORM_INPUT',
+        },
+        {
+          payload: {
+            stepType: 'heaterShaker',
+            targetHeaterShakerTemperature: '10',
+          },
+          type: 'SAVE_STEP_FORM',
+        },
+      ]
+
+      const store: any = mockStore()
+      store.dispatch(saveHeaterShakerFormWithAddedPauseUntilTemp())
+
+      expect(store.getActions()).toEqual(HsStepWithPause)
     })
   })
 })
