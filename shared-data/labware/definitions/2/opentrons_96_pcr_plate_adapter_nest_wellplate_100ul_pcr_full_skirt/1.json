@@ -128,7 +128,7 @@
     },
     "metadata": {
         "displayName": "Opentrons 96 PCR Plate Adapter with Nest Well Plate 100uL PCR Full Skirt",
-        "displayCategory": "heaterShakerAdapter",
+        "displayCategory": "aluminumBlock",
         "displayVolumeUnits": "µL",
         "tags": []
     },
