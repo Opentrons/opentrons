@@ -1,4 +1,4 @@
-from opentrons import types
+from opentrons import protocol_api, types
 
 metadata = {
     "protocolName": "Test Simulate",
@@ -9,7 +9,7 @@ metadata = {
 }
 
 
-def run(ctx):
+def run(ctx: protocol_api.ProtocolContext) -> None:
     ctx.comment(str(ctx.api_version))
     ctx.home()
     tr = ctx.load_labware("opentrons_96_tiprack_300ul", 1)

@@ -1,7 +1,7 @@
 # Uncomment to enable logging during tests
 # import logging
 # from logging.config import dictConfig
-from typing import AsyncIterator
+from typing import AsyncIterator, Callable, Generator, cast
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
@@ -47,19 +47,19 @@ def asyncio_loop_exception_handler(loop):
 
 
 @pytest.fixture
-def ot_config_tempdir(tmpdir):
-    os.environ["OT_API_CONFIG_DIR"] = str(tmpdir)
+def ot_config_tempdir(tmp_path: pathlib.Path) -> Generator[pathlib.Path, None, None]:
+    os.environ["OT_API_CONFIG_DIR"] = str(tmp_path)
     config.reload()
 
-    yield tmpdir
+    yield tmp_path
 
     del os.environ["OT_API_CONFIG_DIR"]
     config.reload()
 
 
 @pytest.fixture
-def labware_offset_tempdir(ot_config_tempdir):
-    yield config.get_opentrons_path("labware_calibration_offsets_dir_v2")
+def labware_offset_tempdir(ot_config_tempdir) -> pathlib.Path:
+    return config.get_opentrons_path("labware_calibration_offsets_dir_v2")
 
 
 @pytest.fixture(autouse=True)
@@ -304,8 +304,8 @@ async def hardware_api(loop, is_robot):
 
 
 @pytest.fixture
-def get_labware_fixture():
-    def _get_labware_fixture(fixture_name):
+def get_labware_fixture() -> Callable[[str], LabwareDefinition]:
+    def _get_labware_fixture(fixture_name: str) -> LabwareDefinition:
         with open(
             (
                 pathlib.Path(__file__).parent
@@ -320,7 +320,7 @@ def get_labware_fixture():
             ),
             "rb",
         ) as f:
-            return json.loads(f.read().decode("utf-8"))
+            return cast(LabwareDefinition, json.loads(f.read().decode("utf-8")))
 
     return _get_labware_fixture
 

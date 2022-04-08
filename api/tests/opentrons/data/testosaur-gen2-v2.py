@@ -1,4 +1,4 @@
-from opentrons import types
+from opentrons import protocol_api, types
 
 metadata = {
     "protocolName": "Testosaur",
@@ -9,7 +9,7 @@ metadata = {
 }
 
 
-def run(ctx):
+def run(ctx: protocol_api.ProtocolContext) -> None:
     ctx.home()
     tr = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
     right = ctx.load_instrument("p300_single_gen2", types.Mount.RIGHT, [tr])
