@@ -48,7 +48,7 @@ import { TestShakeSlideout } from './TestShakeSlideout'
 
 import magneticModule from '../../../assets/images/magnetic_module_gen_2_transparent.svg'
 import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparent.svg'
-import thermoModule from '../../../assets/images/thermocycler_open_transparent.svg'
+import thermoModule from '../../../assets/images/thermocycler_closed.svg'
 import heaterShakerModule from '../../../assets/images/heatershaker_module_transparent.svg'
 
 import type {

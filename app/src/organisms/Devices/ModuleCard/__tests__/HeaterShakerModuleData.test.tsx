@@ -89,6 +89,147 @@ describe('HeaterShakerModuleData', () => {
     )
   })
 
+  it('renders an idle shaking status', () => {
+    props = {
+      heaterStatus: 'idle',
+      shakerStatus: 'idle',
+      latchStatus: 'idle_unknown',
+      targetTemp: null,
+      currentTemp: null,
+      targetSpeed: null,
+      currentSpeed: 0,
+    }
+    const { getByText } = render(props)
+    getByText('Target: N/A')
+    getByText('Current: 0 RPM')
+    expect(getByText('Mock StatusLabel')).toHaveStyle(
+      'backgroundColor: COLORS.medGrey'
+    )
+  })
+
+  it('renders an error shaking status', () => {
+    props = {
+      heaterStatus: 'idle',
+      shakerStatus: 'error',
+      latchStatus: 'idle_unknown',
+      targetTemp: null,
+      currentTemp: null,
+      targetSpeed: 200,
+      currentSpeed: 200,
+    }
+    const { getByText } = render(props)
+    getByText('Target: 200 RPM')
+    getByText('Current: 200 RPM')
+    expect(getByText('Mock StatusLabel')).toHaveStyle(
+      'backgroundColor: COLORS.warningBg'
+    )
+  })
+
+  it('renders an idle temp status', () => {
+    props = {
+      heaterStatus: 'idle',
+      shakerStatus: 'idle',
+      latchStatus: 'idle_unknown',
+      targetTemp: null,
+      currentTemp: null,
+      targetSpeed: null,
+      currentSpeed: 0,
+    }
+    const { getByText } = render(props)
+    getByText('Target: N/A')
+    getByText('Current: 0 RPM')
+    expect(getByText('Mock StatusLabel')).toHaveStyle(
+      'backgroundColor: COLORS.medGrey'
+    )
+  })
+
+  it('renders a cooling temp status', () => {
+    props = {
+      heaterStatus: 'cooling',
+      shakerStatus: 'idle',
+      latchStatus: 'idle_unknown',
+      targetTemp: 42,
+      currentTemp: 60,
+      targetSpeed: null,
+      currentSpeed: null,
+    }
+    const { getByText } = render(props)
+    expect(getByText('Mock StatusLabel')).toHaveStyle(
+      'backgroundColor: COLORS.blue'
+    )
+  })
+
+  it('renders a correct text when latch is opened', () => {
+    props = {
+      heaterStatus: 'cooling',
+      shakerStatus: 'idle',
+      latchStatus: 'idle_open',
+      targetTemp: 42,
+      currentTemp: 60,
+      targetSpeed: null,
+      currentSpeed: null,
+    }
+    const { getByText } = render(props)
+    getByText('open')
+  })
+
+  it('renders a correct text when latch is opening', () => {
+    props = {
+      heaterStatus: 'cooling',
+      shakerStatus: 'idle',
+      latchStatus: 'opening',
+      targetTemp: 42,
+      currentTemp: 60,
+      targetSpeed: null,
+      currentSpeed: null,
+    }
+    const { getByText } = render(props)
+    getByText('open')
+  })
+
+  it('renders a correct text when latch is unknown', () => {
+    props = {
+      heaterStatus: 'cooling',
+      shakerStatus: 'idle',
+      latchStatus: 'idle_unknown',
+      targetTemp: 42,
+      currentTemp: 60,
+      targetSpeed: null,
+      currentSpeed: null,
+    }
+    const { getByText } = render(props)
+    getByText('open')
+  })
+
+  it('renders a correct text when latch is closing and is not shaking', () => {
+    props = {
+      heaterStatus: 'cooling',
+      shakerStatus: 'idle',
+      latchStatus: 'closing',
+      targetTemp: 42,
+      currentTemp: 60,
+      targetSpeed: null,
+      currentSpeed: null,
+    }
+    const { getByText } = render(props)
+    getByText('Closed')
+  })
+
+  it('renders a correct text when latch is closing and is shaking', () => {
+    props = {
+      heaterStatus: 'cooling',
+      shakerStatus: 'speeding up',
+      latchStatus: 'closing',
+      targetTemp: 42,
+      currentTemp: 60,
+      targetSpeed: 500,
+      currentSpeed: 200,
+    }
+    const { getByText, getByTestId } = render(props)
+    getByText('Closed and Locked')
+    getByTestId('HeaterShakerModuleData_latch_lock')
+  })
+
   it('renders correct information when status is idle', () => {
     const { getByText } = render(props)
     getByText('Target: N/A')
