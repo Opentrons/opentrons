@@ -11,19 +11,25 @@ import {
   SPACING,
   Box,
   RobotWorkSpace,
-  C_SELECTED_DARK,
+  Module,
 } from '@opentrons/components'
+import {
+  getModuleDef2,
+  inferModuleOrientationFromXCoordinate,
+} from '@opentrons/shared-data'
 import attachHeaterShakerModule from '../../../assets/images/heater_shaker_module_diagram.svg'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import screwdriverOrientedLeft from '../../../assets/images/screwdriver_oriented_left.svg'
-
+import { ModuleRenderInfoForProtocol } from '../hooks'
 interface AttachModuleProps {
-  slotName?: string
+  moduleFromProtocol: ModuleRenderInfoForProtocol | undefined
 }
 
 export function AttachModule(props: AttachModuleProps): JSX.Element {
-  const { slotName } = props
+  const { moduleFromProtocol } = props
   const { t } = useTranslation('heater_shaker')
+
+  const moduleDef = getModuleDef2('heaterShakerModuleV1')
   const DECK_MAP_VIEWBOX = '-80 -20 550 460'
   const DECK_LAYER_BLOCKLIST = [
     'calibrationMarkings',
@@ -91,26 +97,23 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
             padding={SPACING.spacing3}
             data-testid={'HeaterShakerWizard_deckMap'}
           >
-            {/* TODO(sh, 2022-02-18): Dynamically render the heater shaker module in the correct slot number. */}
-            {slotName != null ? (
+            {moduleFromProtocol != null ? (
               <RobotWorkSpace
                 deckDef={standardDeckDef as any}
                 viewBox={DECK_MAP_VIEWBOX}
                 deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-                id={'HeaterShakerWizard_deckMap'}
+                id={'HeaterShakerWizard_AttachModule_deckMap'}
               >
                 {() => (
-                  <>
-                    <g>
-                      <rect
-                        width={127.75 - 2}
-                        height={85.5 - 2}
-                        fill={'none'}
-                        stroke={C_SELECTED_DARK}
-                        strokeWidth={'3px'}
-                      />
-                    </g>
-                  </>
+                  <React.Fragment key={`AttachModule_${moduleDef.model}`}>
+                    <Module
+                      x={moduleFromProtocol.x}
+                      y={moduleFromProtocol.y}
+                      orientation={inferModuleOrientationFromXCoordinate(0)}
+                      def={moduleDef}
+                      data-testid={`AttachModule_${moduleDef.model}`}
+                    />
+                  </React.Fragment>
                 )}
               </RobotWorkSpace>
             ) : (
@@ -118,7 +121,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                 deckDef={standardDeckDef as any}
                 viewBox={DECK_MAP_VIEWBOX}
                 deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-                id={'HeaterShakerWizard_deckMap'}
+                id={'HeaterShakerWizard_AttachModule_deckMap'}
               ></RobotWorkSpace>
             )}
           </Box>
@@ -144,11 +147,11 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
             <Trans
               t={t}
               i18nKey={
-                slotName != null
+                moduleFromProtocol != null
                   ? 'place_the_module_slot_number'
                   : 'place_the_module_slot'
               }
-              values={{ slot: slotName }}
+              values={{ slot: moduleFromProtocol?.slotName }}
               components={{
                 bold: <strong />,
                 block: (

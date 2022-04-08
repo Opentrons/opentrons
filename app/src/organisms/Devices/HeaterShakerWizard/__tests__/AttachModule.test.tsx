@@ -10,14 +10,20 @@ const render = (props: React.ComponentProps<typeof AttachModule>) => {
 }
 
 describe('AttachModule', () => {
+  let props: React.ComponentProps<typeof AttachModule>
+  beforeEach(() => {
+    props = {
+      hasProtocol: false,
+    }
+  })
   it('renders the correct title', () => {
-    const { getByText } = render({})
+    const { getByText } = render(props)
 
     getByText('Step 1 of 4: Attach module to deck')
   })
 
   it('renders the content and images correctly', () => {
-    const { getByText, getByAltText, getByTestId } = render({})
+    const { getByText, getByAltText, getByTestId } = render(props)
 
     getByText(
       nestedTextMatcher(
@@ -54,8 +60,8 @@ describe('AttachModule', () => {
     getByTestId('HeaterShakerWizard_deckMap')
   })
 
-  it('renders the correct slot number when a slot is provided', () => {
-    const { getByText } = render({ slotName: '1' })
+  it('renders the correct slot number when a protocol with a heater shaker is provided', () => {
+    const { getByText } = render(props)
 
     getByText(nestedTextMatcher('Place the module in Slot 1.'))
   })

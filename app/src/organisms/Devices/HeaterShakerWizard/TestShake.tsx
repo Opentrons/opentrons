@@ -17,10 +17,8 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { RPM, HS_RPM_MAX, HS_RPM_MIN } from '@opentrons/shared-data'
-import {
-  useHeaterShakerFromProtocol,
-  useLatchCommand,
-} from '../ModuleCard/hooks'
+import { useLatchCommand } from '../ModuleCard/hooks'
+import { ModuleRenderInfoForProtocol } from '../hooks'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 import { TertiaryButton } from '../../../atoms/Buttons'
 import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'
@@ -36,14 +34,13 @@ import type {
 interface TestShakeProps {
   module: HeaterShakerModule
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
-  hasProtocol: boolean | undefined
+  moduleFromProtocol: ModuleRenderInfoForProtocol | undefined
 }
 
 export function TestShake(props: TestShakeProps): JSX.Element {
-  const { module, setCurrentPage, hasProtocol } = props
+  const { module, setCurrentPage, moduleFromProtocol } = props
   const { t } = useTranslation(['heater_shaker', 'device_details'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const heaterShakerFromProtocol = useHeaterShakerFromProtocol()
   const [isExpanded, setExpanded] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -121,12 +118,12 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             <Trans
               t={t}
               i18nKey={
-                hasProtocol && heaterShakerFromProtocol !== null
+                moduleFromProtocol != null
                   ? 'test_shake_banner_labware_information'
                   : 'test_shake_banner_information'
               }
               values={{
-                labware: heaterShakerFromProtocol?.nestedLabwareDisplayName,
+                labware: moduleFromProtocol?.nestedLabwareDisplayName,
               }}
               components={{
                 bold: <strong />,

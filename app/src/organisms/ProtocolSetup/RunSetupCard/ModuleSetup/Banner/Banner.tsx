@@ -16,14 +16,11 @@ import {
 
 interface BannerProps {
   title: string
-  subtitle?: string
-  body: string
-  btnText: string
-  onClick: () => void
+  children?: React.ReactNode
 }
 
 export function Banner(props: BannerProps): JSX.Element | null {
-  const { title, subtitle, body, btnText, onClick } = props
+  const { title, children } = props
 
   return (
     <React.Fragment>
@@ -52,39 +49,8 @@ export function Banner(props: BannerProps): JSX.Element | null {
               {title}
             </Text>
           </Flex>
-          {subtitle !== null && (
-            <Text
-              fontSize={TYPOGRAPHY.fontSizeP}
-              color={COLORS.darkBlack}
-              paddingTop={SPACING.spacing4}
-            >
-              {subtitle}
-            </Text>
-          )}
-          <Text
-            paddingTop={subtitle === null ? SPACING.spacingM : SPACING.spacing2}
-            color={COLORS.darkGrey}
-            fontSize={TYPOGRAPHY.fontSizeP}
-            data-testid={`banner_body_${title}`}
-          >
-            {body}
-          </Text>
+          {children}
         </Flex>
-
-        {/* TODO immediately: use NewPrimaryBtn when sarah's pr is merged */}
-        <PrimaryBtn
-          marginTop={'2.75rem'}
-          backgroundColor={COLORS.blue}
-          borderRadius={SPACING.spacingM}
-          textTransform={TEXT_TRANSFORM_NONE}
-          css={TYPOGRAPHY.labelRegular}
-          alignItems={ALIGN_CENTER}
-          marginRight={SPACING.spacing3}
-          data-testid={`banner_open_wizard_btn`}
-          onClick={onClick}
-        >
-          {btnText}
-        </PrimaryBtn>
       </Flex>
     </React.Fragment>
   )

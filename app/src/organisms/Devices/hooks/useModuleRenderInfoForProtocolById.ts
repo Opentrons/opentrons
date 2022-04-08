@@ -7,7 +7,7 @@ import { useAttachedModules, useProtocolDetailsForRun } from '.'
 import type { ProtocolModuleInfo } from '../../../organisms/ProtocolSetup/utils/getProtocolModulesInfo'
 import type { AttachedModule } from '../../../redux/modules/types'
 
-interface ModuleRenderInfoForProtocol extends ProtocolModuleInfo {
+export interface ModuleRenderInfoForProtocol extends ProtocolModuleInfo {
   attachedModuleMatch: AttachedModule | null
 }
 
