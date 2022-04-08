@@ -154,11 +154,6 @@ class RunStore:
         Returns:
             The retrieved run entry from the db.
         """
-        run: RunResource = {}
-        # statement = sqlalchemy.select(run_table, action_runs_table).join(action_runs_table,
-        #                                                                  isouter=True).where(
-        #     run_table.c.id == run_id
-        # )
         statement = sqlalchemy.select(run_table).where(run_table.c.id == run_id)
         try:
             with self._sql_engine.begin() as transaction:
