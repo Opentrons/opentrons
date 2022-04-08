@@ -4506,7 +4506,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 def create_temp_protocol(
     protocol_extension: Literal[".py", ".json"], protocol_contents: str
 ) -> IO[bytes]:
-    """Create an temporary protocol file."""
+    """Create a temporary protocol file."""
     file = tempfile.NamedTemporaryFile(suffix=protocol_extension)
     file_contents = protocol_contents
     file.write(str.encode(file_contents))
@@ -4520,5 +4520,5 @@ def get_json_protocol(protocol_name: str) -> IO[bytes]:
 
 
 def get_py_protocol(protocol_name: str) -> IO[bytes]:
-    """A NamedTemporaryFile valid json protocol."""
+    """A NamedTemporaryFile valid python protocol."""
     return create_temp_protocol(".py", protocol_python(protocol_name))

@@ -12,6 +12,8 @@ from tests.integration.protocol_files import get_py_protocol, get_json_protocol
 @pytest.mark.parametrize("protocol", [(get_py_protocol), (get_json_protocol)])
 def test_protocols_persist(protocol: Callable[[str], IO[bytes]]) -> None:
     """Test that json and python protocols are persisted through dev server restart."""
+    # Creating on a non-standard port so no side effects 
+    # if the server is not shutdown properly.
     port = "15555"
     server = DevServer(port=port)
     robot = HttpRobot(host="http://localhost", port=port)
@@ -21,7 +23,7 @@ def test_protocols_persist(protocol: Callable[[str], IO[bytes]]) -> None:
     assert robot.wait_until_alive(6), "Dev Robot never became available."
     protocols_to_create = 13
     for _ in range(protocols_to_create):
-        file = protocol(secrets.token_urlsafe(16))
+        file = protocol(protocol_name=secrets.token_urlsafe(16))
         robot.post_protocol([Path(file.name)])
         file.close()
     server.stop()

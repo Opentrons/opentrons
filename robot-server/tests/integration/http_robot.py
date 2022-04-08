@@ -63,6 +63,6 @@ class HttpRobot:
         return self.session.post(endpoint, files=file_payload)
 
     def delete_run(self, run_id: str) -> Response:
-        """DELETE /runs/{id}."""
+        """DELETE /runs/{run_id}."""
         endpoint = f"{self.base_url}/runs/{run_id}"
         return self.session.delete(endpoint)
