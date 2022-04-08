@@ -3,7 +3,7 @@ import last from 'lodash/last'
 import {
   getUnsavedForm,
   getUnsavedFormIsPristineSetTempForm,
-  getUnsavedFormIsPrestineSetHeaterShakerTempForm,
+  getUnsavedFormIsPristineHeaterShakerForm,
   getOrderedStepIds,
 } from '../../../../step-forms/selectors'
 import { changeFormInput } from '../../../../steplist/actions/actions'
@@ -260,13 +260,13 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
   }
 }
 
-export const saveSetTempFormWithAddedPauseUntilHeaterShakerTemp: () => ThunkAction<any> = () => (
+export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any> = () => (
   dispatch,
   getState
 ) => {
   const initialState = getState()
   const unsavedSetHeaterShakerTemperatureForm = getUnsavedForm(initialState)
-  const isPristineSetHeaterShakerTempForm = getUnsavedFormIsPrestineSetHeaterShakerTempForm(
+  const isPristineSetHeaterShakerTempForm = getUnsavedFormIsPristineHeaterShakerForm(
     initialState
   )
 

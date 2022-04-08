@@ -645,7 +645,7 @@ export const getUnsavedFormIsPristineSetTempForm: Selector<
   }
 )
 
-export const getUnsavedFormIsPrestineSetHeaterShakerTempForm: Selector<
+export const getUnsavedFormIsPristineHeaterShakerForm: Selector<
   BaseState,
   boolean
 > = createSelector(
