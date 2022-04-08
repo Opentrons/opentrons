@@ -29,7 +29,7 @@ The design goal of this API is to make code readable and easy to understand. A p
 1. Tells Python to load the Opentrons Protocol API.
 2. Provides some information about who made the protocol and what it is for.
 3. Tells the robot where to find labware, pipettes, and (optionally) hardware modules.
-4. Gives commands to the robot to manipulate its attached hardware.
+4. Commands the robot to manipulate its attached hardware.
 
 For example, if we wanted to have the OT-2 transfer liquid from well A1 to well B1 on a plate, our protocol would look like:
 	
