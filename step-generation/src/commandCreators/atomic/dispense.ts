@@ -2,6 +2,7 @@ import * as errorCreators from '../../errorCreators'
 import {
   modulePipetteCollision,
   thermocyclerPipetteCollision,
+  pipetteIntoHeaterShakerLatchOpen,
 } from '../../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { DispenseParams } from '@opentrons/shared-data/protocol/types/schemaV3'
@@ -56,6 +57,16 @@ export const dispense: CommandCreator<DispenseParams> = (
     )
   ) {
     errors.push(errorCreators.thermocyclerLidClosed())
+  }
+
+  if (
+    pipetteIntoHeaterShakerLatchOpen(
+      prevRobotState.modules,
+      prevRobotState.labware,
+      labware
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerLatchOpen())
   }
 
   if (errors.length > 0) {

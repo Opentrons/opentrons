@@ -473,6 +473,7 @@ export type ErrorType =
   | 'MISSING_TEMPERATURE_STEP'
   | 'THERMOCYCLER_LID_CLOSED'
   | 'INVALID_SLOT'
+  | 'HEATER_SHAKER_LATCH_OPEN'
 
 export interface CommandCreatorError {
   message: string
