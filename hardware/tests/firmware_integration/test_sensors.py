@@ -26,36 +26,51 @@ from opentrons_hardware.firmware_bindings.utils import (
 )
 
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
-
+from opentrons_hardware.sensors.utils import SensorDataType
 
 @pytest.mark.parametrize(
-    argnames=["sensor_type", "register", "data_to_write"],
+    argnames=["sensor_type"],
     argvalues=[
-        [SensorType.capacitive, 0x01, 0x5],
-        [SensorType.humidity, 0x02, 0x10],
-        [SensorType.temperature, 0x00, 0x4],
+        [SensorType.capacitive],
+        [SensorType.humidity],
+        [SensorType.temperature],
     ],
 )
 @pytest.mark.requires_emulator
-async def test_read_and_write_from_sensors(
+# @pytest.mark.skip("need to refactor sensor write command")
+async def test_write_to_sensors(
+    can_messenger: CanMessenger,
+    can_messenger_queue: WaitableCallback,
+    sensor_type: SensorType,
+) -> None:
+    data_to_write = UInt32Field(200)
+    write_message = WriteToSensorRequest(
+        payload=WriteToSensorRequestPayload(
+            sensor=SensorTypeField(sensor_type),
+            data=data_to_write,
+        )
+    )
+    await can_messenger.send(node_id=NodeId.pipette_left, message=write_message)
+
+
+
+@pytest.mark.parametrize(
+    argnames=["sensor_type", "expected_data"],
+    argvalues=[
+        [SensorType.capacitive, 22400.12],
+        [SensorType.humidity, 83.92],
+        [SensorType.temperature, 22.44],
+        [SensorType.pressure, 2941.99],
+    ],
+)
+@pytest.mark.requires_emulator
+async def test_read_from_sensors(
     loop: asyncio.BaseEventLoop,
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     sensor_type: SensorType,
-    register: int,
-    data_to_write: int,
+    expected_data: float,
 ) -> None:
-    """We should be able to read and write from sensors."""
-    format_for_write = (register << 24) | (0x1 << 16) | data_to_write
-    print(format_for_write)
-    write_message = WriteToSensorRequest(
-        payload=WriteToSensorRequestPayload(
-            sensor=SensorTypeField(sensor_type),
-            data=UInt32Field(data_to_write),
-        )
-    )
-    print(write_message)
-    await can_messenger.send(node_id=NodeId.pipette_left, message=write_message)
 
     read_message = ReadFromSensorRequest(
         payload=ReadFromSensorRequestPayload(
@@ -65,14 +80,18 @@ async def test_read_and_write_from_sensors(
     )
 
     await can_messenger.send(node_id=NodeId.pipette_left, message=read_message)
-    response, _ = await asyncio.wait_for(can_messenger_queue.read(), 1)
+    response, _ = await asyncio.wait_for(can_messenger_queue.read(), 3)
 
     assert isinstance(response, ReadFromSensorResponse)
-    assert response.payload.sensor_data == Int32Field(data_to_write)
+    assert round(SensorDataType.build(response.payload.sensor_data).to_float(),2) == expected_data
+    # SensorDataType.build(response.payload.sensor_data)
 
 
 @pytest.mark.parametrize(
-    argnames=["sensor_type", "expected_value"], argvalues=[[SensorType.capacitive, 5]]
+    argnames=["sensor_type", "expected_value"],
+    argvalues=[[SensorType.capacitive, 22400.0],
+               [SensorType.pressure, 2941.99],
+               ]
 )
 @pytest.mark.requires_emulator
 async def test_baseline_poll_sensors(
@@ -80,7 +99,7 @@ async def test_baseline_poll_sensors(
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     sensor_type: SensorType,
-    expected_value: int,
+    expected_value: float,
 ) -> None:
     """We should be able to poll the pressure and capacitive sensor."""
     poll_sensor = BaselineSensorRequest(
@@ -101,14 +120,18 @@ async def test_baseline_poll_sensors(
             )
         ),
     )
+    # breakpoint()
 
-    response, _ = await asyncio.wait_for(can_messenger_queue.read(), 1)
+    response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
 
     assert isinstance(response, ReadFromSensorResponse)
-    assert response.payload.sensor_data.value == expected_value
+    assert round(SensorDataType.build(response.payload.sensor_data).to_float(),2) == expected_value
 
 
-@pytest.mark.parametrize(argnames=["sensor_type"], argvalues=[[SensorType.capacitive]])
+@pytest.mark.parametrize(argnames=["sensor_type"],
+                         argvalues=[[SensorType.capacitive],
+                                    [SensorType.pressure]
+                                    ])
 @pytest.mark.requires_emulator
 async def test_set_threshold_sensors(
     loop: asyncio.BaseEventLoop,
@@ -124,9 +147,9 @@ async def test_set_threshold_sensors(
     )
     await can_messenger.send(node_id=NodeId.pipette_left, message=set_threshold)
 
-    response, _ = await asyncio.wait_for(can_messenger_queue.read(), 1)
+    response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
 
     assert isinstance(response, SensorThresholdResponse)
     expected_data = set_threshold.payload.threshold.value
 
-    assert response.payload.threshold.value == Int32Field(expected_data)
+    assert response.payload.threshold.value == expected_data

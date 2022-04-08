@@ -57,6 +57,7 @@ class SocketDriver(AbstractCanDriver):
         self._writer.write(data)
 
     async def read(self) -> CanMessage:
+        # breakpoint()
         """Read a message."""
         try:
             header = await self._reader.readexactly(self.header_length)
