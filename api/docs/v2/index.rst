@@ -43,19 +43,19 @@ For example, if we wanted to have the OT-2 transfer liquid from well A1 to well 
         'protocolName': 'My Protocol',
         'author': 'Name <opentrons@example.com>',
         'description': 'Simple protocol to get started using the OT-2',
-        'apiLevel': '|apiLevel|'
+        'apiLevel': '2.12'
     }
 
     # protocol run function
     def run(protocol: protocol_api.ProtocolContext):
 
         # labware
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '1')
-        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '2')
+        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', location='1')
+        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', location='2')
 
         # pipettes
         left_pipette = protocol.load_instrument(
-             'p300_single', 'left', tip_racks=[tiprack])
+             'p300_single', mount='left', tip_racks=[tiprack])
 
         # commands
         left_pipette.pick_up_tip()
