@@ -83,9 +83,9 @@ RESOLVED_LABWARE_OFFSETS = [
 
 async def test_create_run(
     decoy: Decoy,
-    task_runner: TaskRunner,
-    run_store: RunStore,
-    engine_store: EngineStore,
+    mock_task_runner: TaskRunner,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
@@ -112,7 +112,7 @@ async def test_create_run(
     )
 
     engine_state = decoy.mock(cls=StateView)
-    decoy.when(await engine_store.create(run_id=run_id)).then_return(engine_state)
+    decoy.when(await mock_engine_store.create(run_id=run_id)).then_return(engine_state)
 
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
@@ -127,9 +127,9 @@ async def test_create_run(
         request_body=RequestModel(
             data=RunCreate(labwareOffsets=LABWARE_OFFSET_REQUESTS)
         ),
-        run_store=run_store,
-        engine_store=engine_store,
-        task_runner=task_runner,
+        run_store=mock_run_store,
+        engine_store=mock_engine_store,
+        task_runner=mock_task_runner,
         run_id=run_id,
         created_at=run_created_at,
     )
@@ -140,18 +140,17 @@ async def test_create_run(
     decoy.verify(
         # It should have added each requested labware offset to the engine,
         # in the exact order they appear in the request.
-        *[engine_store.engine.add_labware_offset(r) for r in LABWARE_OFFSET_REQUESTS],
-        run_store.insert(run=expected_run),
+        *[mock_engine_store.engine.add_labware_offset(r) for r in LABWARE_OFFSET_REQUESTS],
+        mock_run_store.insert(run=expected_run),
     )
 
 
 async def test_create_protocol_run(
     decoy: Decoy,
-    run_view: RunView,
-    run_store: RunStore,
-    protocol_store: ProtocolStore,
-    engine_store: EngineStore,
-    task_runner: TaskRunner,
+    mock_run_store: RunStore,
+    mock_protocol_store: ProtocolStore,
+    mock_engine_store: EngineStore,
+    mock_task_runner: TaskRunner,
 ) -> None:
     """It should be able to create a protocol run."""
     run_created_at = datetime(year=2021, month=1, day=1)
@@ -188,12 +187,12 @@ async def test_create_protocol_run(
         labwareOffsets=RESOLVED_LABWARE_OFFSETS,
     )
 
-    decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(
+    decoy.when(mock_protocol_store.get(protocol_id="protocol-id")).then_return(
         protocol_resource
     )
 
     engine_state = decoy.mock(cls=StateView)
-    decoy.when(await engine_store.create(run_id="run-id")).then_return(engine_state)
+    decoy.when(await mock_engine_store.create(run_id="run-id")).then_return(engine_state)
 
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
@@ -211,10 +210,10 @@ async def test_create_protocol_run(
                 labwareOffsets=LABWARE_OFFSET_REQUESTS,
             )
         ),
-        run_store=run_store,
-        engine_store=engine_store,
-        protocol_store=protocol_store,
-        task_runner=task_runner,
+        run_store=mock_run_store,
+        engine_store=mock_engine_store,
+        protocol_store=mock_protocol_store,
+        task_runner=mock_task_runner,
         run_id="run-id",
         created_at=run_created_at,
     )
@@ -225,39 +224,39 @@ async def test_create_protocol_run(
     decoy.verify(
         # It should have added each requested labware offset to the engine,
         # in the exact order they appear in the request.
-        *[engine_store.engine.add_labware_offset(r) for r in LABWARE_OFFSET_REQUESTS],
-        engine_store.runner.load(protocol_resource.source),
-        run_store.insert(run=run),
+        *[mock_engine_store.engine.add_labware_offset(r) for r in LABWARE_OFFSET_REQUESTS],
+        mock_engine_store.runner.load(protocol_resource.source),
+        mock_run_store.insert(run=run),
     )
 
 
 async def test_create_protocol_run_bad_protocol_id(
     decoy: Decoy,
-    protocol_store: ProtocolStore,
+    mock_protocol_store: ProtocolStore,
 ) -> None:
     """It should 404 if a protocol for a run does not exist."""
     error = ProtocolNotFoundError("protocol-id")
 
-    decoy.when(protocol_store.get(protocol_id="protocol-id")).then_raise(error)
+    decoy.when(mock_protocol_store.get(protocol_id="protocol-id")).then_raise(error)
 
     with pytest.raises(ApiError) as exc_info:
         await create_run(
             request_body=RequestModel(data=RunCreate(protocolId="protocol-id")),
-            protocol_store=protocol_store,
+            protocol_store=mock_protocol_store,
         )
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "ProtocolNotFound"
 
 
-async def test_create_run_conflict(decoy: Decoy, engine_store: EngineStore) -> None:
+async def test_create_run_conflict(decoy: Decoy, mock_engine_store: EngineStore) -> None:
     """It should respond with a conflict error if multiple engines are created."""
-    decoy.when(await engine_store.create(run_id=matchers.Anything())).then_raise(
+    decoy.when(await mock_engine_store.create(run_id=matchers.Anything())).then_raise(
         EngineConflictError("oh no")
     )
 
     with pytest.raises(ApiError) as exc_info:
-        await create_run(request_body=None, engine_store=engine_store)
+        await create_run(request_body=None, engine_store=mock_engine_store)
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunAlreadyActive"
@@ -265,8 +264,8 @@ async def test_create_run_conflict(decoy: Decoy, engine_store: EngineStore) -> N
 
 async def test_get_run_data_from_url(
     decoy: Decoy,
-    run_store: RunStore,
-    engine_store: EngineStore,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
 ) -> None:
     """It should be able to get a run by ID."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -306,11 +305,11 @@ async def test_get_run_data_from_url(
         labwareOffsets=RESOLVED_LABWARE_OFFSETS,
     )
 
-    decoy.when(run_store.get(run_id="run-id")).then_return(run)
+    decoy.when(mock_run_store.get(run_id="run-id")).then_return(run)
 
     engine_state = decoy.mock(cls=StateView)
 
-    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
+    decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get_all_errors()).then_return([])
     decoy.when(engine_state.pipettes.get_all()).then_return([pipette])
     decoy.when(engine_state.labware.get_all()).then_return([labware])
@@ -323,8 +322,8 @@ async def test_get_run_data_from_url(
 
     result = await get_run_data_from_url(
         runId="run-id",
-        run_store=run_store,
-        engine_store=engine_store,
+        run_store=mock_run_store,
+        engine_store=mock_engine_store,
     )
 
     assert result == expected_response
@@ -332,8 +331,8 @@ async def test_get_run_data_from_url(
 
 async def test_get_run_with_errors(
     decoy: Decoy,
-    run_store: RunStore,
-    engine_store: EngineStore,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
 ) -> None:
     """It should be able to get a run by ID that has errors."""
     run = RunResource(
@@ -371,11 +370,11 @@ async def test_get_run_with_errors(
         labwareOffsets=[],
     )
 
-    decoy.when(run_store.get(run_id="run-id")).then_return(run)
+    decoy.when(mock_run_store.get(run_id="run-id")).then_return(run)
 
     engine_state = decoy.mock(cls=StateView)
 
-    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
+    decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get_all_errors()).then_return([error_1, error_2])
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
@@ -386,21 +385,21 @@ async def test_get_run_with_errors(
 
     result = await get_run_data_from_url(
         runId="run-id",
-        run_store=run_store,
-        engine_store=engine_store,
+        run_store=mock_run_store,
+        engine_store=mock_engine_store,
     )
 
     assert result == expected_response
 
 
-async def test_get_run_with_missing_id(decoy: Decoy, run_store: RunStore) -> None:
+async def test_get_run_with_missing_id(decoy: Decoy, mock_run_store: RunStore) -> None:
     """It should 404 if the run ID does not exist."""
     not_found_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(run_store.get(run_id="run-id")).then_raise(not_found_error)
+    decoy.when(mock_run_store.get(run_id="run-id")).then_raise(not_found_error)
 
     with pytest.raises(ApiError) as exc_info:
-        await get_run_data_from_url(runId="run-id", run_store=run_store)
+        await get_run_data_from_url(runId="run-id", run_store=mock_run_store)
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
@@ -427,11 +426,11 @@ async def test_get_run() -> None:
     assert result.status_code == 200
 
 
-async def test_get_runs_empty(decoy: Decoy, run_store: RunStore) -> None:
+async def test_get_runs_empty(decoy: Decoy, mock_run_store: RunStore) -> None:
     """It should return an empty collection response when no runs exist."""
-    decoy.when(run_store.get_all()).then_return([])
+    decoy.when(mock_run_store.get_all()).then_return([])
 
-    result = await get_runs(run_store=run_store)
+    result = await get_runs(run_store=mock_run_store)
 
     assert result.content.data == []
     assert result.content.links == AllRunsLinks(current=None)
@@ -441,8 +440,8 @@ async def test_get_runs_empty(decoy: Decoy, run_store: RunStore) -> None:
 
 async def test_get_runs_not_empty(
     decoy: Decoy,
-    run_store: RunStore,
-    engine_store: EngineStore,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
 ) -> None:
     """It should return a collection response when a run exists."""
     created_at_1 = datetime(year=2021, month=1, day=1)
@@ -480,13 +479,13 @@ async def test_get_runs_not_empty(
         current=True,
     )
 
-    decoy.when(run_store.get_all()).then_return([run_1, run_2])
+    decoy.when(mock_run_store.get_all()).then_return([run_1, run_2])
 
     engine_state_1 = decoy.mock(cls=StateView)
     engine_state_2 = decoy.mock(cls=StateView)
 
-    decoy.when(engine_store.get_state("unique-id-1")).then_return(engine_state_1)
-    decoy.when(engine_store.get_state("unique-id-2")).then_return(engine_state_2)
+    decoy.when(mock_engine_store.get_state("unique-id-1")).then_return(engine_state_1)
+    decoy.when(mock_engine_store.get_state("unique-id-2")).then_return(engine_state_2)
 
     decoy.when(engine_state_1.commands.get_status()).then_return(
         pe_types.EngineStatus.SUCCEEDED
@@ -496,7 +495,7 @@ async def test_get_runs_not_empty(
         pe_types.EngineStatus.IDLE
     )
 
-    result = await get_runs(run_store=run_store, engine_store=engine_store)
+    result = await get_runs(run_store=mock_run_store, engine_store=mock_engine_store)
 
     assert result.content.data == [response_1, response_2]
     assert result.content.links == AllRunsLinks(
@@ -508,19 +507,19 @@ async def test_get_runs_not_empty(
 
 async def test_delete_run_by_id(
     decoy: Decoy,
-    run_store: RunStore,
-    engine_store: EngineStore,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
 ) -> None:
     """It should be able to remove a run by ID."""
     result = await remove_run(
         runId="run-id",
-        run_store=run_store,
-        engine_store=engine_store,
+        run_store=mock_run_store,
+        engine_store=mock_engine_store,
     )
 
     decoy.verify(
-        await engine_store.clear(),
-        run_store.remove(run_id="run-id"),
+        await mock_engine_store.clear(),
+        mock_run_store.remove(run_id="run-id"),
     )
 
     assert result.content == SimpleEmptyBody()
@@ -529,19 +528,19 @@ async def test_delete_run_by_id(
 
 async def test_delete_run_with_bad_id(
     decoy: Decoy,
-    run_store: RunStore,
-    engine_store: EngineStore,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
 ) -> None:
     """It should 404 if the run ID does not exist."""
     key_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(run_store.remove(run_id="run-id")).then_raise(key_error)
+    decoy.when(mock_run_store.remove(run_id="run-id")).then_raise(key_error)
 
     with pytest.raises(ApiError) as exc_info:
         await remove_run(
             runId="run-id",
-            run_store=run_store,
-            engine_store=engine_store,
+            run_store=mock_run_store,
+            engine_store=mock_engine_store,
         )
 
     assert exc_info.value.status_code == 404
@@ -550,17 +549,17 @@ async def test_delete_run_with_bad_id(
 
 async def test_delete_active_run(
     decoy: Decoy,
-    engine_store: EngineStore,
-    run_store: RunStore,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
 ) -> None:
     """It should 409 if the run is not finished."""
-    decoy.when(await engine_store.clear()).then_raise(EngineConflictError("oh no"))
+    decoy.when(await mock_engine_store.clear()).then_raise(EngineConflictError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await remove_run(
             runId="run-id",
-            run_store=run_store,
-            engine_store=engine_store,
+            run_store=mock_run_store,
+            engine_store=mock_engine_store,
         )
 
     assert exc_info.value.status_code == 409
@@ -569,24 +568,24 @@ async def test_delete_active_run(
 
 async def test_delete_active_run_no_engine(
     decoy: Decoy,
-    engine_store: EngineStore,
-    run_store: RunStore,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
 ) -> None:
     """It should no-op if no engine is present."""
-    decoy.when(engine_store.get_state("run-id")).then_raise(EngineMissingError("oh no"))
+    decoy.when(mock_engine_store.get_state("run-id")).then_raise(EngineMissingError("oh no"))
 
     await remove_run(
         runId="run-id",
-        run_store=run_store,
-        engine_store=engine_store,
+        run_store=mock_run_store,
+        engine_store=mock_engine_store,
     )
 
 
 async def test_update_run_to_not_current(
     decoy: Decoy,
-    engine_store: EngineStore,
-    run_store: RunStore,
-    run_view: RunView,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
+    mock_run_view: RunView,
 ) -> None:
     """It should update a run to no longer be current."""
     run_resource = RunResource(
@@ -620,14 +619,14 @@ async def test_update_run_to_not_current(
 
     run_update = RunUpdate(current=False)
 
-    decoy.when(run_store.get(run_id="run-id")).then_return(run_resource)
+    decoy.when(mock_run_store.get(run_id="run-id")).then_return(run_resource)
 
-    decoy.when(run_view.with_update(run=run_resource, update=run_update)).then_return(
+    decoy.when(mock_run_view.with_update(run=run_resource, update=run_update)).then_return(
         updated_resource
     )
 
     engine_state = decoy.mock(cls=StateView)
-    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
+    decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get_all()).then_return([])
     decoy.when(engine_state.commands.get_all_errors()).then_return([])
     decoy.when(engine_state.pipettes.get_all()).then_return([])
@@ -640,25 +639,25 @@ async def test_update_run_to_not_current(
     result = await update_run(
         runId="run-id",
         request_body=RequestModel(data=run_update),
-        run_store=run_store,
-        run_view=run_view,
-        engine_store=engine_store,
+        run_store=mock_run_store,
+        run_view=mock_run_view,
+        engine_store=mock_engine_store,
     )
 
     assert result.content == SimpleBody(data=expected_response)
     assert result.status_code == 200
 
     decoy.verify(
-        await engine_store.clear(),
-        run_store.update(updated_resource),
+        await mock_engine_store.clear(),
+        mock_run_store.update(updated_resource),
     )
 
 
 async def test_update_current_to_current_noop(
     decoy: Decoy,
-    engine_store: EngineStore,
-    run_store: RunStore,
-    run_view: RunView,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
+    mock_run_view: RunView,
 ) -> None:
     """It should noop if updating the current run to current: true."""
     run_resource = RunResource(
@@ -684,14 +683,14 @@ async def test_update_current_to_current_noop(
 
     run_update = RunUpdate(current=True)
 
-    decoy.when(run_store.get(run_id="run-id")).then_return(run_resource)
+    decoy.when(mock_run_store.get(run_id="run-id")).then_return(run_resource)
 
-    decoy.when(run_view.with_update(run=run_resource, update=run_update)).then_return(
+    decoy.when(mock_run_view.with_update(run=run_resource, update=run_update)).then_return(
         run_resource
     )
 
     engine_state = decoy.mock(cls=StateView)
-    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
+    decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get_all()).then_return([])
     decoy.when(engine_state.commands.get_all_errors()).then_return([])
     decoy.when(engine_state.pipettes.get_all()).then_return([])
@@ -704,22 +703,22 @@ async def test_update_current_to_current_noop(
     result = await update_run(
         runId="run-id",
         request_body=RequestModel(data=run_update),
-        run_store=run_store,
-        run_view=run_view,
-        engine_store=engine_store,
+        run_store=mock_run_store,
+        run_view=mock_run_view,
+        engine_store=mock_engine_store,
     )
 
     assert result.content == SimpleBody(data=expected_response)
     assert result.status_code == 200
 
-    decoy.verify(run_store.update(run_resource), times=0)
-    decoy.verify(await engine_store.clear(), times=0)
+    decoy.verify(mock_run_store.update(run_resource), times=0)
+    decoy.verify(await mock_engine_store.clear(), times=0)
 
 
 async def test_update_to_current_conflict(
     decoy: Decoy,
-    engine_store: EngineStore,
-    run_store: RunStore,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
 ) -> None:
     """It should 409 if attempting to update a not current run."""
     run_resource = RunResource(
@@ -732,14 +731,14 @@ async def test_update_to_current_conflict(
 
     run_update = RunUpdate(current=True)
 
-    decoy.when(run_store.get(run_id="run-id")).then_return(run_resource)
+    decoy.when(mock_run_store.get(run_id="run-id")).then_return(run_resource)
 
     with pytest.raises(ApiError) as exc_info:
         await update_run(
             runId="run-id",
             request_body=RequestModel(data=run_update),
-            run_store=run_store,
-            engine_store=engine_store,
+            run_store=mock_run_store,
+            engine_store=mock_engine_store,
         )
 
     assert exc_info.value.status_code == 409
