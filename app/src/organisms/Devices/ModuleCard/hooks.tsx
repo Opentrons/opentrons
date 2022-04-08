@@ -9,7 +9,11 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import { getProtocolModulesInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { useProtocolDetailsForRun } from '../hooks'
 
 import type {
   HeaterShakerCloseLatchCreateCommand,
@@ -21,8 +25,24 @@ import type {
   TCDeactivateLidCreateCommand,
   TemperatureModuleDeactivateCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type { AttachedModule } from '../../../redux/modules/types'
 
+import type { AttachedModule } from '../../../redux/modules/types'
+import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
+
+export function useHeaterShakerFromProtocol(): ProtocolModuleInfo | null {
+  const currentRunId = useCurrentRunId()
+  const { protocolData } = useProtocolDetailsForRun(currentRunId)
+  if (protocolData == null) return null
+  const protocolModulesInfo = getProtocolModulesInfo(
+    protocolData,
+    standardDeckDef as any
+  )
+  const heaterShakerModule = protocolModulesInfo.find(
+    module => module.moduleDef.model === 'heaterShakerModuleV1'
+  )
+  if (heaterShakerModule == null) return null
+  return heaterShakerModule
+}
 interface LatchCommand {
   toggleLatch: () => void
   isLatchClosed: boolean

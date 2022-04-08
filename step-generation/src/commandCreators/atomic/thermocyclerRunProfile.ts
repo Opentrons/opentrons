@@ -9,9 +9,9 @@ export const thermocyclerRunProfile: CommandCreator<TCProfileParams> = (
   return {
     commands: [
       {
-        command: 'thermocycler/runProfile',
+        commandType: 'thermocycler/runProfile',
         params: {
-          module,
+          moduleId: module,
           profile,
           volume,
         },

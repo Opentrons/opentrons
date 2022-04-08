@@ -1,7 +1,9 @@
 import requests
+from box import Box
 from requests import Response
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MIN_SUPPORTED_VERSION
 from opentrons import __version__, config
+from opentrons_shared_data.module.dev_types import ModuleModel
 
 minimum_version = list(MIN_SUPPORTED_VERSION)
 maximum_version = list(MAX_SUPPORTED_VERSION)
@@ -42,3 +44,13 @@ def delete_all_runs(response: Response, host: str, port: str) -> None:
             f"Deleted run {run_id},"
             f" response status code = {delete_response.status_code}"
         )
+
+
+def get_module_id(response: Response, module_model: ModuleModel) -> Box:
+    """Get the first module id that matches module_model."""
+    modules = response.json()["data"]
+    # assuming dev robot does not have multiples of a module
+    id = next(
+        module["id"] for module in modules if module["moduleModel"] == module_model
+    )
+    return Box({f"{module_model}_id": id})

@@ -1,18 +1,11 @@
 """Tests for module state accessors in the protocol engine state store."""
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
-from decoy import Decoy
 
 from contextlib import nullcontext
-from typing import ContextManager, Dict, NamedTuple, Optional, Type, TypeVar, Union
+from typing import ContextManager, Dict, NamedTuple, Optional, Type, Union
 
 from opentrons_shared_data import load_shared_data
-from opentrons.hardware_control.modules import (
-    AbstractModule,
-    MagDeck,
-    TempDeck,
-    HeaterShaker,
-)
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -27,37 +20,31 @@ from opentrons.protocol_engine.state.modules import (
     HardwareModule,
 )
 
+from opentrons.protocol_engine.state.module_substates import (
+    HeaterShakerModuleSubState,
+    HeaterShakerModuleId,
+    MagneticModuleSubState,
+    MagneticModuleId,
+    TemperatureModuleSubState,
+    TemperatureModuleId,
+    ModuleSubStateType,
+)
+
 
 def make_module_view(
     slot_by_module_id: Optional[Dict[str, Optional[DeckSlotName]]] = None,
     hardware_by_module_id: Optional[Dict[str, HardwareModule]] = None,
+    substate_by_module_id: Optional[Dict[str, ModuleSubStateType]] = None,
     virtualize_modules: bool = False,
 ) -> ModuleView:
     """Get a module view test subject with the specified state."""
     state = ModuleState(
         slot_by_module_id=slot_by_module_id or {},
         hardware_by_module_id=hardware_by_module_id or {},
+        substate_by_module_id=substate_by_module_id or {},
     )
 
     return ModuleView(state=state, virtualize_modules=virtualize_modules)
-
-
-HardwareModuleT = TypeVar("HardwareModuleT", bound=AbstractModule)
-
-
-def make_hardware_module(
-    decoy: Decoy, type: Type[HardwareModuleT], serial_number: str
-) -> HardwareModuleT:
-    """Return a mock hardware module with the specified type and serial number.
-
-    Ideally, we wouldn't use mocks for this, since our subject uses these objects
-    as pure input data, and doesn't call anything behavioral on them.
-    But it's prohibitively difficult to instantiate these objects in tests otherwise.
-    """
-    hardware_module = decoy.mock(cls=type)
-    # "type: ignore" to override what's normally a read-only property.
-    decoy.when(hardware_module.device_info).then_return({"serial": serial_number})
-    return hardware_module
 
 
 def get_sample_parent_module_view(
@@ -69,6 +56,11 @@ def get_sample_parent_module_view(
     magdeck_def = ModuleDefinition.parse_raw(definition)
 
     return make_module_view(
+        slot_by_module_id={
+            "id-non-matching": DeckSlotName.SLOT_1,
+            matching_module_id: DeckSlotName.SLOT_2,
+            "id-another-non-matching": DeckSlotName.SLOT_3,
+        },
         hardware_by_module_id={
             "id-non-matching": HardwareModule(
                 serial_number="serial-non-matching",
@@ -83,32 +75,7 @@ def get_sample_parent_module_view(
                 definition=magdeck_def,
             ),
         },
-        slot_by_module_id={
-            "id-non-matching": DeckSlotName.SLOT_1,
-            matching_module_id: DeckSlotName.SLOT_2,
-            "id-another-non-matching": DeckSlotName.SLOT_3,
-        },
     )
-
-
-def get_attached_modules(
-    decoy: Decoy, matching_module_type: Type[HardwareModuleT]
-) -> Dict[str, AbstractModule]:
-    """Get a list of attached modules, including one "matching" module."""
-    matching = make_hardware_module(
-        decoy=decoy, type=matching_module_type, serial_number="serial-matching"
-    )
-    non_matching = make_hardware_module(
-        decoy=decoy, type=MagDeck, serial_number="serial-non-matching"
-    )
-    another_non_matching = make_hardware_module(
-        decoy=decoy, type=TempDeck, serial_number="serial-another-non-matching"
-    )
-    return {
-        "non_matching": non_matching,
-        "matching": matching,
-        "another_non_matching": another_non_matching,
-    }
 
 
 def test_initial_module_data_by_id() -> None:
@@ -215,17 +182,17 @@ def test_get_all_modules(
     ]
 
 
-def test_get_magnetic_module_view(
+def test_get_magnetic_module_substate(
     magdeck_v1_def: ModuleDefinition,
     magdeck_v2_def: ModuleDefinition,
-    tempdeck_v1_def: ModuleDefinition,
+    heater_shaker_v1_def: ModuleDefinition,
 ) -> None:
-    """It should return a view for the given Magnetic Module, if valid."""
+    """It should return a substate for the given Magnetic Module, if valid."""
     subject = make_module_view(
         slot_by_module_id={
             "magnetic-module-gen1-id": DeckSlotName.SLOT_1,
             "magnetic-module-gen2-id": DeckSlotName.SLOT_2,
-            "temperature-module-id": DeckSlotName.SLOT_3,
+            "heatshake-module-id": DeckSlotName.SLOT_3,
         },
         hardware_by_module_id={
             "magnetic-module-gen1-id": HardwareModule(
@@ -236,30 +203,150 @@ def test_get_magnetic_module_view(
                 serial_number="magnetic-module-gen2-serial",
                 definition=magdeck_v2_def,
             ),
-            "temperature-module-id": HardwareModule(
-                serial_number="temperature-module-serial",
-                definition=tempdeck_v1_def,
+            "heatshake-module-id": HardwareModule(
+                serial_number="heatshake-module-serial",
+                definition=heater_shaker_v1_def,
+            ),
+        },
+        substate_by_module_id={
+            "magnetic-module-gen1-id": MagneticModuleSubState(
+                module_id=MagneticModuleId("magnetic-module-gen1-id"),
+                model=ModuleModel.MAGNETIC_MODULE_V1,
+            ),
+            "magnetic-module-gen2-id": MagneticModuleSubState(
+                module_id=MagneticModuleId("magnetic-module-gen2-id"),
+                model=ModuleModel.MAGNETIC_MODULE_V2,
+            ),
+            "heatshake-module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("heatshake-module-id"),
+                plate_target_temperature=None,
             ),
         },
     )
 
-    module_1_view = subject.get_magnetic_module_view(
+    module_1_substate = subject.get_magnetic_module_substate(
         module_id="magnetic-module-gen1-id"
     )
-    assert module_1_view.parent_module_view is subject
-    assert module_1_view.module_id == "magnetic-module-gen1-id"
+    assert module_1_substate.module_id == "magnetic-module-gen1-id"
+    assert module_1_substate.model == ModuleModel.MAGNETIC_MODULE_V1
 
-    module_2_view = subject.get_magnetic_module_view(
+    module_2_substate = subject.get_magnetic_module_substate(
         module_id="magnetic-module-gen2-id"
     )
-    assert module_2_view.parent_module_view is subject
-    assert module_2_view.module_id == "magnetic-module-gen2-id"
+    assert module_2_substate.module_id == "magnetic-module-gen2-id"
+    assert module_2_substate.model == ModuleModel.MAGNETIC_MODULE_V2
 
     with pytest.raises(errors.WrongModuleTypeError):
-        subject.get_magnetic_module_view(module_id="temperature-module-id")
+        subject.get_magnetic_module_substate(module_id="heatshake-module-id")
 
     with pytest.raises(errors.ModuleNotLoadedError):
-        subject.get_magnetic_module_view(module_id="nonexistent-module-id")
+        subject.get_magnetic_module_substate(module_id="nonexistent-module-id")
+
+
+def test_get_heater_shaker_module_substate(
+    magdeck_v2_def: ModuleDefinition,
+    heater_shaker_v1_def: ModuleDefinition,
+) -> None:
+    """It should return a heater-shaker module substate."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "magnetic-module-gen2-id": DeckSlotName.SLOT_2,
+            "heatshake-module-id": DeckSlotName.SLOT_3,
+        },
+        hardware_by_module_id={
+            "magnetic-module-gen2-id": HardwareModule(
+                serial_number="magnetic-module-gen2-serial",
+                definition=magdeck_v2_def,
+            ),
+            "heatshake-module-id": HardwareModule(
+                serial_number="heatshake-module-serial",
+                definition=heater_shaker_v1_def,
+            ),
+        },
+        substate_by_module_id={
+            "magnetic-module-gen2-id": MagneticModuleSubState(
+                module_id=MagneticModuleId("magnetic-module-gen2-id"),
+                model=ModuleModel.MAGNETIC_MODULE_V2,
+            ),
+            "heatshake-module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("heatshake-module-id"),
+                plate_target_temperature=432,
+            ),
+        },
+    )
+
+    hs_substate = subject.get_heater_shaker_module_substate(
+        module_id="heatshake-module-id"
+    )
+    assert hs_substate.module_id == "heatshake-module-id"
+    assert hs_substate.plate_target_temperature == 432
+
+    with pytest.raises(errors.WrongModuleTypeError):
+        subject.get_heater_shaker_module_substate(module_id="magnetic-module-gen2-id")
+
+    with pytest.raises(errors.ModuleNotLoadedError):
+        subject.get_heater_shaker_module_substate(module_id="nonexistent-module-id")
+
+
+def test_get_temperature_module_substate(
+    tempdeck_v1_def: ModuleDefinition,
+    tempdeck_v2_def: ModuleDefinition,
+    heater_shaker_v1_def: ModuleDefinition,
+) -> None:
+    """It should return a substate for the given Temperature Module, if valid."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "temp-module-gen1-id": DeckSlotName.SLOT_1,
+            "temp-module-gen2-id": DeckSlotName.SLOT_2,
+            "heatshake-module-id": DeckSlotName.SLOT_3,
+        },
+        hardware_by_module_id={
+            "temp-module-gen1-id": HardwareModule(
+                serial_number="temp-module-gen1-serial",
+                definition=tempdeck_v1_def,
+            ),
+            "temp-module-gen2-id": HardwareModule(
+                serial_number="temp-module-gen2-serial",
+                definition=tempdeck_v2_def,
+            ),
+            "heatshake-module-id": HardwareModule(
+                serial_number="heatshake-module-serial",
+                definition=heater_shaker_v1_def,
+            ),
+        },
+        substate_by_module_id={
+            "temp-module-gen1-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("temp-module-gen1-id"),
+                plate_target_temperature=None,
+            ),
+            "temp-module-gen2-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("temp-module-gen2-id"),
+                plate_target_temperature=123,
+            ),
+            "heatshake-module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("heatshake-module-id"),
+                plate_target_temperature=None,
+            ),
+        },
+    )
+
+    module_1_substate = subject.get_temperature_module_substate(
+        module_id="temp-module-gen1-id"
+    )
+    assert module_1_substate.module_id == "temp-module-gen1-id"
+    assert module_1_substate.plate_target_temperature is None
+
+    module_2_substate = subject.get_temperature_module_substate(
+        module_id="temp-module-gen2-id"
+    )
+    assert module_2_substate.module_id == "temp-module-gen2-id"
+    assert module_2_substate.plate_target_temperature == 123
+
+    with pytest.raises(errors.WrongModuleTypeError):
+        subject.get_temperature_module_substate(module_id="heatshake-module-id")
+
+    with pytest.raises(errors.ModuleNotLoadedError):
+        subject.get_temperature_module_substate(module_id="nonexistent-module-id")
 
 
 def test_get_properties_by_id(
@@ -301,22 +388,50 @@ def test_get_properties_by_id(
     )
 
 
-@pytest.mark.parametrize("target", [123.45, None])
-def test_get_plate_target_temperature(
-    target: Optional[float], thermocycler_v1_def: ModuleDefinition
-) -> None:
+def test_get_plate_target_temperature(heater_shaker_v1_def: ModuleDefinition) -> None:
     """It should return whether target temperature is set."""
-    subject = make_module_view(
+    module_view = make_module_view(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
         hardware_by_module_id={
             "module-id": HardwareModule(
                 serial_number="serial-number",
-                definition=thermocycler_v1_def,
-                plate_target_temperature=target,
+                definition=heater_shaker_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("module-id"),
+                plate_target_temperature=12.3,
             )
         },
     )
-    assert subject.get_plate_target_temperature("module-id") == target
+    subject = module_view.get_heater_shaker_module_substate("module-id")
+    assert subject.get_plate_target_temperature() == 12.3
+
+
+def test_get_plate_target_temperature_no_target(
+    heater_shaker_v1_def: ModuleDefinition,
+) -> None:
+    """It should raise if no target temperature is set."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=heater_shaker_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("module-id"),
+                plate_target_temperature=None,
+            )
+        },
+    )
+    subject = module_view.get_heater_shaker_module_substate("module-id")
+
+    with pytest.raises(errors.NoTargetTemperatureSetError):
+        subject.get_plate_target_temperature()
 
 
 def test_get_magnet_home_to_base_offset() -> None:
@@ -577,179 +692,6 @@ def test_select_hardware_module_to_load_rejects_location_reassignment(
         )
 
 
-def test_magnetic_module_view_find_hardware(
-    decoy: Decoy,
-    magdeck_v1_def: ModuleDefinition,
-) -> None:
-    """It should return the matching hardware module."""
-    matching = make_hardware_module(
-        decoy=decoy, type=MagDeck, serial_number="serial-matching"
-    )
-    non_matching = make_hardware_module(
-        decoy=decoy, type=MagDeck, serial_number="serial-non-matching"
-    )
-    another_non_matching = make_hardware_module(
-        decoy=decoy, type=TempDeck, serial_number="serial-another-non-matching"
-    )
-
-    attached = [non_matching, matching, another_non_matching]
-
-    parent = make_module_view(
-        hardware_by_module_id={
-            "id-non-matching": HardwareModule(
-                serial_number="serial-non-matching",
-                definition=magdeck_v1_def,
-            ),
-            "id-matching": HardwareModule(
-                serial_number="serial-matching",
-                definition=magdeck_v1_def,
-            ),
-            "id-another-non-matching": HardwareModule(
-                serial_number="serial-another-non-matching",
-                definition=magdeck_v1_def,
-            ),
-        },
-        slot_by_module_id={
-            "id-non-matching": DeckSlotName.SLOT_1,
-            "id-matching": DeckSlotName.SLOT_2,
-            "id-another-non-matching": DeckSlotName.SLOT_3,
-        },
-    )
-    subject = parent.get_magnetic_module_view(module_id="id-matching")
-
-    result = subject.find_hardware(attached_modules=attached)
-    assert result is matching
-
-
-def test_heater_shaker_module_view_find_hardware(
-    decoy: Decoy,
-    heater_shaker_v1_def: ModuleDefinition,
-) -> None:
-    """It should return the matching hardware heater-shaker module."""
-    attached = get_attached_modules(decoy=decoy, matching_module_type=HeaterShaker)
-    parent = get_sample_parent_module_view(
-        matching_module_def=heater_shaker_v1_def, matching_module_id="id-matching"
-    )
-    subject = parent.get_heater_shaker_module_view(module_id="id-matching")
-
-    result = subject.find_hardware(attached_modules=list(attached.values()))
-    assert result == attached["matching"]
-
-
-@pytest.mark.parametrize(
-    argnames=["module_definition", "module_view_getter_str"],
-    argvalues=[
-        (lazy_fixture("magdeck_v1_def"), "get_magnetic_module_view"),
-        (lazy_fixture("heater_shaker_v1_def"), "get_heater_shaker_module_view"),
-    ],
-)
-def test_magnetic_module_view_find_hardware_returns_none_if_virtualizing(
-    module_definition: ModuleDefinition,
-    module_view_getter_str: str,
-) -> None:
-    """It should handle the case where the Protocol Engine is virtualizing modules.
-
-    This means ignoreing attached_modules and returning None.
-    """
-    parent = make_module_view(
-        hardware_by_module_id={
-            "id-to-match": HardwareModule(
-                serial_number="serial-to-match",
-                definition=module_definition,
-            ),
-        },
-        slot_by_module_id={
-            "id-to-match": DeckSlotName.SLOT_1,
-        },
-        virtualize_modules=True,
-    )
-    module_view_getter = getattr(parent, module_view_getter_str)
-    subject = module_view_getter(module_id="id-to-match")
-
-    # Should return None,
-    # rather than raising because attached_modules contains no match.
-    assert subject.find_hardware(attached_modules=[]) is None
-
-
-@pytest.mark.parametrize(
-    argnames=["module_definition", "module_view_getter_str"],
-    argvalues=[
-        (lazy_fixture("magdeck_v1_def"), "get_magnetic_module_view"),
-        (lazy_fixture("heater_shaker_v1_def"), "get_heater_shaker_module_view"),
-    ],
-)
-def test_magnetic_module_view_find_hardware_raises_if_no_match_attached(
-    module_definition: ModuleDefinition,
-    module_view_getter_str: str,
-) -> None:
-    """It should raise if nothing with a matching serial is in the attached list."""
-    parent = make_module_view(
-        hardware_by_module_id={
-            "id-to-match": HardwareModule(
-                serial_number="serial-to-match",
-                definition=module_definition,
-            ),
-        },
-        slot_by_module_id={
-            "id-to-match": DeckSlotName.SLOT_1,
-        },
-    )
-    module_view_getter = getattr(parent, module_view_getter_str)
-    subject = module_view_getter(module_id="id-to-match")
-
-    with pytest.raises(errors.ModuleNotAttachedError):
-        subject.find_hardware(
-            attached_modules=[],
-        )
-
-
-@pytest.mark.parametrize(
-    argnames=[
-        "module_definition",
-        "non_matching_module_type",
-        "module_view_getter_str",
-    ],
-    argvalues=[
-        (lazy_fixture("magdeck_v1_def"), TempDeck, "get_magnetic_module_view"),
-        (
-            lazy_fixture("heater_shaker_v1_def"),
-            MagDeck,
-            "get_heater_shaker_module_view",
-        ),
-    ],
-)
-def test_magnetic_module_view_find_hardware_raises_if_match_is_wrong_type(
-    decoy: Decoy,
-    module_definition: ModuleDefinition,
-    non_matching_module_type: Type[HardwareModuleT],
-    module_view_getter_str: str,
-) -> None:
-    """It should raise if a match was found but is of an unexpected type."""
-    matching = make_hardware_module(
-        decoy=decoy,
-        type=non_matching_module_type,  # Not a Magnetic Module.
-        serial_number="serial-to-match",
-    )
-    parent = make_module_view(
-        hardware_by_module_id={
-            "id-to-match": HardwareModule(
-                serial_number="serial-to-match",
-                definition=module_definition,
-            ),
-        },
-        slot_by_module_id={
-            "id-to-match": DeckSlotName.SLOT_1,
-        },
-    )
-    module_view_getter = getattr(parent, module_view_getter_str)
-    subject = module_view_getter(module_id="id-to-match")
-
-    with pytest.raises(errors.ModuleNotAttachedError):
-        subject.find_hardware(
-            attached_modules=[matching],
-        )
-
-
 class _CalculateMagnetHardwareHeightTestParams(NamedTuple):
     definition: ModuleDefinition
     mm_from_base: float
@@ -840,7 +782,7 @@ def test_magnetic_module_view_calculate_magnet_hardware_height(
     expected_exception_type: Union[Type[Exception], None],
 ) -> None:
     """It should return the expected height or raise the expected exception."""
-    parent = make_module_view(
+    module_view = make_module_view(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
         hardware_by_module_id={
             "module-id": HardwareModule(
@@ -848,8 +790,14 @@ def test_magnetic_module_view_calculate_magnet_hardware_height(
                 definition=definition,
             )
         },
+        substate_by_module_id={
+            "module-id": MagneticModuleSubState(
+                module_id=MagneticModuleId("module-id"),
+                model=definition.model,  # type: ignore [arg-type]
+            )
+        },
     )
-    subject = parent.get_magnetic_module_view("module-id")
+    subject = module_view.get_magnetic_module_substate("module-id")
     expected_raise: ContextManager[None] = (
         # Not sure why mypy has trouble with this.
         nullcontext()  # type: ignore[assignment]
@@ -861,22 +809,13 @@ def test_magnetic_module_view_calculate_magnet_hardware_height(
         assert result == expected_result
 
 
-@pytest.mark.parametrize(
-    argnames=["target_temp", "expected_valid"],
-    argvalues=[
-        (36.8, False),
-        (37, True),
-        (94.8, True),
-        (95.1, False),
-    ],
-)
-def test_validate_target_temperature(
+@pytest.mark.parametrize("target_temp", [36.8, 95.1])
+def test_validate_heater_shaker_target_temperature_raises(
     heater_shaker_v1_def: ModuleDefinition,
     target_temp: float,
-    expected_valid: bool,
 ) -> None:
     """It should verify if a target temperature is valid for the specified module."""
-    parent = make_module_view(
+    module_view = make_module_view(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
         hardware_by_module_id={
             "module-id": HardwareModule(
@@ -884,11 +823,93 @@ def test_validate_target_temperature(
                 definition=heater_shaker_v1_def,
             )
         },
+        substate_by_module_id={
+            "module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("module-id"),
+                plate_target_temperature=None,
+            )
+        },
     )
-    subject = parent.get_heater_shaker_module_view("module-id")
-    if not expected_valid:
-        with pytest.raises(errors.InvalidTargetTemperatureError):
-            subject.validate_target_temperature(target_temp)
+    subject = module_view.get_heater_shaker_module_substate("module-id")
+    with pytest.raises(errors.InvalidTargetTemperatureError):
+        subject.validate_target_temperature(target_temp)
+
+
+@pytest.mark.parametrize("target_temp", [37, 94.8])
+def test_validate_heater_shaker_target_temperature(
+    heater_shaker_v1_def: ModuleDefinition,
+    target_temp: float,
+) -> None:
+    """It should verify if a target temperature is valid for the specified module."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=heater_shaker_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("module-id"),
+                plate_target_temperature=None,
+            )
+        },
+    )
+    subject = module_view.get_heater_shaker_module_substate("module-id")
+    assert subject.validate_target_temperature(target_temp) == target_temp
+
+
+@pytest.mark.parametrize("target_temp", [-10, 99.9])
+def test_validate_temp_module_target_temperature_raises(
+    tempdeck_v1_def: ModuleDefinition,
+    target_temp: float,
+) -> None:
+    """It should verify if a target temperature is valid for the specified module."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=tempdeck_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                plate_target_temperature=None,
+            )
+        },
+    )
+    subject = module_view.get_temperature_module_substate("module-id")
+    with pytest.raises(errors.InvalidTargetTemperatureError):
+        subject.validate_target_temperature(target_temp)
+
+
+@pytest.mark.parametrize(
+    ["target_temp", "validated_temp"], [(-9.431, -9), (0, 0), (99.1, 99)]
+)
+def test_validate_temp_module_target_temperature(
+    tempdeck_v2_def: ModuleDefinition, target_temp: float, validated_temp: int
+) -> None:
+    """It should verify if a target temperature is valid for the specified module."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=tempdeck_v2_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                plate_target_temperature=None,
+            )
+        },
+    )
+    subject = module_view.get_temperature_module_substate("module-id")
+    assert subject.validate_target_temperature(target_temp) == validated_temp
 
 
 @pytest.mark.parametrize(
@@ -899,7 +920,7 @@ def test_validate_heater_shaker_target_speed_converts_to_int(
     rpm_param: float, validated_param: bool, heater_shaker_v1_def: ModuleDefinition
 ) -> None:
     """It should validate heater-shaker target rpm."""
-    parent = make_module_view(
+    module_view = make_module_view(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
         hardware_by_module_id={
             "module-id": HardwareModule(
@@ -907,8 +928,14 @@ def test_validate_heater_shaker_target_speed_converts_to_int(
                 definition=heater_shaker_v1_def,
             )
         },
+        substate_by_module_id={
+            "module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("module-id"),
+                plate_target_temperature=None,
+            )
+        },
     )
-    subject = parent.get_heater_shaker_module_view("module-id")
+    subject = module_view.get_heater_shaker_module_substate("module-id")
     assert subject.validate_target_speed(rpm_param) == validated_param
 
 
@@ -920,7 +947,7 @@ def test_validate_heater_shaker_target_speed_raises_error(
     rpm_param: float, expected_valid: bool, heater_shaker_v1_def: ModuleDefinition
 ) -> None:
     """It should validate heater-shaker target rpm."""
-    parent = make_module_view(
+    module_view = make_module_view(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
         hardware_by_module_id={
             "module-id": HardwareModule(
@@ -928,8 +955,62 @@ def test_validate_heater_shaker_target_speed_raises_error(
                 definition=heater_shaker_v1_def,
             )
         },
+        substate_by_module_id={
+            "module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("module-id"),
+                plate_target_temperature=None,
+            )
+        },
     )
-    subject = parent.get_heater_shaker_module_view("module-id")
+    subject = module_view.get_heater_shaker_module_substate("module-id")
     if not expected_valid:
         with pytest.raises(errors.InvalidTargetSpeedError):
             subject.validate_target_speed(rpm_param)
+
+
+def test_tempdeck_get_plate_target_temperature(
+    tempdeck_v2_def: ModuleDefinition,
+) -> None:
+    """It should return whether target temperature is set."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=tempdeck_v2_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                plate_target_temperature=12,
+            )
+        },
+    )
+    subject = module_view.get_temperature_module_substate("module-id")
+    assert subject.get_plate_target_temperature() == 12
+
+
+def test_tempdeck_get_plate_target_temperature_no_target(
+    tempdeck_v2_def: ModuleDefinition,
+) -> None:
+    """It should raise if no target temperature is set."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=tempdeck_v2_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                plate_target_temperature=None,
+            )
+        },
+    )
+    subject = module_view.get_temperature_module_substate("module-id")
+
+    with pytest.raises(errors.NoTargetTemperatureSetError):
+        subject.get_plate_target_temperature()

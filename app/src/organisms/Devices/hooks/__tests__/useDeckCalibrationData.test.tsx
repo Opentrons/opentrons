@@ -60,7 +60,10 @@ describe('useDeckCalibrationData hook', () => {
       wrapper,
     })
 
-    expect(result.current).toEqual(null)
+    expect(result.current).toEqual({
+      deckCalibrationData: null,
+      isDeckCalibrated: false,
+    })
     expect(dispatchApiRequest).not.toBeCalled()
   })
 
@@ -73,7 +76,10 @@ describe('useDeckCalibrationData hook', () => {
       wrapper,
     })
 
-    expect(result.current).toEqual(mockDeckCalData)
+    expect(result.current).toEqual({
+      deckCalibrationData: mockDeckCalData,
+      isDeckCalibrated: true,
+    })
     expect(dispatchApiRequest).toBeCalledWith(
       mockFetchCalibrationStatus('otie')
     )

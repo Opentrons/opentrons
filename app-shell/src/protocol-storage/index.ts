@@ -49,6 +49,10 @@ const fetchProtocols = (
           srcFileNames: storedProtocolDir.srcFilePaths.map(
             filePath => path.parse(filePath).base
           ),
+          srcFiles: storedProtocolDir.srcFilePaths.map(srcFilePath => {
+            const buffer = fse.readFileSync(srcFilePath)
+            return Buffer.from(buffer, buffer.byteOffset, buffer.byteLength)
+          }),
           mostRecentAnalysis:
             mostRecentAnalysisFilePath != null
               ? fse.readJsonSync(mostRecentAnalysisFilePath)
@@ -82,6 +86,16 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
       case ProtocolStorageActions.ADD_PROTOCOL: {
         FileSystem.addProtocolFile(
           action.payload.protocolFilePath,
+          FileSystem.PROTOCOLS_DIRECTORY_PATH
+        ).then(() =>
+          fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
+        )
+        break
+      }
+
+      case ProtocolStorageActions.ANALYZE_PROTOCOL: {
+        FileSystem.analyzeProtocolByKey(
+          action.payload.protocolKey,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
         ).then(() =>
           fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)

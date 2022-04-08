@@ -3,7 +3,7 @@
     "temperatureModuleType": "Temperature",
     "magneticModuleType": "Magnetic",
     "thermocyclerModuleType": "Thermocycler",
-    "heaterShakerModuleType": "Heater Shaker"
+    "heaterShakerModuleType": "Heater-Shaker"
   },
   "module_long_names": {
     "temperatureModuleType": "Temperature module",
@@ -32,7 +32,10 @@
     "engage": "engage",
     "go_to": "go to",
     "hold": "hold",
-    "profile": "profile"
+    "profile": "profile",
+    "closed_and_locked": "Closed and Locked",
+    "open": "Open",
+    "deactivate_after": "Deactivate after"
   },
   "block_label": "Block",
   "lid_label": "Lid ({{lidStatus}})",
@@ -41,5 +44,6 @@
   "lid_undefined": "undefined",
   "latch_label": "Latch",
   "heater_label": "Heater",
-  "shaker_label": "Shaker"
+  "shaker_label": "Shaker",
+  "labware_latch": "Labware Latch"
 }

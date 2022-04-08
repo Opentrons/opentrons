@@ -29,8 +29,8 @@ class GCodeCLI:
     CONFIGURATION_COMMAND = "configurations"
     CONFIGURATIONS = HTTP_CONFIGURATIONS + PROTOCOL_CONFIGURATIONS
 
-    PULL_COMMAND = 'pull'
-    PUSH_COMMAND = 'push'
+    LOAD_COMPARISON_COMMAND = 'load-comparison'
+    UPDATE_COMPARISON_COMMAND = 'update-comparison'
 
     @classmethod
     def parse_args(cls, args: List[str]) -> Dict[str, Any]:
@@ -65,7 +65,7 @@ class GCodeCLI:
         able_to_respond_with_error_code = self.args[self.ERROR_ON_DIFFERENT_FILES]
 
         actual = configuration.execute()
-        expected = configuration.get_master_file()
+        expected = configuration.get_comparison_file()
 
         differ = GCodeDiffer(actual, expected)
         strings_equal = differ.strings_are_equal()
@@ -91,12 +91,12 @@ class GCodeCLI:
         return f"Runnable Configurations:\n{path_string}"
 
     def _pull(self) -> str:
-        """Pull master configuration from S3"""
-        return self.configurations[self.args[self.CONFIGURATION_NAME]].get_master_file()
+        """Load comparison file"""
+        return self.configurations[self.args[self.CONFIGURATION_NAME]].get_comparison_file()
 
-    def _push(self) -> str:
-        """Create/Override S3 master file with output of execution"""
-        return self.configurations[self.args[self.CONFIGURATION_NAME]].upload()
+    def _update_comparison(self) -> str:
+        """Create/Override comparison file with output of execution"""
+        return self.configurations[self.args[self.CONFIGURATION_NAME]].update_comparison()
 
     def run_command(self) -> str:
         """Run command and return it's output"""
@@ -108,10 +108,10 @@ class GCodeCLI:
             command_output = self._diff()
         elif passed_command_name == self.CONFIGURATION_COMMAND:
             command_output = self._configurations()
-        elif passed_command_name == self.PULL_COMMAND:
+        elif passed_command_name == self.LOAD_COMPARISON_COMMAND:
             command_output = self._pull()
-        elif passed_command_name == self.PUSH_COMMAND:
-            command_output = self._push()
+        elif passed_command_name == self.UPDATE_COMPARISON_COMMAND:
+            command_output = self._update_comparison()
         else:
             raise UnparsableCLICommandError(
                 passed_command_name, [self.RUN_COMMAND, self.DIFF_FILES_COMMAND]
@@ -134,8 +134,8 @@ class GCodeCLI:
             f"{cls.RUN_COMMAND} | "
             f"{cls.DIFF_FILES_COMMAND} | "
             f"{cls.CONFIGURATION_COMMAND} | "
-            f"{cls.PULL_COMMAND} | "
-            f"{cls.PUSH_COMMAND}"
+            f"{cls.LOAD_COMPARISON_COMMAND} | "
+            f"{cls.UPDATE_COMPARISON_COMMAND}"
         )
 
         run_parser = subparsers.add_parser(
@@ -166,23 +166,23 @@ class GCodeCLI:
             cls.CONFIGURATION_COMMAND, help="List of available configurations"
         )
 
-        pull_parser = subparsers.add_parser(
-            cls.PULL_COMMAND,
-            help="Pull master file content from S3",
+        load_comparison_parser = subparsers.add_parser(
+            cls.LOAD_COMPARISON_COMMAND,
+            help="Load comparison file content",
             formatter_class=argparse.RawTextHelpFormatter,
         )
-        pull_parser.add_argument(
+        load_comparison_parser.add_argument(
             "configuration_name",
             type=str,
             help="Name of configuration you want to pull"
         )
 
-        push_parser = subparsers.add_parser(
-            cls.PUSH_COMMAND,
-            help="Push execution content to S3",
+        update_comparison_parser = subparsers.add_parser(
+            cls.UPDATE_COMPARISON_COMMAND,
+            help="Update comparison file content",
             formatter_class=argparse.RawTextHelpFormatter,
         )
-        push_parser.add_argument(
+        update_comparison_parser.add_argument(
             "configuration_name",
             type=str,
             help="Name of configuration you want to push"

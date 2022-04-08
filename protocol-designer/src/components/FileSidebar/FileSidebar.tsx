@@ -16,20 +16,20 @@ import modalStyles from '../modals/modal.css'
 import styles from './FileSidebar.css'
 
 import { HintKey } from '../../tutorial'
-import { PDProtocolFile } from '../../file-types'
 import {
   InitialDeckSetup,
   SavedStepFormState,
   ModuleOnDeck,
   PipetteOnDeck,
 } from '../../step-forms'
+import type { CreateCommand, ProtocolFile } from '@opentrons/shared-data'
 
 export interface Props {
   loadFile: (event: React.ChangeEvent<HTMLInputElement>) => unknown
   createNewFile?: () => unknown
   canDownload: boolean
   onDownload: () => unknown
-  fileData?: PDProtocolFile | null
+  fileData?: ProtocolFile | null
   pipettesOnDeck: InitialDeckSetup['pipettes']
   modulesOnDeck: InitialDeckSetup['modules']
   savedStepForms: SavedStepFormState
@@ -46,6 +46,13 @@ interface MissingContent {
   pipettesWithoutStep: PipetteOnDeck[]
   modulesWithoutStep: ModuleOnDeck[]
 }
+
+const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
+  'loadLabware',
+  'loadModule',
+  'loadPipette',
+  'loadLiquid',
+]
 
 function getWarningContent({
   noCommands,
@@ -133,22 +140,12 @@ function getWarningContent({
   return null
 }
 
-export const v4WarningContent: JSX.Element = (
+export const v6WarningContent: JSX.Element = (
   <div>
     <p>
-      {i18n.t(`alert.hint.export_v4_protocol_3_18.body1`)}{' '}
-      <strong>{i18n.t(`alert.hint.export_v4_protocol_3_18.body2`)}</strong>
-      {i18n.t(`alert.hint.export_v4_protocol_3_18.body3`)}
-    </p>
-  </div>
-)
-
-export const v5WarningContent: JSX.Element = (
-  <div>
-    <p>
-      {i18n.t(`alert.hint.export_v5_protocol_3_20.body1`)}{' '}
-      <strong>{i18n.t(`alert.hint.export_v5_protocol_3_20.body2`)}</strong>
-      {i18n.t(`alert.hint.export_v5_protocol_3_20.body3`)}
+      {i18n.t(`alert.hint.export_v6_protocol_5_10.body1`)}{' '}
+      <strong>{i18n.t(`alert.hint.export_v6_protocol_5_10.body2`)}</strong>
+      {i18n.t(`alert.hint.export_v6_protocol_5_10.body3`)}
     </p>
   </div>
 )
@@ -174,7 +171,12 @@ export function FileSidebar(props: Props): JSX.Element {
 
   const cancelModal = (): void => setShowExportWarningModal(false)
 
-  const noCommands = fileData ? fileData.commands.length === 0 : true
+  const nonLoadCommands =
+    fileData?.commands.filter(
+      command => !LOAD_COMMANDS.includes(command.commandType)
+    ) ?? []
+
+  const noCommands = fileData ? nonLoadCommands.length === 0 : true
   const pipettesWithoutStep = getUnusedEntities(
     pipettesOnDeck,
     savedStepForms,
@@ -202,11 +204,8 @@ export function FileSidebar(props: Props): JSX.Element {
     content: React.ReactNode
   } => {
     return {
-      hintKey:
-        schemaVersion === 5
-          ? 'export_v5_protocol_3_20'
-          : 'export_v4_protocol_3_18',
-      content: schemaVersion === 5 ? v5WarningContent : v4WarningContent,
+      hintKey: 'export_v6_protocol_5_10',
+      content: v6WarningContent,
     }
   }
 

@@ -8,9 +8,9 @@ export const thermocyclerSetTargetLidTemperature: CommandCreator<TemperaturePara
   return {
     commands: [
       {
-        command: 'thermocycler/setTargetLidTemperature',
+        commandType: 'thermocycler/setTargetLidTemperature',
         params: {
-          module: args.module,
+          moduleId: args.module,
           temperature: args.temperature,
         },
       },

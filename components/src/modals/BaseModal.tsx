@@ -2,6 +2,8 @@ import * as React from 'react'
 
 import * as Styles from '../styles'
 import { Box, Flex } from '../primitives'
+import { COLORS } from '../ui-style-constants'
+
 import type { StyleProps } from '../primitives'
 
 const BASE_STYLE = {
@@ -68,7 +70,7 @@ export interface BaseModalProps extends StyleProps {
  */
 export function BaseModal(props: BaseModalProps): JSX.Element {
   const {
-    overlayColor = 'rgba(22, 33, 45, 0.35)',
+    overlayColor = COLORS.backgroundOverlay,
     zIndex = 10,
     header,
     footer,

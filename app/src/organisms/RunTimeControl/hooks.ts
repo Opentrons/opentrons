@@ -145,7 +145,7 @@ export function useRunStopTime(): string | null {
 }
 
 // TODO(bc, 2022-02-01): replace all usage of the above individual timestamp hooks with useCurrentRunTimestamps
-interface RunTimestamps {
+export interface RunTimestamps {
   startedAt: string | null
   pausedAt: string | null
   stoppedAt: string | null

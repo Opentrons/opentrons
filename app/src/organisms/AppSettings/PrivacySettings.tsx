@@ -5,7 +5,6 @@ import {
   Flex,
   Box,
   Text,
-  ALIGN_CENTER,
   SIZE_2,
   TYPOGRAPHY,
   JUSTIFY_SPACE_BETWEEN,
@@ -26,7 +25,7 @@ export function PrivacySettings(): JSX.Element {
 
   return (
     <Flex
-      alignItems={ALIGN_CENTER}
+      height="calc(100vh - 8.5rem)"
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       paddingX={SPACING.spacing4}
       paddingY={SPACING.spacing5}

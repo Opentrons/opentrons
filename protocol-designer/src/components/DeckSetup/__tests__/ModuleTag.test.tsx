@@ -1,4 +1,5 @@
 import {
+  HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -62,6 +63,32 @@ describe('ModuleTag', () => {
         const component = render(<ModuleStatus moduleState={moduleState} />)
 
         expect(component.text()).toBe('disengaged')
+      })
+    })
+    describe('heaterShaker module', () => {
+      it('displays a temperature, speed, and latch status when module is at target', () => {
+        const moduleState = {
+          type: HEATERSHAKER_MODULE_TYPE,
+          latchOpen: false,
+          targetTemp: 40,
+          targetSpeed: 400,
+        }
+        const component = render(<ModuleStatus moduleState={moduleState} />)
+        expect(component.text()).toBe(
+          'Heater:40 °CShaker:400 RPM Labware Latch:closed'
+        )
+      })
+      it('displays a speed, and latch status when module is at target', () => {
+        const moduleState = {
+          type: HEATERSHAKER_MODULE_TYPE,
+          latchOpen: true,
+          targetTemp: null,
+          targetSpeed: null,
+        }
+        const component = render(<ModuleStatus moduleState={moduleState} />)
+        expect(component.text()).toBe(
+          'Heater:deactivatedShaker:deactivated Labware Latch:open'
+        )
       })
     })
 

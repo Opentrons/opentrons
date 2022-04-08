@@ -26,6 +26,9 @@ export const CLEAR_ADD_PROTOCOL_FAILURE: 'protocolStorage:CLEAR_ADD_PROTOCOL_FAI
 export const OPEN_PROTOCOL_DIRECTORY: 'protocolStorage:OPEN_PROTOCOL_DIRECTORY' =
   'protocolStorage:OPEN_PROTOCOL_DIRECTORY'
 
+export const ANALYZE_PROTOCOL: 'protocolStorage:ANALYZE_PROTOCOL' =
+  'protocolStorage:ANALYZE_PROTOCOL'
+
 // action meta literals
 
 export const POLL = 'poll' as const
@@ -88,5 +91,13 @@ export const clearAddProtocolFailure = (): Types.ClearAddProtocolFailureAction =
 
 export const openProtocolDirectory = (): Types.OpenProtocolDirectoryAction => ({
   type: OPEN_PROTOCOL_DIRECTORY,
+  meta: { shell: true },
+})
+
+export const analyzeProtocol = (
+  protocolKey: string
+): Types.AnalyzeProtocolAction => ({
+  type: ANALYZE_PROTOCOL,
+  payload: { protocolKey },
   meta: { shell: true },
 })

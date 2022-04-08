@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import functools
+
 """ Classes and functions for pipette state tracking
 """
 from dataclasses import asdict, replace
@@ -287,6 +289,9 @@ class Pipette:
     def has_tip(self) -> bool:
         return self._has_tip
 
+    # Cache max is chosen somewhat arbitrarily. With a float is input we don't
+    # want this to unbounded.
+    @functools.lru_cache(maxsize=100)
     def ul_per_mm(self, ul: float, action: UlPerMmAction) -> float:
         sequence = self._config.ul_per_mm[action]
         return pipette_config.piecewise_volume_conversion(ul, sequence)

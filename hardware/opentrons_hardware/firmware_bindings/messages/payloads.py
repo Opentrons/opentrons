@@ -141,6 +141,7 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 
     seq_id: utils.UInt8Field
     current_position_um: utils.UInt32Field
+    encoder_position: utils.UInt32Field
     ack_id: utils.UInt8Field
 
 
@@ -296,6 +297,7 @@ class WriteToSensorRequestPayload(utils.BinarySerializable):
 
     sensor: SensorTypeField
     data: utils.UInt32Field
+    reg_address: utils.UInt8Field
 
 
 @dataclass
@@ -354,3 +356,18 @@ class PipetteInfoResponsePayload(utils.BinarySerializable):
     pipette_name: PipetteNameField
     pipette_model: utils.UInt16Field
     pipette_serial: PipetteSerialField
+
+
+@dataclass
+class BrushedMotorVrefPayload(utils.BinarySerializable):
+    """A request to set the reference voltage of a brushed motor."""
+
+    v_ref: utils.UInt32Field
+
+
+@dataclass
+class BrushedMotorPwmPayload(utils.BinarySerializable):
+    """A request to set the pwm of a brushed motor."""
+
+    freq: utils.UInt32Field
+    duty_cycle: utils.UInt32Field

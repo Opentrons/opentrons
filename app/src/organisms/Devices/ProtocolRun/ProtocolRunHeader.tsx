@@ -14,6 +14,7 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
+import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   AlertItem,
   Box,
@@ -34,6 +35,7 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  useConditionalConfirm,
 } from '@opentrons/components'
 import { useRunQuery } from '@opentrons/react-api-client'
 
@@ -44,6 +46,7 @@ import {
   useCurrentRunId,
 } from '../../../organisms/ProtocolUpload/hooks'
 import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
+import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 import {
   useRunControls,
   useRunStatus,
@@ -52,13 +55,18 @@ import {
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 
 import {
+  useAttachedModules,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
+import { useHeaterShakerFromProtocol } from '../ModuleCard/hooks'
+import { ConfirmAttachmentModal } from '../ModuleCard/ConfirmAttachmentModal'
 
 import type { Run } from '@opentrons/api-client'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
+import { useTrackEvent } from '../../../redux/analytics'
 
 interface ProtocolRunHeaderProps {
   robotName: string
@@ -101,7 +109,8 @@ export function ProtocolRunHeader({
   const { t } = useTranslation('run_details')
   const history = useHistory()
   const [targetProps, tooltipProps] = useHoverTooltip()
-
+  const trackEvent = useTrackEvent()
+  const heaterShakerFromProtocol = useHeaterShakerFromProtocol()
   const runRecord = useRunQuery(runId)
   const { displayName } = useProtocolDetailsForRun(runId)
 
@@ -149,6 +158,34 @@ export function ProtocolRunHeader({
   const currentRunId = useCurrentRunId()
   const isRobotBusy = currentRunId != null && currentRunId !== runId
 
+  const [showIsShakingModal, setShowIsShakingModal] = React.useState<boolean>(
+    false
+  )
+  const attachedModules = useAttachedModules(robotName)
+  const heaterShaker = (attachedModules.find(
+    module => module.type === HEATERSHAKER_MODULE_TYPE
+  ) as unknown) as HeaterShakerModule
+  const isShaking = heaterShaker?.data?.speedStatus !== 'idle'
+
+  const handleProceedToRunClick = (): void => {
+    trackEvent({ name: 'proceedToRun', properties: {} })
+    play()
+  }
+
+  const {
+    confirm: confirmAttachment,
+    showConfirmation: showConfirmationModal,
+    cancel: cancelExit,
+  } = useConditionalConfirm(handleProceedToRunClick, true)
+
+  const handlePlayButtonClick = (): void => {
+    if (isShaking) {
+      setShowIsShakingModal(true)
+    } else if (heaterShakerFromProtocol != null && !isShaking) {
+      confirmAttachment()
+    } else play()
+  }
+
   const isRunControlButtonDisabled =
     !isSetupComplete ||
     isMutationLoading ||
@@ -170,7 +207,7 @@ export function ProtocolRunHeader({
       buttonIconName = 'play'
       buttonText =
         runStatus === RUN_STATUS_IDLE ? t('start_run') : t('resume_run')
-      handleButtonClick = play
+      handleButtonClick = handlePlayButtonClick
       break
     case RUN_STATUS_RUNNING:
       buttonIconName = 'pause'
@@ -327,6 +364,14 @@ export function ProtocolRunHeader({
       marginBottom={SPACING.spacing4}
       padding={SPACING.spacing4}
     >
+      {showConfirmationModal && (
+        <ConfirmAttachmentModal
+          onCloseClick={cancelExit}
+          isProceedToRunModal={true}
+          onConfirmClick={confirmAttachment}
+        />
+      )}
+
       <Flex>
         {/* TODO(bh, 2022-03-15) will update link to a protocol key stored locally when built */}
         <Link to={`/protocols/${runRecord?.data?.data.protocolId}`}>
@@ -402,6 +447,13 @@ export function ProtocolRunHeader({
               completedAt={completedAt}
             />
           </Box>
+          {showIsShakingModal && (
+            <HeaterShakerIsRunningModal
+              closeModal={() => setShowIsShakingModal(false)}
+              module={heaterShaker}
+              startRun={play}
+            />
+          )}
           <PrimaryButton
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}

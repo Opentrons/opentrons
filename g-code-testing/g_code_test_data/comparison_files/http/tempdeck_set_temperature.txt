@@ -1,0 +1,1 @@
+tempdeck: M104 S2.0 -> Setting temperature values to the following: Temperature: 2.0C ->

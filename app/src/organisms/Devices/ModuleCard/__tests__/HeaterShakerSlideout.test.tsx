@@ -5,11 +5,16 @@ import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../../i18n'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { HeaterShakerSlideout } from '../HeaterShakerSlideout'
+import { ConfirmAttachmentModal } from '../ConfirmAttachmentModal'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../ConfirmAttachmentModal')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
+>
+const mockConfirmAttachmentModal = ConfirmAttachmentModal as jest.MockedFunction<
+  typeof ConfirmAttachmentModal
 >
 
 const render = (props: React.ComponentProps<typeof HeaterShakerSlideout>) => {
@@ -28,6 +33,9 @@ describe('HeaterShakerSlideout', () => {
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
+    mockConfirmAttachmentModal.mockReturnValue(
+      <div>mock confirm attachment modal</div>
+    )
   })
 
   afterEach(() => {
@@ -72,23 +80,13 @@ describe('HeaterShakerSlideout', () => {
       onCloseClick: jest.fn(),
     }
 
-    const { getByRole, getByTestId } = render(props)
+    const { getByRole, getByTestId, getByText } = render(props)
     const button = getByRole('button', { name: 'Set Shake Speed' })
     const input = getByTestId('heaterShakerModuleV1_true')
     fireEvent.change(input, { target: { value: '300' } })
     expect(button).toBeEnabled()
     fireEvent.click(button)
-
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'heaterShakerModule/setTargetShakeSpeed',
-        params: {
-          moduleId: 'heatershaker_id',
-          rpm: 300,
-        },
-      },
-    })
-    expect(button).not.toBeEnabled()
+    getByText('mock confirm attachment modal')
   })
 
   it('renders the button and it is not clickable until there is something in form field for set temp', () => {
