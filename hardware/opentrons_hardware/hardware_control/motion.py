@@ -1,7 +1,7 @@
 """A collection of motions that define a single move."""
 from typing import List, Dict, Iterable
 from dataclasses import dataclass
-import numpy as np  # type: ignore[import]
+import numpy as np
 from logging import getLogger
 from enum import Enum, unique
 from opentrons_hardware.firmware_bindings.constants import NodeId
@@ -44,10 +44,10 @@ class MoveType(int, Enum):
 class MoveGroupSingleAxisStep:
     """A single move in a move group."""
 
-    distance_mm: float
-    velocity_mm_sec: float
-    duration_sec: float
-    acceleration_mm_sec_sq: float = 0
+    distance_mm: np.float64
+    velocity_mm_sec: np.float64
+    duration_sec: np.float64
+    acceleration_mm_sec_sq: np.float64 = np.float64(0)
     stop_condition: MoveStopCondition = MoveStopCondition.none
     move_type: MoveType = MoveType.linear
 
@@ -93,9 +93,9 @@ def create_step(
     step: MoveGroupStep = {}
     for axis_node in ordered_nodes:
         step[axis_node] = MoveGroupSingleAxisStep(
-            distance_mm=distance.get(axis_node, 0),
-            acceleration_mm_sec_sq=acceleration.get(axis_node, 0),
-            velocity_mm_sec=velocity.get(axis_node, 0),
+            distance_mm=distance.get(axis_node, np.float64(0)),
+            acceleration_mm_sec_sq=acceleration.get(axis_node, np.float64(0)),
+            velocity_mm_sec=velocity.get(axis_node, np.float64(0)),
             duration_sec=duration,
             stop_condition=stop_condition,
             move_type=MoveType.get_move_type(stop_condition),
@@ -111,7 +111,7 @@ def create_home_step(
     for axis in distance.keys():
         step[axis] = MoveGroupSingleAxisStep(
             distance_mm=distance[axis],
-            acceleration_mm_sec_sq=0,
+            acceleration_mm_sec_sq=np.float64(0),
             velocity_mm_sec=velocity[axis],
             duration_sec=abs(distance[axis] / velocity[axis]),
             stop_condition=MoveStopCondition.limit_switch,

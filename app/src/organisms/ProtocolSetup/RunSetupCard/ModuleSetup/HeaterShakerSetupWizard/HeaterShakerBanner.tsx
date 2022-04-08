@@ -17,7 +17,10 @@ export function HeaterShakerBanner(
   return (
     <>
       {showWizard && (
-        <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
+        <HeaterShakerWizard
+          onCloseClick={() => setShowWizard(false)}
+          hasProtocol={true}
+        />
       )}
       <Banner
         title={t('attach_heater_shaker_to_deck', { name: displayName })}

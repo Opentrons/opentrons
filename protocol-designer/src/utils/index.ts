@@ -89,3 +89,18 @@ export const makeLidLabelText = (lidOpen: boolean): string =>
   i18n.t(`modules.lid_label`, {
     lidStatus: i18n.t(lidOpen ? 'modules.lid_open' : 'modules.lid_closed'),
   })
+
+export const makeSpeedText = (targetSpeed: number | string | null): string =>
+  targetSpeed === null
+    ? i18n.t('modules.status.deactivated')
+    : `${targetSpeed} ${i18n.t('application.units.rpm')}`
+
+export const makeTimerText = (
+  targetMinutes: number | string | null,
+  targetSeconds: number | string | null
+): string | null =>
+  targetMinutes === null && targetSeconds === null
+    ? null
+    : `${targetMinutes}  ${i18n.t(
+        'application.units.minutes'
+      )} + ${targetSeconds}  ${i18n.t('application.units.seconds')} timer`

@@ -1,5 +1,5 @@
 """Tests for motion planning."""
-import numpy as np  # type: ignore[import]
+import numpy as np
 from hypothesis import given, assume, strategies as st
 from hypothesis.extra import numpy as hynp
 from typing import Iterator, List
@@ -50,7 +50,7 @@ def generate_close_coordinates(
     draw: st.DrawFn, prev_coord: Coordinates[str, np.float64]
 ) -> Coordinates[str, np.float64]:
     """Create coordinates using Hypothesis."""
-    diff = [
+    diff: List[np.typing.NDArray[np.float64]] = [
         draw(hynp.from_dtype(np.dtype(np.float64), min_value=0.1, max_value=1.0)),
         draw(hynp.from_dtype(np.dtype(np.float64), min_value=0.1, max_value=1.0)),
         draw(hynp.from_dtype(np.dtype(np.float64), min_value=0.1, max_value=1.0)),
@@ -58,9 +58,8 @@ def generate_close_coordinates(
         draw(hynp.from_dtype(np.dtype(np.float64), min_value=0.1, max_value=1.0)),
         draw(hynp.from_dtype(np.dtype(np.float64), min_value=0.1, max_value=1.0)),
     ]
-    coord = vectorize(prev_coord) + diff
-    formatted: Iterator[np.float64] = (np.float64(i) for i in coord)
-    return dict(zip(SIXAXES, formatted))
+    coord: np.typing.NDArray[np.float64] = vectorize(prev_coord) + diff
+    return dict(zip(SIXAXES, (np.float64(i) for i in coord)))
 
 
 def reject_close_coordinates(
@@ -70,7 +69,7 @@ def reject_close_coordinates(
 
     Consecutive coordinates must be at least 1mm apart in one of the axes.
     """
-    return any(abs(vectorize(b) - vectorize(a)) > 1.0)
+    return not np.any(np.isclose(vectorize(b), vectorize(a), atol=1.0))
 
 
 @st.composite
@@ -86,7 +85,7 @@ def generate_target_list(
         if len(target_list):
             assume(reject_close_coordinates(position, target_list[-1].position))
         target = MoveTarget.build(
-            position, draw(st.floats(min_value=10, max_value=500))
+            position, np.float64(draw(st.floats(min_value=10, max_value=500)))
         )
         target_list.append(target)
     return target_list
@@ -103,7 +102,7 @@ def generate_close_target_list(
     while len(target_list) < target_num:
         position = draw(generate_close_coordinates(prev_coord))
         target = MoveTarget.build(
-            position, draw(st.floats(min_value=0.1, max_value=10.0))
+            position, np.float64(draw(st.floats(min_value=0.1, max_value=10.0)))
         )
         target_list.append(target)
         prev_coord = position

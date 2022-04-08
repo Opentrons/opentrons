@@ -2,7 +2,8 @@
 from __future__ import annotations
 import logging
 import dataclasses
-import numpy as np  # type: ignore[import]
+import numpy as np
+
 
 from typing import (
     cast,
@@ -15,7 +16,11 @@ from typing import (
     Iterable,
     Generator,
     Union,
+    TYPE_CHECKING,
 )
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 log = logging.getLogger(__name__)
 
@@ -51,8 +56,11 @@ class Block:
 
         def _final_speed() -> np.float64:
             """Get final speed of the block."""
-            return np.sqrt(
-                self.initial_speed**2 + self.acceleration * self.distance * 2
+            return cast(
+                np.float64,
+                np.sqrt(
+                    self.initial_speed**2 + self.acceleration * self.distance * 2
+                ),
             )
 
         def _time() -> np.float64:
@@ -264,7 +272,7 @@ class ZeroLengthMoveError(ValueError, Generic[AxisKey, CoordinateValue]):
         return self._destination
 
 
-def vectorize(position: Coordinates[AxisKey, np.float64]) -> np.ndarray:
+def vectorize(position: Coordinates[AxisKey, np.float64]) -> "NDArray[np.float64]":
     """Turn a coordinates map into a vector for math."""
     return np.array(list(position.values()))
 
@@ -272,5 +280,5 @@ def vectorize(position: Coordinates[AxisKey, np.float64]) -> np.ndarray:
 def is_unit_vector(position: Coordinates[AxisKey, np.float64]) -> bool:
     """Check whether a coordinate vector has unit magnitude."""
     vectorized = vectorize(position)
-    magnitude = np.linalg.norm(vectorized)
+    magnitude = np.linalg.norm(vectorized)  # type: ignore[no-untyped-call]
     return cast(bool, np.isclose(magnitude, 1.0))

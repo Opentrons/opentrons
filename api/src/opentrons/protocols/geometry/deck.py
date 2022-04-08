@@ -1,3 +1,4 @@
+import functools
 import logging
 from collections import UserDict
 from dataclasses import dataclass
@@ -57,6 +58,7 @@ class Deck(UserDict):
             load_name = deck_type()
         self._definition = load_deck(load_name, 2)
         self._load_fixtures()
+        self._thermocycler_present = False
 
     def _load_fixtures(self):
         for f in self._definition["locations"]["fixtures"]:
@@ -67,6 +69,7 @@ class Deck(UserDict):
             self.__setitem__(slot_name, loaded_f)
 
     @staticmethod
+    @functools.lru_cache(20)
     def _assure_int(key: object) -> int:
         if isinstance(key, str):
             return int(key)
@@ -97,6 +100,10 @@ class Deck(UserDict):
         self.data[checked_key] = None
         if old:
             self.recalculate_high_z()
+            # Update the thermocycler present member
+            self._thermocycler_present = any(
+                isinstance(item, ThermocyclerGeometry) for item in self.data.values()
+            )
 
     def __setitem__(self, key: types.DeckLocation, val: DeckItem) -> None:
         slot_key_int = self._check_name(key)
@@ -125,6 +132,9 @@ class Deck(UserDict):
             )
         self.data[slot_key_int] = val
         self._highest_z = max(val.highest_z, self._highest_z)
+        self._thermocycler_present = any(
+            isinstance(item, ThermocyclerGeometry) for item in self.data.values()
+        )
 
     def __contains__(self, key: object) -> bool:
         try:
@@ -295,3 +305,8 @@ class Deck(UserDict):
             if item_slot_keys.issubset(covered_sks):
                 colliding_items.setdefault(sk, []).append(i)
         return colliding_items
+
+    @property
+    def thermocycler_present(self) -> bool:
+        """Is a thermocycler present on the deck."""
+        return self._thermocycler_present

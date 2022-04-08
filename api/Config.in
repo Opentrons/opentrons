@@ -9,6 +9,7 @@ config BR2_PACKAGE_PYTHON_OPENTRONS_API
   select BR2_PACKAGE_PYTHON_SERIAL # runtime
   select BR2_PACKAGE_PYTHON_SYSTEMD # runtime
   select BR2_PACKAGE_PYTHON_TYPING_EXTENSIONS # runtime
+  select BR2_PACKAGE_PYTHON_CLICK # runtime
 
   help
     Opentrons API library. Used on an OT-2 robot.

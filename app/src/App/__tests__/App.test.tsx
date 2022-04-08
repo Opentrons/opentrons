@@ -15,7 +15,7 @@ import { MorePanel } from '../../pages/More/MorePanel'
 
 import { useFeatureFlag } from '../../redux/config'
 
-import { Navbar } from '../Navbar'
+import { LegacyNavbar } from '../LegacyNavbar'
 import { NextGenApp } from '../NextGenApp'
 import { TopPortalRoot, PortalRoot } from '../portal'
 import { Alerts } from '../../organisms/Alerts'
@@ -29,7 +29,7 @@ jest.mock('../../pages/Robots/ConnectPanel', () => ({
 }))
 jest.mock('../../pages/Run/RunPanel', () => ({ RunPanel: () => <></> }))
 jest.mock('../../pages/More/MorePanel', () => ({ MorePanel: () => <></> }))
-jest.mock('../Navbar', () => ({ Navbar: () => <></> }))
+jest.mock('../LegacyNavbar', () => ({ LegacyNavbar: () => <></> }))
 jest.mock('../NextGenApp', () => ({ NextGenApp: () => <></> }))
 jest.mock('../../organisms/Alerts', () => ({ Alerts: () => <></> }))
 jest.mock('../../redux/discovery')
@@ -58,9 +58,9 @@ describe('top level App component', () => {
     resetAllWhenMocks()
   })
 
-  it('should render a Navbar', () => {
+  it('should render a LegacyNavbar', () => {
     const { wrapper } = render()
-    expect(wrapper.exists(Navbar)).toBe(true)
+    expect(wrapper.exists(LegacyNavbar)).toBe(true)
   })
 
   it('should render a Robots page on /robot', () => {

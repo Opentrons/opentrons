@@ -1,13 +1,9 @@
 import * as React from 'react'
+import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Portal } from '../../../App/portal'
-import { useSelector } from 'react-redux'
-import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
-import {
-  getAttachedModules,
-  HEATERSHAKER_MODULE_TYPE,
-} from '../../../redux/modules'
+import { HEATERSHAKER_MODULE_TYPE } from '../../../redux/modules'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/Buttons'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
@@ -24,23 +20,23 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import type { State } from '../../../redux/types'
+import type { NextGenRouteParams } from '../../../App/NextGenApp'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
+import { useAttachedModules } from '../hooks'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
+  hasProtocol?: boolean
 }
 
 export const HeaterShakerWizard = (
   props: HeaterShakerWizardProps
 ): JSX.Element | null => {
-  const { onCloseClick } = props
+  const { onCloseClick, hasProtocol } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
-  const robotName = useSelector((state: State) => getConnectedRobotName(state))
-  const attachedModules = useSelector((state: State) =>
-    getAttachedModules(state, robotName === null ? null : robotName)
-  )
+  const { robotName } = useParams<NextGenRouteParams>()
+  const attachedModules = useAttachedModules(robotName)
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const heaterShaker = (attachedModules.find(
@@ -78,7 +74,11 @@ export const HeaterShakerWizard = (
       case 5:
         buttonContent = t('complete')
         return (
-          <TestShake module={heaterShaker} setCurrentPage={setCurrentPage} />
+          <TestShake
+            module={heaterShaker}
+            setCurrentPage={setCurrentPage}
+            hasProtocol={hasProtocol}
+          />
         )
       default:
         return null

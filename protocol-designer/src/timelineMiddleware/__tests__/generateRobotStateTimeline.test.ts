@@ -116,7 +116,7 @@ describe('generateRobotStateTimeline', () => {
     expect(result.timeline.length).toEqual(orderedStepIds.length)
     expect(result.errors).toBe(null)
     const commandOverview = result.timeline.map(frame =>
-      frame.commands.map(command => command.command)
+      frame.commands.map(command => command.commandType)
     )
     // NOTE: if you update this snapshot, make sure this it exhibits eager tip dropping
     expect(commandOverview).toMatchInlineSnapshot(`

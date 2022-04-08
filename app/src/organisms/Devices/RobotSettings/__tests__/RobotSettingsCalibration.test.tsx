@@ -84,7 +84,10 @@ describe('RobotSettingsCalibration', () => {
     mockDeckCalibrationModal.mockReturnValue(
       <div>Mock DeckCalibrationModal</div>
     )
-    mockUseDeckCalibrationData.mockReturnValue(mockDeckCalData)
+    mockUseDeckCalibrationData.mockReturnValue({
+      deckCalibrationData: mockDeckCalData,
+      isDeckCalibrated: true,
+    })
     mockUsePipetteOffsetCalibrations.mockReturnValue([
       mockPipetteOffsetCalibration1,
       mockPipetteOffsetCalibration2,

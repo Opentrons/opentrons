@@ -25,7 +25,11 @@ export function FeatureFlags(): JSX.Element {
   console.log(Config.DEV_INTERNAL_FLAGS)
 
   return (
-    <Box paddingX={SPACING.spacing4} paddingY={SPACING.spacing5}>
+    <Box
+      height="calc(100vh - 8.5rem)"
+      paddingX={SPACING.spacing4}
+      paddingY={SPACING.spacing5}
+    >
       {Config.DEV_INTERNAL_FLAGS.map((flag, index) => (
         <>
           <Flex

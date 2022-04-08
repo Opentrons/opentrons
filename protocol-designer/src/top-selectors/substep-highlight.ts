@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
 import { getWellNamePerMultiTip } from '@opentrons/shared-data'
 import { getWellSetForMultichannel } from '../utils'
-import { Command } from '@opentrons/shared-data/protocol/types/schemaV5Addendum'
+import { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import mapValues from 'lodash/mapValues'
 import * as StepGeneration from '@opentrons/step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'
@@ -86,10 +86,10 @@ function _getSelectedWellsForStep(
     }
   }
 
-  frame.commands.forEach((c: Command) => {
-    if (c.command === 'pickUpTip' && c.params.labware === labwareId) {
-      const commandWellName = c.params.well
-      const pipetteId = c.params.pipette
+  frame.commands.forEach((c: CreateCommand) => {
+    if (c.commandType === 'pickUpTip' && c.params.labwareId === labwareId) {
+      const commandWellName = c.params.wellName
+      const pipetteId = c.params.pipetteId
       const pipetteSpec =
         invariantContext.pipetteEntities[pipetteId]?.spec || {}
 
@@ -183,18 +183,22 @@ function _getSelectedWellsForSubstep(
       const { activeTips } = substeps.multiRows[substepIndex][0]
 
       // just use first multi row
-      if (activeTips && activeTips.labware === labwareId) {
+      if (activeTips && activeTips.labwareId === labwareId) {
         const multiTipWellSet = getWellSetForMultichannel(
           invariantContext.labwareEntities[labwareId].def,
-          activeTips.well
+          activeTips.wellName
         )
         if (multiTipWellSet) tipWellSet = multiTipWellSet
       }
     } else {
       // single-channel
       const { activeTips } = substeps.rows[substepIndex]
-      if (activeTips && activeTips.labware === labwareId && activeTips.well)
-        tipWellSet = [activeTips.well]
+      if (
+        activeTips &&
+        activeTips.labwareId === labwareId &&
+        activeTips.wellName
+      )
+        tipWellSet = [activeTips.wellName]
     }
 
     wells.push(...tipWellSet)

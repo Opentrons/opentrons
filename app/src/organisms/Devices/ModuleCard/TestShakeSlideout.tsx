@@ -92,7 +92,7 @@ export const TestShakeSlideout = (
   const errorMessage =
     shakeValue != null &&
     (parseInt(shakeValue) < HS_RPM_MIN || parseInt(shakeValue) > HS_RPM_MAX)
-      ? t('input_out_of_range')
+      ? t('input_out_of_range', { ns: 'device_details' })
       : null
 
   return (

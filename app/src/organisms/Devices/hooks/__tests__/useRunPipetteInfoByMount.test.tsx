@@ -3,7 +3,6 @@ import { when, resetAllWhenMocks } from 'jest-when'
 
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import _tiprack10ul from '@opentrons/shared-data/labware/definitions/2/opentrons_96_tiprack_10ul/1.json'
-import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 
 import {
   mockPipetteOffsetCalibration1,
@@ -24,6 +23,7 @@ import {
   useProtocolDetailsForRun,
   useRunPipetteInfoByMount,
 } from '..'
+import _uncastedModifiedSimpleV6Protocol from '../__fixtures__/modifiedSimpleV6.json'
 
 import type {
   LabwareDefinition2,
@@ -82,11 +82,11 @@ const TIP_LENGTH_CALIBRATIONS = [
 ]
 
 const tiprack10ul = _tiprack10ul as LabwareDefinition2
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
+const modifiedSimpleV6Protocol = (_uncastedModifiedSimpleV6Protocol as any) as ProtocolAnalysisFile<{}>
 
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
-  protocolData: simpleV6Protocol,
+  protocolData: modifiedSimpleV6Protocol,
 }
 
 describe('useRunPipetteInfoByMount hook', () => {

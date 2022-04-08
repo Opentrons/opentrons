@@ -1,20 +1,20 @@
 import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
-import type { PipetteAccessParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type { DropTipParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 export function forDropTip(
-  params: PipetteAccessParams,
+  params: DropTipParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  const { pipette, labware, well } = params
+  const { pipetteId, labwareId, wellName } = params
   const { robotState } = robotStateAndWarnings
   dispenseUpdateLiquidState({
     invariantContext,
     prevLiquidState: robotState.liquidState,
-    pipette,
-    labware,
+    pipetteId,
+    labwareId,
     useFullVolume: true,
-    well,
+    wellName,
   })
-  robotState.tipState.pipettes[pipette] = false
+  robotState.tipState.pipettes[pipetteId] = false
 }

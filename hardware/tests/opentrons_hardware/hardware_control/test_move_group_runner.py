@@ -1,6 +1,7 @@
 """Tests for the move scheduler."""
 import pytest
 from typing import List, Tuple, Any
+from numpy import float64
 from mock import AsyncMock, call, MagicMock
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 
@@ -55,7 +56,9 @@ def move_group_single() -> MoveGroups:
         [
             {
                 NodeId.head: MoveGroupSingleAxisStep(
-                    distance_mm=246, velocity_mm_sec=2, duration_sec=123
+                    distance_mm=float64(246),
+                    velocity_mm_sec=float64(2),
+                    duration_sec=float64(123),
                 )
             }
         ]
@@ -70,10 +73,10 @@ def move_group_home_single() -> MoveGroups:
         [
             {
                 NodeId.head: MoveGroupSingleAxisStep(
-                    distance_mm=0,
-                    velocity_mm_sec=235,
-                    duration_sec=2142,
-                    acceleration_mm_sec_sq=1000,
+                    distance_mm=float64(0),
+                    velocity_mm_sec=float64(235),
+                    duration_sec=float64(2142),
+                    acceleration_mm_sec_sq=float64(1000),
                     stop_condition=MoveStopCondition.limit_switch,
                     move_type=MoveType.home,
                 ),
@@ -90,10 +93,10 @@ def move_group_multiple() -> MoveGroups:
         [
             {
                 NodeId.head: MoveGroupSingleAxisStep(
-                    distance_mm=229,
-                    velocity_mm_sec=235,
-                    duration_sec=2142,
-                    acceleration_mm_sec_sq=1000,
+                    distance_mm=float64(229),
+                    velocity_mm_sec=float64(235),
+                    duration_sec=float64(2142),
+                    acceleration_mm_sec_sq=float64(1000),
                 ),
             }
         ],
@@ -101,16 +104,16 @@ def move_group_multiple() -> MoveGroups:
         [
             {
                 NodeId.gantry_x: MoveGroupSingleAxisStep(
-                    distance_mm=522,
-                    velocity_mm_sec=22,
-                    duration_sec=1,
-                    acceleration_mm_sec_sq=1000,
+                    distance_mm=float64(522),
+                    velocity_mm_sec=float64(22),
+                    duration_sec=float64(1),
+                    acceleration_mm_sec_sq=float64(1000),
                 ),
                 NodeId.gantry_y: MoveGroupSingleAxisStep(
-                    distance_mm=25,
-                    velocity_mm_sec=23,
-                    duration_sec=0,
-                    acceleration_mm_sec_sq=1000,
+                    distance_mm=float64(25),
+                    velocity_mm_sec=float64(23),
+                    duration_sec=float64(0),
+                    acceleration_mm_sec_sq=float64(1000),
                 ),
             }
         ],
@@ -118,18 +121,18 @@ def move_group_multiple() -> MoveGroups:
         [
             {
                 NodeId.pipette_left: MoveGroupSingleAxisStep(
-                    distance_mm=12,
-                    velocity_mm_sec=-23,
-                    duration_sec=1234,
-                    acceleration_mm_sec_sq=1000,
+                    distance_mm=float64(12),
+                    velocity_mm_sec=float64(-23),
+                    duration_sec=float64(1234),
+                    acceleration_mm_sec_sq=float64(1000),
                 ),
             },
             {
                 NodeId.pipette_left: MoveGroupSingleAxisStep(
-                    distance_mm=12,
-                    velocity_mm_sec=23,
-                    duration_sec=1234,
-                    acceleration_mm_sec_sq=1000,
+                    distance_mm=float64(12),
+                    velocity_mm_sec=float64(23),
+                    duration_sec=float64(1234),
+                    acceleration_mm_sec_sq=float64(1000),
                 ),
             },
         ],
@@ -452,6 +455,7 @@ class MockSendMoveCompleter:
                         group_id=message.payload.group_id,
                         seq_id=UInt8Field(seq_id),
                         current_position_um=UInt32Field(int(move.distance_mm * 1000)),
+                        encoder_position=UInt32Field(int(move.distance_mm * 4000)),
                         ack_id=UInt8Field(1),
                     )
                     arbitration_id = ArbitrationId(
@@ -556,6 +560,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(10000),
+                            encoder_position=UInt32Field(10000 * 4),
                         )
                     ),
                 ),
@@ -567,6 +572,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(1),
                             current_position_um=UInt32Field(20000),
+                            encoder_position=UInt32Field(10000 * 4),
                         )
                     ),
                 ),
@@ -578,6 +584,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(1),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(30000),
+                            encoder_position=UInt32Field(10000 * 4),
                         )
                     ),
                 ),
@@ -595,6 +602,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(10000),
+                            encoder_position=UInt32Field(10000 * 4),
                         )
                     ),
                 ),
@@ -606,6 +614,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(1),
                             current_position_um=UInt32Field(20000),
+                            encoder_position=UInt32Field(10000 * 4),
                         )
                     ),
                 ),
@@ -617,6 +626,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(1),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(30000),
+                            encoder_position=UInt32Field(10000 * 4),
                         )
                     ),
                 ),

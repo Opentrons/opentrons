@@ -1,21 +1,11 @@
 import * as React from 'react'
-import { NavLink, Redirect, Route, Switch, Link } from 'react-router-dom'
-import styled from 'styled-components'
+import { Redirect, Route, Switch } from 'react-router-dom'
 
 import {
   Box,
-  Flex,
   COLORS,
-  Icon,
-  DIRECTION_COLUMN,
-  FLEX_NONE,
   OVERFLOW_SCROLL,
   POSITION_RELATIVE,
-  SPACING,
-  TYPOGRAPHY,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  ALIGN_FLEX_START,
 } from '@opentrons/components'
 
 import { Breadcrumbs } from '../molecules/Breadcrumbs'
@@ -29,81 +19,9 @@ import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { AppSettings } from '../organisms/AppSettings'
 import { Labware } from '../organisms/Labware'
 import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
+import { Navbar } from './Navbar'
 
-export interface RouteProps {
-  /**
-   * the component rendered by a route match
-   * drop developed components into slots held by placeholder div components
-   */
-  component: () => JSX.Element | null
-  exact?: boolean
-  /**
-   * a route/page name to render in the temp nav bar
-   */
-  name: string
-  /**
-   * the path for navigation linking, for example to push to a default tab
-   * some of these links are temp (and params hardcoded) until final nav and breadcrumbs implemented
-   */
-  navLinkTo?: string
-  path: string
-}
-
-const TempNavBarLink = styled(NavLink)<{ lastRoute: boolean }>`
-  color: ${COLORS.white};
-  opacity: 0.8;
-  margin-top: ${props => (props.lastRoute ? 'auto' : SPACING.spacing4)};
-`
-
-// defines a constant for the nav bar width - used in run log component to calculate centering
-export const NAV_BAR_WIDTH = '5.625rem'
-
-/**
- * a temp nav bar to facilitate app navigation during development until breadcrumbs are implemented
- * @param routes
- * @returns {JSX.Element}
- */
-export function TempNavBar({ routes }: { routes: RouteProps[] }): JSX.Element {
-  const navRoutes = routes.filter(
-    ({ navLinkTo }: RouteProps) => navLinkTo != null
-  )
-  return (
-    <Flex
-      backgroundColor={COLORS.darkBlack}
-      css={TYPOGRAPHY.h3Regular}
-      flexDirection={DIRECTION_COLUMN}
-      flex={FLEX_NONE}
-      width={NAV_BAR_WIDTH}
-      padding={SPACING.spacing4}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      alignItems={ALIGN_CENTER}
-    >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        flex={FLEX_NONE}
-        alignItems={ALIGN_FLEX_START}
-      >
-        {navRoutes.map(({ name, navLinkTo }: RouteProps, i: number) => (
-          <TempNavBarLink
-            key={name}
-            to={navLinkTo as string}
-            lastRoute={i === navRoutes.length}
-          >
-            {name}
-          </TempNavBarLink>
-        ))}
-      </Flex>
-      <Link to="/app-settings/general">
-        <Icon
-          width={SPACING.spacing6}
-          name="settings"
-          marginBottom={SPACING.spacing3}
-          color={COLORS.white}
-        ></Icon>
-      </Link>
-    </Flex>
-  )
-}
+import type { RouteProps } from './types'
 
 export type RobotSettingsTab = 'calibration' | 'networking' | 'advanced'
 export type AppSettingsTab =
@@ -225,7 +143,7 @@ export function NextGenApp(): JSX.Element {
   return (
     <>
       <TopPortalRoot />
-      <TempNavBar routes={nextGenRoutes} />
+      <Navbar routes={nextGenRoutes} />
       <Box width="100%">
         <Breadcrumbs pathCrumbs={pathCrumbs} />
         <Box
