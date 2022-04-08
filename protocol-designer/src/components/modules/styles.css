@@ -39,7 +39,7 @@
 .row_title {
   @apply --font-body-2-dark;
 
-  display: block;
+  display: flex;
   margin-bottom: 0.5rem;
   font-weight: var(--fw-semibold);
 }

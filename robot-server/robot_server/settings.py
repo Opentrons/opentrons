@@ -1,4 +1,5 @@
 import typing
+import typing_extensions
 import logging
 from functools import lru_cache
 from pathlib import Path
@@ -32,6 +33,7 @@ class Environment(BaseSettings):
         env_prefix = "OT_ROBOT_SERVER_"
 
 
+# If you update this, also update the generated settings_schema.json.
 class RobotServerSettings(BaseSettings):
     """Robot server settings.
 
@@ -39,42 +41,38 @@ class RobotServerSettings(BaseSettings):
     OT_ROBOT_SERVER_.
     """
 
-    ws_host_name: str = Field(
-        "localhost",
-        description=(
-            "TCP/IP hostname to serve on. Will be ignored if domain"
-            " socket is defined."
-        ),
-    )
-    ws_port: int = Field(
-        31950,
-        description=(
-            "TCP/IP port to serve on. Will be ignored if domain socket is defined."
-        ),
-    )
-    ws_domain_socket: typing.Optional[str] = Field(
-        "/run/aiohttp.sock",
-        description=(
-            "Unix file system path to serve on. This value supersedes"
-            " the port and host name settings."
-        ),
-    )
     simulator_configuration_file_path: typing.Optional[str] = Field(
         None,
         description="Path to a json file that describes the hardware simulator.",
     )
 
-    protocol_manager_max_protocols: int = Field(
-        1,
-        description=(
-            "The maximum number of protocols allowed for upload."
-            " This setting is deprecated and no longer used."
-        ),
-    )
-
     notification_server_subscriber_address: str = Field(
         "tcp://localhost:5555",
         description="The endpoint to subscribe to notification server topics.",
+    )
+
+    persistence_directory: typing.Union[
+        # Literal must come first to avoid Pydantic parsing it as a relative Path
+        # with the filename "automatically_make_temporary".
+        typing_extensions.Literal["automatically_make_temporary"],
+        Path,
+    ] = Field(
+        # TODO(mm, 2022-04-05): This should not have a default value.
+        # It only does now because our code has some deep calls to get_settings(),
+        # and it's difficult to override this settings object for our unit tests.
+        # Making this non-defaultable breaks tests that hit code with deep calls to
+        # get_settings().
+        "automatically_make_temporary",
+        description=(
+            "A directory for the server to store things persistently across boots."
+            " If this directory doesn't already exist, the server will create it."
+            " If this is the string `automatically_make_temporary`,"
+            " the server will use a fresh temporary directory"
+            " (effectively not persisting anything)."
+            "\n\n"
+            "Note that the `opentrons` library is also responsible for persisting"
+            " certain things, and it has its own configuration."
+        ),
     )
 
     class Config:

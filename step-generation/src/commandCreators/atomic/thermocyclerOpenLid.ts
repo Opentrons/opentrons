@@ -8,9 +8,9 @@ export const thermocyclerOpenLid: CommandCreator<ModuleOnlyParams> = (
   return {
     commands: [
       {
-        command: 'thermocycler/openLid',
+        commandType: 'thermocycler/openLid',
         params: {
-          module: args.module,
+          moduleId: args.module,
         },
       },
     ],

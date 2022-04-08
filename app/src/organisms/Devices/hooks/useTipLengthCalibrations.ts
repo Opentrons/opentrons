@@ -6,6 +6,7 @@ import {
   getTipLengthCalibrations,
 } from '../../../redux/calibration'
 import { useDispatchApiRequest } from '../../../redux/robot-api'
+import { useRobot } from '.'
 
 import type { TipLengthCalibration } from '../../../redux/calibration/types'
 import type { State } from '../../../redux/types'
@@ -15,6 +16,8 @@ export function useTipLengthCalibrations(
 ): TipLengthCalibration[] | null {
   const [dispatchRequest] = useDispatchApiRequest()
 
+  const robot = useRobot(robotName)
+
   const tipLengthCalibrations = useSelector((state: State) =>
     getTipLengthCalibrations(state, robotName)
   )
@@ -23,7 +26,7 @@ export function useTipLengthCalibrations(
     if (robotName != null) {
       dispatchRequest(fetchTipLengthCalibrations(robotName))
     }
-  }, [dispatchRequest, robotName])
+  }, [dispatchRequest, robotName, robot?.status])
 
   return tipLengthCalibrations
 }

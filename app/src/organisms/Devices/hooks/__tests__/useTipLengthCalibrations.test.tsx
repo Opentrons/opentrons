@@ -15,13 +15,15 @@ import {
   mockTipLengthCalibration3,
 } from '../../../../redux/calibration/tip-length/__fixtures__'
 import { useDispatchApiRequest } from '../../../../redux/robot-api'
-
+import { useRobot } from '../useRobot'
 import { useTipLengthCalibrations } from '..'
 
+import type { DiscoveredRobot } from '../../../../redux/discovery/types'
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 
 jest.mock('../../../../redux/calibration')
 jest.mock('../../../../redux/robot-api')
+jest.mock('../useRobot')
 
 const mockFetchTipLengthCalibrations = fetchTipLengthCalibrations as jest.MockedFunction<
   typeof fetchTipLengthCalibrations
@@ -32,8 +34,11 @@ const mockGetTipLengthCalibrations = getTipLengthCalibrations as jest.MockedFunc
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
 >
+const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
 const store: Store<any> = createStore(jest.fn(), {})
+
+const ROBOT_NAME = 'otie'
 
 describe('useTipLengthCalibrations hook', () => {
   let dispatchApiRequest: DispatchApiRequestType
@@ -49,6 +54,9 @@ describe('useTipLengthCalibrations hook', () => {
       </Provider>
     )
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
+    when(mockUseRobot)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(({ status: 'chill' } as unknown) as DiscoveredRobot)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -70,14 +78,14 @@ describe('useTipLengthCalibrations hook', () => {
 
   it('returns tip length calibrations when given a robot name', () => {
     when(mockGetTipLengthCalibrations)
-      .calledWith(undefined as any, 'otie')
+      .calledWith(undefined as any, ROBOT_NAME)
       .mockReturnValue([
         mockTipLengthCalibration1,
         mockTipLengthCalibration2,
         mockTipLengthCalibration3,
       ])
 
-    const { result } = renderHook(() => useTipLengthCalibrations('otie'), {
+    const { result } = renderHook(() => useTipLengthCalibrations(ROBOT_NAME), {
       wrapper,
     })
 
@@ -87,7 +95,7 @@ describe('useTipLengthCalibrations hook', () => {
       mockTipLengthCalibration3,
     ])
     expect(dispatchApiRequest).toBeCalledWith(
-      mockFetchTipLengthCalibrations('otie')
+      mockFetchTipLengthCalibrations(ROBOT_NAME)
     )
   })
 })

@@ -18,5 +18,12 @@
   "imported": "{{filename}} imported.",
   "create_new_def": "Create a new labware definition",
   "open_labware_creator": "Open Labware Creator",
-  "drag_and_drop": "Drag and drop or <a>browse</a> your files"
+  "drag_and_drop": "Drag and drop or <a>browse</a> your files",
+  "last_updated": "Last updated",
+  "show_in_folder": "Show in folder",
+  "delete_this_labware": "Delete this labware definition?",
+  "def_moved_to_trash": "This labware definition will be moved to this computer’s trash and may be unrecoverable.",
+  "cannot-run-python-missing-labware": "Robots cannot run Python protocols with missing labware definitions.",
+  "cancel": "cancel",
+  "yes_delete_def": "Yes, delete definiton"
 }

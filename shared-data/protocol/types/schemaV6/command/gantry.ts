@@ -82,16 +82,16 @@ interface MoveToSlotParams {
   forceDirect?: boolean
 }
 
-interface MoveToWellParams {
+export interface MoveToWellParams {
   pipetteId: string
   labwareId: string
   wellName: string
-  wellLocation: {
-    origin: 'top' | 'bottom'
+  wellLocation?: {
+    origin?: 'top' | 'bottom'
     offset?: {
-      x: number
-      y: number
-      z: number
+      x?: number
+      y?: number
+      z?: number
     }
   }
   minimumZHeight?: number

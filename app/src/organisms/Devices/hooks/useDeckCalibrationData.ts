@@ -12,12 +12,20 @@ import type { State } from '../../../redux/types'
 
 export function useDeckCalibrationData(
   robotName: string | null = null
-): DeckCalibrationData | null {
+): {
+  deckCalibrationData: DeckCalibrationData | null
+  isDeckCalibrated: boolean
+} {
   const [dispatchRequest] = useDispatchApiRequest()
 
   const deckCalibrationData = useSelector((state: State) =>
     getDeckCalibrationData(state, robotName)
   )
+
+  const isDeckCalibrated =
+    deckCalibrationData != null &&
+    'lastModified' in deckCalibrationData &&
+    typeof deckCalibrationData.lastModified === 'string'
 
   React.useEffect(() => {
     if (robotName != null) {
@@ -25,5 +33,5 @@ export function useDeckCalibrationData(
     }
   }, [dispatchRequest, robotName])
 
-  return deckCalibrationData
+  return { deckCalibrationData, isDeckCalibrated }
 }

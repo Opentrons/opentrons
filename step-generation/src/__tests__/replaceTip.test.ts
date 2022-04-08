@@ -122,7 +122,7 @@ describe('replaceTip', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         pickUpTipHelper('A1', {
-          labware: tiprack2Id,
+          labwareId: tiprack2Id,
         }),
       ])
     })
@@ -139,7 +139,7 @@ describe('replaceTip', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         pickUpTipHelper('A1', {
-          pipette: p300MultiId,
+          pipetteId: p300MultiId,
         }),
       ])
     })
@@ -164,7 +164,7 @@ describe('replaceTip', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         pickUpTipHelper('A2', {
-          pipette: p300MultiId,
+          pipetteId: p300MultiId,
         }),
       ])
     })
@@ -188,10 +188,10 @@ describe('replaceTip', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         dropTipHelper('A1', {
-          pipette: p300MultiId,
+          pipetteId: p300MultiId,
         }),
         pickUpTipHelper('A1', {
-          pipette: p300MultiId,
+          pipetteId: p300MultiId,
         }),
       ])
     })

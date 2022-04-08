@@ -8,9 +8,9 @@ export const thermocyclerAwaitLidTemperature: CommandCreator<TemperatureParams> 
   return {
     commands: [
       {
-        command: 'thermocycler/awaitLidTemperature',
+        commandType: 'thermocycler/awaitLidTemperature',
         params: {
-          module: args.module,
+          moduleId: args.module,
           temperature: args.temperature,
         },
       },

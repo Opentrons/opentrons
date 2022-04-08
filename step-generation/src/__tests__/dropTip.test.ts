@@ -47,11 +47,11 @@ describe('dropTip', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         {
-          command: 'dropTip',
+          commandType: 'dropTip',
           params: {
-            pipette: DEFAULT_PIPETTE,
-            labware: FIXED_TRASH_ID,
-            well: 'A1',
+            pipetteId: DEFAULT_PIPETTE,
+            labwareId: FIXED_TRASH_ID,
+            wellName: 'A1',
           },
         },
       ])
@@ -87,11 +87,11 @@ describe('dropTip', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         {
-          command: 'dropTip',
+          commandType: 'dropTip',
           params: {
-            pipette: 'p300MultiId',
-            labware: FIXED_TRASH_ID,
-            well: 'A1',
+            pipetteId: 'p300MultiId',
+            labwareId: FIXED_TRASH_ID,
+            wellName: 'A1',
           },
         },
       ])

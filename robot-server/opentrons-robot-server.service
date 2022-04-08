@@ -11,10 +11,19 @@ After=opentrons-status-leds.service
 [Service]
 
 Type=notify
+
 # "--lifespan on" ensures errors in startup and shutdown handlers won't be hidden.
 # See github.com/encode/starlette/issues/1138, fixed in Starlette v0.16.0?
+#
+# /run/aiohttp.sock matches where our reverse proxy expects to find us.
+# It refers to aiohttp even though this server doesn't use that framework
+# for historical reasons.
 ExecStart=uvicorn robot_server:app --uds /run/aiohttp.sock --ws wsproto --lifespan on
-Environment=OT_SMOOTHIE_ID=AMA RUNNING_ON_PI=true
+
+Environment=OT_SMOOTHIE_ID=AMA
+Environment=RUNNING_ON_PI=true
+Environment=OT_ROBOT_SERVER_persistence_directory=/data/opentrons_robot_server
+
 Restart=on-failure
 TimeoutStartSec=3min
 

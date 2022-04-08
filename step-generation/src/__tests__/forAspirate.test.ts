@@ -11,7 +11,7 @@ import {
 import { forAspirate as _forAspirate } from '../getNextRobotStateAndWarnings/forAspirate'
 import * as warningCreators from '../warningCreators'
 import { CommandCreatorWarning, InvariantContext, RobotState } from '../types'
-import { AspDispAirgapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
+import { AspDispAirgapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV6/command/pipetting'
 
 const forAspirate = makeImmutableStateUpdater(_forAspirate)
 
@@ -36,10 +36,10 @@ describe('...single-channel pipette', () => {
     // NOTE: aspirate from TROUGH not sourcePlate
     aspirateSingleCh50FromA1Args = {
       ...flowRatesAndOffsets,
-      labware: labwareId,
-      pipette: DEFAULT_PIPETTE,
+      labwareId,
+      pipetteId: DEFAULT_PIPETTE,
       volume: 50,
-      well: 'A1',
+      wellName: 'A1',
     }
   })
   describe('...fresh tip', () => {
@@ -207,10 +207,10 @@ describe('...8-channel pipette', () => {
   beforeEach(() => {
     aspirate8Ch50FromA1Args = {
       ...flowRatesAndOffsets,
-      labware: labwareId,
-      pipette: 'p300MultiId',
+      labwareId,
+      pipetteId: 'p300MultiId',
       volume: 50,
-      well: 'A1',
+      wellName: 'A1',
     }
   })
 
@@ -347,9 +347,9 @@ describe('8-channel trough', () => {
         }
         const args = {
           ...flowRatesAndOffsets,
-          pipette: 'p300MultiId',
-          well: 'A1',
-          labware: labwareId,
+          pipetteId: 'p300MultiId',
+          wellName: 'A1',
+          labwareId,
           volume: aspirateVolume,
         }
 

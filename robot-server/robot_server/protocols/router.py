@@ -75,9 +75,9 @@ protocols_router = APIRouter()
 )
 async def create_protocol(
     files: List[UploadFile] = File(...),
-    # optional protocol_key to track protocols by the UI.
-    # needs to be Form type because its formData
-    protocol_key: Optional[str] = Form(None),
+    # use Form because request is multipart/form-data
+    # https://fastapi.tiangolo.com/tutorial/request-forms-and-files/
+    key: Optional[str] = Form(None),
     protocol_directory: Path = Depends(get_protocol_directory),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
@@ -92,7 +92,7 @@ async def create_protocol(
 
     Arguments:
         files: List of uploaded files, from form-data.
-        protocol_key: Optional key for tracking protocols by the UI
+        key: Optional key for client-side tracking
         protocol_directory: Location to store uploaded files.
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
@@ -117,7 +117,7 @@ async def create_protocol(
         protocol_id=protocol_id,
         created_at=created_at,
         source=source,
-        protocol_key=protocol_key,
+        protocol_key=key,
     )
 
     protocol_store.insert(protocol_resource)
@@ -138,7 +138,7 @@ async def create_protocol(
         protocolType=source.config.protocol_type,
         metadata=Metadata.parse_obj(source.metadata),
         analyses=analyses,
-        protocol_key=protocol_key,
+        key=key,
         files=[ProtocolFile(name=f.path.name, role=f.role) for f in source.files],
     )
 
@@ -173,7 +173,7 @@ async def get_protocols(
             protocolType=r.source.config.protocol_type,
             metadata=Metadata.parse_obj(r.source.metadata),
             analyses=analysis_store.get_by_protocol(r.protocol_id),
-            protocol_key=r.protocol_key,
+            key=r.protocol_key,
             files=[ProtocolFile(name=f.path.name, role=f.role) for f in r.source.files],
         )
         for r in protocol_resources
@@ -219,7 +219,7 @@ async def get_protocol_by_id(
         protocolType=resource.source.config.protocol_type,
         metadata=Metadata.parse_obj(resource.source.metadata),
         analyses=analyses,
-        protocol_key=resource.protocol_key,
+        key=resource.protocol_key,
         files=[
             ProtocolFile(name=f.path.name, role=f.role) for f in resource.source.files
         ],

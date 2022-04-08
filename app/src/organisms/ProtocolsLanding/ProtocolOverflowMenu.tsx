@@ -27,12 +27,13 @@ import { StyledText } from '../../atoms/text'
 
 interface ProtocolOverflowMenuProps extends StyleProps {
   protocolKey: string
+  handleRunProtocol: () => void
 }
 
 export function ProtocolOverflowMenu(
   props: ProtocolOverflowMenuProps
 ): JSX.Element {
-  const { protocolKey } = props
+  const { protocolKey, handleRunProtocol } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
   const dispatch = useDispatch<Dispatch>()
@@ -44,11 +45,13 @@ export function ProtocolOverflowMenu(
 
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
-    console.log('TODO: handle run protocol')
+    handleRunProtocol()
+    setShowOverflowMenu(!showOverflowMenu)
   }
   const handleClickDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     confirmDeleteProtocol()
+    setShowOverflowMenu(!showOverflowMenu)
   }
   const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()

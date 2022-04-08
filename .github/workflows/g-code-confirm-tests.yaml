@@ -7,8 +7,6 @@ on:
       - 'api/**'
       - 'g-code-testing/**'
       - 'Makefile'
-    branches:
-      - '*'
   push:
     paths:
       - 'api/**'
@@ -16,7 +14,9 @@ on:
       - 'Makefile'
       - '.github/workflows/g-code-confirm-tests.yaml'
     branches:
-      - '*'
+      - 'edge'
+      - 'release'
+      - '*hotfix*'
   create:
     tags:
       - 'v*'
@@ -32,7 +32,7 @@ jobs:
           'swift-smoke',
           'swift-turbo',
           'omega',
-#          'fast'
+          'fast'
         ]
     name: 'Confirm G-Code (${{ matrix.command }})'
     runs-on: 'ubuntu-18.04'
@@ -48,9 +48,5 @@ jobs:
         with:
           project: 'g-code-testing'
 
-      - name: 'Run & Compare to S3'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
-          AWS_DEFAULT_REGION: us-east-2
+      - name: 'Run & Compare to comparison files'
         run: make -C g-code-testing test-g-code-${{ matrix.command }}

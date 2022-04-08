@@ -4,7 +4,7 @@ import {
   getWellsForTips,
   getNextRobotStateAndWarningsSingleCommand,
 } from '@opentrons/step-generation'
-import { Command } from '@opentrons/shared-data/protocol/types/schemaV5Addendum'
+import { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import { Channels } from '@opentrons/components'
 import type {
   CommandCreatorError,
@@ -17,27 +17,27 @@ import { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
 
 /** Return last picked up tip in the specified commands, if any */
 export function _getNewActiveTips(
-  commands: Command[]
+  commands: CreateCommand[]
 ): TipLocation | null | undefined {
-  const lastNewTipCommand: Command | null | undefined = last(
-    commands.filter(c => c.command === 'pickUpTip')
+  const lastNewTipCommand: CreateCommand | null | undefined = last(
+    commands.filter(c => c.commandType === 'pickUpTip')
   )
   const newTipParams =
     (lastNewTipCommand != null &&
-      lastNewTipCommand.command === 'pickUpTip' &&
+      lastNewTipCommand.commandType === 'pickUpTip' &&
       lastNewTipCommand.params) ||
     null
   return newTipParams
 }
 
 const _createNextTimelineFrame = (args: {
-  command: Command
+  command: CreateCommand
   index: number
   nextFrame: CommandsAndWarnings
   volume: number
   wellInfo: SourceDestData
 }): Partial<{
-  command: Command
+  command: CreateCommand
   index: number
   nextFrame: CommandsAndWarnings
   volume: number
@@ -50,7 +50,7 @@ const _createNextTimelineFrame = (args: {
     activeTips: _getNewActiveTips(args.nextFrame.commands.slice(0, args.index)),
   }
   const newTimelineFrame =
-    args.command.command === 'aspirate'
+    args.command.commandType === 'aspirate'
       ? { ..._newTimelineFrameKeys, source: args.wellInfo }
       : { ..._newTimelineFrameKeys, dest: args.wellInfo }
   return newTimelineFrame
@@ -71,20 +71,24 @@ export const substepTimelineSingleChannel = (
   if (nextFrame.errors) return []
   // @ts-expect-error(sa, 2021-6-14): after type narrowing this expect error should not be necessary
   const timeline = nextFrame.commands.reduce<SubstepTimelineAcc>(
-    (acc: SubstepTimelineAcc, command: Command, index: number) => {
+    (acc: SubstepTimelineAcc, command: CreateCommand, index: number) => {
       const nextRobotState = getNextRobotStateAndWarningsSingleCommand(
         command,
         invariantContext,
         acc.prevRobotState
       ).robotState
 
-      if (command.command === 'aspirate' || command.command === 'dispense') {
-        const { well, volume, labware } = command.params
+      if (
+        command.commandType === 'aspirate' ||
+        command.commandType === 'dispense'
+      ) {
+        const { wellName, volume, labwareId } = command.params
         const wellInfo = {
-          labware,
-          wells: [well],
-          preIngreds: acc.prevRobotState.liquidState.labware[labware][well],
-          postIngreds: nextRobotState.liquidState.labware[labware][well],
+          labwareId,
+          wells: [wellName],
+          preIngreds:
+            acc.prevRobotState.liquidState.labware[labwareId][wellName],
+          postIngreds: nextRobotState.liquidState.labware[labwareId][wellName],
         }
         return {
           ...acc,
@@ -125,33 +129,36 @@ export const substepTimelineMultiChannel = (
   if (nextFrame.errors) return []
   // @ts-expect-error(sa, 2021-6-14): after type narrowing this expect error should not be necessary
   const timeline = nextFrame.commands.reduce<SubstepTimelineAcc>(
-    (acc: SubstepTimelineAcc, command: Command, index: number) => {
+    (acc: SubstepTimelineAcc, command: CreateCommand, index: number) => {
       const nextRobotState = getNextRobotStateAndWarningsSingleCommand(
         command,
         invariantContext,
         acc.prevRobotState
       ).robotState
 
-      if (command.command === 'aspirate' || command.command === 'dispense') {
-        const { well, volume, labware } = command.params
+      if (
+        command.commandType === 'aspirate' ||
+        command.commandType === 'dispense'
+      ) {
+        const { wellName, volume, labwareId } = command.params
         const labwareDef = invariantContext.labwareEntities
-          ? invariantContext.labwareEntities[labware].def
+          ? invariantContext.labwareEntities[labwareId].def
           : null
         const wellsForTips =
           channels &&
           labwareDef &&
-          getWellsForTips(channels, labwareDef, well).wellsForTips
+          getWellsForTips(channels, labwareDef, wellName).wellsForTips
         const wellInfo = {
-          labware,
+          labwareId,
           wells: wellsForTips || [],
           preIngreds: wellsForTips
             ? pick(
-                acc.prevRobotState.liquidState.labware[labware],
+                acc.prevRobotState.liquidState.labware[labwareId],
                 wellsForTips
               )
             : {},
           postIngreds: wellsForTips
-            ? pick(nextRobotState.liquidState.labware[labware], wellsForTips)
+            ? pick(nextRobotState.liquidState.labware[labwareId], wellsForTips)
             : {},
         }
         return {

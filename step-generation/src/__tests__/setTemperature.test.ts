@@ -31,9 +31,9 @@ describe('setTemperature', () => {
       expected: {
         commands: [
           {
-            command: 'temperatureModule/setTargetTemperature',
+            commandType: 'temperatureModule/setTargetTemperature',
             params: {
-              module: temperatureModuleId,
+              moduleId: temperatureModuleId,
               temperature: targetTemperature,
             },
           },
@@ -57,7 +57,7 @@ describe('setTemperature', () => {
     //   expected: {
     //     commands: [
     //       {
-    //         command: 'thermocycler/setTarget___TODO___Temperature',
+    //         commandType: 'thermocycler/setTarget___TODO___Temperature',
     //         params: {
     //           module: thermocyclerId,
     //           temperature: targetTemperature,

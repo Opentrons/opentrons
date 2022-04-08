@@ -40,20 +40,26 @@ import {
   mockStopRequestedRun,
   mockSucceededRun,
 } from '../../../../organisms/RunTimeControl/__fixtures__'
+import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
+import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
+import { useTrackEvent } from '../../../../redux/analytics'
+
 import {
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useUnmatchedModulesForProtocol,
   useAttachedModules,
 } from '../../hooks'
+import { useHeaterShakerFromProtocol } from '../../ModuleCard/hooks'
+import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
 import { formatTimestamp } from '../../utils'
 import { ProtocolRunHeader } from '../ProtocolRunHeader'
 import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
-import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { ProtocolModuleInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
 
 const mockPush = jest.fn()
 
@@ -77,6 +83,9 @@ jest.mock('../../../../organisms/RunDetails/ConfirmCancelModal')
 jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../hooks')
 jest.mock('../../HeaterShakerIsRunningModal')
+jest.mock('../../ModuleCard/ConfirmAttachmentModal')
+jest.mock('../../ModuleCard/hooks')
+jest.mock('../../../../redux/analytics')
 
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
@@ -112,6 +121,41 @@ const mockConfirmCancelModal = ConfirmCancelModal as jest.MockedFunction<
 const mockMockHeaterShakerIsRunningModal = HeaterShakerIsRunningModal as jest.MockedFunction<
   typeof HeaterShakerIsRunningModal
 >
+const mockUseHeaterShakerFromProtocol = useHeaterShakerFromProtocol as jest.MockedFunction<
+  typeof useHeaterShakerFromProtocol
+>
+const mockConfirmAttachmentModal = ConfirmAttachmentModal as jest.MockedFunction<
+  typeof ConfirmAttachmentModal
+>
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
+
+const ROBOT_NAME = 'otie'
+const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
+const STARTED_AT = '2022-03-03T19:09:40.620530+00:00'
+const COMPLETED_AT = '2022-03-03T19:39:53.620530+00:00'
+const PROTOCOL_NAME = 'A Protocol for Otie'
+
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
+
+const PROTOCOL_DETAILS = {
+  displayName: PROTOCOL_NAME,
+  protocolData: simpleV6Protocol,
+}
+
+const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
+  moduleId: 'heater_shaker_id',
+  x: 0,
+  y: 0,
+  z: 0,
+  moduleDef: mockHeaterShaker as any,
+  nestedLabwareDef: heaterShakerCommands.labwareDefinitions['example/plate/1'],
+  nestedLabwareDisplayName: null,
+  nestedLabwareId: null,
+  protocolLoadOrder: 1,
+  slotName: '1',
+} as ProtocolModuleInfo
 
 const mockMovingHeaterShaker = {
   model: 'heaterShakerModuleV1',
@@ -135,19 +179,6 @@ const mockMovingHeaterShaker = {
   usbPort: { hub: 1, port: 1 },
 } as any
 
-const ROBOT_NAME = 'otie'
-const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
-const STARTED_AT = '2022-03-03T19:09:40.620530+00:00'
-const COMPLETED_AT = '2022-03-03T19:39:53.620530+00:00'
-const PROTOCOL_NAME = 'A Protocol for Otie'
-
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
-
-const PROTOCOL_DETAILS = {
-  displayName: PROTOCOL_NAME,
-  protocolData: simpleV6Protocol,
-}
-
 const render = () => {
   return renderWithProviders(
     <BrowserRouter>
@@ -156,13 +187,21 @@ const render = () => {
     { i18nInstance: i18n }
   )
 }
+let mockTrackEvent: jest.Mock
 
 describe('ProtocolRunHeader', () => {
   beforeEach(() => {
+    mockTrackEvent = jest.fn()
+    when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
     mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
     mockMockHeaterShakerIsRunningModal.mockReturnValue(
       <div>Mock HeaterShakerIsRunningModal</div>
     )
+    mockUseAttachedModules.mockReturnValue([])
+    mockConfirmAttachmentModal.mockReturnValue(
+      <div>mock confirm attachment modal</div>
+    )
+    mockUseHeaterShakerFromProtocol.mockReturnValue(null)
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID)
     when(mockUseCloseCurrentRun).calledWith().mockReturnValue({
       isClosingCurrentRun: false,
@@ -460,5 +499,17 @@ describe('ProtocolRunHeader', () => {
     const button = getByRole('button', { name: 'Start Run' })
     fireEvent.click(button)
     getByText('Mock HeaterShakerIsRunningModal')
+  })
+
+  it('renders the confirm attachment modal when there is a heater shaker in the protocol and the heater shaker is idle status', () => {
+    mockUseAttachedModules.mockReturnValue([mockHeaterShaker])
+    mockUseHeaterShakerFromProtocol.mockReturnValue(
+      HEATER_SHAKER_PROTOCOL_MODULE_INFO
+    )
+    const [{ getByText, getByRole }] = render()
+
+    const button = getByRole('button', { name: 'Start Run' })
+    fireEvent.click(button)
+    getByText('mock confirm attachment modal')
   })
 })
