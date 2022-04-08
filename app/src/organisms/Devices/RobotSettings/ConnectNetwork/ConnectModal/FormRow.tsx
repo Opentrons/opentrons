@@ -1,7 +1,7 @@
 // presentational components for the wifi connect form
 import * as React from 'react'
 import styled from 'styled-components'
-import { TYPOGRAPHY } from '@opentrons/components'
+import { FONT_WEIGHT_SEMIBOLD } from '@opentrons/components'
 
 export interface FormRowProps {
   label: string
@@ -17,7 +17,7 @@ const StyledLabel = styled.label`
   display: table-cell;
   padding-right: 1rem;
   text-align: right;
-  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+  font-weight: ${FONT_WEIGHT_SEMIBOLD};
 `
 
 const StyledInputWrapper = styled.div`

@@ -24,13 +24,15 @@ import {
   postWifiDisconnect,
 } from '../../../redux/networking'
 import * as RobotApi from '../../../redux/robot-api'
-import { NetworkingSlideout } from './ConnectNetwork/NetworkingSlideout'
+import { TemporarySelectNetwork } from './TemporarySelectNetwork'
 
 import type { State, Dispatch } from '../../../redux/types'
 interface NetworkingProps {
   robotName: string
 }
 
+// ToDo modify ConnectModal to align with new design
+// This is temporary until we can get the new design details
 const HELP_CENTER_URL =
   'https://support.opentrons.com/en/articles/2687586-get-started-connect-to-your-ot-2-over-usb'
 const STATUS_REFRESH_MS = 5000
@@ -39,19 +41,23 @@ const LIST_REFRESH_MS = 10000
 export function RobotSettingsNetworking({
   robotName,
 }: NetworkingProps): JSX.Element {
-  const [
-    showNetworkingSlideout,
-    setShowNetworkingSlideout,
-  ] = React.useState<boolean>(false)
   const { t } = useTranslation('device_settings')
-  const [dispatchApi] = RobotApi.useDispatchApiRequest()
+  const list = useSelector((state: State) => getWifiList(state, robotName))
   const dispatch = useDispatch<Dispatch>()
+  const [dispatchApi] = RobotApi.useDispatchApiRequest()
+
   const { wifi, ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
   )
-
-  const list = useSelector((state: State) => getWifiList(state, robotName))
   const activeNetwork = list.find(wifi => wifi.active)
+
+  const handleDisconnect = (): void => {
+    if (activeNetwork != null) {
+      const ssid = activeNetwork.ssid
+      dispatchApi(postWifiDisconnect(robotName, activeNetwork.ssid))
+      console.log(`disconnected from ${ssid}`)
+    }
+  }
 
   useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
   useInterval(() => dispatch(fetchWifiList(robotName)), LIST_REFRESH_MS, true)
@@ -59,25 +65,12 @@ export function RobotSettingsNetworking({
   React.useEffect(() => {
     dispatch(fetchStatus(robotName))
     dispatch(fetchWifiList(robotName))
-  })
-
-  const handleDisconnect = (): void => {
-    if (activeNetwork != null) {
-      dispatchApi(postWifiDisconnect(robotName, activeNetwork.ssid))
-    }
-  }
+  }, [robotName, dispatch])
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      {showNetworkingSlideout && (
-        <NetworkingSlideout
-          isExpanded={showNetworkingSlideout}
-          onCloseClick={() => setShowNetworkingSlideout(false)}
-          robotName={robotName}
-        />
-      )}
       <Flex marginBottom={SPACING.spacing4}>
-        {wifi !== null && wifi.ipAddress !== null ? (
+        {wifi != null && wifi.ipAddress != null ? (
           <Icon
             width={SPACING.spacing4}
             name="check-circle"
@@ -101,9 +94,9 @@ export function RobotSettingsNetworking({
         {wifi != null && wifi.ipAddress != null ? (
           <>
             <Flex>
-              <SecondaryButton marginRight={SPACING.spacing2}>
-                {t('wireless_network_change_network_button')}
-              </SecondaryButton>
+              <Box width="25%" marginRight={SPACING.spacing3}>
+                <TemporarySelectNetwork robotName={robotName} />
+              </Box>
               <SecondaryButton onClick={handleDisconnect}>
                 {t('wireless_network_disconnect_button')}
               </SecondaryButton>
@@ -145,11 +138,7 @@ export function RobotSettingsNetworking({
             <StyledText as="p" marginBottom={SPACING.spacing4}>
               {t('wireless_network_not_connected')}
             </StyledText>
-            <Flex>
-              <SecondaryButton onClick={() => setShowNetworkingSlideout(true)}>
-                {t('wireless_connect_button')}
-              </SecondaryButton>
-            </Flex>
+            <TemporarySelectNetwork robotName={robotName} />
           </Flex>
         )}
       </Box>
