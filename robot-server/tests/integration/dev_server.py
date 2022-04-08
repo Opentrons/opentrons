@@ -7,6 +7,7 @@ import tempfile
 class DevServer:
     def __init__(self, port: str = "31950") -> None:
         self.server_temp_directory: str = tempfile.mkdtemp()
+        self.persistence_directory: str = tempfile.mkdtemp()
         self.port: str = port
 
     def start(self) -> None:
@@ -36,7 +37,7 @@ class DevServer:
             env={
                 "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev.env",
                 "OT_API_CONFIG_DIR": self.server_temp_directory,
-                "OT_ROBOT_SERVER_persistence_directory": f"{self.server_temp_directory}/robot_db/",  # noqa: E501
+                "OT_ROBOT_SERVER_persistence_directory": self.persistence_directory,
             },
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -45,5 +46,5 @@ class DevServer:
     def stop(self) -> None:
         """Stop the robot server."""
         self.proc.send_signal(signal.SIGTERM)
-        # Calling the function the context manager would.
+        # This calls proc.wait() and does cleanup on stdin, stdout and stderr.
         self.proc.__exit__(None, None, None)
