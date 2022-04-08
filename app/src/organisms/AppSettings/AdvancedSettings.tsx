@@ -274,6 +274,7 @@ export function AdvancedSettings(): JSX.Element {
                     {t('usb_to_ethernet_adapter_toast_message')}
                   </StyledText>
                   <Link
+                    external
                     href={REALTEK_URL}
                     css={TYPOGRAPHY.pRegular}
                     color={COLORS.darkBlack}
