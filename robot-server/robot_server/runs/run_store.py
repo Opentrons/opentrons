@@ -7,7 +7,6 @@ from .action_models import RunAction, RunActionType
 
 import sqlalchemy
 from ..data_access.models import run_table, action_runs_table
-from ..data_access.data_access import get_all, get as get_row
 
 
 @dataclass(frozen=True)
@@ -181,7 +180,12 @@ class RunStore:
         Returns:
             All stored run entries.
         """
-        runs = get_all(self._sql_engine, query_table=run_table)
+        statement = sqlalchemy.select(run_table)
+        try:
+            with self._sql_engine.begin() as transaction:
+                runs = transaction.execute(statement).all()
+        except sqlalchemy.exc.NoResultFound as e:
+            raise e
         return [_convert_sql_row_to_run(sql_row=row) for row in runs]
 
     def remove(self, run_id: str) -> RunResource:

@@ -37,28 +37,3 @@ def get_sql_engine(app_state: AppState = Depends(get_app_state)) -> SQLEngine:
     # FastAPI doesn't give us a convenient way to properly tie
     # the lifetime of a dependency to the lifetime of the server app.
     # https://github.com/tiangolo/fastapi/issues/617
-
-
-#TODO tz: change retured type to generics or Row type
-#do we want to inject the current sql engine or just use a global one?
-def get(sql_engine: sqlalchemy.engine.Engine, statement: sqlalchemy.sql.Select) -> Any: #sqlalchemy.engine.Row:
-    with sql_engine.begin() as transaction:
-        try:
-            row_run = transaction.execute(statement).one()
-        except sqlalchemy.exc.NoResultFound as e:
-            raise sqlalchemy.exc.NoResultFound
-    return row_run
-
-
-#TODO tz: change retured type to generics or Row type
-#do we want to inject the current sql engine or just use a global one or inject it through the constructor?
-def get_all(sql_engine: sqlalchemy.engine.Engine, query_table: sqlalchemy.Table) -> Any: #Dict[str, object]:
-    """Get all known run resources.
-
-    Returns:
-    All stored run entries.
-    """
-    statement = sqlalchemy.select(query_table)
-    with sql_engine.begin() as transaction:
-        all_rows = transaction.execute(statement).all()
-    return all_rows
