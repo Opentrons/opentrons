@@ -29,12 +29,12 @@ describe('AutoAddPauseUntilHeaterShakerTempStepModal ', () => {
 
   it('should render the correct text with 10 C temp and buttons are clickable', () => {
     const { getByText, getByRole } = render(props)
-    getByText('Pause protocol until heater shaker module is at 10°C?')
+    getByText('Pause protocol until Heater-Shaker module is at 10°C?')
     getByText(
       'Pause protocol now to wait until module reaches 10°C before continuing on to the next step.'
     )
     getByText(
-      'Build a pause later if you want your protocol to proceed to the next steps while the temperature module ramps up to 10°C.'
+      'Build a pause later if you want your protocol to proceed to the next steps while the Heater-Shaker module ramps up to 10°C.'
     )
     const cancelBtn = getByRole('button', {
       name: 'I will build a pause later',

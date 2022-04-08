@@ -29,7 +29,7 @@ export const AutoAddPauseUntilHeaterShakerTempStepModal = (
       })}
     </p>
     <p className={styles.body}>
-      {i18n.t('modal.auto_add_pause_until_temp_step.body2', {
+      {i18n.t('modal.auto_add_pause_until_temp_step.heater_shaker_body2', {
         temperature: props.displayTemperature,
       })}
     </p>
