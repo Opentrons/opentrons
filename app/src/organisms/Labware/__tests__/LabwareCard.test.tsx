@@ -46,7 +46,7 @@ describe('LabwareCard', () => {
     getByRole('button', { name: 'mock_definition' })
   })
 
-  it('renders additonal info for custom labware card', () => {
+  it('renders additional info for custom labware card', () => {
     props.labware.modified = 123
     props.labware.filename = 'mock/filename'
     const [{ getByText }] = render(props)
