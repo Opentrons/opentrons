@@ -11,7 +11,7 @@ metadata = {
 
 # protocol run function. the part after the colon lets your editor know
 # where to look for autocomplete suggestions
-def run(protocol: protocol_api.ProtocolContext):
+def run(protocol: protocol_api.ProtocolContext) -> None:
     # labware
     plate = protocol.load_labware("geb_96_tiprack_10ul", 4)
 

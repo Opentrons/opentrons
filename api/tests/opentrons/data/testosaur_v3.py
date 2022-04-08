@@ -1,4 +1,4 @@
-from opentrons import types
+from opentrons import protocol_api, types
 
 metadata = {
     "protocolName": "Testosaur Version 3",
@@ -9,7 +9,7 @@ metadata = {
 }
 
 
-def run(ctx):
+def run(ctx: protocol_api.ProtocolContext) -> None:
     tip_rack = ctx.load_labware("opentrons_96_tiprack_300ul", 8)
     source = ctx.load_labware("nest_12_reservoir_15ml", 1)
     dest = ctx.load_labware("corning_96_wellplate_360ul_flat", 2)
