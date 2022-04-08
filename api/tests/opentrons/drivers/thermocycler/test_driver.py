@@ -1,6 +1,7 @@
 from typing import Optional
 import pytest
 from mock import AsyncMock
+from opentrons.drivers.asyncio.communication import AsyncSerial
 from opentrons.drivers.asyncio.communication.serial_connection import SerialConnection
 from opentrons.drivers.thermocycler import driver
 from opentrons.drivers.command_builder import CommandBuilder
@@ -31,7 +32,7 @@ async def test_factory_check_for_gen2(
 ) -> None:
     """The factory should detect the correct class type"""
     connection.send_command.return_value = response
-    assert expected == await driver.ThermocyclerDriverFactory.check_for_gen2_protocol(
+    assert expected == await driver.ThermocyclerDriverFactory.is_gen2_protocol(
         connection
     )
 

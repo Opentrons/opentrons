@@ -195,18 +195,6 @@ class SerialConnection:
     def name(self) -> str:
         return self._name
 
-    def set_ack(self, ack: str) -> None:
-        """
-        Change the expected acknowledge response for this serial connection
-        """
-        self._ack = ack.encode()
-
-    def set_error_keyword(self, error_keyword: str) -> None:
-        """
-        Change the expected error keyword for this serial connection
-        """
-        self._error_keyword = error_keyword.lower()
-
     def raise_on_error(self, response: str) -> None:
         """
         Raise an error if the response contains an error
@@ -236,9 +224,6 @@ class SerialConnection:
         await asyncio.sleep(self._retry_wait_time_seconds)
         await self._serial.close()
         await self._serial.open()
-
-    def reset_input_buffer(self) -> None:
-        self._serial.reset_input_buffer()
 
     def process_raw_response(self, command: str, response: str) -> str:
         """

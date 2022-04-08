@@ -69,28 +69,53 @@ class ThermocyclerDriverFactory:
 
         Returns: driver
         """
-        connection = await SerialConnection.create(
+        serial_port = await AsyncSerial.create(
             port=port,
             baud_rate=TC_BAUDRATE,
             timeout=DEFAULT_TC_TIMEOUT,
-            ack=TC_GEN2_SERIAL_ACK,
             loop=loop,
             reset_buffer_before_write=False,
         )
+        connection_temp = SerialConnection(
+            serial=serial_port,
+            port=port,
+            name=port,
+            ack=TC_GEN2_SERIAL_ACK,
+            retry_wait_time_seconds=0.1,
+            error_keyword="error",
+            alarm_keyword="alarm",
+        )
 
-        if await ThermocyclerDriverFactory.check_for_gen2_protocol(connection):
-            connection.set_ack(TC_GEN2_ACK)
-            connection.set_error_keyword(TC_GEN2_ERROR_WORD)
+        is_gen2 = await ThermocyclerDriverFactory.is_gen2_protocol(connection_temp)
+        # Must reset input data because the old setting of the ACK did
+        # not necessarily capture the entire response.
+        serial_port.reset_input_buffer()
+
+        if is_gen2:
+            connection = SerialConnection(
+                serial=serial_port,
+                port=port,
+                name=port,
+                ack=TC_GEN2_ACK,
+                retry_wait_time_seconds=0.1,
+                error_keyword=TC_GEN2_ERROR_WORD,
+                alarm_keyword="alarm",
+            )
             return ThermocyclerDriverV2(connection)
         else:
-            connection.set_ack(TC_ACK)
-            # Must cycle the connection because the old setting of the ACK did
-            # not capture the entire response.
-            connection.reset_input_buffer()
+            connection = SerialConnection(
+                serial=serial_port,
+                port=port,
+                name=port,
+                ack=TC_ACK,
+                retry_wait_time_seconds=0.1,
+                error_keyword="error",
+                alarm_keyword="alarm",
+            )
             return ThermocyclerDriver(connection)
 
     @staticmethod
-    async def check_for_gen2_protocol(connection: SerialConnection) -> bool:
+    async def is_gen2_protocol(connection: SerialConnection) -> bool:
         """
         Send a message through a connection to check if the connected
         thermocycler is a Gen1 or Gen2 model
