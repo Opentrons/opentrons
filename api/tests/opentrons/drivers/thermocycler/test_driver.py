@@ -1,7 +1,6 @@
 from typing import Optional
 import pytest
 from mock import AsyncMock
-from opentrons.drivers.asyncio.communication import AsyncSerial
 from opentrons.drivers.asyncio.communication.serial_connection import SerialConnection
 from opentrons.drivers.thermocycler import driver
 from opentrons.drivers.command_builder import CommandBuilder
