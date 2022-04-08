@@ -22,6 +22,7 @@ _PROTOCOL_FILES_SUBDIRECTORY: Final = "protocols"
 
 _log = logging.getLogger(__name__)
 
+
 async def _get_persistence_directory(
     app_state: AppState = Depends(get_app_state),
 ) -> Path:
@@ -77,6 +78,10 @@ def get_sql_engine(
     app_state: AppState = Depends(get_app_state),
     persistence_directory: Path = Depends(_get_persistence_directory),
 ) -> SQLEngine:
+    """Try get sql engine from AppState.
+
+    If it dosent exist set AppState with a new sql engine.
+    """
     sql_engine = _sql_engine.get_from(app_state)
 
     if sql_engine is None:

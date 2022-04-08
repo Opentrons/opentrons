@@ -115,7 +115,7 @@ class ProtocolStore:
 
         return deleted_resource
 
-      
+
 def _convert_sql_row_to_resource(sql_row: sqlalchemy.engine.Row) -> ProtocolResource:
     protocol_id = sql_row.id
     assert isinstance(protocol_id, str)

@@ -137,7 +137,7 @@ class RunStore:
             try:
                 transaction.execute(update_statement)
             except sqlalchemy.exc.NoResultFound:
-                raise RunNotFoundError(run.run_id) from e
+                raise RunNotFoundError(run.run_id)
 
         if run.is_current is True:
             self.update_active_runs(run.run_id)
