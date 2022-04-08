@@ -268,7 +268,9 @@ async def test_get_run_commands(decoy: Decoy, mock_engine_store: EngineStore) ->
     assert result.status_code == 200
 
 
-async def test_get_run_commands_empty(decoy: Decoy, mock_engine_store: EngineStore) -> None:
+async def test_get_run_commands_empty(
+    decoy: Decoy, mock_engine_store: EngineStore
+) -> None:
     """It should return an empty commands list if no commands."""
     run = Run(
         id="run-id",

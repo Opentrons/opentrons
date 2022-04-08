@@ -140,7 +140,10 @@ async def test_create_run(
     decoy.verify(
         # It should have added each requested labware offset to the engine,
         # in the exact order they appear in the request.
-        *[mock_engine_store.engine.add_labware_offset(r) for r in LABWARE_OFFSET_REQUESTS],
+        *[
+            mock_engine_store.engine.add_labware_offset(r)
+            for r in LABWARE_OFFSET_REQUESTS
+        ],
         mock_run_store.insert(run=expected_run),
     )
 
@@ -192,7 +195,9 @@ async def test_create_protocol_run(
     )
 
     engine_state = decoy.mock(cls=StateView)
-    decoy.when(await mock_engine_store.create(run_id="run-id")).then_return(engine_state)
+    decoy.when(await mock_engine_store.create(run_id="run-id")).then_return(
+        engine_state
+    )
 
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
@@ -224,7 +229,10 @@ async def test_create_protocol_run(
     decoy.verify(
         # It should have added each requested labware offset to the engine,
         # in the exact order they appear in the request.
-        *[mock_engine_store.engine.add_labware_offset(r) for r in LABWARE_OFFSET_REQUESTS],
+        *[
+            mock_engine_store.engine.add_labware_offset(r)
+            for r in LABWARE_OFFSET_REQUESTS
+        ],
         mock_engine_store.runner.load(protocol_resource.source),
         mock_run_store.insert(run=run),
     )
@@ -249,7 +257,9 @@ async def test_create_protocol_run_bad_protocol_id(
     assert exc_info.value.content["errors"][0]["id"] == "ProtocolNotFound"
 
 
-async def test_create_run_conflict(decoy: Decoy, mock_engine_store: EngineStore) -> None:
+async def test_create_run_conflict(
+    decoy: Decoy, mock_engine_store: EngineStore
+) -> None:
     """It should respond with a conflict error if multiple engines are created."""
     decoy.when(await mock_engine_store.create(run_id=matchers.Anything())).then_raise(
         EngineConflictError("oh no")
@@ -572,7 +582,9 @@ async def test_delete_active_run_no_engine(
     mock_run_store: RunStore,
 ) -> None:
     """It should no-op if no engine is present."""
-    decoy.when(mock_engine_store.get_state("run-id")).then_raise(EngineMissingError("oh no"))
+    decoy.when(mock_engine_store.get_state("run-id")).then_raise(
+        EngineMissingError("oh no")
+    )
 
     await remove_run(
         runId="run-id",
@@ -621,9 +633,9 @@ async def test_update_run_to_not_current(
 
     decoy.when(mock_run_store.get(run_id="run-id")).then_return(run_resource)
 
-    decoy.when(mock_run_view.with_update(run=run_resource, update=run_update)).then_return(
-        updated_resource
-    )
+    decoy.when(
+        mock_run_view.with_update(run=run_resource, update=run_update)
+    ).then_return(updated_resource)
 
     engine_state = decoy.mock(cls=StateView)
     decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
@@ -685,9 +697,9 @@ async def test_update_current_to_current_noop(
 
     decoy.when(mock_run_store.get(run_id="run-id")).then_return(run_resource)
 
-    decoy.when(mock_run_view.with_update(run=run_resource, update=run_update)).then_return(
-        run_resource
-    )
+    decoy.when(
+        mock_run_view.with_update(run=run_resource, update=run_update)
+    ).then_return(run_resource)
 
     engine_state = decoy.mock(cls=StateView)
     decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)

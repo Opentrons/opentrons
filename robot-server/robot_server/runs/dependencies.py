@@ -16,8 +16,10 @@ _run_store = AppStateValue[RunStore]("run_store")
 _engine_store = AppStateValue[EngineStore]("engine_store")
 
 
-def get_run_store(app_state: AppState = Depends(get_app_state),
-                  sql_engine: SQLEngine = Depends(get_sql_engine)) -> RunStore:
+def get_run_store(
+    app_state: AppState = Depends(get_app_state),
+    sql_engine: SQLEngine = Depends(get_sql_engine),
+) -> RunStore:
     """Get a singleton RunStore to keep track of created runs."""
     run_store = _run_store.get_from(app_state)
 

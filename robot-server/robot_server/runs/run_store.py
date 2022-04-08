@@ -46,20 +46,16 @@ class RunStore:
             run_id: current run id to get
             actions: a list of actions to store in the db
         """
-        # stmt = action_runs_table.update().\
-        #     where(action_runs_table.c.run_id == run_id). \
-        #     values({
-        #     'action_type': sqlalchemy.bindparam('action_type')
-        # })
-
         with self._sql_engine.begin() as transaction:
             try:
-                transaction.execute(sqlalchemy.delete(action_runs_table).where(
-                    action_runs_table.c.run_id == run_id
-                ))
+                transaction.execute(
+                    sqlalchemy.delete(action_runs_table).where(
+                        action_runs_table.c.run_id == run_id
+                    )
+                )
                 self.insert_actions(run_id, actions)
             except sqlalchemy.exc.NoResultFound as e:
-                raise 'update actions ' + e
+                raise e
 
     def insert_actions(self, run_id: str, actions: List[RunAction]) -> None:
         """Insert or update a run actions resource in the db.
@@ -75,14 +71,21 @@ class RunStore:
             try:
                 transaction.execute(action_runs_table.insert(), insert_actions)
             except sqlalchemy.exc.NoResultFound as e:
-                raise 'insert actions ' + e
+                raise e
 
     def update_active_runs(self, run_id: str) -> None:
+        """Update all active runs to not active.
+
+        Params:
+            run_id: run id that should stay active
+        """
         with self._sql_engine.begin() as transaction:
             try:
-                update_statement = sqlalchemy.update(run_table).where(run_table.c.id != run_id,
-                                                                      run_table.c.active_run == True).values(
-                    active_run=False)
+                update_statement = (
+                    sqlalchemy.update(run_table)
+                    .where(run_table.c.id != run_id, run_table.c.active_run)
+                    .values(active_run=False)
+                )
                 transaction.execute(update_statement)
             except sqlalchemy.exc.NoResultFound as e:
                 raise e
@@ -97,7 +100,6 @@ class RunStore:
         Returns:
             The resource that was added to the store.
         """
-
         statement = sqlalchemy.insert(run_table).values(
             _convert_run_to_sql_values(run=run)
         )
@@ -125,8 +127,11 @@ class RunStore:
         Returns:
             The resource that was added to the store.
         """
-
-        update_statement = sqlalchemy.update(run_table).where(run_table.c.id == run.run_id).values(_convert_run_to_sql_values(run))
+        update_statement = (
+            sqlalchemy.update(run_table)
+            .where(run_table.c.id == run.run_id)
+            .values(_convert_run_to_sql_values(run))
+        )
         with self._sql_engine.begin() as transaction:
             try:
                 transaction.execute(update_statement)
@@ -144,7 +149,6 @@ class RunStore:
             self.update_actions(run_id=run.run_id, actions=run.actions)
         return run
 
-
     def get(self, run_id: str) -> RunResource:
         """Get a specific run entry by its identifier.
 
@@ -159,12 +163,14 @@ class RunStore:
             with self._sql_engine.begin() as transaction:
                 row_run = transaction.execute(statement).one()
                 run = _convert_sql_row_to_run(row_run)
-                actions = transaction.execute(action_runs_table.select().where(action_runs_table.c.id == run.run_id))
+                actions = transaction.execute(
+                    action_runs_table.select().where(
+                        action_runs_table.c.id == run.run_id
+                    )
+                )
                 for action in actions:
                     if action.id_1:
-                        run.actions.append(
-                            _convert_sql_row_to_action(action)
-                        )
+                        run.actions.append(_convert_sql_row_to_action(action))
         except sqlalchemy.exc.NoResultFound as e:
             raise RunNotFoundError(run_id) from e
         return run
@@ -195,12 +201,8 @@ class RunStore:
         Raises:
             RunNotFoundError: The specified run ID was not found.
         """
-        select_statement = sqlalchemy.select(run_table).where(
-            run_table.c.id == run_id
-        )
-        delete_statement = sqlalchemy.delete(run_table).where(
-            run_table.c.id == run_id
-        )
+        select_statement = sqlalchemy.select(run_table).where(run_table.c.id == run_id)
+        delete_statement = sqlalchemy.delete(run_table).where(run_table.c.id == run_id)
         with self._sql_engine.begin() as transaction:
             try:
                 # SQLite <3.35.0 doesn't support the RETURNING clause,
@@ -230,7 +232,11 @@ def _convert_sql_row_to_run(sql_row: sqlalchemy.engine.Row) -> RunResource:
     assert isinstance(is_current, bool)
 
     return RunResource(
-        run_id=run_id, created_at=created_at, actions=[], protocol_id=protocol_id, is_current=is_current
+        run_id=run_id,
+        created_at=created_at,
+        actions=[],
+        protocol_id=protocol_id,
+        is_current=is_current,
     )
 
 
@@ -239,7 +245,7 @@ def _convert_run_to_sql_values(run: RunResource) -> Dict[str, object]:
         "id": run.run_id,
         "created_at": run.created_at,
         "protocol_id": run.protocol_id,
-        "active_run": run.is_current
+        "active_run": run.is_current,
     }
 
 
@@ -263,5 +269,5 @@ def _convert_action_to_sql_values(action: RunAction, run_id: str) -> Dict[str, o
         "id": action.id,
         "created_at": action.createdAt,
         "action_type": action.actionType.value,
-        "run_id": run_id
+        "run_id": run_id,
     }

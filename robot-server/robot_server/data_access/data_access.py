@@ -1,6 +1,6 @@
+"""Data access initialization and management."""
 import sqlalchemy
 from sqlalchemy.engine import Engine as SQLEngine
-from typing import Any, Dict
 from fastapi import Depends
 from ..app_state import AppState, AppStateValue, get_app_state
 from .models import metadata
@@ -19,6 +19,10 @@ def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
 
 
 def get_sql_engine(app_state: AppState = Depends(get_app_state)) -> SQLEngine:
+    """Initialize the SQL engine.
+
+    check if exists in AppState if not set AppState value.
+    """
     sql_engine = _sql_engine.get_from(app_state)
 
     if sql_engine is None:

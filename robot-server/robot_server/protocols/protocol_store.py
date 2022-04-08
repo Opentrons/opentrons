@@ -132,7 +132,10 @@ def _convert_sql_row_to_resource(sql_row: sqlalchemy.engine.Row) -> ProtocolReso
         assert isinstance(protocol_key, str)
 
     return ProtocolResource(
-        protocol_id=protocol_id, created_at=created_at, source=source, protocol_key=protocol_key
+        protocol_id=protocol_id,
+        created_at=created_at,
+        source=source,
+        protocol_key=protocol_key,
     )
 
 
@@ -141,5 +144,5 @@ def _convert_resource_to_sql_values(resource: ProtocolResource) -> Dict[str, obj
         "id": resource.protocol_id,
         "created_at": resource.created_at,
         "source": resource.source,
-        "protocol_key": resource.protocol_key
+        "protocol_key": resource.protocol_key,
     }
