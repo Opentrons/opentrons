@@ -11,6 +11,7 @@ import {
   duplicateStep,
   duplicateMultipleSteps,
   saveHeaterShakerFormWithAddedPauseUntilTemp,
+  saveSetTempFormWithAddedPauseUntilTemp,
 } from '../thunks'
 
 jest.mock('../../../../step-forms/selectors')
@@ -34,9 +35,13 @@ const mockGetUnsavedForm = stepFormSelectors.getUnsavedForm as jest.MockedFuncti
 const mockGetUnsavedFormIsPristineHeaterShakerForm = stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm as jest.MockedFunction<
   typeof stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm
 >
+const mockGetUnsavedFormIsPristineSetTempForm = stepFormSelectors.getUnsavedFormIsPristineSetTempForm as jest.MockedFunction<
+  typeof stepFormSelectors.getUnsavedFormIsPristineSetTempForm
+>
 const mockGetRobotStateTimeline = getRobotStateTimeline as jest.MockedFunction<
   typeof getRobotStateTimeline
 >
+
 describe('steps actions', () => {
   describe('selectStep', () => {
     const stepId = 'stepId'
@@ -348,6 +353,86 @@ describe('steps actions', () => {
       store.dispatch(saveHeaterShakerFormWithAddedPauseUntilTemp())
 
       expect(store.getActions()).toEqual(HsStepWithPause)
+    })
+  })
+
+  describe('saveSetTempFormWithAddedPauseUntilTemp', () => {
+    const mockRobotStateTimeline = {
+      commands: {
+        commandType: 'temperatureModule/setTargetTemperature',
+      },
+    } as any
+
+    beforeEach(() => {
+      when(mockGetUnsavedForm)
+        .calledWith(expect.anything())
+        .mockReturnValue({
+          stepType: 'temperature',
+          setTemperature: 'true',
+          targetTemperature: 10,
+        } as any)
+      mockGetUnsavedFormIsPristineSetTempForm.mockReturnValue(true)
+      mockGetRobotStateTimeline.mockReturnValue(mockRobotStateTimeline)
+    })
+
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    it('should save temperature step with a pause until temp is reached', () => {
+      const temperatureStepWithPause = [
+        {
+          payload: {
+            stepType: 'temperature',
+            setTemperature: 'true',
+            targetTemperature: 10,
+          },
+          type: 'SAVE_STEP_FORM',
+        },
+        {
+          meta: {
+            robotStateTimeline: {
+              commands: {
+                commandType: 'temperatureModule/setTargetTemperature',
+              },
+            },
+          },
+          payload: {
+            id: '__presaved_step__',
+            stepType: 'pause',
+          },
+          type: 'ADD_STEP',
+        },
+        {
+          payload: {
+            update: {
+              pauseAction: 'untilTemperature',
+            },
+          },
+          type: 'CHANGE_FORM_INPUT',
+        },
+        {
+          payload: {
+            update: {
+              pauseTemperature: 10,
+            },
+          },
+          type: 'CHANGE_FORM_INPUT',
+        },
+        {
+          payload: {
+            setTemperature: 'true',
+            stepType: 'temperature',
+            targetTemperature: 10,
+          },
+          type: 'SAVE_STEP_FORM',
+        },
+      ]
+
+      const store: any = mockStore()
+      store.dispatch(saveSetTempFormWithAddedPauseUntilTemp())
+
+      expect(store.getActions()).toEqual(temperatureStepWithPause)
     })
   })
 })
