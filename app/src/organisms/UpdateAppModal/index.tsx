@@ -181,7 +181,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
             <>
               <SecondaryBtn
                 as={InternalLink}
-                to="/app-settings/advanced"
+                to="/more/app"
                 onClick={handleCloseClick}
                 marginRight={SPACING_3}
               >
