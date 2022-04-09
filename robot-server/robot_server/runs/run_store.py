@@ -65,9 +65,9 @@ class RunStore:
             run_id: current run id to get
             actions: a list of actions to store in the db
         """
-        insert_actions = []
-        for action in actions:
-            insert_actions.append(_convert_action_to_sql_values(action, run_id))
+        actions_to_insert = [
+            _convert_action_to_sql_values(action, run_id) for action in actions
+        ]
         try:
             with self._sql_engine.begin() as transaction:
                 transaction.execute(action_runs_table.insert(), insert_actions)
