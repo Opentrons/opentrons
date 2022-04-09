@@ -70,9 +70,20 @@ class RunStore:
         ]
         try:
             with self._sql_engine.begin() as transaction:
-                transaction.execute(action_runs_table.insert(), insert_actions)
+                transaction.execute(action_runs_table.insert(), actions_to_insert)
         except sqlalchemy.exc.NoResultFound as e:
             raise e
+
+    def get_actions(self, run_id) -> List[RunAction]:
+        statement = action_runs_table.select().where(action_runs_table.c.run_id == run_id)
+        try:
+            with self._sql_engine.begin() as transaction:
+                actions = transaction.execute(statement)
+        except sqlalchemy.exc.NoResultFound as e:
+            raise e
+        return [
+            _convert_sql_row_to_action(action, run_id) for action in actions
+        ]
 
     def update_active_runs(self, run_id: str) -> None:
         """Update all active runs to not active.
@@ -158,15 +169,8 @@ class RunStore:
         try:
             with self._sql_engine.begin() as transaction:
                 row_run = transaction.execute(statement).one()
-                run = _convert_sql_row_to_run(row_run)
-                actions = transaction.execute(
-                    action_runs_table.select().where(
-                        action_runs_table.c.id == run.run_id
-                    )
-                )
-                for action in actions:
-                    if action.id_1:
-                        run.actions.append(_convert_sql_row_to_action(action))
+                actions = self.get_actions(run_id)
+                run = _convert_sql_row_to_run(row_run, actions)
         except sqlalchemy.exc.NoResultFound as e:
             raise RunNotFoundError(run_id) from e
         return run
@@ -180,6 +184,7 @@ class RunStore:
         statement = sqlalchemy.select(run_table)
         try:
             with self._sql_engine.begin() as transaction:
+                #TODO need to add get actions
                 runs = transaction.execute(statement).all()
         except sqlalchemy.exc.NoResultFound as e:
             raise e
@@ -211,7 +216,7 @@ class RunStore:
         return _convert_sql_row_to_run(row_to_delete)
 
 
-def _convert_sql_row_to_run(sql_row: sqlalchemy.engine.Row) -> RunResource:
+def _convert_sql_row_to_run(sql_row: sqlalchemy.engine.Row, actions: List[RunAction] = None) -> RunResource:
     run_id = sql_row.id
     assert isinstance(run_id, str)
 
@@ -229,7 +234,7 @@ def _convert_sql_row_to_run(sql_row: sqlalchemy.engine.Row) -> RunResource:
     return RunResource(
         run_id=run_id,
         created_at=created_at,
-        actions=[],
+        actions=[actions],
         protocol_id=protocol_id,
         is_current=is_current,
     )
@@ -245,10 +250,10 @@ def _convert_run_to_sql_values(run: RunResource) -> Dict[str, object]:
 
 
 def _convert_sql_row_to_action(sql_row: sqlalchemy.engine.Row) -> RunAction:
-    action_id = sql_row.id_1
+    action_id = sql_row.id
     assert isinstance(action_id, str)
 
-    created_at = sql_row.created_at_1
+    created_at = sql_row.created_at
     assert isinstance(created_at, datetime)
 
     action_type = sql_row.action_type
