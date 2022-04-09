@@ -2,10 +2,9 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
+import { useInterval } from '@opentrons/components'
 import * as RobotApi from '../../../redux/robot-api'
 import * as Networking from '../../../redux/networking'
-
-import { useInterval } from '@opentrons/components'
 import { Portal } from '../../../App/Portal'
 import { SelectSsid } from './ConnectNetwork/SelectSsid'
 import { ConnectModal } from './ConnectNetwork/ConnectModal'
