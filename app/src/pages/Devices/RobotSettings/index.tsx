@@ -32,7 +32,7 @@ export function RobotSettings(): JSX.Element | null {
     [K in RobotSettingsTab]: () => JSX.Element
   } = {
     calibration: () => <RobotSettingsCalibration robotName={robotName} />,
-    // TODO: networking tab content
+
     networking: () => <RobotSettingsNetworking robotName={robotName} />,
     // TODO: advanced tab content
     advanced: () => <div>advanced</div>,
