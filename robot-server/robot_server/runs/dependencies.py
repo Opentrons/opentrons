@@ -1,15 +1,15 @@
 """Run router dependency-injection wire-up."""
 from fastapi import Depends
+from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons.hardware_control import HardwareControlAPI
 
 from robot_server.app_state import AppState, AppStateValue, get_app_state
 from robot_server.hardware import get_hardware
+from robot_server.data_access.persistence import get_sql_engine
 
 from .engine_store import EngineStore
 from .run_store import RunStore
-from sqlalchemy.engine import Engine as SQLEngine
-from ..data_access.data_access import get_sql_engine
 
 
 _run_store = AppStateValue[RunStore]("run_store")

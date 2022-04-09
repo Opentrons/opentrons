@@ -19,7 +19,7 @@ from robot_server.protocols.protocol_store import (
     ProtocolResource,
     ProtocolNotFoundError,
 )
-from robot_server.data_access.data_access import add_tables_to_db
+from robot_server.data_access.persistence import add_tables_to_db
 
 from sqlalchemy.engine import Engine as SQLEngine
 

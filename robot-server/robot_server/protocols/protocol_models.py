@@ -78,4 +78,5 @@ class Protocol(ResourceModel):
         ...,
         description="An analysis of how the protocol is expected to run.",
     )
+
     key: Optional[str] = None

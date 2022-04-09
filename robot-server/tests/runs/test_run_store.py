@@ -6,7 +6,7 @@ from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError
 from robot_server.runs.action_models import RunAction, RunActionType
 from sqlalchemy.engine import Engine as SQLEngine
 from robot_server.db import opened_db
-from robot_server.data_access.data_access import add_tables_to_db
+from robot_server.data_access.persistence import add_tables_to_db
 from pathlib import Path
 
 

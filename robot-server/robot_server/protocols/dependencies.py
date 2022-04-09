@@ -2,22 +2,21 @@
 
 
 import logging
+
 from fastapi import Depends
+from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
 
 from robot_server.app_state import AppState, AppStateValue, get_app_state
+from robot_server.data_access.persistence import get_sql_engine
 
 from .protocol_store import (
     ProtocolStore,
 )
 from .protocol_analyzer import ProtocolAnalyzer
 from .analysis_store import AnalysisStore
-
-from sqlalchemy.engine import Engine as SQLEngine
-from ..data_access.data_access import get_sql_engine
-
 
 _log = logging.getLogger(__name__)
 

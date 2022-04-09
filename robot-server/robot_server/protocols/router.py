@@ -20,6 +20,7 @@ from robot_server.service.json_api import (
     MultiBodyMeta,
     PydanticResponse,
 )
+from robot_server.data_access.persistence import get_protocol_directory
 
 from .protocol_models import Protocol, ProtocolFile, Metadata
 from .protocol_analyzer import ProtocolAnalyzer
@@ -31,7 +32,6 @@ from .dependencies import (
     get_analysis_store,
     get_protocol_analyzer,
 )
-from ..data_access.data_access import get_protocol_directory
 
 
 log = logging.getLogger(__name__)
