@@ -108,7 +108,6 @@ class RunStore:
             try:
                 transaction.execute(statement)
             except sqlalchemy.exc.NoResultFound as e:
-                print(e)
                 raise RunNotFoundError(run.run_id) from e
 
         if run.is_current is True:
@@ -213,7 +212,6 @@ class RunStore:
 
 
 def _convert_sql_row_to_run(sql_row: sqlalchemy.engine.Row) -> RunResource:
-    print(sql_row)
     run_id = sql_row.id
     assert isinstance(run_id, str)
 
