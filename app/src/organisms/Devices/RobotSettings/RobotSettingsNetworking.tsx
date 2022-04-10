@@ -76,6 +76,7 @@ export function RobotSettingsNetworking({
             name="check-circle"
             color={COLORS.success}
             marginRight={SPACING.spacing3}
+            data-testid="RobotSettings_Networking_check_circle"
           ></Icon>
         ) : (
           <Box height={SPACING.spacing4} width={SPACING.spacing4}></Box>
@@ -84,6 +85,7 @@ export function RobotSettingsNetworking({
           width={SPACING.spacing4}
           name="ot-wifi-3"
           marginRight={SPACING.spacing3}
+          data-testid="RobotSettings_Networking_wifi_icon"
         ></Icon>
         <StyledText as="h3">
           {t('wireless_network')}
@@ -150,6 +152,7 @@ export function RobotSettingsNetworking({
             name="check-circle"
             color={COLORS.success}
             marginRight={SPACING.spacing3}
+            data-testid="RobotSettings_Networking_check_circle"
           ></Icon>
         ) : (
           <Box height={SPACING.spacing4} width={SPACING.spacing4}></Box>
@@ -158,6 +161,7 @@ export function RobotSettingsNetworking({
           width={SPACING.spacing4}
           name="usb"
           marginRight={SPACING.spacing4}
+          data-testid="RobotSettings_Networking_usb_icon"
         ></Icon>
         <StyledText as="h3">{t('wired_usb')}</StyledText>
       </Flex>
