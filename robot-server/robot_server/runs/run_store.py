@@ -189,11 +189,10 @@ class RunStore:
         statement = sqlalchemy.select(run_table)
         try:
             with self._sql_engine.begin() as transaction:
-                # TODO need to add get actions
                 runs = transaction.execute(statement).all()
         except sqlalchemy.exc.NoResultFound as e:
             raise e
-        return [_convert_sql_row_to_run(sql_row=row) for row in runs]
+        return [_convert_sql_row_to_run(sql_row=row, actions=self.get_actions(row.id)) for row in runs]
 
     def remove(self, run_id: str) -> RunResource:
         """Remove a run by its unique identifier.
