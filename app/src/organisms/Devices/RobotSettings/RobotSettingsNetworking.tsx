@@ -49,7 +49,7 @@ export function RobotSettingsNetworking({
   const { wifi, ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
   )
-  const activeNetwork = list.find(wifi => wifi.active)
+  const activeNetwork = list?.find(nw => nw.active)
 
   const handleDisconnect = (): void => {
     if (activeNetwork != null) {

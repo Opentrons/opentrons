@@ -55,10 +55,10 @@ export const TemporarySelectNetwork = ({
     return lastId != null ? RobotApi.getRequestById(state, lastId) : null
   })
 
-  const activeNetwork = list.find(nw => nw.active)
+  const activeNetwork = list?.find(nw => nw.active)
 
   const handleDisconnect = (): void => {
-    if (activeNetwork) {
+    if (activeNetwork != null) {
       dispatchApi(Networking.postWifiDisconnect(robotName, activeNetwork.ssid))
     }
   }
@@ -88,7 +88,7 @@ export const TemporarySelectNetwork = ({
   const handleSelectConnect = (ssid: string): void => {
     const network = list.find((nw: WifiNetwork) => nw.ssid === ssid)
 
-    if (network) {
+    if (network != null) {
       const { ssid, securityType } = network
 
       if (securityType === Networking.SECURITY_NONE) {

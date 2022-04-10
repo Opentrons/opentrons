@@ -49,7 +49,9 @@ const formatOptions = (
   list: WifiNetwork[],
   showWifiDisconnect: boolean
 ): SelectOptionOrGroup[] => {
-  const ssidOptionsList = { options: list.map(({ ssid }) => ({ value: ssid })) }
+  const ssidOptionsList = {
+    options: list?.map(({ ssid }) => ({ value: ssid })),
+  }
   const options = [ssidOptionsList, SELECT_JOIN_OTHER_GROUP]
 
   if (showWifiDisconnect) {
