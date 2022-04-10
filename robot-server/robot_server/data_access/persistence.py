@@ -66,7 +66,7 @@ async def get_protocol_directory(
 
 
 def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
-    """Create the necessary database tables to back a `ProtocolStore`.
+    """Create the necessary database tables to back all data stores.
 
     Params:
         sql_engine: An engine for a blank SQL database, to put the tables in.
@@ -78,10 +78,7 @@ def get_sql_engine(
     app_state: AppState = Depends(get_app_state),
     persistence_directory: Path = Depends(_get_persistence_directory),
 ) -> SQLEngine:
-    """Try get sql engine from AppState.
-
-    If it dosent exist set AppState with a new sql engine.
-    """
+    """Return a singleton SQL engine referring to a ready-to-use database."""
     sql_engine = _sql_engine.get_from(app_state)
 
     if sql_engine is None:
