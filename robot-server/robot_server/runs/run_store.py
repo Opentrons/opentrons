@@ -167,16 +167,17 @@ class RunStore:
             The retrieved run entry from the db.
         """
         statement = sqlalchemy.select(run_table).where(run_table.c.id == run_id)
-        try:
-            with self._sql_engine.begin() as transaction:
+        with self._sql_engine.begin() as transaction:
+            try:
                 row_run = transaction.execute(statement)
-                actions = _get_actions_no_transaction(run_id, transaction)
-                run = _convert_sql_row_to_run(
-                    row_run.one(),
-                    [_convert_sql_row_to_action(action) for action in actions],
-                )
-        except sqlalchemy.exc.NoResultFound as e:
-            raise RunNotFoundError(run_id) from e
+            except sqlalchemy.exc.NoResultFound as e:
+                raise RunNotFoundError(run_id) from e
+
+            actions = _get_actions_no_transaction(run_id, transaction)
+            run = _convert_sql_row_to_run(
+                row_run.one(),
+                [_convert_sql_row_to_action(action) for action in actions],
+            )
         return run
 
     def get_all(self) -> List[RunResource]:
