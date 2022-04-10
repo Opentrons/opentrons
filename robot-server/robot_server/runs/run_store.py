@@ -2,11 +2,11 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional
+import sqlalchemy
 
 from .action_models import RunAction, RunActionType
 
-import sqlalchemy
-from ..data_access.models import run_table, actions_table
+from robot_server.data_access.models import run_table, actions_table
 
 
 @dataclass(frozen=True)
@@ -32,6 +32,22 @@ class RunNotFoundError(ValueError):
         super().__init__(f"Run {run_id} was not found.")
 
 
+def _get_actions_no_transaction(
+    run_id: str, transaction: sqlalchemy.engine.Connection
+) -> List[sqlalchemy.engine.Row]:
+    statement = actions_table.select().where(actions_table.c.run_id == run_id)
+    return transaction.execute(statement).all()
+
+
+def _insert_actions_no_transaction(
+    run_id: str, actions: List[RunAction], transaction: sqlalchemy.engine.Connection
+) -> None:
+    actions_to_insert = [
+        _convert_action_to_sql_values(action, run_id) for action in actions
+    ]
+    transaction.execute(actions_table.insert(), actions_to_insert)
+
+
 class RunStore:
     """Methods for storing and retrieving run resources."""
 
@@ -50,7 +66,7 @@ class RunStore:
             transaction.execute(
                 sqlalchemy.delete(actions_table).where(actions_table.c.run_id == run_id)
             )
-        self.insert_actions(run_id, actions)
+            _insert_actions_no_transaction(run_id, actions, transaction)
 
     def insert_actions(self, run_id: str, actions: List[RunAction]) -> None:
         """Insert or update a run actions resource in the db.
@@ -59,25 +75,13 @@ class RunStore:
             run_id: current run id to get
             actions: a list of actions to store in the db
         """
-        actions_to_insert = [
-            _convert_action_to_sql_values(action, run_id) for action in actions
-        ]
-        try:
-            with self._sql_engine.begin() as transaction:
-                transaction.execute(actions_table.insert(), actions_to_insert)
-        except sqlalchemy.exc.NoResultFound as e:
-            raise e
-
-    def _get_actions_no_transaction(
-        self, run_id: str, transaction: sqlalchemy.engine.Connection
-    ) -> List[sqlalchemy.engine.Row]:
-        statement = actions_table.select().where(actions_table.c.run_id == run_id)
-        return transaction.execute(statement).all()
+        with self._sql_engine.begin() as transaction:
+            _insert_actions_no_transaction(run_id, actions, transaction)
 
     def _get_actions(self, run_id: str) -> List[RunAction]:
         try:
             with self._sql_engine.begin() as statement:
-                actions = self._get_actions_no_transaction(run_id, statement)
+                actions = _get_actions_no_transaction(run_id, statement)
         except sqlalchemy.exc.NoResultFound as e:
             raise e
         return [_convert_sql_row_to_action(action) for action in actions]
@@ -166,7 +170,7 @@ class RunStore:
         try:
             with self._sql_engine.begin() as transaction:
                 row_run = transaction.execute(statement)
-                actions = self._get_actions_no_transaction(run_id, transaction)
+                actions = _get_actions_no_transaction(run_id, transaction)
                 run = _convert_sql_row_to_run(
                     row_run.one(),
                     [_convert_sql_row_to_action(action) for action in actions],
@@ -182,11 +186,8 @@ class RunStore:
             All stored run entries.
         """
         statement = sqlalchemy.select(run_table)
-        try:
-            with self._sql_engine.begin() as transaction:
-                runs = transaction.execute(statement).all()
-        except sqlalchemy.exc.NoResultFound as e:
-            raise e
+        with self._sql_engine.begin() as transaction:
+            runs = transaction.execute(statement).all()
         return [
             _convert_sql_row_to_run(sql_row=row, actions=self._get_actions(row.id))
             for row in runs
