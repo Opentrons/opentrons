@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum
-from typing import Iterable, List, Generator
+from typing import Iterable, List, Generator, TextIO
 import binascii
 import struct
 import logging
@@ -69,13 +69,12 @@ class BadChunkSizeException(HexFileException):
 def from_hex_file_path(file_path: Path) -> Iterable[HexRecord]:
     """A generator that processes a hex file at file_path."""
     with file_path.open() as hex_file:
-        for line in hex_file.readlines():
-            yield process_line(line)
+        return from_hex_file(hex_file)
 
 
-def from_hex_contents(data: str) -> Iterable[HexRecord]:
+def from_hex_file(hex_file: TextIO) -> Iterable[HexRecord]:
     """A generator that processes a hex file contents."""
-    for line in data.splitlines():
+    for line in hex_file.readlines():
         yield process_line(line)
 
 
@@ -148,14 +147,14 @@ class HexRecordProcessor:
         self._start_address: int = 0
 
     @classmethod
-    def from_file(cls, file_path: Path) -> HexRecordProcessor:
+    def from_file_path(cls, file_path: Path) -> HexRecordProcessor:
         """Construct from file."""
         return HexRecordProcessor(from_hex_file_path(file_path))
 
     @classmethod
-    def from_content(cls, file_path: Path) -> HexRecordProcessor:
+    def from_file(cls, hex_file: TextIO) -> HexRecordProcessor:
         """Construct from file."""
-        return HexRecordProcessor(from_hex_file_path(file_path))
+        return HexRecordProcessor(from_hex_file(hex_file))
 
     @property
     def start_address(self) -> int:
