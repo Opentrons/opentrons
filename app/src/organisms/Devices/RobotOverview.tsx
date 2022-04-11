@@ -89,7 +89,10 @@ export function RobotOverview({
           <PrimaryButton
             textTransform={TEXT_TRANSFORM_NONE}
             disabled={currentRunId != null || !isRobotViewable}
-            onClick={() => setShowChooseProtocolSlideout(true)}
+            onClick={() => {
+              setShowChooseProtocolSlideout(true)
+              console.log('CLICKED\n\n\n')
+            }}
           >
             {t('run_a_protocol')}
           </PrimaryButton>

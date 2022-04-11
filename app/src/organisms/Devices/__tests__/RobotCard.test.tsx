@@ -9,6 +9,7 @@ import {
   mockLeftProtoPipette,
   mockRightProtoPipette,
 } from '../../../redux/pipettes/__fixtures__'
+import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useAttachedModules, useAttachedPipettes } from '../hooks'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 import { RobotCard } from '../RobotCard'
@@ -32,7 +33,7 @@ const mockRobotStatusBanner = RobotStatusBanner as jest.MockedFunction<
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <RobotCard name="otie" local={true} />
+      <RobotCard robot={mockConnectableRobot} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
