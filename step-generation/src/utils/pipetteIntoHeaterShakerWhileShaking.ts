@@ -15,7 +15,7 @@ export const pipetteIntoHeaterShakerWhileShaking = (
   const isShaking: boolean = Boolean(
     moduleState &&
       moduleState.type === HEATERSHAKER_MODULE_TYPE &&
-      (moduleState.targetSpeed !== null || moduleState.targetSpeed !== 0)
+      moduleState.targetSpeed !== null
   )
   return isShaking
 }
