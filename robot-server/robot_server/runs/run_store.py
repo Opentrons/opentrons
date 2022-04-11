@@ -6,7 +6,7 @@ import sqlalchemy
 
 from .action_models import RunAction, RunActionType
 
-from robot_server.data_access.models import run_table, actions_table
+from robot_server.persistence import run_table, actions_table
 
 
 @dataclass(frozen=True)
@@ -54,7 +54,7 @@ class RunStore:
             _insert_actions_no_transaction(run_id, actions, transaction)
 
     def insert_actions(self, run_id: str, actions: List[RunAction]) -> None:
-        """Insert or update a run actions resource in the db.
+        """Insert a run actions resource in the db.
 
         Arguments:
             run_id: current run id to get

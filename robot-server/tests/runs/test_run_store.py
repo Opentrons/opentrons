@@ -5,8 +5,7 @@ from typing import Generator
 from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError
 from robot_server.runs.action_models import RunAction, RunActionType
 from sqlalchemy.engine import Engine as SQLEngine
-from robot_server.db import opened_db
-from robot_server.data_access.persistence import add_tables_to_db
+from robot_server.persistence import opened_db, add_tables_to_db
 from pathlib import Path
 
 
@@ -36,6 +35,40 @@ def test_add_run(subject: RunStore) -> None:
     result = subject.insert(run)
 
     assert result == run
+
+
+def test_update_run_missing_run(subject: RunStore) -> None:
+    """It should be able to update a run in the store."""
+    action = RunAction(
+        actionType=RunActionType.PLAY,
+        createdAt=datetime(year=2022, month=2, day=2),
+        id="action-id",
+    )
+    action_update = RunAction(
+        actionType=RunActionType.PAUSE,
+        createdAt=datetime(year=2022, month=2, day=2),
+        id="action-id",
+    )
+    run = RunResource(
+        run_id="identical-run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, hour=1, minute=1, second=1),
+        actions=[action],
+        is_current=True,
+    )
+    updated_run = RunResource(
+        run_id="identical-run-id",
+        protocol_id=None,
+        created_at=datetime(year=2022, month=2, day=2, hour=2, minute=2, second=2),
+        actions=[action_update],
+        is_current=True,
+    )
+
+    subject.insert(run)
+
+    result = subject.update(updated_run)
+
+    assert result == updated_run
 
 
 def test_update_run(subject: RunStore) -> None:

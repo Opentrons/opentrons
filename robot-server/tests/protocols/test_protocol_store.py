@@ -13,13 +13,12 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
 )
 
-from robot_server.db import opened_db
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
     ProtocolNotFoundError,
 )
-from robot_server.data_access.persistence import add_tables_to_db
+from robot_server.persistence import opened_db, add_tables_to_db
 
 from sqlalchemy.engine import Engine as SQLEngine
 

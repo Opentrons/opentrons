@@ -11,7 +11,7 @@ from typing import Dict, List, Optional
 import sqlalchemy
 
 from opentrons.protocol_reader import ProtocolSource
-from ..data_access.models import protocol_table
+from robot_server.persistence import protocol_table
 
 
 _log = getLogger(__name__)
