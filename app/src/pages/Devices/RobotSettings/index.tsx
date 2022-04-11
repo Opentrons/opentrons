@@ -17,6 +17,7 @@ import {
 import { Line } from '../../../atoms/structure'
 import { NavTab } from '../../../atoms/NavTab'
 import { RobotSettingsCalibration } from '../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
+import { RobotSettingsAdvanced } from '../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
 
 import type {
   NextGenRouteParams,
@@ -34,7 +35,7 @@ export function RobotSettings(): JSX.Element | null {
     // TODO: networking tab content
     networking: () => <div>networking</div>,
     // TODO: advanced tab content
-    advanced: () => <div>advanced</div>,
+    advanced: () => <RobotSettingsAdvanced robotName={robotName} />,
   }
 
   const RobotSettingsContent =
