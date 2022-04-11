@@ -19,7 +19,7 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element => {
   const heaterShakerModules = Object.values(
     moduleRenderInfoForProtocolById
   ).filter(module => module.moduleDef.model === 'heaterShakerModuleV1')
-  console.log(heaterShakerModules)
+
   return (
     <>
       {heaterShakerModules.length !== 0 && (

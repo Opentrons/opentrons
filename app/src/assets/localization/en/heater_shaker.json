@@ -93,5 +93,6 @@
   "closed": "Closed",
   "closed_and_locked": "Closed and Locked",
   "view_instructions": "View instructions",
-  "improperly_fastened_description": "An improperly fastened Heater Shaker module can shake itself out of a deck slot."
+  "improperly_fastened_description": "An improperly fastened Heater Shaker module can shake itself out of a deck slot.",
+  "module_in_slot": "{{moduleName}} in Slot {{slotName}}"
 }

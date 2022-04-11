@@ -5,7 +5,7 @@ import { Portal } from '../../../App/portal'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
 import { HEATERSHAKER_MODULE_TYPE } from '../../../redux/modules'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/Buttons'
-import { ModuleRenderInfoForProtocol, useAttachedModules } from '../hooks'
+import { useAttachedModules } from '../hooks'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
 import { AttachModule } from './AttachModule'
@@ -23,11 +23,12 @@ import {
 
 import type { NextGenRouteParams } from '../../../App/NextGenApp'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
+import { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
   hasProtocol?: boolean
-  moduleFromProtocol?: ModuleRenderInfoForProtocol
+  moduleFromProtocol?: ProtocolModuleInfo
 }
 
 export const HeaterShakerWizard = (

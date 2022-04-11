@@ -18,7 +18,6 @@ import {
 } from '@opentrons/components'
 import { RPM, HS_RPM_MAX, HS_RPM_MIN } from '@opentrons/shared-data'
 import { useLatchCommand } from '../ModuleCard/hooks'
-import { ModuleRenderInfoForProtocol } from '../hooks'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 import { TertiaryButton } from '../../../atoms/Buttons'
 import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'
@@ -30,11 +29,12 @@ import type {
   HeaterShakerSetTargetShakeSpeedCreateCommand,
   HeaterShakerStopShakeCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
 
 interface TestShakeProps {
   module: HeaterShakerModule
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
-  moduleFromProtocol: ModuleRenderInfoForProtocol | undefined
+  moduleFromProtocol: ProtocolModuleInfo | undefined
 }
 
 export function TestShake(props: TestShakeProps): JSX.Element {

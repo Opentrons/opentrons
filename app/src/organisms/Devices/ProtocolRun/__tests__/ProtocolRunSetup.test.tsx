@@ -20,11 +20,13 @@ import {
 } from '../../hooks'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
+import { ModuleSetup } from '../ModuleSetup'
 
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 jest.mock('../../hooks')
 jest.mock('../SetupRobotCalibration')
+jest.mock('../ModuleSetup')
 
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
@@ -39,6 +41,7 @@ const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFuncti
 const mockSetupRobotCalibration = SetupRobotCalibration as jest.MockedFunction<
   typeof SetupRobotCalibration
 >
+const mockModuleSetup = ModuleSetup as jest.MockedFunction<typeof ModuleSetup>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -78,6 +81,7 @@ describe('ProtocolRunSetup', () => {
         })
       )
       .mockReturnValue(<span>Mock SetupRobotCalibration</span>)
+    mockModuleSetup.mockReturnValue(<div>mock ModuleSetup</div>)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -161,10 +165,7 @@ describe('ProtocolRunSetup', () => {
       const { getByText } = render()
       const moduleSetup = getByText('Module Setup')
       moduleSetup.click()
-      expect(getByText('TODO: module setup').closest('div')).toHaveStyleRule(
-        'visibility',
-        'visible'
-      )
+      getByText('mock ModuleSetup')
     })
 
     it('renders correct text contents for multiple modules', () => {
@@ -225,7 +226,7 @@ describe('ProtocolRunSetup', () => {
     it('defaults to module step expanded if calibration complete and modules present', async () => {
       const { queryByText, getByText } = render()
       await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(getByText('TODO: module setup')).toBeVisible()
+      expect(getByText('mock ModuleSetup')).toBeVisible()
       expect(queryByText('TODO: labware setup')).not.toBeVisible()
     })
 
@@ -237,7 +238,7 @@ describe('ProtocolRunSetup', () => {
       const { queryByText, getByText } = render()
       await new Promise(resolve => setTimeout(resolve, 1000))
       expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
-      expect(queryByText('TODO: module setup')).not.toBeVisible()
+      expect(queryByText('mock ModuleSetup')).not.toBeVisible()
     })
   })
 })

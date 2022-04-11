@@ -1,14 +1,12 @@
 import {
-  ALIGN_CENTER,
   COLORS,
-  PrimaryBtn,
+  NewPrimaryBtn,
   SPACING,
   TEXT_TRANSFORM_NONE,
   TYPOGRAPHY,
   Text,
   Flex,
   DIRECTION_ROW,
-  DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import * as React from 'react'
@@ -32,7 +30,7 @@ export function HeaterShakerBanner(
   return (
     <Banner title={t('attach_heater_shaker_to_deck', { name: displayName })}>
       {modules.map((module, index) => (
-        <>
+        <React.Fragment key={index}>
           {showWizard && (
             <HeaterShakerWizard
               onCloseClick={() => setShowWizard(false)}
@@ -43,42 +41,41 @@ export function HeaterShakerBanner(
           {index > 0 && <Divider color={COLORS.medGrey} />}
           <Text
             fontSize={TYPOGRAPHY.fontSizeP}
-            fontWeight={600}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={COLORS.darkBlack}
             paddingTop={SPACING.spacing4}
           >
-            {`${module.moduleDef.displayName} in Slot ${module.slotName}`}
+            {t('module_in_slot', {
+              moduleName: module.moduleDef.displayName,
+              slotName: module.slotName,
+            })}
           </Text>
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
-            <Flex key={index} flexDirection={DIRECTION_COLUMN}>
-              <Text
-                marginTop={SPACING.spacing3}
-                color={COLORS.darkGrey}
-                fontSize={TYPOGRAPHY.fontSizeP}
-                data-testid={`banner_subtitle_${index}`}
-              >
-                {t('improperly_fastened_description')}
-              </Text>
-              {/* TODO immediately: use NewPrimaryBtn when sarah's pr is merged */}
-            </Flex>
-            <PrimaryBtn
+            <Text
+              marginTop={SPACING.spacing3}
+              color={COLORS.darkGrey}
+              fontSize={TYPOGRAPHY.fontSizeP}
+              data-testid={`banner_subtitle_${index}`}
+            >
+              {t('improperly_fastened_description')}
+            </Text>
+            <NewPrimaryBtn
+              marginLeft={SPACING.spacingXL}
               backgroundColor={COLORS.blue}
               borderRadius={SPACING.spacingM}
               textTransform={TEXT_TRANSFORM_NONE}
               css={TYPOGRAPHY.labelRegular}
-              alignItems={ALIGN_CENTER}
               marginBottom={SPACING.spacingXL}
-              marginLeft={'5rem'}
               data-testid={`banner_open_wizard_btn`}
               onClick={() => setShowWizard(true)}
             >
               {t('view_instructions')}
-            </PrimaryBtn>
+            </NewPrimaryBtn>
           </Flex>
-        </>
+        </React.Fragment>
       ))}
     </Banner>
   )

@@ -20,9 +20,9 @@ import {
 import attachHeaterShakerModule from '../../../assets/images/heater_shaker_module_diagram.svg'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import screwdriverOrientedLeft from '../../../assets/images/screwdriver_oriented_left.svg'
-import { ModuleRenderInfoForProtocol } from '../hooks'
+import { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
 interface AttachModuleProps {
-  moduleFromProtocol: ModuleRenderInfoForProtocol | undefined
+  moduleFromProtocol: ProtocolModuleInfo | undefined
 }
 
 export function AttachModule(props: AttachModuleProps): JSX.Element {
@@ -103,6 +103,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                 viewBox={DECK_MAP_VIEWBOX}
                 deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
                 id={'HeaterShakerWizard_AttachModule_deckMap'}
+                data-testid={`AttachModule_${moduleDef.model}`}
               >
                 {() => (
                   <React.Fragment key={`AttachModule_${moduleDef.model}`}>
@@ -111,7 +112,6 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                       y={moduleFromProtocol.y}
                       orientation={inferModuleOrientationFromXCoordinate(0)}
                       def={moduleDef}
-                      data-testid={`AttachModule_${moduleDef.model}`}
                     />
                   </React.Fragment>
                 )}
@@ -122,7 +122,8 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                 viewBox={DECK_MAP_VIEWBOX}
                 deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
                 id={'HeaterShakerWizard_AttachModule_deckMap'}
-              ></RobotWorkSpace>
+                data-testid={`AttachModule_empty_deck`}
+              />
             )}
           </Box>
           <img src={screwdriverOrientedLeft} alt="screwdriver_1b" />

@@ -6,12 +6,9 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_ROW,
-  ALIGN_CENTER,
   TYPOGRAPHY,
   SPACING,
   Icon,
-  PrimaryBtn,
-  TEXT_TRANSFORM_NONE,
 } from '@opentrons/components'
 
 interface BannerProps {
