@@ -30,7 +30,7 @@ from opentrons_hardware.sensors.utils import SensorDataType
 
 
 @pytest.mark.parametrize(
-    argnames=["sensor_type"],
+    argnames=["sensor_type", "register address"],
     argvalues=[
         [SensorType.capacitive, 0xFF],
         [SensorType.humidity, 0xFE],
