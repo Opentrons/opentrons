@@ -16,7 +16,7 @@ export const MenuItem: BtnComponent = styled(Btn)`
   font-size: ${TYPOGRAPHY.fontSizeP};
   background-color: transparent;
   color: ${COLORS.darkBlack};
-  padding: ${SPACING.spacing3} ${SPACING.spacing4};
+  padding: ${SPACING.spacing3} ${SPACING.spacing2} ${SPACING.spacing3} ${SPACING.spacing4};
 
   &:hover {
     background-color: ${COLORS.lightBlue};

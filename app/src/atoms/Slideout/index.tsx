@@ -13,14 +13,13 @@ import {
   COLORS,
   TYPOGRAPHY,
   Overlay,
-  StyleProps,
   POSITION_FIXED,
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
 import { StyledText } from '../text'
 
-interface Props extends StyleProps {
+interface Props {
   title: string | React.ReactElement
   children: React.ReactNode
   onCloseClick: () => unknown
@@ -72,7 +71,6 @@ export const Slideout = (props: Props): JSX.Element | null => {
     onCloseClick,
     children,
     footer,
-    ...styleProps
   } = props
   return (
     <>
@@ -90,12 +88,12 @@ export const Slideout = (props: Props): JSX.Element | null => {
         backgroundColor={COLORS.white}
         boxShadow={'0px 3px 6px rgba(0, 0, 0, 0.23)'}
         height="100%"
-        {...styleProps}
       >
         <Flex
           paddingY={SPACING.spacing4}
           width="19.5rem"
           height="100%"
+          flex="0 1 auto"
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
@@ -129,7 +127,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
           <Divider marginY={0} color={COLORS.medGrey} />
           <Box
             padding={SPACING.spacing4}
-            flex="0 1 auto"
+            flex="1 1 auto"
             overflowY="scroll"
             data-testid={`Slideout_body_${
               typeof title === 'string' ? title : ''

@@ -51,8 +51,6 @@ export function ChooseProtocolSlideout(
     <Slideout
       isExpanded={showSlideout}
       onCloseClick={onCloseClick}
-      zIndex="10"
-      height="100%"
       title={t('choose_protocol_to_run', { name })}
       footer={
         <ApiHostProvider

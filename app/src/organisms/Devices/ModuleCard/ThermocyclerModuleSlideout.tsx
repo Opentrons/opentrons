@@ -96,7 +96,6 @@ export const ThermocyclerModuleSlideout = (
       title={t('tc_set_temperature', { part: modulePart, name: moduleName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      height={`calc(100vh - ${SPACING.spacing4})`} // subtract breadcrumb strip
       footer={
         <PrimaryButton
           onClick={handleSubmitTemp}

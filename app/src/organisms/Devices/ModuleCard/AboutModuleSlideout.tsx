@@ -61,7 +61,6 @@ export const AboutModuleSlideout = (
       title={t('about_module', { name: moduleName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      height={`calc(100vh - ${SPACING.spacing4})`}
     >
       {module.hasAvailableUpdate && showBanner ? (
         <Flex paddingBottom={SPACING.spacing4}>
@@ -128,7 +127,6 @@ export const AboutModuleSlideout = (
         <Text
           fontSize={TYPOGRAPHY.fontSizeH6}
           paddingTop={SPACING.spacing2}
-          minHeight="34.5rem"
           data-testid={`alert_item_serial_${module.model}`}
         >
           {module.serial}

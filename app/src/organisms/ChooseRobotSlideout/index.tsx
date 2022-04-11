@@ -112,7 +112,6 @@ export function ChooseRobotSlideout(
     <Slideout
       isExpanded={showSlideout}
       onCloseClick={onCloseClick}
-      zIndex="10"
       title={t('choose_robot_to_run', {
         protocol_name: protocolDisplayName,
       })}
