@@ -142,7 +142,7 @@ const StepEditFormManager = (
     handleSave = confirmAddPauseUntilTempStep
   } else if (isPristineSetHeaterShakerTempForm === true) {
     handleSave = confirmAddPauseUntilHeaterShakerTempStep
-  } else handleSave = saveStepForm
+  }
 
   return (
     <>
