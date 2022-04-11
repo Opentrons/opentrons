@@ -46,7 +46,7 @@ async def test_protocols_persist(protocol: Callable[[str], IO[bytes]]) -> None:
         # The number of uploaded protocols prior to restart
         # equals the number of protocols in the get protocols response after restart.
         assert len(response.json()["data"]) == protocols_to_create
-        # The set of (ids,createdAt) after restart is the same as prior to restart.
+        # The set of (id,createdAt) after restart is the same as prior to restart.
         # The union of the sets accomplishes this order ignored comparison.
         assert (
             len(set(uploaded_ids_created_at) & set(restarted_ids_created_at))
