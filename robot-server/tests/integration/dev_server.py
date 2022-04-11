@@ -1,7 +1,10 @@
+from __future__ import annotations
 import subprocess
 import signal
 import sys
 import tempfile
+from types import TracebackType
+from typing import Optional
 
 
 class DevServer:
@@ -10,6 +13,17 @@ class DevServer:
         self.server_temp_directory: str = tempfile.mkdtemp()
         self.persistence_directory: str = tempfile.mkdtemp()
         self.port: str = port
+
+    def __enter__(self) -> DevServer:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Optional[BaseException],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        self.stop()
 
     def start(self) -> None:
         """Run the robot server in a background process."""
