@@ -6,6 +6,7 @@ import _fixtureTiprack1000ul from '@opentrons/shared-data/labware/fixtures/2/fix
 import {
   pipetteIntoHeaterShakerLatchOpen,
   thermocyclerPipetteCollision,
+  pipetteIntoHeaterShakerWhileShaking,
 } from '../utils'
 import {
   getInitialRobotStateStandard,
@@ -25,11 +26,15 @@ const fixtureTiprack1000ul = _fixtureTiprack1000ul as LabwareDefinition2
 
 jest.mock('../utils/thermocyclerPipetteCollision')
 jest.mock('../utils/pipetteIntoHeaterShakerLatchOpen')
+jest.mock('../utils/pipetteIntoHeaterShakerWhileShaking')
 const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
   typeof thermocyclerPipetteCollision
 >
 const mockPipetteIntoHeaterShakerLatchOpen = pipetteIntoHeaterShakerLatchOpen as jest.MockedFunction<
   typeof pipetteIntoHeaterShakerLatchOpen
+>
+const mockPipetteIntoHeaterShakerWhileShaking = pipetteIntoHeaterShakerWhileShaking as jest.MockedFunction<
+  typeof pipetteIntoHeaterShakerWhileShaking
 >
 describe('aspirate', () => {
   let initialRobotState: RobotState
@@ -227,6 +232,35 @@ describe('aspirate', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'HEATER_SHAKER_LATCH_OPEN',
+    })
+  })
+  it('should return an error when aspirating from heaterShaker when it is shaking', () => {
+    mockPipetteIntoHeaterShakerWhileShaking.mockImplementationOnce(
+      (
+        modules: RobotState['modules'],
+        labware: RobotState['labware'],
+        labwareId: string
+      ) => {
+        expect(modules).toBe(robotStateWithTip.modules)
+        expect(labware).toBe(robotStateWithTip.labware)
+        expect(labwareId).toBe(SOURCE_LABWARE)
+        return true
+      }
+    )
+    const result = aspirate(
+      {
+        ...flowRateAndOffsets,
+        pipette: DEFAULT_PIPETTE,
+        volume: 50,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      } as AspDispAirgapParams,
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'HEATER_SHAKER_IS_SHAKING',
     })
   })
 })
