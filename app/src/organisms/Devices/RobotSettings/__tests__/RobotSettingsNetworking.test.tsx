@@ -66,6 +66,7 @@ describe('RobotSettingsNetworking', () => {
   it('should render title and description', () => {
     const [{ getByText, getByTestId }] = render()
     getByText('Wi-Fi - foo')
+    getByText('Network Name')
     getByText('Wired USB')
     getByText('Learn about connecting to a robot via USB')
     getByText('Looking for USB-to-Ethernet Adapter info?')
@@ -79,6 +80,7 @@ describe('RobotSettingsNetworking', () => {
   it('should render Wi-Fi mock data and ethernet mock data', () => {
     const [{ getByText, getByTestId, queryAllByTestId }] = render()
     getByText('Wi-Fi - foo')
+    getByText('Network Name')
     getByText('Wired USB')
     getByText('Wireless IP')
     getByText('Wireless Subnet Mask')
@@ -112,6 +114,7 @@ describe('RobotSettingsNetworking', () => {
 
     const [{ getByText, getByTestId, queryAllByTestId }] = render()
     getByText('Wi-Fi - foo')
+    getByText('Network Name')
     getByText('Wireless IP')
     getByText('Wireless Subnet Mask')
     getByText('Wireless MAC Address')
@@ -152,7 +155,7 @@ describe('RobotSettingsNetworking', () => {
     getByText('255.255.255.124')
     getByText('00:00:00:00:00:00')
     getByText('Wi-Fi')
-    getByText('Not connected via Wi-Fi')
+    getByText('Network Name')
     expect(
       getByTestId('RobotSettings_Networking_wifi_icon')
     ).toBeInTheDocument()
@@ -180,7 +183,7 @@ describe('RobotSettingsNetworking', () => {
       queryAllByTestId('RobotSettings_Networking_check_circle')
     ).toHaveLength(0)
     getByText('Wi-Fi')
-    getByText('Not connected via Wi-Fi')
+    getByText('Network Name')
     getByText('Wired USB')
     getByText('Not connected via wired USB')
   })
