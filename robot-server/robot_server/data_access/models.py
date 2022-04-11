@@ -47,8 +47,7 @@ run_table = sqlalchemy.Table(
         # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#foreign-key-support
         sqlalchemy.ForeignKey("protocol.id"),
         nullable=True,
-    ),
-    sqlalchemy.Column("active_run", sqlalchemy.Boolean, nullable=False),
+    )
 )
 
 # TODO (tz: 4/8/22): add a column sequence_number for preserving the order of actions
