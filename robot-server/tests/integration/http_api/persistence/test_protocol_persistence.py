@@ -17,8 +17,9 @@ async def test_protocols_persist(protocol: Callable[[str], IO[bytes]]) -> None:
     async with RobotClient.make(
         host="http://localhost", port=port, version="*"
     ) as robot_client:
-        if await robot_client.alive():
-            assert False, "A dev robot may NOT already be running when this test runs."
+        assert await robot_client.wait_until_dead(
+            12
+        ), "Dev Robot is running and must not be."
         server.start()
         assert await robot_client.wait_until_alive(
             6

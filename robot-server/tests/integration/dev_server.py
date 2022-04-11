@@ -6,6 +6,7 @@ import tempfile
 
 class DevServer:
     def __init__(self, port: str = "31950") -> None:
+        """Initialize a dev server."""
         self.server_temp_directory: str = tempfile.mkdtemp()
         self.persistence_directory: str = tempfile.mkdtemp()
         self.port: str = port
