@@ -6,8 +6,6 @@ import {
   Box,
   Flex,
   Icon,
-  NewPrimaryBtn,
-  Text,
   ALIGN_CENTER,
   ALIGN_START,
   C_MED_DARK_GRAY,
@@ -27,8 +25,11 @@ import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { ToggleButton, PrimaryButton } from '../../atoms/Buttons'
 import { StyledText } from '../../atoms/text'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
+import { ChooseProtocolSlideout } from '../../organisms/ChooseProtocolSlideout'
+import { Portal } from '../../App/portal'
 import { useLights, useRobot, useIsRobotViewable } from './hooks'
 import { RobotStatusBanner } from './RobotStatusBanner'
+import { CONNECTABLE } from '../../redux/discovery'
 
 interface RobotOverviewProps {
   robotName: string
@@ -42,7 +43,10 @@ export function RobotOverview({
   const robot = useRobot(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
 
-  const [showChooseProtocolSlideout, setShowChooseProtocolSlideout] = React.useState<boolean>(false)
+  const [
+    showChooseProtocolSlideout,
+    setShowChooseProtocolSlideout,
+  ] = React.useState<boolean>(false)
   const { lightsOn, toggleLights } = useLights(robotName)
 
   const currentRunId = useCurrentRunId()
@@ -89,6 +93,16 @@ export function RobotOverview({
           >
             {t('run_a_protocol')}
           </PrimaryButton>
+          {robot.status === CONNECTABLE ? (
+            <Portal level="top">
+              <ChooseProtocolSlideout
+                robot={robot}
+                showSlideout={showChooseProtocolSlideout}
+                onCloseClick={() => setShowChooseProtocolSlideout(false)}
+                height="100vh"
+              />
+            </Portal>
+          ) : null}
         </Flex>
       </Box>
       <Box alignSelf={ALIGN_START}>

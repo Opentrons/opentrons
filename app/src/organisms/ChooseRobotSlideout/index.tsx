@@ -61,6 +61,20 @@ export function ChooseRobotSlideout(
     srcFiles,
     mostRecentAnalysis,
   } = storedProtocolData
+  if (
+    protocolKey == null ||
+    srcFileNames == null ||
+    srcFiles == null ||
+    mostRecentAnalysis == null
+  ) {
+    console.table({
+      protocolKey,
+      srcFileNames,
+      srcFiles,
+      mostRecentAnalysis,
+    })
+    return null
+  }
   const protocolDisplayName =
     mostRecentAnalysis?.metadata?.protocolName ??
     first(srcFileNames) ??
@@ -99,7 +113,6 @@ export function ChooseRobotSlideout(
       isExpanded={showSlideout}
       onCloseClick={onCloseClick}
       zIndex="10"
-      height={`calc(100vh - ${SPACING.spacing4})`}
       title={t('choose_robot_to_run', {
         protocol_name: protocolDisplayName,
       })}

@@ -99,7 +99,6 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   return (
     <Slideout
       onCloseClick={props.onClose}
-      closeOnOutsideClick
       title={slideoutHeader}
       isExpanded
     >
