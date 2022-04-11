@@ -14,6 +14,7 @@ from opentrons_hardware.sensors import fdc1004, hdc2080, mmr920C04
 
 hms = "%H:%M:%S"
 
+
 @dataclass
 class SensorRun:
     """User input for the sensor script."""
@@ -91,7 +92,6 @@ async def handle_pressure_sensor(
             command.pipette_serial_number,
             command.sensor_type.name,
             command.minutes,
-
             command.auto_zero,
             start_time.strftime(hms),
         )
