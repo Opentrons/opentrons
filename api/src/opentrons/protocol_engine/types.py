@@ -155,7 +155,7 @@ class ModuleModel(str, Enum):
             return ModuleType.MAGNETIC
         elif ModuleModel.is_thermocycler_module_model(self):
             return ModuleType.THERMOCYCLER
-        elif ModuleModel.is_heater_shaker_module_model(self):
+        elif self == ModuleModel.HEATER_SHAKER_MODULE_V1:
             return ModuleType.HEATER_SHAKER
 
         assert False, f"Invalid ModuleModel {self}"
