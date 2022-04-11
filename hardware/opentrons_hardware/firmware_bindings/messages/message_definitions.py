@@ -451,3 +451,21 @@ class GripperGripRequest(EmptyPayloadMessage):  # noqa: D101
 @dataclass
 class GripperHomeRequest(EmptyPayloadMessage):  # noqa: D101
     message_id: Literal[MessageId.gripper_home_request] = MessageId.gripper_home_request
+
+
+@dataclass
+class BindSensorOutputRequest:  # noqa: D101
+    payload: payloads.BindSensorOutputRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.BindSensorOutputRequestPayload
+    message_id: Literal[
+        MessageId.bind_sensor_output_request
+    ] = MessageId.bind_sensor_output_request
+
+
+@dataclass
+class BindSensorOutputResponse:  # noqa: D101
+    payload: payloads.BindSensorOutputResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.BindSensorOutputResponsePayload
+    message_id: Literal[
+        MessageId.bind_sensor_output_response
+    ] = MessageId.bind_sensor_output_response
