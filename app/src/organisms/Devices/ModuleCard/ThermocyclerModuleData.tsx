@@ -77,7 +77,7 @@ export const ThermocyclerModuleData = (
   }
 
   return (
-    <div css={MODULE_STATUS_STYLING}>
+    <Flex css={MODULE_STATUS_STYLING}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         data-testid={`thermocycler_module_data_lid`}
@@ -132,6 +132,6 @@ export const ThermocyclerModuleData = (
           {t('current_temp', { temp: currentTemp })}
         </Text>
       </Flex>
-    </div>
+    </Flex>
   )
 }

@@ -61,8 +61,7 @@ export const HeaterShakerModuleData = (
   const isShaking = shakerStatus !== 'idle'
 
   const getStatusLabelProps = (
-    speedStatus: SpeedStatus | null,
-    tempStatus: TemperatureStatus | null
+    status: SpeedStatus | TemperatureStatus
   ): { backgroundColor: string; iconColor: string; textColor: string } => {
     const StatusLabelProps = {
       backgroundColor: COLORS.medGrey,
@@ -71,7 +70,7 @@ export const HeaterShakerModuleData = (
       pulse: false,
     }
 
-    switch (speedStatus) {
+    switch (status) {
       case 'idle': {
         StatusLabelProps.backgroundColor = COLORS.medGrey
         StatusLabelProps.iconColor = COLORS.darkGrey
@@ -81,38 +80,18 @@ export const HeaterShakerModuleData = (
       case 'holding at target': {
         StatusLabelProps.backgroundColor = COLORS.medBlue
         StatusLabelProps.iconColor = COLORS.blue
-
         break
       }
       case 'error': {
         StatusLabelProps.backgroundColor = COLORS.warningBg
         StatusLabelProps.iconColor = COLORS.warning
         StatusLabelProps.textColor = COLORS.warningText
-
-        break
-      }
-      case 'slowing down':
-      case 'speeding up': {
-        StatusLabelProps.backgroundColor = COLORS.blue + '1A'
-        StatusLabelProps.pulse = true
-        break
-      }
-    }
-    switch (tempStatus) {
-      case 'idle': {
-        StatusLabelProps.backgroundColor = COLORS.medGrey
-        StatusLabelProps.iconColor = COLORS.darkGrey
-        StatusLabelProps.textColor = COLORS.darkBlack
-        break
-      }
-      case 'holding at target': {
-        StatusLabelProps.backgroundColor = COLORS.medBlue
-        StatusLabelProps.iconColor = COLORS.blue
-
         break
       }
       case 'heating':
-      case 'cooling': {
+      case 'cooling':
+      case 'slowing down':
+      case 'speeding up': {
         StatusLabelProps.backgroundColor = COLORS.blue + '1A'
         StatusLabelProps.pulse = true
         break
@@ -155,44 +134,12 @@ export const HeaterShakerModuleData = (
   }
 
   return (
-    <>
-      <div css={MODULE_STATUS_STYLING}>
-        {showTemperatureData && (
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            marginRight={SPACING.spacing6}
-            data-testid={`heater_shaker_module_data_temp`}
-          >
-            <Text
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
-              color={COLORS.darkGreyEnabled}
-              fontWeight={TYPOGRAPHY.fontWeightRegular}
-              fontSize={TYPOGRAPHY.fontSizeH6}
-              marginTop={SPACING.spacing3}
-            >
-              {t('heater')}
-            </Text>
-            <StatusLabel
-              status={heaterStatus}
-              {...getStatusLabelProps(null, heaterStatus)}
-            />
-            <Text
-              title="heater_target_temp"
-              fontSize={TYPOGRAPHY.fontSizeH6}
-              marginBottom={SPACING.spacing1}
-            >
-              {t(targetTemp === null ? 'na_temp' : 'target_temp', {
-                temp: targetTemp,
-              })}
-            </Text>
-            <Text title="heater_temp" fontSize={TYPOGRAPHY.fontSizeH6}>
-              {t('current_temp', { temp: currentTemp })}
-            </Text>
-          </Flex>
-        )}
+    <Flex css={MODULE_STATUS_STYLING}>
+      {showTemperatureData && (
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          data-testid={`heater_shaker_module_data_shaker`}
+          marginRight={SPACING.spacing6}
+          data-testid={`heater_shaker_module_data_temp`}
         >
           <Text
             textTransform={TEXT_TRANSFORM_UPPERCASE}
@@ -201,62 +148,92 @@ export const HeaterShakerModuleData = (
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginTop={SPACING.spacing3}
           >
-            {t('shaker')}
+            {t('heater')}
           </Text>
           <StatusLabel
-            status={shakerStatus}
-            {...getStatusLabelProps(shakerStatus, null)}
+            status={heaterStatus}
+            {...getStatusLabelProps(heaterStatus)}
           />
-
           <Text
-            title="shaker_target_speed"
+            title="heater_target_temp"
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginBottom={SPACING.spacing1}
           >
-            {t(targetSpeed === null ? 'na_speed' : 'target_speed', {
-              speed: targetSpeed,
+            {t(targetTemp === null ? 'na_temp' : 'target_temp', {
+              temp: targetTemp,
             })}
           </Text>
-          <Text title="shaker_current_speed" fontSize={TYPOGRAPHY.fontSizeH6}>
-            {t('current_speed', { speed: currentSpeed })}
+          <Text title="heater_temp" fontSize={TYPOGRAPHY.fontSizeH6}>
+            {t('current_temp', { temp: currentTemp })}
           </Text>
         </Flex>
-
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          data-testid={`heater_shaker_module_data_latch`}
+      )}
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        data-testid={`heater_shaker_module_data_shaker`}
+      >
+        <Text
+          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          color={COLORS.darkGreyEnabled}
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
+          fontSize={TYPOGRAPHY.fontSizeH6}
+          marginTop={SPACING.spacing3}
         >
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            <Text
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
-              color={COLORS.darkGreyEnabled}
-              fontWeight={TYPOGRAPHY.fontWeightRegular}
-              fontSize={TYPOGRAPHY.fontSizeH6}
-              marginTop={SPACING.spacing3}
-              title="latch_status"
-            >
-              {t('labware_latch', { ns: 'heater_shaker' })}
-            </Text>
-            <Flex
-              flexDirection={DIRECTION_ROW}
-              marginTop={SPACING.spacing2}
-              fontWeight={TYPOGRAPHY.fontWeightRegular}
-              fontSize={TYPOGRAPHY.fontSizeH6}
-            >
-              {isShaking && (
-                <Icon
-                  paddingBottom="3px"
-                  paddingRight={SPACING.spacing2}
-                  name="closed-locked"
-                  data-testid="HeaterShakerModuleData_latch_lock"
-                  size={SIZE_1}
-                />
-              )}
-              {getLatchStatus(latchStatus)}
-            </Flex>
+          {t('shaker')}
+        </Text>
+        <StatusLabel
+          status={shakerStatus}
+          {...getStatusLabelProps(shakerStatus)}
+        />
+
+        <Text
+          title="shaker_target_speed"
+          fontSize={TYPOGRAPHY.fontSizeH6}
+          marginBottom={SPACING.spacing1}
+        >
+          {t(targetSpeed === null ? 'na_speed' : 'target_speed', {
+            speed: targetSpeed,
+          })}
+        </Text>
+        <Text title="shaker_current_speed" fontSize={TYPOGRAPHY.fontSizeH6}>
+          {t('current_speed', { speed: currentSpeed })}
+        </Text>
+      </Flex>
+
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        data-testid={`heater_shaker_module_data_latch`}
+      >
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <Text
+            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            color={COLORS.darkGreyEnabled}
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+            fontSize={TYPOGRAPHY.fontSizeH6}
+            marginTop={SPACING.spacing3}
+            title="latch_status"
+          >
+            {t('labware_latch', { ns: 'heater_shaker' })}
+          </Text>
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            marginTop={SPACING.spacing2}
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+            fontSize={TYPOGRAPHY.fontSizeH6}
+          >
+            {isShaking && (
+              <Icon
+                paddingBottom="3px"
+                paddingRight={SPACING.spacing2}
+                name="closed-locked"
+                data-testid="HeaterShakerModuleData_latch_lock"
+                size={SIZE_1}
+              />
+            )}
+            {getLatchStatus(latchStatus)}
           </Flex>
         </Flex>
-      </div>
-    </>
+      </Flex>
+    </Flex>
   )
 }

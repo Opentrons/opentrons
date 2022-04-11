@@ -55,10 +55,9 @@ export function PipettesAndModules({
       >
         {isRobotViewable ? (
           <Flex
+            width={attachedModules.length === 1 ? '50%' : '100%'}
             justifyContent={JUSTIFY_START}
             flexWrap={WRAP}
-            width={attachedModules.length > 1 ? '100%' : undefined}
-            maxWidth={attachedModules.length === 1 ? '100%' : undefined}
             flexDirection={DIRECTION_COLUMN}
             maxHeight="25rem"
           >
