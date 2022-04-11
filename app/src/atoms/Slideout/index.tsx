@@ -65,13 +65,7 @@ const COLLAPSED_STYLE = css`
 `
 
 export const Slideout = (props: Props): JSX.Element | null => {
-  const {
-    isExpanded,
-    title,
-    onCloseClick,
-    children,
-    footer,
-  } = props
+  const { isExpanded, title, onCloseClick, children, footer } = props
   return (
     <>
       {isExpanded ? (

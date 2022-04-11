@@ -23,7 +23,11 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
 export function StyledText(props: Props): JSX.Element {
   const { as, fontWeight, children } = props
   const css: FlattenSimpleInterpolation | undefined =
-    styleMap[`${String(as)}${fontWeight === TYPOGRAPHY.fontWeightSemiBold ? 'SemiBold' : ''}`]
+    styleMap[
+      `${String(as)}${
+        fontWeight === TYPOGRAPHY.fontWeightSemiBold ? 'SemiBold' : ''
+      }`
+    ]
   return (
     <Text css={css} {...props}>
       {children}

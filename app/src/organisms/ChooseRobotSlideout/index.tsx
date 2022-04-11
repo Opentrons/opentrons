@@ -44,6 +44,7 @@ import { AvailableRobotOption } from './AvailableRobotOption'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { StyleProps } from '@opentrons/components'
+import { useAvailableAndUnavailableDevices } from '../../pages/Devices/DevicesLanding/hooks'
 
 interface ChooseRobotSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
@@ -55,6 +56,19 @@ export function ChooseRobotSlideout(
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_details', 'shared'])
   const { storedProtocolData, showSlideout, onCloseClick, ...restProps } = props
+  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
+  const dispatch = useDispatch<Dispatch>()
+  const isScanning = useSelector((state: State) => getScanning(state))
+
+  const {
+    unavailableDevices,
+    availableDevices,
+  } = useAvailableAndUnavailableDevices()
+
+  const availableRobots = availableDevices.filter(robot => {
+    // TODO: filter out robots who have a current run that is in thie paused or running status
+    return true
+  })
   const {
     protocolKey,
     srcFileNames,
@@ -67,46 +81,19 @@ export function ChooseRobotSlideout(
     srcFiles == null ||
     mostRecentAnalysis == null
   ) {
-    console.table({
-      protocolKey,
-      srcFileNames,
-      srcFiles,
-      mostRecentAnalysis,
-    })
+    // TODO: do more robust corrupt file catching and handling here
     return null
   }
-  const protocolDisplayName =
-    mostRecentAnalysis?.metadata?.protocolName ??
-    first(srcFileNames) ??
-    protocolKey
-  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
-
   const srcFileObjects = srcFiles.map((srcFileBuffer, index) => {
     const srcFilePath = srcFileNames[index]
     return new File([srcFileBuffer], path.basename(srcFilePath))
   })
-  const dispatch = useDispatch<Dispatch>()
-  const isScanning = useSelector((state: State) => getScanning(state))
-  const connectableRobots = useSelector<
-    State,
-    ReturnType<typeof getConnectableRobots>
-  >(getConnectableRobots)
-  const reachableRobots = useSelector<
-    State,
-    ReturnType<typeof getReachableRobots>
-  >(getReachableRobots)
-  const unavailableRobots = useSelector<
-    State,
-    ReturnType<typeof getUnreachableRobots>
-  >(getUnreachableRobots)
-  const availableRobots = connectableRobots.filter(robot => {
-    // TODO: filter out robots who have a current run that is in thie paused or running status
-    return true
-  })
+  const protocolDisplayName =
+    mostRecentAnalysis?.metadata?.protocolName ??
+    first(srcFileNames) ??
+    protocolKey
   const unavailableOrBusyCount =
-    unavailableRobots.length +
-    reachableRobots.length +
-    (connectableRobots.length - availableRobots.length)
+    unavailableDevices.length + availableDevices.length - availableRobots.length
 
   return (
     <Slideout
@@ -148,7 +135,7 @@ export function ChooseRobotSlideout(
             </Link>
           )}
         </Flex>
-        {!isScanning && connectableRobots.length === 0 ? (
+        {!isScanning && availableRobots.length === 0 ? (
           <Flex
             css={BORDERS.cardOutlineBorder}
             flexDirection={DIRECTION_COLUMN}
@@ -162,7 +149,7 @@ export function ChooseRobotSlideout(
             </StyledText>
           </Flex>
         ) : (
-          connectableRobots.map(robot => (
+          availableRobots.map(robot => (
             <AvailableRobotOption
               key={robot.ip}
               robotName={robot.name}

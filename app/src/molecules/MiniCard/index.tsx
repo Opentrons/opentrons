@@ -1,12 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import {
-  SPACING,
-  Flex,
-  COLORS,
-  BORDERS,
-} from '@opentrons/components'
+import { SPACING, Flex, COLORS, BORDERS } from '@opentrons/components'
 
 interface MiniCardProps {
   onClick: () => void
@@ -38,9 +33,7 @@ const selectedOptionStyles = css`
   }
 `
 
-export function MiniCard(
-  props: MiniCardProps
-): JSX.Element {
+export function MiniCard(props: MiniCardProps): JSX.Element {
   const { children, onClick, isSelected } = props
   return (
     <Flex

@@ -50,7 +50,10 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
             support_email: SUPPORT_EMAIL,
           })}
         </StyledText>
-        <ExternalLink href={NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF} marginTop={SPACING.spacing4}>
+        <ExternalLink
+          href={NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF}
+          marginTop={SPACING.spacing4}
+        >
           {t('learn_more_about_troubleshooting_connection')}
         </ExternalLink>
         <PrimaryButton

@@ -6,7 +6,13 @@ import { useHistory } from 'react-router-dom'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import { useSelector } from 'react-redux'
 
-import { SPACING, TYPOGRAPHY, ALIGN_CENTER, JUSTIFY_CENTER, Flex } from '@opentrons/components'
+import {
+  SPACING,
+  TYPOGRAPHY,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  Flex,
+} from '@opentrons/components'
 
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { Slideout } from '../../atoms/Slideout'
@@ -37,7 +43,7 @@ export function ChooseProtocolSlideout(
   const [
     selectedProtocol,
     setSelectedProtocol,
-  ] = React.useState<StoredProtocolData | null>(first(storedProtocols) ??  null)
+  ] = React.useState<StoredProtocolData | null>(first(storedProtocols) ?? null)
 
   const srcFileObjects =
     selectedProtocol != null
@@ -66,6 +72,7 @@ export function ChooseProtocolSlideout(
     >
       {storedProtocols.map(storedProtocol => (
         <MiniCard
+          key={storedProtocol.protocolKey}
           isSelected={
             selectedProtocol != null &&
             storedProtocol.protocolKey === selectedProtocol.protocolKey
