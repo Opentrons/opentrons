@@ -4,8 +4,8 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
-// import components wifi & ethernet
 import * as Networking from '../../../../redux/networking'
+import * as Fixtures from '../../../../redux/networking/__fixtures__'
 import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
 
 jest.mock('../../../../redux/networking/selectors')
@@ -13,6 +13,10 @@ jest.mock('../../../../redux/robot-api/selectors')
 
 const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
   typeof Networking.getNetworkInterfaces
+>
+
+const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
+  typeof Networking.getWifiList
 >
 
 const render = () => {
@@ -40,12 +44,19 @@ const initialMockEthernet = {
   type: Networking.INTERFACE_ETHERNET,
 }
 
+const mockWifiList = [
+  { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
+  // { ...Fixtures.mockWifiNetwork, ssid: 'bar' },
+]
+
 describe('RobotSettingsNetworking', () => {
   beforeEach(() => {
     mockGetNetworkInterfaces.mockReturnValue({
       wifi: initialMockWifi,
       ethernet: initialMockEthernet,
     })
+
+    mockGetWifiList.mockReturnValue(mockWifiList)
   })
 
   afterEach(() => {
@@ -54,7 +65,7 @@ describe('RobotSettingsNetworking', () => {
 
   it('should render title and description', () => {
     const [{ getByText, getByTestId }] = render()
-    getByText('Wi-Fi')
+    getByText('Wi-Fi - foo')
     getByText('Wired USB')
     getByText('Learn about connecting to a robot via USB')
     getByText('Looking for USB-to-Ethernet Adapter info?')
@@ -67,7 +78,7 @@ describe('RobotSettingsNetworking', () => {
 
   it('should render Wi-Fi mock data and ethernet mock data', () => {
     const [{ getByText, getByTestId, queryAllByTestId }] = render()
-    getByText('Wi-Fi')
+    getByText('Wi-Fi - foo')
     getByText('Wired USB')
     getByText('Wireless IP')
     getByText('Wireless Subnet Mask')
@@ -100,7 +111,7 @@ describe('RobotSettingsNetworking', () => {
     mockGetNetworkInterfaces.mockReturnValue({ wifi: mockWiFi, ethernet: null })
 
     const [{ getByText, getByTestId, queryAllByTestId }] = render()
-    getByText('Wi-Fi')
+    getByText('Wi-Fi - foo')
     getByText('Wireless IP')
     getByText('Wireless Subnet Mask')
     getByText('Wireless MAC Address')
@@ -129,8 +140,10 @@ describe('RobotSettingsNetworking', () => {
       wifi: null,
       ethernet: mockWiredUSB,
     })
+    mockGetWifiList.mockReturnValue([])
     const [{ getByText, getByTestId, queryAllByTestId }] = render()
 
+    // expect(queryByText('foo')).not.toBeInTheDocument()
     getByText('Wired USB')
     getByText('Wired IP')
     getByText('Wired Subnet Mask')
@@ -154,6 +167,7 @@ describe('RobotSettingsNetworking', () => {
       wifi: null,
       ethernet: null,
     })
+    mockGetWifiList.mockReturnValue([])
     const [{ getByText, queryByText, queryAllByTestId }] = render()
 
     expect(queryByText('Wireless IP')).not.toBeInTheDocument()
