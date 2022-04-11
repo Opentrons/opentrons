@@ -86,7 +86,7 @@ class ThermocyclerDriverFactory:
             alarm_keyword="alarm",
         )
 
-        is_gen2 = await ThermocyclerDriverFactory.is_gen2_protocol(connection_temp)
+        is_gen2 = await ThermocyclerDriverFactory.is_gen2_thermocycler(connection_temp)
         # Must reset input data because the old setting of the ACK did
         # not necessarily capture the entire response.
         serial_port.reset_input_buffer()
@@ -115,7 +115,7 @@ class ThermocyclerDriverFactory:
             return ThermocyclerDriver(connection)
 
     @staticmethod
-    async def is_gen2_protocol(connection: SerialConnection) -> bool:
+    async def is_gen2_thermocycler(connection: SerialConnection) -> bool:
         """
         Send a message through a connection to check if the connected
         thermocycler is a Gen1 or Gen2 model
