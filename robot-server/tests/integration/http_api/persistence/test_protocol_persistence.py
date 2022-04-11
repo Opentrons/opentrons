@@ -28,9 +28,9 @@ async def test_protocols_persist(protocol: Callable[[str], IO[bytes]]) -> None:
             with protocol(secrets.token_urlsafe(16)) as file:
                 await robot_client.post_protocol([Path(file.name)])
         response = await robot_client.get_protocols()
-        uploaded_protocol_ids = [protocol["id"] for protocol in response.json()["data"]]
-        uploaded_created_at = [
-            protocol["createdAt"] for protocol in response.json()["data"]
+        uploaded_ids_created_at = [
+            (protocol["id"], protocol["createdAt"])
+            for protocol in response.json()["data"]
         ]
         server.stop()
         assert await robot_client.wait_until_dead(12), "Dev Robot did not stop."
@@ -39,20 +39,17 @@ async def test_protocols_persist(protocol: Callable[[str], IO[bytes]]) -> None:
             6
         ), "Dev Robot never became available."
         response = await robot_client.get_protocols()
-        restarted_protocol_ids = [
-            protocol["id"] for protocol in response.json()["data"]
+        restarted_ids_created_at = [
+            (protocol["id"], protocol["createdAt"])
+            for protocol in response.json()["data"]
         ]
-        restarted_created_at = [
-            protocol["createdAt"] for protocol in response.json()["data"]
-        ]
-        # The length of the get protocols
+        # The number of uploaded protocols prior to restart
+        # equals the number of protocols in the get protocols response after restart.
         assert len(response.json()["data"]) == protocols_to_create
+        # The set of (ids,createdAt) after restart is the same as prior to restart.
+        # The union of the sets accomplishes this order ignored comparison.
         assert (
-            len(list(set(uploaded_protocol_ids) & set(restarted_protocol_ids)))
-            == protocols_to_create
-        )
-        assert (
-            len(list(set(uploaded_created_at) & set(restarted_created_at)))
+            len(set(uploaded_ids_created_at) & set(restarted_ids_created_at))
             == protocols_to_create
         )
         server.stop()
