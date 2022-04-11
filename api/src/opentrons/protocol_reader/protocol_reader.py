@@ -1,6 +1,6 @@
 """Read relevant protocol information from a set of files."""
 from pathlib import Path
-from typing import List, Sequence, Union
+from typing import List, Optional, Sequence
 
 from .input_file import AbstractInputFile
 from .file_reader_writer import FileReaderWriter, FileReadError
@@ -84,7 +84,7 @@ class ProtocolReader:
         files: Sequence[Path],
         directory: Optional[Path],
     ) -> ProtocolSource:
-        """Compute a `ProtocolSource` from  `read_and_save()`, except don't
+        """Compute a `ProtocolSource` from protocol source files on the filesystem.
 
         Arguments:
             files: The files comprising the protocol.
