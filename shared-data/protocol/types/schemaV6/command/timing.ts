@@ -5,7 +5,7 @@ export interface TimingCreateCommand extends CommonCommandCreateInfo {
 }
 export interface TimingRunTimeCommand
   extends CommonCommandRunTimeInfo,
-  TimingCreateCommand {
+    TimingCreateCommand {
   result: {}
 }
 
@@ -20,7 +20,7 @@ export interface PauseCreateCommand extends CommonCommandCreateInfo {
 }
 export interface PauseRunTimeCommand
   extends CommonCommandRunTimeInfo,
-  PauseCreateCommand {
+    PauseCreateCommand {
   result: any
 }
 

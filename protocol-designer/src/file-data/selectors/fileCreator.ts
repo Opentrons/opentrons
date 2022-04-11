@@ -249,7 +249,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       ...loadPipetteCommands,
       ...loadLabwareCommands,
       ...loadModuleCommands,
-      ...loadLiquidCommands
+      ...loadLiquidCommands,
     ]
 
     const nonLoadCommands: CreateCommand[] = flatMap(

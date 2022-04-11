@@ -13,7 +13,7 @@ export interface LoadPipetteCreateCommand extends CommonCommandCreateInfo {
 }
 export interface LoadPipetteRunTimeCommand
   extends CommonCommandRunTimeInfo,
-  Omit<LoadPipetteCreateCommand, 'params'> {
+    Omit<LoadPipetteCreateCommand, 'params'> {
   params: LoadPipetteParams & {
     pipetteName: PipetteName
   }
@@ -25,7 +25,7 @@ export interface LoadLabwareCreateCommand extends CommonCommandCreateInfo {
 }
 export interface LoadLabwareRunTimeCommand
   extends CommonCommandRunTimeInfo,
-  LoadLabwareCreateCommand {
+    LoadLabwareCreateCommand {
   result: LoadLabwareResult
 }
 export interface LoadModuleCreateCommand extends CommonCommandCreateInfo {
@@ -34,7 +34,7 @@ export interface LoadModuleCreateCommand extends CommonCommandCreateInfo {
 }
 export interface LoadModuleRunTimeCommand
   extends CommonCommandRunTimeInfo,
-  Omit<LoadModuleCreateCommand, 'params'> {
+    Omit<LoadModuleCreateCommand, 'params'> {
   params: LoadModuleParams & {
     model: ModuleModel
   }
@@ -46,7 +46,7 @@ export interface LoadLiquidCreateCommand extends CommonCommandCreateInfo {
 }
 export interface LoadLiquidRunTimeCommand
   extends CommonCommandRunTimeInfo,
-  LoadLiquidCreateCommand {
+    LoadLiquidCreateCommand {
   result: LoadLiquidResult
 }
 

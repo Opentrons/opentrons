@@ -1,5 +1,5 @@
 import { CommonCommandRunTimeInfo } from '.'
-import { CommonCommandCreateInfo } from '../../../../lib/protocol/types/schemaV6/command/index.d';
+import { CommonCommandCreateInfo } from '../../../../lib/protocol/types/schemaV6/command/index.d'
 export type PipettingRunTimeCommand =
   | AspirateRunTimeCommand
   | DispenseRunTimeCommand
@@ -25,7 +25,7 @@ export interface AspirateCreateCommand extends CommonCommandCreateInfo {
 }
 export interface AspirateRunTimeCommand
   extends CommonCommandRunTimeInfo,
-  AspirateCreateCommand {
+    AspirateCreateCommand {
   result: BasicLiquidHandlingResult
 }
 export interface DispenseCreateCommand extends CommonCommandCreateInfo {
@@ -34,7 +34,7 @@ export interface DispenseCreateCommand extends CommonCommandCreateInfo {
 }
 export interface DispenseRunTimeCommand
   extends CommonCommandRunTimeInfo,
-  DispenseCreateCommand {
+    DispenseCreateCommand {
   result: BasicLiquidHandlingResult
 }
 export interface BlowoutCreateCommand extends CommonCommandCreateInfo {
@@ -43,7 +43,7 @@ export interface BlowoutCreateCommand extends CommonCommandCreateInfo {
 }
 export interface BlowoutRunTimeCommand
   extends CommonCommandRunTimeInfo,
-  BlowoutCreateCommand {
+    BlowoutCreateCommand {
   result: BasicLiquidHandlingResult
 }
 export interface TouchTipCreateCommand extends CommonCommandCreateInfo {
@@ -52,7 +52,7 @@ export interface TouchTipCreateCommand extends CommonCommandCreateInfo {
 }
 export interface TouchTipRunTimeCommand
   extends CommonCommandRunTimeInfo,
-  TouchTipCreateCommand {
+    TouchTipCreateCommand {
   result: BasicLiquidHandlingResult
 }
 export interface PickUpTipCreateCommand extends CommonCommandCreateInfo {
@@ -61,7 +61,7 @@ export interface PickUpTipCreateCommand extends CommonCommandCreateInfo {
 }
 export interface PickUpTipRunTimeCommand
   extends CommonCommandRunTimeInfo,
-  PickUpTipCreateCommand {
+    PickUpTipCreateCommand {
   result: any
 }
 export interface DropTipCreateCommand extends CommonCommandCreateInfo {
@@ -70,7 +70,7 @@ export interface DropTipCreateCommand extends CommonCommandCreateInfo {
 }
 export interface DropTipRunTimeCommand
   extends CommonCommandRunTimeInfo,
-  DropTipCreateCommand {
+    DropTipCreateCommand {
   result: any
 }
 

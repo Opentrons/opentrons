@@ -148,7 +148,8 @@ describe('v6 migration', () => {
         commandType: 'loadLiquid',
         params: {
           liquidId: '0',
-          labwareId: '6114d3d0-b759-11ec-81e8-7fa12dc3e861:opentrons/opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap/1', // this is just taken from the fixture
+          labwareId:
+            '6114d3d0-b759-11ec-81e8-7fa12dc3e861:opentrons/opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap/1', // this is just taken from the fixture
           volumeByWell: {
             A1: 222,
             B1: 222,
@@ -166,7 +167,8 @@ describe('v6 migration', () => {
         commandType: 'loadLiquid',
         params: {
           liquidId: '1',
-          labwareId: '6114d3d0-b759-11ec-81e8-7fa12dc3e861:opentrons/opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap/1', // this is just taken from the fixture
+          labwareId:
+            '6114d3d0-b759-11ec-81e8-7fa12dc3e861:opentrons/opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap/1', // this is just taken from the fixture
           volumeByWell: {
             A3: 333,
             B3: 333,
@@ -184,7 +186,8 @@ describe('v6 migration', () => {
         commandType: 'loadLiquid',
         params: {
           liquidId: '2',
-          labwareId: '6114d3d0-b759-11ec-81e8-7fa12dc3e861:opentrons/opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap/1', // this is just taken from the fixture
+          labwareId:
+            '6114d3d0-b759-11ec-81e8-7fa12dc3e861:opentrons/opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap/1', // this is just taken from the fixture
           volumeByWell: {
             A5: 444,
             B5: 444,
@@ -202,7 +205,8 @@ describe('v6 migration', () => {
         commandType: 'loadLiquid',
         params: {
           liquidId: '0',
-          labwareId: '64c66a20-b759-11ec-81e8-7fa12dc3e861:opentrons/usascientific_96_wellplate_2.4ml_deep/1', // this is just taken from the fixture
+          labwareId:
+            '64c66a20-b759-11ec-81e8-7fa12dc3e861:opentrons/usascientific_96_wellplate_2.4ml_deep/1', // this is just taken from the fixture
           volumeByWell: {
             A1: 555,
             B1: 555,
@@ -236,7 +240,8 @@ describe('v6 migration', () => {
         commandType: 'loadLiquid',
         params: {
           liquidId: '1',
-          labwareId: '64c66a20-b759-11ec-81e8-7fa12dc3e861:opentrons/usascientific_96_wellplate_2.4ml_deep/1', // this is just taken from the fixture
+          labwareId:
+            '64c66a20-b759-11ec-81e8-7fa12dc3e861:opentrons/usascientific_96_wellplate_2.4ml_deep/1', // this is just taken from the fixture
           volumeByWell: {
             A4: 666,
             B4: 666,
@@ -270,7 +275,8 @@ describe('v6 migration', () => {
         commandType: 'loadLiquid',
         params: {
           liquidId: '2',
-          labwareId: '64c66a20-b759-11ec-81e8-7fa12dc3e861:opentrons/usascientific_96_wellplate_2.4ml_deep/1', // this is just taken from the fixture
+          labwareId:
+            '64c66a20-b759-11ec-81e8-7fa12dc3e861:opentrons/usascientific_96_wellplate_2.4ml_deep/1', // this is just taken from the fixture
           volumeByWell: {
             A7: 777,
             B7: 777,
@@ -319,17 +325,19 @@ describe('v6 migration', () => {
             E12: 777,
             F12: 777,
             G12: 777,
-            H12: 777
-          }
+            H12: 777,
+          },
         },
-      }
+      },
     ]
 
     const migratedLiquidsFile = migrateFile(_oldProtocolMultipleLiquids as any)
     const loadLiquidCommands = migratedLiquidsFile.commands.filter(
       command => command.commandType === 'loadLiquid'
     )
-    expect(loadLiquidCommands).toEqual(expect.arrayContaining(expectedLoadLiquidCommands))
+    expect(loadLiquidCommands).toEqual(
+      expect.arrayContaining(expectedLoadLiquidCommands)
+    )
   })
   it('replaces air gap commands with aspirate commands', () => {
     const expectedConvertedAirgapCommands = [

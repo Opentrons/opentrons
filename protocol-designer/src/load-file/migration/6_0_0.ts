@@ -12,7 +12,7 @@ import { uuid } from '../../utils'
 //  and labware access parameters, renames AirGap to aspirate, and removes all temporal properties from labware, pipettes,
 //  and module keys such as slot, mount
 //  and renames well to wellName
-import { getLoadLiquidCommands } from './utils/getLoadLiquidCommands';
+import { getLoadLiquidCommands } from './utils/getLoadLiquidCommands'
 import type {
   LoadPipetteCreateCommand,
   LoadModuleCreateCommand,
@@ -22,7 +22,7 @@ import type {
   CreateCommand,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
-import type { DesignerApplicationData } from './utils/getLoadLiquidCommands';
+import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 const PD_VERSION = '6.0.0'
 const SCHEMA_VERSION = 6
@@ -127,20 +127,20 @@ export const migrateFile = (
   const liquids: ProtocolFile['liquids'] =
     appData.designerApplication?.data?.ingredients != null
       ? reduce(
-        appData.designerApplication?.data?.ingredients,
-        (acc, liquidData, liquidId) => {
-          return {
-            ...acc,
-            [liquidId]: {
-              displayName: liquidData.name,
-              description: liquidData.description,
-            },
-          }
-        },
-        {}
-      )
+          appData.designerApplication?.data?.ingredients,
+          (acc, liquidData, liquidId) => {
+            return {
+              ...acc,
+              [liquidId]: {
+                displayName: liquidData.name,
+                description: liquidData.description,
+              },
+            }
+          },
+          {}
+        )
       : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      ({} as ProtocolFile['liquids'])
+        ({} as ProtocolFile['liquids'])
 
   return {
     ...appData,
