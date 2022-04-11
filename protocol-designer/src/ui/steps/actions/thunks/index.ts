@@ -265,12 +265,12 @@ export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any>
   getState
 ) => {
   const initialState = getState()
-  const unsavedSetHeaterShakerTemperatureForm = getUnsavedForm(initialState)
+  const unsavedSetHeaterShakerForm = getUnsavedForm(initialState)
   const isPristineSetHeaterShakerTempForm = getUnsavedFormIsPristineHeaterShakerForm(
     initialState
   )
 
-  if (!unsavedSetHeaterShakerTemperatureForm) {
+  if (!unsavedSetHeaterShakerForm) {
     assert(
       false,
       'Tried to saveSetHeaterShakerTempFormWithAddedPauseUntilTemp with falsey unsavedForm. This should never be able to happen.'
@@ -278,7 +278,7 @@ export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any>
     return
   }
 
-  const { id } = unsavedSetHeaterShakerTemperatureForm
+  const { id } = unsavedSetHeaterShakerForm
 
   if (!isPristineSetHeaterShakerTempForm) {
     assert(
@@ -288,14 +288,13 @@ export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any>
     return
   }
 
-  const temperature =
-    unsavedSetHeaterShakerTemperatureForm?.targetHeaterShakerTemperature
+  const temperature = unsavedSetHeaterShakerForm?.targetHeaterShakerTemperature
 
   assert(
     temperature != null && temperature !== '',
     `tried to auto-add a pause until temp, but targetHeaterShakerTemperature is missing: ${temperature}`
   )
-  dispatch(_saveStepForm(unsavedSetHeaterShakerTemperatureForm))
+  dispatch(_saveStepForm(unsavedSetHeaterShakerForm))
   dispatch(
     addStep({
       stepType: 'pause',
@@ -309,6 +308,15 @@ export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any>
       },
     })
   )
+  const heaterShakerModuleId = unsavedSetHeaterShakerForm.moduleId
+  dispatch(
+    changeFormInput({
+      update: {
+        moduleId: heaterShakerModuleId,
+      },
+    })
+  )
+
   dispatch(
     changeFormInput({
       update: {

@@ -13,6 +13,7 @@ import {
   saveHeaterShakerFormWithAddedPauseUntilTemp,
   saveSetTempFormWithAddedPauseUntilTemp,
 } from '../thunks'
+import type { Timeline, RobotState } from '@opentrons/step-generation/src/types'
 
 jest.mock('../../../../step-forms/selectors')
 jest.mock('../../selectors')
@@ -41,6 +42,34 @@ const mockGetUnsavedFormIsPristineSetTempForm = stepFormSelectors.getUnsavedForm
 const mockGetRobotStateTimeline = getRobotStateTimeline as jest.MockedFunction<
   typeof getRobotStateTimeline
 >
+
+const initialRobotState: RobotState = {
+  labware: {
+    trashId: {
+      slot: '12',
+    },
+    tiprackId: {
+      slot: '1',
+    },
+    plateId: {
+      slot: '7',
+    },
+  },
+  modules: {},
+  pipettes: {
+    pipetteId: {
+      mount: 'left',
+    },
+  },
+  liquidState: {
+    pipettes: {},
+    labware: {},
+  },
+  tipState: {
+    pipettes: {},
+    tipracks: {},
+  },
+}
 
 describe('steps actions', () => {
   describe('selectStep', () => {
@@ -279,12 +308,26 @@ describe('steps actions', () => {
       ])
     })
   })
+
   describe('saveHeaterShakerFormWithAddedPauseUntilTemp', () => {
-    const mockRobotStateTimeline = {
-      commands: {
-        commandType: 'heaterShakerModule/awaitTemperature',
-      },
-    } as any
+    const mockRobotStateTimeline: Timeline = {
+      timeline: [
+        {
+          commands: [
+            {
+              commandType: 'heaterShakerModule/awaitTemperature',
+
+              params: {
+                moduleId: 'heaterShakerId',
+              },
+            },
+          ],
+          robotState: initialRobotState,
+          warnings: [],
+        },
+      ],
+      errors: null,
+    }
 
     beforeEach(() => {
       when(mockGetUnsavedForm)
@@ -310,12 +353,51 @@ describe('steps actions', () => {
           },
           type: 'SAVE_STEP_FORM',
         },
+
         {
           meta: {
             robotStateTimeline: {
-              commands: {
-                commandType: 'heaterShakerModule/awaitTemperature',
-              },
+              errors: null,
+              timeline: [
+                {
+                  commands: [
+                    {
+                      commandType: 'heaterShakerModule/awaitTemperature',
+                      params: {
+                        moduleId: 'heaterShakerId',
+                      },
+                    },
+                  ],
+                  robotState: {
+                    labware: {
+                      plateId: {
+                        slot: '7',
+                      },
+                      tiprackId: {
+                        slot: '1',
+                      },
+                      trashId: {
+                        slot: '12',
+                      },
+                    },
+                    liquidState: {
+                      labware: {},
+                      pipettes: {},
+                    },
+                    modules: {},
+                    pipettes: {
+                      pipetteId: {
+                        mount: 'left',
+                      },
+                    },
+                    tipState: {
+                      pipettes: {},
+                      tipracks: {},
+                    },
+                  },
+                  warnings: [],
+                },
+              ],
             },
           },
           payload: {
@@ -328,6 +410,14 @@ describe('steps actions', () => {
           payload: {
             update: {
               pauseAction: 'untilTemperature',
+            },
+          },
+          type: 'CHANGE_FORM_INPUT',
+        },
+        {
+          payload: {
+            update: {
+              moduleId: undefined,
             },
           },
           type: 'CHANGE_FORM_INPUT',
@@ -357,11 +447,25 @@ describe('steps actions', () => {
   })
 
   describe('saveSetTempFormWithAddedPauseUntilTemp', () => {
-    const mockRobotStateTimeline = {
-      commands: {
-        commandType: 'temperatureModule/setTargetTemperature',
-      },
-    } as any
+    const mockRobotStateTimeline: Timeline = {
+      timeline: [
+        {
+          commands: [
+            {
+              commandType: 'temperatureModule/setTargetTemperature',
+
+              params: {
+                moduleId: 'temperatureId',
+                temperature: 25,
+              },
+            },
+          ],
+          robotState: initialRobotState,
+          warnings: [],
+        },
+      ],
+      errors: null,
+    }
 
     beforeEach(() => {
       when(mockGetUnsavedForm)
@@ -383,18 +487,58 @@ describe('steps actions', () => {
       const temperatureStepWithPause = [
         {
           payload: {
-            stepType: 'temperature',
             setTemperature: 'true',
+            stepType: 'temperature',
             targetTemperature: 10,
           },
           type: 'SAVE_STEP_FORM',
         },
+
         {
           meta: {
             robotStateTimeline: {
-              commands: {
-                commandType: 'temperatureModule/setTargetTemperature',
-              },
+              errors: null,
+              timeline: [
+                {
+                  commands: [
+                    {
+                      commandType: 'temperatureModule/setTargetTemperature',
+                      params: {
+                        moduleId: 'temperatureId',
+                        temperature: 25,
+                      },
+                    },
+                  ],
+                  robotState: {
+                    labware: {
+                      plateId: {
+                        slot: '7',
+                      },
+                      tiprackId: {
+                        slot: '1',
+                      },
+                      trashId: {
+                        slot: '12',
+                      },
+                    },
+                    liquidState: {
+                      labware: {},
+                      pipettes: {},
+                    },
+                    modules: {},
+                    pipettes: {
+                      pipetteId: {
+                        mount: 'left',
+                      },
+                    },
+                    tipState: {
+                      pipettes: {},
+                      tipracks: {},
+                    },
+                  },
+                  warnings: [],
+                },
+              ],
             },
           },
           payload: {

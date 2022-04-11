@@ -139,33 +139,6 @@ describe('moveToWell', () => {
       type: 'THERMOCYCLER_LID_CLOSED',
     })
   })
-  it('should return an error when moving to well in a thermocycler with pipette collision', () => {
-    mockThermocyclerPipetteCollision.mockImplementationOnce(
-      (
-        modules: RobotState['modules'],
-        labware: RobotState['labware'],
-        labwareId: string
-      ) => {
-        expect(modules).toBe(robotStateWithTip.modules)
-        expect(labware).toBe(robotStateWithTip.labware)
-        expect(labwareId).toBe(SOURCE_LABWARE)
-        return true
-      }
-    )
-    const result = moveToWell(
-      {
-        pipette: DEFAULT_PIPETTE,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      },
-      invariantContext,
-      robotStateWithTip
-    )
-    expect(getErrorResult(result).errors).toHaveLength(1)
-    expect(getErrorResult(result).errors[0]).toMatchObject({
-      type: 'THERMOCYCLER_LID_CLOSED',
-    })
-  })
 
   it('should return an error when moving to well in a heater-shaker with latch opened', () => {
     mockPipetteIntoHeaterShakerLatchOpen.mockImplementationOnce(
