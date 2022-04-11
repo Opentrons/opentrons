@@ -9,7 +9,7 @@ import * as RobotApi from '../../../../redux/robot-api'
 import * as Fixtures from '../../../../redux/networking/__fixtures__'
 import * as Constants from '../ConnectNetwork/constants'
 
-import { Portal } from '../../../../App/Portal'
+import { Portal } from '../../../../App/portal'
 import { SelectSsid } from '../ConnectNetwork/SelectSsid'
 import { ConnectModal } from '../ConnectNetwork/ConnectModal'
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
