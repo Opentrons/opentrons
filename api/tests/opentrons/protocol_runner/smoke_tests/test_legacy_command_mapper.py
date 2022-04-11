@@ -68,7 +68,10 @@ def pick_up_tip_protocol_file(tmp_path: Path) -> Path:
 async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
     """It should map legacy pick up tip commands."""
     protocol_reader = ProtocolReader()
-    protocol_source = await protocol_reader.read([pick_up_tip_protocol_file])
+    protocol_source = await protocol_reader.read_saved(
+        files=[pick_up_tip_protocol_file],
+        directory=None,
+    )
 
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)

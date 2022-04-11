@@ -10,7 +10,10 @@ from opentrons.protocol_runner.python_file_reader import PythonFileReader
 async def test_read_gets_run_method(python_protocol_file: Path) -> None:
     """It should pull the run method out of the Python file."""
     protocol_reader = ProtocolReader()
-    protocol_source = await protocol_reader.read([python_protocol_file])
+    protocol_source = await protocol_reader.read_saved(
+        files=[python_protocol_file],
+        directory=None,
+    )
 
     subject = PythonFileReader()
     result = subject.read(protocol_source)
