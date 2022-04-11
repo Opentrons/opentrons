@@ -15,15 +15,15 @@ import {
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
-import { SecondaryButton } from '../../../atoms/Buttons'
+// import { SecondaryButton } from '../../../atoms/Buttons'
 import {
   fetchStatus,
   fetchWifiList,
   getNetworkInterfaces,
   getWifiList,
-  postWifiDisconnect,
+  /* postWifiDisconnect, */
 } from '../../../redux/networking'
-import * as RobotApi from '../../../redux/robot-api'
+// import * as RobotApi from '../../../redux/robot-api'
 import { TemporarySelectNetwork } from './TemporarySelectNetwork'
 
 import type { State, Dispatch } from '../../../redux/types'
@@ -33,7 +33,6 @@ interface NetworkingProps {
 
 // ToDo modify ConnectModal to align with new design
 // This is temporary until we can get the new design details
-// All comments-outs are to align the updated design
 const HELP_CENTER_URL =
   'https://support.opentrons.com/en/articles/2687586-get-started-connect-to-your-ot-2-over-usb'
 const STATUS_REFRESH_MS = 5000
@@ -51,14 +50,6 @@ export function RobotSettingsNetworking({
     getNetworkInterfaces(state, robotName)
   )
   const activeNetwork = list?.find(nw => nw.active)
-
-  // const handleDisconnect = (): void => {
-  //   if (activeNetwork != null) {
-  //     const ssid = activeNetwork.ssid
-  //     dispatchApi(postWifiDisconnect(robotName, activeNetwork.ssid))
-  //     console.log(`disconnected from ${ssid}`)
-  //   }
-  // }
 
   useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
   useInterval(() => dispatch(fetchWifiList(robotName)), LIST_REFRESH_MS, true)
@@ -80,7 +71,7 @@ export function RobotSettingsNetworking({
             data-testid="RobotSettings_Networking_check_circle"
           ></Icon>
         ) : (
-          <Box height={SPACING.spacing4} width={SPACING.spacing4}></Box>
+          <Box height={SPACING.spacing4} width={SPACING.spacing5}></Box>
         )}
         <Icon
           width={SPACING.spacing4}
@@ -93,6 +84,11 @@ export function RobotSettingsNetworking({
           {activeNetwork?.ssid && ` - ${activeNetwork.ssid}`}
         </StyledText>
       </Flex>
+      <Flex paddingLeft={SPACING.spacing7} marginBottom={SPACING.spacing3}>
+        <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+          {t('wireless_network_name')}
+        </StyledText>
+      </Flex>
       <Box paddingLeft={SPACING.spacing7} marginBottom={SPACING.spacing4}>
         {wifi != null && wifi.ipAddress != null ? (
           <>
@@ -100,9 +96,6 @@ export function RobotSettingsNetworking({
               <Box width="25%" marginRight={SPACING.spacing3}>
                 <TemporarySelectNetwork robotName={robotName} />
               </Box>
-              {/* <SecondaryButton onClick={handleDisconnect}>
-                {t('wireless_network_disconnect_button')}
-              </SecondaryButton> */}
             </Flex>
             <Flex marginTop={SPACING.spacing4} marginBottom={SPACING.spacing4}>
               <Flex
@@ -138,9 +131,6 @@ export function RobotSettingsNetworking({
           </>
         ) : (
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="p" marginBottom={SPACING.spacing4}>
-              {t('wireless_network_not_connected')}
-            </StyledText>
             <TemporarySelectNetwork robotName={robotName} />
           </Flex>
         )}

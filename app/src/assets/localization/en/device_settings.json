@@ -6,6 +6,7 @@
   "download_calibration_data": "Download calibration data",
   "networking": "Networking",
   "wireless_network": "Wi-Fi",
+  "wireless_network_name": "Network Name",
   "wireless_network_not_connected": "Not connected via Wi-Fi",
   "wireless_network_change_network_button": "Change network",
   "wireless_network_disconnect_button": "Disconnect from Wi-Fi",
