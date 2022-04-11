@@ -16,12 +16,11 @@ import { MiniCard } from '../../molecules/MiniCard'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { useCreateRunFromProtocol } from '../ChooseRobotSlideout/useCreateRunFromProtocol'
 
-import type { StyleProps } from '@opentrons/components'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
 
-interface ChooseProtocolSlideoutProps extends StyleProps {
+interface ChooseProtocolSlideoutProps {
   robot: Robot
   onCloseClick: () => void
   showSlideout: boolean
@@ -30,7 +29,7 @@ export function ChooseProtocolSlideout(
   props: ChooseProtocolSlideoutProps
 ): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
-  const { robot, showSlideout, onCloseClick, ...styleProps } = props
+  const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
   const storedProtocols = useSelector((state: State) =>
     getStoredProtocols(state)
@@ -41,7 +40,7 @@ export function ChooseProtocolSlideout(
   ] = React.useState<StoredProtocolData | null>(first(storedProtocols) ??  null)
 
   const srcFileObjects =
-    selectedProtocol != null && false
+    selectedProtocol != null
       ? selectedProtocol.srcFiles.map((srcFileBuffer, index) => {
           const srcFilePath = selectedProtocol.srcFileNames[index]
           return new File([srcFileBuffer], path.basename(srcFilePath))
@@ -53,9 +52,7 @@ export function ChooseProtocolSlideout(
       onCloseClick={onCloseClick}
       title={t('choose_protocol_to_run', { name })}
       footer={
-        <ApiHostProvider
-          hostname={selectedProtocol != null ? selectedProtocol.ip : null}
-        >
+        <ApiHostProvider hostname={robot.ip}>
           <CreateRunButton
             disabled={selectedProtocol == null}
             protocolKey={
@@ -66,7 +63,6 @@ export function ChooseProtocolSlideout(
           />
         </ApiHostProvider>
       }
-      {...styleProps}
     >
       {storedProtocols.map(storedProtocol => (
         <MiniCard

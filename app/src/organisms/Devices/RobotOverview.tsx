@@ -99,7 +99,6 @@ export function RobotOverview({
                 robot={robot}
                 showSlideout={showChooseProtocolSlideout}
                 onCloseClick={() => setShowChooseProtocolSlideout(false)}
-                height="100vh"
               />
             </Portal>
           ) : null}
