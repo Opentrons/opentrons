@@ -1,0 +1,7 @@
+# Editable versions of opentrons packages.
+
+-e ../api
+-e ../robot-server
+-e ../notify-server
+-e ../shared-data/python
+-e ../update-server

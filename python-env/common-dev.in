@@ -1,0 +1,24 @@
+# Dev dependencies common to all applications.
+
+atomicwrites==1.4.0; sys_platform == 'win32'
+colorama==0.4.4; sys_platform == 'win32'
+pytest~=6.1
+pytest-aiohttp==0.3.0
+pytest-cov==2.10.1
+pytest-xdist~=2.2.1 
+requests==2.26.0
+tavern~=1.6
+graphviz==0.17
+mock~=4.0.2
+mypy==0.910
+flake8~=3.9.0
+flake8-annotations~=2.6.2
+flake8-docstrings~=1.6.0
+flake8-noqa~=1.2.1
+decoy~=1.10.0
+httpx==0.18.*
+black==22.3.0
+types-requests==2.25.6
+types-mock==4.0.1
+sqlalchemy2-stubs==0.0.2a21
+python-box==5.4.1
