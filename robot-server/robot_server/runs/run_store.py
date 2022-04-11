@@ -68,22 +68,6 @@ class RunStore:
             actions = _get_actions_no_transaction(run_id, statement)
         return [_convert_sql_row_to_action(action) for action in actions]
 
-    # def update_active_runs(self, run_id: str) -> None:
-    #     """Update all active runs to not active.
-    #
-    #     Params:
-    #         run_id: run id that should stay active
-    #     """
-    #     with self._sql_engine.begin() as transaction:
-    #         try:
-    #             update_statement = (
-    #                 sqlalchemy.update(run_table)
-    #                 .where(run_table.c.id != run_id, run_table.c.active_run)
-    #                 .values(active_run=False)
-    #             )
-    #             transaction.execute(update_statement)
-    #         except sqlalchemy.exc.NoResultFound as e:
-    #             raise RunNotFoundError(run_id)
 
     def insert(self, run: RunResource) -> RunResource:
         """Insert run resource in the db.
@@ -104,7 +88,7 @@ class RunStore:
             except sqlalchemy.exc.NoResultFound as e:
                 raise RunNotFoundError(run.run_id) from e
 
-        if run.is_current is True:
+        if run.is_current is True and self.__active_run != run.run_id:
             self.__active_run = run.run_id
 
         if run.actions:
@@ -132,7 +116,7 @@ class RunStore:
             except Exception as e:
                 raise RunNotFoundError(run.run_id)
 
-        if run.is_current is True:
+        if run.is_current is True and self.__active_run != run.run_id:
             self.__active_run = run.run_id
 
         if run.actions:
