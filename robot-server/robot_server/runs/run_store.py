@@ -68,7 +68,6 @@ class RunStore:
             actions = _get_actions_no_transaction(run_id, statement)
         return [_convert_sql_row_to_action(action) for action in actions]
 
-
     def insert(self, run: RunResource) -> RunResource:
         """Insert run resource in the db.
 
@@ -83,16 +82,14 @@ class RunStore:
             _convert_run_to_sql_values(run=run)
         )
         with self._sql_engine.begin() as transaction:
-            try:
-                transaction.execute(statement)
-            except sqlalchemy.exc.NoResultFound as e:
-                raise RunNotFoundError(run.run_id) from e
+            transaction.execute(statement)
 
         if run.is_current is True and self.__active_run != run.run_id:
             self.__active_run = run.run_id
 
-        if run.actions:
-            self.insert_actions(run_id=run.run_id, actions=run.actions)
+        # TODO (tz): Do we even need to insert the actions when creating a run?
+        # if run.actions:
+        #     self.insert_actions(run_id=run.run_id, actions=run.actions)
         return run
 
     def update(self, run: RunResource) -> RunResource:
@@ -107,14 +104,17 @@ class RunStore:
         """
         update_statement = (
             sqlalchemy.update(run_table)
-                .where(run_table.c.id == run.run_id)
-                .values(_convert_run_to_sql_values(run))
+            .where(run_table.c.id == run.run_id)
+            .values(_convert_run_to_sql_values(run))
         )
         with self._sql_engine.begin() as transaction:
             try:
-                transaction.execute(update_statement)
-            except Exception as e:
-                raise RunNotFoundError(run.run_id)
+                transaction.execute(
+                    run_table.select().where(run_table.c.id == run.run_id)
+                ).one()
+            except sqlalchemy.exc.NoResultFound as e:
+                raise RunNotFoundError(run_id=run.run_id) from e
+            transaction.execute(update_statement)
 
         if run.is_current is True and self.__active_run != run.run_id:
             self.__active_run = run.run_id
@@ -142,7 +142,9 @@ class RunStore:
             actions = _get_actions_no_transaction(run_id, transaction)
             run = _convert_sql_row_to_run(
                 row_run,
-                [_convert_sql_row_to_action(action) for action in actions], self.__active_run)
+                [_convert_sql_row_to_action(action) for action in actions],
+                self.__active_run,
+            )
         return run
 
     def get_all(self) -> List[RunResource]:
@@ -155,7 +157,11 @@ class RunStore:
         with self._sql_engine.begin() as transaction:
             runs = transaction.execute(statement).all()
         return [
-            _convert_sql_row_to_run(sql_row=row, actions=self._get_actions(row.id), current_run_id=self.__active_run)
+            _convert_sql_row_to_run(
+                sql_row=row,
+                actions=self._get_actions(row.id),
+                current_run_id=self.__active_run,
+            )
             for row in runs
         ]
 
@@ -186,23 +192,27 @@ class RunStore:
 
 
 def _get_actions_no_transaction(
-        run_id: str, transaction: sqlalchemy.engine.Connection
+    run_id: str, transaction: sqlalchemy.engine.Connection
 ) -> List[sqlalchemy.engine.Row]:
     statement = actions_table.select().where(actions_table.c.run_id == run_id)
     return transaction.execute(statement).all()
 
 
 def _insert_actions_no_transaction(
-        run_id: str, actions: List[RunAction], transaction: sqlalchemy.engine.Connection
+    run_id: str, actions: List[RunAction], transaction: sqlalchemy.engine.Connection
 ) -> None:
     actions_to_insert = [
         _convert_action_to_sql_values(action, run_id) for action in actions
     ]
+    # TODO (tz): selecting to see the id exits before inserting - FK does not raise bc its not enforced yet.
+    # SQLite does not support FK by default. Need to add support
+    # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#foreign-key-support
+    transaction.execute(run_table.select().where(run_table.c.id == run_id)).one()
     transaction.execute(actions_table.insert(), actions_to_insert)
 
 
 def _convert_sql_row_to_run(
-        sql_row: sqlalchemy.engine.Row, actions: List[RunAction], current_run_id: str
+    sql_row: sqlalchemy.engine.Row, actions: List[RunAction], current_run_id: str
 ) -> RunResource:
     run_id = sql_row.id
     assert isinstance(run_id, str)
@@ -231,7 +241,7 @@ def _convert_run_to_sql_values(run: RunResource) -> Dict[str, object]:
     return {
         "id": run.run_id,
         "created_at": run.created_at,
-        "protocol_id": run.protocol_id
+        "protocol_id": run.protocol_id,
     }
 
 

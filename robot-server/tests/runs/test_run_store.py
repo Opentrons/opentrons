@@ -37,38 +37,32 @@ def test_add_run(subject: RunStore) -> None:
     assert result == run
 
 
-def test_update_run_missing_run(subject: RunStore) -> None:
+def test_update_run_missing_id(subject: RunStore) -> None:
     """It should be able to update a run in the store."""
     action = RunAction(
         actionType=RunActionType.PLAY,
         createdAt=datetime(year=2022, month=2, day=2),
         id="action-id",
     )
-    action_update = RunAction(
-        actionType=RunActionType.PAUSE,
-        createdAt=datetime(year=2022, month=2, day=2),
-        id="action-id",
-    )
     run = RunResource(
-        run_id="identical-run-id",
+        run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, hour=1, minute=1, second=1),
-        actions=[action],
+        actions=[],
         is_current=True,
     )
     updated_run = RunResource(
-        run_id="identical-run-id",
+        run_id="missing-run-id",
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2, hour=2, minute=2, second=2),
-        actions=[action_update],
+        actions=[action],
         is_current=True,
     )
 
     subject.insert(run)
 
-    result = subject.update(updated_run)
-
-    assert result == updated_run
+    with pytest.raises(RunNotFoundError, match="missing-run-id"):
+        subject.update(updated_run)
 
 
 def test_update_run(subject: RunStore) -> None:
@@ -87,7 +81,7 @@ def test_update_run(subject: RunStore) -> None:
         run_id="identical-run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, hour=1, minute=1, second=1),
-        actions=[action],
+        actions=[],
         is_current=True,
     )
     updated_run = RunResource(
@@ -116,15 +110,22 @@ def test_get_run(subject: RunStore) -> None:
         run_id="run-id",
         protocol_id=None,
         created_at=datetime.now(),
+        actions=[],
+        is_current=False,
+    )
+    update_run = RunResource(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime.now(),
         actions=[action],
         is_current=False,
     )
 
     subject.insert(run)
-
+    subject.update(update_run)
     result = subject.get(run_id="run-id")
 
-    assert result == run
+    assert result == update_run
 
 
 def test_get_run_missing(subject: RunStore) -> None:
@@ -210,3 +211,18 @@ def test_add_run_current_run_deactivates(subject: RunStore) -> None:
 
     assert subject.get("run-id-1").is_current is False
     assert subject.get("run-id-2").is_current is True
+
+
+def test_insert_actions_no_run(subject: RunStore) -> None:
+    """Insert actions with a run that dosent exist should raise an exception."""
+
+    actions = [
+        RunAction(
+            actionType=RunActionType.PLAY,
+            createdAt=datetime(year=2022, month=2, day=2),
+            id="action-id-1",
+        )
+    ]
+
+    with pytest.raises(Exception):
+        subject.insert_actions(run_id="run-id-996", actions=actions)
