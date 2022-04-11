@@ -33,6 +33,7 @@ interface NetworkingProps {
 
 // ToDo modify ConnectModal to align with new design
 // This is temporary until we can get the new design details
+// All comments-outs are to align the updated design
 const HELP_CENTER_URL =
   'https://support.opentrons.com/en/articles/2687586-get-started-connect-to-your-ot-2-over-usb'
 const STATUS_REFRESH_MS = 5000
@@ -44,20 +45,20 @@ export function RobotSettingsNetworking({
   const { t } = useTranslation('device_settings')
   const list = useSelector((state: State) => getWifiList(state, robotName))
   const dispatch = useDispatch<Dispatch>()
-  const [dispatchApi] = RobotApi.useDispatchApiRequest()
+  // const [dispatchApi] = RobotApi.useDispatchApiRequest()
 
   const { wifi, ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
   )
   const activeNetwork = list?.find(nw => nw.active)
 
-  const handleDisconnect = (): void => {
-    if (activeNetwork != null) {
-      const ssid = activeNetwork.ssid
-      dispatchApi(postWifiDisconnect(robotName, activeNetwork.ssid))
-      console.log(`disconnected from ${ssid}`)
-    }
-  }
+  // const handleDisconnect = (): void => {
+  //   if (activeNetwork != null) {
+  //     const ssid = activeNetwork.ssid
+  //     dispatchApi(postWifiDisconnect(robotName, activeNetwork.ssid))
+  //     console.log(`disconnected from ${ssid}`)
+  //   }
+  // }
 
   useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
   useInterval(() => dispatch(fetchWifiList(robotName)), LIST_REFRESH_MS, true)
@@ -99,9 +100,9 @@ export function RobotSettingsNetworking({
               <Box width="25%" marginRight={SPACING.spacing3}>
                 <TemporarySelectNetwork robotName={robotName} />
               </Box>
-              <SecondaryButton onClick={handleDisconnect}>
+              {/* <SecondaryButton onClick={handleDisconnect}>
                 {t('wireless_network_disconnect_button')}
-              </SecondaryButton>
+              </SecondaryButton> */}
             </Flex>
             <Flex marginTop={SPACING.spacing4} marginBottom={SPACING.spacing4}>
               <Flex

@@ -48,7 +48,7 @@ export const SELECT_AUTHENTICATION_METHOD = 'Select authentication method'
 
 export const SELECT_FILE = 'Select file'
 
-export const SELECT_NETWORK = 'Select network'
+export const SELECT_NETWORK = 'Choose a network...'
 
 export const SUCCESSFULLY_DISCONNECTED = 'Successfully disconnected from Wi-Fi'
 
