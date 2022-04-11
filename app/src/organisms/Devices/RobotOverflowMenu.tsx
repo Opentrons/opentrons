@@ -109,7 +109,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           />
         ) : null}
         {showConnectionTroubleshootingModal ? (
-          <ConnectionTroubleshootingModal />
+          <ConnectionTroubleshootingModal onClose={() => setShowConnectionTroubleshootingModal(false)}/>
         ) : null}
       </Portal>
     </Flex>

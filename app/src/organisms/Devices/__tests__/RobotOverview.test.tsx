@@ -6,7 +6,7 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
-import {ChooseProtocolSlideout} from '../../../organisms/ChooseProtocolSlideout'
+import { ChooseProtocolSlideout } from '../../../organisms/ChooseProtocolSlideout'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useLights, useRobot, useIsRobotViewable } from '../hooks'
 import { RobotStatusBanner } from '../RobotStatusBanner'
@@ -21,7 +21,9 @@ const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
 
 const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<typeof useIsRobotViewable>
+const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
+  typeof useIsRobotViewable
+>
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
@@ -53,7 +55,11 @@ describe('RobotOverview', () => {
     })
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     mockRobotStatusBanner.mockReturnValue(<div>Mock RobotStatusBanner</div>)
-    mockChooseProtocolSlideout.mockImplementation(({showSlideout}) => <div>Mock Choose Protocol Slideout {showSlideout ? 'showing' : 'hidden'}</div>)
+    mockChooseProtocolSlideout.mockImplementation(({ showSlideout }) => (
+      <div>
+        Mock Choose Protocol Slideout {showSlideout ? 'showing' : 'hidden'}
+      </div>
+    ))
     mockUseCurrentRunId.mockReturnValue(null)
     mockUseIsRobotViewable.mockReturnValue(true)
   })
@@ -92,7 +98,7 @@ describe('RobotOverview', () => {
     const [{ getByText, getByRole }] = render()
 
     getByText('Mock Choose Protocol Slideout hidden')
-    const runButton = getByRole('button', {name: 'Run a Protocol'})
+    const runButton = getByRole('button', { name: 'Run a Protocol' })
     fireEvent.click(runButton)
     getByText('Mock Choose Protocol Slideout showing')
   })

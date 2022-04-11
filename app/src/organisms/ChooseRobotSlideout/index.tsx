@@ -27,13 +27,7 @@ import {
 
 import { Slideout } from '../../atoms/Slideout'
 import { PrimaryButton } from '../../atoms/Buttons'
-import {
-  getConnectableRobots,
-  getReachableRobots,
-  getScanning,
-  getUnreachableRobots,
-  startDiscovery,
-} from '../../redux/discovery'
+import { getScanning, startDiscovery } from '../../redux/discovery'
 
 import { StyledText } from '../../atoms/text'
 import { StoredProtocolData } from '../../redux/protocol-storage'
