@@ -3,6 +3,7 @@ import { curryCommandCreator } from './curryCommandCreator'
 import { reduceCommandCreators } from './reduceCommandCreators'
 import { modulePipetteCollision } from './modulePipetteCollision'
 import { thermocyclerPipetteCollision } from './thermocyclerPipetteCollision'
+import { pipetteIntoHeaterShakerLatchOpen } from './pipetteIntoHeaterShakerLatchOpen'
 import { orderWells } from './orderWells'
 export {
   commandCreatorsTimeline,
@@ -11,6 +12,7 @@ export {
   reduceCommandCreators,
   modulePipetteCollision,
   thermocyclerPipetteCollision,
+  pipetteIntoHeaterShakerLatchOpen,
 }
 export * from './commandCreatorArgsGetters'
 export * from './misc'

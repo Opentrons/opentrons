@@ -1,6 +1,9 @@
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { moveToWell } from '../commandCreators/atomic/moveToWell'
-import { thermocyclerPipetteCollision } from '../utils'
+import {
+  thermocyclerPipetteCollision,
+  pipetteIntoHeaterShakerLatchOpen,
+} from '../utils'
 import {
   getRobotStateWithTipStandard,
   makeContext,
@@ -12,8 +15,12 @@ import {
 import type { InvariantContext, RobotState } from '../types'
 
 jest.mock('../utils/thermocyclerPipetteCollision')
+jest.mock('../utils/pipetteIntoHeaterShakerLatchOpen')
 const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
   typeof thermocyclerPipetteCollision
+>
+const mockPipetteIntoHeaterShakerLatchOpen = pipetteIntoHeaterShakerLatchOpen as jest.MockedFunction<
+  typeof pipetteIntoHeaterShakerLatchOpen
 >
 describe('moveToWell', () => {
   let robotStateWithTip: RobotState
@@ -130,6 +137,34 @@ describe('moveToWell', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'THERMOCYCLER_LID_CLOSED',
+    })
+  })
+
+  it('should return an error when moving to well in a heater-shaker with latch opened', () => {
+    mockPipetteIntoHeaterShakerLatchOpen.mockImplementationOnce(
+      (
+        modules: RobotState['modules'],
+        labware: RobotState['labware'],
+        labwareId: string
+      ) => {
+        expect(modules).toBe(robotStateWithTip.modules)
+        expect(labware).toBe(robotStateWithTip.labware)
+        expect(labwareId).toBe(SOURCE_LABWARE)
+        return true
+      }
+    )
+    const result = moveToWell(
+      {
+        pipette: DEFAULT_PIPETTE,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'HEATER_SHAKER_LATCH_OPEN',
     })
   })
 })

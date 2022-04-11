@@ -2,6 +2,7 @@ import * as errorCreators from '../../errorCreators'
 import {
   modulePipetteCollision,
   thermocyclerPipetteCollision,
+  pipetteIntoHeaterShakerLatchOpen,
 } from '../../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { MoveToWellParams as v5MoveToWellParams } from '@opentrons/shared-data/protocol/types/schemaV5'
@@ -58,6 +59,16 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
     )
   ) {
     errors.push(errorCreators.thermocyclerLidClosed())
+  }
+
+  if (
+    pipetteIntoHeaterShakerLatchOpen(
+      prevRobotState.modules,
+      prevRobotState.labware,
+      labware
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerLatchOpen())
   }
 
   if (errors.length > 0) {
