@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 import {
   Flex,
@@ -9,27 +10,34 @@ import {
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
   SIZE_4,
+  Overlay,
+  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
+import { CONNECTABLE } from '../../redux/discovery'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { Divider } from '../../atoms/structure'
 import { Portal } from '../../App/portal'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
+import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
 
 import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
-import { CONNECTABLE } from '../../redux/discovery'
-
 interface RobotOverflowMenuProps extends StyleProps {
   robot: DiscoveredRobot
 }
 
 export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   const { robot, ...styleProps } = props
-  const { t } = useTranslation(['protocol_list', 'shared'])
+  const { t } = useTranslation(['devices_landing', 'shared'])
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
   const [
     showChooseProtocolSlideout,
     setShowChooseProtocolSlideout,
+  ] = React.useState<boolean>(false)
+  const [
+    showConnectionTroubleshootingModal,
+    setShowConnectionTroubleshootingModal,
   ] = React.useState<boolean>(false)
 
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
@@ -40,6 +48,14 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     setShowOverflowMenu(!showOverflowMenu)
+  }
+  const handleClickOutside: React.MouseEventHandler<HTMLDivElement> = e => {
+    e.preventDefault()
+    setShowOverflowMenu(false)
+  }
+  const handleClickConnectionTroubleshooting: React.MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    setShowConnectionTroubleshootingModal(true)
   }
   return (
     <Flex
@@ -61,16 +77,39 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          <MenuItem onClick={handleClickRun}>{t('run')}</MenuItem>
+          {robot.status === CONNECTABLE ? (
+            <MenuItem onClick={handleClickRun}>{t('run_protocol')}</MenuItem>
+          ) : (
+            <MenuItem onClick={handleClickConnectionTroubleshooting}>
+              {t('why_is_this_robot_unavailable')}
+            </MenuItem>
+          )}
+          <Divider />
+          <MenuItem
+            to={`/devices/${robot.name}/robot-settings`}
+            as={Link}
+            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          >
+            {t('robot_settings')}
+          </MenuItem>
         </Flex>
       ) : null}
       <Portal level="top">
+        {showOverflowMenu ? (
+          <Overlay
+            onClick={handleClickOutside}
+            backgroundColor={COLORS.transparent}
+          />
+        ) : null}
         {robot.status === CONNECTABLE ? (
           <ChooseProtocolSlideout
             robot={robot}
             showSlideout={showChooseProtocolSlideout}
             onCloseClick={() => setShowChooseProtocolSlideout(false)}
           />
+        ) : null}
+        {showConnectionTroubleshootingModal ? (
+          <ConnectionTroubleshootingModal />
         ) : null}
       </Portal>
     </Flex>

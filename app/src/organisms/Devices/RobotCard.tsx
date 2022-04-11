@@ -18,7 +18,6 @@ import {
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { StyledText } from '../../atoms/text'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { useAttachedModules, useAttachedPipettes } from './hooks'
 import { RobotStatusBanner } from './RobotStatusBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
