@@ -32,9 +32,10 @@ from opentrons_hardware.sensors.utils import SensorDataType
 @pytest.mark.parametrize(
     argnames=["sensor_type"],
     argvalues=[
-        [SensorType.capacitive],
-        [SensorType.humidity],
-        [SensorType.temperature],
+        [SensorType.capacitive, 0xFF],
+        [SensorType.humidity, 0xFE],
+        [SensorType.temperature, 0xFE],
+        [SensorType.pressure, 0xC2],
     ],
 )
 @pytest.mark.requires_emulator
@@ -43,6 +44,7 @@ async def test_write_to_sensors(
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     sensor_type: SensorType,
+    register_address: UInt8Field,
 ) -> None:
     """We should be able to write configuration values to all sensors."""
     data_to_write = UInt32Field(200)
@@ -50,6 +52,7 @@ async def test_write_to_sensors(
         payload=WriteToSensorRequestPayload(
             sensor=SensorTypeField(sensor_type),
             data=data_to_write,
+            reg_address=register_address,
         )
     )
     await can_messenger.send(node_id=NodeId.pipette_left, message=write_message)
