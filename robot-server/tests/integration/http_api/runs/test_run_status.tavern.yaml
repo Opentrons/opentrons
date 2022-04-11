@@ -1,0 +1,142 @@
+test_name: Alter the value of run status and current
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: Create Empty Run 1
+    request:
+      url: '{host:s}:{port:d}/runs'
+      json:
+        data: {}
+      method: POST
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          status: idle
+          current: true
+      save:
+        json:
+          first_run_id: data.id
+  - name: Patch the Run
+    request:
+      url: '{host:s}:{port:d}/runs/{first_run_id}'
+      json:
+        data: { 'current': false }
+      method: PATCH
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          id: !anystr
+          status: stopped
+          current: false
+  - name: Create Empty Run 2
+    request:
+      url: '{host:s}:{port:d}/runs'
+      json:
+        data: {}
+      method: POST
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          status: idle
+          current: true
+      save:
+        json:
+          second_run_id: data.id
+  - name: Create Empty Run 3
+    request:
+      url: '{host:s}:{port:d}/runs'
+      json:
+        data: {}
+      method: POST
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          status: idle
+          current: true
+      save:
+        json:
+          third_run_id: data.id
+  - name: Get run 2
+    request:
+      url: '{host:s}:{port:d}/runs/{second_run_id}'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          id: !anystr
+          status: stopped
+          current: false
+  - name: Get run 3
+    request:
+      url: '{host:s}:{port:d}/runs/{third_run_id}'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          id: !anystr
+          status: idle
+          current: true
+  - name: Create Empty Run 4
+    request:
+      url: '{host:s}:{port:d}/runs'
+      json:
+        data: {}
+      method: POST
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          status: idle
+          current: true
+      save:
+        json:
+          fourth_run_id: data.id
+  - name: Issue stop action to Run 4
+    request:
+      url: '{host:s}:{port:d}/runs/{fourth_run_id}/actions'
+      json:
+        data:
+          actionType: stop
+      method: POST
+    response:
+      status_code: 201
+  - name: Get run 4
+    request:
+      url: '{host:s}:{port:d}/runs/{fourth_run_id}'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          id: !anystr
+          status: stopped
+          current: true
