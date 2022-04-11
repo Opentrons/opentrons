@@ -40,10 +40,9 @@ How the API Works
 
 The design goal of this API is to make code readable and easy to understand. A protocol, in its most basic form:
 
-1. Tells Python to load the Opentrons Protocol API.
-2. Provides some information about who made the protocol and what it is for.
-3. Tells the robot where to find labware, pipettes, and (optionally) hardware modules.
-4. Commands the robot to manipulate its attached hardware.
+1. Provides some information about who made the protocol and what it is for.
+2. Tells the robot where to find labware, pipettes, and (optionally) hardware modules.
+3. Commands the robot to manipulate its attached hardware.
 
 For example, if we wanted to have the OT-2 transfer liquid from well A1 to well B1 on a plate, our protocol would look like:
 	
@@ -57,7 +56,7 @@ For example, if we wanted to have the OT-2 transfer liquid from well A1 to well 
         'protocolName': 'My Protocol',
         'author': 'Name <opentrons@example.com>',
         'description': 'Simple protocol to get started using the OT-2',
-        'apiLevel': '2.12'
+        'apiLevel': '|apiLevel|'
     }
 
     # protocol run function
@@ -79,13 +78,12 @@ For example, if we wanted to have the OT-2 transfer liquid from well A1 to well 
 
 This example proceeds completely linearly. Following it line-by-line, you can see that it has the following effects:
 
-1. Loads the Opentrons Protocol API.
-2. Gives the name, contact information, and a brief description for the protocol. Also indicates the minimum version of the API that the protocol can run on.
-3. Tells the robot that there is:
+1. Gives the name, contact information, and a brief description for the protocol. Also indicates the minimum version of the API that the protocol can run on.
+2. Tells the robot that there is:
 	a. A 96-well flat plate in slot 1.
 	b. A rack of 300 µL tips in slot 2.
 	c. A single-channel 300 µL pipette attached to the left mount, which should pick up tips from the aforementioned rack.
-4. Tells the robot to act by:
+3. Tells the robot to act by:
 	a. Picking up the first tip from the tip rack.
 	b. Aspirating 100 µL of liquid from well A1 of the plate.
 	c. Dispensing 100 µL of liquid into well B1 of the plate.
