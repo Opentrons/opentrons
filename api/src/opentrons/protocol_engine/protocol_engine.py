@@ -189,6 +189,7 @@ class ProtocolEngine:
         self,
         error: Optional[Exception] = None,
         drop_tips_and_home: bool = True,
+        set_run_status: bool = True,
     ) -> None:
         """Gracefully finish using the ProtocolEngine, waiting for it to become idle.
 
@@ -203,6 +204,8 @@ class ProtocolEngine:
         Arguments:
             error: An error that caused the stop, if applicable.
             drop_tips_and_home: Whether to home and drop tips as part of cleanup.
+            set_run_status: Whether to calculate a `success` or `failure` run status.
+                If `False`, will set status to `stopped`.
         """
         if error:
             error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
@@ -213,7 +216,9 @@ class ProtocolEngine:
         else:
             error_details = None
 
-        self._action_dispatcher.dispatch(FinishAction(error_details=error_details))
+        self._action_dispatcher.dispatch(
+            FinishAction(error_details=error_details, set_run_status=set_run_status)
+        )
 
         try:
             await self._queue_worker.join()
