@@ -51,7 +51,7 @@
   "shaker": "Shaker",
   "target_speed": "Target: {{speed}} RPM",
   "current_speed": "Current: {{speed}} RPM",
-  "na_speed": "Target: N/A RPM",
+  "na_speed": "Target: N/A",
   "set_status_heater_shaker": "Set {{part}} for {{name}}",
   "set_temp_or_shake": "Set {{part}}",
   "set_target_temp_of_hs": "Set target temperature. This module actively heats but cools passively to room temperature.",

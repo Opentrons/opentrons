@@ -53,7 +53,7 @@ export const ModuleOverflowMenu = (
                 return (
                   <>
                     <MenuItem
-                      minWidth="10rem"
+                      minWidth="10.6rem"
                       key={`${index}_${module.model}`}
                       onClick={() => item.onClick(item.isSecondary)}
                       data-testid={`module_setting_${module.model}`}
