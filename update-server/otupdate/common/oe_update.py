@@ -27,8 +27,6 @@ def _begin_unzip_update_package(
     Remember this only unzips the package not
     the actual update file!
     """
-    LOG.info("In _begin_unzip_update_package")
-    LOG.info(f"file path, " f"{downloaded_update_path}, in _begin_unzip_update_package")
     session.set_stage(Stages.VALIDATING)
     unzip_future = asyncio.ensure_future(
         loop.run_in_executor(
