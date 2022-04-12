@@ -10,6 +10,7 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
 import {
+  getRobotSerialNumber,
   getRobotFirmwareVersion,
   getRobotProtocolApiVersion,
 } from '../../../../redux/discovery'
@@ -24,6 +25,7 @@ export function RobotInformation({
 }: RobotInformationProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'robot_info'])
   // TODO: serialNumber
+  const serialNumber = getRobotSerialNumber(robot as ViewableRobot)
   const firmwareVersion = getRobotFirmwareVersion(robot as ViewableRobot)
   const protocolApiVersions = getRobotProtocolApiVersion(robot as ViewableRobot)
   const minProtocolApiVersion = protocolApiVersions?.min ?? 'Unknown'
@@ -33,6 +35,8 @@ export function RobotInformation({
     max: maxProtocolApiVersion,
   })
 
+  console.log(serialNumber)
+
   return (
     <Box>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} marginTop={SPACING.spacing4}>
@@ -40,7 +44,7 @@ export function RobotInformation({
           <StyledText css={TYPOGRAPHY.pSemiBold}>
             {t('robot_serial_number')}
           </StyledText>
-          <StyledText as="p">{'robot serial number'}</StyledText>
+          <StyledText as="p">{serialNumber}</StyledText>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing4}>
           <StyledText css={TYPOGRAPHY.pSemiBold}>

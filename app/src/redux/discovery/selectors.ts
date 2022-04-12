@@ -73,7 +73,6 @@ export const getDiscoveredRobots: (
       const port = addr?.port ?? null
       const healthStatus = addr?.healthStatus ?? null
       const serverHealthStatus = addr?.serverHealthStatus ?? null
-      const serialNumber = robotState?.serverHealth?.serialNumber ?? null
       const baseRobot = {
         ...robotState,
         displayName: makeDisplayName(robotName),
@@ -90,7 +89,6 @@ export const getDiscoveredRobots: (
             port,
             health,
             serverHealthStatus,
-            serialNumber,
             healthStatus: HEALTH_STATUS_OK,
             status: CONNECTABLE,
           }
@@ -103,7 +101,6 @@ export const getDiscoveredRobots: (
             port,
             healthStatus,
             serverHealthStatus,
-            serialNumber,
             status: REACHABLE,
           }
         }
@@ -115,7 +112,6 @@ export const getDiscoveredRobots: (
         port,
         healthStatus,
         serverHealthStatus,
-        serialNumber,
         status: UNREACHABLE,
       }
     })
@@ -171,6 +167,11 @@ export const getDiscoverableRobotByName: (
   (state: State, robotName: string | null) => robotName,
   (robots, robotName) => robots.find(r => r.name === robotName) ?? null
 )
+
+export const getRobotSerialNumber = (robot: DiscoveredRobot): string | null =>
+  (robot.health && robot.health.serial_number) ??
+  (robot.serverHealth && robot.serverHealth.serialNumber) ??
+  null
 
 export const getRobotApiVersion = (robot: DiscoveredRobot): string | null =>
   (robot.health && semver.valid(robot.health.api_version)) ??
