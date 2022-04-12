@@ -44,7 +44,6 @@ async def test_protocols_persist(protocol: Callable[[str], IO[bytes]]) -> None:
             response = await robot_client.get_protocols()
             restarted_protocols = response.json()["data"]
 
-
             # The number of uploaded protocols prior to restart equals the number
             # of protocols in the get protocols response after restart.
             assert len(restarted_protocols) == protocols_to_create
