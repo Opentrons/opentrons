@@ -36,7 +36,7 @@ const EXPANDED_STYLE = css`
   }
 `
 export function Toast(props: ToastProps): JSX.Element {
-  const { message, type, closeButton, onClose, } = props
+  const { message, type, closeButton, onClose } = props
   let iconName: IconName = 'alert-circle'
   let color = COLORS.error
   let backgroundColor = COLORS.errorBg
