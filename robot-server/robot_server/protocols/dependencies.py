@@ -107,15 +107,21 @@ def get_protocol_reader() -> ProtocolReader:
     return ProtocolReader()
 
 
-def get_protocol_store(
+async def get_protocol_store(
     app_state: AppState = Depends(get_app_state),
     sql_engine: SQLEngine = Depends(_get_sql_engine),
+    protocol_directory: Path = Depends(get_protocol_directory),
+    protocol_reader: ProtocolReader = Depends(get_protocol_reader),
 ) -> ProtocolStore:
     """Get a singleton ProtocolStore to keep track of created protocols."""
     protocol_store = _protocol_store.get_from(app_state)
 
     if protocol_store is None:
-        protocol_store = ProtocolStore(sql_engine=sql_engine)
+        protocol_store = await ProtocolStore.rehydrate(
+            sql_engine=sql_engine,
+            protocols_directory=protocol_directory,
+            protocol_reader=protocol_reader,
+        )
         _protocol_store.set_on(app_state, protocol_store)
 
     return protocol_store

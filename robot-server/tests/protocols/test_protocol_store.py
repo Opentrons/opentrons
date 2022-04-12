@@ -6,6 +6,7 @@ from typing import Generator
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_reader import (
+    ProtocolReader
     ProtocolSource,
     ProtocolSourceFile,
     ProtocolFileRole,
@@ -43,7 +44,7 @@ def protocol_file_directory(tmp_path: Path) -> Path:
 @pytest.fixture
 def subject(sql_engine: SQLEngine) -> ProtocolStore:
     """Get a ProtocolStore test subject."""
-    return ProtocolStore(sql_engine=sql_engine)
+    return ProtocolStore.create_empty(sql_engine=sql_engine)
 
 
 async def test_insert_and_get_protocol(
