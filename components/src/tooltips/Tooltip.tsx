@@ -22,7 +22,7 @@ const TOOLTIP_CSS = css`
   cursor: pointer;
   font-size: ${fontSizeLabel};
   border-radius: ${spacingS};
-  width: 140px;
+  width: 8.75rem;
 `
 
 export interface TooltipProps extends StyleProps {
