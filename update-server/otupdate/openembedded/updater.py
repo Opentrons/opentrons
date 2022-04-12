@@ -12,7 +12,7 @@ import logging
 
 UPDATE_PKG = "ot3-system.zip"
 ROOTFS_SIG_NAME = "rootfs.xz.hash.sig"
-ROOTFS_HASH_NAME = "rootfs.xz.md5sum"
+ROOTFS_HASH_NAME = "rootfs.xz.sha256"
 ROOTFS_NAME = "rootfs.xz"
 UPDATE_FILES = [ROOTFS_NAME, ROOTFS_SIG_NAME, ROOTFS_HASH_NAME]
 

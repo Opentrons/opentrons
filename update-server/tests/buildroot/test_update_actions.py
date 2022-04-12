@@ -34,8 +34,6 @@ def test_validate_hash_only(downloaded_update_file):
         ROOTFS_HASH_NAME,
         ROOTFS_SIG_NAME,
         UPDATE_FILES,
-        lambda file_path: open(file_path, "rb").read().strip(),
-        "sha256",
     )
     # We should have a callback call for
     # - the unzips (see test_unzip for calculation)
@@ -64,8 +62,6 @@ def test_validate(downloaded_update_file, testing_cert):
         ROOTFS_HASH_NAME,
         ROOTFS_SIG_NAME,
         UPDATE_FILES,
-        lambda file_path: open(file_path, "rb").read().strip(),
-        "sha256",
     )
     # We should have a callback call for
     # - the unzips (see test_unzip for calculation)
@@ -94,8 +90,6 @@ def test_validate_catches_bad_hash(downloaded_update_file):
             ROOTFS_HASH_NAME,
             ROOTFS_SIG_NAME,
             UPDATE_FILES,
-            lambda file_path: open(file_path, "rb").read().strip(),
-            "sha256",
         )
 
 
@@ -112,8 +106,6 @@ def test_validate_catches_bad_sig(downloaded_update_file, testing_cert):
             ROOTFS_HASH_NAME,
             ROOTFS_SIG_NAME,
             UPDATE_FILES,
-            lambda file_path: open(file_path, "rb").read().strip(),
-            "sha256",
         )
 
 
@@ -130,8 +122,6 @@ def test_validate_catches_missing_sig(downloaded_update_file, testing_cert):
             ROOTFS_HASH_NAME,
             ROOTFS_SIG_NAME,
             UPDATE_FILES,
-            lambda file_path: open(file_path, "rb").read().strip(),
-            "sha256",
         )
 
 
@@ -148,8 +138,6 @@ def test_validate_catches_missing_hash(downloaded_update_file, testing_cert):
             ROOTFS_HASH_NAME,
             ROOTFS_SIG_NAME,
             UPDATE_FILES,
-            lambda file_path: open(file_path, "rb").read().strip(),
-            "sha256",
         )
 
 
@@ -166,8 +154,6 @@ def test_validate_catches_missing_image(downloaded_update_file, testing_cert):
             ROOTFS_HASH_NAME,
             ROOTFS_SIG_NAME,
             UPDATE_FILES,
-            lambda file_path: open(file_path, "rb").read().strip(),
-            "sha256",
         )
 
 

@@ -151,8 +151,6 @@ def _begin_validation(
             ROOTFS_HASH_NAME,
             ROOTFS_SIG_NAME,
             UPDATE_FILES,
-            lambda file_path: open(file_path, "rb").read().strip(),
-            "sha256",
         )
     )
 
