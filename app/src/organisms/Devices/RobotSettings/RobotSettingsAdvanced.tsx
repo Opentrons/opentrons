@@ -45,7 +45,7 @@ export function RobotSettingsAdvanced({
         <Divider marginY={SPACING.spacing5} />
         <OpenJupyterControl robotIp={ipAddress} />
         <Divider marginY={SPACING.spacing5} />
-        <UpdateRobotSoftware />
+        <UpdateRobotSoftware robotName={robotName} />
         <Troubleshooting robot={robot as ViewableRobot} />
         <Divider marginY={SPACING.spacing5} />
         <FactoryReset />
