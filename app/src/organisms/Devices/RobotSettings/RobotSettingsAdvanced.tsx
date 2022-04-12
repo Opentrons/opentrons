@@ -16,8 +16,11 @@ import { LegacySettings } from './AdvancedTab/LegacySettings'
 import { ShortTrashBin } from './AdvancedTab/ShortTrashBin'
 import { UseOlderAspirateBehavior } from './AdvancedTab/UseOlderAspirateBehavior'
 import { getRobotByName } from '../../../redux/discovery'
+import { getRobotSettings } from '../../../redux/robot-settings'
+
 import type { State } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
+import type { RobotSettings } from '../../../redux/robot-settings/types'
 interface RobotSettingsAdvancedProps {
   robotName: string
 }
@@ -29,6 +32,9 @@ export function RobotSettingsAdvanced({
 
   //   const pauseProtocol // ask Brian
   const ipAddress = robot?.ip != null ? robot.ip : ''
+  const settings = useSelector<State, RobotSettings>((state: State) =>
+    getRobotSettings(state, robotName)
+  )
 
   return (
     <>
@@ -41,7 +47,12 @@ export function RobotSettingsAdvanced({
         <Divider marginY={SPACING.spacing5} />
         <UsageSettings />
         <Divider marginY={SPACING.spacing5} />
-        <DisableHoming />
+        <DisableHoming
+          settings={settings.find(
+            setting => setting.id === 'disableHomeOnBoot'
+          )}
+          robotName={robotName}
+        />
         <Divider marginY={SPACING.spacing5} />
         <OpenJupyterControl robotIp={ipAddress} />
         <Divider marginY={SPACING.spacing5} />

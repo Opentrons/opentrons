@@ -66,6 +66,8 @@ export function AdvancedSettingsCard(
     dispatch(fetchSettings(name))
   }, [dispatch, name])
 
+  console.log('setttings', settings)
+
   return (
     <Card title={t('title')}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
