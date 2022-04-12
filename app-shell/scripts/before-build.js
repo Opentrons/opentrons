@@ -5,6 +5,7 @@ const path = require('path')
 const download = require('download')
 const decompress = require('decompress')
 const crypto = require('crypto')
+const execa = require('execa')
 
 const PYTHON_BY_PLATFORM = {
   darwin: {
@@ -34,6 +35,7 @@ const PYTHON_BY_PLATFORM = {
 }
 
 const PYTHON_DESTINATION = path.join(__dirname, '..')
+const PYTHON_POST_EXTRACT_LOCATION = path.join(PYTHON_DESTINATION, 'python')
 
 module.exports = function beforeBuild(context) {
   const { platform, arch } = context
@@ -66,5 +68,31 @@ module.exports = function beforeBuild(context) {
       console.log(`Standalone Python SHA256: ${downloadHash}`)
       return decompress(data, PYTHON_DESTINATION)
     })
-    .then(() => console.log('Standalone Python extracted'))
+    .then(() => {
+      console.log('Standalone Python extracted, installing `opentrons` package')
+
+      return execa(
+        'python3.10',
+        [
+          '-m',
+          'pip',
+          'install',
+          '--user',
+          '--use-feature=in-tree-build',
+          path.join(__dirname, '../../shared-data/python'),
+          path.join(__dirname, '../../api'),
+        ],
+        {
+          env: {
+            PYTHONUSERBASE: PYTHON_POST_EXTRACT_LOCATION,
+          },
+        }
+      )
+    })
+    .then(() => {
+      console.log("`opentrons` package installed to app's Python environment")
+      // must return a truthy value, or else electron-builder will
+      // skip installing project dependencies into the package
+      return true
+    })
 }

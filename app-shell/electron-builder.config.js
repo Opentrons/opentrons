@@ -16,7 +16,9 @@ module.exports = {
     },
     'build/br-premigration-wheels',
     '!Makefile',
+    '!python',
   ],
+  extraResources: ['python'],
   /* eslint-disable no-template-curly-in-string */
   artifactName: '${productName}-v${version}-${os}-${env.BUILD_ID}.${ext}',
   /* eslint-enable no-template-curly-in-string */

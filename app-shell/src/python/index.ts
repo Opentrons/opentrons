@@ -7,7 +7,9 @@ import { getConfig } from '../config'
 
 const log = createLogger('python')
 
-function findPython(): string | undefined {
+let pythonPath: string | null = null
+
+export function initializePython(): void {
   const pathToPythonOverride: string | null = getConfig('python')
     .pathToPythonOverride
 
@@ -36,12 +38,16 @@ function findPython(): string | undefined {
       fs.accessSync(path, fs.constants.X_OK)
       const stats = fs.statSync(path)
       if (stats.isFile()) {
-        log.debug('Python candidate selected', { path })
-        return path
+        log.info('Python environment selected', { path })
+        pythonPath = path
       }
     } catch (error) {
       log.debug('Python candidate not executable, skipping', { path, error })
     }
+  }
+
+  if (pythonPath == null) {
+    log.error('No valid Python environment found')
   }
 }
 
@@ -49,24 +55,24 @@ export function runFileWithPython(
   srcFilePath: string,
   destFilePath: string
 ): Promise<void> {
-  const pythonPath = findPython()
-
-  if (pythonPath != null) {
-    return execa(pythonPath, [
-      '-m',
-      'opentrons.cli',
-      'analyze',
-      '--json',
-      srcFilePath,
-    ])
-      .then(output => {
-        log.debug('python output: ', output)
-        fs.writeFile(destFilePath, output.stdout)
-      })
-      .catch(e => {
-        log.error(e)
-      })
-  } else {
-    return Promise.reject(new Error('Python interpreter could not be found'))
+  if (pythonPath === null) {
+    return Promise.reject(
+      new Error('No Python interpreter set, was `initializePython` called?')
+    )
   }
+
+  return execa(pythonPath, [
+    '-m',
+    'opentrons.cli',
+    'analyze',
+    '--json',
+    srcFilePath,
+  ])
+    .then(output => {
+      log.debug('python output: ', output)
+      fs.writeFile(destFilePath, output.stdout)
+    })
+    .catch(e => {
+      log.error(e)
+    })
 }
