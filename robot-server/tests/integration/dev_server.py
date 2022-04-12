@@ -54,12 +54,13 @@ class DevServer:
                 "OT_API_CONFIG_DIR": self.server_temp_directory,
                 "OT_ROBOT_SERVER_persistence_directory": self.persistence_directory,
             },
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            # The server will log to its stdout or stderr.
+            # Let it inherit our stdout and stderr so PyTest captures its logs.
+            stdout=None,
+            stderr=None,
         )
 
     def stop(self) -> None:
         """Stop the robot server."""
         self.proc.send_signal(signal.SIGTERM)
-        # This calls proc.wait() and does cleanup on stdin, stdout and stderr.
-        self.proc.__exit__(None, None, None)
+        self.proc.wait()
