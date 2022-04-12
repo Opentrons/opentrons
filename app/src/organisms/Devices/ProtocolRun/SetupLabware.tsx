@@ -77,11 +77,11 @@ interface SetupLabwareProps {
   runId: string
 }
 
-export const SetupLabware = ({
+export function SetupLabware({
   protocolRunHeaderRef,
   robotName,
   runId,
-}: SetupLabwareProps): JSX.Element => {
+}: SetupLabwareProps): JSX.Element {
   const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
     robotName,
     runId
@@ -125,9 +125,10 @@ export const SetupLabware = ({
   const moduleAndCalibrationIncomplete =
     missingModuleIds.length > 0 && !isCalibrationComplete
 
-  const [downloadOffsetDataModal, showDownloadOffsetDataModal] = React.useState(
-    false
-  )
+  const [
+    downloadOffsetDataModal,
+    showDownloadOffsetDataModal,
+  ] = React.useState<boolean>(false)
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
   )
@@ -287,7 +288,7 @@ export const SetupLabware = ({
                 </StyledText>
                 {isLabwareOffsetCodeSnippetsOn ? (
                   <Link
-                    role={'link'}
+                    role="link"
                     css={TYPOGRAPHY.labelSemiBold}
                     color={COLORS.darkBlack}
                     onClick={() => showDownloadOffsetDataModal(true)}
@@ -306,7 +307,7 @@ export const SetupLabware = ({
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
               >
                 <Link
-                  role={'link'}
+                  role="link"
                   css={TYPOGRAPHY.labelSemiBold}
                   color={COLORS.darkBlack}
                   onClick={() => setShowLabwareHelpModal(true)}

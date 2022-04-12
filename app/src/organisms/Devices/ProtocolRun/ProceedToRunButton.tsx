@@ -17,11 +17,11 @@ interface ProceedToRunButtonProps {
   runId: string
 }
 
-export const ProceedToRunButton = ({
+export function ProceedToRunButton({
   protocolRunHeaderRef,
   robotName,
   runId,
-}: ProceedToRunButtonProps): JSX.Element | null => {
+}: ProceedToRunButtonProps): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
