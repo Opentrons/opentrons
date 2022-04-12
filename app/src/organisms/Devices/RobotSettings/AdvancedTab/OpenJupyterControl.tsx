@@ -9,10 +9,10 @@ import {
   Box,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useTrackEvent } from '../../../redux/analytics'
-import { StyledText } from '../../../atoms/text'
-import { TertiaryButton } from '../../../atoms/Buttons'
-import { ExternalLink } from '../../../atoms/Link/ExternalLink'
+import { useTrackEvent } from '../../../../redux/analytics'
+import { StyledText } from '../../../../atoms/text'
+import { TertiaryButton } from '../../../../atoms/Buttons'
+import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 
 const EVENT_JUPYTER_OPEN = { name: 'jupyterOpen', properties: {} }
 

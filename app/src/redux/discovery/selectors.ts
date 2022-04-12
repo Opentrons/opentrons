@@ -73,6 +73,7 @@ export const getDiscoveredRobots: (
       const port = addr?.port ?? null
       const healthStatus = addr?.healthStatus ?? null
       const serverHealthStatus = addr?.serverHealthStatus ?? null
+      const serialNumber = robotState?.serverHealth?.serialNumber ?? null
       const baseRobot = {
         ...robotState,
         displayName: makeDisplayName(robotName),
@@ -89,6 +90,7 @@ export const getDiscoveredRobots: (
             port,
             health,
             serverHealthStatus,
+            serialNumber,
             healthStatus: HEALTH_STATUS_OK,
             status: CONNECTABLE,
           }
@@ -101,6 +103,7 @@ export const getDiscoveredRobots: (
             port,
             healthStatus,
             serverHealthStatus,
+            serialNumber,
             status: REACHABLE,
           }
         }
@@ -112,6 +115,7 @@ export const getDiscoveredRobots: (
         port,
         healthStatus,
         serverHealthStatus,
+        serialNumber,
         status: UNREACHABLE,
       }
     })
