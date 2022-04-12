@@ -1,10 +1,11 @@
 """Runs' in-memory store."""
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 import sqlalchemy
 
 from .action_models import RunAction, RunActionType
+from .run_models import RunUpdate
 
 from robot_server.persistence import run_table, actions_table
 
@@ -38,35 +39,29 @@ class RunStore:
     def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
         """Initialize a RunStore and its in-memory storage."""
         self._sql_engine = sql_engine
-        self.__active_run = ""
+        self._active_run = ""
 
-    def update_actions(self, run_id: str, actions: List[RunAction]) -> None:
-        """Update run actions in the db.
-
-        Arguments:
-            run_id: current run id to get
-            actions: a list of actions to store in the db
-        """
-        with self._sql_engine.begin() as transaction:
-            transaction.execute(
-                sqlalchemy.delete(actions_table).where(actions_table.c.run_id == run_id)
-            )
-            _insert_actions_no_transaction(run_id, actions, transaction)
-
-    def insert_actions(self, run_id: str, actions: List[RunAction]) -> None:
-        """Insert run actions resource in the db.
+    def insert_action(self, run_id: str, action: RunAction) -> None:
+        """Insert run action in the db.
 
         Arguments:
             run_id: current run id to get
-            actions: a list of actions to store in the db
+            action: action to insert into the db
         """
         with self._sql_engine.begin() as transaction:
-            _insert_actions_no_transaction(run_id, actions, transaction)
+            _insert_action_no_transaction(run_id, action, transaction)
 
     def _get_actions(self, run_id: str) -> List[RunAction]:
         with self._sql_engine.begin() as statement:
             actions = _get_actions_no_transaction(run_id, statement)
         return [_convert_sql_row_to_action(action) for action in actions]
+
+    def update_active_run(self, run_id: str, is_current: bool) -> RunResource:
+        if is_current is True:
+            self._active_run = run_id
+        elif is_current is False and self._active_run == run_id:
+            self._active_run = ""
+        return self.get(run_id)
 
     def insert(self, run: RunResource) -> RunResource:
         """Insert run resource in the db.
@@ -83,40 +78,8 @@ class RunStore:
         with self._sql_engine.begin() as transaction:
             transaction.execute(statement)
 
-        if run.is_current is True and self.__active_run != run.run_id:
-            self.__active_run = run.run_id
+        self.update_active_run(run_id=run.run_id, is_current=run.is_current)
 
-        return run
-
-    def update(self, run: RunResource) -> RunResource:
-        """Update a run resource in the db.
-
-        Arguments:
-            run: Run resource to store. Reads `run.id` to
-                determine identity in storage.
-
-        Returns:
-            The resource that was added to the store.
-        """
-        update_statement = (
-            sqlalchemy.update(run_table)
-            .where(run_table.c.id == run.run_id)
-            .values(_convert_run_to_sql_values(run))
-        )
-        with self._sql_engine.begin() as transaction:
-            try:
-                transaction.execute(
-                    sqlalchemy.select(run_table).where(run_table.c.id == run.run_id)
-                ).one()
-            except sqlalchemy.exc.NoResultFound as e:
-                raise RunNotFoundError(run_id=run.run_id) from e
-            transaction.execute(update_statement)
-
-        if run.is_current is True and self.__active_run != run.run_id:
-            self.__active_run = run.run_id
-
-        if run.actions:
-            self.update_actions(run_id=run.run_id, actions=run.actions)
         return run
 
     def get(self, run_id: str) -> RunResource:
@@ -139,7 +102,7 @@ class RunStore:
             run = _convert_sql_row_to_run(
                 row_run,
                 [_convert_sql_row_to_action(action) for action in actions],
-                self.__active_run,
+                self._active_run,
             )
         return run
 
@@ -156,7 +119,7 @@ class RunStore:
             _convert_sql_row_to_run(
                 sql_row=row,
                 actions=self._get_actions(row.id),
-                current_run_id=self.__active_run,
+                current_run_id=self._active_run,
             )
             for row in runs
         ]
@@ -184,7 +147,7 @@ class RunStore:
                 raise RunNotFoundError(run_id) from e
             transaction.execute(delete_statement)
 
-        return _convert_sql_row_to_run(row_to_delete, [], self.__active_run)
+        return _convert_sql_row_to_run(row_to_delete, [], self._active_run)
 
 
 def _get_actions_no_transaction(
@@ -194,19 +157,19 @@ def _get_actions_no_transaction(
     return transaction.execute(statement).all()
 
 
-def _insert_actions_no_transaction(
-    run_id: str, actions: List[RunAction], transaction: sqlalchemy.engine.Connection
+def _insert_action_no_transaction(
+    run_id: str, action: RunAction, transaction: sqlalchemy.engine.Connection
 ) -> None:
-    actions_to_insert = [
-        _convert_action_to_sql_values(action, run_id) for action in actions
-    ]
     # TODO (tz): selecting to raise an error if a run does not exist.
     # SQLite does not support FK by default. Need to add support
     # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#foreign-key-support
-    transaction.execute(
-        sqlalchemy.select(run_table).where(run_table.c.id == run_id)
-    ).one()
-    transaction.execute(sqlalchemy.insert(actions_table), actions_to_insert)
+    try:
+        transaction.execute(
+            sqlalchemy.select(run_table).where(run_table.c.id == run_id)
+        ).one()
+    except sqlalchemy.exc.NoResultFound as e:
+        raise RunNotFoundError(run_id) from e
+    transaction.execute(sqlalchemy.insert(actions_table), _convert_action_to_sql_values(run_id=run_id, action=action))
 
 
 def _convert_sql_row_to_run(

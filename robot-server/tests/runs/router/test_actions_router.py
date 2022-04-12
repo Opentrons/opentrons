@@ -97,7 +97,7 @@ async def test_create_play_action_to_start_run(
 
     decoy.verify(
         task_runner.run(mock_engine_store.runner.run),
-        mock_run_store.update(run=next_run),
+        mock_run_store.insert_action(run_id=next_run.run_id, action=action),
     )
 
 
@@ -149,7 +149,7 @@ async def test_create_play_action_to_resume_run(
 
     decoy.verify(
         mock_engine_store.runner.play(),
-        mock_run_store.update(run=next_run),
+        mock_run_store.insert_action(run_id=next_run.run_id, action=action),
     )
 
 
@@ -230,7 +230,7 @@ async def test_create_play_action_not_allowed(
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunActionNotAllowed"
 
-    decoy.verify(mock_run_store.update(run=matchers.Anything()), times=0)
+    decoy.verify(mock_run_store.insert_action(run_id=matchers.Anything(), action=matchers.Anything()), times=0)
 
 
 async def test_create_run_action_not_current(
@@ -260,8 +260,8 @@ async def test_create_run_action_not_current(
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
-
-    decoy.verify(mock_run_store.update(run=matchers.Anything()), times=0)
+    # TODO (tz): does this makes sense?
+    decoy.verify(mock_run_store.insert_action(run_id=prev_run.run_id, action=matchers.Anything()), times=0)
 
 
 async def test_create_pause_action(
@@ -310,7 +310,7 @@ async def test_create_pause_action(
 
     decoy.verify(
         mock_engine_store.runner.pause(),
-        mock_run_store.update(run=next_run),
+        mock_run_store.insert_action(run_id=next_run.run_id, action=action),
     )
 
 
@@ -362,5 +362,5 @@ async def test_create_stop_action(
 
     decoy.verify(
         task_runner.run(mock_engine_store.runner.stop),
-        mock_run_store.update(run=next_run),
+        mock_run_store.insert_action(run_id=next_run.run_id, action=action),
     )

@@ -101,7 +101,7 @@ actions_table = sqlalchemy.Table(
 # https://docs.sqlalchemy.org/en/14/orm/extensions/asyncio.html
 @contextmanager
 def opened_db(db_file_path: Path) -> Generator[SQLEngine, None, None]:
-    """Return an Engine for a SQLite database on hte filesystem.
+    """Return an Engine for a SQLite database on the filesystem.
 
     Clean up the engine when the context manager exits.
 

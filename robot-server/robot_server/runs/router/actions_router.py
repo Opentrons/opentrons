@@ -77,11 +77,10 @@ async def create_run_action(
             status.HTTP_409_CONFLICT
         )
 
-    action, next_run = run_view.with_action(
-        run=prev_run,
-        action_id=action_id,
-        action_data=request_body.data,
-        created_at=created_at,
+    action = RunAction(
+        id=action_id,
+        actionType=request_body.data.actionType,
+        createdAt=created_at,
     )
 
     try:
@@ -106,7 +105,7 @@ async def create_run_action(
     except ProtocolEngineStoppedError as e:
         raise RunActionNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
-    run_store.update(run=next_run)
+    run_store.insert_action(run_id=runId, action=action)
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=action),
