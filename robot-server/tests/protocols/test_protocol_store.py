@@ -6,7 +6,6 @@ from typing import Generator
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_reader import (
-    ProtocolReader
     ProtocolSource,
     ProtocolSourceFile,
     ProtocolFileRole,
