@@ -54,6 +54,7 @@ class DevServer:
                 "OT_API_CONFIG_DIR": self.server_temp_directory,
                 "OT_ROBOT_SERVER_persistence_directory": self.persistence_directory,
             },
+            stdin=subprocess.DEVNULL,
             # The server will log to its stdout or stderr.
             # Let it inherit our stdout and stderr so PyTest captures its logs.
             stdout=None,
