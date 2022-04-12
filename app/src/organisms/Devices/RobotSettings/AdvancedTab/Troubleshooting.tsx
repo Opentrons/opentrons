@@ -13,8 +13,9 @@ import {
 import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/Buttons'
 import { downloadLogs } from '../../../../redux/shell/robot-logs/actions'
-
-import type { Dispatch, State } from '../../../../redux/types'
+import { getRobotLogsDownloading } from '../../../../redux/shell/robot-logs/selectors'
+import { CONNECTABLE } from '../../../../redux/discovery'
+import type { Dispatch } from '../../../../redux/types'
 import { ViewableRobot } from '../../../../redux/discovery/types'
 
 interface TroubleshootingProps {
@@ -24,6 +25,9 @@ interface TroubleshootingProps {
 export function Troubleshooting({ robot }: TroubleshootingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
+  const controlDisabled = robot?.status !== CONNECTABLE
+  const logsAvailable = robot?.health && robot?.health.logs
+  const robotLogsDownloading = useSelector(getRobotLogsDownloading)
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -40,7 +44,7 @@ export function Troubleshooting({ robot }: TroubleshootingProps): JSX.Element {
         </StyledText>
       </Box>
       <TertiaryButton
-        // disabled={controlDisabled || !logsAvailable || robotLogsDownloading}
+        disabled={controlDisabled || !logsAvailable || robotLogsDownloading}
         marginLeft={SPACING_AUTO}
         onClick={() => dispatch(downloadLogs(robot as ViewableRobot))}
         id="AdvancedSettings_downloadLogsButton"

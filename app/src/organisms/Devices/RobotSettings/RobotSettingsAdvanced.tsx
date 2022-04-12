@@ -16,10 +16,8 @@ import { LegacySettings } from './AdvancedTab/LegacySettings'
 import { ShortTrashBin } from './AdvancedTab/ShortTrashBin'
 import { UseOlderAspirateBehavior } from './AdvancedTab/UseOlderAspirateBehavior'
 import { getRobotByName } from '../../../redux/discovery'
-
 import type { State } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
-
 interface RobotSettingsAdvancedProps {
   robotName: string
 }
@@ -28,11 +26,9 @@ export function RobotSettingsAdvanced({
   robotName,
 }: RobotSettingsAdvancedProps): JSX.Element {
   const robot = useSelector((state: State) => getRobotByName(state, robotName))
-  //   const controlDisabled = robot?.status !== CONNECTABLE
-  //   const logsAvailable = robot?.health && robot?.health.logs
-  //   const robotLogsDownloading = useSelector(getRobotLogsDownloading)
 
   //   const pauseProtocol // ask Brian
+  const ipAddress = robot?.ip != null ? robot.ip : ''
 
   return (
     <>
@@ -47,7 +43,7 @@ export function RobotSettingsAdvanced({
         <Divider marginY={SPACING.spacing5} />
         <DisableHoming />
         <Divider marginY={SPACING.spacing5} />
-        <OpenJupyterControl robotIp={''} />
+        <OpenJupyterControl robotIp={ipAddress} />
         <Divider marginY={SPACING.spacing5} />
         <UpdateRobotSoftware />
         <Troubleshooting robot={robot as ViewableRobot} />
