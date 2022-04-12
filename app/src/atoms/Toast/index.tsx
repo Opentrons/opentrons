@@ -36,7 +36,7 @@ const EXPANDED_STYLE = css`
   }
 `
 export function Toast(props: ToastProps): JSX.Element {
-  const { message, type, closeButton, onClose } = props
+  const { message, type, closeButton, onClose, } = props
   let iconName: IconName = 'alert-circle'
   let color = COLORS.error
   let backgroundColor = COLORS.errorBg
@@ -69,6 +69,7 @@ export function Toast(props: ToastProps): JSX.Element {
       right={SPACING.spacing4}
       bottom={SPACING.spacing4}
       position="fixed"
+      data-testid={`Toast_${type}`}
     >
       <Flex flexDirection="row">
         <Icon
