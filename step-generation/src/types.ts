@@ -285,7 +285,7 @@ export type PauseArgs = CommonArgs & {
 }
 
 export interface AwaitTemperatureArgs {
-  module: string | null
+  module: string
   commandCreatorFnName: 'awaitTemperature'
   temperature: number
   message?: string
