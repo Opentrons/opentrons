@@ -9,6 +9,8 @@ import {
   TYPOGRAPHY,
   SPACING,
   Icon,
+  NewPrimaryBtn,
+  TEXT_TRANSFORM_NONE,
 } from '@opentrons/components'
 
 interface BannerProps {
@@ -23,12 +25,15 @@ export function Banner(props: BannerProps): JSX.Element | null {
     <React.Fragment>
       <Flex
         marginTop={TYPOGRAPHY.lineHeight16}
-        flexDirection={DIRECTION_ROW}
+        flexDirection={DIRECTION_COLUMN}
         backgroundColor={COLORS.background}
         padding={SPACING.spacing5}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+        >
           <Flex flexDirection={DIRECTION_ROW}>
             <Icon
               size={SPACING.spacing6}
@@ -46,9 +51,55 @@ export function Banner(props: BannerProps): JSX.Element | null {
               {title}
             </Text>
           </Flex>
-          {children}
         </Flex>
+        {children}
       </Flex>
     </React.Fragment>
+  )
+}
+
+interface BannerItemProps {
+  title: string
+  body: string
+  btnText: string
+  onClick: () => void
+}
+
+export const BannerItem = (props: BannerItemProps): JSX.Element => {
+  return (
+    <>
+      <Text
+        fontSize={TYPOGRAPHY.fontSizeP}
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        color={COLORS.darkBlack}
+        paddingTop={SPACING.spacing4}
+      >
+        {props.title}
+      </Text>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      >
+        <Text
+          marginTop={SPACING.spacing3}
+          color={COLORS.darkGrey}
+          fontSize={TYPOGRAPHY.fontSizeP}
+          data-testid={`banner_subtitle_${props.title}`}
+        >
+          {props.body}
+        </Text>
+        <NewPrimaryBtn
+          backgroundColor={COLORS.blue}
+          borderRadius={SPACING.spacingM}
+          textTransform={TEXT_TRANSFORM_NONE}
+          css={TYPOGRAPHY.labelRegular}
+          marginBottom={SPACING.spacingXL}
+          data-testid={`banner_open_wizard_btn`}
+          onClick={() => props.onClick()}
+        >
+          {props.btnText}
+        </NewPrimaryBtn>
+      </Flex>
+    </>
   )
 }

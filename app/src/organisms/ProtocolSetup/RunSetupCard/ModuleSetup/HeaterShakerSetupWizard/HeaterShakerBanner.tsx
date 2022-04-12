@@ -1,20 +1,10 @@
-import {
-  COLORS,
-  NewPrimaryBtn,
-  SPACING,
-  TEXT_TRANSFORM_NONE,
-  TYPOGRAPHY,
-  Text,
-  Flex,
-  DIRECTION_ROW,
-  JUSTIFY_SPACE_BETWEEN,
-} from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Divider } from '../../../../../atoms/structure/Divider'
 import { HeaterShakerWizard } from '../../../../Devices/HeaterShakerWizard'
 import { ModuleRenderInfoForProtocol } from '../../../../Devices/hooks'
-import { Banner } from '../Banner/Banner'
+import { Banner, BannerItem } from '../Banner/Banner'
 
 interface HeaterShakerBannerProps {
   displayName: string
@@ -34,47 +24,19 @@ export function HeaterShakerBanner(
           {showWizard && (
             <HeaterShakerWizard
               onCloseClick={() => setShowWizard(false)}
-              hasProtocol={true}
               moduleFromProtocol={module}
             />
           )}
           {index > 0 && <Divider color={COLORS.medGrey} />}
-          <Text
-            fontSize={TYPOGRAPHY.fontSizeP}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            color={COLORS.darkBlack}
-            paddingTop={SPACING.spacing4}
-          >
-            {t('module_in_slot', {
+          <BannerItem
+            title={t('module_in_slot', {
               moduleName: module.moduleDef.displayName,
               slotName: module.slotName,
             })}
-          </Text>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-          >
-            <Text
-              marginTop={SPACING.spacing3}
-              color={COLORS.darkGrey}
-              fontSize={TYPOGRAPHY.fontSizeP}
-              data-testid={`banner_subtitle_${index}`}
-            >
-              {t('improperly_fastened_description')}
-            </Text>
-            <NewPrimaryBtn
-              marginLeft={SPACING.spacingXL}
-              backgroundColor={COLORS.blue}
-              borderRadius={SPACING.spacingM}
-              textTransform={TEXT_TRANSFORM_NONE}
-              css={TYPOGRAPHY.labelRegular}
-              marginBottom={SPACING.spacingXL}
-              data-testid={`banner_open_wizard_btn`}
-              onClick={() => setShowWizard(true)}
-            >
-              {t('view_instructions')}
-            </NewPrimaryBtn>
-          </Flex>
+            body={t('improperly_fastened_description')}
+            btnText={t('view_instructions')}
+            onClick={() => setShowWizard(true)}
+          />
         </React.Fragment>
       ))}
     </Banner>
