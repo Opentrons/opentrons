@@ -114,7 +114,7 @@ def opened_db(db_file_path: Path) -> Generator[SQLEngine, None, None]:
 
 
 def open_db_no_cleanup(db_file_path: Path) -> SQLEngine:
-    """Like `create_in_memory_db()`, except without automatic cleanup."""
+    """Create a database engine for performing transactions."""
     return create_engine(
         # sqlite://<hostname>/<path>
         # where <hostname> is empty.
