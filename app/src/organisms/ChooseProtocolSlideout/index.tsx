@@ -1,8 +1,8 @@
 import * as React from 'react'
 import path from 'path'
 import first from 'lodash/first'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { Trans, useTranslation } from 'react-i18next'
+import { Link, useHistory } from 'react-router-dom'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import { useSelector } from 'react-redux'
 
@@ -12,6 +12,11 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   Flex,
+  BORDERS,
+  DIRECTION_COLUMN,
+  Icon,
+  COLORS,
+  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
 import { getStoredProtocols } from '../../redux/protocol-storage'
@@ -70,31 +75,62 @@ export function ChooseProtocolSlideout(
         </ApiHostProvider>
       }
     >
-      {storedProtocols.map(storedProtocol => (
-        <MiniCard
-          key={storedProtocol.protocolKey}
-          isSelected={
-            selectedProtocol != null &&
-            storedProtocol.protocolKey === selectedProtocol.protocolKey
-          }
-          onClick={() => setSelectedProtocol(storedProtocol)}
-        >
-          <Flex
-            marginRight={SPACING.spacing4}
-            height="6rem"
-            width="6rem"
-            justifyContent={JUSTIFY_CENTER}
-            alignItems={ALIGN_CENTER}
+      {storedProtocols.length > 0 ? (
+        storedProtocols.map(storedProtocol => (
+          <MiniCard
+            key={storedProtocol.protocolKey}
+            isSelected={
+              selectedProtocol != null &&
+              storedProtocol.protocolKey === selectedProtocol.protocolKey
+            }
+            onClick={() => setSelectedProtocol(storedProtocol)}
           >
-            <DeckThumbnail analysis={storedProtocol.mostRecentAnalysis} />
-          </Flex>
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {storedProtocol.mostRecentAnalysis?.metadata?.protocolName ??
-              first(storedProtocol.srcFileNames) ??
-              storedProtocol.protocolKey}
+            <Flex
+              marginRight={SPACING.spacing4}
+              height="6rem"
+              width="6rem"
+              justifyContent={JUSTIFY_CENTER}
+              alignItems={ALIGN_CENTER}
+            >
+              <DeckThumbnail analysis={storedProtocol.mostRecentAnalysis} />
+            </Flex>
+            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {storedProtocol.mostRecentAnalysis?.metadata?.protocolName ??
+                first(storedProtocol.srcFileNames) ??
+                storedProtocol.protocolKey}
+            </StyledText>
+          </MiniCard>
+        ))
+      ) : (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_CENTER}
+          width="100%"
+          minHeight="11rem"
+          padding={SPACING.spacing4}
+          css={BORDERS.cardOutlineBorder}
+        >
+          <Icon size="1.25rem" name="alert-circle" color={COLORS.medGrey} />
+          <StyledText
+            as="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            marginTop={SPACING.spacing3}
+          >
+            {t('no_protocols_found')}
           </StyledText>
-        </MiniCard>
-      ))}
+          <StyledText
+            as="p"
+            marginTop={SPACING.spacing3}
+            textAlign={TEXT_ALIGN_CENTER}
+          >
+            <Trans
+              i18nKey="to_run_protocol_go_to_protocols_page"
+              components={{ navlink: <Link to="/protocols" /> }}
+            />
+          </StyledText>
+        </Flex>
+      )}
     </Slideout>
   )
 }
