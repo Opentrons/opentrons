@@ -116,6 +116,7 @@ export function ChooseProtocolSlideout(
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginTop={SPACING.spacing3}
+            role="heading"
           >
             {t('no_protocols_found')}
           </StyledText>
@@ -125,6 +126,7 @@ export function ChooseProtocolSlideout(
             textAlign={TEXT_ALIGN_CENTER}
           >
             <Trans
+              t={t}
               i18nKey="to_run_protocol_go_to_protocols_page"
               components={{ navlink: <Link to="/protocols" /> }}
             />

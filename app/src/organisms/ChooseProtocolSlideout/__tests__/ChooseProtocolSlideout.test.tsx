@@ -1,17 +1,21 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { getStoredProtocols } from '../../../redux/protocol-storage'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
+import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
 import { ChooseProtocolSlideout } from '../'
 
 jest.mock('../../../redux/protocol-storage')
+jest.mock('../../../molecules/DeckThumbnail')
 
 const mockGetStoredProtocols = getStoredProtocols as jest.MockedFunction<
   typeof getStoredProtocols
+>
+const mockDeckThumbnail = DeckThumbnail as jest.MockedFunction<
+  typeof DeckThumbnail
 >
 
 const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {
@@ -28,6 +32,7 @@ const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {
 describe('ChooseProtocolSlideout', () => {
   beforeEach(() => {
     mockGetStoredProtocols.mockReturnValue([storedProtocolDataFixture])
+    mockDeckThumbnail.mockReturnValue(<div>mock Deck Thumbnail</div>)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -52,19 +57,26 @@ describe('ChooseProtocolSlideout', () => {
     expect(queryAllByText(mockConnectableRobot.name).length).toEqual(0)
   })
   it('renders an available protocol option for every stored protocol if any', () => {
-    const [{ queryByText }] = render({
+    const [{ getByText, queryByRole }] = render({
       robot: mockConnectableRobot,
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    expect(queryByText('fakeProtocolName')).toBeInTheDocument()
+    getByText('mock Deck Thumbnail')
+    getByText('fakeSrcFileName')
+    expect(queryByRole('heading', { name: 'No protocols found' })).toBeNull()
   })
   it('renders an empty state if no protocol options', () => {
-    const [{ queryByText }] = render({
+    mockGetStoredProtocols.mockReturnValue([])
+    const [{ getByRole, queryByText }] = render({
       robot: mockConnectableRobot,
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    expect(queryByText('No protocols found')).toBeInTheDocument()
+    expect(queryByText('mock Deck Thumbnail')).toBeNull()
+    expect(queryByText('fakeSrcFileName')).toBeNull()
+    expect(
+      getByRole('heading', { name: 'No protocols found' })
+    ).toBeInTheDocument()
   })
 })
