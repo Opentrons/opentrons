@@ -11,6 +11,7 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
+import { getDisabledFields } from '../../../../steplist/formLevel'
 import {
   ToggleRowField,
   TextField,
@@ -27,8 +28,8 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
   const [targetLatchProps, tooltipLatchProps] = useHoverTooltip({
     placement: TOOLTIP_BOTTOM,
   })
-
   const { propsForFields, formData } = props
+
   return (
     <div>
       <span className={styles.section_header_text}>
@@ -111,7 +112,6 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
           >
             <ToggleRowField
               {...propsForFields.latchOpen}
-              disabled={formData.setShake === true}
               offLabel={i18n.t(
                 'form.step_edit_form.field.heaterShaker.latch.toggleOff'
               )}
@@ -122,7 +122,7 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
           </FormGroup>
         </Flex>
       </div>
-      <Flex paddingBottom={SPACING.spacing6}>
+      <Flex paddingBottom={'8.4rem'}>
         <Flex width={SPACING.spacingM}>
           <CheckboxRowField
             tooltipPlacement={TOOLTIP_BOTTOM}
@@ -144,9 +144,9 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
             />
           </CheckboxRowField>
         </Flex>
-        {formData.setShake === true && (
+        {propsForFields.latchOpen.disabled && (
           <Tooltip {...tooltipLatchProps}>
-            {getSingleSelectDisabledTooltip('latchOpen', 'heaterShaker')}
+            {propsForFields.latchOpen.tooltipContent}
           </Tooltip>
         )}
       </Flex>

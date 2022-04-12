@@ -1,6 +1,7 @@
 import { defaultMemoize } from 'reselect'
 import { getDisabledFieldsMoveLiquidForm } from './getDisabledFieldsMoveLiquidForm'
 import { getDisabledFieldsMixForm } from './getDisabledFieldsMixForm'
+import { getDisabledFieldsHeaterShaker } from './getDisabledFieldsHeaterShaker'
 import { FormData } from '../../../form-types'
 
 function _getDisabledFields(rawForm: FormData): Set<string> {
@@ -10,6 +11,9 @@ function _getDisabledFields(rawForm: FormData): Set<string> {
 
     case 'mix':
       return getDisabledFieldsMixForm(rawForm)
+
+    case 'heaterShaker':
+      return getDisabledFieldsHeaterShaker(rawForm)
 
     case 'pause':
     case 'magnet':
