@@ -137,12 +137,12 @@ const StepEditFormManager = (
     formData,
     handleChangeFormInput
   )
-  let handleSave
+  let handleSave = saveStepForm
   if (isPristineSetTempForm === true) {
     handleSave = confirmAddPauseUntilTempStep
   } else if (isPristineSetHeaterShakerTempForm === true) {
     handleSave = confirmAddPauseUntilHeaterShakerTempStep
-  } else handleSave = saveStepForm
+  }
 
   return (
     <>

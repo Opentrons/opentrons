@@ -438,7 +438,7 @@ export function ProtocolRunHeader({
               completedAt={completedAt}
             />
           </Box>
-          {showIsShakingModal && heaterShaker?.data != null && (
+          {showIsShakingModal && heaterShaker != null && (
             <HeaterShakerIsRunningModal
               closeModal={() => setShowIsShakingModal(false)}
               module={heaterShaker}

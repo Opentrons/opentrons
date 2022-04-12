@@ -145,7 +145,7 @@ export function useModuleOverflowMenu(
   const labwareLatchBtn = (
     <>
       <MenuItem
-        minWidth="10rem"
+        minWidth="10.6rem"
         key={`hs_labware_latch_${module.model}`}
         data-testid={`hs_labware_latch_${module.model}`}
         onClick={toggleLatch}
@@ -167,7 +167,7 @@ export function useModuleOverflowMenu(
 
   const aboutModuleBtn = (
     <MenuItem
-      minWidth="10rem"
+      minWidth="10.6rem"
       key={`about_module_${module.model}`}
       id={`about_module_${module.model}`}
       data-testid={`about_module_${module.model}`}
@@ -179,7 +179,7 @@ export function useModuleOverflowMenu(
 
   const attachToDeckBtn = (
     <MenuItem
-      minWidth="10rem"
+      minWidth="10.6rem"
       key={`hs_attach_to_deck_${module.model}`}
       data-testid={`hs_attach_to_deck_${module.model}`}
       onClick={() => handleWizardClick()}
@@ -189,7 +189,7 @@ export function useModuleOverflowMenu(
   )
   const testShakeBtn = (
     <MenuItem
-      minWidth="10rem"
+      minWidth="10.6rem"
       onClick={() => handleTestShakeClick()}
       key={`hs_test_shake_btn_${module.model}`}
     >

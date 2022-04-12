@@ -5,6 +5,7 @@ import mock
 import pytest
 from mock import AsyncMock, MagicMock
 
+from opentrons_hardware.firmware_bindings import NodeId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     FirmwareUpdateStartApp,
 )
@@ -13,8 +14,9 @@ from opentrons_hardware.firmware_update import (
     FirmwareUpdateDownloader,
     FirmwareUpdateEraser,
     run_update,
-    head,
+    HexRecordProcessor,
 )
+from opentrons_hardware.firmware_update.target import Target
 
 
 @pytest.fixture
@@ -38,21 +40,33 @@ def mock_eraser_run() -> Iterator[AsyncMock]:
         yield p
 
 
+@pytest.fixture
+def mock_hex_record_builder() -> Iterator[MagicMock]:
+    """Mock builder function."""
+    with mock.patch.object(HexRecordProcessor, "from_file") as p:
+        yield p
+
+
 @pytest.mark.parametrize(argnames=["should_erase"], argvalues=[[True], [False]])
 async def test_run_update(
     mock_initiator_run: AsyncMock,
     mock_downloader_run: AsyncMock,
     mock_eraser_run: AsyncMock,
+    mock_hex_record_builder: MagicMock,
     should_erase: bool,
 ) -> None:
     """It should call all the functions."""
     mock_messenger = AsyncMock()
-    mock_hex = MagicMock()
-    target = head
+
+    mock_hex_file = MagicMock()
+    mock_hex_record_processor = MagicMock()
+    mock_hex_record_builder.return_value = mock_hex_record_processor
+
+    target = Target(system_node=NodeId.head)
     await run_update(
         messenger=mock_messenger,
-        target=target,
-        hex_processor=mock_hex,
+        node_id=target.system_node,
+        hex_file=mock_hex_file,
         retry_count=12,
         timeout_seconds=11,
         erase=should_erase,
@@ -67,8 +81,11 @@ async def test_run_update(
     else:
         mock_eraser_run.assert_not_called()
     mock_downloader_run.assert_called_once_with(
-        node_id=target.bootloader_node, hex_processor=mock_hex, ack_wait_seconds=11
+        node_id=target.bootloader_node,
+        hex_processor=mock_hex_record_processor,
+        ack_wait_seconds=11,
     )
     mock_messenger.send.assert_called_once_with(
-        node_id=head.bootloader_node, message=FirmwareUpdateStartApp()
+        node_id=target.bootloader_node, message=FirmwareUpdateStartApp()
     )
+    mock_hex_record_builder.assert_called_once_with(mock_hex_file)

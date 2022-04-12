@@ -14,6 +14,7 @@ import {
 } from '../hooks'
 import { SetupLabware } from './SetupLabware'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
+import { ModuleSetup } from './ModuleSetup'
 import { SetupStep } from './SetupStep'
 
 const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
@@ -102,11 +103,7 @@ export function ProtocolRunSetup({
       description: t(`${ROBOT_CALIBRATION_STEP_KEY}_description`),
     },
     [MODULE_SETUP_KEY]: {
-      stepInternals: (
-        <StyledText as="p" marginTop={SPACING.spacing4}>
-          TODO: module setup
-        </StyledText>
-      ),
+      stepInternals: <ModuleSetup robotName={robotName} runId={runId} />,
       description: t(`${MODULE_SETUP_KEY}_description`, {
         count:
           protocolData != null && 'modules' in protocolData

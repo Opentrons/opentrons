@@ -1,23 +1,20 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import {
   Flex,
   Text,
-  JUSTIFY_SPACE_BETWEEN,
   TEXT_TRANSFORM_UPPERCASE,
   COLORS,
   DIRECTION_COLUMN,
   SPACING,
-  ALIGN_FLEX_START,
   Icon,
   DIRECTION_ROW,
   TYPOGRAPHY,
-  C_SKY_BLUE,
   TEXT_TRANSFORM_CAPITALIZE,
   SIZE_1,
 } from '@opentrons/components'
 import { StatusLabel } from '../../../atoms/StatusLabel'
-
 import type {
   LatchStatus,
   SpeedStatus,
@@ -34,6 +31,18 @@ interface HeaterShakerModuleDataProps {
   currentSpeed: number | null
   showTemperatureData?: boolean
 }
+
+const MODULE_STATUS_STYLING = css`
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+
+  @media (min-width: 800px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 900px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+`
 
 export const HeaterShakerModuleData = (
   props: HeaterShakerModuleDataProps
@@ -52,7 +61,7 @@ export const HeaterShakerModuleData = (
   const isShaking = shakerStatus !== 'idle'
 
   const getStatusLabelProps = (
-    status: string | null
+    status: SpeedStatus | TemperatureStatus
   ): { backgroundColor: string; iconColor: string; textColor: string } => {
     const StatusLabelProps = {
       backgroundColor: COLORS.medGrey,
@@ -69,18 +78,26 @@ export const HeaterShakerModuleData = (
         break
       }
       case 'holding at target': {
-        StatusLabelProps.backgroundColor = C_SKY_BLUE
+        StatusLabelProps.backgroundColor = COLORS.medBlue
         StatusLabelProps.iconColor = COLORS.blue
-
+        break
+      }
+      case 'error': {
+        StatusLabelProps.backgroundColor = COLORS.warningBg
+        StatusLabelProps.iconColor = COLORS.warning
+        StatusLabelProps.textColor = COLORS.warningText
         break
       }
       case 'heating':
-      case 'shaking': {
+      case 'cooling':
+      case 'slowing down':
+      case 'speeding up': {
         StatusLabelProps.backgroundColor = COLORS.blue + '1A'
         StatusLabelProps.pulse = true
         break
       }
     }
+
     return StatusLabelProps
   }
 
@@ -117,44 +134,12 @@ export const HeaterShakerModuleData = (
   }
 
   return (
-    <>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        {showTemperatureData && (
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            marginRight={SPACING.spacing6}
-            data-testid={`heater_shaker_module_data_temp`}
-          >
-            <Text
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
-              color={COLORS.darkGreyEnabled}
-              fontWeight={TYPOGRAPHY.fontWeightRegular}
-              fontSize={TYPOGRAPHY.fontSizeH6}
-              marginTop={SPACING.spacing3}
-            >
-              {t('heater')}
-            </Text>
-            <StatusLabel
-              status={heaterStatus}
-              {...getStatusLabelProps(heaterStatus)}
-            />
-            <Text
-              title="heater_target_temp"
-              fontSize={TYPOGRAPHY.fontSizeH6}
-              marginBottom={SPACING.spacing1}
-            >
-              {t(targetTemp === null ? 'na_temp' : 'target_temp', {
-                temp: targetTemp,
-              })}
-            </Text>
-            <Text title="heater_temp" fontSize={TYPOGRAPHY.fontSizeH6}>
-              {t('current_temp', { temp: currentTemp })}
-            </Text>
-          </Flex>
-        )}
+    <Flex css={MODULE_STATUS_STYLING}>
+      {showTemperatureData && (
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          data-testid={`heater_shaker_module_data_shaker`}
+          marginRight={SPACING.spacing6}
+          data-testid={`heater_shaker_module_data_temp`}
         >
           <Text
             textTransform={TEXT_TRANSFORM_UPPERCASE}
@@ -163,26 +148,58 @@ export const HeaterShakerModuleData = (
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginTop={SPACING.spacing3}
           >
-            {t('shaker')}
+            {t('heater')}
           </Text>
           <StatusLabel
-            status={shakerStatus}
-            {...getStatusLabelProps(shakerStatus)}
+            status={heaterStatus}
+            {...getStatusLabelProps(heaterStatus)}
           />
           <Text
-            title="shaker_target_speed"
+            title="heater_target_temp"
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginBottom={SPACING.spacing1}
           >
-            {t(targetSpeed === null ? 'na_speed' : 'target_speed', {
-              speed: targetSpeed,
+            {t(targetTemp === null ? 'na_temp' : 'target_temp', {
+              temp: targetTemp,
             })}
           </Text>
-          <Text title="shaker_current_speed" fontSize={TYPOGRAPHY.fontSizeH6}>
-            {t('current_speed', { speed: currentSpeed })}
+          <Text title="heater_temp" fontSize={TYPOGRAPHY.fontSizeH6}>
+            {t('current_temp', { temp: currentTemp })}
           </Text>
         </Flex>
+      )}
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        data-testid={`heater_shaker_module_data_shaker`}
+      >
+        <Text
+          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          color={COLORS.darkGreyEnabled}
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
+          fontSize={TYPOGRAPHY.fontSizeH6}
+          marginTop={SPACING.spacing3}
+        >
+          {t('shaker')}
+        </Text>
+        <StatusLabel
+          status={shakerStatus}
+          {...getStatusLabelProps(shakerStatus)}
+        />
+
+        <Text
+          title="shaker_target_speed"
+          fontSize={TYPOGRAPHY.fontSizeH6}
+          marginBottom={SPACING.spacing1}
+        >
+          {t(targetSpeed === null ? 'na_speed' : 'target_speed', {
+            speed: targetSpeed,
+          })}
+        </Text>
+        <Text title="shaker_current_speed" fontSize={TYPOGRAPHY.fontSizeH6}>
+          {t('current_speed', { speed: currentSpeed })}
+        </Text>
       </Flex>
+
       <Flex
         flexDirection={DIRECTION_ROW}
         data-testid={`heater_shaker_module_data_latch`}
@@ -194,27 +211,29 @@ export const HeaterShakerModuleData = (
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginTop={SPACING.spacing3}
+            title="latch_status"
           >
             {t('labware_latch', { ns: 'heater_shaker' })}
           </Text>
-          <Text
-            title="latch_status"
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            marginTop={SPACING.spacing2}
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
-            alignItems={ALIGN_FLEX_START}
           >
-            <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing2}>
-              {isShaking && (
-                <Icon
-                  name="closed-locked"
-                  data-testid="HeaterShakerModuleData_latch_lock"
-                  size={SIZE_1}
-                />
-              )}
-              {getLatchStatus(latchStatus)}
-            </Flex>
-          </Text>
+            {isShaking && (
+              <Icon
+                paddingBottom="3px"
+                paddingRight={SPACING.spacing2}
+                name="closed-locked"
+                data-testid="HeaterShakerModuleData_latch_lock"
+                size={SIZE_1}
+              />
+            )}
+            {getLatchStatus(latchStatus)}
+          </Flex>
         </Flex>
       </Flex>
-    </>
+    </Flex>
   )
 }

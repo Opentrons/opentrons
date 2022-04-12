@@ -4,7 +4,7 @@ import io
 from dataclasses import dataclass
 from decoy import Decoy
 from pathlib import Path
-from typing import IO
+from typing import IO, Optional
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.models import LabwareDefinition
@@ -120,7 +120,7 @@ async def test_read_files(
     decoy.when(role_analyzer.analyze([buffered_file])).then_return(analyzed_roles)
     decoy.when(config_analyzer.analyze(main_file)).then_return(analyzed_config)
 
-    result = await subject.read(files=[input_file], directory=tmp_path)
+    result = await subject.read_and_save(files=[input_file], directory=tmp_path)
 
     assert result == ProtocolSource(
         directory=tmp_path,
@@ -165,7 +165,7 @@ async def test_read_error(
     )
 
     with pytest.raises(ProtocolFilesInvalidError, match="oh no"):
-        await subject.read(directory=tmp_path, files=[input_file])
+        await subject.read_and_save(directory=tmp_path, files=[input_file])
 
 
 async def test_role_error(
@@ -193,7 +193,7 @@ async def test_role_error(
     )
 
     with pytest.raises(ProtocolFilesInvalidError, match="oh no"):
-        await subject.read(directory=tmp_path, files=[input_file])
+        await subject.read_and_save(directory=tmp_path, files=[input_file])
 
 
 async def test_config_error(
@@ -233,12 +233,13 @@ async def test_config_error(
     )
 
     with pytest.raises(ProtocolFilesInvalidError, match="oh no"):
-        await subject.read(directory=tmp_path, files=[input_file])
+        await subject.read_and_save(directory=tmp_path, files=[input_file])
 
 
+@pytest.mark.parametrize("directory", [None, Path("/some/dir")])
 async def test_read_files_no_copy(
     decoy: Decoy,
-    tmp_path: Path,
+    directory: Optional[Path],
     file_reader_writer: FileReaderWriter,
     role_analyzer: RoleAnalyzer,
     config_analyzer: ConfigAnalyzer,
@@ -271,10 +272,10 @@ async def test_read_files_no_copy(
     decoy.when(role_analyzer.analyze([buffered_file])).then_return(analyzed_roles)
     decoy.when(config_analyzer.analyze(main_file)).then_return(analyzed_config)
 
-    result = await subject.read(files=[input_file])
+    result = await subject.read_saved(files=[input_file], directory=directory)
 
     assert result == ProtocolSource(
-        directory=None,
+        directory=directory,
         main_file=Path("/dev/null/protocol.py"),
         files=[
             ProtocolSourceFile(
