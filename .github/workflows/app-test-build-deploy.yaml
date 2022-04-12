@@ -143,6 +143,7 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS }}
           APPLE_ID: ${{ secrets.OT_APP_APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
+          HOST_PYTHON: python
         run: |
           make -C app-shell dist-${{ matrix.os }}
 

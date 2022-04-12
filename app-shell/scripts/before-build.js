@@ -7,6 +7,8 @@ const decompress = require('decompress')
 const crypto = require('crypto')
 const execa = require('execa')
 
+const HOST_PYTHON = process.env.HOST_PYTHON ?? 'python3.10'
+
 const PYTHON_BY_PLATFORM = {
   darwin: {
     x64: {
@@ -72,7 +74,7 @@ module.exports = function beforeBuild(context) {
       console.log('Standalone Python extracted, installing `opentrons` package')
 
       return execa(
-        'python3.10',
+        HOST_PYTHON,
         [
           '-m',
           'pip',
