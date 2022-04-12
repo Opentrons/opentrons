@@ -67,11 +67,6 @@ def test_update_run_missing_id(subject: RunStore) -> None:
 
 def test_update_run(subject: RunStore) -> None:
     """It should be able to update a run in the store."""
-    action = RunAction(
-        actionType=RunActionType.PLAY,
-        createdAt=datetime(year=2022, month=2, day=2),
-        id="action-id",
-    )
     action_update = RunAction(
         actionType=RunActionType.PAUSE,
         createdAt=datetime(year=2022, month=2, day=2),
@@ -215,7 +210,6 @@ def test_add_run_current_run_deactivates(subject: RunStore) -> None:
 
 def test_insert_actions_no_run(subject: RunStore) -> None:
     """Insert actions with a run that dosent exist should raise an exception."""
-
     actions = [
         RunAction(
             actionType=RunActionType.PLAY,

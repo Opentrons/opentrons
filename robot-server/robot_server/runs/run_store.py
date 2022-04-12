@@ -204,7 +204,7 @@ def _insert_actions_no_transaction(
     actions_to_insert = [
         _convert_action_to_sql_values(action, run_id) for action in actions
     ]
-    # TODO (tz): selecting to see the id exits before inserting - FK does not raise bc its not enforced yet.
+    # TODO (tz): selecting to raise an error if a run does not exist.
     # SQLite does not support FK by default. Need to add support
     # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#foreign-key-support
     transaction.execute(run_table.select().where(run_table.c.id == run_id)).one()
