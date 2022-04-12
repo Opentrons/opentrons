@@ -11,18 +11,18 @@ import {
 import { getAllDefinitions } from './helpers/definitions'
 import type { Dispatch } from '../../redux/types'
 
-import type { LabwareDefinition2 as LabwareDefiniton } from '@opentrons/shared-data'
+import type { LabwareDefinition2 as LabwareDefinition } from '@opentrons/shared-data'
 
 export interface LabwareDefAndDate {
-  definition: LabwareDefiniton
+  definition: LabwareDefinition
   modified?: number
   filename?: string
 }
 
 export function useGetAllLabware(): LabwareDefAndDate[] {
   const fullLabwareList: LabwareDefAndDate[] = []
-  const labwareDefinitons = getAllDefinitions()
-  labwareDefinitons.map(def => fullLabwareList.push({ definition: def }))
+  const labwareDefinitions = getAllDefinitions()
+  labwareDefinitions.map(def => fullLabwareList.push({ definition: def }))
   const customLabwareList = useSelector(getCustomLabware)
 
   customLabwareList.map(customLabware =>

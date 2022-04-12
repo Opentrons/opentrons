@@ -94,7 +94,11 @@ export function GeneralSettings(): JSX.Element {
   })
   return (
     <>
-      <Box paddingX={SPACING.spacing4} paddingY={SPACING.spacing5}>
+      <Box
+        height="calc(100vh - 8.5rem)"
+        paddingX={SPACING.spacing4}
+        paddingY={SPACING.spacing5}
+      >
         {showUpdateBanner && (
           <Box
             marginBottom={SPACING.spacing4}

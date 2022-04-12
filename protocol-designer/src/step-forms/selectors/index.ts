@@ -643,6 +643,21 @@ export const getUnsavedFormIsPristineSetTempForm: Selector<
     return isPresaved && isSetTempForm
   }
 )
+
+export const getUnsavedFormIsPristineHeaterShakerForm: Selector<
+  BaseState,
+  boolean
+> = createSelector(
+  getUnsavedForm,
+  getCurrentFormIsPresaved,
+  (unsavedForm, isPresaved) => {
+    const isSetHsTempForm =
+      unsavedForm?.stepType === 'heaterShaker' &&
+      unsavedForm?.targetHeaterShakerTemperature !== null
+
+    return isPresaved && isSetHsTempForm
+  }
+)
 export const getFormLevelWarningsForUnsavedForm: Selector<
   BaseState,
   FormWarning[]

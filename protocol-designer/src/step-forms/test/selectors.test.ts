@@ -2,6 +2,8 @@ import {
   _hasFieldLevelErrors,
   getEquippedPipetteOptions,
   getBatchEditFormHasUnsavedChanges,
+  getUnsavedFormIsPristineHeaterShakerForm,
+  getUnsavedFormIsPristineSetTempForm,
 } from '../selectors'
 import { getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
@@ -152,5 +154,69 @@ describe('getBatchEditFormHasUnsavedChanges', () => {
   it('should return false if there are no unsaved changes ', () => {
     // @ts-expect-error(sa, 2021-6-14): resultFunc (from reselect) is weirdly not part of their Selector interface
     expect(getBatchEditFormHasUnsavedChanges.resultFunc({})).toBe(false)
+  })
+})
+
+describe('getUnsavedFormIsPristineSetTempForm', () => {
+  const mockIsPresaved = true
+  it('should return true if temperature mod set temp is true formData ', () => {
+    // @ts-expect-error(jr, 4/8/22): missing module id
+    const formData: FormData = {
+      stepType: 'temperature',
+      setTemperature: 'true',
+    }
+    const expected = true
+    // @ts-expect-error(jr, 4/8/22): resultFunc (from reselect) is not part of their Selector interface
+    const result = getUnsavedFormIsPristineSetTempForm.resultFunc(
+      formData,
+      mockIsPresaved
+    )
+    expect(result).toEqual(expected)
+  })
+  it('should return false if temperature mod is false in formData ', () => {
+    // @ts-expect-error(jr, 4/8/22): missing module id
+    const formData: FormData = {
+      stepType: 'temperature',
+      setTemperature: null,
+    }
+    const expected = false
+    // @ts-expect-error(jr, 4/8/22): resultFunc (from reselect) is not part of their Selector interface
+    const result = getUnsavedFormIsPristineSetTempForm.resultFunc(
+      formData,
+      mockIsPresaved
+    )
+    expect(result).toEqual(expected)
+  })
+})
+
+describe('getUnsavedFormIsPrestineSetHeaterShakerTempForm', () => {
+  const mockIsPresaved = true
+  it('should return true if heater shaker temperature is true in formData ', () => {
+    // @ts-expect-error(jr, 4/8/22): missing module id
+    const formData: FormData = {
+      stepType: 'heaterShaker',
+      targetHeaterShakerTemperature: '10',
+    }
+    const expected = true
+    // @ts-expect-error(jr, 4/8/22): resultFunc (from reselect) is not part of their Selector interface
+    const result = getUnsavedFormIsPristineHeaterShakerForm.resultFunc(
+      formData,
+      mockIsPresaved
+    )
+    expect(result).toEqual(expected)
+  })
+  it('should return false if heater shaker temperature is false in formData ', () => {
+    // @ts-expect-error(jr, 4/8/22): missing module id
+    const formData: FormData = {
+      stepType: 'heaterShaker',
+      targetHeaterShakerTemperature: null,
+    }
+    const expected = false
+    // @ts-expect-error(jr, 4/8/22): resultFunc (from reselect) is not part of their Selector interface
+    const result = getUnsavedFormIsPristineHeaterShakerForm.resultFunc(
+      formData,
+      mockIsPresaved
+    )
+    expect(result).toEqual(expected)
   })
 })

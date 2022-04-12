@@ -90,8 +90,6 @@ async def test_messaging(
     assert mock_messenger.send.mock_calls == [
         call(
             node_id=NodeId.head,
-            message=message_definitions.AttachedToolsRequest(
-                payload=payloads.EmptyPayload()
-            ),
+            message=message_definitions.AttachedToolsRequest(),
         )
     ]

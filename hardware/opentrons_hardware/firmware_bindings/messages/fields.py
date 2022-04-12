@@ -6,6 +6,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     ToolType,
     SensorType,
     PipetteName,
+    SensorOutputBinding,
 )
 
 
@@ -113,3 +114,14 @@ class PipetteSerialField(utils.BinaryFieldBase[bytes]):
 
     NUM_BYTES = 12
     FORMAT = f"{NUM_BYTES}s"
+
+
+class SensorOutputBindingField(utils.UInt8Field):
+    """sensor type."""
+
+    def __repr__(self) -> str:
+        """Print version flags."""
+        flags_list = [
+            flag.name for flag in SensorOutputBinding if bool(self.value & flag.value)
+        ]
+        return f"{self.__class__.__name__}(value={','.join(flags_list)})"

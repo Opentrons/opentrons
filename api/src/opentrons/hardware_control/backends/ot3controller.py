@@ -28,6 +28,7 @@ from .ot3utils import (
     get_current_settings,
     create_home_group,
     node_to_axis,
+    sub_system_to_node_id,
 )
 
 try:
@@ -58,7 +59,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SetupRequest,
     EnableMotorRequest,
 )
-from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
+from opentrons_hardware import firmware_update
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
@@ -68,6 +69,7 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     OT3AxisMap,
     CurrentConfig,
+    OT3SubSystem,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -159,11 +161,11 @@ class OT3Controller:
         """Set up the motors."""
         await self._messenger.send(
             node_id=NodeId.broadcast,
-            message=SetupRequest(payload=EmptyPayload()),
+            message=SetupRequest(),
         )
         await self._messenger.send(
             node_id=NodeId.broadcast,
-            message=EnableMotorRequest(payload=EmptyPayload()),
+            message=EnableMotorRequest(),
         )
 
     @property
@@ -204,10 +206,9 @@ class OT3Controller:
         """Move to a position.
 
         Args:
-            target_position: Map of axis to position.
-            home_flagged_axes: Whether to home afterwords.
-            speed: Optional speed
-            axis_max_speeds: Optional map of axis to speed.
+            origin: The starting point of the move
+            moves: List of moves.
+            stop_condition: The stop condition.
 
         Returns:
             None
@@ -474,11 +475,19 @@ class OT3Controller:
         """Get the firmware version."""
         return None
 
-    async def update_firmware(
-        self, filename: str, loop: asyncio.AbstractEventLoop, modeset: bool
-    ) -> str:
+    async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
         """Update the firmware."""
-        return "Done"
+        with open(filename, "r") as f:
+            await firmware_update.run_update(
+                messenger=self._messenger,
+                node_id=sub_system_to_node_id(target),
+                hex_file=f,
+                # TODO (amit, 2022-04-05): Fill in retry_count and timeout_seconds from
+                #  config values.
+                retry_count=3,
+                timeout_seconds=20,
+                erase=True,
+            )
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
@@ -572,9 +581,12 @@ class OT3Controller:
         current_set: Set[NodeId], probed_set: Set[NodeId]
     ) -> Set[NodeId]:
         probed_set = OT3Controller._replace_head_node(probed_set)
-        core_replaced: Set[NodeId] = set(
-            [NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l, NodeId.head_r]
-        )
+        core_replaced: Set[NodeId] = {
+            NodeId.gantry_x,
+            NodeId.gantry_y,
+            NodeId.head_l,
+            NodeId.head_r,
+        }
         current_set -= core_replaced
         current_set |= probed_set
         return current_set
@@ -585,7 +597,7 @@ class OT3Controller:
         Unlike probe_network, this always waits for the nodes that must be present for
         a working machine, and no more.
         """
-        core_nodes = set([NodeId.gantry_x, NodeId.gantry_y, NodeId.head])
+        core_nodes = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
         core_present = await probe(self._messenger, core_nodes, timeout)
         self._present_nodes = self._filter_probed_core_nodes(
             self._present_nodes, core_present
@@ -602,7 +614,7 @@ class OT3Controller:
         # see if we should expect instruments to be present, which should be removed
         # when that method actually does canbus stuff
         instrs = await self.get_attached_instruments({})
-        expected = set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head))
+        expected = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
         if instrs.get(OT3Mount.LEFT, cast("AttachedInstrument", {})).get(
             "config", None
         ):

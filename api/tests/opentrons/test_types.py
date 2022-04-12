@@ -1,8 +1,9 @@
 import pytest
 from opentrons.types import Point, Location
+from opentrons.protocol_api.labware import Labware
 
 
-def test_point_mul():
+def test_point_mul() -> None:
     a = Point(1, 2, 3)
     b: float = 2
     assert a * b == Point(2, 4, 6)
@@ -14,7 +15,7 @@ def test_point_mul():
         a * a  # type: ignore[operator]
 
 
-def test_point_rmul():
+def test_point_rmul() -> None:
     a = Point(1, 2, 3)
     b: float = 2
     assert b * a == Point(2, 4, 6)
@@ -23,7 +24,7 @@ def test_point_rmul():
     assert b * a == Point(3.1, 6.2, 9.3)
 
 
-def test_location_repr_labware(min_lw):
+def test_location_repr_labware(min_lw: Labware) -> None:
     """It should represent labware as Labware"""
     loc = Location(point=Point(x=1.1, y=2.1, z=3.5), labware=min_lw)
     assert (
@@ -32,7 +33,7 @@ def test_location_repr_labware(min_lw):
     )
 
 
-def test_location_repr_well(min_lw):
+def test_location_repr_well(min_lw: Labware) -> None:
     """It should represent labware as Well"""
     loc = Location(point=Point(x=1, y=2, z=3), labware=min_lw.wells()[0])
     assert (
@@ -41,7 +42,7 @@ def test_location_repr_well(min_lw):
     )
 
 
-def test_location_repr_slot():
+def test_location_repr_slot() -> None:
     """It should represent labware as a slot"""
     loc = Location(point=Point(x=-1, y=2, z=3), labware="1")
     assert f"{loc}" == "Location(point=Point(x=-1, y=2, z=3), labware=1)"
