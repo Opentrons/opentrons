@@ -11,14 +11,12 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
-import { getDisabledFields } from '../../../../steplist/formLevel'
 import {
   ToggleRowField,
   TextField,
   CheckboxRowField,
   StepFormDropdown,
 } from '../../fields'
-import { getSingleSelectDisabledTooltip } from '../../utils'
 import styles from '../../StepEditForm.css'
 
 import type { StepFormProps } from '../../types'
