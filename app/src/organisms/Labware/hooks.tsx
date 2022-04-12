@@ -20,9 +20,15 @@ export interface LabwareDefAndDate {
 }
 
 export function useGetAllLabware(
-  sortBy: 'alphabetical' | 'reverse'
+  sortBy: 'alphabetical' | 'reverse',
+  filterBy:
+    | 'all'
+    | 'wellPlate'
+    | 'tipRack'
+    | 'tubeRack'
+    | 'reservoir'
+    | 'aluminumBlock'
 ): LabwareDefAndDate[] {
-  console.log(sortBy)
   const fullLabwareList: LabwareDefAndDate[] = []
   const labwareDefinitions = getAllDefinitions()
   labwareDefinitions.map(def => fullLabwareList.push({ definition: def }))
@@ -46,6 +52,12 @@ export function useGetAllLabware(
     }
     return 0
   })
+  if (filterBy !== 'all') {
+    return fullLabwareList.filter(
+      labwareItem =>
+        labwareItem.definition.metadata.displayCategory === filterBy
+    )
+  }
   return fullLabwareList
 }
 

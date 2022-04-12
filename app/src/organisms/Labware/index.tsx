@@ -4,6 +4,7 @@ import {
   Box,
   Flex,
   Link,
+  DropdownField,
   SPACING,
   COLORS,
   TYPOGRAPHY,
@@ -14,6 +15,9 @@ import {
   ALIGN_CENTER,
   Icon,
   JUSTIFY_FLEX_END,
+  ALIGN_END,
+  ALIGN_START,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/Buttons'
@@ -30,6 +34,14 @@ import {
 } from './hooks'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
+const FILTER_OPTIONS = [
+  { name: 'All', value: 'all' },
+  { name: 'Well Plate', value: 'wellPlate' },
+  { name: 'Tip Rack', value: 'tipRack' },
+  { name: 'Tube Rack', value: 'tubeRack' },
+  { name: 'Reservoir', value: 'reservoir' },
+  { name: 'Aluminum Block', value: 'aluminumBlock' },
+]
 
 export function Labware(): JSX.Element {
   const { t } = useTranslation('labware_landing')
@@ -40,7 +52,13 @@ export function Labware(): JSX.Element {
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
   const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
 
-  const labware = useGetAllLabware(sortBy)
+  const [filterBy, setFilterBy] = React.useState<
+    'all' | 'wellPlate' | 'tipRack' | 'tubeRack' | 'reservoir' | 'aluminumBlock'
+  >('all')
+  const handleFilterChange: React.ChangeEventHandler<HTMLSelectElement> = event =>
+    setFilterBy(event.target.value)
+
+  const labware = useGetAllLabware(sortBy, filterBy)
   const { labwareFailureMessage, clearLabwareFailure } = useLabwareFailure()
   const { newLabwareName, clearLabwareName } = useNewLabwareName()
   const [showAddLabwareSlideout, setShowAddLabwareSlideout] = React.useState(
@@ -84,10 +102,22 @@ export function Labware(): JSX.Element {
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}
-          justifyContent={JUSTIFY_FLEX_END}
-          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignItems={ALIGN_FLEX_END}
           paddingBottom={SPACING.spacing5}
         >
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+            <StyledText css={TYPOGRAPHY.labelSemiBold}>
+              {t('category')}
+            </StyledText>
+            <Box width="10rem">
+              <DropdownField
+                options={FILTER_OPTIONS}
+                onChange={handleFilterChange}
+                value={filterBy}
+              />
+            </Box>
+          </Flex>
           <Flex
             flexDirection={DIRECTION_ROW}
             alignItems={ALIGN_CENTER}
