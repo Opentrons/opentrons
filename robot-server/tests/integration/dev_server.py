@@ -56,7 +56,7 @@ class DevServer:
             },
             stdin=subprocess.DEVNULL,
             # The server will log to its stdout or stderr.
-            # Let it inherit our stdout and stderr so PyTest captures its logs.
+            # Let it inherit our stdout and stderr so pytest captures its logs.
             stdout=None,
             stderr=None,
         )
