@@ -14,13 +14,19 @@ export function initializePython(): void {
     .pathToPythonOverride
 
   let pythonCandidates = [
+    // Linux + macOS
     path.join(process.resourcesPath ?? './', 'python', 'bin', 'python3'),
+    // Windows
+    path.join(process.resourcesPath ?? './', 'python'),
   ]
 
   if (pathToPythonOverride != null) {
     pythonCandidates = [
       pathToPythonOverride,
+      // Linux + macOS
       path.join(pathToPythonOverride, 'bin/python3'),
+      // Windows
+      path.join(pathToPythonOverride, 'python'),
       ...pythonCandidates,
     ]
   }
