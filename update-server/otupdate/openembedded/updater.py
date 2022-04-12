@@ -1,8 +1,6 @@
 """OE Updater and dependency injection classes."""
 import contextlib
 import lzma
-import os
-import shutil
 import tempfile
 
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
@@ -75,18 +73,19 @@ class RootFSInterface:
         chunk_size: int = 1024,
     ) -> None:
 
-        total_size = os.path.getsize(rootfs_filepath)
+        total_size = 1436978176
         written_size = 0
         try:
             with lzma.open(rootfs_filepath, "rb") as fsrc, open(
                 part.path, "wb"
             ) as fdst:
-                try:
-                    shutil.copyfileobj(fsrc, fdst, length=chunk_size)
+                while True:
+                    chunk = fsrc.read(chunk_size)
+                    fdst.write(chunk)
                     written_size += chunk_size
                     progress_callback(written_size / total_size)
-                except Exception:
-                    LOG.exception("RootFSInterface::write_update exception writing")
+                    if len(chunk) != chunk_size:
+                        break
         except Exception:
             LOG.exception("RootFSInterface::write_update exception reading")
 
@@ -107,6 +106,9 @@ class Updater(UpdateActionsInterface):
             LOG.error(msg)
             raise RuntimeError(msg)
         else:
+            # resize part now!
+            subprocess.run(["resize2fs", new.path])
+
             LOG.info(f"commit_update: committed to booting {new}")
 
     @contextlib.contextmanager
@@ -119,7 +121,7 @@ class Updater(UpdateActionsInterface):
 
         :param mountpoint_in: The directory in which to create the mountpoint.
         """
-        unused = self.part_mngr.find_unused_partition()
+        unused = self.part_mngr.find_unused_partition(self.part_mngr.used_partition())
         part_path = unused.path
         with tempfile.TemporaryDirectory(
             dir=self.part_mngr.mountpoint_root()
@@ -144,7 +146,6 @@ class Updater(UpdateActionsInterface):
         file_size: int = None,
     ) -> Partition:
         self.decomp_and_write(rootfs_filepath, progress_callback)
-        LOG.warning("Entering write_update of Updater class!")
         unused_partition = self.part_mngr.find_unused_partition(
             self.part_mngr.used_partition()
         )

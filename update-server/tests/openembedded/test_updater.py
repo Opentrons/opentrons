@@ -1,10 +1,11 @@
 """Tests for OE Updater."""
+from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
 
 from otupdate.common.update_actions import Partition
-from otupdate.openembedded.updater import Updater, PartitionManager
+from otupdate.openembedded.updater import Updater, PartitionManager, RootFSInterface
 
 
 # test valid partition switch
@@ -95,3 +96,15 @@ def test_decomp_and_write(
     updater.decomp_and_write("test_path", fake_callable)
     mock_partition_manager_valid_switch.find_unused_partition.assert_called()
     mock_root_fs_interface.write_update.assert_called()
+
+
+def test_lzma(testing_partition):
+    cb = mock.Mock()
+    root_FS_intf = RootFSInterface()
+    p = Partition(2, testing_partition)
+    root_FS_intf.write_update("rootfs.xz", p, cb)
+    size_of_rootfs = 1436978176
+    calls = size_of_rootfs / 1024
+    if calls * 1024 != size_of_rootfs:
+        calls += 1
+    assert cb.call_count == calls

@@ -90,7 +90,6 @@ async def _save_file(part: BodyPartReader, path: str):
     # making sure directory exists first
     Path(path).mkdir(parents=True, exist_ok=True)
     with open(os.path.join(path, part.name), "wb") as write:
-        LOG.info(f"_save_file trying to write at ===> {path}")
         while not part.at_eof():
             chunk = await part.read_chunk()
             decoded = part.decode(chunk)
@@ -186,10 +185,11 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
         )
     reader = await request.multipart()
     async for part in reader:
-        if part.name != "ot2-system.zip" or part.name != UPDATE_PKG:
-            LOG.warning(f"Unknown field name {part.name} in file_upload, ignoring")
+        if part.name != "ot2-system.zip" and part.name != UPDATE_PKG:
+            LOG.info(f"Unknown field name {part.name} in file_upload, ignoring")
             await part.release()
         else:
+            LOG.info(f"Writing {part.name}")
             await _save_file(part, session.download_path)
 
     maybe_actions = update_actions.UpdateActionsInterface.from_request(request)
