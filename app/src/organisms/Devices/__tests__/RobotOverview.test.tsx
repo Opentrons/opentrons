@@ -5,8 +5,8 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
-import { ChooseProtocolSlideout } from '../../../organisms/ChooseProtocolSlideout'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useLights, useRobot, useIsRobotViewable } from '../hooks'
 import { RobotStatusBanner } from '../RobotStatusBanner'
@@ -15,7 +15,7 @@ import { RobotOverview } from '../RobotOverview'
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 jest.mock('../RobotStatusBanner')
-jest.mock('../../../organisms/ChooseProtocolSlideout')
+jest.mock('../../ChooseProtocolSlideout')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
 
