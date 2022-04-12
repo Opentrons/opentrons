@@ -298,6 +298,11 @@ and when that is implemented.
   margin: 0 0 1rem 1.75rem;
 }
 
+.toggle_form_group_no_bottom_margin {
+  min-width: 20%;
+  margin: 0 0 0 1.75rem;
+}
+
 .toggle_row {
   display: flex;
   flex-direction: row;

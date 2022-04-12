@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import { FONT_BODY_1_LIGHT, C_DARK_GRAY } from '../styles'
+import { fontSizeLabel } from '../ui-style-constants/typography'
+import { spacing3, spacingS } from '../ui-style-constants/spacing'
+import { darkBlack, white } from '../ui-style-constants/colors'
 import { ARROW_SIZE_PX } from './styles'
 import { Box } from '../primitives'
 
@@ -13,11 +15,14 @@ import type { StyleProps } from '../primitives'
 const TOOLTIP_CSS = css`
   position: absolute;
   z-index: 9001;
-  padding: 0.5rem;
-  ${FONT_BODY_1_LIGHT}
-  background-color: ${C_DARK_GRAY};
-  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.13), 0 3px 6px 0 rgba(0, 0, 0, 0.23);
+  padding: ${spacing3};
+  color: ${white};
+  background-color: ${darkBlack};
+  filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.2));
   cursor: pointer;
+  font-size: ${fontSizeLabel};
+  border-radius: ${spacingS};
+  width: 140px;
 `
 
 export interface TooltipProps extends StyleProps {
@@ -90,7 +95,7 @@ const ARROW_CSS_TOP = css`
   ${ARROW_CSS_BASE}
   bottom: ${ARROW_ANCHOR_OFFSET};
   border-bottom-style: none;
-  border-top-color: ${C_DARK_GRAY};
+  border-top-color: ${darkBlack};
 `
 
 // arrow pointing left from the right tooltip
@@ -98,7 +103,7 @@ const ARROW_CSS_RIGHT = css`
   ${ARROW_CSS_BASE}
   left: ${ARROW_ANCHOR_OFFSET};
   border-left-style: none;
-  border-right-color: ${C_DARK_GRAY};
+  border-right-color: ${darkBlack};
 `
 
 // arrow pointing up from the bottom tooltip
@@ -106,7 +111,7 @@ const ARROW_CSS_BOTTOM = css`
   ${ARROW_CSS_BASE}
   top: ${ARROW_ANCHOR_OFFSET};
   border-top-style: none;
-  border-bottom-color: ${C_DARK_GRAY};
+  border-bottom-color: ${darkBlack};
 `
 
 // arrow pointing right from the left tooltip
@@ -114,7 +119,7 @@ const ARROW_CSS_LEFT = css`
   ${ARROW_CSS_BASE}
   right: ${ARROW_ANCHOR_OFFSET};
   border-right-style: none;
-  border-left-color: ${C_DARK_GRAY};
+  border-left-color: ${darkBlack};
 `
 
 const ARROW_CSS_BY_PLACEMENT_BASE: Record<

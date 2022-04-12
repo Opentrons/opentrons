@@ -1,7 +1,14 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
-import { FormGroup, Flex, SPACING } from '@opentrons/components'
+import {
+  FormGroup,
+  Flex,
+  SPACING,
+  useHoverTooltip,
+  Tooltip,
+  TOOLTIP_BOTTOM,
+} from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
 import {
@@ -10,12 +17,17 @@ import {
   CheckboxRowField,
   StepFormDropdown,
 } from '../../fields'
+import { getSingleSelectDisabledTooltip } from '../../utils'
 import styles from '../../StepEditForm.css'
 
 import type { StepFormProps } from '../../types'
 
 export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
   const moduleLabwareOptions = useSelector(getHeaterShakerLabwareOptions)
+  const [targetLatchProps, tooltipLatchProps] = useHoverTooltip({
+    placement: TOOLTIP_BOTTOM,
+  })
+
   const { propsForFields, formData } = props
   return (
     <div>
@@ -90,43 +102,53 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
             )}
           </div>
         </FormGroup>
-
-        <FormGroup
-          label={i18n.t(
-            'form.step_edit_form.field.heaterShaker.latch.setLatch'
-          )}
-          className={styles.toggle_form_group}
-        >
-          <ToggleRowField
-            {...propsForFields.latchOpen}
-            offLabel={i18n.t(
-              'form.step_edit_form.field.heaterShaker.latch.toggleOff'
+        <Flex {...targetLatchProps}>
+          <FormGroup
+            label={i18n.t(
+              'form.step_edit_form.field.heaterShaker.latch.setLatch'
             )}
-            onLabel={i18n.t(
-              'form.step_edit_form.field.heaterShaker.latch.toggleOn'
-            )}
-          />
-        </FormGroup>
+            className={styles.toggle_form_group_no_bottom_margin}
+          >
+            <ToggleRowField
+              {...propsForFields.latchOpen}
+              disabled={formData.setShake === true}
+              offLabel={i18n.t(
+                'form.step_edit_form.field.heaterShaker.latch.toggleOff'
+              )}
+              onLabel={i18n.t(
+                'form.step_edit_form.field.heaterShaker.latch.toggleOn'
+              )}
+            />
+          </FormGroup>
+        </Flex>
       </div>
       <Flex paddingBottom={SPACING.spacing6}>
-        <CheckboxRowField
-          {...propsForFields.heaterShakerSetTimer}
-          label={i18n.t(
-            'form.step_edit_form.field.heaterShaker.timer.heaterShakerSetTimer'
-          )}
-          className={styles.small_field}
-        >
-          <TextField
-            {...propsForFields.heaterShakerTimerMinutes}
+        <Flex width={SPACING.spacingM}>
+          <CheckboxRowField
+            tooltipPlacement={TOOLTIP_BOTTOM}
+            {...propsForFields.heaterShakerSetTimer}
             className={styles.small_field}
-            units={i18n.t('application.units.minutes')}
-          />
-          <TextField
-            {...propsForFields.heaterShakerTimerSeconds}
-            className={styles.small_field}
-            units={i18n.t('application.units.seconds')}
-          />
-        </CheckboxRowField>
+            label={i18n.t(
+              'form.step_edit_form.field.heaterShaker.timer.heaterShakerSetTimer'
+            )}
+          >
+            <TextField
+              {...propsForFields.heaterShakerTimerMinutes}
+              className={styles.small_field}
+              units={i18n.t('application.units.minutes')}
+            />
+            <TextField
+              {...propsForFields.heaterShakerTimerSeconds}
+              className={styles.small_field}
+              units={i18n.t('application.units.seconds')}
+            />
+          </CheckboxRowField>
+        </Flex>
+        {formData.setShake === true && (
+          <Tooltip {...tooltipLatchProps}>
+            {getSingleSelectDisabledTooltip('latchOpen', 'heaterShaker')}
+          </Tooltip>
+        )}
       </Flex>
     </div>
   )
