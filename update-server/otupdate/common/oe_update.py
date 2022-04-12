@@ -69,11 +69,7 @@ def _begin_decomp_and_write(
     actions: update_actions.UpdateActionsInterface,
 ):
     """Start the write process!"""
-    LOG.info("In _begin_straight_fwd_decomp_and_write")
-    LOG.info(
-        f"file path, "
-        f"{downloaded_update_path}, in _begin_straight_fwd_decomp_and_write"
-    )
+
     session.set_stage(Stages.WRITING)
     write_future = asyncio.ensure_future(
         loop.run_in_executor(
