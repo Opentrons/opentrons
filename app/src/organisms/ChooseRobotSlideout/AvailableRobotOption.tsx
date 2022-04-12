@@ -5,8 +5,6 @@ import {
   SPACING,
   Icon,
   Flex,
-  COLORS,
-  BORDERS,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   SIZE_1,
