@@ -4,19 +4,23 @@
 #
 #    pip-compile --output-file=ot3-dev-requirements.txt common-dev.in opentrons-editable.in ot3-dev-dep.in
 #
--e file:///Users/amit/code/opentrons/notify-server
-    # via -r opentrons-editable.in
--e file:///Users/amit/code/opentrons/api
-    # via -r opentrons-editable.in
--e file:///Users/amit/code/opentrons/hardware
-    # via -r ot3-dev-dep.in
--e file:///Users/amit/code/opentrons/shared-data/python
+-e file:../notify-server#egg=notify-server
     # via
     #   -r opentrons-editable.in
-    #   opentrons
--e file:///Users/amit/code/opentrons/update-server
+    #   robot-server
+-e file:../api#egg=opentrons
+    # via
+    #   -r opentrons-editable.in
+    #   robot-server
+-e file:../hardware#egg=opentrons-hardware
+    # via -r ot3-dev-dep.in
+-e file:../shared-data/python#egg=opentrons-shared-data
+    # via
+    #   -r opentrons-editable.in
+    #   robot-server
+-e file:../update-server#egg=update-server
     # via -r opentrons-editable.in
--e file:///Users/amit/code/opentrons/robot-server
+-e file:../robot-server#egg=robot-server
     # via -r opentrons-editable.in
 aenum==3.1.8
     # via python-can
@@ -24,14 +28,11 @@ aiohttp==3.4.4
     # via
     #   otupdate
     #   pytest-aiohttp
-aionotify==0.2.0
-    # via opentrons
 aiosqlite==0.17.0
     # via robot-server
 anyio==3.3.0
     # via
     #   httpcore
-    #   opentrons
     #   robot-server
 asgiref==3.5.0
     # via uvicorn
@@ -40,7 +41,6 @@ async-timeout==3.0.1
 attrs==21.4.0
     # via
     #   aiohttp
-    #   jsonschema
     #   pytest
 black==22.3.0
     # via -r common-dev.in
@@ -55,7 +55,6 @@ charset-normalizer==2.0.12
 click==8.1.2
     # via
     #   black
-    #   opentrons
     #   uvicorn
 coverage==6.3.2
     # via pytest-cov
@@ -110,8 +109,6 @@ iniconfig==1.1.1
     # via pytest
 jmespath==0.10.0
     # via tavern
-jsonschema==3.0.2
-    # via opentrons
 mccabe==0.6.1
     # via flake8
 mock==4.0.3
@@ -126,8 +123,6 @@ mypy-extensions==0.4.3
     # via
     #   black
     #   mypy
-numpy==1.21.5
-    # via opentrons
 packaging==21.3
     # via pytest
 paho-mqtt==1.5.1
@@ -149,8 +144,6 @@ pycodestyle==2.7.0
 pydantic==1.8.2
     # via
     #   fastapi
-    #   notify-server
-    #   opentrons
     #   robot-server
 pydocstyle==6.1.1
     # via flake8-docstrings
@@ -162,12 +155,8 @@ pykwalify==1.8.0
     # via tavern
 pyparsing==3.0.8
     # via packaging
-pyrsistent==0.18.1
-    # via jsonschema
 pyserial==3.5
-    # via
-    #   opentrons
-    #   opentrons-hardware
+    # via opentrons-hardware
 pytest==6.2.5
     # via
     #   -r common-dev.in
@@ -198,8 +187,6 @@ python-multipart==0.0.5
     # via robot-server
 pyyaml==5.4.1
     # via tavern
-pyzmq==19.0.2
-    # via notify-server
 requests==2.26.0
     # via
     #   -r common-dev.in
@@ -212,7 +199,6 @@ ruamel-yaml-clib==0.2.6
     # via ruamel-yaml
 six==1.16.0
     # via
-    #   jsonschema
     #   python-dateutil
     #   python-multipart
 sniffio==1.2.0
@@ -256,7 +242,6 @@ typing-extensions==4.1.1
     #   flake8-noqa
     #   importlib-metadata
     #   mypy
-    #   opentrons
     #   pydantic
     #   robot-server
     #   sqlalchemy2-stubs
@@ -274,6 +259,3 @@ yarl==1.7.2
     # via aiohttp
 zipp==3.8.0
     # via importlib-metadata
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools
