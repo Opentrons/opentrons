@@ -69,6 +69,7 @@ import type { HeaterShakerModule } from '../../../redux/modules/types'
 import { useTrackEvent } from '../../../redux/analytics'
 
 interface ProtocolRunHeaderProps {
+  protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
   robotName: string
   runId: string
 }
@@ -103,6 +104,7 @@ function RunTimer({
 }
 
 export function ProtocolRunHeader({
+  protocolRunHeaderRef,
   robotName,
   runId,
 }: ProtocolRunHeaderProps): JSX.Element | null {
@@ -162,10 +164,12 @@ export function ProtocolRunHeader({
     false
   )
   const attachedModules = useAttachedModules(robotName)
-  const heaterShaker = (attachedModules.find(
-    module => module.type === HEATERSHAKER_MODULE_TYPE
-  ) as unknown) as HeaterShakerModule
-  const isShaking = heaterShaker?.data?.speedStatus !== 'idle'
+  const heaterShaker = attachedModules.find(
+    (module): module is HeaterShakerModule =>
+      module.type === HEATERSHAKER_MODULE_TYPE
+  )
+  const isShaking =
+    heaterShaker?.data != null && heaterShaker.data.speedStatus !== 'idle'
 
   const handleProceedToRunClick = (): void => {
     trackEvent({ name: 'proceedToRun', properties: {} })
@@ -315,20 +319,6 @@ export function ProtocolRunHeader({
               {completedAtTimestamp}
             </StyledText>
           </Box>
-          {/* TODO(bh, 2022-03-07): determine how (and whether) to derive "elapsed time", as it does not exist in 5.0 functionality
-        <Box>
-          <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
-            color={COLORS.darkGreyEnabled}
-            css={TYPOGRAPHY.h6Default}
-            paddingBottom={SPACING.spacing2}
-          >
-            {t('total_elapsed_time')}
-          </StyledText>
-          <StyledText css={TYPOGRAPHY.pRegular} color={COLORS.darkBlack}>
-            {runTime}
-          </StyledText>
-        </Box> */}
         </Flex>
         {showCancelButton ? (
           <SecondaryButton
@@ -355,6 +345,7 @@ export function ProtocolRunHeader({
 
   return (
     <Flex
+      ref={protocolRunHeaderRef}
       backgroundColor={COLORS.white}
       border={BORDERS.lineBorder}
       borderRadius={BORDERS.radiusSoftCorners}
@@ -447,7 +438,7 @@ export function ProtocolRunHeader({
               completedAt={completedAt}
             />
           </Box>
-          {showIsShakingModal && (
+          {showIsShakingModal && heaterShaker?.data != null && (
             <HeaterShakerIsRunningModal
               closeModal={() => setShowIsShakingModal(false)}
               module={heaterShaker}

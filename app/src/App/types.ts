@@ -16,3 +16,26 @@ export interface RouteProps {
   navLinkTo?: string
   path: string
 }
+
+export type RobotSettingsTab = 'calibration' | 'networking' | 'advanced'
+
+export type AppSettingsTab =
+  | 'general'
+  | 'privacy'
+  | 'advanced'
+  | 'feature-flags'
+
+export type ProtocolRunDetailsTab = 'setup' | 'module-controls' | 'run-log'
+
+/**
+ * route params type definition for the next gen app
+ */
+export interface NextGenRouteParams {
+  appSettingsTab: AppSettingsTab
+  robotName: string
+  protocolKey: string
+  labwareId: string
+  robotSettingsTab: RobotSettingsTab
+  runId: string
+  protocolRunDetailsTab: ProtocolRunDetailsTab
+}

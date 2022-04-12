@@ -20,7 +20,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import type { NextGenRouteParams } from '../../../App/NextGenApp'
+import type { NextGenRouteParams } from '../../../App/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import { useAttachedModules } from '../hooks'
 

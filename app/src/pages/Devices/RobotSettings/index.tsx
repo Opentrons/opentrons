@@ -18,10 +18,7 @@ import { Line } from '../../../atoms/structure'
 import { NavTab } from '../../../atoms/NavTab'
 import { RobotSettingsCalibration } from '../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
 
-import type {
-  NextGenRouteParams,
-  RobotSettingsTab,
-} from '../../../App/NextGenApp'
+import type { NextGenRouteParams, RobotSettingsTab } from '../../../App/types'
 
 export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')

@@ -1,13 +1,17 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import '@testing-library/jest-dom'
-import { StaticRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { StaticRouter } from 'react-router-dom'
+
 import { renderWithProviders } from '@opentrons/components'
-import { useTrackEvent } from '../../../../redux/analytics'
+
 import { i18n } from '../../../../i18n'
-import * as hooks from '../hooks'
-import { ProceedToRunCta } from '../ProceedToRunCta'
+import { useTrackEvent } from '../../../../redux/analytics'
+import {
+  useRunCalibrationStatus,
+  useUnmatchedModulesForProtocol,
+} from '../../hooks'
+import { ProceedToRunButton } from '../ProceedToRunButton'
+
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -15,25 +19,30 @@ jest.mock('@opentrons/components', () => {
     Tooltip: jest.fn(({ children }) => <div>{children}</div>),
   }
 })
-jest.mock('../../../../redux/protocol')
 jest.mock('../../../../redux/analytics')
-jest.mock('../hooks')
+jest.mock('../../hooks')
 
-const mockUseModuleMatchResults = hooks.useModuleMatchResults as jest.MockedFunction<
-  typeof hooks.useModuleMatchResults
+const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
+  typeof useUnmatchedModulesForProtocol
 >
-const mockUseProtocolCalibrationStatus = hooks.useProtocolCalibrationStatus as jest.MockedFunction<
-  typeof hooks.useProtocolCalibrationStatus
+const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
+  typeof useRunCalibrationStatus
 >
-
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
 
+const ROBOT_NAME = 'otie'
+const RUN_ID = '1'
+
 const render = () => {
   return renderWithProviders(
     <StaticRouter>
-      <ProceedToRunCta />
+      <ProceedToRunButton
+        protocolRunHeaderRef={null}
+        robotName={ROBOT_NAME}
+        runId={RUN_ID}
+      />
     </StaticRouter>,
     {
       i18nInstance: i18n,
@@ -43,38 +52,41 @@ const render = () => {
 
 let mockTrackEvent: jest.Mock
 
-describe('ProceedToRunCta', () => {
+describe('ProceedToRunButton', () => {
   beforeEach(() => {
-    mockUseProtocolCalibrationStatus.mockReturnValue({
-      complete: true,
-    })
+    when(mockUseUnmatchedModulesForProtocol)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        missingModuleIds: [],
+        remainingAttachedModules: [],
+      })
+
+    when(mockUseRunCalibrationStatus)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        complete: true,
+      })
+
     mockTrackEvent = jest.fn()
     when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
   })
   afterEach(() => {
-    jest.restoreAllMocks()
     resetAllWhenMocks()
   })
 
   it('should be enabled with no tooltip if there are no missing Ids', () => {
-    mockUseModuleMatchResults.mockReturnValue({
-      missingModuleIds: [],
-      remainingAttachedModules: [],
-    })
-
     const { getByRole } = render()
-    const button = getByRole('button', { name: 'Proceed to run' })
+    const button = getByRole('link', { name: 'Proceed to run' })
     expect(button).not.toBeDisabled()
+    expect(button.getAttribute('href')).toEqual(
+      '/devices/otie/protocol-runs/1/run-log'
+    )
   })
 
   it('should track a mixpanel event when clicked', () => {
-    mockUseModuleMatchResults.mockReturnValue({
-      missingModuleIds: [],
-      remainingAttachedModules: [],
-    })
     const { getByRole } = render()
-    const button = getByRole('button', { name: 'Proceed to run' })
-    fireEvent.click(button)
+    const button = getByRole('link', { name: 'Proceed to run' })
+    button.click()
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'proceedToRun',
       properties: {},
@@ -82,23 +94,29 @@ describe('ProceedToRunCta', () => {
   })
 
   it('should be disabled with modules not connected tooltip when there are missing moduleIds', () => {
-    mockUseModuleMatchResults.mockReturnValue({
-      missingModuleIds: ['temperatureModuleV1'],
-      remainingAttachedModules: [],
-    })
+    when(mockUseUnmatchedModulesForProtocol)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        missingModuleIds: ['temperatureModuleV1'],
+        remainingAttachedModules: [],
+      })
     const { getByRole, getByText } = render()
     const button = getByRole('button', { name: 'Proceed to run' })
     expect(button).toBeDisabled()
     getByText('Make sure all modules are connected before proceeding to run')
   })
   it('should be disabled with modules not connected and calibration not completed tooltip if missing cal and moduleIds', async () => {
-    mockUseModuleMatchResults.mockReturnValue({
-      missingModuleIds: ['temperatureModuleV1'],
-      remainingAttachedModules: [],
-    })
-    mockUseProtocolCalibrationStatus.mockReturnValue({
-      complete: false,
-    } as any)
+    when(mockUseUnmatchedModulesForProtocol)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        missingModuleIds: ['temperatureModuleV1'],
+        remainingAttachedModules: [],
+      })
+    when(mockUseRunCalibrationStatus)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        complete: false,
+      })
     const { getByRole, getByText } = render()
     const button = getByRole('button', { name: 'Proceed to run' })
     expect(button).toBeDisabled()
@@ -106,14 +124,12 @@ describe('ProceedToRunCta', () => {
       'Make sure robot calibration is complete and all modules are connected before proceeding to run'
     )
   })
-  it('should be disabled with calibration not complete tooltip', async () => {
-    mockUseModuleMatchResults.mockReturnValue({
-      missingModuleIds: [],
-      remainingAttachedModules: [],
-    })
-    mockUseProtocolCalibrationStatus.mockReturnValue({
-      complete: false,
-    } as any)
+  it('should be disabled with calibration not complete tooltip when calibration not complete', async () => {
+    when(mockUseRunCalibrationStatus)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        complete: false,
+      })
     const { getByRole, getByText } = render()
     const button = getByRole('button', { name: 'Proceed to run' })
     expect(button).toBeDisabled()
