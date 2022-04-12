@@ -23,7 +23,6 @@ _protocol_directory = AppStateValue[Path]("protocol_directory")
 
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-robot-server-"
 _DATABASE_FILE: Final = "robot_server.db"
-_PROTOCOL_FILES_SUBDIRECTORY: Final = "protocols"
 
 _log = logging.getLogger(__name__)
 
@@ -124,7 +123,7 @@ def open_db_no_cleanup(db_file_path: Path) -> SQLEngine:
     )
 
 
-async def _get_persistence_directory(
+async def get_persistence_directory(
     app_state: AppState = Depends(get_app_state),
 ) -> Path:
     """Return the root persistence directory, creating it if necessary."""
@@ -151,21 +150,6 @@ async def _get_persistence_directory(
     return persistence_dir
 
 
-async def get_protocol_directory(
-    app_state: AppState = Depends(get_app_state),
-    persistence_directory: Path = Depends(_get_persistence_directory),
-) -> Path:
-    """Get the directory to save protocol files, creating it if needed."""
-    protocol_directory = _protocol_directory.get_from(app_state)
-
-    if protocol_directory is None:
-        protocol_directory = persistence_directory / _PROTOCOL_FILES_SUBDIRECTORY
-        await AsyncPath(protocol_directory).mkdir(exist_ok=True)
-        _protocol_directory.set_on(app_state, protocol_directory)
-
-    return protocol_directory
-
-
 def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
     """Create the necessary database tables to back all data stores.
 
@@ -177,7 +161,7 @@ def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
 
 def get_sql_engine(
     app_state: AppState = Depends(get_app_state),
-    persistence_directory: Path = Depends(_get_persistence_directory),
+    persistence_directory: Path = Depends(get_persistence_directory),
 ) -> SQLEngine:
     """Return a singleton SQL engine referring to a ready-to-use database."""
     sql_engine = _sql_engine.get_from(app_state)

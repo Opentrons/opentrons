@@ -20,7 +20,6 @@ from robot_server.service.json_api import (
     MultiBodyMeta,
     PydanticResponse,
 )
-from robot_server.persistence import get_protocol_directory
 
 from .protocol_models import Protocol, ProtocolFile, Metadata
 from .protocol_analyzer import ProtocolAnalyzer
@@ -31,6 +30,7 @@ from .dependencies import (
     get_protocol_store,
     get_analysis_store,
     get_protocol_analyzer,
+    get_protocol_directory,
 )
 
 
