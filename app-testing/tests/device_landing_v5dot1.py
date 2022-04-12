@@ -52,6 +52,10 @@ def test_device_landing_v5dot1(
             driver, console, request.node.nodeid
         )
 
+        assert device_landing.get_device_header().is_displayed()
+        assert device_landing.get_how_to_setup_a_robot().is_displayed()
+        device_landing.click_how_to_setup_a_robot()
+
         for robot in robots:
             ot_robot = OtRobot(console, robot)
             console.print(

@@ -7,7 +7,9 @@ from selenium.webdriver.remote.webelement import WebElement
 
 from src.driver.base import Base, Element
 
-PageName = Literal["devices","protocols", "labware", "app-settings/general"]
+PageName = Literal["devices", "protocols", "labware", "app-settings/general"]
+
+
 class DeviceLanding:
     """Elements and actions for the Page that loads when the app is opened."""
 
@@ -44,6 +46,25 @@ class DeviceLanding:
             (By.ID, "RobotOverview_lightsToggle"), f"Lights toggle button."
         )
         return self.base.clickable_wrapper(lights, 5)
+
+    def get_device_header(self) -> Optional[WebElement]:
+        """Get the device header."""
+        header: Element = Element((By.ID, "DevicesLanding_title"), f"Device header.")
+        return self.base.clickable_wrapper(header, 5)
+
+    def get_how_to_setup_a_robot(self) -> Optional[WebElement]:
+        """Get the how to setup a robot."""
+        header: Element = Element(
+            (By.XPATH, '//a[text()="See how to set up a new robot"]'),
+            f"See how to set up a new robot.",
+        )
+        return self.base.clickable_wrapper(header, 5)
+
+    def click_how_to_setup_a_robot(self) -> None:
+        """Click on the how to setup a robot"""
+        button: Optional[WebElement] = self.get_how_to_setup_a_robot()
+        if button:
+            button.click()
 
     def get_lights_status(self) -> bool:
         """Return True if toggle is on, False if toggle is off."""
