@@ -13,40 +13,23 @@ export function initializePython(): void {
   const pathToPythonOverride: string | null = getConfig('python')
     .pathToPythonOverride
 
-  let possiblePythonPaths = [
-    path.join(process.resourcesPath ?? './', 'python'),
+  let pythonCandidates = [
     path.join(process.resourcesPath ?? './', 'python', 'bin', 'python3'),
   ]
 
   if (pathToPythonOverride != null) {
-    possiblePythonPaths = [
+    pythonCandidates = [
       pathToPythonOverride,
       path.join(pathToPythonOverride, 'bin/python3'),
-      ...possiblePythonPaths,
+      ...pythonCandidates,
     ]
   }
 
-  if (process.env.NODE_ENV !== 'production') {
-    possiblePythonPaths = [
-      ...possiblePythonPaths,
-      path.join(__dirname, '../python/bin/python3'),
-    ]
-  }
+  pythonPath = pythonCandidates.filter(testPythonPath)[0] ?? null
 
-  for (const path of possiblePythonPaths) {
-    try {
-      fs.accessSync(path, fs.constants.X_OK)
-      const stats = fs.statSync(path)
-      if (stats.isFile()) {
-        log.info('Python environment selected', { path })
-        pythonPath = path
-      }
-    } catch (error) {
-      log.debug('Python candidate not executable, skipping', { path, error })
-    }
-  }
-
-  if (pythonPath == null) {
+  if (pythonPath != null)
+    log.info('Python environment selected', { pythonPath })
+  else {
     log.error('No valid Python environment found')
   }
 }
@@ -75,4 +58,22 @@ export function runFileWithPython(
     .catch(e => {
       log.error(e)
     })
+}
+
+function testPythonPath(candidatePath: string): boolean {
+  try {
+    fs.accessSync(candidatePath, fs.constants.X_OK)
+    const stats = fs.statSync(candidatePath)
+
+    if (stats.isFile()) {
+      return true
+    }
+  } catch (error) {
+    log.debug('Python candidate not executable, skipping', {
+      candidatePath,
+      error,
+    })
+  }
+
+  return false
 }
