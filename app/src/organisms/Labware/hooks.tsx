@@ -19,7 +19,10 @@ export interface LabwareDefAndDate {
   filename?: string
 }
 
-export function useGetAllLabware(): LabwareDefAndDate[] {
+export function useGetAllLabware(
+  sortBy: 'alphabetical' | 'reverse'
+): LabwareDefAndDate[] {
+  console.log(sortBy)
   const fullLabwareList: LabwareDefAndDate[] = []
   const labwareDefinitions = getAllDefinitions()
   labwareDefinitions.map(def => fullLabwareList.push({ definition: def }))
@@ -34,7 +37,15 @@ export function useGetAllLabware(): LabwareDefAndDate[] {
         })
       : null
   )
-
+  fullLabwareList.sort(function (a, b) {
+    if (a.definition.metadata.displayName < b.definition.metadata.displayName) {
+      return sortBy === 'alphabetical' ? -1 : 1
+    }
+    if (a.definition.metadata.displayName > b.definition.metadata.displayName) {
+      return sortBy === 'alphabetical' ? 1 : -1
+    }
+    return 0
+  })
   return fullLabwareList
 }
 
