@@ -86,7 +86,6 @@ async def status(request: web.Request, session: UpdateSession) -> web.Response:
 
 
 async def _save_file(part: BodyPartReader, path: str):
-    LOG.info(f"path {os.path.join(path, part.name)}, in _save_file")
     # making sure directory exists first
     Path(path).mkdir(parents=True, exist_ok=True)
     with open(os.path.join(path, part.name), "wb") as write:
