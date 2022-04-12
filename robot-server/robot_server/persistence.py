@@ -96,8 +96,7 @@ actions_table = sqlalchemy.Table(
 )
 
 
-# TODO(mm, 2022-03-29): When we confirm we can use SQLAlchemy 1.4 on the OT-2,
-# convert these to return an async engine.
+# TODO(mm, 2022-03-29): convert these to return an async engine.
 # https://docs.sqlalchemy.org/en/14/orm/extensions/asyncio.html
 @contextmanager
 def opened_db(db_file_path: Path) -> Generator[SQLEngine, None, None]:
@@ -115,7 +114,7 @@ def opened_db(db_file_path: Path) -> Generator[SQLEngine, None, None]:
 
 
 def open_db_no_cleanup(db_file_path: Path) -> SQLEngine:
-    """Like `create_in_memory_db()`, except without automatic cleanup."""
+    """Create a database engine for performing transactions."""
     return create_engine(
         # sqlite://<hostname>/<path>
         # where <hostname> is empty.
