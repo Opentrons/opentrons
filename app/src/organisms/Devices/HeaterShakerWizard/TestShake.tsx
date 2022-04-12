@@ -34,7 +34,7 @@ import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolMo
 interface TestShakeProps {
   module: HeaterShakerModule
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
-  moduleFromProtocol: ProtocolModuleInfo | undefined
+  moduleFromProtocol?: ProtocolModuleInfo
 }
 
 export function TestShake(props: TestShakeProps): JSX.Element {

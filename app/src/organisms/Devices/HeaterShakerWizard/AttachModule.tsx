@@ -22,7 +22,7 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import screwdriverOrientedLeft from '../../../assets/images/screwdriver_oriented_left.svg'
 import { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
 interface AttachModuleProps {
-  moduleFromProtocol: ProtocolModuleInfo | undefined
+  moduleFromProtocol?: ProtocolModuleInfo
 }
 
 export function AttachModule(props: AttachModuleProps): JSX.Element {
@@ -103,10 +103,12 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                 viewBox={DECK_MAP_VIEWBOX}
                 deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
                 id={'HeaterShakerWizard_AttachModule_deckMap'}
-                data-testid={`AttachModule_${moduleDef.model}`}
+                data-testid={`AttachModule_${moduleFromProtocol.moduleId}`}
               >
                 {() => (
-                  <React.Fragment key={`AttachModule_${moduleDef.model}`}>
+                  <React.Fragment
+                    key={`AttachModule_${moduleFromProtocol.moduleId}`}
+                  >
                     <Module
                       x={moduleFromProtocol.x}
                       y={moduleFromProtocol.y}

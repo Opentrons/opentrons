@@ -23,7 +23,7 @@ import {
 
 import type { NextGenRouteParams } from '../../../App/NextGenApp'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
