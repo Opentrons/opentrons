@@ -94,6 +94,21 @@ def test_update_run(subject: RunStore) -> None:
     assert result == updated_run
 
 
+def test_get_run_no_actions(subject: RunStore) -> None:
+    """It can get a previously stored run entry."""
+    run = RunResource(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime.now(),
+        actions=[],
+        is_current=False,
+    )
+    subject.insert(run)
+    result = subject.get(run_id="run-id")
+
+    assert result == run
+
+
 def test_get_run(subject: RunStore) -> None:
     """It can get a previously stored run entry."""
     action = RunAction(
