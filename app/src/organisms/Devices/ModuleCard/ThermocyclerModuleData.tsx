@@ -1,23 +1,15 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 import {
   Flex,
   Text,
-  JUSTIFY_SPACE_BETWEEN,
   TEXT_TRANSFORM_UPPERCASE,
   SPACING_2,
   FONT_SIZE_CAPTION,
   FONT_WEIGHT_REGULAR,
-  C_HARBOR_GRAY,
-  C_DARK_GRAY,
   DIRECTION_COLUMN,
-  SPACING_4,
-  C_SILVER_GRAY,
-  C_DARK_BLACK,
-  C_SKY_BLUE,
-  C_BLUE,
-  C_BLUE_PRESSED,
   COLORS,
   SPACING,
 } from '@opentrons/components'
@@ -32,6 +24,15 @@ interface ThermocyclerModuleProps {
   lidTarget: number | null
 }
 
+const MODULE_STATUS_STYLING = css`
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+
+  @media (min-width: 800px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+`
+
 export const ThermocyclerModuleData = (
   props: ThermocyclerModuleProps
 ): JSX.Element | null => {
@@ -42,27 +43,27 @@ export const ThermocyclerModuleData = (
     status: string | null
   ): { backgroundColor: string; iconColor: string; textColor: string } => {
     const StatusLabelProps = {
-      backgroundColor: C_SILVER_GRAY,
-      iconColor: C_DARK_GRAY,
-      textColor: C_BLUE_PRESSED,
+      backgroundColor: COLORS.medGrey,
+      iconColor: COLORS.darkGrey,
+      textColor: COLORS.bluePressed,
       pulse: false,
     }
 
     switch (status) {
       case 'idle': {
-        StatusLabelProps.backgroundColor = C_SILVER_GRAY
-        StatusLabelProps.iconColor = C_DARK_GRAY
-        StatusLabelProps.textColor = C_DARK_BLACK
+        StatusLabelProps.backgroundColor = COLORS.medGrey
+        StatusLabelProps.iconColor = COLORS.darkGrey
+        StatusLabelProps.textColor = COLORS.darkBlack
         break
       }
       case 'holding at target': {
-        StatusLabelProps.backgroundColor = C_SKY_BLUE
-        StatusLabelProps.iconColor = C_BLUE
+        StatusLabelProps.backgroundColor = COLORS.medBlue
+        StatusLabelProps.iconColor = COLORS.blue
         break
       }
       case 'cooling':
       case 'heating': {
-        StatusLabelProps.backgroundColor = C_SKY_BLUE
+        StatusLabelProps.backgroundColor = COLORS.medBlue
         StatusLabelProps.pulse = true
         break
       }
@@ -76,14 +77,14 @@ export const ThermocyclerModuleData = (
   }
 
   return (
-    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+    <Flex css={MODULE_STATUS_STYLING}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         data-testid={`thermocycler_module_data_lid`}
       >
         <Text
           textTransform={TEXT_TRANSFORM_UPPERCASE}
-          color={C_HARBOR_GRAY}
+          color={COLORS.darkGreyEnabled}
           fontWeight={FONT_WEIGHT_REGULAR}
           fontSize={FONT_SIZE_CAPTION}
           marginTop={SPACING_2}
@@ -106,12 +107,11 @@ export const ThermocyclerModuleData = (
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        marginLeft={SPACING_4}
         data-testid={`thermocycler_module_data_block`}
       >
         <Text
           textTransform={TEXT_TRANSFORM_UPPERCASE}
-          color={C_HARBOR_GRAY}
+          color={COLORS.darkGreyEnabled}
           fontWeight={FONT_WEIGHT_REGULAR}
           fontSize={FONT_SIZE_CAPTION}
           marginTop={SPACING_2}

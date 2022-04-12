@@ -97,8 +97,8 @@ class ProtocolSource:
     (Excluding information that would require in-depth simulation of the protocol.)
 
     Attributes:
-        directory: The directory of the protocol files, if a directory
-            was created by the ProtocolReader.
+        directory: The directory containing the protocol files
+            (and only the protocol files), or ``None`` if this is unknown.
         main_file: The location of the protocol's main file on disk.
         files: Descriptions of all files that make up the protocol.
         metadata: Arbitrary metadata specified by the protocols.

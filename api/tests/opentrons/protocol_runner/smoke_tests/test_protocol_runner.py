@@ -34,7 +34,10 @@ async def test_runner_with_python(
 ) -> None:
     """It should run a Python protocol on the ProtocolRunner."""
     protocol_reader = ProtocolReader()
-    protocol_source = await protocol_reader.read([python_protocol_file])
+    protocol_source = await protocol_reader.read_saved(
+        files=[python_protocol_file],
+        directory=None,
+    )
 
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)
@@ -96,7 +99,10 @@ async def test_runner_with_python(
 async def test_runner_with_json(json_protocol_file: Path) -> None:
     """It should run a JSON protocol on the ProtocolRunner."""
     protocol_reader = ProtocolReader()
-    protocol_source = await protocol_reader.read([json_protocol_file])
+    protocol_source = await protocol_reader.read_saved(
+        files=[json_protocol_file],
+        directory=None,
+    )
 
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)
@@ -145,7 +151,10 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
 async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> None:
     """It should run a Python protocol on the ProtocolRunner."""
     protocol_reader = ProtocolReader()
-    protocol_source = await protocol_reader.read([legacy_python_protocol_file])
+    protocol_source = await protocol_reader.read_saved(
+        files=[legacy_python_protocol_file],
+        directory=None,
+    )
 
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)
@@ -197,7 +206,10 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
 async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
     """It should run a Python protocol on the ProtocolRunner."""
     protocol_reader = ProtocolReader()
-    protocol_source = await protocol_reader.read([legacy_json_protocol_file])
+    protocol_source = await protocol_reader.read_saved(
+        files=[legacy_json_protocol_file],
+        directory=None,
+    )
 
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)
