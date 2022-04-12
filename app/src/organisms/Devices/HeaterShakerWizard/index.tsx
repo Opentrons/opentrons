@@ -6,7 +6,6 @@ import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
 import { HEATERSHAKER_MODULE_TYPE } from '../../../redux/modules'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/Buttons'
 import { useAttachedModules } from '../hooks'
-import { useHeaterShakerFromProtocol } from '../ModuleCard/hooks'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
 import { AttachModule } from './AttachModule'
@@ -41,24 +40,19 @@ export const HeaterShakerWizard = (
   const { robotName } = useParams<NextGenRouteParams>()
   const attachedModules = useAttachedModules(robotName)
   const [targetProps, tooltipProps] = useHoverTooltip()
-
   const heaterShaker =
     attachedModules.find(
       (module): module is HeaterShakerModule =>
         module.type === HEATERSHAKER_MODULE_TYPE
     ) ?? null
-  const heaterShakerFromProtocol = useHeaterShakerFromProtocol()
 
   let isPrimaryCTAEnabled: boolean = true
 
   if (currentPage === 4) {
     isPrimaryCTAEnabled = Boolean(heaterShaker)
   }
-
   const labwareDef =
-    heaterShakerFromProtocol != null
-      ? heaterShakerFromProtocol.nestedLabwareDef
-      : null
+    moduleFromProtocol != null ? moduleFromProtocol.nestedLabwareDef : null
 
   let adapterName: ThermalAdapterName | null = null
   if (
