@@ -24,6 +24,7 @@ import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
 import { TertiaryButton, ToggleButton } from '../../../atoms/Buttons'
+import { OpenJupyterControl } from './OpenJupyterControl'
 
 import {
   getRobotByName,
@@ -37,8 +38,6 @@ import type { ViewableRobot } from '../../../redux/discovery/types'
 
 const GITHUB_LINK =
   'https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md'
-const JUPYTER_NOTEBOOK_LINK =
-  'https://docs.opentrons.com/v2/new_advanced_running.html#jupyter-notebook'
 const OT_APP_UPDATE_PAGE_LINK = 'https://opentrons.com/ot-app/'
 
 interface RobotSettingsAdvancedProps {
@@ -230,8 +229,8 @@ export function RobotSettingsAdvanced({
           </Box>
           <ToggleButton
             label="pause_protocol"
-            toggledOn={null}
-            onClick={null}
+            toggledOn={dummyForToggle}
+            onClick={dummyForToggle}
             id="AdvancedSettings_unavailableRobotsToggleButton"
           />
         </Flex>
@@ -251,44 +250,13 @@ export function RobotSettingsAdvanced({
           </Box>
           <ToggleButton
             label="disable_homing"
-            toggledOn={null}
-            onClick={null}
+            toggledOn={dummyForToggle}
+            onClick={dummyForToggle}
             id="AdvancedSettings_unavailableRobotsToggleButton"
           />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
-
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
-            <StyledText
-              as="h3"
-              css={TYPOGRAPHY.h3SemiBold}
-              marginBottom={SPACING.spacing4}
-              id="AdvancedSettings_About"
-            >
-              {t('jupyter_notebook')}
-            </StyledText>
-            {/* <StyledText
-              as="p"
-              css={TYPOGRAPHY.pSemiBold}
-              marginBottom={SPACING.spacing2}
-            >
-              {t('robot_name')}
-            </StyledText> */}
-            <StyledText as="p">{t('jupyter_notebook_description')}</StyledText>
-            <ExternalLink href={JUPYTER_NOTEBOOK_LINK}>
-              {t('jupyter_notebook_link')}
-            </ExternalLink>
-          </Box>
-          <TertiaryButton
-            marginLeft={SPACING_AUTO}
-            onClick={null} // ToDo add slideout
-            id="AdvancedSettings_RenameRobot"
-          >
-            {t('launch_jupyter_notebook_button')}
-          </TertiaryButton>
-        </Flex>
-
+        <OpenJupyterControl robotIp={''} />
         <Divider marginY={SPACING.spacing5} />
 
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -391,14 +359,63 @@ export function RobotSettingsAdvanced({
             <StyledText
               as="h3"
               css={TYPOGRAPHY.h3SemiBold}
+              marginBottom={SPACING.spacing4}
+              id="AdvancedSettings_About"
+            >
+              {t('factory_reset')}
+            </StyledText>
+            <StyledText as="p">{t('factory_reset_description')}</StyledText>
+          </Box>
+          <TertiaryButton
+            marginLeft={SPACING_AUTO}
+            onClick={null} // ToDo add slideout
+            id="AdvancedSettings_FactoryResetChooseButton"
+          >
+            {t('factory_reset_settings_button')}
+          </TertiaryButton>
+        </Flex>
+        <Divider marginY={SPACING.spacing5} />
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          marginBottom={SPACING.spacing5}
+        >
+          <Box width="70%">
+            <StyledText
+              as="h3"
+              css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_showLink"
             >
-              {t('show_link_labware_data')}
+              {t('use_older_protocol_analysis_method')}
             </StyledText>
             <StyledText as="p">
-              {t('show_link_labware_data_description')}
+              {t('use_older_protocol_analysis_method_description')}
             </StyledText>
+          </Box>
+          <ToggleButton
+            label="show_link_to_get_labware_offset_data"
+            toggledOn={dummyForToggle}
+            onClick={dummyForToggle}
+            id="AdvancedSettings_showLinkToggleButton"
+          />
+        </Flex>
+
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Box width="70%">
+            <StyledText
+              as="h2"
+              css={TYPOGRAPHY.h3SemiBold}
+              //   paddingBottom={SPACING.spacing3}
+              marginBottom={SPACING.spacing4}
+              id="AdvancedSettings_showLink"
+            >
+              {t('legacy_settings')}
+            </StyledText>
+            <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+              {t('calibrate_deck')}
+            </StyledText>
+            <StyledText as="p">{t('calibrate_deck_description')}</StyledText>
           </Box>
           <ToggleButton
             label="show_link_to_get_labware_offset_data"
@@ -413,21 +430,20 @@ export function RobotSettingsAdvanced({
             <Text
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
-              id="AdvancedSettings_clearRobots"
+              id="AdvancedSettings_devTools"
             >
-              {t('clear_unavail_robots')}
+              {t('short_trash_bin')}
             </Text>
             <Text css={TYPOGRAPHY.pRegular}>
-              {t('clear_robots_description')}
+              {t('short_trash_bin_description')}
             </Text>
           </Box>
-          <TertiaryButton
-            marginLeft={SPACING_AUTO}
-            // onClick={() => dispatch(clearDiscoveryCache())}
-            id="AdvancedSettings_clearUnavailableRobots"
-          >
-            {t('clear_robots_button')}
-          </TertiaryButton>
+          <ToggleButton
+            label="enable_dev_tools"
+            toggledOn={dummyForToggle}
+            onClick={dummyForToggle}
+            id="AdvancedSettings_shortTrashBin"
+          />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -437,17 +453,17 @@ export function RobotSettingsAdvanced({
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_devTools"
             >
-              {t('enable_dev_tools')}
+              {t('use_older_aspirate')}
             </Text>
             <Text css={TYPOGRAPHY.pRegular}>
-              {t('enable_dev_tools_description')}
+              {t('use_older_aspirate_description')}
             </Text>
           </Box>
           <ToggleButton
             label="enable_dev_tools"
             toggledOn={dummyForToggle}
             onClick={dummyForToggle}
-            id="AdvancedSettings_devTooltoggle"
+            id="AdvancedSettings_useOlderAspirate"
           />
         </Flex>
       </Box>
