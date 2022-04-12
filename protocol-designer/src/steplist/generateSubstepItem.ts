@@ -402,7 +402,7 @@ export function generateSubstepItem(
 
   if (stepArgs.commandCreatorFnName === 'awaitTemperature') {
     const moduleId = stepArgs.module
-    const { type } = invariantContext.moduleEntities[moduleId]
+    const { type } = invariantContext.moduleEntities[moduleId as string]
     return {
       substepType: 'awaitTemperature',
       temperature: stepArgs.temperature,

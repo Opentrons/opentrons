@@ -1,6 +1,9 @@
 import React from 'react'
 import { shallow } from 'enzyme'
-import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import { THERMOCYCLER_STATE } from '../../../constants'
 import { StepItemContents, StepItemContentsProps } from '../StepItem'
 import { ModuleStepItems } from '../ModuleStepItems'
@@ -144,6 +147,7 @@ describe('StepItemContents', () => {
         temperature: 45,
         labwareNickname: 'temperature nickname',
         message: 'message',
+        moduleType: TEMPERATURE_MODULE_TYPE,
       }
       // @ts-expect-error(sa, 2021-6-21): StepItemContents might return a list of JSX Elements
       const wrapper = shallow(<StepItemContents {...awaitTemperatureProps} />)
