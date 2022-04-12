@@ -91,5 +91,8 @@
   "proceed_to_run": "Proceed to run",
   "confirm_attachment": "Confirm attachment",
   "closed": "Closed",
-  "closed_and_locked": "Closed and Locked"
+  "closed_and_locked": "Closed and Locked",
+  "view_instructions": "View instructions",
+  "improperly_fastened_description": "An improperly fastened Heater Shaker module can shake itself out of a deck slot.",
+  "module_in_slot": "{{moduleName}} in Slot {{slotName}}"
 }
