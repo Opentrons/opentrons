@@ -1,6 +1,5 @@
 import reduce from 'lodash/reduce'
 import { uuid } from '../../../utils'
-import type { ProtocolFileV5 } from '@opentrons/shared-data'
 import type { LoadLiquidCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 export interface DesignerApplicationData {
@@ -20,20 +19,18 @@ export interface DesignerApplicationData {
 }
 
 export const getLoadLiquidCommands = (
-  designerApplication: ProtocolFileV5<DesignerApplicationData>['designerApplication']
+  ingredients?: DesignerApplicationData['ingredients'],
+  ingredLocations?: DesignerApplicationData['ingredLocations']
 ): LoadLiquidCreateCommand[] => {
   let loadLiquidCommands: LoadLiquidCreateCommand[] = []
 
   let labwareIdsByLiquidId: { [liquidId: string]: string[] } = {}
 
-  if (
-    designerApplication?.data?.ingredLocations != null &&
-    designerApplication?.data?.ingredients != null
-  ) {
-    Object.keys(designerApplication?.data?.ingredients).forEach(liquidId => {
-      if (designerApplication?.data?.ingredLocations != null) {
+  if (ingredLocations != null && ingredients != null) {
+    Object.keys(ingredients).forEach(liquidId => {
+      if (ingredLocations != null) {
         for (const [labwareId, liquidsByWellName] of Object.entries(
-          designerApplication?.data?.ingredLocations
+          ingredLocations
         )) {
           Object.values(liquidsByWellName).forEach(volumeByLiquidId => {
             if (liquidId in volumeByLiquidId) {
@@ -63,7 +60,7 @@ export const getLoadLiquidCommands = (
         const commands: LoadLiquidCreateCommand[] = labwareIds.map(
           labwareId => {
             const volumeByWell = reduce(
-              designerApplication.data?.ingredLocations[labwareId],
+              ingredLocations[labwareId],
               (acc, volumesByLiquidId, wellName) => {
                 if (liquidId in volumesByLiquidId) {
                   return {

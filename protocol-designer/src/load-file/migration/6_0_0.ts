@@ -121,7 +121,10 @@ export const migrateFile = (
     }
   )
 
-  const loadLiquidCommands = getLoadLiquidCommands(designerApplication)
+  const loadLiquidCommands = getLoadLiquidCommands(
+    designerApplication?.data?.ingredients,
+    designerApplication?.data?.ingredLocations
+  )
   const migratedV5Commands = migrateCommands(commands)
 
   const liquids: ProtocolFile['liquids'] =

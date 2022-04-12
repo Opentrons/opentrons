@@ -214,7 +214,10 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       }
     )
 
-    const loadLiquidCommands = getLoadLiquidCommands(designerApplication)
+    const loadLiquidCommands = getLoadLiquidCommands(
+      ingredients,
+      ingredLocations
+    )
     const modules: ProtocolFile['modules'] = mapValues(
       moduleEntities,
       (moduleEntity: ModuleEntity, moduleId: string) => ({
