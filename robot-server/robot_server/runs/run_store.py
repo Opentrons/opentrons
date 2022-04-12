@@ -86,9 +86,6 @@ class RunStore:
         if run.is_current is True and self.__active_run != run.run_id:
             self.__active_run = run.run_id
 
-        # TODO (tz): Do we even need to insert the actions when creating a run?
-        # if run.actions:
-        #     self.insert_actions(run_id=run.run_id, actions=run.actions)
         return run
 
     def update(self, run: RunResource) -> RunResource:
