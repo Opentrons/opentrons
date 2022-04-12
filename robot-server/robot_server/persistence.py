@@ -96,8 +96,7 @@ actions_table = sqlalchemy.Table(
 )
 
 
-# TODO(mm, 2022-03-29): When we confirm we can use SQLAlchemy 1.4 on the OT-2,
-# convert these to return an async engine.
+# TODO(mm, 2022-03-29): convert these to return an async engine.
 # https://docs.sqlalchemy.org/en/14/orm/extensions/asyncio.html
 @contextmanager
 def opened_db(db_file_path: Path) -> Generator[SQLEngine, None, None]:
