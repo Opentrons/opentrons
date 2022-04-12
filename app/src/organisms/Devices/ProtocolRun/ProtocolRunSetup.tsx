@@ -5,7 +5,6 @@ import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 import { protocolHasModules } from '@opentrons/shared-data'
 
 import { Line } from '../../../atoms/structure'
-import { StyledText } from '../../../atoms/text'
 import {
   useDeckCalibrationData,
   useProtocolDetailsForRun,
