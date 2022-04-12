@@ -22,7 +22,7 @@ async def test_protocols_persist(protocol: Callable[[str], IO[bytes]]) -> None:
         with DevServer(port=port) as server:
             server.start()
             assert await robot_client.wait_until_alive(
-                6
+                10
             ), "Dev Robot never became available."
             protocols_to_create = 13
             for _ in range(protocols_to_create):
@@ -37,7 +37,7 @@ async def test_protocols_persist(protocol: Callable[[str], IO[bytes]]) -> None:
             assert await robot_client.wait_until_dead(12), "Dev Robot did not stop."
             server.start()
             assert await robot_client.wait_until_alive(
-                6
+                10
             ), "Dev Robot never became available."
             response = await robot_client.get_protocols()
             restarted_ids_created_at = [
