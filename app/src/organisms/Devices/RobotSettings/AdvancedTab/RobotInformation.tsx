@@ -33,6 +33,8 @@ export function RobotInformation({
     max: maxProtocolApiVersion,
   })
 
+  // TODO: serialNumber
+
   return (
     <Box>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} marginTop={SPACING.spacing4}>
