@@ -41,7 +41,7 @@ export interface TooltipProps extends StyleProps {
   arrowRef: React.RefCallback<HTMLElement | null>
   /** Inline styles to apply to arrow element (provided by useTooltip) */
   arrowStyle: CSSProperties
-  /** Specify tooltip width when the default width isn't big enough see PD's PathField/Path for example*/
+  /** Specify tooltip width when the default width isn't big enough see PD's PathField/Path for example */
   width?: string
   /** Specify background color to COLORS.darkBlack when implementing a tooltip in the app */
   backgroundColor?: string
@@ -80,71 +80,71 @@ export const Tooltip = React.forwardRef(function TooltipComponent(
       {...boxProps}
     >
       {children}
-      <Arrow {...{ arrowRef, arrowStyle, placement }} />
+      <Arrow {...{ arrowRef, arrowStyle, placement, backgroundColor }} />
     </Box>
   ) : null
 })
-
-// shift arrows off the element
-const ARROW_ANCHOR_OFFSET = `-${ARROW_SIZE_PX}px;`
-
-// use borders to create arrows
-const ARROW_CSS_BASE = css`
-  position: absolute;
-  border-width: ${ARROW_SIZE_PX}px;
-  border-style: solid;
-  border-color: transparent;
-`
-
-// arrow pointing down from the top tooltip
-const ARROW_CSS_TOP = css`
-  ${ARROW_CSS_BASE}
-  bottom: ${ARROW_ANCHOR_OFFSET};
-  border-bottom-style: none;
-  border-top-color: ${darkGrey};
-`
-
-// arrow pointing left from the right tooltip
-const ARROW_CSS_RIGHT = css`
-  ${ARROW_CSS_BASE}
-  left: ${ARROW_ANCHOR_OFFSET};
-  border-left-style: none;
-  border-right-color: ${darkGrey};
-`
-
-// arrow pointing up from the bottom tooltip
-const ARROW_CSS_BOTTOM = css`
-  ${ARROW_CSS_BASE}
-  top: ${ARROW_ANCHOR_OFFSET};
-  border-top-style: none;
-  border-bottom-color: ${darkGrey};
-`
-
-// arrow pointing right from the left tooltip
-const ARROW_CSS_LEFT = css`
-  ${ARROW_CSS_BASE}
-  right: ${ARROW_ANCHOR_OFFSET};
-  border-right-style: none;
-  border-left-color: ${darkGrey};
-`
-
-const ARROW_CSS_BY_PLACEMENT_BASE: Record<
-  string,
-  FlattenSimpleInterpolation
-> = {
-  top: ARROW_CSS_TOP,
-  right: ARROW_CSS_RIGHT,
-  bottom: ARROW_CSS_BOTTOM,
-  left: ARROW_CSS_LEFT,
-}
 
 export interface ArrowProps {
   placement: Placement | null
   arrowRef: React.RefCallback<HTMLElement>
   arrowStyle: CSSProperties
+  backgroundColor: string
 }
 
 export function Arrow(props: ArrowProps): JSX.Element {
+  // shift arrows off the element
+  const ARROW_ANCHOR_OFFSET = `-${ARROW_SIZE_PX}px;`
+
+  // use borders to create arrows
+  const ARROW_CSS_BASE = css`
+    position: absolute;
+    border-width: ${ARROW_SIZE_PX}px;
+    border-style: solid;
+    border-color: transparent;
+  `
+
+  // arrow pointing down from the top tooltip
+  const ARROW_CSS_TOP = css`
+    ${ARROW_CSS_BASE}
+    bottom: ${ARROW_ANCHOR_OFFSET};
+    border-bottom-style: none;
+    border-top-color: ${props.backgroundColor};
+  `
+
+  // arrow pointing left from the right tooltip
+  const ARROW_CSS_RIGHT = css`
+    ${ARROW_CSS_BASE}
+    left: ${ARROW_ANCHOR_OFFSET};
+    border-left-style: none;
+    border-right-color: ${props.backgroundColor};
+  `
+
+  // arrow pointing up from the bottom tooltip
+  const ARROW_CSS_BOTTOM = css`
+    ${ARROW_CSS_BASE}
+    top: ${ARROW_ANCHOR_OFFSET};
+    border-top-style: none;
+    border-bottom-color: ${props.backgroundColor};
+  `
+
+  // arrow pointing right from the left tooltip
+  const ARROW_CSS_LEFT = css`
+    ${ARROW_CSS_BASE}
+    right: ${ARROW_ANCHOR_OFFSET};
+    border-right-style: none;
+    border-left-color: ${props.backgroundColor};
+  `
+
+  const ARROW_CSS_BY_PLACEMENT_BASE: Record<
+    string,
+    FlattenSimpleInterpolation
+  > = {
+    top: ARROW_CSS_TOP,
+    right: ARROW_CSS_RIGHT,
+    bottom: ARROW_CSS_BOTTOM,
+    left: ARROW_CSS_LEFT,
+  }
   const placement = props.placement ?? ''
   const placementBase = placement.split('-')[0]
   const arrowCss = ARROW_CSS_BY_PLACEMENT_BASE[placementBase]
