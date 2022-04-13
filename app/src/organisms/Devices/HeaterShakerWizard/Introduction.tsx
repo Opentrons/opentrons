@@ -1,5 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -16,6 +17,9 @@ import {
 } from '@opentrons/components'
 
 import heaterShaker from '@opentrons/app/src/assets/images/heater_shaker_empty.png'
+import flatBottom from '@opentrons/app/src/assets/images/flatbottom_thermal_adapter.png'
+import deepwell from '@opentrons/app/src/assets/images/deepwell_thermal_adapter.png'
+import pcr from '@opentrons/app/src/assets/images/pcr_thermal_adapter.png'
 import screwdriver from '@opentrons/app/src/assets/images/t10_torx_screwdriver.png'
 
 import type {
@@ -94,24 +98,29 @@ interface IntroductionProps {
   thermalAdapterName: ThermalAdapterName | null
 }
 
+const THERMAL_ADAPTER_TRANSFORM = css`
+  transform: scale(1.4);
+  transform-origin: 90% 50%;
+`
+
 export function Introduction(props: IntroductionProps): JSX.Element {
   const { labwareDefinition, thermalAdapterName } = props
   const { t } = useTranslation('heater_shaker')
 
-  //  TODO(jr, 2022-04-03): plus in real thermal adapter images
+  //  TODO(jr, 2022-04-03): plus in universal adapter when available
   let adapterImage: string = ''
   switch (thermalAdapterName) {
     case 'PCR Adapter':
-      adapterImage = heaterShaker
+      adapterImage = pcr
       break
     case 'Universal Flat Adapter':
       adapterImage = heaterShaker
       break
     case 'Deep Well Adapter':
-      adapterImage = heaterShaker
+      adapterImage = deepwell
       break
     case '96 Flat Bottom Adapter':
-      adapterImage = heaterShaker
+      adapterImage = flatBottom
       break
   }
 
@@ -154,7 +163,11 @@ export function Introduction(props: IntroductionProps): JSX.Element {
             subtext={t('screw_may_be_in_module')}
             image={
               thermalAdapterName != null ? (
-                <Flex width={'6.25rem'} height={'4.313rem'}>
+                <Flex
+                  width={'6.2rem'}
+                  height={'4.313rem'}
+                  css={THERMAL_ADAPTER_TRANSFORM}
+                >
                   <img src={adapterImage} alt={`${thermalAdapterName}`} />
                 </Flex>
               ) : undefined
