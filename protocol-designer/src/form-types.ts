@@ -260,7 +260,7 @@ export interface HydratedHeaterShakerFormData {
   stepDetails: string | null
   moduleId: string
   heaterShakerSetTimer: 'true' | 'false' | null
-  setTemperature: boolean
+  setHeaterShakerTemperature: boolean
   setShake: boolean
   latchOpen: boolean
   targetHeaterShakerTemperature: string | null

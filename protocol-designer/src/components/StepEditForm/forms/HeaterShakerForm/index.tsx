@@ -41,7 +41,7 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
         >
           <div className={styles.toggle_row}>
             <ToggleRowField
-              {...propsForFields.setTemperature}
+              {...propsForFields.setHeaterShakerTemperature}
               offLabel={i18n.t(
                 'form.step_edit_form.field.heaterShaker.temperature.toggleOff'
               )}
@@ -49,7 +49,7 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
                 'form.step_edit_form.field.heaterShaker.temperature.toggleOn'
               )}
             />
-            {formData.setTemperature === true && (
+            {formData.setHeaterShakerTemperature === true && (
               <TextField
                 {...propsForFields.targetHeaterShakerTemperature}
                 className={cx(
