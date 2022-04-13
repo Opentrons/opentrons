@@ -22,6 +22,7 @@ class GCODE(str, Enum):
     OPEN_LABWARE_LATCH = "M242"
     CLOSE_LABWARE_LATCH = "M243"
     GET_LABWARE_LATCH_STATE = "M241"
+    DEACTIVATE_HEATER = "M106"
 
 
 HS_BAUDRATE = 115200
@@ -156,7 +157,10 @@ class HeaterShakerDriver(AbstractHeaterShakerDriver):
         return utils.parse_labware_latch_status_response(status_string=response)
 
     async def home(self) -> None:
-        """Send home command"""
+        """Send home command.
+        
+        Note: Homing also stops the shaking motion if applicable.
+        """
         c = CommandBuilder(terminator=HS_COMMAND_TERMINATOR).add_gcode(gcode=GCODE.HOME)
         await self._connection.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
 
@@ -176,3 +180,8 @@ class HeaterShakerDriver(AbstractHeaterShakerDriver):
         )
         await self._connection.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
         await self._connection.close()
+
+    async def deactivate_heater(self) -> None:
+        """Send deactivate-heater command"""
+        c = CommandBuilder(terminator=HS_COMMAND_TERMINATOR).add_gcode(gcode=GCODE.DEACTIVATE_HEATER)
+        await self._connection.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)

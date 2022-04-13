@@ -2,6 +2,7 @@ import asyncio
 import logging
 from anyio import create_task_group
 from dataclasses import dataclass
+from types import NoneType
 from typing import Optional, Mapping, Callable
 from typing_extensions import Final
 from opentrons.drivers.rpi_drivers.types import USBPort
@@ -396,8 +397,19 @@ class HeaterShaker(mod_abc.AbstractModule):
     async def deactivate(self) -> None:
         """Stop heating/cooling; stop shaking and home the plate"""
         await self.wait_for_is_running()
-        # TODO (spp, 2022-3-22): Use a separate gcode for deactivating heating
-        await self._driver.set_temperature(0)
+        await self._driver.deactivate_heater()
+        self._listener.state.temperature.target = None
+        await self._driver.home()
+
+    async def deactivate_heater(self) -> None:
+        """Stop heating/cooling"""
+        await self.wait_for_is_running()
+        await self._driver.deactivate_heater()
+        self._listener.state.temperature.target = None
+
+    async def deactivate_shaker(self) -> None:
+        """Stop shaking and home the plate"""
+        await self.wait_for_is_running()
         await self._driver.home()
 
     async def open_labware_latch(self) -> None:

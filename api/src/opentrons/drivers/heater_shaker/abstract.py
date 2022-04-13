@@ -59,6 +59,11 @@ class AbstractHeaterShakerDriver(ABC):
     async def home(self) -> None:
         """Send deactivate shaker command"""
         ...
+        
+    @abstractmethod
+    async def deactivate_heater(self) -> None:
+        """Send deactivate heater command"""
+        ...
 
     @abstractmethod
     async def get_device_info(self) -> Dict[str, str]:
