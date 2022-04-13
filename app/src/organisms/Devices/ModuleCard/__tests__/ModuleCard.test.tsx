@@ -4,7 +4,12 @@ import { fireEvent } from '@testing-library/react'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
+import {
+  DispatchApiRequestType,
+  useDispatchApiRequest,
+} from '../../../../redux/robot-api'
 import { useCurrentRunStatus } from '../../../RunTimeControl/hooks'
+import * as RobotApi from '../../../../redux/robot-api'
 import { MagneticModuleData } from '../MagneticModuleData'
 import { TemperatureModuleData } from '../TemperatureModuleData'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
@@ -17,12 +22,12 @@ import {
   mockThermocycler,
   mockHeaterShaker,
 } from '../../../../redux/modules/__fixtures__'
+import { mockRobot } from '../../../../redux/robot-api/__fixtures__'
 
 import type {
   HeaterShakerModule,
   MagneticModule,
 } from '../../../../redux/modules/types'
-import { mockRobot } from '../../../../redux/robot-api/__fixtures__'
 
 jest.mock('../MagneticModuleData')
 jest.mock('../TemperatureModuleData')
@@ -30,6 +35,7 @@ jest.mock('../ThermocyclerModuleData')
 jest.mock('../HeaterShakerModuleData')
 jest.mock('../ModuleOverflowMenu')
 jest.mock('../../../RunTimeControl/hooks')
+jest.mock('../../../../redux/robot-api')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
@@ -56,7 +62,12 @@ const mockHeaterShakerModuleData = HeaterShakerModuleData as jest.MockedFunction
 const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
   typeof useCurrentRunStatus
 >
-
+const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
+  typeof useDispatchApiRequest
+>
+const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
+  typeof RobotApi.getRequestById
+>
 const mockMagneticModuleHub = {
   model: 'magneticModuleV1',
   type: 'magneticModuleType',
@@ -103,7 +114,11 @@ const render = (props: React.ComponentProps<typeof ModuleCard>) => {
 }
 
 describe('ModuleCard', () => {
+  let dispatchApiRequest: DispatchApiRequestType
+
   beforeEach(() => {
+    dispatchApiRequest = jest.fn()
+    mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, ['id']])
     mockMagneticModuleData.mockReturnValue(<div>Mock Magnetic Module Data</div>)
     mockThermocyclerModuleData.mockReturnValue(
       <div>Mock Thermocycler Module Data</div>
@@ -112,7 +127,15 @@ describe('ModuleCard', () => {
       <div>Mock Heater Shaker Module Data</div>
     )
     mockModuleOverflowMenu.mockReturnValue(<div>mock module overflow menu</div>)
-
+    mockGetRequestById.mockReturnValue({
+      status: RobotApi.SUCCESS,
+      response: {
+        method: 'POST',
+        ok: true,
+        path: '/',
+        status: 200,
+      },
+    })
     when(mockUseCurrentRunStatus)
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_IDLE)
@@ -227,6 +250,6 @@ describe('ModuleCard', () => {
       robotName: mockRobot.name,
     })
     getByText('Firmware update available.')
-    getByText('View Update')
+    getByText('Update now')
   })
 })
