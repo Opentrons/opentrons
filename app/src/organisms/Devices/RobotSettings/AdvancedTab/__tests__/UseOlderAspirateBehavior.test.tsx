@@ -3,27 +3,20 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
-import {
-  updateSetting,
-  getRobotSettings,
-} from '../../../../../redux/robot-settings'
-
+import { getRobotSettings } from '../../../../../redux/robot-settings'
 import { UseOlderAspirateBehavior } from '../UseOlderAspirateBehavior'
 
 jest.mock('../../../../../redux/robot-settings/selectors')
-
-const mockUpdateSetting = updateSetting as jest.MockedFunction<
-  typeof updateSetting
->
 
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
 >
 
 const mockSettings = {
-  id: 'homing-test',
-  title: 'Disable home on boot',
-  description: 'Disable home on boot test',
+  id: 'useOldAspirationFunctions',
+  title: 'Use older aspirate behavior',
+  description:
+    'Aspirate with the less accurate volumetric calibrations that were used before version 3.7.0. Use this if you need consistency with pre-v3.7.0 results. This only affects GEN1 P10S, P10M, P50S, P50M, and P300S pipettes.',
   value: true,
   restart_required: false,
 }
@@ -55,6 +48,20 @@ describe('RobotSettings UseOlderAspirateBehavior', () => {
     const toggleButton = getByRole('switch', {
       name: 'use_older_aspirate_behavior',
     })
+    expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+  })
+
+  it('should change the value when a user clicks a toggle button', () => {
+    const tempMockSettings = {
+      ...mockSettings,
+      value: false,
+    }
+    mockGetRobotSettings.mockReturnValue([tempMockSettings])
+    const [{ getByRole }] = render()
+    const toggleButton = getByRole('switch', {
+      name: 'use_older_aspirate_behavior',
+    })
+    fireEvent.click(toggleButton)
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
   })
 })

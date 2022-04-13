@@ -3,27 +3,20 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
-import {
-  updateSetting,
-  getRobotSettings,
-} from '../../../../../redux/robot-settings'
-
+import { getRobotSettings } from '../../../../../redux/robot-settings'
 import { UseOlderProtocol } from '../UseOlderProtocol'
 
 jest.mock('../../../../../redux/robot-settings/selectors')
-
-const mockUpdateSetting = updateSetting as jest.MockedFunction<
-  typeof updateSetting
->
 
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
 >
 
 const mockSettings = {
-  id: 'homing-test',
-  title: 'Disable home on boot',
-  description: 'Disable home on boot test',
+  id: 'disableFastProtocolUpload',
+  title: 'Use older protocol analysis method',
+  description:
+    'Use an older, slower method of analyzing uploaded protocols. This changes how the OT-2 validates your protocol during the upload step, but does not affect how your protocol actually runs. Opentrons Support might ask you to change this setting if you encounter problems with the newer, faster protocol analysis method.',
   value: true,
   restart_required: false,
 }
@@ -56,6 +49,20 @@ describe('RobotSettings ShortTrashBin', () => {
     const toggleButton = getByRole('switch', {
       name: 'use_older_protocol_analysis_method',
     })
+    expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+  })
+
+  it('should change the value when a user clicks a toggle button', () => {
+    const tempMockSettings = {
+      ...mockSettings,
+      value: false,
+    }
+    mockGetRobotSettings.mockReturnValue([tempMockSettings])
+    const [{ getByRole }] = render()
+    const toggleButton = getByRole('switch', {
+      name: 'use_older_protocol_analysis_method',
+    })
+    fireEvent.click(toggleButton)
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
   })
 })

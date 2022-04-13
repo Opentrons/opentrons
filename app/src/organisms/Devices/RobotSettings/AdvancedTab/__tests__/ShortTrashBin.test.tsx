@@ -3,27 +3,19 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
-import {
-  updateSetting,
-  getRobotSettings,
-} from '../../../../../redux/robot-settings'
-
+import { getRobotSettings } from '../../../../../redux/robot-settings'
 import { ShortTrashBin } from '../ShortTrashBin'
 
 jest.mock('../../../../../redux/robot-settings/selectors')
-
-const mockUpdateSetting = updateSetting as jest.MockedFunction<
-  typeof updateSetting
->
 
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
 >
 
 const mockSettings = {
-  id: 'homing-test',
-  title: 'Disable home on boot',
-  description: 'Disable home on boot test',
+  id: 'shortFixedTrash',
+  title: 'Short (55mm) fixed trash',
+  description: 'Trash box is 55mm tall (rather than the 77mm default)',
   value: true,
   restart_required: false,
 }
@@ -53,6 +45,20 @@ describe('RobotSettings ShortTrashBin', () => {
       'For pre-2019 robots with trash bins that are 55mm tall (instead of 77mm default)'
     )
     const toggleButton = getByRole('switch', { name: 'short_trash_bin' })
+    expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+  })
+
+  it('should change the value when a user clicks a toggle button', () => {
+    const tempMockSettings = {
+      ...mockSettings,
+      value: false,
+    }
+    mockGetRobotSettings.mockReturnValue([tempMockSettings])
+    const [{ getByRole }] = render()
+    const toggleButton = getByRole('switch', {
+      name: 'short_trash_bin',
+    })
+    fireEvent.click(toggleButton)
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
   })
 })

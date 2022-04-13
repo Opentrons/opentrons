@@ -3,18 +3,11 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
-import {
-  updateSetting,
-  getRobotSettings,
-} from '../../../../../redux/robot-settings'
+import { getRobotSettings } from '../../../../../redux/robot-settings'
 
 import { DisableHoming } from '../DisableHoming'
 
 jest.mock('../../../../../redux/robot-settings/selectors')
-
-const mockUpdateSetting = updateSetting as jest.MockedFunction<
-  typeof updateSetting
->
 
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
@@ -54,21 +47,17 @@ describe('RobotSettings DisableHoming', () => {
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
   })
 
-  it('should update the value when a user clicks a toggole button', () => {
+  it('should change the value when a user clicks a toggle button', () => {
     const tempMockSettings = {
-      id: 'homing-test',
-      title: 'Disable home on boot',
-      description: 'Disable home on boot test',
+      ...mockSettings,
       value: false,
-      restart_required: false,
     }
-    // const tempSettings = { ...mockSettings, value: false }
-    updateSetting('otie', tempMockSettings.id, tempMockSettings.value)
-    // mockGetRobotSettings.mockReturnValue([tempMockSettings])
+    mockGetRobotSettings.mockReturnValue([tempMockSettings])
     const [{ getByRole }] = render()
-    // const toggleButton = getByRole('switch', { name: 'disable_homing' })
-    // fireEvent.click(toggleButton)
-    // expect(toggleButton).getAttribute('aria-checked', 'false')
-    // expect(toggleButton.getAttribute('aria-checked')).toBe('false')
+    const toggleButton = getByRole('switch', {
+      name: 'disable_homing',
+    })
+    fireEvent.click(toggleButton)
+    expect(toggleButton.getAttribute('aria-checked')).toBe('true')
   })
 })
