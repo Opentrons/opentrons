@@ -138,7 +138,7 @@ describe('AboutModuleSlideout', () => {
     const button = getByRole('button', { name: 'View Firmware Update' })
     fireEvent.click(button)
     expect(button).toBeEnabled()
-    const viewUpdate = getByRole('button', { name: 'View Update' })
+    const viewUpdate = getByRole('button', { name: 'Update now' })
     fireEvent.click(viewUpdate)
     expect(viewUpdate).toBeEnabled()
     const exit = getByLabelText('close_icon')
