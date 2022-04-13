@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { MemoryRouter } from 'react-router-dom'
 import { i18n } from '../../../../i18n'
 import { useAttachedModules } from '../../hooks'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
@@ -15,7 +16,6 @@ import { TestShake } from '../TestShake'
 
 import type { ProtocolModuleInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
 
-jest.mock('../../../../redux/robot/selectors')
 jest.mock('../Introduction')
 jest.mock('../KeyParts')
 jest.mock('../AttachModule')
@@ -23,8 +23,6 @@ jest.mock('../AttachAdapter')
 jest.mock('../PowerOn')
 jest.mock('../TestShake')
 jest.mock('../../hooks')
-jest.mock('../../../../redux/modules')
-jest.mock('../../ModuleCard/hooks')
 
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
@@ -43,30 +41,26 @@ const mockAttachAdapter = AttachAdapter as jest.MockedFunction<
 const mockPowerOn = PowerOn as jest.MockedFunction<typeof PowerOn>
 const mockTestShake = TestShake as jest.MockedFunction<typeof TestShake>
 
-const render = (props: React.ComponentProps<typeof HeaterShakerWizard>) => {
-  return renderWithProviders(<HeaterShakerWizard {...props} />, {
-    i18nInstance: i18n,
-  })[0]
+const render = (
+  props: React.ComponentProps<typeof HeaterShakerWizard>,
+  path = '/'
+) => {
+  return renderWithProviders(
+    <MemoryRouter initialEntries={[path]} initialIndex={0}>
+      <HeaterShakerWizard {...props} />
+    </MemoryRouter>,
+    {
+      i18nInstance: i18n,
+    }
+  )[0]
 }
 
-const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
-  moduleId: 'heater_shaker_id',
-  x: 0,
-  y: 0,
-  z: 0,
-  moduleDef: mockHeaterShaker as any,
-  nestedLabwareDef: heaterShakerCommands.labwareDefinitions['example/plate/1'],
-  nestedLabwareDisplayName: null,
-  nestedLabwareId: null,
-  protocolLoadOrder: 1,
-  slotName: '1',
-} as ProtocolModuleInfo
-
 describe('HeaterShakerWizard', () => {
-  const props: React.ComponentProps<typeof HeaterShakerWizard> = {
-    onCloseClick: jest.fn(),
-  }
+  let props: React.ComponentProps<typeof HeaterShakerWizard>
   beforeEach(() => {
+    props = {
+      onCloseClick: jest.fn(),
+    }
     mockUseAttachedModules.mockReturnValue([mockHeaterShaker])
     mockIntroduction.mockReturnValue(<div>Mock Introduction</div>)
     mockKeyParts.mockReturnValue(<div>Mock Key Parts</div>)
@@ -76,13 +70,16 @@ describe('HeaterShakerWizard', () => {
     mockTestShake.mockReturnValue(<div>Mock Test Shake</div>)
   })
 
-  it('renders the main modal component of the wizard', () => {
-    const { getByText } = render(props)
+  it('renders the main modal component of the wizard and exit button is clickable', () => {
+    const { getByText, getByLabelText } = render(props)
     getByText(/Attach Heater Shaker Module/i)
     getByText('Mock Introduction')
+    const close = getByLabelText('close')
+    fireEvent.click(close)
+    expect(props.onCloseClick).toHaveBeenCalled()
   })
 
-  it('renders wizard and returns the correct pages when the buttons are clicked with test shake button disabled', () => {
+  it('renders wizard and returns the correct pages when the buttons are clicked', () => {
     const { getByText, getByRole } = render(props)
 
     let button = getByRole('button', { name: 'Continue to attachment guide' })
@@ -108,7 +105,49 @@ describe('HeaterShakerWizard', () => {
     getByRole('button', { name: 'Complete' })
   })
 
-  it('renders power on component and the test shake button is not disabled', () => {
+  it('renders wizard and returns the correct pages when the buttons are clicked and protocol is known', () => {
+    props = {
+      onCloseClick: jest.fn(),
+      moduleFromProtocol: {
+        moduleId: 'heater_shaker_id',
+        x: 0,
+        y: 0,
+        z: 0,
+        moduleDef: mockHeaterShaker as any,
+        nestedLabwareDef:
+          heaterShakerCommands.labwareDefinitions['example/plate/1'],
+        nestedLabwareDisplayName: null,
+        nestedLabwareId: null,
+        protocolLoadOrder: 1,
+        slotName: '1',
+      } as ProtocolModuleInfo,
+    }
+    const { getByText, getByRole } = render(props)
+
+    let button = getByRole('button', { name: 'Continue to attachment guide' })
+    fireEvent.click(button)
+    getByText('Mock Key Parts')
+
+    button = getByRole('button', { name: 'Begin attachment' })
+    fireEvent.click(button)
+    getByText('Mock Attach Module')
+
+    button = getByRole('button', { name: 'Continue to attach thermal adapter' })
+    fireEvent.click(button)
+    getByText('Mock Attach Adapter')
+
+    button = getByRole('button', { name: 'Continue to power on module' })
+    fireEvent.click(button)
+    getByText('Mock Power On')
+
+    button = getByRole('button', { name: 'Continue to test shake' })
+    fireEvent.click(button)
+    getByText('Mock Test Shake')
+
+    getByRole('button', { name: 'Complete' })
+  })
+
+  it('renders power on component and the test shake button is disabled', () => {
     mockUseAttachedModules.mockReturnValue([])
 
     const { getByText, getByRole } = render(props)
