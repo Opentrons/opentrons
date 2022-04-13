@@ -2,6 +2,8 @@
 import pytest
 from datetime import datetime
 from typing import Generator
+
+from multidict import istr
 from sqlalchemy.engine import Engine as SQLEngine
 from pathlib import Path
 
@@ -73,10 +75,14 @@ def test_update_active_run(subject: RunStore) -> None:
 
     subject.insert(run)
 
-    subject.update_active_run(run_id=run.run_id, is_current=updated_run.is_current)
-    result = subject.get(run_id=run.run_id)
-    print(result)
+    result = subject.update_active_run(run_id=run.run_id, is_current=updated_run.is_current)
     assert result.is_current == updated_run.is_current
+
+
+def test_update_active_run_run_not_found(subject: RunStore) -> None:
+    """It should raise RunNotFound error."""
+    with pytest.raises(RunNotFoundError, match="run-id"):
+        subject.update_active_run(run_id="run-id", is_current=True)
 
 
 def test_get_run_no_actions(subject: RunStore) -> None:

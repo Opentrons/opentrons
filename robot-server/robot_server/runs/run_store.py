@@ -36,7 +36,7 @@ class RunStore:
     """Methods for storing and retrieving run resources."""
 
     def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
-        """Initialize a RunStore and its in-memory storage."""
+        """Initialize a RunStore with sql engine."""
         self._sql_engine = sql_engine
         self._active_run = ""
 
