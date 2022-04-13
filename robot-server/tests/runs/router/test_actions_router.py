@@ -160,20 +160,6 @@ async def test_create_play_action_not_allowed(
     task_runner: TaskRunner,
 ) -> None:
     """It should 409 if the runner is not able to handle the action."""
-    actions = RunAction(
-        actionType=RunActionType.PLAY,
-        createdAt=datetime(year=2022, month=2, day=2),
-        id="action-id",
-    )
-
-    next_run = RunResource(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1),
-        actions=[actions],
-        is_current=True,
-    )
-
     decoy.when(mock_engine_store.runner.was_started()).then_return(True)
 
     decoy.when(mock_engine_store.runner.play()).then_raise(

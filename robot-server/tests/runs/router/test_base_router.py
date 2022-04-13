@@ -664,9 +664,7 @@ async def test_update_run_to_not_current(
 
 
 async def test_update_current_to_current_noop(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore
+    decoy: Decoy, mock_engine_store: EngineStore, mock_run_store: RunStore
 ) -> None:
     """It should noop if updating the current run to current: true."""
     run_resource = RunResource(
