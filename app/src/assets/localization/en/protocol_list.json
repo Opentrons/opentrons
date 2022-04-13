@@ -7,8 +7,10 @@
   "left_mount": "left mount",
   "loading_data": "Loading data...",
   "modules": "modules",
+  "protocol_analysis_failure": "Protocol analysis failure.",
   "right_mount": "right mount",
   "robot": "robot",
   "run": "Run",
-  "this_protocol_will_be_trashed": "This protocol will be moved to this computer’s trash and may be unrecoverable."
+  "this_protocol_will_be_trashed": "This protocol will be moved to this computer’s trash and may be unrecoverable.",
+  "updated": "Updated"
 }

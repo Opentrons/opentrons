@@ -75,7 +75,7 @@ export function ChooseProtocolSlideout(
         </ApiHostProvider>
       }
     >
-      {storedProtocols.length > 0 ? (
+      {storedProtocols.length > 0 && false ? (
         storedProtocols.map(storedProtocol => (
           <MiniCard
             key={storedProtocol.protocolKey}

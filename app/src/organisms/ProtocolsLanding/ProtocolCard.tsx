@@ -9,6 +9,7 @@ import {
 } from '@opentrons/shared-data'
 
 import {
+  Box,
   Flex,
   Icon,
   DIRECTION_ROW,
@@ -20,6 +21,7 @@ import {
   ALIGN_CENTER,
   SIZE_3,
   ModuleIcon,
+  POSITION_ABSOLUTE,
 } from '@opentrons/components'
 import { Link } from 'react-router-dom'
 import {
@@ -31,6 +33,7 @@ import { StoredProtocolData } from '../../redux/protocol-storage'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
+import { Banner } from '../../atoms/Banner'
 
 interface ProtocolCardProps extends StoredProtocolData {
   handleRunProtocol: () => void
@@ -68,26 +71,17 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
           <AnalysisInfo
             mostRecentAnalysis={mostRecentAnalysis}
             protocolDisplayName={protocolDisplayName}
+            modified={modified}
           />
         ) : (
           <StyledText as="p">{t('loading_data')}</StyledText>
         )}
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Box position={POSITION_ABSOLUTE} top={SPACING.spacing2} right={SPACING.spacing2}>
           <ProtocolOverflowMenu
             protocolKey={protocolKey}
             handleRunProtocol={handleRunProtocol}
           />
-          <StyledText
-            as="label"
-            position="absolute"
-            bottom={SPACING.spacing4}
-            right={SPACING.spacing4}
-          >
-            {t('last_updated_at', {
-              date: format(new Date(modified), 'MM/dd/yy HH:mm:ss'),
-            })}
-          </StyledText>
-        </Flex>
+        </Box>
       </Flex>
     </Link>
   )
@@ -95,12 +89,12 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
 
 interface AnalysisInfoProps {
   protocolDisplayName: string
+  modified: number
   mostRecentAnalysis: ProtocolAnalysisFile<{}>
 }
 function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
-  const { protocolDisplayName, mostRecentAnalysis } = props
+  const { protocolDisplayName, mostRecentAnalysis, modified } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
-  const robotModel = mostRecentAnalysis?.robot?.model ?? t('shared:no_data')
   const {
     left: leftMountPipetteName,
     right: rightMountPipetteName,
@@ -110,11 +104,10 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   ).map(getModuleType)
 
   return (
-    <Flex>
+    <Flex flex="1">
       <Flex
         marginRight={SPACING.spacing4}
-        height="6rem"
-        width="6rem"
+        size="6rem"
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
       >
@@ -124,15 +117,16 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           <Icon name="ot-spinner" spin size={SIZE_3} />
         )}
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
+      <Flex
+        flex="1"
+        flexDirection={DIRECTION_COLUMN}
+        marginRight={SPACING.spacing4}
+      >
+        <Banner type="error">{t('protocol_analysis_failure')}</Banner>
         <StyledText as="h3" marginBottom={SPACING.spacing4} height="2.75rem">
           {protocolDisplayName}
         </StyledText>
         <Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
-            <StyledText as="h6">{t('robot')}</StyledText>
-            <StyledText as="p">{robotModel}</StyledText>
-          </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
             <StyledText as="h6">{t('left_mount')}</StyledText>
             <StyledText as="p">
@@ -167,6 +161,12 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               </Flex>
             </Flex>
           ) : null}
+          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
+            <StyledText as="h6">{t('updated')}</StyledText>
+            <StyledText as="label">
+              {format(new Date(modified), 'MM/dd/yy HH:mm:ss')}
+            </StyledText>
+          </Flex>
         </Flex>
       </Flex>
     </Flex>

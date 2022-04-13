@@ -12,16 +12,15 @@ import {
   BORDERS,
   Btn,
 } from '@opentrons/components'
-import { css } from 'styled-components'
+
+import type { StyleProps } from '@opentrons/components'
 
 export type BannerType = 'success' | 'warning' | 'error' | 'updating'
 
-export interface BannerProps {
+export interface BannerProps extends StyleProps {
   /** name constant of the icon to display */
   type: BannerType
-  /** title/main message of colored alert bar */
-  title: React.ReactNode
-  /** Alert message body contents */
+  /** Banner contents */
   children?: React.ReactNode
   /** optional handler to show close button/clear alert  */
   onCloseClick?: () => unknown
@@ -55,28 +54,15 @@ const BANNER_PROPS_BY_TYPE: Record<
   },
 }
 
-const MESSAGE_STYLING = css`
-  padding: ${SPACING.spacing4} 3rem;
-  background-color: ${COLORS.white};
-
-  & a {
-    text-decoration: underline;
-    color: inherit;
-  }
-
-  &:empty {
-    padding: 0;
-  }
-`
 export function Banner(props: BannerProps): JSX.Element {
-  const bannerProps = BANNER_PROPS_BY_TYPE[props.type]
-  const icon = props.icon ? props.icon : bannerProps.icon
+  const {type, onCloseClick, icon, children, ...styleProps} = props
+  const bannerProps = BANNER_PROPS_BY_TYPE[type]
 
   const iconProps = {
-    ...icon,
+    ...(icon ?? bannerProps.icon),
     size: SPACING.spacing4,
     marginRight: SPACING.spacing3,
-    color: BANNER_PROPS_BY_TYPE[props.type].color,
+    color: BANNER_PROPS_BY_TYPE[type].color,
   }
 
   return (
@@ -84,10 +70,11 @@ export function Banner(props: BannerProps): JSX.Element {
       fontSize={TYPOGRAPHY.fontSizeP}
       fontWeight={TYPOGRAPHY.fontWeightRegular}
       borderRadius={SPACING.spacing2}
-      backgroundColor={BANNER_PROPS_BY_TYPE[props.type].backgroundColor}
+      backgroundColor={BANNER_PROPS_BY_TYPE[type].backgroundColor}
       border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${
-        BANNER_PROPS_BY_TYPE[props.type].color
+        BANNER_PROPS_BY_TYPE[type].color
       }`}
+      {...styleProps}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -96,14 +83,16 @@ export function Banner(props: BannerProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         padding={`${SPACING.spacing2} ${SPACING.spacing2} ${SPACING.spacing2} ${SPACING.spacing3}`}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        data-testid={`Banner_${props.title}_${props.type}`}
+        data-testid={`Banner_${type}`}
       >
         <Icon
           {...iconProps}
-          aria-label={`icon_${props.type}`}
-          spin={BANNER_PROPS_BY_TYPE[props.type].icon.name === 'ot-spinner'}
+          aria-label={`icon_${type}`}
+          spin={BANNER_PROPS_BY_TYPE[type].icon.name === 'ot-spinner'}
         />
-        <Flex width="100%">{props.title}</Flex>
+        <Flex flex="1" alignItems={ALIGN_CENTER}>
+          {props.children}
+        </Flex>
         {props.onCloseClick && (
           <Btn
             onClick={props.onCloseClick}
@@ -114,7 +103,6 @@ export function Banner(props: BannerProps): JSX.Element {
           </Btn>
         )}
       </Flex>
-      {props.children && <Flex css={MESSAGE_STYLING}>{props.children}</Flex>}
     </Flex>
   )
 }

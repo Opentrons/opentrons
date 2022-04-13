@@ -63,8 +63,15 @@ export function runFileWithPython(
         log.debug('python output: ', output)
         fs.writeFile(destFilePath, output.stdout)
       })
-      .catch(e => {
+      .catch((e: Error) => {
         log.error(e)
+        fs.writeJSON(destFilePath, {
+          errors: [e.message],
+          files: [],
+          config: {},
+          metadata: [],
+          commands: [],
+        })
       })
   } else {
     return Promise.reject(new Error('Python interpreter could not be found'))
