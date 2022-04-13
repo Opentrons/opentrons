@@ -10,8 +10,6 @@ from pathlib import Path
 from tempfile import mkdtemp
 from typing_extensions import Final
 from anyio import Path as AsyncPath
-from contextlib import contextmanager
-from typing import Generator
 
 from robot_server.app_state import AppState, AppStateValue, get_app_state
 from robot_server.settings import get_settings
@@ -94,23 +92,6 @@ actions_table = sqlalchemy.Table(
         sqlalchemy.ForeignKey("run.id"),
     ),
 )
-
-
-# TODO(mm, 2022-03-29): convert these to return an async engine.
-# https://docs.sqlalchemy.org/en/14/orm/extensions/asyncio.html
-@contextmanager
-def opened_db(db_file_path: Path) -> Generator[SQLEngine, None, None]:
-    """Return an Engine for a SQLite database on the filesystem.
-
-    Clean up the engine when the context manager exits.
-
-    The new database will be totally blank--no tables.
-    """
-    sql_engine = open_db_no_cleanup(db_file_path=db_file_path)
-    try:
-        yield sql_engine
-    finally:
-        sql_engine.dispose()
 
 
 def open_db_no_cleanup(db_file_path: Path) -> SQLEngine:
