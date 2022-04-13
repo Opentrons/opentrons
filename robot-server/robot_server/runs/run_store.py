@@ -57,6 +57,7 @@ class RunStore:
         return [_convert_sql_row_to_action(action) for action in actions]
 
     def update_active_run(self, run_id: str, is_current: bool) -> RunResource:
+        print("run id: ", run_id, "is current: ", is_current)
         if is_current is True:
             self._active_run = run_id
         elif is_current is False and self._active_run == run_id:

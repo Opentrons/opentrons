@@ -31,7 +31,6 @@ from robot_server.protocols import (
 )
 
 from ..run_store import RunStore, RunResource, RunNotFoundError
-from ..run_view import RunView
 from ..run_models import Run, RunSummary, RunCreate, RunUpdate
 from ..engine_store import EngineStore, EngineConflictError
 from ..dependencies import get_run_store, get_engine_store
@@ -323,7 +322,6 @@ async def update_run(
     Args:
         runId: Run ID pulled from URL.
         request_body: Update data from request body.
-        run_view: Run model manipulation interface.
         run_store: Run storage interface.
         engine_store: ProtocolEngine storage and control.
     """
@@ -343,19 +341,18 @@ async def update_run(
             await engine_store.clear()
         except EngineConflictError:
             raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
-        updated_run = run_store.update_active_run(run_id=runId,
-                                                  is_current=update.current if update.current is not None else run.is_current)
+        run = run_store.update_active_run(run_id=runId,
+                is_current=update.current if update.current is not None else run.is_current)
         log.info(f'Marked run "{runId}" as not current.')
 
     engine_state = engine_store.get_state(run.run_id)
 
-    run_resource = updated_run if updated_run else run
     data = Run.construct(
-        id=run_resource.run_id,
-        protocolId=run_resource.protocol_id,
-        createdAt=run_resource.created_at,
-        current=run_resource.is_current,
-        actions=run_resource.actions,
+        id=run.run_id,
+        protocolId=run.protocol_id,
+        createdAt=run.created_at,
+        current=run.is_current,
+        actions=run.actions,
         errors=engine_state.commands.get_all_errors(),
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
