@@ -3,7 +3,7 @@ import { css } from 'styled-components'
 
 import { fontSizeLabel } from '../ui-style-constants/typography'
 import { spacing3, spacingS } from '../ui-style-constants/spacing'
-import { darkBlack, white } from '../ui-style-constants/colors'
+import { white, darkGrey } from '../ui-style-constants/colors'
 import { ARROW_SIZE_PX } from './styles'
 import { Box } from '../primitives'
 
@@ -17,12 +17,10 @@ const TOOLTIP_CSS = css`
   z-index: 9001;
   padding: ${spacing3};
   color: ${white};
-  background-color: ${darkBlack};
   filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.2));
   cursor: pointer;
   font-size: ${fontSizeLabel};
   border-radius: ${spacingS};
-  width: 8.75rem;
 `
 
 export interface TooltipProps extends StyleProps {
@@ -43,6 +41,10 @@ export interface TooltipProps extends StyleProps {
   arrowRef: React.RefCallback<HTMLElement | null>
   /** Inline styles to apply to arrow element (provided by useTooltip) */
   arrowStyle: CSSProperties
+  /** Specify tooltip width when the default width isn't big enough see PD's PathField/Path for example*/
+  width?: string
+  /** Specify background color to COLORS.darkBlack when implementing a tooltip in the app */
+  backgroundColor?: string
 }
 
 /**
@@ -61,6 +63,8 @@ export const Tooltip = React.forwardRef(function TooltipComponent(
     arrowRef,
     arrowStyle,
     children,
+    width = '8.75rem',
+    backgroundColor = darkGrey,
     ...boxProps
   } = props
 
@@ -71,6 +75,8 @@ export const Tooltip = React.forwardRef(function TooltipComponent(
       style={style}
       ref={ref}
       css={TOOLTIP_CSS}
+      width={width}
+      backgroundColor={backgroundColor}
       {...boxProps}
     >
       {children}
@@ -95,7 +101,7 @@ const ARROW_CSS_TOP = css`
   ${ARROW_CSS_BASE}
   bottom: ${ARROW_ANCHOR_OFFSET};
   border-bottom-style: none;
-  border-top-color: ${darkBlack};
+  border-top-color: ${darkGrey};
 `
 
 // arrow pointing left from the right tooltip
@@ -103,7 +109,7 @@ const ARROW_CSS_RIGHT = css`
   ${ARROW_CSS_BASE}
   left: ${ARROW_ANCHOR_OFFSET};
   border-left-style: none;
-  border-right-color: ${darkBlack};
+  border-right-color: ${darkGrey};
 `
 
 // arrow pointing up from the bottom tooltip
@@ -111,7 +117,7 @@ const ARROW_CSS_BOTTOM = css`
   ${ARROW_CSS_BASE}
   top: ${ARROW_ANCHOR_OFFSET};
   border-top-style: none;
-  border-bottom-color: ${darkBlack};
+  border-bottom-color: ${darkGrey};
 `
 
 // arrow pointing right from the left tooltip
@@ -119,7 +125,7 @@ const ARROW_CSS_LEFT = css`
   ${ARROW_CSS_BASE}
   right: ${ARROW_ANCHOR_OFFSET};
   border-right-style: none;
-  border-left-color: ${darkBlack};
+  border-left-color: ${darkGrey};
 `
 
 const ARROW_CSS_BY_PLACEMENT_BASE: Record<
