@@ -2,30 +2,34 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
-import * as RobotApi from '../../../../redux/robot-api'
-import * as Networking from '../../../../redux/networking'
-
 import { useInterval } from '@opentrons/components'
-import { Portal } from '../../../../App/portal'
-import { SelectSsid } from './SelectSsid'
-import { ConnectModal } from './ConnectModal'
-import { DisconnectModal } from './DisconnectModal'
-import { ResultModal } from './ResultModal'
+import * as RobotApi from '../../../redux/robot-api'
+import * as Networking from '../../../redux/networking'
+import { Portal } from '../../../App/portal'
 
-import { CONNECT, DISCONNECT, JOIN_OTHER } from './constants'
+import { SelectSsid } from './ConnectNetwork/SelectSsid'
+import { ConnectModal } from './ConnectNetwork/ConnectModal'
+import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
+import { ResultModal } from './ConnectNetwork/ResultModal'
 
-import type { State, Dispatch } from '../../../../redux/types'
-import type { WifiConfigureRequest, NetworkChangeState } from './types'
+import { CONNECT, DISCONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
 
-interface SelectNetworkProps {
+import type { State, Dispatch } from '../../../redux/types'
+import type { WifiNetwork } from '../../../redux/networking/types'
+import type {
+  WifiConfigureRequest,
+  NetworkChangeState,
+} from './ConnectNetwork/types'
+
+interface TempSelectNetworkProps {
   robotName: string
 }
 
 const LIST_REFRESH_MS = 10000
 
-export const SelectNetwork = ({
+export const TemporarySelectNetwork = ({
   robotName,
-}: SelectNetworkProps): JSX.Element => {
+}: TempSelectNetworkProps): JSX.Element => {
   const list = useSelector((state: State) =>
     Networking.getWifiList(state, robotName)
   )
@@ -47,14 +51,10 @@ export const SelectNetwork = ({
 
   const [dispatchApi, requestIds] = RobotApi.useDispatchApiRequest()
 
-  const requestState = useSelector((state: State) =>
-    // @ts-expect-error TODO use commented code below to protect against retrieving a request when the id doesn't exist
-    RobotApi.getRequestById(state, last(requestIds))
-  )
-  // const requestState = useSelector((state: State) => {
-  //   const lastId = last(requestIds)
-  //   return lastId != null ? RobotApi.getRequestById(state, lastId) : null
-  // })
+  const requestState = useSelector((state: State) => {
+    const lastId = last(requestIds)
+    return lastId != null ? RobotApi.getRequestById(state, lastId) : null
+  })
 
   const activeNetwork = list?.find(nw => nw.active)
 
@@ -87,9 +87,9 @@ export const SelectNetwork = ({
   }, [robotName, dispatch, changeState.type])
 
   const handleSelectConnect = (ssid: string): void => {
-    const network = list.find(nw => nw.ssid === ssid)
+    const network = list.find((nw: WifiNetwork) => nw.ssid === ssid)
 
-    if (network) {
+    if (network != null) {
       const { ssid, securityType } = network
 
       if (securityType === Networking.SECURITY_NONE) {
@@ -110,11 +110,10 @@ export const SelectNetwork = ({
   }
 
   const handleDone = (): void => {
-    // @ts-expect-error TODO use commented code below
-    if (last(requestIds)) dispatch(RobotApi.dismissRequest(last(requestIds)))
-    // const lastId = last(requestIds)
-    // if (lastId != null) dispatch(RobotApi.dismissRequest(lastId))
-
+    const lastId = last(requestIds)
+    if (lastId != null) {
+      dispatch(RobotApi.dismissRequest(lastId))
+    }
     setChangeState({ type: null })
   }
 
@@ -136,17 +135,12 @@ export const SelectNetwork = ({
               ssid={changeState.ssid}
               isPending={requestState.status === RobotApi.PENDING}
               error={
-                // @ts-expect-error TODO use commented code below
-                requestState.error && requestState.error.message
-                  ? // @ts-expect-error TODO use commented code below
-                    requestState.error
+                'error' in requestState &&
+                requestState.error &&
+                'message' in requestState.error &&
+                requestState.error.message
+                  ? requestState.error
                   : null
-                // 'error' in requestState &&
-                // requestState.error &&
-                // 'message' in requestState.error &&
-                // requestState.error.message
-                //   ? requestState.error
-                //   : null
               }
               onClose={handleDone}
             />
