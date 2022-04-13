@@ -50,9 +50,9 @@ KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 DESCRIPTION = "A server providing access to the Opentrons API"
 PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
-    f"opentrons=={VERSION}",
-    f"opentrons-shared-data=={VERSION}",
-    f"notify-server=={VERSION}",
+    #f"opentrons=={VERSION}",
+    #f"opentrons-shared-data=={VERSION}",
+    #f"notify-server=={VERSION}",
     "anyio==3.3.0",
     "fastapi==0.68.1",
     "python-dotenv==0.19.0",
