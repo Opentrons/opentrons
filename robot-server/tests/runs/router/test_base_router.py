@@ -23,8 +23,6 @@ from robot_server.protocols import (
     ProtocolResource,
     ProtocolNotFoundError,
 )
-
-from robot_server.runs.run_view import RunView
 from robot_server.runs.run_models import Run, RunSummary, RunCreate, RunUpdate
 
 from robot_server.runs.engine_store import (
@@ -668,8 +666,7 @@ async def test_update_run_to_not_current(
 async def test_update_current_to_current_noop(
     decoy: Decoy,
     mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    mock_run_view: RunView,
+    mock_run_store: RunStore
 ) -> None:
     """It should noop if updating the current run to current: true."""
     run_resource = RunResource(

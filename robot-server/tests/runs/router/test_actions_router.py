@@ -8,7 +8,6 @@ from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 from robot_server.errors import ApiError
 from robot_server.service.json_api import RequestModel
 from robot_server.service.task_runner import TaskRunner
-from robot_server.runs.run_view import RunView
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.run_store import (
     RunStore,
@@ -49,7 +48,6 @@ def prev_run(decoy: Decoy, mock_run_store: RunStore) -> RunResource:
 
 async def test_create_play_action_to_start_run(
     decoy: Decoy,
-    mock_run_view: RunView,
     mock_run_store: RunStore,
     mock_engine_store: EngineStore,
     prev_run: RunResource,
@@ -70,21 +68,11 @@ async def test_create_play_action_to_start_run(
         is_current=True,
     )
 
-    decoy.when(
-        mock_run_view.with_action(
-            run=prev_run,
-            action_id="action-id",
-            action_data=RunActionCreate(actionType=RunActionType.PLAY),
-            created_at=datetime(year=2022, month=2, day=2),
-        ),
-    ).then_return((action, next_run))
-
     decoy.when(mock_engine_store.runner.was_started()).then_return(False)
 
     result = await create_run_action(
         runId="run-id",
         request_body=RequestModel(data=RunActionCreate(actionType=RunActionType.PLAY)),
-        run_view=mock_run_view,
         run_store=mock_run_store,
         engine_store=mock_engine_store,
         action_id="action-id",
@@ -103,7 +91,6 @@ async def test_create_play_action_to_start_run(
 
 async def test_create_play_action_to_resume_run(
     decoy: Decoy,
-    mock_run_view: RunView,
     mock_run_store: RunStore,
     mock_engine_store: EngineStore,
     prev_run: RunResource,
@@ -123,21 +110,11 @@ async def test_create_play_action_to_resume_run(
         is_current=True,
     )
 
-    decoy.when(
-        mock_run_view.with_action(
-            run=prev_run,
-            action_id="action-id",
-            action_data=RunActionCreate(actionType=RunActionType.PLAY),
-            created_at=datetime(year=2022, month=2, day=2),
-        ),
-    ).then_return((action, next_run))
-
     decoy.when(mock_engine_store.runner.was_started()).then_return(True)
 
     result = await create_run_action(
         runId="run-id",
         request_body=RequestModel(data=RunActionCreate(actionType=RunActionType.PLAY)),
-        run_view=mock_run_view,
         run_store=mock_run_store,
         engine_store=mock_engine_store,
         action_id="action-id",
@@ -177,7 +154,6 @@ async def test_create_play_action_with_missing_id(
 
 async def test_create_play_action_not_allowed(
     decoy: Decoy,
-    mock_run_view: RunView,
     mock_run_store: RunStore,
     mock_engine_store: EngineStore,
     prev_run: RunResource,
@@ -198,15 +174,6 @@ async def test_create_play_action_not_allowed(
         is_current=True,
     )
 
-    decoy.when(
-        mock_run_view.with_action(
-            run=prev_run,
-            action_id="action-id",
-            action_data=RunActionCreate(actionType=RunActionType.PLAY),
-            created_at=datetime(year=2022, month=2, day=2),
-        ),
-    ).then_return((actions, next_run))
-
     decoy.when(mock_engine_store.runner.was_started()).then_return(True)
 
     decoy.when(mock_engine_store.runner.play()).then_raise(
@@ -219,7 +186,6 @@ async def test_create_play_action_not_allowed(
             request_body=RequestModel(
                 data=RunActionCreate(actionType=RunActionType.PLAY)
             ),
-            run_view=mock_run_view,
             run_store=mock_run_store,
             engine_store=mock_engine_store,
             task_runner=task_runner,
@@ -276,7 +242,6 @@ async def test_create_run_action_not_current(
 
 async def test_create_pause_action(
     decoy: Decoy,
-    mock_run_view: RunView,
     mock_run_store: RunStore,
     mock_engine_store: EngineStore,
     prev_run: RunResource,
@@ -296,19 +261,9 @@ async def test_create_pause_action(
         is_current=True,
     )
 
-    decoy.when(
-        mock_run_view.with_action(
-            run=prev_run,
-            action_id="action-id",
-            action_data=RunActionCreate(actionType=RunActionType.PAUSE),
-            created_at=datetime(year=2022, month=2, day=2),
-        ),
-    ).then_return((action, next_run))
-
     result = await create_run_action(
         runId="run-id",
         request_body=RequestModel(data=RunActionCreate(actionType=RunActionType.PAUSE)),
-        run_view=mock_run_view,
         run_store=mock_run_store,
         engine_store=mock_engine_store,
         action_id="action-id",
@@ -326,7 +281,6 @@ async def test_create_pause_action(
 
 async def test_create_stop_action(
     decoy: Decoy,
-    mock_run_view: RunView,
     mock_run_store: RunStore,
     mock_engine_store: EngineStore,
     prev_run: RunResource,
@@ -347,19 +301,9 @@ async def test_create_stop_action(
         is_current=True,
     )
 
-    decoy.when(
-        mock_run_view.with_action(
-            run=prev_run,
-            action_id="action-id",
-            action_data=RunActionCreate(actionType=RunActionType.STOP),
-            created_at=datetime(year=2022, month=2, day=2),
-        ),
-    ).then_return((action, next_run))
-
     result = await create_run_action(
         runId="run-id",
         request_body=RequestModel(data=RunActionCreate(actionType=RunActionType.STOP)),
-        run_view=mock_run_view,
         run_store=mock_run_store,
         engine_store=mock_engine_store,
         task_runner=task_runner,

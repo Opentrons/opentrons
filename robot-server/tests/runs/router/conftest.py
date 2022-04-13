@@ -4,7 +4,6 @@ from decoy import Decoy
 
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols import ProtocolStore
-from robot_server.runs.run_view import RunView
 from robot_server.runs.run_store import RunStore
 from robot_server.runs.engine_store import EngineStore
 
@@ -25,12 +24,6 @@ def mock_protocol_store(decoy: Decoy) -> ProtocolStore:
 def mock_run_store(decoy: Decoy) -> RunStore:
     """Get a mock RunStore interface."""
     return decoy.mock(cls=RunStore)
-
-
-@pytest.fixture()
-def mock_run_view(decoy: Decoy) -> RunView:
-    """Get a mock RunView interface."""
-    return decoy.mock(cls=RunView)
 
 
 @pytest.fixture()

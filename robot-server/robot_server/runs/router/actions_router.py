@@ -58,7 +58,6 @@ async def create_run_action(
     Arguments:
         runId: Run ID pulled from the URL.
         request_body: Input payload from the request body.
-        run_view: Resource model builder.
         run_store: Run storage interface.
         engine_store: Protocol engine and runner storage.
         action_id: Generated ID to assign to the control action.
