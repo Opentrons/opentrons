@@ -41,7 +41,9 @@ describe('DevicesLanding', () => {
   beforeEach(() => {
     mockGetScanning.mockReturnValue(false)
     mockScanning.mockReturnValue(<div>Mock Scanning</div>)
-    mockRobotCard.mockImplementation(({ name }) => <div>Mock Robot {name}</div>)
+    mockRobotCard.mockImplementation(({ robot: { name } }) => (
+      <div>Mock Robot {name}</div>
+    ))
     mockDevicesEmptyState.mockReturnValue(<div>Mock DevicesEmptyState</div>)
     mockUseAvailableAndUnavailableDevices.mockReturnValue({
       availableDevices: [{ ...mockConnectableRobot, name: 'connectableRobot' }],

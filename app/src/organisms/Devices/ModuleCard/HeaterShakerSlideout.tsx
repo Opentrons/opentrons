@@ -127,7 +127,6 @@ export const HeaterShakerSlideout = (
         })}
         onCloseClick={onCloseClick}
         isExpanded={isExpanded}
-        height={`calc(100vh - ${SPACING.spacing4})`}
         footer={
           <PrimaryButton
             onClick={handleSubmitCommand}

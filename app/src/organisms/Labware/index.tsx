@@ -75,9 +75,9 @@ export function Labware(): JSX.Element {
           </SecondaryButton>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
-          {labware.map(labware => (
+          {labware.map((labware, index) => (
             <LabwareCard
-              key={labware.definition.metadata.displayName}
+              key={`${labware.definition.metadata.displayName}${index}`}
               labware={labware}
               onClick={() => {
                 setCurrentLabwaredef(labware)

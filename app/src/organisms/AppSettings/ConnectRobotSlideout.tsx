@@ -69,7 +69,6 @@ export function ConnectRobotSlideout(
       title={t('connect_ip')}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      height="100%"
       footer={
         <PrimaryButton onClick={onCloseClick} width="100%">
           {t('connect_ip_button')}
