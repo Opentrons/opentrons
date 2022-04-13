@@ -59,7 +59,7 @@ const PathButton = (buttonProps: ButtonProps): JSX.Element => {
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const tooltip = (
-    <Tooltip width="59.5%" {...tooltipProps}>
+    <Tooltip width="33.5rem" {...tooltipProps}>
       <div className={styles.path_tooltip_title}>
         {i18n.t(`form.step_edit_form.field.path.title.${path}`)}
       </div>

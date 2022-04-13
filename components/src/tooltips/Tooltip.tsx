@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
+import { radiusSoftCorners } from '../ui-style-constants/borders'
 import { fontSizeLabel } from '../ui-style-constants/typography'
-import { spacing3, spacingS } from '../ui-style-constants/spacing'
+import { spacing3 } from '../ui-style-constants/spacing'
 import { white, darkGrey } from '../ui-style-constants/colors'
 import { ARROW_SIZE_PX } from './styles'
 import { Box } from '../primitives'
@@ -20,7 +21,7 @@ const TOOLTIP_CSS = css`
   filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.2));
   cursor: pointer;
   font-size: ${fontSizeLabel};
-  border-radius: ${spacingS};
+  border-radius: ${radiusSoftCorners};
 `
 
 export interface TooltipProps extends StyleProps {
@@ -41,10 +42,6 @@ export interface TooltipProps extends StyleProps {
   arrowRef: React.RefCallback<HTMLElement | null>
   /** Inline styles to apply to arrow element (provided by useTooltip) */
   arrowStyle: CSSProperties
-  /** Specify tooltip width when the default width isn't big enough see PD's PathField/Path for example */
-  width?: string
-  /** Specify background color to COLORS.darkBlack when implementing a tooltip in the app */
-  backgroundColor?: string
 }
 
 /**

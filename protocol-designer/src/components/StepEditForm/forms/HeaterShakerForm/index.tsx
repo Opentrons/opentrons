@@ -106,7 +106,7 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
             label={i18n.t(
               'form.step_edit_form.field.heaterShaker.latch.setLatch'
             )}
-            className={styles.toggle_form_group_no_bottom_margin}
+            className={styles.set_plate_latch_form_group}
           >
             <ToggleRowField
               {...propsForFields.latchOpen}
