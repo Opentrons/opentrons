@@ -5,6 +5,7 @@ import mapValues from 'lodash/mapValues'
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
 import uniq from 'lodash/uniq'
+import { FIXED_TRASH_ID, OT2_STANDARD_DECKID, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
 import { getFileMetadata } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
 import { selectors as dismissSelectors } from '../../dismiss'
@@ -23,11 +24,12 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
-import {
+import type {
   ModuleEntity,
   PipetteEntity,
   LabwareEntities,
   PipetteEntities,
+  RobotState,
 } from '@opentrons/step-generation'
 import type {
   CreateCommand,
@@ -39,7 +41,6 @@ import type {
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import { OT2_STANDARD_DECKID, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
 if (isEmpty(process.env.OT_PD_VERSION))
@@ -196,22 +197,25 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       })
     )
 
-    const loadLabwareCommands = map(
+    const loadLabwareCommands = reduce<RobotState['labware'], LoadLabwareCreateCommand[]>(
       initialRobotState.labware,
       (
+        acc,
         labware: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
         labwareId: string
-      ): LoadLabwareCreateCommand => {
+      ): LoadLabwareCreateCommand[] => {
+        if (labwareId === FIXED_TRASH_ID) return [...acc]
+        const isLabwareOnTopOfModule = labware.slot in initialRobotState.modules
         const loadLabwareCommand = {
           key: uuid(),
           commandType: 'loadLabware' as const,
           params: {
             labwareId: labwareId,
-            location: { slotName: labware.slot },
+            location: isLabwareOnTopOfModule ? { moduleId: labware.slot } : { slotName: labware.slot },
           },
         }
-        return loadLabwareCommand
-      }
+        return [...acc, loadLabwareCommand]
+      }, []
     )
 
     const loadLiquidCommands = getLoadLiquidCommands(
