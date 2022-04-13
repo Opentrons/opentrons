@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
 import { getRobotApiVersion } from '../../../../redux/discovery'
-import { ViewableRobot } from '../../../../redux/discovery/types'
+import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 interface RobotServerVersionProps {
   robot: ViewableRobot

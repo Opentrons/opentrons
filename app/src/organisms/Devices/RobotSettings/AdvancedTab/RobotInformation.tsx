@@ -23,19 +23,14 @@ interface RobotInformationProps {
 export function RobotInformation({
   robot,
 }: RobotInformationProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'robot_info'])
+  const { t } = useTranslation('device_settings')
   // TODO: serialNumber
   const serialNumber = getRobotSerialNumber(robot as ViewableRobot)
   const firmwareVersion = getRobotFirmwareVersion(robot as ViewableRobot)
   const protocolApiVersions = getRobotProtocolApiVersion(robot as ViewableRobot)
   const minProtocolApiVersion = protocolApiVersions?.min ?? 'Unknown'
   const maxProtocolApiVersion = protocolApiVersions?.max ?? 'Unknown'
-  const apiVersionMinMax = t('robot_info:api_version_min_max', {
-    min: minProtocolApiVersion,
-    max: maxProtocolApiVersion,
-  })
-
-  console.log(serialNumber)
+  const apiVersionMinMax = `v${minProtocolApiVersion} - v${maxProtocolApiVersion}`
 
   return (
     <Box>

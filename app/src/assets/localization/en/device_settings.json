@@ -13,6 +13,7 @@
   "robot_server_versions": "Robot Server Versions",
   "robot_server_versions_description": "View latest release notes on",
   "robot_server_versions_status": "up to date",
+  "robot_server_versions_view_update": "View update",
   "github":"GitHub",
   "robot_serial_number": "Robot Serial Number",
   "firmware_version": "Firmware Version",
