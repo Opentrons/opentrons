@@ -36,6 +36,8 @@ export function RobotSettingsAdvanced({
     getRobotSettings(state, robotName)
   )
 
+  const findSettings = (id: string) => settings.find(s => s.id === id)
+
   return (
     <>
       <Box paddingX={SPACING.spacing4}>
@@ -45,12 +47,13 @@ export function RobotSettingsAdvanced({
         <Divider marginY={SPACING.spacing5} />
         <RobotInformation robot={robot as ViewableRobot} />
         <Divider marginY={SPACING.spacing5} />
-        <UsageSettings />
+        <UsageSettings
+          settings={findSettings('enableDoorSafetySwitch')}
+          robotName={robotName}
+        />
         <Divider marginY={SPACING.spacing5} />
         <DisableHoming
-          settings={settings.find(
-            setting => setting.id === 'disableHomeOnBoot'
-          )}
+          settings={findSettings('disableHomeOnBoot')}
           robotName={robotName}
         />
         <Divider marginY={SPACING.spacing5} />
@@ -61,12 +64,24 @@ export function RobotSettingsAdvanced({
         <Divider marginY={SPACING.spacing5} />
         <FactoryReset />
         <Divider marginY={SPACING.spacing5} />
-        <UseOlderProtocol />
-        <LegacySettings />
+        <UseOlderProtocol
+          settings={findSettings('disableFastProtocolUpload')}
+          robotName={robotName}
+        />
+        <LegacySettings
+          settings={findSettings('deckCalibrationDots')}
+          robotName={robotName}
+        />
         <Divider marginY={SPACING.spacing5} />
-        <ShortTrashBin />
+        <ShortTrashBin
+          settings={findSettings('shortFixedTrash')}
+          robotName={robotName}
+        />
         <Divider marginY={SPACING.spacing5} />
-        <UseOlderAspirateBehavior />
+        <UseOlderAspirateBehavior
+          settings={findSettings('useOldAspirationFunctions')}
+          robotName={robotName}
+        />
       </Box>
     </>
   )

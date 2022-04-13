@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   ALIGN_CENTER,
@@ -11,12 +11,25 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
 import { ToggleButton } from '../../../../atoms/Buttons'
+import { updateSetting } from '../../../../redux/robot-settings'
 
-export function LegacySettings(): JSX.Element {
+import type { Dispatch } from '../../../../redux/types'
+import type { RobotSettingsField } from '../../../../redux/robot-settings/types'
+
+interface LegacySettingsProps {
+  settings: RobotSettingsField | undefined
+  robotName: string
+}
+
+export function LegacySettings({
+  settings,
+  robotName,
+}: LegacySettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const dummyForToggle = (): void => {
-    console.log('dummyForToggle')
-  }
+  const dispatch = useDispatch<Dispatch>()
+  const value = settings?.value ? settings.value : false
+  const id = settings?.id ? settings.id : 'deckCalibrationDots'
+
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
@@ -36,8 +49,8 @@ export function LegacySettings(): JSX.Element {
       </Box>
       <ToggleButton
         label="show_link_to_get_labware_offset_data"
-        toggledOn={dummyForToggle}
-        onClick={dummyForToggle}
+        toggledOn={settings?.value === true}
+        onClick={() => dispatch(updateSetting(robotName, id, !value))}
         id="AdvancedSettings_showLinkToggleButton"
       />
     </Flex>

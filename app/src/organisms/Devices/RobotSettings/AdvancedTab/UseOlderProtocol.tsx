@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -10,13 +11,23 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
 import { ToggleButton } from '../../../../atoms/Buttons'
+import { updateSetting } from '../../../../redux/robot-settings'
 
-export function UseOlderProtocol(): JSX.Element {
+import type { Dispatch } from '../../../../redux/types'
+import type { RobotSettingsField } from '../../../../redux/robot-settings/types'
+interface UseOlderProtocolProps {
+  settings: RobotSettingsField | undefined
+  robotName: string
+}
+
+export function UseOlderProtocol({
+  settings,
+  robotName,
+}: UseOlderProtocolProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-
-  const dummyForToggle = (): void => {
-    console.log('dummyForToggle')
-  }
+  const dispatch = useDispatch<Dispatch>()
+  const value = settings?.value ? settings.value : false
+  const id = settings?.id ? settings.id : 'disableFastProtocolUpload'
 
   return (
     <Flex
@@ -39,8 +50,8 @@ export function UseOlderProtocol(): JSX.Element {
       </Box>
       <ToggleButton
         label="show_link_to_get_labware_offset_data"
-        toggledOn={dummyForToggle}
-        onClick={dummyForToggle}
+        toggledOn={settings?.value === true}
+        onClick={() => dispatch(updateSetting(robotName, id, !value))}
         id="AdvancedSettings_showLinkToggleButton"
       />
     </Flex>

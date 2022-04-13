@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -10,12 +11,25 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
 import { ToggleButton } from '../../../../atoms/Buttons'
+import { updateSetting } from '../../../../redux/robot-settings'
 
-export function UseOlderAspirateBehavior(): JSX.Element {
+import type { Dispatch } from '../../../../redux/types'
+import type { RobotSettingsField } from '../../../../redux/robot-settings/types'
+
+interface UseOlderAspirateBehaviorProps {
+  settings: RobotSettingsField | undefined
+  robotName: string
+}
+
+export function UseOlderAspirateBehavior({
+  settings,
+  robotName,
+}: UseOlderAspirateBehaviorProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const dummyForToggle = (): void => {
-    console.log('dummyForToggle')
-  }
+  const dispatch = useDispatch<Dispatch>()
+  const value = settings?.value ? settings.value : false
+  const id = settings?.id ? settings.id : 'useOldAspirationFunctions'
+
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
@@ -31,8 +45,8 @@ export function UseOlderAspirateBehavior(): JSX.Element {
       </Box>
       <ToggleButton
         label="enable_dev_tools"
-        toggledOn={dummyForToggle}
-        onClick={dummyForToggle}
+        toggledOn={settings?.value === true}
+        onClick={() => dispatch(updateSetting(robotName, id, !value))}
         id="AdvancedSettings_useOlderAspirate"
       />
     </Flex>
