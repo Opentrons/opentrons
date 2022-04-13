@@ -22,6 +22,7 @@ import type {
   HeaterShakerModule,
   MagneticModule,
 } from '../../../../redux/modules/types'
+import { mockRobot } from '../../../../redux/robot-api/__fixtures__'
 
 jest.mock('../MagneticModuleData')
 jest.mock('../TemperatureModuleData')
@@ -126,6 +127,7 @@ describe('ModuleCard', () => {
   it('renders information for a magnetic module with mocked status', () => {
     const { getByText, getByAltText } = render({
       module: mockMagneticModule,
+      robotName: mockRobot.name,
     })
 
     getByText('Magnetic Module GEN1')
@@ -136,6 +138,7 @@ describe('ModuleCard', () => {
   it('renders information if module is connected via hub', () => {
     const { getByText, getByAltText } = render({
       module: mockMagneticModuleHub,
+      robotName: mockRobot.name,
     })
     getByText('Magnetic Module GEN1')
     getByText('Mock Magnetic Module Data')
@@ -149,6 +152,7 @@ describe('ModuleCard', () => {
 
     const { getByText, getByAltText } = render({
       module: mockTemperatureModuleGen2,
+      robotName: mockRobot.name,
     })
     getByText('Temperature Module GEN2')
     getByText('Mock Temperature Module Data')
@@ -159,6 +163,7 @@ describe('ModuleCard', () => {
   it('renders information for a thermocycler module with mocked status', () => {
     const { getByText, getByAltText } = render({
       module: mockThermocycler,
+      robotName: mockRobot.name,
     })
 
     getByText('Thermocycler Module')
@@ -170,6 +175,7 @@ describe('ModuleCard', () => {
   it('renders information for a heater shaker module with mocked status', () => {
     const { getByText, getByAltText } = render({
       module: mockHeaterShaker,
+      robotName: mockRobot.name,
     })
 
     getByText('Heater Shaker Module GEN1')
@@ -181,6 +187,7 @@ describe('ModuleCard', () => {
   it('renders kebab icon and is clickable', () => {
     const { getByRole, getByText } = render({
       module: mockMagneticModule,
+      robotName: mockRobot.name,
     })
     const overflowButton = getByRole('button', {
       name: /overflow/i,
@@ -198,6 +205,7 @@ describe('ModuleCard', () => {
 
     const { getByRole, getByText } = render({
       module: mockMagneticModule,
+      robotName: mockRobot.name,
     })
     const overflowButton = getByRole('button', {
       name: /overflow/i,
@@ -209,12 +217,14 @@ describe('ModuleCard', () => {
   it('renders information for a heater shaker module when it is hot, showing the too hot banner', () => {
     const { getByText } = render({
       module: mockHotHeaterShaker,
+      robotName: mockRobot.name,
     })
     getByText(nestedTextMatcher('Module is hot to the touch'))
   })
   it('renders information for a magnetic module when an update is available so update banner renders', () => {
     const { getByText } = render({
       module: mockMagneticModuleHub,
+      robotName: mockRobot.name,
     })
     getByText('Firmware update available.')
     getByText('View Update')
