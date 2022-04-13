@@ -55,7 +55,9 @@ describe('useGetAllLabware hook', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
-    const { result } = renderHook(useGetAllLabware, { wrapper })
+    const { result } = renderHook(() => useGetAllLabware('reverse', 'all'), {
+      wrapper,
+    })
     const labware1 = result.current[0]
     const labware2 = result.current[1]
 
