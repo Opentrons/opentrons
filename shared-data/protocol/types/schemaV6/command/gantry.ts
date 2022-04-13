@@ -1,7 +1,7 @@
-import type { CommonCommandRunTimeInfo } from '.'
+import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 import type { MotorAxis } from '../../../../js/types'
 
-export interface MoveToSlotCreateCommand {
+export interface MoveToSlotCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveToSlot'
   params: MoveToSlotParams
 }
@@ -10,7 +10,7 @@ export interface MoveToSlotRunTimeCommand
     MoveToSlotCreateCommand {
   result: {}
 }
-export interface MoveToWellCreateCommand {
+export interface MoveToWellCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveToWell'
   params: MoveToWellParams
 }
@@ -19,7 +19,8 @@ export interface MoveToWellRunTimeCommand
     MoveToWellCreateCommand {
   result: {}
 }
-export interface MoveToCoordinatesCreateCommand {
+export interface MoveToCoordinatesCreateCommand
+  extends CommonCommandCreateInfo {
   commandType: 'moveToCoordinates'
   params: MoveToCoordinatesParams
 }
@@ -28,7 +29,7 @@ export interface MoveToCoordinatesRunTimeCommand
     MoveToCoordinatesCreateCommand {
   result: {}
 }
-export interface MoveRelativeCreateCommand {
+export interface MoveRelativeCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveRelative'
   params: MoveRelativeParams
 }
@@ -37,7 +38,7 @@ export interface MoveRelativeRunTimeCommand
     MoveRelativeCreateCommand {
   result: {}
 }
-export interface SavePositionCreateCommand {
+export interface SavePositionCreateCommand extends CommonCommandCreateInfo {
   commandType: 'savePosition'
   params: SavePositionParams
 }
@@ -46,7 +47,7 @@ export interface SavePositionRunTimeCommand
     SavePositionCreateCommand {
   result: {}
 }
-export interface HomeCreateCommand {
+export interface HomeCreateCommand extends CommonCommandCreateInfo {
   commandType: 'home'
   params: HomeParams
 }
