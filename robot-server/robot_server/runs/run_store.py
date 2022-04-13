@@ -1,11 +1,10 @@
 """Runs' in-memory store."""
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 import sqlalchemy
 
 from .action_models import RunAction, RunActionType
-from .run_models import RunUpdate
 
 from robot_server.persistence import run_table, actions_table
 
@@ -57,7 +56,15 @@ class RunStore:
         return [_convert_sql_row_to_action(action) for action in actions]
 
     def update_active_run(self, run_id: str, is_current: bool) -> RunResource:
-        print("run id: ", run_id, "is current: ", is_current)
+        """Update current active run resource in memory.
+
+        Arguments:
+            run_id: run to update
+            is_current: is run active or not
+
+        Returns:
+            The resource that was updated.
+        """
         if is_current is True:
             self._active_run = run_id
         elif is_current is False and self._active_run == run_id:
@@ -170,7 +177,10 @@ def _insert_action_no_transaction(
         ).one()
     except sqlalchemy.exc.NoResultFound as e:
         raise RunNotFoundError(run_id) from e
-    transaction.execute(sqlalchemy.insert(actions_table), _convert_action_to_sql_values(run_id=run_id, action=action))
+    transaction.execute(
+        sqlalchemy.insert(actions_table),
+        _convert_action_to_sql_values(run_id=run_id, action=action),
+    )
 
 
 def _convert_sql_row_to_run(

@@ -38,7 +38,7 @@ def test_add_run(subject: RunStore) -> None:
 
 
 def test_insert_actions_missing_run_id(subject: RunStore) -> None:
-    """Should not be able to insert an action with a run id the does not exist"""
+    """Should not be able to insert an action with a run id the does not exist."""
     action = RunAction(
         actionType=RunActionType.PLAY,
         createdAt=datetime(year=2022, month=2, day=2),
@@ -206,10 +206,10 @@ def test_add_run_current_run_deactivates(subject: RunStore) -> None:
 def test_insert_actions_no_run(subject: RunStore) -> None:
     """Insert actions with a run that dosent exist should raise an exception."""
     action = RunAction(
-            actionType=RunActionType.PLAY,
-            createdAt=datetime(year=2022, month=2, day=2),
-            id="action-id-1",
-        )
+        actionType=RunActionType.PLAY,
+        createdAt=datetime(year=2022, month=2, day=2),
+        id="action-id-1",
+    )
 
     with pytest.raises(Exception):
         subject.insert_action(run_id="run-id-996", action=action)
