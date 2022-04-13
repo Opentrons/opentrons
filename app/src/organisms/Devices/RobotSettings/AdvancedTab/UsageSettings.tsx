@@ -47,10 +47,10 @@ export function UsageSettings({
         <StyledText as="p">{t('pause_protocol_description')}</StyledText>
       </Box>
       <ToggleButton
-        label="pause_protocol"
+        label="usage_settings_pause_protocol"
         toggledOn={settings?.value === true}
         onClick={() => dispatch(updateSetting(robotName, id, !value))}
-        id="AdvancedSettings_unavailableRobotsToggleButton"
+        id="RobotSettings_usageSettingsToggleButton"
       />
     </Flex>
   )

@@ -47,7 +47,7 @@ export function DisableHoming({
         label="disable_homing"
         toggledOn={value === true}
         onClick={() => dispatch(updateSetting(robotName, id, !value))}
-        id="AdvancedSettings_unavailableRobotsToggleButton"
+        id="RobotSettings_disableHomingToggleButton"
       />
     </Flex>
   )

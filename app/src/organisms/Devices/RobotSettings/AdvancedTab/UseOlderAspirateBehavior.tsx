@@ -44,7 +44,7 @@ export function UseOlderAspirateBehavior({
         <StyledText as="p">{t('use_older_aspirate_description')}</StyledText>
       </Box>
       <ToggleButton
-        label="enable_dev_tools"
+        label="use_older_aspirate_behavior"
         toggledOn={settings?.value === true}
         onClick={() => dispatch(updateSetting(robotName, id, !value))}
         id="AdvancedSettings_useOlderAspirate"

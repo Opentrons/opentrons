@@ -45,7 +45,7 @@ export function ShortTrashBin({
         </StyledText>
       </Box>
       <ToggleButton
-        label="enable_dev_tools"
+        label="short_trash_bin"
         toggledOn={settings?.value === true}
         onClick={() => dispatch(updateSetting(robotName, id, !value))}
         id="AdvancedSettings_shortTrashBin"

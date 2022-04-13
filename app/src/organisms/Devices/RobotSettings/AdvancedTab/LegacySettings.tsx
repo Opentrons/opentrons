@@ -48,10 +48,10 @@ export function LegacySettings({
         <StyledText as="p">{t('calibrate_deck_description')}</StyledText>
       </Box>
       <ToggleButton
-        label="show_link_to_get_labware_offset_data"
+        label="legacy_settings"
         toggledOn={settings?.value === true}
         onClick={() => dispatch(updateSetting(robotName, id, !value))}
-        id="AdvancedSettings_showLinkToggleButton"
+        id="RobotSettings_legacySettingsToggleButton"
       />
     </Flex>
   )
