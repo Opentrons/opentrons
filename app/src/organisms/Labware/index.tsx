@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import startCase from 'lodash/startCase'
 import {
   Box,
   Flex,
   Link,
-  DropdownField,
   SPACING,
   COLORS,
+  BORDERS,
   TYPOGRAPHY,
   POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
@@ -14,15 +15,13 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   Icon,
-  JUSTIFY_FLEX_END,
-  ALIGN_END,
-  ALIGN_START,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/Buttons'
 import { Toast } from '../../atoms/Toast'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { LabwareCard } from './LabwareCard'
 import { AddCustomLabware } from './AddCustomLabware'
 import { LabwareDetails } from './LabwareDetails'
@@ -32,16 +31,29 @@ import {
   useLabwareFailure,
   useNewLabwareName,
 } from './hooks'
+import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
+type labwareDisplayCategory =
+  | 'all'
+  | 'wellPlate'
+  | 'tipRack'
+  | 'tubeRack'
+  | 'reservoir'
+  | 'aluminumBlock'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
-const FILTER_OPTIONS = [
-  { name: 'All', value: 'all' },
-  { name: 'Well Plate', value: 'wellPlate' },
-  { name: 'Tip Rack', value: 'tipRack' },
-  { name: 'Tube Rack', value: 'tubeRack' },
-  { name: 'Reservoir', value: 'reservoir' },
-  { name: 'Aluminum Block', value: 'aluminumBlock' },
+const labwareDisplayCategoryFilters: labwareDisplayCategory[] = [
+  'all',
+  'wellPlate',
+  'tipRack',
+  'tubeRack',
+  'reservoir',
+  'aluminumBlock',
 ]
+
+const FILTER_OPTIONS: DropdownOption[] = []
+labwareDisplayCategoryFilters.forEach(category =>
+  FILTER_OPTIONS.push({ name: startCase(category), value: category })
+)
 
 export function Labware(): JSX.Element {
   const { t } = useTranslation('labware_landing')
@@ -52,11 +64,7 @@ export function Labware(): JSX.Element {
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
   const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
 
-  const [filterBy, setFilterBy] = React.useState<
-    'all' | 'wellPlate' | 'tipRack' | 'tubeRack' | 'reservoir' | 'aluminumBlock'
-  >('all')
-  const handleFilterChange: React.ChangeEventHandler<HTMLSelectElement> = event =>
-    setFilterBy(event.target.value)
+  const [filterBy, setFilterBy] = React.useState<labwareDisplayCategory>('all')
 
   const labware = useGetAllLabware(sortBy, filterBy)
   const { labwareFailureMessage, clearLabwareFailure } = useLabwareFailure()
@@ -68,7 +76,7 @@ export function Labware(): JSX.Element {
   const [showFailureToast, setShowFailureToast] = React.useState(false)
   const [
     currentLabwareDef,
-    setCurrentLabwaredef,
+    setCurrentLabwareDef,
   ] = React.useState<null | LabwareDefAndDate>(null)
 
   React.useEffect(() => {
@@ -110,18 +118,18 @@ export function Labware(): JSX.Element {
             <StyledText css={TYPOGRAPHY.labelSemiBold}>
               {t('category')}
             </StyledText>
-            <Box width="10rem">
-              <DropdownField
-                options={FILTER_OPTIONS}
-                onChange={handleFilterChange}
-                value={filterBy}
-              />
-            </Box>
+            <DropdownMenu
+              filterOptions={FILTER_OPTIONS}
+              currentOption={{ value: filterBy, name: startCase(filterBy) }}
+              onClick={value => {
+                setFilterBy(value as labwareDisplayCategory)
+              }}
+            />
           </Flex>
           <Flex
             flexDirection={DIRECTION_ROW}
             alignItems={ALIGN_CENTER}
-            onClick={() => toggleSetShowSortByMenu()}
+            onClick={toggleSetShowSortByMenu}
           >
             <StyledText css={TYPOGRAPHY.pSemiBold}>{t('sort_by')} </StyledText>
             <Icon
@@ -133,11 +141,11 @@ export function Labware(): JSX.Element {
             <Flex
               width="9rem"
               zIndex={10}
-              borderRadius={'4px 4px 0px 0px'}
+              borderRadius={BORDERS.radiusSoftCorners}
               boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
               position={POSITION_ABSOLUTE}
               backgroundColor={COLORS.white}
-              top="6.5rem"
+              top="8.5rem"
               right={0}
               flexDirection={DIRECTION_COLUMN}
             >
@@ -166,7 +174,7 @@ export function Labware(): JSX.Element {
               key={`${labware.definition.metadata.displayName}${index}`}
               labware={labware}
               onClick={() => {
-                setCurrentLabwaredef(labware)
+                setCurrentLabwareDef(labware)
               }}
             />
           ))}
@@ -234,7 +242,7 @@ export function Labware(): JSX.Element {
       {currentLabwareDef != null && (
         <LabwareDetails
           labware={currentLabwareDef}
-          onClose={() => setCurrentLabwaredef(null)}
+          onClose={() => setCurrentLabwareDef(null)}
         />
       )}
     </>
