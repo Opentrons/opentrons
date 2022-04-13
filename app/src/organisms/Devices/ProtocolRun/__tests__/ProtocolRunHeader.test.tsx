@@ -182,7 +182,11 @@ const mockMovingHeaterShaker = {
 const render = () => {
   return renderWithProviders(
     <BrowserRouter>
-      <ProtocolRunHeader robotName={ROBOT_NAME} runId={RUN_ID} />
+      <ProtocolRunHeader
+        protocolRunHeaderRef={null}
+        robotName={ROBOT_NAME}
+        runId={RUN_ID}
+      />
     </BrowserRouter>,
     { i18nInstance: i18n }
   )

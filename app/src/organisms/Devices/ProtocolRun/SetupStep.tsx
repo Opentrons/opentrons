@@ -34,7 +34,7 @@ interface SetupStepProps {
 const EXPANDED_STYLE = css`
   transition: max-height 300ms ease-in, visibility 400ms ease;
   visibility: visible;
-  max-height: 100vh;
+  max-height: 180vh;
   overflow: hidden;
 `
 const COLLAPSED_STYLE = css`

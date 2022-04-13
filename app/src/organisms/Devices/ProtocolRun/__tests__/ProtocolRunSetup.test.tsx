@@ -18,6 +18,7 @@ import {
   useRobot,
   useRunCalibrationStatus,
 } from '../../hooks'
+import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import { ModuleSetup } from '../ModuleSetup'
@@ -25,6 +26,7 @@ import { ModuleSetup } from '../ModuleSetup'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 jest.mock('../../hooks')
+jest.mock('../SetupLabware')
 jest.mock('../SetupRobotCalibration')
 jest.mock('../ModuleSetup')
 
@@ -38,6 +40,9 @@ const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
 >
+const mockSetupLabware = SetupLabware as jest.MockedFunction<
+  typeof SetupLabware
+>
 const mockSetupRobotCalibration = SetupRobotCalibration as jest.MockedFunction<
   typeof SetupRobotCalibration
 >
@@ -48,7 +53,11 @@ const RUN_ID = '1'
 
 const render = () => {
   return renderWithProviders(
-    <ProtocolRunSetup robotName={ROBOT_NAME} runId={RUN_ID} />,
+    <ProtocolRunSetup
+      protocolRunHeaderRef={null}
+      robotName={ROBOT_NAME}
+      runId={RUN_ID}
+    />,
     {
       i18nInstance: i18n,
     }
@@ -81,6 +90,15 @@ describe('ProtocolRunSetup', () => {
         })
       )
       .mockReturnValue(<span>Mock SetupRobotCalibration</span>)
+    when(mockSetupLabware)
+      .calledWith(
+        partialComponentPropsMatcher({
+          protocolRunHeaderRef: null,
+          robotName: ROBOT_NAME,
+          runId: RUN_ID,
+        })
+      )
+      .mockReturnValue(<span>Mock SetupLabware</span>)
     mockModuleSetup.mockReturnValue(<div>mock ModuleSetup</div>)
   })
   afterEach(() => {
@@ -125,7 +143,7 @@ describe('ProtocolRunSetup', () => {
       )
       const labwareSetup = getByText('Labware Setup')
       labwareSetup.click()
-      expect(getByText('TODO: labware setup')).toBeVisible()
+      expect(getByText('Mock SetupLabware')).toBeVisible()
     })
     it('does NOT render module setup', () => {
       const { queryByText } = render()
@@ -135,7 +153,7 @@ describe('ProtocolRunSetup', () => {
     it('defaults to labware step expanded if calibration complete', async () => {
       const { getByText } = render()
       await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(getByText('TODO: labware setup')).toBeVisible()
+      expect(getByText('Mock SetupLabware')).toBeVisible()
     })
 
     it('defaults to robot calibration step expanded if calibration incomplete', async () => {
@@ -227,7 +245,7 @@ describe('ProtocolRunSetup', () => {
       const { queryByText, getByText } = render()
       await new Promise(resolve => setTimeout(resolve, 1000))
       expect(getByText('mock ModuleSetup')).toBeVisible()
-      expect(queryByText('TODO: labware setup')).not.toBeVisible()
+      expect(queryByText('Mock SetupLabware')).not.toBeVisible()
     })
 
     it('defaults to robot calibration step expanded if calibration incomplete and modules present', async () => {
