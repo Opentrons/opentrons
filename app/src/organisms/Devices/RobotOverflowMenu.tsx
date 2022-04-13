@@ -11,6 +11,7 @@ import {
   ALIGN_FLEX_END,
   SIZE_4,
   Overlay,
+  SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { CONNECTABLE } from '../../redux/discovery'
@@ -62,6 +63,9 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
       data-testid={`RobotCard_${robot.name}_overflowMenu`}
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
+      onClick={e => {
+        e.preventDefault()
+      }}
       {...styleProps}
     >
       <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
@@ -73,7 +77,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
-          top="3rem"
+          top={SPACING.spacing7}
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >

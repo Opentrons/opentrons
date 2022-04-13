@@ -91,7 +91,6 @@ export function RobotOverview({
             disabled={currentRunId != null || !isRobotViewable}
             onClick={() => {
               setShowChooseProtocolSlideout(true)
-              console.log('CLICKED\n\n\n')
             }}
           >
             {t('run_a_protocol')}

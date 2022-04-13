@@ -25,6 +25,7 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
+import { useAvailableAndUnavailableDevices } from '../../pages/Devices/DevicesLanding/hooks'
 import { Slideout } from '../../atoms/Slideout'
 import { PrimaryButton } from '../../atoms/Buttons'
 import { getScanning, startDiscovery } from '../../redux/discovery'
@@ -36,9 +37,8 @@ import { Robot } from '../../redux/discovery/types'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 import { AvailableRobotOption } from './AvailableRobotOption'
 
-import type { State, Dispatch } from '../../redux/types'
 import type { StyleProps } from '@opentrons/components'
-import { useAvailableAndUnavailableDevices } from '../../pages/Devices/DevicesLanding/hooks'
+import type { State, Dispatch } from '../../redux/types'
 
 interface ChooseRobotSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
