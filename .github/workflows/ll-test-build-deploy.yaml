@@ -20,7 +20,7 @@ on:
       - 'package.json'
       - '.github/workflows/ll-test-build-deploy.yaml'
     branches:
-      - '*'
+      - '**'
     tags:
       - 'labware-library*'
   workflow_dispatch:
@@ -69,6 +69,7 @@ jobs:
 
   e2e-test:
     name: 'labware library e2e tests on ${{ matrix.os }}'
+    needs: ['js-unit-test']
     timeout-minutes: 30
     strategy:
       matrix:
@@ -103,6 +104,7 @@ jobs:
         run: make -C labware-library test-e2e
   build-ll:
     name: 'build labware library artifact'
+    needs: ['js-unit-test']
     runs-on: 'ubuntu-18.04'
     if: github.event_name != 'pull_request'
     steps:
@@ -140,7 +142,7 @@ jobs:
   deploy-ll:
     name: 'deploy LL artifact to S3'
     runs-on: 'ubuntu-18.04'
-    needs: ["js-unit-test", "e2e-test", "build-ll"]
+    needs: ['js-unit-test', 'e2e-test', 'build-ll']
     if: github.event_name != 'pull_request'
     steps:
       - uses: 'actions/checkout@v2'
