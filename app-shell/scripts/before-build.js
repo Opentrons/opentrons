@@ -63,7 +63,7 @@ module.exports = function beforeBuild(context) {
 
       if (downloadHash !== sha256) {
         throw new Error(
-          `SHA265 mismatch; expected ${sha256}, got ${downloadHash}`
+          `SHA256 mismatch; expected ${sha256}, got ${downloadHash}`
         )
       }
 
