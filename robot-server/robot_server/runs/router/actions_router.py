@@ -14,7 +14,6 @@ from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResp
 from robot_server.service.task_runner import TaskRunner
 
 from ..run_store import RunStore, RunNotFoundError
-from ..run_view import RunView
 from ..action_models import RunAction, RunActionType, RunActionCreate
 from ..engine_store import EngineStore
 from ..dependencies import get_run_store, get_engine_store
@@ -48,7 +47,6 @@ class RunActionNotAllowed(ErrorDetails):
 async def create_run_action(
     runId: str,
     request_body: RequestModel[RunActionCreate],
-    run_view: RunView = Depends(RunView),
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
     action_id: str = Depends(get_unique_id),
