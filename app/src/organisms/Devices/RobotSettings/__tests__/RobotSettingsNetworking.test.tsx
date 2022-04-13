@@ -46,7 +46,7 @@ const initialMockEthernet = {
 
 const mockWifiList = [
   { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
-  // { ...Fixtures.mockWifiNetwork, ssid: 'bar' },
+  { ...Fixtures.mockWifiNetwork, ssid: 'bar', active: false },
 ]
 
 describe('RobotSettingsNetworking', () => {
@@ -64,7 +64,7 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render title and description', () => {
-    const [{ getByText, getByTestId }] = render()
+    const [{ getByText, getByTestId, queryByText }] = render()
     getByText('Wi-Fi - foo')
     getByText('Network Name')
     getByText('Wired USB')
@@ -75,10 +75,11 @@ describe('RobotSettingsNetworking', () => {
       getByTestId('RobotSettings_Networking_wifi_icon')
     ).toBeInTheDocument()
     expect(getByTestId('RobotSettings_Networking_usb_icon')).toBeInTheDocument()
+    expect(queryByText('Wi-Fi - bar')).not.toBeInTheDocument()
   })
 
   it('should render Wi-Fi mock data and ethernet mock data', () => {
-    const [{ getByText, getByTestId, queryAllByTestId }] = render()
+    const [{ getByText, getByTestId, queryByText, queryAllByTestId }] = render()
     getByText('Wi-Fi - foo')
     getByText('Network Name')
     getByText('Wired USB')
@@ -94,6 +95,7 @@ describe('RobotSettingsNetworking', () => {
     getByText('127.0.0.101')
     getByText('255.255.255.231')
     getByText('US:B0:00:00:00:00')
+    expect(queryByText('Wi-Fi - bar')).not.toBeInTheDocument()
     expect(
       getByTestId('RobotSettings_Networking_wifi_icon')
     ).toBeInTheDocument()
@@ -112,7 +114,7 @@ describe('RobotSettingsNetworking', () => {
     }
     mockGetNetworkInterfaces.mockReturnValue({ wifi: mockWiFi, ethernet: null })
 
-    const [{ getByText, getByTestId, queryAllByTestId }] = render()
+    const [{ getByText, getByTestId, queryByText, queryAllByTestId }] = render()
     getByText('Wi-Fi - foo')
     getByText('Network Name')
     getByText('Wireless IP')
@@ -123,6 +125,7 @@ describe('RobotSettingsNetworking', () => {
     getByText('00:00:00:00:00:00')
     getByText('Wired USB')
     getByText('Not connected via wired USB')
+    expect(queryByText('Wi-Fi - bar')).not.toBeInTheDocument()
     expect(
       getByTestId('RobotSettings_Networking_wifi_icon')
     ).toBeInTheDocument()
@@ -146,7 +149,6 @@ describe('RobotSettingsNetworking', () => {
     mockGetWifiList.mockReturnValue([])
     const [{ getByText, getByTestId, queryAllByTestId }] = render()
 
-    // expect(queryByText('foo')).not.toBeInTheDocument()
     getByText('Wired USB')
     getByText('Wired IP')
     getByText('Wired Subnet Mask')
@@ -188,7 +190,6 @@ describe('RobotSettingsNetworking', () => {
     getByText('Not connected via wired USB')
   })
 
-  // link check
   it('should render the right links to external resouce and internal resource', () => {
     const usbExternalLink =
       'https://support.opentrons.com/en/articles/2687586-get-started-connect-to-your-ot-2-over-usb'
