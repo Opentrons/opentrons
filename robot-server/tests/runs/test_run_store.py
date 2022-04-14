@@ -163,16 +163,21 @@ def test_get_all_runs(subject: RunStore) -> None:
 
 def test_remove_run(subject: RunStore) -> None:
     """It can remove and return a previously stored run entry."""
+    action = RunAction(
+        actionType=RunActionType.PLAY,
+        createdAt=datetime(year=2022, month=2, day=2),
+        id="action-id",
+    )
     run = RunResource(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime.now(),
-        actions=[],
+        actions=[action],
         is_current=True,
     )
 
     subject.insert(run)
-
+    subject.insert_action(run_id="run-id", action=action)
     result = subject.remove(run_id="run-id")
 
     assert result == run

@@ -160,12 +160,11 @@ class RunStore:
                 # SQLite <3.35.0 doesn't support the RETURNING clause,
                 # so we do it ourselves with a separate SELECT.
                 row_to_delete = transaction.execute(select_run_statement).one()
-                actions = transaction.execute(select_action_statement).all()
             except sqlalchemy.exc.NoResultFound as e:
                 raise RunNotFoundError(run_id) from e
+            actions = transaction.execute(select_action_statement).all()
             transaction.execute(delete_actions_statement)
             transaction.execute(delete_run_statement)
-
         return _convert_sql_row_to_run(
             row_to_delete,
             [_convert_sql_row_to_action(action) for action in actions],
