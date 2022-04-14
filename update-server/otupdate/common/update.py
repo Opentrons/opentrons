@@ -198,13 +198,13 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             status=500,
         )
 
-        _begin_validation(
-            session,
-            config.config_from_request(request),
-            asyncio.get_event_loop(),
-            os.path.join(session.download_path, part.name),
-            maybe_actions,
-        )
+    _begin_validation(
+        session,
+        config.config_from_request(request),
+        asyncio.get_event_loop(),
+        os.path.join(session.download_path, part.name),
+        maybe_actions,
+    )
 
     return web.json_response(data=session.state, status=201)
 
