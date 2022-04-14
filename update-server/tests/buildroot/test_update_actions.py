@@ -14,13 +14,6 @@ import pytest
 from otupdate.buildroot import update_actions
 from otupdate.common import file_actions
 
-from otupdate.buildroot.update_actions import (
-    ROOTFS_SIG_NAME,
-    ROOTFS_HASH_NAME,
-    ROOTFS_NAME,
-    UPDATE_FILES,
-)
-
 
 @pytest.mark.exclude_rootfs_ext4_hash_sig
 def test_validate_hash_only(downloaded_update_file):
@@ -30,10 +23,6 @@ def test_validate_hash_only(downloaded_update_file):
         downloaded_update_file,
         cb,
         None,
-        ROOTFS_NAME,
-        ROOTFS_HASH_NAME,
-        ROOTFS_SIG_NAME,
-        UPDATE_FILES,
     )
     # We should have a callback call for
     # - the unzips (see test_unzip for calculation)
@@ -58,10 +47,6 @@ def test_validate(downloaded_update_file, testing_cert):
         downloaded_update_file,
         cb,
         cert_path,
-        ROOTFS_NAME,
-        ROOTFS_HASH_NAME,
-        ROOTFS_SIG_NAME,
-        UPDATE_FILES,
     )
     # We should have a callback call for
     # - the unzips (see test_unzip for calculation)
@@ -86,10 +71,6 @@ def test_validate_catches_bad_hash(downloaded_update_file):
             downloaded_update_file,
             cb,
             None,
-            ROOTFS_NAME,
-            ROOTFS_HASH_NAME,
-            ROOTFS_SIG_NAME,
-            UPDATE_FILES,
         )
 
 
@@ -102,10 +83,6 @@ def test_validate_catches_bad_sig(downloaded_update_file, testing_cert):
             downloaded_update_file,
             cb,
             testing_cert,
-            ROOTFS_NAME,
-            ROOTFS_HASH_NAME,
-            ROOTFS_SIG_NAME,
-            UPDATE_FILES,
         )
 
 
@@ -118,10 +95,6 @@ def test_validate_catches_missing_sig(downloaded_update_file, testing_cert):
             downloaded_update_file,
             cb,
             testing_cert,
-            ROOTFS_NAME,
-            ROOTFS_HASH_NAME,
-            ROOTFS_SIG_NAME,
-            UPDATE_FILES,
         )
 
 
@@ -134,10 +107,6 @@ def test_validate_catches_missing_hash(downloaded_update_file, testing_cert):
             downloaded_update_file,
             cb,
             testing_cert,
-            ROOTFS_NAME,
-            ROOTFS_HASH_NAME,
-            ROOTFS_SIG_NAME,
-            UPDATE_FILES,
         )
 
 
@@ -150,10 +119,6 @@ def test_validate_catches_missing_image(downloaded_update_file, testing_cert):
             downloaded_update_file,
             cb,
             testing_cert,
-            ROOTFS_NAME,
-            ROOTFS_HASH_NAME,
-            ROOTFS_SIG_NAME,
-            UPDATE_FILES,
         )
 
 

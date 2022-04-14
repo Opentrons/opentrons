@@ -19,13 +19,6 @@ from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
 from . import config, update_actions
 from .session import UpdateSession, Stages
 
-from otupdate.buildroot.update_actions import (
-    ROOTFS_SIG_NAME,
-    ROOTFS_HASH_NAME,
-    ROOTFS_NAME,
-    UPDATE_FILES,
-)
-
 from otupdate.openembedded.updater import UPDATE_PKG
 
 SESSION_VARNAME = APP_VARIABLE_PREFIX + "session"
@@ -145,10 +138,6 @@ def _begin_validation(
             downloaded_update_path,
             session.set_progress,
             cert_path,
-            ROOTFS_NAME,
-            ROOTFS_HASH_NAME,
-            ROOTFS_SIG_NAME,
-            UPDATE_FILES,
         )
     )
 

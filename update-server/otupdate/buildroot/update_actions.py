@@ -12,8 +12,14 @@ import os
 import re
 import subprocess
 import tempfile
-from typing import Callable
+from typing import Callable, Optional
 
+from otupdate.common.file_actions import (
+    unzip_update,
+    hash_file,
+    HashMismatch,
+    verify_signature,
+)
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
 
 ROOTFS_SIG_NAME = "rootfs.ext4.hash.sig"
@@ -29,6 +35,61 @@ class RootPartitions(enum.Enum):
 
 
 class OT2UpdateActions(UpdateActionsInterface):
+    def validate_update(
+        self,
+        filepath: str,
+        progress_callback: Callable[[float], None],
+        cert_path: Optional[str],
+    ) -> Optional[str]:
+        """Worker for validation. Call in an executor (so it can return things)
+
+        - Unzips filepath to its directory
+        - Hashes the rootfs inside
+        - If requested, checks the signature of the hash
+        :param filepath: The path to the update zip file
+        :param progress_callback: The function to call with progress between 0
+                                  and 1.0. May never reach precisely 1.0, best
+                                  only for user information
+        :param cert_path: Path to an x.509 certificate to check the signature
+                          against. If ``None``, signature checking is disabled
+
+        :returns str: Path to the rootfs file to update
+
+        Will also raise an exception if validation fails
+        """
+
+        def zip_callback(progress):
+            progress_callback(progress / 2.0)
+
+        required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
+        if cert_path:
+            required.append(ROOTFS_SIG_NAME)
+        files, sizes = unzip_update(filepath, zip_callback, UPDATE_FILES, required)
+
+        def hash_callback(progress):
+            progress_callback(progress / 2.0 + 0.5)
+
+        rootfs = files.get(ROOTFS_NAME)
+        assert rootfs
+        rootfs_hash = hash_file(rootfs, hash_callback, file_size=sizes[ROOTFS_NAME])
+        hashfile = files.get(ROOTFS_HASH_NAME)
+        assert hashfile
+        packaged_hash = open(hashfile, "rb").read().strip()
+        if packaged_hash != rootfs_hash:
+            msg = (
+                f"Hash mismatch: calculated {rootfs_hash!r} != "
+                f"packaged {packaged_hash!r}"
+            )
+            LOG.error(msg)
+            raise HashMismatch(msg)
+
+        if cert_path:
+            sigfile = files.get(ROOTFS_SIG_NAME)
+            assert sigfile
+            verify_signature(hashfile, sigfile, cert_path)
+
+        return rootfs
+
     def write_update(
         self,
         rootfs_filepath: str,

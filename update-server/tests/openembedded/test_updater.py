@@ -1,11 +1,17 @@
 """Tests for OE Updater."""
+import os
 from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
 
 from otupdate.common.update_actions import Partition
-from otupdate.openembedded.updater import Updater, PartitionManager, RootFSInterface
+from otupdate.openembedded.updater import (
+    Updater,
+    PartitionManager,
+    RootFSInterface,
+    OEPartition,
+)
 
 import lzma
 
@@ -63,9 +69,9 @@ def test_update_invalid_part_switch(
 @pytest.mark.parametrize(
     "test_input,expected",
     [
-        (b"2", Partition(3, "/dev/mmcblk0p3")),
-        (b"3", Partition(2, "/dev/mmcblk0p2")),
-        (b"", Partition(3, "/dev/mmcblk0p3")),
+        (b"2", OEPartition(3, "/dev/mmcblk0p3", "/media/mmcblk0p3")),
+        (b"3", OEPartition(2, "/dev/mmcblk0p2", "/media/mmcblk0p2")),
+        (b"", OEPartition(3, "/dev/mmcblk0p3", "/media/mmcblk0p3")),
     ],
 )
 def test_unused_partition(mock_root_fs_interface, test_input, expected):
@@ -88,7 +94,7 @@ def test_decomp_and_write(
     mock_root_fs_interface.write_update.assert_called()
 
 
-def test_lzma(testing_partition):
+def test_lzma(testing_partition, tmpdir):
     """Test that lzma decompresses a .xz
     correctly.
     Updater::write_update has a callback to report
@@ -97,18 +103,21 @@ def test_lzma(testing_partition):
     This test uses callback call count to see if
     the entire file decompresses correctly.
     """
+    rfs_path = os.path.join(tmpdir, "rootfs.xz")
+    with lzma.open(rfs_path, "w") as f:
+        f.write(os.urandom(400000))
     cb = mock.Mock()
     root_FS_intf = RootFSInterface()
     p = Partition(2, testing_partition)
     total_size = 0
     chunk_size = 1024 * 32
-    with lzma.open("xz_file.xz", "rb") as fsrc:
+    with lzma.open(rfs_path, "rb") as fsrc:
         while True:
             chunk = fsrc.read(chunk_size)
             total_size += len(chunk)
             if len(chunk) != chunk_size:
                 break
-    root_FS_intf.write_update("xz_file.xz", p, cb, chunk_size)
+    root_FS_intf.write_update(rfs_path, p, cb, chunk_size)
     if total_size % chunk_size != 0:
         calls = int(total_size / chunk_size) + 1
     else:

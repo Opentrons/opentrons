@@ -5,20 +5,15 @@ update actions
 
 import abc
 import contextlib
-from typing import NamedTuple, Optional, Callable, Iterator, List
+from typing import NamedTuple, Optional, Callable, Iterator, Union
 from aiohttp import web
 
 from .constants import APP_VARIABLE_PREFIX
 
-from otupdate.common.file_actions import (
-    unzip_update,
-    hash_file,
-    verify_signature,
-    HashMismatch,
-)
 
 import logging
 
+from ..openembedded.updater import OEPartition
 
 FILE_ACTIONS_VARNAME = APP_VARIABLE_PREFIX + "fileactions"
 
@@ -41,15 +36,12 @@ class UpdateActionsInterface:
         """Build the object and put it in the app store"""
         app[FILE_ACTIONS_VARNAME] = cls()
 
+    @abc.abstractmethod
     def validate_update(
         self,
         filepath: str,
         progress_callback: Callable[[float], None],
         cert_path: Optional[str],
-        rootfs_name: str,
-        rootfs_hash_name: str,
-        rootfs_sig_name: str,
-        update_files: List[str],
     ) -> Optional[str]:
         """Worker for validation. Call in an executor (so it can return things)
 
@@ -62,46 +54,10 @@ class UpdateActionsInterface:
                                   only for user information
         :param cert_path: Path to an x.509 certificate to check the signature
                           against. If ``None``, signature checking is disabled
-        :param rootfs_name: Root FS filename
-        :param rootfs_hash_name: Root FS hash filename
-        :param rootfs_sig_name: root FS sig filename
-        :param update_files: list of update files
         :returns str: Path to the rootfs file to update
 
         Will also raise an exception if validation fails
         """
-
-        def zip_callback(progress):
-            progress_callback(progress / 2.0)
-
-        required = [rootfs_name, rootfs_hash_name]
-        if cert_path:
-            required.append(rootfs_sig_name)
-        files, sizes = unzip_update(filepath, zip_callback, update_files, required)
-
-        def hash_callback(progress):
-            progress_callback(progress / 2.0 + 0.5)
-
-        rootfs = files.get(rootfs_name)
-        assert rootfs
-        rootfs_hash = hash_file(rootfs, hash_callback, file_size=sizes[rootfs_name])
-        hashfile = files.get(rootfs_hash_name)
-        assert hashfile
-        packaged_hash = open(hashfile, "rb").read().strip()
-        if packaged_hash != rootfs_hash:
-            msg = (
-                f"Hash mismatch: calculated {rootfs_hash!r} != "
-                f"packaged {packaged_hash!r}"
-            )
-            LOG.error(msg)
-            raise HashMismatch(msg)
-
-        if cert_path:
-            sigfile = files.get(rootfs_sig_name)
-            assert sigfile
-            verify_signature(hashfile, sigfile, cert_path)
-
-        return rootfs
 
     @abc.abstractmethod
     def write_update(
@@ -110,7 +66,7 @@ class UpdateActionsInterface:
         progress_callback: Callable[[float], None],
         chunk_size: int,
         file_size: Optional[int],
-    ) -> Partition:
+    ) -> Union[Partition, OEPartition]:
         """
         Write the object to a specific rootfs path
         """

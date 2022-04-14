@@ -4,8 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from otupdate import openembedded
-from otupdate.common.update_actions import Partition
-from otupdate.openembedded.updater import RootFSInterface, PartitionManager
+from otupdate.openembedded.updater import RootFSInterface, PartitionManager, OEPartition
 from tests.common.config import FakeRootPartElem
 
 
@@ -19,9 +18,15 @@ def mock_root_fs_interface() -> MagicMock:
 def mock_partition_manager_valid_switch() -> MagicMock:
     """Mock Partition Manager."""
     mock = MagicMock(spec=PartitionManager)
-    mock.find_unused_partition.return_value = Partition(2, "/dev/mmcblk0p2")
-    mock.switch_partition.return_value = Partition(2, "/dev/mmcblk0p2")
+    mock.find_unused_partition.return_value = OEPartition(
+        2, "/dev/mmcblk0p2", "/media/mmcblk0p2"
+    )
+    mock.switch_partition.return_value = OEPartition(
+        2, "/dev/mmcblk0p2", "/media/mmcblk0p2"
+    )
     mock.resize_partition.return_value = True
+    mock.mount_fs.return_value = True
+    mock.umount_fs.return_value = True
 
     mock.mountpoint_root.return_value = "/mnt"
 
@@ -32,8 +37,12 @@ def mock_partition_manager_valid_switch() -> MagicMock:
 def mock_partition_manager_invalid_switch() -> MagicMock:
     """Mock Partition Manager."""
     mock = MagicMock(spec=PartitionManager)
-    mock.find_unused_partition.return_value = Partition(2, "/dev/mmcblk0p2")
-    mock.switch_partition.return_value = Partition(3, "/dev/mmcblk0p2")
+    mock.find_unused_partition.return_value = OEPartition(
+        2, "/dev/mmcblk0p2", "/media/mmcblk0p2"
+    )
+    mock.switch_partition.return_value = OEPartition(
+        3, "/dev/mmcblk0p3", "/media/mmcblk0p3"
+    )
     mock.resize_partition.return_value = True
 
     mock.mountpoint_root.return_value = "/mnt"
@@ -48,5 +57,7 @@ def testing_partition(monkeypatch, tmpdir):
     monkeypatch.setattr(
         openembedded.updater.PartitionManager, "find_unused_partition", find_unused
     )
-    find_unused.return_value = FakeRootPartElem("TWO", Partition(2, part_file))
+    find_unused.return_value = FakeRootPartElem(
+        "TWO", OEPartition(2, part_file, "/mnt/mmblk0-p2")
+    )
     return part_file
