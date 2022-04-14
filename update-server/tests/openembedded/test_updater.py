@@ -5,7 +5,6 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from otupdate.common.update_actions import Partition
 from otupdate.openembedded.constants import OEPartition
 from otupdate.openembedded.updater import (
     Updater,
@@ -108,7 +107,7 @@ def test_lzma(testing_partition, tmpdir):
         f.write(os.urandom(400000))
     cb = mock.Mock()
     root_FS_intf = RootFSInterface()
-    p = Partition(2, testing_partition)
+    p = OEPartition(2, testing_partition, "/media/mmcblk0p2")
     total_size = 0
     chunk_size = 1024 * 32
     with lzma.open(rfs_path, "rb") as fsrc:
