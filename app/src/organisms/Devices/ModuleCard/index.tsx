@@ -113,7 +113,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const handleUpdateClick = (): void => {
     robotName && dispatchApiRequest(updateModule(robotName, module.serial))
     setTimeout(() => {
-      latestRequest?.status === SUCCESS ? setShowSuccessToast(true) : null
+      latestRequest?.status === SUCCESS && setShowSuccessToast(true)
     }, 5000)
   }
   const isPending = latestRequest?.status === PENDING
