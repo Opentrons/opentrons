@@ -2,7 +2,7 @@ import { css } from 'styled-components'
 // import type { FlattenSimpleInterpolation } from 'styled-components'
 
 // Font Sizes
-export const fontSizeH1 = '1.188rem' // 18px
+export const fontSizeH1 = '1.188rem' // 19px
 export const fontSizeH2 = '0.9375rem' // 15px
 export const fontSizeH3 = '0.875rem' // 14px
 export const fontSizeH4 = '0.813rem' //  13px
