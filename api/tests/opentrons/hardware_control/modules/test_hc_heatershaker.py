@@ -144,7 +144,7 @@ async def test_deactivated_updated_live_data(simulating_module):
             "speedStatus": "idle",
             "temperatureStatus": "idle",
             "currentSpeed": 0,
-            "currentTemp": 0,
+            "currentTemp": 23,
             "targetSpeed": None,
             "targetTemp": None,
             "errorDetails": None,
