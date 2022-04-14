@@ -5,7 +5,11 @@ import mapValues from 'lodash/mapValues'
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
 import uniq from 'lodash/uniq'
-import { FIXED_TRASH_ID, OT2_STANDARD_DECKID, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
+import {
+  FIXED_TRASH_ID,
+  OT2_STANDARD_DECKID,
+  OT2_STANDARD_MODEL,
+} from '@opentrons/shared-data'
 import { getFileMetadata } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
 import { selectors as dismissSelectors } from '../../dismiss'
@@ -197,7 +201,10 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       })
     )
 
-    const loadLabwareCommands = reduce<RobotState['labware'], LoadLabwareCreateCommand[]>(
+    const loadLabwareCommands = reduce<
+      RobotState['labware'],
+      LoadLabwareCreateCommand[]
+    >(
       initialRobotState.labware,
       (
         acc,
@@ -211,11 +218,14 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           commandType: 'loadLabware' as const,
           params: {
             labwareId: labwareId,
-            location: isLabwareOnTopOfModule ? { moduleId: labware.slot } : { slotName: labware.slot },
+            location: isLabwareOnTopOfModule
+              ? { moduleId: labware.slot }
+              : { slotName: labware.slot },
           },
         }
         return [...acc, loadLabwareCommand]
-      }, []
+      },
+      []
     )
 
     const loadLiquidCommands = getLoadLiquidCommands(
