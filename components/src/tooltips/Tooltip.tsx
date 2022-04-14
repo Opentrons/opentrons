@@ -2,7 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 
 import { radiusSoftCorners } from '../ui-style-constants/borders'
-import { fontSizeLabel } from '../ui-style-constants/typography'
+import { fontSizeH4 } from '../ui-style-constants/typography'
 import { spacing3 } from '../ui-style-constants/spacing'
 import { white, darkGrey } from '../ui-style-constants/colors'
 import { ARROW_SIZE_PX } from './styles'
@@ -12,17 +12,6 @@ import type { CSSProperties } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { Placement } from './types'
 import type { StyleProps } from '../primitives'
-
-const TOOLTIP_CSS = css`
-  position: absolute;
-  z-index: 9001;
-  padding: ${spacing3};
-  color: ${white};
-  filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.2));
-  cursor: pointer;
-  font-size: ${fontSizeLabel};
-  border-radius: ${radiusSoftCorners};
-`
 
 export interface TooltipProps extends StyleProps {
   /** Whether or not the tooltip should be rendered */
@@ -61,9 +50,21 @@ export const Tooltip = React.forwardRef(function TooltipComponent(
     arrowStyle,
     children,
     width,
+    fontSize = fontSizeH4,
     backgroundColor = darkGrey,
     ...boxProps
   } = props
+
+  const TOOLTIP_CSS = css`
+    position: absolute;
+    z-index: 9001;
+    padding: ${spacing3};
+    color: ${white};
+    filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.2));
+    cursor: pointer;
+    font-size: ${fontSize};
+    border-radius: ${radiusSoftCorners};
+  `
 
   return visible ? (
     <Box
