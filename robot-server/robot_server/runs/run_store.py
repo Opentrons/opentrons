@@ -199,7 +199,6 @@ def _convert_sql_row_to_run(
         assert isinstance(protocol_id, str)
 
     is_current = current_run_id == run_id
-    assert isinstance(is_current, bool)
 
     return RunResource(
         run_id=run_id,
