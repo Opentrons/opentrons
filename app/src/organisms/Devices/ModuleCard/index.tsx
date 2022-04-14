@@ -42,6 +42,7 @@ import {
   FAILURE,
   getErrorResponseMessage,
   dismissRequest,
+  SUCCESS,
 } from '../../../redux/robot-api'
 import { Banner } from '../../../atoms/Banner'
 import { Toast } from '../../../atoms/Toast'
@@ -99,12 +100,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       }
     },
   })
-  const handleUpdateClick = (): void => {
-    robotName && dispatchApiRequest(updateModule(robotName, module.serial))
-    setTimeout(() => {
-      setShowSuccessToast(true)
-    }, 10000)
-  }
+
   const latestRequestId = last(requestIds)
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId ? getRequestById(state, latestRequestId) : null
@@ -113,6 +109,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     if (latestRequestId != null) {
       dispatch(dismissRequest(latestRequestId))
     }
+  }
+  const handleUpdateClick = (): void => {
+    robotName && dispatchApiRequest(updateModule(robotName, module.serial))
+    setTimeout(() => {
+      latestRequest?.status === SUCCESS ? setShowSuccessToast(true) : null
+    }, 5000)
   }
   const isPending = latestRequest?.status === PENDING
   const hotToTouch: IconProps = { name: 'ot-hot-to-touch' }
@@ -273,15 +275,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   onClose={() => setShowSuccessToast(false)}
                 />
               )}
-              {latestRequest != null &&
-                latestRequest &&
-                latestRequest.status === FAILURE && (
-                  <FirmwareUpdateFailedModal
-                    module={module}
-                    onCloseClick={handleCloseErrorModal}
-                    errorMessage={getErrorResponseMessage(latestRequest.error)}
-                  />
-                )}
+              {latestRequest != null && latestRequest.status === FAILURE && (
+                <FirmwareUpdateFailedModal
+                  module={module}
+                  onCloseClick={handleCloseErrorModal}
+                  errorMessage={getErrorResponseMessage(latestRequest.error)}
+                />
+              )}
               {module.hasAvailableUpdate && showBanner && !isPending ? (
                 <Flex
                   paddingBottom={SPACING.spacing2}

@@ -8,6 +8,7 @@ import {
   DispatchApiRequestType,
   useDispatchApiRequest,
 } from '../../../../redux/robot-api'
+import { Toast } from '../../../../atoms/Toast'
 import { useCurrentRunStatus } from '../../../RunTimeControl/hooks'
 import * as RobotApi from '../../../../redux/robot-api'
 import { MagneticModuleData } from '../MagneticModuleData'
@@ -38,6 +39,7 @@ jest.mock('../ModuleOverflowMenu')
 jest.mock('../../../RunTimeControl/hooks')
 jest.mock('../FirmwareUpdateFailedModal')
 jest.mock('../../../../redux/robot-api')
+jest.mock('../../../../atoms/Toast')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
@@ -73,6 +75,7 @@ const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
 const mockFirmwareUpdateFailedModal = FirmwareUpdateFailedModal as jest.MockedFunction<
   typeof FirmwareUpdateFailedModal
 >
+const mockToast = Toast as jest.MockedFunction<typeof Toast>
 const mockMagneticModuleHub = {
   model: 'magneticModuleV1',
   type: 'magneticModuleType',
@@ -135,6 +138,7 @@ describe('ModuleCard', () => {
     mockFirmwareUpdateFailedModal.mockReturnValue(
       <div>mock firmware update failed modal</div>
     )
+    mockToast.mockReturnValue(<div>mock toast</div>)
     mockGetRequestById.mockReturnValue({
       status: RobotApi.SUCCESS,
       response: {
@@ -252,12 +256,49 @@ describe('ModuleCard', () => {
     })
     getByText(nestedTextMatcher('Module is hot to the touch'))
   })
-  it('renders information for a magnetic module when an update is available so update banner renders', () => {
+  it('renders information for a magnetic module when an update is available so update banner renders then toast renders when successful', async () => {
     const { getByText } = render({
       module: mockMagneticModuleHub,
       robotName: mockRobot.name,
     })
     getByText('Firmware update available.')
-    getByText('Update now')
+    const button = getByText('Update now')
+    fireEvent.click(button)
+    expect(mockGetRequestById).toHaveBeenCalled()
+    await new Promise(resolve => setTimeout(resolve, 5000))
+    expect(getByText('mock toast')).toBeVisible()
+  })
+  it('renders information for update available and it fails rendering the fail modal', () => {
+    mockGetRequestById.mockReturnValue({
+      status: RobotApi.FAILURE,
+      response: {
+        method: 'POST',
+        ok: false,
+        path: '/',
+        status: 500,
+      },
+      error: { message: 'ruh roh' },
+    })
+
+    const { getByText } = render({
+      module: mockMagneticModuleHub,
+      robotName: mockRobot.name,
+    })
+    getByText('Firmware update available.')
+    const button = getByText('Update now')
+    fireEvent.click(button)
+    expect(mockGetRequestById).toHaveBeenCalled()
+    expect(getByText('mock firmware update failed modal')).toBeVisible()
+  })
+  it('renders information for update available and updating now text shows up when update is in progress', () => {
+    mockGetRequestById.mockReturnValue({
+      status: RobotApi.PENDING,
+    })
+    const { getByText, getByLabelText } = render({
+      module: mockMagneticModuleHub,
+      robotName: mockRobot.name,
+    })
+    expect(getByText('Updating firmware...')).toBeVisible()
+    expect(getByLabelText('ot-spinner')).toBeVisible()
   })
 })
