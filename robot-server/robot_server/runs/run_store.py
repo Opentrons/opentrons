@@ -143,18 +143,34 @@ class RunStore:
         Raises:
             RunNotFoundError: The specified run ID was not found.
         """
-        select_statement = sqlalchemy.select(run_table).where(run_table.c.id == run_id)
-        delete_statement = sqlalchemy.delete(run_table).where(run_table.c.id == run_id)
+        select_run_statement = sqlalchemy.select(run_table).where(
+            run_table.c.id == run_id
+        )
+        select_action_statement = sqlalchemy.select(action_table).where(
+            action_table.c.run_id == run_id
+        )
+        delete_run_statement = sqlalchemy.delete(run_table).where(
+            run_table.c.id == run_id
+        )
+        delete_actions_statement = sqlalchemy.delete(action_table).where(
+            action_table.c.run_id == run_id
+        )
         with self._sql_engine.begin() as transaction:
             try:
                 # SQLite <3.35.0 doesn't support the RETURNING clause,
                 # so we do it ourselves with a separate SELECT.
-                row_to_delete = transaction.execute(select_statement).one()
+                row_to_delete = transaction.execute(select_run_statement).one()
+                actions = transaction.execute(select_action_statement).all()
             except sqlalchemy.exc.NoResultFound as e:
                 raise RunNotFoundError(run_id) from e
-            transaction.execute(delete_statement)
+            transaction.execute(delete_actions_statement)
+            transaction.execute(delete_run_statement)
 
-        return _convert_sql_row_to_run(row_to_delete, [], self._active_run)
+        return _convert_sql_row_to_run(
+            row_to_delete,
+            [_convert_sql_row_to_action(action) for action in actions],
+            self._active_run,
+        )
 
 
 def _get_actions_no_transaction(
