@@ -123,14 +123,14 @@ class RunStore:
         statement = sqlalchemy.select(run_table)
         with self._sql_engine.begin() as transaction:
             runs = transaction.execute(statement).all()
-        return [
-            _convert_sql_row_to_run(
-                sql_row=row,
-                actions=self._get_actions(row.id),
-                current_run_id=self._active_run,
-            )
-            for row in runs
-        ]
+            return [
+                _convert_sql_row_to_run(
+                    sql_row=row,
+                    actions=self._get_no_transaction(row.id,  transaction),
+                    current_run_id=self._active_run,
+                )
+                for row in runs
+            ]
 
     def remove(self, run_id: str) -> RunResource:
         """Remove a run by its unique identifier.
