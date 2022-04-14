@@ -11,7 +11,7 @@
     "magnet": "Engage or disengage the Magnetic module.",
     "temperature": "Set temperature command for Temperature module.",
     "thermocycler": "Change Thermocycler state or program a profile.",
-    "heaterShaker": "Set heat, shake, or labware latch commands for the Heater Shaker module"
+    "heaterShaker": "Set heat, shake, or labware latch commands for the Heater-Shaker module"
   },
 
   "disabled_module_step": "Add a relevant module to use this step",
@@ -46,7 +46,9 @@
       "dispense_touchTip_checkbox": "Touch tip to each side of well after dispensing",
       "mix_touchTip_checkbox": "Touch tip to each side of the well after mixing",
 
-      "volume": "Volume to dispense in each well"
+      "volume": "Volume to dispense in each well",
+
+      "heaterShakerSetTimer": "Once this counter has elapsed, the module will deactivate the heater and shaker"
     },
     "indeterminate": {
       "aspirate_airGap_checkbox": "Not all selected steps are using this setting",
@@ -82,6 +84,11 @@
     "pauseAction": {
       "disabled": {
         "wait_until_temp": "There is no temperature module on the deck"
+      }
+    },
+    "heaterShaker": {
+      "disabled": {
+        "latchOpen": "Labware Latch cannot be open while the module is shaking"
       }
     }
   },
