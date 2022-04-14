@@ -67,6 +67,7 @@ export function InformationCard(props: InformationCardProps): JSX.Element {
   })
 
   const updateDisabled = autoUpdateDisabledReason !== null
+  console.log('autoUpdateAction', autoUpdateAction)
 
   // check for available updates on an interval
   useInterval(checkAppUpdate, UPDATE_RECHECK_DELAY_MS)

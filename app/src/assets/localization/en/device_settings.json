@@ -44,5 +44,10 @@
   "short_trash_bin":"Short trash bin",
   "short_trash_bin_description":"For pre-2019 robots with trash bins that are 55mm tall (instead of 77mm default)",
   "use_older_aspirate":"Use older aspirate behavior",
-  "use_older_aspirate_description":"Aspirate with the less accurate volumetric calibrations that were used before version 3.7.0. Use this if you need consistency with pre-v3.7.0 results. This only affects GEN1 P10S, P10M, P50M, and P300S pipettes."
+  "use_older_aspirate_description":"Aspirate with the less accurate volumetric calibrations that were used before version 3.7.0. Use this if you need consistency with pre-v3.7.0 results. This only affects GEN1 P10S, P10M, P50M, and P300S pipettes.",
+  "rename_robot_slideout_title": "Rename Robot",
+  "rename_robot_slideout_description": "Choose a name for your robot. A restart is required to finish renaming the robot.",
+  "rename_robot_slideout_label": "Robot Name",
+  "rename_robot_button": "Rename and restart",
+  "rename_robot_input_limitation_lable": "TBD"
 }
