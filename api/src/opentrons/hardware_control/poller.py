@@ -2,8 +2,10 @@ import asyncio
 from abc import abstractmethod, ABC
 from collections import deque
 from typing import TypeVar, Generic, Deque, Optional
+import logging
 
 DataT = TypeVar("DataT")
+log = logging.getLogger(__name__)
 
 
 class Reader(ABC, Generic[DataT]):
@@ -90,13 +92,15 @@ class WaitableListener(Listener[DataT]):
         """Notify all futures of a new poll result."""
         while self._futures:
             f = self._futures.popleft()
-            f.set_result(val)
+            if not f.done():
+                f.set_result(val)
 
     def _cancel(self, exc: Exception) -> None:
         """Notify all futures of an error."""
         while self._futures:
             f = self._futures.popleft()
-            f.set_exception(exc)
+            if not f.done():
+                f.set_exception(exc)
 
 
 class Poller(Generic[DataT]):
@@ -138,6 +142,7 @@ class Poller(Generic[DataT]):
                 poll = await self._reader.read()
                 self._listener.on_poll(poll)
             except Exception as e:
+                log.exception("Polling exception")
                 self._listener.on_error(e)
 
             try:
