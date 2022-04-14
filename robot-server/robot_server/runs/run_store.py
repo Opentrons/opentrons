@@ -68,7 +68,7 @@ class RunStore:
         if is_current is True:
             self._active_run = run_id
         elif is_current is False and self._active_run == run_id:
-            self._active_run = ""
+            self._active_run = None
         return self.get(run_id)
 
     def insert(self, run: RunResource) -> RunResource:
