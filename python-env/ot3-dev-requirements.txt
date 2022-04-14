@@ -4,19 +4,19 @@
 #
 #    pip-compile --output-file=ot3-dev-requirements.txt common-dev.in ot3-dev-requirements.in
 #
--e file:../notify-server
+-e file:../notify-server#egg=notify_server
     # via -r ot3-dev-requirements.in
--e file:../api
+-e file:../api#egg=opentrons
     # via -r ot3-dev-requirements.in
--e file:../hardware
+-e file:../hardware#egg=opentrons_hardware
     # via -r ot3-dev-requirements.in
--e file:../shared-data/python
+-e file:../shared-data/python#egg=opentrons_shared_data
     # via
     #   -r ot3-dev-requirements.in
     #   opentrons
--e file:../update-server
+-e file:../update-server#egg=update_server
     # via -r ot3-dev-requirements.in
--e file:../robot-server
+-e file:../robot-server#egg=robot_server
     # via -r ot3-dev-requirements.in
 aenum==3.1.8
     # via python-can

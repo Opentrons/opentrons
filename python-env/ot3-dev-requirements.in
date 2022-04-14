@@ -1,9 +1,8 @@
 # Dependencies for ot3
 
-# Add editable
--e file:../api
--e file:../robot-server
--e file:../notify-server
--e file:../shared-data/python
--e file:../update-server
--e file:../hardware
+-e file:../api#egg=opentrons
+-e file:../robot-server#egg=robot_server
+-e file:../notify-server#egg=notify_server
+-e file:../shared-data/python#egg=opentrons_shared_data
+-e file:../update-server#egg=otupdate
+-e file:../hardware#egg=opentrons_hardware
