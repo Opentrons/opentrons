@@ -102,13 +102,13 @@ def test_lzma(testing_partition):
     p = Partition(2, testing_partition)
     total_size = 0
     chunk_size = 1024 * 32
-    with lzma.open("test-xz.xz", "rb") as fsrc:
+    with lzma.open("xz_file.xz", "rb") as fsrc:
         while True:
             chunk = fsrc.read(chunk_size)
             total_size += len(chunk)
             if len(chunk) != chunk_size:
                 break
-    root_FS_intf.write_update("test-xz.xz", p, cb, chunk_size)
+    root_FS_intf.write_update("xz_file.xz", p, cb, chunk_size)
     if total_size % chunk_size != 0:
         calls = int(total_size / chunk_size) + 1
     else:
