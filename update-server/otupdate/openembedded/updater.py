@@ -10,11 +10,13 @@ from otupdate.common.file_actions import (
     verify_signature,
 )
 from otupdate.common.update_actions import UpdateActionsInterface
-from typing import Callable, Optional, NamedTuple
+from typing import Callable, Optional
 import enum
 import subprocess
 
 import logging
+
+from otupdate.openembedded.constants import OEPartition
 
 UPDATE_PKG = "ot3-system.zip"
 ROOTFS_SIG_NAME = "rootfs.xz.hash.sig"
@@ -23,12 +25,6 @@ ROOTFS_NAME = "rootfs.xz"
 UPDATE_FILES = [ROOTFS_NAME, ROOTFS_SIG_NAME, ROOTFS_HASH_NAME]
 
 LOG = logging.getLogger(__name__)
-
-
-class OEPartition(NamedTuple):
-    number: int
-    path: str
-    mount_point: str
 
 
 class RootPartitions(enum.Enum):

@@ -13,7 +13,7 @@ from .constants import APP_VARIABLE_PREFIX
 
 import logging
 
-from ..openembedded.updater import OEPartition
+from ..openembedded.constants import OEPartition
 
 FILE_ACTIONS_VARNAME = APP_VARIABLE_PREFIX + "fileactions"
 

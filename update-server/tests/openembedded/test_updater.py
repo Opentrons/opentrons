@@ -6,11 +6,11 @@ from unittest.mock import MagicMock
 import pytest
 
 from otupdate.common.update_actions import Partition
+from otupdate.openembedded.constants import OEPartition
 from otupdate.openembedded.updater import (
     Updater,
     PartitionManager,
     RootFSInterface,
-    OEPartition,
 )
 
 import lzma

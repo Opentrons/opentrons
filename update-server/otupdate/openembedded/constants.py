@@ -3,6 +3,7 @@
 from typing import NamedTuple
 
 
-class Partition(NamedTuple):
+class OEPartition(NamedTuple):
     number: int
     path: str
+    mount_point: str
