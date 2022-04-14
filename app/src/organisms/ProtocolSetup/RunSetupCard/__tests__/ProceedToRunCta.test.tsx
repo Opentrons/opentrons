@@ -63,7 +63,7 @@ describe('ProceedToRunCta', () => {
     })
 
     const { getByRole } = render()
-    const button = getByRole('button', { name: 'Proceed to Run' })
+    const button = getByRole('button', { name: 'Proceed to run' })
     expect(button).not.toBeDisabled()
   })
 
@@ -73,7 +73,7 @@ describe('ProceedToRunCta', () => {
       remainingAttachedModules: [],
     })
     const { getByRole } = render()
-    const button = getByRole('button', { name: 'Proceed to Run' })
+    const button = getByRole('button', { name: 'Proceed to run' })
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'proceedToRun',
@@ -87,7 +87,7 @@ describe('ProceedToRunCta', () => {
       remainingAttachedModules: [],
     })
     const { getByRole, getByText } = render()
-    const button = getByRole('button', { name: 'Proceed to Run' })
+    const button = getByRole('button', { name: 'Proceed to run' })
     expect(button).toBeDisabled()
     getByText('Make sure all modules are connected before proceeding to run')
   })
@@ -100,7 +100,7 @@ describe('ProceedToRunCta', () => {
       complete: false,
     } as any)
     const { getByRole, getByText } = render()
-    const button = getByRole('button', { name: 'Proceed to Run' })
+    const button = getByRole('button', { name: 'Proceed to run' })
     expect(button).toBeDisabled()
     getByText(
       'Make sure robot calibration is complete and all modules are connected before proceeding to run'
@@ -115,7 +115,7 @@ describe('ProceedToRunCta', () => {
       complete: false,
     } as any)
     const { getByRole, getByText } = render()
-    const button = getByRole('button', { name: 'Proceed to Run' })
+    const button = getByRole('button', { name: 'Proceed to run' })
     expect(button).toBeDisabled()
     getByText(
       'Make sure robot calibration is complete before proceeding to run'

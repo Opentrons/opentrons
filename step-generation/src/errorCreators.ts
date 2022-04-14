@@ -126,3 +126,10 @@ export const heaterShakerLatchOpen = (): CommandCreatorError => {
     message: 'Attempted to pipette into a heater-shaker with the latch open.',
   }
 }
+
+export const heaterShakerIsShaking = (): CommandCreatorError => {
+  return {
+    type: 'HEATER_SHAKER_IS_SHAKING',
+    message: 'Attempted to pipette into a heater-shaker when it is shaking.',
+  }
+}

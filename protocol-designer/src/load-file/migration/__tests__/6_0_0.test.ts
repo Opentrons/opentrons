@@ -1,15 +1,26 @@
 import { migrateFile } from '../6_0_0'
+import { getLoadLiquidCommands } from '../utils/getLoadLiquidCommands'
 import _oldProtocol from 'protocol-designer/fixtures/protocol/5/doItAllV5.json'
-import type { ProtocolFile, ProtocolFileV5 } from '@opentrons/shared-data'
+import type { ProtocolFileV5 } from '@opentrons/shared-data'
 
 const oldProtocol = (_oldProtocol as unknown) as ProtocolFileV5<any>
 
+jest.mock('../utils/getLoadLiquidCommands')
+
+const mockGetLoadLiquidCommands = getLoadLiquidCommands as jest.MockedFunction<
+  typeof getLoadLiquidCommands
+>
+
 describe('v6 migration', () => {
-  let migratedFile = {} as ProtocolFile
   beforeEach(() => {
-    migratedFile = migrateFile(oldProtocol)
+    mockGetLoadLiquidCommands.mockReturnValue([])
+  })
+  afterEach(() => {
+    jest.restoreAllMocks()
   })
   it('removes slot from modules and labware', () => {
+    const migratedFile = migrateFile(oldProtocol)
+
     expect(
       oldProtocol.modules[
         '0b419310-75c7-11ea-b42f-4b64e50f43e5:magneticModuleType'
@@ -34,6 +45,7 @@ describe('v6 migration', () => {
     ).toBeUndefined()
   })
   it('removes mount from pipettes', () => {
+    const migratedFile = migrateFile(oldProtocol)
     expect(
       oldProtocol.pipettes['0b3f2210-75c7-11ea-b42f-4b64e50f43e5'].mount
     ).toEqual('left')
@@ -43,6 +55,7 @@ describe('v6 migration', () => {
     ).toBeUndefined()
   })
   it('adds deckId to Robot', () => {
+    const migratedFile = migrateFile(oldProtocol)
     expect(oldProtocol.robot).toEqual({ model: 'OT-2 Standard' })
     expect(migratedFile.robot).toEqual({
       model: 'OT-2 Standard',
@@ -50,10 +63,12 @@ describe('v6 migration', () => {
     })
   })
   it('adds a liquids key', () => {
+    const migratedFile = migrateFile(oldProtocol)
     const expectedLiquids = { '0': { displayName: 'Water', description: null } }
     expect(migratedFile.liquids).toEqual(expectedLiquids)
   })
   it('creates loadModule commands', () => {
+    const migratedFile = migrateFile(oldProtocol)
     const expectedLoadModuleCommands = [
       {
         key: expect.any(String),
@@ -80,6 +95,7 @@ describe('v6 migration', () => {
     expect(loadModuleCommands).toEqual(expectedLoadModuleCommands)
   })
   it('creates loadPipette commands', () => {
+    const migratedFile = migrateFile(oldProtocol)
     const expectedLoadPipetteCommands = [
       {
         key: expect.any(String),
@@ -96,6 +112,7 @@ describe('v6 migration', () => {
     expect(loadPipetteCommands).toEqual(expectedLoadPipetteCommands)
   })
   it('creates loadLabware commands', () => {
+    const migratedFile = migrateFile(oldProtocol)
     const loadLabwareCommands = migratedFile.commands.filter(
       command => command.commandType === 'loadLabware'
     )
@@ -140,7 +157,15 @@ describe('v6 migration', () => {
     ]
     expect(loadLabwareCommands).toEqual(expectedLoadLabwareCommaands)
   })
+  it('creates loadLiquid commands', () => {
+    migrateFile(oldProtocol)
+    expect(mockGetLoadLiquidCommands).toHaveBeenCalledWith(
+      _oldProtocol.designerApplication.data.ingredients,
+      _oldProtocol.designerApplication.data.ingredLocations
+    )
+  })
   it('replaces air gap commands with aspirate commands', () => {
+    const migratedFile = migrateFile(oldProtocol)
     const expectedConvertedAirgapCommands = [
       {
         key: expect.any(String), // no key used to exist in v5 commands

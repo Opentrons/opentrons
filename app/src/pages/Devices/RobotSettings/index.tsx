@@ -18,11 +18,9 @@ import { Line } from '../../../atoms/structure'
 import { NavTab } from '../../../atoms/NavTab'
 import { RobotSettingsCalibration } from '../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
 import { RobotSettingsAdvanced } from '../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
+import { RobotSettingsNetworking } from '../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 
-import type {
-  NextGenRouteParams,
-  RobotSettingsTab,
-} from '../../../App/NextGenApp'
+import type { NextGenRouteParams, RobotSettingsTab } from '../../../App/types'
 
 export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')
@@ -32,8 +30,8 @@ export function RobotSettings(): JSX.Element | null {
     [K in RobotSettingsTab]: () => JSX.Element
   } = {
     calibration: () => <RobotSettingsCalibration robotName={robotName} />,
-    // TODO: networking tab content
-    networking: () => <div>networking</div>,
+
+    networking: () => <RobotSettingsNetworking robotName={robotName} />,
     // TODO: advanced tab content
     advanced: () => <RobotSettingsAdvanced robotName={robotName} />,
   }

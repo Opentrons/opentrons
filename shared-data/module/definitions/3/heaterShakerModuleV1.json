@@ -3,9 +3,9 @@
   "moduleType": "heaterShakerModuleType",
   "model": "heaterShakerModuleV1",
   "labwareOffset": {
-    "x": -0.6,
-    "y": -0.825,
-    "z": 70
+    "x": -0.125,
+    "y": 1.125,
+    "z": 68.275
   },
   "dimensions": {
     "bareOverallHeight": 82,
@@ -18,13 +18,13 @@
     "labwareInterfaceYDimension": 86
   },
   "cornerOffsetFromSlot": {
-    "x": -17.3,
-    "y": -2.7,
+    "x": -18,
+    "y": -1.8,
     "z": 0
   },
   "calibrationPoint": {
-    "x": 12,
-    "y": 9
+    "x": 12.0,
+    "y": 8.75
   },
   "displayName": "Heater Shaker Module GEN1",
   "quirks": [],
@@ -32,22 +32,22 @@
     "ot2_standard": {
       "3": {
         "labwareOffset": [
-          [-1, 0, 0.25],
-          [0, 1, 0],
+          [-1, 0, 0],
+          [0, -1, 0],
           [0, 0, 1]
         ]
       },
       "6": {
         "labwareOffset": [
-          [-1, 0, 0.25],
-          [0, 1, 0],
+          [-1, 0, 0],
+          [0, -1, 0],
           [0, 0, 1]
         ]
       },
       "9": {
         "labwareOffset": [
-          [-1, 0, 0.25],
-          [0, 1, 0],
+          [-1, 0, 0],
+          [0, -1, 0],
           [0, 0, 1]
         ]
       }
@@ -55,22 +55,22 @@
     "ot2_short_trash": {
       "3": {
         "labwareOffset": [
-          [-1, 0, 0.25],
-          [0, 1, 0],
+          [-1, 0, 0],
+          [0, -1, 0],
           [0, 0, 1]
         ]
       },
       "6": {
         "labwareOffset": [
-          [-1, 0, 0.25],
-          [0, 1, 0],
+          [-1, 0, 0],
+          [0, -1, 0],
           [0, 0, 1]
         ]
       },
       "9": {
         "labwareOffset": [
-          [-1, 0, 0.25],
-          [0, 1, 0],
+          [-1, 0, 0],
+          [0, -1, 0],
           [0, 0, 1]
         ]
       }

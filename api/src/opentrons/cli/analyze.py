@@ -55,7 +55,10 @@ def _get_input_files(files_and_dirs: Sequence[Path]) -> List[Path]:
 async def _analyze(files_and_dirs: Sequence[Path], json_mode: bool) -> None:
     input_files = _get_input_files(files_and_dirs)
 
-    protocol_source = await ProtocolReader().read(input_files)
+    protocol_source = await ProtocolReader().read_saved(
+        files=input_files,
+        directory=None,
+    )
     runner = await create_simulating_runner()
     analysis = await runner.run(protocol_source)
 

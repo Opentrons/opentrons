@@ -5,14 +5,13 @@ import {
   SPACING,
   Icon,
   Flex,
-  COLORS,
-  BORDERS,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   SIZE_1,
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
+import { MiniCard } from '../../molecules/MiniCard'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 
 interface AvailableRobotOptionProps {
@@ -22,29 +21,13 @@ interface AvailableRobotOptionProps {
   onClick: () => void
   isSelected: boolean
 }
-const unselectedOptionStyles = css`
-  background-color: ${COLORS.white};
-  border: 1px solid ${COLORS.medGrey};
-  border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing3};
-  width: 100%;
-  cursor: pointer;
-`
-const selectedOptionStyles = css`
-  ${unselectedOptionStyles}
-  border: 1px solid ${COLORS.blue};
-  background-color: ${COLORS.lightBlue};
-`
 
 export function AvailableRobotOption(
   props: AvailableRobotOptionProps
 ): JSX.Element {
   const { robotName, robotModel, local, onClick, isSelected } = props
   return (
-    <Flex
-      onClick={onClick}
-      css={isSelected ? selectedOptionStyles : unselectedOptionStyles}
-    >
+    <MiniCard onClick={onClick} isSelected={isSelected}>
       <img
         src={OT2_PNG}
         css={css`
@@ -70,6 +53,6 @@ export function AvailableRobotOption(
           />
         </Flex>
       </Flex>
-    </Flex>
+    </MiniCard>
   )
 }

@@ -100,7 +100,6 @@ export const TestShakeSlideout = (
       title={t('test_shake', { ns: 'heater_shaker' })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      height={`calc(100vh - ${SPACING.spacing4})`} // subtract breadcrumb strip
       footer={
         <PrimaryButton
           textTransform={TEXT_TRANSFORM_CAPITALIZE}

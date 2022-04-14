@@ -23,28 +23,6 @@ import { Navbar } from './Navbar'
 
 import type { RouteProps } from './types'
 
-export type RobotSettingsTab = 'calibration' | 'networking' | 'advanced'
-export type AppSettingsTab =
-  | 'general'
-  | 'privacy'
-  | 'advanced'
-  | 'feature-flags'
-
-export type ProtocolRunDetailsTab = 'setup' | 'module-controls' | 'run-log'
-
-/**
- * route params type definition for the next gen app
- */
-export interface NextGenRouteParams {
-  appSettingsTab: AppSettingsTab
-  robotName: string
-  protocolKey: string
-  labwareId: string
-  robotSettingsTab: RobotSettingsTab
-  runId: string
-  protocolRunDetailsTab: ProtocolRunDetailsTab
-}
-
 /**
  * Provides localized translation keys to substitute for a path segment, for breadcrumbs or menu
  * `null` indicates that a path segment should not be displayed

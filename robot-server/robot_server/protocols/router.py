@@ -104,7 +104,7 @@ async def create_protocol(
         created_at: Timestamp to attach to the new resource.
     """
     try:
-        source = await protocol_reader.read(
+        source = await protocol_reader.read_and_save(
             files=files,
             directory=protocol_directory / protocol_id,
         )

@@ -35,11 +35,6 @@ const style = css`
     background-color: ${COLORS.lightBlue};
   }
 
-  &:focus,
-  &:active {
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  }
-
   &:disabled,
   &.disabled {
     color: ${COLORS.greyDisabled};

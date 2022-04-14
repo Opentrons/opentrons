@@ -5,6 +5,7 @@ import { Portal } from '../../../App/portal'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
 import { HEATERSHAKER_MODULE_TYPE } from '../../../redux/modules'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/Buttons'
+import { useAttachedModules } from '../hooks'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
 import { AttachModule } from './AttachModule'
@@ -20,19 +21,19 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import type { NextGenRouteParams } from '../../../App/NextGenApp'
+import type { NextGenRouteParams } from '../../../App/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import { useAttachedModules } from '../hooks'
+import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
-  hasProtocol?: boolean
+  moduleFromProtocol?: ProtocolModuleInfo
 }
 
 export const HeaterShakerWizard = (
   props: HeaterShakerWizardProps
 ): JSX.Element | null => {
-  const { onCloseClick, hasProtocol } = props
+  const { onCloseClick, moduleFromProtocol } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
   const { robotName } = useParams<NextGenRouteParams>()
@@ -66,7 +67,7 @@ export const HeaterShakerWizard = (
         return <KeyParts />
       case 2:
         buttonContent = t('btn_thermal_adapter')
-        return <AttachModule slotName={'1'} />
+        return <AttachModule moduleFromProtocol={moduleFromProtocol} />
       case 3:
         buttonContent = t('btn_power_module')
         return <AttachAdapter />
@@ -81,7 +82,7 @@ export const HeaterShakerWizard = (
             <TestShake
               module={heaterShaker}
               setCurrentPage={setCurrentPage}
-              hasProtocol={hasProtocol}
+              moduleFromProtocol={moduleFromProtocol}
             />
           ) : null
         )
