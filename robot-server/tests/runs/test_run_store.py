@@ -44,7 +44,7 @@ def test_add_run(subject: RunStore) -> None:
 
 
 def test_insert_actions_missing_run_id(subject: RunStore) -> None:
-    """Should not be able to insert an action with a run id the does not exist."""
+    """Should not be able to insert an action with a run id that does not exist."""
     action = RunAction(
         actionType=RunActionType.PLAY,
         createdAt=datetime(year=2022, month=2, day=2),
