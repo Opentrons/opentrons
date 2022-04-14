@@ -27,9 +27,6 @@ describe('FirmwareUpdateFailedModal', () => {
     const { getByText } = render(props)
     getByText('Failed to update module firmware')
     getByText('error message')
-    getByText(
-      'Bundled fw file not found for module of type: temperatureModuleType'
-    )
   })
   it('should call onCloseClick when the close button is pressed', () => {
     const { getByRole, getByLabelText } = render(props)

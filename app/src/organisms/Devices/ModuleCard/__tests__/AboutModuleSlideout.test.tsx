@@ -41,6 +41,7 @@ describe('AboutModuleSlideout', () => {
       module: mockMagneticModule,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      firmwareUpdateClick: jest.fn(),
     }
     mockGetConnectedRobotName.mockReturnValue('Mock Robot Name')
     mockUseCurrentRunStatus.mockReturnValue(RUN_STATUS_IDLE)
@@ -62,18 +63,26 @@ describe('AboutModuleSlideout', () => {
     expect(props.onCloseClick).toHaveBeenCalled()
   })
 
-  it('renders firmware button disabled when run is running', () => {
+  it('renders no banner when run is running', () => {
     mockUseCurrentRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
-    const { getByRole } = render(props)
-    const button = getByRole('button', { name: 'View Firmware Update' })
-    expect(button).toBeDisabled()
+    const { getByText } = render(props)
+
+    getByText('About Magnetic Module GEN1')
+    getByText('def456')
+    getByText('Serial Number')
+    getByText('Current Version')
+    getByText('Version v2.0.0')
   })
 
-  it('renders firmware button disabled when run is finishing', () => {
+  it('renders no banner when run is finishing', () => {
     mockUseCurrentRunStatus.mockReturnValue(RUN_STATUS_FINISHING)
-    const { getByRole } = render(props)
-    const button = getByRole('button', { name: 'View Firmware Update' })
-    expect(button).toBeDisabled()
+    const { getByText } = render(props)
+
+    getByText('About Magnetic Module GEN1')
+    getByText('def456')
+    getByText('Serial Number')
+    getByText('Current Version')
+    getByText('Version v2.0.0')
   })
 
   it('renders correct info when module is a magnetic module GEN2', () => {
@@ -81,6 +90,7 @@ describe('AboutModuleSlideout', () => {
       module: mockMagneticModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      firmwareUpdateClick: jest.fn(),
     }
     const { getByText } = render(props)
 
@@ -96,6 +106,7 @@ describe('AboutModuleSlideout', () => {
       module: mockTemperatureModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      firmwareUpdateClick: jest.fn(),
     }
     const { getByText } = render(props)
 
@@ -111,6 +122,7 @@ describe('AboutModuleSlideout', () => {
       module: mockTemperatureModule,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      firmwareUpdateClick: jest.fn(),
     }
     const { getByText } = render(props)
 
@@ -126,6 +138,7 @@ describe('AboutModuleSlideout', () => {
       module: mockThermocycler,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      firmwareUpdateClick: jest.fn(),
     }
     const { getByText, getByRole, getByLabelText } = render(props)
 
@@ -135,15 +148,13 @@ describe('AboutModuleSlideout', () => {
     getByText('Current Version')
     getByText('Version v2.0.0')
     getByText('Firmware update available.')
-    const button = getByRole('button', { name: 'View Firmware Update' })
-    fireEvent.click(button)
-    expect(button).toBeEnabled()
     const viewUpdate = getByRole('button', { name: 'Update now' })
     fireEvent.click(viewUpdate)
+    expect(props.firmwareUpdateClick).toHaveBeenCalled()
+    expect(props.onCloseClick).toHaveBeenCalled()
     expect(viewUpdate).toBeEnabled()
     const exit = getByLabelText('close_icon')
     fireEvent.click(exit)
     expect(exit).not.toBeVisible()
-    //  TODO(jr, 2/23/22): expect button to open a modal when this is properly wired up
   })
 })

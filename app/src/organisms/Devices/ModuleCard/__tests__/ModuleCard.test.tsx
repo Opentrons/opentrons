@@ -15,6 +15,7 @@ import { TemperatureModuleData } from '../TemperatureModuleData'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
 import { HeaterShakerModuleData } from '../HeaterShakerModuleData'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
+import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 import { ModuleCard } from '..'
 import {
   mockMagneticModule,
@@ -35,6 +36,7 @@ jest.mock('../ThermocyclerModuleData')
 jest.mock('../HeaterShakerModuleData')
 jest.mock('../ModuleOverflowMenu')
 jest.mock('../../../RunTimeControl/hooks')
+jest.mock('../FirmwareUpdateFailedModal')
 jest.mock('../../../../redux/robot-api')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
@@ -67,6 +69,9 @@ const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
 >
 const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
   typeof RobotApi.getRequestById
+>
+const mockFirmwareUpdateFailedModal = FirmwareUpdateFailedModal as jest.MockedFunction<
+  typeof FirmwareUpdateFailedModal
 >
 const mockMagneticModuleHub = {
   model: 'magneticModuleV1',
@@ -127,6 +132,9 @@ describe('ModuleCard', () => {
       <div>Mock Heater Shaker Module Data</div>
     )
     mockModuleOverflowMenu.mockReturnValue(<div>mock module overflow menu</div>)
+    mockFirmwareUpdateFailedModal.mockReturnValue(
+      <div>mock firmware update failed modal</div>
+    )
     mockGetRequestById.mockReturnValue({
       status: RobotApi.SUCCESS,
       response: {

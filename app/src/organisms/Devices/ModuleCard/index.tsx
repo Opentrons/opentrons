@@ -99,6 +99,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       }
     },
   })
+  const handleUpdateClick = (): void => {
+    robotName && dispatchApiRequest(updateModule(robotName, module.serial))
+    setTimeout(() => {
+      setShowSuccessToast(true)
+    }, 10000)
+  }
   const latestRequestId = last(requestIds)
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId ? getRequestById(state, latestRequestId) : null
@@ -211,13 +217,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     setShowSlideout(false)
   }
 
-  const handleUpdateClick = (): void => {
-    robotName && dispatchApiRequest(updateModule(robotName, module.serial))
-    setTimeout(() => {
-      setShowSuccessToast(true)
-    }, 10000)
-  }
-
   return (
     <React.Fragment>
       <Flex
@@ -245,6 +244,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             module={module}
             isExpanded={showAboutModule}
             onCloseClick={() => setShowAboutModule(false)}
+            firmwareUpdateClick={handleUpdateClick}
           />
         )}
         {showTestShake && (
@@ -278,14 +278,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 latestRequest.status === FAILURE && (
                   <FirmwareUpdateFailedModal
                     module={module}
-                    onCloseClick={() => handleCloseErrorModal()}
+                    onCloseClick={handleCloseErrorModal}
                     errorMessage={getErrorResponseMessage(latestRequest.error)}
                   />
                 )}
               {module.hasAvailableUpdate && showBanner && !isPending ? (
                 <Flex
                   paddingBottom={SPACING.spacing2}
-                  width="12.4rem"
+                  width="100%"
+                  flexDirection={DIRECTION_COLUMN}
                   data-testid={`ModuleCard_firmware_update_banner_${module.serial}`}
                 >
                   <Banner
@@ -308,7 +309,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               ) : null}
               {isTooHot ? (
                 <Flex
-                  width="12.4rem"
+                  width="100%"
+                  flexDirection={DIRECTION_COLUMN}
                   paddingRight={SPACING.spacingM}
                   paddingBottom={SPACING.spacing3}
                   data-testid={`ModuleCard_too_hot_banner_${module.serial}`}
@@ -331,7 +333,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   fontSize={TYPOGRAPHY.fontSizeP}
                   data-testid={`ModuleCard_update_pending_${module.serial}`}
                 >
-                  <Icon width={SPACING.spacingSM} name="ot-spinner" spin />
+                  <Icon
+                    width={SPACING.spacingSM}
+                    name="ot-spinner"
+                    spin
+                    aria-label="ot-spinner"
+                  />
                   <Text marginLeft={SPACING.spacing3}>
                     {t('updating_firmware')}
                   </Text>

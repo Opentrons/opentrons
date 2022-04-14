@@ -50,9 +50,6 @@ export const FirmwareUpdateFailedModal = (
         <Text paddingBottom={SPACING.spacing2}>
           {t('an_error_occurred_while_updating')}
         </Text>
-        <Text paddingBottom={SPACING.spacing2}>
-          {t('bundle_firmware_file_not_found', { module: module.type })}
-        </Text>
         <Text>{errorMessage}</Text>
       </Flex>
       <Flex
