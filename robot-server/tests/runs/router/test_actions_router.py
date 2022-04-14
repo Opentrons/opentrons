@@ -60,14 +60,6 @@ async def test_create_play_action_to_start_run(
         id="action-id",
     )
 
-    next_run = RunResource(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1),
-        actions=[action],
-        is_current=True,
-    )
-
     decoy.when(mock_engine_store.runner.was_started()).then_return(False)
 
     result = await create_run_action(
@@ -85,7 +77,7 @@ async def test_create_play_action_to_start_run(
 
     decoy.verify(
         task_runner.run(mock_engine_store.runner.run),
-        mock_run_store.insert_action(run_id=next_run.run_id, action=action),
+        mock_run_store.insert_action(run_id=prev_run.run_id, action=action),
     )
 
 
@@ -100,14 +92,6 @@ async def test_create_play_action_to_resume_run(
         actionType=RunActionType.PLAY,
         createdAt=datetime(year=2022, month=2, day=2),
         id="action-id",
-    )
-
-    next_run = RunResource(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1),
-        actions=[action],
-        is_current=True,
     )
 
     decoy.when(mock_engine_store.runner.was_started()).then_return(True)
@@ -126,7 +110,7 @@ async def test_create_play_action_to_resume_run(
 
     decoy.verify(
         mock_engine_store.runner.play(),
-        mock_run_store.insert_action(run_id=next_run.run_id, action=action),
+        mock_run_store.insert_action(run_id=prev_run.run_id, action=action),
     )
 
 
@@ -217,7 +201,6 @@ async def test_create_run_action_not_current(
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
-    # TODO (tz): does this makes sense?
     decoy.verify(
         mock_run_store.insert_action(
             run_id=prev_run.run_id, action=matchers.Anything()
@@ -239,14 +222,6 @@ async def test_create_pause_action(
         id="action-id",
     )
 
-    next_run = RunResource(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1),
-        actions=[action],
-        is_current=True,
-    )
-
     result = await create_run_action(
         runId="run-id",
         request_body=RequestModel(data=RunActionCreate(actionType=RunActionType.PAUSE)),
@@ -261,7 +236,7 @@ async def test_create_pause_action(
 
     decoy.verify(
         mock_engine_store.runner.pause(),
-        mock_run_store.insert_action(run_id=next_run.run_id, action=action),
+        mock_run_store.insert_action(run_id=prev_run.run_id, action=action),
     )
 
 
@@ -279,14 +254,6 @@ async def test_create_stop_action(
         id="action-id",
     )
 
-    next_run = RunResource(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1),
-        actions=[action],
-        is_current=True,
-    )
-
     result = await create_run_action(
         runId="run-id",
         request_body=RequestModel(data=RunActionCreate(actionType=RunActionType.STOP)),
@@ -302,5 +269,5 @@ async def test_create_stop_action(
 
     decoy.verify(
         task_runner.run(mock_engine_store.runner.stop),
-        mock_run_store.insert_action(run_id=next_run.run_id, action=action),
+        mock_run_store.insert_action(run_id=prev_run.run_id, action=action),
     )

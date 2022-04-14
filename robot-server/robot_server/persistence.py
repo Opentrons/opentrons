@@ -73,7 +73,7 @@ run_table = sqlalchemy.Table(
 )
 
 # TODO (tz: 4/8/22): add a column sequence_number for preserving the order of actions
-actions_table = sqlalchemy.Table(
+action_table = sqlalchemy.Table(
     "action",
     _metadata,
     sqlalchemy.Column(

@@ -6,7 +6,7 @@ import sqlalchemy
 
 from .action_models import RunAction, RunActionType
 
-from robot_server.persistence import run_table, actions_table
+from robot_server.persistence import run_table, action_table
 
 
 @dataclass(frozen=True)
@@ -65,6 +65,7 @@ class RunStore:
         Returns:
             The resource that was updated.
         """
+        # TODO (tz 4-13-22): Check if run exists before setting the current run.
         if is_current is True:
             self._active_run = run_id
         elif is_current is False and self._active_run == run_id:
@@ -161,7 +162,7 @@ class RunStore:
 def _get_actions_no_transaction(
     run_id: str, transaction: sqlalchemy.engine.Connection
 ) -> List[sqlalchemy.engine.Row]:
-    statement = actions_table.select().where(actions_table.c.run_id == run_id)
+    statement = action_table.select().where(action_table.c.run_id == run_id)
     return transaction.execute(statement).all()
 
 
@@ -178,7 +179,7 @@ def _insert_action_no_transaction(
     except sqlalchemy.exc.NoResultFound as e:
         raise RunNotFoundError(run_id) from e
     transaction.execute(
-        sqlalchemy.insert(actions_table),
+        sqlalchemy.insert(action_table),
         _convert_action_to_sql_values(run_id=run_id, action=action),
     )
 
