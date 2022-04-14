@@ -60,7 +60,7 @@ export const Tooltip = React.forwardRef(function TooltipComponent(
     arrowRef,
     arrowStyle,
     children,
-    width = '8.75rem',
+    width,
     backgroundColor = darkGrey,
     ...boxProps
   } = props
