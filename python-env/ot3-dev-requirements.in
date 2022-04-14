@@ -1,0 +1,9 @@
+# Dependencies for ot3
+
+# Add editable
+-e file:../api
+-e file:../robot-server
+-e file:../notify-server
+-e file:../shared-data/python
+-e file:../update-server
+-e file:../hardware

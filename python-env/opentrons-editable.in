@@ -1,7 +1,0 @@
-# Editable versions of opentrons packages.
-
--e file:../api#egg=opentrons
--e file:../robot-server#egg=robot-server
--e file:../notify-server#egg=notify-server
--e file:../shared-data/python#egg=opentrons-shared-data
--e file:../update-server#egg=update-server

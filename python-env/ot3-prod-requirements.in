@@ -1,0 +1,8 @@
+# Dependencies for ot3
+
+../api
+../robot-server
+../notify-server
+../shared-data/python
+../update-server
+../hardware

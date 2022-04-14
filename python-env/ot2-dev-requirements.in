@@ -1,0 +1,8 @@
+# Dependencies for ot2
+
+# Add editable
+-e file:../api
+-e file:../robot-server
+-e file:../notify-server
+-e file:../shared-data/python
+-e file:../update-server

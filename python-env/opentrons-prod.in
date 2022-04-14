@@ -1,5 +1,0 @@
-file:../api#egg=opentrons
-file:../robot-server#egg=robot-server
-file:../notify-server#egg=notify-server
-file:../shared-data/python#egg=opentrons-shared-data
-file:../update-server#egg=update-server
