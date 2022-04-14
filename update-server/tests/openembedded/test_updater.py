@@ -1,11 +1,12 @@
 """Tests for OE Updater."""
 import os
+from typing import NamedTuple
 from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
 
-from otupdate.openembedded.constants import OEPartition
+
 from otupdate.openembedded.updater import (
     Updater,
     PartitionManager,
@@ -16,6 +17,10 @@ import lzma
 
 # test valid partition switch
 
+class OEPartition(NamedTuple):
+    number: int
+    path: str
+    mount_point: str
 
 def test_update_valid_part_switch(
     mock_root_fs_interface: MagicMock, mock_partition_manager_valid_switch: MagicMock

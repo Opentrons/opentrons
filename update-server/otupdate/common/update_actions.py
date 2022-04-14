@@ -13,7 +13,7 @@ from .constants import APP_VARIABLE_PREFIX
 
 import logging
 
-from ..openembedded.constants import OEPartition
+
 
 FILE_ACTIONS_VARNAME = APP_VARIABLE_PREFIX + "fileactions"
 
@@ -23,6 +23,7 @@ LOG = logging.getLogger(__name__)
 class Partition(NamedTuple):
     number: int
     path: str
+    mount_point: str = None
 
 
 class UpdateActionsInterface:
@@ -66,7 +67,7 @@ class UpdateActionsInterface:
         progress_callback: Callable[[float], None],
         chunk_size: int,
         file_size: Optional[int],
-    ) -> Union[Partition, OEPartition]:
+    ) -> Partition:
         """
         Write the object to a specific rootfs path
         """

@@ -9,14 +9,12 @@ from otupdate.common.file_actions import (
     HashMismatch,
     verify_signature,
 )
-from otupdate.common.update_actions import UpdateActionsInterface
-from typing import Callable, Optional
+from otupdate.common.update_actions import UpdateActionsInterface, Partition
+from typing import Callable, Optional, NamedTuple
 import enum
 import subprocess
 
 import logging
-
-from otupdate.openembedded.constants import OEPartition
 
 UPDATE_PKG = "ot3-system.zip"
 ROOTFS_SIG_NAME = "rootfs.xz.hash.sig"
@@ -28,8 +26,8 @@ LOG = logging.getLogger(__name__)
 
 
 class RootPartitions(enum.Enum):
-    TWO: OEPartition = OEPartition(2, "/dev/mmcblk0p2", "/media/mmcblk0p2")
-    THREE: OEPartition = OEPartition(3, "/dev/mmcblk0p3", "/media/mmcblk0p3")
+    TWO: Partition = Partition(2, "/dev/mmcblk0p2", "/media/mmcblk0p2")
+    THREE: Partition = Partition(3, "/dev/mmcblk0p3", "/media/mmcblk0p3")
 
 
 class PartitionManager:
@@ -53,7 +51,7 @@ class PartitionManager:
         """Find used partition"""
         return subprocess.check_output(["fw_printenv", "-n", "root_part"]).strip()
 
-    def find_unused_partition(self, which: bytes) -> OEPartition:
+    def find_unused_partition(self, which: bytes) -> Partition:
         """Find unused partition"""
         # fw_printenv -n root_part gives the currently
         # active root_fs partition, find that, and
@@ -65,7 +63,7 @@ class PartitionManager:
             b"": RootPartitions.THREE.value,
         }[which]
 
-    def switch_partition(self) -> OEPartition:
+    def switch_partition(self) -> Partition:
         unused_partition = self.find_unused_partition(self.used_partition())
         if unused_partition.number == 2:
             subprocess.run(["fw_setenv", "root_part", "2"])
@@ -95,11 +93,11 @@ class RootFSInterface:
     """RootFS interface class."""
 
     def write_update(
-        self,
-        rootfs_filepath: str,
-        part: OEPartition,
-        progress_callback: Callable[[float], None],
-        chunk_size: int = 1024,
+            self,
+            rootfs_filepath: str,
+            part: Partition,
+            progress_callback: Callable[[float], None],
+            chunk_size: int = 1024,
     ) -> None:
         total_size = 0
         written_size = 0
@@ -114,7 +112,7 @@ class RootFSInterface:
                     if len(chunk) != chunk_size:
                         break
             with lzma.open(rootfs_filepath, "rb") as fsrc, open(
-                part.path, "wb"
+                    part.path, "wb"
             ) as fdst:
                 while True:
                     chunk = fsrc.read(chunk_size)
@@ -135,10 +133,10 @@ class Updater(UpdateActionsInterface):
         self.part_mngr = part_mngr
 
     def validate_update(
-        self,
-        filepath: str,
-        progress_callback: Callable[[float], None],
-        cert_path: Optional[str],
+            self,
+            filepath: str,
+            progress_callback: Callable[[float], None],
+            cert_path: Optional[str],
     ) -> Optional[str]:
         """Worker for validation. Call in an executor (so it can return things)
 
@@ -216,7 +214,7 @@ class Updater(UpdateActionsInterface):
         unused = self.part_mngr.find_unused_partition(self.part_mngr.used_partition())
         part_path = unused.path
         with tempfile.TemporaryDirectory(
-            dir=self.part_mngr.mountpoint_root()
+                dir=self.part_mngr.mountpoint_root()
         ) as mountpoint:
             subprocess.check_output(["mount", part_path, mountpoint])
             LOG.info(f"mounted {part_path} to {mountpoint}")
@@ -231,12 +229,12 @@ class Updater(UpdateActionsInterface):
         pass
 
     def write_update(
-        self,
-        rootfs_filepath: str,
-        progress_callback: Callable[[float], None],
-        chunk_size: int = 1024,
-        file_size: int = None,
-    ) -> OEPartition:
+            self,
+            rootfs_filepath: str,
+            progress_callback: Callable[[float], None],
+            chunk_size: int = 1024,
+            file_size: int = None,
+    ) -> Partition:
         self.decomp_and_write(rootfs_filepath, progress_callback)
         unused_partition = self.part_mngr.find_unused_partition(
             self.part_mngr.used_partition()
@@ -244,7 +242,7 @@ class Updater(UpdateActionsInterface):
         return unused_partition
 
     def decomp_and_write(
-        self, downloaded_update_path: str, progress_callback: Callable[[float], None]
+            self, downloaded_update_path: str, progress_callback: Callable[[float], None]
     ) -> None:
         """Decompress and write update to partition
 
