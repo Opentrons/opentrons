@@ -50,11 +50,6 @@ class RunStore:
         with self._sql_engine.begin() as transaction:
             _insert_action_no_transaction(run_id, action, transaction)
 
-    def _get_actions(self, run_id: str) -> List[RunAction]:
-        with self._sql_engine.begin() as statement:
-            actions = _get_actions_no_transaction(run_id, statement)
-        return [_convert_sql_row_to_action(action) for action in actions]
-
     def update_active_run(self, run_id: str, is_current: bool) -> RunResource:
         """Update current active run resource in memory.
 

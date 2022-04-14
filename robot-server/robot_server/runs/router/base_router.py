@@ -341,10 +341,7 @@ async def update_run(
             await engine_store.clear()
         except EngineConflictError:
             raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
-        run = run_store.update_active_run(
-            run_id=runId,
-            is_current=update.current if update.current is not None else run.is_current,
-        )
+        run = run_store.update_active_run(run_id=runId, is_current=update.current)
         log.info(f'Marked run "{runId}" as not current.')
 
     engine_state = engine_store.get_state(run.run_id)
