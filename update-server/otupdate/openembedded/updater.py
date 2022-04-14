@@ -54,6 +54,13 @@ class PartitionManager:
             3: RootPartitions.THREE.value,
         }[unused_partition.number]
 
+    def resize_partition(self, path: str) -> bool:
+        # resize part now!
+        if subprocess.run(["resize2fs", path]).returncode == 0:
+            return True
+        else:
+            return False
+
     def mountpoint_root(self):
         """provides mountpoint location for :py:meth:`mount_update`.
 
@@ -72,10 +79,18 @@ class RootFSInterface:
         progress_callback: Callable[[float], None],
         chunk_size: int = 1024,
     ) -> None:
-
-        total_size = 1436978176
+        total_size = 0
         written_size = 0
         try:
+            # the double pass here is
+            # temporary until we have
+            # xz size decoding working
+            with lzma.open(rootfs_filepath, "rb") as fsrc:
+                while True:
+                    chunk = fsrc.read(chunk_size)
+                    total_size += len(chunk)
+                    if len(chunk) != chunk_size:
+                        break
             with lzma.open(rootfs_filepath, "rb") as fsrc, open(
                 part.path, "wb"
             ) as fdst:
@@ -106,8 +121,7 @@ class Updater(UpdateActionsInterface):
             LOG.error(msg)
             raise RuntimeError(msg)
         else:
-            # resize part now!
-            subprocess.run(["resize2fs", new.path])
+            self.part_mngr.resize_partition(new.path)
 
             LOG.info(f"commit_update: committed to booting {new}")
 

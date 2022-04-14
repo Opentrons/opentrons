@@ -1,4 +1,4 @@
-""" oe_update.py: client script for running OE updates
+""" oe_upload.py: client script for running OE updates
 
 This requires aiohttp
 """

@@ -7,6 +7,7 @@ import pytest
 from otupdate.common.update_actions import Partition
 from otupdate.openembedded.updater import Updater, PartitionManager, RootFSInterface
 
+import lzma
 
 # test valid partition switch
 
@@ -20,19 +21,16 @@ def test_update_valid_part_switch(
         root_FS_intf=mock_root_fs_interface,
         part_mngr=mock_partition_manager_valid_switch,
     )
-
-    def fake_callable(fake_val: float):
-        """Fake callable."""
-        pass
-
-    updater.decomp_and_write("/mmc/blk0p1", fake_callable(24))
+    # lambda just mocks progress callback,
+    # 2 here has no significance whatsoever.
+    updater.decomp_and_write("/mmc/blk0p1", lambda x: x(2))
     mock_partition_manager_valid_switch.find_unused_partition.assert_called()
     mock_root_fs_interface.write_update.assert_called()
     updater.commit_update()
     mock_partition_manager_valid_switch.find_unused_partition.assert_called()
     mock_partition_manager_valid_switch.switch_partition.assert_called()
 
-    updater.write_update("/mmc/blk0p1", fake_callable(24))
+    updater.write_update("/mmc/blk0p1", lambda x: x(2))
     mock_partition_manager_valid_switch.find_unused_partition.assert_called()
 
     updater.mount_update()
@@ -53,11 +51,7 @@ def test_update_invalid_part_switch(
         part_mngr=mock_partition_manager_invalid_switch,
     )
 
-    def fake_callable(fake_val: float):
-        """Fake callable."""
-        pass
-
-    updater.decomp_and_write("/mmc/blk0p1", fake_callable(24))
+    updater.decomp_and_write("/mmc/blk0p1", lambda x: x(2))
     mock_partition_manager_invalid_switch.find_unused_partition.assert_called()
     mock_root_fs_interface.write_update.assert_called()
 
@@ -89,22 +83,34 @@ def test_decomp_and_write(
         part_mngr=mock_partition_manager_valid_switch,
     )
 
-    def fake_callable(fake_val: float):
-        """Fake callable."""
-        pass
-
-    updater.decomp_and_write("test_path", fake_callable)
+    updater.decomp_and_write("test_path", lambda x: x(2))
     mock_partition_manager_valid_switch.find_unused_partition.assert_called()
     mock_root_fs_interface.write_update.assert_called()
 
 
 def test_lzma(testing_partition):
+    """Test that lzma decompresses a .xz
+    correctly.
+    Updater::write_update has a callback to report
+    progress. callback gets kicked off
+    on writing every chunk.
+    This test uses callback call count to see if
+    the entire file decompresses correctly.
+    """
     cb = mock.Mock()
     root_FS_intf = RootFSInterface()
     p = Partition(2, testing_partition)
-    root_FS_intf.write_update("rootfs.xz", p, cb)
-    size_of_rootfs = 1436978176
-    calls = size_of_rootfs / 1024
-    if calls * 1024 != size_of_rootfs:
-        calls += 1
+    total_size = 0
+    chunk_size = 1024 * 32
+    with lzma.open("test-xz.xz", "rb") as fsrc:
+        while True:
+            chunk = fsrc.read(chunk_size)
+            total_size += len(chunk)
+            if len(chunk) != chunk_size:
+                break
+    root_FS_intf.write_update("test-xz.xz", p, cb, chunk_size)
+    if total_size % chunk_size != 0:
+        calls = int(total_size / chunk_size) + 1
+    else:
+        calls = total_size / chunk_size
     assert cb.call_count == calls

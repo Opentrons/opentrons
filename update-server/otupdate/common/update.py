@@ -27,7 +27,6 @@ from otupdate.buildroot.update_actions import (
 )
 
 from otupdate.openembedded.updater import UPDATE_PKG
-from .oe_update import _begin_unzip_update_package
 
 SESSION_VARNAME = APP_VARIABLE_PREFIX + "session"
 LOG = logging.getLogger(__name__)
@@ -198,20 +197,12 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             },
             status=500,
         )
-    if part.name == "ot2-system.zip":
+
         _begin_validation(
             session,
             config.config_from_request(request),
             asyncio.get_event_loop(),
-            os.path.join(session.download_path, "ot2-system.zip"),
-            maybe_actions,
-        )
-    if part.name == UPDATE_PKG:
-        _begin_unzip_update_package(
-            session,
-            config.config_from_request(request),
-            asyncio.get_event_loop(),
-            os.path.join(session.download_path, UPDATE_PKG),
+            os.path.join(session.download_path, part.name),
             maybe_actions,
         )
 

@@ -21,6 +21,7 @@ def mock_partition_manager_valid_switch() -> MagicMock:
     mock = MagicMock(spec=PartitionManager)
     mock.find_unused_partition.return_value = Partition(2, "/dev/mmcblk0p2")
     mock.switch_partition.return_value = Partition(2, "/dev/mmcblk0p2")
+    mock.resize_partition.return_value = True
 
     mock.mountpoint_root.return_value = "/mnt"
 
@@ -33,6 +34,7 @@ def mock_partition_manager_invalid_switch() -> MagicMock:
     mock = MagicMock(spec=PartitionManager)
     mock.find_unused_partition.return_value = Partition(2, "/dev/mmcblk0p2")
     mock.switch_partition.return_value = Partition(3, "/dev/mmcblk0p2")
+    mock.resize_partition.return_value = True
 
     mock.mountpoint_root.return_value = "/mnt"
 

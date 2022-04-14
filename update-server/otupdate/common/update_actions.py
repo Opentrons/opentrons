@@ -19,6 +19,7 @@ from otupdate.common.file_actions import (
 
 import logging
 
+
 FILE_ACTIONS_VARNAME = APP_VARIABLE_PREFIX + "fileactions"
 
 LOG = logging.getLogger(__name__)
