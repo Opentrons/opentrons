@@ -4,8 +4,9 @@ from unittest.mock import MagicMock
 import pytest
 
 from otupdate import openembedded
-from otupdate.openembedded.updater import RootFSInterface, PartitionManager, OEPartition
+from otupdate.openembedded.updater import RootFSInterface, PartitionManager
 from tests.common.config import FakeRootPartElem
+from otupdate.openembedded.constants import OEPartition
 
 
 @pytest.fixture
