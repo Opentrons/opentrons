@@ -203,7 +203,7 @@ async def test_create_run_action_not_current(
     assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
     decoy.verify(
         mock_run_store.insert_action(
-            run_id=prev_run.run_id, action=matchers.Anything()
+            run_id=matchers.Anything(), action=matchers.Anything()
         ),
         times=0,
     )

@@ -38,7 +38,7 @@ class RunStore:
     def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
         """Initialize a RunStore with sql engine."""
         self._sql_engine = sql_engine
-        self._active_run = ""
+        self._active_run: Optional[str] = None
 
     def insert_action(self, run_id: str, action: RunAction) -> None:
         """Insert run action in the db.
@@ -69,7 +69,7 @@ class RunStore:
         if is_current is True:
             self._active_run = run_id
         elif is_current is False and self._active_run == run_id:
-            self._active_run = ""
+            self._active_run = None
         return self.get(run_id)
 
     def insert(self, run: RunResource) -> RunResource:
@@ -124,14 +124,14 @@ class RunStore:
         statement = sqlalchemy.select(run_table)
         with self._sql_engine.begin() as transaction:
             runs = transaction.execute(statement).all()
-        return [
-            _convert_sql_row_to_run(
-                sql_row=row,
-                actions=self._get_actions(row.id),
-                current_run_id=self._active_run,
-            )
-            for row in runs
-        ]
+            return [
+                _convert_sql_row_to_run(
+                    sql_row=row,
+                    actions=self._get_no_transaction(row.id,  transaction),
+                    current_run_id=self._active_run,
+                )
+                for row in runs
+            ]
 
     def remove(self, run_id: str) -> RunResource:
         """Remove a run by its unique identifier.
