@@ -127,7 +127,10 @@ class RunStore:
             return [
                 _convert_sql_row_to_run(
                     sql_row=row,
-                    actions=self._get_no_transaction(row.id,  transaction),
+                    actions=[
+                        _convert_sql_row_to_action(sql_row=row)
+                        for row in _get_actions_no_transaction(row.id, transaction)
+                    ],
                     current_run_id=self._active_run,
                 )
                 for row in runs
@@ -185,7 +188,9 @@ def _insert_action_no_transaction(
 
 
 def _convert_sql_row_to_run(
-    sql_row: sqlalchemy.engine.Row, actions: List[RunAction], current_run_id: str
+    sql_row: sqlalchemy.engine.Row,
+    actions: List[RunAction],
+    current_run_id: Optional[str],
 ) -> RunResource:
     run_id = sql_row.id
     assert isinstance(run_id, str)

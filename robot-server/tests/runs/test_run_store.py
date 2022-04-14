@@ -16,8 +16,8 @@ def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
     """Return a set-up database to back the store."""
     db_file_path = tmp_path / "test.db"
     sql_engine = open_db_no_cleanup(db_file_path=db_file_path)
-    add_tables_to_db(sql_engine)
     try:
+        add_tables_to_db(sql_engine)
         yield sql_engine
     finally:
         sql_engine.dispose()
@@ -213,6 +213,36 @@ def test_add_run_current_run_deactivates(subject: RunStore) -> None:
 
     assert subject.get("run-id-1").is_current is False
     assert subject.get("run-id-2").is_current is True
+
+
+def test_update_active_run_deactivates(subject: RunStore) -> None:
+    """Updating active run should deactivate other runs."""
+    actions = RunAction(
+        actionType=RunActionType.PLAY,
+        createdAt=datetime(year=2022, month=2, day=2),
+        id="action-id",
+    )
+    run_1 = RunResource(
+        run_id="run-id-1",
+        protocol_id=None,
+        created_at=datetime.now(),
+        actions=[actions],
+        is_current=True,
+    )
+    run_2 = RunResource(
+        run_id="run-id-2",
+        protocol_id=None,
+        created_at=datetime.now(),
+        actions=[],
+        is_current=True,
+    )
+
+    subject.insert(run_1)
+    subject.insert(run_2)
+    subject.update_active_run(run_1.run_id, True)
+
+    assert subject.get("run-id-1").is_current is True
+    assert subject.get("run-id-2").is_current is False
 
 
 def test_insert_actions_no_run(subject: RunStore) -> None:
