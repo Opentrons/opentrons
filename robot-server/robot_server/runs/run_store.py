@@ -38,7 +38,7 @@ class RunStore:
     def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
         """Initialize a RunStore with sql engine."""
         self._sql_engine = sql_engine
-        self._active_run = ""
+        self._active_run: Optional[str] = None
 
     def insert_action(self, run_id: str, action: RunAction) -> None:
         """Insert run action in the db.
