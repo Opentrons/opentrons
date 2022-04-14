@@ -17,10 +17,12 @@ import lzma
 
 # test valid partition switch
 
+
 class OEPartition(NamedTuple):
     number: int
     path: str
     mount_point: str
+
 
 def test_update_valid_part_switch(
     mock_root_fs_interface: MagicMock, mock_partition_manager_valid_switch: MagicMock

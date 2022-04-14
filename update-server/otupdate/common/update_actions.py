@@ -5,14 +5,13 @@ update actions
 
 import abc
 import contextlib
-from typing import NamedTuple, Optional, Callable, Iterator, Union
+from typing import NamedTuple, Optional, Callable, Iterator
 from aiohttp import web
 
 from .constants import APP_VARIABLE_PREFIX
 
 
 import logging
-
 
 
 FILE_ACTIONS_VARNAME = APP_VARIABLE_PREFIX + "fileactions"
@@ -23,7 +22,7 @@ LOG = logging.getLogger(__name__)
 class Partition(NamedTuple):
     number: int
     path: str
-    mount_point: str = None
+    mount_point: str = ""
 
 
 class UpdateActionsInterface:
