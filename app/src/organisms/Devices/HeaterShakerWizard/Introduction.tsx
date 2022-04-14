@@ -20,6 +20,7 @@ import heaterShaker from '@opentrons/app/src/assets/images/heater_shaker_empty.p
 import flatBottom from '@opentrons/app/src/assets/images/flatbottom_thermal_adapter.png'
 import deepwell from '@opentrons/app/src/assets/images/deepwell_thermal_adapter.png'
 import pcr from '@opentrons/app/src/assets/images/pcr_thermal_adapter.png'
+import universal from '@opentrons/app/src/assets/images/universal_thermal_adapter.png'
 import screwdriver from '@opentrons/app/src/assets/images/t10_torx_screwdriver.png'
 
 import type {
@@ -107,14 +108,13 @@ export function Introduction(props: IntroductionProps): JSX.Element {
   const { labwareDefinition, thermalAdapterName } = props
   const { t } = useTranslation('heater_shaker')
 
-  //  TODO(jr, 2022-04-03): plus in universal adapter when available
   let adapterImage: string = ''
   switch (thermalAdapterName) {
     case 'PCR Adapter':
       adapterImage = pcr
       break
     case 'Universal Flat Adapter':
-      adapterImage = heaterShaker
+      adapterImage = universal
       break
     case 'Deep Well Adapter':
       adapterImage = deepwell
