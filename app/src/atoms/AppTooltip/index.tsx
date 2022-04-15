@@ -9,7 +9,7 @@ import { Tooltip } from '@opentrons/components/src/tooltips/Tooltip'
 export interface TooltipProps {
   key: string
   children: React.ReactNode
-  tooltipProps: UseTooltipResultTooltipProps
+  tooltipProps: UseTooltipResultTooltipProps & { visible: boolean }
 }
 
 export function AppTooltip(props: TooltipProps): JSX.Element {
@@ -18,7 +18,6 @@ export function AppTooltip(props: TooltipProps): JSX.Element {
   return (
     <Tooltip
       {...tooltipProps}
-      visible={true}
       backgroundColor={COLORS.darkBlack}
       key={key}
       fontSize={TYPOGRAPHY.fontSizeCaption}
