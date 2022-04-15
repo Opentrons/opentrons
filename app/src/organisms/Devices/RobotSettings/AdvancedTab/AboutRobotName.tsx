@@ -20,6 +20,10 @@ export function AboutRobotName({
   robotName,
 }: AboutRobotNameProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const [
+    showRenameRobotSlideout,
+    setShowRenameRobotSlideout,
+  ] = React.useState<boolean>(false)
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -43,8 +47,8 @@ export function AboutRobotName({
       </Box>
       <TertiaryButton
         marginLeft={SPACING_AUTO}
-        onClick={null} // ToDo add slideout
-        id="AdvancedSettings_RenameRobot"
+        onClick={() => setShowRenameRobotSlideout(true)}
+        id="RobotSettings_RenameRobot"
       >
         {t('robot_rename_button')}
       </TertiaryButton>

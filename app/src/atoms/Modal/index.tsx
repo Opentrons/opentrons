@@ -1,7 +1,6 @@
 import * as React from 'react'
 
 import {
-  Text,
   Box,
   Icon,
   BaseModal,
@@ -14,11 +13,15 @@ import {
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
+import { StyledText } from '../text'
+import type { IconName } from '@opentrons/components'
 
 interface ModalProps extends BaseModalProps {
   onClose?: () => void
   title?: React.ReactNode
   children?: React.ReactNode
+  icon?: IconName
+  iconColor?: string
 }
 
 export const Modal = (props: ModalProps): JSX.Element => {
@@ -31,9 +34,26 @@ export const Modal = (props: ModalProps): JSX.Element => {
           paddingX={SPACING.spacing5}
           paddingTop={SPACING.spacing4}
         >
-          <Text css={TYPOGRAPHY.h3SemiBold}>{props.title}</Text>
+          <Flex alignItems={ALIGN_CENTER}>
+            {props.icon != null && (
+              <Icon
+                name={props.icon}
+                color={props.iconColor}
+                width={SPACING.spacing5}
+                height={SPACING.spacing5}
+                marginRight={SPACING.spacing3}
+              />
+            )}
+            <StyledText as="h3" css={TYPOGRAPHY.h3SemiBold}>
+              {props.title}
+            </StyledText>
+          </Flex>
           {props.onClose != null && (
-            <Box onClick={props.onClose} role="button">
+            <Box
+              onClick={props.onClose}
+              role="button"
+              alignItems={ALIGN_CENTER}
+            >
               <Icon
                 name={'close'}
                 width={SPACING.spacing5}

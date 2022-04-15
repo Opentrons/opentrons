@@ -12,11 +12,12 @@ import {
 import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/Buttons'
 
-export function FactoryReset(): JSX.Element {
+interface FactoryResetProps {
+  robotName: string
+}
+
+export function FactoryReset({ robotName }: FactoryResetProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const dummyForToggle = (): void => {
-    console.log('dummyForToggle')
-  }
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -33,8 +34,8 @@ export function FactoryReset(): JSX.Element {
       </Box>
       <TertiaryButton
         marginLeft={SPACING_AUTO}
-        onClick={null} // ToDo add slideout
-        id="AdvancedSettings_FactoryResetChooseButton"
+        onClick={null}
+        id="RobotSettings_FactoryResetChooseButton"
       >
         {t('factory_reset_settings_button')}
       </TertiaryButton>

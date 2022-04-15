@@ -17,10 +17,16 @@ import { ShortTrashBin } from './AdvancedTab/ShortTrashBin'
 import { UseOlderAspirateBehavior } from './AdvancedTab/UseOlderAspirateBehavior'
 import { getRobotByName } from '../../../redux/discovery'
 import { getRobotSettings } from '../../../redux/robot-settings'
+import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
+// import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
+import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
 
 import type { State } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
-import type { RobotSettings } from '../../../redux/robot-settings/types'
+import type {
+  RobotSettings,
+  RobotSettingsField,
+} from '../../../redux/robot-settings/types'
 interface RobotSettingsAdvancedProps {
   robotName: string
 }
@@ -28,6 +34,14 @@ interface RobotSettingsAdvancedProps {
 export function RobotSettingsAdvanced({
   robotName,
 }: RobotSettingsAdvancedProps): JSX.Element {
+  const [
+    showRenameRobotSlideout,
+    setShowRenameRobotSlideout,
+  ] = React.useState<boolean>(true)
+  const [
+    showFactoryResetModal,
+    setShowFactoryResetModal,
+  ] = React.useState<boolean>(false)
   const robot = useSelector((state: State) => getRobotByName(state, robotName))
 
   //   const pauseProtocol // ask Brian
@@ -36,11 +50,21 @@ export function RobotSettingsAdvanced({
     getRobotSettings(state, robotName)
   )
 
-  const findSettings = (id: string) => settings.find(s => s.id === id)
+  const findSettings = (id: string): RobotSettingsField | undefined =>
+    settings.find(s => s.id === id)
 
   return (
     <>
       <Box paddingX={SPACING.spacing4}>
+        {showRenameRobotSlideout && (
+          <RenameRobotSlideout
+            isExpanded={showRenameRobotSlideout}
+            onCloseClick={() => setShowRenameRobotSlideout(false)}
+            robotName={robotName}
+          />
+          // <FactoryResetModal isRobotConnected={true} />
+        )}
+        {showFactoryResetModal && <FactoryResetModal isRobotConnected={true} />}
         <AboutRobotName robotName={robotName} />
         <Divider marginY={SPACING.spacing5} />
         <RobotServerVersion robot={robot as ViewableRobot} />
