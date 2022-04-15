@@ -68,8 +68,6 @@ run_table = sqlalchemy.Table(
     sqlalchemy.Column(
         "protocol_id",
         sqlalchemy.String,
-        # TODO (tz 4/8/22): SQLite does not support FK by default. Need to add support
-        # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#foreign-key-support
         sqlalchemy.ForeignKey("protocol.id"),
     ),
 )
@@ -88,8 +86,6 @@ action_table = sqlalchemy.Table(
     sqlalchemy.Column(
         "run_id",
         sqlalchemy.String,
-        # TODO (tz 4/8/22): SQLite does not support FK by default. Need to add support
-        # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#foreign-key-support
         sqlalchemy.ForeignKey("run.id"),
         nullable=False,
     ),

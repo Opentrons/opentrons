@@ -182,15 +182,6 @@ def _get_actions_no_transaction(
 def _insert_action_no_transaction(
     run_id: str, action: RunAction, transaction: sqlalchemy.engine.Connection
 ) -> None:
-    # TODO (tz): selecting to raise an error if a run does not exist.
-    # SQLite does not support FK by default. Need to add support
-    # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#foreign-key-support
-    # try:
-    #     transaction.execute(
-    #         sqlalchemy.select(run_table).where(run_table.c.id == run_id)
-    #     ).one()
-    # except sqlalchemy.exc.NoResultFound as e:
-    #     raise RunNotFoundError(run_id) from e
     transaction.execute(
         sqlalchemy.insert(action_table),
         _convert_action_to_sql_values(run_id=run_id, action=action),

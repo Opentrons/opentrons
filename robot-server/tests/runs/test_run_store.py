@@ -56,6 +56,20 @@ def test_insert_actions_missing_run_id(subject: RunStore) -> None:
         subject.insert_action(run_id="missing-run-id", action=action)
 
 
+def test_insert_run_missing_protocol_id(subject: RunStore) -> None:
+    """Should not be able to insert an action with a run id that does not exist."""
+    run = RunResource(
+        run_id="run-id",
+        protocol_id="missing-protocol-id",
+        created_at=datetime.now(),
+        actions=[],
+        is_current=True,
+    )
+
+    with pytest.raises(sqlalchemy.exc.IntegrityError, match="missing-protocol-id"):
+        subject.insert(run)
+
+
 def test_update_active_run(subject: RunStore) -> None:
     """It should be able to update a run in the store."""
     run = RunResource(
