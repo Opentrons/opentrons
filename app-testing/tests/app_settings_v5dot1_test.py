@@ -87,7 +87,7 @@ def test_app_settings_v5dot1(
         assert app_settings.get_textbox_to_enter_the_ip().is_displayed()
         app_settings.click_add_ip_or_hostname()
         assert app_settings.get_try_again_link().is_displayed()
-        app_settings.enter_hostname("AKNA")
+        app_settings.enter_hostname(["AKNA"])
         assert app_settings.get_add_button().is_displayed()
         app_settings.click_add_button()
         assert app_settings.get_done_button().is_displayed()
