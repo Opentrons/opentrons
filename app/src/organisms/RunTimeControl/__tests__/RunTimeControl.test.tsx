@@ -110,14 +110,14 @@ describe('RunTimeControl', () => {
 
     expect(getByText('Status: Not started')).toBeTruthy()
     expect(queryByText('Mock Timer')).toBeNull()
-    expect(getByRole('button', { name: 'Start Run' })).toBeTruthy()
+    expect(getByRole('button', { name: 'Start run' })).toBeTruthy()
   })
   it('should render disabled button with tooltip if calibration is incomplete', () => {
     mockUseProtocolCalibrationStatus.mockReturnValue({
       complete: false,
     } as any)
     const [{ getByRole, getByText }] = render()
-    const button = getByRole('button', { name: 'Start Run' })
+    const button = getByRole('button', { name: 'Start run' })
     expect(button).toBeDisabled()
     getByText('Complete required steps on Protocol tab before starting the run')
   })
@@ -127,7 +127,7 @@ describe('RunTimeControl', () => {
       remainingAttachedModules: [],
     })
     const [{ getByRole, getByText }] = render()
-    const button = getByRole('button', { name: 'Start Run' })
+    const button = getByRole('button', { name: 'Start run' })
     expect(button).toBeDisabled()
     getByText('Complete required steps on Protocol tab before starting the run')
   })
@@ -145,7 +145,7 @@ describe('RunTimeControl', () => {
         isResetRunLoading: false,
       })
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Start Run' })
+    const button = getByRole('button', { name: 'Start run' })
     expect(button).toBeDisabled()
   })
   it('should render disabled button if pause run action is loading', () => {
@@ -165,7 +165,7 @@ describe('RunTimeControl', () => {
       .calledWith()
       .mockReturnValue(RUN_STATUS_RUNNING)
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Pause Run' })
+    const button = getByRole('button', { name: 'Pause run' })
     expect(button).toBeDisabled()
   })
   it('should render disabled button if reset run action is loading', () => {
@@ -185,7 +185,7 @@ describe('RunTimeControl', () => {
       .calledWith()
       .mockReturnValue(RUN_STATUS_SUCCEEDED)
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Run Again' })
+    const button = getByRole('button', { name: 'Run again' })
     expect(button).toBeDisabled()
   })
 
@@ -227,7 +227,7 @@ describe('RunTimeControl', () => {
       .calledWith()
       .mockReturnValue(RUN_STATUS_SUCCEEDED)
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Run Again' })
+    const button = getByRole('button', { name: 'Run again' })
     expect(button).toBeEnabled()
   })
 
@@ -248,7 +248,7 @@ describe('RunTimeControl', () => {
       .calledWith()
       .mockReturnValue(RUN_STATUS_STOPPED)
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Run Again' })
+    const button = getByRole('button', { name: 'Run again' })
     expect(button).toBeEnabled()
   })
 
@@ -262,7 +262,7 @@ describe('RunTimeControl', () => {
 
     expect(getByText('Status: Running')).toBeTruthy()
     expect(getByText('Mock Timer')).toBeTruthy()
-    expect(getByRole('button', { name: 'Pause Run' })).toBeTruthy()
+    expect(getByRole('button', { name: 'Pause run' })).toBeTruthy()
   })
 
   it('renders a run status and timer if paused', () => {
@@ -275,7 +275,7 @@ describe('RunTimeControl', () => {
 
     expect(getByText('Status: Paused')).toBeTruthy()
     expect(getByText('Mock Timer')).toBeTruthy()
-    expect(getByRole('button', { name: 'Resume Run' })).toBeTruthy()
+    expect(getByRole('button', { name: 'Resume run' })).toBeTruthy()
   })
 
   it('renders a run status and timer if pause-requested', () => {
@@ -288,7 +288,7 @@ describe('RunTimeControl', () => {
 
     expect(getByText('Status: Pause requested')).toBeTruthy()
     expect(getByText('Mock Timer')).toBeTruthy()
-    expect(getByRole('button', { name: 'Resume Run' })).toBeTruthy()
+    expect(getByRole('button', { name: 'Resume run' })).toBeTruthy()
   })
 
   it('renders a run status, timer, and disabled resume run button if paused by door open', () => {
@@ -301,7 +301,7 @@ describe('RunTimeControl', () => {
 
     getByText('Status: Paused - door open')
     getByText('Mock Timer')
-    expect(getByRole('button', { name: 'Resume Run' })).toBeDisabled()
+    expect(getByRole('button', { name: 'Resume run' })).toBeDisabled()
   })
 
   it('renders a run status and timer if stop-requested', () => {
@@ -332,7 +332,7 @@ describe('RunTimeControl', () => {
 
     expect(getByText('Status: Canceled')).toBeTruthy()
     expect(getByText('Mock Timer')).toBeTruthy()
-    expect(getByRole('button', { name: 'Run Again' })).toBeTruthy()
+    expect(getByRole('button', { name: 'Run again' })).toBeTruthy()
   })
 
   it('renders a run status and timer if failed', () => {
@@ -351,7 +351,7 @@ describe('RunTimeControl', () => {
 
     expect(getByText('Status: Completed')).toBeTruthy()
     expect(getByText('Mock Timer')).toBeTruthy()
-    expect(getByRole('button', { name: 'Run Again' })).toBeTruthy()
+    expect(getByRole('button', { name: 'Run again' })).toBeTruthy()
   })
 
   it('renders a run status and timer if succeeded', () => {
@@ -370,7 +370,7 @@ describe('RunTimeControl', () => {
 
     expect(getByText('Status: Completed')).toBeTruthy()
     expect(getByText('Mock Timer')).toBeTruthy()
-    expect(getByRole('button', { name: 'Run Again' })).toBeTruthy()
+    expect(getByRole('button', { name: 'Run again' })).toBeTruthy()
   })
 
   it('renders an alert when run status is paused by opened door', () => {

@@ -40,6 +40,9 @@ export const textAlignRight = 'right'
 export const textAlignCenter = 'center'
 export const textAlignJustify = 'justify'
 
+// text decoration
+export const textDecorationUnderline = 'underline'
+
 // Default font styles, color agnostic for first pass
 export const h1Default = css`
   font-size: ${fontSizeH1};

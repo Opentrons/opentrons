@@ -56,9 +56,6 @@ const BANNER_PROPS_BY_TYPE: Record<
 }
 
 const MESSAGE_STYLING = css`
-  padding: ${SPACING.spacing4} 3rem;
-  background-color: ${COLORS.white};
-
   & a {
     text-decoration: underline;
     color: inherit;
@@ -88,13 +85,15 @@ export function Banner(props: BannerProps): JSX.Element {
       border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${
         BANNER_PROPS_BY_TYPE[props.type].color
       }`}
+      padding={SPACING.spacing3}
+      paddingRight={SPACING.spacing4}
     >
       <Flex
+        color={COLORS.darkBlack}
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         flex="auto"
         alignItems={ALIGN_CENTER}
-        padding={`${SPACING.spacing2} ${SPACING.spacing2} ${SPACING.spacing2} ${SPACING.spacing3}`}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         data-testid={`Banner_${props.title}_${props.type}`}
       >
