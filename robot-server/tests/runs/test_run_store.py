@@ -3,6 +3,7 @@ import pytest
 from datetime import datetime
 from typing import Generator
 
+import sqlalchemy
 from sqlalchemy.engine import Engine as SQLEngine
 from pathlib import Path
 
@@ -51,7 +52,7 @@ def test_insert_actions_missing_run_id(subject: RunStore) -> None:
         id="action-id",
     )
 
-    with pytest.raises(RunNotFoundError, match="missing-run-id"):
+    with pytest.raises(sqlalchemy.exc.IntegrityError, match="missing-run-id"):
         subject.insert_action(run_id="missing-run-id", action=action)
 
 
