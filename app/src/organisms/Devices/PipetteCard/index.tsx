@@ -19,7 +19,7 @@ import {
   InstrumentDiagram,
 } from '@opentrons/components'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
-import { PipetteOverflowMenu } from './pipetteOverflowMenu'
+import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 
 import type {
   Mount,

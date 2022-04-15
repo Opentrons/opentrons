@@ -2,7 +2,7 @@ import * as React from 'react'
 import { resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-import { PipetteOverflowMenu } from '../pipetteOverflowMenu'
+import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import { mockLeftProtoPipette } from '../../../../redux/pipettes/__fixtures__'
 
 import type { Mount } from '../../../../redux/pipettes/types'

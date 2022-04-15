@@ -3,7 +3,7 @@ import { resetAllWhenMocks } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-import { PipetteOverflowMenu } from '../pipetteOverflowMenu'
+import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import { PipetteCard } from '..'
 import {
   mockLeftProtoPipette,
