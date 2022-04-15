@@ -4,7 +4,6 @@ from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy import create_engine
 from fastapi import Depends
 from sqlalchemy import event
-from sqlite3 import Connection as SQLite3Connection
 
 import logging
 
@@ -15,7 +14,6 @@ from anyio import Path as AsyncPath
 
 from robot_server.app_state import AppState, AppStateValue, get_app_state
 from robot_server.settings import get_settings
-
 
 _sql_engine = AppStateValue[SQLEngine]("sql_engine")
 _persistence_directory = AppStateValue[Path]("persistence_directory")
@@ -92,12 +90,13 @@ action_table = sqlalchemy.Table(
 )
 
 
+# Enable foreign key support in sqlite
+# https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#foreign-key-support
 @event.listens_for(SQLEngine, "connect")
-def _set_sqlite_pragma(dbapi_connection, connection_record):
-    if isinstance(dbapi_connection, SQLite3Connection):
-        cursor = dbapi_connection.cursor()
-        cursor.execute("PRAGMA foreign_keys=ON;")
-        cursor.close()
+def _set_sqlite_pragma(dbapi_connection: sqlalchemy.engine.Connection, connection_record: sqlalchemy.engine.CursorResult) -> None:
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON;")
+    cursor.close()
 
 
 def open_db_no_cleanup(db_file_path: Path) -> SQLEngine:
@@ -110,7 +109,7 @@ def open_db_no_cleanup(db_file_path: Path) -> SQLEngine:
 
 
 async def get_persistence_directory(
-    app_state: AppState = Depends(get_app_state),
+        app_state: AppState = Depends(get_app_state),
 ) -> Path:
     """Return the root persistence directory, creating it if necessary."""
     persistence_dir = _persistence_directory.get_from(app_state)
@@ -146,8 +145,8 @@ def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
 
 
 def get_sql_engine(
-    app_state: AppState = Depends(get_app_state),
-    persistence_directory: Path = Depends(get_persistence_directory),
+        app_state: AppState = Depends(get_app_state),
+        persistence_directory: Path = Depends(get_persistence_directory),
 ) -> SQLEngine:
     """Return a singleton SQL engine referring to a ready-to-use database."""
     sql_engine = _sql_engine.get_from(app_state)
