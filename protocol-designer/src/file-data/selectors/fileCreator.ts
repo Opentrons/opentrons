@@ -16,6 +16,7 @@ import { uuid } from '../../utils'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
+import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
@@ -32,8 +33,8 @@ import type {
   CreateCommand,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
-import { Selector } from '../../types'
-import {
+import type { Selector } from '../../types'
+import type {
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
@@ -108,6 +109,39 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     const { author, description, created } = fileMetadata
     const name = fileMetadata.protocolName || 'untitled'
     const lastModified = fileMetadata.lastModified
+    // TODO: Ian 2018-07-10 allow user to save steps in JSON file, even if those
+    // step never have saved forms.
+    // (We could just export the `steps` reducer, but we've sunset it)
+    const savedOrderedStepIds = orderedStepIds.filter(
+      stepId => savedStepForms[stepId]
+    )
+    const designerApplication = {
+      name: 'opentrons/protocol-designer',
+      version: applicationVersion,
+      data: {
+        _internalAppBuildDate,
+        defaultValues: {
+          // TODO: Ian 2019-06-13 load these into redux and always get them from redux, not constants.js
+          // This `defaultValues` key is not yet read by anything, but is populated here for auditability
+          // and so that later we can do #3587 without a PD migration
+          aspirate_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+          dispense_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+          touchTip_mmFromTop: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
+          blowout_mmFromTop: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
+        },
+        pipetteTiprackAssignments: mapValues(
+          pipetteEntities,
+          (
+            p: typeof pipetteEntities[keyof typeof pipetteEntities]
+          ): string | null | undefined => p.tiprackDefURI
+        ),
+        dismissedWarnings,
+        ingredients,
+        ingredLocations,
+        savedStepForms,
+        orderedStepIds: savedOrderedStepIds,
+      },
+    }
 
     const pipettes: ProtocolFile['pipettes'] = mapValues(
       initialRobotState.pipettes,
@@ -179,6 +213,11 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         return loadLabwareCommand
       }
     )
+
+    const loadLiquidCommands = getLoadLiquidCommands(
+      ingredients,
+      ingredLocations
+    )
     const modules: ProtocolFile['modules'] = mapValues(
       moduleEntities,
       (moduleEntity: ModuleEntity, moduleId: string) => ({
@@ -203,12 +242,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         return loadModuleCommand
       }
     )
-    // TODO: Ian 2018-07-10 allow user to save steps in JSON file, even if those
-    // step never have saved forms.
-    // (We could just export the `steps` reducer, but we've sunset it)
-    const savedOrderedStepIds = orderedStepIds.filter(
-      stepId => savedStepForms[stepId]
-    )
+
     const labwareDefinitions = getLabwareDefinitionsInUse(
       labwareEntities,
       pipetteEntities,
@@ -218,7 +252,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       ...loadPipetteCommands,
       ...loadLabwareCommands,
       ...loadModuleCommands,
-      // TODO: generate load liquid commands https://github.com/Opentrons/opentrons/issues/9702
+      ...loadLiquidCommands,
     ]
 
     const nonLoadCommands: CreateCommand[] = flatMap(
@@ -240,33 +274,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         subcategory: null,
         tags: [],
       },
-      designerApplication: {
-        name: 'opentrons/protocol-designer',
-        version: applicationVersion,
-        data: {
-          _internalAppBuildDate,
-          defaultValues: {
-            // TODO: Ian 2019-06-13 load these into redux and always get them from redux, not constants.js
-            // This `defaultValues` key is not yet read by anything, but is populated here for auditability
-            // and so that later we can do #3587 without a PD migration
-            aspirate_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-            dispense_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-            touchTip_mmFromTop: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
-            blowout_mmFromTop: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
-          },
-          pipetteTiprackAssignments: mapValues(
-            pipetteEntities,
-            (
-              p: typeof pipetteEntities[keyof typeof pipetteEntities]
-            ): string | null | undefined => p.tiprackDefURI
-          ),
-          dismissedWarnings,
-          ingredients,
-          ingredLocations,
-          savedStepForms,
-          orderedStepIds: savedOrderedStepIds,
-        },
-      },
+      designerApplication,
       robot: {
         model: OT2_STANDARD_MODEL,
         deckId: OT2_STANDARD_DECKID,

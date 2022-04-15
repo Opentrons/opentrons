@@ -2,10 +2,7 @@ import * as React from 'react'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import {
-  useHeaterShakerFromProtocol,
-  useLatchCommand,
-} from '../../ModuleCard/hooks'
+import { useLatchCommand } from '../../ModuleCard/hooks'
 import { i18n } from '../../../../i18n'
 import { TestShake } from '../TestShake'
 import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
@@ -23,9 +20,6 @@ const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFu
 >
 const mockUseLatchCommand = useLatchCommand as jest.MockedFunction<
   typeof useLatchCommand
->
-const mockUseHeaterShakerFromProtocol = useHeaterShakerFromProtocol as jest.MockedFunction<
-  typeof useHeaterShakerFromProtocol
 >
 const mockHeaterShakerModuleCard = HeaterShakerModuleCard as jest.MockedFunction<
   typeof HeaterShakerModuleCard
@@ -126,7 +120,7 @@ describe('TestShake', () => {
     props = {
       setCurrentPage: jest.fn(),
       module: mockHeaterShaker,
-      hasProtocol: false,
+      moduleFromProtocol: undefined,
     }
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
@@ -140,9 +134,6 @@ describe('TestShake', () => {
       handleLatch: jest.fn(),
       isLatchClosed: true,
     } as any)
-    mockUseHeaterShakerFromProtocol.mockReturnValue(
-      HEATER_SHAKER_PROTOCOL_MODULE_INFO
-    )
   })
   it('renders the correct title', () => {
     const { getByText } = render(props)
@@ -161,7 +152,7 @@ describe('TestShake', () => {
     props = {
       setCurrentPage: jest.fn(),
       module: mockHeaterShaker,
-      hasProtocol: true,
+      moduleFromProtocol: HEATER_SHAKER_PROTOCOL_MODULE_INFO,
     }
     const { getByText } = render(props)
     getByText(
@@ -181,7 +172,7 @@ describe('TestShake', () => {
     props = {
       module: mockHeaterShaker,
       setCurrentPage: jest.fn(),
-      hasProtocol: false,
+      moduleFromProtocol: undefined,
     }
 
     mockUseLatchCommand.mockReturnValue({
@@ -198,7 +189,7 @@ describe('TestShake', () => {
     props = {
       module: mockCloseLatchHeaterShaker,
       setCurrentPage: jest.fn(),
-      hasProtocol: false,
+      moduleFromProtocol: undefined,
     }
 
     const { getByRole } = render(props)
@@ -236,7 +227,7 @@ describe('TestShake', () => {
     props = {
       module: mockOpenLatchHeaterShaker,
       setCurrentPage: jest.fn(),
-      hasProtocol: false,
+      moduleFromProtocol: undefined,
     }
 
     mockUseLatchCommand.mockReturnValue({
@@ -253,7 +244,7 @@ describe('TestShake', () => {
     props = {
       module: mockCloseLatchHeaterShaker,
       setCurrentPage: jest.fn(),
-      hasProtocol: false,
+      moduleFromProtocol: undefined,
     }
 
     mockUseLatchCommand.mockReturnValue({
@@ -271,7 +262,7 @@ describe('TestShake', () => {
     props = {
       module: mockOpenLatchHeaterShaker,
       setCurrentPage: jest.fn(),
-      hasProtocol: false,
+      moduleFromProtocol: undefined,
     }
 
     mockUseLatchCommand.mockReturnValue({
@@ -289,7 +280,7 @@ describe('TestShake', () => {
     props = {
       module: mockCloseLatchHeaterShaker,
       setCurrentPage: jest.fn(),
-      hasProtocol: false,
+      moduleFromProtocol: undefined,
     }
 
     const { getByRole } = render(props)
@@ -313,7 +304,7 @@ describe('TestShake', () => {
     props = {
       module: mockMovingHeaterShaker,
       setCurrentPage: jest.fn(),
-      hasProtocol: false,
+      moduleFromProtocol: undefined,
     }
 
     const { getByRole } = render(props)

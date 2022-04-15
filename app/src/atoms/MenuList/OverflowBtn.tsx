@@ -29,11 +29,9 @@ const overflowButtonStyles = css`
   }
 `
 
-export const OverflowBtn = (
-  props: React.ComponentProps<typeof Btn>
-): JSX.Element | null => {
-  return (
-    <Btn css={overflowButtonStyles} {...props}>
+export const OverflowBtn = React.forwardRef(
+  (props: React.ComponentProps<typeof Btn>, ref): JSX.Element | null => (
+    <Btn css={overflowButtonStyles} {...props} ref={ref}>
       <svg
         width="19"
         height="31"
@@ -48,4 +46,4 @@ export const OverflowBtn = (
       {props.children}
     </Btn>
   )
-}
+)

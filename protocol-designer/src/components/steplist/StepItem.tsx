@@ -469,7 +469,7 @@ export const StepItemContents = (
         message={substeps.message}
         action={i18n.t('modules.actions.await_temperature')}
         actionText={temperature}
-        moduleType={TEMPERATURE_MODULE_TYPE}
+        moduleType={substeps.moduleType}
         labwareNickname={substeps.labwareNickname}
       />
     )

@@ -48,9 +48,9 @@ export const HeaterShakerSlideout = (
   const moduleName = getModuleDisplayName(module.model)
   const modulePart = isSetShake ? t('shake_speed') : t('temperature')
 
-  const setShakeSpeedCommand = (): void => {
+  const sendShakeSpeedCommand = (): void => {
     if (hsValue != null && isSetShake) {
-      const saveShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
+      const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
         commandType: 'heaterShakerModule/setTargetShakeSpeed',
         params: {
           moduleId: module.id,
@@ -58,7 +58,7 @@ export const HeaterShakerSlideout = (
         },
       }
       createLiveCommand({
-        command: saveShakeCommand,
+        command: setShakeCommand,
       }).catch((e: Error) => {
         console.error(`error setting heater shaker shake speed: ${e.message}`)
       })
@@ -70,11 +70,11 @@ export const HeaterShakerSlideout = (
     confirm: confirmAttachment,
     showConfirmation: showConfirmationModal,
     cancel: cancelExit,
-  } = useConditionalConfirm(setShakeSpeedCommand, true)
+  } = useConditionalConfirm(sendShakeSpeedCommand, true)
 
-  const handleSubmitCommand = (): void => {
+  const sendSetTemperatureCommand = (): void => {
     if (hsValue != null && !isSetShake) {
-      const saveTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
+      const setTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
         commandType: 'heaterShakerModule/startSetTargetTemperature',
         params: {
           moduleId: module.id,
@@ -82,10 +82,10 @@ export const HeaterShakerSlideout = (
         },
       }
       createLiveCommand({
-        command: saveTempCommand,
+        command: setTempCommand,
       }).catch((e: Error) => {
         console.error(
-          `error setting module status with command type ${saveTempCommand.commandType}: ${e.message}`
+          `error setting module status with command type ${setTempCommand.commandType}: ${e.message}`
         )
       })
     }
@@ -127,10 +127,9 @@ export const HeaterShakerSlideout = (
         })}
         onCloseClick={onCloseClick}
         isExpanded={isExpanded}
-        height={`calc(100vh - ${SPACING.spacing4})`}
         footer={
           <PrimaryButton
-            onClick={handleSubmitCommand}
+            onClick={sendSetTemperatureCommand}
             disabled={hsValue === null || errorMessage !== null}
             width="100%"
             data-testid={`HeaterShakerSlideout_btn_${module.serial}`}

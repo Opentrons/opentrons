@@ -12,6 +12,7 @@ import { uuid } from '../../utils'
 //  and labware access parameters, renames AirGap to aspirate, and removes all temporal properties from labware, pipettes,
 //  and module keys such as slot, mount
 //  and renames well to wellName
+import { getLoadLiquidCommands } from './utils/getLoadLiquidCommands'
 import type {
   LoadPipetteCreateCommand,
   LoadModuleCreateCommand,
@@ -21,18 +22,7 @@ import type {
   CreateCommand,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
-
-interface DesignerApplicationData {
-  ingredients: Record<
-    string,
-    {
-      name: string
-      description: string | null
-      serialize: boolean
-      liquidGroupId: string
-    }
-  >
-}
+import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 const PD_VERSION = '6.0.0'
 const SCHEMA_VERSION = 6
@@ -85,7 +75,7 @@ const migrateCommands = (
 export const migrateFile = (
   appData: ProtocolFileV5<DesignerApplicationData>
 ): ProtocolFile => {
-  const { pipettes, labware, modules, commands } = appData
+  const { pipettes, labware, modules, commands, designerApplication } = appData
   const loadPipetteCommands: LoadPipetteCreateCommand[] = map(
     pipettes,
     (pipette, pipetteId) => {
@@ -131,6 +121,10 @@ export const migrateFile = (
     }
   )
 
+  const loadLiquidCommands = getLoadLiquidCommands(
+    designerApplication?.data?.ingredients,
+    designerApplication?.data?.ingredLocations
+  )
   const migratedV5Commands = migrateCommands(commands)
 
   const liquids: ProtocolFile['liquids'] =
@@ -168,7 +162,7 @@ export const migrateFile = (
     modules: migrateModules(appData.modules),
     liquids,
     commands: [
-      // TODO: generate load liquid commands https://github.com/Opentrons/opentrons/issues/9702
+      ...loadLiquidCommands,
       ...loadPipetteCommands,
       ...loadModuleCommands,
       ...loadLabwareCommands,

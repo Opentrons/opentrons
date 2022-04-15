@@ -1,3 +1,6 @@
+import asyncio
+from typing import Callable
+
 import pytest
 from mock import AsyncMock, MagicMock
 from opentrons.hardware_control.poller import Poller, Listener, Reader, WaitableListener
@@ -7,7 +10,7 @@ async def test_poll_error() -> None:
     """It should call error callback on error."""
     exc = AssertionError()
 
-    async def raiser():
+    async def raiser() -> None:
         raise exc
 
     reader = AsyncMock(spec=Reader)
@@ -38,7 +41,7 @@ async def test_await_poll_error() -> None:
     """It should raise in wait_next_poll if reader raises."""
     exc = AssertionError()
 
-    async def raiser():
+    async def raiser() -> None:
         raise exc
 
     reader = AsyncMock(spec=Reader)
@@ -49,3 +52,36 @@ async def test_await_poll_error() -> None:
     with pytest.raises(exc.__class__):
         await listener.wait_next_poll()
     await p.stop_and_wait()
+
+
+@pytest.mark.parametrize(
+    argnames=["func"],
+    argvalues=[
+        [
+            # Notifies that a poll is complete
+            lambda x: x.on_poll(1)
+        ],
+        [
+            # Notifies that an error occurred
+            lambda x: x.on_error(ValueError("Hi!"))
+        ],
+        [
+            # Notifies poller terminated
+            lambda x: x.on_terminated()
+        ],
+    ],
+)
+async def test_on_poll_canceled_future(
+    func: Callable[[WaitableListener[int]], None]
+) -> None:
+    """It should ignore canceled futures"""
+    listener = WaitableListener[int]()
+    # Create a task that waits for a poll
+    task = asyncio.create_task(listener.wait_next_poll())
+    # Let it start
+    await asyncio.sleep(0.001)
+    # Cancel the task
+    task.cancel()
+    # Notify.
+    func(listener)
+    # There should be no exception

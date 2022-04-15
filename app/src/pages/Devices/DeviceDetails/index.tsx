@@ -19,7 +19,7 @@ import { PipettesAndModules } from '../../../organisms/Devices/PipettesAndModule
 import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
 
-import type { NextGenRouteParams } from '../../../App/NextGenApp'
+import type { NextGenRouteParams } from '../../../App/types'
 
 export function DeviceDetails(): JSX.Element | null {
   const { robotName } = useParams<NextGenRouteParams>()
