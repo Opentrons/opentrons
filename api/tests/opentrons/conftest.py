@@ -230,6 +230,8 @@ async def hardware(request, virtual_smoothie_env):
             )
 
 
+# Async because ProtocolContext.__init__() needs an event loop,
+# so this fixture needs to run in an event loop.
 @pytest.fixture
 async def ctx(hardware) -> ProtocolContext:
     return ProtocolContext(

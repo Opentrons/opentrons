@@ -1015,7 +1015,7 @@ def test_tip_length_for_load_caldata(ctx):
     delete.clear_tip_length_calibration()
 
 
-def test_bundled_labware(get_labware_fixture, hardware):
+async def test_bundled_labware(get_labware_fixture, hardware):
     fixture_96_plate = get_labware_fixture("fixture_96_plate")
     bundled_labware = {"fixture/fixture_96_plate/1": fixture_96_plate}
 
@@ -1031,7 +1031,7 @@ def test_bundled_labware(get_labware_fixture, hardware):
     assert ctx.loaded_labwares[3]._implementation.get_definition() == fixture_96_plate
 
 
-def test_bundled_labware_missing(get_labware_fixture, hardware):
+async def test_bundled_labware_missing(get_labware_fixture, hardware):
     bundled_labware: Dict[str, Any] = {}
     with pytest.raises(
         RuntimeError, match="No labware found in bundle with load name fixture_96_plate"
@@ -1060,7 +1060,7 @@ def test_bundled_labware_missing(get_labware_fixture, hardware):
         ctx.load_labware("fixture_96_plate", 3, namespace="fixture")
 
 
-def test_bundled_data(hardware):
+async def test_bundled_data(hardware):
     bundled_data = {"foo": b"1,2,3"}
     ctx = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(
@@ -1071,7 +1071,7 @@ def test_bundled_data(hardware):
     assert ctx.bundled_data == bundled_data
 
 
-def test_extra_labware(get_labware_fixture, hardware):
+async def test_extra_labware(get_labware_fixture, hardware):
     fixture_96_plate = get_labware_fixture("fixture_96_plate")
     bundled_labware = {"fixture/fixture_96_plate/1": fixture_96_plate}
     ctx = papi.ProtocolContext(
@@ -1086,7 +1086,7 @@ def test_extra_labware(get_labware_fixture, hardware):
     assert ctx.loaded_labwares[3]._implementation.get_definition() == fixture_96_plate
 
 
-def test_api_version_checking(hardware):
+async def test_api_version_checking(hardware):
     minor_over = APIVersion(
         papi.MAX_SUPPORTED_VERSION.major,
         papi.MAX_SUPPORTED_VERSION.minor + 1,
@@ -1108,7 +1108,7 @@ def test_api_version_checking(hardware):
         )
 
 
-def test_api_per_call_checking(monkeypatch, hardware):
+async def test_api_per_call_checking(monkeypatch, hardware):
     implementation = ProtocolContextImplementation(sync_hardware=hardware.sync)
 
     ctx = papi.ProtocolContext(

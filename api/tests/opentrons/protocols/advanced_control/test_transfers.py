@@ -1108,7 +1108,7 @@ async def test_multichannel_transfer_old_version(hardware):
             xfer_plan_list.append(step)
 
 
-def test_multichannel_transfer_locs(hardware):
+async def test_multichannel_transfer_locs(hardware):
     api_version = APIVersion(2, 2)
     ctx = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(
