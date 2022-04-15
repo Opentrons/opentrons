@@ -1,13 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Flex,
-  POSITION_RELATIVE,
-  Tooltip,
-  useHoverTooltip,
-} from '@opentrons/components'
+import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
 import { MenuList } from '../../../atoms/MenuList'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { MenuItemsByModuleType, useModuleOverflowMenu } from './hooks'
 
 import type { AttachedModule } from '../../../redux/modules/types'
@@ -64,7 +60,7 @@ export const ModuleOverflowMenu = (
                     </MenuItem>
                     {item.disabledReason && (
                       <Tooltip
-                        {...tooltipProps}
+                        tooltipProps={tooltipProps}
                         key={`tooltip_${index}_${module.model}`}
                       >
                         {t('cannot_shake', { ns: 'heater_shaker' })}
