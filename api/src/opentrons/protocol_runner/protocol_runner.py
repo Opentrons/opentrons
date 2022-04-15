@@ -148,7 +148,10 @@ class ProtocolRunner:
         if self._was_started:
             await self._protocol_engine.stop()
         else:
-            await self._protocol_engine.finish(drop_tips_and_home=False)
+            await self._protocol_engine.finish(
+                drop_tips_and_home=False,
+                set_run_status=False,
+            )
 
     async def run(
         self,

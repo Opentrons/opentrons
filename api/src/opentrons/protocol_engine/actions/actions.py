@@ -61,9 +61,11 @@ class FinishErrorDetails:
 class FinishAction:
     """Gracefully stop processing commands in the engine.
 
-    After a FinishAction, the engine status will be marked as succeeded or failed.
+    After a FinishAction, the engine status will be marked as `succeeded` or `failed`
+    if `set_run_status` is True. If False, status will be `stopped`.
     """
 
+    set_run_status: bool = True
     error_details: Optional[FinishErrorDetails] = None
 
 
