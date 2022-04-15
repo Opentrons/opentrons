@@ -264,8 +264,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     )
     const loadCommands: CreateCommand[] = [
       ...loadPipetteCommands,
-      ...loadLabwareCommands,
       ...loadModuleCommands,
+      ...loadLabwareCommands,
       ...loadLiquidCommands,
     ]
 
