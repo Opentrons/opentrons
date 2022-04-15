@@ -27,21 +27,15 @@ import { AddCustomLabware } from './AddCustomLabware'
 import { LabwareDetails } from './LabwareDetails'
 import {
   LabwareDefAndDate,
-  useGetAllLabware,
+  useAllLabware,
   useLabwareFailure,
   useNewLabwareName,
 } from './hooks'
 import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
-type labwareDisplayCategory =
-  | 'all'
-  | 'wellPlate'
-  | 'tipRack'
-  | 'tubeRack'
-  | 'reservoir'
-  | 'aluminumBlock'
+import type { LabwareFilter, LabwareSort } from './types'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
-const labwareDisplayCategoryFilters: labwareDisplayCategory[] = [
+const labwareDisplayCategoryFilters: LabwareFilter[] = [
   'all',
   'wellPlate',
   'tipRack',
@@ -58,15 +52,13 @@ labwareDisplayCategoryFilters.forEach(category =>
 export function Labware(): JSX.Element {
   const { t } = useTranslation('labware_landing')
 
-  const [sortBy, setSortBy] = React.useState<'alphabetical' | 'reverse'>(
-    'alphabetical'
-  )
+  const [sortBy, setSortBy] = React.useState<LabwareSort>('alphabetical')
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
   const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
 
-  const [filterBy, setFilterBy] = React.useState<labwareDisplayCategory>('all')
+  const [filterBy, setFilterBy] = React.useState<LabwareFilter>('all')
 
-  const labware = useGetAllLabware(sortBy, filterBy)
+  const labware = useAllLabware(sortBy, filterBy)
   const { labwareFailureMessage, clearLabwareFailure } = useLabwareFailure()
   const { newLabwareName, clearLabwareName } = useNewLabwareName()
   const [showAddLabwareSlideout, setShowAddLabwareSlideout] = React.useState(
@@ -115,14 +107,14 @@ export function Labware(): JSX.Element {
           paddingBottom={SPACING.spacing5}
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
-            <StyledText css={TYPOGRAPHY.labelSemiBold}>
+            <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {t('category')}
             </StyledText>
             <DropdownMenu
               filterOptions={FILTER_OPTIONS}
               currentOption={{ value: filterBy, name: startCase(filterBy) }}
               onClick={value => {
-                setFilterBy(value as labwareDisplayCategory)
+                setFilterBy(value as LabwareFilter)
               }}
             />
           </Flex>
@@ -140,7 +132,7 @@ export function Labware(): JSX.Element {
           {showSortByMenu && (
             <Flex
               width="9rem"
-              zIndex={10}
+              zIndex={2}
               borderRadius={BORDERS.radiusSoftCorners}
               boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
               position={POSITION_ABSOLUTE}

@@ -12,6 +12,7 @@ import { getAllDefinitions } from './helpers/definitions'
 import type { Dispatch } from '../../redux/types'
 
 import type { LabwareDefinition2 as LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareFilter, LabwareSort } from './types'
 
 export interface LabwareDefAndDate {
   definition: LabwareDefinition
@@ -19,15 +20,9 @@ export interface LabwareDefAndDate {
   filename?: string
 }
 
-export function useGetAllLabware(
-  sortBy: 'alphabetical' | 'reverse',
-  filterBy:
-    | 'all'
-    | 'wellPlate'
-    | 'tipRack'
-    | 'tubeRack'
-    | 'reservoir'
-    | 'aluminumBlock'
+export function useAllLabware(
+  sortBy: LabwareSort,
+  filterBy: LabwareFilter
 ): LabwareDefAndDate[] {
   const fullLabwareList: LabwareDefAndDate[] = []
   const labwareDefinitions = getAllDefinitions()

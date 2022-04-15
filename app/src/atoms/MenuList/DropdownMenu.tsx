@@ -27,6 +27,8 @@ export interface DropdownMenuProps {
   currentOption: DropdownOption
 }
 
+// TODO: (smb: 4/15/22) refactor this to use html select for accessibility
+
 export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   const { filterOptions, onClick, currentOption } = props
   const [showDropdownMenu, setShowDropdownMenu] = React.useState<boolean>(false)
@@ -39,7 +41,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        width="128px"
+        width="8rem"
         onClick={toggleSetShowDropdownMenu}
         border={BORDERS.lineBorder}
         borderRadius={BORDERS.radiusRoundEdge}
@@ -57,8 +59,8 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
       </Flex>
       {showDropdownMenu && (
         <Flex
-          width="128px"
-          zIndex={10}
+          width="8rem"
+          zIndex={2}
           borderRadius={BORDERS.radiusSoftCorners}
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
           position={POSITION_ABSOLUTE}

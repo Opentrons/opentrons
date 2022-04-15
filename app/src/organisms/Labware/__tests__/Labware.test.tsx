@@ -5,11 +5,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { LabwareCard } from '../LabwareCard'
 import { AddCustomLabware } from '../AddCustomLabware'
-import {
-  useGetAllLabware,
-  useLabwareFailure,
-  useNewLabwareName,
-} from '../hooks'
+import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
 import { Labware } from '../'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
 
@@ -22,8 +18,8 @@ const mockLabwareCard = LabwareCard as jest.MockedFunction<typeof LabwareCard>
 const mockAddCustomLabware = AddCustomLabware as jest.MockedFunction<
   typeof AddCustomLabware
 >
-const mockUseGetAllLabware = useGetAllLabware as jest.MockedFunction<
-  typeof useGetAllLabware
+const mockUseAllLabware = useAllLabware as jest.MockedFunction<
+  typeof useAllLabware
 >
 const mockUseLabwareFailure = useLabwareFailure as jest.MockedFunction<
   typeof useLabwareFailure
@@ -47,7 +43,7 @@ describe('Labware', () => {
   beforeEach(() => {
     mockLabwareCard.mockReturnValue(<div>Mock Labware Card</div>)
     mockAddCustomLabware.mockReturnValue(<div>Mock Add Custom Labware</div>)
-    mockUseGetAllLabware.mockReturnValue([{ definition: mockDefinition }])
+    mockUseAllLabware.mockReturnValue([{ definition: mockDefinition }])
     mockUseLabwareFailure.mockReturnValue({
       labwareFailureMessage: null,
       clearLabwareFailure: jest.fn(),

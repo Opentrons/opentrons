@@ -16,11 +16,7 @@ import {
   mockValidLabware,
 } from '../../../redux/custom-labware/__fixtures__'
 
-import {
-  useGetAllLabware,
-  useLabwareFailure,
-  useNewLabwareName,
-} from '../hooks'
+import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
 
 import type { Store } from 'redux'
 import type { State } from '../../../redux/types'
@@ -40,7 +36,7 @@ const mockGetAddNewLabwareName = getAddNewLabwareName as jest.MockedFunction<
   typeof getAddNewLabwareName
 >
 
-describe('useGetAllLabware hook', () => {
+describe('useAllLabware hook', () => {
   const store: Store<State> = createStore(jest.fn(), {})
   beforeEach(() => {
     mockGetAllAllDefs.mockReturnValue([mockDefinition])
@@ -55,7 +51,7 @@ describe('useGetAllLabware hook', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
-    const { result } = renderHook(() => useGetAllLabware('reverse', 'all'), {
+    const { result } = renderHook(() => useAllLabware('reverse', 'all'), {
       wrapper,
     })
     const labware1 = result.current[0]
@@ -69,12 +65,9 @@ describe('useGetAllLabware hook', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
-    const { result } = renderHook(
-      () => useGetAllLabware('alphabetical', 'all'),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useAllLabware('alphabetical', 'all'), {
+      wrapper,
+    })
     const labware1 = result.current[0]
     const labware2 = result.current[1]
 
@@ -86,12 +79,9 @@ describe('useGetAllLabware hook', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
-    const { result } = renderHook(
-      () => useGetAllLabware('reverse', 'reservoir'),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useAllLabware('reverse', 'reservoir'), {
+      wrapper,
+    })
     const labware1 = result.current[0]
     const labware2 = result.current[1]
 
@@ -102,12 +92,9 @@ describe('useGetAllLabware hook', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
-    const { result } = renderHook(
-      () => useGetAllLabware('reverse', 'wellPlate'),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useAllLabware('reverse', 'wellPlate'), {
+      wrapper,
+    })
     const labware1 = result.current[0]
     const labware2 = result.current[1]
 
