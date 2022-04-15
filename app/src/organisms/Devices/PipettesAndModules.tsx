@@ -16,10 +16,16 @@ import {
   SPACING_3,
   WRAP,
   JUSTIFY_START,
+  DIRECTION_ROW,
 } from '@opentrons/components'
 
 import { ModuleCard } from './ModuleCard'
-import { useAttachedModules, useIsRobotViewable } from './hooks'
+import {
+  useAttachedModules,
+  useAttachedPipettes,
+  useIsRobotViewable,
+} from './hooks'
+import { PipetteCard } from './PipetteCard'
 
 interface PipettesAndModulesProps {
   robotName: string
@@ -31,6 +37,7 @@ export function PipettesAndModules({
   const { t } = useTranslation('device_details')
 
   const attachedModules = useAttachedModules(robotName)
+  const attachedPipettes = useAttachedPipettes(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
 
   return (
@@ -53,21 +60,30 @@ export function PipettesAndModules({
         padding={SPACING_2}
         width="100%"
       >
+        {/* TODO(jr, 4/15/22): This needs to be refactored to get a combined array of pipettes and modules so it can display as the designs are */}
         {isRobotViewable ? (
           <Flex
-            width={attachedModules.length === 1 ? '50%' : '100%'}
-            justifyContent={JUSTIFY_START}
-            flexWrap={WRAP}
             flexDirection={DIRECTION_COLUMN}
-            maxHeight="25rem"
+            width={attachedModules.length === 1 ? '50%' : '100%'}
           >
-            {attachedModules.map((module, index) => {
-              return (
-                <Flex key={`moduleCard_${module.type}_${index}`}>
-                  <ModuleCard module={module} />
-                </Flex>
-              )
-            })}
+            <Flex flexDirection={DIRECTION_ROW}>
+              <PipetteCard leftPipette={attachedPipettes.left} />
+              <PipetteCard rightPipette={attachedPipettes.right} />
+            </Flex>
+            <Flex
+              justifyContent={JUSTIFY_START}
+              flexDirection={DIRECTION_COLUMN}
+              flexWrap={WRAP}
+              maxHeight="25rem"
+            >
+              {attachedModules.map((module, index) => {
+                return (
+                  <Flex key={`moduleCard_${module.type}_${index}`}>
+                    <ModuleCard module={module} />
+                  </Flex>
+                )
+              })}
+            </Flex>
           </Flex>
         ) : (
           <Text

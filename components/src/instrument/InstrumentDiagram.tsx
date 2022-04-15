@@ -1,18 +1,20 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import singleSrc from './pipetteSingle.png'
-import multiSrc from './pipetteMulti.png'
-import singleGEN2Src from './pipetteGEN2Single.png'
-import multiGEN2Src from './pipetteGEN2Multi.png'
+import singleSrc from '@opentrons/components/src/instrument/single_channel_GEN1_800px.png'
+import multiSrc from '@opentrons/components/src/instrument/multi-channel_GEN1_800px.png'
+import singleGEN2Src from '@opentrons/components/src/instrument/single-channel_GEN2_800px.png'
+import multiGEN2Src from '@opentrons/components/src/instrument/multi-channel_GEN2_800px.png'
 import styles from './instrument.css'
 
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { Mount } from '../robot-types'
+import type { FlattenSimpleInterpolation } from 'styled-components'
 
 export interface InstrumentDiagramProps {
   pipetteSpecs?: Pick<PipetteNameSpecs, 'displayCategory' | 'channels'> | null
   className?: string
+  css?: FlattenSimpleInterpolation
   mount: Mount
 }
 
@@ -32,7 +34,7 @@ export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
     }
   }
   return (
-    <div className={props.className}>
+    <div className={props.className} css={props.css}>
       <img
         className={cx({ [styles.flipped_image]: mount === 'right' })}
         src={imgSrc}
