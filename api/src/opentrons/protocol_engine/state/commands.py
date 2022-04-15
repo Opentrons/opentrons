@@ -270,11 +270,14 @@ class CommandStore(HasState[CommandState], HandlesActions):
         elif isinstance(action, FinishAction):
             if not self._state.run_result:
                 self._state.queue_status = QueueStatus.INACTIVE
-                self._state.run_result = (
-                    RunResult.SUCCEEDED
-                    if not action.error_details
-                    else RunResult.FAILED
-                )
+                if action.set_run_status:
+                    self._state.run_result = (
+                        RunResult.SUCCEEDED
+                        if not action.error_details
+                        else RunResult.FAILED
+                    )
+                else:
+                    self._state.run_result = RunResult.STOPPED
 
                 # any `ProtocolEngineError`'s will be captured by `FailCommandAction`,
                 # so only capture unknown errors here

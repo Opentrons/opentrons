@@ -16,11 +16,7 @@ import {
   mockValidLabware,
 } from '../../../redux/custom-labware/__fixtures__'
 
-import {
-  useGetAllLabware,
-  useLabwareFailure,
-  useNewLabwareName,
-} from '../hooks'
+import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
 
 import type { Store } from 'redux'
 import type { State } from '../../../redux/types'
@@ -40,7 +36,7 @@ const mockGetAddNewLabwareName = getAddNewLabwareName as jest.MockedFunction<
   typeof getAddNewLabwareName
 >
 
-describe('useGetAllLabware hook', () => {
+describe('useAllLabware hook', () => {
   const store: Store<State> = createStore(jest.fn(), {})
   beforeEach(() => {
     mockGetAllAllDefs.mockReturnValue([mockDefinition])
@@ -55,7 +51,50 @@ describe('useGetAllLabware hook', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
-    const { result } = renderHook(useGetAllLabware, { wrapper })
+    const { result } = renderHook(() => useAllLabware('reverse', 'all'), {
+      wrapper,
+    })
+    const labware1 = result.current[0]
+    const labware2 = result.current[1]
+
+    expect(labware1.definition).toBe(mockDefinition)
+    expect(labware2.modified).toBe(mockValidLabware.modified)
+    expect(labware2.definition).toBe(mockValidLabware.definition)
+  })
+  it('should return alphabetically sorted list', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <Provider store={store}>{children}</Provider>
+    )
+    const { result } = renderHook(() => useAllLabware('alphabetical', 'all'), {
+      wrapper,
+    })
+    const labware1 = result.current[0]
+    const labware2 = result.current[1]
+
+    expect(labware2.definition).toBe(mockDefinition)
+    expect(labware1.modified).toBe(mockValidLabware.modified)
+    expect(labware1.definition).toBe(mockValidLabware.definition)
+  })
+  it('should return no labware if not the right filter', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <Provider store={store}>{children}</Provider>
+    )
+    const { result } = renderHook(() => useAllLabware('reverse', 'reservoir'), {
+      wrapper,
+    })
+    const labware1 = result.current[0]
+    const labware2 = result.current[1]
+
+    expect(labware1).toBe(undefined)
+    expect(labware2).toBe(undefined)
+  })
+  it('should return labware with wellPlate filter', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <Provider store={store}>{children}</Provider>
+    )
+    const { result } = renderHook(() => useAllLabware('reverse', 'wellPlate'), {
+      wrapper,
+    })
     const labware1 = result.current[0]
     const labware2 = result.current[1]
 
