@@ -60,6 +60,25 @@ class DeviceLanding:
         )
         return self.base.clickable_wrapper(header, 5)
 
+    def get_setup_a_robot_header(self) -> Optional[WebElement]:
+        """Get the how to setup a robot."""
+        header: Element = Element(
+            (By.XPATH, '//p[text()="How to set up a new robot"]'),
+            f"How to set up a new robot.",
+        )
+        return self.base.clickable_wrapper(header, 5)
+
+    def get_link_to_setting_up_a_new_robot(self) -> Optional[WebElement]:
+        """Get link for the how to setup a robot."""
+        header: Element = Element(
+            (
+                By.XPATH,
+                '//a[contains(@href,"https://support.opentrons.com/en/collections/1559720-ot-2-get-started")]',
+            ),
+            f"link for how to set up a new robot.",
+        )
+        return self.base.clickable_wrapper(header, 5)
+
     def click_how_to_setup_a_robot(self) -> None:
         """Click on the how to setup a robot"""
         button: Optional[WebElement] = self.get_how_to_setup_a_robot()
