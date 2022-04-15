@@ -135,9 +135,18 @@ async def test_updated_live_data(simulating_module):
 
 async def test_deactivated_updated_live_data(simulating_module):
     """Should update live data after module commands."""
-    await simulating_module.close_labware_latch()
+    assert simulating_module.live_data == {
+        "data": {
+            "labwareLatchStatus": "idle_closed",
+            "speedStatus": not "idle",
+            "temperatureStatus": not "idle",
+            "targetSpeed": not None,
+            "targetTemp": not None,
+            "errorDetails": None,
+        },
+        "status": "running",
+    }
     await simulating_module.deactivate()
-    await simulating_module.wait_next_poll()
     assert simulating_module.live_data == {
         "data": {
             "labwareLatchStatus": "idle_closed",

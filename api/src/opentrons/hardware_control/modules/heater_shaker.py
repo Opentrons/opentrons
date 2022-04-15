@@ -126,7 +126,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         """
         DELTA: Final = 0.7
         status = TemperatureStatus.IDLE
-        if temperature.target is not None:
+        if (temperature.target is not None) and (temperature.target != 0):
             diff = temperature.target - temperature.current
             if abs(diff) < DELTA:  # To avoid status fluctuation near target
                 status = TemperatureStatus.HOLDING
@@ -397,19 +397,20 @@ class HeaterShaker(mod_abc.AbstractModule):
         """Stop heating/cooling; stop shaking and home the plate"""
         await self.wait_for_is_running()
         await self._driver.deactivate_heater()
-        self._listener.state.temperature.target = None
         await self._driver.home()
+        await self.wait_next_poll()
 
     async def deactivate_heater(self) -> None:
         """Stop heating/cooling"""
         await self.wait_for_is_running()
         await self._driver.deactivate_heater()
-        self._listener.state.temperature.target = None
+        await self.wait_next_poll()
 
     async def deactivate_shaker(self) -> None:
         """Stop shaking and home the plate"""
         await self.wait_for_is_running()
         await self._driver.home()
+        await self.wait_next_poll()
 
     async def open_labware_latch(self) -> None:
         await self.wait_for_is_running()
