@@ -39,4 +39,12 @@ describe('Slideout', () => {
     fireEvent.click(button)
     expect(mockOnClick).toHaveBeenCalledTimes(1)
   })
+
+  it('clicking overlay triggers close', () => {
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: /exit/i })
+    expect(button).toBeEnabled()
+    fireEvent.click(button)
+    expect(mockOnClick).toHaveBeenCalledTimes(1)
+  })
 })

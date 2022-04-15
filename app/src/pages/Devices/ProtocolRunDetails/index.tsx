@@ -25,10 +25,7 @@ import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/Protoc
 import { RunLog } from '../../../organisms/Devices/ProtocolRun/RunLog'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 
-import type {
-  NextGenRouteParams,
-  ProtocolRunDetailsTab,
-} from '../../../App/types'
+import type { NavRouteParams, ProtocolRunDetailsTab } from '../../../App/types'
 
 const RoundNavLink = styled(NavLink)`
   ${TYPOGRAPHY.pSemiBold}
@@ -81,7 +78,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
     robotName,
     runId,
     protocolRunDetailsTab,
-  } = useParams<NextGenRouteParams>()
+  } = useParams<NavRouteParams>()
 
   const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
 
