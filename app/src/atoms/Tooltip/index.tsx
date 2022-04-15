@@ -4,7 +4,7 @@ import {
   TYPOGRAPHY,
   UseTooltipResultTooltipProps,
 } from '@opentrons/components'
-import { Tooltip } from '@opentrons/components/src/tooltips/Tooltip'
+import { Tooltip as SharedTooltip } from '@opentrons/components/src/tooltips/Tooltip'
 
 export interface TooltipProps {
   key: string
@@ -12,11 +12,11 @@ export interface TooltipProps {
   tooltipProps: UseTooltipResultTooltipProps & { visible: boolean }
 }
 
-export function AppTooltip(props: TooltipProps): JSX.Element {
+export function Tooltip(props: TooltipProps): JSX.Element {
   const { key, children, tooltipProps } = props
 
   return (
-    <Tooltip
+    <SharedTooltip
       {...tooltipProps}
       backgroundColor={COLORS.darkBlack}
       key={key}
@@ -24,6 +24,6 @@ export function AppTooltip(props: TooltipProps): JSX.Element {
       width={'8.75rem'}
     >
       {children}
-    </Tooltip>
+    </SharedTooltip>
   )
 }

@@ -12,7 +12,7 @@ import {
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { getProtocolModulesInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
-import { AppTooltip } from '../../../atoms/AppTooltip'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useProtocolDetailsForRun } from '../hooks'
 
@@ -158,12 +158,12 @@ export function useModuleOverflowMenu(
         })}
       </MenuItem>
       {isLatchDisabled ? (
-        <AppTooltip
+        <Tooltip
           tooltipProps={tooltipProps}
           key={`tooltip_latch_${module.model}`}
         >
           {t('cannot_open_latch', { ns: 'heater_shaker' })}
-        </AppTooltip>
+        </Tooltip>
       ) : null}
     </>
   )

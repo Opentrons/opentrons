@@ -1,14 +1,14 @@
 import * as React from 'react'
-import { AppTooltip } from './index'
+import { Tooltip } from './index'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Atoms/AppTooltip',
-  component: AppTooltip,
+  title: 'App/Atoms/Tooltip',
+  component: Tooltip,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof AppTooltip>> = args => (
-  <AppTooltip {...args} />
+const Template: Story<React.ComponentProps<typeof Tooltip>> = args => (
+  <Tooltip {...args} />
 )
 
 export const Primary = Template.bind({})
