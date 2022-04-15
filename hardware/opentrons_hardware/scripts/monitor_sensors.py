@@ -14,6 +14,7 @@ from opentrons_hardware.firmware_bindings.messages import (
     payloads,
     fields,
 )
+from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32Field
 from opentrons_hardware.sensors.utils import SensorDataType
 
 from opentrons_hardware.drivers.can_bus.build import build_driver
@@ -25,7 +26,16 @@ async def do_run(
     callback: WaitableCallback,
     target_node: constants.NodeId,
     target_sensor: constants.SensorType,
+    threshold: float,
 ) -> None:
+    threshold_payload = payloads.SetSensorThresholdRequestPayload(
+        sensor=fields.SensorTypeField(constants.SensorType.capacitive),
+        threshold=Int32Field(int(threshold * 2**15)),
+    )
+    threshold_message = message_definitions.SetSensorThresholdRequest(
+        payload=threshold_payload
+    )
+    await messenger.send(target_node, threshold_message)
     stim_payload = payloads.BindSensorOutputRequestPayload(
         sensor=fields.SensorTypeField(target_sensor.value),
         binding=fields.SensorOutputBindingField(3),
@@ -61,7 +71,7 @@ async def run(args: argparse.Namespace) -> None:
     messenger = CanMessenger(driver)
     messenger.start()
     with WaitableCallback(messenger) as reader:
-        return await do_run(messenger, reader, target, sensor)
+        return await do_run(messenger, reader, target, sensor, args.threshold)
 
 
 def main() -> None:
@@ -84,6 +94,9 @@ def main() -> None:
         choices=["capacitive"],
         help="which sensor",
         default="capacitive",
+    )
+    parser.add_argument(
+        "-t", "--threshold", type=float, help="sensor threshold", default=50
     )
 
     args = parser.parse_args()
