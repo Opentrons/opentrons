@@ -60,7 +60,7 @@ export function PipettesAndModules({
         padding={SPACING_2}
         width="100%"
       >
-        {/* TODO(jr, 4/15/22): This needs to be refactored to get a combined array of pipettes and modules so it can display as the designs are */}
+        {/* TODO(jr, 4/15/22): This needs to be refactored to get a combined array of pipettes and modules so it can display with widths matching each column as the design shows */}
         {isRobotViewable ? (
           <Flex
             flexDirection={DIRECTION_COLUMN}
