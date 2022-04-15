@@ -47,6 +47,44 @@ class DeviceLanding:
         )
         return self.base.clickable_wrapper(lights, 5)
 
+    def get_robot_image(self) -> Optional[WebElement]:
+        """Get the robot_image."""
+        lights: Element = Element(
+            (By.ID, "RobotCard_opentrons-dev_robotImage"), f"Robot image."
+        )
+        return self.base.clickable_wrapper(lights, 5)
+
+    def get_robot_name_device_detail(self) -> Optional[WebElement]:
+        """Get the robot name on device detail page."""
+        lights: Element = Element(
+            (By.ID, "RobotStatusBanner_opentrons-dev_robotName"),
+            f"the robot name on device detail page.",
+        )
+        return self.base.clickable_wrapper(lights, 5)
+
+    def get_left_mount_pipette(self) -> Optional[WebElement]:
+        """Get the left mount pipette."""
+        text: Element = Element(
+            (By.ID, "RobotCard_opentrons-dev_leftMountPipette"), f"Left mount pipette."
+        )
+        return self.base.clickable_wrapper(text, 5)
+
+    def get_right_mount_pipette(self) -> Optional[WebElement]:
+        """Get the right mount pipette."""
+        text: Element = Element(
+            (By.ID, "RobotCard_opentrons-dev_rightMountPipette"),
+            f"Right mount pipette.",
+        )
+        return self.base.clickable_wrapper(text, 5)
+
+    def get_overflow_button_on_device_landing(self) -> Optional[WebElement]:
+        """Get the overflow button on device landing page."""
+        text: Element = Element(
+            (By.ID, "RobotCard_opentrons-dev_overflowMenu"),
+            f"Get the overflow button on device landing page.",
+        )
+        return self.base.clickable_wrapper(text, 5)
+
     def get_device_header(self) -> Optional[WebElement]:
         """Get the device header."""
         header: Element = Element((By.ID, "DevicesLanding_title"), f"Device header.")
@@ -63,10 +101,10 @@ class DeviceLanding:
     def get_setup_a_robot_header(self) -> Optional[WebElement]:
         """Get the how to setup a robot."""
         header: Element = Element(
-            (By.XPATH, '//p[text()="How to set up a new robot"]'),
+            (By.XPATH, '//p[text()="How to setup a new robot"]'),
             f"How to set up a new robot.",
         )
-        return self.base.clickable_wrapper(header, 5)
+        return self.base.clickable_wrapper(header, 15)
 
     def get_link_to_setting_up_a_new_robot(self) -> Optional[WebElement]:
         """Get link for the how to setup a robot."""
@@ -82,6 +120,23 @@ class DeviceLanding:
     def click_how_to_setup_a_robot(self) -> None:
         """Click on the how to setup a robot"""
         button: Optional[WebElement] = self.get_how_to_setup_a_robot()
+        if button:
+            button.click()
+
+    def get_close_button(self) -> Optional[WebElement]:
+        """Get the close button."""
+        button: Element = Element(
+            (
+                By.XPATH,
+                '//button[text()="close"]',
+            ),
+            f"Get the close button.",
+        )
+        return self.base.clickable_wrapper(button, 5)
+
+    def click_close_button(self) -> None:
+        """Click on the close button"""
+        button: Optional[WebElement] = self.get_close_button()
         if button:
             button.click()
 
@@ -119,6 +174,14 @@ class DeviceLanding:
             return ""
         return element.text
 
+    def get_image_robot_overview(self) -> Optional[WebElement]:
+        """Get the robot image on device detail page."""
+        image: Element = Element(
+            (By.ID, "RobotOverview_robotImage"),
+            f"the robot image on device detail page.",
+        )
+        return self.base.clickable_wrapper(image, 5)
+
     def get_recent_protocol_runs_header_text(self) -> str:
         header: Element = Element(
             (By.ID, "RecentProtocolRuns_title"), f"header 'Recent Protocol Runs'"
@@ -127,6 +190,22 @@ class DeviceLanding:
         if not element:
             return ""
         return element.text
+
+    def get_mag_deck_image(self) -> Optional[WebElement]:
+        """Get the mag deck image on device detail page."""
+        image: Element = Element(
+            (By.XPATH, f"//img[@alt='magneticModuleV2']"),
+            f"the mag deck image on device detail page.",
+        )
+        return self.base.clickable_wrapper(image, 5)
+
+    def get_mag_module_name(self) -> Optional[WebElement]:
+        """Get the mag module name on device detail page."""
+        image: Element = Element(
+            (By.XPATH, f"//p[text()='Magnetic Module GEN2']"),
+            f"the mag module name on device detail page.",
+        )
+        return self.base.clickable_wrapper(image, 5)
 
     def click_module_actions_button(self, module_serial: str) -> None:
         button: Element = Element(

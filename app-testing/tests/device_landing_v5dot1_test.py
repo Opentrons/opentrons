@@ -14,7 +14,7 @@ from selenium.webdriver.chrome.options import Options
 from src.resources.ot_robot5dot1 import OtRobot
 from src.resources.ot_application import OtApplication
 from src.pages.device_landing import DeviceLanding
-from src.resources.robot_data import Dev, RobotDataType
+from src.resources.robot_data import Dev, Kansas, RobotDataType
 
 style = Style(color="#ac0505", bgcolor="yellow", bold=True)
 
@@ -57,7 +57,7 @@ def test_device_landing_v5dot1(
         device_landing.click_how_to_setup_a_robot()
         assert device_landing.get_setup_a_robot_header().is_displayed()
         assert device_landing.get_link_to_setting_up_a_new_robot().is_displayed()
-        click on close buton
+        device_landing.click_close_button()
         for robot in robots:
             ot_robot = OtRobot(console, robot)
             console.print(
@@ -67,9 +67,15 @@ def test_device_landing_v5dot1(
 
             # Is the robot connected?
             device_landing.robot_banner(robot_name=ot_robot.data.display_name)
+            assert device_landing.get_robot_image().is_displayed()
+            assert device_landing.get_left_mount_pipette().is_displayed()
+            assert device_landing.get_right_mount_pipette().is_displayed()
+            assert device_landing.get_overflow_button_on_device_landing().is_displayed()
             device_landing.base.click(
                 device_landing.expander(ot_robot.data.display_name)
             )
+            assert device_landing.get_image_robot_overview().is_displayed()
+            assert device_landing.get_robot_name_device_detail().is_displayed()
             assert (
                 device_landing.get_pipettes_and_modules_header_text()
                 == "Pipettes and Modules"
@@ -82,6 +88,8 @@ def test_device_landing_v5dot1(
                 device_landing.set_lights(True) == True
             ), "Lights toggle was not set to on."
 
+            device_landing.get_mag_deck_image().is_displayed()
+            device_landing.get_mag_module_name().is_displayed()
             for serial in [
                 module.serial
                 for module in ot_robot.modules
@@ -96,4 +104,5 @@ def test_device_landing_v5dot1(
                 else:
                     device_landing.click_module_actions_button(serial)
                     device_landing.click_mag_disengage()
+                time.sleep(3)
             device_landing.navigate("devices")
