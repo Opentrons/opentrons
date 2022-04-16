@@ -27,7 +27,7 @@ from robot_server.runs.router.commands_router import (
 )
 
 
-async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> None:
+async def test_create_run_command(decoy: Decoy, mock_engine_store: EngineStore) -> None:
     """It should add the requested command to the ProtocolEngine and return it."""
     command_request = pe_commands.PauseCreate(
         params=pe_commands.PauseParams(message="Hello")
@@ -54,7 +54,7 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
         params=pe_commands.PauseParams(message="Hello"),
     )
 
-    protocol_engine = engine_store.engine
+    protocol_engine = mock_engine_store.engine
 
     def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
         decoy.when(protocol_engine.state_view.commands.get("command-id")).then_return(
@@ -62,14 +62,14 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
         )
         return command_once_added
 
-    decoy.when(engine_store.engine.add_command(command_request)).then_do(
+    decoy.when(mock_engine_store.engine.add_command(command_request)).then_do(
         _stub_queued_command_state
     )
 
     result = await create_run_command(
         request_body=RequestModel(data=command_request),
         waitUntilComplete=False,
-        engine_store=engine_store,
+        engine_store=mock_engine_store,
         run=run,
     )
 
@@ -80,7 +80,7 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
 
 async def test_create_run_command_not_current(
     decoy: Decoy,
-    engine_store: EngineStore,
+    mock_engine_store: EngineStore,
 ) -> None:
     """It should 400 if you try to add commands to non-current run."""
     command_request = pe_commands.PauseCreate(
@@ -104,7 +104,7 @@ async def test_create_run_command_not_current(
         await create_run_command(
             request_body=RequestModel(data=command_request),
             waitUntilComplete=False,
-            engine_store=engine_store,
+            engine_store=mock_engine_store,
             run=run,
         )
 
@@ -113,7 +113,7 @@ async def test_create_run_command_not_current(
 
 
 async def test_create_run_command_blocking_completion(
-    decoy: Decoy, engine_store: EngineStore
+    decoy: Decoy, mock_engine_store: EngineStore
 ) -> None:
     """It should return the completed command once the command is completed."""
     run = Run.construct(
@@ -149,7 +149,7 @@ async def test_create_run_command_blocking_completion(
         params=pe_commands.PauseParams(message="Hello"),
     )
 
-    protocol_engine = engine_store.engine
+    protocol_engine = mock_engine_store.engine
 
     def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
         decoy.when(protocol_engine.state_view.commands.get("command-id")).then_return(
@@ -174,7 +174,7 @@ async def test_create_run_command_blocking_completion(
         request_body=RequestModel(data=command_request),
         waitUntilComplete=True,
         timeout=999,
-        engine_store=engine_store,
+        engine_store=mock_engine_store,
         run=run,
     )
 
@@ -182,7 +182,7 @@ async def test_create_run_command_blocking_completion(
     assert result.status_code == 201
 
 
-async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None:
+async def test_get_run_commands(decoy: Decoy, mock_engine_store: EngineStore) -> None:
     """It should return a list of all commands in a run."""
     run = Run(
         id="run-id",
@@ -214,7 +214,7 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
     )
 
     engine_state = decoy.mock(cls=StateView)
-    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
+    decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get_current()).then_return(
         CurrentCommand(
             command_id="current-command-id",
@@ -229,7 +229,7 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
 
     result = await get_run_commands(
         run=run,
-        engine_store=engine_store,
+        engine_store=mock_engine_store,
         cursor=None,
         pageLength=42,
     )
@@ -268,7 +268,9 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
     assert result.status_code == 200
 
 
-async def test_get_run_commands_empty(decoy: Decoy, engine_store: EngineStore) -> None:
+async def test_get_run_commands_empty(
+    decoy: Decoy, mock_engine_store: EngineStore
+) -> None:
     """It should return an empty commands list if no commands."""
     run = Run(
         id="run-id",
@@ -284,7 +286,7 @@ async def test_get_run_commands_empty(decoy: Decoy, engine_store: EngineStore) -
     )
 
     engine_state = decoy.mock(cls=StateView)
-    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
+    decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get_current()).then_return(None)
     decoy.when(engine_state.commands.get_slice(cursor=21, length=42)).then_return(
         CommandSlice(commands=[], cursor=0, total_length=0)
@@ -292,7 +294,7 @@ async def test_get_run_commands_empty(decoy: Decoy, engine_store: EngineStore) -
 
     result = await get_run_commands(
         run=run,
-        engine_store=engine_store,
+        engine_store=mock_engine_store,
         cursor=21,
         pageLength=42,
     )
@@ -305,7 +307,7 @@ async def test_get_run_commands_empty(decoy: Decoy, engine_store: EngineStore) -
 
 async def test_get_run_command_by_id(
     decoy: Decoy,
-    engine_store: EngineStore,
+    mock_engine_store: EngineStore,
 ) -> None:
     """It should return full details about a command by ID."""
     command = pe_commands.MoveToWell(
@@ -331,12 +333,12 @@ async def test_get_run_command_by_id(
 
     engine_state = decoy.mock(cls=StateView)
 
-    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
+    decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get("command-id")).then_return(command)
 
     result = await get_run_command(
         commandId="command-id",
-        engine_store=engine_store,
+        engine_store=mock_engine_store,
         run=run,
     )
 
@@ -346,7 +348,7 @@ async def test_get_run_command_by_id(
 
 async def test_get_run_command_missing_command(
     decoy: Decoy,
-    engine_store: EngineStore,
+    mock_engine_store: EngineStore,
 ) -> None:
     """It should 404 if you attempt to get a non-existent command."""
     key_error = pe_errors.CommandDoesNotExistError("oh no")
@@ -365,13 +367,13 @@ async def test_get_run_command_missing_command(
     )
 
     engine_state = decoy.mock(cls=StateView)
-    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
+    decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get("command-id")).then_raise(key_error)
 
     with pytest.raises(ApiError) as exc_info:
         await get_run_command(
             commandId="command-id",
-            engine_store=engine_store,
+            engine_store=mock_engine_store,
             run=run,
         )
 
