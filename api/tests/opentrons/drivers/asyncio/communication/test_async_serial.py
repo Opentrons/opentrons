@@ -30,9 +30,7 @@ def mock_serial(
 
 
 @pytest.fixture
-async def subject(
-    mock_serial: MagicMock
-) -> AsyncSerial:
+async def subject(mock_serial: MagicMock) -> AsyncSerial:
     """The test subject."""
     return AsyncSerial(
         serial=mock_serial,

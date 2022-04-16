@@ -321,7 +321,9 @@ async def test_attitude_deck_cal_applied(monkeypatch):
         nonlocal called_with
         called_with = position
 
-    hardware_api = await hc.API.build_hardware_simulator(loop=asyncio.get_running_loop())
+    hardware_api = await hc.API.build_hardware_simulator(
+        loop=asyncio.get_running_loop()
+    )
     monkeypatch.setattr(hardware_api._backend, "move", mock_move)
     deck_cal = RobotCalibration(
         deck_calibration=DeckCalibration(

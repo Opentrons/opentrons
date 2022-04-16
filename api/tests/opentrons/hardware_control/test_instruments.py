@@ -124,7 +124,9 @@ def get_plunger_speed(api):
 
 async def test_cache_instruments(sim_and_instr):
     sim_builder, dummy_instruments = sim_and_instr
-    hw_api = await sim_builder(attached_instruments=dummy_instruments, loop=asyncio.get_running_loop())
+    hw_api = await sim_builder(
+        attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
+    )
     await hw_api.cache_instruments()
     attached = hw_api.attached_instruments
     typeguard.check_type("left mount dict", attached[types.Mount.LEFT], PipetteDict)
@@ -132,7 +134,9 @@ async def test_cache_instruments(sim_and_instr):
 
 async def test_mismatch_fails(sim_and_instr):
     sim_builder, dummy_instruments = sim_and_instr
-    hw_api = await sim_builder(attached_instruments=dummy_instruments, loop=asyncio.get_running_loop())
+    hw_api = await sim_builder(
+        attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
+    )
     requested_instr = {
         types.Mount.LEFT: "p20_single_gen2",
         types.Mount.RIGHT: "p300_single",
@@ -141,12 +145,11 @@ async def test_mismatch_fails(sim_and_instr):
         await hw_api.cache_instruments(requested_instr)
 
 
-async def test_backwards_compatibility(
-    dummy_backwards_compatibility, sim_and_instr
-):
+async def test_backwards_compatibility(dummy_backwards_compatibility, sim_and_instr):
     sim_builder, _ = sim_and_instr
     hw_api = await sim_builder(
-        attached_instruments=dummy_backwards_compatibility, loop=asyncio.get_running_loop()
+        attached_instruments=dummy_backwards_compatibility,
+        loop=asyncio.get_running_loop(),
     )
     requested_instr = {types.Mount.LEFT: "p10_single", types.Mount.RIGHT: "p300_single"}
     volumes = {
@@ -295,7 +298,9 @@ async def test_cache_instruments_sim(sim_and_instr):
 
 async def test_prep_aspirate(sim_and_instr):
     sim_builder, dummy_instruments = sim_and_instr
-    hw_api = await sim_builder(attached_instruments=dummy_instruments, loop=asyncio.get_running_loop())
+    hw_api = await sim_builder(
+        attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
+    )
     await hw_api.home()
     await hw_api.cache_instruments()
 
@@ -351,7 +356,9 @@ async def test_aspirate_old(dummy_instruments, old_aspiration):
 
 
 async def test_aspirate_ot3(dummy_instruments_ot3, ot3_api_obj):
-    hw_api = await ot3_api_obj(attached_instruments=dummy_instruments_ot3, loop=asyncio.get_running_loop())
+    hw_api = await ot3_api_obj(
+        attached_instruments=dummy_instruments_ot3, loop=asyncio.get_running_loop()
+    )
     await hw_api.home()
     await hw_api.cache_instruments()
 
@@ -394,7 +401,9 @@ async def test_dispense_ot2(dummy_instruments):
 
 
 async def test_dispense_ot3(dummy_instruments_ot3, ot3_api_obj):
-    hw_api = await ot3_api_obj(attached_instruments=dummy_instruments_ot3, loop=asyncio.get_running_loop())
+    hw_api = await ot3_api_obj(
+        attached_instruments=dummy_instruments_ot3, loop=asyncio.get_running_loop()
+    )
     await hw_api.home()
 
     await hw_api.cache_instruments()
@@ -419,7 +428,9 @@ async def test_dispense_ot3(dummy_instruments_ot3, ot3_api_obj):
 
 async def test_no_pipette(sim_and_instr):
     sim_builder, dummy_instruments = sim_and_instr
-    hw_api = await sim_builder(attached_instruments=dummy_instruments, loop=asyncio.get_running_loop())
+    hw_api = await sim_builder(
+        attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
+    )
     await hw_api.cache_instruments()
     aspirate_ul = 3.0
     aspirate_rate = 2
@@ -430,7 +441,9 @@ async def test_no_pipette(sim_and_instr):
 
 async def test_pick_up_tip(is_robot, sim_and_instr):
     sim_builder, dummy_instruments = sim_and_instr
-    hw_api = await sim_builder(attached_instruments=dummy_instruments, loop=asyncio.get_running_loop())
+    hw_api = await sim_builder(
+        attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
+    )
     mount = types.Mount.LEFT
     await hw_api.home()
     await hw_api.cache_instruments()
@@ -486,7 +499,9 @@ def assert_move_called(mock_move, speed, lock=None):
 
 async def test_aspirate_flow_rate(sim_and_instr):
     sim_builder, dummy_instruments = sim_and_instr
-    hw_api = await sim_builder(attached_instruments=dummy_instruments, loop=asyncio.get_running_loop())
+    hw_api = await sim_builder(
+        attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
+    )
     mount = types.Mount.LEFT
     await hw_api.home()
     await hw_api.cache_instruments()
@@ -543,7 +558,9 @@ async def test_aspirate_flow_rate(sim_and_instr):
 
 async def test_dispense_flow_rate(sim_and_instr):
     sim_builder, dummy_instruments = sim_and_instr
-    hw_api = await sim_builder(attached_instruments=dummy_instruments, loop=asyncio.get_running_loop())
+    hw_api = await sim_builder(
+        attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
+    )
     mount = types.Mount.LEFT
     await hw_api.home()
     await hw_api.cache_instruments()
@@ -598,7 +615,9 @@ async def test_dispense_flow_rate(sim_and_instr):
 
 async def test_blowout_flow_rate(sim_and_instr):
     sim_builder, dummy_instruments = sim_and_instr
-    hw_api = await sim_builder(attached_instruments=dummy_instruments, loop=asyncio.get_running_loop())
+    hw_api = await sim_builder(
+        attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
+    )
     mount = types.Mount.LEFT
     await hw_api.home()
     await hw_api.cache_instruments()
@@ -636,7 +655,9 @@ async def test_blowout_flow_rate(sim_and_instr):
 
 async def test_reset_instruments(monkeypatch, sim_and_instr):
     sim_builder, dummy_instruments = sim_and_instr
-    hw_api = await sim_builder(attached_instruments=dummy_instruments, loop=asyncio.get_running_loop())
+    hw_api = await sim_builder(
+        attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
+    )
     hw_api.set_flow_rate(types.Mount.LEFT, 20)
     # gut check
     assert hw_api.attached_instruments[types.Mount.LEFT]["aspirate_flow_rate"] == 20
