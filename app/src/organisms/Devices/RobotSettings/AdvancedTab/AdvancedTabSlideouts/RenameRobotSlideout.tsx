@@ -42,7 +42,8 @@ export function RenameRobotSlideout({
     onSuccess: (data: UpdatedRobotName) => {
       //   setNewRobotName(data.name)
       dispatch(removeRobot(previousRobotName))
-      data.name != null && history.push(`/devices/${data.name}/robot-settings`)
+      data.name != null &&
+        history.push(`/devices/${data.name as string}/robot-settings`)
     },
     onError: error => {
       console.error('error', error.message)

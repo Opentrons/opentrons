@@ -13,10 +13,15 @@ import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/Buttons'
 
 interface FactoryResetProps {
-  robotName: string
+  updateIsExpanded: (
+    isExpanded: boolean,
+    type: 'factoryReset' | 'renameRobot'
+  ) => void
 }
 
-export function FactoryReset({ robotName }: FactoryResetProps): JSX.Element {
+export function FactoryReset({
+  updateIsExpanded,
+}: FactoryResetProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
   return (
@@ -34,7 +39,7 @@ export function FactoryReset({ robotName }: FactoryResetProps): JSX.Element {
       </Box>
       <TertiaryButton
         marginLeft={SPACING_AUTO}
-        onClick={null}
+        onClick={() => updateIsExpanded(true, 'factoryReset')}
         id="RobotSettings_FactoryResetChooseButton"
       >
         {t('factory_reset_settings_button')}

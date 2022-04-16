@@ -69,6 +69,8 @@ export function ResetRobotModal(props: ResetRobotModalProps): JSX.Element {
     getResetConfigOptions(state, robotName)
   )
 
+  console.log('5.0.2 reset options', options)
+
   React.useEffect(() => {
     dispatch(fetchResetConfigOptions(robotName))
   }, [robotName, dispatch])

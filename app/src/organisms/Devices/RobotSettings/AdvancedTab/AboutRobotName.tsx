@@ -14,16 +14,17 @@ import { TertiaryButton } from '../../../../atoms/Buttons'
 
 interface AboutRobotNameProps {
   robotName: string
+  updateIsExpanded: (
+    isExpanded: boolean,
+    type: 'factoryReset' | 'renameRobot'
+  ) => void
 }
 
 export function AboutRobotName({
   robotName,
+  updateIsExpanded,
 }: AboutRobotNameProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const [
-    showRenameRobotSlideout,
-    setShowRenameRobotSlideout,
-  ] = React.useState<boolean>(false)
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -47,7 +48,7 @@ export function AboutRobotName({
       </Box>
       <TertiaryButton
         marginLeft={SPACING_AUTO}
-        onClick={() => setShowRenameRobotSlideout(true)}
+        onClick={() => updateIsExpanded(true, 'renameRobot')}
         id="RobotSettings_RenameRobot"
       >
         {t('robot_rename_button')}

@@ -1,13 +1,14 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
   CheckboxField,
-  DIRECTION_ROW,
   Link,
   COLORS,
 } from '@opentrons/components'
@@ -15,6 +16,11 @@ import { Slideout } from '../../../../../atoms/Slideout'
 import { PrimaryButton } from '../../../../../atoms/Buttons'
 import { StyledText } from '../../../../../atoms/text'
 import { Divider } from '../../../../../atoms/structure'
+import { Banner } from '../../../../../atoms/Banner'
+import {
+  getResetConfigOptions,
+  fetchResetConfigOptions,
+} from '../../../../../redux/robot-admin'
 import { getRobotByName } from '../../../../../redux/discovery'
 import { useTrackEvent } from '../../../../../redux/analytics'
 import {
@@ -23,7 +29,8 @@ import {
   useTipLengthCalibrations,
 } from '../../../hooks'
 
-import type { State } from '../../../../../redux/types'
+import type { State, Dispatch } from '../../../../../redux/types'
+import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
 
 interface FactoryResetSlideoutProps {
   isExpanded: boolean
@@ -39,13 +46,23 @@ export function FactoryResetSlideout({
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
   const robot = useSelector((state: State) => getRobotByName(state, robotName))
+  const dispatch = useDispatch<Dispatch>()
+
+  const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
 
   // Calibration data
   const deckCalibrationData = useDeckCalibrationData(robotName)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robotName)
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
+  const options = useSelector((state: State) =>
+    getResetConfigOptions(state, robotName)
+  )
 
-  // Protocol run history data
+  console.log('reset options', options)
+
+  React.useEffect(() => {
+    dispatch(fetchResetConfigOptions(robotName))
+  }, [dispatch, robotName])
 
   const downloadCalibrationLogs: React.MouseEventHandler = e => {
     e.preventDefault()
@@ -71,9 +88,11 @@ export function FactoryResetSlideout({
     // false reconnect modal
   }
 
+  // ToDo: Protocol run history data
+
   return (
     <Slideout
-      title={t('factory_reset')}
+      title={t('factory_reset_slideout_title')}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
@@ -83,10 +102,19 @@ export function FactoryResetSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p">{t('')}</StyledText>
-        {/* warning */}
-        <Divider />
-        <Flex flexDirection={DIRECTION_ROW}>
+        <StyledText as="p" marginBottom={SPACING.spacing4}>
+          {t('factory_reset_slideout_description')}
+        </StyledText>
+        <Banner
+          type="warning"
+          title={t('factory_reset_slideout_warning_message')}
+        />
+        <Divider marginY={SPACING.spacing4} />
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          marginBottom={SPACING.spacing3}
+        >
           <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
             {t('factory_reset_slideout_calibration_title')}
           </StyledText>
@@ -98,11 +126,31 @@ export function FactoryResetSlideout({
             {t('factory_reset_slideout_download_logs_link')}
           </Link>
         </Flex>
-
-        <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
-          {t('factory_reset_slideout_protocol_run_history_title')}
+        <StyledText as="p" marginBottom={SPACING.spacing3}>
+          {t('factory_reset_slideout_calibration_description')}
         </StyledText>
-        <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          marginBottom={SPACING.spacing3}
+        >
+          <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+            {t('factory_reset_slideout_protocol_run_history_title')}
+          </StyledText>
+          <Link
+            color={COLORS.blue}
+            css={TYPOGRAPHY.pSemiBold}
+            onClick={downloadCalibrationLogs}
+          >
+            {t('factory_reset_slideout_download_logs_link')}
+          </Link>
+        </Flex>
+
+        <StyledText
+          as="p"
+          css={TYPOGRAPHY.pSemiBold}
+          marginBottom={SPACING.spacing3}
+        >
           {t('factory_reset_slideout_boot_scripts_title')}
         </StyledText>
       </Flex>

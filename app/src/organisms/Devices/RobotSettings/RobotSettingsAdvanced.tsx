@@ -18,7 +18,7 @@ import { UseOlderAspirateBehavior } from './AdvancedTab/UseOlderAspirateBehavior
 import { getRobotByName } from '../../../redux/discovery'
 import { getRobotSettings } from '../../../redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
-// import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
+import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
 import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
 
 import type { State } from '../../../redux/types'
@@ -37,14 +37,16 @@ export function RobotSettingsAdvanced({
   const [
     showRenameRobotSlideout,
     setShowRenameRobotSlideout,
-  ] = React.useState<boolean>(true)
-  const [
-    showFactoryResetModal,
-    setShowFactoryResetModal,
   ] = React.useState<boolean>(false)
+  const [
+    showFactoryResetSlideout,
+    setShowFactoryResetSlideout,
+  ] = React.useState<boolean>(false)
+  // const [
+  //   showFactoryResetModal,
+  //   setShowFactoryResetModal,
+  // ] = React.useState<boolean>(false)
   const robot = useSelector((state: State) => getRobotByName(state, robotName))
-
-  //   const pauseProtocol // ask Brian
   const ipAddress = robot?.ip != null ? robot.ip : ''
   const settings = useSelector<State, RobotSettings>((state: State) =>
     getRobotSettings(state, robotName)
@@ -52,6 +54,17 @@ export function RobotSettingsAdvanced({
 
   const findSettings = (id: string): RobotSettingsField | undefined =>
     settings.find(s => s.id === id)
+
+  const updateIsExpanded = (
+    isExpanded: boolean,
+    type: 'factoryReset' | 'renameRobot'
+  ): void => {
+    if (type === 'factoryReset') {
+      setShowFactoryResetSlideout(isExpanded)
+    } else {
+      setShowRenameRobotSlideout(isExpanded)
+    }
+  }
 
   return (
     <>
@@ -64,8 +77,18 @@ export function RobotSettingsAdvanced({
           />
           // <FactoryResetModal isRobotConnected={true} />
         )}
-        {showFactoryResetModal && <FactoryResetModal isRobotConnected={true} />}
-        <AboutRobotName robotName={robotName} />
+        {showFactoryResetSlideout && (
+          <FactoryResetSlideout
+            isExpanded={showFactoryResetSlideout}
+            onCloseClick={() => setShowFactoryResetSlideout(false)}
+            robotName={robotName}
+          />
+        )}
+        {/* {showFactoryResetModal && <FactoryResetModal isRobotConnected={true} />} */}
+        <AboutRobotName
+          robotName={robotName}
+          updateIsExpanded={updateIsExpanded}
+        />
         <Divider marginY={SPACING.spacing5} />
         <RobotServerVersion robot={robot as ViewableRobot} />
         <Divider marginY={SPACING.spacing5} />
@@ -86,7 +109,7 @@ export function RobotSettingsAdvanced({
         <UpdateRobotSoftware robotName={robotName} />
         <Troubleshooting robot={robot as ViewableRobot} />
         <Divider marginY={SPACING.spacing5} />
-        <FactoryReset />
+        <FactoryReset updateIsExpanded={updateIsExpanded} />
         <Divider marginY={SPACING.spacing5} />
         <UseOlderProtocol
           settings={findSettings('disableFastProtocolUpload')}
