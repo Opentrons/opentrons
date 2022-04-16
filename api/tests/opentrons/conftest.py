@@ -36,16 +36,6 @@ from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 Protocol = namedtuple("Protocol", ["text", "filename", "filelike"])
 
 
-@pytest.fixture(autouse=True)
-def asyncio_loop_exception_handler(loop):
-    def exception_handler(loop, context):
-        pytest.fail(str(context))
-
-    loop.set_exception_handler(exception_handler)
-    yield
-    loop.set_exception_handler(None)
-
-
 @pytest.fixture
 def ot_config_tempdir(tmp_path: pathlib.Path) -> Generator[pathlib.Path, None, None]:
     os.environ["OT_API_CONFIG_DIR"] = str(tmp_path)
