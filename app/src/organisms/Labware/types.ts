@@ -34,7 +34,12 @@ export interface LabwareWellGroupProperties {
 
 export type LabwareList = LabwareDefinition[]
 
-export interface FilterParams {
-  category: string
-  manufacturer: string
-}
+export type LabwareFilter =
+  | 'all'
+  | 'wellPlate'
+  | 'tipRack'
+  | 'tubeRack'
+  | 'reservoir'
+  | 'aluminumBlock'
+
+export type LabwareSort = 'alphabetical' | 'reverse'

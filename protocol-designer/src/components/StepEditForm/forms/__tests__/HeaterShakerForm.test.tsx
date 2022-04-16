@@ -56,12 +56,12 @@ describe('HeaterShakerForm', () => {
         focusedField: null,
       },
       propsForFields: {
-        setTemperature: {
+        setHeaterShakerTemperature: {
           onFieldFocus: jest.fn() as any,
           onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
-          name: 'setTemperature',
+          name: 'setHeaterShakerTemperature',
           updateValue: jest.fn() as any,
           value: null,
         },
@@ -135,7 +135,7 @@ describe('HeaterShakerForm', () => {
     when(mockToggleRowField)
       .calledWith(
         partialComponentPropsMatcher({
-          name: 'setTemperature',
+          name: 'setHeaterShakerTemperature',
         })
       )
       .mockReturnValue(<div>mock set temp toggle!</div>)
@@ -145,7 +145,7 @@ describe('HeaterShakerForm', () => {
   it('should render a temperature input when the temperature toggle is ON', () => {
     props.formData = {
       ...props.formData,
-      setTemperature: true,
+      setHeaterShakerTemperature: true,
     }
     when(mockTextField)
       .calledWith(
