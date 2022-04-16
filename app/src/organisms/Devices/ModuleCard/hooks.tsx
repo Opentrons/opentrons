@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
-import { Tooltip, useHoverTooltip } from '@opentrons/components'
+import { useHoverTooltip } from '@opentrons/components'
 import {
   CreateCommand,
   HEATERSHAKER_MODULE_TYPE,
@@ -12,6 +12,7 @@ import {
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { getProtocolModulesInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useProtocolDetailsForRun } from '../hooks'
 
@@ -156,9 +157,11 @@ export function useModuleOverflowMenu(
           ns: 'heater_shaker',
         })}
       </MenuItem>
-      {/* TODO:(jr, 3/11/22): update Tooltip to new design */}
       {isLatchDisabled ? (
-        <Tooltip {...tooltipProps} key={`tooltip_latch_${module.model}`}>
+        <Tooltip
+          tooltipProps={tooltipProps}
+          key={`tooltip_latch_${module.model}`}
+        >
           {t('cannot_open_latch', { ns: 'heater_shaker' })}
         </Tooltip>
       ) : null}

@@ -34,7 +34,7 @@ describe('AutoAddPauseUntilHeaterShakerTempStepModal ', () => {
       'Pause protocol now to wait until module reaches 10°C before continuing on to the next step.'
     )
     getByText(
-      'Build a pause later if you want your protocol to proceed to the next steps while the Heater-Shaker module ramps up to 10°C.'
+      'Build a pause later if you want your protocol to proceed to the next steps while the Heater-Shaker module goes to 10°C'
     )
     const cancelBtn = getByRole('button', {
       name: 'I will build a pause later',
