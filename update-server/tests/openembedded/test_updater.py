@@ -1,12 +1,11 @@
 """Tests for OE Updater."""
 import os
-from typing import NamedTuple
 from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
 
-
+from otupdate.common.update_actions import Partition
 from otupdate.openembedded.updater import (
     Updater,
     PartitionManager,
@@ -15,13 +14,8 @@ from otupdate.openembedded.updater import (
 
 import lzma
 
+
 # test valid partition switch
-
-
-class OEPartition(NamedTuple):
-    number: int
-    path: str
-    mount_point: str
 
 
 def test_update_valid_part_switch(
@@ -75,9 +69,9 @@ def test_update_invalid_part_switch(
 @pytest.mark.parametrize(
     "test_input,expected",
     [
-        (b"2", OEPartition(3, "/dev/mmcblk0p3", "/media/mmcblk0p3")),
-        (b"3", OEPartition(2, "/dev/mmcblk0p2", "/media/mmcblk0p2")),
-        (b"", OEPartition(3, "/dev/mmcblk0p3", "/media/mmcblk0p3")),
+        (b"2", Partition(3, "/dev/mmcblk0p3", "/media/mmcblk0p3")),
+        (b"3", Partition(2, "/dev/mmcblk0p2", "/media/mmcblk0p2")),
+        (b"", Partition(3, "/dev/mmcblk0p3", "/media/mmcblk0p3")),
     ],
 )
 def test_unused_partition(mock_root_fs_interface, test_input, expected):
@@ -100,6 +94,21 @@ def test_decomp_and_write(
     mock_root_fs_interface.write_update.assert_called()
 
 
+def test_commit_update(
+    monkeypatch,
+    mock_root_fs_interface: MagicMock,
+    mock_partition_manager_valid_switch: MagicMock,
+):
+    """Test commit_update mounts and resizes rootfs as expected!"""
+    updater = Updater(
+        root_FS_intf=mock_root_fs_interface,
+        part_mngr=mock_partition_manager_valid_switch,
+    )
+    updater.commit_update()
+    mock_partition_manager_valid_switch.mount_fs.assert_called()
+    mock_partition_manager_valid_switch.resize_partition.assert_called()
+
+
 def test_lzma(testing_partition, tmpdir):
     """Test that lzma decompresses a .xz
     correctly.
@@ -114,7 +123,7 @@ def test_lzma(testing_partition, tmpdir):
         f.write(os.urandom(400000))
     cb = mock.Mock()
     root_FS_intf = RootFSInterface()
-    p = OEPartition(2, testing_partition, "/media/mmcblk0p2")
+    p = Partition(2, testing_partition, "/media/mmcblk0p2")
     total_size = 0
     chunk_size = 1024 * 32
     with lzma.open(rfs_path, "rb") as fsrc:

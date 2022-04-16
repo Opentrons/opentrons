@@ -4,9 +4,40 @@ from unittest.mock import MagicMock
 import pytest
 
 from otupdate import openembedded
-from otupdate.common.update_actions import Partition
-from otupdate.openembedded.updater import RootFSInterface, PartitionManager
+from otupdate.common.update_actions import Partition, UpdateActionsInterface
+from otupdate.openembedded.updater import RootFSInterface, PartitionManager, Updater
 from tests.common.config import FakeRootPartElem
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+
+
+@pytest.fixture
+def mock_update_actions_interface(
+    mock_root_fs_interface: MagicMock, mock_partition_manager_invalid_switch: MagicMock
+) -> MagicMock:
+    """Mock UpdateActionsInterface"""
+    updater = Updater(
+        root_FS_intf=mock_root_fs_interface,
+        part_mngr=mock_partition_manager_invalid_switch,
+    )
+    mock = MagicMock(spec=UpdateActionsInterface)
+    mock.from_request.return_value = updater
+
+
+@pytest.fixture
+async def test_cli(aiohttp_client, loop, otupdate_config, monkeypatch):
+    """
+    Build an app using dummy versions, then build a test client and return it
+    """
+    app = openembedded.get_app(
+        system_version_file=os.path.join(HERE, "version.json"),
+        config_file_override=otupdate_config,
+        name_override="opentrons-test",
+        boot_id_override="dummy-boot-id-abc123",
+        loop=loop,
+    )
+    client = await loop.create_task(aiohttp_client(app))
+    return client
 
 
 @pytest.fixture
