@@ -42,15 +42,20 @@ export function RobotSettingsAdvanced({
     showFactoryResetSlideout,
     setShowFactoryResetSlideout,
   ] = React.useState<boolean>(false)
-  // const [
-  //   showFactoryResetModal,
-  //   setShowFactoryResetModal,
-  // ] = React.useState<boolean>(false)
+  const [
+    showFactoryResetModal,
+    setShowFactoryResetModal,
+  ] = React.useState<boolean>(false)
   const robot = useSelector((state: State) => getRobotByName(state, robotName))
   const ipAddress = robot?.ip != null ? robot.ip : ''
   const settings = useSelector<State, RobotSettings>((state: State) =>
     getRobotSettings(state, robotName)
   )
+
+  // ToDo add this to GitHub PR
+  // check the connection here because FactoryResetSlideout return back to the resetOptions
+  // when a user clicks 'Clear data and restart robot'
+  const connected = robot?.connected != null && robot.connected
 
   const findSettings = (id: string): RobotSettingsField | undefined =>
     settings.find(s => s.id === id)
@@ -84,7 +89,14 @@ export function RobotSettingsAdvanced({
             robotName={robotName}
           />
         )}
-        {/* {showFactoryResetModal && <FactoryResetModal isRobotConnected={true} />} */}
+        {showFactoryResetModal && (
+          <FactoryResetModal
+            closeModal={() => setShowFactoryResetModal(false)}
+            isRobotConnected={connected}
+            robotName={robotName}
+            resetOptions={{}} // ToDo pass resetOptions from the slideout
+          />
+        )}
         <AboutRobotName
           robotName={robotName}
           updateIsExpanded={updateIsExpanded}

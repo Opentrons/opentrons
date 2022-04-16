@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import last from 'lodash/last'
 import {
   Flex,
   COLORS,
@@ -11,42 +12,59 @@ import {
 import { StyledText } from '../../../../../atoms/text'
 import { PrimaryButton, SecondaryButton } from '../../../../../atoms/buttons'
 import { Modal } from '../../../../../atoms/Modal'
-import { useDispatchApiRequest } from '../../../../../redux/robot-api'
+import {
+  useDispatchApiRequest,
+  getRequestById,
+  SUCCESS,
+  PENDING,
+} from '../../../../../redux/robot-api'
 import { resetConfig } from '../../../../../redux/robot-admin'
 import { connect } from '../../../../../redux/robot'
 
-import type { Dispatch } from '../../../../../redux/types'
+import type { State, Dispatch } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
 // click cancel button -> close modal
 // click confirm button -> close modal and clear selected data
 
 interface FactoryResetModalProps {
+  closeModal: () => void
   isRobotConnected: boolean
   robotName: string
   resetOptions?: ResetConfigRequest
 }
 
 export function FactoryResetModal({
+  closeModal,
   isRobotConnected,
   robotName,
   resetOptions,
 }: FactoryResetModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const [dispatchRequest] = useDispatchApiRequest()
+  const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const dispatch = useDispatch<Dispatch>()
+  const resetRequestStatus = useSelector((state: State) => {
+    const lastId = last(requestIds)
+    return lastId != null ? getRequestById(state, lastId) : null
+  })?.status
 
-  const triggerReset = (): unknown => {
+  const triggerReset = (): void => {
     if (resetOptions) dispatchRequest(resetConfig(robotName, resetOptions))
   }
 
-  const connectRobot = (): unknown => {
+  const connectRobot = (): void => {
     dispatch(connect(robotName))
   }
+
+  React.useEffect(() => {
+    if (resetRequestStatus === SUCCESS) closeModal()
+  }, [resetRequestStatus, closeModal])
+
+  const PENDING_STATUS = resetRequestStatus === PENDING
 
   return (
     <>
       {isRobotConnected ? (
-        <Modal title={t('factory_reset_modal_title')} onClose={() => {}}>
+        <Modal title={t('factory_reset_modal_title')} onClose={closeModal}>
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText as="p" marginBottom={SPACING.spacing5}>
               {t('factory_reset_modal_description')}
@@ -61,6 +79,7 @@ export function FactoryResetModal({
               <PrimaryButton
                 backgroundColor={COLORS.error}
                 onClick={triggerReset}
+                disabled={PENDING_STATUS}
               >
                 {t('factory_reset_modal_confirm_button')}
               </PrimaryButton>
@@ -72,7 +91,7 @@ export function FactoryResetModal({
           title={t('factory_reset_modal_connection_lost_title')}
           icon="alert-circle"
           iconColor={COLORS.blue}
-          onClose={() => {}}
+          onClose={closeModal}
         >
           <StyledText as="p" marginBottom={SPACING.spacing5}>
             {t('factory_reset_modal_connection_lost_description')}
