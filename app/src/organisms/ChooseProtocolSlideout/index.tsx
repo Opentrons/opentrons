@@ -75,7 +75,7 @@ export function ChooseProtocolSlideout(
         </ApiHostProvider>
       }
     >
-      {storedProtocols.length > 0 && false ? (
+      {storedProtocols.length > 0 ? (
         storedProtocols.map(storedProtocol => (
           <MiniCard
             key={storedProtocol.protocolKey}
@@ -92,7 +92,7 @@ export function ChooseProtocolSlideout(
               justifyContent={JUSTIFY_CENTER}
               alignItems={ALIGN_CENTER}
             >
-              <DeckThumbnail analysis={storedProtocol.mostRecentAnalysis} />
+              <DeckThumbnail commands={storedProtocol.mostRecentAnalysis.commands} />
             </Flex>
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {storedProtocol.mostRecentAnalysis?.metadata?.protocolName ??

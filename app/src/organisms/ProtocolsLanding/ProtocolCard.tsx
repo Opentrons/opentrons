@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { format } from 'date-fns'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 import first from 'lodash/first'
 import {
   getModuleType,
@@ -22,6 +22,8 @@ import {
   SIZE_3,
   ModuleIcon,
   POSITION_ABSOLUTE,
+  Btn,
+  TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
 import { Link } from 'react-router-dom'
 import {
@@ -34,13 +36,15 @@ import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { Banner } from '../../atoms/Banner'
+import { Portal } from '../../App/portal'
+import { Modal } from '../../atoms/Modal'
+import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 
 interface ProtocolCardProps extends StoredProtocolData {
   handleRunProtocol: () => void
 }
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
-  const { t } = useTranslation('protocol_list')
   const {
     handleRunProtocol,
     protocolKey,
@@ -54,6 +58,8 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
     first(srcFileNames) ??
     protocolKey
 
+  // TODO: in addition to checking if most recent analysis is null, also check that analysis is
+  // in progress in order to show loading state.
   return (
     <Link to={`/protocols/${protocolKey}`} style={{ color: 'inherit' }}>
       <Flex
@@ -67,16 +73,16 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
         width="100%"
         position="relative"
       >
-        {mostRecentAnalysis != null ? (
-          <AnalysisInfo
-            mostRecentAnalysis={mostRecentAnalysis}
-            protocolDisplayName={protocolDisplayName}
-            modified={modified}
-          />
-        ) : (
-          <StyledText as="p">{t('loading_data')}</StyledText>
-        )}
-        <Box position={POSITION_ABSOLUTE} top={SPACING.spacing2} right={SPACING.spacing2}>
+        <AnalysisInfo
+          mostRecentAnalysis={mostRecentAnalysis}
+          protocolDisplayName={protocolDisplayName}
+          modified={modified}
+        />
+        <Box
+          position={POSITION_ABSOLUTE}
+          top={SPACING.spacing2}
+          right={SPACING.spacing2}
+        >
           <ProtocolOverflowMenu
             protocolKey={protocolKey}
             handleRunProtocol={handleRunProtocol}
@@ -87,88 +93,158 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   )
 }
 
+type AnalysisStatus = 'missing' | 'loading' | 'error' | 'complete'
+function getAnalysisStatus(
+  analysis?: ProtocolAnalysisFile<{}>
+): AnalysisStatus {
+  if (analysis != null) {
+    if (analysis.errors.length > 0) return 'error'
+    // TODO: presence of commands is not actually a good heuristic for gauging if an analysis is in progress
+    // replace this check with a boolean that represents whether the python analysis is in flight
+    return analysis.commands.length > 0 ? 'complete' : 'loading'
+  } else {
+    return 'missing'
+  }
+}
+
 interface AnalysisInfoProps {
   protocolDisplayName: string
   modified: number
-  mostRecentAnalysis: ProtocolAnalysisFile<{}>
+  mostRecentAnalysis?: ProtocolAnalysisFile<{}>
 }
 function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   const { protocolDisplayName, mostRecentAnalysis, modified } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
-  const {
-    left: leftMountPipetteName,
-    right: rightMountPipetteName,
-  } = parseInitialPipetteNamesByMount(mostRecentAnalysis)
+  const [showErrorDetails, setShowErrorDetails] = React.useState(false)
+
+  const analysisStatus = getAnalysisStatus(mostRecentAnalysis)
+
+  const { left: leftMountPipetteName, right: rightMountPipetteName } =
+    mostRecentAnalysis != null
+      ? parseInitialPipetteNamesByMount(mostRecentAnalysis.commands)
+      : { left: null, right: null }
   const requiredModuleTypes = parseAllRequiredModuleModels(
-    mostRecentAnalysis
+    mostRecentAnalysis != null ? mostRecentAnalysis.commands : []
   ).map(getModuleType)
 
   return (
-    <Flex flex="1">
-      <Flex
-        marginRight={SPACING.spacing4}
-        size="6rem"
-        justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
-      >
-        {mostRecentAnalysis != null ? (
-          <DeckThumbnail analysis={mostRecentAnalysis} />
-        ) : (
-          <Icon name="ot-spinner" spin size={SIZE_3} />
-        )}
-      </Flex>
-      <Flex
-        flex="1"
-        flexDirection={DIRECTION_COLUMN}
-        marginRight={SPACING.spacing4}
-      >
-        <Banner type="error">{t('protocol_analysis_failure')}</Banner>
-        <StyledText as="h3" marginBottom={SPACING.spacing4} height="2.75rem">
-          {protocolDisplayName}
-        </StyledText>
-        <Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
-            <StyledText as="h6">{t('left_mount')}</StyledText>
-            <StyledText as="p">
-              {leftMountPipetteName != null
-                ? getPipetteNameSpecs(leftMountPipetteName)?.displayName
-                : t('empty')}
-            </StyledText>
-          </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
-            <StyledText as="h6">{t('right_mount')}</StyledText>
-            <StyledText as="p">
-              {rightMountPipetteName != null
-                ? getPipetteNameSpecs(rightMountPipetteName)?.displayName
-                : t('empty')}
-            </StyledText>
-          </Flex>
-          {requiredModuleTypes.length > 0 ? (
+      <Flex flex="1">
+        <Flex
+          marginRight={SPACING.spacing4}
+          size="6rem"
+          justifyContent={JUSTIFY_CENTER}
+          alignItems={ALIGN_CENTER}
+        >
+          {
+            {
+              missing: <Icon name="ot-spinner" spin size={SIZE_3} />,
+              loading: <Icon name="ot-spinner" spin size={SIZE_3} />,
+              error: <Box size="6rem" backgroundColor={COLORS.medGrey} />,
+              complete: (
+                <DeckThumbnail commands={mostRecentAnalysis?.commands ?? []} />
+              ),
+            }[analysisStatus]
+          }
+        </Flex>
+        <Flex
+          flex="1"
+          flexDirection={DIRECTION_COLUMN}
+          marginRight={SPACING.spacing4}
+        >
+          {analysisStatus === 'error' ?  <ProtocolAnalysisFailure errors={mostRecentAnalysis?.errors ?? []}/> : null}
+          <StyledText as="h3" marginBottom={SPACING.spacing4}>
+            {protocolDisplayName}
+          </StyledText>
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+            {analysisStatus === 'loading' ? (
+              <StyledText as="p">{t('loading_data')}</StyledText>
+            ) : (
+              <>
+                <Flex
+                  flex="1"
+                  flexDirection={DIRECTION_COLUMN}
+                  marginRight={SPACING.spacing4}
+                >
+                  <StyledText as="h6" marginBottom={SPACING.spacing3}>
+                    {t('left_mount')}
+                  </StyledText>
+                  <StyledText as="p">
+                    {
+                      {
+                        missing: t('no_data'),
+                        loading: t('no_data'),
+                        error: t('no_data'),
+                        complete:
+                          leftMountPipetteName != null
+                            ? getPipetteNameSpecs(leftMountPipetteName)
+                                ?.displayName
+                            : t('empty'),
+                      }[analysisStatus]
+                    }
+                  </StyledText>
+                </Flex>
+                <Flex
+                  flex="1"
+                  flexDirection={DIRECTION_COLUMN}
+                  marginRight={SPACING.spacing4}
+                >
+                  <StyledText as="h6" marginBottom={SPACING.spacing3}>
+                    {t('right_mount')}
+                  </StyledText>
+                  <StyledText as="p">
+                    {
+                      {
+                        missing: t('no_data'),
+                        loading: t('no_data'),
+                        error: t('no_data'),
+                        complete:
+                          rightMountPipetteName != null
+                            ? getPipetteNameSpecs(rightMountPipetteName)
+                                ?.displayName
+                            : t('empty'),
+                      }[analysisStatus]
+                    }
+                  </StyledText>
+                </Flex>
+                <Flex
+                  flex="1"
+                  flexDirection={DIRECTION_COLUMN}
+                  marginRight={SPACING.spacing4}
+                >
+                  {requiredModuleTypes.length > 0 ? (
+                    <>
+                      <StyledText as="h6" marginBottom={SPACING.spacing3}>
+                        {t('modules')}
+                      </StyledText>
+                      <Flex>
+                        {requiredModuleTypes.map((moduleType, index) => (
+                          <ModuleIcon
+                            key={index}
+                            moduleType={moduleType}
+                            height="1rem"
+                            marginRight={SPACING.spacing3}
+                          />
+                        ))}
+                      </Flex>
+                    </>
+                  ) : null}
+                </Flex>
+              </>
+            )}
             <Flex
+              flex="1"
               flexDirection={DIRECTION_COLUMN}
               marginRight={SPACING.spacing4}
             >
-              <StyledText as="h6">{t('modules')}</StyledText>
-              <Flex>
-                {requiredModuleTypes.map((moduleType, index) => (
-                  <ModuleIcon
-                    key={index}
-                    moduleType={moduleType}
-                    height="1rem"
-                    marginRight={SPACING.spacing3}
-                  />
-                ))}
-              </Flex>
+              <StyledText as="h6" marginBottom={SPACING.spacing3}>
+                {t('updated')}
+              </StyledText>
+              <StyledText as="p">
+                {format(new Date(modified), 'MM/dd/yy HH:mm:ss')}
+              </StyledText>
             </Flex>
-          ) : null}
-          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
-            <StyledText as="h6">{t('updated')}</StyledText>
-            <StyledText as="label">
-              {format(new Date(modified), 'MM/dd/yy HH:mm:ss')}
-            </StyledText>
           </Flex>
         </Flex>
       </Flex>
-    </Flex>
   )
 }

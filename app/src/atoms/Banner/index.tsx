@@ -55,7 +55,7 @@ const BANNER_PROPS_BY_TYPE: Record<
 }
 
 export function Banner(props: BannerProps): JSX.Element {
-  const {type, onCloseClick, icon, children, ...styleProps} = props
+  const { type, onCloseClick, icon, children, ...styleProps } = props
   const bannerProps = BANNER_PROPS_BY_TYPE[type]
 
   const iconProps = {
@@ -71,38 +71,31 @@ export function Banner(props: BannerProps): JSX.Element {
       fontWeight={TYPOGRAPHY.fontWeightRegular}
       borderRadius={SPACING.spacing2}
       backgroundColor={BANNER_PROPS_BY_TYPE[type].backgroundColor}
-      border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${
-        BANNER_PROPS_BY_TYPE[type].color
-      }`}
+      border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${BANNER_PROPS_BY_TYPE[type].color}`}
+      flexDirection={DIRECTION_ROW}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      alignItems={ALIGN_CENTER}
+      padding={SPACING.spacing3}
+      data-testid={`Banner_${type}`}
       {...styleProps}
     >
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        flex="auto"
-        alignItems={ALIGN_CENTER}
-        padding={`${SPACING.spacing2} ${SPACING.spacing2} ${SPACING.spacing2} ${SPACING.spacing3}`}
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-        data-testid={`Banner_${type}`}
-      >
-        <Icon
-          {...iconProps}
-          aria-label={`icon_${type}`}
-          spin={BANNER_PROPS_BY_TYPE[type].icon.name === 'ot-spinner'}
-        />
-        <Flex flex="1" alignItems={ALIGN_CENTER}>
-          {props.children}
-        </Flex>
-        {props.onCloseClick && (
-          <Btn
-            onClick={props.onCloseClick}
-            width={SPACING.spacing5}
-            height={SPACING.spacing5}
-          >
-            <Icon name="close" aria-label="close_icon" />
-          </Btn>
-        )}
+      <Icon
+        {...iconProps}
+        aria-label={`icon_${type}`}
+        spin={BANNER_PROPS_BY_TYPE[type].icon.name === 'ot-spinner'}
+      />
+      <Flex flex="1" alignItems={ALIGN_CENTER}>
+        {props.children}
       </Flex>
+      {props.onCloseClick && (
+        <Btn
+          onClick={props.onCloseClick}
+          width={SPACING.spacing5}
+          height={SPACING.spacing5}
+        >
+          <Icon name="close" aria-label="close_icon" />
+        </Btn>
+      )}
     </Flex>
   )
 }

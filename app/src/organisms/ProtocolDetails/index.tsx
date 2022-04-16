@@ -30,9 +30,10 @@ import {
 } from '@opentrons/api-client'
 
 import { StoredProtocolData } from '../../redux/protocol-storage'
+import { ProtocolAnalysisFailure } from '../../organisms/ProtocolAnalysisFailure'
+import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/Buttons'
-import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
@@ -110,9 +111,9 @@ export function ProtocolDetails(
   const {
     left: leftMountPipetteName,
     right: rightMountPipetteName,
-  } = parseInitialPipetteNamesByMount(mostRecentAnalysis)
+  } = parseInitialPipetteNamesByMount(mostRecentAnalysis.commands)
   const requiredModuleTypes = parseAllRequiredModuleModels(
-    mostRecentAnalysis
+    mostRecentAnalysis.commands
   ).map(getModuleType)
 
   const protocolName =
@@ -182,6 +183,8 @@ export function ProtocolDetails(
         height={`calc(100vh - ${SPACING.spacing4})`} // account for the breadcrumbs bar
       />
       <Card marginBottom={SPACING.spacing4} padding={SPACING.spacing4}>
+
+        {mostRecentAnalysis != null && mostRecentAnalysis.errors.length > 0 ?  <ProtocolAnalysisFailure errors={mostRecentAnalysis.errors}/> : null}
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -260,7 +263,7 @@ export function ProtocolDetails(
           </StyledText>
           <Divider />
           <Box padding={SPACING.spacing4}>
-            <DeckThumbnail analysis={mostRecentAnalysis} />
+            <DeckThumbnail commands={mostRecentAnalysis.commands} />
           </Box>
         </Card>
         <Box height="100%" width={SPACING.spacing4} />
