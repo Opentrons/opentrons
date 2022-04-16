@@ -31,13 +31,13 @@ def mock_serial(
 
 @pytest.fixture
 async def subject(
-    loop: asyncio.AbstractEventLoop, mock_serial: MagicMock
+    mock_serial: MagicMock
 ) -> AsyncSerial:
     """The test subject."""
     return AsyncSerial(
         serial=mock_serial,
         executor=ThreadPoolExecutor(),
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         reset_buffer_before_write=False,
     )
 

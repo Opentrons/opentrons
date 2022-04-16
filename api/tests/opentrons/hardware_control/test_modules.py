@@ -85,8 +85,10 @@ async def test_filtering_modules():
     assert filtered_modules == api.attached_modules[2:4]
 
 
-async def test_module_update_integration(monkeypatch, loop):
+async def test_module_update_integration(monkeypatch):
     from opentrons.hardware_control import modules
+
+    loop = asyncio.get_running_loop()
 
     def async_return(result):
         f = asyncio.Future()

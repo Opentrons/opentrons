@@ -9,7 +9,6 @@ from opentrons.hardware_control.modules import Thermocycler
 
 @pytest.fixture
 async def thermocycler(
-    loop: asyncio.BaseEventLoop,
     emulation_app: Iterator[None],
     emulator_settings: Settings,
 ) -> Thermocycler:
@@ -19,7 +18,7 @@ async def thermocycler(
         port=f"socket://127.0.0.1:{emulator_settings.thermocycler_proxy.driver_port}",
         execution_manager=execution_manager,
         usb_port=USBPort(name="", port_number=1, device_path="", hub=1),
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         polling_frequency=0.01,
     )
     yield module

@@ -1,10 +1,11 @@
-import pytest
+import asyncio
 from mock import AsyncMock
-from opentrons.drivers.temp_deck import AbstractTempDeckDriver
-from opentrons.hardware_control import modules, ExecutionManager
 
+import pytest
 
 from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.temp_deck import AbstractTempDeckDriver
+from opentrons.hardware_control import modules, ExecutionManager
 
 
 @pytest.fixture
@@ -17,25 +18,25 @@ def usb_port():
     )
 
 
-async def test_sim_initialization(loop, usb_port):
+async def test_sim_initialization(usb_port):
     temp = await modules.build(
         port="/dev/ot_module_sim_tempdeck0",
         usb_port=usb_port,
         which="tempdeck",
         simulating=True,
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     assert isinstance(temp, modules.AbstractModule)
 
 
-async def test_sim_state(loop, usb_port):
+async def test_sim_state(usb_port):
     temp = await modules.TempDeck.build(
         port="/dev/ot_module_sim_tempdeck0",
         usb_port=usb_port,
         simulating=True,
         interrupt_callback=lambda x: None,
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     await temp.wait_next_poll()
@@ -52,13 +53,13 @@ async def test_sim_state(loop, usb_port):
     assert status["version"] == "dummyVersionTD"
 
 
-async def test_sim_update(loop, usb_port):
+async def test_sim_update(usb_port):
     temp = await modules.TempDeck.build(
         port="/dev/ot_module_sim_tempdeck0",
         usb_port=usb_port,
         simulating=True,
         interrupt_callback=lambda x: None,
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
         polling_frequency=0,
     )
@@ -73,13 +74,13 @@ async def test_sim_update(loop, usb_port):
     assert temp.status == "idle"
 
 
-async def test_revision_model_parsing(loop, usb_port):
+async def test_revision_model_parsing(usb_port):
     mag = await modules.TempDeck.build(
         port="",
         simulating=True,
         usb_port=usb_port,
         interrupt_callback=lambda x: None,
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
         polling_frequency=0,
     )
@@ -93,7 +94,7 @@ async def test_revision_model_parsing(loop, usb_port):
     assert mag.model() == "temperatureModuleV1"
 
 
-async def test_poll_error(loop, usb_port) -> None:
+async def test_poll_error(usb_port) -> None:
     mock_driver = AsyncMock(spec=AbstractTempDeckDriver)
     mock_driver.get_temperature.side_effect = ValueError("hello!")
 
@@ -103,7 +104,7 @@ async def test_poll_error(loop, usb_port) -> None:
         execution_manager=AsyncMock(spec=ExecutionManager),
         driver=mock_driver,
         device_info={},
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         polling_frequency=1,
     )
     with pytest.raises(ValueError, match="hello!"):

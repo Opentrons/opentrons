@@ -1,9 +1,11 @@
-import pytest
+import asyncio
 import mock
-from opentrons.drivers.thermocycler import SimulatingDriver
-from opentrons.hardware_control import modules, ExecutionManager
+
+import pytest
 
 from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.thermocycler import SimulatingDriver
+from opentrons.hardware_control import modules, ExecutionManager
 
 
 @pytest.fixture
@@ -16,26 +18,26 @@ def usb_port() -> USBPort:
     )
 
 
-async def test_sim_initialization(loop, usb_port):
+async def test_sim_initialization(usb_port):
     therm = await modules.build(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
         which="thermocycler",
         simulating=True,
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
 
     assert isinstance(therm, modules.AbstractModule)
 
 
-async def test_lid(loop, usb_port):
+async def test_lid(usb_port):
     therm = await modules.build(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
         which="thermocycler",
         simulating=True,
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
 
@@ -56,13 +58,13 @@ async def test_lid(loop, usb_port):
     assert therm.lid_status == "open"
 
 
-async def test_sim_state(loop, usb_port):
+async def test_sim_state(usb_port):
     therm = await modules.build(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
         which="thermocycler",
         simulating=True,
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
 
@@ -78,13 +80,13 @@ async def test_sim_state(loop, usb_port):
     assert status["version"] == "dummyVersionTC"
 
 
-async def test_sim_update(loop, usb_port):
+async def test_sim_update(usb_port):
     therm = await modules.build(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
         which="thermocycler",
         simulating=True,
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
 
@@ -147,13 +149,13 @@ def simulator_set_plate_spy(
 
 @pytest.fixture
 async def set_temperature_subject(
-    loop, usb_port: USBPort, simulator_set_plate_spy: SimulatingDriver
+    usb_port: USBPort, simulator_set_plate_spy: SimulatingDriver
 ) -> modules.Thermocycler:
     """Fixture that spys on set_plate_temperature"""
     hw_tc = modules.Thermocycler(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
         driver=simulator_set_plate_spy,
         device_info={},

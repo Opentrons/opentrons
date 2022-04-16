@@ -7,7 +7,7 @@ from opentrons.hardware_control import (
 )
 
 
-async def test_state_machine(loop):
+async def test_state_machine():
     """
     Test that an execution manager's state is RUNNING on init
     and PAUSE when it when pause is called, unless CANCELLED
@@ -43,7 +43,7 @@ async def test_state_machine(loop):
     assert await exec_mgr.get_state() == ExecutionState.RUNNING
 
 
-async def test_cancel_tasks(loop):
+async def test_cancel_tasks():
     """
     Test that an execution manager cancels all un-protected
     running asyncio Tasks when cancel is called
@@ -54,6 +54,8 @@ async def test_cancel_tasks(loop):
             await asyncio.sleep(1)
 
     exec_mgr = ExecutionManager()
+
+    loop = asyncio.get_running_loop()
 
     cancellable_task = loop.create_task(fake_task())
     await exec_mgr.register_cancellable_task(cancellable_task)

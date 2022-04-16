@@ -76,7 +76,6 @@ def test_get_all_adv_settings_empty(clear_cache, mock_read_settings_file):
 
 
 async def test_set_adv_setting(
-    loop,
     mock_read_settings_file,
     mock_settings_values,
     mock_write_settings_file,
@@ -95,7 +94,7 @@ async def test_set_adv_setting(
 
 
 async def test_set_adv_setting_unknown(
-    loop, mock_read_settings_file, mock_write_settings_file
+    mock_read_settings_file, mock_write_settings_file
 ):
     mock_read_settings_file.return_value = advanced_settings.SettingsData({}, 1)
     with pytest.raises(ValueError, match="is not recognized"):
@@ -103,7 +102,7 @@ async def test_set_adv_setting_unknown(
 
 
 async def test_get_all_adv_settings_lru_cache(
-    loop, clear_cache, mock_read_settings_file, mock_write_settings_file
+    clear_cache, mock_read_settings_file, mock_write_settings_file
 ):
     # Cache should not be used.
     advanced_settings.get_all_adv_settings()
@@ -126,7 +125,6 @@ async def test_get_all_adv_settings_lru_cache(
 
 
 async def test_restart_required(
-    loop,
     restore_restart_required,
     mock_read_settings_file,
     mock_write_settings_file,
@@ -161,7 +159,7 @@ async def test_restart_required(
         [False, "info"],
     ],
 )
-async def test_disable_log_integration_side_effect(loop, v, expected_level):
+async def test_disable_log_integration_side_effect(v, expected_level):
     with patch("opentrons.config.advanced_settings.log_control") as mock_log_control:
 
         async def set_syslog_level(level):
@@ -177,7 +175,7 @@ async def test_disable_log_integration_side_effect(loop, v, expected_level):
             mock_log_control.set_syslog_level.assert_called_once_with(expected_level)
 
 
-async def test_disable_log_integration_side_effect_error(loop):
+async def test_disable_log_integration_side_effect_error():
     with patch("opentrons.config.advanced_settings.log_control") as mock_log_control:
 
         async def set_syslog_level(level):

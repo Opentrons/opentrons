@@ -1,3 +1,4 @@
+import asyncio
 import mock
 import pytest
 from opentrons import types
@@ -310,7 +311,7 @@ async def test_new_critical_point_applied(hardware_api):
     assert await hardware_api.current_position(types.Mount.RIGHT) == target
 
 
-async def test_attitude_deck_cal_applied(monkeypatch, loop):
+async def test_attitude_deck_cal_applied(monkeypatch):
     new_gantry_cal = [[1.0047, -0.0046, 0.0], [0.0011, 1.0038, 0.0], [0.0, 0.0, 1.0]]
     called_with = None
 
@@ -320,7 +321,7 @@ async def test_attitude_deck_cal_applied(monkeypatch, loop):
         nonlocal called_with
         called_with = position
 
-    hardware_api = await hc.API.build_hardware_simulator(loop=loop)
+    hardware_api = await hc.API.build_hardware_simulator(loop=asyncio.get_running_loop())
     monkeypatch.setattr(hardware_api._backend, "move", mock_move)
     deck_cal = RobotCalibration(
         deck_calibration=DeckCalibration(

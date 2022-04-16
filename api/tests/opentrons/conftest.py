@@ -13,6 +13,7 @@ try:
     import aionotify  # type: ignore[import]
 except (OSError, ModuleNotFoundError):
     aionotify = None
+import asyncio
 import os
 import io
 import json
@@ -143,7 +144,7 @@ def virtual_smoothie_env(monkeypatch):
 @pytest.fixture(
     params=["ot2", "ot3"],
 )
-async def machine_variant_ffs(request, loop):
+async def machine_variant_ffs(request):
     if request.node.get_closest_marker("ot3_only") and request.param == "ot2":
         pytest.skip()
     if request.node.get_closest_marker("ot2_only") and request.param == "ot3":
@@ -174,7 +175,7 @@ async def _build_ot2_hw() -> AsyncIterator[ThreadManager[HardwareControlAPI]]:
 
 
 @pytest.fixture
-async def ot2_hardware(request, loop, virtual_smoothie_env):
+async def ot2_hardware(request, virtual_smoothie_env):
     async for hw in _build_ot2_hw():
         yield hw
 
@@ -193,7 +194,7 @@ async def _build_ot3_hw() -> AsyncIterator[ThreadManager[HardwareControlAPI]]:
 
 
 @pytest.fixture
-async def ot3_hardware(request, loop, enable_ot3_hardware_controller):
+async def ot3_hardware(request, enable_ot3_hardware_controller):
     # this is from the command line parameters added in root conftest
     if request.config.getoption("--ot2-only"):
         pytest.skip("testing only ot2")
@@ -207,7 +208,7 @@ async def ot3_hardware(request, loop, enable_ot3_hardware_controller):
     params=[lambda: _build_ot2_hw, lambda: _build_ot3_hw],
     ids=["ot2", "ot3"],
 )
-async def hardware(request, loop, virtual_smoothie_env):
+async def hardware(request, virtual_smoothie_env):
     if request.node.get_closest_marker("ot2_only") and request.param() == _build_ot3_hw:
         pytest.skip()
     if request.node.get_closest_marker("ot3_only") and request.param() == _build_ot2_hw:
@@ -230,10 +231,10 @@ async def hardware(request, loop, virtual_smoothie_env):
 
 
 @pytest.fixture
-async def ctx(loop, hardware) -> ProtocolContext:
+async def ctx(hardware) -> ProtocolContext:
     return ProtocolContext(
         implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
-        loop=loop,
+        loop=asyncio.get_running_loop(),
     )
 
 
@@ -288,8 +289,8 @@ def cntrlr_mock_connect(monkeypatch):
 
 
 @pytest.fixture
-async def hardware_api(loop, is_robot):
-    hw_api = await API.build_hardware_simulator(loop=loop)
+async def hardware_api(is_robot):
+    hw_api = await API.build_hardware_simulator(loop=asyncio.get_running_loop())
     return hw_api
 
 
