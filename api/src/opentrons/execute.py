@@ -328,7 +328,7 @@ def make_runlog_cb() -> Callable[[command_types.CommandMessage], None]:
                 " ".join(
                     [
                         "\t" * level,
-                        command["payload"].get("text", "").format(**command["payload"]),
+                        command["payload"].get("text", "")
                     ]
                 )
             )
