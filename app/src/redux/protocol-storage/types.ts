@@ -24,6 +24,7 @@ export interface ProtocolStorageState {
   readonly filesByProtocolKey: {
     [protocolKey: string]: StoredProtocolData
   }
+  readonly inProgressAnalysisProtocolKeys: string[]
   readonly addFailureFile: StoredProtocolDir | null
   readonly addFailureMessage: string | null
   readonly listFailureMessage: string | null
@@ -86,6 +87,18 @@ export interface AnalyzeProtocolAction {
   meta: { shell: true }
 }
 
+export interface AnalyzeProtocolSuccessAction {
+  type: 'protocolStorage:ANALYZE_PROTOCOL_SUCCESS'
+  payload: { protocolKey: string }
+  meta: { shell: true }
+}
+
+export interface AnalyzeProtocolFailureAction {
+  type: 'protocolStorage:ANALYZE_PROTOCOL_FAILURE'
+  payload: { protocolKey: string }
+  meta: { shell: true }
+}
+
 export type ProtocolStorageAction =
   | FetchProtocolsAction
   | UpdateProtocolListAction
@@ -96,3 +109,5 @@ export type ProtocolStorageAction =
   | ClearAddProtocolFailureAction
   | OpenProtocolDirectoryAction
   | AnalyzeProtocolAction
+  | AnalyzeProtocolSuccessAction
+  | AnalyzeProtocolFailureAction

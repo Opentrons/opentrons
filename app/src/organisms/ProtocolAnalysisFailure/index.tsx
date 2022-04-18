@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useDispatch } from 'react-redux'
 import { useTranslation, Trans } from 'react-i18next'
 
 import {
@@ -18,15 +19,19 @@ import { Portal } from '../../App/portal'
 import { Modal } from '../../atoms/Modal'
 import { PrimaryButton } from '../../atoms/Buttons'
 
+import type { Dispatch } from '../../redux/types'
+import { analyzeProtocol } from '../../redux/protocol-storage'
 interface ProtocolAnalysisFailureProps {
   errors: string[]
+  protocolKey: string
 }
 
 export function ProtocolAnalysisFailure(
   props: ProtocolAnalysisFailureProps
 ): JSX.Element {
-  const { errors } = props
+  const { errors, protocolKey } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
+  const dispatch = useDispatch<Dispatch>()
   const [showErrorDetails, setShowErrorDetails] = React.useState(false)
 
   return (
@@ -59,6 +64,7 @@ export function ProtocolAnalysisFailure(
                   onClick={e => {
                     e.preventDefault()
                     console.log('TODO: trigger analysis')
+                    dispatch(analyzeProtocol(protocolKey))
                   }}
                 />
               ),

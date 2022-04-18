@@ -45,7 +45,7 @@ function findPython(): string | undefined {
   }
 }
 
-export function runFileWithPython(
+export function analyzeProtocolSource(
   srcFilePath: string,
   destFilePath: string
 ): Promise<void> {
