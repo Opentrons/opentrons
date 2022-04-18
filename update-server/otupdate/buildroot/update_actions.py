@@ -17,8 +17,8 @@ from typing import Callable, Optional
 from otupdate.common.file_actions import (
     unzip_update,
     hash_file,
-    verify_signature,
     HashMismatch,
+    verify_signature,
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
 
@@ -40,7 +40,7 @@ class OT2UpdateActions(UpdateActionsInterface):
         filepath: str,
         progress_callback: Callable[[float], None],
         cert_path: Optional[str],
-    ):
+    ) -> Optional[str]:
         """Worker for validation. Call in an executor (so it can return things)
 
         - Unzips filepath to its directory
@@ -52,6 +52,7 @@ class OT2UpdateActions(UpdateActionsInterface):
                                   only for user information
         :param cert_path: Path to an x.509 certificate to check the signature
                           against. If ``None``, signature checking is disabled
+
         :returns str: Path to the rootfs file to update
 
         Will also raise an exception if validation fails
@@ -126,8 +127,6 @@ class OT2UpdateActions(UpdateActionsInterface):
         Should be used as a context manager, and the yielded value is the path
         to the mount. When the context manager exits, the partition will be
         unmounted again and its mountpoint removed.
-
-        :param mountpoint_in: The directory in which to create the mountpoint.
         """
         unused = _find_unused_partition()
         part_path = unused.value.path
