@@ -21,10 +21,9 @@ import {
 import { resetConfig } from '../../../../../redux/robot-admin'
 import { connect } from '../../../../../redux/robot'
 
+import type { IconProps } from '@opentrons/components'
 import type { State, Dispatch } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
-// click cancel button -> close modal
-// click confirm button -> close modal and clear selected data
 
 interface FactoryResetModalProps {
   closeModal: () => void
@@ -39,6 +38,7 @@ export function FactoryResetModal({
   robotName,
   resetOptions,
 }: FactoryResetModalProps): JSX.Element {
+  const reconnectModalIcon: IconProps = { name: 'alert-circle' }
   const { t } = useTranslation('device_settings')
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const dispatch = useDispatch<Dispatch>()
@@ -89,7 +89,7 @@ export function FactoryResetModal({
       ) : (
         <Modal
           title={t('factory_reset_modal_connection_lost_title')}
-          icon="alert-circle"
+          icon={reconnectModalIcon}
           iconColor={COLORS.blue}
           onClose={closeModal}
         >

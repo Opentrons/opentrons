@@ -14,13 +14,13 @@ import {
 
 import { Divider } from '../structure'
 import { StyledText } from '../text'
-import type { IconName } from '@opentrons/components'
+import type { IconProps } from '@opentrons/components'
 
 interface ModalProps extends BaseModalProps {
   onClose?: () => void
   title?: React.ReactNode
   children?: React.ReactNode
-  icon?: IconName
+  icon?: IconProps
   iconColor?: string
 }
 
@@ -37,7 +37,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
           <Flex alignItems={ALIGN_CENTER}>
             {props.icon != null && (
               <Icon
-                name={props.icon}
+                name={props.icon.name}
                 color={props.iconColor}
                 width={SPACING.spacing5}
                 height={SPACING.spacing5}

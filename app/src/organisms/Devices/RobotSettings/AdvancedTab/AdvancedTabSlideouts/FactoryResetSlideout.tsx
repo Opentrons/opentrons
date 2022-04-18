@@ -11,7 +11,6 @@ import {
   CheckboxField,
   Link,
   COLORS,
-  LabeledCheckbox,
 } from '@opentrons/components'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { PrimaryButton } from '../../../../../atoms/Buttons'
@@ -39,13 +38,15 @@ import type {
 interface FactoryResetSlideoutProps {
   isExpanded: boolean
   onCloseClick: () => void
-  robotName: string // maybe robot
+  robotName: string
+  updateResetStatus: (connected: boolean, rOptions?: ResetConfigRequest) => void
 }
 
 export function FactoryResetSlideout({
   isExpanded,
   onCloseClick,
   robotName,
+  updateResetStatus,
 }: FactoryResetSlideoutProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
@@ -121,13 +122,15 @@ export function FactoryResetSlideout({
     )
   }
 
-  const handleConnectionCheck = (): void => {
-    const { connected } = robot
-    // true factory reset modal
-    // false reconnect modal
+  const handleClearData = (): void => {
+    // first check connection
+    const connected = robot?.connected ?? false
+    updateResetStatus(connected, resetOptions)
+    onCloseClick()
   }
 
   // ToDo: Protocol run history data
+  console.log('resetOptions', resetOptions)
 
   return (
     <Slideout
@@ -135,7 +138,7 @@ export function FactoryResetSlideout({
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
-        <PrimaryButton disabled={true} onClick={() => {}} width="100%">
+        <PrimaryButton disabled={true} onClick={handleClearData} width="100%">
           {t('factory_reset_slideout_data_clear_button')}
         </PrimaryButton>
       }
@@ -168,14 +171,6 @@ export function FactoryResetSlideout({
         <StyledText as="p" marginBottom={SPACING.spacing3}>
           {t('factory_reset_slideout_calibration_description')}
         </StyledText>
-        {/* {calibrationOptions &&
-          calibrationOptions.map(option => (
-            <StyledText
-              as="p"
-              key={option.id}
-            >{`Clear ${option.name}`}</StyledText>
-          ))} */}
-
         {calibrationOptions &&
           calibrationOptions.map(opt => (
             <CheckboxField

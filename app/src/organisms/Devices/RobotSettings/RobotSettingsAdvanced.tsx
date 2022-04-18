@@ -27,6 +27,8 @@ import type {
   RobotSettings,
   RobotSettingsField,
 } from '../../../redux/robot-settings/types'
+import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
+
 interface RobotSettingsAdvancedProps {
   robotName: string
 }
@@ -52,10 +54,13 @@ export function RobotSettingsAdvanced({
     getRobotSettings(state, robotName)
   )
 
+  const [isRobotConnected, setIsRobotConnected] = React.useState<boolean>()
+  const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
+
   // ToDo add this to GitHub PR
   // check the connection here because FactoryResetSlideout return back to the resetOptions
   // when a user clicks 'Clear data and restart robot'
-  const connected = robot?.connected != null && robot.connected
+  // const connected = robot?.connected != null && robot.connected
 
   const findSettings = (id: string): RobotSettingsField | undefined =>
     settings.find(s => s.id === id)
@@ -71,6 +76,15 @@ export function RobotSettingsAdvanced({
     }
   }
 
+  const updateResetStatus = (
+    connected: boolean,
+    options?: ResetConfigRequest
+  ): void => {
+    if (connected && options != null) setResetOptions(options)
+    setShowFactoryResetModal(true)
+    setIsRobotConnected(connected ?? false)
+  }
+
   return (
     <>
       <Box paddingX={SPACING.spacing4}>
@@ -80,21 +94,21 @@ export function RobotSettingsAdvanced({
             onCloseClick={() => setShowRenameRobotSlideout(false)}
             robotName={robotName}
           />
-          // <FactoryResetModal isRobotConnected={true} />
         )}
         {showFactoryResetSlideout && (
           <FactoryResetSlideout
             isExpanded={showFactoryResetSlideout}
             onCloseClick={() => setShowFactoryResetSlideout(false)}
             robotName={robotName}
+            updateResetStatus={updateResetStatus}
           />
         )}
         {showFactoryResetModal && (
           <FactoryResetModal
             closeModal={() => setShowFactoryResetModal(false)}
-            isRobotConnected={connected}
+            isRobotConnected={isRobotConnected}
             robotName={robotName}
-            resetOptions={{}} // ToDo pass resetOptions from the slideout
+            resetOptions={resetOptions} // ToDo pass resetOptions from the slideout
           />
         )}
         <AboutRobotName
