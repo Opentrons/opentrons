@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { mountWithProviders } from '@opentrons/components'
-import {i18n} from '../../../../i18n'
+import { i18n } from '../../../../i18n'
 import * as Config from '../../../../redux/config'
 import { AppAdvancedSettingsCard } from '../AppAdvancedSettingsCard'
 
