@@ -107,6 +107,16 @@ describe('protocol storage actions', () => {
         meta: { shell: true },
       },
     },
+    {
+      name: 'viewProtocolSourceFolder',
+      creator: actions.viewProtocolSourceFolder,
+      args: ['fakeProtocolKey'],
+      expected: {
+        type: 'protocolStorage:VIEW_PROTOCOL_SOURCE_FOLDER',
+        payload: { protocolKey: 'fakeProtocolKey' },
+        meta: { shell: true },
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

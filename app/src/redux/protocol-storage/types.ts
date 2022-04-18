@@ -99,6 +99,12 @@ export interface AnalyzeProtocolFailureAction {
   meta: { shell: true }
 }
 
+export interface ViewProtocolSourceFolder {
+  type: 'protocolStorage:VIEW_PROTOCOL_SOURCE_FOLDER'
+  payload: { protocolKey: string }
+  meta: { shell: true }
+}
+
 export type ProtocolStorageAction =
   | FetchProtocolsAction
   | UpdateProtocolListAction
@@ -111,3 +117,4 @@ export type ProtocolStorageAction =
   | AnalyzeProtocolAction
   | AnalyzeProtocolSuccessAction
   | AnalyzeProtocolFailureAction
+  | ViewProtocolSourceFolder

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
-import first from 'lodash/first'
+import { useSelector } from 'react-redux'
 import {
   getModuleType,
   getPipetteNameSpecs,
@@ -29,11 +29,15 @@ import {
   parseAllRequiredModuleModels,
 } from '@opentrons/api-client'
 
-import { StoredProtocolData } from '../../redux/protocol-storage'
+import { isProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
-import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
+import { ProtocolAnalysisFailure } from '../ProtocolAnalysisError'
+import { getAnalysisStatus, getProtocolDisplayName } from './utils'
+
+import type { StoredProtocolData } from '../../redux/protocol-storage'
+import type { State } from '../../redux/types'
 
 interface ProtocolCardProps extends StoredProtocolData {
   handleRunProtocol: () => void
@@ -48,13 +52,11 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
     modified,
   } = props
 
-  const protocolDisplayName =
-    mostRecentAnalysis?.metadata?.protocolName ??
-    first(srcFileNames) ??
-    protocolKey
+  const isAnalyzing = useSelector((state: State) =>
+    isProtocolAnalysisInProgress(state, protocolKey)
+  )
+  const protocolDisplayName = getProtocolDisplayName(protocolKey, srcFileNames, mostRecentAnalysis)
 
-  // TODO: in addition to checking if most recent analysis is null, also check that analysis is
-  // in progress in order to show loading state.
   return (
     <Link to={`/protocols/${protocolKey}`} style={{ color: 'inherit' }}>
       <Flex
@@ -72,6 +74,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
           protocolKey={protocolKey}
           mostRecentAnalysis={mostRecentAnalysis}
           protocolDisplayName={protocolDisplayName}
+          isAnalyzing={isAnalyzing}
           modified={modified}
         />
         <Box
@@ -89,31 +92,26 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   )
 }
 
-type AnalysisStatus = 'missing' | 'loading' | 'error' | 'complete'
-function getAnalysisStatus(
-  analysis?: ProtocolAnalysisFile<{}>
-): AnalysisStatus {
-  if (analysis != null) {
-    if (analysis.errors.length > 0) return 'error'
-    // TODO: presence of commands is not actually a good heuristic for gauging if an analysis is in progress
-    // replace this check with a boolean that represents whether the python analysis is in flight
-    return analysis.commands.length > 0 ? 'complete' : 'loading'
-  } else {
-    return 'missing'
-  }
-}
+
 
 interface AnalysisInfoProps {
   protocolKey: string
   protocolDisplayName: string
   modified: number
+  isAnalyzing: boolean
   mostRecentAnalysis?: ProtocolAnalysisFile<{}>
 }
 function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
-  const { protocolKey, protocolDisplayName, mostRecentAnalysis, modified } = props
+  const {
+    protocolKey,
+    protocolDisplayName,
+    isAnalyzing,
+    mostRecentAnalysis,
+    modified,
+  } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
 
-  const analysisStatus = getAnalysisStatus(mostRecentAnalysis)
+  const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     mostRecentAnalysis != null

@@ -158,3 +158,12 @@ export function analyzeProtocolByKey(
   const destFilePath = makeAnalysisFilePath(analysisDirPath)
   return analyzeProtocolSource(srcDirPath, destFilePath)
 }
+
+export function viewProtocolSourceFolder(
+  protocolKey: string,
+  protocolsDirPath: string
+): void {
+  const protocolDirPath = path.join(protocolsDirPath, protocolKey)
+  const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
+  shell.openPath(srcDirPath)
+}

@@ -1,6 +1,6 @@
 import fse from 'fs-extra'
 import path from 'path'
-import { protocol, shell } from 'electron'
+import { shell } from 'electron'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import * as ProtocolStorageActions from '@opentrons/app/src/redux/protocol-storage/actions'
@@ -98,12 +98,25 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
         FileSystem.analyzeProtocolByKey(
           action.payload.protocolKey,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
-        ).then(() =>
-          dispatch(ProtocolStorageActions.ANALYZE_PROTOCOL_SUCCESS)
-          fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
-        ).catch((_e: Error) => {
-          dispatch(ProtocolStorageActions.ANALYZE_PROTOCOL_FAILURE)
-        })
+        )
+          .then(() => {
+            dispatch(
+              ProtocolStorageActions.analyzeProtocolSuccess(
+                action.payload.protocolKey
+              )
+            )
+            return fetchProtocols(
+              dispatch,
+              ProtocolStorageActions.PROTOCOL_ADDITION
+            )
+          })
+          .catch((_e: Error) => {
+            dispatch(
+              ProtocolStorageActions.analyzeProtocolFailure(
+                action.payload.protocolKey
+              )
+            )
+          })
         break
       }
 
@@ -113,6 +126,14 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
           FileSystem.PROTOCOLS_DIRECTORY_PATH
         ).then(() =>
           fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
+        )
+        break
+      }
+
+      case ProtocolStorageActions.VIEW_PROTOCOL_SOURCE_FOLDER: {
+        FileSystem.viewProtocolSourceFolder(
+          action.payload.protocolKey,
+          FileSystem.PROTOCOLS_DIRECTORY_PATH
         )
         break
       }

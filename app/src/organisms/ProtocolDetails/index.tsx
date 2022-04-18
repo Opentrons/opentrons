@@ -3,6 +3,7 @@ import first from 'lodash/first'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { getModuleType, getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   Box,
@@ -29,14 +30,21 @@ import {
   parseAllRequiredModuleModels,
 } from '@opentrons/api-client'
 
-import { StoredProtocolData } from '../../redux/protocol-storage'
-import { ProtocolAnalysisFailure } from '../../organisms/ProtocolAnalysisFailure'
+import { isProtocolAnalysisInProgress } from '../../redux/protocol-storage'
+import { ProtocolAnalysisFailure } from '../ProtocolAnalysisError'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/Buttons'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
+import { OverflowMenu } from './OverflowMenu'
+import {
+  getAnalysisStatus,
+  getProtocolDisplayName,
+} from '../ProtocolsLanding/utils'
+
+import type { State } from '../../redux/types'
+import type { StoredProtocolData } from '../../redux/protocol-storage'
 
 const defaultTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -104,22 +112,25 @@ export function ProtocolDetails(
     'robot_config' | 'labware'
   >('robot_config')
   const [showSlideout, setShowSlideout] = React.useState(false)
+  const isAnalyzing = useSelector((state: State) =>
+    isProtocolAnalysisInProgress(state, protocolKey)
+  )
+  const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
+  if (analysisStatus === 'missing') return null
 
-  if (mostRecentAnalysis == null) return null
-
-  const robotModel = mostRecentAnalysis?.robot?.model ?? 'OT-2'
-  const {
-    left: leftMountPipetteName,
-    right: rightMountPipetteName,
-  } = parseInitialPipetteNamesByMount(mostRecentAnalysis.commands)
+  const { left: leftMountPipetteName, right: rightMountPipetteName } =
+    mostRecentAnalysis != null
+      ? parseInitialPipetteNamesByMount(mostRecentAnalysis.commands)
+      : { left: null, right: null }
   const requiredModuleTypes = parseAllRequiredModuleModels(
-    mostRecentAnalysis.commands
+    mostRecentAnalysis != null ? mostRecentAnalysis.commands : []
   ).map(getModuleType)
 
-  const protocolName =
-    mostRecentAnalysis?.metadata?.protocolName ??
-    first(srcFileNames) ??
-    protocolKey
+  const protocolDisplayName = getProtocolDisplayName(
+    protocolKey,
+    srcFileNames,
+    mostRecentAnalysis
+  )
 
   // TODO: IMMEDIATELY parse real values out of analysis file for these with fallback to no data
   const creationMethod = t('shared:no_data')
@@ -132,10 +143,6 @@ export function ProtocolDetails(
       <Box>TODO: labware tab contents</Box>
     ) : (
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <Flex flexDirection={DIRECTION_ROW} marginRight={SPACING.spacing4}>
-          <StyledText as="h6">{t('robot')}</StyledText>
-          <StyledText as="p">{robotModel}</StyledText>
-        </Flex>
         <Flex flexDirection={DIRECTION_ROW} marginRight={SPACING.spacing4}>
           <StyledText as="h6">{t('left_mount')}</StyledText>
           <StyledText as="p">
@@ -180,21 +187,24 @@ export function ProtocolDetails(
         onCloseClick={() => setShowSlideout(false)}
         showSlideout={showSlideout}
         storedProtocolData={props}
-        height={`calc(100vh - ${SPACING.spacing4})`} // account for the breadcrumbs bar
       />
       <Card marginBottom={SPACING.spacing4} padding={SPACING.spacing4}>
-
-        {mostRecentAnalysis != null && mostRecentAnalysis.errors.length > 0 ?  <ProtocolAnalysisFailure errors={mostRecentAnalysis.errors}/> : null}
+        {analysisStatus !== 'loading' &&
+        mostRecentAnalysis != null &&
+        mostRecentAnalysis.errors.length > 0 ? (
+          <ProtocolAnalysisFailure
+            protocolKey={protocolKey}
+            errors={mostRecentAnalysis.errors}
+          />
+        ) : null}
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <StyledText as="h3" marginBottom={SPACING.spacing4} height="2.75rem">
-            {protocolName}
+            {protocolDisplayName}
           </StyledText>
-          <OverflowBtn
-            onClick={() => console.log('TODO: open overflow menu')}
-          />
+          <OverflowMenu protocolKey={protocolKey} />
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}
@@ -202,17 +212,27 @@ export function ProtocolDetails(
         >
           <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
             <StyledText as="h6">{t('creation_method')}</StyledText>
-            <StyledText as="p">{creationMethod}</StyledText>
+            <StyledText as="p">
+              {analysisStatus === 'loading'
+                ? t('shared:loading')
+                : creationMethod}
+            </StyledText>
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
             <StyledText as="h6">{t('last_updated')}</StyledText>
             <StyledText as="p">
-              {format(new Date(modified), 'MMMM dd, yyyy HH:mm')}
+              {analysisStatus === 'loading'
+                ? t('shared:loading')
+                : format(new Date(modified), 'MMMM dd, yyyy HH:mm')}
             </StyledText>
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
             <StyledText as="h6">{t('last_analyzed')}</StyledText>
-            <StyledText as="p">{lastAnalyzed}</StyledText>
+            <StyledText as="p">
+              {analysisStatus === 'loading'
+                ? t('shared:loading')
+                : lastAnalyzed}
+            </StyledText>
           </Flex>
           <PrimaryButton onClick={() => setShowSlideout(true)}>
             {t('run_protocol')}
@@ -226,7 +246,9 @@ export function ProtocolDetails(
             marginRight={SPACING.spacing4}
           >
             <StyledText as="h6">{t('org_or_author')}</StyledText>
-            <StyledText as="p">{author}</StyledText>
+            <StyledText as="p">
+              {analysisStatus === 'loading' ? t('shared:loading') : author}
+            </StyledText>
           </Flex>
           <Flex
             flex="1"
@@ -234,7 +256,9 @@ export function ProtocolDetails(
             marginRight={SPACING.spacing4}
           >
             <StyledText as="h6">{t('description')}</StyledText>
-            <StyledText as="p">{description}</StyledText>
+            <StyledText as="p">
+              {analysisStatus === 'loading' ? t('shared:loading') : description}
+            </StyledText>
             <Link
               onClick={() =>
                 console.log(
@@ -263,7 +287,18 @@ export function ProtocolDetails(
           </StyledText>
           <Divider />
           <Box padding={SPACING.spacing4}>
-            <DeckThumbnail commands={mostRecentAnalysis.commands} />
+            {
+              {
+                missing: <Box size="6rem" backgroundColor={COLORS.medGrey} />,
+                loading: <Box size="6rem" backgroundColor={COLORS.medGrey} />,
+                error: <Box size="6rem" backgroundColor={COLORS.medGrey} />,
+                complete: (
+                  <DeckThumbnail
+                    commands={mostRecentAnalysis?.commands ?? []}
+                  />
+                ),
+              }[analysisStatus]
+            }
           </Box>
         </Card>
         <Box height="100%" width={SPACING.spacing4} />

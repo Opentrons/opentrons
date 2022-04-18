@@ -16,6 +16,7 @@ import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
+import { State } from '../../redux/types'
 
 interface ProtocolListProps {
   storedProtocols: StoredProtocolData[]
@@ -24,7 +25,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   const [showSlideout, setShowSlideout] = React.useState(false)
   const { t } = useTranslation('protocol_info')
   const { storedProtocols } = props
-
   const [
     selectedProtocol,
     setSelectedProtocol,
