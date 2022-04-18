@@ -91,6 +91,7 @@ export function AppAdvancedSettingsCard(): JSX.Element {
     dispatch(Config.toggleDevInternalFlag(flag))
   const handleChannel: React.ChangeEventHandler<HTMLSelectElement> = event =>
     dispatch(Config.updateConfigValue('update.channel', event.target.value))
+
   return (
     <>
       <Card title={TITLE}>

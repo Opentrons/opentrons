@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import startCase from 'lodash/startCase'
 import {
   Flex,
   Box,
