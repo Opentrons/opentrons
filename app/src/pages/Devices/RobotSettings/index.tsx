@@ -19,11 +19,11 @@ import { NavTab } from '../../../atoms/NavTab'
 import { RobotSettingsCalibration } from '../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
 import { RobotSettingsNetworking } from '../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 
-import type { NextGenRouteParams, RobotSettingsTab } from '../../../App/types'
+import type { NavRouteParams, RobotSettingsTab } from '../../../App/types'
 
 export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')
-  const { robotName, robotSettingsTab } = useParams<NextGenRouteParams>()
+  const { robotName, robotSettingsTab } = useParams<NavRouteParams>()
 
   const robotSettingsContentByTab: {
     [K in RobotSettingsTab]: () => JSX.Element

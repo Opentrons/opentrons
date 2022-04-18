@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import startCase from 'lodash/startCase'
 import {
   Flex,
   Box,
@@ -16,13 +15,14 @@ import * as Config from '../../redux/config'
 import type { DevInternalFlag } from '../../redux/config/types'
 import { Divider } from '../../atoms/structure'
 import { ToggleButton } from '../../atoms/Buttons'
+import { useTranslation } from 'react-i18next'
 
 export function FeatureFlags(): JSX.Element {
+  const { t } = useTranslation('app_settings')
   const devInternalFlags = useSelector(Config.getFeatureFlags)
   const dispatch = useDispatch<Dispatch>()
   const toggleDevInternalFlag = (flag: DevInternalFlag): unknown =>
     dispatch(Config.toggleDevInternalFlag(flag))
-  console.log(Config.DEV_INTERNAL_FLAGS)
 
   return (
     <Box
@@ -38,7 +38,7 @@ export function FeatureFlags(): JSX.Element {
             key={flag}
           >
             <Text css={TYPOGRAPHY.h3SemiBold} id={`FeatureFlags_${flag}_text`}>
-              {startCase(flag)}
+              {t(`__dev_internal__${flag}`)}
             </Text>
             <ToggleButton
               label={`${flag}-toggle`}

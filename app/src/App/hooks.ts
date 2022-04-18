@@ -10,7 +10,7 @@ import {
 import { getConnectedRobot } from '../redux/discovery'
 import { formatTimestamp } from '../organisms/Devices/utils'
 import { useIsProtocolRunLoaded } from '../organisms/ProtocolUpload/hooks'
-import { translationKeyByPathSegment } from './NextGenApp'
+import { translationKeyByPathSegment } from './constants'
 
 import type { PathCrumb } from '../molecules/Breadcrumbs'
 import type { NavLocation } from '../redux/nav/types'
