@@ -92,6 +92,8 @@ action_table = sqlalchemy.Table(
 
 # Enable foreign key support in sqlite
 # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#foreign-key-support
+# mypy is expecting the decorator to return a function.
+# sqlalchemy listens_for() decorator does not return a function.
 @event.listens_for(SQLEngine, "connect")  # type: ignore
 def _set_sqlite_pragma(
     dbapi_connection: sqlalchemy.engine.CursorResult,
