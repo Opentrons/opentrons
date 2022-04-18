@@ -25,15 +25,10 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
+import { useAvailableAndUnavailableDevices } from '../../pages/Devices/DevicesLanding/hooks'
 import { Slideout } from '../../atoms/Slideout'
 import { PrimaryButton } from '../../atoms/Buttons'
-import {
-  getConnectableRobots,
-  getReachableRobots,
-  getScanning,
-  getUnreachableRobots,
-  startDiscovery,
-} from '../../redux/discovery'
+import { getScanning, startDiscovery } from '../../redux/discovery'
 
 import { StyledText } from '../../atoms/text'
 import { StoredProtocolData } from '../../redux/protocol-storage'
@@ -42,8 +37,8 @@ import { Robot } from '../../redux/discovery/types'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 import { AvailableRobotOption } from './AvailableRobotOption'
 
-import type { State, Dispatch } from '../../redux/types'
 import type { StyleProps } from '@opentrons/components'
+import type { State, Dispatch } from '../../redux/types'
 
 interface ChooseRobotSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
@@ -55,51 +50,49 @@ export function ChooseRobotSlideout(
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_details', 'shared'])
   const { storedProtocolData, showSlideout, onCloseClick, ...restProps } = props
+  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
+  const dispatch = useDispatch<Dispatch>()
+  const isScanning = useSelector((state: State) => getScanning(state))
+
+  const {
+    unavailableDevices,
+    availableDevices,
+  } = useAvailableAndUnavailableDevices()
+
+  const availableRobots = availableDevices.filter(robot => {
+    // TODO: filter out robots who have a current run that is in thie paused or running status
+    return true
+  })
   const {
     protocolKey,
     srcFileNames,
     srcFiles,
     mostRecentAnalysis,
   } = storedProtocolData
-  const protocolDisplayName =
-    mostRecentAnalysis?.metadata?.protocolName ??
-    first(srcFileNames) ??
-    protocolKey
-  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
-
+  if (
+    protocolKey == null ||
+    srcFileNames == null ||
+    srcFiles == null ||
+    mostRecentAnalysis == null
+  ) {
+    // TODO: do more robust corrupt file catching and handling here
+    return null
+  }
   const srcFileObjects = srcFiles.map((srcFileBuffer, index) => {
     const srcFilePath = srcFileNames[index]
     return new File([srcFileBuffer], path.basename(srcFilePath))
   })
-  const dispatch = useDispatch<Dispatch>()
-  const isScanning = useSelector((state: State) => getScanning(state))
-  const connectableRobots = useSelector<
-    State,
-    ReturnType<typeof getConnectableRobots>
-  >(getConnectableRobots)
-  const reachableRobots = useSelector<
-    State,
-    ReturnType<typeof getReachableRobots>
-  >(getReachableRobots)
-  const unavailableRobots = useSelector<
-    State,
-    ReturnType<typeof getUnreachableRobots>
-  >(getUnreachableRobots)
-  const availableRobots = connectableRobots.filter(robot => {
-    // TODO: filter out robots who have a current run that is in thie paused or running status
-    return true
-  })
+  const protocolDisplayName =
+    mostRecentAnalysis?.metadata?.protocolName ??
+    first(srcFileNames) ??
+    protocolKey
   const unavailableOrBusyCount =
-    unavailableRobots.length +
-    reachableRobots.length +
-    (connectableRobots.length - availableRobots.length)
+    unavailableDevices.length + availableDevices.length - availableRobots.length
 
   return (
     <Slideout
       isExpanded={showSlideout}
       onCloseClick={onCloseClick}
-      zIndex="10"
-      height={`calc(100vh - ${SPACING.spacing4})`}
       title={t('choose_robot_to_run', {
         protocol_name: protocolDisplayName,
       })}
@@ -136,7 +129,7 @@ export function ChooseRobotSlideout(
             </Link>
           )}
         </Flex>
-        {!isScanning && connectableRobots.length === 0 ? (
+        {!isScanning && availableRobots.length === 0 ? (
           <Flex
             css={BORDERS.cardOutlineBorder}
             flexDirection={DIRECTION_COLUMN}
@@ -150,7 +143,7 @@ export function ChooseRobotSlideout(
             </StyledText>
           </Flex>
         ) : (
-          connectableRobots.map(robot => (
+          availableRobots.map(robot => (
             <AvailableRobotOption
               key={robot.ip}
               robotName={robot.name}

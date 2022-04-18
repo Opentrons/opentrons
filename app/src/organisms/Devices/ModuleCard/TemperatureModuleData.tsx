@@ -1,16 +1,12 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  C_BLUE,
-  C_DARK_BLACK,
-  C_DARK_GRAY,
-  C_SILVER_GRAY,
-  C_SKY_BLUE,
   DIRECTION_COLUMN,
   Flex,
   FONT_SIZE_CAPTION,
   Text,
   SPACING,
+  COLORS,
 } from '@opentrons/components'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 import type { TemperatureStatus } from '../../../redux/modules/api-types'
@@ -27,25 +23,25 @@ export const TemperatureModuleData = (
   const { moduleStatus, targetTemp, currentTemp } = props
   const { t } = useTranslation('device_details')
 
-  let backgroundColor: string = C_SILVER_GRAY
-  let iconColor: string = C_DARK_GRAY
+  let backgroundColor: string = COLORS.medGrey
+  let iconColor: string = COLORS.darkGrey
   let textColor
   let pulse
   switch (moduleStatus) {
     case 'idle': {
-      backgroundColor = C_SILVER_GRAY
-      iconColor = C_DARK_GRAY
-      textColor = C_DARK_BLACK
+      backgroundColor = COLORS.medGrey
+      iconColor = COLORS.darkGrey
+      textColor = COLORS.darkBlack
       break
     }
     case 'holding at target': {
-      backgroundColor = C_SKY_BLUE
-      iconColor = C_BLUE
+      backgroundColor = COLORS.medBlue
+      iconColor = COLORS.blue
       break
     }
     case 'cooling':
     case 'heating': {
-      backgroundColor = C_SKY_BLUE
+      backgroundColor = COLORS.medBlue
       pulse = true
       break
     }

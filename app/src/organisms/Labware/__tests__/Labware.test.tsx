@@ -5,11 +5,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { LabwareCard } from '../LabwareCard'
 import { AddCustomLabware } from '../AddCustomLabware'
-import {
-  useGetAllLabware,
-  useLabwareFailure,
-  useNewLabwareName,
-} from '../hooks'
+import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
 import { Labware } from '../'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
 
@@ -22,8 +18,8 @@ const mockLabwareCard = LabwareCard as jest.MockedFunction<typeof LabwareCard>
 const mockAddCustomLabware = AddCustomLabware as jest.MockedFunction<
   typeof AddCustomLabware
 >
-const mockUseGetAllLabware = useGetAllLabware as jest.MockedFunction<
-  typeof useGetAllLabware
+const mockUseAllLabware = useAllLabware as jest.MockedFunction<
+  typeof useAllLabware
 >
 const mockUseLabwareFailure = useLabwareFailure as jest.MockedFunction<
   typeof useLabwareFailure
@@ -47,7 +43,7 @@ describe('Labware', () => {
   beforeEach(() => {
     mockLabwareCard.mockReturnValue(<div>Mock Labware Card</div>)
     mockAddCustomLabware.mockReturnValue(<div>Mock Add Custom Labware</div>)
-    mockUseGetAllLabware.mockReturnValue([{ definition: mockDefinition }])
+    mockUseAllLabware.mockReturnValue([{ definition: mockDefinition }])
     mockUseLabwareFailure.mockReturnValue({
       labwareFailureMessage: null,
       clearLabwareFailure: jest.fn(),
@@ -66,6 +62,9 @@ describe('Labware', () => {
     getByText('labware')
     getByText('Mock Labware Card')
     getByRole('button', { name: 'Import' })
+    getByText('Category')
+    getByText('All')
+    getByText('Sort by')
   })
   it('renders AddCustomLabware slideout when import button is clicked', () => {
     const [{ getByText, getByRole, queryByText }] = render()
@@ -94,5 +93,32 @@ describe('Labware', () => {
     })
     const [{ getByText }] = render()
     getByText('mock filename imported.')
+  })
+  it('renders filter by menu when it is clicked', () => {
+    const [{ getByText, getByRole }] = render()
+    const filter = getByText('All')
+    fireEvent.click(filter)
+    getByRole('button', { name: 'All' })
+    getByRole('button', { name: 'Well Plate' })
+    getByRole('button', { name: 'Tip Rack' })
+    getByRole('button', { name: 'Tube Rack' })
+    getByRole('button', { name: 'Reservoir' })
+    getByRole('button', { name: 'Aluminum Block' })
+  })
+  it('renders changes filter menu button when an option is selected', () => {
+    const [{ getByText, getByRole }] = render()
+    const filter = getByText('All')
+    fireEvent.click(filter)
+    const wellPlate = getByRole('button', { name: 'Well Plate' })
+    fireEvent.click(wellPlate)
+    getByText('Well Plate')
+  })
+  it('renders sort by menu when sort is clicked', () => {
+    const [{ getByText, getByRole }] = render()
+    const sort = getByText('Sort by')
+    fireEvent.click(sort)
+    getByText('Alphabetical')
+    getByRole('button', { name: 'Alphabetical' })
+    getByRole('button', { name: 'Reverse alphabetical' })
   })
 })

@@ -423,3 +423,9 @@ export interface ProtocolResource {
 export type MotorAxis = Array<
   'x' | 'y' | 'leftZ' | 'rightZ' | 'leftPlunger' | 'rightPlunger'
 >
+
+export type ThermalAdapterName =
+  | 'PCR Adapter'
+  | 'Deep Well Adapter'
+  | '96 Flat Bottom Adapter'
+  | 'Universal Flat Adapter'

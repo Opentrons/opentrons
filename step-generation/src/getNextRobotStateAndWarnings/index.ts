@@ -82,7 +82,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'touchTip':
     case 'delay':
-    case 'dispenseAirGap':
     case 'moveToWell':
       // these commands don't have any effects on the state
       break

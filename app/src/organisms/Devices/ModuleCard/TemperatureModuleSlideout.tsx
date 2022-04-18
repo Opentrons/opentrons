@@ -70,7 +70,6 @@ export const TemperatureModuleSlideout = (
       title={t('tempdeck_slideout_title', { name: name })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      height={`calc(100vh - ${SPACING.spacing4})`}
       footer={
         <PrimaryButton
           width="100%"

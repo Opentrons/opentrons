@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
-import { Tooltip, useHoverTooltip } from '@opentrons/components'
+import { useHoverTooltip } from '@opentrons/components'
 import {
   CreateCommand,
   HEATERSHAKER_MODULE_TYPE,
@@ -12,6 +12,7 @@ import {
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { getProtocolModulesInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useProtocolDetailsForRun } from '../hooks'
 
@@ -145,7 +146,7 @@ export function useModuleOverflowMenu(
   const labwareLatchBtn = (
     <>
       <MenuItem
-        minWidth="10rem"
+        minWidth="10.6rem"
         key={`hs_labware_latch_${module.model}`}
         data-testid={`hs_labware_latch_${module.model}`}
         onClick={toggleLatch}
@@ -156,9 +157,11 @@ export function useModuleOverflowMenu(
           ns: 'heater_shaker',
         })}
       </MenuItem>
-      {/* TODO:(jr, 3/11/22): update Tooltip to new design */}
       {isLatchDisabled ? (
-        <Tooltip {...tooltipProps} key={`tooltip_latch_${module.model}`}>
+        <Tooltip
+          tooltipProps={tooltipProps}
+          key={`tooltip_latch_${module.model}`}
+        >
           {t('cannot_open_latch', { ns: 'heater_shaker' })}
         </Tooltip>
       ) : null}
@@ -167,7 +170,7 @@ export function useModuleOverflowMenu(
 
   const aboutModuleBtn = (
     <MenuItem
-      minWidth="10rem"
+      minWidth="10.6rem"
       key={`about_module_${module.model}`}
       id={`about_module_${module.model}`}
       data-testid={`about_module_${module.model}`}
@@ -179,7 +182,7 @@ export function useModuleOverflowMenu(
 
   const attachToDeckBtn = (
     <MenuItem
-      minWidth="10rem"
+      minWidth="10.6rem"
       key={`hs_attach_to_deck_${module.model}`}
       data-testid={`hs_attach_to_deck_${module.model}`}
       onClick={() => handleWizardClick()}
@@ -189,7 +192,7 @@ export function useModuleOverflowMenu(
   )
   const testShakeBtn = (
     <MenuItem
-      minWidth="10rem"
+      minWidth="10.6rem"
       onClick={() => handleTestShakeClick()}
       key={`hs_test_shake_btn_${module.model}`}
     >

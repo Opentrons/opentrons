@@ -13,6 +13,7 @@ from anyio import Path as AsyncPath
 import sqlalchemy
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
+from robot_server.persistence import protocol_table
 
 
 _log = getLogger(__name__)
@@ -236,15 +237,15 @@ class ProtocolStore:
         )
 
     def _sql_insert(self, resource: _DBProtocolResource) -> None:
-        statement = sqlalchemy.insert(_protocol_table).values(
+        statement = sqlalchemy.insert(protocol_table).values(
             _convert_dataclass_to_sql_values(resource=resource)
         )
         with self._sql_engine.begin() as transaction:
             transaction.execute(statement)
 
     def _sql_get(self, protocol_id: str) -> _DBProtocolResource:
-        statement = sqlalchemy.select(_protocol_table).where(
-            _protocol_table.c.id == protocol_id
+        statement = sqlalchemy.select(protocol_table).where(
+            protocol_table.c.id == protocol_id
         )
         with self._sql_engine.begin() as transaction:
             try:
@@ -260,17 +261,17 @@ class ProtocolStore:
     def _sql_get_all_from_engine(
         sql_engine: sqlalchemy.engine.Engine,
     ) -> List[_DBProtocolResource]:
-        statement = sqlalchemy.select(_protocol_table)
+        statement = sqlalchemy.select(protocol_table)
         with sql_engine.begin() as transaction:
             all_rows = transaction.execute(statement).all()
         return [_convert_sql_row_to_dataclass(sql_row=row) for row in all_rows]
 
     def _sql_remove(self, protocol_id: str) -> _DBProtocolResource:
-        select_statement = sqlalchemy.select(_protocol_table).where(
-            _protocol_table.c.id == protocol_id
+        select_statement = sqlalchemy.select(protocol_table).where(
+            protocol_table.c.id == protocol_id
         )
-        delete_statement = sqlalchemy.delete(_protocol_table).where(
-            _protocol_table.c.id == protocol_id
+        delete_statement = sqlalchemy.delete(protocol_table).where(
+            protocol_table.c.id == protocol_id
         )
         with self._sql_engine.begin() as transaction:
             try:
@@ -283,33 +284,6 @@ class ProtocolStore:
 
         deleted_resource = _convert_sql_row_to_dataclass(sql_row=row_to_delete)
         return deleted_resource
-
-
-def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
-    """Create the necessary database tables to back a `ProtocolStore`.
-
-    Params:
-        sql_engine: An engine for a blank SQL database, to put the tables in.
-    """
-    _metadata.create_all(sql_engine)
-
-
-_metadata = sqlalchemy.MetaData()
-_protocol_table = sqlalchemy.Table(
-    "protocol",
-    _metadata,
-    sqlalchemy.Column(
-        "id",
-        sqlalchemy.String,
-        primary_key=True,
-    ),
-    sqlalchemy.Column(
-        "created_at",
-        sqlalchemy.DateTime,
-        nullable=False,
-    ),
-    sqlalchemy.Column("protocol_key", sqlalchemy.String, nullable=True),
-)
 
 
 @dataclass(frozen=True)

@@ -4,6 +4,7 @@ import {
   PauseArgs,
   ThermocyclerProfileStepArgs,
 } from '@opentrons/step-generation'
+import { ModuleType } from '@opentrons/shared-data'
 import { StepIdType } from '../form-types'
 import { FormError } from './formLevel/errors'
 // timeline start and end
@@ -113,6 +114,7 @@ export interface AwaitTemperatureSubstepItem {
   substepType: 'awaitTemperature'
   temperature: number
   labwareNickname: string | null | undefined
+  moduleType: ModuleType
   message?: string
 }
 

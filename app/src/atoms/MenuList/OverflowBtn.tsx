@@ -11,15 +11,16 @@ const overflowButtonStyles = css`
   }
 
   &:active {
-    background-color: ${COLORS.lightBlue};
+    background-color: ${COLORS.lightGreyHover};
+    box-shadow: 0 0 0 1px ${COLORS.lightGrey};
   }
 
   &:active circle {
-    fill: ${COLORS.blue};
+    fill: ${COLORS.darkGreyPressed};
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.blueFocus};
+    box-shadow: 0 0 0 3px ${COLORS.warning};
   }
 
   &:disabled,
@@ -28,11 +29,9 @@ const overflowButtonStyles = css`
   }
 `
 
-export const OverflowBtn = (
-  props: React.ComponentProps<typeof Btn>
-): JSX.Element | null => {
-  return (
-    <Btn css={overflowButtonStyles} {...props}>
+export const OverflowBtn = React.forwardRef(
+  (props: React.ComponentProps<typeof Btn>, ref): JSX.Element | null => (
+    <Btn css={overflowButtonStyles} {...props} ref={ref}>
       <svg
         width="19"
         height="31"
@@ -47,4 +46,4 @@ export const OverflowBtn = (
       {props.children}
     </Btn>
   )
-}
+)

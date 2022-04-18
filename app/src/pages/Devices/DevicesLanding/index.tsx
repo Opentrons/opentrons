@@ -54,7 +54,7 @@ export function DevicesLanding(): JSX.Element {
           >
             {availableDevices.map(robot => (
               <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
-                <RobotCard name={robot.name} local={robot.local} />
+                <RobotCard robot={robot} />
               </ApiHostProvider>
             ))}
           </CollapsibleSection>
@@ -68,7 +68,7 @@ export function DevicesLanding(): JSX.Element {
         >
           {unavailableDevices.map(robot => (
             <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
-              <RobotCard name={robot.name} local={robot.local} />
+              <RobotCard robot={robot} />
             </ApiHostProvider>
           ))}
         </CollapsibleSection>
