@@ -40,8 +40,8 @@ describe('protocol storage selectors', () => {
     )
     expect(result).toEqual(secondProtocol)
   })
-  it('isProtocolAnalysisInProgress returns true if in progress', () => {
-    const result = selectors.isProtocolAnalysisInProgress(
+  it('getIsProtocolAnalysisInProgress returns true if in progress', () => {
+    const result = selectors.getIsProtocolAnalysisInProgress(
       {
         protocolStorage: {
           addFailureFile: null,
@@ -59,8 +59,8 @@ describe('protocol storage selectors', () => {
     )
     expect(result).toBe(true)
   })
-  it('isProtocolAnalysisInProgress returns false if not in progress', () => {
-    const result = selectors.isProtocolAnalysisInProgress(
+  it('getIsProtocolAnalysisInProgress returns false if not in progress', () => {
+    const result = selectors.getIsProtocolAnalysisInProgress(
       {
         protocolStorage: {
           addFailureFile: null,

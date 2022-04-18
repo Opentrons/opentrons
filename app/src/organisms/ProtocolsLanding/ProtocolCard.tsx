@@ -29,7 +29,7 @@ import {
   parseAllRequiredModuleModels,
 } from '@opentrons/api-client'
 
-import { isProtocolAnalysisInProgress } from '../../redux/protocol-storage'
+import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
@@ -53,7 +53,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   } = props
 
   const isAnalyzing = useSelector((state: State) =>
-    isProtocolAnalysisInProgress(state, protocolKey)
+    getIsProtocolAnalysisInProgress(state, protocolKey)
   )
   const protocolDisplayName = getProtocolDisplayName(
     protocolKey,

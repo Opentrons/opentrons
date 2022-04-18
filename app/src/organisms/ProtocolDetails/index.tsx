@@ -30,7 +30,7 @@ import {
   parseAllRequiredModuleModels,
 } from '@opentrons/api-client'
 
-import { isProtocolAnalysisInProgress } from '../../redux/protocol-storage'
+import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { StyledText } from '../../atoms/text'
@@ -113,7 +113,7 @@ export function ProtocolDetails(
   >('robot_config')
   const [showSlideout, setShowSlideout] = React.useState(false)
   const isAnalyzing = useSelector((state: State) =>
-    isProtocolAnalysisInProgress(state, protocolKey)
+    getIsProtocolAnalysisInProgress(state, protocolKey)
   )
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
   if (analysisStatus === 'missing') return null
