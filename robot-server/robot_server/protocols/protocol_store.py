@@ -7,9 +7,9 @@ from dataclasses import dataclass
 from datetime import datetime
 from logging import getLogger
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set
 
-from anyio import Path as AsyncPath
+from anyio import Path as AsyncPath, create_task_group
 import sqlalchemy
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
@@ -37,8 +37,8 @@ class ProtocolNotFoundError(KeyError):
         super().__init__(f"Protocol {protocol_id} was not found.")
 
 
-class FileMissingError(Exception):
-    """Raised if expected files are missing when rehydrating.
+class SubdirectoryMissingError(Exception):
+    """Raised if expected protocol subdirectories are missing when rehydrating.
 
     We never expect this to happen if the system is working correctly.
     It might happen if someone's tampered with the file storage.
@@ -106,64 +106,22 @@ class ProtocolStore:
             protocol_reader: An interface to compute `ProtocolSource`s from protocol
                 files while rehydrating.
         """
-        protocols_directory_async = AsyncPath(protocols_directory)
-        directory_members = [m async for m in protocols_directory_async.iterdir()]
-        directory_member_names = set(m.name for m in directory_members)
-
         # The SQL database is the canonical source of which protocols
         # have been added successfully.
         expected_ids = set(
             r.protocol_id for r in cls._sql_get_all_from_engine(sql_engine=sql_engine)
         )
-        extra_members = directory_member_names - expected_ids
-        missing_members = expected_ids - directory_member_names
 
-        if extra_members:
-            # Extra members may be left over from prior interrupted writes
-            # and other kinds of failed insertions.
-            _log.warning(
-                f"Unexpected files or directories inside protocol storage directory:"
-                f" {extra_members}."
-                f" Ignoring them."
-            )
+        sources_by_id = await _compute_protocol_sources(
+            expected_protocol_ids=expected_ids,
+            protocols_directory=AsyncPath(protocols_directory),
+            protocol_reader=protocol_reader,
+        )
 
-        if missing_members:
-            raise FileMissingError(
-                f"Missing subdirectories for protocols: {missing_members}"
-            )
-
-        sources_by_id: Dict[str, ProtocolSource] = {}
-
-        for protocol_subdirectory in directory_members:
-            # Given that the expected protocol subdirectories exist,
-            # we trust that the files in each subdirectory are correct.
-            # No extra files, and no files missing.
-            #
-            # This is a safe assumption as long as:
-            #  * Every protocol is guaranteed to have had all of its files successfully
-            #    stored before it gets committed to the SQL database
-            #  * Nobody has tampered with file the storage.
-            protocol_files = [f async for f in protocol_subdirectory.iterdir()]
-
-            # We don't store the ProtocolSource part in the database because it's
-            # a big, deep, complex, unstable object, so migrations and compatibility
-            # would be painful. Instead, we compute it based on the stored files,
-            # and keep it in memory.
-            #
-            # This can fail if a software update makes ProtocolReader reject files
-            # that it formerly accepted. We currently trust that this won't happen.
-            source = await protocol_reader.read_saved(
-                files=[Path(f) for f in protocol_files],
-                directory=Path(protocol_subdirectory),
-            )
-            sources_by_id[protocol_subdirectory.name] = source
-
-        result = ProtocolStore(
+        return ProtocolStore(
             _sql_engine=sql_engine,
             _sources_by_id=sources_by_id,
         )
-
-        return result
 
     def insert(self, resource: ProtocolResource) -> None:
         """Insert a protocol resource into the store.
@@ -284,6 +242,92 @@ class ProtocolStore:
 
         deleted_resource = _convert_sql_row_to_dataclass(sql_row=row_to_delete)
         return deleted_resource
+
+
+# TODO(mm, 2022-04-18):
+# Restructure to degrade gracefully in the face of ProtocolReader failures.
+#
+# * ProtocolStore.get_all() should omit protocols for which it failed to compute
+#   a ProtocolSource.
+# * ProtocolStore.get(id) should continue to raise an exception if it failed to compute
+#   that protocol's ProtocolSource.
+async def _compute_protocol_sources(
+    expected_protocol_ids: Set[str],
+    protocols_directory: AsyncPath,
+    protocol_reader: ProtocolReader,
+) -> Dict[str, ProtocolSource]:
+    """Compute `ProtocolSource` objects from protocol source files.
+
+    We don't store these `ProtocolSource` objects in the SQL database because
+    they're big, deep, complex, and unstable, so migrations and compatibility
+    would be painful. Instead, we compute them based on the stored files,
+    and keep them in memory.
+
+    Params:
+        expected_protocol_ids: The ID of every protocol for which to compute a
+            `ProtocolSource`.
+        protocols_directory: A directory containing one subdirectory per protocol
+            named by protocol ID. Scanned for files to pass to `protocol_reader`.
+        protocol_reader: An interface to use to compute `ProtocolSource`s.
+
+    Returns:
+        A map from protocol ID to computed `ProtocolSource`.
+
+    Raises:
+        Exception: This is not expected to raise anything,
+            but it might if a software update makes ProtocolReader reject files
+            that it formerly accepted.
+    """
+    sources_by_id: Dict[str, ProtocolSource] = {}
+
+    directory_members = [m async for m in protocols_directory.iterdir()]
+    directory_member_names = set(m.name for m in directory_members)
+    extra_members = directory_member_names - expected_protocol_ids
+    missing_members = expected_protocol_ids - directory_member_names
+
+    if extra_members:
+        # Extra members may be left over from prior interrupted writes
+        # and other kinds of failed insertions.
+        _log.warning(
+            f"Unexpected files or directories inside protocol storage directory:"
+            f" {extra_members}."
+            f" Ignoring them."
+        )
+
+    if missing_members:
+        raise SubdirectoryMissingError(
+            f"Missing subdirectories for protocols: {missing_members}"
+        )
+
+    async def compute_source(
+        protocol_id: str, protocol_subdirectory: AsyncPath
+    ) -> None:
+        # Given that the expected protocol subdirectory exists,
+        # we trust that the files in it are correct.
+        # No extra files, and no files missing.
+        #
+        # This is a safe assumption as long as:
+        #  * Nobody has tampered with file the storage.
+        #  * We don't try to compute the source of any protocol whose insertion
+        #    failed halfway through and left files behind.
+        protocol_files = [Path(f) async for f in protocol_subdirectory.iterdir()]
+        protocol_source = await protocol_reader.read_saved(
+            files=protocol_files, directory=Path(protocol_subdirectory)
+        )
+        sources_by_id[protocol_id] = protocol_source
+
+    async with create_task_group() as task_group:
+        # Use a TaskGroup instead of asyncio.gather() so,
+        # if any task raises an unexpected exception,
+        # it cancels every other task and raises an exception to signal the bug.
+        for protocol_id in expected_protocol_ids:
+            protocol_subdirectory = protocols_directory / protocol_id
+            task_group.start_soon(compute_source, protocol_id, protocol_subdirectory)
+
+    for id in expected_protocol_ids:
+        assert id in sources_by_id
+
+    return sources_by_id
 
 
 @dataclass(frozen=True)
