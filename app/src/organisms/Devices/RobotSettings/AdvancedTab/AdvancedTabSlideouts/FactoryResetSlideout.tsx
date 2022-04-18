@@ -80,7 +80,7 @@ export function FactoryResetSlideout({
       }
     })
     setCalibrationOptions(cOptions)
-  }, [options, dispatch])
+  }, [options])
 
   React.useEffect(() => {
     const bOption = options.filter(option => {
@@ -89,7 +89,7 @@ export function FactoryResetSlideout({
       }
     })
     setBootScriptOption(bOption)
-  }, [options, dispatch])
+  }, [options])
 
   React.useEffect(() => {
     const pOption = options.filter(option => {
@@ -98,7 +98,7 @@ export function FactoryResetSlideout({
       }
     })
     setProtocolOptions(pOption)
-  }, [options, dispatch])
+  }, [options])
 
   React.useEffect(() => {
     dispatch(fetchResetConfigOptions(robotName))
@@ -128,9 +128,6 @@ export function FactoryResetSlideout({
     updateResetStatus(connected, resetOptions)
     onCloseClick()
   }
-
-  // ToDo: Protocol run history data
-  console.log('resetOptions', resetOptions)
 
   return (
     <Slideout
