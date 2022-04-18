@@ -40,7 +40,6 @@ export function RenameRobotSlideout({
 
   const { updateRobotName } = useUpdateRobotNameMutation({
     onSuccess: (data: UpdatedRobotName) => {
-      //   setNewRobotName(data.name)
       dispatch(removeRobot(previousRobotName))
       data.name != null &&
         history.push(`/devices/${data.name as string}/robot-settings`)
@@ -62,7 +61,7 @@ export function RenameRobotSlideout({
       isExpanded={isExpanded}
       footer={
         <PrimaryButton
-          disabled={newRobotName == null}
+          disabled={newRobotName == null || newRobotName.length > 35}
           onClick={handleRenameRobot}
           width="100%"
         >
