@@ -167,12 +167,12 @@ async def test_update_happypath(
 
 @pytest.mark.exclude_rootfs_ext4
 async def test_update_catches_validation_fail(
-    test_cli, update_session, downloaded_update_file, loop, testing_partition
+    test_cli, update_session, downloaded_update_ot3_file, loop, testing_partition
 ):
     # Upload
     resp = await test_cli.post(
         session_endpoint(update_session, "file"),
-        data={"ot2-system.zip": open(downloaded_update_file, "rb")},
+        data={"ot3-system.zip": open(downloaded_update_ot3_file, "rb")},
     )
     assert resp.status == 201
     body = await resp.json()
