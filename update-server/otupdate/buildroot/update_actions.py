@@ -127,8 +127,6 @@ class OT2UpdateActions(UpdateActionsInterface):
         Should be used as a context manager, and the yielded value is the path
         to the mount. When the context manager exits, the partition will be
         unmounted again and its mountpoint removed.
-
-        :param mountpoint_in: The directory in which to create the mountpoint.
         """
         unused = _find_unused_partition()
         part_path = unused.value.path

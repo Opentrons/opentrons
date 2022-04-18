@@ -12,6 +12,10 @@ from otupdate.common import file_actions
 from otupdate.common.session import UpdateSession, Stages
 
 
+# TODO (al, 2022-04-18): This is a copy and paste of the buildroot test_update.
+#  It should not make it to edge. Consolidate tests.
+
+
 def session_endpoint(token, endpoint):
     return f"/server/update/{token}/{endpoint}"
 
