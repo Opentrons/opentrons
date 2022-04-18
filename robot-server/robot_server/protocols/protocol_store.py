@@ -76,7 +76,7 @@ class ProtocolStore:
                 use as its backing storage.
                 This is expected to already have the proper tables set up;
                 see `add_tables_to_db()`.
-                This should no protocol data currently stored.
+                This should have no protocol data currently stored.
                 If there is data, use `rehydrate()` instead.
         """
         return cls(_sql_engine=sql_engine, _sources_by_id={})
