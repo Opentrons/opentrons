@@ -71,7 +71,7 @@ export function RobotServerVersion({
     if (autoUpdateAction !== 'reinstall') {
       setShowBanner(true)
     }
-  })
+  }, [])
 
   // check for available updates
   useInterval(checkAppUpdate, UPDATE_RECHECK_DELAY_MS)
@@ -102,7 +102,9 @@ export function RobotServerVersion({
             {t('robot_server_versions')}
           </StyledText>
           <StyledText as="p" paddingBottom={SPACING.spacing2}>
-            {`v${robotServerVersion}`}
+            {robotServerVersion != null
+              ? `v${robotServerVersion}`
+              : t('robot_server_versions_status_unknown')}
           </StyledText>
           <StyledText as="p">
             {t('robot_server_versions_description')}

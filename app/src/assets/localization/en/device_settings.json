@@ -36,6 +36,7 @@
   "robot_server_versions": "Robot Server Versions",
   "robot_server_versions_description": "View latest release notes on",
   "robot_server_versions_status": "up to date",
+  "robot_server_versions_status_unknown": "Unknown",
   "robot_server_versions_banner_title": "A software update is available for this robot.",
   "robot_server_versions_view_update": "View update",
   "github":"GitHub",
