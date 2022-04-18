@@ -261,6 +261,8 @@ async def test_get_bundled_fw(monkeypatch, tmpdir):
     assert api.attached_modules[2].bundled_fw == BundledFirmware(
         version="0.1.2", path=dummy_tc_file
     )
+    for m in api.attached_modules:
+        await m.cleanup()
 
 
 @pytest.mark.parametrize(
