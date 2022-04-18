@@ -1,5 +1,4 @@
 import { curryCommandCreator, reduceCommandCreators } from '../../utils'
-import { heaterShakerDiff } from '../../utils/heaterShakerDiff'
 import * as errorCreators from '../../errorCreators'
 import {
   CommandCreator,
@@ -31,26 +30,16 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
       errors: [errorCreators.missingModuleError()],
     }
   }
-  const {
-    latchOpen,
-    latchClosed,
-    setTemperature,
-    deactivateHeater,
-    setShakeSpeed,
-    stopShake,
-  } = heaterShakerDiff(heaterShakerState, args)
 
   const commandCreators: CurriedCommandCreator[] = []
 
-  if (latchOpen) {
+  if (args.latchOpen) {
     commandCreators.push(
       curryCommandCreator(heaterShakerOpenLatch, {
         moduleId: args.module,
       })
     )
-  }
-
-  if (latchClosed) {
+  } else {
     commandCreators.push(
       curryCommandCreator(heaterShakerCloseLatch, {
         moduleId: args.module,
@@ -58,15 +47,13 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
     )
   }
 
-  if (deactivateHeater) {
+  if (args.targetTemperature === null) {
     commandCreators.push(
       curryCommandCreator(heaterShakerDeactivateHeater, {
         moduleId: args.module,
       })
     )
-  }
-
-  if (args.targetTemperature !== null && setTemperature) {
+  } else {
     commandCreators.push(
       curryCommandCreator(heaterShakerSetTemperature, {
         module: args.module,
@@ -84,15 +71,13 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
     )
   }
 
-  if (stopShake) {
+  if (args.rpm === null) {
     commandCreators.push(
       curryCommandCreator(heaterShakerStopShake, {
         moduleId: args.module,
       })
     )
-  }
-
-  if (args.rpm !== null && setShakeSpeed) {
+  } else {
     commandCreators.push(
       curryCommandCreator(heaterShakerSetTargetShakeSpeed, {
         moduleId: args.module,

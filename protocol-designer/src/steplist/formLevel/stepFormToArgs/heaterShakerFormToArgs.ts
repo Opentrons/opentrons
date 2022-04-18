@@ -7,14 +7,16 @@ export const heaterShakerFormToArgs = (
 ): HeaterShakerArgs => {
   const {
     moduleId,
-    setTemperature,
+    setHeaterShakerTemperature,
     targetHeaterShakerTemperature,
     targetSpeed,
     setShake,
     latchOpen,
   } = formData
   assert(
-    setTemperature ? !Number.isNaN(targetHeaterShakerTemperature) : true,
+    setHeaterShakerTemperature
+      ? !Number.isNaN(targetHeaterShakerTemperature)
+      : true,
     'heaterShakerFormToArgs expected targetTemp to be a number when setTemp is true'
   )
   assert(
@@ -23,7 +25,7 @@ export const heaterShakerFormToArgs = (
   )
 
   const targetTemperature =
-    setTemperature && targetHeaterShakerTemperature != null
+    setHeaterShakerTemperature && targetHeaterShakerTemperature != null
       ? parseFloat(targetHeaterShakerTemperature)
       : null
   const targetShake =

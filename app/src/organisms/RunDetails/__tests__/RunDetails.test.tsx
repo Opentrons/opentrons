@@ -153,7 +153,7 @@ describe('RunDetails', () => {
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_RUNNING)
     const { getByRole, getByText } = render()
-    const button = getByRole('button', { name: 'Cancel Run' })
+    const button = getByRole('button', { name: 'Cancel run' })
     fireEvent.click(button)
     expect(button).toBeTruthy()
     expect(getByText('Are you sure you want to cancel this run?')).toBeTruthy()
@@ -176,7 +176,7 @@ describe('RunDetails', () => {
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_FINISHING)
     const { getByRole } = render()
-    const button = getByRole('button', { name: 'Cancel Run' })
+    const button = getByRole('button', { name: 'Cancel run' })
     expect(button).toBeEnabled()
   })
 
@@ -185,7 +185,7 @@ describe('RunDetails', () => {
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_PAUSED)
     const { getByRole } = render()
-    const button = getByRole('button', { name: 'Cancel Run' })
+    const button = getByRole('button', { name: 'Cancel run' })
     expect(button).toBeEnabled()
   })
 
@@ -194,7 +194,7 @@ describe('RunDetails', () => {
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
     const { getByRole } = render()
-    const button = getByRole('button', { name: 'Cancel Run' })
+    const button = getByRole('button', { name: 'Cancel run' })
     expect(button).toBeEnabled()
   })
 
@@ -203,7 +203,7 @@ describe('RunDetails', () => {
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     const { getByRole } = render()
-    const button = getByRole('button', { name: 'Cancel Run' })
+    const button = getByRole('button', { name: 'Cancel run' })
     expect(button).toBeEnabled()
   })
 

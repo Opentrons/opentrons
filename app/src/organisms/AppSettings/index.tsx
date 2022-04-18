@@ -20,7 +20,7 @@ import { FeatureFlags } from './FeatureFlags'
 
 import { NavTab } from '../../atoms/NavTab'
 import { Line } from '../../atoms/structure'
-import type { NextGenRouteParams, AppSettingsTab } from '../../App/NextGenApp'
+import type { NextGenRouteParams, AppSettingsTab } from '../../App/types'
 
 export function AppSettings(): JSX.Element {
   const { t } = useTranslation('app_settings')
@@ -42,29 +42,31 @@ export function AppSettings(): JSX.Element {
     (() => <Redirect to={`/app-settings/general`} />)
 
   return (
-    <Box backgroundColor={COLORS.white} height="100%">
-      <Box padding={SPACING.spacing4} paddingBottom="0">
-        <Text css={TYPOGRAPHY.h1Default} paddingBottom={SPACING.spacing5}>
-          {t('app_settings')}
-        </Text>
-        <Flex
-          alignItems={ALIGN_START}
-          flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacingM}
-        >
-          <NavTab to="/app-settings/general" tabName={t('general')} />
-          <NavTab to="/app-settings/privacy" tabName={t('privacy')} />
-          <NavTab to="/app-settings/advanced" tabName={t('advanced')} />
-          {devToolsOn && (
-            <NavTab
-              to="/app-settings/feature-flags"
-              tabName={t('feature_flags')}
-            />
-          )}
-        </Flex>
+    <Flex paddingX={SPACING.spacing4} paddingY={SPACING.spacing4}>
+      <Box backgroundColor={COLORS.white} height="100%" width="100%">
+        <Box padding={SPACING.spacing4} paddingBottom="0">
+          <Text css={TYPOGRAPHY.h1Default} paddingBottom={SPACING.spacing5}>
+            {t('app_settings')}
+          </Text>
+          <Flex
+            alignItems={ALIGN_START}
+            flexDirection={DIRECTION_ROW}
+            gridGap={SPACING.spacingM}
+          >
+            <NavTab to="/app-settings/general" tabName={t('general')} />
+            <NavTab to="/app-settings/privacy" tabName={t('privacy')} />
+            <NavTab to="/app-settings/advanced" tabName={t('advanced')} />
+            {devToolsOn && (
+              <NavTab
+                to="/app-settings/feature-flags"
+                tabName={t('feature_flags')}
+              />
+            )}
+          </Flex>
+        </Box>
+        <Line />
+        <AppSettingsContent />
       </Box>
-      <Line />
-      <AppSettingsContent />
-    </Box>
+    </Flex>
   )
 }

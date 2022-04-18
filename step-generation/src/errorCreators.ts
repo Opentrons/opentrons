@@ -119,3 +119,17 @@ export const thermocyclerLidClosed = (): CommandCreatorError => {
     message: 'Attempted to pipette into a thermocycler with the lid closed.',
   }
 }
+
+export const heaterShakerLatchOpen = (): CommandCreatorError => {
+  return {
+    type: 'HEATER_SHAKER_LATCH_OPEN',
+    message: 'Attempted to pipette into a heater-shaker with the latch open.',
+  }
+}
+
+export const heaterShakerIsShaking = (): CommandCreatorError => {
+  return {
+    type: 'HEATER_SHAKER_IS_SHAKING',
+    message: 'Attempted to pipette into a heater-shaker when it is shaking.',
+  }
+}

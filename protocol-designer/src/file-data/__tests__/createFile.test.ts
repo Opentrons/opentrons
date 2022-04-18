@@ -11,6 +11,7 @@ import {
   fixtureP300Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
 import { LabwareDefinition2 } from '@opentrons/shared-data'
+import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 import { createFile, getLabwareDefinitionsInUse } from '../selectors'
 import {
   fileMetadata,
@@ -28,6 +29,12 @@ import {
   PipetteEntities,
 } from '../../../../step-generation/src/types'
 import { LabwareDefByDefURI } from '../../labware-defs'
+
+jest.mock('../../load-file/migration/utils/getLoadLiquidCommands')
+
+const mockGetLoadLiquidCommands = getLoadLiquidCommands as jest.MockedFunction<
+  typeof getLoadLiquidCommands
+>
 
 const getAjvValidator = (_protocolSchema: Record<string, any>) => {
   const ajv = new Ajv({
@@ -57,6 +64,12 @@ const expectResultToMatchSchema = (
 }
 
 describe('createFile selector', () => {
+  beforeEach(() => {
+    mockGetLoadLiquidCommands.mockReturnValue([])
+  })
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
   it('should return a schema-valid JSON V6 protocol', () => {
     // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = createFile.resultFunc(
@@ -79,6 +92,10 @@ describe('createFile selector', () => {
     // have the opportunity to validate their part of the schema
     expect(!isEmpty(result.labware)).toBe(true)
     expect(!isEmpty(result.pipettes)).toBe(true)
+    expect(mockGetLoadLiquidCommands).toHaveBeenCalledWith(
+      ingredients,
+      ingredLocations
+    )
   })
 })
 describe('getLabwareDefinitionsInUse util', () => {

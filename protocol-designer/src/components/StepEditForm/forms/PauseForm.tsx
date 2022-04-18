@@ -23,13 +23,29 @@ import styles from '../StepEditForm.css'
 import { StepFormProps } from '../types'
 
 export const PauseForm = (props: StepFormProps): JSX.Element => {
-  const moduleLabwareOptions = useSelector(
+  const tempModuleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
   )
+
+  const heaterShakerModuleLabwareOptions = useSelector(
+    uiModuleSelectors.getHeaterShakerLabwareOptions
+  )
+
+  const moduleLabwareOptions = [
+    ...tempModuleLabwareOptions,
+    ...heaterShakerModuleLabwareOptions,
+  ]
 
   const pauseUntilTempEnabled = useSelector(
     uiModuleSelectors.getTempModuleIsOnDeck
   )
+
+  const pauseUntilHeaterShakerEnabled = useSelector(
+    uiModuleSelectors.getHeaterShakerModuleIsOnDeck
+  )
+
+  const pauseUntilModuleEnabled =
+    pauseUntilTempEnabled || pauseUntilHeaterShakerEnabled
 
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_BOTTOM,
@@ -95,7 +111,7 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
             </div>
           )}
 
-          {pauseUntilTempEnabled ? null : (
+          {pauseUntilModuleEnabled ? null : (
             <Tooltip {...tooltipProps}>
               {getSingleSelectDisabledTooltip('wait_until_temp', 'pauseAction')}
             </Tooltip>
@@ -105,7 +121,7 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
               <RadioGroupField
                 {...propsForFields.pauseAction}
                 className={cx({
-                  [styles.disabled]: !pauseUntilTempEnabled,
+                  [styles.disabled]: !pauseUntilModuleEnabled,
                 })}
                 options={[
                   {

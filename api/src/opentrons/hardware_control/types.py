@@ -116,7 +116,7 @@ class OT3Axis(enum.Enum):
     Z_G = 4  # gripper mount Z
     P_L = 5  # left pipette plunger
     P_R = 6  # right pipette plunger
-    Q = 7  # hi-thruput pipette tiprack grab
+    Q = 7  # hi-throughput pipette tiprack grab
     G = 8  # gripper grab
 
     @classmethod
@@ -227,6 +227,23 @@ class OT3Axis(enum.Enum):
         return self.name
 
 
+class OT3SubSystem(enum.Enum):
+    """An enumeration of ot3 components.
+
+    This is a complete list of unique firmware nodes in the ot3.
+    """
+
+    gantry_x = 0
+    gantry_y = 1
+    head = 2
+    pipette_left = 3
+    pipette_right = 4
+    gripper = 5
+
+    def __str__(self) -> str:
+        return self.name
+
+
 BCAxes = Union[Axis, OT3Axis]
 AxisMapValue = TypeVar("AxisMapValue")
 OT3AxisMap = Dict[OT3Axis, AxisMapValue]
@@ -238,7 +255,7 @@ class CurrentConfig:
     run_current: float
 
     def as_tuple(self) -> Tuple[float, float]:
-        return (self.hold_current, self.run_current)
+        return self.hold_current, self.run_current
 
 
 class DoorState(enum.Enum):

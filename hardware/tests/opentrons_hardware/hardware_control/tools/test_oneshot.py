@@ -67,9 +67,7 @@ async def test_suppresses_undefined(
     # them
     assert await mock_messenger.send.called_once_with(
         node_id=NodeId.head,
-        message=message_definitions.AttachedToolsRequest(
-            payload=payloads.EmptyPayload()
-        ),
+        message=message_definitions.AttachedToolsRequest(),
     )
 
 
@@ -175,15 +173,11 @@ async def test_sends_only_required_followups(
     assert mock_messenger.send.mock_calls == [
         call(
             node_id=NodeId.head,
-            message=message_definitions.AttachedToolsRequest(
-                payload=payloads.EmptyPayload()
-            ),
+            message=message_definitions.AttachedToolsRequest(),
         ),
         call(
             node_id=NodeId.broadcast,
-            message=message_definitions.PipetteInfoRequest(
-                payload=payloads.EmptyPayload()
-            ),
+            message=message_definitions.PipetteInfoRequest(),
         ),
     ]
 
@@ -269,9 +263,7 @@ async def test_sends_all_required_followups(
         ),
         call(
             node_id=NodeId.broadcast,
-            message=message_definitions.PipetteInfoRequest(
-                payload=payloads.EmptyPayload()
-            ),
+            message=message_definitions.PipetteInfoRequest(),
         ),
     ]
 

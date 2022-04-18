@@ -15,11 +15,19 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  DIRECTION_COLUMN,
+  BORDER_STYLE_SOLID,
+  BORDERS,
 } from '@opentrons/components'
 import * as Config from '../../redux/config'
 import * as Calibration from '../../redux/calibration'
 import * as CustomLabware from '../../redux/custom-labware'
 import { clearDiscoveryCache } from '../../redux/discovery'
+import {
+  getU2EAdapterDevice,
+  getU2EWindowsDriverStatus,
+  OUTDATED,
+} from '../../redux/system-info'
 import { Divider } from '../../atoms/structure'
 import { TertiaryButton, ToggleButton } from '../../atoms/Buttons'
 import { StyledText } from '../../atoms/text'
@@ -30,6 +38,7 @@ import type { DropdownOption } from '@opentrons/components'
 const ALWAYS_BLOCK: 'always-block' = 'always-block'
 const ALWAYS_TRASH: 'always-trash' = 'always-trash'
 const ALWAYS_PROMPT: 'always-prompt' = 'always-prompt'
+const REALTEK_URL = 'https://www.realtek.com/en/'
 
 type BlockSelection =
   | typeof ALWAYS_BLOCK
@@ -65,6 +74,13 @@ export function AdvancedSettings(): JSX.Element {
         break
     }
   }
+
+  const device = useSelector(getU2EAdapterDevice)
+  const driverOutdated = useSelector((state: State) => {
+    const status = getU2EWindowsDriverStatus(state)
+    return status === OUTDATED
+  })
+
   const toggleLabwareOffsetData = (): unknown =>
     dispatch(
       Config.updateConfigValue(
@@ -221,6 +237,100 @@ export function AdvancedSettings(): JSX.Element {
             }
             id="AdvancedSettings_unavailableRobotsToggleButton"
           />
+        </Flex>
+        <Divider marginY={SPACING.spacing5} />
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Box>
+            <StyledText
+              as="h3"
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
+              id="AdvancedSettings_u2eInformation"
+            >
+              {t('usb_to_ethernet_adapter_info')}
+            </StyledText>
+            <StyledText as="p">
+              {t('usb_to_ethernet_adapter_info_description')}
+            </StyledText>
+            {driverOutdated && (
+              <Flex
+                backgroundColor={COLORS.warningBg}
+                paddingTop={SPACING.spacing3}
+                paddingBottom={SPACING.spacing3}
+                marginTop={SPACING.spacing4}
+                borderColor={COLORS.warning}
+                border={BORDER_STYLE_SOLID}
+                borderRadius={BORDERS.radiusSoftCorners}
+              >
+                <Flex flexDirection="row">
+                  <Icon
+                    name="alert-circle"
+                    color={COLORS.warning}
+                    width={SPACING.spacing4}
+                    marginLeft={SPACING.spacing3}
+                    marginRight={SPACING.spacing3}
+                  />
+                  <StyledText as="p" color={COLORS.darkBlack}>
+                    {t('usb_to_ethernet_adapter_toast_message')}
+                  </StyledText>
+                  <Link
+                    external
+                    href={REALTEK_URL}
+                    css={TYPOGRAPHY.pRegular}
+                    color={COLORS.darkBlack}
+                    position="absolute"
+                    right={SPACING.spacingXL}
+                    textDecoration="underline"
+                    id="AdvancedSettings_realtekLink"
+                  >
+                    {t('usb_to_ethernet_adapter_link')}
+                  </Link>
+                </Flex>
+              </Flex>
+            )}
+            {device === null ? (
+              <StyledText as="p" marginTop={SPACING.spacing4}>
+                {t('usb_to_ethernet_not_connected')}
+              </StyledText>
+            ) : (
+              <Flex
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+                marginTop={SPACING.spacing4}
+              >
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  paddingRight={SPACING.spacing4}
+                >
+                  <StyledText css={TYPOGRAPHY.pSemiBold}>
+                    {t('usb_to_ethernet_adapter_description')}
+                  </StyledText>
+                  <StyledText as="p">{device?.deviceName}</StyledText>
+                </Flex>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  paddingRight={SPACING.spacing4}
+                >
+                  <StyledText css={TYPOGRAPHY.pSemiBold}>
+                    {t('usb_to_ethernet_adapter_manufacturer')}
+                  </StyledText>
+                  <StyledText as="p">{device?.manufacturer}</StyledText>
+                </Flex>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  paddingRight={SPACING.spacing4}
+                >
+                  <StyledText css={TYPOGRAPHY.pSemiBold}>
+                    {t('usb_to_ethernet_adapter_driver_version')}
+                  </StyledText>
+                  <StyledText as="p">
+                    {device?.windowsDriverVersion
+                      ? device.windowsDriverVersion
+                      : t('usb_to_ethernet_adapter_no_driver_version')}
+                  </StyledText>
+                </Flex>
+              </Flex>
+            )}
+          </Box>
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>

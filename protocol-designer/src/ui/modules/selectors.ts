@@ -146,3 +146,14 @@ export const getTempModuleIsOnDeck: Selector<boolean> = createSelector(
     return Boolean(tempOnDeck)
   }
 )
+
+export const getHeaterShakerModuleIsOnDeck: Selector<boolean> = createSelector(
+  getInitialDeckSetup,
+  initialDeckSetup => {
+    const heaterShakerOnDeck = getModuleOnDeckByType(
+      initialDeckSetup,
+      HEATERSHAKER_MODULE_TYPE
+    )
+    return Boolean(heaterShakerOnDeck)
+  }
+)

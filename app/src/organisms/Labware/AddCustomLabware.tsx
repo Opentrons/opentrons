@@ -34,7 +34,6 @@ export function AddCustomLabware(props: AddCustomLabwareProps): JSX.Element {
       title={t('import_custom_def')}
       onCloseClick={props.onCloseClick}
       isExpanded={props.isExpanded}
-      height="100%"
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { LabwareCard } from '../LabwareCard'
-import { useGetAllLabware } from '../hooks'
+import { useAllLabware } from '../hooks'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
 
 jest.mock('../hooks')
@@ -15,8 +15,8 @@ jest.mock('@opentrons/components', () => {
   }
 })
 
-const mockUseGetAllLabware = useGetAllLabware as jest.MockedFunction<
-  typeof useGetAllLabware
+const mockUseAllLabware = useAllLabware as jest.MockedFunction<
+  typeof useAllLabware
 >
 const render = (props: React.ComponentProps<typeof LabwareCard>) => {
   return renderWithProviders(<LabwareCard {...props} />, {
@@ -27,7 +27,7 @@ const render = (props: React.ComponentProps<typeof LabwareCard>) => {
 describe('LabwareCard', () => {
   let props: React.ComponentProps<typeof LabwareCard>
   beforeEach(() => {
-    mockUseGetAllLabware.mockReturnValue([{ definition: mockDefinition }])
+    mockUseAllLabware.mockReturnValue([{ definition: mockDefinition }])
     props = {
       labware: {
         definition: mockDefinition,
@@ -46,7 +46,7 @@ describe('LabwareCard', () => {
     getByRole('button', { name: 'mock_definition' })
   })
 
-  it('renders additonal info for custom labware card', () => {
+  it('renders additional info for custom labware card', () => {
     props.labware.modified = 123
     props.labware.filename = 'mock/filename'
     const [{ getByText }] = render(props)

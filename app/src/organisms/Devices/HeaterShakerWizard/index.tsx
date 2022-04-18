@@ -5,6 +5,7 @@ import { Portal } from '../../../App/portal'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
 import { HEATERSHAKER_MODULE_TYPE } from '../../../redux/modules'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/Buttons'
+import { useAttachedModules } from '../hooks'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
 import { AttachModule } from './AttachModule'
@@ -20,32 +21,53 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import type { NextGenRouteParams } from '../../../App/NextGenApp'
+import type { NextGenRouteParams } from '../../../App/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import { useAttachedModules } from '../hooks'
+import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
+import type { ThermalAdapterName } from '@opentrons/shared-data'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
-  hasProtocol?: boolean
+  moduleFromProtocol?: ProtocolModuleInfo
 }
 
 export const HeaterShakerWizard = (
   props: HeaterShakerWizardProps
 ): JSX.Element | null => {
-  const { onCloseClick, hasProtocol } = props
+  const { onCloseClick, moduleFromProtocol } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
   const { robotName } = useParams<NextGenRouteParams>()
   const attachedModules = useAttachedModules(robotName)
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const heaterShaker =
+    attachedModules.find(
+      (module): module is HeaterShakerModule =>
+        module.type === HEATERSHAKER_MODULE_TYPE
+    ) ?? null
 
-  const heaterShaker = (attachedModules.find(
-    module => module.type === HEATERSHAKER_MODULE_TYPE
-  ) as unknown) as HeaterShakerModule
   let isPrimaryCTAEnabled: boolean = true
 
   if (currentPage === 4) {
     isPrimaryCTAEnabled = Boolean(heaterShaker)
+  }
+  const labwareDef =
+    moduleFromProtocol != null ? moduleFromProtocol.nestedLabwareDef : null
+
+  let adapterName: ThermalAdapterName | null = null
+  if (
+    labwareDef != null &&
+    labwareDef.parameters.loadName.includes('adapter')
+  ) {
+    if (labwareDef.parameters.loadName.includes('pcr')) {
+      adapterName = 'PCR Adapter'
+    } else if (labwareDef.parameters.loadName.includes('deepwell')) {
+      adapterName = 'Deep Well Adapter'
+    } else if (labwareDef.parameters.loadName.includes('96flatbottom')) {
+      adapterName = '96 Flat Bottom Adapter'
+    }
+  } else if (labwareDef != null) {
+    adapterName = 'Universal Flat Adapter'
   }
 
   let buttonContent = null
@@ -55,8 +77,8 @@ export const HeaterShakerWizard = (
         buttonContent = t('btn_continue_attachment_guide')
         return (
           <Introduction
-          //  TODO(jr, 2022-02-16): get labwareDefinition2 of labware on top of heater shaker (nestedLabwareDef from moduleRenderInfoById)
-          //  TODO(jr, 2022-02-16): get adapter name and image - would this be connected to nestedLabwareDefinition?
+            labwareDefinition={labwareDef}
+            thermalAdapterName={adapterName}
           />
         )
       case 1:
@@ -64,7 +86,7 @@ export const HeaterShakerWizard = (
         return <KeyParts />
       case 2:
         buttonContent = t('btn_thermal_adapter')
-        return <AttachModule slotName={'1'} />
+        return <AttachModule moduleFromProtocol={moduleFromProtocol} />
       case 3:
         buttonContent = t('btn_power_module')
         return <AttachAdapter />
@@ -74,11 +96,14 @@ export const HeaterShakerWizard = (
       case 5:
         buttonContent = t('complete')
         return (
-          <TestShake
-            module={heaterShaker}
-            setCurrentPage={setCurrentPage}
-            hasProtocol={hasProtocol}
-          />
+          // heaterShaker should never be null because isPrimaryCTAEnabled would be disabled otherwise
+          heaterShaker != null ? (
+            <TestShake
+              module={heaterShaker}
+              setCurrentPage={setCurrentPage}
+              moduleFromProtocol={moduleFromProtocol}
+            />
+          ) : null
         )
       default:
         return null

@@ -312,7 +312,7 @@ describe('ModuleSetup', () => {
 
     const { getByText, getByRole } = render(props)
     getByText('mock module info magneticModuleV2')
-    const button = getByRole('button', { name: 'Proceed to Labware Setup' })
+    const button = getByRole('button', { name: 'Proceed to labware setup' })
     expect(button).toHaveAttribute('disabled')
   })
 
@@ -383,7 +383,7 @@ describe('ModuleSetup', () => {
 
     const { getByText, getByRole } = render(props)
     getByText('mock module info magneticModuleV2')
-    const button = getByRole('button', { name: 'Proceed to Labware Setup' })
+    const button = getByRole('button', { name: 'Proceed to labware setup' })
     expect(button).not.toBeDisabled()
   })
   it('renders Moam with the correct module in the correct slot', () => {
@@ -460,7 +460,7 @@ describe('ModuleSetup', () => {
 
     const { getByText, getByRole } = render(props)
     getByText('mock module info magneticModuleV2')
-    const button = getByRole('button', { name: 'Proceed to Labware Setup' })
+    const button = getByRole('button', { name: 'Proceed to labware setup' })
     expect(button).not.toBeDisabled()
   })
   it.todo('renders heater shaker banner correctly')

@@ -26,11 +26,11 @@ from .protocol_analyzer import ProtocolAnalyzer
 from .analysis_store import AnalysisStore
 from .protocol_store import ProtocolStore, ProtocolResource, ProtocolNotFoundError
 from .dependencies import (
-    get_protocol_directory,
     get_protocol_reader,
     get_protocol_store,
     get_analysis_store,
     get_protocol_analyzer,
+    get_protocol_directory,
 )
 
 
@@ -104,7 +104,7 @@ async def create_protocol(
         created_at: Timestamp to attach to the new resource.
     """
     try:
-        source = await protocol_reader.read(
+        source = await protocol_reader.read_and_save(
             files=files,
             directory=protocol_directory / protocol_id,
         )

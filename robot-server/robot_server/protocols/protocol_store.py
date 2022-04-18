@@ -11,6 +11,7 @@ from typing import Dict, List, Optional
 import sqlalchemy
 
 from opentrons.protocol_reader import ProtocolSource
+from robot_server.persistence import protocol_table
 
 
 _log = getLogger(__name__)
@@ -53,7 +54,7 @@ class ProtocolStore:
 
     def insert(self, resource: ProtocolResource) -> None:
         """Insert a protocol resource into the store."""
-        statement = sqlalchemy.insert(_protocol_table).values(
+        statement = sqlalchemy.insert(protocol_table).values(
             _convert_resource_to_sql_values(resource=resource)
         )
         with self._sql_engine.begin() as transaction:
@@ -61,8 +62,8 @@ class ProtocolStore:
 
     def get(self, protocol_id: str) -> ProtocolResource:
         """Get a single protocol by ID."""
-        statement = sqlalchemy.select(_protocol_table).where(
-            _protocol_table.c.id == protocol_id
+        statement = sqlalchemy.select(protocol_table).where(
+            protocol_table.c.id == protocol_id
         )
         with self._sql_engine.begin() as transaction:
             try:
@@ -73,7 +74,7 @@ class ProtocolStore:
 
     def get_all(self) -> List[ProtocolResource]:
         """Get all protocols currently saved in this store."""
-        statement = sqlalchemy.select(_protocol_table)
+        statement = sqlalchemy.select(protocol_table)
         with self._sql_engine.begin() as transaction:
             all_rows = transaction.execute(statement).all()
         return [_convert_sql_row_to_resource(sql_row=row) for row in all_rows]
@@ -88,11 +89,11 @@ class ProtocolStore:
             The `ProtocolResource` as it appeared just before removing it.
             Note that the files it refers to will no longer exist.
         """
-        select_statement = sqlalchemy.select(_protocol_table).where(
-            _protocol_table.c.id == protocol_id
+        select_statement = sqlalchemy.select(protocol_table).where(
+            protocol_table.c.id == protocol_id
         )
-        delete_statement = sqlalchemy.delete(_protocol_table).where(
-            _protocol_table.c.id == protocol_id
+        delete_statement = sqlalchemy.delete(protocol_table).where(
+            protocol_table.c.id == protocol_id
         )
         with self._sql_engine.begin() as transaction:
             try:
@@ -113,41 +114,6 @@ class ProtocolStore:
             protocol_dir.rmdir()
 
         return deleted_resource
-
-
-def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
-    """Create the necessary database tables to back a `ProtocolStore`.
-
-    Params:
-        sql_engine: An engine for a blank SQL database, to put the tables in.
-    """
-    _metadata.create_all(sql_engine)
-
-
-_metadata = sqlalchemy.MetaData()
-_protocol_table = sqlalchemy.Table(
-    "protocol",
-    _metadata,
-    sqlalchemy.Column(
-        "id",
-        sqlalchemy.String,
-        primary_key=True,
-    ),
-    sqlalchemy.Column(
-        "created_at",
-        sqlalchemy.DateTime,
-        nullable=False,
-    ),
-    # TODO(mm, 2022-03-29):
-    # Storing pickled Python objects, especially of an internal class,
-    # will cause migration and compatibility problems.
-    sqlalchemy.Column(
-        "source",
-        sqlalchemy.PickleType,
-        nullable=False,
-    ),
-    sqlalchemy.Column("protocol_key", sqlalchemy.String, nullable=True),
-)
 
 
 def _convert_sql_row_to_resource(sql_row: sqlalchemy.engine.Row) -> ProtocolResource:

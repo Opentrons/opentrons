@@ -1,4 +1,5 @@
 import pytest
+from pathlib import Path
 from unittest.mock import MagicMock
 
 from opentrons.calibration_storage import get, file_operators as io, migration
@@ -47,21 +48,21 @@ NEW_FORMAT = {
 
 
 @pytest.fixture
-def setup(labware_offset_tempdir):
+def setup(labware_offset_tempdir: Path) -> Path:
     offset_dir = labware_offset_tempdir
     index_path = offset_dir / "index.json"
     io.save_to_file(index_path, OLD_FORMAT)
     return index_path
 
 
-def test_migrate_index_file(setup):
+def test_migrate_index_file(setup: Path) -> None:
     index_path = setup
     migration.migrate_index_0_to_1(index_path)
     data = io.read_cal_file(index_path)
     assert data == NEW_FORMAT
 
 
-def test_migration_called(setup):
+def test_migration_called(setup: Path) -> None:
     migration.migrate_index_0_to_1 = MagicMock()
     get.get_all_calibrations()
     assert migration.migrate_index_0_to_1.called

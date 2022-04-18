@@ -1,5 +1,6 @@
 import last from 'lodash/last'
 import {
+  HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -150,6 +151,34 @@ const _patchTemperatureModuleId = (args: {
   return null
 }
 
+const _patchHeaterShakerModuleId = (args: {
+  initialDeckSetup: InitialDeckSetup
+  orderedStepIds: OrderedStepIdsState
+  savedStepForms: SavedStepFormState
+  stepType: StepType
+}): FormUpdater => () => {
+  const { initialDeckSetup, stepType } = args
+  const hasHeaterShakerModuleId =
+    stepType === 'pause' || stepType === 'heaterShaker'
+
+  // Auto-populate moduleId field of 'pause' and 'heaterShaker' steps.
+  // Note, if both a temperature module and a heater shaker module are present, the pause form
+  // will default to use the heater shaker
+  // Bypass dependent field changes, do not use handleFormChange
+  if (hasHeaterShakerModuleId) {
+    const moduleId =
+      getModuleOnDeckByType(initialDeckSetup, HEATERSHAKER_MODULE_TYPE)?.id ??
+      null
+    if (moduleId != null) {
+      return {
+        moduleId,
+      }
+    }
+  }
+
+  return null
+}
+
 const _patchThermocyclerFields = (args: {
   initialDeckSetup: InitialDeckSetup
   stepType: StepType
@@ -222,6 +251,13 @@ export const createPresavedStepForm = ({
     stepType,
   })
 
+  const updateHeaterShakerModuleId = _patchHeaterShakerModuleId({
+    initialDeckSetup,
+    orderedStepIds,
+    savedStepForms,
+    stepType,
+  })
+
   const updateThermocyclerFields = _patchThermocyclerFields({
     initialDeckSetup,
     stepType,
@@ -234,6 +270,7 @@ export const createPresavedStepForm = ({
     updateDefaultPipette,
     updateTemperatureModuleId,
     updateThermocyclerFields,
+    updateHeaterShakerModuleId,
     updateMagneticModuleId,
   ].reduce<FormData>(
     (acc, updater: FormUpdater) => {

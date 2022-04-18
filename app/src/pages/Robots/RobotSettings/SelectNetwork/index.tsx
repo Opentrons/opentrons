@@ -56,10 +56,10 @@ export const SelectNetwork = ({
   //   return lastId != null ? RobotApi.getRequestById(state, lastId) : null
   // })
 
-  const activeNetwork = list.find(nw => nw.active)
+  const activeNetwork = list?.find(nw => nw.active)
 
   const handleDisconnect = (): void => {
-    if (activeNetwork) {
+    if (activeNetwork != null) {
       dispatchApi(Networking.postWifiDisconnect(robotName, activeNetwork.ssid))
     }
   }

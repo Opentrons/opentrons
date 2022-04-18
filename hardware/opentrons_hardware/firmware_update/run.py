@@ -1,8 +1,9 @@
 """Complete FW updater."""
 import logging
-from typing import Optional
+from typing import Optional, TextIO
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
+from opentrons_hardware.firmware_bindings import NodeId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     FirmwareUpdateStartApp,
 )
@@ -11,17 +12,16 @@ from opentrons_hardware.firmware_update import (
     FirmwareUpdateDownloader,
     FirmwareUpdateEraser,
     HexRecordProcessor,
-    Target,
 )
-
+from opentrons_hardware.firmware_update.target import Target
 
 logger = logging.getLogger(__name__)
 
 
 async def run_update(
     messenger: CanMessenger,
-    target: Target,
-    hex_processor: HexRecordProcessor,
+    node_id: NodeId,
+    hex_file: TextIO,
     retry_count: int,
     timeout_seconds: float,
     erase: Optional[bool] = True,
@@ -29,9 +29,9 @@ async def run_update(
     """Perform a firmware update on a node target.
 
     Args:
-        messenger: The can messenger to use
-        target: The node being updated
-        hex_processor: The producer of
+        messenger: The can messenger to use.
+        node_id: The node being updated.
+        hex_file: File containing firmware.
         retry_count: Number of times to retry.
         timeout_seconds: How much to wait for responses.
         erase: Whether to erase flash before updating.
@@ -39,8 +39,12 @@ async def run_update(
     Returns:
         None
     """
+    hex_processor = HexRecordProcessor.from_file(hex_file)
+
     initiator = FirmwareUpdateInitiator(messenger)
     downloader = FirmwareUpdateDownloader(messenger)
+
+    target = Target(system_node=node_id)
 
     logger.info(f"Initiating FW Update on {target}.")
 

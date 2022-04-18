@@ -3,6 +3,7 @@ import last from 'lodash/last'
 import {
   getUnsavedForm,
   getUnsavedFormIsPristineSetTempForm,
+  getUnsavedFormIsPristineHeaterShakerForm,
   getOrderedStepIds,
 } from '../../../../step-forms/selectors'
 import { changeFormInput } from '../../../../steplist/actions/actions'
@@ -218,6 +219,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
   }
 
   const temperature = unsavedSetTemperatureForm?.targetTemperature
+
   assert(
     temperature != null && temperature !== '',
     `tried to auto-add a pause until temp, but targetTemperature is missing: ${temperature}`
@@ -251,6 +253,79 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
   const unsavedPauseForm = getUnsavedForm(getState())
 
   // this conditional is for Flow, the unsaved form should always exist
+  if (unsavedPauseForm != null) {
+    dispatch(_saveStepForm(unsavedPauseForm))
+  } else {
+    assert(false, 'could not auto-save pause form, getUnsavedForm returned')
+  }
+}
+
+export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any> = () => (
+  dispatch,
+  getState
+) => {
+  const initialState = getState()
+  const unsavedHeaterShakerForm = getUnsavedForm(initialState)
+  const isPristineSetHeaterShakerTempForm = getUnsavedFormIsPristineHeaterShakerForm(
+    initialState
+  )
+
+  if (!unsavedHeaterShakerForm) {
+    assert(
+      false,
+      'Tried to saveSetHeaterShakerTempFormWithAddedPauseUntilTemp with falsey unsavedForm. This should never be able to happen.'
+    )
+    return
+  }
+
+  const { id } = unsavedHeaterShakerForm
+
+  if (!isPristineSetHeaterShakerTempForm) {
+    assert(
+      false,
+      `tried to saveSetHeaterShakerTempFormWithAddedPauseUntilTemp but form ${id} is not a pristine set heater shaker temp form`
+    )
+    return
+  }
+
+  const temperature = unsavedHeaterShakerForm?.targetHeaterShakerTemperature
+
+  assert(
+    temperature != null && temperature !== '',
+    `tried to auto-add a pause until temp, but targetHeaterShakerTemperature is missing: ${temperature}`
+  )
+  dispatch(_saveStepForm(unsavedHeaterShakerForm))
+  dispatch(
+    addStep({
+      stepType: 'pause',
+      robotStateTimeline: fileDataSelectors.getRobotStateTimeline(getState()),
+    })
+  )
+  dispatch(
+    changeFormInput({
+      update: {
+        pauseAction: PAUSE_UNTIL_TEMP,
+      },
+    })
+  )
+  const heaterShakerModuleId = unsavedHeaterShakerForm.moduleId
+  dispatch(
+    changeFormInput({
+      update: {
+        moduleId: heaterShakerModuleId,
+      },
+    })
+  )
+
+  dispatch(
+    changeFormInput({
+      update: {
+        pauseTemperature: temperature,
+      },
+    })
+  )
+  const unsavedPauseForm = getUnsavedForm(getState())
+
   if (unsavedPauseForm != null) {
     dispatch(_saveStepForm(unsavedPauseForm))
   } else {

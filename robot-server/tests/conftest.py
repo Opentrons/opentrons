@@ -141,8 +141,11 @@ def run_server(
             "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev.env",
             "OT_API_CONFIG_DIR": server_temp_directory,
         },
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stdin=subprocess.DEVNULL,
+        # The server will log to its stdout or stderr.
+        # Let it inherit our stdout and stderr so pytest captures its logs.
+        stdout=None,
+        stderr=None,
     ) as proc:
         # Wait for a bit to get started by polling /health
         from requests.exceptions import ConnectionError
