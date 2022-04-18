@@ -256,7 +256,7 @@ describe('ModuleCard', () => {
     })
     getByText(nestedTextMatcher('Module is hot to the touch'))
   })
-  it('renders information for a magnetic module when an update is available so update banner renders then toast renders when successful', async () => {
+  it('renders information for a magnetic module when an update is available so update banner renders', () => {
     const { getByText } = render({
       module: mockMagneticModuleHub,
       robotName: mockRobot.name,
@@ -265,8 +265,6 @@ describe('ModuleCard', () => {
     const button = getByText('Update now')
     fireEvent.click(button)
     expect(mockGetRequestById).toHaveBeenCalled()
-    await new Promise(resolve => setTimeout(resolve, 5000))
-    expect(getByText('mock toast')).toBeVisible()
   })
   it('renders information for update available and it fails rendering the fail modal', () => {
     mockGetRequestById.mockReturnValue({
