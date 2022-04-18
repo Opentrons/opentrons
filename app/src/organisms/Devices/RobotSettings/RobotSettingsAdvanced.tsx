@@ -53,14 +53,12 @@ export function RobotSettingsAdvanced({
   const settings = useSelector<State, RobotSettings>((state: State) =>
     getRobotSettings(state, robotName)
   )
+  const connected = robot?.connected != null && robot.connected
 
-  const [isRobotConnected, setIsRobotConnected] = React.useState<boolean>()
+  const [isRobotConnected, setIsRobotConnected] = React.useState<boolean>(
+    connected
+  )
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
-
-  // ToDo add this to GitHub PR
-  // check the connection here because FactoryResetSlideout return back to the resetOptions
-  // when a user clicks 'Clear data and restart robot'
-  // const connected = robot?.connected != null && robot.connected
 
   const findSettings = (id: string): RobotSettingsField | undefined =>
     settings.find(s => s.id === id)
@@ -77,12 +75,12 @@ export function RobotSettingsAdvanced({
   }
 
   const updateResetStatus = (
-    connected: boolean,
+    isConnected: boolean,
     options?: ResetConfigRequest
   ): void => {
     if (connected && options != null) setResetOptions(options)
     setShowFactoryResetModal(true)
-    setIsRobotConnected(connected ?? false)
+    setIsRobotConnected(isConnected ?? false)
   }
 
   return (
@@ -108,7 +106,7 @@ export function RobotSettingsAdvanced({
             closeModal={() => setShowFactoryResetModal(false)}
             isRobotConnected={isRobotConnected}
             robotName={robotName}
-            resetOptions={resetOptions} // ToDo pass resetOptions from the slideout
+            resetOptions={resetOptions}
           />
         )}
         <AboutRobotName
