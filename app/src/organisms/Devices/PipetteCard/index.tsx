@@ -15,6 +15,7 @@ import {
   COLORS,
   useOnClickOutside,
   InstrumentDiagram,
+  BORDERS,
 } from '@opentrons/components'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { StyledText } from '../../../atoms/text'
@@ -41,17 +42,13 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   return (
     <Flex
       backgroundColor={COLORS.background}
-      borderRadius={SPACING.spacing2}
+      borderRadius={BORDERS.radiusSoftCorners}
       marginBottom={SPACING.spacing3}
-      marginLeft={SPACING.spacing2}
-      marginRight={SPACING.spacing2}
+      marginX={SPACING.spacing2}
       width={'100%'}
       data-testid={`PipetteCard_${pipetteName}`}
     >
-      <Box
-        padding={`${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing3}`}
-        width="100%"
-      >
+      <Box padding={`${SPACING.spacing4} ${SPACING.spacing3}`} width="100%">
         <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
           <Flex alignItems={ALIGN_START}>
             {pipetteInfo === null ? null : (
