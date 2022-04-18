@@ -15,6 +15,6 @@ export const INITIAL_ARROW_STYLE = {
 
 export const TOOLTIP_OFFSET_PX = 8
 
-export const ARROW_OFFSET_PX = 2
+export const ARROW_OFFSET_PX = 4
 
 export const ARROW_SIZE_PX = TOOLTIP_OFFSET_PX - ARROW_OFFSET_PX

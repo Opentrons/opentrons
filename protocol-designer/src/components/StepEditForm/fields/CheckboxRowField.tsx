@@ -8,12 +8,14 @@ import {
 import cx from 'classnames'
 import styles from '../StepEditForm.css'
 import { FieldProps } from '../types'
+import type { Placement } from '@opentrons/components'
 
 type CheckboxRowProps = FieldProps & {
   children?: React.ReactNode
   className?: string
   label?: string
   tooltipContent?: React.ReactNode
+  tooltipPlacement?: Placement
 }
 
 export const CheckboxRowField = (props: CheckboxRowProps): JSX.Element => {
@@ -27,15 +29,16 @@ export const CheckboxRowField = (props: CheckboxRowProps): JSX.Element => {
     tooltipContent,
     updateValue,
     value,
+    tooltipPlacement = TOOLTIP_TOP,
   } = props
 
   const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: TOOLTIP_TOP,
+    placement: tooltipPlacement,
   })
 
   return (
     <>
-      <Tooltip maxWidth="18rem" lineHeight="1.5" {...tooltipProps}>
+      <Tooltip lineHeight="1.5" {...tooltipProps}>
         {tooltipContent}
       </Tooltip>
       <div className={styles.checkbox_row}>

@@ -57,7 +57,7 @@ setup:
 
 .PHONY: clean
 clean:
-	shx rm -rf lib dist
+	shx rm -rf lib dist python
 
 # artifacts
 #####################################################################

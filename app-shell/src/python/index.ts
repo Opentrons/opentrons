@@ -8,41 +8,36 @@ import { getConfig } from '../config'
 
 const log = createLogger('python')
 
-function findPython(): string | undefined {
+let pythonPath: string | null = null
+
+export function initializePython(): void {
   const pathToPythonOverride: string | null = getConfig('python')
     .pathToPythonOverride
 
-  let possiblePythonPaths = [
-    path.join(process.resourcesPath ?? './', 'python'),
+  let pythonCandidates = [
+    // Linux + macOS
     path.join(process.resourcesPath ?? './', 'python', 'bin', 'python3'),
+    // Windows
+    path.join(process.resourcesPath ?? './', 'python'),
   ]
 
   if (pathToPythonOverride != null) {
-    possiblePythonPaths = [
+    pythonCandidates = [
       pathToPythonOverride,
+      // Linux + macOS
       path.join(pathToPythonOverride, 'bin/python3'),
-      ...possiblePythonPaths,
+      // Windows
+      path.join(pathToPythonOverride, 'python'),
+      ...pythonCandidates,
     ]
   }
 
-  if (process.env.NODE_ENV !== 'production') {
-    possiblePythonPaths = [
-      ...possiblePythonPaths,
-      path.join(__dirname, '../python/bin/python3'),
-    ]
-  }
+  pythonPath = pythonCandidates.filter(testPythonPath)[0] ?? null
 
-  for (const path of possiblePythonPaths) {
-    try {
-      fs.accessSync(path, fs.constants.X_OK)
-      const stats = fs.statSync(path)
-      if (stats.isFile()) {
-        log.debug('Python candidate selected', { path })
-        return path
-      }
-    } catch (error) {
-      log.debug('Python candidate not executable, skipping', { path, error })
-    }
+  if (pythonPath != null)
+    log.info('Python environment selected', { pythonPath })
+  else {
+    log.error('No valid Python environment found')
   }
 }
 
@@ -50,38 +45,56 @@ export function analyzeProtocolSource(
   srcFilePath: string,
   destFilePath: string
 ): Promise<void> {
-  const pythonPath = findPython()
-
-  if (pythonPath != null) {
-    return execa(pythonPath, [
-      '-m',
-      'opentrons.cli',
-      'analyze',
-      '--json',
-      srcFilePath,
-    ])
-      .then(output => {
-        log.debug('python output: ', output)
-        fs.writeFile(destFilePath, output.stdout)
-      })
-      .catch((e: Error) => {
-        log.error(e)
-        fs.writeJSON(destFilePath, {
-          errors: [
-            {
-              id: uuid(),
-              errorType: 'AnalysisError',
-              createdAt: new Date().getTime(),
-              detail: e.message,
-            },
-          ],
-          files: [],
-          config: {},
-          metadata: [],
-          commands: [],
-        })
-      })
-  } else {
-    return Promise.reject(new Error('Python interpreter could not be found'))
+  if (pythonPath === null) {
+    return Promise.reject(
+      new Error('No Python interpreter set, was `initializePython` called?')
+    )
   }
+
+  return execa(pythonPath, [
+    '-m',
+    'opentrons.cli',
+    'analyze',
+    '--json',
+    srcFilePath,
+  ])
+    .then(output => {
+      log.debug('python output: ', output)
+      fs.writeFile(destFilePath, output.stdout)
+    })
+    .catch(e => {
+      log.error(e)
+      fs.writeJSON(destFilePath, {
+        errors: [
+          {
+            id: uuid(),
+            errorType: 'AnalysisError',
+            createdAt: new Date().getTime(),
+            detail: e.message,
+          },
+        ],
+        files: [],
+        config: {},
+        metadata: [],
+        commands: [],
+      })
+    })
+}
+
+function testPythonPath(candidatePath: string): boolean {
+  try {
+    fs.accessSync(candidatePath, fs.constants.X_OK)
+    const stats = fs.statSync(candidatePath)
+
+    if (stats.isFile()) {
+      return true
+    }
+  } catch (error) {
+    log.debug('Python candidate not executable, skipping', {
+      candidatePath,
+      error,
+    })
+  }
+
+  return false
 }

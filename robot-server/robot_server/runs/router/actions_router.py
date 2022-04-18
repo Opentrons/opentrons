@@ -14,7 +14,6 @@ from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResp
 from robot_server.service.task_runner import TaskRunner
 
 from ..run_store import RunStore, RunNotFoundError
-from ..run_view import RunView
 from ..action_models import RunAction, RunActionType, RunActionCreate
 from ..engine_store import EngineStore
 from ..dependencies import get_run_store, get_engine_store
@@ -48,7 +47,6 @@ class RunActionNotAllowed(ErrorDetails):
 async def create_run_action(
     runId: str,
     request_body: RequestModel[RunActionCreate],
-    run_view: RunView = Depends(RunView),
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
     action_id: str = Depends(get_unique_id),
@@ -60,7 +58,6 @@ async def create_run_action(
     Arguments:
         runId: Run ID pulled from the URL.
         request_body: Input payload from the request body.
-        run_view: Resource model builder.
         run_store: Run storage interface.
         engine_store: Protocol engine and runner storage.
         action_id: Generated ID to assign to the control action.
@@ -77,11 +74,10 @@ async def create_run_action(
             status.HTTP_409_CONFLICT
         )
 
-    action, next_run = run_view.with_action(
-        run=prev_run,
-        action_id=action_id,
-        action_data=request_body.data,
-        created_at=created_at,
+    action = RunAction(
+        id=action_id,
+        actionType=request_body.data.actionType,
+        createdAt=created_at,
     )
 
     try:
@@ -106,7 +102,7 @@ async def create_run_action(
     except ProtocolEngineStoppedError as e:
         raise RunActionNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
-    run_store.upsert(run=next_run)
+    run_store.insert_action(run_id=runId, action=action)
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=action),

@@ -17,7 +17,7 @@ import { ModuleInfo } from '../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleI
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 
-const VIEW_BOX = '-150 -40 440 128'
+const VIEW_BOX = '-150 -38 440 128'
 interface PowerOnProps {
   attachedModule: HeaterShakerModule | null
 }
