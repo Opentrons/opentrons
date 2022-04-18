@@ -25,9 +25,12 @@ export function RobotInformation({
 }: RobotInformationProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   // TODO: serialNumber
-  const serialNumber = getRobotSerialNumber(robot as ViewableRobot)
-  const firmwareVersion = getRobotFirmwareVersion(robot as ViewableRobot)
-  const protocolApiVersions = getRobotProtocolApiVersion(robot as ViewableRobot)
+  const serialNumber =
+    (robot as ViewableRobot) != null ? getRobotSerialNumber(robot) : null
+  const firmwareVersion =
+    (robot as ViewableRobot) != null ? getRobotFirmwareVersion(robot) : null
+  const protocolApiVersions =
+    (robot as ViewableRobot) != null ? getRobotProtocolApiVersion(robot) : null
   const minProtocolApiVersion = protocolApiVersions?.min ?? 'Unknown'
   const maxProtocolApiVersion = protocolApiVersions?.max ?? 'Unknown'
   const apiVersionMinMax = `v${minProtocolApiVersion} - v${maxProtocolApiVersion}`
@@ -39,19 +42,31 @@ export function RobotInformation({
           <StyledText css={TYPOGRAPHY.pSemiBold}>
             {t('robot_serial_number')}
           </StyledText>
-          <StyledText as="p">{serialNumber}</StyledText>
+          <StyledText as="p">
+            {serialNumber != null
+              ? serialNumber
+              : t('robot_settings_advanced_unknown')}
+          </StyledText>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing4}>
           <StyledText css={TYPOGRAPHY.pSemiBold}>
             {t('firmware_version')}
           </StyledText>
-          <StyledText as="p">{firmwareVersion}</StyledText>
+          <StyledText as="p">
+            {firmwareVersion != null
+              ? firmwareVersion
+              : t('robot_settings_advanced_unknown')}
+          </StyledText>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing4}>
           <StyledText css={TYPOGRAPHY.pSemiBold}>
             {t('supported_protocol_api_versions')}
           </StyledText>
-          <StyledText as="p">{apiVersionMinMax}</StyledText>
+          <StyledText as="p">
+            {apiVersionMinMax != null
+              ? apiVersionMinMax
+              : t('robot_settings_advanced_unknown')}
+          </StyledText>
         </Flex>
       </Flex>
     </Box>

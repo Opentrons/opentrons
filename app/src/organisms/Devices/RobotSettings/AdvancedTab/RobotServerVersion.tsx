@@ -24,6 +24,7 @@ import type { State, Dispatch } from '../../../../redux/types'
 
 interface RobotServerVersionProps {
   robot: ViewableRobot
+  robotName: string
 }
 
 const UPDATE_RECHECK_DELAY_MS = 60000
@@ -32,6 +33,7 @@ const GITHUB_LINK =
 
 export function RobotServerVersion({
   robot,
+  robotName,
 }: RobotServerVersionProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
@@ -40,13 +42,14 @@ export function RobotServerVersion({
   ])
   const { autoUpdateAction, autoUpdateDisabledReason } = useSelector(
     (state: State) => {
-      return getBuildrootUpdateDisplayInfo(state, robot.name)
+      return getBuildrootUpdateDisplayInfo(state, robotName)
     }
   )
   const [showBanner, setShowBanner] = React.useState<boolean>(
     autoUpdateAction !== 'reinstall'
   )
-  const robotServerVersion = getRobotApiVersion(robot as ViewableRobot)
+  const robotServerVersion =
+    (robot as ViewableRobot) != null ? getRobotApiVersion(robot) : null
 
   const updateDisabled = autoUpdateDisabledReason !== null // pass to modal
 
@@ -104,7 +107,7 @@ export function RobotServerVersion({
           <StyledText as="p" paddingBottom={SPACING.spacing2}>
             {robotServerVersion != null
               ? `v${robotServerVersion}`
-              : t('robot_server_versions_status_unknown')}
+              : t('robot_settings_advanced_unknown')}
           </StyledText>
           <StyledText as="p">
             {t('robot_server_versions_description')}

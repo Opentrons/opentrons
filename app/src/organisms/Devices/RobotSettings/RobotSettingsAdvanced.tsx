@@ -102,7 +102,10 @@ export function RobotSettingsAdvanced({
           updateIsExpanded={updateIsExpanded}
         />
         <Divider marginY={SPACING.spacing5} />
-        <RobotServerVersion robot={robot as ViewableRobot} />
+        <RobotServerVersion
+          robot={robot as ViewableRobot}
+          robotName={robotName}
+        />
         <Divider marginY={SPACING.spacing5} />
         <RobotInformation robot={robot as ViewableRobot} />
         <Divider marginY={SPACING.spacing5} />
