@@ -17,6 +17,9 @@ from otupdate.common import (
 from otupdate.openembedded.updater import RootFSInterface, PartitionManager, Updater
 from ..common.update_actions import FILE_ACTIONS_VARNAME
 
+BR_BUILTIN_VERSION_FILE = "/etc/VERSION.json"
+
+
 LOG = logging.getLogger(__name__)
 
 
@@ -48,6 +51,8 @@ def get_app(
     loop: asyncio.AbstractEventLoop = None,
 ) -> web.Application:
     """Build and return the aiohttp.web.Application that runs the server"""
+    if not system_version_file:
+        system_version_file = BR_BUILTIN_VERSION_FILE
 
     version = get_version_dict(system_version_file)
 
