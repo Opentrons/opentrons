@@ -67,10 +67,13 @@ async def test_insert_and_get_protocol(
         protocol_key="dummy-data-111",
     )
 
+    assert subject.has("protocol-id") is False
+
     subject.insert(protocol_resource)
     result = subject.get("protocol-id")
 
     assert result == protocol_resource
+    assert subject.has("protocol-id") is True
 
 
 async def test_insert_with_duplicate_key_raises(

@@ -24,6 +24,7 @@ from robot_server.service.json_api import (
 from .protocol_models import Protocol, ProtocolFile, Metadata
 from .protocol_analyzer import ProtocolAnalyzer
 from .analysis_store import AnalysisStore
+from .analysis_models import ProtocolAnalysis
 from .protocol_store import ProtocolStore, ProtocolResource, ProtocolNotFoundError
 from .dependencies import (
     get_protocol_reader,
@@ -127,7 +128,7 @@ async def create_protocol(
         protocol_resource=protocol_resource,
         analysis_id=analysis_id,
     )
-    analyses = analysis_store.add_pending(
+    pending_analysis = analysis_store.add_pending(
         protocol_id=protocol_id,
         analysis_id=analysis_id,
     )
@@ -137,7 +138,7 @@ async def create_protocol(
         createdAt=created_at,
         protocolType=source.config.protocol_type,
         metadata=Metadata.parse_obj(source.metadata),
-        analyses=analyses,
+        analyses=[pending_analysis],
         key=key,
         files=[ProtocolFile(name=f.path.name, role=f.role) for f in source.files],
     )
@@ -172,7 +173,7 @@ async def get_protocols(
             createdAt=r.created_at,
             protocolType=r.source.config.protocol_type,
             metadata=Metadata.parse_obj(r.source.metadata),
-            analyses=analysis_store.get_by_protocol(r.protocol_id),
+            analyses=analysis_store.get_summaries_by_protocol(r.protocol_id),
             key=r.protocol_key,
             files=[ProtocolFile(name=f.path.name, role=f.role) for f in r.source.files],
         )
@@ -208,12 +209,12 @@ async def get_protocol_by_id(
     """
     try:
         resource = protocol_store.get(protocol_id=protocolId)
-        analyses = analysis_store.get_by_protocol(protocol_id=protocolId)
+        analyses = analysis_store.get_summaries_by_protocol(protocol_id=protocolId)
 
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    data = Protocol(
+    data = Protocol.construct(
         id=protocolId,
         createdAt=resource.created_at,
         protocolType=resource.source.config.protocol_type,
@@ -258,4 +259,39 @@ async def delete_protocol_by_id(
     return await PydanticResponse.create(
         content=SimpleEmptyBody.construct(),
         status_code=status.HTTP_200_OK,
+    )
+
+
+@protocols_router.get(
+    path="/protocols/{protocolId}/analyses",
+    summary="Get a protocol's analyses",
+    responses={
+        status.HTTP_200_OK: {"model": SimpleMultiBody[ProtocolAnalysis]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
+    },
+)
+async def get_protocol_analyses(
+    protocolId: str,
+    protocol_store: ProtocolStore = Depends(get_protocol_store),
+    analysis_store: AnalysisStore = Depends(get_analysis_store),
+) -> PydanticResponse[SimpleMultiBody[ProtocolAnalysis]]:
+    """Get a protocol's full analyses list.
+
+    Arguments:
+        protocolId: Protocol identifier to delete, pulled from URL.
+        protocol_store: Database of protocol resources.
+        analysis_store: Database of analysis resources.
+    """
+    if not protocol_store.has(protocolId):
+        raise ProtocolNotFound(detail=f"Protocol {protocolId} not found").as_error(
+            status.HTTP_404_NOT_FOUND
+        )
+
+    analyses = analysis_store.get_by_protocol(protocolId)
+
+    return await PydanticResponse.create(
+        content=SimpleMultiBody.construct(
+            data=analyses,
+            meta=MultiBodyMeta(cursor=0, totalLength=len(analyses)),
+        )
     )

@@ -35,7 +35,7 @@ stages:
     max_retries: 5
     delay_after: 1
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{host:s}:{port:d}/protocols/{protocol_id}/analyses'
       method: GET
     response:
       strict:
@@ -43,11 +43,9 @@ stages:
       status_code: 200
       json:
         data:
-          - id: '{protocol_id}'
-            analyses:
-              - id: '{analyses_id}'
-                status: completed
-                result: ok
+          - id: '{analyses_id}'
+            status: completed
+            result: ok
   - name: Delete the protocol
     request:
       url: '{host:s}:{port:d}/protocols/{protocol_id}'

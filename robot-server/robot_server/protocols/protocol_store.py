@@ -79,6 +79,17 @@ class ProtocolStore:
             all_rows = transaction.execute(statement).all()
         return [_convert_sql_row_to_resource(sql_row=row) for row in all_rows]
 
+    def has(self, protocol_id: str) -> bool:
+        """Check for the presence of a protocol ID in the store."""
+        statement = sqlalchemy.select(protocol_table).where(
+            protocol_table.c.id == protocol_id
+        )
+
+        with self._sql_engine.begin() as transaction:
+            result = transaction.execute(statement).one_or_none()
+
+        return result is not None
+
     def remove(self, protocol_id: str) -> ProtocolResource:
         """Remove a `ProtocolResource` from the store.
 

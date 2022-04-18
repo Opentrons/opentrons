@@ -45,10 +45,11 @@ class AnalysisSummary(BaseModel):
 class PendingAnalysis(AnalysisSummary):
     """A protocol analysis that is on-going."""
 
+    id: str = Field(..., description="Unique identifier of this analysis resource")
     status: Literal[AnalysisStatus.PENDING] = AnalysisStatus.PENDING
 
 
-class CompletedAnalysis(AnalysisSummary):
+class CompletedAnalysis(BaseModel):
     """A completed protocol run analysis.
 
     This analysis provides three pieces of information:
@@ -69,6 +70,7 @@ class CompletedAnalysis(AnalysisSummary):
         JSON protocols are currently deterministic by design.
     """
 
+    id: str = Field(..., description="Unique identifier of this analysis resource")
     status: Literal[AnalysisStatus.COMPLETED] = AnalysisStatus.COMPLETED
     result: AnalysisResult = Field(
         ...,

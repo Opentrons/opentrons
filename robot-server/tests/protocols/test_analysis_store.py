@@ -22,16 +22,24 @@ def test_get_empty() -> None:
     """It should return an empty list if no analysis saved."""
     subject = AnalysisStore()
     result = subject.get_by_protocol("protocol-id")
+    summaries_result = subject.get_summaries_by_protocol("protocol-id")
 
     assert result == []
+    assert summaries_result == []
 
 
 def test_add_pending() -> None:
     """It should add a pending analysis to the store."""
     subject = AnalysisStore()
+    expected_pending_analysis = PendingAnalysis(id="analysis-id")
+
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
 
-    assert result == [PendingAnalysis(id="analysis-id")]
+    assert result == expected_pending_analysis
+    assert subject.get_by_protocol("protocol-id") == [expected_pending_analysis]
+    assert subject.get_summaries_by_protocol("protocol-id") == [
+        expected_pending_analysis
+    ]
 
 
 def test_add_analysis_equipment() -> None:

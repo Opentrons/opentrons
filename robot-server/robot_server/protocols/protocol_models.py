@@ -9,7 +9,7 @@ from opentrons.protocol_reader import (
 )
 
 from robot_server.service.json_api import ResourceModel
-from .analysis_models import ProtocolAnalysis
+from .analysis_models import AnalysisSummary
 
 
 class ProtocolFile(BaseModel):
@@ -72,11 +72,12 @@ class Protocol(ResourceModel):
     # be a better way (e.g. produce better OpenAPI) to represent an arbitrary JSON obj.
     metadata: Metadata
 
-    # TODO(mc, 2021-09-01): consider reporting summary objects here, with the
-    # option to `GET /protocols/:pid/analysis/:aid` if needed
-    analyses: Sequence[ProtocolAnalysis] = Field(
+    analyses: Sequence[AnalysisSummary] = Field(
         ...,
-        description="An analysis of how the protocol is expected to run.",
+        description=(
+            "An analysis of how the protocol is expected to run."
+            " Use GET /protocols/:protocol_id/analyses for more information."
+        ),
     )
 
     key: Optional[str] = None
