@@ -21,6 +21,8 @@ async def test_get_modules_simulating():
     await asyncio.sleep(0.05)
     from_api = api.attached_modules
     assert sorted([mod.name() for mod in from_api]) == sorted(mods)
+    for m in api.attached_modules:
+        await m.cleanup()
 
 
 async def test_module_caching():
@@ -84,24 +86,16 @@ async def test_filtering_modules():
     assert len(filtered_modules) == 2
     assert filtered_modules == api.attached_modules[2:4]
 
+    for m in api.attached_modules:
+        await m.cleanup()
 
-async def test_module_update_integration(monkeypatch):
+
+@pytest.fixture
+async def mod_tempdeck():
     from opentrons.hardware_control import modules
 
     loop = asyncio.get_running_loop()
 
-    def async_return(result):
-        f = asyncio.Future()
-        f.set_result(result)
-        return f
-
-    bootloader_kwargs = {
-        "stdout": asyncio.subprocess.PIPE,
-        "stderr": asyncio.subprocess.PIPE,
-        "loop": loop,
-    }
-
-    # test temperature module update with avrdude bootloader
     usb_port = USBPort(
         name="",
         hub=None,
@@ -118,6 +112,77 @@ async def test_module_update_integration(monkeypatch):
         execution_manager=ExecutionManager(),
         sim_model="temperatureModuleV2",
     )
+    yield tempdeck
+    await tempdeck.cleanup()
+
+
+@pytest.fixture
+async def mod_magdeck():
+    from opentrons.hardware_control import modules
+
+    loop = asyncio.get_running_loop()
+
+    usb_port = USBPort(
+        name="",
+        hub=None,
+        port_number=0,
+        device_path="/dev/ot_module_sim_magdeck0",
+    )
+
+    magdeck = await modules.build(
+        port="/dev/ot_module_sim_magdeck0",
+        usb_port=usb_port,
+        which="magdeck",
+        simulating=True,
+        loop=loop,
+        execution_manager=ExecutionManager(),
+    )
+    yield magdeck
+    await magdeck.cleanup()
+
+
+@pytest.fixture
+async def mod_thermocycler():
+    from opentrons.hardware_control import modules
+
+    loop = asyncio.get_running_loop()
+
+    usb_port = USBPort(
+        name="",
+        hub=None,
+        port_number=0,
+        device_path="/dev/ot_module_sim_thermocycler0",
+    )
+
+    thermocycler = await modules.build(
+        port="/dev/ot_module_sim_thermocycler0",
+        usb_port=usb_port,
+        which="thermocycler",
+        simulating=True,
+        loop=loop,
+        execution_manager=ExecutionManager(),
+    )
+    yield thermocycler
+    await thermocycler.cleanup()
+
+
+async def test_module_update_integration(
+    monkeypatch, mod_tempdeck, mod_magdeck, mod_thermocycler
+):
+    from opentrons.hardware_control import modules
+
+    loop = asyncio.get_running_loop()
+
+    def async_return(result):
+        f = asyncio.Future()
+        f.set_result(result)
+        return f
+
+    bootloader_kwargs = {
+        "stdout": asyncio.subprocess.PIPE,
+        "stderr": asyncio.subprocess.PIPE,
+        "loop": loop,
+    }
 
     upload_via_avrdude_mock = mock.Mock(
         return_value=(async_return((True, "avrdude bootloader worked")))
@@ -131,39 +196,20 @@ async def test_module_update_integration(monkeypatch):
         modules.update, "find_bootloader_port", mock_find_avrdude_bootloader_port
     )
 
-    await modules.update_firmware(tempdeck, "fake_fw_file_path", loop)
+    # test temperature module update with avrdude bootloader
+    await modules.update_firmware(mod_tempdeck, "fake_fw_file_path", loop)
     upload_via_avrdude_mock.assert_called_once_with(
         "ot_module_avrdude_bootloader1", "fake_fw_file_path", bootloader_kwargs
     )
     upload_via_avrdude_mock.reset_mock()
 
     # test magnetic module update with avrdude bootloader
-
-    magdeck = await modules.build(
-        port="/dev/ot_module_sim_magdeck0",
-        usb_port=usb_port,
-        which="magdeck",
-        simulating=True,
-        loop=loop,
-        execution_manager=ExecutionManager(),
-    )
-
-    await modules.update_firmware(magdeck, "fake_fw_file_path", loop)
+    await modules.update_firmware(mod_magdeck, "fake_fw_file_path", loop)
     upload_via_avrdude_mock.assert_called_once_with(
         "ot_module_avrdude_bootloader1", "fake_fw_file_path", bootloader_kwargs
     )
 
     # test thermocycler module update with bossa bootloader
-
-    thermocycler = await modules.build(
-        port="/dev/ot_module_sim_thermocycler0",
-        usb_port=usb_port,
-        which="thermocycler",
-        simulating=True,
-        loop=loop,
-        execution_manager=ExecutionManager(),
-    )
-
     upload_via_bossa_mock = mock.Mock(
         return_value=(async_return((True, "bossa bootloader worked")))
     )
@@ -176,7 +222,7 @@ async def test_module_update_integration(monkeypatch):
         modules.update, "find_bootloader_port", mock_find_bossa_bootloader_port
     )
 
-    await modules.update_firmware(thermocycler, "fake_fw_file_path", loop)
+    await modules.update_firmware(mod_thermocycler, "fake_fw_file_path", loop)
     upload_via_bossa_mock.assert_called_once_with(
         "ot_module_bossa_bootloader1", "fake_fw_file_path", bootloader_kwargs
     )
