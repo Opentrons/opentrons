@@ -1,5 +1,4 @@
 import * as React from 'react'
-import first from 'lodash/first'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
@@ -24,6 +23,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TEXT_TRANSFORM_CAPITALIZE,
   ModuleIcon,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
@@ -143,37 +143,59 @@ export function ProtocolDetails(
       <Box>TODO: labware tab contents</Box>
     ) : (
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <Flex flexDirection={DIRECTION_ROW} marginRight={SPACING.spacing4}>
-          <StyledText as="h6">{t('left_mount')}</StyledText>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_CENTER}
+          marginY={SPACING.spacing3}
+        >
+          <StyledText as="h6" fontWeight={TYPOGRAPHY.fontWeightSemiBold} marginRight={SPACING.spacing4}>
+            {t('left_mount')}
+          </StyledText>
           <StyledText as="p">
             {leftMountPipetteName != null
               ? getPipetteNameSpecs(leftMountPipetteName)?.displayName
               : t('shared:empty')}
           </StyledText>
         </Flex>
-        <Flex flexDirection={DIRECTION_ROW} marginRight={SPACING.spacing4}>
-          <StyledText as="h6">{t('right_mount')}</StyledText>
+        <Divider width="100%" />
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_CENTER}
+          marginY={SPACING.spacing3}
+        >
+          <StyledText as="h6" fontWeight={TYPOGRAPHY.fontWeightSemiBold} marginRight={SPACING.spacing4}>
+            {t('right_mount')}
+          </StyledText>
           <StyledText as="p">
             {rightMountPipetteName != null
               ? getPipetteNameSpecs(rightMountPipetteName)?.displayName
               : t('shared:empty')}
           </StyledText>
         </Flex>
-        {requiredModuleTypes.length > 0 ? (
-          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
-            <StyledText as="h6">{t('modules')}</StyledText>
-            <Flex>
-              {requiredModuleTypes.map((moduleType, index) => (
+        {requiredModuleTypes.map((moduleType, index) => (
+          <>
+            <Divider width="100%" />
+            <Flex
+              key={index}
+              flexDirection={DIRECTION_ROW}
+              alignItems={ALIGN_CENTER}
+              marginY={SPACING.spacing3}
+            >
+              <StyledText as="h6" fontWeight={TYPOGRAPHY.fontWeightSemiBold} marginRight={SPACING.spacing4}>
+                TODO slot
+              </StyledText>
+              <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
                 <ModuleIcon
                   key={index}
                   moduleType={moduleType}
                   height="1rem"
                   marginRight={SPACING.spacing3}
                 />
-              ))}
+                <StyledText as="p">{moduleType}</StyledText>
+              </Flex>
             </Flex>
-          </Flex>
-        ) : null}
+          </>
+        ))}
       </Flex>
     )
 
@@ -276,7 +298,7 @@ export function ProtocolDetails(
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Card flex="1">
+        <Card flex="0 0 20rem">
           <StyledText
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -289,9 +311,9 @@ export function ProtocolDetails(
           <Box padding={SPACING.spacing4}>
             {
               {
-                missing: <Box size="6rem" backgroundColor={COLORS.medGrey} />,
-                loading: <Box size="6rem" backgroundColor={COLORS.medGrey} />,
-                error: <Box size="6rem" backgroundColor={COLORS.medGrey} />,
+                missing: <Box size="15rem" backgroundColor={COLORS.medGrey} />,
+                loading: <Box size="15rem" backgroundColor={COLORS.medGrey} />,
+                error: <Box size="15rem" backgroundColor={COLORS.medGrey} />,
                 complete: (
                   <DeckThumbnail
                     commands={mostRecentAnalysis?.commands ?? []}
