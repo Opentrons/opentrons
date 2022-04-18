@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-import { LEFT, RIGHT } from '../../../redux/pipettes'
+import { LEFT } from '../../../redux/pipettes'
 import {
   Box,
   Flex,
@@ -21,44 +20,23 @@ import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { StyledText } from '../../../atoms/text'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 
-import type {
-  Mount,
-  AttachedPipettesByMount,
-} from '../../../redux/pipettes/types'
+import type { Mount } from '../../../redux/pipettes/types'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 interface PipetteCardProps {
-  leftPipette?: AttachedPipettesByMount['left']
-  rightPipette?: AttachedPipettesByMount['right']
+  pipetteInfo: PipetteModelSpecs | null
+  mount: Mount
+  robotName: string
 }
 
-const IMAGE_CSS = css`
-  transform: scale(0.3);
-  width: 50px;
-  height: 50px;
-  transform-origin: 20% -10%;
-`
-
-export const PipetteCard = (props: PipetteCardProps): JSX.Element | null => {
+export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { t } = useTranslation('device_details')
   const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
-  const { leftPipette, rightPipette } = props
-
+  const { pipetteInfo, mount, robotName } = props
+  const pipetteName = pipetteInfo?.displayName
   const pipetteOverflowWrapperRef = useOnClickOutside({
     onClickOutside: () => setShowOverflowMenu(false),
   }) as React.RefObject<HTMLDivElement>
-
-  let mount: Mount = LEFT
-  let pipetteName: string = t('empty')
-  if (leftPipette) {
-    pipetteName = leftPipette.modelSpecs.displayName
-    mount = LEFT
-  } else if (rightPipette) {
-    pipetteName = rightPipette.modelSpecs.displayName
-    mount = RIGHT
-    //  if pipettes === null then we still need to know which mount it came from to render an empty pipette card
-  } else if (rightPipette === null) {
-    mount = RIGHT
-  }
 
   return (
     <Flex
@@ -76,13 +54,13 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element | null => {
       >
         <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
           <Flex alignItems={ALIGN_START}>
-            {leftPipette === null || rightPipette === null ? null : (
+            {pipetteInfo === null ? null : (
               <InstrumentDiagram
-                pipetteSpecs={
-                  leftPipette?.modelSpecs ?? rightPipette?.modelSpecs
-                }
-                mount={leftPipette != null ? LEFT : RIGHT}
-                css={IMAGE_CSS}
+                pipetteSpecs={pipetteInfo}
+                mount={mount}
+                transform="scale(0.3)"
+                size="3.125rem"
+                transformOrigin="20% -10%"
               />
             )}
           </Flex>
@@ -102,7 +80,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element | null => {
               data-testid={`PipetteCard_display_name_${pipetteName}`}
             >
               <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
-                {pipetteName}
+                {pipetteName ?? t('empty')}
               </StyledText>
             </Flex>
           </Flex>
@@ -125,7 +103,11 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element | null => {
           ref={pipetteOverflowWrapperRef}
           data-testid={`PipetteCard_overflow_menu_${pipetteName}`}
         >
-          <PipetteOverflowMenu pipetteName={pipetteName} mount={mount} />
+          <PipetteOverflowMenu
+            pipetteName={pipetteName ?? t('empty')}
+            mount={mount}
+            robotName={robotName}
+          />
         </div>
       )}
     </Flex>

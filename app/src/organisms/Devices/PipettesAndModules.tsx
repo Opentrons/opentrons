@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-
+import { LEFT, RIGHT } from '@opentrons/shared-data'
 import {
   Flex,
   Text,
@@ -67,8 +67,16 @@ export function PipettesAndModules({
             width={attachedModules.length === 1 ? '50%' : '100%'}
           >
             <Flex flexDirection={DIRECTION_ROW}>
-              <PipetteCard leftPipette={attachedPipettes.left} />
-              <PipetteCard rightPipette={attachedPipettes.right} />
+              <PipetteCard
+                pipetteInfo={attachedPipettes.left?.modelSpecs ?? null}
+                mount={LEFT}
+                robotName={robotName}
+              />
+              <PipetteCard
+                pipetteInfo={attachedPipettes.right?.modelSpecs ?? null}
+                mount={RIGHT}
+                robotName={robotName}
+              />
             </Flex>
             <Flex
               justifyContent={JUSTIFY_START}

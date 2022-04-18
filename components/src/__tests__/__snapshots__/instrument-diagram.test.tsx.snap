@@ -1,8 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`InstrumentDiagram Multi-channel GEN2 renders correctly 1`] = `
+.c0 {
+  min-width: 0;
+}
+
 <div
-  className=""
+  className="c0"
 >
   <img
     className="flipped_image"
@@ -12,8 +16,12 @@ exports[`InstrumentDiagram Multi-channel GEN2 renders correctly 1`] = `
 `;
 
 exports[`InstrumentDiagram Multi-channel renders correctly 1`] = `
+.c0 {
+  min-width: 0;
+}
+
 <div
-  className=""
+  className="c0"
 >
   <img
     className=""
@@ -23,8 +31,12 @@ exports[`InstrumentDiagram Multi-channel renders correctly 1`] = `
 `;
 
 exports[`InstrumentDiagram Single-channel GEN2 renders correctly 1`] = `
+.c0 {
+  min-width: 0;
+}
+
 <div
-  className=""
+  className="c0"
 >
   <img
     className="flipped_image"
@@ -34,8 +46,12 @@ exports[`InstrumentDiagram Single-channel GEN2 renders correctly 1`] = `
 `;
 
 exports[`InstrumentDiagram Single-channel renders correctly 1`] = `
+.c0 {
+  min-width: 0;
+}
+
 <div
-  className=""
+  className="c0"
 >
   <img
     className=""
@@ -45,6 +61,10 @@ exports[`InstrumentDiagram Single-channel renders correctly 1`] = `
 `;
 
 exports[`InstrumentGroup Renders correctly 1`] = `
+.c0 {
+  min-width: 0;
+}
+
 <section
   className="pipette_group"
 >
@@ -68,7 +88,7 @@ exports[`InstrumentGroup Renders correctly 1`] = `
       </div>
     </div>
     <div
-      className="pipette_icon"
+      className="c0 pipette_icon"
     >
       <img
         className=""
@@ -96,7 +116,7 @@ exports[`InstrumentGroup Renders correctly 1`] = `
       </div>
     </div>
     <div
-      className="pipette_icon"
+      className="c0 pipette_icon"
     >
       <img
         className="flipped_image"

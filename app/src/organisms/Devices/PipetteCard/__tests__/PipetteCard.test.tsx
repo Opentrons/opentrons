@@ -6,9 +6,11 @@ import { i18n } from '../../../../i18n'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import { PipetteCard } from '..'
 import {
-  mockLeftProtoPipette,
-  mockRightProtoPipette,
+  mockLeftSpecs,
+  mockRightSpecs,
 } from '../../../../redux/pipettes/__fixtures__'
+import { LEFT } from '@opentrons/shared-data'
+import { RIGHT } from '../../../../redux/pipettes'
 
 jest.mock('../PipetteOverflowMenu')
 
@@ -22,6 +24,7 @@ const render = (props: React.ComponentProps<typeof PipetteCard>) => {
   })[0]
 }
 
+const mockRobotName = 'mockRobotName'
 describe('PipetteCard', () => {
   beforeEach(() => {
     mockPipetteOverflowMenu.mockReturnValue(
@@ -35,39 +38,51 @@ describe('PipetteCard', () => {
 
   it('renders information for a left pipette', () => {
     const { getByText } = render({
-      leftPipette: mockLeftProtoPipette,
+      pipetteInfo: mockLeftSpecs,
+      mount: LEFT,
+      robotName: mockRobotName,
     })
     getByText('left Mount')
     getByText('Left Pipette')
   })
   it('renders information for a right pipette', () => {
     const { getByText } = render({
-      rightPipette: mockRightProtoPipette,
+      pipetteInfo: mockRightSpecs,
+      mount: RIGHT,
+      robotName: mockRobotName,
     })
     getByText('right Mount')
     getByText('Right Pipette')
   })
   it('renders information for no pipette on right Mount', () => {
     const { getByText } = render({
-      rightPipette: null,
+      pipetteInfo: null,
+      mount: RIGHT,
+      robotName: mockRobotName,
     })
     getByText('right Mount')
     getByText('Empty')
   })
   it('renders information for no pipette on left Mount', () => {
     const { getByText } = render({
-      leftPipette: null,
+      pipetteInfo: null,
+      mount: LEFT,
+      robotName: mockRobotName,
     })
     getByText('left Mount')
     getByText('Empty')
   })
   it('renders kebab icon and is clickable', () => {
     const { getByRole, getByText } = render({
-      rightPipette: mockRightProtoPipette,
+      pipetteInfo: mockRightSpecs,
+      mount: RIGHT,
+      robotName: mockRobotName,
     })
+
     const overflowButton = getByRole('button', {
       name: /overflow/i,
     })
+
     fireEvent.click(overflowButton)
     expect(overflowButton).not.toBeDisabled()
     getByText('mock pipette overflow menu')

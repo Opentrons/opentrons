@@ -10,16 +10,26 @@ import type { Mount } from '../../../redux/pipettes/types'
 interface PipetteOverflowMenuProps {
   pipetteName: PipetteModelSpecs['displayName'] | string
   mount: Mount
+  robotName: string
 }
 
 export const PipetteOverflowMenu = (
   props: PipetteOverflowMenuProps
 ): JSX.Element => {
   const { t } = useTranslation('device_details')
-  const { mount, pipetteName } = props
+  const { mount, pipetteName, robotName } = props
+  const [
+    showPipetteOverflowMenuOptions,
+    setPipetteOverflowMenuOptions,
+  ] = React.useState(false)
 
   return (
     <Flex position={POSITION_RELATIVE}>
+      {showPipetteOverflowMenuOptions &&
+        //  TODO(jr, 4/18/22): wire this up
+        console.log(
+          `add pipette calibration flow here which also  will need ${robotName}`
+        )}
       <MenuList
         buttons={
           pipetteName === 'Empty'
@@ -37,7 +47,7 @@ export const PipetteOverflowMenu = (
                 <MenuItem
                   minWidth="10.6rem"
                   key={`${pipetteName}_${mount}_calibrate_offset`}
-                  onClick={() => console.log('wire up')}
+                  onClick={() => setPipetteOverflowMenuOptions(true)}
                   data-testid={`pipetteOverflowMenu_calibrate_offset_btn_${pipetteName}_${mount}`}
                 >
                   {t('calibrate_pipette_offset')}

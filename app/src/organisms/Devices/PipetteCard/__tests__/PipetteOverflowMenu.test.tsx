@@ -13,6 +13,7 @@ const render = (props: React.ComponentProps<typeof PipetteOverflowMenu>) => {
   })[0]
 }
 
+const mockRobotName = 'mockRobotName'
 const LEFT = 'left' as Mount
 describe('PipetteOverflowMenu', () => {
   let props: React.ComponentProps<typeof PipetteOverflowMenu>
@@ -21,6 +22,7 @@ describe('PipetteOverflowMenu', () => {
     props = {
       pipetteName: mockLeftProtoPipette.displayName,
       mount: LEFT,
+      robotName: mockRobotName,
     }
   })
   afterEach(() => {
@@ -39,6 +41,7 @@ describe('PipetteOverflowMenu', () => {
     props = {
       pipetteName: 'Empty',
       mount: LEFT,
+      robotName: mockRobotName,
     }
     const { getByRole } = render(props)
     getByRole('button', { name: 'Attach pipette' })
