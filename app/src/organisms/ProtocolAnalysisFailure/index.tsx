@@ -34,6 +34,18 @@ export function ProtocolAnalysisFailure(
   const dispatch = useDispatch<Dispatch>()
   const [showErrorDetails, setShowErrorDetails] = React.useState(false)
 
+  const handleClickShowDetails: React.MouseEventHandler = e => {
+    e.preventDefault()
+    setShowErrorDetails(true)
+  }
+  const handleClickHideDetails: React.MouseEventHandler = e => {
+    e.preventDefault()
+    setShowErrorDetails(false)
+  }
+  const handleClickReanalyze: React.MouseEventHandler = e => {
+    e.preventDefault()
+    dispatch(analyzeProtocol(protocolKey))
+  }
   return (
     <Banner type="error" marginBottom={SPACING.spacing4}>
       <Flex
@@ -50,22 +62,17 @@ export function ProtocolAnalysisFailure(
               errorLink: (
                 <Btn
                   as="a"
+                  role="button"
                   textDecoration={TEXT_DECORATION_UNDERLINE}
-                  onClick={e => {
-                    e.preventDefault()
-                    setShowErrorDetails(true)
-                  }}
+                  onClick={handleClickShowDetails}
                 />
               ),
               analysisLink: (
                 <Btn
                   as="a"
+                  role="button"
                   textDecoration={TEXT_DECORATION_UNDERLINE}
-                  onClick={e => {
-                    e.preventDefault()
-                    console.log('TODO: trigger analysis')
-                    dispatch(analyzeProtocol(protocolKey))
-                  }}
+                  onClick={handleClickReanalyze}
                 />
               ),
             }}
@@ -77,10 +84,7 @@ export function ProtocolAnalysisFailure(
           <Modal
             type="error"
             title={t('protocol_analysis_failure')}
-            onClose={e => {
-              e.preventDefault()
-              setShowErrorDetails(false)
-            }}
+            onClose={handleClickHideDetails}
           >
             {errors.map((error, index) => (
               <StyledText key={index} as="p">
@@ -89,7 +93,7 @@ export function ProtocolAnalysisFailure(
             ))}
             <Flex justifyContent={JUSTIFY_FLEX_END}>
               <PrimaryButton
-                onClick={() => setShowErrorDetails(false)}
+                onClick={handleClickHideDetails}
                 textTransform={TEXT_TRANSFORM_CAPITALIZE}
                 marginTop={SPACING.spacing4}
               >

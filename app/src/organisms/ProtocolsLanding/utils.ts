@@ -1,11 +1,11 @@
 import first from 'lodash/first'
-import { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 type AnalysisStatus = 'missing' | 'loading' | 'error' | 'complete'
 
 export function getAnalysisStatus(
   isAnalyzing: boolean,
-  analysis?: ProtocolAnalysisFile<{}>
+  analysis?: ProtocolAnalysisOutput
 ): AnalysisStatus {
   if (isAnalyzing) {
     return 'loading'
@@ -19,7 +19,7 @@ export function getAnalysisStatus(
 export function getProtocolDisplayName(
   protocolKey: string,
   srcFileNames: string[],
-  analysis?: ProtocolAnalysisFile<{}>
+  analysis?: ProtocolAnalysisOutput
 ): string {
   return analysis?.metadata?.protocolName ?? first(srcFileNames) ?? protocolKey
 }

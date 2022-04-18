@@ -1,6 +1,6 @@
 // common types
 
-import { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 export interface StoredProtocolDir {
   dirPath: string
@@ -14,7 +14,7 @@ export interface StoredProtocolData {
   modified: number
   srcFileNames: string[]
   srcFiles: Buffer[]
-  mostRecentAnalysis: ProtocolAnalysisFile<{}>
+  mostRecentAnalysis: ProtocolAnalysisOutput
 }
 
 // state types

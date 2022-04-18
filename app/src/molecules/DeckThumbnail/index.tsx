@@ -35,7 +35,9 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const { commands } = props
   const initialLoadedLabwareBySlot = parseInitialLoadedLabwareBySlot(commands)
   const initialLoadedModulesBySlot = parseInitialLoadedModulesBySlot(commands)
-  const initialLoadedLabwareByModuleId = parseInitialLoadedLabwareByModuleId(commands)
+  const initialLoadedLabwareByModuleId = parseInitialLoadedLabwareByModuleId(
+    commands
+  )
 
   return (
     <RobotWorkSpace

@@ -19,7 +19,7 @@ import { Divider } from '../structure'
 type ModalType = 'info' | 'warning' | 'error'
 interface ModalProps extends BaseModalProps {
   type?: ModalType
-  onClose?: () => void
+  onClose?: React.MouseEventHandler
   title?: React.ReactNode
   children?: React.ReactNode
 }

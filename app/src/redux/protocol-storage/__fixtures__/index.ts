@@ -1,11 +1,11 @@
 import { simpleAnalysisFileFixture } from '@opentrons/api-client'
 import { StoredProtocolData, StoredProtocolDir } from '../types'
 
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 export const storedProtocolData: StoredProtocolData = {
   protocolKey: 'protocolKeyStub',
-  mostRecentAnalysis: (simpleAnalysisFileFixture as any) as ProtocolAnalysisFile<{}>,
+  mostRecentAnalysis: (simpleAnalysisFileFixture as any) as ProtocolAnalysisOutput,
   srcFileNames: ['fakeSrcFileName'],
   srcFiles: ['fakeSrcFile' as any],
   modified: 123456789,

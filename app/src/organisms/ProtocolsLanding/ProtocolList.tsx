@@ -16,7 +16,6 @@ import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
-import { State } from '../../redux/types'
 
 interface ProtocolListProps {
   storedProtocols: StoredProtocolData[]

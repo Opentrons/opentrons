@@ -31,7 +31,7 @@ import {
 } from '@opentrons/api-client'
 
 import { isProtocolAnalysisInProgress } from '../../redux/protocol-storage'
-import { ProtocolAnalysisFailure } from '../ProtocolAnalysisError'
+import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/Buttons'
@@ -148,7 +148,11 @@ export function ProtocolDetails(
           alignItems={ALIGN_CENTER}
           marginY={SPACING.spacing3}
         >
-          <StyledText as="h6" fontWeight={TYPOGRAPHY.fontWeightSemiBold} marginRight={SPACING.spacing4}>
+          <StyledText
+            as="h6"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            marginRight={SPACING.spacing4}
+          >
             {t('left_mount')}
           </StyledText>
           <StyledText as="p">
@@ -163,7 +167,11 @@ export function ProtocolDetails(
           alignItems={ALIGN_CENTER}
           marginY={SPACING.spacing3}
         >
-          <StyledText as="h6" fontWeight={TYPOGRAPHY.fontWeightSemiBold} marginRight={SPACING.spacing4}>
+          <StyledText
+            as="h6"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            marginRight={SPACING.spacing4}
+          >
             {t('right_mount')}
           </StyledText>
           <StyledText as="p">
@@ -181,7 +189,11 @@ export function ProtocolDetails(
               alignItems={ALIGN_CENTER}
               marginY={SPACING.spacing3}
             >
-              <StyledText as="h6" fontWeight={TYPOGRAPHY.fontWeightSemiBold} marginRight={SPACING.spacing4}>
+              <StyledText
+                as="h6"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                marginRight={SPACING.spacing4}
+              >
                 TODO slot
               </StyledText>
               <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
@@ -216,7 +228,7 @@ export function ProtocolDetails(
         mostRecentAnalysis.errors.length > 0 ? (
           <ProtocolAnalysisFailure
             protocolKey={protocolKey}
-            errors={mostRecentAnalysis.errors}
+            errors={mostRecentAnalysis.errors.map(e => e.detail)}
           />
         ) : null}
         <Flex

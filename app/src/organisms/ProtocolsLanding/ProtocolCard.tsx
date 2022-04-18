@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import {
   getModuleType,
   getPipetteNameSpecs,
-  ProtocolAnalysisFile,
+  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
 import {
@@ -33,7 +33,7 @@ import { isProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
-import { ProtocolAnalysisFailure } from '../ProtocolAnalysisError'
+import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { getAnalysisStatus, getProtocolDisplayName } from './utils'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -55,7 +55,11 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const isAnalyzing = useSelector((state: State) =>
     isProtocolAnalysisInProgress(state, protocolKey)
   )
-  const protocolDisplayName = getProtocolDisplayName(protocolKey, srcFileNames, mostRecentAnalysis)
+  const protocolDisplayName = getProtocolDisplayName(
+    protocolKey,
+    srcFileNames,
+    mostRecentAnalysis
+  )
 
   return (
     <Link to={`/protocols/${protocolKey}`} style={{ color: 'inherit' }}>
@@ -92,14 +96,12 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   )
 }
 
-
-
 interface AnalysisInfoProps {
   protocolKey: string
   protocolDisplayName: string
   modified: number
   isAnalyzing: boolean
-  mostRecentAnalysis?: ProtocolAnalysisFile<{}>
+  mostRecentAnalysis?: ProtocolAnalysisOutput
 }
 function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   const {
@@ -148,7 +150,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
         {analysisStatus === 'error' ? (
           <ProtocolAnalysisFailure
             protocolKey={protocolKey}
-            errors={mostRecentAnalysis?.errors ?? []}
+            errors={mostRecentAnalysis?.errors.map(e => e.detail) ?? []}
           />
         ) : null}
         <StyledText as="h3" marginBottom={SPACING.spacing4}>
@@ -156,7 +158,9 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
         </StyledText>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           {analysisStatus === 'loading' ? (
-            <StyledText as="p">{t('loading_data')}</StyledText>
+            <StyledText as="p" flex="1">
+              {t('loading_data')}
+            </StyledText>
           ) : (
             <>
               <Flex
@@ -231,7 +235,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             </>
           )}
           <Flex
-            flex="1"
+            flex="0 0 8rem"
             flexDirection={DIRECTION_COLUMN}
             marginRight={SPACING.spacing4}
           >

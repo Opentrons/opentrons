@@ -13,7 +13,10 @@ import {
 } from '@opentrons/components'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { analyzeProtocol, viewProtocolSourceFolder } from '../../redux/protocol-storage'
+import {
+  analyzeProtocol,
+  viewProtocolSourceFolder,
+} from '../../redux/protocol-storage'
 
 import type { Dispatch } from '../../redux/types'
 
@@ -21,9 +24,7 @@ interface OverflowMenuProps {
   protocolKey: string
 }
 
-export function OverflowMenu(
-  props: OverflowMenuProps
-): JSX.Element {
+export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
   const { protocolKey } = props
   const { t } = useTranslation('protocol_details')
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
@@ -58,7 +59,9 @@ export function OverflowMenu(
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          <MenuItem onClick={handleClickShowInFolder}>{t('show_in_folder')}</MenuItem>
+          <MenuItem onClick={handleClickShowInFolder}>
+            {t('show_in_folder')}
+          </MenuItem>
           <MenuItem onClick={handleClickReanalyze}>{t('reanalyze')}</MenuItem>
         </Flex>
       ) : null}
