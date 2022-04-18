@@ -5,7 +5,6 @@ import { LEFT, RIGHT } from '../../../redux/pipettes'
 import {
   Box,
   Flex,
-  Text,
   DIRECTION_ROW,
   ALIGN_START,
   DIRECTION_COLUMN,
@@ -19,6 +18,7 @@ import {
   InstrumentDiagram,
 } from '@opentrons/components'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
+import { StyledText } from '../../../atoms/text'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 
 import type {
@@ -47,91 +47,87 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element | null => {
     onClickOutside: () => setShowOverflowMenu(false),
   }) as React.RefObject<HTMLDivElement>
 
-  let mount: Mount = 'left'
+  let mount: Mount = LEFT
   let pipetteName: string = t('empty')
-  if (leftPipette != null) {
+  if (leftPipette) {
     pipetteName = leftPipette.modelSpecs.displayName
-    mount = 'left'
-  } else if (rightPipette != null) {
+    mount = LEFT
+  } else if (rightPipette) {
     pipetteName = rightPipette.modelSpecs.displayName
-    mount = 'right'
-  } else if (leftPipette === null) {
-    mount = 'left'
+    mount = RIGHT
+    //  if pipettes === null then we still need to know which mount it came from to render an empty pipette card
   } else if (rightPipette === null) {
-    mount = 'right'
+    mount = RIGHT
   }
 
   return (
-    <>
-      <Flex
-        backgroundColor={COLORS.background}
-        borderRadius={SPACING.spacing2}
-        marginBottom={SPACING.spacing3}
-        marginLeft={SPACING.spacing2}
-        marginRight={SPACING.spacing2}
-        width={'100%'}
-        data-testid={`PipetteCard_${pipetteName}`}
+    <Flex
+      backgroundColor={COLORS.background}
+      borderRadius={SPACING.spacing2}
+      marginBottom={SPACING.spacing3}
+      marginLeft={SPACING.spacing2}
+      marginRight={SPACING.spacing2}
+      width={'100%'}
+      data-testid={`PipetteCard_${pipetteName}`}
+    >
+      <Box
+        padding={`${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing3}`}
+        width="100%"
       >
-        <Box
-          padding={`${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing3}`}
-          width="100%"
-        >
-          <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
-            <Flex alignItems={ALIGN_START}>
-              {leftPipette === null || rightPipette === null ? null : (
-                <InstrumentDiagram
-                  pipetteSpecs={
-                    leftPipette?.modelSpecs ?? rightPipette?.modelSpecs
-                  }
-                  mount={leftPipette != null ? LEFT : RIGHT}
-                  css={IMAGE_CSS}
-                />
-              )}
-            </Flex>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              paddingLeft={SPACING.spacing3}
+        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
+          <Flex alignItems={ALIGN_START}>
+            {leftPipette === null || rightPipette === null ? null : (
+              <InstrumentDiagram
+                pipetteSpecs={
+                  leftPipette?.modelSpecs ?? rightPipette?.modelSpecs
+                }
+                mount={leftPipette != null ? LEFT : RIGHT}
+                css={IMAGE_CSS}
+              />
+            )}
+          </Flex>
+          <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing3}>
+            <StyledText
+              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              color={COLORS.darkGrey}
+              fontWeight={FONT_WEIGHT_REGULAR}
+              fontSize={FONT_SIZE_CAPTION}
+              paddingBottom={SPACING.spacing2}
+              data-testid={`PipetteCard_mount_${pipetteName}`}
             >
-              <Text
-                textTransform={TEXT_TRANSFORM_UPPERCASE}
-                color={COLORS.darkGrey}
-                fontWeight={FONT_WEIGHT_REGULAR}
-                fontSize={FONT_SIZE_CAPTION}
-                paddingBottom={SPACING.spacing2}
-                data-testid={`PipetteCard_mount_${pipetteName}`}
-              >
-                {t('mount', { side: mount === 'left' ? 'left' : 'right' })}
-              </Text>
-              <Flex
-                paddingBottom={SPACING.spacing2}
-                data-testid={`PipetteCard_display_name_${pipetteName}`}
-              >
-                <Text fontSize={TYPOGRAPHY.fontSizeP}>{pipetteName}</Text>
-              </Flex>
+              {t('mount', { side: mount === LEFT ? t('left') : t('right') })}
+            </StyledText>
+            <Flex
+              paddingBottom={SPACING.spacing2}
+              data-testid={`PipetteCard_display_name_${pipetteName}`}
+            >
+              <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
+                {pipetteName}
+              </StyledText>
             </Flex>
           </Flex>
-        </Box>
-        <Box
-          alignSelf={ALIGN_START}
-          padding={SPACING.spacing2}
-          data-testid={`PipetteCard_overflow_btn_${pipetteName}`}
+        </Flex>
+      </Box>
+      <Box
+        alignSelf={ALIGN_START}
+        padding={SPACING.spacing2}
+        data-testid={`PipetteCard_overflow_btn_${pipetteName}`}
+      >
+        <OverflowBtn
+          aria-label="overflow"
+          onClick={() => {
+            setShowOverflowMenu(prevShowOverflowMenu => !prevShowOverflowMenu)
+          }}
+        />
+      </Box>
+      {showOverflowMenu && (
+        <div
+          ref={pipetteOverflowWrapperRef}
+          data-testid={`PipetteCard_overflow_menu_${pipetteName}`}
         >
-          <OverflowBtn
-            aria-label="overflow"
-            onClick={() => {
-              setShowOverflowMenu(prevShowOverflowMenu => !prevShowOverflowMenu)
-            }}
-          />
-        </Box>
-        {showOverflowMenu && (
-          <div
-            ref={pipetteOverflowWrapperRef}
-            data-testid={`PipetteCard_overflow_menu_${pipetteName}`}
-          >
-            <PipetteOverflowMenu pipetteName={pipetteName} mount={mount} />
-          </div>
-        )}
-      </Flex>
-    </>
+          <PipetteOverflowMenu pipetteName={pipetteName} mount={mount} />
+        </div>
+      )}
+    </Flex>
   )
 }

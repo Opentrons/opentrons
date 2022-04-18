@@ -10,7 +10,7 @@ import {
   mockRightProtoPipette,
 } from '../../../../redux/pipettes/__fixtures__'
 
-jest.mock('../pipetteOverflowMenu')
+jest.mock('../PipetteOverflowMenu')
 
 const mockPipetteOverflowMenu = PipetteOverflowMenu as jest.MockedFunction<
   typeof PipetteOverflowMenu
@@ -47,11 +47,18 @@ describe('PipetteCard', () => {
     getByText('right Mount')
     getByText('Right Pipette')
   })
-  it('renders information for no pipette', () => {
+  it('renders information for no pipette on right Mount', () => {
     const { getByText } = render({
       rightPipette: null,
     })
     getByText('right Mount')
+    getByText('Empty')
+  })
+  it('renders information for no pipette on left Mount', () => {
+    const { getByText } = render({
+      leftPipette: null,
+    })
+    getByText('left Mount')
     getByText('Empty')
   })
   it('renders kebab icon and is clickable', () => {
