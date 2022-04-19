@@ -35,15 +35,36 @@ def get_protocol_reader() -> ProtocolReader:
     return ProtocolReader()
 
 
-def get_protocol_store(
+async def get_protocol_directory(
+    app_state: AppState = Depends(get_app_state),
+    persistence_directory: Path = Depends(get_persistence_directory),
+) -> Path:
+    """Get the directory to save protocol files, creating it if needed."""
+    protocol_directory = _protocol_directory.get_from(app_state)
+
+    if protocol_directory is None:
+        protocol_directory = persistence_directory / _PROTOCOL_FILES_SUBDIRECTORY
+        await AsyncPath(protocol_directory).mkdir(exist_ok=True)
+        _protocol_directory.set_on(app_state, protocol_directory)
+
+    return protocol_directory
+
+
+async def get_protocol_store(
     app_state: AppState = Depends(get_app_state),
     sql_engine: SQLEngine = Depends(get_sql_engine),
+    protocol_directory: Path = Depends(get_protocol_directory),
+    protocol_reader: ProtocolReader = Depends(get_protocol_reader),
 ) -> ProtocolStore:
     """Get a singleton ProtocolStore to keep track of created protocols."""
     protocol_store = _protocol_store.get_from(app_state)
 
     if protocol_store is None:
-        protocol_store = ProtocolStore(sql_engine=sql_engine)
+        protocol_store = await ProtocolStore.rehydrate(
+            sql_engine=sql_engine,
+            protocols_directory=protocol_directory,
+            protocol_reader=protocol_reader,
+        )
         _protocol_store.set_on(app_state, protocol_store)
 
     return protocol_store
@@ -70,18 +91,3 @@ async def get_protocol_analyzer(
         protocol_runner=protocol_runner,
         analysis_store=analysis_store,
     )
-
-
-async def get_protocol_directory(
-    app_state: AppState = Depends(get_app_state),
-    persistence_directory: Path = Depends(get_persistence_directory),
-) -> Path:
-    """Get the directory to save protocol files, creating it if needed."""
-    protocol_directory = _protocol_directory.get_from(app_state)
-
-    if protocol_directory is None:
-        protocol_directory = persistence_directory / _PROTOCOL_FILES_SUBDIRECTORY
-        await AsyncPath(protocol_directory).mkdir(exist_ok=True)
-        _protocol_directory.set_on(app_state, protocol_directory)
-
-    return protocol_directory

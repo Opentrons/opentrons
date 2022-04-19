@@ -1,23 +1,24 @@
 import * as React from 'react'
 import cx from 'classnames'
-
-import singleSrc from './pipetteSingle.png'
-import multiSrc from './pipetteMulti.png'
-import singleGEN2Src from './pipetteGEN2Single.png'
-import multiGEN2Src from './pipetteGEN2Multi.png'
+import { Box } from '..'
+import singleSrc from '@opentrons/components/src/instrument/single_channel_GEN1_800px.png'
+import multiSrc from '@opentrons/components/src/instrument/multi-channel_GEN1_800px.png'
+import singleGEN2Src from '@opentrons/components/src/instrument/single-channel_GEN2_800px.png'
+import multiGEN2Src from '@opentrons/components/src/instrument/multi-channel_GEN2_800px.png'
 import styles from './instrument.css'
 
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { Mount } from '../robot-types'
+import type { StyleProps } from '..'
 
-export interface InstrumentDiagramProps {
+export interface InstrumentDiagramProps extends StyleProps {
   pipetteSpecs?: Pick<PipetteNameSpecs, 'displayCategory' | 'channels'> | null
   className?: string
   mount: Mount
 }
 
 export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
-  const { pipetteSpecs, mount } = props
+  const { pipetteSpecs, mount, className, ...styleProps } = props
   const { displayCategory, channels } = pipetteSpecs || {}
 
   let imgSrc
@@ -32,11 +33,11 @@ export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
     }
   }
   return (
-    <div className={props.className}>
+    <Box className={className} {...styleProps}>
       <img
         className={cx({ [styles.flipped_image]: mount === 'right' })}
         src={imgSrc}
       />
-    </div>
+    </Box>
   )
 }

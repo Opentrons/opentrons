@@ -147,7 +147,7 @@ def test_eap_check_option():
     )
 
 
-async def test_list_keys(loop, wifi_keys_tempdir):
+async def test_list_keys(wifi_keys_tempdir):
     dummy_names = ["ad12d1df199bc912", "cbdda8124128cf", "812410990c5412"]
     for dn in dummy_names:
         os.mkdir(os.path.join(wifi_keys_tempdir, dn))
@@ -165,7 +165,7 @@ async def test_list_keys(loop, wifi_keys_tempdir):
             raise KeyError(dn)
 
 
-async def test_key_lifecycle(loop, wifi_keys_tempdir):
+async def test_key_lifecycle(wifi_keys_tempdir):
     with tempfile.TemporaryDirectory() as source_td:
         keys = list(wifi.list_keys())
         assert keys == []

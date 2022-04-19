@@ -2,7 +2,7 @@
 import reduce from 'lodash/reduce'
 
 import type { PipetteName, ModuleModel } from '@opentrons/shared-data'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
   LoadLabwareRunTimeCommand,
   LoadModuleRunTimeCommand,
@@ -14,9 +14,8 @@ interface PipetteNamesByMount {
   right: PipetteName | null
 }
 export function parseInitialPipetteNamesByMount(
-  analysis: ProtocolAnalysisFile<{}>
+  commands: RunTimeCommand[]
 ): PipetteNamesByMount {
-  const { commands } = analysis
   const rightPipetteName = commands.find(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'right'
@@ -32,9 +31,9 @@ export function parseInitialPipetteNamesByMount(
 }
 
 export function parseAllRequiredModuleModels(
-  analysis: ProtocolAnalysisFile<{}>
+  commands: RunTimeCommand[]
 ): ModuleModel[] {
-  return analysis.commands.reduce<ModuleModel[]>(
+  return commands.reduce<ModuleModel[]>(
     (acc, command) =>
       command.commandType === 'loadModule'
         ? [...acc, command.params.model]
@@ -47,9 +46,9 @@ interface LoadedLabwareBySlot {
   [slotName: string]: LoadLabwareRunTimeCommand
 }
 export function parseInitialLoadedLabwareBySlot(
-  analysis: ProtocolAnalysisFile<{}>
+  commands: RunTimeCommand[]
 ): LoadedLabwareBySlot {
-  const loadLabwareCommandsReversed = analysis.commands
+  const loadLabwareCommandsReversed = commands
     .filter(
       (command): command is LoadLabwareRunTimeCommand =>
         command.commandType === 'loadLabware'
@@ -69,9 +68,9 @@ interface LoadedLabwareByModuleId {
   [moduleId: string]: LoadLabwareRunTimeCommand
 }
 export function parseInitialLoadedLabwareByModuleId(
-  analysis: ProtocolAnalysisFile<{}>
+  commands: RunTimeCommand[]
 ): LoadedLabwareByModuleId {
-  const loadLabwareCommandsReversed = analysis.commands
+  const loadLabwareCommandsReversed = commands
     .filter(
       (command): command is LoadLabwareRunTimeCommand =>
         command.commandType === 'loadLabware'
@@ -90,9 +89,9 @@ interface LoadedModulesBySlot {
   [slotName: string]: LoadModuleRunTimeCommand
 }
 export function parseInitialLoadedModulesBySlot(
-  analysis: ProtocolAnalysisFile<{}>
+  commands: RunTimeCommand[]
 ): LoadedModulesBySlot {
-  const loadLabwareCommandsReversed = analysis.commands
+  const loadLabwareCommandsReversed = commands
     .filter(
       (command): command is LoadModuleRunTimeCommand =>
         command.commandType === 'loadModule'

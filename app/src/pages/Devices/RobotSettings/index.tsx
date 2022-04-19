@@ -23,12 +23,12 @@ import { RobotSettingsCalibration } from '../../../organisms/Devices/RobotSettin
 import { RobotSettingsAdvanced } from '../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsNetworking } from '../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 
-import type { NextGenRouteParams, RobotSettingsTab } from '../../../App/types'
 import type { State } from '../../../redux/types'
+import type { NavRouteParams, RobotSettingsTab } from '../../../App/types'
 
 export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')
-  const { robotName, robotSettingsTab } = useParams<NextGenRouteParams>()
+  const { robotName, robotSettingsTab } = useParams<NavRouteParams>()
   const robot = useSelector((state: State) => getRobotByName(state, robotName))
 
   const robotSettingsContentByTab: {

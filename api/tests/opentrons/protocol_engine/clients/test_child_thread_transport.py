@@ -1,7 +1,7 @@
 """Tests for am ChildThreadTransport."""
 
 import pytest
-from asyncio import AbstractEventLoop
+from asyncio import get_running_loop
 from datetime import datetime
 from decoy import Decoy
 from functools import partial
@@ -19,17 +19,15 @@ async def engine(decoy: Decoy) -> ProtocolEngine:
 
 
 @pytest.fixture
-def subject(
+async def subject(
     engine: ProtocolEngine,
-    loop: AbstractEventLoop,
 ) -> ChildThreadTransport:
     """Get a ChildThreadTransport test subject."""
-    return ChildThreadTransport(engine=engine, loop=loop)
+    return ChildThreadTransport(engine=engine, loop=get_running_loop())
 
 
 async def test_execute_command(
     decoy: Decoy,
-    loop: AbstractEventLoop,
     engine: ProtocolEngine,
     subject: ChildThreadTransport,
 ) -> None:
@@ -54,14 +52,13 @@ async def test_execute_command(
     )
 
     task = partial(subject.execute_command, request=cmd_request)
-    result = await loop.run_in_executor(None, task)
+    result = await get_running_loop().run_in_executor(None, task)
 
     assert result == cmd_result
 
 
 async def test_execute_command_failure(
     decoy: Decoy,
-    loop: AbstractEventLoop,
     engine: ProtocolEngine,
     subject: ChildThreadTransport,
 ) -> None:
@@ -93,4 +90,4 @@ async def test_execute_command_failure(
     task = partial(subject.execute_command, request=cmd_request)
 
     with pytest.raises(ProtocolEngineError, match="Things are not looking good"):
-        await loop.run_in_executor(None, task)
+        await get_running_loop().run_in_executor(None, task)
