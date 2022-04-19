@@ -7,7 +7,10 @@ from logging.config import dictConfig
 from typing import Iterator, List, Any, Dict
 
 from opentrons_hardware.drivers.can_bus.build import build_driver
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
+from opentrons_hardware.drivers.can_bus.can_messenger import (
+    CanMessenger,
+    WaitableCallback,
+)
 from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32Field
 from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
@@ -89,12 +92,8 @@ class Capturer:
             )
 
 
-async def run(args: argparse.Namespace) -> None:
-    """Entry point for script."""
-    driver = await build_driver(build_settings(args))
-    messenger = CanMessenger(driver=driver)
-    messenger.start()
-
+async def run(args: argparse.Namespace, messenger: CanMessenger) -> None:
+    """Do a single pass."""
     target_z = NodeId["head_" + args.mount[0]]
     target_pipette = NodeId["pipette_" + args.mount]
     found = await probe(messenger, set((NodeId.head, target_pipette)), 10)
@@ -114,7 +113,7 @@ async def run(args: argparse.Namespace) -> None:
     move_groups = [
         # Group 0 - home
         [create_home_step({target_z: float64(-1000)}, {target_z: float64(-50)})],
-        # Group 1
+        # Group 1 - prep
         [
             create_step(
                 {target_z: float64(args.prep_distance)},
@@ -123,6 +122,9 @@ async def run(args: argparse.Namespace) -> None:
                 float64(args.prep_distance / args.prep_speed),
                 [target_z],
             ),
+        ],
+        # group 2 (separate to set the threshold)
+        [
             create_step(
                 {target_z: float64(args.distance)},
                 {target_z: float64(args.speed)},
@@ -155,22 +157,57 @@ async def run(args: argparse.Namespace) -> None:
         binding=fields.SensorOutputBindingField(0),
     )
     reset_message = message_definitions.BindSensorOutputRequest(payload=reset_payload)
-    runner = MoveGroupRunner(move_groups=move_groups)
-    await messenger.send(target_pipette, threshold_message)
+    await messenger.send(target_pipette, reset_message)
+    runner = MoveGroupRunner(move_groups=move_groups[:-1])
+    await runner.run(can_messenger=messenger)
+    with WaitableCallback(messenger) as wc:
+        await messenger.send(target_pipette, threshold_message)
+        async for response, _ in wc:
+            if isinstance(response, message_definitions.SensorThresholdResponse):
+                thresh = sensor_utils.SensorDataType.build(
+                    response.payload.threshold
+                ).to_float()
+                print(f"threshold set to {thresh}pF")
+                break
     await messenger.send(target_pipette, stim_message)
+    runner = MoveGroupRunner(move_groups=[move_groups[-1]])
     position = await runner.run(can_messenger=messenger)
     if args.verbose_monitoring:
         print(f"Sensor data: {sensor_cap.get_all()}")
     print(f"Position: {position[target_z]}")
     await messenger.send(target_pipette, reset_message)
-    await asyncio.get_running_loop().run_in_executor(
-        None, lambda: input("press enter to home")
-    )
+    if not args.continuous:
+        await asyncio.get_running_loop().run_in_executor(
+            None, lambda: input("press enter to home")
+        )
     runner = MoveGroupRunner(move_groups=[move_groups[0]])
     await runner.run(can_messenger=messenger)
     await messenger.send(NodeId.broadcast, message_definitions.DisableMotorRequest())
-    await messenger.stop()
-    driver.shutdown()
+    messenger.remove_listener(sensor_cap)
+
+
+async def do_repeats(args: argparse.Namespace) -> None:
+    """Execute the right number of runs."""
+    run_count = 0
+
+    def _done() -> bool:
+        nonlocal run_count
+        run_count += 1
+        if args.runs == 0:
+            return False
+        if run_count >= args.runs:
+            return True
+        return False
+
+    while True:
+        driver = await build_driver(build_settings(args))
+        messenger = CanMessenger(driver=driver)
+        messenger.start()
+        await run(args, messenger)
+        if _done():
+            await messenger.stop()
+            driver.shutdown()
+            return
 
 
 def main() -> None:
@@ -184,7 +221,13 @@ def main() -> None:
     parser.add_argument("-d", "--distance", type=float, default=7)
     parser.add_argument("-pd", "--prep-distance", type=float, default=12)
     parser.add_argument("-ps", "--prep-speed", type=float, default=50)
-    parser.add_argument("-t", "--threshold", type=float, default=17)
+    parser.add_argument(
+        "-t",
+        "--threshold",
+        type=float,
+        default=0,
+        help="capacitance threshold; 0 is autodiscover",
+    )
     parser.add_argument("-v", "--verbose-monitoring", action="store_true")
     parser.add_argument(
         "-l",
@@ -193,10 +236,19 @@ def main() -> None:
         choices=["INFO", "DEBUG", "WARNING", "ERROR"],
         default="WARNING",
     )
+    parser.add_argument(
+        "-r", "--runs", type=int, default=1, help="number of runs. 0 is infinite."
+    )
+    parser.add_argument(
+        "-c",
+        "--continuous",
+        action="store_true",
+        help="Do not wait for human input ever",
+    )
     args = parser.parse_args()
     dictConfig(build_log_config(args.log_level))
 
-    asyncio.run(run(args))
+    asyncio.run(do_repeats(args))
 
 
 if __name__ == "__main__":
