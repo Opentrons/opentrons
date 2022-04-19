@@ -494,9 +494,32 @@ describe('LabwareSetup', () => {
       .calledWith([mockMagneticModule.model])
       .mockReturnValue(['magneticModuleType'])
 
-    mockModuleExtraAttention.mockReturnValue(
-      <div>mock module extra attention banner with magnetic module and TC</div>
-    )
+    when(mockModuleExtraAttention)
+      .calledWith(
+        componentPropsMatcher({
+          moduleTypes: ['magneticModuleType'],
+          modulesInfo: {
+            [mockMagneticModule.moduleId]: {
+              moduleId: mockMagneticModule.moduleId,
+              x: MOCK_MAGNETIC_MODULE_COORDS[0],
+              y: MOCK_MAGNETIC_MODULE_COORDS[1],
+              z: MOCK_MAGNETIC_MODULE_COORDS[2],
+              moduleDef: mockMagneticModule as any,
+              nestedLabwareDisplayName: 'Source Plate',
+              nestedLabwareDef: null,
+              nestedLabwareId: null,
+              protocolLoadOrder: 0,
+              slotName: '3',
+              attachedModuleMatch: null,
+            },
+          },
+        })
+      )
+      .mockReturnValue(
+        <div>
+          mock module extra attention banner with magnetic module and TC
+        </div>
+      )
 
     const { getByText } = render()
     getByText('mock module extra attention banner with magnetic module and TC')
