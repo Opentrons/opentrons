@@ -73,3 +73,5 @@ async def test_cancel_tasks():
     assert len(all_tasks) == 2  # current and other
     assert other_task in all_tasks
     assert cancellable_task not in all_tasks
+
+    other_task.cancel()
