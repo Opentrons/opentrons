@@ -13,8 +13,9 @@ import {
   getRobotSerialNumber,
   getRobotFirmwareVersion,
   getRobotProtocolApiVersion,
+  REACHABLE,
 } from '../../../../redux/discovery'
-import { ViewableRobot } from '../../../../redux/discovery/types'
+import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 interface RobotInformationProps {
   robot: ViewableRobot
@@ -25,11 +26,11 @@ export function RobotInformation({
 }: RobotInformationProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const serialNumber =
-    (robot as ViewableRobot) != null ? getRobotSerialNumber(robot) : null
+    robot.status === REACHABLE ? getRobotSerialNumber(robot) : null
   const firmwareVersion =
-    (robot as ViewableRobot) != null ? getRobotFirmwareVersion(robot) : null
+    robot.status === REACHABLE ? getRobotFirmwareVersion(robot) : null
   const protocolApiVersions =
-    (robot as ViewableRobot) != null ? getRobotProtocolApiVersion(robot) : null
+    robot.status === REACHABLE ? getRobotProtocolApiVersion(robot) : null
   const minProtocolApiVersion = protocolApiVersions?.min ?? 'Unknown'
   const maxProtocolApiVersion = protocolApiVersions?.max ?? 'Unknown'
   const apiVersionMinMax = `v${minProtocolApiVersion} - v${maxProtocolApiVersion}`

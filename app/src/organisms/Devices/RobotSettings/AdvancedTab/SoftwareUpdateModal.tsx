@@ -11,12 +11,16 @@ import {
 import { getShellUpdateState } from '../../../../redux/shell'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
 // import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
+
+import { UpdateBuildroot } from '../../../../pages/Robots/RobotSettings/UpdateBuildroot'
 import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { PrimaryButton, SecondaryButton } from '../../../../atoms/Buttons'
 import { Banner } from '../../../../atoms/Banner'
 import { Modal } from '../../../../atoms/Modal'
 import { Divider } from '../../../../atoms/structure'
+import { useRobot } from '../../hooks'
+import { REACHABLE } from '../../../../redux/discovery'
 
 const TECHNICAL_CHANGE_LOG_URL =
   'https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md'
@@ -25,14 +29,14 @@ const ISSUE_TRACKER_URL =
 const RELEASE_NOTES_URL = 'https://github.com/Opentrons/opentrons/releases'
 
 interface SoftwareUpdateModalProps {
-  //   robotName: string
+  robotName: string
   closeModal: () => void
 }
 
 export function SoftwareUpdateModal({
-  //   robotName,
+  robotName,
   closeModal,
-}: SoftwareUpdateModalProps): JSX.Element {
+}: SoftwareUpdateModalProps): JSX.Element | null {
   const { t } = useTranslation('device_settings')
 
   const currentRunId = useCurrentRunId()
@@ -42,8 +46,19 @@ export function SoftwareUpdateModal({
   const { info: updateInfo } = updateState
   const version = updateInfo?.version ?? ''
   //   const releaseNotes = updateInfo?.releaseNotes
+  const robot = useRobot(robotName)
+  const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(false)
 
-  return (
+  const handleCloseModal = (): void => {
+    setShowUpdateModal(false)
+    closeModal()
+  }
+
+  if (robot?.status !== REACHABLE) return null
+
+  return showUpdateModal ? (
+    <UpdateBuildroot robot={robot} close={handleCloseModal} />
+  ) : (
     <Modal title={t('software_update_modal_title')} onClose={closeModal}>
       <Banner type="informing">
         {currentRunId == null
@@ -98,7 +113,10 @@ export function SoftwareUpdateModal({
           <SecondaryButton onClick={() => {}} marginRight={SPACING.spacing3}>
             {t('software_update_modal_remind_me_later_button')}
           </SecondaryButton>
-          <PrimaryButton onClick={() => {}} disabled={currentRunId != null}>
+          <PrimaryButton
+            onClick={() => setShowUpdateModal(true)}
+            disabled={currentRunId != null}
+          >
             {t('software_update_modal_update_button')}
           </PrimaryButton>
         </Flex>

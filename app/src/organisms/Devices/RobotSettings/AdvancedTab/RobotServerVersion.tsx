@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
 import { Banner } from '../../../../atoms/Banner'
-import { getRobotApiVersion } from '../../../../redux/discovery'
+import { getRobotApiVersion, REACHABLE } from '../../../../redux/discovery'
 import { checkShellUpdate } from '../../../../redux/shell'
 import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
 
@@ -25,6 +25,7 @@ import type { State, Dispatch } from '../../../../redux/types'
 interface RobotServerVersionProps {
   robot: ViewableRobot
   robotName: string
+  updateSoftwareUpdateModal: (isOpen: boolean) => void
 }
 
 const UPDATE_RECHECK_DELAY_MS = 60000
@@ -34,6 +35,7 @@ const GITHUB_LINK =
 export function RobotServerVersion({
   robot,
   robotName,
+  updateSoftwareUpdateModal,
 }: RobotServerVersionProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
@@ -49,44 +51,35 @@ export function RobotServerVersion({
     autoUpdateAction !== 'reinstall'
   )
   const robotServerVersion =
-    (robot as ViewableRobot) != null ? getRobotApiVersion(robot) : null
+    robot.status === REACHABLE ? getRobotApiVersion(robot) : null
 
   const updateDisabled = autoUpdateDisabledReason !== null // pass to modal
 
-  const bannerMessage = `${t('robot_server_versions_banner_title')} ${t(
-    'robot_server_versions_view_update'
-  )}`
-
-  // const ViewUpdateButton = (): JSX.Element => {
-  //   <Link>
-  //   </Link>
-  // }
-
-  // const SoftwareUpdateBanner = (): JSX.Element => {
-  //   return(
-
-  //   )
-  // }
-
-  // Display the banner when the autoUpdateAction is not reinstall which is upgrade or downgrade
-
-  React.useEffect(() => {
-    if (autoUpdateAction !== 'reinstall') {
-      setShowBanner(true)
-    }
-  }, [])
+  // React.useEffect(() => {
+  //   if (autoUpdateAction !== 'reinstall') {
+  //     setShowBanner(true)
+  //   }
+  // }, [])
 
   // check for available updates
   useInterval(checkAppUpdate, UPDATE_RECHECK_DELAY_MS)
 
   return (
     <>
-      {showBanner ? (
-        <Banner
-          type="warning"
-          onCloseClick={() => setShowBanner(false)}
-          title={bannerMessage}
-        ></Banner>
+      {true ? (
+        <Banner type="warning" onCloseClick={() => setShowBanner(false)}>
+          <StyledText as="p" marginRight={SPACING.spacing2}>
+            {t('robot_server_versions_banner_title')}
+          </StyledText>
+          <Link
+            as="button"
+            backGroundColor={COLORS.warningBg}
+            onClick={() => updateSoftwareUpdateModal(true)}
+            css={TYPOGRAPHY.pRegular}
+          >
+            {t('robot_server_versions_view_update')}
+          </Link>
+        </Banner>
       ) : (
         <Flex justifyContent={JUSTIFY_FLEX_END}>
           <StyledText as="label" color={COLORS.darkGreyEnabled}>

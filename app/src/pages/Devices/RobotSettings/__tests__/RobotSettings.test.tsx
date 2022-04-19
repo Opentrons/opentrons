@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
@@ -82,7 +83,7 @@ describe('RobotSettings', () => {
 
     const networkingTab = getByText('Networking')
     expect(queryByText('Mock RobotSettingsNetworking')).toBeFalsy()
-    networkingTab.click()
+    fireEvent.click(networkingTab)
     getByText('Mock RobotSettingsNetworking')
   })
 })

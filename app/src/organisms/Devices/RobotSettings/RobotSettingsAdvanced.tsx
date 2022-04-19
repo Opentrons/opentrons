@@ -88,10 +88,15 @@ export function RobotSettingsAdvanced({
     setIsRobotConnected(isConnected ?? false)
   }
 
+  const updateSoftwareUpdateModal = (isOpen: boolean): void => {
+    setShowSoftwareUpdateModal(isOpen)
+  }
+
   return (
     <>
       {showSoftwareUpdateModal && (
         <SoftwareUpdateModal
+          robotName={robotName}
           closeModal={() => setShowSoftwareUpdateModal(false)}
         />
       )}
@@ -127,6 +132,7 @@ export function RobotSettingsAdvanced({
         <RobotServerVersion
           robot={robot as ViewableRobot}
           robotName={robotName}
+          updateSoftwareUpdateModal={updateSoftwareUpdateModal}
         />
         <Divider marginY={SPACING.spacing5} />
         <RobotInformation robot={robot as ViewableRobot} />
