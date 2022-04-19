@@ -3,7 +3,7 @@ name: Release Testing Feedback
 about: Create an issue to track a bug or feedback
 title: '5.1 Feedback: '
 labels: '5.1-feedback'
-assignees: ''
+assignees: '@nusrat813,@y3rsh'
 ---
 
 # Overview
