@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
-
+import { Box } from '@opentrons/components'
 import {
   SUCCESS,
   FAILURE,
@@ -15,9 +15,7 @@ import {
   updatePipetteSettings,
 } from '../../redux/pipettes'
 import { useFeatureFlag } from '../../redux/config'
-
-import { ScrollableAlertModal } from '../../molecules/modals'
-import { ConfigMessage } from './ConfigMessage'
+// import { ScrollableAlertModal } from '../../molecules/modals'
 import { ConfigForm } from './ConfigForm'
 import { ConfigErrorBanner } from './ConfigErrorBanner'
 
@@ -29,7 +27,6 @@ import type {
 } from '../../redux/pipettes/types'
 
 // TODO(mc, 2019-12-09): i18n
-const PIPETTE_SETTINGS = 'Pipette Settings'
 const AN_ERROR_OCCURRED_WHILE_UPDATING =
   "An error occurred while updating your pipette's settings. Please try again."
 
@@ -78,12 +75,9 @@ export function ConfigurePipette(props: Props): JSX.Element {
   }, [updateRequest, closeModal])
 
   return (
-    <ScrollableAlertModal
-      heading={`${PIPETTE_SETTINGS}: ${pipette?.modelSpecs.displayName || ''}`}
-      alertOverlay
-    >
+    // <ScrollableAlertModal>
+    <Box zIndex={1}>
       {updateError && <ConfigErrorBanner message={updateError} />}
-      <ConfigMessage />
       {settings && (
         <ConfigForm
           settings={settings}
@@ -93,6 +87,7 @@ export function ConfigurePipette(props: Props): JSX.Element {
           __showHiddenFields={__showHiddenFields}
         />
       )}
-    </ScrollableAlertModal>
+    </Box>
+    // </ScrollableAlertModal>
   )
 }

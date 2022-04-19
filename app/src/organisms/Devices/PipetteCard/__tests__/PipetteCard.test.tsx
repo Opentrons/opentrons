@@ -9,8 +9,7 @@ import {
   mockLeftSpecs,
   mockRightSpecs,
 } from '../../../../redux/pipettes/__fixtures__'
-import { LEFT } from '@opentrons/shared-data'
-import { RIGHT } from '../../../../redux/pipettes'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
 
 jest.mock('../PipetteOverflowMenu')
 
@@ -41,6 +40,7 @@ describe('PipetteCard', () => {
       pipetteInfo: mockLeftSpecs,
       mount: LEFT,
       robotName: mockRobotName,
+      pipetteId: 'id',
     })
     getByText('left Mount')
     getByText('Left Pipette')
@@ -50,6 +50,7 @@ describe('PipetteCard', () => {
       pipetteInfo: mockRightSpecs,
       mount: RIGHT,
       robotName: mockRobotName,
+      pipetteId: 'id',
     })
     getByText('right Mount')
     getByText('Right Pipette')

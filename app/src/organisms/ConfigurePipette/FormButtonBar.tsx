@@ -1,28 +1,52 @@
 import * as React from 'react'
-
-import { BottomButtonBar } from '../../molecules/modals'
-
-import styles from './styles.css'
-
-import type { ButtonProps } from '@opentrons/components'
-
-type MaybeButtonProps = ButtonProps | null | undefined
+import { useTranslation } from 'react-i18next'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  SPACING,
+  TEXT_TRANSFORM_UPPERCASE,
+} from '@opentrons/components'
+import { PrimaryButton, SecondaryButton } from '../../atoms/Buttons'
+import { Divider } from '../../atoms/structure'
 export interface FormButtonBarProps {
-  buttons: MaybeButtonProps[]
+  isTopButton: boolean
+  onClick?: () => unknown
+  disabled: boolean
 }
 
 export function FormButtonBar(props: FormButtonBarProps): JSX.Element {
-  const className = styles.form_button
-  const buttons = props.buttons.map(button => ({ ...button, className }))
+  const { isTopButton, onClick, disabled } = props
+  const { t } = useTranslation('shared')
 
   return (
-    <BottomButtonBar
-      buttons={buttons}
-      description={
-        <p className={styles.reset_message}>
-          * To reset an individual setting, simply clear the field.
-        </p>
-      }
-    />
+    <>
+      {isTopButton ? (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          textTransform={TEXT_TRANSFORM_UPPERCASE}
+        >
+          <SecondaryButton
+            marginTop={SPACING.spacingSM}
+            marginBottom={SPACING.spacingSM}
+            onClick={onClick}
+            disabled={disabled}
+          >
+            {t('reset_all')}
+          </SecondaryButton>
+          <Divider />
+        </Flex>
+      ) : (
+        <Flex
+          justifyContent={JUSTIFY_CENTER}
+          flexDirection={DIRECTION_COLUMN}
+          textTransform={TEXT_TRANSFORM_UPPERCASE}
+        >
+          <PrimaryButton type={'submit'} disabled={disabled}>
+            {t('confirm')}
+          </PrimaryButton>
+        </Flex>
+      )}
+    </>
   )
 }

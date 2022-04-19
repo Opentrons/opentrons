@@ -65,11 +65,13 @@ export function PipettesAndModules({
           <Flex flexDirection={DIRECTION_COLUMN} width="100%">
             <Flex flexDirection={DIRECTION_ROW}>
               <PipetteCard
+                pipetteId={attachedPipettes.left?.id}
                 pipetteInfo={attachedPipettes.left?.modelSpecs ?? null}
                 mount={LEFT}
                 robotName={robotName}
               />
               <PipetteCard
+                pipetteId={attachedPipettes.right?.id}
                 pipetteInfo={attachedPipettes.right?.modelSpecs ?? null}
                 mount={RIGHT}
                 robotName={robotName}

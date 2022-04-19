@@ -19,13 +19,17 @@ import {
 } from '@opentrons/components'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { StyledText } from '../../../atoms/text'
+import { ChangePipette } from '../../ChangePipette'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
+import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
+import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
-import type { Mount } from '../../../redux/pipettes/types'
+import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 interface PipetteCardProps {
   pipetteInfo: PipetteModelSpecs | null
+  pipetteId?: AttachedPipette['id']
   mount: Mount
   robotName: string
 }
@@ -33,11 +37,25 @@ interface PipetteCardProps {
 export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { t } = useTranslation('device_details')
   const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
-  const { pipetteInfo, mount, robotName } = props
+  const { pipetteInfo, mount, robotName, pipetteId } = props
   const pipetteName = pipetteInfo?.displayName
   const pipetteOverflowWrapperRef = useOnClickOutside({
     onClickOutside: () => setShowOverflowMenu(false),
   }) as React.RefObject<HTMLDivElement>
+  const [showChangePipette, setChangePipette] = React.useState(false)
+  const [showSlideout, setShowSlideout] = React.useState(false)
+  const [showAboutSlideout, setShowAboutSlideout] = React.useState(false)
+
+  const handleChangePipette = (): void => {
+    setChangePipette(true)
+  }
+  const handleSlideout = (isAboutPipette: boolean = false): void => {
+    if (isAboutPipette) {
+      setShowAboutSlideout(true)
+    } else {
+      setShowSlideout(true)
+    }
+  }
 
   return (
     <Flex
@@ -48,6 +66,30 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       width={'100%'}
       data-testid={`PipetteCard_${pipetteName}`}
     >
+      {showChangePipette && (
+        <ChangePipette
+          robotName={robotName}
+          mount={mount}
+          closeModal={() => setChangePipette(false)}
+        />
+      )}
+      {showSlideout && pipetteInfo != null && (
+        <PipetteSettingsSlideout
+          mount={mount}
+          robotName={robotName}
+          pipetteName={pipetteInfo.displayName}
+          onCloseClick={() => setShowSlideout(false)}
+          isExpanded={true}
+        />
+      )}
+      {showAboutSlideout && pipetteInfo != null && pipetteId != null && (
+        <AboutPipetteSlideout
+          pipetteId={pipetteId}
+          pipetteName={pipetteInfo.displayName}
+          onCloseClick={() => setShowAboutSlideout(false)}
+          isExpanded={true}
+        />
+      )}
       <Box padding={`${SPACING.spacing4} ${SPACING.spacing3}`} width="100%">
         <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
           <Flex alignItems={ALIGN_START}>
@@ -104,6 +146,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             pipetteName={pipetteName ?? t('empty')}
             mount={mount}
             robotName={robotName}
+            handleChangePipette={handleChangePipette}
+            handleSlideout={handleSlideout}
           />
         </div>
       )}
