@@ -4,9 +4,8 @@ import asyncio
 import logging
 from numpy import float64
 from logging.config import dictConfig
-from typing import Optional, Iterator, List, Any, Dict
+from typing import Iterator, List, Any, Dict
 
-from opentrons_hardware.drivers.can_bus import CanDriver
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32Field
@@ -23,8 +22,6 @@ from opentrons_hardware.firmware_bindings.messages import (
 )
 
 from opentrons_hardware.hardware_control.motion import (
-    MoveGroupSingleAxisStep,
-    MoveType,
     MoveStopCondition,
     create_home_step,
     create_step,
@@ -37,6 +34,7 @@ log = logging.getLogger(__name__)
 
 
 def build_log_config(level: str) -> Dict[str, Any]:
+    """Build a log config from a level."""
     return {
         "version": 1,
         "disable_existing_loggers": False,
@@ -60,16 +58,21 @@ def build_log_config(level: str) -> Dict[str, Any]:
 
 
 class Capturer:
+    """Capture incoming sensor messages."""
+
     def __init__(self) -> None:
+        """Build the capturer."""
         self.response_queue: asyncio.Queue[float] = asyncio.Queue()
 
     def _do_get_all(self) -> Iterator[float]:
+        """Worker to get messages."""
         try:
             yield self.response_queue.get_nowait()
         except asyncio.QueueEmpty:
             return
 
     def get_all(self) -> List[float]:
+        """Get all captured messages."""
         return list(self._do_get_all())
 
     def __call__(
@@ -77,6 +80,7 @@ class Capturer:
         message: MessageDefinition,
         arbitration_id: ArbitrationId,
     ) -> None:
+        """Callback entry point for capturing messages."""
         if isinstance(message, message_definitions.ReadFromSensorResponse):
             self.response_queue.put_nowait(
                 sensor_utils.SensorDataType.build(
@@ -171,7 +175,6 @@ async def run(args: argparse.Namespace) -> None:
 
 def main() -> None:
     """Entry point."""
-
     parser = argparse.ArgumentParser(description="CAN bus move.")
     add_can_args(parser)
     parser.add_argument(

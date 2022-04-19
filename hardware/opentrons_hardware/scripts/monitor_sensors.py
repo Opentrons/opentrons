@@ -1,9 +1,8 @@
+"""Script to monitor sensor output."""
 import asyncio
 import argparse
 import datetime
 
-
-from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     WaitableCallback,
@@ -28,6 +27,7 @@ async def do_run(
     target_sensor: constants.SensorType,
     threshold: float,
 ) -> None:
+    """Configure and start the monitoring."""
     threshold_payload = payloads.SetSensorThresholdRequestPayload(
         sensor=fields.SensorTypeField(constants.SensorType.capacitive),
         threshold=Int32Field(int(threshold * 2**15)),
@@ -76,7 +76,6 @@ async def run(args: argparse.Namespace) -> None:
 
 def main() -> None:
     """Entry point."""
-
     parser = argparse.ArgumentParser(description="CAN bus testing.")
     add_can_args(parser)
     parser.add_argument(
