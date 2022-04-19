@@ -712,6 +712,13 @@ async def test_update_current_to_current_noop(
     assert result.status_code == 200
 
     decoy.verify(await mock_engine_store.clear(), times=0)
+    decoy.verify(
+        mock_run_store.update_active_run(
+            run_id=matchers.Anything(),
+            is_current=matchers.Anything(),
+        ),
+        times=0,
+    )
 
 
 async def test_update_to_current_conflict(
