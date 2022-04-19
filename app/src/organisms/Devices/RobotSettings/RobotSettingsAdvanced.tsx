@@ -49,6 +49,11 @@ export function RobotSettingsAdvanced({
     showFactoryResetModal,
     setShowFactoryResetModal,
   ] = React.useState<boolean>(false)
+  const [
+    showSoftwareUpdateModal,
+    setShowSoftwareUpdateModal,
+  ] = React.useState<boolean>(true)
+
   const robot = useSelector((state: State) => getRobotByName(state, robotName))
   const ipAddress = robot?.ip != null ? robot.ip : ''
   const settings = useSelector<State, RobotSettings>((state: State) =>
@@ -59,12 +64,7 @@ export function RobotSettingsAdvanced({
   const [isRobotConnected, setIsRobotConnected] = React.useState<boolean>(
     connected
   )
-  const [
-    showSoftwareUpdateModal,
-    setShowSoftwareUpdateModal,
-  ] = React.useState<boolean>(false)
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
-
   const findSettings = (id: string): RobotSettingsField | undefined =>
     settings.find(s => s.id === id)
 

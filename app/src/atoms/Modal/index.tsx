@@ -15,7 +15,6 @@ import {
 
 import { StyledText } from '../text'
 import { Divider } from '../structure'
-import { StyledText } from '../text'
 import type { IconProps } from '@opentrons/components'
 
 type ModalType = 'info' | 'warning' | 'error'

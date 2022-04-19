@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 import { getShellUpdateState } from '../../../../redux/shell'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
-import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
+// import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
 import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { PrimaryButton, SecondaryButton } from '../../../../atoms/Buttons'
@@ -35,26 +35,21 @@ export function SoftwareUpdateModal({
 }: SoftwareUpdateModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
-  // TODO: CHeck protocol is running
   const currentRunId = useCurrentRunId()
+  // ToDo: Add release notes for the new design
   const updateState = useSelector(getShellUpdateState)
-  const { downloaded, downloading, error, info: updateInfo } = updateState
+  //   const { downloaded, downloading, error, info: updateInfo } = updateState
+  const { info: updateInfo } = updateState
   const version = updateInfo?.version ?? ''
-  const releaseNotes = updateInfo?.releaseNotes
+  //   const releaseNotes = updateInfo?.releaseNotes
 
   return (
-    <Modal
-      title={
-        currentRunId != null
-          ? t('software_update_modal_protocol_running_banner_message')
-          : t('Robot Update Available')
-      }
-      onClose={closeModal}
-    >
-      <Banner
-        type="informing"
-        title={t('Updating the robot’s software requires restarting the robot')}
-      ></Banner>
+    <Modal title={t('software_update_modal_title')} onClose={closeModal}>
+      <Banner type="informing">
+        {currentRunId == null
+          ? t('software_update_modal_available_banner_message')
+          : t('software_update_modal_protocol_running_banner_message')}
+      </Banner>
       <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing4}>
         {/* <ReleaseNotes source={releaseNotes} /> ToDo: align with new design */}
         <StyledText css={TYPOGRAPHY.pSemiBold}>
@@ -70,19 +65,23 @@ export function SoftwareUpdateModal({
         <StyledText css={TYPOGRAPHY.pSemiBold} marginTop={SPACING.spacing3}>
           {t('software_update_modal_but_fixes_label')}
         </StyledText>
-        <StyledText as="p">{'None in the Opentrons dummy text'}</StyledText>
+        <StyledText as="p" marginBottom={SPACING.spacing4}>
+          {'None in the Opentrons dummy text'}
+        </StyledText>
         <Divider />
         <ExternalLink
           href={TECHNICAL_CHANGE_LOG_URL}
           css={TYPOGRAPHY.pSemiBold}
-          id=""
+          id="SoftwareUpdateTechnicalChangeLogLink"
+          marginTop={SPACING.spacing4}
+          marginBottom={SPACING.spacing3}
         >
           {t('software_update_modal_technical_change_log_link')}
         </ExternalLink>
         <ExternalLink
           href={ISSUE_TRACKER_URL}
           css={TYPOGRAPHY.pSemiBold}
-          id=""
+          id="SoftwareUpdateIssueTrackerLink"
           marginBottom={SPACING.spacing3}
         >
           {t('software_update_modal_issue_tracker_link')}
@@ -90,17 +89,13 @@ export function SoftwareUpdateModal({
         <ExternalLink
           href={RELEASE_NOTES_URL}
           css={TYPOGRAPHY.pSemiBold}
-          id=""
+          id="SoftwareUpdateReleaseNotesLink"
           marginBottom={SPACING.spacing3}
         >
           {t('software_update_modal_release_notes_link')}
         </ExternalLink>
         <Flex justifyContent={JUSTIFY_FLEX_END}>
-          <SecondaryButton
-            onClick={() => {}}
-            marginRight={SPACING.spacing3}
-            marginBottom={SPACING.spacing3}
-          >
+          <SecondaryButton onClick={() => {}} marginRight={SPACING.spacing3}>
             {t('software_update_modal_remind_me_later_button')}
           </SecondaryButton>
           <PrimaryButton onClick={() => {}} disabled={currentRunId != null}>
