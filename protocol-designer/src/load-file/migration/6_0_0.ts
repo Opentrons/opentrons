@@ -164,20 +164,20 @@ export const migrateFile = (
   const liquids: ProtocolFile['liquids'] =
     appData.designerApplication?.data?.ingredients != null
       ? reduce(
-        appData.designerApplication?.data?.ingredients,
-        (acc, liquidData, liquidId) => {
-          return {
-            ...acc,
-            [liquidId]: {
-              displayName: liquidData.name,
-              description: liquidData.description ?? '',
-            },
-          }
-        },
-        {}
-      )
+          appData.designerApplication?.data?.ingredients,
+          (acc, liquidData, liquidId) => {
+            return {
+              ...acc,
+              [liquidId]: {
+                displayName: liquidData.name,
+                description: liquidData.description ?? '',
+              },
+            }
+          },
+          {}
+        )
       : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      ({} as ProtocolFile['liquids'])
+        ({} as ProtocolFile['liquids'])
   return {
     ...appData,
     designerApplication: {

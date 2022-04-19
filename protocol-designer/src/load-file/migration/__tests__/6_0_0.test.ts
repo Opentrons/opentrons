@@ -65,7 +65,7 @@ describe('v6 migration', () => {
     })
   })
   it('adds a liquids key', () => {
-    const migratedFile = migrateFile(oldProtocol)
+    const migratedFile = migrateFile(oldDoItAllProtocol)
     const expectedLiquids = { '0': { displayName: 'Water', description: '' } }
     expect(migratedFile.liquids).toEqual(expectedLiquids)
   })
