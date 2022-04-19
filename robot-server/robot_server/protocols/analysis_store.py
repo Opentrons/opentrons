@@ -61,10 +61,10 @@ class AnalysisStore:
         )
 
     def get_summaries_by_protocol(self, protocol_id: str) -> List[AnalysisSummary]:
-        """Get an analysis for a given protocol ID from the store."""
+        """Get analysis summaries for a given protocol ID from the store."""
         full_analyses = self.get_by_protocol(protocol_id)
 
-        return [AnalysisSummary(id=a.id, status=a.status) for a in full_analyses]
+        return [AnalysisSummary.construct(id=a.id, status=a.status) for a in full_analyses]
 
     def get_by_protocol(self, protocol_id: str) -> List[ProtocolAnalysis]:
         """Get an analysis for a given protocol ID from the store."""
