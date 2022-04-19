@@ -44,7 +44,7 @@
   "current_version": "Current Version",
   "version": "Version {{version}}",
   "serial_number": "Serial Number",
-  "link_firmwainre_update": "View Firmware Update",
+  "link_firmware_update": "View Firmware Update",
   "firmware_update_available": "Firmware update available.",
   "update_now": "Update now",
   "heater": "Heater",
