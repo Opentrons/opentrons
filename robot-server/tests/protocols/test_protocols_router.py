@@ -139,7 +139,7 @@ async def test_get_protocols(
         createdAt=created_at_1,
         protocolType=ProtocolType.PYTHON,
         metadata=Metadata(),
-        analyses=[analysis_1],
+        analysisSummaries=[analysis_1],
         files=[],
         key="dummy-key-111",
     )
@@ -148,7 +148,7 @@ async def test_get_protocols(
         createdAt=created_at_2,
         protocolType=ProtocolType.JSON,
         metadata=Metadata(),
-        analyses=[analysis_2],
+        analysisSummaries=[analysis_2],
         files=[],
         key="dummy-key-222",
     )
@@ -211,7 +211,7 @@ async def test_get_protocol_by_id(
         createdAt=datetime(year=2021, month=1, day=1),
         protocolType=ProtocolType.PYTHON,
         metadata=Metadata(),
-        analyses=[analysis_summary],
+        analysisSummaries=[analysis_summary],
         files=[],
         key="dummy-key-111",
     )
@@ -304,7 +304,7 @@ async def test_create_protocol(
         createdAt=datetime(year=2021, month=1, day=1),
         protocolType=ProtocolType.JSON,
         metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
-        analyses=[pending_analysis],
+        analysisSummaries=[pending_analysis],
         files=[ProtocolFile(name="foo.json", role=ProtocolFileRole.MAIN)],
         key="dummy-key-111",
     )

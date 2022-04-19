@@ -14,7 +14,7 @@ stages:
       save:
         json:
           protocol_id: data.id
-          analyses_id: data.analyses[0].id
+          analysis_id: data.analysisSummaries[0].id
       status_code: 201
       json:
         data:
@@ -28,7 +28,8 @@ stages:
             apiLevel: '2.6'
             protocolName: basic_transfer_standalone
             author: engineer@opentrons.com
-          analyses:
+          analyses: []
+          analysisSummaries:
             - id: !anystr
               status: pending
   - name: Retry until analyses status is completed and result is ok.
@@ -43,7 +44,7 @@ stages:
       status_code: 200
       json:
         data:
-          - id: '{analyses_id}'
+          - id: '{analysis_id}'
             status: completed
             result: ok
   - name: Delete the protocol

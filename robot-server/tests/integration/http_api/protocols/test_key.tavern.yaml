@@ -29,7 +29,8 @@ stages:
             apiLevel: '2.6'
             protocolName: basic_transfer_standalone
             author: engineer@opentrons.com
-          analyses:
+          analyses: []
+          analysisSummaries:
             - id: !anystr
               status: pending
           key: protocol_key

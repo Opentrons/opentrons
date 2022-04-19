@@ -16,13 +16,13 @@ stages:
       save:
         json:
           protocol_id: data.id
-          analyses_id: data.analyses[0].id
+          analysis_id: data.analysisSummaries[0].id
       status_code: 201
       json:
         data:
           id: !anystr
           protocolType: json
-          analyses:
+          analysisSummaries:
             - id: !anystr
               status: pending
   - name: Retry until analyses status is completed.
@@ -38,8 +38,8 @@ stages:
       json:
         data:
           - id: '{protocol_id}'
-            analyses:
-              - id: '{analyses_id}'
+            analysisSummaries:
+              - id: '{analysis_id}'
                 status: completed
   - name: Get protocol by ID
     request:
@@ -62,8 +62,9 @@ stages:
             description: A short test protocol
             author: engineering <engineering@opentrons.com>
             protocolName: Simple test protocol
-          analyses:
-            - id: '{analyses_id}'
+          analyses: []
+          analysisSummaries:
+            - id: '{analysis_id}'
               status: completed
   - name: Get protocol analysis by ID
     request:
@@ -76,7 +77,7 @@ stages:
           cursor: 0
           totalLength: 1
         data:
-          - id: '{analyses_id}'
+          - id: '{analysis_id}'
             status: completed
             result: ok
             pipettes:

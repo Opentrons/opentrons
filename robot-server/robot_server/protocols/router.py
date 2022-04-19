@@ -138,7 +138,7 @@ async def create_protocol(
         createdAt=created_at,
         protocolType=source.config.protocol_type,
         metadata=Metadata.parse_obj(source.metadata),
-        analyses=[pending_analysis],
+        analysisSummaries=[pending_analysis],
         key=key,
         files=[ProtocolFile(name=f.path.name, role=f.role) for f in source.files],
     )
@@ -173,7 +173,7 @@ async def get_protocols(
             createdAt=r.created_at,
             protocolType=r.source.config.protocol_type,
             metadata=Metadata.parse_obj(r.source.metadata),
-            analyses=analysis_store.get_summaries_by_protocol(r.protocol_id),
+            analysisSummaries=analysis_store.get_summaries_by_protocol(r.protocol_id),
             key=r.protocol_key,
             files=[ProtocolFile(name=f.path.name, role=f.role) for f in r.source.files],
         )
@@ -209,17 +209,17 @@ async def get_protocol_by_id(
     """
     try:
         resource = protocol_store.get(protocol_id=protocolId)
-        analyses = analysis_store.get_summaries_by_protocol(protocol_id=protocolId)
-
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+
+    analyses = analysis_store.get_summaries_by_protocol(protocol_id=protocolId)
 
     data = Protocol.construct(
         id=protocolId,
         createdAt=resource.created_at,
         protocolType=resource.source.config.protocol_type,
         metadata=Metadata.parse_obj(resource.source.metadata),
-        analyses=analyses,
+        analysisSummaries=analyses,
         key=resource.protocol_key,
         files=[
             ProtocolFile(name=f.path.name, role=f.role) for f in resource.source.files

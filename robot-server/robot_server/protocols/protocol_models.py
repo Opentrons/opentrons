@@ -1,7 +1,7 @@
 """Protocol file models."""
 from datetime import datetime
 from pydantic import BaseModel, Extra, Field
-from typing import Sequence, Optional
+from typing import Any, List, Optional
 
 from opentrons.protocol_reader import (
     ProtocolType as ProtocolType,
@@ -61,7 +61,7 @@ class Protocol(ResourceModel):
         ),
     )
 
-    files: Sequence[ProtocolFile]
+    files: List[ProtocolFile]
 
     protocolType: ProtocolType = Field(
         ...,
@@ -72,11 +72,20 @@ class Protocol(ResourceModel):
     # be a better way (e.g. produce better OpenAPI) to represent an arbitrary JSON obj.
     metadata: Metadata
 
-    analyses: Sequence[AnalysisSummary] = Field(
+    analyses: List[Any] = Field(
+        default_factory=list,
+        description=(
+            "This field was deprecated for performance reasons."
+            " Use `analysisSummaries` and `GET /protocols/:id/analyses` instead."
+        ),
+    )
+
+    analysisSummaries: List[AnalysisSummary] = Field(
         ...,
         description=(
-            "An analysis of how the protocol is expected to run."
-            " Use GET /protocols/:protocol_id/analyses for more information."
+            "Summaries of any analyses run to check how this protocol"
+            " is expected to run. For more detailed information,"
+            " use `GET /protocols/:id/analyses`."
         ),
     )
 

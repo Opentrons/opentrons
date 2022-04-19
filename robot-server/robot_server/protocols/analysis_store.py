@@ -29,7 +29,11 @@ class AnalysisStore:
     def add_pending(self, protocol_id: str, analysis_id: str) -> PendingAnalysis:
         """Add a pending analysis to the store."""
         ids_for_protocol = self._analysis_ids_by_protocol[protocol_id]
-        assert analysis_id not in ids_for_protocol, "Duplicate analysis ID"
+
+        assert (
+            analysis_id not in ids_for_protocol
+            and analysis_id not in self._analyses_by_id
+        ), "Duplicate analysis ID"
 
         pending_analysis = PendingAnalysis.construct(id=analysis_id)
         self._analyses_by_id[analysis_id] = pending_analysis
@@ -64,7 +68,9 @@ class AnalysisStore:
         """Get analysis summaries for a given protocol ID from the store."""
         full_analyses = self.get_by_protocol(protocol_id)
 
-        return [AnalysisSummary.construct(id=a.id, status=a.status) for a in full_analyses]
+        return [
+            AnalysisSummary.construct(id=a.id, status=a.status) for a in full_analyses
+        ]
 
     def get_by_protocol(self, protocol_id: str) -> List[ProtocolAnalysis]:
         """Get an analysis for a given protocol ID from the store."""
