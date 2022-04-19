@@ -78,6 +78,20 @@ def test_app_settings_v5dot1(
         assert app_settings.get_connect_robot_via_IP_header().is_displayed()
         assert app_settings.get_connect_to_robot_via_IP_address_button().is_displayed()
         app_settings.click_connect_to_robot_via_IP_address_button()
+        assert (
+            app_settings.get_connect_to_robot_via_IP_address_slideout_header().is_displayed()
+        )
+        assert (
+            app_settings.get_link_learn_more_about_connecting_a_robot_manually().is_displayed()
+        )
+        assert app_settings.get_textbox_to_enter_the_ip().is_displayed()
+        app_settings.click_add_ip_or_hostname()
+        assert app_settings.get_try_again_link().is_displayed()
+        app_settings.enter_hostname(["AKNA"])
+        assert app_settings.get_add_button().is_displayed()
+        app_settings.click_add_button()
+        assert app_settings.get_done_button().is_displayed()
+        app_settings.click_done_button()
 
         ## Privacy Tab verification
         app_settings.click_privacy_tab()
