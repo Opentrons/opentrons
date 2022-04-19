@@ -50,7 +50,6 @@ async def test_sim_state(subject: modules.AbstractModule):
     # return v1 if sim_model is not passed
     assert status["model"] == "temp_deck_v1.1"
     assert status["version"] == "dummyVersionTD"
-    await subject.cleanup()
 
 
 async def test_sim_update(subject: modules.AbstractModule):
@@ -76,7 +75,7 @@ async def test_revision_model_parsing(subject: modules.AbstractModule):
     assert subject.model() == "temperatureModuleV1"
 
 
-async def test_poll_error(usb_port) -> None:
+async def test_poll_error(usb_port: USBPort) -> None:
     mock_driver = AsyncMock(spec=AbstractTempDeckDriver)
     mock_driver.get_temperature.side_effect = ValueError("hello!")
 
