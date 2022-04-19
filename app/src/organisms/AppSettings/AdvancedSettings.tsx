@@ -250,28 +250,25 @@ export function AdvancedSettings(): JSX.Element {
               {t('usb_to_ethernet_adapter_info_description')}
             </StyledText>
             {driverOutdated && (
-              <Banner
-                type="warning"
-                title={
-                  <Flex>
-                    <StyledText as="p" color={COLORS.darkBlack}>
-                      {t('usb_to_ethernet_adapter_toast_message')}
-                    </StyledText>
-                    <Link
-                      external
-                      href={REALTEK_URL}
-                      css={TYPOGRAPHY.pRegular}
-                      color={COLORS.darkBlack}
-                      position="absolute"
-                      right={SPACING.spacing7}
-                      textDecoration="underline"
-                      id="AdvancedSettings_realtekLink"
-                    >
-                      {t('usb_to_ethernet_adapter_link')}
-                    </Link>
-                  </Flex>
-                }
-              ></Banner>
+              <Banner type="warning">
+                <Flex>
+                  <StyledText as="p" color={COLORS.darkBlack}>
+                    {t('usb_to_ethernet_adapter_toast_message')}
+                  </StyledText>
+                  <Link
+                    external
+                    href={REALTEK_URL}
+                    css={TYPOGRAPHY.pRegular}
+                    color={COLORS.darkBlack}
+                    position="absolute"
+                    right={SPACING.spacing7}
+                    textDecoration="underline"
+                    id="AdvancedSettings_realtekLink"
+                  >
+                    {t('usb_to_ethernet_adapter_link')}
+                  </Link>
+                </Flex>
+              </Banner>
             )}
             {device === null ? (
               <StyledText as="p" marginTop={SPACING.spacing4}>
