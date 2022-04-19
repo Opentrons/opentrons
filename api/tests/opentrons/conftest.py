@@ -170,6 +170,8 @@ async def _build_ot2_hw() -> AsyncIterator[ThreadManager[HardwareControlAPI]]:
         yield hw_sim
     finally:
         config.robot_configs.clear()
+        for m in hw_sim.attached_modules:
+            await m.cleanup()
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
 
@@ -189,8 +191,11 @@ async def _build_ot3_hw() -> AsyncIterator[ThreadManager[HardwareControlAPI]]:
         yield hw_sim
     finally:
         config.robot_configs.clear()
+        for m in hw_sim.attached_modules:
+            await m.cleanup()
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
+
 
 
 @pytest.fixture
@@ -234,10 +239,14 @@ async def hardware(request, virtual_smoothie_env):
 # so this fixture needs to run in an event loop.
 @pytest.fixture
 async def ctx(hardware) -> ProtocolContext:
-    return ProtocolContext(
+    c = ProtocolContext(
         implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
         loop=asyncio.get_running_loop(),
     )
+    yield c
+    # Manually clean up all the modules.
+    for m in c.loaded_modules.items():
+        m[1]._module.cleanup()
 
 
 @pytest.fixture
