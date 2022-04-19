@@ -15,6 +15,7 @@ from opentrons.protocol_engine import (
     LoadedLabware,
     LoadedModule,
     LoadedPipette,
+    LabwareOffset
 )
 
 from .task_queue import TaskQueue
@@ -43,6 +44,7 @@ class ProtocolRunData:
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]
     modules: List[LoadedModule]
+    labwareOffsets: List[LabwareOffset]
 
 
 # TODO(mc, 2022-01-11): this class has become bloated. Split into an abstract
@@ -173,6 +175,7 @@ class ProtocolRunner:
             labware=self._protocol_engine.state_view.labware.get_all(),
             pipettes=self._protocol_engine.state_view.pipettes.get_all(),
             modules=self._protocol_engine.state_view.modules.get_all(),
+            labwareOffsets=self._protocol_engine.engine_state.labware.get_labware_offsets()
         )
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:

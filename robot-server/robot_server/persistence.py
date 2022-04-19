@@ -78,8 +78,22 @@ action_table = sqlalchemy.Table(
     sqlalchemy.Column(
         "run_id",
         sqlalchemy.String,
-        # TODO (tz 4/8/22): SQLite does not support FK by default. Need to add support
-        # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#foreign-key-support
+        sqlalchemy.ForeignKey("run.id"),
+        nullable=False,
+    ),
+)
+
+engine_state_table = sqlalchemy.Table(
+    "engine_state",
+    _metadata,
+    sqlalchemy.Column(
+        "id", sqlalchemy.INT, primary_key=True, sqlite_autoincrement=True
+    ),
+    sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False),
+    sqlalchemy.Column("state", sqlalchemy.JSON, nullable=False),
+    sqlalchemy.Column(
+        "run_id",
+        sqlalchemy.String,
         sqlalchemy.ForeignKey("run.id"),
         nullable=False,
     ),
