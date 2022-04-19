@@ -197,7 +197,6 @@ async def _build_ot3_hw() -> AsyncIterator[ThreadManager[HardwareControlAPI]]:
         hw_sim.clean_up()
 
 
-
 @pytest.fixture
 async def ot3_hardware(request, enable_ot3_hardware_controller):
     # this is from the command line parameters added in root conftest
@@ -238,7 +237,7 @@ async def hardware(request, virtual_smoothie_env):
 # Async because ProtocolContext.__init__() needs an event loop,
 # so this fixture needs to run in an event loop.
 @pytest.fixture
-async def ctx(hardware) -> ProtocolContext:
+async def ctx(hardware) -> AsyncIterator[ProtocolContext]:
     c = ProtocolContext(
         implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
         loop=asyncio.get_running_loop(),
