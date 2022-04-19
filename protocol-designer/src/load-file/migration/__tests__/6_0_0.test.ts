@@ -64,7 +64,7 @@ describe('v6 migration', () => {
   })
   it('adds a liquids key', () => {
     const migratedFile = migrateFile(oldProtocol)
-    const expectedLiquids = { '0': { displayName: 'Water', description: null } }
+    const expectedLiquids = { '0': { displayName: 'Water', description: '' } }
     expect(migratedFile.liquids).toEqual(expectedLiquids)
   })
   it('creates loadModule commands', () => {
