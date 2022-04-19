@@ -593,7 +593,9 @@ async def test_delete_active_run_no_engine(
 
 
 async def test_update_run_to_not_current(
-    decoy: Decoy, mock_engine_store: EngineStore, mock_run_store: RunStore
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
 ) -> None:
     """It should update a run to no longer be current."""
     run_resource = RunResource(
@@ -630,9 +632,7 @@ async def test_update_run_to_not_current(
     decoy.when(mock_run_store.get(run_id="run-id")).then_return(run_resource)
 
     decoy.when(
-        mock_run_store.update_active_run(
-            run_id="run-id", is_current=updated_resource.is_current
-        )
+        mock_run_store.update_active_run(run_id="run-id", is_current=False)
     ).then_return(updated_resource)
 
     engine_state = decoy.mock(cls=StateView)
@@ -658,9 +658,6 @@ async def test_update_run_to_not_current(
 
     decoy.verify(
         await mock_engine_store.clear(),
-        mock_run_store.update_active_run(
-            run_id=updated_resource.run_id, is_current=updated_resource.is_current
-        ),
     )
 
 
@@ -669,14 +666,6 @@ async def test_update_current_to_current_noop(
 ) -> None:
     """It should noop if updating the current run to current: true."""
     run_resource = RunResource(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1),
-        actions=[],
-        is_current=True,
-    )
-
-    updated_run_resource = RunResource(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1),
@@ -701,12 +690,6 @@ async def test_update_current_to_current_noop(
 
     decoy.when(mock_run_store.get(run_id="run-id")).then_return(run_resource)
 
-    decoy.when(
-        mock_run_store.update_active_run(
-            run_id=run_resource.run_id, is_current=updated_run_resource.is_current
-        )
-    ).then_return(updated_run_resource)
-
     engine_state = decoy.mock(cls=StateView)
     decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get_all()).then_return([])
@@ -728,16 +711,14 @@ async def test_update_current_to_current_noop(
     assert result.content == SimpleBody(data=expected_response)
     assert result.status_code == 200
 
+    decoy.verify(await mock_engine_store.clear(), times=0)
     decoy.verify(
         mock_run_store.update_active_run(
-            run_id=run_resource.run_id,
-            is_current=run_update.current
-            if run_update.current is not None
-            else run_resource.is_current,
+            run_id=matchers.Anything(),
+            is_current=matchers.Anything(),
         ),
         times=0,
     )
-    decoy.verify(await mock_engine_store.clear(), times=0)
 
 
 async def test_update_to_current_conflict(

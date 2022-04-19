@@ -40,4 +40,42 @@ describe('protocol storage selectors', () => {
     )
     expect(result).toEqual(secondProtocol)
   })
+  it('getIsProtocolAnalysisInProgress returns true if in progress', () => {
+    const result = selectors.getIsProtocolAnalysisInProgress(
+      {
+        protocolStorage: {
+          addFailureFile: null,
+          addFailureMessage: null,
+          listFailureMessage: null,
+          protocolKeys: [firstProtocol.protocolKey, secondProtocol.protocolKey],
+          filesByProtocolKey: {
+            [firstProtocol.protocolKey]: firstProtocol,
+            [secondProtocol.protocolKey]: secondProtocol,
+          },
+          inProgressAnalysisProtocolKeys: [secondProtocol.protocolKey],
+        },
+      } as State,
+      secondProtocol.protocolKey
+    )
+    expect(result).toBe(true)
+  })
+  it('getIsProtocolAnalysisInProgress returns false if not in progress', () => {
+    const result = selectors.getIsProtocolAnalysisInProgress(
+      {
+        protocolStorage: {
+          addFailureFile: null,
+          addFailureMessage: null,
+          listFailureMessage: null,
+          protocolKeys: [firstProtocol.protocolKey, secondProtocol.protocolKey],
+          filesByProtocolKey: {
+            [firstProtocol.protocolKey]: firstProtocol,
+            [secondProtocol.protocolKey]: secondProtocol,
+          },
+          inProgressAnalysisProtocolKeys: [secondProtocol.protocolKey],
+        },
+      } as State,
+      firstProtocol.protocolKey
+    )
+    expect(result).toBe(false)
+  })
 })
