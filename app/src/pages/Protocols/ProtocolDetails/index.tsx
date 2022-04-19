@@ -9,10 +9,10 @@ import {
 import { ProtocolDetails as ProtocolDetailsContents } from '../../../organisms/ProtocolDetails'
 
 import type { Dispatch, State } from '../../../redux/types'
-import type { NextGenRouteParams } from '../../../App/types'
+import type { NavRouteParams } from '../../../App/types'
 
 export function ProtocolDetails(): JSX.Element {
-  const { protocolKey } = useParams<NextGenRouteParams>()
+  const { protocolKey } = useParams<NavRouteParams>()
 
   const dispatch = useDispatch<Dispatch>()
   const storedProtocol = useSelector((state: State) =>

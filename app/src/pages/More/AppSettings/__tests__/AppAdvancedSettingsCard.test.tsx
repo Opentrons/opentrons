@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { mountWithStore } from '@opentrons/components'
+import { mountWithProviders } from '@opentrons/components'
+import { i18n } from '../../../../i18n'
 import * as Config from '../../../../redux/config'
 import { AppAdvancedSettingsCard } from '../AppAdvancedSettingsCard'
 
@@ -32,12 +33,13 @@ const MOCK_STATE: State = { robotApi: {} } as any
 
 describe('AppAdvancedSettingsCard', () => {
   const render = () => {
-    return mountWithStore<
+    return mountWithProviders<
       React.ComponentProps<typeof AppAdvancedSettingsCard>,
       State,
       Action
     >(<AppAdvancedSettingsCard />, {
       initialState: MOCK_STATE,
+      i18nInstance: i18n,
     })
   }
 
@@ -172,14 +174,14 @@ describe('AppAdvancedSettingsCard', () => {
   it('does not render dev feature flags when dev tools not enabled', () => {
     const { wrapper } = render()
 
-    expect(wrapper.text().includes('__DEV__')).toBe(false)
+    expect(wrapper.text().includes('Developer Only')).toBe(false)
   })
 
   it('does renders dev feature flags when dev tools enabled', () => {
     getDevtoolsEnabled.mockReturnValue(true)
     const { wrapper } = render()
 
-    expect(wrapper.text().includes('__DEV__')).toBe(true)
+    expect(wrapper.text().includes('Developer Only')).toBe(true)
   })
 
   it('switching toggles dispatches toggle action', () => {

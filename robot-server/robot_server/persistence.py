@@ -39,14 +39,6 @@ protocol_table = sqlalchemy.Table(
         sqlalchemy.DateTime,
         nullable=False,
     ),
-    # TODO(mm, 2022-03-29):
-    # Storing pickled Python objects, especially of an internal class,
-    # will cause migration and compatibility problems.
-    sqlalchemy.Column(
-        "source",
-        sqlalchemy.PickleType,
-        nullable=False,
-    ),
     sqlalchemy.Column("protocol_key", sqlalchemy.String, nullable=True),
 )
 

@@ -5,7 +5,7 @@ from opentrons import hardware_control as hc
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 
 
-async def test_gpio_setup(loop, monkeypatch):
+async def test_gpio_setup(monkeypatch):
     # Test without DTOVERLAY path
     # Board revision should be defaulted to 2.1
     backend = await hc.Controller.build(config=None)

@@ -3,6 +3,7 @@ import { dependentFieldsUpdateMix } from './dependentFieldsUpdateMix'
 import { dependentFieldsUpdateMagnet } from './dependentFieldsUpdateMagnet'
 import { dependentFieldsUpdatePause } from './dependentFieldsUpdatePause'
 import { dependentFieldsUpdateTemperature } from './dependentFieldsUpdateTemperature'
+import { dependentFieldsUpdateHeaterShaker } from './dependentFieldsUpdateHeaterShaker'
 import { dependentFieldsUpdateThermocycler } from './dependentFieldsUpdateThermocycler'
 import { LabwareEntities, PipetteEntities } from '@opentrons/step-generation'
 import { FormData } from '../../../form-types'
@@ -49,7 +50,13 @@ export function handleFormChange(
     )
     return { ...patch, ...dependentFieldsPatch }
   }
-
+  if (rawForm.stepType === 'heaterShaker') {
+    const dependentFieldsPatch = dependentFieldsUpdateHeaterShaker(
+      patch,
+      rawForm
+    )
+    return { ...patch, ...dependentFieldsPatch }
+  }
   if (rawForm.stepType === 'thermocycler') {
     const dependentFieldsPatch = dependentFieldsUpdateThermocycler(
       patch,
