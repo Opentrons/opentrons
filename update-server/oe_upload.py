@@ -11,7 +11,7 @@ import sys
 import aiohttp
 
 
-# TODO (al, 2022-04-18): This separate script should not make it to edge. It and
+# TODO (al, 2022-04-18): This separate script should be refactored. It and
 #  buildroot_upload.py should be merged into one script.
 
 
