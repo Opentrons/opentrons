@@ -204,8 +204,15 @@ describe('v6 migration', () => {
   it('unchecks aspirate delay and dispense delay when no offset was applied', () => {
     const migratedFile = migrateFile(oldMultipleLiquidsProtocol)
     const TRANSFER_STEP_ID = 'b98d3ec0-c024-11ec-aabf-8ff28455296a' // this is just taken from the fixture
-    expect((migratedFile as any).designerApplication.data.savedStepForms[TRANSFER_STEP_ID].aspirate_delay_checkbox).toBe(false)
-    expect((migratedFile as any).designerApplication.data.savedStepForms[TRANSFER_STEP_ID].dispense_delay_checkbox).toBe(false)
-
+    expect(
+      (migratedFile as any).designerApplication.data.savedStepForms[
+        TRANSFER_STEP_ID
+      ].aspirate_delay_checkbox
+    ).toBe(false)
+    expect(
+      (migratedFile as any).designerApplication.data.savedStepForms[
+        TRANSFER_STEP_ID
+      ].dispense_delay_checkbox
+    ).toBe(false)
   })
 })

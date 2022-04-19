@@ -37,9 +37,9 @@ export const migrateSavedStepForms = (
       let migratedStepForm = { ...stepForm }
       if (
         stepForm.aspirate_delay_checkbox === true &&
-        (stepForm.aspirate_delay_mmFromBottom === null || stepForm.aspirate_delay_mmFromBottom === 0)
+        (stepForm.aspirate_delay_mmFromBottom === null ||
+          stepForm.aspirate_delay_mmFromBottom === 0)
       ) {
-
         migratedStepForm = {
           ...migratedStepForm,
           aspirate_delay_checkbox: false,
@@ -47,7 +47,8 @@ export const migrateSavedStepForms = (
       }
       if (
         stepForm.dispense_delay_checkbox === true &&
-        (stepForm.dispense_delay_mmFromBottom === null || stepForm.dispense_delay_mmFromBottom === 0)
+        (stepForm.dispense_delay_mmFromBottom === null ||
+          stepForm.dispense_delay_mmFromBottom === 0)
       ) {
         migratedStepForm = {
           ...migratedStepForm,
@@ -163,18 +164,18 @@ export const migrateFile = (
   const liquids: ProtocolFile['liquids'] =
     appData.designerApplication?.data?.ingredients != null
       ? reduce(
-          appData.designerApplication?.data?.ingredients,
-          (acc, liquidData, liquidId) => {
-            return {
-              ...acc,
-              [liquidId]: {
-                displayName: liquidData.name,
-                description: liquidData.description ?? '',
-              },
-            }
-          },
-          {}
-        )
+        appData.designerApplication?.data?.ingredients,
+        (acc, liquidData, liquidId) => {
+          return {
+            ...acc,
+            [liquidId]: {
+              displayName: liquidData.name,
+              description: liquidData.description ?? '',
+            },
+          }
+        },
+        {}
+      )
       : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       ({} as ProtocolFile['liquids'])
   return {
