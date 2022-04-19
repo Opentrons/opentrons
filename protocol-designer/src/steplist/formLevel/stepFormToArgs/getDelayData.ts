@@ -23,7 +23,7 @@ export function getMoveLiquidDelayData(
   } else if (mmFromBottomFormValue === null) {
     mmFromBottom = getDefaultMmFromBottom({
       name: mmFromBottomField,
-      wellDepthMm: NaN /* NOTE: `wellDepthMm` should not be used for delay offsets */,
+      wellDepthMm: 0 /* NOTE: `wellDepthMm` should not be used for delay offsets */,
     })
   }
   if (
