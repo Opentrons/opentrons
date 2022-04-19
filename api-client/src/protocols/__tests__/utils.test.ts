@@ -1,4 +1,4 @@
-import { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import { RunTimeCommand } from '@opentrons/shared-data'
 import {
   parseInitialPipetteNamesByMount,
   parseAllRequiredModuleModels,
@@ -9,7 +9,7 @@ import {
 
 import { simpleAnalysisFileFixture } from '../__fixtures__'
 
-const protocolAnalysisFile: ProtocolAnalysisFile<{}> = simpleAnalysisFileFixture as any
+const mockRunTimeCommands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
 
 describe('parseInitialPipetteNamesByMount', () => {
   it('returns pipette names for each mount if loaded and null if nothing loaded', () => {
@@ -17,19 +17,16 @@ describe('parseInitialPipetteNamesByMount', () => {
       left: 'p300_single_gen2',
       right: null,
     }
-    expect(parseInitialPipetteNamesByMount(protocolAnalysisFile)).toEqual(
+    expect(parseInitialPipetteNamesByMount(mockRunTimeCommands)).toEqual(
       expected
     )
   })
   it('returns pipette names for right mount if loaded', () => {
-    const onlyRightMount: ProtocolAnalysisFile<{}> = {
-      ...protocolAnalysisFile,
-      commands: protocolAnalysisFile.commands.map(c =>
-        c.commandType === 'loadPipette'
-          ? { ...c, params: { ...c.params, mount: 'right' } }
-          : c
-      ),
-    }
+    const onlyRightMount: RunTimeCommand[] = mockRunTimeCommands.map(c =>
+      c.commandType === 'loadPipette'
+        ? { ...c, params: { ...c.params, mount: 'right' } }
+        : c
+    )
     const expected = {
       left: null,
       right: 'p300_single_gen2',
@@ -40,26 +37,26 @@ describe('parseInitialPipetteNamesByMount', () => {
 describe('parseAllRequiredModuleModels', () => {
   it('returns all models for all loaded modules', () => {
     const expected = ['magneticModuleV2', 'temperatureModuleV2']
-    expect(parseAllRequiredModuleModels(protocolAnalysisFile)).toEqual(expected)
+    expect(parseAllRequiredModuleModels(mockRunTimeCommands)).toEqual(expected)
   })
 })
 describe('parseInitialLoadedLabwareBySlot', () => {
   it('returns only labware loaded in slots', () => {
     const expected = {
-      2: protocolAnalysisFile.commands.find(
+      2: mockRunTimeCommands.find(
         c =>
           c.commandType === 'loadLabware' &&
           'slotName' in c.params?.location &&
           c.params?.location?.slotName === '2'
       ),
-      12: protocolAnalysisFile.commands.find(
+      12: mockRunTimeCommands.find(
         c =>
           c.commandType === 'loadLabware' &&
           'slotName' in c.params?.location &&
           c.params?.location?.slotName === '12'
       ),
     }
-    expect(parseInitialLoadedLabwareBySlot(protocolAnalysisFile)).toEqual(
+    expect(parseInitialLoadedLabwareBySlot(mockRunTimeCommands)).toEqual(
       expected
     )
   })
@@ -67,20 +64,20 @@ describe('parseInitialLoadedLabwareBySlot', () => {
 describe('parseInitialLoadedLabwareByModuleId', () => {
   it('returns only labware loaded in modules', () => {
     const expected = {
-      'module-0': protocolAnalysisFile.commands.find(
+      'module-0': mockRunTimeCommands.find(
         c =>
           c.commandType === 'loadLabware' &&
           'moduleId' in c.params?.location &&
           c.params?.location?.moduleId === 'module-0'
       ),
-      'module-1': protocolAnalysisFile.commands.find(
+      'module-1': mockRunTimeCommands.find(
         c =>
           c.commandType === 'loadLabware' &&
           'moduleId' in c.params?.location &&
           c.params?.location?.moduleId === 'module-1'
       ),
     }
-    expect(parseInitialLoadedLabwareByModuleId(protocolAnalysisFile)).toEqual(
+    expect(parseInitialLoadedLabwareByModuleId(mockRunTimeCommands)).toEqual(
       expected
     )
   })
@@ -88,20 +85,20 @@ describe('parseInitialLoadedLabwareByModuleId', () => {
 describe('parseInitialLoadedModulesBySlot', () => {
   it('returns modules loaded in slots', () => {
     const expected = {
-      1: protocolAnalysisFile.commands.find(
+      1: mockRunTimeCommands.find(
         c =>
           c.commandType === 'loadModule' &&
           'slotName' in c.params?.location &&
           c.params?.location?.slotName === '1'
       ),
-      3: protocolAnalysisFile.commands.find(
+      3: mockRunTimeCommands.find(
         c =>
           c.commandType === 'loadModule' &&
           'slotName' in c.params?.location &&
           c.params?.location?.slotName === '3'
       ),
     }
-    expect(parseInitialLoadedModulesBySlot(protocolAnalysisFile)).toEqual(
+    expect(parseInitialLoadedModulesBySlot(mockRunTimeCommands)).toEqual(
       expected
     )
   })

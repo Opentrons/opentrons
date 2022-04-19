@@ -234,23 +234,20 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   <Banner
                     type="warning"
                     onCloseClick={() => setShowBanner(false)}
-                    title={
-                      <>
-                        <Flex flexDirection={DIRECTION_COLUMN}>
-                          {t('firmware_update_available')}
-                          <Btn
-                            textAlign={ALIGN_START}
-                            fontSize={TYPOGRAPHY.fontSizeP}
-                            textDecoration={TEXT_DECORATION_UNDERLINE}
-                            // TODO(jr, 3/21/22) wire up button when we know where this should link to
-                            onClick={() => console.log('firmware update!')}
-                          >
-                            {t('view_update')}
-                          </Btn>
-                        </Flex>
-                      </>
-                    }
-                  />
+                  >
+                    <Flex flexDirection={DIRECTION_COLUMN}>
+                      {t('firmware_update_available')}
+                      <Btn
+                        textAlign={ALIGN_START}
+                        fontSize={TYPOGRAPHY.fontSizeP}
+                        textDecoration={TEXT_DECORATION_UNDERLINE}
+                        // TODO(jr, 3/21/22) wire up button when we know where this should link to
+                        onClick={() => console.log('firmware update!')}
+                      >
+                        {t('view_update')}
+                      </Btn>
+                    </Flex>
+                  </Banner>
                 </Flex>
               ) : null}
               {isTooHot ? (
@@ -259,20 +256,16 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   paddingRight={SPACING.spacingM}
                   paddingBottom={SPACING.spacing3}
                 >
-                  <Banner
-                    type="warning"
-                    icon={hotToTouch}
-                    title={
-                      <Trans
-                        t={t}
-                        i18nKey="hot_to_the_touch"
-                        components={{
-                          bold: <strong />,
-                          block: <Text fontSize={TYPOGRAPHY.fontSizeP} />,
-                        }}
-                      />
-                    }
-                  />
+                  <Banner type="warning" icon={hotToTouch}>
+                    <Trans
+                      t={t}
+                      i18nKey="hot_to_the_touch"
+                      components={{
+                        bold: <strong />,
+                        block: <Text fontSize={TYPOGRAPHY.fontSizeP} />,
+                      }}
+                    />
+                  </Banner>
                 </Flex>
               ) : null}
               <Text

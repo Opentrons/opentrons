@@ -301,37 +301,35 @@ export function ProtocolRunHeader({
     switch (runStatus) {
       case RUN_STATUS_FAILED: {
         return (
-          <Banner
-            type="error"
-            title={`${t('run_failed')}. ${t(
-              'clear_protocol_to_make_available'
-            )}`}
-          >
-            {clearProtocolLink}
+          <Banner type="error">
+            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+              {`${t('run_failed')}. ${t('clear_protocol_to_make_available')} `}
+              {clearProtocolLink}
+            </Flex>
           </Banner>
         )
       }
       case RUN_STATUS_STOPPED: {
         return (
-          <Banner
-            type="warning"
-            title={`${t('run_canceled')}. ${t(
-              'clear_protocol_to_make_available'
-            )}`}
-          >
-            {clearProtocolLink}
+          <Banner type="warning">
+            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+              {`${t('run_canceled')}. ${t(
+                'clear_protocol_to_make_available'
+              )} `}
+              {clearProtocolLink}
+            </Flex>
           </Banner>
         )
       }
       case RUN_STATUS_SUCCEEDED: {
         return (
-          <Banner
-            type="success"
-            title={`${t('run_completed')}. ${t(
-              'clear_protocol_to_make_available'
-            )}`}
-          >
-            {clearProtocolLink}
+          <Banner type="success">
+            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+              {`${t('run_completed')}. ${t(
+                'clear_protocol_to_make_available'
+              )}`}
+              {clearProtocolLink}
+            </Flex>
           </Banner>
         )
       }
@@ -428,7 +426,7 @@ export function ProtocolRunHeader({
         </Link>
       </Flex>
       {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
-        <Banner type="warning" title={t('close_door_to_resume')} />
+        <Banner type="warning">{t('close_door_to_resume')}</Banner>
       ) : null}
       {isCurrentRun ? <ClearProtocolBanner /> : null}
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>

@@ -131,6 +131,57 @@ describe('protocolStorageReducer', () => {
         addFailureMessage: null,
       },
     },
+    {
+      name: 'handles ANALYZE_PROTOCOL',
+      state: INITIAL_STATE,
+      action: {
+        type: 'protocolStorage:ANALYZE_PROTOCOL',
+        payload: {
+          protocolKey: 'fakeProtocolKey',
+        },
+        meta: { shell: true },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        inProgressAnalysisProtocolKeys: ['fakeProtocolKey'],
+      },
+    },
+    {
+      name: 'handles ANALYZE_PROTOCOL_SUCCESS',
+      state: {
+        ...INITIAL_STATE,
+        inProgressAnalysisProtocolKeys: ['fakeProtocolKey'],
+      },
+      action: {
+        type: 'protocolStorage:ANALYZE_PROTOCOL_SUCCESS',
+        payload: {
+          protocolKey: 'fakeProtocolKey',
+        },
+        meta: { shell: true },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        inProgressAnalysisProtocolKeys: [],
+      },
+    },
+    {
+      name: 'handles ANALYZE_PROTOCOL_FAILURE',
+      state: {
+        ...INITIAL_STATE,
+        inProgressAnalysisProtocolKeys: ['fakeProtocolKey'],
+      },
+      action: {
+        type: 'protocolStorage:ANALYZE_PROTOCOL_FAILURE',
+        payload: {
+          protocolKey: 'fakeProtocolKey',
+        },
+        meta: { shell: true },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        inProgressAnalysisProtocolKeys: [],
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

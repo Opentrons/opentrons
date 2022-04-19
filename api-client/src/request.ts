@@ -10,7 +10,7 @@ export type Response<Data> = AxiosResponse<Data>
 export const DEFAULT_PORT = 31950
 
 export const DEFAULT_HEADERS = {
-  'Opentrons-Version': '*',
+  'Opentrons-Version': '3',
 }
 
 export const GET = 'GET'
