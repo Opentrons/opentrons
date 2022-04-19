@@ -53,7 +53,7 @@
   "no_folder": "No additional source folder specified",
   "add_folder_button": "Add labware source folder",
   "change_folder_button": "Change labware source folder",
-  "tip_length_cal_methold": "Tip Length Calibration Method",
+  "tip_length_cal_method": "Tip Length Calibration Method",
   "cal_block": "Always use calibration block to calibrate",
   "trash_bin": "Always use trash bin to calibrate",
   "prompt": "Always show the prompt to choose calibration block or trash bin",
