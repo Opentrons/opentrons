@@ -14,7 +14,12 @@ import {
 } from '@opentrons/components'
 import { css } from 'styled-components'
 
-export type BannerType = 'success' | 'warning' | 'error' | 'updating'
+export type BannerType =
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'updating'
+  | 'informing'
 
 export interface BannerProps {
   /** name constant of the icon to display */
@@ -51,6 +56,11 @@ const BANNER_PROPS_BY_TYPE: Record<
   updating: {
     icon: { name: 'ot-spinner' },
     backgroundColor: COLORS.greyDisabled,
+    color: COLORS.darkGreyEnabled,
+  },
+  informing: {
+    icon: { name: 'information' },
+    backgroundColor: COLORS.background,
     color: COLORS.darkGreyEnabled,
   },
 }

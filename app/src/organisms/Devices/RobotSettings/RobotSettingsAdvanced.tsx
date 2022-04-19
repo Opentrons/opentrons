@@ -20,6 +20,7 @@ import { getRobotSettings } from '../../../redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
 import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
+import { SoftwareUpdateModal } from './AdvancedTab/SoftwareUpdateModal'
 
 import type { State } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
@@ -58,6 +59,10 @@ export function RobotSettingsAdvanced({
   const [isRobotConnected, setIsRobotConnected] = React.useState<boolean>(
     connected
   )
+  const [
+    showSoftwareUpdateModal,
+    setShowSoftwareUpdateModal,
+  ] = React.useState<boolean>(false)
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
 
   const findSettings = (id: string): RobotSettingsField | undefined =>
@@ -85,6 +90,11 @@ export function RobotSettingsAdvanced({
 
   return (
     <>
+      {showSoftwareUpdateModal && (
+        <SoftwareUpdateModal
+          closeModal={() => setShowSoftwareUpdateModal(false)}
+        />
+      )}
       <Box paddingX={SPACING.spacing4}>
         {showRenameRobotSlideout && (
           <RenameRobotSlideout

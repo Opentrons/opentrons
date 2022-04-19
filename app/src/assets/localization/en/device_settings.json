@@ -96,5 +96,16 @@
   "factory_reset_modal_connection_lost_title": "Connection to robot lost",
   "factory_reset_modal_connection_lost_description": "The Opentrons App is unable to communicate with this robot right now. Double check the USB or Wifi connection to the robot, then try to reconnect.",
   "factory_reset_modal_connection_lost_retry_button": "Retry",
-  "factory_reset_modal_connection_lost_close_button": "Close"
+  "factory_reset_modal_connection_lost_close_button": "Close",
+  "software_update_modal_title": "Robot Update Available",
+  "software_update_modal_available_banner_message": "Updating the robot’s software requires restarting the robot",
+  "software_update_modal_protocol_running_banner_message": "Updating the robot’s software requires restarting the robot",
+  "software_update_modal_app_change_label": "App Changes in {{version}}",
+  "software_update_modal_new_features_label": "New Features",
+  "software_update_modal_but_fixes_label": "Bug Fixes",
+  "software_update_modal_technical_change_log_link": "View Opentrons technical change log",
+  "software_update_modal_issue_tracker_link": "View Opentrons issue tracker",
+  "software_update_modal_release_notes_link": "View full Opentrons release notes",
+  "software_update_modal_remind_me_later_button": "Remind me later",
+  "software_update_modal_update_button": "Update robot now"
 }
