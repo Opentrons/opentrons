@@ -38,12 +38,12 @@ const BANNER_PROPS_BY_TYPE: Record<
     color: COLORS.success,
   },
   error: {
-    icon: { name: 'information' },
+    icon: { name: 'alert-circle' },
     backgroundColor: COLORS.errorBg,
     color: COLORS.error,
   },
   warning: {
-    icon: { name: 'information' },
+    icon: { name: 'alert-circle' },
     backgroundColor: COLORS.warningBg,
     color: COLORS.warning,
   },

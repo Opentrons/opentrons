@@ -302,24 +302,34 @@ export function ProtocolRunHeader({
       case RUN_STATUS_FAILED: {
         return (
           <Banner type="error">
-            {`${t('run_failed')}. ${t('clear_protocol_to_make_available')} `}
-            {clearProtocolLink}
+            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+              {`${t('run_failed')}. ${t('clear_protocol_to_make_available')} `}
+              {clearProtocolLink}
+            </Flex>
           </Banner>
         )
       }
       case RUN_STATUS_STOPPED: {
         return (
           <Banner type="warning">
-            {`${t('run_canceled')}. ${t('clear_protocol_to_make_available')} `}
-            {clearProtocolLink}
+            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+              {`${t('run_canceled')}. ${t(
+                'clear_protocol_to_make_available'
+              )} `}
+              {clearProtocolLink}
+            </Flex>
           </Banner>
         )
       }
       case RUN_STATUS_SUCCEEDED: {
         return (
           <Banner type="success">
-            {`${t('run_completed')}. ${t('clear_protocol_to_make_available')}`}
-            {clearProtocolLink}
+            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+              {`${t('run_completed')}. ${t(
+                'clear_protocol_to_make_available'
+              )}`}
+              {clearProtocolLink}
+            </Flex>
           </Banner>
         )
       }

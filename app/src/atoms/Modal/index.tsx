@@ -1,7 +1,6 @@
 import * as React from 'react'
 
 import {
-  Text,
   Btn,
   Icon,
   BaseModal,
@@ -14,6 +13,7 @@ import {
   COLORS,
 } from '@opentrons/components'
 
+import { StyledText } from '../text'
 import { Divider } from '../structure'
 
 type ModalType = 'info' | 'warning' | 'error'
@@ -40,11 +40,13 @@ export const Modal = (props: ModalProps): JSX.Element => {
               <Icon
                 name="alert-circle"
                 color={type === 'error' ? COLORS.error : COLORS.warning}
-                size="1.25rem"
+                size={SPACING.spacingM}
                 marginRight={SPACING.spacing3}
               />
             ) : null}
-            <Text css={TYPOGRAPHY.h3SemiBold}>{title}</Text>
+            <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {title}
+            </StyledText>
           </Flex>
           {onClose != null && (
             <Btn onClick={onClose}>
