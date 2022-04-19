@@ -87,6 +87,7 @@ export interface PositionProps {
   bottom?: string | number
   left?: string | number
   transform?: string
+  transformOrigin?: CSSProperties['transformOrigin']
 }
 
 export interface TransitionProps {

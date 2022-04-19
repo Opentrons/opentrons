@@ -77,6 +77,46 @@ describe('protocol storage actions', () => {
         meta: { shell: true },
       },
     },
+    {
+      name: 'analyzeProtocol',
+      creator: actions.analyzeProtocol,
+      args: ['fakeProtocolKey'],
+      expected: {
+        type: 'protocolStorage:ANALYZE_PROTOCOL',
+        payload: { protocolKey: 'fakeProtocolKey' },
+        meta: { shell: true },
+      },
+    },
+    {
+      name: 'analyzeProtocolSuccess',
+      creator: actions.analyzeProtocolSuccess,
+      args: ['fakeProtocolKey'],
+      expected: {
+        type: 'protocolStorage:ANALYZE_PROTOCOL_SUCCESS',
+        payload: { protocolKey: 'fakeProtocolKey' },
+        meta: { shell: true },
+      },
+    },
+    {
+      name: 'analyzeProtocolFailure',
+      creator: actions.analyzeProtocolFailure,
+      args: ['fakeProtocolKey'],
+      expected: {
+        type: 'protocolStorage:ANALYZE_PROTOCOL_FAILURE',
+        payload: { protocolKey: 'fakeProtocolKey' },
+        meta: { shell: true },
+      },
+    },
+    {
+      name: 'viewProtocolSourceFolder',
+      creator: actions.viewProtocolSourceFolder,
+      args: ['fakeProtocolKey'],
+      expected: {
+        type: 'protocolStorage:VIEW_PROTOCOL_SOURCE_FOLDER',
+        payload: { protocolKey: 'fakeProtocolKey' },
+        meta: { shell: true },
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

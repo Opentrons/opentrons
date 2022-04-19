@@ -1,42 +1,70 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`InstrumentDiagram Multi-channel GEN2 renders correctly 1`] = `
-<div>
+.c0 {
+  min-width: 0;
+}
+
+<div
+  className="c0"
+>
   <img
     className="flipped_image"
-    src="pipetteGEN2Multi.png"
+    src="multi-channel_GEN2_800px.png"
   />
 </div>
 `;
 
 exports[`InstrumentDiagram Multi-channel renders correctly 1`] = `
-<div>
+.c0 {
+  min-width: 0;
+}
+
+<div
+  className="c0"
+>
   <img
     className=""
-    src="pipetteMulti.png"
+    src="multi-channel_GEN1_800px.png"
   />
 </div>
 `;
 
 exports[`InstrumentDiagram Single-channel GEN2 renders correctly 1`] = `
-<div>
+.c0 {
+  min-width: 0;
+}
+
+<div
+  className="c0"
+>
   <img
     className="flipped_image"
-    src="pipetteGEN2Single.png"
+    src="single-channel_GEN2_800px.png"
   />
 </div>
 `;
 
 exports[`InstrumentDiagram Single-channel renders correctly 1`] = `
-<div>
+.c0 {
+  min-width: 0;
+}
+
+<div
+  className="c0"
+>
   <img
     className=""
-    src="pipetteSingle.png"
+    src="single_channel_GEN1_800px.png"
   />
 </div>
 `;
 
 exports[`InstrumentGroup Renders correctly 1`] = `
+.c0 {
+  min-width: 0;
+}
+
 <section
   className="pipette_group"
 >
@@ -60,11 +88,11 @@ exports[`InstrumentGroup Renders correctly 1`] = `
       </div>
     </div>
     <div
-      className="pipette_icon"
+      className="c0 pipette_icon"
     >
       <img
         className=""
-        src="pipetteMulti.png"
+        src="multi-channel_GEN1_800px.png"
       />
     </div>
   </div>
@@ -88,11 +116,11 @@ exports[`InstrumentGroup Renders correctly 1`] = `
       </div>
     </div>
     <div
-      className="pipette_icon"
+      className="c0 pipette_icon"
     >
       <img
         className="flipped_image"
-        src="pipetteSingle.png"
+        src="single_channel_GEN1_800px.png"
       />
     </div>
   </div>

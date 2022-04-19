@@ -1,8 +1,7 @@
 import * as React from 'react'
 
 import {
-  Text,
-  Box,
+  Btn,
   Icon,
   BaseModal,
   BaseModalProps,
@@ -11,44 +10,61 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  COLORS,
 } from '@opentrons/components'
 
+import { StyledText } from '../text'
 import { Divider } from '../structure'
 
+type ModalType = 'info' | 'warning' | 'error'
 interface ModalProps extends BaseModalProps {
-  onClose?: () => void
+  type?: ModalType
+  onClose?: React.MouseEventHandler
   title?: React.ReactNode
   children?: React.ReactNode
 }
 
 export const Modal = (props: ModalProps): JSX.Element => {
+  const { type = 'info', onClose, title, children } = props
   const header =
-    props.title != null ? (
+    title != null ? (
       <>
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           paddingX={SPACING.spacing5}
-          paddingTop={SPACING.spacing4}
+          paddingY={SPACING.spacing4}
         >
-          <Text css={TYPOGRAPHY.h3SemiBold}>{props.title}</Text>
-          {props.onClose != null && (
-            <Box onClick={props.onClose} role="button">
+          <Flex>
+            {['error', 'warning'].includes(type) ? (
+              <Icon
+                name="alert-circle"
+                color={type === 'error' ? COLORS.error : COLORS.warning}
+                size={SPACING.spacingM}
+                marginRight={SPACING.spacing3}
+              />
+            ) : null}
+            <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {title}
+            </StyledText>
+          </Flex>
+          {onClose != null && (
+            <Btn onClick={onClose}>
               <Icon
                 name={'close'}
                 width={SPACING.spacing5}
                 height={SPACING.spacing5}
               />
-            </Box>
+            </Btn>
           )}
         </Flex>
-        <Divider width="100%" paddingTop="0" paddingBottom={SPACING.spacing4} />
+        <Divider width="100%" marginY="0" />
       </>
     ) : null
 
   return (
     <BaseModal width={'31.25rem'} noHeaderStyles header={header}>
-      {props.children}
+      {children}
     </BaseModal>
   )
 }
