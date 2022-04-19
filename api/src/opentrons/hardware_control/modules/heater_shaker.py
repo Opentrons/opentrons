@@ -126,7 +126,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         """
         DELTA: Final = 0.7
         status = TemperatureStatus.IDLE
-        if (temperature.target is not None) and (temperature.target != 0):
+        if temperature.target is not None:
             diff = temperature.target - temperature.current
             if abs(diff) < DELTA:  # To avoid status fluctuation near target
                 status = TemperatureStatus.HOLDING
