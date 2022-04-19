@@ -38,7 +38,10 @@ export function FactoryResetModal({
   robotName,
   resetOptions,
 }: FactoryResetModalProps): JSX.Element {
-  const reconnectModalIcon: IconProps = { name: 'alert-circle' }
+  const reconnectModalIcon: IconProps = {
+    name: 'alert-circle',
+    color: COLORS.blue,
+  }
   const { t } = useTranslation('device_settings')
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const dispatch = useDispatch<Dispatch>()
@@ -71,7 +74,7 @@ export function FactoryResetModal({
             </StyledText>
             <Flex justifyContent={JUSTIFY_FLEX_END}>
               <SecondaryButton
-                onClick={() => {}}
+                onClick={closeModal}
                 marginRight={SPACING.spacing3}
               >
                 {t('factory_reset_model_cancel_button')}
@@ -90,7 +93,6 @@ export function FactoryResetModal({
         <Modal
           title={t('factory_reset_modal_connection_lost_title')}
           icon={reconnectModalIcon}
-          iconColor={COLORS.blue}
           onClose={closeModal}
         >
           <StyledText as="p" marginBottom={SPACING.spacing5}>

@@ -34,12 +34,12 @@ export function Troubleshooting({ robot }: TroubleshootingProps): JSX.Element {
       <Box width="70%">
         <StyledText
           as="h3"
-          css={TYPOGRAPHY.h3SemiBold}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacingM}
         >
           {t('update_robot_software_troubleshooting')}
         </StyledText>
-        <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('update_robot_software_download_logs')}
         </StyledText>
       </Box>

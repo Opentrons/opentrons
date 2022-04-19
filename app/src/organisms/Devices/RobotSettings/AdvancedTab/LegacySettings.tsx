@@ -36,7 +36,6 @@ export function LegacySettings({
         <StyledText
           as="h2"
           css={TYPOGRAPHY.h3SemiBold}
-          //   paddingBottom={SPACING.spacing3}
           marginBottom={SPACING.spacing4}
           id="AdvancedSettings_showLink"
         >

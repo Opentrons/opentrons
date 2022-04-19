@@ -11,7 +11,6 @@ import {
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import { removeRobot } from '../../../../../redux/discovery'
-// import { useRobot } from '../../../hooks'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
 import { PrimaryButton } from '../../../../../atoms/buttons'

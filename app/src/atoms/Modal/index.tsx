@@ -24,7 +24,6 @@ interface ModalProps extends BaseModalProps {
   title?: React.ReactNode
   children?: React.ReactNode
   icon?: IconProps
-  iconColor?: string
 }
 
 export const Modal = (props: ModalProps): JSX.Element => {

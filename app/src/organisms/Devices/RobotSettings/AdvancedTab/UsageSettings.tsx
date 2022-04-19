@@ -35,13 +35,13 @@ export function UsageSettings({
       <Box width="70%">
         <StyledText
           as="h3"
-          css={TYPOGRAPHY.h3SemiBold}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing3}
           id="AdvancedSettings_UsageSettings"
         >
           {t('usage_settings')}
         </StyledText>
-        <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('pause_protocol')}
         </StyledText>
         <StyledText as="p">{t('pause_protocol_description')}</StyledText>

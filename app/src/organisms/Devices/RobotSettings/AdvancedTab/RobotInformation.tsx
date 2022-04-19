@@ -24,7 +24,6 @@ export function RobotInformation({
   robot,
 }: RobotInformationProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  // TODO: serialNumber
   const serialNumber =
     (robot as ViewableRobot) != null ? getRobotSerialNumber(robot) : null
   const firmwareVersion =

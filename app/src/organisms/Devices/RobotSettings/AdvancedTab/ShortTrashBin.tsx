@@ -34,7 +34,8 @@ export function ShortTrashBin({
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
         <StyledText
-          css={TYPOGRAPHY.h3SemiBold}
+          as="h3"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing3}
           id="AdvancedSettings_devTools"
         >
