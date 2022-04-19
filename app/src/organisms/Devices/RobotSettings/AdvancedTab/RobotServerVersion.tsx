@@ -73,7 +73,6 @@ export function RobotServerVersion({
           </StyledText>
           <Link
             as="button"
-            backGroundColor={COLORS.warningBg}
             onClick={() => updateSoftwareUpdateModal(true)}
             css={TYPOGRAPHY.pRegular}
           >
