@@ -22,8 +22,10 @@ def ack() -> str:
     return "ack"
 
 
+# Async because SerialConnection.__init__() needs an event loop,
+# so this fixture needs to run in an event loop.
 @pytest.fixture
-def subject(mock_serial_port: AsyncMock, ack: str) -> SerialConnection:
+async def subject(mock_serial_port: AsyncMock, ack: str) -> SerialConnection:
     """Create the test subject."""
     SerialConnection.RETRY_WAIT_TIME = 0  # type: ignore[attr-defined]
     return SerialConnection(

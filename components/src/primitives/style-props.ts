@@ -89,6 +89,7 @@ const POSITION_PROPS = [
   'bottom',
   'left',
   'transform',
+  'transformOrigin',
 ] as const
 
 const TRANSITION_PROPS = ['transition'] as const

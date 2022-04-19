@@ -30,7 +30,6 @@ try:
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
-
 from opentrons_shared_data.protocol.dev_types import JsonProtocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
@@ -38,7 +37,12 @@ from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 from opentrons import config
 from opentrons import hardware_control as hc
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
-from opentrons.hardware_control import HardwareControlAPI, API, ThreadManager
+from opentrons.hardware_control import (
+    API,
+    HardwareControlAPI,
+    ThreadManager,
+    ThreadManagedHardware,
+)
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
@@ -68,21 +72,6 @@ class Bundle(TypedDict):
     bundled_data: Dict[str, str]
     bundled_labware: Dict[str, LabwareDefinition]
     bundled_python: Dict[str, Any]
-
-
-@pytest.fixture(autouse=True)
-def asyncio_loop_exception_handler(
-    loop: asyncio.AbstractEventLoop,
-) -> Generator[None, None, None]:
-    def exception_handler(
-        loop: asyncio.AbstractEventLoop,
-        context: Dict[str, object],
-    ) -> None:
-        pytest.fail(str(context))
-
-    loop.set_exception_handler(exception_handler)
-    yield
-    loop.set_exception_handler(None)
 
 
 @pytest.fixture()
@@ -197,7 +186,6 @@ def virtual_smoothie_env(
 @pytest.fixture(params=["ot2", "ot3"])
 async def machine_variant_ffs(
     request: pytest.FixtureRequest,
-    loop: asyncio.AbstractEventLoop,
 ) -> AsyncGenerator[None, None]:
     device_param = request.param  # type: ignore[attr-defined]
 
@@ -219,28 +207,28 @@ async def machine_variant_ffs(
     )
 
 
-async def _build_ot2_hw() -> AsyncGenerator[ThreadManager[HardwareControlAPI], None]:
+async def _build_ot2_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
     hw_sim = ThreadManager(API.build_hardware_simulator)
     old_config = config.robot_configs.load()
     try:
         yield hw_sim
     finally:
         config.robot_configs.clear()
+        for m in hw_sim.attached_modules:
+            await m.cleanup()
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
 
 
 @pytest.fixture()
 async def ot2_hardware(
-    request: pytest.FixtureRequest,
-    loop: asyncio.AbstractEventLoop,
     virtual_smoothie_env: None,
-) -> AsyncGenerator[ThreadManager[HardwareControlAPI], None]:
+) -> AsyncGenerator[ThreadManagedHardware, None]:
     async for hw in _build_ot2_hw():
         yield hw
 
 
-async def _build_ot3_hw() -> AsyncGenerator[ThreadManager[HardwareControlAPI], None]:
+async def _build_ot3_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
     from opentrons.hardware_control.ot3api import OT3API
 
     hw_sim = ThreadManager(OT3API.build_hardware_simulator)
@@ -249,6 +237,8 @@ async def _build_ot3_hw() -> AsyncGenerator[ThreadManager[HardwareControlAPI], N
         yield hw_sim
     finally:
         config.robot_configs.clear()
+        for m in hw_sim.attached_modules:
+            await m.cleanup()
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
 
@@ -256,9 +246,8 @@ async def _build_ot3_hw() -> AsyncGenerator[ThreadManager[HardwareControlAPI], N
 @pytest.fixture()
 async def ot3_hardware(
     request: pytest.FixtureRequest,
-    loop: asyncio.AbstractEventLoop,
     enable_ot3_hardware_controller: None,
-) -> AsyncGenerator[ThreadManager[HardwareControlAPI], None]:
+) -> AsyncGenerator[ThreadManagedHardware, None]:
     # this is from the command line parameters added in root conftest
     if request.config.getoption("--ot2-only"):
         pytest.skip("testing only ot2")
@@ -274,9 +263,8 @@ async def ot3_hardware(
 )
 async def hardware(
     request: pytest.FixtureRequest,
-    loop: asyncio.AbstractEventLoop,
     virtual_smoothie_env: None,
-) -> AsyncGenerator[ThreadManager[HardwareControlAPI], None]:
+) -> AsyncGenerator[ThreadManagedHardware, None]:
     hw_builder = request.param()  # type: ignore[attr-defined]
 
     if request.node.get_closest_marker("ot2_only") and hw_builder == _build_ot3_hw:
@@ -299,15 +287,20 @@ async def hardware(
             )
 
 
+# Async because ProtocolContext.__init__() needs an event loop,
+# so this fixture needs to run in an event loop.
 @pytest.fixture()
 async def ctx(
-    loop: asyncio.AbstractEventLoop,
-    hardware: ThreadManager[HardwareControlAPI],
-) -> ProtocolContext:
-    return ProtocolContext(
+    hardware: ThreadManagedHardware,
+) -> AsyncGenerator[ProtocolContext, None]:
+    c = ProtocolContext(
         implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
-        loop=loop,
+        loop=asyncio.get_running_loop(),
     )
+    yield c
+    # Manually clean up all the modules.
+    for m in c.loaded_modules.items():
+        m[1]._module.cleanup()
 
 
 @pytest.fixture()
@@ -364,11 +357,8 @@ def cntrlr_mock_connect(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 @pytest.fixture()
-async def hardware_api(
-    loop: asyncio.AbstractEventLoop,
-    is_robot: bool,
-) -> HardwareControlAPI:
-    hw_api = await API.build_hardware_simulator(loop=loop)
+async def hardware_api(is_robot: None) -> HardwareControlAPI:
+    hw_api = await API.build_hardware_simulator(loop=asyncio.get_running_loop())
     return hw_api
 
 

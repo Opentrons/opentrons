@@ -165,6 +165,7 @@ async def test_create_protocol_run(
     )
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
+        protocol_key=None,
         created_at=datetime(year=2022, month=2, day=2),
         source=ProtocolSource(
             directory=Path("/dev/null"),
