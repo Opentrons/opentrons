@@ -1,9 +1,11 @@
 import { migrateFile } from '../6_0_0'
 import { getLoadLiquidCommands } from '../utils/getLoadLiquidCommands'
-import _oldProtocol from 'protocol-designer/fixtures/protocol/5/doItAllV5.json'
+import _oldDoItAllProtocol from '../../../../fixtures/protocol/5/doItAllV5.json'
+import _oldMultipleLiquidsProtocol from '../../../../fixtures/protocol/5/multipleLiquids.json'
 import type { ProtocolFileV5 } from '@opentrons/shared-data'
 
-const oldProtocol = (_oldProtocol as unknown) as ProtocolFileV5<any>
+const oldDoItAllProtocol = (_oldDoItAllProtocol as unknown) as ProtocolFileV5<any>
+const oldMultipleLiquidsProtocol = (_oldMultipleLiquidsProtocol as unknown) as ProtocolFileV5<any>
 
 jest.mock('../utils/getLoadLiquidCommands')
 
@@ -19,15 +21,15 @@ describe('v6 migration', () => {
     jest.restoreAllMocks()
   })
   it('removes slot from modules and labware', () => {
-    const migratedFile = migrateFile(oldProtocol)
+    const migratedFile = migrateFile(oldDoItAllProtocol)
 
     expect(
-      oldProtocol.modules[
+      oldDoItAllProtocol.modules[
         '0b419310-75c7-11ea-b42f-4b64e50f43e5:magneticModuleType'
       ].slot
     ).toEqual('1')
     expect(
-      oldProtocol.labware[
+      oldDoItAllProtocol.labware[
         '0b44c760-75c7-11ea-b42f-4b64e50f43e5:opentrons/opentrons_96_tiprack_300ul/1'
       ].slot
     ).toEqual('2')
@@ -45,9 +47,9 @@ describe('v6 migration', () => {
     ).toBeUndefined()
   })
   it('removes mount from pipettes', () => {
-    const migratedFile = migrateFile(oldProtocol)
+    const migratedFile = migrateFile(oldDoItAllProtocol)
     expect(
-      oldProtocol.pipettes['0b3f2210-75c7-11ea-b42f-4b64e50f43e5'].mount
+      oldDoItAllProtocol.pipettes['0b3f2210-75c7-11ea-b42f-4b64e50f43e5'].mount
     ).toEqual('left')
     expect(
       //  @ts-expect-error: mount does not exist in pipettes in v6
@@ -55,8 +57,8 @@ describe('v6 migration', () => {
     ).toBeUndefined()
   })
   it('adds deckId to Robot', () => {
-    const migratedFile = migrateFile(oldProtocol)
-    expect(oldProtocol.robot).toEqual({ model: 'OT-2 Standard' })
+    const migratedFile = migrateFile(oldDoItAllProtocol)
+    expect(oldDoItAllProtocol.robot).toEqual({ model: 'OT-2 Standard' })
     expect(migratedFile.robot).toEqual({
       model: 'OT-2 Standard',
       deckId: 'ot2_standard',
@@ -68,7 +70,7 @@ describe('v6 migration', () => {
     expect(migratedFile.liquids).toEqual(expectedLiquids)
   })
   it('creates loadModule commands', () => {
-    const migratedFile = migrateFile(oldProtocol)
+    const migratedFile = migrateFile(oldDoItAllProtocol)
     const expectedLoadModuleCommands = [
       {
         key: expect.any(String),
@@ -95,7 +97,7 @@ describe('v6 migration', () => {
     expect(loadModuleCommands).toEqual(expectedLoadModuleCommands)
   })
   it('creates loadPipette commands', () => {
-    const migratedFile = migrateFile(oldProtocol)
+    const migratedFile = migrateFile(oldDoItAllProtocol)
     const expectedLoadPipetteCommands = [
       {
         key: expect.any(String),
@@ -112,7 +114,7 @@ describe('v6 migration', () => {
     expect(loadPipetteCommands).toEqual(expectedLoadPipetteCommands)
   })
   it('creates loadLabware commands', () => {
-    const migratedFile = migrateFile(oldProtocol)
+    const migratedFile = migrateFile(oldDoItAllProtocol)
     const loadLabwareCommands = migratedFile.commands.filter(
       command => command.commandType === 'loadLabware'
     )
@@ -158,14 +160,14 @@ describe('v6 migration', () => {
     expect(loadLabwareCommands).toEqual(expectedLoadLabwareCommaands)
   })
   it('creates loadLiquid commands', () => {
-    migrateFile(oldProtocol)
+    migrateFile(oldDoItAllProtocol)
     expect(mockGetLoadLiquidCommands).toHaveBeenCalledWith(
-      _oldProtocol.designerApplication.data.ingredients,
-      _oldProtocol.designerApplication.data.ingredLocations
+      _oldDoItAllProtocol.designerApplication.data.ingredients,
+      _oldDoItAllProtocol.designerApplication.data.ingredLocations
     )
   })
   it('replaces air gap commands with aspirate commands', () => {
-    const migratedFile = migrateFile(oldProtocol)
+    const migratedFile = migrateFile(oldDoItAllProtocol)
     const expectedConvertedAirgapCommands = [
       {
         key: expect.any(String), // no key used to exist in v5 commands
@@ -197,5 +199,13 @@ describe('v6 migration', () => {
     expect(migratedFile.commands).toEqual(
       expect.arrayContaining(expectedConvertedAirgapCommands)
     )
+  })
+  // see https://github.com/Opentrons/opentrons/issues/8153
+  it('unchecks aspirate delay and dispense delay when no offset was applied', () => {
+    const migratedFile = migrateFile(oldMultipleLiquidsProtocol)
+    const TRANSFER_STEP_ID = 'b98d3ec0-c024-11ec-aabf-8ff28455296a' // this is just taken from the fixture
+    expect((migratedFile as any).designerApplication.data.savedStepForms[TRANSFER_STEP_ID].aspirate_delay_checkbox).toBe(false)
+    expect((migratedFile as any).designerApplication.data.savedStepForms[TRANSFER_STEP_ID].dispense_delay_checkbox).toBe(false)
+
   })
 })
