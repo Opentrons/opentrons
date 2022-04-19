@@ -58,11 +58,12 @@ import type {
 
 interface ModuleCardProps {
   module: AttachedModule
+  runId?: string
 }
 
 export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
-  const { module } = props
+  const { module, runId } = props
   const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [hasSecondary, setHasSecondary] = React.useState(false)
@@ -195,7 +196,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         {showWizard && (
           <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
         )}
-        {showSlideout && (
+        {showSlideout && runId != null ? (
+          <ModuleSlideout
+            module={module}
+            runId={runId}
+            isSecondary={hasSecondary}
+            showSlideout={showSlideout}
+            onCloseClick={() => setShowSlideout(false)}
+          />
+        ) : (
           <ModuleSlideout
             module={module}
             isSecondary={hasSecondary}
@@ -215,6 +224,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             module={module as HeaterShakerModule}
             isExpanded={showTestShake}
             onCloseClick={() => setShowTestShake(false)}
+            runId={runId}
           />
         )}
         <Box
@@ -333,6 +343,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             <ModuleOverflowMenu
               handleAboutClick={handleAboutClick}
               module={module}
+              runId={runId}
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}
               handleWizardClick={handleWizardClick}
@@ -346,18 +357,20 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
 interface ModuleSlideoutProps {
   module: AttachedModule
+  runId?: string
   isSecondary: boolean
   showSlideout: boolean
   onCloseClick: () => unknown
 }
 
 const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
-  const { module, isSecondary, showSlideout, onCloseClick } = props
+  const { module, runId, isSecondary, showSlideout, onCloseClick } = props
 
   if (module.type === THERMOCYCLER_MODULE_TYPE) {
     return (
       <ThermocyclerModuleSlideout
         module={module}
+        runId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
         isSecondaryTemp={isSecondary}
@@ -367,6 +380,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
     return (
       <MagneticModuleSlideout
         module={module}
+        runId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
       />
@@ -375,6 +389,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
     return (
       <TemperatureModuleSlideout
         module={module}
+        runId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
       />
@@ -383,6 +398,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
     return (
       <HeaterShakerSlideout
         module={module}
+        runId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
         isSetShake={isSecondary}

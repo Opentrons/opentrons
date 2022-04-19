@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  useCreateCommandMutation,
+  useCreateLiveCommandMutation,
+} from '@opentrons/react-api-client'
 import {
   Flex,
   Text,
@@ -64,14 +67,16 @@ interface MagneticModuleSlideoutProps {
   module: MagneticModule
   onCloseClick: () => unknown
   isExpanded: boolean
+  runId?: string
 }
 
 export const MagneticModuleSlideout = (
   props: MagneticModuleSlideoutProps
 ): JSX.Element | null => {
-  const { module, isExpanded, onCloseClick } = props
+  const { module, isExpanded, onCloseClick, runId } = props
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { createCommand } = useCreateCommandMutation()
   const [engageHeightValue, setEngageHeightValue] = React.useState<
     string | null
   >(null)
@@ -113,11 +118,21 @@ export const MagneticModuleSlideout = (
           engageHeight: parseInt(engageHeightValue),
         },
       }
-      createLiveCommand({ command: setEngageCommand }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${setEngageCommand.commandType}: ${e.message}`
+      if (runId != null) {
+        createCommand({ runId: runId, command: setEngageCommand }).catch(
+          (e: Error) => {
+            console.error(
+              `error setting module status with command type ${setEngageCommand.commandType} and run id ${runId}: ${e.message}`
+            )
+          }
         )
-      })
+      } else {
+        createLiveCommand({ command: setEngageCommand }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${setEngageCommand.commandType}: ${e.message}`
+          )
+        })
+      }
     }
     setEngageHeightValue(null)
   }

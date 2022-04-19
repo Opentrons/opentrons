@@ -24,6 +24,7 @@ import { useRobot } from '../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { RunLog } from '../../../organisms/Devices/ProtocolRun/RunLog'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
+import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 
 import type {
   NextGenRouteParams,
@@ -107,8 +108,9 @@ export function ProtocolRunDetails(): JSX.Element | null {
         runId={runId}
       />
     ),
-    // TODO: module controls tab content
-    'module-controls': () => <div>module controls content</div>,
+    'module-controls': () => (
+      <ProtocolRunModuleControls robotName={robotName} runId={runId} />
+    ),
     'run-log': () => <RunLog robotName={robotName} runId={runId} />,
   }
 

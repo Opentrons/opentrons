@@ -8,7 +8,10 @@ import {
   TEMP_BLOCK_MAX,
   TEMP_MIN,
 } from '@opentrons/shared-data'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  useCreateCommandMutation,
+  useCreateLiveCommandMutation,
+} from '@opentrons/react-api-client'
 import { Slideout } from '../../../atoms/Slideout'
 import { InputField } from '../../../atoms/InputField'
 import {
@@ -33,15 +36,17 @@ interface ThermocyclerModuleSlideoutProps {
   onCloseClick: () => unknown
   isExpanded: boolean
   isSecondaryTemp?: boolean
+  runId?: string
 }
 
 export const ThermocyclerModuleSlideout = (
   props: ThermocyclerModuleSlideoutProps
 ): JSX.Element | null => {
-  const { module, onCloseClick, isExpanded, isSecondaryTemp } = props
+  const { module, onCloseClick, isExpanded, isSecondaryTemp, runId } = props
   const { t } = useTranslation('device_details')
   const [tempValue, setTempValue] = React.useState<string | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { createCommand } = useCreateCommandMutation()
   const moduleName = getModuleDisplayName(module.model)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
   const tempRanges = getTCTempRange(isSecondaryTemp)
@@ -78,15 +83,28 @@ export const ThermocyclerModuleSlideout = (
           //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
         },
       }
-      createLiveCommand({
-        command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${
-            saveLidCommand.commandType ?? saveBlockCommand.commandType
-          }: ${e.message}`
-        )
-      })
+      if (runId != null) {
+        createCommand({
+          runId: runId,
+          command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${
+              saveLidCommand.commandType ?? saveBlockCommand.commandType
+            } and run id ${runId}: ${e.message}`
+          )
+        })
+      } else {
+        createLiveCommand({
+          command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${
+              saveLidCommand.commandType ?? saveBlockCommand.commandType
+            }: ${e.message}`
+          )
+        })
+      }
     }
     setTempValue(null)
   }
