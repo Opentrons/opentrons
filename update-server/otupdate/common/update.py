@@ -170,7 +170,8 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
         )
     reader = await request.multipart()
     async for part in reader:
-        # TODO (al, 2022-04-18): This check should not make it to edge.
+        # TODO (al, 2022-04-18): This check should not be here. All ot2 and ot3 disambiguation
+        #  should happen in update actions.
         if part.name != "ot2-system.zip" and part.name != UPDATE_PKG:
             LOG.info(f"Unknown field name {part.name} in file_upload, ignoring")
             await part.release()
@@ -192,7 +193,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
         session,
         config.config_from_request(request),
         asyncio.get_event_loop(),
-        # TODO (al, 2022-04-18): Use of part.name here should not make it to edge.
+        # TODO (al, 2022-04-18): Use of part.name should not be here
         os.path.join(session.download_path, part.name),
         maybe_actions,
     )
