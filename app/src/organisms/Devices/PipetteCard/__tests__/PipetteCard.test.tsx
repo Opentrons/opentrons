@@ -1,20 +1,40 @@
 import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
+import { resetAllWhenMocks, when } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { i18n } from '../../../../i18n'
+import { getHasCalibrationBlock } from '../../../../redux/config'
+import { AskForCalibrationBlockModal } from '../../../CalibrateTipLength'
+import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
+import { usePipetteOffsetCalibration } from '../../hooks'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import { PipetteCard } from '..'
 import {
   mockLeftSpecs,
   mockRightSpecs,
 } from '../../../../redux/pipettes/__fixtures__'
-import { LEFT, RIGHT } from '@opentrons/shared-data'
 
 jest.mock('../PipetteOverflowMenu')
+jest.mock('../../../../redux/config')
+jest.mock('../../../CalibratePipetteOffset/useCalibratePipetteOffset')
+jest.mock('../../../CalibrateTipLength')
+jest.mock('../../hooks')
 
 const mockPipetteOverflowMenu = PipetteOverflowMenu as jest.MockedFunction<
   typeof PipetteOverflowMenu
+>
+const mockGetHasCalibrationBlock = getHasCalibrationBlock as jest.MockedFunction<
+  typeof getHasCalibrationBlock
+>
+const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFunction<
+  typeof useCalibratePipetteOffset
+>
+const mockAskForCalibrationBlockModal = AskForCalibrationBlockModal as jest.MockedFunction<
+  typeof AskForCalibrationBlockModal
+>
+const mockUsePipetteOffsetCalibration = usePipetteOffsetCalibration as jest.MockedFunction<
+  typeof usePipetteOffsetCalibration
 >
 
 const render = (props: React.ComponentProps<typeof PipetteCard>) => {
@@ -25,9 +45,18 @@ const render = (props: React.ComponentProps<typeof PipetteCard>) => {
 
 const mockRobotName = 'mockRobotName'
 describe('PipetteCard', () => {
+  let startWizard: any
+
   beforeEach(() => {
-    mockPipetteOverflowMenu.mockReturnValue(
+    startWizard = jest.fn()
+    when(mockPipetteOverflowMenu).mockReturnValue(
       <div>mock pipette overflow menu</div>
+    )
+    when(mockUsePipetteOffsetCalibration).mockReturnValue(null)
+    when(mockGetHasCalibrationBlock).mockReturnValue(null)
+    when(mockUseCalibratePipetteOffset).mockReturnValue([startWizard, null])
+    when(mockAskForCalibrationBlockModal).mockReturnValue(
+      <div>Mock AskForCalibrationBlockModal</div>
     )
   })
   afterEach(() => {

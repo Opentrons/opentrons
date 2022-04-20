@@ -14,7 +14,6 @@ const render = (props: React.ComponentProps<typeof PipetteOverflowMenu>) => {
   })[0]
 }
 
-const mockRobotName = 'mockRobotName'
 const LEFT = 'left' as Mount
 describe('PipetteOverflowMenu', () => {
   let props: React.ComponentProps<typeof PipetteOverflowMenu>
@@ -23,9 +22,8 @@ describe('PipetteOverflowMenu', () => {
     props = {
       pipetteName: mockLeftProtoPipette.displayName,
       mount: LEFT,
-      robotName: mockRobotName,
-      handleChangePipette: jest.fn(),
-      handleSlideout: jest.fn(),
+      handleClick: jest.fn(),
+      isPipetteCalibrated: false,
     }
   })
   afterEach(() => {
@@ -40,25 +38,38 @@ describe('PipetteOverflowMenu', () => {
     const settings = getByRole('button', { name: 'View pipette settings' })
     const about = getByRole('button', { name: 'About pipette' })
     fireEvent.click(detach)
-    expect(props.handleChangePipette).toHaveBeenCalled()
+    expect(props.handleClick).toHaveBeenCalled()
     fireEvent.click(settings)
-    expect(props.handleSlideout).toHaveBeenCalled()
+    expect(props.handleClick).toHaveBeenCalled()
     fireEvent.click(about)
-    expect(props.handleSlideout).toHaveBeenCalled()
+    expect(props.handleClick).toHaveBeenCalled()
     fireEvent.click(calibrate)
-    //  TODO((jr, 4/19/22):wire this up when calibrate button is complete
+    expect(props.handleClick).toHaveBeenCalled()
   })
   it('renders information with no pipette attached', () => {
     props = {
       pipetteName: 'Empty',
       mount: LEFT,
-      robotName: mockRobotName,
-      handleChangePipette: jest.fn(),
-      handleSlideout: jest.fn(),
+      handleClick: jest.fn(),
+      isPipetteCalibrated: false,
     }
     const { getByRole } = render(props)
     const btn = getByRole('button', { name: 'Attach pipette' })
     fireEvent.click(btn)
-    expect(props.handleChangePipette).toHaveBeenCalled()
+    expect(props.handleClick).toHaveBeenCalled()
+  })
+  it('renders recalibrate pipette offset text', () => {
+    props = {
+      pipetteName: mockLeftProtoPipette.displayName,
+      mount: LEFT,
+      handleClick: jest.fn(),
+      isPipetteCalibrated: true,
+    }
+    const { getByRole } = render(props)
+    const recalibrate = getByRole('button', {
+      name: 'Recalibrate pipette offset',
+    })
+    fireEvent.click(recalibrate)
+    expect(props.handleClick).toHaveBeenCalled()
   })
 })

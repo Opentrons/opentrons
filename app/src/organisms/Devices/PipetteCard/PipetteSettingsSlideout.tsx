@@ -33,7 +33,10 @@ export const PipetteSettingsSlideout = (
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
     >
-      <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        data-testid={`PipetteSettingsSlideout_${robotName}_${mount}`}
+      >
         <Trans
           t={t}
           i18nKey={'these_are_advanced_settings'}

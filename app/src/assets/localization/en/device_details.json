@@ -71,6 +71,7 @@
   "empty": "Empty",
   "attach_pipette": "Attach pipette",
   "calibrate_pipette_offset": "Calibrate pipette offset",
+  "recalibrate_pipette_offset": "Recalibrate pipette offset",
   "detach_pipette": "Detach pipette",
   "view_pipette_setting": "View pipette settings",
   "left": "left",

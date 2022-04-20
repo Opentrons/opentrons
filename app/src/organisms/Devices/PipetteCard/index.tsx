@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { LEFT } from '../../../redux/pipettes'
 import {
   Box,
@@ -18,8 +19,17 @@ import {
   BORDERS,
 } from '@opentrons/components'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
+import { Portal } from '../../../App/portal'
 import { StyledText } from '../../../atoms/text'
+import { getHasCalibrationBlock } from '../../../redux/config'
 import { ChangePipette } from '../../ChangePipette'
+import { useCalibratePipetteOffset } from '../../CalibratePipetteOffset/useCalibratePipetteOffset'
+import {
+  INTENT_CALIBRATE_PIPETTE_OFFSET,
+  INTENT_RECALIBRATE_PIPETTE_OFFSET,
+} from '../../CalibrationPanels'
+import { AskForCalibrationBlockModal } from '../../CalibrateTipLength'
+import { usePipetteOffsetCalibration } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
@@ -45,14 +55,46 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const [showChangePipette, setChangePipette] = React.useState(false)
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [showAboutSlideout, setShowAboutSlideout] = React.useState(false)
-
-  const handleChangePipette = (): void => {
-    setChangePipette(true)
-  }
-  const handleSlideout = (isAboutPipette: boolean = false): void => {
-    if (isAboutPipette) {
-      setShowAboutSlideout(true)
+  const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
+  const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
+  const [
+    startPipetteOffsetCalibration,
+    PipetteOffsetCalibrationWizard,
+  ] = useCalibratePipetteOffset(robotName, { mount })
+  const pipetteOffsetCalibration = usePipetteOffsetCalibration(
+    robotName,
+    pipetteId,
+    mount
+  )
+  const startPipetteOffsetCalibrationBlockModal = (
+    hasBlockModalResponse: boolean | null
+  ): void => {
+    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
+      setShowCalBlockModal(true)
     } else {
+      startPipetteOffsetCalibration({
+        overrideParams: {
+          hasCalibrationBlock: Boolean(
+            configHasCalibrationBlock ?? hasBlockModalResponse
+          ),
+        },
+        withIntent: pipetteOffsetCalibration
+          ? INTENT_RECALIBRATE_PIPETTE_OFFSET
+          : INTENT_CALIBRATE_PIPETTE_OFFSET,
+      })
+
+      setShowCalBlockModal(false)
+    }
+  }
+
+  const handleClick = (index: number): void => {
+    if (index === 0) {
+      setChangePipette(true)
+    } else if (index === 1) {
+      startPipetteOffsetCalibrationBlockModal(null)
+    } else if (index === 2) {
+      setShowAboutSlideout(true)
+    } else if (index === 3) {
       setShowSlideout(true)
     }
   }
@@ -82,6 +124,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           isExpanded={true}
         />
       )}
+      {PipetteOffsetCalibrationWizard}
+
       {showAboutSlideout && pipetteInfo != null && pipetteId != null && (
         <AboutPipetteSlideout
           pipetteId={pipetteId}
@@ -89,6 +133,17 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           onCloseClick={() => setShowAboutSlideout(false)}
           isExpanded={true}
         />
+      )}
+      {showCalBlockModal && (
+        <Portal level="top">
+          <AskForCalibrationBlockModal
+            onResponse={hasBlockModalResponse => {
+              startPipetteOffsetCalibrationBlockModal(hasBlockModalResponse)
+            }}
+            titleBarTitle={t('pipette_offset_cal')}
+            closePrompt={() => setShowCalBlockModal(false)}
+          />
+        </Portal>
       )}
       <Box padding={`${SPACING.spacing4} ${SPACING.spacing3}`} width="100%">
         <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
@@ -145,9 +200,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           <PipetteOverflowMenu
             pipetteName={pipetteName ?? t('empty')}
             mount={mount}
-            robotName={robotName}
-            handleChangePipette={handleChangePipette}
-            handleSlideout={handleSlideout}
+            handleClick={handleClick}
+            isPipetteCalibrated={pipetteOffsetCalibration != null}
           />
         </div>
       )}
