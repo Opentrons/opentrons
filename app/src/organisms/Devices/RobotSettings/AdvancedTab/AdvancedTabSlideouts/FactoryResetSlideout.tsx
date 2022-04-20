@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -16,11 +16,8 @@ import { PrimaryButton } from '../../../../../atoms/Buttons'
 import { StyledText } from '../../../../../atoms/text'
 import { Divider } from '../../../../../atoms/structure'
 import { Banner } from '../../../../../atoms/Banner'
-import {
-  getResetConfigOptions,
-  fetchResetConfigOptions,
-} from '../../../../../redux/robot-admin'
-import { getRobotByName } from '../../../../../redux/discovery'
+import { fetchResetConfigOptions } from '../../../../../redux/robot-admin'
+// import { getRobotByName } from '../../../../../redux/discovery'
 import { useTrackEvent } from '../../../../../redux/analytics'
 import {
   useDeckCalibrationData,
@@ -28,7 +25,7 @@ import {
   useTipLengthCalibrations,
 } from '../../../hooks'
 
-import type { State, Dispatch } from '../../../../../redux/types'
+import type { Dispatch } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
 
 interface FactoryResetSlideoutProps {
@@ -47,18 +44,18 @@ export function FactoryResetSlideout({
 }: FactoryResetSlideoutProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
-  const robot = useSelector((state: State) => getRobotByName(state, robotName))
+  // const robot = useSelector((state: State) => getRobotByName(state, robotName))
   const dispatch = useDispatch<Dispatch>()
 
-  const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
+  // const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
 
   // Calibration data
   const deckCalibrationData = useDeckCalibrationData(robotName)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robotName)
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
-  const options = useSelector((state: State) =>
-    getResetConfigOptions(state, robotName)
-  )
+  // const options = useSelector((state: State) =>
+  //   getResetConfigOptions(state, robotName)
+  // )
 
   React.useEffect(() => {
     dispatch(fetchResetConfigOptions(robotName))
@@ -84,8 +81,8 @@ export function FactoryResetSlideout({
 
   const handleClearData = (): void => {
     // first check connection
-    const connected = robot?.connected ?? false
-    updateResetStatus(connected, resetOptions)
+    // const connected = robot?.connected ?? false
+    // updateResetStatus(connected, resetOptions)
     onCloseClick()
   }
 
