@@ -23,7 +23,7 @@ import { RobotStatusBanner } from './RobotStatusBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
-import { UpdateRobotBanner } from '../UpdateRobotBanner'
+// import { UpdateRobotBanner } from '../UpdateRobotBanner'
 
 interface RobotCardProps {
   robot: DiscoveredRobot
