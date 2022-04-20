@@ -20,16 +20,12 @@ const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.
 >
 
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-const mockUpdate = jest.fn()
 
 const MOCK_ROBOT_VERSION = '7.7.7'
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <RobotServerVersion
-        robotName="otie"
-        updateSoftwareUpdateModal={mockUpdate}
-      />
+      <RobotServerVersion robotName="otie" />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
