@@ -16,7 +16,7 @@ import { usePipetteOffsetCalibration } from '..'
 
 import type { DiscoveredRobot } from '../../../../redux/discovery/types'
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
-import type { AttachedPipette, Mount } from '../../../../redux/pipettes/types'
+import { AttachedPipette, Mount } from '../../../../redux/pipettes/types'
 
 jest.mock('../../../../redux/calibration')
 jest.mock('../../../../redux/robot-api')
@@ -62,18 +62,21 @@ describe('usePipetteOffsetCalibration hook', () => {
     jest.resetAllMocks()
   })
 
-  it('returns no pipette offset calibrations when given a null robot name', () => {
+  it('returns no pipette offset calibration when given a null robot name and null pipette id', () => {
     mockGetCalibrationForPipette.mockReturnValue(null)
 
-    const { result } = renderHook(() => usePipetteOffsetCalibration(null), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => usePipetteOffsetCalibration(null, null, MOUNT),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current).toEqual(null)
     expect(dispatchApiRequest).not.toBeCalled()
   })
 
-  it('returns pipette offset calibrations when given a robot name', () => {
+  it('returns pipette offset calibration when given a robot name, pipette id, and mount', () => {
     when(mockGetCalibrationForPipette)
       .calledWith(undefined as any, ROBOT_NAME, PIPETTE_ID, MOUNT)
       .mockReturnValue(mockPipetteOffsetCalibration1)

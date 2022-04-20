@@ -66,6 +66,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteId,
     mount
   )
+
   const startPipetteOffsetCalibrationBlockModal = (
     hasBlockModalResponse: boolean | null
   ): void => {
