@@ -114,7 +114,7 @@ export function SoftwareUpdateModal({
           {t('software_update_modal_release_notes_link')}
         </ExternalLink>
         <Flex justifyContent={JUSTIFY_FLEX_END}>
-          <SecondaryButton onClick={() => {}} marginRight={SPACING.spacing3}>
+          <SecondaryButton onClick={closeModal} marginRight={SPACING.spacing3}>
             {t('software_update_modal_remind_me_later_button')}
           </SecondaryButton>
           <PrimaryButton

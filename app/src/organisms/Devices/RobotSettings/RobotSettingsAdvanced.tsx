@@ -52,7 +52,7 @@ export function RobotSettingsAdvanced({
   const [
     showSoftwareUpdateModal,
     setShowSoftwareUpdateModal,
-  ] = React.useState<boolean>(true)
+  ] = React.useState<boolean>(false)
 
   const robot = useSelector((state: State) => getRobotByName(state, robotName))
   const ipAddress = robot?.ip != null ? robot.ip : ''
