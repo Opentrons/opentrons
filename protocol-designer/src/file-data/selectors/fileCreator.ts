@@ -183,7 +183,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           ...acc,
           [liquidId]: {
             displayName: liquidData.name,
-            description: liquidData.description,
+            description: liquidData.description ?? '',
           },
         }
       },
