@@ -8,7 +8,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
-  CheckboxField,
   Link,
   COLORS,
 } from '@opentrons/components'
@@ -30,10 +29,7 @@ import {
 } from '../../../hooks'
 
 import type { State, Dispatch } from '../../../../../redux/types'
-import type {
-  ResetConfigOption,
-  ResetConfigRequest,
-} from '../../../../../redux/robot-admin/types'
+import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
 
 interface FactoryResetSlideoutProps {
   isExpanded: boolean
@@ -42,6 +38,7 @@ interface FactoryResetSlideoutProps {
   updateResetStatus: (connected: boolean, rOptions?: ResetConfigRequest) => void
 }
 
+// TOD: this slideout will be fixed in another PR
 export function FactoryResetSlideout({
   isExpanded,
   onCloseClick,
@@ -54,16 +51,6 @@ export function FactoryResetSlideout({
   const dispatch = useDispatch<Dispatch>()
 
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
-  // const [optionIds, setOptionIds] = React.useState<string[]>([])
-  const [bootScriptOption, setBootScriptOption] = React.useState<
-    ResetConfigOption[]
-  >([])
-  const [calibrationOptions, setCalibrationOptions] = React.useState<
-    ResetConfigOption[]
-  >([])
-  const [protocolOptions, setProtocolOptions] = React.useState<
-    ResetConfigOption[]
-  >([])
 
   // Calibration data
   const deckCalibrationData = useDeckCalibrationData(robotName)
@@ -72,33 +59,6 @@ export function FactoryResetSlideout({
   const options = useSelector((state: State) =>
     getResetConfigOptions(state, robotName)
   )
-
-  React.useEffect(() => {
-    const cOptions = options.filter(option => {
-      if (option.id.includes('Calibration')) {
-        return option
-      }
-    })
-    setCalibrationOptions(cOptions)
-  }, [options])
-
-  React.useEffect(() => {
-    const bOption = options.filter(option => {
-      if (option.id.includes('boot')) {
-        return option
-      }
-    })
-    setBootScriptOption(bOption)
-  }, [options])
-
-  React.useEffect(() => {
-    const pOption = options.filter(option => {
-      if (option.id.includes('protocol')) {
-        return option
-      }
-    })
-    setProtocolOptions(pOption)
-  }, [options])
 
   React.useEffect(() => {
     dispatch(fetchResetConfigOptions(robotName))
@@ -144,10 +104,9 @@ export function FactoryResetSlideout({
         <StyledText as="p" marginBottom={SPACING.spacing4}>
           {t('factory_reset_slideout_description')}
         </StyledText>
-        <Banner
-          type="warning"
-          title={t('factory_reset_slideout_warning_message')}
-        />
+        <Banner type="warning">
+          {t('factory_reset_slideout_warning_message')}
+        </Banner>
         <Divider marginY={SPACING.spacing4} />
         <Flex
           flexDirection={DIRECTION_ROW}
@@ -168,7 +127,7 @@ export function FactoryResetSlideout({
         <StyledText as="p" marginBottom={SPACING.spacing3}>
           {t('factory_reset_slideout_calibration_description')}
         </StyledText>
-        {calibrationOptions &&
+        {/* {calibrationOptions &&
           calibrationOptions.map(opt => (
             <CheckboxField
               key={opt.id}
@@ -182,7 +141,7 @@ export function FactoryResetSlideout({
             >
               <StyledText>{`Clear ${opt.name}`}</StyledText>
             </CheckboxField>
-          ))}
+          ))} */}
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -199,13 +158,13 @@ export function FactoryResetSlideout({
             {t('factory_reset_slideout_download_logs_link')}
           </Link>
         </Flex>
-        {protocolOptions &&
+        {/* {protocolOptions &&
           protocolOptions.map(option => (
             <StyledText
               as="p"
               key={option.id}
             >{`Clear ${option.name}`}</StyledText>
-          ))}
+          ))} */}
 
         <StyledText
           as="p"
@@ -214,7 +173,7 @@ export function FactoryResetSlideout({
         >
           {t('factory_reset_slideout_boot_scripts_title')}
         </StyledText>
-        {bootScriptOption &&
+        {/* {bootScriptOption &&
           bootScriptOption.map(opt => (
             <CheckboxField
               key={opt.id}
@@ -228,7 +187,7 @@ export function FactoryResetSlideout({
             >
               <StyledText as="p">{`Clear ${opt.name}`}</StyledText>
             </CheckboxField>
-          ))}
+          ))} */}
       </Flex>
     </Slideout>
   )
