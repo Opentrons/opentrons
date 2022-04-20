@@ -19,7 +19,6 @@ import { UseOlderProtocol } from '../AdvancedTab/UseOlderProtocol'
 
 import { RobotSettingsAdvanced } from '../RobotSettingsAdvanced'
 
-import { State } from '../../../../redux/types'
 import { ShellUpdateState } from '../../../../redux/shell/types'
 
 jest.mock('../../../../redux/robot-settings/selectors')
