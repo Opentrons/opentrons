@@ -3,7 +3,6 @@ import pytest
 from datetime import datetime
 from typing import Generator
 
-import sqlalchemy
 from sqlalchemy.engine import Engine as SQLEngine
 from pathlib import Path
 

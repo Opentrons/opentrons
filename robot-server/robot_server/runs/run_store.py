@@ -51,7 +51,7 @@ class RunStore:
         with self._sql_engine.begin() as transaction:
             try:
                 _insert_action_no_transaction(run_id, action, transaction)
-            except sqlalchemy.exc.IntegrityError as e:
+            except sqlalchemy.exc.IntegrityError:
                 raise RunNotFoundError(run_id=run_id)
 
     def update_active_run(self, run_id: str, is_current: bool) -> RunResource:
@@ -86,7 +86,8 @@ class RunStore:
         with self._sql_engine.begin() as transaction:
             try:
                 transaction.execute(statement)
-            except sqlalchemy.exc.IntegrityError as e:
+            except sqlalchemy.exc.IntegrityError:
+                assert run.protocol_id is not None
                 raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
         self.update_active_run(run_id=run.run_id, is_current=run.is_current)
