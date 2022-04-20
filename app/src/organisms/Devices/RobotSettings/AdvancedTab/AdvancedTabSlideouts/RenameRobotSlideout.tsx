@@ -13,7 +13,7 @@ import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import { removeRobot } from '../../../../../redux/discovery'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
-import { PrimaryButton } from '../../../../../atoms/buttons'
+import { PrimaryButton } from '../../../../../atoms/Buttons'
 import { InputField } from '../../../../../atoms/InputField'
 
 import type { UpdatedRobotName } from '@opentrons/api-client'

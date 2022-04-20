@@ -10,7 +10,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../../../../../atoms/text'
-import { PrimaryButton, SecondaryButton } from '../../../../../atoms/buttons'
+import { PrimaryButton, SecondaryButton } from '../../../../../atoms/Buttons'
 import { Modal } from '../../../../../atoms/Modal'
 import {
   useDispatchApiRequest,

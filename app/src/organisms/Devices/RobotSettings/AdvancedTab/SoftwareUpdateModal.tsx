@@ -72,16 +72,20 @@ export function SoftwareUpdateModal({
             version: `${version}`,
           })}
         </StyledText>
-        <StyledText as="p">{'None in the Opentrons dummy text'}</StyledText>
+        <StyledText as="p">
+          {'None in the Opentrons (Here will be change logs)'}
+        </StyledText>
         <StyledText css={TYPOGRAPHY.pSemiBold} marginTop={SPACING.spacing3}>
           {t('software_update_modal_new_features_label')}
         </StyledText>
-        <StyledText as="p">{'None in the Opentrons dummy text'}</StyledText>
+        <StyledText as="p">
+          {'None in the Opentrons (Here will be features info)'}
+        </StyledText>
         <StyledText css={TYPOGRAPHY.pSemiBold} marginTop={SPACING.spacing3}>
           {t('software_update_modal_but_fixes_label')}
         </StyledText>
         <StyledText as="p" marginBottom={SPACING.spacing4}>
-          {'None in the Opentrons dummy text'}
+          {'None in the Opentrons (Here will be fixes info)'}
         </StyledText>
         <Divider />
         <ExternalLink
