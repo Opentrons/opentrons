@@ -1,3 +1,3 @@
 export interface UpdatedRobotName {
-  name: string;
+  name: string
 }
