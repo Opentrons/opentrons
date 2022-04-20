@@ -1,7 +1,6 @@
 export const mockHealthResponse = {
   name: 'opentrons-dev',
   api_version: '1.2.3',
-  serial_number: '12345',
   fw_version: '4.5.6',
   system_version: '7.8.9',
 }

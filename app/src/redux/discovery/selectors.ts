@@ -169,7 +169,6 @@ export const getDiscoverableRobotByName: (
 )
 
 export const getRobotSerialNumber = (robot: DiscoveredRobot): string | null =>
-  (robot.health && robot.health.serial_number) ??
   (robot.serverHealth && robot.serverHealth.serialNumber) ??
   null
 

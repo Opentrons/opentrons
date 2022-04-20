@@ -110,7 +110,6 @@ type Service = {
   health: ?{
     name: string,
     api_version: string,
-    serial_number: string,
     fw_version: string,
     system_version?: string,
     logs?: Array<string>,
