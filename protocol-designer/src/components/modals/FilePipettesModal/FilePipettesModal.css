@@ -78,7 +78,7 @@
 .mount_diagram {
   display: flex;
   justify-content: space-around;
-  flex: 1 1 4rem;
+  flex: 1 1 6rem;
   margin-right: 0.5rem;
 
   & img {

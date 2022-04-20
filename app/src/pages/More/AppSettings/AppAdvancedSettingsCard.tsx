@@ -1,7 +1,6 @@
 // app info card with version and updated
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import startCase from 'lodash/startCase'
 
 import {
   Card,
@@ -16,6 +15,7 @@ import * as Calibration from '../../../redux/calibration'
 import type { DropdownOption } from '@opentrons/components'
 import type { DevInternalFlag } from '../../../redux/config/types'
 import type { State, Dispatch } from '../../../redux/types'
+import { useTranslation } from 'react-i18next'
 
 const TITLE = 'Advanced Settings'
 
@@ -51,6 +51,7 @@ const LABWARE_OFFSET_DATA_BODY =
   'If you need to access Labware Offset data outside of the Opentrons App, enabling this setting will display a link to download Offset Data (if it is present) on the Labware Setup section of the Protocol page and the Labware Position Check Summary screen.'
 
 export function AppAdvancedSettingsCard(): JSX.Element {
+  const { t } = useTranslation('app_settings')
   const useTrashSurfaceForTipCal = useSelector((state: State) =>
     Config.getUseTrashSurfaceForTipCal(state)
   )
@@ -90,6 +91,7 @@ export function AppAdvancedSettingsCard(): JSX.Element {
     dispatch(Config.toggleDevInternalFlag(flag))
   const handleChannel: React.ChangeEventHandler<HTMLSelectElement> = event =>
     dispatch(Config.updateConfigValue('update.channel', event.target.value))
+
   return (
     <>
       <Card title={TITLE}>
@@ -150,7 +152,7 @@ export function AppAdvancedSettingsCard(): JSX.Element {
             <LabeledToggle
               key={flag}
               data-test={`devInternalToggle${flag}`}
-              label={`__DEV__ ${startCase(flag)}`}
+              label={t(`__dev_internal__${flag}`)}
               toggledOn={Boolean(devInternalFlags?.[flag])}
               onClick={() => toggleDevInternalFlag(flag)}
             />

@@ -136,7 +136,7 @@ export const migrateFile = (
               ...acc,
               [liquidId]: {
                 displayName: liquidData.name,
-                description: liquidData.description,
+                description: liquidData.description ?? '',
               },
             }
           },

@@ -15,12 +15,11 @@ import {
   parseInitialLoadedModulesBySlot,
 } from '@opentrons/api-client'
 
-import type { DeckSlot, ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { DeckSlot, RunTimeCommand } from '@opentrons/shared-data'
 
 interface DeckThumbnailProps {
-  analysis: ProtocolAnalysisFile<{}>
+  commands: RunTimeCommand[]
 }
-
 const deckSetupLayerBlocklist = [
   'calibrationMarkings',
   'fixedBase',
@@ -33,11 +32,11 @@ const deckSetupLayerBlocklist = [
 
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
-  const { analysis } = props
-  const initialLoadedLabwareBySlot = parseInitialLoadedLabwareBySlot(analysis)
-  const initialLoadedModulesBySlot = parseInitialLoadedModulesBySlot(analysis)
+  const { commands } = props
+  const initialLoadedLabwareBySlot = parseInitialLoadedLabwareBySlot(commands)
+  const initialLoadedModulesBySlot = parseInitialLoadedModulesBySlot(commands)
   const initialLoadedLabwareByModuleId = parseInitialLoadedLabwareByModuleId(
-    analysis
+    commands
   )
 
   return (

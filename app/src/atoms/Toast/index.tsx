@@ -69,6 +69,7 @@ export function Toast(props: ToastProps): JSX.Element {
       right={SPACING.spacing4}
       bottom={SPACING.spacing4}
       position="fixed"
+      data-testid={`Toast_${type}`}
     >
       <Flex flexDirection="row">
         <Icon
