@@ -42,7 +42,11 @@ export const ProtocolRunModuleControls = ({
             key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
           >
             {module.attachedModuleMatch != null ? (
-              <ModuleCard runId={runId} module={module.attachedModuleMatch} />
+              <ModuleCard
+                runId={runId}
+                module={module.attachedModuleMatch}
+                slot={module.slotName}
+              />
             ) : null}
           </Flex>
         )
