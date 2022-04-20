@@ -3,7 +3,7 @@ import pytest
 from datetime import datetime
 from typing import Generator
 
-from sqlalchemy.engine import Engine as SQLEngine
+import sqlalchemy
 from pathlib import Path
 
 from opentrons.protocol_runner import ProtocolRunData
@@ -14,13 +14,13 @@ from opentrons.protocol_engine import (
 )
 from opentrons.types import MountType, DeckSlotName
 
-from robot_server.runs.engine_state_store import EngineStateStore, EngineState
+from robot_server.runs.engine_state_store import EngineStateStore, EngineStateResource
 from robot_server.runs.run_store import RunNotFoundError
 from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
 
 
 @pytest.fixture
-def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
+def sql_engine(tmp_path: Path) -> Generator[sqlalchemy.engine.Engine, None, None]:
     """Return a set-up database to back the store."""
     db_file_path = tmp_path / "test.db"
     sql_engine = open_db_no_cleanup(db_file_path=db_file_path)
@@ -32,13 +32,14 @@ def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
 
 
 @pytest.fixture
-def subject(sql_engine: SQLEngine) -> EngineStateStore:
+def subject(sql_engine: sqlalchemy.engine.Engine) -> EngineStateStore:
     """Get a ProtocolStore test subject."""
     return EngineStateStore(sql_engine=sql_engine)
 
 
-def test_insert_state(subject: EngineStateStore) -> None:
-    """It should be able to add a new run to the store."""
+@pytest.fixture
+def protocol_run() -> ProtocolRunData:
+    """Get a ProtocolRunData test object."""
     analysis_command = pe_commands.Pause(
         id="command-id",
         key="command-key",
@@ -67,7 +68,7 @@ def test_insert_state(subject: EngineStateStore) -> None:
         pipetteName=pe_types.PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
     )
-    state = ProtocolRunData(
+    return ProtocolRunData(
         commands=[analysis_command],
         errors=[analysis_error],
         labware=[analysis_labware],
@@ -78,11 +79,33 @@ def test_insert_state(subject: EngineStateStore) -> None:
         labwareOffsets=[],
     )
 
-    engine_state = EngineState(
+
+def test_insert_state(subject: EngineStateStore, protocol_run: ProtocolRunData) -> None:
+    """It should be able to add a new run to the store."""
+    engine_state = EngineStateResource(
         run_id="run-id",
-        state=state,
+        state=protocol_run,
         # created_at=datetime.now()
     )
     result = subject.insert(engine_state)
 
     assert result == engine_state
+
+
+def test_get_run_state(subject: EngineStateStore) -> None:
+    """It should be able to get engine state from the store."""
+    pass
+
+
+def test_insert_state_run_not_found(
+    subject: EngineStateStore, protocol_run: ProtocolRunData
+) -> None:
+    """It should be able to catch the exception raised by insert."""
+    engine_state = EngineStateResource(
+        run_id="run-not-found",
+        state=protocol_run,
+        # created_at=datetime.now()
+    )
+
+    with pytest.raises(RunNotFoundError, match="run-not-found"):
+        subject.insert(engine_state)
