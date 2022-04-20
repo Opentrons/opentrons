@@ -1,14 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 
 import {
   Box,
   Flex,
-  Icon,
   ALIGN_CENTER,
   ALIGN_START,
-  C_MED_DARK_GRAY,
   C_MED_LIGHT_GRAY,
   C_WHITE,
   DIRECTION_COLUMN,
@@ -30,6 +27,7 @@ import { Portal } from '../../App/portal'
 import { useLights, useRobot, useIsRobotViewable } from './hooks'
 import { RobotStatusBanner } from './RobotStatusBanner'
 import { CONNECTABLE } from '../../redux/discovery'
+import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
 
 interface RobotOverviewProps {
   robotName: string
@@ -107,13 +105,7 @@ export function RobotOverview({
         </Flex>
       </Box>
       <Box alignSelf={ALIGN_START}>
-        {/* temp link to robot settings until overflow menu implemented. selector may change */}
-        <Link
-          to={`/devices/${robotName}/robot-settings/calibration`}
-          id="RobotOverview_overflowMenu"
-        >
-          <Icon name="dots-vertical" color={C_MED_DARK_GRAY} size={SIZE_2} />
-        </Link>
+        <RobotOverviewOverflowMenu robot={robot} />
       </Box>
     </Flex>
   ) : null
