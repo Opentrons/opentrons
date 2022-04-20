@@ -55,7 +55,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
           id={`RobotCard_${name}_robotImage`}
         />
         <Box padding={SPACING.spacing3} width="100%">
-          <UpdateRobotBanner robotName={name} marginBottom={SPACING.spacing3} />
+          {/* TODO: uncomment this when we prevent all nested clicks from triggering a route change * <UpdateRobotBanner robotName={name} marginBottom={SPACING.spacing3} /> */}
           <RobotStatusBanner name={name} local={local} />
           <Flex>
             <Flex

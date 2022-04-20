@@ -84,10 +84,11 @@ describe('RobotCard', () => {
     getByText('Mock RobotStatusBanner')
   })
 
-  it('renders a UpdateRobotBanner component', () => {
-    const [{ getByText }] = render()
-    getByText('Mock UpdateRobotBanner')
-  })
+  // TODO: uncomment this test when it's uncommented in the component
+  // it('renders a UpdateRobotBanner component', () => {
+  //   const [{ getByText }] = render()
+  //   getByText('Mock UpdateRobotBanner')
+  // })
 
   it('renders the type of pipettes attached to left and right mounts', () => {
     const [{ getByText }] = render()

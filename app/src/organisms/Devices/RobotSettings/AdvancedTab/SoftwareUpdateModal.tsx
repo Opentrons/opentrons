@@ -54,6 +54,12 @@ export function SoftwareUpdateModal({
     closeModal()
   }
 
+  const handleLaunchUpdateModal: React.MouseEventHandler = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowUpdateModal(true)
+  }
+
   if (robot?.status !== CONNECTABLE && robot?.status !== REACHABLE) return null
 
   return showUpdateModal ? (
@@ -68,9 +74,7 @@ export function SoftwareUpdateModal({
       <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing4}>
         {/* <ReleaseNotes source={releaseNotes} /> ToDo: align with new design */}
         <StyledText css={TYPOGRAPHY.pSemiBold}>
-          {t('software_update_modal_app_change_label', {
-            version: `${version}`,
-          })}
+          {t('software_update_modal_app_change_label', { version })}
         </StyledText>
         <StyledText as="p">
           {'None in the Opentrons (Here will be change logs)'}
@@ -118,7 +122,7 @@ export function SoftwareUpdateModal({
             {t('software_update_modal_remind_me_later_button')}
           </SecondaryButton>
           <PrimaryButton
-            onClick={() => setShowUpdateModal(true)}
+            onClick={handleLaunchUpdateModal}
             disabled={currentRunId != null}
           >
             {t('software_update_modal_update_button')}
