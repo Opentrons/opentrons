@@ -52,9 +52,9 @@ async def test_protocols_persist(protocol: Callable[[str], IO[bytes]]) -> None:
             # except we don't care about analyses,
             # and we don't care about order.
             for p in uploaded_protocols:
-                del p["analyses"]
+                del p["analysisSummaries"]
             for p in restarted_protocols:
-                del p["analyses"]
+                del p["analysisSummaries"]
             uploaded_protocols.sort(key=lambda p: p["id"])
             restarted_protocols.sort(key=lambda p: p["id"])
             assert uploaded_protocols == restarted_protocols

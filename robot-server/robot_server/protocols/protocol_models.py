@@ -76,6 +76,7 @@ class Protocol(ResourceModel):
         default_factory=list,
         description=(
             "This field was deprecated for performance reasons."
+            " It will always be returned as an empty list."
             " Use `analysisSummaries` and `GET /protocols/:id/analyses` instead."
         ),
     )
