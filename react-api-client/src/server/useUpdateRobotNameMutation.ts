@@ -10,7 +10,6 @@ import { useHost } from '../api'
 import type { AxiosError } from 'axios'
 import type { ErrorResponse, HostConfig, UpdatedRobotName } from '@opentrons/api-client'
 
-
 export type UseUpdateRobotNameMutationResult = UseMutationResult<
   UpdatedRobotName,
   AxiosError<ErrorResponse>,
