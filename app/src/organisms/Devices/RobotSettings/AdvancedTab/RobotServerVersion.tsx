@@ -13,17 +13,16 @@ import {
   useInterval,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
+import { useRobot } from '../../hooks'
 import { StyledText } from '../../../../atoms/text'
 import { Banner } from '../../../../atoms/Banner'
-import { getRobotApiVersion, REACHABLE } from '../../../../redux/discovery'
+import { getRobotApiVersion } from '../../../../redux/discovery'
 import { checkShellUpdate } from '../../../../redux/shell'
 import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
 
-import type { ViewableRobot } from '../../../../redux/discovery/types'
 import type { State, Dispatch } from '../../../../redux/types'
 
 interface RobotServerVersionProps {
-  robot: ViewableRobot
   robotName: string
   updateSoftwareUpdateModal: (isOpen: boolean) => void
 }
@@ -33,53 +32,49 @@ const GITHUB_LINK =
   'https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md'
 
 export function RobotServerVersion({
-  robot,
   robotName,
   updateSoftwareUpdateModal,
 }: RobotServerVersionProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
+  const robot = useRobot(robotName)
   const checkAppUpdate = React.useCallback(() => dispatch(checkShellUpdate()), [
     dispatch,
   ])
-  const { autoUpdateAction, autoUpdateDisabledReason } = useSelector(
-    (state: State) => {
-      return getBuildrootUpdateDisplayInfo(state, robotName)
-    }
-  )
-  const [showBanner, setShowBanner] = React.useState<boolean>(
+  const { autoUpdateAction } = useSelector((state: State) => {
+    return getBuildrootUpdateDisplayInfo(state, robotName)
+  })
+  const [showUpdateBanner, setShowUpdateBanner] = React.useState<boolean>(
     autoUpdateAction !== 'reinstall'
   )
   const robotServerVersion =
-    robot.status === REACHABLE ? getRobotApiVersion(robot) : null
-
-  const updateDisabled = autoUpdateDisabledReason !== null // pass to modal
-
-  // React.useEffect(() => {
-  //   if (autoUpdateAction !== 'reinstall') {
-  //     setShowBanner(true)
-  //   }
-  // }, [])
+    robot?.status != null ? getRobotApiVersion(robot) : null
 
   // check for available updates
   useInterval(checkAppUpdate, UPDATE_RECHECK_DELAY_MS)
 
   return (
     <>
-      {true ? (
-        <Banner type="warning" onCloseClick={() => setShowBanner(false)}>
-          <StyledText as="p" marginRight={SPACING.spacing2}>
-            {t('robot_server_versions_banner_title')}
-          </StyledText>
-          <Link
-            as="button"
-            onClick={() => updateSoftwareUpdateModal(true)}
-            css={TYPOGRAPHY.pRegular}
+      {showUpdateBanner ? (
+        <Box marginBottom={SPACING.spacing4} width="100%">
+          <Banner
+            type="warning"
+            onCloseClick={() => setShowUpdateBanner(false)}
           >
-            {t('robot_server_versions_view_update')}
-          </Link>
-        </Banner>
+            <StyledText as="p" marginRight={SPACING.spacing2}>
+              {t('robot_server_versions_banner_title')}
+            </StyledText>
+            <Link
+              onClick={() => updateSoftwareUpdateModal(true)}
+              css={TYPOGRAPHY.pRegular}
+              textDecoration={TYPOGRAPHY.textDecorationUnderline}
+            >
+              {t('robot_server_versions_view_update')}
+            </Link>
+          </Banner>
+        </Box>
       ) : (
+        // TODO: add reinstall option
         <Flex justifyContent={JUSTIFY_FLEX_END}>
           <StyledText as="label" color={COLORS.darkGreyEnabled}>
             {t('robot_server_versions_status')}

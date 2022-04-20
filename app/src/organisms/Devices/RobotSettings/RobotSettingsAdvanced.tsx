@@ -66,7 +66,7 @@ export function RobotSettingsAdvanced({
   )
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
   const findSettings = (id: string): RobotSettingsField | undefined =>
-    settings.find(s => s.id === id)
+    settings?.find(s => s.id === id)
 
   const updateIsExpanded = (
     isExpanded: boolean,
@@ -89,6 +89,7 @@ export function RobotSettingsAdvanced({
   }
 
   const updateSoftwareUpdateModal = (isOpen: boolean): void => {
+    console.log('clicked')
     setShowSoftwareUpdateModal(isOpen)
   }
 
@@ -130,12 +131,11 @@ export function RobotSettingsAdvanced({
         />
         <Divider marginY={SPACING.spacing5} />
         <RobotServerVersion
-          robot={robot as ViewableRobot}
           robotName={robotName}
           updateSoftwareUpdateModal={updateSoftwareUpdateModal}
         />
         <Divider marginY={SPACING.spacing5} />
-        <RobotInformation robot={robot as ViewableRobot} />
+        <RobotInformation robotName={robotName} />
         <Divider marginY={SPACING.spacing5} />
         <UsageSettings
           settings={findSettings('enableDoorSafetySwitch')}

@@ -9,31 +9,34 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
+import { useRobot } from '../../../../organisms/Devices/hooks'
 import {
   getRobotSerialNumber,
   getRobotFirmwareVersion,
   getRobotProtocolApiVersion,
-  REACHABLE,
 } from '../../../../redux/discovery'
-import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 interface RobotInformationProps {
-  robot: ViewableRobot
+  robotName: string
 }
 
 export function RobotInformation({
-  robot,
-}: RobotInformationProps): JSX.Element {
+  robotName,
+}: RobotInformationProps): JSX.Element | null {
   const { t } = useTranslation('device_settings')
+  const robot = useRobot(robotName)
   const serialNumber =
-    robot.status === REACHABLE ? getRobotSerialNumber(robot) : null
+    robot?.status != null ? getRobotSerialNumber(robot) : null
   const firmwareVersion =
-    robot.status === REACHABLE ? getRobotFirmwareVersion(robot) : null
+    robot?.status != null ? getRobotFirmwareVersion(robot) : null
   const protocolApiVersions =
-    robot.status === REACHABLE ? getRobotProtocolApiVersion(robot) : null
-  const minProtocolApiVersion = protocolApiVersions?.min ?? 'Unknown'
-  const maxProtocolApiVersion = protocolApiVersions?.max ?? 'Unknown'
-  const apiVersionMinMax = `v${minProtocolApiVersion} - v${maxProtocolApiVersion}`
+    robot?.status != null ? getRobotProtocolApiVersion(robot) : null
+  const minProtocolApiVersion = protocolApiVersions?.min ?? null
+  const maxProtocolApiVersion = protocolApiVersions?.max ?? null
+  const apiVersionMinMax =
+    minProtocolApiVersion != null && maxProtocolApiVersion != null
+      ? `v${minProtocolApiVersion} - v${maxProtocolApiVersion}`
+      : t('robot_settings_advanced_unknown')
 
   return (
     <Box>
