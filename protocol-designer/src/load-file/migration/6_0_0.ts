@@ -30,8 +30,7 @@ const SCHEMA_VERSION = 6
 export const migrateSavedStepForms = (
   savedStepForms?: Record<string, any>
 ): Record<string, any> => {
-  // uncheck asp + disp delay checkbox if the offset is 0 or null as before they were not getting registered because of a bug
-  // because of a bug. see https://github.com/Opentrons/opentrons/issues/8153
+  // uncheck asp + disp delay checkbox if the offset is 0 or null, see https://github.com/Opentrons/opentrons/issues/8153
   return mapValues(savedStepForms, stepForm => {
     if (stepForm.stepType === 'moveLiquid') {
       let migratedStepForm = { ...stepForm }
