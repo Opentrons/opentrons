@@ -55,15 +55,11 @@ describe('RobotOverviewOverflowMenu', () => {
     const updateRobotSoftwareBtn = getByRole('button', {
       name: 'Update robot software',
     })
-    const disconnectBtn = getByRole('button', {
-      name: 'Disconnect from network',
-    })
     const restartBtn = getByRole('button', { name: 'restart robot' })
     const homeBtn = getByRole('button', { name: 'Home gantry' })
     const settingsBtn = getByRole('link', { name: 'robot settings' })
 
     expect(updateRobotSoftwareBtn).toBeEnabled()
-    expect(disconnectBtn).toBeEnabled()
     expect(restartBtn).toBeEnabled()
     expect(homeBtn).toBeEnabled()
     expect(settingsBtn).toBeEnabled()
@@ -82,14 +78,10 @@ describe('RobotOverviewOverflowMenu', () => {
     const updateRobotSoftwareBtn = getByRole('button', {
       name: 'Update robot software',
     })
-    const disconnectBtn = getByRole('button', {
-      name: 'Disconnect from network',
-    })
     const restartBtn = getByRole('button', { name: 'restart robot' })
     const homeBtn = getByRole('button', { name: 'Home gantry' })
 
     expect(updateRobotSoftwareBtn).toBeDisabled()
-    expect(disconnectBtn).toBeDisabled()
     expect(restartBtn).toBeDisabled()
     expect(homeBtn).toBeDisabled()
   })

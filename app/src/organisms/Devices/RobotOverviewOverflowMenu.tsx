@@ -15,7 +15,6 @@ import {
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { restartRobot } from '../../redux/robot-admin'
 import { home, ROBOT } from '../../redux/robot-controls'
-import { CONNECTABLE } from '../../redux/discovery'
 import { Portal } from '../../App/portal'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
@@ -84,17 +83,8 @@ export const RobotOverviewOverflowMenu = (
         >
           {/* TODO(sh, 2022-04-19): complete wiring up menu items below and disabled reasons */}
           <MenuItem disabled={buttonDisabledReason}>
-            {t('update_robot_update')}
+            {t('update_robot_software')}
           </MenuItem>
-          {robot.status === CONNECTABLE ? (
-            <MenuItem disabled={buttonDisabledReason}>
-              {t('disconnect_from_network')}
-            </MenuItem>
-          ) : (
-            <MenuItem disabled={buttonDisabledReason}>
-              {t('connect_to_network')}
-            </MenuItem>
-          )}
           <MenuItem
             onClick={handleClickRestart}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
