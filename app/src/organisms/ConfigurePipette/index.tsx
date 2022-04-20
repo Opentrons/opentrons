@@ -15,7 +15,6 @@ import {
   updatePipetteSettings,
 } from '../../redux/pipettes'
 import { useFeatureFlag } from '../../redux/config'
-// import { ScrollableAlertModal } from '../../molecules/modals'
 import { ConfigForm } from './ConfigForm'
 import { ConfigErrorBanner } from './ConfigErrorBanner'
 
@@ -75,7 +74,6 @@ export function ConfigurePipette(props: Props): JSX.Element {
   }, [updateRequest, closeModal])
 
   return (
-    // <ScrollableAlertModal>
     <Box zIndex={1}>
       {updateError && <ConfigErrorBanner message={updateError} />}
       {settings && (
@@ -88,6 +86,5 @@ export function ConfigurePipette(props: Props): JSX.Element {
         />
       )}
     </Box>
-    // </ScrollableAlertModal>
   )
 }

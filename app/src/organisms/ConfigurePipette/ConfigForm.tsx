@@ -247,7 +247,6 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
                   formFields={powerFields}
                 />
               </FormColumn>
-
               <FormButtonBar
                 isTopButton={false}
                 disabled={disableSubmit || updateInProgress}

@@ -85,5 +85,8 @@
   "these_are_advanced_settings": "<block>These are advanced settings. Please do not attempt to adjust without assistance from Opentrons Support. Changing these settings may affect the lifespan of your pipette.</block><block>These settings do not override any pipette settings defined in protocols.</block>",
   "reset_all": "Reset all",
   "about_pipette": "About pipette",
-  "about_pipette_name": "About {{name}} Pipette"
+  "about_pipette_name": "About {{name}} Pipette",
+  "pipette_offset_calibration_needed": "Pipette Offset calibration needed.",
+  "calibrate_now": "Calibrate now",
+  "deck_cal_missing": "Pipette Offset calibration missing. Calibrate deck first."
 }

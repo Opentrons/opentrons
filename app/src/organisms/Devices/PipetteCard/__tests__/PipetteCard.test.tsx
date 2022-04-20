@@ -5,21 +5,29 @@ import { renderWithProviders } from '@opentrons/components'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { i18n } from '../../../../i18n'
 import { getHasCalibrationBlock } from '../../../../redux/config'
+import { Banner } from '../../../../atoms/Banner'
 import { AskForCalibrationBlockModal } from '../../../CalibrateTipLength'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { usePipetteOffsetCalibration } from '../../hooks'
+import {
+  useDeckCalibrationData,
+  usePipetteOffsetCalibration,
+} from '../../hooks'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import { PipetteCard } from '..'
 import {
   mockLeftSpecs,
   mockRightSpecs,
 } from '../../../../redux/pipettes/__fixtures__'
+import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
+import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 
 jest.mock('../PipetteOverflowMenu')
 jest.mock('../../../../redux/config')
 jest.mock('../../../CalibratePipetteOffset/useCalibratePipetteOffset')
 jest.mock('../../../CalibrateTipLength')
 jest.mock('../../hooks')
+jest.mock('../../../../atoms/Banner')
+jest.mock('../AboutPipetteSlideout')
 
 const mockPipetteOverflowMenu = PipetteOverflowMenu as jest.MockedFunction<
   typeof PipetteOverflowMenu
@@ -36,6 +44,13 @@ const mockAskForCalibrationBlockModal = AskForCalibrationBlockModal as jest.Mock
 const mockUsePipetteOffsetCalibration = usePipetteOffsetCalibration as jest.MockedFunction<
   typeof usePipetteOffsetCalibration
 >
+const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
+  typeof useDeckCalibrationData
+>
+const mockAboutPipettesSlideout = AboutPipetteSlideout as jest.MockedFunction<
+  typeof AboutPipetteSlideout
+>
+const mockBanner = Banner as jest.MockedFunction<typeof Banner>
 
 const render = (props: React.ComponentProps<typeof PipetteCard>) => {
   return renderWithProviders(<PipetteCard {...props} />, {
@@ -49,6 +64,14 @@ describe('PipetteCard', () => {
 
   beforeEach(() => {
     startWizard = jest.fn()
+    when(mockAboutPipettesSlideout).mockReturnValue(
+      <div>mock about slideout</div>
+    )
+    when(mockBanner).mockReturnValue(<div>mock banner</div>)
+    when(mockUseDeckCalibrationData).calledWith(mockRobotName).mockReturnValue({
+      isDeckCalibrated: true,
+      deckCalibrationData: mockDeckCalData,
+    })
     when(mockPipetteOverflowMenu).mockReturnValue(
       <div>mock pipette overflow menu</div>
     )
@@ -83,6 +106,32 @@ describe('PipetteCard', () => {
     })
     getByText('right Mount')
     getByText('Right Pipette')
+  })
+  it('renders information for a right pipette with no deck cal banner', () => {
+    when(mockUseDeckCalibrationData).calledWith(mockRobotName).mockReturnValue({
+      isDeckCalibrated: false,
+      deckCalibrationData: null,
+    })
+    const { getByText } = render({
+      pipetteInfo: mockRightSpecs,
+      mount: RIGHT,
+      robotName: mockRobotName,
+      pipetteId: 'id',
+    })
+    getByText('right Mount')
+    getByText('Right Pipette')
+    getByText('mock banner')
+  })
+  it('renders information for a right pipette with no pipette offset cal banner', () => {
+    const { getByText } = render({
+      pipetteInfo: mockRightSpecs,
+      mount: RIGHT,
+      robotName: mockRobotName,
+      pipetteId: 'id',
+    })
+    getByText('right Mount')
+    getByText('Right Pipette')
+    getByText('mock banner')
   })
   it('renders information for no pipette on right Mount', () => {
     const { getByText } = render({
