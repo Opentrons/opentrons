@@ -40,9 +40,6 @@ export function RobotServerVersion({
 
   return (
     <>
-      <Box marginBottom={SPACING.spacing4} width="100%">
-        <UpdateRobotBanner robotName={robotName} />
-      </Box>
       {autoUpdateAction !== 'reinstall' ? (
         <Box marginBottom={SPACING.spacing4} width="100%">
           <UpdateRobotBanner robotName={robotName} />

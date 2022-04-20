@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { SPACING, TYPOGRAPHY, Link, useInterval } from '@opentrons/components'
+import { SPACING, TYPOGRAPHY, Btn, useInterval } from '@opentrons/components'
 import { Portal } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
@@ -50,13 +50,13 @@ export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
           <StyledText as="p" marginRight={SPACING.spacing2}>
             {t('robot_server_versions_banner_title')}
           </StyledText>
-          <Link
+          <Btn
             onClick={() => setShowSoftwareUpdateModal(true)}
             css={TYPOGRAPHY.pRegular}
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
           >
             {t('robot_server_versions_view_update')}
-          </Link>
+          </Btn>
         </Banner>
       ) : null}
       {showSoftwareUpdateModal ? (
