@@ -3,7 +3,7 @@ import sqlalchemy
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy import create_engine
 from fastapi import Depends
-
+from datetime import datetime
 import logging
 
 from pathlib import Path
@@ -87,9 +87,9 @@ engine_state_table = sqlalchemy.Table(
     "engine_state",
     _metadata,
     sqlalchemy.Column(
-        "id", sqlalchemy.INT, primary_key=True, sqlite_autoincrement=True
+        "id", sqlalchemy.INT, primary_key=True
     ),
-    sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False),
+    # sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False),
     sqlalchemy.Column("state", sqlalchemy.JSON, nullable=False),
     sqlalchemy.Column(
         "run_id",

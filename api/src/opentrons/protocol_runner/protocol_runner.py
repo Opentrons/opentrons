@@ -1,6 +1,7 @@
 """Protocol run control and management."""
 from dataclasses import dataclass
 from typing import List, Optional, cast
+from pydantic import BaseModel
 
 from opentrons.hardware_control import HardwareControlAPI, ThreadManagedHardware
 from opentrons.protocol_reader import (
@@ -36,7 +37,7 @@ from .legacy_wrappers import (
 
 
 @dataclass(frozen=True)
-class ProtocolRunData:
+class ProtocolRunData(BaseModel):
     """Data from a protocol run."""
 
     commands: List[Command]
