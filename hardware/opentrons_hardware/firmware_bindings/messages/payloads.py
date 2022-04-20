@@ -393,7 +393,7 @@ class BrushedMotorPwmPayload(utils.BinarySerializable):
 
 @dataclass
 class GripperInfoResponsePayload(utils.BinarySerializable):
-    """A response carrying data about an attached pipette."""
+    """A response carrying data about an attached gripper."""
 
     gripper_model: utils.UInt16Field
     gripper_serial: GripperSerialField
