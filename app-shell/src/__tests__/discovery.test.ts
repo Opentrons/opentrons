@@ -211,6 +211,7 @@ describe('app-shell/discovery', () => {
           health: {
             name: 'opentrons',
             api_version: '3.19.0',
+            serial_number: '123456789',
             fw_version: 'v1.0.8-1f0a3d7',
             system_version: 'v1.3.7-2-g9e23b93f41',
           },
@@ -234,12 +235,14 @@ describe('app-shell/discovery', () => {
           health: {
             name: 'opentrons',
             api_version: '3.19.0',
+            serial_number: '123456789',
             fw_version: 'v1.0.8-1f0a3d7',
             system_version: 'v1.3.7-2-g9e23b93f41',
           },
           serverHealth: {
             name: 'opentrons',
             apiServerVersion: '3.19.0',
+            serialNumber: '123456789',
             updateServerVersion: '3.19.0',
             smoothieVersion: 'unimplemented',
             systemVersion: 'v1.3.7-2-g9e23b93f41',

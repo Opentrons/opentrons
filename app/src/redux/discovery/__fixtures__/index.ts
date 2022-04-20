@@ -16,6 +16,7 @@ import type {
 export const mockHealthResponse = {
   name: 'robot-name',
   api_version: '0.0.0-mock',
+  serial_number: '0.0.0-mock',
   fw_version: '0.0.0-mock',
   system_version: '0.0.0-mock',
   logs: [] as string[],

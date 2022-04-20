@@ -56,12 +56,14 @@ describe('discovery client action creators', () => {
     const health = {
       name: 'opentrons-dev',
       api_version: '1.2.3',
+      serial_number: '12345',
       fw_version: '4.5.6',
       system_version: '7.8.9',
     }
     const serverHealth = {
       name: 'opentrons-dev',
       apiServerVersion: '1.2.3',
+      serialNumber: '12345',
       updateServerVersion: '1.2.3',
       smoothieVersion: '4.5.6',
       systemVersion: '7.8.9',

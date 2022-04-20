@@ -110,6 +110,7 @@ type Service = {
   health: ?{
     name: string,
     api_version: string,
+    serial_number: string,
     fw_version: string,
     system_version?: string,
     logs?: Array<string>,
@@ -119,6 +120,7 @@ type Service = {
   serverHealth: ?{
     name: string,
     apiServerVersion: string,
+    serialNumber: string,
     updateServerVersion: string,
     smoothieVersion: string,
     systemVersion: string,
