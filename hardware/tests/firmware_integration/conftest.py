@@ -1,7 +1,6 @@
 """Common fixtures for integration tests."""
 from __future__ import annotations
 import pytest
-import asyncio
 from typing import AsyncGenerator, Iterator, AsyncIterator, List, Dict
 
 from _pytest.fixtures import FixtureRequest
@@ -14,8 +13,7 @@ from opentrons_hardware.firmware_bindings import constants
 
 
 @pytest.fixture
-async def driver(
-) -> AsyncGenerator[AbstractCanDriver, None]:
+async def driver() -> AsyncGenerator[AbstractCanDriver, None]:
     """Create CanDriver connected to OT-3 Emulator."""
     settings = DriverSettings()
     driver = await build_driver(settings)
