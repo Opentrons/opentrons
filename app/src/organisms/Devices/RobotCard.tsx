@@ -23,6 +23,7 @@ import { RobotStatusBanner } from './RobotStatusBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
+import { UpdateRobotBanner } from '../UpdateRobotBanner'
 
 interface RobotCardProps {
   robot: DiscoveredRobot
@@ -54,6 +55,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
           id={`RobotCard_${name}_robotImage`}
         />
         <Box padding={SPACING.spacing3} width="100%">
+          <UpdateRobotBanner robotName={name} marginBottom={SPACING.spacing3} />
           <RobotStatusBanner name={name} local={local} />
           <Flex>
             <Flex

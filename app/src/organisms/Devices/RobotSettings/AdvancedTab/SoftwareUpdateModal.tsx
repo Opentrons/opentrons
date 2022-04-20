@@ -20,7 +20,7 @@ import { Banner } from '../../../../atoms/Banner'
 import { Modal } from '../../../../atoms/Modal'
 import { Divider } from '../../../../atoms/structure'
 import { useRobot } from '../../hooks'
-import { REACHABLE } from '../../../../redux/discovery'
+import { CONNECTABLE, REACHABLE } from '../../../../redux/discovery'
 
 const TECHNICAL_CHANGE_LOG_URL =
   'https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md'
@@ -46,15 +46,15 @@ export function SoftwareUpdateModal({
   const { info: updateInfo } = updateState
   const version = updateInfo?.version ?? ''
   //   const releaseNotes = updateInfo?.releaseNotes
-  const robot = useRobot(robotName)
   const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(false)
+  const robot = useRobot(robotName)
 
   const handleCloseModal = (): void => {
     setShowUpdateModal(false)
     closeModal()
   }
 
-  if (robot?.status !== REACHABLE) return null
+  if (robot?.status !== CONNECTABLE && robot?.status !== REACHABLE) return null
 
   return showUpdateModal ? (
     <UpdateBuildroot robot={robot} close={handleCloseModal} />

@@ -88,11 +88,6 @@ export function RobotSettingsAdvanced({
     setIsRobotConnected(isConnected ?? false)
   }
 
-  const updateSoftwareUpdateModal = (isOpen: boolean): void => {
-    console.log('clicked')
-    setShowSoftwareUpdateModal(isOpen)
-  }
-
   return (
     <>
       {showSoftwareUpdateModal && (
@@ -130,10 +125,7 @@ export function RobotSettingsAdvanced({
           updateIsExpanded={updateIsExpanded}
         />
         <Divider marginY={SPACING.spacing5} />
-        <RobotServerVersion
-          robotName={robotName}
-          updateSoftwareUpdateModal={updateSoftwareUpdateModal}
-        />
+        <RobotServerVersion robotName={robotName} />
         <Divider marginY={SPACING.spacing5} />
         <RobotInformation robotName={robotName} />
         <Divider marginY={SPACING.spacing5} />
