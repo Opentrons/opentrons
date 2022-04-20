@@ -15,7 +15,6 @@ from opentrons_hardware.firmware_bindings import constants
 
 @pytest.fixture
 async def driver(
-    loop: asyncio.BaseEventLoop,
 ) -> AsyncGenerator[AbstractCanDriver, None]:
     """Create CanDriver connected to OT-3 Emulator."""
     settings = DriverSettings()
