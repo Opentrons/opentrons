@@ -169,8 +169,7 @@ export const getDiscoverableRobotByName: (
 )
 
 export const getRobotSerialNumber = (robot: DiscoveredRobot): string | null =>
-  (robot.serverHealth && robot.serverHealth.serialNumber) ??
-  null
+  (robot.serverHealth && robot.serverHealth.serialNumber) ?? null
 
 export const getRobotApiVersion = (robot: DiscoveredRobot): string | null =>
   (robot.health && semver.valid(robot.health.api_version)) ??
