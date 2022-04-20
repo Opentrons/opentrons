@@ -7,6 +7,7 @@ import sqlalchemy
 from .action_models import RunAction, RunActionType
 
 from robot_server.persistence import run_table, action_table
+from robot_server.protocols.protocol_store import ProtocolNotFoundError
 
 
 @dataclass(frozen=True)
@@ -48,7 +49,10 @@ class RunStore:
             action: action to insert into the db
         """
         with self._sql_engine.begin() as transaction:
-            _insert_action_no_transaction(run_id, action, transaction)
+            try:
+                _insert_action_no_transaction(run_id, action, transaction)
+            except sqlalchemy.exc.IntegrityError as e:
+                raise RunNotFoundError(run_id=run_id)
 
     def update_active_run(self, run_id: str, is_current: bool) -> RunResource:
         """Update current active run resource in memory.
@@ -80,7 +84,10 @@ class RunStore:
             _convert_run_to_sql_values(run=run)
         )
         with self._sql_engine.begin() as transaction:
-            transaction.execute(statement)
+            try:
+                transaction.execute(statement)
+            except sqlalchemy.exc.IntegrityError as e:
+                raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
         self.update_active_run(run_id=run.run_id, is_current=run.is_current)
 
