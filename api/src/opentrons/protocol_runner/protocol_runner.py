@@ -176,6 +176,7 @@ class ProtocolRunner:
             labware=self._protocol_engine.state_view.labware.get_all(),
             pipettes=self._protocol_engine.state_view.pipettes.get_all(),
             modules=self._protocol_engine.state_view.modules.get_all(),
+            # TODO (tz 4-20-2022): understand why this is failing tests/integration/http_api/protocols/test_upload.tavern.yaml
             labwareOffsets=self._protocol_engine.engine_state.labware.get_labware_offsets()
         )
 
