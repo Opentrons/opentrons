@@ -68,6 +68,7 @@ MessageDefinition = Union[
     defs.HomeRequest,
     defs.PipetteInfoRequest,
     defs.PipetteInfoResponse,
+    defs.BindSensorOutputRequest,
 ]
 
 
