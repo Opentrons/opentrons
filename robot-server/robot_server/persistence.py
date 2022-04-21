@@ -42,6 +42,29 @@ protocol_table = sqlalchemy.Table(
     sqlalchemy.Column("protocol_key", sqlalchemy.String, nullable=True),
 )
 
+analysis_table = sqlalchemy.Table(
+    "analysis",
+    _metadata,
+    sqlalchemy.Column(
+        "id",
+        sqlalchemy.String,
+        primary_key=True,
+    ),
+    sqlalchemy.Column(
+        "protocol_id", sqlalchemy.String, sqlalchemy.ForeignKey("protocol.id")
+    ),
+    sqlalchemy.Column(
+        "analyzer_version",
+        sqlalchemy.String,
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "completed_analysis",
+        sqlalchemy.String,
+        nullable=False,
+    ),
+)
+
 run_table = sqlalchemy.Table(
     "run",
     _metadata,
