@@ -472,6 +472,7 @@ class BindSensorOutputResponse:  # noqa: D101
 
 
 @dataclass
+<<<<<<< HEAD
 class GripperInfoRequest(EmptyPayloadMessage):  # noqa: D101
     message_id: Literal[MessageId.gripper_info_request] = MessageId.gripper_info_request
 
@@ -483,3 +484,30 @@ class GripperInfoResponse:  # noqa: D101
     message_id: Literal[
         MessageId.gripper_info_response
     ] = MessageId.gripper_info_response
+=======
+class PickUpTipRequest:  # noqa: D101
+    payload: payloads.PickUpTipRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.PickUpTipRequestPayload
+    message_id: Literal[MessageId.pick_up_tip_request] = MessageId.pick_up_tip_request
+
+
+@dataclass
+class PickUpTipResponse:  # noqa: D101
+    payload: payloads.PickUpTipResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.PickUpTipResponsePayload
+    message_id: Literal[MessageId.pick_up_tip_response] = MessageId.pick_up_tip_response
+
+
+@dataclass
+class DropTipRequest:  # noqa: D101
+    payload: payloads.DropTipRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.DropTipRequestPayload
+    message_id: Literal[MessageId.drop_tip_request] = MessageId.drop_tip_request
+
+
+@dataclass
+class DropTipResponse:  # noqa: D101
+    payload: payloads.DropTipResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.DropTipResponsePayload
+    message_id: Literal[MessageId.drop_tip_response] = MessageId.drop_tip_response
+>>>>>>> feat(ot3): add pipette tip handling CAN messages

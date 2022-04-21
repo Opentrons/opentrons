@@ -397,3 +397,30 @@ class GripperInfoResponsePayload(utils.BinarySerializable):
 
     gripper_model: utils.UInt16Field
     gripper_serial: GripperSerialField
+    
+    
+class PickUpTipRequestPayload(AddToMoveGroupRequestPayload):
+    """A request to pick up a tip."""
+
+    velocity: utils.Int32Field
+
+
+@dataclass
+class PickUpTipResponsePayload(MoveGroupResponsePayload):
+    """A response that sends back whether pick up tip was successful."""
+
+    success: utils.UInt8Field
+
+
+@dataclass
+class DropTipRequestPayload(AddToMoveGroupRequestPayload):
+    """A request to drop a tip."""
+
+    velocity: utils.Int32Field
+
+
+@dataclass
+class DropTipResponsePayload(MoveGroupResponsePayload):
+    """A response that sends back whether drop tip was successful."""
+
+    success: utils.UInt8Field

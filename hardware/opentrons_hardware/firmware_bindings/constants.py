@@ -121,6 +121,11 @@ class MessageId(int, Enum):
     limit_sw_request = 0x08
     limit_sw_response = 0x09
 
+    pick_up_tip_request = 0x501
+    pick_up_tip_response = 0x502
+    drop_tip_request = 0x503
+    drop_tip_response = 0x504
+
     read_sensor_request = 0x82
     write_sensor_request = 0x83
     baseline_sensor_request = 0x84
