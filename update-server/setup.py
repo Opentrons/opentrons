@@ -38,8 +38,6 @@ DESCRIPTION = (
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
     'aiohttp==3.4.4',
-    # TODO (al, 2022-03-16): Is this really in pypy ? (NO)!
-    # 'bmap-tools==3.6'
 ]
 
 
