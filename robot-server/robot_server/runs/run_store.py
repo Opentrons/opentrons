@@ -7,7 +7,7 @@ import sqlalchemy
 from .action_models import RunAction, RunActionType
 
 from robot_server.persistence import run_table, action_table
-from robot_server.protocols.protocol_store import ProtocolNotFoundError
+from robot_server.protocols import ProtocolNotFoundError
 
 
 @dataclass(frozen=True)
