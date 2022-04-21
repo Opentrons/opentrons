@@ -397,8 +397,8 @@ class GripperInfoResponsePayload(utils.BinarySerializable):
 
     gripper_model: utils.UInt16Field
     gripper_serial: GripperSerialField
-    
-    
+
+
 class PickUpTipRequestPayload(AddToMoveGroupRequestPayload):
     """A request to pick up a tip."""
 
