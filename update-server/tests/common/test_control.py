@@ -5,7 +5,7 @@ import json
 import os
 from unittest import mock
 
-from otupdate.buildroot import control
+from otupdate.common import control
 
 
 async def test_health(test_cli):
