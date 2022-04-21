@@ -24,6 +24,7 @@ import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { Portal } from '../../../App/portal'
 import { StyledText } from '../../../atoms/text'
 import { getHasCalibrationBlock } from '../../../redux/config'
+import { Banner } from '../../../atoms/Banner'
 import { ChangePipette } from '../../ChangePipette'
 import { useCalibratePipetteOffset } from '../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import {
@@ -38,7 +39,6 @@ import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
 import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
-import { Banner } from '../../../atoms/Banner'
 
 interface PipetteCardProps {
   pipetteInfo: PipetteModelSpecs | null
@@ -168,36 +168,30 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             pipetteOffsetCalibration == null &&
             showBanner ? (
               <Flex paddingBottom={SPACING.spacing2}>
-                <Banner
-                  type="error"
-                  onCloseClick={() => setShowBanner(false)}
-                  title={t('deck_cal_missing')}
-                />
+                <Banner type="error" onCloseClick={() => setShowBanner(false)}>
+                  {t('deck_cal_missing')}
+                </Banner>
               </Flex>
             ) : null}
             {isDeckCalibrated &&
             pipetteOffsetCalibration == null &&
             showBanner ? (
               <Flex paddingBottom={SPACING.spacing2}>
-                <Banner
-                  type="error"
-                  onCloseClick={() => setShowBanner(false)}
-                  title={
-                    <>
-                      <Flex flexDirection={DIRECTION_COLUMN}>
-                        {t('pipette_offset_calibration_needed')}
-                        <Btn
-                          textAlign={ALIGN_START}
-                          fontSize={TYPOGRAPHY.fontSizeP}
-                          textDecoration={TEXT_DECORATION_UNDERLINE}
-                          onClick={() => handleClick(1)}
-                        >
-                          {t('calibrate_now')}
-                        </Btn>
-                      </Flex>
-                    </>
-                  }
-                />
+                <Banner type="error" onCloseClick={() => setShowBanner(false)}>
+                  <>
+                    <Flex flexDirection={DIRECTION_COLUMN}>
+                      {t('pipette_offset_calibration_needed')}
+                      <Btn
+                        textAlign={ALIGN_START}
+                        fontSize={TYPOGRAPHY.fontSizeP}
+                        textDecoration={TEXT_DECORATION_UNDERLINE}
+                        onClick={() => handleClick(1)}
+                      >
+                        {t('calibrate_now')}
+                      </Btn>
+                    </Flex>
+                  </>
+                </Banner>
               </Flex>
             ) : null}
             <StyledText
