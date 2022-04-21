@@ -58,7 +58,11 @@ export const RobotConfigurationDetails = (
           {t('left_mount')}
         </StyledText>
         <Flex marginX={'6rem'} position={POSITION_ABSOLUTE}>
-          <StyledText as="p" textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+          <StyledText
+            as="p"
+            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            data-testid={'leftMountPipetteName'}
+          >
             {leftMountPipetteName != null
               ? getPipetteNameSpecs(leftMountPipetteName)?.displayName
               : t('shared:empty')}
@@ -81,7 +85,11 @@ export const RobotConfigurationDetails = (
           {t('right_mount')}
         </StyledText>
         <Flex marginX={'6rem'} position={POSITION_ABSOLUTE}>
-          <StyledText as="p" textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+          <StyledText
+            as="p"
+            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            data-testid={'rightMountPipetteName'}
+          >
             {rightMountPipetteName != null
               ? getPipetteNameSpecs(rightMountPipetteName)?.displayName
               : t('shared:empty')}
@@ -97,6 +105,7 @@ export const RobotConfigurationDetails = (
                   flexDirection={DIRECTION_ROW}
                   alignItems={ALIGN_CENTER}
                   marginY={SPACING.spacing3}
+                  data-testid={`${module.params.model}_slot_${module.params.location.slotName}`}
                 >
                   <StyledText
                     as="h6"
