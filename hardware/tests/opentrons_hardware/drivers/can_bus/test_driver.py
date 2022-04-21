@@ -1,5 +1,4 @@
 """Can Driver tests."""
-import asyncio
 from typing import AsyncGenerator
 
 import pytest
@@ -24,9 +23,7 @@ def can_bus(bus_channel: str) -> Bus:
 
 
 @pytest.fixture
-async def subject(
-    loop: asyncio.BaseEventLoop, bus_channel: str
-) -> AsyncGenerator[CanDriver, None]:
+async def subject(bus_channel: str) -> AsyncGenerator[CanDriver, None]:
     """The can driver under test."""
     driver = await CanDriver.build(channel=bus_channel, interface="virtual", bitrate=0)
     yield driver
