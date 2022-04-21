@@ -30,12 +30,8 @@ describe('EmptyStateLinks', () => {
       /Don't have a protocol yet\?/i
     )
 
-    expect(
-      getByRole('link', { name: 'Launch Opentrons Protocol Library' })
-    ).toBeTruthy()
-    expect(
-      getByRole('link', { name: 'Launch Opentrons Protocol Designer' })
-    ).toBeTruthy()
+    expect(getByRole('link', { name: 'Open Protocol Library' })).toBeTruthy()
+    expect(getByRole('link', { name: 'Open Protocol Designer' })).toBeTruthy()
     expect(
       getByRole('link', { name: 'Open Python API Documentation' })
     ).toBeTruthy()
