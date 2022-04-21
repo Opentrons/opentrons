@@ -12,7 +12,7 @@ import os
 import re
 import subprocess
 import tempfile
-from typing import Callable, Optional
+from typing import Callable, Optional, List
 
 from otupdate.common.file_actions import (
     unzip_update,
@@ -22,6 +22,7 @@ from otupdate.common.file_actions import (
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
 
+UPDATE_PKG = "ot2-system.zip"
 ROOTFS_SIG_NAME = "rootfs.ext4.hash.sig"
 ROOTFS_HASH_NAME = "rootfs.ext4.hash"
 ROOTFS_NAME = "rootfs.ext4"
@@ -35,11 +36,25 @@ class RootPartitions(enum.Enum):
 
 
 class OT2UpdateActions(UpdateActionsInterface):
+
+    def get_required_files(self, cert_path: str) -> List[str]:
+        required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
+        if cert_path:
+            required.append(ROOTFS_SIG_NAME)
+        return required
+
+    def get_update_pkg_name(self) -> str:
+        return UPDATE_PKG
+
+    def check_update_pkg_name(self, name: str) -> bool:
+        """Make sure we're dealing with a valid update package!"""
+        return name is UPDATE_PKG
+
     def validate_update(
-        self,
-        filepath: str,
-        progress_callback: Callable[[float], None],
-        cert_path: Optional[str],
+            self,
+            filepath: str,
+            progress_callback: Callable[[float], None],
+            cert_path: Optional[str],
     ) -> Optional[str]:
         """Worker for validation. Call in an executor (so it can return things)
 
@@ -61,9 +76,8 @@ class OT2UpdateActions(UpdateActionsInterface):
         def zip_callback(progress):
             progress_callback(progress / 2.0)
 
-        required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
-        if cert_path:
-            required.append(ROOTFS_SIG_NAME)
+        required = self.get_required_files(cert_path)
+
         files, sizes = unzip_update(filepath, zip_callback, UPDATE_FILES, required)
 
         def hash_callback(progress):
@@ -91,11 +105,11 @@ class OT2UpdateActions(UpdateActionsInterface):
         return rootfs
 
     def write_update(
-        self,
-        rootfs_filepath: str,
-        progress_callback: Callable[[float], None],
-        chunk_size: int = 1024,
-        file_size: int = None,
+            self,
+            rootfs_filepath: str,
+            progress_callback: Callable[[float], None],
+            chunk_size: int = 1024,
+            file_size: int = None,
     ) -> Partition:
         """
         Write the new rootfs to the next root partition
@@ -165,11 +179,11 @@ def _find_unused_partition() -> RootPartitions:
 
 
 def write_file(
-    infile: str,
-    outfile: str,
-    progress_callback: Callable[[float], None],
-    chunk_size: int = 1024,
-    file_size: int = None,
+        infile: str,
+        outfile: str,
+        progress_callback: Callable[[float], None],
+        chunk_size: int = 1024,
+        file_size: int = None,
 ):
     """Write a file to another file with progress callbacks.
 
