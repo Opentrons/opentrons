@@ -7,7 +7,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 ---
 # OT-2 Software Changes in 5.1.0-beta.0
 
-Welcome to the beta release of v5.0.0 release of the OT-2 software!
+Welcome to the beta release of v5.1.0 of the OT-2 software!
 
 In conjunction with changes on the app-side, the 5.1.0 release reshapes the way your OT-2 stores runs and protocols. We're very excited for you to try this new experience out, and we appreciate your feedback (and patience) as you use this new software.
 
