@@ -5,7 +5,6 @@ import { css } from 'styled-components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_FINISHING } from '@opentrons/api-client'
 import {
   Flex,
-  Text,
   DIRECTION_COLUMN,
   TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
@@ -18,6 +17,7 @@ import {
   ALIGN_START,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
+import { StyledText } from '../../../atoms/text'
 import { SecondaryButton } from '../../../atoms/Buttons'
 import { Slideout } from '../../../atoms/Slideout'
 import { Banner } from '../../../atoms/Banner'
@@ -61,7 +61,6 @@ export const AboutModuleSlideout = (
       title={t('about_module', { name: moduleName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      height={`calc(100vh - ${SPACING.spacing4})`}
     >
       {module.hasAvailableUpdate && showBanner ? (
         <Flex paddingBottom={SPACING.spacing4}>
@@ -70,22 +69,19 @@ export const AboutModuleSlideout = (
             css={ALERT_ITEM_STYLE}
             type="warning"
             onCloseClick={() => setShowBanner(false)}
-            title={
-              <>
-                {t('firmware_update_available')}
-                <Btn
-                  textAlign={ALIGN_START}
-                  paddingLeft={SPACING.spacing2}
-                  fontSize={TYPOGRAPHY.fontSizeP}
-                  textDecoration={TEXT_DECORATION_UNDERLINE}
-                  //  TODO(jr, 3/21/22): wire up the link
-                  onClick={() => console.log('firmware update!')}
-                >
-                  {t('view_update')}
-                </Btn>
-              </>
-            }
-          />
+          >
+            {t('firmware_update_available')}
+            <Btn
+              textAlign={ALIGN_START}
+              paddingLeft={SPACING.spacing2}
+              fontSize={TYPOGRAPHY.fontSizeP}
+              textDecoration={TEXT_DECORATION_UNDERLINE}
+              //  TODO(jr, 3/21/22): wire up the link
+              onClick={() => console.log('firmware update!')}
+            >
+              {t('view_update')}
+            </Btn>
+          </Banner>
         </Flex>
       ) : null}
       <Flex flexDirection={DIRECTION_COLUMN}>
@@ -94,15 +90,10 @@ export const AboutModuleSlideout = (
             flexDirection={DIRECTION_COLUMN}
             data-testid={`alert_item_version_${module.model}`}
           >
-            <Text
-              fontSize={TYPOGRAPHY.fontSizeH6}
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
-            >
-              {t('current_version')}
-            </Text>
-            <Text fontSize={TYPOGRAPHY.fontSizeP} paddingTop={SPACING.spacing2}>
+            <StyledText as="h6">{t('current_version')}</StyledText>
+            <StyledText as="p" paddingTop={SPACING.spacing2}>
               {t('version', { version: module.fwVersion })}
-            </Text>
+            </StyledText>
           </Flex>
           {module.hasAvailableUpdate && showBanner ? (
             <SecondaryButton
@@ -117,22 +108,20 @@ export const AboutModuleSlideout = (
             </SecondaryButton>
           ) : null}
         </Flex>
-        <Text
+        <StyledText
           paddingTop={SPACING.spacing4}
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-          fontSize={TYPOGRAPHY.fontSizeH6}
+          as="h6"
           data-testid={`alert_item_serial_number_text_${module.model}`}
         >
           {t('serial_number')}
-        </Text>
-        <Text
-          fontSize={TYPOGRAPHY.fontSizeH6}
+        </StyledText>
+        <StyledText
+          as="h6"
           paddingTop={SPACING.spacing2}
-          minHeight="34.5rem"
           data-testid={`alert_item_serial_${module.model}`}
         >
           {module.serial}
-        </Text>
+        </StyledText>
       </Flex>
     </Slideout>
   )

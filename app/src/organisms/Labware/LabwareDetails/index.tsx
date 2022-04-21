@@ -97,12 +97,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   )
 
   return (
-    <Slideout
-      onCloseClick={props.onClose}
-      closeOnOutsideClick
-      title={slideoutHeader}
-      isExpanded
-    >
+    <Slideout onCloseClick={props.onClose} title={slideoutHeader} isExpanded>
       <Gallery definition={definition} />
       <Box
         backgroundColor={COLORS.lightGrey}

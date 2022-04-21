@@ -11,6 +11,7 @@ export const blueFocus = '#deecff'
 export const blue = '#006cfa'
 export const blueHover = '#0061e0'
 export const bluePressed = '#0050b8'
+export const medBlue = '#d9e9fe'
 
 export const disabled = '#a0a0a0'
 export const medGreyHover = '#b8b8b8'
@@ -31,6 +32,7 @@ export const greyPressed = '#8d8d91'
 export const greyDisabled = '#eaeaeb'
 
 export const lightGrey = '#f8f8f8'
+export const lightGreyHover = '#3314202c'
 
 export const yellow = '#f2b53c'
 export const yellowHover = '#eca20f'

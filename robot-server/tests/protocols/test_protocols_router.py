@@ -262,7 +262,7 @@ async def test_create_protocol(
     analysis = PendingAnalysis(id="analysis-id")
 
     decoy.when(
-        await protocol_reader.read(
+        await protocol_reader.read_and_save(
             files=[protocol_file],
             directory=protocol_directory / "protocol-id",
         )
@@ -313,7 +313,7 @@ async def test_create_protocol_not_readable(
 ) -> None:
     """It should 400 if the protocol is rejected by the pre-analyzer."""
     decoy.when(
-        await protocol_reader.read(
+        await protocol_reader.read_and_save(
             directory=matchers.Anything(),
             files=matchers.Anything(),
         )

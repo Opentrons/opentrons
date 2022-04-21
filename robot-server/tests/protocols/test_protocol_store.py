@@ -13,13 +13,12 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
 )
 
-from robot_server.db import opened_db
 from robot_server.protocols.protocol_store import (
-    add_tables_to_db,
     ProtocolStore,
     ProtocolResource,
     ProtocolNotFoundError,
 )
+from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
 
 from sqlalchemy.engine import Engine as SQLEngine
 
@@ -27,9 +26,13 @@ from sqlalchemy.engine import Engine as SQLEngine
 @pytest.fixture
 def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
     """Return a set-up database to back the store."""
-    with opened_db(db_file_path=tmp_path / "test.db") as engine:
-        add_tables_to_db(engine)
-        yield engine
+    db_file_path = tmp_path / "test.db"
+    sql_engine = open_db_no_cleanup(db_file_path=db_file_path)
+    add_tables_to_db(sql_engine)
+    try:
+        yield sql_engine
+    finally:
+        sql_engine.dispose()
 
 
 @pytest.fixture
@@ -43,7 +46,7 @@ def protocol_file_directory(tmp_path: Path) -> Path:
 @pytest.fixture
 def subject(sql_engine: SQLEngine) -> ProtocolStore:
     """Get a ProtocolStore test subject."""
-    return ProtocolStore(sql_engine=sql_engine)
+    return ProtocolStore.create_empty(sql_engine=sql_engine)
 
 
 async def test_insert_and_get_protocol(

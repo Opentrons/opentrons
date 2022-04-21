@@ -127,7 +127,6 @@ export const MagneticModuleSlideout = (
       title={t('set_engage_height_slideout', { name: moduleName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      height={`calc(100vh - ${SPACING.spacing4})`}
       footer={
         <PrimaryButton
           width="100%"

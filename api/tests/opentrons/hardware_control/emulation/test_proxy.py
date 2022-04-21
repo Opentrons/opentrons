@@ -42,13 +42,12 @@ def proxy_listener() -> SimpleProxyListener:
 
 @pytest.fixture
 async def subject(
-    loop: asyncio.AbstractEventLoop,
     setting: ProxySettings,
     proxy_listener: SimpleProxyListener,
 ) -> AsyncIterator[Proxy]:
     """Test subject."""
     p = Proxy("proxy", proxy_listener, setting)
-    task = loop.create_task(p.run())
+    task = asyncio.get_running_loop().create_task(p.run())
     yield p
     task.cancel()
     try:

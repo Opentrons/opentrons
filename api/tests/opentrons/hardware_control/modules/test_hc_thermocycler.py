@@ -1,9 +1,11 @@
-import pytest
+import asyncio
 import mock
-from opentrons.drivers.thermocycler import SimulatingDriver
-from opentrons.hardware_control import modules, ExecutionManager
+
+import pytest
 
 from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.thermocycler import SimulatingDriver
+from opentrons.hardware_control import modules, ExecutionManager
 
 
 @pytest.fixture
@@ -16,114 +18,93 @@ def usb_port() -> USBPort:
     )
 
 
-async def test_sim_initialization(loop, usb_port):
+@pytest.fixture
+async def subject(usb_port: USBPort) -> modules.Thermocycler:
+    """Test subject"""
     therm = await modules.build(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
         which="thermocycler",
         simulating=True,
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
-
-    assert isinstance(therm, modules.AbstractModule)
-
-
-async def test_lid(loop, usb_port):
-    therm = await modules.build(
-        port="/dev/ot_module_sim_thermocycler0",
-        usb_port=usb_port,
-        which="thermocycler",
-        simulating=True,
-        loop=loop,
-        execution_manager=ExecutionManager(),
-    )
-
-    await therm.open()
-    await therm.wait_next_poll()
-    assert therm.lid_status == "open"
-
-    await therm.close()
-    await therm.wait_next_poll()
-    assert therm.lid_status == "closed"
-
-    await therm.close()
-    await therm.wait_next_poll()
-    assert therm.lid_status == "closed"
-
-    await therm.open()
-    await therm.wait_next_poll()
-    assert therm.lid_status == "open"
+    yield therm
+    await therm.cleanup()
 
 
-async def test_sim_state(loop, usb_port):
-    therm = await modules.build(
-        port="/dev/ot_module_sim_thermocycler0",
-        usb_port=usb_port,
-        which="thermocycler",
-        simulating=True,
-        loop=loop,
-        execution_manager=ExecutionManager(),
-    )
+async def test_sim_initialization(subject: modules.Thermocycler):
+    assert isinstance(subject, modules.AbstractModule)
 
-    assert therm.temperature is None
-    assert therm.target is None
-    assert therm.status == "error"
-    assert therm.live_data["status"] == therm.status
-    assert therm.live_data["data"]["currentTemp"] == therm.temperature
-    assert therm.live_data["data"]["targetTemp"] == therm.target
-    status = therm.device_info
+
+async def test_lid(subject: modules.Thermocycler):
+    await subject.open()
+    await subject.wait_next_poll()
+    assert subject.lid_status == "open"
+
+    await subject.close()
+    await subject.wait_next_poll()
+    assert subject.lid_status == "closed"
+
+    await subject.close()
+    await subject.wait_next_poll()
+    assert subject.lid_status == "closed"
+
+    await subject.open()
+    await subject.wait_next_poll()
+    assert subject.lid_status == "open"
+
+
+async def test_sim_state(subject: modules.Thermocycler):
+    assert subject.temperature == 23
+    assert subject.target is None
+    assert subject.status == "idle"
+    assert subject.live_data["status"] == subject.status
+    assert subject.live_data["data"]["currentTemp"] == subject.temperature
+    assert subject.live_data["data"]["targetTemp"] == subject.target
+    status = subject.device_info
     assert status["serial"] == "dummySerialTC"
     assert status["model"] == "dummyModelTC"
     assert status["version"] == "dummyVersionTC"
 
 
-async def test_sim_update(loop, usb_port):
-    therm = await modules.build(
-        port="/dev/ot_module_sim_thermocycler0",
-        usb_port=usb_port,
-        which="thermocycler",
-        simulating=True,
-        loop=loop,
-        execution_manager=ExecutionManager(),
-    )
-
-    await therm.set_temperature(
+async def test_sim_update(subject: modules.Thermocycler):
+    await subject.set_temperature(
         temperature=10, hold_time_seconds=None, hold_time_minutes=None, volume=50
     )
-    await therm.wait_next_poll()
-    assert therm.temperature == 10
-    assert therm.target == 10
-    assert therm.status == "holding at target"
-    # await asyncio.wait_for(therm.wait_for_temp(), timeout=0.2)
-    await therm.deactivate_block()
-    await therm.wait_next_poll()
-    assert therm.temperature == 23
-    assert therm.target is None
-    assert therm.status == "idle"
+    await subject.wait_next_poll()
+    assert subject.temperature == 10
+    assert subject.target == 10
+    assert subject.status == "holding at target"
 
-    await therm.set_lid_temperature(temperature=80)
-    assert therm.lid_temp == 80
-    assert therm.lid_target == 80
+    await subject.deactivate_block()
+    await subject.wait_next_poll()
+    assert subject.temperature == 23
+    assert subject.target is None
+    assert subject.status == "idle"
 
-    await therm.deactivate_lid()
-    await therm.wait_next_poll()
-    assert therm.lid_temp == 23
-    assert therm.lid_target is None
+    await subject.set_lid_temperature(temperature=80)
+    assert subject.lid_temp == 80
+    assert subject.lid_target == 80
 
-    await therm.set_temperature(temperature=10, volume=60, hold_time_seconds=2)
-    await therm.set_lid_temperature(temperature=70)
-    assert therm.temperature == 10
-    assert therm.target == 10
-    assert therm.lid_temp == 70
-    assert therm.lid_target == 70
-    await therm.deactivate()
-    await therm.wait_next_poll()
-    assert therm.temperature == 23
-    assert therm.target is None
-    assert therm.status == "idle"
-    assert therm.lid_temp == 23
-    assert therm.lid_target is None
+    await subject.deactivate_lid()
+    await subject.wait_next_poll()
+    assert subject.lid_temp == 23
+    assert subject.lid_target is None
+
+    await subject.set_temperature(temperature=10, volume=60, hold_time_seconds=2)
+    await subject.set_lid_temperature(temperature=70)
+    assert subject.temperature == 10
+    assert subject.target == 10
+    assert subject.lid_temp == 70
+    assert subject.lid_target == 70
+    await subject.deactivate()
+    await subject.wait_next_poll()
+    assert subject.temperature == 23
+    assert subject.target is None
+    assert subject.status == "idle"
+    assert subject.lid_temp == 23
+    assert subject.lid_target is None
 
 
 @pytest.fixture
@@ -147,19 +128,20 @@ def simulator_set_plate_spy(
 
 @pytest.fixture
 async def set_temperature_subject(
-    loop, usb_port: USBPort, simulator_set_plate_spy: SimulatingDriver
+    usb_port: USBPort, simulator_set_plate_spy: SimulatingDriver
 ) -> modules.Thermocycler:
     """Fixture that spys on set_plate_temperature"""
     hw_tc = modules.Thermocycler(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
         driver=simulator_set_plate_spy,
         device_info={},
         polling_interval_sec=0.001,
     )
-    return hw_tc
+    yield hw_tc
+    await hw_tc.cleanup()
 
 
 async def test_set_temperature_with_volume(

@@ -18,13 +18,17 @@ import {
   useRobot,
   useRunCalibrationStatus,
 } from '../../hooks'
+import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
+import { SetupModules } from '../SetupModules'
 
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 jest.mock('../../hooks')
+jest.mock('../SetupLabware')
 jest.mock('../SetupRobotCalibration')
+jest.mock('../SetupModules')
 
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
@@ -36,8 +40,14 @@ const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
 >
+const mockSetupLabware = SetupLabware as jest.MockedFunction<
+  typeof SetupLabware
+>
 const mockSetupRobotCalibration = SetupRobotCalibration as jest.MockedFunction<
   typeof SetupRobotCalibration
+>
+const mockSetupModules = SetupModules as jest.MockedFunction<
+  typeof SetupModules
 >
 
 const ROBOT_NAME = 'otie'
@@ -45,7 +55,11 @@ const RUN_ID = '1'
 
 const render = () => {
   return renderWithProviders(
-    <ProtocolRunSetup robotName={ROBOT_NAME} runId={RUN_ID} />,
+    <ProtocolRunSetup
+      protocolRunHeaderRef={null}
+      robotName={ROBOT_NAME}
+      runId={RUN_ID}
+    />,
     {
       i18nInstance: i18n,
     }
@@ -78,6 +92,16 @@ describe('ProtocolRunSetup', () => {
         })
       )
       .mockReturnValue(<span>Mock SetupRobotCalibration</span>)
+    when(mockSetupLabware)
+      .calledWith(
+        partialComponentPropsMatcher({
+          protocolRunHeaderRef: null,
+          robotName: ROBOT_NAME,
+          runId: RUN_ID,
+        })
+      )
+      .mockReturnValue(<span>Mock SetupLabware</span>)
+    when(mockSetupModules).mockReturnValue(<div>mock SetupModules</div>)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -121,7 +145,7 @@ describe('ProtocolRunSetup', () => {
       )
       const labwareSetup = getByText('Labware Setup')
       labwareSetup.click()
-      expect(getByText('TODO: labware setup')).toBeVisible()
+      expect(getByText('Mock SetupLabware')).toBeVisible()
     })
     it('does NOT render module setup', () => {
       const { queryByText } = render()
@@ -131,7 +155,7 @@ describe('ProtocolRunSetup', () => {
     it('defaults to labware step expanded if calibration complete', async () => {
       const { getByText } = render()
       await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(getByText('TODO: labware setup')).toBeVisible()
+      expect(getByText('Mock SetupLabware')).toBeVisible()
     })
 
     it('defaults to robot calibration step expanded if calibration incomplete', async () => {
@@ -161,10 +185,7 @@ describe('ProtocolRunSetup', () => {
       const { getByText } = render()
       const moduleSetup = getByText('Module Setup')
       moduleSetup.click()
-      expect(getByText('TODO: module setup').closest('div')).toHaveStyleRule(
-        'visibility',
-        'visible'
-      )
+      getByText('mock SetupModules')
     })
 
     it('renders correct text contents for multiple modules', () => {
@@ -225,8 +246,8 @@ describe('ProtocolRunSetup', () => {
     it('defaults to module step expanded if calibration complete and modules present', async () => {
       const { queryByText, getByText } = render()
       await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(getByText('TODO: module setup')).toBeVisible()
-      expect(queryByText('TODO: labware setup')).not.toBeVisible()
+      expect(getByText('mock SetupModules')).toBeVisible()
+      expect(queryByText('Mock SetupLabware')).not.toBeVisible()
     })
 
     it('defaults to robot calibration step expanded if calibration incomplete and modules present', async () => {
@@ -237,7 +258,7 @@ describe('ProtocolRunSetup', () => {
       const { queryByText, getByText } = render()
       await new Promise(resolve => setTimeout(resolve, 1000))
       expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
-      expect(queryByText('TODO: module setup')).not.toBeVisible()
+      expect(queryByText('mock SetupModules')).not.toBeVisible()
     })
   })
 })

@@ -5,6 +5,11 @@ import mapValues from 'lodash/mapValues'
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
 import uniq from 'lodash/uniq'
+import {
+  FIXED_TRASH_ID,
+  OT2_STANDARD_DECKID,
+  OT2_STANDARD_MODEL,
+} from '@opentrons/shared-data'
 import { getFileMetadata } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
 import { selectors as dismissSelectors } from '../../dismiss'
@@ -16,29 +21,30 @@ import { uuid } from '../../utils'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
+import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
-import {
+import type {
   ModuleEntity,
   PipetteEntity,
   LabwareEntities,
   PipetteEntities,
+  RobotState,
 } from '@opentrons/step-generation'
 import type {
   CreateCommand,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
-import { Selector } from '../../types'
-import {
+import type { Selector } from '../../types'
+import type {
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import { OT2_STANDARD_DECKID, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
 if (isEmpty(process.env.OT_PD_VERSION))
@@ -108,6 +114,39 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     const { author, description, created } = fileMetadata
     const name = fileMetadata.protocolName || 'untitled'
     const lastModified = fileMetadata.lastModified
+    // TODO: Ian 2018-07-10 allow user to save steps in JSON file, even if those
+    // step never have saved forms.
+    // (We could just export the `steps` reducer, but we've sunset it)
+    const savedOrderedStepIds = orderedStepIds.filter(
+      stepId => savedStepForms[stepId]
+    )
+    const designerApplication = {
+      name: 'opentrons/protocol-designer',
+      version: applicationVersion,
+      data: {
+        _internalAppBuildDate,
+        defaultValues: {
+          // TODO: Ian 2019-06-13 load these into redux and always get them from redux, not constants.js
+          // This `defaultValues` key is not yet read by anything, but is populated here for auditability
+          // and so that later we can do #3587 without a PD migration
+          aspirate_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+          dispense_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+          touchTip_mmFromTop: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
+          blowout_mmFromTop: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
+        },
+        pipetteTiprackAssignments: mapValues(
+          pipetteEntities,
+          (
+            p: typeof pipetteEntities[keyof typeof pipetteEntities]
+          ): string | null | undefined => p.tiprackDefURI
+        ),
+        dismissedWarnings,
+        ingredients,
+        ingredLocations,
+        savedStepForms,
+        orderedStepIds: savedOrderedStepIds,
+      },
+    }
 
     const pipettes: ProtocolFile['pipettes'] = mapValues(
       initialRobotState.pipettes,
@@ -144,7 +183,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           ...acc,
           [liquidId]: {
             displayName: liquidData.name,
-            description: liquidData.description,
+            description: liquidData.description ?? '',
           },
         }
       },
@@ -162,22 +201,36 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       })
     )
 
-    const loadLabwareCommands = map(
+    const loadLabwareCommands = reduce<
+      RobotState['labware'],
+      LoadLabwareCreateCommand[]
+    >(
       initialRobotState.labware,
       (
+        acc,
         labware: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
         labwareId: string
-      ): LoadLabwareCreateCommand => {
+      ): LoadLabwareCreateCommand[] => {
+        if (labwareId === FIXED_TRASH_ID) return [...acc]
+        const isLabwareOnTopOfModule = labware.slot in initialRobotState.modules
         const loadLabwareCommand = {
           key: uuid(),
           commandType: 'loadLabware' as const,
           params: {
             labwareId: labwareId,
-            location: { slotName: labware.slot },
+            location: isLabwareOnTopOfModule
+              ? { moduleId: labware.slot }
+              : { slotName: labware.slot },
           },
         }
-        return loadLabwareCommand
-      }
+        return [...acc, loadLabwareCommand]
+      },
+      []
+    )
+
+    const loadLiquidCommands = getLoadLiquidCommands(
+      ingredients,
+      ingredLocations
     )
     const modules: ProtocolFile['modules'] = mapValues(
       moduleEntities,
@@ -203,12 +256,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         return loadModuleCommand
       }
     )
-    // TODO: Ian 2018-07-10 allow user to save steps in JSON file, even if those
-    // step never have saved forms.
-    // (We could just export the `steps` reducer, but we've sunset it)
-    const savedOrderedStepIds = orderedStepIds.filter(
-      stepId => savedStepForms[stepId]
-    )
+
     const labwareDefinitions = getLabwareDefinitionsInUse(
       labwareEntities,
       pipetteEntities,
@@ -216,9 +264,9 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     )
     const loadCommands: CreateCommand[] = [
       ...loadPipetteCommands,
-      ...loadLabwareCommands,
       ...loadModuleCommands,
-      // TODO: generate load liquid commands https://github.com/Opentrons/opentrons/issues/9702
+      ...loadLabwareCommands,
+      ...loadLiquidCommands,
     ]
 
     const nonLoadCommands: CreateCommand[] = flatMap(
@@ -240,33 +288,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         subcategory: null,
         tags: [],
       },
-      designerApplication: {
-        name: 'opentrons/protocol-designer',
-        version: applicationVersion,
-        data: {
-          _internalAppBuildDate,
-          defaultValues: {
-            // TODO: Ian 2019-06-13 load these into redux and always get them from redux, not constants.js
-            // This `defaultValues` key is not yet read by anything, but is populated here for auditability
-            // and so that later we can do #3587 without a PD migration
-            aspirate_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-            dispense_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-            touchTip_mmFromTop: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
-            blowout_mmFromTop: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
-          },
-          pipetteTiprackAssignments: mapValues(
-            pipetteEntities,
-            (
-              p: typeof pipetteEntities[keyof typeof pipetteEntities]
-            ): string | null | undefined => p.tiprackDefURI
-          ),
-          dismissedWarnings,
-          ingredients,
-          ingredLocations,
-          savedStepForms,
-          orderedStepIds: savedOrderedStepIds,
-        },
-      },
+      designerApplication,
       robot: {
         model: OT2_STANDARD_MODEL,
         deckId: OT2_STANDARD_DECKID,

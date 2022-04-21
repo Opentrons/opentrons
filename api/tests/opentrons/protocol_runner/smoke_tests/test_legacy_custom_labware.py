@@ -47,7 +47,10 @@ def custom_labware_protocol_files(tmp_path: Path) -> List[Path]:
 async def test_legacy_custom_labware(custom_labware_protocol_files: List[Path]) -> None:
     """It should map legacy pick up tip commands."""
     protocol_reader = ProtocolReader()
-    protocol_source = await protocol_reader.read(custom_labware_protocol_files)
+    protocol_source = await protocol_reader.read_saved(
+        files=custom_labware_protocol_files,
+        directory=None,
+    )
 
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)

@@ -54,6 +54,7 @@ export function AttachAdapter(): JSX.Element {
               marginTop={SPACING.spacing3}
               backgroundColor={COLORS.background}
               paddingTop={SPACING.spacing4}
+              paddingRight={SPACING.spacing4}
               paddingLeft={SPACING.spacing4}
               flexDirection={DIRECTION_ROW}
               marginRight={SPACING.spacingSM}
@@ -94,7 +95,10 @@ export function AttachAdapter(): JSX.Element {
         >
           {t('2b')}
         </Text>
-        <Flex border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}>
+        <Flex
+          border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}
+          width="100%"
+        >
           <Flex
             padding={`${SPACING.spacingM} 2.5rem ${SPACING.spacingXL} ${SPACING.spacingXL}`}
             data-testid={`attach_adapter_alignment_image`}

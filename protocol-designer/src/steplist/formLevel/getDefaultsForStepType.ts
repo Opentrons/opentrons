@@ -117,7 +117,7 @@ export function getDefaultsForStepType(
     case 'heaterShaker':
       return {
         moduleId: null,
-        setTemperature: null,
+        setHeaterShakerTemperature: null,
         targetHeaterShakerTemperature: null,
         targetSpeed: null,
         setShake: null,

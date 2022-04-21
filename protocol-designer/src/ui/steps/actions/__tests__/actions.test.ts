@@ -4,11 +4,21 @@ import thunk from 'redux-thunk'
 import { when, resetAllWhenMocks } from 'jest-when'
 import * as utils from '../../../../utils'
 import * as stepFormSelectors from '../../../../step-forms/selectors'
+import { getRobotStateTimeline } from '../../../../file-data/selectors'
 import { getMultiSelectLastSelected } from '../../selectors'
 import { selectStep, selectAllSteps, deselectAllSteps } from '../actions'
-import { duplicateStep, duplicateMultipleSteps } from '../thunks'
+import {
+  duplicateStep,
+  duplicateMultipleSteps,
+  saveHeaterShakerFormWithAddedPauseUntilTemp,
+  saveSetTempFormWithAddedPauseUntilTemp,
+} from '../thunks'
+import type { Timeline, RobotState } from '@opentrons/step-generation/src/types'
+
 jest.mock('../../../../step-forms/selectors')
 jest.mock('../../selectors')
+jest.mock('../../../../file-data/selectors')
+
 const mockStore = configureMockStore([thunk])
 const mockGetSavedStepForms = stepFormSelectors.getSavedStepForms as jest.MockedFunction<
   typeof stepFormSelectors.getSavedStepForms
@@ -19,6 +29,48 @@ const mockGetOrderedStepIds = stepFormSelectors.getOrderedStepIds as jest.Mocked
 const mockGetMultiSelectLastSelected = getMultiSelectLastSelected as jest.MockedFunction<
   typeof getMultiSelectLastSelected
 >
+
+const mockGetUnsavedForm = stepFormSelectors.getUnsavedForm as jest.MockedFunction<
+  typeof stepFormSelectors.getUnsavedForm
+>
+const mockGetUnsavedFormIsPristineHeaterShakerForm = stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm as jest.MockedFunction<
+  typeof stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm
+>
+const mockGetUnsavedFormIsPristineSetTempForm = stepFormSelectors.getUnsavedFormIsPristineSetTempForm as jest.MockedFunction<
+  typeof stepFormSelectors.getUnsavedFormIsPristineSetTempForm
+>
+const mockGetRobotStateTimeline = getRobotStateTimeline as jest.MockedFunction<
+  typeof getRobotStateTimeline
+>
+
+const initialRobotState: RobotState = {
+  labware: {
+    trashId: {
+      slot: '12',
+    },
+    tiprackId: {
+      slot: '1',
+    },
+    plateId: {
+      slot: '7',
+    },
+  },
+  modules: {},
+  pipettes: {
+    pipetteId: {
+      mount: 'left',
+    },
+  },
+  liquidState: {
+    pipettes: {},
+    labware: {},
+  },
+  tipState: {
+    pipettes: {},
+    tipracks: {},
+  },
+}
+
 describe('steps actions', () => {
   describe('selectStep', () => {
     const stepId = 'stepId'
@@ -254,6 +306,277 @@ describe('steps actions', () => {
         duplicateStepsAction,
         selectMultipleStepsAction,
       ])
+    })
+  })
+
+  describe('saveHeaterShakerFormWithAddedPauseUntilTemp', () => {
+    const mockRobotStateTimeline: Timeline = {
+      timeline: [
+        {
+          commands: [
+            {
+              commandType: 'heaterShakerModule/awaitTemperature',
+
+              params: {
+                moduleId: 'heaterShakerId',
+              },
+            },
+          ],
+          robotState: initialRobotState,
+          warnings: [],
+        },
+      ],
+      errors: null,
+    }
+
+    beforeEach(() => {
+      when(mockGetUnsavedForm)
+        .calledWith(expect.anything())
+        .mockReturnValue({
+          stepType: 'heaterShaker',
+          targetHeaterShakerTemperature: '10',
+        } as any)
+      mockGetUnsavedFormIsPristineHeaterShakerForm.mockReturnValue(true)
+      mockGetRobotStateTimeline.mockReturnValue(mockRobotStateTimeline)
+    })
+
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    it('should save heater shaker step with a pause until temp is reached', () => {
+      const HsStepWithPause = [
+        {
+          payload: {
+            stepType: 'heaterShaker',
+            targetHeaterShakerTemperature: '10',
+          },
+          type: 'SAVE_STEP_FORM',
+        },
+
+        {
+          meta: {
+            robotStateTimeline: {
+              errors: null,
+              timeline: [
+                {
+                  commands: [
+                    {
+                      commandType: 'heaterShakerModule/awaitTemperature',
+                      params: {
+                        moduleId: 'heaterShakerId',
+                      },
+                    },
+                  ],
+                  robotState: {
+                    labware: {
+                      plateId: {
+                        slot: '7',
+                      },
+                      tiprackId: {
+                        slot: '1',
+                      },
+                      trashId: {
+                        slot: '12',
+                      },
+                    },
+                    liquidState: {
+                      labware: {},
+                      pipettes: {},
+                    },
+                    modules: {},
+                    pipettes: {
+                      pipetteId: {
+                        mount: 'left',
+                      },
+                    },
+                    tipState: {
+                      pipettes: {},
+                      tipracks: {},
+                    },
+                  },
+                  warnings: [],
+                },
+              ],
+            },
+          },
+          payload: {
+            id: '__presaved_step__',
+            stepType: 'pause',
+          },
+          type: 'ADD_STEP',
+        },
+        {
+          payload: {
+            update: {
+              pauseAction: 'untilTemperature',
+            },
+          },
+          type: 'CHANGE_FORM_INPUT',
+        },
+        {
+          payload: {
+            update: {
+              moduleId: undefined,
+            },
+          },
+          type: 'CHANGE_FORM_INPUT',
+        },
+        {
+          payload: {
+            update: {
+              pauseTemperature: '10',
+            },
+          },
+          type: 'CHANGE_FORM_INPUT',
+        },
+        {
+          payload: {
+            stepType: 'heaterShaker',
+            targetHeaterShakerTemperature: '10',
+          },
+          type: 'SAVE_STEP_FORM',
+        },
+      ]
+
+      const store: any = mockStore()
+      store.dispatch(saveHeaterShakerFormWithAddedPauseUntilTemp())
+
+      expect(store.getActions()).toEqual(HsStepWithPause)
+    })
+  })
+
+  describe('saveSetTempFormWithAddedPauseUntilTemp', () => {
+    const mockRobotStateTimeline: Timeline = {
+      timeline: [
+        {
+          commands: [
+            {
+              commandType: 'temperatureModule/setTargetTemperature',
+
+              params: {
+                moduleId: 'temperatureId',
+                temperature: 25,
+              },
+            },
+          ],
+          robotState: initialRobotState,
+          warnings: [],
+        },
+      ],
+      errors: null,
+    }
+
+    beforeEach(() => {
+      when(mockGetUnsavedForm)
+        .calledWith(expect.anything())
+        .mockReturnValue({
+          stepType: 'temperature',
+          setTemperature: 'true',
+          targetTemperature: 10,
+        } as any)
+      mockGetUnsavedFormIsPristineSetTempForm.mockReturnValue(true)
+      mockGetRobotStateTimeline.mockReturnValue(mockRobotStateTimeline)
+    })
+
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    it('should save temperature step with a pause until temp is reached', () => {
+      const temperatureStepWithPause = [
+        {
+          payload: {
+            setTemperature: 'true',
+            stepType: 'temperature',
+            targetTemperature: 10,
+          },
+          type: 'SAVE_STEP_FORM',
+        },
+
+        {
+          meta: {
+            robotStateTimeline: {
+              errors: null,
+              timeline: [
+                {
+                  commands: [
+                    {
+                      commandType: 'temperatureModule/setTargetTemperature',
+                      params: {
+                        moduleId: 'temperatureId',
+                        temperature: 25,
+                      },
+                    },
+                  ],
+                  robotState: {
+                    labware: {
+                      plateId: {
+                        slot: '7',
+                      },
+                      tiprackId: {
+                        slot: '1',
+                      },
+                      trashId: {
+                        slot: '12',
+                      },
+                    },
+                    liquidState: {
+                      labware: {},
+                      pipettes: {},
+                    },
+                    modules: {},
+                    pipettes: {
+                      pipetteId: {
+                        mount: 'left',
+                      },
+                    },
+                    tipState: {
+                      pipettes: {},
+                      tipracks: {},
+                    },
+                  },
+                  warnings: [],
+                },
+              ],
+            },
+          },
+          payload: {
+            id: '__presaved_step__',
+            stepType: 'pause',
+          },
+          type: 'ADD_STEP',
+        },
+        {
+          payload: {
+            update: {
+              pauseAction: 'untilTemperature',
+            },
+          },
+          type: 'CHANGE_FORM_INPUT',
+        },
+        {
+          payload: {
+            update: {
+              pauseTemperature: 10,
+            },
+          },
+          type: 'CHANGE_FORM_INPUT',
+        },
+        {
+          payload: {
+            setTemperature: 'true',
+            stepType: 'temperature',
+            targetTemperature: 10,
+          },
+          type: 'SAVE_STEP_FORM',
+        },
+      ]
+
+      const store: any = mockStore()
+      store.dispatch(saveSetTempFormWithAddedPauseUntilTemp())
+
+      expect(store.getActions()).toEqual(temperatureStepWithPause)
     })
   })
 })

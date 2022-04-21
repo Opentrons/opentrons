@@ -20,14 +20,18 @@ import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { StyledText } from '../../atoms/text'
 import { useAttachedModules, useAttachedPipettes } from './hooks'
 import { RobotStatusBanner } from './RobotStatusBanner'
+import { RobotOverflowMenu } from './RobotOverflowMenu'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
+// import { UpdateRobotBanner } from '../UpdateRobotBanner'
 
-type RobotCardProps = Pick<DiscoveredRobot, 'name' | 'local'>
+interface RobotCardProps {
+  robot: DiscoveredRobot
+}
 
 export function RobotCard(props: RobotCardProps): JSX.Element | null {
-  const { name = null, local } = props
+  const { robot } = props
+  const { name = null, local } = robot
   const { t } = useTranslation('devices_landing')
 
   const attachedModules = useAttachedModules(name)
@@ -51,6 +55,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
           id={`RobotCard_${name}_robotImage`}
         />
         <Box padding={SPACING.spacing3} width="100%">
+          {/* TODO: uncomment this when we prevent all nested clicks from triggering a route change * <UpdateRobotBanner robotName={name} marginBottom={SPACING.spacing3} /> */}
           <RobotStatusBanner name={name} local={local} />
           <Flex>
             <Flex
@@ -87,22 +92,14 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
                   <ModuleIcon
                     key={`${name}_${module.model}_${i}`}
                     moduleType={module.type}
+                    size={SPACING.spacing4}
                   />
                 ))}
               </Flex>
             </Flex>
           </Flex>
         </Box>
-        {/* temp link from three dot menu to device detail page. Robot actions menu covered in ticket #8673 */}
-        {/* attachment of RobotCard_${name}_overflowMenu selector may change */}
-        <OverflowBtn
-          id={`RobotCard_${name}_overflowMenu`}
-          alignSelf={ALIGN_START}
-          onClick={(e: MouseEvent) => {
-            e.preventDefault()
-            console.log('TODO set show overflow menu')
-          }}
-        />
+        <RobotOverflowMenu robot={robot} alignSelf={ALIGN_START} />
       </Flex>
     </Link>
   ) : null

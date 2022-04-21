@@ -51,7 +51,7 @@
   "shaker": "Shaker",
   "target_speed": "Target: {{speed}} RPM",
   "current_speed": "Current: {{speed}} RPM",
-  "na_speed": "Target: N/A RPM",
+  "na_speed": "Target: N/A",
   "set_status_heater_shaker": "Set {{part}} for {{name}}",
   "set_temp_or_shake": "Set {{part}}",
   "set_target_temp_of_hs": "Set target temperature. This module actively heats but cools passively to room temperature.",
@@ -63,5 +63,16 @@
   "module_status_range": "Between {{min}} - {{max}} {{unit}}",
   "module_controls": "Module Controls",
   "hot_to_the_touch": "<block>Module is <bold>hot</bold> to the touch</block>",
-  "module_actions_unavailable": "Module actions unavailable while protocol is running"
+  "module_actions_unavailable": "Module actions unavailable while protocol is running",
+  "choose_protocol_to_run": "Choose protocol to Run on {{name}}",
+  "no_protocols_found": "No protocols found",
+  "to_run_protocol_go_to_protocols_page": "To run a protocol on this robot, import a protocol on the <navlink>Protocols page</navlink>",
+  "mount": "{{side}} Mount",
+  "empty": "Empty",
+  "attach_pipette": "Attach pipette",
+  "calibrate_pipette_offset": "Calibrate pipette offset",
+  "detach_pipette": "Detach pipette",
+  "view_pipette_setting": "View pipette settings",
+  "left": "left",
+  "right": "right"
 }

@@ -20,12 +20,12 @@ import { FeatureFlags } from './FeatureFlags'
 
 import { NavTab } from '../../atoms/NavTab'
 import { Line } from '../../atoms/structure'
-import type { NextGenRouteParams, AppSettingsTab } from '../../App/NextGenApp'
+import type { NavRouteParams, AppSettingsTab } from '../../App/types'
 
 export function AppSettings(): JSX.Element {
   const { t } = useTranslation('app_settings')
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
-  const { appSettingsTab } = useParams<NextGenRouteParams>()
+  const { appSettingsTab } = useParams<NavRouteParams>()
 
   const appSettingsContentByTab: {
     [K in AppSettingsTab]: () => JSX.Element

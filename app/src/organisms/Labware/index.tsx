@@ -1,38 +1,64 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import startCase from 'lodash/startCase'
 import {
   Box,
   Flex,
   Link,
   SPACING,
   COLORS,
+  BORDERS,
   TYPOGRAPHY,
+  POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   Icon,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/Buttons'
 import { Toast } from '../../atoms/Toast'
-
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { LabwareCard } from './LabwareCard'
 import { AddCustomLabware } from './AddCustomLabware'
 import { LabwareDetails } from './LabwareDetails'
 import {
   LabwareDefAndDate,
-  useGetAllLabware,
+  useAllLabware,
   useLabwareFailure,
   useNewLabwareName,
 } from './hooks'
+import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
+import type { LabwareFilter, LabwareSort } from './types'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
+const labwareDisplayCategoryFilters: LabwareFilter[] = [
+  'all',
+  'wellPlate',
+  'tipRack',
+  'tubeRack',
+  'reservoir',
+  'aluminumBlock',
+]
+
+const FILTER_OPTIONS: DropdownOption[] = []
+labwareDisplayCategoryFilters.forEach(category =>
+  FILTER_OPTIONS.push({ name: startCase(category), value: category })
+)
 
 export function Labware(): JSX.Element {
   const { t } = useTranslation('labware_landing')
 
-  const labware = useGetAllLabware()
+  const [sortBy, setSortBy] = React.useState<LabwareSort>('alphabetical')
+  const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
+  const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
+
+  const [filterBy, setFilterBy] = React.useState<LabwareFilter>('all')
+
+  const labware = useAllLabware(sortBy, filterBy)
   const { labwareFailureMessage, clearLabwareFailure } = useLabwareFailure()
   const { newLabwareName, clearLabwareName } = useNewLabwareName()
   const [showAddLabwareSlideout, setShowAddLabwareSlideout] = React.useState(
@@ -42,7 +68,7 @@ export function Labware(): JSX.Element {
   const [showFailureToast, setShowFailureToast] = React.useState(false)
   const [
     currentLabwareDef,
-    setCurrentLabwaredef,
+    setCurrentLabwareDef,
   ] = React.useState<null | LabwareDefAndDate>(null)
 
   React.useEffect(() => {
@@ -74,13 +100,73 @@ export function Labware(): JSX.Element {
             {t('import')}
           </SecondaryButton>
         </Flex>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignItems={ALIGN_FLEX_END}
+          paddingBottom={SPACING.spacing5}
+        >
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+            <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {t('category')}
+            </StyledText>
+            <DropdownMenu
+              filterOptions={FILTER_OPTIONS}
+              currentOption={{ value: filterBy, name: startCase(filterBy) }}
+              onClick={value => {
+                setFilterBy(value as LabwareFilter)
+              }}
+            />
+          </Flex>
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            alignItems={ALIGN_CENTER}
+            onClick={toggleSetShowSortByMenu}
+          >
+            <StyledText css={TYPOGRAPHY.pSemiBold}>{t('sort_by')} </StyledText>
+            <Icon
+              height={TYPOGRAPHY.lineHeight16}
+              name={showSortByMenu ? 'chevron-up' : 'chevron-down'}
+            />
+          </Flex>
+          {showSortByMenu && (
+            <Flex
+              width="9rem"
+              zIndex={2}
+              borderRadius={BORDERS.radiusSoftCorners}
+              boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
+              position={POSITION_ABSOLUTE}
+              backgroundColor={COLORS.white}
+              top="8.5rem"
+              right={0}
+              flexDirection={DIRECTION_COLUMN}
+            >
+              <MenuItem
+                onClick={() => {
+                  setSortBy('alphabetical')
+                  setShowSortByMenu(false)
+                }}
+              >
+                {t('alphabetical')}
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setSortBy('reverse')
+                  setShowSortByMenu(false)
+                }}
+              >
+                {t('reverse')}
+              </MenuItem>
+            </Flex>
+          )}
+        </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
-          {labware.map(labware => (
+          {labware.map((labware, index) => (
             <LabwareCard
-              key={labware.definition.metadata.displayName}
+              key={`${labware.definition.metadata.displayName}${index}`}
               labware={labware}
               onClick={() => {
-                setCurrentLabwaredef(labware)
+                setCurrentLabwareDef(labware)
               }}
             />
           ))}
@@ -148,7 +234,7 @@ export function Labware(): JSX.Element {
       {currentLabwareDef != null && (
         <LabwareDetails
           labware={currentLabwareDef}
-          onClose={() => setCurrentLabwaredef(null)}
+          onClose={() => setCurrentLabwareDef(null)}
         />
       )}
     </>

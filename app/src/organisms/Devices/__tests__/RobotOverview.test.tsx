@@ -1,28 +1,42 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { useLights, useRobot } from '../hooks'
+import { useLights, useRobot, useIsRobotViewable } from '../hooks'
+import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 import { RobotOverview } from '../RobotOverview'
 
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 jest.mock('../RobotStatusBanner')
+jest.mock('../../UpdateRobotBanner')
+jest.mock('../../ChooseProtocolSlideout')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
 
 const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
+const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
+  typeof useIsRobotViewable
+>
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
 const mockRobotStatusBanner = RobotStatusBanner as jest.MockedFunction<
   typeof RobotStatusBanner
+>
+const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction<
+  typeof ChooseProtocolSlideout
+>
+const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
+  typeof UpdateRobotBanner
 >
 
 const mockToggleLights = jest.fn()
@@ -46,7 +60,14 @@ describe('RobotOverview', () => {
     })
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     mockRobotStatusBanner.mockReturnValue(<div>Mock RobotStatusBanner</div>)
+    mockChooseProtocolSlideout.mockImplementation(({ showSlideout }) => (
+      <div>
+        Mock Choose Protocol Slideout {showSlideout ? 'showing' : 'hidden'}
+      </div>
+    ))
+    mockUpdateRobotBanner.mockReturnValue(<div>Mock UpdateRobotBanner</div>)
     mockUseCurrentRunId.mockReturnValue(null)
+    mockUseIsRobotViewable.mockReturnValue(true)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -63,6 +84,11 @@ describe('RobotOverview', () => {
     getByText('Mock RobotStatusBanner')
   })
 
+  it('renders a UpdateRobotBanner component', () => {
+    const [{ getByText }] = render()
+    getByText('Mock UpdateRobotBanner')
+  })
+
   it('renders a lights toggle button', () => {
     const [{ getByRole, getByText }] = render()
 
@@ -77,5 +103,14 @@ describe('RobotOverview', () => {
     const [{ getByText }] = render()
 
     getByText('Run a Protocol')
+  })
+
+  it('renders a choose protocol slideout hidden by default, expanded after launch', () => {
+    const [{ getByText, getByRole }] = render()
+
+    getByText('Mock Choose Protocol Slideout hidden')
+    const runButton = getByRole('button', { name: 'Run a Protocol' })
+    fireEvent.click(runButton)
+    getByText('Mock Choose Protocol Slideout showing')
   })
 })

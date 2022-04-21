@@ -30,8 +30,10 @@ def mock_module_controller() -> mock.MagicMock:
     return mock.MagicMock()
 
 
+# Async because ProtocolContext.__init__() needs an event loop,
+# so this fixture needs to run in an event loop.
 @pytest.fixture
-def ctx_with_tempdeck(
+async def ctx_with_tempdeck(
     mock_hardware: mock.MagicMock, mock_module_controller: mock.MagicMock
 ) -> ProtocolContext:
     """Context fixture with a mock temp deck."""
@@ -51,8 +53,10 @@ def ctx_with_tempdeck(
     )
 
 
+# Async because ProtocolContext.__init__() needs an event loop,
+# so this fixture needs to run in an event loop.
 @pytest.fixture
-def ctx_with_magdeck(
+async def ctx_with_magdeck(
     mock_hardware: mock.AsyncMock, mock_module_controller: mock.MagicMock
 ) -> ProtocolContext:
     """Context fixture with a mock mag deck."""
@@ -72,8 +76,10 @@ def ctx_with_magdeck(
     )
 
 
+# Async because ProtocolContext.__init__() needs an event loop,
+# so this fixture needs to run in an event loop.
 @pytest.fixture
-def ctx_with_thermocycler(
+async def ctx_with_thermocycler(
     mock_hardware: mock.AsyncMock, mock_module_controller: mock.MagicMock
 ) -> ProtocolContext:
     """Context fixture with a mock thermocycler."""

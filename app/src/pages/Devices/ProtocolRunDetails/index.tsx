@@ -25,10 +25,7 @@ import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/Protoc
 import { RunLog } from '../../../organisms/Devices/ProtocolRun/RunLog'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 
-import type {
-  NextGenRouteParams,
-  ProtocolRunDetailsTab,
-} from '../../../App/NextGenApp'
+import type { NavRouteParams, ProtocolRunDetailsTab } from '../../../App/types'
 
 const RoundNavLink = styled(NavLink)`
   ${TYPOGRAPHY.pSemiBold}
@@ -81,22 +78,32 @@ export function ProtocolRunDetails(): JSX.Element | null {
     robotName,
     runId,
     protocolRunDetailsTab,
-  } = useParams<NextGenRouteParams>()
+  } = useParams<NavRouteParams>()
+
+  const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
 
   const robot = useRobot(robotName)
 
   interface ProtocolRunDetailsTabProps {
+    protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
     robotName: string
     runId: string
   }
 
   const protocolRunDetailsContentByTab: {
     [K in ProtocolRunDetailsTab]: ({
+      protocolRunHeaderRef,
       robotName,
       runId,
     }: ProtocolRunDetailsTabProps) => JSX.Element | null
   } = {
-    setup: () => <ProtocolRunSetup robotName={robotName} runId={runId} />,
+    setup: () => (
+      <ProtocolRunSetup
+        protocolRunHeaderRef={protocolRunHeaderRef}
+        robotName={robotName}
+        runId={runId}
+      />
+    ),
     // TODO: module controls tab content
     'module-controls': () => <div>module controls content</div>,
     'run-log': () => <RunLog robotName={robotName} runId={runId} />,
@@ -122,7 +129,11 @@ export function ProtocolRunDetails(): JSX.Element | null {
           marginBottom={SPACING.spacing4}
           width="100%"
         >
-          <ProtocolRunHeader robotName={robot.name} runId={runId} />
+          <ProtocolRunHeader
+            protocolRunHeaderRef={protocolRunHeaderRef}
+            robotName={robot.name}
+            runId={runId}
+          />
           <Flex>
             <RoundTab
               id="ProtocolRunDetails_setupTab"
@@ -152,7 +163,11 @@ export function ProtocolRunDetails(): JSX.Element | null {
               BORDERS.radiusSoftCorners
             }`}
           >
-            <ProtocolRunDetailsContent robotName={robotName} runId={runId} />
+            <ProtocolRunDetailsContent
+              protocolRunHeaderRef={protocolRunHeaderRef}
+              robotName={robotName}
+              runId={runId}
+            />
           </Box>
         </Flex>
       </Box>

@@ -24,7 +24,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   const [showSlideout, setShowSlideout] = React.useState(false)
   const { t } = useTranslation('protocol_info')
   const { storedProtocols } = props
-
   const [
     selectedProtocol,
     setSelectedProtocol,
@@ -67,8 +66,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         title={t('import_new_protocol')}
         isExpanded={showSlideout}
         onCloseClick={() => setShowSlideout(false)}
-        zIndex="10"
-        height="100%"
       >
         <Box height="26rem">
           <UploadInput onUpload={() => setShowSlideout(false)} />

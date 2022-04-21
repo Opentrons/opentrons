@@ -23,11 +23,7 @@ export function ProtocolsEmptyState(): JSX.Element | null {
       <Text role="complementary" as="h4">
         {t('import_a_file')}
       </Text>
-      <UploadInput
-        onUpload={() => {
-          console.log('todo')
-        }}
-      />
+      <UploadInput />
       <EmptyStateLinks title={t('no_protocol_yet')} />
     </Flex>
   )
