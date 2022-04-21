@@ -44,8 +44,8 @@ describe('UploadInput', () => {
       /Don't have a protocol yet\?/i
     )
     getByText('MOCK LAST RUN')
-    expect(getByRole('link', { name: 'Open Protocol Library' })).toBeTruthy()
-    expect(getByRole('link', { name: 'Open Protocol Designer' })).toBeTruthy()
+    getByRole('link', { name: 'Open Protocol Library' })
+    getByRole('link', { name: 'Open Protocol Designer' })
   })
 
   it('opens file select on button click', () => {
