@@ -87,7 +87,9 @@ class RunStore:
             try:
                 transaction.execute(statement)
             except sqlalchemy.exc.IntegrityError:
-                assert run.protocol_id is not None
+                assert (
+                    run.protocol_id is not None
+                ), "Insert run failed due to unexpected IntegrityError"
                 raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
         self.update_active_run(run_id=run.run_id, is_current=run.is_current)
