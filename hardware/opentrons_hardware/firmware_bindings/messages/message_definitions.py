@@ -485,6 +485,7 @@ class GripperInfoResponse:  # noqa: D101
     ] = MessageId.gripper_info_response
 
 
+@dataclass
 class PickUpTipRequest:  # noqa: D101
     payload: payloads.PickUpTipRequestPayload
     payload_type: Type[BinarySerializable] = payloads.PickUpTipRequestPayload
