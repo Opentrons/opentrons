@@ -70,7 +70,7 @@ export const AboutModuleSlideout = (
               textDecoration={TEXT_DECORATION_UNDERLINE}
               onClick={handleFirmwareUpdateClick}
             >
-              {t('view_update')}
+              {t('update_now')}
             </Btn>
           </Banner>
         </Flex>

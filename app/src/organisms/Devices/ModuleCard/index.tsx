@@ -304,7 +304,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                         textDecoration={TEXT_DECORATION_UNDERLINE}
                         onClick={() => handleUpdateClick()}
                       >
-                        {t('view_update')}
+                        {t('update_now')}
                       </Btn>
                     </Flex>
                   </Banner>
