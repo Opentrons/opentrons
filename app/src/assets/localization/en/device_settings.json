@@ -75,6 +75,7 @@
   "rename_robot_slideout_label": "Robot Name",
   "rename_robot_button": "Rename robot",
   "rename_robot_input_limitation_label": "35 characters max",
+  "rename_robot_input_error_message": "Something wrong",
   "factory_reset_slideout_title": "Factory Reset",
   "factory_reset_slideout_description": "Select the robot data to clear.",
   "factory_reset_slideout_warning_message": "Factory resets cannot be undone",

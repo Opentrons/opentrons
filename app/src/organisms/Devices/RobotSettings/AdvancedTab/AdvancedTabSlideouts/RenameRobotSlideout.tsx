@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useFormik } from 'formik'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -24,18 +25,54 @@ interface RenameRobotSlideoutProps {
   robotName: string
 }
 
+interface FormikErrors {
+  newRobotName?: string
+}
+
+/* max length is 35 and min length is 1
+   allow users to use alphabets, numbers, space, ', !, ?, $, _, and -
+   not allow users to use space at the beginning of a new name
+*/
+const REGEX_RENAME_ROBOT_PATTERN = /^\S([a-zA-Z0-9\s-_!$?*]{0,35})$/
+const regexPattern = new RegExp(REGEX_RENAME_ROBOT_PATTERN)
+
 export function RenameRobotSlideout({
   isExpanded,
   onCloseClick,
   robotName,
 }: RenameRobotSlideoutProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const [newRobotName, setNewRobotName] = React.useState<string | null>()
+  // const [newRobotName, setNewRobotName] = React.useState<string>('')
+  // const [isValidName, setIsValidName] = React.useState<boolean>(false)
   const [previousRobotName, setPreviousRobotName] = React.useState<string>(
     robotName
   )
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
+
+  const formik = useFormik({
+    initialValues: {
+      newRobotName: '',
+    },
+    onSubmit: (values, { resetForm }) => {
+      const newName = values.newRobotName
+      // const inputForm = document.getElementById('newRobotName')
+      // if (inputForm) inputForm.style.border = `1px solid ${COLORS.medGrey}`
+      updateRobotName(newName)
+      resetForm({ values: undefined })
+    },
+    validate: values => {
+      const errors: FormikErrors = {}
+      const newName = values.newRobotName
+      console.log(newName, regexPattern.test(newName) ? 'valid' : 'invalid')
+      if (!regexPattern.test(newName)) {
+        errors.newRobotName = t('rename_robot_input_error_message')
+        // const inputForm = document.getElementById('newRobotName')
+        // if (inputForm) inputForm.style.border = `1px solid ${COLORS.error}`
+      }
+      return errors
+    },
+  })
 
   const { updateRobotName } = useUpdateRobotNameMutation({
     onSuccess: (data: UpdatedRobotName) => {
@@ -53,6 +90,19 @@ export function RenameRobotSlideout({
     updateRobotName(newRobotName as string)
   }
 
+  // const handleUserInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  //   e.preventDefault()
+  //   // console.log('value', value)
+  //   // TODO error message handling
+
+  //   setIsValidName(regexPattern.test(e.target.value))
+  //   setNewRobotName(e.target.value)
+  //   console.log(
+  //     e.target.value,
+  //     regexPattern.test(e.target.value) ? 'valid' : 'invalid'
+  //   )
+  // }
+
   return (
     <Slideout
       title={t('rename_robot_slideout_title')}
@@ -60,7 +110,10 @@ export function RenameRobotSlideout({
       isExpanded={isExpanded}
       footer={
         <PrimaryButton
-          disabled={newRobotName == null || newRobotName.length > 35}
+          disabled={
+            formik.errors.newRobotName != null ||
+            formik.values.newRobotName === ''
+          }
           onClick={handleRenameRobot}
           width="100%"
         >
@@ -81,14 +134,21 @@ export function RenameRobotSlideout({
         </StyledText>
         <InputField
           data-testid="rename-robot_input"
+          id="newRobotName"
+          name="newRobotName"
           type="text"
-          value={newRobotName}
-          onChange={e => setNewRobotName(e.target.value)}
-          error={null}
+          onChange={formik.handleChange}
+          value={formik.values.newRobotName}
+          error={formik.errors.newRobotName && ' '}
         />
         <StyledText as="label" color={COLORS.darkGreyEnabled}>
           {t('rename_robot_input_limitation_label')}
         </StyledText>
+        {formik.errors.newRobotName && (
+          <StyledText as="label" color={COLORS.error}>
+            {formik.errors.newRobotName}
+          </StyledText>
+        )}
       </Flex>
     </Slideout>
   )

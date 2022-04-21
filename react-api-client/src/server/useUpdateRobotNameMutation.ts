@@ -38,8 +38,6 @@ export function useUpdateRobotNameMutation(
   const host = useHost()
   const queryClient = useQueryClient()
 
-  console.log('host info: ', host)
-
   const mutation = useMutation<
     UpdatedRobotName,
     AxiosError<ErrorResponse>,
