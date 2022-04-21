@@ -132,8 +132,9 @@ export function ChooseRobotSlideout(
               onClick={() => dispatch(startDiscovery())}
               textTransform={TEXT_TRANSFORM_CAPITALIZE}
               role="button"
+              css={TYPOGRAPHY.pSemiBold}
             >
-              {t('shared:refresh')}
+              {t('shared:refresh_list')}
             </Link>
           )}
         </Flex>

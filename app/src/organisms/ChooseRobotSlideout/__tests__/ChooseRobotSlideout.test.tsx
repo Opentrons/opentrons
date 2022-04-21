@@ -152,12 +152,12 @@ describe('ChooseRobotSlideout', () => {
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    const refreshButton = getByRole('button', { name: 'refresh' })
+    const refreshButton = getByRole('button', { name: 'Refresh list' })
     fireEvent.click(refreshButton)
     expect(mockStartDiscovery).toHaveBeenCalled()
     expect(dispatch).toHaveBeenCalledWith({ type: 'mockStartDiscovery' })
   })
-  it('allows an available robot to be selected', async () => {
+  it('allows an available robot to be selected', () => {
     const [{ getByRole, getByText }] = render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
@@ -171,7 +171,7 @@ describe('ChooseRobotSlideout', () => {
     proceedButton.click()
     expect(mockCreateRun).toBeCalled()
   })
-  it('launches the robot is busy modal when the selected robot is busy', async () => {
+  it('launches the robot is busy modal when the selected robot is busy', () => {
     mockUseCurrentRunId.mockReturnValue('1')
     mockUseCurrentRunStatus.mockReturnValue('idle')
     const [{ getByRole, getByText }] = render({
