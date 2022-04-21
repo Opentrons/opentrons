@@ -80,7 +80,7 @@ class DeviceLanding:
     def get_overflow_button_on_device_landing(self) -> Optional[WebElement]:
         """Get the overflow button on device landing page."""
         text: Element = Element(
-            (By.ID, "RobotCard_opentrons-dev_overflowMenu"),
+            (By.XPATH, f"//div[@data-testid='RobotCard_opentrons-dev_overflowMenu']"),
             f"Get the overflow button on device landing page.",
         )
         return self.base.clickable_wrapper(text, 5)
@@ -199,6 +199,28 @@ class DeviceLanding:
         )
         return self.base.clickable_wrapper(image, 5)
 
+    def get_left_mount_pipette_device_detail(self) -> Optional[WebElement]:
+        """Get the left mount pipette on device detail page."""
+        text: Element = Element(
+            (
+                By.XPATH,
+                f"//p[@data-testid='PipetteCard_mount_P20 Single-Channel GEN2']",
+            ),
+            f"the left mount pipette on device detail page.",
+        )
+        return self.base.clickable_wrapper(text, 5)
+
+    def get_right_mount_pipette_device_detail(self) -> Optional[WebElement]:
+        """Get the right mount pipette on device detail page."""
+        text: Element = Element(
+            (
+                By.XPATH,
+                f"//p[@data-testid='PipetteCard_mount_P20 Single-Channel GEN2']",
+            ),
+            f"the right mount pipette on device detail page.",
+        )
+        return self.base.clickable_wrapper(text, 5)
+
     def get_mag_module_name(self) -> Optional[WebElement]:
         """Get the mag module name on device detail page."""
         image: Element = Element(
@@ -214,6 +236,16 @@ class DeviceLanding:
                 f"//div[@data-testid='module_card_overflow_btn_{module_serial}']//button",
             ),
             f"Button to open module actions menu.'",
+        )
+        self.base.click(button)
+
+    def click_run_a_protocol_button_device_landing(self, module_serial: str) -> None:
+        button: Element = Element(
+            (
+                By.XPATH,
+                f"//button[text()='Run a Protocol']",
+            ),
+            f"Button to go to setup for run page.'",
         )
         self.base.click(button)
 
@@ -239,6 +271,16 @@ class DeviceLanding:
         if element:
             element.clear()
             element.send_keys(height)
+
+    def click_engage_height_button(self) -> None:
+        close: Element = Element(
+            (
+                By.XPATH,
+                f"//button[@data-testid='MagneticModuleSlideout_btn_fatal-attraction']",
+            ),
+            f"Button to set engage height slideout.'",
+        )
+        self.base.click(close)
 
     def close_mag_slideout(self) -> None:
         close: Element = Element(

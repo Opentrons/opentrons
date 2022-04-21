@@ -30,8 +30,6 @@ def test_device_landing_v5dot1(
     os.environ["OT_APP_ANALYTICS__SEEN_OPT_IN"] = "true"
     # app should look on localhost for robots
     os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"
-    # app should use the __DEV__ Hierarchy Reorganization
-    os.environ["OT_APP_DEV_INTERNAL__hierarchyReorganization"] = "true"
     # Start chromedriver with our options and use the
     # context manager to ensure it quits.
     with webdriver.Chrome(options=chrome_options) as driver:
@@ -88,6 +86,8 @@ def test_device_landing_v5dot1(
                 device_landing.set_lights(True) == True
             ), "Lights toggle was not set to on."
 
+            device_landing.get_left_mount_pipette_device_detail().is_displayed()
+            device_landing.get_right_mount_pipette_device_detail().is_displayed()
             device_landing.get_mag_deck_image().is_displayed()
             device_landing.get_mag_module_name().is_displayed()
             for serial in [
@@ -100,9 +100,10 @@ def test_device_landing_v5dot1(
                     device_landing.click_module_actions_button(serial)
                     device_landing.click_mag_engage_height(serial)
                     device_landing.enter_mag_engage_height(serial, "10")
+                    device_landing.click_engage_height_button()
                     device_landing.close_mag_slideout()
                 else:
                     device_landing.click_module_actions_button(serial)
                     device_landing.click_mag_disengage()
                 time.sleep(3)
-            device_landing.navigate("devices")
+            device_landing.click_run_a_protocol_button_device_landing()
