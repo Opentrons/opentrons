@@ -1,4 +1,5 @@
 """ Test the Transfer class and its functions """
+import asyncio
 import pytest
 import opentrons.protocol_api as papi
 from opentrons.protocols.context.protocol_api.protocol_context import (
@@ -1045,12 +1046,12 @@ def test_oversized_transfer(_instr_labware):
     assert xfer_plan_list == exp1
 
 
-def test_multichannel_transfer_old_version(loop, hardware):
+async def test_multichannel_transfer_old_version(hardware):
     # for API version below 2.2, multichannel pipette can only
     # reach row A of 384-well plates
     ctx = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         api_version=APIVersion(2, 1),
     )
     lw1 = ctx.load_labware("biorad_96_wellplate_200ul_pcr", 1)
@@ -1107,13 +1108,13 @@ def test_multichannel_transfer_old_version(loop, hardware):
             xfer_plan_list.append(step)
 
 
-def test_multichannel_transfer_locs(loop, hardware):
+async def test_multichannel_transfer_locs(hardware):
     api_version = APIVersion(2, 2)
     ctx = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(
             api_version=api_version, sync_hardware=hardware.sync
         ),
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         api_version=api_version,
     )
     lw1 = ctx.load_labware("biorad_96_wellplate_200ul_pcr", 1)

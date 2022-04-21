@@ -24,7 +24,6 @@ def filter_func(arb: ArbitrationId) -> bool:
 @pytest.mark.requires_emulator
 @pytest.mark.can_filter_func.with_args(filter_func)
 async def test_each_node(
-    loop: asyncio.BaseEventLoop,
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     motor_node_id: NodeId,

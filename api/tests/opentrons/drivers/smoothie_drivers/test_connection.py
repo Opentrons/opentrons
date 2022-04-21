@@ -12,8 +12,10 @@ def mock_serial_connection() -> AsyncMock:
     return AsyncMock(spec=AsyncSerial)
 
 
+# Async because SmoothieConnection.__init__() needs an event loop,
+# so this fixture needs to run in an event loop.
 @pytest.fixture
-def subject(mock_serial_connection: AsyncMock) -> SmoothieConnection:
+async def subject(mock_serial_connection: AsyncMock) -> SmoothieConnection:
     """The test subject."""
     return SmoothieConnection(
         serial=mock_serial_connection,

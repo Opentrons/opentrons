@@ -3,6 +3,7 @@ from mock import patch, PropertyMock, MagicMock
 
 import pytest
 import asyncio
+from decoy import matchers
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import (
     MagDeck,
@@ -15,7 +16,7 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 
 
 @pytest.fixture
-async def magdeck(loop: asyncio.AbstractEventLoop):
+async def magdeck():
     usb_port = USBPort(
         name="",
         hub=None,
@@ -28,7 +29,7 @@ async def magdeck(loop: asyncio.AbstractEventLoop):
         which="magdeck",
         simulating=True,
         execution_manager=ExecutionManager(),
-        loop=asyncio.get_event_loop(),
+        loop=asyncio.get_running_loop(),
     )
     MagDeck.current_height = PropertyMock(return_value=321)
 
@@ -38,7 +39,7 @@ async def magdeck(loop: asyncio.AbstractEventLoop):
 
 
 @pytest.fixture
-async def tempdeck(loop: asyncio.AbstractEventLoop):
+async def tempdeck():
     usb_port = USBPort(
         name="",
         hub=None,
@@ -51,7 +52,7 @@ async def tempdeck(loop: asyncio.AbstractEventLoop):
         which="tempdeck",
         simulating=True,
         execution_manager=ExecutionManager(),
-        loop=asyncio.get_event_loop(),
+        loop=asyncio.get_running_loop(),
     )
     TempDeck.temperature = PropertyMock(return_value=123.0)
     TempDeck.target = PropertyMock(return_value=321.0)
@@ -62,7 +63,7 @@ async def tempdeck(loop: asyncio.AbstractEventLoop):
 
 
 @pytest.fixture
-async def thermocycler(loop: asyncio.AbstractEventLoop):
+async def thermocycler():
     usb_port = USBPort(
         name="",
         hub=None,
@@ -75,7 +76,7 @@ async def thermocycler(loop: asyncio.AbstractEventLoop):
         which="thermocycler",
         simulating=True,
         execution_manager=ExecutionManager(),
-        loop=loop,
+        loop=asyncio.get_running_loop(),
     )
 
     Thermocycler.lid_status = PropertyMock(return_value="open")
@@ -95,7 +96,7 @@ async def thermocycler(loop: asyncio.AbstractEventLoop):
 
 
 @pytest.fixture
-async def heater_shaker(loop: asyncio.AbstractEventLoop):
+async def heater_shaker():
     """Get a mocked out heater-shaker hardware control object."""
     usb_port = USBPort(
         name="",
@@ -109,7 +110,7 @@ async def heater_shaker(loop: asyncio.AbstractEventLoop):
         which="heatershaker",
         simulating=True,
         execution_manager=ExecutionManager(),
-        loop=loop,
+        loop=asyncio.get_running_loop(),
     )
 
     HeaterShaker.live_data = PropertyMock(
@@ -290,7 +291,9 @@ def test_post_serial_update(api_client, hardware, tempdeck):
         resp = api_client.post("/modules/dummySerialTD/update")
 
         p.assert_called_once_with(
-            tempdeck, tempdeck._bundled_fw.path, asyncio.get_event_loop()
+            tempdeck,
+            tempdeck._bundled_fw.path,
+            matchers.IsA(asyncio.AbstractEventLoop),
         )
 
         body = resp.json()

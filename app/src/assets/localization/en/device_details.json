@@ -67,5 +67,13 @@
   "choose_protocol_to_run": "Choose protocol to Run on {{name}}",
   "no_protocols_found": "No protocols found",
   "to_run_protocol_go_to_protocols_page": "To run a protocol on this robot, import a protocol on the <navlink>Protocols page</navlink>",
+  "mount": "{{side}} Mount",
+  "empty": "Empty",
+  "attach_pipette": "Attach pipette",
+  "calibrate_pipette_offset": "Calibrate pipette offset",
+  "detach_pipette": "Detach pipette",
+  "view_pipette_setting": "View pipette settings",
+  "left": "left",
+  "right": "right",
   "deck_slot": "deck slot {{slot}}"
 }

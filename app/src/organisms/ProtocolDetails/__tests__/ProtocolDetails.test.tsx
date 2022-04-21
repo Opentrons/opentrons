@@ -10,6 +10,7 @@ import {
   getScanning,
   getUnreachableRobots,
 } from '../../../redux/discovery'
+import { getIsProtocolAnalysisInProgress } from '../../../redux/protocol-storage/selectors'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -20,6 +21,7 @@ import { ProtocolDetails } from '..'
 import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
 
 jest.mock('../../../redux/discovery/selectors')
+jest.mock('../../../redux/protocol-storage/selectors')
 jest.mock('../../../molecules/DeckThumbnail')
 
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
@@ -34,6 +36,9 @@ const mockGetUnreachableRobots = getUnreachableRobots as jest.MockedFunction<
 const mockGetScanning = getScanning as jest.MockedFunction<typeof getScanning>
 const mockDeckThumbnail = DeckThumbnail as jest.MockedFunction<
   typeof DeckThumbnail
+>
+const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as jest.MockedFunction<
+  typeof getIsProtocolAnalysisInProgress
 >
 
 const render = (
@@ -56,6 +61,7 @@ describe('ProtocolDetails', () => {
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
     mockGetScanning.mockReturnValue(false)
     mockDeckThumbnail.mockReturnValue(<div>mock Deck Thumbnail</div>)
+    mockGetIsProtocolAnalysisInProgress.mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()

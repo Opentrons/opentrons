@@ -1,52 +1,80 @@
 # Uncomment to enable logging during tests
 # import logging
 # from logging.config import dictConfig
-from typing import AsyncIterator, Callable, Generator, cast
-from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
-from opentrons.protocol_api.labware import Labware
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
-from opentrons.protocols.context.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
+from __future__ import annotations
+import asyncio
+import io
+import json
+import os
+import pathlib
+import tempfile
+import zipfile
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    AsyncGenerator,
+    Callable,
+    Dict,
+    Generator,
+    NamedTuple,
+    TextIO,
+    Union,
+    cast,
 )
+from typing_extensions import TypedDict
+
+import pytest
 
 try:
     import aionotify  # type: ignore[import]
 except (OSError, ModuleNotFoundError):
     aionotify = None
-import os
-import io
-import json
-import pathlib
-import tempfile
-from collections import namedtuple
-import zipfile
 
-import pytest
-
-from opentrons import config
-from opentrons import hardware_control as hc
-from opentrons.hardware_control import HardwareControlAPI, API, ThreadManager
-from opentrons.protocol_api import ProtocolContext
-from opentrons.types import Location, Point
-
+from opentrons_shared_data.protocol.dev_types import JsonProtocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 
+from opentrons import config
+from opentrons import hardware_control as hc
+from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
+from opentrons.hardware_control import (
+    API,
+    HardwareControlAPI,
+    ThreadManager,
+    ThreadManagedHardware,
+)
+from opentrons.protocol_api import ProtocolContext
+from opentrons.protocol_api.labware import Labware
+from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
+from opentrons.protocols.context.protocol_api.protocol_context import (
+    ProtocolContextImplementation,
+)
+from opentrons.types import Location, Point
 
-Protocol = namedtuple("Protocol", ["text", "filename", "filelike"])
+
+if TYPE_CHECKING:
+    from opentrons.drivers.smoothie_drivers import SmoothieDriver as SmoothieDriverType
 
 
-@pytest.fixture(autouse=True)
-def asyncio_loop_exception_handler(loop):
-    def exception_handler(loop, context):
-        pytest.fail(str(context))
-
-    loop.set_exception_handler(exception_handler)
-    yield
-    loop.set_exception_handler(None)
+class Protocol(NamedTuple):
+    text: str
+    filename: str
+    filelike: TextIO
 
 
-@pytest.fixture
+class Bundle(TypedDict):
+    source_dir: pathlib.Path
+    filename: str
+    contents: str
+    filelike: io.BytesIO
+    binary_zipfile: bytes
+    metadata: Dict[str, str]
+    bundled_data: Dict[str, str]
+    bundled_labware: Dict[str, LabwareDefinition]
+    bundled_python: Dict[str, Any]
+
+
+@pytest.fixture()
 def ot_config_tempdir(tmp_path: pathlib.Path) -> Generator[pathlib.Path, None, None]:
     os.environ["OT_API_CONFIG_DIR"] = str(tmp_path)
     config.reload()
@@ -57,13 +85,13 @@ def ot_config_tempdir(tmp_path: pathlib.Path) -> Generator[pathlib.Path, None, N
     config.reload()
 
 
-@pytest.fixture
-def labware_offset_tempdir(ot_config_tempdir) -> pathlib.Path:
+@pytest.fixture()
+def labware_offset_tempdir(ot_config_tempdir: pathlib.Path) -> pathlib.Path:
     return config.get_opentrons_path("labware_calibration_offsets_dir_v2")
 
 
 @pytest.fixture(autouse=True)
-def clear_feature_flags():
+def clear_feature_flags() -> Generator[None, None, None]:
     ff_file = config.CONFIG["feature_flags_file"]
     if os.path.exists(ff_file):
         os.remove(ff_file)
@@ -72,8 +100,8 @@ def clear_feature_flags():
         os.remove(ff_file)
 
 
-@pytest.fixture
-def wifi_keys_tempdir():
+@pytest.fixture()
+def wifi_keys_tempdir() -> Generator[str, None, None]:
     old_wifi_keys = config.CONFIG["wifi_keys_dir"]
     with tempfile.TemporaryDirectory() as td:
         config.CONFIG["wifi_keys_dir"] = pathlib.Path(td)
@@ -81,37 +109,39 @@ def wifi_keys_tempdir():
         config.CONFIG["wifi_keys_dir"] = old_wifi_keys
 
 
-@pytest.fixture
-def is_robot(monkeypatch):
+@pytest.fixture()
+def is_robot(monkeypatch: pytest.MonkeyPatch) -> Generator[None, None, None]:
     monkeypatch.setattr(config, "IS_ROBOT", True)
     yield
     monkeypatch.setattr(config, "IS_ROBOT", False)
 
 
 # -------feature flag fixtures-------------
-@pytest.fixture
-async def short_trash_flag():
+@pytest.fixture()
+async def short_trash_flag() -> AsyncGenerator[None, None]:
     await config.advanced_settings.set_adv_setting("shortFixedTrash", True)
     yield
     await config.advanced_settings.set_adv_setting("shortFixedTrash", False)
 
 
-@pytest.fixture
-async def old_aspiration(monkeypatch):
+@pytest.fixture()
+async def old_aspiration() -> AsyncGenerator[None, None]:
     await config.advanced_settings.set_adv_setting("useOldAspirationFunctions", True)
     yield
     await config.advanced_settings.set_adv_setting("useOldAspirationFunctions", False)
 
 
-@pytest.fixture
-async def enable_door_safety_switch():
+@pytest.fixture()
+async def enable_door_safety_switch() -> AsyncGenerator[None, None]:
     await config.advanced_settings.set_adv_setting("enableDoorSafetySwitch", True)
     yield
     await config.advanced_settings.set_adv_setting("enableDoorSafetySwitch", False)
 
 
-@pytest.fixture
-async def enable_ot3_hardware_controller(request):
+@pytest.fixture()
+async def enable_ot3_hardware_controller(
+    request: pytest.FixtureRequest,
+) -> AsyncGenerator[None, None]:
     # this is from the command line parameters added in root conftest
     if request.config.getoption("--ot2-only"):
         pytest.skip("testing only ot2")
@@ -124,13 +154,14 @@ async def enable_ot3_hardware_controller(request):
 # -----end feature flag fixtures-----------
 
 
-@pytest.fixture(params=["testosaur_v2.py"])
-def protocol(request):
-    try:
-        root = request.getfixturevalue("protocol_file")
-    except Exception:
-        root = request.param
+@pytest.fixture()
+def protocol_file() -> str:
+    return "testosaur_v2.py"
 
+
+@pytest.fixture()
+def protocol(protocol_file: str) -> Generator[Protocol, None, None]:
+    root = protocol_file
     filename = os.path.join(os.path.dirname(__file__), "data", root)
 
     file = open(filename)
@@ -142,21 +173,25 @@ def protocol(request):
     file.close()
 
 
-@pytest.fixture
-def virtual_smoothie_env(monkeypatch):
+@pytest.fixture()
+def virtual_smoothie_env(
+    monkeypatch: pytest.MonkeyPatch,
+) -> Generator[None, None, None]:
     # TODO (ben 20180426): move this to the .env file
     monkeypatch.setenv("ENABLE_VIRTUAL_SMOOTHIE", "true")
     yield
     monkeypatch.setenv("ENABLE_VIRTUAL_SMOOTHIE", "false")
 
 
-@pytest.fixture(
-    params=["ot2", "ot3"],
-)
-async def machine_variant_ffs(request, loop):
-    if request.node.get_closest_marker("ot3_only") and request.param == "ot2":
+@pytest.fixture(params=["ot2", "ot3"])
+async def machine_variant_ffs(
+    request: pytest.FixtureRequest,
+) -> AsyncGenerator[None, None]:
+    device_param = request.param  # type: ignore[attr-defined]
+
+    if request.node.get_closest_marker("ot3_only") and device_param == "ot2":
         pytest.skip()
-    if request.node.get_closest_marker("ot2_only") and request.param == "ot3":
+    if request.node.get_closest_marker("ot2_only") and device_param == "ot3":
         pytest.skip()
 
     old = config.advanced_settings.get_adv_setting("enableOT3HardwareController")
@@ -164,7 +199,7 @@ async def machine_variant_ffs(request, loop):
     old_value = old.value
 
     await config.advanced_settings.set_adv_setting(
-        "enableOT3HardwareController", request.param == "ot3"
+        "enableOT3HardwareController", device_param == "ot3"
     )
     yield
     await config.advanced_settings.set_adv_setting(
@@ -172,24 +207,28 @@ async def machine_variant_ffs(request, loop):
     )
 
 
-async def _build_ot2_hw() -> AsyncIterator[ThreadManager[HardwareControlAPI]]:
+async def _build_ot2_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
     hw_sim = ThreadManager(API.build_hardware_simulator)
     old_config = config.robot_configs.load()
     try:
         yield hw_sim
     finally:
         config.robot_configs.clear()
+        for m in hw_sim.attached_modules:
+            await m.cleanup()
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
 
 
-@pytest.fixture
-async def ot2_hardware(request, loop, virtual_smoothie_env):
+@pytest.fixture()
+async def ot2_hardware(
+    virtual_smoothie_env: None,
+) -> AsyncGenerator[ThreadManagedHardware, None]:
     async for hw in _build_ot2_hw():
         yield hw
 
 
-async def _build_ot3_hw() -> AsyncIterator[ThreadManager[HardwareControlAPI]]:
+async def _build_ot3_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
     from opentrons.hardware_control.ot3api import OT3API
 
     hw_sim = ThreadManager(OT3API.build_hardware_simulator)
@@ -198,12 +237,17 @@ async def _build_ot3_hw() -> AsyncIterator[ThreadManager[HardwareControlAPI]]:
         yield hw_sim
     finally:
         config.robot_configs.clear()
+        for m in hw_sim.attached_modules:
+            await m.cleanup()
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
 
 
-@pytest.fixture
-async def ot3_hardware(request, loop, enable_ot3_hardware_controller):
+@pytest.fixture()
+async def ot3_hardware(
+    request: pytest.FixtureRequest,
+    enable_ot3_hardware_controller: None,
+) -> AsyncGenerator[ThreadManagedHardware, None]:
     # this is from the command line parameters added in root conftest
     if request.config.getoption("--ot2-only"):
         pytest.skip("testing only ot2")
@@ -217,17 +261,21 @@ async def ot3_hardware(request, loop, enable_ot3_hardware_controller):
     params=[lambda: _build_ot2_hw, lambda: _build_ot3_hw],
     ids=["ot2", "ot3"],
 )
-async def hardware(request, loop, virtual_smoothie_env):
-    if request.node.get_closest_marker("ot2_only") and request.param() == _build_ot3_hw:
+async def hardware(
+    request: pytest.FixtureRequest,
+    virtual_smoothie_env: None,
+) -> AsyncGenerator[ThreadManagedHardware, None]:
+    hw_builder = request.param()  # type: ignore[attr-defined]
+
+    if request.node.get_closest_marker("ot2_only") and hw_builder == _build_ot3_hw:
         pytest.skip()
-    if request.node.get_closest_marker("ot3_only") and request.param() == _build_ot2_hw:
+    if request.node.get_closest_marker("ot3_only") and hw_builder == _build_ot2_hw:
         pytest.skip()
-    if request.param() == _build_ot3_hw and request.config.getoption("--ot2-only"):
+    if hw_builder == _build_ot3_hw and request.config.getoption("--ot2-only"):
         pytest.skip("testing only ot2")
 
-    # param() return a function we have to call
-    async for hw in request.param()():
-        if request.param() == _build_ot3_hw:
+    async for hw in hw_builder():
+        if hw_builder == _build_ot3_hw:
             await config.advanced_settings.set_adv_setting(
                 "enableOT3HardwareController", True
             )
@@ -239,16 +287,26 @@ async def hardware(request, loop, virtual_smoothie_env):
             )
 
 
-@pytest.fixture
-async def ctx(loop, hardware) -> ProtocolContext:
-    return ProtocolContext(
+# Async because ProtocolContext.__init__() needs an event loop,
+# so this fixture needs to run in an event loop.
+@pytest.fixture()
+async def ctx(
+    hardware: ThreadManagedHardware,
+) -> AsyncGenerator[ProtocolContext, None]:
+    c = ProtocolContext(
         implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
-        loop=loop,
+        loop=asyncio.get_running_loop(),
     )
+    yield c
+    # Manually clean up all the modules.
+    for m in c.loaded_modules.items():
+        m[1]._module.cleanup()
 
 
-@pytest.fixture
-async def smoothie(monkeypatch):
+@pytest.fixture()
+async def smoothie(
+    monkeypatch: pytest.MonkeyPatch,
+) -> AsyncGenerator[SmoothieDriverType, None]:
     from opentrons.drivers.smoothie_drivers import SmoothieDriver
     from opentrons.config import robot_configs
 
@@ -266,8 +324,8 @@ async def smoothie(monkeypatch):
     monkeypatch.setenv("ENABLE_VIRTUAL_SMOOTHIE", "false")
 
 
-@pytest.fixture
-def hardware_controller_lockfile():
+@pytest.fixture()
+def hardware_controller_lockfile() -> Generator[str, None, None]:
     old_lockfile = config.CONFIG["hardware_controller_lockfile"]
     with tempfile.TemporaryDirectory() as td:
         config.CONFIG["hardware_controller_lockfile"] = (
@@ -277,8 +335,8 @@ def hardware_controller_lockfile():
         config.CONFIG["hardware_controller_lockfile"] = old_lockfile
 
 
-@pytest.fixture
-def running_on_pi():
+@pytest.fixture()
+def running_on_pi() -> Generator[None, None, None]:
     oldpi = config.IS_ROBOT
     config.IS_ROBOT = True
     yield
@@ -286,24 +344,25 @@ def running_on_pi():
 
 
 @pytest.mark.skipif(
-    not hc.Controller, reason="hardware controller not available " "(probably windows)"
+    not hc.Controller,
+    reason="hardware controller not available (probably windows)",
 )
-@pytest.fixture
-def cntrlr_mock_connect(monkeypatch):
-    async def mock_connect(obj, port=None):
+@pytest.fixture()
+def cntrlr_mock_connect(monkeypatch: pytest.MonkeyPatch) -> None:
+    async def mock_connect(obj: object, port: Any = None) -> None:
         return
 
     monkeypatch.setattr(hc.Controller, "connect", mock_connect)
     monkeypatch.setattr(hc.Controller, "fw_version", "virtual")
 
 
-@pytest.fixture
-async def hardware_api(loop, is_robot):
-    hw_api = await API.build_hardware_simulator(loop=loop)
+@pytest.fixture()
+async def hardware_api(is_robot: None) -> HardwareControlAPI:
+    hw_api = await API.build_hardware_simulator(loop=asyncio.get_running_loop())
     return hw_api
 
 
-@pytest.fixture
+@pytest.fixture()
 def get_labware_fixture() -> Callable[[str], LabwareDefinition]:
     def _get_labware_fixture(fixture_name: str) -> LabwareDefinition:
         with open(
@@ -325,9 +384,13 @@ def get_labware_fixture() -> Callable[[str], LabwareDefinition]:
     return _get_labware_fixture
 
 
-@pytest.fixture
-def get_json_protocol_fixture():
-    def _get_json_protocol_fixture(fixture_version, fixture_name, decode=True):
+@pytest.fixture()
+def get_json_protocol_fixture() -> Callable[[str, str, bool], Union[str, JsonProtocol]]:
+    def _get_json_protocol_fixture(
+        fixture_version: str,
+        fixture_name: str,
+        decode: bool = True,
+    ) -> Union[str, JsonProtocol]:
         with open(
             pathlib.Path(__file__).parent
             / ".."
@@ -342,16 +405,16 @@ def get_json_protocol_fixture():
         ) as f:
             contents = f.read().decode("utf-8")
             if decode:
-                return json.loads(contents)
+                return cast(JsonProtocol, json.loads(contents))
             else:
                 return contents
 
     return _get_json_protocol_fixture
 
 
-@pytest.fixture
-def get_module_fixture():
-    def _get_module_fixture(fixture_name):
+@pytest.fixture()
+def get_module_fixture() -> Callable[[str], ModuleDefinitionV2]:
+    def _get_module_fixture(fixture_name: str) -> ModuleDefinitionV2:
         with open(
             pathlib.Path(__file__).parent
             / ".."
@@ -364,14 +427,14 @@ def get_module_fixture():
             / f"{fixture_name}.json",
             "rb",
         ) as f:
-            return json.loads(f.read().decode("utf-8"))
+            return cast(ModuleDefinitionV2, json.loads(f.read().decode("utf-8")))
 
     return _get_module_fixture
 
 
 @pytest.fixture
-def get_bundle_fixture():
-    def get_std_labware(loadName, version=1):
+def get_bundle_fixture() -> Callable[[str], Bundle]:
+    def get_std_labware(loadName: str, version: int = 1) -> LabwareDefinition:
         with open(
             pathlib.Path(__file__).parent
             / ".."
@@ -385,10 +448,10 @@ def get_bundle_fixture():
             / f"{version}.json",
             "rb",
         ) as f:
-            labware_def = json.loads(f.read().decode("utf-8"))
+            labware_def = cast(LabwareDefinition, json.loads(f.read().decode("utf-8")))
         return labware_def
 
-    def _get_bundle_protocol_fixture(fixture_name):
+    def _get_bundle_protocol_fixture(fixture_name: str) -> Bundle:
         """
         It's ugly to store bundles as .zip's, so we'll build the .zip
         from fixtures and return it as `bytes`.
@@ -404,7 +467,10 @@ def get_bundle_fixture():
             / fixture_name
         )
 
-        result = {"filename": f"{fixture_name}.zip", "source_dir": fixture_dir}
+        result: Bundle = {  # type: ignore[typeddict-item]
+            "filename": f"{fixture_name}.zip",
+            "source_dir": fixture_dir,
+        }
 
         fixed_trash_def = get_std_labware("opentrons_1_trash_1100ml_fixed")
 
@@ -490,7 +556,7 @@ def get_bundle_fixture():
     return _get_bundle_protocol_fixture
 
 
-@pytest.fixture
+@pytest.fixture()
 def minimal_labware_def() -> LabwareDefinition:
     return {
         "metadata": {
@@ -535,7 +601,7 @@ def minimal_labware_def() -> LabwareDefinition:
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def minimal_labware_def2() -> LabwareDefinition:
     return {
         "metadata": {
@@ -616,31 +682,31 @@ def minimal_labware_def2() -> LabwareDefinition:
     }
 
 
-@pytest.fixture
-def min_lw_impl(minimal_labware_def) -> LabwareImplementation:
+@pytest.fixture()
+def min_lw_impl(minimal_labware_def: LabwareDefinition) -> LabwareImplementation:
     return LabwareImplementation(
         definition=minimal_labware_def, parent=Location(Point(0, 0, 0), "deck")
     )
 
 
-@pytest.fixture
-def min_lw2_impl(minimal_labware_def2) -> LabwareImplementation:
+@pytest.fixture()
+def min_lw2_impl(minimal_labware_def2: LabwareDefinition) -> LabwareImplementation:
     return LabwareImplementation(
         definition=minimal_labware_def2, parent=Location(Point(0, 0, 0), "deck")
     )
 
 
-@pytest.fixture
-def min_lw(min_lw_impl) -> Labware:
+@pytest.fixture()
+def min_lw(min_lw_impl: LabwareImplementation) -> Labware:
     return Labware(implementation=min_lw_impl)
 
 
-@pytest.fixture
-def min_lw2(min_lw2_impl) -> Labware:
+@pytest.fixture()
+def min_lw2(min_lw2_impl: LabwareImplementation) -> Labware:
     return Labware(implementation=min_lw2_impl)
 
 
-@pytest.fixture
+@pytest.fixture()
 def minimal_module_def() -> ModuleDefinitionV2:
     return {
         "$otSharedSchema": "module/schemas/2",
