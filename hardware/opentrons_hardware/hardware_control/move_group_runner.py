@@ -75,9 +75,9 @@ class MoveGroupRunner:
             The current position after the move for all the axes that
             acknowledged completing moves.
         """
-        if not self._has_moves(self._move_groups):
-            log.debug("No moves. Nothing to do.")
-            return {}
+        # if not self._has_moves(self._move_groups):
+        #     log.debug("No moves. Nothing to do.")
+        #     return {}
 
         await self._clear_groups(can_messenger)
         await self._send_groups(can_messenger)
@@ -85,8 +85,8 @@ class MoveGroupRunner:
         return self._accumulate_move_completions(move_completion_data)
 
     @staticmethod
-    def _accumulate_move_completions(completions: _Completions) -> NodeDict[float]:
-        position: NodeDict[List[Tuple[Tuple[int, int], float]]] = defaultdict(list)
+    def _accumulate_move_completions(completions: _Completions) -> NodeDict[Tuple[float, float]]:
+        position: NodeDict[List[Tuple[Tuple[int, int], float, float]]] = defaultdict(list)
         for arbid, completion in completions:
             position[NodeId(arbid.parts.originating_node_id)].append(
                 (
@@ -95,8 +95,11 @@ class MoveGroupRunner:
                         completion.payload.seq_id.value,
                     ),
                     float(completion.payload.current_position_um.value) / 1000.0,
+                    float(completion.payload.encoder_position.value) / 1000.0,
                 )
             )
+            print("{} Encoder Position:".format(arbid.parts.originating_node_id))
+            print(float(completion.payload.encoder_position.value) / 1000.0)
         # for each node, pull the position from the completion with the largest
         # combination of group id and sequence id
         return {
