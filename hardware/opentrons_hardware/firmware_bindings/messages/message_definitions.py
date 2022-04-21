@@ -469,3 +469,17 @@ class BindSensorOutputResponse:  # noqa: D101
     message_id: Literal[
         MessageId.bind_sensor_output_response
     ] = MessageId.bind_sensor_output_response
+
+
+@dataclass
+class GripperInfoRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[MessageId.gripper_info_request] = MessageId.gripper_info_request
+
+
+@dataclass
+class GripperInfoResponse:  # noqa: D101
+    payload: payloads.GripperInfoResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.GripperInfoResponsePayload
+    message_id: Literal[
+        MessageId.gripper_info_response
+    ] = MessageId.gripper_info_response
