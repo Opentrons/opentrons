@@ -88,5 +88,6 @@
   "about_pipette_name": "About {{name}} Pipette",
   "pipette_offset_calibration_needed": "Pipette Offset calibration needed.",
   "calibrate_now": "Calibrate now",
-  "deck_cal_missing": "Pipette Offset calibration missing. Calibrate deck first."
+  "deck_cal_missing": "Pipette Offset calibration missing. Calibrate deck first.",
+  "an_error_occurred_while_updating": "An error occurred while updating your pipette's settings. Please try again."
 }
