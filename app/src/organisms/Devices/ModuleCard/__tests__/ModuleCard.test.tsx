@@ -139,15 +139,7 @@ describe('ModuleCard', () => {
       <div>mock firmware update failed modal</div>
     )
     mockToast.mockReturnValue(<div>mock toast</div>)
-    mockGetRequestById.mockReturnValue({
-      status: RobotApi.SUCCESS,
-      response: {
-        method: 'POST',
-        ok: true,
-        path: '/',
-        status: 200,
-      },
-    })
+    mockGetRequestById.mockReturnValue(null)
     when(mockUseCurrentRunStatus)
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_IDLE)
@@ -255,6 +247,22 @@ describe('ModuleCard', () => {
       robotName: mockRobot.name,
     })
     getByText(nestedTextMatcher('Module is hot to the touch'))
+  })
+  it('renders information success toast when update has completed', () => {
+    mockGetRequestById.mockReturnValue({
+      status: RobotApi.SUCCESS,
+      response: {
+        method: 'POST',
+        ok: true,
+        path: '/',
+        status: 200,
+      },
+    })
+    const { getByText } = render({
+      module: mockHotHeaterShaker,
+      robotName: mockRobot.name,
+    })
+    getByText('mock toast')
   })
   it('renders information for a magnetic module when an update is available so update banner renders', () => {
     const { getByText } = render({

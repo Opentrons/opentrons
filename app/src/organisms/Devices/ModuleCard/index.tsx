@@ -90,9 +90,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showTestShake, setShowTestShake] = React.useState(false)
   const [showBanner, setShowBanner] = React.useState<boolean>(true)
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
-  const [currentFwVersion, setFwVersion] = React.useState<number>(
-    parseInt(module.fwVersion)
-  )
   const [targetProps, tooltipProps] = useHoverTooltip()
   const history = useHistory()
   const [dispatchApiRequest, requestIds] = useDispatchApiRequest()
@@ -103,7 +100,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       }
     },
   })
-  const oldFwVersion = currentFwVersion
   const latestRequestId = last(requestIds)
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId ? getRequestById(state, latestRequestId) : null
@@ -115,13 +111,16 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   }
   const handleUpdateClick = (): void => {
     robotName && dispatchApiRequest(updateModule(robotName, module.serial))
-    if (latestRequest?.status === SUCCESS) {
-      setFwVersion(parseInt(module.fwVersion))
-      if (currentFwVersion > oldFwVersion) {
-        setShowSuccessToast(true)
-      }
-    }
   }
+  React.useEffect(() => {
+    if (
+      module.hasAvailableUpdate === false &&
+      latestRequest?.status === SUCCESS
+    ) {
+      setShowSuccessToast(true)
+    }
+  }, [module.hasAvailableUpdate, latestRequest?.status])
+
   const isPending = latestRequest?.status === PENDING
   const hotToTouch: IconProps = { name: 'ot-hot-to-touch' }
 

@@ -6,13 +6,13 @@ import {
   JUSTIFY_FLEX_END,
   Text,
   SPACING,
-  TYPOGRAPHY,
   DIRECTION_COLUMN,
   Icon,
   COLORS,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../../atoms/Buttons'
+import { StyledText } from '../../../atoms/text'
 import { Modal } from '../../../atoms/Modal'
 
 import type { AttachedModule } from '../../../redux/modules/types'
@@ -36,7 +36,9 @@ export const FirmwareUpdateFailedModal = (
         name="information"
         aria-label="information"
       />
-      <Text marginLeft={SPACING.spacing3}>{t('firmware_update_failed')}</Text>
+      <StyledText marginLeft={SPACING.spacing3}>
+        {t('firmware_update_failed')}
+      </StyledText>
     </Flex>
   )
 
@@ -44,7 +46,6 @@ export const FirmwareUpdateFailedModal = (
     <Modal title={title} onClose={onCloseClick}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        fontSize={TYPOGRAPHY.fontSizeP}
         data-testid={`FirmwareUpdateFailedModal_body_text_${module.serial}`}
       >
         <Text paddingBottom={SPACING.spacing2}>
@@ -58,11 +59,12 @@ export const FirmwareUpdateFailedModal = (
         justifyContent={JUSTIFY_FLEX_END}
         data-testid={`FirmwareUpdateFailedModal_cancel_btn_${module.serial}`}
       >
-        <Flex textTransform={TEXT_TRANSFORM_CAPITALIZE}>
-          <PrimaryButton onClick={onCloseClick}>
-            {t('shared:close')}
-          </PrimaryButton>
-        </Flex>
+        <PrimaryButton
+          onClick={onCloseClick}
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        >
+          {t('shared:close')}
+        </PrimaryButton>
       </Flex>
     </Modal>
   )
