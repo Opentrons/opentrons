@@ -58,8 +58,9 @@ export function RenameRobotSlideout({
       const newName = values.newRobotName
       // const inputForm = document.getElementById('newRobotName')
       // if (inputForm) inputForm.style.border = `1px solid ${COLORS.medGrey}`
+      setPreviousRobotName(robotName)
       updateRobotName(newName)
-      resetForm({ values: undefined })
+      // resetForm({ values: undefined })
     },
     validate: values => {
       const errors: FormikErrors = {}
@@ -85,10 +86,10 @@ export function RenameRobotSlideout({
     },
   })
 
-  const handleRenameRobot = (): void => {
-    setPreviousRobotName(robotName)
-    updateRobotName(newRobotName as string)
-  }
+  // const handleRenameRobot = (): void => {
+  //   setPreviousRobotName(robotName)
+  //   updateRobotName(newRobotName as string)
+  // }
 
   // const handleUserInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
   //   e.preventDefault()
@@ -114,7 +115,7 @@ export function RenameRobotSlideout({
             formik.errors.newRobotName != null ||
             formik.values.newRobotName === ''
           }
-          onClick={handleRenameRobot}
+          onClick={formik.handleSubmit}
           width="100%"
         >
           {t('rename_robot_button')}
