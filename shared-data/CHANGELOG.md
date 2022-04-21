@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
+
+
+### Bug Fixes
+
+* **api:** drop loop parameters removed in Python 3.10 ([#9368](https://github.com/Opentrons/opentrons/issues/9368)) ([e549c8c](https://github.com/Opentrons/opentrons/commit/e549c8c20205f7575700ed4df0adae18990305a9)), closes [#9331](https://github.com/Opentrons/opentrons/issues/9331)
+* **labware-library:** Update shop links for alumn block nest ([#9406](https://github.com/Opentrons/opentrons/issues/9406)) ([e46879e](https://github.com/Opentrons/opentrons/commit/e46879e5818d13ce414a4c7064ccebc1e3e36feb)), closes [#9375](https://github.com/Opentrons/opentrons/issues/9375)
+* **shared-data:** Add Python tests for JSON v5 type-checking, and fix several small bugs ([#9720](https://github.com/Opentrons/opentrons/issues/9720)) ([805a262](https://github.com/Opentrons/opentrons/commit/805a26272c62078e6f0de28dab7dc94c96ee2006))
+
+
+### Features
+
+* **api:** add ProtocolEngine-based analysis CLI ([#9862](https://github.com/Opentrons/opentrons/issues/9862)) ([257b06d](https://github.com/Opentrons/opentrons/commit/257b06d9b82ff6ab0c472bde064f144b023cd4a2))
+* **api:** Analyze v6 json protocols and translate v6 commands to protocol engine  ([#9772](https://github.com/Opentrons/opentrons/issues/9772)) ([c6bc5d8](https://github.com/Opentrons/opentrons/commit/c6bc5d857ba080dc9ed0392bc42822471f091ddd))
+* **app:** add test shake slideout ([#9680](https://github.com/Opentrons/opentrons/issues/9680)) ([f3c8296](https://github.com/Opentrons/opentrons/commit/f3c82961939c5627de5dae1a68b78e2caad328d0)), closes [#9317](https://github.com/Opentrons/opentrons/issues/9317)
+* **app:** create Banner component and add throughout module cards ([#9740](https://github.com/Opentrons/opentrons/issues/9740)) ([161a554](https://github.com/Opentrons/opentrons/commit/161a554ce57133eff511e05e6975fb5491d2ce95)), closes [#9290](https://github.com/Opentrons/opentrons/issues/9290) [#9545](https://github.com/Opentrons/opentrons/issues/9545)
+* **app:** create Slideout component and make mag deck slideout ([#9382](https://github.com/Opentrons/opentrons/issues/9382)) ([1a3441b](https://github.com/Opentrons/opentrons/commit/1a3441b9532e5c37b699cd599a92fcb1a7837e2c)), closes [#8788](https://github.com/Opentrons/opentrons/issues/8788)
+* **app:** creates temp module slideout ([#9415](https://github.com/Opentrons/opentrons/issues/9415)) ([4f85fd5](https://github.com/Opentrons/opentrons/commit/4f85fd560ba1b9f72fe8471b0b5ea6b4bcb32655)), closes [#8790](https://github.com/Opentrons/opentrons/issues/8790)
+* **app:** heater shaker wizard test shake ([#9549](https://github.com/Opentrons/opentrons/issues/9549)) ([fa6f9c6](https://github.com/Opentrons/opentrons/commit/fa6f9c6f146a2eb3c54ca0131461abb22c8ec715))
+* **app:** slideout and functionality to heater shaker overflow menu ([#9682](https://github.com/Opentrons/opentrons/issues/9682)) ([271dea6](https://github.com/Opentrons/opentrons/commit/271dea6d1924a795f56aee1e2a0839ef8d10bf61)), closes [#9304](https://github.com/Opentrons/opentrons/issues/9304) [#9303](https://github.com/Opentrons/opentrons/issues/9303) [#9302](https://github.com/Opentrons/opentrons/issues/9302) [#9450](https://github.com/Opentrons/opentrons/issues/9450)
+* **app:** wire up Heater Shaker wizard intro page ([#9867](https://github.com/Opentrons/opentrons/issues/9867)) ([f6235c0](https://github.com/Opentrons/opentrons/commit/f6235c055f1ff180edbd594692d2dc783ac3fc4a)), closes [#9518](https://github.com/Opentrons/opentrons/issues/9518)
+* **app, app-shell, api-client:** include analysis as cli tool within app for protocol ingestion  ([#9825](https://github.com/Opentrons/opentrons/issues/9825)) ([cdf6c59](https://github.com/Opentrons/opentrons/commit/cdf6c59a96ea6ea5dca2ed79269537dbc0bc6ff7))
+* **heater-shaker:** update module definition ([#9759](https://github.com/Opentrons/opentrons/issues/9759)) ([8c0a796](https://github.com/Opentrons/opentrons/commit/8c0a796a2e687d9ec514a49952db705270468804))
+* **protocol-designer:** add load liquid commands ([#9923](https://github.com/Opentrons/opentrons/issues/9923)) ([5b003f5](https://github.com/Opentrons/opentrons/commit/5b003f57ed224b69c2b133156c8685e3808e812b)), closes [#9702](https://github.com/Opentrons/opentrons/issues/9702)
+* **protocol-designer:** add schema v6 migration support ([#9595](https://github.com/Opentrons/opentrons/issues/9595)) ([639cc00](https://github.com/Opentrons/opentrons/commit/639cc0093aac7cf960d0254796c5ca0131d15e25)), closes [#9542](https://github.com/Opentrons/opentrons/issues/9542)
+* **robot-server:** recognize JSONv6 as a valid main protocol file ([#9686](https://github.com/Opentrons/opentrons/issues/9686)) ([32a5ed0](https://github.com/Opentrons/opentrons/commit/32a5ed00882aa981821f6e14cad720958e4ddc89))
+* **shared-data:** add heater shaker 2d render key ([#9707](https://github.com/Opentrons/opentrons/issues/9707)) ([094af23](https://github.com/Opentrons/opentrons/commit/094af238976532e99a8324e0d89a1a2101a5e095))
+* **step-generation, protocol-designer:** add JSON schema v6 support ([#9824](https://github.com/Opentrons/opentrons/issues/9824)) ([0c95a58](https://github.com/Opentrons/opentrons/commit/0c95a58c309ea8d901bbb9fac82f371c296fe1d4))
+
+
+
+
+
 ## [5.0.2](https://github.com/Opentrons/opentrons/compare/v5.0.1...v5.0.2) (2022-03-03)
 
 
