@@ -7,7 +7,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 ---
 
 # Opentrons App Changes in 5.1.0-beta.0
-Welcome to the beta release of v5.1.0 release of the Opentrons App!
+Welcome to the beta release of v5.1.0 of the Opentrons App!
 
 After you update your app, please be sure to update any OT-2s you will be using with this beta.
 The 5.1.0 release reshapes the main navigational structure.  We're very excited for you to try this new experience out, and we appreciate your feedback (and patience) as you use this new software.
