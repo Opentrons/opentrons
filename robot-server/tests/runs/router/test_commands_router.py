@@ -62,7 +62,8 @@ async def test_create_run_command(decoy: Decoy, mock_engine_store: EngineStore) 
         )
         return command_once_added
 
-    decoy.when(mock_engine_store.engine.add_command(command_request)).then_do(
+    decoy.when(mock_engine_store.engine.add_command(
+        command_request, is_setup=False)).then_do(
         _stub_queued_command_state
     )
 
@@ -70,6 +71,7 @@ async def test_create_run_command(decoy: Decoy, mock_engine_store: EngineStore) 
         request_body=RequestModel(data=command_request),
         waitUntilComplete=False,
         engine_store=mock_engine_store,
+        isSetupCommand=False,
         run=run,
     )
 
@@ -378,4 +380,42 @@ async def test_get_run_command_missing_command(
         )
 
     assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["detail"] == "oh no"
+
+
+async def test_add_conflicting_setup_command(
+        decoy: Decoy,
+        mock_engine_store: EngineStore
+) -> None:
+    """It should raise an error if the setup command cannot be added."""
+    command_request = pe_commands.PauseCreate(
+        params=pe_commands.PauseParams(message="Hello")
+    )
+
+    run = Run(
+        id="run-id",
+        protocolId=None,
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=EngineStatus.RUNNING,
+        current=True,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
+    )
+
+    decoy.when(mock_engine_store.engine.add_command(command_request, is_setup=True)
+               ).then_raise(pe_errors.SetupCommandNotAllowedError("oh no"))
+
+    with pytest.raises(ApiError) as exc_info:
+        await create_run_command(
+            request_body=RequestModel(data=command_request),
+            waitUntilComplete=False,
+            isSetupCommand=True,
+            engine_store=mock_engine_store,
+            run=run,
+        )
+
+    assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["detail"] == "oh no"

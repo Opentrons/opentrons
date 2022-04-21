@@ -89,6 +89,10 @@ class MustHomeError(ProtocolEngineError):
     """An error raised when motors must be homed due to unknown current position."""
 
 
+class SetupCommandNotAllowedError(ProtocolEngineError):
+    """An error raised when adding a setup command to a non-idle/ non-paused engine."""
+
+
 class ProtocolEngineStoppedError(ProtocolEngineError):
     """An error raised when attempting an invalid action with a stopped engine."""
 

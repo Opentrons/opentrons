@@ -37,6 +37,13 @@ class CommandNotFound(ErrorDetails):
     title: str = "Run Command Not Found"
 
 
+class CommandNotAllowed(ErrorDetails):
+    """An error if a given run command is not allowed."""
+
+    id: Literal["CommandNotAllowed"] = "CommandNotAllowed"
+    title: str = "Setup Command Not Allowed"
+
+
 class CommandLinkMeta(BaseModel):
     """Metadata about a command resource referenced in `links`."""
 
@@ -111,6 +118,15 @@ async def create_run_command(
             " Inspect the returned command's `status` to detect the timeout."
         ),
     ),
+    isSetupCommand: bool = Query(
+        default=False,
+        description=(
+            "If `false`, then this command will be queued as part of protocol commands"
+            "\n\n"
+            "If `true`, and protocol is paused/ idle, then this command will be added "
+            "to a separate queue and will be executed immediately."
+        ),
+    ),
     engine_store: EngineStore = Depends(get_engine_store),
     run: Run = Depends(get_run_data_from_url),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
@@ -123,6 +139,8 @@ async def create_run_command(
             Else, return immediately. Comes from a query parameter in the URL.
         timeout: The maximum time, in seconds, to wait before returning.
             Comes from a query parameter in the URL.
+        isSetupCommand: Whether this command is part of a protocol or is a setup command
+            that should be executed immediately.
         engine_store: Used to retrieve the `ProtocolEngine` on which the new
             command will be enqueued.
         run: Run response model, provided by the route handler for
@@ -135,7 +153,10 @@ async def create_run_command(
         )
 
     engine = engine_store.engine
-    command = engine.add_command(request_body.data)
+    try:
+        command = engine.add_command(request_body.data, is_setup=isSetupCommand)
+    except pe_errors.SetupCommandNotAllowedError as e:
+        raise CommandNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
     if waitUntilComplete:
         with move_on_after(timeout / 1000.0):
