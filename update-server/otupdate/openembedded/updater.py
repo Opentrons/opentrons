@@ -10,7 +10,7 @@ from otupdate.common.file_actions import (
     verify_signature,
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
-from typing import Callable, Optional
+from typing import Callable, Optional, List
 import enum
 import subprocess
 
@@ -132,6 +132,19 @@ class Updater(UpdateActionsInterface):
         self.root_FS_intf = root_FS_intf
         self.part_mngr = part_mngr
 
+    def get_required_files(self, cert_path: str) -> List[str]:
+        required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
+        if cert_path:
+            required.append(ROOTFS_SIG_NAME)
+        return required
+
+    def get_update_pkg_name(self) -> str:
+        return UPDATE_PKG
+
+    def check_update_pkg_name(self, name: str) -> bool:
+        """Make sure we're dealing with a valid update package!"""
+        return name is UPDATE_PKG
+
     def validate_update(
         self,
         filepath: str,
@@ -158,9 +171,7 @@ class Updater(UpdateActionsInterface):
         def zip_callback(progress):
             progress_callback(progress / 2.0)
 
-        required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
-        if cert_path:
-            required.append(ROOTFS_SIG_NAME)
+        required = self.get_required_files(cert_path)
         files, sizes = unzip_update(filepath, zip_callback, UPDATE_FILES, required)
 
         def hash_callback(progress):

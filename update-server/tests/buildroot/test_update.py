@@ -8,6 +8,7 @@ import zipfile
 import pytest
 
 from otupdate.buildroot import update, config, update_actions
+from otupdate.openembedded import updater
 from otupdate.common import file_actions
 from otupdate.common.session import UpdateSession, Stages
 

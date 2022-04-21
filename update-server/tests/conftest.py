@@ -53,7 +53,7 @@ def downloaded_update_file(request, extracted_update_file):
     This uses :py:meth:`extracted_update_file` to generate the contents, so
     marks that fixture understands can be used when requesting this fixture
 
-    Can also be used by tests that will uploaded it to a test server, since
+    Can also be used by tests that will upload it to a test server, since
     when the test server boots its download path will be somewhere else
     """
     rootfs_path = os.path.join(extracted_update_file, "rootfs.ext4")
