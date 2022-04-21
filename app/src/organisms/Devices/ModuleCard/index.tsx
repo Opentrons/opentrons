@@ -262,10 +262,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             onCloseClick={() => setShowTestShake(false)}
           />
         )}
-        <Box
-          padding={`${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing3}`}
-          width="100%"
-        >
+        <Box padding={`${SPACING.spacing4} ${SPACING.spacing3}`} width="100%">
           <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
             <Flex alignItems={ALIGN_START} opacity={isPending ? '50%' : '100%'}>
               <img width="60px" height="54px" src={image} alt={module.model} />
