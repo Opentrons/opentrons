@@ -70,12 +70,15 @@ async def get_protocol_store(
     return protocol_store
 
 
-def get_analysis_store(app_state: AppState = Depends(get_app_state)) -> AnalysisStore:
+def get_analysis_store(
+    app_state: AppState = Depends(get_app_state),
+    sql_engine: SQLEngine = Depends(get_sql_engine),
+) -> AnalysisStore:
     """Get a singleton AnalysisStore to keep track of created analyses."""
     analysis_store = _analysis_store.get_from(app_state)
 
     if analysis_store is None:
-        analysis_store = AnalysisStore()
+        analysis_store = AnalysisStore(sql_engine=sql_engine)
         _analysis_store.set_on(app_state, analysis_store)
 
     return analysis_store

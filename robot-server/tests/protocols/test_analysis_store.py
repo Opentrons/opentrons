@@ -1,7 +1,10 @@
 """Tests for the AnalysisStore interface."""
 import pytest
 from datetime import datetime
-from typing import List, NamedTuple
+from pathlib import Path
+from typing import Generator, List, NamedTuple
+
+from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import (
@@ -10,6 +13,7 @@ from opentrons.protocol_engine import (
     types as pe_types,
 )
 
+from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.analysis_models import (
     AnalysisResult,
@@ -18,9 +22,25 @@ from robot_server.protocols.analysis_models import (
 )
 
 
-def test_get_empty() -> None:
+@pytest.fixture
+def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
+    """Return a set-up database to back the store."""
+    db_file_path = tmp_path / "test.db"
+    sql_engine = open_db_no_cleanup(db_file_path=db_file_path)
+    try:
+        add_tables_to_db(sql_engine)
+        yield sql_engine
+    finally:
+        sql_engine.dispose()
+
+
+@pytest.fixture
+def subject(sql_engine: SQLEngine) -> AnalysisStore:
+    return AnalysisStore(sql_engine=sql_engine)
+
+
+def test_get_empty(subject: AnalysisStore) -> None:
     """It should return an empty list if no analysis saved."""
-    subject = AnalysisStore()
     result = subject.get_by_protocol("protocol-id")
     summaries_result = subject.get_summaries_by_protocol("protocol-id")
 
@@ -28,9 +48,8 @@ def test_get_empty() -> None:
     assert summaries_result == []
 
 
-def test_add_pending() -> None:
+def test_add_pending(subject: AnalysisStore) -> None:
     """It should add a pending analysis to the store."""
-    subject = AnalysisStore()
     expected_pending_analysis = PendingAnalysis(id="analysis-id")
 
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
@@ -42,7 +61,7 @@ def test_add_pending() -> None:
     ]
 
 
-def test_add_analysis_equipment() -> None:
+def test_add_analysis_equipment(subject: AnalysisStore) -> None:
     """It should add labware and pipettes to the stored analysis."""
     labware = pe_types.LoadedLabware(
         id="labware-id",
@@ -58,7 +77,6 @@ def test_add_analysis_equipment() -> None:
         mount=MountType.LEFT,
     )
 
-    subject = AnalysisStore()
     subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
     subject.update(
         analysis_id="analysis-id",
@@ -122,13 +140,12 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
 
 @pytest.mark.parametrize(CommandAnalysisSpec._fields, command_analysis_specs)
 def test_add_parses_labware_commands(
+    subject: AnalysisStore,
     commands: List[pe_commands.Command],
     errors: List[pe_errors.ErrorOccurrence],
     expected_result: AnalysisResult,
 ) -> None:
     """It should be able to parse the commands list for analysis results."""
-    subject = AnalysisStore()
-
     subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
     subject.update(
         analysis_id="analysis-id",
