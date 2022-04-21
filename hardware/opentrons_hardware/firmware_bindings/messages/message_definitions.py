@@ -489,14 +489,18 @@ class GripperInfoResponse:  # noqa: D101
 class PickUpTipRequest:  # noqa: D101
     payload: payloads.PickUpTipRequestPayload
     payload_type: Type[BinarySerializable] = payloads.PickUpTipRequestPayload
-    message_id: Literal[MessageId.pick_up_tip_request] = MessageId.pick_up_tip_request
+    message_id: Literal[
+        MessageId.do_self_contained_pickup_request
+    ] = MessageId.do_self_contained_pickup_request
 
 
 @dataclass
 class PickUpTipResponse:  # noqa: D101
     payload: payloads.PickUpTipResponsePayload
     payload_type: Type[BinarySerializable] = payloads.PickUpTipResponsePayload
-    message_id: Literal[MessageId.pick_up_tip_response] = MessageId.pick_up_tip_response
+    message_id: Literal[
+        MessageId.do_self_contained_pickup_response
+    ] = MessageId.do_self_contained_pickup_response
 
 
 @dataclass
