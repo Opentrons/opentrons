@@ -2,6 +2,7 @@
 import sqlalchemy
 from dataclasses import dataclass
 from typing import Dict
+from pydantic import parse_obj_as
 
 from opentrons.protocol_runner import ProtocolRunData
 
@@ -49,7 +50,7 @@ class EngineStateStore:
         return state
 
     def get(self, run_id: str) -> EngineStateResource:
-        """Get engine state to db.
+        """Get engine state from db.
 
         Arguments:
             run_id: Run id related to the engine state.
@@ -66,9 +67,15 @@ class EngineStateStore:
 
 
 def _convert_sql_row_to_sql_engine_state(
-    sql_row: sqlalchemy.engine.Row,
+        sql_row: sqlalchemy.engine.Row,
 ) -> EngineStateResource:
-    pass
+    run_id = sql_row.run_id
+    assert isinstance(run_id, str)
+
+    state = sql_row.state
+    assert isinstance(state, str)
+
+    return EngineStateResource(run_id=run_id, state=parse_obj_as(ProtocolRunData, state))
 
 
 def _convert_state_to_sql_values(state: EngineStateResource) -> Dict[str, object]:

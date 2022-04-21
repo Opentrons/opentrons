@@ -87,7 +87,7 @@ engine_state_table = sqlalchemy.Table(
     _metadata,
     sqlalchemy.Column("id", sqlalchemy.INT, primary_key=True),
     # sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False),
-    sqlalchemy.Column("state", sqlalchemy.JSON, nullable=False),
+    sqlalchemy.Column("state", sqlalchemy.TEXT, nullable=False),
     sqlalchemy.Column(
         "run_id",
         sqlalchemy.String,

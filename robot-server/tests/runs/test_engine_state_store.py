@@ -92,9 +92,17 @@ def test_insert_state(subject: EngineStateStore, protocol_run: ProtocolRunData) 
     assert result == engine_state
 
 
-def test_get_run_state(subject: EngineStateStore) -> None:
+def test_get_run_state(subject: EngineStateStore, protocol_run: ProtocolRunData) -> None:
     """It should be able to get engine state from the store."""
-    pass
+    engine_state = EngineStateResource(
+        run_id="run-id",
+        state=protocol_run,
+        # created_at=datetime.now()
+    )
+
+    subject.insert(state=engine_state)
+    result = subject.get("run-id")
+    assert engine_state == result
 
 
 def test_insert_state_run_not_found(
