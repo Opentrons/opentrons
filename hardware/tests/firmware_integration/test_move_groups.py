@@ -43,7 +43,6 @@ def filter_func(arb: ArbitrationId) -> bool:
 @pytest.mark.requires_emulator
 @pytest.mark.can_filter_func.with_args(filter_func)
 async def test_add_moves(
-    loop: asyncio.BaseEventLoop,
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     motor_node_id: NodeId,
@@ -87,7 +86,6 @@ async def test_add_moves(
 
 @pytest.mark.requires_emulator
 async def test_move_integration(
-    loop: asyncio.BaseEventLoop,
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     all_motor_nodes: List[NodeId],

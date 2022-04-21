@@ -19,3 +19,9 @@ export const getStoredProtocol: (
   protocolKey: string
 ) => StoredProtocolData | null = (state, protocolKey) =>
   state.protocolStorage.filesByProtocolKey[protocolKey] ?? null
+
+export const getIsProtocolAnalysisInProgress: (
+  state: State,
+  protocolKey: string
+) => boolean = (state, protocolKey) =>
+  state.protocolStorage.inProgressAnalysisProtocolKeys.includes(protocolKey)

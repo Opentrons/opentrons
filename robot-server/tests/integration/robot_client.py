@@ -53,12 +53,16 @@ class RobotClient:
     async def _poll_for_alive(self) -> None:
         """Retry the /heath and /openapi.json until both reachable."""
         while not await self.alive():
-            pass
+            # Avoid spamming the server in case a request immediately
+            # returns some kind of "not ready."
+            await asyncio.sleep(0.1)
 
     async def _poll_for_dead(self) -> None:
         """Poll the /heath and /openapi.json until both unreachable."""
         while await self.alive():
-            pass
+            # Avoid spamming the server in case a request immediately
+            # returns some kind of "not ready."
+            await asyncio.sleep(0.1)
 
     async def wait_until_alive(self, timeout_sec: float) -> bool:
         try:

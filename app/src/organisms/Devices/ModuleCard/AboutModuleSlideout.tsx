@@ -69,22 +69,19 @@ export const AboutModuleSlideout = (
             css={ALERT_ITEM_STYLE}
             type="warning"
             onCloseClick={() => setShowBanner(false)}
-            title={
-              <>
-                {t('firmware_update_available')}
-                <Btn
-                  textAlign={ALIGN_START}
-                  paddingLeft={SPACING.spacing2}
-                  fontSize={TYPOGRAPHY.fontSizeP}
-                  textDecoration={TEXT_DECORATION_UNDERLINE}
-                  //  TODO(jr, 3/21/22): wire up the link
-                  onClick={() => console.log('firmware update!')}
-                >
-                  {t('view_update')}
-                </Btn>
-              </>
-            }
-          />
+          >
+            {t('firmware_update_available')}
+            <Btn
+              textAlign={ALIGN_START}
+              paddingLeft={SPACING.spacing2}
+              fontSize={TYPOGRAPHY.fontSizeP}
+              textDecoration={TEXT_DECORATION_UNDERLINE}
+              //  TODO(jr, 3/21/22): wire up the link
+              onClick={() => console.log('firmware update!')}
+            >
+              {t('view_update')}
+            </Btn>
+          </Banner>
         </Flex>
       ) : null}
       <Flex flexDirection={DIRECTION_COLUMN}>

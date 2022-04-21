@@ -1,6 +1,8 @@
-import pytest
-from opentrons.hardware_control import modules, ExecutionManager
+import asyncio
 
+import pytest
+
+from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 
@@ -14,25 +16,25 @@ def usb_port():
     )
 
 
-async def test_sim_initialization(loop, usb_port):
+async def test_sim_initialization(usb_port):
     mag = await modules.build(
         port="/dev/ot_module_sim_magdeck0",
         usb_port=usb_port,
         which="magdeck",
         simulating=True,
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     assert isinstance(mag, modules.AbstractModule)
 
 
-async def test_sim_data(loop, usb_port):
+async def test_sim_data(usb_port):
     mag = await modules.build(
         port="/dev/ot_module_sim_magdeck0",
         usb_port=usb_port,
         which="magdeck",
         simulating=True,
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     assert mag.status == "disengaged"
@@ -44,13 +46,13 @@ async def test_sim_data(loop, usb_port):
     assert "data" in mag.live_data
 
 
-async def test_sim_state_update(loop, usb_port):
+async def test_sim_state_update(usb_port):
     mag = await modules.build(
         port="/dev/ot_module_sim_magdeck0",
         usb_port=usb_port,
         which="magdeck",
         simulating=True,
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     await mag.calibrate()
@@ -61,13 +63,13 @@ async def test_sim_state_update(loop, usb_port):
     assert mag.status == "disengaged"
 
 
-async def test_revision_model_parsing(loop, usb_port):
+async def test_revision_model_parsing(usb_port):
     mag = await modules.build(
         "",
         "magdeck",
         True,
         usb_port,
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     mag._device_info["model"] = "mag_deck_v1.1"

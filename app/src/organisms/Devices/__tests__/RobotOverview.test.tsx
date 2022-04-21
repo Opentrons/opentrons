@@ -9,12 +9,14 @@ import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useLights, useRobot, useIsRobotViewable } from '../hooks'
+import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 import { RobotOverview } from '../RobotOverview'
 
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 jest.mock('../RobotStatusBanner')
+jest.mock('../../UpdateRobotBanner')
 jest.mock('../../ChooseProtocolSlideout')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
@@ -32,6 +34,9 @@ const mockRobotStatusBanner = RobotStatusBanner as jest.MockedFunction<
 >
 const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction<
   typeof ChooseProtocolSlideout
+>
+const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
+  typeof UpdateRobotBanner
 >
 
 const mockToggleLights = jest.fn()
@@ -60,6 +65,7 @@ describe('RobotOverview', () => {
         Mock Choose Protocol Slideout {showSlideout ? 'showing' : 'hidden'}
       </div>
     ))
+    mockUpdateRobotBanner.mockReturnValue(<div>Mock UpdateRobotBanner</div>)
     mockUseCurrentRunId.mockReturnValue(null)
     mockUseIsRobotViewable.mockReturnValue(true)
   })
@@ -76,6 +82,11 @@ describe('RobotOverview', () => {
   it('renders a RobotStatusBanner component', () => {
     const [{ getByText }] = render()
     getByText('Mock RobotStatusBanner')
+  })
+
+  it('renders a UpdateRobotBanner component', () => {
+    const [{ getByText }] = render()
+    getByText('Mock UpdateRobotBanner')
   })
 
   it('renders a lights toggle button', () => {
