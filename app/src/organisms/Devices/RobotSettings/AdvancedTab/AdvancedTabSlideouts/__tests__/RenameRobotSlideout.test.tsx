@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../../i18n'
 
@@ -33,7 +33,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
 
     getByText('Rename Robot')
     getByText(
-      'Choose a name for your robot. You can use letters, numbers, spaces, special characters (!?$*) and emojis.'
+      'Please enter 35 characters max using valid inputs: letters, numbers, spaces and these special characters: !?$*’-_.'
     )
     getByText('Robot Name')
     getByText('35 characters max')
@@ -43,34 +43,60 @@ describe('RobotSettings RenameRobotSlideout', () => {
     expect(renameButton).toBeDisabled()
   })
 
-  it('should be disabled false when a user typing allowed characters', () => {
+  it('should be disabled false when a user typing allowed characters', async () => {
     const [{ getByRole }] = render()
     const input = getByRole('textbox')
     fireEvent.change(input, { target: { value: 'mockInput' } })
-    expect(input).toHaveValue('mockInput')
-    const renameButton = getByRole('button', { name: 'Rename robot' })
-    expect(renameButton).not.toBeDisabled()
-  })
 
-  it('should keep disabled when a user types invalid character/characters', () => {
-    const [{ getByRole }] = render()
-    const input = getByRole('textbox')
-    fireEvent.change(input, { target: { value: '@@@@mockInput' } })
-    expect(input).toHaveValue('@@@@mockInput')
-    const renameButton = getByRole('button', { name: 'Rename robot' })
-    expect(renameButton).toBeDisabled()
-  })
-
-  it('should keep disabled when a user types more than 36 characters', () => {
-    const [{ getByRole }] = render()
-    const input = getByRole('textbox')
-    fireEvent.change(input, {
-      target: { value: 'This is 35 characters This is a mock' },
+    await waitFor(() => {
+      expect(input).toHaveValue('mockInput')
+      const renameButton = getByRole('button', { name: 'Rename robot' })
+      expect(renameButton).not.toBeDisabled()
     })
-    expect(input).toHaveValue('This is 35 characters This is a mock')
-    const renameButton = getByRole('button', { name: 'Rename robot' })
-    expect(renameButton).toBeDisabled()
   })
 
-  it('should close the slideout when a user change the name successfully', () => {})
+  it('button should be disabled and render the error message when a user types invalid character/characters', async () => {
+    const [{ getByRole, getByText }] = render()
+    const input = getByRole('textbox')
+    fireEvent.change(input, { target: { value: 'mockInput@@@' } })
+    const renameButton = getByRole('button', { name: /Rename robot/i })
+    await waitFor(() => {
+      expect(input).toHaveValue('mockInput@@@')
+      expect(renameButton).toBeInTheDocument()
+      expect(renameButton).toBeDisabled()
+      getByText(
+        'Please enter 35 characters max using valid inputs: letters, numbers, spaces and these special characters: !?$*’-_.'
+      )
+    })
+  })
+
+  // it('button should be disabled and render the error message when a user types more than 36 characters', () => {
+  //   const [{ getByRole, getByText }] = render()
+  //   const input = getByRole('textbox')
+  //   fireEvent.change(input, {
+  //     target: { value: 'This is 35 characters This is a mock' },
+  //   })
+  //   expect(input).toHaveValue('This is 35 characters This is a mock')
+  //   const renameButton = getByRole('button', { name: 'Rename robot' })
+  //   expect(renameButton).toBeDisabled()
+  //   getByText(
+  //     'Please enter 35 characters max using valid inputs: letters, numbers, spaces and these special characters: !?$*’-_.'
+  //   )
+  // })
+
+  // it('button should be disabled and render the error message when a user tries to use space as the first letter', () => {
+  //   const [{ getByRole, getByText }] = render()
+  //   const input = getByRole('textbox')
+  //   fireEvent.change(input, {
+  //     target: { value: ' ' },
+  //   })
+  //   expect(input).toHaveValue(' ')
+  //   const renameButton = getByRole('button', { name: 'Rename robot' })
+  //   expect(renameButton).toBeDisabled()
+  //   getByText(
+  //     'Please enter 35 characters max using valid inputs: letters, numbers, spaces and these special characters: !?$*’-_.'
+  //   )
+  // })
+
+  // it('should close the slideout when a user change the name successfully', () => {})
 })

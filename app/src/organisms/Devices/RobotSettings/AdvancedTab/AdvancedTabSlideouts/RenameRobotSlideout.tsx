@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useFormik } from 'formik'
+import { ErrorMessage, useFormik } from 'formik'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -61,7 +61,7 @@ export function RenameRobotSlideout({
     validate: values => {
       const errors: FormikErrors = {}
       const newName = values.newRobotName
-      console.log(newName, regexPattern.test(newName) ? 'valid' : 'invalid')
+      // console.log(newName, regexPattern.test(newName) ? 'valid' : 'invalid')
       if (!regexPattern.test(newName)) {
         errors.newRobotName = t('rename_robot_input_error_message')
       }
@@ -71,9 +71,9 @@ export function RenameRobotSlideout({
 
   const { updateRobotName } = useUpdateRobotNameMutation({
     onSuccess: (data: UpdatedRobotName) => {
+      // remove the previous robot name from the list
       dispatch(removeRobot(previousRobotName))
-      data.name != null &&
-        history.push(`/devices/${data.name as string}/robot-settings`)
+      data.name != null && history.push(`/devices/${data.name}/robot-settings`)
     },
     onError: error => {
       console.error('error', error.message)
@@ -87,10 +87,7 @@ export function RenameRobotSlideout({
       isExpanded={isExpanded}
       footer={
         <PrimaryButton
-          disabled={
-            formik.errors.newRobotName != null ||
-            formik.values.newRobotName === ''
-          }
+          disabled={!(formik.isValid && formik.dirty)}
           onClick={formik.handleSubmit}
           width="100%"
         >
