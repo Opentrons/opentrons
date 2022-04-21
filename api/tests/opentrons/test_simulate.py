@@ -1,7 +1,8 @@
-# coding=utf-8
+from __future__ import annotations
 import io
 import os
 from pathlib import Path
+from typing import TYPE_CHECKING, Callable, TextIO, cast
 
 import pytest
 
@@ -9,11 +10,19 @@ from opentrons import simulate, protocols
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 
+if TYPE_CHECKING:
+    from tests.opentrons.conftest import Bundle, Protocol
+
+
 HERE = Path(__file__).parent
 
 
 @pytest.mark.parametrize("protocol_file", ["test_simulate.py"])
-def test_simulate_function_apiv2(protocol, protocol_file, monkeypatch):
+def test_simulate_function_apiv2(
+    protocol: Protocol,
+    protocol_file: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setenv("OT_API_FF_allowBundleCreation", "1")
     runlog, bundle = simulate.simulate(protocol.filelike, "test_simulate.py")
     assert isinstance(bundle, protocols.types.BundleContents)
@@ -26,7 +35,9 @@ def test_simulate_function_apiv2(protocol, protocol_file, monkeypatch):
     ]
 
 
-def test_simulate_function_json_apiv2(get_json_protocol_fixture):
+def test_simulate_function_json_apiv2(
+    get_json_protocol_fixture: Callable[[str, str, bool], str]
+) -> None:
     jp = get_json_protocol_fixture("3", "simple", False)
     filelike = io.StringIO(jp)
     runlog, bundle = simulate.simulate(filelike, "simple.json")
@@ -43,9 +54,14 @@ def test_simulate_function_json_apiv2(get_json_protocol_fixture):
     ]
 
 
-def test_simulate_function_bundle_apiv2(get_bundle_fixture):
-    bundle = get_bundle_fixture("simple_bundle")
-    runlog, bundle = simulate.simulate(bundle["filelike"], "simple_bundle.zip")
+def test_simulate_function_bundle_apiv2(
+    get_bundle_fixture: Callable[[str], Bundle]
+) -> None:
+    bundle_fixture = get_bundle_fixture("simple_bundle")
+    runlog, bundle = simulate.simulate(
+        cast(TextIO, bundle_fixture["filelike"]),
+        "simple_bundle.zip",
+    )
     assert bundle is None
     assert [item["payload"]["text"] for item in runlog] == [
         "Transferring 1.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",  # noqa: E501
@@ -67,13 +83,17 @@ def test_simulate_function_bundle_apiv2(get_bundle_fixture):
 
 
 @pytest.mark.parametrize("protocol_file", ["testosaur.py"])
-def test_simulate_function_v1(protocol, protocol_file):
+def test_simulate_function_v1(protocol: Protocol, protocol_file: str) -> None:
     with pytest.raises(ApiDeprecationError):
         simulate.simulate(protocol.filelike, "testosaur.py")
 
 
 @pytest.mark.parametrize("protocol_file", ["python_v2_custom_lw.py"])
-def test_simulate_extra_labware(protocol, protocol_file, monkeypatch):
+def test_simulate_extra_labware(
+    protocol: Protocol,
+    protocol_file: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     fixturedir = (
         HERE / ".." / ".." / ".." / "shared-data" / "labware" / "fixtures" / "2"
     )
@@ -117,6 +137,10 @@ def test_simulate_extra_labware(protocol, protocol_file, monkeypatch):
 
 
 @pytest.mark.parametrize("protocol_file", ["bug_aspirate_tip.py"])
-def test_simulate_aspirate_tip(protocol, protocol_file, monkeypatch):
+def test_simulate_aspirate_tip(
+    protocol: Protocol,
+    protocol_file: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     with pytest.raises(ExceptionInProtocolError):
         simulate.simulate(protocol.filelike, "bug_aspirate_tip.py")

@@ -32,7 +32,6 @@ async def test_creates_protocol_context(protocol_engine: ProtocolEngine) -> None
 
 
 async def test_wires_protocol_context_to_engine(
-    loop: asyncio.AbstractEventLoop,
     protocol_engine: ProtocolEngine,
 ) -> None:
     """Smoke test the returned ProtocolContext by running a command."""
@@ -41,7 +40,7 @@ async def test_wires_protocol_context_to_engine(
 
     # run a ProtocolContext command in a ThreadPoolExecutor to validate
     # commands are going to the engine across the thread boundary
-    result = await loop.run_in_executor(
+    result = await asyncio.get_running_loop().run_in_executor(
         executor=None,
         func=partial(
             context.load_labware,

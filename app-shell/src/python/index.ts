@@ -1,6 +1,7 @@
 import path from 'path'
 import fs from 'fs-extra'
 import execa from 'execa'
+import uuid from 'uuid/v4'
 
 import { createLogger } from '../log'
 import { getConfig } from '../config'
@@ -40,7 +41,7 @@ export function initializePython(): void {
   }
 }
 
-export function runFileWithPython(
+export function analyzeProtocolSource(
   srcFilePath: string,
   destFilePath: string
 ): Promise<void> {
@@ -63,6 +64,20 @@ export function runFileWithPython(
     })
     .catch(e => {
       log.error(e)
+      fs.writeJSON(destFilePath, {
+        errors: [
+          {
+            id: uuid(),
+            errorType: 'AnalysisError',
+            createdAt: new Date().getTime(),
+            detail: e.message,
+          },
+        ],
+        files: [],
+        config: {},
+        metadata: [],
+        commands: [],
+      })
     })
 }
 

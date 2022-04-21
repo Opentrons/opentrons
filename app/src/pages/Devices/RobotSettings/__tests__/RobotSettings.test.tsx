@@ -6,19 +6,24 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { RobotSettingsCalibration } from '../../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
 import { RobotSettingsNetworking } from '../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
+import { RobotSettingsAdvanced } from '../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettings } from '..'
 
 jest.mock(
   '../../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
 )
 jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking')
+jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced')
+jest.mock('../../../../redux/discovery/selectors')
 
 const mockRobotSettingsCalibration = RobotSettingsCalibration as jest.MockedFunction<
   typeof RobotSettingsCalibration
 >
-
 const mockRobotSettingsNetworking = RobotSettingsNetworking as jest.MockedFunction<
   typeof RobotSettingsNetworking
+>
+const mockRobotSettingsAdvanced = RobotSettingsAdvanced as jest.MockedFunction<
+  typeof RobotSettingsAdvanced
 >
 
 const render = (path = '/') => {
@@ -41,6 +46,9 @@ describe('RobotSettings', () => {
     )
     mockRobotSettingsNetworking.mockReturnValue(
       <div>Mock RobotSettingsNetworking</div>
+    )
+    mockRobotSettingsAdvanced.mockReturnValue(
+      <div>Mock RobotSettingsAdvanced</div>
     )
   })
   afterEach(() => {
@@ -84,5 +92,16 @@ describe('RobotSettings', () => {
     expect(queryByText('Mock RobotSettingsNetworking')).toBeFalsy()
     networkingTab.click()
     getByText('Mock RobotSettingsNetworking')
+  })
+
+  it('renders advanced content when the advanced tab is clicked', () => {
+    const [{ getByText, queryByText }] = render(
+      '/devices/otie/robot-settings/calibration'
+    )
+
+    const AdvancedTab = getByText('Advanced')
+    expect(queryByText('Mock RobotSettingsAdvanced')).toBeFalsy()
+    AdvancedTab.click()
+    getByText('Mock RobotSettingsAdvanced')
   })
 })
