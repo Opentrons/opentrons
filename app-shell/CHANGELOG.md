@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
+
+
+### Features
+
+* **app:**  App robot settings advanced tab robot update ([#10010](https://github.com/Opentrons/opentrons/issues/10010)) ([cf4e9ec](https://github.com/Opentrons/opentrons/commit/cf4e9ecf1bc825bf86339fb0867781a8e25f7e3a))
+* **app:** add managed file system storage for protocols ([#9703](https://github.com/Opentrons/opentrons/issues/9703)) ([153431f](https://github.com/Opentrons/opentrons/commit/153431f7092ce542d068fcd603f423cd3f5442ad)), closes [#9483](https://github.com/Opentrons/opentrons/issues/9483) [#9405](https://github.com/Opentrons/opentrons/issues/9405)
+* **app:** import new custom labware definition ([#9749](https://github.com/Opentrons/opentrons/issues/9749)) ([d3479fd](https://github.com/Opentrons/opentrons/commit/d3479fdb07ab12cf8199e8d7160478ef99061601)), closes [#8866](https://github.com/Opentrons/opentrons/issues/8866)
+* **app, app-shell:** add labware details slideout and overflow menu ([#9894](https://github.com/Opentrons/opentrons/issues/9894)) ([dee5a11](https://github.com/Opentrons/opentrons/commit/dee5a11e594f48b9bd642755d5cc63c023d6c0dc)), closes [#8870](https://github.com/Opentrons/opentrons/issues/8870)
+* **app, app-shell, api-client:** include analysis as cli tool within app for protocol ingestion  ([#9825](https://github.com/Opentrons/opentrons/issues/9825)) ([cdf6c59](https://github.com/Opentrons/opentrons/commit/cdf6c59a96ea6ea5dca2ed79269537dbc0bc6ff7))
+
+
+
+
+
 ## [5.0.2](https://github.com/Opentrons/opentrons/compare/v5.0.1...v5.0.2) (2022-03-03)
 
 **Note:** Version bump only for package @opentrons/app-shell

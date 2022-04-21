@@ -1,6 +1,7 @@
 export interface Health {
   name: string
   api_version: string
+  serial_number: string
   fw_version: string
   board_revision: string
   logs: string[]

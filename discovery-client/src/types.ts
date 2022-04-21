@@ -34,6 +34,7 @@ export interface ServerHealthResponse {
   name: string
   apiServerVersion: string
   updateServerVersion: string
+  serialNumber: string
   smoothieVersion: string
   systemVersion: string
   capabilities?: CapabilityMap

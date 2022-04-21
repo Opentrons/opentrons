@@ -116,6 +116,18 @@ class PipetteSerialField(utils.BinaryFieldBase[bytes]):
     FORMAT = f"{NUM_BYTES}s"
 
 
+class GripperSerialField(utils.BinaryFieldBase[bytes]):
+    """The serial number of a gripper.
+
+    This is sized to handle only the datecode part of the serial
+    number; the full field can be synthesized from this, the
+    model number, and the name.
+    """
+
+    NUM_BYTES = 12
+    FORMAT = f"{NUM_BYTES}s"
+
+
 class SensorOutputBindingField(utils.UInt8Field):
     """sensor type."""
 

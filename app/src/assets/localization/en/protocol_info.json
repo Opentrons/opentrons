@@ -1,5 +1,5 @@
 {
-  "browse_protocol_library": "Launch Opentrons Protocol Library",
+  "browse_protocol_library": "Open Protocol Library",
   "choose_file": "Choose File...",
   "choose_protocol_file": "Choose File",
   "choose_snippet_type": "Choose the Labware Offset Data Python Snippet based on target execution environment.",
@@ -22,7 +22,7 @@
   "labware_legacy_definition": "N/A",
   "labware_cal_description": "Calibrated offset from labware origin point",
   "last_updated": "Last Updated",
-  "launch_protocol_designer": "Launch Opentrons Protocol Designer",
+  "launch_protocol_designer": "Open Protocol Designer",
   "modules_title": "Required Modules",
   "no_protocol_yet": "Don't have a protocol yet?",
   "create_or_download": "Create or download a new protocol",

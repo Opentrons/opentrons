@@ -12,12 +12,14 @@ import {
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useAttachedModules, useAttachedPipettes } from '../hooks'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
+import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 import { RobotCard } from '../RobotCard'
 
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 jest.mock('../RobotStatusBanner')
+jest.mock('../../UpdateRobotBanner')
 jest.mock('../../ChooseProtocolSlideout')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
@@ -33,6 +35,9 @@ const mockRobotStatusBanner = RobotStatusBanner as jest.MockedFunction<
 >
 const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction<
   typeof ChooseProtocolSlideout
+>
+const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
+  typeof UpdateRobotBanner
 >
 
 const render = () => {
@@ -61,6 +66,7 @@ describe('RobotCard', () => {
         Mock Choose Protocol Slideout {showSlideout ? 'showing' : 'hidden'}
       </div>
     ))
+    mockUpdateRobotBanner.mockReturnValue(<div>Mock UpdateRobotBanner</div>)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -77,6 +83,12 @@ describe('RobotCard', () => {
     const [{ getByText }] = render()
     getByText('Mock RobotStatusBanner')
   })
+
+  // TODO: uncomment this test when it's uncommented in the component
+  // it('renders a UpdateRobotBanner component', () => {
+  //   const [{ getByText }] = render()
+  //   getByText('Mock UpdateRobotBanner')
+  // })
 
   it('renders the type of pipettes attached to left and right mounts', () => {
     const [{ getByText }] = render()

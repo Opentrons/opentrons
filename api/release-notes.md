@@ -5,21 +5,39 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
 ---
+# OT-2 Software Changes in 5.1.0-beta.0
 
-# OT-2 Software Changes in 5.0.2
+Welcome to the beta release of v5.1.0 of the OT-2 software!
+
+In conjunction with changes on the app-side, the 5.1.0 release reshapes the way your OT-2 stores runs and protocols. We're very excited for you to try this new experience out, and we appreciate your feedback (and patience) as you use this new software.
+
+This is beta software! You may experience unexpected crashes or missing features not detailed here. Please see the [issue tracker][] for more details and to leave feedback.
+[issue tracker]: https://github.com/Opentrons/opentrons/issues/new?assignees=y3rsh%2Cnusrat813&labels=5.1-feedback&template=testing_feedback.yml&title=5.1+Feedback%3A++%3Ctitle%3E
+
+## New Features
+
+- Your past 20 protocol runs will be persisted on the robot, even across reboots
+
+## Known Issues
+
+This beta is a work in progress! We'll be addressing issues in upcoming releases of 5.1.0.
+
+---
+
+## OT-2 Software Changes in 5.0.2
 
 Welcome to the v5.0.2 release of the Opentrons OT-2 software!
 
 This release is a complete refactor of how the OT-2 communicates with the Opentrons app, and features a number of changes to how protocols are loaded and stored on the robot.
 
-## New Features
+### New Features
 
  - A modern, http-based interface has replaced the RPC endpoints for communicating with the Opentrons App
  - More thorough information about a protocol is returned to the Opentrons App to enable the display of live protocol status
  - The most recent protocol analysis and run are stored on the robot to enable easy, quick re-running via the Opentrons App
  - A new way to use labware offsets in Jupyter notebook and SSH sessions
 
-## 5.0.1 to 5.0.2
+### 5.0.1 to 5.0.2
 
 The 5.0.2 hotfix release contains two fixes in the robot software:
 
@@ -27,11 +45,11 @@ The 5.0.2 hotfix release contains two fixes in the robot software:
 2. User-defined labware labels are now returned to the Opentrons App from protocol analyses and runs.
 3. Protocol file uploads now permit uppercase .json and .py extensions.
 
-## 5.0.0 to 5.0.1
+### 5.0.0 to 5.0.1
 
 The 5.0.1 hotfix release does not contain any changes to the robot software
 
-## Known Issues
+### Known Issues
 
 - Your last run protocol will not be saved through robot reboots.
 - When you load multiple instances of the same module type in a protocol, the USB port numbers shown in "Module Setup" are incorrect.
