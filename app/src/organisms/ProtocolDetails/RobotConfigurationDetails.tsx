@@ -8,6 +8,7 @@ import {
   Flex,
   ModuleIcon,
   POSITION_ABSOLUTE,
+  SIZE_1,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TEXT_TRANSFORM_UPPERCASE,
@@ -17,13 +18,13 @@ import {
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
-  PipetteName,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { PipetteName } from '@opentrons/shared-data'
 
 interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null
@@ -43,59 +44,24 @@ export const RobotConfigurationDetails = (
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        alignItems={ALIGN_CENTER}
-        marginY={SPACING.spacing3}
-      >
-        <StyledText
-          as="h6"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginRight={SPACING.spacing4}
-          color={COLORS.darkGreyPressed}
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-        >
-          {t('left_mount')}
-        </StyledText>
-        <Flex marginX={'6rem'} position={POSITION_ABSOLUTE}>
-          <StyledText
-            as="p"
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            data-testid={'leftMountPipetteName'}
-          >
-            {leftMountPipetteName != null
-              ? getPipetteNameSpecs(leftMountPipetteName)?.displayName
-              : t('shared:empty')}
-          </StyledText>
-        </Flex>
-      </Flex>
+      <RobotConfigurationDetailsItem
+        label={t('left_mount')}
+        item={
+          leftMountPipetteName != null
+            ? (getPipetteNameSpecs(leftMountPipetteName)?.displayName as string)
+            : t('shared:empty')
+        }
+      />
       <Divider width="100%" />
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        alignItems={ALIGN_CENTER}
-        marginY={SPACING.spacing3}
-      >
-        <StyledText
-          as="h6"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginRight={SPACING.spacing4}
-          color={COLORS.darkGreyPressed}
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-        >
-          {t('right_mount')}
-        </StyledText>
-        <Flex marginX={'6rem'} position={POSITION_ABSOLUTE}>
-          <StyledText
-            as="p"
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            data-testid={'rightMountPipetteName'}
-          >
-            {rightMountPipetteName != null
-              ? getPipetteNameSpecs(rightMountPipetteName)?.displayName
-              : t('shared:empty')}
-          </StyledText>
-        </Flex>
-      </Flex>
+      <RobotConfigurationDetailsItem
+        label={t('right_mount')}
+        item={
+          rightMountPipetteName != null
+            ? (getPipetteNameSpecs(rightMountPipetteName)
+                ?.displayName as string)
+            : t('shared:empty')
+        }
+      />
       {requiredModuleDetails != null
         ? requiredModuleDetails.map((module, index) => {
             return (
@@ -105,7 +71,7 @@ export const RobotConfigurationDetails = (
                   flexDirection={DIRECTION_ROW}
                   alignItems={ALIGN_CENTER}
                   marginY={SPACING.spacing3}
-                  data-testid={`${module.params.model}_slot_${module.params.location.slotName}`}
+                  data-testid={`RobotConfigurationDetails__${module.params.model}_slot_${module.params.location.slotName}`}
                 >
                   <StyledText
                     as="h6"
@@ -126,7 +92,7 @@ export const RobotConfigurationDetails = (
                     <ModuleIcon
                       key={index}
                       moduleType={getModuleType(module.params.model)}
-                      height="1rem"
+                      height={SIZE_1}
                       marginRight={SPACING.spacing3}
                       alignSelf={ALIGN_CENTER}
                     />
@@ -139,6 +105,43 @@ export const RobotConfigurationDetails = (
             )
           })
         : null}
+    </Flex>
+  )
+}
+
+interface RobotConfigurationDetailsItemProps {
+  label: string
+  item: string
+}
+
+export const RobotConfigurationDetailsItem = (
+  props: RobotConfigurationDetailsItemProps
+): JSX.Element => {
+  const { label, item } = props
+  return (
+    <Flex
+      flexDirection={DIRECTION_ROW}
+      alignItems={ALIGN_CENTER}
+      marginY={SPACING.spacing3}
+    >
+      <StyledText
+        as="h6"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        marginRight={SPACING.spacing4}
+        color={COLORS.darkGreyPressed}
+        textTransform={TEXT_TRANSFORM_UPPERCASE}
+      >
+        {label}
+      </StyledText>
+      <Flex marginX={'6rem'} position={POSITION_ABSOLUTE}>
+        <StyledText
+          as="p"
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          data-testid={`RobotConfigurationDetails_${label}`}
+        >
+          {item}
+        </StyledText>
+      </Flex>
     </Flex>
   )
 }
