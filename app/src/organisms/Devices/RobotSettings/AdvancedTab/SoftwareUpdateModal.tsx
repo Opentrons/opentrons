@@ -66,7 +66,7 @@ export function SoftwareUpdateModal({
           : t('software_update_modal_protocol_running_banner_message')}
       </Banner>
       <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing4}>
-        {/* <ReleaseNotes source={releaseNotes} /> ToDo: align with new design */}
+        {/* <ReleaseNotes source={releaseNotes} /> TODO: Need to align the following with new design */}
         <StyledText css={TYPOGRAPHY.pSemiBold}>
           {t('software_update_modal_app_change_label', {
             version: `${version}`,
