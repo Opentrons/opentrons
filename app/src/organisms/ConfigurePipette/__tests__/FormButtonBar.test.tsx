@@ -14,7 +14,7 @@ describe('FormButtonBar', () => {
   let props: React.ComponentProps<typeof FormButtonBar>
   beforeEach(() => {
     props = {
-      isTopButton: true,
+      isResetButton: true,
       onClick: jest.fn(),
       disabled: false,
     }
@@ -31,7 +31,7 @@ describe('FormButtonBar', () => {
   })
   it('renders top button text and is disabled', () => {
     props = {
-      isTopButton: true,
+      isResetButton: true,
       onClick: jest.fn(),
       disabled: true,
     }
@@ -41,7 +41,7 @@ describe('FormButtonBar', () => {
   })
   it('renders bottom button text and is not disabled', () => {
     props = {
-      isTopButton: false,
+      isResetButton: false,
       onClick: jest.fn(),
       disabled: false,
     }
@@ -50,7 +50,7 @@ describe('FormButtonBar', () => {
   })
   it('renders bottom button text and disabled', () => {
     props = {
-      isTopButton: false,
+      isResetButton: false,
       onClick: jest.fn(),
       disabled: true,
     }

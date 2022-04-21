@@ -93,18 +93,19 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     }
   }
 
-  const handleClick = (index: number): void => {
-    if (index === 0) {
-      setChangePipette(true)
-    } else if (index === 1) {
-      startPipetteOffsetCalibrationBlockModal(null)
-    } else if (index === 2) {
+  const handleChangePipette = (): void => {
+    setChangePipette(true)
+  }
+  const handleCalibrate = (): void => {
+    startPipetteOffsetCalibrationBlockModal(null)
+  }
+  const handleSlideout = (isAboutSlideout: boolean): void => {
+    if (isAboutSlideout) {
       setShowAboutSlideout(true)
-    } else if (index === 3) {
+    } else {
       setShowSlideout(true)
     }
   }
-
   return (
     <Flex
       backgroundColor={COLORS.background}
@@ -185,7 +186,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                         textAlign={ALIGN_START}
                         fontSize={TYPOGRAPHY.fontSizeP}
                         textDecoration={TEXT_DECORATION_UNDERLINE}
-                        onClick={() => handleClick(1)}
+                        onClick={handleCalibrate}
                       >
                         {t('calibrate_now')}
                       </Btn>
@@ -235,7 +236,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           <PipetteOverflowMenu
             pipetteName={pipetteName ?? t('empty')}
             mount={mount}
-            handleClick={handleClick}
+            handleChangePipette={handleChangePipette}
+            handleCalibrate={handleCalibrate}
+            handleSlideout={handleSlideout}
             isPipetteCalibrated={pipetteOffsetCalibration != null}
           />
         </div>

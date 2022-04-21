@@ -11,7 +11,9 @@ import type { Mount } from '../../../redux/pipettes/types'
 interface PipetteOverflowMenuProps {
   pipetteName: PipetteModelSpecs['displayName'] | string
   mount: Mount
-  handleClick: (index: number) => void
+  handleChangePipette: () => void
+  handleCalibrate: () => void
+  handleSlideout: (isAboutSlideout: boolean) => void
   isPipetteCalibrated: boolean
 }
 
@@ -19,7 +21,14 @@ export const PipetteOverflowMenu = (
   props: PipetteOverflowMenuProps
 ): JSX.Element => {
   const { t } = useTranslation('device_details')
-  const { mount, pipetteName, handleClick, isPipetteCalibrated } = props
+  const {
+    mount,
+    pipetteName,
+    handleChangePipette,
+    handleCalibrate,
+    handleSlideout,
+    isPipetteCalibrated,
+  } = props
 
   //   TODO(jr,4/20/22): wire up disabled reasons
   return (
@@ -31,7 +40,7 @@ export const PipetteOverflowMenu = (
                 <MenuItem
                   minWidth="10.6rem"
                   key={`${pipetteName}_${mount}_attach_pipette`}
-                  onClick={() => handleClick(0)}
+                  onClick={() => handleChangePipette()}
                   data-testid={`pipetteOverflowMenu_attach_pipette_btn_${pipetteName}_${mount}`}
                 >
                   {t('attach_pipette')}
@@ -41,7 +50,7 @@ export const PipetteOverflowMenu = (
                 <MenuItem
                   minWidth="10.6rem"
                   key={`${pipetteName}_${mount}_calibrate_offset`}
-                  onClick={() => handleClick(1)}
+                  onClick={() => handleCalibrate()}
                   data-testid={`pipetteOverflowMenu_calibrate_offset_btn_${pipetteName}_${mount}`}
                 >
                   {t(
@@ -53,7 +62,7 @@ export const PipetteOverflowMenu = (
                 <MenuItem
                   minWidth="10.6rem"
                   key={`${pipetteName}_${mount}_detach`}
-                  onClick={() => handleClick(0)}
+                  onClick={() => handleChangePipette()}
                   data-testid={`pipetteOverflowMenu_detach_pipette_btn_${pipetteName}_${mount}`}
                 >
                   {t('detach_pipette')}
@@ -61,7 +70,7 @@ export const PipetteOverflowMenu = (
                 <MenuItem
                   minWidth="10.6rem"
                   key={`${pipetteName}_${mount}_about_pipette`}
-                  onClick={() => handleClick(2)}
+                  onClick={() => handleSlideout(true)}
                   data-testid={`pipetteOverflowMenu_about_pipette_slideout_btn_${pipetteName}_${mount}`}
                 >
                   {t('about_pipette')}
@@ -69,7 +78,7 @@ export const PipetteOverflowMenu = (
                 <MenuItem
                   minWidth="10.6rem"
                   key={`${pipetteName}_${mount}_view_settings`}
-                  onClick={() => handleClick(3)}
+                  onClick={() => handleSlideout(false)}
                   data-testid={`pipetteOverflowMenu_view_settings_btn_${pipetteName}_${mount}`}
                 >
                   {t('view_pipette_setting')}

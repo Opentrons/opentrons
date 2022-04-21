@@ -219,7 +219,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
           return (
             <Form>
               <FormButtonBar
-                isTopButton={true}
+                isResetButton={true}
                 onClick={handleReset}
                 disabled={updateInProgress}
               />
@@ -248,7 +248,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
                 />
               </FormColumn>
               <FormButtonBar
-                isTopButton={false}
+                isResetButton={false}
                 disabled={disableSubmit || updateInProgress}
               />
             </Form>

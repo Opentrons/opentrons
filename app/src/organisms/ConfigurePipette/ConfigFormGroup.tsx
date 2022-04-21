@@ -2,14 +2,13 @@ import * as React from 'react'
 import { Field } from 'formik'
 import {
   FormGroup,
-  Text,
   CheckboxField,
   Flex,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
 import { InputField } from '../../atoms/InputField'
+import { StyledText } from '../../atoms/text'
 import styles from './styles.css'
 
 import type { FieldProps } from 'formik'
@@ -68,13 +67,16 @@ export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      fontSize={TYPOGRAPHY.fontSizeLabel}
       paddingTop={SPACING.spacing2}
       paddingBottom={SPACING.spacing2}
     >
-      <Text id={props.labelFor} paddingBottom={SPACING.spacing3}>
+      <StyledText
+        as="label"
+        id={props.labelFor}
+        paddingBottom={SPACING.spacing3}
+      >
         {props.label}
-      </Text>
+      </StyledText>
       {props.children}
     </Flex>
   )
@@ -134,9 +136,12 @@ export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
           />
         )}
       </Field>
-      <Text paddingLeft={SPACING.spacing3} paddingTop={SPACING.spacingXXS}>
+      <StyledText
+        paddingLeft={SPACING.spacing3}
+        paddingTop={SPACING.spacingXXS}
+      >
         {displayName}
-      </Text>
+      </StyledText>
     </Flex>
   )
 }

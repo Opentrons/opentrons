@@ -22,7 +22,9 @@ describe('PipetteOverflowMenu', () => {
     props = {
       pipetteName: mockLeftProtoPipette.displayName,
       mount: LEFT,
-      handleClick: jest.fn(),
+      handleChangePipette: jest.fn(),
+      handleCalibrate: jest.fn(),
+      handleSlideout: jest.fn(),
       isPipetteCalibrated: false,
     }
   })
@@ -38,31 +40,35 @@ describe('PipetteOverflowMenu', () => {
     const settings = getByRole('button', { name: 'View pipette settings' })
     const about = getByRole('button', { name: 'About pipette' })
     fireEvent.click(detach)
-    expect(props.handleClick).toHaveBeenCalled()
+    expect(props.handleChangePipette).toHaveBeenCalled()
     fireEvent.click(settings)
-    expect(props.handleClick).toHaveBeenCalled()
+    expect(props.handleSlideout).toHaveBeenCalled()
     fireEvent.click(about)
-    expect(props.handleClick).toHaveBeenCalled()
+    expect(props.handleSlideout).toHaveBeenCalled()
     fireEvent.click(calibrate)
-    expect(props.handleClick).toHaveBeenCalled()
+    expect(props.handleCalibrate).toHaveBeenCalled()
   })
   it('renders information with no pipette attached', () => {
     props = {
       pipetteName: 'Empty',
       mount: LEFT,
-      handleClick: jest.fn(),
+      handleChangePipette: jest.fn(),
+      handleCalibrate: jest.fn(),
+      handleSlideout: jest.fn(),
       isPipetteCalibrated: false,
     }
     const { getByRole } = render(props)
     const btn = getByRole('button', { name: 'Attach pipette' })
     fireEvent.click(btn)
-    expect(props.handleClick).toHaveBeenCalled()
+    expect(props.handleChangePipette).toHaveBeenCalled()
   })
   it('renders recalibrate pipette offset text', () => {
     props = {
       pipetteName: mockLeftProtoPipette.displayName,
       mount: LEFT,
-      handleClick: jest.fn(),
+      handleChangePipette: jest.fn(),
+      handleCalibrate: jest.fn(),
+      handleSlideout: jest.fn(),
       isPipetteCalibrated: true,
     }
     const { getByRole } = render(props)
@@ -70,6 +76,6 @@ describe('PipetteOverflowMenu', () => {
       name: 'Recalibrate pipette offset',
     })
     fireEvent.click(recalibrate)
-    expect(props.handleClick).toHaveBeenCalled()
+    expect(props.handleCalibrate).toHaveBeenCalled()
   })
 })

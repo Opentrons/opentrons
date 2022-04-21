@@ -10,43 +10,39 @@ import {
 import { PrimaryButton, SecondaryButton } from '../../atoms/Buttons'
 import { Divider } from '../../atoms/structure'
 export interface FormButtonBarProps {
-  isTopButton: boolean
+  isResetButton: boolean
   onClick?: () => unknown
   disabled: boolean
 }
 
 export function FormButtonBar(props: FormButtonBarProps): JSX.Element {
-  const { isTopButton, onClick, disabled } = props
+  const { isResetButton, onClick, disabled } = props
   const { t } = useTranslation('shared')
 
-  return (
-    <>
-      {isTopButton ? (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-        >
-          <SecondaryButton
-            marginTop={SPACING.spacingSM}
-            marginBottom={SPACING.spacingSM}
-            onClick={onClick}
-            disabled={disabled}
-          >
-            {t('reset_all')}
-          </SecondaryButton>
-          <Divider />
-        </Flex>
-      ) : (
-        <Flex
-          justifyContent={JUSTIFY_CENTER}
-          flexDirection={DIRECTION_COLUMN}
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-        >
-          <PrimaryButton type={'submit'} disabled={disabled}>
-            {t('confirm')}
-          </PrimaryButton>
-        </Flex>
-      )}
-    </>
+  return isResetButton ? (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      textTransform={TEXT_TRANSFORM_UPPERCASE}
+    >
+      <SecondaryButton
+        marginTop={SPACING.spacingSM}
+        marginBottom={SPACING.spacingSM}
+        onClick={onClick}
+        disabled={disabled}
+      >
+        {t('reset_all')}
+      </SecondaryButton>
+      <Divider />
+    </Flex>
+  ) : (
+    <Flex
+      justifyContent={JUSTIFY_CENTER}
+      flexDirection={DIRECTION_COLUMN}
+      textTransform={TEXT_TRANSFORM_UPPERCASE}
+    >
+      <PrimaryButton type={'submit'} disabled={disabled}>
+        {t('confirm')}
+      </PrimaryButton>
+    </Flex>
   )
 }
