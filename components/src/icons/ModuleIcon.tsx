@@ -25,5 +25,5 @@ export function ModuleIcon(props: ModuleIconProps): JSX.Element {
   const { moduleType, ...styleProps } = props
   const iconName = MODULE_ICON_NAME_BY_TYPE[moduleType]
 
-  return <Icon name={iconName} {...styleProps} />
+  return <Icon name={iconName} {...styleProps} data-testid={`ModuleIcon_${iconName}`}/>
 }

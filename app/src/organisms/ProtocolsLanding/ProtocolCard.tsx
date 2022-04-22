@@ -130,6 +130,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
         size="6rem"
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
+        data-testid={`ProtocolCard_deckLayout_${protocolDisplayName}`}
       >
         {
           {
@@ -153,7 +154,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             errors={mostRecentAnalysis?.errors.map(e => e.detail) ?? []}
           />
         ) : null}
-        <StyledText as="h3" marginBottom={SPACING.spacing4}>
+        <StyledText as="h3" marginBottom={SPACING.spacing4} data-testid={`ProtocolCard_${protocolDisplayName}`}>
           {protocolDisplayName}
         </StyledText>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -167,6 +168,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flex="1"
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
+                data-testid={`ProtocolCard_leftMount_${protocolDisplayName}`}
               >
                 <StyledText as="h6" marginBottom={SPACING.spacing3}>
                   {t('left_mount')}
@@ -190,6 +192,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flex="1"
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
+                data-testid={`ProtocolCard_rightMount_${protocolDisplayName}`}
               >
                 <StyledText as="h6" marginBottom={SPACING.spacing3}>
                   {t('right_mount')}
@@ -238,6 +241,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             flex="0 0 8rem"
             flexDirection={DIRECTION_COLUMN}
             marginRight={SPACING.spacing4}
+            data-testid={`ProtocolCard_date_${protocolDisplayName}`}
           >
             <StyledText as="h6" marginBottom={SPACING.spacing3}>
               {t('updated')}

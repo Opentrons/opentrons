@@ -235,16 +235,16 @@ export function ProtocolDetails(
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <StyledText as="h3" marginBottom={SPACING.spacing4} height="2.75rem">
+          <StyledText as="h3" marginBottom={SPACING.spacing4} height="2.75rem" data-testid={`ProtocolDetails_${protocolDisplayName}`}>
             {protocolDisplayName}
           </StyledText>
-          <OverflowMenu protocolKey={protocolKey} />
+          <OverflowMenu protocolKey={protocolKey} data-testid={`ProtocolDetails_overFlowMenu`}/>
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
+          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4} data-testid={`ProtocolDetails_creationMethod`}>
             <StyledText as="h6">{t('creation_method')}</StyledText>
             <StyledText as="p">
               {analysisStatus === 'loading'
@@ -252,7 +252,7 @@ export function ProtocolDetails(
                 : creationMethod}
             </StyledText>
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
+          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4} data-testid={`ProtocolDetails_lastUpdated`}>
             <StyledText as="h6">{t('last_updated')}</StyledText>
             <StyledText as="p">
               {analysisStatus === 'loading'
@@ -260,7 +260,7 @@ export function ProtocolDetails(
                 : format(new Date(modified), 'MMMM dd, yyyy HH:mm')}
             </StyledText>
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
+          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4} data-testid={`ProtocolDetails_lastAnalyzed`}>
             <StyledText as="h6">{t('last_analyzed')}</StyledText>
             <StyledText as="p">
               {analysisStatus === 'loading'
@@ -268,7 +268,7 @@ export function ProtocolDetails(
                 : lastAnalyzed}
             </StyledText>
           </Flex>
-          <PrimaryButton onClick={() => setShowSlideout(true)}>
+          <PrimaryButton onClick={() => setShowSlideout(true)} data-testid={`ProtocolDetails_runProtocol`}>
             {t('run_protocol')}
           </PrimaryButton>
         </Flex>
@@ -278,6 +278,7 @@ export function ProtocolDetails(
             flex="1"
             flexDirection={DIRECTION_COLUMN}
             marginRight={SPACING.spacing4}
+            data-testid={`ProtocolDetails_author`}
           >
             <StyledText as="h6">{t('org_or_author')}</StyledText>
             <StyledText as="p">
@@ -288,6 +289,7 @@ export function ProtocolDetails(
             flex="1"
             flexDirection={DIRECTION_COLUMN}
             marginRight={SPACING.spacing4}
+            data-testid={`ProtocolDetails_description`}
           >
             <StyledText as="h6">{t('description')}</StyledText>
             <StyledText as="p">
@@ -310,7 +312,7 @@ export function ProtocolDetails(
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Card flex="0 0 20rem">
+        <Card flex="0 0 20rem" data-testid={`ProtocolDetails_deckMap`}>
           <StyledText
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -339,12 +341,14 @@ export function ProtocolDetails(
         <Card flex="1">
           <Flex>
             <RoundTab
+            data-testid={`ProtocolDetails_robotConfig`}
               isCurrent={currentTab === 'robot_config'}
               onClick={() => setCurrentTab('robot_config')}
             >
               {t('robot_configuration')}
             </RoundTab>
             <RoundTab
+              data-testid={`ProtocolDetails_labware`}
               isCurrent={currentTab === 'labware'}
               onClick={() => setCurrentTab('labware')}
             >
