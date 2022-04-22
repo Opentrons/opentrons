@@ -276,8 +276,13 @@ export function ProtocolDetails(
             }
           </Box>
         </Card>
-        <Box height="100%" width={SPACING.spacing4} />
-        <Card flex="1">
+
+        <Flex
+          width="100%"
+          height="100%"
+          flexDirection={DIRECTION_COLUMN}
+          marginLeft={SPACING.spacing4}
+        >
           <Flex>
             <RoundTab
               isCurrent={currentTab === 'robot_config'}
@@ -309,7 +314,7 @@ export function ProtocolDetails(
           >
             {getTabContents()}
           </Box>
-        </Card>
+        </Flex>
       </Flex>
     </Flex>
   )

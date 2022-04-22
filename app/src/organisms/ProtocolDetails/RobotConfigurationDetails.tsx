@@ -47,19 +47,16 @@ export const RobotConfigurationDetails = (
       <RobotConfigurationDetailsItem
         label={t('left_mount')}
         item={
-          leftMountPipetteName != null
-            ? (getPipetteNameSpecs(leftMountPipetteName)?.displayName as string)
-            : t('shared:empty')
+          getPipetteNameSpecs(leftMountPipetteName as PipetteName)
+            ?.displayName ?? t('shared:empty')
         }
       />
       <Divider width="100%" />
       <RobotConfigurationDetailsItem
         label={t('right_mount')}
         item={
-          rightMountPipetteName != null
-            ? (getPipetteNameSpecs(rightMountPipetteName)
-                ?.displayName as string)
-            : t('shared:empty')
+          getPipetteNameSpecs(rightMountPipetteName as PipetteName)
+            ?.displayName ?? t('shared:empty')
         }
       />
       {requiredModuleDetails != null
