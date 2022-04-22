@@ -36,11 +36,11 @@ const closeIconStyles = css`
   width: ${SPACING.spacingL};
   height: ${SPACING.spacingL};
   &:hover {
-    background-color: rgba(22, 33, 45, 0.15);
+    background-color: #16212d26;
   }
 
   &:active {
-    background-color: rgba(22, 33, 45, 0.25);
+    background-color: #16212d40;
   }
 `
 
@@ -89,7 +89,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
       header={header}
       css={css`
         border-radius: ${BORDERS.radiusSoftCorners};
-        box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.23);
+        box-shadow: ${BORDERS.smallDropShadow};
       `}
     >
       {children}
