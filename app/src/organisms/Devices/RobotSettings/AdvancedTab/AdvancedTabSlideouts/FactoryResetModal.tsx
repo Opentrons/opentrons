@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
 import {
@@ -19,10 +19,9 @@ import {
   PENDING,
 } from '../../../../../redux/robot-api'
 import { resetConfig } from '../../../../../redux/robot-admin'
-import { connect } from '../../../../../redux/robot'
 
 import type { IconProps } from '@opentrons/components'
-import type { State, Dispatch } from '../../../../../redux/types'
+import type { State } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
 
 interface FactoryResetModalProps {
@@ -44,18 +43,14 @@ export function FactoryResetModal({
   }
   const { t } = useTranslation('device_settings')
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
-  const dispatch = useDispatch<Dispatch>()
   const resetRequestStatus = useSelector((state: State) => {
     const lastId = last(requestIds)
     return lastId != null ? getRequestById(state, lastId) : null
   })?.status
 
   const triggerReset = (): void => {
-    if (resetOptions) dispatchRequest(resetConfig(robotName, resetOptions))
-  }
-
-  const connectRobot = (): void => {
-    dispatch(connect(robotName))
+    if (resetOptions != null)
+      dispatchRequest(resetConfig(robotName, resetOptions))
   }
 
   React.useEffect(() => {
@@ -99,13 +94,7 @@ export function FactoryResetModal({
             {t('factory_reset_modal_connection_lost_description')}
           </StyledText>
           <Flex justifyContent={JUSTIFY_FLEX_END}>
-            <SecondaryButton
-              marginRight={SPACING.spacing3}
-              onClick={connectRobot}
-            >
-              {t('factory_reset_modal_connection_lost_retry_button')}
-            </SecondaryButton>
-            <PrimaryButton>
+            <PrimaryButton onClick={closeModal}>
               {t('factory_reset_modal_connection_lost_close_button')}
             </PrimaryButton>
           </Flex>

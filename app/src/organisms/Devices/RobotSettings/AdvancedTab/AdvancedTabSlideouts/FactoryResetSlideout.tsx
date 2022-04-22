@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -10,22 +10,26 @@ import {
   TYPOGRAPHY,
   Link,
   COLORS,
+  CheckboxField,
 } from '@opentrons/components'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { PrimaryButton } from '../../../../../atoms/Buttons'
 import { StyledText } from '../../../../../atoms/text'
 import { Divider } from '../../../../../atoms/structure'
 import { Banner } from '../../../../../atoms/Banner'
-import { fetchResetConfigOptions } from '../../../../../redux/robot-admin'
-// import { getRobotByName } from '../../../../../redux/discovery'
+import {
+  getResetConfigOptions,
+  fetchResetConfigOptions,
+} from '../../../../../redux/robot-admin'
 import { useTrackEvent } from '../../../../../redux/analytics'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
+  useRobot,
 } from '../../../hooks'
 
-import type { Dispatch } from '../../../../../redux/types'
+import type { State, Dispatch } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
 
 interface FactoryResetSlideoutProps {
@@ -35,7 +39,6 @@ interface FactoryResetSlideoutProps {
   updateResetStatus: (connected: boolean, rOptions?: ResetConfigRequest) => void
 }
 
-// TOD: this slideout will be fixed in another PR
 export function FactoryResetSlideout({
   isExpanded,
   onCloseClick,
@@ -44,18 +47,26 @@ export function FactoryResetSlideout({
 }: FactoryResetSlideoutProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
-  // const robot = useSelector((state: State) => getRobotByName(state, robotName))
+  const robot = useRobot(robotName)
   const dispatch = useDispatch<Dispatch>()
-
-  // const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
+  const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
 
   // Calibration data
   const deckCalibrationData = useDeckCalibrationData(robotName)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robotName)
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
-  // const options = useSelector((state: State) =>
-  //   getResetConfigOptions(state, robotName)
-  // )
+  const options = useSelector((state: State) =>
+    getResetConfigOptions(state, robotName)
+  )
+
+  // TODO: This should be temporary. Need to wait for the CPX team's update of Protocol resetOptions.
+  // CPX team won't change the order of the options
+  const calibrationOptions = options.filter(opt =>
+    opt.id.includes('Calibration')
+  )
+  const bootScriptOption = options.filter(opt =>
+    opt.id.includes('bootScript')
+  )[0]
 
   React.useEffect(() => {
     dispatch(fetchResetConfigOptions(robotName))
@@ -80,9 +91,8 @@ export function FactoryResetSlideout({
   }
 
   const handleClearData = (): void => {
-    // first check connection
-    // const connected = robot?.connected ?? false
-    // updateResetStatus(connected, resetOptions)
+    const connected = robot?.status !== 'unreachable'
+    updateResetStatus(connected, resetOptions)
     onCloseClick()
   }
 
@@ -92,7 +102,11 @@ export function FactoryResetSlideout({
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
-        <PrimaryButton disabled={true} onClick={handleClearData} width="100%">
+        <PrimaryButton
+          disabled={!(Object.values(resetOptions).find(val => val) ?? false)}
+          onClick={handleClearData}
+          width="100%"
+        >
           {t('factory_reset_slideout_data_clear_button')}
         </PrimaryButton>
       }
@@ -124,21 +138,20 @@ export function FactoryResetSlideout({
         <StyledText as="p" marginBottom={SPACING.spacing3}>
           {t('factory_reset_slideout_calibration_description')}
         </StyledText>
-        {/* {calibrationOptions &&
-          calibrationOptions.map(opt => (
-            <CheckboxField
-              key={opt.id}
-              onChange={() =>
-                setResetOptions({
-                  ...resetOptions,
-                  [opt.id]: !resetOptions[opt.id],
-                })
-              }
-              value={resetOptions[opt.id]}
-            >
-              <StyledText>{`Clear ${opt.name}`}</StyledText>
-            </CheckboxField>
-          ))} */}
+        {calibrationOptions.map(opt => (
+          <CheckboxField
+            key={opt.id}
+            onChange={() =>
+              setResetOptions({
+                ...resetOptions,
+                [opt.id]: !(resetOptions[opt.id] ?? false),
+              })
+            }
+            value={resetOptions[opt.id]}
+            label={opt.name}
+          />
+        ))}
+
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -155,14 +168,6 @@ export function FactoryResetSlideout({
             {t('factory_reset_slideout_download_logs_link')}
           </Link>
         </Flex>
-        {/* {protocolOptions &&
-          protocolOptions.map(option => (
-            <StyledText
-              as="p"
-              key={option.id}
-            >{`Clear ${option.name}`}</StyledText>
-          ))} */}
-
         <StyledText
           as="p"
           css={TYPOGRAPHY.pSemiBold}
@@ -170,21 +175,21 @@ export function FactoryResetSlideout({
         >
           {t('factory_reset_slideout_boot_scripts_title')}
         </StyledText>
-        {/* {bootScriptOption &&
-          bootScriptOption.map(opt => (
-            <CheckboxField
-              key={opt.id}
-              onChange={() =>
-                setResetOptions({
-                  ...resetOptions,
-                  [opt.id]: !resetOptions[opt.id],
-                })
-              }
-              value={resetOptions[opt.id]}
-            >
-              <StyledText as="p">{`Clear ${opt.name}`}</StyledText>
-            </CheckboxField>
-          ))} */}
+        {bootScriptOption != null && (
+          <CheckboxField
+            onChange={() => {
+              setResetOptions({
+                ...resetOptions,
+                [bootScriptOption.id]: !(
+                  resetOptions[bootScriptOption.id] ?? false
+                ),
+              })
+            }}
+            name={bootScriptOption.id}
+            value={resetOptions[bootScriptOption.id]}
+            label={`Clear ${bootScriptOption.name}`}
+          />
+        )}
       </Flex>
     </Slideout>
   )

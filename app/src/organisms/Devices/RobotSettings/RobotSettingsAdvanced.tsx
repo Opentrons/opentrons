@@ -83,9 +83,11 @@ export function RobotSettingsAdvanced({
     isConnected: boolean,
     options?: ResetConfigRequest
   ): void => {
-    if (connected && options != null) setResetOptions(options)
+    console.log('RobotSettingsAdvanced', options)
+    if (options != null) setResetOptions(options)
     setShowFactoryResetModal(true)
     setIsRobotConnected(isConnected ?? false)
+    console.log('in updateResetStatus', resetOptions)
   }
 
   return (
