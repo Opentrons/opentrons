@@ -16,7 +16,7 @@ from opentrons.protocol_engine import (
     LoadedLabware,
 )
 
-from robot_server.persistence import analysis_table
+from robot_server.persistence import analysis_table, protocol_table
 
 from .analysis_models import (
     AnalysisSummary,
@@ -25,6 +25,8 @@ from .analysis_models import (
     CompletedAnalysis,
     AnalysisResult,
 )
+
+from .protocol_store import ProtocolNotFoundError
 
 
 _log = getLogger(__name__)
@@ -66,9 +68,13 @@ class AnalysisStore:
             protocol_id not in self._pending_analyses_by_protocol
         ), "Protocol already has a pending analysis."
 
-        # For implementation simplicity, we don't check these assumptions:
-        #   * The protocol_id must refer to a valid protocol.
-        #   * The analysis_id must be unique across all protocols.
+        with self._sql_engine.begin() as transaction:
+            self._sql_check_protocol_exists(
+                connection=transaction, protocol_id=protocol_id
+            )
+
+        # For implementation simplicity, we don't check our assumption that
+        # the analysis_id must be unique across protocols.
 
         pending_analysis = PendingAnalysis.construct(id=analysis_id)
         self._pending_analyses_by_protocol[protocol_id] = pending_analysis
@@ -155,6 +161,9 @@ class AnalysisStore:
             .order_by(sqlalchemy.column("_ROWID_"))
         )
         with self._sql_engine.begin() as transaction:
+            self._sql_check_protocol_exists(
+                connection=transaction, protocol_id=protocol_id
+            )
             results = transaction.execute(statement).all()
         return [_CompletedAnalysisResource.from_sql_row(r) for r in results]
 
@@ -165,6 +174,9 @@ class AnalysisStore:
             .order_by(sqlalchemy.column("_ROWID_"))
         )
         with self._sql_engine.begin() as transaction:
+            self._sql_check_protocol_exists(
+                connection=transaction, protocol_id=protocol_id
+            )
             results = transaction.execute(statement).all()
 
         result_ids: List[str] = []
@@ -180,6 +192,18 @@ class AnalysisStore:
         )
         with self._sql_engine.begin() as transaction:
             transaction.execute(statement)
+
+    @staticmethod
+    def _sql_check_protocol_exists(connection: sqlalchemy.engine.Connection, protocol_id: str) -> None:
+        statement = sqlalchemy.select(
+            # Thrown away. Dummy column just to have something small to select.
+            protocol_table.c.id
+        ).where(protocol_table.c.id == protocol_id)
+        results = connection.execute(statement)
+        try:
+            results.one()
+        except sqlalchemy.exc.NoResultFound as e:
+            raise ProtocolNotFoundError(protocol_id=protocol_id) from e
 
 
 @dataclass
