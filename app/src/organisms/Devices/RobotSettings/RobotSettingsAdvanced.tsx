@@ -15,7 +15,7 @@ import { UseOlderProtocol } from './AdvancedTab/UseOlderProtocol'
 import { LegacySettings } from './AdvancedTab/LegacySettings'
 import { ShortTrashBin } from './AdvancedTab/ShortTrashBin'
 import { UseOlderAspirateBehavior } from './AdvancedTab/UseOlderAspirateBehavior'
-import { getRobotByName } from '../../../redux/discovery'
+import { useRobot } from '../hooks'
 import { getRobotSettings } from '../../../redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
@@ -54,7 +54,7 @@ export function RobotSettingsAdvanced({
     setShowSoftwareUpdateModal,
   ] = React.useState<boolean>(false)
 
-  const robot = useSelector((state: State) => getRobotByName(state, robotName))
+  const robot = useRobot(robotName)
   const ipAddress = robot?.ip != null ? robot.ip : ''
   const settings = useSelector<State, RobotSettings>((state: State) =>
     getRobotSettings(state, robotName)

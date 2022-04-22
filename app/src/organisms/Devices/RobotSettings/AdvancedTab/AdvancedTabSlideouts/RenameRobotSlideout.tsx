@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ErrorMessage, useFormik } from 'formik'
+import { useFormik } from 'formik'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -76,6 +76,8 @@ export function RenameRobotSlideout({
       data.name != null && history.push(`/devices/${data.name}/robot-settings`)
     },
     onError: error => {
+      // TODO: handle error
+      // When #9960 is solved, need to update.
       console.error('error', error.message)
     },
   })
