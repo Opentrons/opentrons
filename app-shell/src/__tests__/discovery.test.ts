@@ -240,6 +240,7 @@ describe('app-shell/discovery', () => {
           serverHealth: {
             name: 'opentrons',
             apiServerVersion: '3.19.0',
+            serialNumber: '123456789',
             updateServerVersion: '3.19.0',
             smoothieVersion: 'unimplemented',
             systemVersion: 'v1.3.7-2-g9e23b93f41',

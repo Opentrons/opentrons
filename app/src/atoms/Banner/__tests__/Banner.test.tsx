@@ -16,7 +16,7 @@ describe('Banner', () => {
   beforeEach(() => {
     props = {
       type: 'success',
-      title: 'TITLE',
+      children: 'TITLE',
     }
   })
   it('renders success banner', () => {
@@ -27,7 +27,7 @@ describe('Banner', () => {
   it('renders success banner with exit button and when click dismisses banner', () => {
     props = {
       type: 'success',
-      title: 'TITLE',
+      children: 'TITLE',
       onCloseClick: jest.fn(),
     }
     const { getByText, getByLabelText } = render(props)
@@ -39,7 +39,7 @@ describe('Banner', () => {
   it('renders warning banner', () => {
     props = {
       type: 'warning',
-      title: 'TITLE',
+      children: 'TITLE',
     }
     const { getByText, getByLabelText } = render(props)
     getByLabelText('icon_warning')
@@ -48,7 +48,7 @@ describe('Banner', () => {
   it('renders error banner', () => {
     props = {
       type: 'error',
-      title: 'TITLE',
+      children: 'TITLE',
     }
     const { getByText, getByLabelText } = render(props)
     getByLabelText('icon_error')
@@ -57,16 +57,16 @@ describe('Banner', () => {
   it('renders updating banner', () => {
     props = {
       type: 'updating',
-      title: 'TITLE',
+      children: 'TITLE',
     }
     const { getByText, getByLabelText } = render(props)
     getByLabelText('icon_updating')
     getByText('TITLE')
   })
-  it('renders hot to touch banner', () => {
+  it('renders custom icon banner', () => {
     props = {
       type: 'warning',
-      title: 'TITLE',
+      children: 'TITLE',
       icon: { name: 'ot-hot-to-touch' },
     }
     const { getByText, getByLabelText } = render(props)

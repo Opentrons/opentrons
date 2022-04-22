@@ -8,6 +8,7 @@ export const mockHealthResponse = {
 export const mockServerHealthResponse = {
   name: 'opentrons-dev',
   apiServerVersion: '1.2.3',
+  serialNumber: '12345',
   updateServerVersion: '1.2.3',
   smoothieVersion: '4.5.6',
   systemVersion: '7.8.9',

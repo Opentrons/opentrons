@@ -62,10 +62,7 @@ export function PipettesAndModules({
       >
         {/* TODO(jr, 4/15/22): This needs to be refactored to get a combined array of pipettes and modules so it can display with widths matching each column as the design shows */}
         {isRobotViewable ? (
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            width={attachedModules.length === 1 ? '50%' : '100%'}
-          >
+          <Flex flexDirection={DIRECTION_COLUMN} width="100%">
             <Flex flexDirection={DIRECTION_ROW}>
               <PipetteCard
                 pipetteInfo={attachedPipettes.left?.modelSpecs ?? null}
@@ -86,7 +83,11 @@ export function PipettesAndModules({
             >
               {attachedModules.map((module, index) => {
                 return (
-                  <Flex key={`moduleCard_${module.type}_${index}`}>
+                  <Flex
+                    flex="1"
+                    maxWidth="50%"
+                    key={`moduleCard_${module.type}_${index}`}
+                  >
                     <ModuleCard module={module} />
                   </Flex>
                 )

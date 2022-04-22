@@ -92,7 +92,9 @@ export function ChooseProtocolSlideout(
               justifyContent={JUSTIFY_CENTER}
               alignItems={ALIGN_CENTER}
             >
-              <DeckThumbnail analysis={storedProtocol.mostRecentAnalysis} />
+              <DeckThumbnail
+                commands={storedProtocol.mostRecentAnalysis.commands}
+              />
             </Flex>
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {storedProtocol.mostRecentAnalysis?.metadata?.protocolName ??

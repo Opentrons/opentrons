@@ -9,6 +9,7 @@ import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useLights, useRobot, useIsRobotViewable } from '../hooks'
+import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 import { RobotOverview } from '../RobotOverview'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
@@ -16,6 +17,7 @@ import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 jest.mock('../RobotStatusBanner')
+jest.mock('../../UpdateRobotBanner')
 jest.mock('../../ChooseProtocolSlideout')
 jest.mock('../RobotOverviewOverflowMenu')
 
@@ -34,6 +36,9 @@ const mockRobotStatusBanner = RobotStatusBanner as jest.MockedFunction<
 >
 const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction<
   typeof ChooseProtocolSlideout
+>
+const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
+  typeof UpdateRobotBanner
 >
 const mockRobotOverviewOverflowMenu = RobotOverviewOverflowMenu as jest.MockedFunction<
   typeof RobotOverviewOverflowMenu
@@ -65,6 +70,7 @@ describe('RobotOverview', () => {
         Mock Choose Protocol Slideout {showSlideout ? 'showing' : 'hidden'}
       </div>
     ))
+    mockUpdateRobotBanner.mockReturnValue(<div>Mock UpdateRobotBanner</div>)
     mockUseCurrentRunId.mockReturnValue(null)
     mockUseIsRobotViewable.mockReturnValue(true)
     mockRobotOverviewOverflowMenu.mockReturnValue(
@@ -84,6 +90,11 @@ describe('RobotOverview', () => {
   it('renders a RobotStatusBanner component', () => {
     const [{ getByText }] = render()
     getByText('Mock RobotStatusBanner')
+  })
+
+  it('renders a UpdateRobotBanner component', () => {
+    const [{ getByText }] = render()
+    getByText('Mock UpdateRobotBanner')
   })
 
   it('renders a lights toggle button', () => {
