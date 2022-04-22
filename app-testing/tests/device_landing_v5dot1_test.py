@@ -4,6 +4,7 @@ from pathlib import Path
 import time
 from typing import Generic, List, Union
 import pytest
+import logging
 
 from rich.console import Console
 from rich.style import Style
@@ -12,11 +13,17 @@ from selenium.webdriver.chrome.options import Options
 
 
 from src.resources.ot_robot5dot1 import OtRobot
+from src.menus.left_menu import LeftMenu
+from src.menus.protocol_file import ProtocolFile
+from src.driver.drag_drop import drag_and_drop_file
 from src.resources.ot_application import OtApplication
 from src.pages.device_landing import DeviceLanding
+from src.pages.protocol_uploadv5dot1 import ProtocolUpload
 from src.resources.robot_data import Dev, Kansas, RobotDataType
 
 style = Style(color="#ac0505", bgcolor="yellow", bold=True)
+
+logger = logging.getLogger(__name__)
 
 
 @pytest.mark.v5dot1
@@ -107,3 +114,39 @@ def test_device_landing_v5dot1(
                     device_landing.click_mag_disengage()
                 time.sleep(3)
             device_landing.click_run_a_protocol_button_device_landing()
+
+
+@pytest.mark.v5dot1
+def test_run_protocol_robot_landing_page_v5dot1(
+    chrome_options: Options,
+    console: Console,
+    test_protocols: Dict[str, Path],
+    robots: List[RobotDataType],
+    request: pytest.FixtureRequest,
+) -> None:
+    """Test the initial load of the app with a docker or dev mode emulated robot."""
+    os.environ["OT_APP_ANALYTICS__SEEN_OPT_IN"] = "true"
+    # app should look on localhost for robots
+    os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"
+    # Start chromedriver with our options and use the
+    # context manager to ensure it quits.
+    with webdriver.Chrome(options=chrome_options) as driver:
+        console.print("Driver Capabilities.")
+        console.print(driver.capabilities)
+        # Each chromedriver instance will have its own user data store.
+        # Instantiate the model of the application with the path to the
+        # config.json
+        ot_application = OtApplication(
+            Path(f"{driver.capabilities['chrome']['userDataDir']}/config.json")
+        )
+        # Add the value to the config to ignore app updates.
+        ot_application.config["alerts"]["ignored"] = ["appUpdateAvailable"]
+        ot_application.write_config()
+        left_menu = LeftMenu(driver)
+        left_menu.click_protocol_upload_button()
+        protocol_file = ProtocolFile(driver)
+        logger.info(
+            f"uploading protocol: {test_protocols['protocoluploadjson'].resolve()}"
+        )
+        input = protocol_file.get_drag_json_protocol()
+        drag_and_drop_file(input, test_protocols["protocoluploadjson"])
