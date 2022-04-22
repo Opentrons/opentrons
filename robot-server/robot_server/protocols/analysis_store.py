@@ -26,7 +26,7 @@ class AnalysisStore:
         self._analysis_ids_by_protocol: Dict[str, List[str]] = defaultdict(list)
         self._analyses_by_id: Dict[str, ProtocolAnalysis] = {}
 
-    def add_pending(self, protocol_id: str, analysis_id: str) -> PendingAnalysis:
+    def add_pending(self, protocol_id: str, analysis_id: str) -> AnalysisSummary:
         """Add a pending analysis to the store."""
         ids_for_protocol = self._analysis_ids_by_protocol[protocol_id]
 
@@ -39,7 +39,7 @@ class AnalysisStore:
         self._analyses_by_id[analysis_id] = pending_analysis
         ids_for_protocol.append(analysis_id)
 
-        return pending_analysis
+        return AnalysisSummary(id=analysis_id, status=pending_analysis.status)
 
     def update(
         self,

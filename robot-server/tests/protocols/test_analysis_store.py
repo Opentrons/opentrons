@@ -13,6 +13,8 @@ from opentrons.protocol_engine import (
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.analysis_models import (
     AnalysisResult,
+    AnalysisStatus,
+    AnalysisSummary,
     PendingAnalysis,
     CompletedAnalysis,
 )
@@ -31,15 +33,17 @@ def test_get_empty() -> None:
 def test_add_pending() -> None:
     """It should add a pending analysis to the store."""
     subject = AnalysisStore()
-    expected_pending_analysis = PendingAnalysis(id="analysis-id")
+    expected_analysis = PendingAnalysis(id="analysis-id")
+    expected_summary = AnalysisSummary(
+        id="analysis-id",
+        status=AnalysisStatus.PENDING,
+    )
 
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
 
-    assert result == expected_pending_analysis
-    assert subject.get_by_protocol("protocol-id") == [expected_pending_analysis]
-    assert subject.get_summaries_by_protocol("protocol-id") == [
-        expected_pending_analysis
-    ]
+    assert result == expected_summary
+    assert subject.get_by_protocol("protocol-id") == [expected_analysis]
+    assert subject.get_summaries_by_protocol("protocol-id") == [expected_summary]
 
 
 def test_add_analysis_equipment() -> None:

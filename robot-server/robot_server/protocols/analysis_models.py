@@ -42,11 +42,14 @@ class AnalysisSummary(BaseModel):
     status: AnalysisStatus = Field(..., description="Status of the analysis")
 
 
-class PendingAnalysis(AnalysisSummary):
+class PendingAnalysis(BaseModel):
     """A protocol analysis that is on-going."""
 
     id: str = Field(..., description="Unique identifier of this analysis resource")
-    status: Literal[AnalysisStatus.PENDING] = AnalysisStatus.PENDING
+    status: Literal[AnalysisStatus.PENDING] = Field(
+        AnalysisStatus.PENDING,
+        description="Status marking the analysis as pending",
+    )
 
 
 class CompletedAnalysis(BaseModel):
@@ -71,7 +74,10 @@ class CompletedAnalysis(BaseModel):
     """
 
     id: str = Field(..., description="Unique identifier of this analysis resource")
-    status: Literal[AnalysisStatus.COMPLETED] = AnalysisStatus.COMPLETED
+    status: Literal[AnalysisStatus.COMPLETED] = Field(
+        AnalysisStatus.COMPLETED,
+        description="Status marking the analysis as completed",
+    )
     result: AnalysisResult = Field(
         ...,
         description="Whether the protocol is expected to run successfully",

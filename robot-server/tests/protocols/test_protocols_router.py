@@ -25,7 +25,6 @@ from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 from robot_server.protocols.analysis_models import (
     AnalysisStatus,
     AnalysisSummary,
-    PendingAnalysis,
     CompletedAnalysis,
     AnalysisResult,
 )
@@ -131,8 +130,8 @@ async def test_get_protocols(
         protocol_key="dummy-key-222",
     )
 
-    analysis_1 = PendingAnalysis(id="analysis-id-abc")
-    analysis_2 = PendingAnalysis(id="analysis-id-123")
+    analysis_1 = AnalysisSummary(id="analysis-id-abc", status=AnalysisStatus.PENDING)
+    analysis_2 = AnalysisSummary(id="analysis-id-123", status=AnalysisStatus.PENDING)
 
     expected_protocol_1 = Protocol(
         id="abc",
@@ -192,7 +191,8 @@ async def test_get_protocol_by_id(
     )
 
     analysis_summary = AnalysisSummary(
-        id="analysis-id", status=AnalysisStatus.COMPLETED
+        id="analysis-id",
+        status=AnalysisStatus.COMPLETED,
     )
 
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(resource)
@@ -272,7 +272,10 @@ async def test_create_protocol(
         protocol_key="dummy-key-111",
     )
 
-    pending_analysis = PendingAnalysis(id="analysis-id")
+    pending_analysis = AnalysisSummary(
+        id="analysis-id",
+        status=AnalysisStatus.PENDING,
+    )
 
     decoy.when(
         await protocol_reader.read_and_save(
