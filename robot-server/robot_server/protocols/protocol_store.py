@@ -1,6 +1,4 @@
 """Store and retrieve information about uploaded protocols."""
-
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -13,7 +11,7 @@ from anyio import Path as AsyncPath, create_task_group
 import sqlalchemy
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
-from robot_server.persistence import protocol_table
+from robot_server.persistence import protocol_table, ensure_datetime
 
 
 _log = getLogger(__name__)
@@ -72,7 +70,7 @@ class ProtocolStore:
         """Return a new, empty ProtocolStore.
 
         Params:
-            sql_engine: A referenece to the database that this ProtocolStore should
+            sql_engine: A reference to the database that this ProtocolStore should
                 use as its backing storage.
                 This is expected to already have the proper tables set up;
                 see `add_tables_to_db()`.
@@ -100,7 +98,7 @@ class ProtocolStore:
                 use as its backing storage.
                 This is expected to already have the proper tables set up;
                 see `add_tables_to_db()`.
-            protocols_direrctory: Where to look for protocol files while rehydrating.
+            protocols_directory: Where to look for protocol files while rehydrating.
                 This is expected to have one subdirectory per protocol,
                 named after its protocol ID.
             protocol_reader: An interface to compute `ProtocolSource`s from protocol
@@ -343,15 +341,13 @@ def _convert_sql_row_to_dataclass(
     sql_row: sqlalchemy.engine.Row,
 ) -> _DBProtocolResource:
     protocol_id = sql_row.id
-    assert isinstance(protocol_id, str)
-
-    created_at = sql_row.created_at
-    assert isinstance(created_at, datetime)
-
     protocol_key = sql_row.protocol_key
-    # key is optional in DB. If it's present (not None) it must be a str.
-    if protocol_key is not None:
-        assert isinstance(protocol_key, str)
+    created_at = ensure_datetime(sql_row.created_at)
+
+    assert isinstance(protocol_id, str), f"Protocol ID {protocol_id} not a string"
+    assert protocol_key is None or isinstance(
+        protocol_key, str
+    ), f"Protocol Key {protocol_key} not a string or None"
 
     return _DBProtocolResource(
         protocol_id=protocol_id,

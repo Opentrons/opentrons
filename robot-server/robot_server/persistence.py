@@ -1,19 +1,18 @@
 """Data access initialization and management."""
-import sqlalchemy
-from sqlalchemy.engine import Engine as SQLEngine
-from sqlalchemy import create_engine
-from fastapi import Depends
-
 import logging
-
+from datetime import datetime, timezone
 from pathlib import Path
 from tempfile import mkdtemp
-from typing_extensions import Final
+
+import sqlalchemy
 from anyio import Path as AsyncPath
+from fastapi import Depends
+from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine as SQLEngine
+from typing_extensions import Final
 
 from robot_server.app_state import AppState, AppStateValue, get_app_state
 from robot_server.settings import get_settings
-
 
 _sql_engine = AppStateValue[SQLEngine]("sql_engine")
 _persistence_directory = AppStateValue[Path]("persistence_directory")
@@ -36,7 +35,8 @@ protocol_table = sqlalchemy.Table(
     ),
     sqlalchemy.Column(
         "created_at",
-        sqlalchemy.DateTime,
+        # NOTE: SQLite does not support timezone-aware datetimes
+        sqlalchemy.DateTime(timezone=True),
         nullable=False,
     ),
     sqlalchemy.Column("protocol_key", sqlalchemy.String, nullable=True),
@@ -52,7 +52,8 @@ run_table = sqlalchemy.Table(
     ),
     sqlalchemy.Column(
         "created_at",
-        sqlalchemy.DateTime,
+        # NOTE: SQLite does not support timezone-aware datetimes
+        sqlalchemy.DateTime(timezone=True),
         nullable=False,
     ),
     sqlalchemy.Column(
@@ -73,7 +74,8 @@ action_table = sqlalchemy.Table(
         sqlalchemy.String,
         primary_key=True,
     ),
-    sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False),
+    # NOTE: SQLite does not support timezone-aware datetimes
+    sqlalchemy.Column("created_at", sqlalchemy.DateTime(timezone=True), nullable=False),
     sqlalchemy.Column("action_type", sqlalchemy.String, nullable=False),
     sqlalchemy.Column(
         "run_id",
@@ -150,3 +152,18 @@ def get_sql_engine(
     # FastAPI doesn't give us a convenient way to properly tie
     # the lifetime of a dependency to the lifetime of the server app.
     # https://github.com/tiangolo/fastapi/issues/617
+
+
+def ensure_datetime(dt: object) -> datetime:
+    """Ensure a persisted object is a TZ-aware datetime.
+
+    Args:
+        dt: A naive (timezone-less) datetime pulled from the database.
+
+    Returns:
+        A datetime with its timezone set to UTC.
+    """
+    assert isinstance(dt, datetime), f"{dt} is not a datetime"
+    assert dt.tzinfo is None, f"{dt} is not a naive datetime"
+
+    return dt.replace(tzinfo=timezone.utc)
