@@ -51,7 +51,12 @@ export const Modal = (props: ModalProps): JSX.Element => {
             </StyledText>
           </Flex>
           {onClose != null && (
-            <Btn onClick={onClose}>
+            <Btn
+              onClick={onClose}
+              data-testid={`Modal_icon_close_${
+                typeof title === 'string' ? title : ''
+              }`}
+            >
               <Icon
                 name={'close'}
                 width={SPACING.spacing5}
