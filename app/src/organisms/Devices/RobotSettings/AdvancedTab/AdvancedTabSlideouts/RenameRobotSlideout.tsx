@@ -68,6 +68,8 @@ export function RenameRobotSlideout({
     },
   })
 
+  // TODO: when a user lost connection while the user is renaming a robot,
+  // the app needs to show a message to inform that.
   const { updateRobotName } = useUpdateRobotNameMutation({
     onSuccess: (data: UpdatedRobotName) => {
       // remove the previous robot name from the list
