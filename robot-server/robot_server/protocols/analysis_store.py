@@ -24,6 +24,7 @@ from .analysis_models import (
     PendingAnalysis,
     CompletedAnalysis,
     AnalysisResult,
+    AnalysisStatus,
 )
 
 from .protocol_store import ProtocolNotFoundError
@@ -128,11 +129,20 @@ class AnalysisStore:
 
     def get_summaries_by_protocol(self, protocol_id: str) -> List[AnalysisSummary]:
         """Get summaries of all analyses for a protocol, in order from oldest first."""
-        full_analyses = self.get_by_protocol(protocol_id)
-
-        return [
-            AnalysisSummary.construct(id=a.id, status=a.status) for a in full_analyses
+        completed_analysis_ids = self._sql_get_ids_by_protocol(protocol_id=protocol_id)
+        completed_analysis_summaries = [
+            AnalysisSummary.construct(id=analysis_id, status=AnalysisStatus.COMPLETED)
+            for analysis_id in completed_analysis_ids
         ]
+
+        pending_analyses: List[AnalysisSummary]
+        try:
+            pending_analyses = [self._pending_analyses_by_protocol[protocol_id]]
+        except KeyError:
+            pending_analyses = []
+
+        result = completed_analysis_summaries + pending_analyses
+        return result
 
     def get_by_protocol(self, protocol_id: str) -> List[ProtocolAnalysis]:
         """Get all analyses for a protocol, in order from oldest first."""
