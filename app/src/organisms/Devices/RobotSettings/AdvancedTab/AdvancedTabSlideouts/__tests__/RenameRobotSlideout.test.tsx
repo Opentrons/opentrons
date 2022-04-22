@@ -7,7 +7,6 @@ import { i18n } from '../../../../../../i18n'
 import { RenameRobotSlideout } from '../RenameRobotSlideout'
 
 const mockOnCloseClick = jest.fn()
-
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
@@ -103,10 +102,16 @@ describe('RobotSettings RenameRobotSlideout', () => {
       expect(error).toBeInTheDocument()
     })
   })
+  // TODO: The following test case will be tested in the future
   // it('should close the slideout when a user change the name successfully', () => {
-  //   const [ { getByRole } ] = render()
+  //   const [{ getByRole }, store] = render()
+  //   expect(store.dispatch).toHaveBeenCalledWith(removeRobot('otie'))
   //   const input = getByRole('textbox')
   //   fireEvent.change(input, { target: { value: 'newMockInput' } })
   //   const renameButton = getByRole('button', { name: 'Rename robot' })
+  //   fireEvent.click(renameButton)
+  //   expect(store.getState().router.location.pathname).toBe(
+  //     '/devices/newMockInput/robot-settings'
+  //   )
   // })
 })

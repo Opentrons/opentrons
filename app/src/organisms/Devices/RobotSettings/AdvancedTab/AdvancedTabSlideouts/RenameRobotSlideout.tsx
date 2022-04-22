@@ -61,7 +61,6 @@ export function RenameRobotSlideout({
     validate: values => {
       const errors: FormikErrors = {}
       const newName = values.newRobotName
-      // console.log(newName, regexPattern.test(newName) ? 'valid' : 'invalid')
       if (!regexPattern.test(newName)) {
         errors.newRobotName = t('rename_robot_input_error_message')
       }
