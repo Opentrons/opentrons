@@ -2,7 +2,7 @@ from __future__ import annotations
 import asyncio
 
 from pathlib import Path
-from typing import AsyncGenerator, List
+from typing import Any, AsyncGenerator, Dict, List
 import httpx
 from httpx import Response
 
@@ -171,4 +171,26 @@ class RobotClient:
         """DELETE /runs/{run_id}."""
         response = await self.httpx_client.delete(f"{self.base_url}/runs/{run_id}")
         response.raise_for_status()
+        return response
+
+    async def post_commands(self, command: Dict[Any,Any]) -> Response:
+        """POST /commands.
+        note this will create a run
+        """
+        print(command)
+        response = await self.httpx_client.post(f"{self.base_url}/commands", json=command)
+        return response
+
+    async def post_runs(self) -> Response:
+        """POST /runs.
+        """
+        response = await self.httpx_client.post(f"{self.base_url}/runs", json={"data": {}})
+        return response
+
+
+    async def get_runs(self) -> Response:
+        """GET /runs."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/runs"
+        )
         return response
