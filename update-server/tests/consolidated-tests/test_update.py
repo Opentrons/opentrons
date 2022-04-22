@@ -65,24 +65,36 @@ async def test_commit_fails_wrong_state(test_cli, update_session):
 
 
 br_handler = update_actions.OT2UpdateActions()
+
 oe_handler = Updater(
     root_FS_intf=mock_root_fs_interface,
     part_mngr=mock_partition_manager_valid_switch,
 )
 
 
-@pytest.mark.parametrize('sys_handler', [br_handler, oe_handler])
+@pytest.mark.parametrize('sys_handler', ["br", "oe"])
 async def test_updater_chain(
-        otupdate_config, downloaded_update_file_oe, downloaded_update_file_br, loop, testing_partition, sys_handler,
+        otupdate_config,
+        downloaded_update_file_oe,
+        downloaded_update_file_br,
+        loop,
+        testing_partition,
+        sys_handler,
+        mock_root_fs_interface,
+        mock_partition_manager_valid_switch,
 
 ):
+
+    oe_handler = Updater(
+        root_FS_intf=mock_root_fs_interface,
+        part_mngr=mock_partition_manager_valid_switch,
+    )
     conf = config.load_from_path(otupdate_config)
     session = UpdateSession(conf.download_storage_path)
-    # handler = update_actions.OT2UpdateActions()
-    if isinstance(sys_handler, Updater):
-        fut = update._begin_validation(session, conf, loop, downloaded_update_file_oe, sys_handler)
-    elif isinstance(sys_handler, update_actions.OT2UpdateActions):
-        fut = update._begin_validation(session, conf, loop, downloaded_update_file_br, sys_handler)
+    if sys_handler is "oe":
+        fut = update._begin_validation(session, conf, loop, downloaded_update_file_oe, oe_handler)
+    elif sys_handler is "br":
+        fut = update._begin_validation(session, conf, loop, downloaded_update_file_br, br_handler)
     assert session.stage == Stages.VALIDATING
     last_progress = 0.0
     while session.stage == Stages.VALIDATING:
@@ -98,3 +110,29 @@ async def test_updater_chain(
         last_progress = session.state["progress"]
         await asyncio.sleep(0.1)
     assert session.stage == Stages.DONE, session.error
+
+
+@pytest.mark.exclude_rootfs_ext4
+@pytest.mark.parametrize('sys_handler', [br_handler, oe_handler])
+async def test_session_catches_validation_fail(
+        otupdate_config,
+        downloaded_update_file_oe,
+        downloaded_update_file_br,
+        loop,
+        sys_handler
+):
+    conf = config.load_from_path(otupdate_config)
+    session = UpdateSession(conf.download_storage_path)
+    if isinstance(sys_handler, Updater):
+        fut = update._begin_validation(session, conf, loop, downloaded_update_file_oe, sys_handler)
+    elif isinstance(sys_handler, update_actions.OT2UpdateActions):
+        fut = update._begin_validation(session, conf, loop, downloaded_update_file_br, sys_handler)
+    with pytest.raises(file_actions.FileMissing):
+        await fut
+    assert session.state["stage"] == "error"
+    assert session.stage == Stages.ERROR
+    assert "error" in session.state
+    assert "message" in session.state
+
+
+

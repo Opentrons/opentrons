@@ -1,0 +1,261 @@
+import os
+import subprocess
+import re
+import zipfile
+from unittest import mock
+
+import pytest
+
+from otupdate import buildroot, common
+
+from otupdate import openembedded
+from otupdate.common.update_actions import Partition
+from tests.common.config import FakeRootPartElem
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+
+
+@pytest.fixture(params=[openembedded, buildroot])
+async def test_cli(aiohttp_client, loop, otupdate_config, request):
+    """
+    Build an app using dummy versions, then build a test client and return it
+    """
+    cli_client_pkg = request.param
+    app = cli_client_pkg.get_app(
+        system_version_file=os.path.join(HERE, "version.json"),
+        config_file_override=otupdate_config,
+        name_override="opentrons-test",
+        boot_id_override="dummy-boot-id-abc123",
+        loop=loop,
+    )
+    client = await loop.create_task(aiohttp_client(app))
+    return client
+
+
+@pytest.fixture
+def downloaded_update_file_oe(request, extracted_update_file_oe):
+    """
+    Return the path to a zipped update file
+
+    To exclude files, mark with ``exclude_rootfs_ext4``,
+    ``exclude_rootfs_ext4_hash``, ``exclude_rootfs_ext4_hash_sig``.
+
+    This uses :py:meth:`extracted_update_file` to generate the contents, so
+    marks that fixture understands can be used when requesting this fixture
+
+    Can also be used by tests that will upload it to a test server, since
+    when the test server boots its download path will be somewhere else
+    """
+    rootfs_path = os.path.join(extracted_update_file_oe, "rootfs.xz")
+    hash_path = os.path.join(extracted_update_file_oe, "rootfs.xz.sha256")
+    sig_path = os.path.join(extracted_update_file_oe, "rootfs.xz.hash.sig")
+    zip_path = os.path.join(extracted_update_file_oe, "ot3-system.zip")
+    with zipfile.ZipFile(zip_path, "w") as zf:
+        if not request.node.get_closest_marker("exclude_rootfs_ext4"):
+            zf.write(rootfs_path, "rootfs.xz")
+        if not request.node.get_closest_marker("exclude_rootfs_ext4_hash"):
+            zf.write(hash_path, "rootfs.xz.sha256")
+        if not request.node.get_closest_marker("exclude_rootfs_ext4_hash_sig"):
+            zf.write(sig_path, "rootfs.xz.hash.sig")
+    os.unlink(rootfs_path)
+    os.unlink(hash_path)
+    os.unlink(sig_path)
+    return zip_path
+
+
+@pytest.fixture
+def downloaded_update_file_br(request, extracted_update_file_br):
+    """
+    Return the path to a zipped update file
+
+    To exclude files, mark with ``exclude_rootfs_ext4``,
+    ``exclude_rootfs_ext4_hash``, ``exclude_rootfs_ext4_hash_sig``.
+
+    This uses :py:meth:`extracted_update_file` to generate the contents, so
+    marks that fixture understands can be used when requesting this fixture
+
+    Can also be used by tests that will upload it to a test server, since
+    when the test server boots its download path will be somewhere else
+    """
+    rootfs_path = os.path.join(extracted_update_file_br, "rootfs.ext4")
+    hash_path = os.path.join(extracted_update_file_br, "rootfs.ext4.hash")
+    sig_path = os.path.join(extracted_update_file_br, "rootfs.ext4.hash.sig")
+    zip_path = os.path.join(extracted_update_file_br, "ot2-system.zip")
+    with zipfile.ZipFile(zip_path, "w") as zf:
+        if not request.node.get_closest_marker("exclude_rootfs_ext4"):
+            zf.write(rootfs_path, "rootfs.ext4")
+        if not request.node.get_closest_marker("exclude_rootfs_ext4_hash"):
+            zf.write(hash_path, "rootfs.ext4.hash")
+        if not request.node.get_closest_marker("exclude_rootfs_ext4_hash_sig"):
+            zf.write(sig_path, "rootfs.ext4.hash.sig")
+    os.unlink(rootfs_path)
+    os.unlink(hash_path)
+    os.unlink(sig_path)
+    return zip_path
+
+
+@pytest.fixture
+def downloaded_update_file(request, extracted_update_file_oe, extracted_update_file_br):
+    """
+    Return the path to a zipped update file
+
+    To exclude files, mark with ``exclude_rootfs_ext4``,
+    ``exclude_rootfs_ext4_hash``, ``exclude_rootfs_ext4_hash_sig``.
+
+    This uses :py:meth:`extracted_update_file` to generate the contents, so
+    marks that fixture understands can be used when requesting this fixture
+
+    Can also be used by tests that will upload it to a test server, since
+    when the test server boots its download path will be somewhere else
+    """
+    sys_type = request.param
+    if sys_type is "br":
+        rootfs_path = os.path.join(extracted_update_file_br, "rootfs.ext4")
+        hash_path = os.path.join(extracted_update_file_br, "rootfs.ext4.hash")
+        sig_path = os.path.join(extracted_update_file_br, "rootfs.ext4.hash.sig")
+        zip_path = os.path.join(extracted_update_file_br, "ot2-system.zip")
+        with zipfile.ZipFile(zip_path, "w") as zf:
+            if not request.node.get_closest_marker("exclude_rootfs_ext4"):
+                zf.write(rootfs_path, "rootfs.ext4")
+            if not request.node.get_closest_marker("exclude_rootfs_ext4_hash"):
+                zf.write(hash_path, "rootfs.ext4.hash")
+            if not request.node.get_closest_marker("exclude_rootfs_ext4_hash_sig"):
+                zf.write(sig_path, "rootfs.ext4.hash.sig")
+        os.unlink(rootfs_path)
+        os.unlink(hash_path)
+        os.unlink(sig_path)
+        return zip_path
+    elif sys_type is "oe":
+        rootfs_path = os.path.join(extracted_update_file_oe, "rootfs.xz")
+        hash_path = os.path.join(extracted_update_file_oe, "rootfs.xz.sha256")
+        sig_path = os.path.join(extracted_update_file_oe, "rootfs.xz.hash.sig")
+        zip_path = os.path.join(extracted_update_file_oe, "ot3-system.zip")
+        with zipfile.ZipFile(zip_path, "w") as zf:
+            if not request.node.get_closest_marker("exclude_rootfs_ext4"):
+                zf.write(rootfs_path, "rootfs.xz")
+            if not request.node.get_closest_marker("exclude_rootfs_ext4_hash"):
+                zf.write(hash_path, "rootfs.xz.sha256")
+            if not request.node.get_closest_marker("exclude_rootfs_ext4_hash_sig"):
+                zf.write(sig_path, "rootfs.xz.hash.sig")
+        os.unlink(rootfs_path)
+        os.unlink(hash_path)
+        os.unlink(sig_path)
+        return zip_path
+
+
+@pytest.fixture
+def extracted_update_file_br(request, tmpdir):
+    """
+    Return the path to a dir containing an unzipped update file.
+
+    To make a bad hash, mark with ``bad_hash``. To make a bad
+    signature, mark with ``bad_sig``.
+    """
+    rootfs_path = os.path.join(tmpdir, "rootfs.ext4")
+    hash_path = os.path.join(tmpdir, "rootfs.ext4.hash")
+    sig_path = os.path.join(tmpdir, "rootfs.ext4.hash.sig")
+    rootfs_contents = os.urandom(100000)
+    with open(rootfs_path, "wb") as rfs:
+        rfs.write(rootfs_contents)
+    if request.node.get_closest_marker("bad_hash"):
+        hashval = b"0oas0ajcs0asd0asjc0ans0d9ajsd0ian0s9djas"
+    else:
+        try:
+            shasum_out = subprocess.check_output(["shasum", "-a", "256", rootfs_path])
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            pytest.skip("no shasum invokeable on command line")
+        hashval = re.match(b"^([a-z0-9]+) ", shasum_out).group(1)
+    with open(hash_path, "wb") as rfsh:
+        rfsh.write(hashval)
+    if not request.node.get_closest_marker("bad_sig"):
+        try:
+            subprocess.check_output(["openssl", "version"])
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            pytest.skip("requires openssl binary to be installed")
+        subprocess.check_call(
+            [
+                "openssl",
+                "dgst",
+                "-sha256",
+                "-sign",
+                os.path.join(HERE, "ot-update-server-unit-tests.key"),
+                "-out",
+                sig_path,
+                hash_path,
+            ]
+        )
+    else:
+        with open(sig_path, "wb") as sigfile:
+            sigfile.write(os.urandom(256))
+    return tmpdir
+
+
+@pytest.fixture
+def extracted_update_file_oe(request, tmpdir):
+    """
+    Return the path to a dir containing an unzipped update file.
+
+    To make a bad hash, mark with ``bad_hash``. To make a bad
+    signature, mark with ``bad_sig``.
+    """
+    rootfs_path = os.path.join(tmpdir, "rootfs.xz")
+    hash_path = os.path.join(tmpdir, "rootfs.xz.sha256")
+    sig_path = os.path.join(tmpdir, "rootfs.xz.hash.sig")
+    rootfs_contents = os.urandom(100000)
+    with open(rootfs_path, "wb") as rfs:
+        rfs.write(rootfs_contents)
+    if request.node.get_closest_marker("bad_hash"):
+        hashval = b"0oas0ajcs0asd0asjc0ans0d9ajsd0ian0s9djas"
+    else:
+        try:
+            shasum_out = subprocess.check_output(["shasum", "-a", "256", rootfs_path])
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            pytest.skip("no shasum invokeable on command line")
+        hashval = re.match(b"^([a-z0-9]+) ", shasum_out).group(1)
+    with open(hash_path, "wb") as rfsh:
+        rfsh.write(hashval)
+    if not request.node.get_closest_marker("bad_sig"):
+        try:
+            subprocess.check_output(["openssl", "version"])
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            pytest.skip("requires openssl binary to be installed")
+        subprocess.check_call(
+            [
+                "openssl",
+                "dgst",
+                "-sha256",
+                "-sign",
+                os.path.join(HERE, "ot-update-server-unit-tests.key"),
+                "-out",
+                sig_path,
+                hash_path,
+            ]
+        )
+    else:
+        with open(sig_path, "wb") as sigfile:
+            sigfile.write(os.urandom(256))
+    return tmpdir
+
+
+@pytest.fixture
+def testing_partition(monkeypatch, tmpdir):
+    partfile = os.path.join(tmpdir, "fake-partition")
+    find_unused = mock.Mock()
+    monkeypatch.setattr(buildroot.update_actions, "_find_unused_partition", find_unused)
+    find_unused.return_value = FakeRootPartElem(
+        "TWO", common.update_actions.Partition(2, partfile)
+    )
+    return partfile
+
+
+@pytest.fixture
+def testing_partition_oe(monkeypatch, tmpdir):
+    part_file = os.path.join(tmpdir, "fake-partition")
+    find_unused = mock.Mock()
+    monkeypatch.setattr(
+        openembedded.updater.PartitionManager, "find_unused_partition", find_unused
+    )
+    find_unused.return_value = FakeRootPartElem(
+        "TWO", Partition(2, part_file, "/mnt/mmblk0-p2")
+    )
+    return part_file
