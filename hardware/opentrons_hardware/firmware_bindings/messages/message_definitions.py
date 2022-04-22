@@ -486,32 +486,18 @@ class GripperInfoResponse:  # noqa: D101
 
 
 @dataclass
-class PickUpTipRequest:  # noqa: D101
-    payload: payloads.PickUpTipRequestPayload
-    payload_type: Type[BinarySerializable] = payloads.PickUpTipRequestPayload
+class TipActionRequest:  # noqa: D101
+    payload: payloads.TipActionRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.TipActionRequestPayload
     message_id: Literal[
-        MessageId.do_self_contained_pickup_request
-    ] = MessageId.do_self_contained_pickup_request
+        MessageId.do_self_contained_tip_action_request
+    ] = MessageId.do_self_contained_tip_action_request
 
 
 @dataclass
-class PickUpTipResponse:  # noqa: D101
-    payload: payloads.PickUpTipResponsePayload
-    payload_type: Type[BinarySerializable] = payloads.PickUpTipResponsePayload
+class TipActionResponse:  # noqa: D101
+    payload: payloads.TipActionResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.TipActionResponsePayload
     message_id: Literal[
-        MessageId.do_self_contained_pickup_response
-    ] = MessageId.do_self_contained_pickup_response
-
-
-@dataclass
-class DropTipRequest:  # noqa: D101
-    payload: payloads.DropTipRequestPayload
-    payload_type: Type[BinarySerializable] = payloads.DropTipRequestPayload
-    message_id: Literal[MessageId.drop_tip_request] = MessageId.drop_tip_request
-
-
-@dataclass
-class DropTipResponse:  # noqa: D101
-    payload: payloads.DropTipResponsePayload
-    payload_type: Type[BinarySerializable] = payloads.DropTipResponsePayload
-    message_id: Literal[MessageId.drop_tip_response] = MessageId.drop_tip_response
+        MessageId.do_self_contained_tip_action_response
+    ] = MessageId.do_self_contained_tip_action_response
