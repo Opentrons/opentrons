@@ -29,6 +29,7 @@ class UpdateActionsInterface:
     @abc.abstractmethod
     def get_required_files(self, cert_path: str) -> List[str]:
         ...
+
     @staticmethod
     def from_request(request: web.Request) -> Optional["UpdateActionsInterface"]:
         """Get the update object from the aiohttp app store"""
@@ -43,11 +44,11 @@ class UpdateActionsInterface:
     def check_update_pkg_name(self, name: str) -> bool:
         """Make sure we're dealing with a valid update package!"""
         ...
+
     @abc.abstractmethod
     def get_update_pkg_name(self) -> str:
         """Get update package name."""
         ...
-
 
     @abc.abstractmethod
     def validate_update(

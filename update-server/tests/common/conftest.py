@@ -28,12 +28,20 @@ async def test_cli(aiohttp_client, loop, otupdate_config, request):
     return client
 
 
-br_files = dict([("ROOTFS", "rootfs.ext4"),
-                 ("ROOTFS_HASH", "rootfs.ext4.hash"),
-                 ("ROOTFS_SIG", "rootfs.ext4.hash.sig")])
-oe_files = dict([("ROOTFS", "rootfs.ext4"),
-                 ("ROOTFS_HASH", "rootfs.ext4.hash"),
-                 ("ROOTFS_SIG", "rootfs.ext4.hash.sig")])
+br_files = dict(
+    [
+        ("ROOTFS", "rootfs.ext4"),
+        ("ROOTFS_HASH", "rootfs.ext4.hash"),
+        ("ROOTFS_SIG", "rootfs.ext4.hash.sig"),
+    ]
+)
+oe_files = dict(
+    [
+        ("ROOTFS", "rootfs.ext4"),
+        ("ROOTFS_HASH", "rootfs.ext4.hash"),
+        ("ROOTFS_SIG", "rootfs.ext4.hash.sig"),
+    ]
+)
 
 
 @pytest.fixture(params=[br_files, oe_files])

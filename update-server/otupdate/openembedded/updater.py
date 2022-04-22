@@ -132,7 +132,7 @@ class Updater(UpdateActionsInterface):
         self.root_FS_intf = root_FS_intf
         self.part_mngr = part_mngr
 
-    def get_required_files(self, cert_path: str) -> List[str]:
+    def get_required_files(self, cert_path: Optional[str]) -> List[str]:
         required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
         if cert_path:
             required.append(ROOTFS_SIG_NAME)
