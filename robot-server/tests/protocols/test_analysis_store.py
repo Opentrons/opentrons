@@ -4,6 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Generator, List, NamedTuple
 
+import pytest
 from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons.types import MountType, DeckSlotName
@@ -12,14 +13,28 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
     types as pe_types,
 )
+from opentrons.protocol_reader import (
+    ProtocolSource,
+    JsonProtocolConfig,
+)
 
 from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
-from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.analysis_models import (
     AnalysisResult,
     PendingAnalysis,
     CompletedAnalysis,
 )
+from robot_server.protocols.analysis_store import AnalysisStore
+from robot_server.protocols.protocol_store import (
+    ProtocolStore,
+    ProtocolResource,
+    ProtocolNotFoundError,
+)
+
+
+@pytest.fixture(autouse=True)
+def set_logs(caplog):
+    caplog.set_level("DEBUG", logger="sqlalchemy")
 
 
 @pytest.fixture
@@ -39,8 +54,43 @@ def subject(sql_engine: SQLEngine) -> AnalysisStore:
     return AnalysisStore(sql_engine=sql_engine)
 
 
-def test_get_empty(subject: AnalysisStore) -> None:
+def make_dummy_protocol_resource(
+    protocol_id: str
+) -> ProtocolResource:
+    return ProtocolResource(
+        protocol_id=protocol_id,
+        created_at=datetime(year=2021, month=1, day=1),
+        source=ProtocolSource(
+            directory=Path("/dev/null"),
+            main_file=Path("/dev/null"),
+            config=JsonProtocolConfig(schema_version=123),
+            files=[],
+            metadata={},
+            labware_definitions=[],
+        ),
+        protocol_key=None,
+    )
+
+
+@pytest.fixture
+def protocol_store(sql_engine: SQLEngine) -> ProtocolStore:
+    """Get a ProtocolStore test subject."""
+    return ProtocolStore.create_empty(sql_engine=sql_engine)
+
+
+def test_protocol_not_found(subject: AnalysisStore) -> None:
+    with pytest.raises(ProtocolNotFoundError):
+        subject.add_pending(protocol_id="nonexistent-protocol-id", analysis_id="analysis-id-does-not-matter")
+    with pytest.raises(ProtocolNotFoundError):
+        subject.get_summaries_by_protocol(protocol_id="nonexistent-protocol-id")
+    with pytest.raises(ProtocolNotFoundError):
+        subject.get_by_protocol(protocol_id="nonexistent-protocol-id")
+
+
+def test_get_empty(subject: AnalysisStore, protocol_store: ProtocolStore) -> None:
     """It should return an empty list if no analysis saved."""
+    protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
+
     result = subject.get_by_protocol("protocol-id")
     summaries_result = subject.get_summaries_by_protocol("protocol-id")
 
@@ -48,8 +98,10 @@ def test_get_empty(subject: AnalysisStore) -> None:
     assert summaries_result == []
 
 
-def test_add_pending(subject: AnalysisStore) -> None:
+def test_add_pending(subject: AnalysisStore, protocol_store: ProtocolStore) -> None:
     """It should add a pending analysis to the store."""
+    protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
+
     expected_pending_analysis = PendingAnalysis(id="analysis-id")
 
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
@@ -61,8 +113,10 @@ def test_add_pending(subject: AnalysisStore) -> None:
     ]
 
 
-def test_add_analysis_equipment(subject: AnalysisStore) -> None:
+def test_add_analysis_equipment(subject: AnalysisStore, protocol_store: ProtocolStore) -> None:
     """It should add labware and pipettes to the stored analysis."""
+    protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
+
     labware = pe_types.LoadedLabware(
         id="labware-id",
         loadName="load-name",
@@ -141,11 +195,13 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
 @pytest.mark.parametrize(CommandAnalysisSpec._fields, command_analysis_specs)
 def test_add_parses_labware_commands(
     subject: AnalysisStore,
+    protocol_store: ProtocolStore,
     commands: List[pe_commands.Command],
     errors: List[pe_errors.ErrorOccurrence],
     expected_result: AnalysisResult,
 ) -> None:
     """It should be able to parse the commands list for analysis results."""
+    protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
     subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
     subject.update(
         analysis_id="analysis-id",
