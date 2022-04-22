@@ -39,6 +39,12 @@ export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
   // check for available updates
   useInterval(checkAppUpdate, UPDATE_RECHECK_DELAY_MS)
 
+  const handleLaunchModal: React.MouseEventHandler = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowSoftwareUpdateModal(true)
+  }
+
   return (
     <>
       {showUpdateBanner ? (
@@ -51,7 +57,7 @@ export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
             {t('robot_server_versions_banner_title')}
           </StyledText>
           <Btn
-            onClick={() => setShowSoftwareUpdateModal(true)}
+            onClick={handleLaunchModal}
             css={TYPOGRAPHY.pRegular}
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
           >

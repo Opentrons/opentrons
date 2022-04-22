@@ -14,6 +14,7 @@ from .fields import (
     SensorTypeField,
     PipetteNameField,
     PipetteSerialField,
+    GripperSerialField,
     SensorOutputBindingField,
 )
 from .. import utils
@@ -388,3 +389,11 @@ class BrushedMotorPwmPayload(utils.BinarySerializable):
 
     freq: utils.UInt32Field
     duty_cycle: utils.UInt32Field
+
+
+@dataclass
+class GripperInfoResponsePayload(utils.BinarySerializable):
+    """A response carrying data about an attached gripper."""
+
+    gripper_model: utils.UInt16Field
+    gripper_serial: GripperSerialField

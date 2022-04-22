@@ -9,7 +9,7 @@ from robot_server.service.session.models.session import SessionType
 
 
 @pytest.fixture
-async def session(session_manager, loop) -> BaseSession:
+async def session(session_manager) -> BaseSession:
     """An added session"""
     return await session_manager.add(
         session_type=SessionType.live_protocol, session_meta_data=SessionMetaData()

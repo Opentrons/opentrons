@@ -35,7 +35,6 @@ export function RobotSettings(): JSX.Element | null {
     calibration: () => <RobotSettingsCalibration robotName={robotName} />,
 
     networking: () => <RobotSettingsNetworking robotName={robotName} />,
-
     advanced: () => <RobotSettingsAdvanced robotName={robotName} />,
   }
 
