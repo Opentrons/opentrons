@@ -483,3 +483,21 @@ class GripperInfoResponse:  # noqa: D101
     message_id: Literal[
         MessageId.gripper_info_response
     ] = MessageId.gripper_info_response
+
+
+@dataclass
+class TipActionRequest:  # noqa: D101
+    payload: payloads.TipActionRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.TipActionRequestPayload
+    message_id: Literal[
+        MessageId.do_self_contained_tip_action_request
+    ] = MessageId.do_self_contained_tip_action_request
+
+
+@dataclass
+class TipActionResponse:  # noqa: D101
+    payload: payloads.TipActionResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.TipActionResponsePayload
+    message_id: Literal[
+        MessageId.do_self_contained_tip_action_response
+    ] = MessageId.do_self_contained_tip_action_response

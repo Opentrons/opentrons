@@ -397,3 +397,16 @@ class GripperInfoResponsePayload(utils.BinarySerializable):
 
     gripper_model: utils.UInt16Field
     gripper_serial: GripperSerialField
+
+
+class TipActionRequestPayload(AddToMoveGroupRequestPayload):
+    """A request to perform a tip action."""
+
+    velocity: utils.Int32Field
+
+
+@dataclass
+class TipActionResponsePayload(MoveGroupResponsePayload):
+    """A response that sends back whether tip action was successful."""
+
+    success: utils.UInt8Field
