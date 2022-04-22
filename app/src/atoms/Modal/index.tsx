@@ -11,10 +11,12 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   COLORS,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../text'
 import { Divider } from '../structure'
+
 import type { IconProps } from '@opentrons/components'
 
 type ModalType = 'info' | 'warning' | 'error'
@@ -31,8 +33,8 @@ const closeIconStyles = css`
   justify-content: center;
   align-items: center;
   border-radius: 14px;
-  width: 28px;
-  height: 28px;
+  width: ${SPACING.spacingL};
+  height: ${SPACING.spacingL};
   &:hover {
     background-color: rgba(22, 33, 45, 0.15);
   }
@@ -86,7 +88,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
       noHeaderStyles
       header={header}
       css={css`
-        border-radius: 0.25rem;
+        border-radius: ${BORDERS.radiusSoftCorners};
         box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.23);
       `}
     >

@@ -48,34 +48,29 @@ export const h1Default = css`
   font-size: ${fontSizeH1};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight24};
-  color: ${COLORS.darkBlack};
 `
 
 export const h2Regular = css`
   font-size: ${fontSizeH2};
   font-weight: ${fontWeightRegular};
   line-height: ${lineHeight20};
-  color: ${COLORS.darkBlack};
 `
 
 export const h2SemiBold = css`
   font-size: ${fontSizeH2};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${COLORS.darkBlack};
 `
 export const h3Regular = css`
   font-size: ${fontSizeH3};
   font-weight: ${fontWeightRegular};
   line-height: ${lineHeight20};
-  color: ${COLORS.darkBlack};
 `
 
 export const h3SemiBold = css`
   font-size: ${fontSizeH3};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${COLORS.darkBlack};
 `
 
 export const h6Default = css`
@@ -83,14 +78,12 @@ export const h6Default = css`
   font-weight: ${fontWeightRegular};
   line-height: ${lineHeight12};
   text-transform: ${textTransformUppercase};
-  color: ${COLORS.darkGreyEnabled};
 `
 
 export const h6SemiBold = css`
   font-size: ${fontSizeH6};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight12};
-  color: ${COLORS.darkGreyEnabled};
 `
 
 export const pRegular = css`

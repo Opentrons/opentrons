@@ -106,19 +106,16 @@ export function GeneralSettings(): JSX.Element {
           >
             <Banner
               type="warning"
-              title={
-                <>
-                  {t('update_available')}
-                  <Link
-                    textDecoration={TEXT_DECORATION_UNDERLINE}
-                    onClick={() => setShowUpdateModal(true)}
-                  >
-                    {t('view_update')}
-                  </Link>
-                </>
-              }
               onCloseClick={() => setShowUpdateBanner(false)}
-            />
+            >
+              {t('update_available')}
+              <Link
+                textDecoration={TEXT_DECORATION_UNDERLINE}
+                onClick={() => setShowUpdateModal(true)}
+              >
+                {t('view_update')}
+              </Link>
+            </Banner>
           </Box>
         )}
         <Flex

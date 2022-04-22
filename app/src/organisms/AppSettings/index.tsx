@@ -12,7 +12,6 @@ import {
   COLORS,
   BORDERS,
   TYPOGRAPHY,
-  SPACING_3,
 } from '@opentrons/components'
 import * as Config from '../../redux/config'
 import { GeneralSettings } from './GeneralSettings'
@@ -49,8 +48,8 @@ export function AppSettings(): JSX.Element {
         backgroundColor={COLORS.white}
         height="100%"
         width="100%"
-        margin={SPACING_3}
-        border={`1px solid ${COLORS.medGrey}`}
+        margin={SPACING.spacing4}
+        border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGrey}`}
         borderRadius={BORDERS.radiusSoftCorners}
         minHeight="95%"
       >

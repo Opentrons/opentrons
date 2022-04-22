@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import * as Styles from '../styles'
 import { Box, Flex } from '../primitives'
-import { COLORS } from '../ui-style-constants'
+import { COLORS, SPACING } from '../ui-style-constants'
 
 import type { StyleProps } from '../primitives'
 
@@ -16,7 +16,7 @@ const BASE_STYLE = {
   left: 0,
   width: '100%',
   height: '100%',
-  padding: '1rem 1.5rem',
+  padding: `${SPACING.spacing4}, ${SPACING.spacing5}`,
 } as const
 
 const MODAL_STYLE = {
@@ -30,20 +30,20 @@ const MODAL_STYLE = {
 const HEADER_STYLE = {
   backgroundColor: Styles.C_LIGHT_GRAY,
   position: Styles.POSITION_STICKY,
-  padding: Styles.SPACING_3,
+  padding: SPACING.spacing4,
   top: 0,
 } as const
 
 const FOOTER_STYLE = {
   backgroundColor: Styles.C_WHITE,
   position: Styles.POSITION_STICKY,
-  padding: Styles.SPACING_3,
+  padding: SPACING.spacing4,
   bottom: 0,
 } as const
 
 const CONTENT_STYLE = {
-  paddingX: Styles.SPACING_4,
-  paddingY: Styles.SPACING_3,
+  paddingX: SPACING.spacing6,
+  paddingY: SPACING.spacing4,
 } as const
 
 export interface BaseModalProps extends StyleProps {
