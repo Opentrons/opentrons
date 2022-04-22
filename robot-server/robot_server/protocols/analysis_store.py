@@ -139,7 +139,6 @@ class AnalysisStore:
         completed_analysis_resources = self._sql_get_by_protocol(
             protocol_id=protocol_id
         )
-        # TODO: If version mismatch, log warning.
         completed_analyses: List[ProtocolAnalysis] = [
             resource.completed_analysis for resource in completed_analysis_resources
         ]
