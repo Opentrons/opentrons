@@ -21,6 +21,8 @@ class NodeId(int, Enum):
     head_l = 0x51
     head_r = 0x52
     gripper = 0x20
+    gripper_z = 0x21
+    gripper_g = 0x22
     pipette_left_bootloader = pipette_left | 0xF
     pipette_right_bootloader = pipette_right | 0xF
     gantry_x_bootloader = gantry_x | 0xF
@@ -56,6 +58,8 @@ class MessageId(int, Enum):
     task_info_response = 0x305
     pipette_info_request = 0x306
     pipette_info_response = 0x307
+    gripper_info_request = 0x308
+    gripper_info_response = 0x309
 
     stop_request = 0x00
 
