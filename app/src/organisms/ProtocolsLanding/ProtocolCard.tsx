@@ -154,7 +154,11 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             errors={mostRecentAnalysis?.errors.map(e => e.detail) ?? []}
           />
         ) : null}
-        <StyledText as="h3" marginBottom={SPACING.spacing4} data-testid={`ProtocolCard_${protocolDisplayName}`}>
+        <StyledText
+          as="h3"
+          marginBottom={SPACING.spacing4}
+          data-testid={`ProtocolCard_${protocolDisplayName}`}
+        >
           {protocolDisplayName}
         </StyledText>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
