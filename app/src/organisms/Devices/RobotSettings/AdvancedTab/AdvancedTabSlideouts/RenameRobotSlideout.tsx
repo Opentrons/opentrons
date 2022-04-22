@@ -88,8 +88,8 @@ export function RenameRobotSlideout({
       isExpanded={isExpanded}
       footer={
         <PrimaryButton
+          onClick={() => formik.handleSubmit()}
           disabled={!(formik.isValid && formik.dirty)}
-          onClick={formik.handleSubmit}
           width="100%"
         >
           {t('rename_robot_button')}
