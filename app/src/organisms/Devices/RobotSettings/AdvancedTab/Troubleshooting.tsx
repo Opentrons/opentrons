@@ -26,7 +26,7 @@ export function Troubleshooting({ robot }: TroubleshootingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
   const controlDisabled = robot?.status !== CONNECTABLE
-  const logsAvailable = robot?.health && robot?.health.logs
+  const logsAvailable = robot?.health != null && robot?.health.logs
   const robotLogsDownloading = useSelector(getRobotLogsDownloading)
 
   return (
@@ -39,14 +39,20 @@ export function Troubleshooting({ robot }: TroubleshootingProps): JSX.Element {
         >
           {t('update_robot_software_troubleshooting')}
         </StyledText>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <StyledText
+          as="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          data-testid="RobotSettings_Troubleshooting"
+        >
           {t('update_robot_software_download_logs')}
         </StyledText>
       </Box>
       <TertiaryButton
-        disabled={controlDisabled || !logsAvailable || robotLogsDownloading}
+        disabled={
+          controlDisabled || logsAvailable == null || robotLogsDownloading
+        }
         marginLeft={SPACING_AUTO}
-        onClick={() => dispatch(downloadLogs(robot as ViewableRobot))}
+        onClick={() => dispatch(downloadLogs(robot))}
         id="AdvancedSettings_downloadLogsButton"
       >
         {t('update_robot_software_download_logs')}
