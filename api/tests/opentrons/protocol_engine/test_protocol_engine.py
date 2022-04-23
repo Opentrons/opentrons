@@ -19,6 +19,7 @@ from opentrons.protocol_engine.types import (
     LabwareUri,
     ModuleDefinition,
     ModuleModel,
+    EngineStatus,
 )
 from opentrons.protocol_engine.execution import (
     QueueWorker,
@@ -28,7 +29,7 @@ from opentrons.protocol_engine.execution import (
 from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
-
+from opentrons.protocol_engine.errors import SetupCommandNotAllowedError
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
     AddLabwareOffsetAction,
@@ -175,6 +176,21 @@ def test_add_command(
     result = subject.add_command(request)
 
     assert result == queued
+
+
+async def test_adding_setup_command_raises_when_engine_busy(
+    decoy: Decoy,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+) -> None:
+    """Test that adding a setup command fails when the engine is not idle/paused."""
+    # created_at = datetime(year=2021, month=1, day=1)
+    params = commands.HomeParams()
+    request = commands.HomeCreate(params=params)
+    decoy.when(state_store.commands.raise_if_not_paused_or_idle()
+               ).then_raise(SetupCommandNotAllowedError)
+    with pytest.raises(SetupCommandNotAllowedError):
+        subject.add_command(request, is_setup=True)
 
 
 async def test_add_and_execute_command(

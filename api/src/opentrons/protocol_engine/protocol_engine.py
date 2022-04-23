@@ -117,16 +117,22 @@ class ProtocolEngine:
         self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(action)
 
-    def add_command(self, request: CommandCreate) -> Command:
+    def add_command(self, request: CommandCreate, is_setup: bool = False) -> Command:
         """Add a command to the `ProtocolEngine`'s queue.
 
         Arguments:
             request: The command type and payload data used to construct
                 the command in state.
-
+            is_setup: Whether the command is a setup command
         Returns:
             The full, newly queued command.
+        Raises: SetupCommandNotAllowed error if the command is a setup command and
+            the engine is not idle or paused.
         """
+        if is_setup:
+            self.state_view.commands.raise_if_not_paused_or_idle()
+            # add to setup command queue
+
         command_id = self._model_utils.generate_id()
         action = QueueCommandAction(
             request=request,

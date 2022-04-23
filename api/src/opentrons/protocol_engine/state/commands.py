@@ -30,6 +30,7 @@ from ..errors import (
     ProtocolEngineStoppedError,
     ErrorOccurrence,
     RobotDoorOpenError,
+    SetupCommandNotAllowedError,
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
@@ -498,6 +499,13 @@ class CommandView(HasState[CommandState]):
         """Raise if the engine is currently paused by an open door."""
         if self.get_status() == EngineStatus.BLOCKED_BY_OPEN_DOOR:
             raise RobotDoorOpenError("Front door or top window is currently open.")
+
+    def raise_if_not_paused_or_idle(self) -> None:
+        """Raise if the engine is neither paused nor idle."""
+        if not (self.get_status() == EngineStatus.PAUSED
+                or self.get_status() == EngineStatus.IDLE):
+            raise SetupCommandNotAllowedError("Setup command can only be run when the"
+                                              "engine is paused or idle.")
 
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""

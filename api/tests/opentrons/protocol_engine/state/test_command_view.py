@@ -243,6 +243,73 @@ def test_validate_action_allowed(
         subject.raise_if_stop_requested()
 
 
+class SetupCommandAllowedSpec(NamedTuple):
+    """Spec data to test raise_if_not_paused_or_idle."""
+
+    subject: CommandView
+    expected_error: Optional[Type[errors.ProtocolEngineError]]
+
+
+command_allowed_specs: List[SetupCommandAllowedSpec] = [
+    SetupCommandAllowedSpec(    # Status: RUNNING
+        subject=get_command_view(
+            queue_status=QueueStatus.ACTIVE,
+            running_command_id=None,
+            queued_command_ids=[],
+        ),
+        expected_error=errors.SetupCommandNotAllowedError
+    ),
+    SetupCommandAllowedSpec(    # Status: IDLE
+        subject=get_command_view(
+            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            running_command_id=None,
+            queued_command_ids=[],
+        ),
+        expected_error=None
+    ),
+    SetupCommandAllowedSpec(    # Status: PAUSED
+        subject=get_command_view(
+            queue_status=QueueStatus.INACTIVE,
+        ),
+        expected_error=None,
+    ),
+    SetupCommandAllowedSpec(    # Status: FAILED
+        subject=get_command_view(
+            run_result=RunResult.FAILED,
+            is_hardware_stopped=True,
+        ),
+        expected_error=errors.SetupCommandNotAllowedError
+    ),
+    SetupCommandAllowedSpec(    # Status: BLOCKED_BY_OPEN_DOOR
+        subject=get_command_view(
+            queue_status=QueueStatus.INACTIVE,
+            is_door_blocking=True,
+        ),
+        expected_error=errors.SetupCommandNotAllowedError
+    ),
+    SetupCommandAllowedSpec(    # Status: FINISHING
+        subject=get_command_view(
+            queue_status=QueueStatus.INACTIVE,
+            run_result=RunResult.SUCCEEDED,
+            is_hardware_stopped=False,
+        ),
+        expected_error=errors.SetupCommandNotAllowedError
+    )
+]
+
+
+@pytest.mark.parametrize(SetupCommandAllowedSpec._fields, command_allowed_specs)
+def test_raise_unless_engine_paused_or_idle(
+        subject: CommandView,
+        expected_error: Optional[Type[errors.SetupCommandNotAllowedError]]
+) -> None:
+    """It should validate if a setup command can be run."""
+    expectation = pytest.raises(expected_error) if expected_error else does_not_raise()
+
+    with expectation:  # type: ignore[attr-defined]
+        subject.raise_if_not_paused_or_idle()
+
+
 class PlayAllowedSpec(NamedTuple):
     """Spec data to test CommandView.validate_action_allowed."""
 
