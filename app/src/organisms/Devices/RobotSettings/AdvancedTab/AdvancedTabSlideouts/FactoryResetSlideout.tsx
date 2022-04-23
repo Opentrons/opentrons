@@ -148,7 +148,7 @@ export function FactoryResetSlideout({
               })
             }
             value={resetOptions[opt.id]}
-            label={opt.name}
+            label={`Clear ${opt.name}`}
           />
         ))}
 
