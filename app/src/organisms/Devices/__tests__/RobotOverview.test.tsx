@@ -12,12 +12,14 @@ import { useLights, useRobot, useIsRobotViewable } from '../hooks'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 import { RobotOverview } from '../RobotOverview'
+import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 jest.mock('../RobotStatusBanner')
 jest.mock('../../UpdateRobotBanner')
 jest.mock('../../ChooseProtocolSlideout')
+jest.mock('../RobotOverviewOverflowMenu')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
 
@@ -37,6 +39,9 @@ const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction
 >
 const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
   typeof UpdateRobotBanner
+>
+const mockRobotOverviewOverflowMenu = RobotOverviewOverflowMenu as jest.MockedFunction<
+  typeof RobotOverviewOverflowMenu
 >
 
 const mockToggleLights = jest.fn()
@@ -68,6 +73,9 @@ describe('RobotOverview', () => {
     mockUpdateRobotBanner.mockReturnValue(<div>Mock UpdateRobotBanner</div>)
     mockUseCurrentRunId.mockReturnValue(null)
     mockUseIsRobotViewable.mockReturnValue(true)
+    mockRobotOverviewOverflowMenu.mockReturnValue(
+      <div>mock RobotOverviewOverflowMenu</div>
+    )
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -112,5 +120,11 @@ describe('RobotOverview', () => {
     const runButton = getByRole('button', { name: 'Run a Protocol' })
     fireEvent.click(runButton)
     getByText('Mock Choose Protocol Slideout showing')
+  })
+
+  it('renders an overflow menu for the robot overview', () => {
+    const [{ getByText }] = render()
+
+    getByText('mock RobotOverviewOverflowMenu')
   })
 })

@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
+
+
+### Bug Fixes
+
+* **app:** fix heater shaker intro pg and misc typography ([#9493](https://github.com/Opentrons/opentrons/issues/9493)) ([347ed6e](https://github.com/Opentrons/opentrons/commit/347ed6e1b90a87f97bb171be87620f20f2db28f2))
+
+
+### Features
+
+* **app:** about Module Slideouts ([#9543](https://github.com/Opentrons/opentrons/issues/9543)) ([d40dbc3](https://github.com/Opentrons/opentrons/commit/d40dbc3502cef97bbb10956c831e94e48f0ed688)), closes [#9305](https://github.com/Opentrons/opentrons/issues/9305)
+* **app:** add heater shaker attach module page ([#9517](https://github.com/Opentrons/opentrons/issues/9517)) ([caaab4e](https://github.com/Opentrons/opentrons/commit/caaab4e64ce321689ce930ee399f4c7fbecb2565))
+* **app:** add heater shaker wizard scaffold ([#9451](https://github.com/Opentrons/opentrons/issues/9451)) ([c68b750](https://github.com/Opentrons/opentrons/commit/c68b75018f58343852d72c297c8970483760d6cd))
+* **app:** add magnetic module card in device details ([#9347](https://github.com/Opentrons/opentrons/issues/9347)) ([466e056](https://github.com/Opentrons/opentrons/commit/466e0567065d8773a81c25cd1b5c7998e00adf2c)), closes [#9324](https://github.com/Opentrons/opentrons/issues/9324)
+* **app:** add overFlow menu component and icon states ([#9409](https://github.com/Opentrons/opentrons/issues/9409)) ([40fcfd9](https://github.com/Opentrons/opentrons/commit/40fcfd9ee628dccace4a8e118d0039030ebd400c)), closes [#9362](https://github.com/Opentrons/opentrons/issues/9362)
+* **app:** Add protocols list skeleton layout ([#9638](https://github.com/Opentrons/opentrons/issues/9638)) ([cfa1aa5](https://github.com/Opentrons/opentrons/commit/cfa1aa50501677dab49cbb9b3e02e373f256293a))
+* **app:** add temperature module card in device details ([#9361](https://github.com/Opentrons/opentrons/issues/9361)) ([decbcbb](https://github.com/Opentrons/opentrons/commit/decbcbb753acdae9d7f0f1d79b332fb3a535e0cb)), closes [#9325](https://github.com/Opentrons/opentrons/issues/9325)
+* **app:** add thermocycler module card in device details ([#9373](https://github.com/Opentrons/opentrons/issues/9373)) ([64575c0](https://github.com/Opentrons/opentrons/commit/64575c0201a24c233fc0462c3848dbc37b1d58e7)), closes [#9326](https://github.com/Opentrons/opentrons/issues/9326)
+* **app:** app Settings for unified app ([#9489](https://github.com/Opentrons/opentrons/issues/9489)) ([af8d1ce](https://github.com/Opentrons/opentrons/commit/af8d1ce24071c5b75ef67ad244ca959246a4f9c7)), closes [#8885](https://github.com/Opentrons/opentrons/issues/8885) [#8884](https://github.com/Opentrons/opentrons/issues/8884) [#8886](https://github.com/Opentrons/opentrons/issues/8886) [#8882](https://github.com/Opentrons/opentrons/issues/8882) [#8880](https://github.com/Opentrons/opentrons/issues/8880) [#8879](https://github.com/Opentrons/opentrons/issues/8879)
+* **app:** Connect Robot via IP Address Slidout ([#9811](https://github.com/Opentrons/opentrons/issues/9811)) ([4a93206](https://github.com/Opentrons/opentrons/commit/4a932064598cbdece69d47c475a90d9d602fa751)), closes [#8883](https://github.com/Opentrons/opentrons/issues/8883) [/github.com/Opentrons/opentrons/pull/9811#discussion_r837678382](https://github.com//github.com/Opentrons/opentrons/pull/9811/issues/discussion_r837678382)
+* **app:** create Banner component and add throughout module cards ([#9740](https://github.com/Opentrons/opentrons/issues/9740)) ([161a554](https://github.com/Opentrons/opentrons/commit/161a554ce57133eff511e05e6975fb5491d2ce95)), closes [#9290](https://github.com/Opentrons/opentrons/issues/9290) [#9545](https://github.com/Opentrons/opentrons/issues/9545)
+* **app:** create heater shaker wizard intro page ([#9469](https://github.com/Opentrons/opentrons/issues/9469)) ([b8848f2](https://github.com/Opentrons/opentrons/commit/b8848f28d534a7023e984c0b43814db9c966964f)), closes [#9283](https://github.com/Opentrons/opentrons/issues/9283)
+* **app:** Create Labware card and Labware Landing ([#9612](https://github.com/Opentrons/opentrons/issues/9612)) ([d09dbd1](https://github.com/Opentrons/opentrons/commit/d09dbd1547c419b7fb63f7dca1589c7def5bcb43)), closes [#8861](https://github.com/Opentrons/opentrons/issues/8861)
+* **app:** creates temp module slideout ([#9415](https://github.com/Opentrons/opentrons/issues/9415)) ([4f85fd5](https://github.com/Opentrons/opentrons/commit/4f85fd560ba1b9f72fe8471b0b5ea6b4bcb32655)), closes [#8790](https://github.com/Opentrons/opentrons/issues/8790)
+* **app:** heater shaker banner ([#9424](https://github.com/Opentrons/opentrons/issues/9424)) ([17ee912](https://github.com/Opentrons/opentrons/commit/17ee91255c7dc996cec4cb7d54a9e26502a5e63a)), closes [#9243](https://github.com/Opentrons/opentrons/issues/9243)
+* **app:** heater shaker wizard thermal adapter page ([#9500](https://github.com/Opentrons/opentrons/issues/9500)) ([60b249b](https://github.com/Opentrons/opentrons/commit/60b249b8a088fc0604820416668cd45d31e55b8c)), closes [#9283](https://github.com/Opentrons/opentrons/issues/9283)
+* **app:** make pipette cards and overflow menus ([#9976](https://github.com/Opentrons/opentrons/issues/9976)) ([c2753cd](https://github.com/Opentrons/opentrons/commit/c2753cdb1b1f27c2d5762a220a5d3aba061bb921)), closes [#8692](https://github.com/Opentrons/opentrons/issues/8692) [#8693](https://github.com/Opentrons/opentrons/issues/8693)
+* **app:** slideout and functionality to heater shaker overflow menu ([#9682](https://github.com/Opentrons/opentrons/issues/9682)) ([271dea6](https://github.com/Opentrons/opentrons/commit/271dea6d1924a795f56aee1e2a0839ef8d10bf61)), closes [#9304](https://github.com/Opentrons/opentrons/issues/9304) [#9303](https://github.com/Opentrons/opentrons/issues/9303) [#9302](https://github.com/Opentrons/opentrons/issues/9302) [#9450](https://github.com/Opentrons/opentrons/issues/9450)
+* **app, app-shell:** add labware details slideout and overflow menu ([#9894](https://github.com/Opentrons/opentrons/issues/9894)) ([dee5a11](https://github.com/Opentrons/opentrons/commit/dee5a11e594f48b9bd642755d5cc63c023d6c0dc)), closes [#8870](https://github.com/Opentrons/opentrons/issues/8870)
+* **app, app-shell, api-client:** include analysis as cli tool within app for protocol ingestion  ([#9825](https://github.com/Opentrons/opentrons/issues/9825)) ([cdf6c59](https://github.com/Opentrons/opentrons/commit/cdf6c59a96ea6ea5dca2ed79269537dbc0bc6ff7))
+* **components:** Add design system constants to components library ([#9398](https://github.com/Opentrons/opentrons/issues/9398)) ([657df06](https://github.com/Opentrons/opentrons/commit/657df06a813359d1a4ed519057c687f68b8559b0)), closes [#9389](https://github.com/Opentrons/opentrons/issues/9389)
+* **components:** Add single path icon data for new compound icons ([#9462](https://github.com/Opentrons/opentrons/issues/9462)) ([fe164a4](https://github.com/Opentrons/opentrons/commit/fe164a472205de559a054eeeaac81fc27990554c))
+* **protocol-designer:** add tooltips to H-S stepform ([#9944](https://github.com/Opentrons/opentrons/issues/9944)) ([d5d06b1](https://github.com/Opentrons/opentrons/commit/d5d06b100a88780d76f46f06a39d6b0c3ba964f1)), closes [#9733](https://github.com/Opentrons/opentrons/issues/9733)
+
+
+
+
+
 ## [5.0.2](https://github.com/Opentrons/opentrons/compare/v5.0.1...v5.0.2) (2022-03-03)
 
 **Note:** Version bump only for package @opentrons/components

@@ -17,7 +17,7 @@ import { StyledText } from '../../../../../atoms/text'
 import { Divider } from '../../../../../atoms/structure'
 import { Banner } from '../../../../../atoms/Banner'
 import { fetchResetConfigOptions } from '../../../../../redux/robot-admin'
-// import { getRobotByName } from '../../../../../redux/discovery'
+// import { useRobot } from '../../../../../hooks'
 import { useTrackEvent } from '../../../../../redux/analytics'
 import {
   useDeckCalibrationData,
@@ -44,7 +44,7 @@ export function FactoryResetSlideout({
 }: FactoryResetSlideoutProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
-  // const robot = useSelector((state: State) => getRobotByName(state, robotName))
+  // const robot = useRobot(robotName)
   const dispatch = useDispatch<Dispatch>()
 
   // const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
