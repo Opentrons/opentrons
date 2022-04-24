@@ -1,9 +1,9 @@
 import * as React from 'react'
+import map from 'lodash/map'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { getModuleType, getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   Box,
   Btn,
@@ -22,12 +22,11 @@ import {
   Card,
   JUSTIFY_SPACE_BETWEEN,
   TEXT_TRANSFORM_CAPITALIZE,
-  ModuleIcon,
-  ALIGN_CENTER,
+  Text,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
-  parseAllRequiredModuleModels,
+  parseInitialLoadedModulesBySlot,
 } from '@opentrons/api-client'
 
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
@@ -45,6 +44,7 @@ import {
 
 import type { State } from '../../redux/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
+import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 
 const defaultTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -122,9 +122,12 @@ export function ProtocolDetails(
     mostRecentAnalysis != null
       ? parseInitialPipetteNamesByMount(mostRecentAnalysis.commands)
       : { left: null, right: null }
-  const requiredModuleTypes = parseAllRequiredModuleModels(
-    mostRecentAnalysis != null ? mostRecentAnalysis.commands : []
-  ).map(getModuleType)
+
+  const requiredModuleDetails = map(
+    parseInitialLoadedModulesBySlot(
+      mostRecentAnalysis.commands != null ? mostRecentAnalysis.commands : []
+    )
+  )
 
   const protocolDisplayName = getProtocolDisplayName(
     protocolKey,
@@ -142,73 +145,11 @@ export function ProtocolDetails(
     currentTab === 'labware' ? (
       <Box>TODO: labware tab contents</Box>
     ) : (
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          alignItems={ALIGN_CENTER}
-          marginY={SPACING.spacing3}
-        >
-          <StyledText
-            as="h6"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            marginRight={SPACING.spacing4}
-          >
-            {t('left_mount')}
-          </StyledText>
-          <StyledText as="p">
-            {leftMountPipetteName != null
-              ? getPipetteNameSpecs(leftMountPipetteName)?.displayName
-              : t('shared:empty')}
-          </StyledText>
-        </Flex>
-        <Divider width="100%" />
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          alignItems={ALIGN_CENTER}
-          marginY={SPACING.spacing3}
-        >
-          <StyledText
-            as="h6"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            marginRight={SPACING.spacing4}
-          >
-            {t('right_mount')}
-          </StyledText>
-          <StyledText as="p">
-            {rightMountPipetteName != null
-              ? getPipetteNameSpecs(rightMountPipetteName)?.displayName
-              : t('shared:empty')}
-          </StyledText>
-        </Flex>
-        {requiredModuleTypes.map((moduleType, index) => (
-          <>
-            <Divider width="100%" />
-            <Flex
-              key={index}
-              flexDirection={DIRECTION_ROW}
-              alignItems={ALIGN_CENTER}
-              marginY={SPACING.spacing3}
-            >
-              <StyledText
-                as="h6"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                marginRight={SPACING.spacing4}
-              >
-                TODO slot
-              </StyledText>
-              <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-                <ModuleIcon
-                  key={index}
-                  moduleType={moduleType}
-                  height="1rem"
-                  marginRight={SPACING.spacing3}
-                />
-                <StyledText as="p">{moduleType}</StyledText>
-              </Flex>
-            </Flex>
-          </>
-        ))}
-      </Flex>
+      <RobotConfigurationDetails
+        leftMountPipetteName={leftMountPipetteName}
+        rightMountPipetteName={rightMountPipetteName}
+        requiredModuleDetails={requiredModuleDetails}
+      />
     )
 
   return (
@@ -335,7 +276,11 @@ export function ProtocolDetails(
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Card flex="0 0 20rem" data-testid={`ProtocolDetails_deckMap`}>
+        <Card
+          flex="0 0 20rem"
+          backgroundColor={COLORS.white}
+          data-testid={`ProtocolDetails_deckMap`}
+        >
           <StyledText
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -345,7 +290,7 @@ export function ProtocolDetails(
             {t('deck_setup')}
           </StyledText>
           <Divider />
-          <Box padding={SPACING.spacing4}>
+          <Box padding={SPACING.spacing4} backgroundColor={COLORS.white}>
             {
               {
                 missing: <Box size="15rem" backgroundColor={COLORS.medGrey} />,
@@ -360,22 +305,31 @@ export function ProtocolDetails(
             }
           </Box>
         </Card>
-        <Box height="100%" width={SPACING.spacing4} />
-        <Card flex="1">
+
+        <Flex
+          width="100%"
+          height="100%"
+          flexDirection={DIRECTION_COLUMN}
+          marginLeft={SPACING.spacing4}
+        >
           <Flex>
             <RoundTab
               data-testid={`ProtocolDetails_robotConfig`}
               isCurrent={currentTab === 'robot_config'}
               onClick={() => setCurrentTab('robot_config')}
             >
-              {t('robot_configuration')}
+              <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+                {t('robot_configuration')}
+              </Text>
             </RoundTab>
             <RoundTab
               data-testid={`ProtocolDetails_labware`}
               isCurrent={currentTab === 'labware'}
               onClick={() => setCurrentTab('labware')}
             >
-              {t('labware')}
+              <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+                {t('labware')}
+              </Text>
             </RoundTab>
           </Flex>
           <Box
@@ -391,7 +345,7 @@ export function ProtocolDetails(
           >
             {getTabContents()}
           </Box>
-        </Card>
+        </Flex>
       </Flex>
     </Flex>
   )
