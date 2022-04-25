@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Redirect, useParams } from 'react-router-dom'
 
@@ -13,17 +14,22 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import { getRobotByName } from '../../../redux/discovery'
 import { Line } from '../../../atoms/structure'
 import { NavTab } from '../../../atoms/NavTab'
 import { RobotSettingsCalibration } from '../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
+import { RobotSettingsAdvanced } from '../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsNetworking } from '../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 
+import type { State } from '../../../redux/types'
 import type { NavRouteParams, RobotSettingsTab } from '../../../App/types'
 
 export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')
   const { robotName, robotSettingsTab } = useParams<NavRouteParams>()
+  const robot = useSelector((state: State) => getRobotByName(state, robotName))
 
   const robotSettingsContentByTab: {
     [K in RobotSettingsTab]: () => JSX.Element
@@ -32,7 +38,7 @@ export function RobotSettings(): JSX.Element | null {
 
     networking: () => <RobotSettingsNetworking robotName={robotName} />,
     // TODO: advanced tab content
-    advanced: () => <div>advanced</div>,
+    advanced: () => <RobotSettingsAdvanced robotName={robotName} />,
   }
 
   const RobotSettingsContent =
@@ -80,7 +86,12 @@ export function RobotSettings(): JSX.Element | null {
         </Box>
         <Line />
         <Box padding={`${SPACING.spacing5} ${SPACING.spacing4}`}>
-          <RobotSettingsContent />
+          <ApiHostProvider
+            hostname={robot?.ip ?? null}
+            port={robot?.port ?? null}
+          >
+            <RobotSettingsContent />
+          </ApiHostProvider>
         </Box>
       </Flex>
     </Box>

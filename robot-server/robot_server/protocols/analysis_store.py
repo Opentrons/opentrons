@@ -54,7 +54,7 @@ class AnalysisStore:
         # we only allow at most one pending analysis per protocol at a time.
         self._pending_analyses_by_protocol: Dict[str, PendingAnalysis] = {}
 
-    def add_pending(self, protocol_id: str, analysis_id: str) -> PendingAnalysis:
+    def add_pending(self, protocol_id: str, analysis_id: str) -> AnalysisSummary:
         """Add a new pending analysis to the store.
 
         Parameters:
@@ -79,7 +79,7 @@ class AnalysisStore:
 
         pending_analysis = PendingAnalysis.construct(id=analysis_id)
         self._pending_analyses_by_protocol[protocol_id] = pending_analysis
-        return pending_analysis
+        return AnalysisSummary(id=pending_analysis.id, status=pending_analysis.status)
 
     def update(
         self,

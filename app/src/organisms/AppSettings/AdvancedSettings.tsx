@@ -15,6 +15,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
+  TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
 import * as Config from '../../redux/config'
 import * as Calibration from '../../redux/calibration'
@@ -262,7 +263,7 @@ export function AdvancedSettings(): JSX.Element {
                     color={COLORS.darkBlack}
                     position="absolute"
                     right={SPACING.spacing7}
-                    textDecoration="underline"
+                    textDecoration={TEXT_DECORATION_UNDERLINE}
                     id="AdvancedSettings_realtekLink"
                   >
                     {t('usb_to_ethernet_adapter_link')}

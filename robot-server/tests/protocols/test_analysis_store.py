@@ -21,6 +21,8 @@ from opentrons.protocol_reader import (
 from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
 from robot_server.protocols.analysis_models import (
     AnalysisResult,
+    AnalysisStatus,
+    AnalysisSummary,
     PendingAnalysis,
     CompletedAnalysis,
 )
@@ -102,15 +104,16 @@ def test_add_pending(subject: AnalysisStore, protocol_store: ProtocolStore) -> N
     """It should add a pending analysis to the store."""
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
-    expected_pending_analysis = PendingAnalysis(id="analysis-id")
+    expected_summary = AnalysisSummary(
+        id="analysis-id",
+        status=AnalysisStatus.PENDING
+    )
 
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
 
-    assert result == expected_pending_analysis
-    assert subject.get_by_protocol("protocol-id") == [expected_pending_analysis]
-    assert subject.get_summaries_by_protocol("protocol-id") == [
-        expected_pending_analysis
-    ]
+    assert result == expected_summary
+    assert subject.get_by_protocol("protocol-id") == [expected_summary]
+    assert subject.get_summaries_by_protocol("protocol-id") == [expected_summary]
 
 
 def test_add_analysis_equipment(subject: AnalysisStore, protocol_store: ProtocolStore) -> None:
