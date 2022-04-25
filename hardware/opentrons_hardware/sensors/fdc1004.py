@@ -31,11 +31,11 @@ class CapacitiveSensor(AbstractAdvancedSensor):
         self,
         can_messenger: CanMessenger,
         node_id: NodeId,
-        poll_for: int,
+        poll_for_ms: int,
         timeout: int = 1,
     ) -> Optional[SensorDataType]:
         """Poll the capacitive sensor."""
-        poll = PollSensorInformation(self._sensor_type, node_id, poll_for)
+        poll = PollSensorInformation(self._sensor_type, node_id, poll_for_ms)
         scheduler = SensorScheduler()
         return await scheduler.run_poll(poll, can_messenger, timeout)
 

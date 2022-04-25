@@ -3,6 +3,8 @@ import pytest
 import mock
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
+from unittest.mock import patch
+from mock.mock import AsyncMock
 
 from tests.conftest import MockCanMessageNotifier
 
@@ -323,3 +325,110 @@ async def test_threshold(
         mock_messenger, NodeId.pipette_left, threshold, 10
     )
     assert return_data == threshold
+
+
+@pytest.mark.parametrize(
+    argnames=["node_id", "timeout", "sensor"],
+    argvalues=[
+        [NodeId.pipette_left, 1, lazy_fixture("pressure_sensor")],
+        [NodeId.pipette_left, 5, lazy_fixture("capacitive_sensor")],
+    ],
+)
+async def test_bind_to_sync(
+    mock_messenger: mock.AsyncMock,
+    can_message_notifier: MockCanMessageNotifier,
+    sensor: sensor_abc.AbstractAdvancedSensor,
+    node_id: NodeId,
+    timeout: int,
+) -> None:
+    """Test for bind_to_sync.
+
+    Tests that bind_to_sync does in fact try to
+    send out a BindSensorOutputRequest.
+    """
+    await sensor.bind_to_sync(
+        mock_messenger, node_id, SensorOutputBinding.sync, timeout
+    )
+    mock_messenger.send.assert_called_once_with(
+        node_id=node_id,
+        message=BindSensorOutputRequest(
+            payload=BindSensorOutputRequestPayload(
+                sensor=SensorTypeField(sensor._sensor_type),
+                binding=SensorOutputBindingField(SensorOutputBinding.sync),
+            )
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["sensor", "node_id", "sample_rate", "timeout"],
+    argvalues=[
+        [lazy_fixture("capacitive_sensor"), NodeId.pipette_right, 1000, 10],
+        [lazy_fixture("pressure_sensor"), NodeId.pipette_left, 2000, 2],
+    ],
+)
+async def test_get_baseline(
+    mock_messenger: mock.AsyncMock,
+    can_message_notifier: MockCanMessageNotifier,
+    sensor: sensor_abc.AbstractAdvancedSensor,
+    node_id: NodeId,
+    sample_rate: int,
+    timeout: int,
+) -> None:
+    """Test for get_baseline.
+
+    Tests that the function sends out a BaelineSensorRequest,
+    and reads ReadFromSensorResponse message containing the
+    correct information.
+    """
+
+    def responder(node_id: NodeId, message: MessageDefinition) -> None:
+        """Message responder."""
+        if isinstance(message, BaselineSensorRequest):
+            can_message_notifier.notify(
+                ReadFromSensorResponse(
+                    payload=ReadFromSensorResponsePayload(
+                        sensor=SensorTypeField(sensor._sensor_type),
+                        sensor_data=Int32Field(50),
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=ReadFromSensorResponse.message_id,
+                        node_id=node_id,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
+
+    mock_messenger.send.side_effect = responder
+    baseline = await sensor.get_baseline(mock_messenger, node_id, 100, timeout)
+    assert baseline == SensorDataType.build(Int32Field(50))
+
+
+@pytest.mark.parametrize(
+    argnames=["sensor", "node_id", "timeout"],
+    argvalues=[
+        [lazy_fixture("capacitive_sensor"), NodeId.pipette_left, 2],
+        [lazy_fixture("pressure_sensor"), NodeId.pipette_right, 3],
+    ],
+)
+async def test_debug_poll(
+    mock_messenger: mock.AsyncMock,
+    can_message_notifier: MockCanMessageNotifier,
+    sensor: sensor_abc.AbstractAdvancedSensor,
+    node_id: NodeId,
+    timeout: int,
+) -> None:
+    """Test for debug poll."""
+    await sensor.bind_to_sync(mock_messenger, node_id, SensorOutputBinding.report)
+    for i in range(2):
+        with patch.object(
+            sensor._scheduler,
+            "_wait_for_response",
+            new=AsyncMock(return_value=SensorDataType.build(50)),
+        ):
+
+            data = await sensor.get_report(node_id, mock_messenger, timeout)
+            assert data == SensorDataType.build(Int32Field(50))

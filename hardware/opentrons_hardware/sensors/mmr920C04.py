@@ -25,6 +25,7 @@ class PressureSensor(AbstractAdvancedSensor):
     ) -> None:
         """Constructor."""
         super().__init__(zero_threshold, stop_threshold, offset, SensorType.pressure)
+        self._scheduler = SensorScheduler()
 
     async def poll(
         self,
@@ -33,10 +34,9 @@ class PressureSensor(AbstractAdvancedSensor):
         poll_for_ms: int,
         timeout: int = 1,
     ) -> Optional[SensorDataType]:
-        """Poll the pressure sensor."""
+        """Poll the capacitive sensor."""
         poll = PollSensorInformation(self._sensor_type, node_id, poll_for_ms)
-        scheduler = SensorScheduler()
-        return await scheduler.run_poll(poll, can_messenger, timeout)
+        return await self._scheduler.run_poll(poll, can_messenger, timeout)
 
     async def poll_temperature(
         self,
@@ -61,8 +61,7 @@ class PressureSensor(AbstractAdvancedSensor):
     ) -> Optional[SensorDataType]:
         """Poll the read sensor."""
         read = ReadSensorInformation(self._sensor_type, node_id, offset)
-        scheduler = SensorScheduler()
-        return await scheduler.send_read(read, can_messenger, timeout)
+        return await self._scheduler.send_read(read, can_messenger, timeout)
 
     async def read_temperature(
         self,
@@ -84,8 +83,7 @@ class PressureSensor(AbstractAdvancedSensor):
     ) -> None:
         """Write to a register of the pressure sensor."""
         write = WriteSensorInformation(self._sensor_type, node_id, data)
-        scheduler = SensorScheduler()
-        await scheduler.send_write(write, can_messenger)
+        await self._scheduler.send_write(write, can_messenger)
 
     async def send_zero_threshold(
         self,

@@ -105,6 +105,7 @@ class SensorScheduler:
                 data = await asyncio.wait_for(
                     self._wait_for_response(sensor.node_id, reader), timeout
                 )
+                print("wait_for_response done")
             except asyncio.TimeoutError:
                 log.warning("Sensor Read timed out")
             finally:
