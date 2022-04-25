@@ -3,10 +3,8 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../../i18n'
-// import { getConfig } from '../../../../../../redux/config'
 import { getResetConfigOptions } from '../../../../../../redux/robot-admin'
 import { FactoryResetSlideout } from '../FactoryResetSlideout'
-import { is } from 'date-fns/locale'
 
 jest.mock('../../../../../../redux/config')
 jest.mock('../../../../../../redux/discovery')
