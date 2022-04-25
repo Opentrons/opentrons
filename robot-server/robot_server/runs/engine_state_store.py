@@ -73,10 +73,11 @@ def _convert_sql_row_to_sql_engine_state(
     assert isinstance(run_id, str)
 
     state = sql_row.state
-    assert isinstance(state, str)
+    assert isinstance(state, Dict)
 
     return EngineStateResource(run_id=run_id, state=parse_obj_as(ProtocolRunData, state))
 
 
 def _convert_state_to_sql_values(state: EngineStateResource) -> Dict[str, object]:
-    return {"run_id": state.run_id, "state": state.state.json()}
+    print(state.state.dict())
+    return {"run_id": state.run_id, "state": state.state.dict()}
