@@ -127,6 +127,32 @@ class CapacitivePassSettings:
     max_overrun_distance_mm: float
     speed_mm_per_s: float
 
+
+@dataclass(frozen=True)
+class ZSenseSettings:
+    point: Offset
+    pass_settings: CapacitivePassSettings
+
+
+@dataclass(frozen=True)
+class EdgeSenseSettings:
+    plus_x_pos: Offset
+    minus_x_pos: Offset
+    plus_y_pos: Offset
+    minus_y_pos: Offset
+    overrun_tolerance_mm: float
+    early_sense_tolerance_mm: float
+    pass_settings: CapacitivePassSettings
+    search_initial_tolerance_mm: float
+    search_iteration_limit: int
+
+
+@dataclass(frozen=True)
+class OT3CalibrationSettings:
+    z_offset: ZSenseSettings
+    edge_sense: EdgeSenseSettings
+
+
 @dataclass
 class OT3Config:
     model: Literal["OT-3 Standard"]
@@ -141,3 +167,4 @@ class OT3Config:
     left_mount_offset: Offset
     right_mount_offset: Offset
     gripper_mount_offset: Offset
+    calibration: OT3CalibrationSettings
