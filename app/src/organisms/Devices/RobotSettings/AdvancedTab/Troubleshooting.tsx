@@ -34,10 +34,16 @@ export function Troubleshooting({
   const logsAvailable = health != null && health.logs
   const robotLogsDownloading = useSelector(getRobotLogsDownloading)
 
+  console.log('robotLogsDownloading', robotLogsDownloading)
+
   const handleClick = (): void => {
     updateDownloadLogsStatus(robotLogsDownloading)
     dispatch(downloadLogs(robot))
   }
+
+  React.useEffect(() => {
+    updateDownloadLogsStatus(robotLogsDownloading)
+  }, [robotLogsDownloading, dispatch])
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>

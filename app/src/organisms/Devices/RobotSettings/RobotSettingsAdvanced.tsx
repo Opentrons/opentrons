@@ -97,7 +97,10 @@ export function RobotSettingsAdvanced({
   }
 
   const updateDownloadLogsStatus = (isDownloading: boolean): void => {
+    console.log('before', showDownloadToast)
+    console.log('updated', isDownloading)
     setShowDownloadToast(isDownloading)
+    console.log('updated', showDownloadToast)
   }
 
   return (
@@ -113,6 +116,7 @@ export function RobotSettingsAdvanced({
           message={t('update_robot_software_download_logs_toast_message')}
           icon={toastIcon}
           onClose={() => setShowDownloadToast(false)}
+          noTimeout={true}
         />
       )}
       <Box paddingX={SPACING.spacing4}>
