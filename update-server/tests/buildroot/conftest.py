@@ -10,7 +10,7 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 
 
 @pytest.fixture
-async def test_cli(aiohttp_client, loop, otupdate_config, monkeypatch):
+async def test_cli(aiohttp_client, loop, otupdate_config):
     """
     Build an app using dummy versions, then build a test client and return it
     """

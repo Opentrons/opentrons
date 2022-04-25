@@ -7,13 +7,16 @@ import os
 import zipfile
 
 import pytest
+from _pytest import monkeypatch
 
 from otupdate import openembedded, buildroot
 from otupdate.buildroot import update, config, update_actions
 from otupdate.common import file_actions
 from otupdate.common.session import UpdateSession, Stages
+from otupdate.common.update_actions import UpdateActionsInterface
 from otupdate.openembedded import Updater
-from tests.openembedded.conftest import mock_root_fs_interface, mock_partition_manager_valid_switch
+from tests.openembedded.conftest import mock_root_fs_interface, mock_partition_manager_valid_switch, \
+    mock_root_fs_interface_, mock_partition_manager_valid_switch_
 
 
 @pytest.fixture
@@ -66,35 +69,27 @@ async def test_commit_fails_wrong_state(test_cli, update_session):
 
 br_handler = update_actions.OT2UpdateActions()
 
-oe_handler = Updater(
-    root_FS_intf=mock_root_fs_interface,
-    part_mngr=mock_partition_manager_valid_switch,
-)
+
+@pytest.fixture(params=[(0, lambda: Updater(mock_root_fs_interface_(), mock_partition_manager_valid_switch_())),
+                        (1, lambda: update_actions.OT2UpdateActions()),
+
+                        ])
+def sys_handler(request):
+    return request.param
 
 
-@pytest.mark.parametrize('sys_handler', ["br", "oe"])
 async def test_updater_chain(
         otupdate_config,
-        downloaded_update_file_oe,
-        downloaded_update_file_br,
+        downloaded_update_file_common,
         loop,
         testing_partition,
         sys_handler,
-        mock_root_fs_interface,
-        mock_partition_manager_valid_switch,
 
 ):
-
-    oe_handler = Updater(
-        root_FS_intf=mock_root_fs_interface,
-        part_mngr=mock_partition_manager_valid_switch,
-    )
     conf = config.load_from_path(otupdate_config)
     session = UpdateSession(conf.download_storage_path)
-    if sys_handler is "oe":
-        fut = update._begin_validation(session, conf, loop, downloaded_update_file_oe, oe_handler)
-    elif sys_handler is "br":
-        fut = update._begin_validation(session, conf, loop, downloaded_update_file_br, br_handler)
+    fut = update._begin_validation(session, conf, loop, downloaded_update_file_common.pop(sys_handler[0]),
+                                   sys_handler[1]())
     assert session.stage == Stages.VALIDATING
     last_progress = 0.0
     while session.stage == Stages.VALIDATING:
@@ -113,26 +108,21 @@ async def test_updater_chain(
 
 
 @pytest.mark.exclude_rootfs_ext4
-@pytest.mark.parametrize('sys_handler', [br_handler, oe_handler])
 async def test_session_catches_validation_fail(
         otupdate_config,
-        downloaded_update_file_oe,
-        downloaded_update_file_br,
+        downloaded_update_file_common,
         loop,
-        sys_handler
+        sys_handler,
 ):
     conf = config.load_from_path(otupdate_config)
     session = UpdateSession(conf.download_storage_path)
-    if isinstance(sys_handler, Updater):
-        fut = update._begin_validation(session, conf, loop, downloaded_update_file_oe, sys_handler)
-    elif isinstance(sys_handler, update_actions.OT2UpdateActions):
-        fut = update._begin_validation(session, conf, loop, downloaded_update_file_br, sys_handler)
+    fut = update._begin_validation(session, conf, loop, downloaded_update_file_common.pop(sys_handler[0]),
+                                   sys_handler[1]())
     with pytest.raises(file_actions.FileMissing):
         await fut
     assert session.state["stage"] == "error"
     assert session.stage == Stages.ERROR
     assert "error" in session.state
     assert "message" in session.state
-
 
 

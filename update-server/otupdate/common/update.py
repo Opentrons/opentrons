@@ -168,6 +168,17 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             },
             status=409,
         )
+    reader = await request.multipart()
+    async for part in reader:
+        # TODO (al, 2022-04-18): This check should not be here. All ot2 and
+        #  ot3 disambiguation should happen in update actions.
+        if part.name != "ot2-system.zip" and part.name != UPDATE_PKG:
+            LOG.info(f"Unknown field name {part.name} in file_upload, ignoring")
+            await part.release()
+        else:
+            LOG.info(f"Writing {part.name}")
+            await _save_file(part, session.download_path)
+
     maybe_actions = update_actions.UpdateActionsInterface.from_request(request)
     if not maybe_actions:
         return web.json_response(
@@ -177,25 +188,13 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             },
             status=500,
         )
-    reader = await request.multipart()
-    async for part in reader:
-        # TODO (al, 2022-04-18): This check should not be here. All ot2 and
-        #  ot3 disambiguation should happen in update actions.
-        if not maybe_actions.check_update_pkg_name(part.name):
-            LOG.info(f"Unknown field name {part.name} in file_upload, ignoring")
-            await part.release()
-        else:
-            LOG.info(f"Writing {part.name}")
-            await _save_file(part, session.download_path)
-
-
 
     _begin_validation(
         session,
         config.config_from_request(request),
         asyncio.get_event_loop(),
         # TODO (al, 2022-04-18): Use of part.name should not be here
-        os.path.join(session.download_path, maybe_actions.get_update_pkg_name()),
+        os.path.join(session.download_path, part.name),
         maybe_actions,
     )
 
