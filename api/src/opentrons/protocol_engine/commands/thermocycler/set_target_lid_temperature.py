@@ -19,7 +19,8 @@ class SetTargetLidTemperatureParams(BaseModel):
     """Input parameters to set a Thermocycler's target lid temperature."""
 
     moduleId: str = Field(..., description="Unique ID of the Thermocycler Module.")
-    celsius: float = Field(..., description="Target temperature in °C.")
+    # TODO(mc, 2022-04-25): rename to "celsius"
+    temperature: float = Field(..., description="Target temperature in °C.")
 
 
 class SetTargetLidTemperatureResult(BaseModel):
