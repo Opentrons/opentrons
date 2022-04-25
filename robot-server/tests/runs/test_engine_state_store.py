@@ -87,8 +87,11 @@ def test_pydantic_parse_json(protocol_run: ProtocolRunData) -> None:
     expected_json = protocol_run.json()
     expected_dict = protocol_run.dict()
     json_load_dict = json.loads(expected_json)
-    print(json_load_dict)
-    print(expected_dict)
+    # print(json_load_dict)
+    # print(expected_dict)
+    print(ProtocolRunData.parse_raw(expected_json))
+    print("---real data---")
+    print(protocol_run)
     # assert parse_obj_as(ProtocolRunData, expected_dict) == protocol_run
     assert ProtocolRunData.parse_raw(expected_json) == protocol_run
     assert json_load_dict == expected_dict
