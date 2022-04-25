@@ -7,11 +7,17 @@ from .heater_shaker_module_substate import (
     HeaterShakerModuleId,
 )
 from .temperature_module_substate import TemperatureModuleSubState, TemperatureModuleId
+from .thermocycler_module_substate import (
+    ThermocyclerModuleSubState,
+    ThermocyclerModuleId,
+)
+
 
 ModuleSubStateType = Union[
     HeaterShakerModuleSubState,
     MagneticModuleSubState,
     TemperatureModuleSubState,
+    ThermocyclerModuleSubState,
 ]
 
 __all__ = [
@@ -21,6 +27,8 @@ __all__ = [
     "HeaterShakerModuleId",
     "TemperatureModuleSubState",
     "TemperatureModuleId",
+    "ThermocyclerModuleSubState",
+    "ThermocyclerModuleId",
     # Union of all module substates
     "ModuleSubStateType",
 ]

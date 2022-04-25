@@ -3,7 +3,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, NamedTuple, Optional, Sequence, overload, Union
+from typing import (
+    Dict,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    overload,
+    Union,
+    Type,
+    TypeVar,
+)
 from numpy import array, dot
 
 from opentrons.hardware_control.modules.magdeck import (
@@ -28,11 +38,16 @@ from .module_substates import (
     MagneticModuleSubState,
     HeaterShakerModuleSubState,
     TemperatureModuleSubState,
+    ThermocyclerModuleSubState,
     MagneticModuleId,
     HeaterShakerModuleId,
     TemperatureModuleId,
+    # ThermocyclerModuleId,
     ModuleSubStateType,
 )
+
+
+ModuleSubStateT = TypeVar("ModuleSubStateT", bound=ModuleSubStateType)
 
 
 class SlotTransit(NamedTuple):
@@ -250,6 +265,32 @@ class ModuleView(HasState[ModuleState]):
         """Get a list of all module entries in state."""
         return [self.get(mod_id) for mod_id in self._state.slot_by_module_id.keys()]
 
+    def _get_module_substate(
+        self, module_id: str, expected_type: Type[ModuleSubStateT], expected_name: str
+    ) -> ModuleSubStateT:
+        """Return a the specific sub-state of a given module ID.
+
+        Args:
+            module_id: The ID of the module.
+            expected_type: The shape of the substate that we expect.
+            expected_name: A user-friendly name of the module to put into an
+                error message if the substate does not match the expected type.
+
+        Raises:
+            ModuleNotLoadedError: If module_id has not been loaded.
+            WrongModuleTypeError: If module_id has been loaded,
+                but it's not the expected type.
+        """
+        try:
+            substate = self._state.substate_by_module_id[module_id]
+        except KeyError as e:
+            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+
+        if isinstance(substate, expected_type):
+            return substate
+
+        raise errors.WrongModuleTypeError(f"{module_id} is not a {expected_name}.")
+
     def get_magnetic_module_substate(self, module_id: str) -> MagneticModuleSubState:
         """Return a `MagneticModuleSubState` for the given Magnetic Module.
 
@@ -258,17 +299,11 @@ class ModuleView(HasState[ModuleState]):
             WrongModuleTypeError: If module_id has been loaded,
                 but it's not a Magnetic Module.
         """
-        try:
-            substate = self._state.substate_by_module_id[module_id]
-        except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
-        else:
-            if isinstance(substate, MagneticModuleSubState):
-                return substate
-            else:
-                raise errors.WrongModuleTypeError(
-                    f"{module_id} is not a Magnetic Module."
-                )
+        return self._get_module_substate(
+            module_id=module_id,
+            expected_type=MagneticModuleSubState,
+            expected_name="Magnetic Module",
+        )
 
     def get_heater_shaker_module_substate(
         self, module_id: str
@@ -280,17 +315,11 @@ class ModuleView(HasState[ModuleState]):
            WrongModuleTypeError: If module_id has been loaded,
                but it's not a Heater-Shaker Module.
         """
-        try:
-            substate = self._state.substate_by_module_id[module_id]
-        except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
-        else:
-            if isinstance(substate, HeaterShakerModuleSubState):
-                return substate
-            else:
-                raise errors.WrongModuleTypeError(
-                    f"{module_id} is not a Heater-Shaker Module."
-                )
+        return self._get_module_substate(
+            module_id=module_id,
+            expected_type=HeaterShakerModuleSubState,
+            expected_name="Heater-Shaker Module",
+        )
 
     def get_temperature_module_substate(
         self, module_id: str
@@ -300,19 +329,29 @@ class ModuleView(HasState[ModuleState]):
         Raises:
            ModuleNotLoadedError: If module_id has not been loaded.
            WrongModuleTypeError: If module_id has been loaded,
-               but it's not a Heater-Shaker Module.
+               but it's not a Temperature Module.
         """
-        try:
-            substate = self._state.substate_by_module_id[module_id]
-        except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
-        else:
-            if isinstance(substate, TemperatureModuleSubState):
-                return substate
-            else:
-                raise errors.WrongModuleTypeError(
-                    f"{module_id} is not a Temperature Module."
-                )
+        return self._get_module_substate(
+            module_id=module_id,
+            expected_type=TemperatureModuleSubState,
+            expected_name="Temperature Module",
+        )
+
+    def get_thermocycler_module_substate(
+        self, module_id: str
+    ) -> ThermocyclerModuleSubState:
+        """Return a `ThermocyclerModuleSubState` for the given Thermocycler Module.
+
+        Raises:
+           ModuleNotLoadedError: If module_id has not been loaded.
+           WrongModuleTypeError: If module_id has been loaded,
+               but it's not a Thermocycler Module.
+        """
+        return self._get_module_substate(
+            module_id=module_id,
+            expected_type=ThermocyclerModuleSubState,
+            expected_name="Thermocycler Module",
+        )
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
         """Get the slot location of the given module."""
