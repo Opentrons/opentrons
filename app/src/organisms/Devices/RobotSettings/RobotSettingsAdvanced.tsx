@@ -96,12 +96,8 @@ export function RobotSettingsAdvanced({
     setIsRobotConnected(isConnected ?? false)
   }
 
-  const updateDownloadLogsStatus = (isDownloading: boolean): void => {
-    console.log('before', showDownloadToast)
-    console.log('updated', isDownloading)
+  const updateDownloadLogsStatus = (isDownloading: boolean): void =>
     setShowDownloadToast(isDownloading)
-    console.log('updated', showDownloadToast)
-  }
 
   return (
     <>

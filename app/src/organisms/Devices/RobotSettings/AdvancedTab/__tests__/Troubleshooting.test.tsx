@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import {
@@ -37,5 +38,12 @@ describe('RobotSettings Troubleshooting', () => {
     const [{ getByRole }] = render(mockUnreachableRobot)
     const downloadLogsButton = getByRole('button', { name: 'Download logs' })
     expect(downloadLogsButton).toBeDisabled()
+  })
+
+  it('should call updateDownloadLogsStatus when clicking Download logs button', () => {
+    const [{ getByRole }] = render(mockConnectableRobot)
+    const downloadLogsButton = getByRole('button', { name: 'Download logs' })
+    fireEvent.click(downloadLogsButton)
+    expect(mockUpdateDownloadLogsStatus).toHaveBeenCalled()
   })
 })
