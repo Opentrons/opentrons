@@ -108,10 +108,10 @@ def test_get_empty(subject: AnalysisStore, protocol_store: ProtocolStore) -> Non
     """It should return an empty list if no analysis saved."""
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
 
-    result = subject.get_by_protocol("protocol-id")
+    full_result = subject.get_by_protocol("protocol-id")
     summaries_result = subject.get_summaries_by_protocol("protocol-id")
 
-    assert result == []
+    assert full_result == []
     assert summaries_result == []
 
 
