@@ -105,12 +105,16 @@ def test_add_pending(subject: AnalysisStore, protocol_store: ProtocolStore) -> N
     """It should add a pending analysis to the store."""
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
-    expected_summary = AnalysisSummary(id="analysis-id", status=AnalysisStatus.PENDING)
+    expected_analysis = PendingAnalysis(id="analysis-id")
+    expected_summary = AnalysisSummary(
+        id="analysis-id",
+        status=AnalysisStatus.PENDING,
+    )
 
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
 
     assert result == expected_summary
-    assert subject.get_by_protocol("protocol-id") == [expected_summary]
+    assert subject.get_by_protocol("protocol-id") == [expected_analysis]
     assert subject.get_summaries_by_protocol("protocol-id") == [expected_summary]
 
 
