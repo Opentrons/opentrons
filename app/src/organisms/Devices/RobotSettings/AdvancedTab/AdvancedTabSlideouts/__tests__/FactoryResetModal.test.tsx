@@ -3,11 +3,22 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../../i18n'
+import { resetConfig } from '../../../../../../redux/robot-admin'
+import { useDispatchApiRequest } from '../../../../../../redux/robot-api'
 
 import { FactoryResetModal } from '../FactoryResetModal'
 
-const mockResetOptions = {}
+import type { DispatchApiRequestType } from '../../../../../../redux/robot-api'
 
+jest.mock('../../../../../../redux/robot-admin')
+jest.mock('../../../../../../redux/robot-api')
+
+const mockResetConfig = resetConfig as jest.MockedFunction<typeof resetConfig>
+const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
+  typeof useDispatchApiRequest
+>
+
+const mockResetOptions = {}
 const mockCloseModal = jest.fn()
 const ROBOT_NAME = 'otie'
 const render = (props: React.ComponentProps<typeof FactoryResetModal>) => {
@@ -20,7 +31,11 @@ const render = (props: React.ComponentProps<typeof FactoryResetModal>) => {
 }
 
 describe('RobotSettings FactoryResetModal', () => {
-  beforeEach(() => {})
+  let dispatchApiRequest: DispatchApiRequestType
+  beforeEach(() => {
+    dispatchApiRequest = jest.fn()
+    mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
+  })
 
   afterEach(() => {
     jest.resetAllMocks()
@@ -39,23 +54,37 @@ describe('RobotSettings FactoryResetModal', () => {
     getByRole('button', { name: 'Yes, clear data and restart robot' })
   })
 
-  // it('should call closeModal when the user clicks the Yes button', () => {
-  //   const [{ getByText, getByRole }] = render({
-  //     closeModal: mockCloseModal,
-  //     isRobotConnected: true,
-  //     robotName: ROBOT_NAME,
-  //     resetOptions: mockResetOptions,
-  //   })
-  // })
+  it('should close the modal when the user clicks the Yes button', () => {
+    const clearMockResetOptions = {
+      bootScript: true,
+      deckCalibration: true,
+    }
+    const [{ getByRole }] = render({
+      closeModal: mockCloseModal,
+      isRobotConnected: true,
+      robotName: ROBOT_NAME,
+      resetOptions: clearMockResetOptions,
+    })
+    const clearDataAndRestartRobotButton = getByRole('button', {
+      name: 'Yes, clear data and restart robot',
+    })
+    fireEvent.click(clearDataAndRestartRobotButton)
+    expect(dispatchApiRequest).toBeCalledWith(
+      mockResetConfig(ROBOT_NAME, clearMockResetOptions)
+    )
+  })
 
-  // it('should close the modal when clicking the Cancel button', () => {
-  //   const [{ getByText, getByRole }] = render({
-  //     closeModal: mockCloseModal,
-  //     isRobotConnected: true,
-  //     robotName: ROBOT_NAME,
-  //     resetOptions: mockResetOptions,
-  //   })
-  // })
+  it('should close the modal when clicking the Cancel button', () => {
+    const [{ getByRole }] = render({
+      closeModal: mockCloseModal,
+      isRobotConnected: true,
+      robotName: ROBOT_NAME,
+      resetOptions: mockResetOptions,
+    })
+    const cancelButton = getByRole('button', { name: 'Cancel' })
+    fireEvent.click(cancelButton)
+    expect(mockCloseModal).toHaveBeenCalled()
+  })
 
   it('should close the modal when clicking the close icon button', () => {
     const [{ getByTestId }] = render({

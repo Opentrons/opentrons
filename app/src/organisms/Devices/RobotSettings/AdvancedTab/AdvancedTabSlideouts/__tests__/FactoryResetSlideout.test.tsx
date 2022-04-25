@@ -79,6 +79,16 @@ describe('RobotSettings FactoryResetSlideout', () => {
     getByTestId('Slideout_icon_close_Factory Reset')
   })
 
+  it('should enable Clear data and restart robot button when checked one checkbox', () => {
+    const [{ getByRole }] = render()
+    const checkbox = getByRole('checkbox', { name: 'Clear Calibration Bar' })
+    fireEvent.click(checkbox)
+    const clearButton = getByRole('button', {
+      name: 'Clear data and restart robot',
+    })
+    expect(clearButton).toBeEnabled()
+  })
+
   it('should close the slideout when clicking close icon button', () => {
     const [{ getByTestId }] = render()
     const closeButton = getByTestId('Slideout_icon_close_Factory Reset')
