@@ -205,7 +205,9 @@ class AnalysisStore:
             transaction.execute(statement)
 
     @staticmethod
-    def _sql_check_protocol_exists(connection: sqlalchemy.engine.Connection, protocol_id: str) -> None:
+    def _sql_check_protocol_exists(
+        connection: sqlalchemy.engine.Connection, protocol_id: str
+    ) -> None:
         statement = sqlalchemy.select(
             # Thrown away. Dummy column just to have something small to select.
             protocol_table.c.id

@@ -56,9 +56,7 @@ def subject(sql_engine: SQLEngine) -> AnalysisStore:
     return AnalysisStore(sql_engine=sql_engine)
 
 
-def make_dummy_protocol_resource(
-    protocol_id: str
-) -> ProtocolResource:
+def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
     return ProtocolResource(
         protocol_id=protocol_id,
         created_at=datetime(year=2021, month=1, day=1),
@@ -82,7 +80,10 @@ def protocol_store(sql_engine: SQLEngine) -> ProtocolStore:
 
 def test_protocol_not_found(subject: AnalysisStore) -> None:
     with pytest.raises(ProtocolNotFoundError):
-        subject.add_pending(protocol_id="nonexistent-protocol-id", analysis_id="analysis-id-does-not-matter")
+        subject.add_pending(
+            protocol_id="nonexistent-protocol-id",
+            analysis_id="analysis-id-does-not-matter",
+        )
     with pytest.raises(ProtocolNotFoundError):
         subject.get_summaries_by_protocol(protocol_id="nonexistent-protocol-id")
     with pytest.raises(ProtocolNotFoundError):
@@ -104,10 +105,7 @@ def test_add_pending(subject: AnalysisStore, protocol_store: ProtocolStore) -> N
     """It should add a pending analysis to the store."""
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
-    expected_summary = AnalysisSummary(
-        id="analysis-id",
-        status=AnalysisStatus.PENDING
-    )
+    expected_summary = AnalysisSummary(id="analysis-id", status=AnalysisStatus.PENDING)
 
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
 
@@ -116,7 +114,9 @@ def test_add_pending(subject: AnalysisStore, protocol_store: ProtocolStore) -> N
     assert subject.get_summaries_by_protocol("protocol-id") == [expected_summary]
 
 
-def test_add_analysis_equipment(subject: AnalysisStore, protocol_store: ProtocolStore) -> None:
+def test_add_analysis_equipment(
+    subject: AnalysisStore, protocol_store: ProtocolStore
+) -> None:
     """It should add labware and pipettes to the stored analysis."""
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
