@@ -1,4 +1,8 @@
-import type { ProtocolResource } from '@opentrons/shared-data'
+import type {
+  ProtocolResource,
+  PendingProtocolAnalysis,
+  CompletedProtocolAnalysis,
+} from '@opentrons/shared-data'
 import type { ResourceLinks } from '../types'
 
 export interface ProtocolMetadata {
@@ -17,6 +21,10 @@ export interface Protocol {
   links?: ResourceLinks
   data: ProtocolResource
 }
+
+export type ProtocolAnalyses = Array<
+  CompletedProtocolAnalysis | PendingProtocolAnalysis
+>
 
 export interface Protocols {
   links?: ResourceLinks
