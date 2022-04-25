@@ -20,14 +20,23 @@ import { ViewableRobot } from '../../../../redux/discovery/types'
 
 interface TroubleshootingProps {
   robot: ViewableRobot
+  updateDownloadLogsStatus: (status: boolean) => void
 }
 
-export function Troubleshooting({ robot }: TroubleshootingProps): JSX.Element {
+export function Troubleshooting({
+  robot,
+  updateDownloadLogsStatus,
+}: TroubleshootingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
   const controlDisabled = robot?.status !== CONNECTABLE
   const logsAvailable = robot?.health != null && robot?.health.logs
   const robotLogsDownloading = useSelector(getRobotLogsDownloading)
+
+  const handleClick = (): void => {
+    updateDownloadLogsStatus(true)
+    dispatch(downloadLogs(robot))
+  }
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -52,7 +61,7 @@ export function Troubleshooting({ robot }: TroubleshootingProps): JSX.Element {
           controlDisabled || logsAvailable == null || robotLogsDownloading
         }
         marginLeft={SPACING_AUTO}
-        onClick={() => dispatch(downloadLogs(robot))}
+        onClick={() => handleClick()}
         id="AdvancedSettings_downloadLogsButton"
       >
         {t('update_robot_software_download_logs')}

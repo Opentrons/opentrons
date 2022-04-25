@@ -12,11 +12,13 @@ import {
   BORDER_STYLE_SOLID,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import type { IconProps } from '@opentrons/components'
 import { StyledText } from '../text'
 
 export interface ToastProps {
   message: string | JSX.Element
-  type: 'success' | 'warning' | 'error'
+  type?: 'success' | 'warning' | 'error'
+  icon?: IconProps
   closeButton?: boolean
   onClose: () => void
 }
@@ -36,8 +38,8 @@ const EXPANDED_STYLE = css`
   }
 `
 export function Toast(props: ToastProps): JSX.Element {
-  const { message, type, closeButton, onClose } = props
-  let iconName: IconName = 'alert-circle'
+  const { message, type, icon, closeButton, onClose } = props
+  let iconName: IconName = icon?.name != null ? icon.name : 'alert-circle'
   let color = COLORS.error
   let backgroundColor = COLORS.errorBg
 
@@ -77,6 +79,7 @@ export function Toast(props: ToastProps): JSX.Element {
           color={color}
           width={SPACING.spacing4}
           marginRight={SPACING.spacing3}
+          spin={icon?.spin != null ? icon.spin : false}
         />
         <StyledText as="p">{message}</StyledText>
       </Flex>
