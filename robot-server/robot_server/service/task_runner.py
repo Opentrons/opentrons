@@ -8,6 +8,8 @@ from logging import getLogger
 from typing import Any, Awaitable, Callable
 from anyio import create_task_group
 from anyio.abc import TaskGroup
+from fastapi import Depends
+from robot_server.app_state import AppState, AppStateValue, get_app_state
 
 
 log = getLogger(__name__)
@@ -50,5 +52,9 @@ class TaskRunner:
         log.cancel(f"Background task {func_name} cancelled_cleanedup")
         # Clean up all cancelled tasks 
         raise NotImplementedError
+    
+def get_task_runner(app_state: AppState = Depends(get_app_state)) -> TaskRunner:
+    return app_state.task_runner
+  
         
             

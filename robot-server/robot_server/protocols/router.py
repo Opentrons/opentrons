@@ -11,7 +11,7 @@ from typing_extensions import Literal
 from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
 
 from robot_server.errors import ErrorDetails, ErrorBody
-from robot_server.service.task_runner import TaskRunner
+from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.service.dependencies import get_unique_id, get_current_time
 from robot_server.service.json_api import (
     SimpleBody,
@@ -83,7 +83,7 @@ async def create_protocol(
     analysis_store: AnalysisStore = Depends(get_analysis_store),
     protocol_reader: ProtocolReader = Depends(get_protocol_reader),
     protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
-    task_runner: TaskRunner = Depends(TaskRunner),
+    task_runner: TaskRunner = Depends(get_task_runner),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
