@@ -17,7 +17,7 @@ import { StyledText } from '../text'
 
 export interface ToastProps {
   message: string | JSX.Element
-  type?: 'success' | 'warning' | 'error'
+  type?: 'success' | 'warning' | 'error' | 'info'
   icon?: IconProps
   closeButton?: boolean
   onClose: () => void
@@ -40,7 +40,7 @@ const EXPANDED_STYLE = css`
 `
 export function Toast(props: ToastProps): JSX.Element {
   const { message, type, icon, closeButton, onClose, noTimeout } = props
-  let iconName: IconName = icon?.name != null ? icon.name : 'alert-circle'
+  let iconName: IconName = 'alert-circle'
   let color = COLORS.error
   let backgroundColor = COLORS.errorBg
 
@@ -51,6 +51,10 @@ export function Toast(props: ToastProps): JSX.Element {
     iconName = 'check-circle'
     color = COLORS.success
     backgroundColor = COLORS.successBg
+  } else {
+    iconName = icon?.name != null ? icon.name : 'information'
+    color = COLORS.darkBlack
+    backgroundColor = COLORS.greyDisabled
   }
 
   if (noTimeout === false) {
