@@ -79,7 +79,7 @@ class AnalysisStore:
 
         pending_analysis = PendingAnalysis.construct(id=analysis_id)
         self._pending_analyses_by_protocol[protocol_id] = pending_analysis
-        return AnalysisSummary(id=pending_analysis.id, status=pending_analysis.status)
+        return _pending_to_summary(pending=pending_analysis)
 
     def update(
         self,
@@ -137,7 +137,9 @@ class AnalysisStore:
 
         pending_analyses: List[AnalysisSummary]
         try:
-            pending_analyses = [self._pending_analyses_by_protocol[protocol_id]]
+            pending_analyses = [
+                _pending_to_summary(self._pending_analyses_by_protocol[protocol_id])
+            ]
         except KeyError:
             pending_analyses = []
 
@@ -257,3 +259,7 @@ class _CompletedAnalysisResource:
             analyzer_version=analyzer_version,
             completed_analysis=completed_analysis,
         )
+
+
+def _pending_to_summary(pending: PendingAnalysis) -> AnalysisSummary:
+    return AnalysisSummary(id=pending.id, status=pending.status)
