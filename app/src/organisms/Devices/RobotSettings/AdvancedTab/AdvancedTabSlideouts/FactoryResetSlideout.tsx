@@ -61,14 +61,10 @@ export function FactoryResetSlideout({
 
   // TODO: This should be temporary. Need to wait for the CPX team's update of Protocol resetOptions.
   // CPX team won't change the order of the options
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-  const calibrationOptions = options
-    ? options.filter(opt => opt.id.includes('Calibration'))
-    : []
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-  const bootScriptOption = options
-    ? options.filter(opt => opt.id.includes('bootScript'))
-    : []
+  const calibrationOptions =
+    options != null ? options.filter(opt => opt.id.includes('Calibration')) : []
+  const bootScriptOption =
+    options != null ? options.filter(opt => opt.id.includes('bootScript')) : []
 
   React.useEffect(() => {
     dispatch(fetchResetConfigOptions(robotName))
