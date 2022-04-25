@@ -33,10 +33,12 @@ protocol_table = sqlalchemy.Table(
         sqlalchemy.String,
         primary_key=True,
     ),
+    # NOTE: This column stores naive (timezone-less) datetimes.
+    # Timezones are stripped from inserted values, due to SQLite limitations.
+    # To ensure proper functionality, all inserted datetimes must be UTC.
     sqlalchemy.Column(
         "created_at",
-        # NOTE: SQLite does not support timezone-aware datetimes
-        sqlalchemy.DateTime(timezone=True),
+        sqlalchemy.DateTime(),
         nullable=False,
     ),
     sqlalchemy.Column("protocol_key", sqlalchemy.String, nullable=True),
@@ -50,10 +52,10 @@ run_table = sqlalchemy.Table(
         sqlalchemy.String,
         primary_key=True,
     ),
+    # NOTE: See above note about naive datetimes
     sqlalchemy.Column(
         "created_at",
-        # NOTE: SQLite does not support timezone-aware datetimes
-        sqlalchemy.DateTime(timezone=True),
+        sqlalchemy.DateTime(),
         nullable=False,
     ),
     sqlalchemy.Column(
@@ -74,8 +76,8 @@ action_table = sqlalchemy.Table(
         sqlalchemy.String,
         primary_key=True,
     ),
-    # NOTE: SQLite does not support timezone-aware datetimes
-    sqlalchemy.Column("created_at", sqlalchemy.DateTime(timezone=True), nullable=False),
+    # NOTE: See above note about naive datetimes
+    sqlalchemy.Column("created_at", sqlalchemy.DateTime(), nullable=False),
     sqlalchemy.Column("action_type", sqlalchemy.String, nullable=False),
     sqlalchemy.Column(
         "run_id",
@@ -154,16 +156,20 @@ def get_sql_engine(
     # https://github.com/tiangolo/fastapi/issues/617
 
 
-def ensure_datetime(dt: object) -> datetime:
-    """Ensure a persisted object is a TZ-aware datetime.
+def ensure_utc_datetime(dt: object) -> datetime:
+    """Ensure an object is a TZ-aware UTC datetime.
 
     Args:
-        dt: A naive (timezone-less) datetime pulled from the database.
+        dt: A UTC-coded datetime to be insterted into the database,
+            or a naive (timezone-less) datetime pulled from the database.
 
     Returns:
         A datetime with its timezone set to UTC.
     """
     assert isinstance(dt, datetime), f"{dt} is not a datetime"
-    assert dt.tzinfo is None, f"{dt} is not a naive datetime"
 
-    return dt.replace(tzinfo=timezone.utc)
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    else:
+        assert dt.tzinfo == timezone.utc, f"Expected '{dt}' to be UTC"
+        return dt

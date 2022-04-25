@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 
 import sqlalchemy
 
-from robot_server.persistence import action_table, ensure_datetime, run_table
+from robot_server.persistence import action_table, ensure_utc_datetime, run_table
 
 from .action_models import RunAction, RunActionType
 
@@ -205,7 +205,7 @@ def _convert_sql_row_to_run(
 ) -> RunResource:
     run_id = sql_row.id
     protocol_id = sql_row.protocol_id
-    created_at = ensure_datetime(sql_row.created_at)
+    created_at = ensure_utc_datetime(sql_row.created_at)
 
     assert isinstance(run_id, str), f"Run ID {run_id} is not a string"
     assert protocol_id is None or isinstance(
@@ -226,7 +226,7 @@ def _convert_sql_row_to_run(
 def _convert_run_to_sql_values(run: RunResource) -> Dict[str, object]:
     return {
         "id": run.run_id,
-        "created_at": run.created_at,
+        "created_at": ensure_utc_datetime(run.created_at),
         "protocol_id": run.protocol_id,
     }
 
@@ -235,7 +235,7 @@ def _convert_sql_row_to_action(sql_row: sqlalchemy.engine.Row) -> RunAction:
     # rely on Pydantic and Enum to raise if data shapes are wrong
     return RunAction(
         id=sql_row.id,
-        createdAt=ensure_datetime(sql_row.created_at),
+        createdAt=ensure_utc_datetime(sql_row.created_at),
         actionType=RunActionType(sql_row.action_type),
     )
 
@@ -243,7 +243,7 @@ def _convert_sql_row_to_action(sql_row: sqlalchemy.engine.Row) -> RunAction:
 def _convert_action_to_sql_values(action: RunAction, run_id: str) -> Dict[str, object]:
     return {
         "id": action.id,
-        "created_at": action.createdAt,
+        "created_at": ensure_utc_datetime(action.createdAt),
         "action_type": action.actionType.value,
         "run_id": run_id,
     }
