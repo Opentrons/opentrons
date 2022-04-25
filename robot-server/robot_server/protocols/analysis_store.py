@@ -39,10 +39,10 @@ _ANALYZER_VERSION = "TODO"
 class AnalysisStore:
     """Storage interface for protocol analyses.
 
-    Completed analyses are saved to persistent storage.
+    Completed analyses (succeeded or failed) are saved to persistent storage.
 
     Pending analyses don't make sense to persist across reboots,
-    so those are kept in-memory and lost when the store instance is destroyed.
+    so they're only kept in-memory, and lost when the store instance is destroyed.
     """
 
     def __init__(self, sql_engine: SQLEngine) -> None:
