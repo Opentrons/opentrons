@@ -7,6 +7,7 @@ import sqlalchemy
 from .action_models import RunAction, RunActionType
 
 from robot_server.persistence import run_table, action_table
+from robot_server.protocols import ProtocolNotFoundError
 
 
 @dataclass(frozen=True)
@@ -48,7 +49,10 @@ class RunStore:
             action: action to insert into the db
         """
         with self._sql_engine.begin() as transaction:
-            _insert_action_no_transaction(run_id, action, transaction)
+            try:
+                _insert_action_no_transaction(run_id, action, transaction)
+            except sqlalchemy.exc.IntegrityError:
+                raise RunNotFoundError(run_id=run_id)
 
     def update_active_run(self, run_id: str, is_current: bool) -> RunResource:
         """Update current active run resource in memory.
@@ -80,7 +84,13 @@ class RunStore:
             _convert_run_to_sql_values(run=run)
         )
         with self._sql_engine.begin() as transaction:
-            transaction.execute(statement)
+            try:
+                transaction.execute(statement)
+            except sqlalchemy.exc.IntegrityError:
+                assert (
+                    run.protocol_id is not None
+                ), "Insert run failed due to unexpected IntegrityError"
+                raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
         self.update_active_run(run_id=run.run_id, is_current=run.is_current)
 
@@ -182,15 +192,6 @@ def _get_actions_no_transaction(
 def _insert_action_no_transaction(
     run_id: str, action: RunAction, transaction: sqlalchemy.engine.Connection
 ) -> None:
-    # TODO (tz): selecting to raise an error if a run does not exist.
-    # SQLite does not support FK by default. Need to add support
-    # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#foreign-key-support
-    try:
-        transaction.execute(
-            sqlalchemy.select(run_table).where(run_table.c.id == run_id)
-        ).one()
-    except sqlalchemy.exc.NoResultFound as e:
-        raise RunNotFoundError(run_id) from e
     transaction.execute(
         sqlalchemy.insert(action_table),
         _convert_action_to_sql_values(run_id=run_id, action=action),

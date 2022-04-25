@@ -7,10 +7,10 @@ export function updateRobotName(
   config: HostConfig,
   newName: string
 ): ResponsePromise<UpdatedRobotName> {
-  return request<UpdatedRobotName, string>(
+  return request<UpdatedRobotName, { name: string }>(
     POST,
     '/server/name',
-    newName,
+    { name: newName },
     config
   )
 }

@@ -5,6 +5,7 @@ import {
   COLORS,
   BORDERS,
   SIZE_2,
+  SPACING,
   NewAlertPrimaryBtn,
   NewPrimaryBtn,
   NewSecondaryBtn,
@@ -29,6 +30,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
 export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
   background-color: ${COLORS.error};
   border-radius: ${BORDERS.radiusSoftCorners};
+  padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   ${TYPOGRAPHY.pSemiBold}
 
@@ -38,6 +40,7 @@ export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
 export const PrimaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blue};
   border-radius: ${BORDERS.radiusSoftCorners};
+  padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   ${TYPOGRAPHY.pSemiBold}
 
@@ -47,6 +50,7 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
 export const SecondaryButton = styled(NewSecondaryBtn)`
   color: ${COLORS.blue};
   border-radius: ${BORDERS.radiusSoftCorners};
+  padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   ${TYPOGRAPHY.pSemiBold}
 
