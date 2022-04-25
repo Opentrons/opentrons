@@ -1,7 +1,7 @@
 """Main FastAPI application."""
 import asyncio
 import logging
-from task_runner import TaskRunner
+from .service.task_runner import TaskRunner
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -64,7 +64,6 @@ async def on_shutdown() -> None:
     )
 
     shutdown_errors = [r for r in shutdown_results if isinstance(r, BaseException)]
-
 
     for e in shutdown_errors:
         log.warning("Error during shutdown", exc_info=e)

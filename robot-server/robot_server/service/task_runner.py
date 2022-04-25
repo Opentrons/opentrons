@@ -30,9 +30,8 @@ class TaskRunner:
         tg = create_task_group() 
         await tg.__aenter__()
         return cls(tg)
-        
-            
-    def run(self, func: TaskFunc, *args: Any) -> None:
+                   
+    def run(self, func: TaskFunc, **kwargs: Any) -> None:
         """Run an async function in the background.
 
         Will log when the function completes, including any error
@@ -40,16 +39,22 @@ class TaskRunner:
 
         Arguments:
             func: An async, None-returning function to run in the background.
-            Use *args to outling the 1:1 correspondence of each tasks.
+            Use **kwargs to pass to func.
         """
         func_name = func.__qualname__
-        self._task_group.start_soon(func, *args, name = func_name)
-
-          
-    async def cancel_all_and_clean_up(self, func_name) -> None:
+                
+        async def py_closure() -> None:
+            #py_closure() is a calllable
+            await func(**kwargs)
+            # Just call func with the arguments passed into it
+           
+        self._task_group.start_soon(py_closure, name = func_name)
+            
+                 
+    async def cancel_all_and_clean_up(self) -> None:
         self._task_group.cancel_scope.cancel()
-        await self.__task_group.__aexit__() 
-        log.cancel(f"Background task {func_name} cancelled_cleanedup")
+        await self._task_group.__aexit__(None, None, None) 
+        log.debug(f"Background task cancelled_cleanedup")
         # Clean up all cancelled tasks 
         raise NotImplementedError
     
@@ -57,4 +62,4 @@ def get_task_runner(app_state: AppState = Depends(get_app_state)) -> TaskRunner:
     return app_state.task_runner
   
         
-            
+        
