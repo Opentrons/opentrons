@@ -10,6 +10,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorOutputBinding,
     SensorType,
 )
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
@@ -257,26 +258,42 @@ class SensorScheduler:
             finally:
                 return status
 
+    @staticmethod
+    def _log_sensor_output(message: MessageDefinition, arb: ArbitrationId) -> None:
+        if isinstance(message, ReadFromSensorResponse):
+            log.info(
+                f"{SensorType(message.payload.sensor.value).name}: "
+                f"{SensorDataType.build(message.payload.sensor_data).to_float()}"
+            )
+
     @asynccontextmanager
     async def bind_sync(
         self,
         target_sensor: SensorInformation,
         can_messenger: CanMessenger,
         timeout: float = 0.5,
+        log: bool = False,
     ) -> AsyncIterator[None]:
         """While acquired, bind the specified sensor to control sync."""
+        flags = [SensorOutputBinding.sync]
+        if log:
+            flags.append(SensorOutputBinding.report)
         await can_messenger.send(
             node_id=target_sensor.node_id,
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
                     sensor=SensorTypeField(target_sensor.sensor_type),
-                    binding=SensorOutputBindingField(SensorOutputBinding.sync),
+                    binding=SensorOutputBindingField.from_flags(flags),
                 )
             ),
         )
         try:
+            if log:
+                can_messenger.add_listener(self._log_sensor_output)
             yield
         finally:
+            if log:
+                can_messenger.remove_listener(self._log_sensor_output)
             await can_messenger.send(
                 node_id=target_sensor.node_id,
                 message=BindSensorOutputRequest(

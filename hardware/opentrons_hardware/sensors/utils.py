@@ -4,9 +4,7 @@ from typing import List, overload, Union
 from typing_extensions import Final, Literal
 
 from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
-from opentrons_hardware.firmware_bindings.messages.fields import (
-    SensorOutputBindingField,
-)
+
 from opentrons_hardware.firmware_bindings.utils.binary_serializable import (
     Int32Field,
 )
@@ -34,11 +32,6 @@ class SensorDataType:
     @overload
     @classmethod
     def build(cls, data: List[int]) -> "SensorDataType":
-        ...
-
-    @overload
-    @classmethod
-    def build(cls, data: SensorOutputBindingField) -> "SensorDataType":
         ...
 
     @classmethod
