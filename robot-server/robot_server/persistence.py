@@ -38,7 +38,7 @@ protocol_table = sqlalchemy.Table(
     # To ensure proper functionality, all inserted datetimes must be UTC.
     sqlalchemy.Column(
         "created_at",
-        sqlalchemy.DateTime(),
+        sqlalchemy.DateTime,
         nullable=False,
     ),
     sqlalchemy.Column("protocol_key", sqlalchemy.String, nullable=True),
@@ -55,7 +55,7 @@ run_table = sqlalchemy.Table(
     # NOTE: See above note about naive datetimes
     sqlalchemy.Column(
         "created_at",
-        sqlalchemy.DateTime(),
+        sqlalchemy.DateTime,
         nullable=False,
     ),
     sqlalchemy.Column(
@@ -77,7 +77,7 @@ action_table = sqlalchemy.Table(
         primary_key=True,
     ),
     # NOTE: See above note about naive datetimes
-    sqlalchemy.Column("created_at", sqlalchemy.DateTime(), nullable=False),
+    sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False),
     sqlalchemy.Column("action_type", sqlalchemy.String, nullable=False),
     sqlalchemy.Column(
         "run_id",
