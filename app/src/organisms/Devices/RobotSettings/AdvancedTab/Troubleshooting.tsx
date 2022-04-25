@@ -29,12 +29,13 @@ export function Troubleshooting({
 }: TroubleshootingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
-  const controlDisabled = robot?.status !== CONNECTABLE
-  const logsAvailable = robot?.health != null && robot?.health.logs
+  const { health, status } = robot
+  const controlDisabled = status !== CONNECTABLE
+  const logsAvailable = health != null && health.logs
   const robotLogsDownloading = useSelector(getRobotLogsDownloading)
 
   const handleClick = (): void => {
-    updateDownloadLogsStatus(true)
+    updateDownloadLogsStatus(robotLogsDownloading)
     dispatch(downloadLogs(robot))
   }
 
