@@ -6,6 +6,7 @@ from typing import Generator
 from sqlalchemy.engine import Engine as SQLEngine
 from pathlib import Path
 
+from robot_server.protocols.protocol_store import ProtocolNotFoundError
 from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError
 from robot_server.runs.action_models import RunAction, RunActionType
 from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
@@ -53,6 +54,20 @@ def test_insert_actions_missing_run_id(subject: RunStore) -> None:
 
     with pytest.raises(RunNotFoundError, match="missing-run-id"):
         subject.insert_action(run_id="missing-run-id", action=action)
+
+
+def test_insert_run_missing_protocol_id(subject: RunStore) -> None:
+    """Should not be able to insert an action with a run id that does not exist."""
+    run = RunResource(
+        run_id="run-id",
+        protocol_id="missing-protocol-id",
+        created_at=datetime.now(),
+        actions=[],
+        is_current=True,
+    )
+
+    with pytest.raises(ProtocolNotFoundError, match="missing-protocol-id"):
+        subject.insert(run)
 
 
 def test_update_active_run(subject: RunStore) -> None:
