@@ -1,7 +1,8 @@
 """Sensor helper classes."""
 from dataclasses import dataclass
-from typing import List, overload
-from typing_extensions import Final
+from typing import List, overload, Union
+from typing_extensions import Final, Literal
+
 from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorOutputBindingField,
@@ -80,6 +81,13 @@ class WriteSensorInformation(SensorInformation):
     """Write sensor information."""
 
     data: SensorDataType
+
+
+@dataclass
+class SensorThresholdInformation(SensorInformation):
+    """Set a sensor threshold or request an autoset."""
+
+    data: Union[SensorDataType, Literal["auto"]]
 
 
 @dataclass
