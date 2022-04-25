@@ -87,7 +87,8 @@ engine_state_table = sqlalchemy.Table(
     _metadata,
     sqlalchemy.Column("id", sqlalchemy.INT, primary_key=True),
     # sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False),
-    sqlalchemy.Column("state", sqlalchemy.PickleType, nullable=False),
+    sqlalchemy.Column("state_pickle", sqlalchemy.PickleType, nullable=False),
+    sqlalchemy.Column("state_string", sqlalchemy.String, nullable=True),
     sqlalchemy.Column(
         "run_id",
         sqlalchemy.String,

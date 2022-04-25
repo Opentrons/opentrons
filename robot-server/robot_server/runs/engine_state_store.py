@@ -1,7 +1,7 @@
 """Engine state on-db store."""
 import sqlalchemy
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Optional
 from pydantic import parse_obj_as
 
 from opentrons.protocol_runner import ProtocolRunData
@@ -19,6 +19,7 @@ class EngineStateResource:
 
     run_id: str
     state: ProtocolRunData
+    state_string: Optional[str] = None
     # created_at: datetime
 
 
@@ -72,12 +73,14 @@ def _convert_sql_row_to_sql_engine_state(
     run_id = sql_row.run_id
     assert isinstance(run_id, str)
 
-    state = sql_row.state
-    assert isinstance(state, Dict)
+    state_pickle = sql_row.state_pickle
+    assert isinstance(state_pickle, Dict)
 
-    return EngineStateResource(run_id=run_id, state=parse_obj_as(ProtocolRunData, state))
+    state_string = sql_row.state_string
+    assert isinstance(state_string, str)
+
+    return EngineStateResource(run_id=run_id, state=parse_obj_as(ProtocolRunData, state_pickle), state_string=ProtocolRunData.parse_raw(state_string))
 
 
 def _convert_state_to_sql_values(state: EngineStateResource) -> Dict[str, object]:
-    print(state.state.dict())
-    return {"run_id": state.run_id, "state": state.state.dict()}
+    return {"run_id": state.run_id, "state_pickle": state.state.dict(), "state_string": state.state.json()}

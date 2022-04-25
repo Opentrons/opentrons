@@ -1,10 +1,13 @@
 """Tests for robot_server.runs.run_store."""
+import json
+
 import pytest
 from datetime import datetime
 from typing import Generator
 
 import sqlalchemy
 from pathlib import Path
+from pydantic import parse_obj_as
 
 from opentrons.protocol_runner import ProtocolRunData
 from opentrons.protocol_engine import (
@@ -78,6 +81,17 @@ def protocol_run() -> ProtocolRunData:
         # TODO (tz 22-4-19): added the field to class. make sure what to initialize
         labwareOffsets=[],
     )
+
+
+def test_pydantic_parse_json(protocol_run: ProtocolRunData) -> None:
+    expected_json = protocol_run.json()
+    expected_dict = protocol_run.dict()
+    json_load_dict = json.loads(expected_json)
+    print(json_load_dict)
+    print(expected_dict)
+    # assert parse_obj_as(ProtocolRunData, expected_dict) == protocol_run
+    assert ProtocolRunData.parse_raw(expected_json) == protocol_run
+    assert json_load_dict == expected_dict
 
 
 def test_insert_state(subject: EngineStateStore, protocol_run: ProtocolRunData) -> None:
