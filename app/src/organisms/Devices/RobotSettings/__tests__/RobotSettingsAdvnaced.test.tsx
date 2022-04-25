@@ -177,11 +177,6 @@ describe('RobotSettings Advanced tab', () => {
     getByText('Mock Troubleshooting Section')
   })
 
-  it('should render download logs toast when clicking download logs button', () => {
-    const [{ getByText }] = render()
-    getByText('Downloading logs...')
-  })
-
   it('should render UpdateRobotSoftware section', () => {
     const [{ getByText }] = render()
     getByText('Mock UpdateRobotSoftware Section')

@@ -27,6 +27,9 @@ const render = (robot: any) => {
 }
 
 describe('RobotSettings Troubleshooting', () => {
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
   it('should render title, description, and button', () => {
     const [{ getByText, getByRole, getByTestId }] = render(mockConnectableRobot)
     getByText('Troubleshooting')

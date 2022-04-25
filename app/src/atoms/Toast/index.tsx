@@ -21,7 +21,7 @@ export interface ToastProps {
   icon?: IconProps
   closeButton?: boolean
   onClose: () => void
-  noTimeout?: boolean
+  requiredTimeout?: boolean
 }
 
 const EXPANDED_STYLE = css`
@@ -39,7 +39,7 @@ const EXPANDED_STYLE = css`
   }
 `
 export function Toast(props: ToastProps): JSX.Element {
-  const { message, type, icon, closeButton, onClose, noTimeout } = props
+  const { message, type, icon, closeButton, onClose, requiredTimeout } = props
   let iconName: IconName = 'alert-circle'
   let color = COLORS.error
   let backgroundColor = COLORS.errorBg
@@ -57,7 +57,7 @@ export function Toast(props: ToastProps): JSX.Element {
     backgroundColor = COLORS.greyDisabled
   }
 
-  if (noTimeout === false) {
+  if (!(requiredTimeout ?? false)) {
     setTimeout(() => {
       onClose()
     }, 3000)
@@ -78,7 +78,7 @@ export function Toast(props: ToastProps): JSX.Element {
       right={SPACING.spacing4}
       bottom={SPACING.spacing4}
       position="fixed"
-      data-testid={`Toast_${type}`}
+      data-testid={`Toast_${type as string}`}
     >
       <Flex flexDirection="row">
         <Icon

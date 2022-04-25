@@ -39,7 +39,7 @@ interface RobotSettingsAdvancedProps {
 export function RobotSettingsAdvanced({
   robotName,
 }: RobotSettingsAdvancedProps): JSX.Element {
-  const { t } = useTranslation()
+  const { t } = useTranslation('device_settings')
   const [
     showRenameRobotSlideout,
     setShowRenameRobotSlideout,
@@ -110,9 +110,11 @@ export function RobotSettingsAdvanced({
       {showDownloadToast && (
         <Toast
           message={t('update_robot_software_download_logs_toast_message')}
+          type="info"
           icon={toastIcon}
+          closeButton={false}
           onClose={() => setShowDownloadToast(false)}
-          noTimeout={true}
+          requiredTimeout={false}
         />
       )}
       <Box paddingX={SPACING.spacing4}>

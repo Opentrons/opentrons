@@ -43,7 +43,7 @@ export function Troubleshooting({
 
   React.useEffect(() => {
     updateDownloadLogsStatus(robotLogsDownloading)
-  }, [robotLogsDownloading, dispatch])
+  }, [robotLogsDownloading])
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
