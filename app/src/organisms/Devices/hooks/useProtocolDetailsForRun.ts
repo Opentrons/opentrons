@@ -19,31 +19,34 @@ export function useProtocolDetailsForRun(
 ): ProtocolDetails {
   const { data: runRecord } = useRunQuery(runId)
   const protocolId = runRecord?.data?.protocolId ?? null
-  const { data: protocolRecord } = useProtocolQuery(protocolId, {
-    staleTime: Infinity,
-  })
-
   const enableProtocolPolling = React.useRef<boolean>(true)
-
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(
+  const { data: protocolRecord } = useProtocolQuery(
     protocolId,
-    { staleTime: Infinity },
+    {
+      staleTime: Infinity,
+    },
     enableProtocolPolling.current
   )
 
-  const mostRecentAnalysis = last(protocolAnalyses) ?? null
+  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
+    staleTime: Infinity,
+  })
+
+  const mostRecentAnalysisSummary =
+    last(protocolRecord?.data?.analysisSummaries ?? []) ?? null
 
   React.useEffect(() => {
-    if (mostRecentAnalysis?.status === 'completed') {
+    if (mostRecentAnalysisSummary?.status === 'completed') {
       enableProtocolPolling.current = false
     } else {
       enableProtocolPolling.current = true
     }
-  }, [mostRecentAnalysis?.status])
+  }, [mostRecentAnalysisSummary?.status])
 
   const displayName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
+  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
 
   return {
     displayName: displayName ?? null,

@@ -22,9 +22,10 @@ export interface Protocol {
   data: ProtocolResource
 }
 
-export type ProtocolAnalyses = Array<
-  CompletedProtocolAnalysis | PendingProtocolAnalysis
->
+export interface ProtocolAnalyses {
+  links?: ResourceLinks
+  data: Array<CompletedProtocolAnalysis | PendingProtocolAnalysis>
+}
 
 export interface Protocols {
   links?: ResourceLinks
