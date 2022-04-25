@@ -52,11 +52,28 @@ def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
 
 
 @pytest.fixture
+def protocol_store(sql_engine: SQLEngine) -> ProtocolStore:
+    """Return a `ProtocolStore` linked to the same database as the subject under test.
+
+    `ProtocolStore` is tested elsewhere.
+    We only need it here to prepare the database for our `AnalysisStore` tests.
+    An analysis always needs a protocol to link to.
+    """
+    return ProtocolStore.create_empty(sql_engine=sql_engine)
+
+
+@pytest.fixture
 def subject(sql_engine: SQLEngine) -> AnalysisStore:
+    """Return the `AnalysisStore` test subject."""
     return AnalysisStore(sql_engine=sql_engine)
 
 
 def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
+    """Return a placeholder `ProtocolResource` to insert into a `ProtocolStore`.
+
+    Parameters:
+        protocol_id: The ID to give to the new `ProtocolResource`.
+    """
     return ProtocolResource(
         protocol_id=protocol_id,
         created_at=datetime(year=2021, month=1, day=1),
@@ -72,20 +89,17 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
     )
 
 
-@pytest.fixture
-def protocol_store(sql_engine: SQLEngine) -> ProtocolStore:
-    """Get a ProtocolStore test subject."""
-    return ProtocolStore.create_empty(sql_engine=sql_engine)
-
-
 def test_protocol_not_found(subject: AnalysisStore) -> None:
+    """Every method that takes a protocol ID should raise if it doesn't exist."""
     with pytest.raises(ProtocolNotFoundError):
         subject.add_pending(
             protocol_id="nonexistent-protocol-id",
             analysis_id="analysis-id-does-not-matter",
         )
+
     with pytest.raises(ProtocolNotFoundError):
         subject.get_summaries_by_protocol(protocol_id="nonexistent-protocol-id")
+
     with pytest.raises(ProtocolNotFoundError):
         subject.get_by_protocol(protocol_id="nonexistent-protocol-id")
 
