@@ -2,12 +2,13 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional
+
 import sqlalchemy
 
-from .action_models import RunAction, RunActionType
-
-from robot_server.persistence import run_table, action_table
+from robot_server.persistence import run_table, action_table, ensure_utc_datetime
 from robot_server.protocols import ProtocolNotFoundError
+
+from .action_models import RunAction, RunActionType
 
 
 @dataclass(frozen=True)
@@ -204,15 +205,13 @@ def _convert_sql_row_to_run(
     current_run_id: Optional[str],
 ) -> RunResource:
     run_id = sql_row.id
-    assert isinstance(run_id, str)
-
-    created_at = sql_row.created_at
-    assert isinstance(created_at, datetime)
-
     protocol_id = sql_row.protocol_id
-    # key is optional in DB. If its not None assert type as string
-    if protocol_id is not None:
-        assert isinstance(protocol_id, str)
+    created_at = ensure_utc_datetime(sql_row.created_at)
+
+    assert isinstance(run_id, str), f"Run ID {run_id} is not a string"
+    assert protocol_id is None or isinstance(
+        protocol_id, str
+    ), f"Protocol ID {protocol_id} is not a string or None"
 
     is_current = current_run_id == run_id
 
@@ -228,30 +227,24 @@ def _convert_sql_row_to_run(
 def _convert_run_to_sql_values(run: RunResource) -> Dict[str, object]:
     return {
         "id": run.run_id,
-        "created_at": run.created_at,
+        "created_at": ensure_utc_datetime(run.created_at),
         "protocol_id": run.protocol_id,
     }
 
 
 def _convert_sql_row_to_action(sql_row: sqlalchemy.engine.Row) -> RunAction:
-    action_id = sql_row.id
-    assert isinstance(action_id, str)
-
-    created_at = sql_row.created_at
-    assert isinstance(created_at, datetime)
-
-    action_type = sql_row.action_type
-    assert isinstance(action_type, str)
-
+    # rely on Pydantic and Enum to raise if data shapes are wrong
     return RunAction(
-        id=action_id, createdAt=created_at, actionType=RunActionType(action_type)
+        id=sql_row.id,
+        createdAt=ensure_utc_datetime(sql_row.created_at),
+        actionType=RunActionType(sql_row.action_type),
     )
 
 
 def _convert_action_to_sql_values(action: RunAction, run_id: str) -> Dict[str, object]:
     return {
         "id": action.id,
-        "created_at": action.createdAt,
+        "created_at": ensure_utc_datetime(action.createdAt),
         "action_type": action.actionType.value,
         "run_id": run_id,
     }

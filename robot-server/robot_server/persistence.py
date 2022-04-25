@@ -1,13 +1,13 @@
 """Data access initialization and management."""
-import sqlalchemy
-from fastapi import Depends
-
 import logging
-
+from datetime import datetime, timezone
 from pathlib import Path
 from tempfile import mkdtemp
-from typing_extensions import Final
+
+import sqlalchemy
 from anyio import Path as AsyncPath
+from fastapi import Depends
+from typing_extensions import Final
 
 from robot_server.app_state import AppState, AppStateValue, get_app_state
 from robot_server.settings import get_settings
@@ -31,6 +31,9 @@ protocol_table = sqlalchemy.Table(
         sqlalchemy.String,
         primary_key=True,
     ),
+    # NOTE: This column stores naive (timezone-less) datetimes.
+    # Timezones are stripped from inserted values, due to SQLite limitations.
+    # To ensure proper functionality, all inserted datetimes must be UTC.
     sqlalchemy.Column(
         "created_at",
         sqlalchemy.DateTime,
@@ -47,6 +50,7 @@ run_table = sqlalchemy.Table(
         sqlalchemy.String,
         primary_key=True,
     ),
+    # NOTE: See above note about naive datetimes
     sqlalchemy.Column(
         "created_at",
         sqlalchemy.DateTime,
@@ -68,6 +72,7 @@ action_table = sqlalchemy.Table(
         sqlalchemy.String,
         primary_key=True,
     ),
+    # NOTE: See above note about naive datetimes
     sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False),
     sqlalchemy.Column("action_type", sqlalchemy.String, nullable=False),
     sqlalchemy.Column(
@@ -156,3 +161,22 @@ def get_sql_engine(
     # FastAPI doesn't give us a convenient way to properly tie
     # the lifetime of a dependency to the lifetime of the server app.
     # https://github.com/tiangolo/fastapi/issues/617
+
+
+def ensure_utc_datetime(dt: object) -> datetime:
+    """Ensure an object is a TZ-aware UTC datetime.
+
+    Args:
+        dt: A UTC-coded datetime to be insterted into the database,
+            or a naive (timezone-less) datetime pulled from the database.
+
+    Returns:
+        A datetime with its timezone set to UTC.
+    """
+    assert isinstance(dt, datetime), f"{dt} is not a datetime"
+
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    else:
+        assert dt.tzinfo == timezone.utc, f"Expected '{dt}' to be UTC"
+        return dt
