@@ -61,12 +61,14 @@ export function FactoryResetSlideout({
 
   // TODO: This should be temporary. Need to wait for the CPX team's update of Protocol resetOptions.
   // CPX team won't change the order of the options
-  const calibrationOptions = options.filter(opt =>
-    opt.id.includes('Calibration')
-  )
-  const bootScriptOption = options.filter(opt =>
-    opt.id.includes('bootScript')
-  )[0]
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  const calibrationOptions = options
+    ? options.filter(opt => opt.id.includes('Calibration'))
+    : []
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  const bootScriptOption = options
+    ? options.filter(opt => opt.id.includes('bootScript'))
+    : []
 
   React.useEffect(() => {
     dispatch(fetchResetConfigOptions(robotName))
@@ -151,7 +153,6 @@ export function FactoryResetSlideout({
             label={`Clear ${opt.name}`}
           />
         ))}
-
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -175,21 +176,19 @@ export function FactoryResetSlideout({
         >
           {t('factory_reset_slideout_boot_scripts_title')}
         </StyledText>
-        {bootScriptOption != null && (
+        {bootScriptOption.map(opt => (
           <CheckboxField
-            onChange={() => {
+            key={opt.id}
+            onChange={() =>
               setResetOptions({
                 ...resetOptions,
-                [bootScriptOption.id]: !(
-                  resetOptions[bootScriptOption.id] ?? false
-                ),
+                [opt.id]: !(resetOptions[opt.id] ?? false),
               })
-            }}
-            name={bootScriptOption.id}
-            value={resetOptions[bootScriptOption.id]}
-            label={`Clear ${bootScriptOption.name}`}
+            }
+            value={resetOptions[opt.id]}
+            label={`Clear ${opt.name}`}
           />
-        )}
+        ))}
       </Flex>
     </Slideout>
   )
