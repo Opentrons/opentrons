@@ -16,7 +16,7 @@ from opentrons.protocol_engine import (
     LoadedLabware,
 )
 
-from robot_server.persistence import analysis_table, protocol_table
+from robot_server.persistence import analysis_table, protocol_table, sqlite_rowid
 
 from .analysis_models import (
     AnalysisSummary,
@@ -165,9 +165,9 @@ class AnalysisStore:
         self, protocol_id: str
     ) -> List[_CompletedAnalysisResource]:
         statement = (
-            analysis_table.select()
+            sqlalchemy.select(analysis_table)
             .where(analysis_table.c.protocol_id == protocol_id)
-            .order_by(sqlalchemy.column("_ROWID_"))
+            .order_by(sqlite_rowid)
         )
         with self._sql_engine.begin() as transaction:
             self._sql_check_protocol_exists(
@@ -178,9 +178,9 @@ class AnalysisStore:
 
     def _sql_get_ids_by_protocol(self, protocol_id: str) -> List[str]:
         statement = (
-            analysis_table.select(analysis_table.c.id)
+            sqlalchemy.select(analysis_table.c.id)
             .where(analysis_table.c.protocol_id == protocol_id)
-            .order_by(sqlalchemy.column("_ROWID_"))
+            .order_by(sqlite_rowid)
         )
         with self._sql_engine.begin() as transaction:
             self._sql_check_protocol_exists(

@@ -109,6 +109,18 @@ action_table = sqlalchemy.Table(
 )
 
 
+# A reference to SQLite's built-in ROWID column.
+#
+# ROWID is basically an autoincrementing integer, implicitly present in every table.
+# It's useful for selecting rows in the order we originally inserted them.
+# For example:
+#
+#     sqlalchemy.select(my_table).order_by(sqlite_row_id)
+#
+# https://www.sqlite.org/autoinc.html
+sqlite_rowid = sqlalchemy.column("_ROWID_")
+
+
 def open_db_no_cleanup(db_file_path: Path) -> SQLEngine:
     """Create a database engine for performing transactions."""
     return create_engine(
