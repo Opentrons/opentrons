@@ -121,6 +121,12 @@ class OT3CurrentSettings:
         return base
 
 
+@dataclass(frozen=True)
+class CapacitivePassSettings:
+    prep_distance_mm: float
+    max_overrun_distance_mm: float
+    speed_mm_per_s: float
+
 @dataclass
 class OT3Config:
     model: Literal["OT-3 Standard"]

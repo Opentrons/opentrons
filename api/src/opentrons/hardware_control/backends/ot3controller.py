@@ -29,6 +29,7 @@ from .ot3utils import (
     create_home_group,
     node_to_axis,
     sub_system_to_node_id,
+    sensor_node_for_mount,
 )
 
 try:
@@ -77,6 +78,8 @@ from opentrons_hardware.hardware_control.motion import (
 )
 from opentrons_hardware.hardware_control.types import NodeMap
 from opentrons_hardware.hardware_control.tools import detector, types as ohc_tool_types
+
+from opentrons_hardware.hardware_control.tool_sensors import capacitive_probe
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
@@ -634,3 +637,12 @@ class OT3Controller:
     ) -> NodeMap[MapPayload]:
         by_node = {axis_to_node(k): v for k, v in to_xform.items()}
         return {k: v for k, v in by_node.items() if k in self._present_nodes}
+
+    async def capacitive_probe(
+        self, mount: OT3Mount, distance_mm: float, speed_mm_per_s: float
+    ) -> None:
+        pos = await capacitive_probe(
+            self._messenger, sensor_node_for_mount(mount), distance_mm, speed_mm_per_s
+        )
+
+        self._position[axis_to_node(OT3Axis.by_mount(mount))] = pos
