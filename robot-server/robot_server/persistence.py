@@ -7,14 +7,12 @@ from tempfile import mkdtemp
 import sqlalchemy
 from anyio import Path as AsyncPath
 from fastapi import Depends
-from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine as SQLEngine
 from typing_extensions import Final
 
 from robot_server.app_state import AppState, AppStateValue, get_app_state
 from robot_server.settings import get_settings
 
-_sql_engine = AppStateValue[SQLEngine]("sql_engine")
+_sql_engine = AppStateValue[sqlalchemy.engine.Engine]("sql_engine")
 _persistence_directory = AppStateValue[Path]("persistence_directory")
 _protocol_directory = AppStateValue[Path]("protocol_directory")
 
@@ -61,8 +59,6 @@ run_table = sqlalchemy.Table(
     sqlalchemy.Column(
         "protocol_id",
         sqlalchemy.String,
-        # TODO (tz 4/8/22): SQLite does not support FK by default. Need to add support
-        # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#foreign-key-support
         sqlalchemy.ForeignKey("protocol.id"),
     ),
 )
@@ -82,21 +78,32 @@ action_table = sqlalchemy.Table(
     sqlalchemy.Column(
         "run_id",
         sqlalchemy.String,
-        # TODO (tz 4/8/22): SQLite does not support FK by default. Need to add support
-        # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#foreign-key-support
         sqlalchemy.ForeignKey("run.id"),
         nullable=False,
     ),
 )
 
 
-def open_db_no_cleanup(db_file_path: Path) -> SQLEngine:
+def open_db_no_cleanup(db_file_path: Path) -> sqlalchemy.engine.Engine:
     """Create a database engine for performing transactions."""
-    return create_engine(
+    engine = sqlalchemy.create_engine(
         # sqlite://<hostname>/<path>
         # where <hostname> is empty.
         f"sqlite:///{db_file_path}",
     )
+
+    # Enable foreign key support in sqlite
+    # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#foreign-key-support
+    @sqlalchemy.event.listens_for(engine, "connect")  # type: ignore[misc]
+    def _set_sqlite_pragma(
+        dbapi_connection: sqlalchemy.engine.CursorResult,
+        connection_record: sqlalchemy.engine.CursorResult,
+    ) -> None:
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON;")
+        cursor.close()
+
+    return engine
 
 
 async def get_persistence_directory(
@@ -138,7 +145,7 @@ def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
 def get_sql_engine(
     app_state: AppState = Depends(get_app_state),
     persistence_directory: Path = Depends(get_persistence_directory),
-) -> SQLEngine:
+) -> sqlalchemy.engine.Engine:
     """Return a singleton SQL engine referring to a ready-to-use database."""
     sql_engine = _sql_engine.get_from(app_state)
 
