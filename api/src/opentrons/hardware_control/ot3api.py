@@ -563,7 +563,7 @@ class OT3API(
             ot3pos = self._effector_pos_from_carriage_pos(
                 OT3Mount.from_mount(mount), self._current_position, critical_point
             )
-            return {ot3ax.to_axis(): value for ot3ax, value in ot3pos.items()}
+            return ot3pos
 
     def _effector_pos_from_carriage_pos(
         self,

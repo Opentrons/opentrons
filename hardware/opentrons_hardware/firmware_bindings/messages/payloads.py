@@ -146,6 +146,12 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
     encoder_position: utils.UInt32Field
     ack_id: utils.UInt8Field
 
+@dataclass
+class GetEncoderPayload(MoveGroupResponsePayload):
+    """Notification of a completed move group."""
+
+    seq_id: utils.UInt8Field
+    encoder_position: utils.UInt32Field
 
 @dataclass
 class MotionConstraintsPayload(utils.BinarySerializable):

@@ -158,6 +158,12 @@ class MoveCompleted:  # noqa: D101
     payload_type: Type[BinarySerializable] = payloads.MoveCompletedPayload
     message_id: Literal[MessageId.move_completed] = MessageId.move_completed
 
+@dataclass
+class GetEncoderPositionRequest:  # noqa: D101
+    payload: payloads.GetEncoderPayload
+    payload_type: Type[BinarySerializable] = payloads.GetEncoderPayload
+    message_id: Literal[MessageId.GetEncoderPositionRequest] = MessageId.GetEncoderPositionRequest
+
 
 @dataclass
 class SetMotionConstraints:  # noqa: D101

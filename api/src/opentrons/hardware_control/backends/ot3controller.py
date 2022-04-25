@@ -96,6 +96,7 @@ class OT3Controller:
 
     _messenger: CanMessenger
     _position: Dict[NodeId, float]
+    _data: Dict[NodeId, float]
     _tool_detector: detector.OneshotToolDetector
 
     @classmethod
@@ -125,6 +126,7 @@ class OT3Controller:
         self._messenger.start()
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
         self._position = self._get_home_position()
+        self._data = None
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -217,6 +219,7 @@ class OT3Controller:
         move_group, _ = group
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
+        self._data = positions
         self._position.update(positions)
 
     async def home(self, axes: Sequence[OT3Axis]) -> OT3AxisMap[float]:

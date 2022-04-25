@@ -75,9 +75,9 @@ class MoveGroupRunner:
             The current position after the move for all the axes that
             acknowledged completing moves.
         """
-        # if not self._has_moves(self._move_groups):
-        #     log.debug("No moves. Nothing to do.")
-        #     return {}
+        if not self._has_moves(self._move_groups):
+            log.debug("No moves. Nothing to do.")
+            return {}
 
         await self._clear_groups(can_messenger)
         await self._send_groups(can_messenger)
@@ -98,16 +98,23 @@ class MoveGroupRunner:
                     float(completion.payload.encoder_position.value) / 1000.0,
                 )
             )
-            print("{} Encoder Position:".format(arbid.parts.originating_node_id))
-            print(float(completion.payload.encoder_position.value) / 1000.0)
         # for each node, pull the position from the completion with the largest
         # combination of group id and sequence id
+        pos = {
+            node: next(
+                reversed(
+                    sorted(poslist, key=lambda position_element: position_element[0])
+                )
+            )[1:3]
+            for node, poslist in position.items()
+        }
+        print("for loop: ",pos)
         return {
             node: next(
                 reversed(
                     sorted(poslist, key=lambda position_element: position_element[0])
                 )
-            )[1]
+            )[1:3]
             for node, poslist in position.items()
         }
 

@@ -30,6 +30,7 @@ MessageDefinition = Union[
     defs.ExecuteMoveGroupRequest,
     defs.ClearAllMoveGroupsRequest,
     defs.MoveCompleted,
+    defs.GetEncoderPositionRequest,
     defs.SetMotionConstraints,
     defs.GetMotionConstraintsRequest,
     defs.GetMotionConstraintsResponse,

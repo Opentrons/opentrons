@@ -267,6 +267,9 @@ def target_position_from_plunger(  # type: ignore[no-untyped-def]
 def deck_point_from_machine_point(
     machine_point: Point, attitude: AttitudeMatrix, offset: Point
 ) -> Point:
+    print("Machine Point: ", machine_point)
+    print("offset: ", offset)
+    print("attitude: ", attitude)
     return Point(
         *linal.apply_reverse(
             attitude,

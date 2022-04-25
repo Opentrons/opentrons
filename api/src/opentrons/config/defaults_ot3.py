@@ -22,9 +22,14 @@ DEFAULT_DECK_TRANSFORM: Final[OT3Transform] = [
     [0.0, -1.0, 0.0],
     [0.0, 0.0, -1.0],
 ]
-DEFAULT_CARRIAGE_OFFSET: Final[Offset] = (436.605, 484.975, 233.475)
-DEFAULT_LEFT_MOUNT_OFFSET: Final[Offset] = (-21.0, -63.05, 256.175)
-DEFAULT_RIGHT_MOUNT_OFFSET: Final[Offset] = (33, -63.05, 256.175)
+"""
+I believe this offset on the z mount is incorrect and should be kept at 0.0
+Originally was 256.175 for left and right mount offset.
+default was 233.475
+"""
+DEFAULT_CARRIAGE_OFFSET: Final[Offset] = (436.605, 484.975, 210.475)
+DEFAULT_LEFT_MOUNT_OFFSET: Final[Offset] = (-21.0, -63.05, 0.0)
+DEFAULT_RIGHT_MOUNT_OFFSET: Final[Offset] = (33, -63.05, 0.0)
 DEFAULT_GRIPPER_MOUNT_OFFSET: Final[Offset] = (-50.0, 0.0, 0.0)
 DEFAULT_Z_RETRACT_DISTANCE: Final = 2
 
