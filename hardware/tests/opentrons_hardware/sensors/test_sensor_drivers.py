@@ -10,7 +10,10 @@ from tests.conftest import MockCanMessageNotifier
 
 from opentrons_hardware.sensors import fdc1004, hdc2080, mmr920C04, sensor_abc
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
-from opentrons_hardware.firmware_bindings.constants import SensorType, NodeId
+from opentrons_hardware.firmware_bindings.constants import (
+    SensorType,
+    NodeId,
+)
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
@@ -26,6 +29,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     WriteToSensorRequest,
     ReadFromSensorResponse,
     SensorThresholdResponse,
+    BindSensorOutputRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
@@ -34,9 +38,14 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     WriteToSensorRequestPayload,
     ReadFromSensorResponsePayload,
     SensorThresholdResponsePayload,
+    BindSensorOutputRequestPayload,
 )
-from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    SensorTypeField,
+    SensorOutputBindingField,
+)
 from opentrons_hardware.sensors.utils import SensorDataType
+from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
 
 
 @pytest.fixture
@@ -93,7 +102,7 @@ async def test_polling(
 ) -> None:
     """Test that a polling function sends the expected message."""
     messenger = mock.AsyncMock(spec=CanMessenger)
-    await sensor.poll(messenger, node, 10)
+    await sensor.get_baseline(messenger, node, 10, 10)
     messenger.send.assert_called_once_with(node_id=node, message=message)
 
 
@@ -131,7 +140,7 @@ async def test_receive_data_polling(
         )
 
     mock_messenger.send.side_effect = responder
-    return_data = await sensor.poll(mock_messenger, NodeId.pipette_left, 10)
+    return_data = await sensor.get_baseline(mock_messenger, NodeId.pipette_left, 10, 10)
     assert return_data == SensorDataType.build([0x0, 0x1, 0x0])
 
 
@@ -342,7 +351,6 @@ async def test_bind_to_sync(
     timeout: int,
 ) -> None:
     """Test for bind_to_sync.
-
     Tests that bind_to_sync does in fact try to
     send out a BindSensorOutputRequest.
     """
@@ -376,7 +384,6 @@ async def test_get_baseline(
     timeout: int,
 ) -> None:
     """Test for get_baseline.
-
     Tests that the function sends out a BaelineSensorRequest,
     and reads ReadFromSensorResponse message containing the
     correct information.

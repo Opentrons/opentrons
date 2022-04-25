@@ -2,10 +2,14 @@
 from abc import ABC, abstractmethod
 
 from typing import Optional
-
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorType,
+)
 from opentrons_hardware.sensors.utils import SensorDataType
+from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
+from .scheduler import SensorScheduler
 
 
 class AbstractBasicSensor(ABC):
@@ -45,6 +49,7 @@ class AbstractAdvancedSensor(AbstractBasicSensor):
         self._stop_threshold: float = stop_threshold
         self._offset: float = offset
         self._sensor_type: SensorType = sensor_type
+        self._scheduler = SensorScheduler()
 
     @property
     def zero_threshold(self) -> float:
@@ -77,11 +82,23 @@ class AbstractAdvancedSensor(AbstractBasicSensor):
         self._offset = offset
 
     @abstractmethod
-    async def poll(
+    async def bind_to_sync(
+        self,
+        can_messenger: CanMessenger,
+        node_id: NodeId,
+        binding: SensorOutputBinding = SensorOutputBinding.sync,
+        timeout: int = 1,
+    ) -> None:
+        """Send a BindSensorOutputRequest."""
+        ...
+
+    @abstractmethod
+    async def get_baseline(
         self,
         can_messenger: CanMessenger,
         node_id: NodeId,
         poll_for_ms: int,
+        sample_rate: int,
         timeout: int = 1,
     ) -> Optional[SensorDataType]:
         """Poll the sensor for data."""
@@ -96,4 +113,16 @@ class AbstractAdvancedSensor(AbstractBasicSensor):
         timeout: int = 1,
     ) -> Optional[SensorDataType]:
         """Send the zero threshold to the sensor."""
+        ...
+
+    async def get_report(
+        self,
+        node_id: NodeId,
+        can_messenger: CanMessenger,
+        timeout: int = 1,
+    ) -> Optional[SensorDataType]:
+        """This function retrieves ReadFromResponse messages.
+        This is meant to be called after a bind_to_sync call,
+        with the sensor being bound to "report".
+        """
         ...
