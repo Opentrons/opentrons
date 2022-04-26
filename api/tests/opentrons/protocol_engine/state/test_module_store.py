@@ -27,6 +27,8 @@ from opentrons.protocol_engine.state.module_substates import (
     HeaterShakerModuleSubState,
     TemperatureModuleId,
     TemperatureModuleSubState,
+    ThermocyclerModuleId,
+    ThermocyclerModuleSubState,
     ModuleSubStateType,
 )
 
@@ -68,6 +70,11 @@ def test_initial_state() -> None:
                 module_id=TemperatureModuleId("module-id"),
                 plate_target_temperature=None,
             ),
+        ),
+        (
+            lazy_fixture("thermocycler_v1_def"),
+            ModuleModel.THERMOCYCLER_MODULE_V1,
+            ThermocyclerModuleSubState(module_id=ThermocyclerModuleId("module-id")),
         ),
     ],
 )
@@ -130,6 +137,10 @@ def test_load_module(
                 module_id=TemperatureModuleId("module-id"),
                 plate_target_temperature=None,
             ),
+        ),
+        (
+            lazy_fixture("thermocycler_v1_def"),
+            ThermocyclerModuleSubState(module_id=ThermocyclerModuleId("module-id")),
         ),
     ],
 )
