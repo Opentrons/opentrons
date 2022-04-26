@@ -9,7 +9,8 @@ import pick from 'lodash/pick'
 import omit from 'lodash/omit'
 import set from 'lodash/set'
 import isEmpty from 'lodash/isEmpty'
-import { FormButtonBar } from './FormButtonBar'
+import { ConfigFormResetButton } from './ConfigFormResetButton'
+import { ConfigFormSubmitButton } from './ConfigFormSubmitButton'
 import {
   ConfigFormGroup,
   FormColumn,
@@ -218,8 +219,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
           //  TODO(jr, 4/19/22): add groupLabels to i18n
           return (
             <Form>
-              <FormButtonBar
-                isResetButton={true}
+              <ConfigFormResetButton
                 onClick={handleReset}
                 disabled={updateInProgress}
               />
@@ -247,8 +247,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
                   formFields={powerFields}
                 />
               </FormColumn>
-              <FormButtonBar
-                isResetButton={false}
+              <ConfigFormSubmitButton
                 disabled={disableSubmit || updateInProgress}
               />
             </Form>

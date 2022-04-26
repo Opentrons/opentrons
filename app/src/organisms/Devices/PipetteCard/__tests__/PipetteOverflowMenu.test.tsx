@@ -24,7 +24,8 @@ describe('PipetteOverflowMenu', () => {
       mount: LEFT,
       handleChangePipette: jest.fn(),
       handleCalibrate: jest.fn(),
-      handleSlideout: jest.fn(),
+      handleAboutSlideout: jest.fn(),
+      handleSettingsSlideout: jest.fn(),
       isPipetteCalibrated: false,
     }
   })
@@ -42,9 +43,9 @@ describe('PipetteOverflowMenu', () => {
     fireEvent.click(detach)
     expect(props.handleChangePipette).toHaveBeenCalled()
     fireEvent.click(settings)
-    expect(props.handleSlideout).toHaveBeenCalled()
+    expect(props.handleSettingsSlideout).toHaveBeenCalled()
     fireEvent.click(about)
-    expect(props.handleSlideout).toHaveBeenCalled()
+    expect(props.handleAboutSlideout).toHaveBeenCalled()
     fireEvent.click(calibrate)
     expect(props.handleCalibrate).toHaveBeenCalled()
   })
@@ -54,7 +55,8 @@ describe('PipetteOverflowMenu', () => {
       mount: LEFT,
       handleChangePipette: jest.fn(),
       handleCalibrate: jest.fn(),
-      handleSlideout: jest.fn(),
+      handleAboutSlideout: jest.fn(),
+      handleSettingsSlideout: jest.fn(),
       isPipetteCalibrated: false,
     }
     const { getByRole } = render(props)
@@ -68,7 +70,8 @@ describe('PipetteOverflowMenu', () => {
       mount: LEFT,
       handleChangePipette: jest.fn(),
       handleCalibrate: jest.fn(),
-      handleSlideout: jest.fn(),
+      handleAboutSlideout: jest.fn(),
+      handleSettingsSlideout: jest.fn(),
       isPipetteCalibrated: true,
     }
     const { getByRole } = render(props)

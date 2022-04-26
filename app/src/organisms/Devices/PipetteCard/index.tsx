@@ -99,12 +99,11 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const handleCalibrate = (): void => {
     startPipetteOffsetCalibrationBlockModal(null)
   }
-  const handleSlideout = (isAboutSlideout: boolean): void => {
-    if (isAboutSlideout) {
-      setShowAboutSlideout(true)
-    } else {
-      setShowSlideout(true)
-    }
+  const handleAboutSlideout = (): void => {
+    setShowAboutSlideout(true)
+  }
+  const handleSettingsSlideout = (): void => {
+    setShowSlideout(true)
   }
   return (
     <Flex
@@ -167,6 +166,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing3}>
             {!isDeckCalibrated &&
             pipetteOffsetCalibration == null &&
+            pipetteInfo != null &&
             showBanner ? (
               <Flex paddingBottom={SPACING.spacing2}>
                 <Banner type="error" onCloseClick={() => setShowBanner(false)}>
@@ -176,6 +176,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             ) : null}
             {isDeckCalibrated &&
             pipetteOffsetCalibration == null &&
+            pipetteInfo != null &&
             showBanner ? (
               <Flex paddingBottom={SPACING.spacing2}>
                 <Banner type="error" onCloseClick={() => setShowBanner(false)}>
@@ -238,7 +239,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             mount={mount}
             handleChangePipette={handleChangePipette}
             handleCalibrate={handleCalibrate}
-            handleSlideout={handleSlideout}
+            handleSettingsSlideout={handleSettingsSlideout}
+            handleAboutSlideout={handleAboutSlideout}
             isPipetteCalibrated={pipetteOffsetCalibration != null}
           />
         </div>
