@@ -88,7 +88,7 @@ export function PipettesAndModules({
                     maxWidth="50%"
                     key={`moduleCard_${module.type}_${index}`}
                   >
-                    <ModuleCard module={module} />
+                    <ModuleCard module={module} robotName={robotName} />
                   </Flex>
                 )
               })}

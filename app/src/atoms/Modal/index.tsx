@@ -18,7 +18,7 @@ import { Divider } from '../structure'
 import type { IconProps } from '@opentrons/components'
 
 type ModalType = 'info' | 'warning' | 'error'
-interface ModalProps extends BaseModalProps {
+export interface ModalProps extends BaseModalProps {
   type?: ModalType
   onClose?: React.MouseEventHandler
   title?: React.ReactNode

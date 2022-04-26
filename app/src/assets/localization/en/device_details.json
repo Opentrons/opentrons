@@ -46,7 +46,7 @@
   "serial_number": "Serial Number",
   "link_firmware_update": "View Firmware Update",
   "firmware_update_available": "Firmware update available.",
-  "view_update": "View Update",
+  "update_now": "Update now",
   "heater": "Heater",
   "shaker": "Shaker",
   "target_speed": "Target: {{speed}} RPM",
@@ -74,5 +74,10 @@
   "detach_pipette": "Detach pipette",
   "view_pipette_setting": "View pipette settings",
   "left": "left",
-  "right": "right"
+  "right": "right",
+  "firmware_update_failed": "Failed to update module firmware",
+  "an_error_occurred_while_updating": "An error occurred while attempting to update your robot.",
+  "bundle_firmware_file_not_found": "Bundled fw file not found for module of type: {{module}}",
+  "firmware_update_installation_successful": "Installation successful",
+  "updating_firmware": "Updating firmware..."
 }
