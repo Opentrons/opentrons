@@ -351,7 +351,7 @@ async def test_bind_to_sync(
     timeout: int,
 ) -> None:
     """Test for bind_to_sync.
-    Tests that bind_to_sync does in fact try to
+    Tests that bind_to_sync does in fact
     send out a BindSensorOutputRequest.
     """
     await sensor.bind_to_sync(
@@ -384,7 +384,7 @@ async def test_get_baseline(
     timeout: int,
 ) -> None:
     """Test for get_baseline.
-    Tests that the function sends out a BaelineSensorRequest,
+    Tests that a BaselineSensorRequest gets sent,
     and reads ReadFromSensorResponse message containing the
     correct information.
     """
