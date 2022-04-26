@@ -91,6 +91,7 @@ engine_state_table = sqlalchemy.Table(
         "state", sqlalchemy.PickleType
     ),  # TODO for testing , nullable=False),
     sqlalchemy.Column("state_string", sqlalchemy.String),
+    sqlalchemy.Column("engine_status", sqlalchemy.String),
     sqlalchemy.Column(
         "run_id",
         sqlalchemy.String,

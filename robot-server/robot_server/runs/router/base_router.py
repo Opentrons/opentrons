@@ -355,8 +355,11 @@ async def update_run(
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
         labwareOffsets=engine_state.labware.get_labware_offsets(),
+        # TODO tz: do we want to add the status?
         # status=engine_state.commands.get_status(),
+        # added from protocol_runner, do we need it?
         commands=engine_state.commands.get_all(),
+        # added from protocol_runner, do we need it?
         modules=engine_state.modules.get_all()
     )
 
@@ -364,16 +367,17 @@ async def update_run(
         run_id=run.run_id,
         state=store_run_state
     ))
+
     data = Run.construct(
         id=run.run_id,
         protocolId=run.protocol_id,
         createdAt=run.created_at,
         current=run.is_current,
         actions=run.actions,
-        errors=engine_state.commands.get_all_errors(),
-        pipettes=engine_state.pipettes.get_all(),
-        labware=engine_state.labware.get_all(),
-        labwareOffsets=engine_state.labware.get_labware_offsets(),
+        errors=store_run_state.errors,
+        pipettes=store_run_state.pipettes,
+        labware=store_run_state.labware,
+        labwareOffsets=store_run_state.labwareOffsets,
         status=engine_state.commands.get_status(),
     )
 

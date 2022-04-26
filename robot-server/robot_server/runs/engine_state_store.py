@@ -19,6 +19,7 @@ class EngineStateResource:
 
     run_id: str
     state: ProtocolRunData
+    engine_status: str
     # created_at: datetime
 
 
@@ -124,14 +125,18 @@ class EngineStateStore:
 def _convert_sql_row_to_sql_engine_state(
     sql_row: sqlalchemy.engine.Row,
 ) -> EngineStateResource:
+
     run_id = sql_row.run_id
     assert isinstance(run_id, str)
+
+    status = sql_row.engine_status
+    assert isinstance(status, str)
 
     state = sql_row.state
     assert isinstance(state, Dict)
 
     return EngineStateResource(
-        run_id=run_id, state=parse_obj_as(ProtocolRunData, state)
+        run_id=run_id, state=parse_obj_as(ProtocolRunData, state), engine_status=status
     )
 
 
@@ -139,4 +144,5 @@ def _convert_state_to_sql_values(state: EngineStateResource) -> Dict[str, object
     return {
         "run_id": state.run_id,
         "state": state.state.dict(),
+        "engine_status": state.engine_status
     }
