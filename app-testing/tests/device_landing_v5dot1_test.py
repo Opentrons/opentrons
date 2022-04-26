@@ -100,22 +100,6 @@ def test_device_landing_v5dot1(
             device_landing.get_right_mount_pipette_device_detail().is_displayed()
             device_landing.get_mag_deck_image().is_displayed()
             device_landing.get_mag_module_name().is_displayed()
-            for serial in [
-                module.serial
-                for module in ot_robot.modules
-                if module.type in ["magneticModuleV2", "magneticModuleV1"]
-            ]:
-
-                if not device_landing.mag_engaged():
-                    device_landing.click_module_actions_button(serial)
-                    device_landing.click_mag_engage_height(serial)
-                    device_landing.enter_mag_engage_height(serial, "10")
-                    device_landing.click_engage_height_button()
-                    device_landing.close_mag_slideout()
-                else:
-                    device_landing.click_module_actions_button(serial)
-                    device_landing.click_mag_disengage()
-                time.sleep(3)
             device_landing.click_run_a_protocol_button_device_landing()
 
 
@@ -206,9 +190,62 @@ def test_run_protocol_robot_landing_page_v5dot1(
             assert device_landing.get_clear_button_run_page().is_displayed()
             assert device_landing.get_run_button().is_displayed()
             assert device_landing.get_success_banner_run_page().is_displayed()
+
+            # TC2 : Running the protocol from run page by clciking on Run again button
+            device_landing.click_start_run_button()
+            assert device_landing.get_run_button().is_displayed()
+            device_landing.click_start_run_button()  # clicking on start run after clicking run again on  Run page
+            assert device_landing.get_clear_button_run_page().is_displayed()
+            assert device_landing.get_run_button().is_displayed()
+            assert device_landing.get_success_banner_run_page().is_displayed()
+            # Always clear the protocol before running the next script
+            device_landing.click_clear_protocol_button()
             device_landing.click_on_jump_to_current_step()
             assert device_landing.get_current_step_text().is_displayed()
 
-            # Always clear the protocol before running the next script
+            # TC3 : Choosing a protocol from list by clicking on Run a Protocol button on robot landing page
+            left_menu.click_devices_button()
+            assert device_landing.get_overflow_button_on_device_landing().is_displayed()
+            device_landing.click_overflow_menu_button_on_device_landing()
+            device_landing.click_run_protocol_robot_landing_overflow_button()  # clicking on run protocol from overflow menu on robot landing page
+            assert (
+                device_landing.get_protocol_name_device_detail_slideout().is_displayed()
+            )
+            time.sleep(2)
+            # device_landing.click_proceed_to_setup_button_device_landing_page()
+
+            # Verify the Setup for run page
+            robot_calibrate = RobotCalibration(driver)
+            assert robot_calibrate.get_robot_calibration().text == "Robot Calibration"
+            robot_calibrate.click_robot_calibration()
+            assert robot_calibrate.get_deck_calibration().text == "Deck Calibration"
+            assert robot_calibrate.get_required_pipettes().text == "Required Pipettes"
+            assert (
+                robot_calibrate.get_calibration_ready_locator().text
+                == "Calibration Ready"
+            )
+            assert (
+                robot_calibrate.get_required_tip_length_calibration().text
+                == "Required Tip Length Calibrations"
+            )
+            module_setup = ModuleSetup(driver)
+            assert module_setup.get_proceed_to_module_setup().is_displayed()
+            module_setup.click_proceed_to_module_setup()
+            assert module_setup.get_module_setup_text_locator().text == "Module Setup"
+            assert module_setup.get_thermocycler_module().text == "Thermocycler Module"
+            assert module_setup.get_magetic_module().text == "Magnetic Module GEN1"
+            assert (
+                module_setup.get_temperature_module().text == "Temperature Module GEN1"
+            )
+            assert module_setup.get_proceed_to_labware_setup().is_displayed()
+            module_setup.click_proceed_to_labware_setup()
+            labware_setup = LabwareSetup(driver)
+            assert labware_setup.get_labware_setup_text().is_displayed()
+            labware_setup.click_proceed_to_run_button()
+            device_landing.click_start_run_button()
+            assert device_landing.get_clear_button_run_page().is_displayed()
+            assert device_landing.get_run_button().is_displayed()
+            assert device_landing.get_success_banner_run_page().is_displayed()
             device_landing.click_clear_protocol_button()
-            time.sleep(5)
+            device_landing.click_on_jump_to_current_step()
+            assert device_landing.get_current_step_text().is_displayed()

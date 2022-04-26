@@ -85,6 +85,12 @@ class DeviceLanding:
         )
         return self.base.clickable_wrapper(text, 5)
 
+    def click_overflow_menu_button_on_device_landing(self) -> None:
+        """Click on overflow menu on device landing page"""
+        button: Optional[WebElement] = self.get_overflow_button_on_device_landing()
+        if button:
+            button.click()
+
     def get_device_header(self) -> Optional[WebElement]:
         """Get the device header."""
         header: Element = Element((By.ID, "DevicesLanding_title"), f"Device header.")
@@ -329,6 +335,16 @@ class DeviceLanding:
                 f"ProtocolRunHeader_closeRunButton",
             ),
             f"Button to clear the protocol from set up run page.'",
+        )
+        self.base.clickable_wrapper(button, 5)
+
+    def click_run_protocol_robot_landing_overflow_button(self) -> None:
+        button: Element = Element(
+            (
+                By.XPATH,
+                f"//div[@data-testid='RobotCard_opentrons-dev_overflowMenu']//div//button",
+            ),
+            f"Button to select run protocol from robot landing overflow menu.'",
         )
         self.base.clickable_wrapper(button, 5)
 
