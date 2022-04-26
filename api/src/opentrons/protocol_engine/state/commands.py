@@ -13,6 +13,7 @@ from opentrons.hardware_control.types import DoorStateNotification, DoorState
 from ..actions import (
     Action,
     QueueCommandAction,
+    QueueSetupCommandAction,
     UpdateCommandAction,
     FailCommandAction,
     PlayAction,
@@ -48,7 +49,7 @@ class QueueStatus(str, Enum):
             the latest command may be running if it was already processed.
     """
 
-    IMPLICITLY_ACTIVE = "implicitly-active"
+    IMPLICITLY_ACTIVE = "implicitly-active"     # implies that the setup queue is active
     ACTIVE = "active"
     INACTIVE = "inactive"
 
@@ -97,6 +98,9 @@ class CommandState:
 
     queued_command_ids: OrderedSet[str]
     """The IDs of queued commands, in FIFO order"""
+
+    queued_setup_command_ids: OrderedSet[str]
+    """The IDs of queued setup commands, in FIFO order"""
 
     running_command_id: Optional[str]
     """The ID of the currently running command, if any"""
@@ -149,6 +153,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             running_command_id=None,
             all_command_ids=[],
             queued_command_ids=OrderedSet(),
+            queued_setup_command_ids=OrderedSet(),
             commands_by_id=OrderedDict(),
             errors_by_id={},
         )
@@ -180,6 +185,29 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 command=queued_command,
             )
 
+        elif isinstance(action, QueueSetupCommandAction):
+            assert action.command_id not in self._state.commands_by_id
+
+            # TODO(mc, 2021-06-22): mypy has trouble with this automatic
+            # request > command mapping, figure out how to type precisely
+            # (or wait for a future mypy version that can figure it out).
+            # For now, unit tests cover mapping every request type
+            queued_command = action.request._CommandCls.construct(
+                id=action.command_id,
+                key=action.command_key,
+                createdAt=action.created_at,
+                params=action.request.params,  # type: ignore[arg-type]
+                status=CommandStatus.QUEUED,
+            )
+
+            next_index = len(self._state.all_command_ids)
+            self._state.all_command_ids.append(action.command_id)
+            self._state.queued_setup_command_ids.add(queued_command.id)
+            self._state.commands_by_id[queued_command.id] = CommandEntry(
+                index=next_index,
+                command=queued_command,
+            )
+
         # TODO(mc, 2021-12-28): replace "UpdateCommandAction" with explicit
         # state change actions (e.g. RunCommandAction, SucceedCommandAction)
         # to make a command's queue transition logic easier to follow
@@ -202,6 +230,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
             try:
                 self._state.queued_command_ids.remove(command.id)
+                self._state.queued_setup_command_ids.remove(command.id)
             except KeyError:
                 pass
 
@@ -417,8 +446,11 @@ class CommandView(HasState[CommandState]):
         if self._state.run_result:
             raise ProtocolEngineStoppedError("Engine was stopped")
 
-        if self._state.queue_status == QueueStatus.INACTIVE:
-            return None
+        # Revise this so that we always prioritize the setup queue. 
+        if (self._state.queue_status == QueueStatus.INACTIVE
+                or self.get_status() == QueueStatus.IMPLICITLY_ACTIVE):
+            # Verify if this condition is enough to make sure status is paused or idle
+            return next(iter(self._state.queued_setup_command_ids), None)
 
         return next(iter(self._state.queued_command_ids), None)
 

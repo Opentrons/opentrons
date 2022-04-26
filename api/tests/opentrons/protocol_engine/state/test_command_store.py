@@ -21,6 +21,7 @@ from opentrons.protocol_engine.state.commands import (
 
 from opentrons.protocol_engine.actions import (
     QueueCommandAction,
+    QueueSetupCommandAction,
     UpdateCommandAction,
     FailCommandAction,
     PlayAction,
@@ -52,6 +53,7 @@ def test_initial_state() -> None:
         run_result=None,
         running_command_id=None,
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         all_command_ids=[],
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -221,6 +223,44 @@ def test_command_queue_and_unqueue() -> None:
 
     subject.handle_action(update_1)
     assert subject.state.queued_command_ids == OrderedSet()
+
+
+def test_setup_command_queue_and_unqueue() -> None:
+    """It should queue on QueueSetupCommandAction and dequeue on UpdateCommandAction."""
+    queue_1 = QueueSetupCommandAction(
+        request=commands.PauseCreate(params=commands.PauseParams()),
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-1",
+        command_key="command-key-1",
+    )
+    queue_2 = QueueSetupCommandAction(
+        request=commands.PauseCreate(params=commands.PauseParams()),
+        created_at=datetime(year=2022, month=2, day=2),
+        command_id="command-id-2",
+        command_key="command-key-2",
+    )
+    update_1 = UpdateCommandAction(
+        command=create_running_command(command_id="command-id-1"),
+    )
+    update_2 = UpdateCommandAction(
+        command=create_running_command(command_id="command-id-2"),
+    )
+
+    subject = CommandStore()
+
+    subject.handle_action(queue_1)
+    assert subject.state.queued_setup_command_ids == OrderedSet(["command-id-1"])
+
+    subject.handle_action(queue_2)
+    assert subject.state.queued_setup_command_ids == OrderedSet(
+        ["command-id-1", "command-id-2"]
+    )
+
+    subject.handle_action(update_2)
+    assert subject.state.queued_setup_command_ids == OrderedSet(["command-id-1"])
+
+    subject.handle_action(update_1)
+    assert subject.state.queued_setup_command_ids == OrderedSet()
 
 
 def test_running_command_id() -> None:

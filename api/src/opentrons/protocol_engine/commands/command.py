@@ -100,6 +100,11 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
         description="Command execution completed timestamp, if completed",
     )
 
+    # is_setup: Optional[bool] = Field(
+    #     False,
+    #     description="Whether the command is a setup command"
+    # )
+    # or command source?
 
 class AbstractCommandImpl(
     ABC,

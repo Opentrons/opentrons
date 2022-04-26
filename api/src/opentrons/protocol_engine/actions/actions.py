@@ -92,6 +92,16 @@ class QueueCommandAction:
 
 
 @dataclass(frozen=True)
+class QueueSetupCommandAction:
+    """Add a setup command request to the queue."""
+
+    command_id: str
+    command_key: str
+    created_at: datetime
+    request: CommandCreate
+
+
+@dataclass(frozen=True)
 class UpdateCommandAction:
     """Update a given command."""
 
@@ -147,6 +157,7 @@ Action = Union[
     HardwareStoppedAction,
     HardwareEventAction,
     QueueCommandAction,
+    QueueSetupCommandAction,
     UpdateCommandAction,
     FailCommandAction,
     AddLabwareOffsetAction,

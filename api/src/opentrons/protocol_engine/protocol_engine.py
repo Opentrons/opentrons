@@ -28,6 +28,7 @@ from .actions import (
     FinishAction,
     FinishErrorDetails,
     QueueCommandAction,
+    QueueSetupCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddModuleAction,
@@ -77,6 +78,11 @@ class ProtocolEngine:
             state_store=self._state_store,
             action_dispatcher=self._action_dispatcher,
         )
+        # self._setup_commands_queue_worker = create_queue_worker(
+        #     hardware_api=hardware_api,
+        #     state_store=state_store,
+        #     action_dispatcher=self._action_dispatcher
+        # )
         self._hardware_stopper = hardware_stopper or HardwareStopper(
             hardware_api=hardware_api, state_store=state_store
         )
@@ -90,6 +96,7 @@ class ProtocolEngine:
         self._module_data_provider = module_data_provider or ModuleDataProvider()
 
         self._queue_worker.start()
+        # self._setup_commands_queue_worker.start()
         self._hardware_event_forwarder.start()
 
     @property
@@ -129,19 +136,28 @@ class ProtocolEngine:
         Raises: SetupCommandNotAllowed error if the command is a setup command and
             the engine is not idle or paused.
         """
+        command_id = self._model_utils.generate_id()
+
         if is_setup:
             self.state_view.commands.raise_if_not_paused_or_idle()
             # add to setup command queue
-
-        command_id = self._model_utils.generate_id()
-        action = QueueCommandAction(
-            request=request,
-            command_id=command_id,
-            # TODO(mc, 2021-12-13): generate a command key from params and state
-            # https://github.com/Opentrons/opentrons/issues/8986
-            command_key=command_id,
-            created_at=self._model_utils.get_timestamp(),
-        )
+            action = QueueSetupCommandAction(
+                request=request,
+                command_id=command_id,
+                # TODO(mc, 2021-12-13): generate a command key from params and state
+                # https://github.com/Opentrons/opentrons/issues/8986
+                command_key=command_id,
+                created_at=self._model_utils.get_timestamp(),
+            )
+        else:
+            action = QueueCommandAction(
+                request=request,
+                command_id=command_id,
+                # TODO(mc, 2021-12-13): generate a command key from params and state
+                # https://github.com/Opentrons/opentrons/issues/8986
+                command_key=command_id,
+                created_at=self._model_utils.get_timestamp(),
+            )
         self._action_dispatcher.dispatch(action)
         return self._state_store.commands.get(command_id)
 
