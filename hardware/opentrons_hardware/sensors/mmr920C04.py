@@ -15,11 +15,9 @@ from opentrons_hardware.sensors.utils import (
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BindSensorOutputRequest,
-    BaselineSensorRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     BindSensorOutputRequestPayload,
-    BaselineSensorRequestPayload,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorOutputBindingField,
@@ -27,7 +25,6 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
 )
 
 import logging
-from opentrons_hardware.firmware_bindings.utils import UInt16Field
 from .scheduler import SensorScheduler
 from .sensor_abc import AbstractAdvancedSensor
 
@@ -72,6 +69,7 @@ class PressureSensor(AbstractAdvancedSensor):
         timeout: int = 1,
     ) -> Optional[SensorDataType]:
         """This function retrieves ReadFromResponse messages.
+
         This is meant to be called after a bind_to_sync call,
         with the sensor being bound to "report".
         """

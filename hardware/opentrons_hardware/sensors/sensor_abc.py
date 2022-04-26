@@ -122,6 +122,7 @@ class AbstractAdvancedSensor(AbstractBasicSensor):
         timeout: int = 1,
     ) -> Optional[SensorDataType]:
         """This function retrieves ReadFromResponse messages.
+
         This is meant to be called after a bind_to_sync call,
         with the sensor being bound to "report".
         """

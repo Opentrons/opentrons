@@ -118,6 +118,7 @@ class SensorScheduler:
         node_id: NodeId,
     ) -> Optional[SensorDataType]:
         """Helper function for the get_report sensor driver.
+
         This simply retrieves CAN messages without first
         sending a ReadFromSensorRequest.
         """
