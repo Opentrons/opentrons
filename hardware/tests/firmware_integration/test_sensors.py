@@ -69,7 +69,6 @@ async def test_write_to_sensors(
 )
 @pytest.mark.requires_emulator
 async def test_read_from_sensors(
-    loop: asyncio.BaseEventLoop,
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     sensor_type: SensorType,
@@ -102,7 +101,6 @@ async def test_read_from_sensors(
 )
 @pytest.mark.requires_emulator
 async def test_baseline_poll_sensors(
-    loop: asyncio.BaseEventLoop,
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     sensor_type: SensorType,
