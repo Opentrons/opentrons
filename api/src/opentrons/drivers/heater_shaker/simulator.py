@@ -53,6 +53,17 @@ class SimulatingDriver(AbstractHeaterShakerDriver):
 
     async def deactivate_heater(self) -> None:
         self._temperature.target = None
+        self._temperature.current = 23
+
+    async def deactivate_shaker(self) -> None:
+        self._rpm.target = 0
+        self._rpm.current = 0
+
+    async def deactivate(self) -> None:
+        self._temperature.target = None
+        self._temperature.current = 23
+        self._rpm.target = 0
+        self._rpm.current = 0
 
     async def get_device_info(self) -> Dict[str, str]:
         return {

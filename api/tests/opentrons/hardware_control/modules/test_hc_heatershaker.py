@@ -67,7 +67,7 @@ async def test_sim_update(simulating_module):
 
     await simulating_module.deactivate()
     await simulating_module.wait_next_poll()
-    assert simulating_module.temperature == 0
+    assert simulating_module.temperature == 23
     assert simulating_module.speed == 0
     assert simulating_module.target_temperature is None
     assert simulating_module.target_speed is None
@@ -165,5 +165,5 @@ async def test_deactivated_updated_live_data(simulating_module):
             "targetTemp": None,
             "errorDetails": None,
         },
-        "status": "running",
+        "status": "idle",
     }
