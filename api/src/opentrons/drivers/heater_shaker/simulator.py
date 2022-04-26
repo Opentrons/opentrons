@@ -51,6 +51,9 @@ class SimulatingDriver(AbstractHeaterShakerDriver):
         self._rpm.current = 0
         self._homing_status = True
 
+    async def deactivate_heater(self) -> None:
+        self._temperature.target = None
+
     async def get_device_info(self) -> Dict[str, str]:
         return {
             "serial": "dummySerialHS",
