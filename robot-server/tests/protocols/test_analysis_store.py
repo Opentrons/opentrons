@@ -175,16 +175,16 @@ def test_add_analysis_equipment(
     ]
 
 
-class CommandAnalysisSpec(NamedTuple):
-    """Spec data for command parsing tests."""
+class AnalysisResultSpec(NamedTuple):
+    """Spec data for analyis result tests."""
 
     commands: List[pe_commands.Command]
     errors: List[pe_errors.ErrorOccurrence]
     expected_result: AnalysisResult
 
 
-command_analysis_specs: List[CommandAnalysisSpec] = [
-    CommandAnalysisSpec(
+analysis_result_specs: List[AnalysisResultSpec] = [
+    AnalysisResultSpec(
         commands=[
             pe_commands.Pause(
                 id="pause-1",
@@ -198,7 +198,7 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
         errors=[],
         expected_result=AnalysisResult.OK,
     ),
-    CommandAnalysisSpec(
+    AnalysisResultSpec(
         commands=[],
         errors=[
             pe_errors.ErrorOccurrence(
@@ -213,15 +213,15 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
 ]
 
 
-@pytest.mark.parametrize(CommandAnalysisSpec._fields, command_analysis_specs)
-def test_add_parses_labware_commands(
+@pytest.mark.parametrize(AnalysisResultSpec._fields, analysis_result_specs)
+def test_update_infers_status_from_errors(
     subject: AnalysisStore,
     protocol_store: ProtocolStore,
     commands: List[pe_commands.Command],
     errors: List[pe_errors.ErrorOccurrence],
     expected_result: AnalysisResult,
 ) -> None:
-    """It should be able to parse the commands list for analysis results."""
+    """It should decide the analysis result based on whether there are errors."""
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
     subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
     subject.update(
@@ -231,6 +231,6 @@ def test_add_parses_labware_commands(
         labware=[],
         pipettes=[],
     )
-    res = subject.get_by_protocol("protocol-id")[0].result  # type: ignore[union-attr]
-
-    assert res == expected_result
+    analysis = subject.get_by_protocol("protocol-id")[0]
+    assert isinstance(analysis, CompletedAnalysis)
+    assert analysis.result == expected_result
