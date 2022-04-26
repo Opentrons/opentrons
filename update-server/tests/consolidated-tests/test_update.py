@@ -1,4 +1,4 @@
-""" These tests are common for openembedded and buildroot
+""" Consolidated update tests for openembedded and buildroot
 """
 import asyncio
 import binascii
@@ -12,10 +12,12 @@ from otupdate.buildroot import update, config, update_actions
 from otupdate.common import file_actions
 from otupdate.common.session import UpdateSession, Stages
 from otupdate.common.update_actions import UpdateActionsInterface
-from otupdate.openembedded import Updater
+from otupdate.openembedded import Updater, PartitionManager, RootFSInterface
 from tests.openembedded.conftest import (
     mock_root_fs_interface_,
     mock_partition_manager_valid_switch_,
+    mock_root_fs_interface,
+    mock_partition_manager_valid_switch,
 )
 
 
@@ -153,6 +155,8 @@ async def test_update_happypath(
     mock_partition_manager_valid_switch,
     extracted_update_file_common,
 ):
+    fs_intf = RootFSInterface()
+    pm = PartitionManager()
     updaters = [
         Updater(
             root_FS_intf=mock_root_fs_interface,
@@ -212,6 +216,7 @@ async def test_update_happypath(
             resp = await test_cli[0].get(session_endpoint(update_session, "status"))
             assert resp.status == 200
             body = await resp.json()
+            print(body)
             last_progress = body["progress"]
             assert loop.time() - then <= 300
 
@@ -225,3 +230,14 @@ async def test_update_happypath(
             tp_hash = binascii.hexlify(tp_hasher.digest())
             assert tp_hash == zf.read("rootfs.ext4.hash").strip()
             fd.close()
+    if test_cli[1] == "otupdate.openembedded":
+        with zipfile.ZipFile(downloaded_update_file_common[0], "r") as zf:
+            tp_hasher = hashlib.sha256()
+            fd = open(testing_partition, "rb")
+            tp_hasher.update(fd.read())
+            tp_hash = binascii.hexlify(tp_hasher.digest())
+            assert tp_hash == zf.read("rootfs.ext4.hash").strip()
+            fd.close()
+
+
+
