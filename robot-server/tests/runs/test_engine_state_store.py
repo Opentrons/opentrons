@@ -108,8 +108,9 @@ def test_get_run_state(
     assert engine_state == result
 
 
+@pytest.mark.parametrize("input", [True, False])
 def test_insert_get_by_state_type(
-    subject: EngineStateStore, protocol_run: ProtocolRunData
+    subject: EngineStateStore, protocol_run: ProtocolRunData, input: bool
 ) -> None:
     """It should test the time for prasing a json type and a string type."""
     engine_state = EngineStateResource(
@@ -118,16 +119,11 @@ def test_insert_get_by_state_type(
         # created_at=datetime.now()
     )
 
-    subject.insert(state=engine_state)
-    result_pickle_state = subject.get_state_by_type(run_id="run-id", return_pickle=True)
-    result_pickle_string = subject.get_state_by_type(
-        run_id="run-id", return_pickle=False
-    )
+    subject.insert_state_by_type(state=engine_state, insert_pickle=input)
+    result_state = subject.get_state_by_type(run_id="run-id", return_pickle=input)
 
-    assert engine_state.run_id == result_pickle_state.run_id
-    assert engine_state.state == result_pickle_state.state
-    assert engine_state.run_id == result_pickle_string.run_id
-    assert engine_state.state == result_pickle_string.state
+    assert engine_state.run_id == result_state.run_id
+    assert engine_state.state == result_state.state
 
 
 def test_insert_state_run_not_found(
