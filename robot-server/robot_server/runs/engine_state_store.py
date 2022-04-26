@@ -50,30 +50,27 @@ class EngineStateStore:
 
         return state
 
+    # TODO (tz): just for testing time parsing
     def insert_state_by_type(
-            self, state: EngineStateResource, insert_pickle: bool
+        self, state: EngineStateResource, insert_pickle: bool
     ) -> EngineStateResource:
         """Insert engine state by type to db.
 
-            Arguments:
-            state: Engine state resource to store.
+        Arguments:
+        state: Engine state resource to store.
 
-            Returns:
-            The engine state that was added to the store.
-               """
+        Returns:
+        The engine state that was added to the store.
+        """
         if insert_pickle:
-            insert_row = {
-                "run_id": state.run_id,
-                "state": state.state.dict()}
+            insert_row = {"run_id": state.run_id, "state": state.state.dict()}
         else:
             insert_row = {
                 "run_id": state.run_id,
                 "state_string": state.state.json(),
             }
 
-        statement = sqlalchemy.insert(engine_state_table).values(
-            insert_row
-        )
+        statement = sqlalchemy.insert(engine_state_table).values(insert_row)
         with self._sql_engine.begin() as transaction:
             try:
                 transaction.execute(statement)
@@ -82,13 +79,15 @@ class EngineStateStore:
 
         return state
 
+    # TODO (tz): just for testing time parsing
     def get_state_by_type(
-            self, run_id: str, return_pickle: bool
+        self, run_id: str, return_pickle: bool
     ) -> EngineStateResource:
         """Get engine state by type from db.
 
         Arguments:
             run_id: Run id related to the engine state.
+            return_pickle: Parse state as pickle or json.
 
         Returns:
             The engine state that found in the store.
@@ -124,7 +123,7 @@ class EngineStateStore:
 
 
 def _convert_sql_row_to_sql_engine_state(
-        sql_row: sqlalchemy.engine.Row,
+    sql_row: sqlalchemy.engine.Row,
 ) -> EngineStateResource:
     run_id = sql_row.run_id
     assert isinstance(run_id, str)
