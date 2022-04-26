@@ -268,7 +268,7 @@ class ModuleView(HasState[ModuleState]):
     def _get_module_substate(
         self, module_id: str, expected_type: Type[ModuleSubStateT], expected_name: str
     ) -> ModuleSubStateT:
-        """Return a the specific sub-state of a given module ID.
+        """Return the specific sub-state of a given module ID.
 
         Args:
             module_id: The ID of the module.
