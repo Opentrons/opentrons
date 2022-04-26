@@ -37,7 +37,7 @@ async def test_cli(aiohttp_client, loop, otupdate_config, monkeypatch):
         loop=loop,
     )
     client = await loop.create_task(aiohttp_client(app))
-    return client
+    return client, app
 
 
 def mock_root_fs_interface_() -> MagicMock:
@@ -103,16 +103,3 @@ def mock_partition_manager_invalid_switch() -> MagicMock:
     mock.mountpoint_root.return_value = "/mnt"
 
     return mock
-
-
-@pytest.fixture
-def testing_partition(monkeypatch, tmpdir):
-    part_file = os.path.join(tmpdir, "fake-partition")
-    find_unused = mock.Mock()
-    monkeypatch.setattr(
-        openembedded.updater.PartitionManager, "find_unused_partition", find_unused
-    )
-    find_unused.return_value = FakeRootPartElem(
-        "TWO", Partition(2, part_file, "/mnt/mmblk0-p2")
-    )
-    return part_file

@@ -29,11 +29,11 @@ async def test_cli(aiohttp_client, loop, otupdate_config, request):
         loop=loop,
     )
     client = await loop.create_task(aiohttp_client(app))
-    return client
+    return client, cli_client_pkg.__name__
 
 
 @pytest.fixture
-def downloaded_update_file_common(request, extracted_update_file):
+def downloaded_update_file_common(request, extracted_update_file_common):
     """
     Return the path to a zipped update file
 
@@ -58,10 +58,10 @@ def downloaded_update_file_common(request, extracted_update_file):
          "ot2-system.zip"),
     ]
     for index, (rootfs, sha256, sig, pkg) in enumerate(list_of_update_files):
-        rootfs_path = os.path.join(extracted_update_file[index], rootfs)
-        hash_path = os.path.join(extracted_update_file[index], sha256)
-        sig_path = os.path.join(extracted_update_file[index], sig)
-        zip_path = (os.path.join(extracted_update_file[index], pkg))
+        rootfs_path = os.path.join(extracted_update_file_common[index], rootfs)
+        hash_path = os.path.join(extracted_update_file_common[index], sha256)
+        sig_path = os.path.join(extracted_update_file_common[index], sig)
+        zip_path = (os.path.join(extracted_update_file_common[index], pkg))
         with zipfile.ZipFile(zip_path, "w") as zf:
             if not request.node.get_closest_marker("exclude_rootfs_ext4"):
                 zf.write(rootfs_path, rootfs)
@@ -78,7 +78,7 @@ def downloaded_update_file_common(request, extracted_update_file):
 
 
 @pytest.fixture
-def extracted_update_file(request, tmpdir):
+def extracted_update_file_common(request, tmpdir):
     """
     Return the path to a dir containing an unzipped update file.
 
@@ -146,46 +146,3 @@ def testing_partition(monkeypatch, tmpdir):
         "TWO", common.update_actions.Partition(2, partfile)
     )
     return partfile
-
-
-@pytest.fixture
-def testing_partition_oe(monkeypatch, tmpdir):
-    part_file = os.path.join(tmpdir, "fake-partition")
-    find_unused = mock.Mock()
-    monkeypatch.setattr(
-        openembedded.updater.PartitionManager, "find_unused_partition", find_unused
-    )
-    find_unused.return_value = FakeRootPartElem(
-        "TWO", Partition(2, part_file, "/mnt/mmblk0-p2")
-    )
-    return part_file
-
-@pytest.fixture
-def downloaded_update_file(request, extracted_update_file):
-    """
-    Return the path to a zipped update file
-
-    To exclude files, mark with ``exclude_rootfs_ext4``,
-    ``exclude_rootfs_ext4_hash``, ``exclude_rootfs_ext4_hash_sig``.
-
-    This uses :py:meth:`extracted_update_file` to generate the contents, so
-    marks that fixture understands can be used when requesting this fixture
-
-    Can also be used by tests that will upload it to a test server, since
-    when the test server boots its download path will be somewhere else
-    """
-    rootfs_path = os.path.join(extracted_update_file, "rootfs.ext4")
-    hash_path = os.path.join(extracted_update_file, "rootfs.ext4.hash")
-    sig_path = os.path.join(extracted_update_file, "rootfs.ext4.hash.sig")
-    zip_path = os.path.join(extracted_update_file, "ot2-system.zip")
-    with zipfile.ZipFile(zip_path, "w") as zf:
-        if not request.node.get_closest_marker("exclude_rootfs_ext4"):
-            zf.write(rootfs_path, "rootfs.ext4")
-        if not request.node.get_closest_marker("exclude_rootfs_ext4_hash"):
-            zf.write(hash_path, "rootfs.ext4.hash")
-        if not request.node.get_closest_marker("exclude_rootfs_ext4_hash_sig"):
-            zf.write(sig_path, "rootfs.ext4.hash.sig")
-    os.unlink(rootfs_path)
-    os.unlink(hash_path)
-    os.unlink(sig_path)
-    return zip_path

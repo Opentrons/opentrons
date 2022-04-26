@@ -5,26 +5,26 @@ import binascii
 import hashlib
 import os
 import zipfile
+from unittest import mock
 
 import pytest
-from _pytest import monkeypatch
 
-from otupdate import openembedded, buildroot
 from otupdate.buildroot import update, config, update_actions
 from otupdate.common import file_actions
 from otupdate.common.session import UpdateSession, Stages
 from otupdate.common.update_actions import UpdateActionsInterface
-from otupdate.openembedded import Updater
+from otupdate.openembedded import Updater, updater
+from tests.common.config import testing_partition2
 from tests.openembedded.conftest import mock_root_fs_interface, mock_partition_manager_valid_switch, \
     mock_root_fs_interface_, mock_partition_manager_valid_switch_
 
 
 @pytest.fixture
 async def update_session(test_cli):
-    resp = await test_cli.post("/server/update/begin")
+    resp = await test_cli[0].post("/server/update/begin")
     body = await resp.json()
     yield body["token"]
-    await test_cli.post("/server/update/cancel")
+    await test_cli[0].post("/server/update/cancel")
 
 
 def session_endpoint(token, endpoint):
@@ -33,15 +33,15 @@ def session_endpoint(token, endpoint):
 
 async def test_begin(test_cli):
     # Creating a session should work
-    resp = await test_cli.post("/server/update/begin")
+    resp = await test_cli[0].post("/server/update/begin")
     body = await resp.json()
     assert resp.status == 201
     assert "token" in body
-    assert test_cli.server.app.get(update.SESSION_VARNAME)
-    assert test_cli.server.app[update.SESSION_VARNAME].token == body["token"]
+    assert test_cli[0].server.app.get(update.SESSION_VARNAME)
+    assert test_cli[0].server.app[update.SESSION_VARNAME].token == body["token"]
 
     # Creating a session twice shouldn’t
-    resp = await test_cli.post("/server/update/begin")
+    resp = await test_cli[0].post("/server/update/begin")
     body = await resp.json()
     assert resp.status == 409
     assert "message" in body
@@ -49,21 +49,21 @@ async def test_begin(test_cli):
 
 async def test_cancel(test_cli):
     # cancelling when there’s a session should work great
-    resp = await test_cli.post("/server/update/begin")
-    assert test_cli.server.app.get(update.SESSION_VARNAME)
+    resp = await test_cli[0].post("/server/update/begin")
+    assert test_cli[0].server.app.get(update.SESSION_VARNAME)
 
-    resp = await test_cli.post("/server/update/cancel")
+    resp = await test_cli[0].post("/server/update/cancel")
     assert resp.status == 200
-    assert test_cli.server.app.get(update.SESSION_VARNAME) is None
+    assert test_cli[0].server.app.get(update.SESSION_VARNAME) is None
 
     # and so should cancelling when there isn’t one
 
-    resp = await test_cli.post("/server/update/cancel")
+    resp = await test_cli[0].post("/server/update/cancel")
     assert resp.status == 200
 
 
 async def test_commit_fails_wrong_state(test_cli, update_session):
-    resp = await test_cli.post(session_endpoint(update_session, "commit"))
+    resp = await test_cli[0].post(session_endpoint(update_session, "commit"))
     assert resp.status == 409
 
 
@@ -126,3 +126,70 @@ async def test_session_catches_validation_fail(
     assert "message" in session.state
 
 
+async def test_update_happypath(
+        test_cli, update_session, downloaded_update_file_common, loop, testing_partition,
+        monkeypatch,
+        mock_root_fs_interface,
+        mock_partition_manager_valid_switch,
+        extracted_update_file_common,
+):
+    updaters = [
+        Updater(
+            root_FS_intf=mock_root_fs_interface,
+            part_mngr=mock_partition_manager_valid_switch,
+        ),
+        (update_actions.OT2UpdateActions()),
+    ]
+
+    # Upload
+    if test_cli[1] == "otupdate.openembedded":
+        monkeypatch.setattr(UpdateActionsInterface, "from_request", lambda x: updaters[0])
+        resp = await test_cli[0].post(
+            session_endpoint(update_session, "file"),
+            data={os.path.basename(downloaded_update_file_common[0]): open(downloaded_update_file_common[0], "rb")},
+        )
+    elif test_cli[1] == "otupdate.buildroot":
+        monkeypatch.setattr(UpdateActionsInterface, "from_request", lambda x: updaters[1])
+        resp = await test_cli[0].post(
+            session_endpoint(update_session, "file"),
+            data={os.path.basename(downloaded_update_file_common[1]): open(downloaded_update_file_common[1], "rb")},
+        )
+
+    assert resp.status == 201
+    body = await resp.json()
+    assert body["stage"] == "validating"
+    assert "progress" in body
+    # Wait through validation
+    then = loop.time()
+    last_progress = 0.0
+    while body["stage"] == "validating":
+        assert body["progress"] >= last_progress
+        resp = await test_cli[0].get(session_endpoint(update_session, "status"))
+        assert resp.status == 200
+        body = await resp.json()
+
+        last_progress = body["progress"]
+        assert loop.time() - then <= 300
+
+    if body["stage"] == "writing":
+        # Wait through write
+        then = loop.time()
+        last_progress = 0.0
+        while body["stage"] == "writing":
+            assert body["progress"] >= last_progress
+            resp = await test_cli[0].get(session_endpoint(update_session, "status"))
+            assert resp.status == 200
+            body = await resp.json()
+            last_progress = body["progress"]
+            assert loop.time() - then <= 300
+
+    assert body["stage"] == "done"
+
+    if test_cli[1] == "otupdate.buildroot":
+        with zipfile.ZipFile(downloaded_update_file_common[1], "r") as zf:
+            tp_hasher = hashlib.sha256()
+            fd = open(testing_partition, "rb")
+            tp_hasher.update(fd.read())
+            tp_hash = binascii.hexlify(tp_hasher.digest())
+            assert tp_hash == zf.read("rootfs.ext4.hash").strip()
+            fd.close()
