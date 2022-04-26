@@ -15,10 +15,7 @@ import type {
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
 
-// const contents = JSON.stringify({ name: 'mockRobotName' })
-
 const newRobotName = 'mockRobotName'
-
 const mockUpdateRobotName = updateRobotName as jest.MockedFunction<
   typeof updateRobotName
 >
@@ -26,7 +23,7 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
-const UPDATEROBOTNAME_RESPONSE = {
+const UPDATE_ROBOT_NAME_RESPONSE = {
   name: 'mockRobotName',
 }
 
@@ -57,7 +54,6 @@ describe('useUpdatedRobotNameMutation, hook', () => {
     expect(result.current.data).toBeUndefined()
     result.current.updateRobotName(newRobotName)
     await waitFor(() => {
-      console.log(result.current.status)
       return result.current.status !== 'loading'
     })
   })
@@ -67,7 +63,7 @@ describe('useUpdatedRobotNameMutation, hook', () => {
     when(mockUpdateRobotName)
       .calledWith(HOST_CONFIG, newRobotName)
       .mockResolvedValue({
-        data: UPDATEROBOTNAME_RESPONSE,
+        data: UPDATE_ROBOT_NAME_RESPONSE,
       } as Response<UpdatedRobotName>)
 
     const { result, waitFor } = renderHook(() => useUpdateRobotNameMutation(), {
@@ -77,6 +73,6 @@ describe('useUpdatedRobotNameMutation, hook', () => {
 
     await waitFor(() => result.current.data != null)
 
-    expect(result.current.data).toEqual(UPDATEROBOTNAME_RESPONSE)
+    expect(result.current.data).toEqual(UPDATE_ROBOT_NAME_RESPONSE)
   })
 })
