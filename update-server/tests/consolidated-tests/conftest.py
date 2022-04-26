@@ -9,7 +9,6 @@ import pytest
 from otupdate import buildroot, common
 
 from otupdate import openembedded
-from otupdate.common.update_actions import Partition
 from tests.common.config import FakeRootPartElem
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -48,20 +47,14 @@ def downloaded_update_file_common(request, extracted_update_file_common):
     """
     zip_path_arr = []
     list_of_update_files = [
-        ("rootfs.xz",
-         "rootfs.xz.sha256",
-         "rootfs.xz.hash.sig",
-         "ot3-system.zip"),
-        ("rootfs.ext4",
-         "rootfs.ext4.hash",
-         "rootfs.ext4.hash.sig",
-         "ot2-system.zip"),
+        ("rootfs.xz", "rootfs.xz.sha256", "rootfs.xz.hash.sig", "ot3-system.zip"),
+        ("rootfs.ext4", "rootfs.ext4.hash", "rootfs.ext4.hash.sig", "ot2-system.zip"),
     ]
     for index, (rootfs, sha256, sig, pkg) in enumerate(list_of_update_files):
         rootfs_path = os.path.join(extracted_update_file_common[index], rootfs)
         hash_path = os.path.join(extracted_update_file_common[index], sha256)
         sig_path = os.path.join(extracted_update_file_common[index], sig)
-        zip_path = (os.path.join(extracted_update_file_common[index], pkg))
+        zip_path = os.path.join(extracted_update_file_common[index], pkg)
         with zipfile.ZipFile(zip_path, "w") as zf:
             if not request.node.get_closest_marker("exclude_rootfs_ext4"):
                 zf.write(rootfs_path, rootfs)
@@ -87,14 +80,16 @@ def extracted_update_file_common(request, tmpdir):
     """
     extracted_files_dir_path_arr = []
     list_of_extracted_files = [
-        ("rootfs.xz",
-         "rootfs.xz.sha256",
-         "rootfs.xz.hash.sig",
-         ),
-        ("rootfs.ext4",
-         "rootfs.ext4.hash",
-         "rootfs.ext4.hash.sig",
-         ),
+        (
+            "rootfs.xz",
+            "rootfs.xz.sha256",
+            "rootfs.xz.hash.sig",
+        ),
+        (
+            "rootfs.ext4",
+            "rootfs.ext4.hash",
+            "rootfs.ext4.hash.sig",
+        ),
     ]
     for (rootfs, sha256, sig) in list_of_extracted_files:
         rootfs_path = os.path.join(tmpdir, rootfs)
@@ -107,7 +102,9 @@ def extracted_update_file_common(request, tmpdir):
             hashval = b"0oas0ajcs0asd0asjc0ans0d9ajsd0ian0s9djas"
         else:
             try:
-                shasum_out = subprocess.check_output(["shasum", "-a", "256", rootfs_path])
+                shasum_out = subprocess.check_output(
+                    ["shasum", "-a", "256", rootfs_path]
+                )
             except (subprocess.CalledProcessError, FileNotFoundError):
                 pytest.skip("no shasum invokeable on command line")
             hashval = re.match(b"^([a-z0-9]+) ", shasum_out).group(1)

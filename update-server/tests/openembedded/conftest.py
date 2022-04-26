@@ -1,19 +1,17 @@
 import os
-from unittest import mock
 from unittest.mock import MagicMock
 import pytest
 
 from otupdate import openembedded
 from otupdate.common.update_actions import Partition, UpdateActionsInterface
 from otupdate.openembedded.updater import RootFSInterface, PartitionManager, Updater
-from tests.common.config import FakeRootPartElem
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 
 @pytest.fixture
 def mock_update_actions_interface(
-        mock_root_fs_interface: MagicMock, mock_partition_manager_invalid_switch: MagicMock
+    mock_root_fs_interface: MagicMock, mock_partition_manager_invalid_switch: MagicMock
 ) -> MagicMock:
     """Mock UpdateActionsInterface"""
     updater = Updater(

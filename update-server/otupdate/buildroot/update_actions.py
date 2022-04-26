@@ -36,8 +36,7 @@ class RootPartitions(enum.Enum):
 
 
 class OT2UpdateActions(UpdateActionsInterface):
-
-    def get_required_files(self, cert_path: str) -> List[str]:
+    def get_required_files(self, cert_path: Optional[str]) -> List[str]:
         required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
         if cert_path:
             required.append(ROOTFS_SIG_NAME)
@@ -51,10 +50,10 @@ class OT2UpdateActions(UpdateActionsInterface):
         return name is UPDATE_PKG
 
     def validate_update(
-            self,
-            filepath: str,
-            progress_callback: Callable[[float], None],
-            cert_path: Optional[str],
+        self,
+        filepath: str,
+        progress_callback: Callable[[float], None],
+        cert_path: Optional[str],
     ) -> Optional[str]:
         """Worker for validation. Call in an executor (so it can return things)
 
@@ -105,11 +104,11 @@ class OT2UpdateActions(UpdateActionsInterface):
         return rootfs
 
     def write_update(
-            self,
-            rootfs_filepath: str,
-            progress_callback: Callable[[float], None],
-            chunk_size: int = 1024,
-            file_size: int = None,
+        self,
+        rootfs_filepath: str,
+        progress_callback: Callable[[float], None],
+        chunk_size: int = 1024,
+        file_size: int = None,
     ) -> Partition:
         """
         Write the new rootfs to the next root partition
@@ -179,11 +178,11 @@ def _find_unused_partition() -> RootPartitions:
 
 
 def write_file(
-        infile: str,
-        outfile: str,
-        progress_callback: Callable[[float], None],
-        chunk_size: int = 1024,
-        file_size: int = None,
+    infile: str,
+    outfile: str,
+    progress_callback: Callable[[float], None],
+    chunk_size: int = 1024,
+    file_size: int = None,
 ):
     """Write a file to another file with progress callbacks.
 

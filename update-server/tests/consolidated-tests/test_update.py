@@ -5,7 +5,6 @@ import binascii
 import hashlib
 import os
 import zipfile
-from unittest import mock
 
 import pytest
 
@@ -13,10 +12,11 @@ from otupdate.buildroot import update, config, update_actions
 from otupdate.common import file_actions
 from otupdate.common.session import UpdateSession, Stages
 from otupdate.common.update_actions import UpdateActionsInterface
-from otupdate.openembedded import Updater, updater
-from tests.common.config import testing_partition2
-from tests.openembedded.conftest import mock_root_fs_interface, mock_partition_manager_valid_switch, \
-    mock_root_fs_interface_, mock_partition_manager_valid_switch_
+from otupdate.openembedded import Updater
+from tests.openembedded.conftest import (
+    mock_root_fs_interface_,
+    mock_partition_manager_valid_switch_,
+)
 
 
 @pytest.fixture
@@ -70,26 +70,37 @@ async def test_commit_fails_wrong_state(test_cli, update_session):
 br_handler = update_actions.OT2UpdateActions()
 
 
-@pytest.fixture(params=[(0, lambda: Updater(mock_root_fs_interface_(), mock_partition_manager_valid_switch_())),
-                        (1, lambda: update_actions.OT2UpdateActions()),
-
-                        ])
+@pytest.fixture(
+    params=[
+        (
+            0,
+            lambda: Updater(
+                mock_root_fs_interface_(), mock_partition_manager_valid_switch_()
+            ),
+        ),
+        (1, lambda: update_actions.OT2UpdateActions()),
+    ]
+)
 def sys_handler(request):
     return request.param
 
 
 async def test_updater_chain(
-        otupdate_config,
-        downloaded_update_file_common,
-        loop,
-        testing_partition,
-        sys_handler,
-
+    otupdate_config,
+    downloaded_update_file_common,
+    loop,
+    testing_partition,
+    sys_handler,
 ):
     conf = config.load_from_path(otupdate_config)
     session = UpdateSession(conf.download_storage_path)
-    fut = update._begin_validation(session, conf, loop, downloaded_update_file_common.pop(sys_handler[0]),
-                                   sys_handler[1]())
+    fut = update._begin_validation(
+        session,
+        conf,
+        loop,
+        downloaded_update_file_common.pop(sys_handler[0]),
+        sys_handler[1](),
+    )
     assert session.stage == Stages.VALIDATING
     last_progress = 0.0
     while session.stage == Stages.VALIDATING:
@@ -109,15 +120,20 @@ async def test_updater_chain(
 
 @pytest.mark.exclude_rootfs_ext4
 async def test_session_catches_validation_fail(
-        otupdate_config,
-        downloaded_update_file_common,
-        loop,
-        sys_handler,
+    otupdate_config,
+    downloaded_update_file_common,
+    loop,
+    sys_handler,
 ):
     conf = config.load_from_path(otupdate_config)
     session = UpdateSession(conf.download_storage_path)
-    fut = update._begin_validation(session, conf, loop, downloaded_update_file_common.pop(sys_handler[0]),
-                                   sys_handler[1]())
+    fut = update._begin_validation(
+        session,
+        conf,
+        loop,
+        downloaded_update_file_common.pop(sys_handler[0]),
+        sys_handler[1](),
+    )
     with pytest.raises(file_actions.FileMissing):
         await fut
     assert session.state["stage"] == "error"
@@ -127,11 +143,15 @@ async def test_session_catches_validation_fail(
 
 
 async def test_update_happypath(
-        test_cli, update_session, downloaded_update_file_common, loop, testing_partition,
-        monkeypatch,
-        mock_root_fs_interface,
-        mock_partition_manager_valid_switch,
-        extracted_update_file_common,
+    test_cli,
+    update_session,
+    downloaded_update_file_common,
+    loop,
+    testing_partition,
+    monkeypatch,
+    mock_root_fs_interface,
+    mock_partition_manager_valid_switch,
+    extracted_update_file_common,
 ):
     updaters = [
         Updater(
@@ -143,16 +163,28 @@ async def test_update_happypath(
 
     # Upload
     if test_cli[1] == "otupdate.openembedded":
-        monkeypatch.setattr(UpdateActionsInterface, "from_request", lambda x: updaters[0])
+        monkeypatch.setattr(
+            UpdateActionsInterface, "from_request", lambda x: updaters[0]
+        )
         resp = await test_cli[0].post(
             session_endpoint(update_session, "file"),
-            data={os.path.basename(downloaded_update_file_common[0]): open(downloaded_update_file_common[0], "rb")},
+            data={
+                os.path.basename(downloaded_update_file_common[0]): open(
+                    downloaded_update_file_common[0], "rb"
+                )
+            },
         )
     elif test_cli[1] == "otupdate.buildroot":
-        monkeypatch.setattr(UpdateActionsInterface, "from_request", lambda x: updaters[1])
+        monkeypatch.setattr(
+            UpdateActionsInterface, "from_request", lambda x: updaters[1]
+        )
         resp = await test_cli[0].post(
             session_endpoint(update_session, "file"),
-            data={os.path.basename(downloaded_update_file_common[1]): open(downloaded_update_file_common[1], "rb")},
+            data={
+                os.path.basename(downloaded_update_file_common[1]): open(
+                    downloaded_update_file_common[1], "rb"
+                )
+            },
         )
 
     assert resp.status == 201

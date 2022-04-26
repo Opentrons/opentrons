@@ -19,7 +19,7 @@ import lzma
 
 
 def test_update_valid_part_switch(
-        mock_root_fs_interface: MagicMock, mock_partition_manager_valid_switch: MagicMock
+    mock_root_fs_interface: MagicMock, mock_partition_manager_valid_switch: MagicMock
 ):
     """Test root fs being written to unused partition."""
 
@@ -48,7 +48,7 @@ def test_update_valid_part_switch(
 
 
 def test_update_invalid_part_switch(
-        mock_root_fs_interface: MagicMock, mock_partition_manager_invalid_switch: MagicMock
+    mock_root_fs_interface: MagicMock, mock_partition_manager_invalid_switch: MagicMock
 ):
     """Test for an invalid partition switch."""
 
@@ -81,7 +81,7 @@ def test_unused_partition(mock_root_fs_interface, test_input, expected):
 
 
 def test_decomp_and_write(
-        mock_root_fs_interface: MagicMock, mock_partition_manager_valid_switch: MagicMock
+    mock_root_fs_interface: MagicMock, mock_partition_manager_valid_switch: MagicMock
 ):
     """Test helper functions get called as expected in decomp_and_write"""
     updater = Updater(
@@ -95,9 +95,9 @@ def test_decomp_and_write(
 
 
 def test_commit_update(
-        monkeypatch,
-        mock_root_fs_interface: MagicMock,
-        mock_partition_manager_valid_switch: MagicMock,
+    monkeypatch,
+    mock_root_fs_interface: MagicMock,
+    mock_partition_manager_valid_switch: MagicMock,
 ):
     """Test commit_update mounts and resizes rootfs as expected!"""
     updater = Updater(
