@@ -1063,3 +1063,31 @@ def test_thermocycler_validate_target_block_temperature_raises(
 
     with pytest.raises(errors.InvalidTargetTemperatureError):
         subject.validate_target_block_temperature(input_temperature)
+
+
+@pytest.mark.parametrize("input_temperature", [37, 37.0, 37.001, 109.999, 110, 110.0])
+def test_thermocycler_validate_target_lid_temperature(
+    module_view_with_thermocycler: ModuleView,
+    input_temperature: float,
+) -> None:
+    """It should return a valid target block temperature."""
+    subject = module_view_with_thermocycler.get_thermocycler_module_substate(
+        "module-id"
+    )
+    result = subject.validate_target_lid_temperature(input_temperature)
+
+    assert result == input_temperature
+
+
+@pytest.mark.parametrize("input_temperature", [36.999, 110.001])
+def test_thermocycler_validate_target_lid_temperature_raises(
+    module_view_with_thermocycler: ModuleView,
+    input_temperature: float,
+) -> None:
+    """It should raise on invalid target block temperature."""
+    subject = module_view_with_thermocycler.get_thermocycler_module_substate(
+        "module-id"
+    )
+
+    with pytest.raises(errors.InvalidTargetTemperatureError):
+        subject.validate_target_lid_temperature(input_temperature)
