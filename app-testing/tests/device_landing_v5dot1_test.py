@@ -5,6 +5,7 @@ import time
 from typing import Generic, List, Union
 import pytest
 import logging
+from typing import Dict
 
 from rich.console import Console
 from rich.style import Style
@@ -13,12 +14,14 @@ from selenium.webdriver.chrome.options import Options
 
 
 from src.resources.ot_robot5dot1 import OtRobot
-from src.menus.left_menu import LeftMenu
+from src.menus.left_menu_v5dot1 import LeftMenu
 from src.menus.protocol_file import ProtocolFile
 from src.driver.drag_drop import drag_and_drop_file
 from src.resources.ot_application import OtApplication
 from src.pages.device_landing import DeviceLanding
-from src.pages.protocol_uploadv5dot1 import ProtocolUpload
+from src.pages.robot_calibration import RobotCalibration
+from src.pages.module_setup import ModuleSetup
+from src.pages.labware_setup import LabwareSetup
 from src.resources.robot_data import Dev, Kansas, RobotDataType
 
 style = Style(color="#ac0505", bgcolor="yellow", bold=True)
@@ -142,11 +145,70 @@ def test_run_protocol_robot_landing_page_v5dot1(
         # Add the value to the config to ignore app updates.
         ot_application.config["alerts"]["ignored"] = ["appUpdateAvailable"]
         ot_application.write_config()
-        left_menu = LeftMenu(driver)
-        left_menu.click_protocol_upload_button()
+        left_menu: LeftMenu = LeftMenu(driver, console, request.node.nodeid)
+        left_menu.click_protocols_button()
         protocol_file = ProtocolFile(driver)
         logger.info(
             f"uploading protocol: {test_protocols['protocoluploadjson'].resolve()}"
         )
         input = protocol_file.get_drag_json_protocol()
         drag_and_drop_file(input, test_protocols["protocoluploadjson"])
+        time.sleep(3)  # waiting for protocol to analyze
+        device_landing: DeviceLanding = DeviceLanding(
+            driver, console, request.node.nodeid
+        )
+        left_menu.click_devices_button()
+        for robot in robots:
+            ot_robot = OtRobot(console, robot)
+            console.print(
+                f"Testing against robot {ot_robot.data.display_name}", style=style
+            )
+            assert ot_robot.is_alive(), "is the robot available?"
+            device_landing.base.click(
+                device_landing.expander(ot_robot.data.display_name)
+            )
+            device_landing.click_run_a_protocol_button_device_landing()
+            assert (
+                device_landing.get_protocol_name_device_detail_slideout().is_displayed()
+            )
+            time.sleep(2)
+            # device_landing.click_proceed_to_setup_button_device_landing_page()
+
+            # Verify the Setup for run page
+            robot_calibrate = RobotCalibration(driver)
+            assert robot_calibrate.get_robot_calibration().text == "Robot Calibration"
+            robot_calibrate.click_robot_calibration()
+            assert robot_calibrate.get_deck_calibration().text == "Deck Calibration"
+            assert robot_calibrate.get_required_pipettes().text == "Required Pipettes"
+            assert (
+                robot_calibrate.get_calibration_ready_locator().text
+                == "Calibration Ready"
+            )
+            assert (
+                robot_calibrate.get_required_tip_length_calibration().text
+                == "Required Tip Length Calibrations"
+            )
+            module_setup = ModuleSetup(driver)
+            assert module_setup.get_proceed_to_module_setup().is_displayed()
+            module_setup.click_proceed_to_module_setup()
+            assert module_setup.get_module_setup_text_locator().text == "Module Setup"
+            assert module_setup.get_thermocycler_module().text == "Thermocycler Module"
+            assert module_setup.get_magetic_module().text == "Magnetic Module GEN1"
+            assert (
+                module_setup.get_temperature_module().text == "Temperature Module GEN1"
+            )
+            assert module_setup.get_proceed_to_labware_setup().is_displayed()
+            module_setup.click_proceed_to_labware_setup()
+            labware_setup = LabwareSetup(driver)
+            assert labware_setup.get_labware_setup_text().is_displayed()
+            labware_setup.click_proceed_to_run_button()
+            device_landing.click_start_run_button()
+            assert device_landing.get_clear_button_run_page().is_displayed()
+            assert device_landing.get_run_button().is_displayed()
+            assert device_landing.get_success_banner_run_page().is_displayed()
+            device_landing.click_on_jump_to_current_step()
+            assert device_landing.get_current_step_text().is_displayed()
+
+            # Always clear the protocol before running the next script
+            device_landing.click_clear_protocol_button()
+            time.sleep(5)

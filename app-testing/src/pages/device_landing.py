@@ -101,7 +101,7 @@ class DeviceLanding:
     def get_setup_a_robot_header(self) -> Optional[WebElement]:
         """Get the how to setup a robot."""
         header: Element = Element(
-            (By.XPATH, '//p[text()="How to setup a new robot"]'),
+            (By.XPATH, '//h3[text()="How to setup a new robot"]'),
             f"How to set up a new robot.",
         )
         return self.base.clickable_wrapper(header, 15)
@@ -210,6 +210,17 @@ class DeviceLanding:
         )
         return self.base.clickable_wrapper(text, 5)
 
+    def get_protocol_name_device_detail_slideout(self) -> Optional[WebElement]:
+        """Get the protocol name on device detail page slide out."""
+        text: Element = Element(
+            (
+                By.XPATH,
+                f"//div[@data-testid='Slideout_body_Choose protocol to Run on opentrons-dev']//div",
+            ),
+            f"the protocol name on device detail page slide out.",
+        )
+        return self.base.clickable_wrapper(text, 5)
+
     def get_right_mount_pipette_device_detail(self) -> Optional[WebElement]:
         """Get the right mount pipette on device detail page."""
         text: Element = Element(
@@ -229,6 +240,38 @@ class DeviceLanding:
         )
         return self.base.clickable_wrapper(image, 5)
 
+    def get_current_step_text(self) -> Optional[WebElement]:
+        """Get the current step text on run log."""
+        text: Element = Element(
+            (By.XPATH, f"//p[text()='Current Step']"),
+            f"the current step text on run log.",
+        )
+        return self.base.clickable_wrapper(text, 5)
+
+    def get_clear_button_run_page(self) -> Optional[WebElement]:
+        """Get the clear button on run page."""
+        button: Element = Element(
+            (By.ID, f"ProtocolRunHeader_closeRunButton"),
+            f"Get the clear button on run page.",
+        )
+        return self.base.clickable_wrapper(button, 10)
+
+    def get_run_button(self) -> Optional[WebElement]:
+        """Get the run button on run page."""
+        button: Element = Element(
+            (By.ID, f"ProtocolRunHeader_runControlButton"),
+            f"Get the run button on run page.",
+        )
+        return self.base.clickable_wrapper(button, 5)
+
+    def get_success_banner_run_page(self) -> Optional[WebElement]:
+        """Get the success banner on run page."""
+        banner: Element = Element(
+            (By.XPATH, f"//div[@data-testid='Banner_success']"),
+            f"Get the success banner on run page.",
+        )
+        return self.base.clickable_wrapper(banner, 5)
+
     def click_module_actions_button(self, module_serial: str) -> None:
         button: Element = Element(
             (
@@ -239,7 +282,27 @@ class DeviceLanding:
         )
         self.base.click(button)
 
-    def click_run_a_protocol_button_device_landing(self, module_serial: str) -> None:
+    def click_on_opentrons_dev_app_device_landing_page(self) -> None:
+        button: Element = Element(
+            (
+                By.ID,
+                f"RobotStatusBanner_opentrons-dev_robotName",
+            ),
+            f"Clicking on dev robot in device landing page.'",
+        )
+        self.base.click(button)
+
+    def click_on_jump_to_current_step(self) -> None:
+        button: Element = Element(
+            (
+                By.ID,
+                f"RunLog_jumpToCurrentStep",
+            ),
+            f"Clicking on jump to current step.'",
+        )
+        self.base.click(button)
+
+    def click_run_a_protocol_button_device_landing(self) -> None:
         button: Element = Element(
             (
                 By.XPATH,
@@ -248,6 +311,26 @@ class DeviceLanding:
             f"Button to go to setup for run page.'",
         )
         self.base.click(button)
+
+    def click_proceed_to_setup_button_device_landing_page(self) -> None:
+        button: Element = Element(
+            (
+                By.XPATH,
+                f"//button[text()='Proceed to setup']",
+            ),
+            f"Button to Proceed to setup for set up run page.'",
+        )
+        self.base.clickable_wrapper(button, 10)
+
+    def click_clear_protocol_button(self) -> None:
+        button: Element = Element(
+            (
+                By.ID,
+                f"ProtocolRunHeader_closeRunButton",
+            ),
+            f"Button to clear the protocol from set up run page.'",
+        )
+        self.base.clickable_wrapper(button, 5)
 
     def click_mag_engage_height(self, module_serial: str) -> None:
         button: Element = Element(
@@ -279,6 +362,16 @@ class DeviceLanding:
                 f"//button[@data-testid='MagneticModuleSlideout_btn_fatal-attraction']",
             ),
             f"Button to set engage height slideout.'",
+        )
+        self.base.click(close)
+
+    def click_start_run_button(self) -> None:
+        close: Element = Element(
+            (
+                By.ID,
+                f"ProtocolRunHeader_runControlButton",
+            ),
+            f"Button to start the run on run page.'",
         )
         self.base.click(close)
 
