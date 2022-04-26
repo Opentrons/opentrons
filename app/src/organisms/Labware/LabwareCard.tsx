@@ -37,6 +37,11 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const displayCategory = startCase(definition.metadata.displayCategory)
   const isCustomDefinition = modified != null
 
+  const handleCopyClick = async (e: React.MouseEvent): Promise<void> => {
+    e.stopPropagation()
+    await navigator.clipboard.writeText(apiName)
+  }
+
   return (
     <Box
       role="link"
@@ -100,11 +105,16 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               </StyledText>
               <Link
                 css={TYPOGRAPHY.pRegular}
-                onClick={() => navigator.clipboard.writeText(apiName)}
+                onClick={handleCopyClick}
                 role="button"
               >
                 <Flex alignItems={ALIGN_CENTER}>
-                  {apiName} <Icon height={SIZE_1} name="copy-text" />
+                  {apiName}{' '}
+                  <Icon
+                    height={SIZE_1}
+                    name="copy-text"
+                    aria-label="copy-text"
+                  />
                 </Flex>
               </Link>
             </Box>
