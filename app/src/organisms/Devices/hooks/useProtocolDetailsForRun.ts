@@ -19,13 +19,16 @@ export function useProtocolDetailsForRun(
 ): ProtocolDetails {
   const { data: runRecord } = useRunQuery(runId)
   const protocolId = runRecord?.data?.protocolId ?? null
-  const enableProtocolPolling = React.useRef<boolean>(true)
+  const [isPollingProtocol, setIsPollingProtocol] = React.useState<boolean>(
+    true
+  )
+
   const { data: protocolRecord } = useProtocolQuery(
     protocolId,
     {
       staleTime: Infinity,
     },
-    enableProtocolPolling.current
+    isPollingProtocol
   )
 
   const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
@@ -37,9 +40,9 @@ export function useProtocolDetailsForRun(
 
   React.useEffect(() => {
     if (mostRecentAnalysisSummary?.status === 'completed') {
-      enableProtocolPolling.current = false
+      setIsPollingProtocol(false)
     } else {
-      enableProtocolPolling.current = true
+      setIsPollingProtocol(true)
     }
   }, [mostRecentAnalysisSummary?.status])
 

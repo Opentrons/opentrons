@@ -92,7 +92,7 @@ describe('useProtocolDetailsForRun hook', () => {
         data: { data: { protocolId: PROTOCOL_ID } } as any,
       } as UseQueryResult<Run>)
     when(mockUseProtocolQuery)
-      .calledWith(PROTOCOL_ID, { staleTime: Infinity }, true)
+      .calledWith(PROTOCOL_ID, { staleTime: Infinity }, expect.any(Boolean))
       .mockReturnValue({ data: PROTOCOL_RESPONSE } as UseQueryResult<Protocol>)
     when(mockUseProtocolAnalysesQuery)
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
