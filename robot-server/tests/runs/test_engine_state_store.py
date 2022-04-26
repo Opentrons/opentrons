@@ -111,7 +111,7 @@ def test_get_run_state(
 def test_insert_get_by_state_type(
     subject: EngineStateStore, protocol_run: ProtocolRunData
 ) -> None:
-    """It should test the time for prasing a json type and a string type"""
+    """It should test the time for prasing a json type and a string type."""
     engine_state = EngineStateResource(
         run_id="run-id",
         state=protocol_run,
