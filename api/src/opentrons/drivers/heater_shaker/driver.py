@@ -119,8 +119,7 @@ class HeaterShakerDriver(AbstractHeaterShakerDriver):
             command=c, retries=DEFAULT_COMMAND_RETRIES
         )
         return utils.parse_temperature_response(
-            temperature_string=response,
-            rounding_val=utils.HS_GCODE_ROUNDING_PRECISION
+            temperature_string=response, rounding_val=utils.HS_GCODE_ROUNDING_PRECISION
         )
 
     async def set_rpm(self, rpm: int) -> None:
