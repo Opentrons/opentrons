@@ -10,6 +10,7 @@ import {
   DIRECTION_ROW,
   SPACING,
   COLORS,
+  BORDERS,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import * as Config from '../../redux/config'
@@ -43,7 +44,15 @@ export function AppSettings(): JSX.Element {
 
   return (
     <Flex paddingX={SPACING.spacing4} paddingY={SPACING.spacing4}>
-      <Box backgroundColor={COLORS.white} height="100%" width="100%">
+      <Box
+        backgroundColor={COLORS.white}
+        height="100%"
+        width="100%"
+        margin={SPACING.spacing4}
+        border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGrey}`}
+        borderRadius={BORDERS.radiusSoftCorners}
+        minHeight="95%"
+      >
         <Box padding={SPACING.spacing4} paddingBottom="0">
           <Text css={TYPOGRAPHY.h1Default} paddingBottom={SPACING.spacing5}>
             {t('app_settings')}
