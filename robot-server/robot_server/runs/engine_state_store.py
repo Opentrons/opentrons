@@ -103,7 +103,7 @@ class EngineStateStore:
             state_result = ProtocolRunData.parse_raw(state_row.state_string)
         state_result
 
-        return EngineStateResource(run_id=run_id, state=state_result)
+        return EngineStateResource(run_id=run_id, state=state_result, engine_status=state_row.engine_status)
 
     def get(self, run_id: str) -> EngineStateResource:
         """Get engine state from db.

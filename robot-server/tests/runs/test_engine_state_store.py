@@ -68,10 +68,16 @@ def protocol_run() -> ProtocolRunData:
         pipetteName=pe_types.PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
     )
+    analysis_command_list = []
+    labware_list = []
+    for i in range(1000):
+        analysis_command_list.append(analysis_command)
+        labware_list.append(analysis_labware)
+
     return ProtocolRunData(
-        commands=[analysis_command],
+        commands=analysis_command_list,
         errors=[analysis_error],
-        labware=[analysis_labware],
+        labware=labware_list,
         pipettes=[analysis_pipette],
         # TODO(mc, 2022-02-14): evaluate usage of modules in the analysis resp.
         modules=[],
@@ -117,7 +123,7 @@ def teardown():
     print("teardown")
 
 
-@pytest.mark.parametrize("pickle_type", [True, False])
+@pytest.mark.parametrize("pickle_type", [False, True])
 def test_insert_get_by_state_type(subject: EngineStateStore, protocol_run: ProtocolRunData, pickle_type: bool, teardown) -> None:
     """It should test the time for prasing a json type and a string type."""
     engine_state = EngineStateResource(
