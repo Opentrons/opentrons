@@ -159,7 +159,7 @@ async def test_update_happypath(
     pm = PartitionManager()
     updaters = [
         Updater(
-            root_FS_intf=mock_root_fs_interface,
+            root_FS_intf=fs_intf,
             part_mngr=mock_partition_manager_valid_switch,
         ),
         (update_actions.OT2UpdateActions()),
@@ -236,7 +236,7 @@ async def test_update_happypath(
             fd = open(testing_partition, "rb")
             tp_hasher.update(fd.read())
             tp_hash = binascii.hexlify(tp_hasher.digest())
-            assert tp_hash == zf.read("rootfs.ext4.hash").strip()
+            assert tp_hash == zf.read("rootfs.xz.sha256").strip()
             fd.close()
 
 

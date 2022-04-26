@@ -1,3 +1,4 @@
+import lzma
 import os
 import subprocess
 import re
@@ -96,13 +97,29 @@ def extracted_update_file_common(request, tmpdir):
         rootfs_path = os.path.join(tmpdir, rootfs)
         hash_path = os.path.join(tmpdir, sha256)
         sig_path = os.path.join(tmpdir, sig)
+        uncomp_xz_path = os.path.join(tmpdir, "tmp_uncomp")
         rootfs_contents = os.urandom(100000)
-        with open(rootfs_path, "wb") as rfs:
-            rfs.write(rootfs_contents)
+        if rootfs == "rootfs.xz":
+            with lzma.open(rootfs_path, "w") as f:
+                f.write(rootfs_contents)
+            with lzma.open(rootfs_path, "rb") as fsrc, open(uncomp_xz_path, "wb") as fdst:
+                while True:
+                    chunk = fsrc.read(1024)
+                    fdst.write(chunk)
+                    if len(chunk) != 1024:
+                        break
+        else:
+            with open(rootfs_path, "wb") as rfs:
+                rfs.write(rootfs_contents)
         if request.node.get_closest_marker("bad_hash"):
             hashval = b"0oas0ajcs0asd0asjc0ans0d9ajsd0ian0s9djas"
         else:
             try:
+               # if rootfs == "rootfs.xz":
+                   # shasum_out = subprocess.check_output(
+                   #     ["shasum", "-a", "256", uncomp_xz_path]
+                   # )
+                # else:
                 shasum_out = subprocess.check_output(
                     ["shasum", "-a", "256", rootfs_path]
                 )
