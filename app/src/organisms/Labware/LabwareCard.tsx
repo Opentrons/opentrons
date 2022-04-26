@@ -17,6 +17,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
   ALIGN_FLEX_END,
+  ALIGN_CENTER,
+  SIZE_1,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
@@ -37,12 +39,14 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
 
   return (
     <Box
+      role="link"
       backgroundColor={COLORS.white}
       color={COLORS.black}
       css={BORDERS.cardOutlineBorder}
       padding={SPACING.spacing4}
       height="7.375rem"
       onClick={props.onClick}
+      cursor="pointer"
     >
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} height="100%">
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
@@ -99,7 +103,9 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 onClick={() => navigator.clipboard.writeText(apiName)}
                 role="button"
               >
-                {apiName} <Icon height=".7rem" name="ot-copy-text" />
+                <Flex alignItems={ALIGN_CENTER}>
+                  {apiName} <Icon height={SIZE_1} name="copy-text" />
+                </Flex>
               </Link>
             </Box>
           </Flex>
