@@ -1,11 +1,12 @@
 """Tests for robot_server.runs.run_store."""
 import pytest
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Generator
 
 from sqlalchemy.engine import Engine as SQLEngine
 from pathlib import Path
 
+from robot_server.protocols.protocol_store import ProtocolNotFoundError
 from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError
 from robot_server.runs.action_models import RunAction, RunActionType
 from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
@@ -34,7 +35,7 @@ def test_add_run(subject: RunStore) -> None:
     run = RunResource(
         run_id="run-id",
         protocol_id=None,
-        created_at=datetime.now(),
+        created_at=datetime.now(tz=timezone.utc),
         actions=[],
         is_current=True,
     )
@@ -47,7 +48,7 @@ def test_insert_actions_missing_run_id(subject: RunStore) -> None:
     """Should not be able to insert an action with a run id that does not exist."""
     action = RunAction(
         actionType=RunActionType.PLAY,
-        createdAt=datetime(year=2022, month=2, day=2),
+        createdAt=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
         id="action-id",
     )
 
@@ -55,19 +56,33 @@ def test_insert_actions_missing_run_id(subject: RunStore) -> None:
         subject.insert_action(run_id="missing-run-id", action=action)
 
 
+def test_insert_run_missing_protocol_id(subject: RunStore) -> None:
+    """Should not be able to insert an action with a run id that does not exist."""
+    run = RunResource(
+        run_id="run-id",
+        protocol_id="missing-protocol-id",
+        created_at=datetime.now(),
+        actions=[],
+        is_current=True,
+    )
+
+    with pytest.raises(ProtocolNotFoundError, match="missing-protocol-id"):
+        subject.insert(run)
+
+
 def test_update_active_run(subject: RunStore) -> None:
     """It should be able to update a run in the store."""
     run = RunResource(
         run_id="identical-run-id",
         protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1, hour=1, minute=1, second=1),
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[],
         is_current=False,
     )
     updated_run = RunResource(
         run_id="identical-run-id",
         protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1, hour=1, minute=1, second=1),
+        created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
         actions=[],
         is_current=True,
     )
@@ -75,7 +90,8 @@ def test_update_active_run(subject: RunStore) -> None:
     subject.insert(run)
 
     result = subject.update_active_run(
-        run_id=run.run_id, is_current=updated_run.is_current
+        run_id=run.run_id,
+        is_current=updated_run.is_current,
     )
     assert result.is_current == updated_run.is_current
 
@@ -91,7 +107,7 @@ def test_get_run_no_actions(subject: RunStore) -> None:
     run = RunResource(
         run_id="run-id",
         protocol_id=None,
-        created_at=datetime.now(),
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[],
         is_current=False,
     )
@@ -105,20 +121,20 @@ def test_get_run(subject: RunStore) -> None:
     """It can get a previously stored run entry."""
     action = RunAction(
         actionType=RunActionType.PLAY,
-        createdAt=datetime(year=2022, month=2, day=2),
+        createdAt=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
         id="action-id",
     )
     run = RunResource(
         run_id="run-id",
         protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1, hour=1, minute=1, second=1),
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[],
         is_current=False,
     )
     update_run = RunResource(
         run_id="run-id",
         protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1, hour=1, minute=1, second=1),
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[action],
         is_current=False,
     )
@@ -141,14 +157,14 @@ def test_get_all_runs(subject: RunStore) -> None:
     run_1 = RunResource(
         run_id="run-id-1",
         protocol_id=None,
-        created_at=datetime.now(),
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[],
         is_current=False,
     )
     run_2 = RunResource(
         run_id="run-id-2",
         protocol_id=None,
-        created_at=datetime.now(),
+        created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
         actions=[],
         is_current=True,
     )
@@ -165,13 +181,13 @@ def test_remove_run(subject: RunStore) -> None:
     """It can remove and return a previously stored run entry."""
     action = RunAction(
         actionType=RunActionType.PLAY,
-        createdAt=datetime(year=2022, month=2, day=2),
+        createdAt=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
         id="action-id",
     )
     run = RunResource(
         run_id="run-id",
         protocol_id=None,
-        created_at=datetime.now(),
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[action],
         is_current=True,
     )
@@ -194,21 +210,20 @@ def test_add_run_current_run_deactivates(subject: RunStore) -> None:
     """Adding a current run should mark all others as not current."""
     actions = RunAction(
         actionType=RunActionType.PLAY,
-        createdAt=datetime(year=2022, month=2, day=2),
+        createdAt=datetime(year=2023, month=3, day=3, tzinfo=timezone.utc),
         id="action-id",
     )
     run_1 = RunResource(
         run_id="run-id-1",
         protocol_id=None,
-        created_at=datetime.now(),
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[actions],
         is_current=True,
     )
-
     run_2 = RunResource(
         run_id="run-id-2",
         protocol_id=None,
-        created_at=datetime.now(),
+        created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
         actions=[],
         is_current=True,
     )
@@ -224,20 +239,20 @@ def test_update_active_run_deactivates(subject: RunStore) -> None:
     """Updating active run should deactivate other runs."""
     actions = RunAction(
         actionType=RunActionType.PLAY,
-        createdAt=datetime(year=2022, month=2, day=2),
+        createdAt=datetime(year=2023, month=3, day=3),
         id="action-id",
     )
     run_1 = RunResource(
         run_id="run-id-1",
         protocol_id=None,
-        created_at=datetime.now(),
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[actions],
         is_current=True,
     )
     run_2 = RunResource(
         run_id="run-id-2",
         protocol_id=None,
-        created_at=datetime.now(),
+        created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
         actions=[],
         is_current=True,
     )
@@ -251,10 +266,10 @@ def test_update_active_run_deactivates(subject: RunStore) -> None:
 
 
 def test_insert_actions_no_run(subject: RunStore) -> None:
-    """Insert actions with a run that dosent exist should raise an exception."""
+    """Insert actions with a run that doesn't exist should raise an exception."""
     action = RunAction(
         actionType=RunActionType.PLAY,
-        createdAt=datetime(year=2022, month=2, day=2),
+        createdAt=datetime(year=2023, month=3, day=3, tzinfo=timezone.utc),
         id="action-id-1",
     )
 
