@@ -105,23 +105,30 @@ class RootFSInterface:
             # the double pass here is
             # temporary until we have
             # xz size decoding working
-            with lzma.open(rootfs_filepath, "rb") as fsrc:
-                while True:
-                    chunk = fsrc.read(chunk_size)
-                    total_size += len(chunk)
-                    if len(chunk) != chunk_size:
-                        break
-            with lzma.open(rootfs_filepath, "rb") as fsrc, open(
-                part.path, "wb"
-            ) as fdst:
-                while True:
-                    chunk = fsrc.read(chunk_size)
-                    fdst.write(chunk)
-                    written_size += chunk_size
-                    progress_callback(written_size / total_size)
-                    if len(chunk) != chunk_size:
-                        break
+            try:
+                with lzma.open(rootfs_filepath, "rb") as fsrc:
+                    while True:
+                        chunk = fsrc.read(chunk_size)
+                        total_size += len(chunk)
+                        if len(chunk) != chunk_size:
+                            break
+            except Exception as a:
+                print(f'**********Exception opening {part.path} {rootfs_filepath} {str(a)}')
+            try:
+                with lzma.open(rootfs_filepath, "rb") as fsrc, open(
+                    part.path, "wb"
+                ) as fdst:
+                    while True:
+                        chunk = fsrc.read(chunk_size)
+                        fdst.write(chunk)
+                        written_size += chunk_size
+                        progress_callback(written_size / total_size)
+                        if len(chunk) != chunk_size:
+                            break
+            except Exception as a:
+                print(f'********************exception writing {part.path} {rootfs_filepath} {str(a)}')
         except Exception:
+            print("****************************exception")
             LOG.exception("RootFSInterface::write_update exception reading")
 
 
