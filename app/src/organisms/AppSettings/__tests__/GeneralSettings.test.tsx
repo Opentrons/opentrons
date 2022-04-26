@@ -52,6 +52,8 @@ describe('GeneralSettings', () => {
     getByText(
       'It is very important for the robot and app software to be on the same version. Manage the robot software versions via Robot Settings > Advanced.'
     )
+    getByText('View latest release notes on')
+    getByRole('link', { name: 'GitHub' })
     getByRole('link', {
       name:
         'Learn more about keeping the Opentrons app and robot software in sync',
