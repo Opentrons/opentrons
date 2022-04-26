@@ -123,7 +123,7 @@ def teardown():
     print("teardown")
 
 
-@pytest.mark.parametrize("pickle_type", [False, True])
+@pytest.mark.parametrize("pickle_type", [True, False])
 def test_insert_get_by_state_type(subject: EngineStateStore, protocol_run: ProtocolRunData, pickle_type: bool, teardown) -> None:
     """It should test the time for prasing a json type and a string type."""
     engine_state = EngineStateResource(

@@ -3,6 +3,7 @@ import sqlalchemy
 from dataclasses import dataclass
 from typing import Dict, Optional
 from pydantic import parse_obj_as
+import os
 
 from opentrons.protocol_runner import ProtocolRunData
 
@@ -73,7 +74,7 @@ class EngineStateStore:
         statement = sqlalchemy.insert(engine_state_table).values(insert_row)
         with self._sql_engine.begin() as transaction:
             try:
-                transaction.execute(statement)
+                transaction.execute(statement, autocommit=False)
             except sqlalchemy.exc.IntegrityError:
                 raise RunNotFoundError(run_id=state.run_id)
 
@@ -96,11 +97,19 @@ class EngineStateStore:
             engine_state_table.c.run_id == run_id
         )
         with self._sql_engine.begin() as transaction:
-            state_row = transaction.execute(statement).one()
+            state_row = transaction.execute(statement, autocommit=False).one()
+            result = transaction.execute("PRAGMA page_size").all()
+            count = transaction.execute("PRAGMA page_count").all()
         if return_pickle:
             state_result = parse_obj_as(ProtocolRunData, state_row.state)
+            print("---pickle-size---")
+            print(result)
+            print(count)
         else:
             state_result = ProtocolRunData.parse_raw(state_row.state_string)
+            print("---str-size---")
+            print(result)
+            print(count)
         state_result
 
         return EngineStateResource(run_id=run_id, state=state_result, engine_status=state_row.engine_status)
