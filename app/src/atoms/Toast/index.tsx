@@ -87,6 +87,7 @@ export function Toast(props: ToastProps): JSX.Element {
           width={SPACING.spacing4}
           marginRight={SPACING.spacing3}
           spin={icon?.spin != null ? icon.spin : false}
+          aria-label={`icon_${type as string}`}
         />
         <StyledText as="p">{message}</StyledText>
       </Flex>
