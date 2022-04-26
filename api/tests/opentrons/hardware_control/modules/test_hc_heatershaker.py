@@ -133,6 +133,7 @@ async def test_updated_live_data(simulating_module):
         "status": "running",
     }
 
+
 async def test_deactivated_updated_live_data(simulating_module):
     """Should update live data after module commands."""
     await simulating_module.close_labware_latch()

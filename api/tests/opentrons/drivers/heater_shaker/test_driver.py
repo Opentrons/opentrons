@@ -116,7 +116,9 @@ async def test_home(subject: driver.HeaterShakerDriver, connection: AsyncMock) -
     connection.send_command.assert_called_once_with(command=expected, retries=0)
 
 
-async def test_deactivate_heater(subject: driver.HeaterShakerDriver, connection: AsyncMock) -> None:
+async def test_deactivate_heater(
+    subject: driver.HeaterShakerDriver, connection: AsyncMock
+) -> None:
     """It should send a deactivate-heater command"""
     connection.send_command.return_value = "M106 ok\n"
     await subject.deactivate_heater()

@@ -158,7 +158,7 @@ class HeaterShakerDriver(AbstractHeaterShakerDriver):
 
     async def home(self) -> None:
         """Send home command.
-        
+
         Note: Homing also stops the shaking motion if applicable.
         """
         c = CommandBuilder(terminator=HS_COMMAND_TERMINATOR).add_gcode(gcode=GCODE.HOME)
@@ -183,5 +183,7 @@ class HeaterShakerDriver(AbstractHeaterShakerDriver):
 
     async def deactivate_heater(self) -> None:
         """Send deactivate-heater command"""
-        c = CommandBuilder(terminator=HS_COMMAND_TERMINATOR).add_gcode(gcode=GCODE.DEACTIVATE_HEATER)
+        c = CommandBuilder(terminator=HS_COMMAND_TERMINATOR).add_gcode(
+            gcode=GCODE.DEACTIVATE_HEATER
+        )
         await self._connection.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
