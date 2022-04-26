@@ -1,4 +1,4 @@
-"""Test Thermocucler set block temperature command implementation."""
+"""Test Thermocycler set block temperature command implementation."""
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import Thermocycler

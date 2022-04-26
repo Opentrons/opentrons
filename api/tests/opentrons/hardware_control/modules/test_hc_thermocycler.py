@@ -9,7 +9,7 @@ from opentrons.drivers.thermocycler import SimulatingDriver
 from opentrons.hardware_control import modules, ExecutionManager
 
 
-@pytest.fixture()
+@pytest.fixture
 def usb_port() -> USBPort:
     return USBPort(
         name="",
@@ -19,7 +19,7 @@ def usb_port() -> USBPort:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 async def subject(usb_port: USBPort) -> AsyncGenerator[modules.Thermocycler, None]:
     """Test subject"""
     therm = await modules.build(
@@ -113,17 +113,17 @@ async def test_sim_update(subject: modules.Thermocycler) -> None:
     assert subject.target is None
 
 
-@pytest.fixture()
+@pytest.fixture
 def simulator() -> SimulatingDriver:
     return SimulatingDriver()
 
 
-@pytest.fixture()
+@pytest.fixture
 def set_plate_temp_spy(simulator: SimulatingDriver) -> mock.AsyncMock:
     return mock.AsyncMock(wraps=simulator.set_plate_temperature)
 
 
-@pytest.fixture()
+@pytest.fixture
 def simulator_set_plate_spy(
     simulator: SimulatingDriver, set_plate_temp_spy: mock.AsyncMock
 ) -> SimulatingDriver:
@@ -132,7 +132,7 @@ def simulator_set_plate_spy(
     return simulator
 
 
-@pytest.fixture()
+@pytest.fixture
 async def set_temperature_subject(
     usb_port: USBPort, simulator_set_plate_spy: SimulatingDriver
 ) -> AsyncGenerator[modules.Thermocycler, None]:

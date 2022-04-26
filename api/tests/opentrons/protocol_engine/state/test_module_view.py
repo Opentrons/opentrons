@@ -1018,7 +1018,7 @@ def test_tempdeck_get_plate_target_temperature_no_target(
         subject.get_plate_target_temperature()
 
 
-@pytest.fixture()
+@pytest.fixture
 def module_view_with_thermocycler(thermocycler_v1_def: ModuleDefinition) -> ModuleView:
     """Get a module state view with a loaded thermocycler."""
     return make_module_view(
