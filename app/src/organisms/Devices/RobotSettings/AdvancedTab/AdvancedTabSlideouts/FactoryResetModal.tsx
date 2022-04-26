@@ -71,8 +71,8 @@ export function FactoryResetModal({
             <Flex justifyContent={JUSTIFY_FLEX_END}>
               <SecondaryButton
                 onClick={closeModal}
-                marginRight={SPACING.spacing3}
                 textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                marginRight={SPACING.spacing3}
               >
                 {t('shared:cancel')}
               </SecondaryButton>

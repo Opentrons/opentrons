@@ -41,8 +41,8 @@ describe('RobotSettings FactoryResetModal', () => {
     jest.resetAllMocks()
   })
 
-  it('should render title, icon, description, and buttons', () => {
-    const [{ getByText, getByRole }] = render({
+  it('should render title, description, and buttons', () => {
+    const [{ getByText, getByRole, getByLabelText }] = render({
       closeModal: mockCloseModal,
       isRobotConnected: true,
       robotName: ROBOT_NAME,
@@ -50,7 +50,7 @@ describe('RobotSettings FactoryResetModal', () => {
     })
     getByText('Reset to factory settings?')
     getByText('This data cannot be retrieved later.')
-    getByRole('button', { name: 'Cancel' })
+    getByRole('button', { name: 'cancel' })
     getByRole('button', { name: 'Yes, clear data and restart robot' })
   })
 
@@ -81,7 +81,7 @@ describe('RobotSettings FactoryResetModal', () => {
       robotName: ROBOT_NAME,
       resetOptions: mockResetOptions,
     })
-    const cancelButton = getByRole('button', { name: 'Cancel' })
+    const cancelButton = getByRole('button', { name: 'cancel' })
     fireEvent.click(cancelButton)
     expect(mockCloseModal).toHaveBeenCalled()
   })
@@ -101,7 +101,7 @@ describe('RobotSettings FactoryResetModal', () => {
   })
 
   // UNREACHABLE ROBOT
-  it('should render title, icon, description, and button-UNREACHABLE', () => {
+  it('should render title, description, and button-UNREACHABLE', () => {
     const [{ getByText, getByRole }] = render({
       closeModal: mockCloseModal,
       isRobotConnected: false,
