@@ -51,18 +51,28 @@ class EngineStateStore:
         return state
 
     def insert_state_by_type(
-        self, state: EngineStateResource, insert_pickle: bool
+            self, state: EngineStateResource, insert_pickle: bool
     ) -> EngineStateResource:
-        """Get engine state from db.
+        """Insert engine state by type to db.
 
-        Arguments:
-            run_id: Run id related to the engine state.
+            Arguments:
+            state: Engine state resource to store.
 
-        Returns:
-            The engine state that found in the store.
-        """
+            Returns:
+            The engine state that was added to the store.
+               """
+        if insert_pickle:
+            insert_row = {
+                "run_id": state.run_id,
+                "state": state.state.dict()}
+        else:
+            insert_row = {
+                "run_id": state.run_id,
+                "state_string": state.state.json(),
+            }
+
         statement = sqlalchemy.insert(engine_state_table).values(
-            _convert_state_to_sql_values(state=state)
+            insert_row
         )
         with self._sql_engine.begin() as transaction:
             try:
@@ -73,9 +83,9 @@ class EngineStateStore:
         return state
 
     def get_state_by_type(
-        self, run_id: str, return_pickle: bool
+            self, run_id: str, return_pickle: bool
     ) -> EngineStateResource:
-        """Get engine state from db.
+        """Get engine state by type from db.
 
         Arguments:
             run_id: Run id related to the engine state.
@@ -89,8 +99,10 @@ class EngineStateStore:
         with self._sql_engine.begin() as transaction:
             state_row = transaction.execute(statement).one()
         if return_pickle:
+            state_result = parse_obj_as(ProtocolRunData, state_row.state)
+        else:
             state_result = ProtocolRunData.parse_raw(state_row.state_string)
-        state_result = parse_obj_as(ProtocolRunData, state_row.state)
+        state_result
 
         return EngineStateResource(run_id=run_id, state=state_result)
 
@@ -112,7 +124,7 @@ class EngineStateStore:
 
 
 def _convert_sql_row_to_sql_engine_state(
-    sql_row: sqlalchemy.engine.Row,
+        sql_row: sqlalchemy.engine.Row,
 ) -> EngineStateResource:
     run_id = sql_row.run_id
     assert isinstance(run_id, str)
