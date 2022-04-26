@@ -18,6 +18,14 @@ from .analysis_models import (
 )
 
 
+class AnalysisNotFoundError(ValueError):
+    """Exception raised if a given analysis is not found."""
+
+    def __init__(self, analysis_id: str) -> None:
+        """Initialize the error's message."""
+        super().__init__(f"Analysis {analysis_id} not found.")
+
+
 class AnalysisStore:
     """Storage interface for protocol analyses."""
 
@@ -25,6 +33,13 @@ class AnalysisStore:
         """Initialize the AnalysisStore's internal state."""
         self._analysis_ids_by_protocol: Dict[str, List[str]] = defaultdict(list)
         self._analyses_by_id: Dict[str, ProtocolAnalysis] = {}
+
+    def get(self, analysis_id: str) -> ProtocolAnalysis:
+        """Get a single protocol analysis by its ID."""
+        try:
+            return self._analyses_by_id[analysis_id]
+        except KeyError as error:
+            raise AnalysisNotFoundError(analysis_id) from error
 
     def add_pending(self, protocol_id: str, analysis_id: str) -> AnalysisSummary:
         """Add a pending analysis to the store."""

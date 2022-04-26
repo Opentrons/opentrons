@@ -10,7 +10,7 @@ from opentrons.protocol_engine import (
     types as pe_types,
 )
 
-from robot_server.protocols.analysis_store import AnalysisStore
+from robot_server.protocols.analysis_store import AnalysisStore, AnalysisNotFoundError
 from robot_server.protocols.analysis_models import (
     AnalysisResult,
     AnalysisStatus,
@@ -29,6 +29,9 @@ def test_get_empty() -> None:
     assert result == []
     assert summaries_result == []
 
+    with pytest.raises(AnalysisNotFoundError, match="analysis-id"):
+        subject.get("analysis-id")
+
 
 def test_add_pending() -> None:
     """It should add a pending analysis to the store."""
@@ -42,6 +45,7 @@ def test_add_pending() -> None:
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
 
     assert result == expected_summary
+    assert subject.get("analysis-id") == expected_analysis
     assert subject.get_by_protocol("protocol-id") == [expected_analysis]
     assert subject.get_summaries_by_protocol("protocol-id") == [expected_summary]
 
@@ -72,18 +76,17 @@ def test_add_analysis_equipment() -> None:
         errors=[],
     )
 
-    result = subject.get_by_protocol("protocol-id")
+    result = subject.get("analysis-id")
 
-    assert result == [
-        CompletedAnalysis(
-            id="analysis-id",
-            result=AnalysisResult.OK,
-            labware=[labware],
-            pipettes=[pipette],
-            commands=[],
-            errors=[],
-        )
-    ]
+    assert result == CompletedAnalysis(
+        id="analysis-id",
+        result=AnalysisResult.OK,
+        labware=[labware],
+        pipettes=[pipette],
+        commands=[],
+        errors=[],
+    )
+    assert subject.get_by_protocol("protocol-id") == [result]
 
 
 class CommandAnalysisSpec(NamedTuple):
