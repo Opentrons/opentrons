@@ -36,6 +36,10 @@ _log = getLogger(__name__)
 _ANALYZER_VERSION = "TODO"
 
 
+class AnalysisNotFoundError(Exception):
+    """Raised when requesting an analysis by its ID and that analysis doesn't exist."""
+
+
 class AnalysisStore:
     """Storage interface for protocol analyses.
 
@@ -46,24 +50,25 @@ class AnalysisStore:
     """
 
     def __init__(self, sql_engine: SQLEngine) -> None:
-        """Initialize the AnalysisStore's internal state."""
+        """Initialize the `AnalysisStore`."""
         self._sql_engine = sql_engine
 
         # To make it easier for us to preserve the correct order of analyses
         # when some are stored in the database and some are stored in-memory,
-        # we only allow at most one pending analysis per protocol at a time.
+        # we disallow more than one pending analysis per protocol at a time.
         self._pending_analyses_by_protocol: Dict[str, PendingAnalysis] = {}
 
     def add_pending(self, protocol_id: str, analysis_id: str) -> AnalysisSummary:
         """Add a new pending analysis to the store.
 
         Parameters:
-            protocol_id: The protocol to add an analysis to.
+            protocol_id: The protocol to add the new pending analysis to.
+                Must not already have a pending analysis.
             analysis_id: The ID of the new analysis.
                 Must be unique across *all* protocols, not just this one.
 
         Returns:
-            The just-added analysis.
+            A summary of the just-added analysis.
         """
         assert (
             protocol_id not in self._pending_analyses_by_protocol
@@ -76,6 +81,9 @@ class AnalysisStore:
 
         # For implementation simplicity, we don't check our assumption that
         # the analysis_id must be unique across protocols.
+        # If the caller violates this assumption, it will eventually be a SQL
+        # constraint violation when they promote this pending analysis to a completed one,
+        # and we try inserting it into the database.
 
         pending_analysis = PendingAnalysis.construct(id=analysis_id)
         self._pending_analyses_by_protocol[protocol_id] = pending_analysis
@@ -89,11 +97,20 @@ class AnalysisStore:
         pipettes: List[LoadedPipette],
         errors: List[ErrorOccurrence],
     ) -> None:
-        """Promote a pending analysis to completed, adding details of its results."""
+        """Promote a pending analysis to completed, adding details of its results.
+
+        Raises:
+            AnalysisNotFoundError: If `analysis_id` doesn't point to a pending analysis.
+        """
         if len(errors) > 0:
             result = AnalysisResult.NOT_OK
         else:
             result = AnalysisResult.OK
+
+        # Allow AnalysisNotFoundError to propagate.
+        protocol_id = self._get_protocol_of_pending_analysis(
+            pending_analysis_id=analysis_id
+        )
 
         completed_analysis = CompletedAnalysis.construct(
             id=analysis_id,
@@ -103,19 +120,6 @@ class AnalysisStore:
             pipettes=pipettes,
             errors=errors,
         )
-
-        protocol_id: Optional[str] = None
-
-        # TODO(mm, 2021-04-20): This linear search is inefficient.
-        for (
-            protocol_id_candidate,
-            pending_analysis,
-        ) in self._pending_analyses_by_protocol.items():
-            if pending_analysis.id == analysis_id:
-                protocol_id = protocol_id_candidate
-                break
-
-        assert protocol_id is not None, "Can only update a pending analysis."
 
         completed_analysis_resource = _CompletedAnalysisResource(
             id=completed_analysis.id,
@@ -162,6 +166,25 @@ class AnalysisStore:
             pending_analyses = []
 
         return completed_analyses + pending_analyses
+
+    def _get_protocol_of_pending_analysis(self, pending_analysis_id: str) -> str:
+        """Return the protocol that owns the given pending analysis.
+
+        Raises:
+            AnalysisNotFoundError: If pending_analysis_id doesn't point to any
+                analysis, or points to analysis that isn't pending.
+        """
+        # This linear search is inefficient,
+        # but we only expect a protocol to have a handful of analyses, at most.
+        for (
+            protocol_id_candidate,
+            pending_analysis,
+        ) in self._pending_analyses_by_protocol.items():
+            if pending_analysis.id == pending_analysis_id:
+                return protocol_id_candidate
+        raise AnalysisNotFoundError(
+            f'Analysis {pending_analysis_id} does not exist or is not pending.'
+        )
 
     def _sql_get_by_protocol(
         self, protocol_id: str
