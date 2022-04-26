@@ -149,7 +149,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         """
         DELTA: Final = 100
         status = SpeedStatus.IDLE
-        if (speed.target is not None) and (speed.target != 0):
+        if speed.target is not None:
             diff = speed.target - speed.current
             if abs(diff) < DELTA:  # To avoid status fluctuation near target
                 status = SpeedStatus.HOLDING
