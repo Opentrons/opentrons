@@ -61,7 +61,8 @@ def parse_temperature_response(
     does not currently have a target temperature set and is not regulating
     (as the heater/shaker does - it has a resistive heater rather than a
     thermoelectric cooler, and therefore cannot regulate on a temperature below
-    ambient).
+    ambient). Heater/shaker firmware has been updated to return a target of None
+    if heater is deactivated or in error state.
 
     Example input: "T:none C:25"""
     data = parse_key_values(temperature_string)
