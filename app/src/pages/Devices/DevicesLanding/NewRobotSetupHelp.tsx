@@ -5,6 +5,9 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Link,
+  TYPOGRAPHY,
+  TEXT_TRANSFORM_CAPITALIZE,
+  SPACING,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -24,7 +27,10 @@ export function NewRobotSetupHelp(): JSX.Element {
 
   return (
     <>
-      <Link onClick={() => setShowNewRobotHelpModal(true)}>
+      <Link
+        css={TYPOGRAPHY.labelSemiBold}
+        onClick={() => setShowNewRobotHelpModal(true)}
+      >
         {t('see_how_to_setup_new_robot')}
       </Link>
       <Portal>
@@ -34,13 +40,16 @@ export function NewRobotSetupHelp(): JSX.Element {
             onClose={() => setShowNewRobotHelpModal(false)}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="p">{t('use_usb_cable_for_new_robot')}</StyledText>
+              <StyledText as="p" marginBottom={SPACING.spacing4}>
+                {t('use_usb_cable_for_new_robot')}
+              </StyledText>
               <ExternalLink href={NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF}>
                 {t('learn_more_about_new_robot_setup')}
               </ExternalLink>
               <PrimaryButton
                 onClick={() => setShowNewRobotHelpModal(false)}
                 alignSelf={ALIGN_FLEX_END}
+                textTransform={TEXT_TRANSFORM_CAPITALIZE}
               >
                 {t('shared:close')}
               </PrimaryButton>
