@@ -108,28 +108,27 @@ def test_get_run_state(
     assert engine_state == result
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture
 def teardown():
     print("setup")
     yield None
     print("teardown")
 
 
-class TestStateType:
-    @pytest.mark.parametrize("pickle_type", [False, True])
-    def test_insert_get_by_state_type(self, subject: EngineStateStore, protocol_run: ProtocolRunData, pickle_type: bool, teardown) -> None:
-        """It should test the time for prasing a json type and a string type."""
-        engine_state = EngineStateResource(
-            run_id="run-id",
-            state=protocol_run,
-            # created_at=datetime.now()
-        )
+@pytest.mark.parametrize("pickle_type", [True, False])
+def test_insert_get_by_state_type(subject: EngineStateStore, protocol_run: ProtocolRunData, pickle_type: bool, teardown) -> None:
+    """It should test the time for prasing a json type and a string type."""
+    engine_state = EngineStateResource(
+        run_id="run-id",
+        state=protocol_run,
+        # created_at=datetime.now()
+    )
 
-        subject.insert_state_by_type(state=engine_state, insert_pickle=pickle_type)
-        result_state = subject.get_state_by_type(run_id="run-id", return_pickle=pickle_type)
+    subject.insert_state_by_type(state=engine_state, insert_pickle=pickle_type)
+    result_state = subject.get_state_by_type(run_id="run-id", return_pickle=pickle_type)
 
-        assert engine_state.run_id == result_state.run_id
-        assert engine_state.state == result_state.state
+    assert engine_state.run_id == result_state.run_id
+    assert engine_state.state == result_state.state
 
 
 def test_insert_state_run_not_found(

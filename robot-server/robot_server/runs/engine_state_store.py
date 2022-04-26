@@ -19,7 +19,6 @@ class EngineStateResource:
 
     run_id: str
     state: ProtocolRunData
-    state_string: Optional[str] = None
     # created_at: datetime
 
 

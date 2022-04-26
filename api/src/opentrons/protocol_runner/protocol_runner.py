@@ -36,7 +36,6 @@ from .legacy_wrappers import (
 )
 
 
-# @dataclass(frozen=True)
 class ProtocolRunData(BaseModel):
     """Data from a protocol run."""
 

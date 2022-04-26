@@ -10,6 +10,8 @@ from typing_extensions import Literal
 from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel, Field
 
+from opentrons.protocol_runner import ProtocolRunData
+
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.task_runner import TaskRunner
@@ -31,9 +33,10 @@ from robot_server.protocols import (
 )
 
 from ..run_store import RunStore, RunResource, RunNotFoundError
+from ..engine_state_store import EngineStateResource, EngineStateStore
 from ..run_models import Run, RunSummary, RunCreate, RunUpdate
 from ..engine_store import EngineStore, EngineConflictError
-from ..dependencies import get_run_store, get_engine_store
+from ..dependencies import get_run_store, get_engine_store, get_engine_state_store
 
 
 log = logging.getLogger(__name__)
@@ -316,6 +319,7 @@ async def update_run(
     request_body: RequestModel[RunUpdate],
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
+    engine_state_store: EngineStateStore = Depends(get_engine_state_store),
 ) -> PydanticResponse[SimpleBody[Run]]:
     """Update a run by its ID.
 
@@ -346,6 +350,20 @@ async def update_run(
 
     engine_state = engine_store.get_state(run.run_id)
 
+    store_run_state = ProtocolRunData(
+        errors=engine_state.commands.get_all_errors(),
+        pipettes=engine_state.pipettes.get_all(),
+        labware=engine_state.labware.get_all(),
+        labwareOffsets=engine_state.labware.get_labware_offsets(),
+        # status=engine_state.commands.get_status(),
+        commands=engine_state.commands.get_all(),
+        modules=engine_state.modules.get_all()
+    )
+
+    engine_state_store.insert(EngineStateResource.costruct(
+        run_id=run.run_id,
+        state=store_run_state
+    ))
     data = Run.construct(
         id=run.run_id,
         protocolId=run.protocol_id,
