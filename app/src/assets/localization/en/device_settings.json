@@ -92,7 +92,6 @@
   "factory_reset_slideout_download_logs_link": "Download",
   "factory_reset_modal_title": "Reset to factory settings?",
   "factory_reset_modal_description": "This data cannot be retrieved later.",
-  "factory_reset_model_cancel_button": "Cancel",
   "factory_reset_modal_confirm_button": "Yes, clear data and restart robot",
   "factory_reset_modal_connection_lost_title": "Connection to robot lost",
   "factory_reset_modal_connection_lost_description": "The Opentrons App is unable to communicate with this robot right now. Double check the USB or Wifi connection to the robot, then try to reconnect.",

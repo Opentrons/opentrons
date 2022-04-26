@@ -8,6 +8,7 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
   SPACING,
+  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { StyledText } from '../../../../../atoms/text'
 import { PrimaryButton, SecondaryButton } from '../../../../../atoms/Buttons'
@@ -41,7 +42,7 @@ export function FactoryResetModal({
     name: 'alert-circle',
     color: COLORS.blue,
   }
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'shared'])
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const resetRequestStatus = useSelector((state: State) => {
     const lastId = last(requestIds)
@@ -71,8 +72,9 @@ export function FactoryResetModal({
               <SecondaryButton
                 onClick={closeModal}
                 marginRight={SPACING.spacing3}
+                textTransform={TEXT_TRANSFORM_CAPITALIZE}
               >
-                {t('factory_reset_model_cancel_button')}
+                {t('shared:cancel')}
               </SecondaryButton>
               <PrimaryButton
                 backgroundColor={COLORS.error}
