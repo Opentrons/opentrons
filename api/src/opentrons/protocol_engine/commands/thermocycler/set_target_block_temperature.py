@@ -49,7 +49,20 @@ class SetTargetBlockTemperatureImpl(
         params: SetTargetBlockTemperatureParams,
     ) -> SetTargetBlockTemperatureResult:
         """Set a Thermocycler's target block temperature."""
-        raise NotImplementedError()
+        thermocycler_state = self._state_view.modules.get_thermocycler_module_substate(
+            params.moduleId
+        )
+        target_temperature = thermocycler_state.validate_target_block_temperature(
+            params.temperature
+        )
+        thermocycler_hardware = self._equipment.get_module_hardware_api(
+            thermocycler_state.module_id
+        )
+
+        if thermocycler_hardware is not None:
+            await thermocycler_hardware.set_target_block_temperature(target_temperature)
+
+        return SetTargetBlockTemperatureResult()
 
 
 class SetTargetBlockTemperature(
