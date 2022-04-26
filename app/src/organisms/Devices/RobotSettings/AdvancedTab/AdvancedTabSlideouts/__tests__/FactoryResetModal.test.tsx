@@ -42,7 +42,7 @@ describe('RobotSettings FactoryResetModal', () => {
   })
 
   it('should render title, description, and buttons', () => {
-    const [{ getByText, getByRole, getByLabelText }] = render({
+    const [{ getByText, getByRole }] = render({
       closeModal: mockCloseModal,
       isRobotConnected: true,
       robotName: ROBOT_NAME,
