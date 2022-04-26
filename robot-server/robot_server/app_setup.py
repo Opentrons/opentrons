@@ -51,7 +51,7 @@ async def on_startup() -> None:
 
     initialize_logging()
     initialize_hardware(app.state)
-    app.state.task_runner = await TaskRunner.make_task_runner()
+    app.state.task_runner = TaskRunner()
 
 
 @app.on_event("shutdown")

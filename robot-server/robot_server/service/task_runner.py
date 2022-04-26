@@ -3,11 +3,11 @@
 The task runner refactor is now using anyio instead of fastapi.BackgroundTasks.
 Testing will be similar to the previous code base primarily integration and end-to-end tests.
 """
+
 from __future__ import annotations
+import asyncio
 from logging import getLogger
-from typing import Any, Awaitable, Callable
-from anyio import create_task_group
-from anyio.abc import TaskGroup
+from typing import Any, Awaitable, Callable, Set
 from fastapi import Depends
 from robot_server.app_state import AppState, AppStateValue, get_app_state
 
@@ -18,19 +18,14 @@ TaskFunc = Callable[..., Awaitable[Any]]
 
            
 class TaskRunner:
-    def __init__(self, task_group: TaskGroup) -> None:
-        """Initialize the TaskRunner using Anyio
-        __init__() is private, not to be called by anything outside of this module.ç
+    def __init__(self) -> None:
+        """Initialize the TaskRunner by using Python Set
         """
-        self._task_group = task_group
 
-    
-    @classmethod    
-    async def make_task_runner(cls) -> TaskRunner:
-        tg = create_task_group() 
-        await tg.__aenter__()
-        return cls(tg)
-                   
+        self._running_tasks: Set[asyncio.Task[None]] = set()
+        #set of background tasks
+
+     
     def run(self, func: TaskFunc, **kwargs: Any) -> None:
         """Run an async function in the background.
 
@@ -42,21 +37,20 @@ class TaskRunner:
             Use **kwargs to pass to func.
         """
         func_name = func.__qualname__
-                
-        async def py_closure() -> None:
-            #py_closure() is a calllable
-            await func(**kwargs)
-            # Just call func with the arguments passed into it
-           
-        self._task_group.start_soon(py_closure, name = func_name)
-            
-                 
+                           
+        new_ct = asyncio.create_task(func(**kwargs))
+        #Create Tasks running in the background
+        self._running_tasks.add(new_ct)
+        
+                    
     async def cancel_all_and_clean_up(self) -> None:
-        self._task_group.cancel_scope.cancel()
-        await self._task_group.__aexit__(None, None, None) 
+        for i in self._running_tasks: 
+            i.cancel()
+        await asyncio.gather(*self._running_tasks, return_exceptions = True)
+
         log.debug(f"Background task cancelled_cleanedup")
         # Clean up all cancelled tasks 
-        raise NotImplementedError
+
     
 def get_task_runner(app_state: AppState = Depends(get_app_state)) -> TaskRunner:
     return app_state.task_runner
