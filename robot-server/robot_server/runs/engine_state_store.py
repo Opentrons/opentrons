@@ -50,6 +50,50 @@ class EngineStateStore:
 
         return state
 
+    def insert_state_by_type(
+        self, state: EngineStateResource, insert_pickle: bool
+    ) -> EngineStateResource:
+        """Get engine state from db.
+
+        Arguments:
+            run_id: Run id related to the engine state.
+
+        Returns:
+            The engine state that found in the store.
+        """
+        statement = sqlalchemy.insert(engine_state_table).values(
+            _convert_state_to_sql_values(state=state)
+        )
+        with self._sql_engine.begin() as transaction:
+            try:
+                transaction.execute(statement)
+            except sqlalchemy.exc.IntegrityError:
+                raise RunNotFoundError(run_id=state.run_id)
+
+        return state
+
+    def get_state_by_type(
+        self, run_id: str, return_pickle: bool
+    ) -> EngineStateResource:
+        """Get engine state from db.
+
+        Arguments:
+            run_id: Run id related to the engine state.
+
+        Returns:
+            The engine state that found in the store.
+        """
+        statement = sqlalchemy.select(engine_state_table).where(
+            engine_state_table.c.run_id == run_id
+        )
+        with self._sql_engine.begin() as transaction:
+            state_row = transaction.execute(statement).one()
+        if return_pickle:
+            state_result = ProtocolRunData.parse_raw(state_row.state_string)
+        state_result = parse_obj_as(ProtocolRunData, state_row.state)
+
+        return EngineStateResource(run_id=run_id, state=state_result)
+
     def get(self, run_id: str) -> EngineStateResource:
         """Get engine state from db.
 
@@ -68,19 +112,25 @@ class EngineStateStore:
 
 
 def _convert_sql_row_to_sql_engine_state(
-        sql_row: sqlalchemy.engine.Row,
+    sql_row: sqlalchemy.engine.Row,
 ) -> EngineStateResource:
     run_id = sql_row.run_id
     assert isinstance(run_id, str)
 
-    state_pickle = sql_row.state_pickle
-    assert isinstance(state_pickle, Dict)
+    state = sql_row.state
+    assert isinstance(state, Dict)
 
     state_string = sql_row.state_string
     assert isinstance(state_string, str)
 
-    return EngineStateResource(run_id=run_id, state=parse_obj_as(ProtocolRunData, state_pickle), state_string=ProtocolRunData.parse_raw(state_string))
+    return EngineStateResource(
+        run_id=run_id, state=parse_obj_as(ProtocolRunData, state)
+    )
 
 
 def _convert_state_to_sql_values(state: EngineStateResource) -> Dict[str, object]:
-    return {"run_id": state.run_id, "state_pickle": state.state.dict(), "state_string": state.state.json()}
+    return {
+        "run_id": state.run_id,
+        "state": state.state.dict(),
+        "state_string": state.state.json(),
+    }

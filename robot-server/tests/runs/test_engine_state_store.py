@@ -1,13 +1,10 @@
 """Tests for robot_server.runs.run_store."""
-import json
-
 import pytest
 from datetime import datetime
 from typing import Generator
 
 import sqlalchemy
 from pathlib import Path
-from pydantic import parse_obj_as
 
 from opentrons.protocol_runner import ProtocolRunData
 from opentrons.protocol_engine import (
@@ -95,7 +92,9 @@ def test_insert_state(subject: EngineStateStore, protocol_run: ProtocolRunData) 
     assert result == engine_state
 
 
-def test_get_run_state(subject: EngineStateStore, protocol_run: ProtocolRunData) -> None:
+def test_get_run_state(
+    subject: EngineStateStore, protocol_run: ProtocolRunData
+) -> None:
     """It should be able to get engine state from the store."""
     engine_state = EngineStateResource(
         run_id="run-id",
@@ -106,8 +105,29 @@ def test_get_run_state(subject: EngineStateStore, protocol_run: ProtocolRunData)
     subject.insert(state=engine_state)
     result = subject.get("run-id")
 
-    assert engine_state.run_id == result.run_id
-    assert engine_state.state == result.state
+    assert engine_state == result
+
+
+def test_insert_get_by_state_type(
+    subject: EngineStateStore, protocol_run: ProtocolRunData
+) -> None:
+    """It should test the time for prasing a json type and a string type"""
+    engine_state = EngineStateResource(
+        run_id="run-id",
+        state=protocol_run,
+        # created_at=datetime.now()
+    )
+
+    subject.insert(state=engine_state)
+    result_pickle_state = subject.get_state_by_type(run_id="run-id", return_pickle=True)
+    result_pickle_string = subject.get_state_by_type(
+        run_id="run-id", return_pickle=False
+    )
+
+    assert engine_state.run_id == result_pickle_state.run_id
+    assert engine_state.state == result_pickle_state.state
+    assert engine_state.run_id == result_pickle_string.run_id
+    assert engine_state.state == result_pickle_string.state
 
 
 def test_insert_state_run_not_found(
