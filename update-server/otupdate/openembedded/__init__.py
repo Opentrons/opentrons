@@ -15,7 +15,7 @@ from otupdate.common import (
 )
 
 from otupdate.openembedded.updater import RootFSInterface, PartitionManager, Updater
-from ..common.update_actions import FILE_ACTIONS_VARNAME
+from otupdate.common.update_actions import FILE_ACTIONS_VARNAME
 
 BR_BUILTIN_VERSION_FILE = "/etc/VERSION.json"
 

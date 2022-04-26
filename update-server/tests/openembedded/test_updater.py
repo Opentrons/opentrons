@@ -43,10 +43,6 @@ def test_update_valid_part_switch(
     mock_partition_manager_valid_switch.find_unused_partition.assert_called()
 
 
-# test invalid partition switch
-# root fs not being written to unused partition
-
-
 def test_update_invalid_part_switch(
     mock_root_fs_interface: MagicMock, mock_partition_manager_invalid_switch: MagicMock
 ):
@@ -95,7 +91,6 @@ def test_decomp_and_write(
 
 
 def test_commit_update(
-    monkeypatch,
     mock_root_fs_interface: MagicMock,
     mock_partition_manager_valid_switch: MagicMock,
 ):
@@ -110,11 +105,11 @@ def test_commit_update(
 
 
 def test_lzma(testing_partition, tmpdir):
-    """Test that lzma decompresses a .xz
-    correctly.
-    Updater::write_update has a callback to report
-    progress. callback gets kicked off
-    on writing every chunk.
+    """Test that lzma decompresses a .xz correctly.
+
+    Updater::write_update has a callback to report progress. callback gets kicked
+    off on writing every chunk.
+
     This test uses callback call count to see if
     the entire file decompresses correctly.
     """

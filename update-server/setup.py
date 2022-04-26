@@ -69,7 +69,5 @@ if __name__ == "__main__":
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
         tests_require=['pytest'],
-        # TODO (al, 2022-03-16): Is this really in pypy ? (NO)!
-        # extras_require={'openembedded': 'bmap-tools==3.6'},
         include_package_data=True
     )
