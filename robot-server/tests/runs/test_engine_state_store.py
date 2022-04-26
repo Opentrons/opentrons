@@ -85,6 +85,7 @@ def test_insert_state(subject: EngineStateStore, protocol_run: ProtocolRunData) 
     engine_state = EngineStateResource(
         run_id="run-id",
         state=protocol_run,
+        engine_status="idle"
         # created_at=datetime.now()
     )
     result = subject.insert(engine_state)
@@ -99,6 +100,7 @@ def test_get_run_state(
     engine_state = EngineStateResource(
         run_id="run-id",
         state=protocol_run,
+        engine_status="idle"
         # created_at=datetime.now()
     )
 
@@ -121,6 +123,7 @@ def test_insert_get_by_state_type(subject: EngineStateStore, protocol_run: Proto
     engine_state = EngineStateResource(
         run_id="run-id",
         state=protocol_run,
+        engine_status="idle"
         # created_at=datetime.now()
     )
 
@@ -138,6 +141,7 @@ def test_insert_state_run_not_found(
     engine_state = EngineStateResource(
         run_id="run-not-found",
         state=protocol_run,
+        engine_status="idle"
         # created_at=datetime.now()
     )
 
