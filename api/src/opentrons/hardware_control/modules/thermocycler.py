@@ -299,7 +299,12 @@ class Thermocycler(mod_abc.AbstractModule):
         await task
 
     # TODO(mc, 2022-04-25): de-duplicate with `set_temperature`
-    async def set_target_block_temperature(self, celsius: float) -> None:
+    async def set_target_block_temperature(
+        self,
+        celsius: float,
+        hold_time_seconds: Optional[float] = None,
+        volume: Optional[float] = None,
+    ) -> None:
         """Set the Thermocycler's target block temperature.
 
         Does not wait for the target temperature to be reached.
@@ -308,7 +313,12 @@ class Thermocycler(mod_abc.AbstractModule):
             celsius: The target block temperature, in degrees celsius.
         """
         await self.wait_for_is_running()
-        await self._driver.set_plate_temperature(temp=celsius)
+        await self._driver.set_plate_temperature(
+            temp=celsius,
+            hold_time=hold_time_seconds,
+            volume=volume,
+        )
+        await self.wait_next_poll()
 
     async def _wait_for_lid_temp(self) -> None:
         """
