@@ -13,7 +13,7 @@ from anyio import Path as AsyncPath, create_task_group
 import sqlalchemy
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
-from robot_server.persistence import protocol_table
+from robot_server.persistence import analysis_table, protocol_table
 
 
 _log = getLogger(__name__)
@@ -239,7 +239,10 @@ class ProtocolStore:
         select_statement = sqlalchemy.select(protocol_table).where(
             protocol_table.c.id == protocol_id
         )
-        delete_statement = sqlalchemy.delete(protocol_table).where(
+        delete_analyses_statement = sqlalchemy.delete(analysis_table).where(
+            analysis_table.c.protocol_id == protocol_id
+        )
+        delete_protocol_statement = sqlalchemy.delete(protocol_table).where(
             protocol_table.c.id == protocol_id
         )
         with self._sql_engine.begin() as transaction:
@@ -249,7 +252,8 @@ class ProtocolStore:
                 row_to_delete = transaction.execute(select_statement).one()
             except sqlalchemy.exc.NoResultFound as e:
                 raise ProtocolNotFoundError(protocol_id=protocol_id) from e
-            transaction.execute(delete_statement)
+            transaction.execute(delete_analyses_statement)
+            transaction.execute(delete_protocol_statement)
 
         deleted_resource = _convert_sql_row_to_dataclass(sql_row=row_to_delete)
         return deleted_resource
