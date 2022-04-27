@@ -10,9 +10,9 @@ import {
   RPM,
   CELSIUS,
   HS_RPM_MAX,
-  TEMP_MAX,
   HS_RPM_MIN,
-  TEMP_MIN,
+  TEMP_LID_MIN,
+  TEMP_MAX,
 } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
 import {
@@ -133,13 +133,13 @@ export const HeaterShakerSlideout = (
   } else {
     errorMessage =
       hsValue != null &&
-      (parseInt(hsValue) < TEMP_MIN || parseInt(hsValue) > TEMP_MAX)
+      (parseInt(hsValue) < TEMP_LID_MIN || parseInt(hsValue) > TEMP_MAX)
         ? t('input_out_of_range')
         : null
   }
 
   const inputMax = isSetShake ? HS_RPM_MAX : TEMP_MAX
-  const inputMin = isSetShake ? HS_RPM_MIN : TEMP_MIN
+  const inputMin = isSetShake ? HS_RPM_MIN : TEMP_LID_MIN
   const unit = isSetShake ? RPM : CELSIUS
 
   return (
@@ -165,7 +165,7 @@ export const HeaterShakerSlideout = (
             width="100%"
             data-testid={`HeaterShakerSlideout_btn_${module.serialNumber}`}
           >
-            {t('set_temp_or_shake', { part: modulePart })}
+            {t('confirm')}
           </PrimaryButton>
         }
       >

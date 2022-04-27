@@ -61,8 +61,8 @@ describe('ThermocyclerModuleSlideout', () => {
     getByText(
       'Pre heat or cool your Thermocycler Lid. Enter a whole number between 37 °C and 110 °C.'
     )
-    getByText('Temperature')
-    getByText('Set Lid Temperature')
+    getByText('Set lid temperature')
+    getByText('Confirm')
   })
 
   it('renders correct title and body for Thermocycler Block Temperature', () => {
@@ -78,8 +78,8 @@ describe('ThermocyclerModuleSlideout', () => {
     getByText(
       'Pre heat or cool your Thermocycler Block. Enter a whole number between 4 °C and 99 °C.'
     )
-    getByText('Temperature')
-    getByText('Set Block Temperature')
+    getByText('Set block temperature')
+    getByText('Confirm')
   })
 
   it('renders the button and it is not clickable until there is something in form field for the TC Block', () => {
@@ -90,7 +90,7 @@ describe('ThermocyclerModuleSlideout', () => {
       onCloseClick: jest.fn(),
     }
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Block Temperature' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('thermocyclerModuleV1_false')
     fireEvent.change(input, { target: { value: '45' } })
     expect(button).toBeEnabled()
@@ -116,7 +116,7 @@ describe('ThermocyclerModuleSlideout', () => {
       onCloseClick: jest.fn(),
     }
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Lid Temperature' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('thermocyclerModuleV1_true')
     fireEvent.change(input, { target: { value: '45' } })
     expect(button).toBeEnabled()

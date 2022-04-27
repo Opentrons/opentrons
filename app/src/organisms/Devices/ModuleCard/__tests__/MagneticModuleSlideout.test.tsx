@@ -67,8 +67,8 @@ describe('MagneticModuleSlideout', () => {
     getByText('40')
     getByText('0')
     getByText('-5')
-    getByText('Engage height')
     getByText('Set Engage Height')
+    getByText('Confirm')
   })
 
   it('renders correct title and body for a gen2 magnetic module', () => {
@@ -90,13 +90,13 @@ describe('MagneticModuleSlideout', () => {
     getByText('16 mm')
     getByText('0 mm')
     getByText('-4 mm')
-    getByText('Engage height')
     getByText('Set Engage Height')
+    getByText('Confirm')
   })
 
   it('renders the button and it is not clickable until there is something in form field', () => {
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Engage Height' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('magneticModuleV1')
     fireEvent.change(input, { target: { value: '10' } })
     expect(button).toBeEnabled()

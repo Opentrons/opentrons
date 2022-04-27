@@ -142,12 +142,16 @@ function Input(props: InputFieldProps): JSX.Element {
         )}
       </Flex>
       <Flex
-        color={error ? COLORS.error : COLORS.darkGreyEnabled}
+        color={COLORS.darkGreyEnabled}
         fontSize={TYPOGRAPHY.fontSizeH6}
         paddingTop={SPACING.spacing2}
+        flexDirection={DIRECTION_COLUMN}
       >
-        <span>{error ? props.error : props.caption}</span>
-        <span>{props.secondaryCaption}</span>
+        <Flex paddingBottom={SPACING.spacing2}>{props.caption}</Flex>
+        {props.secondaryCaption ? (
+          <Flex paddingBottom={SPACING.spacing2}>{props.secondaryCaption}</Flex>
+        ) : null}
+        <Flex color={COLORS.error}>{props.error}</Flex>
       </Flex>
     </Flex>
   )

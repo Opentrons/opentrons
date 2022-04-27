@@ -121,7 +121,7 @@ export const ThermocyclerModuleSlideout = (
           width="100%"
           data-testid={`ThermocyclerSlideout_btn_${module.serialNumber}`}
         >
-          {t('set_tc_temp_slideout', { part: modulePart })}
+          {t('confirm')}
         </PrimaryButton>
       }
     >
@@ -148,7 +148,7 @@ export const ThermocyclerModuleSlideout = (
           color={COLORS.darkGrey}
           marginBottom={SPACING.spacing1}
         >
-          {t('temperature')}
+          {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}
         </Text>
         <InputField
           data-testid={`${module.moduleModel}_${isSecondaryTemp}`}

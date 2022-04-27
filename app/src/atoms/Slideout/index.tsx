@@ -64,6 +64,17 @@ const COLLAPSED_STYLE = css`
   }
 `
 
+const CLOSE_ICON_STYLE = css`
+  border-radius: 50%;
+
+  &:hover {
+    background: #16212d26;
+  }
+  &:active {
+    background: #16212d40;
+  }
+`
+
 export const Slideout = (props: Props): JSX.Element | null => {
   const { isExpanded, title, onCloseClick, children, footer } = props
   return (
@@ -111,7 +122,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
                     typeof title === 'string' ? title : ''
                   }`}
                 >
-                  <Icon name="close" />
+                  <Icon name="close" css={CLOSE_ICON_STYLE} />
                 </Btn>
               </Flex>
             </Flex>
