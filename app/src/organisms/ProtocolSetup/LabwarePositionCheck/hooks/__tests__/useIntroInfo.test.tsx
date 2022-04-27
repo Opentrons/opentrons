@@ -7,7 +7,7 @@ import { renderHook } from '@testing-library/react-hooks'
 import { getPipetteNameSpecs, PipetteName } from '@opentrons/shared-data'
 import { getPipetteMount } from '../../../utils/getPipetteMount'
 import { useProtocolDetails } from '../../../../RunDetails/hooks'
-import * as hooks from '..'
+import { useIntroInfo } from '../useIntroInfo'
 import { getLabwareLocation } from '../../../utils/getLabwareLocation'
 import { getLabwarePositionCheckSteps } from '../../getLabwarePositionCheckSteps'
 import type { PickUpTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
@@ -121,7 +121,7 @@ describe('useIntroInfo', () => {
         </QueryClientProvider>
       </Provider>
     )
-    const { result } = renderHook(hooks.useIntroInfo, { wrapper })
+    const { result } = renderHook(useIntroInfo, { wrapper })
     const {
       primaryPipetteMount,
       secondaryPipetteMount,

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import reduce from 'lodash/reduce'
 import isEqual from 'lodash/isEqual'
@@ -17,6 +17,8 @@ import {
   useCreateCommandMutation,
 } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../../../redux/analytics'
+import { sendModuleCommand } from '../../../../redux/modules'
+import { useAttachedModules } from '../../../Devices/hooks'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import {
   useCurrentRunId,
@@ -24,11 +26,6 @@ import {
   useCurrentProtocol,
 } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
-import {
-  sendModuleCommand,
-  getAttachedModulesForConnectedRobot,
-} from '../../../../redux/modules'
-import { getConnectedRobotName } from '../../../../redux/robot/selectors'
 import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
 import { getModuleInitialLoadInfo } from '../../utils/getModuleInitialLoadInfo'
 import { getLabwareOffsetLocation } from '../../utils/getLabwareOffsetLocation'
@@ -253,8 +250,8 @@ export function useLabwarePositionCheck(
   const trackEvent = useTrackEvent()
   const LPCSteps = useSteps()
   const dispatch = useDispatch()
-  const robotName = useSelector(getConnectedRobotName)
-  const attachedModules = useSelector(getAttachedModulesForConnectedRobot)
+  const robotName = host?.robotName ?? ''
+  const attachedModules = useAttachedModules(robotName)
 
   const LPCCommands = LPCSteps.reduce<LabwarePositionCheckCreateCommand[]>(
     (commands, currentStep) => {
@@ -598,7 +595,7 @@ export function useLabwarePositionCheck(
             'Expected to be able to find thermocycler serial number, but could not.'
           )
         }
-        dispatch(sendModuleCommand(robotName as string, serial, 'open'))
+        dispatch(sendModuleCommand(robotName, serial, 'open'))
       } else {
         createCommand({
           runId: currentRunId,
