@@ -4,12 +4,15 @@ import subprocess
 import re
 import zipfile
 from unittest import mock
+from unittest.mock import MagicMock
 
 import pytest
 
 from otupdate import buildroot, common
 
 from otupdate import openembedded
+from otupdate.common.update_actions import Partition
+from otupdate.openembedded import PartitionManager
 from tests.common.config import FakeRootPartElem
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -71,6 +74,61 @@ def downloaded_update_file_common(request, extracted_update_file_common):
     return zip_path_arr
 
 
+def write_fake_rootfs(
+    rootfs_name: str, rootfs_path: str, rootfs_contents: bytes, uncomp_xz_path: str
+):
+    if rootfs_name == "rootfs.xz":
+        with lzma.open(rootfs_path, "w") as f:
+            f.write(rootfs_contents)
+        with lzma.open(rootfs_path, "rb") as fsrc, open(uncomp_xz_path, "wb") as fdst:
+            while True:
+                chunk = fsrc.read(1024)
+                fdst.write(chunk)
+                if len(chunk) != 1024:
+                    break
+        return uncomp_xz_path
+    else:
+        with open(rootfs_path, "wb") as rfs:
+            rfs.write(rootfs_contents)
+            return rootfs_path
+
+
+def gen_hash_val(
+    rootfs_name: str, rootfs_path: str, rootfs_contents: bytes, uncomp_xz_path: str
+):
+
+    if rootfs_name == "rootfs.xz":
+        try:
+            shasum_out = subprocess.check_output(
+                [
+                    "shasum",
+                    "-a",
+                    "256",
+                    write_fake_rootfs(
+                        rootfs_name, rootfs_path, rootfs_contents, uncomp_xz_path
+                    ),
+                ]
+            )
+            return shasum_out
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            pytest.skip("no shasum invokeable on command line")
+    else:
+        try:
+            shasum_out = subprocess.check_output(
+                [
+                    "shasum",
+                    "-a",
+                    "256",
+                    write_fake_rootfs(
+                        rootfs_name, rootfs_path, rootfs_contents, uncomp_xz_path
+                    ),
+                ]
+            )
+            return shasum_out
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            pytest.skip("no shasum invokeable on command line")
+
+
 @pytest.fixture
 def extracted_update_file_common(request, tmpdir):
     """
@@ -92,44 +150,22 @@ def extracted_update_file_common(request, tmpdir):
             "rootfs.ext4.hash.sig",
         ),
     ]
+
     for (rootfs, sha256, sig) in list_of_extracted_files:
         rootfs_path = os.path.join(tmpdir, rootfs)
         hash_path = os.path.join(tmpdir, sha256)
         sig_path = os.path.join(tmpdir, sig)
         uncomp_xz_path = os.path.join(tmpdir, "tmp_uncomp")
         rootfs_contents = os.urandom(100000)
-        if rootfs == "rootfs.xz":
-            with lzma.open(rootfs_path, "w") as f:
-                f.write(rootfs_contents)
-            with lzma.open(rootfs_path, "rb") as fsrc, open(
-                uncomp_xz_path, "wb"
-            ) as fdst:
-                while True:
-                    chunk = fsrc.read(1024)
-                    fdst.write(chunk)
-                    if len(chunk) != 1024:
-                        break
-        else:
-            with open(rootfs_path, "wb") as rfs:
-                rfs.write(rootfs_contents)
+
         if request.node.get_closest_marker("bad_hash"):
             hashval = b"0oas0ajcs0asd0asjc0ans0d9ajsd0ian0s9djas"
         else:
-            if rootfs == "rootfs.xz":
-                try:
-                    shasum_out = subprocess.check_output(
-                        ["shasum", "-a", "256", uncomp_xz_path]
-                    )
-                except (subprocess.CalledProcessError, FileNotFoundError):
-                    pytest.skip("no shasum invokeable on command line")
-            else:
-                try:
-                    shasum_out = subprocess.check_output(
-                        ["shasum", "-a", "256", rootfs_path]
-                    )
-                except (subprocess.CalledProcessError, FileNotFoundError):
-                    pytest.skip("no shasum invokeable on command line")
-            hashval = re.match(b"^([a-z0-9]+) ", shasum_out).group(1)
+
+            hashval = re.match(
+                b"^([a-z0-9]+) ",
+                gen_hash_val(rootfs, rootfs_path, rootfs_contents, uncomp_xz_path),
+            ).group(1)
         with open(hash_path, "wb") as rfsh:
             rfsh.write(hashval)
         if not request.node.get_closest_marker("bad_sig"):
@@ -171,3 +207,19 @@ def testing_partition(monkeypatch, tmpdir):
         "ONE", common.update_actions.Partition(1, partfile2)
     )
     return partfile
+
+
+@pytest.fixture
+def mock_partition_manager_valid_switch(tmpdir) -> MagicMock:
+    """Mock Partition Manager."""
+    partfile = os.path.join(tmpdir, "fake-partition")
+    mock_part = MagicMock(spec=PartitionManager)
+    mock_part.find_unused_partition.return_value = Partition(2, partfile)
+    mock_part.switch_partition.return_value = Partition(2, partfile)
+    mock_part.resize_partition.return_value = True
+    mock_part.mount_fs.return_value = True
+    mock_part.umount_fs.return_value = True
+
+    mock_part.mountpoint_root.return_value = "/mnt"
+
+    return mock_part

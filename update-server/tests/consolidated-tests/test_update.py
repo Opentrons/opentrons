@@ -12,11 +12,9 @@ from otupdate.buildroot import update, config, update_actions
 from otupdate.common import file_actions
 from otupdate.common.session import UpdateSession, Stages
 from otupdate.common.update_actions import UpdateActionsInterface
-from otupdate.openembedded import Updater, PartitionManager, RootFSInterface
+from otupdate.openembedded import Updater, RootFSInterface
 from tests.openembedded.conftest import (
     mock_partition_manager_valid_switch_,
-    mock_root_fs_interface,
-    mock_partition_manager_valid_switch,
 )
 
 
@@ -151,10 +149,10 @@ async def test_update_happypath(
     mock_partition_manager_valid_switch,
     extracted_update_file_common,
 ):
-    fs_intf = RootFSInterface()
+
     updaters = [
         Updater(
-            root_FS_intf=fs_intf,
+            root_FS_intf=RootFSInterface(),
             part_mngr=mock_partition_manager_valid_switch,
         ),
         (update_actions.OT2UpdateActions()),

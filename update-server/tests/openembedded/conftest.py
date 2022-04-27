@@ -76,16 +76,16 @@ FakeRootPartElem = collections.namedtuple("FakeRootPartElem", ("name", "value"))
 def mock_partition_manager_valid_switch(tmpdir) -> MagicMock:
     """Mock Partition Manager."""
     partfile = os.path.join(tmpdir, "fake-partition")
-    mock = MagicMock(spec=PartitionManager)
-    mock.find_unused_partition.return_value = Partition(2, partfile)
-    mock.switch_partition.return_value = Partition(2, partfile)
-    mock.resize_partition.return_value = True
-    mock.mount_fs.return_value = True
-    mock.umount_fs.return_value = True
+    mock_part = MagicMock(spec=PartitionManager)
+    mock_part.find_unused_partition.return_value = Partition(2, partfile)
+    mock_part.switch_partition.return_value = Partition(2, partfile)
+    mock_part.resize_partition.return_value = True
+    mock_part.mount_fs.return_value = True
+    mock_part.umount_fs.return_value = True
 
-    mock.mountpoint_root.return_value = "/mnt"
+    mock_part.mountpoint_root.return_value = "/mnt"
 
-    return mock
+    return mock_part
 
 
 @pytest.fixture
