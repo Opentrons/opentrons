@@ -157,8 +157,8 @@ export function AdvancedSettings(): JSX.Element {
               >
                 {labwarePath}
                 <Icon
-                  width={SPACING.spacing3}
-                  height={SPACING.spacing3}
+                  width="0.7rem"
+                  height="0.7rem"
                   marginLeft={SPACING.spacing3}
                   name="open-in-new"
                 />
