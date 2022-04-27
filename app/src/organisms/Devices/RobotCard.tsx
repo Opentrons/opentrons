@@ -15,10 +15,12 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   BORDERS,
   ModuleIcon,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
+import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
 import { useAttachedModules, useAttachedPipettes } from './hooks'
 import { RobotStatusBanner } from './RobotStatusBanner'
@@ -37,6 +39,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const { name = null, local } = robot
   const { t } = useTranslation('devices_landing')
   const attachedModules = useAttachedModules(name)
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const attachedPipettes = useAttachedPipettes(name)
 
   return name != null ? (
@@ -97,11 +100,19 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
                     key={`${name}_${module.moduleModel}_${i}`}
                     moduleType={module.moduleType}
                     size={SPACING.spacing4}
-                    moduleModel={module.model}
-                    tooltipText={t(
-                      'this_robot_has_connected_and_power_on_module',
-                      { moduleName: getModuleDisplayName(module.model) }
-                    )}
+                    iconTargetProps={targetProps}
+                    moduleIconTooltip={
+                      <Flex position="relative" marginTop={SPACING.spacingM}>
+                        <Tooltip
+                          tooltipProps={tooltipProps}
+                          key={`ModuleIcon_tooltip_${i}`}
+                        >
+                          {t('this_robot_has_connected_and_power_on_module', {
+                            moduleName: getModuleDisplayName(module.model),
+                          })}
+                        </Tooltip>
+                      </Flex>
+                    }
                   />
                 ))}
               </Flex>
