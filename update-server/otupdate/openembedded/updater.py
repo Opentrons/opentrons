@@ -195,9 +195,12 @@ class Updater(UpdateActionsInterface):
                 f"packaged {packaged_hash!r}"
             )
             LOG.error(msg)
+<<<<<<< HEAD
         # tests for hash checksums expect a hash for the contents of
         # rootfs rather than the compresses file. For consolidated tests
         # to work, taking out this raise for now!
+=======
+>>>>>>> 13117b62b (testing)
         # raise HashMismatch(msg)
 
         if cert_path:
