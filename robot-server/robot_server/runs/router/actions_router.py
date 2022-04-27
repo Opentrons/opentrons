@@ -4,6 +4,8 @@ import logging
 from fastapi import APIRouter, Depends, status
 from datetime import datetime
 from typing import Union
+
+from opentrons.protocol_runner import ProtocolRunner
 from typing_extensions import Literal
 
 from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
@@ -13,12 +15,12 @@ from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
 from robot_server.service.task_runner import TaskRunner
 
+from ..engine_state_store import EngineStateStore
 from ..run_store import RunStore, RunNotFoundError
 from ..action_models import RunAction, RunActionType, RunActionCreate
 from ..engine_store import EngineStore
-from ..dependencies import get_run_store, get_engine_store
+from ..dependencies import get_run_store, get_engine_store, get_engine_state_store
 from .base_router import RunNotFound, RunStopped
-
 
 log = logging.getLogger(__name__)
 actions_router = APIRouter()
@@ -45,13 +47,14 @@ class RunActionNotAllowed(ErrorDetails):
     },
 )
 async def create_run_action(
-    runId: str,
-    request_body: RequestModel[RunActionCreate],
-    run_store: RunStore = Depends(get_run_store),
-    engine_store: EngineStore = Depends(get_engine_store),
-    action_id: str = Depends(get_unique_id),
-    created_at: datetime = Depends(get_current_time),
-    task_runner: TaskRunner = Depends(TaskRunner),
+        runId: str,
+        request_body: RequestModel[RunActionCreate],
+        run_store: RunStore = Depends(get_run_store),
+        engine_store: EngineStore = Depends(get_engine_store),
+        action_id: str = Depends(get_unique_id),
+        created_at: datetime = Depends(get_current_time),
+        task_runner: TaskRunner = Depends(TaskRunner),
+        engine_state_store: EngineStateStore = Depends(get_engine_state_store),
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 
@@ -89,7 +92,8 @@ async def create_run_action(
                 engine_store.runner.play()
             else:
                 log.info(f'Starting run "{runId}".')
-                task_runner.run(engine_store.runner.run)
+                collaborator = ProtocolRunnerWrapper(engine_store.runner, engine_state_store)
+                task_runner.run(collaborator.run)
 
         elif action.actionType == RunActionType.PAUSE:
             log.info(f'Pausing run "{runId}".')
@@ -108,3 +112,15 @@ async def create_run_action(
         content=SimpleBody.construct(data=action),
         status_code=status.HTTP_201_CREATED,
     )
+
+
+class ProtocolRunnerWrapper:
+    def __init__(self, runner: ProtocolRunner, engine_state_store: EngineStateStore):
+        _protocol_runner = runner
+        _engine_state_store = engine_state_store
+
+    async def run(
+            self
+    ) -> None:
+        result = self._protocol_runner.run()
+        self._engine_state_store.insert(result)

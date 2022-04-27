@@ -351,22 +351,20 @@ async def update_run(
 
     engine_state = engine_store.get_state(run.run_id)
 
-    store_run_state = ProtocolRunData(
+    protocol_run_data = ProtocolRunData(
         errors=engine_state.commands.get_all_errors(),
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
         labwareOffsets=engine_state.labware.get_labware_offsets(),
-        # TODO tz: do we want to add the status?
-        # status=engine_state.commands.get_status(),
         # added from protocol_runner, do we need it?
-        commands=engine_state.commands.get_all(),
+        commands=[],
         # added from protocol_runner, do we need it?
         modules=[]
     )
 
-    engine_state_store.insert(EngineStateResource(
+    insert_engine_state_result = engine_state_store.insert(EngineStateResource(
         run_id=run.run_id,
-        state=store_run_state,
+        state=protocol_run_data,
         engine_status=engine_state.commands.get_status()
     ))
 
@@ -376,11 +374,11 @@ async def update_run(
         createdAt=run.created_at,
         current=run.is_current,
         actions=run.actions,
-        errors=store_run_state.errors,
-        pipettes=store_run_state.pipettes,
-        labware=store_run_state.labware,
-        labwareOffsets=store_run_state.labwareOffsets,
-        status=engine_state.commands.get_status(),
+        errors=protocol_run_data.errors,
+        pipettes=protocol_run_data.pipettes,
+        labware=protocol_run_data.labware,
+        labwareOffsets=protocol_run_data.labwareOffsets,
+        status=insert_engine_state_result.engine_status if insert_engine_state_result else engine_state.commands.get_status(),
     )
 
     return await PydanticResponse.create(
