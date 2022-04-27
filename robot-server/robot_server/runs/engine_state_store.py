@@ -102,14 +102,13 @@ class EngineStateStore:
             count = transaction.execute("PRAGMA page_count").all()
         if return_pickle:
             state_result = parse_obj_as(ProtocolRunData, state_row.state)
-            print("---pickle-size---")
-            print(result)
-            print(count)
+            print("---pickle-db-size---")
+            print(f"{result}*{count}")
         else:
             state_result = ProtocolRunData.parse_raw(state_row.state_string)
-            print("---str-size---")
-            print(result)
-            print(count)
+            print("---str-db-size---")
+            print(f"{result}*{count}")
+
         state_result
 
         return EngineStateResource(run_id=run_id, state=state_result, engine_status=state_row.engine_status)
