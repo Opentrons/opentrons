@@ -52,7 +52,7 @@ def get_app(
         system_version_file = BR_BUILTIN_VERSION_FILE
 
     version = get_version(system_version_file)
-    name = name_override or name_management.get_name()
+    name = name_override or name_management.get_pretty_hostname()
     boot_id = boot_id_override or control.get_boot_id()
     config_obj = config.load(config_file_override)
 
@@ -99,8 +99,8 @@ def get_app(
             web.post("/server/ssh_keys", ssh_key_management.add),
             web.delete("/server/ssh_keys", ssh_key_management.clear),
             web.delete("/server/ssh_keys/{key_md5}", ssh_key_management.remove),
-            web.post("/server/name", name_management.set_name_endpoint),
-            web.get("/server/name", name_management.get_name_endpoint),
+            web.post("/server/name", name_management.set_display_name_endpoint),
+            web.get("/server/name", name_management.get_display_name_endpoint),
         ]
     )
     return app

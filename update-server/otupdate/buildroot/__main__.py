@@ -19,7 +19,7 @@ def main():
     systemd.configure_logging(getattr(logging, args.log_level.upper()))
 
     LOG.info("Setting hostname")
-    hostname = loop.run_until_complete(name_management.setup_hostname())
+    hostname = loop.run_until_complete(name_management.set_up_static_hostname())
     LOG.info(f"Set hostname to {hostname}")
 
     LOG.info("Building buildroot update server")

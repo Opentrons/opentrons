@@ -5,7 +5,7 @@ async def test_name_endpoint(test_cli, monkeypatch):
     async def fake_name(name):
         return name + name
 
-    monkeypatch.setattr(name_management, "set_name", fake_name)
+    monkeypatch.setattr(name_management, "set_pretty_hostname", fake_name)
 
     to_set = "check out this cool name"
     resp = await test_cli.post("/server/name", json={"name": to_set})
