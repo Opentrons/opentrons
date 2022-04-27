@@ -249,7 +249,7 @@ async def set_pretty_hostname(name: str) -> str:
     Writes the new name to /etc/machine-info so it persists across reboots,
     and so it can be picked up by Avahi on its next restart.
 
-    Also notifies the currently-running Avahi daemon the updated pretty hostname,
+    Also notifies the currently-running Avahi daemon of the updated pretty hostname,
     to apply it immediately.
 
     :param name: The name to set.
