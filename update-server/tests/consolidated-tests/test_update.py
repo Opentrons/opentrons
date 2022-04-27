@@ -14,7 +14,6 @@ from otupdate.common.session import UpdateSession, Stages
 from otupdate.common.update_actions import UpdateActionsInterface
 from otupdate.openembedded import Updater, PartitionManager, RootFSInterface
 from tests.openembedded.conftest import (
-    mock_root_fs_interface_,
     mock_partition_manager_valid_switch_,
     mock_root_fs_interface,
     mock_partition_manager_valid_switch,
@@ -76,9 +75,7 @@ br_handler = update_actions.OT2UpdateActions()
     params=[
         (
             0,
-            lambda: Updater(
-                RootFSInterface(), mock_partition_manager_valid_switch_()
-            ),
+            lambda: Updater(RootFSInterface(), mock_partition_manager_valid_switch_()),
         ),
         (1, lambda: update_actions.OT2UpdateActions()),
     ]
@@ -151,12 +148,10 @@ async def test_update_happypath(
     loop,
     testing_partition,
     monkeypatch,
-    mock_root_fs_interface,
     mock_partition_manager_valid_switch,
     extracted_update_file_common,
 ):
     fs_intf = RootFSInterface()
-    pm = PartitionManager()
     updaters = [
         Updater(
             root_FS_intf=fs_intf,
@@ -238,6 +233,3 @@ async def test_update_happypath(
             tp_hash = binascii.hexlify(tp_hasher.digest())
             assert tp_hash == zf.read("rootfs.xz.sha256").strip()
             fd.close()
-
-
-

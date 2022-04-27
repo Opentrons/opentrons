@@ -94,7 +94,7 @@ class OT2UpdateActions(UpdateActionsInterface):
                 f"packaged {packaged_hash!r}"
             )
             LOG.error(msg)
-          #  raise HashMismatch(msg)
+            raise HashMismatch(msg)
 
         if cert_path:
             sigfile = files.get(ROOTFS_SIG_NAME)

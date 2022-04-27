@@ -13,7 +13,6 @@ from otupdate import openembedded
 from tests.common.config import FakeRootPartElem
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-COMMON = os.path.abspath(os.path.dirname("common"))
 
 
 @pytest.fixture(params=[openembedded, buildroot])
@@ -102,7 +101,9 @@ def extracted_update_file_common(request, tmpdir):
         if rootfs == "rootfs.xz":
             with lzma.open(rootfs_path, "w") as f:
                 f.write(rootfs_contents)
-            with lzma.open(rootfs_path, "rb") as fsrc, open(uncomp_xz_path, "wb") as fdst:
+            with lzma.open(rootfs_path, "rb") as fsrc, open(
+                uncomp_xz_path, "wb"
+            ) as fdst:
                 while True:
                     chunk = fsrc.read(1024)
                     fdst.write(chunk)
@@ -142,7 +143,7 @@ def extracted_update_file_common(request, tmpdir):
                     "dgst",
                     "-sha256",
                     "-sign",
-                    os.path.join(COMMON, "ot-update-server-unit-tests.key"),
+                    os.path.join(HERE, "ot-update-server-unit-tests.key"),
                     "-out",
                     sig_path,
                     hash_path,
