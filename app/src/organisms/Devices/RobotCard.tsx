@@ -13,8 +13,8 @@ import {
   DIRECTION_ROW,
   SPACING,
   TEXT_TRANSFORM_UPPERCASE,
-  ModuleIcon,
   BORDERS,
+  ModuleIcon,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
