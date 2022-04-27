@@ -401,6 +401,15 @@ class GripperInfoResponsePayload(utils.BinarySerializable):
     gripper_serial: GripperSerialField
 
 
+@dataclass
+class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
+    """A request to move gripper."""
+    
+    freq: utils.UInt32Field
+    duty_cycle: utils.UInt32Field
+
+
+@dataclass
 class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     """A request to perform a tip action."""
 
