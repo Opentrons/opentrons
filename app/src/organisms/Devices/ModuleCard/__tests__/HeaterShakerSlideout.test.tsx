@@ -71,12 +71,12 @@ describe('HeaterShakerSlideout', () => {
     }
     const { getByText } = render(props)
 
-    getByText('Set Shake Speed for Heater Shaker Module GEN1')
+    getByText('Set Shake Speed for Heater-Shaker Module GEN1')
     getByText('Set RPM for this module.')
     getByText('Confirm')
   })
 
-  it('renders correct title and body for heater shaker set temperature', () => {
+  it('renders correct title and body for heatershaker set temperature', () => {
     props = {
       module: mockHeaterShaker,
       isSetShake: false,
@@ -85,7 +85,7 @@ describe('HeaterShakerSlideout', () => {
     }
     const { getByText } = render(props)
 
-    getByText('Set Temperature for Heater Shaker Module GEN1')
+    getByText('Set Temperature for Heater-Shaker Module GEN1')
     getByText(
       'Set target temperature. This module actively heats but cools passively to room temperature.'
     )
