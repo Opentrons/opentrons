@@ -32,6 +32,7 @@ import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModule
 import { Divider } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { InputField } from '../../../atoms/InputField'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { HeaterShakerWizard } from '../HeaterShakerWizard'
 import { useLatchControls } from './hooks'
 import { Collapsible } from './Collapsible'
@@ -41,7 +42,6 @@ import type {
   HeaterShakerSetTargetShakeSpeedCreateCommand,
   HeaterShakerStopShakeCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import { Tooltip } from '../../../atoms/Tooltip'
 
 interface TestShakeSlideoutProps {
   module: HeaterShakerModule
