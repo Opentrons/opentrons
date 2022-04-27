@@ -5,13 +5,8 @@ import json
 import sys
 import subprocess
 import zipfile
-from unittest import mock
 
 import pytest
-
-from otupdate import openembedded
-from otupdate.common.update_actions import Partition
-from tests.common.config import FakeRootPartElem
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -212,15 +207,3 @@ def otupdate_config(request, tmpdir, testing_cert):
             conf.update({"update_cert_path": testing_cert})
     json.dump(conf, open(path, "w"))
     return path
-
-@pytest.fixture
-def testing_partition(monkeypatch, tmpdir):
-    part_file = os.path.join(tmpdir, "fake-partition")
-    find_unused = mock.Mock()
-    monkeypatch.setattr(
-        openembedded.updater.PartitionManager, "find_unused_partition", find_unused
-    )
-    find_unused.return_value = FakeRootPartElem(
-        "TWO", Partition(2, part_file, "/mnt/mmblk0-p2")
-    )
-    return part_file

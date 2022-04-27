@@ -24,6 +24,7 @@ async def test_cli(aiohttp_client, loop, otupdate_config, monkeypatch):
     client = await loop.create_task(aiohttp_client(app))
     return client
 
+
 # This can be used to replace update_actions.RootPartitions elements as long
 # as the callee doesn’t actually do identity checking
 FakeRootPartElem = collections.namedtuple("FakeRootPartElem", ("name", "value"))
