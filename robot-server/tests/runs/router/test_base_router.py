@@ -707,10 +707,8 @@ async def test_update_run_to_not_current(
         mock_run_store.update_active_run(
             run_id=updated_resource.run_id, is_current=updated_resource.is_current
         ),
+        mock_engine_state_store.insert(matchers.Anything())
     )
-
-    get_run_state = mock_engine_state_store.get(run_id="run-id")
-    assert get_run_state.state == protocol_run
 
 
 async def test_update_current_to_current_noop(
