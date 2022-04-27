@@ -3,9 +3,6 @@ import { ofType } from 'redux-observable'
 import { GET } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
 import {
-  MAGDECK,
-  TEMPDECK,
-  THERMOCYCLER,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -38,15 +35,10 @@ import type {
 import type { FetchModulesAction, AttachedModule } from '../types'
 import type {
   ApiAttachedModule,
-  ApiAttachedModuleLegacy,
   TemperatureData,
   MagneticData,
   ThermocyclerData,
-  TemperatureStatus,
-  MagneticStatus,
-  ThermocyclerStatus,
   HeaterShakerData,
-  HeaterShakerStatus,
 } from '../api-types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchModulesAction> = action => ({
@@ -56,121 +48,77 @@ const mapActionToRequest: ActionToRequestMapper<FetchModulesAction> = action => 
 
 type IdentifierWithData =
   | {
-      type: typeof MAGNETIC_MODULE_TYPE
-      model: MagneticModuleModel
+      moduleType: typeof MAGNETIC_MODULE_TYPE
+      moduleModel: MagneticModuleModel
       data: MagneticData
-      status: MagneticStatus
     }
   | {
-      type: typeof TEMPERATURE_MODULE_TYPE
-      model: TemperatureModuleModel
+      moduleType: typeof TEMPERATURE_MODULE_TYPE
+      moduleModel: TemperatureModuleModel
       data: TemperatureData
-      status: TemperatureStatus
     }
   | {
-      type: typeof THERMOCYCLER_MODULE_TYPE
-      model: ThermocyclerModuleModel
+      moduleType: typeof THERMOCYCLER_MODULE_TYPE
+      moduleModel: ThermocyclerModuleModel
       data: ThermocyclerData
-      status: ThermocyclerStatus
     }
   | {
-      type: typeof HEATERSHAKER_MODULE_TYPE
-      model: HeaterShakerModuleModel
+      moduleType: typeof HEATERSHAKER_MODULE_TYPE
+      moduleModel: HeaterShakerModuleModel
       data: HeaterShakerData
-      status: HeaterShakerStatus
     }
 
-const normalizeModuleInfoLegacy = (
-  response: ApiAttachedModuleLegacy
-): IdentifierWithData => {
-  switch (response.name) {
-    case MAGDECK:
-      return {
-        type: MAGNETIC_MODULE_TYPE,
-        model: MAGNETIC_MODULE_V1,
-        data: response.data,
-        status: response.status,
-      }
-    case TEMPDECK:
-      return {
-        type: TEMPERATURE_MODULE_TYPE,
-        model: TEMPERATURE_MODULE_V1,
-        data: response.data,
-        status: response.status,
-      }
-    case THERMOCYCLER:
-      return {
-        type: THERMOCYCLER_MODULE_TYPE,
-        model: THERMOCYCLER_MODULE_V1,
-        data: response.data,
-        status: response.status,
-      }
-    default:
-      throw new Error(`bad module name ${(response as any).name}`)
-  }
-}
-
-const normalizeModuleInfoNew = (
+const normalizeModuleInfo = (
   response: ApiAttachedModule
 ): IdentifierWithData => {
   switch (response.moduleModel) {
     case MAGNETIC_MODULE_V1:
     case MAGNETIC_MODULE_V2:
       return {
-        model: response.moduleModel,
-        type: MAGNETIC_MODULE_TYPE,
+        moduleModel: response.moduleModel,
+        moduleType: MAGNETIC_MODULE_TYPE,
         data: response.data,
-        status: response.status,
       }
     case TEMPERATURE_MODULE_V1:
     case TEMPERATURE_MODULE_V2:
       return {
-        model: response.moduleModel,
-        type: TEMPERATURE_MODULE_TYPE,
+        moduleModel: response.moduleModel,
+        moduleType: TEMPERATURE_MODULE_TYPE,
         data: response.data,
-        status: response.status,
       }
     case THERMOCYCLER_MODULE_V1:
       return {
-        model: response.moduleModel,
-        type: THERMOCYCLER_MODULE_TYPE,
+        moduleModel: response.moduleModel,
+        moduleType: THERMOCYCLER_MODULE_TYPE,
         data: response.data,
-        status: response.status,
       }
     case HEATERSHAKER_MODULE_V1:
       return {
-        model: response.moduleModel,
-        type: HEATERSHAKER_MODULE_TYPE,
+        moduleModel: response.moduleModel,
+        moduleType: HEATERSHAKER_MODULE_TYPE,
         data: response.data,
-        status: response.status,
       }
     default:
       throw new Error(`bad module model ${(response as any).moduleModel}`)
   }
 }
 
-const normalizeModuleInfo = (
-  response: ApiAttachedModule | ApiAttachedModuleLegacy
-): IdentifierWithData => {
-  if ('moduleModel' in response) {
-    return normalizeModuleInfoNew(response)
-  } else {
-    return normalizeModuleInfoLegacy(response)
-  }
-}
-
 const normalizeModuleResponse = (
-  response: ApiAttachedModule
+  apiModule: ApiAttachedModule
 ): AttachedModule => {
   return {
-    ...normalizeModuleInfo(response),
-    id: response.id,
-    revision: response.revision ? response.revision : response.model,
-    port: response.port,
-    serial: response.serial,
-    fwVersion: response.fwVersion,
-    hasAvailableUpdate: response.hasAvailableUpdate,
-    usbPort: response.usbPort ?? { hub: null, port: null },
+    // model: apiModule.moduleModel,
+    // data: apiModule.data,
+    // status: apiModule.status,
+    ...normalizeModuleInfo(apiModule),
+    id: apiModule.id,
+    hardwareRevision: apiModule.hardwareRevision
+      ? apiModule.hardwareRevision
+      : apiModule.moduleModel,
+    serialNumber: apiModule.serialNumber,
+    firmwareVersion: apiModule.firmwareVersion,
+    hasAvailableUpdate: apiModule.hasAvailableUpdate,
+    usbPort: apiModule.usbPort ?? { hub: null, port: null },
   }
 }
 
@@ -183,7 +131,7 @@ const mapResponseToAction: ResponseToActionMapper<FetchModulesAction> = (
   return response.ok
     ? Actions.fetchModulesSuccess(
         host.name,
-        body.modules.map(normalizeModuleResponse),
+        body.data.map(normalizeModuleResponse),
         meta
       )
     : Actions.fetchModulesFailure(host.name, body, meta)

@@ -39,7 +39,7 @@ export function PipettesAndModules({
   const attachedModules = useAttachedModules(robotName)
   const attachedPipettes = useAttachedPipettes(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
-
+  console.log(attachedModules)
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
