@@ -12,6 +12,7 @@ from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 from opentrons.protocol_runner import ProtocolRunData
 
 from robot_server.errors import ApiError
+from robot_server.runs import engine_state_store
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.json_api import (
     RequestModel,
@@ -79,25 +80,6 @@ RESOLVED_LABWARE_OFFSETS = [
         vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
     ),
 ]
-
-
-@pytest.fixture
-def sql_engine(tmp_path: Path) -> Generator[sqlalchemy.engine.Engine, None, None]:
-    """Return a set-up database to back the store."""
-    db_file_path = tmp_path / "test.db"
-    sql_engine = open_db_no_cleanup(db_file_path=db_file_path)
-    try:
-        add_tables_to_db(sql_engine)
-        yield sql_engine
-    finally:
-        sql_engine.dispose()
-
-
-@pytest.fixture
-def subject(sql_engine: sqlalchemy.engine.Engine) -> EngineStateStore:
-    """Get a ProtocolStore test subject."""
-    return EngineStateStore(sql_engine=sql_engine)
-
 
 @pytest.fixture
 def protocol_run() -> ProtocolRunData:
@@ -656,7 +638,7 @@ async def test_delete_active_run_no_engine(
 
 
 async def test_update_run_to_not_current(
-    decoy: Decoy, mock_engine_store: EngineStore, mock_run_store: RunStore, subject: EngineStateStore, protocol_run: ProtocolRunData
+    decoy: Decoy, mock_engine_store: EngineStore, mock_run_store: RunStore, mock_engine_state_store: EngineStateStore, protocol_run: ProtocolRunData
 ) -> None:
     """It should update a run to no longer be current."""
     run_resource = RunResource(
@@ -714,6 +696,7 @@ async def test_update_run_to_not_current(
         request_body=RequestModel(data=run_update),
         run_store=mock_run_store,
         engine_store=mock_engine_store,
+        engine_state_store=mock_engine_state_store
     )
 
     assert result.content == SimpleBody(data=expected_response)
@@ -726,8 +709,8 @@ async def test_update_run_to_not_current(
         ),
     )
 
-    get_run_state = subject.get(run_id="run-id")
-    assert get_run_state == protocol_run
+    get_run_state = mock_engine_state_store.get(run_id="run-id")
+    assert get_run_state.state == protocol_run
 
 
 async def test_update_current_to_current_noop(

@@ -117,14 +117,14 @@ def test_get_run_state(
 
 
 @pytest.fixture
-def teardown():
+def teardown() -> None:
     print("setup")
     yield None
     print("teardown")
 
 
 @pytest.mark.parametrize("pickle_type", [True, False])
-def test_insert_get_by_state_type(subject: EngineStateStore, protocol_run: ProtocolRunData, pickle_type: bool, teardown) -> None:
+def test_insert_get_by_state_type(subject: EngineStateStore, protocol_run: ProtocolRunData, pickle_type: bool, teardown: pytest.FixtureRequest) -> None:
     """It should test the time and db size for prasing a json type and a string type."""
     engine_state = EngineStateResource(
         run_id="run-id",

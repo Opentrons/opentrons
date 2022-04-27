@@ -366,7 +366,8 @@ async def update_run(
 
     engine_state_store.insert(EngineStateResource(
         run_id=run.run_id,
-        state=store_run_state
+        state=store_run_state,
+        engine_status=engine_state.commands.get_status()
     ))
 
     data = Run.construct(
