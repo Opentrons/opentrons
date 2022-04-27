@@ -63,7 +63,7 @@ async def test_protocols_persist(protocol: Callable[[str], IO[bytes]]) -> None:
             server.stop()
 
 
-async def test_protocol_with_laware_upload_persistence() -> None:
+async def test_protocol_with_labware_upload_persistence() -> None:
     """Upload a python protocol and 2 custom labware files.
 
     Protocol and labware are persisted on server restart.
