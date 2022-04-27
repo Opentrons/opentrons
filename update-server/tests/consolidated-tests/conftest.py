@@ -114,17 +114,20 @@ def extracted_update_file_common(request, tmpdir):
         if request.node.get_closest_marker("bad_hash"):
             hashval = b"0oas0ajcs0asd0asjc0ans0d9ajsd0ian0s9djas"
         else:
-            try:
-               # if rootfs == "rootfs.xz":
-                   # shasum_out = subprocess.check_output(
-                   #     ["shasum", "-a", "256", uncomp_xz_path]
-                   # )
-                # else:
-                shasum_out = subprocess.check_output(
-                    ["shasum", "-a", "256", rootfs_path]
-                )
-            except (subprocess.CalledProcessError, FileNotFoundError):
-                pytest.skip("no shasum invokeable on command line")
+            if rootfs == "rootfs.xz":
+                try:
+                    shasum_out = subprocess.check_output(
+                        ["shasum", "-a", "256", uncomp_xz_path]
+                    )
+                except (subprocess.CalledProcessError, FileNotFoundError):
+                    pytest.skip("no shasum invokeable on command line")
+            else:
+                try:
+                    shasum_out = subprocess.check_output(
+                        ["shasum", "-a", "256", rootfs_path]
+                    )
+                except (subprocess.CalledProcessError, FileNotFoundError):
+                    pytest.skip("no shasum invokeable on command line")
             hashval = re.match(b"^([a-z0-9]+) ", shasum_out).group(1)
         with open(hash_path, "wb") as rfsh:
             rfsh.write(hashval)

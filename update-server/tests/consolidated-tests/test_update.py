@@ -77,7 +77,7 @@ br_handler = update_actions.OT2UpdateActions()
         (
             0,
             lambda: Updater(
-                mock_root_fs_interface_(), mock_partition_manager_valid_switch_()
+                RootFSInterface(), mock_partition_manager_valid_switch_()
             ),
         ),
         (1, lambda: update_actions.OT2UpdateActions()),
