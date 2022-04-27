@@ -37,18 +37,20 @@ import type {
   LabwarePositionCheckMovementCommand,
   LabwarePositionCheckStep,
 } from './types'
+import { useProtocolDetailsForRun } from '../../Devices/hooks'
 
 const DECK_MAP_VIEWBOX = '-30 -20 170 115'
 interface LabwarePositionCheckStepDetailProps {
   selectedStep: LabwarePositionCheckStep
   jog: Jog
+  runId: string
 }
 export const LabwarePositionCheckStepDetail = (
   props: LabwarePositionCheckStepDetailProps
 ): JSX.Element | null => {
-  const { selectedStep } = props
+  const { selectedStep, runId } = props
   const { t } = useTranslation('labware_position_check')
-  const { protocolData } = useProtocolDetails()
+  const { protocolData } = useProtocolDetailsForRun(runId)
   const [showJogControls, setShowJogControls] = React.useState<boolean>(false)
   const { labwareId } = selectedStep
   if (protocolData == null) return null
@@ -95,6 +97,7 @@ export const LabwarePositionCheckStepDetail = (
         <StepDetailText
           selectedStep={props.selectedStep}
           pipetteChannels={pipetteChannels}
+          runId={runId}
         />
         <Flex
           justifyContent={JUSTIFY_SPACE_BETWEEN}

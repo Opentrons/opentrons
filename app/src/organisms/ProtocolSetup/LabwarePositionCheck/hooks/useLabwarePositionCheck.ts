@@ -68,6 +68,7 @@ import type {
   LabwarePositionCheckStep,
   SavePositionCommandData,
 } from '../types'
+import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 
 export type LabwarePositionCheckUtils =
   | {
@@ -92,8 +93,11 @@ type LPCPrepCommand =
 
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 
-const useLpcCtaText = (command: LabwarePositionCheckCreateCommand): string => {
-  const { protocolData } = useProtocolDetails()
+const useLpcCtaText = (
+  command: LabwarePositionCheckCreateCommand,
+  runId: string | null
+): string => {
+  const { protocolData } = useProtocolDetailsForRun(runId)
   const { t } = useTranslation('labware_position_check')
   if (command == null) return ''
   const commands = protocolData?.commands ?? []
@@ -128,10 +132,11 @@ const useLpcCtaText = (command: LabwarePositionCheckCreateCommand): string => {
 export const useTitleText = (
   loading: boolean,
   command: LabwarePositionCheckMovementCommand,
+  runId: string | null,
   labware?: ProtocolFile<{}>['labware'],
   labwareDefinitions?: ProtocolFile<{}>['labwareDefinitions']
 ): string => {
-  const { protocolData } = useProtocolDetails()
+  const { protocolData } = useProtocolDetailsForRun(runId)
   const { t } = useTranslation('labware_position_check')
 
   if (command == null) {
@@ -243,15 +248,15 @@ export function useLabwarePositionCheck(
   const [dropTipOffset, setDropTipOffset] = React.useState<VectorOffset>(
     IDENTITY_VECTOR
   )
-  const { protocolData } = useProtocolDetails()
+  const currentRunId = useCurrentRunId()
+  const { protocolData } = useProtocolDetailsForRun(currentRunId)
   const protocolType = useCurrentProtocol()?.data.protocolType
   const { createLabwareDefinition } = useCreateLabwareDefinitionMutation()
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const { createCommand } = useCreateCommandMutation()
   const host = useHost()
-  const currentRunId = useCurrentRunId()
   const trackEvent = useTrackEvent()
-  const LPCSteps = useSteps()
+  const LPCSteps = useSteps(currentRunId)
   const dispatch = useDispatch()
   const robotName = useSelector(getConnectedRobotName)
   const attachedModules = useSelector(getAttachedModulesForConnectedRobot)
@@ -306,11 +311,12 @@ export function useLabwarePositionCheck(
     return matchingCommand
   }) as LabwarePositionCheckStep
 
-  const ctaText = useLpcCtaText(currentCommand)
+  const ctaText = useLpcCtaText(currentCommand, currentRunId)
   const robotCommands = useCurrentRunCommands()
   const titleText = useTitleText(
     isLoading,
     prevCommand,
+    currentRunId,
     protocolData?.labware,
     protocolData?.labwareDefinitions
   )

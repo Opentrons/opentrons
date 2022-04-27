@@ -24,6 +24,7 @@ const mockLabwarePositionCheckStepDetailModal = LabwarePositionCheckStepDetailMo
 >
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
+const MOCK_RUN_ID = 'fakeRunId'
 
 const mockLabwarePositionCheckStepTipRack = {
   labwareId:
@@ -66,6 +67,7 @@ describe('StepDetailText', () => {
   beforeEach(() => {
     props = {
       selectedStep: mockLabwarePositionCheckStepTipRack,
+      runId: MOCK_RUN_ID
     }
 
     when(mockLabwarePositionCheckStepDetailModal)
@@ -126,6 +128,7 @@ describe('StepDetailText', () => {
     props = {
       selectedStep: mockLabwarePositionCheckStepLabware,
       pipetteChannels: 1,
+      runId: MOCK_RUN_ID
     }
     const { getByText } = render(props)
     getByText('See how to tell if the pipette is centered')
@@ -156,6 +159,7 @@ describe('StepDetailText', () => {
     props = {
       selectedStep: mockLabwarePositionCheckStepLabware,
       pipetteChannels: 8,
+      runId: MOCK_RUN_ID
     }
     when(mockUseProtocolDetails)
       .calledWith()

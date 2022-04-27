@@ -33,6 +33,7 @@ const mockDeckmap = DeckMap as jest.MockedFunction<typeof DeckMap>
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
 const MOCK_SECTIONS = ['PRIMARY_PIPETTE_TIPRACKS' as Section]
+const MOCK_RUN_ID = 'fakeRunId'
 
 const MOCK_LABWARE_POSITION_CHECK_STEP_TIPRACK = {
   labwareId:
@@ -62,6 +63,7 @@ describe('GenericStepScreen', () => {
     props = {
       selectedStep: MOCK_LABWARE_POSITION_CHECK_STEP_TIPRACK,
       setCurrentLabwareCheckStep: () => {},
+      runId: MOCK_RUN_ID
     } as any
     when(mockLabwarePositionCheckStepDetail)
       .calledWith(
@@ -76,7 +78,7 @@ describe('GenericStepScreen', () => {
     mockUseLabwareIdsBySection.mockReturnValue({})
     mockUseSteps.mockReturnValue([])
 
-    when(mockUseIntroInfo).calledWith().mockReturnValue({
+    when(mockUseIntroInfo).calledWith(MOCK_RUN_ID).mockReturnValue({
       primaryPipetteMount: 'left',
       secondaryPipetteMount: '',
       firstTiprackSlot: '2',

@@ -72,6 +72,7 @@ const TIPRACK_DEF_ID = 'tiprack_DEF_ID'
 const LABWARE_DEF = {
   ordering: [['A1', 'A2']],
 }
+const MOCK_RUN_ID = 'fakeRunId'
 const mockLabwarePositionCheckStepTipRack = {
   labwareId:
     '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1',
@@ -101,6 +102,7 @@ describe('LabwarePositionCheckStepDetail', () => {
     props = {
       selectedStep: mockLabwarePositionCheckStepTipRack,
       jog: jest.fn() as any,
+      runId: MOCK_RUN_ID
     }
     when(mockStepDetailText)
       .calledWith(

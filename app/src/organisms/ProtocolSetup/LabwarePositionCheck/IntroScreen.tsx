@@ -17,7 +17,7 @@ import {
   FONT_SIZE_BODY_2,
   SPACING_6,
 } from '@opentrons/components'
-import { useCurrentRun } from '../../ProtocolUpload/hooks'
+import { useCurrentRun, useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { getLatestLabwareOffsetCount } from '../LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 import { SectionList } from './SectionList'
 import { DeckMap } from './DeckMap'
@@ -28,11 +28,11 @@ export const INTERVAL_MS = 3000
 export const IntroScreen = (props: {
   beginLPC: () => void
 }): JSX.Element | null => {
-  const introInfo = useIntroInfo()
-  const labwareIdsBySection = useLabwareIdsBySection()
+  const runRecord = useCurrentRun()
+  const labwareIdsBySection = useLabwareIdsBySection(runRecord?.data?.id ?? null)
+  const introInfo = useIntroInfo(runRecord?.data?.id ?? null)
   const { t } = useTranslation(['labware_position_check', 'shared'])
 
-  const runRecord = useCurrentRun()
   const currentRunData = runRecord?.data
   const labwareOffsetCount = getLatestLabwareOffsetCount(
     currentRunData?.labwareOffsets ?? []

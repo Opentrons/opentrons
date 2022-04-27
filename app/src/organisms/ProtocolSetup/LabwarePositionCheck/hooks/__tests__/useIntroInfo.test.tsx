@@ -29,6 +29,7 @@ const SECONDARY_PIPETTE_NAME = 'SECONDARY_PIPETTE_NAME'
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PICKUP_TIP_LABWARE_SLOT = '3'
 const PICKUP_TIP_LABWARE_DISPLAY_NAME = 'PICKUP_TIP_LABWARE_DISPLAY_NAME'
+const MOCK_RUN_ID = 'fakeRunId'
 
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
@@ -121,7 +122,7 @@ describe('useIntroInfo', () => {
         </QueryClientProvider>
       </Provider>
     )
-    const { result } = renderHook(hooks.useIntroInfo, { wrapper })
+    const { result } = renderHook(() => hooks.useIntroInfo(MOCK_RUN_ID), { wrapper })
     const {
       primaryPipetteMount,
       secondaryPipetteMount,

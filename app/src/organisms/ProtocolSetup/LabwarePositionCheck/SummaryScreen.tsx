@@ -26,16 +26,18 @@ import { LabwareOffsetsSummary } from './LabwareOffsetsSummary'
 import { useIntroInfo, useLabwareOffsets, LabwareOffsets } from './hooks'
 import type { SavePositionCommandData } from './types'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import { useProtocolDetailsForRun } from '../../Devices/hooks'
 
 export const SummaryScreen = (props: {
   savePositionCommandData: SavePositionCommandData
   onCloseClick: () => unknown
 }): JSX.Element | null => {
   const { savePositionCommandData } = props
+  const runId = useCurrentRunId()
   const [labwareOffsets, setLabwareOffsets] = React.useState<LabwareOffsets>([])
   const { t } = useTranslation('labware_position_check')
-  const introInfo = useIntroInfo()
-  const { protocolData } = useProtocolDetails()
+  const introInfo = useIntroInfo(runId)
+  const { protocolData } = useProtocolDetailsForRun(runId)
   useLabwareOffsets(
     savePositionCommandData,
     protocolData as ProtocolAnalysisFile
@@ -47,7 +49,6 @@ export const SummaryScreen = (props: {
       console.error(`error getting labware offsets: ${e.message}`)
     )
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
-  const runId = useCurrentRunId()
   const { setIsShowingLPCSuccessToast } = useLPCSuccessToast()
 
   if (runId == null || introInfo == null || protocolData == null) return null

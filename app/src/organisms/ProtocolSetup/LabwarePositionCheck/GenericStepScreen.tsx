@@ -26,13 +26,14 @@ interface GenericStepScreenProps {
   proceed: () => void
   jog: Jog
   title: string
+  runId: string
 }
 export const GenericStepScreen = (
   props: GenericStepScreenProps
 ): JSX.Element | null => {
-  const introInfo = useIntroInfo()
-  const labwareIdsBySection = useLabwareIdsBySection()
-  const allSteps = useSteps()
+  const introInfo = useIntroInfo(props.runId)
+  const labwareIdsBySection = useLabwareIdsBySection(props.runId)
+  const allSteps = useSteps(props.runId)
   if (introInfo == null) return null
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
   const labwareIdsToHighlight = labwareIdsBySection[props.selectedStep.section]
@@ -84,6 +85,7 @@ export const GenericStepScreen = (
           <LabwarePositionCheckStepDetail
             selectedStep={props.selectedStep}
             jog={props.jog}
+            runId={props.runId}
           />
         </Flex>
       </Flex>

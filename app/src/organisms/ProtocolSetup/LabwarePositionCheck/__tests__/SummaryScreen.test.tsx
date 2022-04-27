@@ -51,6 +51,7 @@ const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'
 const LABWARE_DEF = {
   ordering: [['A1', 'A2']],
 }
+const MOCK_RUN_ID = 'fake_run_id'
 
 const render = (props: React.ComponentProps<typeof SummaryScreen>) => {
   return renderWithProviders(<SummaryScreen {...props} />, {
@@ -66,7 +67,7 @@ describe('SummaryScreen', () => {
       savePositionCommandData: { someLabwareIf: ['commandId1', 'commandId2'] },
       onCloseClick: jest.fn(),
     }
-    mockUseCurrentRunId.mockReturnValue('fake_run_id')
+    mockUseCurrentRunId.mockReturnValue(MOCK_RUN_ID)
     mockSectionList.mockReturnValue(<div>Mock SectionList</div>)
     mockDeckmap.mockReturnValue(<div>Mock DeckMap</div>)
     mockLabwareOffsetsSummary.mockReturnValue(
@@ -74,7 +75,7 @@ describe('SummaryScreen', () => {
     )
     mockUseLabwareOffsets.mockResolvedValue([])
 
-    when(mockUseIntroInfo).calledWith().mockReturnValue({
+    when(mockUseIntroInfo).calledWith(MOCK_RUN_ID).mockReturnValue({
       primaryPipetteMount: 'left',
       secondaryPipetteMount: '',
       firstTiprackSlot: '2',

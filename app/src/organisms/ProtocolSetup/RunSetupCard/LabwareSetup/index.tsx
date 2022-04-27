@@ -147,9 +147,7 @@ export const LabwareSetup = (): JSX.Element | null => {
         />
       )}
       {showLabwarePositionCheckModal && (
-        <LabwarePositionCheck
-          onCloseClick={() => setShowLabwarePositionCheckModal(false)}
-        />
+        <p>deprecated entrypoint to labware position check, slated for deletion </p>
       )}
       {downloadOffsetDataModal && (
         <DownloadOffsetDataModal
@@ -199,11 +197,6 @@ export const LabwareSetup = (): JSX.Element | null => {
                           key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
                         >
                           <LabwareRender definition={nestedLabwareDef} />
-                          <LabwareInfoOverlay
-                            definition={nestedLabwareDef}
-                            labwareId={nestedLabwareId}
-                            displayName={nestedLabwareDisplayName}
-                          />
                         </React.Fragment>
                       ) : null}
                     </Module>
@@ -218,11 +211,6 @@ export const LabwareSetup = (): JSX.Element | null => {
                       >
                         <g transform={`translate(${x},${y})`}>
                           <LabwareRender definition={labwareDef} />
-                          <LabwareInfoOverlay
-                            definition={labwareDef}
-                            labwareId={labwareId}
-                            displayName={displayName}
-                          />
                         </g>
                       </React.Fragment>
                     )

@@ -76,7 +76,7 @@ describe('useLabwarePositionCheck', () => {
     when(mockUseCurrentRunId).calledWith().mockReturnValue(MOCK_RUN_ID)
     when(mockUseCurrentRunCommands).calledWith().mockReturnValue([])
     when(mockUseSteps)
-      .calledWith()
+      .calledWith(MOCK_RUN_ID)
       .mockReturnValue([
         {
           commands: [
@@ -182,7 +182,7 @@ describe('useLabwarePositionCheck', () => {
   describe('proceed', () => {
     it('should home the robot after issuing the last LPC command', async () => {
       when(mockUseSteps)
-        .calledWith()
+        .calledWith(MOCK_RUN_ID)
         .mockReturnValue([
           {
             commands: [
@@ -235,7 +235,7 @@ describe('useLabwarePositionCheck', () => {
     })
     it('should execute the next command', async () => {
       when(mockUseSteps)
-        .calledWith()
+        .calledWith(MOCK_RUN_ID)
         .mockReturnValue([
           {
             commands: [

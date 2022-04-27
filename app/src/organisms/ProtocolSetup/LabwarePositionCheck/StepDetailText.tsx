@@ -12,18 +12,20 @@ import {
 import { useProtocolDetails } from '../../RunDetails/hooks'
 import { LabwarePositionCheckStepDetailModal } from './LabwarePositionCheckStepDetailModal'
 import type { LabwarePositionCheckStep } from './types'
+import { useProtocolDetailsForRun } from '../../Devices/hooks'
 
 interface StepDetailTextProps {
   selectedStep: LabwarePositionCheckStep
+  runId: string
   pipetteChannels?: 1 | 8
 }
 export const StepDetailText = (
   props: StepDetailTextProps
 ): JSX.Element | null => {
   const { labwareId } = props.selectedStep
-  const { pipetteChannels } = props
+  const { pipetteChannels, runId } = props
   const { t } = useTranslation('labware_position_check')
-  const { protocolData } = useProtocolDetails()
+  const { protocolData } = useProtocolDetailsForRun(runId)
   const [
     showLabwarePositionCheckStepDetailModal,
     setLabwarePositionCheckStepDetailModal,

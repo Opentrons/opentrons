@@ -28,6 +28,7 @@ const wrapper: React.FunctionComponent<{}> = ({ children }) => (
 const mockProtocolData: any = { commands: [] }
 const mockLabwareId = 'mockLabwareId'
 const mockSlotNumber = 'mockSlotNumber'
+const mockRunId = 'mockRunId'
 
 describe('useTitleText', () => {
   beforeEach(() => {
@@ -52,7 +53,7 @@ describe('useTitleText', () => {
       },
     }
 
-    const { result } = renderHook(() => useTitleText(true, command), {
+    const { result } = renderHook(() => useTitleText(true, command, mockRunId), {
       wrapper,
     })
     expect(result.current).toBe(`Moving to slot ${mockSlotNumber}`)
@@ -67,7 +68,7 @@ describe('useTitleText', () => {
       },
     }
 
-    const { result } = renderHook(() => useTitleText(true, command), {
+    const { result } = renderHook(() => useTitleText(true, command, mockRunId), {
       wrapper,
     })
     expect(result.current).toBe(`Picking up tip in slot ${mockSlotNumber}`)
@@ -82,7 +83,7 @@ describe('useTitleText', () => {
       },
     }
 
-    const { result } = renderHook(() => useTitleText(true, command), {
+    const { result } = renderHook(() => useTitleText(true, command, mockRunId), {
       wrapper,
     })
     expect(result.current).toBe(`Returning tip in slot ${mockSlotNumber}`)
