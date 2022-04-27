@@ -84,7 +84,7 @@ def sys_handler(request):
 
 async def test_updater_chain(
     otupdate_config,
-    downloaded_update_file_common,
+        downloaded_update_file_consolidated,
     loop,
     testing_partition,
     sys_handler,
@@ -95,7 +95,7 @@ async def test_updater_chain(
         session,
         conf,
         loop,
-        downloaded_update_file_common.pop(sys_handler[0]),
+        downloaded_update_file_consolidated.pop(sys_handler[0]),
         sys_handler[1](),
     )
     assert session.stage == Stages.VALIDATING
@@ -118,7 +118,7 @@ async def test_updater_chain(
 @pytest.mark.exclude_rootfs_ext4
 async def test_session_catches_validation_fail(
     otupdate_config,
-    downloaded_update_file_common,
+        downloaded_update_file_consolidated,
     loop,
     sys_handler,
 ):
@@ -128,7 +128,7 @@ async def test_session_catches_validation_fail(
         session,
         conf,
         loop,
-        downloaded_update_file_common.pop(sys_handler[0]),
+        downloaded_update_file_consolidated.pop(sys_handler[0]),
         sys_handler[1](),
     )
     with pytest.raises(file_actions.FileMissing):
@@ -142,12 +142,12 @@ async def test_session_catches_validation_fail(
 async def test_update_happypath(
     test_cli,
     update_session,
-    downloaded_update_file_common,
+        downloaded_update_file_consolidated,
     loop,
     testing_partition,
     monkeypatch,
     mock_partition_manager_valid_switch,
-    extracted_update_file_common,
+        extracted_update_file_consolidated,
 ):
 
     updaters = [
@@ -166,8 +166,8 @@ async def test_update_happypath(
         resp = await test_cli[0].post(
             session_endpoint(update_session, "file"),
             data={
-                os.path.basename(downloaded_update_file_common[0]): open(
-                    downloaded_update_file_common[0], "rb"
+                os.path.basename(downloaded_update_file_consolidated[0]): open(
+                    downloaded_update_file_consolidated[0], "rb"
                 )
             },
         )
@@ -178,8 +178,8 @@ async def test_update_happypath(
         resp = await test_cli[0].post(
             session_endpoint(update_session, "file"),
             data={
-                os.path.basename(downloaded_update_file_common[1]): open(
-                    downloaded_update_file_common[1], "rb"
+                os.path.basename(downloaded_update_file_consolidated[1]): open(
+                    downloaded_update_file_consolidated[1], "rb"
                 )
             },
         )
@@ -209,14 +209,13 @@ async def test_update_happypath(
             resp = await test_cli[0].get(session_endpoint(update_session, "status"))
             assert resp.status == 200
             body = await resp.json()
-            print(body)
             last_progress = body["progress"]
             assert loop.time() - then <= 300
 
     assert body["stage"] == "done"
 
     if test_cli[1] == "otupdate.buildroot":
-        with zipfile.ZipFile(downloaded_update_file_common[1], "r") as zf:
+        with zipfile.ZipFile(downloaded_update_file_consolidated[1], "r") as zf:
             tp_hasher = hashlib.sha256()
             fd = open(testing_partition, "rb")
             tp_hasher.update(fd.read())
@@ -224,7 +223,7 @@ async def test_update_happypath(
             assert tp_hash == zf.read("rootfs.ext4.hash").strip()
             fd.close()
     if test_cli[1] == "otupdate.openembedded":
-        with zipfile.ZipFile(downloaded_update_file_common[0], "r") as zf:
+        with zipfile.ZipFile(downloaded_update_file_consolidated[0], "r") as zf:
             tp_hasher = hashlib.sha256()
             fd = open(testing_partition, "rb")
             tp_hasher.update(fd.read())

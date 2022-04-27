@@ -92,11 +92,11 @@ class RootFSInterface:
     """RootFS interface class."""
 
     def write_update(
-        self,
-        rootfs_filepath: str,
-        part: Partition,
-        progress_callback: Callable[[float], None],
-        chunk_size: int = 1024,
+            self,
+            rootfs_filepath: str,
+            part: Partition,
+            progress_callback: Callable[[float], None],
+            chunk_size: int = 1024,
     ) -> None:
         total_size = 0
         written_size = 0
@@ -115,7 +115,7 @@ class RootFSInterface:
                 print(f'**********Exception opening {part.path} {rootfs_filepath} {str(a)}')
             try:
                 with lzma.open(rootfs_filepath, "rb") as fsrc, open(
-                    part.path, "wb"
+                        part.path, "wb"
                 ) as fdst:
                     while True:
                         chunk = fsrc.read(chunk_size)
@@ -152,10 +152,10 @@ class Updater(UpdateActionsInterface):
         return name is UPDATE_PKG
 
     def validate_update(
-        self,
-        filepath: str,
-        progress_callback: Callable[[float], None],
-        cert_path: Optional[str],
+            self,
+            filepath: str,
+            progress_callback: Callable[[float], None],
+            cert_path: Optional[str],
     ) -> Optional[str]:
         """Worker for validation. Call in an executor (so it can return things)
 
@@ -204,6 +204,13 @@ class Updater(UpdateActionsInterface):
         # rootfs rather than the compresses file. For consolidated tests
         # to work, taking out this raise for now!
 
+        # update-server checksum tests historically used the idea
+        # of writing a rootfs to a fake partition, generate a hash
+        # against the fake partition, and compare it with the hash
+        # of rootfs file. This doesn't quite work out when the rootfs
+        # is compressed (xz for ot3).
+        # For consolidated tests to work, taking out this raise for now!
+
         # raise HashMismatch(msg)
 
         if cert_path:
@@ -240,7 +247,7 @@ class Updater(UpdateActionsInterface):
         unused = self.part_mngr.find_unused_partition(self.part_mngr.used_partition())
         part_path = unused.path
         with tempfile.TemporaryDirectory(
-            dir=self.part_mngr.mountpoint_root()
+                dir=self.part_mngr.mountpoint_root()
         ) as mountpoint:
             subprocess.check_output(["mount", part_path, mountpoint])
             LOG.info(f"mounted {part_path} to {mountpoint}")
@@ -255,11 +262,11 @@ class Updater(UpdateActionsInterface):
         pass
 
     def write_update(
-        self,
-        rootfs_filepath: str,
-        progress_callback: Callable[[float], None],
-        chunk_size: int = 1024,
-        file_size: int = None,
+            self,
+            rootfs_filepath: str,
+            progress_callback: Callable[[float], None],
+            chunk_size: int = 1024,
+            file_size: int = None,
     ) -> Partition:
         self.decomp_and_write(rootfs_filepath, progress_callback)
         unused_partition = self.part_mngr.find_unused_partition(
@@ -268,7 +275,7 @@ class Updater(UpdateActionsInterface):
         return unused_partition
 
     def decomp_and_write(
-        self, downloaded_update_path: str, progress_callback: Callable[[float], None]
+            self, downloaded_update_path: str, progress_callback: Callable[[float], None]
     ) -> None:
         """Decompress and write update to partition
 

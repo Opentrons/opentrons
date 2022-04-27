@@ -36,7 +36,7 @@ async def test_cli(aiohttp_client, loop, otupdate_config, request):
 
 
 @pytest.fixture
-def downloaded_update_file_common(request, extracted_update_file_common):
+def downloaded_update_file_consolidated(request, extracted_update_file_consolidated):
     """
     Return the path to a zipped update file
 
@@ -55,10 +55,10 @@ def downloaded_update_file_common(request, extracted_update_file_common):
         ("rootfs.ext4", "rootfs.ext4.hash", "rootfs.ext4.hash.sig", "ot2-system.zip"),
     ]
     for index, (rootfs, sha256, sig, pkg) in enumerate(list_of_update_files):
-        rootfs_path = os.path.join(extracted_update_file_common[index], rootfs)
-        hash_path = os.path.join(extracted_update_file_common[index], sha256)
-        sig_path = os.path.join(extracted_update_file_common[index], sig)
-        zip_path = os.path.join(extracted_update_file_common[index], pkg)
+        rootfs_path = os.path.join(extracted_update_file_consolidated[index], rootfs)
+        hash_path = os.path.join(extracted_update_file_consolidated[index], sha256)
+        sig_path = os.path.join(extracted_update_file_consolidated[index], sig)
+        zip_path = os.path.join(extracted_update_file_consolidated[index], pkg)
         with zipfile.ZipFile(zip_path, "w") as zf:
             if not request.node.get_closest_marker("exclude_rootfs_ext4"):
                 zf.write(rootfs_path, rootfs)
@@ -130,7 +130,7 @@ def gen_hash_val(
 
 
 @pytest.fixture
-def extracted_update_file_common(request, tmpdir):
+def extracted_update_file_consolidated(request, tmpdir):
     """
     Return the path to a dir containing an unzipped update file.
 
