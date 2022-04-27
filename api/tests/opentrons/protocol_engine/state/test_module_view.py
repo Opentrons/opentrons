@@ -27,6 +27,8 @@ from opentrons.protocol_engine.state.module_substates import (
     MagneticModuleId,
     TemperatureModuleSubState,
     TemperatureModuleId,
+    ThermocyclerModuleSubState,
+    ThermocyclerModuleId,
     ModuleSubStateType,
 )
 
@@ -1014,3 +1016,50 @@ def test_tempdeck_get_plate_target_temperature_no_target(
 
     with pytest.raises(errors.NoTargetTemperatureSetError):
         subject.get_plate_target_temperature()
+
+
+@pytest.fixture
+def module_view_with_thermocycler(thermocycler_v1_def: ModuleDefinition) -> ModuleView:
+    """Get a module state view with a loaded thermocycler."""
+    return make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=thermocycler_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": ThermocyclerModuleSubState(
+                module_id=ThermocyclerModuleId("module-id"),
+            )
+        },
+    )
+
+
+@pytest.mark.parametrize("input_temperature", [0, 0.0, 0.001, 98.999, 99, 99.0])
+def test_thermocycler_validate_target_block_temperature(
+    module_view_with_thermocycler: ModuleView,
+    input_temperature: float,
+) -> None:
+    """It should return a valid target block temperature."""
+    subject = module_view_with_thermocycler.get_thermocycler_module_substate(
+        "module-id"
+    )
+    result = subject.validate_target_block_temperature(input_temperature)
+
+    assert result == input_temperature
+
+
+@pytest.mark.parametrize("input_temperature", [-0.001, 99.001])
+def test_thermocycler_validate_target_block_temperature_raises(
+    module_view_with_thermocycler: ModuleView,
+    input_temperature: float,
+) -> None:
+    """It should raise on invalid target block temperature."""
+    subject = module_view_with_thermocycler.get_thermocycler_module_substate(
+        "module-id"
+    )
+
+    with pytest.raises(errors.InvalidTargetTemperatureError):
+        subject.validate_target_block_temperature(input_temperature)
