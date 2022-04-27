@@ -12,7 +12,7 @@ from aiohttp import web
 LOG = logging.getLogger(__name__)
 
 
-def main():
+def main() -> None:
     parser = cli.build_root_parser()
     args = parser.parse_args()
     loop = asyncio.get_event_loop()
@@ -27,7 +27,7 @@ def main():
 
     name = app[constants.DEVICE_NAME_VARNAME]
     LOG.info(f"Setting advertised name to {name}")
-    loop.run_until_complete(name_management.set_name(name))
+    loop.run_until_complete(name_management.set_pretty_hostname(name))
 
     LOG.info(f"Notifying {systemd.SOURCE} that service is up")
     systemd.notify_up()
