@@ -276,6 +276,7 @@ async def set_display_name_endpoint(request: web.Request) -> web.Response:
 
     Request with POST /server/name {"name": new_name}
     Responds with 200 OK {"name": "set_name"}
+    or 400 Bad Request
 
     In general, the name that is set will be the same name that was requested.
     """
