@@ -135,7 +135,6 @@ export const moveLiquidFormToArgs = (
     'dispense_delay_seconds',
     'dispense_delay_mmFromBottom'
   )
-
   const blowoutLocation =
     (fields.blowout_checkbox && fields.blowout_location) || null
   const blowoutOffsetFromTopMm = DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
