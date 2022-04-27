@@ -328,6 +328,7 @@ async def update_run(
         request_body: Update data from request body.
         run_store: Run storage interface.
         engine_store: ProtocolEngine storage and control.
+        engine_state_store: ProtocolEngine state storage and control.
     """
     update = request_body.data
 
@@ -360,10 +361,10 @@ async def update_run(
         # added from protocol_runner, do we need it?
         commands=engine_state.commands.get_all(),
         # added from protocol_runner, do we need it?
-        modules=engine_state.modules.get_all()
+        modules=[]
     )
 
-    engine_state_store.insert(EngineStateResource.costruct(
+    engine_state_store.insert(EngineStateResource(
         run_id=run.run_id,
         state=store_run_state
     ))

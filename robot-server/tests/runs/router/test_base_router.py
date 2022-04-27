@@ -3,10 +3,13 @@ import pytest
 from datetime import datetime
 from decoy import Decoy, matchers
 from pathlib import Path
+import sqlalchemy
+from typing import Generator
 
 from opentrons.types import DeckSlotName, MountType
-from opentrons.protocol_engine import StateView, ErrorOccurrence, types as pe_types
+from opentrons.protocol_engine import StateView, ErrorOccurrence, types as pe_types, commands as pe_commands, errors as pe_errors
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
+from opentrons.protocol_runner import ProtocolRunData
 
 from robot_server.errors import ApiError
 from robot_server.service.task_runner import TaskRunner
@@ -17,7 +20,7 @@ from robot_server.service.json_api import (
     MultiBodyMeta,
     ResourceLink,
 )
-
+from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
 from robot_server.protocols import (
     ProtocolStore,
     ProtocolResource,
@@ -36,7 +39,7 @@ from robot_server.runs.run_store import (
     RunNotFoundError,
     RunResource,
 )
-
+from robot_server.runs.engine_state_store import EngineStateStore, EngineStateResource
 from robot_server.runs.router.base_router import (
     AllRunsLinks,
     create_run,
@@ -46,7 +49,6 @@ from robot_server.runs.router.base_router import (
     remove_run,
     update_run,
 )
-
 
 LABWARE_OFFSET_REQUESTS = [
     pe_types.LabwareOffsetCreate(
@@ -77,6 +79,67 @@ RESOLVED_LABWARE_OFFSETS = [
         vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
     ),
 ]
+
+
+@pytest.fixture
+def sql_engine(tmp_path: Path) -> Generator[sqlalchemy.engine.Engine, None, None]:
+    """Return a set-up database to back the store."""
+    db_file_path = tmp_path / "test.db"
+    sql_engine = open_db_no_cleanup(db_file_path=db_file_path)
+    try:
+        add_tables_to_db(sql_engine)
+        yield sql_engine
+    finally:
+        sql_engine.dispose()
+
+
+@pytest.fixture
+def subject(sql_engine: sqlalchemy.engine.Engine) -> EngineStateStore:
+    """Get a ProtocolStore test subject."""
+    return EngineStateStore(sql_engine=sql_engine)
+
+
+@pytest.fixture
+def protocol_run() -> ProtocolRunData:
+    """Get a ProtocolRunData test object."""
+    analysis_command = pe_commands.Pause(
+        id="command-id",
+        key="command-key",
+        status=pe_commands.CommandStatus.SUCCEEDED,
+        createdAt=datetime(year=2022, month=2, day=2),
+        params=pe_commands.PauseParams(message="hello world"),
+    )
+
+    analysis_error = pe_errors.ErrorOccurrence(
+        id="error-id",
+        createdAt=datetime(year=2023, month=3, day=3),
+        errorType="BadError",
+        detail="oh no",
+    )
+
+    analysis_labware = pe_types.LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="namespace/load-name/42",
+        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offsetId=None,
+    )
+
+    analysis_pipette = pe_types.LoadedPipette(
+        id="pipette-id",
+        pipetteName=pe_types.PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+    return ProtocolRunData(
+        commands=[analysis_command],
+        errors=[analysis_error],
+        labware=[analysis_labware],
+        pipettes=[analysis_pipette],
+        # TODO(mc, 2022-02-14): evaluate usage of modules in the analysis resp.
+        modules=[],
+        # TODO (tz 22-4-19): added the field to class. make sure what to initialize
+        labwareOffsets=[],
+    )
 
 
 async def test_create_run(
@@ -593,7 +656,7 @@ async def test_delete_active_run_no_engine(
 
 
 async def test_update_run_to_not_current(
-    decoy: Decoy, mock_engine_store: EngineStore, mock_run_store: RunStore
+    decoy: Decoy, mock_engine_store: EngineStore, mock_run_store: RunStore, subject: EngineStateStore, protocol_run: ProtocolRunData
 ) -> None:
     """It should update a run to no longer be current."""
     run_resource = RunResource(
@@ -662,6 +725,9 @@ async def test_update_run_to_not_current(
             run_id=updated_resource.run_id, is_current=updated_resource.is_current
         ),
     )
+
+    get_run_state = subject.get(run_id="run-id")
+    assert get_run_state == protocol_run
 
 
 async def test_update_current_to_current_noop(
