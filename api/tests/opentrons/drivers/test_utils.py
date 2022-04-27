@@ -101,7 +101,7 @@ def test_parse_hs_device_information_failure(input_str: str) -> None:
         ["T:-123.566 C:-123.446", Temperature(target=-123.57, current=-123.45)],
         ["a:3 T:2. C:3 H:0 G:1", Temperature(target=2, current=3)],
         ["T:0 C:124", Temperature(target=0, current=124)],
-        ["T:None C:124", Temperature(target=None, current=124)],
+        ["T:none C:124", Temperature(target=None, current=124)],
     ],
 )
 def test_parse_temperature_response_success(
