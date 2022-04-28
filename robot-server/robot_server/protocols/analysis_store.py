@@ -36,8 +36,19 @@ _log = getLogger(__name__)
 _ANALYZER_VERSION = "TODO"
 
 
-class AnalysisNotFoundError(Exception):
-    """Raised when requesting an analysis by its ID and that analysis doesn't exist."""
+class AnalysisNotFoundError(ValueError):
+    """Exception raised if a given analysis is not found."""
+
+    def __init__(self, analysis_id: str) -> None:
+        """Initialize the error's message."""
+        super().__init__(f'Analysis "{analysis_id}" not found.')
+
+
+class AnalysisNotPendingOrNotFoundError(ValueError):
+    """Raised if a given analysis was expected to be pending, but isn't."""
+
+    def __init__(self, analysis_id: str) -> None:
+        super().__init__(f'Analysis "{analysis_id}" does not exist or is not pending.')
 
 
 class AnalysisStore:
@@ -57,6 +68,10 @@ class AnalysisStore:
         # when some are stored in the database and some are stored in-memory,
         # we disallow more than one pending analysis per protocol at a time.
         self._pending_analyses_by_protocol: Dict[str, PendingAnalysis] = {}
+
+    def get(self, analysis_id: str) -> ProtocolAnalysis:
+        """Get a single protocol analysis by its ID."""
+        raise NotImplementedError
 
     def add_pending(self, protocol_id: str, analysis_id: str) -> AnalysisSummary:
         """Add a new pending analysis to the store.

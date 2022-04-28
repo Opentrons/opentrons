@@ -20,12 +20,13 @@ from opentrons.protocol_reader import (
 from robot_server.errors import ApiError
 from robot_server.service.json_api import SimpleEmptyBody, MultiBodyMeta
 from robot_server.service.task_runner import TaskRunner
-from robot_server.protocols.analysis_store import AnalysisStore
+from robot_server.protocols.analysis_store import AnalysisStore, AnalysisNotFoundError
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 from robot_server.protocols.analysis_models import (
     AnalysisStatus,
     AnalysisSummary,
     CompletedAnalysis,
+    PendingAnalysis,
     AnalysisResult,
 )
 
@@ -47,6 +48,7 @@ from robot_server.protocols.router import (
     get_protocol_by_id,
     delete_protocol_by_id,
     get_protocol_analyses,
+    get_protocol_analysis_by_id,
 )
 
 
@@ -422,3 +424,68 @@ async def test_get_protocol_analyses_not_found(
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "ProtocolNotFound"
+
+
+async def test_get_protocol_analysis_by_id(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+) -> None:
+    """It should get a single full analysis by ID."""
+    analysis = PendingAnalysis(id="analysis-id")
+
+    decoy.when(protocol_store.has("protocol-id")).then_return(True)
+    decoy.when(analysis_store.get("analysis-id")).then_return(analysis)
+
+    result = await get_protocol_analysis_by_id(
+        protocolId="protocol-id",
+        analysisId="analysis-id",
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+    )
+
+    assert result.status_code == 200
+    assert result.content.data == analysis
+
+
+async def test_get_protocol_analysis_by_id_protocol_not_found(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+) -> None:
+    """It should 404 if the protocol does not exist."""
+    decoy.when(protocol_store.has("protocol-id")).then_return(False)
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_protocol_analysis_by_id(
+            protocolId="protocol-id",
+            analysisId="analysis-id",
+            protocol_store=protocol_store,
+            analysis_store=analysis_store,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "ProtocolNotFound"
+
+
+async def test_get_protocol_analysis_by_id_analysis_not_found(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+) -> None:
+    """It should get a single full analysis by ID."""
+    decoy.when(protocol_store.has("protocol-id")).then_return(True)
+    decoy.when(analysis_store.get("analysis-id")).then_raise(
+        AnalysisNotFoundError("oh no")
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_protocol_analysis_by_id(
+            protocolId="protocol-id",
+            analysisId="analysis-id",
+            protocol_store=protocol_store,
+            analysis_store=analysis_store,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "AnalysisNotFound"

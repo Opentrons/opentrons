@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import last from 'lodash/last'
-import { schemaV6Adapter } from '@opentrons/shared-data'
-import { useCurrentProtocol, useCurrentRun } from '../ProtocolUpload/hooks'
+import { useCurrentRun } from '../ProtocolUpload/hooks'
 import { formatInterval } from '../RunTimeControl/utils'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 interface ProtocolDetails {
@@ -42,20 +41,13 @@ function useNow(): string {
   return now
 }
 
+/*
+ * @deprecated slated for removal in 5.1.0
+ */
 export function useProtocolDetails(): ProtocolDetails {
-  let protocolData: ProtocolAnalysisFile<{}> | null = null
-  const protocolRecord = useCurrentProtocol()
-  const protocolAnalysis = protocolRecord?.data.analyses
-  if (protocolAnalysis != null) {
-    const lastProtocolAnalysis = protocolAnalysis[protocolAnalysis.length - 1]
-    if (lastProtocolAnalysis.status === 'completed') {
-      protocolData = schemaV6Adapter(lastProtocolAnalysis)
-    }
-  }
-  const displayName =
-    protocolRecord?.data.metadata.protocolName ??
-    protocolRecord?.data.files[0].name
-  return { displayName: displayName ?? null, protocolData }
+  const protocolData: ProtocolAnalysisFile<{}> | null = null
+  const displayName = null
+  return { displayName, protocolData }
 }
 
 export function useTimeElapsedSincePause(): string | null {

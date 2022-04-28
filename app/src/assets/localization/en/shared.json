@@ -21,5 +21,9 @@
   "stop": "stop",
   "try_again": "try again",
   "unknown": "unknown",
-  "dont_show_me_again": "Don’t show me again"
+  "dont_show_me_again": "Don’t show me again",
+  "view_latest_release_notes": "View latest release notes on",
+  "github": "GitHub",
+  "confirm": "Confirm",
+  "reset_all": "Reset all"
 }

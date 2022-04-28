@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
+import { css } from 'styled-components'
 import {
   Flex,
   Box,
@@ -156,8 +157,7 @@ export function AdvancedSettings(): JSX.Element {
               >
                 {labwarePath}
                 <Icon
-                  width={SPACING.spacing3}
-                  height={SPACING.spacing3}
+                  height="0.75rem"
                   marginLeft={SPACING.spacing3}
                   name="open-in-new"
                 />
@@ -190,7 +190,11 @@ export function AdvancedSettings(): JSX.Element {
             {t('tip_length_cal_method')}
           </StyledText>
           <RadioGroup
-            css={TYPOGRAPHY.pRegular}
+            useBlueChecked
+            css={css`
+              ${TYPOGRAPHY.pRegular}
+              line-height: ${TYPOGRAPHY.lineHeight20};
+            `}
             value={
               useTrashSurfaceForTipCal === true
                 ? ALWAYS_TRASH

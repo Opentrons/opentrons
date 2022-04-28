@@ -114,6 +114,9 @@ def test_get_empty(subject: AnalysisStore, protocol_store: ProtocolStore) -> Non
     assert full_result == []
     assert summaries_result == []
 
+    with pytest.raises(AnalysisNotFoundError, match="analysis-id"):
+        subject.get("analysis-id")
+
 
 def test_add_pending(subject: AnalysisStore, protocol_store: ProtocolStore) -> None:
     """It should add a pending analysis to the store."""
@@ -128,6 +131,7 @@ def test_add_pending(subject: AnalysisStore, protocol_store: ProtocolStore) -> N
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
 
     assert result == expected_summary
+    assert subject.get("analysis-id") == expected_analysis
     assert subject.get_by_protocol("protocol-id") == [expected_analysis]
     assert subject.get_summaries_by_protocol("protocol-id") == [expected_summary]
 
@@ -193,18 +197,17 @@ def test_add_analysis_equipment(
         errors=[],
     )
 
-    result = subject.get_by_protocol("protocol-id")
+    result = subject.get("analysis-id")
 
-    assert result == [
-        CompletedAnalysis(
-            id="analysis-id",
-            result=AnalysisResult.OK,
-            labware=[labware],
-            pipettes=[pipette],
-            commands=[],
-            errors=[],
-        )
-    ]
+    assert result == CompletedAnalysis(
+        id="analysis-id",
+        result=AnalysisResult.OK,
+        labware=[labware],
+        pipettes=[pipette],
+        commands=[],
+        errors=[],
+    )
+    assert subject.get_by_protocol("protocol-id") == [result]
 
 
 class AnalysisResultSpec(NamedTuple):

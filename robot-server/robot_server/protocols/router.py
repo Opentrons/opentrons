@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, UploadFile, status, Form
-from typing import List, Optional
+from typing import List, Optional, Union
 from typing_extensions import Literal
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
@@ -23,7 +23,7 @@ from robot_server.service.json_api import (
 
 from .protocol_models import Protocol, ProtocolFile, Metadata
 from .protocol_analyzer import ProtocolAnalyzer
-from .analysis_store import AnalysisStore
+from .analysis_store import AnalysisStore, AnalysisNotFoundError
 from .analysis_models import ProtocolAnalysis
 from .protocol_store import ProtocolStore, ProtocolResource, ProtocolNotFoundError
 from .dependencies import (
@@ -43,6 +43,13 @@ class ProtocolNotFound(ErrorDetails):
 
     id: Literal["ProtocolNotFound"] = "ProtocolNotFound"
     title: str = "Protocol Not Found"
+
+
+class AnalysisNotFound(ErrorDetails):
+    """An error returned when a given protocol analysis cannot be found."""
+
+    id: Literal["AnalysisNotFound"] = "AnalysisNotFound"
+    title: str = "Protocol Analysis Not Found"
 
 
 class ProtocolFilesInvalid(ErrorDetails):
@@ -295,3 +302,42 @@ async def get_protocol_analyses(
             meta=MultiBodyMeta(cursor=0, totalLength=len(analyses)),
         )
     )
+
+
+@protocols_router.get(
+    path="/protocols/{protocolId}/analyses/{analysisId}",
+    summary="Get one of a protocol's analyses",
+    responses={
+        status.HTTP_200_OK: {"model": SimpleBody[ProtocolAnalysis]},
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorBody[Union[ProtocolNotFound, AnalysisNotFound]]
+        },
+    },
+)
+async def get_protocol_analysis_by_id(
+    protocolId: str,
+    analysisId: str,
+    protocol_store: ProtocolStore = Depends(get_protocol_store),
+    analysis_store: AnalysisStore = Depends(get_analysis_store),
+) -> PydanticResponse[SimpleBody[ProtocolAnalysis]]:
+    """Get a protocol analysis by analyis ID.
+
+    Arguments:
+        protocolId: The ID of the protocol, pulled from the URL.
+        analysisId: THe ID of the analysis, pulled from the URL.
+        protocol_store: Protocol resource storage.
+        analysis_store: Analysis resource storage.
+    """
+    if not protocol_store.has(protocolId):
+        raise ProtocolNotFound(detail=f"Protocol {protocolId} not found").as_error(
+            status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        analysis = analysis_store.get(analysisId)
+    except AnalysisNotFoundError as error:
+        raise AnalysisNotFound(detail=str(error)).as_error(
+            status.HTTP_404_NOT_FOUND
+        ) from error
+
+    return await PydanticResponse.create(content=SimpleBody.construct(data=analysis))

@@ -1,5 +1,11 @@
+import * as React from 'react'
+import last from 'lodash/last'
 import { schemaV6Adapter } from '@opentrons/shared-data'
-import { useProtocolForRun } from '.'
+import {
+  useProtocolQuery,
+  useProtocolAnalysesQuery,
+  useRunQuery,
+} from '@opentrons/react-api-client'
 
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
@@ -11,19 +17,43 @@ export interface ProtocolDetails {
 export function useProtocolDetailsForRun(
   runId: string | null
 ): ProtocolDetails {
-  let protocolData: ProtocolAnalysisFile<{}> | null = null
-  const protocolRecord = useProtocolForRun(runId)
+  const { data: runRecord } = useRunQuery(runId)
+  const protocolId = runRecord?.data?.protocolId ?? null
+  const [isPollingProtocol, setIsPollingProtocol] = React.useState<boolean>(
+    true
+  )
 
-  const protocolAnalysis = protocolRecord?.data.analyses
-  if (protocolAnalysis != null) {
-    const lastProtocolAnalysis = protocolAnalysis[protocolAnalysis.length - 1]
-    if (lastProtocolAnalysis.status === 'completed') {
-      protocolData = schemaV6Adapter(lastProtocolAnalysis)
+  const { data: protocolRecord } = useProtocolQuery(
+    protocolId,
+    {
+      staleTime: Infinity,
+    },
+    isPollingProtocol
+  )
+
+  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
+    staleTime: Infinity,
+  })
+
+  const mostRecentAnalysisSummary =
+    last(protocolRecord?.data?.analysisSummaries ?? []) ?? null
+
+  React.useEffect(() => {
+    if (mostRecentAnalysisSummary?.status === 'completed') {
+      setIsPollingProtocol(false)
+    } else {
+      setIsPollingProtocol(true)
     }
-  }
+  }, [mostRecentAnalysisSummary?.status])
+
   const displayName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
+  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
 
-  return { displayName: displayName ?? null, protocolData }
+  return {
+    displayName: displayName ?? null,
+    protocolData:
+      mostRecentAnalysis != null ? schemaV6Adapter(mostRecentAnalysis) : null,
+  }
 }

@@ -20,7 +20,7 @@ import {
 } from '@opentrons/components'
 import { useCurrentRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareOffsetLocation } from '../../utils/getLabwareOffsetLocation'
-import { useProtocolDetails } from '../../../RunDetails/hooks'
+import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
 
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -29,6 +29,7 @@ interface LabwareInfoProps {
   displayName: string | null
   definitionDisplayName: string
   labwareId: string
+  runId: string
 }
 
 const labwareDisplayNameStyle = css`
@@ -40,9 +41,9 @@ const labwareDisplayNameStyle = css`
   -webkit-box-orient: vertical;
 `
 const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
-  const { displayName, definitionDisplayName, labwareId } = props
+  const { displayName, definitionDisplayName, labwareId, runId } = props
   const { t } = useTranslation('protocol_setup')
-  const { protocolData } = useProtocolDetails()
+  const { protocolData } = useProtocolDetailsForRun(runId)
   const runRecord = useCurrentRun()
 
   // protocolData should never be null as we don't render the `ProtocolSetup` unless we have an analysis
@@ -173,11 +174,12 @@ interface LabwareInfoOverlayProps {
   definition: LabwareDefinition2
   labwareId: string
   displayName: string | null
+  runId: string
 }
 export const LabwareInfoOverlay = (
   props: LabwareInfoOverlayProps
 ): JSX.Element => {
-  const { definition, labwareId, displayName } = props
+  const { definition, labwareId, displayName, runId } = props
   const width = definition.dimensions.xDimension
   const height = definition.dimensions.yDimension
   return (
@@ -195,6 +197,7 @@ export const LabwareInfoOverlay = (
         displayName={displayName}
         definitionDisplayName={getLabwareDisplayName(definition)}
         labwareId={labwareId}
+        runId={runId}
       />
     </RobotCoordsForeignDiv>
   )
