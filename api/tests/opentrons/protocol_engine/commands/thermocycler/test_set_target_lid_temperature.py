@@ -15,7 +15,7 @@ from opentrons.protocol_engine.commands.thermocycler.set_target_lid_temperature 
 )
 
 
-async def test_set_target_lif_temperature(
+async def test_set_target_lid_temperature(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
