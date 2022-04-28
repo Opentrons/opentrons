@@ -6,6 +6,7 @@ import tempfile
 from otupdate.common.file_actions import (
     unzip_update,
     hash_file,
+    HashMismatch,
     verify_signature,
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
@@ -177,6 +178,7 @@ class Updater(UpdateActionsInterface):
                 f"packaged {packaged_hash!r}"
             )
             LOG.error(msg)
+            raise HashMismatch(msg)
 
         if cert_path:
             sigfile = files.get(ROOTFS_SIG_NAME)

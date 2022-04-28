@@ -225,5 +225,5 @@ async def test_update_happypath(
             fd = open(testing_partition, "rb")
             tp_hasher.update(fd.read())
             tp_hash = binascii.hexlify(tp_hasher.digest())
-            assert tp_hash == zf.read("rootfs.xz.sha256").strip()
+            assert tp_hash == zf.read("tmp_uncomp_xz_hash_path").strip()
             fd.close()

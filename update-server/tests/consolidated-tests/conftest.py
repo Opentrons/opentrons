@@ -52,13 +52,26 @@ def downloaded_update_file_consolidated(request, extracted_update_file_consolida
     """
     zip_path_arr = []
     list_of_update_files = [
-        ("rootfs.xz", "rootfs.xz.sha256", "rootfs.xz.hash.sig", "ot3-system.zip"),
-        ("rootfs.ext4", "rootfs.ext4.hash", "rootfs.ext4.hash.sig", "ot2-system.zip"),
+        (
+            "rootfs.xz",
+            "rootfs.xz.sha256",
+            "rootfs.xz.hash.sig",
+            "tmp_uncomp_xz_hash_path",
+            "ot3-system.zip",
+        ),
+        (
+            "rootfs.ext4",
+            "rootfs.ext4.hash",
+            "rootfs.ext4.hash.sig",
+            "tmp_uncomp_xz_hash_path",
+            "ot2-system.zip",
+        ),
     ]
-    for index, (rootfs, sha256, sig, pkg) in enumerate(list_of_update_files):
+    for index, (rootfs, sha256, sig, xz_hash, pkg) in enumerate(list_of_update_files):
         rootfs_path = os.path.join(extracted_update_file_consolidated[index], rootfs)
         hash_path = os.path.join(extracted_update_file_consolidated[index], sha256)
         sig_path = os.path.join(extracted_update_file_consolidated[index], sig)
+        xz_hash_path = os.path.join(extracted_update_file_consolidated[index], xz_hash)
         zip_path = os.path.join(extracted_update_file_consolidated[index], pkg)
         with zipfile.ZipFile(zip_path, "w") as zf:
             if not request.node.get_closest_marker("exclude_rootfs_ext4"):
@@ -67,6 +80,7 @@ def downloaded_update_file_consolidated(request, extracted_update_file_consolida
                 zf.write(hash_path, sha256)
             if not request.node.get_closest_marker("exclude_rootfs_ext4_hash_sig"):
                 zf.write(sig_path, sig)
+            zf.write(xz_hash_path, xz_hash)
             zip_path_arr.append(zip_path)
         os.unlink(rootfs_path)
         os.unlink(hash_path)
@@ -113,6 +127,21 @@ def gen_hash_val(
         pytest.skip("no shasum invokeable on command line")
 
 
+def gen_hash_val_direct(rfs_path: str) -> str:
+    try:
+        shasum_out = subprocess.check_output(
+            [
+                "shasum",
+                "-a",
+                "256",
+                rfs_path,
+            ]
+        )
+        return shasum_out
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        pytest.skip("no shasum invokeable on command line")
+
+
 @pytest.fixture
 def extracted_update_file_consolidated(request, tmpdir):
     """
@@ -138,20 +167,27 @@ def extracted_update_file_consolidated(request, tmpdir):
     for (rootfs, sha256, sig) in list_of_extracted_files:
         rootfs_path = os.path.join(tmpdir, rootfs)
         hash_path = os.path.join(tmpdir, sha256)
+        uncomp_xz_hash_path = os.path.join(tmpdir, "tmp_uncomp_xz_hash_path")
         sig_path = os.path.join(tmpdir, sig)
         uncomp_xz_path = os.path.join(tmpdir, "tmp_uncomp")
         rootfs_contents = os.urandom(100000)
-
+        write_fake_rootfs(rootfs, rootfs_path, rootfs_contents, uncomp_xz_path)
         if request.node.get_closest_marker("bad_hash"):
             hashval = b"0oas0ajcs0asd0asjc0ans0d9ajsd0ian0s9djas"
         else:
 
             hashval = re.match(
                 b"^([a-z0-9]+) ",
-                gen_hash_val(rootfs, rootfs_path, rootfs_contents, uncomp_xz_path),
+                gen_hash_val_direct(rootfs_path),
+            ).group(1)
+            hashval2 = re.match(
+                b"^([a-z0-9]+) ",
+                gen_hash_val_direct(uncomp_xz_path),
             ).group(1)
         with open(hash_path, "wb") as rfsh:
             rfsh.write(hashval)
+        with open(uncomp_xz_hash_path, "wb") as rfsh:
+            rfsh.write(hashval2)
         if not request.node.get_closest_marker("bad_sig"):
             try:
                 subprocess.check_output(["openssl", "version"])
