@@ -77,7 +77,7 @@ def downloaded_update_file_consolidated(request, extracted_update_file_consolida
 
 def write_fake_rootfs(
     rootfs_name: str, rootfs_path: str, rootfs_contents: bytes, uncomp_xz_path: str
-):
+) -> str:
     if rootfs_name == "rootfs.xz":
         with lzma.open(rootfs_path, "w") as f:
             f.write(rootfs_contents)
@@ -96,7 +96,7 @@ def write_fake_rootfs(
 
 def gen_hash_val(
     rootfs_name: str, rootfs_path: str, rootfs_contents: bytes, uncomp_xz_path: str
-):
+) -> str:
     if rootfs_name == "rootfs.xz":
         try:
             shasum_out = subprocess.check_output(
