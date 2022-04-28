@@ -378,13 +378,19 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('[data-test="StepItem_2"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
-    // Verify that trashId is selected
-    cy.get('[id=BlowoutLocationField_dropdown]').should('have.value', 'trashId')
+    // Verify that fixedTrash is selected
+    cy.get('[id=BlowoutLocationField_dropdown]').should(
+      'have.value',
+      'fixedTrash'
+    )
     // Click on step 3 to verify the batch editing
     cy.get('[data-test="StepItem_3"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
     // Verify that trash is selected for the blowout option
-    cy.get('[id=BlowoutLocationField_dropdown]').should('have.value', 'trashId')
+    cy.get('[id=BlowoutLocationField_dropdown]').should(
+      'have.value',
+      'fixedTrash'
+    )
   })
 })
