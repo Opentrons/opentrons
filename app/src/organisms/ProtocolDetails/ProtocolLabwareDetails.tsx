@@ -11,8 +11,7 @@ import {
   Overlay,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  SIZE_3,
-  SIZE_4,
+  SIZE_5,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
@@ -56,25 +55,23 @@ export const ProtocolLabwareDetails = (
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-      >
+      <Flex flexDirection={DIRECTION_ROW}>
         <StyledText
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginRight={SPACING.spacing4}
           color={COLORS.darkBlack}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          data-testid={'ProtocolLabwareDetails_labware_name'}
         >
           {t('labware_name')}
         </StyledText>
         <StyledText
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginRight={SIZE_4}
           color={COLORS.darkBlack}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          marginLeft={SIZE_5}
+          data-testid={'ProtocolLabwareDetails_quantity'}
         >
           {t('quantity')}
         </StyledText>
@@ -87,6 +84,7 @@ export const ProtocolLabwareDetails = (
               displayName={labware.result.definition.metadata.displayName}
               quantity={labware.quantity}
               labware={{ definition: labware.result.definition }}
+              data-testid={`ProtocolLabwareDetails_item_${index}`}
             />
           </React.Fragment>
         )
@@ -124,13 +122,13 @@ export const ProtocolLabwareDetailItem = (
               marginRight={SPACING.spacing3}
             />
           ) : (
-            <Flex marginLeft={'1.25rem'}></Flex>
+            <Flex marginLeft={SPACING.spacingM} />
           )}
           <StyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             color={COLORS.darkBlack}
-            width={'15rem'}
+            width={SIZE_5}
           >
             {displayName}
           </StyledText>
@@ -139,7 +137,7 @@ export const ProtocolLabwareDetailItem = (
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={COLORS.darkBlack}
-          marginLeft={SIZE_3}
+          marginLeft={'5rem'}
         >
           {quantity}
         </StyledText>
@@ -184,8 +182,11 @@ export const LabwareDetailOverflowMenu = (
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
       marginRight={SPACING.spacing3}
+      marginLeft={'auto'}
     >
-      <OverflowBtn onClick={handleOverflowClick} />
+      <Flex>
+        <OverflowBtn onClick={handleOverflowClick} />
+      </Flex>
       {showOverflowMenu ? (
         <Flex
           width={'11rem'}
