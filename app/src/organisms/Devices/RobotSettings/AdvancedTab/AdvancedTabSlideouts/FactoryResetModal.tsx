@@ -9,9 +9,12 @@ import {
   JUSTIFY_FLEX_END,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
+  Link,
+  TYPOGRAPHY,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../../../../atoms/text'
-import { PrimaryButton, SecondaryButton } from '../../../../../atoms/Buttons'
+import { PrimaryButton } from '../../../../../atoms/Buttons'
 import { Modal } from '../../../../../atoms/Modal'
 import {
   useDispatchApiRequest,
@@ -63,19 +66,27 @@ export function FactoryResetModal({
   return (
     <>
       {isRobotConnected ? (
-        <Modal title={t('factory_reset_modal_title')} onClose={closeModal}>
+        <Modal
+          type="warning"
+          title={t('factory_reset_modal_title')}
+          onClose={closeModal}
+        >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText as="p" marginBottom={SPACING.spacing5}>
               {t('factory_reset_modal_description')}
             </StyledText>
-            <Flex justifyContent={JUSTIFY_FLEX_END}>
-              <SecondaryButton
+            <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
+              <Link
+                role="button"
                 onClick={closeModal}
                 textTransform={TEXT_TRANSFORM_CAPITALIZE}
                 marginRight={SPACING.spacing3}
+                color={COLORS.blue}
+                css={TYPOGRAPHY.fontSizeP}
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {t('shared:cancel')}
-              </SecondaryButton>
+              </Link>
               <PrimaryButton
                 backgroundColor={COLORS.error}
                 onClick={triggerReset}
