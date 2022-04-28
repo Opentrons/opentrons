@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { act, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { Toast } from '..'
 
@@ -94,5 +94,44 @@ describe('Toast', () => {
     expect(infoToast).toHaveStyle(`color: #16212D
     background-color: #eaeaeb`)
     getByLabelText('icon_info')
+  })
+  it('after 3 seconds the toast should be closed automatically', async () => {
+    jest.useFakeTimers()
+    props = {
+      message: 'test message',
+      type: 'info',
+      closeButton: false,
+      onClose: jest.fn(),
+    }
+    const { getByText } = render(props)
+    getByText('test message')
+    act(() => {
+      jest.advanceTimersByTime(100)
+    })
+    expect(props.onClose).not.toHaveBeenCalled()
+    act(() => {
+      jest.advanceTimersByTime(3000)
+    })
+    expect(props.onClose).toHaveBeenCalled()
+  })
+
+  it('should stay more than 3 seconds when requiredTimeout is false', () => {
+    props = {
+      message: 'test message',
+      type: 'info',
+      closeButton: false,
+      onClose: jest.fn(),
+      requiredTimeout: false,
+    }
+    const { getByText } = render(props)
+    getByText('test message')
+    act(() => {
+      jest.advanceTimersByTime(100)
+    })
+    expect(props.onClose).not.toHaveBeenCalled()
+    act(() => {
+      jest.advanceTimersByTime(3000)
+    })
+    expect(props.onClose).not.toHaveBeenCalled()
   })
 })
