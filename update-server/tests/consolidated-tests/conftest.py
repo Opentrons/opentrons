@@ -108,25 +108,6 @@ def write_fake_rootfs(
             return rootfs_path
 
 
-def gen_hash_val(
-    rootfs_name: str, rootfs_path: str, rootfs_contents: bytes, uncomp_xz_path: str
-) -> str:
-    try:
-        shasum_out = subprocess.check_output(
-            [
-                "shasum",
-                "-a",
-                "256",
-                write_fake_rootfs(
-                    rootfs_name, rootfs_path, rootfs_contents, uncomp_xz_path
-                ),
-            ]
-        )
-        return shasum_out
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        pytest.skip("no shasum invokeable on command line")
-
-
 def gen_hash_val_direct(rfs_path: str) -> str:
     try:
         shasum_out = subprocess.check_output(

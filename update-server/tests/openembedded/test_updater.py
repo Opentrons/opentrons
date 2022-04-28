@@ -91,7 +91,6 @@ def test_decomp_and_write(
 
 
 def test_commit_update(
-    monkeypatch,
     mock_root_fs_interface: MagicMock,
     mock_partition_manager_valid_switch: MagicMock,
 ):
