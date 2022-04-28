@@ -46,6 +46,9 @@ const CONTENT_STYLE = {
   paddingY: SPACING.spacing4,
 } as const
 
+/**
+ *  @deprecated Use Modal in app folder
+ */
 export interface BaseModalProps extends StyleProps {
   /** Overlay color, defaults to `OVERLAY_GRAY_90` */
   overlayColor?: string
@@ -67,6 +70,7 @@ export interface BaseModalProps extends StyleProps {
  * - A content area, with `overflow-y: auto` and customizable with style props
  * - An optional sticky header
  * - An optional sticky footer
+ *  @deprecated Use Modal in app folder
  */
 export function BaseModal(props: BaseModalProps): JSX.Element {
   const {
