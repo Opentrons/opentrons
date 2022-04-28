@@ -49,7 +49,7 @@ export const FirmwareUpdateFailedModal = (
         data-testid={`FirmwareUpdateFailedModal_body_text_${module.serial}`}
       >
         <Text paddingBottom={SPACING.spacing2}>
-          {t('an_error_occurred_while_updating')}
+          {t('an_error_occurred_while_updating_please_try_again')}
         </Text>
         <Text>{errorMessage}</Text>
       </Flex>

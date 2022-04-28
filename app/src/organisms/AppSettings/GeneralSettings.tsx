@@ -6,7 +6,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import {
   SPACING_AUTO,
   Flex,
-  AlertItem,
   useMountEffect,
   Box,
   Link,
@@ -23,6 +22,7 @@ import { TertiaryButton, ToggleButton } from '../../atoms/Buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
+import { Banner } from '../../atoms/Banner'
 import {
   CURRENT_VERSION,
   getAvailableShellUpdate,
@@ -107,21 +107,18 @@ export function GeneralSettings(): JSX.Element {
             marginBottom={SPACING.spacing4}
             id="GeneralSettings_updatebanner"
           >
-            <AlertItem
+            <Banner
               type="warning"
-              title={
-                <>
-                  {t('update_available')}
-                  <Link
-                    textDecoration={TEXT_DECORATION_UNDERLINE}
-                    onClick={() => setShowUpdateModal(true)}
-                  >
-                    {t('view_update')}
-                  </Link>
-                </>
-              }
               onCloseClick={() => setShowUpdateBanner(false)}
-            />
+            >
+              {t('update_available')}
+              <Link
+                textDecoration={TEXT_DECORATION_UNDERLINE}
+                onClick={() => setShowUpdateModal(true)}
+              >
+                {t('view_update')}
+              </Link>
+            </Banner>
           </Box>
         )}
         <Flex
@@ -136,7 +133,7 @@ export function GeneralSettings(): JSX.Element {
               onCloseClick={() => setShowConnectRobotSlideout(false)}
             />
           )}
-          <Box width="70%">
+          <Box width="65%">
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
@@ -163,22 +160,22 @@ export function GeneralSettings(): JSX.Element {
             </StyledText>
             <Link
               role="button"
-              css={TYPOGRAPHY.pSemiBold}
-              color={COLORS.blue}
+              css={TYPOGRAPHY.linkPSemibold}
               onClick={() => setShowPreviousVersionModal(true)}
               id="GeneralSettings_previousVersionLink"
             >
               {t('restore_previous')}
             </Link>
-            <Box>
-              <ExternalLink
-                css={TYPOGRAPHY.pSemiBold}
-                href={SOFTWARE_SYNC_URL}
-                id="GeneralSettings_appAndRobotSync"
-              >
-                {t('versions_sync')}
-              </ExternalLink>
-            </Box>
+            <StyledText as="p" paddingY={SPACING.spacing3}>
+              {t('manage_versions')}
+            </StyledText>
+            <ExternalLink
+              css={TYPOGRAPHY.linkPSemibold}
+              href={SOFTWARE_SYNC_URL}
+              id="GeneralSettings_appAndRobotSync"
+            >
+              {t('versions_sync')}
+            </ExternalLink>
           </Box>
           {updateAvailable ? (
             <TertiaryButton
