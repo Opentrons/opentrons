@@ -77,7 +77,8 @@ async def test_create_play_action_to_start_run(
     assert result.content.data == action
     assert result.status_code == 201
 
-    mock_protocol_runner_wrapper = ProtocolRunnerWrapper(runner=matchers.Anything(), engine_state_store=mock_engine_state_store)
+    mock_protocol_runner_wrapper = ProtocolRunnerWrapper(runner=mock_engine_store.runner, engine_state_store=mock_engine_state_store)
+
     decoy.verify(
         task_runner.run(mock_protocol_runner_wrapper.run),
         mock_run_store.insert_action(run_id=prev_run.run_id, action=action),
