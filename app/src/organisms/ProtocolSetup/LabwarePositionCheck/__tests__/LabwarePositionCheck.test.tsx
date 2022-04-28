@@ -51,6 +51,7 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
+const MOCK_RUN_ID = 'fakeRunId'
 
 const render = (props: React.ComponentProps<typeof LabwarePositionCheck>) => {
   return renderWithProviders(<LabwarePositionCheck {...props} />, {
@@ -65,9 +66,10 @@ describe('LabwarePositionCheck', () => {
   beforeEach(() => {
     props = {
       onCloseClick: jest.fn(),
+      runId: MOCK_RUN_ID,
     }
     when(mockUseSteps)
-      .calledWith()
+      .calledWith(MOCK_RUN_ID)
       .mockReturnValue([
         {
           commands: [

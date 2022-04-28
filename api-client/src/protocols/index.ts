@@ -1,4 +1,5 @@
 export { getProtocol } from './getProtocol'
+export { getProtocolAnalyses } from './getProtocolAnalyses'
 export { deleteProtocol } from './deleteProtocol'
 export { createProtocol } from './createProtocol'
 export { getProtocols } from './getProtocols'

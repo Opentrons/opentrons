@@ -15,6 +15,8 @@ import {
   useCurrentRunId,
   useCurrentRunCommands,
 } from '../../../../ProtocolUpload/hooks'
+
+import { useProtocolDetailsForRun } from '../../../../Devices/hooks'
 import { getLabwareLocation } from '../../../utils/getLabwareLocation'
 import { useSteps } from '../useSteps'
 import { useLabwarePositionCheck } from '../useLabwarePositionCheck'
@@ -26,6 +28,7 @@ jest.mock('../../../../../redux/robot/selectors')
 jest.mock('../../../../../redux/analytics')
 jest.mock('../../../../../redux/modules')
 jest.mock('../../../../ProtocolUpload/hooks')
+jest.mock('../../../../Devices/hooks')
 jest.mock('../../../utils/getLabwareLocation')
 jest.mock('../useSteps')
 
@@ -62,6 +65,9 @@ const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
+>
 let mockTrackEvent: jest.Mock
 describe('useLabwarePositionCheck', () => {
   const MOCK_RUN_ID = 'MOCK_RUN_ID'
@@ -74,9 +80,12 @@ describe('useLabwarePositionCheck', () => {
   let mockCreateLabwareDefinition: jest.Mock
   beforeEach(() => {
     when(mockUseCurrentRunId).calledWith().mockReturnValue(MOCK_RUN_ID)
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(MOCK_RUN_ID)
+      .mockReturnValue({ protocolData: null } as any)
     when(mockUseCurrentRunCommands).calledWith().mockReturnValue([])
     when(mockUseSteps)
-      .calledWith()
+      .calledWith(MOCK_RUN_ID)
       .mockReturnValue([
         {
           commands: [
@@ -182,7 +191,7 @@ describe('useLabwarePositionCheck', () => {
   describe('proceed', () => {
     it('should home the robot after issuing the last LPC command', async () => {
       when(mockUseSteps)
-        .calledWith()
+        .calledWith(MOCK_RUN_ID)
         .mockReturnValue([
           {
             commands: [
@@ -235,7 +244,7 @@ describe('useLabwarePositionCheck', () => {
     })
     it('should execute the next command', async () => {
       when(mockUseSteps)
-        .calledWith()
+        .calledWith(MOCK_RUN_ID)
         .mockReturnValue([
           {
             commands: [

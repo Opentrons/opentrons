@@ -25,6 +25,22 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   ${TYPOGRAPHY.labelSemiBold}
 
   ${styleProps}
+
+  &:hover {
+    background-color: ${COLORS.blueHover};
+  }
+
+  &:active {
+    background-color: ${COLORS.bluePressed};
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 3px ${COLORS.warning};
+  }
+
+  &:disabled {
+    background-color: ${COLORS.greyDisabled};
+  }
 `
 
 export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`

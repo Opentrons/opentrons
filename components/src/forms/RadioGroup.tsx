@@ -1,7 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '../icons'
-
 import styles from './forms.css'
 
 export interface RadioOption {
@@ -29,6 +28,8 @@ export interface RadioGroupProps {
   error?: string | null | undefined
   /** 'name' attr of input */
   name?: string
+  /** optional prop to turn radio field blue when checked */
+  useBlueChecked?: boolean
 }
 
 export function RadioGroup(props: RadioGroupProps): JSX.Element {
@@ -45,34 +46,42 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
 
   return (
     <div className={outerClassName}>
-      {props.options?.map(radio => (
-        <label key={radio.value} className={itemClassName}>
-          <div className={styles.checkbox_icon}>
-            <Icon
-              name={
-                radio.value === props.value
-                  ? 'radiobox-marked'
-                  : 'radiobox-blank'
-              }
-              width="100%"
-            />
-          </div>
+      {props.options?.map(radio => {
+        const useStyleUpdates =
+          props.useBlueChecked && radio.value === props.value
+        return (
+          <label key={radio.value} className={itemClassName}>
+            <div
+              className={cx(styles.checkbox_icon, {
+                [styles.checked]: useStyleUpdates,
+              })}
+            >
+              <Icon
+                name={
+                  radio.value === props.value
+                    ? 'radiobox-marked'
+                    : 'radiobox-blank'
+                }
+                width={props.useBlueChecked ? '75%' : '100%'}
+              />
+            </div>
 
-          <input
-            className={cx(styles.input_field, styles.accessibly_hidden)}
-            type="radio"
-            name={props.name}
-            value={radio.value}
-            checked={radio.value === props.value}
-            onBlur={props.onBlur}
-            onChange={props.onChange}
-          />
-          <div className={cx(props.labelTextClassName, styles.label_text)}>
-            {radio.name}
-          </div>
-          {radio.children}
-        </label>
-      ))}
+            <input
+              className={cx(styles.input_field, styles.accessibly_hidden)}
+              type="radio"
+              name={props.name}
+              value={radio.value}
+              checked={radio.value === props.value}
+              onBlur={props.onBlur}
+              onChange={props.onChange}
+            />
+            <div className={cx(props.labelTextClassName, styles.label_text)}>
+              {radio.name}
+            </div>
+            {radio.children}
+          </label>
+        )
+      })}
     </div>
   )
 }

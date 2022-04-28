@@ -15,6 +15,8 @@ and/or schema generation.
 
 from . import heater_shaker
 from . import magnetic_module
+from . import temperature_module
+from . import thermocycler
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, CommandStatus
 
@@ -236,4 +238,6 @@ __all__ = [
     # module command bundles
     "heater_shaker",
     "magnetic_module",
+    "temperature_module",
+    "thermocycler",
 ]

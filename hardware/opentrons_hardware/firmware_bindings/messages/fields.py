@@ -142,5 +142,5 @@ class SensorOutputBindingField(utils.UInt8Field):
 class EepromDataField(utils.BinaryFieldBase[bytes]):
     """The data portion of an eeprom read/write message."""
 
-    NUM_BYTES = 32
+    NUM_BYTES = 8
     FORMAT = f"{NUM_BYTES}s"
