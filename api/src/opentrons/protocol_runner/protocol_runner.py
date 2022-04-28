@@ -1,7 +1,7 @@
 """Protocol run control and management."""
 from dataclasses import dataclass
 from typing import List, Optional, cast
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from opentrons.hardware_control import HardwareControlAPI, ThreadManagedHardware
 from opentrons.protocol_reader import (
@@ -43,8 +43,8 @@ class ProtocolRunData(BaseModel):
     errors: List[ErrorOccurrence]
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]
-    modules: List[LoadedModule] # TODO use default factory by pydantic
-    labwareOffsets: List[LabwareOffset] # TODO use default factory by pydantic
+    modules: List[LoadedModule]
+    labwareOffsets: List[LabwareOffset]
 
 
 # TODO(mc, 2022-01-11): this class has become bloated. Split into an abstract

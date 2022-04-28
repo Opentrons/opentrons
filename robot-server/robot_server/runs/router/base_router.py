@@ -5,6 +5,8 @@ Contains routes dealing primarily with `Run` models.
 import logging
 from datetime import datetime
 from typing import Optional, Union
+
+from pbr.hooks import commands
 from typing_extensions import Literal
 
 from fastapi import APIRouter, Depends, status
@@ -342,6 +344,8 @@ async def update_run(
             status.HTTP_409_CONFLICT
         )
 
+    # engine_state = engine_store.get_state(run.run_id)
+
     engine_state = engine_store.engine.state_view
 
     protocol_run_data = ProtocolRunData(
@@ -349,9 +353,9 @@ async def update_run(
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
         labwareOffsets=engine_state.labware.get_labware_offsets(),
-        # added from protocol_runner, do we need it?
+        # TODO (tz)
+        # get all commands, modules. extract this to method in engine_state
         commands=[],
-        # added from protocol_runner, do we need it?
         modules=[]
     )
 
