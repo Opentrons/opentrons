@@ -12,7 +12,7 @@ import os
 import re
 import subprocess
 import tempfile
-from typing import Callable, Optional, List
+from typing import Callable, Optional
 
 from otupdate.common.file_actions import (
     unzip_update,
@@ -22,7 +22,6 @@ from otupdate.common.file_actions import (
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
 
-UPDATE_PKG = "ot2-system.zip"
 ROOTFS_SIG_NAME = "rootfs.ext4.hash.sig"
 ROOTFS_HASH_NAME = "rootfs.ext4.hash"
 ROOTFS_NAME = "rootfs.ext4"
@@ -36,19 +35,6 @@ class RootPartitions(enum.Enum):
 
 
 class OT2UpdateActions(UpdateActionsInterface):
-    def get_required_files(self, cert_path: Optional[str]) -> List[str]:
-        required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
-        if cert_path:
-            required.append(ROOTFS_SIG_NAME)
-        return required
-
-    def get_update_pkg_name(self) -> str:
-        return UPDATE_PKG
-
-    def check_update_pkg_name(self, name: str) -> bool:
-        """Make sure we're dealing with a valid update package!"""
-        return name == UPDATE_PKG
-
     def validate_update(
         self,
         filepath: str,
@@ -75,8 +61,9 @@ class OT2UpdateActions(UpdateActionsInterface):
         def zip_callback(progress):
             progress_callback(progress / 2.0)
 
-        required = self.get_required_files(cert_path)
-
+        required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
+        if cert_path:
+            required.append(ROOTFS_SIG_NAME)
         files, sizes = unzip_update(filepath, zip_callback, UPDATE_FILES, required)
 
         def hash_callback(progress):

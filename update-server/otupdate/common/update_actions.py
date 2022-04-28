@@ -5,7 +5,7 @@ update actions
 
 import abc
 import contextlib
-from typing import NamedTuple, Optional, Callable, Iterator, List
+from typing import NamedTuple, Optional, Callable, Iterator
 from aiohttp import web
 
 from .constants import APP_VARIABLE_PREFIX
@@ -26,10 +26,6 @@ class Partition(NamedTuple):
 
 
 class UpdateActionsInterface:
-    @abc.abstractmethod
-    def get_required_files(self, cert_path: str) -> List[str]:
-        ...
-
     @staticmethod
     def from_request(request: web.Request) -> Optional["UpdateActionsInterface"]:
         """Get the update object from the aiohttp app store"""
@@ -39,16 +35,6 @@ class UpdateActionsInterface:
     def build_and_insert(cls, app: web.Application):
         """Build the object and put it in the app store"""
         app[FILE_ACTIONS_VARNAME] = cls()
-
-    @abc.abstractmethod
-    def check_update_pkg_name(self, name: str) -> bool:
-        """Make sure we're dealing with a valid update package!"""
-        ...
-
-    @abc.abstractmethod
-    def get_update_pkg_name(self) -> str:
-        """Get update package name."""
-        ...
 
     @abc.abstractmethod
     def validate_update(
@@ -72,7 +58,6 @@ class UpdateActionsInterface:
 
         Will also raise an exception if validation fails
         """
-        ...
 
     @abc.abstractmethod
     def write_update(

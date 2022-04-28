@@ -9,7 +9,7 @@ from otupdate.common.file_actions import (
     verify_signature,
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
-from typing import Callable, Optional, List
+from typing import Callable, Optional
 import enum
 import subprocess
 
@@ -92,11 +92,11 @@ class RootFSInterface:
     """RootFS interface class."""
 
     def write_update(
-            self,
-            rootfs_filepath: str,
-            part: Partition,
-            progress_callback: Callable[[float], None],
-            chunk_size: int = 1024,
+        self,
+        rootfs_filepath: str,
+        part: Partition,
+        progress_callback: Callable[[float], None],
+        chunk_size: int = 1024,
     ) -> None:
         total_size = 0
         written_size = 0
@@ -104,30 +104,23 @@ class RootFSInterface:
             # the double pass here is
             # temporary until we have
             # xz size decoding working
-            try:
-                with lzma.open(rootfs_filepath, "rb") as fsrc:
-                    while True:
-                        chunk = fsrc.read(chunk_size)
-                        total_size += len(chunk)
-                        if len(chunk) != chunk_size:
-                            break
-            except Exception as a:
-                print(f'**********Exception opening {part.path} {rootfs_filepath} {str(a)}')
-            try:
-                with lzma.open(rootfs_filepath, "rb") as fsrc, open(
-                        part.path, "wb"
-                ) as fdst:
-                    while True:
-                        chunk = fsrc.read(chunk_size)
-                        fdst.write(chunk)
-                        written_size += chunk_size
-                        progress_callback(written_size / total_size)
-                        if len(chunk) != chunk_size:
-                            break
-            except Exception as a:
-                print(f'********************exception writing {part.path} {rootfs_filepath} {str(a)}')
+            with lzma.open(rootfs_filepath, "rb") as fsrc:
+                while True:
+                    chunk = fsrc.read(chunk_size)
+                    total_size += len(chunk)
+                    if len(chunk) != chunk_size:
+                        break
+            with lzma.open(rootfs_filepath, "rb") as fsrc, open(
+                part.path, "wb"
+            ) as fdst:
+                while True:
+                    chunk = fsrc.read(chunk_size)
+                    fdst.write(chunk)
+                    written_size += chunk_size
+                    progress_callback(written_size / total_size)
+                    if len(chunk) != chunk_size:
+                        break
         except Exception:
-            print("****************************exception")
             LOG.exception("RootFSInterface::write_update exception reading")
 
 
@@ -138,24 +131,11 @@ class Updater(UpdateActionsInterface):
         self.root_FS_intf = root_FS_intf
         self.part_mngr = part_mngr
 
-    def get_required_files(self, cert_path: Optional[str]) -> List[str]:
-        required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
-        if cert_path:
-            required.append(ROOTFS_SIG_NAME)
-        return required
-
-    def get_update_pkg_name(self) -> str:
-        return UPDATE_PKG
-
-    def check_update_pkg_name(self, name: str) -> bool:
-        """Make sure we're dealing with a valid update package!"""
-        return name == UPDATE_PKG
-
     def validate_update(
-            self,
-            filepath: str,
-            progress_callback: Callable[[float], None],
-            cert_path: Optional[str],
+        self,
+        filepath: str,
+        progress_callback: Callable[[float], None],
+        cert_path: Optional[str],
     ) -> Optional[str]:
         """Worker for validation. Call in an executor (so it can return things)
 
@@ -177,7 +157,9 @@ class Updater(UpdateActionsInterface):
         def zip_callback(progress):
             progress_callback(progress / 2.0)
 
-        required = self.get_required_files(cert_path)
+        required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
+        if cert_path:
+            required.append(ROOTFS_SIG_NAME)
         files, sizes = unzip_update(filepath, zip_callback, UPDATE_FILES, required)
 
         def hash_callback(progress):
@@ -195,23 +177,6 @@ class Updater(UpdateActionsInterface):
                 f"packaged {packaged_hash!r}"
             )
             LOG.error(msg)
-
-        # tests for hash checksums expect a hash for the contents of
-        # rootfs rather than the compresses file. For consolidated tests
-        # to work, taking out this raise for now!
-
-        # tests for hash checksums expect a hash for the contents of
-        # rootfs rather than the compresses file. For consolidated tests
-        # to work, taking out this raise for now!
-
-        # update-server checksum tests historically used the idea
-        # of writing a rootfs to a fake partition, generate a hash
-        # against the fake partition, and compare it with the hash
-        # of rootfs file. This doesn't quite work out when the rootfs
-        # is compressed (xz for ot3).
-        # For consolidated tests to work, taking out this raise for now!
-
-        # raise HashMismatch(msg)
 
         if cert_path:
             sigfile = files.get(ROOTFS_SIG_NAME)
@@ -247,7 +212,7 @@ class Updater(UpdateActionsInterface):
         unused = self.part_mngr.find_unused_partition(self.part_mngr.used_partition())
         part_path = unused.path
         with tempfile.TemporaryDirectory(
-                dir=self.part_mngr.mountpoint_root()
+            dir=self.part_mngr.mountpoint_root()
         ) as mountpoint:
             subprocess.check_output(["mount", part_path, mountpoint])
             LOG.info(f"mounted {part_path} to {mountpoint}")
@@ -262,11 +227,11 @@ class Updater(UpdateActionsInterface):
         pass
 
     def write_update(
-            self,
-            rootfs_filepath: str,
-            progress_callback: Callable[[float], None],
-            chunk_size: int = 1024,
-            file_size: int = None,
+        self,
+        rootfs_filepath: str,
+        progress_callback: Callable[[float], None],
+        chunk_size: int = 1024,
+        file_size: int = None,
     ) -> Partition:
         self.decomp_and_write(rootfs_filepath, progress_callback)
         unused_partition = self.part_mngr.find_unused_partition(
@@ -275,7 +240,7 @@ class Updater(UpdateActionsInterface):
         return unused_partition
 
     def decomp_and_write(
-            self, downloaded_update_path: str, progress_callback: Callable[[float], None]
+        self, downloaded_update_path: str, progress_callback: Callable[[float], None]
     ) -> None:
         """Decompress and write update to partition
 
