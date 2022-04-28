@@ -312,8 +312,6 @@ should only be used if you have a specific need.
 
 .. versionadded:: 2.0
 
-.. _new-default-op-positions:
-
 
 TK replacement / link out to gantry movement?
 
