@@ -66,9 +66,6 @@ async def test_commit_fails_wrong_state(test_cli, update_session):
     assert resp.status == 409
 
 
-br_handler = update_actions.OT2UpdateActions()
-
-
 @pytest.fixture(
     params=[
         (
@@ -84,7 +81,7 @@ def sys_handler(request):
 
 async def test_updater_chain(
     otupdate_config,
-        downloaded_update_file_consolidated,
+    downloaded_update_file_consolidated,
     loop,
     testing_partition,
     sys_handler,
@@ -118,7 +115,7 @@ async def test_updater_chain(
 @pytest.mark.exclude_rootfs_ext4
 async def test_session_catches_validation_fail(
     otupdate_config,
-        downloaded_update_file_consolidated,
+    downloaded_update_file_consolidated,
     loop,
     sys_handler,
 ):
@@ -142,12 +139,12 @@ async def test_session_catches_validation_fail(
 async def test_update_happypath(
     test_cli,
     update_session,
-        downloaded_update_file_consolidated,
+    downloaded_update_file_consolidated,
     loop,
     testing_partition,
     monkeypatch,
     mock_partition_manager_valid_switch,
-        extracted_update_file_consolidated,
+    extracted_update_file_consolidated,
 ):
 
     updaters = [

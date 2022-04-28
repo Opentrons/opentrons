@@ -149,7 +149,7 @@ class Updater(UpdateActionsInterface):
 
     def check_update_pkg_name(self, name: str) -> bool:
         """Make sure we're dealing with a valid update package!"""
-        return name is UPDATE_PKG
+        return name == UPDATE_PKG
 
     def validate_update(
             self,

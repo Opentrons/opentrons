@@ -121,53 +121,6 @@ def extracted_update_file(request, tmpdir):
 
 
 @pytest.fixture
-def extracted_ot3_update_file(request, tmpdir):
-    """
-    Return the path to a dir containing an unzipped update file.
-
-    To make a bad hash, mark with ``bad_hash``. To make a bad
-    signature, mark with ``bad_sig``.
-    """
-    rootfs_path = os.path.join(tmpdir, "rootfs.xz")
-    hash_path = os.path.join(tmpdir, "rootfs.xz.sha256")
-    sig_path = os.path.join(tmpdir, "rootfs.xz.hash.sig")
-    rootfs_contents = os.urandom(100000)
-    with open(rootfs_path, "wb") as rfs:
-        rfs.write(rootfs_contents)
-    if request.node.get_closest_marker("bad_hash"):
-        hashval = b"0oas0ajcs0asd0asjc0ans0d9ajsd0ian0s9djas"
-    else:
-        try:
-            shasum_out = subprocess.check_output(["shasum", "-a", "256", rootfs_path])
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            pytest.skip("no shasum invokeable on command line")
-        hashval = re.match(b"^([a-z0-9]+) ", shasum_out).group(1)
-    with open(hash_path, "wb") as rfsh:
-        rfsh.write(hashval)
-    if not request.node.get_closest_marker("bad_sig"):
-        try:
-            subprocess.check_output(["openssl", "version"])
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            pytest.skip("requires openssl binary to be installed")
-        subprocess.check_call(
-            [
-                "openssl",
-                "dgst",
-                "-sha256",
-                "-sign",
-                os.path.join(HERE, "ot-update-server-unit-tests.key"),
-                "-out",
-                sig_path,
-                hash_path,
-            ]
-        )
-    else:
-        with open(sig_path, "wb") as sigfile:
-            sigfile.write(os.urandom(256))
-    return tmpdir
-
-
-@pytest.fixture
 def loop():
     if sys.platform == "win32":
         _loop = asyncio.ProactorEventLoop()

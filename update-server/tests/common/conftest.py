@@ -9,6 +9,7 @@ from otupdate import buildroot
 from otupdate import openembedded
 
 HERE = os.path.abspath(os.path.dirname(__file__))
+one_up = os.path.abspath(os.path.join(__file__, "../../"))
 
 
 @pytest.fixture(params=[openembedded, buildroot])
@@ -80,7 +81,7 @@ def extracted_update_file(request, tmpdir):
                 "dgst",
                 "-sha256",
                 "-sign",
-                os.path.join(HERE, "ot-update-server-unit-tests.key"),
+                os.path.join(one_up, "ot-update-server-unit-tests.key"),
                 "-out",
                 sig_path,
                 hash_path,

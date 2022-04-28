@@ -16,6 +16,7 @@ from otupdate.openembedded import PartitionManager
 from tests.common.config import FakeRootPartElem
 
 HERE = os.path.abspath(os.path.dirname(__file__))
+one_up = os.path.abspath(os.path.join(__file__, "../../"))
 
 
 @pytest.fixture(params=[openembedded, buildroot])
@@ -96,7 +97,6 @@ def write_fake_rootfs(
 def gen_hash_val(
     rootfs_name: str, rootfs_path: str, rootfs_contents: bytes, uncomp_xz_path: str
 ):
-
     if rootfs_name == "rootfs.xz":
         try:
             shasum_out = subprocess.check_output(
@@ -179,7 +179,7 @@ def extracted_update_file_consolidated(request, tmpdir):
                     "dgst",
                     "-sha256",
                     "-sign",
-                    os.path.join(HERE, "ot-update-server-unit-tests.key"),
+                    os.path.join(one_up, "ot-update-server-unit-tests.key"),
                     "-out",
                     sig_path,
                     hash_path,
@@ -195,16 +195,11 @@ def extracted_update_file_consolidated(request, tmpdir):
 @pytest.fixture
 def testing_partition(monkeypatch, tmpdir):
     partfile = os.path.join(tmpdir, "fake-partition")
-    partfile2 = os.path.join(tmpdir, "fake2-partition")
     find_unused = mock.Mock()
-    find_unused2 = mock.Mock()
     monkeypatch.setattr(buildroot.update_actions, "_find_unused_partition", find_unused)
 
     find_unused.return_value = FakeRootPartElem(
         "TWO", common.update_actions.Partition(2, partfile)
-    )
-    find_unused2.return_value = FakeRootPartElem(
-        "ONE", common.update_actions.Partition(1, partfile2)
     )
     return partfile
 
