@@ -3,7 +3,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, NamedTuple, Optional, Sequence, overload, Union
+from typing import (
+    Dict,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    overload,
+    Union,
+    Type,
+    TypeVar,
+)
 from numpy import array, dot
 
 from opentrons.hardware_control.modules.magdeck import (
@@ -28,11 +38,16 @@ from .module_substates import (
     MagneticModuleSubState,
     HeaterShakerModuleSubState,
     TemperatureModuleSubState,
+    ThermocyclerModuleSubState,
     MagneticModuleId,
     HeaterShakerModuleId,
     TemperatureModuleId,
+    ThermocyclerModuleId,
     ModuleSubStateType,
 )
+
+
+ModuleSubStateT = TypeVar("ModuleSubStateT", bound=ModuleSubStateType)
 
 
 class SlotTransit(NamedTuple):
@@ -94,64 +109,21 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             self._handle_command(action.command)
 
         elif isinstance(action, AddModuleAction):
-            self._state.slot_by_module_id[action.module_id] = None
-            self._state.hardware_by_module_id[action.module_id] = HardwareModule(
+            self._add_module_substate(
+                module_id=action.module_id,
                 serial_number=action.serial_number,
                 definition=action.definition,
             )
-            module_id = action.module_id
-            module_model = action.definition.model
-            if ModuleModel.is_magnetic_module_model(module_model):
-                self._state.substate_by_module_id[module_id] = MagneticModuleSubState(
-                    module_id=MagneticModuleId(module_id), model=module_model
-                )
-            elif ModuleModel.is_heater_shaker_module_model(module_model):
-                self._state.substate_by_module_id[
-                    module_id
-                ] = HeaterShakerModuleSubState(
-                    module_id=HeaterShakerModuleId(module_id),
-                    plate_target_temperature=None,
-                )
-            elif ModuleModel.is_temperature_module_model(module_model):
-                self._state.substate_by_module_id[
-                    module_id
-                ] = TemperatureModuleSubState(
-                    module_id=TemperatureModuleId(module_id),
-                    plate_target_temperature=None,
-                )
 
     def _handle_command(self, command: Command) -> None:
         if isinstance(command.result, LoadModuleResult):
-            module_id = command.result.moduleId
-            serial_number = command.result.serialNumber
-            definition = command.result.definition
-            slot_name = command.params.location.slotName
-
-            self._state.slot_by_module_id[module_id] = slot_name
-            self._state.hardware_by_module_id[module_id] = HardwareModule(
-                serial_number=serial_number,
-                definition=definition,
+            self._add_module_substate(
+                module_id=command.result.moduleId,
+                serial_number=command.result.serialNumber,
+                definition=command.result.definition,
+                slot_name=command.params.location.slotName,
             )
-            module_id = command.result.moduleId
-            module_model = command.result.definition.model
-            if ModuleModel.is_magnetic_module_model(module_model):
-                self._state.substate_by_module_id[module_id] = MagneticModuleSubState(
-                    module_id=MagneticModuleId(module_id), model=module_model
-                )
-            elif ModuleModel.is_heater_shaker_module_model(module_model):
-                self._state.substate_by_module_id[
-                    module_id
-                ] = HeaterShakerModuleSubState(
-                    module_id=HeaterShakerModuleId(module_id),
-                    plate_target_temperature=None,
-                )
-            elif ModuleModel.is_temperature_module_model(module_model):
-                self._state.substate_by_module_id[
-                    module_id
-                ] = TemperatureModuleSubState(
-                    module_id=TemperatureModuleId(module_id),
-                    plate_target_temperature=None,
-                )
+
         if isinstance(
             command.result,
             (
@@ -169,6 +141,41 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             ),
         ):
             self._handle_temperature_module_commands(command)
+
+    def _add_module_substate(
+        self,
+        module_id: str,
+        serial_number: str,
+        definition: ModuleDefinition,
+        slot_name: Optional[DeckSlotName] = None,
+    ) -> None:
+        model = definition.model
+
+        self._state.slot_by_module_id[module_id] = slot_name
+        self._state.hardware_by_module_id[module_id] = HardwareModule(
+            serial_number=serial_number,
+            definition=definition,
+        )
+
+        if ModuleModel.is_magnetic_module_model(model):
+            self._state.substate_by_module_id[module_id] = MagneticModuleSubState(
+                module_id=MagneticModuleId(module_id),
+                model=model,
+            )
+        elif ModuleModel.is_heater_shaker_module_model(model):
+            self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId(module_id),
+                plate_target_temperature=None,
+            )
+        elif ModuleModel.is_temperature_module_model(model):
+            self._state.substate_by_module_id[module_id] = TemperatureModuleSubState(
+                module_id=TemperatureModuleId(module_id),
+                plate_target_temperature=None,
+            )
+        elif ModuleModel.is_thermocycler_module_model(model):
+            self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
+                module_id=ThermocyclerModuleId(module_id),
+            )
 
     def _handle_heater_shaker_commands(
         self,
@@ -250,6 +257,32 @@ class ModuleView(HasState[ModuleState]):
         """Get a list of all module entries in state."""
         return [self.get(mod_id) for mod_id in self._state.slot_by_module_id.keys()]
 
+    def _get_module_substate(
+        self, module_id: str, expected_type: Type[ModuleSubStateT], expected_name: str
+    ) -> ModuleSubStateT:
+        """Return the specific sub-state of a given module ID.
+
+        Args:
+            module_id: The ID of the module.
+            expected_type: The shape of the substate that we expect.
+            expected_name: A user-friendly name of the module to put into an
+                error message if the substate does not match the expected type.
+
+        Raises:
+            ModuleNotLoadedError: If module_id has not been loaded.
+            WrongModuleTypeError: If module_id has been loaded,
+                but it's not the expected type.
+        """
+        try:
+            substate = self._state.substate_by_module_id[module_id]
+        except KeyError as e:
+            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+
+        if isinstance(substate, expected_type):
+            return substate
+
+        raise errors.WrongModuleTypeError(f"{module_id} is not a {expected_name}.")
+
     def get_magnetic_module_substate(self, module_id: str) -> MagneticModuleSubState:
         """Return a `MagneticModuleSubState` for the given Magnetic Module.
 
@@ -258,17 +291,11 @@ class ModuleView(HasState[ModuleState]):
             WrongModuleTypeError: If module_id has been loaded,
                 but it's not a Magnetic Module.
         """
-        try:
-            substate = self._state.substate_by_module_id[module_id]
-        except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
-        else:
-            if isinstance(substate, MagneticModuleSubState):
-                return substate
-            else:
-                raise errors.WrongModuleTypeError(
-                    f"{module_id} is not a Magnetic Module."
-                )
+        return self._get_module_substate(
+            module_id=module_id,
+            expected_type=MagneticModuleSubState,
+            expected_name="Magnetic Module",
+        )
 
     def get_heater_shaker_module_substate(
         self, module_id: str
@@ -280,17 +307,11 @@ class ModuleView(HasState[ModuleState]):
            WrongModuleTypeError: If module_id has been loaded,
                but it's not a Heater-Shaker Module.
         """
-        try:
-            substate = self._state.substate_by_module_id[module_id]
-        except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
-        else:
-            if isinstance(substate, HeaterShakerModuleSubState):
-                return substate
-            else:
-                raise errors.WrongModuleTypeError(
-                    f"{module_id} is not a Heater-Shaker Module."
-                )
+        return self._get_module_substate(
+            module_id=module_id,
+            expected_type=HeaterShakerModuleSubState,
+            expected_name="Heater-Shaker Module",
+        )
 
     def get_temperature_module_substate(
         self, module_id: str
@@ -300,19 +321,29 @@ class ModuleView(HasState[ModuleState]):
         Raises:
            ModuleNotLoadedError: If module_id has not been loaded.
            WrongModuleTypeError: If module_id has been loaded,
-               but it's not a Heater-Shaker Module.
+               but it's not a Temperature Module.
         """
-        try:
-            substate = self._state.substate_by_module_id[module_id]
-        except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
-        else:
-            if isinstance(substate, TemperatureModuleSubState):
-                return substate
-            else:
-                raise errors.WrongModuleTypeError(
-                    f"{module_id} is not a Temperature Module."
-                )
+        return self._get_module_substate(
+            module_id=module_id,
+            expected_type=TemperatureModuleSubState,
+            expected_name="Temperature Module",
+        )
+
+    def get_thermocycler_module_substate(
+        self, module_id: str
+    ) -> ThermocyclerModuleSubState:
+        """Return a `ThermocyclerModuleSubState` for the given Thermocycler Module.
+
+        Raises:
+           ModuleNotLoadedError: If module_id has not been loaded.
+           WrongModuleTypeError: If module_id has been loaded,
+               but it's not a Thermocycler Module.
+        """
+        return self._get_module_substate(
+            module_id=module_id,
+            expected_type=ThermocyclerModuleSubState,
+            expected_name="Thermocycler Module",
+        )
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
         """Get the slot location of the given module."""

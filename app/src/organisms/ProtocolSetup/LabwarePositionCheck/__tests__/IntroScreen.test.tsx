@@ -65,6 +65,7 @@ const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
 )
 const MOCK_SECTIONS = ['MOCK_PRIMARY_PIPETTE_TIPRACKS' as Section]
 const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
+const MOCK_RUN_ID = 'fakeRunId'
 
 const render = (props: React.ComponentProps<typeof IntroScreen>) => {
   return renderWithProviders(<IntroScreen {...props} />, {
@@ -117,7 +118,7 @@ describe('IntroScreen', () => {
           z: MOCK_300_UL_TIPRACK_COORDS[2],
         },
       })
-    when(mockUseLabwareIdsBySection).calledWith().mockReturnValue({})
+    when(mockUseLabwareIdsBySection).calledWith(MOCK_RUN_ID).mockReturnValue({})
     when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
 
     when(mockUseIntroInfo).calledWith().mockReturnValue({
@@ -130,7 +131,7 @@ describe('IntroScreen', () => {
     when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
-        data: { labwareOffsets: mockOffsets },
+        data: { id: MOCK_RUN_ID, labwareOffsets: mockOffsets },
       } as any)
   })
   afterEach(() => {

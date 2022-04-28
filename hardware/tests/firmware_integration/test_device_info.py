@@ -23,7 +23,6 @@ def filter_func(arb: ArbitrationId) -> bool:
 @pytest.mark.requires_emulator
 @pytest.mark.can_filter_func.with_args(filter_func)
 async def test_broadcast(
-    loop: asyncio.BaseEventLoop,
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
 ) -> None:
@@ -44,14 +43,13 @@ async def test_broadcast(
             if arbitration_id.parts.originating_node_id in nodes:
                 nodes.remove(arbitration_id.parts.originating_node_id)
 
-    t = loop.create_task(_check())
+    t = asyncio.get_running_loop().create_task(_check())
     await asyncio.wait_for(t, 1)
 
 
 @pytest.mark.requires_emulator
 @pytest.mark.can_filter_func.with_args(filter_func)
 async def test_each_node(
-    loop: asyncio.BaseEventLoop,
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     subsystem_node_id: NodeId,

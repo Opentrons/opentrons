@@ -5,6 +5,7 @@ from typing import Union
 from . import heater_shaker
 from . import magnetic_module
 from . import temperature_module
+from . import thermocycler
 
 from .set_rail_lights import (
     SetRailLights,
@@ -131,6 +132,7 @@ Command = Union[
     Pause,
     PickUpTip,
     SavePosition,
+    SetRailLights,
     heater_shaker.AwaitTemperature,
     heater_shaker.StartSetTargetTemperature,
     heater_shaker.DeactivateHeater,
@@ -143,7 +145,10 @@ Command = Union[
     temperature_module.SetTargetTemperature,
     temperature_module.AwaitTemperature,
     temperature_module.DeactivateTemperature,
-    SetRailLights,
+    thermocycler.SetTargetBlockTemperature,
+    thermocycler.SetTargetLidTemperature,
+    thermocycler.DeactivateBlock,
+    thermocycler.DeactivateLid,
 ]
 
 CommandParams = Union[
@@ -160,6 +165,7 @@ CommandParams = Union[
     PauseParams,
     PickUpTipParams,
     SavePositionParams,
+    SetRailLightsParams,
     heater_shaker.AwaitTemperatureParams,
     heater_shaker.StartSetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -172,7 +178,10 @@ CommandParams = Union[
     temperature_module.SetTargetTemperatureParams,
     temperature_module.AwaitTemperatureParams,
     temperature_module.DeactivateTemperatureParams,
-    SetRailLightsParams,
+    thermocycler.SetTargetBlockTemperatureParams,
+    thermocycler.SetTargetLidTemperatureParams,
+    thermocycler.DeactivateBlockParams,
+    thermocycler.DeactivateLidParams,
 ]
 
 CommandType = Union[
@@ -189,6 +198,7 @@ CommandType = Union[
     PauseCommandType,
     PickUpTipCommandType,
     SavePositionCommandType,
+    SetRailLightsCommandType,
     heater_shaker.AwaitTemperatureCommandType,
     heater_shaker.StartSetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -201,7 +211,10 @@ CommandType = Union[
     temperature_module.SetTargetTemperatureCommandType,
     temperature_module.AwaitTemperatureCommandType,
     temperature_module.DeactivateTemperatureCommandType,
-    SetRailLightsCommandType,
+    thermocycler.SetTargetBlockTemperatureCommandType,
+    thermocycler.SetTargetLidTemperatureCommandType,
+    thermocycler.DeactivateBlockCommandType,
+    thermocycler.DeactivateLidCommandType,
 ]
 
 CommandCreate = Union[
@@ -217,6 +230,7 @@ CommandCreate = Union[
     PauseCreate,
     PickUpTipCreate,
     SavePositionCreate,
+    SetRailLightsCreate,
     heater_shaker.AwaitTemperatureCreate,
     heater_shaker.StartSetTargetTemperatureCreate,
     heater_shaker.DeactivateHeaterCreate,
@@ -229,7 +243,10 @@ CommandCreate = Union[
     temperature_module.SetTargetTemperatureCreate,
     temperature_module.AwaitTemperatureCreate,
     temperature_module.DeactivateTemperatureCreate,
-    SetRailLightsCreate,
+    thermocycler.SetTargetBlockTemperatureCreate,
+    thermocycler.SetTargetLidTemperatureCreate,
+    thermocycler.DeactivateBlockCreate,
+    thermocycler.DeactivateLidCreate,
 ]
 
 CommandResult = Union[
@@ -246,6 +263,7 @@ CommandResult = Union[
     PauseResult,
     PickUpTipResult,
     SavePositionResult,
+    SetRailLightsResult,
     heater_shaker.AwaitTemperatureResult,
     heater_shaker.StartSetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,
@@ -258,5 +276,8 @@ CommandResult = Union[
     temperature_module.SetTargetTemperatureResult,
     temperature_module.AwaitTemperatureResult,
     temperature_module.DeactivateTemperatureResult,
-    SetRailLightsResult,
+    thermocycler.SetTargetBlockTemperatureResult,
+    thermocycler.SetTargetLidTemperatureResult,
+    thermocycler.DeactivateBlockResult,
+    thermocycler.DeactivateLidResult,
 ]

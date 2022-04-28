@@ -16,7 +16,7 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { JogControls } from '../../../../molecules/JogControls'
-import { useProtocolDetails } from '../../../RunDetails/hooks'
+import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { LabwarePositionCheckStepDetail } from '../LabwarePositionCheckStepDetail'
 import { StepDetailText } from '../StepDetailText'
 
@@ -37,15 +37,15 @@ jest.mock('@opentrons/shared-data', () => {
     getIsTiprack: jest.fn(),
   }
 })
-jest.mock('../../../RunDetails/hooks')
+jest.mock('../../../Devices/hooks')
 jest.mock('../StepDetailText')
 jest.mock('../../../../molecules/JogControls')
 
 const mockStepDetailText = StepDetailText as jest.MockedFunction<
   typeof StepDetailText
 >
-const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
-  typeof useProtocolDetails
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
 >
 const mockGetPipetteNameSpecs = getPipetteNameSpecs as jest.MockedFunction<
   typeof getPipetteNameSpecs
@@ -72,6 +72,7 @@ const TIPRACK_DEF_ID = 'tiprack_DEF_ID'
 const LABWARE_DEF = {
   ordering: [['A1', 'A2']],
 }
+const MOCK_RUN_ID = 'fakeRunId'
 const mockLabwarePositionCheckStepTipRack = {
   labwareId:
     '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1',
@@ -101,6 +102,7 @@ describe('LabwarePositionCheckStepDetail', () => {
     props = {
       selectedStep: mockLabwarePositionCheckStepTipRack,
       jog: jest.fn() as any,
+      runId: MOCK_RUN_ID,
     }
     when(mockStepDetailText)
       .calledWith(
@@ -109,8 +111,8 @@ describe('LabwarePositionCheckStepDetail', () => {
         })
       )
       .mockReturnValue(<div>Mock Step Detail Text </div>)
-    when(mockUseProtocolDetails)
-      .calledWith()
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(MOCK_RUN_ID)
       .mockReturnValue({
         protocolData: {
           labware: {
@@ -174,15 +176,15 @@ describe('LabwarePositionCheckStepDetail', () => {
     screen.getByAltText('level with labware')
   })
   it('renders null if protocol data is null', () => {
-    mockUseProtocolDetails.mockReturnValue({ protocolData: null } as any)
+    mockUseProtocolDetailsForRun.mockReturnValue({ protocolData: null } as any)
     const { container } = render(props)
     expect(container.firstChild).toBeNull()
   })
   it('renders the level with tip image', () => {
     mockGetIsTiprack.mockReturnValue(true)
 
-    when(mockUseProtocolDetails)
-      .calledWith()
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(MOCK_RUN_ID)
       .mockReturnValue({
         protocolData: {
           labware: {
