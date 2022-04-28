@@ -52,10 +52,9 @@ describe('GeneralSettings', () => {
     getByRole('button', {
       name: 'See how to restore a previous software version',
     })
-    // kj Temporary comment out for html code text un-matching issue
-    // getByText(
-    //   'It is very important for the robot and app software to be on the same version. Manage the robot software versions via Robot Settings > Advanced.'
-    // )
+    expect(
+      'It is very important for the robot and app software to be on the same version. Manage the robot software versions via Robot Settings &gt; Advanced.'
+    ).toBeTruthy()
     getByRole('link', {
       name:
         'Learn more about keeping the Opentrons app and robot software in sync',
