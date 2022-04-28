@@ -41,6 +41,11 @@ class OrderedSet(Generic[_SetElementT]):
         """
         del self._elements[element]
 
+    def remove_if_found(self, element: _SetElementT) -> None:
+        """Remove ``element`` from the set. No-op if not found."""
+        if element in self._elements:
+            del self._elements[element]
+
     def clear(self) -> None:
         """Remove all elements from the set."""
         self._elements.clear()

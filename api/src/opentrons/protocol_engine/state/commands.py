@@ -24,7 +24,7 @@ from ..actions import (
     HardwareEventAction,
 )
 
-from ..commands import Command, CommandStatus
+from ..commands import Command, CommandStatus, CommandSource
 from ..errors import (
     ProtocolEngineError,
     CommandDoesNotExistError,
@@ -198,6 +198,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 createdAt=action.created_at,
                 params=action.request.params,  # type: ignore[arg-type]
                 status=CommandStatus.QUEUED,
+                commandSource=CommandSource.SETUP,
             )
 
             next_index = len(self._state.all_command_ids)
@@ -228,11 +229,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     command=command,
                 )
 
-            try:
-                self._state.queued_command_ids.remove(command.id)
-                self._state.queued_setup_command_ids.remove(command.id)
-            except KeyError:
-                pass
+            self._state.queued_command_ids.remove_if_found(command.id)
+            self._state.queued_setup_command_ids.remove_if_found(command.id)
 
             if command.status == CommandStatus.RUNNING:
                 self._state.running_command_id = command.id
@@ -259,10 +257,17 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 ),
             )
 
-            other_command_ids_to_fail = [
-                *[i for i in self._state.queued_command_ids],
-            ]
+            if prev_entry.command.commandSource == CommandSource.SETUP:
+                other_command_ids_to_fail = [
+                    *[i for i in self._state.queued_setup_command_ids],
+                ]
+            else:
+                other_command_ids_to_fail = [
+                    *[i for i in self._state.queued_command_ids],
+                ]
+                self._state.queued_command_ids.clear()
 
+            self._state.queued_setup_command_ids.clear()
             for command_id in other_command_ids_to_fail:
                 prev_entry = self._state.commands_by_id[command_id]
 
@@ -279,8 +284,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if self._state.running_command_id == action.command_id:
                 self._state.running_command_id = None
 
-            self._state.queued_command_ids.clear()
-
         elif isinstance(action, PlayAction):
             if not self._state.run_result:
                 if self._state.is_door_blocking:
@@ -288,6 +291,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     self._state.queue_status = QueueStatus.INACTIVE
                 else:
                     self._state.queue_status = QueueStatus.ACTIVE
+                    self._state.queued_setup_command_ids.clear()
 
         elif isinstance(action, PauseAction):
             self._state.queue_status = QueueStatus.INACTIVE
@@ -446,13 +450,18 @@ class CommandView(HasState[CommandState]):
         if self._state.run_result:
             raise ProtocolEngineStoppedError("Engine was stopped")
 
-        # Revise this so that we always prioritize the setup queue. 
-        if (self._state.queue_status == QueueStatus.INACTIVE
-                or self.get_status() == QueueStatus.IMPLICITLY_ACTIVE):
-            # Verify if this condition is enough to make sure status is paused or idle
-            return next(iter(self._state.queued_setup_command_ids), None)
-
-        return next(iter(self._state.queued_command_ids), None)
+        # Since a resume action empties the setup command queue, presence of
+        # setup commands in queue indicate that they were added when a protocol run was
+        # either idle or paused, and that the run is currently idle or paused or
+        # might be transitioning out of idle/pause. In such case, prioritize running
+        # the setup command instead of a queued protocol command.
+        next_setup_cmd = next(iter(self._state.queued_setup_command_ids), None)
+        if next_setup_cmd:
+            return next_setup_cmd
+        elif self._state.queue_status == QueueStatus.INACTIVE:
+            return
+        else:
+            return next(iter(self._state.queued_command_ids), None)
 
     def get_is_okay_to_clear(self) -> bool:
         """Get whether the engine is stopped or unplayed so it could be removed."""

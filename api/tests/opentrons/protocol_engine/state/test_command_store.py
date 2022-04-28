@@ -15,6 +15,7 @@ from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandStore,
     CommandEntry,
+    CommandSource,
     RunResult,
     QueueStatus,
 )
@@ -263,6 +264,33 @@ def test_setup_command_queue_and_unqueue() -> None:
     assert subject.state.queued_setup_command_ids == OrderedSet()
 
 
+def test_setup_queue_action_updates_command_source() -> None:
+    """It should update command source correctly."""
+    queue_cmd = QueueSetupCommandAction(
+        request=commands.PauseCreate(params=commands.PauseParams()),
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-1",
+        command_key="command-key-1",
+    )
+
+    expected_pause_cmd = commands.Pause(
+        id="command-id-1",
+        key="command-key-1",
+        createdAt=datetime(year=2021, month=1, day=1),
+        params=commands.PauseParams(),
+        status=commands.CommandStatus.QUEUED,
+        commandSource=CommandSource.SETUP,
+    )
+
+    subject = CommandStore()
+
+    subject.handle_action(queue_cmd)
+    assert subject.state.commands_by_id["command-id-1"] == CommandEntry(
+        index=0,
+        command=expected_pause_cmd
+    )
+
+
 def test_running_command_id() -> None:
     """It should update the running command ID through a command's lifecycle."""
     queue = QueueCommandAction(
@@ -310,7 +338,7 @@ def test_running_command_no_queue() -> None:
     assert subject.state.running_command_id is None
 
 
-def test_command_failure_clears_queue() -> None:
+def test_command_failure_clears_queues() -> None:
     """It should clear the command queue on command failure."""
     queue_1 = QueueCommandAction(
         request=commands.PauseCreate(params=commands.PauseParams()),
@@ -382,6 +410,103 @@ def test_command_failure_clears_queue() -> None:
     }
 
 
+def test_setup_command_failure_only_clears_setup_command_queue() -> None:
+    """It should clear only the setup command queue for a failed setup command.
+
+    This test queues up a non-setup command followed by two setup commands,
+    then attempts to run and fail the first setup command and
+    """
+    cmd_1_non_setup = commands.Pause(
+        id="command-id-1",
+        key="command-key-1",
+        createdAt=datetime(year=2021, month=1, day=1),
+        params=commands.PauseParams(),
+        status=commands.CommandStatus.QUEUED,
+    )
+    queue_action_1_non_setup = QueueCommandAction(
+        request=commands.PauseCreate(params=cmd_1_non_setup.params),
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-1",
+        command_key="command-key-1",
+    )
+    queue_action_2_setup = QueueSetupCommandAction(
+        request=commands.PauseCreate(params=commands.PauseParams()),
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-2",
+        command_key="command-key-2",
+    )
+    queue_action_3_setup = QueueSetupCommandAction(
+        request=commands.PauseCreate(params=commands.PauseParams()),
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-3",
+        command_key="command-key-3",
+    )
+
+    running_cmd_2 = UpdateCommandAction(
+        command=commands.Pause(
+            id="command-id-2",
+            key="command-key-2",
+            createdAt=datetime(year=2021, month=1, day=1),
+            startedAt=datetime(year=2022, month=2, day=2),
+            params=commands.PauseParams(),
+            status=commands.CommandStatus.RUNNING,
+            commandSource=CommandSource.SETUP
+        )
+    )
+    failed_action_cmd_2 = FailCommandAction(
+        command_id="command-id-2",
+        error_id="error-id",
+        failed_at=datetime(year=2023, month=3, day=3),
+        error=errors.ProtocolEngineError("oh no"),
+    )
+    expected_failed_cmd_2 = commands.Pause(
+        id="command-id-2",
+        key="command-key-2",
+        error=errors.ErrorOccurrence(
+            id="error-id",
+            errorType="ProtocolEngineError",
+            detail="oh no",
+            createdAt=datetime(year=2023, month=3, day=3),
+        ),
+        createdAt=datetime(year=2021, month=1, day=1),
+        startedAt=datetime(year=2022, month=2, day=2),
+        completedAt=datetime(year=2023, month=3, day=3),
+        params=commands.PauseParams(),
+        status=commands.CommandStatus.FAILED,
+        commandSource=CommandSource.SETUP
+    )
+    expected_failed_cmd_3 = commands.Pause(
+        id="command-id-3",
+        key="command-key-3",
+        error=None,
+        createdAt=datetime(year=2021, month=1, day=1),
+        completedAt=datetime(year=2023, month=3, day=3),
+        params=commands.PauseParams(),
+        status=commands.CommandStatus.FAILED,
+        commandSource=CommandSource.SETUP
+    )
+
+    subject = CommandStore()
+
+    subject.handle_action(queue_action_1_non_setup)
+    subject.handle_action(queue_action_2_setup)
+    subject.handle_action(queue_action_3_setup)
+    subject.handle_action(running_cmd_2)
+    subject.handle_action(failed_action_cmd_2)
+
+    assert subject.state.running_command_id is None
+    assert subject.state.queued_setup_command_ids == OrderedSet()
+    assert subject.state.queued_command_ids == OrderedSet(["command-id-1"])
+    assert subject.state.all_command_ids == ["command-id-1",
+                                             "command-id-2",
+                                             "command-id-3"]
+    assert subject.state.commands_by_id == {
+        "command-id-1": CommandEntry(index=0, command=cmd_1_non_setup),
+        "command-id-2": CommandEntry(index=1, command=expected_failed_cmd_2),
+        "command-id-3": CommandEntry(index=2, command=expected_failed_cmd_3)
+    }
+
+
 def test_command_store_preserves_handle_order() -> None:
     """It should store commands in the order they are handled."""
     # Any arbitrary 3 commands that compare non-equal (!=) to each other.
@@ -426,6 +551,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -433,7 +559,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
 
 @pytest.mark.parametrize("pause_source", PauseSource)
 def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
-    """It should set the running flag on play."""
+    """It should set the running flag on play and clear the setup command queue."""
     subject = CommandStore()
     subject.handle_action(PauseAction(source=pause_source))
     subject.handle_action(PlayAction())
@@ -446,7 +572,48 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
+        errors_by_id={},
+    )
+
+
+@pytest.mark.parametrize("pause_source", PauseSource)
+def test_play_action_clears_setup_command_queue(pause_source: PauseSource) -> None:
+    """Test that a play/resume clears the setup command queue."""
+    pause_cmd = commands.Pause(
+            id="command-id-1",
+            key="command-key-1",
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=commands.PauseParams(),
+            status=commands.CommandStatus.QUEUED,
+        )
+    queue_cmd = QueueSetupCommandAction(
+        request=commands.PauseCreate(params=commands.PauseParams()),
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-1",
+        command_key="command-key-1",
+    )
+
+    subject = CommandStore()
+    subject.handle_action(queue_cmd)
+    subject.handle_action(PauseAction(source=pause_source))
+    assert subject.state.queued_setup_command_ids == OrderedSet(["command-id-1"])
+
+    subject.handle_action(PlayAction())
+
+    assert subject.state == CommandState(
+        queue_status=QueueStatus.ACTIVE,
+        run_result=None,
+        is_hardware_stopped=False,
+        is_door_blocking=False,
+        running_command_id=None,
+        all_command_ids=["command-id-1"],
+        queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
+        commands_by_id={
+            "command-id-1": CommandEntry(index=0, command=pause_cmd),
+        },
         errors_by_id={},
     )
 
@@ -463,6 +630,7 @@ def test_command_store_handles_play_according_to_door_state() -> None:
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -479,6 +647,7 @@ def test_command_store_handles_play_according_to_door_state() -> None:
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -499,6 +668,7 @@ def test_command_store_handles_finish_action() -> None:
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -529,6 +699,7 @@ def test_command_store_handles_stop_action() -> None:
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -548,6 +719,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -572,6 +744,7 @@ def test_command_store_ignores_known_finish_error() -> None:
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -596,6 +769,7 @@ def test_command_store_saves_unknown_finish_error() -> None:
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={
             "error-id": errors.ErrorOccurrence(
@@ -624,6 +798,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -645,6 +820,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -686,6 +862,7 @@ def test_command_store_handles_command_failed() -> None:
         running_command_id=None,
         all_command_ids=["command-id"],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id={
             "command-id": CommandEntry(index=0, command=expected_failed_command),
         },
@@ -706,6 +883,7 @@ def test_handles_hardware_stopped() -> None:
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -729,6 +907,7 @@ def test_handles_door_open_and_close_event() -> None:
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -744,6 +923,7 @@ def test_handles_door_open_and_close_event() -> None:
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -765,6 +945,7 @@ def test_handles_door_event_during_idle_run() -> None:
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -779,6 +960,7 @@ def test_handles_door_event_during_idle_run() -> None:
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )

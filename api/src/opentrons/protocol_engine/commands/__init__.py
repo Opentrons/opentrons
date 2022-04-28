@@ -16,7 +16,13 @@ and/or schema generation.
 from . import heater_shaker
 from . import magnetic_module
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, CommandStatus
+from .command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    CommandStatus,
+    CommandSource
+)
 
 from .command_unions import (
     Command,
@@ -150,6 +156,7 @@ __all__ = [
     "BaseCommand",
     "BaseCommandCreate",
     "CommandStatus",
+    "CommandSource",
     # aspirate command models
     "Aspirate",
     "AspirateCreate",

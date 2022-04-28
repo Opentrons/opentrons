@@ -33,6 +33,7 @@ def get_command_view(
     run_result: Optional[RunResult] = None,
     running_command_id: Optional[str] = None,
     queued_command_ids: Sequence[str] = (),
+    queued_setup_command_ids: Sequence[str] = (),
     errors_by_id: Optional[Dict[str, errors.ErrorOccurrence]] = None,
     commands: Sequence[cmd.Command] = (),
 ) -> CommandView:
@@ -50,6 +51,7 @@ def get_command_view(
         run_result=run_result,
         running_command_id=running_command_id,
         queued_command_ids=OrderedSet(queued_command_ids),
+        queued_setup_command_ids=OrderedSet(queued_setup_command_ids),
         errors_by_id=errors_by_id or {},
         all_command_ids=all_command_ids,
         commands_by_id=commands_by_id,
@@ -97,6 +99,21 @@ def test_get_next_queued_returns_first_queued(queue_status: QueueStatus) -> None
     )
 
     assert subject.get_next_queued() == "command-id-1"
+
+
+@pytest.mark.parametrize(
+    "queue_status", [QueueStatus.IMPLICITLY_ACTIVE, QueueStatus.ACTIVE]
+)
+def test_get_next_queued_prioritizes_setup_command_queue(
+        queue_status: QueueStatus) -> None:
+    """It should prioritize setup command queue over protocol command queue."""
+    subject = get_command_view(
+        queue_status=queue_status,
+        queued_command_ids=["command-id-1", "command-id-2"],
+        queued_setup_command_ids=["setup-command-id"]
+    )
+
+    assert subject.get_next_queued() == "setup-command-id"
 
 
 def test_get_next_queued_returns_none_when_no_pending() -> None:

@@ -35,6 +35,12 @@ class CommandStatus(str, Enum):
     FAILED = "failed"
 
 
+class CommandSource(str, Enum):
+    """Source that generated a given command."""
+    PROTOCOL = "protocol"
+    SETUP = "setup"
+
+
 class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
     """Base class for command creation requests.
 
@@ -99,12 +105,11 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
         None,
         description="Command execution completed timestamp, if completed",
     )
+    commandSource: Optional[CommandSource] = Field(
+        None,
+        description="Source that generated this command."
+    )
 
-    # is_setup: Optional[bool] = Field(
-    #     False,
-    #     description="Whether the command is a setup command"
-    # )
-    # or command source?
 
 class AbstractCommandImpl(
     ABC,
