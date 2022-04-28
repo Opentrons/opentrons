@@ -9,14 +9,14 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { useCurrentRun } from '../../../../ProtocolUpload/hooks'
-import { useProtocolDetails } from '../../../../RunDetails/hooks'
+import { useProtocolDetailsForRun } from '../../../../Devices/hooks'
 import { getLabwareLocation } from '../../../utils/getLabwareLocation'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getLabwareDefinitionUri } from '../../../utils/getLabwareDefinitionUri'
 
 jest.mock('../../../../ProtocolUpload/hooks')
 jest.mock('../../../utils/getLabwareLocation')
-jest.mock('../../../../RunDetails/hooks')
+jest.mock('../../../../Devices/hooks')
 jest.mock('../../../utils/getLabwareDefinitionUri')
 
 jest.mock('@opentrons/shared-data', () => {
@@ -44,8 +44,8 @@ const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
 const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
   typeof useCurrentRun
 >
-const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
-  typeof useProtocolDetails
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
 >
 const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
   typeof getLabwareLocation
@@ -58,6 +58,7 @@ const MOCK_LABWARE_DEFINITION_ID = 'some_labware_definition_id'
 const MOCK_LABWARE_DEFINITION_URI = 'some_labware_definition_uri'
 const MOCK_SLOT_NAME = '4'
 const MOCK_LABWARE_VECTOR = { x: 1, y: 2, z: 3 }
+const MOCK_RUN_ID = 'fake_run_id'
 
 describe('LabwareInfoOverlay', () => {
   let props: React.ComponentProps<typeof LabwareInfoOverlay>
@@ -68,6 +69,7 @@ describe('LabwareInfoOverlay', () => {
       definition: fixture_tiprack_300_ul as LabwareDefinition2,
       displayName: 'fresh tips',
       labwareId: MOCK_LABWARE_ID,
+      runId: MOCK_RUN_ID,
     }
     labware = {
       [MOCK_LABWARE_ID]: {
@@ -81,8 +83,8 @@ describe('LabwareInfoOverlay', () => {
       .calledWith(props.definition)
       .mockReturnValue('mock definition display name')
 
-    when(mockUseProtocolDetails)
-      .calledWith()
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(MOCK_RUN_ID)
       .mockReturnValue({
         protocolData: {
           commands: [],

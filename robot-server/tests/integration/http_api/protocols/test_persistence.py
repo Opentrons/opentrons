@@ -51,11 +51,11 @@ async def test_protocols_persist(protocol: Callable[[str], IO[bytes]]) -> None:
             # The protocols after restart are the same as prior to restart,
             # except we don't care about analyses,
             # and we don't care about order.
-            # TODO(jm, 2022-04-20): Remove once analyses persisted.
+            # TODO(jm, 2022-04-27): Adjust once analyses persisted.
             for p in uploaded_protocols:
-                del p["analyses"]
+                del p["analysisSummaries"]
             for p in restarted_protocols:
-                del p["analyses"]
+                del p["analysisSummaries"]
             uploaded_protocols.sort(key=lambda p: p["id"])
             restarted_protocols.sort(key=lambda p: p["id"])
             assert uploaded_protocols == restarted_protocols
@@ -91,8 +91,8 @@ async def test_protocol_with_labware_upload_persistence() -> None:
             protocol_id = protocol_upload_json["data"]["id"]
             result = await robot_client.get_protocol(protocol_id)
             protocol_detail = result.json()["data"]
-            # TODO(jm, 2022-04-20): Remove once analyses persisted.
-            del protocol_detail["analyses"]
+            # TODO(jm, 2022-04-27): Adjust once analyses persisted.
+            del protocol_detail["analysisSummaries"]
             server.stop()
             assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
             server.start()
@@ -101,8 +101,8 @@ async def test_protocol_with_labware_upload_persistence() -> None:
             ), "Dev Robot never became available."
             result = await robot_client.get_protocol(protocol_id)
             restarted_protocol_detail = result.json()["data"]
-            # TODO(jm, 2022-04-20): Remove once analyses persisted.
-            del restarted_protocol_detail["analyses"]
+            # TODO(jm, 2022-04-27): Adjust once analyses persisted.
+            del restarted_protocol_detail["analysisSummaries"]
             protocol_detail["files"].sort(key=lambda n: n["name"])
             restarted_protocol_detail["files"].sort(key=lambda n: n["name"])
             assert restarted_protocol_detail == protocol_detail

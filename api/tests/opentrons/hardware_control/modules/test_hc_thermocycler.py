@@ -112,6 +112,11 @@ async def test_sim_update(subject: modules.Thermocycler) -> None:
     await subject.deactivate_block()
     assert subject.target is None
 
+    await subject.set_target_lid_temperature(celsius=50.0)
+    assert subject.lid_target == 50.0
+    await subject.deactivate_lid()
+    assert subject.lid_target is None
+
 
 @pytest.fixture
 def simulator() -> SimulatingDriver:
