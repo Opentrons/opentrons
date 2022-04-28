@@ -31,8 +31,7 @@ export const getAttachedModules: (
         })
       : {},
   // sort by usbPort info, if they do not exist (robot version below 4.3), sort by serial
-  modulesByPort =>
-    sortBy(modulesByPort, ['usbPort.hub', 'usbPort.port', 'serial'])
+  modulesByPort => sortBy(modulesByPort, ['usbPort.port', 'serialNumber'])
 )
 
 export const getAttachedModulesForConnectedRobot = (
@@ -44,7 +43,7 @@ export const getAttachedModulesForConnectedRobot = (
 
 const isModulePrepared = (module: Types.AttachedModule): boolean => {
   if (module.moduleType === THERMOCYCLER_MODULE_TYPE)
-    return module.data.lid === 'open'
+    return module.data.lidStatus === 'open'
   return false
 }
 

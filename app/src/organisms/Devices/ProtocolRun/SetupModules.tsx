@@ -77,7 +77,7 @@ export const SetupModules = ({
   )
 
   const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
-
+  console.log(heaterShakerModules[0]?.moduleDef.displayName)
   return (
     <Flex
       flex="1"

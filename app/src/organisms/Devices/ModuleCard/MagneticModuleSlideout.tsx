@@ -132,7 +132,7 @@ export const MagneticModuleSlideout = (
           width="100%"
           onClick={handleSubmitHeight}
           disabled={engageHeightValue == null || errorMessage !== null}
-          data-testid={`MagneticModuleSlideout_btn_${module.serialNumer}`}
+          data-testid={`MagneticModuleSlideout_btn_${module.serialNumber}`}
         >
           {t('set_engage_height')}
         </PrimaryButton>
@@ -142,7 +142,7 @@ export const MagneticModuleSlideout = (
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing2}
-        data-testid={`MagneticModuleSlideout_body_text_${module.serialNumer}`}
+        data-testid={`MagneticModuleSlideout_body_text_${module.serialNumber}`}
       >
         {t('set_engage_height_slideout_body', {
           lower:

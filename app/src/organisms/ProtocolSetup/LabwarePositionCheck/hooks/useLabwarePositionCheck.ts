@@ -591,8 +591,8 @@ export function useLabwarePositionCheck(
       // delete this once PE supports themocycler open lid command
       if (prepCommand.commandType === 'thermocycler/openLid') {
         const serial = attachedModules.find(
-          module => module.type === THERMOCYCLER_MODULE_TYPE
-        )?.serial
+          module => module.moduleType === THERMOCYCLER_MODULE_TYPE
+        )?.serialNumber
         if (serial == null) {
           throw new Error(
             'Expected to be able to find thermocycler serial number, but could not.'

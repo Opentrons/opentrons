@@ -16,6 +16,7 @@ import type {
 interface PhysicalPort {
   path: string | null
   port: number | null
+  hub: number | null
 }
 
 export interface ApiBaseModule {
@@ -129,7 +130,6 @@ export interface ApiMagneticModule extends ApiBaseModule {
 export interface ApiMagneticModuleLegacy extends ApiBaseModuleLegacy {
   name: typeof MAGDECK
   data: MagneticData
-  status: MagneticStatus
 }
 
 export interface ApiThermocyclerModule extends ApiBaseModule {

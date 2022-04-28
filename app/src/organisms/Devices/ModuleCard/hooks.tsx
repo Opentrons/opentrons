@@ -114,7 +114,8 @@ export function useModuleOverflowMenu(
     }
     case 'thermocyclerModuleType': {
       deactivateModuleCommandType =
-        module.data.lidTarget !== null && module.data.status !== 'idle'
+        module.data.lidTargetTemperature !== null &&
+        module.data.status !== 'idle'
           ? 'thermocycler/deactivateLid'
           : 'thermocycler/deactivateBlock'
       break
@@ -220,7 +221,7 @@ export function useModuleOverflowMenu(
       {
         setSetting:
           module.moduleType === THERMOCYCLER_MODULE_TYPE &&
-          module.data.lidTarget !== null
+          module.data.lidTargetTemperature !== null
             ? t('overflow_menu_deactivate_lid')
             : t('overflow_menu_lid_temp'),
         isSecondary: true,
@@ -228,7 +229,7 @@ export function useModuleOverflowMenu(
         menuButtons: null,
         onClick:
           module.moduleType === THERMOCYCLER_MODULE_TYPE &&
-          module.data.lidTarget !== null
+          module.data.lidTargetTemperature !== null
             ? () => handleDeactivationCommand()
             : () => handleSlideoutClick(true),
       },

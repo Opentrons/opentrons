@@ -42,7 +42,7 @@ export const ThermocyclerModuleSlideout = (
   const { t } = useTranslation('device_details')
   const [tempValue, setTempValue] = React.useState<string | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const moduleName = getModuleDisplayName(module.model)
+  const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
   const tempRanges = getTCTempRange(isSecondaryTemp)
 
@@ -101,7 +101,7 @@ export const ThermocyclerModuleSlideout = (
           onClick={handleSubmitTemp}
           disabled={tempValue === null || errorMessage !== null}
           width="100%"
-          data-testid={`ThermocyclerSlideout_btn_${module.serial}`}
+          data-testid={`ThermocyclerSlideout_btn_${module.serialNumber}`}
         >
           {t('set_tc_temp_slideout', { part: modulePart })}
         </PrimaryButton>
@@ -111,7 +111,7 @@ export const ThermocyclerModuleSlideout = (
         fontWeight={FONT_WEIGHT_REGULAR}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing2}
-        data-testid={`ThermocyclerSlideout_text_${module.serial}`}
+        data-testid={`ThermocyclerSlideout_text_${module.serialNumber}`}
       >
         {t('tc_set_temperature_body', {
           part: modulePart,
@@ -122,7 +122,7 @@ export const ThermocyclerModuleSlideout = (
       <Flex
         marginTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`ThermocyclerSlideout_input_field_${module.serial}`}
+        data-testid={`ThermocyclerSlideout_input_field_${module.serialNumber}`}
       >
         <Text
           fontWeight={FONT_WEIGHT_REGULAR}
@@ -133,8 +133,8 @@ export const ThermocyclerModuleSlideout = (
           {t('temperature')}
         </Text>
         <InputField
-          data-testid={`${module.model}_${isSecondaryTemp}`}
-          id={`${module.model}_${isSecondaryTemp}`}
+          data-testid={`${module.moduleModel}_${isSecondaryTemp}`}
+          id={`${module.moduleModel}_${isSecondaryTemp}`}
           autoFocus
           units={CELSIUS}
           value={tempValue}

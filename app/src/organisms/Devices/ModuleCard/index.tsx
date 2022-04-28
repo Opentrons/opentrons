@@ -362,7 +362,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     data-testid={`ModuleCard_usb_port_${module.serialNumber}`}
                   >
                     {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
-                      port: module.usbPort.path ?? module.usbPort.port,
+                      port: module.usbPort.hub ?? module.usbPort.port,
                     })}
                   </Text>
                   <Flex

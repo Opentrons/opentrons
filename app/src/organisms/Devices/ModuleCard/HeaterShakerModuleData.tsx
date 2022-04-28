@@ -159,7 +159,7 @@ export const HeaterShakerModuleData = (
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginBottom={SPACING.spacing1}
           >
-            {t(targetTemp === null ? 'na_temp' : 'target_temp', {
+            {t(targetTemp != null ? 'target_temp' : 'na_temp', {
               temp: targetTemp,
             })}
           </Text>
@@ -191,7 +191,7 @@ export const HeaterShakerModuleData = (
           fontSize={TYPOGRAPHY.fontSizeH6}
           marginBottom={SPACING.spacing1}
         >
-          {t(targetSpeed === null ? 'na_speed' : 'target_speed', {
+          {t(targetSpeed != null ? 'target_speed' : 'na_speed', {
             speed: targetSpeed,
           })}
         </Text>

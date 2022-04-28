@@ -90,8 +90,8 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
               <Flex>
                 {attachedModules.map((module, i) => (
                   <ModuleIcon
-                    key={`${name}_${module.model}_${i}`}
-                    moduleType={module.type}
+                    key={`${name}_${module.moduleModel}_${i}`}
+                    moduleType={module.moduleType}
                     size={SPACING.spacing4}
                   />
                 ))}
