@@ -8,7 +8,7 @@ from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 from robot_server.errors import ApiError
 from robot_server.service.json_api import RequestModel
 from robot_server.service.task_runner import TaskRunner
-from robot_server.runs.engine_store import EngineStore
+from robot_server.runs.engine_store import EngineStore, ProtocolRunnerWrapper
 from robot_server.runs.run_store import (
     RunStore,
     RunNotFoundError,
@@ -22,7 +22,7 @@ from robot_server.runs.action_models import (
 )
 
 from robot_server.runs.router.actions_router import create_run_action
-
+from robot_server.runs.engine_state_store import EngineStateStore
 
 @pytest.fixture
 def task_runner(decoy: Decoy) -> TaskRunner:
@@ -52,6 +52,7 @@ async def test_create_play_action_to_start_run(
     mock_engine_store: EngineStore,
     prev_run: RunResource,
     task_runner: TaskRunner,
+    mock_engine_state_store: EngineStateStore
 ) -> None:
     """It should handle a play action that start the runner."""
     action = RunAction(
@@ -70,13 +71,15 @@ async def test_create_play_action_to_start_run(
         action_id="action-id",
         created_at=datetime(year=2022, month=2, day=2),
         task_runner=task_runner,
+        engine_state_store=mock_engine_state_store
     )
 
     assert result.content.data == action
     assert result.status_code == 201
 
+    mock_protocol_runner_wrapper = ProtocolRunnerWrapper(runner=matchers.Anything(), engine_state_store=mock_engine_state_store)
     decoy.verify(
-        task_runner.run(mock_engine_store.runner.run),
+        task_runner.run(mock_protocol_runner_wrapper.run),
         mock_run_store.insert_action(run_id=prev_run.run_id, action=action),
     )
 

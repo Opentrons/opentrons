@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, status
 from datetime import datetime
 from typing import Union
 
-from opentrons.protocol_runner import ProtocolRunner
 from typing_extensions import Literal
 
 from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
@@ -18,7 +17,7 @@ from robot_server.service.task_runner import TaskRunner
 from ..engine_state_store import EngineStateStore
 from ..run_store import RunStore, RunNotFoundError
 from ..action_models import RunAction, RunActionType, RunActionCreate
-from ..engine_store import EngineStore
+from ..engine_store import EngineStore, ProtocolRunnerWrapper
 from ..dependencies import get_run_store, get_engine_store, get_engine_state_store
 from .base_router import RunNotFound, RunStopped
 
@@ -112,15 +111,3 @@ async def create_run_action(
         content=SimpleBody.construct(data=action),
         status_code=status.HTTP_201_CREATED,
     )
-
-
-class ProtocolRunnerWrapper:
-    def __init__(self, runner: ProtocolRunner, engine_state_store: EngineStateStore):
-        _protocol_runner = runner
-        _engine_state_store = engine_state_store
-
-    async def run(
-            self
-    ) -> None:
-        result = self._protocol_runner.run()
-        self._engine_state_store.insert(result)

@@ -4,6 +4,19 @@ from typing import Dict, NamedTuple, Optional
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import ProtocolEngine, StateView, create_protocol_engine
 from opentrons.protocol_runner import ProtocolRunner
+from robot_server.runs.engine_state_store import EngineStateStore
+
+
+class ProtocolRunnerWrapper:
+    def __init__(self, runner: ProtocolRunner, engine_state_store: EngineStateStore):
+        _protocol_runner = runner
+        _engine_state_store = engine_state_store
+
+    async def run(
+            self
+    ) -> None:
+        result = self._protocol_runner.run()
+        self._engine_state_store.insert(result)
 
 
 class EngineMissingError(RuntimeError):
