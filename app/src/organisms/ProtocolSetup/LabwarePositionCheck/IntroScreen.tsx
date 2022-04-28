@@ -32,7 +32,7 @@ export const IntroScreen = (props: {
   const labwareIdsBySection = useLabwareIdsBySection(
     runRecord?.data?.id ?? null
   )
-  const introInfo = useIntroInfo(runRecord?.data?.id ?? null)
+  const introInfo = useIntroInfo()
   const { t } = useTranslation(['labware_position_check', 'shared'])
 
   const currentRunData = runRecord?.data

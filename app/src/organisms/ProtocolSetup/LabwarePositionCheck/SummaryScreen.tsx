@@ -35,7 +35,7 @@ export const SummaryScreen = (props: {
   const runId = useCurrentRunId()
   const [labwareOffsets, setLabwareOffsets] = React.useState<LabwareOffsets>([])
   const { t } = useTranslation('labware_position_check')
-  const introInfo = useIntroInfo(runId)
+  const introInfo = useIntroInfo()
   const { protocolData } = useProtocolDetailsForRun(runId)
   useLabwareOffsets(
     savePositionCommandData,

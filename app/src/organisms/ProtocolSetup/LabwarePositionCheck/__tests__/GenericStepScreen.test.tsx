@@ -78,7 +78,7 @@ describe('GenericStepScreen', () => {
     mockUseLabwareIdsBySection.mockReturnValue({})
     mockUseSteps.mockReturnValue([])
 
-    when(mockUseIntroInfo).calledWith(MOCK_RUN_ID).mockReturnValue({
+    when(mockUseIntroInfo).calledWith().mockReturnValue({
       primaryPipetteMount: 'left',
       secondaryPipetteMount: '',
       firstTiprackSlot: '2',

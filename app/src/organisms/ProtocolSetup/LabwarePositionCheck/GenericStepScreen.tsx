@@ -31,7 +31,7 @@ interface GenericStepScreenProps {
 export const GenericStepScreen = (
   props: GenericStepScreenProps
 ): JSX.Element | null => {
-  const introInfo = useIntroInfo(props.runId)
+  const introInfo = useIntroInfo()
   const labwareIdsBySection = useLabwareIdsBySection(props.runId)
   const allSteps = useSteps(props.runId)
   if (introInfo == null) return null

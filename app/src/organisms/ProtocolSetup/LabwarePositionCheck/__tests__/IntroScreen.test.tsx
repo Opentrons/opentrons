@@ -121,7 +121,7 @@ describe('IntroScreen', () => {
     when(mockUseLabwareIdsBySection).calledWith(MOCK_RUN_ID).mockReturnValue({})
     when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
 
-    when(mockUseIntroInfo).calledWith(MOCK_RUN_ID).mockReturnValue({
+    when(mockUseIntroInfo).calledWith().mockReturnValue({
       primaryPipetteMount: 'left',
       secondaryPipetteMount: '',
       firstTiprackSlot: '2',
