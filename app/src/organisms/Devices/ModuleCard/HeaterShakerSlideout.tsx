@@ -72,7 +72,7 @@ export const HeaterShakerSlideout = (
     cancel: cancelExit,
   } = useConditionalConfirm(sendShakeSpeedCommand, true)
 
-  const sendSetTemperatureCommand = (): void => {
+  const sendSetTemperatureOrShakeCommand = (): void => {
     if (hsValue != null && !isSetShake) {
       const setTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
         commandType: 'heaterShakerModule/startSetTargetTemperature',
@@ -118,6 +118,7 @@ export const HeaterShakerSlideout = (
           onCloseClick={cancelExit}
           onConfirmClick={confirmAttachment}
           isProceedToRunModal={false}
+          onResponse={() => confirmAttachment}
         />
       )}
       <Slideout
@@ -129,7 +130,7 @@ export const HeaterShakerSlideout = (
         isExpanded={isExpanded}
         footer={
           <PrimaryButton
-            onClick={sendSetTemperatureCommand}
+            onClick={sendSetTemperatureOrShakeCommand}
             disabled={hsValue === null || errorMessage !== null}
             width="100%"
             data-testid={`HeaterShakerSlideout_btn_${module.serialNumber}`}

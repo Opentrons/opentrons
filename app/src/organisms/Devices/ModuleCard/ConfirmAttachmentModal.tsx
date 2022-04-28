@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import {
   CheckboxField,
   DIRECTION_ROW,
@@ -15,21 +16,40 @@ import {
 import { SecondaryButton, PrimaryButton } from '../../../atoms/Buttons'
 import { Modal } from '../../../atoms/Modal'
 import { useHeaterShakerFromProtocol } from './hooks'
+import { Dispatch } from '../../../redux/types'
+import { setDismissConfirmHeaterShakerAttachmentModal } from '../../../redux/calibration'
 
 interface ConfirmAttachmentModalProps {
   onCloseClick: () => void
   onConfirmClick: () => unknown
   isProceedToRunModal: boolean
+  onResponse: (isModalDismissed: boolean) => void
 }
 export const ConfirmAttachmentModal = (
   props: ConfirmAttachmentModalProps
 ): JSX.Element | null => {
-  const { isProceedToRunModal, onCloseClick, onConfirmClick } = props
+  const {
+    isProceedToRunModal,
+    onCloseClick,
+    onConfirmClick,
+    onResponse,
+  } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [isDismissed, setIsDismissed] = React.useState<boolean>(false)
   const heaterShaker = useHeaterShakerFromProtocol()
+  const dispatch = useDispatch<Dispatch>()
   const slotNumber = heaterShaker != null ? heaterShaker.slotName : null
 
+  const makeModalDismissed = (isModalDismissed: boolean) => (): void => {
+    if (isDismissed) {
+      dispatch(setDismissConfirmHeaterShakerAttachmentModal(!isModalDismissed))
+      onConfirmClick()
+    }
+    onResponse(isModalDismissed)
+    onConfirmClick()
+  }
+
+  console.log(onResponse)
   return (
     <Modal
       title={t('confirm_heater_shaker_modal_attachment')}
@@ -99,7 +119,7 @@ export const ConfirmAttachmentModal = (
             isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
           }`}
         >
-          <PrimaryButton onClick={onConfirmClick}>
+          <PrimaryButton onClick={makeModalDismissed(true)}>
             {isProceedToRunModal
               ? t('proceed_to_run')
               : t('confirm_attachment')}

@@ -51,3 +51,9 @@ export function setUseTrashSurfaceForTipCal(
     shouldUseTrashSurface
   )
 }
+
+export function setDismissConfirmHeaterShakerAttachmentModal(
+  modalDismissed: boolean
+): UpdateConfigValueAction {
+  return updateConfigValue('calibration.dismissModal', modalDismissed)
+}
