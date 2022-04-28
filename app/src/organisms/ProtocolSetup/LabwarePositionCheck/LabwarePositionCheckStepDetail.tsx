@@ -27,7 +27,7 @@ import {
   JogControls,
   VERTICAL_PLANE,
 } from '../../../molecules/JogControls'
-import { useProtocolDetails } from '../../RunDetails/hooks'
+import { useProtocolDetailsForRun } from '../../Devices/hooks'
 import { StepDetailText } from './StepDetailText'
 import levelWithTip from '../../../assets/images/lpc_level_with_tip.svg'
 import levelWithLabware from '../../../assets/images/lpc_level_with_labware.svg'
@@ -37,7 +37,6 @@ import type {
   LabwarePositionCheckMovementCommand,
   LabwarePositionCheckStep,
 } from './types'
-import { useProtocolDetailsForRun } from '../../Devices/hooks'
 
 const DECK_MAP_VIEWBOX = '-30 -20 170 115'
 interface LabwarePositionCheckStepDetailProps {

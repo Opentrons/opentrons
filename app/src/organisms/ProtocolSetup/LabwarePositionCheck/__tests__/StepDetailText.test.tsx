@@ -9,15 +9,15 @@ import {
   renderWithProviders,
 } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-import { useProtocolDetails } from '../../../RunDetails/hooks'
+import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { LabwarePositionCheckStepDetailModal } from '../LabwarePositionCheckStepDetailModal'
 import { StepDetailText } from '../StepDetailText'
 
 jest.mock('../LabwarePositionCheckStepDetailModal')
-jest.mock('../../../RunDetails/hooks')
+jest.mock('../../../Devices/hooks')
 
-const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
-  typeof useProtocolDetails
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
 >
 const mockLabwarePositionCheckStepDetailModal = LabwarePositionCheckStepDetailModal as jest.MockedFunction<
   typeof LabwarePositionCheckStepDetailModal
@@ -67,7 +67,7 @@ describe('StepDetailText', () => {
   beforeEach(() => {
     props = {
       selectedStep: mockLabwarePositionCheckStepTipRack,
-      runId: MOCK_RUN_ID
+      runId: MOCK_RUN_ID,
     }
 
     when(mockLabwarePositionCheckStepDetailModal)
@@ -81,8 +81,8 @@ describe('StepDetailText', () => {
           mock labware position check step detail modal
         </div>
       ))
-    when(mockUseProtocolDetails)
-      .calledWith()
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(MOCK_RUN_ID)
       .mockReturnValue({
         protocolData: withSinglechannelProtocol,
       } as any)
@@ -128,7 +128,7 @@ describe('StepDetailText', () => {
     props = {
       selectedStep: mockLabwarePositionCheckStepLabware,
       pipetteChannels: 1,
-      runId: MOCK_RUN_ID
+      runId: MOCK_RUN_ID,
     }
     const { getByText } = render(props)
     getByText('See how to tell if the pipette is centered')
@@ -140,8 +140,8 @@ describe('StepDetailText', () => {
   })
   it('renders the 8 tips with tiprack text: labware_step_detail_tiprack_plural', () => {
     props = { ...props, pipetteChannels: 8 }
-    when(mockUseProtocolDetails)
-      .calledWith()
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(MOCK_RUN_ID)
       .mockReturnValue({
         protocolData: withMultiChannelProtocol,
       } as any)
@@ -159,10 +159,10 @@ describe('StepDetailText', () => {
     props = {
       selectedStep: mockLabwarePositionCheckStepLabware,
       pipetteChannels: 8,
-      runId: MOCK_RUN_ID
+      runId: MOCK_RUN_ID,
     }
-    when(mockUseProtocolDetails)
-      .calledWith()
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(MOCK_RUN_ID)
       .mockReturnValue({
         protocolData: withMultiChannelProtocol,
       } as any)
@@ -177,8 +177,8 @@ describe('StepDetailText', () => {
     )
   })
   it('returns null if protocolData is null', () => {
-    when(mockUseProtocolDetails)
-      .calledWith()
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(MOCK_RUN_ID)
       .mockReturnValue({
         protocolData: null,
       } as any)

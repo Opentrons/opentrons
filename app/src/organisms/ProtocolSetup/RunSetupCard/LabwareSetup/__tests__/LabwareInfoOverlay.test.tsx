@@ -69,7 +69,7 @@ describe('LabwareInfoOverlay', () => {
       definition: fixture_tiprack_300_ul as LabwareDefinition2,
       displayName: 'fresh tips',
       labwareId: MOCK_LABWARE_ID,
-      runId: MOCK_RUN_ID
+      runId: MOCK_RUN_ID,
     }
     labware = {
       [MOCK_LABWARE_ID]: {

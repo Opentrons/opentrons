@@ -4,7 +4,7 @@ import { act } from 'react-dom/test-utils'
 import { fireEvent } from '@testing-library/dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-import { useProtocolDetails } from '../../../RunDetails/hooks'
+import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { SectionList } from '../SectionList'
 import { DeckMap } from '../DeckMap'
@@ -15,7 +15,7 @@ import { Section } from '../types'
 import { useLPCSuccessToast } from '../../hooks'
 
 jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../../../RunDetails/hooks')
+jest.mock('../../../Devices/hooks')
 jest.mock('../../hooks')
 jest.mock('../SectionList')
 jest.mock('../hooks')
@@ -26,8 +26,8 @@ const mockSectionList = SectionList as jest.MockedFunction<typeof SectionList>
 const mockUseIntroInfo = useIntroInfo as jest.MockedFunction<
   typeof useIntroInfo
 >
-const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
-  typeof useProtocolDetails
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
 >
 const mockDeckmap = DeckMap as jest.MockedFunction<typeof DeckMap>
 
@@ -82,8 +82,8 @@ describe('SummaryScreen', () => {
       sections: MOCK_SECTIONS,
     })
 
-    when(mockUseProtocolDetails)
-      .calledWith()
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(MOCK_RUN_ID)
       .mockReturnValue({
         protocolData: {
           labware: {

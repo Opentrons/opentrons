@@ -17,7 +17,6 @@ import {
 } from '@opentrons/components'
 import { IDENTITY_VECTOR } from '@opentrons/shared-data'
 import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
-import { useProtocolDetails } from '../../RunDetails/hooks'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useLPCSuccessToast } from '../hooks'
 import { DeckMap } from './DeckMap'

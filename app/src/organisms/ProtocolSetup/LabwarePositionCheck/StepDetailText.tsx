@@ -9,7 +9,6 @@ import {
   JUSTIFY_CENTER,
   FONT_SIZE_BODY_2,
 } from '@opentrons/components'
-import { useProtocolDetails } from '../../RunDetails/hooks'
 import { LabwarePositionCheckStepDetailModal } from './LabwarePositionCheckStepDetailModal'
 import type { LabwarePositionCheckStep } from './types'
 import { useProtocolDetailsForRun } from '../../Devices/hooks'

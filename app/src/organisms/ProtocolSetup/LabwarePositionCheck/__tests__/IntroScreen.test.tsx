@@ -131,7 +131,7 @@ describe('IntroScreen', () => {
     when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
-        data: { labwareOffsets: mockOffsets },
+        data: { id: MOCK_RUN_ID, labwareOffsets: mockOffsets },
       } as any)
   })
   afterEach(() => {

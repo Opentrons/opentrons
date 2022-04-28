@@ -38,7 +38,6 @@ import {
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 
 import { useCurrentRunStatus } from '../../../RunTimeControl/hooks'
-import { LabwarePositionCheck } from '../../LabwarePositionCheck'
 import styles from '../../styles.css'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { DownloadOffsetDataModal } from '../../../ProtocolUpload/DownloadOffsetDataModal'
@@ -48,7 +47,6 @@ import {
   useLPCSuccessToast,
 } from '../../hooks'
 import { useModuleMatchResults, useProtocolCalibrationStatus } from '../hooks'
-import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from './LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
@@ -147,7 +145,9 @@ export const LabwareSetup = (): JSX.Element | null => {
         />
       )}
       {showLabwarePositionCheckModal && (
-        <p>deprecated entrypoint to labware position check, slated for deletion </p>
+        <p>
+          deprecated entrypoint to labware position check, slated for deletion{' '}
+        </p>
       )}
       {downloadOffsetDataModal && (
         <DownloadOffsetDataModal

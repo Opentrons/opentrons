@@ -17,12 +17,12 @@ import {
   useCreateCommandMutation,
 } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../../../redux/analytics'
-import { useProtocolDetails } from '../../../RunDetails/hooks'
 import {
   useCurrentRunId,
   useCurrentRunCommands,
   useCurrentProtocol,
 } from '../../../ProtocolUpload/hooks'
+import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import {
   sendModuleCommand,
@@ -68,7 +68,6 @@ import type {
   LabwarePositionCheckStep,
   SavePositionCommandData,
 } from '../types'
-import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 
 export type LabwarePositionCheckUtils =
   | {

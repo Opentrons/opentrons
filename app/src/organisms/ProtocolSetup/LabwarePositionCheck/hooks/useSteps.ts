@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useProtocolDetailsForRun } from '../../../Devices/hooks'
+import { useProtocolDetailsForRun } from '../../../Devices/hooks/useProtocolDetailsForRun'
 import { getLabwarePositionCheckSteps } from '../getLabwarePositionCheckSteps'
 import type { LabwarePositionCheckStep } from '../types'
 
