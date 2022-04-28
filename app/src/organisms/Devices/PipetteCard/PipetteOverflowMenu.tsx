@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Flex, POSITION_RELATIVE } from '@opentrons/components'
-import { EMPTY } from '@opentrons/shared-data'
 import { MenuList } from '../../../atoms/MenuList'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 
@@ -36,7 +35,7 @@ export const PipetteOverflowMenu = (
     <Flex position={POSITION_RELATIVE}>
       <MenuList
         buttons={
-          pipetteName === EMPTY
+          pipetteName === 'Empty'
             ? [
                 <MenuItem
                   minWidth="10.6rem"

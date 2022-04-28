@@ -180,19 +180,17 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             showBanner ? (
               <Flex paddingBottom={SPACING.spacing2}>
                 <Banner type="error" onCloseClick={() => setShowBanner(false)}>
-                  <>
-                    <Flex flexDirection={DIRECTION_COLUMN}>
-                      {t('pipette_offset_calibration_needed')}
-                      <Btn
-                        textAlign={ALIGN_START}
-                        fontSize={TYPOGRAPHY.fontSizeP}
-                        textDecoration={TEXT_DECORATION_UNDERLINE}
-                        onClick={handleCalibrate}
-                      >
-                        {t('calibrate_now')}
-                      </Btn>
-                    </Flex>
-                  </>
+                  <Flex flexDirection={DIRECTION_COLUMN}>
+                    {t('pipette_offset_calibration_needed')}
+                    <Btn
+                      textAlign={ALIGN_START}
+                      fontSize={TYPOGRAPHY.fontSizeP}
+                      textDecoration={TEXT_DECORATION_UNDERLINE}
+                      onClick={handleCalibrate}
+                    >
+                      {t('calibrate_now')}
+                    </Btn>
+                  </Flex>
                 </Banner>
               </Flex>
             ) : null}
