@@ -58,7 +58,7 @@ describe('RobotSettings FactoryResetSlideout', () => {
   it('should render title, description, checkboxes, links and button', () => {
     const [{ getByText, getByRole, getAllByText, getByTestId }] = render()
 
-    // TODO after CPX team's update need to add items for Protocol Run History
+    // TODO: (koji, 4/28/22) after CPX team's update need to add items for Protocol Run History
 
     getByText('Factory Reset')
     getByText('Select the robot data to clear.')
