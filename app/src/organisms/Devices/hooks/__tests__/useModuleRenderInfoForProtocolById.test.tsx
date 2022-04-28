@@ -18,7 +18,6 @@ import {
 } from '..'
 
 import type {
-  ModuleDefinition,
   ModuleModel,
   ModuleType,
   ProtocolAnalysisFile,

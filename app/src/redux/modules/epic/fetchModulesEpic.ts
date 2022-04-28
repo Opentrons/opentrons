@@ -107,9 +107,6 @@ const normalizeModuleResponse = (
   apiModule: ApiAttachedModule
 ): AttachedModule => {
   return {
-    // model: apiModule.moduleModel,
-    // data: apiModule.data,
-    // status: apiModule.status,
     ...normalizeModuleInfo(apiModule),
     id: apiModule.id,
     hardwareRevision: apiModule.hardwareRevision

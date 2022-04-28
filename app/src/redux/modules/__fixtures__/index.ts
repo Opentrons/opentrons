@@ -35,7 +35,7 @@ export const mockApiTemperatureModule: ApiTypes.ApiTemperatureModule = {
     targetTemperature: null,
     status: 'idle',
   },
-  usbPort: { hub: 1, port: 1, path: '/dev/ot_module_tempdeck0' },
+  usbPort: { hub: null, port: 1, path: '/dev/ot_module_tempdeck0' },
 }
 
 export const mockApiTemperatureModuleGen2: ApiTypes.ApiTemperatureModule = {
@@ -115,7 +115,7 @@ export const mockApiMagneticModule: ApiTypes.ApiMagneticModule = {
     height: 42,
     status: 'disengaged',
   },
-  usbPort: { hub: 1, port: 1, path: '/dev/ot_module_magdeck0' },
+  usbPort: { hub: null, port: 1, path: '/dev/ot_module_magdeck0' },
 }
 
 export const mockApiMagneticModuleGen2: ApiTypes.ApiMagneticModule = {
@@ -132,7 +132,7 @@ export const mockApiMagneticModuleGen2: ApiTypes.ApiMagneticModule = {
     height: 42,
     status: 'disengaged',
   },
-  usbPort: { hub: 1, port: 1, path: '/dev/ot_module_magdeck0' },
+  usbPort: { hub: null, port: 1, path: '/dev/ot_module_magdeck0' },
 }
 
 export const mockMagneticModule: Types.MagneticModule = {
@@ -299,7 +299,7 @@ export const mockFetchModulesSuccess: RobotApiResponse = {
   ...mockFetchModulesSuccessMeta,
   host: mockRobot,
   body: {
-    modules: [
+    data: [
       mockApiMagneticModule,
       mockApiTemperatureModule,
       mockApiThermocycler,
