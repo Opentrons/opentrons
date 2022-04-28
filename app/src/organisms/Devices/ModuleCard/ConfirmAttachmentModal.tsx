@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 import {
   CheckboxField,
   DIRECTION_ROW,
@@ -16,14 +15,16 @@ import {
 import { SecondaryButton, PrimaryButton } from '../../../atoms/Buttons'
 import { Modal } from '../../../atoms/Modal'
 import { useHeaterShakerFromProtocol } from './hooks'
+import { useDispatch } from 'react-redux'
 import { Dispatch } from '../../../redux/types'
-import { setDismissConfirmHeaterShakerAttachmentModal } from '../../../redux/calibration'
+import { UpdateConfigValueAction } from '../../../redux/config/types'
+import { updateConfigValue } from '../../../redux/config'
 
 interface ConfirmAttachmentModalProps {
   onCloseClick: () => void
-  onConfirmClick: () => unknown
+  onConfirmClick?: () => unknown
   isProceedToRunModal: boolean
-  onResponse: (isModalDismissed: boolean) => void
+  onResponse?: (isModalDismissed: boolean) => void
 }
 export const ConfirmAttachmentModal = (
   props: ConfirmAttachmentModalProps
@@ -37,19 +38,19 @@ export const ConfirmAttachmentModal = (
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [isDismissed, setIsDismissed] = React.useState<boolean>(false)
   const heaterShaker = useHeaterShakerFromProtocol()
-  const dispatch = useDispatch<Dispatch>()
   const slotNumber = heaterShaker != null ? heaterShaker.slotName : null
+  const dispatch = useDispatch<Dispatch>()
 
-  const makeModalDismissed = (isModalDismissed: boolean) => (): void => {
-    if (isDismissed) {
-      dispatch(setDismissConfirmHeaterShakerAttachmentModal(!isModalDismissed))
-      onConfirmClick()
+  const makeModalDismissed = (isModalDismissed: boolean): void => {
+    if (onResponse != null) {
+      if (isDismissed) {
+        onResponse(isModalDismissed)
+      }
+      onResponse(!isModalDismissed)
     }
-    onResponse(isModalDismissed)
-    onConfirmClick()
   }
+  console.log(isDismissed)
 
-  console.log(onResponse)
   return (
     <Modal
       title={t('confirm_heater_shaker_modal_attachment')}
@@ -119,7 +120,9 @@ export const ConfirmAttachmentModal = (
             isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
           }`}
         >
-          <PrimaryButton onClick={makeModalDismissed(true)}>
+          <PrimaryButton
+            onClick={isProceedToRunModal ? onConfirmClick : makeModalDismissed}
+          >
             {isProceedToRunModal
               ? t('proceed_to_run')
               : t('confirm_attachment')}

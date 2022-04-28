@@ -116,9 +116,8 @@ export const HeaterShakerSlideout = (
       {showConfirmationModal && (
         <ConfirmAttachmentModal
           onCloseClick={cancelExit}
-          onConfirmClick={confirmAttachment}
           isProceedToRunModal={false}
-          onResponse={() => confirmAttachment}
+          onResponse={sendShakeSpeedCommand}
         />
       )}
       <Slideout
