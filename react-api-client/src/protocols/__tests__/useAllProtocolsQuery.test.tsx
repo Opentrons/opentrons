@@ -24,14 +24,14 @@ const PROTOCOLS_RESPONSE = {
       createdAt: 'now',
       protocolType: 'json',
       metadata: {},
-      analyses: {},
+      analysisSummaries: {},
     },
     {
       id: '2',
       createdAt: 'now',
       protocolType: 'python',
       metadata: {},
-      analyses: {},
+      analysisSummaries: {},
     },
   ],
 } as Protocols
