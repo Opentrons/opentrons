@@ -3,8 +3,6 @@ import pytest
 from datetime import datetime
 from decoy import Decoy, matchers
 from pathlib import Path
-import sqlalchemy
-from typing import Generator
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import StateView, ErrorOccurrence, types as pe_types, commands as pe_commands, errors as pe_errors
@@ -21,7 +19,6 @@ from robot_server.service.json_api import (
     MultiBodyMeta,
     ResourceLink,
 )
-from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
 from robot_server.protocols import (
     ProtocolStore,
     ProtocolResource,
@@ -657,6 +654,8 @@ async def test_update_run_to_not_current(
         is_current=False,
     )
 
+    engine_state_resource = EngineStateResource(run_id="run-id", state=protocol_run, engine_status="succeeded")
+
     expected_response = Run(
         id="run-id",
         protocolId=None,
@@ -680,16 +679,18 @@ async def test_update_run_to_not_current(
         )
     ).then_return(updated_resource)
 
-    engine_state = decoy.mock(cls=StateView)
-    decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
-    decoy.when(engine_state.commands.get_all()).then_return([])
-    decoy.when(engine_state.commands.get_all_errors()).then_return([])
-    decoy.when(engine_state.pipettes.get_all()).then_return([])
-    decoy.when(engine_state.labware.get_all()).then_return([])
-    decoy.when(engine_state.labware.get_labware_offsets()).then_return([])
-    decoy.when(engine_state.commands.get_status()).then_return(
-        pe_types.EngineStatus.SUCCEEDED
-    )
+    decoy.when(mock_engine_state_store.insert(engine_state_resource)).then_return(engine_state_resource)
+
+    # engine_state = decoy.mock(cls=StateView)
+    # decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
+    # decoy.when(engine_state.commands.get_all()).then_return([])
+    # decoy.when(engine_state.commands.get_all_errors()).then_return([])
+    # decoy.when(engine_state.pipettes.get_all()).then_return([])
+    # decoy.when(engine_state.labware.get_all()).then_return([])
+    # decoy.when(engine_state.labware.get_labware_offsets()).then_return([])
+    # decoy.when(engine_state.commands.get_status()).then_return(
+    #     pe_types.EngineStatus.SUCCEEDED
+    # )
 
     result = await update_run(
         runId="run-id",
@@ -707,7 +708,6 @@ async def test_update_run_to_not_current(
         mock_run_store.update_active_run(
             run_id=updated_resource.run_id, is_current=updated_resource.is_current
         ),
-        mock_engine_state_store.insert(matchers.Anything())
     )
 
 

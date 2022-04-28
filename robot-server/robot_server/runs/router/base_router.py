@@ -341,15 +341,8 @@ async def update_run(
         raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
             status.HTTP_409_CONFLICT
         )
-    elif update.current is False:
-        try:
-            await engine_store.clear()
-        except EngineConflictError:
-            raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
-        run = run_store.update_active_run(run_id=runId, is_current=update.current)
-        log.info(f'Marked run "{runId}" as not current.')
 
-    engine_state = engine_store.get_state(run.run_id)
+    engine_state = engine_store.engine.state_view
 
     protocol_run_data = ProtocolRunData(
         errors=engine_state.commands.get_all_errors(),
@@ -362,11 +355,19 @@ async def update_run(
         modules=[]
     )
 
-    insert_engine_state_result = engine_state_store.insert(EngineStateResource(
-        run_id=run.run_id,
-        state=protocol_run_data,
-        engine_status=engine_state.commands.get_status()
-    ))
+    if update.current is False:
+        try:
+            await engine_store.clear()
+        except EngineConflictError:
+            raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
+        run = run_store.update_active_run(run_id=runId, is_current=update.current)
+        log.info(f'Marked run "{runId}" as not current.')
+
+        insert_engine_state_result = engine_state_store.insert(EngineStateResource(
+            run_id=run.run_id,
+            state=protocol_run_data,
+            engine_status=engine_state.commands.get_status()
+        ))
 
     data = Run.construct(
         id=run.run_id,

@@ -43,8 +43,8 @@ class ProtocolRunData(BaseModel):
     errors: List[ErrorOccurrence]
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]
-    modules: List[LoadedModule]
-    labwareOffsets: List[LabwareOffset]
+    modules: List[LoadedModule] # TODO use default factory by pydantic
+    labwareOffsets: List[LabwareOffset] # TODO use default factory by pydantic
 
 
 # TODO(mc, 2022-01-11): this class has become bloated. Split into an abstract
