@@ -26,7 +26,11 @@ from robot_server.protocols.analysis_models import (
     PendingAnalysis,
     CompletedAnalysis,
 )
-from robot_server.protocols.analysis_store import AnalysisStore, AnalysisNotFoundError
+from robot_server.protocols.analysis_store import (
+    AnalysisStore,
+    AnalysisNotFoundError,
+    AnalysisNotPendingOrNotFoundError,
+)
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
@@ -131,10 +135,12 @@ def test_add_pending(subject: AnalysisStore, protocol_store: ProtocolStore) -> N
     assert subject.get_summaries_by_protocol("protocol-id") == [expected_summary]
 
 
-def test_update_raises_if_analysis_is_not_pending(subject: AnalysisStore, protocol_store: ProtocolStore) -> None:
+def test_update_raises_if_analysis_is_not_pending(
+    subject: AnalysisStore, protocol_store: ProtocolStore
+) -> None:
     """It should raise if you try to update an analysis that's not pending."""
     # Trying to update an analysis that doesn't exist:
-    with pytest.raises(AnalysisNotFoundError):
+    with pytest.raises(AnalysisNotPendingOrNotFoundError, match="analysis-id"):
         subject.update(
             analysis_id="nonexistent-analysis-id",
             commands=[],
@@ -153,7 +159,7 @@ def test_update_raises_if_analysis_is_not_pending(subject: AnalysisStore, protoc
         pipettes=[],
         errors=[],
     )
-    with pytest.raises(AnalysisNotFoundError):
+    with pytest.raises(AnalysisNotPendingOrNotFoundError, match="analysis-id"):
         subject.update(
             analysis_id="analysis-id",
             commands=[],
