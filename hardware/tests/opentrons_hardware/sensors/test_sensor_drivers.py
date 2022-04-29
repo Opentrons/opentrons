@@ -356,7 +356,7 @@ async def test_bind_to_sync(
     send out a BindSensorOutputRequest.
     """
     await sensor.bind_to_sync(
-        mock_messenger, node_id, SensorOutputBinding.sync, timeout
+        mock_messenger, node_id, SensorOutputBinding.sync,
     )
     mock_messenger.send.assert_called_once_with(
         node_id=node_id,
