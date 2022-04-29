@@ -250,7 +250,16 @@ class ProtocolStore:
                 row_to_delete = transaction.execute(select_statement).one()
             except sqlalchemy.exc.NoResultFound as e:
                 raise ProtocolNotFoundError(protocol_id=protocol_id) from e
+
+            # TODO(mm, 2022-04-28): Deleting analyses from the table is enough to
+            # avoid a SQL foreign key conflict. But, if this protocol had any *pending*
+            # analyses, they'll be left behind in the AnalysisStore, orphaned,
+            # since they're stored independently of this SQL table.
+            #
+            # To fix this, we'll need to merge the Store classes
+            # or otherwise give them access to each other.
             transaction.execute(delete_analyses_statement)
+
             transaction.execute(delete_protocol_statement)
 
         deleted_resource = _convert_sql_row_to_dataclass(sql_row=row_to_delete)
