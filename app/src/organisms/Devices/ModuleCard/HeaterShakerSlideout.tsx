@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   getModuleDisplayName,
@@ -22,6 +23,7 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../../atoms/Buttons'
+import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { InputField } from '../../../atoms/InputField'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 
@@ -46,6 +48,7 @@ export const HeaterShakerSlideout = (
   const [hsValue, setHsValue] = React.useState<string | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
+  const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const modulePart = isSetShake ? t('shake_speed') : t('temperature')
 
   const sendShakeSpeedCommand = (): void => {
@@ -70,7 +73,10 @@ export const HeaterShakerSlideout = (
     confirm: confirmAttachment,
     showConfirmation: showConfirmationModal,
     cancel: cancelExit,
-  } = useConditionalConfirm(sendShakeSpeedCommand, true)
+  } = useConditionalConfirm(
+    sendShakeSpeedCommand,
+    !configHasHeaterShakerAttached
+  )
 
   const sendSetTemperatureOrShakeCommand = (): void => {
     if (hsValue != null && !isSetShake) {
@@ -117,7 +123,7 @@ export const HeaterShakerSlideout = (
         <ConfirmAttachmentModal
           onCloseClick={cancelExit}
           isProceedToRunModal={false}
-          onResponse={sendShakeSpeedCommand}
+          onConfirmClick={sendShakeSpeedCommand}
         />
       )}
       <Slideout

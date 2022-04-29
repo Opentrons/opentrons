@@ -40,9 +40,9 @@ describe('ConfirmAttachmentBanner', () => {
 
   beforeEach(() => {
     props = {
-      onCloseClick: jest.fn(),
-      isProceedToRunModal: false,
       onConfirmClick: jest.fn(),
+      isProceedToRunModal: false,
+      onCloseClick: jest.fn(),
     }
     mockUseHeaterShakerFromProtocol.mockReturnValue(
       HEATER_SHAKER_PROTOCOL_MODULE_INFO

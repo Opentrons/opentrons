@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import {
   CheckboxField,
   DIRECTION_ROW,
@@ -14,42 +15,40 @@ import {
 } from '@opentrons/components'
 import { SecondaryButton, PrimaryButton } from '../../../atoms/Buttons'
 import { Modal } from '../../../atoms/Modal'
-import { useHeaterShakerFromProtocol } from './hooks'
-import { useDispatch } from 'react-redux'
 import { Dispatch } from '../../../redux/types'
 import { UpdateConfigValueAction } from '../../../redux/config/types'
 import { updateConfigValue } from '../../../redux/config'
+import { useHeaterShakerFromProtocol } from './hooks'
 
+export function setHeaterShakerAttached(
+  heaterShakerAttached: boolean
+): UpdateConfigValueAction {
+  return updateConfigValue(
+    'modules.heaterShaker.isAttached',
+    heaterShakerAttached
+  )
+}
 interface ConfirmAttachmentModalProps {
   onCloseClick: () => void
-  onConfirmClick?: () => unknown
   isProceedToRunModal: boolean
-  onResponse?: (isModalDismissed: boolean) => void
+  onConfirmClick: () => void
 }
 export const ConfirmAttachmentModal = (
   props: ConfirmAttachmentModalProps
 ): JSX.Element | null => {
-  const {
-    isProceedToRunModal,
-    onCloseClick,
-    onConfirmClick,
-    onResponse,
-  } = props
+  const { isProceedToRunModal, onCloseClick, onConfirmClick } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [isDismissed, setIsDismissed] = React.useState<boolean>(false)
   const heaterShaker = useHeaterShakerFromProtocol()
   const slotNumber = heaterShaker != null ? heaterShaker.slotName : null
   const dispatch = useDispatch<Dispatch>()
 
-  const makeModalDismissed = (isModalDismissed: boolean): void => {
-    if (onResponse != null) {
-      if (isDismissed) {
-        onResponse(isModalDismissed)
-      }
-      onResponse(!isModalDismissed)
+  const makeModalDismissed = (): void => {
+    if (isDismissed) {
+      dispatch(setHeaterShakerAttached(isDismissed))
     }
+    onConfirmClick()
   }
-  console.log(isDismissed)
 
   return (
     <Modal
@@ -81,7 +80,6 @@ export const ConfirmAttachmentModal = (
           isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
         }`}
       >
-        {/* TODO(jr, 3/29/22): wire up checkbox field, pending usage of Alerts */}
         <CheckboxField
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setIsDismissed(e.currentTarget.checked)
@@ -120,9 +118,7 @@ export const ConfirmAttachmentModal = (
             isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
           }`}
         >
-          <PrimaryButton
-            onClick={isProceedToRunModal ? onConfirmClick : makeModalDismissed}
-          >
+          <PrimaryButton onClick={makeModalDismissed}>
             {isProceedToRunModal
               ? t('proceed_to_run')
               : t('confirm_attachment')}

@@ -3,13 +3,18 @@ import { renderWithProviders } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../../i18n'
+import { getIsHeaterShakerAttached } from '../../../../redux/config'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { HeaterShakerSlideout } from '../HeaterShakerSlideout'
 import { ConfirmAttachmentModal } from '../ConfirmAttachmentModal'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../ConfirmAttachmentModal')
+jest.mock('../../../../redux/config')
 
+const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
+  typeof getIsHeaterShakerAttached
+>
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
@@ -30,6 +35,7 @@ describe('HeaterShakerSlideout', () => {
   beforeEach(() => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
+    mockGetIsHeaterShakerAttached.mockReturnValue(false)
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
@@ -113,5 +119,22 @@ describe('HeaterShakerSlideout', () => {
       },
     })
     expect(button).not.toBeEnabled()
+  })
+  it('renders heater shaker form field and when button is clicked, confirm attachment modal is not rendered', () => {
+    mockGetIsHeaterShakerAttached.mockReturnValue(true)
+    props = {
+      module: mockHeaterShaker,
+      isSetShake: true,
+      isExpanded: true,
+      onCloseClick: jest.fn(),
+    }
+
+    const { getByRole, getByTestId } = render(props)
+    const button = getByRole('button', { name: 'Set Shake Speed' })
+    const input = getByTestId('heaterShakerModuleV1_true')
+    fireEvent.change(input, { target: { value: '300' } })
+    expect(button).toBeEnabled()
+    fireEvent.click(button)
+    expect(props.onCloseClick).toHaveBeenCalled()
   })
 })
