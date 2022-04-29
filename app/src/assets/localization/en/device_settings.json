@@ -56,6 +56,7 @@
   "update_robot_software_link": "Launch Opentrons software update page",
   "update_robot_software_troubleshooting": "Troubleshooting",
   "update_robot_software_download_logs": "Download logs",
+  "update_robot_software_download_logs_toast_message": "Downloading logs...",
   "factory_reset": "Factory reset",
   "factory_reset_description": "Reset labware calibration, boot scripts, and/or robot calibration to factory settings.",
   "factory_reset_settings_button": "Choose reset settings",
