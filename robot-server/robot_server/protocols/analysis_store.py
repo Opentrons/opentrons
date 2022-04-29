@@ -1,7 +1,6 @@
 """Protocol analysis storage."""
 from __future__ import annotations
 
-from collections import defaultdict
 from dataclasses import dataclass
 from logging import getLogger
 from typing import Dict, List, Optional
@@ -48,6 +47,7 @@ class AnalysisNotPendingOrNotFoundError(ValueError):
     """Raised if a given analysis was expected to be pending, but isn't."""
 
     def __init__(self, analysis_id: str) -> None:
+        """Initialize the error's message."""
         super().__init__(f'Analysis "{analysis_id}" does not exist or is not pending.')
 
 

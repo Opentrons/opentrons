@@ -1,10 +1,10 @@
 """Tests for the AnalysisStore interface."""
 import pytest
+
 from datetime import datetime
 from pathlib import Path
 from typing import Generator, List, NamedTuple
 
-import pytest
 from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons.types import MountType, DeckSlotName
