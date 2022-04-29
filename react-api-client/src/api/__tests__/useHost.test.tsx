@@ -26,7 +26,11 @@ describe('ApiHostProvider and useHost', () => {
     )
     const { result } = renderHook(useHost, { wrapper })
 
-    expect(result.current).toEqual({ hostname: 'localhost', port: null })
+    expect(result.current).toEqual({
+      hostname: 'localhost',
+      port: null,
+      robotName: null,
+    })
   })
 
   it('should allow a port to be set', () => {
@@ -37,6 +41,25 @@ describe('ApiHostProvider and useHost', () => {
     )
     const { result } = renderHook(useHost, { wrapper })
 
-    expect(result.current).toEqual({ hostname: '127.0.0.1', port: 31950 })
+    expect(result.current).toEqual({
+      hostname: '127.0.0.1',
+      port: 31950,
+      robotName: null,
+    })
+  })
+
+  it('should allow a robot name to be set', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <ApiHostProvider hostname="127.0.0.1" robotName="otie">
+        {children}
+      </ApiHostProvider>
+    )
+    const { result } = renderHook(useHost, { wrapper })
+
+    expect(result.current).toEqual({
+      hostname: '127.0.0.1',
+      port: null,
+      robotName: 'otie',
+    })
   })
 })

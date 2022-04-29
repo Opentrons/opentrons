@@ -1,6 +1,7 @@
 export interface HostConfig {
   hostname: string
   port?: number | null
+  robotName?: string | null
 }
 
 export interface ResourceLink {
