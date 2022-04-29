@@ -17,7 +17,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { RPM, HS_RPM_MAX, HS_RPM_MIN } from '@opentrons/shared-data'
-import { useLatchCommand } from '../ModuleCard/hooks'
+import { useLatchControls } from '../ModuleCard/hooks'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 import { TertiaryButton } from '../../../atoms/Buttons'
 import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'
@@ -44,7 +44,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   const [isExpanded, setExpanded] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { toggleLatch, isLatchClosed } = useLatchCommand(module, null)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module, null)
   const isShaking = module.data.speedStatus !== 'idle'
 
   const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {

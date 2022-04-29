@@ -16,7 +16,7 @@ import { getProtocolModulesInfo } from '../../../ProtocolSetup/utils/getProtocol
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { useProtocolDetailsForRun } from '../../hooks'
 import {
-  useLatchCommand,
+  useLatchControls,
   useModuleOverflowMenu,
   useHeaterShakerFromProtocol,
 } from '../hooks'
@@ -201,7 +201,7 @@ const mockTCLidHeating = {
   usbPort: { hub: 1, port: 1, path: '/dev/ot_module_thermocycler0' },
 } as any
 
-describe('useLatchCommand', () => {
+describe('useLatchControls', () => {
   const store: Store<any> = createStore(jest.fn(), {})
   let mockCreateLiveCommand = jest.fn()
   let mockCreateCommand = jest.fn()
@@ -231,7 +231,7 @@ describe('useLatchCommand', () => {
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
     )
-    const { result } = renderHook(() => useLatchCommand(mockHeaterShaker), {
+    const { result } = renderHook(() => useLatchControls(mockHeaterShaker), {
       wrapper,
     })
     const { isLatchClosed } = result.current
@@ -254,7 +254,7 @@ describe('useLatchCommand', () => {
       </I18nextProvider>
     )
     const { result } = renderHook(
-      () => useLatchCommand(mockCloseLatchHeaterShaker),
+      () => useLatchControls(mockCloseLatchHeaterShaker),
       {
         wrapper,
       }

@@ -22,7 +22,6 @@ export const ProtocolRunModuleControls = ({
     robotName,
     runId
   )
-
   const attachedModules = Object.values(moduleRenderInfoForProtocolById).filter(
     module => module.attachedModuleMatch != null
   )
@@ -46,7 +45,7 @@ export const ProtocolRunModuleControls = ({
                 robotName={robotName}
                 runId={runId}
                 module={module.attachedModuleMatch}
-                slot={module.slotName}
+                slotName={module.slotName}
               />
             ) : null}
           </Flex>

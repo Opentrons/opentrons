@@ -33,7 +33,7 @@ import { Divider } from '../../../atoms/structure'
 import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'
 import { InputField } from '../../../atoms/InputField'
 import { HeaterShakerWizard } from '../HeaterShakerWizard'
-import { useLatchCommand } from './hooks'
+import { useLatchControls } from './hooks'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
@@ -57,7 +57,7 @@ export const TestShakeSlideout = (
   const { createCommand } = useCreateCommandMutation()
   const name = getModuleDisplayName(module.moduleModel)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { toggleLatch, isLatchClosed } = useLatchCommand(module, runId)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
 
   const [showCollapsed, setShowCollapsed] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)

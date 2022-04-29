@@ -11,11 +11,11 @@ import type { ModuleType } from '@opentrons/shared-data'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
-  runId?: string
   handleSlideoutClick: () => void
   handleAboutClick: () => void
   handleTestShakeClick: () => void
   handleWizardClick: () => void
+  runId?: string
 }
 
 export const ModuleOverflowMenu = (

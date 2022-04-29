@@ -192,15 +192,11 @@ export const ModuleControlsTab = (
     runId
   )
 
-  return (
-    <>
-      {isEmpty(moduleRenderInfoForProtocolById) ? null : (
-        <RoundTab
-          id="ProtocolRunDetails_moduleControlsTab"
-          to={`/devices/${robotName}/protocol-runs/${runId}/module-controls`}
-          tabName={t('module_controls')}
-        />
-      )}
-    </>
+  return isEmpty(moduleRenderInfoForProtocolById) ? null : (
+    <RoundTab
+      id="ProtocolRunDetails_moduleControlsTab"
+      to={`/devices/${robotName}/protocol-runs/${runId}/module-controls`}
+      tabName={t('module_controls')}
+    />
   )
 }

@@ -77,12 +77,12 @@ interface ModuleCardProps {
   module: AttachedModule
   robotName: string
   runId?: string
-  slot?: string
+  slotName?: string
 }
 
 export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
-  const { module, robotName, runId, slot } = props
+  const { module, robotName, runId, slotName } = props
   const dispatch = useDispatch<Dispatch>()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
   const [showSlideout, setShowSlideout] = React.useState(false)
@@ -373,8 +373,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     data-testid={`module_card_usb_port_${module.serialNumber}`}
                   >
                     {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
-                    slot != null
-                      ? t('deck_slot', { slot: slot }) + ' - '
+                    slotName != null
+                      ? t('deck_slot', { slot: slotName }) + ' - '
                       : null}
                     {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
                       port: module.usbPort.hub ?? module.usbPort.port,

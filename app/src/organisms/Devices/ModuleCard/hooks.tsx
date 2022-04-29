@@ -47,15 +47,15 @@ export function useHeaterShakerFromProtocol(): ProtocolModuleInfo | null {
   if (heaterShakerModule == null) return null
   return heaterShakerModule
 }
-interface LatchCommand {
+interface LatchControls {
   toggleLatch: () => void
   isLatchClosed: boolean
 }
 
-export function useLatchCommand(
+export function useLatchControls(
   module: AttachedModule,
-  runId: string | null = null
-): LatchCommand {
+  runId?: string | null
+): LatchControls {
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
 
@@ -119,7 +119,7 @@ export function useModuleOverflowMenu(
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
-  const { toggleLatch, isLatchClosed } = useLatchCommand(module, runId)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   let deactivateModuleCommandType: CreateCommand['commandType']
