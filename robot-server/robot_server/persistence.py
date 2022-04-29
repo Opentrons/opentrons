@@ -51,7 +51,11 @@ analysis_table = sqlalchemy.Table(
         primary_key=True,
     ),
     sqlalchemy.Column(
-        "protocol_id", sqlalchemy.String, sqlalchemy.ForeignKey("protocol.id")
+        "protocol_id",
+        sqlalchemy.String,
+        sqlalchemy.ForeignKey("protocol.id"),
+        index=True,
+        nullable=False,
     ),
     sqlalchemy.Column(
         "analyzer_version",
