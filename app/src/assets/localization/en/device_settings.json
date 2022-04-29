@@ -15,7 +15,7 @@
   "tip_length_calibrations_history_link": "See all Tip Length Calibration history",
   "calibration_health_check_title": "Calibration Health Check",
   "calibration_health_check_description": "Check the accuracy of key calibration points without recalibrating the robot.",
-  "calibration_health_check_button": "Check Health",
+  "calibration_health_check_button": "Check health",
   "calibration": "Calibration",
   "download_calibration_data": "Download calibration data",
   "networking": "Networking",

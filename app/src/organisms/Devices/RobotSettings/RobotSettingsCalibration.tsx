@@ -24,6 +24,7 @@ import {
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
+  useAttachedPipettes,
 } from '../hooks'
 
 interface CalibrationProps {
@@ -47,6 +48,7 @@ export function RobotSettingsCalibration({
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
   const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
+  const attachedPipettes = useAttachedPipettes(robot?.name != null ? robot.name : null)
 
   const onClickSaveAs: React.MouseEventHandler = e => {
     e.preventDefault()
@@ -65,6 +67,10 @@ export function RobotSettingsCalibration({
       `opentrons-${robotName}-calibration.json`
     )
   }
+
+  console.log('pipetteOffsetCalibrations', pipetteOffsetCalibrations)
+  console.log('tipLengthCalibrations', tipLengthCalibrations)
+  console.log('attachedPipettes', attachedPipettes)
 
   return (
     <>
@@ -128,11 +134,14 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing3}>
               {t('pipette_offset_calibrations_description')}
             </StyledText>
-            {showDeckCalibrationModal ? (
-              <DeckCalibrationModal
-                onCloseClick={() => setShowDeckCalibrationModal(false)}
-              />
-            ) : null}
+            {pipetteOffsetCalibrations?.map(calibration =>
+            <>
+            <StyledText as="p">{calibration?.pipette}</StyledText>
+              <StyledText as="p">{calibration?.offset}</StyledText>
+              <StyledText as="p">{calibration.mount}</StyledText>
+              <StyledText as="p">{calibration.}</StyledText>
+            </>
+            )}
           </Box>
         </Flex>
       </Box>
