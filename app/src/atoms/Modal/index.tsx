@@ -111,7 +111,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
                 <Btn
                   onClick={onClose}
                   css={closeIconStyles}
-                  aria-label={'close'}
+                  aria-label={'close_icon_btn'}
                   data-testid={`Modal_icon_close_${
                     typeof title === 'string' ? title : ''
                   }`}

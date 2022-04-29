@@ -37,7 +37,7 @@ describe('NewRobotSetupHelp', () => {
     fireEvent.click(link)
     expect(getByText('How to setup a new robot')).toBeInTheDocument()
 
-    const xButton = getByRole('button', { name: '' })
+    const xButton = getByRole('button', { name: /close_icon_btn/i })
     fireEvent.click(xButton)
 
     expect(queryByText('How to setup a new robot')).toBeFalsy()

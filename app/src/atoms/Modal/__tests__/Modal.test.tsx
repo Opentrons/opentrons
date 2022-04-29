@@ -27,7 +27,7 @@ describe('Modal', () => {
     getByText('children')
     getByText('title')
     getByText('footer')
-    const btn = getByRole('button', { name: /close/i })
+    const btn = getByRole('button', { name: /close_icon_btn/i })
     fireEvent.click(btn)
     expect(props.onClose).toHaveBeenCalled()
   })
