@@ -7,6 +7,7 @@ import {
   Flex,
   Link,
   ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -68,7 +69,7 @@ export function RobotSettingsCalibration({
   return (
     <>
       <Box paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER}>
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
             <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
               {t('about_calibration_title')}
@@ -95,7 +96,87 @@ export function RobotSettingsCalibration({
         </Flex>
       </Box>
       <Line />
-      {/* TODO: additional calibration content here */}
+      {/* Deck Calibration this comment will removed when finish all sections */}
+      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Box marginRight={SPACING.spacing6}>
+            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
+              {t('deck_calibration_title')}
+            </Box>
+            <StyledText as="p" marginBottom={SPACING.spacing3}>
+              {t('deck_calibration_description')}
+            </StyledText>
+            {showDeckCalibrationModal ? (
+              <DeckCalibrationModal
+                onCloseClick={() => setShowDeckCalibrationModal(false)}
+              />
+            ) : null}
+          </Box>
+          <TertiaryButton onClick={onClickSaveAs}>
+            {t('deck_calibration_recalibrate_button')}
+          </TertiaryButton>
+        </Flex>
+      </Box>
+      <Line />
+      {/* Pipette Offset Calibrations this comment will removed when finish all sections */}
+      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
+        <Flex alignItems={ALIGN_CENTER}>
+          <Box marginRight={SPACING.spacing6}>
+            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
+              {t('pipette_offset_calibrations_title')}
+            </Box>
+            <StyledText as="p" marginBottom={SPACING.spacing3}>
+              {t('pipette_offset_calibrations_description')}
+            </StyledText>
+            {showDeckCalibrationModal ? (
+              <DeckCalibrationModal
+                onCloseClick={() => setShowDeckCalibrationModal(false)}
+              />
+            ) : null}
+          </Box>
+        </Flex>
+      </Box>
+      <Line />
+      {/* Tip Length Calibrations this comment will removed when finish all sections */}
+      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
+        <Flex alignItems={ALIGN_CENTER}>
+          <Box marginRight={SPACING.spacing6}>
+            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
+              {t('tip_length_calibrations_title')}
+            </Box>
+            <StyledText as="p" marginBottom={SPACING.spacing3}>
+              {t('tip_length_calibrations_description')}
+            </StyledText>
+            {showDeckCalibrationModal ? (
+              <DeckCalibrationModal
+                onCloseClick={() => setShowDeckCalibrationModal(false)}
+              />
+            ) : null}
+          </Box>
+        </Flex>
+      </Box>
+      <Line />
+      {/* Calibration Health Check this comment will removed when finish all sections */}
+      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Box marginRight={SPACING.spacing6}>
+            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
+              {t('calibration_health_check_title')}
+            </Box>
+            <StyledText as="p" marginBottom={SPACING.spacing3}>
+              {t('calibration_health_check_description')}
+            </StyledText>
+            {showDeckCalibrationModal ? (
+              <DeckCalibrationModal
+                onCloseClick={() => setShowDeckCalibrationModal(false)}
+              />
+            ) : null}
+          </Box>
+          <TertiaryButton onClick={onClickSaveAs}>
+            {t('calibration_health_check_button')}
+          </TertiaryButton>
+        </Flex>
+      </Box>
     </>
   )
 }
