@@ -77,42 +77,41 @@ const mockFirmwareUpdateFailedModal = FirmwareUpdateFailedModal as jest.MockedFu
 >
 const mockToast = Toast as jest.MockedFunction<typeof Toast>
 const mockMagneticModuleHub = {
-  model: 'magneticModuleV1',
-  type: 'magneticModuleType',
-  port: '/dev/ot_module_magdeck0',
-  serial: 'def456',
-  revision: 'mag_deck_v4.0',
-  fwVersion: 'v2.0.0',
-  status: 'disengaged',
+  id: 'magdeck_id',
+  moduleModel: 'magneticModuleV1',
+  moduleType: 'magneticModuleType',
+  serialNumber: 'def456',
+  hardwareRevision: 'mag_deck_v4.0',
+  firmwareVersion: 'v2.0.0',
   hasAvailableUpdate: true,
   data: {
     engaged: false,
     height: 42,
+    status: 'disengaged',
   },
-  usbPort: { hub: 2, port: null },
+  usbPort: { hub: 2, path: '/dev/ot_module_magdeck0', port: null },
 } as MagneticModule
 
 const mockHotHeaterShaker = {
   id: 'heatershaker_id',
-  model: 'heaterShakerModuleV1',
-  type: 'heaterShakerModuleType',
-  port: '/dev/ot_module_thermocycler0',
-  serial: 'jkl123',
-  revision: 'heatershaker_v4.0',
-  fwVersion: 'v2.0.0',
-  status: 'idle',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
   hasAvailableUpdate: false,
   data: {
-    labwareLatchStatus: 'idle_unknown',
+    labwareLatchStatus: 'idle_open',
     speedStatus: 'idle',
     temperatureStatus: 'heating',
     currentSpeed: null,
-    currentTemp: 50,
+    currentTemperature: 50,
     targetSpeed: null,
-    targetTemp: 60,
+    targetTemperature: 60,
     errorDetails: null,
+    status: 'idle',
   },
-  usbPort: { hub: 1, port: 1 },
+  usbPort: { path: '/dev/ot_module_heatershaker0', hub: null, port: 1 },
 } as HeaterShakerModule
 
 const render = (props: React.ComponentProps<typeof ModuleCard>) => {

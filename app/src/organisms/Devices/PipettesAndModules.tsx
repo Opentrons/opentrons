@@ -36,7 +36,6 @@ export function PipettesAndModules({
   const attachedModules = useAttachedModules(robotName)
   const attachedPipettes = useAttachedPipettes(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
-
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
@@ -86,7 +85,7 @@ export function PipettesAndModules({
                   <Flex
                     flex="1"
                     maxWidth="50%"
-                    key={`moduleCard_${module.type}_${index}`}
+                    key={`moduleCard_${module.moduleType}_${index}`}
                   >
                     <ModuleCard module={module} robotName={robotName} />
                   </Flex>

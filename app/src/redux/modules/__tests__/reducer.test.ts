@@ -30,7 +30,7 @@ const SPECS: ReducerSpec[] = [
     expected: {
       robotName: {
         modulesById: {
-          [Fixtures.mockTemperatureModule.serial]:
+          [Fixtures.mockTemperatureModule.serialNumber]:
             Fixtures.mockTemperatureModule,
         },
       },

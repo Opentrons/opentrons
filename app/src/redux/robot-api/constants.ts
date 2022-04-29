@@ -1,4 +1,4 @@
-export const HTTP_API_VERSION: 2 = 2
+export const HTTP_API_VERSION: 3 = 3
 
 export const GET: 'GET' = 'GET'
 export const POST: 'POST' = 'POST'

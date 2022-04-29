@@ -19,9 +19,9 @@ describe('TemperatureModuleData', () => {
   let props: React.ComponentProps<typeof TemperatureModuleData>
   beforeEach(() => {
     props = {
-      moduleStatus: mockTemperatureModuleGen2.status,
-      targetTemp: mockTemperatureModuleGen2.data.targetTemp,
-      currentTemp: mockTemperatureModuleGen2.data.currentTemp,
+      moduleStatus: mockTemperatureModuleGen2.data.status,
+      targetTemp: mockTemperatureModuleGen2.data.targetTemperature,
+      currentTemp: mockTemperatureModuleGen2.data.currentTemperature,
     }
     mockStatusLabel.mockReturnValue(<div>Mock StatusLabel</div>)
   })
@@ -39,8 +39,8 @@ describe('TemperatureModuleData', () => {
   it('renders a holding at target status', () => {
     props = {
       moduleStatus: 'holding at target',
-      targetTemp: mockTemperatureModuleGen2.data.targetTemp,
-      currentTemp: mockTemperatureModuleGen2.data.currentTemp,
+      targetTemp: mockTemperatureModuleGen2.data.targetTemperature,
+      currentTemp: mockTemperatureModuleGen2.data.currentTemperature,
     }
     const { getByText } = render(props)
     expect(getByText('Mock StatusLabel')).toHaveStyle(
@@ -51,8 +51,8 @@ describe('TemperatureModuleData', () => {
   it('renders a cooling status', () => {
     props = {
       moduleStatus: 'cooling',
-      targetTemp: mockTemperatureModuleGen2.data.targetTemp,
-      currentTemp: mockTemperatureModuleGen2.data.currentTemp,
+      targetTemp: mockTemperatureModuleGen2.data.targetTemperature,
+      currentTemp: mockTemperatureModuleGen2.data.currentTemperature,
     }
     const { getByText } = render(props)
     expect(getByText('Mock StatusLabel')).toHaveStyle(
@@ -63,8 +63,8 @@ describe('TemperatureModuleData', () => {
   it('renders a heating status', () => {
     props = {
       moduleStatus: 'heating',
-      targetTemp: mockTemperatureModuleGen2.data.targetTemp,
-      currentTemp: mockTemperatureModuleGen2.data.currentTemp,
+      targetTemp: mockTemperatureModuleGen2.data.targetTemperature,
+      currentTemp: mockTemperatureModuleGen2.data.currentTemperature,
     }
     const { getByText } = render(props)
     expect(getByText('Mock StatusLabel')).toHaveStyle(
@@ -80,9 +80,9 @@ describe('TemperatureModuleData', () => {
 
   it('renders correct temperature information when target temp is not null', () => {
     props = {
-      moduleStatus: mockTemperatureModuleGen2.status,
+      moduleStatus: mockTemperatureModuleGen2.data.status,
       targetTemp: 34,
-      currentTemp: mockTemperatureModuleGen2.data.currentTemp,
+      currentTemp: mockTemperatureModuleGen2.data.currentTemperature,
     }
     const { getByText } = render(props)
     getByText(`Target: ${props.targetTemp}°C`)

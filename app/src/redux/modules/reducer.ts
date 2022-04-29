@@ -19,7 +19,7 @@ export const modulesReducer: Reducer<ModulesState, Action> = (
     case Constants.FETCH_MODULES_SUCCESS: {
       const { robotName, modules } = action.payload
       const robotState = state[robotName] || INITIAL_MODULES_STATE
-      const modulesById = keyBy(modules, 'serial')
+      const modulesById = keyBy(modules, 'serialNumber')
 
       return { ...state, [robotName]: { ...robotState, modulesById } }
     }

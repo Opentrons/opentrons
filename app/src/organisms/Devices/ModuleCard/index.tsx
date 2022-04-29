@@ -110,7 +110,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
   }
   const handleUpdateClick = (): void => {
-    robotName && dispatchApiRequest(updateModule(robotName, module.serial))
+    robotName &&
+      dispatchApiRequest(updateModule(robotName, module.serialNumber))
   }
   React.useEffect(() => {
     if (
@@ -132,20 +133,20 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   }) as React.RefObject<HTMLDivElement>
 
   const isTooHot =
-    module.model === 'heaterShakerModuleV1' &&
-    module.data.currentTemp != null &&
-    module.data.currentTemp > HS_TOO_HOT_TEMP
+    module.moduleModel === 'heaterShakerModuleV1' &&
+    module.data.currentTemperature != null &&
+    module.data.currentTemperature > HS_TOO_HOT_TEMP
 
   let image = ''
   let moduleData: JSX.Element = <div></div>
-  switch (module.type) {
+  switch (module.moduleType) {
     case 'magneticModuleType': {
       image = magneticModule
       moduleData = (
         <MagneticModuleData
-          moduleStatus={module.status}
+          moduleStatus={module.data.status}
           moduleHeight={module.data.height}
-          moduleModel={module.model}
+          moduleModel={module.moduleModel}
         />
       )
       break
@@ -155,9 +156,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       image = temperatureModule
       moduleData = (
         <TemperatureModuleData
-          moduleStatus={module.status}
-          targetTemp={module.data.targetTemp}
-          currentTemp={module.data.currentTemp}
+          moduleStatus={module.data.status}
+          targetTemp={module.data.targetTemperature}
+          currentTemp={module.data.currentTemperature}
         />
       )
       break
@@ -167,11 +168,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       image = thermoModule
       moduleData = (
         <ThermocyclerModuleData
-          status={module.status}
-          currentTemp={module.data.currentTemp}
-          targetTemp={module.data.targetTemp}
-          lidTarget={module.data.lidTarget}
-          lidTemp={module.data.lidTemp}
+          status={module.data.status}
+          currentTemp={module.data.currentTemperature}
+          targetTemp={module.data.targetTemperature}
+          lidTarget={module.data.lidTargetTemperature}
+          lidTemp={module.data.lidTemperature}
         />
       )
       break
@@ -184,8 +185,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           heaterStatus={module.data.temperatureStatus}
           shakerStatus={module.data.speedStatus}
           latchStatus={module.data.labwareLatchStatus}
-          targetTemp={module.data.targetTemp}
-          currentTemp={module.data.currentTemp}
+          targetTemp={module.data.targetTemperature}
+          currentTemp={module.data.currentTemperature}
           targetSpeed={module.data.targetSpeed}
           currentSpeed={module.data.currentSpeed}
           showTemperatureData={true}
@@ -233,7 +234,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         marginLeft={SPACING.spacing2}
         marginRight={SPACING.spacing2}
         width={'100%'}
-        data-testid={`ModuleCard_${module.serial}`}
+        data-testid={`ModuleCard_${module.serialNumber}`}
       >
         {showWizard && (
           <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
@@ -264,7 +265,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         <Box padding={`${SPACING.spacing4} ${SPACING.spacing3}`} width="100%">
           <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
             <Flex alignItems={ALIGN_START} opacity={isPending ? '50%' : '100%'}>
-              <img width="60px" height="54px" src={image} alt={module.model} />
+              <img
+                width="60px"
+                height="54px"
+                src={image}
+                alt={module.moduleModel}
+              />
             </Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}
@@ -289,7 +295,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   paddingBottom={SPACING.spacing2}
                   width="100%"
                   flexDirection={DIRECTION_COLUMN}
-                  data-testid={`ModuleCard_firmware_update_banner_${module.serial}`}
+                  data-testid={`ModuleCard_firmware_update_banner_${module.serialNumber}`}
                 >
                   <Banner
                     type="warning"
@@ -315,7 +321,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   flexDirection={DIRECTION_COLUMN}
                   paddingRight={SPACING.spacingM}
                   paddingBottom={SPACING.spacing3}
-                  data-testid={`ModuleCard_too_hot_banner_${module.serial}`}
+                  data-testid={`ModuleCard_too_hot_banner_${module.serialNumber}`}
                 >
                   <Banner type="warning" icon={hotToTouch}>
                     <Trans
@@ -333,7 +339,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 <Flex
                   flexDirection={DIRECTION_ROW}
                   fontSize={TYPOGRAPHY.fontSizeP}
-                  data-testid={`ModuleCard_update_pending_${module.serial}`}
+                  data-testid={`ModuleCard_update_pending_${module.serialNumber}`}
                 >
                   <Icon
                     width={SPACING.spacingSM}
@@ -353,7 +359,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     fontWeight={FONT_WEIGHT_REGULAR}
                     fontSize={FONT_SIZE_CAPTION}
                     paddingBottom={SPACING.spacing2}
-                    data-testid={`ModuleCard_usb_port_${module.serial}`}
+                    data-testid={`ModuleCard_usb_port_${module.serialNumber}`}
                   >
                     {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
                       port: module.usbPort.hub ?? module.usbPort.port,
@@ -361,16 +367,16 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   </Text>
                   <Flex
                     paddingBottom={SPACING.spacing2}
-                    data-testid={`ModuleCrd_display_name_${module.serial}`}
+                    data-testid={`ModuleCrd_display_name_${module.serialNumber}`}
                     fontSize={TYPOGRAPHY.fontSizeP}
                   >
                     <ModuleIcon
-                      moduleType={module.type}
+                      moduleType={module.moduleType}
                       size="1rem"
                       marginRight={SPACING.spacing1}
                       color={COLORS.darkGreyEnabled}
                     />
-                    <Text>{getModuleDisplayName(module.model)}</Text>
+                    <Text>{getModuleDisplayName(module.moduleModel)}</Text>
                   </Flex>
                 </>
               )}
@@ -387,7 +393,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         <Box
           alignSelf={ALIGN_START}
           padding={SPACING.spacing2}
-          data-testid={`ModuleCard_overflow_btn_${module.serial}`}
+          data-testid={`ModuleCard_overflow_btn_${module.serialNumber}`}
           opacity={isPending ? '50%' : '100%'}
         >
           <OverflowBtn
@@ -399,7 +405,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             }}
           />
           {isOverflowBtnDisabled && (
-            <Tooltip {...tooltipProps} key={`tooltip_${module.serial}`}>
+            <Tooltip {...tooltipProps} key={`tooltip_${module.serialNumber}`}>
               {t('module_actions_unavailable')}
             </Tooltip>
           )}
@@ -407,7 +413,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         {showOverflowMenu && (
           <div
             ref={moduleOverflowWrapperRef}
-            data-testid={`ModuleCard_overflow_menu_${module.serial}`}
+            data-testid={`ModuleCard_overflow_menu_${module.serialNumber}`}
           >
             <ModuleOverflowMenu
               handleAboutClick={handleAboutClick}
@@ -433,7 +439,7 @@ interface ModuleSlideoutProps {
 const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
   const { module, isSecondary, showSlideout, onCloseClick } = props
 
-  if (module.type === THERMOCYCLER_MODULE_TYPE) {
+  if (module.moduleType === THERMOCYCLER_MODULE_TYPE) {
     return (
       <ThermocyclerModuleSlideout
         module={module}
@@ -442,7 +448,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
         isSecondaryTemp={isSecondary}
       />
     )
-  } else if (module.type === MAGNETIC_MODULE_TYPE) {
+  } else if (module.moduleType === MAGNETIC_MODULE_TYPE) {
     return (
       <MagneticModuleSlideout
         module={module}
@@ -450,7 +456,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
         isExpanded={showSlideout}
       />
     )
-  } else if (module.type === TEMPERATURE_MODULE_TYPE) {
+  } else if (module.moduleType === TEMPERATURE_MODULE_TYPE) {
     return (
       <TemperatureModuleSlideout
         module={module}
