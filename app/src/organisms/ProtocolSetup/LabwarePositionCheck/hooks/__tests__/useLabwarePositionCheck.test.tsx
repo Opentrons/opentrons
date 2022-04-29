@@ -11,13 +11,15 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../../../../redux/analytics'
-import { useAttachedModules } from '../../../../Devices/hooks'
 import {
   useCurrentRunId,
   useCurrentRunCommands,
 } from '../../../../ProtocolUpload/hooks'
 
-import { useProtocolDetailsForRun } from '../../../../Devices/hooks'
+import {
+  useAttachedModules,
+  useProtocolDetailsForRun,
+} from '../../../../Devices/hooks'
 import { getLabwareLocation } from '../../../utils/getLabwareLocation'
 import { useSteps } from '../useSteps'
 import { useLabwarePositionCheck } from '../useLabwarePositionCheck'
