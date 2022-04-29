@@ -679,8 +679,6 @@ async def test_update_run_to_not_current(
         )
     ).then_return(updated_resource)
 
-    decoy.when(mock_engine_state_store.insert(engine_state_resource)).then_return(engine_state_resource)
-
     engine_state = decoy.mock(cls=StateView)
     decoy.when(mock_engine_store.engine.state_view).then_return(engine_state)
     decoy.when(engine_state.commands.get_all()).then_return([])
@@ -691,6 +689,11 @@ async def test_update_run_to_not_current(
     decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.SUCCEEDED
     )
+    decoy.when(engine_state.modules.get_all()).then_return([])
+
+    decoy.when(engine_state.get_protocol_run_data()).then_return(protocol_run)
+
+    decoy.when(mock_engine_state_store.insert(engine_state_resource)).then_return(engine_state_resource)
 
     result = await update_run(
         runId="run-id",
@@ -755,15 +758,17 @@ async def test_update_current_to_current_noop(
     ).then_return(updated_run_resource)
 
     engine_state = decoy.mock(cls=StateView)
-    decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
+    decoy.when(mock_engine_store.engine.state_view).then_return(engine_state)
     decoy.when(engine_state.commands.get_all()).then_return([])
     decoy.when(engine_state.commands.get_all_errors()).then_return([])
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
     decoy.when(engine_state.labware.get_labware_offsets()).then_return([])
+    decoy.when(engine_state.modules.get_all()).then_return([])
     decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.SUCCEEDED
     )
+    decoy.when(engine_state.get_protocol_run_data()).then_return(protocol_run)
 
     result = await update_run(
         runId="run-id",

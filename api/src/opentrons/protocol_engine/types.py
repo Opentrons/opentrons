@@ -15,16 +15,6 @@ from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
     LabwareUri as LabwareUri,
 )
 
-class ProtocolRunData(BaseModel):
-    """Data from a protocol run."""
-
-    commands: List[Command]
-    errors: List[ErrorOccurrence]
-    labware: List[LoadedLabware]
-    pipettes: List[LoadedPipette]
-    modules: List[LoadedModule]
-    labwareOffsets: List[LabwareOffset]
-
 
 class EngineStatus(str, Enum):
     """Current execution status of a ProtocolEngine."""

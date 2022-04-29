@@ -18,7 +18,7 @@ from .modules import ModuleState, ModuleStore, ModuleView
 from .geometry import GeometryView
 from .motion import MotionView
 from .configs import EngineConfigs
-from ..types import ProtocolRunData
+from .protocol_run_data import ProtocolRunData
 
 ReturnT = TypeVar("ReturnT")
 

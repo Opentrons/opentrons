@@ -5,6 +5,7 @@ from .commands import CommandState, CommandView, CommandSlice, CurrentCommand
 from .labware import LabwareState, LabwareView
 from .pipettes import PipetteState, PipetteView, HardwarePipette, CurrentWell
 from .modules import ModuleState, ModuleView, HardwareModule
+from .protocol_run_data import ProtocolRunData
 from .module_substates import (
     MagneticModuleId,
     MagneticModuleSubState,
@@ -22,6 +23,7 @@ __all__ = [
     "State",
     "StateStore",
     "StateView",
+    "ProtocolRunData"
     # command state and values
     "CommandState",
     "CommandView",

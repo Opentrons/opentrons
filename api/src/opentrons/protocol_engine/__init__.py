@@ -9,7 +9,7 @@ from .create_protocol_engine import create_protocol_engine
 from .protocol_engine import ProtocolEngine
 from .errors import ProtocolEngineError, ErrorOccurrence
 from .commands import Command, CommandParams, CommandCreate, CommandStatus, CommandType
-from .state import State, StateView, CommandSlice, CurrentCommand, EngineConfigs
+from .state import State, StateView, CommandSlice, CurrentCommand, EngineConfigs, ProtocolRunData
 from .plugins import AbstractPlugin
 
 from .types import (
@@ -30,9 +30,9 @@ from .types import (
     WellOrigin,
     WellOffset,
     ModuleModel,
-    ModuleDefinition,
-    ProtocolRunData
+    ModuleDefinition
 )
+
 
 __all__ = [
     # main factory and interface exports
