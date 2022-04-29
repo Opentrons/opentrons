@@ -85,7 +85,7 @@ describe('ModuleExtraAttention', () => {
 
   it('should render the correct title', () => {
     const { getByText } = render(props)
-    getByText('Secure Labware and Modules Before Proceeding to Run')
+    getByText(/Secure Labware and Modules Before Proceeding to Run/i)
   })
 
   it('if there is a magnetic module it should show the correct item and information', () => {

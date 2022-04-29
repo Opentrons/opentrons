@@ -31,6 +31,7 @@ export const ModuleExtraAttention = (
   props: ModuleExtraAttentionProps
 ): JSX.Element => {
   const { moduleTypes, modulesInfo } = props
+  const { t } = useTranslation('protocol_setup')
   const [
     secureLabwareModalType,
     setSecureLabwareModalType,
@@ -41,7 +42,7 @@ export const ModuleExtraAttention = (
   ).filter(module => moduleTypes.includes(module.moduleDef.moduleType))
 
   return (
-    <Banner title={'Secure Labware and Modules Before Proceeding to Run'}>
+    <Banner title={t('extra_attention_warning_title')}>
       {secureLabwareModalType != null && (
         <SecureLabwareModal
           type={secureLabwareModalType as ModuleTypesThatRequiresExtraAttention}
@@ -95,7 +96,8 @@ const ModuleExtraAttentionItem = (
     case HEATERSHAKER_MODULE_TYPE:
       if (moduleInfo.attachedModuleMatch !== null) {
         const isLatchClosed =
-          moduleInfo.attachedModuleMatch.type === 'heaterShakerModuleType' &&
+          moduleInfo.attachedModuleMatch.moduleType ===
+            'heaterShakerModuleType' &&
           (moduleInfo.attachedModuleMatch.data.labwareLatchStatus ===
             'idle_closed' ||
             moduleInfo.attachedModuleMatch.data.labwareLatchStatus ===
