@@ -39,6 +39,7 @@ __all__ = [
     "create_protocol_engine",
     "ProtocolEngine",
     "EngineConfigs",
+    "ProtocolRunData",
     # error types
     "ProtocolEngineError",
     "ErrorOccurrence",
@@ -72,7 +73,6 @@ __all__ = [
     "WellOffset",
     "ModuleModel",
     "ModuleDefinition",
-    "ProtocolRunData"
     # plugins
     "AbstractPlugin",
 ]

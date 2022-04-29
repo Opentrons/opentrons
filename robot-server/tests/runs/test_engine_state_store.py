@@ -6,11 +6,11 @@ from typing import Generator
 import sqlalchemy
 from pathlib import Path
 
-from opentrons.protocol_runner import ProtocolRunData
 from opentrons.protocol_engine import (
     commands as pe_commands,
     errors as pe_errors,
     types as pe_types,
+    ProtocolRunData
 )
 from opentrons.types import MountType, DeckSlotName
 
@@ -117,14 +117,14 @@ def test_get_run_state(
 
 
 @pytest.fixture
-def teardown() -> None:
+def teardown() -> Generator[None, None, None]:
     print("setup")
     yield None
     print("teardown")
 
 
 @pytest.mark.parametrize("pickle_type", [True, False])
-def test_insert_get_by_state_type(subject: EngineStateStore, protocol_run: ProtocolRunData, pickle_type: bool, teardown: pytest.FixtureRequest) -> None:
+def test_insert_get_by_state_type(subject: EngineStateStore, protocol_run: ProtocolRunData, pickle_type: bool, teardown: Generator[None, None, None]) -> None:
     """It should test the time and db size for prasing a json type and a string type."""
     engine_state = EngineStateResource(
         run_id="run-id",

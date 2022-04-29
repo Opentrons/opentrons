@@ -10,7 +10,8 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
     types as pe_types,
 )
-from opentrons.protocol_runner import ProtocolRunner, ProtocolRunData
+from opentrons.protocol_engine import ProtocolRunData
+from opentrons.protocol_runner import ProtocolRunner
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
 from robot_server.protocols.analysis_store import AnalysisStore

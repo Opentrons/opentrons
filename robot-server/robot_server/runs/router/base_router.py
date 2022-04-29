@@ -5,8 +5,6 @@ Contains routes dealing primarily with `Run` models.
 import logging
 from datetime import datetime
 from typing import Optional, Union
-
-from pbr.hooks import commands
 from typing_extensions import Literal
 
 from fastapi import APIRouter, Depends, status
@@ -38,6 +36,7 @@ from ..run_models import Run, RunSummary, RunCreate, RunUpdate
 from ..engine_store import EngineStore, EngineConflictError
 from ..dependencies import get_run_store, get_engine_store, get_engine_state_store
 
+from opentrons.protocol_engine import EngineStatus
 
 log = logging.getLogger(__name__)
 base_router = APIRouter()
@@ -370,7 +369,7 @@ async def update_run(
         pipettes=protocol_run_data.pipettes,
         labware=protocol_run_data.labware,
         labwareOffsets=protocol_run_data.labwareOffsets,
-        status=insert_engine_state_result.engine_status if insert_engine_state_result else engine_state.commands.get_status(),
+        status=EngineStatus(insert_engine_state_result.engine_status) if insert_engine_state_result else engine_state.commands.get_status(),
     )
 
     return await PydanticResponse.create(
