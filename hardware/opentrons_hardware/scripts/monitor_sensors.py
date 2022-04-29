@@ -30,7 +30,7 @@ async def do_run(
     """Configure and start the monitoring."""
     threshold_payload = payloads.SetSensorThresholdRequestPayload(
         sensor=fields.SensorTypeField(constants.SensorType.capacitive),
-        threshold=Int32Field(int(threshold * 2**15)),
+        threshold=Int32Field(int(threshold * 2**16)),
     )
     threshold_message = message_definitions.SetSensorThresholdRequest(
         payload=threshold_payload

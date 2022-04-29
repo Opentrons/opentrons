@@ -42,7 +42,7 @@ class SensorDataType:
 
     def to_float(self) -> float:
         """Convert data to float."""
-        return (1.0 * self.as_int) / 2**15
+        return (1.0 * self.as_int) / 2**16
 
     @property
     def to_int(self) -> int:
