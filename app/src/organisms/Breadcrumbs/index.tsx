@@ -30,7 +30,7 @@ import type { State } from '../../redux/types'
 
 interface CrumbNameProps {
   crumbName: string
-  isLastCrumb?: boolean
+  isLastCrumb: boolean
 }
 
 function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
@@ -83,6 +83,12 @@ const CrumbLink = styled(Link)`
   }
 `
 
+const CrumbLinkInactive = styled(Flex)`
+  &:hover {
+    opacity: 1;
+  }
+`
+
 export function Breadcrumbs(): JSX.Element | null {
   const { robotName } = useParams<NavRouteParams>()
   const robot = useRobot(robotName)
@@ -104,16 +110,15 @@ export function Breadcrumbs(): JSX.Element | null {
 
           return (
             <Flex key={crumb.pathSegment} paddingRight={SPACING.spacing2}>
-              {!isLastCrumb ? (
-                <CrumbLink to={linkPath}>
-                  <CrumbName crumbName={crumb.crumbName} />
-                </CrumbLink>
-              ) : (
+              <CrumbLink
+                as={!isLastCrumb ? CrumbLink : CrumbLinkInactive}
+                to={linkPath}
+              >
                 <CrumbName
                   crumbName={crumb.crumbName}
                   isLastCrumb={isLastCrumb}
                 />
-              )}
+              </CrumbLink>
             </Flex>
           )
         })}
