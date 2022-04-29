@@ -91,8 +91,8 @@ async def create_run_action(
                 engine_store.runner.play()
             else:
                 log.info(f'Starting run "{runId}".')
-                collaborator = ProtocolRunnerWrapper(engine_store.runner, engine_state_store)
-                task_runner.run(collaborator.run)
+                # collaborator = ProtocolRunnerWrapper(engine_store.runner, engine_state_store)
+                task_runner.run_waterfall([engine_store.runner.run, engine_state_store.insert])
 
         elif action.actionType == RunActionType.PAUSE:
             log.info(f'Pausing run "{runId}".')

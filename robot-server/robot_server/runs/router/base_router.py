@@ -345,7 +345,7 @@ async def update_run(
 
     protocol_run_data = engine_state.get_protocol_run_data()
     # TODO (tz, 2022-29-4): Should we leave declaration or use 'insert_engine_state_result' in locals()
-    insert_engine_state_result: EngineStateResource = None
+    insert_engine_state_result: Optional[EngineStateResource] = None
     if update.current is False:
         try:
             await engine_store.clear()

@@ -6,7 +6,7 @@ and end-to-end tests.
 """
 from fastapi import BackgroundTasks
 from logging import getLogger
-from typing import Any, Awaitable, Callable
+from typing import Any, Awaitable, Callable, List
 
 log = getLogger(__name__)
 
@@ -44,6 +44,28 @@ class TaskRunner:
             try:
                 await func(**kwargs)
                 log.debug(f"Background task {func_name} succeeded")
+            except Exception as e:
+                log.warning(f"Background task {func_name} failed", exc_info=e)
+
+        self._background_tasks.add_task(_run_async_task)
+
+    def run_waterfall(self, func_list: List[TaskFunc]) -> None:
+        """Run an async function in the background.
+
+        Will log when the function completes, including any error
+        that may occur.
+
+        Arguments:
+            func: An async, None-returning function to run in the background.
+            Use kwargs to add arguments if required.
+        """
+        async def _run_async_task() -> None:
+            try:
+                response = await func_list[0]()
+                func_name = func_list[0].__qualname__
+                log.debug(f"Background task {func_name} succeeded")
+                func_name = func_list[1].__qualname__
+                func_list[1](response)
             except Exception as e:
                 log.warning(f"Background task {func_name} failed", exc_info=e)
 
