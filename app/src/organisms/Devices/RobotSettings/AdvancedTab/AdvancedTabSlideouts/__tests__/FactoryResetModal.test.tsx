@@ -51,7 +51,7 @@ describe('RobotSettings FactoryResetModal', () => {
     getByText('Reset to factory settings?')
     getByText('This data cannot be retrieved later.')
     getByRole('button', { name: 'cancel' })
-    getByRole('button', { name: 'Yes, clear data and restart robot' })
+    getByRole('button', { name: 'Yes' })
   })
 
   it('should close the modal when the user clicks the Yes button', () => {
