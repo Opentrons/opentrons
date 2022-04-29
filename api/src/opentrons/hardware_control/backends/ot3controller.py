@@ -126,7 +126,7 @@ class OT3Controller:
         self._messenger.start()
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
         self._position = self._get_home_position()
-        self._data = None
+        self._encoder_position = self._get_home_position()
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -219,8 +219,15 @@ class OT3Controller:
         move_group, _ = group
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
-        self._data = positions
-        self._position.update(positions)
+        print("position: ", positions)
+        for position in positions.items():
+            print(position)
+            print(type(position))
+            self._position.update({position[0]: position[1][0]})
+            self._encoder_position.update({position[0]: position[1][1]})
+        print("AxisConver: ", axis_convert(self._position, 0.0) )
+        print(self._encoder_position)
+        # self._position.update(positions)
 
     async def home(self, axes: Sequence[OT3Axis]) -> OT3AxisMap[float]:
         """Home each axis passed in, and reset the positions to 0.
@@ -295,9 +302,16 @@ class OT3Controller:
         if move_group_pipette:
             coros.append(runner_pipette.run(can_messenger=self._messenger))
         positions = await asyncio.gather(*coros)
+        print("position: ", positions)
         for position in positions:
-            self._position.update(position)
+            print(type(position))
+            for p in position.items():
+                print(p)
+                self._position.update({p[0]: p[1][0]})
+                self._encoder_position.update({p[0]: p[1][1]})
 
+        print("AxisConver: ", axis_convert(self._position, 0.0) )
+        print(self._encoder_position)
         return axis_convert(self._position, 0.0)
 
     def _filter_move_group(self, move_group: MoveGroup) -> MoveGroup:

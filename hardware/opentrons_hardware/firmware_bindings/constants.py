@@ -84,8 +84,9 @@ class MessageId(int, Enum):
     clear_all_move_groups_request = 0x19
     home_request = 0x20
     move_completed = 0x13
-    encoder_position_request = 0x14
-    encoder_position_response = 0x12
+
+    encoder_position_request = 0x12
+    encoder_position_response = 0x14
 
     set_motion_constraints = 0x101
     get_motion_constraints_request = 0x102

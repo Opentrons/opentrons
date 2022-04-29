@@ -1,4 +1,4 @@
-limit"""Payloads of can bus messages."""
+"""Payloads of can bus messages."""
 # TODO (amit, 2022-01-26): Figure out why using annotations import ruins
 #  dataclass fields interpretation.
 #  from __future__ import annotations
@@ -148,7 +148,7 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 
 @dataclass
 class EncoderPositionResponse(utils.BinarySerializable):
-    """Notification of a completed move group."""
+    """Read Encoder Position."""
     # seq_id: utils.UInt8Field
     encoder_position: utils.UInt32Field
 

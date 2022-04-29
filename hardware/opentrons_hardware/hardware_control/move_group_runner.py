@@ -15,6 +15,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     MoveCompleted,
     ExecuteMoveGroupRequest,
     HomeRequest,
+    EncoderPositionRequest
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
@@ -95,12 +96,12 @@ class MoveGroupRunner:
                         completion.payload.seq_id.value,
                     ),
                     float(completion.payload.current_position_um.value) / 1000.0,
-                    float(completion.payload.encoder_position.value) / 1000.0,
+                    float(completion.payload.encoder_position.value) / 1000.0
                 )
             )
         # for each node, pull the position from the completion with the largest
         # combination of group id and sequence id
-        pos = {
+        move_completions = {
             node: next(
                 reversed(
                     sorted(poslist, key=lambda position_element: position_element[0])
@@ -108,14 +109,33 @@ class MoveGroupRunner:
             )[1:3]
             for node, poslist in position.items()
         }
-        print("for loop: ",pos)
+        print(move_completions)
+        return move_completions
+
+    async def _read_encoder_positions(self, can_messenger: CanMessenger) -> NodeDict[float]:
+        """Send command to all message groups
+        Args:
+            can_messenger: a can messenger
+
+        Returns:
+            The encoder current position
+        """
+        encoder_positions = await can_messenger.send(node_id=NodeId.broadcast,
+                                                message=EncoderPositionRequest())
+        encoder_position: NodeDict[List[Tuple[int, int], float]] = defaultdict(list)
+        for arbid, enc_p in encoder_positions:
+            encoder_position[NodeId(arbid.parts.originating_node_id)].append(
+                (
+                    float(enc_p.payload.encoder_position.value) / 1000.0,
+                )
+            )
         return {
             node: next(
                 reversed(
-                    sorted(poslist, key=lambda position_element: position_element[0])
+                    sorted(enc_poslist, key=lambda enc_position_element: enc_position_element[0])
                 )
-            )[1:3]
-            for node, poslist in position.items()
+            )[1]
+            for node, enc_poslist in encoder_position.items()
         }
 
     async def _clear_groups(self, can_messenger: CanMessenger) -> None:

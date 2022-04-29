@@ -134,6 +134,7 @@ class OT3API(
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: OT3AxisMap[float] = {}
+        self._encoder_current_position: OT3AxisMap[float] = {}
 
         self._last_moved_mount: Optional[OT3Mount] = None
         # The motion lock synchronizes calls to long-running physical tasks
@@ -564,6 +565,34 @@ class OT3API(
                 OT3Mount.from_mount(mount), self._current_position, critical_point
             )
             return ot3pos
+
+    async def encoder_current_position(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        refresh: bool = False,
+        fail_on_not_homed: bool = False,
+    ) -> Dict[Axis, float]:
+        """Return the postion (in deck coords) of the critical point of the
+        specified mount.
+        """
+        z_ax = OT3Axis.by_mount(mount)
+        plunger_ax = OT3Axis.of_main_tool_actuator(mount)
+        position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, plunger_ax]
+
+        # if fail_on_not_homed and (
+        #     not self._backend.is_homed(position_axes) or not self._encoder_current_position
+        # ):
+        #     raise MustHomeError(
+        #         f"Current position of {str(mount)} pipette is unknown, please home."
+        #     )
+        #
+        # elif not self._encoder_current_position and not refresh:
+        #     raise MustHomeError("Encoder position is unknown; please home motors.")
+        async with self._motion_lock:
+            if refresh:
+                self._encoder_current_position = await self._backend.get_encoder_position(position_axes),
+                print(_self.encoder_current_position)
+            return self._encoder_current_position
 
     def _effector_pos_from_carriage_pos(
         self,
