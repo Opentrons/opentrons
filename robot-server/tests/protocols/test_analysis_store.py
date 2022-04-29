@@ -34,11 +34,6 @@ from robot_server.protocols.protocol_store import (
 )
 
 
-@pytest.fixture(autouse=True)
-def set_logs(caplog):
-    caplog.set_level("DEBUG", logger="sqlalchemy")
-
-
 @pytest.fixture
 def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
     """Return a set-up database to back the store."""
