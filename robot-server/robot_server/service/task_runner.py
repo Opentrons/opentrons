@@ -6,17 +6,17 @@ Testing will be similar to the previous code base primarily integration and end-
 
 from __future__ import annotations
 import asyncio
+from hashlib import new
 from logging import getLogger
 from typing import Any, Awaitable, Callable, Set
 from fastapi import Depends
 from robot_server.app_state import AppState, AppStateValue, get_app_state
 
-
 log = getLogger(__name__)
 
 TaskFunc = Callable[..., Awaitable[Any]]
 
-_init_taskrunner = AppStateValue["asyncio.Task[None]"]("bg_task_runner")
+_init_taskrunner = AppStateValue["TaskRunner"]("bg_task_runner")
 
 
 class TaskRunner:
@@ -38,39 +38,41 @@ class TaskRunner:
         """
         func_name = func.__qualname__
 
-        new_ct = asyncio.create_task(func(**kwargs))
-        # Create Tasks running in the background
-        self._running_tasks.add(new_ct)
-        asyncio.current_task()
-        self._running_tasks.remove(new_ct)
-
-        async def initialize_task_runner_tasks(app_state: AppState) -> None:
-            """Create a new `TaskRunner` and store it on `app_state`."""
-            initialize_taskrunner = _init_taskrunner.get_from(app_state)
-
-            if initialize_taskrunner is None:
-                initialize_taskrunner = asyncio.create_task(func(**kwargs))
-                _init_taskrunner.set_on(app_state, initialize_taskrunner)
-
-        async def clean_up_task_runner(app_state: AppState) -> None:
-            """Clean up the `TaskRunner` stored on `app_state`."""
-            initialize_task = _init_taskrunner.get_from(app_state)
-
-            _init_taskrunner.set_on(app_state, None)
-
-            if initialize_task is not None:
-                initialize_task.cancel()
-                await asyncio.gather(initialize_task, return_exceptions=True)
-
-            for task in self._running_tasks:
-                task.cancel()
+        async def wrapper() -> None:
+            # Add the previous logic back
+            current_task = asyncio.current_task()
             try:
-                await asyncio.gather(*self._running_tasks, return_exceptions=True)
+                await func(**kwargs)
                 log.debug(f"Background task {func_name} succeeded")
             except Exception as e:
                 log.warning(f"Background task {func_name} failed", exc_info=e)
+            finally:
+                self._running_tasks.remove(current_task)
+
+        wrapper_task = asyncio.create_task(wrapper())
+        self._running_tasks.add(wrapper_task)
+
+    async def cancel_all_and_clean_up(self) -> None:
+        for task in self._running_tasks:
+            task.cancel()
+        await asyncio.gather(*self._running_tasks, return_exceptions=True)
+
+
+def initialize_task_runner(app_state: AppState) -> None:
+    """Create a new `TaskRunner` and store it on `app_state`."""
+    _init_taskrunner.set_on(app_state, TaskRunner())
+
+
+async def clean_up_task_runner(app_state: AppState) -> None:
+    """Clean up the `TaskRunner` stored on `app_state`."""
+    task_runner = _init_taskrunner.get_from(app_state)
+
+    if task_runner is not None:
+        await task_runner.cancel_all_and_clean_up()
 
 
 # The get_task_runner method is for the HTTP endpoint functions that need a TaskRunner instance.
 def get_task_runner(app_state: AppState = Depends(get_app_state)) -> TaskRunner:
-    return app_state.task_runner
+    new_task_runner = _init_taskrunner.get_from(app_state)
+    assert new_task_runner, "Task runner was not initialized"
+    return new_task_runner

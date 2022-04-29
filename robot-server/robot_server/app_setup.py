@@ -11,7 +11,9 @@ from .hardware import initialize_hardware, cleanup_hardware
 from .router import router
 from .service import initialize_logging
 from .service.task_runner import (
-    TaskRunner
+    TaskRunner,
+    initialize_task_runner,
+    clean_up_task_runner,
 )
 from .settings import get_settings
 
@@ -53,7 +55,7 @@ async def on_startup() -> None:
 
     initialize_logging()
     initialize_hardware(app.state)
-    initialize_task_runner_tasks(app.state)
+    initialize_task_runner(app.state)
 
 
 @app.on_event("shutdown")
