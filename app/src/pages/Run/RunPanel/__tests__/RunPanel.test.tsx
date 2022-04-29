@@ -9,14 +9,11 @@ import {
 import { i18n } from '../../../../i18n'
 
 import { RunTimeControl } from '../../../../organisms/RunTimeControl'
-import { ModuleLiveStatusCards } from '../ModuleLiveStatusCards'
 import { RunPanel } from '../'
 
-jest.mock('../ModuleLiveStatusCards')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../organisms/RunTimeControl')
 
-const mockModuleLiveStatusCards = ModuleLiveStatusCards as jest.Mock
 const mockRunTimeControl = RunTimeControl as jest.Mock
 
 const render = () => {
@@ -25,9 +22,6 @@ const render = () => {
 
 describe('RunSetupCard', () => {
   beforeEach(() => {
-    when(mockModuleLiveStatusCards)
-      .calledWith(partialComponentPropsMatcher({}))
-      .mockImplementation(() => <div>Mock Module Live Status Cards</div>)
     when(mockRunTimeControl)
       .calledWith(partialComponentPropsMatcher({}))
       .mockImplementation(() => <div>Mock Run Time Control</div>)
@@ -40,6 +34,5 @@ describe('RunSetupCard', () => {
   it('renders run panel components', () => {
     const { getByText } = render()
     getByText('Mock Run Time Control')
-    getByText('Mock Module Live Status Cards')
   })
 })

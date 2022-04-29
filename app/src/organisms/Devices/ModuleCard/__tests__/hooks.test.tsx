@@ -7,7 +7,7 @@ import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react-hooks'
 import { i18n } from '../../../../i18n'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { ModuleDefinition } from '@opentrons/shared-data'
+import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { getProtocolModulesInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
@@ -48,157 +48,151 @@ const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
 >
 
 const mockCloseLatchHeaterShaker = {
-  model: 'heaterShakerModuleV1',
-  type: 'heaterShakerModuleType',
-  port: '/dev/ot_module_thermocycler0',
-  serial: 'jkl123',
-  revision: 'heatershaker_v4.0',
-  fwVersion: 'v2.0.0',
-  status: 'idle',
+  id: 'heatershaker_id',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
   hasAvailableUpdate: true,
   data: {
     labwareLatchStatus: 'idle_closed',
     speedStatus: 'idle',
     temperatureStatus: 'idle',
     currentSpeed: null,
-    currentTemp: null,
+    currentTemperature: null,
     targetSpeed: null,
     targetTemp: null,
     errorDetails: null,
+    status: 'idle',
   },
-  usbPort: { hub: 1, port: 1 },
+  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1, hub: null },
 } as any
 
 const mockHeatHeaterShaker = {
-  id: 'heaterShaker_id',
-  model: 'heaterShakerModuleV1',
-  type: 'heaterShakerModuleType',
-  port: '/dev/ot_module_thermocycler0',
-  serial: 'jkl123',
-  revision: 'heatershaker_v4.0',
-  fwVersion: 'v2.0.0',
-  status: 'heating',
+  id: 'heatershaker_id',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
   hasAvailableUpdate: true,
   data: {
     labwareLatchStatus: 'idle_open',
     speedStatus: 'idle',
     temperatureStatus: 'idle',
     currentSpeed: null,
-    currentTemp: null,
+    currentTemperature: null,
     targetSpeed: null,
     targetTemp: null,
     errorDetails: null,
+    status: 'heating',
   },
-  usbPort: { hub: 1, port: 1 },
+  usbPort: { hub: 1, port: 1, path: '/dev/ot_module_heatershaker0' },
 } as any
 
 const mockDeactivateShakeHeaterShaker = {
-  id: 'heaterShaker_id',
-  model: 'heaterShakerModuleV1',
-  type: 'heaterShakerModuleType',
-  port: '/dev/ot_module_thermocycler0',
-  serial: 'jkl123',
-  revision: 'heatershaker_v4.0',
-  fwVersion: 'v2.0.0',
-  status: 'idle',
+  id: 'heatershaker_id',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
   hasAvailableUpdate: true,
   data: {
     labwareLatchStatus: 'idle_open',
     speedStatus: 'speeding up',
     temperatureStatus: 'idle',
     currentSpeed: null,
-    currentTemp: null,
+    currentTemperature: null,
     targetSpeed: null,
     targetTemp: null,
     errorDetails: null,
+    status: 'idle',
   },
   usbPort: { hub: 1, port: 1 },
 } as any
 
 const mockMagDeckEngaged = {
   id: 'magdeck_id',
-  model: 'magneticModuleV1',
-  type: 'magneticModuleType',
-  port: '/dev/ot_module_magdeck0',
-  serial: 'def456',
-  revision: 'mag_deck_v4.0',
-  fwVersion: 'v2.0.0',
-  status: 'engaged',
+  moduleType: 'magneticModuleType',
+  moduleModel: 'magneticModuleV1',
+  serialNumber: 'def456',
+  hardwareRevision: 'mag_deck_v4.0',
+  firmwareVersion: 'v2.0.0',
   hasAvailableUpdate: true,
   data: {
     engaged: false,
     height: 42,
+    status: 'engaged',
   },
-  usbPort: { hub: 1, port: 1 },
+  usbPort: { hub: 1, port: 1, path: '/dev/ot_module_heatershaker0' },
 } as any
 
 const mockTemperatureModuleHeating = {
   id: 'tempdeck_id',
-  model: 'temperatureModuleV2',
-  type: 'temperatureModuleType',
-  port: '/dev/ot_module_tempdeck0',
-  serial: 'abc123',
-  revision: 'temp_deck_v20.0',
-  fwVersion: 'v2.0.0',
-  status: 'heating',
+  moduleModel: 'temperatureModuleV2',
+  moduleType: 'temperatureModuleType',
+  serialNumber: 'abc123',
+  hardwareRevision: 'temp_deck_v20.0',
+  firmwareVersion: 'v2.0.0',
   hasAvailableUpdate: true,
   data: {
-    currentTemp: 25,
-    targetTemp: null,
+    currentTemperature: 25,
+    targetTemperature: null,
+    status: 'heating',
   },
-  usbPort: { hub: 1, port: 1 },
+  usbPort: { hub: 1, port: 1, path: '/dev/ot_module_tempdeck0' },
 } as any
 
 const mockTCBlockHeating = {
   id: 'thermocycler_id',
-  model: 'thermocyclerModuleV1',
-  type: 'thermocyclerModuleType',
-  port: '/dev/ot_module_thermocycler0',
-  serial: 'ghi789',
-  revision: 'thermocycler_v4.0',
-  fwVersion: 'v2.0.0',
-  status: 'heating',
+  moduleModel: 'thermocyclerModuleV1',
+  moduleType: 'thermocyclerModuleType',
+  serialNumber: 'ghi789',
+  hardwareRevision: 'thermocycler_v4.0',
+  firmwareVersion: 'v2.0.0',
   hasAvailableUpdate: true,
   data: {
     lid: 'open',
-    lidTarget: null,
-    lidTemp: null,
-    currentTemp: null,
-    targetTemp: null,
+    lidTargetTemperature: null,
+    lidTemperature: null,
+    currentTemperature: null,
+    targetTemperature: null,
     holdTime: null,
     rampRate: null,
     currentCycleIndex: null,
     totalCycleCount: null,
     currentStepIndex: null,
     totalStepCount: null,
+    status: 'heating',
   },
-  usbPort: { hub: 1, port: 1 },
+  usbPort: { hub: 1, port: 1, path: '/dev/ot_module_thermocycler0' },
 } as any
 
 const mockTCLidHeating = {
   id: 'thermocycler_id',
-  model: 'thermocyclerModuleV1',
-  type: 'thermocyclerModuleType',
-  port: '/dev/ot_module_thermocycler0',
-  serial: 'ghi789',
-  revision: 'thermocycler_v4.0',
-  fwVersion: 'v2.0.0',
-  status: 'heating',
+  moduleModel: 'thermocyclerModuleV1',
+  moduleType: 'thermocyclerModuleType',
+  serialNumber: 'ghi789',
+  hardwareRevision: 'thermocycler_v4.0',
+  firmwareVersion: 'v2.0.0',
   hasAvailableUpdate: true,
   data: {
     lid: 'open',
-    lidTarget: 50,
-    lidTemp: 40,
-    currentTemp: null,
-    targetTemp: null,
+    lidTargetTemperature: 50,
+    lidTemperature: 40,
+    currentTemperature: null,
+    targetTemperature: null,
     holdTime: null,
     rampRate: null,
     currentCycleIndex: null,
     totalCycleCount: null,
     currentStepIndex: null,
     totalStepCount: null,
+    status: 'heating',
   },
-  usbPort: { hub: 1, port: 1 },
+  usbPort: { hub: 1, port: 1, path: '/dev/ot_module_thermocycler0' },
 } as any
 
 describe('useLatchCommand', () => {
@@ -218,7 +212,7 @@ describe('useLatchCommand', () => {
     jest.restoreAllMocks()
   })
 
-  it('should return latch is open and handle latch function and command to close latch ', () => {
+  it('should return latch is open and handle latch function and command to close latch', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
@@ -590,12 +584,30 @@ describe('useModuleOverflowMenu', () => {
   })
 })
 
+const mockHeaterShakerDefinition = {
+  moduleId: 'someHeaterShakerModule',
+  model: 'heaterShakerModuleV1' as ModuleModel,
+  type: 'heaterShakerModuleType' as ModuleType,
+  displayName: 'Heater Shaker Module',
+  labwareOffset: { x: 5, y: 5, z: 5 },
+  cornerOffsetFromSlot: { x: 1, y: 1, z: 1 },
+  dimensions: {
+    xDimension: 100,
+    yDimension: 100,
+    footprintXDimension: 50,
+    footprintYDimension: 50,
+    labwareInterfaceXDimension: 80,
+    labwareInterfaceYDimension: 120,
+  },
+  twoDimensionalRendering: { children: [] },
+}
+
 const HEATER_SHAKER_MODULE_INFO = {
   moduleId: 'heaterShakerModuleId',
   x: 0,
   y: 0,
   z: 0,
-  moduleDef: (mockHeaterShaker as unknown) as ModuleDefinition,
+  moduleDef: mockHeaterShakerDefinition as any,
   nestedLabwareDef: null,
   nestedLabwareId: null,
   nestedLabwareDisplayName: null,

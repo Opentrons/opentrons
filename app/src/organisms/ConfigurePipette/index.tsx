@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
-
+import { useTranslation } from 'react-i18next'
+import { Box } from '@opentrons/components'
 import {
   SUCCESS,
   FAILURE,
@@ -15,9 +16,6 @@ import {
   updatePipetteSettings,
 } from '../../redux/pipettes'
 import { useFeatureFlag } from '../../redux/config'
-
-import { ScrollableAlertModal } from '../../molecules/modals'
-import { ConfigMessage } from './ConfigMessage'
 import { ConfigForm } from './ConfigForm'
 import { ConfigErrorBanner } from './ConfigErrorBanner'
 
@@ -28,11 +26,6 @@ import type {
   PipetteSettingsFieldsUpdate,
 } from '../../redux/pipettes/types'
 
-// TODO(mc, 2019-12-09): i18n
-const PIPETTE_SETTINGS = 'Pipette Settings'
-const AN_ERROR_OCCURRED_WHILE_UPDATING =
-  "An error occurred while updating your pipette's settings. Please try again."
-
 interface Props {
   robotName: string
   mount: Mount
@@ -41,6 +34,7 @@ interface Props {
 
 export function ConfigurePipette(props: Props): JSX.Element {
   const { robotName, mount, closeModal } = props
+  const { t } = useTranslation('device_details')
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
 
   const pipette = useSelector(
@@ -64,7 +58,7 @@ export function ConfigurePipette(props: Props): JSX.Element {
   const updateError: string | null =
     updateRequest && updateRequest.status === FAILURE
       ? // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
-        updateRequest.error.message || AN_ERROR_OCCURRED_WHILE_UPDATING
+        updateRequest.error.message || t('an_error_occurred_while_updating')
       : null
 
   // TODO(mc, 2019-12-09): remove this feature flag
@@ -78,12 +72,8 @@ export function ConfigurePipette(props: Props): JSX.Element {
   }, [updateRequest, closeModal])
 
   return (
-    <ScrollableAlertModal
-      heading={`${PIPETTE_SETTINGS}: ${pipette?.modelSpecs.displayName || ''}`}
-      alertOverlay
-    >
+    <Box zIndex={1}>
       {updateError && <ConfigErrorBanner message={updateError} />}
-      <ConfigMessage />
       {settings && (
         <ConfigForm
           settings={settings}
@@ -93,6 +83,6 @@ export function ConfigurePipette(props: Props): JSX.Element {
           __showHiddenFields={__showHiddenFields}
         />
       )}
-    </ScrollableAlertModal>
+    </Box>
   )
 }

@@ -1,9 +1,5 @@
 @import '@opentrons/components';
 
-.config_message {
-  margin-bottom: 0.5rem;
-}
-
 .warning_title {
   @apply --font-body-2-dark;
 
@@ -21,7 +17,7 @@
   width: 50%;
   display: inline-block;
   vertical-align: top;
-  padding: 1rem 2rem 1rem 0;
+  padding: 1rem 1rem 1rem 0;
 }
 
 .form_group {

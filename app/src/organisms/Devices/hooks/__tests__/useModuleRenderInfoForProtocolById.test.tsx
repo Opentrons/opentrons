@@ -18,7 +18,8 @@ import {
 } from '..'
 
 import type {
-  ModuleDefinition,
+  ModuleModel,
+  ModuleType,
   ProtocolAnalysisFile,
 } from '@opentrons/shared-data'
 import type { ProtocolDetails } from '..'
@@ -44,12 +45,46 @@ const PROTOCOL_DETAILS = {
   protocolData: simpleV6Protocol,
 }
 
+const mockMagneticModuleDefinition = {
+  moduleId: 'someMagneticModule',
+  model: 'magneticModuleV2' as ModuleModel,
+  type: 'magneticModuleType' as ModuleType,
+  labwareOffset: { x: 5, y: 5, z: 5 },
+  cornerOffsetFromSlot: { x: 1, y: 1, z: 1 },
+  dimensions: {
+    xDimension: 100,
+    yDimension: 100,
+    footprintXDimension: 50,
+    footprintYDimension: 50,
+    labwareInterfaceXDimension: 80,
+    labwareInterfaceYDimension: 120,
+  },
+  twoDimensionalRendering: { children: [] },
+}
+
+const mockTemperatureModuleDefinition = {
+  moduleId: 'someMagneticModule',
+  model: 'temperatureModuleV2' as ModuleModel,
+  type: 'temperatureModuleType' as ModuleType,
+  labwareOffset: { x: 5, y: 5, z: 5 },
+  cornerOffsetFromSlot: { x: 1, y: 1, z: 1 },
+  dimensions: {
+    xDimension: 100,
+    yDimension: 100,
+    footprintXDimension: 50,
+    footprintYDimension: 50,
+    labwareInterfaceXDimension: 80,
+    labwareInterfaceYDimension: 120,
+  },
+  twoDimensionalRendering: { children: [] },
+}
+
 const MAGNETIC_MODULE_INFO = {
   moduleId: 'magneticModuleId',
   x: 0,
   y: 0,
   z: 0,
-  moduleDef: mockMagneticModuleGen2 as any,
+  moduleDef: mockMagneticModuleDefinition as any,
   nestedLabwareDef: null,
   nestedLabwareId: null,
   nestedLabwareDisplayName: null,
@@ -62,7 +97,7 @@ const TEMPERATURE_MODULE_INFO = {
   x: 0,
   y: 0,
   z: 0,
-  moduleDef: (mockTemperatureModuleGen2 as unknown) as ModuleDefinition,
+  moduleDef: mockTemperatureModuleDefinition,
   nestedLabwareDef: null,
   nestedLabwareId: null,
   nestedLabwareDisplayName: null,
