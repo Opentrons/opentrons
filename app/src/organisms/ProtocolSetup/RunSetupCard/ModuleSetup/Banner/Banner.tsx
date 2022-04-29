@@ -11,6 +11,7 @@ import {
   Icon,
   NewPrimaryBtn,
   TEXT_TRANSFORM_NONE,
+  SIZE_6,
 } from '@opentrons/components'
 
 interface BannerProps {
@@ -84,6 +85,7 @@ export const BannerItem = (props: BannerItemProps): JSX.Element => {
           marginTop={SPACING.spacing3}
           color={COLORS.darkGrey}
           fontSize={TYPOGRAPHY.fontSizeP}
+          maxWidth={SIZE_6}
           data-testid={`banner_subtitle_${props.title}`}
         >
           {props.body}

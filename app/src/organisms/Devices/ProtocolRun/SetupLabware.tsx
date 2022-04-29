@@ -39,7 +39,7 @@ import { SecondaryButton } from '../../../atoms/Buttons'
 import { StyledText } from '../../../atoms/text'
 import { useLPCSuccessToast } from '../../../organisms/ProtocolSetup/hooks'
 import { LabwarePositionCheck } from '../../../organisms/ProtocolSetup/LabwarePositionCheck'
-import { ExtraAttentionWarning } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/ExtraAttentionWarning'
+import { ModuleExtraAttention } from './ModuleExtraAttention'
 import { LabwareInfoOverlay } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
@@ -162,7 +162,6 @@ export function SetupLabware({
   } else if (!tipsArePickedUp) {
     lpcDisabledReason = t('lpc_disabled_no_tipracks_used')
   }
-
   return (
     <>
       {showLabwareHelpModal && (
@@ -184,11 +183,13 @@ export function SetupLabware({
       )}
       <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
         <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing4}>
-          {moduleTypesThatRequireExtraAttention.length > 0 && (
-            <ExtraAttentionWarning
+          {moduleTypesThatRequireExtraAttention.length > 0 &&
+          moduleRenderInfoById ? (
+            <ModuleExtraAttention
               moduleTypes={moduleTypesThatRequireExtraAttention}
+              modulesInfo={moduleRenderInfoById}
             />
-          )}
+          ) : null}
           <RobotWorkSpace
             deckDef={(standardDeckDef as unknown) as DeckDefinition}
             viewBox={DECK_MAP_VIEWBOX}
