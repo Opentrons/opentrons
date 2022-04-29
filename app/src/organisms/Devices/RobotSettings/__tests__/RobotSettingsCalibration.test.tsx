@@ -104,7 +104,7 @@ describe('RobotSettingsCalibration', () => {
     jest.resetAllMocks()
   })
 
-  it('renders a title and description', () => {
+  it('renders a title and description - About Calibration', () => {
     const [{ getByText }] = render()
     getByText('About Calibration')
     getByText(
@@ -130,5 +130,43 @@ describe('RobotSettingsCalibration', () => {
       name: 'calibrationDataDownloaded',
       properties: {},
     })
+  })
+
+  // deck calibration this comment will be removed when finish all sections
+  it('renders a title description and button - Deck Calibration', () => {
+    const [{ getByText, getByRole }] = render()
+    getByText('Deck Calibration')
+    getByText(
+      'Deck calibration measures the deck position relative to the gantry. This calibration is the foundation for tip length and pipette offset calibrations. Calibrate your deck during new robot setup. Redo deck calibration if you relocate your robot.'
+    )
+    getByRole('button', { name: 'Recalibrate deck' })
+  })
+
+  // Pipette Offset Calibrations this comment will be removed when finish all sections
+  it('renders a title and description - Pipette Offset Calibrations', () => {
+    const [{ getByText }] = render()
+    getByText('Pipette Offset Calibrations')
+    getByText(
+      'Pipette offset calibration measures a pipette’s position relative to the pipette mount and the deck. You can recalibrate a pipette’s offset if its currently attached to this robot.'
+    )
+  })
+
+  // Pipette Offset Calibrations this comment will be removed when finish all sections
+  it('renders a title and description - Tip Length Calibrations', () => {
+    const [{ getByText }] = render()
+    getByText('Tip Length Calibrations')
+    getByText(
+      'Tip length calibration measures the distance between the bottom of the tip and the pipette’s nozzle. You can recalibrate a tip length if the pipette associated with it is currently attached to this robot. If you recalibrate a tip length, you will be prompted to recalibrate that pipette’s offset calibration.'
+    )
+  })
+
+  // Pipette Offset Calibrations this comment will be removed when finish all sections
+  it('renders a title description and button - Calibration Health Check', () => {
+    const [{ getByText, getByRole }] = render()
+    getByText('Calibration Health Check')
+    getByText(
+      'Check the accuracy of key calibration points without recalibrating the robot.'
+    )
+    getByRole('button', { name: 'Check Health' })
   })
 })
