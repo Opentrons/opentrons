@@ -59,8 +59,7 @@ export function FactoryResetSlideout({
     getResetConfigOptions(state, robotName)
   )
 
-  // TODO: This should be temporary. Need to wait for the CPX team's update of Protocol resetOptions.
-  // CPX team won't change the order of the options
+  // TODO(koji 4/28/2022): This should be temporary. Need to wait for the CPX team's update of Protocol resetOptions.
   const calibrationOptions =
     options != null ? options.filter(opt => opt.id.includes('Calibration')) : []
   const bootScriptOption =
