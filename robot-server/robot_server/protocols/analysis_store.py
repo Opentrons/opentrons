@@ -62,8 +62,8 @@ class AnalysisStore:
 
     def __init__(self, sql_engine: SQLEngine) -> None:
         """Initialize the `AnalysisStore`."""
-        self._pending_analysis_store = _PendingAnalysisStore()
-        self._completed_analysis_store = _CompletedAnalysisStore(sql_engine=sql_engine)
+        self._pending_store = _PendingAnalysisStore()
+        self._completed_store = _CompletedAnalysisStore(sql_engine=sql_engine)
 
     def add_pending(self, protocol_id: str, analysis_id: str) -> AnalysisSummary:
         """Add a new pending analysis to the store.
@@ -84,8 +84,8 @@ class AnalysisStore:
         Returns:
             A summary of the just-added analysis.
         """
-        self._completed_analysis_store.check_protocol_exists(protocol_id=protocol_id)
-        new_pending_analysis = self._pending_analysis_store.add(
+        self._completed_store.check_protocol_exists(protocol_id=protocol_id)
+        new_pending_analysis = self._pending_store.add(
             protocol_id=protocol_id, analysis_id=analysis_id
         )
         return _summarize_pending(pending_analysis=new_pending_analysis)
@@ -103,9 +103,7 @@ class AnalysisStore:
         Raises:
             AnalysisNotPendingOrNotFoundError
         """
-        protocol_id = self._pending_analysis_store.get_protocol_id(
-            analysis_id=analysis_id
-        )
+        protocol_id = self._pending_store.get_protocol_id(analysis_id=analysis_id)
 
         if protocol_id is None:
             # No pending analysis with the given ID.
@@ -131,19 +129,19 @@ class AnalysisStore:
             analyzer_version=_ANALYZER_VERSION,
             completed_analysis=completed_analysis,
         )
-        self._completed_analysis_store.add(
+        self._completed_store.add(
             completed_analysis_resource=completed_analysis_resource
         )
 
-        self._pending_analysis_store.remove(analysis_id=analysis_id)
+        self._pending_store.remove(analysis_id=analysis_id)
 
     def get(self, analysis_id: str) -> ProtocolAnalysis:
         """Get a single protocol analysis by its ID."""
-        pending_analysis = self._pending_analysis_store.get(analysis_id=analysis_id)
+        pending_analysis = self._pending_store.get(analysis_id=analysis_id)
         if pending_analysis is not None:
             return pending_analysis
         else:
-            completed_analysis_resource = self._completed_analysis_store.get_by_id(
+            completed_analysis_resource = self._completed_store.get_by_id(
                 analysis_id=analysis_id
             )
             completed_analysis = completed_analysis_resource.completed_analysis
@@ -151,7 +149,7 @@ class AnalysisStore:
 
     def get_summaries_by_protocol(self, protocol_id: str) -> List[AnalysisSummary]:
         """Get summaries of all analyses for a protocol, in order from oldest first."""
-        completed_analysis_ids = self._completed_analysis_store.get_ids_by_protocol(
+        completed_analysis_ids = self._completed_store.get_ids_by_protocol(
             protocol_id=protocol_id
         )
         completed_analysis_summaries = [
@@ -159,9 +157,7 @@ class AnalysisStore:
             for analysis_id in completed_analysis_ids
         ]
 
-        pending_analysis = self._pending_analysis_store.get_by_protocol(
-            protocol_id=protocol_id
-        )
+        pending_analysis = self._pending_store.get_by_protocol(protocol_id=protocol_id)
         if pending_analysis is None:
             return completed_analysis_summaries
         else:
@@ -169,16 +165,14 @@ class AnalysisStore:
 
     def get_by_protocol(self, protocol_id: str) -> List[ProtocolAnalysis]:
         """Get all analyses for a protocol, in order from oldest first."""
-        completed_analysis_resources = self._completed_analysis_store.get_by_protocol(
+        completed_analysis_resources = self._completed_store.get_by_protocol(
             protocol_id=protocol_id
         )
         completed_analyses: List[ProtocolAnalysis] = [
             resource.completed_analysis for resource in completed_analysis_resources
         ]
 
-        pending_analysis = self._pending_analysis_store.get_by_protocol(
-            protocol_id=protocol_id
-        )
+        pending_analysis = self._pending_store.get_by_protocol(protocol_id=protocol_id)
 
         if pending_analysis is None:
             return completed_analyses
