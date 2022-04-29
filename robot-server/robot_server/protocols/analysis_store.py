@@ -62,16 +62,8 @@ class AnalysisStore:
 
     def __init__(self, sql_engine: SQLEngine) -> None:
         """Initialize the `AnalysisStore`."""
-        self._sql_engine = sql_engine
         self._pending_analysis_store = _PendingAnalysisStore()
-
-        self._pending_analyses_by_id: Dict[str, PendingAnalysis] = {}
-
-        # We only store at most one pending analysis per protocol.
-        # This makes it easier for us to preserve the correct order of analyses
-        # when some are stored in the database and some are stored in-memory.
-        # The in-memory pending one, if it exists, is always the most recent one.
-        self._pending_analysis_ids_by_protocol: Dict[str, str] = {}
+        self._completed_analysis_store = _CompletedAnalysisStore(sql_engine=sql_engine)
 
     def add_pending(self, protocol_id: str, analysis_id: str) -> AnalysisSummary:
         """Add a new pending analysis to the store.
@@ -86,13 +78,13 @@ class AnalysisStore:
                 this method will "succeed," but a future call to `update()` may fail
                 unexpectedly because of a SQL uniqueness constraint violation.
 
+        Raises:
+            ProtocolNotFoundError
+
         Returns:
             A summary of the just-added analysis.
         """
-        with self._sql_engine.begin() as transaction:
-            self._sql_check_protocol_exists(
-                connection=transaction, protocol_id=protocol_id
-            )
+        self._completed_analysis_store.check_protocol_exists(protocol_id=protocol_id)
         new_pending_analysis = self._pending_analysis_store.add(
             protocol_id=protocol_id, analysis_id=analysis_id
         )
@@ -139,7 +131,9 @@ class AnalysisStore:
             analyzer_version=_ANALYZER_VERSION,
             completed_analysis=completed_analysis,
         )
-        self._sql_add(completed_analysis_resource=completed_analysis_resource)
+        self._completed_analysis_store.add(
+            completed_analysis_resource=completed_analysis_resource
+        )
 
         self._pending_analysis_store.remove(analysis_id=analysis_id)
 
@@ -149,13 +143,17 @@ class AnalysisStore:
         if pending_analysis is not None:
             return pending_analysis
         else:
-            completed_analysis_resource = self._sql_get_by_id(analysis_id=analysis_id)
+            completed_analysis_resource = self._completed_analysis_store.get_by_id(
+                analysis_id=analysis_id
+            )
             completed_analysis = completed_analysis_resource.completed_analysis
             return completed_analysis
 
     def get_summaries_by_protocol(self, protocol_id: str) -> List[AnalysisSummary]:
         """Get summaries of all analyses for a protocol, in order from oldest first."""
-        completed_analysis_ids = self._sql_get_ids_by_protocol(protocol_id=protocol_id)
+        completed_analysis_ids = self._completed_analysis_store.get_ids_by_protocol(
+            protocol_id=protocol_id
+        )
         completed_analysis_summaries = [
             AnalysisSummary.construct(id=analysis_id, status=AnalysisStatus.COMPLETED)
             for analysis_id in completed_analysis_ids
@@ -171,7 +169,7 @@ class AnalysisStore:
 
     def get_by_protocol(self, protocol_id: str) -> List[ProtocolAnalysis]:
         """Get all analyses for a protocol, in order from oldest first."""
-        completed_analysis_resources = self._sql_get_by_protocol(
+        completed_analysis_resources = self._completed_analysis_store.get_by_protocol(
             protocol_id=protocol_id
         )
         completed_analyses: List[ProtocolAnalysis] = [
@@ -187,75 +185,16 @@ class AnalysisStore:
         else:
             return completed_analyses + [pending_analysis]
 
-    def _sql_get_by_id(self, analysis_id: str) -> _CompletedAnalysisResource:
-        statement = sqlalchemy.select(analysis_table).where(
-            analysis_table.c.id == analysis_id
-        )
-        with self._sql_engine.begin() as transaction:
-            try:
-                result = transaction.execute(statement).one()
-            except sqlalchemy.exc.NoResultFound:
-                raise AnalysisNotFoundError(analysis_id=analysis_id)
-        return _CompletedAnalysisResource.from_sql_row(result)
-
-    def _sql_get_by_protocol(
-        self, protocol_id: str
-    ) -> List[_CompletedAnalysisResource]:
-        statement = (
-            sqlalchemy.select(analysis_table)
-            .where(analysis_table.c.protocol_id == protocol_id)
-            .order_by(sqlite_rowid)
-        )
-        with self._sql_engine.begin() as transaction:
-            self._sql_check_protocol_exists(
-                connection=transaction, protocol_id=protocol_id
-            )
-            results = transaction.execute(statement).all()
-        return [_CompletedAnalysisResource.from_sql_row(r) for r in results]
-
-    def _sql_get_ids_by_protocol(self, protocol_id: str) -> List[str]:
-        statement = (
-            sqlalchemy.select(analysis_table.c.id)
-            .where(analysis_table.c.protocol_id == protocol_id)
-            .order_by(sqlite_rowid)
-        )
-        with self._sql_engine.begin() as transaction:
-            self._sql_check_protocol_exists(
-                connection=transaction, protocol_id=protocol_id
-            )
-            results = transaction.execute(statement).all()
-
-        result_ids: List[str] = []
-        for row in results:
-            assert isinstance(row.id, str)
-            result_ids.append(row.id)
-
-        return result_ids
-
-    def _sql_add(self, completed_analysis_resource: _CompletedAnalysisResource) -> None:
-        statement = analysis_table.insert().values(
-            completed_analysis_resource.to_sql_values()
-        )
-        with self._sql_engine.begin() as transaction:
-            transaction.execute(statement)
-
-    @staticmethod
-    def _sql_check_protocol_exists(
-        connection: sqlalchemy.engine.Connection, protocol_id: str
-    ) -> None:
-        statement = sqlalchemy.select(
-            # Thrown away. Dummy column just to have something small to select.
-            protocol_table.c.id
-        ).where(protocol_table.c.id == protocol_id)
-        results = connection.execute(statement)
-        try:
-            results.one()
-        except sqlalchemy.exc.NoResultFound as e:
-            raise ProtocolNotFoundError(protocol_id=protocol_id) from e
-
 
 class _PendingAnalysisStore:
-    """An in-memory store of pending analyses."""
+    """An in-memory store of protocol analyses that are pending.
+
+    We only store at most one pending analysis per protocol.
+    This makes it easier for us to preserve the correct order of analyses
+    when some are stored here, in-memory, and others are stored in the SQL database.
+    The in-memory pending one, if it exists, is always more recent than anything
+    in the SQL database.
+    """
 
     def __init__(self) -> None:
         self._analyses_by_id: Dict[str, PendingAnalysis] = {}
@@ -305,7 +244,12 @@ class _PendingAnalysisStore:
 
 @dataclass
 class _CompletedAnalysisResource:
-    id: str
+    """A protocol analysis that's been completed, storable in a SQL database.
+
+    See `_CompletedAnalysisStore`.
+    """
+
+    id: str  # Already in completed_analysis, but pulled out for efficient querying.
     protocol_id: str
     analyzer_version: str
     completed_analysis: CompletedAnalysis
@@ -345,6 +289,77 @@ class _CompletedAnalysisResource:
             analyzer_version=analyzer_version,
             completed_analysis=completed_analysis,
         )
+
+
+class _CompletedAnalysisStore:
+    """A SQL-backed persistent store of protocol analyses that are completed."""
+
+    def __init__(self, sql_engine: SQLEngine) -> None:
+        self._sql_engine = sql_engine
+
+    def get_by_id(self, analysis_id: str) -> _CompletedAnalysisResource:
+        statement = sqlalchemy.select(analysis_table).where(
+            analysis_table.c.id == analysis_id
+        )
+        with self._sql_engine.begin() as transaction:
+            try:
+                result = transaction.execute(statement).one()
+            except sqlalchemy.exc.NoResultFound:
+                raise AnalysisNotFoundError(analysis_id=analysis_id)
+        return _CompletedAnalysisResource.from_sql_row(result)
+
+    def get_by_protocol(self, protocol_id: str) -> List[_CompletedAnalysisResource]:
+        statement = (
+            sqlalchemy.select(analysis_table)
+            .where(analysis_table.c.protocol_id == protocol_id)
+            .order_by(sqlite_rowid)
+        )
+        with self._sql_engine.begin() as transaction:
+            self._check_protocol_exists(connection=transaction, protocol_id=protocol_id)
+            results = transaction.execute(statement).all()
+        return [_CompletedAnalysisResource.from_sql_row(r) for r in results]
+
+    def get_ids_by_protocol(self, protocol_id: str) -> List[str]:
+        statement = (
+            sqlalchemy.select(analysis_table.c.id)
+            .where(analysis_table.c.protocol_id == protocol_id)
+            .order_by(sqlite_rowid)
+        )
+        with self._sql_engine.begin() as transaction:
+            self._check_protocol_exists(connection=transaction, protocol_id=protocol_id)
+            results = transaction.execute(statement).all()
+
+        result_ids: List[str] = []
+        for row in results:
+            assert isinstance(row.id, str)
+            result_ids.append(row.id)
+
+        return result_ids
+
+    def add(self, completed_analysis_resource: _CompletedAnalysisResource) -> None:
+        statement = analysis_table.insert().values(
+            completed_analysis_resource.to_sql_values()
+        )
+        with self._sql_engine.begin() as transaction:
+            transaction.execute(statement)
+
+    def check_protocol_exists(self, protocol_id: str) -> None:
+        with self._sql_engine.begin() as transaction:
+            self._check_protocol_exists(connection=transaction, protocol_id=protocol_id)
+
+    @staticmethod
+    def _check_protocol_exists(
+        connection: sqlalchemy.engine.Connection, protocol_id: str
+    ) -> None:
+        statement = sqlalchemy.select(
+            # Thrown away. Dummy column just to have something small to select.
+            protocol_table.c.id
+        ).where(protocol_table.c.id == protocol_id)
+        results = connection.execute(statement)
+        try:
+            results.one()
+        except sqlalchemy.exc.NoResultFound as e:
+            raise ProtocolNotFoundError(protocol_id=protocol_id) from e
 
 
 def _summarize_pending(pending_analysis: PendingAnalysis) -> AnalysisSummary:
