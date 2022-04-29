@@ -105,11 +105,6 @@ stages:
                 definitionUri: opentrons/opentrons_96_tiprack_10ul/1
                 location:
                   slotName: '8'
-              - id: fixedTrash
-                loadName: opentrons_1_trash_1100ml_fixed
-                definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
-                location:
-                  slotName: '12'
             commands:
               - id: !anystr
                 createdAt: !anystr
