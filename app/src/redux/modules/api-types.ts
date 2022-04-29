@@ -73,7 +73,7 @@ export interface HeaterShakerData {
   currentSpeed: number | null
   currentTemperature: number | null
   targetSpeed: number | null
-  targetTemp: number | null
+  targetTemperature: number | null
   errorDetails: string | null
   status: HeaterShakerStatus
 }

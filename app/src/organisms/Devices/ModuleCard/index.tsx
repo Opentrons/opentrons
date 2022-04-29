@@ -185,7 +185,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           heaterStatus={module.data.temperatureStatus}
           shakerStatus={module.data.speedStatus}
           latchStatus={module.data.labwareLatchStatus}
-          targetTemp={module.data.targetTemp}
+          targetTemp={module.data.targetTemperature}
           currentTemp={module.data.currentTemperature}
           targetSpeed={module.data.targetSpeed}
           currentSpeed={module.data.currentSpeed}

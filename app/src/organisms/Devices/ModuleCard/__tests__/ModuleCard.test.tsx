@@ -107,7 +107,7 @@ const mockHotHeaterShaker = {
     currentSpeed: null,
     currentTemperature: 50,
     targetSpeed: null,
-    targetTemp: 60,
+    targetTemperature: 60,
     errorDetails: null,
     status: 'idle',
   },
