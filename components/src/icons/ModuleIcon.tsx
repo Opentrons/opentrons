@@ -6,7 +6,6 @@ import {
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { UseHoverTooltipTargetProps } from '..'
 
 import type { ModuleType } from '@opentrons/shared-data'
 import type { StyleProps } from '../primitives/types'
@@ -20,28 +19,17 @@ const MODULE_ICON_NAME_BY_TYPE: { [type in ModuleType]: IconName } = {
 
 interface ModuleIconProps extends StyleProps {
   moduleType: ModuleType
-  moduleIconTooltip?: React.ReactNode
-  iconTargetProps?: UseHoverTooltipTargetProps
 }
 
 export function ModuleIcon(props: ModuleIconProps): JSX.Element {
-  const {
-    moduleType,
-    moduleIconTooltip,
-    iconTargetProps,
-    ...styleProps
-  } = props
+  const { moduleType, ...styleProps } = props
   const iconName = MODULE_ICON_NAME_BY_TYPE[moduleType]
 
   return (
-    <>
-      <Icon
-        name={iconName}
-        {...styleProps}
-        data-testid={`ModuleIcon_${iconName}`}
-        {...iconTargetProps}
-      />
-      {moduleIconTooltip}
-    </>
+    <Icon
+      name={iconName}
+      {...styleProps}
+      data-testid={`ModuleIcon_${iconName}`}
+    />
   )
 }
