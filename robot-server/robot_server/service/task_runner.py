@@ -6,12 +6,13 @@ and end-to-end tests.
 """
 from fastapi import BackgroundTasks
 from logging import getLogger
-from typing import Any, Awaitable, Callable, List
+from typing import Any, Awaitable, Callable, List, Optional
 
 log = getLogger(__name__)
 
-
 TaskFunc = Callable[..., Awaitable[Any]]
+# TODO (tz, 2022-04-29): Should I declare this or should I make the other method async?
+TaskFuncAll = Callable[..., Any]
 
 
 class TaskRunner:
@@ -49,7 +50,7 @@ class TaskRunner:
 
         self._background_tasks.add_task(_run_async_task)
 
-    def run_waterfall(self, func_list: List[TaskFunc]) -> None:
+    def run_waterfall(self, func_list: List[TaskFuncAll]) -> None:
         """Run an async function in the background.
 
         Will log when the function completes, including any error
@@ -59,14 +60,19 @@ class TaskRunner:
             func: An async, None-returning function to run in the background.
             Use kwargs to add arguments if required.
         """
+
         async def _run_async_task() -> None:
-            try:
-                response = await func_list[0]()
-                func_name = func_list[0].__qualname__
-                log.debug(f"Background task {func_name} succeeded")
-                func_name = func_list[1].__qualname__
-                func_list[1](response)
-            except Exception as e:
-                log.warning(f"Background task {func_name} failed", exc_info=e)
+            response: Optional[str] = None
+            for idx, func in enumerate(func_list):
+                func_name = func.__qualname__
+                if response is None:
+                    try:
+                        response = await func()
+                    except Exception as e:
+                        log.warning(f"Background task {func_name} failed", exc_info=e)
+                else:
+                    func_list[idx + 1](response)
+                    log.debug(f"Background task {func_name} succeeded")
+                    response = None
 
         self._background_tasks.add_task(_run_async_task)

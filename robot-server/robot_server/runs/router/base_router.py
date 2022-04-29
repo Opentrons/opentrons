@@ -353,11 +353,13 @@ async def update_run(
             raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
         run = run_store.update_active_run(run_id=runId, is_current=update.current)
         log.info(f'Marked run "{runId}" as not current.')
-        insert_engine_state_result = engine_state_store.insert(EngineStateResource(
-            run_id=run.run_id,
-            state=protocol_run_data,
-            engine_status=engine_state.commands.get_status()
-        ))
+        insert_engine_state_result = engine_state_store.insert(
+            EngineStateResource(
+                run_id=run.run_id,
+                state=protocol_run_data,
+                engine_status=engine_state.commands.get_status(),
+            )
+        )
 
     data = Run.construct(
         id=run.run_id,
@@ -369,7 +371,9 @@ async def update_run(
         pipettes=protocol_run_data.pipettes,
         labware=protocol_run_data.labware,
         labwareOffsets=protocol_run_data.labwareOffsets,
-        status=EngineStatus(insert_engine_state_result.engine_status) if insert_engine_state_result is not None else engine_state.commands.get_status(),
+        status=EngineStatus(insert_engine_state_result.engine_status)
+        if insert_engine_state_result is not None
+        else engine_state.commands.get_status(),
     )
 
     return await PydanticResponse.create(

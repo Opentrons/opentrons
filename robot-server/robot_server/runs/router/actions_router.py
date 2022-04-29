@@ -17,7 +17,7 @@ from robot_server.service.task_runner import TaskRunner
 from ..engine_state_store import EngineStateStore
 from ..run_store import RunStore, RunNotFoundError
 from ..action_models import RunAction, RunActionType, RunActionCreate
-from ..engine_store import EngineStore, ProtocolRunnerWrapper
+from ..engine_store import EngineStore
 from ..dependencies import get_run_store, get_engine_store, get_engine_state_store
 from .base_router import RunNotFound, RunStopped
 
@@ -46,14 +46,14 @@ class RunActionNotAllowed(ErrorDetails):
     },
 )
 async def create_run_action(
-        runId: str,
-        request_body: RequestModel[RunActionCreate],
-        run_store: RunStore = Depends(get_run_store),
-        engine_store: EngineStore = Depends(get_engine_store),
-        action_id: str = Depends(get_unique_id),
-        created_at: datetime = Depends(get_current_time),
-        task_runner: TaskRunner = Depends(TaskRunner),
-        engine_state_store: EngineStateStore = Depends(get_engine_state_store),
+    runId: str,
+    request_body: RequestModel[RunActionCreate],
+    run_store: RunStore = Depends(get_run_store),
+    engine_store: EngineStore = Depends(get_engine_store),
+    action_id: str = Depends(get_unique_id),
+    created_at: datetime = Depends(get_current_time),
+    task_runner: TaskRunner = Depends(TaskRunner),
+    engine_state_store: EngineStateStore = Depends(get_engine_state_store),
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 
@@ -91,8 +91,9 @@ async def create_run_action(
                 engine_store.runner.play()
             else:
                 log.info(f'Starting run "{runId}".')
-                # collaborator = ProtocolRunnerWrapper(engine_store.runner, engine_state_store)
-                task_runner.run_waterfall([engine_store.runner.run, engine_state_store.insert])
+                task_runner.run_waterfall(
+                    [engine_store.runner.run, engine_state_store.insert]
+                )
 
         elif action.actionType == RunActionType.PAUSE:
             log.info(f'Pausing run "{runId}".')

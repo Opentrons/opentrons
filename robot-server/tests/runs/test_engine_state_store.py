@@ -10,7 +10,7 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
     errors as pe_errors,
     types as pe_types,
-    ProtocolRunData
+    ProtocolRunData,
 )
 from opentrons.types import MountType, DeckSlotName
 
@@ -124,7 +124,12 @@ def teardown() -> Generator[None, None, None]:
 
 
 @pytest.mark.parametrize("pickle_type", [True, False])
-def test_insert_get_by_state_type(subject: EngineStateStore, protocol_run: ProtocolRunData, pickle_type: bool, teardown: Generator[None, None, None]) -> None:
+def test_insert_get_by_state_type(
+    subject: EngineStateStore,
+    protocol_run: ProtocolRunData,
+    pickle_type: bool,
+    teardown: Generator[None, None, None],
+) -> None:
     """It should test the time and db size for prasing a json type and a string type."""
     engine_state = EngineStateResource(
         run_id="run-id",

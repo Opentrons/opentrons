@@ -109,7 +109,9 @@ class EngineStateStore:
 
         state_result
 
-        return EngineStateResource(run_id=run_id, state=state_result, engine_status=state_row.engine_status)
+        return EngineStateResource(
+            run_id=run_id, state=state_result, engine_status=state_row.engine_status
+        )
 
     def get(self, run_id: str) -> EngineStateResource:
         """Get engine state from db.
@@ -150,5 +152,5 @@ def _convert_state_to_sql_values(state: EngineStateResource) -> Dict[str, object
     return {
         "run_id": state.run_id,
         "state": state.state.dict(),
-        "engine_status": state.engine_status
+        "engine_status": state.engine_status,
     }

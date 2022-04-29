@@ -37,4 +37,3 @@ def mock_engine_store(decoy: Decoy) -> EngineStore:
 def mock_engine_state_store(decoy: Decoy) -> EngineStateStore:
     """Get a mock EngineStore interface."""
     return decoy.mock(cls=EngineStateStore)
-

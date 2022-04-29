@@ -7,18 +7,6 @@ from opentrons.protocol_runner import ProtocolRunner
 from robot_server.runs.engine_state_store import EngineStateStore
 
 
-class ProtocolRunnerWrapper:
-    def __init__(self, runner: ProtocolRunner, engine_state_store: EngineStateStore):
-        _protocol_runner = runner
-        _engine_state_store = engine_state_store
-
-    async def run(
-            self
-    ) -> None:
-        result = self._protocol_runner.run()
-        self._engine_state_store.insert(result)
-
-
 class EngineMissingError(RuntimeError):
     """An error raised if the engine somehow hasn't been initialized.
 
@@ -39,6 +27,7 @@ class RunnerEnginePair(NamedTuple):
 
     runner: ProtocolRunner
     engine: ProtocolEngine
+
 
 # TODO (tz, 2022-04-28) change name after storing it all in the DB. check if this is even needed after Db access
 # TODO(mc, 2021-05-28): evaluate multi-engine logic, which this does not support

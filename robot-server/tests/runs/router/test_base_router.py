@@ -5,7 +5,13 @@ from decoy import Decoy, matchers
 from pathlib import Path
 
 from opentrons.types import DeckSlotName, MountType
-from opentrons.protocol_engine import StateView, ErrorOccurrence, types as pe_types, commands as pe_commands, errors as pe_errors
+from opentrons.protocol_engine import (
+    StateView,
+    ErrorOccurrence,
+    types as pe_types,
+    commands as pe_commands,
+    errors as pe_errors,
+)
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 from opentrons.protocol_engine import ProtocolRunData
 
@@ -77,6 +83,7 @@ RESOLVED_LABWARE_OFFSETS = [
         vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
     ),
 ]
+
 
 @pytest.fixture
 def protocol_run() -> ProtocolRunData:
@@ -635,7 +642,11 @@ async def test_delete_active_run_no_engine(
 
 
 async def test_update_run_to_not_current(
-    decoy: Decoy, mock_engine_store: EngineStore, mock_run_store: RunStore, mock_engine_state_store: EngineStateStore, protocol_run: ProtocolRunData
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
+    mock_engine_state_store: EngineStateStore,
+    protocol_run: ProtocolRunData,
 ) -> None:
     """It should update a run to no longer be current."""
     run_resource = RunResource(
@@ -654,7 +665,9 @@ async def test_update_run_to_not_current(
         is_current=False,
     )
 
-    engine_state_resource = EngineStateResource(run_id="run-id", state=protocol_run, engine_status="succeeded")
+    engine_state_resource = EngineStateResource(
+        run_id="run-id", state=protocol_run, engine_status="succeeded"
+    )
 
     expected_response = Run(
         id="run-id",
@@ -693,14 +706,16 @@ async def test_update_run_to_not_current(
 
     decoy.when(engine_state.get_protocol_run_data()).then_return(protocol_run)
 
-    decoy.when(mock_engine_state_store.insert(engine_state_resource)).then_return(engine_state_resource)
+    decoy.when(mock_engine_state_store.insert(engine_state_resource)).then_return(
+        engine_state_resource
+    )
 
     result = await update_run(
         runId="run-id",
         request_body=RequestModel(data=run_update),
         run_store=mock_run_store,
         engine_store=mock_engine_store,
-        engine_state_store=mock_engine_state_store
+        engine_state_store=mock_engine_state_store,
     )
 
     assert result.content == SimpleBody(data=expected_response)
@@ -715,8 +730,11 @@ async def test_update_run_to_not_current(
 
 
 async def test_update_current_to_current_noop(
-    decoy: Decoy, mock_engine_store: EngineStore, mock_run_store: RunStore, mock_engine_state_store: EngineStateStore,
-    protocol_run: ProtocolRunData
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
+    mock_engine_state_store: EngineStateStore,
+    protocol_run: ProtocolRunData,
 ) -> None:
     """It should noop if updating the current run to current: true."""
     run_resource = RunResource(
@@ -748,7 +766,9 @@ async def test_update_current_to_current_noop(
         labwareOffsets=protocol_run.labwareOffsets,
     )
 
-    engine_state_resource = EngineStateResource(run_id="run-id", state=protocol_run, engine_status="succeeded")
+    engine_state_resource = EngineStateResource(
+        run_id="run-id", state=protocol_run, engine_status="succeeded"
+    )
 
     run_update = RunUpdate(current=True)
 
@@ -773,14 +793,16 @@ async def test_update_current_to_current_noop(
     )
     decoy.when(engine_state.get_protocol_run_data()).then_return(protocol_run)
 
-    decoy.when(mock_engine_state_store.insert(engine_state_resource)).then_return(engine_state_resource)
+    decoy.when(mock_engine_state_store.insert(engine_state_resource)).then_return(
+        engine_state_resource
+    )
 
     result = await update_run(
         runId="run-id",
         request_body=RequestModel(data=run_update),
         run_store=mock_run_store,
         engine_store=mock_engine_store,
-        engine_state_store=mock_engine_state_store
+        engine_state_store=mock_engine_state_store,
     )
 
     assert result.content == SimpleBody(data=expected_response)
