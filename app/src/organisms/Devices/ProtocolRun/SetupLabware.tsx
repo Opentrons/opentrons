@@ -38,7 +38,6 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { SecondaryButton } from '../../../atoms/Buttons'
 import { StyledText } from '../../../atoms/text'
 import { useLPCSuccessToast } from '../../../organisms/ProtocolSetup/hooks'
-// TODO(bh: 2022/04/12): nested DeckMap needs robotName prop to remove connected robot reference
 import { LabwarePositionCheck } from '../../../organisms/ProtocolSetup/LabwarePositionCheck'
 import { ExtraAttentionWarning } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/ExtraAttentionWarning'
 import { LabwareInfoOverlay } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay'
