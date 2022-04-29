@@ -12,20 +12,18 @@ import type { AttachedModule } from '../../redux/modules/types'
 
 interface ModuleIconProps {
   module: AttachedModule
-  robotName: string
   index: number
   tooltipText: string
 }
 
 export function ModuleIcon(props: ModuleIconProps): JSX.Element {
-  const { module, index, robotName, tooltipText } = props
+  const { module, index, tooltipText } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   return (
     <>
       <Flex {...targetProps}>
         <SharedModuleIcon
-          key={`${module.moduleModel}_${index}_${robotName}`}
           moduleType={module.moduleType}
           size={SPACING.spacing4}
         />

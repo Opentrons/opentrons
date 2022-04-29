@@ -94,13 +94,13 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
               <Flex>
                 {attachedModules.map((module, i) => (
                   <ModuleIcon
+                    key={`${module.moduleModel}_${i}_${name}`}
                     tooltipText={t(
                       'this_robot_has_connected_and_power_on_module',
                       {
                         moduleName: getModuleDisplayName(module.moduleModel),
                       }
                     )}
-                    robotName={name}
                     index={i}
                     module={module}
                   />
