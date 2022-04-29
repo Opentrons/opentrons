@@ -43,7 +43,7 @@ export const ConfirmAttachmentModal = (
   const slotNumber = heaterShaker != null ? heaterShaker.slotName : null
   const dispatch = useDispatch<Dispatch>()
 
-  const makeModalDismissed = (): void => {
+  const confirmAttached = (): void => {
     if (isDismissed) {
       dispatch(setHeaterShakerAttached(isDismissed))
     }
@@ -118,7 +118,7 @@ export const ConfirmAttachmentModal = (
             isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
           }`}
         >
-          <PrimaryButton onClick={makeModalDismissed}>
+          <PrimaryButton onClick={confirmAttached}>
             {isProceedToRunModal
               ? t('proceed_to_run')
               : t('confirm_attachment')}
