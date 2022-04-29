@@ -65,7 +65,7 @@ class DeactivateLid(BaseCommand[DeactivateLidParams, DeactivateLidResult]):
 class DeactivateLidCreate(BaseCommandCreate[DeactivateLidParams]):
     """A request to create a Thermocycler's deactivate lid command."""
 
-    commandType: DeactivateLidCommandType
+    commandType: DeactivateLidCommandType = "thermocycler/deactivateLid"
     params: DeactivateLidParams
 
     _CommandCls: Type[DeactivateLid] = DeactivateLid

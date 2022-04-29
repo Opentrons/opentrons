@@ -67,7 +67,7 @@ class DeactivateBlock(BaseCommand[DeactivateBlockParams, DeactivateBlockResult])
 class DeactivateBlockCreate(BaseCommandCreate[DeactivateBlockParams]):
     """A request to create a Thermocycler's deactivate block command."""
 
-    commandType: DeactivateBlockCommandType
+    commandType: DeactivateBlockCommandType = "thermocycler/deactivateBlock"
     params: DeactivateBlockParams
 
     _CommandCls: Type[DeactivateBlock] = DeactivateBlock

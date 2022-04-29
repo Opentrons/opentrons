@@ -263,6 +263,22 @@ def test_pause(
     assert result == response
 
 
+def test_set_rail_lights(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a setRailLights command."""
+    request = commands.SetRailLightsCreate(params=commands.SetRailLightsParams(on=True))
+    response = commands.SetRailLightsResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.set_rail_lights(on=True)
+
+    assert result == response
+
+
 def test_magnetic_module_engage(
     decoy: Decoy,
     transport: AbstractSyncTransport,
@@ -283,17 +299,33 @@ def test_magnetic_module_engage(
     assert result == response
 
 
-def test_set_rail_lights(
+def test_thermocycler_deactivate_block(
     decoy: Decoy,
     transport: AbstractSyncTransport,
     subject: SyncClient,
 ) -> None:
-    """It should execute a setRailLights command."""
-    request = commands.SetRailLightsCreate(params=commands.SetRailLightsParams(on=True))
-    response = commands.SetRailLightsResult()
-
+    """It should execute a Thermocycler's deactivate block command."""
+    request = commands.thermocycler.DeactivateBlockCreate(
+        params=commands.thermocycler.DeactivateBlockParams(moduleId="module-id")
+    )
+    response = commands.thermocycler.DeactivateBlockResult()
     decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.thermocycler_deactivate_block(module_id="module-id")
 
-    result = subject.set_rail_lights(on=True)
+    assert result == response
+
+
+def test_thermocycler_deactivate_lid(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Thermocycler's deactivate block command."""
+    request = commands.thermocycler.DeactivateLidCreate(
+        params=commands.thermocycler.DeactivateLidParams(moduleId="module-id")
+    )
+    response = commands.thermocycler.DeactivateLidResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.thermocycler_deactivate_lid(module_id="module-id")
 
     assert result == response
