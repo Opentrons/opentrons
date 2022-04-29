@@ -43,7 +43,6 @@ import { ExtraAttentionWarning } from '../../../organisms/ProtocolSetup/RunSetup
 import { LabwareInfoOverlay } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
-// TODO(bh: 2022/04/12): remove current run and protocol references (can download offset data when not current run)
 import { DownloadOffsetDataModal } from '../../../organisms/ProtocolUpload/DownloadOffsetDataModal'
 import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
@@ -180,6 +179,7 @@ export function SetupLabware({
       {downloadOffsetDataModal && (
         <DownloadOffsetDataModal
           onCloseClick={() => showDownloadOffsetDataModal(false)}
+          runId={runId}
         />
       )}
       <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
