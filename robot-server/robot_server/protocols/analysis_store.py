@@ -81,7 +81,7 @@ class AnalysisStore:
     def add_pending(self, protocol_id: str, analysis_id: str) -> AnalysisSummary:
         """Add a new pending analysis to the store.
 
-        Parameters:
+        Args:
             protocol_id: The protocol to add the new pending analysis to.
                 Must not already have a pending analysis.
             analysis_id: The ID of the new analysis.
@@ -199,7 +199,7 @@ class AnalysisStore:
         with self._sql_engine.begin() as transaction:
             try:
                 result = transaction.execute(statement).one()
-            except sqlalchemy.exc.NoResultFound as e:
+            except sqlalchemy.exc.NoResultFound:
                 raise AnalysisNotFoundError(analysis_id=analysis_id)
         return _CompletedAnalysisResource.from_sql_row(result)
 

@@ -70,7 +70,7 @@ def subject(sql_engine: SQLEngine) -> AnalysisStore:
 def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
     """Return a placeholder `ProtocolResource` to insert into a `ProtocolStore`.
 
-    Parameters:
+    Args:
         protocol_id: The ID to give to the new `ProtocolResource`.
     """
     return ProtocolResource(
