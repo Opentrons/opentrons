@@ -73,11 +73,6 @@ class AnalysisStore:
         # The in-memory pending one, if it exists, is always the most recent one.
         self._pending_analysis_ids_by_protocol: Dict[str, str] = {}
 
-        _log.debug("Debug")
-        _log.info("Info")
-        _log.warning("Warning")
-        _log.error("Error")
-
     def add_pending(self, protocol_id: str, analysis_id: str) -> AnalysisSummary:
         """Add a new pending analysis to the store.
 
