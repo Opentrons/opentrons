@@ -1,5 +1,5 @@
 import * as React from 'react'
-import '@testing-library/jest-dom'
+import '../../../../LabwarePositionCheck/__tests__/node_modules/@testing-library/jest-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import {
   componentPropsMatcher,

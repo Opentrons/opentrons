@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { when } from 'jest-when'
-import '@testing-library/jest-dom'
+import '../../../organisms/LabwarePositionCheck/__tests__/node_modules/@testing-library/jest-dom'
 import { StaticRouter } from 'react-router-dom'
 import {
   componentPropsMatcher,

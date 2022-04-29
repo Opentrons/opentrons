@@ -1,5 +1,5 @@
 import * as React from 'react'
-import '@testing-library/jest-dom'
+import '../../../../LabwarePositionCheck/__tests__/node_modules/@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {

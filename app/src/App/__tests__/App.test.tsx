@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import '@testing-library/jest-dom'
+import '../../organisms/LabwarePositionCheck/__tests__/node_modules/@testing-library/jest-dom'
 import { resetAllWhenMocks, when } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
