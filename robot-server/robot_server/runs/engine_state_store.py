@@ -1,14 +1,12 @@
 """Engine state on-db store."""
 import sqlalchemy
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Dict
 from pydantic import parse_obj_as
-import os
-
-from opentrons.protocol_runner import ProtocolRunData
 
 from robot_server.persistence import engine_state_table
 from .run_store import RunNotFoundError
+from opentrons.protocol_engine import ProtocolRunData
 
 
 @dataclass(frozen=True)

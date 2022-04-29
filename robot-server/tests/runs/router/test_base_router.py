@@ -7,7 +7,7 @@ from pathlib import Path
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import StateView, ErrorOccurrence, types as pe_types, commands as pe_commands, errors as pe_errors
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
-from opentrons.protocol_runner import ProtocolRunData
+from opentrons.protocol_engine import ProtocolRunData
 
 from robot_server.errors import ApiError
 from robot_server.runs import engine_state_store

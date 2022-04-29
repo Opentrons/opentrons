@@ -12,8 +12,6 @@ from typing_extensions import Literal
 from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel, Field
 
-from opentrons.protocol_runner import ProtocolRunData
-
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.task_runner import TaskRunner
@@ -344,20 +342,9 @@ async def update_run(
             status.HTTP_409_CONFLICT
         )
 
-    # engine_state = engine_store.get_state(run.run_id)
-
     engine_state = engine_store.engine.state_view
 
-    protocol_run_data = ProtocolRunData(
-        errors=engine_state.commands.get_all_errors(),
-        pipettes=engine_state.pipettes.get_all(),
-        labware=engine_state.labware.get_all(),
-        labwareOffsets=engine_state.labware.get_labware_offsets(),
-        # TODO (tz)
-        # get all commands, modules. extract this to method in engine_state
-        commands=[],
-        modules=[]
-    )
+    protocol_run_data = engine_state.get_protocol_run_data()
 
     if update.current is False:
         try:

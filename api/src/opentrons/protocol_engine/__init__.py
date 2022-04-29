@@ -31,6 +31,7 @@ from .types import (
     WellOffset,
     ModuleModel,
     ModuleDefinition,
+    ProtocolRunData
 )
 
 __all__ = [
@@ -71,6 +72,7 @@ __all__ = [
     "WellOffset",
     "ModuleModel",
     "ModuleDefinition",
+    "ProtocolRunData"
     # plugins
     "AbstractPlugin",
 ]

@@ -11,6 +11,7 @@ from opentrons.protocol_reader import (
 )
 from opentrons.protocol_engine import (
     ProtocolEngine,
+    ProtocolRunData,
     Command,
     ErrorOccurrence,
     LoadedLabware,
@@ -34,18 +35,6 @@ from .legacy_wrappers import (
     LegacyContextCreator,
     LegacyExecutor,
 )
-
-
-class ProtocolRunData(BaseModel):
-    """Data from a protocol run."""
-
-    commands: List[Command]
-    errors: List[ErrorOccurrence]
-    labware: List[LoadedLabware]
-    pipettes: List[LoadedPipette]
-    modules: List[LoadedModule]
-    labwareOffsets: List[LabwareOffset]
-
 
 # TODO(mc, 2022-01-11): this class has become bloated. Split into an abstract
 # interfaces and several concrete implementations per protocol type
