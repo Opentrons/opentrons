@@ -66,7 +66,7 @@ describe('RobotSettings FactoryResetModal', () => {
       resetOptions: clearMockResetOptions,
     })
     const clearDataAndRestartRobotButton = getByRole('button', {
-      name: 'Yes, clear data and restart robot',
+      name: 'Yes',
     })
     fireEvent.click(clearDataAndRestartRobotButton)
     expect(dispatchApiRequest).toBeCalledWith(
