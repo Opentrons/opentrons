@@ -334,6 +334,8 @@ async def get_protocol_analysis_by_id(
         )
 
     try:
+        # TODO(mm, 2022-04-28): This will erroneously return an analysis even if
+        # this analysis isn't owned by this protocol. This should be an error.
         analysis = analysis_store.get(analysisId)
     except AnalysisNotFoundError as error:
         raise AnalysisNotFound(detail=str(error)).as_error(
