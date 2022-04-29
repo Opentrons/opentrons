@@ -87,6 +87,7 @@ run_table = sqlalchemy.Table(
         "protocol_id",
         sqlalchemy.String,
         sqlalchemy.ForeignKey("protocol.id"),
+        nullable=True,
     ),
 )
 
