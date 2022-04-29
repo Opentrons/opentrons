@@ -21,7 +21,6 @@ import { DeviceDetails } from '../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../pages/Devices/DevicesLanding'
 import { ProtocolRunDetails } from '../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../pages/Devices/RobotSettings'
-import { usePathCrumbs } from './hooks'
 import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
 import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { AppSettings } from '../organisms/AppSettings'
@@ -32,64 +31,64 @@ import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
 
 import type { RouteProps } from './types'
 
-export const nextGenRoutes: RouteProps[] = [
+export const routes: RouteProps[] = [
   {
-    component: ProtocolsLanding,
+    Component: ProtocolsLanding,
     exact: true,
     name: 'Protocols',
     navLinkTo: '/protocols',
     path: '/protocols',
   },
   {
-    component: ProtocolDetails,
+    Component: ProtocolDetails,
     exact: true,
     name: 'Protocol Details',
     path: '/protocols/:protocolKey',
   },
   {
-    component: () => <div>deck setup</div>,
+    Component: () => <div>deck setup</div>,
     name: 'Deck Setup',
     path: '/protocols/:protocolKey/deck-setup',
   },
   {
-    component: Labware,
+    Component: Labware,
     name: 'Labware',
     navLinkTo: '/labware',
     // labwareId param is for details slideout
     path: '/labware/:labwareId?',
   },
   {
-    component: DevicesLanding,
+    Component: DevicesLanding,
     exact: true,
     name: 'Devices',
     navLinkTo: '/devices',
     path: '/devices',
   },
   {
-    component: DeviceDetails,
+    Component: DeviceDetails,
     exact: true,
     name: 'Device Details',
     path: '/devices/:robotName',
   },
   {
-    component: RobotSettings,
+    Component: RobotSettings,
     exact: true,
     name: 'Robot Settings',
     path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
   },
   {
-    component: () => <div>protocol runs landing</div>,
+    Component: () => <div>protocol runs landing</div>,
     exact: true,
     name: 'Protocol Runs',
     path: '/devices/:robotName/protocol-runs',
   },
   {
-    component: ProtocolRunDetails,
+    Component: ProtocolRunDetails,
     name: 'Run Details',
     path: '/devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab?',
   },
   {
-    component: AppSettings,
+    Component: AppSettings,
     exact: true,
     name: 'App Settings',
     path: '/app-settings/:appSettingsTab?',
@@ -99,7 +98,6 @@ export const nextGenRoutes: RouteProps[] = [
 const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
 export const AppComponent = (): JSX.Element => {
-  const pathCrumbs = usePathCrumbs()
   const isLegacyApp = useFeatureFlag('hierarchyReorganization')
 
   return (
@@ -118,36 +116,29 @@ export const AppComponent = (): JSX.Element => {
         ) : (
           <>
             <TopPortalRoot />
-            <Navbar routes={nextGenRoutes} />
+            <Navbar routes={routes} />
             <Box width="100%">
-              <Breadcrumbs pathCrumbs={pathCrumbs} />
-              <Box
-                position={POSITION_RELATIVE}
-                width="100%"
-                height="100%"
-                backgroundColor={COLORS.background}
-                overflow={OVERFLOW_SCROLL}
-              >
-                <ModalPortalRoot />
-                <Switch>
-                  {nextGenRoutes.map(
-                    ({ component, exact, path }: RouteProps) => {
-                      return (
-                        <Route
-                          key={path}
-                          component={component}
-                          exact={exact}
-                          path={path}
-                        />
-                      )
-                    }
-                  )}
-                  <Redirect exact from="/" to="/devices" />
-                  {/* this redirect from /robots is necessary because the existing app <Redirect /> to /robots renders before feature flags load */}
-                  <Redirect from="/robots" to="/devices" />
-                </Switch>
-                <Alerts />
-              </Box>
+              <Switch>
+                {routes.map(({ Component, exact, path }: RouteProps) => {
+                  return (
+                    <Route key={path} exact={exact} path={path}>
+                      <Breadcrumbs />
+                      <Box
+                        position={POSITION_RELATIVE}
+                        width="100%"
+                        height="100%"
+                        backgroundColor={COLORS.background}
+                        overflow={OVERFLOW_SCROLL}
+                      >
+                        <ModalPortalRoot />
+                        <Component />
+                      </Box>
+                    </Route>
+                  )
+                })}
+                <Redirect exact from="/" to="/devices" />
+              </Switch>
+              <Alerts />
             </Box>
           </>
         )}

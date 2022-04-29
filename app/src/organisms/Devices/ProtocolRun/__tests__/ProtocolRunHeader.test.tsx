@@ -47,6 +47,7 @@ import { useTrackEvent } from '../../../../redux/analytics'
 import {
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
+  useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
   useAttachedModules,
 } from '../../hooks'
@@ -112,6 +113,9 @@ const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jes
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
 >
+const mockUseRunCreatedAtTimestamp = useRunCreatedAtTimestamp as jest.MockedFunction<
+  typeof useRunCreatedAtTimestamp
+>
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
 >
@@ -133,6 +137,7 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
+const CREATED_AT = '03/03/2022 19:08:49'
 const STARTED_AT = '2022-03-03T19:09:40.620530+00:00'
 const COMPLETED_AT = '2022-03-03T19:39:53.620530+00:00'
 const PROTOCOL_NAME = 'A Protocol for Otie'
@@ -233,6 +238,9 @@ describe('ProtocolRunHeader', () => {
       stoppedAt: null,
       completedAt: null,
     })
+    when(mockUseRunCreatedAtTimestamp)
+      .calledWith(RUN_ID)
+      .mockReturnValue(CREATED_AT)
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -259,7 +267,7 @@ describe('ProtocolRunHeader', () => {
 
     getByText('A Protocol for Otie')
     getByText('Run ID')
-    getByText(formatTimestamp(mockIdleUnstartedRun.createdAt))
+    getByText('03/03/2022 19:08:49')
     getByText('Status')
     getByText('Not started')
     getByText('Run Time')

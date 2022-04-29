@@ -14,7 +14,6 @@ import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../organisms/AppSettings/GeneralSettings'
 import { Alerts } from '../../organisms/Alerts'
 import { useFeatureFlag } from '../../redux/config'
-import { usePathCrumbs } from '../hooks'
 import { LegacyApp } from '../LegacyApp'
 import { App } from '../'
 
@@ -60,9 +59,6 @@ const mockAppSettings = GeneralSettings as jest.MockedFunction<
 mockAppSettings.mockReturnValue(<div>Mock AppSettings</div>)
 const mockBreadcrumbs = Breadcrumbs as jest.MockedFunction<typeof Breadcrumbs>
 mockBreadcrumbs.mockReturnValue(<div>Mock Breadcrumbs</div>)
-const mockUsePathCrumbs = usePathCrumbs as jest.MockedFunction<
-  typeof usePathCrumbs
->
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -75,7 +71,6 @@ const render = (path = '/') => {
 
 describe('App', () => {
   beforeEach(() => {
-    when(mockUsePathCrumbs).calledWith().mockReturnValue([])
     when(mockUseFeatureFlag)
       .calledWith('hierarchyReorganization')
       .mockReturnValue(false)
