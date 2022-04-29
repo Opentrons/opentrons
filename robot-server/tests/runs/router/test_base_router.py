@@ -742,11 +742,13 @@ async def test_update_current_to_current_noop(
         status=pe_types.EngineStatus.SUCCEEDED,
         current=True,
         actions=[],
-        errors=[],
-        pipettes=[],
-        labware=[],
-        labwareOffsets=[],
+        errors=protocol_run.errors,
+        pipettes=protocol_run.pipettes,
+        labware=protocol_run.labware,
+        labwareOffsets=protocol_run.labwareOffsets,
     )
+
+    engine_state_resource = EngineStateResource(run_id="run-id", state=protocol_run, engine_status="succeeded")
 
     run_update = RunUpdate(current=True)
 
@@ -770,6 +772,8 @@ async def test_update_current_to_current_noop(
         pe_types.EngineStatus.SUCCEEDED
     )
     decoy.when(engine_state.get_protocol_run_data()).then_return(protocol_run)
+
+    decoy.when(mock_engine_state_store.insert(engine_state_resource)).then_return(engine_state_resource)
 
     result = await update_run(
         runId="run-id",

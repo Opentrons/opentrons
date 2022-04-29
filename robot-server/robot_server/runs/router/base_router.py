@@ -344,7 +344,8 @@ async def update_run(
     engine_state = engine_store.engine.state_view
 
     protocol_run_data = engine_state.get_protocol_run_data()
-
+    # TODO (tz, 2022-29-4): Should we leave declaration or use 'insert_engine_state_result' in locals()
+    insert_engine_state_result: EngineStateResource = None
     if update.current is False:
         try:
             await engine_store.clear()
@@ -352,7 +353,6 @@ async def update_run(
             raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
         run = run_store.update_active_run(run_id=runId, is_current=update.current)
         log.info(f'Marked run "{runId}" as not current.')
-
         insert_engine_state_result = engine_state_store.insert(EngineStateResource(
             run_id=run.run_id,
             state=protocol_run_data,
@@ -369,7 +369,7 @@ async def update_run(
         pipettes=protocol_run_data.pipettes,
         labware=protocol_run_data.labware,
         labwareOffsets=protocol_run_data.labwareOffsets,
-        status=EngineStatus(insert_engine_state_result.engine_status) if insert_engine_state_result else engine_state.commands.get_status(),
+        status=EngineStatus(insert_engine_state_result.engine_status) if insert_engine_state_result is not None else engine_state.commands.get_status(),
     )
 
     return await PydanticResponse.create(
