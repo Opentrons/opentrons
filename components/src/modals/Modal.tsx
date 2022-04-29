@@ -26,7 +26,6 @@ export interface ModalProps {
 /**
  * Base modal component that fills its nearest `display:relative` ancestor
  * with a dark overlay and displays `children` as its contents in a white box
- * @deprecated Use Modal in app folder
  */
 export function Modal(props: ModalProps): JSX.Element {
   const {
