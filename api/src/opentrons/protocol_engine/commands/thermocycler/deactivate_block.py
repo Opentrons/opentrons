@@ -41,7 +41,17 @@ class DeactivateBlockImpl(
 
     async def execute(self, params: DeactivateBlockParams) -> DeactivateBlockResult:
         """Unset a Thermocycler's target block temperature."""
-        raise NotImplementedError()
+        thermocycler_state = self._state_view.modules.get_thermocycler_module_substate(
+            params.moduleId
+        )
+        thermocycler_hardware = self._equipment.get_module_hardware_api(
+            thermocycler_state.module_id
+        )
+
+        if thermocycler_hardware is not None:
+            await thermocycler_hardware.deactivate_block()
+
+        return DeactivateBlockResult()
 
 
 class DeactivateBlock(BaseCommand[DeactivateBlockParams, DeactivateBlockResult]):

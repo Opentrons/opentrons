@@ -39,7 +39,17 @@ class DeactivateLidImpl(AbstractCommandImpl[DeactivateLidParams, DeactivateLidRe
 
     async def execute(self, params: DeactivateLidParams) -> DeactivateLidResult:
         """Unset a Thermocycler's target lid temperature."""
-        raise NotImplementedError()
+        thermocycler_state = self._state_view.modules.get_thermocycler_module_substate(
+            params.moduleId
+        )
+        thermocycler_hardware = self._equipment.get_module_hardware_api(
+            thermocycler_state.module_id
+        )
+
+        if thermocycler_hardware is not None:
+            await thermocycler_hardware.deactivate_lid()
+
+        return DeactivateLidResult()
 
 
 class DeactivateLid(BaseCommand[DeactivateLidParams, DeactivateLidResult]):
