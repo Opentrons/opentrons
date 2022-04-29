@@ -6,7 +6,7 @@ import { resetAllWhenMocks, when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../i18n'
-import { Breadcrumbs } from '../../molecules/Breadcrumbs'
+import { Breadcrumbs } from '../../organisms/Breadcrumbs'
 import { DeviceDetails } from '../../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../../pages/Devices/DevicesLanding'
 import { ProtocolsLanding } from '../../pages/Protocols/ProtocolsLanding'
@@ -18,7 +18,7 @@ import { useFeatureFlag } from '../../redux/config'
 import { LegacyApp } from '../LegacyApp'
 import { App } from '../'
 
-jest.mock('../../molecules/Breadcrumbs')
+jest.mock('../../organisms/Breadcrumbs')
 jest.mock('../../organisms/Devices/hooks')
 jest.mock('../../pages/Devices/DeviceDetails')
 jest.mock('../../pages/Devices/DevicesLanding')

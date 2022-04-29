@@ -15,8 +15,7 @@ import {
 import { useFeatureFlag } from '../redux/config'
 import { GlobalStyle } from '../atoms/GlobalStyle'
 import { Alerts } from '../organisms/Alerts'
-
-import { Breadcrumbs } from '../molecules/Breadcrumbs'
+import { Breadcrumbs } from '../organisms/Breadcrumbs'
 import { DeviceDetails } from '../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../pages/Devices/DevicesLanding'
 import { ProtocolRunDetails } from '../pages/Devices/ProtocolRunDetails'
