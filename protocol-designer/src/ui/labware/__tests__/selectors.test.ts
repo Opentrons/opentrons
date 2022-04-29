@@ -33,7 +33,7 @@ describe('labware selectors', () => {
   beforeEach(() => {
     trash = {
       // @ts-expect-error(sa, 2021-6-15): missing id and labwareDefURI
-      trashId: {
+      fixedTrash: {
         def: { ...fixtureTrash },
       },
     }
@@ -60,8 +60,8 @@ describe('labware selectors', () => {
     }
 
     names = {
-      trashId: 'Trash',
-      trashId2: 'Trash',
+      fixedTrash: 'Trash',
+      fixedTrash2: 'Trash',
 
       tiprack100Id: 'Opentrons Tip Rack 1000 µL',
       tiprack10Id: 'Opentrons Tip Rack 10 µL',
@@ -95,11 +95,11 @@ describe('labware selectors', () => {
       expect(
         // @ts-expect-error(sa, 2021-6-15): resultFunc
         getDisposalLabwareOptions.resultFunc(labwareEntities, names)
-      ).toEqual([{ name: 'Trash', value: 'trashId' }])
+      ).toEqual([{ name: 'Trash', value: 'fixedTrash' }])
     })
     it('filters out labware that is NOT trash when multiple trash bins present', () => {
       const trash2 = {
-        trashId2: {
+        fixedTrash2: {
           def: { ...fixtureTrash },
         },
       }
@@ -113,8 +113,8 @@ describe('labware selectors', () => {
         // @ts-expect-error(sa, 2021-6-15): resultFunc
         getDisposalLabwareOptions.resultFunc(labwareEntities, names)
       ).toEqual([
-        { name: 'Trash', value: 'trashId' },
-        { name: 'Trash', value: 'trashId2' },
+        { name: 'Trash', value: 'fixedTrash' },
+        { name: 'Trash', value: 'fixedTrash2' },
       ])
     })
   })
@@ -147,7 +147,7 @@ describe('labware selectors', () => {
         getLabwareOptions.resultFunc(labwareEntities, names, initialDeckSetup)
       ).toEqual([
         { name: 'Source Plate', value: 'wellPlateId' },
-        { name: 'Trash', value: 'trashId' },
+        { name: 'Trash', value: 'fixedTrash' },
       ])
     })
 
@@ -215,7 +215,7 @@ describe('labware selectors', () => {
         { name: 'MAG Well Plate', value: 'wellPlateId' },
         { name: 'TEMP Temp Plate', value: 'tempPlateId' },
         { name: 'THERMO TC Plate', value: 'tcPlateId' },
-        { name: 'Trash', value: 'trashId' },
+        { name: 'Trash', value: 'fixedTrash' },
       ])
     })
   })

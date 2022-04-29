@@ -1,4 +1,5 @@
 import map from 'lodash/map'
+import mapKeys from 'lodash/mapKeys'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
@@ -23,17 +24,38 @@ import type {
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
+import { FIXED_TRASH_ID, INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 
 const PD_VERSION = '6.0.0'
 const SCHEMA_VERSION = 6
+const OLD_TRASH_ID = 'trashId'
 
 export const migrateSavedStepForms = (
   savedStepForms?: Record<string, any>
 ): Record<string, any> => {
   // uncheck asp + disp delay checkbox if the offset is 0 or null, see https://github.com/Opentrons/opentrons/issues/8153
-  return mapValues(savedStepForms, stepForm => {
+  return mapValues(savedStepForms, (stepForm, stepKey) => {
+    let migratedStepForm = { ...stepForm }
+
+    // change old instances of trashId to fixedTrash
+    migratedStepForm = mapValues(migratedStepForm, stepFormValue =>
+      stepFormValue === OLD_TRASH_ID ? FIXED_TRASH_ID : stepFormValue
+    )
+    // burrow into the labwareLocationUpdate key and change it there too
+    if (
+      stepKey === INITIAL_DECK_SETUP_STEP_ID &&
+      migratedStepForm.labwareLocationUpdate != null
+    ) {
+      migratedStepForm = {
+        ...migratedStepForm,
+        labwareLocationUpdate: mapKeys(
+          migratedStepForm.labwareLocationUpdate,
+          (_labwareLocation, labwareId) =>
+            labwareId === OLD_TRASH_ID ? FIXED_TRASH_ID : labwareId
+        ),
+      }
+    }
     if (stepForm.stepType === 'moveLiquid') {
-      let migratedStepForm = { ...stepForm }
       if (
         stepForm.aspirate_delay_checkbox === true &&
         (stepForm.aspirate_delay_mmFromBottom === null ||
@@ -54,17 +76,28 @@ export const migrateSavedStepForms = (
           dispense_delay_checkbox: false,
         }
       }
-      return migratedStepForm
     }
-    return stepForm
+    return migratedStepForm
   })
 }
 
 const migratePipettes = (appData: Record<string, any>): Record<string, any> =>
   mapValues(appData, pipettes => omit(pipettes, 'mount'))
 
-const migrateLabware = (appData: Record<string, any>): Record<string, any> =>
-  mapValues(appData, labware => omit(labware, 'slot'))
+const migrateLabware = (
+  labware: ProtocolFileV5<{}>['labware']
+): ProtocolFile['labware'] => {
+  const labwareWithUpdatedTrashId = mapKeys(
+    labware,
+    (_labwareEntity, labwareId) =>
+      labwareId === OLD_TRASH_ID ? FIXED_TRASH_ID : labwareId
+  )
+  const labwareWithoutTempotalProperties = mapValues(
+    labwareWithUpdatedTrashId,
+    labware => omit(labware, 'slot')
+  )
+  return labwareWithoutTempotalProperties
+}
 
 const migrateModules = (appData: Record<string, any>): Record<string, any> =>
   mapValues(appData, modules => omit(modules, 'slot'))
@@ -146,7 +179,7 @@ export const migrateFile = (
         key: uuid(),
         commandType: 'loadLabware' as const,
         params: {
-          labwareId: labwareId,
+          labwareId: labwareId === OLD_TRASH_ID ? FIXED_TRASH_ID : labwareId,
           location: { slotName: labware.slot },
         },
       }

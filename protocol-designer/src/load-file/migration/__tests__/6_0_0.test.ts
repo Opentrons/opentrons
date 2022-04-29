@@ -122,7 +122,7 @@ describe('v6 migration', () => {
       {
         key: expect.any(String),
         commandType: 'loadLabware',
-        params: { labwareId: 'trashId', location: { slotName: '12' } },
+        params: { labwareId: 'fixedTrash', location: { slotName: '12' } },
       },
       {
         key: expect.any(String),

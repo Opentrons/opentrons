@@ -984,7 +984,7 @@ describe('advanced options', () => {
       const args = {
         ...allArgs,
         changeTip: 'never',
-        blowoutLocation: 'trashId',
+        blowoutLocation: 'fixedTrash',
       } as TransferArgs
       const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
@@ -1283,7 +1283,7 @@ describe('advanced options', () => {
           commandType: 'blowout',
           params: {
             pipetteId: 'p300SingleId',
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
             flowRate: 2.3,
             wellLocation: {
@@ -1543,7 +1543,7 @@ describe('advanced options', () => {
           commandType: 'blowout',
           params: {
             flowRate: 2.3,
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellLocation: {
               origin: 'bottom',
               offset: {
@@ -1582,7 +1582,7 @@ describe('advanced options', () => {
           commandType: 'dropTip',
           params: {
             pipetteId: 'p300SingleId',
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
           },
         },
@@ -2194,7 +2194,7 @@ describe('advanced options', () => {
           commandType: 'dropTip',
           params: {
             pipetteId: 'p300SingleId',
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
           },
         },
@@ -2216,7 +2216,7 @@ describe('advanced options', () => {
           commandType: 'dropTip',
           params: {
             pipetteId: 'p300SingleId',
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
           },
         },
@@ -2823,7 +2823,7 @@ describe('advanced options', () => {
           commandType: 'dropTip',
           params: {
             pipetteId: 'p300SingleId',
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
           },
         },
@@ -2845,7 +2845,7 @@ describe('advanced options', () => {
           commandType: 'dropTip',
           params: {
             pipetteId: 'p300SingleId',
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
           },
         },
@@ -3187,7 +3187,7 @@ describe('advanced options', () => {
           commandType: 'dropTip',
           params: {
             pipetteId: 'p300SingleId',
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
           },
         },
@@ -3488,7 +3488,7 @@ describe('advanced options', () => {
           commandType: 'dropTip',
           params: {
             pipetteId: 'p300SingleId',
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
           },
         },
