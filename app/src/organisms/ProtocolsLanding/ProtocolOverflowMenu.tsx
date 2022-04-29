@@ -18,7 +18,10 @@ import {
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Portal } from '../../App/portal'
-import { removeProtocol } from '../../redux/protocol-storage'
+import {
+  removeProtocol,
+  viewProtocolSourceFolder,
+} from '../../redux/protocol-storage'
 
 import type { StyleProps } from '@opentrons/components'
 import type { Dispatch } from '../../redux/types'
@@ -43,6 +46,11 @@ export function ProtocolOverflowMenu(
     cancel: cancelDeleteProtocol,
   } = useConditionalConfirm(() => dispatch(removeProtocol(protocolKey)), true)
 
+  const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    dispatch(viewProtocolSourceFolder(protocolKey))
+    setShowOverflowMenu(!showOverflowMenu)
+  }
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     handleRunProtocol()
@@ -72,6 +80,9 @@ export function ProtocolOverflowMenu(
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
+          <MenuItem onClick={handleClickShowInFolder}>
+            {t('show_in_folder')}
+          </MenuItem>
           <MenuItem onClick={handleClickRun}>{t('run')}</MenuItem>
           <MenuItem onClick={handleClickDelete}>
             {t('delete_protocol')}

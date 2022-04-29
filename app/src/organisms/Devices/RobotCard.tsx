@@ -23,6 +23,8 @@ import { RobotStatusBanner } from './RobotStatusBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
+import { UNREACHABLE } from '../../redux/discovery'
+// import { UpdateRobotBanner } from '../UpdateRobotBanner'
 
 interface RobotCardProps {
   robot: DiscoveredRobot
@@ -54,7 +56,10 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
           id={`RobotCard_${name}_robotImage`}
         />
         <Box padding={SPACING.spacing3} width="100%">
-          <RobotStatusBanner name={name} local={local} />
+          {/* TODO: uncomment this when we prevent all nested clicks from triggering a route change * <UpdateRobotBanner robotName={name} marginBottom={SPACING.spacing3} /> */}
+          {robot.status !== UNREACHABLE ? (
+            <RobotStatusBanner name={name} local={local} />
+          ) : null}
           <Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}
@@ -88,8 +93,9 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
               <Flex>
                 {attachedModules.map((module, i) => (
                   <ModuleIcon
-                    key={`${name}_${module.model}_${i}`}
-                    moduleType={module.type}
+                    key={`${name}_${module.moduleModel}_${i}`}
+                    moduleType={module.moduleType}
+                    size={SPACING.spacing4}
                   />
                 ))}
               </Flex>

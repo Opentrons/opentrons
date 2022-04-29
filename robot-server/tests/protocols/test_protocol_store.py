@@ -1,6 +1,6 @@
 """Tests for the ProtocolStore interface."""
 import pytest
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Generator
 
@@ -13,13 +13,12 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
 )
 
-from robot_server.db import opened_db
 from robot_server.protocols.protocol_store import (
-    add_tables_to_db,
     ProtocolStore,
     ProtocolResource,
     ProtocolNotFoundError,
 )
+from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
 
 from sqlalchemy.engine import Engine as SQLEngine
 
@@ -27,9 +26,13 @@ from sqlalchemy.engine import Engine as SQLEngine
 @pytest.fixture
 def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
     """Return a set-up database to back the store."""
-    with opened_db(db_file_path=tmp_path / "test.db") as engine:
-        add_tables_to_db(engine)
-        yield engine
+    db_file_path = tmp_path / "test.db"
+    sql_engine = open_db_no_cleanup(db_file_path=db_file_path)
+    add_tables_to_db(sql_engine)
+    try:
+        yield sql_engine
+    finally:
+        sql_engine.dispose()
 
 
 @pytest.fixture
@@ -43,7 +46,7 @@ def protocol_file_directory(tmp_path: Path) -> Path:
 @pytest.fixture
 def subject(sql_engine: SQLEngine) -> ProtocolStore:
     """Get a ProtocolStore test subject."""
-    return ProtocolStore(sql_engine=sql_engine)
+    return ProtocolStore.create_empty(sql_engine=sql_engine)
 
 
 async def test_insert_and_get_protocol(
@@ -52,7 +55,7 @@ async def test_insert_and_get_protocol(
     """It should store a single protocol."""
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
-        created_at=datetime(year=2021, month=1, day=1),
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         source=ProtocolSource(
             directory=protocol_file_directory,
             main_file=(protocol_file_directory / "abc.json"),
@@ -64,10 +67,13 @@ async def test_insert_and_get_protocol(
         protocol_key="dummy-data-111",
     )
 
+    assert subject.has("protocol-id") is False
+
     subject.insert(protocol_resource)
     result = subject.get("protocol-id")
 
     assert result == protocol_resource
+    assert subject.has("protocol-id") is True
 
 
 async def test_insert_with_duplicate_key_raises(
@@ -76,7 +82,7 @@ async def test_insert_with_duplicate_key_raises(
     """It should raise an error when the given protocol ID is not unique."""
     protocol_resource_1 = ProtocolResource(
         protocol_id="protocol-id",
-        created_at=datetime(year=2021, month=1, day=1),
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         source=ProtocolSource(
             directory=protocol_file_directory,
             main_file=(protocol_file_directory / "abc.json"),
@@ -89,7 +95,7 @@ async def test_insert_with_duplicate_key_raises(
     )
     protocol_resource_2 = ProtocolResource(
         protocol_id="protocol-id",
-        created_at=datetime(year=2022, month=2, day=2),
+        created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
         source=ProtocolSource(
             directory=protocol_file_directory,
             main_file=(protocol_file_directory / "def.json"),
@@ -120,8 +126,8 @@ async def test_get_all_protocols(
     protocol_file_directory: Path, subject: ProtocolStore
 ) -> None:
     """It should get all protocols existing in the store."""
-    created_at_1 = datetime.now()
-    created_at_2 = datetime.now()
+    created_at_1 = datetime(year=2021, month=1, day=1, tzinfo=timezone.utc)
+    created_at_2 = datetime(year=2022, month=2, day=2, tzinfo=timezone.utc)
 
     resource_1 = ProtocolResource(
         protocol_id="abc",
@@ -170,7 +176,7 @@ async def test_remove_protocol(
 
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
-        created_at=datetime(year=2021, month=1, day=1),
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         source=ProtocolSource(
             directory=directory,
             main_file=main_file,

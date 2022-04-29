@@ -3,7 +3,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { simpleAnalysisFileFixture } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
 import { DeckThumbnail } from '../'
-import { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import { RunTimeCommand } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -20,7 +20,7 @@ jest.mock('@opentrons/components', () => {
   }
 })
 
-const analysis = (simpleAnalysisFileFixture as any) as ProtocolAnalysisFile<{}>
+const commands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
 
 const render = (props: React.ComponentProps<typeof DeckThumbnail>) => {
   return renderWithProviders(<DeckThumbnail {...props} />, {
@@ -30,7 +30,7 @@ const render = (props: React.ComponentProps<typeof DeckThumbnail>) => {
 
 describe('DeckThumbnail', () => {
   it('renders loaded equipment from protocol analysis file', () => {
-    const { queryByText } = render({ analysis })
+    const { queryByText } = render({ commands })
     expect(queryByText('mock Module (0,0) magneticModuleV2')).not.toBeFalsy()
     expect(
       queryByText('mock Module (265,0) temperatureModuleV2')

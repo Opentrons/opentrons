@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
 import { hot } from 'react-hot-loader/root'
-import { useSelector } from 'react-redux'
 
 import {
   Flex,
@@ -9,33 +8,99 @@ import {
   POSITION_RELATIVE,
   POSITION_FIXED,
   DIRECTION_ROW,
+  COLORS,
+  OVERFLOW_SCROLL,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { useFeatureFlag } from '../redux/config'
-import { getConnectedRobot } from '../redux/discovery'
 import { GlobalStyle } from '../atoms/GlobalStyle'
 import { Alerts } from '../organisms/Alerts'
 
-import { Robots } from '../pages/Robots'
-import { Upload } from '../pages/Upload'
-import { Run } from '../pages/Run'
-import { More } from '../pages/More'
-
-import { ConnectPanel } from '../pages/Robots/ConnectPanel'
-import { RunPanel } from '../pages/Run/RunPanel'
-import { MorePanel } from '../pages/More/MorePanel'
-
-import { LegacyNavbar } from './LegacyNavbar'
-import { NextGenApp } from './NextGenApp'
+import { Breadcrumbs } from '../molecules/Breadcrumbs'
+import { DeviceDetails } from '../pages/Devices/DeviceDetails'
+import { DevicesLanding } from '../pages/Devices/DevicesLanding'
+import { ProtocolRunDetails } from '../pages/Devices/ProtocolRunDetails'
+import { RobotSettings } from '../pages/Devices/RobotSettings'
+import { usePathCrumbs } from './hooks'
+import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
+import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
+import { AppSettings } from '../organisms/AppSettings'
+import { Labware } from '../organisms/Labware'
+import { Navbar } from './Navbar'
+import { LegacyApp } from './LegacyApp'
 import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
 
-import type { State } from '../redux/types'
+import type { RouteProps } from './types'
+
+export const nextGenRoutes: RouteProps[] = [
+  {
+    component: ProtocolsLanding,
+    exact: true,
+    name: 'Protocols',
+    navLinkTo: '/protocols',
+    path: '/protocols',
+  },
+  {
+    component: ProtocolDetails,
+    exact: true,
+    name: 'Protocol Details',
+    path: '/protocols/:protocolKey',
+  },
+  {
+    component: () => <div>deck setup</div>,
+    name: 'Deck Setup',
+    path: '/protocols/:protocolKey/deck-setup',
+  },
+  {
+    component: Labware,
+    name: 'Labware',
+    navLinkTo: '/labware',
+    // labwareId param is for details slideout
+    path: '/labware/:labwareId?',
+  },
+  {
+    component: DevicesLanding,
+    exact: true,
+    name: 'Devices',
+    navLinkTo: '/devices',
+    path: '/devices',
+  },
+  {
+    component: DeviceDetails,
+    exact: true,
+    name: 'Device Details',
+    path: '/devices/:robotName',
+  },
+  {
+    component: RobotSettings,
+    exact: true,
+    name: 'Robot Settings',
+    path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
+  },
+  {
+    component: () => <div>protocol runs landing</div>,
+    exact: true,
+    name: 'Protocol Runs',
+    path: '/devices/:robotName/protocol-runs',
+  },
+  {
+    component: ProtocolRunDetails,
+    name: 'Run Details',
+    path: '/devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab?',
+  },
+  {
+    component: AppSettings,
+    exact: true,
+    name: 'App Settings',
+    path: '/app-settings/:appSettingsTab?',
+  },
+]
 
 const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
 export const AppComponent = (): JSX.Element => {
-  const isNextGenApp = useFeatureFlag('hierarchyReorganization')
+  const pathCrumbs = usePathCrumbs()
+  const isLegacyApp = useFeatureFlag('hierarchyReorganization')
 
   return (
     <>
@@ -48,46 +113,46 @@ export const AppComponent = (): JSX.Element => {
         onDragOver={stopEvent}
         onDrop={stopEvent}
       >
-        {isNextGenApp ? <NextGenApp /> : <LegacyApp />}
+        {isLegacyApp ? (
+          <LegacyApp />
+        ) : (
+          <>
+            <TopPortalRoot />
+            <Navbar routes={nextGenRoutes} />
+            <Box width="100%">
+              <Breadcrumbs pathCrumbs={pathCrumbs} />
+              <Box
+                position={POSITION_RELATIVE}
+                width="100%"
+                height="100%"
+                backgroundColor={COLORS.background}
+                overflow={OVERFLOW_SCROLL}
+              >
+                <ModalPortalRoot />
+                <Switch>
+                  {nextGenRoutes.map(
+                    ({ component, exact, path }: RouteProps) => {
+                      return (
+                        <Route
+                          key={path}
+                          component={component}
+                          exact={exact}
+                          path={path}
+                        />
+                      )
+                    }
+                  )}
+                  <Redirect exact from="/" to="/protocols" />
+                  {/* this redirect from /robots is necessary because the existing app <Redirect /> to /robots renders before feature flags load */}
+                  <Redirect from="/robots" to="/devices" />
+                </Switch>
+                <Alerts />
+              </Box>
+            </Box>
+          </>
+        )}
       </Flex>
     </>
-  )
-}
-
-function LegacyApp(): JSX.Element {
-  const connectedRobot = useSelector((state: State) => getConnectedRobot(state))
-
-  return (
-    <ApiHostProvider hostname={connectedRobot?.ip ?? null}>
-      <LegacyNavbar />
-      <Switch>
-        <Route path="/robots/:name?" component={ConnectPanel} />
-        <Route path="/more" component={MorePanel} />
-        <Route path="/run" component={RunPanel} />
-      </Switch>
-      <TopPortalRoot />
-      <Box position={POSITION_RELATIVE} width="100%" height="100%">
-        <ModalPortalRoot />
-        <Switch>
-          <Route path="/robots/:name?">
-            <Robots />
-          </Route>
-          <Route path="/more">
-            <More />
-          </Route>
-          <Route path="/upload">
-            <Upload />
-          </Route>
-          <Route path="/run">
-            <Run />
-          </Route>
-          <Redirect exact from="/" to="/robots" />
-          {/* redirect after next gen app feature flag toggle */}
-          <Redirect exact from="/app-settings/feature-flags" to="/more" />
-        </Switch>
-        <Alerts />
-      </Box>
-    </ApiHostProvider>
   )
 }
 

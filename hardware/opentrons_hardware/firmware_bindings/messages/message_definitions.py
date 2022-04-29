@@ -94,20 +94,22 @@ class SetupRequest(EmptyPayloadMessage):  # noqa: D101
 
 @dataclass
 class WriteToEEPromRequest:  # noqa: D101
-    payload: payloads.WriteToEEPromRequestPayload
-    payload_type: Type[BinarySerializable] = payloads.WriteToEEPromRequestPayload
+    payload: payloads.EEProDataPayload
+    payload_type: Type[BinarySerializable] = payloads.EEProDataPayload
     message_id: Literal[MessageId.write_eeprom] = MessageId.write_eeprom
 
 
 @dataclass
-class ReadFromEEPromRequest(EmptyPayloadMessage):  # noqa: D101
+class ReadFromEEPromRequest:  # noqa: D101
+    payload: payloads.EEPromReadPayload
+    payload_type: Type[BinarySerializable] = payloads.EEPromReadPayload
     message_id: Literal[MessageId.read_eeprom_request] = MessageId.read_eeprom_request
 
 
 @dataclass
 class ReadFromEEPromResponse:  # noqa: D101
-    payload: payloads.ReadFromEEPromResponsePayload
-    payload_type: Type[BinarySerializable] = payloads.ReadFromEEPromResponsePayload
+    payload: payloads.EEProDataPayload
+    payload_type: Type[BinarySerializable] = payloads.EEProDataPayload
     message_id: Literal[MessageId.read_eeprom_response] = MessageId.read_eeprom_response
 
 
@@ -469,3 +471,35 @@ class BindSensorOutputResponse:  # noqa: D101
     message_id: Literal[
         MessageId.bind_sensor_output_response
     ] = MessageId.bind_sensor_output_response
+
+
+@dataclass
+class GripperInfoRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[MessageId.gripper_info_request] = MessageId.gripper_info_request
+
+
+@dataclass
+class GripperInfoResponse:  # noqa: D101
+    payload: payloads.GripperInfoResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.GripperInfoResponsePayload
+    message_id: Literal[
+        MessageId.gripper_info_response
+    ] = MessageId.gripper_info_response
+
+
+@dataclass
+class TipActionRequest:  # noqa: D101
+    payload: payloads.TipActionRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.TipActionRequestPayload
+    message_id: Literal[
+        MessageId.do_self_contained_tip_action_request
+    ] = MessageId.do_self_contained_tip_action_request
+
+
+@dataclass
+class TipActionResponse:  # noqa: D101
+    payload: payloads.TipActionResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.TipActionResponsePayload
+    message_id: Literal[
+        MessageId.do_self_contained_tip_action_response
+    ] = MessageId.do_self_contained_tip_action_response

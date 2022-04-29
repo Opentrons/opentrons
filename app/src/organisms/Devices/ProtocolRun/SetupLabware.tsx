@@ -174,6 +174,7 @@ export function SetupLabware({
       {showLabwarePositionCheckModal && (
         <LabwarePositionCheck
           onCloseClick={() => setShowLabwarePositionCheckModal(false)}
+          runId={runId}
         />
       )}
       {downloadOffsetDataModal && (
@@ -229,6 +230,7 @@ export function SetupLabware({
                             definition={nestedLabwareDef}
                             labwareId={nestedLabwareId}
                             displayName={nestedLabwareDisplayName}
+                            runId={runId}
                           />
                         </React.Fragment>
                       ) : null}
@@ -248,6 +250,7 @@ export function SetupLabware({
                             definition={labwareDef}
                             labwareId={labwareId}
                             displayName={displayName}
+                            runId={runId}
                           />
                         </g>
                       </React.Fragment>

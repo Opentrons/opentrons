@@ -108,18 +108,18 @@ describe('RobotCalibration', () => {
       })
     ).toBeTruthy()
     expect(
-      getByRole('button', { name: 'Proceed to Module Setup' })
+      getByRole('button', { name: 'Proceed to module setup' })
     ).toBeTruthy()
   })
   it('changes Proceed CTA copy based on next step', () => {
     const { getByRole } = render({ nextStep: 'labware_setup_step' })[0]
     expect(
-      getByRole('button', { name: 'Proceed to Labware Setup' })
+      getByRole('button', { name: 'Proceed to labware setup' })
     ).toBeTruthy()
   })
   it('calls the expandStep function and tracks the analytics event on click', () => {
     const { getByRole } = render()[0]
-    fireEvent.click(getByRole('button', { name: 'Proceed to Module Setup' }))
+    fireEvent.click(getByRole('button', { name: 'Proceed to module setup' }))
     expect(mockExpandStep).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'proceed_to_module_setup_step',
@@ -128,7 +128,7 @@ describe('RobotCalibration', () => {
   })
   it('does not the expandStep function on click if button is disabled', () => {
     const { getByRole } = render({ calibrationStatus: { complete: false } })[0]
-    fireEvent.click(getByRole('button', { name: 'Proceed to Module Setup' }))
+    fireEvent.click(getByRole('button', { name: 'Proceed to module setup' }))
     expect(mockExpandStep).not.toHaveBeenCalled()
   })
 })

@@ -464,6 +464,16 @@ def test_command_store_handles_finish_action() -> None:
     )
 
 
+def test_command_store_handles_finish_action_with_stopped() -> None:
+    """It should change to a stopped state if FinishAction has set_run_status=False."""
+    subject = CommandStore()
+
+    subject.handle_action(PlayAction())
+    subject.handle_action(FinishAction(set_run_status=False))
+
+    assert subject.state.run_result == RunResult.STOPPED
+
+
 def test_command_store_handles_stop_action() -> None:
     """It should mark the engine as non-gracefully stopped on StopAction."""
     subject = CommandStore()

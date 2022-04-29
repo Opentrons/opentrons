@@ -1,4 +1,4 @@
-from asyncio import Event
+import asyncio
 from mock import call, MagicMock
 
 import pytest
@@ -216,13 +216,11 @@ def test_identify(api_client, hardware):
         [control.post_move_robot, None],
     ],
 )
-async def test_concurrent_motion_fails(
-    hardware, loop, blocking_call, blocking_call_data
-):
+async def test_concurrent_motion_fails(hardware, blocking_call, blocking_call_data):
     """A test that while a HOME or MOVE is happening, other HOME and MOVE
     requests will fail."""
-
-    event = Event()
+    loop = asyncio.get_running_loop()
+    event = asyncio.Event()
 
     # A wait that will happen within motion lock
     async def wait_on_event(*args, **kwargs):

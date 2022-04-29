@@ -135,7 +135,7 @@ describe('getDefaultsForStepType', () => {
     it('should get the correct defaults', () => {
       expect(getDefaultsForStepType('heaterShaker')).toEqual({
         moduleId: null,
-        setTemperature: null,
+        setHeaterShakerTemperature: null,
         targetHeaterShakerTemperature: null,
         setShake: null,
         targetSpeed: null,

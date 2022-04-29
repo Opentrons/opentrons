@@ -57,7 +57,7 @@ jobs:
           path: |
             ${{ github.workspace }}/.yarn-cache
             ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'

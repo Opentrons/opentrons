@@ -1,8 +1,9 @@
-# coding=utf-8
+from __future__ import annotations
 import io
 import os
-from pathlib import Path
 import mock
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Callable, TextIO, cast
 
 import pytest
 
@@ -12,14 +13,21 @@ from opentrons.hardware_control import Controller, api
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.config.pipette_config import load
 
+if TYPE_CHECKING:
+    from tests.opentrons.conftest import Bundle, Protocol
+
+
 HERE = Path(__file__).parent
 
 
 @pytest.fixture
-def mock_get_attached_instr(monkeypatch, virtual_smoothie_env):
+def mock_get_attached_instr(
+    monkeypatch: pytest.MonkeyPatch,
+    virtual_smoothie_env: None,
+) -> mock.AsyncMock:
     gai_mock = mock.AsyncMock()
 
-    async def dummy_delay(self, duration_s):
+    async def dummy_delay(self: Any, duration_s: float) -> None:
         pass
 
     monkeypatch.setattr(Controller, "get_attached_instruments", gai_mock)
@@ -33,8 +41,12 @@ def mock_get_attached_instr(monkeypatch, virtual_smoothie_env):
 
 @pytest.mark.parametrize("protocol_file", ["testosaur_v2.py"])
 def test_execute_function_apiv2(
-    protocol, protocol_file, monkeypatch, virtual_smoothie_env, mock_get_attached_instr
-):
+    protocol: Protocol,
+    protocol_file: str,
+    monkeypatch: pytest.MonkeyPatch,
+    virtual_smoothie_env: None,
+    mock_get_attached_instr: mock.AsyncMock,
+) -> None:
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
         "config": load(PipetteModel("p10_single_v1.5")),
@@ -46,7 +58,7 @@ def test_execute_function_apiv2(
     }
     entries = []
 
-    def emit_runlog(entry):
+    def emit_runlog(entry: Any) -> None:
         nonlocal entries
         entries.append(entry)
 
@@ -60,13 +72,15 @@ def test_execute_function_apiv2(
 
 
 def test_execute_function_json_v3_apiv2(
-    get_json_protocol_fixture, virtual_smoothie_env, mock_get_attached_instr
-):
+    get_json_protocol_fixture: Callable[[str, str, bool], str],
+    virtual_smoothie_env: None,
+    mock_get_attached_instr: mock.AsyncMock,
+) -> None:
     jp = get_json_protocol_fixture("3", "simple", False)
     filelike = io.StringIO(jp)
     entries = []
 
-    def emit_runlog(entry):
+    def emit_runlog(entry: Any) -> None:
         nonlocal entries
         entries.append(entry)
 
@@ -88,13 +102,15 @@ def test_execute_function_json_v3_apiv2(
 
 
 def test_execute_function_json_v4_apiv2(
-    get_json_protocol_fixture, virtual_smoothie_env, mock_get_attached_instr
-):
+    get_json_protocol_fixture: Callable[[str, str, bool], str],
+    virtual_smoothie_env: None,
+    mock_get_attached_instr: mock.AsyncMock,
+) -> None:
     jp = get_json_protocol_fixture("4", "simpleV4", False)
     filelike = io.StringIO(jp)
     entries = []
 
-    def emit_runlog(entry):
+    def emit_runlog(entry: Any) -> None:
         nonlocal entries
         entries.append(entry)
 
@@ -116,13 +132,15 @@ def test_execute_function_json_v4_apiv2(
 
 
 def test_execute_function_json_v5_apiv2(
-    get_json_protocol_fixture, virtual_smoothie_env, mock_get_attached_instr
-):
+    get_json_protocol_fixture: Callable[[str, str, bool], str],
+    virtual_smoothie_env: None,
+    mock_get_attached_instr: mock.AsyncMock,
+) -> None:
     jp = get_json_protocol_fixture("5", "simpleV5", False)
     filelike = io.StringIO(jp)
     entries = []
 
-    def emit_runlog(entry):
+    def emit_runlog(entry: Any) -> None:
         nonlocal entries
         entries.append(entry)
 
@@ -146,12 +164,14 @@ def test_execute_function_json_v5_apiv2(
 
 
 def test_execute_function_bundle_apiv2(
-    get_bundle_fixture, virtual_smoothie_env, mock_get_attached_instr
-):
+    get_bundle_fixture: Callable[[str], Bundle],
+    virtual_smoothie_env: None,
+    mock_get_attached_instr: mock.AsyncMock,
+) -> None:
     bundle = get_bundle_fixture("simple_bundle")
     entries = []
 
-    def emit_runlog(entry):
+    def emit_runlog(entry: Any) -> None:
         nonlocal entries
         entries.append(entry)
 
@@ -159,7 +179,11 @@ def test_execute_function_bundle_apiv2(
         "config": load(PipetteModel("p10_single_v1.5")),
         "id": "testid",
     }
-    execute.execute(bundle["filelike"], "simple_bundle.zip", emit_runlog=emit_runlog)
+    execute.execute(
+        cast(TextIO, bundle["filelike"]),
+        "simple_bundle.zip",
+        emit_runlog=emit_runlog,
+    )
     assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
         "Transferring 1.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",  # noqa: E501
         "Picking up tip from A1 of Opentrons 96 Tip Rack 10 µL on 3",
@@ -181,14 +205,18 @@ def test_execute_function_bundle_apiv2(
 
 @pytest.mark.parametrize("protocol_file", ["python_v2_custom_lw.py"])
 def test_execute_extra_labware(
-    protocol, protocol_file, monkeypatch, virtual_smoothie_env, mock_get_attached_instr
-):
+    protocol: Protocol,
+    protocol_file: str,
+    monkeypatch: pytest.MonkeyPatch,
+    virtual_smoothie_env: None,
+    mock_get_attached_instr: mock.AsyncMock,
+) -> None:
     fixturedir = (
         HERE / ".." / ".." / ".." / "shared-data" / "labware" / "fixtures" / "2"
     )
     entries = []
 
-    def emit_runlog(entry):
+    def emit_runlog(entry: Any) -> None:
         nonlocal entries
         entries.append(entry)
 

@@ -158,25 +158,25 @@ const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
 } as ProtocolModuleInfo
 
 const mockMovingHeaterShaker = {
-  model: 'heaterShakerModuleV1',
-  type: 'heaterShakerModuleType',
-  port: '/dev/ot_module_thermocycler0',
-  serial: 'jkl123',
-  revision: 'heatershaker_v4.0',
-  fwVersion: 'v2.0.0',
-  status: 'idle',
+  id: 'heatershaker_id',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
   hasAvailableUpdate: true,
   data: {
     labwareLatchStatus: 'idle_closed',
     speedStatus: 'speeding up',
     temperatureStatus: 'idle',
     currentSpeed: null,
-    currentTemp: null,
+    currentTemperature: null,
     targetSpeed: null,
     targetTemp: null,
     errorDetails: null,
+    status: 'idle',
   },
-  usbPort: { hub: 1, port: 1 },
+  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
 } as any
 
 const render = () => {
@@ -192,10 +192,13 @@ const render = () => {
   )
 }
 let mockTrackEvent: jest.Mock
+let mockCloseCurrentRun: jest.Mock
 
 describe('ProtocolRunHeader', () => {
   beforeEach(() => {
     mockTrackEvent = jest.fn()
+    mockCloseCurrentRun = jest.fn()
+
     when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
     mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
     mockMockHeaterShakerIsRunningModal.mockReturnValue(
@@ -209,7 +212,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID)
     when(mockUseCloseCurrentRun).calledWith().mockReturnValue({
       isClosingCurrentRun: false,
-      closeCurrentRun: jest.fn(),
+      closeCurrentRun: mockCloseCurrentRun,
     })
     when(mockUseRunControls)
       .calledWith(RUN_ID, expect.anything())
@@ -255,7 +258,7 @@ describe('ProtocolRunHeader', () => {
     const [{ getByText }] = render()
 
     getByText('A Protocol for Otie')
-    getByText('Run Record ID')
+    getByText('Run ID')
     getByText(formatTimestamp(mockIdleUnstartedRun.createdAt))
     getByText('Status')
     getByText('Not started')
@@ -271,13 +274,15 @@ describe('ProtocolRunHeader', () => {
     )
   })
 
-  it('renders a start run button when run is ready to start and not protocol start/end', () => {
+  it('renders a start run button and clear protocol button when run is ready to start', () => {
     const [{ getByRole, queryByText }] = render()
 
-    getByRole('button', { name: 'Start Run' })
+    getByRole('button', { name: 'Start run' })
     expect(queryByText(formatTimestamp(STARTED_AT))).toBeFalsy()
     expect(queryByText('Protocol start')).toBeFalsy()
     expect(queryByText('Protocol end')).toBeFalsy()
+    getByRole('button', { name: 'Clear protocol' }).click()
+    expect(mockCloseCurrentRun).toBeCalled()
   })
 
   it('disables the Start Run button with tooltip if calibration is incomplete', () => {
@@ -287,7 +292,7 @@ describe('ProtocolRunHeader', () => {
 
     const [{ getByRole, getByText }] = render()
 
-    const button = getByRole('button', { name: 'Start Run' })
+    const button = getByRole('button', { name: 'Start run' })
     expect(button).toBeDisabled()
     getByText('Complete required steps in Setup tab')
   })
@@ -301,7 +306,7 @@ describe('ProtocolRunHeader', () => {
       })
 
     const [{ getByRole, getByText }] = render()
-    const button = getByRole('button', { name: 'Start Run' })
+    const button = getByRole('button', { name: 'Start run' })
     expect(button).toBeDisabled()
     getByText('Complete required steps in Setup tab')
   })
@@ -317,10 +322,11 @@ describe('ProtocolRunHeader', () => {
       .mockReturnValue(RUN_STATUS_RUNNING)
     const [{ getByRole, getByText }] = render()
 
-    getByRole('button', { name: 'Pause Run' })
+    getByRole('button', { name: 'Pause run' })
     getByText(formatTimestamp(STARTED_AT))
     getByText('Protocol start')
     getByText('Protocol end')
+    expect(getByRole('button', { name: 'Clear protocol' })).toBeDisabled()
   })
 
   it('renders a cancel run button when running and shows a confirm cancel modal when clicked', () => {
@@ -335,7 +341,7 @@ describe('ProtocolRunHeader', () => {
     const [{ getByText, queryByText }] = render()
 
     expect(queryByText('Mock ConfirmCancelModal')).toBeFalsy()
-    const cancelButton = getByText('Cancel Run')
+    const cancelButton = getByText('Cancel run')
     cancelButton.click()
     getByText('Mock ConfirmCancelModal')
   })
@@ -350,8 +356,8 @@ describe('ProtocolRunHeader', () => {
 
     const [{ getByRole, getByText }] = render()
 
-    getByRole('button', { name: 'Resume Run' })
-    getByRole('button', { name: 'Cancel Run' })
+    getByRole('button', { name: 'Resume run' })
+    getByRole('button', { name: 'Cancel run' })
     getByText('Paused')
   })
 
@@ -367,9 +373,9 @@ describe('ProtocolRunHeader', () => {
 
     const [{ getByRole, getByText }] = render()
 
-    const button = getByRole('button', { name: 'Resume Run' })
+    const button = getByRole('button', { name: 'Resume run' })
     expect(button).toBeDisabled()
-    getByRole('button', { name: 'Cancel Run' })
+    getByRole('button', { name: 'Cancel run' })
     getByText('Pause requested')
   })
 
@@ -406,11 +412,13 @@ describe('ProtocolRunHeader', () => {
       completedAt: COMPLETED_AT,
     })
 
-    const [{ getByText }] = render()
+    const [{ getByRole, getByText }] = render()
 
-    getByText('Run Again')
+    getByText('Run again')
     getByText('Canceled')
     getByText(formatTimestamp(COMPLETED_AT))
+    getByRole('button', { name: 'Clear protocol' }).click()
+    expect(mockCloseCurrentRun).toBeCalled()
   })
 
   it('renders a Run Again button and end time when run has failed', () => {
@@ -427,11 +435,13 @@ describe('ProtocolRunHeader', () => {
       completedAt: COMPLETED_AT,
     })
 
-    const [{ getByText }] = render()
+    const [{ getByRole, getByText }] = render()
 
-    getByText('Run Again')
+    getByText('Run again')
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
+    getByRole('button', { name: 'Clear protocol' }).click()
+    expect(mockCloseCurrentRun).toBeCalled()
   })
 
   it('renders a Run Again button and end time when run has succeeded', () => {
@@ -450,11 +460,13 @@ describe('ProtocolRunHeader', () => {
       completedAt: COMPLETED_AT,
     })
 
-    const [{ getByText }] = render()
+    const [{ getByRole, getByText }] = render()
 
-    getByText('Run Again')
+    getByText('Run again')
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
+    getByRole('button', { name: 'Clear protocol' }).click()
+    expect(mockCloseCurrentRun).toBeCalled()
   })
 
   it('disables the Run Again button with tooltip for a completed run if the robot is busy', () => {
@@ -476,7 +488,7 @@ describe('ProtocolRunHeader', () => {
 
     const [{ getByRole, getByText }] = render()
 
-    const button = getByRole('button', { name: 'Run Again' })
+    const button = getByRole('button', { name: 'Run again' })
     expect(button).toBeDisabled()
     getByText('Robot is busy')
   })
@@ -490,17 +502,41 @@ describe('ProtocolRunHeader', () => {
     getByText('Close robot door to resume run')
   })
 
-  it('renders an alert when run has failed', () => {
+  it('renders a clear protocol banner when run has failed', () => {
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_FAILED)
-    const [{ getByText }] = render()
+    const [{ getByRole, getByText }] = render()
 
-    getByText('Protocol run failed')
+    getByText('Run failed. Clear protocol from robot to make it available.')
+    getByRole('link', { name: 'Clear protocol' }).click()
+    expect(mockCloseCurrentRun).toBeCalled()
   })
 
-  it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsShakingModal', () => {
+  it('renders a clear protocol banner when run has been canceled', () => {
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_STOPPED)
+    const [{ getByRole, getByText }] = render()
+
+    getByText('Run canceled. Clear protocol from robot to make it available.')
+    getByRole('link', { name: 'Clear protocol' }).click()
+    expect(mockCloseCurrentRun).toBeCalled()
+  })
+
+  it('renders a clear protocol banner when run has succeeded', () => {
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_SUCCEEDED)
+    const [{ getByRole, getByText }] = render()
+
+    getByText('Run completed. Clear protocol from robot to make it available.')
+    getByRole('link', { name: 'Clear protocol' }).click()
+    expect(mockCloseCurrentRun).toBeCalled()
+  })
+
+  it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', () => {
     mockUseAttachedModules.mockReturnValue([mockMovingHeaterShaker])
     const [{ getByRole, getByText }] = render()
-    const button = getByRole('button', { name: 'Start Run' })
+    const button = getByRole('button', { name: 'Start run' })
     fireEvent.click(button)
     getByText('Mock HeaterShakerIsRunningModal')
   })
@@ -512,7 +548,7 @@ describe('ProtocolRunHeader', () => {
     )
     const [{ getByText, getByRole }] = render()
 
-    const button = getByRole('button', { name: 'Start Run' })
+    const button = getByRole('button', { name: 'Start run' })
     fireEvent.click(button)
     getByText('mock confirm attachment modal')
   })

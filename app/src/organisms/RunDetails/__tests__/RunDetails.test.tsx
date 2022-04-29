@@ -26,7 +26,6 @@ import {
   useCurrentRunControls,
   useRunControls,
 } from '../../RunTimeControl/hooks'
-import { ProtocolLoader } from '../../ProtocolUpload'
 import {
   useCloseCurrentRun,
   useCurrentRunId,
@@ -153,7 +152,7 @@ describe('RunDetails', () => {
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_RUNNING)
     const { getByRole, getByText } = render()
-    const button = getByRole('button', { name: 'Cancel Run' })
+    const button = getByRole('button', { name: 'Cancel run' })
     fireEvent.click(button)
     expect(button).toBeTruthy()
     expect(getByText('Are you sure you want to cancel this run?')).toBeTruthy()
@@ -176,7 +175,7 @@ describe('RunDetails', () => {
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_FINISHING)
     const { getByRole } = render()
-    const button = getByRole('button', { name: 'Cancel Run' })
+    const button = getByRole('button', { name: 'Cancel run' })
     expect(button).toBeEnabled()
   })
 
@@ -185,7 +184,7 @@ describe('RunDetails', () => {
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_PAUSED)
     const { getByRole } = render()
-    const button = getByRole('button', { name: 'Cancel Run' })
+    const button = getByRole('button', { name: 'Cancel run' })
     expect(button).toBeEnabled()
   })
 
@@ -194,7 +193,7 @@ describe('RunDetails', () => {
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
     const { getByRole } = render()
-    const button = getByRole('button', { name: 'Cancel Run' })
+    const button = getByRole('button', { name: 'Cancel run' })
     expect(button).toBeEnabled()
   })
 
@@ -203,7 +202,7 @@ describe('RunDetails', () => {
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     const { getByRole } = render()
-    const button = getByRole('button', { name: 'Cancel Run' })
+    const button = getByRole('button', { name: 'Cancel run' })
     expect(button).toBeEnabled()
   })
 
@@ -259,31 +258,5 @@ describe('RunDetails', () => {
     const { queryByRole } = render()
     const button = queryByRole('button', { name: 'close' })
     expect(button).not.toBeInTheDocument()
-  })
-
-  const renderProtocolLoader = (
-    props: React.ComponentProps<typeof ProtocolLoader>
-  ) => {
-    return renderWithProviders(<ProtocolLoader {...props} />)[0]
-  }
-
-  let props: React.ComponentProps<typeof ProtocolLoader>
-  beforeEach(() => {
-    props = { loadingText: 'Loading Protocol' }
-  })
-
-  it('renders a loader if protocol run is not loaded', () => {
-    when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(false)
-    const { getByText } = renderProtocolLoader(props)
-    getByText('Loading Protocol')
-  })
-
-  it('renders a loader if closing current run', () => {
-    when(mockUseCloseCurrentRun).calledWith().mockReturnValue({
-      closeCurrentRun: jest.fn(),
-      isClosingCurrentRun: true,
-    })
-    const { getByText } = renderProtocolLoader(props)
-    getByText('Loading Protocol')
   })
 })

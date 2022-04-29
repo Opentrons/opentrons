@@ -95,13 +95,13 @@ describe('SetupRobotCalibration', () => {
   it('changes Proceed CTA copy based on next step', () => {
     const { getByRole } = render({ nextStep: 'labware_setup_step' })[0]
 
-    getByRole('button', { name: 'Proceed to Labware Setup' })
+    getByRole('button', { name: 'Proceed to labware setup' })
   })
 
   it('calls the expandStep function and tracks the analytics event on click', () => {
     const { getByRole } = render()[0]
 
-    fireEvent.click(getByRole('button', { name: 'Proceed to Module Setup' }))
+    fireEvent.click(getByRole('button', { name: 'Proceed to module setup' }))
     expect(mockExpandStep).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'proceed_to_module_setup_step',
@@ -112,7 +112,7 @@ describe('SetupRobotCalibration', () => {
   it('does not call the expandStep function on click if calibration is not complete', () => {
     const { getByRole } = render({ calibrationStatus: { complete: false } })[0]
 
-    fireEvent.click(getByRole('button', { name: 'Proceed to Module Setup' }))
+    fireEvent.click(getByRole('button', { name: 'Proceed to module setup' }))
     expect(mockExpandStep).not.toHaveBeenCalled()
   })
 })

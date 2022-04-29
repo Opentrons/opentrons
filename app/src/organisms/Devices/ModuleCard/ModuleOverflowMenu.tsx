@@ -1,13 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Flex,
-  POSITION_RELATIVE,
-  Tooltip,
-  useHoverTooltip,
-} from '@opentrons/components'
+import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
 import { MenuList } from '../../../atoms/MenuList'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { MenuItemsByModuleType, useModuleOverflowMenu } from './hooks'
 
 import type { AttachedModule } from '../../../redux/modules/types'
@@ -47,16 +43,16 @@ export const ModuleOverflowMenu = (
         <MenuList
           buttons={[
             (menuOverflowItemsByModuleType[
-              module.type
+              module.moduleType
             ] as MenuItemsByModuleType[ModuleType]).map(
               (item: any, index: number) => {
                 return (
                   <>
                     <MenuItem
                       minWidth="10.6rem"
-                      key={`${index}_${module.model}`}
+                      key={`${index}_${module.moduleModel}`}
                       onClick={() => item.onClick(item.isSecondary)}
-                      data-testid={`module_setting_${module.model}`}
+                      data-testid={`module_setting_${module.moduleModel}`}
                       disabled={item.disabledReason}
                       {...targetProps}
                     >
@@ -64,8 +60,8 @@ export const ModuleOverflowMenu = (
                     </MenuItem>
                     {item.disabledReason && (
                       <Tooltip
-                        {...tooltipProps}
-                        key={`tooltip_${index}_${module.model}`}
+                        tooltipProps={tooltipProps}
+                        key={`tooltip_${index}_${module.moduleModel}`}
                       >
                         {t('cannot_shake', { ns: 'heater_shaker' })}
                       </Tooltip>

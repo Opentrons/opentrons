@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
+import { css } from 'styled-components'
 import {
   Flex,
   Box,
   Link,
   Icon,
-  Text,
   DropdownField,
   RadioGroup,
   SPACING_AUTO,
@@ -16,8 +16,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
-  BORDER_STYLE_SOLID,
-  BORDERS,
+  TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
 import * as Config from '../../redux/config'
 import * as Calibration from '../../redux/calibration'
@@ -31,6 +30,7 @@ import {
 import { Divider } from '../../atoms/structure'
 import { TertiaryButton, ToggleButton } from '../../atoms/Buttons'
 import { StyledText } from '../../atoms/text'
+import { Banner } from '../../atoms/Banner'
 
 import type { Dispatch, State } from '../../redux/types'
 import type { DropdownOption } from '@opentrons/components'
@@ -104,16 +104,16 @@ export function AdvancedSettings(): JSX.Element {
           gridGap={SPACING.spacing4}
         >
           <Box width="70%">
-            <Text
+            <StyledText
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_updatedChannel"
             >
               {t('update_channel')}
-            </Text>
-            <Text css={TYPOGRAPHY.pRegular} paddingBottom={SPACING.spacing3}>
+            </StyledText>
+            <StyledText as="p" paddingBottom={SPACING.spacing3}>
               {t('update_description')}
-            </Text>
+            </StyledText>
           </Box>
           <Box width="10rem">
             <DropdownField
@@ -127,24 +127,24 @@ export function AdvancedSettings(): JSX.Element {
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
-            <Text
+            <StyledText
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_customLabware"
             >
               {t('additional_labware_folder_title')}
-            </Text>
-            <Text css={TYPOGRAPHY.pRegular} paddingBottom={SPACING.spacing3}>
+            </StyledText>
+            <StyledText as="p" paddingBottom={SPACING.spacing3}>
               {t('additional_folder_description')}
-            </Text>
-            <Text
-              css={TYPOGRAPHY.h6Default}
+            </StyledText>
+            <StyledText
+              as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
               color={COLORS.darkGreyEnabled}
               paddingBottom={SPACING.spacing2}
             >
               {t('additional_folder_location')}
-            </Text>
+            </StyledText>
             {labwarePath !== '' ? (
               <Link
                 css={TYPOGRAPHY.pRegular}
@@ -157,14 +157,13 @@ export function AdvancedSettings(): JSX.Element {
               >
                 {labwarePath}
                 <Icon
-                  width={SPACING.spacing3}
-                  height={SPACING.spacing3}
+                  height="0.75rem"
                   marginLeft={SPACING.spacing3}
                   name="open-in-new"
                 />
               </Link>
             ) : (
-              <Text css={TYPOGRAPHY.pRegular}>{t('no_folder')}</Text>
+              <StyledText as="p">{t('no_folder')}</StyledText>
             )}
           </Box>
           {
@@ -183,15 +182,19 @@ export function AdvancedSettings(): JSX.Element {
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Box>
-          <Text
+          <StyledText
             css={TYPOGRAPHY.h3SemiBold}
             paddingBottom={SPACING.spacing3}
             id="AdvancedSettings_tipLengthCalibration"
           >
-            {t('tip_length_cal_methold')}
-          </Text>
+            {t('tip_length_cal_method')}
+          </StyledText>
           <RadioGroup
-            css={TYPOGRAPHY.pRegular}
+            useBlueChecked
+            css={css`
+              ${TYPOGRAPHY.pRegular}
+              line-height: ${TYPOGRAPHY.lineHeight20};
+            `}
             value={
               useTrashSurfaceForTipCal === true
                 ? ALWAYS_TRASH
@@ -218,16 +221,16 @@ export function AdvancedSettings(): JSX.Element {
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
-            <Text
+            <StyledText
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_unavailableRobots"
             >
               {t('display_unavail_robots')}
-            </Text>
-            <Text css={TYPOGRAPHY.pRegular}>
+            </StyledText>
+            <StyledText as="p">
               {t('display_unavail_robots_description')}
-            </Text>
+            </StyledText>
           </Box>
           <ToggleButton
             label="display_unavailable_robots"
@@ -242,7 +245,6 @@ export function AdvancedSettings(): JSX.Element {
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box>
             <StyledText
-              as="h3"
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_u2eInformation"
@@ -253,23 +255,8 @@ export function AdvancedSettings(): JSX.Element {
               {t('usb_to_ethernet_adapter_info_description')}
             </StyledText>
             {driverOutdated && (
-              <Flex
-                backgroundColor={COLORS.warningBg}
-                paddingTop={SPACING.spacing3}
-                paddingBottom={SPACING.spacing3}
-                marginTop={SPACING.spacing4}
-                borderColor={COLORS.warning}
-                border={BORDER_STYLE_SOLID}
-                borderRadius={BORDERS.radiusSoftCorners}
-              >
-                <Flex flexDirection="row">
-                  <Icon
-                    name="alert-circle"
-                    color={COLORS.warning}
-                    width={SPACING.spacing4}
-                    marginLeft={SPACING.spacing3}
-                    marginRight={SPACING.spacing3}
-                  />
+              <Banner type="warning">
+                <Flex>
                   <StyledText as="p" color={COLORS.darkBlack}>
                     {t('usb_to_ethernet_adapter_toast_message')}
                   </StyledText>
@@ -279,14 +266,14 @@ export function AdvancedSettings(): JSX.Element {
                     css={TYPOGRAPHY.pRegular}
                     color={COLORS.darkBlack}
                     position="absolute"
-                    right={SPACING.spacingXL}
-                    textDecoration="underline"
+                    right={SPACING.spacing7}
+                    textDecoration={TEXT_DECORATION_UNDERLINE}
                     id="AdvancedSettings_realtekLink"
                   >
                     {t('usb_to_ethernet_adapter_link')}
                   </Link>
                 </Flex>
-              </Flex>
+              </Banner>
             )}
             {device === null ? (
               <StyledText as="p" marginTop={SPACING.spacing4}>
@@ -336,7 +323,6 @@ export function AdvancedSettings(): JSX.Element {
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
             <StyledText
-              as="h3"
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_showLink"
@@ -357,16 +343,14 @@ export function AdvancedSettings(): JSX.Element {
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
-            <Text
+            <StyledText
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_clearRobots"
             >
               {t('clear_unavail_robots')}
-            </Text>
-            <Text css={TYPOGRAPHY.pRegular}>
-              {t('clear_robots_description')}
-            </Text>
+            </StyledText>
+            <StyledText as="p">{t('clear_robots_description')}</StyledText>
           </Box>
           <TertiaryButton
             marginLeft={SPACING_AUTO}
@@ -379,16 +363,14 @@ export function AdvancedSettings(): JSX.Element {
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
-            <Text
+            <StyledText
               css={TYPOGRAPHY.h3SemiBold}
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_devTools"
             >
               {t('enable_dev_tools')}
-            </Text>
-            <Text css={TYPOGRAPHY.pRegular}>
-              {t('enable_dev_tools_description')}
-            </Text>
+            </StyledText>
+            <StyledText as="p">{t('enable_dev_tools_description')}</StyledText>
           </Box>
           <ToggleButton
             label="enable_dev_tools"

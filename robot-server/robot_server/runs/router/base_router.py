@@ -31,7 +31,6 @@ from robot_server.protocols import (
 )
 
 from ..run_store import RunStore, RunResource, RunNotFoundError
-from ..run_view import RunView
 from ..run_models import Run, RunSummary, RunCreate, RunUpdate
 from ..engine_store import EngineStore, EngineConflictError
 from ..dependencies import get_run_store, get_engine_store
@@ -115,7 +114,7 @@ async def get_run_data_from_url(
     )
 
 
-@base_router.post(
+@base_router.post(  # noqa: C901
     path="/runs",
     summary="Create a run",
     description="Create a new run to track robot interaction.",
@@ -174,8 +173,11 @@ async def create_run(
         is_current=True,
         actions=[],
     )
+    try:
+        run_store.insert(run=run)
+    except ProtocolNotFoundError as e:
+        raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    run_store.upsert(run=run)
     log.info(f'Created protocol run "{run_id}" from protocol "{protocol_id}".')
 
     data = Run.construct(
@@ -315,7 +317,6 @@ async def remove_run(
 async def update_run(
     runId: str,
     request_body: RequestModel[RunUpdate],
-    run_view: RunView = Depends(RunView),
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
 ) -> PydanticResponse[SimpleBody[Run]]:
@@ -324,7 +325,6 @@ async def update_run(
     Args:
         runId: Run ID pulled from URL.
         request_body: Update data from request body.
-        run_view: Run model manipulation interface.
         run_store: Run storage interface.
         engine_store: ProtocolEngine storage and control.
     """
@@ -340,14 +340,11 @@ async def update_run(
             status.HTTP_409_CONFLICT
         )
     elif update.current is False:
-        run = run_view.with_update(run=run, update=update)
-
         try:
             await engine_store.clear()
         except EngineConflictError:
             raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
-
-        run_store.upsert(run)
+        run = run_store.update_active_run(run_id=runId, is_current=update.current)
         log.info(f'Marked run "{runId}" as not current.')
 
     engine_state = engine_store.get_state(run.run_id)

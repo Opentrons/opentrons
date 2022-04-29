@@ -1,135 +1,147 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { mountWithProviders } from '@opentrons/components'
-import { AppComponent } from '..'
+import '@testing-library/jest-dom'
+import { resetAllWhenMocks, when } from 'jest-when'
 
-import { Robots } from '../../pages/Robots'
-import { Upload } from '../../pages/Upload'
-import { Run } from '../../pages/Run'
-import { More } from '../../pages/More'
+import { renderWithProviders } from '@opentrons/components'
 
-import { ConnectPanel } from '../../pages/Robots/ConnectPanel'
-import { RunPanel } from '../../pages/Run/RunPanel'
-import { MorePanel } from '../../pages/More/MorePanel'
-
-import { useFeatureFlag } from '../../redux/config'
-
-import { LegacyNavbar } from '../LegacyNavbar'
-import { NextGenApp } from '../NextGenApp'
-import { TopPortalRoot, PortalRoot } from '../portal'
+import { i18n } from '../../i18n'
+import { Breadcrumbs } from '../../molecules/Breadcrumbs'
+import { DeviceDetails } from '../../pages/Devices/DeviceDetails'
+import { DevicesLanding } from '../../pages/Devices/DevicesLanding'
+import { ProtocolsLanding } from '../../pages/Protocols/ProtocolsLanding'
+import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
+import { RobotSettings } from '../../pages/Devices/RobotSettings'
+import { GeneralSettings } from '../../organisms/AppSettings/GeneralSettings'
 import { Alerts } from '../../organisms/Alerts'
+import { useFeatureFlag } from '../../redux/config'
+import { usePathCrumbs } from '../hooks'
+import { LegacyApp } from '../LegacyApp'
+import { App } from '../'
 
-jest.mock('../../pages/Robots', () => ({ Robots: () => <></> }))
-jest.mock('../../pages/Upload', () => ({ Upload: () => <></> }))
-jest.mock('../../pages/Run', () => ({ Run: () => <></> }))
-jest.mock('../../pages/More', () => ({ More: () => <></> }))
-jest.mock('../../pages/Robots/ConnectPanel', () => ({
-  ConnectPanel: () => <></>,
-}))
-jest.mock('../../pages/Run/RunPanel', () => ({ RunPanel: () => <></> }))
-jest.mock('../../pages/More/MorePanel', () => ({ MorePanel: () => <></> }))
-jest.mock('../LegacyNavbar', () => ({ LegacyNavbar: () => <></> }))
-jest.mock('../NextGenApp', () => ({ NextGenApp: () => <></> }))
-jest.mock('../../organisms/Alerts', () => ({ Alerts: () => <></> }))
-jest.mock('../../redux/discovery')
+jest.mock('../../molecules/Breadcrumbs')
+jest.mock('../../organisms/Devices/hooks')
+jest.mock('../../pages/Devices/DeviceDetails')
+jest.mock('../../pages/Devices/DevicesLanding')
+jest.mock('../../pages/Protocols/ProtocolsLanding')
+jest.mock('../../pages/Devices/ProtocolRunDetails')
+jest.mock('../../pages/Devices/RobotSettings')
+jest.mock('../../organisms/Alerts')
+jest.mock('../../organisms/Labware/helpers/getAllDefs')
+jest.mock('../../organisms/AppSettings/GeneralSettings')
 jest.mock('../../redux/config')
+jest.mock('../LegacyApp')
+jest.mock('../hooks')
 
+const mockLegacyApp = LegacyApp as jest.MockedFunction<typeof LegacyApp>
+mockLegacyApp.mockReturnValue(<div>Mock LegacyApp</div>)
 const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
   typeof useFeatureFlag
 >
+const mockDeviceDetails = DeviceDetails as jest.MockedFunction<
+  typeof DeviceDetails
+>
+mockDeviceDetails.mockReturnValue(<div>Mock DeviceDetails</div>)
+const mockDevicesLanding = DevicesLanding as jest.MockedFunction<
+  typeof DevicesLanding
+>
+mockDevicesLanding.mockReturnValue(<div>Mock DevicesLanding</div>)
+const mockProtocolsLanding = ProtocolsLanding as jest.MockedFunction<
+  typeof ProtocolsLanding
+>
+mockProtocolsLanding.mockReturnValue(<div>Mock ProtocolsLanding</div>)
+const mockProtocolRunDetails = ProtocolRunDetails as jest.MockedFunction<
+  typeof ProtocolRunDetails
+>
+mockProtocolRunDetails.mockReturnValue(<div>Mock ProtocolRunDetails</div>)
+const mockRobotSettings = RobotSettings as jest.MockedFunction<
+  typeof RobotSettings
+>
+mockRobotSettings.mockReturnValue(<div>Mock RobotSettings</div>)
+const mockAlerts = Alerts as jest.MockedFunction<typeof Alerts>
+mockAlerts.mockReturnValue(<div>Mock Alerts</div>)
+const mockAppSettings = GeneralSettings as jest.MockedFunction<
+  typeof GeneralSettings
+>
+mockAppSettings.mockReturnValue(<div>Mock AppSettings</div>)
+const mockBreadcrumbs = Breadcrumbs as jest.MockedFunction<typeof Breadcrumbs>
+mockBreadcrumbs.mockReturnValue(<div>Mock Breadcrumbs</div>)
+const mockUsePathCrumbs = usePathCrumbs as jest.MockedFunction<
+  typeof usePathCrumbs
+>
 
-describe('top level App component', () => {
-  const render = (url = '/') => {
-    return mountWithProviders(
-      <MemoryRouter initialEntries={[url]} initialIndex={0}>
-        <AppComponent />,
-      </MemoryRouter>
-    )
-  }
+const render = (path = '/') => {
+  return renderWithProviders(
+    <MemoryRouter initialEntries={[path]} initialIndex={0}>
+      <App />
+    </MemoryRouter>,
+    { i18nInstance: i18n }
+  )
+}
 
+describe('App', () => {
   beforeEach(() => {
+    when(mockUsePathCrumbs).calledWith().mockReturnValue([])
     when(mockUseFeatureFlag)
       .calledWith('hierarchyReorganization')
       .mockReturnValue(false)
   })
-
   afterEach(() => {
     resetAllWhenMocks()
   })
 
-  it('should render a LegacyNavbar', () => {
-    const { wrapper } = render()
-    expect(wrapper.exists(LegacyNavbar)).toBe(true)
+  it('renders a Breadcrumbs component', () => {
+    const [{ getByText }] = render('/devices')
+    getByText('Mock Breadcrumbs')
   })
 
-  it('should render a Robots page on /robot', () => {
-    const { wrapper } = render('/robots')
-    expect(wrapper.exists(Robots)).toBe(true)
-    expect(wrapper.exists(ConnectPanel)).toBe(true)
+  it('renders an AppSettings component', () => {
+    const [{ getByText }] = render('/app-settings/general')
+    getByText('Mock AppSettings')
   })
 
-  it('should render a Robots page on /robot/:robot-name', () => {
-    const { wrapper } = render('/robots/some-name')
-    expect(wrapper.exists(Robots)).toBe(true)
-    expect(wrapper.exists(ConnectPanel)).toBe(true)
+  it('renders a DevicesLanding component from /robots', () => {
+    const [{ getByText }] = render('/devices')
+    getByText('Mock DevicesLanding')
   })
 
-  it('should render a More page on /more', () => {
-    const { wrapper } = render('/more')
-    expect(wrapper.exists(More)).toBe(true)
-    expect(wrapper.exists(MorePanel)).toBe(true)
+  it('renders a DeviceDetails component from /robots/:robotName', () => {
+    const [{ getByText }] = render('/devices/otie')
+    getByText('Mock DeviceDetails')
   })
 
-  it('should render an Upload page on /upload', () => {
-    const { wrapper } = render('/upload')
-    expect(wrapper.exists(Upload)).toBe(true)
+  it('renders a RobotSettings component from /robots/:robotName/robot-settings/:robotSettingsTab', () => {
+    const [{ getByText }] = render('/devices/otie/robot-settings/calibration')
+    getByText('Mock RobotSettings')
   })
 
-  it('should render a Run page on /run', () => {
-    const { wrapper } = render('/run')
-    expect(wrapper.exists(Run)).toBe(true)
-    expect(wrapper.exists(RunPanel)).toBe(true)
+  it('renders a ProtocolsLanding component from /protocols', () => {
+    const [{ getByText }] = render('/protocols')
+    getByText('Mock ProtocolsLanding')
   })
 
-  it('should render a PortalRoot for modals', () => {
-    const { wrapper } = render()
-    expect(wrapper.exists(PortalRoot)).toBe(true)
-  })
-
-  it('should render a TopPortalRoot for top level modals', () => {
-    const { wrapper } = render()
-    expect(wrapper.exists(TopPortalRoot)).toBe(true)
-  })
-
-  it('should redirect to /robots from /', () => {
-    const { wrapper } = render('/')
-    expect(wrapper.exists(Robots)).toBe(true)
-    expect(wrapper.exists(ConnectPanel)).toBe(true)
-  })
-
-  it('should redirect to /more from /app-settings/feature-flags', () => {
-    const { wrapper } = render('/app-settings/feature-flags')
-    expect(wrapper.exists(More)).toBe(true)
-    expect(wrapper.exists(MorePanel)).toBe(true)
+  it('renders a ProtocolRunDetails component from /robots/:robotName/protocol-runs/:runId/:protocolRunDetailsTab', () => {
+    const [{ getByText }] = render(
+      '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/setup'
+    )
+    getByText('Mock ProtocolRunDetails')
   })
 
   it('should render app-wide Alerts', () => {
-    const { wrapper } = render()
-    expect(wrapper.exists(Alerts)).toBe(true)
+    const [{ getByText }] = render()
+    getByText('Mock Alerts')
   })
 
-  it('should not render the Next Gen App when the Hierarchy Reorganization feature flag is off', () => {
-    const { wrapper } = render()
-    expect(wrapper.exists(NextGenApp)).toBe(false)
+  it('should render not render the Legacy App when the Hierarchy Reorganization feature flag is false', () => {
+    const [{ queryByText }] = render()
+    expect(queryByText('Mock LegacyApp')).toBeNull()
   })
 
-  it('should render the Next Gen App when the Hierarchy Reorganization feature flag is on', () => {
+  it('should only render the legacy app when hierarchyReorg feature flag is true', () => {
     when(mockUseFeatureFlag)
       .calledWith('hierarchyReorganization')
       .mockReturnValue(true)
-
-    const { wrapper } = render()
-    expect(wrapper.exists(NextGenApp)).toBe(true)
+    const [{ getByText }] = render()
+    getByText('Mock LegacyApp')
   })
 })

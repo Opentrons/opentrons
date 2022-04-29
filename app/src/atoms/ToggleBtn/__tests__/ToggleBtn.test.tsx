@@ -21,7 +21,7 @@ describe('ToggleBtn', () => {
     expect(button.prop('aria-label')).toBe('my-toggle')
     expect(button.prop('aria-checked')).toBe(false)
     expect(button.prop('color')).toBe(C_DARK_GRAY)
-    expect(icon.prop('name')).toBe('ot-toggle-switch-off')
+    expect(icon.prop('name')).toBe('ot-toggle-input-off')
   })
 
   it('should be a toggle-switch-on icon when toggled on', () => {
@@ -31,7 +31,7 @@ describe('ToggleBtn', () => {
 
     expect(button.prop('color')).toBe(C_SELECTED_DARK)
     expect(button.prop('aria-checked')).toBe(true)
-    expect(icon.prop('name')).toBe('ot-toggle-switch-on')
+    expect(icon.prop('name')).toBe('ot-toggle-input-on')
   })
 
   it('should set the color to disabled when disabled', () => {

@@ -6,7 +6,7 @@ import { app, shell } from 'electron'
 
 import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storage'
 import type { Dirent } from 'fs'
-import { runFileWithPython } from '../python'
+import { analyzeProtocolSource } from '../python'
 
 /**
  * Module for managing local protocol files on the host filesystem
@@ -123,10 +123,7 @@ export function addProtocolFile(
     .then(() => fs.mkdir(srcDirPath))
     .then(() => fs.mkdir(analysisDirPath))
     .then(() => fs.copy(mainFileSourcePath, mainFileDestPath))
-    .then(() =>
-      runFileWithPython(srcDirPath, makeAnalysisFilePath(analysisDirPath))
-    )
-    .then(() => mainFileDestPath)
+    .then(() => protocolKey)
 }
 
 export function removeProtocolByKey(
@@ -159,5 +156,14 @@ export function analyzeProtocolByKey(
     PROTOCOL_ANALYSIS_DIRECTORY_NAME
   )
   const destFilePath = makeAnalysisFilePath(analysisDirPath)
-  return runFileWithPython(srcDirPath, destFilePath)
+  return analyzeProtocolSource(srcDirPath, destFilePath)
+}
+
+export function viewProtocolSourceFolder(
+  protocolKey: string,
+  protocolsDirPath: string
+): void {
+  const protocolDirPath = path.join(protocolsDirPath, protocolKey)
+  const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
+  shell.openPath(srcDirPath)
 }

@@ -1,3 +1,4 @@
+import asyncio
 import pytest
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.hardware_control.modules.types import (
@@ -20,13 +21,13 @@ def usb_port():
 
 
 @pytest.fixture
-async def simulating_module(usb_port, loop):
+async def simulating_module(usb_port):
     module = await modules.build(
         port=usb_port.device_path,
         usb_port=usb_port,
         which="heatershaker",
         simulating=True,
-        loop=loop,
+        loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     assert isinstance(module, modules.AbstractModule)

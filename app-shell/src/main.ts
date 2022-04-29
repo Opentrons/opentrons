@@ -4,6 +4,7 @@ import contextMenu from 'electron-context-menu'
 
 import { createUi } from './ui'
 import { initializeMenu } from './menu'
+import { initializePython } from './python'
 import { createLogger } from './log'
 import { registerDiscovery } from './discovery'
 import { registerLabware } from './labware'
@@ -59,7 +60,9 @@ function startUp(): void {
   mainWindow.once('closed', () => (mainWindow = null))
 
   contextMenu({ showInspectElement: config.devtools })
+
   initializeMenu()
+  initializePython()
 
   // wire modules to UI dispatches
   const dispatch: Dispatch = action => {

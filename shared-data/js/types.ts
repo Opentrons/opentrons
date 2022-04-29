@@ -377,6 +377,10 @@ export interface PendingProtocolAnalysis {
   id: string
   status?: 'pending'
 }
+export interface ProtocolAnalysisSummary {
+  id: string
+  status: 'pending' | 'completed'
+}
 export interface LoadedPipette {
   id: string
   pipetteName: PipetteName
@@ -416,10 +420,20 @@ export interface ProtocolResource {
   createdAt: string
   protocolType: 'json' | 'python'
   metadata: ProtocolMetadata
-  analyses: Array<PendingProtocolAnalysis | CompletedProtocolAnalysis>
+  analysisSummaries: ProtocolAnalysisSummary[]
   files: ResourceFile[]
+}
+
+export interface ProtocolAnalysesResource {
+  analyses: Array<PendingProtocolAnalysis | CompletedProtocolAnalysis>
 }
 
 export type MotorAxis = Array<
   'x' | 'y' | 'leftZ' | 'rightZ' | 'leftPlunger' | 'rightPlunger'
 >
+
+export type ThermalAdapterName =
+  | 'PCR Adapter'
+  | 'Deep Well Adapter'
+  | '96 Flat Bottom Adapter'
+  | 'Universal Flat Adapter'

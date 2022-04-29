@@ -8,7 +8,7 @@ import {
   useRobot,
 } from '.'
 
-export interface ModuleMatchResults {
+interface UnmatchedModuleResults {
   missingModuleIds: string[]
   remainingAttachedModules: AttachedModule[]
 }
@@ -17,7 +17,7 @@ export interface ModuleMatchResults {
 export function useUnmatchedModulesForProtocol(
   robotName: string,
   runId: string
-): ModuleMatchResults {
+): UnmatchedModuleResults {
   const robot = useRobot(robotName)
   const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
     robotName,
@@ -30,7 +30,7 @@ export function useUnmatchedModulesForProtocol(
 
   const { missingModuleIds, remainingAttachedModules } = reduce<
     typeof moduleRenderInfoById,
-    ModuleMatchResults
+    UnmatchedModuleResults
   >(
     moduleRenderInfoById,
     (acc, { moduleDef }, id) => {
@@ -39,8 +39,8 @@ export function useUnmatchedModulesForProtocol(
       const moduleTypeMatchIndex = acc.remainingAttachedModules.findIndex(
         attachedModule => {
           return (
-            model === attachedModule.model ||
-            compatibleWith.includes(attachedModule.model)
+            model === attachedModule.moduleModel ||
+            compatibleWith.includes(attachedModule.moduleModel)
           )
         }
       )

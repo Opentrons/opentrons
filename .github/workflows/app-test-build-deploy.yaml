@@ -69,7 +69,7 @@ jobs:
           path: |
             ${{ github.workspace }}/.npm-cache/_prebuild
             ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: 'setup-js'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
@@ -98,6 +98,9 @@ jobs:
       - uses: 'actions/setup-node@v1'
         with:
           node-version: '14'
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
       - name: 'install libudev'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get install libudev-dev
@@ -114,7 +117,7 @@ jobs:
           path: |
             ${{ github.workspace }}/.npm-cache/_prebuild
             ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: setup-js
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
@@ -142,6 +145,7 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS }}
           APPLE_ID: ${{ secrets.OT_APP_APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
+          HOST_PYTHON: python
         run: |
           make -C app-shell dist-${{ matrix.os }}
 

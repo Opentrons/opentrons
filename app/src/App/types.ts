@@ -30,7 +30,7 @@ export type ProtocolRunDetailsTab = 'setup' | 'module-controls' | 'run-log'
 /**
  * route params type definition for the next gen app
  */
-export interface NextGenRouteParams {
+export interface NavRouteParams {
   appSettingsTab: AppSettingsTab
   robotName: string
   protocolKey: string

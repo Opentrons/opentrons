@@ -27,6 +27,39 @@ import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 const PD_VERSION = '6.0.0'
 const SCHEMA_VERSION = 6
 
+export const migrateSavedStepForms = (
+  savedStepForms?: Record<string, any>
+): Record<string, any> => {
+  // uncheck asp + disp delay checkbox if the offset is 0 or null, see https://github.com/Opentrons/opentrons/issues/8153
+  return mapValues(savedStepForms, stepForm => {
+    if (stepForm.stepType === 'moveLiquid') {
+      let migratedStepForm = { ...stepForm }
+      if (
+        stepForm.aspirate_delay_checkbox === true &&
+        (stepForm.aspirate_delay_mmFromBottom === null ||
+          stepForm.aspirate_delay_mmFromBottom === 0)
+      ) {
+        migratedStepForm = {
+          ...migratedStepForm,
+          aspirate_delay_checkbox: false,
+        }
+      }
+      if (
+        stepForm.dispense_delay_checkbox === true &&
+        (stepForm.dispense_delay_mmFromBottom === null ||
+          stepForm.dispense_delay_mmFromBottom === 0)
+      ) {
+        migratedStepForm = {
+          ...migratedStepForm,
+          dispense_delay_checkbox: false,
+        }
+      }
+      return migratedStepForm
+    }
+    return stepForm
+  })
+}
+
 const migratePipettes = (appData: Record<string, any>): Record<string, any> =>
   mapValues(appData, pipettes => omit(pipettes, 'mount'))
 
@@ -136,7 +169,7 @@ export const migrateFile = (
               ...acc,
               [liquidId]: {
                 displayName: liquidData.name,
-                description: liquidData.description,
+                description: liquidData.description ?? '',
               },
             }
           },
@@ -144,12 +177,17 @@ export const migrateFile = (
         )
       : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         ({} as ProtocolFile['liquids'])
-
   return {
     ...appData,
     designerApplication: {
       ...appData.designerApplication,
       version: PD_VERSION,
+      data: {
+        ...appData.designerApplication?.data,
+        savedStepForms: migrateSavedStepForms(
+          appData.designerApplication?.data?.savedStepForms
+        ),
+      },
     },
     schemaVersion: SCHEMA_VERSION,
     $otSharedSchema: '#/protocol/schemas/6',

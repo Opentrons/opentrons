@@ -6,7 +6,7 @@ from opentrons.hardware_control import simulator_setup
 from opentrons.types import Mount
 
 
-async def test_with_magdeck(loop):
+async def test_with_magdeck():
     setup = simulator_setup.SimulatorSetup(
         attached_modules={
             "magdeck": [simulator_setup.ModuleCall("engage", kwargs={"height": 3})]
@@ -21,7 +21,7 @@ async def test_with_magdeck(loop):
     }
 
 
-async def test_with_thermocycler(loop):
+async def test_with_thermocycler():
     setup = simulator_setup.SimulatorSetup(
         attached_modules={
             "thermocycler": [
@@ -58,7 +58,7 @@ async def test_with_thermocycler(loop):
     }
 
 
-async def test_with_tempdeck(loop):
+async def test_with_tempdeck():
     setup = simulator_setup.SimulatorSetup(
         attached_modules={
             "tempdeck": [

@@ -1,8 +1,8 @@
 import { css } from 'styled-components'
-// import type { FlattenSimpleInterpolation } from 'styled-components'
+import { COLORS } from './'
 
 // Font Sizes
-export const fontSizeH1 = '1.125rem' // 18px
+export const fontSizeH1 = '1.188rem' // 19px
 export const fontSizeH2 = '0.9375rem' // 15px
 export const fontSizeH3 = '0.875rem' // 14px
 export const fontSizeH4 = '0.813rem' //  13px
@@ -40,7 +40,10 @@ export const textAlignRight = 'right'
 export const textAlignCenter = 'center'
 export const textAlignJustify = 'justify'
 
-// Default font styles, color agnositic for first pass
+// text decoration
+export const textDecorationUnderline = 'underline'
+
+// Default font styles, color agnostic for first pass
 export const h1Default = css`
   font-size: ${fontSizeH1};
   font-weight: ${fontWeightSemiBold};
@@ -105,4 +108,15 @@ export const labelSemiBold = css`
   font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight12};
+`
+
+export const linkPSemibold = css`
+  font-size: ${fontSizeP};
+  font-weight: ${fontWeightSemiBold};
+  line-height: ${lineHeight16};
+  color: ${COLORS.blue};
+
+  &:hover {
+    opacity: 70%;
+  }
 `

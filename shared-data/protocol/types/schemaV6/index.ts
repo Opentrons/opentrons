@@ -69,3 +69,38 @@ export interface ProtocolAnalysisFile<DesignerApplicationData = {}>
   extends Omit<ProtocolFile<DesignerApplicationData>, 'commands'> {
   commands: RunTimeCommand[]
 }
+
+/**
+ * This type interface is represents the output of the opentrons analyze cli tool
+ * which contains the protocol analysis engine
+ * TODO: reconcile this type with that of the analysis returned from
+ * the protocols record endpoints on the robot-server
+ */
+export interface ProtocolAnalysisOutput {
+  createdAt: number
+  commands: RunTimeCommand[]
+  errors: AnalysisError[]
+  files: AnalysisSourceFile[]
+  config: JsonConfig | PythonConfig
+  metadata: { [key: string]: any }
+}
+
+interface AnalysisSourceFile {
+  name: string
+  role: 'main' | 'labware'
+}
+interface JsonConfig {
+  protocolType: 'python'
+  schemaVersion: number
+}
+interface PythonConfig {
+  protocolType: 'json'
+  apiVersion: number
+}
+
+interface AnalysisError {
+  id: string
+  errorType: string
+  createdAt: number
+  detail: string
+}
