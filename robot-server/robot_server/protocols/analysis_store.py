@@ -1,5 +1,6 @@
 """Protocol analysis storage."""
-from typing import Dict, List, Set
+from collections import defaultdict
+from typing import Dict, List
 
 from opentrons.protocol_engine import (
     Command,
@@ -9,6 +10,7 @@ from opentrons.protocol_engine import (
 )
 
 from .analysis_models import (
+    AnalysisSummary,
     ProtocolAnalysis,
     PendingAnalysis,
     CompletedAnalysis,
@@ -16,23 +18,43 @@ from .analysis_models import (
 )
 
 
+class AnalysisNotFoundError(ValueError):
+    """Exception raised if a given analysis is not found."""
+
+    def __init__(self, analysis_id: str) -> None:
+        """Initialize the error's message."""
+        super().__init__(f"Analysis {analysis_id} not found.")
+
+
 class AnalysisStore:
     """Storage interface for protocol analyses."""
 
     def __init__(self) -> None:
         """Initialize the AnalysisStore's internal state."""
-        self._analysis_ids_by_protocol: Dict[str, Set[str]] = {}
+        self._analysis_ids_by_protocol: Dict[str, List[str]] = defaultdict(list)
         self._analyses_by_id: Dict[str, ProtocolAnalysis] = {}
 
-    def add_pending(self, protocol_id: str, analysis_id: str) -> List[ProtocolAnalysis]:
+    def get(self, analysis_id: str) -> ProtocolAnalysis:
+        """Get a single protocol analysis by its ID."""
+        try:
+            return self._analyses_by_id[analysis_id]
+        except KeyError as error:
+            raise AnalysisNotFoundError(analysis_id) from error
+
+    def add_pending(self, protocol_id: str, analysis_id: str) -> AnalysisSummary:
         """Add a pending analysis to the store."""
-        self._analyses_by_id[analysis_id] = PendingAnalysis.construct(id=analysis_id)
+        ids_for_protocol = self._analysis_ids_by_protocol[protocol_id]
 
-        ids_for_protocol = self._analysis_ids_by_protocol.get(protocol_id, set())
-        ids_for_protocol.add(analysis_id)
-        self._analysis_ids_by_protocol[protocol_id] = ids_for_protocol
+        assert (
+            analysis_id not in ids_for_protocol
+            and analysis_id not in self._analyses_by_id
+        ), "Duplicate analysis ID"
 
-        return self.get_by_protocol(protocol_id)
+        pending_analysis = PendingAnalysis.construct(id=analysis_id)
+        self._analyses_by_id[analysis_id] = pending_analysis
+        ids_for_protocol.append(analysis_id)
+
+        return AnalysisSummary(id=analysis_id, status=pending_analysis.status)
 
     def update(
         self,
@@ -57,8 +79,16 @@ class AnalysisStore:
             errors=errors,
         )
 
+    def get_summaries_by_protocol(self, protocol_id: str) -> List[AnalysisSummary]:
+        """Get analysis summaries for a given protocol ID from the store."""
+        full_analyses = self.get_by_protocol(protocol_id)
+
+        return [
+            AnalysisSummary.construct(id=a.id, status=a.status) for a in full_analyses
+        ]
+
     def get_by_protocol(self, protocol_id: str) -> List[ProtocolAnalysis]:
         """Get an analysis for a given protocol ID from the store."""
-        ids_for_protocol = self._analysis_ids_by_protocol.get(protocol_id, set())
+        ids_for_protocol = self._analysis_ids_by_protocol[protocol_id]
 
         return [self._analyses_by_id[analysis_id] for analysis_id in ids_for_protocol]

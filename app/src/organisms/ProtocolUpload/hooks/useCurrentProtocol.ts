@@ -1,5 +1,4 @@
 import * as React from 'react'
-import last from 'lodash/last'
 import { useProtocolQuery } from '@opentrons/react-api-client'
 import { useCurrentRun } from './useCurrentRun'
 
@@ -14,16 +13,6 @@ export function useCurrentProtocol(): Protocol | null {
     { staleTime: Infinity },
     enableProtocolPolling.current
   )
-
-  const mostRecentAnalysis = last(protocolRecord?.data.analyses) ?? null
-
-  React.useEffect(() => {
-    if (mostRecentAnalysis?.status === 'completed') {
-      enableProtocolPolling.current = false
-    } else {
-      enableProtocolPolling.current = true
-    }
-  }, [mostRecentAnalysis?.status])
 
   return protocolRecord ?? null
 }

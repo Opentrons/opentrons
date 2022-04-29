@@ -136,7 +136,7 @@ export const AppComponent = (): JSX.Element => {
                     </Route>
                   )
                 })}
-                <Redirect exact from="/" to="/devices" />
+                <Redirect exact from="/" to="/protocols" />
               </Switch>
               <Alerts />
             </Box>

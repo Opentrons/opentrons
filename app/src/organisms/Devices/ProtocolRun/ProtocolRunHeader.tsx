@@ -169,7 +169,7 @@ export function ProtocolRunHeader({
   const attachedModules = useAttachedModules(robotName)
   const heaterShaker = attachedModules.find(
     (module): module is HeaterShakerModule =>
-      module.type === HEATERSHAKER_MODULE_TYPE
+      module.moduleType === HEATERSHAKER_MODULE_TYPE
   )
   const isShaking =
     heaterShaker?.data != null && heaterShaker.data.speedStatus !== 'idle'
