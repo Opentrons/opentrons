@@ -320,6 +320,19 @@ class Thermocycler(mod_abc.AbstractModule):
         )
         await self.wait_next_poll()
 
+    # TODO(mc, 2022-04-26): de-duplicate with `set_lid_temperature`
+    async def set_target_lid_temperature(self, celsius: float) -> None:
+        """Set the Thermocycler's target lid temperature.
+
+        Does not wait for the target temperature to be reached.
+
+        Args:
+            celsius: The target lid temperature, in degrees celsius.
+        """
+        await self.wait_for_is_running()
+        await self._driver.set_lid_temperature(temp=celsius)
+        await self.wait_next_poll()
+
     async def _wait_for_lid_temp(self) -> None:
         """
         This method only exits if lid target temperature has been reached.

@@ -9,6 +9,7 @@ import { i18n } from '../../i18n'
 import { Breadcrumbs } from '../../molecules/Breadcrumbs'
 import { DeviceDetails } from '../../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../../pages/Devices/DevicesLanding'
+import { ProtocolsLanding } from '../../pages/Protocols/ProtocolsLanding'
 import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../organisms/AppSettings/GeneralSettings'
@@ -22,6 +23,7 @@ jest.mock('../../molecules/Breadcrumbs')
 jest.mock('../../organisms/Devices/hooks')
 jest.mock('../../pages/Devices/DeviceDetails')
 jest.mock('../../pages/Devices/DevicesLanding')
+jest.mock('../../pages/Protocols/ProtocolsLanding')
 jest.mock('../../pages/Devices/ProtocolRunDetails')
 jest.mock('../../pages/Devices/RobotSettings')
 jest.mock('../../organisms/Alerts')
@@ -44,6 +46,10 @@ const mockDevicesLanding = DevicesLanding as jest.MockedFunction<
   typeof DevicesLanding
 >
 mockDevicesLanding.mockReturnValue(<div>Mock DevicesLanding</div>)
+const mockProtocolsLanding = ProtocolsLanding as jest.MockedFunction<
+  typeof ProtocolsLanding
+>
+mockProtocolsLanding.mockReturnValue(<div>Mock ProtocolsLanding</div>)
 const mockProtocolRunDetails = ProtocolRunDetails as jest.MockedFunction<
   typeof ProtocolRunDetails
 >
@@ -107,6 +113,11 @@ describe('App', () => {
   it('renders a RobotSettings component from /robots/:robotName/robot-settings/:robotSettingsTab', () => {
     const [{ getByText }] = render('/devices/otie/robot-settings/calibration')
     getByText('Mock RobotSettings')
+  })
+
+  it('renders a ProtocolsLanding component from /protocols', () => {
+    const [{ getByText }] = render('/protocols')
+    getByText('Mock ProtocolsLanding')
   })
 
   it('renders a ProtocolRunDetails component from /robots/:robotName/protocol-runs/:runId/:protocolRunDetailsTab', () => {

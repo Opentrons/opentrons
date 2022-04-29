@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { Box, SPACING } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { Box, SPACING, IconProps } from '@opentrons/components'
 import { Divider } from '../../../atoms/structure'
+import { Toast } from '../../../atoms/Toast'
 import { AboutRobotName } from './AdvancedTab/AboutRobotName'
 import { RobotInformation } from './AdvancedTab/RobotInformation'
 import { RobotServerVersion } from './AdvancedTab/RobotServerVersion'
@@ -37,6 +39,7 @@ interface RobotSettingsAdvancedProps {
 export function RobotSettingsAdvanced({
   robotName,
 }: RobotSettingsAdvancedProps): JSX.Element {
+  const { t } = useTranslation('device_settings')
   const [
     showRenameRobotSlideout,
     setShowRenameRobotSlideout,
@@ -53,6 +56,11 @@ export function RobotSettingsAdvanced({
     showSoftwareUpdateModal,
     setShowSoftwareUpdateModal,
   ] = React.useState<boolean>(false)
+  const [showDownloadToast, setShowDownloadToast] = React.useState<boolean>(
+    false
+  )
+
+  const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
 
   const robot = useRobot(robotName)
   const ipAddress = robot?.ip != null ? robot.ip : ''
@@ -88,12 +96,25 @@ export function RobotSettingsAdvanced({
     setIsRobotConnected(isConnected ?? false)
   }
 
+  const updateDownloadLogsStatus = (isDownloading: boolean): void =>
+    setShowDownloadToast(isDownloading)
+
   return (
     <>
       {showSoftwareUpdateModal && (
         <SoftwareUpdateModal
           robotName={robotName}
           closeModal={() => setShowSoftwareUpdateModal(false)}
+        />
+      )}
+      {showDownloadToast && (
+        <Toast
+          message={t('update_robot_software_download_logs_toast_message')}
+          type="info"
+          icon={toastIcon}
+          closeButton={false}
+          onClose={() => setShowDownloadToast(false)}
+          requiredTimeout={false}
         />
       )}
       <Box paddingX={SPACING.spacing4}>
@@ -142,7 +163,10 @@ export function RobotSettingsAdvanced({
         <OpenJupyterControl robotIp={ipAddress} />
         <Divider marginY={SPACING.spacing5} />
         <UpdateRobotSoftware robotName={robotName} />
-        <Troubleshooting robot={robot as ViewableRobot} />
+        <Troubleshooting
+          robot={robot as ViewableRobot}
+          updateDownloadLogsStatus={updateDownloadLogsStatus}
+        />
         <Divider marginY={SPACING.spacing5} />
         <FactoryReset updateIsExpanded={updateIsExpanded} />
         <Divider marginY={SPACING.spacing5} />

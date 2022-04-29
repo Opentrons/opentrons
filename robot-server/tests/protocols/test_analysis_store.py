@@ -10,9 +10,11 @@ from opentrons.protocol_engine import (
     types as pe_types,
 )
 
-from robot_server.protocols.analysis_store import AnalysisStore
+from robot_server.protocols.analysis_store import AnalysisStore, AnalysisNotFoundError
 from robot_server.protocols.analysis_models import (
     AnalysisResult,
+    AnalysisStatus,
+    AnalysisSummary,
     PendingAnalysis,
     CompletedAnalysis,
 )
@@ -22,16 +24,30 @@ def test_get_empty() -> None:
     """It should return an empty list if no analysis saved."""
     subject = AnalysisStore()
     result = subject.get_by_protocol("protocol-id")
+    summaries_result = subject.get_summaries_by_protocol("protocol-id")
 
     assert result == []
+    assert summaries_result == []
+
+    with pytest.raises(AnalysisNotFoundError, match="analysis-id"):
+        subject.get("analysis-id")
 
 
 def test_add_pending() -> None:
     """It should add a pending analysis to the store."""
     subject = AnalysisStore()
+    expected_analysis = PendingAnalysis(id="analysis-id")
+    expected_summary = AnalysisSummary(
+        id="analysis-id",
+        status=AnalysisStatus.PENDING,
+    )
+
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
 
-    assert result == [PendingAnalysis(id="analysis-id")]
+    assert result == expected_summary
+    assert subject.get("analysis-id") == expected_analysis
+    assert subject.get_by_protocol("protocol-id") == [expected_analysis]
+    assert subject.get_summaries_by_protocol("protocol-id") == [expected_summary]
 
 
 def test_add_analysis_equipment() -> None:
@@ -60,18 +76,17 @@ def test_add_analysis_equipment() -> None:
         errors=[],
     )
 
-    result = subject.get_by_protocol("protocol-id")
+    result = subject.get("analysis-id")
 
-    assert result == [
-        CompletedAnalysis(
-            id="analysis-id",
-            result=AnalysisResult.OK,
-            labware=[labware],
-            pipettes=[pipette],
-            commands=[],
-            errors=[],
-        )
-    ]
+    assert result == CompletedAnalysis(
+        id="analysis-id",
+        result=AnalysisResult.OK,
+        labware=[labware],
+        pipettes=[pipette],
+        commands=[],
+        errors=[],
+    )
+    assert subject.get_by_protocol("protocol-id") == [result]
 
 
 class CommandAnalysisSpec(NamedTuple):

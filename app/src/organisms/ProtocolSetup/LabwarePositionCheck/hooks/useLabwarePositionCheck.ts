@@ -18,13 +18,15 @@ import {
 } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { sendModuleCommand } from '../../../../redux/modules'
-import { useAttachedModules } from '../../../Devices/hooks'
-import { useProtocolDetails } from '../../../RunDetails/hooks'
 import {
   useCurrentRunId,
   useCurrentRunCommands,
   useCurrentProtocol,
 } from '../../../ProtocolUpload/hooks'
+import {
+  useAttachedModules,
+  useProtocolDetailsForRun,
+} from '../../../Devices/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
 import { getModuleInitialLoadInfo } from '../../utils/getModuleInitialLoadInfo'
@@ -89,8 +91,11 @@ type LPCPrepCommand =
 
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 
-const useLpcCtaText = (command: LabwarePositionCheckCreateCommand): string => {
-  const { protocolData } = useProtocolDetails()
+const useLpcCtaText = (
+  command: LabwarePositionCheckCreateCommand,
+  runId: string | null
+): string => {
+  const { protocolData } = useProtocolDetailsForRun(runId)
   const { t } = useTranslation('labware_position_check')
   if (command == null) return ''
   const commands = protocolData?.commands ?? []
@@ -125,10 +130,11 @@ const useLpcCtaText = (command: LabwarePositionCheckCreateCommand): string => {
 export const useTitleText = (
   loading: boolean,
   command: LabwarePositionCheckMovementCommand,
+  runId: string | null,
   labware?: ProtocolFile<{}>['labware'],
   labwareDefinitions?: ProtocolFile<{}>['labwareDefinitions']
 ): string => {
-  const { protocolData } = useProtocolDetails()
+  const { protocolData } = useProtocolDetailsForRun(runId)
   const { t } = useTranslation('labware_position_check')
 
   if (command == null) {
@@ -240,15 +246,15 @@ export function useLabwarePositionCheck(
   const [dropTipOffset, setDropTipOffset] = React.useState<VectorOffset>(
     IDENTITY_VECTOR
   )
-  const { protocolData } = useProtocolDetails()
+  const currentRunId = useCurrentRunId()
+  const { protocolData } = useProtocolDetailsForRun(currentRunId)
   const protocolType = useCurrentProtocol()?.data.protocolType
   const { createLabwareDefinition } = useCreateLabwareDefinitionMutation()
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const { createCommand } = useCreateCommandMutation()
   const host = useHost()
-  const currentRunId = useCurrentRunId()
   const trackEvent = useTrackEvent()
-  const LPCSteps = useSteps()
+  const LPCSteps = useSteps(currentRunId)
   const dispatch = useDispatch()
   const robotName = host?.robotName ?? ''
   const attachedModules = useAttachedModules(robotName)
@@ -303,11 +309,12 @@ export function useLabwarePositionCheck(
     return matchingCommand
   }) as LabwarePositionCheckStep
 
-  const ctaText = useLpcCtaText(currentCommand)
+  const ctaText = useLpcCtaText(currentCommand, currentRunId)
   const robotCommands = useCurrentRunCommands()
   const titleText = useTitleText(
     isLoading,
     prevCommand,
+    currentRunId,
     protocolData?.labware,
     protocolData?.labwareDefinitions
   )
@@ -588,8 +595,8 @@ export function useLabwarePositionCheck(
       // delete this once PE supports themocycler open lid command
       if (prepCommand.commandType === 'thermocycler/openLid') {
         const serial = attachedModules.find(
-          module => module.type === THERMOCYCLER_MODULE_TYPE
-        )?.serial
+          module => module.moduleType === THERMOCYCLER_MODULE_TYPE
+        )?.serialNumber
         if (serial == null) {
           throw new Error(
             'Expected to be able to find thermocycler serial number, but could not.'

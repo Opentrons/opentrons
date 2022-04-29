@@ -28,11 +28,13 @@ export const INTERVAL_MS = 3000
 export const IntroScreen = (props: {
   beginLPC: () => void
 }): JSX.Element | null => {
+  const runRecord = useCurrentRun()
+  const labwareIdsBySection = useLabwareIdsBySection(
+    runRecord?.data?.id ?? null
+  )
   const introInfo = useIntroInfo()
-  const labwareIdsBySection = useLabwareIdsBySection()
   const { t } = useTranslation(['labware_position_check', 'shared'])
 
-  const runRecord = useCurrentRun()
   const currentRunData = runRecord?.data
   const labwareOffsetCount = getLatestLabwareOffsetCount(
     currentRunData?.labwareOffsets ?? []

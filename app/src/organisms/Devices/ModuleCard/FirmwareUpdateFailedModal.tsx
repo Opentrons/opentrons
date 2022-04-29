@@ -46,10 +46,10 @@ export const FirmwareUpdateFailedModal = (
     <Modal title={title} onClose={onCloseClick}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`FirmwareUpdateFailedModal_body_text_${module.serial}`}
+        data-testid={`FirmwareUpdateFailedModal_body_text_${module.serialNumber}`}
       >
         <Text paddingBottom={SPACING.spacing2}>
-          {t('an_error_occurred_while_updating')}
+          {t('an_error_occurred_while_updating_please_try_again')}
         </Text>
         <Text>{errorMessage}</Text>
       </Flex>
@@ -57,7 +57,7 @@ export const FirmwareUpdateFailedModal = (
         flexDirection={DIRECTION_ROW}
         paddingTop={SPACING.spacingXL}
         justifyContent={JUSTIFY_FLEX_END}
-        data-testid={`FirmwareUpdateFailedModal_cancel_btn_${module.serial}`}
+        data-testid={`FirmwareUpdateFailedModal_cancel_btn_${module.serialNumber}`}
       >
         <PrimaryButton
           onClick={onCloseClick}
