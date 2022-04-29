@@ -663,10 +663,10 @@ async def test_update_run_to_not_current(
         status=pe_types.EngineStatus.SUCCEEDED,
         current=False,
         actions=[],
-        errors=[],
-        pipettes=[],
-        labware=[],
-        labwareOffsets=[],
+        errors=protocol_run.errors,
+        pipettes=protocol_run.pipettes,
+        labware=protocol_run.labware,
+        labwareOffsets=protocol_run.labwareOffsets,
     )
 
     run_update = RunUpdate(current=False)
