@@ -55,7 +55,7 @@ export const TestShakeSlideout = (
   const { t } = useTranslation(['device_details', 'shared', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
-  const name = getModuleDisplayName(module.model)
+  const name = getModuleDisplayName(module.moduleModel)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { toggleLatch, isLatchClosed } = useLatchCommand(module, runId)
 

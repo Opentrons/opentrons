@@ -43,6 +43,7 @@ export const ProtocolRunModuleControls = ({
           >
             {module.attachedModuleMatch != null ? (
               <ModuleCard
+                robotName={robotName}
                 runId={runId}
                 module={module.attachedModuleMatch}
                 slot={module.slotName}

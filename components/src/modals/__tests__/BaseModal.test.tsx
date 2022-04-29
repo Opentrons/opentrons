@@ -4,6 +4,7 @@ import { shallow } from 'enzyme'
 import { OVERLAY_BLACK_90, C_WHITE, C_LIGHT_GRAY } from '../../styles'
 
 import { Box, Flex, Text, Btn } from '../../primitives'
+import { SPACING } from '../../ui-style-constants'
 import { BaseModal } from '../BaseModal'
 
 describe('BaseModal', () => {
@@ -21,7 +22,7 @@ describe('BaseModal', () => {
       height: '100%',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '4rem',
+      padding: `${SPACING.spacing4}, ${SPACING.spacing5}`,
     })
   })
 

@@ -30,7 +30,7 @@ const GITHUB_LINK =
 export function RobotServerVersion({
   robotName,
 }: RobotServerVersionProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'shared'])
   const robot = useRobot(robotName)
   const { autoUpdateAction } = useSelector((state: State) => {
     return getBuildrootUpdateDisplayInfo(state, robotName)
@@ -68,12 +68,12 @@ export function RobotServerVersion({
               : t('robot_settings_advanced_unknown')}
           </StyledText>
           <StyledText as="p">
-            {t('robot_server_versions_description')}
+            {t('shared:view_latest_release_notes')}
             <Link
               external
               href={GITHUB_LINK}
               id="AdvancedSettings_GitHubLink"
-            >{` ${t('github')}`}</Link>
+            >{` ${t('shared:github')}`}</Link>
           </StyledText>
         </Box>
       </Flex>

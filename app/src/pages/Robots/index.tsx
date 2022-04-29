@@ -16,7 +16,6 @@ import { Splash } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { RobotSettings } from './RobotSettings'
 import { InstrumentSettings } from './InstrumentSettings'
-import { ModuleSettings } from './ModuleSettings'
 
 export function Robots(): JSX.Element {
   const { path, url, params } = useRouteMatch<{ name: string }>()
@@ -58,12 +57,7 @@ export function Robots(): JSX.Element {
           path={instrumentsMatch.path}
           pathname={location && location.pathname}
         />
-      ) : robot.status === CONNECTABLE && modulesMatch ? (
-        <ModuleSettings
-          robotName={robot.name}
-          robotDisplayName={robot.displayName}
-        />
-      ) : (
+      ) : robot.status === CONNECTABLE && modulesMatch ? null : (
         <RobotSettings robot={robot} />
       )}
     </ApiHostProvider>

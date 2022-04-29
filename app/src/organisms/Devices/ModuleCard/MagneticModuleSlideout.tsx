@@ -81,8 +81,8 @@ export const MagneticModuleSlideout = (
     string | null
   >(null)
 
-  const moduleName = getModuleDisplayName(module.model)
-  const info = getInfoByModel(module.model)
+  const moduleName = getModuleDisplayName(module.moduleModel)
+  const info = getInfoByModel(module.moduleModel)
 
   let max: number | TFunctionResult = 0
   let labwareBottom: number | TFunctionResult = 0
@@ -147,7 +147,7 @@ export const MagneticModuleSlideout = (
           width="100%"
           onClick={handleSubmitHeight}
           disabled={engageHeightValue == null || errorMessage !== null}
-          data-testid={`MagneticModuleSlideout_btn_${module.serial}`}
+          data-testid={`MagneticModuleSlideout_btn_${module.serialNumber}`}
         >
           {t('set_engage_height')}
         </PrimaryButton>
@@ -157,15 +157,15 @@ export const MagneticModuleSlideout = (
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing2}
-        data-testid={`MagneticModuleSlideout_body_text_${module.serial}`}
+        data-testid={`MagneticModuleSlideout_body_text_${module.serialNumber}`}
       >
         {t('set_engage_height_slideout_body', {
           lower:
-            module.model === MAGNETIC_MODULE_V1
+            module.moduleModel === MAGNETIC_MODULE_V1
               ? MAGNETIC_MODULE_V1_DISNEGAGED_HEIGHT
               : MAGNETIC_MODULE_V2_DISNEGAGED_HEIGHT,
           higher:
-            module.model === MAGNETIC_MODULE_V1
+            module.moduleModel === MAGNETIC_MODULE_V1
               ? MAGNETIC_MODULE_V1_MAX_ENGAGE_HEIGHT
               : MAGNETIC_MODULE_V2_MAX_ENGAGE_HEIGHT,
         })}
@@ -176,7 +176,7 @@ export const MagneticModuleSlideout = (
         paddingTop={SPACING.spacing4}
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         paddingBottom={SPACING.spacing3}
-        data-testid={`MagneticModuleSlideout_body_subtitle_${module.serial}`}
+        data-testid={`MagneticModuleSlideout_body_subtitle_${module.serialNumber}`}
       >
         {t('set_engage_height_slideout_subtitle', { gen: info.version })}
       </Text>
@@ -190,7 +190,7 @@ export const MagneticModuleSlideout = (
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          data-testid={`MagneticModuleSlideout_body_data_text_${module.serial}`}
+          data-testid={`MagneticModuleSlideout_body_data_text_${module.serialNumber}`}
         >
           <Text paddingBottom={SPACING.spacing3}>
             {t('max_engage_height_slideout')}
@@ -205,7 +205,7 @@ export const MagneticModuleSlideout = (
         <Flex
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_FLEX_END}
-          data-testid={`MagneticModuleSlideout_body_data_num_${module.serial}`}
+          data-testid={`MagneticModuleSlideout_body_data_num_${module.serialNumber}`}
         >
           <Text paddingBottom={SPACING.spacing3}>{max}</Text>
           <Text paddingBottom={SPACING.spacing3}>{labwareBottom}</Text>
@@ -215,7 +215,7 @@ export const MagneticModuleSlideout = (
       <Flex
         marginTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`MagneticModuleSlideout_input_field_${module.serial}`}
+        data-testid={`MagneticModuleSlideout_input_field_${module.serialNumber}`}
       >
         <Text
           fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -226,8 +226,8 @@ export const MagneticModuleSlideout = (
           {t('engage_height_slideout')}
         </Text>
         <InputField
-          data-testid={`${module.model}`}
-          id={`${module.model}`}
+          data-testid={`${module.moduleModel}`}
+          id={`${module.moduleModel}`}
           autoFocus
           units={info.units}
           value={engageHeightValue}

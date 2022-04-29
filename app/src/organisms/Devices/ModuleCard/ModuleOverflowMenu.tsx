@@ -46,16 +46,16 @@ export const ModuleOverflowMenu = (
         <MenuList
           buttons={[
             (menuOverflowItemsByModuleType[
-              module.type
+              module.moduleType
             ] as MenuItemsByModuleType[ModuleType]).map(
               (item: any, index: number) => {
                 return (
                   <>
                     <MenuItem
                       minWidth="10.6rem"
-                      key={`${index}_${module.model}`}
+                      key={`${index}_${module.moduleModel}`}
                       onClick={() => item.onClick(item.isSecondary)}
-                      data-testid={`module_setting_${module.model}`}
+                      data-testid={`module_setting_${module.moduleModel}`}
                       disabled={item.disabledReason}
                       {...targetProps}
                     >
@@ -64,7 +64,7 @@ export const ModuleOverflowMenu = (
                     {item.disabledReason && (
                       <Tooltip
                         tooltipProps={tooltipProps}
-                        key={`tooltip_${index}_${module.model}`}
+                        key={`tooltip_${index}_${module.moduleModel}`}
                       >
                         {t('cannot_shake', { ns: 'heater_shaker' })}
                       </Tooltip>

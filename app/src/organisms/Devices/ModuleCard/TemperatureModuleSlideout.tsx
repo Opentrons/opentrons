@@ -40,7 +40,7 @@ export const TemperatureModuleSlideout = (
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
-  const name = getModuleDisplayName(module.model)
+  const name = getModuleDisplayName(module.moduleModel)
   const [temperatureValue, setTemperatureValue] = React.useState<string | null>(
     null
   )
@@ -91,7 +91,7 @@ export const TemperatureModuleSlideout = (
           width="100%"
           onClick={handleSubmitTemperature}
           disabled={temperatureValue === null || valueOutOfRange}
-          data-testid={`TemperatureSlideout_btn_${module.serial}`}
+          data-testid={`TemperatureSlideout_btn_${module.serialNumber}`}
         >
           {t('set_temp_slideout')}
         </PrimaryButton>
@@ -101,7 +101,7 @@ export const TemperatureModuleSlideout = (
         fontWeight={FONT_WEIGHT_REGULAR}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing2}
-        data-testid={`TemperatureSlideout_body_text_${module.serial}`}
+        data-testid={`TemperatureSlideout_body_text_${module.serialNumber}`}
       >
         {t('tempdeck_slideout_body', {
           model: name,
@@ -110,7 +110,7 @@ export const TemperatureModuleSlideout = (
       <Flex
         marginTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`TemperatureSlideout_input_field_${module.serial}`}
+        data-testid={`TemperatureSlideout_input_field_${module.serialNumber}`}
       >
         <Text
           fontWeight={FONT_WEIGHT_REGULAR}
@@ -121,8 +121,8 @@ export const TemperatureModuleSlideout = (
           {t('temperature')}
         </Text>
         <InputField
-          id={`${module.model}`}
-          data-testid={`${module.model}`}
+          id={`${module.moduleModel}`}
+          data-testid={`${module.moduleModel}`}
           autoFocus
           units={CELSIUS}
           value={temperatureValue}

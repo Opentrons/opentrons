@@ -43,7 +43,7 @@ export const HeaterShakerWizard = (
   const heaterShaker =
     attachedModules.find(
       (module): module is HeaterShakerModule =>
-        module.type === HEATERSHAKER_MODULE_TYPE
+        module.moduleType === HEATERSHAKER_MODULE_TYPE
     ) ?? null
 
   let isPrimaryCTAEnabled: boolean = true

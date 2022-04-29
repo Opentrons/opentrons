@@ -158,25 +158,25 @@ const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
 } as ProtocolModuleInfo
 
 const mockMovingHeaterShaker = {
-  model: 'heaterShakerModuleV1',
-  type: 'heaterShakerModuleType',
-  port: '/dev/ot_module_thermocycler0',
-  serial: 'jkl123',
-  revision: 'heatershaker_v4.0',
-  fwVersion: 'v2.0.0',
-  status: 'idle',
+  id: 'heatershaker_id',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
   hasAvailableUpdate: true,
   data: {
     labwareLatchStatus: 'idle_closed',
     speedStatus: 'speeding up',
     temperatureStatus: 'idle',
     currentSpeed: null,
-    currentTemp: null,
+    currentTemperature: null,
     targetSpeed: null,
     targetTemp: null,
     errorDetails: null,
+    status: 'idle',
   },
-  usbPort: { hub: 1, port: 1 },
+  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
 } as any
 
 const render = () => {
@@ -533,7 +533,7 @@ describe('ProtocolRunHeader', () => {
     expect(mockCloseCurrentRun).toBeCalled()
   })
 
-  it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsShakingModal', () => {
+  it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', () => {
     mockUseAttachedModules.mockReturnValue([mockMovingHeaterShaker])
     const [{ getByRole, getByText }] = render()
     const button = getByRole('button', { name: 'Start run' })

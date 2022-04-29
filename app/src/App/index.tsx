@@ -142,7 +142,7 @@ export const AppComponent = (): JSX.Element => {
                       )
                     }
                   )}
-                  <Redirect exact from="/" to="/devices" />
+                  <Redirect exact from="/" to="/protocols" />
                   {/* this redirect from /robots is necessary because the existing app <Redirect /> to /robots renders before feature flags load */}
                   <Redirect from="/robots" to="/devices" />
                 </Switch>

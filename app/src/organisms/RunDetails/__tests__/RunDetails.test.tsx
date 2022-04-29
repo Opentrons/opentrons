@@ -26,7 +26,6 @@ import {
   useCurrentRunControls,
   useRunControls,
 } from '../../RunTimeControl/hooks'
-import { ProtocolLoader } from '../../ProtocolUpload'
 import {
   useCloseCurrentRun,
   useCurrentRunId,
@@ -259,31 +258,5 @@ describe('RunDetails', () => {
     const { queryByRole } = render()
     const button = queryByRole('button', { name: 'close' })
     expect(button).not.toBeInTheDocument()
-  })
-
-  const renderProtocolLoader = (
-    props: React.ComponentProps<typeof ProtocolLoader>
-  ) => {
-    return renderWithProviders(<ProtocolLoader {...props} />)[0]
-  }
-
-  let props: React.ComponentProps<typeof ProtocolLoader>
-  beforeEach(() => {
-    props = { loadingText: 'Loading Protocol' }
-  })
-
-  it('renders a loader if protocol run is not loaded', () => {
-    when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(false)
-    const { getByText } = renderProtocolLoader(props)
-    getByText('Loading Protocol')
-  })
-
-  it('renders a loader if closing current run', () => {
-    when(mockUseCloseCurrentRun).calledWith().mockReturnValue({
-      closeCurrentRun: jest.fn(),
-      isClosingCurrentRun: true,
-    })
-    const { getByText } = renderProtocolLoader(props)
-    getByText('Loading Protocol')
   })
 })
