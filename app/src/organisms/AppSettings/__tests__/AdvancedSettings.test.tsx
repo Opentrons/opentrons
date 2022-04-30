@@ -46,6 +46,10 @@ const mockGetU2EWindowsDriverStatus = SystemInfo.getU2EWindowsDriverStatus as je
   typeof SystemInfo.getU2EWindowsDriverStatus
 >
 
+const mockGetIsHeaterShakerAttached = Config.getIsHeaterShakerAttached as jest.MockedFunction<
+  typeof Config.getIsHeaterShakerAttached
+>
+
 describe('AdvancedSettings', () => {
   beforeEach(() => {
     getCustomLabwarePath.mockReturnValue('')
@@ -190,6 +194,28 @@ describe('AdvancedSettings', () => {
     const [{ getByRole }] = render()
     const toggleButton = getByRole('switch', {
       name: 'show_link_to_get_labware_offset_data',
+    })
+    expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+  })
+
+  it('renders the toggle button on when showing heater shaker modal as false', () => {
+    mockGetIsHeaterShakerAttached.mockReturnValue(true)
+    const [{ getByRole, getByText }] = render()
+    getByText('Confirm Heater-Shaker Module Attachment')
+    getByText(
+      'Display a reminder to attach the Heater-Shaker properly before running a test shake or using it in a protocol.'
+    )
+    const toggleButton = getByRole('switch', {
+      name: 'show_heater_shaker_modal',
+    })
+    expect(toggleButton.getAttribute('aria-checked')).toBe('false')
+  })
+
+  it('renders the toggle button on when showing heater shaker modal as true', () => {
+    mockGetIsHeaterShakerAttached.mockReturnValue(false)
+    const [{ getByRole }] = render()
+    const toggleButton = getByRole('switch', {
+      name: 'show_heater_shaker_modal',
     })
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
   })
