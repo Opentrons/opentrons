@@ -37,6 +37,7 @@ class CommandStatus(str, Enum):
 
 class CommandSource(str, Enum):
     """Source that generated a given command."""
+
     PROTOCOL = "protocol"
     SETUP = "setup"
 
@@ -106,8 +107,7 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
         description="Command execution completed timestamp, if completed",
     )
     commandSource: Optional[CommandSource] = Field(
-        None,
-        description="Source that generated this command."
+        None, description="Source that generated this command."
     )
 
 

@@ -19,7 +19,6 @@ from opentrons.protocol_engine.types import (
     LabwareUri,
     ModuleDefinition,
     ModuleModel,
-    EngineStatus,
 )
 from opentrons.protocol_engine.execution import (
     QueueWorker,
@@ -184,11 +183,11 @@ async def test_adding_setup_command_raises_when_engine_busy(
     subject: ProtocolEngine,
 ) -> None:
     """Test that adding a setup command fails when the engine is not idle/paused."""
-    # created_at = datetime(year=2021, month=1, day=1)
     params = commands.HomeParams()
     request = commands.HomeCreate(params=params)
-    decoy.when(state_store.commands.raise_if_not_paused_or_idle()
-               ).then_raise(SetupCommandNotAllowedError)
+    decoy.when(state_store.commands.raise_if_not_paused_or_idle()).then_raise(
+        SetupCommandNotAllowedError("oh no")
+    )
     with pytest.raises(SetupCommandNotAllowedError):
         subject.add_command(request, is_setup=True)
 

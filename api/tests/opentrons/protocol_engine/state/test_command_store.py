@@ -15,7 +15,6 @@ from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandStore,
     CommandEntry,
-    CommandSource,
     RunResult,
     QueueStatus,
 )
@@ -279,15 +278,14 @@ def test_setup_queue_action_updates_command_source() -> None:
         createdAt=datetime(year=2021, month=1, day=1),
         params=commands.PauseParams(),
         status=commands.CommandStatus.QUEUED,
-        commandSource=CommandSource.SETUP,
+        commandSource=commands.CommandSource.SETUP,
     )
 
     subject = CommandStore()
 
     subject.handle_action(queue_cmd)
     assert subject.state.commands_by_id["command-id-1"] == CommandEntry(
-        index=0,
-        command=expected_pause_cmd
+        index=0, command=expected_pause_cmd
     )
 
 
@@ -450,7 +448,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
             startedAt=datetime(year=2022, month=2, day=2),
             params=commands.PauseParams(),
             status=commands.CommandStatus.RUNNING,
-            commandSource=CommandSource.SETUP
+            commandSource=commands.CommandSource.SETUP,
         )
     )
     failed_action_cmd_2 = FailCommandAction(
@@ -473,7 +471,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         completedAt=datetime(year=2023, month=3, day=3),
         params=commands.PauseParams(),
         status=commands.CommandStatus.FAILED,
-        commandSource=CommandSource.SETUP
+        commandSource=commands.CommandSource.SETUP,
     )
     expected_failed_cmd_3 = commands.Pause(
         id="command-id-3",
@@ -483,7 +481,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         completedAt=datetime(year=2023, month=3, day=3),
         params=commands.PauseParams(),
         status=commands.CommandStatus.FAILED,
-        commandSource=CommandSource.SETUP
+        commandSource=commands.CommandSource.SETUP,
     )
 
     subject = CommandStore()
@@ -497,13 +495,15 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
     assert subject.state.running_command_id is None
     assert subject.state.queued_setup_command_ids == OrderedSet()
     assert subject.state.queued_command_ids == OrderedSet(["command-id-1"])
-    assert subject.state.all_command_ids == ["command-id-1",
-                                             "command-id-2",
-                                             "command-id-3"]
+    assert subject.state.all_command_ids == [
+        "command-id-1",
+        "command-id-2",
+        "command-id-3",
+    ]
     assert subject.state.commands_by_id == {
         "command-id-1": CommandEntry(index=0, command=cmd_1_non_setup),
         "command-id-2": CommandEntry(index=1, command=expected_failed_cmd_2),
-        "command-id-3": CommandEntry(index=2, command=expected_failed_cmd_3)
+        "command-id-3": CommandEntry(index=2, command=expected_failed_cmd_3),
     }
 
 
@@ -582,12 +582,13 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
 def test_play_action_clears_setup_command_queue(pause_source: PauseSource) -> None:
     """Test that a play/resume clears the setup command queue."""
     pause_cmd = commands.Pause(
-            id="command-id-1",
-            key="command-key-1",
-            createdAt=datetime(year=2021, month=1, day=1),
-            params=commands.PauseParams(),
-            status=commands.CommandStatus.QUEUED,
-        )
+        id="command-id-1",
+        key="command-key-1",
+        createdAt=datetime(year=2021, month=1, day=1),
+        params=commands.PauseParams(),
+        status=commands.CommandStatus.QUEUED,
+        commandSource=commands.CommandSource.SETUP,
+    )
     queue_cmd = QueueSetupCommandAction(
         request=commands.PauseCreate(params=commands.PauseParams()),
         created_at=datetime(year=2021, month=1, day=1),

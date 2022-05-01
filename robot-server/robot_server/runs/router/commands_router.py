@@ -119,7 +119,7 @@ async def create_run_command(
         ),
     ),
     isSetupCommand: bool = Query(
-        default=False,
+        default=True,
         description=(
             "If `false`, then this command will be queued as part of protocol commands"
             "\n\n"

@@ -62,10 +62,9 @@ async def test_create_run_command(decoy: Decoy, mock_engine_store: EngineStore) 
         )
         return command_once_added
 
-    decoy.when(mock_engine_store.engine.add_command(
-        command_request, is_setup=False)).then_do(
-        _stub_queued_command_state
-    )
+    decoy.when(
+        mock_engine_store.engine.add_command(command_request, is_setup=False)
+    ).then_do(_stub_queued_command_state)
 
     result = await create_run_command(
         request_body=RequestModel(data=command_request),
@@ -164,7 +163,7 @@ async def test_create_run_command_blocking_completion(
             command_once_completed
         )
 
-    decoy.when(protocol_engine.add_command(command_request)).then_do(
+    decoy.when(protocol_engine.add_command(command_request, is_setup=True)).then_do(
         _stub_queued_command_state
     )
 
@@ -178,6 +177,7 @@ async def test_create_run_command_blocking_completion(
         timeout=999,
         engine_store=mock_engine_store,
         run=run,
+        isSetupCommand=True,
     )
 
     assert result.content.data == command_once_completed
@@ -384,8 +384,7 @@ async def test_get_run_command_missing_command(
 
 
 async def test_add_conflicting_setup_command(
-        decoy: Decoy,
-        mock_engine_store: EngineStore
+    decoy: Decoy, mock_engine_store: EngineStore
 ) -> None:
     """It should raise an error if the setup command cannot be added."""
     command_request = pe_commands.PauseCreate(
@@ -405,8 +404,9 @@ async def test_add_conflicting_setup_command(
         labwareOffsets=[],
     )
 
-    decoy.when(mock_engine_store.engine.add_command(command_request, is_setup=True)
-               ).then_raise(pe_errors.SetupCommandNotAllowedError("oh no"))
+    decoy.when(
+        mock_engine_store.engine.add_command(command_request, is_setup=True)
+    ).then_raise(pe_errors.SetupCommandNotAllowedError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await create_run_command(

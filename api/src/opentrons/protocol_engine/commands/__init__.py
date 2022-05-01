@@ -21,7 +21,7 @@ from .command import (
     BaseCommand,
     BaseCommandCreate,
     CommandStatus,
-    CommandSource
+    CommandSource,
 )
 
 from .command_unions import (

@@ -49,7 +49,7 @@ class QueueStatus(str, Enum):
             the latest command may be running if it was already processed.
     """
 
-    IMPLICITLY_ACTIVE = "implicitly-active"     # implies that the setup queue is active
+    IMPLICITLY_ACTIVE = "implicitly-active"  # implies that the setup queue is active
     ACTIVE = "active"
     INACTIVE = "inactive"
 
@@ -459,7 +459,7 @@ class CommandView(HasState[CommandState]):
         if next_setup_cmd:
             return next_setup_cmd
         elif self._state.queue_status == QueueStatus.INACTIVE:
-            return
+            return None
         else:
             return next(iter(self._state.queued_command_ids), None)
 
@@ -543,10 +543,13 @@ class CommandView(HasState[CommandState]):
 
     def raise_if_not_paused_or_idle(self) -> None:
         """Raise if the engine is neither paused nor idle."""
-        if not (self.get_status() == EngineStatus.PAUSED
-                or self.get_status() == EngineStatus.IDLE):
-            raise SetupCommandNotAllowedError("Setup command can only be run when the"
-                                              "engine is paused or idle.")
+        if not (
+            self.get_status() == EngineStatus.PAUSED
+            or self.get_status() == EngineStatus.IDLE
+        ):
+            raise SetupCommandNotAllowedError(
+                "Setup command can only be run when the" "engine is paused or idle."
+            )
 
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""

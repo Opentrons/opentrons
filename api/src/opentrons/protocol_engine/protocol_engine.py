@@ -1,5 +1,5 @@
 """ProtocolEngine class definition."""
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
@@ -137,7 +137,7 @@ class ProtocolEngine:
             the engine is not idle or paused.
         """
         command_id = self._model_utils.generate_id()
-
+        action: Union[QueueCommandAction, QueueSetupCommandAction]
         if is_setup:
             self.state_view.commands.raise_if_not_paused_or_idle()
             # add to setup command queue

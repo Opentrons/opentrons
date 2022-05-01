@@ -93,7 +93,7 @@ def test_remove_if_found() -> None:
     subject.remove_if_found(2)
     assert list(subject) == [1, 3, 4, 5]
 
-    subject.remove_if_found(2)   # Should just noop
+    subject.remove_if_found(2)  # Should just noop
     assert list(subject) == [1, 3, 4, 5]
 
 

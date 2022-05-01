@@ -105,12 +105,13 @@ def test_get_next_queued_returns_first_queued(queue_status: QueueStatus) -> None
     "queue_status", [QueueStatus.IMPLICITLY_ACTIVE, QueueStatus.ACTIVE]
 )
 def test_get_next_queued_prioritizes_setup_command_queue(
-        queue_status: QueueStatus) -> None:
+    queue_status: QueueStatus,
+) -> None:
     """It should prioritize setup command queue over protocol command queue."""
     subject = get_command_view(
         queue_status=queue_status,
         queued_command_ids=["command-id-1", "command-id-2"],
-        queued_setup_command_ids=["setup-command-id"]
+        queued_setup_command_ids=["setup-command-id"],
     )
 
     assert subject.get_next_queued() == "setup-command-id"
@@ -268,57 +269,57 @@ class SetupCommandAllowedSpec(NamedTuple):
 
 
 command_allowed_specs: List[SetupCommandAllowedSpec] = [
-    SetupCommandAllowedSpec(    # Status: RUNNING
+    SetupCommandAllowedSpec(  # Status: RUNNING
         subject=get_command_view(
             queue_status=QueueStatus.ACTIVE,
             running_command_id=None,
             queued_command_ids=[],
         ),
-        expected_error=errors.SetupCommandNotAllowedError
+        expected_error=errors.SetupCommandNotAllowedError,
     ),
-    SetupCommandAllowedSpec(    # Status: IDLE
+    SetupCommandAllowedSpec(  # Status: IDLE
         subject=get_command_view(
             queue_status=QueueStatus.IMPLICITLY_ACTIVE,
             running_command_id=None,
             queued_command_ids=[],
         ),
-        expected_error=None
+        expected_error=None,
     ),
-    SetupCommandAllowedSpec(    # Status: PAUSED
+    SetupCommandAllowedSpec(  # Status: PAUSED
         subject=get_command_view(
             queue_status=QueueStatus.INACTIVE,
         ),
         expected_error=None,
     ),
-    SetupCommandAllowedSpec(    # Status: FAILED
+    SetupCommandAllowedSpec(  # Status: FAILED
         subject=get_command_view(
             run_result=RunResult.FAILED,
             is_hardware_stopped=True,
         ),
-        expected_error=errors.SetupCommandNotAllowedError
+        expected_error=errors.SetupCommandNotAllowedError,
     ),
-    SetupCommandAllowedSpec(    # Status: BLOCKED_BY_OPEN_DOOR
+    SetupCommandAllowedSpec(  # Status: BLOCKED_BY_OPEN_DOOR
         subject=get_command_view(
             queue_status=QueueStatus.INACTIVE,
             is_door_blocking=True,
         ),
-        expected_error=errors.SetupCommandNotAllowedError
+        expected_error=errors.SetupCommandNotAllowedError,
     ),
-    SetupCommandAllowedSpec(    # Status: FINISHING
+    SetupCommandAllowedSpec(  # Status: FINISHING
         subject=get_command_view(
             queue_status=QueueStatus.INACTIVE,
             run_result=RunResult.SUCCEEDED,
             is_hardware_stopped=False,
         ),
-        expected_error=errors.SetupCommandNotAllowedError
-    )
+        expected_error=errors.SetupCommandNotAllowedError,
+    ),
 ]
 
 
 @pytest.mark.parametrize(SetupCommandAllowedSpec._fields, command_allowed_specs)
 def test_raise_unless_engine_paused_or_idle(
-        subject: CommandView,
-        expected_error: Optional[Type[errors.SetupCommandNotAllowedError]]
+    subject: CommandView,
+    expected_error: Optional[Type[errors.SetupCommandNotAllowedError]],
 ) -> None:
     """It should validate if a setup command can be run."""
     expectation = pytest.raises(expected_error) if expected_error else does_not_raise()
