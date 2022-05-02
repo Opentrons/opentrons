@@ -23,7 +23,6 @@ class TaskRunner:
         """Initialize the TaskRunner"""
 
         self._running_tasks: Set[asyncio.Task[None]] = set()
-  
 
     def run(self, func: TaskFunc, **kwargs: Any) -> None:
         """Run an async function in the background.
@@ -39,6 +38,7 @@ class TaskRunner:
 
         async def wrapper() -> None:
             current_task = asyncio.current_task()
+            assert current_task is not None
             try:
                 await func(**kwargs)
                 log.debug(f"Background task {func_name} succeeded")
@@ -52,7 +52,7 @@ class TaskRunner:
 
     async def cancel_all_and_clean_up(self) -> None:
         """Cancel any ongoing background tasks and wait for them to stop.
-           Intended to be called just once, when the server shuts down.
+        Intended to be called just once, when the server shuts down.
         """
         for task in self._running_tasks:
             task.cancel()
@@ -67,14 +67,14 @@ class TaskRunner:
 
 def initialize_task_runner(app_state: AppState) -> None:
     """Create a new `TaskRunner` and store it on `app_state`
-       Intended to be called just once, when the server starts up.s
+    Intended to be called just once, when the server starts up.s
     """
     task_runner.set_on(app_state, TaskRunner())
 
 
 async def clean_up_task_runner(app_state: AppState) -> None:
     """Clean up the `TaskRunner` stored on `app_state`.
-       Intended to be called just once, when the server shuts down.
+    Intended to be called just once, when the server shuts down.
     """
     task_runner = task_runner.get_from(app_state)
 
@@ -85,9 +85,6 @@ async def clean_up_task_runner(app_state: AppState) -> None:
 def get_task_runner(app_state: AppState = Depends(get_app_state)) -> TaskRunner:
     """Intended to be used by endpoint functions as a FastAPI dependency,
     like `task_runner = fastapi.Depends(get_task_runner)`.
-
-    Args:
-        app_state (AppState, optional): _description_. Defaults to Depends(get_app_state).
 
     Returns:
         TaskRunner: _description_

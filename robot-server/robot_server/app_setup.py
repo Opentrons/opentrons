@@ -11,7 +11,6 @@ from .hardware import initialize_hardware, cleanup_hardware
 from .router import router
 from .service import initialize_logging
 from .service.task_runner import (
-    TaskRunner,
     initialize_task_runner,
     clean_up_task_runner,
 )
