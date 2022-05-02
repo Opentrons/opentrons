@@ -61,20 +61,7 @@ export function ProtocolRunSetup({
         LABWARE_SETUP_KEY,
       ]
     }
-    let initialExpandedStepKey: StepKey = ROBOT_CALIBRATION_STEP_KEY
-    if (calibrationStatus.complete && isDeckCalibrated) {
-      initialExpandedStepKey =
-        nextStepKeysInOrder[
-          nextStepKeysInOrder.findIndex(v => v === ROBOT_CALIBRATION_STEP_KEY) +
-            1
-        ]
-    }
     setStepKeysInOrder(nextStepKeysInOrder)
-    const initialExpandTimer = setTimeout(
-      () => setExpandedStepKey(initialExpandedStepKey),
-      INITIAL_EXPAND_DELAY_MS
-    )
-    return () => clearTimeout(initialExpandTimer)
   }, [Boolean(protocolData), protocolData?.commands])
 
   if (robot == null) return null

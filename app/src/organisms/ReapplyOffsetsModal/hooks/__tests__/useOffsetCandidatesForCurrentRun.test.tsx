@@ -7,7 +7,6 @@ import { mockRunningRun } from '../../../RunTimeControl/__fixtures__'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 
-import type { RunSummaryData } from '@opentrons/api-client'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type { ProtocolDetails } from '../../../Devices/hooks'

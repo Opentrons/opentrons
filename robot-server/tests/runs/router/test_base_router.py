@@ -23,7 +23,7 @@ from robot_server.protocols import (
     ProtocolResource,
     ProtocolNotFoundError,
 )
-from robot_server.runs.run_models import Run, RunSummary, RunCreate, RunUpdate
+from robot_server.runs.run_models import Run, RunCreate, RunUpdate
 
 from robot_server.runs.engine_store import (
     EngineStore,
@@ -472,20 +472,30 @@ async def test_get_runs_not_empty(
         is_current=True,
     )
 
-    response_1 = RunSummary(
+    response_1 = Run(
         id="unique-id-1",
         protocolId=None,
         createdAt=created_at_1,
         status=pe_types.EngineStatus.SUCCEEDED,
         current=False,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
     )
 
-    response_2 = RunSummary(
+    response_2 = Run(
         id="unique-id-2",
         protocolId=None,
         createdAt=created_at_2,
         status=pe_types.EngineStatus.IDLE,
         current=True,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
     )
 
     decoy.when(mock_run_store.get_all()).then_return([run_1, run_2])

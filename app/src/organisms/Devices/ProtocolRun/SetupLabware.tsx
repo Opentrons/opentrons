@@ -166,7 +166,8 @@ export function SetupLabware({
   }
   return (
     <>
-      {currentRun?.labwareOffsets == null ? <ReapplyOffsetsModal /> : null}
+      {/* {currentRun?.data.id === runId && (currentRun?.data?.labwareOffsets == null || currentRun?.data?.labwareOffsets === []) ? <ReapplyOffsetsModal /> : null} */}
+      <ReapplyOffsetsModal />
       {showLabwareHelpModal && (
         <LabwareOffsetModal
           onCloseClick={() => setShowLabwareHelpModal(false)}

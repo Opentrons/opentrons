@@ -7,8 +7,10 @@ export function useHistoricRunDetails(): RunData[] {
 
   return allHistoricRuns == null
     ? []
-    : allHistoricRuns.data.sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      )
+    : allHistoricRuns.data
+        .filter(run => !run.current)
+        .sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        )
 }

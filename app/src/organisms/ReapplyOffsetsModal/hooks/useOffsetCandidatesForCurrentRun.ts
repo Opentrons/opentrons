@@ -37,7 +37,9 @@ export function useOffsetCandidatesForCurrentRun(): LabwareOffset[] {
 
       return allHistoricOffsets.find(
         offset =>
-          isEqual(offset.location, location) && offset.definitionUri === defUri
+          !isEqual(offset.vector, { x: 0, y: 0, z: 0 }) &&
+          isEqual(offset.location, location) &&
+          offset.definitionUri === defUri
       )
     })
     .filter((candidate): candidate is LabwareOffset => candidate !== undefined)
