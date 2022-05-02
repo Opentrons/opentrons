@@ -10,8 +10,7 @@ import { useHistoricRunDetails } from '../useHistoricRunDetails'
 import { mockRunningRun } from '../../../RunTimeControl/__fixtures__'
 import { mockSuccessQueryResults } from '../../../../__fixtures__'
 
-import type { UseQueryResult } from 'react-query'
-import type { RunSummaryData } from '@opentrons/api-client'
+import type { RunData } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 
@@ -20,14 +19,16 @@ const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
 >
 const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 
-const MOCK_RUN_LATER: RunSummaryData = {
+const MOCK_RUN_LATER: RunData = {
+  ...mockRunningRun,
   id: 'run_one',
   createdAt: '2022-05-02T14:34:48.843177',
   current: false,
   status: 'succeeded',
   protocolId: 'fakeProtocolId',
 }
-const MOCK_RUN_EARLIER: RunSummaryData = {
+const MOCK_RUN_EARLIER: RunData = {
+  ...mockRunningRun,
   id: 'run_zero',
   createdAt: '2022-05-01T14:34:48.843177',
   current: false,
@@ -48,14 +49,14 @@ describe('useHistoricRunDetails', () => {
     .calledWith(MOCK_RUN_LATER.id)
     .mockReturnValue(
       mockSuccessQueryResults({
-        data: { ...mockRunningRun, ...MOCK_RUN_LATER },
+        data: MOCK_RUN_LATER,
       })
     )
   when(mockUseRunQuery)
     .calledWith(MOCK_RUN_EARLIER.id)
     .mockReturnValue(
       mockSuccessQueryResults({
-        data: { ...mockRunningRun, ...MOCK_RUN_EARLIER },
+        data: MOCK_RUN_EARLIER,
       })
     )
 
@@ -65,9 +66,6 @@ describe('useHistoricRunDetails', () => {
     )
     const { result, waitFor } = renderHook(useHistoricRunDetails, { wrapper })
     await waitFor(() => result.current != null)
-    expect(result.current).toEqual([
-      { ...mockRunningRun, ...MOCK_RUN_EARLIER },
-      { ...mockRunningRun, ...MOCK_RUN_LATER },
-    ])
+    expect(result.current).toEqual([MOCK_RUN_EARLIER, MOCK_RUN_LATER])
   })
 })

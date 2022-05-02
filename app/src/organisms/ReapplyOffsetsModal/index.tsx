@@ -1,9 +1,14 @@
-import { Modal } from "../../atoms/Modal"
+import * as React from 'react'
+import { Modal } from '../../atoms/Modal'
+import { useOffsetCandidatesForCurrentRun } from './hooks'
 
 export function ReapplyOffsetsModal(): JSX.Element {
+  const offsetCandidates = useOffsetCandidatesForCurrentRun()
   return (
     <Modal>
-      TODO: GATHER RELEVANT OFFSETS
+      {offsetCandidates.map(offset => (
+        <p>{offset.id}</p>
+      ))}
     </Modal>
   )
 }

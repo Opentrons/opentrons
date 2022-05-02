@@ -46,6 +46,8 @@ import { getModuleTypesThatRequireExtraAttention } from '../../../organisms/Prot
 import { DownloadOffsetDataModal } from '../../../organisms/ProtocolUpload/DownloadOffsetDataModal'
 import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
+import { ReapplyOffsetsModal } from '../../ReapplyOffsetsModal'
+import { useCurrentRun } from '../../ProtocolUpload/hooks'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
@@ -56,7 +58,6 @@ import {
 import { ProceedToRunButton } from './ProceedToRunButton'
 
 import type { DeckDefinition } from '@opentrons/shared-data'
-
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
   'fixedBase',
@@ -96,6 +97,7 @@ export function SetupLabware({
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
+  const currentRun = useCurrentRun()
   const runStatus = useRunStatus(runId)
   const { protocolData } = useProtocolDetailsForRun(runId)
   const { t } = useTranslation('protocol_setup')
@@ -164,6 +166,7 @@ export function SetupLabware({
   }
   return (
     <>
+      {currentRun?.labwareOffsets == null ? <ReapplyOffsetsModal /> : null}
       {showLabwareHelpModal && (
         <LabwareOffsetModal
           onCloseClick={() => setShowLabwareHelpModal(false)}
