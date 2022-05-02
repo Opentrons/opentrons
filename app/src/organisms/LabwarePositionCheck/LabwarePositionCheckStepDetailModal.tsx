@@ -27,18 +27,18 @@ import {
   C_DARK_GRAY,
 } from '@opentrons/components'
 import { Portal } from '../../App/portal'
-import styles from '../styles.css'
+import styles from './styles.css'
 
 interface LabwarePositionCheckStepDetailModalProps {
   onCloseClick: () => unknown
 }
 
 const POSITION_IMGS = {
-  modalNozzle1: require('../../../assets/images/lpc_modal_nozzle_1.jpg'),
-  modalNozzle2: require('../../../assets/images/lpc_modal_nozzle_not_centered_1.jpg'),
-  modalNozzle3: require('../../../assets/images/lpc_modal_nozzle_2.jpg'),
-  modalNozzle4: require('../../../assets/images/lpc_modal_nozzle_not_centered_2.jpg'),
-  modalNozzle5: require('../../../assets/images/lpc_modal_nozzle_paper.jpg'),
+  modalNozzle1: require('../../assets/images/lpc_modal_nozzle_1.jpg'),
+  modalNozzle2: require('../../assets/images/lpc_modal_nozzle_not_centered_1.jpg'),
+  modalNozzle3: require('../../assets/images/lpc_modal_nozzle_2.jpg'),
+  modalNozzle4: require('../../assets/images/lpc_modal_nozzle_not_centered_2.jpg'),
+  modalNozzle5: require('../../assets/images/lpc_modal_nozzle_paper.jpg'),
 }
 
 export const LabwarePositionCheckStepDetailModal = (

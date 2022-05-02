@@ -13,7 +13,7 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_SPACE_EVENLY,
 } from '@opentrons/components'
-import styles from '../styles.css'
+import styles from './styles.css'
 
 interface ExitPreventionModalProps {
   onGoBack: () => void

@@ -23,9 +23,10 @@ import { DeckMap } from './DeckMap'
 import { SectionList } from './SectionList'
 import { LabwareOffsetsSummary } from './LabwareOffsetsSummary'
 import { useIntroInfo, useLabwareOffsets, LabwareOffsets } from './hooks'
+import { useProtocolDetailsForRun } from '../Devices/hooks'
+
 import type { SavePositionCommandData } from './types'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
-import { useProtocolDetailsForRun } from '../Devices/hooks'
 
 export const SummaryScreen = (props: {
   savePositionCommandData: SavePositionCommandData

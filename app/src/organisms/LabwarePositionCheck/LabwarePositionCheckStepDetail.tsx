@@ -29,8 +29,8 @@ import {
 } from '../../molecules/JogControls'
 import { useProtocolDetailsForRun } from '../Devices/hooks'
 import { StepDetailText } from './StepDetailText'
-import levelWithTip from '../../../assets/images/lpc_level_with_tip.svg'
-import levelWithLabware from '../../../assets/images/lpc_level_with_labware.svg'
+import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
+import levelWithLabware from '../../assets/images/lpc_level_with_labware.svg'
 import type { Jog } from '../../molecules/JogControls/types'
 import type {
   LabwarePositionCheckCreateCommand,

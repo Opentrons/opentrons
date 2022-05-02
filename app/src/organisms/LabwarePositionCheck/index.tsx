@@ -19,8 +19,7 @@ import { SummaryScreen } from './SummaryScreen'
 import { RobotMotionLoadingModal } from './RobotMotionLoadingModal'
 import { ConfirmPickUpTipModal } from './ConfirmPickUpTipModal'
 import { ExitPreventionModal } from './ExitPreventionModal'
-
-import styles from '../styles.css'
+import styles from './styles.css'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown

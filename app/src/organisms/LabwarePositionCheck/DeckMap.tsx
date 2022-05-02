@@ -20,12 +20,11 @@ import {
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
-} from '../../../organisms/Devices/hooks'
-import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
+} from '../../organisms/Devices/hooks'
+import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import styles from '../styles.css'
 
 const DECK_MAP_VIEWBOX = '-80 -20 550 460'
