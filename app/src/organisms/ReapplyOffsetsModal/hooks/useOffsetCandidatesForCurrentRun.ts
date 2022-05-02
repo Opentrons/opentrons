@@ -1,20 +1,18 @@
-import { useAllRunsQuery, useRunQuery } from '@opentrons/react-api-client'
-import { useProtocolDetailsForRun } from '../Devices/hooks'
-import { getLabwareDefinitionUri } from '../ProtocolSetup/utils/getLabwareDefinitionUri'
-import { getLabwareOffsetLocation } from '../ProtocolSetup/utils/getLabwareOffsetLocation'
-import { useCurrentRun } from '../ProtocolUpload/hooks'
+import isEqual from 'lodash/isEqual'
+import { useProtocolDetailsForRun } from '../../Devices/hooks'
+import { getLabwareDefinitionUri } from '../../ProtocolSetup/utils/getLabwareDefinitionUri'
+import { getLabwareOffsetLocation } from '../../ProtocolSetup/utils/getLabwareOffsetLocation'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useHistoricRunDetails } from './useHistoricRunDetails'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 
-export function getOffsetCandidatesForCurrentRun(): LabwareOffset[] {
-  const currentRun = useCurrentRun()
-  const { protocolData } = useProtocolDetailsForRun(
-    currentRun?.data?.id ?? null
-  )
+export function useOffsetCandidatesForCurrentRun(): LabwareOffset[] {
+  const currentRunId = useCurrentRunId()
+  const { protocolData } = useProtocolDetailsForRun(currentRunId)
   const historicRunDetails = useHistoricRunDetails()
   const allHistoricOffsets = historicRunDetails
-    .map(run => run.data.labwareOffsets ?? [])
+    .map(run => run.labwareOffsets ?? [])
     .flat()
 
   if (
@@ -39,7 +37,7 @@ export function getOffsetCandidatesForCurrentRun(): LabwareOffset[] {
 
       return allHistoricOffsets.find(
         offset =>
-          offset.location === location && offset.definitionUri === defUri
+          isEqual(offset.location, location) && offset.definitionUri === defUri
       )
     })
     .filter((candidate): candidate is LabwareOffset => candidate !== undefined)

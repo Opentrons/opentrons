@@ -1,9 +1,10 @@
 import { useAllRunsQuery, useRunQuery } from '@opentrons/react-api-client'
 
-import type { Run, RunSummaryData } from '@opentrons/api-client'
+import type { RunData, RunSummaryData } from '@opentrons/api-client'
 
-export function useHistoricRunDetails(): Run[] {
+export function useHistoricRunDetails(): RunData[] {
   const { data: allHistoricRuns } = useAllRunsQuery()
+
   return allHistoricRuns == null
     ? []
     : allHistoricRuns.data
@@ -11,8 +12,8 @@ export function useHistoricRunDetails(): Run[] {
           (a, b) =>
             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         )
-        .reduce((acc: Run[], run: RunSummaryData) => {
-          const runDetails = useRunQuery(run.id)?.data
+        .reduce((acc: RunData[], run: RunSummaryData) => {
+          const runDetails = useRunQuery(run.id)?.data?.data
           return runDetails != null ? [...acc, runDetails] : acc
         }, [])
 }
