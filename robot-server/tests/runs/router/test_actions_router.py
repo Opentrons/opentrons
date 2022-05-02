@@ -53,7 +53,7 @@ async def test_create_play_action_to_start_run(
     mock_engine_store: EngineStore,
     prev_run: RunResource,
     task_runner: TaskRunner,
-    mock_engine_state_store: RunStateStore,
+    mock_run_state_store: RunStateStore,
 ) -> None:
     """It should handle a play action that start the runner."""
     action = RunAction(
@@ -72,7 +72,7 @@ async def test_create_play_action_to_start_run(
         action_id="action-id",
         created_at=datetime(year=2022, month=2, day=2),
         task_runner=task_runner,
-        engine_state_store=mock_engine_state_store,
+        engine_state_store=mock_run_state_store,
     )
 
     assert result.content.data == action
@@ -80,7 +80,7 @@ async def test_create_play_action_to_start_run(
 
     decoy.verify(
         task_runner.run_waterfall(
-            [mock_engine_store.runner.run, mock_engine_state_store.insert]
+            [mock_engine_store.runner.run, mock_run_state_store.insert]
         ),
         mock_run_store.insert_action(run_id=prev_run.run_id, action=action),
     )

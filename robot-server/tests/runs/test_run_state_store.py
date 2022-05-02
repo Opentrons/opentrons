@@ -1,6 +1,6 @@
 """Tests for robot_server.runs.run_store."""
 import pytest
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Generator
 
 import sqlalchemy
@@ -15,9 +15,19 @@ from opentrons.protocol_engine import (
 from opentrons.types import MountType, DeckSlotName
 
 from robot_server.runs.run_state_store import RunStateStore, RunStateResource
-from robot_server.runs.run_store import RunNotFoundError
+from robot_server.runs.run_store import RunNotFoundError, RunResource, RunStore
 from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
 
+
+@pytest.fixture
+def run_resource() -> RunResource:
+    return RunResource(
+        run_id="identical-run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        actions=[],
+        is_current=False,
+    )
 
 @pytest.fixture
 def sql_engine(tmp_path: Path) -> Generator[sqlalchemy.engine.Engine, None, None]:
@@ -35,6 +45,11 @@ def sql_engine(tmp_path: Path) -> Generator[sqlalchemy.engine.Engine, None, None
 def subject(sql_engine: sqlalchemy.engine.Engine) -> RunStateStore:
     """Get a ProtocolStore test subject."""
     return RunStateStore(sql_engine=sql_engine)
+
+@pytest.fixture
+def run_store(sql_engine: sqlalchemy.engine.Engine) -> RunStore:
+    """Get a ProtocolStore test subject."""
+    return RunStore(sql_engine=sql_engine)
 
 
 @pytest.fixture
@@ -86,8 +101,11 @@ def protocol_run() -> ProtocolRunData:
     )
 
 
-def test_insert_state(subject: RunStateStore, protocol_run: ProtocolRunData) -> None:
+def test_insert_state(subject: RunStateStore, run_store: RunStore, protocol_run: ProtocolRunData, run_resource: RunResource) -> None:
     """It should be able to add a new run to the store."""
+
+    inserted_run = run_store.insert(run_resource)
+    print(inserted_run)
     engine_state = RunStateResource(
         run_id="run-id",
         state=protocol_run,
