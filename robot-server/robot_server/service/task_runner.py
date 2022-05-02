@@ -51,19 +51,18 @@ class TaskRunner:
         self._background_tasks.add_task(_run_async_task)
 
     def run_waterfall(self, func_list: List[TaskFuncAll]) -> None:
-        """Run an async function in the background.
+        """Run a list of functions in the background.
 
         Will log when the function completes, including any error
         that may occur.
 
         Arguments:
-            func: An async, None-returning function to run in the background.
-            Use kwargs to add arguments if required.
+            func_list: function list to run in the background.
         """
 
         async def _run_async_task() -> None:
             response: Optional[str] = None
-            for idx, func in enumerate(func_list):
+            for func in func_list:
                 func_name = func.__qualname__
                 if response is None:
                     try:
@@ -71,7 +70,7 @@ class TaskRunner:
                     except Exception as e:
                         log.warning(f"Background task {func_name} failed", exc_info=e)
                 else:
-                    func_list[idx + 1](response)
+                    func(response)
                     log.debug(f"Background task {func_name} succeeded")
                     response = None
 
