@@ -404,7 +404,7 @@ class GripperInfoResponsePayload(utils.BinarySerializable):
 @dataclass
 class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
     """A request to move gripper."""
-    
+
     freq: utils.UInt32Field
     duty_cycle: utils.UInt32Field
 
