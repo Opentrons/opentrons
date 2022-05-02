@@ -19,15 +19,18 @@ from robot_server.runs.run_store import RunNotFoundError, RunResource, RunStore
 from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
 
 
+# TODO(tz): move to conftest file. create a fixter that inserts a fun
 @pytest.fixture
 def run_resource() -> RunResource:
+    """Return a run resource."""
     return RunResource(
-        run_id="identical-run-id",
+        run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[],
         is_current=False,
     )
+
 
 @pytest.fixture
 def sql_engine(tmp_path: Path) -> Generator[sqlalchemy.engine.Engine, None, None]:
@@ -46,6 +49,8 @@ def subject(sql_engine: sqlalchemy.engine.Engine) -> RunStateStore:
     """Get a ProtocolStore test subject."""
     return RunStateStore(sql_engine=sql_engine)
 
+
+# TODO(tz): move to conftest file.
 @pytest.fixture
 def run_store(sql_engine: sqlalchemy.engine.Engine) -> RunStore:
     """Get a ProtocolStore test subject."""
@@ -101,11 +106,15 @@ def protocol_run() -> ProtocolRunData:
     )
 
 
-def test_insert_state(subject: RunStateStore, run_store: RunStore, protocol_run: ProtocolRunData, run_resource: RunResource) -> None:
+def test_insert_state(
+    subject: RunStateStore,
+    run_store: RunStore,
+    protocol_run: ProtocolRunData,
+    run_resource: RunResource,
+) -> None:
     """It should be able to add a new run to the store."""
-
     inserted_run = run_store.insert(run_resource)
-    print(inserted_run)
+    print("inserted run " + inserted_run.run_id)
     engine_state = RunStateResource(
         run_id="run-id",
         state=protocol_run,
@@ -117,8 +126,14 @@ def test_insert_state(subject: RunStateStore, run_store: RunStore, protocol_run:
     assert result == engine_state
 
 
-def test_get_run_state(subject: RunStateStore, protocol_run: ProtocolRunData) -> None:
+def test_get_run_state(
+    subject: RunStateStore,
+    run_store: RunStore,
+    run_resource: RunResource,
+    protocol_run: ProtocolRunData,
+) -> None:
     """It should be able to get engine state from the store."""
+    run_store.insert(run_resource)
     engine_state = RunStateResource(
         run_id="run-id",
         state=protocol_run,
@@ -143,11 +158,14 @@ def teardown() -> Generator[None, None, None]:
 @pytest.mark.parametrize("pickle_type", [True, False])
 def test_insert_get_by_state_type(
     subject: RunStateStore,
+    run_store: RunStore,
+    run_resource: RunResource,
     protocol_run: ProtocolRunData,
     pickle_type: bool,
     teardown: Generator[None, None, None],
 ) -> None:
     """It should test the time and db size for prasing a json type and a string type."""
+    run_store.insert(run_resource)
     engine_state = RunStateResource(
         run_id="run-id",
         state=protocol_run,
