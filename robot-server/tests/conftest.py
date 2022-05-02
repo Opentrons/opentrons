@@ -56,7 +56,7 @@ def configure_test_logs(caplog: pytest.LogCaptureFixture) -> None:
     """
     # Fix up SQLAlchemy's logging so that it uses the same log level as everything else.
     # By default, SQLAlchemy's logging is slightly unusual: it hides messages below
-    # WARNING, even if you pass --log-level=DEBUG to PyTest on the command line.
+    # WARNING, even if you pass --log-level=DEBUG to pytest on the command line.
     # See: https://docs.sqlalchemy.org/en/14/core/engines.html#configuring-logging
     caplog.set_level("NOTSET", logger="sqlalchemy")
 
