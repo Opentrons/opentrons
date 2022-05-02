@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Flex,
   ALIGN_CENTER,
@@ -16,6 +17,9 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { Banner } from '../../atoms/Banner'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { ModuleCard } from './ModuleCard'
 import {
   useAttachedModules,
@@ -36,6 +40,11 @@ export function PipettesAndModules({
   const attachedModules = useAttachedModules(robotName)
   const attachedPipettes = useAttachedPipettes(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
+  const currentRunId = useCurrentRunId()
+  const runStatus = useCurrentRunStatus()
+  const showWarningBanner =
+    currentRunId != null || (runStatus != null && runStatus !== RUN_STATUS_IDLE)
+
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
@@ -54,9 +63,18 @@ export function PipettesAndModules({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         minHeight={SIZE_3}
-        padding={SPACING.spacing3}
+        paddingX={SPACING.spacing3}
+        paddingBottom={SPACING.spacing3}
         width="100%"
+        flexDirection={DIRECTION_COLUMN}
       >
+        {showWarningBanner && (
+          <Flex paddingBottom={SPACING.spacing4}>
+            <Banner type="warning">
+              <Flex width="100%">{t('robot_control_not_available')}</Flex>
+            </Banner>
+          </Flex>
+        )}
         {/* TODO(jr, 4/15/22): This needs to be refactored to get a combined array of pipettes and modules so it can display with widths matching each column as the design shows */}
         {isRobotViewable ? (
           <Flex flexDirection={DIRECTION_COLUMN} width="100%">
