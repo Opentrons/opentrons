@@ -820,16 +820,16 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/startSetTargetTemperature"]
+                "enum": ["heaterShaker/setTargetTemperature"]
               },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Heater Shaker Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": {
+                  "celsius": {
                     "type": "number",
                     "description": "target temperature to heat to in °C"
                   }
@@ -845,7 +845,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/setTargetShakeSpeed"]
+                "enum": ["heaterShaker/setAndWaitForShakeSpeed"]
               },
               "params": {
                 "required": ["moduleId", "rpm"],
@@ -864,13 +864,13 @@
           },
 
           {
-            "description": "Heater Shaker Module Await Temperature: Delay protocol execution until the previously supplied startSetTargetTemperature command's temperature parameter has been reached. Errors if no target temperature was set previously.",
+            "description": "Heater Shaker Module Wait For Temperature: Delay protocol execution until the previously supplied startSetTargetTemperature command's temperature parameter has been reached. Errors if no target temperature was set previously.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/awaitTemperature"]
+                "enum": ["heaterShaker/waitForTemperature"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -885,7 +885,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/deactivateHeater"]
+                "enum": ["heaterShaker/deactivateHeater"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -900,7 +900,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/stopShake"]
+                "enum": ["heaterShaker/stopShake"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -915,7 +915,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/openLatch"]
+                "enum": ["heaterShaker/openLatch"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -930,7 +930,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/closeLatch"]
+                "enum": ["heaterShaker/closeLatch"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
