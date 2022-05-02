@@ -5,6 +5,8 @@ from typing import List, overload
 from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
 from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32Field
 
+int_to_float = 2**16
+
 
 @dataclass
 class SensorDataType:
@@ -42,7 +44,7 @@ class SensorDataType:
 
     def to_float(self) -> float:
         """Convert data to float."""
-        return (1.0 * self.as_int) / 2**16
+        return (1.0 * self.as_int) / int_to_float
 
     @property
     def to_int(self) -> int:
