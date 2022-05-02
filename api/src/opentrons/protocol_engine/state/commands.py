@@ -32,6 +32,7 @@ from ..errors import (
     ErrorOccurrence,
     RobotDoorOpenError,
     SetupCommandNotAllowedError,
+    UnexpectedProtocolError,
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
@@ -577,10 +578,13 @@ class CommandView(HasState[CommandState]):
                 return EngineStatus.PAUSED
 
         else:
-            any_running = self._state.running_command_id is not None
-            any_queued = len(self._state.queued_command_ids) > 0
+            # any_running = self._state.running_command_id is not None
+            # any_queued = len(self._state.queued_command_ids) > 0
+            #
+            # if any_running or any_queued:
+            #     return EngineStatus.RUNNING
+            # else:
+            return EngineStatus.IDLE
 
-            if any_running or any_queued:
-                return EngineStatus.RUNNING
-            else:
-                return EngineStatus.IDLE
+        # TODO (spp, 2022-04-29): We might want to add a new "setup commands running"
+        #  status.
