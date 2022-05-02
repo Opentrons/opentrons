@@ -3,6 +3,7 @@ import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import type { DeckDefinition, LabwareDefinition2 } from '../types'
+import type { LabwareParameters, ThermalAdapterName } from '..'
 
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
@@ -183,4 +184,22 @@ export const getSlotHasMatingSurfaceUnitVector = (
   )?.matingSurfaceUnitVector
 
   return Boolean(matingSurfaceUnitVector)
+}
+
+export const getAdapterName = (
+  labwareLoadname: LabwareParameters['loadName']
+): ThermalAdapterName => {
+  let adapterName: ThermalAdapterName
+
+  if (labwareLoadname.includes('pcr')) {
+    adapterName = 'PCR Adapter'
+  } else if (labwareLoadname.includes('deepwell')) {
+    adapterName = 'Deep Well Adapter'
+  } else if (labwareLoadname.includes('flatbottom')) {
+    adapterName = '96 Flat Bottom Adapter'
+  } else {
+    adapterName = 'Universal Flat Adapter'
+  }
+
+  return adapterName
 }
