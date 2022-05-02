@@ -42,7 +42,7 @@ export function PipettesAndModules({
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
   const runStatus = useCurrentRunStatus()
-  const showWarningBanner =
+  const isProtocolLoaded =
     currentRunId != null || (runStatus != null && runStatus !== RUN_STATUS_IDLE)
 
   return (
@@ -68,11 +68,14 @@ export function PipettesAndModules({
         width="100%"
         flexDirection={DIRECTION_COLUMN}
       >
-        {showWarningBanner && (
-          <Flex paddingBottom={SPACING.spacing4}>
-            <Banner type="warning">
-              <Flex width="100%">{t('robot_control_not_available')}</Flex>
-            </Banner>
+        {isProtocolLoaded && (
+          <Flex
+            paddingBottom={SPACING.spacing4}
+            flexDirection={DIRECTION_COLUMN}
+            paddingX={SPACING.spacing2}
+            width="100%"
+          >
+            <Banner type="warning">{t('robot_control_not_available')}</Banner>
           </Flex>
         )}
         {/* TODO(jr, 4/15/22): This needs to be refactored to get a combined array of pipettes and modules so it can display with widths matching each column as the design shows */}

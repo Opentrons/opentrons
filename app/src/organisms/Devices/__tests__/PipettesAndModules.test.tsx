@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
+import { Banner } from '../../../atoms/Banner'
 import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import {
   useAttachedModules,
   useAttachedPipettes,
@@ -10,10 +13,14 @@ import {
 import { ModuleCard } from '../ModuleCard'
 import { PipettesAndModules } from '../PipettesAndModules'
 import { PipetteCard } from '../PipetteCard'
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 jest.mock('../hooks')
 jest.mock('../ModuleCard')
 jest.mock('../PipetteCard')
+jest.mock('../../ProtocolUpload/hooks')
+jest.mock('../../../atoms/Banner')
+jest.mock('../../RunTimeControl/hooks')
 
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
@@ -26,6 +33,13 @@ const mockPipetteCard = PipetteCard as jest.MockedFunction<typeof PipetteCard>
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
 >
+const mockBanner = Banner as jest.MockedFunction<typeof Banner>
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
+>
+const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
+  typeof useCurrentRunStatus
+>
 
 const render = () => {
   return renderWithProviders(<PipettesAndModules robotName="otie" />, {
@@ -34,6 +48,10 @@ const render = () => {
 }
 
 describe('PipettesAndModules', () => {
+  beforeEach(() => {
+    mockUseCurrentRunId.mockReturnValue(null)
+    mockUseCurrentRunStatus.mockReturnValue(null)
+  })
   afterEach(() => {
     jest.resetAllMocks()
   })
@@ -69,5 +87,19 @@ describe('PipettesAndModules', () => {
     })
     const [{ getAllByText }] = render()
     getAllByText('Mock PipetteCard')
+  })
+  it('renders the protocol loaded banner when protocol is loaded', () => {
+    mockUseCurrentRunId.mockReturnValue('RUNID')
+    mockBanner.mockReturnValue(<div>mock Banner</div>)
+    const [{ getByText }] = render()
+
+    getByText('mock Banner')
+  })
+  it('renders the protocol loaded banner when run status is not idle', () => {
+    mockUseCurrentRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
+    mockBanner.mockReturnValue(<div>mock Banner</div>)
+    const [{ getByText }] = render()
+
+    getByText('mock Banner')
   })
 })
