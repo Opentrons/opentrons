@@ -22,7 +22,7 @@ from robot_server.runs.action_models import (
 )
 
 from robot_server.runs.router.actions_router import create_run_action
-from robot_server.runs.engine_state_store import EngineStateStore
+from robot_server.runs.run_state_store import RunStateStore
 
 
 @pytest.fixture
@@ -53,7 +53,7 @@ async def test_create_play_action_to_start_run(
     mock_engine_store: EngineStore,
     prev_run: RunResource,
     task_runner: TaskRunner,
-    mock_engine_state_store: EngineStateStore,
+    mock_engine_state_store: RunStateStore,
 ) -> None:
     """It should handle a play action that start the runner."""
     action = RunAction(

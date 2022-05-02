@@ -42,7 +42,7 @@ from robot_server.runs.run_store import (
     RunNotFoundError,
     RunResource,
 )
-from robot_server.runs.engine_state_store import EngineStateStore, EngineStateResource
+from robot_server.runs.run_state_store import RunStateStore, RunStateResource
 from robot_server.runs.router.base_router import (
     AllRunsLinks,
     create_run,
@@ -644,7 +644,7 @@ async def test_update_run_to_not_current(
     decoy: Decoy,
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
-    mock_engine_state_store: EngineStateStore,
+    mock_engine_state_store: RunStateStore,
     protocol_run: ProtocolRunData,
 ) -> None:
     """It should update a run to no longer be current."""
@@ -664,7 +664,7 @@ async def test_update_run_to_not_current(
         is_current=False,
     )
 
-    engine_state_resource = EngineStateResource(
+    engine_state_resource = RunStateResource(
         run_id="run-id", state=protocol_run, engine_status="succeeded"
     )
 
@@ -732,7 +732,7 @@ async def test_update_current_to_current_noop(
     decoy: Decoy,
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
-    mock_engine_state_store: EngineStateStore,
+    mock_engine_state_store: RunStateStore,
     protocol_run: ProtocolRunData,
 ) -> None:
     """It should noop if updating the current run to current: true."""
@@ -765,7 +765,7 @@ async def test_update_current_to_current_noop(
         labwareOffsets=protocol_run.labwareOffsets,
     )
 
-    engine_state_resource = EngineStateResource(
+    engine_state_resource = RunStateResource(
         run_id="run-id", state=protocol_run, engine_status="succeeded"
     )
 

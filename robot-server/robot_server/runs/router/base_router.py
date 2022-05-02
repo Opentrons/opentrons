@@ -31,7 +31,7 @@ from robot_server.protocols import (
 )
 
 from ..run_store import RunStore, RunResource, RunNotFoundError
-from ..engine_state_store import EngineStateResource, EngineStateStore
+from ..run_state_store import RunStateResource, RunStateStore
 from ..run_models import Run, RunSummary, RunCreate, RunUpdate
 from ..engine_store import EngineStore, EngineConflictError
 from ..dependencies import get_run_store, get_engine_store, get_engine_state_store
@@ -318,7 +318,7 @@ async def update_run(
     request_body: RequestModel[RunUpdate],
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-    engine_state_store: EngineStateStore = Depends(get_engine_state_store),
+    engine_state_store: RunStateStore = Depends(get_engine_state_store),
 ) -> PydanticResponse[SimpleBody[Run]]:
     """Update a run by its ID.
 
@@ -345,8 +345,8 @@ async def update_run(
 
     protocol_run_data = engine_state.get_protocol_run_data()
     # TODO (tz, 2022-29-4): Should we leave declaration or
-    #  use else insert_engine_state_result=None
-    insert_engine_state_result: Optional[EngineStateResource] = None
+    # use else insert_engine_state_result=None
+    insert_engine_state_result: Optional[RunStateResource] = None
     if update.current is False:
         try:
             await engine_store.clear()
@@ -355,7 +355,7 @@ async def update_run(
         run = run_store.update_active_run(run_id=runId, is_current=update.current)
         log.info(f'Marked run "{runId}" as not current.')
         insert_engine_state_result = engine_state_store.insert(
-            EngineStateResource(
+            RunStateResource(
                 run_id=run.run_id,
                 state=protocol_run_data,
                 engine_status=engine_state.commands.get_status(),

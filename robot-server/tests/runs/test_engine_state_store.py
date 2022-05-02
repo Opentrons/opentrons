@@ -14,7 +14,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.types import MountType, DeckSlotName
 
-from robot_server.runs.engine_state_store import EngineStateStore, EngineStateResource
+from robot_server.runs.run_state_store import RunStateStore, RunStateResource
 from robot_server.runs.run_store import RunNotFoundError
 from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
 
@@ -32,9 +32,9 @@ def sql_engine(tmp_path: Path) -> Generator[sqlalchemy.engine.Engine, None, None
 
 
 @pytest.fixture
-def subject(sql_engine: sqlalchemy.engine.Engine) -> EngineStateStore:
+def subject(sql_engine: sqlalchemy.engine.Engine) -> RunStateStore:
     """Get a ProtocolStore test subject."""
-    return EngineStateStore(sql_engine=sql_engine)
+    return RunStateStore(sql_engine=sql_engine)
 
 
 @pytest.fixture
@@ -86,9 +86,9 @@ def protocol_run() -> ProtocolRunData:
     )
 
 
-def test_insert_state(subject: EngineStateStore, protocol_run: ProtocolRunData) -> None:
+def test_insert_state(subject: RunStateStore, protocol_run: ProtocolRunData) -> None:
     """It should be able to add a new run to the store."""
-    engine_state = EngineStateResource(
+    engine_state = RunStateResource(
         run_id="run-id",
         state=protocol_run,
         engine_status="idle"
@@ -99,11 +99,9 @@ def test_insert_state(subject: EngineStateStore, protocol_run: ProtocolRunData) 
     assert result == engine_state
 
 
-def test_get_run_state(
-    subject: EngineStateStore, protocol_run: ProtocolRunData
-) -> None:
+def test_get_run_state(subject: RunStateStore, protocol_run: ProtocolRunData) -> None:
     """It should be able to get engine state from the store."""
-    engine_state = EngineStateResource(
+    engine_state = RunStateResource(
         run_id="run-id",
         state=protocol_run,
         engine_status="idle"
@@ -126,13 +124,13 @@ def teardown() -> Generator[None, None, None]:
 
 @pytest.mark.parametrize("pickle_type", [True, False])
 def test_insert_get_by_state_type(
-    subject: EngineStateStore,
+    subject: RunStateStore,
     protocol_run: ProtocolRunData,
     pickle_type: bool,
     teardown: Generator[None, None, None],
 ) -> None:
     """It should test the time and db size for prasing a json type and a string type."""
-    engine_state = EngineStateResource(
+    engine_state = RunStateResource(
         run_id="run-id",
         state=protocol_run,
         engine_status="idle"
@@ -147,10 +145,10 @@ def test_insert_get_by_state_type(
 
 
 def test_insert_state_run_not_found(
-    subject: EngineStateStore, protocol_run: ProtocolRunData
+    subject: RunStateStore, protocol_run: ProtocolRunData
 ) -> None:
     """It should be able to catch the exception raised by insert."""
-    engine_state = EngineStateResource(
+    engine_state = RunStateResource(
         run_id="run-not-found",
         state=protocol_run,
         engine_status="idle"

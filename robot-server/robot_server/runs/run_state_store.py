@@ -10,8 +10,8 @@ from opentrons.protocol_engine import ProtocolRunData
 
 
 @dataclass(frozen=True)
-class EngineStateResource:
-    """An entry in the engine state store, used to construct response models.
+class RunStateResource:
+    """An entry in the run state store, used to construct response models.
 
     This represents all run engine state derived from ProtocolEngine instance.
     """
@@ -22,14 +22,14 @@ class EngineStateResource:
     # created_at: datetime
 
 
-class EngineStateStore:
+class RunStateStore:
     """Methods for storing and retrieving run resources."""
 
     def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
         """Initialize a RunStore with sql engine."""
         self._sql_engine = sql_engine
 
-    def insert(self, state: EngineStateResource) -> EngineStateResource:
+    def insert(self, state: RunStateResource) -> RunStateResource:
         """Insert engine state to db.
 
         Arguments:
@@ -51,8 +51,8 @@ class EngineStateStore:
 
     # TODO (tz): just for testing time parsing
     def insert_state_by_type(
-        self, state: EngineStateResource, insert_pickle: bool
-    ) -> EngineStateResource:
+        self, state: RunStateResource, insert_pickle: bool
+    ) -> RunStateResource:
         """Insert engine state by type to db.
 
         Arguments:
@@ -79,9 +79,7 @@ class EngineStateStore:
         return state
 
     # TODO (tz): just for testing time parsing
-    def get_state_by_type(
-        self, run_id: str, return_pickle: bool
-    ) -> EngineStateResource:
+    def get_state_by_type(self, run_id: str, return_pickle: bool) -> RunStateResource:
         """Get engine state by type from db.
 
         Arguments:
@@ -109,11 +107,11 @@ class EngineStateStore:
 
         state_result
 
-        return EngineStateResource(
+        return RunStateResource(
             run_id=run_id, state=state_result, engine_status=state_row.engine_status
         )
 
-    def get(self, run_id: str) -> EngineStateResource:
+    def get(self, run_id: str) -> RunStateResource:
         """Get engine state from db.
 
         Arguments:
@@ -132,7 +130,7 @@ class EngineStateStore:
 
 def _convert_sql_row_to_sql_engine_state(
     sql_row: sqlalchemy.engine.Row,
-) -> EngineStateResource:
+) -> RunStateResource:
 
     run_id = sql_row.run_id
     assert isinstance(run_id, str)
@@ -143,12 +141,12 @@ def _convert_sql_row_to_sql_engine_state(
     state = sql_row.state
     assert isinstance(state, Dict)
 
-    return EngineStateResource(
+    return RunStateResource(
         run_id=run_id, state=parse_obj_as(ProtocolRunData, state), engine_status=status
     )
 
 
-def _convert_state_to_sql_values(state: EngineStateResource) -> Dict[str, object]:
+def _convert_state_to_sql_values(state: RunStateResource) -> Dict[str, object]:
     return {
         "run_id": state.run_id,
         "state": state.state.dict(),
