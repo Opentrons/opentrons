@@ -15,16 +15,6 @@ type MigrationsByVersion = Record<
   Version,
   (arg0: Record<string, any>) => Record<string, any>
 >
-const allMigrationsByVersion: MigrationsByVersion = {
-  // @ts-expect-error file types are incompatible
-  '1.1.0': migrateFileOne,
-  // @ts-expect-error file types are incompatible
-  '3.0.0': migrateFileThree,
-  '4.0.0': migrateFileFour,
-  '5.0.0': migrateFileFive,
-  '5.1.0': migrateFileFiveOne,
-  '5.2.0': migrateFileFiveTwo,
-}
 // get all versions to migrate newer than the file's applicationVersion
 export const getMigrationVersionsToRunFromVersion = (
   migrationsByVersion: {},
@@ -34,6 +24,19 @@ export const getMigrationVersionsToRunFromVersion = (
     semver.compare
   )
   return takeRightWhile(allSortedVersions, v => semver.gt(v, version))
+}
+
+const allMigrationsByVersion: MigrationsByVersion = {
+  // @ts-expect-error file types are incompatible
+  '1.1.0': migrateFileOne,
+  // @ts-expect-error file types are incompatible
+  '3.0.0': migrateFileThree,
+  '4.0.0': migrateFileFour,
+  '5.0.0': migrateFileFive,
+  '5.1.0': migrateFileFiveOne,
+  '5.2.0': migrateFileFiveTwo,
+  // @ts-expect-error fix MigrationsByVersion type (and the function signatures of the older migration functions above)
+  '6.0.0': migrateFileSix,
 }
 export const migration = (
   file: any
@@ -56,48 +59,6 @@ export const migration = (
   )
   const migratedFile = flow(
     migrationVersionsToRun.map(version => allMigrationsByVersion[version])
-  )(file)
-  return {
-    file: migratedFile,
-    didMigrate: migrationVersionsToRun.length > 0,
-    migrationsRan: migrationVersionsToRun,
-  }
-}
-
-const allMigrationsByVersionWithV6: MigrationsByVersion = {
-  // @ts-expect-error file types are incompatible
-  '1.1.0': migrateFileOne,
-  // @ts-expect-error file types are incompatible
-  '3.0.0': migrateFileThree,
-  '4.0.0': migrateFileFour,
-  '5.0.0': migrateFileFive,
-  '5.1.0': migrateFileFiveOne,
-  '5.2.0': migrateFileFiveTwo,
-  // @ts-expect-error fix MigrationsByVersion type (and the function signatures of the older migration functions above)
-  '6.0.0': migrateFileSix,
-}
-// rename this to "migration" and remove the other migration after removing the schema v6 feature flag
-export const migrationWithV6 = (
-  file: any
-): {
-  file: PDProtocolFile
-  didMigrate: boolean
-  migrationsRan: string[]
-} => {
-  const designerApplication =
-    file.designerApplication || file['designer-application']
-  // NOTE: default exists because any protocol that doesn't include the application version
-  // key will be treated as the oldest migrateable version ('1.0.0')
-  const applicationVersion: string =
-    designerApplication.applicationVersion ||
-    designerApplication.version ||
-    OLDEST_MIGRATEABLE_VERSION
-  const migrationVersionsToRun = getMigrationVersionsToRunFromVersion(
-    allMigrationsByVersionWithV6,
-    applicationVersion
-  )
-  const migratedFile = flow(
-    migrationVersionsToRun.map(version => allMigrationsByVersionWithV6[version])
   )(file)
   return {
     file: migratedFile,

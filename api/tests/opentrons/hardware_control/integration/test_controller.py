@@ -1,4 +1,3 @@
-import asyncio
 from typing import Iterator
 
 import pytest
@@ -11,7 +10,6 @@ from opentrons.types import Mount
 
 @pytest.fixture
 async def subject(
-    loop: asyncio.BaseEventLoop,
     emulation_app: Iterator[None],
     emulator_settings: Settings,
 ) -> Controller:

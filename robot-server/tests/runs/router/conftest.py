@@ -34,6 +34,6 @@ def mock_engine_store(decoy: Decoy) -> EngineStore:
 
 
 @pytest.fixture()
-def mock_engine_state_store(decoy: Decoy) -> RunStateStore:
+def mock_run_state_store(decoy: Decoy) -> RunStateStore:
     """Get a mock EngineStore interface."""
     return decoy.mock(cls=RunStateStore)

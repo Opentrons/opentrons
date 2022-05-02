@@ -2,11 +2,13 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional
+
 import sqlalchemy
 
-from .action_models import RunAction, RunActionType
+from robot_server.persistence import run_table, action_table, ensure_utc_datetime
+from robot_server.protocols import ProtocolNotFoundError
 
-from robot_server.persistence import run_table, action_table
+from .action_models import RunAction, RunActionType
 
 
 @dataclass(frozen=True)
@@ -48,7 +50,10 @@ class RunStore:
             action: action to insert into the db
         """
         with self._sql_engine.begin() as transaction:
-            _insert_action_no_transaction(run_id, action, transaction)
+            try:
+                _insert_action_no_transaction(run_id, action, transaction)
+            except sqlalchemy.exc.IntegrityError:
+                raise RunNotFoundError(run_id=run_id)
 
     def update_active_run(self, run_id: str, is_current: bool) -> RunResource:
         """Update current active run resource in memory.
@@ -80,7 +85,13 @@ class RunStore:
             _convert_run_to_sql_values(run=run)
         )
         with self._sql_engine.begin() as transaction:
-            transaction.execute(statement)
+            try:
+                transaction.execute(statement)
+            except sqlalchemy.exc.IntegrityError:
+                assert (
+                    run.protocol_id is not None
+                ), "Insert run failed due to unexpected IntegrityError"
+                raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
         self.update_active_run(run_id=run.run_id, is_current=run.is_current)
 
@@ -182,15 +193,6 @@ def _get_actions_no_transaction(
 def _insert_action_no_transaction(
     run_id: str, action: RunAction, transaction: sqlalchemy.engine.Connection
 ) -> None:
-    # TODO (tz): selecting to raise an error if a run does not exist.
-    # SQLite does not support FK by default. Need to add support
-    # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#foreign-key-support
-    try:
-        transaction.execute(
-            sqlalchemy.select(run_table).where(run_table.c.id == run_id)
-        ).one()
-    except sqlalchemy.exc.NoResultFound as e:
-        raise RunNotFoundError(run_id) from e
     transaction.execute(
         sqlalchemy.insert(action_table),
         _convert_action_to_sql_values(run_id=run_id, action=action),
@@ -203,15 +205,13 @@ def _convert_sql_row_to_run(
     current_run_id: Optional[str],
 ) -> RunResource:
     run_id = sql_row.id
-    assert isinstance(run_id, str)
-
-    created_at = sql_row.created_at
-    assert isinstance(created_at, datetime)
-
     protocol_id = sql_row.protocol_id
-    # key is optional in DB. If its not None assert type as string
-    if protocol_id is not None:
-        assert isinstance(protocol_id, str)
+    created_at = ensure_utc_datetime(sql_row.created_at)
+
+    assert isinstance(run_id, str), f"Run ID {run_id} is not a string"
+    assert protocol_id is None or isinstance(
+        protocol_id, str
+    ), f"Protocol ID {protocol_id} is not a string or None"
 
     is_current = current_run_id == run_id
 
@@ -227,30 +227,24 @@ def _convert_sql_row_to_run(
 def _convert_run_to_sql_values(run: RunResource) -> Dict[str, object]:
     return {
         "id": run.run_id,
-        "created_at": run.created_at,
+        "created_at": ensure_utc_datetime(run.created_at),
         "protocol_id": run.protocol_id,
     }
 
 
 def _convert_sql_row_to_action(sql_row: sqlalchemy.engine.Row) -> RunAction:
-    action_id = sql_row.id
-    assert isinstance(action_id, str)
-
-    created_at = sql_row.created_at
-    assert isinstance(created_at, datetime)
-
-    action_type = sql_row.action_type
-    assert isinstance(action_type, str)
-
+    # rely on Pydantic and Enum to raise if data shapes are wrong
     return RunAction(
-        id=action_id, createdAt=created_at, actionType=RunActionType(action_type)
+        id=sql_row.id,
+        createdAt=ensure_utc_datetime(sql_row.created_at),
+        actionType=RunActionType(sql_row.action_type),
     )
 
 
 def _convert_action_to_sql_values(action: RunAction, run_id: str) -> Dict[str, object]:
     return {
         "id": action.id,
-        "created_at": action.createdAt,
+        "created_at": ensure_utc_datetime(action.createdAt),
         "action_type": action.actionType.value,
         "run_id": run_id,
     }

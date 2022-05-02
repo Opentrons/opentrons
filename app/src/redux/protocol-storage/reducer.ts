@@ -1,5 +1,6 @@
 // protocol storage reducer
 import keyBy from 'lodash/keyBy'
+import without from 'lodash/without'
 import * as Actions from './actions'
 
 import type { Action } from '../types'
@@ -9,6 +10,7 @@ import { Reducer } from 'redux'
 export const INITIAL_STATE: ProtocolStorageState = {
   protocolKeys: [],
   filesByProtocolKey: {},
+  inProgressAnalysisProtocolKeys: [],
   addFailureFile: null,
   addFailureMessage: null,
   listFailureMessage: null,
@@ -42,6 +44,27 @@ export const protocolStorageReducer: Reducer<ProtocolStorageState, Action> = (
         ...state,
         addFailureFile: action.payload.protocol,
         addFailureMessage: action.payload.message,
+      }
+    }
+
+    case Actions.ANALYZE_PROTOCOL: {
+      return {
+        ...state,
+        inProgressAnalysisProtocolKeys: [
+          ...state.inProgressAnalysisProtocolKeys,
+          action.payload.protocolKey,
+        ],
+      }
+    }
+
+    case Actions.ANALYZE_PROTOCOL_SUCCESS:
+    case Actions.ANALYZE_PROTOCOL_FAILURE: {
+      return {
+        ...state,
+        inProgressAnalysisProtocolKeys: without(
+          state.inProgressAnalysisProtocolKeys,
+          action.payload.protocolKey
+        ),
       }
     }
   }

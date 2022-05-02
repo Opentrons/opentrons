@@ -16,6 +16,7 @@ export interface DesignerApplicationData {
       [wellName: string]: { [liquidId: string]: { volume: number } }
     }
   }
+  savedStepForms: Record<string, any>
 }
 
 export const getLoadLiquidCommands = (

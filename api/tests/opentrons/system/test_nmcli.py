@@ -137,7 +137,7 @@ mock_bad_security:50:no:foobar
     assert result == expected
 
 
-async def test_networking_status(loop, monkeypatch):
+async def test_networking_status(monkeypatch):
     async def mock_call(cmd):
         # Command: `nmcli networking connectivity`
         if "connectivity" in cmd:

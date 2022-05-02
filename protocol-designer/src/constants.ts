@@ -24,7 +24,7 @@ export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>
 export function getAllWellsForLabware(def: LabwareDefinition2): string[] {
   return Object.keys(def.wells)
 }
-export const FIXED_TRASH_ID: 'trashId' = 'trashId'
+export const FIXED_TRASH_ID: 'fixedTrash' = 'fixedTrash'
 // Standard slot dims FOR VISUALIZATION ONLY
 export const STD_SLOT_X_DIM = 128
 export const STD_SLOT_Y_DIM = 86

@@ -11,6 +11,10 @@ from .module_substates import (
     MagneticModuleSubState,
     HeaterShakerModuleId,
     HeaterShakerModuleSubState,
+    TemperatureModuleId,
+    TemperatureModuleSubState,
+    ThermocyclerModuleId,
+    ThermocyclerModuleSubState,
     ModuleSubStateType,
 )
 from .geometry import GeometryView, TipGeometry
@@ -45,6 +49,10 @@ __all__ = [
     "MagneticModuleSubState",
     "HeaterShakerModuleId",
     "HeaterShakerModuleSubState",
+    "TemperatureModuleId",
+    "TemperatureModuleSubState",
+    "ThermocyclerModuleId",
+    "ThermocyclerModuleSubState",
     "ModuleSubStateType",
     # computed geometry state
     "GeometryView",

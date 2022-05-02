@@ -35,7 +35,7 @@ from opentrons_hardware.firmware_bindings.utils import UInt8Field, UInt32Field
 
 
 @pytest.fixture
-async def incoming_messages(loop: asyncio.AbstractEventLoop) -> Queue[CanMessage]:
+async def incoming_messages() -> Queue[CanMessage]:
     """Incoming message queue."""
     return asyncio.Queue()
 

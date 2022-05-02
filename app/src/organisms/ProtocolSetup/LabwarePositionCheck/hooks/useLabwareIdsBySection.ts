@@ -5,9 +5,11 @@ import { useSections } from './useSections'
 type LabwareIdsBySection = {
   [section in Section]?: string[]
 }
-export function useLabwareIdsBySection(): LabwareIdsBySection {
-  const steps = useSteps()
-  const sections = useSections()
+export function useLabwareIdsBySection(
+  runId: string | null
+): LabwareIdsBySection {
+  const steps = useSteps(runId)
+  const sections = useSections(runId)
   return sections.reduce<LabwareIdsBySection>(
     (labwareIdsBySection, section) => {
       return {

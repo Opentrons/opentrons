@@ -12,16 +12,20 @@ import {
   BORDERS,
   Btn,
 } from '@opentrons/components'
-import { css } from 'styled-components'
 
-export type BannerType = 'success' | 'warning' | 'error' | 'updating'
+import type { StyleProps } from '@opentrons/components'
 
-export interface BannerProps {
+export type BannerType =
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'updating'
+  | 'informing'
+
+export interface BannerProps extends StyleProps {
   /** name constant of the icon to display */
   type: BannerType
-  /** title/main message of colored alert bar */
-  title: React.ReactNode
-  /** Alert message body contents */
+  /** Banner contents */
   children?: React.ReactNode
   /** optional handler to show close button/clear alert  */
   onCloseClick?: () => unknown
@@ -39,12 +43,12 @@ const BANNER_PROPS_BY_TYPE: Record<
     color: COLORS.success,
   },
   error: {
-    icon: { name: 'information' },
+    icon: { name: 'alert-circle' },
     backgroundColor: COLORS.errorBg,
     color: COLORS.error,
   },
   warning: {
-    icon: { name: 'information' },
+    icon: { name: 'alert-circle' },
     backgroundColor: COLORS.warningBg,
     color: COLORS.warning,
   },
@@ -53,27 +57,22 @@ const BANNER_PROPS_BY_TYPE: Record<
     backgroundColor: COLORS.greyDisabled,
     color: COLORS.darkGreyEnabled,
   },
+  informing: {
+    icon: { name: 'information' },
+    backgroundColor: COLORS.background,
+    color: COLORS.darkGreyEnabled,
+  },
 }
 
-const MESSAGE_STYLING = css`
-  & a {
-    text-decoration: underline;
-    color: inherit;
-  }
-
-  &:empty {
-    padding: 0;
-  }
-`
 export function Banner(props: BannerProps): JSX.Element {
-  const bannerProps = BANNER_PROPS_BY_TYPE[props.type]
-  const icon = props.icon ? props.icon : bannerProps.icon
+  const { type, onCloseClick, icon, children, ...styleProps } = props
+  const bannerProps = BANNER_PROPS_BY_TYPE[type]
 
   const iconProps = {
-    ...icon,
+    ...(icon ?? bannerProps.icon),
     size: SPACING.spacing4,
     marginRight: SPACING.spacing3,
-    color: BANNER_PROPS_BY_TYPE[props.type].color,
+    color: BANNER_PROPS_BY_TYPE[type].color,
   }
 
   return (
@@ -81,39 +80,32 @@ export function Banner(props: BannerProps): JSX.Element {
       fontSize={TYPOGRAPHY.fontSizeP}
       fontWeight={TYPOGRAPHY.fontWeightRegular}
       borderRadius={SPACING.spacing2}
-      backgroundColor={BANNER_PROPS_BY_TYPE[props.type].backgroundColor}
-      border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${
-        BANNER_PROPS_BY_TYPE[props.type].color
-      }`}
+      backgroundColor={BANNER_PROPS_BY_TYPE[type].backgroundColor}
+      border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${BANNER_PROPS_BY_TYPE[type].color}`}
+      flexDirection={DIRECTION_ROW}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      alignItems={ALIGN_CENTER}
       padding={SPACING.spacing3}
-      paddingRight={SPACING.spacing4}
+      data-testid={`Banner_${type}`}
+      {...styleProps}
     >
-      <Flex
-        color={COLORS.darkBlack}
-        flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        flex="auto"
-        alignItems={ALIGN_CENTER}
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-        data-testid={`Banner_${props.title}_${props.type}`}
-      >
-        <Icon
-          {...iconProps}
-          aria-label={`icon_${props.type}`}
-          spin={BANNER_PROPS_BY_TYPE[props.type].icon.name === 'ot-spinner'}
-        />
-        <Flex width="100%">{props.title}</Flex>
-        {props.onCloseClick && (
-          <Btn
-            onClick={props.onCloseClick}
-            width={SPACING.spacing5}
-            height={SPACING.spacing5}
-          >
-            <Icon name="close" aria-label="close_icon" />
-          </Btn>
-        )}
+      <Icon
+        {...iconProps}
+        aria-label={`icon_${type}`}
+        spin={BANNER_PROPS_BY_TYPE[type].icon.name === 'ot-spinner'}
+      />
+      <Flex flex="1" alignItems={ALIGN_CENTER}>
+        {props.children}
       </Flex>
-      {props.children && <Flex css={MESSAGE_STYLING}>{props.children}</Flex>}
+      {props.onCloseClick && (
+        <Btn
+          onClick={props.onCloseClick}
+          width={SPACING.spacing5}
+          height={SPACING.spacing5}
+        >
+          <Icon name="close" aria-label="close_icon" />
+        </Btn>
+      )}
     </Flex>
   )
 }

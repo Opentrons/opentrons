@@ -3,6 +3,9 @@
 exports[` 1`] = `
 Object {
   "labware": Object {
+    "fixedTrash": Object {
+      "slot": "12",
+    },
     "somePlateId": Object {
       "slot": "1",
     },
@@ -12,12 +15,12 @@ Object {
     "tiprack300Id": Object {
       "slot": "4",
     },
-    "trashId": Object {
-      "slot": "12",
-    },
   },
   "liquidState": Object {
     "labware": Object {
+      "fixedTrash": Object {
+        "A1": Object {},
+      },
       "somePlateId": Object {
         "A1": Object {},
         "A10": Object {},
@@ -311,9 +314,6 @@ Object {
         "H7": Object {},
         "H8": Object {},
         "H9": Object {},
-      },
-      "trashId": Object {
-        "A1": Object {},
       },
     },
     "pipettes": Object {

@@ -215,7 +215,7 @@ export const makeStateArgsStandard = (): StandardMakeStateArgs => ({
     destPlateId: {
       slot: '3',
     },
-    trashId: {
+    fixedTrash: {
       slot: '12',
     },
   },

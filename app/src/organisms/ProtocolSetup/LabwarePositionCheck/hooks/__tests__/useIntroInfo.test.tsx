@@ -6,8 +6,9 @@ import { createStore, Store } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
 import { getPipetteNameSpecs, PipetteName } from '@opentrons/shared-data'
 import { getPipetteMount } from '../../../utils/getPipetteMount'
-import { useProtocolDetails } from '../../../../RunDetails/hooks'
-import * as hooks from '..'
+import { useCurrentRunId } from '../../../../ProtocolUpload/hooks'
+import { useProtocolDetailsForRun } from '../../../../Devices/hooks/useProtocolDetailsForRun'
+import { useIntroInfo } from '../useIntroInfo'
 import { getLabwareLocation } from '../../../utils/getLabwareLocation'
 import { getLabwarePositionCheckSteps } from '../../getLabwarePositionCheckSteps'
 import type { PickUpTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
@@ -18,7 +19,8 @@ jest.mock('../../getLabwarePositionCheckSteps')
 jest.mock('../../../../../redux/protocol')
 jest.mock('../../../utils/getPipetteMount')
 jest.mock('../../../utils/getLabwareLocation')
-jest.mock('../../../../RunDetails/hooks')
+jest.mock('../../../../Devices/hooks/useProtocolDetailsForRun')
+jest.mock('../../../../ProtocolUpload/hooks')
 
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
 const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME' as PipetteName
@@ -29,9 +31,10 @@ const SECONDARY_PIPETTE_NAME = 'SECONDARY_PIPETTE_NAME'
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PICKUP_TIP_LABWARE_SLOT = '3'
 const PICKUP_TIP_LABWARE_DISPLAY_NAME = 'PICKUP_TIP_LABWARE_DISPLAY_NAME'
+const MOCK_RUN_ID = 'fakeRunId'
 
-const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
-  typeof useProtocolDetails
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
 >
 const mockGetPipetteNameSpecs = getPipetteNameSpecs as jest.MockedFunction<
   typeof getPipetteNameSpecs
@@ -44,6 +47,9 @@ const mockGetPipetteMount = getPipetteMount as jest.MockedFunction<
 >
 const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
   typeof getLabwareLocation
+>
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
 >
 
 const store: Store<any> = createStore(jest.fn(), {})
@@ -79,7 +85,7 @@ describe('useIntroInfo', () => {
         ],
       },
     ])
-    mockUseProtocolDetails.mockReturnValue({
+    mockUseProtocolDetailsForRun.mockReturnValue({
       protocolData: {
         labware: {
           [PICKUP_TIP_LABWARE_ID]: {
@@ -112,6 +118,8 @@ describe('useIntroInfo', () => {
     when(mockGetLabwareLocation)
       .calledWith(PICKUP_TIP_LABWARE_ID, protocolCommands)
       .mockReturnValue({ slotName: PICKUP_TIP_LABWARE_SLOT })
+
+    when(mockUseCurrentRunId).calledWith().mockReturnValue(MOCK_RUN_ID)
   })
   it('should gather all labware position check intro screen data', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
@@ -121,7 +129,9 @@ describe('useIntroInfo', () => {
         </QueryClientProvider>
       </Provider>
     )
-    const { result } = renderHook(hooks.useIntroInfo, { wrapper })
+    const { result } = renderHook(() => useIntroInfo(), {
+      wrapper,
+    })
     const {
       primaryPipetteMount,
       secondaryPipetteMount,

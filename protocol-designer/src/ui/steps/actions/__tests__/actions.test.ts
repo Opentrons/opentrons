@@ -45,7 +45,7 @@ const mockGetRobotStateTimeline = getRobotStateTimeline as jest.MockedFunction<
 
 const initialRobotState: RobotState = {
   labware: {
-    trashId: {
+    fixedTrash: {
       slot: '12',
     },
     tiprackId: {
@@ -376,7 +376,7 @@ describe('steps actions', () => {
                       tiprackId: {
                         slot: '1',
                       },
-                      trashId: {
+                      fixedTrash: {
                         slot: '12',
                       },
                     },
@@ -517,7 +517,7 @@ describe('steps actions', () => {
                       tiprackId: {
                         slot: '1',
                       },
-                      trashId: {
+                      fixedTrash: {
                         slot: '12',
                       },
                     },

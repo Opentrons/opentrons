@@ -1,9 +1,9 @@
 import * as React from 'react'
-import first from 'lodash/first'
+import map from 'lodash/map'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { getModuleType, getPipetteNameSpecs } from '@opentrons/shared-data'
+import { useSelector } from 'react-redux'
 import {
   Box,
   Btn,
@@ -22,20 +22,29 @@ import {
   Card,
   JUSTIFY_SPACE_BETWEEN,
   TEXT_TRANSFORM_CAPITALIZE,
-  ModuleIcon,
+  Text,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
-  parseAllRequiredModuleModels,
+  parseInitialLoadedModulesBySlot,
 } from '@opentrons/api-client'
 
-import { StoredProtocolData } from '../../redux/protocol-storage'
+import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
+import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
+import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/Buttons'
-import { DeckThumbnail } from '../../molecules/DeckThumbnail'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
+import { OverflowMenu } from './OverflowMenu'
+import {
+  getAnalysisStatus,
+  getProtocolDisplayName,
+} from '../ProtocolsLanding/utils'
+
+import type { State } from '../../redux/types'
+import type { StoredProtocolData } from '../../redux/protocol-storage'
+import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 
 const defaultTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -103,22 +112,28 @@ export function ProtocolDetails(
     'robot_config' | 'labware'
   >('robot_config')
   const [showSlideout, setShowSlideout] = React.useState(false)
+  const isAnalyzing = useSelector((state: State) =>
+    getIsProtocolAnalysisInProgress(state, protocolKey)
+  )
+  const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
+  if (analysisStatus === 'missing') return null
 
-  if (mostRecentAnalysis == null) return null
+  const { left: leftMountPipetteName, right: rightMountPipetteName } =
+    mostRecentAnalysis != null
+      ? parseInitialPipetteNamesByMount(mostRecentAnalysis.commands)
+      : { left: null, right: null }
 
-  const robotModel = mostRecentAnalysis?.robot?.model ?? 'OT-2'
-  const {
-    left: leftMountPipetteName,
-    right: rightMountPipetteName,
-  } = parseInitialPipetteNamesByMount(mostRecentAnalysis)
-  const requiredModuleTypes = parseAllRequiredModuleModels(
+  const requiredModuleDetails = map(
+    parseInitialLoadedModulesBySlot(
+      mostRecentAnalysis.commands != null ? mostRecentAnalysis.commands : []
+    )
+  )
+
+  const protocolDisplayName = getProtocolDisplayName(
+    protocolKey,
+    srcFileNames,
     mostRecentAnalysis
-  ).map(getModuleType)
-
-  const protocolName =
-    mostRecentAnalysis?.metadata?.protocolName ??
-    first(srcFileNames) ??
-    protocolKey
+  )
 
   // TODO: IMMEDIATELY parse real values out of analysis file for these with fallback to no data
   const creationMethod = t('shared:no_data')
@@ -130,43 +145,11 @@ export function ProtocolDetails(
     currentTab === 'labware' ? (
       <Box>TODO: labware tab contents</Box>
     ) : (
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <Flex flexDirection={DIRECTION_ROW} marginRight={SPACING.spacing4}>
-          <StyledText as="h6">{t('robot')}</StyledText>
-          <StyledText as="p">{robotModel}</StyledText>
-        </Flex>
-        <Flex flexDirection={DIRECTION_ROW} marginRight={SPACING.spacing4}>
-          <StyledText as="h6">{t('left_mount')}</StyledText>
-          <StyledText as="p">
-            {leftMountPipetteName != null
-              ? getPipetteNameSpecs(leftMountPipetteName)?.displayName
-              : t('shared:empty')}
-          </StyledText>
-        </Flex>
-        <Flex flexDirection={DIRECTION_ROW} marginRight={SPACING.spacing4}>
-          <StyledText as="h6">{t('right_mount')}</StyledText>
-          <StyledText as="p">
-            {rightMountPipetteName != null
-              ? getPipetteNameSpecs(rightMountPipetteName)?.displayName
-              : t('shared:empty')}
-          </StyledText>
-        </Flex>
-        {requiredModuleTypes.length > 0 ? (
-          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
-            <StyledText as="h6">{t('modules')}</StyledText>
-            <Flex>
-              {requiredModuleTypes.map((moduleType, index) => (
-                <ModuleIcon
-                  key={index}
-                  moduleType={moduleType}
-                  height="1rem"
-                  marginRight={SPACING.spacing3}
-                />
-              ))}
-            </Flex>
-          </Flex>
-        ) : null}
-      </Flex>
+      <RobotConfigurationDetails
+        leftMountPipetteName={leftMountPipetteName}
+        rightMountPipetteName={rightMountPipetteName}
+        requiredModuleDetails={requiredModuleDetails}
+      />
     )
 
   return (
@@ -179,39 +162,77 @@ export function ProtocolDetails(
         onCloseClick={() => setShowSlideout(false)}
         showSlideout={showSlideout}
         storedProtocolData={props}
-        height={`calc(100vh - ${SPACING.spacing4})`} // account for the breadcrumbs bar
       />
       <Card marginBottom={SPACING.spacing4} padding={SPACING.spacing4}>
+        {analysisStatus !== 'loading' &&
+        mostRecentAnalysis != null &&
+        mostRecentAnalysis.errors.length > 0 ? (
+          <ProtocolAnalysisFailure
+            protocolKey={protocolKey}
+            errors={mostRecentAnalysis.errors.map(e => e.detail)}
+          />
+        ) : null}
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <StyledText as="h3" marginBottom={SPACING.spacing4} height="2.75rem">
-            {protocolName}
+          <StyledText
+            as="h3"
+            marginBottom={SPACING.spacing4}
+            height="2.75rem"
+            data-testid={`ProtocolDetails_${protocolDisplayName}`}
+          >
+            {protocolDisplayName}
           </StyledText>
-          <OverflowBtn
-            onClick={() => console.log('TODO: open overflow menu')}
+          <OverflowMenu
+            protocolKey={protocolKey}
+            data-testid={`ProtocolDetails_overFlowMenu`}
           />
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            marginRight={SPACING.spacing4}
+            data-testid={`ProtocolDetails_creationMethod`}
+          >
             <StyledText as="h6">{t('creation_method')}</StyledText>
-            <StyledText as="p">{creationMethod}</StyledText>
-          </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
-            <StyledText as="h6">{t('last_updated')}</StyledText>
             <StyledText as="p">
-              {format(new Date(modified), 'MMMM dd, yyyy HH:mm')}
+              {analysisStatus === 'loading'
+                ? t('shared:loading')
+                : creationMethod}
             </StyledText>
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
-            <StyledText as="h6">{t('last_analyzed')}</StyledText>
-            <StyledText as="p">{lastAnalyzed}</StyledText>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            marginRight={SPACING.spacing4}
+            data-testid={`ProtocolDetails_lastUpdated`}
+          >
+            <StyledText as="h6">{t('last_updated')}</StyledText>
+            <StyledText as="p">
+              {analysisStatus === 'loading'
+                ? t('shared:loading')
+                : format(new Date(modified), 'MMMM dd, yyyy HH:mm')}
+            </StyledText>
           </Flex>
-          <PrimaryButton onClick={() => setShowSlideout(true)}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            marginRight={SPACING.spacing4}
+            data-testid={`ProtocolDetails_lastAnalyzed`}
+          >
+            <StyledText as="h6">{t('last_analyzed')}</StyledText>
+            <StyledText as="p">
+              {analysisStatus === 'loading'
+                ? t('shared:loading')
+                : lastAnalyzed}
+            </StyledText>
+          </Flex>
+          <PrimaryButton
+            onClick={() => setShowSlideout(true)}
+            data-testid={`ProtocolDetails_runProtocol`}
+          >
             {t('run_protocol')}
           </PrimaryButton>
         </Flex>
@@ -221,17 +242,23 @@ export function ProtocolDetails(
             flex="1"
             flexDirection={DIRECTION_COLUMN}
             marginRight={SPACING.spacing4}
+            data-testid={`ProtocolDetails_author`}
           >
             <StyledText as="h6">{t('org_or_author')}</StyledText>
-            <StyledText as="p">{author}</StyledText>
+            <StyledText as="p">
+              {analysisStatus === 'loading' ? t('shared:loading') : author}
+            </StyledText>
           </Flex>
           <Flex
             flex="1"
             flexDirection={DIRECTION_COLUMN}
             marginRight={SPACING.spacing4}
+            data-testid={`ProtocolDetails_description`}
           >
             <StyledText as="h6">{t('description')}</StyledText>
-            <StyledText as="p">{description}</StyledText>
+            <StyledText as="p">
+              {analysisStatus === 'loading' ? t('shared:loading') : description}
+            </StyledText>
             <Link
               onClick={() =>
                 console.log(
@@ -249,7 +276,11 @@ export function ProtocolDetails(
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Card flex="1">
+        <Card
+          flex="0 0 20rem"
+          backgroundColor={COLORS.white}
+          data-testid={`ProtocolDetails_deckMap`}
+        >
           <StyledText
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -259,24 +290,46 @@ export function ProtocolDetails(
             {t('deck_setup')}
           </StyledText>
           <Divider />
-          <Box padding={SPACING.spacing4}>
-            <DeckThumbnail analysis={mostRecentAnalysis} />
+          <Box padding={SPACING.spacing4} backgroundColor={COLORS.white}>
+            {
+              {
+                missing: <Box size="15rem" backgroundColor={COLORS.medGrey} />,
+                loading: <Box size="15rem" backgroundColor={COLORS.medGrey} />,
+                error: <Box size="15rem" backgroundColor={COLORS.medGrey} />,
+                complete: (
+                  <DeckThumbnail
+                    commands={mostRecentAnalysis?.commands ?? []}
+                  />
+                ),
+              }[analysisStatus]
+            }
           </Box>
         </Card>
-        <Box height="100%" width={SPACING.spacing4} />
-        <Card flex="1">
+
+        <Flex
+          width="100%"
+          height="100%"
+          flexDirection={DIRECTION_COLUMN}
+          marginLeft={SPACING.spacing4}
+        >
           <Flex>
             <RoundTab
+              data-testid={`ProtocolDetails_robotConfig`}
               isCurrent={currentTab === 'robot_config'}
               onClick={() => setCurrentTab('robot_config')}
             >
-              {t('robot_configuration')}
+              <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+                {t('robot_configuration')}
+              </Text>
             </RoundTab>
             <RoundTab
+              data-testid={`ProtocolDetails_labware`}
               isCurrent={currentTab === 'labware'}
               onClick={() => setCurrentTab('labware')}
             >
-              {t('labware')}
+              <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+                {t('labware')}
+              </Text>
             </RoundTab>
           </Flex>
           <Box
@@ -292,7 +345,7 @@ export function ProtocolDetails(
           >
             {getTabContents()}
           </Box>
-        </Card>
+        </Flex>
       </Flex>
     </Flex>
   )

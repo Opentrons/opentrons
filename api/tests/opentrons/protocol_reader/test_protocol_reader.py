@@ -2,7 +2,7 @@
 import pytest
 import io
 from dataclasses import dataclass
-from decoy import Decoy
+from decoy import Decoy, matchers
 from pathlib import Path
 from typing import IO, Optional
 
@@ -289,7 +289,9 @@ async def test_read_files_no_copy(
     )
 
     decoy.verify(
-        await file_reader_writer.write(),  # type: ignore[call-arg]
-        ignore_extra_args=True,
+        await file_reader_writer.write(
+            directory=matchers.Anything(),
+            files=matchers.Anything(),
+        ),
         times=0,
     )

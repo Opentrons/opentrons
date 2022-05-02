@@ -5,7 +5,6 @@ import {
   LinkProps,
   Icon,
   TYPOGRAPHY,
-  COLORS,
   SPACING,
 } from '@opentrons/components'
 
@@ -16,7 +15,7 @@ export interface ExternalLinkProps extends LinkProps {
 }
 
 export const ExternalLink = (props: ExternalLinkProps): JSX.Element => (
-  <Link external {...props} color={COLORS.blue} css={TYPOGRAPHY.labelRegular}>
+  <Link external {...props} css={TYPOGRAPHY.linkPSemibold}>
     {props.children}
     <Icon
       width={SPACING.spacing3}

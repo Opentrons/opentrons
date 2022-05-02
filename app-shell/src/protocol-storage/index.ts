@@ -87,9 +87,10 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
         FileSystem.addProtocolFile(
           action.payload.protocolFilePath,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
-        ).then(() =>
+        ).then(protocolKey => {
           fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
-        )
+          dispatch(ProtocolStorageActions.analyzeProtocol(protocolKey))
+        })
         break
       }
 
@@ -97,9 +98,25 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
         FileSystem.analyzeProtocolByKey(
           action.payload.protocolKey,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
-        ).then(() =>
-          fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
         )
+          .then(() => {
+            dispatch(
+              ProtocolStorageActions.analyzeProtocolSuccess(
+                action.payload.protocolKey
+              )
+            )
+            return fetchProtocols(
+              dispatch,
+              ProtocolStorageActions.PROTOCOL_ADDITION
+            )
+          })
+          .catch((_e: Error) => {
+            dispatch(
+              ProtocolStorageActions.analyzeProtocolFailure(
+                action.payload.protocolKey
+              )
+            )
+          })
         break
       }
 
@@ -109,6 +126,14 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
           FileSystem.PROTOCOLS_DIRECTORY_PATH
         ).then(() =>
           fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
+        )
+        break
+      }
+
+      case ProtocolStorageActions.VIEW_PROTOCOL_SOURCE_FOLDER: {
+        FileSystem.viewProtocolSourceFolder(
+          action.payload.protocolKey,
+          FileSystem.PROTOCOLS_DIRECTORY_PATH
         )
         break
       }

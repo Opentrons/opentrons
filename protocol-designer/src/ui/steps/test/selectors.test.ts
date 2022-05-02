@@ -536,7 +536,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
         },
         blowout_location: {
-          value: 'trashId',
+          value: 'fixedTrash',
           isIndeterminate: false,
         },
         changeTip: {
@@ -733,7 +733,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
         },
         blowout_location: {
           isIndeterminate: false,
-          value: 'trashId',
+          value: 'fixedTrash',
         },
         aspirate_wells: {
           isIndeterminate: true,
@@ -797,7 +797,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
         mix_wellOrder_first: { value: 't2b', isIndeterminate: false },
         mix_wellOrder_second: { value: 'l2r', isIndeterminate: false },
         blowout_checkbox: { value: false, isIndeterminate: false },
-        blowout_location: { value: 'trashId', isIndeterminate: false },
+        blowout_location: { value: 'fixedTrash', isIndeterminate: false },
         mix_mmFromBottom: { value: 0.5, isIndeterminate: false },
         pipette: { value: 'some_pipette_id', isIndeterminate: false },
         wells: { isIndeterminate: true },

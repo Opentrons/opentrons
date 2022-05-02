@@ -324,14 +324,7 @@ def make_runlog_cb() -> Callable[[command_types.CommandMessage], None]:
                 level -= 1
         last_dollar = command["$"]
         if command["$"] == "before":
-            print(
-                " ".join(
-                    [
-                        "\t" * level,
-                        command["payload"].get("text", "").format(**command["payload"]),
-                    ]
-                )
-            )
+            print(" ".join(["\t" * level, command["payload"].get("text", "")]))
 
     return _print_runlog
 

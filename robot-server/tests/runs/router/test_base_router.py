@@ -24,6 +24,7 @@ from robot_server.service.json_api import (
     MultiBodyMeta,
     ResourceLink,
 )
+
 from robot_server.protocols import (
     ProtocolStore,
     ProtocolResource,
@@ -52,6 +53,7 @@ from robot_server.runs.router.base_router import (
     remove_run,
     update_run,
 )
+
 
 LABWARE_OFFSET_REQUESTS = [
     pe_types.LabwareOffsetCreate(
@@ -686,13 +688,11 @@ async def test_update_run_to_not_current(
     decoy.when(mock_run_store.get(run_id="run-id")).then_return(run_resource)
 
     decoy.when(
-        mock_run_store.update_active_run(
-            run_id="run-id", is_current=updated_resource.is_current
-        )
+        mock_run_store.update_active_run(run_id="run-id", is_current=False)
     ).then_return(updated_resource)
 
     engine_state = decoy.mock(cls=StateView)
-    decoy.when(mock_engine_store.engine.state_view).then_return(engine_state)
+    decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get_all()).then_return([])
     decoy.when(engine_state.commands.get_all_errors()).then_return([])
     decoy.when(engine_state.pipettes.get_all()).then_return([])
@@ -722,9 +722,6 @@ async def test_update_run_to_not_current(
 
     decoy.verify(
         await mock_engine_store.clear(),
-        mock_run_store.update_active_run(
-            run_id=updated_resource.run_id, is_current=updated_resource.is_current
-        ),
     )
 
 
@@ -807,12 +804,11 @@ async def test_update_current_to_current_noop(
     assert result.content == SimpleBody(data=expected_response)
     assert result.status_code == 200
 
+    decoy.verify(await mock_engine_store.clear(), times=0)
     decoy.verify(
         mock_run_store.update_active_run(
-            run_id=run_resource.run_id,
-            is_current=run_update.current
-            if run_update.current is not None
-            else run_resource.is_current,
+            run_id=matchers.Anything(),
+            is_current=matchers.Anything(),
         ),
         times=0,
     )
