@@ -138,14 +138,16 @@ class AnalysisStore:
     async def get(self, analysis_id: str) -> ProtocolAnalysis:
         """Get a single protocol analysis by its ID."""
         pending_analysis = self._pending_store.get(analysis_id=analysis_id)
+        completed_analysis_resource = await self._completed_store.get_by_id(
+            analysis_id=analysis_id
+        )
+
         if pending_analysis is not None:
             return pending_analysis
+        elif completed_analysis_resource is not None:
+            return completed_analysis_resource.completed_analysis
         else:
-            completed_analysis_resource = await self._completed_store.get_by_id(
-                analysis_id=analysis_id
-            )
-            completed_analysis = completed_analysis_resource.completed_analysis
-            return completed_analysis
+            raise AnalysisNotFoundError(analysis_id=analysis_id)
 
     def get_summaries_by_protocol(self, protocol_id: str) -> List[AnalysisSummary]:
         """Get summaries of all analyses for a protocol, in order from oldest first."""
@@ -326,7 +328,7 @@ class _CompletedAnalysisStore:
     def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
         self._sql_engine = sql_engine
 
-    async def get_by_id(self, analysis_id: str) -> _CompletedAnalysisResource:
+    async def get_by_id(self, analysis_id: str) -> Optional[_CompletedAnalysisResource]:
         statement = sqlalchemy.select(analysis_table).where(
             analysis_table.c.id == analysis_id
         )
@@ -334,7 +336,7 @@ class _CompletedAnalysisStore:
             try:
                 result = transaction.execute(statement).one()
             except sqlalchemy.exc.NoResultFound:
-                raise AnalysisNotFoundError(analysis_id=analysis_id)
+                return None
         return await _CompletedAnalysisResource.from_sql_row(result)
 
     async def get_by_protocol(
