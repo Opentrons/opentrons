@@ -15,7 +15,7 @@ log = getLogger(__name__)
 
 TaskFunc = Callable[..., Awaitable[Any]]
 
-task_runner = AppStateValue["TaskRunner"]("task_runner")
+_task_runner = AppStateValue["TaskRunner"]("task_runner")
 
 
 class TaskRunner:
@@ -52,6 +52,7 @@ class TaskRunner:
 
     async def cancel_all_and_clean_up(self) -> None:
         """Cancel any ongoing background tasks and wait for them to stop.
+
         Intended to be called just once, when the server shuts down.
         """
         for task in self._running_tasks:
@@ -67,16 +68,18 @@ class TaskRunner:
 
 def initialize_task_runner(app_state: AppState) -> None:
     """Create a new `TaskRunner` and store it on `app_state`
+
     Intended to be called just once, when the server starts up.s
     """
-    task_runner.set_on(app_state, TaskRunner())
+    _task_runner.set_on(app_state, TaskRunner())
 
 
 async def clean_up_task_runner(app_state: AppState) -> None:
     """Clean up the `TaskRunner` stored on `app_state`.
+
     Intended to be called just once, when the server shuts down.
     """
-    task_runner = task_runner.get_from(app_state)
+    task_runner = _task_runner.get_from(app_state)
 
     if task_runner is not None:
         await task_runner.cancel_all_and_clean_up()
@@ -85,10 +88,7 @@ async def clean_up_task_runner(app_state: AppState) -> None:
 def get_task_runner(app_state: AppState = Depends(get_app_state)) -> TaskRunner:
     """Intended to be used by endpoint functions as a FastAPI dependency,
     like `task_runner = fastapi.Depends(get_task_runner)`.
-
-    Returns:
-        TaskRunner: _description_
     """
-    new_task_runner = task_runner.get_from(app_state)
-    assert new_task_runner, "Task runner was not initialized"
-    return new_task_runner
+    task_runner = _task_runner.get_from(app_state)
+    assert task_runner, "Task runner was not initialized"
+    return task_runner
