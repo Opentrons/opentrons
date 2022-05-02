@@ -12,14 +12,17 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
 import { TertiaryButton } from '../../../atoms/Buttons'
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { DeckCalibrationModal } from '../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
+import { formatLastModified } from '../../../organisms/CalibrationPanels/utils'
 import { useTrackEvent } from '../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
 import { CONNECTABLE } from '../../../redux/discovery'
@@ -27,6 +30,7 @@ import { selectors as robotSelectors } from '../../../redux/robot'
 import * as RobotApi from '../../../redux/robot-api'
 import * as Config from '../../../redux/config'
 import * as Sessions from '../../../redux/sessions'
+import * as Calibration from '../../../redux/calibration'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
@@ -38,6 +42,10 @@ import {
 import type { State } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
 import type { SessionCommandString } from '../../../redux/sessions/types'
+import type {
+  DeckCalibrationData,
+  DeckCalibrationStatus,
+} from '../../../redux/calibration/types'
 
 interface CalibrationProps {
   robotName: string
@@ -56,6 +64,7 @@ export function RobotSettingsCalibration({
     'robot_calibration',
   ])
   const doTrackEvent = useTrackEvent()
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const [
     showDeckCalibrationModal,
@@ -121,6 +130,24 @@ export function RobotSettingsCalibration({
 
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
   // const configHasCalibrationBlock = null
+  const deckCalStatus = useSelector((state: State) => {
+    return Calibration.getDeckCalibrationStatus(state, robotName)
+  })
+
+  const deckCalibrationButtonText =
+    deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_IDENTITY
+      ? t('deck_calibration_recalibrate_button')
+      : t('deck_calibration_calibrate_button')
+
+  const deckLastModified = (): string => {
+    const data = deckCalibrationData.deckCalibrationData
+    const calibratedDate = data?.lastModified ?? null
+    return calibratedDate
+      ? t('last_calibrated', {
+          date: formatLastModified(calibratedDate),
+        })
+      : t('not_calibrated')
+  }
 
   const onClickSaveAs: React.MouseEventHandler = e => {
     e.preventDefault()
@@ -151,9 +178,7 @@ export function RobotSettingsCalibration({
     buttonDisabledReason = t('shared:disabled_no_pipette_attached')
   }
 
-  console.log('buttonDisabled', Boolean(buttonDisabledReason) || isPending)
-
-  const buttonDisabled = Boolean(buttonDisabledReason) || isPending
+  const helthCheckButtonDisabled = Boolean(buttonDisabledReason) || isPending
 
   const handleHealthCheck = (
     hasBlockModalResponse: boolean | null = null
@@ -232,14 +257,10 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing3}>
               {t('deck_calibration_description')}
             </StyledText>
-            {showDeckCalibrationModal ? (
-              <DeckCalibrationModal
-                onCloseClick={() => setShowDeckCalibrationModal(false)}
-              />
-            ) : null}
+            <StyledText as="label">{deckLastModified()}</StyledText>
           </Box>
           <TertiaryButton onClick={null}>
-            {t('deck_calibration_recalibrate_button')}
+            {deckCalibrationButtonText}
           </TertiaryButton>
         </Flex>
       </Box>
@@ -276,11 +297,6 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing3}>
               {t('tip_length_calibrations_description')}
             </StyledText>
-            {showDeckCalibrationModal ? (
-              <DeckCalibrationModal
-                onCloseClick={() => setShowDeckCalibrationModal(false)}
-              />
-            ) : null}
           </Box>
         </Flex>
       </Box>
@@ -295,18 +311,24 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing3}>
               {t('calibration_health_check_description')}
             </StyledText>
-            {showDeckCalibrationModal ? (
-              <DeckCalibrationModal
-                onCloseClick={() => setShowDeckCalibrationModal(false)}
-              />
-            ) : null}
+            {tipLengthCalibrations?.map(tip => (
+              <>
+                <StyledText as="p">{tip?.uri}</StyledText>
+                <StyledText as="p">{tip?.pipette}</StyledText>
+                <StyledText as="p">{tip?.lastModified}</StyledText>
+                {/* <StyledText as="p">{calibration.}</StyledText> */}
+              </>
+            ))}
           </Box>
           <TertiaryButton
             onClick={() => handleHealthCheck(null)}
-            disabled={false}
+            disabled={helthCheckButtonDisabled}
           >
             {t('calibration_health_check_button')}
           </TertiaryButton>
+          <Tooltip tooltipProps={tooltipProps} key="HealthCheckTooltip">
+            {t('calibration_health_check_tooltip')}
+          </Tooltip>
         </Flex>
       </Box>
     </>

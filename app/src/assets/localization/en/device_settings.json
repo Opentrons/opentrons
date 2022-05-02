@@ -7,6 +7,8 @@
   "deck_calibration_recalibrate_button": "Recalibrate deck",
   "deck_calibration_calibrate_button": "Calibrate deck",
   "deck_calibration_banner_message": "Deck Calibration missing",
+  "last_calibrated": "Last calibrated: {{date}}",
+  "not_calibrated": "Not calibrated yet",
   "pipette_offset_calibrations_title": "Pipette Offset Calibrations",
   "pipette_offset_calibrations_description": "Pipette offset calibration measures a pipette’s position relative to the pipette mount and the deck. You can recalibrate a pipette’s offset if its currently attached to this robot.",
   "pipette_offset_calibrations_history_link": "See all Pipette Offset Calibration history",
