@@ -69,7 +69,9 @@ describe('GeneralSettings', () => {
 
   it('renders the text and toggle for update alert section', () => {
     const [{ getByText, getByRole }] = render()
-    getByText('Receive an alert when an Opentrons software update is available')
+    getByText(
+      'Receive an alert when an Opentrons software update is available.'
+    )
     getByRole('switch', {
       name: 'Enable app update notifications',
     })

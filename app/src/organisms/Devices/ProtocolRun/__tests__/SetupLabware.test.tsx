@@ -24,7 +24,7 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { i18n } from '../../../../i18n'
 import { useLPCSuccessToast } from '../../../../organisms/ProtocolSetup/hooks'
 import { LabwarePositionCheck } from '../../../../organisms/ProtocolSetup/LabwarePositionCheck'
-import { ExtraAttentionWarning } from '../../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/ExtraAttentionWarning'
+import { ModuleExtraAttention } from '../ModuleExtraAttention'
 import { LabwareInfoOverlay } from '../../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
@@ -58,9 +58,7 @@ jest.mock('@opentrons/shared-data', () => {
 jest.mock('../../../../organisms/ProtocolSetup/hooks')
 jest.mock('../../../../organisms/ProtocolSetup/LabwareOffsetSuccessToast')
 jest.mock('../../../../organisms/ProtocolSetup/LabwarePositionCheck')
-jest.mock(
-  '../../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/ExtraAttentionWarning'
-)
+jest.mock('../ModuleExtraAttention')
 jest.mock(
   '../../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay'
 )
@@ -95,8 +93,8 @@ const mockLabwareOffsetModal = LabwareOffsetModal as jest.MockedFunction<
 const mockGetModuleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention as jest.MockedFunction<
   typeof getModuleTypesThatRequireExtraAttention
 >
-const mockExtraAttentionWarning = ExtraAttentionWarning as jest.MockedFunction<
-  typeof ExtraAttentionWarning
+const mockModuleExtraAttention = ModuleExtraAttention as jest.MockedFunction<
+  typeof ModuleExtraAttention
 >
 const mockUseLabwareRenderInfoForRunById = useLabwareRenderInfoForRunById as jest.MockedFunction<
   typeof useLabwareRenderInfoForRunById
@@ -139,10 +137,23 @@ const MOCK_TC_COORDS = [20, 30, 0]
 const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
 
 const mockMagneticModule = {
-  labwareOffset: { x: 5, y: 5, z: 5 },
   moduleId: 'someMagneticModule',
   model: 'magneticModuleV2' as ModuleModel,
   type: 'magneticModuleType' as ModuleType,
+  labwareOffset: { x: 5, y: 5, z: 5 },
+  cornerOffsetFromSlot: { x: 1, y: 1, z: 1 },
+  calibrationPoint: { x: 0, y: 0 },
+  displayName: 'Magnetic Module',
+  dimensions: {
+    xDimension: 100,
+    yDimension: 100,
+    footprintXDimension: 50,
+    footprintYDimension: 50,
+    labwareInterfaceXDimension: 80,
+    labwareInterfaceYDimension: 120,
+  },
+  twoDimensionalRendering: { children: [] },
+  quirks: [],
 }
 
 const mockTCModule = {
@@ -460,23 +471,58 @@ describe('LabwareSetup', () => {
     fireEvent.click(button)
     expect(queryByText('mock Labware Position Check')).toBeNull()
   })
-  it('should render the extra attention warning when there are modules/labware that need extra attention', () => {
-    when(mockGetModuleTypesThatRequireExtraAttention)
-      .calledWith([])
-      .mockReturnValue(['magneticModuleType', 'thermocyclerModuleType'])
+  it('should render the module extra attention banner when there are modules/labware that need extra attention', () => {
+    when(mockUseModuleRenderInfoForProtocolById)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        [mockMagneticModule.moduleId]: {
+          moduleId: mockMagneticModule.moduleId,
+          x: MOCK_MAGNETIC_MODULE_COORDS[0],
+          y: MOCK_MAGNETIC_MODULE_COORDS[1],
+          z: MOCK_MAGNETIC_MODULE_COORDS[2],
+          moduleDef: mockMagneticModule as any,
+          nestedLabwareDisplayName: 'Source Plate',
+          nestedLabwareDef: null,
+          nestedLabwareId: null,
+          protocolLoadOrder: 0,
+          slotName: '3',
+          attachedModuleMatch: null,
+        },
+      } as any)
 
-    when(mockExtraAttentionWarning)
+    when(mockGetModuleTypesThatRequireExtraAttention)
+      .calledWith([mockMagneticModule.model])
+      .mockReturnValue(['magneticModuleType'])
+
+    when(mockModuleExtraAttention)
       .calledWith(
         componentPropsMatcher({
-          moduleTypes: ['magneticModuleType', 'thermocyclerModuleType'],
+          moduleTypes: ['magneticModuleType'],
+          modulesInfo: {
+            [mockMagneticModule.moduleId]: {
+              moduleId: mockMagneticModule.moduleId,
+              x: MOCK_MAGNETIC_MODULE_COORDS[0],
+              y: MOCK_MAGNETIC_MODULE_COORDS[1],
+              z: MOCK_MAGNETIC_MODULE_COORDS[2],
+              moduleDef: mockMagneticModule as any,
+              nestedLabwareDisplayName: 'Source Plate',
+              nestedLabwareDef: null,
+              nestedLabwareId: null,
+              protocolLoadOrder: 0,
+              slotName: '3',
+              attachedModuleMatch: null,
+            },
+          },
         })
       )
       .mockReturnValue(
-        <div>mock extra attention warning with magnetic module and TC</div>
+        <div>
+          mock module extra attention banner with magnetic module and TC
+        </div>
       )
 
     const { getByText } = render()
-    getByText('mock extra attention warning with magnetic module and TC')
+    getByText('mock module extra attention banner with magnetic module and TC')
   })
   it('should close Labware Offset Success toast when LPC is launched', () => {
     const mockSetIsShowingLPCSuccessToast = jest.fn()

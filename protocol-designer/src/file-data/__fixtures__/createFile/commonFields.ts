@@ -30,9 +30,9 @@ export const dismissedWarnings: DismissedWarningState = {
 export const ingredients: IngredientsState = {}
 export const ingredLocations: LabwareLiquidState = {}
 export const labwareEntities: LabwareEntities = {
-  trashId: {
+  fixedTrash: {
     labwareDefURI: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
-    id: 'trashId',
+    id: 'fixedTrash',
     def: fixtureTrash,
   },
   tiprackId: {
@@ -56,7 +56,7 @@ export const pipetteEntities: PipetteEntities = {
   },
 }
 export const labwareNicknamesById: Record<string, string> = {
-  trashId: 'Trash',
+  fixedTrash: 'Trash',
   tiprackId: 'Opentrons 96 Tip Rack 10 µL',
   plateId: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
 }

@@ -926,7 +926,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         sourceWell: 'A1',
         destWells: ['A2', 'A3', 'A4'],
         changeTip: 'never',
-        blowoutLocation: 'trashId',
+        blowoutLocation: 'fixedTrash',
       } as DistributeArgs
 
       const result = distribute(args, invariantContext, robotStateWithTip)
@@ -1004,7 +1004,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         sourceWell: 'A1',
         destWells: ['A2', 'A3', 'A4'],
         changeTip: 'always',
-        blowoutLocation: 'trashId',
+        blowoutLocation: 'fixedTrash',
       } as DistributeArgs
 
       const result = distribute(args, invariantContext, robotStateWithTip)
@@ -1090,7 +1090,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         sourceWell: 'A1',
         destWells: ['A2', 'A3', 'A4'],
         changeTip: 'once',
-        blowoutLocation: 'trashId',
+        blowoutLocation: 'fixedTrash',
       } as DistributeArgs
 
       const result = distribute(args, invariantContext, robotStateWithTip)
