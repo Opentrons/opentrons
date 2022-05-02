@@ -1,11 +1,11 @@
 """Sensor helper classes."""
 from dataclasses import dataclass
-from typing import List, overload
+from typing import List, overload, Final
 
 from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
 from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32Field
 
-int_to_float = 2**16
+max_threshold_int: Final[float] = 2**16
 
 
 @dataclass
@@ -44,7 +44,7 @@ class SensorDataType:
 
     def to_float(self) -> float:
         """Convert data to float."""
-        return (1.0 * self.as_int) / int_to_float
+        return (1.0 * self.as_int) / max_threshold_int
 
     @property
     def to_int(self) -> int:
