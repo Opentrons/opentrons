@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from logging import getLogger
 from typing import Dict, List, Optional
 
+import anyio
 import sqlalchemy
 from sqlalchemy.engine import Engine as SQLEngine, Row as SQLRow
 
@@ -90,7 +91,7 @@ class AnalysisStore:
         )
         return _summarize_pending(pending_analysis=new_pending_analysis)
 
-    def update(
+    async def update(
         self,
         analysis_id: str,
         commands: List[Command],
@@ -129,19 +130,19 @@ class AnalysisStore:
             analyzer_version=_ANALYZER_VERSION,
             completed_analysis=completed_analysis,
         )
-        self._completed_store.add(
+        await self._completed_store.add(
             completed_analysis_resource=completed_analysis_resource
         )
 
         self._pending_store.remove(analysis_id=analysis_id)
 
-    def get(self, analysis_id: str) -> ProtocolAnalysis:
+    async def get(self, analysis_id: str) -> ProtocolAnalysis:
         """Get a single protocol analysis by its ID."""
         pending_analysis = self._pending_store.get(analysis_id=analysis_id)
         if pending_analysis is not None:
             return pending_analysis
         else:
-            completed_analysis_resource = self._completed_store.get_by_id(
+            completed_analysis_resource = await self._completed_store.get_by_id(
                 analysis_id=analysis_id
             )
             completed_analysis = completed_analysis_resource.completed_analysis
@@ -163,9 +164,9 @@ class AnalysisStore:
         else:
             return completed_analysis_summaries + [_summarize_pending(pending_analysis)]
 
-    def get_by_protocol(self, protocol_id: str) -> List[ProtocolAnalysis]:
+    async def get_by_protocol(self, protocol_id: str) -> List[ProtocolAnalysis]:
         """Get all analyses for a protocol, in order from oldest first."""
-        completed_analysis_resources = self._completed_store.get_by_protocol(
+        completed_analysis_resources = await self._completed_store.get_by_protocol(
             protocol_id=protocol_id
         )
         completed_analyses: List[ProtocolAnalysis] = [
@@ -248,17 +249,43 @@ class _CompletedAnalysisResource:
     analyzer_version: str
     completed_analysis: CompletedAnalysis
 
-    def to_sql_values(self) -> Dict[str, object]:
+    async def to_sql_values(self) -> Dict[str, object]:
+        """Return this data as a dict that can be passed to a SQLALchemy insert.
+
+        This potentially involves heavy serialization, so it's offloaded
+        to a worker thread.
+
+        Do not modify anything while serialization is ongoing in its worker thread.
+
+        Avoid calling this from inside a SQL transaction, since it might be slow.
+        """
+
+        def serialize_completed_analysis() -> str:
+            return self.completed_analysis.json()
+
+        serialized_completed_analysis = await anyio.to_thread.run_sync(
+            serialize_completed_analysis,
+            # Cancellation may orphan the worker thread,
+            # but that should be harmless in this case.
+            cancellable=True,
+        )
+
         return {
             "id": self.id,
             "protocol_id": self.protocol_id,
             "analyzer_version": self.analyzer_version,
             # TODO: Offload to thread?
-            "completed_analysis": self.completed_analysis.json(),
+            "completed_analysis": serialized_completed_analysis,
         }
 
     @classmethod
     def from_sql_row(cls, sql_row: SQLRow) -> _CompletedAnalysisResource:
+        """Extract the data from a SQLAlchemy row object.
+
+        This potentially involves heavy parsing, so it's offloaded to a worker thread.
+
+        Avoid calling this from inside a SQL transaction, since it might be slow.
+        """
         analyzer_version = sql_row.analyzer_version
         if analyzer_version != _ANALYZER_VERSION:
             _log.warning(
@@ -274,8 +301,15 @@ class _CompletedAnalysisResource:
         protocol_id = sql_row.protocol_id
         assert isinstance(protocol_id, str)
 
-        # TODO: Offload to thread?
-        completed_analysis = CompletedAnalysis.parse_raw(sql_row.completed_analysis)
+        def parse_completed_analysis() -> CompletedAnalysis:
+            return CompletedAnalysis.parse_raw(sql_row.completed_analysis)
+
+        completed_analysis = await anyio.to_thread.run_sync(
+            parse_completed_analysis,
+            # Cancellation may orphan the worker thread,
+            # but that should be harmless in this case.
+            cancellable=True,
+        )
 
         return cls(
             id=id,
@@ -291,7 +325,7 @@ class _CompletedAnalysisStore:
     def __init__(self, sql_engine: SQLEngine) -> None:
         self._sql_engine = sql_engine
 
-    def get_by_id(self, analysis_id: str) -> _CompletedAnalysisResource:
+    async def get_by_id(self, analysis_id: str) -> _CompletedAnalysisResource:
         statement = sqlalchemy.select(analysis_table).where(
             analysis_table.c.id == analysis_id
         )
@@ -300,9 +334,11 @@ class _CompletedAnalysisStore:
                 result = transaction.execute(statement).one()
             except sqlalchemy.exc.NoResultFound:
                 raise AnalysisNotFoundError(analysis_id=analysis_id)
-        return _CompletedAnalysisResource.from_sql_row(result)
+        return await _CompletedAnalysisResource.from_sql_row(result)
 
-    def get_by_protocol(self, protocol_id: str) -> List[_CompletedAnalysisResource]:
+    async def get_by_protocol(
+        self, protocol_id: str
+    ) -> List[_CompletedAnalysisResource]:
         statement = (
             sqlalchemy.select(analysis_table)
             .where(analysis_table.c.protocol_id == protocol_id)
@@ -311,7 +347,7 @@ class _CompletedAnalysisStore:
         with self._sql_engine.begin() as transaction:
             self._check_protocol_exists(connection=transaction, protocol_id=protocol_id)
             results = transaction.execute(statement).all()
-        return [_CompletedAnalysisResource.from_sql_row(r) for r in results]
+        return [await _CompletedAnalysisResource.from_sql_row(r) for r in results]
 
     def get_ids_by_protocol(self, protocol_id: str) -> List[str]:
         statement = (
@@ -330,9 +366,11 @@ class _CompletedAnalysisStore:
 
         return result_ids
 
-    def add(self, completed_analysis_resource: _CompletedAnalysisResource) -> None:
+    async def add(
+        self, completed_analysis_resource: _CompletedAnalysisResource
+    ) -> None:
         statement = analysis_table.insert().values(
-            completed_analysis_resource.to_sql_values()
+            await completed_analysis_resource.to_sql_values()
         )
         with self._sql_engine.begin() as transaction:
             transaction.execute(statement)

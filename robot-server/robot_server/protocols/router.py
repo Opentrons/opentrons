@@ -294,7 +294,7 @@ async def get_protocol_analyses(
             status.HTTP_404_NOT_FOUND
         )
 
-    analyses = analysis_store.get_by_protocol(protocolId)
+    analyses = await analysis_store.get_by_protocol(protocolId)
 
     return await PydanticResponse.create(
         content=SimpleMultiBody.construct(
@@ -336,7 +336,7 @@ async def get_protocol_analysis_by_id(
     try:
         # TODO(mm, 2022-04-28): This will erroneously return an analysis even if
         # this analysis isn't owned by this protocol. This should be an error.
-        analysis = analysis_store.get(analysisId)
+        analysis = await analysis_store.get(analysisId)
     except AnalysisNotFoundError as error:
         raise AnalysisNotFound(detail=str(error)).as_error(
             status.HTTP_404_NOT_FOUND

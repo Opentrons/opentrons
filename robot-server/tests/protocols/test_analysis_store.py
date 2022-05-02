@@ -88,7 +88,7 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
     )
 
 
-def test_protocol_not_found(subject: AnalysisStore) -> None:
+async def test_protocol_not_found(subject: AnalysisStore) -> None:
     """Every method that takes a protocol ID should raise if it doesn't exist."""
     with pytest.raises(ProtocolNotFoundError):
         subject.add_pending(
@@ -100,24 +100,26 @@ def test_protocol_not_found(subject: AnalysisStore) -> None:
         subject.get_summaries_by_protocol(protocol_id="nonexistent-protocol-id")
 
     with pytest.raises(ProtocolNotFoundError):
-        subject.get_by_protocol(protocol_id="nonexistent-protocol-id")
+        await subject.get_by_protocol(protocol_id="nonexistent-protocol-id")
 
 
-def test_get_empty(subject: AnalysisStore, protocol_store: ProtocolStore) -> None:
+async def test_get_empty(subject: AnalysisStore, protocol_store: ProtocolStore) -> None:
     """It should return an empty list if no analysis saved."""
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
 
-    full_result = subject.get_by_protocol("protocol-id")
+    full_result = await subject.get_by_protocol("protocol-id")
     summaries_result = subject.get_summaries_by_protocol("protocol-id")
 
     assert full_result == []
     assert summaries_result == []
 
     with pytest.raises(AnalysisNotFoundError, match="analysis-id"):
-        subject.get("analysis-id")
+        await subject.get("analysis-id")
 
 
-def test_add_pending(subject: AnalysisStore, protocol_store: ProtocolStore) -> None:
+async def test_add_pending(
+    subject: AnalysisStore, protocol_store: ProtocolStore
+) -> None:
     """It should add a pending analysis to the store."""
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
@@ -130,18 +132,18 @@ def test_add_pending(subject: AnalysisStore, protocol_store: ProtocolStore) -> N
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
 
     assert result == expected_summary
-    assert subject.get("analysis-id") == expected_analysis
-    assert subject.get_by_protocol("protocol-id") == [expected_analysis]
+    assert await subject.get("analysis-id") == expected_analysis
+    assert await subject.get_by_protocol("protocol-id") == [expected_analysis]
     assert subject.get_summaries_by_protocol("protocol-id") == [expected_summary]
 
 
-def test_update_raises_if_analysis_is_not_pending(
+async def test_update_raises_if_analysis_is_not_pending(
     subject: AnalysisStore, protocol_store: ProtocolStore
 ) -> None:
     """It should raise if you try to update an analysis that's not pending."""
     # Trying to update an analysis that doesn't exist:
     with pytest.raises(AnalysisNotPendingOrNotFoundError, match="analysis-id"):
-        subject.update(
+        await subject.update(
             analysis_id="nonexistent-analysis-id",
             commands=[],
             labware=[],
@@ -152,7 +154,7 @@ def test_update_raises_if_analysis_is_not_pending(
     # Trying to update an analysis that exists, but isn't pending:
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
     subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
-    subject.update(
+    await subject.update(
         analysis_id="analysis-id",
         commands=[],
         labware=[],
@@ -160,7 +162,7 @@ def test_update_raises_if_analysis_is_not_pending(
         errors=[],
     )
     with pytest.raises(AnalysisNotPendingOrNotFoundError, match="analysis-id"):
-        subject.update(
+        await subject.update(
             analysis_id="analysis-id",
             commands=[],
             labware=[],
@@ -169,7 +171,7 @@ def test_update_raises_if_analysis_is_not_pending(
         )
 
 
-def test_add_analysis_equipment(
+async def test_add_analysis_equipment(
     subject: AnalysisStore, protocol_store: ProtocolStore
 ) -> None:
     """It should add labware and pipettes to the stored analysis."""
@@ -190,7 +192,7 @@ def test_add_analysis_equipment(
     )
 
     subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
-    subject.update(
+    await subject.update(
         analysis_id="analysis-id",
         labware=[labware],
         pipettes=[pipette],
@@ -198,7 +200,7 @@ def test_add_analysis_equipment(
         errors=[],
     )
 
-    result = subject.get("analysis-id")
+    result = await subject.get("analysis-id")
 
     assert result == CompletedAnalysis(
         id="analysis-id",
@@ -208,7 +210,7 @@ def test_add_analysis_equipment(
         commands=[],
         errors=[],
     )
-    assert subject.get_by_protocol("protocol-id") == [result]
+    assert await subject.get_by_protocol("protocol-id") == [result]
 
 
 class AnalysisResultSpec(NamedTuple):
@@ -250,7 +252,7 @@ analysis_result_specs: List[AnalysisResultSpec] = [
 
 
 @pytest.mark.parametrize(AnalysisResultSpec._fields, analysis_result_specs)
-def test_update_infers_status_from_errors(
+async def test_update_infers_status_from_errors(
     subject: AnalysisStore,
     protocol_store: ProtocolStore,
     commands: List[pe_commands.Command],
@@ -260,13 +262,13 @@ def test_update_infers_status_from_errors(
     """It should decide the analysis result based on whether there are errors."""
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
     subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
-    subject.update(
+    await subject.update(
         analysis_id="analysis-id",
         commands=commands,
         errors=errors,
         labware=[],
         pipettes=[],
     )
-    analysis = subject.get_by_protocol("protocol-id")[0]
+    analysis = (await subject.get_by_protocol("protocol-id"))[0]
     assert isinstance(analysis, CompletedAnalysis)
     assert analysis.result == expected_result
