@@ -628,16 +628,16 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["thermocycler/setTargetBlockTemperature"]
+                "enum": ["thermocycler/setAndWaitForBlockTemperature"]
               },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" },
+                  "celsius": { "type": "number" },
                   "volume": {
                     "type": "number"
                   }
@@ -656,13 +656,13 @@
                 "enum": ["thermocycler/setTargetLidTemperature"]
               },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" }
+                  "celsius": { "type": "number" }
                 }
               }
             }
@@ -674,15 +674,15 @@
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
-              "commandType": { "enum": ["thermocycler/awaitBlockTemperature"] },
+              "commandType": { "enum": ["thermocycler/waitForBlockTemperature"] },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" }
+                  "celsius": { "type": "number" }
                 }
               }
             }
@@ -694,15 +694,15 @@
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
-              "commandType": { "enum": ["thermocycler/awaitLidTemperature"] },
+              "commandType": { "enum": ["thermocycler/waitForLidTemperature"] },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" }
+                  "celsius": { "type": "number" }
                 }
               }
             }
