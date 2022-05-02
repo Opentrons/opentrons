@@ -54,7 +54,7 @@ class AnalysisNotPendingOrNotFoundError(ValueError):
 class AnalysisStore:
     """Storage interface for protocol analyses.
 
-    Completed analyses (succeeded or failed) are saved to persistent storage.
+    Completed analyses (OK or NOT-OK) are saved to persistent storage.
 
     Pending analyses don't make sense to persist across reboots,
     so they're only kept in-memory, and lost when the store instance is destroyed.
