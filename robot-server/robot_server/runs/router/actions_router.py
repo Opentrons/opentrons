@@ -65,6 +65,7 @@ async def create_run_action(
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
         task_runner: Background task runner.
+        engine_state_store: Protocol engine state storage interface.
     """
     try:
         prev_run = run_store.get(run_id=runId)

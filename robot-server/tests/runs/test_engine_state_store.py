@@ -118,6 +118,7 @@ def test_get_run_state(
 
 @pytest.fixture
 def teardown() -> Generator[None, None, None]:
+    """It should teardown test setup."""
     print("setup")
     yield None
     print("teardown")

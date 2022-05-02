@@ -16,7 +16,6 @@ from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 from opentrons.protocol_engine import ProtocolRunData
 
 from robot_server.errors import ApiError
-from robot_server.runs import engine_state_store
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.json_api import (
     RequestModel,

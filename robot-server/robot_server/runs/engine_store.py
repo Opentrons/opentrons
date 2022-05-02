@@ -4,7 +4,6 @@ from typing import Dict, NamedTuple, Optional
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import ProtocolEngine, StateView, create_protocol_engine
 from opentrons.protocol_runner import ProtocolRunner
-from robot_server.runs.engine_state_store import EngineStateStore
 
 
 class EngineMissingError(RuntimeError):
@@ -29,7 +28,8 @@ class RunnerEnginePair(NamedTuple):
     engine: ProtocolEngine
 
 
-# TODO (tz, 2022-04-28) change name after storing it all in the DB. check if this is even needed after Db access
+# TODO (tz, 2022-04-28) change name after storing it all in the DB.
+#  check if this is even needed after Db access
 # TODO(mc, 2021-05-28): evaluate multi-engine logic, which this does not support
 class EngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
