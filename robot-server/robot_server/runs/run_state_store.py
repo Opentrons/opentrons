@@ -3,8 +3,9 @@ import sqlalchemy
 from dataclasses import dataclass
 from typing import Dict
 from pydantic import parse_obj_as
+from datetime import datetime
 
-from robot_server.persistence import engine_state_table
+from robot_server.persistence import run_state_table, ensure_utc_datetime
 from .run_store import RunNotFoundError
 from opentrons.protocol_engine import ProtocolRunData
 
@@ -38,7 +39,7 @@ class RunStateStore:
         Returns:
             The engine state that was added to the store.
         """
-        statement = sqlalchemy.insert(engine_state_table).values(
+        statement = sqlalchemy.insert(run_state_table).values(
             _convert_state_to_sql_values(state=state)
         )
         with self._sql_engine.begin() as transaction:
@@ -49,67 +50,6 @@ class RunStateStore:
 
         return state
 
-    # TODO (tz): just for testing time parsing
-    def insert_state_by_type(
-        self, state: RunStateResource, insert_pickle: bool
-    ) -> RunStateResource:
-        """Insert engine state by type to db.
-
-        Arguments:
-        state: Engine state resource to store.
-
-        Returns:
-        The engine state that was added to the store.
-        """
-        if insert_pickle:
-            insert_row = {"run_id": state.run_id, "state": state.state.dict()}
-        else:
-            insert_row = {
-                "run_id": state.run_id,
-                "state_string": state.state.json(),
-            }
-
-        statement = sqlalchemy.insert(engine_state_table).values(insert_row)
-        with self._sql_engine.begin() as transaction:
-            try:
-                transaction.execute(statement, autocommit=False)
-            except sqlalchemy.exc.IntegrityError:
-                raise RunNotFoundError(run_id=state.run_id)
-
-        return state
-
-    # TODO (tz): just for testing time parsing
-    def get_state_by_type(self, run_id: str, return_pickle: bool) -> RunStateResource:
-        """Get engine state by type from db.
-
-        Arguments:
-            run_id: Run id related to the engine state.
-            return_pickle: Parse state as pickle or json.
-
-        Returns:
-            The engine state that found in the store.
-        """
-        statement = sqlalchemy.select(engine_state_table).where(
-            engine_state_table.c.run_id == run_id
-        )
-        with self._sql_engine.begin() as transaction:
-            state_row = transaction.execute(statement, autocommit=False).one()
-            result = transaction.execute("PRAGMA page_size").all()
-            count = transaction.execute("PRAGMA page_count").all()
-        if return_pickle:
-            state_result = parse_obj_as(ProtocolRunData, state_row.state)
-            print("---pickle-db-size---")
-            print(f"{result}*{count}")
-        else:
-            state_result = ProtocolRunData.parse_raw(state_row.state_string)
-            print("---str-db-size---")
-            print(f"{result}*{count}")
-
-        state_result
-
-        return RunStateResource(
-            run_id=run_id, state=state_result, engine_status=state_row.engine_status
-        )
 
     def get(self, run_id: str) -> RunStateResource:
         """Get engine state from db.
@@ -120,8 +60,8 @@ class RunStateStore:
         Returns:
             The engine state that found in the store.
         """
-        statement = sqlalchemy.select(engine_state_table).where(
-            engine_state_table.c.run_id == run_id
+        statement = sqlalchemy.select(run_state_table).where(
+            run_state_table.c.run_id == run_id
         )
         with self._sql_engine.begin() as transaction:
             state_row = transaction.execute(statement).one()
@@ -151,4 +91,5 @@ def _convert_state_to_sql_values(state: RunStateResource) -> Dict[str, object]:
         "run_id": state.run_id,
         "state": state.state.dict(),
         "engine_status": state.engine_status,
+        "created_at": ensure_utc_datetime(datetime.now())
     }

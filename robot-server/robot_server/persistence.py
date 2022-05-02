@@ -85,15 +85,14 @@ action_table = sqlalchemy.Table(
     ),
 )
 
-engine_state_table = sqlalchemy.Table(
-    "engine_state",
+run_state_table = sqlalchemy.Table(
+    "run_state",
     _metadata,
     sqlalchemy.Column("id", sqlalchemy.INT, primary_key=True),
-    # sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False),
+    # NOTE: See above note about naive datetimes
+    sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False),
     sqlalchemy.Column(
-        "state", sqlalchemy.PickleType
-    ),  # TODO for testing , nullable=False),
-    sqlalchemy.Column("state_string", sqlalchemy.String),
+        "state", sqlalchemy.PickleType ,nullable=False),
     sqlalchemy.Column("engine_status", sqlalchemy.String),
     sqlalchemy.Column(
         "run_id",
