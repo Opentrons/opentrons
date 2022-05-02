@@ -324,7 +324,7 @@ async def get_protocol_analysis_by_id(
 
     Arguments:
         protocolId: The ID of the protocol, pulled from the URL.
-        analysisId: THe ID of the analysis, pulled from the URL.
+        analysisId: The ID of the analysis, pulled from the URL.
         protocol_store: Protocol resource storage.
         analysis_store: Analysis resource storage.
     """
