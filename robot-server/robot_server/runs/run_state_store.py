@@ -3,7 +3,7 @@ import sqlalchemy
 from dataclasses import dataclass
 from typing import Dict
 from pydantic import parse_obj_as
-from datetime import datetime
+from datetime import datetime, timezone
 
 from robot_server.persistence import run_state_table, ensure_utc_datetime
 from .run_store import RunNotFoundError
@@ -20,7 +20,7 @@ class RunStateResource:
     run_id: str
     state: ProtocolRunData
     engine_status: str
-    # created_at: datetime
+    created_at: datetime
 
 
 class RunStateStore:
@@ -51,6 +51,7 @@ class RunStateStore:
         return state
 
 
+
     def get(self, run_id: str) -> RunStateResource:
         """Get engine state from db.
 
@@ -65,10 +66,10 @@ class RunStateStore:
         )
         with self._sql_engine.begin() as transaction:
             state_row = transaction.execute(statement).one()
-        return _convert_sql_row_to_sql_engine_state(state_row)
+        return _convert_sql_row_to_sql_run_state(state_row)
 
 
-def _convert_sql_row_to_sql_engine_state(
+def _convert_sql_row_to_sql_run_state(
     sql_row: sqlalchemy.engine.Row,
 ) -> RunStateResource:
 
@@ -81,8 +82,10 @@ def _convert_sql_row_to_sql_engine_state(
     state = sql_row.state
     assert isinstance(state, Dict)
 
+    created_at = ensure_utc_datetime(sql_row.created_at)
+
     return RunStateResource(
-        run_id=run_id, state=parse_obj_as(ProtocolRunData, state), engine_status=status
+        run_id=run_id, state=parse_obj_as(ProtocolRunData, state), engine_status=status, created_at=created_at
     )
 
 
@@ -91,5 +94,5 @@ def _convert_state_to_sql_values(state: RunStateResource) -> Dict[str, object]:
         "run_id": state.run_id,
         "state": state.state.dict(),
         "engine_status": state.engine_status,
-        "created_at": ensure_utc_datetime(datetime.now())
+        "created_at": ensure_utc_datetime(datetime.now(tz=timezone.utc))
     }

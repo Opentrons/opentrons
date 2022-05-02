@@ -117,8 +117,8 @@ def test_insert_state(
     engine_state = RunStateResource(
         run_id="run-id",
         state=protocol_run,
-        engine_status="idle"
-        # created_at=datetime.now()
+        engine_status="idle",
+        created_at=datetime.now(timezone.utc)
     )
     result = subject.insert(engine_state)
 
@@ -136,8 +136,8 @@ def test_get_run_state(
     engine_state = RunStateResource(
         run_id="run-id",
         state=protocol_run,
-        engine_status="idle"
-        # created_at=datetime.now()
+        engine_status="idle",
+        created_at=datetime.now(timezone.utc)
     )
 
     subject.insert(state=engine_state)
@@ -153,8 +153,8 @@ def test_insert_state_run_not_found(
     engine_state = RunStateResource(
         run_id="run-not-found",
         state=protocol_run,
-        engine_status="idle"
-        # created_at=datetime.now()
+        engine_status="idle",
+        created_at=datetime.now(timezone.utc)
     )
 
     with pytest.raises(RunNotFoundError, match="run-not-found"):
