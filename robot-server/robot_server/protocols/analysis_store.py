@@ -43,14 +43,6 @@ class AnalysisNotFoundError(ValueError):
         super().__init__(f'Analysis "{analysis_id}" not found.')
 
 
-class AnalysisNotPendingOrNotFoundError(ValueError):
-    """Raised if a given analysis was expected to be pending, but isn't."""
-
-    def __init__(self, analysis_id: str) -> None:
-        """Initialize the error's message."""
-        super().__init__(f'Analysis "{analysis_id}" does not exist or is not pending.')
-
-
 class AnalysisStore:
     """Storage interface for protocol analyses.
 
@@ -105,10 +97,10 @@ class AnalysisStore:
         """
         protocol_id = self._pending_store.get_protocol_id(analysis_id=analysis_id)
 
-        if protocol_id is None:
-            # No pending analysis with the given ID.
-            # There might be a completed one, but you can't update completed analyses.
-            raise AnalysisNotPendingOrNotFoundError(analysis_id=analysis_id)
+        # No protocol ID means there was no pending analysis with the given analysis ID.
+        assert (
+            protocol_id is not None
+        ), "Analysis ID to update must be for a valid pending analysis."
 
         if len(errors) > 0:
             result = AnalysisResult.NOT_OK
