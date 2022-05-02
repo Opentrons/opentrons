@@ -45,14 +45,6 @@ export function PipetteOffsets(props: Props): JSX.Element {
     return CustomLabware.getCustomLabwareDefinitions(state)
   })
 
-  console.log('==========start=========')
-  console.log('attachedPipettes', attachedPipettes)
-  console.log('===================')
-  console.log('pipetteCalibrations', pipetteCalibrations)
-  console.log('===================')
-  console.log('customLabwareDefs', customLabwareDefs)
-  console.log('==========end=========')
-
   return (
     <TitledControl
       padding={SPACING_3}
