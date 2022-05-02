@@ -30,7 +30,7 @@ beforeEach(() => {
     },
   } as any
   labwareEntities = {
-    trashId: {
+    fixedTrash: {
       type: 'trash-box',
       def: fixtureTrash,
     },
@@ -109,7 +109,7 @@ describe('well selection should update', () => {
   })
   it('select single-well labware', () => {
     const patch = {
-      labware: 'trashId',
+      labware: 'fixedTrash',
     }
     expect(handleFormHelper(patch, form)).toEqual({
       ...patch,
@@ -119,7 +119,7 @@ describe('well selection should update', () => {
     })
   })
   it('select labware with multiple wells', () => {
-    const trashLabwareForm = { ...form, labware: 'trashId' }
+    const trashLabwareForm = { ...form, labware: 'fixedTrash' }
     const patch = {
       labware: 'plateId',
     }

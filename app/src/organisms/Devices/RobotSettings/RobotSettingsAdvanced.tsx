@@ -91,7 +91,7 @@ export function RobotSettingsAdvanced({
     isConnected: boolean,
     options?: ResetConfigRequest
   ): void => {
-    if (connected && options != null) setResetOptions(options)
+    if (options != null) setResetOptions(options)
     setShowFactoryResetModal(true)
     setIsRobotConnected(isConnected ?? false)
   }
