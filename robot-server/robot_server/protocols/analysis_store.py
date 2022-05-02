@@ -7,7 +7,6 @@ from typing import Dict, List, Optional
 
 import anyio
 import sqlalchemy
-from sqlalchemy.engine import Engine as SQLEngine, Row as SQLRow
 
 from opentrons.protocol_engine import (
     Command,
@@ -61,7 +60,7 @@ class AnalysisStore:
     so they're only kept in-memory, and lost when the store instance is destroyed.
     """
 
-    def __init__(self, sql_engine: SQLEngine) -> None:
+    def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
         """Initialize the `AnalysisStore`."""
         self._pending_store = _PendingAnalysisStore()
         self._completed_store = _CompletedAnalysisStore(sql_engine=sql_engine)
@@ -279,7 +278,9 @@ class _CompletedAnalysisResource:
         }
 
     @classmethod
-    def from_sql_row(cls, sql_row: SQLRow) -> _CompletedAnalysisResource:
+    async def from_sql_row(
+        cls, sql_row: sqlalchemy.engine.Row
+    ) -> _CompletedAnalysisResource:
         """Extract the data from a SQLAlchemy row object.
 
         This potentially involves heavy parsing, so it's offloaded to a worker thread.
@@ -322,7 +323,7 @@ class _CompletedAnalysisResource:
 class _CompletedAnalysisStore:
     """A SQL-backed persistent store of protocol analyses that are completed."""
 
-    def __init__(self, sql_engine: SQLEngine) -> None:
+    def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
         self._sql_engine = sql_engine
 
     async def get_by_id(self, analysis_id: str) -> _CompletedAnalysisResource:
