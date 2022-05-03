@@ -3,7 +3,7 @@ import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import type { DeckDefinition, LabwareDefinition2 } from '../types'
-import type { LabwareParameters, ThermalAdapterName } from '..'
+import type { ThermalAdapterName } from '..'
 
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
