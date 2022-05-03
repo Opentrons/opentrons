@@ -81,7 +81,7 @@ describe('TemperatureModuleSlideout', () => {
         commandType: 'temperatureModule/setTargetTemperature',
         params: {
           moduleId: mockTemperatureModule.id,
-          temperature: 20,
+          celsius: 20,
         },
       },
     })
