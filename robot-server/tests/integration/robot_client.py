@@ -15,7 +15,12 @@ SHUTDOWN_WAIT = 15
 
 
 class RobotClient:
-    """HTTP-API client for a robot."""
+    """Client for the robot's HTTP API.
+
+    This is mostly a thin wrapper, where most methods have a 1:1 correspondence
+    with HTTP endpoints. See the robot server's OpenAPI specification for
+    details on semantics and request/response shapes.
+    """
 
     def __init__(
         self,
@@ -137,49 +142,6 @@ class RobotClient:
         response.raise_for_status()
         return response
 
-    async def analysis_complete(self, protocol_id: str, analyses_id: str) -> bool:
-        """Is an analysis status complete?"""
-        response = await self.get_protocol(protocol_id)
-        analyses = response.json()["data"]["analyses"]
-        target_analysis = next(
-            (analysis for analysis in analyses if analysis["id"] == analyses_id), None
-        )
-        if not target_analysis:
-            raise KeyError(f"Analysis id {analyses_id} not found.")
-        return bool(target_analysis["status"] == "completed")
-
-    async def _poll_analysis_complete(self, protocol_id: str, analyses_id: str) -> None:
-        while not await self.analysis_complete(protocol_id, analyses_id):
-            await asyncio.sleep(1)  # Avoid spamming the server.
-
-    # TODO: Delete this?
-    async def wait_for_analysis_complete(
-        self, protocol_id: str, analysis_id: str, timeout_sec: float
-    ) -> bool:
-        """Retry until analysis status is complete or timeout."""
-        try:
-            await asyncio.wait_for(
-                self._poll_analysis_complete(protocol_id, analysis_id),
-                timeout=timeout_sec,
-            )
-            return True
-        except asyncio.TimeoutError:
-            return False
-
-    # TODO: Move out of this class?
-    async def wait_for_all_analyses_to_complete(self) -> None:
-        async def _all_analyses_are_complete() -> bool:
-            protocols = (await self.get_protocols()).json()
-            for protocol in protocols["data"]:
-                for analysis_summary in protocol["analysisSummaries"]:
-                    if analysis_summary["status"] != "completed":
-                        return False
-            return True
-
-        while not await _all_analyses_are_complete():
-            await asyncio.sleep(1)
-        # TODO: Timeout?
-
     async def get_analysis(self, protocol_id: str, analysis_id: str) -> Response:
         """GET /protocols/{protocol_id}/{analysis_id}."""
         response = await self.httpx_client.get(
@@ -187,38 +149,6 @@ class RobotClient:
         )
         response.raise_for_status()
         return response
-
-    # TODO: Move out of this class?
-    async def get_all_analyses(self) -> Dict[str, List[object]]:
-        """Fetch a complete list of full analyses for every protocol.
-
-        The HTTP API offers no single endpoint that does this, so this synthesizes
-        responses from multiple endpoints.
-
-        Returns:
-            A mapping from protocol ID to a list of that protocol's full analyses.
-        """
-        analyses_by_protocol_id: Dict[str, List[object]] = {}
-
-        protocols_response = await self.get_protocols()
-        protocols = protocols_response.json()["data"]
-
-        for protocol in protocols:
-            analyses_on_this_protocol: List[object] = []
-
-            protocol_id = protocol["id"]
-            analysis_ids = [a["id"] for a in protocol["analysisSummaries"]]
-
-            for analysis_id in analysis_ids:
-                analysis_response = await self.get_analysis(
-                    protocol_id=protocol_id,
-                    analysis_id=analysis_id,
-                )
-                analyses_on_this_protocol.append(analysis_response.json()["data"])
-
-            analyses_by_protocol_id[protocol_id] = analyses_on_this_protocol
-
-        return analyses_by_protocol_id
 
     async def delete_run(self, run_id: str) -> Response:
         """DELETE /runs/{run_id}."""

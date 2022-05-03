@@ -1,6 +1,7 @@
+import asyncio
 from pathlib import Path
 import secrets
-from typing import Callable, IO
+from typing import Callable, Dict, IO, List
 
 import pytest
 
@@ -36,14 +37,17 @@ async def test_protocols_and_analyses_persist(
                 with protocol(secrets.token_urlsafe(16)) as file:
                     await robot_client.post_protocol([Path(file.name)])
 
-            await robot_client.wait_for_all_analyses_to_complete()
+            await asyncio.wait_for(
+                _wait_for_all_analyses_to_complete(robot_client),
+                timeout=30
+            )
 
             # The protocols response will include analysis statuses. Fetch it
             # *after* all analyses complete to make sure it's deterministic.
             protocols_before_restart = (await robot_client.get_protocols()).json()[
                 "data"
             ]
-            analyses_before_restart = await robot_client.get_all_analyses()
+            analyses_before_restart = await _get_all_analyses(robot_client)
 
             server.stop()
             assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
@@ -56,7 +60,7 @@ async def test_protocols_and_analyses_persist(
             protocols_after_restart = (await robot_client.get_protocols()).json()[
                 "data"
             ]
-            analyses_after_restart = await robot_client.get_all_analyses()
+            analyses_after_restart = await _get_all_analyses(robot_client)
 
             # The number of uploaded protocols prior to restart equals the number
             # of protocols in the get protocols response after restart.
@@ -134,3 +138,48 @@ async def test_protocol_labware_files_persist() -> None:
             assert four_tuberack.is_file()
             assert six_tuberack.is_file()
             server.stop()
+
+
+async def _get_all_analyses(robot_client: RobotClient) -> Dict[str, List[object]]:
+    """Fetch a complete list of full analyses for every protocol.
+
+    The HTTP API offers no single endpoint that does this, so this synthesizes
+    responses from multiple endpoints.
+
+    Returns:
+        A mapping from protocol ID to a list of that protocol's full analyses.
+    """
+    analyses_by_protocol_id: Dict[str, List[object]] = {}
+
+    protocols_response = await robot_client.get_protocols()
+    protocols = protocols_response.json()["data"]
+
+    for protocol in protocols:
+        analyses_on_this_protocol: List[object] = []
+
+        protocol_id = protocol["id"]
+        analysis_ids = [a["id"] for a in protocol["analysisSummaries"]]
+
+        for analysis_id in analysis_ids:
+            analysis_response = await robot_client.get_analysis(
+                protocol_id=protocol_id,
+                analysis_id=analysis_id,
+            )
+            analyses_on_this_protocol.append(analysis_response.json()["data"])
+
+        analyses_by_protocol_id[protocol_id] = analyses_on_this_protocol
+
+    return analyses_by_protocol_id
+
+
+async def _wait_for_all_analyses_to_complete(robot_client: RobotClient) -> None:
+        async def _all_analyses_are_complete() -> bool:
+            protocols = (await robot_client.get_protocols()).json()
+            for protocol in protocols["data"]:
+                for analysis_summary in protocol["analysisSummaries"]:
+                    if analysis_summary["status"] != "completed":
+                        return False
+            return True
+
+        while not await _all_analyses_are_complete():
+            await asyncio.sleep(1)
