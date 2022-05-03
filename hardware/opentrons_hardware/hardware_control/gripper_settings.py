@@ -7,7 +7,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     GripperGripRequest,
     GripperHomeRequest,
 )
-from opentrons_hardware.firmware_bindings.utils import UInt32Field
+from opentrons_hardware.firmware_bindings.utils import UInt8Field, UInt32Field
 from opentrons_hardware.firmware_bindings.constants import NodeId
 
 
@@ -42,11 +42,37 @@ async def set_pwm_param(
     )
 
 
-async def grip(can_messenger: CanMessenger) -> None:
+async def grip(
+    can_messenger: CanMessenger, group_id: int, seq_id: int, freq: int, duty_cycle: int
+) -> None:
     """Start grip motion."""
-    await can_messenger.send(node_id=NodeId.gripper, message=GripperGripRequest())
+    await can_messenger.send(
+        node_id=NodeId.gripper,
+        message=GripperGripRequest(
+            payload=payloads.GripperMoveRequestPayload(
+                group_id=UInt8Field(group_id),
+                seq_id=UInt8Field(seq_id),
+                duration=UInt32Field(0),
+                freq=UInt32Field(freq),
+                duty_cycle=UInt32Field(duty_cycle),
+            )
+        ),
+    )
 
 
-async def home(can_messenger: CanMessenger) -> None:
+async def home(
+    can_messenger: CanMessenger, group_id: int, seq_id: int, freq: int, duty_cycle: int
+) -> None:
     """Start home motion."""
-    await can_messenger.send(node_id=NodeId.gripper, message=GripperHomeRequest())
+    await can_messenger.send(
+        node_id=NodeId.gripper,
+        message=GripperHomeRequest(
+            payload=payloads.GripperMoveRequestPayload(
+                group_id=UInt8Field(group_id),
+                seq_id=UInt8Field(seq_id),
+                duration=UInt32Field(0),
+                freq=UInt32Field(freq),
+                duty_cycle=UInt32Field(duty_cycle),
+            )
+        ),
+    )
