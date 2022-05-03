@@ -64,8 +64,17 @@ class PressureSensor(AbstractAdvancedSensor):
                 ),
             )
             yield True
-        except TimeoutError:
-            yield False
+        finally:
+            await can_messenger.send(
+                node_id=node_id,
+                message=BindSensorOutputRequest(
+                    payload=BindSensorOutputRequestPayload(
+                        sensor=SensorTypeField(self._sensor_type),
+                        binding=SensorOutputBindingField(SensorOutputBinding.none),
+                    )
+                ),
+            )
+
 
     async def get_report(
         self,
