@@ -53,6 +53,9 @@ class TaskRunner:
     def run_waterfall(self, func_list: List[TaskFuncAll]) -> None:
         """Run a list of functions in the background.
 
+        The order of the items in list matter.
+        Add items to list in the order we want to call the methods.
+
         Will log when the function completes, including any error
         that may occur.
 

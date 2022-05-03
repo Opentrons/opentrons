@@ -158,15 +158,8 @@ class ProtocolRunner:
         self._task_queue.start()
         await self._task_queue.join()
 
-        return ProtocolRunData(
-            commands=self._protocol_engine.state_view.commands.get_all(),
-            errors=self._protocol_engine.state_view.commands.get_all_errors(),
-            labware=self._protocol_engine.state_view.labware.get_all(),
-            pipettes=self._protocol_engine.state_view.pipettes.get_all(),
-            modules=self._protocol_engine.state_view.modules.get_all(),
-            # TODO check why is failing in the upload protocol integration tests
-            labwareOffsets=[] #self._protocol_engine.engine_state.labware.get_labware_offsets()
-        )
+        return self._protocol_engine.state_view.get_protocol_run_data()
+
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:
         protocol = self._json_file_reader.read(protocol_source)

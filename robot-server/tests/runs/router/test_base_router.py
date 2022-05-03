@@ -646,7 +646,7 @@ async def test_update_run_to_not_current(
     decoy: Decoy,
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
-    mock_engine_state_store: RunStateStore,
+    mock_run_state_store: RunStateStore,
     protocol_run: ProtocolRunData,
 ) -> None:
     """It should update a run to no longer be current."""
@@ -692,20 +692,13 @@ async def test_update_run_to_not_current(
     ).then_return(updated_resource)
 
     engine_state = decoy.mock(cls=StateView)
-    decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
-    decoy.when(engine_state.commands.get_all()).then_return([])
-    decoy.when(engine_state.commands.get_all_errors()).then_return([])
-    decoy.when(engine_state.pipettes.get_all()).then_return([])
-    decoy.when(engine_state.labware.get_all()).then_return([])
-    decoy.when(engine_state.labware.get_labware_offsets()).then_return([])
+    decoy.when(mock_engine_store.engine.state_view).then_return(engine_state)
     decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.SUCCEEDED
     )
-    decoy.when(engine_state.modules.get_all()).then_return([])
-
     decoy.when(engine_state.get_protocol_run_data()).then_return(protocol_run)
 
-    decoy.when(mock_engine_state_store.insert(engine_state_resource)).then_return(
+    decoy.when(mock_run_state_store.insert(engine_state_resource)).then_return(
         engine_state_resource
     )
 
@@ -714,9 +707,8 @@ async def test_update_run_to_not_current(
         request_body=RequestModel(data=run_update),
         run_store=mock_run_store,
         engine_store=mock_engine_store,
-        engine_state_store=mock_engine_state_store,
+        engine_state_store=mock_run_state_store,
     )
-
     assert result.content == SimpleBody(data=expected_response)
     assert result.status_code == 200
 
@@ -729,7 +721,7 @@ async def test_update_current_to_current_noop(
     decoy: Decoy,
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
-    mock_engine_state_store: RunStateStore,
+    mock_run_state_store: RunStateStore,
     protocol_run: ProtocolRunData,
 ) -> None:
     """It should noop if updating the current run to current: true."""
@@ -778,18 +770,12 @@ async def test_update_current_to_current_noop(
 
     engine_state = decoy.mock(cls=StateView)
     decoy.when(mock_engine_store.engine.state_view).then_return(engine_state)
-    decoy.when(engine_state.commands.get_all()).then_return([])
-    decoy.when(engine_state.commands.get_all_errors()).then_return([])
-    decoy.when(engine_state.pipettes.get_all()).then_return([])
-    decoy.when(engine_state.labware.get_all()).then_return([])
-    decoy.when(engine_state.labware.get_labware_offsets()).then_return([])
-    decoy.when(engine_state.modules.get_all()).then_return([])
     decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.SUCCEEDED
     )
     decoy.when(engine_state.get_protocol_run_data()).then_return(protocol_run)
 
-    decoy.when(mock_engine_state_store.insert(engine_state_resource)).then_return(
+    decoy.when(mock_run_state_store.insert(engine_state_resource)).then_return(
         engine_state_resource
     )
 
@@ -798,7 +784,7 @@ async def test_update_current_to_current_noop(
         request_body=RequestModel(data=run_update),
         run_store=mock_run_store,
         engine_store=mock_engine_store,
-        engine_state_store=mock_engine_state_store,
+        engine_state_store=mock_run_state_store,
     )
 
     assert result.content == SimpleBody(data=expected_response)
