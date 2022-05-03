@@ -589,7 +589,7 @@
           },
 
           {
-            "description": "Temperature Module Await Temperature: Delay protocol execution until the specified temperature is reached.",
+            "description": "Temperature Module Wait For Temperature: Delay protocol execution until the specified temperature is reached.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
