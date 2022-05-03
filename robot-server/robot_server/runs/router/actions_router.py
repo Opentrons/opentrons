@@ -18,7 +18,7 @@ from ..run_state_store import RunStateStore
 from ..run_store import RunStore, RunNotFoundError
 from ..action_models import RunAction, RunActionType, RunActionCreate
 from ..engine_store import EngineStore
-from ..dependencies import get_run_store, get_engine_store, get_engine_state_store
+from ..dependencies import get_run_store, get_engine_store, get_run_state_store
 from .base_router import RunNotFound, RunStopped
 
 log = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ async def create_run_action(
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     task_runner: TaskRunner = Depends(TaskRunner),
-    engine_state_store: RunStateStore = Depends(get_engine_state_store),
+    run_state_store: RunStateStore = Depends(get_run_state_store),
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 
@@ -65,7 +65,7 @@ async def create_run_action(
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
         task_runner: Background task runner.
-        engine_state_store: Protocol engine state storage interface.
+        run_state_store: Protocol engine state storage interface.
     """
     try:
         prev_run = run_store.get(run_id=runId)
@@ -93,7 +93,7 @@ async def create_run_action(
             else:
                 log.info(f'Starting run "{runId}".')
                 task_runner.run_waterfall(
-                    [engine_store.runner.run, engine_state_store.insert]
+                    [engine_store.runner.run, run_state_store.insert]
                 )
 
         elif action.actionType == RunActionType.PAUSE:

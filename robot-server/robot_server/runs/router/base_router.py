@@ -34,7 +34,7 @@ from ..run_store import RunStore, RunResource, RunNotFoundError
 from ..run_state_store import RunStateResource, RunStateStore
 from ..run_models import Run, RunSummary, RunCreate, RunUpdate
 from ..engine_store import EngineStore, EngineConflictError
-from ..dependencies import get_run_store, get_engine_store, get_engine_state_store
+from ..dependencies import get_run_store, get_engine_store, get_run_state_store
 
 from opentrons.protocol_engine import EngineStatus
 
@@ -321,7 +321,7 @@ async def update_run(
     request_body: RequestModel[RunUpdate],
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-    engine_state_store: RunStateStore = Depends(get_engine_state_store),
+    run_state_store: RunStateStore = Depends(get_run_state_store),
 ) -> PydanticResponse[SimpleBody[Run]]:
     """Update a run by its ID.
 
@@ -330,7 +330,7 @@ async def update_run(
         request_body: Update data from request body.
         run_store: Run storage interface.
         engine_store: ProtocolEngine storage and control.
-        engine_state_store: ProtocolEngine state storage and control.
+        run_state_store: ProtocolEngine state storage and control.
     """
     update = request_body.data
 
@@ -357,7 +357,7 @@ async def update_run(
             raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
         run = run_store.update_active_run(run_id=runId, is_current=update.current)
         log.info(f'Marked run "{runId}" as not current.')
-        insert_engine_state_result = engine_state_store.insert(
+        insert_engine_state_result = run_state_store.insert(
             RunStateResource(
                 run_id=run.run_id,
                 state=protocol_run_data,

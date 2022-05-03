@@ -72,7 +72,7 @@ async def test_create_play_action_to_start_run(
         action_id="action-id",
         created_at=datetime(year=2022, month=2, day=2),
         task_runner=task_runner,
-        engine_state_store=mock_run_state_store,
+        run_state_store=mock_run_state_store,
     )
 
     assert result.content.data == action
@@ -163,9 +163,9 @@ async def test_create_play_action_not_allowed(
             ),
             run_store=mock_run_store,
             engine_store=mock_engine_store,
-            task_runner=task_runner,
             action_id="action-id",
             created_at=datetime(year=2022, month=2, day=2),
+            task_runner=task_runner,
         )
 
     assert exc_info.value.status_code == 409
@@ -264,9 +264,9 @@ async def test_create_stop_action(
         request_body=RequestModel(data=RunActionCreate(actionType=RunActionType.STOP)),
         run_store=mock_run_store,
         engine_store=mock_engine_store,
-        task_runner=task_runner,
         action_id="action-id",
         created_at=datetime(year=2022, month=2, day=2),
+        task_runner=task_runner,
     )
 
     assert result.content.data == action

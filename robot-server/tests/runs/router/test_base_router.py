@@ -707,7 +707,7 @@ async def test_update_run_to_not_current(
         request_body=RequestModel(data=run_update),
         run_store=mock_run_store,
         engine_store=mock_engine_store,
-        engine_state_store=mock_run_state_store,
+        run_state_store=mock_run_state_store,
     )
     assert result.content == SimpleBody(data=expected_response)
     assert result.status_code == 200
@@ -784,7 +784,7 @@ async def test_update_current_to_current_noop(
         request_body=RequestModel(data=run_update),
         run_store=mock_run_store,
         engine_store=mock_engine_store,
-        engine_state_store=mock_run_state_store,
+        run_state_store=mock_run_state_store,
     )
 
     assert result.content == SimpleBody(data=expected_response)
