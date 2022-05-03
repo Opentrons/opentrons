@@ -1,16 +1,15 @@
 from opentrons import protocol_api, types
 
-# metadata = {
-#     "protocolName": "Testosaur",
-#     "author": "Opentrons <engineering@opentrons.com>",
-#     "description": 'A variant on "Dinosaur" for testing',
-#     "source": "Opentrons Repository",
-#     "apiLevel": "2.0",
-# }
+metadata = {
+    "protocolName": "Testosaur",
+    "author": "Opentrons <engineering@opentrons.com>",
+    "description": 'A variant on "Dinosaur" for testing',
+    "source": "Opentrons Repository",
+    "apiLevel": "2.0",
+}
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
-    print("HELLO WORLD")
     ctx.home()
     tr = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
     right = ctx.load_instrument("p300_single", types.Mount.RIGHT, [tr])
