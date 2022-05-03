@@ -667,7 +667,7 @@ async def test_update_run_to_not_current(
     )
 
     engine_state_resource = RunStateResource(
-        run_id="run-id", state=protocol_run, engine_status="succeeded"
+        run_id="run-id", state=protocol_run, engine_status="succeeded", created_at=None
     )
 
     expected_response = Run(
@@ -763,7 +763,7 @@ async def test_update_current_to_current_noop(
     )
 
     engine_state_resource = RunStateResource(
-        run_id="run-id", state=protocol_run, engine_status="succeeded"
+        run_id="run-id", state=protocol_run, engine_status="succeeded", created_at=None
     )
 
     run_update = RunUpdate(current=True)

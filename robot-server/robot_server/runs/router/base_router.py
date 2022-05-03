@@ -362,6 +362,7 @@ async def update_run(
                 run_id=run.run_id,
                 state=protocol_run_data,
                 engine_status=engine_state.commands.get_status(),
+                created_at=None,
             )
         )
 

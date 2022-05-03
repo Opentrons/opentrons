@@ -91,8 +91,7 @@ run_state_table = sqlalchemy.Table(
     sqlalchemy.Column("id", sqlalchemy.INT, primary_key=True),
     # NOTE: See above note about naive datetimes
     sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False),
-    sqlalchemy.Column(
-        "state", sqlalchemy.PickleType ,nullable=False),
+    sqlalchemy.Column("state", sqlalchemy.PickleType, nullable=False),
     sqlalchemy.Column("engine_status", sqlalchemy.String),
     sqlalchemy.Column(
         "run_id",
