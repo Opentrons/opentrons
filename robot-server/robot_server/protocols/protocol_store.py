@@ -256,8 +256,10 @@ class ProtocolStore:
             # analyses, they'll be left behind in the AnalysisStore, orphaned,
             # since they're stored independently of this SQL table.
             #
-            # To fix this, we'll need to merge the Store classes
-            # or otherwise give them access to each other.
+            # To fix this, we'll need to either:
+            #
+            # * Merge the Store classes or otherwise give them access to each other.
+            # * Switch from SQLAlchemy Core to ORM and use cascade deletes.
             transaction.execute(delete_analyses_statement)
 
             transaction.execute(delete_protocol_statement)
