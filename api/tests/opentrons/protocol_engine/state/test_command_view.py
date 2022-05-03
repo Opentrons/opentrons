@@ -156,7 +156,7 @@ def test_get_is_running_queue() -> None:
     assert subject.get_is_running() is True
 
     subject = get_command_view(queue_status=QueueStatus.IMPLICITLY_ACTIVE)
-    assert subject.get_is_running() is True
+    assert subject.get_is_running() is False
 
 
 def test_get_is_complete() -> None:
@@ -406,30 +406,6 @@ get_status_specs: List[GetStatusSpec] = [
     ),
     GetStatusSpec(
         subject=get_command_view(
-            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
-            running_command_id="command-id",
-            queued_command_ids=[],
-        ),
-        expected_status=EngineStatus.RUNNING,
-    ),
-    GetStatusSpec(
-        subject=get_command_view(
-            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
-            running_command_id=None,
-            queued_command_ids=["command-id"],
-        ),
-        expected_status=EngineStatus.RUNNING,
-    ),
-    GetStatusSpec(
-        subject=get_command_view(
-            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
-            running_command_id=None,
-            queued_command_ids=[],
-        ),
-        expected_status=EngineStatus.IDLE,
-    ),
-    GetStatusSpec(
-        subject=get_command_view(
             queue_status=QueueStatus.INACTIVE,
             run_result=RunResult.SUCCEEDED,
             is_hardware_stopped=False,
@@ -499,6 +475,15 @@ get_status_specs: List[GetStatusSpec] = [
         ),
         expected_status=EngineStatus.PAUSED,
     ),
+    GetStatusSpec(
+        subject=get_command_view(
+            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            running_command_id="command-id",
+            queued_command_ids=["command-id-1"],
+            queued_setup_command_ids=["command-id-2"],
+        ),
+        expected_status=EngineStatus.IDLE,
+    ),
 ]
 
 
@@ -517,31 +502,39 @@ class GetOkayToClearSpec(NamedTuple):
 
 get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
     GetOkayToClearSpec(
+        # Protocol not played yet, no commands queued or ran yet
         subject=get_command_view(
             queue_status=QueueStatus.IMPLICITLY_ACTIVE,
             running_command_id=None,
             queued_command_ids=[],
+            queued_setup_command_ids=[],
         ),
         expected_is_okay=True,
     ),
     GetOkayToClearSpec(
+        # Protocol commands are queued but not played yet,
+        # no setup commands queued or running
         subject=get_command_view(
             queue_status=QueueStatus.IMPLICITLY_ACTIVE,
             running_command_id=None,
+            queued_setup_command_ids=[],
             queued_command_ids=["command-id"],
+            commands=[create_queued_command(command_id="command-id")],
+        ),
+        expected_is_okay=True,
+    ),
+    GetOkayToClearSpec(
+        # Protocol not played yet, setup commands are queued
+        subject=get_command_view(
+            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            running_command_id=None,
+            queued_setup_command_ids=["command-id"],
             commands=[create_queued_command(command_id="command-id")],
         ),
         expected_is_okay=False,
     ),
     GetOkayToClearSpec(
-        subject=get_command_view(
-            running_command_id=None,
-            queued_command_ids=[],
-            commands=[create_queued_command(command_id="command-id")],
-        ),
-        expected_is_okay=True,
-    ),
-    GetOkayToClearSpec(
+        # Protocol is stopped
         subject=get_command_view(
             is_hardware_stopped=True,
         ),

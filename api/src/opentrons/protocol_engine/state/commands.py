@@ -32,7 +32,7 @@ from ..errors import (
     ErrorOccurrence,
     RobotDoorOpenError,
     SetupCommandNotAllowedError,
-    UnexpectedProtocolError,
+    UnexpectedEngineStatusError,
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
@@ -465,8 +465,14 @@ class CommandView(HasState[CommandState]):
             return next(iter(self._state.queued_command_ids), None)
 
     def get_is_okay_to_clear(self) -> bool:
-        """Get whether the engine is stopped or unplayed so it could be removed."""
-        if self.get_is_stopped() or self.get_status() == EngineStatus.IDLE:
+        """Get whether the engine is stopped or sitting idlly so it could be removed."""
+        if self.get_is_stopped():
+            return True
+        elif (
+            self.get_status() == EngineStatus.IDLE
+            and self._state.running_command_id is None
+            and len(self._state.queued_setup_command_ids) == 0
+        ):
             return True
         else:
             return False
@@ -480,12 +486,8 @@ class CommandView(HasState[CommandState]):
         return self._state.queue_status == QueueStatus.IMPLICITLY_ACTIVE
 
     def get_is_running(self) -> bool:
-        """Get whether the engine is running and queued commands should be executed."""
-        queue_status = self._state.queue_status
-        return (
-            queue_status == QueueStatus.IMPLICITLY_ACTIVE
-            or queue_status == QueueStatus.ACTIVE
-        )
+        """Get whether the protocol is running & queued commands should be executed."""
+        return self._state.queue_status == QueueStatus.ACTIVE
 
     def get_is_complete(self, command_id: str) -> bool:
         """Get whether a given command is completed.
@@ -577,14 +579,9 @@ class CommandView(HasState[CommandState]):
             else:
                 return EngineStatus.PAUSED
 
-        else:
-            # any_running = self._state.running_command_id is not None
-            # any_queued = len(self._state.queued_command_ids) > 0
-            #
-            # if any_running or any_queued:
-            #     return EngineStatus.RUNNING
-            # else:
+        elif self._state.queue_status == QueueStatus.IMPLICITLY_ACTIVE:
             return EngineStatus.IDLE
 
-        # TODO (spp, 2022-04-29): We might want to add a new "setup commands running"
-        #  status.
+        raise UnexpectedEngineStatusError(
+            "Protocol engine has encountered an" " unexpected state."
+        )

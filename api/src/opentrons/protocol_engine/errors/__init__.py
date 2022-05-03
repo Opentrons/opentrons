@@ -3,6 +3,7 @@
 from .exceptions import (
     ProtocolEngineError,
     UnexpectedProtocolError,
+    UnexpectedEngineStatusError,
     FailedToLoadPipetteError,
     PipetteNotAttachedError,
     CommandDoesNotExistError,
@@ -38,6 +39,7 @@ __all__ = [
     # exceptions
     "ProtocolEngineError",
     "UnexpectedProtocolError",
+    "UnexpectedEngineStatusError",
     "FailedToLoadPipetteError",
     "PipetteNotAttachedError",
     "CommandDoesNotExistError",
