@@ -13,7 +13,6 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { RobotCard } from '../../../organisms/Devices/RobotCard'
 import { DevicesEmptyState } from '../../../organisms/Devices/DevicesEmptyState'
-import { Scanning } from '../../../organisms/Devices/Scanning'
 import { CollapsibleSection } from '../../../molecules/CollapsibleSection'
 import { getScanning } from '../../../redux/discovery'
 
@@ -40,7 +39,6 @@ export function DevicesLanding(): JSX.Element {
         </StyledText>
         <NewRobotSetupHelp />
       </Flex>
-      {isScanning ? <Scanning /> : null}
       {!isScanning &&
       [...availableDevices, ...unavailableDevices].length === 0 ? (
         <DevicesEmptyState />
