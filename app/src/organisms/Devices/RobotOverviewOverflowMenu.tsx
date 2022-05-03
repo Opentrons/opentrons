@@ -98,7 +98,7 @@ export const RobotOverviewOverflowMenu = (
           >
             {t('home_gantry')}
           </MenuItem>
-          <Divider />
+          <Divider marginY={null} />
           <MenuItem
             to={`/devices/${robot.name}/robot-settings`}
             as={Link}
