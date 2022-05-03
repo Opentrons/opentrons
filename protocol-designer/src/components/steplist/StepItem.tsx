@@ -461,7 +461,7 @@ export const StepItemContents = (
     )
   }
 
-  if (substeps && substeps.substepType === 'awaitTemperature') {
+  if (substeps && substeps.substepType === 'waitForTemperature') {
     const temperature = makeTemperatureText(substeps.temperature)
 
     return (

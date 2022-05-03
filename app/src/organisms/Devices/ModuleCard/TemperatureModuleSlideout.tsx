@@ -46,7 +46,7 @@ export const TemperatureModuleSlideout = (
         commandType: 'temperatureModule/setTargetTemperature',
         params: {
           moduleId: module.id,
-          temperature: parseInt(temperatureValue),
+          celsius: parseInt(temperatureValue),
         },
       }
       createLiveCommand({

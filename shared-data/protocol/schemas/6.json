@@ -594,7 +594,9 @@
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
-              "commandType": { "enum": ["temperatureModule/waitForTemperature"] },
+              "commandType": {
+                "enum": ["temperatureModule/waitForTemperature"]
+              },
               "params": {
                 "required": ["moduleId", "celsius"],
                 "properties": {

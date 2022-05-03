@@ -98,7 +98,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
-    case 'temperatureModule/awaitTemperature':
+    case 'temperatureModule/waitForTemperature':
       forAwaitTemperature(
         command.params,
         invariantContext,

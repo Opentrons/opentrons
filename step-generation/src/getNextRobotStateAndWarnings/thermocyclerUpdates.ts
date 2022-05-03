@@ -49,6 +49,7 @@ export const forThermocyclerSetTargetLidTemperature = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
+  // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10178 merges
   const { moduleId, temperature } = params
   const { robotState } = robotStateAndWarnings
 
