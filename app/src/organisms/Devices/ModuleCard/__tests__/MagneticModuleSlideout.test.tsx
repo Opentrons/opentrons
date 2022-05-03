@@ -122,7 +122,7 @@ describe('MagneticModuleSlideout', () => {
     }
 
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Engage Height' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('magneticModuleV1')
     fireEvent.change(input, { target: { value: '10' } })
     expect(button).toBeEnabled()

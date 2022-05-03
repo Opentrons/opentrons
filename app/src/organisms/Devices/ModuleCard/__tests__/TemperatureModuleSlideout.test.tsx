@@ -114,7 +114,7 @@ describe('TemperatureModuleSlideout', () => {
       runId: 'test123',
     }
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Temperature' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('temperatureModuleV2')
     fireEvent.change(input, { target: { value: '20' } })
     expect(button).toBeEnabled()

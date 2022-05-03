@@ -21,8 +21,8 @@ import { Tooltip } from '../../../atoms/Tooltip'
 import { Divider } from '../../../atoms/structure'
 import { InputField } from '../../../atoms/InputField'
 import { Collapsible } from '../ModuleCard/Collapsible'
+import { useLatchControls } from '../ModuleCard/hooks'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
-import { useLatchControls } from './hooks'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
@@ -44,7 +44,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   const [isExpanded, setExpanded] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { toggleLatch, isLatchClosed } = useLatchCommand(module)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const isShaking = module.data.speedStatus !== 'idle'
 
   const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {

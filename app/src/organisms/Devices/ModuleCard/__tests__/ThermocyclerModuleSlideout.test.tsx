@@ -143,7 +143,7 @@ describe('ThermocyclerModuleSlideout', () => {
       runId: 'test123',
     }
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Block Temperature' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('thermocyclerModuleV1_false')
     fireEvent.change(input, { target: { value: '45' } })
     expect(button).toBeEnabled()
@@ -171,7 +171,7 @@ describe('ThermocyclerModuleSlideout', () => {
       runId: 'test123',
     }
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Lid Temperature' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('thermocyclerModuleV1_true')
     fireEvent.change(input, { target: { value: '45' } })
     expect(button).toBeEnabled()

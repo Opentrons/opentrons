@@ -144,7 +144,7 @@ describe('HeaterShakerSlideout', () => {
     }
 
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Shake Speed' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('heaterShakerModuleV1_true')
     fireEvent.change(input, { target: { value: '300' } })
     expect(button).toBeEnabled()
@@ -162,7 +162,7 @@ describe('HeaterShakerSlideout', () => {
     }
 
     const { getByRole, getByTestId, getByText } = render(props)
-    const button = getByRole('button', { name: 'Set Shake Speed' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('heaterShakerModuleV1_true')
     fireEvent.change(input, { target: { value: '300' } })
     expect(button).toBeEnabled()
@@ -179,9 +179,9 @@ describe('HeaterShakerSlideout', () => {
       runId: 'test123',
     }
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Temperature' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('heaterShakerModuleV1_false')
-    fireEvent.change(input, { target: { value: '20' } })
+    fireEvent.change(input, { target: { value: '40' } })
     expect(button).toBeEnabled()
     fireEvent.click(button)
 
@@ -191,7 +191,7 @@ describe('HeaterShakerSlideout', () => {
         commandType: 'heaterShakerModule/startSetTargetTemperature',
         params: {
           moduleId: 'heatershaker_id',
-          temperature: 20,
+          temperature: 40,
         },
       },
     })
