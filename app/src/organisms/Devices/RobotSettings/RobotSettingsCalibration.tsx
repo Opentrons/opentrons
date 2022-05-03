@@ -53,6 +53,7 @@ import type {
   SessionCommandString,
   DeckCalibrationSession,
 } from '../../../redux/sessions/types'
+import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
 
 // import type {
 //   DeckCalibrationData,
@@ -262,11 +263,12 @@ export function RobotSettingsCalibration({
     }
   }
 
+  // for debug TODO: remove when open a PR
   // console.log('pipetteOffsetCalibrations', pipetteOffsetCalibrations)
   // console.log('tipLengthCalibrations', tipLengthCalibrations)
   // console.log('attachedPipettes', attachedPipettes)
-  console.log('showConfirmStart', showConfirmStart)
-  console.log('pipOffsetDataPresent', pipOffsetDataPresent)
+  // console.log('showConfirmStart', showConfirmStart)
+  // console.log('pipOffsetDataPresent', pipOffsetDataPresent)
 
   const demoPippet = [
     {
@@ -399,6 +401,9 @@ export function RobotSettingsCalibration({
                   as="label"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   color={COLORS.darkBlack}
+                  marginLeft={SPACING.spacing4}
+                  marginRight={SPACING.spacing4}
+                  width="10rem"
                   data-testid={'pipette_offset_calibrations_model_and_serial'}
                 >
                   {t(
@@ -410,6 +415,9 @@ export function RobotSettingsCalibration({
                   as="label"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   color={COLORS.darkBlack}
+                  // marginLeft={SPACING.spacing4}
+                  marginLeft="3.5rem"
+                  width="2.5rem"
                   data-testid={'pipette_offset_calibrations_mount'}
                 >
                   {t('pipette_offset_calibrations_table_header_mount')}
@@ -419,6 +427,8 @@ export function RobotSettingsCalibration({
                   as="label"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   color={COLORS.darkBlack}
+                  marginLeft="4rem"
+                  width="3.75rem"
                   data-testid={'pipette_offset_calibrations_attached'}
                 >
                   {t('pipette_offset_calibrations_table_header_attached')}
@@ -428,6 +438,8 @@ export function RobotSettingsCalibration({
                   as="label"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   color={COLORS.darkBlack}
+                  marginLeft="8rem"
+                  width="8.5rem"
                   data-testid={'pipette_offset_calibrations_tiprack'}
                 >
                   {t('pipette_offset_calibrations_table_header_tiprack')}
@@ -437,6 +449,7 @@ export function RobotSettingsCalibration({
                   as="label"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   color={COLORS.darkBlack}
+                  marginLeft="3rem"
                   data-testid={'pipette_offset_calibrations_last_calibrated'}
                 >
                   {t(
@@ -447,6 +460,7 @@ export function RobotSettingsCalibration({
               {demoPippet?.map((calibration, index) => (
                 <React.Fragment key={index}>
                   <PipetteOffsetCalDetailItem
+                    attachedPipettes={attachedPipettes}
                     model={calibration.id}
                     serial={calibration.pipette}
                     mount={calibration.mount}
@@ -510,6 +524,7 @@ export function RobotSettingsCalibration({
 }
 
 interface PipetteOffsetCalDetailItemProps {
+  attachedPipettes: AttachedPipettesByMount
   model: string
   serial: string
   mount: string
@@ -530,7 +545,7 @@ function PipetteOffsetCalDetailItem({
 
   const formatLastModified = (lastModified: string): string => {
     return typeof lastModified === 'string'
-      ? format(new Date(lastModified), 'd/M/yyyy HH:mm:ss')
+      ? format(new Date(lastModified), 'M/d/yyyy HH:mm:ss')
       : 'unknown'
   }
 
@@ -544,10 +559,10 @@ function PipetteOffsetCalDetailItem({
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
-          <StyledText as="p" width="10rem">
+          <StyledText as="p" marginLeft={SPACING.spacing4} width="10rem">
             {model}
           </StyledText>
-          <StyledText as="p" width="10rem">
+          <StyledText as="p" marginLeft={SPACING.spacing4} width="10rem">
             {serial}
           </StyledText>
         </Flex>
