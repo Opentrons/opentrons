@@ -123,7 +123,11 @@ export function ProtocolRunDetails(): JSX.Element | null {
     ))
 
   return robot != null ? (
-    <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
+    <ApiHostProvider
+      key={robot.name}
+      hostname={robot.ip ?? null}
+      robotName={robot.name}
+    >
       <Box
         minWidth={SIZE_6}
         height="100%"
