@@ -130,16 +130,45 @@ export function RobotSettingsCalibration({
         : null
     )?.status === RobotApi.PENDING
 
+  const createRequest = useSelector((state: State) =>
+    createRequestId.current
+      ? RobotApi.getRequestById(state, createRequestId.current)
+      : null
+  )
+  const createStatus = createRequest?.status
+
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
   // const configHasCalibrationBlock = null
   const deckCalStatus = useSelector((state: State) => {
     return Calibration.getDeckCalibrationStatus(state, robotName)
   })
 
+  let buttonDisabledReason = null
+  if (notConnectable) {
+    buttonDisabledReason = t('shared:disabled_cannot_connect')
+  } else if (!robot.connected) {
+    buttonDisabledReason = t('shared:disabled_connect_to_robot')
+  } else if (isRunning) {
+    buttonDisabledReason = t('shared:disabled_protocol_is_running')
+  } else if (!pipettePresent) {
+    buttonDisabledReason = t('shared:disabled_no_pipette_attached')
+  }
+
+  const healthCheckButtonDisabled = Boolean(buttonDisabledReason) || isPending
+
   const deckCalibrationButtonText =
     deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_IDENTITY
       ? t('deck_calibration_recalibrate_button')
       : t('deck_calibration_calibrate_button')
+
+  const disabledOrBusyReason = isPending
+    ? t('robot_calibration:deck_calibration_spinner', {
+        ongoing_action:
+          createStatus === RobotApi.PENDING
+            ? t('shared:starting')
+            : t('shared:ending'),
+      })
+    : buttonDisabledReason
 
   const deckLastModified = (): string => {
     const data = deckCalibrationData.deckCalibrationData
@@ -185,24 +214,9 @@ export function RobotSettingsCalibration({
     )
   }
 
-  let buttonDisabledReason = null
-  if (notConnectable) {
-    buttonDisabledReason = t('shared:disabled_cannot_connect')
-  } else if (!robot.connected) {
-    buttonDisabledReason = t('shared:disabled_connect_to_robot')
-  } else if (isRunning) {
-    buttonDisabledReason = t('shared:disabled_protocol_is_running')
-  } else if (!pipettePresent) {
-    buttonDisabledReason = t('shared:disabled_no_pipette_attached')
-  }
-
-  const helthCheckButtonDisabled = Boolean(buttonDisabledReason) || isPending
-
   const handleHealthCheck = (
     hasBlockModalResponse: boolean | null = null
   ): void => {
-    console.log('handleHealthCheck', hasBlockModalResponse)
-    console.log('showCalBlockModal', showCalBlockModal)
     if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
       setShowCalBlockModal(true)
     } else {
@@ -225,6 +239,13 @@ export function RobotSettingsCalibration({
   // console.log('pipetteOffsetCalibrations', pipetteOffsetCalibrations)
   // console.log('tipLengthCalibrations', tipLengthCalibrations)
   // console.log('attachedPipettes', attachedPipettes)
+  console.log('showConfirmStart', showConfirmStart)
+
+  React.useEffect(() => {
+    if (createStatus === RobotApi.SUCCESS) {
+      createRequestId.current = null
+    }
+  }, [createStatus])
 
   return (
     <>
@@ -283,7 +304,10 @@ export function RobotSettingsCalibration({
             </StyledText>
             <StyledText as="label">{deckLastModified()}</StyledText>
           </Box>
-          <TertiaryButton onClick={confirmStart} disabled={false}>
+          <TertiaryButton
+            onClick={confirmStart}
+            // disabled={disabledOrBusyReason}
+          >
             {deckCalibrationButtonText}
           </TertiaryButton>
         </Flex>
@@ -304,7 +328,6 @@ export function RobotSettingsCalibration({
                 <StyledText as="p">{calibration?.pipette}</StyledText>
                 <StyledText as="p">{calibration?.offset}</StyledText>
                 <StyledText as="p">{calibration.mount}</StyledText>
-                {/* <StyledText as="p">{calibration.}</StyledText> */}
               </>
             ))}
           </Box>
@@ -346,7 +369,7 @@ export function RobotSettingsCalibration({
           </Box>
           <TertiaryButton
             onClick={() => handleHealthCheck(null)}
-            disabled={helthCheckButtonDisabled}
+            disabled={healthCheckButtonDisabled}
           >
             {t('calibration_health_check_button')}
           </TertiaryButton>
