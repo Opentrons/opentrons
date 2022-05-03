@@ -186,16 +186,22 @@ export const getSlotHasMatingSurfaceUnitVector = (
   return Boolean(matingSurfaceUnitVector)
 }
 
-export const getAdapterName = (
-  labwareLoadname: LabwareParameters['loadName']
-): ThermalAdapterName => {
+export const getAdapterName = (labwareLoadname: string): ThermalAdapterName => {
   let adapterName: ThermalAdapterName = 'Universal Flat Adapter'
 
-  if (labwareLoadname.includes('pcr')) {
+  if (
+    labwareLoadname ===
+    'opentrons_96_pcr_plate_adapter_nest_wellplate_100ul_pcr_full_skirt'
+  ) {
     adapterName = 'PCR Adapter'
-  } else if (labwareLoadname.includes('deepwell')) {
+  } else if (
+    labwareLoadname === 'opentrons_96_deepwell_adapter_nest_wellplate_2ml_deep'
+  ) {
     adapterName = 'Deep Well Adapter'
-  } else if (labwareLoadname.includes('flatbottom')) {
+  } else if (
+    labwareLoadname ===
+    'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat'
+  ) {
     adapterName = '96 Flat Bottom Adapter'
   }
 
