@@ -88,7 +88,7 @@ class StateView(HasState[State]):
             labware=self._labware.get_all(),
             labwareOffsets=self._labware.get_labware_offsets(),
             commands=self.commands.get_all(),
-            modules=self.modules.get_all()
+            modules=self.modules.get_all(),
         )
 
 
@@ -148,7 +148,6 @@ class StateStore(StateView, ActionHandler):
             substore.handle_action(action)
 
         self._update_state_views()
-
 
     async def wait_for(
         self,

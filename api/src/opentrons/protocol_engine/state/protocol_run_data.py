@@ -1,10 +1,11 @@
+"""Protocol run data class for storing protocol engine state."""
 from pydantic import BaseModel
 from typing import List
 
-from .commands import Command, ErrorOccurrence
-from .labware import LoadedLabware, LabwareOffset
-from .modules import LoadedModule
-from .pipettes import LoadedPipette
+from ..commands import Command
+from ..errors import ErrorOccurrence
+from ..types import LoadedLabware, LabwareOffset, LoadedModule, LoadedPipette
+
 
 class ProtocolRunData(BaseModel):
     """Data from a protocol run."""

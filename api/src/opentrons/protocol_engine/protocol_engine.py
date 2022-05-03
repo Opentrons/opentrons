@@ -34,6 +34,7 @@ from .actions import (
     HardwareStoppedAction,
 )
 
+
 class ProtocolEngine:
     """Main ProtocolEngine class.
 

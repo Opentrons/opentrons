@@ -1,7 +1,5 @@
 """Protocol run control and management."""
-from dataclasses import dataclass
-from typing import List, Optional, cast
-from pydantic import BaseModel, Field
+from typing import Optional, cast
 
 from opentrons.hardware_control import HardwareControlAPI, ThreadManagedHardware
 from opentrons.protocol_reader import (
@@ -9,16 +7,7 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
     JsonProtocolConfig,
 )
-from opentrons.protocol_engine import (
-    ProtocolEngine,
-    ProtocolRunData,
-    Command,
-    ErrorOccurrence,
-    LoadedLabware,
-    LoadedModule,
-    LoadedPipette,
-    LabwareOffset
-)
+from opentrons.protocol_engine import ProtocolEngine, ProtocolRunData
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
@@ -35,6 +24,7 @@ from .legacy_wrappers import (
     LegacyContextCreator,
     LegacyExecutor,
 )
+
 
 # TODO(mc, 2022-01-11): this class has become bloated. Split into an abstract
 # interfaces and several concrete implementations per protocol type
@@ -159,7 +149,6 @@ class ProtocolRunner:
         await self._task_queue.join()
 
         return self._protocol_engine.state_view.get_protocol_run_data()
-
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:
         protocol = self._json_file_reader.read(protocol_source)

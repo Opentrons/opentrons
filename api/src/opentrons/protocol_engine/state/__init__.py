@@ -27,7 +27,7 @@ __all__ = [
     "State",
     "StateStore",
     "StateView",
-    "ProtocolRunData"
+    "ProtocolRunData",
     # command state and values
     "CommandState",
     "CommandView",
