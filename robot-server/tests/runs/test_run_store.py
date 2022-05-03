@@ -1,33 +1,18 @@
 """Tests for robot_server.runs.run_store."""
 import pytest
 from datetime import datetime, timezone
-from typing import Generator
 
-from sqlalchemy.engine import Engine as SQLEngine
-from pathlib import Path
+from sqlalchemy.engine import Engine
 
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
 from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError
 from robot_server.runs.action_models import RunAction, RunActionType
-from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
 
 
 @pytest.fixture
-def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
-    """Return a set-up database to back the store."""
-    db_file_path = tmp_path / "test.db"
-    sql_engine = open_db_no_cleanup(db_file_path=db_file_path)
-    try:
-        add_tables_to_db(sql_engine)
-        yield sql_engine
-    finally:
-        sql_engine.dispose()
-
-
-@pytest.fixture
-def subject(sql_engine: SQLEngine) -> RunStore:
+def subject(sql_engine_fixture: Engine) -> RunStore:
     """Get a ProtocolStore test subject."""
-    return RunStore(sql_engine=sql_engine)
+    return RunStore(sql_engine=sql_engine_fixture)
 
 
 def test_add_run(subject: RunStore) -> None:

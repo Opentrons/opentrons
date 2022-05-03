@@ -1,10 +1,8 @@
 """Tests for robot_server.runs.run_store."""
 import pytest
 from datetime import datetime, timezone
-from typing import Generator
 
 import sqlalchemy
-from pathlib import Path
 
 from opentrons.protocol_engine import (
     commands as pe_commands,
@@ -16,7 +14,6 @@ from opentrons.types import MountType, DeckSlotName
 
 from robot_server.runs.run_state_store import RunStateStore, RunStateResource
 from robot_server.runs.run_store import RunNotFoundError, RunResource, RunStore
-from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
 
 
 # TODO(tz): move to conftest file. create a fixter that inserts a fun
@@ -33,28 +30,16 @@ def run_resource() -> RunResource:
 
 
 @pytest.fixture
-def sql_engine(tmp_path: Path) -> Generator[sqlalchemy.engine.Engine, None, None]:
-    """Return a set-up database to back the store."""
-    db_file_path = tmp_path / "test.db"
-    sql_engine = open_db_no_cleanup(db_file_path=db_file_path)
-    try:
-        add_tables_to_db(sql_engine)
-        yield sql_engine
-    finally:
-        sql_engine.dispose()
-
-
-@pytest.fixture
-def subject(sql_engine: sqlalchemy.engine.Engine) -> RunStateStore:
+def subject(sql_engine_fixture: sqlalchemy.engine.Engine) -> RunStateStore:
     """Get a ProtocolStore test subject."""
-    return RunStateStore(sql_engine=sql_engine)
+    return RunStateStore(sql_engine=sql_engine_fixture)
 
 
 # TODO(tz): move to conftest file.
 @pytest.fixture
-def run_store(sql_engine: sqlalchemy.engine.Engine) -> RunStore:
+def run_store(sql_engine_fixture: sqlalchemy.engine.Engine) -> RunStore:
     """Get a ProtocolStore test subject."""
-    return RunStore(sql_engine=sql_engine)
+    return RunStore(sql_engine=sql_engine_fixture)
 
 
 @pytest.fixture
@@ -88,16 +73,11 @@ def protocol_run() -> ProtocolRunData:
         pipetteName=pe_types.PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
     )
-    analysis_command_list = []
-    labware_list = []
-    for i in range(1000):
-        analysis_command_list.append(analysis_command)
-        labware_list.append(analysis_labware)
 
     return ProtocolRunData(
-        commands=analysis_command_list,
+        commands=[analysis_command],
         errors=[analysis_error],
-        labware=labware_list,
+        labware=[analysis_labware],
         pipettes=[analysis_pipette],
         # TODO(mc, 2022-02-14): evaluate usage of modules in the analysis resp.
         modules=[],

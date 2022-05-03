@@ -2,7 +2,6 @@
 import pytest
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Generator
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_reader import (
@@ -18,21 +17,8 @@ from robot_server.protocols.protocol_store import (
     ProtocolResource,
     ProtocolNotFoundError,
 )
-from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
 
 from sqlalchemy.engine import Engine as SQLEngine
-
-
-@pytest.fixture
-def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
-    """Return a set-up database to back the store."""
-    db_file_path = tmp_path / "test.db"
-    sql_engine = open_db_no_cleanup(db_file_path=db_file_path)
-    add_tables_to_db(sql_engine)
-    try:
-        yield sql_engine
-    finally:
-        sql_engine.dispose()
 
 
 @pytest.fixture
@@ -44,9 +30,9 @@ def protocol_file_directory(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def subject(sql_engine: SQLEngine) -> ProtocolStore:
+def subject(sql_engine_fixture: SQLEngine) -> ProtocolStore:
     """Get a ProtocolStore test subject."""
-    return ProtocolStore.create_empty(sql_engine=sql_engine)
+    return ProtocolStore.create_empty(sql_engine=sql_engine_fixture)
 
 
 async def test_insert_and_get_protocol(
