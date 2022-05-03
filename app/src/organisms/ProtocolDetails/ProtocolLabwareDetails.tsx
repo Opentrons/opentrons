@@ -13,9 +13,9 @@ import {
   POSITION_RELATIVE,
   SIZE_5,
   SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
@@ -41,12 +41,12 @@ export const ProtocolLabwareDetails = (
       ? [
           ...requiredLabwareDetails
             .reduce((obj, labware) => {
-              if (!obj.has(labware.result.definition.parameters.loadName))
-                obj.set(labware.result.definition.parameters.loadName, {
+              if (!obj.has(getLabwareDefURI(labware.result.definition)))
+                obj.set(getLabwareDefURI(labware.result.definition), {
                   ...labware,
                   quantity: 0,
                 })
-              obj.get(labware.result.definition.parameters.loadName).quantity++
+              obj.get(getLabwareDefURI(labware.result.definition)).quantity++
               return obj
             }, new Map())
             .values(),
@@ -60,7 +60,6 @@ export const ProtocolLabwareDetails = (
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.darkBlack}
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
           data-testid={'ProtocolLabwareDetails_labware_name'}
         >
           {t('labware_name')}
@@ -69,7 +68,6 @@ export const ProtocolLabwareDetails = (
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.darkBlack}
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
           marginLeft={SIZE_5}
           data-testid={'ProtocolLabwareDetails_quantity'}
         >
