@@ -16,13 +16,13 @@ import { StyledText } from '../../../atoms/text'
 import { PrimaryButton } from '../../../atoms/Buttons'
 
 interface DeckCalibrationConfirmModalProps {
-  closeModal: () => void
   confirm: () => unknown
+  cancel: () => unknown
 }
 
 export function DeckCalibrationConfirmModal({
-  closeModal,
   confirm,
+  cancel,
 }: DeckCalibrationConfirmModalProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
 
@@ -30,28 +30,38 @@ export function DeckCalibrationConfirmModal({
     <Modal
       type="warning"
       title={t('deck_calibration_modal_title')}
-      onClose={closeModal}
+      onClose={cancel}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p">
+        <StyledText as="p" marginBottom={SPACING.spacing4}>
           {t('deck_calibration_modal_description')}
         </StyledText>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <StyledText
+          as="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          marginBottom={SPACING.spacing5}
+        >
           {t('deck_calibration_modal_pipette_description')}
         </StyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
           <Link
             role="button"
-            onClick={closeModal}
+            onClick={cancel}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing5}
             color={COLORS.blue}
             css={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('shared:cancel')}
           </Link>
-          <PrimaryButton backgroundColor={COLORS.error} onClick={confirm}>
+          <PrimaryButton
+            backgroundColor={COLORS.error}
+            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            css={TYPOGRAPHY.fontSizeP}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            onClick={confirm}
+          >
             {t('shared:yes')}
           </PrimaryButton>
         </Flex>

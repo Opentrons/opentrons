@@ -39,6 +39,7 @@ import {
   useTipLengthCalibrations,
   useAttachedPipettes,
 } from '../hooks'
+import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 
 import type { State } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
@@ -236,6 +237,12 @@ export function RobotSettingsCalibration({
           />
         ) : null}
       </Portal>
+      {showConfirmStart && pipOffsetDataPresent && (
+        <DeckCalibrationConfirmModal
+          confirm={confirmStart}
+          cancel={cancelStart}
+        />
+      )}
       <Box paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
@@ -314,6 +321,14 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing3}>
               {t('tip_length_calibrations_description')}
             </StyledText>
+            {tipLengthCalibrations?.map(tip => (
+              <>
+                <StyledText as="p">{tip?.uri}</StyledText>
+                <StyledText as="p">{tip?.pipette}</StyledText>
+                <StyledText as="p">{tip?.lastModified}</StyledText>
+                {/* <StyledText as="p">{calibration.}</StyledText> */}
+              </>
+            ))}
           </Box>
         </Flex>
       </Box>
@@ -328,14 +343,6 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing3}>
               {t('calibration_health_check_description')}
             </StyledText>
-            {tipLengthCalibrations?.map(tip => (
-              <>
-                <StyledText as="p">{tip?.uri}</StyledText>
-                <StyledText as="p">{tip?.pipette}</StyledText>
-                <StyledText as="p">{tip?.lastModified}</StyledText>
-                {/* <StyledText as="p">{calibration.}</StyledText> */}
-              </>
-            ))}
           </Box>
           <TertiaryButton
             onClick={() => handleHealthCheck(null)}
