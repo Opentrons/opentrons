@@ -4,7 +4,7 @@ import contextMenu from 'electron-context-menu'
 
 import { createUi } from './ui'
 import { initializeMenu } from './menu'
-import { initializePython } from './python'
+import { initializePython } from './protocolAnalysis'
 import { createLogger } from './log'
 import { registerDiscovery } from './discovery'
 import { registerLabware } from './labware'

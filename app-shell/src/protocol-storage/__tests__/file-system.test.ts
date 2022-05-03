@@ -17,12 +17,12 @@ import {
   PROTOCOLS_DIRECTORY_PATH,
 } from '../file-system'
 import { getConfig } from '../../config'
-import { analyzeProtocolSource } from '../../python'
+import { analyzeProtocolSource } from '../../protocolAnalysis'
 
 jest.mock('uuid/v4')
 jest.mock('electron')
 jest.mock('../../config')
-jest.mock('../../python')
+jest.mock('../../protocolAnalysis')
 
 const trashItem = Electron.shell.trashItem as jest.MockedFunction<
   typeof Electron.shell.trashItem
