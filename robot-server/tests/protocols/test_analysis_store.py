@@ -162,7 +162,7 @@ async def test_returned_in_order_added(
         "analysis-id-1",
         "analysis-id-2",
         "analysis-id-3",
-        "analysis-id-4"
+        "analysis-id-4",
     ]
     summaries = subject.get_summaries_by_protocol(protocol_id="protocol-id")
     full_analyses = await subject.get_by_protocol(protocol_id="protocol-id")
