@@ -87,6 +87,8 @@
   "robot_has_previous_offsets": "{{robotName}} has stored Labware Offset data from previous protocol runs. Do you want to apply that data to this protocol run? You can still adjust any offsets with Labware Position Check.",
   "stored_labware_offset_data": "Stored Labware Offset data that applies to this protocol",
   "labware": "labware",
-  "labware_offset_data": "labware_offset_data",
-  "location": "location"
+  "labware_offset_data": "labware offset data",
+  "location": "location",
+  "apply_stored_data": "Apply stored data",
+  "ignore_stored_data": "Ignore stored data"
 }

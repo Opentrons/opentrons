@@ -38,7 +38,7 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { SecondaryButton } from '../../../atoms/Buttons'
 import { StyledText } from '../../../atoms/text'
 import { useLPCSuccessToast } from '../../../organisms/ProtocolSetup/hooks'
-import { LabwarePositionCheck } from '../../../organisms/ProtocolSetup/LabwarePositionCheck'
+import { LabwarePositionCheck } from '../../../organisms/LabwarePositionCheck'
 import { ModuleExtraAttention } from './ModuleExtraAttention'
 import { LabwareInfoOverlay } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
@@ -164,10 +164,15 @@ export function SetupLabware({
   } else if (!tipsArePickedUp) {
     lpcDisabledReason = t('lpc_disabled_no_tipracks_used')
   }
+
+  const showReapplyOffsetsModal =
+    currentRun?.data.id === runId &&
+    (currentRun?.data?.labwareOffsets == null ||
+      currentRun?.data?.labwareOffsets.length === 0)
+
   return (
     <>
-      {/* {currentRun?.data.id === runId && (currentRun?.data?.labwareOffsets == null || currentRun?.data?.labwareOffsets === []) ? <ReapplyOffsetsModal /> : null} */}
-      <ReapplyOffsetsModal />
+      {showReapplyOffsetsModal ? <ReapplyOffsetsModal robotName={robotName} runId={runId} /> : null}
       {showLabwareHelpModal && (
         <LabwareOffsetModal
           onCloseClick={() => setShowLabwareHelpModal(false)}
