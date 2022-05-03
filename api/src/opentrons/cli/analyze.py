@@ -14,6 +14,7 @@ from opentrons.protocol_reader import (
     ProtocolFileRole,
     ProtocolType,
     JsonProtocolConfig,
+    ProtocolFilesInvalidError,
 )
 from opentrons.protocol_runner import create_simulating_runner
 from opentrons.protocol_engine import Command, ErrorOccurrence
@@ -58,10 +59,14 @@ async def _analyze(
 ) -> None:
     input_files = _get_input_files(files_and_dirs)
 
-    protocol_source = await ProtocolReader().read_saved(
-        files=input_files,
-        directory=None,
-    )
+    try:
+        protocol_source = await ProtocolReader().read_saved(
+            files=input_files,
+            directory=None,
+        )
+    except ProtocolFilesInvalidError as error:
+        raise click.ClickException(str(error))
+
     runner = await create_simulating_runner()
     analysis = await runner.run(protocol_source)
 

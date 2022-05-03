@@ -23,9 +23,10 @@ export function selectPythonPath(pythonOverride: string | null): void {
     ]
   }
 
+  pythonPath = candidates.filter(testPythonPath)[0] ?? null
+
   if (pythonPath !== null) {
     log.info('Python environment selected', { pythonPath })
-    pythonPath = candidates.filter(testPythonPath)[0] ?? null
   } else {
     log.error('No valid Python environment found', { candidates })
   }
@@ -44,6 +45,8 @@ function testPythonPath(path: string): boolean {
 
     if (stats.isFile()) {
       return true
+    } else {
+      log.debug('Python candidate is not a file, skipping', { path })
     }
   } catch (error) {
     log.debug('Python candidate not executable, skipping', { path })

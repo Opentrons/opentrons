@@ -12,9 +12,18 @@ export function executeAnalyzeCli(
     '-m',
     'opentrons.cli',
     'analyze',
-    `--jsonOutput=${outputPath}`,
+    `--json-output=${outputPath}`,
     sourcePath,
-  ]).then(output => {
-    log.debug('Output from opentrons.cli', { output })
-  })
+  ])
+    .then(output => {
+      log.debug('Output from opentrons.cli', { output })
+    })
+    .catch(error => {
+      const message =
+        typeof error.stderr === 'string' && error.stderr !== ''
+          ? error.stderr
+          : error.message
+
+      throw new Error(message)
+    })
 }
