@@ -67,7 +67,7 @@ describe('analyzeProtocolSource', () => {
     when(mockGetPythonPath).calledWith().mockRejectedValue(error)
 
     return analyzeProtocolSource(sourcePath, outputPath).then(() => {
-      expect(mockWriteFailedAnalysis).toHaveBeenCalledWith(error)
+      expect(mockWriteFailedAnalysis).toHaveBeenCalledWith(outputPath, 'oh no')
     })
   })
 
@@ -84,7 +84,7 @@ describe('analyzeProtocolSource', () => {
       .mockRejectedValue(error)
 
     return analyzeProtocolSource(sourcePath, outputPath).then(() => {
-      expect(mockWriteFailedAnalysis).toHaveBeenCalledWith(error)
+      expect(mockWriteFailedAnalysis).toHaveBeenCalledWith(outputPath, 'oh no')
     })
   })
 })

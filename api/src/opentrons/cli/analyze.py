@@ -1,11 +1,11 @@
 """Opentrons analyze CLI."""
 import click
 
-from anyio import run
+from anyio import run, Path as AsyncPath
 from datetime import datetime, timezone
 from pathlib import Path
 from pydantic import BaseModel
-from typing import Any, Dict, List, Sequence, Union
+from typing import Any, Dict, List, Optional, Sequence, Union
 from typing_extensions import Literal
 
 from opentrons.protocols.api_support.types import APIVersion
@@ -27,17 +27,17 @@ from opentrons.protocol_engine import Command, ErrorOccurrence
     type=click.Path(exists=True, path_type=Path, file_okay=True, dir_okay=True),
 )
 @click.option(
-    "--json/--no-json",
-    default=False,
+    "--json-output",
     help="Return analysis results as machine-readable JSON.",
+    type=click.Path(path_type=AsyncPath),
 )
-def analyze(files: Sequence[Path], json: bool) -> None:
+def analyze(files: Sequence[Path], json_output: Optional[Path]) -> None:
     """Analyze a protocol.
 
     You can use `opentrons analyze` to get a protocol's expected
     equipment and commands.
     """
-    run(_analyze, files, json)
+    run(_analyze, files, json_output)
 
 
 def _get_input_files(files_and_dirs: Sequence[Path]) -> List[Path]:
@@ -52,7 +52,10 @@ def _get_input_files(files_and_dirs: Sequence[Path]) -> List[Path]:
     return results
 
 
-async def _analyze(files_and_dirs: Sequence[Path], json_mode: bool) -> None:
+async def _analyze(
+    files_and_dirs: Sequence[Path],
+    json_output: Optional[AsyncPath],
+) -> None:
     input_files = _get_input_files(files_and_dirs)
 
     protocol_source = await ProtocolReader().read_saved(
@@ -62,7 +65,7 @@ async def _analyze(files_and_dirs: Sequence[Path], json_mode: bool) -> None:
     runner = await create_simulating_runner()
     analysis = await runner.run(protocol_source)
 
-    if json_mode:
+    if json_output:
         results = AnalyzeResults(
             createdAt=datetime.now(tz=timezone.utc),
             files=[
@@ -78,12 +81,13 @@ async def _analyze(files_and_dirs: Sequence[Path], json_mode: bool) -> None:
             commands=analysis.commands,
             errors=analysis.errors,
         )
-        click.echo(results.json())
-        return
 
-    raise click.UsageError(
-        "Currently, this tool only supports JSON mode. Use `--json`."
-    )
+        await json_output.write_text(results.json(exclude_none=True))
+
+    else:
+        raise click.UsageError(
+            "Currently, this tool only supports JSON mode. Use `--json`."
+        )
 
 
 class ProtocolFile(BaseModel):
