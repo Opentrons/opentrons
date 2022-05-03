@@ -236,13 +236,13 @@ export function RobotSettingsCalibration({
             closePrompt={() => setShowCalBlockModal(false)}
           />
         ) : null}
+        {showConfirmStart && pipOffsetDataPresent && (
+          <DeckCalibrationConfirmModal
+            confirm={confirmStart}
+            cancel={cancelStart}
+          />
+        )}
       </Portal>
-      {showConfirmStart && pipOffsetDataPresent && (
-        <DeckCalibrationConfirmModal
-          confirm={confirmStart}
-          cancel={cancelStart}
-        />
-      )}
       <Box paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
