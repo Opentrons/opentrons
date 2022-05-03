@@ -2,6 +2,7 @@ import * as React from 'react'
 import { saveAs } from 'file-saver'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { format } from 'date-fns'
 
 import {
   Box,
@@ -14,18 +15,22 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
   useConditionalConfirm,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
 import { TertiaryButton } from '../../../atoms/Buttons'
-import { Line } from '../../../atoms/structure'
+import { Divider, Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { DeckCalibrationModal } from '../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import { formatLastModified } from '../../../organisms/CalibrationPanels/utils'
+
 import { useTrackEvent } from '../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
+import { getDeckCalibrationSession } from '../../../redux/sessions/deck-calibration/selectors'
 import { CONNECTABLE } from '../../../redux/discovery'
 import { selectors as robotSelectors } from '../../../redux/robot'
 import * as RobotApi from '../../../redux/robot-api'
@@ -39,15 +44,20 @@ import {
   useTipLengthCalibrations,
   useAttachedPipettes,
 } from '../hooks'
+import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 
 import type { State } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
-import type { SessionCommandString } from '../../../redux/sessions/types'
 import type {
-  DeckCalibrationData,
-  DeckCalibrationStatus,
-} from '../../../redux/calibration/types'
+  SessionCommandString,
+  DeckCalibrationSession,
+} from '../../../redux/sessions/types'
+
+// import type {
+//   DeckCalibrationData,
+//   DeckCalibrationStatus,
+// } from '../../../redux/calibration/types'
 
 interface CalibrationProps {
   robotName: string
@@ -182,7 +192,15 @@ export function RobotSettingsCalibration({
       : t('not_calibrated')
   }
 
+  const isJogging =
+    useSelector((state: State) =>
+      jogRequestId.current
+        ? RobotApi.getRequestById(state, jogRequestId.current)
+        : null
+    )?.status === RobotApi.PENDING
+
   const handleStartDeckCalSession = (): void => {
+    console.log('handleStartDeckCalSession')
     dispatchRequests(
       Sessions.ensureSession(robotName, Sessions.SESSION_TYPE_DECK_CALIBRATION)
     )
@@ -191,6 +209,12 @@ export function RobotSettingsCalibration({
     pipetteOffsetCalibrations != null
       ? pipetteOffsetCalibrations.length > 0
       : false
+
+  const deckCalibrationSession: DeckCalibrationSession | null = useSelector(
+    (state: State) => {
+      return getDeckCalibrationSession(state, robotName)
+    }
+  )
 
   const {
     showConfirmation: showConfirmStart,
@@ -242,6 +266,42 @@ export function RobotSettingsCalibration({
   // console.log('tipLengthCalibrations', tipLengthCalibrations)
   // console.log('attachedPipettes', attachedPipettes)
   console.log('showConfirmStart', showConfirmStart)
+  console.log('pipOffsetDataPresent', pipOffsetDataPresent)
+
+  const demoPippet = [
+    {
+      id: 'P20SV202019072546&right',
+      pipette: 'P20SV202019072546',
+      mount: 'right',
+      offset: [7, 1, 0],
+      tiprack:
+        '60e107ba7e6e5d23beefe9f0c888f860f7b923c71906aaa5e7f460ab25c4f38a',
+      tiprackUri: 'opentrons/opentrons_96_tiprack_20ul/1',
+      lastModified: '2021-11-15T21:39:32.768556+00:00',
+      source: 'user',
+      status: {
+        markedBad: false,
+        source: null,
+        markedAt: null,
+      },
+    },
+    {
+      id: 'P1KSV222021011802&left',
+      pipette: 'P1KSV222021011802',
+      mount: 'left',
+      offset: [-1.7763568394002505e-15, 0, -5],
+      tiprack:
+        'f979b7278ee3e6c4a13a6336cc6a602688f916ab2962de49263a1af5b513a533',
+      tiprackUri: 'opentrons/opentrons_96_tiprack_1000ul/1',
+      lastModified: '2022-03-30T00:10:01.533919+00:00',
+      source: 'user',
+      status: {
+        markedBad: false,
+        source: null,
+        markedAt: null,
+      },
+    },
+  ]
 
   React.useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
@@ -259,6 +319,13 @@ export function RobotSettingsCalibration({
             closePrompt={() => setShowCalBlockModal(false)}
           />
         ) : null}
+        <CalibrateDeck
+          session={deckCalibrationSession}
+          robotName={robotName}
+          dispatchRequests={dispatchRequests}
+          showSpinner={isPending}
+          isJogging={isJogging}
+        />
         {showConfirmStart && pipOffsetDataPresent && (
           <DeckCalibrationConfirmModal
             confirm={confirmStart}
@@ -308,8 +375,8 @@ export function RobotSettingsCalibration({
             <StyledText as="label">{deckLastModified()}</StyledText>
           </Box>
           <TertiaryButton
-            onClick={confirmStart}
-            // disabled={disabledOrBusyReason}
+            onClick={() => confirmStart()}
+            disabled={disabledOrBusyReason}
           >
             {deckCalibrationButtonText}
           </TertiaryButton>
@@ -326,13 +393,70 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing3}>
               {t('pipette_offset_calibrations_description')}
             </StyledText>
-            {pipetteOffsetCalibrations?.map(calibration => (
-              <>
-                <StyledText as="p">{calibration?.pipette}</StyledText>
-                <StyledText as="p">{calibration?.offset}</StyledText>
-                <StyledText as="p">{calibration.mount}</StyledText>
-              </>
-            ))}
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <Flex flexDirection={DIRECTION_ROW}>
+                <StyledText
+                  as="label"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  color={COLORS.darkBlack}
+                  data-testid={'pipette_offset_calibrations_model_and_serial'}
+                >
+                  {t(
+                    'pipette_offset_calibrations_table_header_model_and_serial'
+                  )}
+                </StyledText>
+
+                <StyledText
+                  as="label"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  color={COLORS.darkBlack}
+                  data-testid={'pipette_offset_calibrations_mount'}
+                >
+                  {t('pipette_offset_calibrations_table_header_mount')}
+                </StyledText>
+
+                <StyledText
+                  as="label"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  color={COLORS.darkBlack}
+                  data-testid={'pipette_offset_calibrations_attached'}
+                >
+                  {t('pipette_offset_calibrations_table_header_attached')}
+                </StyledText>
+
+                <StyledText
+                  as="label"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  color={COLORS.darkBlack}
+                  data-testid={'pipette_offset_calibrations_tiprack'}
+                >
+                  {t('pipette_offset_calibrations_table_header_tiprack')}
+                </StyledText>
+
+                <StyledText
+                  as="label"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  color={COLORS.darkBlack}
+                  data-testid={'pipette_offset_calibrations_last_calibrated'}
+                >
+                  {t(
+                    'pipette_offset_calibrations_table_header_last_calibrated'
+                  )}
+                </StyledText>
+              </Flex>
+              {demoPippet?.map((calibration, index) => (
+                <React.Fragment key={index}>
+                  <PipetteOffsetCalDetailItem
+                    model={calibration.id}
+                    serial={calibration.pipette}
+                    mount={calibration.mount}
+                    attached={true}
+                    tiprack={calibration.tiprackUri}
+                    lastCalibrated={calibration.lastModified}
+                  />
+                </React.Fragment>
+              ))}
+            </Flex>
           </Box>
         </Flex>
       </Box>
@@ -384,3 +508,82 @@ export function RobotSettingsCalibration({
     </>
   )
 }
+
+interface PipetteOffsetCalDetailItemProps {
+  model: string
+  serial: string
+  mount: string
+  attached: boolean
+  tiprack: string
+  lastCalibrated: string
+}
+
+function PipetteOffsetCalDetailItem({
+  model,
+  serial,
+  mount,
+  attached,
+  tiprack,
+  lastCalibrated,
+}: PipetteOffsetCalDetailItemProps): JSX.Element {
+  const { t } = useTranslation('shared')
+
+  const formatLastModified = (lastModified: string): string => {
+    return typeof lastModified === 'string'
+      ? format(new Date(lastModified), 'd/M/yyyy HH:mm:ss')
+      : 'unknown'
+  }
+
+  return (
+    <>
+      <Divider />
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        marginY={SPACING.spacing3}
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      >
+        <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
+          <StyledText as="p" width="10rem">
+            {model}
+          </StyledText>
+          <StyledText as="p" width="10rem">
+            {serial}
+          </StyledText>
+        </Flex>
+        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+          <StyledText as="p" width="2.5rem">
+            {mount}
+          </StyledText>
+        </Flex>
+        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+          <StyledText as="p" width="3.75rem">
+            {attached ? t('yes') : t('no')}
+          </StyledText>
+        </Flex>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_CENTER}
+          css={{ 'word-wrap': 'break-word' }}
+        >
+          <StyledText as="p" width="8.5rem" height="2.5rem">
+            {tiprack}
+          </StyledText>
+        </Flex>
+        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+          <StyledText as="p">{formatLastModified(lastCalibrated)}</StyledText>
+        </Flex>
+      </Flex>
+    </>
+  )
+}
+
+// interface PipetteOverflowMenuProps {}
+
+// function PipetteOverflowMenu({}: PipetteOverflowMenuProps): JSX.Element {
+//   const { t } = useTranslation('device_settings')
+//   return (
+//     <>
+//     </>
+//   )
+// }
