@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Flex,
   ALIGN_CENTER,
@@ -19,7 +18,6 @@ import {
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { ModuleCard } from './ModuleCard'
 import {
   useAttachedModules,
@@ -41,9 +39,6 @@ export function PipettesAndModules({
   const attachedPipettes = useAttachedPipettes(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
-  const runStatus = useCurrentRunStatus()
-  const isProtocolLoaded =
-    currentRunId != null || (runStatus != null && runStatus !== RUN_STATUS_IDLE)
 
   return (
     <Flex
@@ -68,7 +63,7 @@ export function PipettesAndModules({
         width="100%"
         flexDirection={DIRECTION_COLUMN}
       >
-        {isProtocolLoaded && (
+        {currentRunId != null && (
           <Flex
             paddingBottom={SPACING.spacing4}
             flexDirection={DIRECTION_COLUMN}
