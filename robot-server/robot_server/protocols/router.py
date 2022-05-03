@@ -284,6 +284,8 @@ async def get_protocol_analyses(
 ) -> PydanticResponse[SimpleMultiBody[ProtocolAnalysis]]:
     """Get a protocol's full analyses list.
 
+    Analyses are returned in order from least-recently started to most-recently started.
+
     Arguments:
         protocolId: Protocol identifier to delete, pulled from URL.
         protocol_store: Database of protocol resources.
