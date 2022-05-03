@@ -320,7 +320,7 @@ def test_thermocycler_deactivate_lid(
     transport: AbstractSyncTransport,
     subject: SyncClient,
 ) -> None:
-    """It should execute a Thermocycler's deactivate block command."""
+    """It should execute a Thermocycler's deactivate lid command."""
     request = commands.thermocycler.DeactivateLidCreate(
         params=commands.thermocycler.DeactivateLidParams(moduleId="module-id")
     )
