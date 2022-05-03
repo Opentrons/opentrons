@@ -15,7 +15,7 @@ from opentrons.protocol_engine import (
     LoadedLabware,
 )
 
-from robot_server.persistence import analysis_table, protocol_table, sqlite_rowid
+from robot_server.persistence import analysis_table, sqlite_rowid
 
 from .analysis_models import (
     AnalysisSummary,
@@ -25,8 +25,6 @@ from .analysis_models import (
     AnalysisResult,
     AnalysisStatus,
 )
-
-from .protocol_store import ProtocolNotFoundError
 
 
 _log = getLogger(__name__)
@@ -62,7 +60,8 @@ class AnalysisStore:
 
         Args:
             protocol_id: The protocol to add the new pending analysis to.
-                Must not already have a pending analysis.
+                Must point to a valid protocol that does not already have
+                a pending analysis.
             analysis_id: The ID of the new analysis.
                 Must be unique across *all* protocols, not just this one.
 
@@ -70,13 +69,9 @@ class AnalysisStore:
                 this method will "succeed," but a future call to `update()` may fail
                 unexpectedly because of a SQL uniqueness constraint violation.
 
-        Raises:
-            ProtocolNotFoundError
-
         Returns:
             A summary of the just-added analysis.
         """
-        self._completed_store.check_protocol_exists(protocol_id=protocol_id)
         new_pending_analysis = self._pending_store.add(
             protocol_id=protocol_id, analysis_id=analysis_id
         )
@@ -321,6 +316,7 @@ class _CompletedAnalysisStore:
         self._sql_engine = sql_engine
 
     async def get_by_id(self, analysis_id: str) -> Optional[_CompletedAnalysisResource]:
+        """Return the analysis with the given ID, if it exists."""
         statement = sqlalchemy.select(analysis_table).where(
             analysis_table.c.id == analysis_id
         )
@@ -334,24 +330,28 @@ class _CompletedAnalysisStore:
     async def get_by_protocol(
         self, protocol_id: str
     ) -> List[_CompletedAnalysisResource]:
+        """Return all analyses associated with the given protocol, oldest-added first.
+
+        If protocol_id doesn't point to a valid protocol, returns an empty list;
+        doesn't raise an error.
+        """
         statement = (
             sqlalchemy.select(analysis_table)
             .where(analysis_table.c.protocol_id == protocol_id)
             .order_by(sqlite_rowid)
         )
         with self._sql_engine.begin() as transaction:
-            self._check_protocol_exists(connection=transaction, protocol_id=protocol_id)
             results = transaction.execute(statement).all()
         return [await _CompletedAnalysisResource.from_sql_row(r) for r in results]
 
     def get_ids_by_protocol(self, protocol_id: str) -> List[str]:
+        """Like `get_by_protocol()`, but return only the ID of each analysis."""
         statement = (
             sqlalchemy.select(analysis_table.c.id)
             .where(analysis_table.c.protocol_id == protocol_id)
             .order_by(sqlite_rowid)
         )
         with self._sql_engine.begin() as transaction:
-            self._check_protocol_exists(connection=transaction, protocol_id=protocol_id)
             results = transaction.execute(statement).all()
 
         result_ids: List[str] = []
@@ -369,24 +369,6 @@ class _CompletedAnalysisStore:
         )
         with self._sql_engine.begin() as transaction:
             transaction.execute(statement)
-
-    def check_protocol_exists(self, protocol_id: str) -> None:
-        with self._sql_engine.begin() as transaction:
-            self._check_protocol_exists(connection=transaction, protocol_id=protocol_id)
-
-    @staticmethod
-    def _check_protocol_exists(
-        connection: sqlalchemy.engine.Connection, protocol_id: str
-    ) -> None:
-        statement = sqlalchemy.select(
-            # Thrown away. Dummy column just to have something small to select.
-            protocol_table.c.id
-        ).where(protocol_table.c.id == protocol_id)
-        results = connection.execute(statement)
-        try:
-            results.one()
-        except sqlalchemy.exc.NoResultFound as e:
-            raise ProtocolNotFoundError(protocol_id=protocol_id) from e
 
 
 def _summarize_pending(pending_analysis: PendingAnalysis) -> AnalysisSummary:

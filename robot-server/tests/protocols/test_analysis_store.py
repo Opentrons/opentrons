@@ -87,21 +87,6 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
     )
 
 
-async def test_protocol_not_found(subject: AnalysisStore) -> None:
-    """Every method that takes a protocol ID should raise if it doesn't exist."""
-    with pytest.raises(ProtocolNotFoundError):
-        subject.add_pending(
-            protocol_id="nonexistent-protocol-id",
-            analysis_id="analysis-id-does-not-matter",
-        )
-
-    with pytest.raises(ProtocolNotFoundError):
-        subject.get_summaries_by_protocol(protocol_id="nonexistent-protocol-id")
-
-    with pytest.raises(ProtocolNotFoundError):
-        await subject.get_by_protocol(protocol_id="nonexistent-protocol-id")
-
-
 async def test_get_empty(subject: AnalysisStore, protocol_store: ProtocolStore) -> None:
     """It should return an empty list if no analysis saved."""
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
