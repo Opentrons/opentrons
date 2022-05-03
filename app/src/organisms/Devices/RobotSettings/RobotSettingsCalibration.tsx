@@ -170,9 +170,11 @@ export function RobotSettingsCalibration({
       })
     : buttonDisabledReason
 
+  console.log('disabledOrBusyReason', disabledOrBusyReason)
+
   const deckLastModified = (): string => {
-    const data = deckCalibrationData.deckCalibrationData
-    const calibratedDate = data?.lastModified ?? null
+    const calibratedDate =
+      deckCalibrationData.deckCalibrationData?.lastModified ?? null
     return calibratedDate
       ? t('last_calibrated', {
           date: formatLastModified(calibratedDate),
@@ -264,6 +266,7 @@ export function RobotSettingsCalibration({
           />
         )}
       </Portal>
+      {/* About Calibration this comment will removed when finish all sections */}
       <Box paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
