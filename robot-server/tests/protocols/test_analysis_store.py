@@ -136,6 +136,55 @@ async def test_add_pending(
     assert subject.get_summaries_by_protocol("protocol-id") == [expected_summary]
 
 
+async def test_returned_in_order_added(
+    subject: AnalysisStore, protocol_store: ProtocolStore
+) -> None:
+    """It should return analyses from least-recently-added to most-recently-added."""
+    protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
+
+    subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id-1")
+    await subject.update(
+        analysis_id="analysis-id-1",
+        labware=[],
+        pipettes=[],
+        commands=[],
+        errors=[],
+    )
+
+    subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id-2")
+    await subject.update(
+        analysis_id="analysis-id-2",
+        labware=[],
+        pipettes=[],
+        commands=[],
+        errors=[],
+    )
+
+    subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id-3")
+    await subject.update(
+        analysis_id="analysis-id-3",
+        labware=[],
+        pipettes=[],
+        commands=[],
+        errors=[],
+    )
+
+    subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id-4")
+    # Leave as pending, to test that we interleave completed & pending analyses
+    # in the correct order.
+
+    expected_order = [
+        "analysis-id-1",
+        "analysis-id-2",
+        "analysis-id-3",
+        "analysis-id-4"
+    ]
+    summaries = subject.get_summaries_by_protocol(protocol_id="protocol-id")
+    full_analyses = await subject.get_by_protocol(protocol_id="protocol-id")
+    assert [s.id for s in summaries] == expected_order
+    assert [a.id for a in full_analyses] == expected_order
+
+
 async def test_add_analysis_equipment(
     subject: AnalysisStore, protocol_store: ProtocolStore
 ) -> None:
