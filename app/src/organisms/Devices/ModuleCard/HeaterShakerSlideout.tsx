@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  useCreateCommandMutation,
+  useCreateLiveCommandMutation,
+} from '@opentrons/react-api-client'
 import {
   getModuleDisplayName,
   RPM,
@@ -38,15 +41,17 @@ interface HeaterShakerSlideoutProps {
   onCloseClick: () => unknown
   isExpanded: boolean
   isSetShake: boolean
+  runId?: string
 }
 
 export const HeaterShakerSlideout = (
   props: HeaterShakerSlideoutProps
 ): JSX.Element | null => {
-  const { module, onCloseClick, isExpanded, isSetShake } = props
+  const { module, onCloseClick, isExpanded, isSetShake, runId } = props
   const { t } = useTranslation('device_details')
   const [hsValue, setHsValue] = React.useState<string | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { createCommand } = useCreateCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const modulePart = isSetShake ? t('shake_speed') : t('temperature')
@@ -60,11 +65,21 @@ export const HeaterShakerSlideout = (
           rpm: parseInt(hsValue),
         },
       }
-      createLiveCommand({
-        command: setShakeCommand,
-      }).catch((e: Error) => {
-        console.error(`error setting heater shaker shake speed: ${e.message}`)
-      })
+      if (runId != null) {
+        createCommand({ runId: runId, command: setShakeCommand }).catch(
+          (e: Error) => {
+            console.error(
+              `error setting heater shaker shake speed: ${e.message} with run id ${runId}`
+            )
+          }
+        )
+      } else {
+        createLiveCommand({
+          command: setShakeCommand,
+        }).catch((e: Error) => {
+          console.error(`error setting heater shaker shake speed: ${e.message}`)
+        })
+      }
     }
     onCloseClick()
     setHsValue(null)
@@ -87,13 +102,23 @@ export const HeaterShakerSlideout = (
           temperature: parseInt(hsValue),
         },
       }
-      createLiveCommand({
-        command: setTempCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${setTempCommand.commandType}: ${e.message}`
+      if (runId != null) {
+        createCommand({ runId: runId, command: setTempCommand }).catch(
+          (e: Error) => {
+            console.error(
+              `error setting module status with command type ${setTempCommand.commandType} with run id ${runId}: ${e.message}`
+            )
+          }
         )
-      })
+      } else {
+        createLiveCommand({
+          command: setTempCommand,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${setTempCommand.commandType}: ${e.message}`
+          )
+        })
+      }
     }
     isSetShake ? confirmAttachment() : setHsValue(null)
   }
