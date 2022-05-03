@@ -13,6 +13,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   useHoverTooltip,
+  useConditionalConfirm,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
@@ -149,6 +150,22 @@ export function RobotSettingsCalibration({
       : t('not_calibrated')
   }
 
+  const handleStartDeckCalSession = (): void => {
+    dispatchRequests(
+      Sessions.ensureSession(robotName, Sessions.SESSION_TYPE_DECK_CALIBRATION)
+    )
+  }
+  const pipOffsetDataPresent =
+    pipetteOffsetCalibrations != null
+      ? pipetteOffsetCalibrations.length > 0
+      : false
+
+  const {
+    showConfirmation: showConfirmStart,
+    confirm: confirmStart,
+    cancel: cancelStart,
+  } = useConditionalConfirm(handleStartDeckCalSession, !!pipOffsetDataPresent)
+
   const onClickSaveAs: React.MouseEventHandler = e => {
     e.preventDefault()
     doTrackEvent({
@@ -259,7 +276,7 @@ export function RobotSettingsCalibration({
             </StyledText>
             <StyledText as="label">{deckLastModified()}</StyledText>
           </Box>
-          <TertiaryButton onClick={null}>
+          <TertiaryButton onClick={confirmStart} disabled={false}>
             {deckCalibrationButtonText}
           </TertiaryButton>
         </Flex>
