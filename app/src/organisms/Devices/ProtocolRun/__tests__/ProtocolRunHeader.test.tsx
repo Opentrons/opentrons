@@ -43,6 +43,7 @@ import {
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { useTrackEvent } from '../../../../redux/analytics'
+import { getIsHeaterShakerAttached } from '../../../../redux/config'
 
 import {
   useProtocolDetailsForRun,
@@ -86,7 +87,11 @@ jest.mock('../../HeaterShakerIsRunningModal')
 jest.mock('../../ModuleCard/ConfirmAttachmentModal')
 jest.mock('../../ModuleCard/hooks')
 jest.mock('../../../../redux/analytics')
+jest.mock('../../../../redux/config')
 
+const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
+  typeof getIsHeaterShakerAttached
+>
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
@@ -158,25 +163,25 @@ const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
 } as ProtocolModuleInfo
 
 const mockMovingHeaterShaker = {
-  model: 'heaterShakerModuleV1',
-  type: 'heaterShakerModuleType',
-  port: '/dev/ot_module_thermocycler0',
-  serial: 'jkl123',
-  revision: 'heatershaker_v4.0',
-  fwVersion: 'v2.0.0',
-  status: 'idle',
+  id: 'heatershaker_id',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
   hasAvailableUpdate: true,
   data: {
     labwareLatchStatus: 'idle_closed',
     speedStatus: 'speeding up',
     temperatureStatus: 'idle',
     currentSpeed: null,
-    currentTemp: null,
+    currentTemperature: null,
     targetSpeed: null,
     targetTemp: null,
     errorDetails: null,
+    status: 'idle',
   },
-  usbPort: { hub: 1, port: 1 },
+  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
 } as any
 
 const render = () => {
@@ -205,6 +210,7 @@ describe('ProtocolRunHeader', () => {
       <div>Mock HeaterShakerIsRunningModal</div>
     )
     mockUseAttachedModules.mockReturnValue([])
+    mockGetIsHeaterShakerAttached.mockReturnValue(false)
     mockConfirmAttachmentModal.mockReturnValue(
       <div>mock confirm attachment modal</div>
     )
@@ -533,7 +539,7 @@ describe('ProtocolRunHeader', () => {
     expect(mockCloseCurrentRun).toBeCalled()
   })
 
-  it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsShakingModal', () => {
+  it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', () => {
     mockUseAttachedModules.mockReturnValue([mockMovingHeaterShaker])
     const [{ getByRole, getByText }] = render()
     const button = getByRole('button', { name: 'Start run' })
@@ -551,5 +557,17 @@ describe('ProtocolRunHeader', () => {
     const button = getByRole('button', { name: 'Start run' })
     fireEvent.click(button)
     getByText('mock confirm attachment modal')
+  })
+
+  it('does not render confirm attachment modal when there is a heater shaker in the protocol and the heater shaker is idle status', () => {
+    mockGetIsHeaterShakerAttached.mockReturnValue(true)
+    mockUseAttachedModules.mockReturnValue([mockHeaterShaker])
+    mockUseHeaterShakerFromProtocol.mockReturnValue(
+      HEATER_SHAKER_PROTOCOL_MODULE_INFO
+    )
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Start run' })
+    fireEvent.click(button)
+    expect(mockUseRunControls).toHaveBeenCalled()
   })
 })

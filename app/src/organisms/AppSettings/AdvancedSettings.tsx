@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
+import { css } from 'styled-components'
 import {
   Flex,
   Box,
@@ -15,6 +16,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
+  TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
 import * as Config from '../../redux/config'
 import * as Calibration from '../../redux/calibration'
@@ -57,6 +59,9 @@ export function AdvancedSettings(): JSX.Element {
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     Config.getIsLabwareOffsetCodeSnippetsOn
   )
+  const isHeaterShakerAttachmentModalVisible = useSelector(
+    Config.getIsHeaterShakerAttached
+  )
   const dispatch = useDispatch<Dispatch>()
 
   const handleUseTrashSelection = (selection: BlockSelection): void => {
@@ -86,6 +91,15 @@ export function AdvancedSettings(): JSX.Element {
         Boolean(!isLabwareOffsetCodeSnippetsOn)
       )
     )
+
+  const toggleHeaterShakerModalVisibilty = (): unknown =>
+    dispatch(
+      Config.updateConfigValue(
+        'modules.heaterShaker.isAttached',
+        Boolean(!isHeaterShakerAttachmentModalVisible)
+      )
+    )
+
   const toggleDevtools = (): unknown => dispatch(Config.toggleDevtools())
   const handleChannel: React.ChangeEventHandler<HTMLSelectElement> = event =>
     dispatch(Config.updateConfigValue('update.channel', event.target.value))
@@ -155,8 +169,7 @@ export function AdvancedSettings(): JSX.Element {
               >
                 {labwarePath}
                 <Icon
-                  width={SPACING.spacing3}
-                  height={SPACING.spacing3}
+                  height="0.75rem"
                   marginLeft={SPACING.spacing3}
                   name="open-in-new"
                 />
@@ -189,7 +202,11 @@ export function AdvancedSettings(): JSX.Element {
             {t('tip_length_cal_method')}
           </StyledText>
           <RadioGroup
-            css={TYPOGRAPHY.pRegular}
+            useBlueChecked
+            css={css`
+              ${TYPOGRAPHY.pRegular}
+              line-height: ${TYPOGRAPHY.lineHeight20};
+            `}
             value={
               useTrashSurfaceForTipCal === true
                 ? ALWAYS_TRASH
@@ -262,7 +279,7 @@ export function AdvancedSettings(): JSX.Element {
                     color={COLORS.darkBlack}
                     position="absolute"
                     right={SPACING.spacing7}
-                    textDecoration="underline"
+                    textDecoration={TEXT_DECORATION_UNDERLINE}
                     id="AdvancedSettings_realtekLink"
                   >
                     {t('usb_to_ethernet_adapter_link')}
@@ -333,6 +350,27 @@ export function AdvancedSettings(): JSX.Element {
             toggledOn={isLabwareOffsetCodeSnippetsOn}
             onClick={toggleLabwareOffsetData}
             id="AdvancedSettings_showLinkToggleButton"
+          />
+        </Flex>
+        <Divider marginY={SPACING.spacing5} />
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Box width="70%">
+            <StyledText
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
+              id="AdvancedSettings_showHeaterShakerAttachmentModal"
+            >
+              {t('heater_shaker_attach_visible')}
+            </StyledText>
+            <StyledText as="p">
+              {t('heater_shaker_attach_description')}
+            </StyledText>
+          </Box>
+          <ToggleButton
+            label="show_heater_shaker_modal"
+            toggledOn={!isHeaterShakerAttachmentModalVisible}
+            onClick={toggleHeaterShakerModalVisibilty}
+            id="AdvancedSettings_showHeaterShakerAttachmentBtn"
           />
         </Flex>
         <Divider marginY={SPACING.spacing5} />

@@ -365,7 +365,7 @@ describe('disposal volume should update...', () => {
 
   describe('blowout location should reset via updatePatchBlowoutFields...', () => {
     const resetBlowoutLocation = {
-      blowout_location: 'trashId',
+      blowout_location: 'fixedTrash',
     }
 
     const testCases = [
@@ -392,7 +392,7 @@ describe('disposal volume should update...', () => {
         expect(result).toEqual(patch)
       })
 
-      it(`when changing path ${prevPath} → ${nextPath}, ${incompatible} reset to trashId`, () => {
+      it(`when changing path ${prevPath} → ${nextPath}, ${incompatible} reset to fixedTrash`, () => {
         // @ts-expect-error(sa, 2021-6-15): missing id and stepType to be valid formData type
         const result = updatePatchBlowoutFields(patch, {
           path: prevPath,

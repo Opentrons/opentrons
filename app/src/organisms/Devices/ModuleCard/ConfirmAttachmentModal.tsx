@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import {
   CheckboxField,
   DIRECTION_ROW,
@@ -14,12 +15,23 @@ import {
 } from '@opentrons/components'
 import { SecondaryButton, PrimaryButton } from '../../../atoms/Buttons'
 import { Modal } from '../../../atoms/Modal'
+import { Dispatch } from '../../../redux/types'
+import { UpdateConfigValueAction } from '../../../redux/config/types'
+import { updateConfigValue } from '../../../redux/config'
 import { useHeaterShakerFromProtocol } from './hooks'
 
+export function setHeaterShakerAttached(
+  heaterShakerAttached: boolean
+): UpdateConfigValueAction {
+  return updateConfigValue(
+    'modules.heaterShaker.isAttached',
+    heaterShakerAttached
+  )
+}
 interface ConfirmAttachmentModalProps {
   onCloseClick: () => void
-  onConfirmClick: () => unknown
   isProceedToRunModal: boolean
+  onConfirmClick: () => void
 }
 export const ConfirmAttachmentModal = (
   props: ConfirmAttachmentModalProps
@@ -29,6 +41,14 @@ export const ConfirmAttachmentModal = (
   const [isDismissed, setIsDismissed] = React.useState<boolean>(false)
   const heaterShaker = useHeaterShakerFromProtocol()
   const slotNumber = heaterShaker != null ? heaterShaker.slotName : null
+  const dispatch = useDispatch<Dispatch>()
+
+  const confirmAttached = (): void => {
+    if (isDismissed) {
+      dispatch(setHeaterShakerAttached(isDismissed))
+    }
+    onConfirmClick()
+  }
 
   return (
     <Modal
@@ -60,7 +80,6 @@ export const ConfirmAttachmentModal = (
           isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
         }`}
       >
-        {/* TODO(jr, 3/29/22): wire up checkbox field, pending usage of Alerts */}
         <CheckboxField
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setIsDismissed(e.currentTarget.checked)
@@ -99,7 +118,7 @@ export const ConfirmAttachmentModal = (
             isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
           }`}
         >
-          <PrimaryButton onClick={onConfirmClick}>
+          <PrimaryButton onClick={confirmAttached}>
             {isProceedToRunModal
               ? t('proceed_to_run')
               : t('confirm_attachment')}

@@ -6,9 +6,11 @@ import argparse
 
 from typing import Callable
 from logging.config import dictConfig
+from opentrons_hardware.firmware_bindings.messages import payloads
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SetupRequest,
     DisableMotorRequest,
+    ExecuteMoveGroupRequest,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import NodeId
@@ -20,6 +22,8 @@ from opentrons_hardware.hardware_control.gripper_settings import (
     grip,
     home,
 )
+from opentrons_hardware.firmware_bindings.utils import UInt8Field
+
 
 GetInputFunc = Callable[[str], str]
 OutputFunc = Callable[[str], None]
@@ -56,6 +60,20 @@ def in_green(s: str) -> str:
     return f"\033[92m{str(s)}\033[0m"
 
 
+async def execute_move(messenger: CanMessenger) -> None:
+    """Send an execute move command."""
+    await messenger.send(
+        node_id=NodeId.broadcast,
+        message=ExecuteMoveGroupRequest(
+            payload=payloads.ExecuteMoveGroupRequestPayload(
+                group_id=UInt8Field(0),
+                start_trigger=UInt8Field(0),
+                cancel_trigger=UInt8Field(0),
+            )
+        ),
+    )
+
+
 def output_details(i: int, freq: int, duty_cycle: int, v_ref: float) -> None:
     """Print out test details."""
     print(f"\n\033[95mRound {i}:\033[0m")
@@ -88,11 +106,13 @@ async def run(args: argparse.Namespace) -> None:
 
             input(in_green("Press Enter to grip...\n"))
 
-            await grip(messenger)
+            await grip(messenger, 0, 0, 0, 0)
+            await execute_move(messenger)
 
             input(in_green("Press Enter to release...\n"))
 
-            await home(messenger)
+            await home(messenger, 0, 0, 0, 0)
+            await execute_move(messenger)
 
     except asyncio.CancelledError:
         pass

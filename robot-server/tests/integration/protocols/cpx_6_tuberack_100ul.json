@@ -1,0 +1,122 @@
+{
+    "ordering": [
+        [
+            "A1",
+            "B1"
+        ],
+        [
+            "A2",
+            "B2"
+        ],
+        [
+            "A3",
+            "B3"
+        ]
+    ],
+    "brand": {
+        "brand": "cpx",
+        "brandId": []
+    },
+    "metadata": {
+        "displayName": "cpx 6 Tube Rack with cpx 0.1 mL",
+        "displayCategory": "tubeRack",
+        "displayVolumeUnits": "µL",
+        "tags": []
+    },
+    "dimensions": {
+        "xDimension": 127,
+        "yDimension": 85,
+        "zDimension": 40
+    },
+    "wells": {
+        "A1": {
+            "depth": 23,
+            "totalLiquidVolume": 100,
+            "shape": "circular",
+            "diameter": 20,
+            "x": 20,
+            "y": 65,
+            "z": 17
+        },
+        "B1": {
+            "depth": 23,
+            "totalLiquidVolume": 100,
+            "shape": "circular",
+            "diameter": 20,
+            "x": 20,
+            "y": 35,
+            "z": 17
+        },
+        "A2": {
+            "depth": 23,
+            "totalLiquidVolume": 100,
+            "shape": "circular",
+            "diameter": 20,
+            "x": 50,
+            "y": 65,
+            "z": 17
+        },
+        "B2": {
+            "depth": 23,
+            "totalLiquidVolume": 100,
+            "shape": "circular",
+            "diameter": 20,
+            "x": 50,
+            "y": 35,
+            "z": 17
+        },
+        "A3": {
+            "depth": 23,
+            "totalLiquidVolume": 100,
+            "shape": "circular",
+            "diameter": 20,
+            "x": 80,
+            "y": 65,
+            "z": 17
+        },
+        "B3": {
+            "depth": 23,
+            "totalLiquidVolume": 100,
+            "shape": "circular",
+            "diameter": 20,
+            "x": 80,
+            "y": 35,
+            "z": 17
+        }
+    },
+    "groups": [
+        {
+            "brand": {
+                "brand": "cpx",
+                "brandId": []
+            },
+            "metadata": {
+                "wellBottomShape": "u",
+                "displayCategory": "tubeRack"
+            },
+            "wells": [
+                "A1",
+                "B1",
+                "A2",
+                "B2",
+                "A3",
+                "B3"
+            ]
+        }
+    ],
+    "parameters": {
+        "format": "irregular",
+        "quirks": [],
+        "isTiprack": false,
+        "isMagneticModuleCompatible": false,
+        "loadName": "cpx_6_tuberack_100ul"
+    },
+    "namespace": "custom_beta",
+    "version": 1,
+    "schemaVersion": 2,
+    "cornerOffsetFromSlot": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+    }
+}
