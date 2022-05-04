@@ -30,7 +30,28 @@ from .analysis_models import (
 _log = getLogger(__name__)
 
 
-_ANALYZER_VERSION = "TODO"
+# We mark every analysis stored in the database with a version string.
+#
+# When we read an analysis from the database, we must account for the possibility
+# that it was stored by an old software version that treated analyses differently.
+# These version strings give us a way to notice this condition and deal with it safely.
+#
+# Examples of cases where this version string might need to change,
+# and where we might need to specially handle data stored with prior version strings:
+#
+#     * We've changed the shape of what we're storing in the database.
+#       So the new software needs to migrate the data stored by the old software.
+#
+#     * We've changed details about how protocols run, causing a protocol's stored
+#       analysis to no longer faithfully represent how that protocol would run now.
+#
+#       This could be something scientific like changing the way that we break down
+#       complex liquid-handling commands, or it could be something internal like
+#       changing the way we generate Protocol Engine command `key`s.
+#
+# This does not necessarily have any correspondence with the user-facing
+# robot software version.
+_CURRENT_ANALYZER_VERSION = "initial"
 
 
 class AnalysisNotFoundError(ValueError):
@@ -113,7 +134,7 @@ class AnalysisStore:
         completed_analysis_resource = _CompletedAnalysisResource(
             id=completed_analysis.id,
             protocol_id=protocol_id,
-            analyzer_version=_ANALYZER_VERSION,
+            analyzer_version=_CURRENT_ANALYZER_VERSION,
             completed_analysis=completed_analysis,
         )
         await self._completed_store.add(
@@ -277,10 +298,10 @@ class _CompletedAnalysisResource:
         Avoid calling this from inside a SQL transaction, since it might be slow.
         """
         analyzer_version = sql_row.analyzer_version
-        if analyzer_version != _ANALYZER_VERSION:
+        if analyzer_version != _CURRENT_ANALYZER_VERSION:
             _log.warning(
                 f'Analysis in database was created under version "{analyzer_version}",'
-                f' but we are version "{_ANALYZER_VERSION}".'
+                f' but we are version "{_CURRENT_ANALYZER_VERSION}".'
                 f" This may cause compatibility problems."
             )
         assert isinstance(analyzer_version, str)
