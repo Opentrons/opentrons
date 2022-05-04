@@ -23,6 +23,7 @@ describe('write failed analysis', () => {
         const result = JSON.parse(contents.toString())
 
         expect(result).toEqual({
+          createdAt: expect.stringMatching(ISO_8061_DATETIME_RE),
           errors: [
             {
               id: expect.any(String),
