@@ -41,7 +41,7 @@ describe('forEngageMagnet', () => {
   it('engages magnetic module when it was unengaged', () => {
     const params = {
       moduleId,
-      engageHeight: 10,
+      height: 10,
     }
     const result = forEngageMagnet(
       params,
@@ -56,7 +56,7 @@ describe('forEngageMagnet', () => {
   it('no effect on magnetic module "engaged" state when already engaged', () => {
     const params = {
       moduleId,
-      engageHeight: 11,
+      height: 11,
     }
     const result = forEngageMagnet(params, invariantContext, engagedRobotState)
     expect(result).toEqual({

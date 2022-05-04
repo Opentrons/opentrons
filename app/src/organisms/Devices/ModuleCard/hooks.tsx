@@ -24,7 +24,7 @@ import type {
   HeaterShakerDeactivateHeaterCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
   HeaterShakerStopShakeCreateCommand,
-  MagneticModuleDisengageMagnetCreateCommand,
+  MagneticModuleDisengageCreateCommand,
   TCDeactivateBlockCreateCommand,
   TCDeactivateLidCreateCommand,
   TemperatureModuleDeactivateCreateCommand,
@@ -129,7 +129,7 @@ export function useModuleOverflowMenu(
       break
     }
     case 'magneticModuleType': {
-      deactivateModuleCommandType = 'magneticModule/disengageMagnet'
+      deactivateModuleCommandType = 'magneticModule/disengage'
       break
     }
     case 'thermocyclerModuleType': {
@@ -151,7 +151,7 @@ export function useModuleOverflowMenu(
 
   const deactivateCommand:
     | TemperatureModuleDeactivateCreateCommand
-    | MagneticModuleDisengageMagnetCreateCommand
+    | MagneticModuleDisengageCreateCommand
     | HeaterShakerDeactivateHeaterCreateCommand
     | TCDeactivateLidCreateCommand
     | TCDeactivateBlockCreateCommand

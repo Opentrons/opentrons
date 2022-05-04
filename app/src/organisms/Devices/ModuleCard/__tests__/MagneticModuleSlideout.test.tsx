@@ -103,10 +103,10 @@ describe('MagneticModuleSlideout', () => {
     fireEvent.click(button)
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'magneticModule/engageMagnet',
+        commandType: 'magneticModule/engage',
         params: {
           moduleId: 'magdeck_id',
-          engageHeight: 10,
+          height: 10,
         },
       },
     })
@@ -130,10 +130,10 @@ describe('MagneticModuleSlideout', () => {
     expect(mockCreateCommand).toHaveBeenCalledWith({
       runId: props.runId,
       command: {
-        commandType: 'magneticModule/engageMagnet',
+        commandType: 'magneticModule/engage',
         params: {
           moduleId: 'magdeck_id',
-          engageHeight: 10,
+          height: 10,
         },
       },
     })

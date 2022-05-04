@@ -112,10 +112,10 @@ export const MagneticModuleSlideout = (
   const handleSubmitHeight = (): void => {
     if (engageHeightValue != null) {
       const setEngageCommand: MagneticModuleEngageMagnetCreateCommand = {
-        commandType: 'magneticModule/engageMagnet',
+        commandType: 'magneticModule/engage',
         params: {
           moduleId: module.id,
-          engageHeight: parseInt(engageHeightValue),
+          height: parseInt(engageHeightValue),
         },
       }
       if (runId != null) {
