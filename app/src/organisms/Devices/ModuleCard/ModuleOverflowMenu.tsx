@@ -15,6 +15,7 @@ interface ModuleOverflowMenuProps {
   handleAboutClick: () => void
   handleTestShakeClick: () => void
   handleWizardClick: () => void
+  runId?: string
 }
 
 export const ModuleOverflowMenu = (
@@ -23,6 +24,7 @@ export const ModuleOverflowMenu = (
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const {
     module,
+    runId,
     handleSlideoutClick,
     handleAboutClick,
     handleTestShakeClick,
@@ -31,6 +33,7 @@ export const ModuleOverflowMenu = (
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { menuOverflowItemsByModuleType } = useModuleOverflowMenu(
     module,
+    runId,
     handleAboutClick,
     handleTestShakeClick,
     handleWizardClick,

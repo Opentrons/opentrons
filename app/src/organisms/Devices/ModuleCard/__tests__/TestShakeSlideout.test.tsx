@@ -1,12 +1,15 @@
 import * as React from 'react'
 import { i18n } from '../../../../i18n'
 import { fireEvent } from '@testing-library/react'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  useCreateCommandMutation,
+  useCreateLiveCommandMutation,
+} from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { TestShakeSlideout } from '../TestShakeSlideout'
 import { HeaterShakerModuleCard } from '../../HeaterShakerWizard/HeaterShakerModuleCard'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
-import { useLatchCommand } from '../hooks'
+import { useLatchControls } from '../hooks'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../HeaterShakerWizard/HeaterShakerModuleCard')
@@ -15,11 +18,14 @@ jest.mock('../hooks')
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
+const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
+  typeof useCreateCommandMutation
+>
 const mockHeaterShakerModuleCard = HeaterShakerModuleCard as jest.MockedFunction<
   typeof HeaterShakerModuleCard
 >
-const mockUseLatchCommand = useLatchCommand as jest.MockedFunction<
-  typeof useLatchCommand
+const mockUseLatchControls = useLatchControls as jest.MockedFunction<
+  typeof useLatchControls
 >
 
 const render = (props: React.ComponentProps<typeof TestShakeSlideout>) => {
@@ -97,13 +103,14 @@ const mockMovingHeaterShaker = {
 describe('TestShakeSlideout', () => {
   let props: React.ComponentProps<typeof TestShakeSlideout>
   let mockCreateLiveCommand = jest.fn()
+  let mockCreateCommand = jest.fn()
   beforeEach(() => {
     props = {
       module: mockHeaterShaker,
       onCloseClick: jest.fn(),
       isExpanded: true,
     }
-    mockUseLatchCommand.mockReturnValue({
+    mockUseLatchControls.mockReturnValue({
       handleLatch: jest.fn(),
       isLatchClosed: true,
     } as any)
@@ -111,6 +118,12 @@ describe('TestShakeSlideout', () => {
     mockCreateLiveCommand.mockResolvedValue(null)
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
+    } as any)
+
+    mockCreateCommand = jest.fn()
+    mockCreateCommand.mockResolvedValue(null)
+    mockUseCommandMutation.mockReturnValue({
+      createCommand: mockCreateCommand,
     } as any)
     mockHeaterShakerModuleCard.mockReturnValue(
       <div>Mock Heater Shaker Module Card</div>
@@ -170,7 +183,7 @@ describe('TestShakeSlideout', () => {
       onCloseClick: jest.fn(),
       isExpanded: true,
     }
-    mockUseLatchCommand.mockReturnValue({
+    mockUseLatchControls.mockReturnValue({
       toggleLatch: jest.fn(),
       isLatchClosed: false,
     })
@@ -202,7 +215,7 @@ describe('TestShakeSlideout', () => {
     const { getByRole } = render(props)
     const button = getByRole('button', { name: /Open/i })
     fireEvent.click(button)
-    expect(mockUseLatchCommand).toHaveBeenCalled()
+    expect(mockUseLatchControls).toHaveBeenCalled()
   })
 
   it('entering an input for shake speed and clicking start should begin shaking', () => {
@@ -219,6 +232,46 @@ describe('TestShakeSlideout', () => {
     fireEvent.click(button)
 
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'heaterShakerModule/setTargetShakeSpeed',
+        params: {
+          moduleId: 'heatershaker_id',
+          rpm: 300,
+        },
+      },
+    })
+  })
+
+  it('renders the open labware latch button and clicking it opens the latch when there is a runId', () => {
+    props = {
+      module: mockCloseLatchHeaterShaker,
+      onCloseClick: jest.fn(),
+      isExpanded: true,
+      runId: 'test123',
+    }
+
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: /Open/i })
+    fireEvent.click(button)
+    expect(mockUseLatchControls).toHaveBeenCalled()
+  })
+
+  it('entering an input for shake speed and clicking start should begin shaking when there is a runId', () => {
+    props = {
+      module: mockHeaterShaker,
+      onCloseClick: jest.fn(),
+      isExpanded: true,
+      runId: 'test123',
+    }
+
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: /Start/i })
+    const input = getByRole('spinbutton')
+    fireEvent.change(input, { target: { value: '300' } })
+    fireEvent.click(button)
+
+    expect(mockCreateCommand).toHaveBeenCalledWith({
+      runId: props.runId,
       command: {
         commandType: 'heaterShakerModule/setTargetShakeSpeed',
         params: {

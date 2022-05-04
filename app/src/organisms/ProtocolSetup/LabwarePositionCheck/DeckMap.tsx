@@ -1,5 +1,7 @@
 import * as React from 'react'
 import map from 'lodash/map'
+
+import { useHost } from '@opentrons/react-api-client'
 import {
   LabwareRender,
   Module,
@@ -18,7 +20,12 @@ import {
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../hooks'
+
+import {
+  useLabwareRenderInfoForRunById,
+  useModuleRenderInfoForProtocolById,
+} from '../../../organisms/Devices/hooks'
+import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import styles from '../styles.css'
 
 const DECK_MAP_VIEWBOX = '-80 -20 550 460'
@@ -39,8 +46,16 @@ interface DeckMapProps {
 
 export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
   const { labwareIdsToHighlight, completedLabwareIds } = props
-  const moduleRenderInfoById = useModuleRenderInfoById()
-  const labwareRenderInfoById = useLabwareRenderInfoById()
+
+  // LPC is only accessible when a run is current and host robot exists
+  const robotName = useHost()?.robotName ?? ''
+  const runId = useCurrentRunId() ?? ''
+
+  const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
+    robotName,
+    runId
+  )
+  const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
 
   return (
     <RobotWorkSpace

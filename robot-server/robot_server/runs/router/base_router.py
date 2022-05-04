@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
-from robot_server.service.task_runner import TaskRunner
+from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
@@ -132,7 +132,7 @@ async def create_run(
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     run_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
-    task_runner: TaskRunner = Depends(TaskRunner),
+    task_runner: TaskRunner = Depends(get_task_runner),
 ) -> PydanticResponse[SimpleBody[Run]]:
     """Create a new run.
 
