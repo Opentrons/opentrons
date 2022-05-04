@@ -205,6 +205,22 @@ class DeviceLanding:
         )
         return self.base.clickable_wrapper(image, 5)
 
+    def get_thermocycler_deck_image(self) -> Optional[WebElement]:
+        """Get the thermocycler deck image on device detail page."""
+        image: Element = Element(
+            (By.XPATH, f"//img[@alt='thermocyclerModuleV1']"),
+            f"the thermocycler deck image on device detail page.",
+        )
+        return self.base.clickable_wrapper(image, 5)
+
+    def get_tem_deck_image(self) -> Optional[WebElement]:
+        """Get the temp deck image on device detail page."""
+        image: Element = Element(
+            (By.XPATH, f"//img[@alt='temperatureModuleV1']"),
+            f"the temp deck image on device detail page.",
+        )
+        return self.base.clickable_wrapper(image, 5)
+
     def get_left_mount_pipette_device_detail(self) -> Optional[WebElement]:
         """Get the left mount pipette on device detail page."""
         text: Element = Element(
@@ -242,6 +258,22 @@ class DeviceLanding:
         """Get the mag module name on device detail page."""
         image: Element = Element(
             (By.XPATH, f"//p[text()='Magnetic Module GEN1']"),
+            f"the mag module name on device detail page.",
+        )
+        return self.base.clickable_wrapper(image, 5)
+
+    def get_thermocycler_module_name(self) -> Optional[WebElement]:
+        """Get the mag module name on device detail page."""
+        image: Element = Element(
+            (By.XPATH, f"//p[text()='Thermocycler Module']"),
+            f"the mag module name on device detail page.",
+        )
+        return self.base.clickable_wrapper(image, 5)
+
+    def get_tem_module_name(self) -> Optional[WebElement]:
+        """Get the mag module name on device detail page."""
+        image: Element = Element(
+            (By.XPATH, f"//p[text()='Temperature Module GEN1']"),
             f"the mag module name on device detail page.",
         )
         return self.base.clickable_wrapper(image, 5)

@@ -92,10 +92,14 @@ def test_device_landing_v5dot1(
                 device_landing.get_recent_protocol_runs_header_text()
                 == "Recent Protocol Runs"
             )
-            device_landing.get_left_mount_pipette_device_detail().is_displayed()
-            device_landing.get_right_mount_pipette_device_detail().is_displayed()
-            device_landing.get_mag_deck_image().is_displayed()
-            device_landing.get_mag_module_name().is_displayed()
+            assert device_landing.get_left_mount_pipette_device_detail().is_displayed()
+            assert device_landing.get_right_mount_pipette_device_detail().is_displayed()
+            assert device_landing.get_mag_deck_image().is_displayed()
+            assert device_landing.get_mag_module_name().is_displayed()
+            assert device_landing.get_thermocycler_deck_image().is_displayed()
+            assert device_landing.get_thermocycler_module_name().is_displayed()
+            assert device_landing.get_tem_deck_image().is_displayed()
+            assert device_landing.get_tem_module_name().is_displayed()
 
 
 @pytest.mark.v5dot1
