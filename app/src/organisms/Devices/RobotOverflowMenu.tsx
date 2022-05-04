@@ -84,7 +84,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           {robot.status === CONNECTABLE ? (
             <MenuItem
               onClick={handleClickRun}
-              data-testid="RobotOverflowMenu_runProtocol"
+              data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
             >
               {t('run_protocol')}
             </MenuItem>
@@ -98,7 +98,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
             to={`/devices/${robot.name}/robot-settings`}
             as={Link}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            data-testid="RobotOverflowMenu_robotSettings"
+            data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
           >
             {t('robot_settings')}
           </MenuItem>
