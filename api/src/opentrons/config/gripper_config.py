@@ -3,9 +3,6 @@ from dataclasses import dataclass
 import logging
 from typing import Tuple, Literal
 
-from opentrons import config
-from opentrons.config import feature_flags as ff
-
 log = logging.getLogger(__name__)
 
 GripperName = Literal["gripper"]
@@ -22,4 +19,4 @@ class GripperConfig:
     home_position: float
     steps_per_mm: float
     idle_current: float
-    model: `GripperModel`
+    model: GripperModel
