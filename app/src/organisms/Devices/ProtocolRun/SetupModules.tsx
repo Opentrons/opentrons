@@ -77,7 +77,6 @@ export const SetupModules = ({
   )
 
   const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
-
   return (
     <Flex
       flex="1"

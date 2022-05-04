@@ -4,7 +4,7 @@ import { SavedStepFormState, ModuleEntities } from '../../../step-forms'
 import { StepIdType } from '../../../form-types'
 export const initialRobotState: RobotState = {
   labware: {
-    trashId: {
+    fixedTrash: {
       slot: '12',
     },
     tiprackId: {
@@ -62,7 +62,7 @@ export const robotStateTimeline: Timeline = {
           params: {
             pipetteId: 'pipetteId',
             volume: 6,
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
             wellLocation: {
               origin: 'bottom',
@@ -77,7 +77,7 @@ export const robotStateTimeline: Timeline = {
           commandType: 'dropTip',
           params: {
             pipetteId: 'pipetteId',
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
           },
         },
@@ -110,7 +110,7 @@ export const robotStateTimeline: Timeline = {
           params: {
             pipetteId: 'pipetteId',
             volume: 6,
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
             wellLocation: {
               origin: 'bottom',
@@ -125,7 +125,7 @@ export const robotStateTimeline: Timeline = {
           commandType: 'dropTip',
           params: {
             pipetteId: 'pipetteId',
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
           },
         },
@@ -141,7 +141,7 @@ export const savedStepForms: SavedStepFormState = {
     stepType: 'manualIntervention',
     id: '__INITIAL_DECK_SETUP_STEP__',
     labwareLocationUpdate: {
-      trashId: '12',
+      fixedTrash: '12',
       tiprackId: '2',
       plateId: '1',
     },
@@ -171,7 +171,7 @@ export const savedStepForms: SavedStepFormState = {
     aspirate_mmFromBottom: 1,
     aspirate_touchTip_checkbox: false,
     dispense_flowRate: null,
-    dispense_labwareId: 'trashId',
+    dispense_labwareId: 'fixedTrash',
     dispense_wells: ['A1'],
     dispense_wellOrder_first: 't2b',
     dispense_wellOrder_second: 'l2r',
@@ -183,7 +183,7 @@ export const savedStepForms: SavedStepFormState = {
     disposalVolume_checkbox: true,
     disposalVolume_volume: '1',
     blowout_checkbox: false,
-    blowout_location: 'trashId',
+    blowout_location: 'fixedTrash',
     preWetTip: false,
   },
 }

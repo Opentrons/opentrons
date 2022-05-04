@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import reduce from 'lodash/reduce'
 import isEqual from 'lodash/isEqual'
@@ -17,18 +17,17 @@ import {
   useCreateCommandMutation,
 } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../../../redux/analytics'
+import { sendModuleCommand } from '../../../../redux/modules'
 import {
   useCurrentRunId,
   useCurrentRunCommands,
   useCurrentProtocol,
 } from '../../../ProtocolUpload/hooks'
-import { useProtocolDetailsForRun } from '../../../Devices/hooks'
-import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import {
-  sendModuleCommand,
-  getAttachedModulesForConnectedRobot,
-} from '../../../../redux/modules'
-import { getConnectedRobotName } from '../../../../redux/robot/selectors'
+  useAttachedModules,
+  useProtocolDetailsForRun,
+} from '../../../Devices/hooks'
+import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
 import { getModuleInitialLoadInfo } from '../../utils/getModuleInitialLoadInfo'
 import { getLabwareOffsetLocation } from '../../utils/getLabwareOffsetLocation'
@@ -257,8 +256,8 @@ export function useLabwarePositionCheck(
   const trackEvent = useTrackEvent()
   const LPCSteps = useSteps(currentRunId)
   const dispatch = useDispatch()
-  const robotName = useSelector(getConnectedRobotName)
-  const attachedModules = useSelector(getAttachedModulesForConnectedRobot)
+  const robotName = host?.robotName ?? ''
+  const attachedModules = useAttachedModules(robotName)
 
   const LPCCommands = LPCSteps.reduce<LabwarePositionCheckCreateCommand[]>(
     (commands, currentStep) => {
@@ -596,14 +595,14 @@ export function useLabwarePositionCheck(
       // delete this once PE supports themocycler open lid command
       if (prepCommand.commandType === 'thermocycler/openLid') {
         const serial = attachedModules.find(
-          module => module.type === THERMOCYCLER_MODULE_TYPE
-        )?.serial
+          module => module.moduleType === THERMOCYCLER_MODULE_TYPE
+        )?.serialNumber
         if (serial == null) {
           throw new Error(
             'Expected to be able to find thermocycler serial number, but could not.'
           )
         }
-        dispatch(sendModuleCommand(robotName as string, serial, 'open'))
+        dispatch(sendModuleCommand(robotName, serial, 'open'))
       } else {
         createCommand({
           runId: currentRunId,

@@ -83,7 +83,7 @@ export function Labware(): JSX.Element {
 
   return (
     <>
-      <Box paddingX={SPACING.spacing4} paddingY={SPACING.spacing5}>
+      <Box paddingX={SPACING.spacing4} paddingY={SPACING.spacing4}>
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}

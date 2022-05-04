@@ -69,7 +69,13 @@ export const Modal = (props: ModalProps): JSX.Element => {
             </StyledText>
           </Flex>
           {onClose != null && (
-            <Btn onClick={onClose} css={closeIconStyles}>
+            <Btn
+              onClick={onClose}
+              css={closeIconStyles}
+              data-testid={`Modal_icon_close_${
+                typeof title === 'string' ? title : ''
+              }`}
+            >
               <Icon
                 name={'close'}
                 width={SPACING.spacing5}

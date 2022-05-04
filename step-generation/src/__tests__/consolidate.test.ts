@@ -1011,7 +1011,7 @@ describe('consolidate single-channel', () => {
           times: 1,
         },
         touchTipAfterDispense: true,
-        blowoutLocation: 'trashId',
+        blowoutLocation: 'fixedTrash',
         blowoutFlowRateUlSec: 2.3,
         blowoutOffsetFromTopMm: 3.3,
         dispenseAirGapVolume: 35,
@@ -1329,7 +1329,7 @@ describe('consolidate single-channel', () => {
           commandType: 'blowout',
           params: {
             pipetteId: 'p300SingleId',
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
             flowRate: 2.3,
             wellLocation: {
@@ -1568,7 +1568,7 @@ describe('consolidate single-channel', () => {
           commandType: 'blowout',
           params: {
             pipetteId: 'p300SingleId',
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
             flowRate: 2.3,
             wellLocation: {
@@ -1609,7 +1609,7 @@ describe('consolidate single-channel', () => {
           commandType: 'dropTip',
           params: {
             pipetteId: 'p300SingleId',
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
           },
         },
@@ -2237,7 +2237,7 @@ describe('consolidate single-channel', () => {
           commandType: 'dropTip',
           params: {
             pipetteId: 'p300SingleId',
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
           },
         },
@@ -2624,7 +2624,7 @@ describe('consolidate single-channel', () => {
           commandType: 'dropTip',
           params: {
             pipetteId: 'p300SingleId',
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
           },
         },
@@ -2903,7 +2903,7 @@ describe('consolidate single-channel', () => {
           commandType: 'dropTip',
           params: {
             pipetteId: 'p300SingleId',
-            labwareId: 'trashId',
+            labwareId: 'fixedTrash',
             wellName: 'A1',
           },
         },

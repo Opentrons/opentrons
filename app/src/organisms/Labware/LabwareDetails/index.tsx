@@ -49,7 +49,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const insertCategory = insert?.metadata.displayCategory
   const irregular = wellGroups.length > 1
   const isMultiRow = ordering.some(row => row.length > 1)
-  const isCustomDefinition = modified != null
+  const isCustomDefinition = definition.namespace !== 'opentrons'
 
   const slideoutHeader = (
     <Flex

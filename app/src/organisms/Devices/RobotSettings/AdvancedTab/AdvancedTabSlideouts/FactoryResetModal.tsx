@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
 import {
@@ -8,9 +8,13 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
   SPACING,
+  TEXT_TRANSFORM_CAPITALIZE,
+  Link,
+  TYPOGRAPHY,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../../../../atoms/text'
-import { PrimaryButton, SecondaryButton } from '../../../../../atoms/Buttons'
+import { PrimaryButton } from '../../../../../atoms/Buttons'
 import { Modal } from '../../../../../atoms/Modal'
 import {
   useDispatchApiRequest,
@@ -19,10 +23,9 @@ import {
   PENDING,
 } from '../../../../../redux/robot-api'
 import { resetConfig } from '../../../../../redux/robot-admin'
-import { connect } from '../../../../../redux/robot'
 
 import type { IconProps } from '@opentrons/components'
-import type { State, Dispatch } from '../../../../../redux/types'
+import type { State } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
 
 interface FactoryResetModalProps {
@@ -42,20 +45,16 @@ export function FactoryResetModal({
     name: 'alert-circle',
     color: COLORS.blue,
   }
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'shared'])
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
-  const dispatch = useDispatch<Dispatch>()
   const resetRequestStatus = useSelector((state: State) => {
     const lastId = last(requestIds)
     return lastId != null ? getRequestById(state, lastId) : null
   })?.status
 
   const triggerReset = (): void => {
-    if (resetOptions) dispatchRequest(resetConfig(robotName, resetOptions))
-  }
-
-  const connectRobot = (): void => {
-    dispatch(connect(robotName))
+    if (resetOptions != null)
+      dispatchRequest(resetConfig(robotName, resetOptions))
   }
 
   React.useEffect(() => {
@@ -67,18 +66,27 @@ export function FactoryResetModal({
   return (
     <>
       {isRobotConnected ? (
-        <Modal title={t('factory_reset_modal_title')} onClose={closeModal}>
+        <Modal
+          type="warning"
+          title={t('factory_reset_modal_title')}
+          onClose={closeModal}
+        >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText as="p" marginBottom={SPACING.spacing5}>
               {t('factory_reset_modal_description')}
             </StyledText>
-            <Flex justifyContent={JUSTIFY_FLEX_END}>
-              <SecondaryButton
+            <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
+              <Link
+                role="button"
                 onClick={closeModal}
+                textTransform={TEXT_TRANSFORM_CAPITALIZE}
                 marginRight={SPACING.spacing3}
+                color={COLORS.blue}
+                css={TYPOGRAPHY.fontSizeP}
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
-                {t('factory_reset_model_cancel_button')}
-              </SecondaryButton>
+                {t('shared:cancel')}
+              </Link>
               <PrimaryButton
                 backgroundColor={COLORS.error}
                 onClick={triggerReset}
@@ -99,13 +107,7 @@ export function FactoryResetModal({
             {t('factory_reset_modal_connection_lost_description')}
           </StyledText>
           <Flex justifyContent={JUSTIFY_FLEX_END}>
-            <SecondaryButton
-              marginRight={SPACING.spacing3}
-              onClick={connectRobot}
-            >
-              {t('factory_reset_modal_connection_lost_retry_button')}
-            </SecondaryButton>
-            <PrimaryButton>
+            <PrimaryButton onClick={closeModal}>
               {t('factory_reset_modal_connection_lost_close_button')}
             </PrimaryButton>
           </Flex>

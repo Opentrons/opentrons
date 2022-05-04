@@ -5,6 +5,7 @@ import type {
   ConfigV3,
   ConfigV4,
   ConfigV5,
+  ConfigV6,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -105,5 +106,15 @@ export const MOCK_CONFIG_V5: ConfigV5 = {
   version: 5,
   python: {
     pathToPythonOverride: null,
+  },
+}
+
+export const MOCK_CONFIG_V6: ConfigV6 = {
+  ...MOCK_CONFIG_V5,
+  version: 6,
+  modules: {
+    heaterShaker: {
+      isAttached: false,
+    },
   },
 }

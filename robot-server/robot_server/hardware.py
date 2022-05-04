@@ -18,16 +18,18 @@ from notify_server.settings import Settings as NotifyServerSettings
 from notify_server.models import event, topics
 from notify_server.models.hardware_event import DoorStatePayload
 
-from .app_state import AppState, AppStateValue, get_app_state
+from .app_state import AppState, AppStateAccessor, get_app_state
 from .errors import ErrorDetails
 from .settings import get_settings
 
 
 log = logging.getLogger(__name__)
 
-_hw_api = AppStateValue[ThreadManagedHardware]("hardware_api")
-_init_task = AppStateValue["asyncio.Task[None]"]("hardware_init_task")
-_event_unsubscribe = AppStateValue[Callable[[], None]]("hardware_event_unsubscribe")
+_hw_api_accessor = AppStateAccessor[ThreadManagedHardware]("hardware_api")
+_init_task_accessor = AppStateAccessor["asyncio.Task[None]"]("hardware_init_task")
+_event_unsubscribe_accessor = AppStateAccessor[Callable[[], None]](
+    "hardware_event_unsubscribe"
+)
 
 
 class HardwareNotYetInitialized(ErrorDetails):
@@ -47,22 +49,22 @@ class HardwareFailedToInitialize(ErrorDetails):
 
 def initialize_hardware(app_state: AppState) -> None:
     """Initialize the HardwareAPI singleton, attaching it to global state."""
-    initialize_task = _init_task.get_from(app_state)
+    initialize_task = _init_task_accessor.get_from(app_state)
 
     if initialize_task is None:
         initialize_task = asyncio.create_task(_initialize_hardware_api(app_state))
-        _init_task.set_on(app_state, initialize_task)
+        _init_task_accessor.set_on(app_state, initialize_task)
 
 
 async def cleanup_hardware(app_state: AppState) -> None:
     """Shutdown the HardwareAPI singleton and remove it from global state."""
-    initialize_task = _init_task.get_from(app_state)
-    thread_manager = _hw_api.get_from(app_state)
-    unsubscribe_from_events = _event_unsubscribe.get_from(app_state)
+    initialize_task = _init_task_accessor.get_from(app_state)
+    thread_manager = _hw_api_accessor.get_from(app_state)
+    unsubscribe_from_events = _event_unsubscribe_accessor.get_from(app_state)
 
-    _init_task.set_on(app_state, None)
-    _hw_api.set_on(app_state, None)
-    _event_unsubscribe.set_on(app_state, None)
+    _init_task_accessor.set_on(app_state, None)
+    _hw_api_accessor.set_on(app_state, None)
+    _event_unsubscribe_accessor.set_on(app_state, None)
 
     if initialize_task is not None:
         initialize_task.cancel()
@@ -90,8 +92,8 @@ async def get_thread_manager(
     Raises:
         ApiError: The Hardware API is still initializing or failed to initialize.
     """
-    initialize_task = _init_task.get_from(app_state)
-    hardware_api = _hw_api.get_from(app_state)
+    initialize_task = _init_task_accessor.get_from(app_state)
+    hardware_api = _hw_api_accessor.get_from(app_state)
 
     if initialize_task is None or hardware_api is None or not initialize_task.done():
         raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
@@ -174,7 +176,7 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
             hardware_api = await initialize_api()
 
         _initialize_event_watchers(app_state, hardware_api)
-        _hw_api.set_on(app_state, hardware_api)
+        _hw_api_accessor.set_on(app_state, hardware_api)
 
         if systemd_available:
             try:
@@ -221,4 +223,4 @@ def _initialize_event_watchers(
         )
 
     unsubscribe = hardware_api.register_callback(_publish_hardware_event)
-    _event_unsubscribe.set_on(app_state, unsubscribe)
+    _event_unsubscribe_accessor.set_on(app_state, unsubscribe)
