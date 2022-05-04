@@ -200,7 +200,7 @@ class DeviceLanding:
     def get_mag_deck_image(self) -> Optional[WebElement]:
         """Get the mag deck image on device detail page."""
         image: Element = Element(
-            (By.XPATH, f"//img[@alt='magneticModuleV2']"),
+            (By.XPATH, f"//img[@alt='magneticModuleV1']"),
             f"the mag deck image on device detail page.",
         )
         return self.base.clickable_wrapper(image, 5)
@@ -210,7 +210,7 @@ class DeviceLanding:
         text: Element = Element(
             (
                 By.XPATH,
-                f"//p[@data-testid='PipetteCard_mount_P20 Single-Channel GEN2']",
+                f"//div[@data-testid='PipetteCard_display_name_P10 Single-Channel GEN1']",
             ),
             f"the left mount pipette on device detail page.",
         )
@@ -232,7 +232,7 @@ class DeviceLanding:
         text: Element = Element(
             (
                 By.XPATH,
-                f"//p[@data-testid='PipetteCard_mount_P20 Single-Channel GEN2']",
+                f"//div[@data-testid='PipetteCard_display_name_P300 Single-Channel GEN1']",
             ),
             f"the right mount pipette on device detail page.",
         )
@@ -241,7 +241,7 @@ class DeviceLanding:
     def get_mag_module_name(self) -> Optional[WebElement]:
         """Get the mag module name on device detail page."""
         image: Element = Element(
-            (By.XPATH, f"//p[text()='Magnetic Module GEN2']"),
+            (By.XPATH, f"//p[text()='Magnetic Module GEN1']"),
             f"the mag module name on device detail page.",
         )
         return self.base.clickable_wrapper(image, 5)
