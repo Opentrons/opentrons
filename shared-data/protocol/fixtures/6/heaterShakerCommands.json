@@ -1384,6 +1384,20 @@
       }
     },
     {
+      "commandType": "heaterShaker/openLabwareLatch",
+      "id": "16abc123",
+      "params": {
+        "moduleId": "heaterShakerId"
+      }
+    },
+    {
+      "commandType": "heaterShaker/closeLabwareLatch",
+      "id": "17abc123",
+      "params": {
+        "moduleId": "heaterShakerId"
+      }
+    },
+    {
       "commandType": "heaterShaker/deactivateHeater",
       "id": "16abc123",
       "params": {

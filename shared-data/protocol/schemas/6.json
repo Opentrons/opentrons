@@ -915,7 +915,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShaker/openLatch"]
+                "enum": ["heaterShaker/openLabwareLatch"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -930,7 +930,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShaker/closeLatch"]
+                "enum": ["heaterShaker/closeLabwareLatch"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
