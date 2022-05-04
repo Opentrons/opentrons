@@ -1,6 +1,7 @@
 """Protocol analysis storage."""
 from __future__ import annotations
 
+import pickle
 from dataclasses import dataclass
 from logging import getLogger
 from typing import Dict, List, Optional
@@ -269,8 +270,8 @@ class _CompletedAnalysisResource:
         Avoid calling this from inside a SQL transaction, since it might be slow.
         """
 
-        def serialize_completed_analysis() -> str:
-            return self.completed_analysis.json()
+        def serialize_completed_analysis() -> bytes:
+            return pickle.dumps(self.completed_analysis.dict())
 
         serialized_completed_analysis = await anyio.to_thread.run_sync(
             serialize_completed_analysis,
@@ -312,7 +313,7 @@ class _CompletedAnalysisResource:
         assert isinstance(protocol_id, str)
 
         def parse_completed_analysis() -> CompletedAnalysis:
-            return CompletedAnalysis.parse_raw(sql_row.completed_analysis)
+            return CompletedAnalysis.parse_obj(pickle.loads(sql_row.completed_analysis))
 
         completed_analysis = await anyio.to_thread.run_sync(
             parse_completed_analysis,

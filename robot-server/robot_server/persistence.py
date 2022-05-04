@@ -64,7 +64,7 @@ analysis_table = sqlalchemy.Table(
     ),
     sqlalchemy.Column(
         "completed_analysis",
-        sqlalchemy.String,
+        sqlalchemy.LargeBinary,
         nullable=False,
     ),
 )
