@@ -85,10 +85,10 @@ describe('ThermocyclerModuleSlideout', () => {
 
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'thermocycler/setTargetBlockTemperature',
+        commandType: 'thermocycler/setAndWaitForBlockTemperature',
         params: {
           moduleId: mockThermocycler.id,
-          temperature: 45,
+          celsius: 45,
         },
       },
     })
@@ -114,7 +114,7 @@ describe('ThermocyclerModuleSlideout', () => {
         commandType: 'thermocycler/setTargetLidTemperature',
         params: {
           moduleId: mockThermocycler.id,
-          temperature: 45,
+          celsius: 45,
         },
       },
     })

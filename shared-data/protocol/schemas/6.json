@@ -622,7 +622,7 @@
           },
 
           {
-            "description": "Thermocycler Set Target Block Temperature: Well block will begin moving to the target temperature. This command is blocking, it delays protocol execution while approaching the target temperature.",
+            "description": "Thermocycler Set And Wait For Block Temperature: Well block will begin moving to the target temperature. This command is blocking, it delays protocol execution while approaching the target temperature.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
@@ -674,7 +674,9 @@
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
-              "commandType": { "enum": ["thermocycler/waitForBlockTemperature"] },
+              "commandType": {
+                "enum": ["thermocycler/waitForBlockTemperature"]
+              },
               "params": {
                 "required": ["moduleId", "celsius"],
                 "properties": {

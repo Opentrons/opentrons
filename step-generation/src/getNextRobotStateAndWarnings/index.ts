@@ -106,7 +106,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
-    case 'thermocycler/setTargetBlockTemperature':
+    case 'thermocycler/setAndWaitForBlockTemperature':
       forThermocyclerSetTargetBlockTemperature(
         command.params,
         invariantContext,
@@ -122,7 +122,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
-    case 'thermocycler/awaitBlockTemperature':
+    case 'thermocycler/waitForBlockTemperature':
       forThermocyclerAwaitBlockTemperature(
         command.params,
         invariantContext,
@@ -130,7 +130,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
-    case 'thermocycler/awaitLidTemperature':
+    case 'thermocycler/waitForLidTemperature':
       forThermocyclerAwaitLidTemperature(
         command.params,
         invariantContext,

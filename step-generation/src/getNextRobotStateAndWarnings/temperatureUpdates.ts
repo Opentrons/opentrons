@@ -33,6 +33,7 @@ export function forSetTemperature(
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { robotState } = robotStateAndWarnings
+  // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10176 merges
   const { moduleId, temperature } = params
   const moduleState = getModuleState(robotState, moduleId)
 
@@ -48,6 +49,7 @@ export function forAwaitTemperature(
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { robotState } = robotStateAndWarnings
+  // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10176 merges
   const { moduleId, temperature } = params
   const moduleState = getModuleState(robotState, moduleId)
 

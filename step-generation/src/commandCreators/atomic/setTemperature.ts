@@ -7,6 +7,7 @@ import * as errorCreators from '../../errorCreators'
 import type { CommandCreator, SetTemperatureArgs } from '../../types'
 
 /** Set temperature target for specified module. */
+// @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10176 merges
 export const setTemperature: CommandCreator<SetTemperatureArgs> = (
   args,
   invariantContext,

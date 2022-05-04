@@ -1,7 +1,7 @@
-import { thermocyclerSetTargetBlockTemperature } from '../commandCreators/atomic/thermocyclerSetTargetBlockTemperature'
+import { thermocyclerSetAndWaitForBlockTemperature } from '../commandCreators/atomic/thermocyclerSetAndWaitForBlockTemperature'
 import { thermocyclerSetTargetLidTemperature } from '../commandCreators/atomic/thermocyclerSetTargetLidTemperature'
-import { thermocyclerAwaitBlockTemperature } from '../commandCreators/atomic/thermocyclerAwaitBlockTemperature'
-import { thermocyclerAwaitLidTemperature } from '../commandCreators/atomic/thermocyclerAwaitLidTemperature'
+import { thermocyclerWaitForBlockTemperature } from '../commandCreators/atomic/thermocyclerWaitForBlockTemperature'
+import { thermocyclerWaitForLidTemperature } from '../commandCreators/atomic/thermocyclerWaitForLidTemperature'
 import { thermocyclerDeactivateBlock } from '../commandCreators/atomic/thermocyclerDeactivateBlock'
 import { thermocyclerDeactivateLid } from '../commandCreators/atomic/thermocyclerDeactivateLid'
 import { thermocyclerRunProfile } from '../commandCreators/atomic/thermocyclerRunProfile'
@@ -38,8 +38,8 @@ describe('thermocycler atomic commands', () => {
   // the command creator takes, so tests are type-safe
   const testCasesSetBlock = [
     {
-      commandCreator: thermocyclerSetTargetBlockTemperature,
-      expectedType: 'thermocycler/setTargetBlockTemperature',
+      commandCreator: thermocyclerSetAndWaitForBlockTemperature,
+      expectedType: 'thermocycler/setAndWaitForBlockTemperature',
       params: {
         module,
         temperature,
@@ -56,16 +56,16 @@ describe('thermocycler atomic commands', () => {
       },
     },
     {
-      commandCreator: thermocyclerAwaitBlockTemperature,
-      expectedType: 'thermocycler/awaitBlockTemperature',
+      commandCreator: thermocyclerWaitForBlockTemperature,
+      expectedType: 'thermocycler/waitForBlockTemperature',
       params: {
         module,
         temperature,
       },
     },
     {
-      commandCreator: thermocyclerAwaitLidTemperature,
-      expectedType: 'thermocycler/awaitLidTemperature',
+      commandCreator: thermocyclerWaitForLidTemperature,
+      expectedType: 'thermocycler/waitForLidTemperature',
       params: {
         module,
         temperature,
@@ -129,9 +129,15 @@ describe('thermocycler atomic commands', () => {
       const res = getSuccessResult(result)
       // delete this once params are changed to conform to v6 params
       // @ts-expect-error
-      const v6Params = { ...params, moduleId: params.module }
+      const v6Params = {
+        ...params,
+        moduleId: params.module,
+        celsius: params.temperature,
+      }
       // @ts-expect-error
       delete v6Params.module
+      // @ts-expect-error
+      delete v6Params.temperature
       expect(res.commands).toEqual([
         {
           commandType: expectedType,

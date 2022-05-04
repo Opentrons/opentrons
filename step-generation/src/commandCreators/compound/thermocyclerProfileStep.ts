@@ -1,7 +1,7 @@
 import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import { thermocyclerStateGetter } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
-import { thermocyclerAwaitLidTemperature } from '../atomic/thermocyclerAwaitLidTemperature'
+import { thermocyclerWaitForLidTemperature } from '../atomic/thermocyclerWaitForLidTemperature'
 import { thermocyclerRunProfile } from '../atomic/thermocyclerRunProfile'
 import { thermocyclerSetTargetLidTemperature } from '../atomic/thermocyclerSetTargetLidTemperature'
 import { thermocyclerAwaitProfileComplete } from '../atomic/thermocyclerAwaitProfileComplete'
@@ -52,7 +52,7 @@ export const thermocyclerProfileStep: CommandCreator<ThermocyclerProfileStepArgs
       })
     )
     commandCreators.push(
-      curryCommandCreator(thermocyclerAwaitLidTemperature, {
+      curryCommandCreator(thermocyclerWaitForLidTemperature, {
         module: moduleId,
         temperature: profileTargetLidTemp,
       })

@@ -456,7 +456,7 @@ describe('steps actions', () => {
 
               params: {
                 moduleId: 'temperatureId',
-                temperature: 25,
+                celsius: 25,
               },
             },
           ],
@@ -505,7 +505,7 @@ describe('steps actions', () => {
                       commandType: 'temperatureModule/setTargetTemperature',
                       params: {
                         moduleId: 'temperatureId',
-                        temperature: 25,
+                        celsius: 25,
                       },
                     },
                   ],
