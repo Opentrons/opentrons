@@ -1,4 +1,3 @@
-// tests for the HostConfig context and hook
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
 import { renderHook } from '@testing-library/react-hooks'

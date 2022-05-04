@@ -15,9 +15,8 @@ import { PrimaryButton, SecondaryButton } from '../../atoms/Buttons'
 import { Modal } from '../../atoms/Modal'
 import { StyledText } from '../../atoms/text'
 import { OffsetVector } from '../../molecules/OffsetVector'
-import { useOffsetCandidatesForCurrentRun } from './hooks'
+import { useOffsetCandidatesForCurrentRun, useClearAllOffsetsForCurrentRun  } from './hooks'
 import styled from 'styled-components'
-import { useClearAllOffsetsForCurrentRun } from './hooks/useClearAllOffsetsForRun'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
