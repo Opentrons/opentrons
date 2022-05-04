@@ -87,11 +87,14 @@ async def _analyze(
             errors=analysis.errors,
         )
 
-        await json_output.write_text(results.json(exclude_none=True))
+        await json_output.write_text(
+            results.json(exclude_none=True),
+            encoding="utf-8",
+        )
 
     else:
         raise click.UsageError(
-            "Currently, this tool only supports JSON mode. Use `--json`."
+            "Currently, this tool only supports JSON mode. Use `--json-output`."
         )
 
 
