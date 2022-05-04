@@ -114,13 +114,13 @@ describe('thermocycler atomic commands', () => {
     },
   ]
 
-  const testParams = <P>({
+  const testParams = ({
     commandCreator,
     params,
     expectedType,
   }: {
-    commandCreator: CommandCreator<P>
-    params: P
+    commandCreator: CommandCreator<any>
+    params: any
     expectedType: string
   }): void => {
     it(`creates a single "${expectedType}" command with the given params`, () => {
@@ -128,15 +128,12 @@ describe('thermocycler atomic commands', () => {
       const result = commandCreator(params, invariantContext, robotInitialState)
       const res = getSuccessResult(result)
       // delete this once params are changed to conform to v6 params
-      // @ts-expect-error
       const v6Params = {
         ...params,
         moduleId: params.module,
         celsius: params.temperature,
       }
-      // @ts-expect-error
       delete v6Params.module
-      // @ts-expect-error
       delete v6Params.temperature
       expect(res.commands).toEqual([
         {
