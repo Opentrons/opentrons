@@ -13,7 +13,7 @@ from robot_server.app_state import AppState, AppStateAccessor, get_app_state
 from robot_server.settings import get_settings
 
 
-_sql_engine_accessor = AppStateAccessor[SQLEngine]("sql_engine")
+_sql_engine_accessor = AppStateAccessor[sqlalchemy.engine.Engine]("sql_engine")
 _persistence_directory_accessor = AppStateAccessor[Path]("persistence_directory")
 _protocol_directory_accessor = AppStateAccessor[Path]("protocol_directory")
 
