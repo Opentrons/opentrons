@@ -2,12 +2,15 @@ from __future__ import annotations
 import asyncio
 
 from pathlib import Path
-from typing import AsyncGenerator, List
+from typing import AsyncGenerator, List, Dict
 import httpx
 from httpx import Response
 
 import concurrent.futures
 import contextlib
+
+from robot_server.service.json_api import RequestModel
+from robot_server.runs.run_models import RunCreate
 
 
 STARTUP_WAIT = 15
@@ -137,10 +140,26 @@ class RobotClient:
         response.raise_for_status()
         return response
 
+    async def get_runs(self) -> Response:
+        """GET /runs."""
+        response = await self.httpx_client.get(url=f"{self.base_url}/runs")
+        response.raise_for_status()
+        return response
+
+    async def post_run(self, req_body: Dict[str, object]) -> Response:
+        """POST /runs."""
+        response = await self.httpx_client.post(
+            url=f"{self.base_url}/runs", json=req_body
+        )
+        print("response")
+        print(response.text)
+        response.raise_for_status()
+        return response
+
     async def analysis_complete(self, protocol_id: str, analyses_id: str) -> bool:
         """Is an analysis status complete?"""
         response = await self.get_protocol(protocol_id)
-        analyses = response.json()["data"]["analyses"]
+        analyses = response.json()["data"]["analysisSummaries"]
         target_analysis = next(
             (analysis for analysis in analyses if analysis["id"] == analyses_id), None
         )
