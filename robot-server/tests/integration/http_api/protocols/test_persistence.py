@@ -38,8 +38,7 @@ async def test_protocols_and_analyses_persist(
                     await robot_client.post_protocol([Path(file.name)])
 
             await asyncio.wait_for(
-                _wait_for_all_analyses_to_complete(robot_client),
-                timeout=30
+                _wait_for_all_analyses_to_complete(robot_client), timeout=30
             )
 
             # The protocols response will include analysis statuses. Fetch it
@@ -173,13 +172,13 @@ async def _get_all_analyses(robot_client: RobotClient) -> Dict[str, List[object]
 
 
 async def _wait_for_all_analyses_to_complete(robot_client: RobotClient) -> None:
-        async def _all_analyses_are_complete() -> bool:
-            protocols = (await robot_client.get_protocols()).json()
-            for protocol in protocols["data"]:
-                for analysis_summary in protocol["analysisSummaries"]:
-                    if analysis_summary["status"] != "completed":
-                        return False
-            return True
+    async def _all_analyses_are_complete() -> bool:
+        protocols = (await robot_client.get_protocols()).json()
+        for protocol in protocols["data"]:
+            for analysis_summary in protocol["analysisSummaries"]:
+                if analysis_summary["status"] != "completed":
+                    return False
+        return True
 
-        while not await _all_analyses_are_complete():
-            await asyncio.sleep(1)
+    while not await _all_analyses_are_complete():
+        await asyncio.sleep(1)

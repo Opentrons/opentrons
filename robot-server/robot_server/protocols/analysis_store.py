@@ -283,7 +283,6 @@ class _CompletedAnalysisResource:
             "id": self.id,
             "protocol_id": self.protocol_id,
             "analyzer_version": self.analyzer_version,
-            # TODO: Offload to thread?
             "completed_analysis": serialized_completed_analysis,
         }
 

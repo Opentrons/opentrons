@@ -33,7 +33,6 @@ from robot_server.protocols.analysis_store import (
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
-    ProtocolNotFoundError,
 )
 
 
