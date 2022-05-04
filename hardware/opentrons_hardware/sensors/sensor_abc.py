@@ -1,7 +1,7 @@
 """Abstract base classes for the sensor drivers."""
 from abc import ABC, abstractmethod
 
-from typing import Optional, AsyncGenerator
+from typing import Optional, AsyncIterator
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -82,16 +82,16 @@ class AbstractAdvancedSensor(AbstractBasicSensor):
         """Set base offset of the sensor."""
         self._offset = offset
 
-    @asynccontextmanager
     @abstractmethod
+    @asynccontextmanager
     async def bind_output(
         self,
         can_messenger: CanMessenger,
         node_id: NodeId,
         binding: SensorOutputBinding = SensorOutputBinding.sync,
-    ) -> AsyncGenerator[bool, None]:
+    ) -> AsyncIterator[None]:
         """Send a BindSensorOutputRequest."""
-        ...
+        yield
 
     @abstractmethod
     async def get_baseline(

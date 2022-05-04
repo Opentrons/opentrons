@@ -1,6 +1,6 @@
 """Capacitve Sensor Driver Class."""
 
-from typing import Optional, AsyncGenerator, AsyncIterator
+from typing import Optional, AsyncIterator
 
 import logging
 
@@ -51,7 +51,7 @@ class CapacitiveSensor(AbstractAdvancedSensor):
         can_messenger: CanMessenger,
         node_id: NodeId,
         binding: SensorOutputBinding = SensorOutputBinding.sync,
-    ) -> AsyncGenerator[bool, None]:
+    ) -> AsyncIterator[None]:
         """Send a BindSensorOutputRequest."""
         try:
             await can_messenger.send(
@@ -63,9 +63,17 @@ class CapacitiveSensor(AbstractAdvancedSensor):
                     )
                 ),
             )
-            yield True
-        except TimeoutError:
-            yield False
+            yield
+        finally:
+            await can_messenger.send(
+                node_id=node_id,
+                message=BindSensorOutputRequest(
+                    payload=BindSensorOutputRequestPayload(
+                        sensor=SensorTypeField(self._sensor_type),
+                        binding=SensorOutputBindingField(SensorOutputBinding.none),
+                    )
+                ),
+            )
 
     async def get_report(
         self,

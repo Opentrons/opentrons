@@ -343,6 +343,7 @@ async def test_threshold(
         [NodeId.pipette_left, 5, lazy_fixture("capacitive_sensor")],
     ],
 )
+# @pytest.mark.skip("need to fix bind_output")
 async def test_bind_to_sync(
     mock_messenger: mock.AsyncMock,
     can_message_notifier: MockCanMessageNotifier,
@@ -355,15 +356,26 @@ async def test_bind_to_sync(
     Tests that bind_to_sync does in fact
     send out a BindSensorOutputRequest.
     """
-    await sensor.bind_to_sync(
-        mock_messenger, node_id, SensorOutputBinding.sync,
-    )
-    mock_messenger.send.assert_called_once_with(
+    async with sensor.bind_output(
+        mock_messenger,
+        node_id,
+        SensorOutputBinding.sync,
+    ):
+        mock_messenger.send.assert_called_with(
+            node_id=node_id,
+            message=BindSensorOutputRequest(
+                payload=BindSensorOutputRequestPayload(
+                    sensor=SensorTypeField(sensor._sensor_type),
+                    binding=SensorOutputBindingField(SensorOutputBinding.sync),
+                )
+            ),
+        )
+    mock_messenger.send.assert_called_with(
         node_id=node_id,
         message=BindSensorOutputRequest(
             payload=BindSensorOutputRequestPayload(
                 sensor=SensorTypeField(sensor._sensor_type),
-                binding=SensorOutputBindingField(SensorOutputBinding.sync),
+                binding=SensorOutputBindingField(SensorOutputBinding.none),
             )
         ),
     )
@@ -423,6 +435,7 @@ async def test_get_baseline(
         [lazy_fixture("pressure_sensor"), NodeId.pipette_right, 3],
     ],
 )
+# @pytest.mark.skip("need to fix bind_output")
 async def test_debug_poll(
     mock_messenger: mock.AsyncMock,
     can_message_notifier: MockCanMessageNotifier,
@@ -431,13 +444,22 @@ async def test_debug_poll(
     timeout: int,
 ) -> None:
     """Test for debug poll."""
-    await sensor.bind_to_sync(mock_messenger, node_id, SensorOutputBinding.report)
-    for i in range(2):
-        with patch.object(
-            sensor._scheduler,
-            "_wait_for_response",
-            new=AsyncMock(return_value=SensorDataType.build(50)),
-        ):
+    async with sensor.bind_output(mock_messenger, node_id, SensorOutputBinding.report):
+        for i in range(2):
+            with patch.object(
+                sensor._scheduler,
+                "_wait_for_response",
+                new=AsyncMock(return_value=SensorDataType.build(50)),
+            ):
 
-            data = await sensor.get_report(node_id, mock_messenger, timeout)
-            assert data == SensorDataType.build(Int32Field(50))
+                data = await sensor.get_report(node_id, mock_messenger, timeout)
+                assert data == SensorDataType.build(Int32Field(50))
+    mock_messenger.send.assert_called_with(
+        node_id=node_id,
+        message=BindSensorOutputRequest(
+            payload=BindSensorOutputRequestPayload(
+                sensor=SensorTypeField(sensor._sensor_type),
+                binding=SensorOutputBindingField(SensorOutputBinding.none),
+            )
+        ),
+    )

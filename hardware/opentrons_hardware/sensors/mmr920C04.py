@@ -1,5 +1,5 @@
 """Pressure Sensor Driver Class."""
-from typing import Optional, AsyncGenerator
+from typing import Optional, AsyncIterator
 
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import (
@@ -51,7 +51,7 @@ class PressureSensor(AbstractAdvancedSensor):
         can_messenger: CanMessenger,
         node_id: NodeId,
         binding: SensorOutputBinding = SensorOutputBinding.sync,
-    ) -> AsyncGenerator[bool, None]:
+    ) -> AsyncIterator[None]:
         """Send a BindSensorOutputRequest."""
         try:
             await can_messenger.send(
@@ -63,7 +63,7 @@ class PressureSensor(AbstractAdvancedSensor):
                     )
                 ),
             )
-            yield True
+            yield
         finally:
             await can_messenger.send(
                 node_id=node_id,
@@ -74,7 +74,6 @@ class PressureSensor(AbstractAdvancedSensor):
                     )
                 ),
             )
-
 
     async def get_report(
         self,
