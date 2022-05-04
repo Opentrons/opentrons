@@ -9,13 +9,13 @@ import asyncio
 from logging import getLogger
 from typing import Any, Awaitable, Callable, Set
 from fastapi import Depends
-from robot_server.app_state import AppState, AppStateValue, get_app_state
+from robot_server.app_state import AppState, AppStateAccessor, get_app_state
 
 log = getLogger(__name__)
 
 TaskFunc = Callable[..., Awaitable[Any]]
 
-_task_runner = AppStateValue["TaskRunner"]("task_runner")
+_task_runner_accessor = AppStateAccessor["TaskRunner"]("task_runner")
 
 
 class TaskRunner:
@@ -71,7 +71,7 @@ def initialize_task_runner(app_state: AppState) -> None:
 
     Intended to be called just once, when the server starts up.s
     """
-    _task_runner.set_on(app_state, TaskRunner())
+    _task_runner_accessor.set_on(app_state, TaskRunner())
 
 
 async def clean_up_task_runner(app_state: AppState) -> None:
@@ -79,7 +79,7 @@ async def clean_up_task_runner(app_state: AppState) -> None:
 
     Intended to be called just once, when the server shuts down.
     """
-    task_runner = _task_runner.get_from(app_state)
+    task_runner = _task_runner_accessor.get_from(app_state)
 
     if task_runner is not None:
         await task_runner.cancel_all_and_clean_up()
@@ -89,6 +89,6 @@ def get_task_runner(app_state: AppState = Depends(get_app_state)) -> TaskRunner:
     """Intended to be used by endpoint functions as a FastAPI dependency,
     like `task_runner = fastapi.Depends(get_task_runner)`.
     """
-    task_runner = _task_runner.get_from(app_state)
+    task_runner = _task_runner_accessor.get_from(app_state)
     assert task_runner, "Task runner was not initialized"
     return task_runner
