@@ -116,27 +116,17 @@ export const ProtocolLabwareDetailItem = (
             <Icon
               color={COLORS.blue}
               name="check-decagram"
-              height=".7rem"
+              height=".75rem"
               marginRight={SPACING.spacing3}
             />
           ) : (
             <Flex marginLeft={SPACING.spacingM} />
           )}
-          <StyledText
-            as="p"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-            color={COLORS.darkBlack}
-            width={SIZE_5}
-          >
+          <StyledText as="p" color={COLORS.darkBlack} width={SIZE_5}>
             {displayName}
           </StyledText>
         </Flex>
-        <StyledText
-          as="p"
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.darkBlack}
-          marginLeft={'5rem'}
-        >
+        <StyledText as="p" color={COLORS.darkBlack} marginLeft={'5rem'}>
           {quantity}
         </StyledText>
         <LabwareDetailOverflowMenu labware={labware} />
