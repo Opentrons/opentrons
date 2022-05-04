@@ -6,27 +6,31 @@ import * as Sessions from '../../../redux/sessions'
 import * as Config from '../../../redux/config'
 
 import {
-  Icon,
-  SecondaryBtn,
-  BORDER_SOLID_LIGHT,
-  Tooltip,
-  useHoverTooltip,
   SpinnerModalPage,
+  Box,
+  SPACING,
+  ALIGN_CENTER,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  TYPOGRAPHY,
+  UseHoverTooltipTargetProps,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
 import { CheckCalibration } from '../../../organisms/CheckCalibration'
+import { StyledText } from '../../../atoms/text'
+import { TertiaryButton } from '../../../atoms/Buttons'
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
-import { TitledControl } from '../../../atoms/TitledControl'
 
 import type { SessionCommandString } from '../../../redux/sessions/types'
 import type { RequestState } from '../../../redux/robot-api/types'
-
 import type { State } from '../../../redux/types'
 
 export interface CheckCalibrationControlProps {
   robotName: string
   disabledReason: string | null
+  children?: React.ReactNode
+  targetProps?: UseHoverTooltipTargetProps
 }
 
 // pipette calibration commands for which the full page spinner should not appear
@@ -36,10 +40,11 @@ const spinnerCommandBlockList: SessionCommandString[] = [
 
 export function CheckCalibrationControl({
   robotName,
+  children,
   disabledReason,
+  targetProps,
 }: CheckCalibrationControlProps): JSX.Element {
   const { t } = useTranslation(['robot_calibration', 'shared'])
-  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const trackedRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
@@ -141,35 +146,28 @@ export function CheckCalibrationControl({
     return null
   })
 
-  const buttonDisabled = Boolean(disabledReason) || showSpinner
-
-  const buttonChildren = showSpinner ? (
-    <Icon name="ot-spinner" height="1em" spin />
-  ) : (
-    t('health_check_button')
-  )
-
   return (
     <>
-      <TitledControl
-        borderBottom={BORDER_SOLID_LIGHT}
-        title={t('health_check_title')}
-        description={t('health_check_description')}
-        control={
-          <SecondaryBtn
+      <Box paddingBottom={SPACING.spacing5} marginTop="24px">
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Box marginRight={SPACING.spacing6}>
+            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
+              {t('calibration_health_check')}
+            </Box>
+            <StyledText as="p" marginBottom={SPACING.spacing3}>
+              {t('check_accuracy')}
+            </StyledText>
+          </Box>
+          <TertiaryButton
             {...targetProps}
-            minWidth="12rem"
-            onClick={() => handleStart(null)} // passing in null because we want to show the AskForBlock modal
-            disabled={buttonDisabled}
+            onClick={() => handleStart(null)}
+            disabled={disabledReason != null}
           >
-            {buttonChildren}
-          </SecondaryBtn>
-        }
-      >
-        {disabledReason !== null && (
-          <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>
-        )}
-      </TitledControl>
+            {t('check_health')}
+          </TertiaryButton>
+          {children}
+        </Flex>
+      </Box>
       <Portal level="top">
         {showCalBlockModal ? (
           <AskForCalibrationBlockModal

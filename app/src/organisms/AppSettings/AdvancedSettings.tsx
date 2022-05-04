@@ -34,6 +34,10 @@ import { Banner } from '../../atoms/Banner'
 
 import type { Dispatch, State } from '../../redux/types'
 import type { DropdownOption } from '@opentrons/components'
+import type {
+  ResetConfigValueAction,
+  UpdateConfigValueAction,
+} from '../../redux/config/types'
 
 const ALWAYS_BLOCK: 'always-block' = 'always-block'
 const ALWAYS_TRASH: 'always-trash' = 'always-trash'
@@ -44,6 +48,14 @@ type BlockSelection =
   | typeof ALWAYS_BLOCK
   | typeof ALWAYS_TRASH
   | typeof ALWAYS_PROMPT
+
+export function updatePathToPython(path: string): UpdateConfigValueAction {
+  return Config.updateConfigValue('python.pathToPythonOverride', path)
+}
+
+export function resetPathToPython(): ResetConfigValueAction {
+  return Config.resetConfigValue('python.pathToPythonOverride')
+}
 
 export function AdvancedSettings(): JSX.Element {
   const { t } = useTranslation('app_settings')
@@ -62,6 +74,8 @@ export function AdvancedSettings(): JSX.Element {
   const isHeaterShakerAttachmentModalVisible = useSelector(
     Config.getIsHeaterShakerAttached
   )
+  const pathToPythonInterpretter = useSelector(Config.getPathToPythonOverride)
+
   const dispatch = useDispatch<Dispatch>()
 
   const handleUseTrashSelection = (selection: BlockSelection): void => {
@@ -392,6 +406,61 @@ export function AdvancedSettings(): JSX.Element {
           >
             {t('clear_robots_button')}
           </TertiaryButton>
+        </Flex>
+        <Divider marginY={SPACING.spacing5} />
+
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Box width="70%">
+            <StyledText
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
+              id="AdvancedSettings_overridePathToPython"
+            >
+              {t('override_path_to_python')}
+            </StyledText>
+            <StyledText as="p" paddingBottom={SPACING.spacing3}>
+              {t('opentrons_app_will_use_interpreter')}
+            </StyledText>
+            <StyledText
+              as="h6"
+              textTransform={TYPOGRAPHY.textTransformUppercase}
+              color={COLORS.darkGreyEnabled}
+              paddingBottom={SPACING.spacing2}
+            >
+              {t('override_path')}
+            </StyledText>
+            {pathToPythonInterpretter !== '' ? (
+              <Link
+                css={TYPOGRAPHY.pRegular}
+                external
+                color={COLORS.darkBlack}
+                onClick={() =>
+                  dispatch(Config.openPythonInterpretterDirectory())
+                }
+                id="AdvancedSettings_sourceFolderLinkPython"
+              >
+                {pathToPythonInterpretter}
+                <Icon
+                  height="0.75rem"
+                  marginLeft={SPACING.spacing3}
+                  name="open-in-new"
+                />
+              </Link>
+            ) : (
+              <StyledText as="p">{t('no_specified_folder')}</StyledText>
+            )}
+          </Box>
+          {
+            <TertiaryButton
+              marginLeft={SPACING_AUTO}
+              onClick={() => dispatch(resetPathToPython())}
+              id="AdvancedSettings_changePythonInterpreterSource"
+            >
+              {pathToPythonInterpretter !== ''
+                ? t('reset_to_default')
+                : t('add_override_path')}
+            </TertiaryButton>
+          }
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>

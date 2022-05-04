@@ -9,9 +9,6 @@
   "deck_calibration_spinner": "Deck calibration is {{ongoing_action}}",
   "definition": "Your OT-2 moves pipettes around in 3D space based on its calibration. <a>Learn more</a> about how calibration works on the OT-2.",
   "download_calibration": "Download your calibration data",
-  "health_check_button": "check health",
-  "health_check_description": "Check the health of the current calibration settings.",
-  "health_check_title": "calibration health check",
   "last_calibrated": "Last calibrated",
   "last_migrated": "Last known calibration migrated",
   "manage_pipettes": "manage pipettes",
@@ -24,5 +21,8 @@
   "serial_number": "Serial number",
   "tip_length": "tip length calibration",
   "title": "robot calibration",
-  "unknown_custom_tiprack": "unknown custom tip rack"
+  "unknown_custom_tiprack": "unknown custom tip rack",
+  "calibration_health_check": "Calibration Health Check",
+  "check_accuracy": "Check the accuracy of key calibration points without recalibrating the robot.",
+  "check_health": "Check Health"
 }

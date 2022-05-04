@@ -53,12 +53,18 @@ export interface SubtractConfigValueAction {
   meta: { shell: true }
 }
 
+export interface OpenPythonInterpretterDirectoryAction {
+  type: 'config:OPEN_PYTHON_INTERPRETTER'
+  meta: { shell: true }
+}
+
 export type ConfigValueChangeAction =
   | UpdateConfigValueAction
   | ResetConfigValueAction
   | ToggleConfigValueAction
   | AddUniqueConfigValueAction
   | SubtractConfigValueAction
+  | OpenPythonInterpretterDirectoryAction
 
 export type ConfigAction =
   | ConfigValueChangeAction

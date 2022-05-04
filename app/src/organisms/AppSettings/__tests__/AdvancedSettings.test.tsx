@@ -50,6 +50,10 @@ const mockGetIsHeaterShakerAttached = Config.getIsHeaterShakerAttached as jest.M
   typeof Config.getIsHeaterShakerAttached
 >
 
+const mockGetPathToPythonOverride = Config.getPathToPythonOverride as jest.MockedFunction<
+  typeof Config.getPathToPythonOverride
+>
+
 describe('AdvancedSettings', () => {
   beforeEach(() => {
     getCustomLabwarePath.mockReturnValue('')
@@ -218,6 +222,29 @@ describe('AdvancedSettings', () => {
       name: 'show_heater_shaker_modal',
     })
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+  })
+
+  it('renders the path to python override text and button with no default path', () => {
+    mockGetPathToPythonOverride.mockReturnValue(null)
+    const [{ getByText, getByRole }] = render()
+    getByText('Override Path to Python')
+    getByText(
+      'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
+    )
+    getByText('override path')
+    getByRole('button', { name: 'Add override path' })
+  })
+
+  it('renders the path to python override text and button with a selected path', () => {
+    mockGetPathToPythonOverride.mockReturnValue('otherPath')
+    const [{ getByText, getByRole }] = render()
+    getByText('Override Path to Python')
+    getByText(
+      'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
+    )
+    getByText('override path')
+    getByText('otherPath')
+    getByRole('button', { name: 'Reset to default' })
   })
 
   it('renders the clear unavailable robots section', () => {

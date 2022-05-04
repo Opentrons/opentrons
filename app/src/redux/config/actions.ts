@@ -85,3 +85,8 @@ export function addManualIp(ip: string): Types.AddUniqueConfigValueAction {
 export function removeManualIp(ip: string): Types.SubtractConfigValueAction {
   return subtractConfigValue('discovery.candidates', ip)
 }
+
+export const openPythonInterpretterDirectory = (): Types.OpenPythonInterpretterDirectoryAction => ({
+  type: 'config:OPEN_PYTHON_INTERPRETTER',
+  meta: { shell: true },
+})
