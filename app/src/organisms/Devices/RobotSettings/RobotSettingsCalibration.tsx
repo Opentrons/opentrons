@@ -17,6 +17,7 @@ import {
   useConditionalConfirm,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
@@ -378,7 +379,7 @@ export function RobotSettingsCalibration({
           </Box>
           <TertiaryButton
             onClick={() => confirmStart()}
-            disabled={disabledOrBusyReason}
+            // disabled={disabledOrBusyReason}
           >
             {deckCalibrationButtonText}
           </TertiaryButton>
@@ -392,16 +393,18 @@ export function RobotSettingsCalibration({
             <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
               {t('pipette_offset_calibrations_title')}
             </Box>
-            <StyledText as="p" marginBottom={SPACING.spacing3}>
+            <StyledText as="p" marginBottom={SPACING.spacing4}>
               {t('pipette_offset_calibrations_description')}
             </StyledText>
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <Flex flexDirection={DIRECTION_ROW}>
+            <Flex flexDirection={DIRECTION_COLUMN} marginX={SPACING.spacing4}>
+              <Flex
+                flexDirection={DIRECTION_ROW}
+                css={{ 'word-wrap': 'break-word' }}
+              >
                 <StyledText
                   as="label"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   color={COLORS.darkBlack}
-                  marginLeft={SPACING.spacing4}
                   marginRight={SPACING.spacing4}
                   width="10rem"
                   data-testid={'pipette_offset_calibrations_model_and_serial'}
@@ -415,8 +418,7 @@ export function RobotSettingsCalibration({
                   as="label"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   color={COLORS.darkBlack}
-                  // marginLeft={SPACING.spacing4}
-                  marginLeft="3.5rem"
+                  marginRight={SPACING.spacing4}
                   width="2.5rem"
                   data-testid={'pipette_offset_calibrations_mount'}
                 >
@@ -427,7 +429,7 @@ export function RobotSettingsCalibration({
                   as="label"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   color={COLORS.darkBlack}
-                  marginLeft="4rem"
+                  marginRight={SPACING.spacing4}
                   width="3.75rem"
                   data-testid={'pipette_offset_calibrations_attached'}
                 >
@@ -438,7 +440,7 @@ export function RobotSettingsCalibration({
                   as="label"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   color={COLORS.darkBlack}
-                  marginLeft="8rem"
+                  marginRight={SPACING.spacing4}
                   width="8.5rem"
                   data-testid={'pipette_offset_calibrations_tiprack'}
                 >
@@ -449,7 +451,7 @@ export function RobotSettingsCalibration({
                   as="label"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   color={COLORS.darkBlack}
-                  marginLeft="3rem"
+                  width="5.5rem"
                   data-testid={'pipette_offset_calibrations_last_calibrated'}
                 >
                   {t(
@@ -554,40 +556,34 @@ function PipetteOffsetCalDetailItem({
       <Divider />
       <Flex
         flexDirection={DIRECTION_ROW}
-        marginY={SPACING.spacing3}
+        // paddingX={SPACING.spacing4}
+        // paddingY={SPACING.spacing4}
         alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        // justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
-          <StyledText as="p" marginLeft={SPACING.spacing4} width="10rem">
-            {model}
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <StyledText as="p" width="10rem">
+            {serial}
           </StyledText>
-          <StyledText as="p" marginLeft={SPACING.spacing4} width="10rem">
+          <StyledText as="p" width="10rem">
             {serial}
           </StyledText>
         </Flex>
-        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <StyledText as="p" width="2.5rem">
-            {mount}
-          </StyledText>
-        </Flex>
-        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <StyledText as="p" width="3.75rem">
-            {attached ? t('yes') : t('no')}
-          </StyledText>
-        </Flex>
+        <StyledText as="p" width="2.5rem" marginRight={SPACING.spacing4}>
+          {mount}
+        </StyledText>
+        <StyledText as="p" width="3.75rem" marginRight={SPACING.spacing4}>
+          {attached ? t('yes') : t('no')}
+        </StyledText>
         <Flex
-          flexDirection={DIRECTION_ROW}
-          alignItems={ALIGN_CENTER}
           css={{ 'word-wrap': 'break-word' }}
+          marginRight={SPACING.spacing4}
         >
           <StyledText as="p" width="8.5rem" height="2.5rem">
             {tiprack}
           </StyledText>
         </Flex>
-        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <StyledText as="p">{formatLastModified(lastCalibrated)}</StyledText>
-        </Flex>
+        <StyledText as="p">{formatLastModified(lastCalibrated)}</StyledText>
       </Flex>
     </>
   )
