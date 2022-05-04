@@ -1,25 +1,92 @@
 .. _robot-position:
 
-################################
-Controlling the Robot's Position
-################################
+##############
+Robot Position
+##############
 
-TK intro about controlling position
+Most of the time when writing a protocol, the Python Protocol API's methods take care of determining where the robot needs to go to perform the commands you've given. But sometimes you need to modify how the robot moves in order to achieve the purposes of your protocol. This document will cover the two main ways to define positions — relative to labware, or relative to the entire deck — as well as how to alter the robot's speed or trajectory as it moves to those positions.
+
+
+.. _position-relative-labware:
 
 ****************************
 Position Relative to Labware
 ****************************
 
-TK section intro
+For each piece of labware you load, every well has three addressable positions — top, bottom, and center — that are determined by the labware definition. You can use these positions as defined or calculate other positions relative to them in a number of ways.
+
+
+Well Positions
+^^^^^^^^^^^^^^
+
+Top
+---
+
+The method :py:meth:`.Well.top` returns a position at the top of the well, centered in both horizontal directions. 
+
+.. code-block:: python
+
+   plate['A1'].top()     # the top center of the well
+
+This is a good position to use for :ref:`new-blow-out` or any other operation where you
+don't want to contact the liquid. In addition, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` numbers move the position up, and negative ``z``` numbers move it down:
+
+.. code-block:: python
+
+   plate['A1'].top(z=1)  # 1 mm above the top center of the well
+   plate['A1'].top(z=-1) # 1 mm below the top center of the well
+
+.. versionadded:: 2.0
+
+Bottom
+------
+
+The method :py:meth:`.Well.bottom` returns a position at the bottom of the well, centered in both horizontal directions. 
+
+.. code-block:: python
+
+   plate['A1'].bottom()     # the bottom center of the well
+
+This is a good position to start for aspiration 
+or any other operation where you want to contact the liquid. The same as with :py:meth:`.Well.top`, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` numbers move the position up, and negative ``z``` numbers move it down:
+
+.. code-block:: python
+
+   plate['A1'].bottom()     # the bottom center of the well
+   plate['A1'].bottom(z=1)  # 1 mm above the bottom center of the well
+   plate['A1'].bottom(z=-1) # 1 mm below the bottom center of the well
+                            # this may be dangerous!
+
+
+.. warning::
+
+    Negative ``z`` arguments to :py:meth:`.Well.bottom` may cause the tip to
+    collide with the bottom of the well. The OT-2 has no sensors to detect this,
+    and if it happens, the pipette that collided will be too high in z until the next time it picks up a tip.
+
+.. versionadded:: 2.0
+
+Center
+------
+
+The method :py:meth:`.Well.center` returns a position centered in the well both
+vertically and horizontally. This can be a good place to start for precise
+control of positions within the well for unusual or custom labware.
+
+.. code-block:: python
+
+   plate['A1'].center() # the vertical and horizontal center of the well
+
+.. versionadded:: 2.0
 
 
 .. _new-default-op-positions:
 
-Default Positions Within Wells
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changing Default Positions
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-By default, the OT-2 will aspirate and dispense 1mm above the bottom of a well. This
-may not be suitable for some labware geometries, liquids, or experimental
+By default, the OT-2 will aspirate and dispense 1 mm above the bottom of a well. This
+may not be suitable for some labware geometries, liquids, or 
 protocols. While you can specify the exact location within a well in direct calls to
 :py:meth:`.InstrumentContext.aspirate` and :py:meth:`.InstrumentContext.dispense`
 (see the :ref:`v2-location-within-wells` section), you cannot use this method in
@@ -67,73 +134,6 @@ executed as part of a transfer.
 
 .. versionadded:: 2.0
 
-Position Modifiers
-^^^^^^^^^^^^^^^^^^
-
-Top
----
-
-The method :py:meth:`.Well.top` returns a position at the top center of the well. This
-is a good position to use for :ref:`new-blow-out` or any other operation where you
-don't want to be contacting the liquid. In addition, :py:meth:`.Well.top` takes an
-optional argument ``z``, which is a distance in mm to move relative to the top
-vertically (positive numbers move up, and negative numbers move down):
-
-.. code-block:: python
-
-   plate['A1'].top()     # This is the top center of the well
-   plate['A1'].top(z=1)  # This is 1mm above the top center of the well
-   plate['A1'].top(z=-1) # This is 1mm below the top center of the well
-
-.. versionadded:: 2.0
-
-Bottom
-------
-
-The method :py:meth:`.Well.bottom` returns a position at the bottom center of the
-well. This is a good position to start when considering where to aspirate,
-or any other operation where you want to be contacting the liquid. In addition,
-:py:meth:`.Well.bottom` takes an optional argument ``z``, which is a distance in mm
-to move relative to the bottom vertically (positive numbers move up, and negative
-numbers move down):
-
-.. code-block:: python
-
-   plate['A1'].bottom()     # This is the bottom center of the well
-   plate['A1'].bottom(z=1)  # This is 1mm above the bottom center of the well
-   plate['A1'].bottom(z=-1) # This is 1mm below the bottom center of the well.
-                            # this may be dangerous!
-
-
-.. warning::
-
-    Negative ``z`` arguments to :py:meth:`.Well.bottom` may cause the tip to
-    collide with the bottom of the well. The OT-2 has no sensors to detect this,
-    and if it happens, the pipette that collided will be too high in z until the next time it picks up a tip.
-
-
-.. note::
-
-   If you are using this to change the position at which the robot does
-   :ref:`new-aspirate` or :ref:`new-dispense` throughout the protocol, consider
-   setting the default aspirate or dispense offset with
-   :py:obj:`.InstrumentContext.well_bottom_clearance`
-   (see :ref:`new-default-op-positions`).
-
-.. versionadded:: 2.0
-
-Center
-------
-
-The method :py:meth:`.Well.center` returns a position centered in the well both
-vertically and horizontally. This can be a good place to start for precise
-control of positions within the well for unusual or custom labware.
-
-.. code-block:: python
-
-   plate['A1'].center() # This is the vertical and horizontal center of the well
-
-.. versionadded:: 2.0
 
 
 Manipulating Positions
@@ -175,11 +175,27 @@ For example:
 .. versionadded:: 2.0
 
 
+.. _protocol-api-deck-coords:
+
+********************
+Position on the Deck
+********************
+
+
+The OT-2’s base coordinate system is known as *deck coordinates*. Many API functions use this coordinate system, and you can also reference it directly. It is a right-handed coordinate system always specified in mm, with the origin ``(0, 0, 0)`` at the front left of the robot. The positive ``x`` direction is to the right, the positive ``y`` direction is to the back, and the positive ``z`` direction is up. 
+
+You can identify a point in this coordinate system with a :py:class:`.types.Location` object, either as a standard Python :py:class:`tuple` of three floats, or as an instance of the :py:obj:`collections.namedtuple` :py:class:`opentrons.types.Point`.
+
+.. note::
+
+There are technically multiple vertical axes: ``z`` is the axis of the left pipette mount and ``a`` is the axis of the right pipette mount. There are also pipette plunger axes: ``b`` (left) and ``c`` (right). These are obscured by the API’s habit of defining motion commands on a per-pipette basis; the OT-2 internally selects the correct pipette axis to move. Likewise, :py:class:`.types.Location` only deals with ``x``, ``y``, and ``z`` values. 
+
+
 *****************
-Absolute Position
+Movement Behavior
 *****************
 
-TK section intro
+TK intro based on content below
 
 Move To
 =======
@@ -231,7 +247,7 @@ Gantry Speed
 
 The OT-2's gantry usually moves as fast as it can given its construction; this makes
 protocol execution faster and saves time. However, some experiments or liquids may
-require slower, gentler movements over protocol execution time. In this case, you
+require slower, gentler movements. In this case, you
 can alter the OT-2 gantry's speed when a specific pipette is moving by setting
 :py:obj:`.InstrumentContext.default_speed`. This is a value in mm/s that controls
 the overall speed of the gantry. Its default is 400 mm/s.
@@ -279,10 +295,10 @@ resets that axis's limit to the default:
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
-        protocol.max_speeds['X'] = 50  # limit x axis to 50 mm/s
-        del protocol.max_speeds['X']  # reset x axis limit
-        protocol.max_speeds['A'] = 10  # limit a axis to 10 mm/s
-        protocol.max_speeds['A'] = None  # reset a axis limit
+        protocol.max_speeds['X'] = 50		# limit x axis to 50 mm/s
+        del protocol.max_speeds['X']		# reset x axis limit
+        protocol.max_speeds['A'] = 10		# limit a axis to 10 mm/s
+        protocol.max_speeds['A'] = None		# reset a axis limit
 
 
 You cannot set limits for the pipette plunger axes with this mechanism; instead, set the
