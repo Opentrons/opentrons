@@ -14,6 +14,7 @@
   "modules": "modules",
   "no_available_robots_found": "No available robots found",
   "read_more": "read more",
+  "read_less": "read less",
   "reanalyze": "Reanalyze",
   "right_mount": "right mount",
   "robot": "robot",
@@ -25,5 +26,7 @@
   "unavailable_or_busy_robot_not_listed": "{{count}} unavailable or busy robot is not listed",
   "unavailable_or_busy_robot_not_listed_plural": "{{count}} unavailable or busy robots are not listed",
   "view_all_robots": "View all robots on the Devices page",
-  "view_run_details": "View run details"
+  "view_run_details": "View run details",
+  "protocol_designer_version": "Protocol Designer {{version}}",
+  "python_api_version": "Python API {{version}}"
 }

@@ -89,12 +89,12 @@ interface AnalysisSourceFile {
   name: string
   role: 'main' | 'labware'
 }
-interface JsonConfig {
-  protocolType: 'python'
+export interface JsonConfig {
+  protocolType: 'json'
   schemaVersion: number
 }
-interface PythonConfig {
-  protocolType: 'json'
+export interface PythonConfig {
+  protocolType: 'python'
   apiVersion: number
 }
 

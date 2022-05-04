@@ -1,5 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
+import { isEmpty, startCase } from 'lodash'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
@@ -41,10 +42,11 @@ import {
   getAnalysisStatus,
   getProtocolDisplayName,
 } from '../ProtocolsLanding/utils'
+import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 
 import type { State } from '../../redux/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
-import { RobotConfigurationDetails } from './RobotConfigurationDetails'
+import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 
 const defaultTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -101,6 +103,83 @@ function RoundTab({
   )
 }
 
+interface ReadMoreContentProps {
+  metadata: {
+    [key: string]: any
+  }
+  protocolType: 'json' | 'python'
+}
+
+const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
+  const { metadata, protocolType } = props
+  const { t } = useTranslation('protocol_details')
+  const [isReadMore, setIsReadMore] = React.useState(true)
+
+  const description = isEmpty(metadata.description)
+    ? t('shared:no_data')
+    : metadata.description
+
+  const getMetadataDetails = (
+    description: string,
+    protocolType: string
+  ): string | JSX.Element => {
+    if (protocolType === 'json') {
+      return description
+    } else {
+      const filteredMetaData = Object.entries(metadata)
+        .map(e => ({
+          [e[0]]: e[1],
+        }))
+        .filter(
+          item =>
+            Object.keys(item)[0] !== 'protocolName' &&
+            Object.keys(item)[0] !== 'author' &&
+            Object.keys(item)[0] !== 'apiLevel' &&
+            Object.keys(item)[0] !== 'description'
+        )
+
+      return (
+        <Flex
+          flex="1"
+          flexDirection={DIRECTION_COLUMN}
+          data-testid={`ProtocolDetails_description`}
+        >
+          {description}
+          {filteredMetaData.map(item => {
+            return (
+              <>
+                <StyledText as="h6" marginTop={SPACING.spacing3}>
+                  {startCase(Object.keys(item)[0])}
+                </StyledText>
+                <StyledText as="p">{item[Object.keys(item)[0]]}</StyledText>
+              </>
+            )
+          })}
+        </Flex>
+      )
+    }
+  }
+
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      {isReadMore
+        ? description.slice(0, 160)
+        : getMetadataDetails(description, protocolType)}
+      {(description.length > 160 || protocolType === 'python') && (
+        <Link
+          role="button"
+          css={TYPOGRAPHY.linkPSemibold}
+          marginTop={SPACING.spacing3}
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          onClick={() => setIsReadMore(!isReadMore)}
+        >
+          {isReadMore ? t('read_more') : t('read_less')}
+        </Link>
+      )}
+    </Flex>
+  )
+}
+
 interface ProtocolDetailsProps extends StoredProtocolData {}
 
 export function ProtocolDetails(
@@ -135,11 +214,26 @@ export function ProtocolDetails(
     mostRecentAnalysis
   )
 
-  // TODO: IMMEDIATELY parse real values out of analysis file for these with fallback to no data
-  const creationMethod = t('shared:no_data')
-  const author = t('shared:no_data')
-  const description = t('shared:no_data')
-  const lastAnalyzed = t('shared:no_data')
+  const getCreationMethod = (config: JsonConfig | PythonConfig): string => {
+    if (config.protocolType === 'json') {
+      return t('protocol_designer_version', {
+        version: config.schemaVersion.toFixed(1),
+      })
+    } else {
+      return t('python_api_version', {
+        version: config.apiVersion.toString().replace(',', '.'),
+      })
+    }
+  }
+
+  const creationMethod =
+    getCreationMethod(mostRecentAnalysis.config) ?? t('shared:no_data')
+  const author = isEmpty(mostRecentAnalysis.metadata.author)
+    ? t('shared:no_data')
+    : mostRecentAnalysis.metadata.author
+  const lastAnalyzed =
+    format(new Date(mostRecentAnalysis.createdAt), 'MMMM dd, yyyy HH:mm') ??
+    t('shared:no_data')
 
   const getTabContents = (): JSX.Element =>
     currentTab === 'labware' ? (
@@ -163,7 +257,11 @@ export function ProtocolDetails(
         showSlideout={showSlideout}
         storedProtocolData={props}
       />
-      <Card marginBottom={SPACING.spacing4} padding={SPACING.spacing4}>
+      <Card
+        marginBottom={SPACING.spacing4}
+        padding={SPACING.spacing4}
+        backgroundColor={COLORS.white}
+      >
         {analysisStatus !== 'loading' &&
         mostRecentAnalysis != null &&
         mostRecentAnalysis.errors.length > 0 ? (
@@ -186,6 +284,7 @@ export function ProtocolDetails(
           </StyledText>
           <OverflowMenu
             protocolKey={protocolKey}
+            protocolType={mostRecentAnalysis.config.protocolType}
             data-testid={`ProtocolDetails_overFlowMenu`}
           />
         </Flex>
@@ -257,17 +356,15 @@ export function ProtocolDetails(
           >
             <StyledText as="h6">{t('description')}</StyledText>
             <StyledText as="p">
-              {analysisStatus === 'loading' ? t('shared:loading') : description}
+              {analysisStatus === 'loading' ? (
+                t('shared:loading')
+              ) : (
+                <ReadMoreContent
+                  metadata={mostRecentAnalysis.metadata}
+                  protocolType={mostRecentAnalysis.config.protocolType}
+                />
+              )}
             </StyledText>
-            <Link
-              onClick={() =>
-                console.log(
-                  'TODO: truncate description if more than three lines'
-                )
-              }
-            >
-              {t('read_more')}
-            </Link>
           </Flex>
         </Flex>
       </Card>
