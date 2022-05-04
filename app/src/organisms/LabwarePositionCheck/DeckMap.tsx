@@ -25,7 +25,7 @@ import {
   useModuleRenderInfoForProtocolById,
 } from '../../organisms/Devices/hooks'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
-import styles from '../styles.css'
+import styles from './styles.css'
 
 const DECK_MAP_VIEWBOX = '-80 -20 550 460'
 const DECK_LAYER_BLOCKLIST = [
