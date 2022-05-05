@@ -10,6 +10,10 @@ from .errors import exception_handlers
 from .hardware import initialize_hardware, cleanup_hardware
 from .router import router
 from .service import initialize_logging
+from .service.task_runner import (
+    initialize_task_runner,
+    clean_up_task_runner,
+)
 from .settings import get_settings
 
 log = logging.getLogger(__name__)
@@ -50,6 +54,7 @@ async def on_startup() -> None:
 
     initialize_logging()
     initialize_hardware(app.state)
+    initialize_task_runner(app.state)
 
 
 @app.on_event("shutdown")
@@ -57,6 +62,7 @@ async def on_shutdown() -> None:
     """Handle app shutdown."""
     shutdown_results = await asyncio.gather(
         cleanup_hardware(app.state),
+        clean_up_task_runner(app.state),
         return_exceptions=True,
     )
 

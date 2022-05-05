@@ -28,6 +28,8 @@ import {
 import {
   parseInitialPipetteNamesByMount,
   parseInitialLoadedModulesBySlot,
+  parseInitialLoadedLabwareBySlot,
+  parseInitialLoadedLabwareByModuleId,
 } from '@opentrons/api-client'
 
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
@@ -38,11 +40,12 @@ import { PrimaryButton } from '../../atoms/Buttons'
 import { Divider } from '../../atoms/structure'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { OverflowMenu } from './OverflowMenu'
+import { RobotConfigurationDetails } from './RobotConfigurationDetails'
+import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import {
   getAnalysisStatus,
   getProtocolDisplayName,
 } from '../ProtocolsLanding/utils'
-import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 
 import type { State } from '../../redux/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -208,6 +211,15 @@ export function ProtocolDetails(
     )
   )
 
+  const requiredLabwareDetails = map({
+    ...parseInitialLoadedLabwareByModuleId(
+      mostRecentAnalysis.commands != null ? mostRecentAnalysis.commands : []
+    ),
+    ...parseInitialLoadedLabwareBySlot(
+      mostRecentAnalysis.commands != null ? mostRecentAnalysis.commands : []
+    ),
+  }).filter(labware => labware.result.definition.parameters.format !== 'trash')
+
   const protocolDisplayName = getProtocolDisplayName(
     protocolKey,
     srcFileNames,
@@ -237,7 +249,7 @@ export function ProtocolDetails(
 
   const getTabContents = (): JSX.Element =>
     currentTab === 'labware' ? (
-      <Box>TODO: labware tab contents</Box>
+      <ProtocolLabwareDetails requiredLabwareDetails={requiredLabwareDetails} />
     ) : (
       <RobotConfigurationDetails
         leftMountPipetteName={leftMountPipetteName}

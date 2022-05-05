@@ -11,7 +11,7 @@ from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
-from robot_server.service.task_runner import TaskRunner
+from robot_server.service.task_runner import TaskRunner, get_task_runner
 
 from ..run_store import RunStore, RunNotFoundError
 from ..action_models import RunAction, RunActionType, RunActionCreate
@@ -51,7 +51,7 @@ async def create_run_action(
     engine_store: EngineStore = Depends(get_engine_store),
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
-    task_runner: TaskRunner = Depends(TaskRunner),
+    task_runner: TaskRunner = Depends(get_task_runner),
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 

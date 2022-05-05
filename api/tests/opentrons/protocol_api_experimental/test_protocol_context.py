@@ -394,10 +394,16 @@ def test_load_thermocycler(
     )
 
     result = subject.load_module(module_name=module_name)
-    assert result == module_contexts.ThermocyclerModuleContext(module_id="abc123")
+    assert result == module_contexts.ThermocyclerModuleContext(
+        module_id="abc123",
+        engine_client=engine_client,
+    )
 
     result = subject.load_module(module_name=module_name, location="7")
-    assert result == module_contexts.ThermocyclerModuleContext(module_id="abc123")
+    assert result == module_contexts.ThermocyclerModuleContext(
+        module_id="abc123",
+        engine_client=engine_client,
+    )
 
 
 @pytest.mark.parametrize(
