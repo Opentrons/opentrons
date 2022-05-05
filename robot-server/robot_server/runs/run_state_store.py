@@ -63,7 +63,10 @@ class RunStateStore:
             run_state_table.c.run_id == run_id
         )
         with self._sql_engine.begin() as transaction:
-            state_row = transaction.execute(statement).one()
+            try:
+                state_row = transaction.execute(statement).one()
+            except sqlalchemy.exc.NoResultFound:
+                raise RunNotFoundError(run_id=run_id)
         return _convert_sql_row_to_sql_run_state(state_row)
 
 

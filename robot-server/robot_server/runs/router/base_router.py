@@ -212,6 +212,7 @@ async def create_run(
 async def get_runs(
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
+    run_state_store: RunStateStore = Depends(get_run_state_store)
 ) -> PydanticResponse[MultiBody[RunSummary, AllRunsLinks]]:
     """Get all runs.
 
@@ -224,13 +225,17 @@ async def get_runs(
 
     for run in run_store.get_all():
         run_id = run.run_id
-        engine_state = engine_store.get_state(run_id)
+        try:
+            engine_status = run_state_store.get(run_id).engine_status
+        #TODO (tz): change this once get_state PR is worked on
+        except RunNotFoundError:
+            engine_status = EngineStatus.STOPPED
         run_data = RunSummary.construct(
             id=run_id,
             protocolId=run.protocol_id,
             createdAt=run.created_at,
             current=run.is_current,
-            status=engine_state.commands.get_status(),
+            status=engine_status
         )
 
         data.append(run_data)
