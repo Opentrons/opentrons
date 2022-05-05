@@ -54,7 +54,7 @@ export function ReapplyOffsetsModal(
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const clearAllOffsets = useClearAllOffsetsForCurrentRun()
 
-  const handleApply = () => {
+  const handleApply = (): void => {
     if (offsetCandidates.length > 0) {
       offsetCandidates.forEach(offsetCandidate => {
         if (!isEqual(offsetCandidate.vector, IDENTITY_VECTOR)) {
@@ -88,7 +88,7 @@ export function ReapplyOffsetsModal(
             <OffsetTableHeader>{t('labware_offset_data')}</OffsetTableHeader>
           </tr>
           {offsetCandidates.map(offset => (
-            <OffsetTableRow>
+            <OffsetTableRow key={offset.id}>
               <OffsetTableDatum>{offset.location.slotName}</OffsetTableDatum>
               <OffsetTableDatum>TODO</OffsetTableDatum>
               <OffsetTableDatum>{offset.labwareDisplayName}</OffsetTableDatum>

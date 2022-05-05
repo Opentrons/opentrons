@@ -40,9 +40,6 @@ const mockProtocolDetails: ProtocolDetails = {
 }
 
 describe('useClearAllOffsetsForCurrentRun', () => {
-  const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-    <div>{children}</div>
-  )
   let mockCreateOffset: jest.MockedFunction<
     ReturnType<typeof useCreateLabwareOffsetMutation>['createLabwareOffset']
   >
