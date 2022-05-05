@@ -27,12 +27,11 @@ import type { HostConfig } from '@opentrons/api-client'
 import type { LabwarePositionCheckStep } from '../../types'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../../redux/analytics')
-jest.mock('../../../../../redux/modules')
-jest.mock('../../../../Devices/hooks')
-jest.mock('../../../../ProtocolUpload/hooks')
-jest.mock('../../../../Devices/hooks')
-jest.mock('../../../utils/getLabwareLocation')
+jest.mock('../../../../redux/analytics')
+jest.mock('../../../../redux/modules')
+jest.mock('../../../Devices/hooks')
+jest.mock('../../../ProtocolUpload/hooks')
+jest.mock('../../../ProtocolSetup/utils/getLabwareLocation')
 jest.mock('../useSteps')
 
 const queryClient = new QueryClient()

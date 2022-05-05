@@ -14,9 +14,9 @@ import { useIntroInfo, useLabwareOffsets } from '../hooks'
 import { Section } from '../types'
 import { useLPCSuccessToast } from '../../ProtocolSetup/hooks'
 
-jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../../../Devices/hooks')
-jest.mock('../../hooks')
+jest.mock('../../ProtocolUpload/hooks')
+jest.mock('../../Devices/hooks')
+jest.mock('../../ProtocolSetup/hooks')
 jest.mock('../SectionList')
 jest.mock('../hooks')
 jest.mock('../DeckMap')

@@ -20,8 +20,6 @@ const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
 const MODULE_SETUP_KEY = 'module_setup_step' as const
 const LABWARE_SETUP_KEY = 'labware_setup_step' as const
 
-const INITIAL_EXPAND_DELAY_MS = 700
-
 export type StepKey =
   | typeof ROBOT_CALIBRATION_STEP_KEY
   | typeof MODULE_SETUP_KEY

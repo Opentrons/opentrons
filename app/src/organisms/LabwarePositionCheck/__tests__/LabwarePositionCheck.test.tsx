@@ -14,7 +14,7 @@ import { ExitPreventionModal } from '../ExitPreventionModal'
 import { useSteps, useLabwarePositionCheck } from '../hooks'
 import type { LabwarePositionCheckStep } from '../types'
 
-jest.mock('../../../../redux/analytics')
+jest.mock('../../../redux/analytics')
 jest.mock('../GenericStepScreen')
 jest.mock('../IntroScreen')
 jest.mock('../SummaryScreen')

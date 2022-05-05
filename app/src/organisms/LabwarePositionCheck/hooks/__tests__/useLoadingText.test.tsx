@@ -12,8 +12,8 @@ import type {
   PickUpTipCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 
-jest.mock('../../../../Devices/hooks')
-jest.mock('../../../utils/getLabwareLocation')
+jest.mock('../../../Devices/hooks')
+jest.mock('../../../ProtocolSetup/utils/getLabwareLocation')
 
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun

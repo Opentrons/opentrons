@@ -17,7 +17,7 @@ import {
   useModuleRenderInfoForProtocolById,
 } from '../../Devices/hooks'
 import { useCurrentRun, useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { getLatestLabwareOffsetCount } from '../../LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
+import { getLatestLabwareOffsetCount } from '../utils/getLatestLabwareOffsetCount'
 import { SectionList } from '../SectionList'
 import { useIntroInfo, useLabwareIdsBySection } from '../hooks'
 import { IntroScreen, INTERVAL_MS } from '../IntroScreen'
@@ -26,9 +26,9 @@ import type { HostConfig, LabwareOffset } from '@opentrons/api-client'
 
 jest.mock('../hooks')
 jest.mock('../SectionList')
-jest.mock('../../../Devices/hooks')
-jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../../LabwarePositionCheck/utils/getLatestLabwareOffsetCount')
+jest.mock('../../Devices/hooks')
+jest.mock('../../ProtocolUpload/hooks')
+jest.mock('../utils/getLatestLabwareOffsetCount')
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')

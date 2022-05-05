@@ -81,7 +81,12 @@ describe('useOffsetCandidatesForCurrentRun', () => {
     const { result } = renderHook(useOffsetCandidatesForCurrentRun, {
       wrapper,
     })
-    expect(result.current).toEqual([FAKE_OFFSET_TIPRACK_IN_2])
+    expect(result.current).toEqual([
+      {
+        ...FAKE_OFFSET_TIPRACK_IN_2,
+        labwareDisplayName: 'Opentrons 96 Tip Rack 300 µL',
+      },
+    ])
   })
   it('returns first candidate offset if multiple available', () => {
     when(mockUseHistoricRunDetails)
@@ -90,8 +95,8 @@ describe('useOffsetCandidatesForCurrentRun', () => {
         {
           ...mockRunningRun,
           labwareOffsets: [
-            {...FAKE_OFFSET_TIPRACK_IN_2, id: 'first'},
-            {...FAKE_OFFSET_TIPRACK_IN_2, id: 'second'},
+            { ...FAKE_OFFSET_TIPRACK_IN_2, id: 'first' },
+            { ...FAKE_OFFSET_TIPRACK_IN_2, id: 'second' },
           ],
         },
       ])
@@ -99,7 +104,13 @@ describe('useOffsetCandidatesForCurrentRun', () => {
     const { result } = renderHook(useOffsetCandidatesForCurrentRun, {
       wrapper,
     })
-    expect(result.current).toEqual([{...FAKE_OFFSET_TIPRACK_IN_2, id: 'first'}])
+    expect(result.current).toEqual([
+      {
+        ...FAKE_OFFSET_TIPRACK_IN_2,
+        id: 'first',
+        labwareDisplayName: 'Opentrons 96 Tip Rack 300 µL',
+      },
+    ])
   })
   it('returns candidate offset from module location', () => {
     when(mockUseHistoricRunDetails)
@@ -107,14 +118,19 @@ describe('useOffsetCandidatesForCurrentRun', () => {
       .mockReturnValue([
         {
           ...mockRunningRun,
-          labwareOffsets: [ FAKE_OFFSET_PLATE_ON_TC ],
+          labwareOffsets: [FAKE_OFFSET_PLATE_ON_TC],
         },
       ])
 
     const { result } = renderHook(useOffsetCandidatesForCurrentRun, {
       wrapper,
     })
-    expect(result.current).toEqual([FAKE_OFFSET_PLATE_ON_TC])
+    expect(result.current).toEqual([
+      {
+        ...FAKE_OFFSET_PLATE_ON_TC,
+        labwareDisplayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
+      },
+    ])
   })
   it('returns no candidate offset if location does not match', () => {
     when(mockUseHistoricRunDetails)
@@ -122,7 +138,9 @@ describe('useOffsetCandidatesForCurrentRun', () => {
       .mockReturnValue([
         {
           ...mockRunningRun,
-          labwareOffsets: [ {...FAKE_OFFSET_TIPRACK_IN_2, location: {slotName: '11'}}],
+          labwareOffsets: [
+            { ...FAKE_OFFSET_TIPRACK_IN_2, location: { slotName: '11' } },
+          ],
         },
       ])
 
@@ -137,7 +155,9 @@ describe('useOffsetCandidatesForCurrentRun', () => {
       .mockReturnValue([
         {
           ...mockRunningRun,
-          labwareOffsets: [ {...FAKE_OFFSET_TIPRACK_IN_2, definitionUri: 'someBogusDefURI'}],
+          labwareOffsets: [
+            { ...FAKE_OFFSET_TIPRACK_IN_2, definitionUri: 'someBogusDefURI' },
+          ],
         },
       ])
 

@@ -9,7 +9,7 @@ import { getLatestLabwareOffsetCount } from '../../LabwarePositionCheck/utils/ge
 import type { LabwareOffset } from '@opentrons/api-client'
 
 jest.mock('../../ProtocolUpload/hooks')
-jest.mock('../LabwarePositionCheck/utils/getLatestLabwareOffsetCount')
+jest.mock('../../LabwarePositionCheck/utils/getLatestLabwareOffsetCount')
 
 const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
   typeof useCurrentRun

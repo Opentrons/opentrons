@@ -16,11 +16,10 @@ import type { LoadLabwareCreateCommand } from '@opentrons/shared-data/protocol/t
 
 jest.mock('@opentrons/shared-data')
 jest.mock('../../getLabwarePositionCheckSteps')
-jest.mock('../../../../../redux/protocol')
-jest.mock('../../../utils/getPipetteMount')
-jest.mock('../../../utils/getLabwareLocation')
-jest.mock('../../../../Devices/hooks/useProtocolDetailsForRun')
-jest.mock('../../../../ProtocolUpload/hooks')
+jest.mock('../../../ProtocolSetup/utils/getPipetteMount')
+jest.mock('../../../ProtocolSetup/utils/getLabwareLocation')
+jest.mock('../../../Devices/hooks/useProtocolDetailsForRun')
+jest.mock('../../../ProtocolUpload/hooks')
 
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
 const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME' as PipetteName

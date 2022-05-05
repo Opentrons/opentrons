@@ -1,5 +1,5 @@
 import * as React from 'react'
-import '../../../LabwarePositionCheck/__tests__/node_modules/@testing-library/jest-dom'
+import '@testing-library/jest-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
 

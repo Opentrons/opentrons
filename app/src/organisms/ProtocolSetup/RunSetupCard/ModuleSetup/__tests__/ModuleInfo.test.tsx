@@ -1,5 +1,5 @@
 import React from 'react'
-import '../../../../LabwarePositionCheck/__tests__/node_modules/@testing-library/jest-dom'
+import '@testing-library/jest-dom'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import { ModuleInfo } from '../ModuleInfo'
 import { renderWithProviders } from '@opentrons/components'

@@ -56,7 +56,7 @@ const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnaly
 describe('useProtocolDetailsForRun hook', () => {
   beforeEach(() => {
     when(mockUseRunQuery)
-      .calledWith(null)
+      .calledWith(null, {staleTime: Infinity})
       .mockReturnValue({} as UseQueryResult<Run>)
     when(mockUseProtocolQuery)
       .calledWith(null, { staleTime: Infinity }, true)
@@ -87,7 +87,7 @@ describe('useProtocolDetailsForRun hook', () => {
       status: 'completed',
     } as CompletedProtocolAnalysis
     when(mockUseRunQuery)
-      .calledWith(RUN_ID_2)
+      .calledWith(RUN_ID_2, {staleTime: Infinity})
       .mockReturnValue({
         data: { data: { protocolId: PROTOCOL_ID } } as any,
       } as UseQueryResult<Run>)

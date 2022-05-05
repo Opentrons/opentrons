@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import '../../LabwarePositionCheck/__tests__/node_modules/@testing-library/jest-dom'
+import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import * as CustomLabware from '../../../redux/custom-labware'

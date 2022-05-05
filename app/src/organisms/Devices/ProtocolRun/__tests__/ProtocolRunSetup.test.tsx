@@ -152,19 +152,11 @@ describe('ProtocolRunSetup', () => {
       expect(queryByText(/module setup/i)).toBeNull()
     })
 
-    it('defaults to labware step expanded if calibration complete', async () => {
-      const { getByText } = render()
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(getByText('Mock SetupLabware')).toBeVisible()
-    })
-
-    it('defaults to robot calibration step expanded if calibration incomplete', async () => {
-      when(mockUseRunCalibrationStatus)
-        .calledWith(ROBOT_NAME, RUN_ID)
-        .mockReturnValue({ complete: false })
-      const { getByText } = render()
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
+    it('defaults to no step expanded', () => {
+      const { queryByText } = render()
+      expect(queryByText('Mock SetupLabware')).toBeNull()
+      expect(queryByText('Mock SetupModules')).toBeNull()
+      expect(queryByText('Mock SetupRobotCalibration')).toBeNull()
     })
   })
 
@@ -241,24 +233,6 @@ describe('ProtocolRunSetup', () => {
       getByText(
         'Position full tip racks and labware in the deck slots as shown in the deck map.'
       )
-    })
-
-    it('defaults to module step expanded if calibration complete and modules present', async () => {
-      const { queryByText, getByText } = render()
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(getByText('mock SetupModules')).toBeVisible()
-      expect(queryByText('Mock SetupLabware')).not.toBeVisible()
-    })
-
-    it('defaults to robot calibration step expanded if calibration incomplete and modules present', async () => {
-      when(mockUseRunCalibrationStatus)
-        .calledWith(ROBOT_NAME, RUN_ID)
-        .mockReturnValue({ complete: false })
-
-      const { queryByText, getByText } = render()
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
-      expect(queryByText('mock SetupModules')).not.toBeVisible()
     })
   })
 })

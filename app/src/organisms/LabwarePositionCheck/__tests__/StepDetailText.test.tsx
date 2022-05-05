@@ -14,7 +14,7 @@ import { LabwarePositionCheckStepDetailModal } from '../LabwarePositionCheckStep
 import { StepDetailText } from '../StepDetailText'
 
 jest.mock('../LabwarePositionCheckStepDetailModal')
-jest.mock('../../../Devices/hooks')
+jest.mock('../../Devices/hooks')
 
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun

@@ -37,9 +37,9 @@ jest.mock('@opentrons/shared-data', () => {
     getIsTiprack: jest.fn(),
   }
 })
-jest.mock('../../../Devices/hooks')
+jest.mock('../../Devices/hooks')
 jest.mock('../StepDetailText')
-jest.mock('../../../../molecules/JogControls')
+jest.mock('../../../molecules/JogControls')
 
 const mockStepDetailText = StepDetailText as jest.MockedFunction<
   typeof StepDetailText
