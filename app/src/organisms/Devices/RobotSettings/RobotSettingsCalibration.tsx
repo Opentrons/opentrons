@@ -463,8 +463,8 @@ export function RobotSettingsCalibration({
                 <React.Fragment key={index}>
                   <PipetteOffsetCalDetailItem
                     attachedPipettes={attachedPipettes}
-                    model={calibration.id}
-                    serial={calibration.pipette}
+                    pipetteModel={calibration.id}
+                    pipetteSerial={calibration.pipette}
                     mount={calibration.mount}
                     attached={true}
                     tiprack={calibration.tiprackUri}
@@ -487,13 +487,15 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing3}>
               {t('tip_length_calibrations_description')}
             </StyledText>
-            {tipLengthCalibrations?.map(tip => (
-              <>
-                <StyledText as="p">{tip?.uri}</StyledText>
-                <StyledText as="p">{tip?.pipette}</StyledText>
-                <StyledText as="p">{tip?.lastModified}</StyledText>
-                {/* <StyledText as="p">{calibration.}</StyledText> */}
-              </>
+            {tipLengthCalibrations?.map((tip, index) => (
+              <React.Fragment key={index}>
+                <TipLengthCalDetailItem
+                  tiprack={tip?.uri}
+                  pipetteModel={tip?.pipette}
+                  pipetteSerial={tip?.pipette}
+                  lastCalibrated={tip?.lastModified}
+                />
+              </React.Fragment>
             ))}
           </Box>
         </Flex>
@@ -525,10 +527,17 @@ export function RobotSettingsCalibration({
   )
 }
 
+// TODO: utils
+const formatLastCalibrated = (lastModified: string): string => {
+  return typeof lastModified === 'string'
+    ? format(new Date(lastModified), 'M/d/yyyy HH:mm:ss')
+    : 'unknown'
+}
+
 interface PipetteOffsetCalDetailItemProps {
   attachedPipettes: AttachedPipettesByMount
-  model: string
-  serial: string
+  pipetteModel: string
+  pipetteSerial: string
   mount: string
   attached: boolean
   tiprack: string
@@ -536,8 +545,8 @@ interface PipetteOffsetCalDetailItemProps {
 }
 
 function PipetteOffsetCalDetailItem({
-  model,
-  serial,
+  pipetteModel,
+  pipetteSerial,
   mount,
   attached,
   tiprack,
@@ -545,28 +554,16 @@ function PipetteOffsetCalDetailItem({
 }: PipetteOffsetCalDetailItemProps): JSX.Element {
   const { t } = useTranslation('shared')
 
-  const formatLastModified = (lastModified: string): string => {
-    return typeof lastModified === 'string'
-      ? format(new Date(lastModified), 'M/d/yyyy HH:mm:ss')
-      : 'unknown'
-  }
-
   return (
     <>
       <Divider />
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        // paddingX={SPACING.spacing4}
-        // paddingY={SPACING.spacing4}
-        alignItems={ALIGN_CENTER}
-        // justifyContent={JUSTIFY_SPACE_BETWEEN}
-      >
+      <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText as="p" width="10rem">
-            {serial}
+            {pipetteModel}
           </StyledText>
           <StyledText as="p" width="10rem">
-            {serial}
+            {pipetteSerial}
           </StyledText>
         </Flex>
         <StyledText as="p" width="2.5rem" marginRight={SPACING.spacing4}>
@@ -583,18 +580,59 @@ function PipetteOffsetCalDetailItem({
             {tiprack}
           </StyledText>
         </Flex>
+        <StyledText as="p">{formatLastCalibrated(lastCalibrated)}</StyledText>
+      </Flex>
+    </>
+  )
+}
+
+interface TipLengthCalDetailItemProps {
+  tiprack: string
+  pipetteModel: string
+  pipetteSerial: string
+  lastCalibrated: string
+}
+
+function TipLengthCalDetailItem({
+  tiprack,
+  pipetteModel,
+  pipetteSerial,
+  lastCalibrated,
+}: TipLengthCalDetailItemProps): JSX.Element {
+  return (
+    <>
+      <Divider />
+      <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+        <Flex
+          css={{ 'word-wrap': 'break-word' }}
+          marginRight={SPACING.spacing4}
+        >
+          <StyledText as="p" width="13.375rem" marginRight={SPACING.spacing4}>
+            {tiprack}
+          </StyledText>
+        </Flex>
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <StyledText as="p" width="13.375rem">
+            {pipetteModel}
+          </StyledText>
+          <StyledText as="p" width="10rem">
+            {pipetteSerial}
+          </StyledText>
+        </Flex>
+        <StyledText as="p" width="8.5rem" height="2.5rem">
+          {lastCalibrated}
+        </StyledText>
         <StyledText as="p">{formatLastModified(lastCalibrated)}</StyledText>
       </Flex>
     </>
   )
 }
 
-// interface PipetteOverflowMenuProps {}
+interface CalibrationsOverflowMenuProps {
+  calType: 'pipetteOffset' | 'tipLength'
+}
 
-// function PipetteOverflowMenu({}: PipetteOverflowMenuProps): JSX.Element {
-//   const { t } = useTranslation('device_settings')
-//   return (
-//     <>
-//     </>
-//   )
-// }
+function CalibrationsOverflowMenu({}: CalibrationsOverflowMenuProps): JSX.Element {
+  const { t } = useTranslation('device_settings')
+  return <></>
+}
