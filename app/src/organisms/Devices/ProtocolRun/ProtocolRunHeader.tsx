@@ -66,6 +66,7 @@ import {
   useAttachedModules,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
+  useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
@@ -122,17 +123,13 @@ export function ProtocolRunHeader({
   const heaterShakerFromProtocol = useHeaterShakerFromProtocol()
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const runRecord = useRunQuery(runId)
+  const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const { displayName } = useProtocolDetailsForRun(runId)
 
   // this duplicates the run query above but has additional run status processing logic
   const runStatus = useRunStatus(runId)
 
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
-
-  const createdAtTimestamp =
-    runRecord?.data?.data.createdAt != null
-      ? formatTimestamp(runRecord?.data?.data.createdAt)
-      : '--:--:--'
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : '--:--:--'

@@ -67,7 +67,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         isExpanded={showSlideout}
         onCloseClick={() => setShowSlideout(false)}
       >
-        <Box height="26rem">
+        <Box marginTop={SPACING.spacing4}>
           <UploadInput onUpload={() => setShowSlideout(false)} />
         </Box>
       </Slideout>

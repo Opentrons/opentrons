@@ -6,7 +6,7 @@ import { app, shell } from 'electron'
 
 import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storage'
 import type { Dirent } from 'fs'
-import { analyzeProtocolSource } from '../python'
+import { analyzeProtocolSource } from '../protocol-analysis'
 
 /**
  * Module for managing local protocol files on the host filesystem

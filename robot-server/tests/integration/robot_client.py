@@ -98,6 +98,7 @@ class RobotClient:
 
     async def wait_until_dead(self, timeout_sec: float = SHUTDOWN_WAIT) -> bool:
         """Retry the /health and /openapi.json until both unreachable."""
+        print("wait_until_dead")
         try:
             await asyncio.wait_for(self._poll_for_dead(), timeout=timeout_sec)
             return True

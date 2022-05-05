@@ -4,7 +4,6 @@ import logging
 from fastapi import APIRouter, Depends, status
 from datetime import datetime
 from typing import Union
-
 from typing_extensions import Literal
 
 from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
@@ -12,7 +11,7 @@ from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
-from robot_server.service.task_runner import TaskRunner
+from robot_server.service.task_runner import TaskRunner, get_task_runner
 
 from ..run_state_store import RunStateStore
 from ..run_store import RunStore, RunNotFoundError
@@ -52,7 +51,7 @@ async def create_run_action(
     engine_store: EngineStore = Depends(get_engine_store),
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
-    task_runner: TaskRunner = Depends(TaskRunner),
+    task_runner: TaskRunner = Depends(get_task_runner),
     run_state_store: RunStateStore = Depends(get_run_state_store),
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
