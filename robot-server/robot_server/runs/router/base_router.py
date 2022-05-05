@@ -226,7 +226,7 @@ async def get_runs(
     for run in run_store.get_all():
         run_id = run.run_id
         try:
-            engine_status = run_state_store.get(run_id).engine_status
+            engine_status = EngineStatus(run_state_store.get(run_id).engine_status)
         #TODO (tz): change this once get_state PR is worked on
         except RunNotFoundError:
             engine_status = EngineStatus.STOPPED
