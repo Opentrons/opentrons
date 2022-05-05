@@ -98,7 +98,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
             to={`/devices/${robot.name}/robot-settings`}
             as={Link}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
+            data-testid={`RobotOverflowMenu_${robot.name}_robotSettings`}
           >
             {t('robot_settings')}
           </MenuItem>
