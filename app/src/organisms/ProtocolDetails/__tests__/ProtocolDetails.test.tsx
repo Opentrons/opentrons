@@ -57,7 +57,7 @@ const render = (
 const protocolType = 'json'
 const schemaVersion = 6
 const author = 'Otie'
-const createdAt = 123456
+const createdAt = '2022-05-04T18:33:48.916159+00:00'
 const description = 'fake protocol description'
 
 describe('ProtocolDetails', () => {
@@ -188,7 +188,7 @@ describe('ProtocolDetails', () => {
       },
     })
     getByRole('heading', { name: 'last analyzed' })
-    getByText('December 31, 1969 19:02')
+    getByText('May 04, 2022 14:33')
   })
   it('renders the protocol description', () => {
     const { getByRole, getByText } = render({
