@@ -48,6 +48,7 @@ import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalHeader } from './CalibrationsTable/PipetteOffsetCalHeader'
 import { TipLengthCalHeader } from './CalibrationsTable/TipLengthCalHeader'
+import { OverflowMenu } from './CalibrationsTable/OverflowMenu'
 
 import type { State } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
@@ -272,41 +273,6 @@ export function RobotSettingsCalibration({
   // console.log('showConfirmStart', showConfirmStart)
   // console.log('pipOffsetDataPresent', pipOffsetDataPresent)
 
-  const demoPippet = [
-    {
-      id: 'P20SV202019072546&right',
-      pipette: 'P20SV202019072546',
-      mount: 'right',
-      offset: [7, 1, 0],
-      tiprack:
-        '60e107ba7e6e5d23beefe9f0c888f860f7b923c71906aaa5e7f460ab25c4f38a',
-      tiprackUri: 'opentrons/opentrons_96_tiprack_20ul/1',
-      lastModified: '2021-11-15T21:39:32.768556+00:00',
-      source: 'user',
-      status: {
-        markedBad: false,
-        source: null,
-        markedAt: null,
-      },
-    },
-    {
-      id: 'P1KSV222021011802&left',
-      pipette: 'P1KSV222021011802',
-      mount: 'left',
-      offset: [-1.7763568394002505e-15, 0, -5],
-      tiprack:
-        'f979b7278ee3e6c4a13a6336cc6a602688f916ab2962de49263a1af5b513a533',
-      tiprackUri: 'opentrons/opentrons_96_tiprack_1000ul/1',
-      lastModified: '2022-03-30T00:10:01.533919+00:00',
-      source: 'user',
-      status: {
-        markedBad: false,
-        source: null,
-        markedAt: null,
-      },
-    },
-  ]
-
   React.useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
       createRequestId.current = null
@@ -401,6 +367,7 @@ export function RobotSettingsCalibration({
             {pipetteOffsetCalibrations?.map((calibration, index) => (
               <React.Fragment key={index}>
                 <PipetteOffsetCalDetailItem
+                  robotName={robotName}
                   attachedPipettes={attachedPipettes}
                   pipetteModel={calibration.id}
                   pipetteSerial={calibration.pipette}
@@ -430,6 +397,7 @@ export function RobotSettingsCalibration({
             {tipLengthCalibrations?.map((calibration, index) => (
               <React.Fragment key={index}>
                 <TipLengthCalDetailItem
+                  robotName={robotName}
                   tiprack={calibration?.uri}
                   pipetteModel={calibration?.pipette}
                   pipetteSerial={calibration?.pipette}
@@ -475,6 +443,7 @@ const formatLastCalibrated = (lastModified: string): string => {
 }
 
 interface PipetteOffsetCalDetailItemProps {
+  robotName: string
   attachedPipettes: AttachedPipettesByMount
   pipetteModel: string
   pipetteSerial: string
@@ -485,6 +454,8 @@ interface PipetteOffsetCalDetailItemProps {
 }
 
 function PipetteOffsetCalDetailItem({
+  robotName,
+  attachedPipettes,
   pipetteModel,
   pipetteSerial,
   mount,
@@ -517,15 +488,17 @@ function PipetteOffsetCalDetailItem({
             {tiprack}
           </StyledText>
         </Flex>
-        <StyledText as="p" marginLeft={SPACING.spacing4}>
+        <StyledText as="p" marginLeft={SPACING.spacing4} width="7.375rem">
           {formatLastCalibrated(lastCalibrated)}
         </StyledText>
+        <OverflowMenu calType="pipetteOffset" robotName={robotName} />
       </Flex>
     </>
   )
 }
 
 interface TipLengthCalDetailItemProps {
+  robotName: string
   tiprack: string
   pipetteModel: string
   pipetteSerial: string
@@ -533,6 +506,7 @@ interface TipLengthCalDetailItemProps {
 }
 
 function TipLengthCalDetailItem({
+  robotName,
   tiprack,
   pipetteModel,
   pipetteSerial,
@@ -561,16 +535,8 @@ function TipLengthCalDetailItem({
         <StyledText as="p" width="12.5rem">
           {formatLastCalibrated(lastCalibrated)}
         </StyledText>
+        <OverflowMenu calType="tipLength" robotName={robotName} />
       </Flex>
     </>
   )
-}
-
-interface CalibrationsOverflowMenuProps {
-  calType: 'pipetteOffset' | 'tipLength'
-}
-
-function CalibrationsOverflowMenu({}: CalibrationsOverflowMenuProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
-  return <></>
 }

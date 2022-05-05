@@ -22,8 +22,7 @@ export function TipLengthCalHeader(): JSX.Element {
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.darkBlack}
-          marginRight={SPACING.spacing4}
-          width="13.375em"
+          width="13.375rem"
           data-testid={'tip_length_calibrations_tiprack'}
         >
           {t('table_header_tiprack')}
@@ -32,7 +31,7 @@ export function TipLengthCalHeader(): JSX.Element {
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.darkBlack}
-          marginRight={SPACING.spacing4}
+          marginLeft={SPACING.spacing4}
           width="11.75rem"
           data-testid={'tip_length_calibrations_model_and_serial'}
         >
