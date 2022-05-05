@@ -462,10 +462,6 @@ async def test_get_runs_not_empty(
         created_at=created_at_1,
         actions=[],
         is_current=False,
-        errors=[],
-        pipettes=[],
-        labware=[],
-        labwareOffsets=[],
     )
 
     run_2 = RunResource(
@@ -474,10 +470,6 @@ async def test_get_runs_not_empty(
         created_at=created_at_2,
         actions=[],
         is_current=True,
-        errors=[],
-        pipettes=[],
-        labware=[],
-        labwareOffsets=[],
     )
 
     response_1 = Run(
@@ -507,9 +499,22 @@ async def test_get_runs_not_empty(
     )
 
     decoy.when(mock_run_store.get_all()).then_return([run_1, run_2])
-
     engine_state_1 = decoy.mock(cls=StateView)
+    decoy.when(engine_state_1.commands.get_all_errors()).then_return([])
+    decoy.when(engine_state_1.pipettes.get_all()).then_return([])
+    decoy.when(engine_state_1.labware.get_all()).then_return([])
+    decoy.when(engine_state_1.labware.get_labware_offsets()).then_return([])
+    decoy.when(engine_state_1.commands.get_status()).then_return(
+        pe_types.EngineStatus.SUCCEEDED
+    )
     engine_state_2 = decoy.mock(cls=StateView)
+    decoy.when(engine_state_2.commands.get_all_errors()).then_return([])
+    decoy.when(engine_state_2.pipettes.get_all()).then_return([])
+    decoy.when(engine_state_2.labware.get_all()).then_return([])
+    decoy.when(engine_state_2.labware.get_labware_offsets()).then_return([])
+    decoy.when(engine_state_2.commands.get_status()).then_return(
+        pe_types.EngineStatus.SUCCEEDED
+    )
 
     decoy.when(mock_engine_store.get_state("unique-id-1")).then_return(engine_state_1)
     decoy.when(mock_engine_store.get_state("unique-id-2")).then_return(engine_state_2)
