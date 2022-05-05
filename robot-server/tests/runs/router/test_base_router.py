@@ -462,6 +462,10 @@ async def test_get_runs_not_empty(
         created_at=created_at_1,
         actions=[],
         is_current=False,
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
     )
 
     run_2 = RunResource(
@@ -470,6 +474,10 @@ async def test_get_runs_not_empty(
         created_at=created_at_2,
         actions=[],
         is_current=True,
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
     )
 
     response_1 = Run(
