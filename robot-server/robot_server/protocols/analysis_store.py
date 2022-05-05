@@ -87,10 +87,6 @@ class AnalysisStore:
             analysis_id: The ID of the new analysis.
                 Must be unique across *all* protocols, not just this one.
 
-                This uniqueness assumption is not checked here. If you violate it,
-                this method will "succeed," but a future call to `update()` may fail
-                unexpectedly because of a SQL uniqueness constraint violation.
-
         Returns:
             A summary of the just-added analysis.
         """
@@ -109,8 +105,14 @@ class AnalysisStore:
     ) -> None:
         """Promote a pending analysis to completed, adding details of its results.
 
-        Raises:
-            AnalysisNotPendingOrNotFoundError
+        Args:
+            analysis_id: The ID of the analysis to promote.
+                Must point to a valid pending analysis.
+            commands: See `CompletedAnalysis.commands`.
+            labware: See `CompletedAnalysis.labware`.
+            pipettes: See `CompletedAnalysis.pipettes`.
+            errors: See `CompletedAnalysis.errors`. Also used to infer whether
+                the completed analysis result is `OK` or `NOT_OK`.
         """
         protocol_id = self._pending_store.get_protocol_id(analysis_id=analysis_id)
 
@@ -145,7 +147,11 @@ class AnalysisStore:
         self._pending_store.remove(analysis_id=analysis_id)
 
     async def get(self, analysis_id: str) -> ProtocolAnalysis:
-        """Get a single protocol analysis by its ID."""
+        """Get a single protocol analysis by its ID.
+
+        Raises:
+            AnalysisNotFoundError
+        """
         pending_analysis = self._pending_store.get(analysis_id=analysis_id)
         completed_analysis_resource = await self._completed_store.get_by_id(
             analysis_id=analysis_id
@@ -159,7 +165,10 @@ class AnalysisStore:
             raise AnalysisNotFoundError(analysis_id=analysis_id)
 
     def get_summaries_by_protocol(self, protocol_id: str) -> List[AnalysisSummary]:
-        """Get summaries of all analyses for a protocol, in order from oldest first."""
+        """Get summaries of all analyses for a protocol, in order from oldest first.
+
+        If `protocol_id` doesn't point to a valid protocol, returns an empty list.
+        """
         completed_analysis_ids = self._completed_store.get_ids_by_protocol(
             protocol_id=protocol_id
         )
@@ -175,7 +184,10 @@ class AnalysisStore:
             return completed_analysis_summaries + [_summarize_pending(pending_analysis)]
 
     async def get_by_protocol(self, protocol_id: str) -> List[ProtocolAnalysis]:
-        """Get all analyses for a protocol, in order from oldest first."""
+        """Get all analyses for a protocol, in order from oldest first.
+
+        If `protocol_id` doesn't point to a valid protocol, returns an empty list.
+        """
         completed_analysis_resources = await self._completed_store.get_by_protocol(
             protocol_id=protocol_id
         )
