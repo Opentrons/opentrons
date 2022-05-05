@@ -17,7 +17,6 @@ import {
   useConditionalConfirm,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
@@ -47,6 +46,8 @@ import {
 } from '../hooks'
 import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
+import { PipetteOffsetCalHeader } from './CalibrationsTable/PipetteOffsetCalHeader'
+import { TipLengthCalHeader } from './CalibrationsTable/TipLengthCalHeader'
 
 import type { State } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
@@ -265,8 +266,8 @@ export function RobotSettingsCalibration({
   }
 
   // for debug TODO: remove when open a PR
-  // console.log('pipetteOffsetCalibrations', pipetteOffsetCalibrations)
-  // console.log('tipLengthCalibrations', tipLengthCalibrations)
+  console.log('pipetteOffsetCalibrations', pipetteOffsetCalibrations)
+  console.log('tipLengthCalibrations', tipLengthCalibrations)
   // console.log('attachedPipettes', attachedPipettes)
   // console.log('showConfirmStart', showConfirmStart)
   // console.log('pipOffsetDataPresent', pipOffsetDataPresent)
@@ -396,83 +397,21 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing4}>
               {t('pipette_offset_calibrations_description')}
             </StyledText>
-            <Flex flexDirection={DIRECTION_COLUMN} marginX={SPACING.spacing4}>
-              <Flex
-                flexDirection={DIRECTION_ROW}
-                css={{ 'word-wrap': 'break-word' }}
-              >
-                <StyledText
-                  as="label"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  color={COLORS.darkBlack}
-                  marginRight={SPACING.spacing4}
-                  width="10rem"
-                  data-testid={'pipette_offset_calibrations_model_and_serial'}
-                >
-                  {t(
-                    'pipette_offset_calibrations_table_header_model_and_serial'
-                  )}
-                </StyledText>
-
-                <StyledText
-                  as="label"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  color={COLORS.darkBlack}
-                  marginRight={SPACING.spacing4}
-                  width="2.5rem"
-                  data-testid={'pipette_offset_calibrations_mount'}
-                >
-                  {t('pipette_offset_calibrations_table_header_mount')}
-                </StyledText>
-
-                <StyledText
-                  as="label"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  color={COLORS.darkBlack}
-                  marginRight={SPACING.spacing4}
-                  width="3.75rem"
-                  data-testid={'pipette_offset_calibrations_attached'}
-                >
-                  {t('pipette_offset_calibrations_table_header_attached')}
-                </StyledText>
-
-                <StyledText
-                  as="label"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  color={COLORS.darkBlack}
-                  marginRight={SPACING.spacing4}
-                  width="8.5rem"
-                  data-testid={'pipette_offset_calibrations_tiprack'}
-                >
-                  {t('pipette_offset_calibrations_table_header_tiprack')}
-                </StyledText>
-
-                <StyledText
-                  as="label"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  color={COLORS.darkBlack}
-                  width="5.5rem"
-                  data-testid={'pipette_offset_calibrations_last_calibrated'}
-                >
-                  {t(
-                    'pipette_offset_calibrations_table_header_last_calibrated'
-                  )}
-                </StyledText>
-              </Flex>
-              {demoPippet?.map((calibration, index) => (
-                <React.Fragment key={index}>
-                  <PipetteOffsetCalDetailItem
-                    attachedPipettes={attachedPipettes}
-                    pipetteModel={calibration.id}
-                    pipetteSerial={calibration.pipette}
-                    mount={calibration.mount}
-                    attached={true}
-                    tiprack={calibration.tiprackUri}
-                    lastCalibrated={calibration.lastModified}
-                  />
-                </React.Fragment>
-              ))}
-            </Flex>
+            <PipetteOffsetCalHeader />
+            {pipetteOffsetCalibrations?.map((calibration, index) => (
+              <React.Fragment key={index}>
+                <PipetteOffsetCalDetailItem
+                  attachedPipettes={attachedPipettes}
+                  pipetteModel={calibration.id}
+                  pipetteSerial={calibration.pipette}
+                  mount={calibration.mount}
+                  attached={true}
+                  tiprack={calibration.tiprackUri}
+                  lastCalibrated={calibration.lastModified}
+                />
+              </React.Fragment>
+            ))}
+            {/* </Flex> */}
           </Box>
         </Flex>
       </Box>
@@ -484,16 +423,17 @@ export function RobotSettingsCalibration({
             <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
               {t('tip_length_calibrations_title')}
             </Box>
-            <StyledText as="p" marginBottom={SPACING.spacing3}>
+            <StyledText as="p" marginBottom={SPACING.spacing4}>
               {t('tip_length_calibrations_description')}
             </StyledText>
-            {tipLengthCalibrations?.map((tip, index) => (
+            <TipLengthCalHeader />
+            {tipLengthCalibrations?.map((calibration, index) => (
               <React.Fragment key={index}>
                 <TipLengthCalDetailItem
-                  tiprack={tip?.uri}
-                  pipetteModel={tip?.pipette}
-                  pipetteSerial={tip?.pipette}
-                  lastCalibrated={tip?.lastModified}
+                  tiprack={calibration?.uri}
+                  pipetteModel={calibration?.pipette}
+                  pipetteSerial={calibration?.pipette}
+                  lastCalibrated={calibration?.lastModified}
                 />
               </React.Fragment>
             ))}
@@ -566,21 +506,20 @@ function PipetteOffsetCalDetailItem({
             {pipetteSerial}
           </StyledText>
         </Flex>
-        <StyledText as="p" width="2.5rem" marginRight={SPACING.spacing4}>
+        <StyledText as="p" width="2.5rem" marginLeft={SPACING.spacing4}>
           {mount}
         </StyledText>
-        <StyledText as="p" width="3.75rem" marginRight={SPACING.spacing4}>
+        <StyledText as="p" width="3.75rem" marginLeft={SPACING.spacing4}>
           {attached ? t('yes') : t('no')}
         </StyledText>
-        <Flex
-          css={{ 'word-wrap': 'break-word' }}
-          marginRight={SPACING.spacing4}
-        >
+        <Flex css={{ 'word-wrap': 'break-word' }} marginLeft={SPACING.spacing4}>
           <StyledText as="p" width="8.5rem" height="2.5rem">
             {tiprack}
           </StyledText>
         </Flex>
-        <StyledText as="p">{formatLastCalibrated(lastCalibrated)}</StyledText>
+        <StyledText as="p" marginLeft={SPACING.spacing4}>
+          {formatLastCalibrated(lastCalibrated)}
+        </StyledText>
       </Flex>
     </>
   )
@@ -607,22 +546,21 @@ function TipLengthCalDetailItem({
           css={{ 'word-wrap': 'break-word' }}
           marginRight={SPACING.spacing4}
         >
-          <StyledText as="p" width="13.375rem" marginRight={SPACING.spacing4}>
+          <StyledText as="p" width="13.375rem" marginLeft={SPACING.spacing4}>
             {tiprack}
           </StyledText>
         </Flex>
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="p" width="13.375rem">
-            {pipetteModel}
-          </StyledText>
-          <StyledText as="p" width="10rem">
-            {pipetteSerial}
-          </StyledText>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          width="11.75rem"
+          css={{ 'word-wrap': 'break-word' }}
+        >
+          <StyledText as="p">{pipetteModel}</StyledText>
+          <StyledText as="p">{pipetteSerial}</StyledText>
         </Flex>
-        <StyledText as="p" width="8.5rem" height="2.5rem">
-          {lastCalibrated}
+        <StyledText as="p" width="12.5rem">
+          {formatLastCalibrated(lastCalibrated)}
         </StyledText>
-        <StyledText as="p">{formatLastModified(lastCalibrated)}</StyledText>
       </Flex>
     </>
   )
