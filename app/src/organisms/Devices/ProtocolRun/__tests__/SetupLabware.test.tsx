@@ -59,12 +59,8 @@ jest.mock('../../../ProtocolSetup/hooks')
 jest.mock('../../../ProtocolSetup/LabwareOffsetSuccessToast')
 jest.mock('../../../LabwarePositionCheck')
 jest.mock('../ModuleExtraAttention')
-jest.mock(
-  '../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay'
-)
-jest.mock(
-  '../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
-)
+jest.mock('../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay')
+jest.mock('../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal')
 jest.mock(
   '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 )

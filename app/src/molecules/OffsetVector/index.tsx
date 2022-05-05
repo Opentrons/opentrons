@@ -17,21 +17,15 @@ export function OffsetVector(props: OffsetVectorProps): JSX.Element {
       <StyledText as={'strong'} marginRight={SPACING.spacing2}>
         X
       </StyledText>
-      <StyledText marginRight={SPACING.spacing3}>
-        {x.toFixed(2)}
-      </StyledText>
+      <StyledText marginRight={SPACING.spacing3}>{x.toFixed(2)}</StyledText>
       <StyledText as={'strong'} marginRight={SPACING.spacing2}>
         Y
       </StyledText>
-      <StyledText marginRight={SPACING.spacing3}>
-        {y.toFixed(2)}
-      </StyledText>
+      <StyledText marginRight={SPACING.spacing3}>{y.toFixed(2)}</StyledText>
       <StyledText as={'strong'} marginRight={SPACING.spacing2}>
         Z
       </StyledText>
-      <StyledText marginRight={SPACING.spacing3}>
-        {z.toFixed(2)}
-      </StyledText>
+      <StyledText marginRight={SPACING.spacing3}>{z.toFixed(2)}</StyledText>
     </Flex>
   )
 }

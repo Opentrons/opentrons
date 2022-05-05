@@ -15,7 +15,10 @@ import { PrimaryButton, SecondaryButton } from '../../atoms/Buttons'
 import { Modal } from '../../atoms/Modal'
 import { StyledText } from '../../atoms/text'
 import { OffsetVector } from '../../molecules/OffsetVector'
-import { useOffsetCandidatesForCurrentRun, useClearAllOffsetsForCurrentRun  } from './hooks'
+import {
+  useOffsetCandidatesForCurrentRun,
+  useClearAllOffsetsForCurrentRun,
+} from './hooks'
 import styled from 'styled-components'
 
 const OffsetTable = styled('table')`
@@ -81,22 +84,22 @@ export function ReapplyOffsetsModal(
         {t('robot_has_previous_offsets', { robotName: robotName })}
       </StyledText>
       <OffsetTable>
-          <tr>
-            <OffsetTableHeader>{t('location')}</OffsetTableHeader>
-            <OffsetTableHeader>{t('run_id')}</OffsetTableHeader>
-            <OffsetTableHeader>{t('labware')}</OffsetTableHeader>
-            <OffsetTableHeader>{t('labware_offset_data')}</OffsetTableHeader>
-          </tr>
-          {offsetCandidates.map(offset => (
-            <OffsetTableRow key={offset.id}>
-              <OffsetTableDatum>{offset.location.slotName}</OffsetTableDatum>
-              <OffsetTableDatum>TODO</OffsetTableDatum>
-              <OffsetTableDatum>{offset.labwareDisplayName}</OffsetTableDatum>
-              <OffsetTableDatum>
-                <OffsetVector {...offset.vector} />
-              </OffsetTableDatum>
-            </OffsetTableRow>
-          ))}
+        <tr>
+          <OffsetTableHeader>{t('location')}</OffsetTableHeader>
+          <OffsetTableHeader>{t('run_id')}</OffsetTableHeader>
+          <OffsetTableHeader>{t('labware')}</OffsetTableHeader>
+          <OffsetTableHeader>{t('labware_offset_data')}</OffsetTableHeader>
+        </tr>
+        {offsetCandidates.map(offset => (
+          <OffsetTableRow key={offset.id}>
+            <OffsetTableDatum>{offset.location.slotName}</OffsetTableDatum>
+            <OffsetTableDatum>TODO</OffsetTableDatum>
+            <OffsetTableDatum>{offset.labwareDisplayName}</OffsetTableDatum>
+            <OffsetTableDatum>
+              <OffsetVector {...offset.vector} />
+            </OffsetTableDatum>
+          </OffsetTableRow>
+        ))}
       </OffsetTable>
       <Flex justifyContent={JUSTIFY_FLEX_END} marginY={SPACING.spacing3}>
         <SecondaryButton

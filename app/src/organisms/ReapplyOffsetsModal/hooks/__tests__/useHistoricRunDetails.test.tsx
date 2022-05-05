@@ -1,10 +1,7 @@
 import * as React from 'react'
 import { when } from 'jest-when'
 import { renderHook } from '@testing-library/react-hooks'
-import {
-  useAllRunsQuery,
-  useRunQuery,
-} from '@opentrons/react-api-client'
+import { useAllRunsQuery, useRunQuery } from '@opentrons/react-api-client'
 import { useHistoricRunDetails } from '../useHistoricRunDetails'
 import { mockRunningRun } from '../../../RunTimeControl/__fixtures__'
 import { mockSuccessQueryResults } from '../../../../__fixtures__'
