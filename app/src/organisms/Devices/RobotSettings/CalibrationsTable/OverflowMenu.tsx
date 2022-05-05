@@ -9,10 +9,10 @@ import {
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
-  SIZE_4,
 } from '@opentrons/components'
 import { OverflowBtn } from '../../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../../atoms/MenuList/MenuItem'
+import { Divider } from '../../../../atoms/structure'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../redux/calibration'
 import {
@@ -41,27 +41,13 @@ export function OverflowMenu({
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
   // const dispatch = useDispatch<Dispatch>()
 
-  // const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
-  //   e.preventDefault()
-  //   dispatch(viewProtocolSourceFolder(protocolKey))
-  //   setShowOverflowMenu(!showOverflowMenu)
-  // }
-  // const handleClickReanalyze: React.MouseEventHandler<HTMLButtonElement> = e => {
-  //   e.preventDefault()
-  //   dispatch(analyzeProtocol(protocolKey))
-  //   setShowOverflowMenu(!showOverflowMenu)
-  // }
-  // const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
-  //   e.preventDefault()
-  //   setShowOverflowMenu(!showOverflowMenu)
-  // }
-
   const handleCalibration = (calType: 'pipetteOffset' | 'tipLength'): void => {
     if (calType === 'pipetteOffset') {
       // pipetteOffset Recalibrate pipette offset
     } else {
       // tipLength Recalibrate tip length and pipette offset
     }
+    setShowOverflowMenu(!showOverflowMenu)
   }
 
   const handleDownload = (calType: 'pipetteOffset' | 'tipLength'): void => {
@@ -90,18 +76,31 @@ export function OverflowMenu({
         `opentrons-${robotName}-tip-length-calibration.json`
       )
     }
+    setShowOverflowMenu(!showOverflowMenu)
+  }
+
+  const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    setShowOverflowMenu(!showOverflowMenu)
   }
 
   const handleDeleteCalibrationData = (
     calType: 'pipetteOffset' | 'tipLength'
-  ): void => {}
+  ): void => {
+    // method del
+    // endpoint calibration/pipette_offset
+    // pipet_id and mount
+    // endpoint calibration/tip_length
+    // tiprack hash and pipette_id
+    setShowOverflowMenu(!showOverflowMenu)
+  }
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
-      <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={null} />
+      <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
       {showOverflowMenu ? (
         <Flex
-          width={SIZE_4}
+          width={calType === 'pipetteOffset' ? '11.25rem' : '17.25rem'}
           zIndex={10}
           borderRadius={'4px 4px 0px 0px'}
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
@@ -119,6 +118,7 @@ export function OverflowMenu({
           <MenuItem onClick={() => handleDownload(calType)}>
             {t('overflow_menu_download_calibration_data')}
           </MenuItem>
+          <Divider />
           <MenuItem onClick={() => handleDeleteCalibrationData(calType)}>
             {t('overflow_menu_delete_data')}
           </MenuItem>

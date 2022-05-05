@@ -2,7 +2,6 @@ import * as React from 'react'
 import { saveAs } from 'file-saver'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { format } from 'date-fns'
 
 import {
   Box,
@@ -15,13 +14,11 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
   useConditionalConfirm,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
 import { TertiaryButton } from '../../../atoms/Buttons'
-import { Divider, Line } from '../../../atoms/structure'
+import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { DeckCalibrationModal } from '../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
@@ -48,7 +45,8 @@ import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalHeader } from './CalibrationsTable/PipetteOffsetCalHeader'
 import { TipLengthCalHeader } from './CalibrationsTable/TipLengthCalHeader'
-import { OverflowMenu } from './CalibrationsTable/OverflowMenu'
+import { PipetteOffsetCalDetailItem } from './CalibrationsTable/PipetteOffsetCalDetailItem'
+import { TipLengthCalDetailItem } from './CalibrationsTable/TipLengthCalDetailItem'
 
 import type { State } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
@@ -56,12 +54,14 @@ import type {
   SessionCommandString,
   DeckCalibrationSession,
 } from '../../../redux/sessions/types'
-import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
+// import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
 
 // import type {
 //   DeckCalibrationData,
 //   DeckCalibrationStatus,
 // } from '../../../redux/calibration/types'
+
+import { demoPipettes } from './demo'
 
 interface CalibrationProps {
   robotName: string
@@ -363,22 +363,28 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing4}>
               {t('pipette_offset_calibrations_description')}
             </StyledText>
-            <PipetteOffsetCalHeader />
-            {pipetteOffsetCalibrations?.map((calibration, index) => (
-              <React.Fragment key={index}>
-                <PipetteOffsetCalDetailItem
-                  robotName={robotName}
-                  attachedPipettes={attachedPipettes}
-                  pipetteModel={calibration.id}
-                  pipetteSerial={calibration.pipette}
-                  mount={calibration.mount}
-                  attached={true}
-                  tiprack={calibration.tiprackUri}
-                  lastCalibrated={calibration.lastModified}
-                />
-              </React.Fragment>
-            ))}
-            {/* </Flex> */}
+            {pipetteOffsetCalibrations != null &&
+            pipetteOffsetCalibrations.length > 0 ? (
+              <>
+                <PipetteOffsetCalHeader />
+                {pipetteOffsetCalibrations?.map((calibration, index) => (
+                  <React.Fragment key={index}>
+                    <PipetteOffsetCalDetailItem
+                      robotName={robotName}
+                      attachedPipettes={attachedPipettes}
+                      pipetteModel={calibration.id}
+                      pipetteSerial={calibration.pipette}
+                      mount={calibration.mount}
+                      attached={true}
+                      tiprack={calibration.tiprackUri}
+                      lastCalibrated={calibration.lastModified}
+                    />
+                  </React.Fragment>
+                ))}
+              </>
+            ) : (
+              <StyledText as="label">{t('not_calibrated')}</StyledText>
+            )}
           </Box>
         </Flex>
       </Box>
@@ -393,18 +399,25 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing4}>
               {t('tip_length_calibrations_description')}
             </StyledText>
-            <TipLengthCalHeader />
-            {tipLengthCalibrations?.map((calibration, index) => (
-              <React.Fragment key={index}>
-                <TipLengthCalDetailItem
-                  robotName={robotName}
-                  tiprack={calibration?.uri}
-                  pipetteModel={calibration?.pipette}
-                  pipetteSerial={calibration?.pipette}
-                  lastCalibrated={calibration?.lastModified}
-                />
-              </React.Fragment>
-            ))}
+            {tipLengthCalibrations != null &&
+            tipLengthCalibrations?.length > 0 ? (
+              <>
+                <TipLengthCalHeader />
+                {tipLengthCalibrations?.map((calibration, index) => (
+                  <React.Fragment key={index}>
+                    <TipLengthCalDetailItem
+                      robotName={robotName}
+                      tiprack={calibration?.uri}
+                      pipetteModel={calibration?.pipette}
+                      pipetteSerial={calibration?.pipette}
+                      lastCalibrated={calibration?.lastModified}
+                    />
+                  </React.Fragment>
+                ))}
+              </>
+            ) : (
+              <StyledText as="label">{t('not_calibrated')}</StyledText>
+            )}
           </Box>
         </Flex>
       </Box>
@@ -431,112 +444,6 @@ export function RobotSettingsCalibration({
           </Tooltip>
         </Flex>
       </Box>
-    </>
-  )
-}
-
-// TODO: utils
-const formatLastCalibrated = (lastModified: string): string => {
-  return typeof lastModified === 'string'
-    ? format(new Date(lastModified), 'M/d/yyyy HH:mm:ss')
-    : 'unknown'
-}
-
-interface PipetteOffsetCalDetailItemProps {
-  robotName: string
-  attachedPipettes: AttachedPipettesByMount
-  pipetteModel: string
-  pipetteSerial: string
-  mount: string
-  attached: boolean
-  tiprack: string
-  lastCalibrated: string
-}
-
-function PipetteOffsetCalDetailItem({
-  robotName,
-  attachedPipettes,
-  pipetteModel,
-  pipetteSerial,
-  mount,
-  attached,
-  tiprack,
-  lastCalibrated,
-}: PipetteOffsetCalDetailItemProps): JSX.Element {
-  const { t } = useTranslation('shared')
-
-  return (
-    <>
-      <Divider />
-      <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="p" width="10rem">
-            {pipetteModel}
-          </StyledText>
-          <StyledText as="p" width="10rem">
-            {pipetteSerial}
-          </StyledText>
-        </Flex>
-        <StyledText as="p" width="2.5rem" marginLeft={SPACING.spacing4}>
-          {mount}
-        </StyledText>
-        <StyledText as="p" width="3.75rem" marginLeft={SPACING.spacing4}>
-          {attached ? t('yes') : t('no')}
-        </StyledText>
-        <Flex css={{ 'word-wrap': 'break-word' }} marginLeft={SPACING.spacing4}>
-          <StyledText as="p" width="8.5rem" height="2.5rem">
-            {tiprack}
-          </StyledText>
-        </Flex>
-        <StyledText as="p" marginLeft={SPACING.spacing4} width="7.375rem">
-          {formatLastCalibrated(lastCalibrated)}
-        </StyledText>
-        <OverflowMenu calType="pipetteOffset" robotName={robotName} />
-      </Flex>
-    </>
-  )
-}
-
-interface TipLengthCalDetailItemProps {
-  robotName: string
-  tiprack: string
-  pipetteModel: string
-  pipetteSerial: string
-  lastCalibrated: string
-}
-
-function TipLengthCalDetailItem({
-  robotName,
-  tiprack,
-  pipetteModel,
-  pipetteSerial,
-  lastCalibrated,
-}: TipLengthCalDetailItemProps): JSX.Element {
-  return (
-    <>
-      <Divider />
-      <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-        <Flex
-          css={{ 'word-wrap': 'break-word' }}
-          marginRight={SPACING.spacing4}
-        >
-          <StyledText as="p" width="13.375rem" marginLeft={SPACING.spacing4}>
-            {tiprack}
-          </StyledText>
-        </Flex>
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          width="11.75rem"
-          css={{ 'word-wrap': 'break-word' }}
-        >
-          <StyledText as="p">{pipetteModel}</StyledText>
-          <StyledText as="p">{pipetteSerial}</StyledText>
-        </Flex>
-        <StyledText as="p" width="12.5rem">
-          {formatLastCalibrated(lastCalibrated)}
-        </StyledText>
-        <OverflowMenu calType="tipLength" robotName={robotName} />
-      </Flex>
     </>
   )
 }
