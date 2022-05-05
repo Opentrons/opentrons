@@ -64,12 +64,13 @@ class Gripper(Pipette):
     def gripper_id(self) -> Optional[str]:
         return self._gripper_id
 
-    def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
+    def critical_point(self) -> Point:
         """
         The vector from the gripper's origin to its critical point. The
         critical point for a pipette is the end of the nozzle if no tip is
         attached, or the end of the tip if a tip is attached.
         """
+        # TODO: add critical point implementation
         return Point(0, 0, 0)
 
     def __str__(self) -> str:

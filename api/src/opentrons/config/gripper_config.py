@@ -1,7 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass
 import logging
-from typing import Tuple, Literal
+from typing import Tuple
+from typing_extensions import Literal
+from .pipette_config import PipetteConfig
 
 log = logging.getLogger(__name__)
 

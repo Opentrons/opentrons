@@ -16,15 +16,19 @@ from opentrons_shared_data.pipette.dev_types import (
 from opentrons.drivers.types import MoveSplit
 from opentrons.types import Mount
 from opentrons.config.pipette_config import PipetteConfig
+from opentrons.config.gripper_config import (
+    GripperConfig,
+    GripperModel
+)
 
 
 class InstrumentSpec(TypedDict):
-    model: Union[PipetteModel, None]
+    model: Union[PipetteModel, GripperModel, None]
     id: Optional[str]
 
 
 class AttachedInstrument(TypedDict):
-    config: Optional[PipetteConfig]
+    config: Optional[Union[PipetteConfig, GripperConfig]]
     id: Optional[str]
 
 

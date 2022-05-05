@@ -15,6 +15,7 @@ from .api import API
 from .pause_manager import PauseManager
 from .backends import Controller, Simulator
 from .pipette import Pipette
+from .gripper import Gripper
 from .types import (
     CriticalPoint,
     NoTipAttachedError,
@@ -36,6 +37,7 @@ __all__ = [
     "Controller",
     "Simulator",
     "Pipette",
+    'Gripper',
     "PauseManager",
     "SynchronousAdapter",
     "HardwareControlAPI",
