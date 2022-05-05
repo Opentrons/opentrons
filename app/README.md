@@ -12,7 +12,7 @@ This desktop application is built with [Electron][]. You can find the Electron w
 
 ## developing
 
-To get started: clone the Opentrons/opentrons repository, set up your computer for development as specified in the [contributing guide][contributing-guide-setup], and then:
+To get started: clone the `Opentrons/opentrons` repository, set up your computer for development as specified in the [contributing guide][contributing-guide-setup], and then:
 
 ```shell
 # change into the cloned directory
@@ -116,18 +116,18 @@ ANALYZER=1 make -C app
 [style-guide]: https://standardjs.com
 [style-guide-badge]: https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square&maxAge=3600
 [download]: http://opentrons.com/ot-app
-[support]: https://support.opentrons.com/getting-started#software-setup
-[robots]: http://opentrons.com/robots
+[support]: https://support.opentrons.com/s/ot2-get-started
+[robots]: https://opentrons.com/ot-2/
 [contributing-guide-setup]: ../CONTRIBUTING.md#development-setup
 [contributing-guide-running-the-api]: ../CONTRIBUTING.md#opentrons-api
 [app-shell-readme-build]: ../app-shell/README.md#building
 [api-server-source]: ../api/opentrons/server
-[electron]: https://electron.atom.io/
+[electron]: https://www.electronjs.org/
 [electron-renderer]: https://electronjs.org/docs/tutorial/quick-start#renderer-process
 [hmr]: https://webpack.js.org/concepts/hot-module-replacement/
-[react]: https://facebook.github.io/react/
+[react]: https://reactjs.org/
 [redux]: http://redux.js.org/
 [css-modules]: https://github.com/css-modules/css-modules
 [babel]: https://babeljs.io/
 [webpack]: https://webpack.js.org/
-[bundle-analyzer]: https://github.com/th0r/webpack-bundle-analyzer
+[bundle-analyzer]: https://github.com/webpack-contrib/webpack-bundle-analyzer
