@@ -5,7 +5,6 @@ import isEmpty from 'lodash/isEmpty'
 import some from 'lodash/some'
 import { useTranslation } from 'react-i18next'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Flex,
   Icon,
@@ -44,13 +43,13 @@ import { LabwareInfoOverlay } from '../../../organisms/ProtocolSetup/RunSetupCar
 import { LabwareOffsetModal } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import { DownloadOffsetDataModal } from '../../../organisms/ProtocolUpload/DownloadOffsetDataModal'
-import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
+  useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 import { ProceedToRunButton } from './ProceedToRunButton'
@@ -96,7 +95,7 @@ export function SetupLabware({
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
-  const runStatus = useRunStatus(runId)
+  const runHasStarted = useRunHasStarted(runId)
   const { protocolData } = useProtocolDetailsForRun(runId)
   const { t } = useTranslation('protocol_setup')
   const [
@@ -150,7 +149,7 @@ export function SetupLabware({
     lpcDisabledReason = t('lpc_disabled_calibration_not_complete')
   } else if (moduleSetupIncomplete) {
     lpcDisabledReason = t('lpc_disabled_modules_not_connected')
-  } else if (runStatus != null && runStatus !== RUN_STATUS_IDLE) {
+  } else if (runHasStarted) {
     lpcDisabledReason = t('labware_position_check_not_available')
   } else if (
     isEmpty(protocolData?.pipettes) ||
@@ -183,7 +182,8 @@ export function SetupLabware({
       )}
       <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
         <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing4}>
-          {moduleTypesThatRequireExtraAttention.length > 0 &&
+          {!runHasStarted &&
+          moduleTypesThatRequireExtraAttention.length > 0 &&
           moduleRenderInfoById ? (
             <ModuleExtraAttention
               moduleTypes={moduleTypesThatRequireExtraAttention}

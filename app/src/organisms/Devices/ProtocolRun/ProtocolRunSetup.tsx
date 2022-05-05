@@ -5,11 +5,13 @@ import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 import { protocolHasModules } from '@opentrons/shared-data'
 
 import { Line } from '../../../atoms/structure'
+import { InfoMessage } from '../../../atoms/InfoMessage'
 import {
   useDeckCalibrationData,
   useProtocolDetailsForRun,
   useRobot,
   useRunCalibrationStatus,
+  useRunHasStarted,
 } from '../hooks'
 import { SetupLabware } from './SetupLabware'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
@@ -43,6 +45,7 @@ export function ProtocolRunSetup({
   const robot = useRobot(robotName)
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
+  const runHasStarted = useRunHasStarted(runId)
 
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     null
@@ -61,8 +64,10 @@ export function ProtocolRunSetup({
         LABWARE_SETUP_KEY,
       ]
     }
-    let initialExpandedStepKey: StepKey = ROBOT_CALIBRATION_STEP_KEY
-    if (calibrationStatus.complete && isDeckCalibrated) {
+    let initialExpandedStepKey: StepKey | null = ROBOT_CALIBRATION_STEP_KEY
+    if (runHasStarted) {
+      initialExpandedStepKey = null
+    } else if (calibrationStatus.complete && isDeckCalibrated) {
       initialExpandedStepKey =
         nextStepKeysInOrder[
           nextStepKeysInOrder.findIndex(v => v === ROBOT_CALIBRATION_STEP_KEY) +
@@ -75,7 +80,7 @@ export function ProtocolRunSetup({
       INITIAL_EXPAND_DELAY_MS
     )
     return () => clearTimeout(initialExpandTimer)
-  }, [Boolean(protocolData), protocolData?.commands])
+  }, [Boolean(protocolData), protocolData?.commands, runHasStarted])
 
   if (robot == null) return null
 
@@ -134,6 +139,7 @@ export function ProtocolRunSetup({
       gridGap={SPACING.spacing4}
       margin={SPACING.spacing4}
     >
+      {runHasStarted ? <InfoMessage title={t('setup_is_view_only')} /> : null}
       {stepsKeysInOrder.map((stepKey, index) => (
         <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
           <SetupStep
@@ -147,7 +153,7 @@ export function ProtocolRunSetup({
                 : setExpandedStepKey(stepKey)
             }
             calibrationStatusComplete={
-              stepKey === ROBOT_CALIBRATION_STEP_KEY
+              stepKey === ROBOT_CALIBRATION_STEP_KEY && !runHasStarted
                 ? calibrationStatus.complete && isDeckCalibrated
                 : null
             }

@@ -67,6 +67,7 @@ import {
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
+  useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
@@ -126,8 +127,9 @@ export function ProtocolRunHeader({
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const { displayName } = useProtocolDetailsForRun(runId)
 
-  // this duplicates the run query above but has additional run status processing logic
+  // these duplicate the run query above but have additional run status processing logic
   const runStatus = useRunStatus(runId)
+  const runHasStarted = useRunHasStarted(runId)
 
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
 
@@ -341,7 +343,7 @@ export function ProtocolRunHeader({
   }
 
   const ProtocolRunningContent = (): JSX.Element | null =>
-    runStatus != null && runStatus !== RUN_STATUS_IDLE ? (
+    runHasStarted ? (
       <Flex
         backgroundColor={COLORS.lightGrey}
         justifyContent={JUSTIFY_SPACE_BETWEEN}

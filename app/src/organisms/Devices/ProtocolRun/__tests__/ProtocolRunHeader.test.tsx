@@ -49,6 +49,7 @@ import {
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
+  useRunHasStarted,
   useUnmatchedModulesForProtocol,
   useAttachedModules,
 } from '../../hooks'
@@ -107,6 +108,9 @@ const mockUseRunControls = useRunControls as jest.MockedFunction<
 >
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
+>
+const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
+  typeof useRunHasStarted
 >
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
@@ -238,6 +242,7 @@ describe('ProtocolRunHeader', () => {
         isResetRunLoading: false,
       })
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
     when(mockUseRunTimestamps).calledWith(RUN_ID).mockReturnValue({
       startedAt: STARTED_AT,
       pausedAt: null,
@@ -334,6 +339,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_RUNNING)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
     const [{ getByRole, getByText }] = render()
 
     getByRole('button', { name: 'Pause run' })
@@ -352,6 +358,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_RUNNING)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
     const [{ getByText, queryByText }] = render()
 
     expect(queryByText('Mock ConfirmCancelModal')).toBeFalsy()
@@ -367,6 +374,7 @@ describe('ProtocolRunHeader', () => {
         data: { data: mockPausedRun },
       } as UseQueryResult<Run>)
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_PAUSED)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
 
     const [{ getByRole, getByText }] = render()
 
@@ -384,6 +392,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
 
     const [{ getByRole, getByText }] = render()
 
@@ -402,6 +411,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
 
     const [{ getByRole, getByText }] = render()
 
@@ -419,6 +429,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_STOPPED)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
     when(mockUseRunTimestamps).calledWith(RUN_ID).mockReturnValue({
       startedAt: STARTED_AT,
       pausedAt: null,
@@ -442,6 +453,7 @@ describe('ProtocolRunHeader', () => {
         data: { data: mockFailedRun },
       } as UseQueryResult<Run>)
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_FAILED)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
     when(mockUseRunTimestamps).calledWith(RUN_ID).mockReturnValue({
       startedAt: STARTED_AT,
       pausedAt: null,
@@ -467,6 +479,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_SUCCEEDED)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
     when(mockUseRunTimestamps).calledWith(RUN_ID).mockReturnValue({
       startedAt: STARTED_AT,
       pausedAt: null,
@@ -492,6 +505,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_SUCCEEDED)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
     when(mockUseRunTimestamps).calledWith(RUN_ID).mockReturnValue({
       startedAt: STARTED_AT,
       pausedAt: null,
@@ -511,6 +525,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
     const [{ getByText }] = render()
 
     getByText('Close robot door to resume run')
@@ -518,6 +533,7 @@ describe('ProtocolRunHeader', () => {
 
   it('renders a clear protocol banner when run has failed', () => {
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_FAILED)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
     const [{ getByRole, getByText }] = render()
 
     getByText('Run failed. Clear protocol from robot to make it available.')
@@ -529,6 +545,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_STOPPED)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
     const [{ getByRole, getByText }] = render()
 
     getByText('Run canceled. Clear protocol from robot to make it available.')
@@ -540,6 +557,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_SUCCEEDED)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
     const [{ getByRole, getByText }] = render()
 
     getByText('Run completed. Clear protocol from robot to make it available.')

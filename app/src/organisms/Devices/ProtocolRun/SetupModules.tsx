@@ -26,6 +26,7 @@ import { UnMatchedModuleWarning } from '../../../organisms/ProtocolSetup/RunSetu
 import { MultipleModulesModal } from '../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
 import {
   useModuleRenderInfoForProtocolById,
+  useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 
@@ -61,6 +62,7 @@ export const SetupModules = ({
     missingModuleIds,
     remainingAttachedModules,
   } = useUnmatchedModulesForProtocol(robotName, runId)
+  const runHasStarted = useRunHasStarted(runId)
 
   const [
     showMultipleModulesModal,
@@ -137,6 +139,7 @@ export const SetupModules = ({
                         isAttached={attachedModuleMatch != null}
                         usbPort={attachedModuleMatch?.usbPort.port ?? null}
                         hubPort={attachedModuleMatch?.usbPort.hub ?? null}
+                        runId={runId}
                       />
                     </Module>
                   </React.Fragment>
@@ -148,7 +151,7 @@ export const SetupModules = ({
       </RobotWorkSpace>
       <PrimaryButton
         title={t('proceed_to_labware_setup_step')}
-        disabled={missingModuleIds.length > 0}
+        disabled={missingModuleIds.length > 0 || runHasStarted}
         onClick={expandLabwareSetupStep}
         id={'ModuleSetup_proceedToLabwareSetup'}
         alignSelf={ALIGN_CENTER}
@@ -157,9 +160,11 @@ export const SetupModules = ({
       >
         {t('proceed_to_labware_setup_step')}
       </PrimaryButton>
-      {missingModuleIds.length > 0 ? (
+      {missingModuleIds.length > 0 || runHasStarted ? (
         <Tooltip {...tooltipProps}>
-          {t('plug_in_required_module', { count: missingModuleIds.length })}
+          {runHasStarted
+            ? t('protocol_run_started')
+            : t('plug_in_required_module', { count: missingModuleIds.length })}
         </Tooltip>
       ) : null}
     </Flex>

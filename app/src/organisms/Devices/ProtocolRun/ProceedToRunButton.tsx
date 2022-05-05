@@ -9,6 +9,7 @@ import { useTrackEvent } from '../../../redux/analytics'
 import {
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
+  useRunHasStarted,
 } from '../hooks'
 
 interface ProceedToRunButtonProps {
@@ -30,6 +31,8 @@ export function ProceedToRunButton({
     robotName,
     runId
   )
+  const runHasStarted = useRunHasStarted(runId)
+
   const calibrationIncomplete =
     missingModuleIds.length === 0 && !isCalibrationComplete
   const moduleSetupIncomplete =
@@ -38,7 +41,9 @@ export function ProceedToRunButton({
     missingModuleIds.length > 0 && !isCalibrationComplete
 
   let proceedToRunDisabledReason = null
-  if (moduleAndCalibrationIncomplete) {
+  if (runHasStarted) {
+    proceedToRunDisabledReason = t('protocol_run_started')
+  } else if (moduleAndCalibrationIncomplete) {
     proceedToRunDisabledReason = t(
       'run_disabled_modules_and_calibration_not_complete'
     )
