@@ -38,7 +38,7 @@ export function PipetteOffsetCalHeader(): JSX.Element {
         >
           {t('table_header_mount')}
         </StyledText>
-        <StyledText
+        {/* <StyledText
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.darkBlack}
@@ -47,7 +47,7 @@ export function PipetteOffsetCalHeader(): JSX.Element {
           data-testid={'pipette_offset_calibrations_attached'}
         >
           {t('table_header_attached')}
-        </StyledText>
+        </StyledText> */}
         <StyledText
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}

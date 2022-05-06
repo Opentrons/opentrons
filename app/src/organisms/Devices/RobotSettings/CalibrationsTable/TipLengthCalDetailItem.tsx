@@ -12,8 +12,11 @@ import { Divider } from '../../../../atoms/structure'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated } from './utils'
 
+import type { TipLengthCalibration } from '../../../../redux/calibration/types'
+
 interface TipLengthCalDetailItemProps {
   robotName: string
+  tipLengthCalibration: TipLengthCalibration
   tiprack: string
   pipetteModel: string
   pipetteSerial: string
@@ -22,6 +25,7 @@ interface TipLengthCalDetailItemProps {
 
 export function TipLengthCalDetailItem({
   robotName,
+  tipLengthCalibration,
   tiprack,
   pipetteModel,
   pipetteSerial,
@@ -50,7 +54,11 @@ export function TipLengthCalDetailItem({
         <StyledText as="p" width="12.5rem">
           {formatLastCalibrated(lastCalibrated)}
         </StyledText>
-        <OverflowMenu calType="tipLength" robotName={robotName} />
+        <OverflowMenu
+          calType="tipLength"
+          robotName={robotName}
+          tipLengthCalibration={tipLengthCalibration}
+        />
       </Flex>
     </>
   )

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-// import { useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import {
   Flex,
@@ -12,46 +12,126 @@ import {
 } from '@opentrons/components'
 import { OverflowBtn } from '../../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../../atoms/MenuList/MenuItem'
-import { Divider } from '../../../../atoms/structure'
+
+// import { Divider } from '../../../../atoms/structure'
+import {
+  INTENT_RECALIBRATE_PIPETTE_OFFSET,
+  INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
+} from '../../../../organisms/CalibrationPanels'
+import * as Config from '../../../../redux/config'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../redux/calibration'
+import { LEFT } from '../../../../redux/pipettes'
 import {
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
 } from '../../hooks'
+import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
 
-// import type { Dispatch } from '../../../../redux/types'
+// import type { State } from '../../../../redux/types'
+import type {
+  PipetteOffsetCalibration,
+  TipLengthCalibration,
+} from '../../../../redux/calibration/types'
+import type { Mount } from '../../../../redux/pipettes/types'
+
+const CAL_BLOCK_MODAL_CLOSED: 'cal_block_modal_closed' =
+  'cal_block_modal_closed'
+const CAL_BLOCK_MODAL_OPEN_WITH_REDO_TLC: 'cal_block_modal_redo' =
+  'cal_block_modal_redo'
+const CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC: 'cal_block_modal_keep' =
+  'cal_block_modal_keep'
+
+type CalBlockModalState =
+  | typeof CAL_BLOCK_MODAL_CLOSED
+  | typeof CAL_BLOCK_MODAL_OPEN_WITH_REDO_TLC
+  | typeof CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC
 
 interface OverflowMenuProps {
   calType: 'pipetteOffset' | 'tipLength'
   robotName: string
+  pipetteOffsetCalibration?: PipetteOffsetCalibration
+  tipLengthCalibration?: TipLengthCalibration
+  mount: Mount
 }
-
-// download use hooks as well
 
 export function OverflowMenu({
   calType,
   robotName,
+  pipetteOffsetCalibration,
+  tipLengthCalibration,
+  mount,
 }: OverflowMenuProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
+  const [
+    startPipetteOffsetCalibration,
+    PipetteOffsetCalibrationWizard,
+  ] = useCalibratePipetteOffset(robotName, { mount })
 
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robotName)
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
   // const dispatch = useDispatch<Dispatch>()
 
-  const handleCalibration = (calType: 'pipetteOffset' | 'tipLength'): void => {
-    if (calType === 'pipetteOffset') {
-      // pipetteOffset Recalibrate pipette offset
+  const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
+  const [
+    calBlockModalState,
+    setCalBlockModalState,
+  ] = React.useState<CalBlockModalState>(CAL_BLOCK_MODAL_CLOSED)
+  interface StartWizardOptions {
+    keepTipLength: boolean
+    hasBlockModalResponse?: boolean | null
+  }
+  const startPipetteOffsetPossibleTLC = (options: StartWizardOptions): void => {
+    const { keepTipLength, hasBlockModalResponse } = options
+    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
+      setCalBlockModalState(
+        keepTipLength
+          ? CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC
+          : CAL_BLOCK_MODAL_OPEN_WITH_REDO_TLC
+      )
     } else {
-      // tipLength Recalibrate tip length and pipette offset
+      startPipetteOffsetCalibration({
+        overrideParams: {
+          hasCalibrationBlock: Boolean(
+            configHasCalibrationBlock ?? hasBlockModalResponse
+          ),
+          shouldRecalibrateTipLength: !keepTipLength,
+        },
+        withIntent: keepTipLength
+          ? INTENT_RECALIBRATE_PIPETTE_OFFSET
+          : INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
+      })
+      setCalBlockModalState(CAL_BLOCK_MODAL_CLOSED)
+    }
+  }
+
+  const handleCalibration = (
+    calType: 'pipetteOffset' | 'tipLength',
+    e: React.MouseEvent
+  ): void => {
+    e.preventDefault()
+    if (calType === 'pipetteOffset') {
+      console.log('recalibrate pipetteOffset')
+      if (pipetteOffsetCalibration != null) {
+        startPipetteOffsetCalibration({
+          withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
+        })
+      } else {
+        startPipetteOffsetPossibleTLC({ keepTipLength: true })
+      }
+    } else {
+      startPipetteOffsetPossibleTLC({ keepTipLength: false })
     }
     setShowOverflowMenu(!showOverflowMenu)
   }
 
-  const handleDownload = (calType: 'pipetteOffset' | 'tipLength'): void => {
-    // e.preventDefault()
+  const handleDownload = (
+    calType: 'pipetteOffset' | 'tipLength',
+    e: React.MouseEvent
+  ): void => {
+    e.preventDefault()
     doTrackEvent({
       name: EVENT_CALIBRATION_DOWNLOADED,
       properties: {},
@@ -84,16 +164,17 @@ export function OverflowMenu({
     setShowOverflowMenu(!showOverflowMenu)
   }
 
-  const handleDeleteCalibrationData = (
-    calType: 'pipetteOffset' | 'tipLength'
-  ): void => {
-    // method del
-    // endpoint calibration/pipette_offset
-    // pipet_id and mount
-    // endpoint calibration/tip_length
-    // tiprack hash and pipette_id
-    setShowOverflowMenu(!showOverflowMenu)
-  }
+  // TODO 5/6/2021 kj: This is scoped out from 5.1
+  // const handleDeleteCalibrationData = (
+  //   calType: 'pipetteOffset' | 'tipLength'
+  // ): void => {
+  //   // method del
+  //   // endpoint calibration/pipette_offset
+  //   // pipet_id and mount
+  //   // endpoint calibration/tip_length
+  //   // tiprack hash and pipette_id
+  //   setShowOverflowMenu(!showOverflowMenu)
+  // }
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
@@ -110,18 +191,19 @@ export function OverflowMenu({
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          <MenuItem onClick={() => handleCalibration(calType)}>
+          <MenuItem onClick={e => handleCalibration(calType, e)}>
             {calType === 'pipetteOffset'
               ? t('overflow_menu_recalibrate_pipette')
               : t('overflow_menu_recalibrate_tip_and_pipette')}
           </MenuItem>
-          <MenuItem onClick={() => handleDownload(calType)}>
+          <MenuItem onClick={e => handleDownload(calType, e)}>
             {t('overflow_menu_download_calibration_data')}
           </MenuItem>
-          <Divider />
-          <MenuItem onClick={() => handleDeleteCalibrationData(calType)}>
+          {/* TODO 5/6/2021 kj: This is scoped out from 5.1 */}
+          {/* <Divider /> */}
+          {/* <MenuItem onClick={() => handleDeleteCalibrationData(calType)}>
             {t('overflow_menu_delete_data')}
-          </MenuItem>
+          </MenuItem> */}
         </Flex>
       ) : null}
     </Flex>

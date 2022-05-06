@@ -61,7 +61,7 @@ import type {
 //   DeckCalibrationStatus,
 // } from '../../../redux/calibration/types'
 
-import { demoPipettes } from './demo'
+import { demoPippet, demoTipLengths } from './demo'
 
 interface CalibrationProps {
   robotName: string
@@ -371,13 +371,14 @@ export function RobotSettingsCalibration({
                   <React.Fragment key={index}>
                     <PipetteOffsetCalDetailItem
                       robotName={robotName}
-                      attachedPipettes={attachedPipettes}
-                      pipetteModel={calibration.id}
-                      pipetteSerial={calibration.pipette}
-                      mount={calibration.mount}
-                      attached={true}
-                      tiprack={calibration.tiprackUri}
-                      lastCalibrated={calibration.lastModified}
+                      pipetteOffsetCalibration={calibration}
+                      // attachedPipettes={attachedPipettes}
+                      // pipetteModel={calibration.id}
+                      // pipetteSerial={calibration.pipette}
+                      // mount={calibration.mount}
+                      // attached={true}
+                      // tiprack={calibration.tiprackUri}
+                      // lastCalibrated={calibration.lastModified}
                     />
                   </React.Fragment>
                 ))}

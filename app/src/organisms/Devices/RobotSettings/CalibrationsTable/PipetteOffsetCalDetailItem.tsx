@@ -13,41 +13,47 @@ import { Divider } from '../../../../atoms/structure'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated } from './utils'
 
-import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
+import type { PipetteOffsetCalibration } from '../../../../redux/calibration/types'
 
 interface PipetteOffsetCalDetailItemProps {
   robotName: string
-  attachedPipettes: AttachedPipettesByMount
-  pipetteModel: string
-  pipetteSerial: string
-  mount: string
-  attached: boolean
-  tiprack: string
-  lastCalibrated: string
+  pipetteOffsetCalibration: PipetteOffsetCalibration
+  // attachedPipettes: AttachedPipettesByMount
+  // pipetteModel: string
+  // pipetteSerial: string
+  // mount: string
+  // attached: boolean
+  // tiprack: string
+  // lastCalibrated: string
 }
 
 export function PipetteOffsetCalDetailItem({
   robotName,
-  attachedPipettes,
-  pipetteModel,
-  pipetteSerial,
-  mount,
-  attached,
-  tiprack,
-  lastCalibrated,
-}: PipetteOffsetCalDetailItemProps): JSX.Element {
+  pipetteOffsetCalibration,
+}: // attachedPipettes,
+// pipetteModel,
+// pipetteSerial,
+// mount,
+// attached,
+// tiprack,
+// lastCalibrated,
+PipetteOffsetCalDetailItemProps): JSX.Element {
   const { t } = useTranslation('shared')
 
+  const { id, mount, tiprackUri, lastModified } = pipetteOffsetCalibration
+  // get model name
+  // parse tiprackUri
+  const attached = true // This is temporary until we display all pipettes offset calibrations
   return (
     <>
       <Divider />
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText as="p" width="10rem">
-            {pipetteModel}
+            {id}
           </StyledText>
           <StyledText as="p" width="10rem">
-            {pipetteSerial}
+            {id}
           </StyledText>
         </Flex>
         <StyledText as="p" width="2.5rem" marginLeft={SPACING.spacing4}>
@@ -58,13 +64,18 @@ export function PipetteOffsetCalDetailItem({
         </StyledText>
         <Flex css={{ 'word-wrap': 'break-word' }} marginLeft={SPACING.spacing4}>
           <StyledText as="p" width="8.5rem" height="2.5rem">
-            {tiprack}
+            {tiprackUri}
           </StyledText>
         </Flex>
         <StyledText as="p" marginLeft={SPACING.spacing4} width="7.375rem">
-          {formatLastCalibrated(lastCalibrated)}
+          {formatLastCalibrated(lastModified)}
         </StyledText>
-        <OverflowMenu calType="pipetteOffset" robotName={robotName} />
+        <OverflowMenu
+          calType="pipetteOffset"
+          robotName={robotName}
+          pipetteOffsetCalibration={pipetteOffsetCalibration}
+          mount={mount}
+        />
       </Flex>
     </>
   )
