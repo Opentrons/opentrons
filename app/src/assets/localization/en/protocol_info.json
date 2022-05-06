@@ -63,5 +63,7 @@
   "protocols": "Protocols",
   "import": "Import",
   "all_protocols": "All Protocols",
-  "import_new_protocol": "Import a Protocol"
+  "import_new_protocol": "Import a Protocol",
+  "most_recent_updates": "Most recent updates",
+  "oldest_updates": "Oldest updates"
 }

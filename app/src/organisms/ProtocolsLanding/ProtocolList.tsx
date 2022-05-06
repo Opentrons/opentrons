@@ -107,7 +107,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
                   setShowSortByMenu(false)
                 }}
               >
-                {'Most recent updates'}
+                {t('most_recent_updates')}
               </MenuItem>
               <MenuItem
                 onClick={() => {
@@ -123,7 +123,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
                   setShowSortByMenu(false)
                 }}
               >
-                {'Oldest updates'}
+                {t('oldest_updates')}
               </MenuItem>
             </Flex>
           )}
