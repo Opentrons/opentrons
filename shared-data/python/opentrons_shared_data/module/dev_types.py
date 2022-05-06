@@ -69,6 +69,7 @@ CornerOffsetFromSlot = TypedDict(
     "CornerOffsetFromSlot", {"x": float, "y": float, "z": Optional[float]}
 )
 
+# TODO(mc, 2022-03-18): potentially move from typed-dict to Pydantic
 ModuleDefinitionV3 = TypedDict(
     "ModuleDefinitionV3",
     {
@@ -115,7 +116,3 @@ ModuleDefinitionV1 = TypedDict(
         "quirks": List[str],
     },
 )
-
-# # TODO(mc, 2022-03-18): flesh this out; also potentially move
-# # from typed-dict to Pydantic
-# ModuleDefinitionV3 = ModuleDefinitionV2
