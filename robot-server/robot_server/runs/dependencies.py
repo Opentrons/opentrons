@@ -50,7 +50,7 @@ def get_run_state_store(
     app_state: AppState = Depends(get_app_state),
     sql_engine: SQLEngine = Depends(get_sql_engine),
 ) -> RunStateStore:
-    """Get a singleton EngineStateStore to keep track of created state runs."""
+    """Get a singleton RunStateStore to keep track of run states."""
     run_state_store = _run_state_store.get_from(app_state)
 
     if run_state_store is None:
