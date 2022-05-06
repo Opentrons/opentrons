@@ -21,11 +21,11 @@ describe('ThermocyclerModuleData', () => {
   let props: React.ComponentProps<typeof ThermocyclerModuleData>
   beforeEach(() => {
     props = {
-      status: mockThermocycler.status,
-      currentTemp: mockThermocycler.data.currentTemp,
-      targetTemp: mockThermocycler.data.targetTemp,
-      lidTemp: mockThermocycler.data.lidTemp,
-      lidTarget: mockThermocycler.data.lidTarget,
+      status: mockThermocycler.data.status,
+      currentTemp: mockThermocycler.data.currentTemperature,
+      targetTemp: mockThermocycler.data.targetTemperature,
+      lidTemp: mockThermocycler.data.lidTemperature,
+      lidTarget: mockThermocycler.data.lidTargetTemperature,
     }
     mockStatusLabel.mockReturnValue(<div>Mock Thermocycler StatusLabel</div>)
   })

@@ -18,7 +18,7 @@ describe('snapshot tests', () => {
           sourcePlateId: {
             slot: '4',
           },
-          trashId: {
+          fixedTrash: {
             slot: '12',
           },
         },

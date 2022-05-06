@@ -1,5 +1,4 @@
 import { useSelector } from 'react-redux'
-import { useLocation } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import {
   getNavbarLocations,
@@ -8,11 +7,8 @@ import {
   getDeckCalibrationOk,
 } from '../redux/nav'
 import { getConnectedRobot } from '../redux/discovery'
-import { formatTimestamp } from '../organisms/Devices/utils'
 import { useIsProtocolRunLoaded } from '../organisms/ProtocolUpload/hooks'
-import { translationKeyByPathSegment } from './NextGenApp'
 
-import type { PathCrumb } from '../molecules/Breadcrumbs'
 import type { NavLocation } from '../redux/nav/types'
 
 export function useRunLocation(): NavLocation {
@@ -48,42 +44,4 @@ export function useNavLocations(): NavLocation[] {
   const navLocations = [robots, upload, runLocation, more]
 
   return navLocations
-}
-
-// TODO(BC, 3-10-2022): handle protocolKey mapping to display name
-/**
- * a hook for the unified app, to generate an array of path crumbs
- * @returns {PathCrumb[]}
- */
-export function usePathCrumbs(): PathCrumb[] {
-  const { t } = useTranslation('top_navigation')
-  const location = useLocation()
-
-  // TODO(bh, 2022-02-24): map runId to run timestamp
-  // will need to use robot name param, useRobot, instantiate an ApiHostProvider, useRunQuery with runId
-  const subPathname = location.pathname.substring(1)
-
-  const pathCrumbs = subPathname
-    .split('/')
-    // filter out path segments explicitly defined as null
-    .filter(crumb => translationKeyByPathSegment[crumb] !== null)
-    .map(crumb => {
-      const crumbDisplayNameValue = translationKeyByPathSegment[crumb]
-
-      /**
-       * Check if the crumb is a date and parse
-       * Necessary because 'Run Record ID' is planned to be rendered as a date timestamp
-       */
-      const crumbDateNameValue = formatTimestamp(crumb)
-
-      return {
-        pathSegment: crumb,
-        crumbName:
-          crumbDisplayNameValue != null
-            ? t(crumbDisplayNameValue)
-            : crumbDateNameValue,
-      }
-    })
-
-  return pathCrumbs
 }

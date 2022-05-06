@@ -25,6 +25,10 @@ export const getHasCalibrationBlock = (state: State): boolean | null => {
   return useTrashSurface === null ? null : !useTrashSurface
 }
 
+export const getIsHeaterShakerAttached = (state: State): boolean => {
+  return state.config?.modules.heaterShaker.isAttached ?? false
+}
+
 export const getIsLabwareOffsetCodeSnippetsOn = (state: State): boolean => {
   return state.config?.labware.showLabwareOffsetCodeSnippets ?? false
 }

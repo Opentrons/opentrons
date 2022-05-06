@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 
 import {
@@ -45,6 +46,8 @@ import { useRunQuery } from '@opentrons/react-api-client'
 
 import { Banner } from '../../../atoms/Banner'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/Buttons'
+import { useTrackEvent } from '../../../redux/analytics'
+import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { StyledText } from '../../../atoms/text'
 import {
   useCloseCurrentRun,
@@ -63,6 +66,7 @@ import {
   useAttachedModules,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
+  useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
@@ -71,7 +75,6 @@ import { ConfirmAttachmentModal } from '../ModuleCard/ConfirmAttachmentModal'
 
 import type { Run } from '@opentrons/api-client'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import { useTrackEvent } from '../../../redux/analytics'
 
 interface ProtocolRunHeaderProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
@@ -118,18 +121,15 @@ export function ProtocolRunHeader({
   const [targetProps, tooltipProps] = useHoverTooltip()
   const trackEvent = useTrackEvent()
   const heaterShakerFromProtocol = useHeaterShakerFromProtocol()
+  const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const runRecord = useRunQuery(runId)
+  const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const { displayName } = useProtocolDetailsForRun(runId)
 
   // this duplicates the run query above but has additional run status processing logic
   const runStatus = useRunStatus(runId)
 
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
-
-  const createdAtTimestamp =
-    runRecord?.data?.data.createdAt != null
-      ? formatTimestamp(runRecord?.data?.data.createdAt)
-      : '--:--:--'
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : '--:--:--'
@@ -172,7 +172,7 @@ export function ProtocolRunHeader({
   const attachedModules = useAttachedModules(robotName)
   const heaterShaker = attachedModules.find(
     (module): module is HeaterShakerModule =>
-      module.type === HEATERSHAKER_MODULE_TYPE
+      module.moduleType === HEATERSHAKER_MODULE_TYPE
   )
   const isShaking =
     heaterShaker?.data != null && heaterShaker.data.speedStatus !== 'idle'
@@ -186,7 +186,10 @@ export function ProtocolRunHeader({
     confirm: confirmAttachment,
     showConfirmation: showConfirmationModal,
     cancel: cancelExit,
-  } = useConditionalConfirm(handleProceedToRunClick, true)
+  } = useConditionalConfirm(
+    handleProceedToRunClick,
+    !configHasHeaterShakerAttached
+  )
 
   const handlePlayButtonClick = (): void => {
     if (isShaking) {
@@ -301,37 +304,35 @@ export function ProtocolRunHeader({
     switch (runStatus) {
       case RUN_STATUS_FAILED: {
         return (
-          <Banner
-            type="error"
-            title={`${t('run_failed')}. ${t(
-              'clear_protocol_to_make_available'
-            )}`}
-          >
-            {clearProtocolLink}
+          <Banner type="error">
+            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+              {`${t('run_failed')}. ${t('clear_protocol_to_make_available')} `}
+              {clearProtocolLink}
+            </Flex>
           </Banner>
         )
       }
       case RUN_STATUS_STOPPED: {
         return (
-          <Banner
-            type="warning"
-            title={`${t('run_canceled')}. ${t(
-              'clear_protocol_to_make_available'
-            )}`}
-          >
-            {clearProtocolLink}
+          <Banner type="warning">
+            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+              {`${t('run_canceled')}. ${t(
+                'clear_protocol_to_make_available'
+              )} `}
+              {clearProtocolLink}
+            </Flex>
           </Banner>
         )
       }
       case RUN_STATUS_SUCCEEDED: {
         return (
-          <Banner
-            type="success"
-            title={`${t('run_completed')}. ${t(
-              'clear_protocol_to_make_available'
-            )}`}
-          >
-            {clearProtocolLink}
+          <Banner type="success">
+            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+              {`${t('run_completed')}. ${t(
+                'clear_protocol_to_make_available'
+              )}`}
+              {clearProtocolLink}
+            </Flex>
           </Banner>
         )
       }
@@ -411,7 +412,7 @@ export function ProtocolRunHeader({
         <ConfirmAttachmentModal
           onCloseClick={cancelExit}
           isProceedToRunModal={true}
-          onConfirmClick={confirmAttachment}
+          onConfirmClick={handleProceedToRunClick}
         />
       )}
 
@@ -428,7 +429,7 @@ export function ProtocolRunHeader({
         </Link>
       </Flex>
       {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
-        <Banner type="warning" title={t('close_door_to_resume')} />
+        <Banner type="warning">{t('close_door_to_resume')}</Banner>
       ) : null}
       {isCurrentRun ? <ClearProtocolBanner /> : null}
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>

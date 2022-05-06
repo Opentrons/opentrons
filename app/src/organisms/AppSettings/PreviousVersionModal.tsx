@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-
 import {
   Box,
   Flex,
@@ -38,7 +37,7 @@ export function PreviousVersionModal(
         <ExternalLink
           href={UNINSTALL_APP_URL}
           paddingBottom={SPACING.spacing3}
-          css={TYPOGRAPHY.pSemiBold}
+          css={TYPOGRAPHY.linkPSemibold}
           id="PreviousVersionModal_uninstallingAppLink"
         >
           {t('learn_uninstalling')}
@@ -46,7 +45,7 @@ export function PreviousVersionModal(
         <br />
         <ExternalLink
           href={PREVIOUS_RELEASES_URL}
-          css={TYPOGRAPHY.pSemiBold}
+          css={TYPOGRAPHY.linkPSemibold}
           id="PreviousVersionModal_previousReleases"
         >
           {t('previous_releases')}

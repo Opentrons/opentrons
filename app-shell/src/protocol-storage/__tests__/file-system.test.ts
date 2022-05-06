@@ -17,20 +17,20 @@ import {
   PROTOCOLS_DIRECTORY_PATH,
 } from '../file-system'
 import { getConfig } from '../../config'
-import { runFileWithPython } from '../../python'
+import { analyzeProtocolSource } from '../../protocol-analysis'
 
 jest.mock('uuid/v4')
 jest.mock('electron')
 jest.mock('../../config')
-jest.mock('../../python')
+jest.mock('../../protocol-analysis')
 
 const trashItem = Electron.shell.trashItem as jest.MockedFunction<
   typeof Electron.shell.trashItem
 >
 const mockUuid = uuid as jest.MockedFunction<typeof uuid>
 const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
-const mockRunFileWithPython = runFileWithPython as jest.MockedFunction<
-  typeof runFileWithPython
+const mockRunFileWithPython = analyzeProtocolSource as jest.MockedFunction<
+  typeof analyzeProtocolSource
 >
 
 describe('protocol storage directory utilities', () => {

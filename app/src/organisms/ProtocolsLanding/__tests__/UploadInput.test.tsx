@@ -28,12 +28,12 @@ describe('UploadInput', () => {
   })
 
   it('renders correct contents for empty state', () => {
-    const { getByRole } = render()
+    const { findByText, getByRole } = render()
 
-    expect(getByRole('button', { name: 'Choose File' })).toBeTruthy()
-    expect(
-      getByRole('button', { name: 'Drag and drop protocol file here' })
-    ).toBeTruthy()
+    getByRole('button', { name: 'Choose File' })
+    findByText('Drag and drop or')
+    findByText('your files')
+    getByRole('button', { name: 'browse' })
   })
 
   it('opens file select on button click', () => {

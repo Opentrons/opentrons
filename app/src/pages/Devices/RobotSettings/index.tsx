@@ -13,17 +13,21 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import { useRobot } from '../../../organisms/Devices/hooks'
 import { Line } from '../../../atoms/structure'
 import { NavTab } from '../../../atoms/NavTab'
 import { RobotSettingsCalibration } from '../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
+import { RobotSettingsAdvanced } from '../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsNetworking } from '../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 
-import type { NextGenRouteParams, RobotSettingsTab } from '../../../App/types'
+import type { NavRouteParams, RobotSettingsTab } from '../../../App/types'
 
 export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')
-  const { robotName, robotSettingsTab } = useParams<NextGenRouteParams>()
+  const { robotName, robotSettingsTab } = useParams<NavRouteParams>()
+  const robot = useRobot(robotName)
 
   const robotSettingsContentByTab: {
     [K in RobotSettingsTab]: () => JSX.Element
@@ -31,8 +35,7 @@ export function RobotSettings(): JSX.Element | null {
     calibration: () => <RobotSettingsCalibration robotName={robotName} />,
 
     networking: () => <RobotSettingsNetworking robotName={robotName} />,
-    // TODO: advanced tab content
-    advanced: () => <div>advanced</div>,
+    advanced: () => <RobotSettingsAdvanced robotName={robotName} />,
   }
 
   const RobotSettingsContent =
@@ -80,7 +83,12 @@ export function RobotSettings(): JSX.Element | null {
         </Box>
         <Line />
         <Box padding={`${SPACING.spacing5} ${SPACING.spacing4}`}>
-          <RobotSettingsContent />
+          <ApiHostProvider
+            hostname={robot?.ip ?? null}
+            port={robot?.port ?? null}
+          >
+            <RobotSettingsContent />
+          </ApiHostProvider>
         </Box>
       </Flex>
     </Box>

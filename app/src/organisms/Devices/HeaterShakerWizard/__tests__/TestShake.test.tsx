@@ -2,7 +2,7 @@ import * as React from 'react'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { useLatchCommand } from '../../ModuleCard/hooks'
+import { useLatchControls } from '../../ModuleCard/hooks'
 import { i18n } from '../../../../i18n'
 import { TestShake } from '../TestShake'
 import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
@@ -18,8 +18,8 @@ jest.mock('../../ModuleCard/hooks')
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
-const mockUseLatchCommand = useLatchCommand as jest.MockedFunction<
-  typeof useLatchCommand
+const mockUseLatchControls = useLatchControls as jest.MockedFunction<
+  typeof useLatchControls
 >
 const mockHeaterShakerModuleCard = HeaterShakerModuleCard as jest.MockedFunction<
   typeof HeaterShakerModuleCard
@@ -46,71 +46,68 @@ const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
 
 const mockOpenLatchHeaterShaker = {
   id: 'heatershaker_id',
-  model: 'heaterShakerModuleV1',
-  type: 'heaterShakerModuleType',
-  port: '/dev/ot_module_heatershaker0',
-  serial: 'jkl123',
-  revision: 'heatershaker_v4.0',
-  fwVersion: 'v2.0.0',
-  status: 'idle',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
   hasAvailableUpdate: true,
   data: {
     labwareLatchStatus: 'idle_open',
     speedStatus: 'idle',
     temperatureStatus: 'idle',
     currentSpeed: null,
-    currentTemp: null,
+    currentTemperature: null,
     targetSpeed: null,
     targetTemp: null,
     errorDetails: null,
+    status: 'idle',
   },
-  usbPort: { hub: 1, port: 1 },
+  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
 } as any
 
 const mockCloseLatchHeaterShaker = {
   id: 'heatershaker_id',
-  model: 'heaterShakerModuleV1',
-  type: 'heaterShakerModuleType',
-  port: '/dev/ot_module_heatershaker0',
-  serial: 'jkl123',
-  revision: 'heatershaker_v4.0',
-  fwVersion: 'v2.0.0',
-  status: 'idle',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
   hasAvailableUpdate: true,
   data: {
     labwareLatchStatus: 'idle_closed',
     speedStatus: 'idle',
     temperatureStatus: 'idle',
     currentSpeed: null,
-    currentTemp: null,
+    currentTemperature: null,
     targetSpeed: null,
     targetTemp: null,
     errorDetails: null,
+    status: 'idle',
   },
-  usbPort: { hub: 1, port: 1 },
+  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1, hub: null },
 } as any
 
 const mockMovingHeaterShaker = {
   id: 'heatershaker_id',
-  model: 'heaterShakerModuleV1',
-  type: 'heaterShakerModuleType',
-  port: '/dev/ot_module_thermocycler0',
-  serial: 'jkl123',
-  revision: 'heatershaker_v4.0',
-  fwVersion: 'v2.0.0',
-  status: 'idle',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
   hasAvailableUpdate: true,
   data: {
     labwareLatchStatus: 'idle_closed',
     speedStatus: 'speeding up',
     temperatureStatus: 'idle',
     currentSpeed: null,
-    currentTemp: null,
+    currentTemperature: null,
     targetSpeed: null,
     targetTemp: null,
     errorDetails: null,
+    status: 'idle',
   },
-  usbPort: { hub: 1, port: 1 },
+  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
 } as any
 
 describe('TestShake', () => {
@@ -130,7 +127,7 @@ describe('TestShake', () => {
     mockHeaterShakerModuleCard.mockReturnValue(
       <div>Mock Heater Shaker Module Card</div>
     )
-    mockUseLatchCommand.mockReturnValue({
+    mockUseLatchControls.mockReturnValue({
       handleLatch: jest.fn(),
       isLatchClosed: true,
     } as any)
@@ -175,7 +172,7 @@ describe('TestShake', () => {
       moduleFromProtocol: undefined,
     }
 
-    mockUseLatchCommand.mockReturnValue({
+    mockUseLatchControls.mockReturnValue({
       toggleLatch: jest.fn(),
       isLatchClosed: false,
     })
@@ -230,7 +227,7 @@ describe('TestShake', () => {
       moduleFromProtocol: undefined,
     }
 
-    mockUseLatchCommand.mockReturnValue({
+    mockUseLatchControls.mockReturnValue({
       toggleLatch: jest.fn(),
       isLatchClosed: false,
     })
@@ -247,7 +244,7 @@ describe('TestShake', () => {
       moduleFromProtocol: undefined,
     }
 
-    mockUseLatchCommand.mockReturnValue({
+    mockUseLatchControls.mockReturnValue({
       toggleLatch: jest.fn(),
       isLatchClosed: true,
     })
@@ -255,7 +252,7 @@ describe('TestShake', () => {
     const { getByRole } = render(props)
     const button = getByRole('button', { name: /Open Labware Latch/i })
     fireEvent.click(button)
-    expect(mockUseLatchCommand).toHaveBeenCalled()
+    expect(mockUseLatchControls).toHaveBeenCalled()
   })
 
   it('clicking the close latch button should close the heater shaker latch', () => {
@@ -265,7 +262,7 @@ describe('TestShake', () => {
       moduleFromProtocol: undefined,
     }
 
-    mockUseLatchCommand.mockReturnValue({
+    mockUseLatchControls.mockReturnValue({
       toggleLatch: jest.fn(),
       isLatchClosed: false,
     })
@@ -273,7 +270,7 @@ describe('TestShake', () => {
     const { getByRole } = render(props)
     const button = getByRole('button', { name: /Close Labware Latch/i })
     fireEvent.click(button)
-    expect(mockUseLatchCommand).toHaveBeenCalled()
+    expect(mockUseLatchControls).toHaveBeenCalled()
   })
 
   it('entering an input for shake speed and clicking start should begin shaking', () => {

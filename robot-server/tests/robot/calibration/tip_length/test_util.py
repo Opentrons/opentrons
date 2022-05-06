@@ -4,7 +4,7 @@ from robot_server.robot.calibration import util
 
 
 @pytest.fixture
-def machine(loop):
+def machine():
     states = {
         "imaginingTable",
         "millingLumber",

@@ -31,8 +31,7 @@ export const getAttachedModules: (
         })
       : {},
   // sort by usbPort info, if they do not exist (robot version below 4.3), sort by serial
-  modulesByPort =>
-    sortBy(modulesByPort, ['usbPort.hub', 'usbPort.port', 'serial'])
+  modulesByPort => sortBy(modulesByPort, ['usbPort.port', 'serialNumber'])
 )
 
 export const getAttachedModulesForConnectedRobot = (
@@ -43,8 +42,8 @@ export const getAttachedModulesForConnectedRobot = (
 }
 
 const isModulePrepared = (module: Types.AttachedModule): boolean => {
-  if (module.type === THERMOCYCLER_MODULE_TYPE)
-    return module.data.lid === 'open'
+  if (module.moduleType === THERMOCYCLER_MODULE_TYPE)
+    return module.data.lidStatus === 'open'
   return false
 }
 
@@ -62,7 +61,8 @@ export const getUnpreparedModules: (
     // a) required to be prepared by the session
     // b) not prepared according to isModulePrepared
     return attachedModules.filter(
-      m => preparableSessionModules.includes(m.model) && !isModulePrepared(m)
+      m =>
+        preparableSessionModules.includes(m.moduleModel) && !isModulePrepared(m)
     )
   }
 )
@@ -79,7 +79,7 @@ export const getMatchedModules: (
       const compatible =
         attachedModules.find(
           amod =>
-            checkModuleCompatibility(amod.model, pmod.model) &&
+            checkModuleCompatibility(amod.moduleModel, pmod.model) &&
             !matchedAmod.find(m => m.module === amod)
         ) ?? null
       if (compatible !== null) {
@@ -102,7 +102,7 @@ export const getMissingModules: (
     protocolModules.forEach(pmod => {
       const compatible = attachedModules.find(
         amod =>
-          checkModuleCompatibility(amod.model, pmod.model) &&
+          checkModuleCompatibility(amod.moduleModel, pmod.model) &&
           !matchedAmod.includes(amod)
       )
       if (compatible) {

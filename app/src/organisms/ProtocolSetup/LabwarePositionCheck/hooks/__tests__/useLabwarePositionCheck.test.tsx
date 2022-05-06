@@ -8,24 +8,31 @@ import {
   useCreateCommandMutation,
   useCreateLabwareOffsetMutation,
   useCreateLabwareDefinitionMutation,
+  useHost,
 } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../../../../redux/analytics'
-import { getConnectedRobotName } from '../../../../../redux/robot/selectors'
 import {
   useCurrentRunId,
   useCurrentRunCommands,
 } from '../../../../ProtocolUpload/hooks'
+
+import {
+  useAttachedModules,
+  useProtocolDetailsForRun,
+} from '../../../../Devices/hooks'
 import { getLabwareLocation } from '../../../utils/getLabwareLocation'
 import { useSteps } from '../useSteps'
 import { useLabwarePositionCheck } from '../useLabwarePositionCheck'
 
+import type { HostConfig } from '@opentrons/api-client'
 import type { LabwarePositionCheckStep } from '../../types'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../../redux/robot/selectors')
 jest.mock('../../../../../redux/analytics')
 jest.mock('../../../../../redux/modules')
+jest.mock('../../../../Devices/hooks')
 jest.mock('../../../../ProtocolUpload/hooks')
+jest.mock('../../../../Devices/hooks')
 jest.mock('../../../utils/getLabwareLocation')
 jest.mock('../useSteps')
 
@@ -33,10 +40,14 @@ const queryClient = new QueryClient()
 const store: Store<any> = createStore(jest.fn(), {})
 const wrapper: React.FunctionComponent<{}> = ({ children }) => (
   <Provider store={store}>
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>{' '}
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   </Provider>
 )
 
+const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
+  typeof useAttachedModules
+>
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
@@ -50,9 +61,6 @@ const mockUseCreateLabwareDefinitionMutation = useCreateLabwareDefinitionMutatio
 const mockUseCreateLabwareOffsetMutation = useCreateLabwareOffsetMutation as jest.MockedFunction<
   typeof useCreateLabwareOffsetMutation
 >
-const mockGetConnectedRobotName = getConnectedRobotName as jest.MockedFunction<
-  typeof getConnectedRobotName
->
 const mockUseCurrentRunCommands = useCurrentRunCommands as jest.MockedFunction<
   typeof useCurrentRunCommands
 >
@@ -62,9 +70,17 @@ const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
+>
 let mockTrackEvent: jest.Mock
 describe('useLabwarePositionCheck', () => {
+  const MOCK_ROBOT_NAME = 'otie'
   const MOCK_RUN_ID = 'MOCK_RUN_ID'
+  const HOST_CONFIG: HostConfig = {
+    hostname: 'localhost',
+    robotName: MOCK_ROBOT_NAME,
+  }
   const MOCK_PIPETTE_ID = 'MOCK_PIPETTE_ID'
   const MOCK_LABWARE_ID = 'MOCK_LABWARE_ID'
   const MOCK_COMMAND_ID = 'MOCK_COMMAND_ID'
@@ -73,10 +89,15 @@ describe('useLabwarePositionCheck', () => {
   let mockCreateLabwareOffset: jest.Mock
   let mockCreateLabwareDefinition: jest.Mock
   beforeEach(() => {
+    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
+    when(mockUseAttachedModules).calledWith(MOCK_ROBOT_NAME).mockReturnValue([])
     when(mockUseCurrentRunId).calledWith().mockReturnValue(MOCK_RUN_ID)
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(MOCK_RUN_ID)
+      .mockReturnValue({ protocolData: null } as any)
     when(mockUseCurrentRunCommands).calledWith().mockReturnValue([])
     when(mockUseSteps)
-      .calledWith()
+      .calledWith(MOCK_RUN_ID)
       .mockReturnValue([
         {
           commands: [
@@ -108,9 +129,6 @@ describe('useLabwarePositionCheck', () => {
       .mockReturnValue({
         createLabwareOffset: mockCreateLabwareDefinition,
       } as any)
-    when(mockGetConnectedRobotName)
-      .calledWith(expect.anything())
-      .mockReturnValue('mock robot!')
     when(mockGetLabwareLocation)
       .calledWith(MOCK_LABWARE_ID, [])
       .mockReturnValue({ slotName: MOCK_SLOT })
@@ -182,7 +200,7 @@ describe('useLabwarePositionCheck', () => {
   describe('proceed', () => {
     it('should home the robot after issuing the last LPC command', async () => {
       when(mockUseSteps)
-        .calledWith()
+        .calledWith(MOCK_RUN_ID)
         .mockReturnValue([
           {
             commands: [
@@ -235,7 +253,7 @@ describe('useLabwarePositionCheck', () => {
     })
     it('should execute the next command', async () => {
       when(mockUseSteps)
-        .calledWith()
+        .calledWith(MOCK_RUN_ID)
         .mockReturnValue([
           {
             commands: [

@@ -10,15 +10,21 @@
   "empty": "empty",
   "ending": "ending",
   "exit": "exit",
+  "loading": "Loading...",
   "no_data": "no data",
   "ok": "ok",
   "open": "open",
   "refresh": "refresh",
-  "refresh_list": "refresh list",
+  "refresh_list": "Refresh list",
   "start": "start",
   "starting": "starting",
   "stop": "stop",
   "try_again": "try again",
   "unknown": "unknown",
-  "dont_show_me_again": "Don’t show me again"
+  "dont_show_me_again": "Don’t show me again",
+  "drag_and_drop": "Drag and drop or <a>browse</a> your files",
+  "view_latest_release_notes": "View latest release notes on",
+  "github": "GitHub",
+  "confirm": "Confirm",
+  "reset_all": "Reset all"
 }

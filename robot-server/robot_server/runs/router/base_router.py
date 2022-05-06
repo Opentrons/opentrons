@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
-from robot_server.service.task_runner import TaskRunner
+from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
@@ -114,7 +114,7 @@ async def get_run_data_from_url(
     )
 
 
-@base_router.post(
+@base_router.post(  # noqa: C901
     path="/runs",
     summary="Create a run",
     description="Create a new run to track robot interaction.",
@@ -132,7 +132,7 @@ async def create_run(
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     run_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
-    task_runner: TaskRunner = Depends(TaskRunner),
+    task_runner: TaskRunner = Depends(get_task_runner),
 ) -> PydanticResponse[SimpleBody[Run]]:
     """Create a new run.
 
@@ -173,8 +173,11 @@ async def create_run(
         is_current=True,
         actions=[],
     )
+    try:
+        run_store.insert(run=run)
+    except ProtocolNotFoundError as e:
+        raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    run_store.insert(run=run)
     log.info(f'Created protocol run "{run_id}" from protocol "{protocol_id}".')
 
     data = Run.construct(

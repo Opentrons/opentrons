@@ -79,6 +79,7 @@ const LAYOUT_PROPS = [
   'overflowY',
   'whiteSpace',
   'wordSpacing',
+  'cursor',
 ] as const
 
 const POSITION_PROPS = [
@@ -89,6 +90,7 @@ const POSITION_PROPS = [
   'bottom',
   'left',
   'transform',
+  'transformOrigin',
 ] as const
 
 const TRANSITION_PROPS = ['transition'] as const

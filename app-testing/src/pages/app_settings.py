@@ -152,6 +152,98 @@ class AppSettings:
         if button:
             button.click()
 
+    # connect to IP address object
+    def get_connect_to_robot_via_IP_address_slideout_header(
+        self,
+    ) -> Optional[WebElement]:
+        """Get the connect to robot via IP address slideout header."""
+        header: Element = Element(
+            (
+                By.XPATH,
+                "//p[@data-testid='Slideout_title_Connect to a Robot via IP Address']",
+            ),
+            "connect to robot via IP address slideout header text",
+        )
+        return self.base.present_wrapper(header, 2)
+
+    def get_link_learn_more_about_connecting_a_robot_manually(
+        self,
+    ) -> Optional[WebElement]:
+        """Get the link to connect to robot manually."""
+        button: Element = Element(
+            (By.ID, f"ConnectIPAddressSupportPage"),
+            "the link to connect to robot manually",
+        )
+        return self.base.present_wrapper(button, 2)
+
+    def get_textbox_to_enter_the_ip(
+        self,
+    ) -> Optional[WebElement]:
+        """Get the textbox to enter the IP address."""
+        button: Element = Element(
+            (By.ID, f"ip"),
+            "the textbox to enter the IP address",
+        )
+        return self.base.present_wrapper(button, 2)
+
+    def get_try_again_link(
+        self,
+    ) -> Optional[WebElement]:
+        """Get the try again link."""
+        button: Element = Element(
+            (By.ID, f"AppSettings_Connection_Button"),
+            "the try again link",
+        )
+        return self.base.present_wrapper(button, 30)
+
+    def click_add_ip_or_hostname(self) -> None:
+        """Click on text box to add ip or hsotname"""
+        button: Optional[WebElement] = self.get_textbox_to_enter_the_ip()
+        if button:
+            button.click()
+
+    def get_add_button(
+        self,
+    ) -> Optional[WebElement]:
+        """Get the add button."""
+        button: Element = Element(
+            (By.XPATH, f"//button[text()='Add']"),
+            "the add button",
+        )
+        return self.base.present_wrapper(button, 2)
+
+    def click_add_button(self) -> None:
+        """Click on add button"""
+        button: Optional[WebElement] = self.get_add_button()
+        if button:
+            button.click()
+
+    def enter_hostname(self, hostname: str) -> None:
+        input: Element = Element(
+            (By.ID, f"ip"),
+            f"Input hostname to the slideout.'",
+        )
+        element = self.base.clickable_wrapper(input)
+        if element:
+            element.clear()
+            element.send_keys(hostname)
+
+    def get_done_button(
+        self,
+    ) -> Optional[WebElement]:
+        """Get the done button."""
+        button: Element = Element(
+            (By.XPATH, f"//button[text()='Done']"),
+            "the done button",
+        )
+        return self.base.present_wrapper(button, 2)
+
+    def click_done_button(self) -> None:
+        """Click on add button"""
+        button: Optional[WebElement] = self.get_done_button()
+        if button:
+            button.click()
+
     # Privacy Tab elements
     def get_privacy_tab(self) -> Optional[WebElement]:
         """Search for the privacy tab in app-settings."""

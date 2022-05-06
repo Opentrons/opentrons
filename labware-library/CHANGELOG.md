@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
+
+
+### Features
+
+* **app, app-shell:** add labware details slideout and overflow menu ([#9894](https://github.com/Opentrons/opentrons/issues/9894)) ([dee5a11](https://github.com/Opentrons/opentrons/commit/dee5a11e594f48b9bd642755d5cc63c023d6c0dc)), closes [#8870](https://github.com/Opentrons/opentrons/issues/8870)
+* **labware-library:** Add info alert for newly added labware ([#9685](https://github.com/Opentrons/opentrons/issues/9685)) ([01bf481](https://github.com/Opentrons/opentrons/commit/01bf481f5a198ca8e8e72a80fea58009428399f3)), closes [#9575](https://github.com/Opentrons/opentrons/issues/9575)
+
+
+
+
+
 ## [5.0.2](https://github.com/Opentrons/opentrons/compare/v5.0.1...v5.0.2) (2022-03-03)
 
 **Note:** Version bump only for package @opentrons/labware-library

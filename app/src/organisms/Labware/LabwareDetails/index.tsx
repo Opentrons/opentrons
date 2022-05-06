@@ -14,6 +14,7 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
+  SIZE_1,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 import { Slideout } from '../../../atoms/Slideout'
@@ -48,7 +49,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const insertCategory = insert?.metadata.displayCategory
   const irregular = wellGroups.length > 1
   const isMultiRow = ordering.some(row => row.length > 1)
-  const isCustomDefinition = modified != null
+  const isCustomDefinition = definition.namespace !== 'opentrons'
 
   const slideoutHeader = (
     <Flex
@@ -111,7 +112,9 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           onClick={() => navigator.clipboard.writeText(apiName)}
           role="button"
         >
-          {apiName} <Icon height=".7rem" name="ot-copy-text" />
+          <Flex alignItems={ALIGN_CENTER}>
+            {apiName} <Icon height={SIZE_1} name="copy-text" />
+          </Flex>
         </Link>
       </Box>
       <Box border={BORDERS.lineBorder}>

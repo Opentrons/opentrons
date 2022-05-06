@@ -1,9 +1,11 @@
+import * as React from 'react'
+
 export interface RouteProps {
   /**
    * the component rendered by a route match
    * drop developed components into slots held by placeholder div components
    */
-  component: () => JSX.Element | null
+  Component: React.FC
   exact?: boolean
   /**
    * a route/page name to render in the nav bar
@@ -30,7 +32,7 @@ export type ProtocolRunDetailsTab = 'setup' | 'module-controls' | 'run-log'
 /**
  * route params type definition for the next gen app
  */
-export interface NextGenRouteParams {
+export interface NavRouteParams {
   appSettingsTab: AppSettingsTab
   robotName: string
   protocolKey: string

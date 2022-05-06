@@ -119,6 +119,7 @@ type Service = {
   serverHealth: ?{
     name: string,
     apiServerVersion: string,
+    serialNumber: string,
     updateServerVersion: string,
     smoothieVersion: string,
     systemVersion: string,

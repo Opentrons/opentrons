@@ -1,22 +1,18 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 
 import {
   Box,
   Flex,
-  Icon,
   ALIGN_CENTER,
   ALIGN_START,
-  C_MED_DARK_GRAY,
   C_MED_LIGHT_GRAY,
   C_WHITE,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   SIZE_2,
-  SPACING_2,
-  SPACING_3,
+  SPACING,
   TEXT_TRANSFORM_NONE,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
@@ -27,9 +23,11 @@ import { StyledText } from '../../atoms/text'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
 import { Portal } from '../../App/portal'
-import { useLights, useRobot, useIsRobotViewable } from './hooks'
-import { RobotStatusBanner } from './RobotStatusBanner'
 import { CONNECTABLE } from '../../redux/discovery'
+import { UpdateRobotBanner } from '../UpdateRobotBanner'
+import { RobotStatusBanner } from './RobotStatusBanner'
+import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
+import { useLights, useRobot, useIsRobotViewable } from './hooks'
 
 interface RobotOverviewProps {
   robotName: string
@@ -57,8 +55,8 @@ export function RobotOverview({
       backgroundColor={C_WHITE}
       borderBottom={`1px solid ${C_MED_LIGHT_GRAY}`}
       flexDirection={DIRECTION_ROW}
-      marginBottom={SPACING_3}
-      padding={SPACING_2}
+      marginBottom={SPACING.spacing4}
+      padding={SPACING.spacing3}
       width="100%"
     >
       <img
@@ -66,10 +64,17 @@ export function RobotOverview({
         style={{ width: '6rem' }}
         id="RobotOverview_robotImage"
       />
-      <Box padding={SPACING_2} width="100%">
+      <Box padding={SPACING.spacing3} width="100%">
+        <UpdateRobotBanner
+          robotName={robot.name}
+          marginBottom={SPACING.spacing3}
+        />
         <RobotStatusBanner name={robot.name} local={robot.local} />
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING_3}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            paddingRight={SPACING.spacing4}
+          >
             <StyledText as="h6" textTransform={TEXT_TRANSFORM_UPPERCASE}>
               {t('controls')}
             </StyledText>
@@ -80,7 +85,7 @@ export function RobotOverview({
                 disabled={lightsOn === null}
                 onClick={toggleLights}
                 size={SIZE_2}
-                marginRight={SPACING_2}
+                marginRight={SPACING.spacing3}
                 id={`RobotOverview_lightsToggle`}
               />
               <StyledText as="p">{t('lights')}</StyledText>
@@ -107,13 +112,7 @@ export function RobotOverview({
         </Flex>
       </Box>
       <Box alignSelf={ALIGN_START}>
-        {/* temp link to robot settings until overflow menu implemented. selector may change */}
-        <Link
-          to={`/devices/${robotName}/robot-settings/calibration`}
-          id="RobotOverview_overflowMenu"
-        >
-          <Icon name="dots-vertical" color={C_MED_DARK_GRAY} size={SIZE_2} />
-        </Link>
+        <RobotOverviewOverflowMenu robot={robot} />
       </Box>
     </Flex>
   ) : null

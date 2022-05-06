@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  useCreateCommandMutation,
+  useCreateLiveCommandMutation,
+} from '@opentrons/react-api-client'
 import {
   Flex,
   Text,
@@ -30,7 +33,7 @@ import { Divider } from '../../../atoms/structure'
 import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'
 import { InputField } from '../../../atoms/InputField'
 import { HeaterShakerWizard } from '../HeaterShakerWizard'
-import { useLatchCommand } from './hooks'
+import { useLatchControls } from './hooks'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
@@ -42,17 +45,19 @@ interface TestShakeSlideoutProps {
   module: HeaterShakerModule
   onCloseClick: () => unknown
   isExpanded: boolean
+  runId?: string
 }
 
 export const TestShakeSlideout = (
   props: TestShakeSlideoutProps
 ): JSX.Element | null => {
-  const { module, onCloseClick, isExpanded } = props
+  const { module, onCloseClick, isExpanded, runId } = props
   const { t } = useTranslation(['device_details', 'shared', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const name = getModuleDisplayName(module.model)
+  const { createCommand } = useCreateCommandMutation()
+  const name = getModuleDisplayName(module.moduleModel)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { toggleLatch, isLatchClosed } = useLatchCommand(module)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
 
   const [showCollapsed, setShowCollapsed] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
@@ -76,15 +81,28 @@ export const TestShakeSlideout = (
 
   const handleShakeCommand = (): void => {
     if (shakeValue !== null) {
-      createLiveCommand({
-        command: isShaking ? stopShakeCommand : setShakeCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${
-            stopShakeCommand.commandType ?? setShakeCommand.commandType
-          }: ${e.message}`
-        )
-      })
+      if (runId != null) {
+        createCommand({
+          runId: runId,
+          command: isShaking ? stopShakeCommand : setShakeCommand,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${
+              stopShakeCommand.commandType ?? setShakeCommand.commandType
+            }: ${e.message}`
+          )
+        })
+      } else {
+        createLiveCommand({
+          command: isShaking ? stopShakeCommand : setShakeCommand,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${
+              stopShakeCommand.commandType ?? setShakeCommand.commandType
+            }: ${e.message}`
+          )
+        })
+      }
     }
     setShakeValue(null)
   }
