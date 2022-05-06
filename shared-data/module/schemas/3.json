@@ -67,7 +67,7 @@
     "quirks",
     "slotTransforms",
     "compatibleWith",
-    "layers"
+    "twoDimensionalRendering"
   ],
   "additionalProperties": false,
   "properties": {
