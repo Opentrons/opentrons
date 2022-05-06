@@ -213,7 +213,7 @@ async def get_runs(
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
     run_state_store: RunStateStore = Depends(get_run_state_store)
-) -> PydanticResponse[MultiBody[RunSummary, AllRunsLinks]]:
+) -> PydanticResponse[MultiBody[Run, AllRunsLinks]]:
     """Get all runs.
 
     Args:

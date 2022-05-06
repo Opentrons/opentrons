@@ -15,8 +15,6 @@ log = getLogger(__name__)
 
 
 TaskFunc = Callable[..., Awaitable[Any]]
-# TODO (tz, 2022-04-29): Should I declare this or should I make the other method async?
-TaskFuncAll = Callable[..., Any]
 
 _task_runner_accessor = AppStateAccessor["TaskRunner"]("task_runner")
 
