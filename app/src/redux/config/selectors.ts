@@ -38,7 +38,7 @@ export const getPathToPythonOverride: (
   state: State
 ) => string | null = createSelector(
   getConfig,
-  config => config?.python.pathToPythonOverride ?? ''
+  config => config?.python.pathToPythonOverride ?? null
 )
 
 const UPDATE_CHANNEL_OPTS = [

@@ -10,6 +10,7 @@ import { registerDiscovery } from './discovery'
 import { registerLabware } from './labware'
 import { registerRobotLogs } from './robot-logs'
 import { registerUpdate } from './update'
+import { registerPythonPath } from './python'
 import { registerBuildrootUpdate } from './buildroot'
 import { registerSystemInfo } from './system-info'
 import { registerProtocolStorage } from './protocol-storage'
@@ -80,6 +81,7 @@ function startUp(): void {
     registerUpdate(dispatch),
     registerBuildrootUpdate(dispatch),
     registerLabware(dispatch, mainWindow),
+    registerPythonPath(),
     registerSystemInfo(dispatch),
     registerProtocolStorage(dispatch),
   ]
