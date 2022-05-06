@@ -21,7 +21,6 @@ import {
 import * as Config from '../../../../redux/config'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../redux/calibration'
-import { LEFT } from '../../../../redux/pipettes'
 import {
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
@@ -59,7 +58,7 @@ export function OverflowMenu({
   calType,
   robotName,
   pipetteOffsetCalibration,
-  tipLengthCalibration,
+  // tipLengthCalibration,
   mount,
 }: OverflowMenuProps): JSX.Element {
   const { t } = useTranslation('device_settings')
