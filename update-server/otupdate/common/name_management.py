@@ -108,9 +108,14 @@ try:
             _BUS_STATE = DBusState(bus, server_if, entrygroup_if)
 
         _BUS_STATE.entrygroup.Reset()
+
         hostname = _BUS_STATE.server.GetHostName()
         domainname = _BUS_STATE.server.GetDomainName()
 
+        # TODO(mm, 2022-05-06): This isn't exception-safe.
+        # Since we've already reset the entrygroup, if this fails
+        # (for example because Avahi doesn't like the new name),
+        # we'll be left with no entrygroup and Avahi will stop advertising the machine.
         _BUS_STATE.entrygroup.AddService(
             dbus.Int32(-1),  # avahi.IF_UNSPEC
             dbus.Int32(-1),  # avahi.PROTO_UNSPEC
