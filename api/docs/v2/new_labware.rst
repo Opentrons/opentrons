@@ -201,9 +201,9 @@ and it will return the individual well objects in row A.
 
 .. _v2-location-within-wells:
 
-********************************
-Specifying Position Within Wells
-********************************
+***************
+Well Dimensions
+***************
 
 The functions listed above (in the :ref:`new-well-access` section) return objects
 (or lists, lists of lists, dictionaries, or dictionaries of lists of objects)
@@ -219,7 +219,7 @@ and a well with which it is associated. This lets you further manipulate the
 positions returned by these methods. All :py:class:`.InstrumentContext` methods that
 involve positions accept these :py:class:`.Location` objects.
 
-[TK transition, section snipped here]
+[TK reframe intro to be about dimensions, not moving to positions]
 
 .. _new-labware-well-properties:
 
