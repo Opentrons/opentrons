@@ -45,9 +45,8 @@ import {
 } from '../hooks'
 import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
-import { TipLengthCalHeader } from './CalibrationsTable/TipLengthCalHeader'
 import { PipetteOffsetCalItems } from './CalibrationsTable/PipetteOffsetCalItems'
-import { TipLengthCalDetailItem } from './CalibrationsTable/TipLengthCalDetailItem'
+import { TipLengthCalItems } from './CalibrationsTable/TipLengthCalItems'
 
 import type { State } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
@@ -159,6 +158,8 @@ export function RobotSettingsCalibration({
   const attachedPipettes = useAttachedPipettes(
     robot?.name != null ? robot.name : null
   )
+
+  console.log(deckCalibrationData)
 
   const isRunning = useSelector(robotSelectors.getIsRunning)
   const pipettePresent =
@@ -460,7 +461,7 @@ export function RobotSettingsCalibration({
             </StyledText>
             {tipLengthCalibrations != null &&
             tipLengthCalibrations?.length > 0 ? (
-              <TipLengthCalDetailItem
+              <TipLengthCalItems
                 robotName={robotName}
                 formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
                 formattedTipLengthCalibrations={formatTipLengthCalibrations()}
