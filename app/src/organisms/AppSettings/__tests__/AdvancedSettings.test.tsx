@@ -239,7 +239,7 @@ describe('AdvancedSettings', () => {
     getByText('override path')
     getByText('No path specified')
     const button = getByRole('button', { name: 'Add override path' })
-    const input = getByTestId('AdvancedSetting_input')
+    const input = getByTestId('AdvancedSetting_pythonPathDirectoryInput')
     input.click = jest.fn()
     fireEvent.click(button)
     expect(input.click).toHaveBeenCalled()
