@@ -30,6 +30,7 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import (
     MAX_SUPPORTED_VERSION,
     V2_MODULE_DEF_VERSION,
+    V3_MODULE_DEF_VERSION,
 )
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocol_api.labware import Labware
@@ -40,6 +41,7 @@ if TYPE_CHECKING:
     from opentrons_shared_data.module.dev_types import (
         ModuleDefinitionV1,
         ModuleDefinitionV2,
+        ModuleDefinitionV3,
     )
 
 
@@ -525,10 +527,19 @@ def _load_v2_module_def(module_model: ModuleModel) -> "ModuleDefinitionV2":
         )
 
 
+def _load_v3_module_def(module_model: ModuleModel) -> "ModuleDefinitionV3":
+    try:
+        return module.load_definition("3", module_model.value)
+    except module.ModuleNotFoundError:
+        raise NoSuchModuleError(
+            f"Could not find the module {module_model.value}.", module_model
+        )
+
+
 @functools.lru_cache(maxsize=128)
 def _load_module_definition(
     api_level: APIVersion, module_model: ModuleModel
-) -> Union["ModuleDefinitionV2", "ModuleDefinitionV1"]:
+) -> Union["ModuleDefinitionV3", "ModuleDefinitionV2", "ModuleDefinitionV1"]:
     """
     Load the appropriate module definition for this api version
     """
@@ -547,8 +558,10 @@ def _load_module_definition(
                 f"{V2_MODULE_DEF_VERSION} to use this module.",
                 module_model,
             )
-    else:
+    elif api_level < V3_MODULE_DEF_VERSION:
         return _load_v2_module_def(module_model)
+    else:
+        return _load_v3_module_def(module_model)
 
 
 def load_module(
