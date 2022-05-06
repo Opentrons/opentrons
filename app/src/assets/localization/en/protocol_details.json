@@ -25,5 +25,8 @@
   "unavailable_or_busy_robot_not_listed": "{{count}} unavailable or busy robot is not listed",
   "unavailable_or_busy_robot_not_listed_plural": "{{count}} unavailable or busy robots are not listed",
   "view_all_robots": "View all robots on the Devices page",
-  "view_run_details": "View run details"
+  "view_run_details": "View run details",
+  "labware_name": "Labware Name",
+  "quantity": "Quantity",
+  "go_to_labware_definition": "Go to labware definition"
 }

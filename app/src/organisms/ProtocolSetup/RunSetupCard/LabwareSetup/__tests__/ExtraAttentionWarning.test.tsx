@@ -72,7 +72,7 @@ describe('ExtraAttentionWarning', () => {
       name: 'Thermocycler',
     })
     getByText('Labware must be secured with the module’s latch.')
-    getByText('See how to secure labware to the Thermocyler Module')
+    getByText('See how to secure labware to the Thermocycler Module')
     getByText(
       'Thermocycler lid must be open when robot moves to the slots it occupies. Opentrons will automatically open the lid to move to these slots during Labware Position Check.'
     )
@@ -123,7 +123,7 @@ describe('ExtraAttentionWarning', () => {
     ).toBeNull()
 
     const modalLink = getByText(
-      'See how to secure labware to the Thermocyler Module'
+      'See how to secure labware to the Thermocycler Module'
     )
 
     fireEvent.click(modalLink)

@@ -29,7 +29,7 @@
     }
   },
   "labware": {
-    "trashId": {
+    "fixedTrash": {
       "displayName": "Trash",
       "definitionId": "opentrons/opentrons_1_trash_1100ml_fixed/1"
     },
@@ -1295,7 +1295,7 @@
       "commandType": "loadLabware",
       "id": "6abc123",
       "params": {
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "location": {
           "slotName": "12"
         }

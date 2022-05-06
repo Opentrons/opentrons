@@ -89,5 +89,7 @@
   "pipette_offset_calibration_needed": "Pipette Offset calibration needed.",
   "calibrate_now": "Calibrate now",
   "deck_cal_missing": "Pipette Offset calibration missing. Calibrate deck first.",
-  "an_error_occurred_while_updating_please_try_again": "An error occurred while updating your pipette's settings. Please try again."
+  "an_error_occurred_while_updating_please_try_again": "An error occurred while updating your pipette's settings. Please try again.",
+  "deck_slot": "deck slot {{slot}}",
+  "robot_control_not_available": "Some robot controls are not available when run is in progress"
 }

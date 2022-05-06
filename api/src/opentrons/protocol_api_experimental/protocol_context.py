@@ -211,7 +211,9 @@ class ProtocolContext:
         elif result.definition.moduleType == ModuleType.TEMPERATURE:
             return TemperatureModuleContext(module_id=result.moduleId)
         elif result.definition.moduleType == ModuleType.THERMOCYCLER:
-            return ThermocyclerModuleContext(module_id=result.moduleId)
+            return ThermocyclerModuleContext(
+                engine_client=self._engine_client, module_id=result.moduleId
+            )
         else:
             assert False, "Unsupported module definition"
 

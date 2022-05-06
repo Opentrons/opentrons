@@ -68,7 +68,7 @@ Basic.argTypes = {
   },
 }
 Basic.args = {
-  showLabels: true,
+  wellLabelOption: 'SHOW_LABEL_INSIDE',
   highlightedWells: { A1: null, A2: null },
   wellFill: { A1: 'maroon', A2: 'lavender' },
 }
@@ -86,7 +86,7 @@ TipRack.argTypes = {
   },
 }
 TipRack.args = {
-  showLabels: true,
+  wellLabelOption: 'SHOW_LABEL_INSIDE',
   highlightedWells: { A1: null, A2: null },
   missingTips: { C3: null, D4: null },
 }

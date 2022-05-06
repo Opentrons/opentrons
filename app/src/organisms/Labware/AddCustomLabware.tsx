@@ -26,7 +26,7 @@ export interface AddCustomLabwareProps {
 }
 
 export function AddCustomLabware(props: AddCustomLabwareProps): JSX.Element {
-  const { t } = useTranslation('labware_landing')
+  const { t } = useTranslation(['labware_landing', 'shared'])
   const dispatch = useDispatch<Dispatch>()
 
   return (
@@ -50,7 +50,7 @@ export function AddCustomLabware(props: AddCustomLabwareProps): JSX.Element {
             <StyledText as="p">
               <Trans
                 t={t}
-                i18nKey="drag_and_drop"
+                i18nKey="shared:drag_and_drop"
                 components={{
                   a: (
                     <Link

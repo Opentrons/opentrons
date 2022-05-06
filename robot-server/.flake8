@@ -13,6 +13,8 @@ extend-ignore =
     # do not require type annotations for self nor cls
     ANN101,
     ANN102
+    # do not require docstring for __init__, put them on the class
+    D107,
 
 # configure flake8-docstrings
 # https://pypi.org/project/flake8-docstrings/

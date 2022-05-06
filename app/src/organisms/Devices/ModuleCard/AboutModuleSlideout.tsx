@@ -37,7 +37,7 @@ export const AboutModuleSlideout = (
 ): JSX.Element | null => {
   const { module, isExpanded, onCloseClick, firmwareUpdateClick } = props
   const { t } = useTranslation('device_details')
-  const moduleName = getModuleDisplayName(module.model)
+  const moduleName = getModuleDisplayName(module.moduleModel)
   const runStatus = useCurrentRunStatus()
   const [showBanner, setShowBanner] = React.useState<boolean>(true)
   const isDisabled =
@@ -57,7 +57,7 @@ export const AboutModuleSlideout = (
       {module.hasAvailableUpdate && !isDisabled && showBanner ? (
         <Flex paddingBottom={SPACING.spacing4}>
           <Banner
-            data-testid={`alert_item_firmware_update_${module.model}`}
+            data-testid={`alert_item_firmware_update_${module.moduleModel}`}
             css={ALERT_ITEM_STYLE}
             type="warning"
             onCloseClick={() => setShowBanner(false)}
@@ -79,27 +79,27 @@ export const AboutModuleSlideout = (
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            data-testid={`alert_item_version_${module.model}`}
+            data-testid={`alert_item_version_${module.moduleModel}`}
           >
             <StyledText as="h6">{t('current_version')}</StyledText>
             <StyledText as="p" paddingTop={SPACING.spacing2}>
-              {t('version', { version: module.fwVersion })}
+              {t('version', { version: module.firmwareVersion })}
             </StyledText>
           </Flex>
         </Flex>
         <StyledText
           paddingTop={SPACING.spacing4}
           as="h6"
-          data-testid={`alert_item_serial_number_text_${module.model}`}
+          data-testid={`alert_item_serial_number_text_${module.moduleModel}`}
         >
           {t('serial_number')}
         </StyledText>
         <StyledText
           as="h6"
           paddingTop={SPACING.spacing2}
-          data-testid={`alert_item_serial_${module.model}`}
+          data-testid={`alert_item_serial_${module.moduleModel}`}
         >
-          {module.serial}
+          {module.serialNumber}
         </StyledText>
       </Flex>
     </Slideout>
