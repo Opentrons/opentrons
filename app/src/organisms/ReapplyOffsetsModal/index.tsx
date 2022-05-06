@@ -1,7 +1,7 @@
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
-import { IDENTITY_VECTOR } from '@opentrons/shared-data'
+import { getModuleDisplayName, IDENTITY_VECTOR } from '@opentrons/shared-data'
 import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 import {
   Flex,
@@ -20,6 +20,7 @@ import {
   useClearAllOffsetsForCurrentRun,
 } from './hooks'
 import styled from 'styled-components'
+import { formatTimestamp } from '../Devices/utils'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -44,14 +45,13 @@ const OffsetTableDatum = styled('td')`
   text-overflow: wrap;
 `
 interface ReapplyOffsetsModalProps {
-  robotName: string
   runId: string
 }
 
 export function ReapplyOffsetsModal(
   props: ReapplyOffsetsModalProps
 ): JSX.Element | null {
-  const { robotName, runId } = props
+  const { runId } = props
   const { t } = useTranslation('run_details')
   const offsetCandidates = useOffsetCandidatesForCurrentRun()
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
@@ -80,9 +80,7 @@ export function ReapplyOffsetsModal(
 
   return offsetCandidates.length > 0 ? (
     <Modal title={t('apply_stored_labware_offset_data')}>
-      <StyledText as="p">
-        {t('robot_has_previous_offsets', { robotName: robotName })}
-      </StyledText>
+      <StyledText as="p">{t('robot_has_previous_offsets')}</StyledText>
       <OffsetTable>
         <tr>
           <OffsetTableHeader>{t('location')}</OffsetTableHeader>
@@ -92,8 +90,15 @@ export function ReapplyOffsetsModal(
         </tr>
         {offsetCandidates.map(offset => (
           <OffsetTableRow key={offset.id}>
-            <OffsetTableDatum>{offset.location.slotName}</OffsetTableDatum>
-            <OffsetTableDatum>TODO</OffsetTableDatum>
+            <OffsetTableDatum>
+              {t('slot', { slotName: offset.location.slotName })}
+              {offset.location.moduleModel != null
+                ? ` - ${getModuleDisplayName(offset.location.moduleModel)}`
+                : null}
+            </OffsetTableDatum>
+            <OffsetTableDatum>
+              {formatTimestamp(offset.runCreatedAt)}
+            </OffsetTableDatum>
             <OffsetTableDatum>{offset.labwareDisplayName}</OffsetTableDatum>
             <OffsetTableDatum>
               <OffsetVector {...offset.vector} />

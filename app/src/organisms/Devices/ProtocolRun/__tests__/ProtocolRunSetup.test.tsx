@@ -153,10 +153,8 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('defaults to no step expanded', () => {
-      const { queryByText } = render()
-      expect(queryByText('Mock SetupLabware')).toBeNull()
-      expect(queryByText('Mock SetupModules')).toBeNull()
-      expect(queryByText('Mock SetupRobotCalibration')).toBeNull()
+      const { getByText } = render()
+      expect(getByText('Mock SetupLabware')).not.toBeVisible()
     })
   })
 

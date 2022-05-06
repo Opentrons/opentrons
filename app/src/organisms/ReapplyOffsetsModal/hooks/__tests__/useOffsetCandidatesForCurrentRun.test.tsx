@@ -42,14 +42,14 @@ const mockProtocolDetails: ProtocolDetails = {
 }
 const FAKE_OFFSET_TIPRACK_IN_2: LabwareOffset = {
   id: 'fakeOffsetId',
-  createdAt: 'fakeCreatedAtTimestamp',
+  createdAt: 'fakeCreatedAtTimestampTiprack',
   location: { slotName: '2' },
   vector: { x: 1, y: 2, z: 3 },
   definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
 }
 const FAKE_OFFSET_PLATE_ON_TC: LabwareOffset = {
   id: 'fakeOffsetIdOnTC',
-  createdAt: 'fakeCreatedAtTimestamp',
+  createdAt: 'fakeCreatedAtTimestampPlate',
   location: { slotName: '7', moduleModel: 'thermocyclerModuleV1' },
   vector: { x: 4, y: 5, z: 6 },
   definitionUri: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
@@ -85,6 +85,7 @@ describe('useOffsetCandidatesForCurrentRun', () => {
       {
         ...FAKE_OFFSET_TIPRACK_IN_2,
         labwareDisplayName: 'Opentrons 96 Tip Rack 300 µL',
+        runCreatedAt: mockRunningRun.createdAt,
       },
     ])
   })
@@ -109,6 +110,7 @@ describe('useOffsetCandidatesForCurrentRun', () => {
         ...FAKE_OFFSET_TIPRACK_IN_2,
         id: 'first',
         labwareDisplayName: 'Opentrons 96 Tip Rack 300 µL',
+        runCreatedAt: mockRunningRun.createdAt,
       },
     ])
   })
@@ -129,6 +131,7 @@ describe('useOffsetCandidatesForCurrentRun', () => {
       {
         ...FAKE_OFFSET_PLATE_ON_TC,
         labwareDisplayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
+        runCreatedAt: mockRunningRun.createdAt,
       },
     ])
   })

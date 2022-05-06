@@ -9,13 +9,26 @@ import type { LabwareOffset } from '@opentrons/api-client'
 import type { ProtocolFile } from '@opentrons/shared-data'
 interface OffsetCandidate extends LabwareOffset {
   labwareDisplayName: string
+  runCreatedAt: string
 }
 export function useOffsetCandidatesForCurrentRun(): OffsetCandidate[] {
   const currentRunId = useCurrentRunId()
   const { protocolData } = useProtocolDetailsForRun(currentRunId)
   const historicRunDetails = useHistoricRunDetails()
   const allHistoricOffsets = historicRunDetails
-    .map(run => run.labwareOffsets ?? [])
+    .map(
+      run =>
+        run.labwareOffsets
+          ?.map(offset => ({
+            offset,
+            runCreatedAt: run.createdAt,
+          }))
+          ?.sort(
+            (a, b) =>
+              new Date(a.offset.createdAt).getTime() -
+              new Date(b.offset.createdAt).getTime()
+          ) ?? []
+    )
     .flat()
 
   if (
@@ -41,7 +54,7 @@ export function useOffsetCandidatesForCurrentRun(): OffsetCandidate[] {
       const labwareDisplayName = getLabwareDisplayName(definition)
 
       const offsetMatch = allHistoricOffsets.find(
-        offset =>
+        ({ offset }) =>
           !isEqual(offset.vector, { x: 0, y: 0, z: 0 }) &&
           isEqual(offset.location, location) &&
           offset.definitionUri === defUri
@@ -49,7 +62,14 @@ export function useOffsetCandidatesForCurrentRun(): OffsetCandidate[] {
 
       return offsetMatch == null
         ? acc
-        : [...acc, { ...offsetMatch, labwareDisplayName }]
+        : [
+            ...acc,
+            {
+              ...offsetMatch.offset,
+              runCreatedAt: offsetMatch.runCreatedAt,
+              labwareDisplayName,
+            },
+          ]
     },
     []
   )

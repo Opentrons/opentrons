@@ -172,9 +172,7 @@ export function SetupLabware({
 
   return (
     <>
-      {showReapplyOffsetsModal ? (
-        <ReapplyOffsetsModal robotName={robotName} runId={runId} />
-      ) : null}
+      {showReapplyOffsetsModal ? <ReapplyOffsetsModal runId={runId} /> : null}
       {showLabwareHelpModal && (
         <LabwareOffsetModal
           onCloseClick={() => setShowLabwareHelpModal(false)}
