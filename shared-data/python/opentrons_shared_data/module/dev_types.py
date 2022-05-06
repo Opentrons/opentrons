@@ -49,15 +49,15 @@ ModuleDimensions = TypedDict(
     "ModuleDimensions",
     {
         "bareOverallHeight": float,
-         "overLabwareHeight": float,
-         "lidHeight": float,
-         "xDimension": float,
-         "yDimension": float,
-         "footprintXDimension": float,
-         "footprintYDimension": float,
-         "labwareInterfaceXDimension": float,
-         "labwareInterfaceYDimension": float,
-     },
+        "overLabwareHeight": float,
+        "lidHeight": float,
+        "xDimension": float,
+        "yDimension": float,
+        "footprintXDimension": float,
+        "footprintYDimension": float,
+        "labwareInterfaceXDimension": float,
+        "labwareInterfaceYDimension": float,
+    },
     total=False,
 )
 
@@ -84,8 +84,8 @@ ModuleDefinitionV3 = TypedDict(
         "quirks": List[str],
         "slotTransforms": Dict[str, Dict[str, Dict[str, List[List[float]]]]],
         "compatibleWith": List[ModuleModel],
-        "twoDimensionalRendering": Dict[str, Any]
-    }
+        "twoDimensionalRendering": Dict[str, Any],
+    },
 )
 
 
