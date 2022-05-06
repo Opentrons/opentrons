@@ -32,7 +32,7 @@ class ProtocolAnalyzer:
 
         log.info(f'Completed analysis "{analysis_id}".')
 
-        self._analysis_store.update(
+        await self._analysis_store.update(
             analysis_id=analysis_id,
             commands=result.commands,
             labware=result.labware,

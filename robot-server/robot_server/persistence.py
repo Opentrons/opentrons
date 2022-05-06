@@ -43,6 +43,33 @@ protocol_table = sqlalchemy.Table(
     sqlalchemy.Column("protocol_key", sqlalchemy.String, nullable=True),
 )
 
+analysis_table = sqlalchemy.Table(
+    "analysis",
+    _metadata,
+    sqlalchemy.Column(
+        "id",
+        sqlalchemy.String,
+        primary_key=True,
+    ),
+    sqlalchemy.Column(
+        "protocol_id",
+        sqlalchemy.String,
+        sqlalchemy.ForeignKey("protocol.id"),
+        index=True,
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "analyzer_version",
+        sqlalchemy.String,
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "completed_analysis",
+        sqlalchemy.LargeBinary,
+        nullable=False,
+    ),
+)
+
 run_table = sqlalchemy.Table(
     "run",
     _metadata,
@@ -61,6 +88,7 @@ run_table = sqlalchemy.Table(
         "protocol_id",
         sqlalchemy.String,
         sqlalchemy.ForeignKey("protocol.id"),
+        nullable=True,
     ),
     sqlalchemy.Column("state", sqlalchemy.PickleType, nullable=True),
     sqlalchemy.Column("commands", sqlalchemy.PickleType, nullable=True),
@@ -91,6 +119,21 @@ action_table = sqlalchemy.Table(
         nullable=False,
     ),
 )
+
+
+# A reference to SQLite's built-in ROWID column.
+#
+# https://www.sqlite.org/autoinc.html
+#
+# ROWID is basically an autoincrementing integer, implicitly present in every table.
+# It's useful for selecting rows in the order we originally inserted them.
+# For example:
+#
+#     sqlalchemy.select(my_table).order_by(sqlite_row_id)
+#
+# Note that without an explicit .order_by() clause,
+# a .select() call will return results in an undefined order.
+sqlite_rowid = sqlalchemy.column("_ROWID_")
 
 
 def open_db_no_cleanup(db_file_path: Path) -> sqlalchemy.engine.Engine:

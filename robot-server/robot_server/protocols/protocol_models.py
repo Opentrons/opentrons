@@ -87,6 +87,9 @@ class Protocol(ResourceModel):
             "Summaries of any analyses run to check how this protocol"
             " is expected to run. For more detailed information,"
             " use `GET /protocols/:id/analyses`."
+            "\n\n"
+            "Returned in order from the least-recently started analysis"
+            " to the most-recently started analysis."
         ),
     )
 

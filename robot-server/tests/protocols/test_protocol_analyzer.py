@@ -112,7 +112,7 @@ async def test_analyze(
     )
 
     decoy.verify(
-        analysis_store.update(
+        await analysis_store.update(
             analysis_id="analysis-id",
             commands=[analysis_command],
             labware=[analysis_labware],

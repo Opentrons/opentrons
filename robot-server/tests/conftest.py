@@ -46,6 +46,24 @@ async def always_raise() -> NoReturn:
 app.include_router(test_router)
 
 
+@pytest.fixture(autouse=True)
+def configure_test_logs(caplog: pytest.LogCaptureFixture) -> None:
+    """Configure which logs pytest captures and displays.
+
+    Because of the autouse=True, this automatically applies to each test.
+
+    By default, pytest displays log messages of level WARNING and above.
+    If you need to adjust this in the course of a debugging adventure,
+    you should normally do it by passing something like --log-level=DEBUG
+    to pytest on the command line.
+    """
+    # Fix up SQLAlchemy's logging so that it uses the same log level as everything else.
+    # By default, SQLAlchemy's logging is slightly unusual: it hides messages below
+    # WARNING, even if you pass --log-level=DEBUG to pytest on the command line.
+    # See: https://docs.sqlalchemy.org/en/14/core/engines.html#configuring-logging
+    caplog.set_level("NOTSET", logger="sqlalchemy")
+
+
 @pytest.fixture
 def unique_id() -> str:
     """Get a fake unique identifier.

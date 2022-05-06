@@ -21,7 +21,6 @@ from robot_server.protocols.protocol_store import (
 from sqlalchemy.engine import Engine as SQLEngine
 
 
-@pytest.fixture
 def protocol_file_directory(tmp_path: Path) -> Path:
     """Return a directory for protocol files to be placed in."""
     subdirectory = tmp_path / "protocol_files"
