@@ -96,6 +96,12 @@ function importProtocol() {
       encoding: 'utf8',
     })
     cy.get('[data-test="ComputingSpinner"]').should('exist')
+    cy.get('div')
+      .contains(
+        'We have added new features since the last time this protocol was updated, but have not made any changes to existing protocol behavior'
+      )
+      .should('exist')
+    cy.get('button').contains('ok', { matchCase: false }).click()
     // wait until computation is done before proceeding, with generous timeout
     cy.get('[data-test="ComputingSpinner"]', { timeout: 30000 }).should(
       'not.exist'

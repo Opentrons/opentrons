@@ -37,6 +37,7 @@ describe('LabwareCard', () => {
   })
 
   it('renders correct info for opentrons labware card', () => {
+    props.labware.definition.namespace = 'opentrons'
     const [{ getByText, getByRole }] = render(props)
     getByText('mock RobotWorkSpace')
     getByText('Well Plate')
@@ -49,6 +50,7 @@ describe('LabwareCard', () => {
   it('renders additional info for custom labware card', () => {
     props.labware.modified = 123
     props.labware.filename = 'mock/filename'
+    props.labware.definition.namespace = 'custom'
     const [{ getByText }] = render(props)
     getByText('Custom Definition')
     getByText(nestedTextMatcher('Date added'))

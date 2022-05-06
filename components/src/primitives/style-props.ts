@@ -79,6 +79,7 @@ const LAYOUT_PROPS = [
   'overflowY',
   'whiteSpace',
   'wordSpacing',
+  'cursor',
 ] as const
 
 const POSITION_PROPS = [

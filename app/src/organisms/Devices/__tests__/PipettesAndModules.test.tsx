@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
+import { Banner } from '../../../atoms/Banner'
 import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import {
   useAttachedModules,
   useAttachedPipettes,
@@ -14,6 +16,8 @@ import { PipetteCard } from '../PipetteCard'
 jest.mock('../hooks')
 jest.mock('../ModuleCard')
 jest.mock('../PipetteCard')
+jest.mock('../../ProtocolUpload/hooks')
+jest.mock('../../../atoms/Banner')
 
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
@@ -26,6 +30,10 @@ const mockPipetteCard = PipetteCard as jest.MockedFunction<typeof PipetteCard>
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
 >
+const mockBanner = Banner as jest.MockedFunction<typeof Banner>
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
+>
 
 const render = () => {
   return renderWithProviders(<PipettesAndModules robotName="otie" />, {
@@ -34,6 +42,9 @@ const render = () => {
 }
 
 describe('PipettesAndModules', () => {
+  beforeEach(() => {
+    mockUseCurrentRunId.mockReturnValue(null)
+  })
   afterEach(() => {
     jest.resetAllMocks()
   })
@@ -69,5 +80,12 @@ describe('PipettesAndModules', () => {
     })
     const [{ getAllByText }] = render()
     getAllByText('Mock PipetteCard')
+  })
+  it('renders the protocol loaded banner when protocol is loaded', () => {
+    mockUseCurrentRunId.mockReturnValue('RUNID')
+    mockBanner.mockReturnValue(<div>mock Banner</div>)
+    const [{ getByText }] = render()
+
+    getByText('mock Banner')
   })
 })

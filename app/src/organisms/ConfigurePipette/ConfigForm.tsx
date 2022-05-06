@@ -9,9 +9,8 @@ import pick from 'lodash/pick'
 import omit from 'lodash/omit'
 import set from 'lodash/set'
 import isEmpty from 'lodash/isEmpty'
-
-import { Icon } from '@opentrons/components'
-import { FormButtonBar } from './FormButtonBar'
+import { ConfigFormResetButton } from './ConfigFormResetButton'
+import { ConfigFormSubmitButton } from './ConfigFormSubmitButton'
 import {
   ConfigFormGroup,
   FormColumn,
@@ -185,7 +184,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
   }
 
   render(): JSX.Element {
-    const { updateInProgress, closeModal } = this.props
+    const { updateInProgress } = this.props
     const fields = this.getVisibleFields()
     const UNKNOWN_KEYS = this.getUnknownKeys()
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
@@ -217,8 +216,13 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
             })
             formProps.resetForm({ values: newValues })
           }
+          //  TODO(jr, 4/19/22): add groupLabels to i18n
           return (
             <Form>
+              <ConfigFormResetButton
+                onClick={handleReset}
+                disabled={updateInProgress}
+              />
               <FormColumn>
                 <ConfigFormGroup
                   groupLabel="Plunger Positions"
@@ -226,21 +230,10 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
                   formFields={plungerFields}
                 />
                 <ConfigFormGroup
-                  groupLabel="Power / Force"
-                  formFields={powerFields}
-                />
-              </FormColumn>
-              <FormColumn>
-                <ConfigFormGroup
                   groupLabel="Tip Pickup / Drop"
                   formFields={tipFields}
                 />
-                {quirksPresent && (
-                  <ConfigQuirkGroup
-                    groupLabel="Pipette Quirks"
-                    quirks={quirkFields}
-                  />
-                )}
+                {quirksPresent && <ConfigQuirkGroup quirks={quirkFields} />}
                 {this.props.__showHiddenFields && (
                   <ConfigFormGroup
                     groupLabel="For Dev Use Only"
@@ -248,28 +241,14 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
                   />
                 )}
               </FormColumn>
-              <FormButtonBar
-                buttons={[
-                  {
-                    children: 'reset all',
-                    onClick: handleReset,
-                    disabled: updateInProgress,
-                  },
-                  {
-                    children: 'cancel',
-                    onClick: closeModal,
-                    disabled: updateInProgress,
-                  },
-                  {
-                    type: 'submit',
-                    disabled: disableSubmit || updateInProgress,
-                    children: updateInProgress ? (
-                      <Icon name="ot-spinner" height="1em" spin />
-                    ) : (
-                      'save'
-                    ),
-                  },
-                ]}
+              <FormColumn>
+                <ConfigFormGroup
+                  groupLabel="Power / Force"
+                  formFields={powerFields}
+                />
+              </FormColumn>
+              <ConfigFormSubmitButton
+                disabled={disableSubmit || updateInProgress}
               />
             </Form>
           )

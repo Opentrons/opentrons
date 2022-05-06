@@ -38,17 +38,14 @@ import {
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 
 import { useCurrentRunStatus } from '../../../RunTimeControl/hooks'
-import { LabwarePositionCheck } from '../../LabwarePositionCheck'
 import styles from '../../styles.css'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
-import { DownloadOffsetDataModal } from '../../../ProtocolUpload/DownloadOffsetDataModal'
 import {
   useModuleRenderInfoById,
   useLabwareRenderInfoById,
   useLPCSuccessToast,
 } from '../../hooks'
 import { useModuleMatchResults, useProtocolCalibrationStatus } from '../hooks'
-import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from './LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
@@ -147,14 +144,14 @@ export const LabwareSetup = (): JSX.Element | null => {
         />
       )}
       {showLabwarePositionCheckModal && (
-        <LabwarePositionCheck
-          onCloseClick={() => setShowLabwarePositionCheckModal(false)}
-        />
+        <p>
+          deprecated entrypoint to labware position check, slated for deletion{' '}
+        </p>
       )}
       {downloadOffsetDataModal && (
-        <DownloadOffsetDataModal
-          onCloseClick={() => showDownloadOffsetDataModal(false)}
-        />
+        <p>
+          deprecated entrypoint to download offset data, slated for deletion{' '}
+        </p>
       )}
       <Flex flex="1" maxHeight="100vh" flexDirection={DIRECTION_COLUMN}>
         {moduleTypesThatRequireExtraAttention.length > 0 && (
@@ -199,11 +196,6 @@ export const LabwareSetup = (): JSX.Element | null => {
                           key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
                         >
                           <LabwareRender definition={nestedLabwareDef} />
-                          <LabwareInfoOverlay
-                            definition={nestedLabwareDef}
-                            labwareId={nestedLabwareId}
-                            displayName={nestedLabwareDisplayName}
-                          />
                         </React.Fragment>
                       ) : null}
                     </Module>
@@ -218,11 +210,6 @@ export const LabwareSetup = (): JSX.Element | null => {
                       >
                         <g transform={`translate(${x},${y})`}>
                           <LabwareRender definition={labwareDef} />
-                          <LabwareInfoOverlay
-                            definition={labwareDef}
-                            labwareId={labwareId}
-                            displayName={displayName}
-                          />
                         </g>
                       </React.Fragment>
                     )

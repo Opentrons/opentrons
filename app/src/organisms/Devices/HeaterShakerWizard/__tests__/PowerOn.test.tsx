@@ -30,6 +30,10 @@ describe('PowerOn', () => {
   })
 
   it('renders heater shaker SVG with info with module connected', () => {
+    if (props.attachedModule != null) {
+      props.attachedModule.usbPort.hub = 1
+      props.attachedModule.usbPort.port = null
+    }
     const { getByText } = render(props)
     getByText('Connected')
     getByText('Heater Shaker Module GEN1')

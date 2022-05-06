@@ -11,11 +11,13 @@ from opentrons.hardware_control.modules import (
     MagDeck,
     HeaterShaker,
     TempDeck,
+    Thermocycler,
 )
 from opentrons.protocol_engine.state.module_substates import (
     MagneticModuleId,
     HeaterShakerModuleId,
     TemperatureModuleId,
+    ThermocyclerModuleId,
 )
 from ..errors import (
     FailedToLoadPipetteError,
@@ -262,6 +264,13 @@ class EquipmentHandler:
         self,
         module_id: TemperatureModuleId,
     ) -> Optional[TempDeck]:
+        ...
+
+    @overload
+    def get_module_hardware_api(
+        self,
+        module_id: ThermocyclerModuleId,
+    ) -> Optional[Thermocycler]:
         ...
 
     def get_module_hardware_api(self, module_id: str) -> Optional[AbstractModule]:

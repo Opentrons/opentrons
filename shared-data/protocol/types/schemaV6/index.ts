@@ -77,12 +77,12 @@ export interface ProtocolAnalysisFile<DesignerApplicationData = {}>
  * the protocols record endpoints on the robot-server
  */
 export interface ProtocolAnalysisOutput {
-  createdAt: number
-  commands: RunTimeCommand[]
-  errors: AnalysisError[]
+  createdAt: string
   files: AnalysisSourceFile[]
   config: JsonConfig | PythonConfig
   metadata: { [key: string]: any }
+  commands: RunTimeCommand[]
+  errors: AnalysisError[]
 }
 
 interface AnalysisSourceFile {
@@ -90,17 +90,17 @@ interface AnalysisSourceFile {
   role: 'main' | 'labware'
 }
 interface JsonConfig {
-  protocolType: 'python'
+  protocolType: 'json'
   schemaVersion: number
 }
 interface PythonConfig {
-  protocolType: 'json'
-  apiVersion: number
+  protocolType: 'python'
+  apiVersion: [major: number, minor: number]
 }
 
 interface AnalysisError {
   id: string
   errorType: string
-  createdAt: number
+  createdAt: string
   detail: string
 }
