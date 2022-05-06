@@ -8,7 +8,6 @@ import yargsParser from 'yargs-parser'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import * as Cfg from '@opentrons/app/src/redux/config'
-
 import { createLogger } from '../log'
 import { DEFAULTS_V0, migrate } from './migrate'
 import { shouldUpdate, getNextValue } from './update'
@@ -124,7 +123,7 @@ export function handleConfigChange(
 export function registerPythonPath(): Dispatch {
   return function handleActionForPython(action: Action) {
     switch (action.type) {
-      case Cfg.PYTHON_DIRECTORY: {
+      case Cfg.OPEN_PYTHON_DIRECTORY: {
         const dir = getFullConfig().python.pathToPythonOverride
         if (dir != null) {
           shell.openPath(dir)

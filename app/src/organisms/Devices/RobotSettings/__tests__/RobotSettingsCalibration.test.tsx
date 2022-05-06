@@ -7,7 +7,6 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { DeckCalibrationModal } from '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { useTrackEvent } from '../../../../redux/analytics'
-import { CheckCalibrationControl } from '../../../../pages/Robots/RobotSettings/CheckCalibrationControl'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import {
   mockPipetteOffsetCalibration1,
@@ -35,7 +34,6 @@ jest.mock(
 )
 jest.mock('../../../../redux/analytics')
 jest.mock('../../hooks')
-jest.mock('../../../../pages/Robots/RobotSettings/CheckCalibrationControl')
 
 const mockDeckCalibrationModal = DeckCalibrationModal as jest.MockedFunction<
   typeof DeckCalibrationModal
@@ -52,9 +50,6 @@ const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunc
 >
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
->
-const mockCheckCalibrationControl = CheckCalibrationControl as jest.MockedFunction<
-  typeof CheckCalibrationControl
 >
 
 let mockTrackEvent: jest.Mock
@@ -88,9 +83,6 @@ describe('RobotSettingsCalibration', () => {
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockDeckCalibrationModal.mockReturnValue(
       <div>Mock DeckCalibrationModal</div>
-    )
-    mockCheckCalibrationControl.mockReturnValue(
-      <div>Mock CheckCalibrationControl</div>
     )
     mockUseDeckCalibrationData.mockReturnValue({
       deckCalibrationData: mockDeckCalData,
@@ -138,10 +130,5 @@ describe('RobotSettingsCalibration', () => {
       name: 'calibrationDataDownloaded',
       properties: {},
     })
-  })
-
-  it('renders a calibration check component', () => {
-    const [{ getByText }] = render()
-    getByText('Mock CheckCalibrationControl')
   })
 })

@@ -10,8 +10,6 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
-  useHoverTooltip,
-  TOOLTIP_LEFT,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../../atoms/Buttons'
@@ -26,8 +24,6 @@ import {
   useRobot,
   useTipLengthCalibrations,
 } from '../hooks'
-import { CheckCalibrationControl } from '../../../pages/Robots/RobotSettings/CheckCalibrationControl'
-import { Tooltip } from '../../../atoms/Tooltip'
 
 interface CalibrationProps {
   robotName: string
@@ -43,16 +39,13 @@ export function RobotSettingsCalibration({
     showDeckCalibrationModal,
     setShowDeckCalibrationModal,
   ] = React.useState(false)
-  const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: TOOLTIP_LEFT,
-  })
+
   const robot = useRobot(robotName)
 
   // wait for robot request to resolve instead of using name directly from params
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
   const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
-  const isHealthCheckDisabled = deckCalibrationData.isDeckCalibrated
 
   const onClickSaveAs: React.MouseEventHandler = e => {
     e.preventDefault()
@@ -103,26 +96,6 @@ export function RobotSettingsCalibration({
       </Box>
       <Line />
       {/* TODO: additional calibration content here */}
-      <CheckCalibrationControl
-        targetProps={targetProps}
-        robotName={robotName}
-        disabledReason={
-          !isHealthCheckDisabled
-            ? t('fully_calibrate_before_checking_health')
-            : null
-        }
-      >
-        <>
-          {!isHealthCheckDisabled && (
-            <Tooltip
-              key={`RobotSettingsCalibration_tooltip`}
-              tooltipProps={tooltipProps}
-            >
-              {t('fully_calibrate_before_checking_health')}
-            </Tooltip>
-          )}
-        </>
-      </CheckCalibrationControl>
     </>
   )
 }

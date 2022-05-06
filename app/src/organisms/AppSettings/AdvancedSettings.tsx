@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import path from 'path'
 import { useSelector, useDispatch } from 'react-redux'
 import { css } from 'styled-components'
 import {
@@ -108,18 +109,23 @@ export function AdvancedSettings(): JSX.Element {
     )
   const pythonDirectoryFileInput = React.useRef<HTMLInputElement>(null)
 
+  //  TODO(jr, 5/6/22): find another way to get webkitdirectory to work in the input DOM https://github.com/facebook/react/issues/3468
+  React.useEffect(() => {
+    if (pythonDirectoryFileInput.current !== null) {
+      pythonDirectoryFileInput.current.setAttribute('directory', '')
+      pythonDirectoryFileInput.current.setAttribute('webkitdirectory', '')
+    }
+  }, [pythonDirectoryFileInput])
+
   const handleClickPythonDirectoryChange: React.MouseEventHandler<HTMLButtonElement> = _event => {
     pythonDirectoryFileInput.current?.click()
   }
 
   const setPythonInterpretterDirectory: React.ChangeEventHandler<HTMLInputElement> = event => {
     const { files = [] } = event.target ?? {}
-    dispatch(
-      Config.updateConfigValue(
-        'python.pathToPythonOverride',
-        files?.[0]?.path ?? null
-      )
-    )
+    const dirName =
+      files?.[0]?.path != null ? path.dirname(files?.[0]?.path) : null
+    dispatch(Config.updateConfigValue('python.pathToPythonOverride', dirName))
   }
 
   const toggleDevtools = (): unknown => dispatch(Config.toggleDevtools())
@@ -474,17 +480,17 @@ export function AdvancedSettings(): JSX.Element {
               onClick={handleClickPythonDirectoryChange}
               id="AdvancedSettings_changePythonInterpreterSource"
             >
-              <input
-                id="AdvancedSetting_pythonPathDirectoryInput"
-                data-testid="AdvancedSetting_pythonPathDirectoryInput"
-                type="file"
-                css={INPUT_STYLES}
-                ref={pythonDirectoryFileInput}
-                onChange={setPythonInterpretterDirectory}
-              />
               {t('add_override_path')}
             </TertiaryButton>
           )}
+          <input
+            id="AdvancedSetting_pythonPathDirectoryInput"
+            data-testid="AdvancedSetting_pythonPathDirectoryInput"
+            type="file"
+            css={INPUT_STYLES}
+            ref={pythonDirectoryFileInput}
+            onChange={setPythonInterpretterDirectory}
+          />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>

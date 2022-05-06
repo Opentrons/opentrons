@@ -1,78 +1,115 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import {
+  Tooltip,
+  PrimaryBtn,
+  SecondaryBtn,
+  mountWithProviders,
+  WrapperWithStore,
+} from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
-import { getUseTrashSurfaceForTipCal } from '../../../../redux/config'
 import * as Sessions from '../../../../redux/sessions'
+import { TitledControl } from '../../../../atoms/TitledControl'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
+
+import type { State, Action } from '../../../../redux/types'
+import type { HTMLAttributes, ReactWrapper } from 'enzyme'
 
 import { mockCalibrationCheckSessionAttributes } from '../../../../redux/sessions/__fixtures__'
 
 jest.mock('../../../../redux/robot-api/selectors')
 jest.mock('../../../../redux/sessions/selectors')
-jest.mock('../../../../redux/config')
+jest.mock('../../../../organisms/CheckCalibration', () => ({
+  CheckCalibration: () => <></>,
+}))
+
 const getRobotSessionOfType = Sessions.getRobotSessionOfType as jest.MockedFunction<
   typeof Sessions.getRobotSessionOfType
 >
-const mockGetUseTrashSurfaceForTipCal = getUseTrashSurfaceForTipCal as jest.MockedFunction<
-  typeof getUseTrashSurfaceForTipCal
->
 
-const render = (
-  props: React.ComponentProps<typeof CheckCalibrationControl>
-) => {
-  return renderWithProviders(<CheckCalibrationControl {...props} />, {
-    i18nInstance: i18n,
-  })[0]
-}
+const MOCK_STATE: State = { mockState: true } as any
 
 describe('CheckCalibrationControl', () => {
-  let props: React.ComponentProps<typeof CheckCalibrationControl>
+  const getCalCheckButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof CheckCalibrationControl>>
+  ): ReactWrapper<HTMLAttributes> =>
+    wrapper
+      .find('TitledControl[title="calibration health check"]')
+      .find('button')
+
+  const render = (
+    props: Partial<React.ComponentProps<typeof CheckCalibrationControl>> = {}
+  ): WrapperWithStore<
+    React.ComponentProps<typeof CheckCalibrationControl>,
+    State,
+    Action
+  > => {
+    const { robotName = 'robot-name', disabledReason = null } = props
+    return mountWithProviders<
+      React.ComponentProps<typeof CheckCalibrationControl>,
+      State,
+      Action
+    >(
+      <CheckCalibrationControl
+        robotName={robotName}
+        disabledReason={disabledReason}
+      />,
+      { initialState: MOCK_STATE, i18n }
+    )
+  }
 
   beforeEach(() => {
-    props = {
-      disabledReason: null,
-      robotName: 'robotName',
-    }
     const mockCalibrationCheckSession: Sessions.CalibrationCheckSession = {
       id: 'fake_check_session_id',
       ...mockCalibrationCheckSessionAttributes,
     }
     getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
-    mockGetUseTrashSurfaceForTipCal.mockReturnValue(null)
   })
 
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  it('should render correct text', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('Calibration Health Check')
-    getByText(
-      'Check the accuracy of key calibration points without recalibrating the robot.'
+  it('should render a TitledControl', () => {
+    const { wrapper } = render({ disabledReason: null })
+    const titledButton = wrapper.find(TitledControl)
+    const button = titledButton.find(SecondaryBtn)
+
+    expect(titledButton.prop('title')).toMatch(/calibration health check/)
+    expect(titledButton.html()).toMatch(
+      /check the health of the current calibration settings/i
     )
-    const button = getByRole('button', { name: 'Check Health' })
-    expect(button).not.toBeDisabled()
+    expect(button.html()).toMatch(/check health/i)
   })
 
   it('should be able to disable the button', () => {
-    props = {
-      disabledReason: 'disabled',
-      robotName: 'robotName',
-    }
-    const { getByRole } = render(props)
-    const button = getByRole('button', { name: 'Check Health' })
-    expect(button).toBeDisabled()
+    const { wrapper } = render({ disabledReason: 'oh no!' })
+    const button = wrapper.find('button')
+    const tooltip = wrapper.find(Tooltip)
+
+    expect(button.prop('disabled')).toBe(true)
+    expect(tooltip.prop('children')).toBe('oh no!')
   })
 
   it('button launches new check calibration health after confirm', () => {
-    const { getByText, getByRole } = render(props)
-    const button = getByRole('button', { name: 'Check Health' })
-    fireEvent.click(button)
-    getByText(
-      'Check the accuracy of key calibration points without recalibrating the robot.'
-    )
+    const { wrapper, store } = render()
+    getCalCheckButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.update()
+
+    const calBlockButton = wrapper.find(PrimaryBtn)
+    calBlockButton.invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.update()
+
+    expect(store.dispatch).toHaveBeenCalledWith({
+      ...Sessions.ensureSession(
+        'robot-name',
+        Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+        {
+          hasCalibrationBlock: true,
+          tipRacks: [],
+        }
+      ),
+      meta: expect.objectContaining({ requestId: expect.any(String) }),
+    })
   })
 })

@@ -1,7 +1,7 @@
 import * as Constants from './constants'
 import * as Types from './types'
 
-export const PYTHON_DIRECTORY: 'python:OPEN_PYTHON_DIRECTORY' =
+export const OPEN_PYTHON_DIRECTORY: 'python:OPEN_PYTHON_DIRECTORY' =
   'python:OPEN_PYTHON_DIRECTORY'
 
 export const CHANGE_PYTHON_DIRECTORY: 'python:CHANGE_PYTHON_DIRECTORY' =
@@ -93,6 +93,6 @@ export function removeManualIp(ip: string): Types.SubtractConfigValueAction {
 }
 
 export const openPythonInterpreterDirectory = (): Types.OpenPythonInterpreterDirectoryAction => ({
-  type: PYTHON_DIRECTORY,
+  type: OPEN_PYTHON_DIRECTORY,
   meta: { shell: true },
 })

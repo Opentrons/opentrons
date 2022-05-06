@@ -10,11 +10,16 @@ import { registerDiscovery } from './discovery'
 import { registerLabware } from './labware'
 import { registerRobotLogs } from './robot-logs'
 import { registerUpdate } from './update'
-import { registerPythonPath } from './config'
 import { registerBuildrootUpdate } from './buildroot'
 import { registerSystemInfo } from './system-info'
 import { registerProtocolStorage } from './protocol-storage'
-import { getConfig, getStore, getOverrides, registerConfig } from './config'
+import {
+  getConfig,
+  getStore,
+  getOverrides,
+  registerConfig,
+  registerPythonPath,
+} from './config'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
