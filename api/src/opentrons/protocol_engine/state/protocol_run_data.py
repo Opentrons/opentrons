@@ -1,4 +1,4 @@
-"""Protocol run data class for storing protocol engine state."""
+"""Public protocol run data models."""
 from pydantic import BaseModel
 from typing import List
 

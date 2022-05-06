@@ -2,7 +2,7 @@
 import logging
 
 from fastapi import APIRouter, Depends, status
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Union
 from typing_extensions import Literal
 
@@ -13,7 +13,7 @@ from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 
-from ..run_state_store import RunStateStore
+from ..run_state_store import RunStateStore, RunStateResource
 from ..run_store import RunStore, RunNotFoundError
 from ..action_models import RunAction, RunActionType, RunActionCreate
 from ..engine_store import EngineStore
@@ -91,9 +91,14 @@ async def create_run_action(
                 engine_store.runner.play()
             else:
                 log.info(f'Starting run "{runId}".')
-                task_runner.run_waterfall(
-                    [engine_store.runner.run, run_state_store.insert]
-                )
+
+                async def run_protocol_and_insert_result() -> None:
+                    run_result = await engine_store.runner.run()
+                    engine_status = engine_store.engine.state_view.commands.get_status()
+                    run_state_resource = RunStateResource(run_id=runId, state=run_result, engine_status=engine_status, created_at=datetime.now(tz=timezone.utc))
+                    run_state_store.insert(run_state_resource)
+
+                task_runner.run(run_protocol_and_insert_result)
 
         elif action.actionType == RunActionType.PAUSE:
             log.info(f'Pausing run "{runId}".')

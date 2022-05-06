@@ -79,9 +79,7 @@ async def test_create_play_action_to_start_run(
     assert result.status_code == 201
 
     decoy.verify(
-        task_runner.run_waterfall(
-            [mock_engine_store.runner.run, mock_run_state_store.insert]
-        ),
+        task_runner.run(matchers.Anything()),
         mock_run_store.insert_action(run_id=prev_run.run_id, action=action),
     )
 

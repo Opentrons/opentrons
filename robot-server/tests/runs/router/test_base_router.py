@@ -485,11 +485,11 @@ async def test_get_run() -> None:
     assert result.status_code == 200
 
 
-async def test_get_runs_empty(decoy: Decoy, mock_run_store: RunStore) -> None:
+async def test_get_runs_empty(decoy: Decoy, mock_run_store: RunStore, mock_engine_store: EngineStore, mock_run_state_store: RunStateStore) -> None:
     """It should return an empty collection response when no runs exist."""
     decoy.when(mock_run_store.get_all()).then_return([])
 
-    result = await get_runs(run_store=mock_run_store)
+    result = await get_runs(run_store=mock_run_store, engine_store=mock_engine_store, run_state_store=mock_run_state_store)
 
     assert result.content.data == []
     assert result.content.links == AllRunsLinks(current=None)
@@ -501,6 +501,7 @@ async def test_get_runs_not_empty(
     decoy: Decoy,
     mock_run_store: RunStore,
     mock_engine_store: EngineStore,
+    mock_run_state_store: RunStateStore
 ) -> None:
     """It should return a collection response when a run exists."""
     created_at_1 = datetime(year=2021, month=1, day=1)
@@ -554,7 +555,7 @@ async def test_get_runs_not_empty(
         pe_types.EngineStatus.IDLE
     )
 
-    result = await get_runs(run_store=mock_run_store, engine_store=mock_engine_store)
+    result = await get_runs(run_store=mock_run_store, engine_store=mock_engine_store, run_state_store=mock_run_state_store)
 
     assert result.content.data == [response_1, response_2]
     assert result.content.links == AllRunsLinks(

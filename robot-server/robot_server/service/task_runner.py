@@ -7,7 +7,7 @@
 from __future__ import annotations
 import asyncio
 from logging import getLogger
-from typing import Any, Awaitable, Callable, Set, Optional
+from typing import Any, Awaitable, Callable, Set, Optional, List
 from fastapi import Depends
 from robot_server.app_state import AppState, AppStateAccessor, get_app_state
 
@@ -52,35 +52,6 @@ class TaskRunner:
 
         wrapper_task = asyncio.create_task(wrapper())
         self._running_tasks.add(wrapper_task)
-
-    def run_waterfall(self, func_list: List[TaskFuncAll]) -> None:
-        """Run a list of functions in the background.
-
-        The order of the items in list matter.
-        Add items to list in the order we want to call the methods.
-
-        Will log when the function completes, including any error
-        that may occur.
-
-        Arguments:
-            func_list: function list to run in the background.
-        """
-
-        async def _run_async_task() -> None:
-            response: Optional[str] = None
-            for func in func_list:
-                func_name = func.__qualname__
-                if response is None:
-                    try:
-                        response = await func()
-                    except Exception as e:
-                        log.warning(f"Background task {func_name} failed", exc_info=e)
-                else:
-                    func(response)
-                    log.debug(f"Background task {func_name} succeeded")
-                    response = None
-
-        self._background_tasks.add_task(_run_async_task)
 
     async def cancel_all_and_clean_up(self) -> None:
         """Cancel any ongoing background tasks and wait for them to stop.
