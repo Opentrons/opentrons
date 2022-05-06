@@ -30,7 +30,7 @@ from robot_server.protocols import (
     ProtocolResource,
     ProtocolNotFoundError,
 )
-from robot_server.runs.run_models import Run, RunSummary, RunCreate, RunUpdate
+from robot_server.runs.run_models import Run, RunCreate, RunUpdate
 
 from robot_server.runs.engine_store import (
     EngineStore,
@@ -503,7 +503,7 @@ async def test_get_runs_not_empty(
     mock_engine_store: EngineStore,
     mock_run_state_store: RunStateStore
 ) -> None:
-    """It should return a collection response when a run exists."""
+    """"It should return a collection response when a run exists."""
     created_at_1 = datetime(year=2021, month=1, day=1)
     created_at_2 = datetime(year=2022, month=2, day=2)
 
@@ -523,26 +523,49 @@ async def test_get_runs_not_empty(
         is_current=True,
     )
 
-    response_1 = RunSummary(
+    response_1 = Run(
         id="unique-id-1",
         protocolId=None,
         createdAt=created_at_1,
         status=pe_types.EngineStatus.SUCCEEDED,
         current=False,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
     )
 
-    response_2 = RunSummary(
+    response_2 = Run(
         id="unique-id-2",
         protocolId=None,
         createdAt=created_at_2,
         status=pe_types.EngineStatus.IDLE,
         current=True,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
     )
 
     decoy.when(mock_run_store.get_all()).then_return([run_1, run_2])
-
     engine_state_1 = decoy.mock(cls=StateView)
+    decoy.when(engine_state_1.commands.get_all_errors()).then_return([])
+    decoy.when(engine_state_1.pipettes.get_all()).then_return([])
+    decoy.when(engine_state_1.labware.get_all()).then_return([])
+    decoy.when(engine_state_1.labware.get_labware_offsets()).then_return([])
+    decoy.when(engine_state_1.commands.get_status()).then_return(
+        pe_types.EngineStatus.SUCCEEDED
+    )
     engine_state_2 = decoy.mock(cls=StateView)
+    decoy.when(engine_state_2.commands.get_all_errors()).then_return([])
+    decoy.when(engine_state_2.pipettes.get_all()).then_return([])
+    decoy.when(engine_state_2.labware.get_all()).then_return([])
+    decoy.when(engine_state_2.labware.get_labware_offsets()).then_return([])
+    decoy.when(engine_state_2.commands.get_status()).then_return(
+        pe_types.EngineStatus.SUCCEEDED
+    )
 
     decoy.when(mock_engine_store.get_state("unique-id-1")).then_return(engine_state_1)
     decoy.when(mock_engine_store.get_state("unique-id-2")).then_return(engine_state_2)
@@ -555,7 +578,7 @@ async def test_get_runs_not_empty(
         pe_types.EngineStatus.IDLE
     )
 
-    result = await get_runs(run_store=mock_run_store, engine_store=mock_engine_store, run_state_store=mock_run_state_store)
+    result = await get_runs(run_store=mock_run_store, engine_store=mock_engine_store)
 
     assert result.content.data == [response_1, response_2]
     assert result.content.links == AllRunsLinks(
@@ -563,6 +586,7 @@ async def test_get_runs_not_empty(
     )
     assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=2)
     assert result.status_code == 200
+
 
 
 async def test_delete_run_by_id(

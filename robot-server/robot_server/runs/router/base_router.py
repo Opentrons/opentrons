@@ -33,7 +33,7 @@ from robot_server.protocols import (
 from ..run_store import RunStore, RunResource, RunNotFoundError
 from ..run_state_store import RunStateResource, RunStateStore
 from ..run_models import Run, RunSummary, RunCreate, RunUpdate
-from ..engine_store import EngineStore, EngineConflictError
+from ..engine_store import EngineStore, EngineConflictError, EngineMissingError
 from ..dependencies import get_run_store, get_engine_store, get_run_state_store
 
 from opentrons.protocol_engine import EngineStatus
@@ -225,17 +225,37 @@ async def get_runs(
 
     for run in run_store.get_all():
         run_id = run.run_id
+
+        # TODO(mc, 2022-05-06): remove this temporary try/except
+        # once run data persistence lands. This prevents 500 errors
+        # due to mismatch between SQL-backed `RunStore` and in-memory
+        # dictionary backed `EngineStore`.
+        # https://github.com/Opentrons/opentrons/pull/10187
         try:
-            engine_status = EngineStatus(run_state_store.get(run_id).engine_status)
-        #TODO (tz): change this once get_state PR is worked on
-        except RunNotFoundError:
-            engine_status = EngineStatus.STOPPED
-        run_data = RunSummary.construct(
-            id=run_id,
+            engine_state = engine_store.get_state(run_id)
+            errors = engine_state.commands.get_all_errors()
+            pipettes = engine_state.pipettes.get_all()
+            labware = engine_state.labware.get_all()
+            labwareOffsets = engine_state.labware.get_labware_offsets()
+            run_status = engine_state.commands.get_status()
+        except EngineMissingError:
+            errors = []
+            pipettes = []
+            labware = []
+            labwareOffsets = []
+            run_status = EngineStatus.STOPPED
+
+        run_data = Run.construct(
+            id=run.run_id,
             protocolId=run.protocol_id,
             createdAt=run.created_at,
             current=run.is_current,
-            status=engine_status
+            actions=run.actions,
+            errors=errors,
+            pipettes=pipettes,
+            labware=labware,
+            labwareOffsets=labwareOffsets,
+            status=run_status,
         )
 
         data.append(run_data)
