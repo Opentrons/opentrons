@@ -91,6 +91,11 @@ function Input(props: InputFieldProps): JSX.Element {
       ${error ? COLORS.error : COLORS.medGrey};
     font-size: ${TYPOGRAPHY.fontSizeP};
 
+    &:active {
+      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+        ${COLORS.darkGreyEnabled};
+    }
+
     & input {
       border-radius: inherit;
       color: ${COLORS.darkBlack};
@@ -135,7 +140,7 @@ function Input(props: InputFieldProps): JSX.Element {
             textAlign={TEXT_ALIGN_RIGHT}
             alignSelf={ALIGN_CENTER}
             color={COLORS.darkGreyEnabled}
-            fontSize={TYPOGRAPHY.fontSizeH6}
+            fontSize={TYPOGRAPHY.fontSizeLabel}
           >
             {props.units}
           </Flex>
@@ -143,7 +148,7 @@ function Input(props: InputFieldProps): JSX.Element {
       </Flex>
       <Flex
         color={COLORS.darkGreyEnabled}
-        fontSize={TYPOGRAPHY.fontSizeH6}
+        fontSize={TYPOGRAPHY.fontSizeLabel}
         paddingTop={SPACING.spacing2}
         flexDirection={DIRECTION_COLUMN}
       >

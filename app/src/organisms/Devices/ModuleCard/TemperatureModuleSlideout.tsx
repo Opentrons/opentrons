@@ -113,7 +113,7 @@ export const TemperatureModuleSlideout = (
         data-testid={`TemperatureSlideout_input_field_${module.serialNumber}`}
       >
         <Text
-          fontWeight={FONT_WEIGHT_REGULAR}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.black}
           paddingBottom={SPACING.spacing3}

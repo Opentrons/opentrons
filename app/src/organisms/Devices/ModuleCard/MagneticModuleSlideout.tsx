@@ -156,6 +156,7 @@ export const MagneticModuleSlideout = (
       <Text
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
+        color={COLORS.darkBlack}
         paddingTop={SPACING.spacing2}
         data-testid={`MagneticModuleSlideout_body_text_${module.serialNumber}`}
       >
@@ -195,7 +196,7 @@ export const MagneticModuleSlideout = (
         >
           <Text paddingBottom={SPACING.spacing3}>{t('max_engage_height')}</Text>
           <Text paddingBottom={SPACING.spacing3}>{t('labware_bottom')}</Text>
-          <Text paddingBottom={SPACING.spacing3}>{t('disengaged')}</Text>
+          <Text>{t('disengaged')}</Text>
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -206,7 +207,7 @@ export const MagneticModuleSlideout = (
           <Text paddingBottom={SPACING.spacing3} paddingLeft={SPACING.spacing2}>
             {labwareBottom}
           </Text>
-          <Text paddingBottom={SPACING.spacing3}>{disengageHeight}</Text>
+          <Text>{disengageHeight}</Text>
         </Flex>
       </Flex>
       <Flex

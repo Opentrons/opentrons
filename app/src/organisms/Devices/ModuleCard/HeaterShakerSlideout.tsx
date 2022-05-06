@@ -183,10 +183,10 @@ export const HeaterShakerSlideout = (
           data-testid={`HeaterShakerSlideout_input_field_${module.serialNumber}`}
         >
           <Text
-            fontWeight={FONT_WEIGHT_REGULAR}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             fontSize={TYPOGRAPHY.fontSizeH6}
             color={COLORS.darkGrey}
-            marginBottom={SPACING.spacing1}
+            marginBottom={SPACING.spacing3}
           >
             {isSetShake ? t('set_shake_speed') : t('set_block_temp')}
           </Text>

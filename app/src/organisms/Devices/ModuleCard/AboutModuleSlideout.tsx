@@ -12,6 +12,7 @@ import {
   Btn,
   ALIGN_START,
   TEXT_TRANSFORM_CAPITALIZE,
+  COLORS,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { PrimaryButton } from '../../../atoms/Buttons'
@@ -96,6 +97,7 @@ export const AboutModuleSlideout = (
           <Flex
             flexDirection={DIRECTION_COLUMN}
             data-testid={`alert_item_version_${module.moduleModel}`}
+            color={COLORS.darkGreyEnabled}
           >
             <StyledText as="h6">{t('current_version')}</StyledText>
             <StyledText as="p" paddingTop={SPACING.spacing2}>
@@ -107,6 +109,7 @@ export const AboutModuleSlideout = (
           paddingTop={SPACING.spacing4}
           as="h6"
           data-testid={`alert_item_serial_number_text_${module.moduleModel}`}
+          color={COLORS.darkBlack}
         >
           {t('serial_number')}
         </StyledText>

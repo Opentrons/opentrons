@@ -121,14 +121,16 @@ export const TestShakeSlideout = (
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
-        <PrimaryButton
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
-          width="100%"
-          onClick={onCloseClick}
-          data-testid={`Temp_Slideout_set_temp_btn_${name}`}
-        >
-          {t('close', { ns: 'shared' })}
-        </PrimaryButton>
+        <Flex marginTop={SPACING.spacing4}>
+          <PrimaryButton
+            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            width="100%"
+            onClick={onCloseClick}
+            data-testid={`Temp_Slideout_set_temp_btn_${name}`}
+          >
+            {t('close', { ns: 'shared' })}
+          </PrimaryButton>
+        </Flex>
       }
     >
       <Flex

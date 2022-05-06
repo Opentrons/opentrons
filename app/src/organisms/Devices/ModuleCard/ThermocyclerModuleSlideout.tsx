@@ -143,10 +143,10 @@ export const ThermocyclerModuleSlideout = (
         data-testid={`ThermocyclerSlideout_input_field_${module.serialNumber}`}
       >
         <Text
-          fontWeight={FONT_WEIGHT_REGULAR}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.darkGrey}
-          marginBottom={SPACING.spacing1}
+          paddingBottom={SPACING.spacing3}
         >
           {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}
         </Text>
