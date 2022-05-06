@@ -62,6 +62,14 @@ run_table = sqlalchemy.Table(
         sqlalchemy.String,
         sqlalchemy.ForeignKey("protocol.id"),
     ),
+    sqlalchemy.Column("state", sqlalchemy.PickleType, nullable=True),
+    sqlalchemy.Column("commands", sqlalchemy.PickleType, nullable=True),
+    sqlalchemy.Column("engine_status", sqlalchemy.String),
+    sqlalchemy.Column(
+        "_updated_at",
+        sqlalchemy.DateTime,
+        nullable=True,
+    ),
 )
 
 # TODO (tz: 4/8/22): add a column sequence_number for preserving the order of actions
@@ -76,22 +84,6 @@ action_table = sqlalchemy.Table(
     # NOTE: See above note about naive datetimes
     sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False),
     sqlalchemy.Column("action_type", sqlalchemy.String, nullable=False),
-    sqlalchemy.Column(
-        "run_id",
-        sqlalchemy.String,
-        sqlalchemy.ForeignKey("run.id"),
-        nullable=False,
-    ),
-)
-
-run_state_table = sqlalchemy.Table(
-    "run_state",
-    _metadata,
-    sqlalchemy.Column("id", sqlalchemy.INT, primary_key=True),
-    # NOTE: See above note about naive datetimes
-    sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False),
-    sqlalchemy.Column("state", sqlalchemy.PickleType, nullable=False),
-    sqlalchemy.Column("engine_status", sqlalchemy.String),
     sqlalchemy.Column(
         "run_id",
         sqlalchemy.String,
