@@ -49,16 +49,15 @@ type CalBlockModalState =
 interface OverflowMenuProps {
   calType: 'pipetteOffset' | 'tipLength'
   robotName: string
-  pipetteOffsetCalibration?: PipetteOffsetCalibration
-  tipLengthCalibration?: TipLengthCalibration
+  // pipetteOffsetCalibration?: PipetteOffsetCalibration
+  // tipLengthCalibration?: TipLengthCalibration
   mount: Mount
 }
 
 export function OverflowMenu({
   calType,
   robotName,
-  pipetteOffsetCalibration,
-  // tipLengthCalibration,
+  // pipetteOffsetCalibration,
   mount,
 }: OverflowMenuProps): JSX.Element {
   const { t } = useTranslation('device_settings')

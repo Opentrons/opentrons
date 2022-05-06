@@ -18,18 +18,19 @@ import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated } from './utils'
 import { getDisplayNameForTipRack } from '../../../../pages/Robots/InstrumentSettings/utils'
 import { getCustomLabwareDefinitions } from '../../../../redux/custom-labware'
+import { PipetteOffsetCalHeader } from './PipetteOffsetCalHeader'
 
 import type { State } from '../../../../redux/types'
 import type { FormattedPipetteOffsetCalibration } from '../RobotSettingsCalibration'
-interface PipetteOffsetCalDetailItemProps {
+interface PipetteOffsetCalItemsProps {
   robotName: string
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
 }
 
-export function PipetteOffsetCalDetailItem({
+export function PipetteOffsetCalItems({
   robotName,
   formattedPipetteOffsetCalibrations,
-}: PipetteOffsetCalDetailItemProps): JSX.Element {
+}: PipetteOffsetCalItemsProps): JSX.Element {
   const { t } = useTranslation()
 
   const customLabwareDefs = useSelector((state: State) => {
@@ -38,6 +39,7 @@ export function PipetteOffsetCalDetailItem({
 
   return (
     <>
+      <PipetteOffsetCalHeader />
       {formattedPipetteOffsetCalibrations.map((calibration, index) => (
         <React.Fragment key={index}>
           <Divider />

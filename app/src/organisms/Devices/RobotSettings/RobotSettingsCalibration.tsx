@@ -45,9 +45,8 @@ import {
 } from '../hooks'
 import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
-import { PipetteOffsetCalHeader } from './CalibrationsTable/PipetteOffsetCalHeader'
 import { TipLengthCalHeader } from './CalibrationsTable/TipLengthCalHeader'
-import { PipetteOffsetCalDetailItem } from './CalibrationsTable/PipetteOffsetCalDetailItem'
+import { PipetteOffsetCalItems } from './CalibrationsTable/PipetteOffsetCalItems'
 import { TipLengthCalDetailItem } from './CalibrationsTable/TipLengthCalDetailItem'
 
 import type { State } from '../../../redux/types'
@@ -76,6 +75,14 @@ export interface FormattedPipetteOffsetCalibration {
   tiprack?: string
   lastCalibrated?: string
   markedBad?: boolean
+}
+
+export interface FormattedTipLengthCalibration {
+  tiprack: string
+  pipette: string
+  lastCalibrated: string
+  markedBad: boolean
+  uri?: string | null
 }
 
 const spinnerCommandBlockList: SessionCommandString[] = [
@@ -263,6 +270,7 @@ export function RobotSettingsCalibration({
     )
   }
 
+  // TODO check useCurrentRunId
   const handleHealthCheck = (
     hasBlockModalResponse: boolean | null = null
   ): void => {
@@ -284,12 +292,6 @@ export function RobotSettingsCalibration({
       )
     }
   }
-
-  // for debug TODO: remove when open a PR
-  // console.log('pipetteOffsetCalibrations', pipetteOffsetCalibrations)
-  // console.log('tipLengthCalibrations', tipLengthCalibrations)
-  console.log('attachedPipettes left: ', attachedPipettes.left)
-  console.log('attachedPipettes right: ', attachedPipettes.right)
 
   const formatPipetteOffsetCalibrations = (): FormattedPipetteOffsetCalibration[] => {
     const pippets = []
@@ -324,8 +326,20 @@ export function RobotSettingsCalibration({
     return pippets
   }
 
-  // console.log('showConfirmStart', showConfirmStart)
-  // console.log('pipOffsetDataPresent', pipOffsetDataPresent)
+  const formatTipLengthCalibrations = (): FormattedTipLengthCalibration[] => {
+    const tipLengths: FormattedTipLengthCalibration[] = []
+    tipLengthCalibrations?.map(tipLength =>
+      tipLengths.push({
+        tiprack: tipLength.tiprack,
+        pipette: tipLength.pipette,
+        lastCalibrated: tipLength.lastModified,
+        markedBad: tipLength.status.markedBad,
+        uri: tipLength.uri,
+      })
+    )
+    console.log('tipLengths', tipLengths)
+    return tipLengths
+  }
 
   React.useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
@@ -423,15 +437,10 @@ export function RobotSettingsCalibration({
               {t('pipette_offset_calibrations_description')}
             </StyledText>
             {attachedPipettes != null ? (
-              <>
-                <PipetteOffsetCalHeader />
-                <PipetteOffsetCalDetailItem
-                  robotName={robotName}
-                  // pipetteOffsetCalibrations={pipetteOffsetCalibrations}
-                  // attachedPipettes={attachedPipettes}
-                  formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
-                />
-              </>
+              <PipetteOffsetCalItems
+                robotName={robotName}
+                formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
+              />
             ) : (
               <StyledText as="label">{t('not_calibrated')}</StyledText>
             )}
@@ -451,20 +460,11 @@ export function RobotSettingsCalibration({
             </StyledText>
             {tipLengthCalibrations != null &&
             tipLengthCalibrations?.length > 0 ? (
-              <>
-                <TipLengthCalHeader />
-                {tipLengthCalibrations?.map((calibration, index) => (
-                  <React.Fragment key={index}>
-                    <TipLengthCalDetailItem
-                      robotName={robotName}
-                      tiprack={calibration?.uri}
-                      pipetteModel={calibration?.pipette}
-                      pipetteSerial={calibration?.pipette}
-                      lastCalibrated={calibration?.lastModified}
-                    />
-                  </React.Fragment>
-                ))}
-              </>
+              <TipLengthCalDetailItem
+                robotName={robotName}
+                formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
+                formattedTipLengthCalibrations={formatTipLengthCalibrations()}
+              />
             ) : (
               <StyledText as="label">{t('not_calibrated')}</StyledText>
             )}
