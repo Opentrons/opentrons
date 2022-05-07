@@ -19,6 +19,7 @@ class RunStateResource:
 
     run_id: str
     state: ProtocolRunData
+    # TODO (tz): initialize with factory default
     commands: Optional[List[Command]]
     engine_status: str
     _updated_at: Optional[datetime]
@@ -31,8 +32,8 @@ class RunStateStore:
         """Initialize a RunStore with sql engine."""
         self._sql_engine = sql_engine
 
-    def insert(self, state: RunStateResource) -> RunStateResource:
-        """Insert engine state to db.
+    def update_run(self, state: RunStateResource) -> RunStateResource:
+        """update run table with run state to db.
 
         Arguments:
             state: Engine state resource to store.
@@ -40,13 +41,13 @@ class RunStateStore:
         Returns:
             The engine state that was added to the store.
         """
-        statement = sqlalchemy.insert(run_table).values(
+        statement = sqlalchemy.update(run_table).where(run_table.c.id == state.run_id).values(
             _convert_state_to_sql_values(state=state)
         )
         with self._sql_engine.begin() as transaction:
             try:
                 transaction.execute(statement)
-            except sqlalchemy.exc.IntegrityError:
+            except sqlalchemy.exc.NoResultFound:
                 raise RunNotFoundError(run_id=state.run_id)
 
         return state
@@ -84,19 +85,22 @@ def _convert_sql_row_to_sql_run_state(
     state = sql_row.state
     assert isinstance(state, Dict)
 
+    # TODO (tz): set sql_row.commands add assert
+    commands = []
+
     _updated_at = ensure_utc_datetime(sql_row._updated_at)
 
     return RunStateResource(
         run_id=run_id,
         state=parse_obj_as(ProtocolRunData, state),
         engine_status=status,
+        commands=commands,
         _updated_at=_updated_at,
     )
 
 
 def _convert_state_to_sql_values(state: RunStateResource) -> Dict[str, object]:
     return {
-        "run_id": state.run_id,
         "state": state.state.dict(),
         "engine_status": state.engine_status,
         "_updated_at": ensure_utc_datetime(

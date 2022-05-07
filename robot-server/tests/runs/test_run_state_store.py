@@ -86,21 +86,22 @@ def protocol_run() -> ProtocolRunData:
     )
 
 
-def test_insert_state(
+def test_update_run_state(
     subject: RunStateStore,
     run_store: RunStore,
     protocol_run: ProtocolRunData,
     run_resource: RunResource,
 ) -> None:
-    """It should be able to add a run state to the store."""
+    """It should be able to update a run state to the store."""
     run_store.insert(run_resource)
     engine_state = RunStateResource(
         run_id="run-id",
         state=protocol_run,
         engine_status="idle",
-        created_at=datetime.now(timezone.utc),
+        _updated_at=datetime.now(timezone.utc),
+        commands=[]
     )
-    result = subject.insert(engine_state)
+    result = subject.update_run(engine_state)
 
     assert result == engine_state
 
@@ -117,16 +118,17 @@ def test_get_run_state(
         run_id="run-id",
         state=protocol_run,
         engine_status="idle",
-        created_at=datetime.now(timezone.utc),
+        _updated_at=datetime.now(timezone.utc),
+        commands=[]
     )
 
-    subject.insert(state=engine_state)
+    subject.update_run(state=engine_state)
     result = subject.get("run-id")
 
     assert engine_state == result
 
 
-def test_insert_state_run_not_found(
+def test_update_state_run_not_found(
     subject: RunStateStore, protocol_run: ProtocolRunData
 ) -> None:
     """It should be able to catch the exception raised by insert."""
@@ -134,8 +136,9 @@ def test_insert_state_run_not_found(
         run_id="run-not-found",
         state=protocol_run,
         engine_status="idle",
-        created_at=datetime.now(timezone.utc),
+        _updated_at=datetime.now(timezone.utc),
+        commands=[]
     )
 
     with pytest.raises(RunNotFoundError, match="run-not-found"):
-        subject.insert(engine_state)
+        subject.update_run(engine_state)
