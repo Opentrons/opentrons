@@ -131,4 +131,14 @@ describe('RobotSettingsCalibration', () => {
       properties: {},
     })
   })
+
+  // deck calibration this comment will be removed when finish all sections
+  it('renders a title description and button - Deck Calibration', () => {
+    const [{ getByText, getByRole }] = render()
+    getByText('Deck Calibration')
+    getByText(
+      'Deck calibration measures the deck position relative to the gantry. This calibration is the foundation for tip length and pipette offset calibrations. Calibrate your deck during new robot setup. Redo deck calibration if you relocate your robot.'
+    )
+    getByRole('button', { name: 'Recalibrate deck' })
+  })
 })
