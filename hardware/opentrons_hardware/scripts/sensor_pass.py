@@ -136,7 +136,9 @@ async def run(args: argparse.Namespace) -> None:
 
     threshold_payload = payloads.SetSensorThresholdRequestPayload(
         sensor=fields.SensorTypeField(SensorType.capacitive),
-        threshold=Int32Field(int(args.threshold * 2**15)),
+        threshold=Int32Field(
+            int(args.threshold * sensor_utils.sensor_fixed_point_conversion)
+        ),
     )
     threshold_message = message_definitions.SetSensorThresholdRequest(
         payload=threshold_payload
