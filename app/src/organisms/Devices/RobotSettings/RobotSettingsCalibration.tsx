@@ -78,6 +78,7 @@ export function RobotSettingsCalibration({
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
+  const currentRunId = useCurrentRunId()
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -117,8 +118,6 @@ export function RobotSettingsCalibration({
     robot?.name != null ? robot.name : null
   )
 
-  console.log(deckCalibrationData)
-
   const isRunning = useSelector(robotSelectors.getIsRunning)
   const pipettePresent =
     !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
@@ -137,17 +136,12 @@ export function RobotSettingsCalibration({
   const createStatus = createRequest?.status
 
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
-  // const configHasCalibrationBlock = null
-  // const deckCalStatus = useSelector((state: State) => {
-  //   return Calibration.getDeckCalibrationStatus(state, robotName)
-  // })
 
   let buttonDisabledReason = null
   if (notConnectable) {
     buttonDisabledReason = t('shared:disabled_cannot_connect')
   } else if (!robot.connected) {
-    // buttonDisabledReason = t('shared:disabled_connect_to_robot')
-    buttonDisabledReason = useCurrentRunId()
+    buttonDisabledReason = currentRunId
   } else if (isRunning) {
     buttonDisabledReason = t('shared:disabled_protocol_is_running')
   } else if (!pipettePresent) {
