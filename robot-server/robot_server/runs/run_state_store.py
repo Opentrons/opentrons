@@ -1,14 +1,14 @@
 """Engine state on-db store."""
 import sqlalchemy
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 from pydantic import parse_obj_as
 from datetime import datetime, timezone
 
-from robot_server.persistence import run_state_table, ensure_utc_datetime
+from robot_server.persistence import run_table, ensure_utc_datetime
 from .run_store import RunNotFoundError
 from opentrons.protocol_engine import ProtocolRunData
-
+from opentrons.protocol_engine.commands import Command
 
 @dataclass(frozen=True)
 class RunStateResource:
@@ -19,8 +19,9 @@ class RunStateResource:
 
     run_id: str
     state: ProtocolRunData
+    commands: Optional[List[Command]]
     engine_status: str
-    created_at: Optional[datetime]
+    _updated_at: Optional[datetime]
 
 
 class RunStateStore:
@@ -39,7 +40,7 @@ class RunStateStore:
         Returns:
             The engine state that was added to the store.
         """
-        statement = sqlalchemy.insert(run_state_table).values(
+        statement = sqlalchemy.insert(run_table).values(
             _convert_state_to_sql_values(state=state)
         )
         with self._sql_engine.begin() as transaction:
@@ -59,8 +60,8 @@ class RunStateStore:
         Returns:
             The engine state that found in the store.
         """
-        statement = sqlalchemy.select(run_state_table).where(
-            run_state_table.c.run_id == run_id
+        statement = sqlalchemy.select(run_table).where(
+            run_table.c.id == run_id
         )
         with self._sql_engine.begin() as transaction:
             try:
@@ -83,13 +84,13 @@ def _convert_sql_row_to_sql_run_state(
     state = sql_row.state
     assert isinstance(state, Dict)
 
-    created_at = ensure_utc_datetime(sql_row.created_at)
+    _updated_at = ensure_utc_datetime(sql_row._updated_at)
 
     return RunStateResource(
         run_id=run_id,
         state=parse_obj_as(ProtocolRunData, state),
         engine_status=status,
-        created_at=created_at,
+        _updated_at=_updated_at,
     )
 
 
@@ -98,9 +99,9 @@ def _convert_state_to_sql_values(state: RunStateResource) -> Dict[str, object]:
         "run_id": state.run_id,
         "state": state.state.dict(),
         "engine_status": state.engine_status,
-        "created_at": ensure_utc_datetime(
-            state.created_at
-            if state.created_at is not None
+        "_updated_at": ensure_utc_datetime(
+            state._updated_at
+            if state._updated_at is not None
             else datetime.now(tz=timezone.utc)
         ),
     }

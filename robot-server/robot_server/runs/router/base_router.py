@@ -3,7 +3,7 @@
 Contains routes dealing primarily with `Run` models.
 """
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, Union
 from typing_extensions import Literal
 
@@ -387,7 +387,8 @@ async def update_run(
                 run_id=run.run_id,
                 state=protocol_run_data,
                 engine_status=engine_state.commands.get_status(),
-                created_at=None,
+                _updated_at=datetime.now(timezone.utc),
+                commands=protocol_run_data.commands
             )
         )
 
