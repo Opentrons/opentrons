@@ -268,7 +268,7 @@ export function AdvancedSettings(): JSX.Element {
             </StyledText>
             {driverOutdated && (
               <Banner type="warning">
-                <Flex  justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+                <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
                   <StyledText as="p" color={COLORS.darkBlack}>
                     {t('usb_to_ethernet_adapter_toast_message')}
                   </StyledText>
