@@ -20,8 +20,6 @@ const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
 const MODULE_SETUP_KEY = 'module_setup_step' as const
 const LABWARE_SETUP_KEY = 'labware_setup_step' as const
 
-const INITIAL_EXPAND_DELAY_MS = 700
-
 export type StepKey =
   | typeof ROBOT_CALIBRATION_STEP_KEY
   | typeof MODULE_SETUP_KEY
@@ -61,20 +59,7 @@ export function ProtocolRunSetup({
         LABWARE_SETUP_KEY,
       ]
     }
-    let initialExpandedStepKey: StepKey = ROBOT_CALIBRATION_STEP_KEY
-    if (calibrationStatus.complete && isDeckCalibrated) {
-      initialExpandedStepKey =
-        nextStepKeysInOrder[
-          nextStepKeysInOrder.findIndex(v => v === ROBOT_CALIBRATION_STEP_KEY) +
-            1
-        ]
-    }
     setStepKeysInOrder(nextStepKeysInOrder)
-    const initialExpandTimer = setTimeout(
-      () => setExpandedStepKey(initialExpandedStepKey),
-      INITIAL_EXPAND_DELAY_MS
-    )
-    return () => clearTimeout(initialExpandTimer)
   }, [Boolean(protocolData), protocolData?.commands])
 
   if (robot == null) return null

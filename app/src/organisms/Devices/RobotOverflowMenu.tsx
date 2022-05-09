@@ -82,7 +82,12 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
         >
           {robot.status === CONNECTABLE ? (
-            <MenuItem onClick={handleClickRun}>{t('run_protocol')}</MenuItem>
+            <MenuItem
+              onClick={handleClickRun}
+              data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
+            >
+              {t('run_protocol')}
+            </MenuItem>
           ) : (
             <MenuItem onClick={handleClickConnectionTroubleshooting}>
               {t('why_is_this_robot_unavailable')}
@@ -93,6 +98,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
             to={`/devices/${robot.name}/robot-settings`}
             as={Link}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            data-testid={`RobotOverflowMenu_${robot.name}_robotSettings`}
           >
             {t('robot_settings')}
           </MenuItem>

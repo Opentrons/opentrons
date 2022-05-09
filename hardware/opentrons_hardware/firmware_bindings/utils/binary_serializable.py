@@ -49,6 +49,18 @@ class BinaryFieldBase(Generic[T]):
         """
         return cls(t)
 
+    @classmethod
+    def from_string(cls, t: str) -> BinaryFieldBase[T]:
+        """Create from a string.
+
+        Args:
+            t: The value as a string.
+
+        Returns:
+            New instance.
+        """
+        ...
+
     @property
     def value(self) -> T:
         """The value."""
@@ -68,49 +80,58 @@ class BinaryFieldBase(Generic[T]):
         return f"{self.__class__.__name__}(value={repr(self.value)})"
 
 
-class UInt64Field(BinaryFieldBase[int]):
+class IntFieldBase(BinaryFieldBase[int]):
+    """Base class of integer fields."""
+
+    @classmethod
+    def from_string(cls, t: str) -> IntFieldBase:
+        """Create from string."""
+        return cls(int(t))
+
+
+class UInt64Field(IntFieldBase):
     """Unsigned 64-bit integer field."""
 
     FORMAT = "Q"
 
 
-class Int64Field(BinaryFieldBase[int]):
+class Int64Field(IntFieldBase):
     """Signed 64-bit integer field."""
 
     FORMAT = "q"
 
 
-class UInt32Field(BinaryFieldBase[int]):
+class UInt32Field(IntFieldBase):
     """Unsigned 32-bit integer field."""
 
     FORMAT = "L"
 
 
-class Int32Field(BinaryFieldBase[int]):
+class Int32Field(IntFieldBase):
     """Signed 32-bit integer field."""
 
     FORMAT = "l"
 
 
-class UInt16Field(BinaryFieldBase[int]):
+class UInt16Field(IntFieldBase):
     """Unsigned 16-bit integer field."""
 
     FORMAT = "H"
 
 
-class Int16Field(BinaryFieldBase[int]):
+class Int16Field(IntFieldBase):
     """Signed 16-bit integer field."""
 
     FORMAT = "h"
 
 
-class UInt8Field(BinaryFieldBase[int]):
+class UInt8Field(IntFieldBase):
     """Unsigned 8-bit integer field."""
 
     FORMAT = "B"
 
 
-class Int8Field(BinaryFieldBase[int]):
+class Int8Field(IntFieldBase):
     """Signed 8-bit integer field."""
 
     FORMAT = "b"

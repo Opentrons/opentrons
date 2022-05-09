@@ -11,7 +11,7 @@ from typing_extensions import Literal
 from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
 
 from robot_server.errors import ErrorDetails, ErrorBody
-from robot_server.service.task_runner import TaskRunner
+from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.service.dependencies import get_unique_id, get_current_time
 from robot_server.service.json_api import (
     SimpleBody,
@@ -91,7 +91,7 @@ async def create_protocol(
     analysis_store: AnalysisStore = Depends(get_analysis_store),
     protocol_reader: ProtocolReader = Depends(get_protocol_reader),
     protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
-    task_runner: TaskRunner = Depends(TaskRunner),
+    task_runner: TaskRunner = Depends(get_task_runner),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
@@ -284,6 +284,8 @@ async def get_protocol_analyses(
 ) -> PydanticResponse[SimpleMultiBody[ProtocolAnalysis]]:
     """Get a protocol's full analyses list.
 
+    Analyses are returned in order from least-recently started to most-recently started.
+
     Arguments:
         protocolId: Protocol identifier to delete, pulled from URL.
         protocol_store: Database of protocol resources.
@@ -294,7 +296,7 @@ async def get_protocol_analyses(
             status.HTTP_404_NOT_FOUND
         )
 
-    analyses = analysis_store.get_by_protocol(protocolId)
+    analyses = await analysis_store.get_by_protocol(protocolId)
 
     return await PydanticResponse.create(
         content=SimpleMultiBody.construct(
@@ -324,7 +326,7 @@ async def get_protocol_analysis_by_id(
 
     Arguments:
         protocolId: The ID of the protocol, pulled from the URL.
-        analysisId: THe ID of the analysis, pulled from the URL.
+        analysisId: The ID of the analysis, pulled from the URL.
         protocol_store: Protocol resource storage.
         analysis_store: Analysis resource storage.
     """
@@ -334,7 +336,9 @@ async def get_protocol_analysis_by_id(
         )
 
     try:
-        analysis = analysis_store.get(analysisId)
+        # TODO(mm, 2022-04-28): This will erroneously return an analysis even if
+        # this analysis isn't owned by this protocol. This should be an error.
+        analysis = await analysis_store.get(analysisId)
     except AnalysisNotFoundError as error:
         raise AnalysisNotFound(detail=str(error)).as_error(
             status.HTTP_404_NOT_FOUND

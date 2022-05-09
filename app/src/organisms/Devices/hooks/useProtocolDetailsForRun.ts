@@ -17,7 +17,7 @@ export interface ProtocolDetails {
 export function useProtocolDetailsForRun(
   runId: string | null
 ): ProtocolDetails {
-  const { data: runRecord } = useRunQuery(runId)
+  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
   const [isPollingProtocol, setIsPollingProtocol] = React.useState<boolean>(
     true

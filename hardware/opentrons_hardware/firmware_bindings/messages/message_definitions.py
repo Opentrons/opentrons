@@ -94,8 +94,8 @@ class SetupRequest(EmptyPayloadMessage):  # noqa: D101
 
 @dataclass
 class WriteToEEPromRequest:  # noqa: D101
-    payload: payloads.EEProDataPayload
-    payload_type: Type[BinarySerializable] = payloads.EEProDataPayload
+    payload: payloads.EEPromDataPayload
+    payload_type: Type[BinarySerializable] = payloads.EEPromDataPayload
     message_id: Literal[MessageId.write_eeprom] = MessageId.write_eeprom
 
 
@@ -108,8 +108,8 @@ class ReadFromEEPromRequest:  # noqa: D101
 
 @dataclass
 class ReadFromEEPromResponse:  # noqa: D101
-    payload: payloads.EEProDataPayload
-    payload_type: Type[BinarySerializable] = payloads.EEProDataPayload
+    payload: payloads.EEPromDataPayload
+    payload_type: Type[BinarySerializable] = payloads.EEPromDataPayload
     message_id: Literal[MessageId.read_eeprom_response] = MessageId.read_eeprom_response
 
 
@@ -446,12 +446,16 @@ class SetBrushedMotorPwmRequest:  # noqa: D101
 
 
 @dataclass
-class GripperGripRequest(EmptyPayloadMessage):  # noqa: D101
+class GripperGripRequest:  # noqa: D101
+    payload: payloads.GripperMoveRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.GripperMoveRequestPayload
     message_id: Literal[MessageId.gripper_grip_request] = MessageId.gripper_grip_request
 
 
 @dataclass
-class GripperHomeRequest(EmptyPayloadMessage):  # noqa: D101
+class GripperHomeRequest:  # noqa: D101
+    payload: payloads.GripperMoveRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.GripperMoveRequestPayload
     message_id: Literal[MessageId.gripper_home_request] = MessageId.gripper_home_request
 
 

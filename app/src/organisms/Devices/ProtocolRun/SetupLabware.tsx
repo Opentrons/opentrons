@@ -38,16 +38,16 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { SecondaryButton } from '../../../atoms/Buttons'
 import { StyledText } from '../../../atoms/text'
 import { useLPCSuccessToast } from '../../../organisms/ProtocolSetup/hooks'
-// TODO(bh: 2022/04/12): nested DeckMap needs robotName prop to remove connected robot reference
-import { LabwarePositionCheck } from '../../../organisms/ProtocolSetup/LabwarePositionCheck'
+import { LabwarePositionCheck } from '../../../organisms/LabwarePositionCheck'
 import { ModuleExtraAttention } from './ModuleExtraAttention'
 import { LabwareInfoOverlay } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
-// TODO(bh: 2022/04/12): remove current run and protocol references (can download offset data when not current run)
 import { DownloadOffsetDataModal } from '../../../organisms/ProtocolUpload/DownloadOffsetDataModal'
 import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
+import { ReapplyOffsetsModal } from '../../ReapplyOffsetsModal'
+import { useCurrentRun } from '../../ProtocolUpload/hooks'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
@@ -58,7 +58,6 @@ import {
 import { ProceedToRunButton } from './ProceedToRunButton'
 
 import type { DeckDefinition } from '@opentrons/shared-data'
-
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
   'fixedBase',
@@ -98,6 +97,7 @@ export function SetupLabware({
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
+  const currentRun = useCurrentRun()
   const runStatus = useRunStatus(runId)
   const { protocolData } = useProtocolDetailsForRun(runId)
   const { t } = useTranslation('protocol_setup')
@@ -164,8 +164,15 @@ export function SetupLabware({
   } else if (!tipsArePickedUp) {
     lpcDisabledReason = t('lpc_disabled_no_tipracks_used')
   }
+
+  const showReapplyOffsetsModal =
+    currentRun?.data.id === runId &&
+    (currentRun?.data?.labwareOffsets == null ||
+      currentRun?.data?.labwareOffsets.length === 0)
+
   return (
     <>
+      {showReapplyOffsetsModal ? <ReapplyOffsetsModal runId={runId} /> : null}
       {showLabwareHelpModal && (
         <LabwareOffsetModal
           onCloseClick={() => setShowLabwareHelpModal(false)}
@@ -180,6 +187,7 @@ export function SetupLabware({
       {downloadOffsetDataModal && (
         <DownloadOffsetDataModal
           onCloseClick={() => showDownloadOffsetDataModal(false)}
+          runId={runId}
         />
       )}
       <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>

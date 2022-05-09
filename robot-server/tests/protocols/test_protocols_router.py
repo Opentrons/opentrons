@@ -395,7 +395,9 @@ async def test_get_protocol_analyses(
     )
 
     decoy.when(protocol_store.has("protocol-id")).then_return(True)
-    decoy.when(analysis_store.get_by_protocol("protocol-id")).then_return([analysis])
+    decoy.when(await analysis_store.get_by_protocol("protocol-id")).then_return(
+        [analysis]
+    )
 
     result = await get_protocol_analyses(
         protocolId="protocol-id",
@@ -435,7 +437,7 @@ async def test_get_protocol_analysis_by_id(
     analysis = PendingAnalysis(id="analysis-id")
 
     decoy.when(protocol_store.has("protocol-id")).then_return(True)
-    decoy.when(analysis_store.get("analysis-id")).then_return(analysis)
+    decoy.when(await analysis_store.get("analysis-id")).then_return(analysis)
 
     result = await get_protocol_analysis_by_id(
         protocolId="protocol-id",
@@ -475,7 +477,7 @@ async def test_get_protocol_analysis_by_id_analysis_not_found(
 ) -> None:
     """It should get a single full analysis by ID."""
     decoy.when(protocol_store.has("protocol-id")).then_return(True)
-    decoy.when(analysis_store.get("analysis-id")).then_raise(
+    decoy.when(await analysis_store.get("analysis-id")).then_raise(
         AnalysisNotFoundError("oh no")
     )
 

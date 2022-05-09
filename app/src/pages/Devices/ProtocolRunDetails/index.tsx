@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { isEmpty } from 'lodash'
 import { useTranslation } from 'react-i18next'
 import { NavLink, Redirect, useParams } from 'react-router-dom'
 import styled from 'styled-components'
@@ -20,10 +21,14 @@ import {
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
-import { useRobot } from '../../../organisms/Devices/hooks'
+import {
+  useModuleRenderInfoForProtocolById,
+  useRobot,
+} from '../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { RunLog } from '../../../organisms/Devices/ProtocolRun/RunLog'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
+import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 
 import type { NavRouteParams, ProtocolRunDetailsTab } from '../../../App/types'
 
@@ -104,8 +109,9 @@ export function ProtocolRunDetails(): JSX.Element | null {
         runId={runId}
       />
     ),
-    // TODO: module controls tab content
-    'module-controls': () => <div>module controls content</div>,
+    'module-controls': () => (
+      <ProtocolRunModuleControls robotName={robotName} runId={runId} />
+    ),
     'run-log': () => <RunLog robotName={robotName} runId={runId} />,
   }
 
@@ -117,7 +123,11 @@ export function ProtocolRunDetails(): JSX.Element | null {
     ))
 
   return robot != null ? (
-    <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
+    <ApiHostProvider
+      key={robot.name}
+      hostname={robot.ip ?? null}
+      robotName={robot.name}
+    >
       <Box
         minWidth={SIZE_6}
         height="100%"
@@ -140,11 +150,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
               to={`/devices/${robotName}/protocol-runs/${runId}/setup`}
               tabName={t('setup')}
             />
-            <RoundTab
-              id="ProtocolRunDetails_moduleControlsTab"
-              to={`/devices/${robotName}/protocol-runs/${runId}/module-controls`}
-              tabName={t('module_controls')}
-            />
+            <ModuleControlsTab robotName={robotName} runId={runId} />
             <RoundTab
               id="ProtocolRunDetails_runLogTab"
               to={`/devices/${robotName}/protocol-runs/${runId}/run-log`}
@@ -173,4 +179,28 @@ export function ProtocolRunDetails(): JSX.Element | null {
       </Box>
     </ApiHostProvider>
   ) : null
+}
+
+interface ModuleControlsTabProps {
+  robotName: string
+  runId: string
+}
+
+export const ModuleControlsTab = (
+  props: ModuleControlsTabProps
+): JSX.Element | null => {
+  const { robotName, runId } = props
+  const { t } = useTranslation('run_details')
+  const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
+    robotName,
+    runId
+  )
+
+  return isEmpty(moduleRenderInfoForProtocolById) ? null : (
+    <RoundTab
+      id="ProtocolRunDetails_moduleControlsTab"
+      to={`/devices/${robotName}/protocol-runs/${runId}/module-controls`}
+      tabName={t('module_controls')}
+    />
+  )
 }
