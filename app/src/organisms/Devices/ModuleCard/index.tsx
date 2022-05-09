@@ -420,7 +420,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             }}
           />
           {isOverflowBtnDisabled && (
-            <Tooltip {...tooltipProps} key={`tooltip_${module.serialNumber}`}>
+            <Tooltip {...tooltipProps}>
               {t('module_actions_unavailable')}
             </Tooltip>
           )}

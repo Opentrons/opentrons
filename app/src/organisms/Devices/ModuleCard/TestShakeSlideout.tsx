@@ -205,10 +205,7 @@ export const TestShakeSlideout = (
               : t('open', { ns: 'shared' })}
           </TertiaryButton>
           {isShaking ? (
-            <Tooltip
-              tooltipProps={tooltipProps}
-              key={`TestShakeSlideout_latch_btn`}
-            >
+            <Tooltip tooltipProps={tooltipProps}>
               {t('cannot_open_latch', { ns: 'heater_shaker' })}
             </Tooltip>
           ) : null}
@@ -260,10 +257,7 @@ export const TestShakeSlideout = (
               : t('start', { ns: 'shared' })}
           </TertiaryButton>
           {!isLatchClosed ? (
-            <Tooltip
-              tooltipProps={tooltipProps}
-              key={`TestShakeSlideout_shake_tn`}
-            >
+            <Tooltip tooltipProps={tooltipProps}>
               {t('cannot_shake', { ns: 'heater_shaker' })}
             </Tooltip>
           ) : null}

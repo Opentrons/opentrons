@@ -25,7 +25,6 @@ import {
   useRobot,
   useTipLengthCalibrations,
 } from '../../hooks'
-import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
 
 jest.mock('file-saver')
@@ -61,9 +60,6 @@ const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunc
 >
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
->
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
 >
 
 let mockTrackEvent: jest.Mock
@@ -113,7 +109,6 @@ describe('RobotSettingsCalibration', () => {
       mockTipLengthCalibration2,
       mockTipLengthCalibration3,
     ])
-    mockUseCurrentRunId.mockReturnValue(null)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -166,16 +161,4 @@ describe('RobotSettingsCalibration', () => {
     // fireEvent.click(healthCheckButton)
     expect(healthCheckButton).not.toBeDisabled()
   })
-
-  // TODO 5/9/2022 kj temporary commenting out
-  // it('Health check button is not clickable and display tooltip', () => {
-  //   mockUseCurrentRunId.mockReturnValue('RUNID')
-  //   const [{ getByRole }] = render()
-  //   const healthCheckButton = getByRole('button', { name: 'Check health' })
-  //   expect(healthCheckButton).toBeInTheDocument()
-  //   fireEvent.mouseOver(healthCheckButton)
-  //   getByRole('tooltip', {
-  //     name: 'Fully calibrate your robot before checking calibration health',
-  //   })
-  // })
 })

@@ -154,7 +154,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           {isLatchClosed ? t('open_labware_latch') : t('close_labware_latch')}
         </TertiaryButton>
         {isShaking ? (
-          <Tooltip tooltipProps={tooltipProps} key={`TestShake_latch_btn`}>
+          <Tooltip tooltipProps={tooltipProps}>
             {t('cannot_open_latch', { ns: 'heater_shaker' })}
           </Tooltip>
         ) : null}
@@ -195,7 +195,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             {isShaking ? t('stop_shaking') : t('start_shaking')}
           </TertiaryButton>
           {!isLatchClosed ? (
-            <Tooltip tooltipProps={tooltipProps} key={`TestShake_shake_btn`}>
+            <Tooltip tooltipProps={tooltipProps}>
               {t('cannot_shake', { ns: 'heater_shaker' })}
             </Tooltip>
           ) : null}

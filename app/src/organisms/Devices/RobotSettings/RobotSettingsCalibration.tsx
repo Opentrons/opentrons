@@ -23,7 +23,6 @@ import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { DeckCalibrationModal } from '../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
-import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 
 import { useTrackEvent } from '../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
@@ -78,7 +77,6 @@ export function RobotSettingsCalibration({
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
-  const currentRunId = useCurrentRunId()
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -143,8 +141,6 @@ export function RobotSettingsCalibration({
   let buttonDisabledReason = null
   if (notConnectable) {
     buttonDisabledReason = t('shared:disabled_cannot_connect')
-  } else if (!robot.connected) {
-    buttonDisabledReason = currentRunId
   } else if (isRunning) {
     buttonDisabledReason = t('shared:disabled_protocol_is_running')
   } else if (!pipettePresent) {
@@ -258,10 +254,7 @@ export function RobotSettingsCalibration({
             {t('health_check_button')}
           </TertiaryButton>
           {healthCheckButtonDisabled && (
-            <Tooltip
-              tooltipProps={tooltipProps}
-              key="RobotSettingsCalibration_tooltip"
-            >
+            <Tooltip tooltipProps={tooltipProps}>
               {t('fully_calibrate_before_checking_health')}
             </Tooltip>
           )}

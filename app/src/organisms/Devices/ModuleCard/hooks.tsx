@@ -179,10 +179,7 @@ export function useModuleOverflowMenu(
         })}
       </MenuItem>
       {isLatchDisabled ? (
-        <Tooltip
-          tooltipProps={tooltipProps}
-          key={`tooltip_latch_${module.moduleModel}`}
-        >
+        <Tooltip tooltipProps={tooltipProps}>
           {t('cannot_open_latch', { ns: 'heater_shaker' })}
         </Tooltip>
       ) : null}
