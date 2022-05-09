@@ -33,6 +33,11 @@ jest.mock(
   '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 )
 jest.mock('../../../../redux/analytics')
+// jest.mock('../../../../redux/sessions')
+// jest.mock('../../../../redux/robot-api')
+// jest.mock('../../../../redux/discovery/selectors')
+jest.mock('../../../../redux/config')
+jest.mock('../../../../redux/robot')
 jest.mock('../../hooks')
 
 const mockDeckCalibrationModal = DeckCalibrationModal as jest.MockedFunction<
@@ -130,5 +135,13 @@ describe('RobotSettingsCalibration', () => {
       name: 'calibrationDataDownloaded',
       properties: {},
     })
+  })
+
+  it('renders a title and description - Calibration Health Check section', () => {
+    const [{ getByText }] = render()
+    getByText('Calibration Health Check')
+    getByText(
+      'Check the accuracy of key calibration points without recalibrating the robot.'
+    )
   })
 })

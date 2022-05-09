@@ -117,19 +117,22 @@ export function RobotSettingsCalibration({
   const attachedPipettes = useAttachedPipettes(
     robot?.name != null ? robot.name : null
   )
-
   const isRunning = useSelector(robotSelectors.getIsRunning)
+
   const pipettePresent =
-    !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
+    attachedPipettes != null
+      ? !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
+      : false
+
   const isPending =
     useSelector<State, RequestState | null>(state =>
-      trackedRequestId.current
+      trackedRequestId.current != null
         ? RobotApi.getRequestById(state, trackedRequestId.current)
         : null
     )?.status === RobotApi.PENDING
 
   const createRequest = useSelector((state: State) =>
-    createRequestId.current
+    createRequestId.current != null
       ? RobotApi.getRequestById(state, createRequestId.current)
       : null
   )
@@ -189,8 +192,6 @@ export function RobotSettingsCalibration({
       )
     }
   }
-
-  console.log('healthCheckButtonDisabled', healthCheckButtonDisabled)
 
   React.useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
