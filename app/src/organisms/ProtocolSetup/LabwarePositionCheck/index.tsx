@@ -24,6 +24,7 @@ import styles from '../styles.css'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
+  runId: string
   caughtError?: Error
 }
 
@@ -206,6 +207,7 @@ const LabwarePositionCheckComponent = (
           proceed={proceed}
           title={titleText}
           jog={jog}
+          runId={props.runId}
         />
       </ModalPage>
     )

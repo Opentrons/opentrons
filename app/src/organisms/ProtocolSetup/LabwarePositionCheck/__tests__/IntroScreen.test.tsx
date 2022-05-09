@@ -7,22 +7,26 @@ import {
   partialComponentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
+import { useHost } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
-import { useCurrentRun } from '../../../ProtocolUpload/hooks'
+import {
+  useLabwareRenderInfoForRunById,
+  useModuleRenderInfoForProtocolById,
+} from '../../../Devices/hooks'
+import { useCurrentRun, useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { getLatestLabwareOffsetCount } from '../../LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 import { SectionList } from '../SectionList'
 import { useIntroInfo, useLabwareIdsBySection } from '../hooks'
 import { IntroScreen, INTERVAL_MS } from '../IntroScreen'
 import type { Section } from '../types'
-import type { LabwareOffset } from '@opentrons/api-client'
+import type { HostConfig, LabwareOffset } from '@opentrons/api-client'
 
 jest.mock('../hooks')
 jest.mock('../SectionList')
-jest.mock('../../hooks')
+jest.mock('../../../Devices/hooks')
 jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../../LabwarePositionCheck/utils/getLatestLabwareOffsetCount')
 
@@ -34,13 +38,18 @@ jest.mock('@opentrons/components', () => {
     useInterval: jest.fn(),
   }
 })
+jest.mock('@opentrons/react-api-client')
 
-const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFunction<
-  typeof useModuleRenderInfoById
+const mockUseLabwareRenderInfoForRunById = useLabwareRenderInfoForRunById as jest.MockedFunction<
+  typeof useLabwareRenderInfoForRunById
 >
-const mockUseLabwareRenderInfoById = useLabwareRenderInfoById as jest.MockedFunction<
-  typeof useLabwareRenderInfoById
+const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
+  typeof useModuleRenderInfoForProtocolById
 >
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
+>
+const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const mockUseLabwareIdsBySection = useLabwareIdsBySection as jest.MockedFunction<
   typeof useLabwareIdsBySection
 >
@@ -65,6 +74,12 @@ const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
 )
 const MOCK_SECTIONS = ['MOCK_PRIMARY_PIPETTE_TIPRACKS' as Section]
 const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
+const MOCK_ROBOT_NAME = 'otie'
+const HOST_CONFIG: HostConfig = {
+  hostname: 'localhost',
+  robotName: MOCK_ROBOT_NAME,
+}
+const MOCK_RUN_ID = 'fakeRunId'
 
 const render = (props: React.ComponentProps<typeof IntroScreen>) => {
   return renderWithProviders(<IntroScreen {...props} />, {
@@ -106,8 +121,8 @@ describe('IntroScreen', () => {
           })}
         </svg>
       ))
-    when(mockUseLabwareRenderInfoById)
-      .calledWith()
+    when(mockUseLabwareRenderInfoForRunById)
+      .calledWith(MOCK_RUN_ID)
       .mockReturnValue({
         '300_ul_tiprack_id': {
           labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
@@ -117,8 +132,12 @@ describe('IntroScreen', () => {
           z: MOCK_300_UL_TIPRACK_COORDS[2],
         },
       })
-    when(mockUseLabwareIdsBySection).calledWith().mockReturnValue({})
-    when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
+    when(mockUseLabwareIdsBySection).calledWith(MOCK_RUN_ID).mockReturnValue({})
+    when(mockUseModuleRenderInfoForProtocolById)
+      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
+      .mockReturnValue({})
+    when(mockUseCurrentRunId).calledWith().mockReturnValue(MOCK_RUN_ID)
+    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
 
     when(mockUseIntroInfo).calledWith().mockReturnValue({
       primaryPipetteMount: 'left',
@@ -130,7 +149,7 @@ describe('IntroScreen', () => {
     when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
-        data: { labwareOffsets: mockOffsets },
+        data: { id: MOCK_RUN_ID, labwareOffsets: mockOffsets },
       } as any)
   })
   afterEach(() => {

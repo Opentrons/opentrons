@@ -46,6 +46,10 @@ const mockGetU2EWindowsDriverStatus = SystemInfo.getU2EWindowsDriverStatus as je
   typeof SystemInfo.getU2EWindowsDriverStatus
 >
 
+const mockGetIsHeaterShakerAttached = Config.getIsHeaterShakerAttached as jest.MockedFunction<
+  typeof Config.getIsHeaterShakerAttached
+>
+
 describe('AdvancedSettings', () => {
   beforeEach(() => {
     getCustomLabwarePath.mockReturnValue('')
@@ -66,7 +70,7 @@ describe('AdvancedSettings', () => {
 
   it('renders correct titles', () => {
     const [{ getByText }] = render()
-    getByText('Update channel')
+    getByText('Update Channel')
     getByText('Additional Custom Labware Source Folder')
     getByText('Tip Length Calibration Method')
     getByText('Display Unavailable Robots')
@@ -76,7 +80,7 @@ describe('AdvancedSettings', () => {
   it('renders the update channel section', () => {
     const [{ getByText, getByRole }] = render()
     getByText(
-      'Stable receives the latest stable releases. Beta allows you to try out new in-progress features before they launch in Stable channel, but they have not completed testing yet.'
+      'Stable receives the latest stable releases. Beta allows you to try out new features before they have completed testing and launch in the Stable channel.'
     )
     getByRole('option', { name: 'Stable' })
     getByRole('option', { name: 'Beta' })
@@ -86,7 +90,7 @@ describe('AdvancedSettings', () => {
     getCustomLabwarePath.mockReturnValue('/mock/custom-labware-path')
     const [{ getByText, getByRole }] = render()
     getByText(
-      'If you want to specify a folder to manually manage Opentrons Custom Labware files, you can add the directory here.'
+      'If you want to specify a folder to manually manage Custom Labware files, you can add the directory here.'
     )
     getByText('Additional Source Folder')
     getByRole('button', { name: 'Change labware source folder' })
@@ -116,7 +120,7 @@ describe('AdvancedSettings', () => {
     const [{ getByText }] = render()
     getByText('USB-to-Ethernet Adapter Information')
     getByText(
-      'Some OT-2’s have an internal USB-to-Ethernet adapter. If your OT-2 uses this adapter, it will be added to your computer’s device list when you make a wired connection. If you have a Realtek adapter, it is essential that the driver is up to date.'
+      'Some OT-2s have an internal USB-to-Ethernet adapter. If your OT-2 uses this adapter, it will be added to your computer’s device list when you make a wired connection. If you have a Realtek adapter, it is essential that the driver is up to date.'
     )
     getByText('Description')
     getByText('Manufacturer')
@@ -178,7 +182,7 @@ describe('AdvancedSettings', () => {
 
   it('renders the display show link to get labware offset data section', () => {
     const [{ getByText, getByRole }] = render()
-    getByText('Show link to get Labware Offset data')
+    getByText('Show Link to Get Labware Offset Data')
     getByText(
       'If you need to access Labware Offset data outside of the Opentrons App, enabling this setting will display a link to get Offset Data in the Recent Runs overflow menu and in the Labware Setup section of the Protocol page.'
     )
@@ -190,6 +194,28 @@ describe('AdvancedSettings', () => {
     const [{ getByRole }] = render()
     const toggleButton = getByRole('switch', {
       name: 'show_link_to_get_labware_offset_data',
+    })
+    expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+  })
+
+  it('renders the toggle button on when showing heater shaker modal as false', () => {
+    mockGetIsHeaterShakerAttached.mockReturnValue(true)
+    const [{ getByRole, getByText }] = render()
+    getByText('Confirm Heater-Shaker Module Attachment')
+    getByText(
+      'Display a reminder to attach the Heater-Shaker properly before running a test shake or using it in a protocol.'
+    )
+    const toggleButton = getByRole('switch', {
+      name: 'show_heater_shaker_modal',
+    })
+    expect(toggleButton.getAttribute('aria-checked')).toBe('false')
+  })
+
+  it('renders the toggle button on when showing heater shaker modal as true', () => {
+    mockGetIsHeaterShakerAttached.mockReturnValue(false)
+    const [{ getByRole }] = render()
+    const toggleButton = getByRole('switch', {
+      name: 'show_heater_shaker_modal',
     })
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
   })
@@ -206,7 +232,7 @@ describe('AdvancedSettings', () => {
   it('renders the developer tools section', () => {
     const [{ getByText, getByRole }] = render()
     getByText(
-      'Enabling this setting opens Developer Tools on app launch, enables additional logging and gives access to feature flags.'
+      'Open Developer Tools on app launch, enable additional logging, and allow access to feature flags.'
     )
     getByRole('switch', { name: 'enable_dev_tools' })
   })

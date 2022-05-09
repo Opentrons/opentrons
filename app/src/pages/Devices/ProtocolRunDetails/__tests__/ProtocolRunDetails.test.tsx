@@ -5,11 +5,15 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
-import { useRobot } from '../../../../organisms/Devices/hooks'
+import {
+  useModuleRenderInfoForProtocolById,
+  useRobot,
+} from '../../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { ProtocolRunSetup } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { RunLog } from '../../../../organisms/Devices/ProtocolRun/RunLog'
 import { ProtocolRunDetails } from '..'
+import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader')
@@ -25,6 +29,28 @@ const mockRunLog = RunLog as jest.MockedFunction<typeof RunLog>
 const mockProtocolRunSetup = ProtocolRunSetup as jest.MockedFunction<
   typeof ProtocolRunSetup
 >
+const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
+  typeof useModuleRenderInfoForProtocolById
+>
+
+const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
+
+const mockMagneticModule = {
+  moduleId: 'someMagneticModule',
+  model: 'magneticModuleV2' as ModuleModel,
+  type: 'magneticModuleType' as ModuleType,
+  labwareOffset: { x: 5, y: 5, z: 5 },
+  cornerOffsetFromSlot: { x: 1, y: 1, z: 1 },
+  dimensions: {
+    xDimension: 100,
+    yDimension: 100,
+    footprintXDimension: 50,
+    footprintYDimension: 50,
+    labwareInterfaceXDimension: 80,
+    labwareInterfaceYDimension: 120,
+  },
+  twoDimensionalRendering: { children: [] },
+}
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -45,6 +71,19 @@ describe('ProtocolRunDetails', () => {
     mockProtocolRunHeader.mockReturnValue(<div>Mock ProtocolRunHeader</div>)
     mockRunLog.mockReturnValue(<div>Mock RunLog</div>)
     mockProtocolRunSetup.mockReturnValue(<div>Mock ProtocolRunSetup</div>)
+    mockUseModuleRenderInfoForProtocolById.mockReturnValue({
+      [mockMagneticModule.moduleId]: {
+        moduleId: mockMagneticModule.moduleId,
+        x: MOCK_MAGNETIC_MODULE_COORDS[0],
+        y: MOCK_MAGNETIC_MODULE_COORDS[1],
+        z: MOCK_MAGNETIC_MODULE_COORDS[2],
+        moduleDef: mockMagneticModule as any,
+        nestedLabwareDef: null,
+        nestedLabwareId: null,
+        protocolLoadOrder: 0,
+        attachedModuleMatch: null,
+      },
+    } as any)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -108,5 +147,13 @@ describe('ProtocolRunDetails', () => {
     expect(queryByText('Mock ProtocolRunSetup')).toBeFalsy()
     setupTab.click()
     getByText('Mock ProtocolRunSetup')
+  })
+
+  it('should NOT render module controls when there are no modules', () => {
+    mockUseModuleRenderInfoForProtocolById.mockReturnValue({})
+    const [{ queryByText }] = render(
+      '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/setup'
+    )
+    expect(queryByText('Module Controls')).toBeNull()
   })
 })

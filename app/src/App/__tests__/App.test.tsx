@@ -6,22 +6,23 @@ import { resetAllWhenMocks, when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../i18n'
-import { Breadcrumbs } from '../../molecules/Breadcrumbs'
+import { Breadcrumbs } from '../../organisms/Breadcrumbs'
 import { DeviceDetails } from '../../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../../pages/Devices/DevicesLanding'
+import { ProtocolsLanding } from '../../pages/Protocols/ProtocolsLanding'
 import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../organisms/AppSettings/GeneralSettings'
 import { Alerts } from '../../organisms/Alerts'
 import { useFeatureFlag } from '../../redux/config'
-import { usePathCrumbs } from '../hooks'
 import { LegacyApp } from '../LegacyApp'
 import { App } from '../'
 
-jest.mock('../../molecules/Breadcrumbs')
+jest.mock('../../organisms/Breadcrumbs')
 jest.mock('../../organisms/Devices/hooks')
 jest.mock('../../pages/Devices/DeviceDetails')
 jest.mock('../../pages/Devices/DevicesLanding')
+jest.mock('../../pages/Protocols/ProtocolsLanding')
 jest.mock('../../pages/Devices/ProtocolRunDetails')
 jest.mock('../../pages/Devices/RobotSettings')
 jest.mock('../../organisms/Alerts')
@@ -44,6 +45,10 @@ const mockDevicesLanding = DevicesLanding as jest.MockedFunction<
   typeof DevicesLanding
 >
 mockDevicesLanding.mockReturnValue(<div>Mock DevicesLanding</div>)
+const mockProtocolsLanding = ProtocolsLanding as jest.MockedFunction<
+  typeof ProtocolsLanding
+>
+mockProtocolsLanding.mockReturnValue(<div>Mock ProtocolsLanding</div>)
 const mockProtocolRunDetails = ProtocolRunDetails as jest.MockedFunction<
   typeof ProtocolRunDetails
 >
@@ -60,9 +65,6 @@ const mockAppSettings = GeneralSettings as jest.MockedFunction<
 mockAppSettings.mockReturnValue(<div>Mock AppSettings</div>)
 const mockBreadcrumbs = Breadcrumbs as jest.MockedFunction<typeof Breadcrumbs>
 mockBreadcrumbs.mockReturnValue(<div>Mock Breadcrumbs</div>)
-const mockUsePathCrumbs = usePathCrumbs as jest.MockedFunction<
-  typeof usePathCrumbs
->
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -75,7 +77,6 @@ const render = (path = '/') => {
 
 describe('App', () => {
   beforeEach(() => {
-    when(mockUsePathCrumbs).calledWith().mockReturnValue([])
     when(mockUseFeatureFlag)
       .calledWith('hierarchyReorganization')
       .mockReturnValue(false)
@@ -107,6 +108,11 @@ describe('App', () => {
   it('renders a RobotSettings component from /robots/:robotName/robot-settings/:robotSettingsTab', () => {
     const [{ getByText }] = render('/devices/otie/robot-settings/calibration')
     getByText('Mock RobotSettings')
+  })
+
+  it('renders a ProtocolsLanding component from /protocols', () => {
+    const [{ getByText }] = render('/protocols')
+    getByText('Mock ProtocolsLanding')
   })
 
   it('renders a ProtocolRunDetails component from /robots/:robotName/protocol-runs/:runId/:protocolRunDetailsTab', () => {

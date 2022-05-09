@@ -38,13 +38,11 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { SecondaryButton } from '../../../atoms/Buttons'
 import { StyledText } from '../../../atoms/text'
 import { useLPCSuccessToast } from '../../../organisms/ProtocolSetup/hooks'
-// TODO(bh: 2022/04/12): nested DeckMap needs robotName prop to remove connected robot reference
 import { LabwarePositionCheck } from '../../../organisms/ProtocolSetup/LabwarePositionCheck'
-import { ExtraAttentionWarning } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/ExtraAttentionWarning'
+import { ModuleExtraAttention } from './ModuleExtraAttention'
 import { LabwareInfoOverlay } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
-// TODO(bh: 2022/04/12): remove current run and protocol references (can download offset data when not current run)
 import { DownloadOffsetDataModal } from '../../../organisms/ProtocolUpload/DownloadOffsetDataModal'
 import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
@@ -164,7 +162,6 @@ export function SetupLabware({
   } else if (!tipsArePickedUp) {
     lpcDisabledReason = t('lpc_disabled_no_tipracks_used')
   }
-
   return (
     <>
       {showLabwareHelpModal && (
@@ -175,20 +172,24 @@ export function SetupLabware({
       {showLabwarePositionCheckModal && (
         <LabwarePositionCheck
           onCloseClick={() => setShowLabwarePositionCheckModal(false)}
+          runId={runId}
         />
       )}
       {downloadOffsetDataModal && (
         <DownloadOffsetDataModal
           onCloseClick={() => showDownloadOffsetDataModal(false)}
+          runId={runId}
         />
       )}
       <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
         <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing4}>
-          {moduleTypesThatRequireExtraAttention.length > 0 && (
-            <ExtraAttentionWarning
+          {moduleTypesThatRequireExtraAttention.length > 0 &&
+          moduleRenderInfoById ? (
+            <ModuleExtraAttention
               moduleTypes={moduleTypesThatRequireExtraAttention}
+              modulesInfo={moduleRenderInfoById}
             />
-          )}
+          ) : null}
           <RobotWorkSpace
             deckDef={(standardDeckDef as unknown) as DeckDefinition}
             viewBox={DECK_MAP_VIEWBOX}
@@ -228,6 +229,7 @@ export function SetupLabware({
                             definition={nestedLabwareDef}
                             labwareId={nestedLabwareId}
                             displayName={nestedLabwareDisplayName}
+                            runId={runId}
                           />
                         </React.Fragment>
                       ) : null}
@@ -247,6 +249,7 @@ export function SetupLabware({
                             definition={labwareDef}
                             labwareId={labwareId}
                             displayName={displayName}
+                            runId={runId}
                           />
                         </g>
                       </React.Fragment>

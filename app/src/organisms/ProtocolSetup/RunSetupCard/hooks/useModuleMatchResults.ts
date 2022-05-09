@@ -33,8 +33,8 @@ export function useModuleMatchResults(): ModuleMatchResults {
       const moduleTypeMatchIndex = acc.remainingAttachedModules.findIndex(
         attachedModule => {
           return (
-            model === attachedModule.model ||
-            compatibleWith.includes(attachedModule.model)
+            model === attachedModule.moduleModel ||
+            compatibleWith.includes(attachedModule.moduleModel)
           )
         }
       )

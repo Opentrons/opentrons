@@ -25,10 +25,11 @@ import {
   SPACING_2,
   FONT_BODY_1_DARK,
 } from '@opentrons/components'
+import { useRunQuery } from '@opentrons/react-api-client'
+
 import { Portal } from '../../App/portal'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
-import { useProtocolDetails } from '../RunDetails/hooks'
-import { useCurrentRun } from './hooks'
+import { useProtocolDetailsForRun } from '../../organisms/Devices/hooks'
 
 const MODES = ['jupyter', 'cli'] as const
 
@@ -38,14 +39,16 @@ const DISPLAY_NAME_BY_MODE = {
 }
 interface DownloadOffsetDataModalProps {
   onCloseClick: () => unknown
+  runId: string
 }
 
 export const DownloadOffsetDataModal = (
   props: DownloadOffsetDataModalProps
 ): JSX.Element => {
+  const { onCloseClick, runId } = props
   const { t } = useTranslation(['protocol_info', 'shared'])
-  const { protocolData } = useProtocolDetails()
-  const labwareOffsets = useCurrentRun()?.data?.labwareOffsets ?? null
+  const { protocolData } = useProtocolDetailsForRun(runId)
+  const labwareOffsets = useRunQuery(runId)?.data?.data.labwareOffsets ?? null
   const [mode, setMode] = React.useState<typeof MODES[number]>('jupyter')
 
   return (
@@ -59,10 +62,7 @@ export const DownloadOffsetDataModal = (
             marginBottom={SPACING_3}
           >
             <Text css={FONT_HEADER_DARK}>{t('get_labware_offset_data')}</Text>
-            <Box
-              onClick={props.onCloseClick}
-              id={'DownloadOffsetDataModal_xButton'}
-            >
+            <Box onClick={onCloseClick} id={'DownloadOffsetDataModal_xButton'}>
               <Icon name={'close'} size={SIZE_2} />
             </Box>
           </Flex>
@@ -104,7 +104,7 @@ export const DownloadOffsetDataModal = (
           </Flex>
           <Box textAlign={ALIGN_CENTER} marginTop={SPACING_4}>
             <NewPrimaryBtn
-              onClick={props.onCloseClick}
+              onClick={onCloseClick}
               width={SIZE_4}
               name="close"
               id={'DownloadOffsetDataModal_closeButton'}
