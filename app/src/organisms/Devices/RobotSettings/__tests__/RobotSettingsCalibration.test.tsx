@@ -145,14 +145,18 @@ describe('RobotSettingsCalibration', () => {
       'Deck calibration measures the deck position relative to the gantry. This calibration is the foundation for tip length and pipette offset calibrations. Calibrate your deck during new robot setup. Redo deck calibration if you relocate your robot.'
     )
     getByRole('button', { name: 'Recalibrate deck' })
+    getByText('Last calibrated: September 15, 2021 00:00')
   })
 
   it('renders calibrate deck button when deck is not calibrated', () => {
     mockUseDeckCalibrationData.mockReturnValue({
-      deckCalibrationData: mockDeckCalData,
+      deckCalibrationData: null,
       isDeckCalibrated: false,
     })
-    const [{ getByRole }] = render()
+    const [{ getByRole, getByText }] = render()
     getByRole('button', { name: 'Calibrate deck' })
+    getByText('Deck Calibration missing')
+    getByRole('button', { name: 'Calibrate now' })
+    getByText('Not calibrated yet')
   })
 })

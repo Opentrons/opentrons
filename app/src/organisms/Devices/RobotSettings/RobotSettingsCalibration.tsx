@@ -23,7 +23,6 @@ import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { DeckCalibrationModal } from '../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
-// import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import { formatLastModified } from '../../../organisms/CalibrationPanels/utils'
 import { useTrackEvent } from '../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
@@ -265,6 +264,7 @@ export function RobotSettingsCalibration({
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
             <StyledText as="p">{t('deck_calibration_missing')}</StyledText>
             <Link
+              role="button"
               color={COLORS.darkBlack}
               css={TYPOGRAPHY.pRegular}
               textDecoration={TEXT_DECORATION_UNDERLINE}
