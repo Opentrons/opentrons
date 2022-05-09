@@ -22,7 +22,6 @@ import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { DeckCalibrationModal } from '../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
-import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { formatLastModified } from '../../../organisms/CalibrationPanels/utils'
 import { useTrackEvent } from '../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
@@ -111,7 +110,6 @@ export function RobotSettingsCalibration({
   const attachedPipettes = useAttachedPipettes(
     robot?.name != null ? robot.name : null
   )
-  const currentRunId = useCurrentRunId()
 
   const isRunning = useSelector(robotSelectors.getIsRunning)
   const pipettePresent =
@@ -184,7 +182,7 @@ export function RobotSettingsCalibration({
   if (notConnectable) {
     buttonDisabledReason = t('shared:disabled_cannot_connect')
   } else if (!robot.connected) {
-    buttonDisabledReason = currentRunId
+    buttonDisabledReason = t('shared:disabled_connect_to_robot')
   } else if (isRunning) {
     buttonDisabledReason = t('shared:disabled_protocol_is_running')
   } else if (!pipettePresent) {
