@@ -12,37 +12,6 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 
 
 @pytest.fixture
-def downloaded_update_ot3_file(request, extracted_ot3_update_file):
-    """
-    Return the path to a zipped update file
-
-    To exclude files, mark with ``exclude_rootfs_ext4``,
-    ``exclude_rootfs_ext4_hash``, ``exclude_rootfs_ext4_hash_sig``.
-
-    This uses :py:meth:`extracted_update_file` to generate the contents, so
-    marks that fixture understands can be used when requesting this fixture
-
-    Can also be used by tests that will uploaded it to a test server, since
-    when the test server boots its download path will be somewhere else
-    """
-    rootfs_path = os.path.join(extracted_ot3_update_file, "rootfs.xz")
-    hash_path = os.path.join(extracted_ot3_update_file, "rootfs.xz.sha256")
-    sig_path = os.path.join(extracted_ot3_update_file, "rootfs.xz.hash.sig")
-    zip_path = os.path.join(extracted_ot3_update_file, "ot3-system.zip")
-    with zipfile.ZipFile(zip_path, "w") as zf:
-        if not request.node.get_closest_marker("exclude_rootfs_ext4"):
-            zf.write(rootfs_path, "rootfs.xz")
-        if not request.node.get_closest_marker("exclude_rootfs_ext4_hash"):
-            zf.write(hash_path, "rootfs.xz.sha256")
-        if not request.node.get_closest_marker("exclude_rootfs_ext4_hash_sig"):
-            zf.write(sig_path, "rootfs.xz.hash.sig")
-    os.unlink(rootfs_path)
-    os.unlink(hash_path)
-    os.unlink(sig_path)
-    return zip_path
-
-
-@pytest.fixture
 def downloaded_update_file(request, extracted_update_file):
     """
     Return the path to a zipped update file
