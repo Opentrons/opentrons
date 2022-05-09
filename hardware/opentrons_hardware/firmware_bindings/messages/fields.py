@@ -151,4 +151,4 @@ class EepromDataField(utils.BinaryFieldBase[bytes]):
     @classmethod
     def from_string(cls, t: str) -> EepromDataField:
         """Create from a string."""
-        return cls(binascii.unhexlify(t)[:8])
+        return cls(binascii.unhexlify(t)[: cls.NUM_BYTES])
