@@ -81,8 +81,7 @@ async def execute_move(messenger: CanMessenger) -> None:
     )
 
 
-def output_details(
-    i: int, total_i: int) -> None:
+def output_details(i: int, total_i: int) -> None:
     """Print out test details."""
     print(f"\n\033[95mRound {i}/{total_i}:\033[0m")
 
