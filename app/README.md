@@ -82,10 +82,10 @@ Tests for the App are run from the top-level along with all other JS project tes
 
 Test tasks can also be run with the following arguments:
 
-| arg   | default | description             | example                             |
-| ----- | ------- | ----------------------- | ----------------------------------- |
-| watch | false   | Run tests in watch mode | `$ make test-unit watch=true`       |
-| cover | !watch  | Calculate code coverage | `$ make test watch=true cover=true` |
+| Argument | Default  | Description             | Example                           |
+| -------- | -------- | ----------------------- | --------------------------------- |
+| watch    | `false`  | Run tests in watch mode | `make test-unit watch=true`       |
+| cover    | `!watch` | Calculate code coverage | `make test watch=true cover=true` |
 
 ## building
 
