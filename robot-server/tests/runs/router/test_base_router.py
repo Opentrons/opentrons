@@ -485,11 +485,20 @@ async def test_get_run() -> None:
     assert result.status_code == 200
 
 
-async def test_get_runs_empty(decoy: Decoy, mock_run_store: RunStore, mock_engine_store: EngineStore, mock_run_state_store: RunStateStore) -> None:
+async def test_get_runs_empty(
+    decoy: Decoy,
+    mock_run_store: RunStore,
+    mock_engine_store: EngineStore,
+    mock_run_state_store: RunStateStore,
+) -> None:
     """It should return an empty collection response when no runs exist."""
     decoy.when(mock_run_store.get_all()).then_return([])
 
-    result = await get_runs(run_store=mock_run_store, engine_store=mock_engine_store, run_state_store=mock_run_state_store)
+    result = await get_runs(
+        run_store=mock_run_store,
+        engine_store=mock_engine_store,
+        run_state_store=mock_run_state_store,
+    )
 
     assert result.content.data == []
     assert result.content.links == AllRunsLinks(current=None)
@@ -501,9 +510,9 @@ async def test_get_runs_not_empty(
     decoy: Decoy,
     mock_run_store: RunStore,
     mock_engine_store: EngineStore,
-    mock_run_state_store: RunStateStore
+    mock_run_state_store: RunStateStore,
 ) -> None:
-    """"It should return a collection response when a run exists."""
+    """ "It should return a collection response when a run exists."""
     created_at_1 = datetime(year=2021, month=1, day=1)
     created_at_2 = datetime(year=2022, month=2, day=2)
 
@@ -586,7 +595,6 @@ async def test_get_runs_not_empty(
     )
     assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=2)
     assert result.status_code == 200
-
 
 
 async def test_delete_run_by_id(
@@ -692,7 +700,11 @@ async def test_update_run_to_not_current(
     )
 
     engine_state_resource = RunStateResource(
-        run_id="run-id", state=protocol_run, engine_status="succeeded", _updated_at=None, commands=[]
+        run_id="run-id",
+        state=protocol_run,
+        engine_status="succeeded",
+        _updated_at=None,
+        commands=[],
     )
 
     expected_response = Run(
@@ -723,9 +735,9 @@ async def test_update_run_to_not_current(
     )
     decoy.when(engine_state.get_protocol_run_data()).then_return(protocol_run)
 
-    decoy.when(mock_run_state_store.insert(engine_state_resource)).then_return(
-        engine_state_resource
-    )
+    decoy.when(
+        mock_run_state_store.update_run_state(engine_state_resource)
+    ).then_return(engine_state_resource)
 
     result = await update_run(
         runId="run-id",
@@ -780,7 +792,11 @@ async def test_update_current_to_current_noop(
     )
 
     engine_state_resource = RunStateResource(
-        run_id="run-id", state=protocol_run, engine_status="succeeded", _updated_at=None, commands=[]
+        run_id="run-id",
+        state=protocol_run,
+        engine_status="succeeded",
+        _updated_at=None,
+        commands=[],
     )
 
     run_update = RunUpdate(current=True)
@@ -800,9 +816,9 @@ async def test_update_current_to_current_noop(
     )
     decoy.when(engine_state.get_protocol_run_data()).then_return(protocol_run)
 
-    decoy.when(mock_run_state_store.insert(engine_state_resource)).then_return(
-        engine_state_resource
-    )
+    decoy.when(
+        mock_run_state_store.update_run_state(engine_state_resource)
+    ).then_return(engine_state_resource)
 
     result = await update_run(
         runId="run-id",

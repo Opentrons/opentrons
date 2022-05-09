@@ -212,7 +212,7 @@ async def create_run(
 async def get_runs(
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-    run_state_store: RunStateStore = Depends(get_run_state_store)
+    run_state_store: RunStateStore = Depends(get_run_state_store),
 ) -> PydanticResponse[MultiBody[Run, AllRunsLinks]]:
     """Get all runs.
 
@@ -382,13 +382,13 @@ async def update_run(
             raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
         run = run_store.update_active_run(run_id=runId, is_current=update.current)
         log.info(f'Marked run "{runId}" as not current.')
-        insert_engine_state_result = run_state_store.insert(
+        insert_engine_state_result = run_state_store.update_run_state(
             RunStateResource(
                 run_id=run.run_id,
                 state=protocol_run_data,
                 engine_status=engine_state.commands.get_status(),
                 _updated_at=datetime.now(timezone.utc),
-                commands=protocol_run_data.commands
+                commands=protocol_run_data.commands,
             )
         )
 

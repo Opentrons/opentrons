@@ -10,6 +10,7 @@ from .run_store import RunNotFoundError
 from opentrons.protocol_engine import ProtocolRunData
 from opentrons.protocol_engine.commands import Command
 
+
 @dataclass(frozen=True)
 class RunStateResource:
     """An entry in the run state store, used to construct response models.
@@ -32,7 +33,7 @@ class RunStateStore:
         """Initialize a RunStore with sql engine."""
         self._sql_engine = sql_engine
 
-    def update_run(self, state: RunStateResource) -> RunStateResource:
+    def update_run_state(self, state: RunStateResource) -> RunStateResource:
         """update run table with run state to db.
 
         Arguments:
@@ -41,13 +42,14 @@ class RunStateStore:
         Returns:
             The engine state that was added to the store.
         """
-        statement = sqlalchemy.update(run_table).where(run_table.c.id == state.run_id).values(
-            _convert_state_to_sql_values(state=state)
+        statement = (
+            sqlalchemy.update(run_table)
+            .where(run_table.c.id == state.run_id)
+            .values(_convert_state_to_sql_values(state=state))
         )
         with self._sql_engine.begin() as transaction:
-            try:
-                transaction.execute(statement)
-            except sqlalchemy.exc.NoResultFound:
+            result = transaction.execute(statement)
+            if result.rowcount == 0:
                 raise RunNotFoundError(run_id=state.run_id)
 
         return state
@@ -61,9 +63,7 @@ class RunStateStore:
         Returns:
             The engine state that found in the store.
         """
-        statement = sqlalchemy.select(run_table).where(
-            run_table.c.id == run_id
-        )
+        statement = sqlalchemy.select(run_table).where(run_table.c.id == run_id)
         with self._sql_engine.begin() as transaction:
             try:
                 state_row = transaction.execute(statement).one()
@@ -86,7 +86,7 @@ def _convert_sql_row_to_sql_run_state(
     assert isinstance(state, Dict)
 
     # TODO (tz): set sql_row.commands add assert
-    commands = []
+    commands: List[Command] = []
 
     _updated_at = ensure_utc_datetime(sql_row._updated_at)
 

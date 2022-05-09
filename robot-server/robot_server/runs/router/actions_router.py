@@ -95,8 +95,14 @@ async def create_run_action(
                 async def run_protocol_and_insert_result() -> None:
                     run_result = await engine_store.runner.run()
                     engine_status = engine_store.engine.state_view.commands.get_status()
-                    run_state_resource = RunStateResource(run_id=runId, state=run_result, engine_status=engine_status, created_at=datetime.now(tz=timezone.utc))
-                    run_state_store.insert(run_state_resource)
+                    run_state_resource = RunStateResource(
+                        run_id=runId,
+                        state=run_result,
+                        engine_status=engine_status,
+                        _updated_at=datetime.now(tz=timezone.utc),
+                        commands=[],
+                    )
+                    run_state_store.update_run_state(run_state_resource)
 
                 task_runner.run(run_protocol_and_insert_result)
 

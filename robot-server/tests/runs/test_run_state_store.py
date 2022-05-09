@@ -99,9 +99,9 @@ def test_update_run_state(
         state=protocol_run,
         engine_status="idle",
         _updated_at=datetime.now(timezone.utc),
-        commands=[]
+        commands=[],
     )
-    result = subject.update_run(engine_state)
+    result = subject.update_run_state(engine_state)
 
     assert result == engine_state
 
@@ -119,10 +119,10 @@ def test_get_run_state(
         state=protocol_run,
         engine_status="idle",
         _updated_at=datetime.now(timezone.utc),
-        commands=[]
+        commands=[],
     )
 
-    subject.update_run(state=engine_state)
+    subject.update_run_state(state=engine_state)
     result = subject.get("run-id")
 
     assert engine_state == result
@@ -137,8 +137,8 @@ def test_update_state_run_not_found(
         state=protocol_run,
         engine_status="idle",
         _updated_at=datetime.now(timezone.utc),
-        commands=[]
+        commands=[],
     )
 
     with pytest.raises(RunNotFoundError, match="run-not-found"):
-        subject.update_run(engine_state)
+        subject.update_run_state(engine_state)
