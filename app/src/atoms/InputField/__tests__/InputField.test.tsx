@@ -62,6 +62,7 @@ describe('HeaterShakerSlideout', () => {
     const input = getByTestId('input_id')
     fireEvent.change(input, { target: { value: ['12'] } })
     expect(props.onChange).toHaveBeenCalled()
+    getByText('caption')
     getByText('error')
   })
 })
