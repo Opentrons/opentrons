@@ -535,40 +535,6 @@ export function useLabwarePositionCheck(
   const beginLPC = (): void => {
     trackEvent({ name: 'LabwarePositionCheckStarted', properties: {} })
     setIsLoading(true)
-    // first clear all previous labware offsets for each labware
-    const identityLabwareOffsets: LabwareOffsetCreateData[] =
-      protocolData != null
-        ? reduce<ProtocolFile<{}>['labware'], LabwareOffsetCreateData[]>(
-            protocolData?.labware,
-            (acc, _, labwareId) => {
-              const identityOffset = {
-                definitionUri: getLabwareDefinitionUri(
-                  labwareId,
-                  protocolData.labware,
-                  protocolData.labwareDefinitions
-                ),
-                location: getLabwareOffsetLocation(
-                  labwareId,
-                  protocolData?.commands ?? [],
-                  protocolData?.modules ?? {}
-                ),
-                vector: IDENTITY_VECTOR,
-              }
-              return [...acc, identityOffset]
-            },
-            []
-          )
-        : []
-
-    identityLabwareOffsets.forEach(identityOffsetEntry => {
-      createLabwareOffset({
-        runId: currentRunId,
-        data: identityOffsetEntry,
-      }).catch((e: Error) => {
-        console.error(`error clearing labware offsets: ${e.message}`)
-        setError(e)
-      })
-    })
     // load custom labware definitions that come from python protocols first, so that subsequent load labware commands can reference them
     const customLabwareDefinitions: LabwareDefinition2[] =
       protocolType === 'python' && protocolData != null
