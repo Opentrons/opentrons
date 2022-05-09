@@ -1,33 +1,20 @@
 """Capacitve Sensor Driver Class."""
 
-from typing import Optional, AsyncIterator
-
 import logging
 
+from typing import Optional
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
 )
 from opentrons_hardware.firmware_bindings.constants import SensorType, NodeId
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    BindSensorOutputRequest,
-)
-from opentrons_hardware.firmware_bindings.messages.fields import (
-    SensorOutputBindingField,
-    SensorTypeField,
-)
 from opentrons_hardware.sensors.utils import (
     ReadSensorInformation,
     PollSensorInformation,
     WriteSensorInformation,
     SensorDataType,
 )
-from opentrons_hardware.firmware_bindings.messages.payloads import (
-    BindSensorOutputRequestPayload,
-)
 from .sensor_abc import AbstractAdvancedSensor
 from .scheduler import SensorScheduler
-from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
-from contextlib import asynccontextmanager
 
 log = logging.getLogger(__name__)
 
@@ -44,36 +31,6 @@ class CapacitiveSensor(AbstractAdvancedSensor):
         """Constructor."""
         super().__init__(zero_threshold, stop_threshold, offset, SensorType.capacitive)
         self._scheduler = SensorScheduler()
-
-    @asynccontextmanager
-    async def bind_output(
-        self,
-        can_messenger: CanMessenger,
-        node_id: NodeId,
-        binding: SensorOutputBinding = SensorOutputBinding.sync,
-    ) -> AsyncIterator[None]:
-        """Send a BindSensorOutputRequest."""
-        try:
-            await can_messenger.send(
-                node_id=node_id,
-                message=BindSensorOutputRequest(
-                    payload=BindSensorOutputRequestPayload(
-                        sensor=SensorTypeField(self._sensor_type),
-                        binding=SensorOutputBindingField(binding),
-                    )
-                ),
-            )
-            yield
-        finally:
-            await can_messenger.send(
-                node_id=node_id,
-                message=BindSensorOutputRequest(
-                    payload=BindSensorOutputRequestPayload(
-                        sensor=SensorTypeField(self._sensor_type),
-                        binding=SensorOutputBindingField(SensorOutputBinding.none),
-                    )
-                ),
-            )
 
     async def get_report(
         self,

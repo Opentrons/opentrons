@@ -11,6 +11,16 @@ from opentrons_hardware.sensors.utils import SensorDataType
 from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
 from .scheduler import SensorScheduler
 from contextlib import asynccontextmanager
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    BindSensorOutputRequest,
+)
+from opentrons_hardware.firmware_bindings.messages.payloads import (
+    BindSensorOutputRequestPayload,
+)
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    SensorOutputBindingField,
+    SensorTypeField,
+)
 
 
 class AbstractBasicSensor(ABC):
@@ -83,17 +93,6 @@ class AbstractAdvancedSensor(AbstractBasicSensor):
         self._offset = offset
 
     @abstractmethod
-    @asynccontextmanager
-    async def bind_output(
-        self,
-        can_messenger: CanMessenger,
-        node_id: NodeId,
-        binding: SensorOutputBinding = SensorOutputBinding.sync,
-    ) -> AsyncIterator[None]:
-        """Send a BindSensorOutputRequest."""
-        yield
-
-    @abstractmethod
     async def get_baseline(
         self,
         can_messenger: CanMessenger,
@@ -128,3 +127,33 @@ class AbstractAdvancedSensor(AbstractBasicSensor):
         with the sensor being bound to "report".
         """
         ...
+
+    @asynccontextmanager
+    async def bind_output(
+        self,
+        can_messenger: CanMessenger,
+        node_id: NodeId,
+        binding: SensorOutputBinding = SensorOutputBinding.sync,
+    ) -> AsyncIterator[None]:
+        """Send a BindSensorOutputRequest."""
+        try:
+            await can_messenger.send(
+                node_id=node_id,
+                message=BindSensorOutputRequest(
+                    payload=BindSensorOutputRequestPayload(
+                        sensor=SensorTypeField(self._sensor_type),
+                        binding=SensorOutputBindingField(binding),
+                    )
+                ),
+            )
+            yield
+        finally:
+            await can_messenger.send(
+                node_id=node_id,
+                message=BindSensorOutputRequest(
+                    payload=BindSensorOutputRequestPayload(
+                        sensor=SensorTypeField(self._sensor_type),
+                        binding=SensorOutputBindingField(SensorOutputBinding.none),
+                    )
+                ),
+            )
