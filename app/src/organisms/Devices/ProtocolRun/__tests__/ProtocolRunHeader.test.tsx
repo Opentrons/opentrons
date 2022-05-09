@@ -61,7 +61,7 @@ import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
-import type { ProtocolModuleInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 const mockPush = jest.fn()
 

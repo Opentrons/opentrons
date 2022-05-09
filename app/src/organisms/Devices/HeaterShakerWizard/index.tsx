@@ -23,7 +23,7 @@ import {
 
 import type { NavRouteParams } from '../../../App/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import type { ThermalAdapterName } from '@opentrons/shared-data'
 
 interface HeaterShakerWizardProps {

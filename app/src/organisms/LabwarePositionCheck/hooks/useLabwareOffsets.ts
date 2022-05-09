@@ -7,8 +7,8 @@ import {
   ProtocolAnalysisFile,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getLabwareOffsetLocation } from '../../ProtocolSetup/utils/getLabwareOffsetLocation'
-import { getModuleInitialLoadInfo } from '../../ProtocolSetup/utils/getModuleInitialLoadInfo'
+import { getLabwareOffsetLocation } from '../../Devices/ProtocolRun/utils/getLabwareOffsetLocation'
+import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
 import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
 import { getLabwareDefinitionUri } from '../../Devices/ProtocolRun/utils/getLabwareDefinitionUri'
 import { useOffsetDataByLabwareId } from '../../ProtocolUpload/hooks/useOffsetData'

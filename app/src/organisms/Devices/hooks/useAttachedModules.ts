@@ -1,6 +1,5 @@
+import * as React from 'react'
 import { useSelector } from 'react-redux'
-
-import { useInterval } from '@opentrons/components'
 
 import { fetchModules, getAttachedModules } from '../../../redux/modules'
 import { useDispatchApiRequest } from '../../../redux/robot-api'
@@ -8,8 +7,7 @@ import { useDispatchApiRequest } from '../../../redux/robot-api'
 import type { AttachedModule } from '../../../redux/modules/types'
 import type { State } from '../../../redux/types'
 
-const POLL_MODULE_INTERVAL_MS = 50000
-
+// TODO: immediately move this to the react-api-client
 export function useAttachedModules(robotName: string | null): AttachedModule[] {
   const [dispatchRequest] = useDispatchApiRequest()
 
@@ -17,11 +15,9 @@ export function useAttachedModules(robotName: string | null): AttachedModule[] {
     getAttachedModules(state, robotName)
   )
 
-  useInterval(
-    () => robotName != null && dispatchRequest(fetchModules(robotName)),
-    POLL_MODULE_INTERVAL_MS,
-    true
-  )
+  React.useEffect(() => {
+    robotName != null && dispatchRequest(fetchModules(robotName))
+  }, [robotName])
 
   return attachedModules
 }

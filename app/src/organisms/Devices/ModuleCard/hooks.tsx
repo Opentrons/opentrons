@@ -13,7 +13,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { getProtocolModulesInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
@@ -31,7 +31,7 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 import type { AttachedModule } from '../../../redux/modules/types'
-import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 export function useHeaterShakerFromProtocol(): ProtocolModuleInfo | null {
   const currentRunId = useCurrentRunId()

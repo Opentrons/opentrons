@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import isEqual from 'lodash/isEqual'
 import { getCommand } from '@opentrons/api-client'
 import {
+  Coordinates,
   getLabwareDefIsStandard,
   getLabwareDisplayName,
   IDENTITY_VECTOR,
@@ -27,7 +28,7 @@ import {
   useProtocolDetailsForRun,
 } from '../../Devices/hooks'
 import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
-import { getModuleInitialLoadInfo } from '../../ProtocolSetup/utils/getModuleInitialLoadInfo'
+import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
 import { useSteps } from './useSteps'
 import type {
   HostConfig,
@@ -96,8 +97,14 @@ const useLpcCtaText = (
   if (command == null) return ''
   const commands = protocolData?.commands ?? []
   switch (command.commandType) {
-    case 'dropTip':
-      return t('confirm_position_and_return_tip')
+    case 'dropTip': {
+      const labwareId = command.params.labwareId
+      const labwareLocation = getLabwareLocation(labwareId, commands)
+      return t('confirm_position_and_return_tip', {
+        next_slot:
+          'slotName' in labwareLocation ? labwareLocation.slotName : '',
+      })
+    }
     case 'moveToWell': {
       const labwareId = command.params.labwareId
       const labwareLocation = getLabwareLocation(labwareId, commands)
@@ -648,7 +655,12 @@ export function useLabwarePositionCheck(
       })
   }
 
-  const jog = (axis: Axis, dir: Sign, step: StepSize): void => {
+  const jog = (
+    axis: Axis,
+    dir: Sign,
+    step: StepSize,
+    onSuccess?: (position: Coordinates | null) => void
+  ): void => {
     // if a jog is currently in flight, return early
     if (isJogging.current) return
     const moveRelCommand: CreateCommand = {
@@ -666,7 +678,8 @@ export function useLabwarePositionCheck(
       waitUntilComplete: true,
       timeout: JOG_COMMAND_TIMEOUT,
     })
-      .then(() => {
+      .then(data => {
+        onSuccess != null && onSuccess(data?.data?.result?.position ?? null)
         isJogging.current = false
       })
       .catch((e: Error) => {

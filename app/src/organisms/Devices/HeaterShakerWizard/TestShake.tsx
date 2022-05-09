@@ -29,7 +29,7 @@ import type {
   HeaterShakerSetTargetShakeSpeedCreateCommand,
   HeaterShakerStopShakeCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 interface TestShakeProps {
   module: HeaterShakerModule

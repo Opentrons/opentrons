@@ -18,7 +18,7 @@ import { SectionList } from './SectionList'
 import { useIntroInfo, useLabwareIdsBySection, useSteps } from './hooks'
 import { DeckMap } from './DeckMap'
 import type { Jog } from '../../molecules/JogControls'
-import type { LabwarePositionCheckStep } from './types'
+import type { LabwarePositionCheckStep, SavePositionCommandData } from './types'
 
 interface GenericStepScreenProps {
   selectedStep: LabwarePositionCheckStep
@@ -27,6 +27,7 @@ interface GenericStepScreenProps {
   jog: Jog
   title: string
   runId: string
+  savePositionCommandData: SavePositionCommandData
 }
 export const GenericStepScreen = (
   props: GenericStepScreenProps
@@ -86,6 +87,7 @@ export const GenericStepScreen = (
             selectedStep={props.selectedStep}
             jog={props.jog}
             runId={props.runId}
+            savePositionCommandData={props.savePositionCommandData}
           />
         </Flex>
       </Flex>

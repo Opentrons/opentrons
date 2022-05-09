@@ -8,7 +8,7 @@ import { ConfirmAttachmentModal } from '../ConfirmAttachmentModal'
 
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 
-import type { ProtocolModuleInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 jest.mock('../hooks')
 

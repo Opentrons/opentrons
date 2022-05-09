@@ -4,7 +4,7 @@ import {
   RunTimeCommand,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getLabwareLocation } from '../../ProtocolSetup/utils/getLabwareLocation'
+import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
 import type {
   LabwarePositionCheckCreateCommand,
   LabwarePositionCheckStep,

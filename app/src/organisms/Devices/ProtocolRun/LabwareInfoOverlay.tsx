@@ -5,7 +5,6 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 import {
   Box,
   RobotCoordsForeignDiv,
-  Text,
   SPACING,
   COLORS,
   TYPOGRAPHY,
@@ -45,6 +44,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
       backgroundColor={OVERLAY_BLACK_90}
       borderRadius={`0 0 0.4rem 0.4rem`}
       fontSize={FONT_SIZE_CAPTION}
+      padding={SPACING.spacing2}
       color={COLORS.white}
       id={`LabwareInfoOverlay_slot_${labwareId}_offsetBox`}
     >

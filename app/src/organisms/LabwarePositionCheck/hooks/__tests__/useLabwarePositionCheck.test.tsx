@@ -19,7 +19,7 @@ import {
   useAttachedModules,
   useProtocolDetailsForRun,
 } from '../../../Devices/hooks'
-import { getLabwareLocation } from '../../../ProtocolSetup/utils/getLabwareLocation'
+import { getLabwareLocation } from '../../../Devices/ProtocolRun/utils/getLabwareLocation'
 import { useSteps } from '../useSteps'
 import { useLabwarePositionCheck } from '../useLabwarePositionCheck'
 
@@ -31,7 +31,7 @@ jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/modules')
 jest.mock('../../../Devices/hooks')
 jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../../../ProtocolSetup/utils/getLabwareLocation')
+jest.mock('../../../Devices/ProtocolRun/utils/getLabwareLocation')
 jest.mock('../useSteps')
 
 const queryClient = new QueryClient()

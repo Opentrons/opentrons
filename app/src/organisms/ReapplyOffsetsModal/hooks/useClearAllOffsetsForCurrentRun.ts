@@ -2,7 +2,7 @@ import { IDENTITY_VECTOR } from '@opentrons/shared-data'
 import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 import { useProtocolDetailsForRun } from '../../Devices/hooks'
 import { getLabwareDefinitionUri } from '../../Devices/ProtocolRun/utils/getLabwareDefinitionUri'
-import { getLabwareOffsetLocation } from '../../ProtocolSetup/utils/getLabwareOffsetLocation'
+import { getLabwareOffsetLocation } from '../../Devices/ProtocolRun/utils/getLabwareOffsetLocation'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 
 export function useClearAllOffsetsForCurrentRun(): () => void {

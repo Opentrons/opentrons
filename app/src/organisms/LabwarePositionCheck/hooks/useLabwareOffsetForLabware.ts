@@ -3,7 +3,7 @@ import { useRunQuery } from '@opentrons/react-api-client'
 import { useProtocolDetailsForRun } from '../../Devices/hooks'
 import { getCurrentOffsetForLabwareInLocation } from '../../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getLabwareDefinitionUri } from '../../Devices/ProtocolRun/utils/getLabwareDefinitionUri'
-import { getLabwareOffsetLocation } from '../../ProtocolSetup/utils/getLabwareOffsetLocation'
+import { getLabwareOffsetLocation } from '../../Devices/ProtocolRun/utils/getLabwareOffsetLocation'
 
 export function useLabwareOffsetForLabware(
   runId: string,
