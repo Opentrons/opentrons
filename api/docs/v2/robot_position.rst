@@ -4,7 +4,7 @@
 Robot Position
 ##############
 
-Most of the time when writing a protocol, the Python Protocol API's methods take care of determining where the robot needs to go to perform the commands you've given. But sometimes you need to modify how the robot moves in order to achieve the purposes of your protocol. This document will cover the two main ways to define positions — relative to labware, or relative to the entire deck — as well as how to alter the robot's speed or trajectory as it moves to those positions.
+Most of the time when executing a protocol, the Python Protocol API's methods take care of determining where the robot needs to go to perform the commands you've given. But sometimes you need to modify how the robot moves in order to achieve the purposes of your protocol. This document will cover the two main ways to define positions — relative to labware, or relative to the entire deck — as well as how to alter the robot's speed or trajectory as it moves to those positions.
 
 
 .. _position-relative-labware:
@@ -55,7 +55,7 @@ This is a good position to start for aspiration or any other operation where you
 
 .. warning::
 
-    Negative ``z`` arguments to :py:meth:`.Well.bottom` may cause the tip to collide with the bottom of the well. The OT-2 has no sensors to detect this, and a collision may bend the tip (affecting liquid handling) and the pipette may be higher on the z-axis than expected until it picks up another tip.
+    Negative ``z`` arguments to :py:meth:`.Well.bottom` may cause the tip to collide with the bottom of the well. The OT-2 has no sensors to detect this. A collision may bend the tip (affecting liquid handling) and the pipette may be higher on the z-axis than expected until it picks up another tip.
 
 .. versionadded:: 2.0
 
@@ -78,23 +78,9 @@ control of positions within the well for unusual or custom labware.
 Default Positions
 =================
 
-By default, the OT-2 will aspirate and dispense 1 mm above the :py:meth:`.Well.bottom` position, which
-may not be suitable for some labware geometries, liquids, or 
-protocols. 
+By default, the OT-2 will aspirate and dispense 1 mm above the bottom of wells, which may not be suitable for some labware geometries, liquids, or protocols. You can change this by using :py:meth:`.Well.bottom` with the ``z`` argument, although it can be cumbersome to do this repeatedly. If you need to change the aspiration or dispensing height for many operations, specify the distance from the well bottom with :py:obj:`.InstrumentContext.well_bottom_clearance`. This attribute has two sub-attributes: ``well_bottom_clearance.aspirate`` changes the height for aspiration, and ``well_bottom_clearance.dispense`` changes the height for dispensing.
 
-[TK check accuracy, this seems to work fine with transfer 
-While you can specify the exact location within a well in direct calls to
-:py:meth:`.InstrumentContext.aspirate` and :py:meth:`.InstrumentContext.dispense`
-(see the :ref:`v2-location-within-wells` section), you cannot use this method in
-complex commands like :py:meth:`.InstrumentContext.transfer`, and it can be
-cumbersome to specify the position every time.]
-
-Instead, you can use the attribute :py:obj:`.InstrumentContext.well_bottom_clearance`
-to specify the height above the bottom of a well: ``pipette.well_bottom_clearance.aspirate`` changes the height for aspiration, and 
-``pipette.well_bottom_clearance.dispense`` changes the height for dispensing.
-
-Changing these attributes will affect all subsequent aspirate and dispense actions performed by that pipette, even those
-executed as part of a transfer.
+Changing these attributes will affect all subsequent aspirate and dispense actions performed by that pipette, even those executed as part of a :py:meth:`.transfer`.
 
 
 .. code-block:: python
@@ -111,28 +97,25 @@ executed as part of a transfer.
 
         pipette.pick_up_tip()
 
-        # Aspirate 1 mm above the bottom of the well (default)
+        # aspirate 1 mm above the bottom of the well (default)
         pipette.aspirate(50, plate['A1'])
-        # Dispense 1 mm above the bottom of the well (default)
+        # dispense 1 mm above the bottom of the well (default)
         pipette.dispense(50, plate['A1'])
 
-        # Change clearance for aspiration to 2 mm
+        # change clearance for aspiration to 2 mm
         pipette.well_bottom_clearance.aspirate = 2
-        # Aspirate 2 mm above the bottom of the well
+        # aspirate 2 mm above the bottom of the well
         pipette.aspirate(50, plate['A1'])
-        # Still dispensing 1 mm above the bottom
+        # still dispensing 1 mm above the bottom
         pipette.dispense(50, plate['A1'])
 
         pipette.aspirate(50, plate['A1'])
-        # Change clearance for dispensing to 10 mm      
+        # change clearance for dispensing to 10 mm      
         pipette.well_bottom_clearance.dispense = 10
-        # Dispense high above the well
+        # dispense high above the well
         pipette.dispense(50, plate['A1'])
 
 .. versionadded:: 2.0
-
-
-
 
 
 .. _protocol-api-deck-coords:
@@ -144,11 +127,11 @@ Position on the Deck
 
 The OT-2’s base coordinate system is known as *deck coordinates*. Many API functions use this coordinate system, and you can also reference it directly. It is a right-handed coordinate system always specified in mm, with the origin ``(0, 0, 0)`` at the front left of the robot. The positive ``x`` direction is to the right, the positive ``y`` direction is to the back, and the positive ``z`` direction is up. 
 
-You can identify a point in this coordinate system with a :py:class:`.types.Location` object, either as a standard Python :py:class:`tuple` of three floats, or as an instance of the :py:obj:`collections.namedtuple` :py:class:`opentrons.types.Point`.
+You can identify a point in this coordinate system with a :py:class:`.types.Location` object, either as a standard Python :py:class:`tuple` of three floats, or as an instance of the :py:obj:`~collections.namedtuple` :py:class:`.types.Point`.
 
 .. note::
 
-    There are technically multiple vertical axes: ``z`` is the axis of the left pipette mount and ``a`` is the axis of the right pipette mount. There are also pipette plunger axes: ``b`` (left) and ``c`` (right). These are obscured by the API’s habit of defining motion commands on a per-pipette basis; the OT-2 internally selects the correct pipette axis to move. Likewise, :py:class:`.types.Location` only deals with ``x``, ``y``, and ``z`` values. 
+    There are technically multiple vertical axes: ``z`` is the axis of the left pipette mount and ``a`` is the axis of the right pipette mount. There are also pipette plunger axes: ``b`` (left) and ``c`` (right). You usually don't have to refer to these axes directly, since most motion commands are issued to a particular pipette and the OT-2 automatically selects the correct axis to move. Similarly, :py:class:`.types.Location` only deals with ``x``, ``y``, and ``z`` values. 
     
 
 
@@ -157,15 +140,17 @@ You can identify a point in this coordinate system with a :py:class:`.types.Loca
 Movement Behavior
 *****************
 
-Whenever the OT-2 moves to a particular position, it calculates where to move using its `pipette offset and tip length calibration <https://support.opentrons.com/s/article/Get-started-Calibrate-tip-length-and-pipette-offset>`_ data. For convenience, many methods have location arguments and incorporate movement automatically. This section will focus on moving the robot independent from other actions, as well as changing its manner of movement.
+Whenever the OT-2 moves to a particular position, it calculates where to move using its `pipette offset and tip length calibration <https://support.opentrons.com/s/article/Get-started-Calibrate-tip-length-and-pipette-offset>`_ data. For convenience, many methods have location arguments and incorporate movement automatically. This section will focus on moving the robot independent of other actions, as well as changing its manner of movement.
 
 
 Points vs. Locations
 ====================
 
-When instructing the OT-2 to move, it's important to consider the difference between the :py:class:`opentrons.types.Point` and :py:class:`opentrons.types.Location` types. Points are ordered tuples or named tuples: ``(10, 20, 30)``, ``(x=10, y=20, z=30)``, and ``(z=30, y=20, x=10)`` are all equivalent. Locations are a higher-order tuple that combines a point with a reference point: a well, a piece of labware, or ``None`` (the deck).
+When instructing the OT-2 to move, it's important to consider the difference between the :py:class:`~opentrons.types.Point` and :py:class:`~opentrons.types.Location` types. Points are ordered tuples or named tuples: ``(10, 20, 30)``, ``(x=10, y=20, z=30)``, and ``(z=30, y=20, x=10)`` are all equivalent. Locations are a higher-order tuple that combines a point with a reference object: a well, a piece of labware, or ``None`` (the deck).
 
-This distinction is important for the :py:meth:`.Location.move` method, which operates on a location, takes a point as an argument, and outputs an updated location. To use this method, include ``from opentrons import types`` at the start of your protocol. Because ``.move`` is a method, it does not mutate the location it is called against. To perform an action at the updated location, use it as an argument of another method or save it to a variable:
+.. TODO document position_for and other methods in deck.py that return Locations
+
+This distinction is important for the :py:meth:`.Location.move` method, which operates on a location, takes a point as an argument, and outputs an updated location. To use this method, include ``from opentrons import types`` at the start of your protocol. Because ``.move()`` is a method, it does not mutate the location it is called against. To perform an action at the updated location, use it as an argument of another method or save it to a variable:
 
 .. code-block:: python
     :substitutions:
@@ -180,15 +165,15 @@ This distinction is important for the :py:meth:`.Location.move` method, which op
         pipette = protocol.load_instrument('p300_single', 'right', tip_racks = [tiprack])
         pipette.pick_up_tip()
 
-        # Get the location at the center of well A1.
+        # get the location at the center of well A1
         center_location = plate['A1'].center()
 
-        # Get a location 1 mm right, 1 mm back, and 1 mm up from the center of well A1.
+        # get a location 1 mm right, 1 mm back, and 1 mm up from the center of well A1
         adjusted_location = center_location.move(types.Point(x=1, y=1, z=1))
 
-        # Aspirate 1 mm right, 1 mm back, and 1 mm up from the center of well A1.
+        # aspirate 1 mm right, 1 mm back, and 1 mm up from the center of well A1
         pipette.aspirate(50, adjusted_location)
-        # Dispense at the same location
+        # dispense at the same location
         pipette.dispense(50, center_location.move(types.Point(x=1, y=1, z=1)))
 
 
@@ -199,27 +184,20 @@ This distinction is important for the :py:meth:`.Location.move` method, which op
 Move To
 =======
 
-You can use :py:meth:`.InstrumentContext.move_to` to move a pipette to any location on the deck. If the pipette has picked up a tip, it will move the end of the tip to that position; if it hasn't, it will move the pipette nozzle to that position.
+You can use :py:meth:`.InstrumentContext.move_to` to move a pipette to any reachable location on the deck. If the pipette has picked up a tip, it will move the end of the tip to that position; if it hasn't, it will move the pipette nozzle to that position.
 
-For example, to move to the first tip in a tip rack:
-
-.. code-block:: python
-
-    pipette.move_to(tiprack['A1'].top())
-
-
-The argument of ``move_to`` must be a :py:class:`Location`, either one automatically generated by methods like :py:meth:`.Well.top` and :py:meth:`.Well.bottom` or one you've created yourself — you can't move to a well directly. The additional ``z`` arguments of ``.top`` and ``.bottom`` methods (see :ref:`position-relative-labware` above) are shorthand for adjusting the top and bottom locations with ``move``:
+The argument of ``move_to()`` must be a :py:class:`.Location`, either one automatically generated by methods like :py:meth:`.Well.top` and :py:meth:`.Well.bottom` or one you've created yourself — you can't move to a well directly. The additional ``z`` arguments of the ``.top()`` and ``.bottom()`` methods (see :ref:`position-relative-labware` above) are shorthand for adjusting the top and bottom locations with ``move()``:
 
 .. code-block:: python
 
-    pipette.move_to(plate['A1'])            # error; can't move to a well itself
-    pipette.move_to(plate['A1'].bottom())   # move to the bottom of well A1
-    pipette.move_to(plate['A1'].top())      # move to the top of well A1
-    pipette.move_to(plate['A1'].bottom(2))  # move to 2 mm above the bottom of well A1
+    pipette.move_to(plate['A1'])              # error; can't move to a well itself
+    pipette.move_to(plate['A1'].bottom())     # move to the bottom of well A1
+    pipette.move_to(plate['A1'].top())        # move to the top of well A1
+    pipette.move_to(plate['A1'].bottom(z=2))  # move to 2 mm above the bottom of well A1
     pipette.move_to(plate['A1'].bottom().move(types.Point(z=2)))    # same as above
-    pipette.move_to(plate['A1'].top(-2))    # move to 2 mm below the top of well A1
+    pipette.move_to(plate['A1'].top(z=-2))    # move to 2 mm below the top of well A1
 
-When using ``move_to``, by default the pipette will move in an arc: first upwards, then laterally to a position above the target location, and finally downwards to the target location.
+When using ``move_to()``, by default the pipette will move in an arc: first upwards, then laterally to a position above the target location, and finally downwards to the target location.
 If you have a reason for doing so, you can force the pipette to move in a straight line to the target location:
 
 .. code-block:: python
@@ -259,20 +237,18 @@ can reduce the gantry speed for a specific pipette by setting
 
     def run(protocol: protocol_api.ProtocolContext):
         pipette = protocol.load_instrument('p300_single', 'right')
-        # Move to 50 mm above the front left of slot 5 at default speed
+        # move to 50 mm above the front left of slot 5 at default speed
         pipette.move_to(protocol.deck.position_for('5').move(types.Point(z=50)))
-        # Slow down the pipette
+        # slow down the pipette
         pipette.default_speed = 100
-        # Move to 50 mm above the front left of slot 9 much more slowly
+        # move to 50 mm above the front left of slot 9 much more slowly
         pipette.move_to(protocol.deck.position_for('9').move(types.Point(z=50)))
         
-[TK document position_for or change this example]
-
 .. warning::
 
    The default of 400 mm/s was chosen because it is the maximum speed Opentrons knows
    will work with the gantry. Your specific robot may be able to move faster, but you
-   shouldn't increase this value above 400 without extensive experimentation.
+   shouldn't increase this value above 400 unless instructed by Opentrons Support.
 
 
 .. versionadded:: 2.0
@@ -280,18 +256,15 @@ can reduce the gantry speed for a specific pipette by setting
 Axis Speed Limits
 =================
 
-In addition to controlling the overall gantry speed, you can set speed limits for each of the individual  axes: ``x`` (gantry left/right motion), ``y`` (gantry forward/back motion), ``z`` (left pipette up/down motion), and ``a`` (right pipette up/down motion). Unlike ``default_speed``, which is an instrument property, axis speed limits are stored in a protocol property :py:obj:`.ProtocolContext.max_speeds`; therefore the ``x`` and ``y`` values affect all movements by both pipettes. This property works like a dictionary, where the keys are axes, assigning to a key sets a max speed, and deleting a key or setting it to ``None`` resets that axis's limit to the default:
+In addition to controlling the overall gantry speed, you can set speed limits for each of the individual  axes: ``x`` (gantry left/right motion), ``y`` (gantry forward/back motion), ``z`` (left pipette up/down motion), and ``a`` (right pipette up/down motion). Unlike ``default_speed``, which is an instrument property, axis speed limits are stored in a protocol property :py:obj:`.ProtocolContext.max_speeds`; therefore the ``x`` and ``y`` values affect all movements by both pipettes. This property works like a dictionary, where the keys are axes, assigning a value to a key sets a max speed, and deleting a key or setting it to ``None`` resets that axis's limit to the default:
 
 .. code-block:: python
     :substitutions:
 
-    metadata = {'apiLevel': '|apiLevel|'}
-
-    def run(protocol):
-        protocol.max_speeds['x'] = 50       # limit x-axis to 50 mm/s
-        del protocol.max_speeds['x']        # reset x-axis limit
-        protocol.max_speeds['a'] = 10       # limit a-axis to 10 mm/s
-        protocol.max_speeds['a'] = None     # reset a-axis limit
+	protocol.max_speeds['x'] = 50       # limit x-axis to 50 mm/s
+	del protocol.max_speeds['x']        # reset x-axis limit
+	protocol.max_speeds['a'] = 10       # limit a-axis to 10 mm/s
+	protocol.max_speeds['a'] = None     # reset a-axis limit
 
 
 Note that ``max_speeds`` can't set limits for the pipette plunger axes (``b`` and ``c``); instead, set the
