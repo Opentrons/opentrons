@@ -35,9 +35,6 @@ jest.mock(
   '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 )
 jest.mock('../../../../redux/analytics')
-// jest.mock('../../../../redux/sessions')
-// jest.mock('../../../../redux/robot-api')
-// jest.mock('../../../../redux/discovery/selectors')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/robot')
 jest.mock('../../hooks')
@@ -172,13 +169,13 @@ describe('RobotSettingsCalibration', () => {
   })
 
   // it('Health check button is not clickable and display tooltip', () => {
-  //   mockUseCurrentRunId.mockReturnValue('RUNID')
-  //   const [{ getByRole }] = render()
-  //   const healthCheckButton = getByRole('button', { name: 'Check health' })
-  //   expect(healthCheckButton).toBeDisabled()
-  //   // fireEvent.mouseOver(healthCheckButton)
-  //   // getByRole('tooltip', {
-  //   //   name: 'Fully calibrate your robot before checking calibration health',
-  //   // })
+  // mockUseCurrentRunId.mockReturnValue('RUNID')
+  // const [{ getByText, getByRole }] = render()
+  // const healthCheckButton = getByRole('button', { name: 'Check health' })
+  // expect(healthCheckButton).toBeInTheDocument()
+  // fireEvent.mouseOver(healthCheckButton)
+  // getByRole('tooltip', {
+  //   name: 'Fully calibrate your robot before checking calibration health',
+  // })
   // })
 })
