@@ -429,10 +429,19 @@ class PeripheralStatusRequestPayload(utils.BinarySerializable):
 
     sensor: SensorTypeField
 
+<<<<<<< HEAD
 
 @dataclass
 class PeripheralStatusResponsePayload(utils.BinarySerializable):
+=======
+@dataclass
+class PeripheralInfoResponsePayload(utils.BinarySerializable):
+>>>>>>> c1c8f3675 (added message to defs, constants, payloads)
     """A response that sends back the initialization status of a peripheral device."""
 
     sensor: SensorTypeField
     status: utils.UInt8Field
+<<<<<<< HEAD
+=======
+
+>>>>>>> c1c8f3675 (added message to defs, constants, payloads)
