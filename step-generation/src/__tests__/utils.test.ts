@@ -287,7 +287,7 @@ describe('makeInitialRobotState', () => {
             labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
             def: fixtureTiprack300ul,
           },
-          trashId: {
+          fixedTrash: {
             id: FIXED_TRASH_ID,
             labwareDefURI: getLabwareDefURI(fixtureTrash),
             def: fixtureTrash,
@@ -298,7 +298,7 @@ describe('makeInitialRobotState', () => {
         somePlateId: { slot: '1' },
         tiprack10Id: { slot: '2' },
         tiprack300Id: { slot: '4' },
-        trashId: { slot: '12' },
+        fixedTrash: { slot: '12' },
       },
       moduleLocations: {
         someTempModuleId: {

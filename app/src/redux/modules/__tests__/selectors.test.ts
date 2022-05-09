@@ -69,7 +69,7 @@ const SPECS: SelectorSpec[] = [
               ...Fixtures.mockThermocycler,
               data: {
                 ...Fixtures.mockThermocycler.data,
-                lid: 'closed',
+                lidStatus: 'closed',
               },
             } as Types.ThermocyclerModule,
           },
@@ -93,7 +93,7 @@ const SPECS: SelectorSpec[] = [
         ...Fixtures.mockThermocycler,
         data: {
           ...Fixtures.mockThermocycler.data,
-          lid: 'closed',
+          lidStatus: 'closed',
         },
       },
     ],

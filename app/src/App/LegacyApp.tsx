@@ -26,7 +26,10 @@ export function LegacyApp(): JSX.Element {
   const connectedRobot = useSelector((state: State) => getConnectedRobot(state))
 
   return (
-    <ApiHostProvider hostname={connectedRobot?.ip ?? null}>
+    <ApiHostProvider
+      hostname={connectedRobot?.ip ?? null}
+      robotName={connectedRobot?.name}
+    >
       <LegacyNavbar />
       <Switch>
         <Route path="/robots/:name?" component={ConnectPanel} />

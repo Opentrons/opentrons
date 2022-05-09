@@ -10,7 +10,9 @@ import {
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
   SIZE_4,
+  Overlay,
 } from '@opentrons/components'
+import { Portal } from '../../App/portal'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import {
@@ -44,6 +46,11 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
     e.preventDefault()
     setShowOverflowMenu(!showOverflowMenu)
   }
+
+  const handleClickOutside: React.MouseEventHandler<HTMLDivElement> = e => {
+    e.preventDefault()
+    setShowOverflowMenu(false)
+  }
   return (
     <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
       <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
@@ -65,6 +72,14 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
           <MenuItem onClick={handleClickReanalyze}>{t('reanalyze')}</MenuItem>
         </Flex>
       ) : null}
+      <Portal level="top">
+        {showOverflowMenu ? (
+          <Overlay
+            onClick={handleClickOutside}
+            backgroundColor={COLORS.transparent}
+          />
+        ) : null}
+      </Portal>
     </Flex>
   )
 }

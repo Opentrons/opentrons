@@ -36,7 +36,7 @@ export function useModuleRenderInfoForProtocolById(
         attachedModules.find(
           attachedMod =>
             checkModuleCompatibility(
-              attachedMod.model,
+              attachedMod.moduleModel,
               protocolMod.moduleDef.model
             ) && !matchedAmod.find(m => m === attachedMod)
         ) ?? null

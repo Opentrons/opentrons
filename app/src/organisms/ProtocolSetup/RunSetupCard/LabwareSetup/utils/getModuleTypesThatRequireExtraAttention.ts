@@ -3,6 +3,7 @@ import { getModuleType, ModuleModel, ModuleType } from '@opentrons/shared-data'
 const MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION = [
   'magneticModuleType',
   'thermocyclerModuleType',
+  'heaterShakerModuleType',
 ] as const
 
 export type ModuleTypesThatRequiresExtraAttention = typeof MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION[number]

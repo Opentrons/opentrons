@@ -101,6 +101,9 @@ Object {
       "H8": Object {},
       "H9": Object {},
     },
+    "fixedTrash": Object {
+      "A1": Object {},
+    },
     "sourcePlateId": Object {
       "A1": Object {},
       "A10": Object {},
@@ -492,9 +495,6 @@ Object {
       "H7": Object {},
       "H8": Object {},
       "H9": Object {},
-    },
-    "trashId": Object {
-      "A1": Object {},
     },
     "troughId": Object {
       "A1": Object {},
@@ -1680,6 +1680,74 @@ Object {
       },
       "id": "destPlateId",
       "labwareDefURI": "fixture/fixture_96_plate/1",
+    },
+    "fixedTrash": Object {
+      "def": Object {
+        "brand": Object {
+          "brand": "Opentrons",
+        },
+        "cornerOffsetFromSlot": Object {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+        },
+        "dimensions": Object {
+          "xDimension": 172.86,
+          "yDimension": 165.86,
+          "zDimension": 82,
+        },
+        "groups": Array [
+          Object {
+            "metadata": Object {},
+            "wells": Array [
+              "A1",
+            ],
+          },
+        ],
+        "metadata": Object {
+          "displayCategory": "trash",
+          "displayName": "Tall Fixed Trash",
+          "displayVolumeUnits": "L",
+          "tags": Array [
+            "trash",
+            "opentrons",
+            "tall",
+          ],
+        },
+        "namespace": "fixture",
+        "ordering": Array [
+          Array [
+            "A1",
+          ],
+        ],
+        "parameters": Object {
+          "format": "trash",
+          "isMagneticModuleCompatible": false,
+          "isTiprack": false,
+          "loadName": "fixture_trash",
+          "quirks": Array [
+            "fixedTrash",
+            "centerMultichannelOnWells",
+            "touchTipDisabled",
+          ],
+        },
+        "schemaVersion": 2,
+        "version": 1,
+        "wells": Object {
+          "A1": Object {
+            "depth": 77,
+            "shape": "rectangular",
+            "totalLiquidVolume": 1100000,
+            "x": 82.84,
+            "xDimension": 107.11,
+            "y": 53.56,
+            "yDimension": 165.67,
+            "z": 5,
+          },
+        },
+      },
+      "id": "fixedTrash",
+      "labwareDefURI": "fixture/fixture_trash/1",
     },
     "sourcePlateId": Object {
       "def": Object {
@@ -6191,74 +6259,6 @@ Object {
       },
       "id": "tiprack3Id",
       "labwareDefURI": "fixture/fixture_tiprack_300_ul/1",
-    },
-    "trashId": Object {
-      "def": Object {
-        "brand": Object {
-          "brand": "Opentrons",
-        },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": 0,
-          "z": 0,
-        },
-        "dimensions": Object {
-          "xDimension": 172.86,
-          "yDimension": 165.86,
-          "zDimension": 82,
-        },
-        "groups": Array [
-          Object {
-            "metadata": Object {},
-            "wells": Array [
-              "A1",
-            ],
-          },
-        ],
-        "metadata": Object {
-          "displayCategory": "trash",
-          "displayName": "Tall Fixed Trash",
-          "displayVolumeUnits": "L",
-          "tags": Array [
-            "trash",
-            "opentrons",
-            "tall",
-          ],
-        },
-        "namespace": "fixture",
-        "ordering": Array [
-          Array [
-            "A1",
-          ],
-        ],
-        "parameters": Object {
-          "format": "trash",
-          "isMagneticModuleCompatible": false,
-          "isTiprack": false,
-          "loadName": "fixture_trash",
-          "quirks": Array [
-            "fixedTrash",
-            "centerMultichannelOnWells",
-            "touchTipDisabled",
-          ],
-        },
-        "schemaVersion": 2,
-        "version": 1,
-        "wells": Object {
-          "A1": Object {
-            "depth": 77,
-            "shape": "rectangular",
-            "totalLiquidVolume": 1100000,
-            "x": 82.84,
-            "xDimension": 107.11,
-            "y": 53.56,
-            "yDimension": 165.67,
-            "z": 5,
-          },
-        },
-      },
-      "id": "trashId",
-      "labwareDefURI": "fixture/fixture_trash/1",
     },
     "troughId": Object {
       "def": Object {
@@ -11075,6 +11075,9 @@ Object {
 exports[`snapshot tests makeState 1`] = `
 Object {
   "labware": Object {
+    "fixedTrash": Object {
+      "slot": "12",
+    },
     "sourcePlateId": Object {
       "slot": "4",
     },
@@ -11083,9 +11086,6 @@ Object {
     },
     "tiprack2Id": Object {
       "slot": "2",
-    },
-    "trashId": Object {
-      "slot": "12",
     },
   },
   "liquidState": Object {
@@ -11187,6 +11187,9 @@ Object {
         "H7": Object {},
         "H8": Object {},
         "H9": Object {},
+      },
+      "fixedTrash": Object {
+        "A1": Object {},
       },
       "sourcePlateId": Object {
         "A1": Object {},
@@ -11579,9 +11582,6 @@ Object {
         "H7": Object {},
         "H8": Object {},
         "H9": Object {},
-      },
-      "trashId": Object {
-        "A1": Object {},
       },
       "troughId": Object {
         "A1": Object {},
