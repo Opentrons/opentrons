@@ -2,6 +2,7 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import List, Optional
+from typing_extensions import Literal
 
 from opentrons.protocol_engine import (
     CommandStatus,
@@ -130,7 +131,7 @@ class RunCreate(BaseModel):
 class RunUpdate(BaseModel):
     """Update request data for an existing run."""
 
-    current: Optional[bool] = Field(
+    current: Optional[Literal[False]] = Field(
         None,
         description=(
             "Whether this run is currently controlling the robot."

@@ -9,9 +9,6 @@ from httpx import Response
 import concurrent.futures
 import contextlib
 
-from robot_server.service.json_api import RequestModel
-from robot_server.runs.run_models import RunCreate
-
 
 STARTUP_WAIT = 15
 SHUTDOWN_WAIT = 15

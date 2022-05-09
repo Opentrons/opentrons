@@ -5,7 +5,12 @@ from datetime import datetime, timezone
 from sqlalchemy.engine import Engine
 
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
-from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError, RunStateResource
+from robot_server.runs.run_store import (
+    RunStore,
+    RunResource,
+    RunNotFoundError,
+    RunStateResource,
+)
 from robot_server.runs.action_models import RunAction, RunActionType
 
 from opentrons.protocol_engine import (
@@ -15,6 +20,7 @@ from opentrons.protocol_engine import (
     ProtocolRunData,
 )
 from opentrons.types import MountType, DeckSlotName
+
 
 @pytest.fixture
 def subject(sql_engine_fixture: Engine) -> RunStore:

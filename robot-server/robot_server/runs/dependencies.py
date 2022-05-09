@@ -10,6 +10,7 @@ from robot_server.persistence import get_sql_engine
 
 from .engine_store import EngineStore
 from .run_store import RunStore
+from .run_data_manager import RunDataManager
 
 _run_store_accessor = AppStateAccessor[RunStore]("run_store")
 _engine_store_accessor = AppStateAccessor[EngineStore]("engine_store")
@@ -41,3 +42,8 @@ def get_engine_store(
         _engine_store_accessor.set_on(app_state, engine_store)
 
     return engine_store
+
+
+def get_run_data_manager() -> RunDataManager:
+    """Get a singleton run data manager to keep track of current/historical run data."""
+    raise NotImplementedError("TODO")

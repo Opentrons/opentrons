@@ -9,4 +9,4 @@ def run(protocol: ProtocolContext) -> None:
 
     for i in range(10):
         pipette.pick_up_tip(tip_rack.wells_by_name()["A1"])
-        pipette.return_tip(tip_rack.wells_by_name()["A1"])
+        pipette.drop_tip(tip_rack.wells_by_name()["A1"])

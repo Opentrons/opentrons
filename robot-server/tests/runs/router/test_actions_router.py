@@ -75,10 +75,16 @@ async def test_create_play_action_to_start_run(
     assert result.content.data == action
     assert result.status_code == 201
 
+    run_handler_captor = matchers.Captor()
+
     decoy.verify(
-        task_runner.run(matchers.Anything()),
+        task_runner.run(run_handler_captor),
         mock_run_store.insert_action(run_id=prev_run.run_id, action=action),
     )
+
+    await run_handler_captor.value()
+
+    decoy.verify(await mock_engine_store.runner.run(), times=1)
 
 
 async def test_create_play_action_to_resume_run(

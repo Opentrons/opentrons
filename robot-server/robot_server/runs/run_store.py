@@ -28,6 +28,7 @@ class RunResource:
     actions: List[RunAction]
     is_current: bool
 
+
 @dataclass(frozen=True)
 class RunStateResource:
     """An entry in the run state store, used to construct response models.
@@ -60,7 +61,7 @@ class RunStore:
         self._active_run: Optional[str] = None
 
     def update_run_state(self, state: RunStateResource) -> RunStateResource:
-        """update run table with run state to db.
+        """Update run table with run state to db.
 
         Arguments:
             state: Engine state resource to store.

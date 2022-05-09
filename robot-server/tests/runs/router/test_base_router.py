@@ -1,22 +1,13 @@
 """Tests for base /runs routes."""
 import pytest
 from datetime import datetime
-from decoy import Decoy, matchers
+from decoy import Decoy
 from pathlib import Path
 
-from opentrons.types import DeckSlotName, MountType
-from opentrons.protocol_engine import (
-    StateView,
-    ErrorOccurrence,
-    types as pe_types,
-    commands as pe_commands,
-    errors as pe_errors,
-)
+from opentrons.protocol_engine import types as pe_types
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
-from opentrons.protocol_engine import ProtocolRunData
 
 from robot_server.errors import ApiError
-from robot_server.service.task_runner import TaskRunner
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
@@ -31,19 +22,9 @@ from robot_server.protocols import (
     ProtocolNotFoundError,
 )
 from robot_server.runs.run_models import Run, RunCreate, RunUpdate
-
-from robot_server.runs.engine_store import (
-    EngineStore,
-    EngineConflictError,
-    EngineMissingError,
-)
-
-from robot_server.runs.run_store import (
-    RunStore,
-    RunNotFoundError,
-    RunResource,
-    RunStateResource
-)
+from robot_server.runs.engine_store import EngineConflictError
+from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_store import RunNotFoundError
 from robot_server.runs.router.base_router import (
     AllRunsLinks,
     create_run,
@@ -55,129 +36,42 @@ from robot_server.runs.router.base_router import (
 )
 
 
-LABWARE_OFFSET_REQUESTS = [
-    pe_types.LabwareOffsetCreate(
-        definitionUri="namespace_1/load_name_1/123",
-        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
-        vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
-    ),
-    pe_types.LabwareOffsetCreate(
-        definitionUri="namespace_2/load_name_2/123",
-        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_2),
-        vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
-    ),
-]
-
-RESOLVED_LABWARE_OFFSETS = [
-    pe_types.LabwareOffset(
-        id="labware-offset-1-id",
-        createdAt=datetime(year=2021, month=1, day=1),
-        definitionUri="namespace_1/load_name_1/1",
-        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
-        vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
-    ),
-    pe_types.LabwareOffset(
-        id="labware-offset-2-id",
-        createdAt=datetime(year=2021, month=1, day=1),
-        definitionUri="namespace_2/load_name_2/2",
-        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_2),
-        vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
-    ),
-]
-
-
-@pytest.fixture
-def protocol_run() -> ProtocolRunData:
-    """Get a ProtocolRunData test object."""
-    analysis_command = pe_commands.Pause(
-        id="command-id",
-        key="command-key",
-        status=pe_commands.CommandStatus.SUCCEEDED,
-        createdAt=datetime(year=2022, month=2, day=2),
-        params=pe_commands.PauseParams(message="hello world"),
-    )
-
-    analysis_error = pe_errors.ErrorOccurrence(
-        id="error-id",
-        createdAt=datetime(year=2023, month=3, day=3),
-        errorType="BadError",
-        detail="oh no",
-    )
-
-    analysis_labware = pe_types.LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="namespace/load-name/42",
-        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offsetId=None,
-    )
-
-    analysis_pipette = pe_types.LoadedPipette(
-        id="pipette-id",
-        pipetteName=pe_types.PipetteName.P300_SINGLE,
-        mount=MountType.LEFT,
-    )
-    return ProtocolRunData(
-        commands=[analysis_command],
-        errors=[analysis_error],
-        labware=[analysis_labware],
-        pipettes=[analysis_pipette],
-        # TODO(mc, 2022-02-14): evaluate usage of modules in the analysis resp.
-        modules=[],
-        # TODO (tz 22-4-19): added the field to class. make sure what to initialize
-        labwareOffsets=[],
-    )
-
-
 async def test_create_run(
     decoy: Decoy,
-    mock_task_runner: TaskRunner,
-    mock_run_store: RunStore,
-    mock_engine_store: EngineStore,
+    mock_run_data_manager: RunDataManager,
+    labware_offset_create: pe_types.LabwareOffsetCreate,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
     run_created_at = datetime(year=2021, month=1, day=1)
 
-    expected_run = RunResource(
-        run_id=run_id,
-        created_at=run_created_at,
-        protocol_id=None,
-        actions=[],
-        is_current=True,
-    )
     expected_response = Run(
         id=run_id,
-        protocolId=None,
         createdAt=run_created_at,
-        status=pe_types.EngineStatus.IDLE,
+        protocolId=None,
         current=True,
         actions=[],
         errors=[],
         pipettes=[],
         labware=[],
-        labwareOffsets=RESOLVED_LABWARE_OFFSETS,
+        labwareOffsets=[],
+        status=pe_types.EngineStatus.IDLE,
     )
 
-    engine_state = decoy.mock(cls=StateView)
-    decoy.when(await mock_engine_store.create(run_id=run_id)).then_return(engine_state)
-
-    decoy.when(engine_state.pipettes.get_all()).then_return([])
-    decoy.when(engine_state.labware.get_all()).then_return([])
-    decoy.when(engine_state.labware.get_labware_offsets()).then_return(
-        RESOLVED_LABWARE_OFFSETS
-    )
-    decoy.when(engine_state.commands.get_status()).then_return(
-        pe_types.EngineStatus.IDLE
-    )
+    decoy.when(
+        await mock_run_data_manager.create(
+            run_id=run_id,
+            created_at=run_created_at,
+            labware_offsets=[labware_offset_create],
+            protocol=None,
+        )
+    ).then_return(expected_response)
 
     result = await create_run(
         request_body=RequestModel(
-            data=RunCreate(labwareOffsets=LABWARE_OFFSET_REQUESTS)
+            data=RunCreate(labwareOffsets=[labware_offset_create])
         ),
-        run_store=mock_run_store,
-        engine_store=mock_engine_store,
-        task_runner=mock_task_runner,
+        run_data_manager=mock_run_data_manager,
         run_id=run_id,
         created_at=run_created_at,
     )
@@ -185,36 +79,19 @@ async def test_create_run(
     assert result.content.data == expected_response
     assert result.status_code == 201
 
-    decoy.verify(
-        # It should have added each requested labware offset to the engine,
-        # in the exact order they appear in the request.
-        *[
-            mock_engine_store.engine.add_labware_offset(r)
-            for r in LABWARE_OFFSET_REQUESTS
-        ],
-        mock_run_store.insert(run=expected_run),
-    )
-
 
 async def test_create_protocol_run(
     decoy: Decoy,
-    mock_run_store: RunStore,
     mock_protocol_store: ProtocolStore,
-    mock_engine_store: EngineStore,
-    mock_task_runner: TaskRunner,
+    mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should be able to create a protocol run."""
+    run_id = "run-id"
     run_created_at = datetime(year=2021, month=1, day=1)
+    protocol_id = "protocol-id"
 
-    run = RunResource(
-        run_id="run-id",
-        protocol_id="protocol-id",
-        created_at=run_created_at,
-        actions=[],
-        is_current=True,
-    )
     protocol_resource = ProtocolResource(
-        protocol_id="protocol-id",
+        protocol_id=protocol_id,
         protocol_key=None,
         created_at=datetime(year=2022, month=2, day=2),
         source=ProtocolSource(
@@ -226,65 +103,41 @@ async def test_create_protocol_run(
             labware_definitions=[],
         ),
     )
+
     expected_response = Run(
-        id="run-id",
-        protocolId="protocol-id",
+        id=run_id,
         createdAt=run_created_at,
-        status=pe_types.EngineStatus.IDLE,
+        protocolId=protocol_id,
         current=True,
         actions=[],
         errors=[],
         pipettes=[],
         labware=[],
-        labwareOffsets=RESOLVED_LABWARE_OFFSETS,
+        labwareOffsets=[],
+        status=pe_types.EngineStatus.IDLE,
     )
 
-    decoy.when(mock_protocol_store.get(protocol_id="protocol-id")).then_return(
-        protocol_resource
-    )
+    decoy.when(mock_protocol_store.get(protocol_id)).then_return(protocol_resource)
 
-    engine_state = decoy.mock(cls=StateView)
-    decoy.when(await mock_engine_store.create(run_id="run-id")).then_return(
-        engine_state
-    )
-
-    decoy.when(engine_state.pipettes.get_all()).then_return([])
-    decoy.when(engine_state.labware.get_all()).then_return([])
-    decoy.when(engine_state.labware.get_labware_offsets()).then_return(
-        RESOLVED_LABWARE_OFFSETS
-    )
-    decoy.when(engine_state.commands.get_status()).then_return(
-        pe_types.EngineStatus.IDLE
-    )
+    decoy.when(
+        await mock_run_data_manager.create(
+            run_id=run_id,
+            created_at=run_created_at,
+            labware_offsets=[],
+            protocol=protocol_resource,
+        )
+    ).then_return(expected_response)
 
     result = await create_run(
-        request_body=RequestModel(
-            data=RunCreate(
-                protocolId="protocol-id",
-                labwareOffsets=LABWARE_OFFSET_REQUESTS,
-            )
-        ),
-        run_store=mock_run_store,
-        engine_store=mock_engine_store,
+        request_body=RequestModel(data=RunCreate(protocolId="protocol-id")),
         protocol_store=mock_protocol_store,
-        task_runner=mock_task_runner,
-        run_id="run-id",
+        run_data_manager=mock_run_data_manager,
+        run_id=run_id,
         created_at=run_created_at,
     )
 
     assert result.content.data == expected_response
     assert result.status_code == 201
-
-    decoy.verify(
-        # It should have added each requested labware offset to the engine,
-        # in the exact order they appear in the request.
-        *[
-            mock_engine_store.engine.add_labware_offset(r)
-            for r in LABWARE_OFFSET_REQUESTS
-        ],
-        mock_engine_store.runner.load(protocol_resource.source),
-        mock_run_store.insert(run=run),
-    )
 
 
 async def test_create_protocol_run_bad_protocol_id(
@@ -307,15 +160,28 @@ async def test_create_protocol_run_bad_protocol_id(
 
 
 async def test_create_run_conflict(
-    decoy: Decoy, mock_engine_store: EngineStore
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should respond with a conflict error if multiple engines are created."""
-    decoy.when(await mock_engine_store.create(run_id=matchers.Anything())).then_raise(
-        EngineConflictError("oh no")
-    )
+    created_at = datetime(year=2021, month=1, day=1)
+
+    decoy.when(
+        await mock_run_data_manager.create(
+            run_id="run-id",
+            created_at=created_at,
+            labware_offsets=[],
+            protocol=None,
+        )
+    ).then_raise(EngineConflictError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
-        await create_run(request_body=None, engine_store=mock_engine_store)
+        await create_run(
+            run_id="run-id",
+            created_at=created_at,
+            request_body=None,
+            run_data_manager=mock_run_data_manager,
+        )
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunAlreadyActive"
@@ -323,142 +189,46 @@ async def test_create_run_conflict(
 
 async def test_get_run_data_from_url(
     decoy: Decoy,
-    mock_run_store: RunStore,
-    mock_engine_store: EngineStore,
+    mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should be able to get a run by ID."""
-    created_at = datetime(year=2021, month=1, day=1)
-
-    run = RunResource(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=created_at,
-        actions=[],
-        is_current=False,
-    )
-
-    labware = pe_types.LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="namespace/load-name/42",
-        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offsetId=None,
-    )
-
-    pipette = pe_types.LoadedPipette(
-        id="pipette-id",
-        pipetteName=pe_types.PipetteName.P300_SINGLE,
-        mount=MountType.LEFT,
-    )
-
-    expected_response = Run(
-        id="run-id",
-        protocolId=None,
-        createdAt=created_at,
-        status=pe_types.EngineStatus.IDLE,
-        current=False,
-        actions=[],
-        errors=[],
-        pipettes=[pipette],
-        labware=[labware],
-        labwareOffsets=RESOLVED_LABWARE_OFFSETS,
-    )
-
-    decoy.when(mock_run_store.get(run_id="run-id")).then_return(run)
-
-    engine_state = decoy.mock(cls=StateView)
-
-    decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
-    decoy.when(engine_state.commands.get_all_errors()).then_return([])
-    decoy.when(engine_state.pipettes.get_all()).then_return([pipette])
-    decoy.when(engine_state.labware.get_all()).then_return([labware])
-    decoy.when(engine_state.labware.get_labware_offsets()).then_return(
-        RESOLVED_LABWARE_OFFSETS
-    )
-    decoy.when(engine_state.commands.get_status()).then_return(
-        pe_types.EngineStatus.IDLE
-    )
-
-    result = await get_run_data_from_url(
-        runId="run-id",
-        run_store=mock_run_store,
-        engine_store=mock_engine_store,
-    )
-
-    assert result == expected_response
-
-
-async def test_get_run_with_errors(
-    decoy: Decoy,
-    mock_run_store: RunStore,
-    mock_engine_store: EngineStore,
-) -> None:
-    """It should be able to get a run by ID that has errors."""
-    run = RunResource(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1),
-        actions=[],
-        is_current=False,
-    )
-
-    error_1 = ErrorOccurrence(
-        id="error-1",
-        createdAt=datetime(year=2023, month=3, day=3),
-        errorType="SomethingBad",
-        detail="oh no",
-    )
-
-    error_2 = ErrorOccurrence(
-        id="error-2",
-        createdAt=datetime(year=2024, month=4, day=4),
-        errorType="SomethingWorse",
-        detail="oh no no",
-    )
-
     expected_response = Run(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
-        status=pe_types.EngineStatus.FAILED,
+        status=pe_types.EngineStatus.IDLE,
         current=False,
         actions=[],
-        errors=[error_1, error_2],
+        errors=[],
         pipettes=[],
         labware=[],
         labwareOffsets=[],
     )
 
-    decoy.when(mock_run_store.get(run_id="run-id")).then_return(run)
-
-    engine_state = decoy.mock(cls=StateView)
-
-    decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
-    decoy.when(engine_state.commands.get_all_errors()).then_return([error_1, error_2])
-    decoy.when(engine_state.pipettes.get_all()).then_return([])
-    decoy.when(engine_state.labware.get_all()).then_return([])
-    decoy.when(engine_state.labware.get_labware_offsets()).then_return([])
-    decoy.when(engine_state.commands.get_status()).then_return(
-        pe_types.EngineStatus.FAILED
-    )
+    decoy.when(mock_run_data_manager.get("run-id")).then_return(expected_response)
 
     result = await get_run_data_from_url(
         runId="run-id",
-        run_store=mock_run_store,
-        engine_store=mock_engine_store,
+        run_data_manager=mock_run_data_manager,
     )
 
     assert result == expected_response
 
 
-async def test_get_run_with_missing_id(decoy: Decoy, mock_run_store: RunStore) -> None:
+async def test_get_run_with_missing_id(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
     """It should 404 if the run ID does not exist."""
     not_found_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(mock_run_store.get(run_id="run-id")).then_raise(not_found_error)
+    decoy.when(mock_run_data_manager.get(run_id="run-id")).then_raise(not_found_error)
 
     with pytest.raises(ApiError) as exc_info:
-        await get_run_data_from_url(runId="run-id", run_store=mock_run_store)
+        await get_run_data_from_url(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+        )
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
@@ -487,16 +257,13 @@ async def test_get_run() -> None:
 
 async def test_get_runs_empty(
     decoy: Decoy,
-    mock_run_store: RunStore,
-    mock_engine_store: EngineStore,
+    mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should return an empty collection response when no runs exist."""
-    decoy.when(mock_run_store.get_all()).then_return([])
+    decoy.when(mock_run_data_manager.get_all()).then_return([])
+    decoy.when(mock_run_data_manager.get_current_run_id()).then_return(None)
 
-    result = await get_runs(
-        run_store=mock_run_store,
-        engine_store=mock_engine_store,
-    )
+    result = await get_runs(run_data_manager=mock_run_data_manager)
 
     assert result.content.data == []
     assert result.content.links == AllRunsLinks(current=None)
@@ -506,28 +273,11 @@ async def test_get_runs_empty(
 
 async def test_get_runs_not_empty(
     decoy: Decoy,
-    mock_run_store: RunStore,
-    mock_engine_store: EngineStore,
+    mock_run_data_manager: RunDataManager,
 ) -> None:
-    """ "It should return a collection response when a run exists."""
+    """It should return a collection response when a run exists."""
     created_at_1 = datetime(year=2021, month=1, day=1)
     created_at_2 = datetime(year=2022, month=2, day=2)
-
-    run_1 = RunResource(
-        run_id="unique-id-1",
-        protocol_id=None,
-        created_at=created_at_1,
-        actions=[],
-        is_current=False,
-    )
-
-    run_2 = RunResource(
-        run_id="unique-id-2",
-        protocol_id=None,
-        created_at=created_at_2,
-        actions=[],
-        is_current=True,
-    )
 
     response_1 = Run(
         id="unique-id-1",
@@ -555,36 +305,10 @@ async def test_get_runs_not_empty(
         labwareOffsets=[],
     )
 
-    decoy.when(mock_run_store.get_all()).then_return([run_1, run_2])
-    engine_state_1 = decoy.mock(cls=StateView)
-    decoy.when(engine_state_1.commands.get_all_errors()).then_return([])
-    decoy.when(engine_state_1.pipettes.get_all()).then_return([])
-    decoy.when(engine_state_1.labware.get_all()).then_return([])
-    decoy.when(engine_state_1.labware.get_labware_offsets()).then_return([])
-    decoy.when(engine_state_1.commands.get_status()).then_return(
-        pe_types.EngineStatus.SUCCEEDED
-    )
-    engine_state_2 = decoy.mock(cls=StateView)
-    decoy.when(engine_state_2.commands.get_all_errors()).then_return([])
-    decoy.when(engine_state_2.pipettes.get_all()).then_return([])
-    decoy.when(engine_state_2.labware.get_all()).then_return([])
-    decoy.when(engine_state_2.labware.get_labware_offsets()).then_return([])
-    decoy.when(engine_state_2.commands.get_status()).then_return(
-        pe_types.EngineStatus.SUCCEEDED
-    )
+    decoy.when(mock_run_data_manager.get_all()).then_return([response_1, response_2])
+    decoy.when(mock_run_data_manager.get_current_run_id()).then_return("unique-id-2")
 
-    decoy.when(mock_engine_store.get_state("unique-id-1")).then_return(engine_state_1)
-    decoy.when(mock_engine_store.get_state("unique-id-2")).then_return(engine_state_2)
-
-    decoy.when(engine_state_1.commands.get_status()).then_return(
-        pe_types.EngineStatus.SUCCEEDED
-    )
-
-    decoy.when(engine_state_2.commands.get_status()).then_return(
-        pe_types.EngineStatus.IDLE
-    )
-
-    result = await get_runs(run_store=mock_run_store, engine_store=mock_engine_store)
+    result = await get_runs(run_data_manager=mock_run_data_manager)
 
     assert result.content.data == [response_1, response_2]
     assert result.content.links == AllRunsLinks(
@@ -596,20 +320,12 @@ async def test_get_runs_not_empty(
 
 async def test_delete_run_by_id(
     decoy: Decoy,
-    mock_run_store: RunStore,
-    mock_engine_store: EngineStore,
+    mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should be able to remove a run by ID."""
-    result = await remove_run(
-        runId="run-id",
-        run_store=mock_run_store,
-        engine_store=mock_engine_store,
-    )
+    result = await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
 
-    decoy.verify(
-        await mock_engine_store.clear(),
-        mock_run_store.remove(run_id="run-id"),
-    )
+    decoy.verify(await mock_run_data_manager.delete("run-id"), times=1)
 
     assert result.content == SimpleEmptyBody()
     assert result.status_code == 200
@@ -617,20 +333,15 @@ async def test_delete_run_by_id(
 
 async def test_delete_run_with_bad_id(
     decoy: Decoy,
-    mock_run_store: RunStore,
-    mock_engine_store: EngineStore,
+    mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 404 if the run ID does not exist."""
     key_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(mock_run_store.remove(run_id="run-id")).then_raise(key_error)
+    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(key_error)
 
     with pytest.raises(ApiError) as exc_info:
-        await remove_run(
-            runId="run-id",
-            run_store=mock_run_store,
-            engine_store=mock_engine_store,
-        )
+        await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
@@ -638,71 +349,25 @@ async def test_delete_run_with_bad_id(
 
 async def test_delete_active_run(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
+    mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 409 if the run is not finished."""
-    decoy.when(await mock_engine_store.clear()).then_raise(EngineConflictError("oh no"))
+    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(
+        EngineConflictError("oh no")
+    )
 
     with pytest.raises(ApiError) as exc_info:
-        await remove_run(
-            runId="run-id",
-            run_store=mock_run_store,
-            engine_store=mock_engine_store,
-        )
+        await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunNotIdle"
 
 
-async def test_delete_active_run_no_engine(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-) -> None:
-    """It should no-op if no engine is present."""
-    decoy.when(mock_engine_store.get_state("run-id")).then_raise(
-        EngineMissingError("oh no")
-    )
-
-    await remove_run(
-        runId="run-id",
-        run_store=mock_run_store,
-        engine_store=mock_engine_store,
-    )
-
-
 async def test_update_run_to_not_current(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    protocol_run: ProtocolRunData,
+    mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should update a run to no longer be current."""
-    run_resource = RunResource(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1),
-        actions=[],
-        is_current=True,
-    )
-
-    updated_resource = RunResource(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1),
-        actions=[],
-        is_current=False,
-    )
-
-    engine_state_resource = RunStateResource(
-        run_id="run-id",
-        state=protocol_run,
-        engine_status="succeeded",
-        _updated_at=None,
-        commands=[],
-    )
-
     expected_response = Run(
         id="run-id",
         protocolId=None,
@@ -710,68 +375,31 @@ async def test_update_run_to_not_current(
         status=pe_types.EngineStatus.SUCCEEDED,
         current=False,
         actions=[],
-        errors=protocol_run.errors,
-        pipettes=protocol_run.pipettes,
-        labware=protocol_run.labware,
-        labwareOffsets=protocol_run.labwareOffsets,
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
     )
 
-    run_update = RunUpdate(current=False)
-
-    decoy.when(mock_run_store.get(run_id="run-id")).then_return(run_resource)
-
     decoy.when(
-        mock_run_store.update_active_run(run_id="run-id", is_current=False)
-    ).then_return(updated_resource)
-
-    engine_state = decoy.mock(cls=StateView)
-    decoy.when(mock_engine_store.engine.state_view).then_return(engine_state)
-    decoy.when(engine_state.commands.get_status()).then_return(
-        pe_types.EngineStatus.SUCCEEDED
-    )
-    decoy.when(engine_state.get_protocol_run_data()).then_return(protocol_run)
-
-    decoy.when(
-        mock_run_store.update_run_state(engine_state_resource)
-    ).then_return(engine_state_resource)
+        await mock_run_data_manager.get_or_archive("run-id", archive=True)
+    ).then_return(expected_response)
 
     result = await update_run(
         runId="run-id",
-        request_body=RequestModel(data=run_update),
-        run_store=mock_run_store,
-        engine_store=mock_engine_store,
+        request_body=RequestModel(data=RunUpdate(current=False)),
+        run_data_manager=mock_run_data_manager,
     )
+
     assert result.content == SimpleBody(data=expected_response)
     assert result.status_code == 200
 
-    decoy.verify(
-        await mock_engine_store.clear(),
-    )
 
-
-async def test_update_current_to_current_noop(
+async def test_update_current_none_noop(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    protocol_run: ProtocolRunData,
+    mock_run_data_manager: RunDataManager,
 ) -> None:
-    """It should noop if updating the current run to current: true."""
-    run_resource = RunResource(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1),
-        actions=[],
-        is_current=True,
-    )
-
-    updated_run_resource = RunResource(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1),
-        actions=[],
-        is_current=True,
-    )
-
+    """It should noop if the update does not request any change to current."""
     expected_response = Run(
         id="run-id",
         protocolId=None,
@@ -779,87 +407,61 @@ async def test_update_current_to_current_noop(
         status=pe_types.EngineStatus.SUCCEEDED,
         current=True,
         actions=[],
-        errors=protocol_run.errors,
-        pipettes=protocol_run.pipettes,
-        labware=protocol_run.labware,
-        labwareOffsets=protocol_run.labwareOffsets,
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
     )
-
-    engine_state_resource = RunStateResource(
-        run_id="run-id",
-        state=protocol_run,
-        engine_status="succeeded",
-        _updated_at=None,
-        commands=[],
-    )
-
-    run_update = RunUpdate(current=True)
-
-    decoy.when(mock_run_store.get(run_id="run-id")).then_return(run_resource)
 
     decoy.when(
-        mock_run_store.update_active_run(
-            run_id=run_resource.run_id, is_current=updated_run_resource.is_current
-        )
-    ).then_return(updated_run_resource)
-
-    engine_state = decoy.mock(cls=StateView)
-    decoy.when(mock_engine_store.engine.state_view).then_return(engine_state)
-    decoy.when(engine_state.commands.get_status()).then_return(
-        pe_types.EngineStatus.SUCCEEDED
-    )
-    decoy.when(engine_state.get_protocol_run_data()).then_return(protocol_run)
-
-    decoy.when(
-        mock_run_store.update_run_state(engine_state_resource)
-    ).then_return(engine_state_resource)
+        await mock_run_data_manager.get_or_archive("run-id", archive=False)
+    ).then_return(expected_response)
 
     result = await update_run(
         runId="run-id",
-        request_body=RequestModel(data=run_update),
-        run_store=mock_run_store,
-        engine_store=mock_engine_store,
+        request_body=RequestModel(data=RunUpdate()),
+        run_data_manager=mock_run_data_manager,
     )
 
     assert result.content == SimpleBody(data=expected_response)
     assert result.status_code == 200
 
-    decoy.verify(await mock_engine_store.clear(), times=0)
-    decoy.verify(
-        mock_run_store.update_active_run(
-            run_id=matchers.Anything(),
-            is_current=matchers.Anything(),
-        ),
-        times=0,
-    )
-    decoy.verify(await mock_engine_store.clear(), times=0)
-
 
 async def test_update_to_current_conflict(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
+    mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 409 if attempting to update a not current run."""
-    run_resource = RunResource(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1),
-        actions=[],
-        is_current=False,
-    )
-
-    run_update = RunUpdate(current=True)
-
-    decoy.when(mock_run_store.get(run_id="run-id")).then_return(run_resource)
+    decoy.when(
+        await mock_run_data_manager.get_or_archive(run_id="run-id", archive=True)
+    ).then_raise(EngineConflictError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await update_run(
             runId="run-id",
-            request_body=RequestModel(data=run_update),
-            run_store=mock_run_store,
-            engine_store=mock_engine_store,
+            request_body=RequestModel(data=RunUpdate(current=False)),
+            run_data_manager=mock_run_data_manager,
         )
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
+
+
+async def test_update_to_current_missing(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should 409 if attempting to update a not current run."""
+    decoy.when(
+        await mock_run_data_manager.get_or_archive(run_id="run-id", archive=True)
+    ).then_raise(RunNotFoundError(run_id="run-id"))
+
+    with pytest.raises(ApiError) as exc_info:
+        await update_run(
+            runId="run-id",
+            request_body=RequestModel(data=RunUpdate(current=False)),
+            run_data_manager=mock_run_data_manager,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
