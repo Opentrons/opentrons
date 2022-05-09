@@ -7,17 +7,17 @@ import {
 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../../../i18n'
-import { useCurrentRun } from '../../../../ProtocolUpload/hooks'
-import { useProtocolDetailsForRun } from '../../../../Devices/hooks'
-import { getLabwareLocation } from '../../../utils/getLabwareLocation'
+import { i18n } from '../../../../i18n'
+import { useCurrentRun } from '../../../ProtocolUpload/hooks'
+import { useProtocolDetailsForRun } from '../../hooks'
+import { getLabwareLocation } from '../utils/getLabwareLocation'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import { getLabwareDefinitionUri } from '../../../utils/getLabwareDefinitionUri'
+import { getLabwareDefinitionUri } from '../utils/getLabwareDefinitionUri'
 
-jest.mock('../../../../ProtocolUpload/hooks')
-jest.mock('../../../utils/getLabwareLocation')
-jest.mock('../../../../Devices/hooks')
-jest.mock('../../../utils/getLabwareDefinitionUri')
+jest.mock('../../../ProtocolUpload/hooks')
+jest.mock('../utils/getLabwareLocation')
+jest.mock('../../hooks')
+jest.mock('../utils/getLabwareDefinitionUri')
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')

@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  C_NEAR_WHITE,
-  SPACING_2,
+  COLORS,
+  SPACING,
   JUSTIFY_CENTER,
   Flex,
   RobotWorkSpace,
@@ -10,8 +10,6 @@ import {
   PipetteRender,
   WellStroke,
   WELL_LABEL_OPTIONS,
-  C_BLUE,
-  C_MED_GRAY,
   DIRECTION_ROW,
   Box,
   JUSTIFY_SPACE_BETWEEN,
@@ -19,24 +17,28 @@ import {
   FONT_SIZE_BODY_2,
   Link,
   ALIGN_START,
-  SPACING_3,
+  ALIGN_CENTER,
 } from '@opentrons/components'
-import { getIsTiprack, getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getIsTiprack, getPipetteNameSpecs, IDENTITY_VECTOR } from '@opentrons/shared-data'
 import {
   HORIZONTAL_PLANE,
   JogControls,
   VERTICAL_PLANE,
 } from '../../molecules/JogControls'
+import { StyledText } from '../../atoms/text'
+import { OffsetVector } from '../../molecules/OffsetVector'
 import { useProtocolDetailsForRun } from '../Devices/hooks'
 import { StepDetailText } from './StepDetailText'
 import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
 import levelWithLabware from '../../assets/images/lpc_level_with_labware.svg'
+
 import type { Jog } from '../../molecules/JogControls/types'
 import type {
   LabwarePositionCheckCreateCommand,
   LabwarePositionCheckMovementCommand,
   LabwarePositionCheckStep,
 } from './types'
+import { useLabwareOffsetForLabware } from './hooks/useLabwareOffsetForLabware'
 
 const DECK_MAP_VIEWBOX = '-30 -20 170 115'
 interface LabwarePositionCheckStepDetailProps {
@@ -52,6 +54,7 @@ export const LabwarePositionCheckStepDetail = (
   const { protocolData } = useProtocolDetailsForRun(runId)
   const [showJogControls, setShowJogControls] = React.useState<boolean>(false)
   const { labwareId } = selectedStep
+  const initialOffset = useLabwareOffsetForLabware(runId, labwareId)
   if (protocolData == null) return null
   const labwareDefId = protocolData.labware[labwareId].definitionId
   const labwareDef = protocolData.labwareDefinitions[labwareDefId]
@@ -77,86 +80,94 @@ export const LabwarePositionCheckStepDetail = (
   const wellStroke: WellStroke = wellsToHighlight.reduce(
     (acc, wellName) => ({
       ...acc,
-      [wellName]: C_BLUE,
+      [wellName]: COLORS.blue,
     }),
     {}
   )
 
   return (
-    <React.Fragment>
+    <Flex
+      padding={SPACING.spacing3}
+      justifyContent={JUSTIFY_CENTER}
+      boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
+      borderRadius="4px"
+      backgroundColor={COLORS.background}
+      flexDirection={DIRECTION_COLUMN}
+      width="106%"
+    >
+      <StepDetailText
+        selectedStep={props.selectedStep}
+        pipetteChannels={pipetteChannels}
+        runId={runId}
+      />
       <Flex
-        padding={'0.75rem'}
-        justifyContent={JUSTIFY_CENTER}
-        boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
-        borderRadius="4px"
-        backgroundColor={C_NEAR_WHITE}
-        flexDirection={DIRECTION_COLUMN}
-        width="106%"
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        flexDirection={DIRECTION_ROW}
+        alignItems={ALIGN_START}
       >
-        <StepDetailText
-          selectedStep={props.selectedStep}
-          pipetteChannels={pipetteChannels}
-          runId={runId}
-        />
-        <Flex
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          flexDirection={DIRECTION_ROW}
-          alignItems={ALIGN_START}
+        <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
+          {() => (
+            <>
+              <LabwareRender
+                definition={labwareDef}
+                wellStroke={wellStroke}
+                wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
+                highlightedWellLabels={{ wells: wellsToHighlight }}
+                labwareStroke={COLORS.medGrey}
+                wellLabelColor={COLORS.medGrey}
+              />
+              <PipetteRender
+                labwareDef={labwareDef}
+                pipetteName={pipetteName}
+              />
+            </>
+          )}
+        </RobotWorkSpace>
+        <Box
+          width="40%"
+          padding={SPACING.spacing3}
+          marginTop={SPACING.spacing4}
         >
-          <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
-            {() => (
-              <React.Fragment>
-                <LabwareRender
-                  definition={labwareDef}
-                  wellStroke={wellStroke}
-                  wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
-                  highlightedWellLabels={{ wells: wellsToHighlight }}
-                  labwareStroke={C_MED_GRAY}
-                  wellLabelColor={C_MED_GRAY}
-                />
-                <PipetteRender
-                  labwareDef={labwareDef}
-                  pipetteName={pipetteName}
-                />
-              </React.Fragment>
-            )}
-          </RobotWorkSpace>
-          <Box width="40%" padding={SPACING_2} marginTop={SPACING_3}>
-            {getIsTiprack(labwareDef) ? (
-              <img src={levelWithTip} alt="level with tip" />
-            ) : (
-              <img src={levelWithLabware} alt="level with labware" />
-            )}
-          </Box>
-        </Flex>
-        <Box fontSize={FONT_SIZE_BODY_2}>
-          <Flex justifyContent={JUSTIFY_CENTER}>
-            {t('jog_controls_adjustment')}
-          </Flex>
-          {showJogControls ? (
-            <JogControls
-              jog={props.jog}
-              stepSizes={[0.1, 1, 10]}
-              planes={[HORIZONTAL_PLANE, VERTICAL_PLANE]}
-              width="100%"
-              directionControlButtonColor={C_BLUE}
-              isLPC={true}
-            />
+          {getIsTiprack(labwareDef) ? (
+            <img src={levelWithTip} alt="level with tip" />
           ) : (
-            <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING_2}>
+            <img src={levelWithLabware} alt="level with labware" />
+          )}
+        </Box>
+      </Flex>
+
+      <Flex flexDirection={DIRECTION_COLUMN} backgroundColor={COLORS.white}>
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
+          <Flex backgroundColor={COLORS.background}>
+            <StyledText as="h6">{t('labware_offset')}</StyledText>
+            <OffsetVector {...(initialOffset?.vector ?? IDENTITY_VECTOR)} />
+          </Flex>
+          <StyledText as="p">{t('jog_controls_adjustment')}</StyledText>
+          {!showJogControls ? (
+            <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing3}>
               <Link
                 role={'link'}
                 fontSize={FONT_SIZE_BODY_2}
-                color={C_BLUE}
+                color={COLORS.blue}
                 onClick={() => setShowJogControls(true)}
                 id={`LabwarePositionCheckStepDetail_reveal_jog_controls`}
               >
                 {t('reveal_jog_controls')}
               </Link>
             </Flex>
-          )}
-        </Box>
+          ) : null}
+        </Flex>
+        {showJogControls ? (
+          <JogControls
+            jog={props.jog}
+            stepSizes={[0.1, 1, 10]}
+            planes={[HORIZONTAL_PLANE, VERTICAL_PLANE]}
+            width="100%"
+            directionControlButtonColor={COLORS.blue}
+            isLPC={true}
+          />
+        ) : null}
       </Flex>
-    </React.Fragment>
+    </Flex>
   )
 }

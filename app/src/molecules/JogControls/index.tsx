@@ -48,9 +48,6 @@ export function JogControls(props: JogControlsProps): JSX.Element {
   return (
     <Flex
       justifyContent={JUSTIFY_CENTER}
-      paddingX={SPACING_4}
-      paddingTop={SPACING_4}
-      paddingBottom="2.5rem"
       alignSelf={ALIGN_STRETCH}
       {...styleProps}
     >

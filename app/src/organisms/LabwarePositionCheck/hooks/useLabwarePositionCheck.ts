@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import reduce from 'lodash/reduce'
 import isEqual from 'lodash/isEqual'
 import { getCommand } from '@opentrons/api-client'
 import {
@@ -27,16 +26,13 @@ import {
   useAttachedModules,
   useProtocolDetailsForRun,
 } from '../../Devices/hooks'
-import { getLabwareLocation } from '../../ProtocolSetup/utils/getLabwareLocation'
-import { getLabwareDefinitionUri } from '../../ProtocolSetup/utils/getLabwareDefinitionUri'
+import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
 import { getModuleInitialLoadInfo } from '../../ProtocolSetup/utils/getModuleInitialLoadInfo'
-import { getLabwareOffsetLocation } from '../../ProtocolSetup/utils/getLabwareOffsetLocation'
 import { useSteps } from './useSteps'
 import type {
   HostConfig,
   RunCommandSummary,
   VectorOffset,
-  LabwareOffsetCreateData,
 } from '@opentrons/api-client'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {

@@ -25,7 +25,7 @@ import { i18n } from '../../../../i18n'
 import { useLPCSuccessToast } from '../../../ProtocolSetup/hooks'
 import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
 import { ModuleExtraAttention } from '../ModuleExtraAttention'
-import { LabwareInfoOverlay } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay'
+import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import { useRunStatus } from '../../../RunTimeControl/hooks'
@@ -59,7 +59,7 @@ jest.mock('../../../ProtocolSetup/hooks')
 jest.mock('../../../ProtocolSetup/LabwareOffsetSuccessToast')
 jest.mock('../../../LabwarePositionCheck')
 jest.mock('../ModuleExtraAttention')
-jest.mock('../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay')
+jest.mock('../LabwareInfoOverlay')
 jest.mock('../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal')
 jest.mock(
   '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
