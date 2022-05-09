@@ -1,3 +1,4 @@
+import collections
 import os
 from unittest import mock
 from unittest.mock import MagicMock
@@ -6,7 +7,6 @@ import pytest
 from otupdate import openembedded
 from otupdate.common.update_actions import Partition, UpdateActionsInterface
 from otupdate.openembedded.updater import RootFSInterface, PartitionManager, Updater
-from tests.common.config import FakeRootPartElem
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -37,7 +37,12 @@ async def test_cli(aiohttp_client, loop, otupdate_config, monkeypatch):
         loop=loop,
     )
     client = await loop.create_task(aiohttp_client(app))
-    return client
+    return client, app
+
+
+def mock_root_fs_interface_() -> MagicMock:
+    """Mock RootFSInterface."""
+    return MagicMock(spec=RootFSInterface)
 
 
 @pytest.fixture
@@ -46,8 +51,7 @@ def mock_root_fs_interface() -> MagicMock:
     return MagicMock(spec=RootFSInterface)
 
 
-@pytest.fixture
-def mock_partition_manager_valid_switch() -> MagicMock:
+def mock_partition_manager_valid_switch_() -> MagicMock:
     """Mock Partition Manager."""
     mock = MagicMock(spec=PartitionManager)
     mock.find_unused_partition.return_value = Partition(
@@ -63,6 +67,25 @@ def mock_partition_manager_valid_switch() -> MagicMock:
     mock.mountpoint_root.return_value = "/mnt"
 
     return mock
+
+
+FakeRootPartElem = collections.namedtuple("FakeRootPartElem", ("name", "value"))
+
+
+@pytest.fixture
+def mock_partition_manager_valid_switch(tmpdir) -> MagicMock:
+    """Mock Partition Manager."""
+    partfile = os.path.join(tmpdir, "fake-partition")
+    mock_part = MagicMock(spec=PartitionManager)
+    mock_part.find_unused_partition.return_value = Partition(2, partfile)
+    mock_part.switch_partition.return_value = Partition(2, partfile)
+    mock_part.resize_partition.return_value = True
+    mock_part.mount_fs.return_value = True
+    mock_part.umount_fs.return_value = True
+
+    mock_part.mountpoint_root.return_value = "/mnt"
+
+    return mock_part
 
 
 @pytest.fixture
