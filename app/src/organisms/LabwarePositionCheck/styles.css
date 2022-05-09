@@ -11,7 +11,7 @@
 }
 
 .modal_contents {
-  max-width: 100%;
+  max-width: 85%;
   max-height: 100%;
   overflow-y: auto;
 }

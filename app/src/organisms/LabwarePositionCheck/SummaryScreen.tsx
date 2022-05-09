@@ -58,18 +58,16 @@ export const SummaryScreen = (props: {
   const applyLabwareOffsets = (): void => {
     if (labwareOffsets.length > 0) {
       labwareOffsets.forEach(labwareOffset => {
-        if (!isEqual(labwareOffset.vector, IDENTITY_VECTOR)) {
-          createLabwareOffset({
-            runId: runId,
-            data: {
-              definitionUri: labwareOffset.labwareDefinitionUri,
-              location: labwareOffset.labwareOffsetLocation,
-              vector: labwareOffset.vector,
-            },
-          }).catch((e: Error) => {
-            console.error(`error applying labware offsets: ${e.message}`)
-          })
-        }
+        createLabwareOffset({
+          runId: runId,
+          data: {
+            definitionUri: labwareOffset.labwareDefinitionUri,
+            location: labwareOffset.labwareOffsetLocation,
+            vector: labwareOffset.vector,
+          },
+        }).catch((e: Error) => {
+          console.error(`error applying labware offsets: ${e.message}`)
+        })
       })
     } else {
       console.error('no labware offset data found')
