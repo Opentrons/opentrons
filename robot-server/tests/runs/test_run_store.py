@@ -5,14 +5,134 @@ from datetime import datetime, timezone
 from sqlalchemy.engine import Engine
 
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
-from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError
+from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError, RunStateResource
 from robot_server.runs.action_models import RunAction, RunActionType
 
+from opentrons.protocol_engine import (
+    commands as pe_commands,
+    errors as pe_errors,
+    types as pe_types,
+    ProtocolRunData,
+)
+from opentrons.types import MountType, DeckSlotName
 
 @pytest.fixture
 def subject(sql_engine_fixture: Engine) -> RunStore:
     """Get a ProtocolStore test subject."""
     return RunStore(sql_engine=sql_engine_fixture)
+
+
+# TODO(tz): move to conftest file. create a fixter that inserts a fun
+@pytest.fixture
+def run_resource() -> RunResource:
+    """Return a run resource."""
+    return RunResource(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        actions=[],
+        is_current=False,
+    )
+
+
+@pytest.fixture
+def protocol_run() -> ProtocolRunData:
+    """Get a ProtocolRunData test object."""
+    analysis_command = pe_commands.Pause(
+        id="command-id",
+        key="command-key",
+        status=pe_commands.CommandStatus.SUCCEEDED,
+        createdAt=datetime(year=2022, month=2, day=2),
+        params=pe_commands.PauseParams(message="hello world"),
+    )
+
+    analysis_error = pe_errors.ErrorOccurrence(
+        id="error-id",
+        createdAt=datetime(year=2023, month=3, day=3),
+        errorType="BadError",
+        detail="oh no",
+    )
+
+    analysis_labware = pe_types.LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="namespace/load-name/42",
+        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offsetId=None,
+    )
+
+    analysis_pipette = pe_types.LoadedPipette(
+        id="pipette-id",
+        pipetteName=pe_types.PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+
+    return ProtocolRunData(
+        commands=[analysis_command],
+        errors=[analysis_error],
+        labware=[analysis_labware],
+        pipettes=[analysis_pipette],
+        # TODO(mc, 2022-02-14): evaluate usage of modules in the analysis resp.
+        modules=[],
+        # TODO (tz 22-4-19): added the field to class. make sure what to initialize
+        labwareOffsets=[],
+    )
+
+
+def test_update_run_state(
+    subject: RunStore,
+    protocol_run: ProtocolRunData,
+    run_resource: RunResource,
+) -> None:
+    """It should be able to update a run state to the store."""
+    subject.insert(run_resource)
+    engine_state = RunStateResource(
+        run_id="run-id",
+        state=protocol_run,
+        engine_status="idle",
+        _updated_at=datetime.now(timezone.utc),
+        commands=[],
+    )
+    result = subject.update_run_state(engine_state)
+
+    assert result == engine_state
+
+
+def test_get_run_state(
+    subject: RunStore,
+    run_resource: RunResource,
+    protocol_run: ProtocolRunData,
+) -> None:
+    """It should be able to get engine state from the store."""
+    subject.insert(run_resource)
+    engine_state = RunStateResource(
+        run_id="run-id",
+        state=protocol_run,
+        engine_status="idle",
+        _updated_at=datetime.now(timezone.utc),
+        commands=[],
+    )
+
+    subject.update_run_state(state=engine_state)
+    result = subject.get_run_state("run-id")
+
+    assert engine_state == result
+
+
+def test_update_state_run_not_found(
+    subject: RunStore, protocol_run: ProtocolRunData
+) -> None:
+    """It should be able to catch the exception raised by insert."""
+    engine_state = RunStateResource(
+        run_id="run-not-found",
+        state=protocol_run,
+        engine_status="idle",
+        _updated_at=datetime.now(timezone.utc),
+        commands=[],
+    )
+
+    with pytest.raises(RunNotFoundError, match="run-not-found"):
+        subject.update_run_state(engine_state)
 
 
 def test_add_run(subject: RunStore) -> None:

@@ -13,11 +13,10 @@ from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 
-from ..run_state_store import RunStateStore, RunStateResource
-from ..run_store import RunStore, RunNotFoundError
+from ..run_store import RunStore, RunNotFoundError, RunStateResource
 from ..action_models import RunAction, RunActionType, RunActionCreate
 from ..engine_store import EngineStore
-from ..dependencies import get_run_store, get_engine_store, get_run_state_store
+from ..dependencies import get_run_store, get_engine_store
 from .base_router import RunNotFound, RunStopped
 
 log = logging.getLogger(__name__)
@@ -52,7 +51,6 @@ async def create_run_action(
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     task_runner: TaskRunner = Depends(get_task_runner),
-    run_state_store: RunStateStore = Depends(get_run_state_store),
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 
@@ -102,7 +100,7 @@ async def create_run_action(
                         _updated_at=datetime.now(tz=timezone.utc),
                         commands=[],
                     )
-                    run_state_store.update_run_state(run_state_resource)
+                    run_store.update_run_state(run_state_resource)
 
                 task_runner.run(run_protocol_and_insert_result)
 

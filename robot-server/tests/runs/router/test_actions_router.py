@@ -22,7 +22,6 @@ from robot_server.runs.action_models import (
 )
 
 from robot_server.runs.router.actions_router import create_run_action
-from robot_server.runs.run_state_store import RunStateStore
 
 
 @pytest.fixture
@@ -53,7 +52,6 @@ async def test_create_play_action_to_start_run(
     mock_engine_store: EngineStore,
     prev_run: RunResource,
     task_runner: TaskRunner,
-    mock_run_state_store: RunStateStore,
 ) -> None:
     """It should handle a play action that start the runner."""
     action = RunAction(
@@ -72,7 +70,6 @@ async def test_create_play_action_to_start_run(
         action_id="action-id",
         created_at=datetime(year=2022, month=2, day=2),
         task_runner=task_runner,
-        run_state_store=mock_run_state_store,
     )
 
     assert result.content.data == action

@@ -6,7 +6,6 @@ from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols import ProtocolStore
 from robot_server.runs.run_store import RunStore
 from robot_server.runs.engine_store import EngineStore
-from robot_server.runs.run_state_store import RunStateStore
 
 
 @pytest.fixture()
@@ -31,9 +30,3 @@ def mock_run_store(decoy: Decoy) -> RunStore:
 def mock_engine_store(decoy: Decoy) -> EngineStore:
     """Get a mock EngineStore interface."""
     return decoy.mock(cls=EngineStore)
-
-
-@pytest.fixture()
-def mock_run_state_store(decoy: Decoy) -> RunStateStore:
-    """Get a mock EngineStore interface."""
-    return decoy.mock(cls=RunStateStore)

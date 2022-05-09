@@ -1,12 +1,15 @@
 """Runs' on-db store."""
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Optional
-
+from pydantic import parse_obj_as
 import sqlalchemy
 
 from robot_server.persistence import run_table, action_table, ensure_utc_datetime
 from robot_server.protocols import ProtocolNotFoundError
+
+from opentrons.protocol_engine import ProtocolRunData
+from opentrons.protocol_engine.commands import Command
 
 from .action_models import RunAction, RunActionType
 
@@ -25,6 +28,20 @@ class RunResource:
     actions: List[RunAction]
     is_current: bool
 
+@dataclass(frozen=True)
+class RunStateResource:
+    """An entry in the run state store, used to construct response models.
+
+    This represents all run engine state derived from ProtocolEngine instance.
+    """
+
+    run_id: str
+    state: ProtocolRunData
+    # TODO (tz): initialize with factory default
+    commands: Optional[List[Command]]
+    engine_status: str
+    _updated_at: Optional[datetime]
+
 
 class RunNotFoundError(ValueError):
     """Error raised when a given Run ID is not found in the store."""
@@ -41,6 +58,44 @@ class RunStore:
         """Initialize a RunStore with sql engine."""
         self._sql_engine = sql_engine
         self._active_run: Optional[str] = None
+
+    def update_run_state(self, state: RunStateResource) -> RunStateResource:
+        """update run table with run state to db.
+
+        Arguments:
+            state: Engine state resource to store.
+
+        Returns:
+            The engine state that was added to the store.
+        """
+        statement = (
+            sqlalchemy.update(run_table)
+            .where(run_table.c.id == state.run_id)
+            .values(_convert_state_to_sql_values(state=state))
+        )
+        with self._sql_engine.begin() as transaction:
+            result = transaction.execute(statement)
+            if result.rowcount == 0:
+                raise RunNotFoundError(run_id=state.run_id)
+
+        return state
+
+    def get_run_state(self, run_id: str) -> RunStateResource:
+        """Get engine state from db.
+
+        Arguments:
+            run_id: Run id related to the engine state.
+
+        Returns:
+            The engine state that found in the store.
+        """
+        statement = sqlalchemy.select(run_table).where(run_table.c.id == run_id)
+        with self._sql_engine.begin() as transaction:
+            try:
+                state_row = transaction.execute(statement).one()
+            except sqlalchemy.exc.NoResultFound:
+                raise RunNotFoundError(run_id=run_id)
+        return _convert_sql_row_to_sql_run_state(state_row)
 
     def insert_action(self, run_id: str, action: RunAction) -> None:
         """Insert run action in the db.
@@ -247,4 +302,43 @@ def _convert_action_to_sql_values(action: RunAction, run_id: str) -> Dict[str, o
         "created_at": ensure_utc_datetime(action.createdAt),
         "action_type": action.actionType.value,
         "run_id": run_id,
+    }
+
+
+def _convert_sql_row_to_sql_run_state(
+    sql_row: sqlalchemy.engine.Row,
+) -> RunStateResource:
+
+    run_id = sql_row.run_id
+    assert isinstance(run_id, str)
+
+    status = sql_row.engine_status
+    assert isinstance(status, str)
+
+    state = sql_row.state
+    assert isinstance(state, Dict)
+
+    # TODO (tz): set sql_row.commands add assert
+    commands: List[Command] = []
+
+    _updated_at = ensure_utc_datetime(sql_row._updated_at)
+
+    return RunStateResource(
+        run_id=run_id,
+        state=parse_obj_as(ProtocolRunData, state),
+        engine_status=status,
+        commands=commands,
+        _updated_at=_updated_at,
+    )
+
+
+def _convert_state_to_sql_values(state: RunStateResource) -> Dict[str, object]:
+    return {
+        "state": state.state.dict(),
+        "engine_status": state.engine_status,
+        "_updated_at": ensure_utc_datetime(
+            state._updated_at
+            if state._updated_at is not None
+            else datetime.now(tz=timezone.utc)
+        ),
     }

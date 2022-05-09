@@ -30,11 +30,10 @@ from robot_server.protocols import (
     get_protocol_store,
 )
 
-from ..run_store import RunStore, RunResource, RunNotFoundError
-from ..run_state_store import RunStateResource, RunStateStore
+from ..run_store import RunStore, RunResource, RunNotFoundError, RunStateResource
 from ..run_models import Run, RunSummary, RunCreate, RunUpdate
 from ..engine_store import EngineStore, EngineConflictError, EngineMissingError
-from ..dependencies import get_run_store, get_engine_store, get_run_state_store
+from ..dependencies import get_run_store, get_engine_store
 
 from opentrons.protocol_engine import EngineStatus
 
@@ -212,7 +211,6 @@ async def create_run(
 async def get_runs(
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-    run_state_store: RunStateStore = Depends(get_run_state_store),
 ) -> PydanticResponse[MultiBody[Run, AllRunsLinks]]:
     """Get all runs.
 
@@ -346,7 +344,6 @@ async def update_run(
     request_body: RequestModel[RunUpdate],
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-    run_state_store: RunStateStore = Depends(get_run_state_store),
 ) -> PydanticResponse[SimpleBody[Run]]:
     """Update a run by its ID.
 
@@ -382,7 +379,7 @@ async def update_run(
             raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
         run = run_store.update_active_run(run_id=runId, is_current=update.current)
         log.info(f'Marked run "{runId}" as not current.')
-        insert_engine_state_result = run_state_store.update_run_state(
+        insert_engine_state_result = run_store.update_run_state(
             RunStateResource(
                 run_id=run.run_id,
                 state=protocol_run_data,
