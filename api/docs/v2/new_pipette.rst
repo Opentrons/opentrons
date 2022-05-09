@@ -243,11 +243,7 @@ and :ref:`v2-complex-commands`.
 
 .. versionadded:: 2.0
 
-Modifying Pipette Behaviors
----------------------------
 
-The OT-2 has many default behaviors that are occasionally appropriate to change for
-a particular experiment. This section details those behaviors.
 
 .. _new-plunger-flow-rates:
 
@@ -310,11 +306,9 @@ Each of these attributes can be altered without affecting the others.
 units of mm/s of plunger speed. This does not have a linear transfer to flow rate and
 should only be used if you have a specific need.
 
+For other ways of controlling pipette movement, see :ref:`gantry_speed` and :ref:`axis_speed_limits`.
+
 .. versionadded:: 2.0
-
-
-TK replacement / link out to gantry movement?
-
 
 
 .. _defaults:

@@ -219,6 +219,9 @@ Small, direct movements can be useful for working inside of a well, without havi
 
 .. versionadded:: 2.0
 
+
+.. _gantry_speed: 
+
 Gantry Speed
 ============
 
@@ -252,6 +255,9 @@ can reduce the gantry speed for a specific pipette by setting
 
 
 .. versionadded:: 2.0
+
+
+.. _axis_speed_limits:
 
 Axis Speed Limits
 =================
