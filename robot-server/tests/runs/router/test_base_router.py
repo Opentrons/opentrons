@@ -513,19 +513,11 @@ async def test_get_runs_not_empty(
     decoy.when(engine_state_2.labware.get_all()).then_return([])
     decoy.when(engine_state_2.labware.get_labware_offsets()).then_return([])
     decoy.when(engine_state_2.commands.get_status()).then_return(
-        pe_types.EngineStatus.SUCCEEDED
+        pe_types.EngineStatus.IDLE
     )
 
     decoy.when(mock_engine_store.get_state("unique-id-1")).then_return(engine_state_1)
     decoy.when(mock_engine_store.get_state("unique-id-2")).then_return(engine_state_2)
-
-    decoy.when(engine_state_1.commands.get_status()).then_return(
-        pe_types.EngineStatus.SUCCEEDED
-    )
-
-    decoy.when(engine_state_2.commands.get_status()).then_return(
-        pe_types.EngineStatus.IDLE
-    )
 
     result = await get_runs(run_store=mock_run_store, engine_store=mock_engine_store)
 
