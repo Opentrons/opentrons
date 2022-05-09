@@ -8,7 +8,7 @@ import { useDispatchApiRequest } from '../../../redux/robot-api'
 import type { AttachedModule } from '../../../redux/modules/types'
 import type { State } from '../../../redux/types'
 
-const POLL_MODULE_INTERVAL_MS = 5000
+const POLL_MODULE_INTERVAL_MS = 50000
 
 export function useAttachedModules(robotName: string | null): AttachedModule[] {
   const [dispatchRequest] = useDispatchApiRequest()
