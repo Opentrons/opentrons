@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { saveAs } from 'file-saver'
 import { MemoryRouter } from 'react-router-dom'
-// import { fireEvent } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
