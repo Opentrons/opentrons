@@ -4,11 +4,12 @@ import {
 } from '@opentrons/shared-data'
 import { TEMPERATURE_AT_TARGET, TEMPERATURE_DEACTIVATED } from '../../constants'
 import * as errorCreators from '../../errorCreators'
-import type { CommandCreator, AwaitTemperatureArgs } from '../../types'
+import type { CommandCreator, WaitForTemperatureArgs } from '../../types'
 import { getModuleState } from '../../robotStateSelectors'
 
 /** Set temperature target for specified module. */
-export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
+// @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10176 merges
+export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
   args,
   invariantContext,
   prevRobotState
@@ -52,10 +53,6 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
   }
 
   const moduleType = invariantContext.moduleEntities[module]?.type
-  const params = {
-    moduleId: module,
-    temperature,
-  }
 
   switch (moduleType) {
     case TEMPERATURE_MODULE_TYPE:
@@ -63,7 +60,10 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
         commands: [
           {
             commandType: 'temperatureModule/awaitTemperature',
-            params,
+            params: {
+              moduleId: module,
+              temperature,
+            },
           },
         ],
       }
@@ -72,8 +72,11 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
       return {
         commands: [
           {
-            commandType: 'heaterShakerModule/awaitTemperature',
-            params,
+            commandType: 'heaterShaker/waitForTemperature',
+            params: {
+              moduleId: module,
+              celsius: temperature,
+            },
           },
         ],
       }

@@ -107,8 +107,8 @@ const ModuleExtraAttentionItem = (
           | HeaterShakerOpenLatchCreateCommand
           | HeaterShakerCloseLatchCreateCommand = {
           commandType: isLatchClosed
-            ? 'heaterShakerModule/openLatch'
-            : 'heaterShakerModule/closeLatch',
+            ? 'heaterShaker/openLabwareLatch'
+            : 'heaterShaker/closeLabwareLatch',
           params: { moduleId: moduleInfo.moduleId },
         }
 

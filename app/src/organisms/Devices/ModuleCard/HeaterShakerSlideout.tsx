@@ -29,7 +29,7 @@ import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
-  HeaterShakerSetTargetShakeSpeedCreateCommand,
+  HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
   HeaterShakerStartSetTargetTemperatureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
@@ -53,8 +53,8 @@ export const HeaterShakerSlideout = (
 
   const sendShakeSpeedCommand = (): void => {
     if (hsValue != null && isSetShake) {
-      const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
-        commandType: 'heaterShakerModule/setTargetShakeSpeed',
+      const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
+        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
         params: {
           moduleId: module.id,
           rpm: parseInt(hsValue),
@@ -81,10 +81,10 @@ export const HeaterShakerSlideout = (
   const sendSetTemperatureOrShakeCommand = (): void => {
     if (hsValue != null && !isSetShake) {
       const setTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
-        commandType: 'heaterShakerModule/startSetTargetTemperature',
+        commandType: 'heaterShaker/setTargetTemperature',
         params: {
           moduleId: module.id,
-          temperature: parseInt(hsValue),
+          celsius: parseInt(hsValue),
         },
       }
       createLiveCommand({

@@ -26,8 +26,8 @@ import { InputField } from '../../../atoms/InputField'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
-  HeaterShakerSetTargetShakeSpeedCreateCommand,
-  HeaterShakerStopShakeCreateCommand,
+  HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
+  HeaterShakerDeactivateShakerCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
 
@@ -47,16 +47,16 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   const { toggleLatch, isLatchClosed } = useLatchCommand(module)
   const isShaking = module.data.speedStatus !== 'idle'
 
-  const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
-    commandType: 'heaterShakerModule/setTargetShakeSpeed',
+  const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
+    commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
       moduleId: module.id,
       rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
     },
   }
 
-  const stopShakeCommand: HeaterShakerStopShakeCreateCommand = {
-    commandType: 'heaterShakerModule/stopShake',
+  const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
+    commandType: 'heaterShaker/deactivateShaker',
     params: {
       moduleId: module.id,
     },

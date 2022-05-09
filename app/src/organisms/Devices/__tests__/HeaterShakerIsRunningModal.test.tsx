@@ -65,7 +65,7 @@ describe('HeaterShakerIsRunningModal', () => {
     fireEvent.click(button)
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'heaterShakerModule/stopShake',
+        commandType: 'heaterShaker/deactivateShaker',
         params: {
           moduleId: mockHeaterShaker.id,
         },

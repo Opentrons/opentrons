@@ -220,7 +220,7 @@ describe('TestShakeSlideout', () => {
 
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'heaterShakerModule/setTargetShakeSpeed',
+        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
         params: {
           moduleId: 'heatershaker_id',
           rpm: 300,

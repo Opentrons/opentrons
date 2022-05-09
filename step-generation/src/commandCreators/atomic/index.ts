@@ -1,5 +1,5 @@
 import { aspirate } from './aspirate'
-import { awaitTemperature } from './awaitTemperature'
+import { waitForTemperature } from './awaitTemperature'
 import { blowout } from './blowout'
 import { deactivateTemperature } from './deactivateTemperature'
 import { delay } from './delay'
@@ -14,7 +14,7 @@ import { touchTip } from './touchTip'
 import { moveToWell } from './moveToWell'
 export {
   aspirate,
-  awaitTemperature,
+  waitForTemperature as awaitTemperature,
   blowout,
   deactivateTemperature,
   delay,

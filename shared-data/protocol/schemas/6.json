@@ -894,13 +894,13 @@
           },
 
           {
-            "description": "Heater Shaker Module Stop Shake: Module will stop actively shaking and ramp down to a still state",
+            "description": "Heater Shaker Module Deactivate Shaker: Module will stop actively shaking and ramp down to a still state",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShaker/stopShake"]
+                "enum": ["heaterShaker/deactivateShaker"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"

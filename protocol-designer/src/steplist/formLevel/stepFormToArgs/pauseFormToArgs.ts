@@ -4,10 +4,10 @@ import {
   PAUSE_UNTIL_RESUME,
 } from '../../../constants'
 import { FormData } from '../../../form-types'
-import { AwaitTemperatureArgs, PauseArgs } from '@opentrons/step-generation'
+import { WaitForTemperatureArgs, PauseArgs } from '@opentrons/step-generation'
 export const pauseFormToArgs = (
   formData: FormData
-): PauseArgs | AwaitTemperatureArgs | null => {
+): PauseArgs | WaitForTemperatureArgs | null => {
   const hours = parseFloat(formData.pauseHour) || 0
   const minutes = parseFloat(formData.pauseMinute) || 0
   const seconds = parseFloat(formData.pauseSecond) || 0

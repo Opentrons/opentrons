@@ -8,7 +8,7 @@ export const heaterShakerOpenLatch: CommandCreator<ModuleOnlyParams> = (
   return {
     commands: [
       {
-        commandType: 'heaterShakerModule/openLatch',
+        commandType: 'heaterShaker/openLabwareLatch',
         params: {
           moduleId: args.moduleId,
         },

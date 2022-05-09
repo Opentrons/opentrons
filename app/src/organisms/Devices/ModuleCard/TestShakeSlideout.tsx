@@ -34,8 +34,8 @@ import { useLatchCommand } from './hooks'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
-  HeaterShakerSetTargetShakeSpeedCreateCommand,
-  HeaterShakerStopShakeCreateCommand,
+  HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
+  HeaterShakerDeactivateShakerCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface TestShakeSlideoutProps {
@@ -59,16 +59,16 @@ export const TestShakeSlideout = (
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const isShaking = module.data.speedStatus !== 'idle'
 
-  const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
-    commandType: 'heaterShakerModule/setTargetShakeSpeed',
+  const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
+    commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
       moduleId: module.id,
       rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
     },
   }
 
-  const stopShakeCommand: HeaterShakerStopShakeCreateCommand = {
-    commandType: 'heaterShakerModule/stopShake',
+  const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
+    commandType: 'heaterShaker/deactivateShaker',
     params: {
       moduleId: module.id,
     },

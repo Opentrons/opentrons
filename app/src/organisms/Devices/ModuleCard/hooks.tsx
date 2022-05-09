@@ -20,7 +20,7 @@ import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateHeaterCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-  HeaterShakerStopShakeCreateCommand,
+  HeaterShakerDeactivateShakerCreateCommand,
   MagneticModuleDisengageMagnetCreateCommand,
   TCDeactivateBlockCreateCommand,
   TCDeactivateLidCreateCommand,
@@ -61,8 +61,8 @@ export function useLatchCommand(module: AttachedModule): LatchCommand {
     | HeaterShakerOpenLatchCreateCommand
     | HeaterShakerCloseLatchCreateCommand = {
     commandType: isLatchClosed
-      ? 'heaterShakerModule/openLatch'
-      : 'heaterShakerModule/closeLatch',
+      ? 'heaterShaker/openLabwareLatch'
+      : 'heaterShaker/closeLabwareLatch',
     params: { moduleId: module.id },
   }
 
@@ -123,8 +123,8 @@ export function useModuleOverflowMenu(
     case 'heaterShakerModuleType': {
       deactivateModuleCommandType =
         module.data.speedStatus !== 'idle'
-          ? 'heaterShakerModule/stopShake'
-          : 'heaterShakerModule/deactivateHeater'
+          ? 'heaterShaker/deactivateShaker'
+          : 'heaterShaker/deactivateHeater'
       break
     }
   }
@@ -135,7 +135,7 @@ export function useModuleOverflowMenu(
     | HeaterShakerDeactivateHeaterCreateCommand
     | TCDeactivateLidCreateCommand
     | TCDeactivateBlockCreateCommand
-    | HeaterShakerStopShakeCreateCommand = {
+    | HeaterShakerDeactivateShakerCreateCommand = {
     commandType: deactivateModuleCommandType,
     params: { moduleId: module.id },
   }
