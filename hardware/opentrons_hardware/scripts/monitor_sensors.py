@@ -14,7 +14,10 @@ from opentrons_hardware.firmware_bindings.messages import (
     fields,
 )
 from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32Field
-from opentrons_hardware.sensors.utils import SensorDataType
+from opentrons_hardware.sensors.utils import (
+    SensorDataType,
+    sensor_fixed_point_conversion,
+)
 
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
@@ -30,7 +33,7 @@ async def do_run(
     """Configure and start the monitoring."""
     threshold_payload = payloads.SetSensorThresholdRequestPayload(
         sensor=fields.SensorTypeField(constants.SensorType.capacitive),
-        threshold=Int32Field(int(threshold * 2**15)),
+        threshold=Int32Field(int(threshold * sensor_fixed_point_conversion)),
     )
     threshold_message = message_definitions.SetSensorThresholdRequest(
         payload=threshold_payload

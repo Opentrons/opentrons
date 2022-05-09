@@ -37,13 +37,15 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { SecondaryButton } from '../../../atoms/Buttons'
 import { StyledText } from '../../../atoms/text'
 import { useLPCSuccessToast } from '../../../organisms/ProtocolSetup/hooks'
-import { LabwarePositionCheck } from '../../../organisms/ProtocolSetup/LabwarePositionCheck'
+import { LabwarePositionCheck } from '../../../organisms/LabwarePositionCheck'
 import { ModuleExtraAttention } from './ModuleExtraAttention'
 import { LabwareInfoOverlay } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import { DownloadOffsetDataModal } from '../../../organisms/ProtocolUpload/DownloadOffsetDataModal'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
+import { ReapplyOffsetsModal } from '../../ReapplyOffsetsModal'
+import { useCurrentRun } from '../../ProtocolUpload/hooks'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
@@ -55,7 +57,6 @@ import {
 import { ProceedToRunButton } from './ProceedToRunButton'
 
 import type { DeckDefinition } from '@opentrons/shared-data'
-
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
   'fixedBase',
@@ -96,6 +97,7 @@ export function SetupLabware({
     placement: TOOLTIP_LEFT,
   })
   const runHasStarted = useRunHasStarted(runId)
+  const currentRun = useCurrentRun()
   const { protocolData } = useProtocolDetailsForRun(runId)
   const { t } = useTranslation('protocol_setup')
   const [
@@ -161,8 +163,15 @@ export function SetupLabware({
   } else if (!tipsArePickedUp) {
     lpcDisabledReason = t('lpc_disabled_no_tipracks_used')
   }
+
+  const showReapplyOffsetsModal =
+    currentRun?.data.id === runId &&
+    (currentRun?.data?.labwareOffsets == null ||
+      currentRun?.data?.labwareOffsets.length === 0)
+
   return (
     <>
+      {showReapplyOffsetsModal ? <ReapplyOffsetsModal runId={runId} /> : null}
       {showLabwareHelpModal && (
         <LabwareOffsetModal
           onCloseClick={() => setShowLabwareHelpModal(false)}

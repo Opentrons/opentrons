@@ -164,19 +164,9 @@ describe('ProtocolRunSetup', () => {
       expect(queryByText(/module setup/i)).toBeNull()
     })
 
-    it('defaults to labware step expanded if calibration complete', async () => {
+    it('defaults to no step expanded', () => {
       const { getByText } = render()
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(getByText('Mock SetupLabware')).toBeVisible()
-    })
-
-    it('defaults to robot calibration step expanded if calibration incomplete', async () => {
-      when(mockUseRunCalibrationStatus)
-        .calledWith(ROBOT_NAME, RUN_ID)
-        .mockReturnValue({ complete: false })
-      const { getByText } = render()
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
+      expect(getByText('Mock SetupLabware')).not.toBeVisible()
     })
 
     it('renders view-only info message if run has started', async () => {
@@ -264,24 +254,6 @@ describe('ProtocolRunSetup', () => {
       getByText(
         'Position full tip racks and labware in the deck slots as shown in the deck map.'
       )
-    })
-
-    it('defaults to module step expanded if calibration complete and modules present', async () => {
-      const { queryByText, getByText } = render()
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(getByText('Mock SetupModules')).toBeVisible()
-      expect(queryByText('Mock SetupLabware')).not.toBeVisible()
-    })
-
-    it('defaults to robot calibration step expanded if calibration incomplete and modules present', async () => {
-      when(mockUseRunCalibrationStatus)
-        .calledWith(ROBOT_NAME, RUN_ID)
-        .mockReturnValue({ complete: false })
-
-      const { queryByText, getByText } = render()
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
-      expect(queryByText('Mock SetupModules')).not.toBeVisible()
     })
 
     it('renders view-only info message if run has started', async () => {

@@ -144,12 +144,8 @@ def prompt_payload(
     payload_fields = dataclasses.fields(payload_type)
     i = {}
     for f in payload_fields:
-        # TODO (amit 2021-10-01): Conversion to int is not good here long term.
-        #  Should be handled by type coercion in utils.BinarySerializable.
-        #  All values are ints now, but may be bytes in the future (ie serial
-        #  numbers, fw upgrade blobs).
         try:
-            i[f.name] = f.type.build(int(get_user_input(f"enter {f.name}: ")))
+            i[f.name] = f.type.from_string(get_user_input(f"enter {f.name}: ").strip())
         except ValueError as e:
             raise InvalidInput(str(e))
     # Mypy is not liking constructing the derived types.
