@@ -96,21 +96,19 @@ class MoveGroupRunner:
                         completion.payload.seq_id.value,
                     ),
                     float(completion.payload.current_position_um.value) / 1000.0,
-                    float(completion.payload.encoder_position.value) / 1000.0
+                    float(completion.payload.encoder_position.value) / 1000.0,
                 )
             )
         # for each node, pull the position from the completion with the largest
         # combination of group id and sequence id
-        move_completions = {
-            node: next(
-                reversed(
-                    sorted(poslist, key=lambda position_element: position_element[0])
-                )
-            )[1:3]
-            for node, poslist in position.items()
-        }
-        print(move_completions)
-        return move_completions
+        return {
+           node: next(
+               reversed(
+                   sorted(poslist, key=lambda position_element: position_element[0])
+               )
+           )[1:3]
+           for node, poslist in position.items()
+       }
 
     async def _read_encoder_positions(self, can_messenger: CanMessenger) -> NodeDict[float]:
         """Send command to all message groups

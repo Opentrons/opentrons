@@ -572,26 +572,23 @@ class OT3API(
         refresh: bool = False,
         fail_on_not_homed: bool = False,
     ) -> Dict[Axis, float]:
-        """Return the postion (in deck coords) of the critical point of the
-        specified mount.
+        """
+
         """
         z_ax = OT3Axis.by_mount(mount)
         plunger_ax = OT3Axis.of_main_tool_actuator(mount)
         position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, plunger_ax]
-
-        # if fail_on_not_homed and (
-        #     not self._backend.is_homed(position_axes) or not self._encoder_current_position
-        # ):
-        #     raise MustHomeError(
-        #         f"Current position of {str(mount)} pipette is unknown, please home."
-        #     )
-        #
-        # elif not self._encoder_current_position and not refresh:
-        #     raise MustHomeError("Encoder position is unknown; please home motors.")
+        if fail_on_not_homed and (
+            not self._backend.is_homed(position_axes) or not self._encoder_current_position
+        ):
+            raise MustHomeError(
+                f"Current position of {str(mount)} pipette is unknown, please home."
+            )
+        elif not self._encoder_current_position and not refresh:
+            raise MustHomeError("Encoder position is unknown; please home motors.")
         async with self._motion_lock:
             if refresh:
-                self._encoder_current_position = await self._backend.get_encoder_position(position_axes),
-                print(_self.encoder_current_position)
+                self._encoder_current_position = await self._backend._encoder_position
             return self._encoder_current_position
 
     def _effector_pos_from_carriage_pos(
@@ -779,6 +776,7 @@ class OT3API(
             else:
                 self._current_position.update(target_position)
 
+
     @ExecutionManagerProvider.wait_for_running
     async def home(
         self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None
@@ -801,6 +799,7 @@ class OT3API(
                 raise
             else:
                 machine_pos = await self._backend.update_position()
+                encoder_pos = await self._backend.update_encoder_position()
                 position = deck_from_machine(
                     machine_pos,
                     self._transforms.deck_calibration.attitude,
@@ -808,6 +807,7 @@ class OT3API(
                     OT3Axis,
                 )
                 self._current_position.update(position)
+                self._encoder_current_position.update(encoder_pos)
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""
