@@ -116,7 +116,9 @@ export function RobotSettingsCalibration({
 
   const isRunning = useSelector(robotSelectors.getIsRunning)
   const pipettePresent =
-    !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
+    attachedPipettes != null
+      ? !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
+      : false
   const isPending =
     useSelector<State, RequestState | null>(state =>
       trackedRequestId.current != null
