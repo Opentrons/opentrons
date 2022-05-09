@@ -188,10 +188,10 @@ describe('HeaterShakerSlideout', () => {
     expect(mockCreateCommand).toHaveBeenCalledWith({
       runId: props.runId,
       command: {
-        commandType: 'heaterShakerModule/startSetTargetTemperature',
+        commandType: 'heaterShaker/setTargetTemperature',
         params: {
           moduleId: 'heatershaker_id',
-          temperature: 20,
+          celsius: 20,
         },
       },
     })
