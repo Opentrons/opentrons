@@ -17,7 +17,6 @@ from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.hardware_control.gripper_settings import (
-    set_pwm_param,
     set_reference_voltage,
     grip,
     home,
@@ -55,6 +54,14 @@ def prompt_int_input(prompt_name: str) -> int:
         raise InvalidInput(e)
 
 
+def prompt_float_input(prompt_name: str) -> float:
+    """Prompt for a float."""
+    try:
+        return float(input(f"{prompt_name}: "))
+    except (ValueError, IndexError) as e:
+        raise InvalidInput(e)
+
+
 def in_green(s: str) -> str:
     """Return string formatted in red."""
     return f"\033[92m{str(s)}\033[0m"
@@ -74,12 +81,10 @@ async def execute_move(messenger: CanMessenger) -> None:
     )
 
 
-def output_details(i: int, freq: int, duty_cycle: int, v_ref: float) -> None:
+def output_details(
+    i: int, total_i: int) -> None:
     """Print out test details."""
-    print(f"\n\033[95mRound {i}:\033[0m")
-    print("--------")
-    print(f"V_ref: {v_ref * 100} mA")
-    print(f"PWM: {freq}Hz {duty_cycle}%\n")
+    print(f"\n\033[95mRound {i}/{total_i}:\033[0m")
 
 
 async def run(args: argparse.Namespace) -> None:
@@ -87,32 +92,31 @@ async def run(args: argparse.Namespace) -> None:
     os.system("cls")
     os.system("clear")
 
-    print("Gripper testing beings... \n")
+    print("Gripper Life Cycle testing beings... \n")
+    reps = prompt_int_input("Number of repetitions open & close (int)")
+    vref = prompt_float_input("Vref in A (float)")
     pwm_freq = prompt_int_input("PWM frequency in Hz (int)")
     pwm_duty = prompt_int_input("PWM duty cycle in % (int)")
 
     driver = await build_driver(build_settings(args))
     messenger = CanMessenger(driver=driver)
     messenger.start()
+    await set_reference_voltage(messenger, vref)
+    # await set_pwm_param(messenger, pwm_freq, pwm_duty)
+    await messenger.send(node_id=NodeId.gripper, message=SetupRequest())
 
     """Setup gripper"""
     try:
-        await messenger.send(node_id=NodeId.gripper, message=SetupRequest())
-        await set_pwm_param(messenger, pwm_freq, pwm_duty)
+        while True:
+            for i in range(reps):
+                output_details(i, reps)
+                await grip(messenger, 0, 0, pwm_freq, pwm_duty)
+                await execute_move(messenger)
+                await asyncio.sleep(5.0)
 
-        for i, v in enumerate(vref_list):
-            await set_reference_voltage(messenger, v)
-            output_details(i, pwm_freq, pwm_duty, v)
-
-            input(in_green("Press Enter to grip...\n"))
-
-            await grip(messenger, 0, 0, 0, 0)
-            await execute_move(messenger)
-
-            input(in_green("Press Enter to release...\n"))
-
-            await home(messenger, 0, 0, 0, 0)
-            await execute_move(messenger)
+                await home(messenger, 0, 0, pwm_freq, pwm_duty)
+                await execute_move(messenger)
+                print("finished")
 
     except asyncio.CancelledError:
         pass
