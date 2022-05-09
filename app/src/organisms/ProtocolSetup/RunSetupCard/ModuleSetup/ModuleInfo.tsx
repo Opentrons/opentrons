@@ -41,7 +41,6 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
 
   const runHasStarted = useRunHasStarted(runId)
-  console.log('runHasStarted', runHasStarted)
 
   let connectionStatus = t('no_usb_port_yet')
   if (usbPort === null && hubPort === null && isAttached) {
