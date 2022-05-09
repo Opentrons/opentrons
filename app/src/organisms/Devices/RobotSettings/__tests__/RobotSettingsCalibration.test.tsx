@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { saveAs } from 'file-saver'
 import { MemoryRouter } from 'react-router-dom'
+// import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -25,6 +26,7 @@ import {
   useRobot,
   useTipLengthCalibrations,
 } from '../../hooks'
+import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
 
 jest.mock('file-saver')
@@ -39,6 +41,14 @@ jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/robot')
 jest.mock('../../hooks')
+jest.mock('../../../../organisms/ProtocolUpload/hooks')
+jest.mock('@opentrons/components', () => {
+  const actualComponents = jest.requireActual('@opentrons/components')
+  return {
+    ...actualComponents,
+    Tooltip: jest.fn(({ children }) => <div>{children}</div>),
+  }
+})
 
 const mockDeckCalibrationModal = DeckCalibrationModal as jest.MockedFunction<
   typeof DeckCalibrationModal
@@ -55,6 +65,9 @@ const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunc
 >
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
+>
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
 >
 
 let mockTrackEvent: jest.Mock
@@ -104,6 +117,7 @@ describe('RobotSettingsCalibration', () => {
       mockTipLengthCalibration2,
       mockTipLengthCalibration3,
     ])
+    mockUseCurrentRunId.mockReturnValue(null)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -144,4 +158,27 @@ describe('RobotSettingsCalibration', () => {
       'Check the accuracy of key calibration points without recalibrating the robot.'
     )
   })
+
+  it('renders a Check health button', () => {
+    const [{ getByRole }] = render()
+    getByRole('button', { name: 'Check health' })
+  })
+
+  it('Health check button is clickable', () => {
+    const [{ getByRole }] = render()
+    const healthCheckButton = getByRole('button', { name: 'Check health' })
+    // fireEvent.click(healthCheckButton)
+    expect(healthCheckButton).not.toBeDisabled()
+  })
+
+  // it('Health check button is not clickable and display tooltip', () => {
+  //   mockUseCurrentRunId.mockReturnValue('RUNID')
+  //   const [{ getByRole }] = render()
+  //   const healthCheckButton = getByRole('button', { name: 'Check health' })
+  //   expect(healthCheckButton).toBeDisabled()
+  //   // fireEvent.mouseOver(healthCheckButton)
+  //   // getByRole('tooltip', {
+  //   //   name: 'Fully calibrate your robot before checking calibration health',
+  //   // })
+  // })
 })

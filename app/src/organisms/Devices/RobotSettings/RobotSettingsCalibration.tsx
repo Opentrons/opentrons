@@ -253,14 +253,14 @@ export function RobotSettingsCalibration({
           <TertiaryButton
             {...targetProps}
             onClick={() => handleHealthCheck(null)}
-            // disabled={healthCheckButtonDisabled}
+            disabled={healthCheckButtonDisabled}
           >
             {t('health_check_button')}
           </TertiaryButton>
           {healthCheckButtonDisabled && (
             <Tooltip
-              key={`RobotSettingsCalibration_tooltip`}
               tooltipProps={tooltipProps}
+              key="RobotSettingsCalibration_tooltip"
             >
               {t('fully_calibrate_before_checking_health')}
             </Tooltip>
