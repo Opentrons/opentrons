@@ -72,6 +72,7 @@ class NoSuchModuleError(Exception):
         return self.message
 
 
+# TODO (spp, 2022-05-09): add tests
 class ModuleGeometry(DeckItem):
     """
     This class represents an active peripheral, such as an Opentrons Magnetic
@@ -384,13 +385,13 @@ def _load_from_v1(
     return mod
 
 
-def _load_from_v2(
-    definition: "ModuleDefinitionV2",
+def _load_from_v2_or_v3(
+    definition: Union["ModuleDefinitionV2", "ModuleDefinitionV3"],
     parent: Location,
     api_level: APIVersion,
     configuration: GenericConfiguration,
 ) -> ModuleGeometry:
-    """Load a module geometry from a v2 definition.
+    """Load a module geometry from a v2 or a v3 definition.
 
     The definition should be schema checked before being passed to this
      function; all definitions passed here are assumed to be valid.
@@ -451,7 +452,7 @@ def _load_from_v2(
 
 
 def load_module_from_definition(
-    definition: Union["ModuleDefinitionV1", "ModuleDefinitionV2"],
+    definition: Union["ModuleDefinitionV1", "ModuleDefinitionV2", "ModuleDefinitionV3"],
     parent: Location,
     api_level: APIVersion = None,
     configuration: GenericConfiguration = ThermocyclerConfiguration.FULL,
@@ -491,7 +492,17 @@ def load_module_from_definition(
         # mypy can't tell these apart, but we've schema validated it - this is
         # the right type
         v2def: "ModuleDefinitionV2" = definition  # type: ignore
-        return _load_from_v2(v2def, parent, api_level, configuration)
+        return _load_from_v2_or_v3(v2def, parent, api_level, configuration)
+    elif schema == "module/schemas/3":
+        schema_doc = module.load_schema("3")
+        try:
+            jsonschema.validate(definition, schema_doc)
+        except jsonschema.ValidationError:
+            log.exception("Failed to validate module def schema")
+            raise RuntimeError("The specified module definition is not valid.")
+        v3def: "ModuleDefinitionV3" = definition
+        return _load_from_v2_or_v3(v3def, parent, api_level, configuration)
+
     elif isinstance(schema, str):
         maybe_schema = re.match("^module/schemas/([0-9]+)$", schema)
         if maybe_schema:
