@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { saveAs } from 'file-saver'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -25,6 +26,7 @@ import {
   useRobot,
   useTipLengthCalibrations,
 } from '../../hooks'
+
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
 
 jest.mock('file-saver')
@@ -137,7 +139,6 @@ describe('RobotSettingsCalibration', () => {
     })
   })
 
-  // deck calibration this comment will be removed when finish all sections
   it('renders a title description and button - Deck Calibration', () => {
     const [{ getByText, getByRole }] = render()
     getByText('Deck Calibration')
@@ -155,8 +156,16 @@ describe('RobotSettingsCalibration', () => {
     })
     const [{ getByRole, getByText }] = render()
     getByRole('button', { name: 'Calibrate deck' })
+    getByText('Not calibrated yet')
+  })
+
+  it('renders the banner when deck is not calibrated', () => {
+    mockUseDeckCalibrationData.mockReturnValue({
+      deckCalibrationData: null,
+      isDeckCalibrated: false,
+    })
+    const [{ getByRole, getByText }] = render()
     getByText('Deck Calibration missing')
     getByRole('button', { name: 'Calibrate now' })
-    getByText('Not calibrated yet')
   })
 })
