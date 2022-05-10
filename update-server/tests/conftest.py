@@ -5,10 +5,24 @@ import json
 import sys
 import subprocess
 import zipfile
+from typing import Dict
 
 import pytest
 
 HERE = os.path.abspath(os.path.dirname(__file__))
+
+
+@pytest.fixture(scope="session")
+def version_file_path() -> str:
+    """The version file path fixture."""
+    return os.path.join(HERE, "version.json")
+
+
+@pytest.fixture(scope="session")
+def version_dict(version_file_path: str) -> Dict[str, str]:
+    """The version file path fixture."""
+    with open(version_file_path) as f:
+        return json.load(f)
 
 
 @pytest.fixture
