@@ -24,6 +24,7 @@ import {
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
+  useAttachedPipetteCalibrations,
 } from '../../hooks'
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
 
@@ -47,6 +48,9 @@ const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.Mo
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunction<
   typeof useTipLengthCalibrations
+>
+const mockUseAttachedPipetteCalibrations = useAttachedPipetteCalibrations as jest.MockedFunction<
+  typeof useAttachedPipetteCalibrations
 >
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
@@ -99,6 +103,7 @@ describe('RobotSettingsCalibration', () => {
       mockTipLengthCalibration2,
       mockTipLengthCalibration3,
     ])
+    mockUseAttachedPipetteCalibrations.mockReturnValue([])
   })
   afterEach(() => {
     jest.resetAllMocks()
