@@ -26,12 +26,14 @@ def mock_update_actions_interface(
 
 
 @pytest.fixture
-async def test_cli(aiohttp_client, loop, otupdate_config) -> TestClient:
+async def test_cli(
+    aiohttp_client, loop, otupdate_config, version_file_path
+) -> TestClient:
     """
     Build an app using dummy versions, then build a test client and return it
     """
     app = openembedded.get_app(
-        system_version_file=os.path.join(HERE, "version.json"),
+        system_version_file=version_file_path,
         config_file_override=otupdate_config,
         name_override="opentrons-test",
         boot_id_override="dummy-boot-id-abc123",

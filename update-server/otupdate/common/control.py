@@ -8,7 +8,7 @@ import logging
 import subprocess
 from functools import lru_cache
 from pathlib import Path
-from typing import Callable, Coroutine, Mapping
+from typing import Callable, Coroutine, Mapping, Any
 
 from aiohttp import web
 
@@ -32,28 +32,19 @@ async def restart(request: web.Request) -> web.Response:
 
 
 def build_health_endpoint(
-    version_dict: Mapping[str, str]
+    health_response: Mapping[str, Any]
 ) -> Callable[[web.Request], Coroutine[None, None, web.Response]]:
     """Build a coroutine to serve /health that captures version info"""
 
     async def health(request: web.Request) -> web.Response:
         return web.json_response(
             {
-                "name": request.app[DEVICE_NAME_VARNAME],
-                "updateServerVersion": version_dict.get(
-                    "update_server_version", "unknown"
-                ),
-                "serialNumber": get_serial(),
-                "apiServerVersion": version_dict.get(
-                    "opentrons_api_version", "unknown"
-                ),
-                "smoothieVersion": "unimplemented",
-                "systemVersion": version_dict.get("buildroot_version", "unknown"),
-                "capabilities": {
-                    "buildrootUpdate": "/server/update/begin",
-                    "restart": "/server/restart",
+                **health_response,
+                **{
+                    "name": request.app[DEVICE_NAME_VARNAME],
+                    "serialNumber": get_serial(),
+                    "bootId": request.app[DEVICE_BOOT_ID_NAME],
                 },
-                "bootId": request.app[DEVICE_BOOT_ID_NAME],
             },
             headers={"Access-Control-Allow-Origin": "*"},
         )
