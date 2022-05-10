@@ -12,7 +12,8 @@ import {
 } from '@opentrons/components'
 import { OverflowBtn } from '../../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../../atoms/MenuList/MenuItem'
-
+import { AskForCalibrationBlockModal } from '../../../CalibrateTipLength/AskForCalibrationBlockModal'
+import { Portal } from '../../../../App/portal'
 // import { Divider } from '../../../../atoms/structure'
 import {
   INTENT_RECALIBRATE_PIPETTE_OFFSET,
@@ -105,6 +106,17 @@ export function OverflowMenu({
     }
   }
 
+  const checkPipetteCalibrations = (): PipetteOffsetCalibration | null => {
+    if (pipetteOffsetCalibrations == null) {
+      return null
+    } else {
+      const applicablePipetteOffsetCalibration = pipetteOffsetCalibrations?.find(
+        p => p.mount === mount
+      )
+      return applicablePipetteOffsetCalibration ?? null
+    }
+  }
+
   const handleCalibration = (
     calType: 'pipetteOffset' | 'tipLength',
     e: React.MouseEvent
@@ -112,7 +124,7 @@ export function OverflowMenu({
     e.preventDefault()
     if (calType === 'pipetteOffset') {
       console.log('recalibrate pipetteOffset')
-      if (pipetteOffsetCalibration != null) {
+      if (checkPipetteCalibrations != null) {
         startPipetteOffsetCalibration({
           withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
         })
@@ -203,6 +215,21 @@ export function OverflowMenu({
             {t('overflow_menu_delete_data')}
           </MenuItem> */}
         </Flex>
+      ) : null}
+      {calBlockModalState !== CAL_BLOCK_MODAL_CLOSED ? (
+        <Portal level="top">
+          <AskForCalibrationBlockModal
+            onResponse={hasBlockModalResponse => {
+              startPipetteOffsetPossibleTLC({
+                hasBlockModalResponse,
+                keepTipLength:
+                  calBlockModalState === CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC,
+              })
+            }}
+            titleBarTitle="pipette offset calibration"
+            closePrompt={() => setCalBlockModalState(CAL_BLOCK_MODAL_CLOSED)}
+          />
+        </Portal>
       ) : null}
     </Flex>
   )

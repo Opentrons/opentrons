@@ -401,28 +401,7 @@ export function RobotSettingsCalibration({
         </Flex>
       </Box>
       <Line />
-      {/* Deck Calibration this comment will removed when finish all sections */}
-      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box marginRight={SPACING.spacing6}>
-            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
-              {t('deck_calibration_title')}
-            </Box>
-            <StyledText as="p" marginBottom={SPACING.spacing3}>
-              {t('deck_calibration_description')}
-            </StyledText>
-            <StyledText as="label">{deckLastModified()}</StyledText>
-          </Box>
-          <TertiaryButton
-            onClick={() => confirmStart()}
-            // disabled={disabledOrBusyReason}
-          >
-            {deckCalibrationButtonText}
-          </TertiaryButton>
-        </Flex>
-      </Box>
-      <Line />
-      {/* Pipette Offset Calibrations this comment will removed when finish all sections */}
+      {/* PipetteOffsetCalibrations Section */}
       {showPipetteOffsetCalWarning && (
         <Banner type="warning">
           {t('pipette_offset_calibration_recommended')}
@@ -449,7 +428,7 @@ export function RobotSettingsCalibration({
         </Flex>
       </Box>
       <Line />
-      {/* Tip Length Calibrations this comment will removed when finish all sections */}
+      {/* TipLengthCalibrations Section */}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER}>
           <Box marginRight={SPACING.spacing6}>
@@ -470,29 +449,6 @@ export function RobotSettingsCalibration({
               <StyledText as="label">{t('not_calibrated')}</StyledText>
             )}
           </Box>
-        </Flex>
-      </Box>
-      <Line />
-      {/* Calibration Health Check this comment will removed when finish all sections */}
-      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box marginRight={SPACING.spacing6}>
-            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
-              {t('calibration_health_check_title')}
-            </Box>
-            <StyledText as="p" marginBottom={SPACING.spacing3}>
-              {t('calibration_health_check_description')}
-            </StyledText>
-          </Box>
-          <TertiaryButton
-            onClick={() => handleHealthCheck(null)}
-            disabled={healthCheckButtonDisabled}
-          >
-            {t('calibration_health_check_button')}
-          </TertiaryButton>
-          <Tooltip tooltipProps={tooltipProps} key="HealthCheckTooltip">
-            {t('calibration_health_check_tooltip')}
-          </Tooltip>
         </Flex>
       </Box>
     </>

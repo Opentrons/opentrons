@@ -76,7 +76,7 @@ export function PipetteOffsetCalItems({
                 formatLastCalibrated(calibration.lastCalibrated)
               ) : (
                 <>
-                  {calibration.markedBad ? (
+                  {calibration.markedBad ?? false ? (
                     <Icon
                       name="alert-circle"
                       backgroundColor={COLORS.warningBg}
