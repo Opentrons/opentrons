@@ -154,19 +154,6 @@ const PROTOCOL_DETAILS = {
   protocolData: simpleV6Protocol,
 }
 
-const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
-  moduleId: 'heater_shaker_id',
-  x: 0,
-  y: 0,
-  z: 0,
-  moduleDef: mockHeaterShaker as any,
-  nestedLabwareDef: heaterShakerCommands.labwareDefinitions['example/plate/1'],
-  nestedLabwareDisplayName: null,
-  nestedLabwareId: null,
-  protocolLoadOrder: 1,
-  slotName: '1',
-} as ProtocolModuleInfo
-
 const mockMovingHeaterShaker = {
   id: 'heatershaker_id',
   moduleModel: 'heaterShakerModuleV1',
