@@ -435,7 +435,6 @@ async def test_get_baseline(
         [lazy_fixture("pressure_sensor"), NodeId.pipette_right, 3],
     ],
 )
-# @pytest.mark.skip("need to fix bind_output")
 async def test_debug_poll(
     mock_messenger: mock.AsyncMock,
     can_message_notifier: MockCanMessageNotifier,
