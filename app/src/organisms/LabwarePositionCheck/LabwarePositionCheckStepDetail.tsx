@@ -24,6 +24,7 @@ import {
   getIsTiprack,
   getPipetteNameSpecs,
   getVectorDifference,
+  getVectorSum,
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
 import {
@@ -70,7 +71,8 @@ export const LabwarePositionCheckStepDetail = (
     setLivePositionDeckCoords,
   ] = React.useState<Coordinates | null>(null)
 
-  const initialSavePositionCommandId = savePositionCommandData[labwareId][0]
+  const initialSavePositionCommandId = (savePositionCommandData[labwareId] ??
+    [])[0]
   const initialSavePositionCommand = useCommandQuery(
     runId,
     initialSavePositionCommandId
@@ -111,19 +113,19 @@ export const LabwarePositionCheckStepDetail = (
   )
 
   const handleJog: JogControlsProps['jog'] = (axis, direction, step) => {
-    const onSuccess = (position: Coordinates | null): void =>
+    const onSuccess = (position: Coordinates | null): void => {
       setLivePositionDeckCoords(position)
+    }
     props.jog(axis, direction, step, onSuccess)
   }
 
   const joggedVector =
     initialPosition != null && livePositionDeckCoords != null
-      ? getVectorDifference(initialPosition, livePositionDeckCoords)
+      ? getVectorDifference(livePositionDeckCoords, initialPosition)
       : IDENTITY_VECTOR
-
   const liveOffset =
     existingOffset != null
-      ? getVectorDifference(existingOffset.vector, joggedVector)
+      ? getVectorSum(existingOffset.vector, joggedVector)
       : joggedVector
 
   return (
@@ -181,7 +183,11 @@ export const LabwarePositionCheckStepDetail = (
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing3}
       >
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER} marginBottom={SPACING.spacing3}>
+        <Flex
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignItems={ALIGN_CENTER}
+          marginBottom={SPACING.spacing3}
+        >
           <Flex
             backgroundColor={COLORS.background}
             flexDirection={DIRECTION_COLUMN}
@@ -190,7 +196,10 @@ export const LabwarePositionCheckStepDetail = (
             color={COLORS.darkGreyEnabled}
           >
             <StyledText as="h6">{t('labware_offset')}</StyledText>
-            <OffsetVector {...liveOffset} />
+            <OffsetVector
+              {...liveOffset}
+              data-testid="LabwarePositionCheckStepDetail_liveOffset"
+            />
           </Flex>
           <StyledText as="p">{t('jog_controls_adjustment')}</StyledText>
           {!showJogControls ? (

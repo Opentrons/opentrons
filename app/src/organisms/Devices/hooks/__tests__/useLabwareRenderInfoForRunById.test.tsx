@@ -10,7 +10,9 @@ import { useLabwareRenderInfoForRunById, useProtocolDetailsForRun } from '..'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 import type { ProtocolDetails } from '..'
 
-jest.mock('../../../../organisms/Devices/ProtocolRun/utils/getLabwareRenderInfo')
+jest.mock(
+  '../../../../organisms/Devices/ProtocolRun/utils/getLabwareRenderInfo'
+)
 jest.mock('../useProtocolDetailsForRun')
 
 const mockGetLabwareRenderInfo = getLabwareRenderInfo as jest.MockedFunction<

@@ -24,7 +24,9 @@ import type {
 } from '@opentrons/shared-data'
 import type { ProtocolDetails } from '..'
 
-jest.mock('../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
+jest.mock(
+  '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+)
 jest.mock('../useAttachedModules')
 jest.mock('../useProtocolDetailsForRun')
 

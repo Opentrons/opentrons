@@ -148,8 +148,16 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
                 onClick={() => props.jog(axis, sign, props.stepSize)}
                 {...{ gridRow, gridColumn }}
               >
-                <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_CENTER} width="100%">
-                  <Icon size="1.5rem" name={iconName} backgroundColor={props.buttonColor} />
+                <Flex
+                  alignItems={ALIGN_CENTER}
+                  justifyContent={JUSTIFY_CENTER}
+                  width="100%"
+                >
+                  <Icon
+                    size="1.5rem"
+                    name={iconName}
+                    backgroundColor={props.buttonColor}
+                  />
                 </Flex>
               </PrimaryButton>
             )

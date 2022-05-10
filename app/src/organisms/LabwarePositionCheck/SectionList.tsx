@@ -62,7 +62,11 @@ export function SectionList(props: Props): JSX.Element {
           backgroundColor = sectionTextColor
         }
         return (
-          <Flex key={index} padding={SPACING.spacing2} alignItems={ALIGN_CENTER}>
+          <Flex
+            key={index}
+            padding={SPACING.spacing2}
+            alignItems={ALIGN_CENTER}
+          >
             <Box
               width={SIZE_1}
               height={SIZE_1}

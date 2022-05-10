@@ -10,12 +10,12 @@ interface OffsetValueProps {
 }
 export function OffsetValue(props: OffsetValueProps): JSX.Element {
   const { initialOffset } = props
-  const {t} = useTranslation('labware_position_check')
+  const { t } = useTranslation('labware_position_check')
   const currentVector = initialOffset.vector
   return (
     <Flex backgroundColor={COLORS.background}>
       <StyledText as="h6">{t('labware_offset')}</StyledText>
-      <OffsetVector {...currentVector}/>
+      <OffsetVector {...currentVector} />
     </Flex>
   )
 }
