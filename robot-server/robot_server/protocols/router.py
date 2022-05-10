@@ -10,6 +10,7 @@ from typing_extensions import Literal
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
 
+from robot_server.auto_deleter import AutoDeleter, get_auto_deleter
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.service.dependencies import get_unique_id, get_current_time
@@ -92,6 +93,7 @@ async def create_protocol(
     protocol_reader: ProtocolReader = Depends(get_protocol_reader),
     protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
     task_runner: TaskRunner = Depends(get_task_runner),
+    auto_deleter: AutoDeleter = Depends(get_auto_deleter),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
@@ -107,6 +109,8 @@ async def create_protocol(
         protocol_reader: Protocol file reading interface.
         protocol_analyzer: Protocol analysis interface.
         task_runner: Background task runner.
+        auto_deleter: An interface to delete old resources to make room for the new
+            protocol.
         protocol_id: Unique identifier to attach to the protocol resource.
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
@@ -128,6 +132,7 @@ async def create_protocol(
         protocol_key=key,
     )
 
+    await auto_deleter.make_room_for_new_protocol()
     protocol_store.insert(protocol_resource)
 
     task_runner.run(

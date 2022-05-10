@@ -17,6 +17,7 @@ from opentrons.protocol_reader import (
     ProtocolFilesInvalidError,
 )
 
+from robot_server.auto_deleter import AutoDeleter
 from robot_server.errors import ApiError
 from robot_server.service.json_api import SimpleEmptyBody, MultiBodyMeta
 from robot_server.service.task_runner import TaskRunner
@@ -80,6 +81,12 @@ def protocol_analyzer(decoy: Decoy) -> ProtocolAnalyzer:
 def task_runner(decoy: Decoy) -> TaskRunner:
     """Get a mocked out TaskRunner."""
     return decoy.mock(cls=TaskRunner)
+
+
+@pytest.fixture
+def auto_deleter(decoy: Decoy) -> AutoDeleter:
+    """Get a mocked out AutoDeleter."""
+    return decoy.mock(cls=AutoDeleter)
 
 
 async def test_get_protocols_no_protocols(
@@ -247,6 +254,7 @@ async def test_create_protocol(
     protocol_reader: ProtocolReader,
     protocol_analyzer: ProtocolAnalyzer,
     task_runner: TaskRunner,
+    auto_deleter: AutoDeleter,
 ) -> None:
     """It should store an uploaded protocol file."""
     protocol_directory = Path("/dev/null")
@@ -299,6 +307,7 @@ async def test_create_protocol(
         protocol_reader=protocol_reader,
         protocol_analyzer=protocol_analyzer,
         task_runner=task_runner,
+        auto_deleter=auto_deleter,
         protocol_id="protocol-id",
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
@@ -316,6 +325,7 @@ async def test_create_protocol(
     assert result.status_code == 201
 
     decoy.verify(
+        await auto_deleter.make_room_for_new_protocol(),
         protocol_store.insert(protocol_resource),
         task_runner.run(
             protocol_analyzer.analyze,
