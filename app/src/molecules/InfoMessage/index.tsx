@@ -10,6 +10,7 @@ import {
   DIRECTION_ROW,
   SIZE_1,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -42,7 +43,9 @@ export function InfoMessage({ title, body }: InfoMessageProps): JSX.Element {
         gridGap={SPACING.spacing2}
         color={COLORS.darkBlack}
       >
-        <StyledText as="pSemiBold">{title}</StyledText>
+        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {title}
+        </StyledText>
         {body != null ? <StyledText as="p">{body}</StyledText> : null}
       </Flex>
     </Flex>
