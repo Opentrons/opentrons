@@ -165,7 +165,8 @@ describe('RobotSettingsCalibration', () => {
 
   it('renders a Check health button', () => {
     const [{ getByRole }] = render()
-    getByRole('button', { name: 'Check health' })
+    const button = getByRole('button', { name: 'Check health' })
+    expect(button).not.toBeDisabled()
   })
 
   it('Health check button is disabled when a robot is unreachable', () => {
