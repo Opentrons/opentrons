@@ -21,7 +21,7 @@ from robot_server.service.json_api import (
 from ..run_models import Run, RunCommandSummary
 from ..engine_store import EngineStore
 from ..dependencies import get_engine_store
-from .base_router import RunNotFound, RunStopped, get_run_data_from_url
+from .base_router import RunNotFound, get_run_data_from_url, RunStopped
 
 
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20

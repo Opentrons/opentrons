@@ -1,15 +1,21 @@
 """Manage current and historical run data."""
-from datetime import datetime
+import logging
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from opentrons.protocol_engine import LabwareOffsetCreate
+from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 
 from robot_server.protocols import ProtocolResource
 from .engine_store import EngineStore
-from .run_store import RunStore
+from .run_store import RunStore, RunNotFoundError, RunStateResource
 
 from .run_models import Run
-from .action_models import RunAction, RunActionType, RunActionCreate
+from .run_error_models import RunStoppedError, RunActionNotAllowedError
+from .action_models import RunAction, RunActionType
+
+log = logging.getLogger(__name__)
+
 
 class RunDataManager:
     """Collaborator to manage current and historical run data.
@@ -125,8 +131,8 @@ class RunDataManager:
         #             status.HTTP_409_CONFLICT
         #         )
 
-    def create_run_action(self, run_id: str, run_action: RunAction) -> None:
-        """"Create a run action.
+    def create_action(self, run_id: str, run_action: RunAction) -> None:  # noqa: C901
+        """Create a run action.
 
         Arg:
             run_id: The run associated to the action.
@@ -140,49 +146,48 @@ class RunDataManager:
             RunStopped: The given run is not the current run.
             RunActionNotAllowed: The following operation is not allowed
         """
-        raise NotImplementedError("TODO")
-        # try:
-        #     prev_run = get(run_id=runId)
-        # except RunNotFoundError as e:
-        #     raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
-        #
-        # if not prev_run.is_current:
-        #     raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
-        #         status.HTTP_409_CONFLICT
-        #     )
-        # try:
-        #     if action.actionType == RunActionType.PLAY:
-        #         # TODO(mc, 2022-01-11): this won't work very well for HTTP-only
-        #         # runs, which is ok at the time of writing but needs to be addressed
-        #         if engine_store.runner.was_started():
-        #             log.info(f'Resuming run "{runId}".')
-        #             engine_store.runner.play()
-        #         else:
-        #             log.info(f'Starting run "{runId}".')
-        #
-        #             async def run_protocol_and_insert_result() -> None:
-        #                 run_result = await engine_store.runner.run()
-        #                 engine_status = engine_store.engine.state_view.commands.get_status()
-        #                 run_state_resource = RunStateResource(
-        #                     run_id=runId,
-        #                     state=run_result,
-        #                     engine_status=engine_status,
-        #                     _updated_at=datetime.now(tz=timezone.utc),
-        #                     commands=[],
-        #                 )
-        #                 run_store.update_run_state(run_state_resource)
-        #
-        #             task_runner.run(run_protocol_and_insert_result)
-        #
-        #     elif action.actionType == RunActionType.PAUSE:
-        #         log.info(f'Pausing run "{runId}".')
-        #         engine_store.runner.pause()
-        #
-        #     elif action.actionType == RunActionType.STOP:
-        #         log.info(f'Stopping run "{runId}".')
-        #         task_runner.run(engine_store.runner.stop)
-        #
-        # except ProtocolEngineStoppedError as e:
-        #     raise RunActionNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
-        #
-        # run_store.insert_action(run_id=runId, action=action)
+        try:
+            prev_run = self.get(run_id=run_id)
+            print("returned run: " + prev_run.id)
+        except RunNotFoundError:
+            raise RunNotFoundError(run_id=run_id)
+        if not prev_run.current:
+            raise RunStoppedError(run_id=run_id)
+        try:
+            if run_action.actionType == RunActionType.PLAY:
+                # TODO(mc, 2022-01-11): this won't work very well for HTTP-only
+                # runs, which is ok at the time of writing but needs to be addressed
+                if self._engine_store.runner.was_started():
+                    log.info(f'Resuming run "{run_id}".')
+                    self._engine_store.runner.play()
+                else:
+                    log.info(f'Starting run "{run_id}".')
+
+                    async def run_protocol_and_insert_result() -> None:
+                        run_result = await self._engine_store.runner.run()
+                        engine_status = (
+                            self._engine_store.engine.state_view.commands.get_status()
+                        )
+                        run_state_resource = RunStateResource(
+                            run_id=run_id,
+                            state=run_result,
+                            engine_status=engine_status,
+                            _updated_at=datetime.now(tz=timezone.utc),
+                            commands=[],
+                        )
+                        self._run_store.update_run_state(run_state_resource)
+
+                    # task_runner.run(run_protocol_and_insert_result)
+
+            elif run_action.actionType == RunActionType.PAUSE:
+                log.info(f'Pausing run "{run_id}".')
+                self._engine_store.runner.pause()
+
+            elif run_action.actionType == RunActionType.STOP:
+                log.info(f'Stopping run "{run_id}".')
+                # task_runner.run(engine_store.runner.stop)
+
+        except ProtocolEngineStoppedError:
+            raise RunActionNotAllowedError(run_id=run_id)
+
+        self._run_store.insert_action(run_id=run_id, action=run_action)
