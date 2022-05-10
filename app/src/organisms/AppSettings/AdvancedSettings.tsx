@@ -53,6 +53,7 @@ type BlockSelection =
 
 export function AdvancedSettings(): JSX.Element {
   const { t } = useTranslation('app_settings')
+  const pythonDirectoryFileInput = React.useRef<HTMLInputElement>(null)
   const useTrashSurfaceForTipCal = useSelector((state: State) =>
     Config.getUseTrashSurfaceForTipCal(state)
   )
@@ -107,13 +108,12 @@ export function AdvancedSettings(): JSX.Element {
         Boolean(!isHeaterShakerAttachmentModalVisible)
       )
     )
-  const pythonDirectoryFileInput = React.useRef<HTMLInputElement>(null)
 
   //  TODO(jr, 5/6/22): find another way to get webkitdirectory to work in the input DOM https://github.com/facebook/react/issues/3468
   React.useEffect(() => {
     if (pythonDirectoryFileInput.current !== null) {
-      pythonDirectoryFileInput.current.setAttribute('directory', '')
-      pythonDirectoryFileInput.current.setAttribute('webkitdirectory', '')
+      pythonDirectoryFileInput.current.setAttribute('directory', 'true')
+      pythonDirectoryFileInput.current.setAttribute('webkitdirectory', 'true')
     }
   }, [pythonDirectoryFileInput])
 
@@ -121,11 +121,12 @@ export function AdvancedSettings(): JSX.Element {
     pythonDirectoryFileInput.current?.click()
   }
 
-  const setPythonInterpretterDirectory: React.ChangeEventHandler<HTMLInputElement> = event => {
+  const setPythonInterpreterDirectory: React.ChangeEventHandler<HTMLInputElement> = event => {
     const { files = [] } = event.target ?? {}
     const dirName =
       files?.[0]?.path != null ? path.dirname(files?.[0]?.path) : null
     dispatch(Config.updateConfigValue('python.pathToPythonOverride', dirName))
+    event.target.value = ''
   }
 
   const toggleDevtools = (): unknown => dispatch(Config.toggleDevtools())
@@ -489,7 +490,7 @@ export function AdvancedSettings(): JSX.Element {
             type="file"
             css={INPUT_STYLES}
             ref={pythonDirectoryFileInput}
-            onChange={setPythonInterpretterDirectory}
+            onChange={setPythonInterpreterDirectory}
           />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
