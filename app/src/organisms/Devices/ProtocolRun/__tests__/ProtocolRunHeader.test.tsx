@@ -288,14 +288,14 @@ describe('ProtocolRunHeader', () => {
     )
   })
 
-  it('renders a start run button and clear protocol button when run is ready to start', () => {
+  it('renders a start run button and cancel run button when run is ready to start', () => {
     const [{ getByRole, queryByText }] = render()
 
     getByRole('button', { name: 'Start run' })
-    expect(queryByText(formatTimestamp(STARTED_AT))).toBeFalsy()
-    expect(queryByText('Protocol start')).toBeFalsy()
-    expect(queryByText('Protocol end')).toBeFalsy()
-    getByRole('button', { name: 'Clear protocol' }).click()
+    queryByText(formatTimestamp(STARTED_AT))
+    queryByText('Protocol start')
+    queryByText('Protocol end')
+    getByRole('button', { name: 'Cancel run' }).click()
     expect(mockCloseCurrentRun).toBeCalled()
   })
 
@@ -340,7 +340,6 @@ describe('ProtocolRunHeader', () => {
     getByText(formatTimestamp(STARTED_AT))
     getByText('Protocol start')
     getByText('Protocol end')
-    expect(getByRole('button', { name: 'Clear protocol' })).toBeDisabled()
   })
 
   it('renders a cancel run button when running and shows a confirm cancel modal when clicked', () => {
@@ -426,13 +425,11 @@ describe('ProtocolRunHeader', () => {
       completedAt: COMPLETED_AT,
     })
 
-    const [{ getByRole, getByText }] = render()
+    const [{ getByText }] = render()
 
     getByText('Run again')
     getByText('Canceled')
     getByText(formatTimestamp(COMPLETED_AT))
-    getByRole('button', { name: 'Clear protocol' }).click()
-    expect(mockCloseCurrentRun).toBeCalled()
   })
 
   it('renders a Run Again button and end time when run has failed', () => {
@@ -449,13 +446,11 @@ describe('ProtocolRunHeader', () => {
       completedAt: COMPLETED_AT,
     })
 
-    const [{ getByRole, getByText }] = render()
+    const [{ getByText }] = render()
 
     getByText('Run again')
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
-    getByRole('button', { name: 'Clear protocol' }).click()
-    expect(mockCloseCurrentRun).toBeCalled()
   })
 
   it('renders a Run Again button and end time when run has succeeded', () => {
@@ -474,13 +469,11 @@ describe('ProtocolRunHeader', () => {
       completedAt: COMPLETED_AT,
     })
 
-    const [{ getByRole, getByText }] = render()
+    const [{ getByText }] = render()
 
     getByText('Run again')
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
-    getByRole('button', { name: 'Clear protocol' }).click()
-    expect(mockCloseCurrentRun).toBeCalled()
   })
 
   it('disables the Run Again button with tooltip for a completed run if the robot is busy', () => {
