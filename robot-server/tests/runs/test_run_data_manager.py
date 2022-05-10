@@ -9,6 +9,7 @@ from robot_server.runs.engine_store import EngineStore, EngineConflictError
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import Run
 from robot_server.runs.run_store import RunStore, RunResource
+from robot_server.service.task_runner import TaskRunner
 
 
 @pytest.fixture
@@ -24,9 +25,9 @@ def mock_run_store(decoy: Decoy) -> RunStore:
 
 
 @pytest.fixture
-def subject(mock_engine_store: EngineStore, mock_run_store: RunStore) -> RunDataManager:
+def subject(mock_engine_store: EngineStore, mock_run_store: RunStore, mock_task_runner: TaskRunner) -> RunDataManager:
     """Get a RunDataManager test subject."""
-    return RunDataManager(engine_store=mock_engine_store, run_store=mock_run_store)
+    return RunDataManager(engine_store=mock_engine_store, run_store=mock_run_store, task_runner=mock_task_runner)
 
 
 @pytest.fixture

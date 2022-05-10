@@ -7,12 +7,13 @@ from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 from opentrons.protocol_engine import LabwareOffsetCreate, ProtocolRunData
 
 from robot_server.protocols import ProtocolResource
+from robot_server.service.task_runner import TaskRunner
+
 from .engine_store import EngineStore
 from .run_store import RunResource, RunStore, RunNotFoundError, RunStateResource
-
 from .run_models import Run
 from .run_error_models import RunStoppedError, RunActionNotAllowedError
-from .action_models import RunAction, RunActionType
+from .action_models import RunActionType
 
 log = logging.getLogger(__name__)
 
@@ -45,9 +46,10 @@ class RunDataManager:
         run_store: Persistent database of current and historical run data.
     """
 
-    def __init__(self, engine_store: EngineStore, run_store: RunStore) -> None:
+    def __init__(self, engine_store: EngineStore, run_store: RunStore, task_runner: TaskRunner) -> None:
         self._engine_store = engine_store
         self._run_store = run_store
+        self._task_runner = task_runner
 
     @property
     def current_run_id(self) -> Optional[str]:
@@ -210,7 +212,7 @@ class RunDataManager:
                         )
                         self._run_store.update_run_state(run_state_resource)
 
-                    # task_runner.run(run_protocol_and_insert_result)
+                    self._task_runner.run(run_protocol_and_insert_result)
 
             elif run_action.actionType == RunActionType.PAUSE:
                 log.info(f'Pausing run "{run_id}".')
@@ -218,7 +220,7 @@ class RunDataManager:
 
             elif run_action.actionType == RunActionType.STOP:
                 log.info(f'Stopping run "{run_id}".')
-                # task_runner.run(engine_store.runner.stop)
+                self._task_runner.run(self._engine_store.runner.stop)
 
         except ProtocolEngineStoppedError:
             raise RunActionNotAllowedError(run_id=run_id)
