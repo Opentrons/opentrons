@@ -68,4 +68,22 @@ class DeletionPlanner:  # noqa: D101
 
         Arguments are the same as for`plan_deletions_for_new_protocol()`.
         """
-        raise NotImplementedError()
+        runs_upper_limit = maximum_runs - 1
+        if runs_upper_limit < 0:
+            runs_upper_limit = 0
+
+        if len(existing_runs) > runs_upper_limit:
+            num_runs_to_delete = len(existing_runs) - runs_upper_limit
+
+            # Prefer to delete oldest runs first.
+            runs_to_delete = existing_runs[0:num_runs_to_delete]
+
+            return DeletionPlan(
+                runs_to_delete=set(r.run_id for r in runs_to_delete),
+                protocols_to_delete=set()
+            )
+
+        return DeletionPlan(
+            runs_to_delete=set(),
+            protocols_to_delete=set()
+        )
