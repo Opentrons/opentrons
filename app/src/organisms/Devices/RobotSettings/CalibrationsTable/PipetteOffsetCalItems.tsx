@@ -98,6 +98,7 @@ export function PipetteOffsetCalItems({
             <OverflowMenu
               calType="pipetteOffset"
               robotName={robotName}
+              serialNumber={calibration.serialNumber}
               mount={calibration.mount}
             />
           </Flex>

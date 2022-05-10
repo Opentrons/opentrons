@@ -88,6 +88,7 @@ export function TipLengthCalItems({
             <OverflowMenu
               calType="tipLength"
               robotName={robotName}
+              serialNumber={calibration.serialNumber}
               mount={calibration.mount}
             />
           </Flex>
