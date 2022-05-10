@@ -13,13 +13,16 @@ import {
   usePipetteOffsetCalibration,
 } from '../../hooks'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
+import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { PipetteCard } from '..'
+
 import {
   mockLeftSpecs,
   mockRightSpecs,
 } from '../../../../redux/pipettes/__fixtures__'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
+
+import type { DeckCalibrationInfo } from '../../../../redux/calibration/api-types'
 
 jest.mock('../PipetteOverflowMenu')
 jest.mock('../../../../redux/config')
@@ -58,6 +61,24 @@ const render = (props: React.ComponentProps<typeof PipetteCard>) => {
   })[0]
 }
 
+const mockBadDeckCal: DeckCalibrationInfo = {
+  type: 'affine',
+  matrix: [
+    [1.0, 0.0, 0.0, 0.0],
+    [0.0, 1.0, 0.0, 0.0],
+    [0.0, 0.0, 1.0, 0.0],
+    [0.0, 0.0, 0.0, 1.0],
+  ],
+  lastModified: 'September 15, 2021',
+  pipetteCalibratedWith: null,
+  tiprack: null,
+  source: 'user',
+  status: {
+    markedBad: true,
+    source: 'unknown',
+    markedAt: '',
+  },
+}
 const mockRobotName = 'mockRobotName'
 describe('PipetteCard', () => {
   let startWizard: any
@@ -123,6 +144,21 @@ describe('PipetteCard', () => {
     getByText('mock banner')
   })
   it('renders information for a right pipette with no pipette offset cal banner', () => {
+    const { getByText } = render({
+      pipetteInfo: mockRightSpecs,
+      mount: RIGHT,
+      robotName: mockRobotName,
+      pipetteId: 'id',
+    })
+    getByText('right Mount')
+    getByText('Right Pipette')
+    getByText('mock banner')
+  })
+  it('renders information for a right pipette with bad deck cal banner', () => {
+    when(mockUseDeckCalibrationData).calledWith(mockRobotName).mockReturnValue({
+      isDeckCalibrated: true,
+      deckCalibrationData: mockBadDeckCal,
+    })
     const { getByText } = render({
       pipetteInfo: mockRightSpecs,
       mount: RIGHT,

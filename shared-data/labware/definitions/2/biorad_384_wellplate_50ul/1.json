@@ -4312,7 +4312,7 @@
     }
   ],
   "parameters": {
-    "format": "irregular",
+    "format": "384Standard",
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,

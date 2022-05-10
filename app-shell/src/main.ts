@@ -4,7 +4,7 @@ import contextMenu from 'electron-context-menu'
 
 import { createUi } from './ui'
 import { initializeMenu } from './menu'
-import { initializePython } from './python'
+import { initializePython } from './protocol-analysis'
 import { createLogger } from './log'
 import { registerDiscovery } from './discovery'
 import { registerLabware } from './labware'
@@ -13,7 +13,13 @@ import { registerUpdate } from './update'
 import { registerBuildrootUpdate } from './buildroot'
 import { registerSystemInfo } from './system-info'
 import { registerProtocolStorage } from './protocol-storage'
-import { getConfig, getStore, getOverrides, registerConfig } from './config'
+import {
+  getConfig,
+  getStore,
+  getOverrides,
+  registerConfig,
+  registerPythonPath,
+} from './config'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
@@ -80,6 +86,7 @@ function startUp(): void {
     registerUpdate(dispatch),
     registerBuildrootUpdate(dispatch),
     registerLabware(dispatch, mainWindow),
+    registerPythonPath(),
     registerSystemInfo(dispatch),
     registerProtocolStorage(dispatch),
   ]
