@@ -2,20 +2,19 @@
 import logging
 
 from fastapi import APIRouter, Depends, status
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Union
 from typing_extensions import Literal
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
-from robot_server.service.task_runner import TaskRunner, get_task_runner
 
-from ..run_store import RunNotFoundError, RunStateResource
 from ..engine_store import EngineConflictError
+from ..run_store import RunNotFoundError
 from ..run_data_manager import RunDataManager
-from ..action_models import RunAction, RunActionType, RunActionCreate
-from ..dependencies import get_run_store, get_run_data_manager
+from ..action_models import RunAction, RunActionCreate
+from ..dependencies import get_run_data_manager
 from .base_router import RunNotFound, RunStopped
 
 log = logging.getLogger(__name__)
@@ -48,19 +47,15 @@ async def create_run_action(
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
-    task_runner: TaskRunner = Depends(get_task_runner),
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 
     Arguments:
         runId: Run ID pulled from the URL.
         request_body: Input payload from the request body.
-        run_store: Run storage interface.
-        engine_store: Protocol engine and runner storage.
+        run_data_manager: Run data management.
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
-        task_runner: Background task runner.
-        run_state_store: Protocol engine state storage interface.
     """
     action = RunAction(
         id=action_id,

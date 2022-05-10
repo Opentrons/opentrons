@@ -31,7 +31,7 @@ from robot_server.protocols import (
 )
 
 from ..run_store import RunNotFoundError
-from ..run_models import Run, RunSummary, RunCreate, RunUpdate
+from ..run_models import Run, RunCreate, RunUpdate
 from ..engine_store import EngineConflictError
 from ..run_data_manager import RunDataManager
 from ..dependencies import get_run_data_manager
@@ -159,7 +159,7 @@ async def create_run(
     summary="Get all runs",
     description="Get a list of all active and inactive runs.",
     responses={
-        status.HTTP_200_OK: {"model": MultiBody[RunSummary, AllRunsLinks]},
+        status.HTTP_200_OK: {"model": MultiBody[Run, AllRunsLinks]},
     },
 )
 async def get_runs(
@@ -171,7 +171,7 @@ async def get_runs(
         run_data_manager: Current and historical run data management.
     """
     data = run_data_manager.get_all()
-    current_run_id = run_data_manager.get_current_run_id()
+    current_run_id = run_data_manager.current_run_id
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     links = AllRunsLinks(
         current=ResourceLink.construct(href=f"/runs/{current_run_id}")

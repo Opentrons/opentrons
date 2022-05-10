@@ -2,14 +2,30 @@
 from datetime import datetime
 from typing import List, Optional
 
-from opentrons.protocol_engine import LabwareOffsetCreate
+from opentrons.protocol_engine import LabwareOffsetCreate, ProtocolRunData
 
 from robot_server.protocols import ProtocolResource
 from .engine_store import EngineStore
-from .run_store import RunStore
+from .run_store import RunResource, RunStore
 
 from .run_models import Run
-from .action_models import RunAction, RunActionType, RunActionCreate
+from .action_models import RunAction
+
+
+def _build_run(run_resource: RunResource, run_data: ProtocolRunData) -> Run:
+    return Run.construct(
+        id=run_resource.run_id,
+        protocolId=run_resource.protocol_id,
+        createdAt=run_resource.created_at,
+        current=run_resource.is_current,
+        actions=run_resource.actions,
+        status=run_data.status,
+        errors=run_data.errors,
+        labware=run_data.labware,
+        labwareOffsets=run_data.labwareOffsets,
+        pipettes=run_data.pipettes,
+    )
+
 
 class RunDataManager:
     """Collaborator to manage current and historical run data.
@@ -26,12 +42,17 @@ class RunDataManager:
         self._engine_store = engine_store
         self._run_store = run_store
 
+    @property
+    def current_run_id(self) -> Optional[str]:
+        """The identifier of the current run, if any."""
+        raise NotImplementedError("TODO, maybe?")
+
     async def create(
         self,
         run_id: str,
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
-        protocol: Optional[ProtocolResource] = None,
+        protocol: Optional[ProtocolResource],
     ) -> Run:
         """Create a new, current run.
 
@@ -47,11 +68,20 @@ class RunDataManager:
             EngineConflictError: There is a currently active run that cannot
                 be superceded by this new run.
         """
-        raise NotImplementedError("TODO")
-        # Create a row in the run table
-        # Create a current engine in the engine store
-        # Add labware offsets to current engine
-        # Stitch together run resource and run data into `Run` model`
+        # TODO(mc, 2022-05-10): fix race condition between
+        # await engine create and set current run ID
+        run_data = await self._engine_store.create(run_id)
+        run_resource = self._run_store.insert(
+            RunResource(
+                run_id=run_id,
+                created_at=created_at,
+                protocol_id=protocol.protocol_id if protocol is not None else None,
+                actions=[],
+                is_current=True,
+            )
+        )
+
+        return _build_run(run_resource, run_data)
 
     def get(self, run_id: str) -> Run:
         """Get a run resource.
@@ -68,7 +98,14 @@ class RunDataManager:
         Raises:
             RunNotFoundError: The given run identifier does not exist.
         """
-        raise NotImplementedError("TODO")
+        run_resource = self._run_store.get(run_id)
+
+        if run_id == self._engine_store.current_run_id:
+            run_data = self._engine_store.engine.state_view.get_protocol_run_data()
+        else:
+            run_data = self._run_store.get_run_data(run_id)
+
+        return _build_run(run_resource, run_data)
 
     def get_all(self) -> List[Run]:
         """Get current and stored run resources.
@@ -77,11 +114,6 @@ class RunDataManager:
             All run resources.
         """
         raise NotImplementedError("TODO")
-
-    def get_current_run_id(self) -> Optional[str]:
-        """Get the identifier of the current run, if any."""
-        raise NotImplementedError("TODO")
-        #  current_id = next((run.id for run in data if run.current is True), None)
 
     async def delete(self, run_id: str) -> None:
         """Delete a current or historical run.
@@ -96,7 +128,7 @@ class RunDataManager:
         """
         raise NotImplementedError("TODO")
         # await engine_store.clear()
-        # handle engine missing without propogating to client
+        # handle engine missing without propagating to client
         # run_store.remove(run_id=runId)
 
     async def get_or_archive(self, run_id: str, archive: bool) -> Run:
@@ -126,7 +158,7 @@ class RunDataManager:
         #         )
 
     def create_run_action(self, run_id: str, run_action: RunAction) -> None:
-        """"Create a run action.
+        """ "Create a run action.
 
         Arg:
             run_id: The run associated to the action.
@@ -162,7 +194,9 @@ class RunDataManager:
         #
         #             async def run_protocol_and_insert_result() -> None:
         #                 run_result = await engine_store.runner.run()
-        #                 engine_status = engine_store.engine.state_view.commands.get_status()
+        #                 engine_status = (
+        #                       engine_store.engine.state_view.commands.get_status()
+        #                 )
         #                 run_state_resource = RunStateResource(
         #                     run_id=runId,
         #                     state=run_result,
@@ -183,6 +217,8 @@ class RunDataManager:
         #         task_runner.run(engine_store.runner.stop)
         #
         # except ProtocolEngineStoppedError as e:
-        #     raise RunActionNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
+        #     raise RunActionNotAllowed(detail=str(e)).as_error(
+        #         status.HTTP_409_CONFLICT
+        #     )
         #
         # run_store.insert_action(run_id=runId, action=action)
