@@ -3,7 +3,7 @@ import pytest
 from decoy import Decoy
 
 from robot_server.service.task_runner import TaskRunner
-from robot_server.protocols.protocol_store import ProtocolStore
+from robot_server.protocols import ProtocolStore
 from robot_server.runs.run_store import RunStore
 from robot_server.runs.engine_store import EngineStore
 

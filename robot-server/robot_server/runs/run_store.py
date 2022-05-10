@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 import sqlalchemy
 
 from robot_server.persistence import run_table, action_table, ensure_utc_datetime
-from robot_server.protocols.protocol_store import ProtocolNotFoundError
+from robot_server.protocols import ProtocolNotFoundError
 
 from .action_models import RunAction, RunActionType
 
