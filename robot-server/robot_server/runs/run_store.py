@@ -2,8 +2,9 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
-from pydantic import parse_obj_as
+from pydantic import parse_obj_as, Field
 import sqlalchemy
+from sqlalchemy.orm.decl_api import _stateful_declared_attr
 
 from robot_server.persistence import run_table, action_table, ensure_utc_datetime
 from robot_server.protocols import ProtocolNotFoundError
@@ -41,7 +42,7 @@ class RunStateResource:
     # TODO (tz): initialize with factory default
     commands: Optional[List[Command]]
     engine_status: str
-    _updated_at: Optional[datetime]
+    _updated_at: datetime = Field(default_factory=datetime.now(tz=timezone.utc))
 
 
 class RunNotFoundError(ValueError):
@@ -60,7 +61,7 @@ class RunStore:
         self._sql_engine = sql_engine
         self._active_run: Optional[str] = None
 
-    def update_run_state(self, state: RunStateResource) -> RunStateResource:
+    def update_run_state(self, run_id: str, run_data: ProtocolRunData, commands: List[Command]) -> None:
         """Update run table with run state to db.
 
         Arguments:
@@ -71,15 +72,13 @@ class RunStore:
         """
         statement = (
             sqlalchemy.update(run_table)
-            .where(run_table.c.id == state.run_id)
-            .values(_convert_state_to_sql_values(state=state))
-        )
+            .where(run_table.c.id == run_id)
+            .values(_convert_state_to_sql_values(state=RunStateResource(commands=commands, state=run_data))
+        ))
         with self._sql_engine.begin() as transaction:
             result = transaction.execute(statement)
             if result.rowcount == 0:
-                raise RunNotFoundError(run_id=state.run_id)
-
-        return state
+                raise RunNotFoundError(run_id=run_id)
 
     def get_run_state(self, run_id: str) -> RunStateResource:
         """Get engine state from db.
@@ -345,9 +344,6 @@ def _convert_state_to_sql_values(state: RunStateResource) -> Dict[str, object]:
     return {
         "state": state.state.dict(),
         "engine_status": state.engine_status,
-        "_updated_at": ensure_utc_datetime(
-            state._updated_at
-            if state._updated_at is not None
-            else datetime.now(tz=timezone.utc)
-        ),
+        "commands": state.commands,
+        "_updated_at": ensure_utc_datetime(state._updated_at),
     }
