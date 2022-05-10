@@ -52,7 +52,7 @@ import {
   useUnmatchedModulesForProtocol,
   useAttachedModules,
 } from '../../hooks'
-import { useHeaterShakerFromProtocol } from '../../ModuleCard/hooks'
+import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
 import { formatTimestamp } from '../../utils'
 import { ProtocolRunHeader } from '../ProtocolRunHeader'
@@ -130,8 +130,8 @@ const mockConfirmCancelModal = ConfirmCancelModal as jest.MockedFunction<
 const mockMockHeaterShakerIsRunningModal = HeaterShakerIsRunningModal as jest.MockedFunction<
   typeof HeaterShakerIsRunningModal
 >
-const mockUseHeaterShakerFromProtocol = useHeaterShakerFromProtocol as jest.MockedFunction<
-  typeof useHeaterShakerFromProtocol
+const mockUseIsHeaterShakerInProtocol = useIsHeaterShakerInProtocol as jest.MockedFunction<
+  typeof useIsHeaterShakerInProtocol
 >
 const mockConfirmAttachmentModal = ConfirmAttachmentModal as jest.MockedFunction<
   typeof ConfirmAttachmentModal
@@ -219,7 +219,7 @@ describe('ProtocolRunHeader', () => {
     mockConfirmAttachmentModal.mockReturnValue(
       <div>mock confirm attachment modal</div>
     )
-    mockUseHeaterShakerFromProtocol.mockReturnValue(null)
+    mockUseIsHeaterShakerInProtocol.mockReturnValue(false)
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID)
     when(mockUseCloseCurrentRun).calledWith().mockReturnValue({
       isClosingCurrentRun: false,
@@ -557,9 +557,7 @@ describe('ProtocolRunHeader', () => {
 
   it('renders the confirm attachment modal when there is a heater shaker in the protocol and the heater shaker is idle status', () => {
     mockUseAttachedModules.mockReturnValue([mockHeaterShaker])
-    mockUseHeaterShakerFromProtocol.mockReturnValue(
-      HEATER_SHAKER_PROTOCOL_MODULE_INFO
-    )
+    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
     const [{ getByText, getByRole }] = render()
 
     const button = getByRole('button', { name: 'Start run' })
@@ -567,12 +565,10 @@ describe('ProtocolRunHeader', () => {
     getByText('mock confirm attachment modal')
   })
 
-  it('does not render confirm attachment modal when there is a heater shaker in the protocol and the heater shaker is idle status', () => {
+  it('does NOT render confirm attachment modal when the user already confirmed the heater shaker is attached', () => {
     mockGetIsHeaterShakerAttached.mockReturnValue(true)
     mockUseAttachedModules.mockReturnValue([mockHeaterShaker])
-    mockUseHeaterShakerFromProtocol.mockReturnValue(
-      HEATER_SHAKER_PROTOCOL_MODULE_INFO
-    )
+    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Start run' })
     fireEvent.click(button)

@@ -2,19 +2,7 @@ import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../../i18n'
-import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
-import { useHeaterShakerFromProtocol } from '../hooks'
 import { ConfirmAttachmentModal } from '../ConfirmAttachmentModal'
-
-import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
-
-import type { ProtocolModuleInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
-
-jest.mock('../hooks')
-
-const mockUseHeaterShakerFromProtocol = useHeaterShakerFromProtocol as jest.MockedFunction<
-  typeof useHeaterShakerFromProtocol
->
 
 const render = (props: React.ComponentProps<typeof ConfirmAttachmentModal>) => {
   return renderWithProviders(<ConfirmAttachmentModal {...props} />, {
@@ -22,18 +10,6 @@ const render = (props: React.ComponentProps<typeof ConfirmAttachmentModal>) => {
   })[0]
 }
 
-const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
-  moduleId: 'heater_shaker_id',
-  x: 0,
-  y: 0,
-  z: 0,
-  moduleDef: mockHeaterShaker as any,
-  nestedLabwareDef: heaterShakerCommands.labwareDefinitions['example/plate/1'],
-  nestedLabwareDisplayName: null,
-  nestedLabwareId: null,
-  protocolLoadOrder: 1,
-  slotName: '1',
-} as ProtocolModuleInfo
 
 describe('ConfirmAttachmentBanner', () => {
   let props: React.ComponentProps<typeof ConfirmAttachmentModal>
@@ -44,9 +20,6 @@ describe('ConfirmAttachmentBanner', () => {
       isProceedToRunModal: false,
       onCloseClick: jest.fn(),
     }
-    mockUseHeaterShakerFromProtocol.mockReturnValue(
-      HEATER_SHAKER_PROTOCOL_MODULE_INFO
-    )
   })
   afterEach(() => {
     jest.restoreAllMocks()
@@ -80,7 +53,7 @@ describe('ConfirmAttachmentBanner', () => {
     const { getByText, getByRole } = render(props)
 
     getByText(
-      'Before the run begins, module should have both anchors fully extended for a firm attachment to Slot 1.'
+      'Before the run begins, module should have both anchors fully extended for a firm attachment to the deck.'
     )
     getByText('The thermal adapter should be attached to the module.')
     const btn = getByRole('button', { name: 'Proceed to run' })
