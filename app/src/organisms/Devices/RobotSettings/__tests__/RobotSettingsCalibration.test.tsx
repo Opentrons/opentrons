@@ -7,6 +7,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { DeckCalibrationModal } from '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { useTrackEvent } from '../../../../redux/analytics'
+import * as RobotSelectors from '../../../../redux/robot/selectors'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import {
   mockPipetteOffsetCalibration1,
@@ -18,14 +19,21 @@ import {
   mockTipLengthCalibration2,
   mockTipLengthCalibration3,
 } from '../../../../redux/calibration/tip-length/__fixtures__'
-import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+import {
+  mockConnectableRobot,
+  mockUnreachableRobot,
+} from '../../../../redux/discovery/__fixtures__'
+import { mockAttachedPipette } from '../../../../redux/pipettes/__fixtures__'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
+  useAttachedPipettes,
 } from '../../hooks'
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
+
+import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
 
 jest.mock('file-saver')
 
@@ -34,16 +42,13 @@ jest.mock(
 )
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
-jest.mock('../../../../redux/robot')
+jest.mock('../../../../redux/robot/selectors')
 jest.mock('../../hooks')
-jest.mock('../../../../organisms/ProtocolUpload/hooks')
-jest.mock('@opentrons/components', () => {
-  const actualComponents = jest.requireActual('@opentrons/components')
-  return {
-    ...actualComponents,
-    Tooltip: jest.fn(({ children }) => <div>{children}</div>),
-  }
-})
+
+const mockAttachedPipettes: AttachedPipettesByMount = {
+  left: mockAttachedPipette,
+  right: mockAttachedPipette,
+} as any
 
 const mockDeckCalibrationModal = DeckCalibrationModal as jest.MockedFunction<
   typeof DeckCalibrationModal
@@ -60,6 +65,13 @@ const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunc
 >
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
+>
+const mockGetIsRunning = RobotSelectors.getIsRunning as jest.MockedFunction<
+  typeof RobotSelectors.getIsRunning
+>
+
+const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
+  typeof useAttachedPipettes
 >
 
 let mockTrackEvent: jest.Mock
@@ -109,6 +121,7 @@ describe('RobotSettingsCalibration', () => {
       mockTipLengthCalibration2,
       mockTipLengthCalibration3,
     ])
+    mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -155,10 +168,24 @@ describe('RobotSettingsCalibration', () => {
     getByRole('button', { name: 'Check health' })
   })
 
-  it('Health check button is clickable', () => {
+  it('Health check button is disabled when a robot is unreachable', () => {
+    mockUseRobot.mockReturnValue(mockUnreachableRobot)
     const [{ getByRole }] = render()
-    const healthCheckButton = getByRole('button', { name: 'Check health' })
-    // fireEvent.click(healthCheckButton)
-    expect(healthCheckButton).not.toBeDisabled()
+    const button = getByRole('button', { name: 'Check health' })
+    expect(button).toBeDisabled()
+  })
+
+  it('Health check button is disabled when a robot is running', () => {
+    mockGetIsRunning.mockReturnValue(true)
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Check health' })
+    expect(button).toBeDisabled()
+  })
+
+  it('Health check button is disabled when pipette are not set', () => {
+    mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Check health' })
+    expect(button).toBeDisabled()
   })
 })
