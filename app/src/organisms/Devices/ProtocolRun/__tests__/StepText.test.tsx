@@ -6,7 +6,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { i18n } from '../../../../i18n'
-import { getLabwareLocation } from '../../../../organisms/Devices/ProtocolRun/utils/getLabwareLocation'
+import { getLabwareLocation } from '../../ProtocolRun/utils/getLabwareLocation'
 import {
   useLabwareRenderInfoForRunById,
   useProtocolDetailsForRun,
@@ -17,7 +17,7 @@ import { StepText } from '../StepText'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 
 jest.mock('@opentrons/shared-data/js/helpers')
-jest.mock('../../../../organisms/Devices/ProtocolRun/utils/getLabwareLocation')
+jest.mock('../../ProtocolRun/utils/getLabwareLocation')
 jest.mock('../../hooks')
 jest.mock('./../RunLogProtocolSetupInfo')
 

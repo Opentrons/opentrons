@@ -8,7 +8,7 @@ import {
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
-import { getLabwareLocation } from '../../../organisms/Devices/ProtocolRun/utils/getLabwareLocation'
+import { getLabwareLocation } from '../ProtocolRun/utils/getLabwareLocation'
 import {
   useLabwareRenderInfoForRunById,
   useProtocolDetailsForRun,
