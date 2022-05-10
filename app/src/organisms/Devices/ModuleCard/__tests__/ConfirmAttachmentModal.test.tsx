@@ -10,7 +10,6 @@ const render = (props: React.ComponentProps<typeof ConfirmAttachmentModal>) => {
   })[0]
 }
 
-
 describe('ConfirmAttachmentBanner', () => {
   let props: React.ComponentProps<typeof ConfirmAttachmentModal>
 

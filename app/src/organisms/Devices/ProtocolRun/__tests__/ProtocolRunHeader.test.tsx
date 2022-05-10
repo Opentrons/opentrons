@@ -40,7 +40,6 @@ import {
   mockStopRequestedRun,
   mockSucceededRun,
 } from '../../../../organisms/RunTimeControl/__fixtures__'
-import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
@@ -61,7 +60,6 @@ import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
-import type { ProtocolModuleInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
 
 const mockPush = jest.fn()
 
