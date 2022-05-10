@@ -23,12 +23,9 @@ from robot_server.service.json_api import (
     PydanticResponse,
 )
 
-from robot_server.protocols import (
-    ProtocolStore,
-    ProtocolNotFound,
-    ProtocolNotFoundError,
-    get_protocol_store,
-)
+from robot_server.protocols.dependencies import get_protocol_store
+from robot_server.protocols.router import ProtocolNotFound
+from robot_server.protocols.protocol_store import ProtocolStore, ProtocolNotFoundError
 
 from ..run_store import RunStore, RunResource, RunNotFoundError
 from ..run_models import Run, RunSummary, RunCreate, RunUpdate

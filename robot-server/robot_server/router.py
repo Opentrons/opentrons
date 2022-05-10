@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, status
 from .constants import V1_TAG
 from .errors import LegacyErrorResponse
 from .health import health_router
-from .protocols import protocols_router
-from .runs import runs_router
+from .protocols.router import protocols_router
+from .runs.router import runs_router
 from .commands import commands_router
 from .modules import modules_router
 from .system import system_router
