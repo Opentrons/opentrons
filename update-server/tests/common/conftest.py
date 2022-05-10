@@ -3,10 +3,12 @@ import os
 import subprocess
 import re
 import zipfile
+from typing import Tuple
 from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
+from aiohttp.test_utils import TestClient
 
 from otupdate import buildroot, common
 
@@ -20,7 +22,9 @@ one_up = os.path.abspath(os.path.join(__file__, "../../"))
 
 
 @pytest.fixture(params=[openembedded, buildroot])
-async def test_cli(aiohttp_client, loop, otupdate_config, request):
+async def test_cli(
+    aiohttp_client, loop, otupdate_config, request
+) -> Tuple[TestClient, str]:
     """
     Build an app using dummy versions, then build a test client and return it
     """

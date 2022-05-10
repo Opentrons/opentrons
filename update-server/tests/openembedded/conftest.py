@@ -3,6 +3,7 @@ import os
 from unittest import mock
 from unittest.mock import MagicMock
 import pytest
+from aiohttp.test_utils import TestClient
 
 from otupdate import openembedded
 from otupdate.common.update_actions import Partition, UpdateActionsInterface
@@ -25,7 +26,7 @@ def mock_update_actions_interface(
 
 
 @pytest.fixture
-async def test_cli(aiohttp_client, loop, otupdate_config, monkeypatch):
+async def test_cli(aiohttp_client, loop, otupdate_config) -> TestClient:
     """
     Build an app using dummy versions, then build a test client and return it
     """
@@ -37,7 +38,7 @@ async def test_cli(aiohttp_client, loop, otupdate_config, monkeypatch):
         loop=loop,
     )
     client = await loop.create_task(aiohttp_client(app))
-    return client, app
+    return client
 
 
 def mock_root_fs_interface_() -> MagicMock:
