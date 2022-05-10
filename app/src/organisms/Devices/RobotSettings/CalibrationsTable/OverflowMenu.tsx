@@ -73,6 +73,9 @@ export function OverflowMenu({
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
   // const dispatch = useDispatch<Dispatch>()
 
+  console.log(pipetteOffsetCalibrations)
+  console.log(tipLengthCalibrations)
+
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
   const [
     calBlockModalState,
@@ -122,6 +125,7 @@ export function OverflowMenu({
     e: React.MouseEvent
   ): void => {
     e.preventDefault()
+    setShowOverflowMenu(!showOverflowMenu)
     if (calType === 'pipetteOffset') {
       console.log('recalibrate pipetteOffset')
       if (checkPipetteCalibrations != null) {
@@ -134,7 +138,6 @@ export function OverflowMenu({
     } else {
       startPipetteOffsetPossibleTLC({ keepTipLength: false })
     }
-    setShowOverflowMenu(!showOverflowMenu)
   }
 
   const handleDownload = (
@@ -149,20 +152,12 @@ export function OverflowMenu({
 
     if (calType === 'pipetteOffset') {
       saveAs(
-        new Blob([
-          JSON.stringify({
-            pipetteOffset: pipetteOffsetCalibrations,
-          }),
-        ]),
+        new Blob([JSON.stringify(pipetteOffsetCalibrations)]),
         `opentrons-${robotName}-pipette-offset-calibration.json`
       )
     } else if (calType === 'tipLength') {
       saveAs(
-        new Blob([
-          JSON.stringify({
-            tipLength: tipLengthCalibrations,
-          }),
-        ]),
+        new Blob([JSON.stringify(tipLengthCalibrations)]),
         `opentrons-${robotName}-tip-length-calibration.json`
       )
     }
