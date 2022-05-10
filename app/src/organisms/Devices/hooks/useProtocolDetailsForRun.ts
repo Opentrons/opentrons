@@ -23,9 +23,13 @@ export function useProtocolDetailsForRun(
     true
   )
 
-  const { data: protocolRecord } = useProtocolQuery(protocolId, {
-    staleTime: Infinity,
-  })
+  const { data: protocolRecord } = useProtocolQuery(
+    protocolId,
+    {
+      staleTime: Infinity,
+    },
+    isPollingProtocol
+  )
 
   const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
     staleTime: Infinity,
