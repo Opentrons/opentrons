@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { saveAs } from 'file-saver'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, waitFor } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -188,5 +189,17 @@ describe('RobotSettingsCalibration', () => {
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Check health' })
     expect(button).toBeDisabled()
+  })
+
+  it('Health check button shows Tooltip when pipette are not set', async () => {
+    mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
+    const [{ getByRole, findByText }] = render()
+    const button = getByRole('button', { name: 'Check health' })
+    fireEvent.mouseMove(button)
+    await waitFor(() => {
+      findByText(
+        'Fully calibrate your robot before checking calibration health'
+      )
+    })
   })
 })
