@@ -17,7 +17,7 @@ interface ModuleIconProps {
 }
 
 export function ModuleIcon(props: ModuleIconProps): JSX.Element {
-  const { module, index, tooltipText } = props
+  const { module, tooltipText } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   return (
