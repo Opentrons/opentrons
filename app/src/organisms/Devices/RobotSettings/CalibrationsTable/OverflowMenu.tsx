@@ -9,12 +9,13 @@ import {
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
+  Mount,
 } from '@opentrons/components'
+
 import { OverflowBtn } from '../../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../../atoms/MenuList/MenuItem'
 import { AskForCalibrationBlockModal } from '../../../CalibrateTipLength/AskForCalibrationBlockModal'
 import { Portal } from '../../../../App/portal'
-// import { Divider } from '../../../../atoms/structure'
 import {
   INTENT_RECALIBRATE_PIPETTE_OFFSET,
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
@@ -28,12 +29,7 @@ import {
 } from '../../hooks'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
 
-// import type { State } from '../../../../redux/types'
-import type {
-  PipetteOffsetCalibration,
-  TipLengthCalibration,
-} from '../../../../redux/calibration/types'
-import type { Mount } from '../../../../redux/pipettes/types'
+import type { PipetteOffsetCalibration } from '../../../../redux/calibration/types'
 
 const CAL_BLOCK_MODAL_CLOSED: 'cal_block_modal_closed' =
   'cal_block_modal_closed'
@@ -52,13 +48,13 @@ interface OverflowMenuProps {
   robotName: string
   // pipetteOffsetCalibration?: PipetteOffsetCalibration
   // tipLengthCalibration?: TipLengthCalibration
+  // serialNumber: string | null
   mount: Mount
 }
 
 export function OverflowMenu({
   calType,
   robotName,
-  // pipetteOffsetCalibration,
   mount,
 }: OverflowMenuProps): JSX.Element {
   const { t } = useTranslation('device_settings')
@@ -68,14 +64,8 @@ export function OverflowMenu({
     startPipetteOffsetCalibration,
     PipetteOffsetCalibrationWizard,
   ] = useCalibratePipetteOffset(robotName, { mount })
-
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robotName)
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
-  // const dispatch = useDispatch<Dispatch>()
-
-  console.log(pipetteOffsetCalibrations)
-  console.log(tipLengthCalibrations)
-
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
   const [
     calBlockModalState,
@@ -86,6 +76,7 @@ export function OverflowMenu({
     hasBlockModalResponse?: boolean | null
   }
   const startPipetteOffsetPossibleTLC = (options: StartWizardOptions): void => {
+    console.log('called by tip length calibration')
     const { keepTipLength, hasBlockModalResponse } = options
     if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
       setCalBlockModalState(
@@ -127,7 +118,6 @@ export function OverflowMenu({
     e.preventDefault()
     setShowOverflowMenu(!showOverflowMenu)
     if (calType === 'pipetteOffset') {
-      console.log('recalibrate pipetteOffset')
       if (checkPipetteCalibrations != null) {
         startPipetteOffsetCalibration({
           withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
@@ -175,9 +165,9 @@ export function OverflowMenu({
   // ): void => {
   //   // method del
   //   // endpoint calibration/pipette_offset
-  //   // pipet_id and mount
+  //   // params pipet_id and mount
   //   // endpoint calibration/tip_length
-  //   // tiprack hash and pipette_id
+  //   // params tiprack_hash and pipette_id
   //   setShowOverflowMenu(!showOverflowMenu)
   // }
 
@@ -198,7 +188,9 @@ export function OverflowMenu({
         >
           <MenuItem onClick={e => handleCalibration(calType, e)}>
             {calType === 'pipetteOffset'
-              ? t('overflow_menu_recalibrate_pipette')
+              ? checkPipetteCalibrations != null
+                ? t('overflow_menu_recalibrate_pipette')
+                : t('overflow_menu_calibrate_pipette')
               : t('overflow_menu_recalibrate_tip_and_pipette')}
           </MenuItem>
           <MenuItem onClick={e => handleDownload(calType, e)}>
@@ -211,6 +203,7 @@ export function OverflowMenu({
           </MenuItem> */}
         </Flex>
       ) : null}
+      {PipetteOffsetCalibrationWizard}
       {calBlockModalState !== CAL_BLOCK_MODAL_CLOSED ? (
         <Portal level="top">
           <AskForCalibrationBlockModal
@@ -221,7 +214,7 @@ export function OverflowMenu({
                   calBlockModalState === CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC,
               })
             }}
-            titleBarTitle="pipette offset calibration"
+            titleBarTitle={t('pipette_offset_calibration')}
             closePrompt={() => setCalBlockModalState(CAL_BLOCK_MODAL_CLOSED)}
           />
         </Portal>
