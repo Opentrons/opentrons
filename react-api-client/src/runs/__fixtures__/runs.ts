@@ -2,9 +2,8 @@ import {
   RUN_ACTION_TYPE_PLAY,
   RUN_ACTION_TYPE_PAUSE,
   Run,
-  RunSummaries,
+  Runs,
   RunData,
-  RunSummaryData,
 } from '@opentrons/api-client'
 
 export const PROTOCOL_ID = '1'
@@ -66,23 +65,7 @@ export const mockRunResponse: Run = {
   data: mockRunningRun,
 }
 
-export const mockPausedRunSummary: RunSummaryData = {
-  id: mockPausedRun.id,
-  createdAt: mockPausedRun.createdAt,
-  status: mockPausedRun.status,
-  current: mockPausedRun.current,
-  protocolId: mockPausedRun.protocolId,
-}
-
-export const mockRunningRunSummary: RunSummaryData = {
-  id: mockRunningRun.id,
-  createdAt: mockRunningRun.createdAt,
-  status: mockRunningRun.status,
-  current: mockRunningRun.current,
-  protocolId: mockRunningRun.protocolId,
-}
-
-export const mockRunsResponse: RunSummaries = {
-  data: [mockRunningRunSummary, mockPausedRunSummary],
+export const mockRunsResponse: Runs = {
+  data: [mockRunningRun, mockPausedRun],
   links: { current: { href: 'runs/1' } },
 }

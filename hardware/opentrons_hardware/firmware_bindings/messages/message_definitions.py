@@ -94,8 +94,8 @@ class SetupRequest(EmptyPayloadMessage):  # noqa: D101
 
 @dataclass
 class WriteToEEPromRequest:  # noqa: D101
-    payload: payloads.EEProDataPayload
-    payload_type: Type[BinarySerializable] = payloads.EEProDataPayload
+    payload: payloads.EEPromDataPayload
+    payload_type: Type[BinarySerializable] = payloads.EEPromDataPayload
     message_id: Literal[MessageId.write_eeprom] = MessageId.write_eeprom
 
 
@@ -108,8 +108,8 @@ class ReadFromEEPromRequest:  # noqa: D101
 
 @dataclass
 class ReadFromEEPromResponse:  # noqa: D101
-    payload: payloads.EEProDataPayload
-    payload_type: Type[BinarySerializable] = payloads.EEProDataPayload
+    payload: payloads.EEPromDataPayload
+    payload_type: Type[BinarySerializable] = payloads.EEPromDataPayload
     message_id: Literal[MessageId.read_eeprom_response] = MessageId.read_eeprom_response
 
 
