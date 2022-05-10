@@ -181,8 +181,6 @@ export function RobotSettingsCalibration({
   let buttonDisabledReason = null
   if (notConnectable) {
     buttonDisabledReason = t('shared:disabled_cannot_connect')
-  } else if (!robot.connected) {
-    buttonDisabledReason = t('shared:disabled_connect_to_robot')
   } else if (isRunning) {
     buttonDisabledReason = t('shared:disabled_protocol_is_running')
   } else if (!pipettePresent) {

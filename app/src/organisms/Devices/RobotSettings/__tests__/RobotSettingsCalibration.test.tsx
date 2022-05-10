@@ -7,6 +7,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { DeckCalibrationModal } from '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { useTrackEvent } from '../../../../redux/analytics'
+import * as RobotSelectors from '../../../../redux/robot/selectors'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import {
   mockPipetteOffsetCalibration1,
@@ -18,15 +19,22 @@ import {
   mockTipLengthCalibration2,
   mockTipLengthCalibration3,
 } from '../../../../redux/calibration/tip-length/__fixtures__'
-import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+import {
+  mockConnectableRobot,
+  mockUnreachableRobot,
+} from '../../../../redux/discovery/__fixtures__'
+import { mockAttachedPipette } from '../../../../redux/pipettes/__fixtures__'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
+  useAttachedPipettes,
 } from '../../hooks'
 
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
+
+import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
 
 jest.mock('file-saver')
 
@@ -34,12 +42,17 @@ jest.mock(
   '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 )
 jest.mock('../../../../redux/analytics')
-jest.mock('../../../../redux/sessions/selectors')
 jest.mock('../../../../redux/config')
-jest.mock('../../../../redux/robot')
+jest.mock('../../../../redux/robot/selectors')
+jest.mock('../../../../redux/sessions/selectors')
 jest.mock('../../../../redux/robot-api/selectors')
 jest.mock('../../../../redux/calibration')
 jest.mock('../../hooks')
+
+const mockAttachedPipettes: AttachedPipettesByMount = {
+  left: mockAttachedPipette,
+  right: mockAttachedPipette,
+} as any
 
 const mockDeckCalibrationModal = DeckCalibrationModal as jest.MockedFunction<
   typeof DeckCalibrationModal
@@ -56,6 +69,12 @@ const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunc
 >
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
+>
+const mockGetIsRunning = RobotSelectors.getIsRunning as jest.MockedFunction<
+  typeof RobotSelectors.getIsRunning
+>
+const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
+  typeof useAttachedPipettes
 >
 
 let mockTrackEvent: jest.Mock
@@ -105,6 +124,7 @@ describe('RobotSettingsCalibration', () => {
       mockTipLengthCalibration2,
       mockTipLengthCalibration3,
     ])
+    mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -166,5 +186,59 @@ describe('RobotSettingsCalibration', () => {
     const [{ getByRole, getByText }] = render()
     getByText('Deck Calibration missing')
     getByRole('button', { name: 'Calibrate now' })
+  })
+
+  it('recalibration button is disabled when a robot is unreachable', () => {
+    mockUseRobot.mockReturnValue(mockUnreachableRobot)
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Recalibrate deck' })
+    expect(button).toBeDisabled()
+  })
+
+  it('recalibration button is disabled when a robot is running', () => {
+    mockGetIsRunning.mockReturnValue(true)
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Recalibrate deck' })
+    expect(button).toBeDisabled()
+  })
+
+  it('recalibration button is disabled when a robot pipettes are null', () => {
+    mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Recalibrate deck' })
+    expect(button).toBeDisabled()
+  })
+
+  it('calibration button is disabled when a robot is unreachable', () => {
+    mockUseRobot.mockReturnValue(mockUnreachableRobot)
+    mockUseDeckCalibrationData.mockReturnValue({
+      deckCalibrationData: null,
+      isDeckCalibrated: false,
+    })
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Calibrate deck' })
+    expect(button).toBeDisabled()
+  })
+
+  it('calibration button is disabled when a robot is running', () => {
+    mockGetIsRunning.mockReturnValue(true)
+    mockUseDeckCalibrationData.mockReturnValue({
+      deckCalibrationData: null,
+      isDeckCalibrated: false,
+    })
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Calibrate deck' })
+    expect(button).toBeDisabled()
+  })
+
+  it('calibration button is disabled when a robot pipettes are null', () => {
+    mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
+    mockUseDeckCalibrationData.mockReturnValue({
+      deckCalibrationData: null,
+      isDeckCalibrated: false,
+    })
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Calibrate deck' })
+    expect(button).toBeDisabled()
   })
 })
