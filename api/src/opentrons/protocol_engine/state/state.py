@@ -83,11 +83,11 @@ class StateView(HasState[State]):
     def get_protocol_run_data(self) -> ProtocolRunData:
         """Get protocol run data."""
         return ProtocolRunData(
+            status=self.commands.get_status(),
             errors=self._commands.get_all_errors(),
             pipettes=self._pipettes.get_all(),
             labware=self._labware.get_all(),
             labwareOffsets=self._labware.get_labware_offsets(),
-            commands=self.commands.get_all(),
             modules=self.modules.get_all(),
         )
 

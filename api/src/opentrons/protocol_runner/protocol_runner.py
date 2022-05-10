@@ -1,5 +1,6 @@
 """Protocol run control and management."""
-from typing import Optional, cast
+from enum import Enum
+from typing import List, NamedTuple, Optional, cast
 
 from opentrons.hardware_control import HardwareControlAPI, ThreadManagedHardware
 from opentrons.protocol_reader import (
@@ -7,7 +8,7 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
     JsonProtocolConfig,
 )
-from opentrons.protocol_engine import ProtocolEngine, ProtocolRunData
+from opentrons.protocol_engine import ProtocolEngine, ProtocolRunData, Command
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
@@ -24,6 +25,16 @@ from .legacy_wrappers import (
     LegacyContextCreator,
     LegacyExecutor,
 )
+
+
+class PlayType(str, Enum):
+    START = "start"
+    RESUME = "resume"
+
+
+class ProtocolRunResult(NamedTuple):
+    commands: List[Command]
+    data: ProtocolRunData
 
 
 # TODO(mc, 2022-01-11): this class has become bloated. Split into an abstract

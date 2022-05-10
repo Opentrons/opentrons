@@ -10,12 +10,6 @@ from robot_server.runs.run_data_manager import RunDataManager
 
 
 @pytest.fixture()
-def mock_task_runner(decoy: Decoy) -> TaskRunner:
-    """Get a mock background TaskRunner."""
-    return decoy.mock(cls=TaskRunner)
-
-
-@pytest.fixture()
 def mock_protocol_store(decoy: Decoy) -> ProtocolStore:
     """Get a mock ProtocolStore interface."""
     return decoy.mock(cls=ProtocolStore)

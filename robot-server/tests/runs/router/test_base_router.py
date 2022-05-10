@@ -4,7 +4,8 @@ from datetime import datetime
 from decoy import Decoy
 from pathlib import Path
 
-from opentrons.protocol_engine import types as pe_types
+from opentrons.types import DeckSlotName
+from opentrons.protocol_engine import LabwareOffsetCreate, types as pe_types
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
 from robot_server.errors import ApiError
@@ -34,6 +35,16 @@ from robot_server.runs.router.base_router import (
     remove_run,
     update_run,
 )
+
+
+@pytest.fixture
+def labware_offset_create() -> LabwareOffsetCreate:
+    """Get a labware offset create request value object."""
+    return pe_types.LabwareOffsetCreate(
+        definitionUri="namespace_1/load_name_1/123",
+        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
+    )
 
 
 async def test_create_run(

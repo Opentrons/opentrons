@@ -1,8 +1,13 @@
 """In-memory storage of ProtocolEngine instances."""
-from typing import Dict, NamedTuple, Optional
+from typing import Any, Dict, NamedTuple, Optional
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine import ProtocolEngine, StateView, create_protocol_engine, ProtocolRunData
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    StateView,
+    create_protocol_engine,
+    ProtocolRunData,
+)
 from opentrons.protocol_runner import ProtocolRunner
 
 
@@ -70,8 +75,9 @@ class EngineStore:
 
         return self._runner_engine_pair.runner
 
+    # TODO(mc, 2022-05-10): bug in decoy, fix and type as str
     @property
-    def current_run_id(self) -> str:
+    def current_run_id(self) -> Any:
         """Get the run identifier associated with the current engine/runner pair."""
         raise NotImplementedError()
 

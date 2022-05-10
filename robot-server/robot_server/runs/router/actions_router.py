@@ -64,15 +64,24 @@ async def create_run_action(
     )
 
     try:
-        run_data_manager.create_action(run_id=runId, run_action=action)
+        action = run_data_manager.create_action(
+            run_id=runId,
+            action_id=action_id,
+            action_type=request_body.data.actionType,
+            created_at=created_at,
+        )
+
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+
     except RunStoppedError:
         raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
             status.HTTP_409_CONFLICT
         )
+
     except RunActionNotAllowedError as e:
         raise RunActionNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
+
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=action),
         status_code=status.HTTP_201_CREATED,
