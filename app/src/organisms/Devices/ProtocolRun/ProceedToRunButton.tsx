@@ -2,9 +2,10 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
-import { Tooltip, useHoverTooltip } from '@opentrons/components'
+import { useHoverTooltip } from '@opentrons/components'
 
 import { PrimaryButton } from '../../../atoms/Buttons'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { useTrackEvent } from '../../../redux/analytics'
 import {
   useUnmatchedModulesForProtocol,
@@ -71,7 +72,9 @@ export function ProceedToRunButton({
         {t('proceed_to_run')}
       </PrimaryButton>
       {proceedToRunDisabledReason != null && (
-        <Tooltip {...tooltipProps}>{proceedToRunDisabledReason}</Tooltip>
+        <Tooltip tooltipProps={tooltipProps}>
+          {proceedToRunDisabledReason}
+        </Tooltip>
       )}
     </Link>
   )

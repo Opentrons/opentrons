@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
-  Tooltip,
   useHoverTooltip,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -11,6 +10,7 @@ import {
 } from '@opentrons/components'
 
 import { PrimaryButton } from '../../../atoms/Buttons'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { useTrackEvent } from '../../../redux/analytics'
 import { useDeckCalibrationData, useRunHasStarted } from '../hooks'
 import { SetupDeckCalibration } from './SetupDeckCalibration'
@@ -84,7 +84,7 @@ export function SetupRobotCalibration({
         {t(nextStepButtonKey)}
       </PrimaryButton>
       {tooltipText != null ? (
-        <Tooltip {...tooltipProps}>{tooltipText}</Tooltip>
+        <Tooltip tooltipProps={tooltipProps}>{tooltipText}</Tooltip>
       ) : null}
     </Flex>
   )

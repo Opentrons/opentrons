@@ -12,7 +12,6 @@ import {
   Link,
   Module,
   RobotWorkSpace,
-  Tooltip,
   useHoverTooltip,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -21,7 +20,6 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
-  SIZE_5,
   TEXT_TRANSFORM_CAPITALIZE,
   TOOLTIP_LEFT,
   COLORS,
@@ -35,6 +33,7 @@ import {
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 
 import { SecondaryButton } from '../../../atoms/Buttons'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { StyledText } from '../../../atoms/text'
 import { useLPCSuccessToast } from '../../../organisms/ProtocolSetup/hooks'
 import { LabwarePositionCheck } from '../../../organisms/LabwarePositionCheck'
@@ -342,7 +341,7 @@ export function SetupLabware({
                     {t('run_labware_position_check')}
                   </SecondaryButton>
                   {lpcDisabledReason !== null ? (
-                    <Tooltip maxWidth={SIZE_5} {...tooltipProps}>
+                    <Tooltip tooltipProps={tooltipProps}>
                       {lpcDisabledReason}
                     </Tooltip>
                   ) : null}
