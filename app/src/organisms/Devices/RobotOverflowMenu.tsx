@@ -73,7 +73,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
         >
           {t('run_protocol')}
         </MenuItem>
-        <Divider marginY={null} />
+        <Divider marginY={'0'} />
         <MenuItem
           to={`/devices/${robot.name}/robot-settings`}
           as={Link}

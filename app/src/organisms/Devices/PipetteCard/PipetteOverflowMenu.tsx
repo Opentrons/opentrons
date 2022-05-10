@@ -86,7 +86,7 @@ export const PipetteOverflowMenu = (
             >
               {t('about_pipette')}
             </MenuItem>
-            <Divider marginY={null} />
+            <Divider marginY={'0'} />
             <MenuItem
               key={`${pipetteName}_${mount}_view_settings`}
               onClick={() => handleSettingsSlideout()}

@@ -4,9 +4,6 @@ import * as Types from './types'
 export const OPEN_PYTHON_DIRECTORY: 'python:OPEN_PYTHON_DIRECTORY' =
   'python:OPEN_PYTHON_DIRECTORY'
 
-export const CHANGE_PYTHON_DIRECTORY: 'python:CHANGE_PYTHON_DIRECTORY' =
-  'python:CHANGE_PYTHON_DIRECTORY'
-
 // request a config value update
 export const updateConfigValue = (
   path: string,

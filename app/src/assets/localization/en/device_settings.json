@@ -101,6 +101,5 @@
   "software_update_modal_issue_tracker_link": "View Opentrons issue tracker",
   "software_update_modal_release_notes_link": "View full Opentrons release notes",
   "software_update_modal_remind_me_later_button": "Remind me later",
-  "software_update_modal_update_button": "Update robot now",
-  "fully_calibrate_before_checking_health": "Fully calibrate your robot before checking calibration health"
+  "software_update_modal_update_button": "Update robot now"
 }
