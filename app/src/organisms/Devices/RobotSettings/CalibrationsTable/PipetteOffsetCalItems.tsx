@@ -31,7 +31,7 @@ export function PipetteOffsetCalItems({
   robotName,
   formattedPipetteOffsetCalibrations,
 }: PipetteOffsetCalItemsProps): JSX.Element {
-  const { t } = useTranslation()
+  const { t } = useTranslation('device_settings')
 
   const customLabwareDefs = useSelector((state: State) => {
     return getCustomLabwareDefinitions(state)
@@ -45,16 +45,16 @@ export function PipetteOffsetCalItems({
           <Divider />
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="p" width="10rem">
+              <StyledText as="p" width="100%">
                 {calibration.modelName}
               </StyledText>
-              <StyledText as="p" width="10rem">
+              <StyledText as="p" width="100%">
                 {calibration.serialNumber}
               </StyledText>
             </Flex>
             <StyledText
               as="p"
-              width="2.5rem"
+              width="100%"
               marginLeft={SPACING.spacing4}
               textTransform={TEXT_TRANSFORM_CAPITALIZE}
             >
@@ -64,16 +64,21 @@ export function PipetteOffsetCalItems({
               css={{ 'word-wrap': 'break-word' }}
               marginLeft={SPACING.spacing4}
             >
-              <StyledText as="p" width="8.5rem" height="2.5rem">
+              <StyledText as="p" width="100%" height="2.5rem">
                 {getDisplayNameForTipRack(
                   calibration.tiprack,
                   customLabwareDefs
                 )}
               </StyledText>
             </Flex>
-            <StyledText as="p" marginLeft={SPACING.spacing4} width="7.375rem">
+
+            <Flex alignItems={ALIGN_CENTER}>
               {calibration.lastCalibrated != null ? (
-                formatLastCalibrated(calibration.lastCalibrated)
+                <>
+                  <StyledText as="p">
+                    {formatLastCalibrated(calibration.lastCalibrated)}
+                  </StyledText>
+                </>
               ) : (
                 <>
                   {calibration.markedBad ?? false ? (
@@ -81,20 +86,27 @@ export function PipetteOffsetCalItems({
                       name="alert-circle"
                       backgroundColor={COLORS.warningBg}
                       color={COLORS.warning}
-                      size={SPACING.spacing4}
+                      // size={SPACING.spacing4}
+                      height={SPACING.spacing4}
+                      // marginRight={SPACING.spacing2}
                     />
                   ) : (
                     <Icon
                       name="alert-circle"
                       backgroundColor={COLORS.errorBg}
                       color={COLORS.error}
-                      size={SPACING.spacing4}
+                      height={SPACING.spacing4}
+                      // size={SPACING.spacing4}
+                      // marginRight={SPACING.spacing2}
                     />
                   )}
-                  <StyledText as="p">{t('missing_calibration')}</StyledText>
+                  <StyledText as="p" marginLeft={SPACING.spacing4} width="100%">
+                    {t('missing_calibration')}
+                  </StyledText>
                 </>
               )}
-            </StyledText>
+            </Flex>
+
             <OverflowMenu
               calType="pipetteOffset"
               robotName={robotName}
