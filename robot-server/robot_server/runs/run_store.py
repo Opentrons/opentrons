@@ -98,6 +98,14 @@ class RunStore:
                 raise RunNotFoundError(run_id=run_id)
         return _convert_sql_row_to_sql_run_state(state_row)
 
+    def get_run_data(self, run_id: str) -> ProtocolRunData:
+        """Get the archived run data of a run."""
+        raise NotImplementedError("TODO")
+
+    def get_run_commands(self, run_id: str) -> List[Command]:
+        """Get the archived commands list of a run."""
+        raise NotImplementedError("TODO")
+
     def insert_action(self, run_id: str, action: RunAction) -> None:
         """Insert run action in the db.
 

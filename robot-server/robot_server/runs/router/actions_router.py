@@ -56,7 +56,6 @@ async def create_run_action(
         run_data_manager: Current and historical run data management.
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
-        task_runner: Background task runner.
     """
     action = RunAction(
         id=action_id,

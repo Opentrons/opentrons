@@ -2,15 +2,20 @@
 from pydantic import BaseModel
 from typing import List
 
-from ..commands import Command
 from ..errors import ErrorOccurrence
-from ..types import LoadedLabware, LabwareOffset, LoadedModule, LoadedPipette
+from ..types import (
+    EngineStatus,
+    LoadedLabware,
+    LabwareOffset,
+    LoadedModule,
+    LoadedPipette,
+)
 
 
 class ProtocolRunData(BaseModel):
     """Data from a protocol run."""
 
-    commands: List[Command]
+    status: EngineStatus
     errors: List[ErrorOccurrence]
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]

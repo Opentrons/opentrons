@@ -261,7 +261,7 @@ async def test_get_runs_empty(
 ) -> None:
     """It should return an empty collection response when no runs exist."""
     decoy.when(mock_run_data_manager.get_all()).then_return([])
-    decoy.when(mock_run_data_manager.get_current_run_id()).then_return(None)
+    decoy.when(mock_run_data_manager.current_run_id).then_return(None)
 
     result = await get_runs(run_data_manager=mock_run_data_manager)
 
@@ -306,7 +306,7 @@ async def test_get_runs_not_empty(
     )
 
     decoy.when(mock_run_data_manager.get_all()).then_return([response_1, response_2])
-    decoy.when(mock_run_data_manager.get_current_run_id()).then_return("unique-id-2")
+    decoy.when(mock_run_data_manager.current_run_id).then_return("unique-id-2")
 
     result = await get_runs(run_data_manager=mock_run_data_manager)
 

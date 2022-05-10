@@ -2,7 +2,7 @@
 from typing import Dict, NamedTuple, Optional
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine import ProtocolEngine, StateView, create_protocol_engine
+from opentrons.protocol_engine import ProtocolEngine, StateView, create_protocol_engine, ProtocolRunData
 from opentrons.protocol_runner import ProtocolRunner
 
 
@@ -70,6 +70,11 @@ class EngineStore:
 
         return self._runner_engine_pair.runner
 
+    @property
+    def current_run_id(self) -> str:
+        """Get the run identifier associated with the current engine/runner pair."""
+        raise NotImplementedError()
+
     # TODO(mc, 2022-03-21): this resource locking is insufficient;
     # come up with something more sophisticated without race condition holes.
     async def get_default_engine(self) -> ProtocolEngine:
@@ -90,7 +95,7 @@ class EngineStore:
 
         return engine
 
-    async def create(self, run_id: str) -> StateView:
+    async def create(self, run_id: str) -> ProtocolRunData:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
         Args:
@@ -103,6 +108,8 @@ class EngineStore:
             EngineConflictError: The current runner/engine pair is not idle, so
             a new set may not be created.
         """
+        raise NotImplementedError("TODO: change return type")
+
         engine = await create_protocol_engine(hardware_api=self._hardware_api)
         runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)
 
