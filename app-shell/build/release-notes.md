@@ -6,9 +6,9 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 5.1.0
+# Opentrons App Changes in 6.0.0
 
-Welcome to the v5.1.0 release of the Opentrons App! This release focuses on a visual redesign of the app that offers more ways to manage protocols even when you're not connected to a robot.
+Welcome to the v6.0.0 release of the Opentrons App! This release focuses on a visual redesign of the app that offers more ways to manage protocols even when you're not connected to a robot.
 
 This release includes updates to the robot operating system, so be sure to update any OT-2s before running protocols with this version of the app.
 
