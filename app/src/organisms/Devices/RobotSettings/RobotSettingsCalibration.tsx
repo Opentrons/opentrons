@@ -12,7 +12,6 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
-  useHoverTooltip,
   useConditionalConfirm,
   Mount,
 } from '@opentrons/components'
@@ -24,17 +23,14 @@ import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { DeckCalibrationModal } from '../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
-import { formatLastModified } from '../../../organisms/CalibrationPanels/utils'
 
 import { useTrackEvent } from '../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
 import { getDeckCalibrationSession } from '../../../redux/sessions/deck-calibration/selectors'
-import { CONNECTABLE } from '../../../redux/discovery'
-import { selectors as robotSelectors } from '../../../redux/robot'
 import * as RobotApi from '../../../redux/robot-api'
 import * as Config from '../../../redux/config'
 import * as Sessions from '../../../redux/sessions'
-import * as Calibration from '../../../redux/calibration'
+
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
@@ -44,8 +40,8 @@ import {
 } from '../hooks'
 import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
-import { PipetteOffsetCalItems } from './CalibrationsTable/PipetteOffsetCalItems'
-import { TipLengthCalItems } from './CalibrationsTable/TipLengthCalItems'
+import { PipetteOffsetCalItems } from './CalibrationDetails/PipetteOffsetCalItems'
+import { TipLengthCalItems } from './CalibrationDetails/TipLengthCalItems'
 
 import type { State } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
@@ -94,7 +90,6 @@ export function RobotSettingsCalibration({
     'robot_calibration',
   ])
   const doTrackEvent = useTrackEvent()
-  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const [
     showDeckCalibrationModal,
@@ -156,7 +151,10 @@ export function RobotSettingsCalibration({
   )
 
   const pipettePresent =
-    !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
+    attachedPipettes != null
+      ? !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
+      : false
+
   const isPending =
     useSelector<State, RequestState | null>(state =>
       trackedRequestId.current
@@ -244,34 +242,36 @@ export function RobotSettingsCalibration({
 
   const formatPipetteOffsetCalibrations = (): FormattedPipetteOffsetCalibration[] => {
     const pippets = []
-    pippets.push({
-      modelName: attachedPipettes.left?.modelSpecs.displayName,
-      serialNumber: attachedPipettes.left?.id,
-      mount: 'left' as Mount,
-      tiprack: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.left?.id
-      )?.tiprackUri,
-      lastCalibrated: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.left?.id
-      )?.lastModified,
-      markedBad: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.left?.id
-      )?.status.markedBad,
-    })
-    pippets.push({
-      modelName: attachedPipettes.right?.modelSpecs.displayName,
-      serialNumber: attachedPipettes.right?.id,
-      mount: 'right' as Mount,
-      tiprack: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.right?.id
-      )?.tiprackUri,
-      lastCalibrated: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.right?.id
-      )?.lastModified,
-      markedBad: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.right?.id
-      )?.status.markedBad,
-    })
+    if (attachedPipettes != null) {
+      pippets.push({
+        modelName: attachedPipettes.left?.modelSpecs.displayName,
+        serialNumber: attachedPipettes.left?.id,
+        mount: 'left' as Mount,
+        tiprack: pipetteOffsetCalibrations?.find(
+          p => p.pipette === attachedPipettes.left?.id
+        )?.tiprackUri,
+        lastCalibrated: pipetteOffsetCalibrations?.find(
+          p => p.pipette === attachedPipettes.left?.id
+        )?.lastModified,
+        markedBad: pipetteOffsetCalibrations?.find(
+          p => p.pipette === attachedPipettes.left?.id
+        )?.status.markedBad,
+      })
+      pippets.push({
+        modelName: attachedPipettes.right?.modelSpecs.displayName,
+        serialNumber: attachedPipettes.right?.id,
+        mount: 'right' as Mount,
+        tiprack: pipetteOffsetCalibrations?.find(
+          p => p.pipette === attachedPipettes.right?.id
+        )?.tiprackUri,
+        lastCalibrated: pipetteOffsetCalibrations?.find(
+          p => p.pipette === attachedPipettes.right?.id
+        )?.lastModified,
+        markedBad: pipetteOffsetCalibrations?.find(
+          p => p.pipette === attachedPipettes.right?.id
+        )?.status.markedBad,
+      })
+    }
     return pippets
   }
 
@@ -311,9 +311,6 @@ export function RobotSettingsCalibration({
       }
     }
   }
-
-  console.log(attachedPipettes)
-  console.log(pipetteOffsetCalibrations)
 
   React.useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {

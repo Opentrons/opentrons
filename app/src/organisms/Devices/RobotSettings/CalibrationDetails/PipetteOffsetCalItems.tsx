@@ -96,27 +96,40 @@ export function PipetteOffsetCalItems({
                 ) : (
                   <>
                     {calibration.markedBad ?? false ? (
-                      <Icon
-                        name="alert-circle"
-                        backgroundColor={COLORS.warningBg}
-                        color={COLORS.warning}
-                        height={SPACING.spacing2}
-                      />
+                      <>
+                        <Icon
+                          name="alert-circle"
+                          backgroundColor={COLORS.warningBg}
+                          color={COLORS.warning}
+                          height={SPACING.spacing2}
+                        />
+                        <StyledText
+                          as="p"
+                          marginLeft={SPACING.spacing2}
+                          width="100%"
+                          color={COLORS.warningText}
+                        >
+                          {t('missing_calibration')}
+                        </StyledText>
+                      </>
                     ) : (
-                      <Icon
-                        name="alert-circle"
-                        backgroundColor={COLORS.errorBg}
-                        color={COLORS.error}
-                        height={SPACING.spacing4}
-                      />
+                      <>
+                        <Icon
+                          name="alert-circle"
+                          backgroundColor={COLORS.errorBg}
+                          color={COLORS.error}
+                          height={SPACING.spacing4}
+                        />
+                        <StyledText
+                          as="p"
+                          marginLeft={SPACING.spacing2}
+                          width="100%"
+                          color={COLORS.errorText}
+                        >
+                          {t('missing_calibration')}
+                        </StyledText>
+                      </>
                     )}
-                    <StyledText
-                      as="p"
-                      marginLeft={SPACING.spacing2}
-                      width="100%"
-                    >
-                      {t('missing_calibration')}
-                    </StyledText>
                   </>
                 )}
               </Flex>
