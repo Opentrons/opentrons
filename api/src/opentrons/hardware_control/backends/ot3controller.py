@@ -96,7 +96,7 @@ class OT3Controller:
 
     _messenger: CanMessenger
     _position: Dict[NodeId, float]
-    _data: Dict[NodeId, float]
+    _encoder_position: Dict[NodeId, float]
     _tool_detector: detector.OneshotToolDetector
 
     @classmethod

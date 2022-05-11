@@ -267,11 +267,6 @@ def target_position_from_plunger(  # type: ignore[no-untyped-def]
 def deck_point_from_machine_point(
     machine_point: Point, attitude: AttitudeMatrix, offset: Point
 ) -> Point:
-    print("Machine Point: ", machine_point)
-    print("offset: ", offset)
-    print("attitude: ", attitude)
-    # machine_point = tupe(list(v[0] for v in machine_point))
-    # print("Machine Point: ", machine_point)
     return Point(
         *linal.apply_reverse(
             attitude,
@@ -362,12 +357,9 @@ def deck_from_machine(  # type: ignore[no-untyped-def]
     offset,
     axis_enum,
 ):
-    print("Line 363 Machine Point: ", machine_pos)
     """Build a deck-abs position store from the machine's position"""
     with_enum = {_axis_enum(k): v for k, v in machine_pos.items()}
-    print("enum: ", with_enum)
     plunger_axes = {k: v for k, v in with_enum.items() if k not in k.gantry_axes()}
-    print("plunger_axes: ", plunger_axes)
     right = Point(
         with_enum[axis_enum.X],
         with_enum[axis_enum.Y],
@@ -378,8 +370,6 @@ def deck_from_machine(  # type: ignore[no-untyped-def]
         with_enum[axis_enum.Y],
         with_enum[axis_enum.by_mount(Mount.LEFT)],
     )
-    print("Right Point: ", right)
-    print("Left Point: ", left)
     right_deck = deck_point_from_machine_point(right, attitude, offset)
     left_deck = deck_point_from_machine_point(left, attitude, offset)
     deck_pos = {

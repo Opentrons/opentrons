@@ -569,15 +569,20 @@ class OT3API(
     async def encoder_current_position(
         self,
         mount: Union[top_types.Mount, OT3Mount],
+        critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
         fail_on_not_homed: bool = False,
     ) -> Dict[Axis, float]:
         """
-
+        Return the encoder position in relative coords specified mount.
+        TODO: CF Might want to make these coordinates to absolute in deck
+        coordinates
         """
         z_ax = OT3Axis.by_mount(mount)
         plunger_ax = OT3Axis.of_main_tool_actuator(mount)
         position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, plunger_ax]
+        print(position_axes)
+
         if fail_on_not_homed and (
             not self._backend.is_homed(position_axes) or not self._encoder_current_position
         ):
@@ -587,9 +592,11 @@ class OT3API(
         elif not self._encoder_current_position and not refresh:
             raise MustHomeError("Encoder position is unknown; please home motors.")
         async with self._motion_lock:
-            if refresh:
-                self._encoder_current_position = await self._backend._encoder_position
-            return self._encoder_current_position
+            self._encoder_current_position = await self._backend.update_encoder_position()
+            ot3pos = self._effector_pos_from_carriage_pos(
+                OT3Mount.from_mount(mount), self._encoder_current_position, critical_point
+            )
+            return ot3pos
 
     def _effector_pos_from_carriage_pos(
         self,
