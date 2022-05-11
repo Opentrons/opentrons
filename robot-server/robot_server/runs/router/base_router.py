@@ -168,8 +168,6 @@ async def create_run(
     if protocol_resource is not None:
         engine_store.runner.load(protocol_resource.source)
 
-    # TODO: Read this method more carefully and make sure this is the correct place to
-    # insert this. Take care for exception safety.
     run_auto_deleter.make_room_for_new_run()
 
     run = RunResource(
