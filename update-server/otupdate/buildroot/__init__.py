@@ -2,7 +2,7 @@
 import asyncio
 import logging
 import json
-from typing import Mapping
+from typing import Mapping, Any
 from aiohttp import web
 
 from otupdate.common import (
@@ -88,7 +88,10 @@ def get_app(
     update_actions.OT2UpdateActions.build_and_insert(app)
     app.router.add_routes(
         [
-            web.get("/server/update/health", control.build_health_endpoint(version)),
+            web.get(
+                "/server/update/health",
+                control.build_health_endpoint(health_response(version_dict=version)),
+            ),
             web.post("/server/update/begin", update.begin),
             web.post("/server/update/cancel", update.cancel),
             web.get("/server/update/{session}/status", update.status),
@@ -104,3 +107,17 @@ def get_app(
         ]
     )
     return app
+
+
+def health_response(version_dict: Mapping[str, str]) -> Mapping[str, Any]:
+    """Create the buildroot specific health response."""
+    return {
+        "updateServerVersion": version_dict.get("update_server_version", "unknown"),
+        "apiServerVersion": version_dict.get("opentrons_api_version", "unknown"),
+        "smoothieVersion": "unimplemented",
+        "systemVersion": version_dict.get("buildroot_version", "unknown"),
+        "capabilities": {
+            "buildrootUpdate": "/server/update/begin",
+            "restart": "/server/restart",
+        },
+    }

@@ -3,7 +3,7 @@ import asyncio
 import logging
 import json
 from aiohttp import web
-from typing import Optional, Mapping
+from typing import Optional, Mapping, Any
 
 from otupdate.common import (
     config,
@@ -17,7 +17,7 @@ from otupdate.common import (
 from otupdate.openembedded.updater import RootFSInterface, PartitionManager, Updater
 from otupdate.common.update_actions import FILE_ACTIONS_VARNAME
 
-BR_BUILTIN_VERSION_FILE = "/etc/VERSION.json"
+OE_BUILTIN_VERSION_FILE = "/etc/VERSION.json"
 
 
 LOG = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ def get_app(
 ) -> web.Application:
     """Build and return the aiohttp.web.Application that runs the server"""
     if not system_version_file:
-        system_version_file = BR_BUILTIN_VERSION_FILE
+        system_version_file = OE_BUILTIN_VERSION_FILE
 
     version = get_version_dict(system_version_file)
 
@@ -94,6 +94,10 @@ def get_app(
     app[FILE_ACTIONS_VARNAME] = updater
     app.router.add_routes(
         [
+            web.get(
+                "/server/update/health",
+                control.build_health_endpoint(health_response(version_dict=version)),
+            ),
             web.post("/server/update/begin", update.begin),
             web.post("/server/update/cancel", update.cancel),
             web.get("/server/update/{session}/status", update.status),
@@ -109,3 +113,16 @@ def get_app(
         ]
     )
     return app
+
+
+def health_response(version_dict: Mapping[str, str]) -> Mapping[str, Any]:
+    """Create the openembedded specific health response."""
+    return {
+        "updateServerVersion": version_dict.get("update_server_version", "unknown"),
+        "apiServerVersion": version_dict.get("opentrons_api_version", "unknown"),
+        "systemVersion": version_dict.get("openembedded_version", "unknown"),
+        "capabilities": {
+            "openembeddedUpdate": "/server/update/begin",
+            "restart": "/server/restart",
+        },
+    }

@@ -3,10 +3,12 @@ import os
 import subprocess
 import re
 import zipfile
+from typing import Tuple
 from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
+from aiohttp.test_utils import TestClient
 
 from otupdate import buildroot, common
 
@@ -20,13 +22,15 @@ one_up = os.path.abspath(os.path.join(__file__, "../../"))
 
 
 @pytest.fixture(params=[openembedded, buildroot])
-async def test_cli(aiohttp_client, loop, otupdate_config, request):
+async def test_cli(
+    aiohttp_client, loop, otupdate_config, request, version_file_path
+) -> Tuple[TestClient, str]:
     """
     Build an app using dummy versions, then build a test client and return it
     """
     cli_client_pkg = request.param
     app = cli_client_pkg.get_app(
-        system_version_file=os.path.join(HERE, "version.json"),
+        system_version_file=version_file_path,
         config_file_override=otupdate_config,
         name_override="opentrons-test",
         boot_id_override="dummy-boot-id-abc123",

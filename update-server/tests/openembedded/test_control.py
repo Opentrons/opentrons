@@ -1,4 +1,5 @@
-"""test the buildroot endpoints in otupdate.common.control """
+"""test the openembedded endpoints in otupdate.common.control """
+
 from typing import Dict
 
 from aiohttp.test_utils import TestClient
@@ -12,11 +13,10 @@ async def test_health(test_cli: TestClient, version_dict: Dict[str, str]):
         "name": "opentrons-test",
         "updateServerVersion": version_dict["update_server_version"],
         "apiServerVersion": version_dict["opentrons_api_version"],
-        "smoothieVersion": "unimplemented",
-        "systemVersion": version_dict["buildroot_version"],
+        "systemVersion": version_dict["openembedded_version"],
         "bootId": "dummy-boot-id-abc123",
         "capabilities": {
-            "buildrootUpdate": "/server/update/begin",
+            "openembeddedUpdate": "/server/update/begin",
             "restart": "/server/restart",
         },
         "serialNumber": "unknown",
