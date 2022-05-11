@@ -1,5 +1,5 @@
 {
-  "$otSharedSchema": "module/schemas/2",
+  "$otSharedSchema": "module/schemas/3",
   "moduleType": "thermocyclerModuleType",
   "model": "thermocyclerModuleV1",
   "labwareOffset": {
