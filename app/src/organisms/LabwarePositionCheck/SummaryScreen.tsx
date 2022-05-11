@@ -1,5 +1,4 @@
 import * as React from 'react'
-import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_START,
@@ -15,7 +14,6 @@ import {
   Text,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import { IDENTITY_VECTOR } from '@opentrons/shared-data'
 import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { useLPCSuccessToast } from '../ProtocolSetup/hooks'

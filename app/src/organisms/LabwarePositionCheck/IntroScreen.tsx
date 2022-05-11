@@ -5,7 +5,6 @@ import {
   Text,
   Flex,
   Box,
-  AlertItem,
   useInterval,
   TEXT_TRANSFORM_UPPERCASE,
   FONT_WEIGHT_SEMIBOLD,
@@ -18,7 +17,6 @@ import {
   SPACING_6,
 } from '@opentrons/components'
 import { useCurrentRun } from '../ProtocolUpload/hooks'
-import { getLatestLabwareOffsetCount } from './utils/getLatestLabwareOffsetCount'
 import { SectionList } from './SectionList'
 import { DeckMap } from './DeckMap'
 import { useIntroInfo, useLabwareIdsBySection } from './hooks'
@@ -34,11 +32,6 @@ export const IntroScreen = (props: {
   )
   const introInfo = useIntroInfo()
   const { t } = useTranslation(['labware_position_check', 'shared'])
-
-  const currentRunData = runRecord?.data
-  const labwareOffsetCount = getLatestLabwareOffsetCount(
-    currentRunData?.labwareOffsets ?? []
-  )
 
   const [sectionIndex, setSectionIndex] = React.useState<number>(0)
   const rotateSectionIndex = (): void =>

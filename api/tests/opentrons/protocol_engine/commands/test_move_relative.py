@@ -26,7 +26,7 @@ async def test_move_relative_implementation(
 
     result = await subject.execute(data)
 
-    assert result == MoveRelativeResult()
+    assert result == MoveRelativeResult(position=result.position)
     decoy.verify(
         await movement.move_relative(
             pipette_id="pipette-id",

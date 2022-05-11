@@ -12,7 +12,6 @@ import {
 } from '@opentrons/shared-data'
 import {
   useHost,
-  useCreateLabwareOffsetMutation,
   useCreateLabwareDefinitionMutation,
   useCreateCommandMutation,
 } from '@opentrons/react-api-client'
@@ -253,7 +252,6 @@ export function useLabwarePositionCheck(
   const { protocolData } = useProtocolDetailsForRun(currentRunId)
   const protocolType = useCurrentProtocol()?.data.protocolType
   const { createLabwareDefinition } = useCreateLabwareDefinitionMutation()
-  const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const { createCommand } = useCreateCommandMutation()
   const host = useHost()
   const trackEvent = useTrackEvent()

@@ -4,10 +4,8 @@ import isEqual from 'lodash/isEqual'
 import {
   DIRECTION_COLUMN,
   Flex,
-  FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
   NewPrimaryBtn,
-  Text,
   TEXT_TRANSFORM_UPPERCASE,
   ALIGN_FLEX_START,
   SPACING,

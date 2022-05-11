@@ -101,8 +101,7 @@ describe('LabwareInfoOverlay', () => {
 
     when(mockUseLabwareOffsetForLabware)
       .calledWith(MOCK_RUN_ID, MOCK_LABWARE_ID)
-      .mockReturnValue({vector: MOCK_LABWARE_VECTOR} as any)
-
+      .mockReturnValue({ vector: MOCK_LABWARE_VECTOR } as any)
 
     when(mockUseCurrentRun)
       .calledWith()

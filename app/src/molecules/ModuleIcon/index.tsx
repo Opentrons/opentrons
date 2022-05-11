@@ -12,12 +12,11 @@ import type { AttachedModule } from '../../redux/modules/types'
 
 interface ModuleIconProps {
   module: AttachedModule
-  index: number
   tooltipText: string
 }
 
 export function ModuleIcon(props: ModuleIconProps): JSX.Element {
-  const { module, index, tooltipText } = props
+  const { module, tooltipText } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   return (

@@ -19,6 +19,7 @@ export function useLabwareOffsetForLabware(
     protocolData.labware,
     protocolData.labwareDefinitions
   )
+
   const labwareLocation = getLabwareOffsetLocation(
     labwareId,
     protocolData?.commands ?? [],
