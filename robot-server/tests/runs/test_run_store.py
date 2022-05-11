@@ -20,7 +20,7 @@ from opentrons.protocol_engine import (
     ProtocolRunData,
 )
 from opentrons.types import MountType, DeckSlotName
-
+from opentrons.protocol_engine import EngineStatus
 
 @pytest.fixture
 def subject(sql_engine_fixture: Engine) -> RunStore:
@@ -82,6 +82,7 @@ def protocol_run() -> ProtocolRunData:
         modules=[],
         # TODO (tz 22-4-19): added the field to class. make sure what to initialize
         labwareOffsets=[],
+        status=EngineStatus.IDLE
     )
 
 
@@ -99,7 +100,7 @@ def test_update_run_state(
         _updated_at=datetime.now(timezone.utc),
         commands=[],
     )
-    result = subject.update_run_state(engine_state)
+    result = subject.update_run_state(run_id="run-id", run_data=engine_state.state, commands=engine_state.commands)
 
     assert result == engine_state
 
@@ -119,7 +120,7 @@ def test_get_run_state(
         commands=[],
     )
 
-    subject.update_run_state(state=engine_state)
+    subject.update_run_state(run_id="run-id", run_data=engine_state.state, commands=engine_state.commands)
     result = subject.get_run_state("run-id")
 
     assert engine_state == result
@@ -138,7 +139,7 @@ def test_update_state_run_not_found(
     )
 
     with pytest.raises(RunNotFoundError, match="run-not-found"):
-        subject.update_run_state(engine_state)
+        subject.update_run_state(run_id="run-not-found", run_data=engine_state.state, commands=engine_state.commands)
 
 
 def test_add_run(subject: RunStore) -> None:

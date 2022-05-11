@@ -2,9 +2,9 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
+
 from pydantic import parse_obj_as, Field
 import sqlalchemy
-from sqlalchemy.orm.decl_api import _stateful_declared_attr
 
 from robot_server.persistence import run_table, action_table, ensure_utc_datetime
 from robot_server.protocols import ProtocolNotFoundError
@@ -39,10 +39,9 @@ class RunStateResource:
 
     run_id: str
     state: ProtocolRunData
-    # TODO (tz): initialize with factory default
     commands: Optional[List[Command]]
     engine_status: str
-    _updated_at: datetime = Field(default_factory=datetime.now(tz=timezone.utc))
+    _updated_at: datetime = Field(default_factory=datetime.now(tz=timezone.utc), description="datetime the resource has been updated")
 
 
 class RunNotFoundError(ValueError):
@@ -73,7 +72,7 @@ class RunStore:
         statement = (
             sqlalchemy.update(run_table)
             .where(run_table.c.id == run_id)
-            .values(_convert_state_to_sql_values(state=RunStateResource(commands=commands, state=run_data))
+            .values(_convert_state_to_sql_values(state=RunStateResource(commands=commands, state=run_data, run_id=run_id, engine_status=run_data.status))
         ))
         with self._sql_engine.begin() as transaction:
             result = transaction.execute(statement)
