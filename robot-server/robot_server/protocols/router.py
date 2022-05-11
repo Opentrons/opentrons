@@ -10,7 +10,6 @@ from typing_extensions import Literal
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
 
-from robot_server.auto_deleter import AutoDeleter, get_auto_deleter
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.service.dependencies import get_unique_id, get_current_time
@@ -22,12 +21,14 @@ from robot_server.service.json_api import (
     PydanticResponse,
 )
 
+from .protocol_auto_deleter import ProtocolAutoDeleter
 from .protocol_models import Protocol, ProtocolFile, Metadata
 from .protocol_analyzer import ProtocolAnalyzer
 from .analysis_store import AnalysisStore, AnalysisNotFoundError
 from .analysis_models import ProtocolAnalysis
 from .protocol_store import ProtocolStore, ProtocolResource, ProtocolNotFoundError
 from .dependencies import (
+    get_protocol_auto_deleter,
     get_protocol_reader,
     get_protocol_store,
     get_analysis_store,
@@ -93,7 +94,7 @@ async def create_protocol(
     protocol_reader: ProtocolReader = Depends(get_protocol_reader),
     protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
     task_runner: TaskRunner = Depends(get_task_runner),
-    auto_deleter: AutoDeleter = Depends(get_auto_deleter),
+    protocol_auto_deleter: ProtocolAutoDeleter = Depends(get_protocol_auto_deleter),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
@@ -132,7 +133,7 @@ async def create_protocol(
         protocol_key=key,
     )
 
-    await auto_deleter.make_room_for_new_protocol()
+    protocol_auto_deleter.make_room_for_new_protocol()
     protocol_store.insert(protocol_resource)
 
     task_runner.run(

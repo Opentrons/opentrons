@@ -203,6 +203,9 @@ class ProtocolStore:
             source=deleted_source,
         )
 
+    def is_used_by_run(self, protocol_id: str) -> bool:
+        raise NotImplementedError()
+
     def _sql_insert(self, resource: _DBProtocolResource) -> None:
         statement = sqlalchemy.insert(protocol_table).values(
             _convert_dataclass_to_sql_values(resource=resource)

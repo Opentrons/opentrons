@@ -30,10 +30,11 @@ from robot_server.protocols import (
     get_protocol_store,
 )
 
+from ..run_auto_deleter import RunAutoDeleter
 from ..run_store import RunStore, RunResource, RunNotFoundError
 from ..run_models import Run, RunSummary, RunCreate, RunUpdate
 from ..engine_store import EngineStore, EngineConflictError
-from ..dependencies import get_run_store, get_engine_store
+from ..dependencies import get_run_auto_deleter, get_run_store, get_engine_store
 
 
 log = logging.getLogger(__name__)
@@ -133,6 +134,7 @@ async def create_run(
     run_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     task_runner: TaskRunner = Depends(get_task_runner),
+    run_auto_deleter: RunAutoDeleter = Depends(get_run_auto_deleter),
 ) -> PydanticResponse[SimpleBody[Run]]:
     """Create a new run.
 
@@ -165,6 +167,10 @@ async def create_run(
 
     if protocol_resource is not None:
         engine_store.runner.load(protocol_resource.source)
+
+    # TODO: Read this method more carefully and make sure this is the correct place to
+    # insert this. Take care for exception safety.
+    run_auto_deleter.make_room_for_new_run()
 
     run = RunResource(
         run_id=run_id,

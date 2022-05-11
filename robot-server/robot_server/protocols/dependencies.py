@@ -13,17 +13,21 @@ from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
 
 from robot_server.app_state import AppState, AppStateAccessor, get_app_state
+from robot_server.deletion_planner import ProtocolDeletionPlanner
 from robot_server.persistence import get_sql_engine, get_persistence_directory
 
+from .protocol_auto_deleter import ProtocolAutoDeleter
 from .protocol_store import (
     ProtocolStore,
 )
 from .protocol_analyzer import ProtocolAnalyzer
 from .analysis_store import AnalysisStore
 
-_log = logging.getLogger(__name__)
 
 _PROTOCOL_FILES_SUBDIRECTORY: Final = "protocols"
+_MAXIMUM_UNUSED_PROTOCOLS = 5
+
+_log = logging.getLogger(__name__)
 
 _protocol_store_accessor = AppStateAccessor[ProtocolStore]("protocol_store")
 _analysis_store_accessor = AppStateAccessor[AnalysisStore]("analysis_store")
@@ -93,4 +97,15 @@ async def get_protocol_analyzer(
     return ProtocolAnalyzer(
         protocol_runner=protocol_runner,
         analysis_store=analysis_store,
+    )
+
+
+async def get_protocol_auto_deleter(
+    protocol_store: ProtocolStore = Depends(get_protocol_store),
+) -> ProtocolAutoDeleter:
+    return ProtocolAutoDeleter(
+        protocol_store=protocol_store,
+        deletion_planner=ProtocolDeletionPlanner(
+            maximum_unused_protocols=_MAXIMUM_UNUSED_PROTOCOLS
+        ),
     )

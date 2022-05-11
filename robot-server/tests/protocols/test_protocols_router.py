@@ -17,12 +17,12 @@ from opentrons.protocol_reader import (
     ProtocolFilesInvalidError,
 )
 
-from robot_server.auto_deleter import AutoDeleter
 from robot_server.errors import ApiError
 from robot_server.service.json_api import SimpleEmptyBody, MultiBodyMeta
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols.analysis_store import AnalysisStore, AnalysisNotFoundError
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
+from robot_server.protocols.protocol_auto_deleter import ProtocolAutoDeleter
 from robot_server.protocols.analysis_models import (
     AnalysisStatus,
     AnalysisSummary,
@@ -84,9 +84,9 @@ def task_runner(decoy: Decoy) -> TaskRunner:
 
 
 @pytest.fixture
-def auto_deleter(decoy: Decoy) -> AutoDeleter:
+def protocol_auto_deleter(decoy: Decoy) -> ProtocolAutoDeleter:
     """Get a mocked out AutoDeleter."""
-    return decoy.mock(cls=AutoDeleter)
+    return decoy.mock(cls=ProtocolAutoDeleter)
 
 
 async def test_get_protocols_no_protocols(
@@ -254,7 +254,7 @@ async def test_create_protocol(
     protocol_reader: ProtocolReader,
     protocol_analyzer: ProtocolAnalyzer,
     task_runner: TaskRunner,
-    auto_deleter: AutoDeleter,
+    protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should store an uploaded protocol file."""
     protocol_directory = Path("/dev/null")
@@ -307,7 +307,7 @@ async def test_create_protocol(
         protocol_reader=protocol_reader,
         protocol_analyzer=protocol_analyzer,
         task_runner=task_runner,
-        auto_deleter=auto_deleter,
+        protocol_auto_deleter=protocol_auto_deleter,
         protocol_id="protocol-id",
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
@@ -325,7 +325,7 @@ async def test_create_protocol(
     assert result.status_code == 201
 
     decoy.verify(
-        await auto_deleter.make_room_for_new_protocol(),
+        protocol_auto_deleter.make_room_for_new_protocol(),
         protocol_store.insert(protocol_resource),
         task_runner.run(
             protocol_analyzer.analyze,
