@@ -534,7 +534,8 @@ def _load_v2_module_def(module_model: ModuleModel) -> "ModuleDefinitionV2":
         return module.load_definition("2", module_model.value)
     except module.ModuleNotFoundError:
         raise NoSuchModuleError(
-            f"Could not find the module {module_model.value}.", module_model
+            f"Could not find the module {module_model.value} in the "
+            f"specified API version.", module_model
         )
 
 
@@ -543,7 +544,8 @@ def _load_v3_module_def(module_model: ModuleModel) -> "ModuleDefinitionV3":
         return module.load_definition("3", module_model.value)
     except module.ModuleNotFoundError:
         raise NoSuchModuleError(
-            f"Could not find the module {module_model.value}.", module_model
+            f"Could not find the module {module_model.value} in the "
+            f"specified API version.", module_model
         )
 
 
