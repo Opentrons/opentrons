@@ -223,9 +223,9 @@ class OT3Controller:
         move_group, _ = group
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
-        for position in positions.items():
-            self._position.update({position[0]: position[1][0]})
-            self._encoder_position.update({position[0]: position[1][1]})
+        for axis, point in positions.items():
+            self._position.update({axis: point[0]})
+            self._encoder_position.update({axis: point[1]})
 
     async def home(self, axes: Sequence[OT3Axis]) -> OT3AxisMap[float]:
         """Home each axis passed in, and reset the positions to 0.

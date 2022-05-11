@@ -564,7 +564,7 @@ class OT3API(
             ot3pos = self._effector_pos_from_carriage_pos(
                 OT3Mount.from_mount(mount), self._current_position, critical_point
             )
-            return ot3pos
+            return {ot3ax.to_axis(): value for ot3ax, value in ot3pos.items()}
 
     async def encoder_current_position(
         self,
@@ -601,7 +601,7 @@ class OT3API(
                 self._encoder_current_position,
                 critical_point,
             )
-            return ot3pos
+            return {ot3ax.to_axis(): value for ot3ax, value in ot3pos.items()}
 
     def _effector_pos_from_carriage_pos(
         self,
