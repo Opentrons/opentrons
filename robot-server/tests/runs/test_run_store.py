@@ -97,11 +97,10 @@ def test_update_run_state(
         run_id="run-id",
         state=protocol_run,
         engine_status="idle",
-        _updated_at=datetime.now(timezone.utc),
         commands=[],
     )
-    result = subject.update_run_state(run_id="run-id", run_data=engine_state.state, commands=engine_state.commands)
-
+    subject.update_run_state(run_id="run-id", run_data=engine_state.state, commands=engine_state.commands)
+    result = subject.get_run_state(run_id="run-id")
     assert result == engine_state
 
 

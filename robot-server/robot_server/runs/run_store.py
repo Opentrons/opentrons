@@ -1,9 +1,9 @@
 """Runs' on-db store."""
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
-from pydantic import parse_obj_as, Field
+from pydantic import parse_obj_as
 import sqlalchemy
 
 from robot_server.persistence import run_table, action_table, ensure_utc_datetime
@@ -41,7 +41,7 @@ class RunStateResource:
     state: ProtocolRunData
     commands: Optional[List[Command]]
     engine_status: str
-    _updated_at: datetime = Field(default_factory=datetime.now(tz=timezone.utc), description="datetime the resource has been updated")
+    _updated_at: datetime = field(default_factory=lambda: datetime.now(tz=timezone.utc))
 
 
 class RunNotFoundError(ValueError):
@@ -359,8 +359,6 @@ def _convert_sql_row_to_run_state(
 
 
 def _convert_state_to_sql_values(state: RunStateResource) -> Dict[str, object]:
-    print("_convert_state_to_sql_values")
-    print(state._updated_at)
     return {
         "state": state.state.dict(),
         "engine_status": state.engine_status,
