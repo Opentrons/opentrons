@@ -100,7 +100,7 @@ export function PipetteOffsetCalItems({
                         name="alert-circle"
                         backgroundColor={COLORS.warningBg}
                         color={COLORS.warning}
-                        height={SPACING.spacing4}
+                        height={SPACING.spacing2}
                       />
                     ) : (
                       <Icon
@@ -112,7 +112,7 @@ export function PipetteOffsetCalItems({
                     )}
                     <StyledText
                       as="p"
-                      marginLeft={SPACING.spacing4}
+                      marginLeft={SPACING.spacing2}
                       width="100%"
                     >
                       {t('missing_calibration')}
@@ -126,8 +126,8 @@ export function PipetteOffsetCalItems({
               <OverflowMenu
                 calType="pipetteOffset"
                 robotName={robotName}
-                serialNumber={''}
-                mount={'left'}
+                serialNumber={calibration.serialNumber ?? null}
+                mount={calibration.mount}
               />
             </StyledTableCell>
           </StyledTableRow>

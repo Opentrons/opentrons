@@ -1,11 +1,15 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import styled from 'styled-components'
+
 import {
   Flex,
   DIRECTION_ROW,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../../atoms/text'
@@ -14,13 +18,29 @@ import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated } from './utils'
 import { getDisplayNameForTipRack } from '../../../../pages/Robots/InstrumentSettings/utils'
 import { getCustomLabwareDefinitions } from '../../../../redux/custom-labware'
-import { TipLengthCalHeader } from './TipLengthCalHeader'
 
 import type {
   FormattedPipetteOffsetCalibration,
   FormattedTipLengthCalibration,
 } from '../RobotSettingsCalibration'
 import type { State } from '../../../../redux/types'
+
+const StyledTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+`
+const StyledTableHeader = styled.th`
+  ${TYPOGRAPHY.labelSemiBold}
+  padding: ${SPACING.spacing3};
+`
+const StyledTableRow = styled.tr`
+  padding: ${SPACING.spacing3}; ;
+`
+const StyledTableCell = styled.td`
+  padding: ${SPACING.spacing3};
+  text-overflow: wrap;
+`
 
 interface TipLengthCallItemsProps {
   robotName: string
@@ -33,6 +53,7 @@ export function TipLengthCalItems({
   formattedPipetteOffsetCalibrations,
   formattedTipLengthCalibrations,
 }: TipLengthCallItemsProps): JSX.Element {
+  const { t } = useTranslation('device_settings')
   const customLabwareDefs = useSelector((state: State) => {
     return getCustomLabwareDefinitions(state)
   })
@@ -54,46 +75,47 @@ export function TipLengthCalItems({
 
   return (
     <>
-      <TipLengthCalHeader />
-      {tipLengthCalibrations.map((calibration, index) => (
-        <React.Fragment key={index}>
-          <Divider />
-          <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-            <Flex
-              css={{ 'word-wrap': 'break-word' }}
-              marginRight={SPACING.spacing4}
-            >
-              <StyledText
-                as="p"
-                width="13.375rem"
-                marginLeft={SPACING.spacing4}
-              >
+      <StyledTable>
+        <tr>
+          <StyledTableHeader>{t('table_header_tiprack')}</StyledTableHeader>
+          <StyledTableHeader>
+            {t('table_header_model_and_serial')}
+          </StyledTableHeader>
+          <StyledTableHeader>
+            {t('table_header_last_calibrated')}
+          </StyledTableHeader>
+        </tr>
+        {tipLengthCalibrations.map((calibration, index) => (
+          <StyledTableRow key={index}>
+            <StyledTableCell>
+              <StyledText as="p">
                 {getDisplayNameForTipRack(
                   calibration.tiprack,
                   customLabwareDefs
                 )}
               </StyledText>
-            </Flex>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              width="11.75rem"
-              css={{ 'word-wrap': 'break-word' }}
-            >
+            </StyledTableCell>
+            <StyledTableCell>
               <StyledText as="p">{calibration.modelName}</StyledText>
               <StyledText as="p">{calibration.serialNumber}</StyledText>
-            </Flex>
-            <StyledText as="p" width="12.5rem">
-              {formatLastCalibrated(calibration.lastCalibrated)}
-            </StyledText>
-            <OverflowMenu
-              calType="tipLength"
-              robotName={robotName}
-              serialNumber={calibration.serialNumber}
-              mount={calibration.mount}
-            />
-          </Flex>
-        </React.Fragment>
-      ))}
+            </StyledTableCell>
+            <StyledTableCell>
+              <StyledText as="p">
+                {formatLastCalibrated(calibration.lastCalibrated)}
+              </StyledText>
+            </StyledTableCell>
+
+            <StyledTableCell>
+              <OverflowMenu
+                calType="tipLength"
+                robotName={robotName}
+                serialNumber={calibration.serialNumber}
+                mount={calibration.mount}
+              />
+            </StyledTableCell>
+          </StyledTableRow>
+        ))}
+      </StyledTable>
     </>
   )
 }
