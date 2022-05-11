@@ -19,13 +19,11 @@ def _make_dummy_run_resource(run_id: str) -> RunResource:
         protocol_id=None,
         created_at=datetime.min,
         actions=[],
-        is_current=False
+        is_current=False,
     )
 
 
-def test_make_room_for_new_run(
-    decoy: Decoy, caplog: pytest.LogCaptureFixture
-) -> None:
+def test_make_room_for_new_run(decoy: Decoy, caplog: pytest.LogCaptureFixture) -> None:
     mock_run_store = decoy.mock(cls=RunStore)
     mock_deletion_planner = decoy.mock(cls=RunDeletionPlanner)
 
