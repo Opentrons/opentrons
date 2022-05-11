@@ -387,3 +387,17 @@ def test_insert_actions_no_run(subject: RunStore) -> None:
 
     with pytest.raises(Exception):
         subject.insert_action(run_id="run-id-996", action=action)
+
+
+def test_get_run_commands(subject: RunStore, protocol_run: ProtocolRunData, run_resource: RunResource) -> None:
+    subject.insert(run=run_resource)
+    # subject.update_run_state(run_id=run_resource.run_id, run_data=protocol_run, commands=[])
+    result = subject.get_run_commands(run_id=run_resource.run_id)
+    # assert result == protocol_run
+
+
+def test_get_run_data(subject: RunStore, protocol_run: ProtocolRunData, run_resource: RunResource) -> None:
+    subject.insert(run=run_resource)
+    # subject.update_run_state(run_id=run_resource.run_id, run_data=protocol_run, commands=[])
+    result = subject.get_run_data(run_id=run_resource.run_id)
+    # assert result == protocol_run

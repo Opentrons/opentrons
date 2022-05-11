@@ -94,15 +94,27 @@ class RunStore:
                 state_row = transaction.execute(statement).one()
             except sqlalchemy.exc.NoResultFound:
                 raise RunNotFoundError(run_id=run_id)
-        return _convert_sql_row_to_sql_run_state(state_row)
+        return _convert_sql_row_to_run_state(state_row)
 
     def get_run_data(self, run_id: str) -> ProtocolRunData:
         """Get the archived run data of a run."""
-        raise NotImplementedError("TODO")
+        statment = sqlalchemy.select(run_table.c.state).where(run_table.c.id == run_id)
+        with self._sql_engine.begin() as transaction:
+            try:
+                row = transaction.execute(statment).one()
+            except sqlalchemy.exc.NoResultFound:
+                raise RunNotFoundError(run_id=run_id)
+            return _convert_sql_row_to_run_data(row)
 
     def get_run_commands(self, run_id: str) -> List[Command]:
         """Get the archived commands list of a run."""
-        raise NotImplementedError("TODO")
+        statment = sqlalchemy.select(run_table.c.commands).where(run_table.c.id == run_id)
+        with self._sql_engine.begin() as transaction:
+            try:
+                row = transaction.execute(statment).one()
+            except sqlalchemy.exc.NoResultFound:
+                raise RunNotFoundError(run_id=run_id)
+            # return _convert_sql_row_to_run_commands(row)
 
     def insert_action(self, run_id: str, action: RunAction) -> None:
         """Insert run action in the db.
@@ -312,7 +324,14 @@ def _convert_action_to_sql_values(action: RunAction, run_id: str) -> Dict[str, o
     }
 
 
-def _convert_sql_row_to_sql_run_state(
+def _convert_sql_row_to_run_data(sql_row: sqlalchemy.engine.Row) -> ProtocolRunData:
+    print("sql_row")
+    run_data = sql_row[0]
+    print(run_data)
+    return parse_obj_as(ProtocolRunData, run_data)
+
+
+def _convert_sql_row_to_run_state(
     sql_row: sqlalchemy.engine.Row,
 ) -> RunStateResource:
 
@@ -340,6 +359,8 @@ def _convert_sql_row_to_sql_run_state(
 
 
 def _convert_state_to_sql_values(state: RunStateResource) -> Dict[str, object]:
+    print("_convert_state_to_sql_values")
+    print(state._updated_at)
     return {
         "state": state.state.dict(),
         "engine_status": state.engine_status,
