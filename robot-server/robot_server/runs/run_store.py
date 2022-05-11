@@ -154,6 +154,15 @@ class RunStore:
 
         return run
 
+    def has(self, run_id: str) -> bool:
+        statement = sqlalchemy.select(run_table).where(run_table.c.id == run_id)
+        with self._sql_engine.begin() as transaction:
+            try:
+                exists = transaction.execute(statement).first() is not None
+            except sqlalchemy.exc.NoResultFound:
+                return False
+            return exists
+
     def get(self, run_id: str) -> RunResource:
         """Get a specific run entry by its identifier.
 

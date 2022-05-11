@@ -111,8 +111,6 @@ def test_update_run_state(
     assert run_data_result.status == engine_state.engine_status
 
 
-
-
 def test_update_state_run_not_found(
     subject: RunStore, protocol_run: ProtocolRunData
 ) -> None:
@@ -388,3 +386,15 @@ def test_get_run_data(subject: RunStore, protocol_run: ProtocolRunData, run_reso
     subject.update_run_state(run_id=run_resource.run_id, run_data=protocol_run, commands=[])
     result = subject.get_run_data(run_id=run_resource.run_id)
     assert result == protocol_run
+
+
+def test_has_run_id(subject: RunStore, run_resource: RunResource) -> None:
+    subject.insert(run=run_resource)
+    result = subject.has(run_resource.run_id)
+    assert result == True
+
+
+def test_has_no_run_id(subject: RunStore, run_resource: RunResource) -> None:
+    subject.insert(run=run_resource)
+    result = subject.has("no-run-id")
+    assert result == False
