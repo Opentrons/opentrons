@@ -3,17 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
-import {
-  Flex,
-  DIRECTION_ROW,
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { SPACING, TYPOGRAPHY } from '@opentrons/components'
 
 import { StyledText } from '../../../../atoms/text'
-import { Divider } from '../../../../atoms/structure'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated } from './utils'
 import { getDisplayNameForTipRack } from '../../../../pages/Robots/InstrumentSettings/utils'
