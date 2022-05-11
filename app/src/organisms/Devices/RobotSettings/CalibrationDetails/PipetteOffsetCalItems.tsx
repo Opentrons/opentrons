@@ -56,95 +56,100 @@ export function PipetteOffsetCalItems({
   return (
     <>
       <StyledTable>
-        <tr>
-          <StyledTableHeader>
-            {t('table_header_model_and_serial')}
-          </StyledTableHeader>
-          <StyledTableHeader>{t('table_header_mount')}</StyledTableHeader>
-          <StyledTableHeader>{t('table_header_tiprack')}</StyledTableHeader>
-          <StyledTableHeader>
-            {t('table_header_last_calibrated')}
-          </StyledTableHeader>
-        </tr>
-        {formattedPipetteOffsetCalibrations.map((calibration, index) => (
-          <StyledTableRow key={index}>
-            <StyledTableCell>
-              <StyledText as="p">{calibration.modelName}</StyledText>
-              <StyledText as="p">{calibration.serialNumber}</StyledText>
-            </StyledTableCell>
-            <StyledTableCell>
-              <StyledText as="p" textTransform={TEXT_TRANSFORM_CAPITALIZE}>
-                {calibration.mount}
-              </StyledText>
-            </StyledTableCell>
-            <StyledTableCell>
-              <StyledText as="p">
-                {getDisplayNameForTipRack(
-                  calibration.tiprack,
-                  customLabwareDefs
-                )}
-              </StyledText>
-            </StyledTableCell>
-            <StyledTableCell>
-              <Flex alignItems={ALIGN_CENTER}>
-                {calibration.lastCalibrated != null ? (
-                  <>
-                    <StyledText as="p">
-                      {formatLastCalibrated(calibration.lastCalibrated)}
-                    </StyledText>
-                  </>
-                ) : (
-                  <>
-                    {calibration.markedBad ?? false ? (
-                      <>
-                        <Icon
-                          name="alert-circle"
-                          backgroundColor={COLORS.warningBg}
-                          color={COLORS.warning}
-                          height={SPACING.spacing2}
-                        />
-                        <StyledText
-                          as="p"
-                          marginLeft={SPACING.spacing2}
-                          width="100%"
-                          color={COLORS.warningText}
-                        >
-                          {t('missing_calibration')}
-                        </StyledText>
-                      </>
-                    ) : (
-                      <>
-                        <Icon
-                          name="alert-circle"
-                          backgroundColor={COLORS.errorBg}
-                          color={COLORS.error}
-                          height={SPACING.spacing4}
-                        />
-                        <StyledText
-                          as="p"
-                          marginLeft={SPACING.spacing2}
-                          width="100%"
-                          color={COLORS.errorText}
-                        >
-                          {t('missing_calibration')}
-                        </StyledText>
-                      </>
-                    )}
-                  </>
-                )}
-              </Flex>
-            </StyledTableCell>
+        <thead>
+          <tr>
+            <StyledTableHeader>
+              {t('table_header_model_and_serial')}
+            </StyledTableHeader>
+            <StyledTableHeader>{t('table_header_mount')}</StyledTableHeader>
+            <StyledTableHeader>{t('table_header_tiprack')}</StyledTableHeader>
+            <StyledTableHeader>
+              {t('table_header_last_calibrated')}
+            </StyledTableHeader>
+          </tr>
+        </thead>
+        <tbody>
+          {formattedPipetteOffsetCalibrations.map((calibration, index) => (
+            <StyledTableRow key={index}>
+              <StyledTableCell>
+                <StyledText as="p">{calibration.modelName}</StyledText>
+                <StyledText as="p">{calibration.serialNumber}</StyledText>
+              </StyledTableCell>
+              <StyledTableCell>
+                <StyledText as="p" textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+                  {calibration.mount}
+                </StyledText>
+              </StyledTableCell>
+              <StyledTableCell>
+                <StyledText as="p">
+                  {getDisplayNameForTipRack(
+                    calibration.tiprack,
+                    customLabwareDefs
+                  )}
+                </StyledText>
+              </StyledTableCell>
+              <StyledTableCell>
+                <Flex alignItems={ALIGN_CENTER}>
+                  {calibration.lastCalibrated != null &&
+                  !calibration.markedBad ? (
+                    <>
+                      <StyledText as="p">
+                        {formatLastCalibrated(calibration.lastCalibrated)}
+                      </StyledText>
+                    </>
+                  ) : (
+                    <>
+                      {calibration.markedBad ? (
+                        <>
+                          <Icon
+                            name="alert-circle"
+                            backgroundColor={COLORS.warningBg}
+                            color={COLORS.warning}
+                            height={SPACING.spacing2}
+                          />
+                          <StyledText
+                            as="p"
+                            marginLeft={SPACING.spacing2}
+                            width="100%"
+                            color={COLORS.warningText}
+                          >
+                            {t('recalibration_recommended')}
+                          </StyledText>
+                        </>
+                      ) : (
+                        <>
+                          <Icon
+                            name="alert-circle"
+                            backgroundColor={COLORS.errorBg}
+                            color={COLORS.error}
+                            height={SPACING.spacing4}
+                          />
+                          <StyledText
+                            as="p"
+                            marginLeft={SPACING.spacing2}
+                            width="100%"
+                            color={COLORS.errorText}
+                          >
+                            {t('missing_calibration')}
+                          </StyledText>
+                        </>
+                      )}
+                    </>
+                  )}
+                </Flex>
+              </StyledTableCell>
 
-            <StyledTableCell>
-              <OverflowMenu
-                calType="pipetteOffset"
-                robotName={robotName}
-                serialNumber={calibration.serialNumber ?? null}
-                mount={calibration.mount}
-              />
-            </StyledTableCell>
-          </StyledTableRow>
-        ))}
+              <StyledTableCell>
+                <OverflowMenu
+                  calType="pipetteOffset"
+                  robotName={robotName}
+                  serialNumber={calibration.serialNumber ?? null}
+                  mount={calibration.mount}
+                />
+              </StyledTableCell>
+            </StyledTableRow>
+          ))}
+        </tbody>
       </StyledTable>
     </>
   )

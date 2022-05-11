@@ -290,11 +290,13 @@ export function RobotSettingsCalibration({
   }
 
   const checkPipetteCalibrationMissing = (): void => {
-    if (!pipettePresent) {
+    if (
+      pipetteOffsetCalibrations === null ||
+      Object.values(pipetteOffsetCalibrations).length <= 1
+    ) {
       setShowPipetteOffsetCalibrationBanner(true)
       setPipetteOffsetCalBannerType('error')
     } else {
-      // check status of pipette offset calibrations
       const left = attachedPipettes.left?.id
       const right = attachedPipettes.right?.id
       const markedBads =
