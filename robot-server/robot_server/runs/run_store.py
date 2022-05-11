@@ -1,7 +1,7 @@
 """Runs' on-db store."""
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 
 from pydantic import parse_obj_as
 import sqlalchemy
@@ -29,6 +29,7 @@ class RunResource:
     actions: List[RunAction]
     is_current: bool
 
+
 @dataclass(frozen=True)
 class RunStateResource:
     """An entry in the run state store, used to construct response models.
@@ -38,7 +39,7 @@ class RunStateResource:
 
     run_id: str
     protocol_run_data: ProtocolRunData
-    commands: Optional[List[Command]]
+    commands: List[Command]
     engine_status: str
     _updated_at: datetime = field(default_factory=lambda: datetime.now(tz=timezone.utc))
 
@@ -280,7 +281,7 @@ def _convert_sql_row_to_run(
     )
 
 
-def _convert_commands_list_to_dict(commands: List[Command]) -> Dict[str, Command]:
+def _convert_commands_list_to_dict(commands: List[Command]) -> List[Dict[str, Any]]:
     return [command.dict() for command in commands]
 
 
