@@ -3,25 +3,29 @@ import os
 import logging
 import asyncio
 import argparse
+from numpy import float32, float64
 
 from typing import Callable
 from logging.config import dictConfig
-from opentrons_hardware.firmware_bindings.messages import payloads
+
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SetupRequest,
-    DisableMotorRequest,
-    ExecuteMoveGroupRequest,
+    EnableMotorRequest,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
+from opentrons_hardware.hardware_control.motion import (
+    MoveGroupSingleGripperStep,
+    MoveType,
+    MoveGroups,
+)
+from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
+
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.hardware_control.gripper_settings import (
     set_reference_voltage,
-    grip,
-    home,
 )
-from opentrons_hardware.firmware_bindings.utils import UInt8Field
 
 
 GetInputFunc = Callable[[str], str]
@@ -67,20 +71,6 @@ def in_green(s: str) -> str:
     return f"\033[92m{str(s)}\033[0m"
 
 
-async def execute_move(messenger: CanMessenger) -> None:
-    """Send an execute move command."""
-    await messenger.send(
-        node_id=NodeId.broadcast,
-        message=ExecuteMoveGroupRequest(
-            payload=payloads.ExecuteMoveGroupRequestPayload(
-                group_id=UInt8Field(0),
-                start_trigger=UInt8Field(0),
-                cancel_trigger=UInt8Field(0),
-            )
-        ),
-    )
-
-
 def output_details(i: int, total_i: int) -> None:
     """Print out test details."""
     print(f"\n\033[95mRound {i}/{total_i}:\033[0m")
@@ -98,30 +88,54 @@ async def run(args: argparse.Namespace) -> None:
     pwm_duty = prompt_int_input("PWM duty cycle in % (int)")
 
     driver = await build_driver(build_settings(args))
+    # driver = await CanDriver.build(
+    #     bitrate=250000, interface='socketcan', channel='can0'
+    # )
+    # driver = await SocketDriver.build(
+    #     bitrate=250000, interface='pcan', channel='PCAN_USBBUS1'
+    # )
+
     messenger = CanMessenger(driver=driver)
     messenger.start()
     await set_reference_voltage(messenger, vref)
-    # await set_pwm_param(messenger, pwm_freq, pwm_duty)
-    await messenger.send(node_id=NodeId.gripper, message=SetupRequest())
+    await messenger.send(node_id=NodeId.gripper_g, message=SetupRequest())
+    await messenger.send(node_id=NodeId.gripper_g, message=EnableMotorRequest())
 
-    """Setup gripper"""
+    move_groups: MoveGroups = []
+    move_groups.append(
+        [
+            {
+                NodeId.gripper_g: MoveGroupSingleGripperStep(
+                    duration_sec=float64(3),
+                    pwm_frequency=float32(pwm_freq),
+                    pwm_duty_cycle=float32(pwm_duty),
+                )
+            }
+        ]
+    )
+    move_groups.append(
+        [
+            {
+                NodeId.gripper_g: MoveGroupSingleGripperStep(
+                    duration_sec=float64(0),
+                    pwm_frequency=float32(pwm_freq),
+                    pwm_duty_cycle=float32(pwm_duty),
+                    move_type=MoveType.home,
+                )
+            }
+        ]
+    )
+    assert len(move_groups) == 2
+
+    runner = MoveGroupRunner(move_groups=move_groups)
     try:
-        while True:
-            for i in range(reps):
-                output_details(i, reps)
-                await grip(messenger, 0, 0, pwm_freq, pwm_duty)
-                await execute_move(messenger)
-                await asyncio.sleep(5.0)
-
-                await home(messenger, 0, 0, pwm_freq, pwm_duty)
-                await execute_move(messenger)
-                print("finished")
-
+        for i in range(reps):
+            output_details(i, reps)
+            await runner.run(can_messenger=messenger)
     except asyncio.CancelledError:
         pass
     finally:
         print("\nTesting finishes...\n")
-        await messenger.send(node_id=NodeId.gripper, message=DisableMotorRequest())
         await messenger.stop()
         driver.shutdown()
 
