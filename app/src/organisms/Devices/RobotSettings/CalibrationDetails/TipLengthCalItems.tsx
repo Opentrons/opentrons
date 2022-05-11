@@ -68,45 +68,49 @@ export function TipLengthCalItems({
   return (
     <>
       <StyledTable>
-        <tr>
-          <StyledTableHeader>{t('table_header_tiprack')}</StyledTableHeader>
-          <StyledTableHeader>
-            {t('table_header_model_and_serial')}
-          </StyledTableHeader>
-          <StyledTableHeader>
-            {t('table_header_last_calibrated')}
-          </StyledTableHeader>
-        </tr>
-        {tipLengthCalibrations.map((calibration, index) => (
-          <StyledTableRow key={index}>
-            <StyledTableCell>
-              <StyledText as="p">
-                {getDisplayNameForTipRack(
-                  calibration.tiprack,
-                  customLabwareDefs
-                )}
-              </StyledText>
-            </StyledTableCell>
-            <StyledTableCell>
-              <StyledText as="p">{calibration.modelName}</StyledText>
-              <StyledText as="p">{calibration.serialNumber}</StyledText>
-            </StyledTableCell>
-            <StyledTableCell>
-              <StyledText as="p">
-                {formatLastCalibrated(calibration.lastCalibrated)}
-              </StyledText>
-            </StyledTableCell>
+        <thead>
+          <tr>
+            <StyledTableHeader>{t('table_header_tiprack')}</StyledTableHeader>
+            <StyledTableHeader>
+              {t('table_header_model_and_serial')}
+            </StyledTableHeader>
+            <StyledTableHeader>
+              {t('table_header_last_calibrated')}
+            </StyledTableHeader>
+          </tr>
+        </thead>
+        <tbody>
+          {tipLengthCalibrations.map((calibration, index) => (
+            <StyledTableRow key={index}>
+              <StyledTableCell>
+                <StyledText as="p">
+                  {getDisplayNameForTipRack(
+                    calibration.tiprack,
+                    customLabwareDefs
+                  )}
+                </StyledText>
+              </StyledTableCell>
+              <StyledTableCell>
+                <StyledText as="p">{calibration.modelName}</StyledText>
+                <StyledText as="p">{calibration.serialNumber}</StyledText>
+              </StyledTableCell>
+              <StyledTableCell>
+                <StyledText as="p">
+                  {formatLastCalibrated(calibration.lastCalibrated)}
+                </StyledText>
+              </StyledTableCell>
 
-            <StyledTableCell>
-              <OverflowMenu
-                calType="tipLength"
-                robotName={robotName}
-                serialNumber={calibration.serialNumber}
-                mount={calibration.mount}
-              />
-            </StyledTableCell>
-          </StyledTableRow>
-        ))}
+              <StyledTableCell>
+                <OverflowMenu
+                  calType="tipLength"
+                  robotName={robotName}
+                  serialNumber={calibration.serialNumber}
+                  mount={calibration.mount}
+                />
+              </StyledTableCell>
+            </StyledTableRow>
+          ))}
+        </tbody>
       </StyledTable>
     </>
   )

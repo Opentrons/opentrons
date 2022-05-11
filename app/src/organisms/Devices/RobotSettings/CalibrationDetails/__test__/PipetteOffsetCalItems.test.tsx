@@ -59,9 +59,7 @@ describe('PipetteOffsetCalItems', () => {
     getByText('Last Calibrated')
   })
 
-  // it('should render overFlow menu', () => {})
-
-  it('should render pipette offset calibrations data', () => {
+  it('should render overFlow menu', () => {
     const { getAllByRole } = render(props)
     const buttons = getAllByRole('button')
     expect(buttons).toHaveLength(2)

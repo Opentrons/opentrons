@@ -12,6 +12,7 @@ import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
+  mockPipetteOffsetCalibration4,
 } from '../../../../redux/calibration/pipette-offset/__fixtures__'
 import {
   mockTipLengthCalibration1,
@@ -51,9 +52,6 @@ const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.Mo
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunction<
   typeof useTipLengthCalibrations
->
-const mockUseAttachedPipetteCalibrations = useAttachedPipetteCalibrations as jest.MockedFunction<
-  typeof useAttachedPipetteCalibrations
 >
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
@@ -106,7 +104,6 @@ describe('RobotSettingsCalibration', () => {
       mockTipLengthCalibration2,
       mockTipLengthCalibration3,
     ])
-    mockUseAttachedPipetteCalibrations.mockReturnValue([])
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -149,6 +146,29 @@ describe('RobotSettingsCalibration', () => {
     )
   })
 
+  it('renders Not calibrated yet when no pipette offset calibrations data', () => {
+    mockUsePipetteOffsetCalibrations.mockReturnValue(null)
+    const [{ getByText }] = render()
+    getByText('Not calibrated yet')
+  })
+
+  it('renders the error banner when calibration is missing', () => {
+    mockUsePipetteOffsetCalibrations.mockReturnValue(null)
+    const [{ getByText }] = render()
+    getByText('Pipette Offset calibration missing')
+  })
+
+  it('renders the warning banner when calibration is marked bad', () => {
+    mockUsePipetteOffsetCalibrations.mockReturnValue([
+      mockPipetteOffsetCalibration1,
+      mockPipetteOffsetCalibration2,
+      mockPipetteOffsetCalibration3,
+      mockPipetteOffsetCalibration4,
+    ])
+    const [{ getByText }] = render()
+    getByText('Pipette Offset calibration recommended')
+  })
+
   // Tip Length Calibrations this comment will be removed when finish all sections
   it('renders a title and description - Tip Length Calibrations', () => {
     const [{ getByText }] = render()
@@ -156,5 +176,11 @@ describe('RobotSettingsCalibration', () => {
     getByText(
       'Tip length calibration measures the distance between the bottom of the tip and the pipette’s nozzle. You can recalibrate a tip length if the pipette associated with it is currently attached to this robot. If you recalibrate a tip length, you will be prompted to recalibrate that pipette’s offset calibration.'
     )
+  })
+
+  it('renders Not calibrated yet when no tip length calibrations data', () => {
+    mockUseTipLengthCalibrations.mockReturnValue(null)
+    const [{ getByText }] = render()
+    getByText('Not calibrated yet')
   })
 })

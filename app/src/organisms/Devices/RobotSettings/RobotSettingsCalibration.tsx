@@ -297,8 +297,8 @@ export function RobotSettingsCalibration({
       setShowPipetteOffsetCalibrationBanner(true)
       setPipetteOffsetCalBannerType('error')
     } else {
-      const left = attachedPipettes.left?.id
-      const right = attachedPipettes.right?.id
+      const left = attachedPipettes?.left?.id
+      const right = attachedPipettes?.right?.id
       const markedBads =
         pipetteOffsetCalibrations?.filter(
           p =>
@@ -396,7 +396,7 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing4}>
               {t('pipette_offset_calibrations_description')}
             </StyledText>
-            {attachedPipettes != null ? (
+            {pipetteOffsetCalibrations != null ? (
               <PipetteOffsetCalItems
                 robotName={robotName}
                 formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
@@ -418,8 +418,7 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing4}>
               {t('tip_length_calibrations_description')}
             </StyledText>
-            {tipLengthCalibrations != null &&
-            tipLengthCalibrations?.length > 0 ? (
+            {tipLengthCalibrations != null ? (
               <TipLengthCalItems
                 robotName={robotName}
                 formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}

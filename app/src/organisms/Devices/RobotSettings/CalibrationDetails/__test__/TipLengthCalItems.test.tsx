@@ -35,15 +35,15 @@ const mockPipetteOffsetCalibrations = [
 ]
 const mockTipLengthCalibrations = [
   {
-    tiprack: '',
-    pipette: '',
-    lastCalibrated: '',
+    tiprack: 'opentrons/opentrons_96_tiprack_1000ul/1',
+    pipette: 'Mock-P1KSV222021011802',
+    lastCalibrated: '2022-11-10T18:14:01',
     markedBad: false,
   },
   {
-    tiprack: '',
-    pipette: '',
-    lastCalibrated: '',
+    tiprack: 'opentrons/opentrons_96_tiprack_1000ul/1',
+    pipette: 'Mock-P2KSV222021011802',
+    lastCalibrated: '2022-11-10T18:15:02',
     markedBad: false,
   },
 ]
@@ -60,10 +60,31 @@ describe('PipetteOffsetCalItems', () => {
   beforeEach(() => {
     props = {
       robotName: ROBOT_NAME,
+      formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
+      formattedTipLengthCalibrations: mockTipLengthCalibrations,
     }
   })
 
-  it('should render table headers', () => {})
+  it('should render table headers', () => {
+    const { getByText } = render(props)
+    getByText('Tip Rack')
+    getByText('Pipette Model and Serial')
+    getByText('Last Calibrated')
+  })
 
-  it('should render pipette offset calibrations data', () => {})
+  it('should render overFlow menu', () => {
+    const { getAllByRole } = render(props)
+    const buttons = getAllByRole('button')
+    expect(buttons).toHaveLength(2)
+  })
+
+  it('should render tip length calibrations data', () => {
+    const { getByText } = render(props)
+    // todo tiprack
+    getByText('Mock-P1KSV222021011802')
+    getByText('11/10/2022 18:14:01')
+
+    getByText('Mock-P2KSV222021011802')
+    getByText('11/10/2022 18:15:02')
+  })
 })
