@@ -270,9 +270,7 @@ def test_magnetic_module_engage(
 ) -> None:
     """It should execute a Magnetic Module engage command."""
     request = commands.magnetic_module.EngageCreate(
-        params=commands.magnetic_module.EngageParams(
-            moduleId="module-id", engageHeight=12.34
-        )
+        params=commands.magnetic_module.EngageParams(moduleId="module-id", height=12.34)
     )
     response = commands.magnetic_module.EngageResult()
 
