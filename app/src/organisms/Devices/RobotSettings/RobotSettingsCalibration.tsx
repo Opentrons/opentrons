@@ -21,7 +21,6 @@ import { Portal } from '../../../App/portal'
 import { TertiaryButton } from '../../../atoms/Buttons'
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
-import { Tooltip } from '../../../atoms/Tooltip'
 import { Banner } from '../../../atoms/Banner'
 import { DeckCalibrationModal } from '../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
@@ -60,8 +59,6 @@ import type {
 //   DeckCalibrationData,
 //   DeckCalibrationStatus,
 // } from '../../../redux/calibration/types'
-
-// import { demoPippet, demoTipLengths } from './demo'
 
 interface CalibrationProps {
   robotName: string
@@ -104,13 +101,13 @@ export function RobotSettingsCalibration({
     setShowDeckCalibrationModal,
   ] = React.useState(false)
   const [
-    showPipetteOffsetCalWarning,
-    setShowPipetteOffsetCalWarning,
+    showPipetteOffsetCalibrationBanner,
+    setShowPipetteOffsetCalibrationBanner,
   ] = React.useState<boolean>(false)
   const [
-    showPipetteOffsetCalError,
-    setShowPipetteOffsetCalError,
-  ] = React.useState<boolean>(false)
+    pipetteOffsetCalBannerType,
+    setPipetteOffsetCalBannerType,
+  ] = React.useState<string>('')
 
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
 
@@ -119,7 +116,6 @@ export function RobotSettingsCalibration({
   const jogRequestId = React.useRef<string | null>(null)
 
   const robot = useRobot(robotName)
-  const notConnectable = robot?.status !== CONNECTABLE
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -159,7 +155,6 @@ export function RobotSettingsCalibration({
     robot?.name != null ? robot.name : null
   )
 
-  const isRunning = useSelector(robotSelectors.getIsRunning)
   const pipettePresent =
     !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
   const isPending =
@@ -177,47 +172,6 @@ export function RobotSettingsCalibration({
   const createStatus = createRequest?.status
 
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
-  // const configHasCalibrationBlock = null
-  const deckCalStatus = useSelector((state: State) => {
-    return Calibration.getDeckCalibrationStatus(state, robotName)
-  })
-
-  let buttonDisabledReason = null
-  if (notConnectable) {
-    buttonDisabledReason = t('shared:disabled_cannot_connect')
-  } else if (!robot.connected) {
-    buttonDisabledReason = t('shared:disabled_connect_to_robot')
-  } else if (isRunning) {
-    buttonDisabledReason = t('shared:disabled_protocol_is_running')
-  } else if (!pipettePresent) {
-    buttonDisabledReason = t('shared:disabled_no_pipette_attached')
-  }
-
-  const healthCheckButtonDisabled = Boolean(buttonDisabledReason) || isPending
-
-  const deckCalibrationButtonText =
-    deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_IDENTITY
-      ? t('deck_calibration_recalibrate_button')
-      : t('deck_calibration_calibrate_button')
-
-  const disabledOrBusyReason = isPending
-    ? t('robot_calibration:deck_calibration_spinner', {
-        ongoing_action:
-          createStatus === RobotApi.PENDING
-            ? t('shared:starting')
-            : t('shared:ending'),
-      })
-    : buttonDisabledReason
-
-  const deckLastModified = (): string => {
-    const calibratedDate =
-      deckCalibrationData.deckCalibrationData?.lastModified ?? null
-    return calibratedDate
-      ? t('last_calibrated', {
-          date: formatLastModified(calibratedDate),
-        })
-      : t('not_calibrated')
-  }
 
   const isJogging =
     useSelector((state: State) =>
@@ -266,7 +220,6 @@ export function RobotSettingsCalibration({
     )
   }
 
-  // TODO check useCurrentRunId
   const handleHealthCheck = (
     hasBlockModalResponse: boolean | null = null
   ): void => {
@@ -336,11 +289,41 @@ export function RobotSettingsCalibration({
     return tipLengths
   }
 
+  const checkPipetteCalibrationMissing = (): void => {
+    if (!pipettePresent) {
+      setShowPipetteOffsetCalibrationBanner(true)
+      setPipetteOffsetCalBannerType('error')
+    } else {
+      // check status of pipette offset calibrations
+      const left = attachedPipettes.left?.id
+      const right = attachedPipettes.right?.id
+      const markedBads =
+        pipetteOffsetCalibrations?.filter(
+          p =>
+            (p.pipette === left && p.status.markedBad) ||
+            (p.pipette === right && p.status.markedBad)
+        ) ?? null
+      if (markedBads !== null) {
+        setShowPipetteOffsetCalibrationBanner(true)
+        setPipetteOffsetCalBannerType('warning')
+      } else {
+        setShowPipetteOffsetCalibrationBanner(false)
+      }
+    }
+  }
+
+  console.log(attachedPipettes)
+  console.log(pipetteOffsetCalibrations)
+
   React.useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
       createRequestId.current = null
     }
   }, [createStatus])
+
+  React.useEffect(() => {
+    checkPipetteCalibrationMissing()
+  }, [pipettePresent, pipetteOffsetCalibrations])
 
   return (
     <>
@@ -396,9 +379,13 @@ export function RobotSettingsCalibration({
       </Box>
       <Line />
       {/* PipetteOffsetCalibrations Section */}
-      {showPipetteOffsetCalWarning && (
-        <Banner type="warning">
-          {t('pipette_offset_calibration_recommended')}
+      {showPipetteOffsetCalibrationBanner && (
+        <Banner
+          type={pipetteOffsetCalBannerType === 'error' ? 'error' : 'warning'}
+        >
+          {pipetteOffsetCalBannerType === 'error'
+            ? t('pipette_offset_calibration_missing')
+            : t('pipette_offset_calibration_recommended')}
         </Banner>
       )}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
