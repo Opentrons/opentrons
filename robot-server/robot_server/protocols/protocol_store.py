@@ -27,6 +27,20 @@ class ProtocolResource:
     protocol_key: Optional[str]
 
 
+@dataclass(frozen=True)
+class ProtocolRunUsageInfo:
+    """Information about whether a particular protocol is being used by any runs.
+
+    See `runs.RunStore` for information about runs.
+    """
+
+    protocol_id: str
+    """This protocol's ID."""
+
+    is_used_by_run: bool
+    """Whether any currently existing run is linked to this protocol."""
+
+
 class ProtocolNotFoundError(KeyError):
     """Error raised when a protocol ID was not found in the store."""
 
@@ -203,7 +217,8 @@ class ProtocolStore:
             source=deleted_source,
         )
 
-    def is_used_by_run(self, protocol_id: str) -> bool:
+    def get_run_usage_info(self) -> List[ProtocolRunUsageInfo]:
+        # To do: specify that this is returned in order from oldest-first.
         raise NotImplementedError()
 
     def _sql_insert(self, resource: _DBProtocolResource) -> None:

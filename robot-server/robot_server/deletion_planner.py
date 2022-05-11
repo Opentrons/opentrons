@@ -2,21 +2,23 @@
 
 
 from dataclasses import dataclass
-from typing import List, Set
+from typing import Sequence, Set
+from typing_extensions import Protocol as InterfaceShape
 
 
-@dataclass(frozen=True)
-class ProtocolSpec:
+class ProtocolSpec(InterfaceShape):
     """Minimal info about a protocol in the SQL database.
 
     Just enough for the deletion planner to do its job.
     """
 
-    protocol_id: str
-    """This protocol's ID."""
+    @property
+    def protocol_id(self) -> str:
+        """This protocol's ID."""
 
-    is_used_by_run: bool
-    """Whether this protocol is used by any run."""
+    @property
+    def is_used_by_run(self) -> bool:
+        """Whether this protocol is used by any run."""
 
 
 class ProtocolDeletionPlanner:  # noqa: D101
@@ -25,7 +27,7 @@ class ProtocolDeletionPlanner:  # noqa: D101
 
     def plan_for_new_protocol(
         self,
-        existing_protocols: List[ProtocolSpec],
+        existing_protocols: Sequence[ProtocolSpec],
     ) -> Set[str]:
         """Choose which resources to delete in order to make room for a new protocol.
 
@@ -43,7 +45,7 @@ class RunDeletionPlanner:  # noqa: D101
 
     def plan_deletions_for_new_run(
         self,
-        existing_runs: List[str],
+        existing_runs: Sequence[str],
     ) -> Set[str]:
         """Choose which resources to delete in order to make room for a new run.
 
