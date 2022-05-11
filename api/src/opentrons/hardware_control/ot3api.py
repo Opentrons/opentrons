@@ -584,7 +584,8 @@ class OT3API(
         print(position_axes)
 
         if fail_on_not_homed and (
-            not self._backend.is_homed(position_axes) or not self._encoder_current_position
+            not self._backend.is_homed(position_axes)
+            or not self._encoder_current_position
         ):
             raise MustHomeError(
                 f"Current position of {str(mount)} pipette is unknown, please home."
@@ -592,9 +593,13 @@ class OT3API(
         elif not self._encoder_current_position and not refresh:
             raise MustHomeError("Encoder position is unknown; please home motors.")
         async with self._motion_lock:
-            self._encoder_current_position = await self._backend.update_encoder_position()
+            self._encoder_current_position = (
+                await self._backend.update_encoder_position()
+            )
             ot3pos = self._effector_pos_from_carriage_pos(
-                OT3Mount.from_mount(mount), self._encoder_current_position, critical_point
+                OT3Mount.from_mount(mount),
+                self._encoder_current_position,
+                critical_point,
             )
             return ot3pos
 
@@ -782,7 +787,6 @@ class OT3API(
                 raise
             else:
                 self._current_position.update(target_position)
-
 
     @ExecutionManagerProvider.wait_for_running
     async def home(

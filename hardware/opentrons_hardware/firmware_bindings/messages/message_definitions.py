@@ -161,14 +161,18 @@ class MoveCompleted:  # noqa: D101
 
 @dataclass
 class EncoderPositionRequest(EmptyPayloadMessage):  # noqa: D101
-    message_id: Literal[MessageId.encoder_position_request] = MessageId.encoder_position_request
+    message_id: Literal[
+        MessageId.encoder_position_request
+    ] = MessageId.encoder_position_request
 
 
 @dataclass
 class EncoderPositionResponse:  # noqa: D101
     payload: payloads.EncoderPositionResponse
     payload_type: Type[BinarySerializable] = payloads.EncoderPositionResponse
-    message_id: Literal[MessageId.encoder_position_response] = MessageId.encoder_position_response
+    message_id: Literal[
+        MessageId.encoder_position_response
+    ] = MessageId.encoder_position_response
 
 
 @dataclass

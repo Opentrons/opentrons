@@ -370,6 +370,7 @@ def deck_from_machine(  # type: ignore[no-untyped-def]
         with_enum[axis_enum.Y],
         with_enum[axis_enum.by_mount(Mount.LEFT)],
     )
+
     right_deck = deck_point_from_machine_point(right, attitude, offset)
     left_deck = deck_point_from_machine_point(left, attitude, offset)
     deck_pos = {
