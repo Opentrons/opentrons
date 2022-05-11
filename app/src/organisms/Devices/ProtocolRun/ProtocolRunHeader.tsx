@@ -125,8 +125,6 @@ export function ProtocolRunHeader({
   const runRecord = useRunQuery(runId)
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const { displayName } = useProtocolDetailsForRun(runId)
-
-  // this duplicates the run query above but has additional run status processing logic
   const runStatus = useRunStatus(runId)
 
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)

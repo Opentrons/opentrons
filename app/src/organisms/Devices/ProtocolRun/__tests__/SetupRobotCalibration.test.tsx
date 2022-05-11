@@ -7,7 +7,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-import { useDeckCalibrationData } from '../../hooks'
+import { useDeckCalibrationData, useRunHasStarted } from '../../hooks'
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
 import { SetupPipetteCalibration } from '../SetupPipetteCalibration'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
@@ -33,6 +33,9 @@ const mockSetupTipLengthCalibration = SetupTipLengthCalibration as jest.MockedFu
 >
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
+>
+const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
+  typeof useRunHasStarted
 >
 
 const ROBOT_NAME = 'otie'
@@ -78,6 +81,7 @@ describe('SetupRobotCalibration', () => {
       deckCalibrationData: mockDeckCalData,
       isDeckCalibrated: true,
     })
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -112,7 +116,19 @@ describe('SetupRobotCalibration', () => {
   it('does not call the expandStep function on click if calibration is not complete', () => {
     const { getByRole } = render({ calibrationStatus: { complete: false } })[0]
 
-    fireEvent.click(getByRole('button', { name: 'Proceed to module setup' }))
+    const button = getByRole('button', { name: 'Proceed to module setup' })
+    expect(button).toBeDisabled()
+    fireEvent.click(button)
+    expect(mockExpandStep).not.toHaveBeenCalled()
+  })
+
+  it('does not call the expandStep function on click if run has started', () => {
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
+    const { getByRole } = render()[0]
+
+    const button = getByRole('button', { name: 'Proceed to module setup' })
+    expect(button).toBeDisabled()
+    fireEvent.click(button)
     expect(mockExpandStep).not.toHaveBeenCalled()
   })
 })
