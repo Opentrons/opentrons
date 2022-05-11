@@ -13,7 +13,6 @@ import {
   COLORS,
   BORDERS,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   TYPOGRAPHY,
   SIZE_1,
   SIZE_2,
@@ -26,17 +25,13 @@ import {
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
-import { Portal } from '../../App/portal'
-import { PrimaryButton, SecondaryButton } from '../../atoms/Buttons'
-import { Modal } from '../../atoms/Modal'
+import { PrimaryButton } from '../../atoms/Buttons'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
-import { useProtocolDetailsForRun } from '../../organisms/Devices/hooks'
 import {
   useCloseCurrentRun,
   useCurrentRunId,
 } from '../../organisms/ProtocolUpload/hooks'
-import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import { useAvailableAndUnavailableDevices } from '../../pages/Devices/DevicesLanding/hooks'
 import { getScanning, startDiscovery } from '../../redux/discovery'
 import { StoredProtocolData } from '../../redux/protocol-storage'
@@ -44,7 +39,6 @@ import { AvailableRobotOption } from './AvailableRobotOption'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 
 import type { StyleProps } from '@opentrons/components'
-import type { ModalProps } from '../../atoms/Modal'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
 
@@ -193,69 +187,6 @@ export function ChooseRobotSlideout(
   )
 }
 
-interface RobotIsBusyModalProps extends ModalProps {
-  closeCurrentRunOnSuccess: () => void
-  robotName: string
-}
-
-function RobotIsBusyModal({
-  closeCurrentRunOnSuccess,
-  onClose,
-  robotName,
-}: RobotIsBusyModalProps): JSX.Element {
-  const { t } = useTranslation('protocol_details')
-  const history = useHistory()
-  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
-  const currentRunId = useCurrentRunId()
-  const runStatus = useCurrentRunStatus()
-  const { displayName: protocolName } = useProtocolDetailsForRun(currentRunId)
-
-  return (
-    <Modal
-      type="warning"
-      title={t('robot_is_busy', { robotName })}
-      onClose={onClose}
-    >
-      <Flex
-        alignItems={ALIGN_FLEX_END}
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing5}
-        marginY={SPACING.spacing3}
-      >
-        <StyledText
-          fontSize={TYPOGRAPHY.fontSizeLabel}
-          lineHeight={TYPOGRAPHY.lineHeight16}
-        >
-          {t('robot_is_busy_with_protocol', {
-            robotName,
-            protocolName,
-            runStatus,
-          })}
-        </StyledText>
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
-          <SecondaryButton
-            onClick={() =>
-              history.push(
-                `/devices/${robotName}/protocol-runs/${currentRunId}`
-              )
-            }
-          >
-            {t('view_run_details')}
-          </SecondaryButton>
-          <PrimaryButton
-            disabled={isClosingCurrentRun}
-            onClick={() =>
-              closeCurrentRun({ onSuccess: closeCurrentRunOnSuccess })
-            }
-          >
-            {t('clear_and_proceed_to_setup')}
-          </PrimaryButton>
-        </Flex>
-      </Flex>
-    </Modal>
-  )
-}
-
 interface CreateRunButtonProps
   extends React.ComponentProps<typeof PrimaryButton> {
   srcFileObjects: File[]
@@ -272,31 +203,22 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
     },
   })
   const currentRunId = useCurrentRunId()
-  const [
-    showRobotIsBusyModal,
-    setShowRobotIsBusyModal,
-  ] = React.useState<boolean>(false)
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-    currentRunId != null
-      ? setShowRobotIsBusyModal(true)
-      : createRun(srcFileObjects)
+    createRun(srcFileObjects)
   }
 
   return (
     <>
-      <PrimaryButton onClick={handleClick} width="100%" {...buttonProps}>
+      <PrimaryButton
+        onClick={handleClick}
+        width="100%"
+        {...buttonProps}
+        disabled={isClosingCurrentRun}
+      >
         {t('proceed_to_setup')}
       </PrimaryButton>
-      <Portal level="top">
-        {showRobotIsBusyModal ? (
-          <RobotIsBusyModal
-            closeCurrentRunOnSuccess={() => createRun(srcFileObjects)}
-            onClose={() => setShowRobotIsBusyModal(false)}
-            robotName={robotName}
-          />
-        ) : null}
-      </Portal>
     </>
   )
 }

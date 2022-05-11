@@ -18,7 +18,6 @@ import {
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   Box,
-  Btn,
   Flex,
   Icon,
   IconName,
@@ -288,26 +287,13 @@ export function ProtocolRunHeader({
     runStatus === RUN_STATUS_PAUSE_REQUESTED ||
     runStatus === RUN_STATUS_STOP_REQUESTED
 
-  const clearProtocolLink = (
-    <Btn
-      role="link"
-      onClick={handleClearClick}
-      id="ProtocolRunHeader_closeRunLink"
-    >
-      <StyledText textDecoration={TYPOGRAPHY.textDecorationUnderline}>
-        {t('clear_protocol')}
-      </StyledText>
-    </Btn>
-  )
-
   const ClearProtocolBanner = (): JSX.Element | null => {
     switch (runStatus) {
       case RUN_STATUS_FAILED: {
         return (
-          <Banner type="error">
+          <Banner type="error" onCloseClick={handleClearClick}>
             <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-              {`${t('run_failed')}. ${t('clear_protocol_to_make_available')} `}
-              {clearProtocolLink}
+              {`${t('run_failed')}.`}
             </Flex>
           </Banner>
         )
@@ -316,22 +302,16 @@ export function ProtocolRunHeader({
         return (
           <Banner type="warning">
             <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-              {`${t('run_canceled')}. ${t(
-                'clear_protocol_to_make_available'
-              )} `}
-              {clearProtocolLink}
+              {`${t('run_canceled')}.`}
             </Flex>
           </Banner>
         )
       }
       case RUN_STATUS_SUCCEEDED: {
         return (
-          <Banner type="success">
+          <Banner type="success" onCloseClick={handleClearClick}>
             <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-              {`${t('run_completed')}. ${t(
-                'clear_protocol_to_make_available'
-              )}`}
-              {clearProtocolLink}
+              {`${t('run_completed')}.`}
             </Flex>
           </Banner>
         )
