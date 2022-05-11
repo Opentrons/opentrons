@@ -43,7 +43,7 @@ class RunDeletionPlanner:  # noqa: D101
     def __init__(self, maximum_runs: int) -> None:
         self._maximum_runs = maximum_runs
 
-    def plan_deletions_for_new_run(
+    def plan_for_new_run(
         self,
         existing_runs: Sequence[str],
     ) -> Set[str]:

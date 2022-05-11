@@ -55,5 +55,4 @@ async def get_run_auto_deleter(
     return RunAutoDeleter(
         run_store=run_store,
         deletion_planner=RunDeletionPlanner(maximum_runs=_MAXIMUM_RUNS),
-        maximum_runs=_MAXIMUM_RUNS,
     )

@@ -15,16 +15,14 @@ class RunAutoDeleter:  # noqa: D101
         self,
         run_store: RunStore,
         deletion_planner: RunDeletionPlanner,
-        maximum_runs: int,
     ) -> None:
         self._run_store = run_store
         self._deletion_planner = deletion_planner
-        self._maximum_runs = maximum_runs
 
     def make_room_for_new_run(self) -> None:  # noqa: D102
         run_ids = [r.run_id for r in self._run_store.get_all()]
 
-        run_ids_to_delete = self._deletion_planner.plan_deletions_for_new_run(
+        run_ids_to_delete = self._deletion_planner.plan_for_new_run(
             existing_runs=run_ids,
         )
 

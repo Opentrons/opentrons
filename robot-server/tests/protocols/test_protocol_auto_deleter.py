@@ -37,7 +37,7 @@ def test_make_room_for_new_protocol(
         mock_deletion_planner.plan_for_new_protocol(existing_protocols=run_usage_info)
     ).then_return(deletion_plan)
 
-    # Capture log messages from the subject at least as severe as INFO.
+    # Run the subject, capturing log messages at least as severe as INFO.
     with caplog.at_level(logging.INFO):
         subject.make_room_for_new_protocol()
 
