@@ -16,7 +16,7 @@ from opentrons.protocol_engine import (
 from robot_server.errors import ApiError
 from robot_server.service.json_api import RequestModel, MultiBodyMeta
 from robot_server.runs.run_models import Run, RunCommandSummary
-from robot_server.runs.engine_store import EngineStore
+from robot_server.runs.engine_store import EngineStore, ProtocolEngine
 from robot_server.runs.router.commands_router import (
     CommandCollectionLinks,
     CommandLink,
@@ -80,12 +80,13 @@ async def test_create_run_command(decoy: Decoy, mock_engine_store: EngineStore) 
 
 async def test_create_run_command_not_current(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_protocol_engine: ProtocolEngine,
 ) -> None:
     """It should 400 if you try to add commands to non-current run."""
     command_request = pe_commands.PauseCreate(
         params=pe_commands.PauseParams(message="Hello")
     )
+    # decoy.when(mock_protocol_engine.add_command).then_return()
 
     run = Run(
         id="run-id",
@@ -104,7 +105,7 @@ async def test_create_run_command_not_current(
         await create_run_command(
             request_body=RequestModel(data=command_request),
             waitUntilComplete=False,
-            engine_store=mock_engine_store,
+            protocol_engine=mock_protocol_engine,
             run=run,
         )
 

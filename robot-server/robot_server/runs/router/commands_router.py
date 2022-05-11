@@ -7,7 +7,7 @@ from typing_extensions import Final, Literal
 from fastapi import APIRouter, Depends, Query, status
 from pydantic import BaseModel, Field
 
-from opentrons.protocol_engine import commands as pe_commands, errors as pe_errors
+from opentrons.protocol_engine import commands as pe_commands, errors as pe_errors, ProtocolEngine
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
@@ -66,6 +66,26 @@ class CommandCollectionLinks(BaseModel):
     )
 
 
+async def get_current_run_engine_from_url(
+    run: Run,
+    engine_store: EngineStore = Depends(get_engine_store),
+) -> ProtocolEngine:
+    """Get run protocol engine.
+
+    Args:
+        run: Run pulled from url.
+        engine_store: engine store to pull current run ProtocolEngine.
+    """
+    print("runrunrunrun")
+    print(run)
+    if not run.current:
+        raise RunStopped(detail=f"Run {run.id} is not the current run").as_error(
+            status.HTTP_400_BAD_REQUEST
+        )
+
+    return engine_store.engine
+
+
 @commands_router.post(
     path="/runs/{runId}/commands",
     summary="Enqueue a protocol command",
@@ -111,8 +131,8 @@ async def create_run_command(
             " Inspect the returned command's `status` to detect the timeout."
         ),
     ),
-    engine_store: EngineStore = Depends(get_engine_store),
     run: Run = Depends(get_run_data_from_url),
+    protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url)
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
 
@@ -123,25 +143,19 @@ async def create_run_command(
             Else, return immediately. Comes from a query parameter in the URL.
         timeout: The maximum time, in seconds, to wait before returning.
             Comes from a query parameter in the URL.
-        engine_store: Used to retrieve the `ProtocolEngine` on which the new
+        protocol_engine: Used to retrieve the `ProtocolEngine` on which the new
             command will be enqueued.
         run: Run response model, provided by the route handler for
             `GET /runs/{runId}`. Present to ensure 404 if run
             not found.
     """
-    if not run.current:
-        raise RunStopped(detail=f"Run {run.id} is not the current run").as_error(
-            status.HTTP_400_BAD_REQUEST
-        )
-
-    engine = engine_store.engine
-    command = engine.add_command(request_body.data)
+    command = protocol_engine.add_command(request_body.data)
 
     if waitUntilComplete:
         with move_on_after(timeout / 1000.0):
-            await engine.wait_for_command(command.id),
+            await protocol_engine.wait_for_command(command.id),
 
-    response_data = engine.state_view.commands.get(command.id)
+    response_data = protocol_engine.state_view.commands.get(command.id)
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=response_data),
@@ -189,6 +203,7 @@ async def get_run_commands(
         cursor: Cursor index for the collection response.
         pageLength: Maximum number of items to return.
     """
+    # call run_data_manager for logic
     state = engine_store.get_state(run.id)
     current_command = state.commands.get_current()
     command_slice = state.commands.get_slice(cursor=cursor, length=pageLength)
