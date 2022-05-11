@@ -1,23 +1,24 @@
-""" update-server implementation for buildroot systems """
+""" update-server implementation for openembedded systems """
 import asyncio
 import logging
 import json
-from typing import Mapping, Any
 from aiohttp import web
+from typing import Optional, Mapping, Any
 
 from otupdate.common import (
     config,
+    constants,
     control,
     ssh_key_management,
     name_management,
-    constants,
     update,
 )
-from . import update_actions
 
+from otupdate.openembedded.updater import RootFSInterface, PartitionManager, Updater
+from otupdate.common.update_actions import FILE_ACTIONS_VARNAME
 
-BR_BUILTIN_VERSION_FILE = "/etc/VERSION.json"
-#: Location of the builtin system version
+OE_BUILTIN_VERSION_FILE = "/etc/VERSION.json"
+
 
 LOG = logging.getLogger(__name__)
 
@@ -32,9 +33,14 @@ async def log_error_middleware(request, handler):
     return resp
 
 
-def get_version(version_file: str) -> Mapping[str, str]:
-    LOG.debug(f"Loading version file {version_file}")
-    return json.load(open(version_file, "r"))
+def get_version_dict(version_file: Optional[str]) -> Mapping[str, str]:
+    version = {}
+    if version_file:
+        try:
+            version = json.load(open(version_file))
+        except Exception:
+            logging.exception("Could not load version, using defaults")
+    return version
 
 
 def get_app(
@@ -44,17 +50,24 @@ def get_app(
     boot_id_override: str = None,
     loop: asyncio.AbstractEventLoop = None,
 ) -> web.Application:
-    """Build and return the aiohttp.web.Application that runs the server
-
-    The params can be overloaded for testing.
-    """
+    """Build and return the aiohttp.web.Application that runs the server"""
     if not system_version_file:
-        system_version_file = BR_BUILTIN_VERSION_FILE
+        system_version_file = OE_BUILTIN_VERSION_FILE
 
-    version = get_version(system_version_file)
+    version = get_version_dict(system_version_file)
+
+    if not loop:
+        loop = asyncio.get_event_loop()
+
+    config_obj = config.load(config_file_override)
+
+    app = web.Application(middlewares=[log_error_middleware])
     name = name_override or name_management.get_name()
     boot_id = boot_id_override or control.get_boot_id()
-    config_obj = config.load(config_file_override)
+    app[config.CONFIG_VARNAME] = config_obj
+    app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
+    app[constants.DEVICE_BOOT_ID_NAME] = boot_id
+    app[constants.DEVICE_NAME_VARNAME] = name
 
     LOG.info(
         "Setup: "
@@ -72,20 +85,13 @@ def get_app(
                 f'{version.get("update_server_version", "unknown")}',
                 "\t(from git sha      "
                 f'{version.get("update_server_sha", "unknown")}',
-                "Smoothie firmware version: TODO",
             ]
         )
     )
-
-    if not loop:
-        loop = asyncio.get_event_loop()
-
-    app = web.Application(middlewares=[log_error_middleware])
-    app[config.CONFIG_VARNAME] = config_obj
-    app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
-    app[constants.DEVICE_BOOT_ID_NAME] = boot_id
-    app[constants.DEVICE_NAME_VARNAME] = name
-    update_actions.OT2UpdateActions.build_and_insert(app)
+    rfs = RootFSInterface()
+    part_mgr = PartitionManager()
+    updater = Updater(rfs, part_mgr)
+    app[FILE_ACTIONS_VARNAME] = updater
     app.router.add_routes(
         [
             web.get(
@@ -110,14 +116,13 @@ def get_app(
 
 
 def health_response(version_dict: Mapping[str, str]) -> Mapping[str, Any]:
-    """Create the buildroot specific health response."""
+    """Create the openembedded specific health response."""
     return {
         "updateServerVersion": version_dict.get("update_server_version", "unknown"),
         "apiServerVersion": version_dict.get("opentrons_api_version", "unknown"),
-        "smoothieVersion": "unimplemented",
-        "systemVersion": version_dict.get("buildroot_version", "unknown"),
+        "systemVersion": version_dict.get("openembedded_version", "unknown"),
         "capabilities": {
-            "buildrootUpdate": "/server/update/begin",
+            "openembeddedUpdate": "/server/update/begin",
             "restart": "/server/restart",
         },
     }

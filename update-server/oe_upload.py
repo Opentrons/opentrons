@@ -1,25 +1,18 @@
-""" buildroot_update.py: client script for running buildroot updates
-
-This can be used in place of the opentrons app to do updates of buildroot
-systems from update zips. Note that if you just want to do dev scale work
-of modifying the api server, you can probably use the update-api-buildroot
-makefile target in the api project.
+""" oe_upload.py: client script for running OE updates
 
 This requires aiohttp
 """
 
 import argparse
 import asyncio
-import enum
 import json
 import sys
 
 import aiohttp
 
 
-class UPDATE_KIND(enum.Enum):
-    UPDATE = enum.auto()
-    MIGRATE = enum.auto()
+# TODO (al, 2022-04-18): This separate script should be refactored. It and
+#  buildroot_upload.py should be merged into one script.
 
 
 async def poll_status(sess, token, root):
@@ -28,15 +21,12 @@ async def poll_status(sess, token, root):
     return await resp.json()
 
 
-async def do_update(update_file: str, host: str, kind: UPDATE_KIND,
+async def do_update(update_file: str, host: str,
                     pause_between_steps: bool = False):
-    timeout = aiohttp.ClientTimeout(total=900)
+    timeout = aiohttp.ClientTimeout(total=7200)
     async with aiohttp.ClientSession(timeout=timeout) as session:
-        if kind == UPDATE_KIND.MIGRATE:
-            root = host + '/server/update/migration'
-        else:
-            root = host + '/server/update'
-        filename = 'ot2-system.zip'
+        root = host + '/server/update'
+        filename = "ot3-system.zip"
         print(f"Starting update of {update_file.name} to {host}")
         begin_resp = await session.post(root + '/begin')
         if begin_resp.status == 409:
@@ -84,16 +74,16 @@ async def do_update(update_file: str, host: str, kind: UPDATE_KIND,
         status = await file_resp.json()
         while status['stage'] == 'validating':
             sys.stdout.write(
-                f'{status["message"]}: {status["progress"]*100:.0f}%\r')
+                f'{status["message"]}: {status["progress"] * 100:.0f}%\r')
             status = await poll_status(session, token, root)
-        print()
+        print(msg)
         if status['stage'] == 'error':
             print(f'Error validating: {status["error"]}: {status["message"]}')
             sys.exit(-1)
 
         while status['stage'] == 'writing':
             sys.stdout.write(
-                f'{status["message"]}: {status["progress"]*100:.0f}%\r')
+                f'{status["message"]}: {status["progress"] * 100:.0f}%\r')
             status = await poll_status(session, token, root)
 
         if status['stage'] == 'error':
@@ -114,17 +104,14 @@ async def do_update(update_file: str, host: str, kind: UPDATE_KIND,
                       f'{status["message"]}')
                 sys.exit(-1)
 
-        msg = 'Update commited'
+        msg = 'Update committed'
         if pause_between_steps:
             input(f'{msg}. Press enter to continue to restart')
         else:
             print(msg)
 
         print("Restarting...")
-        if kind == UPDATE_KIND.MIGRATE:
-            resp = await session.post(host+'/server/update/restart')
-        else:
-            resp = await session.post(host+'/server/restart')
+        resp = await session.post(host + '/server/restart')
         if resp.status != 200:
             try:
                 body = await resp.json()
@@ -149,27 +136,22 @@ def assure_host(host_arg):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='update buildroot systems')
-    parser.add_argument('action', metavar='ACTION',
-                        choices=['update', 'migrate'],
-                        help='Whether to update the robot (if already on '
-                        'buildroot) or migrate the robot from buildroot to '
-                        'balena')
+    parser = argparse.ArgumentParser(description='update OE systems')
     parser.add_argument('update', metavar='UPDATE_FILE',
                         type=argparse.FileType('rb'),
-                        help='The ot2-system.zip to upload')
+                        help='The OT3/OE root file system to upload')
     parser.add_argument('host', metavar='ROBOT HOSTNAME',
                         type=str,
                         help='The IP of the robot')
     parser.add_argument('-s', '--step-by-step', action='store_true',
                         help='Pause until the user hits enter in between each '
-                        'stage. Useful for dev workflows')
+                             'stage. Useful for dev workflows')
+
     args = parser.parse_args()
     asyncio.get_event_loop().run_until_complete(
         do_update(
             args.update,
             assure_host(args.host),
-            UPDATE_KIND[args.action.upper()],
             pause_between_steps=args.step_by_step))
 
 
