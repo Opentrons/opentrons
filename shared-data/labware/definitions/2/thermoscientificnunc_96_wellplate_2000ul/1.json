@@ -1005,6 +1005,7 @@
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": true,
+    "magneticModuleEngageHeight": 6,
     "loadName": "thermoscientificnunc_96_wellplate_2000ul"
   },
   "namespace": "opentrons",
