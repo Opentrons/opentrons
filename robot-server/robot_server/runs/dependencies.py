@@ -17,7 +17,7 @@ _run_store_accessor = AppStateAccessor[RunStore]("run_store")
 _engine_store_accessor = AppStateAccessor[EngineStore]("engine_store")
 
 
-def get_run_store(
+async def get_run_store(
     app_state: AppState = Depends(get_app_state),
     sql_engine: SQLEngine = Depends(get_sql_engine),
 ) -> RunStore:
@@ -31,7 +31,7 @@ def get_run_store(
     return run_store
 
 
-def get_engine_store(
+async def get_engine_store(
     app_state: AppState = Depends(get_app_state),
     hardware_api: HardwareControlAPI = Depends(get_hardware),
 ) -> EngineStore:
@@ -45,10 +45,14 @@ def get_engine_store(
     return engine_store
 
 
-def get_run_data_manager(
-        task_runner: TaskRunner = Depends(get_task_runner),
-        engine_store: EngineStore = Depends(get_engine_store),
-        run_store: RunStore = Depends(get_run_store),
+async def get_run_data_manager(
+    task_runner: TaskRunner = Depends(get_task_runner),
+    engine_store: EngineStore = Depends(get_engine_store),
+    run_store: RunStore = Depends(get_run_store),
 ) -> RunDataManager:
     """Get a run data manager to keep track of current/historical run data."""
-    return RunDataManager(task_runner=task_runner, engine_store=engine_store, run_store=run_store)
+    return RunDataManager(
+        task_runner=task_runner,
+        engine_store=engine_store,
+        run_store=run_store,
+    )
