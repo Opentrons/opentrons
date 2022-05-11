@@ -92,7 +92,7 @@ run_table = sqlalchemy.Table(
     ),
     sqlalchemy.Column("state", sqlalchemy.PickleType, nullable=True),
     sqlalchemy.Column("commands", sqlalchemy.PickleType, nullable=True),
-    sqlalchemy.Column("engine_status", sqlalchemy.String),
+    sqlalchemy.Column("engine_status", sqlalchemy.String, nullable=True),
     sqlalchemy.Column(
         "_updated_at",
         sqlalchemy.DateTime,

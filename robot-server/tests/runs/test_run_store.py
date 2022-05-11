@@ -1,7 +1,7 @@
 """Tests for robot_server.runs.run_store."""
 import pytest
 from datetime import datetime, timezone
-
+from typing import List
 from sqlalchemy.engine import Engine
 
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
@@ -28,7 +28,20 @@ def subject(sql_engine_fixture: Engine) -> RunStore:
     return RunStore(sql_engine=sql_engine_fixture)
 
 
-# TODO(tz): move to conftest file. create a fixter that inserts a fun
+@pytest.fixture
+def protocol_commands() -> List[pe_commands.Command]:
+    """Get a ProtocolRunData value object."""
+    return [
+        pe_commands.Pause(
+            id="pause-1",
+            key="command-key",
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=pe_commands.PauseParams(message="hello world"),
+            result=pe_commands.PauseResult(),
+        )
+    ]
+
 @pytest.fixture
 def run_resource() -> RunResource:
     """Return a run resource."""
@@ -44,14 +57,6 @@ def run_resource() -> RunResource:
 @pytest.fixture
 def protocol_run() -> ProtocolRunData:
     """Get a ProtocolRunData test object."""
-    analysis_command = pe_commands.Pause(
-        id="command-id",
-        key="command-key",
-        status=pe_commands.CommandStatus.SUCCEEDED,
-        createdAt=datetime(year=2022, month=2, day=2),
-        params=pe_commands.PauseParams(message="hello world"),
-    )
-
     analysis_error = pe_errors.ErrorOccurrence(
         id="error-id",
         createdAt=datetime(year=2023, month=3, day=3),
@@ -74,7 +79,6 @@ def protocol_run() -> ProtocolRunData:
     )
 
     return ProtocolRunData(
-        commands=[analysis_command],
         errors=[analysis_error],
         labware=[analysis_labware],
         pipettes=[analysis_pipette],
@@ -100,29 +104,13 @@ def test_update_run_state(
         commands=[],
     )
     subject.update_run_state(run_id="run-id", run_data=engine_state.state, commands=engine_state.commands)
-    result = subject.get_run_state(run_id="run-id")
-    assert result == engine_state
+    run_data_result = subject.get_run_data(run_id="run-id")
+    commands_result = subject.get_run_commands(run_id="run-id")
+    assert run_data_result == protocol_run
+    assert commands_result == engine_state.commands
+    assert run_data_result.status == engine_state.engine_status
 
 
-def test_get_run_state(
-    subject: RunStore,
-    run_resource: RunResource,
-    protocol_run: ProtocolRunData,
-) -> None:
-    """It should be able to get engine state from the store."""
-    subject.insert(run_resource)
-    engine_state = RunStateResource(
-        run_id="run-id",
-        state=protocol_run,
-        engine_status="idle",
-        _updated_at=datetime.now(timezone.utc),
-        commands=[],
-    )
-
-    subject.update_run_state(run_id="run-id", run_data=engine_state.state, commands=engine_state.commands)
-    result = subject.get_run_state("run-id")
-
-    assert engine_state == result
 
 
 def test_update_state_run_not_found(
@@ -388,15 +376,15 @@ def test_insert_actions_no_run(subject: RunStore) -> None:
         subject.insert_action(run_id="run-id-996", action=action)
 
 
-def test_get_run_commands(subject: RunStore, protocol_run: ProtocolRunData, run_resource: RunResource) -> None:
+def test_get_run_commands(subject: RunStore, protocol_run: ProtocolRunData, run_resource: RunResource, protocol_commands: List[pe_commands.Command]) -> None:
     subject.insert(run=run_resource)
-    # subject.update_run_state(run_id=run_resource.run_id, run_data=protocol_run, commands=[])
+    subject.update_run_state(run_id=run_resource.run_id, run_data=protocol_run, commands=protocol_commands)
     result = subject.get_run_commands(run_id=run_resource.run_id)
-    # assert result == protocol_run
+    assert result == protocol_commands
 
 
 def test_get_run_data(subject: RunStore, protocol_run: ProtocolRunData, run_resource: RunResource) -> None:
     subject.insert(run=run_resource)
-    # subject.update_run_state(run_id=run_resource.run_id, run_data=protocol_run, commands=[])
+    subject.update_run_state(run_id=run_resource.run_id, run_data=protocol_run, commands=[])
     result = subject.get_run_data(run_id=run_resource.run_id)
-    # assert result == protocol_run
+    assert result == protocol_run

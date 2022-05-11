@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
-from pydantic import parse_obj_as
+from pydantic import parse_obj_as, BaseModel
 import sqlalchemy
 
 from robot_server.persistence import run_table, action_table, ensure_utc_datetime
@@ -28,7 +28,6 @@ class RunResource:
     created_at: datetime
     actions: List[RunAction]
     is_current: bool
-
 
 @dataclass(frozen=True)
 class RunStateResource:
@@ -79,23 +78,6 @@ class RunStore:
             if result.rowcount == 0:
                 raise RunNotFoundError(run_id=run_id)
 
-    def get_run_state(self, run_id: str) -> RunStateResource:
-        """Get engine state from db.
-
-        Arguments:
-            run_id: Run id related to the engine state.
-
-        Returns:
-            The engine state that found in the store.
-        """
-        statement = sqlalchemy.select(run_table).where(run_table.c.id == run_id)
-        with self._sql_engine.begin() as transaction:
-            try:
-                state_row = transaction.execute(statement).one()
-            except sqlalchemy.exc.NoResultFound:
-                raise RunNotFoundError(run_id=run_id)
-        return _convert_sql_row_to_run_state(state_row)
-
     def get_run_data(self, run_id: str) -> ProtocolRunData:
         """Get the archived run data of a run."""
         statment = sqlalchemy.select(run_table.c.state).where(run_table.c.id == run_id)
@@ -114,7 +96,7 @@ class RunStore:
                 row = transaction.execute(statment).one()
             except sqlalchemy.exc.NoResultFound:
                 raise RunNotFoundError(run_id=run_id)
-            # return _convert_sql_row_to_run_commands(row)
+            return _convert_sql_row_to_run_commands(row)
 
     def insert_action(self, run_id: str, action: RunAction) -> None:
         """Insert run action in the db.
@@ -325,43 +307,22 @@ def _convert_action_to_sql_values(action: RunAction, run_id: str) -> Dict[str, o
 
 
 def _convert_sql_row_to_run_data(sql_row: sqlalchemy.engine.Row) -> ProtocolRunData:
-    print("sql_row")
     run_data = sql_row[0]
-    print(run_data)
     return parse_obj_as(ProtocolRunData, run_data)
 
 
-def _convert_sql_row_to_run_state(
-    sql_row: sqlalchemy.engine.Row,
-) -> RunStateResource:
+def _convert_sql_row_to_run_commands(sql_row: sqlalchemy.engine.Row) -> List[Command]:
+    return parse_obj_as(List[Command], sql_row[0])
 
-    run_id = sql_row.run_id
-    assert isinstance(run_id, str)
 
-    status = sql_row.engine_status
-    assert isinstance(status, str)
-
-    state = sql_row.state
-    assert isinstance(state, Dict)
-
-    # TODO (tz): set sql_row.commands add assert
-    commands: List[Command] = []
-
-    _updated_at = ensure_utc_datetime(sql_row._updated_at)
-
-    return RunStateResource(
-        run_id=run_id,
-        state=parse_obj_as(ProtocolRunData, state),
-        engine_status=status,
-        commands=commands,
-        _updated_at=_updated_at,
-    )
+def _convert_commands_list_to_dict(commands: List[Command]) -> Dict[str, Command]:
+    return [command.dict() for command in commands]
 
 
 def _convert_state_to_sql_values(state: RunStateResource) -> Dict[str, object]:
     return {
         "state": state.state.dict(),
         "engine_status": state.engine_status,
-        "commands": state.commands,
+        "commands": _convert_commands_list_to_dict(state.commands),
         "_updated_at": ensure_utc_datetime(state._updated_at),
     }
