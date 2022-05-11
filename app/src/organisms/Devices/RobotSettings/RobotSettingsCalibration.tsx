@@ -159,8 +159,6 @@ export function RobotSettingsCalibration({
     robot?.name != null ? robot.name : null
   )
 
-  console.log(deckCalibrationData)
-
   const isRunning = useSelector(robotSelectors.getIsRunning)
   const pipettePresent =
     !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
@@ -211,8 +209,6 @@ export function RobotSettingsCalibration({
       })
     : buttonDisabledReason
 
-  console.log('disabledOrBusyReason', disabledOrBusyReason)
-
   const deckLastModified = (): string => {
     const calibratedDate =
       deckCalibrationData.deckCalibrationData?.lastModified ?? null
@@ -231,7 +227,6 @@ export function RobotSettingsCalibration({
     )?.status === RobotApi.PENDING
 
   const handleStartDeckCalSession = (): void => {
-    console.log('handleStartDeckCalSession')
     dispatchRequests(
       Sessions.ensureSession(robotName, Sessions.SESSION_TYPE_DECK_CALIBRATION)
     )
@@ -338,7 +333,6 @@ export function RobotSettingsCalibration({
         uri: tipLength.uri,
       })
     )
-    console.log('tipLengths', tipLengths)
     return tipLengths
   }
 
