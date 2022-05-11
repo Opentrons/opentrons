@@ -40,6 +40,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
 
   &:disabled {
     background-color: ${COLORS.greyDisabled};
+    color: ${COLORS.disabled};
   }
 `
 

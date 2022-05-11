@@ -67,25 +67,26 @@
     "quirks",
     "slotTransforms",
     "compatibleWith",
-    "layers"
+    "twoDimensionalRendering"
   ],
   "additionalProperties": false,
   "properties": {
     "$otSharedSchema": {
       "type": "string",
-      "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/module/schemas/2 is a reference to this schema."
+      "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/module/schemas/3 is a reference to this schema."
     },
     "moduleType": {
       "enum": [
         "temperatureModuleType",
         "magneticModuleType",
-        "thermocyclerModuleType"
+        "thermocyclerModuleType",
+        "heaterShakerModuleType"
       ],
       "type": "string"
     },
     "model": {
       "type": "string",
-      "pattern": "^(temperatureModule|magneticModule|thermocyclerModule)V[0-9]+$"
+      "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule)V[0-9]+$"
     },
     "labwareOffset": { "$ref": "#/definitions/coordinates" },
     "dimensions": {

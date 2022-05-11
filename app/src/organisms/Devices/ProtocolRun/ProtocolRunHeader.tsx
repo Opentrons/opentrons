@@ -67,7 +67,6 @@ import {
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
-  useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
@@ -126,10 +125,7 @@ export function ProtocolRunHeader({
   const runRecord = useRunQuery(runId)
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const { displayName } = useProtocolDetailsForRun(runId)
-
-  // these duplicate the run query above but have additional run status processing logic
   const runStatus = useRunStatus(runId)
-  const runHasStarted = useRunHasStarted(runId)
 
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
 
@@ -274,21 +270,14 @@ export function ProtocolRunHeader({
     runStatus === RUN_STATUS_RUNNING ||
     runStatus === RUN_STATUS_PAUSED ||
     runStatus === RUN_STATUS_PAUSE_REQUESTED ||
-    runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR
+    runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
+    runStatus === RUN_STATUS_IDLE
 
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
 
   const handleClearClick = (): void => {
     closeCurrentRun()
   }
-
-  const isClearButtonDisabled =
-    isClosingCurrentRun ||
-    runStatus === RUN_STATUS_RUNNING ||
-    runStatus === RUN_STATUS_PAUSED ||
-    runStatus === RUN_STATUS_FINISHING ||
-    runStatus === RUN_STATUS_PAUSE_REQUESTED ||
-    runStatus === RUN_STATUS_STOP_REQUESTED
 
   const clearProtocolLink = (
     <Btn
@@ -343,7 +332,7 @@ export function ProtocolRunHeader({
   }
 
   const ProtocolRunningContent = (): JSX.Element | null =>
-    runHasStarted ? (
+    runStatus != null ? (
       <Flex
         backgroundColor={COLORS.lightGrey}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -389,8 +378,13 @@ export function ProtocolRunHeader({
           <SecondaryButton
             color={COLORS.errorText}
             padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
-            onClick={handleCancelClick}
+            onClick={
+              isCurrentRun && runStatus === RUN_STATUS_IDLE
+                ? handleClearClick
+                : handleCancelClick
+            }
             id="ProtocolRunHeader_cancelRunButton"
+            disabled={isClosingCurrentRun}
           >
             {t('cancel_run')}
           </SecondaryButton>
@@ -519,16 +513,6 @@ export function ProtocolRunHeader({
           gridGap={SPACING.spacingSM}
           width={SIZE_5}
         >
-          {isCurrentRun ? (
-            <SecondaryButton
-              padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
-              onClick={handleClearClick}
-              disabled={isClearButtonDisabled}
-              id="ProtocolRunHeader_closeRunButton"
-            >
-              {t('clear_protocol')}
-            </SecondaryButton>
-          ) : null}
           <PrimaryButton
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
