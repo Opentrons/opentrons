@@ -22,7 +22,8 @@ const PROTOCOL_RESPONSE = {
     createdAt: 'now',
     id: '1',
     metadata: {},
-    analyses: {},
+    analysisSummaries: [],
+    files: [],
   },
 } as Protocol
 

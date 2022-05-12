@@ -1,4 +1,7 @@
 """Custom payload fields."""
+from __future__ import annotations
+
+import binascii
 import enum
 
 from opentrons_hardware.firmware_bindings import utils, ErrorCode
@@ -137,3 +140,15 @@ class SensorOutputBindingField(utils.UInt8Field):
             flag.name for flag in SensorOutputBinding if bool(self.value & flag.value)
         ]
         return f"{self.__class__.__name__}(value={','.join(flags_list)})"
+
+
+class EepromDataField(utils.BinaryFieldBase[bytes]):
+    """The data portion of an eeprom read/write message."""
+
+    NUM_BYTES = 8
+    FORMAT = f"{NUM_BYTES}s"
+
+    @classmethod
+    def from_string(cls, t: str) -> EepromDataField:
+        """Create from a string."""
+        return cls(binascii.unhexlify(t)[: cls.NUM_BYTES])

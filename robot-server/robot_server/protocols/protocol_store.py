@@ -1,6 +1,4 @@
 """Store and retrieve information about uploaded protocols."""
-
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -13,7 +11,7 @@ from anyio import Path as AsyncPath, create_task_group
 import sqlalchemy
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
-from robot_server.persistence import protocol_table
+from robot_server.persistence import analysis_table, protocol_table, ensure_utc_datetime
 
 
 _log = getLogger(__name__)
@@ -72,7 +70,7 @@ class ProtocolStore:
         """Return a new, empty ProtocolStore.
 
         Params:
-            sql_engine: A referenece to the database that this ProtocolStore should
+            sql_engine: A reference to the database that this ProtocolStore should
                 use as its backing storage.
                 This is expected to already have the proper tables set up;
                 see `add_tables_to_db()`.
@@ -100,7 +98,7 @@ class ProtocolStore:
                 use as its backing storage.
                 This is expected to already have the proper tables set up;
                 see `add_tables_to_db()`.
-            protocols_direrctory: Where to look for protocol files while rehydrating.
+            protocols_directory: Where to look for protocol files while rehydrating.
                 This is expected to have one subdirectory per protocol,
                 named after its protocol ID.
             protocol_reader: An interface to compute `ProtocolSource`s from protocol
@@ -163,6 +161,17 @@ class ProtocolStore:
             )
             for r in all_sql_resources
         ]
+
+    def has(self, protocol_id: str) -> bool:
+        """Check for the presence of a protocol ID in the store."""
+        statement = sqlalchemy.select(protocol_table).where(
+            protocol_table.c.id == protocol_id
+        )
+
+        with self._sql_engine.begin() as transaction:
+            result = transaction.execute(statement).one_or_none()
+
+        return result is not None
 
     def remove(self, protocol_id: str) -> ProtocolResource:
         """Remove a `ProtocolResource` from the store.
@@ -228,7 +237,10 @@ class ProtocolStore:
         select_statement = sqlalchemy.select(protocol_table).where(
             protocol_table.c.id == protocol_id
         )
-        delete_statement = sqlalchemy.delete(protocol_table).where(
+        delete_analyses_statement = sqlalchemy.delete(analysis_table).where(
+            analysis_table.c.protocol_id == protocol_id
+        )
+        delete_protocol_statement = sqlalchemy.delete(protocol_table).where(
             protocol_table.c.id == protocol_id
         )
         with self._sql_engine.begin() as transaction:
@@ -238,7 +250,19 @@ class ProtocolStore:
                 row_to_delete = transaction.execute(select_statement).one()
             except sqlalchemy.exc.NoResultFound as e:
                 raise ProtocolNotFoundError(protocol_id=protocol_id) from e
-            transaction.execute(delete_statement)
+
+            # TODO(mm, 2022-04-28): Deleting analyses from the table is enough to
+            # avoid a SQL foreign key conflict. But, if this protocol had any *pending*
+            # analyses, they'll be left behind in the AnalysisStore, orphaned,
+            # since they're stored independently of this SQL table.
+            #
+            # To fix this, we'll need to either:
+            #
+            # * Merge the Store classes or otherwise give them access to each other.
+            # * Switch from SQLAlchemy Core to ORM and use cascade deletes.
+            transaction.execute(delete_analyses_statement)
+
+            transaction.execute(delete_protocol_statement)
 
         deleted_resource = _convert_sql_row_to_dataclass(sql_row=row_to_delete)
         return deleted_resource
@@ -343,15 +367,13 @@ def _convert_sql_row_to_dataclass(
     sql_row: sqlalchemy.engine.Row,
 ) -> _DBProtocolResource:
     protocol_id = sql_row.id
-    assert isinstance(protocol_id, str)
-
-    created_at = sql_row.created_at
-    assert isinstance(created_at, datetime)
-
     protocol_key = sql_row.protocol_key
-    # key is optional in DB. If it's present (not None) it must be a str.
-    if protocol_key is not None:
-        assert isinstance(protocol_key, str)
+    created_at = ensure_utc_datetime(sql_row.created_at)
+
+    assert isinstance(protocol_id, str), f"Protocol ID {protocol_id} not a string"
+    assert protocol_key is None or isinstance(
+        protocol_key, str
+    ), f"Protocol Key {protocol_key} not a string or None"
 
     return _DBProtocolResource(
         protocol_id=protocol_id,
@@ -365,6 +387,6 @@ def _convert_dataclass_to_sql_values(
 ) -> Dict[str, object]:
     return {
         "id": resource.protocol_id,
-        "created_at": resource.created_at,
+        "created_at": ensure_utc_datetime(resource.created_at),
         "protocol_key": resource.protocol_key,
     }

@@ -11,6 +11,7 @@ import {
 } from '../moveLiquidFormToArgs'
 import { getOrderedWells } from '../../../utils'
 import { HydratedMoveLiquidFormData, PathOption } from '../../../../form-types'
+import { DEFAULT_MM_FROM_BOTTOM_ASPIRATE } from '../../../../constants'
 
 jest.mock('../../../utils')
 jest.mock('assert')
@@ -191,10 +192,15 @@ describe('move liquid step form -> command creator args', () => {
       checkboxField: 'aspirate_delay_checkbox',
       formFields: {
         aspirate_delay_seconds: 11,
-        aspirate_delay_mmFromBottom: 12,
+        aspirate_delay_mmFromBottom: null, // use default
       },
       expectedArgsUnchecked: { aspirateDelay: null },
-      expectedArgsChecked: { aspirateDelay: { seconds: 11, mmFromBottom: 12 } },
+      expectedArgsChecked: {
+        aspirateDelay: {
+          seconds: 11,
+          mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+        },
+      },
     },
     {
       checkboxField: 'dispense_delay_checkbox',

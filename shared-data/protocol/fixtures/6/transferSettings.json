@@ -22,7 +22,7 @@
     }
   },
   "labware": {
-    "trashId": {
+    "fixedTrash": {
       "displayName": "Trash",
       "definitionId": "opentrons/opentrons_1_trash_1100ml_fixed/1"
     },
@@ -4619,13 +4619,13 @@
       "id": "5",
       "commandType": "loadLabware",
       "params": {
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "location": {
           "slotName": "12"
         }
       },
       "result": {
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "definition": {
           "ordering": [["A1"]],
           "metadata": {
@@ -10574,7 +10574,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -10622,7 +10622,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -10670,7 +10670,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -10718,7 +10718,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -10766,7 +10766,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -10814,7 +10814,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -10862,7 +10862,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -10910,7 +10910,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -10958,7 +10958,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -11006,7 +11006,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -11040,7 +11040,7 @@
       "params": {
         "pipetteId": "4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b",
         "volume": 20,
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
@@ -11054,7 +11054,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     }

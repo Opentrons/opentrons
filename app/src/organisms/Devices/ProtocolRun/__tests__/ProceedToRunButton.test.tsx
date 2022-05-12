@@ -8,6 +8,7 @@ import { i18n } from '../../../../i18n'
 import { useTrackEvent } from '../../../../redux/analytics'
 import {
   useRunCalibrationStatus,
+  useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
 import { ProceedToRunButton } from '../ProceedToRunButton'
@@ -27,6 +28,9 @@ const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jes
 >
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
+>
+const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
+  typeof useRunHasStarted
 >
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
@@ -66,6 +70,7 @@ describe('ProceedToRunButton', () => {
       .mockReturnValue({
         complete: true,
       })
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
 
     mockTrackEvent = jest.fn()
     when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
@@ -136,5 +141,13 @@ describe('ProceedToRunButton', () => {
     getByText(
       'Make sure robot calibration is complete before proceeding to run'
     )
+  })
+  it('should be disabled with protocol run started tooltip when run has started', async () => {
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
+
+    const { getByRole, getByText } = render()
+    const button = getByRole('button', { name: 'Proceed to run' })
+    expect(button).toBeDisabled()
+    getByText('Protocol run started.')
   })
 })

@@ -54,7 +54,7 @@ export function AdvancedSettingsCard(
   const robotLogsDownloading = useSelector(getRobotLogsDownloading)
   const dispatch = useDispatch<Dispatch>()
   const controlsDisabled = status !== CONNECTABLE
-  const logsAvailable = health && health.logs
+  const logsAvailable = health != null && health.logs
 
   const showLogOptoutModal = settings.some(
     s => s.id === ROBOT_LOGS_OPTOUT_ID && s.value === null
@@ -74,7 +74,9 @@ export function AdvancedSettingsCard(
           value={t('download_logs_description')}
         />
         <SecondaryBtn
-          disabled={controlsDisabled || !logsAvailable || robotLogsDownloading}
+          disabled={
+            controlsDisabled || logsAvailable == null || robotLogsDownloading
+          }
           onClick={() => dispatch(downloadLogs(robot))}
           minWidth={SIZE_4}
           marginLeft={SPACING_4}

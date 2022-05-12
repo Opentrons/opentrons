@@ -1,5 +1,5 @@
 import * as React from 'react'
-
+import { css } from 'styled-components'
 import {
   Btn,
   Icon,
@@ -11,20 +11,38 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   COLORS,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../text'
 import { Divider } from '../structure'
+
 import type { IconProps } from '@opentrons/components'
 
 type ModalType = 'info' | 'warning' | 'error'
-interface ModalProps extends BaseModalProps {
+export interface ModalProps extends BaseModalProps {
   type?: ModalType
   onClose?: React.MouseEventHandler
   title?: React.ReactNode
   children?: React.ReactNode
   icon?: IconProps
 }
+
+const closeIconStyles = css`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 14px;
+  width: ${SPACING.spacingL};
+  height: ${SPACING.spacingL};
+  &:hover {
+    background-color: #16212d26;
+  }
+
+  &:active {
+    background-color: #16212d40;
+  }
+`
 
 export const Modal = (props: ModalProps): JSX.Element => {
   const { type = 'info', onClose, title, children } = props
@@ -51,7 +69,13 @@ export const Modal = (props: ModalProps): JSX.Element => {
             </StyledText>
           </Flex>
           {onClose != null && (
-            <Btn onClick={onClose}>
+            <Btn
+              onClick={onClose}
+              css={closeIconStyles}
+              data-testid={`Modal_icon_close_${
+                typeof title === 'string' ? title : ''
+              }`}
+            >
               <Icon
                 name={'close'}
                 width={SPACING.spacing5}
@@ -65,7 +89,15 @@ export const Modal = (props: ModalProps): JSX.Element => {
     ) : null
 
   return (
-    <BaseModal width={'31.25rem'} noHeaderStyles header={header}>
+    <BaseModal
+      width={'31.25rem'}
+      noHeaderStyles
+      header={header}
+      css={css`
+        border-radius: ${BORDERS.radiusSoftCorners};
+        box-shadow: ${BORDERS.smallDropShadow};
+      `}
+    >
       {children}
     </BaseModal>
   )

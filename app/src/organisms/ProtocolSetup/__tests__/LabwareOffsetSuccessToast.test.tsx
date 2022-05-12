@@ -5,11 +5,11 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { useCurrentRun } from '../../ProtocolUpload/hooks'
 import { LabwareOffsetSuccessToast } from '../LabwareOffsetSuccessToast'
-import { getLatestLabwareOffsetCount } from '../LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
+import { getLatestLabwareOffsetCount } from '../../LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 jest.mock('../../ProtocolUpload/hooks')
-jest.mock('../LabwarePositionCheck/utils/getLatestLabwareOffsetCount')
+jest.mock('../../LabwarePositionCheck/utils/getLatestLabwareOffsetCount')
 
 const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
   typeof useCurrentRun

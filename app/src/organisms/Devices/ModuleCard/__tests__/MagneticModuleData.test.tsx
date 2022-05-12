@@ -22,8 +22,8 @@ describe('MagneticModuleData', () => {
   beforeEach(() => {
     props = {
       moduleHeight: mockMagneticModule.data.height,
-      moduleModel: mockMagneticModule.model,
-      moduleStatus: mockMagneticModule.status,
+      moduleModel: mockMagneticModule.moduleModel,
+      moduleStatus: mockMagneticModule.data.status,
     }
     mockStatusLabel.mockReturnValue(<div>Mock StatusLabel</div>)
   })

@@ -16,6 +16,7 @@ from .fields import (
     PipetteSerialField,
     GripperSerialField,
     SensorOutputBindingField,
+    EepromDataField,
 )
 from .. import utils
 
@@ -70,17 +71,18 @@ class GetSpeedResponsePayload(utils.BinarySerializable):
 
 
 @dataclass
-class WriteToEEPromRequestPayload(utils.BinarySerializable):
-    """Write to eeprom request."""
+class EEPromReadPayload(utils.BinarySerializable):
+    """Eeprom read request payload ."""
 
-    serial_number: utils.UInt16Field
+    address: utils.UInt8Field
+    data_length: utils.UInt8Field
 
 
 @dataclass
-class ReadFromEEPromResponsePayload(utils.BinarySerializable):
-    """Read from ee prom response."""
+class EEPromDataPayload(EEPromReadPayload):
+    """Eeprom payload with data."""
 
-    serial_number: utils.UInt16Field
+    data: EepromDataField
 
 
 @dataclass
@@ -405,3 +407,25 @@ class GripperInfoResponsePayload(utils.BinarySerializable):
 
     gripper_model: utils.UInt16Field
     gripper_serial: GripperSerialField
+
+
+@dataclass
+class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
+    """A request to move gripper."""
+
+    freq: utils.UInt32Field
+    duty_cycle: utils.UInt32Field
+
+
+@dataclass
+class TipActionRequestPayload(AddToMoveGroupRequestPayload):
+    """A request to perform a tip action."""
+
+    velocity: utils.Int32Field
+
+
+@dataclass
+class TipActionResponsePayload(MoveGroupResponsePayload):
+    """A response that sends back whether tip action was successful."""
+
+    success: utils.UInt8Field

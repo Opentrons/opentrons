@@ -17,6 +17,7 @@ import {
   useProtocolDetailsForRun,
   useRobot,
   useRunCalibrationStatus,
+  useRunHasStarted,
 } from '../../hooks'
 import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
@@ -39,6 +40,9 @@ const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunc
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
+>
+const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
+  typeof useRunHasStarted
 >
 const mockSetupLabware = SetupLabware as jest.MockedFunction<
   typeof SetupLabware
@@ -84,6 +88,7 @@ describe('ProtocolRunSetup', () => {
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ complete: true })
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
     when(mockSetupRobotCalibration)
       .calledWith(
         partialComponentPropsMatcher({
@@ -101,7 +106,7 @@ describe('ProtocolRunSetup', () => {
         })
       )
       .mockReturnValue(<span>Mock SetupLabware</span>)
-    when(mockSetupModules).mockReturnValue(<div>mock SetupModules</div>)
+    when(mockSetupModules).mockReturnValue(<div>Mock SetupModules</div>)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -124,6 +129,13 @@ describe('ProtocolRunSetup', () => {
       .mockReturnValue({ complete: false })
     const { getByText } = render()
     getByText('Calibration needed')
+  })
+
+  it('does not render calibration status when run has started', () => {
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
+    const { queryByText } = render()
+    expect(queryByText('Calibration needed')).toBeNull()
+    expect(queryByText('Calibration ready')).toBeNull()
   })
 
   describe('when no modules are in the protocol', () => {
@@ -152,19 +164,19 @@ describe('ProtocolRunSetup', () => {
       expect(queryByText(/module setup/i)).toBeNull()
     })
 
-    it('defaults to labware step expanded if calibration complete', async () => {
+    it('defaults to no step expanded', () => {
       const { getByText } = render()
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(getByText('Mock SetupLabware')).toBeVisible()
+      expect(getByText('Mock SetupLabware')).not.toBeVisible()
     })
 
-    it('defaults to robot calibration step expanded if calibration incomplete', async () => {
-      when(mockUseRunCalibrationStatus)
-        .calledWith(ROBOT_NAME, RUN_ID)
-        .mockReturnValue({ complete: false })
+    it('renders view-only info message if run has started', async () => {
+      when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
+
       const { getByText } = render()
       await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
+      expect(getByText('Mock SetupRobotCalibration')).not.toBeVisible()
+      expect(getByText('Mock SetupLabware')).not.toBeVisible()
+      getByText('Setup is view-only once run has started')
     })
   })
 
@@ -176,6 +188,7 @@ describe('ProtocolRunSetup', () => {
           protocolData: (withModulesProtocol as unknown) as ProtocolAnalysisFile,
           displayName: 'mock display name',
         })
+      when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
     })
     afterEach(() => {
       resetAllWhenMocks()
@@ -185,7 +198,7 @@ describe('ProtocolRunSetup', () => {
       const { getByText } = render()
       const moduleSetup = getByText('Module Setup')
       moduleSetup.click()
-      getByText('mock SetupModules')
+      getByText('Mock SetupModules')
     })
 
     it('renders correct text contents for multiple modules', () => {
@@ -243,22 +256,15 @@ describe('ProtocolRunSetup', () => {
       )
     })
 
-    it('defaults to module step expanded if calibration complete and modules present', async () => {
-      const { queryByText, getByText } = render()
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(getByText('mock SetupModules')).toBeVisible()
-      expect(queryByText('Mock SetupLabware')).not.toBeVisible()
-    })
+    it('renders view-only info message if run has started', async () => {
+      when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
 
-    it('defaults to robot calibration step expanded if calibration incomplete and modules present', async () => {
-      when(mockUseRunCalibrationStatus)
-        .calledWith(ROBOT_NAME, RUN_ID)
-        .mockReturnValue({ complete: false })
-
-      const { queryByText, getByText } = render()
+      const { getByText } = render()
       await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
-      expect(queryByText('mock SetupModules')).not.toBeVisible()
+      expect(getByText('Mock SetupRobotCalibration')).not.toBeVisible()
+      expect(getByText('Mock SetupModules')).not.toBeVisible()
+      expect(getByText('Mock SetupLabware')).not.toBeVisible()
+      getByText('Setup is view-only once run has started')
     })
   })
 })

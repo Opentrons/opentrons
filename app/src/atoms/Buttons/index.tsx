@@ -5,6 +5,7 @@ import {
   COLORS,
   BORDERS,
   SIZE_2,
+  SPACING,
   NewAlertPrimaryBtn,
   NewPrimaryBtn,
   NewSecondaryBtn,
@@ -24,11 +25,29 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   ${TYPOGRAPHY.labelSemiBold}
 
   ${styleProps}
+
+  &:hover {
+    background-color: ${COLORS.blueHover};
+  }
+
+  &:active {
+    background-color: ${COLORS.bluePressed};
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 3px ${COLORS.warning};
+  }
+
+  &:disabled {
+    background-color: ${COLORS.greyDisabled};
+    color: ${COLORS.disabled};
+  }
 `
 
 export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
   background-color: ${COLORS.error};
   border-radius: ${BORDERS.radiusSoftCorners};
+  padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   ${TYPOGRAPHY.pSemiBold}
 
@@ -38,6 +57,7 @@ export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
 export const PrimaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blue};
   border-radius: ${BORDERS.radiusSoftCorners};
+  padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   ${TYPOGRAPHY.pSemiBold}
 
@@ -47,6 +67,7 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
 export const SecondaryButton = styled(NewSecondaryBtn)`
   color: ${COLORS.blue};
   border-radius: ${BORDERS.radiusSoftCorners};
+  padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   ${TYPOGRAPHY.pSemiBold}
 

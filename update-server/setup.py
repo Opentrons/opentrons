@@ -36,7 +36,9 @@ KEYWORDS = ["robots", "automation", "lab"]
 DESCRIPTION = (
     "A server to update software and firmware on Opentrons robots")
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
-INSTALL_REQUIRES = ['aiohttp==3.4.4']
+INSTALL_REQUIRES = [
+    'aiohttp==3.4.4',
+]
 
 
 def read(*parts):

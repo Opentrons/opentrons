@@ -76,13 +76,13 @@ describe('mix step form -> command creator args', () => {
     // BLOWOUT
     {
       checkboxField: 'blowout_checkbox',
-      formFields: { blowout_location: 'trashId' },
+      formFields: { blowout_location: 'fixedTrash' },
       expectedArgsUnchecked: {
         blowoutLocation: null,
         blowoutOffsetFromTopMm: 0,
       },
       expectedArgsChecked: {
-        blowoutLocation: 'trashId',
+        blowoutLocation: 'fixedTrash',
         blowoutOffsetFromTopMm: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
       },
     },

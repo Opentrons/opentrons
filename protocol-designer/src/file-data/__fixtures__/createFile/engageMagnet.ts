@@ -4,7 +4,7 @@ import { SavedStepFormState, ModuleEntities } from '../../../step-forms'
 import { StepIdType } from '../../../form-types'
 export const initialRobotState: RobotState = {
   labware: {
-    trashId: {
+    fixedTrash: {
       slot: '12',
     },
     tiprackId: {
@@ -59,7 +59,7 @@ export const savedStepForms: SavedStepFormState = {
     stepType: 'manualIntervention',
     id: '__INITIAL_DECK_SETUP_STEP__',
     labwareLocationUpdate: {
-      trashId: '12',
+      fixedTrash: '12',
       tiprackId: '2',
       plateId: 'magneticModuleId',
     },

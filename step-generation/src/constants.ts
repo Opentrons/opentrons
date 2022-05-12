@@ -14,4 +14,4 @@ export const MODULES_WITH_COLLISION_ISSUES = [
   MAGNETIC_MODULE_V1,
   TEMPERATURE_MODULE_V1,
 ]
-export const FIXED_TRASH_ID: 'trashId' = 'trashId'
+export const FIXED_TRASH_ID: 'fixedTrash' = 'fixedTrash'

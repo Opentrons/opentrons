@@ -10,8 +10,17 @@ import concurrent.futures
 import contextlib
 
 
+STARTUP_WAIT = 15
+SHUTDOWN_WAIT = 15
+
+
 class RobotClient:
-    """HTTP-API client for a robot."""
+    """Client for the robot's HTTP API.
+
+    This is mostly a thin wrapper, where most methods have a 1:1 correspondence
+    with HTTP endpoints. See the robot server's OpenAPI specification for
+    details on semantics and request/response shapes.
+    """
 
     def __init__(
         self,
@@ -42,7 +51,7 @@ class RobotClient:
                 )
 
     async def alive(self) -> bool:
-        """Are the /heath and /openapi.json both reachable?"""
+        """Are /health and /openapi.json both reachable?"""
         try:
             await self.get_health()
             await self.get_openapi()
@@ -50,29 +59,47 @@ class RobotClient:
         except (httpx.ConnectError, httpx.HTTPStatusError):
             return False
 
+    async def dead(self) -> bool:
+        """Are /health and /openapi.json both unreachable?"""
+        try:
+            await self.get_health()
+            return False
+        except httpx.HTTPStatusError:
+            return False
+        except httpx.ConnectError:
+            pass
+        try:
+            await self.get_openapi()
+            return False
+        except httpx.HTTPStatusError:
+            return False
+        except httpx.ConnectError:
+            # Now both /health and /openapi.json have returned ConnectError.
+            return True
+
     async def _poll_for_alive(self) -> None:
-        """Retry the /heath and /openapi.json until both reachable."""
+        """Retry the /health and /openapi.json until both reachable."""
         while not await self.alive():
             # Avoid spamming the server in case a request immediately
             # returns some kind of "not ready."
             await asyncio.sleep(0.1)
 
     async def _poll_for_dead(self) -> None:
-        """Poll the /heath and /openapi.json until both unreachable."""
-        while await self.alive():
+        """Poll the /health and /openapi.json until both unreachable."""
+        while not await self.dead():
             # Avoid spamming the server in case a request immediately
             # returns some kind of "not ready."
             await asyncio.sleep(0.1)
 
-    async def wait_until_alive(self, timeout_sec: float) -> bool:
+    async def wait_until_alive(self, timeout_sec: float = STARTUP_WAIT) -> bool:
         try:
             await asyncio.wait_for(self._poll_for_alive(), timeout=timeout_sec)
             return True
         except asyncio.TimeoutError:
             return False
 
-    async def wait_until_dead(self, timeout_sec: float) -> bool:
-        """Retry the /heath and /openapi.json until both unreachable."""
+    async def wait_until_dead(self, timeout_sec: float = SHUTDOWN_WAIT) -> bool:
+        """Retry the /health and /openapi.json until both unreachable."""
         try:
             await asyncio.wait_for(self._poll_for_dead(), timeout=timeout_sec)
             return True
@@ -97,6 +124,13 @@ class RobotClient:
         response.raise_for_status()
         return response
 
+    async def get_protocol(self, protocol_id: str) -> Response:
+        """GET /protocols/{protocol_id}."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/protocols/{protocol_id}"
+        )
+        return response
+
     async def post_protocol(self, files: List[Path]) -> Response:
         """POST /protocols."""
         file_payload = []
@@ -104,6 +138,14 @@ class RobotClient:
             file_payload.append(("files", open(file, "rb")))
         response = await self.httpx_client.post(
             url=f"{self.base_url}/protocols", files=file_payload
+        )
+        response.raise_for_status()
+        return response
+
+    async def get_analysis(self, protocol_id: str, analysis_id: str) -> Response:
+        """GET /protocols/{protocol_id}/{analysis_id}."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/protocols/{protocol_id}/analyses/{analysis_id}"
         )
         response.raise_for_status()
         return response
