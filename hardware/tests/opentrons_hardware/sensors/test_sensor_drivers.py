@@ -13,6 +13,7 @@ from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdPar
 from opentrons_hardware.firmware_bindings.constants import SensorType, NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
+
 )
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
@@ -45,6 +46,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorTypeField,
     SensorOutputBindingField,
+    PeripheralInfoResponsePayload,
 )
 from opentrons_hardware.sensors.utils import SensorDataType
 from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
@@ -461,6 +463,7 @@ async def test_debug_poll(
                 binding=SensorOutputBindingField(SensorOutputBinding.none),
             )
         ),
+<<<<<<< HEAD
     )
 
 
@@ -505,3 +508,6 @@ async def test_peripheral_status(
     mock_messenger.send.side_effect = responder
     status = await sensor.get_device_status(mock_messenger, node_id, timeout)
     assert status
+=======
+    )
+>>>>>>> 4026f4bc3 (starting on get_device_status)
