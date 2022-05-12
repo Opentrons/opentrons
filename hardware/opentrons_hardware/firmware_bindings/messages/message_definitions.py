@@ -583,14 +583,14 @@ class PeripheralStatusRequest:  # noqa: D101
     payload: payloads.PeripheralStatusRequestPayload
     payload_type: Type[BinarySerializable] = payloads.PeripheralStatusRequestPayload
     message_id: Literal[
-        MessageId.peripheral_info_request
-    ] = MessageId.peripheral_info_request
+        MessageId.peripheral_status_request
+    ] = MessageId.peripheral_status_request
 
 
 @dataclass
-class PeripheralInfoResponse:  # noqa: D101
-    payload: payloads.PeripheralInfoResponsePayload
-    payload_type: Type[BinarySerializable] = payloads.PeripheralInfoResponsePayload
+class PeripheralStatusResponse:  # noqa: D101
+    payload: payloads.PeripheralStatusResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.PeripheralStatusResponsePayload
     message_id: Literal[
-        MessageId.peripheral_info_response
-    ] = MessageId.peripheral_info_response
+        MessageId.peripheral_status_response
+    ] = MessageId.peripheral_status_response

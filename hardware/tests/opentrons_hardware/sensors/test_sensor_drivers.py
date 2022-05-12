@@ -10,11 +10,11 @@ from tests.conftest import MockCanMessageNotifier
 
 from opentrons_hardware.sensors import fdc1004, hdc2080, mmr920C04, sensor_abc
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
-from opentrons_hardware.firmware_bindings.constants import (
-    SensorType,
-    NodeId,
+from opentrons_hardware.firmware_bindings.constants import SensorType, NodeId
+from opentrons_hardware.drivers.can_bus.can_messenger import (
+    CanMessenger,
+    WaitableCallback,
 )
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
     UInt16Field,
@@ -30,6 +30,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ReadFromSensorResponse,
     SensorThresholdResponse,
     BindSensorOutputRequest,
+    PeripheralInfoRequest,
+    PeripheralInfoResponse,
 )
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
@@ -43,6 +45,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorTypeField,
     SensorOutputBindingField,
+    PeripheralInfoResponsePayload,
 )
 from opentrons_hardware.sensors.utils import SensorDataType
 from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
@@ -336,6 +339,7 @@ async def test_threshold(
     assert return_data == threshold
 
 
+<<<<<<< HEAD
 @pytest.mark.parametrize(
     argnames=["node_id", "timeout", "sensor"],
     argvalues=[
