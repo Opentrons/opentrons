@@ -424,14 +424,14 @@ class TipActionResponsePayload(MoveGroupResponsePayload):
 
 
 @dataclass
-class PeripheralInfoRequestPayload(utils.BinarySerializable):
+class PeripheralStatusRequestPayload(utils.BinarySerializable):
     """A request to get the initialization status of a peripheral device."""
 
     sensor: SensorTypeField
 
 
 @dataclass
-class PeripheralInfoResponsePayload(utils.BinarySerializable):
+class PeripheralStatusResponsePayload(utils.BinarySerializable):
     """A response that sends back the initialization status of a peripheral device."""
 
     sensor: SensorTypeField
