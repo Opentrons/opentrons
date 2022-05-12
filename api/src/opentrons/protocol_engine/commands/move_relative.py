@@ -38,7 +38,6 @@ class MoveRelativeResult(BaseModel):
     )
 
 
-
 class MoveRelativeImplementation(
     AbstractCommandImpl[MoveRelativeParams, MoveRelativeResult]
 ):
