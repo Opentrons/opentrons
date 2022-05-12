@@ -73,6 +73,7 @@ def test_protocol_landing_v5dot1(
         input = protocol_file.get_drag_json_protocol()
         drag_and_drop_file(input, test_protocols["protocoluploadjson"])
 
+        # Verifying elements on Protocol Landing Page
         assert protocol_landing.get_import_button_protocol_landing().is_displayed()
         assert protocol_landing.get_deckMap_protocol_landing().is_displayed()
         assert (
@@ -95,3 +96,37 @@ def test_protocol_landing_v5dot1(
             protocol_landing.get_thermocycler_module_protocol_landing().is_displayed()
         )
         assert protocol_landing.get_updated_timestamp_protocol_landing().is_displayed()
+        protocol_landing.click_protocol_card()
+
+        # Verifying elements on Protocol Detail Page
+        assert (
+            protocol_landing.get_creation_method_text_protocol_detail()
+            == "creation method"
+        )
+        assert protocol_landing.get_creation_method_value_protocol_detail() == "NN MM"
+        assert (
+            protocol_landing.get_last_updated_text_protocol_detail() == "last updated"
+        )
+        assert protocol_landing.get_last_updated_value_protocol_detail().is_displayed()
+        assert (
+            protocol_landing.get_last_analyzed_text_protocol_detail() == "last analyzed"
+        )
+        assert protocol_landing.get_last_analyzed_value_protocol_detail().is_displayed()
+        assert protocol_landing.get_author_text_protocol_detail() == "org/author"
+        assert protocol_landing.get_author_value_protocol_detail() == "nnoo"
+        assert protocol_landing.get_description_text_protocol_detail().is_displayed()
+        assert protocol_landing.get_deckmap_protocol_detail().is_displayed()
+
+        # Verifying Robot Configuration
+        assert (
+            protocol_landing.get_robot_configuration_protocol_detail()
+            == "robot configuration"
+        )
+        assert protocol_landing.get_labware_tab_protocol_detail() == "labware"
+        assert protocol_landing.get_left_mount_protocol_detail().is_displayed()
+        assert protocol_landing.get_right_mount_protocol_detail().is_displayed()
+        assert protocol_landing.get_mag_mod_protocol_detail().is_displayed()
+        assert protocol_landing.get_temp_mod_protocol_detail().is_displayed()
+        assert protocol_landing.get_thermocycler_mod_protocol_detail().is_displayed()
+
+        protocol_landing.click_run_protocol_on_protocol_detail()
