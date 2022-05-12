@@ -223,6 +223,9 @@ def test_get_usage_info(
     run_store: RunStore,
 ) -> None:
     """It should return which protocols are used by runs."""
+    # get_usage_info() should return an empty list when no protocols have been added.
+    assert subject.get_usage_info() == []
+
     protocol_resource_1 = ProtocolResource(
         protocol_id="protocol-id-1",
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
