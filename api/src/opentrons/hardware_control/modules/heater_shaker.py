@@ -396,9 +396,21 @@ class HeaterShaker(mod_abc.AbstractModule):
     async def deactivate(self) -> None:
         """Stop heating/cooling; stop shaking and home the plate"""
         await self.wait_for_is_running()
-        # TODO (spp, 2022-3-22): Use a separate gcode for deactivating heating
-        await self._driver.set_temperature(0)
+        await self._driver.deactivate_heater()
         await self._driver.home()
+        await self.wait_next_poll()
+
+    async def deactivate_heater(self) -> None:
+        """Stop heating/cooling"""
+        await self.wait_for_is_running()
+        await self._driver.deactivate_heater()
+        await self.wait_next_poll()
+
+    async def deactivate_shaker(self) -> None:
+        """Stop shaking and home the plate"""
+        await self.wait_for_is_running()
+        await self._driver.home()
+        await self.wait_next_poll()
 
     async def open_labware_latch(self) -> None:
         await self.wait_for_is_running()

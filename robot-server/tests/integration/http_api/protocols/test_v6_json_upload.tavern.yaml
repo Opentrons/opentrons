@@ -212,7 +212,7 @@ stages:
                           labwareOffset:
                             - - -1
                               - 0
-                              - 0.25
+                              - 0.3
                             - - 0
                               - 1
                               - 0
@@ -223,7 +223,7 @@ stages:
                           labwareOffset:
                             - - -1
                               - 0
-                              - 0.25
+                              - 0.3
                             - - 0
                               - 1
                               - 0
@@ -234,7 +234,7 @@ stages:
                           labwareOffset:
                             - - -1
                               - 0
-                              - 0.25
+                              - 0.3
                             - - 0
                               - 1
                               - 0

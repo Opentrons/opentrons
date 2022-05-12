@@ -93,7 +93,7 @@ export const TemperatureModuleSlideout = (
           disabled={temperatureValue === null || valueOutOfRange}
           data-testid={`TemperatureSlideout_btn_${module.serialNumber}`}
         >
-          {t('set_temp_slideout')}
+          {t('confirm')}
         </PrimaryButton>
       }
     >
@@ -113,12 +113,12 @@ export const TemperatureModuleSlideout = (
         data-testid={`TemperatureSlideout_input_field_${module.serialNumber}`}
       >
         <Text
-          fontWeight={FONT_WEIGHT_REGULAR}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.black}
           paddingBottom={SPACING.spacing3}
         >
-          {t('temperature')}
+          {t('set_temperature')}
         </Text>
         <InputField
           id={`${module.moduleModel}`}

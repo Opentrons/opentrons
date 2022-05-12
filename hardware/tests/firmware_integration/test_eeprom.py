@@ -10,10 +10,10 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     WriteToEEPromRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
-    EEProDataPayload,
+    EEPromDataPayload,
     EEPromReadPayload,
 )
-from opentrons_hardware.firmware_bindings.utils import UInt16Field, UInt8Field
+from opentrons_hardware.firmware_bindings.utils import UInt8Field
 
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 
@@ -23,7 +23,6 @@ def filter_func(arb: ArbitrationId) -> bool:
     return bool(arb.parts.message_id == ReadFromEEPromResponse.message_id)
 
 
-@pytest.mark.skip("eeprom simulator is broken")
 @pytest.mark.requires_emulator
 @pytest.mark.can_filter_func.with_args(filter_func)
 async def test_read_write(
@@ -32,7 +31,7 @@ async def test_read_write(
 ) -> None:
     """It should be able to read and write eeprom values."""
     read_message = ReadFromEEPromRequest(
-        payload=EEPromReadPayload(address=UInt16Field(0), data_length=UInt8Field(10))
+        payload=EEPromReadPayload(address=UInt8Field(0), data_length=UInt8Field(10))
     )
     await can_messenger.send(node_id=NodeId.pipette_left, message=read_message)
 
@@ -45,8 +44,8 @@ async def test_read_write(
     await can_messenger.send(
         node_id=NodeId.pipette_left,
         message=WriteToEEPromRequest(
-            payload=EEProDataPayload(
-                address=UInt16Field(0),
+            payload=EEPromDataPayload(
+                address=UInt8Field(0),
                 data_length=UInt8Field(10),
                 data=EepromDataField(expected_data),
             )

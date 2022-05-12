@@ -20,10 +20,12 @@ import { SetupCalibrationItem } from './SetupCalibrationItem'
 
 interface SetupDeckCalibrationProps {
   robotName: string
+  runId: string
 }
 
 export function SetupDeckCalibration({
   robotName,
+  runId,
 }: SetupDeckCalibrationProps): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
 
@@ -63,6 +65,7 @@ export function SetupDeckCalibration({
             : null
         }
         button={isDeckCalibrated ? undefined : calibrateNowButton}
+        runId={runId}
       />
     </Flex>
   )

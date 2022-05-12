@@ -160,6 +160,14 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.PauseResult, result)
 
+    def set_rail_lights(self, on: bool) -> commands.SetRailLightsResult:
+        """Execute a ``setRailLights`` command and return the result."""
+        request = commands.SetRailLightsCreate(
+            params=commands.SetRailLightsParams(on=on)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.SetRailLightsResult, result)
+
     def magnetic_module_engage(
         self, module_id: str, engage_height: float
     ) -> commands.magnetic_module.EngageResult:
@@ -172,10 +180,22 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.magnetic_module.EngageResult, result)
 
-    def set_rail_lights(self, on: bool) -> commands.SetRailLightsResult:
-        """Execute a ``setRailLights`` command and return the result."""
-        request = commands.SetRailLightsCreate(
-            params=commands.SetRailLightsParams(on=on)
+    def thermocycler_deactivate_block(
+        self, module_id: str
+    ) -> commands.thermocycler.DeactivateBlockResult:
+        """Execute a `thermocycler/deactivateBlock` command and return the result."""
+        request = commands.thermocycler.DeactivateBlockCreate(
+            params=commands.thermocycler.DeactivateBlockParams(moduleId=module_id)
         )
         result = self._transport.execute_command(request=request)
-        return cast(commands.SetRailLightsResult, result)
+        return cast(commands.thermocycler.DeactivateBlockResult, result)
+
+    def thermocycler_deactivate_lid(
+        self, module_id: str
+    ) -> commands.thermocycler.DeactivateLidResult:
+        """Execute a `thermocycler/deactivateLid` command and return the result."""
+        request = commands.thermocycler.DeactivateLidCreate(
+            params=commands.thermocycler.DeactivateLidParams(moduleId=module_id)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.thermocycler.DeactivateLidResult, result)
