@@ -1,6 +1,10 @@
 """Unit tests for `deletion_planner`."""
 
 
+import pytest
+
+from typing import List, NamedTuple, Set
+
 from robot_server.deletion_planner import (
     ProtocolSpec,
     ProtocolDeletionPlanner,
@@ -8,64 +12,43 @@ from robot_server.deletion_planner import (
 )
 
 
-def test_protocol_deletion() -> None:  # noqa: D103
-    # TODO: Add tests for protocol deletion.
-    raise NotImplementedError()
+class _DeletionPlanTestSpec(NamedTuple):
+    maximum_runs: int
+    input_runs: List[str]
+    expected_deletion_plan: Set[str]
 
 
-def test_run_deletion_maximum_of_zero() -> None:  # noqa: D103
-    subject = RunDeletionPlanner(maximum_runs=0)
-    input_runs = [f"run-{i+1}" for i in range(5)]
-
-    # If the maximum runs is 0, everything should be deleted.
-    assert subject.plan_for_new_run(existing_runs=input_runs,) == set(
-        [
-            "run-1",
-            "run-2",
-            "run-3",
-            "run-4",
-            "run-5",
-        ],
-    )
-
-
-def test_run_deletion_several_deleted() -> None:  # noqa: D103
-    subject = RunDeletionPlanner(maximum_runs=2)
-    input_runs = [f"run-{i+1}" for i in range(5)]
-
-    # If the maximum runs is below the number of current runs,
-    # enough runs should be deleted that the new count is one fewer than
-    # the maximum runs. Runs should be deleted oldest-first.
-    assert subject.plan_for_new_run(existing_runs=input_runs,) == set(
-        [
-            "run-1",
-            "run-2",
-            "run-3",
-            "run-4",
-        ]
-    )
+_deletion_plan_test_specs = [
+    _DeletionPlanTestSpec(
+        maximum_runs=1,
+        input_runs=["run-1", "run-2", "run-3", "run-4", "run-5"],
+        expected_deletion_plan=set(["run-1", "run-2", "run-3", "run-4", "run-5"]),
+    ),
+    _DeletionPlanTestSpec(
+        maximum_runs=2,
+        input_runs=["run-1", "run-2", "run-3", "run-4", "run-5"],
+        expected_deletion_plan=set(["run-1", "run-2", "run-3", "run-4"]),
+    ),
+    _DeletionPlanTestSpec(
+        maximum_runs=3,
+        input_runs=["run-1", "run-2", "run-3", "run-4", "run-5"],
+        expected_deletion_plan=set(["run-1", "run-2", "run-3"]),
+    ),
+    _DeletionPlanTestSpec(
+        maximum_runs=999999,
+        input_runs=["run-1", "run-2", "run-3", "run-4", "run-5"],
+        expected_deletion_plan=set(),
+    ),
+]
 
 
-def test_run_deletion_exactly_equal() -> None:  # noqa: D103
-    subject = RunDeletionPlanner(maximum_runs=5)
-    input_runs = [f"run-{i+1}" for i in range(5)]
-
-    # If the maximum runs is exactly equal to the number of current runs,
-    # the single oldest run should be deleted to make room for one new one.
-    assert subject.plan_for_new_run(
-        existing_runs=input_runs,
-    ) == set(["run-1"])
-
-
-def test_run_deletion_no_deletions_needed() -> None:  # noqa: D103
-    subject = RunDeletionPlanner(maximum_runs=6)
-    input_runs = [f"run-{i+1}" for i in range(5)]
-
-    # If the maximum runs is at least one more than the number of current runs,
-    # no runs should be deleted.
-    assert (
-        subject.plan_for_new_run(
-            existing_runs=input_runs,
-        )
-        == set()
-    )
+@pytest.mark.parametrize(_DeletionPlanTestSpec._fields, _deletion_plan_test_specs)
+def test_plan_for_new_run(
+    maximum_runs: int,
+    input_runs: List[str],
+    expected_deletion_plan: Set[str],
+) -> None:
+    """It should return a plan that leaves at least one slot open for a new run."""
+    subject = RunDeletionPlanner(maximum_runs=maximum_runs)
+    result = subject.plan_for_new_run(existing_runs=input_runs)
+    assert result == expected_deletion_plan
