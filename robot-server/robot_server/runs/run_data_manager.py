@@ -168,3 +168,6 @@ class RunDataManager:
         #     # Let exception propagate
         #     commands = self._run_store.get_run_commands(run_id)
         # return self._engine_store.engine.state_view.commnds.get_slice()
+
+    def get_current_command(self, run_id: str) -> Optional[CurrentCommand]:
+        raise NotImplementedError("TODO")
