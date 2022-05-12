@@ -202,8 +202,6 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
       history.push(`/devices/${robotName}/protocol-runs/${runData.id}`)
     },
   })
-  const currentRunId = useCurrentRunId()
-  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
     createRun(srcFileObjects)
@@ -211,12 +209,7 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
 
   return (
     <>
-      <PrimaryButton
-        onClick={handleClick}
-        width="100%"
-        {...buttonProps}
-        disabled={isClosingCurrentRun}
-      >
+      <PrimaryButton onClick={handleClick} width="100%" {...buttonProps}>
         {t('proceed_to_setup')}
       </PrimaryButton>
     </>
