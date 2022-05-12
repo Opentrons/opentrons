@@ -12,8 +12,9 @@ machine_info_examples = [
 
 
 @pytest.mark.parametrize("initial_contents", machine_info_examples)
-def test_rewrite_machine_info_updates_pretty_hostname(initial_contents):
-    rewrite = name_management._rewrite_machine_info(
+def test_rewrite_machine_info_updates_pretty_hostname(initial_contents) -> None:
+    # TODO(mm, 2022-04-27): Rework so we don't have to test a private function.
+    rewrite = name_management._rewrite_machine_info_str(
         initial_contents, "new_pretty_hostname"
     )
     assert (
@@ -25,9 +26,10 @@ def test_rewrite_machine_info_updates_pretty_hostname(initial_contents):
 
 
 @pytest.mark.parametrize("initial_contents", machine_info_examples)
-def test_rewrite_machine_info_preserves_other_lines(initial_contents):
+def test_rewrite_machine_info_preserves_other_lines(initial_contents) -> None:
+    # TODO(mm, 2022-04-27): Rework so we don't have to test a private function.
     initial_lines = Counter(initial_contents.splitlines())
-    rewrite_string = name_management._rewrite_machine_info(
+    rewrite_string = name_management._rewrite_machine_info_str(
         initial_contents, "new_pretty_hostname"
     )
     rewrite_lines = Counter(rewrite_string.splitlines())
@@ -38,12 +40,14 @@ def test_rewrite_machine_info_preserves_other_lines(initial_contents):
         assert line.startswith("PRETTY_HOSTNAME=") or line == ""
 
 
+# Covers this bug: https://github.com/Opentrons/opentrons/pull/4671
 @pytest.mark.parametrize("initial_contents", machine_info_examples)
-def test_rewrite_machine_info_is_idempotent(initial_contents):
-    first_rewrite = name_management._rewrite_machine_info(
+def test_rewrite_machine_info_is_idempotent(initial_contents) -> None:
+    # TODO(mm, 2022-04-27): Rework so we don't have to test a private function.
+    first_rewrite = name_management._rewrite_machine_info_str(
         initial_contents, "new_pretty_hostname"
     )
-    second_rewrite = name_management._rewrite_machine_info(
+    second_rewrite = name_management._rewrite_machine_info_str(
         first_rewrite, "new_pretty_hostname"
     )
     assert second_rewrite == first_rewrite

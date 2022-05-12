@@ -52,7 +52,7 @@ def get_app(
         system_version_file = BR_BUILTIN_VERSION_FILE
 
     version = get_version(system_version_file)
-    name = name_override or name_management.get_name()
+    name = name_override or name_management.get_pretty_hostname()
     boot_id = boot_id_override or control.get_boot_id()
     config_obj = config.load(config_file_override)
 
