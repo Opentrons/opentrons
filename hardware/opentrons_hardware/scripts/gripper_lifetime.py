@@ -88,12 +88,6 @@ async def run(args: argparse.Namespace) -> None:
     pwm_duty = prompt_int_input("PWM duty cycle in % (int)")
 
     driver = await build_driver(build_settings(args))
-    # driver = await CanDriver.build(
-    #     bitrate=250000, interface='socketcan', channel='can0'
-    # )
-    # driver = await SocketDriver.build(
-    #     bitrate=250000, interface='pcan', channel='PCAN_USBBUS1'
-    # )
 
     messenger = CanMessenger(driver=driver)
     messenger.start()
@@ -117,7 +111,7 @@ async def run(args: argparse.Namespace) -> None:
         [
             {
                 NodeId.gripper_g: MoveGroupSingleGripperStep(
-                    duration_sec=float64(0),
+                    duration_sec=float64(3),
                     pwm_frequency=float32(pwm_freq),
                     pwm_duty_cycle=float32(pwm_duty),
                     move_type=MoveType.home,

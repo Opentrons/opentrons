@@ -157,7 +157,7 @@ class MoveGroupRunner:
             home_payload = GripperMoveRequestPayload(
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
-                duration=UInt32Field(0),
+                duration=UInt32Field(int(step.duration_sec * step.pwm_frequency)),
                 freq=UInt32Field(int(step.pwm_frequency)),
                 duty_cycle=UInt32Field(int(step.pwm_duty_cycle)),
             )
