@@ -11,7 +11,7 @@ import argparse
 from logging.config import dictConfig
 from typing import TextIO, Optional
 
-from opentrons_hardware.drivers.can_bus import build
+from opentrons_hardware.drivers.can_bus import build, CanMessenger
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 
 from opentrons_hardware.firmware_bindings.message import CanMessage
@@ -73,7 +73,7 @@ async def input_task(
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    async with build.driver(build_settings(args)) as driver, build.can_messenger(
+    async with build.driver(build_settings(args)) as driver, CanMessenger(
         driver
     ) as messenger:
         try:
