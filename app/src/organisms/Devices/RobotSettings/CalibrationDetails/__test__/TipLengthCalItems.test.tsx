@@ -1,12 +1,8 @@
 import * as React from 'react'
-
 import { renderWithProviders, Mount } from '@opentrons/components'
-
 import { i18n } from '../../../../../i18n'
-// import { getDisplayNameForTipRack } from '../../../../../pages/Robots/InstrumentSettings/utils'
 
 import { TipLengthCalItems } from '../TipLengthCalItems'
-import { PROFILE_ROBOT_NAME } from '../../../../../redux/support/constants'
 
 jest.mock('../../../../../redux/custom-labware/selectors')
 jest.mock('../../../../../redux/config')

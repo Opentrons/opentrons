@@ -67,17 +67,13 @@ describe('PipetteOffsetCalItems', () => {
 
   it('should render pipette offset calibrations data - unknown custom tiprack', () => {
     const { getByText } = render(props)
-    // left
     getByText('mockPipetteModelLeft')
     getByText('1234567')
     getByText('left')
-    // getByText('unknown custom tiprack')
     getByText('11/10/2022 18:14:01')
-    // right
     getByText('mockPipetteModelRight')
     getByText('01234567')
     getByText('right')
-    // getByText('unknown custom tiprack')
     getByText('11/10/2022 18:15:02')
   })
 

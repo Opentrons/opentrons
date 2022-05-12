@@ -117,7 +117,6 @@ export function OverflowMenu({
     e: React.MouseEvent
   ): void => {
     e.preventDefault()
-    setShowOverflowMenu(!showOverflowMenu)
     if (calType === 'pipetteOffset') {
       if (checkPipetteCalibrations != null) {
         startPipetteOffsetCalibration({
@@ -129,6 +128,7 @@ export function OverflowMenu({
     } else {
       startPipetteOffsetPossibleTLC({ keepTipLength: false })
     }
+    setShowOverflowMenu(!showOverflowMenu)
   }
 
   const handleDownload = (
