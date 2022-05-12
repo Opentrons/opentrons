@@ -405,3 +405,36 @@ class ProtocolLanding:
             "the run protocol on Protocol Detail Page.",
         )
         self.base.click(button)
+
+    def get_slideout_header_on_protocol_detail(self) -> Optional[WebElement]:
+        """Get the slideout header on Protocol Detail Page."""
+        header: Element = Element(
+            (
+                By.TAG_NAME,
+                "h2",
+            ),
+            "the slideout header on Protocol Detail Page.",
+        )
+        return self.base.present_wrapper(header, 1)
+
+    def click_proceed_to_setup_on_protocol_detail(self) -> Optional[WebElement]:
+        """Get the proceed to setup on Protocol Detail Page."""
+        button: Element = Element(
+            (
+                By.XPATH,
+                '//button[text()="Proceed to setup"]',
+            ),
+            "the proceed to setup on Protocol Detail Page.",
+        )
+        self.base.click(button)
+
+    def click_robot_on_protocol_detail(self) -> Optional[WebElement]:
+        """Get the robot on Protocol Detail Page."""
+        button: Element = Element(
+            (
+                By.TAG_NAME,
+                "h6",
+            ),
+            "the robot on Protocol Detail Page.",
+        )
+        self.base.click(button)

@@ -18,6 +18,10 @@ from selenium.webdriver.chrome.options import Options
 from src.resources.ot_robot5dot1 import OtRobot
 from src.resources.ot_application import OtApplication
 from src.pages.protocol_landing_v5dot1 import ProtocolLanding
+from src.pages.robot_calibration import RobotCalibration
+from src.pages.module_setup import ModuleSetup
+from src.pages.device_landing import DeviceLanding
+from src.pages.labware_setup import LabwareSetup
 from src.menus.left_menu_v5dot1 import LeftMenu
 from src.resources.robot_data import Dev, Kansas, RobotDataType
 from src.menus.protocol_file import ProtocolFile
@@ -130,3 +134,41 @@ def test_protocol_landing_v5dot1(
         assert protocol_landing.get_thermocycler_mod_protocol_detail().is_displayed()
 
         protocol_landing.click_run_protocol_on_protocol_detail()
+
+        # Verify the robot slideout from protocol detail page
+        assert protocol_landing.get_slideout_header_on_protocol_detail().is_displayed()
+        protocol_landing.click_robot_on_protocol_detail()
+        protocol_landing.click_proceed_to_setup_on_protocol_detail()
+
+        robot_calibrate = RobotCalibration(driver)
+        assert robot_calibrate.get_robot_calibration().text == "Robot Calibration"
+        robot_calibrate.click_robot_calibration()
+        assert robot_calibrate.get_deck_calibration().text == "Deck Calibration"
+        assert robot_calibrate.get_required_pipettes().text == "Required Pipettes"
+        assert (
+            robot_calibrate.get_calibration_ready_locator().text == "Calibration Ready"
+        )
+        assert (
+            robot_calibrate.get_required_tip_length_calibration().text
+            == "Required Tip Length Calibrations"
+        )
+        module_setup = ModuleSetup(driver)
+        assert module_setup.get_proceed_to_module_setup().is_displayed()
+        module_setup.click_proceed_to_module_setup()
+        assert module_setup.get_module_setup_text_locator().text == "Module Setup"
+        assert module_setup.get_thermocycler_module().text == "Thermocycler Module"
+        assert module_setup.get_magetic_module().text == "Magnetic Module GEN1"
+        assert module_setup.get_temperature_module().text == "Temperature Module GEN1"
+        assert module_setup.get_proceed_to_labware_setup().is_displayed()
+        module_setup.click_proceed_to_labware_setup()
+        labware_setup = LabwareSetup(driver)
+        assert labware_setup.get_labware_setup_text().is_displayed()
+        labware_setup.click_proceed_to_run_button()
+        device_landing: DeviceLanding = DeviceLanding(
+            driver, console, request.node.nodeid
+        )
+        # Verify the componenets on run page
+        device_landing.click_start_run_button()
+        assert device_landing.get_clear_button_run_page().is_displayed()
+        assert device_landing.get_run_button().is_displayed()
+        assert device_landing.get_success_banner_run_page().is_displayed()
