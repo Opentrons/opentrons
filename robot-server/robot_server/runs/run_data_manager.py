@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from opentrons.protocol_engine import LabwareOffsetCreate, ProtocolRunData, CommandSlice, CurrentCommand
+from opentrons.protocol_engine import LabwareOffsetCreate, ProtocolRunData, CommandSlice, CurrentCommand, Command
 
 from robot_server.protocols import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
@@ -170,4 +170,7 @@ class RunDataManager:
         # return self._engine_store.engine.state_view.commnds.get_slice()
 
     def get_current_command(self, run_id: str) -> Optional[CurrentCommand]:
+        raise NotImplementedError("TODO")
+
+    def get_command(self, run_id: str, command_id: str) -> Command:
         raise NotImplementedError("TODO")

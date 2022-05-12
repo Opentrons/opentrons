@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 
 from opentrons.protocol_engine import (
     commands as pe_commands,
-    # errors as pe_errors,
+    errors as pe_errors,
     ProtocolEngine,
 )
 from robot_server.service.json_api import (
@@ -273,7 +273,7 @@ async def get_run_commands(
 )
 async def get_run_command(
     commandId: str,
-    engine_store: EngineStore = Depends(get_engine_store),
+    run_data_manager: RunDataManager = Depends(get_run_data_manager),
     run: Run = Depends(get_run_data_from_url),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Get a specific command from a run.
@@ -285,14 +285,12 @@ async def get_run_command(
             `GET /run/{runId}`. Present to ensure 404 if run
             not found.
     """
-    raise NotImplementedError("TODO")
-    # engine_state = engine_store.get_state(run.id)
-    # try:
-    #     command = engine_state.commands.get(commandId)
-    # except pe_errors.CommandDoesNotExistError as e:
-    #     raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+    try:
+        command = run_data_manager.get_command(run_id=run.id, command_id=commandId)
+    except pe_errors.CommandDoesNotExistError as e:
+        raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    # return await PydanticResponse.create(
-    #     content=SimpleBody.construct(data=command),
-    #     status_code=status.HTTP_200_OK,
-    # )
+    return await PydanticResponse.create(
+        content=SimpleBody.construct(data=command),
+        status_code=status.HTTP_200_OK,
+    )
