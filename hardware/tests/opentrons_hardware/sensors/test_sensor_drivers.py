@@ -30,6 +30,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SensorThresholdResponse,
     BindSensorOutputRequest,
     PeripheralStatusRequest,
+    PeripheralStatusRequest,
     PeripheralStatusResponse,
 )
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
@@ -45,6 +46,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorTypeField,
     SensorOutputBindingField,
+    PeripheralInfoResponsePayload,
 )
 from opentrons_hardware.sensors.utils import SensorDataType
 from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
@@ -338,6 +340,7 @@ async def test_threshold(
     assert return_data == threshold
 
 
+<<<<<<< HEAD
 @pytest.mark.parametrize(
     argnames=["node_id", "timeout", "sensor"],
     argvalues=[
