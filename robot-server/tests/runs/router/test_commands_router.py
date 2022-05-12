@@ -29,55 +29,49 @@ from robot_server.runs.router.commands_router import (
 )
 
 
-# async def test_create_run_command(decoy: Decoy, mock_engine_store: EngineStore) -> None:
-#     """It should add the requested command to the ProtocolEngine and return it."""
-#     command_request = pe_commands.PauseCreate(
-#         params=pe_commands.PauseParams(message="Hello")
-#     )
-#
-#     run = Run(
-#         id="run-id",
-#         protocolId=None,
-#         createdAt=datetime(year=2021, month=1, day=1),
-#         status=EngineStatus.RUNNING,
-#         current=True,
-#         actions=[],
-#         errors=[],
-#         pipettes=[],
-#         labware=[],
-#         labwareOffsets=[],
-#     )
-#
-#     command_once_added = pe_commands.Pause(
-#         id="command-id",
-#         key="command-key",
-#         createdAt=datetime(year=2021, month=1, day=1),
-#         status=pe_commands.CommandStatus.QUEUED,
-#         params=pe_commands.PauseParams(message="Hello"),
-#     )
-#
-#     protocol_engine = mock_engine_store.engine
-#
-#     def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
-#         decoy.when(protocol_engine.state_view.commands.get("command-id")).then_return(
-#             command_once_added
-#         )
-#         return command_once_added
-#
-#     decoy.when(mock_engine_store.engine.add_command(command_request)).then_do(
-#         _stub_queued_command_state
-#     )
-#
-#     result = await create_run_command(
-#         request_body=RequestModel(data=command_request),
-#         waitUntilComplete=False,
-#         engine_store=mock_engine_store,
-#         run=run,
-#     )
-#
-#     assert result.content.data == command_once_added
-#     assert result.status_code == 201
-#     decoy.verify(await protocol_engine.wait_for_command("command-id"), times=0)
+async def test_create_run_command(decoy: Decoy, mock_protocol_engine: ProtocolEngine) -> None:
+    """It should add the requested command to the ProtocolEngine and return it."""
+    command_request = pe_commands.PauseCreate(
+        params=pe_commands.PauseParams(message="Hello")
+    )
+
+    run = Run(
+        id="run-id",
+        protocolId=None,
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=EngineStatus.RUNNING,
+        current=True,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
+    )
+
+    command_once_added = pe_commands.Pause(
+        id="command-id",
+        key="command-key",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_commands.CommandStatus.QUEUED,
+        params=pe_commands.PauseParams(message="Hello"),
+    )
+
+    decoy.when(mock_protocol_engine.add_command(command_request)).then_return(
+        command_once_added
+    )
+
+    decoy.when(mock_protocol_engine.state_view.commands.get("command-id")).then_return(command_once_added)
+
+    result = await create_run_command(
+        request_body=RequestModel(data=command_request),
+        waitUntilComplete=False,
+        protocol_engine=mock_protocol_engine,
+        run=run
+    )
+
+    assert result.content.data == command_once_added
+    assert result.status_code == 201
+    decoy.verify(await mock_protocol_engine.wait_for_command("command-id"), times=0)
 
 
 async def test_get_current_run_engine_from_url(decoy: Decoy, mock_engine_store: EngineStore) -> None:
