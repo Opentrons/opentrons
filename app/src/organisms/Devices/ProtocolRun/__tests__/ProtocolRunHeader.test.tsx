@@ -289,14 +289,14 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a start run button and cancel run button when run is ready to start', () => {
-    const [{ getByRole, queryByText }] = render()
+    const [{ getByRole, queryByText, getByText }] = render()
 
     getByRole('button', { name: 'Start run' })
     queryByText(formatTimestamp(STARTED_AT))
     queryByText('Protocol start')
     queryByText('Protocol end')
     getByRole('button', { name: 'Cancel run' }).click()
-    expect(mockCloseCurrentRun).toBeCalled()
+    getByText('Mock ConfirmCancelModal')
   })
 
   it('disables the Start Run button with tooltip if calibration is incomplete', () => {
