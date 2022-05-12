@@ -89,22 +89,6 @@ ModuleDefinitionV3 = TypedDict(
 )
 
 
-ModuleDefinitionV2 = TypedDict(
-    "ModuleDefinitionV2",
-    {
-        "$otSharedSchema": Literal["module/schemas/2"],
-        "moduleType": ModuleType,
-        "model": ModuleModel,
-        "labwareOffset": ModuleLabwareOffset,
-        "dimensions": ModuleDimensions,
-        "calibrationPoint": ModuleCalibrationPointOffset,
-        "displayName": str,
-        "quirks": List[str],
-        "slotTransforms": Dict[str, Dict[str, Dict[str, List[List[float]]]]],
-        "compatibleWith": List[ModuleModel],
-    },
-)
-
 ModuleDefinitionV1 = TypedDict(
     "ModuleDefinitionV1",
     {

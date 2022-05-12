@@ -22,12 +22,6 @@ def test_v3_definitions_match_types(defname: str) -> None:
     typeguard.check_type("def_dict", def_dict, dev_types.ModuleDefinitionV3)
 
 
-@pytest.mark.parametrize("defname", list_v2_defs())
-def test_v2_definitions_match_types(defname: str) -> None:
-    defdict = module.load_definition("2", defname)  # type: ignore [call-overload]
-    typeguard.check_type("defdict", defdict, dev_types.ModuleDefinitionV2)
-
-
 @pytest.mark.parametrize("defname", ["magdeck", "tempdeck", "thermocycler"])
 def test_v1_definitions_match_types(defname: str) -> None:
     defdict = module.load_definition("1", defname)
