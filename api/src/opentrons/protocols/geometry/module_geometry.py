@@ -488,7 +488,9 @@ def load_module_from_definition(
         except jsonschema.ValidationError:
             log.exception("Failed to validate module def schema")
             raise RuntimeError("The specified module definition is not valid.")
-        v3def: "ModuleDefinitionV3" = definition
+        # mypy can't tell these apart, but we've schema validated it - this is
+        # the right type
+        v3def: "ModuleDefinitionV3" = definition    # type: ignore[assignment]
         return _load_from_v3(v3def, parent, api_level, configuration)
 
     elif isinstance(schema, str):
