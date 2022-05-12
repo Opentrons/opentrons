@@ -319,36 +319,34 @@ async def test_get_run_command_by_id(
     assert result.status_code == 200
 
 
-# async def test_get_run_command_missing_command(
-#     decoy: Decoy,
-#     mock_engine_store: EngineStore,
-# ) -> None:
-#     """It should 404 if you attempt to get a non-existent command."""
-#     key_error = pe_errors.CommandDoesNotExistError("oh no")
-#
-#     run = Run(
-#         id="run-id",
-#         protocolId=None,
-#         createdAt=datetime(year=2021, month=1, day=1),
-#         status=EngineStatus.RUNNING,
-#         current=True,
-#         actions=[],
-#         errors=[],
-#         pipettes=[],
-#         labware=[],
-#         labwareOffsets=[],
-#     )
-#
-#     engine_state = decoy.mock(cls=StateView)
-#     decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
-#     decoy.when(engine_state.commands.get("command-id")).then_raise(key_error)
-#
-#     with pytest.raises(ApiError) as exc_info:
-#         await get_run_command(
-#             commandId="command-id",
-#             engine_store=mock_engine_store,
-#             run=run,
-#         )
-#
-#     assert exc_info.value.status_code == 404
-#     assert exc_info.value.content["errors"][0]["detail"] == "oh no"
+async def test_get_run_command_missing_command(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should 404 if you attempt to get a non-existent command."""
+    key_error = pe_errors.CommandDoesNotExistError("oh no")
+
+    run = Run(
+        id="run-id",
+        protocolId=None,
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=EngineStatus.RUNNING,
+        current=True,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
+    )
+
+    decoy.when(mock_run_data_manager.get_command(run_id=run.id, command_id="command-id")).then_raise(key_error)
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_run_command(
+            commandId="command-id",
+            run_data_manager=mock_run_data_manager,
+            run=run,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["detail"] == "oh no"
