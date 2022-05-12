@@ -26,12 +26,12 @@ def test_rewrite_machine_info_updates_pretty_hostname(initial_contents):
 
 @pytest.mark.parametrize("initial_contents", machine_info_examples)
 def test_rewrite_machine_info_preserves_other_lines(initial_contents):
-    intitial_lines = Counter(initial_contents.splitlines())
+    initial_lines = Counter(initial_contents.splitlines())
     rewrite_string = name_management._rewrite_machine_info(
         initial_contents, "new_pretty_hostname"
     )
     rewrite_lines = Counter(rewrite_string.splitlines())
-    lost_lines = intitial_lines - rewrite_lines
+    lost_lines = initial_lines - rewrite_lines
     for line in lost_lines:
         # Lines are only allowed to be "lost" in the rewrite if they were an
         # old PRETTY_HOSTNAME assignment, or were blank.

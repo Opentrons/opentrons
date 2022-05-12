@@ -1,8 +1,8 @@
 # https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms#top-level-syntax
 name: Release Testing Feedback 🔎
 description: Create an issue to track a bug or feedback
-title: '5.1 Feedback:  <title>'
-labels: [5.1-feedback]
+title: '6.0 Feedback:  <title>'
+labels: [6.0-feedback]
 assignees:
   - y3rsh
   - nusrat813

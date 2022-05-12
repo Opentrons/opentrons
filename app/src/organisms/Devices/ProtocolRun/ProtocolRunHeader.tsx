@@ -70,7 +70,7 @@ import {
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
-import { useHeaterShakerFromProtocol } from '../ModuleCard/hooks'
+import { useIsHeaterShakerInProtocol } from '../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../ModuleCard/ConfirmAttachmentModal'
 
 import type { Run } from '@opentrons/api-client'
@@ -120,13 +120,11 @@ export function ProtocolRunHeader({
   const history = useHistory()
   const [targetProps, tooltipProps] = useHoverTooltip()
   const trackEvent = useTrackEvent()
-  const heaterShakerFromProtocol = useHeaterShakerFromProtocol()
+  const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const runRecord = useRunQuery(runId)
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const { displayName } = useProtocolDetailsForRun(runId)
-
-  // this duplicates the run query above but has additional run status processing logic
   const runStatus = useRunStatus(runId)
 
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
@@ -194,7 +192,7 @@ export function ProtocolRunHeader({
   const handlePlayButtonClick = (): void => {
     if (isShaking) {
       setShowIsShakingModal(true)
-    } else if (heaterShakerFromProtocol != null && !isShaking) {
+    } else if (isHeaterShakerInProtocol && !isShaking) {
       confirmAttachment()
     } else play()
   }
