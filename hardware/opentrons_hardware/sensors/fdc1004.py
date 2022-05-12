@@ -1,7 +1,5 @@
 """Capacitve Sensor Driver Class."""
 
-import logging
-
 from typing import Optional, AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -27,8 +25,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BindSensorOutputRequest,
 )
 from .sensor_abc import AbstractAdvancedSensor
-
-log = logging.getLogger(__name__)
 
 
 class CapacitiveSensor(AbstractAdvancedSensor):

@@ -25,10 +25,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BindSensorOutputRequest,
 )
 
-import logging
 from .sensor_abc import AbstractAdvancedSensor
-
-log = logging.getLogger(__name__)
 
 
 class PressureSensor(AbstractAdvancedSensor):
