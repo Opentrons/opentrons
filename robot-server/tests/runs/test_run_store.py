@@ -22,6 +22,7 @@ from opentrons.protocol_engine import (
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import EngineStatus
 
+
 @pytest.fixture
 def subject(sql_engine_fixture: Engine) -> RunStore:
     """Get a ProtocolStore test subject."""
@@ -41,6 +42,7 @@ def protocol_commands() -> List[pe_commands.Command]:
             result=pe_commands.PauseResult(),
         )
     ]
+
 
 @pytest.fixture
 def run_resource() -> RunResource:
@@ -86,7 +88,7 @@ def protocol_run() -> ProtocolRunData:
         modules=[],
         # TODO (tz 22-4-19): added the field to class. make sure what to initialize
         labwareOffsets=[],
-        status=EngineStatus.IDLE
+        status=EngineStatus.IDLE,
     )
 
 
@@ -103,7 +105,11 @@ def test_update_run_state(
         engine_status="idle",
         commands=[],
     )
-    subject.update_run_state(run_id="run-id", run_data=engine_state.protocol_run_data, commands=engine_state.commands)
+    subject.update_run_state(
+        run_id="run-id",
+        run_data=engine_state.protocol_run_data,
+        commands=engine_state.commands,
+    )
     run_data_result = subject.get_run_data(run_id="run-id")
     commands_result = subject.get_run_commands(run_id="run-id")
     assert run_data_result == protocol_run
@@ -124,7 +130,11 @@ def test_update_state_run_not_found(
     )
 
     with pytest.raises(RunNotFoundError, match="run-not-found"):
-        subject.update_run_state(run_id="run-not-found", run_data=engine_state.protocol_run_data, commands=engine_state.commands)
+        subject.update_run_state(
+            run_id="run-not-found",
+            run_data=engine_state.protocol_run_data,
+            commands=engine_state.commands,
+        )
 
 
 def test_add_run(subject: RunStore) -> None:
@@ -374,27 +384,42 @@ def test_insert_actions_no_run(subject: RunStore) -> None:
         subject.insert_action(run_id="run-id-996", action=action)
 
 
-def test_get_run_commands(subject: RunStore, protocol_run: ProtocolRunData, run_resource: RunResource, protocol_commands: List[pe_commands.Command]) -> None:
+def test_get_run_commands(
+    subject: RunStore,
+    protocol_run: ProtocolRunData,
+    run_resource: RunResource,
+    protocol_commands: List[pe_commands.Command],
+) -> None:
+    """It should be able to get all stored run commands."""
     subject.insert(run=run_resource)
-    subject.update_run_state(run_id=run_resource.run_id, run_data=protocol_run, commands=protocol_commands)
+    subject.update_run_state(
+        run_id=run_resource.run_id, run_data=protocol_run, commands=protocol_commands
+    )
     result = subject.get_run_commands(run_id=run_resource.run_id)
     assert result == protocol_commands
 
 
-def test_get_run_data(subject: RunStore, protocol_run: ProtocolRunData, run_resource: RunResource) -> None:
+def test_get_run_data(
+    subject: RunStore, protocol_run: ProtocolRunData, run_resource: RunResource
+) -> None:
+    """It should be able to get store run data."""
     subject.insert(run=run_resource)
-    subject.update_run_state(run_id=run_resource.run_id, run_data=protocol_run, commands=[])
+    subject.update_run_state(
+        run_id=run_resource.run_id, run_data=protocol_run, commands=[]
+    )
     result = subject.get_run_data(run_id=run_resource.run_id)
     assert result == protocol_run
 
 
 def test_has_run_id(subject: RunStore, run_resource: RunResource) -> None:
+    """It should tell us if a given ID is in the store."""
     subject.insert(run=run_resource)
     result = subject.has(run_resource.run_id)
-    assert result == True
+    assert result is True
 
 
 def test_has_no_run_id(subject: RunStore, run_resource: RunResource) -> None:
+    """It should tell us if a given ID is not in the store."""
     subject.insert(run=run_resource)
     result = subject.has("no-run-id")
-    assert result == False
+    assert result is False

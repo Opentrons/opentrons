@@ -1,16 +1,17 @@
 """Runs' on-db store."""
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional, Any
 
-from pydantic import parse_obj_as
 import sqlalchemy
+from pydantic import parse_obj_as
+
+from opentrons.util.helpers import utc_now
+from opentrons.protocol_engine import ProtocolRunData
+from opentrons.protocol_engine.commands import Command
 
 from robot_server.persistence import run_table, action_table, ensure_utc_datetime
 from robot_server.protocols import ProtocolNotFoundError
-
-from opentrons.protocol_engine import ProtocolRunData
-from opentrons.protocol_engine.commands import Command
 
 from .action_models import RunAction, RunActionType
 
@@ -19,7 +20,7 @@ from .action_models import RunAction, RunActionType
 class RunResource:
     """An entry in the run store, used to construct response models.
 
-    This represents all run protocol_run_data that cannot be derived from another
+    This represents all run data that cannot be derived from another
     location, such as a ProtocolEngine instance.
     """
 
@@ -34,14 +35,14 @@ class RunResource:
 class RunStateResource:
     """An entry in the run state store, used to construct response models.
 
-    This represents all run engine protocol_run_data derived from ProtocolEngine instance.
+    This represents all run information derived from the run's ProtocolEngine.
     """
 
     run_id: str
     protocol_run_data: ProtocolRunData
     commands: List[Command]
     engine_status: str
-    _updated_at: Optional[datetime]
+    _updated_at: datetime = field(default_factory=utc_now)
 
 
 class RunNotFoundError(ValueError):
@@ -61,7 +62,10 @@ class RunStore:
         self._active_run: Optional[str] = None
 
     def update_run_state(
-        self, run_id: str, run_data: ProtocolRunData, commands: List[Command]
+        self,
+        run_id: str,
+        run_data: ProtocolRunData,
+        commands: List[Command],
     ) -> None:
         """Update run table with run protocol_run_data to db.
 
@@ -88,30 +92,28 @@ class RunStore:
         with self._sql_engine.begin() as transaction:
             result = transaction.execute(statement)
             if result.rowcount == 0:
-                raise RunNotFoundError(run_id=state.run_id)
-
-        return state
+                raise RunNotFoundError(run_id=run_id)
 
     def get_run_data(self, run_id: str) -> ProtocolRunData:
         """Get the archived run data of a run."""
-        statment = sqlalchemy.select(run_table.c.protocol_run_data).where(
+        statement = sqlalchemy.select(run_table.c.protocol_run_data).where(
             run_table.c.id == run_id
         )
         with self._sql_engine.begin() as transaction:
             try:
-                row = transaction.execute(statment).one()
+                row = transaction.execute(statement).one()
             except sqlalchemy.exc.NoResultFound:
                 raise RunNotFoundError(run_id=run_id)
             return _convert_sql_row_to_run_data(row)
 
     def get_run_commands(self, run_id: str) -> List[Command]:
         """Get the archived commands list of a run."""
-        statment = sqlalchemy.select(run_table.c.commands).where(
+        statement = sqlalchemy.select(run_table.c.commands).where(
             run_table.c.id == run_id
         )
         with self._sql_engine.begin() as transaction:
             try:
-                row = transaction.execute(statment).one()
+                row = transaction.execute(statement).one()
             except sqlalchemy.exc.NoResultFound:
                 raise RunNotFoundError(run_id=run_id)
             return _convert_sql_row_to_run_commands(row)
@@ -172,6 +174,7 @@ class RunStore:
         return run
 
     def has(self, run_id: str) -> bool:
+        """Whether a given run exists in the store."""
         statement = sqlalchemy.select(run_table).where(run_table.c.id == run_id)
         with self._sql_engine.begin() as transaction:
             try:

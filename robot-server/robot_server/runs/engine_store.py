@@ -1,14 +1,13 @@
 """In-memory storage of ProtocolEngine instances."""
-from typing import Any, Dict, NamedTuple, Optional
+from typing import NamedTuple, Optional
 
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_runner import ProtocolRunner
 from opentrons.protocol_engine import (
     ProtocolEngine,
-    StateView,
-    create_protocol_engine,
     ProtocolRunData,
+    create_protocol_engine,
 )
-from opentrons.protocol_runner import ProtocolRunner
 
 
 class EngineMissingError(RuntimeError):
@@ -29,6 +28,7 @@ class EngineConflictError(RuntimeError):
 class RunnerEnginePair(NamedTuple):
     """A stored ProtocolRunner/ProtocolEngine pair."""
 
+    run_id: str
     runner: ProtocolRunner
     engine: ProtocolEngine
 
@@ -49,7 +49,6 @@ class EngineStore:
         self._hardware_api = hardware_api
         self._default_engine: Optional[ProtocolEngine] = None
         self._runner_engine_pair: Optional[RunnerEnginePair] = None
-        self._engines_by_run_id: Dict[str, ProtocolEngine] = {}
 
     @property
     def engine(self) -> ProtocolEngine:
@@ -75,11 +74,14 @@ class EngineStore:
 
         return self._runner_engine_pair.runner
 
-    # TODO(mc, 2022-05-10): bug in decoy, fix and type as str
     @property
-    def current_run_id(self) -> Any:
+    def current_run_id(self) -> Optional[str]:
         """Get the run identifier associated with the current engine/runner pair."""
-        raise NotImplementedError()
+        return (
+            self._runner_engine_pair.run_id
+            if self._runner_engine_pair is not None
+            else None
+        )
 
     # TODO(mc, 2022-03-21): this resource locking is insufficient;
     # come up with something more sophisticated without race condition holes.
@@ -114,31 +116,16 @@ class EngineStore:
             EngineConflictError: The current runner/engine pair is not idle, so
             a new set may not be created.
         """
-        raise NotImplementedError("TODO: change return type")
-
         engine = await create_protocol_engine(hardware_api=self._hardware_api)
         runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)
 
         await self.clear()
 
-        self._runner_engine_pair = RunnerEnginePair(runner=runner, engine=engine)
-        self._engines_by_run_id[run_id] = engine
+        self._runner_engine_pair = RunnerEnginePair(
+            run_id=run_id, runner=runner, engine=engine
+        )
 
-        return engine.state_view
-
-    def get_state(self, run_id: str) -> StateView:
-        """Get a run's ProtocolEngine state.
-
-        Args:
-            run_id: The run resource to retrieve engine state from.
-
-        Raises:
-            EngineMissingError: No engine found for the given run ID.
-        """
-        try:
-            return self._engines_by_run_id[run_id].state_view
-        except KeyError:
-            raise EngineMissingError(f"No engine state found for run {run_id}")
+        return engine.state_view.get_protocol_run_data()
 
     async def clear(self) -> None:
         """Remove the persisted ProtocolEngine, if present, no-op otherwise.

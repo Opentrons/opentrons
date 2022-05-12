@@ -10,8 +10,8 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
     types as pe_types,
 )
-from opentrons.protocol_engine import ProtocolRunData
-from opentrons.protocol_runner import ProtocolRunner
+from opentrons.protocol_engine import ProtocolRunData, EngineStatus
+from opentrons.protocol_runner import ProtocolRunner, ProtocolRunResult
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
 from robot_server.protocols.analysis_store import AnalysisStore
@@ -94,15 +94,17 @@ async def test_analyze(
     )
 
     decoy.when(await protocol_runner.run(protocol_resource.source)).then_return(
-        ProtocolRunData(
+        ProtocolRunResult(
             commands=[analysis_command],
-            errors=[analysis_error],
-            labware=[analysis_labware],
-            pipettes=[analysis_pipette],
-            # TODO(mc, 2022-02-14): evaluate usage of modules in the analysis resp.
-            modules=[],
-            # TODO (tz 22-4-19): added the field to class. make sure what to initialize
-            labwareOffsets=[],
+            data=ProtocolRunData(
+                status=EngineStatus.SUCCEEDED,
+                errors=[analysis_error],
+                labware=[analysis_labware],
+                pipettes=[analysis_pipette],
+                # TODO(mc, 2022-02-14): evaluate usage of modules in the analysis resp.
+                modules=[],
+                labwareOffsets=[],
+            ),
         )
     )
 

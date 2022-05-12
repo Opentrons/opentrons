@@ -3,7 +3,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_engine import ProtocolEngine, ProtocolRunData
 from opentrons.protocol_runner import ProtocolRunner
 
 from robot_server.runs.engine_store import (
@@ -26,19 +26,21 @@ async def test_create_engine(subject: EngineStore) -> None:
     """It should create an engine for a run."""
     result = await subject.create(run_id="run-id")
 
+    assert subject.current_run_id == "run-id"
+    assert isinstance(result, ProtocolRunData)
     assert isinstance(subject.runner, ProtocolRunner)
     assert isinstance(subject.engine, ProtocolEngine)
-    assert result is subject.engine.state_view
-    assert result is subject.get_state("run-id")
 
 
 async def test_archives_state_if_engine_already_exists(subject: EngineStore) -> None:
     """It should not create more than one engine / runner pair."""
-    state_1 = await subject.create(run_id="run-id-1")
-    state_2 = await subject.create(run_id="run-id-2")
+    await subject.create(run_id="run-id-1")
 
-    assert state_2 is subject.engine.state_view
-    assert state_1 is subject.get_state("run-id-1")
+    # should not raise
+    result = await subject.create(run_id="run-id-2")
+
+    assert subject.current_run_id == "run-id-2"
+    assert isinstance(result, ProtocolRunData)
 
 
 async def test_cannot_create_engine_if_active(subject: EngineStore) -> None:
@@ -49,9 +51,13 @@ async def test_cannot_create_engine_if_active(subject: EngineStore) -> None:
     with pytest.raises(EngineConflictError):
         await subject.create(run_id="run-id-2")
 
+    assert subject.current_run_id == "run-id-1"
+
 
 def test_raise_if_engine_does_not_exist(subject: EngineStore) -> None:
     """It should raise if no engine exists when requested."""
+    assert subject.current_run_id is None
+
     with pytest.raises(EngineMissingError):
         subject.engine
 
@@ -64,6 +70,8 @@ async def test_clear_engine(subject: EngineStore) -> None:
     await subject.create(run_id="run-id")
     await subject.runner.run()
     await subject.clear()
+
+    assert subject.current_run_id is None
 
     with pytest.raises(EngineMissingError):
         subject.engine

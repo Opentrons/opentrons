@@ -6,30 +6,38 @@ from decoy import Decoy
 
 from opentrons.protocol_engine import (
     EngineStatus,
-    StateView,
-    CommandSlice,
-    CurrentCommand,
+    # StateView,
+    # CommandSlice,
+    # CurrentCommand,
     commands as pe_commands,
-    errors as pe_errors,
-    ProtocolEngine
+    # errors as pe_errors,
+    ProtocolEngine,
 )
 
 from robot_server.errors import ApiError
-from robot_server.service.json_api import RequestModel, MultiBodyMeta
-from robot_server.runs.run_models import Run, RunCommandSummary
+from robot_server.service.json_api import (
+    RequestModel,
+    # MultiBodyMeta,
+)
+from robot_server.runs.run_models import (
+    Run,
+    # RunCommandSummary,
+)
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.router.commands_router import (
-    CommandCollectionLinks,
-    CommandLink,
-    CommandLinkMeta,
+    # CommandCollectionLinks,
+    # CommandLink,
+    # CommandLinkMeta,
     create_run_command,
-    get_run_command,
-    get_run_commands,
-    get_current_run_engine_from_url
+    # get_run_command,
+    # get_run_commands,
+    get_current_run_engine_from_url,
 )
 
 
-async def test_create_run_command(decoy: Decoy, mock_protocol_engine: ProtocolEngine) -> None:
+async def test_create_run_command(
+    decoy: Decoy, mock_protocol_engine: ProtocolEngine
+) -> None:
     """It should add the requested command to the ProtocolEngine and return it."""
     command_request = pe_commands.PauseCreate(
         params=pe_commands.PauseParams(message="Hello")
@@ -47,13 +55,15 @@ async def test_create_run_command(decoy: Decoy, mock_protocol_engine: ProtocolEn
         command_once_added
     )
 
-    decoy.when(mock_protocol_engine.state_view.commands.get("command-id")).then_return(command_once_added)
+    decoy.when(mock_protocol_engine.state_view.commands.get("command-id")).then_return(
+        command_once_added
+    )
 
     result = await create_run_command(
         request_body=RequestModel(data=command_request),
         waitUntilComplete=False,
         protocol_engine=mock_protocol_engine,
-        runId="run-id"
+        runId="run-id",
     )
 
     assert result.content.data == command_once_added
@@ -61,13 +71,25 @@ async def test_create_run_command(decoy: Decoy, mock_protocol_engine: ProtocolEn
     decoy.verify(await mock_protocol_engine.wait_for_command("command-id"), times=0)
 
 
-async def test_get_current_run_engine_from_url(decoy: Decoy, mock_engine_store: EngineStore) -> None:
-    """Should get an instance of a run protocol engine"""
-
+async def test_get_current_run_engine_from_url(
+    decoy: Decoy, mock_engine_store: EngineStore
+) -> None:
+    """Should get an instance of a run protocol engine."""
+    run = Run(
+        id="run-id",
+        protocolId=None,
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=EngineStatus.RUNNING,
+        current=True,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
+    )
     decoy.when(mock_engine_store.current_run_id).then_return("run-id")
     result = await get_current_run_engine_from_url(
-        runId="run-id",
-        engine_store=mock_engine_store
+        runId="run-id", engine_store=mock_engine_store
     )
     assert isinstance(result, ProtocolEngine)
 
@@ -80,8 +102,7 @@ async def test_get_current_run_engine_from_url_not_current(
 
     with pytest.raises(ApiError) as exc_info:
         await get_current_run_engine_from_url(
-            runId=str,
-            engine_store=mock_engine_store
+            runId="run-id", engine_store=mock_engine_store
         )
 
     assert exc_info.value.status_code == 400
@@ -113,15 +134,15 @@ async def test_create_run_command_blocking_completion(
     )
 
     def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
-        decoy.when(mock_protocol_engine.state_view.commands.get("command-id")).then_return(
-            command_once_added
-        )
+        decoy.when(
+            mock_protocol_engine.state_view.commands.get("command-id")
+        ).then_return(command_once_added)
         return command_once_added
 
     def _stub_completed_command_state(*_a: object, **_k: object) -> None:
-        decoy.when(mock_protocol_engine.state_view.commands.get("command-id")).then_return(
-            command_once_completed
-        )
+        decoy.when(
+            mock_protocol_engine.state_view.commands.get("command-id")
+        ).then_return(command_once_completed)
 
     decoy.when(mock_protocol_engine.add_command(command_request)).then_do(
         _stub_queued_command_state
@@ -143,92 +164,93 @@ async def test_create_run_command_blocking_completion(
     assert result.status_code == 201
 
 
-async def test_get_run_commands(decoy: Decoy, mock_engine_store: EngineStore) -> None:
-    """It should return a list of all commands in a run."""
-    # run = Run(
-    #     id="run-id",
-    #     protocolId=None,
-    #     createdAt=datetime(year=2021, month=1, day=1),
-    #     status=EngineStatus.RUNNING,
-    #     current=True,
-    #     actions=[],
-    #     errors=[],
-    #     pipettes=[],
-    #     labware=[],
-    #     labwareOffsets=[],
-    # )
-    #
-    # command = pe_commands.Pause(
-    #     id="command-id",
-    #     key="command-key",
-    #     status=pe_commands.CommandStatus.FAILED,
-    #     createdAt=datetime(year=2021, month=1, day=1),
-    #     startedAt=datetime(year=2022, month=2, day=2),
-    #     completedAt=datetime(year=2023, month=3, day=3),
-    #     params=pe_commands.PauseParams(message="hello world"),
-    #     error=pe_errors.ErrorOccurrence(
-    #         id="error-id",
-    #         errorType="PrettyBadError",
-    #         createdAt=datetime(year=2024, month=4, day=4),
-    #         detail="Things are not looking good.",
-    #     ),
-    # )
-    #
-    # engine_state = decoy.mock(cls=StateView)
-    # decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
-    # decoy.when(engine_state.commands.get_current()).then_return(
-    #     CurrentCommand(
-    #         command_id="current-command-id",
-    #         command_key="current-command-key",
-    #         created_at=datetime(year=2024, month=4, day=4),
-    #         index=101,
-    #     )
-    # )
-    # decoy.when(engine_state.commands.get_slice(cursor=None, length=42)).then_return(
-    #     CommandSlice(commands=[command], cursor=1, total_length=3)
-    # )
-    #
-    # result = await get_run_commands(
-    #     run=run,
-    #     engine_store=mock_engine_store,
-    #     cursor=None,
-    #     pageLength=42,
-    # )
-    #
-    # assert result.content.data == [
-    #     RunCommandSummary(
-    #         id="command-id",
-    #         key="command-key",
-    #         commandType="pause",
-    #         createdAt=datetime(year=2021, month=1, day=1),
-    #         startedAt=datetime(year=2022, month=2, day=2),
-    #         completedAt=datetime(year=2023, month=3, day=3),
-    #         status=pe_commands.CommandStatus.FAILED,
-    #         params=pe_commands.PauseParams(message="hello world"),
-    #         error=pe_errors.ErrorOccurrence(
-    #             id="error-id",
-    #             errorType="PrettyBadError",
-    #             createdAt=datetime(year=2024, month=4, day=4),
-    #             detail="Things are not looking good.",
-    #         ),
-    #     )
-    # ]
-    # assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)
-    # assert result.content.links == CommandCollectionLinks(
-    #     current=CommandLink(
-    #         href="/runs/run-id/commands/current-command-id",
-    #         meta=CommandLinkMeta(
-    #             runId="run-id",
-    #             commandId="current-command-id",
-    #             key="current-command-key",
-    #             createdAt=datetime(year=2024, month=4, day=4),
-    #             index=101,
-    #         ),
-    #     )
-    # )
-    # assert result.status_code == 200
-
-
+#
+# async def test_get_run_commands(decoy: Decoy, mock_engine_store: EngineStore) -> None:
+#     """It should return a list of all commands in a run."""
+#     run = Run(
+#         id="run-id",
+#         protocolId=None,
+#         createdAt=datetime(year=2021, month=1, day=1),
+#         status=EngineStatus.RUNNING,
+#         current=True,
+#         actions=[],
+#         errors=[],
+#         pipettes=[],
+#         labware=[],
+#         labwareOffsets=[],
+#     )
+#
+#     command = pe_commands.Pause(
+#         id="command-id",
+#         key="command-key",
+#         status=pe_commands.CommandStatus.FAILED,
+#         createdAt=datetime(year=2021, month=1, day=1),
+#         startedAt=datetime(year=2022, month=2, day=2),
+#         completedAt=datetime(year=2023, month=3, day=3),
+#         params=pe_commands.PauseParams(message="hello world"),
+#         error=pe_errors.ErrorOccurrence(
+#             id="error-id",
+#             errorType="PrettyBadError",
+#             createdAt=datetime(year=2024, month=4, day=4),
+#             detail="Things are not looking good.",
+#         ),
+#     )
+#
+#     engine_state = decoy.mock(cls=StateView)
+#     decoy.when(mock_engine_store.get_state("run-id")).then_return(engine_state)
+#     decoy.when(engine_state.commands.get_current()).then_return(
+#         CurrentCommand(
+#             command_id="current-command-id",
+#             command_key="current-command-key",
+#             created_at=datetime(year=2024, month=4, day=4),
+#             index=101,
+#         )
+#     )
+#     decoy.when(engine_state.commands.get_slice(cursor=None, length=42)).then_return(
+#         CommandSlice(commands=[command], cursor=1, total_length=3)
+#     )
+#
+#     result = await get_run_commands(
+#         run=run,
+#         engine_store=mock_engine_store,
+#         cursor=None,
+#         pageLength=42,
+#     )
+#
+#     assert result.content.data == [
+#         RunCommandSummary(
+#             id="command-id",
+#             key="command-key",
+#             commandType="pause",
+#             createdAt=datetime(year=2021, month=1, day=1),
+#             startedAt=datetime(year=2022, month=2, day=2),
+#             completedAt=datetime(year=2023, month=3, day=3),
+#             status=pe_commands.CommandStatus.FAILED,
+#             params=pe_commands.PauseParams(message="hello world"),
+#             error=pe_errors.ErrorOccurrence(
+#                 id="error-id",
+#                 errorType="PrettyBadError",
+#                 createdAt=datetime(year=2024, month=4, day=4),
+#                 detail="Things are not looking good.",
+#             ),
+#         )
+#     ]
+#     assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)
+#     assert result.content.links == CommandCollectionLinks(
+#         current=CommandLink(
+#             href="/runs/run-id/commands/current-command-id",
+#             meta=CommandLinkMeta(
+#                 runId="run-id",
+#                 commandId="current-command-id",
+#                 key="current-command-key",
+#                 createdAt=datetime(year=2024, month=4, day=4),
+#                 index=101,
+#             ),
+#         )
+#     )
+#     assert result.status_code == 200
+#
+#
 # async def test_get_run_commands_empty(
 #     decoy: Decoy, mock_engine_store: EngineStore
 # ) -> None:
