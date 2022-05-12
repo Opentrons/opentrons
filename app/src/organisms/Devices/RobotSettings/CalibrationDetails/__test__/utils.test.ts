@@ -12,10 +12,4 @@ describe('formatLastCalibrated', () => {
     const formatted = formatLastCalibrated(lastModified)
     expect(formatted).toBe('1/10/2022 18:16:29')
   })
-
-  it('should return unknown if lastModified is not a string', () => {
-    const lastModified = undefined
-    const formatted = formatLastCalibrated(lastModified)
-    expect(formatted).toBe('Unknown')
-  })
 })

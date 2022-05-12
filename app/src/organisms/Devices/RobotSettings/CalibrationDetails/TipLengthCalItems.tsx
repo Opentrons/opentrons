@@ -84,10 +84,11 @@ export function TipLengthCalItems({
             <StyledTableRow key={index}>
               <StyledTableCell>
                 <StyledText as="p">
-                  {getDisplayNameForTipRack(
-                    calibration.tiprack,
-                    customLabwareDefs
-                  )}
+                  {calibration.tiprack &&
+                    getDisplayNameForTipRack(
+                      calibration.tiprack,
+                      customLabwareDefs
+                    )}
                 </StyledText>
               </StyledTableCell>
               <StyledTableCell>

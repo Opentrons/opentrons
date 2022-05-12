@@ -418,7 +418,8 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing4}>
               {t('tip_length_calibrations_description')}
             </StyledText>
-            {tipLengthCalibrations != null ? (
+            {tipLengthCalibrations != null &&
+            tipLengthCalibrations.length !== 0 ? (
               <TipLengthCalItems
                 robotName={robotName}
                 formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
