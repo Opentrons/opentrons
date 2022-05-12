@@ -43,4 +43,4 @@ async def test_await_temperature(
 
     result = await subject.execute(data)
     decoy.verify(await tempdeck_hardware.deactivate(), times=1)
-    assert result == temperature_module.AwaitTemperatureResult()
+    assert result == temperature_module.WaitForTemperatureResult()

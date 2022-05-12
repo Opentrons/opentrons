@@ -10,8 +10,8 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import temperature_module
-from opentrons.protocol_engine.commands.temperature_module.await_temperature import (  # noqa: E501
-    AwaitTemperatureImpl,
+from opentrons.protocol_engine.commands.temperature_module.wait_for_temperature import (  # noqa: E501
+    WaitForTemperatureImpl,
 )
 
 
@@ -21,9 +21,9 @@ async def test_await_temperature(
     equipment: EquipmentHandler,
 ) -> None:
     """It should be able to wait for the module's target temperature."""
-    subject = AwaitTemperatureImpl(state_view=state_view, equipment=equipment)
+    subject = WaitForTemperatureImpl(state_view=state_view, equipment=equipment)
 
-    data = temperature_module.AwaitTemperatureParams(moduleId="tempdeck-id")
+    data = temperature_module.WaitForTemperatureParams(moduleId="tempdeck-id")
 
     module_substate = decoy.mock(cls=TemperatureModuleSubState)
     tempdeck_hardware = decoy.mock(cls=TempDeck)
@@ -46,4 +46,4 @@ async def test_await_temperature(
     decoy.verify(
         await tempdeck_hardware.await_temperature(awaiting_temperature=123), times=1
     )
-    assert result == temperature_module.AwaitTemperatureResult()
+    assert result == temperature_module.WaitForTemperatureResult()
