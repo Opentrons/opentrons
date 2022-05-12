@@ -98,9 +98,10 @@ export function HistoricalRunOffsetDrawer(
             padding={SPACING.spacing3}
             backgroundColor={COLORS.white}
             marginY={SPACING.spacing3}
+            marginLeft={SPACING.spacing5}
           >
-            <StyledText marginLeft={SPACING.spacing5} width="24%" as="label">
-              {t('slot_number', { number: offset.location.slotName })}
+            <StyledText width="25%" as="label">
+              {t('slot', { slotName: offset.location.slotName })}
               {offset.location.moduleModel != null &&
                 ` - ${offset.location.moduleModel}`}
             </StyledText>

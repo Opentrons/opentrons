@@ -12,10 +12,13 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { useRunStatus } from '../RunTimeControl/hooks'
+import { formatInterval } from '../RunTimeControl/utils'
 import { formatTimestamp } from './utils'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
 import { HistoricalRunOffsetDrawer as OffsetDrawer } from './HistoricalRunOffsetDrawer'
 import type { RunData } from '@opentrons/api-client'
+
+const EMPTY_TIMESTAMP = '--:--:--'
 
 interface HistoricalProtocolRunProps {
   run: RunData
@@ -32,7 +35,14 @@ export function HistoricalProtocolRun(
   const [offsetDrawerOpen, setOffsetDrawerOpen] = React.useState(false)
   const runStatus = useRunStatus(run.id)
   const runDisplayId = formatTimestamp(run.createdAt)
-
+  let duration = EMPTY_TIMESTAMP
+  if (runStatus !== 'idle') {
+    if (run.completedAt != null) {
+      duration = formatInterval(run.createdAt, run.completedAt)
+    } else {
+      duration = formatInterval(run.createdAt, new Date().toString())
+    }
+  }
   return (
     <>
       <Flex
@@ -64,7 +74,7 @@ export function HistoricalProtocolRun(
           {runStatus != null ? t(`status_${runStatus}`) : ''}
         </StyledText>
         <StyledText as="p" width="20%">
-          duration
+          {duration}
         </StyledText>
         <OverflowMenu
           runId={run.id}

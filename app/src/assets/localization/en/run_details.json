@@ -92,6 +92,5 @@
   "apply_stored_data": "Apply stored data",
   "ignore_stored_data": "Ignore stored data",
   "slot": "Slot {{slotName}}",
-  "no_offsets_available": "No Labware Offset data available",
-  "slot_number": "Slot {{number}}"
+  "no_offsets_available": "No Labware Offset data available"
 }
