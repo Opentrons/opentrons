@@ -1,68 +1,100 @@
-# import time
-# from pathlib import Path
+from typing import AsyncGenerator, NamedTuple
 
-# from tests.integration.dev_server import DevServer
-# from tests.integration.robot_client import RobotClient
+import pytest
 
-# from robot_server.service.json_api import RequestModel
-# from robot_server.runs.run_models import RunCreate
+from tests.integration.dev_server import DevServer
+from tests.integration.robot_client import RobotClient
 
 
-# async def test_runs_persist() -> None:
-#     """Test that protocols are persisted through dev server restart."""
-#     port = "15555"
-#     async with RobotClient.make(
-#         host="http://localhost", port=port, version="*"
-#     ) as robot_client:
-#         assert (
-#             await robot_client.wait_until_dead()
-#         ), "Dev Robot is running and must not be."
-#         with DevServer(port=port) as server:
-#             server.start()
-#             assert (
-#                 await robot_client.wait_until_alive()
-#             ), "Dev Robot never became available."
-#             protocol = await robot_client.post_protocol(
-#                 [
-#                     Path("./tests/integration/protocols/pickup_return_protocol.py"),
-#                 ]
-#             )
+class ClientServerFixture(NamedTuple):
+    client: RobotClient
+    server: DevServer
 
-#             request_body = RequestModel(
-#                 data=RunCreate(protocolId=protocol.json()["data"]["id"])
-#             )
-#             print(
-#                 "analysisSummaries id"
-#                 + protocol.json()["data"]["analysisSummaries"][0]["id"]
-#             )
-#             await robot_client.wait_for_analysis_complete(
-#                 protocol_id=protocol.json()["data"]["id"],
-#                 analysis_id=protocol.json()["data"]["analysisSummaries"][0]["id"],
-#                 timeout_sec=5,
-#             )
-#             print(request_body)
-#             run_response = await robot_client.post_run(req_body=request_body.dict())
-#             print("response " + run_response.read().decode("utf-8"))
+    async def restart(self) -> None:
+        self.server.stop()
+        assert await self.client.wait_until_dead(), "Server did not stop."
+        self.server.start()
+        assert await self.client.wait_until_alive(), "Server never became available."
 
-#             response = await robot_client.get_runs()
-#             uploaded_runs = response.json()["data"]
-#             print("uploaded_runs")
-#             print(uploaded_runs)
-#             # TODO (tz): fixed after get_state is implemented with persistence
-#             # server.stop()
-#             # assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
-#             # print("before start")
-#             # server.start()
-#             # assert (
-#             #     await robot_client.wait_until_alive()
-#             # ), "Dev Robot never became available."
-#             #
-#             # print("second get run")
-#             # response = await robot_client.get_runs()
-#             # print("response")
-#             # print(response.json())
-#             # restarted_runs = response.json()["data"]
-#             # print("restarted_runs")
-#             # print(restarted_runs)
-#             # Make sure the run persisted after reboot
-#             # assert restarted_runs == uploaded_runs
+
+@pytest.fixture
+def port() -> str:
+    """Get a port to run the dev server on."""
+    return "15555"
+
+
+@pytest.fixture
+async def client_and_server(port: str) -> AsyncGenerator[ClientServerFixture, None]:
+    """Get a dev server and a client to that server."""
+    async with RobotClient.make(
+        host="http://localhost",
+        port=port,
+        version="*",
+    ) as client:
+        assert await client.wait_until_dead(), "Server is running and must not be."
+
+        with DevServer(port=port) as server:
+            server.start()
+            assert await client.wait_until_alive(), "Server never became available."
+
+            yield ClientServerFixture(client=client, server=server)
+
+
+async def test_runs_persist(client_and_server: ClientServerFixture) -> None:
+    """Test that protocols are persisted through dev server restart."""
+    client, server = client_and_server
+
+    # create a run
+    create_run_response = await client.post_run(req_body={"data": {}})
+    expected_run = create_run_response.json()["data"]
+    run_id = expected_run["id"]
+
+    # create a command in that run
+    create_command_response = await client.post_run_command(
+        run_id=expected_run["id"],
+        req_body={"data": {"commandType": "home", "params": {}}},
+        params={"waitUntilComplete": True},
+    )
+    expected_command = create_command_response.json()["data"]
+    command_id = expected_command["id"]
+
+    # fetch the same run and commands through various endpoints
+    get_all_runs_response = await client.get_runs()
+    get_all_commands_response = await client.get_run_commands(run_id=run_id)
+    get_run_response = await client.get_run(run_id=run_id)
+    get_command_response = await client.get_run_command(
+        run_id=run_id,
+        command_id=command_id,
+    )
+
+    # ensure fetched resources match created resources
+    assert get_all_runs_response.json()["data"] == [expected_run]
+    assert get_all_commands_response.json()["data"] == [
+        # NOTE: GET /run/:id/commands returns command summaries,
+        # which are commands without the `result` key
+        {k: v for k, v in expected_command.items() if k != "result"}
+    ]
+    assert get_run_response.json()["data"] == expected_run
+    assert get_command_response.json()["data"] == expected_command
+
+    # reboot the server
+    await client_and_server.restart()
+
+    # fetch those same resources again
+    get_all_persisted_runs_response = await client.get_runs()
+    get_all_persisted_commands_response = await client.get_run_commands(run_id=run_id)
+    get_persisted_run_response = await client.get_run(expected_run["id"])
+    get_persisted_command_response = await client.get_run_command(
+        expected_run["id"], expected_command["id"]
+    )
+
+    # ensure the fetched resources still match the originally created ones
+    # even through the server reboot
+    assert get_all_persisted_runs_response.json()["data"] == [expected_run]
+    assert get_all_persisted_commands_response.json()["data"] == [
+        # NOTE: GET /run/:id/commands returns command summaries,
+        # which are commands without the `result` key
+        {k: v for k, v in expected_command.items() if k != "result"}
+    ]
+    assert get_persisted_run_response.json()["data"] == expected_run
+    assert get_persisted_command_response.json()["data"] == expected_command
