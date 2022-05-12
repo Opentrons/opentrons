@@ -10,15 +10,20 @@ import {
   POSITION_RELATIVE,
   COLORS,
 } from '@opentrons/components'
-import { useDeleteRunMutation } from '@opentrons/react-api-client'
+import {
+  useDeleteRunMutation,
+  useAllCommandsQuery,
+} from '@opentrons/react-api-client'
 import { Divider } from '../../atoms/structure'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../RunTimeControl/hooks'
-import type { Run } from '@opentrons/api-client'
+import { downloadFile } from './utils'
+import type { Run, RunData } from '@opentrons/api-client'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
-  runId: string
+  run: RunData
+  protocolName: string
   robotName: string
   robotIsBusy: boolean
 }
@@ -29,7 +34,9 @@ export function HistoricalProtocolRunOverflowMenu(
   const { t } = useTranslation('device_details')
   const history = useHistory()
 
-  const { runId, robotName, robotIsBusy } = props
+  const { run, robotName, protocolName, robotIsBusy } = props
+  const runId = run.id
+  const commands = useAllCommandsQuery(runId)
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
   const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -40,6 +47,18 @@ export function HistoricalProtocolRunOverflowMenu(
     history.push(
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-log`
     )
+  const onDownloadClick: React.MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    const runDetails = {
+      ...run,
+      commands: commands,
+    }
+    const createdAt = new Date(run.createdAt).toISOString()
+    const fileName = `${robotName}_${protocolName}_${createdAt}.json`
+    downloadFile(runDetails, fileName)
+    setShowOverflowMenu(!showOverflowMenu)
+  }
   const { reset } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
 
@@ -64,6 +83,7 @@ export function HistoricalProtocolRunOverflowMenu(
           <MenuItem onClick={reset} disabled={robotIsBusy}>
             {t('rerun_now')}
           </MenuItem>
+          <MenuItem onClick={onDownloadClick}>{t('download_run_log')}</MenuItem>
           <Divider />
           <MenuItem onClick={() => deleteRun(runId)}>
             {t('delete_run')}

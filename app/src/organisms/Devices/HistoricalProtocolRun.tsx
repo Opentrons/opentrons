@@ -34,7 +34,7 @@ export function HistoricalProtocolRun(
   const { run, protocolName, robotIsBusy, robotName } = props
   const [offsetDrawerOpen, setOffsetDrawerOpen] = React.useState(false)
   const runStatus = useRunStatus(run.id)
-  const runDisplayId = formatTimestamp(run.createdAt)
+  const runDisplayName = formatTimestamp(run.createdAt)
   let duration = EMPTY_TIMESTAMP
   if (runStatus !== 'idle') {
     if (run.completedAt != null) {
@@ -65,7 +65,7 @@ export function HistoricalProtocolRun(
           />
         </Box>
         <StyledText as="p" width="25%">
-          {runDisplayId}
+          {runDisplayName}
         </StyledText>
         <StyledText as="p" width="35%">
           {protocolName}
@@ -77,7 +77,8 @@ export function HistoricalProtocolRun(
           {duration}
         </StyledText>
         <OverflowMenu
-          runId={run.id}
+          run={run}
+          protocolName={protocolName}
           robotName={robotName}
           robotIsBusy={robotIsBusy}
         />
