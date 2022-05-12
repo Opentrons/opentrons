@@ -33,7 +33,7 @@ async def build_driver(driver_settings: settings.DriverSettings) -> AbstractCanD
 async def driver(
     driver_settings: settings.DriverSettings,
 ) -> AsyncIterator[AbstractCanDriver]:
-    """Context manager creating a can driver"""
+    """Context manager creating a can driver."""
     d = await build_driver(driver_settings)
     try:
         yield d

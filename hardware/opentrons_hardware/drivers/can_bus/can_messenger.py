@@ -72,14 +72,14 @@ class CanMessenger:
         )
 
     async def __aenter__(self) -> CanMessenger:
-        """Start messenger"""
+        """Start messenger."""
         self.start()
         return self
 
     async def __aexit__(
         self, exc_type: type, exc_val: BaseException, exc_tb: Traceback
     ) -> None:
-        """stop messenger"""
+        """Stop messenger."""
         await self.stop()
 
     def start(self) -> None:
