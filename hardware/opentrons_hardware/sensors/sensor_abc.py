@@ -16,6 +16,10 @@ from contextlib import asynccontextmanager
 class AbstractBasicSensor(ABC):
     """Abstract base class for basic sensors."""
 
+    def __init__(self) -> None:
+        """Constructor."""
+        self._scheduler = SensorScheduler()
+
     @abstractmethod
     async def read(
         self,
@@ -46,11 +50,11 @@ class AbstractAdvancedSensor(AbstractBasicSensor):
         sensor_type: SensorType,
     ) -> None:
         """Constructor."""
+        super().__init__()
         self._zero_threshold: float = zero_threshold
         self._stop_threshold: float = stop_threshold
         self._offset: float = offset
         self._sensor_type: SensorType = sensor_type
-        self._scheduler = SensorScheduler()
 
     @property
     def zero_threshold(self) -> float:

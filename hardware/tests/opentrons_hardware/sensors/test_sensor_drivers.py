@@ -343,7 +343,6 @@ async def test_threshold(
         [NodeId.pipette_left, 5, lazy_fixture("capacitive_sensor")],
     ],
 )
-# @pytest.mark.skip("need to fix bind_output")
 async def test_bind_to_sync(
     mock_messenger: mock.AsyncMock,
     can_message_notifier: MockCanMessageNotifier,

@@ -7,7 +7,6 @@ from opentrons_hardware.sensors.utils import (
     SensorDataType,
 )
 from typing import Optional
-from .scheduler import SensorScheduler
 from .sensor_abc import AbstractBasicSensor
 
 
@@ -17,7 +16,7 @@ class EnvironmentSensor(AbstractBasicSensor):
     def __init__(self, sensor_type: SensorType) -> None:
         """Constructor."""
         self._sensor_type = sensor_type
-        self._scheduler = SensorScheduler()
+        super().__init__()
 
     async def read(
         self,
