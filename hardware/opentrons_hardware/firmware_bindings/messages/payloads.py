@@ -422,11 +422,13 @@ class TipActionResponsePayload(MoveGroupResponsePayload):
 
     success: utils.UInt8Field
 
+
 @dataclass
 class PeripheralInfoRequestPayload(utils.BinarySerializable):
     """A request to get the initialization status of a peripheral device."""
 
     sensor: SensorTypeField
+
 
 @dataclass
 class PeripheralInfoResponsePayload(utils.BinarySerializable):
@@ -434,4 +436,3 @@ class PeripheralInfoResponsePayload(utils.BinarySerializable):
 
     sensor: SensorTypeField
     status: utils.UInt8Field
-

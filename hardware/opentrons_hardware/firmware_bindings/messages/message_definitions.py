@@ -508,16 +508,18 @@ class TipActionResponse:  # noqa: D101
         MessageId.do_self_contained_tip_action_response
     ] = MessageId.do_self_contained_tip_action_response
 
+
 @dataclass
-class PeripheralInfoRequest: # noqa: D101
+class PeripheralInfoRequest:  # noqa: D101
     payload: payloads.PeripheralInfoRequestPayload
     payload_type: Type[BinarySerializable] = payloads.PeripheralInfoRequestPayload
     message_id: Literal[
         MessageId.peripheral_info_request
     ] = MessageId.peripheral_info_request
 
+
 @dataclass
-class PeripheralInfoResponse: # noqa D101
+class PeripheralInfoResponse:  # noqa: D101
     payload: payloads.PeripheralInfoResponsePayload
     payload_type: Type[BinarySerializable] = payloads.PeripheralInfoResponsePayload
     message_id: Literal[
