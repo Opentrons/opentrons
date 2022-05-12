@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from opentrons.protocol_engine import LabwareOffsetCreate, ProtocolRunData, CommandSlice
+from opentrons.protocol_engine import LabwareOffsetCreate, ProtocolRunData, CommandSlice, CurrentCommand
 
 from robot_server.protocols import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
