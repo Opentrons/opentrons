@@ -23,12 +23,12 @@ from opentrons.config.gripper_config import (
 
 
 class InstrumentSpec(TypedDict):
-    model: Union[PipetteModel, GripperModel, None]
+    model: Union[PipetteModel, None]
     id: Optional[str]
 
 
 class AttachedInstrument(TypedDict):
-    config: Optional[Union[PipetteConfig, GripperConfig]]
+    config: Optional[PipetteConfig]
     id: Optional[str]
 
 

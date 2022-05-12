@@ -6,6 +6,7 @@ from dataclasses import asdict, replace
 import logging
 from typing import Any, Dict, Optional, Union, cast
 
+
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.types import Point
 from opentrons.config.defaults_ot3 import DEFAULT_PIPETTE_OFFSET
@@ -14,6 +15,7 @@ from opentrons.config.pipette_config import config_models, config_names, configs
 from opentrons_shared_data.pipette.dev_types import PipetteModel
 from opentrons.calibration_storage.types import PipetteOffsetByPipetteMount, SourceType, CalibrationStatus
 from .instrument_abc import AbstractInstrument
+from .types import CriticalPoint
 
 RECONFIG_KEYS = {"quirks"}
 
@@ -43,7 +45,6 @@ class Gripper(AbstractInstrument):
         config: gripper_config.GripperConfig,
         gripper_id: Optional[str] = None,
     ) -> None:
-        p_config = pipette_config.load(cast("PipetteModel", "p20_single_v3.0"))
         self._config = config
         self._name = self._config.name
         self._model = self._config.model
@@ -77,7 +78,7 @@ class Gripper(AbstractInstrument):
     def gripper_id(self) -> Optional[str]:
         return self._gripper_id
 
-    def critical_point(self) -> Point:
+    def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         """
         The vector from the gripper's origin to its critical point. The
         critical point for a pipette is the end of the nozzle if no tip is

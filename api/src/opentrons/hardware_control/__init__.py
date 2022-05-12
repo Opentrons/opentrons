@@ -28,12 +28,14 @@ from .thread_manager import ThreadManager
 from .execution_manager import ExecutionManager
 from .threaded_async_lock import ThreadedAsyncLock, ThreadedAsyncForbidden
 from .protocols import HardwareControlAPI
+from .instrument_abc import AbstractInstrument
 
 ThreadManagedHardware = ThreadManager[HardwareControlAPI]
 SyncHardwareAPI = SynchronousAdapter[HardwareControlAPI]
 
 __all__ = [
     "API",
+    "AbstractInstrument",
     "Controller",
     "Simulator",
     "Pipette",
