@@ -65,7 +65,7 @@ class MoveGroupRunner:
                     return True
         return False
 
-    async def run(self, can_messenger: CanMessenger) -> NodeDict[float]:
+    async def run(self, can_messenger: CanMessenger) -> NodeDict[Tuple[float, float]]:
         """Run the move group.
 
         Args:

@@ -589,7 +589,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     ),
                 ),
             ],
-            {NodeId.gantry_x: 10},
+            {NodeId.gantry_x: (10, 40)},
         ),
         (
             # multiple axes with different numbers of completions
@@ -631,7 +631,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     ),
                 ),
             ],
-            {NodeId.gantry_x: 10, NodeId.gantry_y: 30},
+            {NodeId.gantry_x: (10, 40), NodeId.gantry_y: (30, 40)},
         ),
         (
             # empty base case
@@ -641,7 +641,8 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
     ],
 )
 def test_accumulate_move_completions(
-    completions: List[Tuple[ArbitrationId, MoveCompleted]], position_map: NodeMap[float]
+    completions: List[Tuple[ArbitrationId, MoveCompleted]],
+    position_map: NodeMap[Tuple[float, float]],
 ) -> None:
     """Build correct move results."""
     assert MoveGroupRunner._accumulate_move_completions(completions) == position_map

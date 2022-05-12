@@ -581,7 +581,6 @@ class OT3API(
         z_ax = OT3Axis.by_mount(mount)
         plunger_ax = OT3Axis.of_main_tool_actuator(mount)
         position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, plunger_ax]
-        print(position_axes)
 
         if fail_on_not_homed and (
             not self._backend.is_homed(position_axes)
