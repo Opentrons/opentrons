@@ -19,7 +19,7 @@ import {
 import { RPM, HS_RPM_MAX, HS_RPM_MIN } from '@opentrons/shared-data'
 import { useLatchControls } from '../ModuleCard/hooks'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
-import { TertiaryButton } from '../../../atoms/Buttons'
+import { TertiaryButton } from '../../../atoms/buttons'
 import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'
 import { Divider } from '../../../atoms/structure'
 import { InputField } from '../../../atoms/InputField'

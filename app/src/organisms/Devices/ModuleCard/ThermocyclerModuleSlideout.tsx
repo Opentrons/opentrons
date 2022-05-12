@@ -23,7 +23,7 @@ import {
   Text,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 
 import type { ThermocyclerModule } from '../../../redux/modules/types'
 import type {
@@ -121,7 +121,7 @@ export const ThermocyclerModuleSlideout = (
           width="100%"
           data-testid={`ThermocyclerSlideout_btn_${module.serialNumber}`}
         >
-          {t('set_tc_temp_slideout', { part: modulePart })}
+          {t('confirm')}
         </PrimaryButton>
       }
     >
@@ -143,12 +143,12 @@ export const ThermocyclerModuleSlideout = (
         data-testid={`ThermocyclerSlideout_input_field_${module.serialNumber}`}
       >
         <Text
-          fontWeight={FONT_WEIGHT_REGULAR}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.darkGrey}
-          marginBottom={SPACING.spacing1}
+          paddingBottom={SPACING.spacing3}
         >
-          {t('temperature')}
+          {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}
         </Text>
         <InputField
           data-testid={`${module.moduleModel}_${isSecondaryTemp}`}

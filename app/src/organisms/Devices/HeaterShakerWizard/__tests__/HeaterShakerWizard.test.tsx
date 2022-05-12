@@ -72,7 +72,7 @@ describe('HeaterShakerWizard', () => {
 
   it('renders the main modal component of the wizard and exit button is clickable', () => {
     const { getByText, getByLabelText } = render(props)
-    getByText(/Attach Heater Shaker Module/i)
+    getByText(/Attach Heater-Shaker Module/i)
     getByText('Mock Introduction')
     const close = getByLabelText('close')
     fireEvent.click(close)

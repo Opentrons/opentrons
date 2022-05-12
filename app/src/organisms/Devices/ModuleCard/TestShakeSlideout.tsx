@@ -27,7 +27,7 @@ import {
   RPM,
 } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
-import { PrimaryButton, TertiaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton, TertiaryButton } from '../../../atoms/buttons'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
 import { Divider } from '../../../atoms/structure'
 import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'

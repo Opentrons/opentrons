@@ -25,7 +25,7 @@ import {
 
 import type { StyleProps } from '@opentrons/components'
 import type { Dispatch } from '../../redux/types'
-import { AlertPrimaryButton, SecondaryButton } from '../../atoms/Buttons'
+import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 interface ProtocolOverflowMenuProps extends StyleProps {

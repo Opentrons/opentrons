@@ -8,7 +8,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { SecondaryButton } from '../../atoms/Buttons'
+import { SecondaryButton } from '../../atoms/buttons'
 import { Slideout } from '../../atoms/Slideout'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { UploadInput } from './UploadInput'

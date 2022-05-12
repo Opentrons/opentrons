@@ -45,6 +45,7 @@ export function SetupPipetteCalibration({
             index={index}
             mount={mount}
             robotName={robotName}
+            runId={runId}
           />
         ) : null
       })}

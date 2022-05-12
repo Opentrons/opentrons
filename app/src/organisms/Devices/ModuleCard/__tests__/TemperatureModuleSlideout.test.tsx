@@ -63,7 +63,7 @@ describe('TemperatureModuleSlideout', () => {
     getByText(
       'Pre heat or cool your Temperature Module GEN1. Enter a whole number between 4 °C and 96 °C.'
     )
-    getByText('Temperature')
+    getByText('Set temperature')
   })
 
   it('renders correct title and body for a gen2 temperature module', () => {
@@ -78,7 +78,7 @@ describe('TemperatureModuleSlideout', () => {
     getByText(
       'Pre heat or cool your Temperature Module GEN2. Enter a whole number between 4 °C and 96 °C.'
     )
-    getByText('Temperature')
+    getByText('Set temperature')
   })
 
   it('renders the button and it is not clickable until there is something in form field', () => {
@@ -88,7 +88,7 @@ describe('TemperatureModuleSlideout', () => {
       onCloseClick: jest.fn(),
     }
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Temperature' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('temperatureModuleV2')
     fireEvent.change(input, { target: { value: '20' } })
     expect(button).toBeEnabled()
@@ -114,7 +114,7 @@ describe('TemperatureModuleSlideout', () => {
       runId: 'test123',
     }
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Temperature' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('temperatureModuleV2')
     fireEvent.change(input, { target: { value: '20' } })
     expect(button).toBeEnabled()

@@ -157,4 +157,23 @@ describe('AboutModuleSlideout', () => {
     fireEvent.click(exit)
     expect(exit).not.toBeVisible()
   })
+
+  it('renders correct info when module is a temperature module GEN1 and clicking on button closes it', () => {
+    props = {
+      module: mockTemperatureModule,
+      isExpanded: true,
+      onCloseClick: jest.fn(),
+      firmwareUpdateClick: jest.fn(),
+    }
+    const { getByText, getByRole } = render(props)
+
+    getByText('About Temperature Module GEN1')
+    getByText('abc123')
+    getByText('Serial Number')
+    getByText('Current Version')
+    getByText('Version v2.0.0')
+    const button = getByRole('button', { name: 'close' })
+    fireEvent.click(button)
+    expect(props.onCloseClick).toHaveBeenCalled()
+  })
 })

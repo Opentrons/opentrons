@@ -16,7 +16,7 @@ import {
   getAnalyticsOptedIn,
 } from '../../redux/analytics'
 
-import { ToggleButton } from '../../atoms/Buttons'
+import { ToggleButton } from '../../atoms/buttons'
 
 export function PrivacySettings(): JSX.Element {
   const { t } = useTranslation('app_settings')

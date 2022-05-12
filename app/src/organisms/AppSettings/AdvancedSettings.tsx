@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import path from 'path'
 import { useSelector, useDispatch } from 'react-redux'
 import { css } from 'styled-components'
 import {
@@ -28,7 +29,7 @@ import {
   OUTDATED,
 } from '../../redux/system-info'
 import { Divider } from '../../atoms/structure'
-import { TertiaryButton, ToggleButton } from '../../atoms/Buttons'
+import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 
@@ -40,6 +41,11 @@ const ALWAYS_TRASH: 'always-trash' = 'always-trash'
 const ALWAYS_PROMPT: 'always-prompt' = 'always-prompt'
 const REALTEK_URL = 'https://www.realtek.com/en/'
 
+const INPUT_STYLES = css`
+  position: fixed;
+  clip: rect(1px 1px 1px 1px);
+`
+
 type BlockSelection =
   | typeof ALWAYS_BLOCK
   | typeof ALWAYS_TRASH
@@ -47,6 +53,7 @@ type BlockSelection =
 
 export function AdvancedSettings(): JSX.Element {
   const { t } = useTranslation('app_settings')
+  const pythonDirectoryFileInput = React.useRef<HTMLInputElement>(null)
   const useTrashSurfaceForTipCal = useSelector((state: State) =>
     Config.getUseTrashSurfaceForTipCal(state)
   )
@@ -62,6 +69,8 @@ export function AdvancedSettings(): JSX.Element {
   const isHeaterShakerAttachmentModalVisible = useSelector(
     Config.getIsHeaterShakerAttached
   )
+  const pathToPythonInterpreter = useSelector(Config.getPathToPythonOverride)
+
   const dispatch = useDispatch<Dispatch>()
 
   const handleUseTrashSelection = (selection: BlockSelection): void => {
@@ -99,6 +108,26 @@ export function AdvancedSettings(): JSX.Element {
         Boolean(!isHeaterShakerAttachmentModalVisible)
       )
     )
+
+  //  TODO(jr, 5/6/22): find another way to get webkitdirectory to work in the input DOM https://github.com/facebook/react/issues/3468
+  React.useEffect(() => {
+    if (pythonDirectoryFileInput.current !== null) {
+      pythonDirectoryFileInput.current.setAttribute('directory', 'true')
+      pythonDirectoryFileInput.current.setAttribute('webkitdirectory', 'true')
+    }
+  }, [pythonDirectoryFileInput])
+
+  const handleClickPythonDirectoryChange: React.MouseEventHandler<HTMLButtonElement> = _event => {
+    pythonDirectoryFileInput.current?.click()
+  }
+
+  const setPythonInterpreterDirectory: React.ChangeEventHandler<HTMLInputElement> = event => {
+    const { files = [] } = event.target ?? {}
+    const dirName =
+      files?.[0]?.path != null ? path.dirname(files?.[0]?.path) : null
+    dispatch(Config.updateConfigValue('python.pathToPythonOverride', dirName))
+    event.target.value = ''
+  }
 
   const toggleDevtools = (): unknown => dispatch(Config.toggleDevtools())
   const handleChannel: React.ChangeEventHandler<HTMLSelectElement> = event =>
@@ -392,6 +421,77 @@ export function AdvancedSettings(): JSX.Element {
           >
             {t('clear_robots_button')}
           </TertiaryButton>
+        </Flex>
+        <Divider marginY={SPACING.spacing5} />
+
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Box width="70%">
+            <StyledText
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
+              id="AdvancedSettings_overridePathToPython"
+            >
+              {t('override_path_to_python')}
+            </StyledText>
+            <StyledText as="p" paddingBottom={SPACING.spacing3}>
+              {t('opentrons_app_will_use_interpreter')}
+            </StyledText>
+            <StyledText
+              as="h6"
+              textTransform={TYPOGRAPHY.textTransformUppercase}
+              color={COLORS.darkGreyEnabled}
+              paddingBottom={SPACING.spacing2}
+            >
+              {t('override_path')}
+            </StyledText>
+            {pathToPythonInterpreter !== null ? (
+              <Link
+                css={TYPOGRAPHY.pRegular}
+                external
+                color={COLORS.darkBlack}
+                onClick={() =>
+                  dispatch(Config.openPythonInterpreterDirectory())
+                }
+                id="AdvancedSettings_sourceFolderLinkPython"
+              >
+                {pathToPythonInterpreter}
+                <Icon
+                  height="0.75rem"
+                  marginLeft={SPACING.spacing3}
+                  name="open-in-new"
+                />
+              </Link>
+            ) : (
+              <StyledText as="p">{t('no_specified_folder')}</StyledText>
+            )}
+          </Box>
+          {pathToPythonInterpreter !== null ? (
+            <TertiaryButton
+              marginLeft={SPACING_AUTO}
+              onClick={() =>
+                dispatch(Config.resetConfigValue('python.pathToPythonOverride'))
+              }
+              id="AdvancedSettings_changePythonInterpreterSource"
+            >
+              {t('reset_to_default')}
+            </TertiaryButton>
+          ) : (
+            <TertiaryButton
+              marginLeft={SPACING_AUTO}
+              onClick={handleClickPythonDirectoryChange}
+              id="AdvancedSettings_changePythonInterpreterSource"
+            >
+              {t('add_override_path')}
+            </TertiaryButton>
+          )}
+          <input
+            id="AdvancedSetting_pythonPathDirectoryInput"
+            data-testid="AdvancedSetting_pythonPathDirectoryInput"
+            type="file"
+            css={INPUT_STYLES}
+            ref={pythonDirectoryFileInput}
+            onChange={setPythonInterpreterDirectory}
+          />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>

@@ -11,7 +11,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
-import { TertiaryButton } from '../../../../atoms/Buttons'
+import { TertiaryButton } from '../../../../atoms/buttons'
 import { downloadLogs } from '../../../../redux/shell/robot-logs/actions'
 import { getRobotLogsDownloading } from '../../../../redux/shell/robot-logs/selectors'
 import { CONNECTABLE } from '../../../../redux/discovery'

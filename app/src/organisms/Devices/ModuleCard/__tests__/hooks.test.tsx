@@ -18,7 +18,7 @@ import { useProtocolDetailsForRun } from '../../hooks'
 import {
   useLatchControls,
   useModuleOverflowMenu,
-  useHeaterShakerFromProtocol,
+  useIsHeaterShakerInProtocol,
 } from '../hooks'
 
 import {
@@ -664,25 +664,25 @@ describe('useProtocolMetadata', () => {
     jest.restoreAllMocks()
   })
 
-  it('should return heater shaker slot number', () => {
+  it('should return true when a heater shaker is in the protocol', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
-    const { result } = renderHook(useHeaterShakerFromProtocol, { wrapper })
-    const heaterShaker = result.current
+    const { result } = renderHook(useIsHeaterShakerInProtocol, { wrapper })
+    const isHeaterShakerInProtocol = result.current
 
-    expect(heaterShaker?.slotName).toBe('1')
+    expect(isHeaterShakerInProtocol).toBe(true)
   })
 
-  it('should return undefined when heater shaker isnt in protocol', () => {
+  it('should return false when a heater shaker is NOT in the protocol', () => {
     mockGetProtocolModulesInfo.mockReturnValue([])
 
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
-    const { result } = renderHook(useHeaterShakerFromProtocol, { wrapper })
-    const heaterShaker = result.current
+    const { result } = renderHook(useIsHeaterShakerInProtocol, { wrapper })
+    const isHeaterShakerInProtocol = result.current
 
-    expect(heaterShaker?.slotName).toBe(undefined)
+    expect(isHeaterShakerInProtocol).toBe(false)
   })
 })
