@@ -1,6 +1,6 @@
 """Router for /protocols endpoints."""
 import logging
-import textwrap
+from textwrap import dedent
 from datetime import datetime
 from pathlib import Path
 
@@ -67,12 +67,17 @@ protocols_router = APIRouter()
 @protocols_router.post(
     path="/protocols",
     summary="Upload a protocol",
-    description=textwrap.dedent(
+    description=dedent(
         """
         Upload a protocol to your device. You may include the following files:
 
         - A single Python protocol file and 0 or more custom labware JSON files
         - A single JSON protocol file (any additional labware files will be ignored)
+
+        When too many protocols already exist, old ones will be automatically deleted
+        to make room for the new one.
+        A protocol will never be automatically deleted if there's a run
+        referring to it, though.
         """
     ),
     status_code=status.HTTP_201_CREATED,

@@ -4,6 +4,7 @@ Contains routes dealing primarily with `Run` models.
 """
 import logging
 from datetime import datetime
+from textwrap import dedent
 from typing import Optional, Union
 from typing_extensions import Literal
 
@@ -119,7 +120,14 @@ async def get_run_data_from_url(
 @base_router.post(  # noqa: C901
     path="/runs",
     summary="Create a run",
-    description="Create a new run to track robot interaction.",
+    description=dedent(
+        """
+        Create a new run to track robot interaction.
+
+        When too many runs already exist, old ones will be automatically deleted
+        to make room for the new one.
+        """
+    ),
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
