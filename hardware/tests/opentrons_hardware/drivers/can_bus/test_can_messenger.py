@@ -55,6 +55,14 @@ def subject(mock_driver: AsyncMock) -> CanMessenger:
     return CanMessenger(driver=mock_driver)
 
 
+async def test_context(mock_driver: AsyncMock) -> None:
+    """It should start and stop."""
+    async with CanMessenger(mock_driver) as m:
+        assert m._task
+        assert not m._task.done()
+    assert m._task.done()
+
+
 @pytest.mark.parametrize(
     "node_id,message",
     [
