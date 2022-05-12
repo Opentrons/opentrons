@@ -2,7 +2,7 @@
   "$otSharedSchema": "module/schemas/3",
   "moduleType": "incompatibleGenerationType",
   "model": "incompatibleGenerationV2",
-  "labwareOffset": {`
+  "labwareOffset": {
     "x": -1.175,
     "y": -0.125,
     "z": 82.25
