@@ -110,8 +110,8 @@ async def create_protocol(
         protocol_reader: Protocol file reading interface.
         protocol_analyzer: Protocol analysis interface.
         task_runner: Background task runner.
-        auto_deleter: An interface to delete old resources to make room for the new
-            protocol.
+        protocol_auto_deleter: An interface to delete old resources to make room for
+            the new protocol.
         protocol_id: Unique identifier to attach to the protocol resource.
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.

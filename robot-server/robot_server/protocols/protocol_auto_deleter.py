@@ -3,7 +3,7 @@
 
 from logging import getLogger
 
-from robot_server.deletion_planner import ProtocolDeletionPlanner, ProtocolSpec
+from robot_server.deletion_planner import ProtocolDeletionPlanner
 from .protocol_store import ProtocolStore
 
 

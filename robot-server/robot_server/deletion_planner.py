@@ -1,7 +1,6 @@
 """Plan auto-deletions of old SQL resources to make room for new ones."""
 
 
-from dataclasses import dataclass
 from typing import Sequence, Set
 from typing_extensions import Protocol as InterfaceShape
 

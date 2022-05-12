@@ -146,6 +146,8 @@ async def create_run(
         run_id: Generated ID to assign to the run.
         created_at: Timestamp to attach to created run.
         task_runner: Background task runner.
+        run_auto_deleter: An interface to delete old resources to make room for
+            the new run.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
     protocol_resource = None

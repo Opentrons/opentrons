@@ -1,4 +1,6 @@
-from datetime import datetime
+"""Unit tests for `protocol_auto_deleter`."""
+
+
 import logging
 
 import pytest
@@ -8,7 +10,6 @@ from robot_server.deletion_planner import ProtocolDeletionPlanner
 from robot_server.protocols.protocol_auto_deleter import ProtocolAutoDeleter
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
-    ProtocolResource,
     ProtocolUsageInfo,
 )
 
@@ -16,6 +17,7 @@ from robot_server.protocols.protocol_store import (
 def test_make_room_for_new_protocol(
     decoy: Decoy, caplog: pytest.LogCaptureFixture
 ) -> None:
+    """It should get a deletion plan and enact it on the store."""
     mock_protocol_store = decoy.mock(cls=ProtocolStore)
     mock_deletion_planner = decoy.mock(cls=ProtocolDeletionPlanner)
 
@@ -44,6 +46,6 @@ def test_make_room_for_new_protocol(
     decoy.verify(mock_protocol_store.remove(protocol_id="protocol-id-4"))
     decoy.verify(mock_protocol_store.remove(protocol_id="protocol-id-5"))
 
-    # It should log the protocols that it plans to delete.
+    # It should log the protocols that it deleted.
     assert "protocol-id-4" in caplog.text
     assert "protocol-id-5" in caplog.text

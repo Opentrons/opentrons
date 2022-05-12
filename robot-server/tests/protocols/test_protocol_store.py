@@ -222,6 +222,7 @@ def test_get_usage_info(
     subject: ProtocolStore,
     run_store: RunStore,
 ) -> None:
+    """It should return which protocols are used by runs."""
     protocol_resource_1 = ProtocolResource(
         protocol_id="protocol-id-1",
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),

@@ -103,6 +103,7 @@ async def get_protocol_analyzer(
 async def get_protocol_auto_deleter(
     protocol_store: ProtocolStore = Depends(get_protocol_store),
 ) -> ProtocolAutoDeleter:
+    """Get a `ProtocolAutoDeleter` to delete old protocols."""
     return ProtocolAutoDeleter(
         protocol_store=protocol_store,
         deletion_planner=ProtocolDeletionPlanner(

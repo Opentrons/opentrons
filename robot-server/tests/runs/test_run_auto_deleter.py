@@ -1,3 +1,6 @@
+"""Unit tests for `run_auto_deleter`."""
+
+
 from datetime import datetime
 import logging
 
@@ -24,6 +27,7 @@ def _make_dummy_run_resource(run_id: str) -> RunResource:
 
 
 def test_make_room_for_new_run(decoy: Decoy, caplog: pytest.LogCaptureFixture) -> None:
+    """It should get a deletion plan and enact it on the store."""
     mock_run_store = decoy.mock(cls=RunStore)
     mock_deletion_planner = decoy.mock(cls=RunDeletionPlanner)
 
@@ -54,6 +58,6 @@ def test_make_room_for_new_run(decoy: Decoy, caplog: pytest.LogCaptureFixture) -
     decoy.verify(mock_run_store.remove(run_id="run-id-4"))
     decoy.verify(mock_run_store.remove(run_id="run-id-5"))
 
-    # It should log the runs that it plans to delete.
+    # It should log the runs that it deleted.
     assert "run-id-4" in caplog.text
     assert "run-id-5" in caplog.text
