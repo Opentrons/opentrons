@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-AwaitTemperatureCommandType = Literal["temperatureModule/awaitTemperature"]
+AwaitTemperatureCommandType = Literal["temperatureModule/waitForTemperature"]
 
 
 class AwaitTemperatureParams(BaseModel):
@@ -63,7 +63,7 @@ class AwaitTemperatureImpl(
 class AwaitTemperature(BaseCommand[AwaitTemperatureParams, AwaitTemperatureResult]):
     """A command to set a Temperature Module's target temperature."""
 
-    commandType: AwaitTemperatureCommandType = "temperatureModule/awaitTemperature"
+    commandType: AwaitTemperatureCommandType = "temperatureModule/waitForTemperature"
     params: AwaitTemperatureParams
     result: Optional[AwaitTemperatureResult]
 
