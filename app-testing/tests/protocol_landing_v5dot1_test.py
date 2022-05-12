@@ -26,6 +26,7 @@ from src.driver.drag_drop import drag_and_drop_file
 style = Style(color="#ac0505", bgcolor="yellow", bold=True)
 logger = logging.getLogger(__name__)
 
+
 @pytest.mark.v5dot1
 def test_protocol_landing_v5dot1(
     chrome_options: Options,
@@ -54,21 +55,43 @@ def test_protocol_landing_v5dot1(
         ot_application.write_config()
         left_menu: LeftMenu = LeftMenu(driver, console, request.node.nodeid)
         left_menu.click_protocols_button()
+
+        # Verifying elements on the protocol page
+        protocol_landing: ProtocolLanding = ProtocolLanding(
+            driver, console, request.node.nodeid
+        )
+        assert protocol_landing.get_choose_file_button().is_displayed()
+        assert protocol_landing.get_drag_drop_file_button().is_displayed()
+        assert protocol_landing.get_protocol_designer_link().is_displayed()
+        assert protocol_landing.get_protocol_library_link().is_displayed()
+        assert protocol_landing.get_python_api_link().is_displayed()
+
         protocol_file = ProtocolFile(driver)
         logger.info(
             f"uploading protocol: {test_protocols['protocoluploadjson'].resolve()}"
         )
         input = protocol_file.get_drag_json_protocol()
         drag_and_drop_file(input, test_protocols["protocoluploadjson"])
-        time.sleep(3)  # waiting for protocol to analyze
-        protocol_landing: ProtocolLanding = ProtocolLanding(
-            driver, console, request.node.nodeid
+
+        assert protocol_landing.get_import_button_protocol_landing().is_displayed()
+        assert protocol_landing.get_deckMap_protocol_landing().is_displayed()
+        assert (
+            protocol_landing.get_protocol_name_text_protocol_landing
+            == "script_pur_sample_1.json"
         )
-        left_menu.click_devices_button()
-        for robot in robots:
-            ot_robot = OtRobot(console, robot)
-            console.print(
-                f"Testing against robot {ot_robot.data.display_name}", style=style
-            )
-            assert ot_robot.is_alive(), "is the robot available?"
-            
+        assert protocol_landing.get_left_mount_text_protocol_landing() == "left mount"
+        assert (
+            protocol_landing.get_left_mount_value_protocol_landing()
+            == "P10 Single-Channel GEN1"
+        )
+        assert protocol_landing.get_right_mount_text_protocol_landing() == "right mount"
+        assert (
+            protocol_landing.get_right_mount_value_protocol_landing()
+            == "P300 Single-Channel GEN1"
+        )
+        assert protocol_landing.get_mag_module_protocol_landing().is_displayed()
+        assert protocol_landing.get_temp_module_protocol_landing().is_displayed()
+        assert (
+            protocol_landing.get_thermocycler_module_protocol_landing().is_displayed()
+        )
+        assert protocol_landing.get_updated_timestamp_protocol_landing().is_displayed()
