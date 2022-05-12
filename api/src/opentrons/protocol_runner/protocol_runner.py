@@ -126,10 +126,12 @@ class ProtocolRunner:
             else:
                 self._load_legacy(protocol_source)
 
-    def play(self) -> None:
+    def play(self) -> PlayType:
         """Start or resume the run."""
+        play_type = PlayType.RESUME if self._was_started else PlayType.START
         self._was_started = True
         self._protocol_engine.play()
+        return play_type
 
     def pause(self) -> None:
         """Pause the run."""
@@ -155,7 +157,9 @@ class ProtocolRunner:
         if protocol_source:
             self.load(protocol_source)
 
-        self.play()
+        if not self._was_started:
+            self.play()
+
         self._task_queue.start()
         await self._task_queue.join()
 

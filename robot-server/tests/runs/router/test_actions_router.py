@@ -5,23 +5,28 @@ from decoy import Decoy
 
 from robot_server.errors import ApiError
 from robot_server.service.json_api import RequestModel
-from robot_server.runs.run_store import RunNotFoundError
-from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_controller import RunController, RunActionNotAllowedError
 
 from robot_server.runs.action_models import (
     RunAction,
     RunActionType,
     RunActionCreate,
 )
-from robot_server.runs.run_error_models import RunStoppedError, RunActionNotAllowedError
 
 from robot_server.runs.router.actions_router import create_run_action
 
 
+@pytest.fixture
+def mock_run_controller(decoy: Decoy) -> RunController:
+    """Get a fake RunController dependency."""
+    return decoy.mock(cls=RunController)
+
+
 async def test_create_run_action(
     decoy: Decoy,
-    mock_run_data_manager: RunDataManager,
+    mock_run_controller: RunController,
 ) -> None:
+    """It should create a run action."""
     run_id = "some-run-id"
     action_id = "some-action-id"
     created_at = datetime(year=2021, month=1, day=1)
@@ -34,8 +39,7 @@ async def test_create_run_action(
     )
 
     decoy.when(
-        mock_run_data_manager.create_action(
-            run_id=run_id,
+        mock_run_controller.create_action(
             action_id=action_id,
             action_type=action_type,
             created_at=created_at,
@@ -45,7 +49,7 @@ async def test_create_run_action(
     result = await create_run_action(
         runId=run_id,
         request_body=request_body,
-        run_data_manager=mock_run_data_manager,
+        run_controller=mock_run_controller,
         action_id=action_id,
         created_at=created_at,
     )
@@ -58,13 +62,11 @@ async def test_create_run_action(
     ("exception", "expected_error_id", "expected_status_code"),
     [
         (RunActionNotAllowedError("oh no"), "RunActionNotAllowed", 409),
-        (RunNotFoundError("oh no"), "RunNotFound", 404),
-        (RunStoppedError("oh no"), "RunStopped", 409),
     ],
 )
 async def test_create_play_action_not_allowed(
     decoy: Decoy,
-    mock_run_data_manager: RunDataManager,
+    mock_run_controller: RunController,
     exception: Exception,
     expected_error_id: str,
     expected_status_code: int,
@@ -77,8 +79,7 @@ async def test_create_play_action_not_allowed(
     request_body = RequestModel(data=RunActionCreate(actionType=action_type))
 
     decoy.when(
-        mock_run_data_manager.create_action(
-            run_id=run_id,
+        mock_run_controller.create_action(
             action_id=action_id,
             action_type=action_type,
             created_at=created_at,
@@ -89,7 +90,7 @@ async def test_create_play_action_not_allowed(
         await create_run_action(
             runId=run_id,
             request_body=request_body,
-            run_data_manager=mock_run_data_manager,
+            run_controller=mock_run_controller,
             action_id=action_id,
             created_at=created_at,
         )

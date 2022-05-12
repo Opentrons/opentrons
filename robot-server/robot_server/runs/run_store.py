@@ -1,6 +1,6 @@
 """Runs' on-db store."""
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from dataclasses import dataclass
+from datetime import datetime
 from typing import Dict, List, Optional, Any
 
 from pydantic import parse_obj_as
@@ -41,7 +41,7 @@ class RunStateResource:
     protocol_run_data: ProtocolRunData
     commands: List[Command]
     engine_status: str
-    _updated_at: datetime = field(default_factory=lambda: datetime.now(tz=timezone.utc))
+    _updated_at: Optional[datetime]
 
 
 class RunNotFoundError(ValueError):
@@ -60,7 +60,9 @@ class RunStore:
         self._sql_engine = sql_engine
         self._active_run: Optional[str] = None
 
-    def update_run_state(self, run_id: str, run_data: ProtocolRunData, commands: List[Command]) -> None:
+    def update_run_state(
+        self, run_id: str, run_data: ProtocolRunData, commands: List[Command]
+    ) -> None:
         """Update run table with run protocol_run_data to db.
 
         Arguments:
@@ -72,16 +74,29 @@ class RunStore:
         statement = (
             sqlalchemy.update(run_table)
             .where(run_table.c.id == run_id)
-            .values(_convert_state_to_sql_values(state=RunStateResource(commands=commands, protocol_run_data=run_data, run_id=run_id, engine_status=run_data.status))
-        ))
+            .values(
+                _convert_state_to_sql_values(
+                    state=RunStateResource(
+                        commands=commands,
+                        protocol_run_data=run_data,
+                        run_id=run_id,
+                        engine_status=run_data.status,
+                    )
+                )
+            )
+        )
         with self._sql_engine.begin() as transaction:
             result = transaction.execute(statement)
             if result.rowcount == 0:
-                raise RunNotFoundError(run_id=run_id)
+                raise RunNotFoundError(run_id=state.run_id)
+
+        return state
 
     def get_run_data(self, run_id: str) -> ProtocolRunData:
         """Get the archived run data of a run."""
-        statment = sqlalchemy.select(run_table.c.protocol_run_data).where(run_table.c.id == run_id)
+        statment = sqlalchemy.select(run_table.c.protocol_run_data).where(
+            run_table.c.id == run_id
+        )
         with self._sql_engine.begin() as transaction:
             try:
                 row = transaction.execute(statment).one()
@@ -91,7 +106,9 @@ class RunStore:
 
     def get_run_commands(self, run_id: str) -> List[Command]:
         """Get the archived commands list of a run."""
-        statment = sqlalchemy.select(run_table.c.commands).where(run_table.c.id == run_id)
+        statment = sqlalchemy.select(run_table.c.commands).where(
+            run_table.c.id == run_id
+        )
         with self._sql_engine.begin() as transaction:
             try:
                 row = transaction.execute(statment).one()
