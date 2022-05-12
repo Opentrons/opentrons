@@ -85,7 +85,6 @@ def output_details(i: int, freq: int, duty_cycle: int, v_ref: float) -> None:
 
 async def run_test(messenger: CanMessenger) -> None:
     """Run the for test."""
-
     print("Gripper testing begins... \n")
     pwm_freq = prompt_int_input("PWM frequency in Hz (int)")
     pwm_duty = prompt_int_input("PWM duty cycle in % (int)")

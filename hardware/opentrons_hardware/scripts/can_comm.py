@@ -213,7 +213,7 @@ async def ui_task(can_driver: AbstractCanDriver) -> None:
             print(in_red(str(e)))
 
 
-async def run_ui(driver: AbstractCanDriver)->None:
+async def run_ui(driver: AbstractCanDriver) -> None:
     """Run the UI."""
     loop = asyncio.get_event_loop()
     fut = asyncio.gather(
@@ -230,7 +230,7 @@ async def run_ui(driver: AbstractCanDriver)->None:
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     async with build.driver(build_settings(args)) as driver:
-        await(run_ui(driver))
+        await (run_ui(driver))
 
 
 def in_red(s: str) -> str:

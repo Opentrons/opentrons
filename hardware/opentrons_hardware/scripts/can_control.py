@@ -73,7 +73,9 @@ async def input_task(
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    async with build.driver(build_settings(args)) as driver, build.can_messenger(driver) as messenger:
+    async with build.driver(build_settings(args)) as driver, build.can_messenger(
+        driver
+    ) as messenger:
         try:
             all_fut = asyncio.gather(
                 monitor_task(messenger, args.output),

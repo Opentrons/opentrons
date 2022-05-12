@@ -113,7 +113,7 @@ async def task(
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    with build.can_messenger(build_settings(args)) as messenger:
+    async with build.can_messenger(build_settings(args)) as messenger:
         loop = asyncio.get_event_loop()
         fut = loop.create_task(task(messenger, args.output))
         try:

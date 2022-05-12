@@ -76,7 +76,6 @@ async def execute_move(messenger: CanMessenger) -> None:
 
 async def run_test(messenger: CanMessenger) -> None:
     """Run test."""
-
     print("Gripper testing begins... \n")
     print("Hints: \033[96mdefaults values\033[0m \n")
     v_ref = prompt_float_input(
@@ -118,6 +117,7 @@ async def run(args: argparse.Namespace) -> None:
 
     async with build.can_messenger(build_settings(args)) as messenger:
         await run_test(messenger)
+
 
 log = logging.getLogger(__name__)
 
