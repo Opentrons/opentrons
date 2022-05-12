@@ -19,8 +19,9 @@ from robot_server.service.json_api import (
 )
 
 from ..run_models import Run, RunCommandSummary
+from ..run_data_manager import RunDataManager
 from ..engine_store import EngineStore
-from ..dependencies import get_engine_store
+from ..dependencies import get_engine_store, get_run_data_manager
 from .base_router import RunNotFound, get_run_data_from_url, RunStopped
 
 
@@ -67,7 +68,7 @@ class CommandCollectionLinks(BaseModel):
 
 
 async def get_current_run_engine_from_url(
-    run: Run,
+    runId: str,
     engine_store: EngineStore = Depends(get_engine_store),
 ) -> ProtocolEngine:
     """Get run protocol engine.
@@ -76,8 +77,8 @@ async def get_current_run_engine_from_url(
         run: Run pulled from url.
         engine_store: engine store to pull current run ProtocolEngine.
     """
-    if run.id != engine_store.current_run_id:
-        raise RunStopped(detail=f"Run {run.id} is not the current run").as_error(
+    if runId != engine_store.current_run_id:
+        raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
             status.HTTP_400_BAD_REQUEST
         )
 
@@ -100,6 +101,7 @@ async def get_current_run_engine_from_url(
 )
 async def create_run_command(
     request_body: RequestModel[pe_commands.CommandCreate],
+    runId: str,
     waitUntilComplete: bool = Query(
         default=False,
         description=(
@@ -129,7 +131,6 @@ async def create_run_command(
             " Inspect the returned command's `status` to detect the timeout."
         ),
     ),
-    run: Run = Depends(get_run_data_from_url),
     protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url)
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
