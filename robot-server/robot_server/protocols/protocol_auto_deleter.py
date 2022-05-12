@@ -20,7 +20,7 @@ class ProtocolAutoDeleter:  # noqa: D101
         self._deletion_planner = deletion_planner
 
     def make_room_for_new_protocol(self) -> None:  # noqa: D102
-        protocol_run_usage_info = self._protocol_store.get_run_usage_info()
+        protocol_run_usage_info = self._protocol_store.get_usage_info()
 
         protocol_ids_to_delete = self._deletion_planner.plan_for_new_protocol(
             existing_protocols=protocol_run_usage_info,

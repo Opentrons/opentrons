@@ -9,7 +9,7 @@ from robot_server.protocols.protocol_auto_deleter import ProtocolAutoDeleter
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
-    ProtocolRunUsageInfo,
+    ProtocolUsageInfo,
 )
 
 
@@ -24,17 +24,17 @@ def test_make_room_for_new_protocol(
         deletion_planner=mock_deletion_planner,
     )
 
-    run_usage_info = [
-        ProtocolRunUsageInfo(protocol_id="protocol-id-1", is_used_by_run=True),
-        ProtocolRunUsageInfo(protocol_id="protocol-id-2", is_used_by_run=False),
-        ProtocolRunUsageInfo(protocol_id="protocol-id-3", is_used_by_run=True),
+    usage_info = [
+        ProtocolUsageInfo(protocol_id="protocol-id-1", is_used_by_run=True),
+        ProtocolUsageInfo(protocol_id="protocol-id-2", is_used_by_run=False),
+        ProtocolUsageInfo(protocol_id="protocol-id-3", is_used_by_run=True),
     ]
 
     deletion_plan = set(["protocol-id-4", "protocol-id-5"])
 
-    decoy.when(mock_protocol_store.get_run_usage_info()).then_return(run_usage_info)
+    decoy.when(mock_protocol_store.get_usage_info()).then_return(usage_info)
     decoy.when(
-        mock_deletion_planner.plan_for_new_protocol(existing_protocols=run_usage_info)
+        mock_deletion_planner.plan_for_new_protocol(existing_protocols=usage_info)
     ).then_return(deletion_plan)
 
     # Run the subject, capturing log messages at least as severe as INFO.
