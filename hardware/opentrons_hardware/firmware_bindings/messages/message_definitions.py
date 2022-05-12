@@ -588,6 +588,7 @@ class PeripheralStatusRequest:  # noqa: D101
     ] = MessageId.peripheral_status_request
 
 
+
 @dataclass
 class PeripheralStatusResponse:  # noqa: D101
     payload: payloads.PeripheralStatusResponsePayload
