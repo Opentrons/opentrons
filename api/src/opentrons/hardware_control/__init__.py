@@ -39,7 +39,7 @@ __all__ = [
     "Controller",
     "Simulator",
     "Pipette",
-    'Gripper',
+    "Gripper",
     "PauseManager",
     "SynchronousAdapter",
     "HardwareControlAPI",

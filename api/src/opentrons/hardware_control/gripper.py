@@ -4,16 +4,10 @@ from __future__ import annotations
 """
 from dataclasses import asdict, replace
 import logging
-from typing import Any, Dict, Optional, Union, cast
+from typing import Any, Dict, Optional, Union
 
-
-from opentrons.hardware_control.pipette import Pipette
 from opentrons.types import Point
-from opentrons.config.defaults_ot3 import DEFAULT_PIPETTE_OFFSET
-from opentrons.config import gripper_config, pipette_config
-from opentrons.config.pipette_config import config_models, config_names, configs, load
-from opentrons_shared_data.pipette.dev_types import PipetteModel
-from opentrons.calibration_storage.types import PipetteOffsetByPipetteMount, SourceType, CalibrationStatus
+from opentrons.config import gripper_config
 from .instrument_abc import AbstractInstrument
 from .types import CriticalPoint
 
@@ -21,13 +15,6 @@ RECONFIG_KEYS = {"quirks"}
 
 
 mod_log = logging.getLogger(__name__)
-
-
-FAKE_PIP_OFFSET = PipetteOffsetByPipetteMount(
-    offset=DEFAULT_PIPETTE_OFFSET,
-    source=SourceType.default,
-    status=CalibrationStatus(),
-)
 
 
 class Gripper(AbstractInstrument):
