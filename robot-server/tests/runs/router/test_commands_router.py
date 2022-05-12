@@ -11,12 +11,13 @@ from opentrons.protocol_engine import (
     CurrentCommand,
     commands as pe_commands,
     errors as pe_errors,
+    ProtocolEngine
 )
 
 from robot_server.errors import ApiError
 from robot_server.service.json_api import RequestModel, MultiBodyMeta
 from robot_server.runs.run_models import Run, RunCommandSummary
-from robot_server.runs.engine_store import EngineStore, ProtocolEngine
+from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.router.commands_router import (
     CommandCollectionLinks,
     CommandLink,
