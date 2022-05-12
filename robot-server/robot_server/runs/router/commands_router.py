@@ -12,6 +12,11 @@ from opentrons.protocol_engine import (
     # errors as pe_errors,
     ProtocolEngine,
 )
+from robot_server.service.json_api import (
+    SimpleMultiBody,
+    MultiBodyMeta,
+    PydanticResponse,
+)
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
@@ -25,7 +30,8 @@ from robot_server.service.json_api import (
 from ..run_models import Run, RunCommandSummary
 from ..run_data_manager import RunDataManager
 from ..engine_store import EngineStore
-from ..dependencies import get_engine_store, get_run_data_manager
+from ..run_store import RunStore
+from ..dependencies import get_engine_store, get_run_data_manager, get_run_store
 from .base_router import RunNotFound, get_run_data_from_url, RunStopped
 
 
@@ -74,6 +80,7 @@ class CommandCollectionLinks(BaseModel):
 async def get_current_run_engine_from_url(
     runId: str,
     engine_store: EngineStore = Depends(get_engine_store),
+    run_store: RunStore = Depends(get_run_store),
 ) -> ProtocolEngine:
     """Get run protocol engine.
 
@@ -81,6 +88,11 @@ async def get_current_run_engine_from_url(
         runId: Run id to associate the command with.
         engine_store: engine store to pull current run ProtocolEngine.
     """
+    if not run_store.has(runId):
+        raise RunNotFound(detail=f"Run {runId} not found.").as_error(
+            status.HTTP_404_NOT_FOUND
+        )
+
     if runId != engine_store.current_run_id:
         raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
             status.HTTP_400_BAD_REQUEST
@@ -105,7 +117,6 @@ async def get_current_run_engine_from_url(
 )
 async def create_run_command(
     request_body: RequestModel[pe_commands.CommandCreate],
-    runId: str,
     waitUntilComplete: bool = Query(
         default=False,
         description=(
@@ -148,9 +159,6 @@ async def create_run_command(
             Comes from a query parameter in the URL.
         protocol_engine: Used to retrieve the `ProtocolEngine` on which the new
             command will be enqueued.
-        run: Run response model, provided by the route handler for
-            `GET /runs/{runId}`. Present to ensure 404 if run
-            not found.
     """
     command = protocol_engine.add_command(request_body.data)
 
@@ -183,7 +191,7 @@ async def create_run_command(
     },
 )
 async def get_run_commands(
-    engine_store: EngineStore = Depends(get_engine_store),
+    run_data_manager: RunDataManager = Depends(get_run_data_manager),
     run: Run = Depends(get_run_data_from_url),
     cursor: Optional[int] = Query(
         None,
@@ -201,55 +209,52 @@ async def get_run_commands(
     """Get a summary of all commands in a run.
 
     Arguments:
-        engine_store: Protocol engine and runner storage.
+        protocol_engine: Used to retrieve the `ProtocolEngine` on which the current run commands
+        exists.
         run: Run response model, provided by the route handler for `GET /runs/{runId}`
         cursor: Cursor index for the collection response.
         pageLength: Maximum number of items to return.
     """
-    # call run_data_manager for logic
-    raise NotImplementedError("TODO")
-    # state = engine_store.get_state(run.id)
-    # current_command = state.commands.get_current()
-    # command_slice = state.commands.get_slice(cursor=cursor, length=pageLength)
+    command_slice = run_data_manager.get_commands_slice(run.id, cursor=cursor, length=pageLength)
+    current_command = run_data_manager.get_current_command()
+    data = [
+        RunCommandSummary.construct(
+            id=c.id,
+            key=c.key,
+            commandType=c.commandType,
+            status=c.status,
+            createdAt=c.createdAt,
+            startedAt=c.startedAt,
+            completedAt=c.completedAt,
+            params=c.params,
+            error=c.error,
+        )
+        for c in command_slice.commands
+    ]
 
-    # data = [
-    #     RunCommandSummary.construct(
-    #         id=c.id,
-    #         key=c.key,
-    #         commandType=c.commandType,
-    #         status=c.status,
-    #         createdAt=c.createdAt,
-    #         startedAt=c.startedAt,
-    #         completedAt=c.completedAt,
-    #         params=c.params,
-    #         error=c.error,
-    #     )
-    #     for c in command_slice.commands
-    # ]
+    meta = MultiBodyMeta(
+        cursor=command_slice.cursor,
+        totalLength=command_slice.total_length,
+    )
 
-    # meta = MultiBodyMeta(
-    #     cursor=command_slice.cursor,
-    #     totalLength=command_slice.total_length,
-    # )
+    links = CommandCollectionLinks()
 
-    # links = CommandCollectionLinks()
+    if current_command is not None:
+        links.current = CommandLink(
+            href=f"/runs/{run.id}/commands/{current_command.command_id}",
+            meta=CommandLinkMeta(
+                runId=run.id,
+                commandId=current_command.command_id,
+                index=current_command.index,
+                key=current_command.command_key,
+                createdAt=current_command.created_at,
+            ),
+        )
 
-    # if current_command is not None:
-    #     links.current = CommandLink(
-    #         href=f"/runs/{run.id}/commands/{current_command.command_id}",
-    #         meta=CommandLinkMeta(
-    #             runId=run.id,
-    #             commandId=current_command.command_id,
-    #             index=current_command.index,
-    #             key=current_command.command_key,
-    #             createdAt=current_command.created_at,
-    #         ),
-    #     )
-
-    # return await PydanticResponse.create(
-    #     content=MultiBody.construct(data=data, meta=meta, links=links),
-    #     status_code=status.HTTP_200_OK,
-    # )
+    return await PydanticResponse.create(
+        content=MultiBody.construct(data=data, meta=meta, links=links),
+        status_code=status.HTTP_200_OK,
+    )
 
 
 @commands_router.get(

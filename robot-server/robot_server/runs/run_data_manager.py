@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from opentrons.protocol_engine import LabwareOffsetCreate, ProtocolRunData
+from opentrons.protocol_engine import LabwareOffsetCreate, ProtocolRunData, CommandSlice
 
 from robot_server.protocols import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
@@ -159,3 +159,13 @@ class RunDataManager:
         #       raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
         #             status.HTTP_409_CONFLICT
         #         )
+
+    def get_commands_slice(self, run_id: str, cursor: Optional[int], length: int,) -> CommandSlice:
+        """Get current command slice"""
+        raise NotImplementedError("TODO")
+        # if self._engine_store.current_run_id == run_id:
+        #     pass
+        # else:
+        #     # Let exception propagate
+        #     commands = self._run_store.get_run_commands(run_id)
+        # return self._engine_store.engine.state_view.commnds.get_slice()
