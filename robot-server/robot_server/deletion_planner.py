@@ -44,12 +44,24 @@ class ProtocolDeletionPlanner:  # noqa: D101
         Returns:
             IDs of protocols to delete.
 
-            After deleting these protocols, the number of unused protocols
-            will be at least one less than the maximum,
-            allowing an additional unused protocol to be added
-            without going over the limit.
+            After deleting these protocols, there will be at least one slot free
+            to add a new protocol without going over the configured limit.
         """
-        raise NotImplementedError()
+        unused_protocols = [p for p in existing_protocols if not p.is_used_by_run]
+
+        # The caller wants to add a new protocol.
+        # If they added it now, how many unused protocols would there be, total?
+        num_after_new_addition = len(unused_protocols) + 1
+
+        if num_after_new_addition > self._maximum_unused_protocols:
+            num_deletions_required = (
+                num_after_new_addition - self._maximum_unused_protocols
+            )
+        else:
+            num_deletions_required = 0
+
+        protocols_to_delete = unused_protocols[:num_deletions_required]
+        return set(p.protocol_id for p in protocols_to_delete)
 
 
 class RunDeletionPlanner:  # noqa: D101
@@ -75,9 +87,8 @@ class RunDeletionPlanner:  # noqa: D101
         Returns:
             The IDs of runs to delete.
 
-            After deleting these runs, the number of runs
-            will be at least one less than the maximum,
-            allowing an additional run to be added without going over the limit.
+            After deleting these runs, there will be at least one slot free
+            to add a new run without going over the configured limit.
         """
         runs_upper_limit = self._maximum_runs - 1
         if runs_upper_limit < 0:
