@@ -212,6 +212,7 @@ class ModuleCalibrationPoint(BaseModel):
 
     x: float
     y: float
+    z: float
 
 
 class LabwareOffsetVector(BaseModel):

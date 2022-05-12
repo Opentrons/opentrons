@@ -65,8 +65,12 @@ ModuleCalibrationPointOffset = TypedDict(
     "ModuleCalibrationPointOffset", {"x": float, "y": float}
 )
 
+ModuleCalibrationPointOffsetWithZ = TypedDict(
+    "ModuleCalibrationPointOffsetWithZ", {"x": float, "y": float, "z": float}
+)
+
 CornerOffsetFromSlot = TypedDict(
-    "CornerOffsetFromSlot", {"x": float, "y": float, "z": Optional[float]}
+    "CornerOffsetFromSlot", {"x": float, "y": float, "z": float}
 )
 
 # TODO(mc, 2022-03-18): potentially move from typed-dict to Pydantic
@@ -79,7 +83,7 @@ ModuleDefinitionV3 = TypedDict(
         "labwareOffset": ModuleLabwareOffset,
         "cornerOffsetFromSlot": CornerOffsetFromSlot,
         "dimensions": ModuleDimensions,
-        "calibrationPoint": ModuleCalibrationPointOffset,
+        "calibrationPoint": ModuleCalibrationPointOffsetWithZ,
         "displayName": str,
         "quirks": List[str],
         "slotTransforms": Dict[str, Dict[str, Dict[str, List[List[float]]]]],

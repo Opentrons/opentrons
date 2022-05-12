@@ -6,7 +6,7 @@ import typeguard
 from opentrons_shared_data import module
 from opentrons_shared_data.module import dev_types
 
-from . import list_v2_defs, list_v3_defs
+from . import list_v3_defs
 
 
 pytestmark = pytest.mark.xfail(
