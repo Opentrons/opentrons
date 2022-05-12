@@ -37,7 +37,6 @@
   "overflow_menu_recalibrate_pipette": "Recalibrate Pipette Offset",
   "overflow_menu_calibrate_pipette": "Calibrate Pipette Offset",
   "overflow_menu_download_calibration_data": "Download calibration data",
-  "overflow_menu_delete_data": "Delete calibration data",
   "overflow_menu_recalibrate_tip_and_pipette": "Recalibrate Tip Length and Pipette Offset",
   "networking": "Networking",
   "wireless_network": "Wi-Fi",

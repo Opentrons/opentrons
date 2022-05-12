@@ -25,7 +25,6 @@ import {
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
-  useAttachedPipetteCalibrations,
 } from '../../hooks'
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
 

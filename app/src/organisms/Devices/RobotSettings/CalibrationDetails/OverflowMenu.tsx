@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { saveAs } from 'file-saver'
 import { useSelector } from 'react-redux'
 
 import {
@@ -75,7 +76,6 @@ export function OverflowMenu({
     hasBlockModalResponse?: boolean | null
   }
   const startPipetteOffsetPossibleTLC = (options: StartWizardOptions): void => {
-    console.log('called by tip length calibration')
     const { keepTipLength, hasBlockModalResponse } = options
     if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
       setCalBlockModalState(
@@ -174,7 +174,11 @@ export function OverflowMenu({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
-      <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
+      <OverflowBtn
+        alignSelf={ALIGN_FLEX_END}
+        aria-label="CalibrationOverflowMenu_button"
+        onClick={handleOverflowClick}
+      />
       {showOverflowMenu ? (
         <Flex
           width={calType === 'pipetteOffset' ? '11.25rem' : '17.25rem'}
