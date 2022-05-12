@@ -13,6 +13,7 @@ from opentrons.config import gripper_config, pipette_config
 from opentrons.config.pipette_config import config_models, config_names, configs, load
 from opentrons_shared_data.pipette.dev_types import PipetteModel
 from opentrons.calibration_storage.types import PipetteOffsetByPipetteMount, SourceType, CalibrationStatus
+from .instrument_abc import AbstractInstrument
 
 RECONFIG_KEYS = {"quirks"}
 
@@ -27,7 +28,7 @@ FAKE_PIP_OFFSET = PipetteOffsetByPipetteMount(
 )
 
 
-class Gripper(Pipette):
+class Gripper(AbstractInstrument):
     """A class to gather and track gripper state and configs.
 
     This class should not touch hardware or call back out to the hardware
@@ -43,7 +44,6 @@ class Gripper(Pipette):
         gripper_id: Optional[str] = None,
     ) -> None:
         p_config = pipette_config.load(cast("PipetteModel", "p20_single_v3.0"))
-        super().__init__(p_config, FAKE_PIP_OFFSET)
         self._config = config
         self._name = self._config.name
         self._model = self._config.model
