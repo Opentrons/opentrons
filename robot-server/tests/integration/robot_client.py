@@ -2,7 +2,7 @@ from __future__ import annotations
 import asyncio
 
 from pathlib import Path
-from typing import AsyncGenerator, List, Dict
+from typing import Any, AsyncGenerator, List, Dict
 import httpx
 from httpx import Response
 
@@ -153,6 +153,46 @@ class RobotClient:
         """POST /runs."""
         response = await self.httpx_client.post(
             url=f"{self.base_url}/runs", json=req_body
+        )
+        print("response")
+        print(response.text)
+        response.raise_for_status()
+        return response
+
+    async def get_run(self, run_id: str) -> Response:
+        """GET /runs/:run_id."""
+        response = await self.httpx_client.get(url=f"{self.base_url}/runs/{run_id}")
+        response.raise_for_status()
+        return response
+
+    async def post_run_command(
+        self, run_id: str, req_body: Dict[str, object], params: Dict[str, Any]
+    ) -> Response:
+        """POST /runs/:run_id/commands."""
+        response = await self.httpx_client.post(
+            url=f"{self.base_url}/runs/{run_id}/commands",
+            json=req_body,
+            params=params,
+        )
+        print("response")
+        print(response.text)
+        response.raise_for_status()
+        return response
+
+    async def get_run_commands(self, run_id: str) -> Response:
+        """GET /runs/:run_id/commands."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/runs/{run_id}/commands",
+        )
+        print("response")
+        print(response.text)
+        response.raise_for_status()
+        return response
+
+    async def get_run_command(self, run_id: str, command_id: str) -> Response:
+        """GET /runs/:run_id/commands/:command_id."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/runs/{run_id}/commands/{command_id}",
         )
         print("response")
         print(response.text)

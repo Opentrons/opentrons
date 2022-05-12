@@ -48,6 +48,7 @@ class RunDataManager:
     @property
     def current_run_id(self) -> Optional[str]:
         """The identifier of the current run, if any."""
+        # get from engine_store
         raise NotImplementedError("TODO, maybe?")
 
     async def create(
@@ -71,8 +72,6 @@ class RunDataManager:
             EngineConflictError: There is a currently active run that cannot
                 be superceded by this new run.
         """
-        # TODO(mc, 2022-05-10): fix race condition between
-        # await engine create and set current run ID
         run_data = await self._engine_store.create(run_id)
         run_resource = self._run_store.insert(
             RunResource(
