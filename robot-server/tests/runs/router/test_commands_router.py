@@ -24,6 +24,7 @@ from robot_server.runs.router.commands_router import (
     create_run_command,
     get_run_command,
     get_run_commands,
+    get_current_run_engine_from_url
 )
 
 
@@ -78,35 +79,16 @@ async def test_create_run_command(decoy: Decoy, mock_engine_store: EngineStore) 
     decoy.verify(await protocol_engine.wait_for_command("command-id"), times=0)
 
 
-async def test_create_run_command_not_current(
+async def test_get_current_run_engine_from_url_not_current(
     decoy: Decoy,
-    mock_protocol_engine: ProtocolEngine,
+    mock_engine_store: EngineStore,
 ) -> None:
     """It should 400 if you try to add commands to non-current run."""
-    command_request = pe_commands.PauseCreate(
-        params=pe_commands.PauseParams(message="Hello")
-    )
-    # decoy.when(mock_protocol_engine.add_command).then_return()
-
-    run = Run(
-        id="run-id",
-        protocolId=None,
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=EngineStatus.RUNNING,
-        current=False,
-        actions=[],
-        errors=[],
-        pipettes=[],
-        labware=[],
-        labwareOffsets=[],
-    )
 
     with pytest.raises(ApiError) as exc_info:
-        await create_run_command(
-            request_body=RequestModel(data=command_request),
-            waitUntilComplete=False,
-            protocol_engine=mock_protocol_engine,
-            run=run,
+        await get_current_run_engine_from_url(
+            runId="run-id",
+            engine_store=mock_engine_store
         )
 
     assert exc_info.value.status_code == 400

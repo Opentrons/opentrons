@@ -67,7 +67,7 @@ class CommandCollectionLinks(BaseModel):
 
 
 async def get_current_run_engine_from_url(
-    run: Run,
+    runId: str,
     engine_store: EngineStore = Depends(get_engine_store),
 ) -> ProtocolEngine:
     """Get run protocol engine.
@@ -76,10 +76,8 @@ async def get_current_run_engine_from_url(
         run: Run pulled from url.
         engine_store: engine store to pull current run ProtocolEngine.
     """
-    print("runrunrunrun")
-    print(run)
-    if not run.current:
-        raise RunStopped(detail=f"Run {run.id} is not the current run").as_error(
+    if runId != engine_store.current_run_id:
+        raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
             status.HTTP_400_BAD_REQUEST
         )
 
@@ -149,6 +147,7 @@ async def create_run_command(
             `GET /runs/{runId}`. Present to ensure 404 if run
             not found.
     """
+    print(protocol_engine)
     command = protocol_engine.add_command(request_body.data)
 
     if waitUntilComplete:
