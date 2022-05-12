@@ -138,7 +138,6 @@ export function PipetteOffsetCalItems({
                   )}
                 </Flex>
               </StyledTableCell>
-
               <StyledTableCell>
                 <OverflowMenu
                   calType="pipetteOffset"
