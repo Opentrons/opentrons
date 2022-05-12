@@ -93,26 +93,32 @@ export function RecentProtocolRuns({
                 {t('run_duration')}
               </StyledText>
             </Flex>
-            {runs.map((run, index) => {
-              const protocol = protocols?.data?.data.find(
-                protocol => protocol.id === run.protocolId
+            {runs
+              .sort(
+                (a, b) =>
+                  new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime()
               )
-              const protocolName =
-                protocol?.metadata.protocolName ??
-                protocol?.files[0].name ??
-                run.protocolId ??
-                ''
+              .map((run, index) => {
+                const protocol = protocols?.data?.data.find(
+                  protocol => protocol.id === run.protocolId
+                )
+                const protocolName =
+                  protocol?.metadata.protocolName ??
+                  protocol?.files[0].name ??
+                  run.protocolId ??
+                  ''
 
-              return (
-                <HistoricalProtocolRun
-                  run={run}
-                  protocolName={protocolName}
-                  robotName={robotName}
-                  robotIsBusy={robotIsBusy}
-                  key={index}
-                />
-              )
-            })}
+                return (
+                  <HistoricalProtocolRun
+                    run={run}
+                    protocolName={protocolName}
+                    robotName={robotName}
+                    robotIsBusy={robotIsBusy}
+                    key={index}
+                  />
+                )
+              })}
           </Box>
         )}
         {!isRobotViewable && (
