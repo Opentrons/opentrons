@@ -28,11 +28,20 @@ from .legacy_wrappers import (
 
 
 class PlayType(str, Enum):
+    """When issuing a `play`, what kind of action was taken.
+
+    Properties:
+        START: the run was not started, so this was the first "play".
+        RESUME: the run was already going, so this play "resumed" the run.
+    """
+
     START = "start"
     RESUME = "resume"
 
 
 class ProtocolRunResult(NamedTuple):
+    """Result data from a run, pulled from the ProtocolEngine."""
+
     commands: List[Command]
     data: ProtocolRunData
 
@@ -150,7 +159,7 @@ class ProtocolRunner:
     async def run(
         self,
         protocol_source: Optional[ProtocolSource] = None,
-    ) -> ProtocolRunData:
+    ) -> ProtocolRunResult:
         """Run a given protocol to completion."""
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
@@ -163,7 +172,9 @@ class ProtocolRunner:
         self._task_queue.start()
         await self._task_queue.join()
 
-        return self._protocol_engine.state_view.get_protocol_run_data()
+        run_data = self._protocol_engine.state_view.get_protocol_run_data()
+        commands = self._protocol_engine.state_view.commands.get_all()
+        return ProtocolRunResult(commands=commands, data=run_data)
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:
         protocol = self._json_file_reader.read(protocol_source)

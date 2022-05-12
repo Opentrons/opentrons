@@ -6,46 +6,41 @@ from decoy import Decoy
 
 from opentrons.protocol_engine import (
     EngineStatus,
-    StateView,
-    CommandSlice,
-    CurrentCommand,
+    # StateView,
+    # CommandSlice,
+    # CurrentCommand,
     commands as pe_commands,
-    errors as pe_errors,
-    ProtocolEngine
+    # errors as pe_errors,
+    ProtocolEngine,
 )
 
 from robot_server.errors import ApiError
-from robot_server.service.json_api import RequestModel, MultiBodyMeta
-from robot_server.runs.run_models import Run, RunCommandSummary
+from robot_server.service.json_api import (
+    RequestModel,
+    # MultiBodyMeta,
+)
+from robot_server.runs.run_models import (
+    Run,
+    # RunCommandSummary,
+)
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.router.commands_router import (
-    CommandCollectionLinks,
-    CommandLink,
-    CommandLinkMeta,
+    # CommandCollectionLinks,
+    # CommandLink,
+    # CommandLinkMeta,
     create_run_command,
-    get_run_command,
-    get_run_commands,
-    get_current_run_engine_from_url
+    # get_run_command,
+    # get_run_commands,
+    get_current_run_engine_from_url,
 )
 
 
-async def test_create_run_command(decoy: Decoy, mock_protocol_engine: ProtocolEngine) -> None:
+async def test_create_run_command(
+    decoy: Decoy, mock_protocol_engine: ProtocolEngine
+) -> None:
     """It should add the requested command to the ProtocolEngine and return it."""
     command_request = pe_commands.PauseCreate(
         params=pe_commands.PauseParams(message="Hello")
-    )
-
-    run = Run(
-        id="run-id",
-        protocolId=None,
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=EngineStatus.RUNNING,
-        current=True,
-        actions=[],
-        errors=[],
-        pipettes=[],
-        labware=[],
-        labwareOffsets=[],
     )
 
     command_once_added = pe_commands.Pause(
@@ -60,13 +55,14 @@ async def test_create_run_command(decoy: Decoy, mock_protocol_engine: ProtocolEn
         command_once_added
     )
 
-    decoy.when(mock_protocol_engine.state_view.commands.get("command-id")).then_return(command_once_added)
+    decoy.when(mock_protocol_engine.state_view.commands.get("command-id")).then_return(
+        command_once_added
+    )
 
     result = await create_run_command(
         request_body=RequestModel(data=command_request),
         waitUntilComplete=False,
         protocol_engine=mock_protocol_engine,
-        run=run
     )
 
     assert result.content.data == command_once_added
@@ -74,8 +70,10 @@ async def test_create_run_command(decoy: Decoy, mock_protocol_engine: ProtocolEn
     decoy.verify(await mock_protocol_engine.wait_for_command("command-id"), times=0)
 
 
-async def test_get_current_run_engine_from_url(decoy: Decoy, mock_engine_store: EngineStore) -> None:
-    """Should get an instance of a run protocol engine"""
+async def test_get_current_run_engine_from_url(
+    decoy: Decoy, mock_engine_store: EngineStore
+) -> None:
+    """Should get an instance of a run protocol engine."""
     run = Run(
         id="run-id",
         protocolId=None,
@@ -88,13 +86,12 @@ async def test_get_current_run_engine_from_url(decoy: Decoy, mock_engine_store: 
         labware=[],
         labwareOffsets=[],
     )
-
     decoy.when(mock_engine_store.current_run_id).then_return("run-id")
     result = await get_current_run_engine_from_url(
-        run=run,
-        engine_store=mock_engine_store
+        run=run, engine_store=mock_engine_store
     )
     assert isinstance(result, ProtocolEngine)
+
 
 async def test_get_current_run_engine_from_url_not_current(
     decoy: Decoy,
@@ -115,10 +112,7 @@ async def test_get_current_run_engine_from_url_not_current(
     )
 
     with pytest.raises(ApiError) as exc_info:
-        await get_current_run_engine_from_url(
-            run=run,
-            engine_store=mock_engine_store
-        )
+        await get_current_run_engine_from_url(run=run, engine_store=mock_engine_store)
 
     assert exc_info.value.status_code == 400
     assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
@@ -128,19 +122,6 @@ async def test_create_run_command_blocking_completion(
     decoy: Decoy, mock_protocol_engine: ProtocolEngine
 ) -> None:
     """It should return the completed command once the command is completed."""
-    run = Run.construct(
-        id="run-id",
-        protocolId=None,
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=EngineStatus.RUNNING,
-        current=True,
-        actions=[],
-        errors=[],
-        pipettes=[],
-        labware=[],
-        labwareOffsets=[],
-    )
-
     command_request = pe_commands.PauseCreate(
         params=pe_commands.PauseParams(message="Hello")
     )
@@ -162,15 +143,15 @@ async def test_create_run_command_blocking_completion(
     )
 
     def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
-        decoy.when(mock_protocol_engine.state_view.commands.get("command-id")).then_return(
-            command_once_added
-        )
+        decoy.when(
+            mock_protocol_engine.state_view.commands.get("command-id")
+        ).then_return(command_once_added)
         return command_once_added
 
     def _stub_completed_command_state(*_a: object, **_k: object) -> None:
-        decoy.when(mock_protocol_engine.state_view.commands.get("command-id")).then_return(
-            command_once_completed
-        )
+        decoy.when(
+            mock_protocol_engine.state_view.commands.get("command-id")
+        ).then_return(command_once_completed)
 
     decoy.when(mock_protocol_engine.add_command(command_request)).then_do(
         _stub_queued_command_state
@@ -185,11 +166,11 @@ async def test_create_run_command_blocking_completion(
         waitUntilComplete=True,
         timeout=999,
         protocol_engine=mock_protocol_engine,
-        run=run,
     )
 
     assert result.content.data == command_once_completed
     assert result.status_code == 201
+
 
 #
 # async def test_get_run_commands(decoy: Decoy, mock_engine_store: EngineStore) -> None:
@@ -325,7 +306,11 @@ async def test_create_run_command_blocking_completion(
 #         key="command-key",
 #         status=pe_commands.CommandStatus.RUNNING,
 #         createdAt=datetime(year=2022, month=2, day=2),
-#         params=pe_commands.MoveToWellParams(pipetteId="a", labwareId="b", wellName="c"),
+#         params=pe_commands.MoveToWellParams(
+#             pipetteId="a",
+#             labwareId="b",
+#             wellName="c",
+#         ),
 #     )
 #
 #     run = Run(

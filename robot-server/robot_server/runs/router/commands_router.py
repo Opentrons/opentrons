@@ -7,14 +7,18 @@ from typing_extensions import Final, Literal
 from fastapi import APIRouter, Depends, Query, status
 from pydantic import BaseModel, Field
 
-from opentrons.protocol_engine import commands as pe_commands, errors as pe_errors, ProtocolEngine
+from opentrons.protocol_engine import (
+    commands as pe_commands,
+    # errors as pe_errors,
+    ProtocolEngine,
+)
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
     MultiBody,
-    MultiBodyMeta,
+    # MultiBodyMeta,
     PydanticResponse,
 )
 
@@ -67,13 +71,13 @@ class CommandCollectionLinks(BaseModel):
 
 
 async def get_current_run_engine_from_url(
-    run: Run,
+    run: Run = Depends(get_run_data_from_url),
     engine_store: EngineStore = Depends(get_engine_store),
 ) -> ProtocolEngine:
     """Get run protocol engine.
 
     Args:
-        run: Run pulled from url.
+        run: Run resource, pulled by ID from a URL parameter.
         engine_store: engine store to pull current run ProtocolEngine.
     """
     if run.id != engine_store.current_run_id:
@@ -129,8 +133,7 @@ async def create_run_command(
             " Inspect the returned command's `status` to detect the timeout."
         ),
     ),
-    run: Run = Depends(get_run_data_from_url),
-    protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url)
+    protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
 
@@ -184,7 +187,7 @@ async def get_run_commands(
         None,
         description=(
             "The starting index of the desired first command in the list."
-            " If unspecicifed, a cursor will be selected automatically"
+            " If unspecified, a cursor will be selected automatically"
             " based on the next queued or more recently executed command."
         ),
     ),
@@ -202,48 +205,49 @@ async def get_run_commands(
         pageLength: Maximum number of items to return.
     """
     # call run_data_manager for logic
-    state = engine_store.get_state(run.id)
-    current_command = state.commands.get_current()
-    command_slice = state.commands.get_slice(cursor=cursor, length=pageLength)
+    raise NotImplementedError("TODO")
+    # state = engine_store.get_state(run.id)
+    # current_command = state.commands.get_current()
+    # command_slice = state.commands.get_slice(cursor=cursor, length=pageLength)
 
-    data = [
-        RunCommandSummary.construct(
-            id=c.id,
-            key=c.key,
-            commandType=c.commandType,
-            status=c.status,
-            createdAt=c.createdAt,
-            startedAt=c.startedAt,
-            completedAt=c.completedAt,
-            params=c.params,
-            error=c.error,
-        )
-        for c in command_slice.commands
-    ]
+    # data = [
+    #     RunCommandSummary.construct(
+    #         id=c.id,
+    #         key=c.key,
+    #         commandType=c.commandType,
+    #         status=c.status,
+    #         createdAt=c.createdAt,
+    #         startedAt=c.startedAt,
+    #         completedAt=c.completedAt,
+    #         params=c.params,
+    #         error=c.error,
+    #     )
+    #     for c in command_slice.commands
+    # ]
 
-    meta = MultiBodyMeta(
-        cursor=command_slice.cursor,
-        totalLength=command_slice.total_length,
-    )
+    # meta = MultiBodyMeta(
+    #     cursor=command_slice.cursor,
+    #     totalLength=command_slice.total_length,
+    # )
 
-    links = CommandCollectionLinks()
+    # links = CommandCollectionLinks()
 
-    if current_command is not None:
-        links.current = CommandLink(
-            href=f"/runs/{run.id}/commands/{current_command.command_id}",
-            meta=CommandLinkMeta(
-                runId=run.id,
-                commandId=current_command.command_id,
-                index=current_command.index,
-                key=current_command.command_key,
-                createdAt=current_command.created_at,
-            ),
-        )
+    # if current_command is not None:
+    #     links.current = CommandLink(
+    #         href=f"/runs/{run.id}/commands/{current_command.command_id}",
+    #         meta=CommandLinkMeta(
+    #             runId=run.id,
+    #             commandId=current_command.command_id,
+    #             index=current_command.index,
+    #             key=current_command.command_key,
+    #             createdAt=current_command.created_at,
+    #         ),
+    #     )
 
-    return await PydanticResponse.create(
-        content=MultiBody.construct(data=data, meta=meta, links=links),
-        status_code=status.HTTP_200_OK,
-    )
+    # return await PydanticResponse.create(
+    #     content=MultiBody.construct(data=data, meta=meta, links=links),
+    #     status_code=status.HTTP_200_OK,
+    # )
 
 
 @commands_router.get(
@@ -274,13 +278,14 @@ async def get_run_command(
             `GET /run/{runId}`. Present to ensure 404 if run
             not found.
     """
-    engine_state = engine_store.get_state(run.id)
-    try:
-        command = engine_state.commands.get(commandId)
-    except pe_errors.CommandDoesNotExistError as e:
-        raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+    raise NotImplementedError("TODO")
+    # engine_state = engine_store.get_state(run.id)
+    # try:
+    #     command = engine_state.commands.get(commandId)
+    # except pe_errors.CommandDoesNotExistError as e:
+    #     raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    return await PydanticResponse.create(
-        content=SimpleBody.construct(data=command),
-        status_code=status.HTTP_200_OK,
-    )
+    # return await PydanticResponse.create(
+    #     content=SimpleBody.construct(data=command),
+    #     status_code=status.HTTP_200_OK,
+    # )

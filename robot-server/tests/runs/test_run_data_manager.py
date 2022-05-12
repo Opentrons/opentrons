@@ -1,15 +1,9 @@
 """Tests for RunDataManager."""
-from typing import List
-
 import pytest
 from datetime import datetime
 from decoy import Decoy, matchers
 
-from opentrons.protocol_engine import (
-    EngineStatus,
-    ProtocolRunData,
-    commands as pe_commands,
-)
+from opentrons.protocol_engine import EngineStatus, ProtocolRunData
 
 from robot_server.runs.engine_store import EngineStore, EngineConflictError
 from robot_server.runs.run_data_manager import RunDataManager
