@@ -82,10 +82,10 @@ Tests for the Opentrons App are run from the top level along with all other JS p
 
 Test tasks can also be run with the following arguments:
 
-| Argument   | Default   | Description             | Example                           |
-| ---------- | --------- | ----------------------- | --------------------------------- |
-| watch      | `false`   | Run tests in watch mode | `make test-unit watch=true`       |
-| cover      | `!watch`  | Calculate code coverage | `make test watch=true cover=true` |
+| Argument | Default  | Description             | Example                           |
+| -------- | -------- | ----------------------- | --------------------------------- |
+| watch    | `false`  | Run tests in watch mode | `make test-unit watch=true`       |
+| cover    | `!watch` | Calculate code coverage | `make test watch=true cover=true` |
 
 ## Building
 

@@ -51,8 +51,12 @@ const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
     'biorad_96_wellplate_200ul_pcr',
     'nest_96_wellplate_100ul_pcr_full_skirt',
   ],
-  // TODO(sh, 2022-02-28): add list of compatible labware for the heater shaker
-  [HEATERSHAKER_MODULE_TYPE]: [],
+  [HEATERSHAKER_MODULE_TYPE]: [
+    'opentrons_96_deepwell_adapter_nest_wellplate_2ml_deep',
+    'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat',
+    'opentrons_96_pcr_plate_adapter_nest_wellplate_100ul_pcr_full_skirt',
+    'opentrons_flat_plate_adapter_corning_384_wellplate_112ul_flat',
+  ],
 }
 export const getLabwareIsCompatible = (
   def: LabwareDefinition2,

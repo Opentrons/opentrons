@@ -72,7 +72,7 @@ describe('HeaterShakerBanner', () => {
     const { getByText } = render(props)
     getByText('Attach HeaterShakerV1 to deck before proceeding to run')
     getByText(
-      'An improperly fastened Heater Shaker module can shake itself out of a deck slot.'
+      'An improperly fastened Heater-Shaker module can shake itself out of a deck slot.'
     )
   })
 

@@ -187,7 +187,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                         leftMountPipetteName != null
                           ? getPipetteNameSpecs(leftMountPipetteName)
                               ?.displayName
-                          : t('empty'),
+                          : t('not_used'),
                     }[analysisStatus]
                   }
                 </StyledText>
@@ -211,7 +211,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                         rightMountPipetteName != null
                           ? getPipetteNameSpecs(rightMountPipetteName)
                               ?.displayName
-                          : t('empty'),
+                          : t('not_used'),
                     }[analysisStatus]
                   }
                 </StyledText>

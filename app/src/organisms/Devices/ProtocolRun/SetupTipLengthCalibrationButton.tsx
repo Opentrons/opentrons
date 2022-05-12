@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Box,
   Flex,
@@ -30,7 +29,6 @@ import {
 } from '../../../organisms/CalibrateTipLength'
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import { INTENT_TIP_LENGTH_IN_PROTOCOL } from '../../../organisms/CalibrationPanels'
-import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import {
   tipLengthCalibrationStarted,
   pipetteOffsetCalibrationStarted,
@@ -40,7 +38,7 @@ import * as RobotApi from '../../../redux/robot-api'
 import * as Sessions from '../../../redux/sessions'
 import { getPipetteOffsetCalibrationSession } from '../../../redux/sessions/pipette-offset-calibration/selectors'
 import { getTipLengthCalibrationSession } from '../../../redux/sessions/tip-length-calibration/selectors'
-import { useDeckCalibrationData } from '../hooks'
+import { useDeckCalibrationData, useRunHasStarted } from '../hooks'
 
 import type { Mount } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -198,9 +196,8 @@ export function SetupTipLengthCalibrationButton({
     hasCalibrated
   )
 
-  const runStatus = useRunStatus(runId)
-  const disableRecalibrate =
-    (runStatus != null && runStatus !== RUN_STATUS_IDLE) || !isDeckCalibrated
+  const runHasStarted = useRunHasStarted(runId)
+  const disableRecalibrate = runHasStarted || !isDeckCalibrated
 
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,

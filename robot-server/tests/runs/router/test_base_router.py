@@ -26,7 +26,7 @@ from robot_server.protocols import (
 
 from robot_server.runs.run_auto_deleter import RunAutoDeleter
 
-from robot_server.runs.run_models import Run, RunSummary, RunCreate, RunUpdate
+from robot_server.runs.run_models import Run, RunCreate, RunUpdate
 
 from robot_server.runs.engine_store import (
     EngineStore,
@@ -481,37 +481,52 @@ async def test_get_runs_not_empty(
         is_current=True,
     )
 
-    response_1 = RunSummary(
+    response_1 = Run(
         id="unique-id-1",
         protocolId=None,
         createdAt=created_at_1,
         status=pe_types.EngineStatus.SUCCEEDED,
         current=False,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
     )
 
-    response_2 = RunSummary(
+    response_2 = Run(
         id="unique-id-2",
         protocolId=None,
         createdAt=created_at_2,
         status=pe_types.EngineStatus.IDLE,
         current=True,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
     )
 
     decoy.when(mock_run_store.get_all()).then_return([run_1, run_2])
-
     engine_state_1 = decoy.mock(cls=StateView)
-    engine_state_2 = decoy.mock(cls=StateView)
-
-    decoy.when(mock_engine_store.get_state("unique-id-1")).then_return(engine_state_1)
-    decoy.when(mock_engine_store.get_state("unique-id-2")).then_return(engine_state_2)
-
+    decoy.when(engine_state_1.commands.get_all_errors()).then_return([])
+    decoy.when(engine_state_1.pipettes.get_all()).then_return([])
+    decoy.when(engine_state_1.labware.get_all()).then_return([])
+    decoy.when(engine_state_1.labware.get_labware_offsets()).then_return([])
     decoy.when(engine_state_1.commands.get_status()).then_return(
         pe_types.EngineStatus.SUCCEEDED
     )
-
+    engine_state_2 = decoy.mock(cls=StateView)
+    decoy.when(engine_state_2.commands.get_all_errors()).then_return([])
+    decoy.when(engine_state_2.pipettes.get_all()).then_return([])
+    decoy.when(engine_state_2.labware.get_all()).then_return([])
+    decoy.when(engine_state_2.labware.get_labware_offsets()).then_return([])
     decoy.when(engine_state_2.commands.get_status()).then_return(
         pe_types.EngineStatus.IDLE
     )
+
+    decoy.when(mock_engine_store.get_state("unique-id-1")).then_return(engine_state_1)
+    decoy.when(mock_engine_store.get_state("unique-id-2")).then_return(engine_state_2)
 
     result = await get_runs(run_store=mock_run_store, engine_store=mock_engine_store)
 
