@@ -204,151 +204,83 @@ async def test_get_historical_run(
     )
 
 
-# @pytest.fixture
-# def task_runner(decoy: Decoy) -> TaskRunner:
-#     """Get a mock background TaskRunner."""
-#     return decoy.mock(cls=TaskRunner)
+async def test_get_all_runs(
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
+    subject: RunDataManager,
+) -> None:
+    """It should get all runs, including current and historical."""
+    current_run_data = ProtocolRunData(
+        status=EngineStatus.IDLE,
+        errors=[],
+        labware=[],
+        labwareOffsets=[],
+        pipettes=[],
+        modules=[],
+    )
 
+    historical_run_data = ProtocolRunData(
+        status=EngineStatus.STOPPED,
+        errors=[],
+        labware=[],
+        labwareOffsets=[],
+        pipettes=[],
+        modules=[],
+    )
 
-# @pytest.fixture
-# def prev_run(decoy: Decoy, mock_run_store: RunStore) -> RunResource:
-#     """Get an existing run resource that's in the store."""
-#     run = RunResource(
-#         run_id="run-id",
-#         protocol_id=None,
-#         created_at=datetime(year=2021, month=1, day=1),
-#         actions=[],
-#         is_current=True,
-#     )
+    current_run_resource = RunResource(
+        run_id="current-run",
+        protocol_id=None,
+        created_at=datetime(year=2022, month=2, day=2),
+        actions=[],
+        is_current=True,
+    )
 
-#     decoy.when(mock_run_store.get(run_id="run-id")).then_return(run)
+    historical_run_resource = RunResource(
+        run_id="historical-run",
+        protocol_id=None,
+        created_at=datetime(year=2023, month=3, day=3),
+        actions=[],
+        is_current=True,
+    )
 
-#     return run
+    decoy.when(mock_engine_store.current_run_id).then_return("current-run")
+    decoy.when(mock_engine_store.engine.state_view.get_protocol_run_data()).then_return(
+        current_run_data
+    )
+    decoy.when(mock_run_store.get_run_data("historical-run")).then_return(
+        historical_run_data
+    )
+    decoy.when(mock_run_store.get_all()).then_return(
+        [historical_run_resource, current_run_resource]
+    )
 
+    result = subject.get_all()
 
-# async def test_create_play_action_to_start_run(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-#     prev_run: Run,
-#     task_runner: TaskRunner,
-# ) -> None:
-#     """It should handle a play action that start the runner."""
-#     action = RunAction(
-#         actionType=RunActionType.PLAY,
-#         createdAt=datetime(year=2022, month=2, day=2),
-#         id="action-id",
-#     )
-
-#     # decoy.when(mock_run_data_manager.runner.was_started()).then_return(False)
-#     decoy.when(mock_run_data_manager.get("run-id")).then_return(prev_run)
-#     result = await create_run_action(
-#         runId="run-id",
-#         request_body=RequestModel(data=RunActionCreate(actionType=RunActionType.PLAY)),
-#         run_data_manager=mock_run_data_manager,
-#         action_id="action-id",
-#         created_at=datetime(year=2022, month=2, day=2),
-#     )
-
-#     assert result.content.data == action
-#     assert result.status_code == 201
-
-#     # run_handler_captor = matchers.Captor()
-#     #
-#     # decoy.verify(
-#     #     task_runner.run(run_handler_captor),
-#     #     mock_run_data_manager.insert_action(run_id=prev_run.run_id, action=action),
-#     # )
-#     #
-#     # await run_handler_captor.value()
-#     #
-#     # decoy.verify(await mock_run_data_manager.runner.run(), times=1)
-
-
-# async def test_create_play_action_to_resume_run(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-#     prev_run: RunResource,
-# ) -> None:
-#     """It should handle a play action that resumes the runner."""
-#     action = RunAction(
-#         actionType=RunActionType.PLAY,
-#         createdAt=datetime(year=2022, month=2, day=2),
-#         id="action-id",
-#     )
-
-#     # decoy.when(mock_run_data_manager.runner.was_started()).then_return(True)
-
-#     result = await create_run_action(
-#         runId="run-id",
-#         request_body=RequestModel(data=RunActionCreate(actionType=RunActionType.PLAY)),
-#         run_data_manager=mock_run_data_manager,
-#         action_id="action-id",
-#         created_at=datetime(year=2022, month=2, day=2),
-#     )
-
-#     assert result.content.data == action
-#     assert result.status_code == 201
-
-#     # decoy.verify(
-#     #     mock_run_data_manager.runner.play(),
-#     #     mock_run_data_manager.insert_action(run_id=prev_run.run_id, action=action),
-#     # )
-
-
-# async def test_create_pause_action(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-#     prev_run: RunResource,
-# ) -> None:
-#     """It should handle a pause action."""
-#     action = RunAction(
-#         actionType=RunActionType.PAUSE,
-#         createdAt=datetime(year=2022, month=2, day=2),
-#         id="action-id",
-#     )
-
-#     result = await create_run_action(
-#         runId="run-id",
-#         request_body=RequestModel(data=RunActionCreate(actionType=RunActionType.PAUSE)),
-#         run_data_manager=mock_run_data_manager,
-#         action_id="action-id",
-#         created_at=datetime(year=2022, month=2, day=2),
-#     )
-
-#     assert result.content.data == action
-#     assert result.status_code == 201
-
-#     # decoy.verify(
-#     #     mock_engine_store.runner.pause(),
-#     #     mock_run_store.insert_action(run_id=prev_run.run_id, action=action),
-#     # )
-
-
-# async def test_create_stop_action(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-#     prev_run: RunResource,
-#     task_runner: TaskRunner,
-# ) -> None:
-#     """It should handle a stop action."""
-#     action = RunAction(
-#         actionType=RunActionType.STOP,
-#         createdAt=datetime(year=2022, month=2, day=2),
-#         id="action-id",
-#     )
-
-#     result = await create_run_action(
-#         runId="run-id",
-#         request_body=RequestModel(data=RunActionCreate(actionType=RunActionType.STOP)),
-#         run_data_manager=mock_run_data_manager,
-#         action_id="action-id",
-#         created_at=datetime(year=2022, month=2, day=2),
-#     )
-
-#     assert result.content.data == action
-#     assert result.status_code == 201
-
-#     # decoy.verify(
-#     #     task_runner.run(mock_engine_store.runner.stop),
-#     #     mock_run_store.insert_action(run_id=prev_run.run_id, action=action),
-#     # )
+    assert result == [
+        Run(
+            id=historical_run_resource.run_id,
+            protocolId=historical_run_resource.protocol_id,
+            createdAt=historical_run_resource.created_at,
+            current=historical_run_resource.is_current,
+            actions=historical_run_resource.actions,
+            status=historical_run_data.status,
+            errors=historical_run_data.errors,
+            labware=historical_run_data.labware,
+            labwareOffsets=historical_run_data.labwareOffsets,
+            pipettes=historical_run_data.pipettes,
+        ),
+        Run(
+            id=current_run_resource.run_id,
+            protocolId=current_run_resource.protocol_id,
+            createdAt=current_run_resource.created_at,
+            current=current_run_resource.is_current,
+            actions=current_run_resource.actions,
+            status=current_run_data.status,
+            errors=current_run_data.errors,
+            labware=current_run_data.labware,
+            labwareOffsets=current_run_data.labwareOffsets,
+            pipettes=current_run_data.pipettes,
+        ),
+    ]

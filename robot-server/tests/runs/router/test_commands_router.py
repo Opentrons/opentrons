@@ -2,15 +2,14 @@
 import pytest
 
 from datetime import datetime
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from opentrons.protocol_engine import (
-    EngineStatus,
     CommandSlice,
     CurrentCommand,
+    ProtocolEngine,
     commands as pe_commands,
     errors as pe_errors,
-    ProtocolEngine,
 )
 
 from robot_server.errors import ApiError
@@ -18,12 +17,11 @@ from robot_server.service.json_api import (
     RequestModel,
     MultiBodyMeta,
 )
-from robot_server.runs.run_models import (
-    Run,
-    RunCommandSummary,
-)
+
+from robot_server.runs.run_store import RunStore, RunNotFoundError, CommandNotFoundError
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_models import RunCommandSummary
 from robot_server.runs.router.commands_router import (
     CommandCollectionLinks,
     CommandLink,
@@ -35,8 +33,66 @@ from robot_server.runs.router.commands_router import (
 )
 
 
+async def test_get_current_run_engine_from_url(
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
+) -> None:
+    """Should get an instance of a run protocol engine."""
+    decoy.when(mock_run_store.has("run-id")).then_return(True)
+    decoy.when(mock_engine_store.current_run_id).then_return("run-id")
+
+    result = await get_current_run_engine_from_url(
+        runId="run-id",
+        engine_store=mock_engine_store,
+        run_store=mock_run_store,
+    )
+
+    assert result is mock_engine_store.engine
+
+
+async def test_get_current_run_engine_no_run(
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
+) -> None:
+    """It should 404 if the run is not in the store."""
+    decoy.when(mock_run_store.has("run-id")).then_return(False)
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_current_run_engine_from_url(
+            runId="run-id",
+            engine_store=mock_engine_store,
+            run_store=mock_run_store,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+
+
+async def test_get_current_run_engine_from_url_not_current(
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
+) -> None:
+    """It should 409 if you try to add commands to non-current run."""
+    decoy.when(mock_run_store.has("run-id")).then_return(True)
+    decoy.when(mock_engine_store.current_run_id).then_return("some-other-run-id")
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_current_run_engine_from_url(
+            runId="run-id",
+            engine_store=mock_engine_store,
+            run_store=mock_run_store,
+        )
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
+
+
 async def test_create_run_command(
-    decoy: Decoy, mock_protocol_engine: ProtocolEngine
+    decoy: Decoy,
+    mock_protocol_engine: ProtocolEngine,
 ) -> None:
     """It should add the requested command to the ProtocolEngine and return it."""
     command_request = pe_commands.PauseCreate(
@@ -68,44 +124,6 @@ async def test_create_run_command(
     assert result.content.data == command_once_added
     assert result.status_code == 201
     decoy.verify(await mock_protocol_engine.wait_for_command("command-id"), times=0)
-
-
-async def test_get_current_run_engine_from_url(
-    decoy: Decoy, mock_engine_store: EngineStore
-) -> None:
-    """Should get an instance of a run protocol engine."""
-    run = Run(
-        id="run-id",
-        protocolId=None,
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=EngineStatus.RUNNING,
-        current=True,
-        actions=[],
-        errors=[],
-        pipettes=[],
-        labware=[],
-        labwareOffsets=[],
-    )
-    decoy.when(mock_engine_store.current_run_id).then_return("run-id")
-    result = await get_current_run_engine_from_url(
-        runId="run-id", engine_store=mock_engine_store
-    )
-    assert isinstance(result, ProtocolEngine)
-
-
-async def test_get_current_run_engine_from_url_not_current(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-) -> None:
-    """It should 400 if you try to add commands to non-current run."""
-
-    with pytest.raises(ApiError) as exc_info:
-        await get_current_run_engine_from_url(
-            runId="run-id", engine_store=mock_engine_store
-        )
-
-    assert exc_info.value.status_code == 400
-    assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
 
 
 async def test_create_run_command_blocking_completion(
@@ -162,21 +180,10 @@ async def test_create_run_command_blocking_completion(
     assert result.status_code == 201
 
 
-async def test_get_run_commands(decoy: Decoy, mock_run_data_manager: RunDataManager) -> None:
+async def test_get_run_commands(
+    decoy: Decoy, mock_run_data_manager: RunDataManager
+) -> None:
     """It should return a list of all commands in a run."""
-    run = Run(
-        id="run-id",
-        protocolId=None,
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=EngineStatus.RUNNING,
-        current=True,
-        actions=[],
-        errors=[],
-        pipettes=[],
-        labware=[],
-        labwareOffsets=[],
-    )
-
     command = pe_commands.Pause(
         id="command-id",
         key="command-key",
@@ -193,7 +200,7 @@ async def test_get_run_commands(decoy: Decoy, mock_run_data_manager: RunDataMana
         ),
     )
 
-    decoy.when(mock_run_data_manager.get_current_command()).then_return(
+    decoy.when(mock_run_data_manager.get_current_command("run-id")).then_return(
         CurrentCommand(
             command_id="current-command-id",
             command_key="current-command-key",
@@ -201,12 +208,16 @@ async def test_get_run_commands(decoy: Decoy, mock_run_data_manager: RunDataMana
             index=101,
         )
     )
-    decoy.when(mock_run_data_manager.get_commands_slice(run_id=run.id, cursor=None, length=42)).then_return(
-        CommandSlice(commands=[command], cursor=1, total_length=3)
-    )
+    decoy.when(
+        mock_run_data_manager.get_commands_slice(
+            run_id="run-id",
+            cursor=None,
+            length=42,
+        )
+    ).then_return(CommandSlice(commands=[command], cursor=1, total_length=3))
 
     result = await get_run_commands(
-        run=run,
+        runId="run-id",
         run_data_manager=mock_run_data_manager,
         cursor=None,
         pageLength=42,
@@ -247,29 +258,17 @@ async def test_get_run_commands(decoy: Decoy, mock_run_data_manager: RunDataMana
 
 
 async def test_get_run_commands_empty(
-    decoy: Decoy, mock_run_data_manager: RunDataManager
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should return an empty commands list if no commands."""
-    run = Run(
-        id="run-id",
-        protocolId=None,
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=EngineStatus.RUNNING,
-        current=True,
-        actions=[],
-        errors=[],
-        pipettes=[],
-        labware=[],
-        labwareOffsets=[],
-    )
-
-    decoy.when(mock_run_data_manager.get_current_command()).then_return(None)
-    decoy.when(mock_run_data_manager.get_commands_slice(run_id=run.id, cursor=21, length=42)).then_return(
-        CommandSlice(commands=[], cursor=0, total_length=0)
-    )
+    decoy.when(mock_run_data_manager.get_current_command("run-id")).then_return(None)
+    decoy.when(
+        mock_run_data_manager.get_commands_slice(run_id="run-id", cursor=21, length=42)
+    ).then_return(CommandSlice(commands=[], cursor=0, total_length=0))
 
     result = await get_run_commands(
-        run=run,
+        runId="run-id",
         run_data_manager=mock_run_data_manager,
         cursor=21,
         pageLength=42,
@@ -281,9 +280,34 @@ async def test_get_run_commands_empty(
     assert result.status_code == 200
 
 
-async def test_get_run_command_by_id(
+async def test_get_run_commands_not_found(
     decoy: Decoy,
-    mock_run_data_manager: RunDataManager
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should 404 if the run is not found."""
+    not_found_error = RunNotFoundError("oh no")
+
+    decoy.when(
+        mock_run_data_manager.get_commands_slice(run_id="run-id", cursor=21, length=42)
+    ).then_raise(not_found_error)
+    decoy.when(mock_run_data_manager.get_current_command(run_id="run-id")).then_raise(
+        not_found_error
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_run_commands(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+            cursor=21,
+            pageLength=42,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+
+
+async def test_get_run_command_by_id(
+    decoy: Decoy, mock_run_data_manager: RunDataManager
 ) -> None:
     """It should return full details about a command by ID."""
     command = pe_commands.MoveToWell(
@@ -294,59 +318,45 @@ async def test_get_run_command_by_id(
         params=pe_commands.MoveToWellParams(pipetteId="a", labwareId="b", wellName="c"),
     )
 
-    run = Run(
-        id="run-id",
-        protocolId=None,
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=EngineStatus.RUNNING,
-        current=True,
-        actions=[],
-        errors=[],
-        pipettes=[],
-        labware=[],
-        labwareOffsets=[],
+    decoy.when(mock_run_data_manager.get_command("run-id", "command-id")).then_return(
+        command
     )
 
-    decoy.when(mock_run_data_manager.get_command(run.id, "command-id")).then_return(command)
-
     result = await get_run_command(
+        runId="run-id",
         commandId="command-id",
         run_data_manager=mock_run_data_manager,
-        run=run,
     )
 
     assert result.content.data == command
     assert result.status_code == 200
 
 
-async def test_get_run_command_missing_command(
+@pytest.mark.parametrize(
+    "exception",
+    [
+        CommandNotFoundError("oh no"),
+        RunNotFoundError("oh no"),
+    ],
+)
+async def test_get_run_command_missing(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    exception: Exception,
 ) -> None:
     """It should 404 if you attempt to get a non-existent command."""
-    key_error = pe_errors.CommandDoesNotExistError("oh no")
-
-    run = Run(
-        id="run-id",
-        protocolId=None,
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=EngineStatus.RUNNING,
-        current=True,
-        actions=[],
-        errors=[],
-        pipettes=[],
-        labware=[],
-        labwareOffsets=[],
-    )
-
-    decoy.when(mock_run_data_manager.get_command(run_id=run.id, command_id="command-id")).then_raise(key_error)
+    decoy.when(
+        mock_run_data_manager.get_command(run_id="run-id", command_id="command-id")
+    ).then_raise(exception)
 
     with pytest.raises(ApiError) as exc_info:
         await get_run_command(
+            runId="run-id",
             commandId="command-id",
             run_data_manager=mock_run_data_manager,
-            run=run,
         )
 
     assert exc_info.value.status_code == 404
-    assert exc_info.value.content["errors"][0]["detail"] == "oh no"
+    assert exc_info.value.content["errors"][0]["detail"] == matchers.StringMatching(
+        "oh no"
+    )

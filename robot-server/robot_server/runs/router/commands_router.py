@@ -7,30 +7,21 @@ from typing_extensions import Final, Literal
 from fastapi import APIRouter, Depends, Query, status
 from pydantic import BaseModel, Field
 
-from opentrons.protocol_engine import (
-    commands as pe_commands,
-    errors as pe_errors,
-    ProtocolEngine,
-)
-from robot_server.service.json_api import (
-    SimpleMultiBody,
-    MultiBodyMeta,
-    PydanticResponse,
-)
+from opentrons.protocol_engine import ProtocolEngine, commands as pe_commands
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
     MultiBody,
-    # MultiBodyMeta,
+    MultiBodyMeta,
     PydanticResponse,
 )
 
-from ..run_models import Run, RunCommandSummary
+from ..run_models import RunCommandSummary
 from ..run_data_manager import RunDataManager
 from ..engine_store import EngineStore
-from ..run_store import RunStore
+from ..run_store import RunStore, RunNotFoundError, CommandNotFoundError
 from ..dependencies import get_engine_store, get_run_data_manager, get_run_store
 from .base_router import RunNotFound, get_run_data_from_url, RunStopped
 
@@ -85,8 +76,9 @@ async def get_current_run_engine_from_url(
     """Get run protocol engine.
 
     Args:
-        runId: Run id to associate the command with.
-        engine_store: engine store to pull current run ProtocolEngine.
+        runId: Run ID to associate the command with.
+        engine_store: Engine store to pull current run ProtocolEngine.
+        run_store: Run data storage.
     """
     if not run_store.has(runId):
         raise RunNotFound(detail=f"Run {runId} not found.").as_error(
@@ -95,7 +87,7 @@ async def get_current_run_engine_from_url(
 
     if runId != engine_store.current_run_id:
         raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
-            status.HTTP_400_BAD_REQUEST
+            status.HTTP_409_CONFLICT
         )
 
     return engine_store.engine
@@ -111,8 +103,8 @@ async def get_current_run_engine_from_url(
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[pe_commands.Command]},
-        status.HTTP_400_BAD_REQUEST: {"model": ErrorBody[RunStopped]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
 async def create_run_command(
@@ -191,8 +183,7 @@ async def create_run_command(
     },
 )
 async def get_run_commands(
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
-    run: Run = Depends(get_run_data_from_url),
+    runId: str = Depends(get_run_data_from_url),
     cursor: Optional[int] = Query(
         None,
         description=(
@@ -205,18 +196,26 @@ async def get_run_commands(
         _DEFAULT_COMMAND_LIST_LENGTH,
         description="The maximum number of commands in the list to return.",
     ),
+    run_data_manager: RunDataManager = Depends(get_run_data_manager),
 ) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
-    """Get a summary of all commands in a run.
+    """Get a summary of a set of commands in a run.
 
     Arguments:
-        protocol_engine: Used to retrieve the `ProtocolEngine` on which the current run commands
-        exists.
-        run: Run response model, provided by the route handler for `GET /runs/{runId}`
+        runId: Requested run ID, from the URL
         cursor: Cursor index for the collection response.
         pageLength: Maximum number of items to return.
+        run_data_manager: Run data retrieval interface.
     """
-    command_slice = run_data_manager.get_commands_slice(run.id, cursor=cursor, length=pageLength)
-    current_command = run_data_manager.get_current_command()
+    try:
+        command_slice = run_data_manager.get_commands_slice(
+            run_id=runId,
+            cursor=cursor,
+            length=pageLength,
+        )
+        current_command = run_data_manager.get_current_command(run_id=runId)
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+
     data = [
         RunCommandSummary.construct(
             id=c.id,
@@ -241,9 +240,9 @@ async def get_run_commands(
 
     if current_command is not None:
         links.current = CommandLink(
-            href=f"/runs/{run.id}/commands/{current_command.command_id}",
+            href=f"/runs/{runId}/commands/{current_command.command_id}",
             meta=CommandLinkMeta(
-                runId=run.id,
+                runId=runId,
                 commandId=current_command.command_id,
                 index=current_command.index,
                 key=current_command.command_key,
@@ -272,23 +271,23 @@ async def get_run_commands(
     },
 )
 async def get_run_command(
+    runId: str,
     commandId: str,
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
-    run: Run = Depends(get_run_data_from_url),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Get a specific command from a run.
 
     Arguments:
+        runId: Run identifier, pulled from route parameter.
         commandId: Command identifier, pulled from route parameter.
-        engine_store: Protocol engine and runner storage.
-        run: Run response model, provided by the route handler for
-            `GET /run/{runId}`. Present to ensure 404 if run
-            not found.
+        run_data_manager: Run data retrieval.
     """
     try:
-        command = run_data_manager.get_command(run_id=run.id, command_id=commandId)
-    except pe_errors.CommandDoesNotExistError as e:
-        raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+        command = run_data_manager.get_command(run_id=runId, command_id=commandId)
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+    except CommandNotFoundError as e:
+        raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=command),

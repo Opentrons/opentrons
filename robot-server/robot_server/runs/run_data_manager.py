@@ -2,7 +2,13 @@
 from datetime import datetime
 from typing import List, Optional
 
-from opentrons.protocol_engine import LabwareOffsetCreate, ProtocolRunData, CommandSlice, CurrentCommand, Command
+from opentrons.protocol_engine import (
+    LabwareOffsetCreate,
+    ProtocolRunData,
+    CommandSlice,
+    CurrentCommand,
+    Command,
+)
 
 from robot_server.protocols import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
@@ -101,11 +107,7 @@ class RunDataManager:
             RunNotFoundError: The given run identifier does not exist.
         """
         run_resource = self._run_store.get(run_id)
-
-        if run_id == self._engine_store.current_run_id:
-            run_data = self._engine_store.engine.state_view.get_protocol_run_data()
-        else:
-            run_data = self._run_store.get_run_data(run_id)
+        run_data = self._get_run_data(run_id)
 
         return _build_run(run_resource, run_data)
 
@@ -115,7 +117,10 @@ class RunDataManager:
         Returns:
             All run resources.
         """
-        raise NotImplementedError("TODO")
+        return [
+            _build_run(run_resource, self._get_run_data(run_resource.run_id))
+            for run_resource in self._run_store.get_all()
+        ]
 
     async def delete(self, run_id: str) -> None:
         """Delete a current or historical run.
@@ -159,18 +164,58 @@ class RunDataManager:
         #             status.HTTP_409_CONFLICT
         #         )
 
-    def get_commands_slice(self, run_id: str, cursor: Optional[int], length: int,) -> CommandSlice:
-        """Get current command slice"""
+    def get_commands_slice(
+        self,
+        run_id: str,
+        cursor: Optional[int],
+        length: int,
+    ) -> CommandSlice:
+        """Get a slice of run commands.
+
+        Args:
+            run_id: ID of the run.
+            cursor: Requested index of first command in the returned slice.
+            length: Length of slice to return.
+
+        Raises:
+            RunNotFoundError: The given run identifier was not found in the database.
+        """
         raise NotImplementedError("TODO")
         # if self._engine_store.current_run_id == run_id:
         #     pass
         # else:
         #     # Let exception propagate
         #     commands = self._run_store.get_run_commands(run_id)
-        # return self._engine_store.engine.state_view.commnds.get_slice()
+        # return self._engine_store.engine.state_view.commands.get_slice()
 
     def get_current_command(self, run_id: str) -> Optional[CurrentCommand]:
+        """Get the currently executing command, if any.
+
+        Args:
+            run_id: ID of the run.
+
+        Raises:
+            RunNotFoundError: The given run identifier was not found in the database.
+        """
         raise NotImplementedError("TODO")
 
     def get_command(self, run_id: str, command_id: str) -> Command:
+        """Get a run's command by ID.
+
+        Args:
+            run_id: ID of the run.
+            command_id: ID of the command.
+
+        Raises:
+            RunNotFoundError: The given run identifier was not found.
+            CommandNotFoundError: The given command identifier was not found.
+        """
         raise NotImplementedError("TODO")
+
+    def _get_run_data(self, run_id: str) -> ProtocolRunData:
+        if run_id == self._engine_store.current_run_id:
+            run_data = self._engine_store.engine.state_view.get_protocol_run_data()
+        else:
+            run_data = self._run_store.get_run_data(run_id)
+
+        return run_data
