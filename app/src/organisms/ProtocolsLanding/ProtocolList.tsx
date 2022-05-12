@@ -65,7 +65,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         marginBottom={SPACING.spacing5}
       >
         <StyledText as="h1">{t('protocols')}</StyledText>
-        {/* TODO - Add text filter dropdown overflow menu component */}
         <Flex flexDirection={DIRECTION_ROW}>
           <Flex
             flexDirection={DIRECTION_ROW}

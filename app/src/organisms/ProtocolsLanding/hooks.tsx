@@ -8,14 +8,17 @@ export function useSortedProtocols(
   protocolData: StoredProtocolData[]
 ): StoredProtocolData[] {
   protocolData.sort((a, b) => {
-    const protocolNameA =
-      a.mostRecentAnalysis.metadata.protocolName != null
-        ? a.mostRecentAnalysis.metadata.protocolName
-        : getProtocolDisplayName(a.protocolKey, a.srcFileNames)
-    const protocolNameB =
-      b.mostRecentAnalysis.metadata.protocolName != null
-        ? b.mostRecentAnalysis.metadata.protocolName
-        : getProtocolDisplayName(b.protocolKey, b.srcFileNames)
+    const protocolNameA = getProtocolDisplayName(
+      a.protocolKey,
+      a.srcFileNames,
+      a.mostRecentAnalysis
+    )
+    const protocolNameB = getProtocolDisplayName(
+      b.protocolKey,
+      b.srcFileNames,
+      b.mostRecentAnalysis
+    )
+
     if (sortBy === 'alphabetical') {
       return protocolNameA.toLowerCase() > protocolNameB.toLowerCase() ? 1 : -1
     } else if (sortBy === 'reverse') {
