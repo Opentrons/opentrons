@@ -14,10 +14,11 @@ import { StyledText } from '../../atoms/text'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { formatTimestamp } from './utils'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
-import type { RunSummaryData } from '@opentrons/api-client'
+import { HistoricalRunOffsetDrawer as OffsetDrawer } from './HistoricalRunOffsetDrawer'
+import type { RunData } from '@opentrons/api-client'
 
 interface HistoricalProtocolRunProps {
-  run: RunSummaryData
+  run: RunData
   protocolName: string
   robotName: string
   robotIsBusy: boolean
@@ -31,7 +32,7 @@ export function HistoricalProtocolRun(
   const [offsetDrawerOpen, setOffsetDrawerOpen] = React.useState(false)
   const runStatus = useRunStatus(run.id)
   const runDisplayId = formatTimestamp(run.createdAt)
-  // add in format timestamp to format duration
+
   return (
     <>
       <Flex
@@ -71,11 +72,7 @@ export function HistoricalProtocolRun(
           robotIsBusy={robotIsBusy}
         />
       </Flex>
-      {offsetDrawerOpen && (
-        <Box padding={SPACING.spacing4} backgroundColor={COLORS.medGrey}>
-          LABWARE OFFSET DATA HERE
-        </Box>
-      )}
+      {offsetDrawerOpen && <OffsetDrawer run={run} />}
     </>
   )
 }
