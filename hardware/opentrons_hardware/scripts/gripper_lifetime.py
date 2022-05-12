@@ -125,7 +125,9 @@ async def run(args: argparse.Namespace) -> None:
     try:
         for i in range(reps):
             output_details(i, reps)
+            log.info(f"*********** Now executing round {i} / {reps}")
             await runner.run(can_messenger=messenger)
+            await asyncio.sleep(1.0)  # Change this value to adjust pause
     except asyncio.CancelledError:
         pass
     finally:
