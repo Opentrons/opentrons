@@ -28,8 +28,8 @@ def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
     """Return a set-up database to back the store."""
     db_file_path = tmp_path / "test.db"
     sql_engine = open_db_no_cleanup(db_file_path=db_file_path)
-    add_tables_to_db(sql_engine)
     try:
+        add_tables_to_db(sql_engine)
         yield sql_engine
     finally:
         sql_engine.dispose()

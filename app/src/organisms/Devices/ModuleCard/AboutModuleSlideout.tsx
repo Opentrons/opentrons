@@ -11,8 +11,11 @@ import {
   TEXT_DECORATION_UNDERLINE,
   Btn,
   ALIGN_START,
+  TEXT_TRANSFORM_CAPITALIZE,
+  COLORS,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
+import { PrimaryButton } from '../../../atoms/Buttons'
 import { StyledText } from '../../../atoms/text'
 import { Slideout } from '../../../atoms/Slideout'
 import { Banner } from '../../../atoms/Banner'
@@ -36,7 +39,7 @@ export const AboutModuleSlideout = (
   props: AboutModuleSlideoutProps
 ): JSX.Element | null => {
   const { module, isExpanded, onCloseClick, firmwareUpdateClick } = props
-  const { t } = useTranslation('device_details')
+  const { t } = useTranslation(['device_details', 'shared'])
   const moduleName = getModuleDisplayName(module.moduleModel)
   const runStatus = useCurrentRunStatus()
   const [showBanner, setShowBanner] = React.useState<boolean>(true)
@@ -53,6 +56,20 @@ export const AboutModuleSlideout = (
       title={t('about_module', { name: moduleName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
+      footer={
+        <PrimaryButton
+          width="100%"
+          onClick={onCloseClick}
+          data-testid={`AboutModuleSlideout_btn_${module.serialNumber}`}
+        >
+          <StyledText
+            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+          >
+            {t('shared:close')}
+          </StyledText>
+        </PrimaryButton>
+      }
     >
       {module.hasAvailableUpdate && !isDisabled && showBanner ? (
         <Flex paddingBottom={SPACING.spacing4}>
@@ -80,6 +97,7 @@ export const AboutModuleSlideout = (
           <Flex
             flexDirection={DIRECTION_COLUMN}
             data-testid={`alert_item_version_${module.moduleModel}`}
+            color={COLORS.darkGreyEnabled}
           >
             <StyledText as="h6">{t('current_version')}</StyledText>
             <StyledText as="p" paddingTop={SPACING.spacing2}>
@@ -91,6 +109,7 @@ export const AboutModuleSlideout = (
           paddingTop={SPACING.spacing4}
           as="h6"
           data-testid={`alert_item_serial_number_text_${module.moduleModel}`}
+          color={COLORS.darkBlack}
         >
           {t('serial_number')}
         </StyledText>

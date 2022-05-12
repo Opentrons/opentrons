@@ -68,7 +68,7 @@ async def test_sim_update(simulating_module):
 
     await simulating_module.deactivate()
     await simulating_module.wait_next_poll()
-    assert simulating_module.temperature == 0
+    assert simulating_module.temperature == 23
     assert simulating_module.speed == 0
     assert simulating_module.target_temperature is None
     assert simulating_module.target_speed is None
@@ -132,4 +132,39 @@ async def test_updated_live_data(simulating_module):
             "errorDetails": None,
         },
         "status": "running",
+    }
+
+
+async def test_deactivated_updated_live_data(simulating_module):
+    """Should update live data after module commands."""
+    await simulating_module.close_labware_latch()
+    await simulating_module.start_set_temperature(50)
+    await simulating_module.start_set_speed(100)
+    await simulating_module.wait_next_poll()
+    assert simulating_module.live_data == {
+        "data": {
+            "labwareLatchStatus": "idle_closed",
+            "speedStatus": "holding at target",
+            "temperatureStatus": "holding at target",
+            "currentSpeed": 100,
+            "currentTemp": 50,
+            "targetSpeed": 100,
+            "targetTemp": 50,
+            "errorDetails": None,
+        },
+        "status": "running",
+    }
+    await simulating_module.deactivate()
+    assert simulating_module.live_data == {
+        "data": {
+            "labwareLatchStatus": "idle_closed",
+            "speedStatus": "idle",
+            "temperatureStatus": "idle",
+            "currentSpeed": 0,
+            "currentTemp": 23,
+            "targetSpeed": None,
+            "targetTemp": None,
+            "errorDetails": None,
+        },
+        "status": "idle",
     }

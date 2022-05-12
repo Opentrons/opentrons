@@ -13,7 +13,7 @@ describe('KeyParts', () => {
   it('renders correct title, image and body', () => {
     const { getByText, getByAltText, getByTestId } = render()
 
-    getByText('Key Heater Shaker parts and terminology')
+    getByText('Key Heater-Shaker parts and terminology')
     getByText(
       nestedTextMatcher(
         'Orient the module so its power ports face away from you.'
