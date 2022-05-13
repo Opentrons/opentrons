@@ -579,9 +579,9 @@ class TipActionResponse:  # noqa: D101
 
 
 @dataclass
-class PeripheralInfoRequest:  # noqa: D101
-    payload: payloads.PeripheralInfoRequestPayload
-    payload_type: Type[BinarySerializable] = payloads.PeripheralInfoRequestPayload
+class PeripheralStatusRequest:  # noqa: D101
+    payload: payloads.PeripheralStatusRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.PeripheralStatusRequestPayload
     message_id: Literal[
         MessageId.peripheral_info_request
     ] = MessageId.peripheral_info_request

@@ -8,6 +8,7 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
 )
 from opentrons_hardware.firmware_bindings.utils.binary_serializable import (
     Int32Field,
+    UInt8Field,
 )
 
 sensor_fixed_point_conversion: Final[float] = 2**16
@@ -32,6 +33,11 @@ class SensorDataType:
 
     @overload
     @classmethod
+    def build(cls, data: UInt8Field) -> "SensorDataType":
+        ...
+
+    @overload
+    @classmethod
     def build(cls, data: List[int]) -> "SensorDataType":
         ...
 
@@ -46,6 +52,8 @@ class SensorDataType:
         if isinstance(data, list):
             backing = Int32Field(cls._convert_to_int(data))
         elif isinstance(data, Int32Field):
+            backing = data
+        elif isinstance(data, UInt8Field):
             backing = data
         else:
             backing = Int32Field(data)
