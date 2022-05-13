@@ -56,18 +56,6 @@ async def test_archives_state_if_engine_already_exists(subject: EngineStore) -> 
     """It should not create more than one engine / runner pair."""
     await subject.create(run_id="run-id-1", labware_offsets=[])
 
-    # should not raise
-    result = await subject.create(run_id="run-id-2", labware_offsets=[])
-
-    assert subject.current_run_id == "run-id-2"
-    assert isinstance(result, ProtocolRunData)
-
-
-async def test_cannot_create_engine_if_active(subject: EngineStore) -> None:
-    """It should not create a new engine if the existing one is active."""
-    await subject.create(run_id="run-id-1", labware_offsets=[])
-    subject.runner.play()
-
     with pytest.raises(EngineConflictError):
         await subject.create(run_id="run-id-2", labware_offsets=[])
 

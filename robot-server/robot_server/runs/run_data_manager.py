@@ -95,6 +95,15 @@ class RunDataManager:
             EngineConflictError: There is a currently active run that cannot
                 be superceded by this new run.
         """
+        prev_run_id = self._engine_store.current_run_id
+        if prev_run_id is not None:
+            prev_run_result = await self._engine_store.clear()
+            self._run_store.update_run_state(
+                run_id=prev_run_id,
+                run_data=prev_run_result.data,
+                commands=prev_run_result.commands,
+            )
+
         run_data = await self._engine_store.create(
             run_id=run_id,
             labware_offsets=labware_offsets,

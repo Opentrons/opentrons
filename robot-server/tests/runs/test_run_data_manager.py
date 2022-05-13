@@ -23,7 +23,9 @@ from robot_server.service.task_runner import TaskRunner
 @pytest.fixture
 def mock_engine_store(decoy: Decoy) -> EngineStore:
     """Get a mock EngineStore."""
-    return decoy.mock(cls=EngineStore)
+    mock = decoy.mock(cls=EngineStore)
+    decoy.when(mock.current_run_id).then_return(None)
+    return mock
 
 
 @pytest.fixture
@@ -525,3 +527,49 @@ async def test_update_current_not_allowed(
 
     with pytest.raises(RunNotCurrentError):
         await subject.update(run_id=run_id, current=False)
+
+
+async def test_create_archives_existing(
+    decoy: Decoy,
+    protocol_run_data: ProtocolRunData,
+    run_resource: RunResource,
+    run_command: commands.Command,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
+    subject: RunDataManager,
+) -> None:
+    """It should persist the previously current run when a new run is created."""
+    run_id_old = "hello world"
+    run_id_new = "hello is it me you're looking for"
+
+    decoy.when(mock_engine_store.current_run_id).then_return(run_id_old)
+    decoy.when(await mock_engine_store.clear()).then_return(
+        ProtocolRunResult(commands=[run_command], data=protocol_run_data)
+    )
+
+    decoy.when(
+        await mock_engine_store.create(run_id=run_id_new, labware_offsets=[])
+    ).then_return(protocol_run_data)
+
+    decoy.when(
+        mock_run_store.insert(
+            run_id=run_id_new,
+            created_at=datetime(year=2021, month=1, day=1),
+            protocol_id=None,
+        )
+    ).then_return(run_resource)
+
+    await subject.create(
+        run_id=run_id_new,
+        created_at=datetime(year=2021, month=1, day=1),
+        labware_offsets=[],
+        protocol=None,
+    )
+
+    decoy.verify(
+        mock_run_store.update_run_state(
+            run_id=run_id_old,
+            run_data=protocol_run_data,
+            commands=[run_command],
+        )
+    )

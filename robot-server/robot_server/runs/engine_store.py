@@ -27,9 +27,6 @@ class RunnerEnginePair(NamedTuple):
     engine: ProtocolEngine
 
 
-# TODO (tz, 2022-04-28) change name after storing it all in the DB.
-#  check if this is even needed after Db access
-# TODO(mc, 2021-05-28): evaluate multi-engine logic, which this does not support
 class EngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
@@ -104,11 +101,11 @@ class EngineStore:
             a new set may not be created.
         """
         engine = await create_protocol_engine(hardware_api=self._hardware_api)
+        runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)
 
         if self._runner_engine_pair is not None:
-            await self.clear()
+            raise EngineConflictError("Another run is currently active.")
 
-        runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)
         for offset in labware_offsets:
             engine.add_labware_offset(offset)
 
