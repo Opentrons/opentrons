@@ -110,7 +110,7 @@ async def test_create(
     created_at = datetime(year=2021, month=1, day=1)
 
     decoy.when(
-        await mock_engine_store.create(run_id=run_id, labware_offsets=[])
+        await mock_engine_store.create(run_id=run_id, labware_offsets=[], protocol=None)
     ).then_return(protocol_run_data)
     decoy.when(
         mock_run_store.insert(
@@ -167,7 +167,11 @@ async def test_create_with_options(
     )
 
     decoy.when(
-        await mock_engine_store.create(run_id=run_id, labware_offsets=[labware_offset])
+        await mock_engine_store.create(
+            run_id=run_id,
+            labware_offsets=[labware_offset],
+            protocol=protocol,
+        )
     ).then_return(protocol_run_data)
 
     decoy.when(
@@ -209,9 +213,9 @@ async def test_create_engine_error(
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
 
-    decoy.when(await mock_engine_store.create(run_id, labware_offsets=[])).then_raise(
-        EngineConflictError("oh no")
-    )
+    decoy.when(
+        await mock_engine_store.create(run_id, labware_offsets=[], protocol=None)
+    ).then_raise(EngineConflictError("oh no"))
 
     with pytest.raises(EngineConflictError):
         await subject.create(
@@ -555,7 +559,11 @@ async def test_create_archives_existing(
     )
 
     decoy.when(
-        await mock_engine_store.create(run_id=run_id_new, labware_offsets=[])
+        await mock_engine_store.create(
+            run_id=run_id_new,
+            labware_offsets=[],
+            protocol=None,
+        )
     ).then_return(protocol_run_data)
 
     decoy.when(

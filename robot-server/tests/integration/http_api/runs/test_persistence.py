@@ -58,7 +58,10 @@ async def test_runs_persist(client_and_server: ClientServerFixture) -> None:
     assert get_run_response.json()["data"] == expected_run
 
     # persist the run by setting current: false
-    await client.patch_run(run_id=run_id, req_body={"data": {"current": False}})
+    archive_run_response = await client.patch_run(
+        run_id=run_id, req_body={"data": {"current": False}}
+    )
+    expected_run = archive_run_response.json()["data"]
 
     # reboot the server
     await client_and_server.restart()
@@ -67,14 +70,7 @@ async def test_runs_persist(client_and_server: ClientServerFixture) -> None:
     get_all_persisted_runs_response = await client.get_runs()
     get_persisted_run_response = await client.get_run(run_id)
 
-    # ensure the fetched resources still match the originally created ones
-    # even through the server reboot
-    expected_run = dict(
-        expected_run,
-        status="stopped",
-        current=False,
-    )
-
+    # ensure the fetched resources still match the originally runs
     assert get_all_persisted_runs_response.json()["data"] == [expected_run]
     assert get_persisted_run_response.json()["data"] == expected_run
 
@@ -117,12 +113,11 @@ async def test_run_actions_labware_offsets_persist(
         req_body={"data": {"actionType": "stop"}},
     )
 
-    # fetch the run with the actions and offsets added
-    get_run_response = await client.get_run(run_id=run_id)
-    expected_run = get_run_response.json()["data"]
-
     # persist the run by setting current: false
-    await client.patch_run(run_id=run_id, req_body={"data": {"current": False}})
+    archive_run_response = await client.patch_run(
+        run_id=run_id, req_body={"data": {"current": False}}
+    )
+    expected_run = archive_run_response.json()["data"]
 
     # reboot the server
     await client_and_server.restart()
@@ -132,17 +127,10 @@ async def test_run_actions_labware_offsets_persist(
     get_persisted_run_response = await client.get_run(run_id)
 
     # ensure the persisted run matches the original
-    expected_run = dict(
-        expected_run,
-        status="stopped",
-        current=False,
-    )
-
     assert get_all_persisted_runs_response.json()["data"] == [expected_run]
     assert get_persisted_run_response.json()["data"] == expected_run
 
 
-@pytest.mark.xfail(strict=True)
 async def test_run_commands_persist(client_and_server: ClientServerFixture) -> None:
     """Test that run commands are persisted through restart."""
     client, server = client_and_server

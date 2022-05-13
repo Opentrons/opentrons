@@ -23,7 +23,7 @@ from ..run_data_manager import RunDataManager
 from ..engine_store import EngineStore
 from ..run_store import RunStore, RunNotFoundError, CommandNotFoundError
 from ..dependencies import get_engine_store, get_run_data_manager, get_run_store
-from .base_router import RunNotFound, get_run_data_from_url, RunStopped
+from .base_router import RunNotFound, RunStopped
 
 
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
@@ -183,7 +183,7 @@ async def create_run_command(
     },
 )
 async def get_run_commands(
-    runId: str = Depends(get_run_data_from_url),
+    runId: str,
     cursor: Optional[int] = Query(
         None,
         description=(
@@ -214,6 +214,7 @@ async def get_run_commands(
         )
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+
     current_command = run_data_manager.get_current_command(run_id=runId)
 
     data = [

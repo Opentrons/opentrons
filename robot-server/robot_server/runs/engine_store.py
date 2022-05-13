@@ -11,6 +11,9 @@ from opentrons.protocol_engine import (
 )
 
 
+from robot_server.protocols import ProtocolResource
+
+
 class EngineConflictError(RuntimeError):
     """An error raised if an active engine is already initialized.
 
@@ -86,12 +89,14 @@ class EngineStore:
         self,
         run_id: str,
         labware_offsets: List[LabwareOffsetCreate],
+        protocol: Optional[ProtocolResource],
     ) -> ProtocolRunData:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
         Args:
             run_id: The run resource the engine is assigned to.
             labware_offsets: Labware offsets to create the engine with.
+            protocol: The protocol to load the runner with, if any.
 
         Returns:
             The initial equipment and status summary of the engine.
@@ -105,6 +110,9 @@ class EngineStore:
 
         if self._runner_engine_pair is not None:
             raise EngineConflictError("Another run is currently active.")
+
+        if protocol is not None:
+            runner.load(protocol.source)
 
         for offset in labware_offsets:
             engine.add_labware_offset(offset)

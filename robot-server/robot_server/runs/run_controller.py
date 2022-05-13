@@ -3,7 +3,6 @@ import logging
 from datetime import datetime
 
 from opentrons.protocol_engine import ProtocolEngineError
-from opentrons.protocol_runner import PlayType
 
 from robot_server.service.task_runner import TaskRunner
 
@@ -62,13 +61,15 @@ class RunController:
 
         try:
             if action_type == RunActionType.PLAY:
-                play_type = self._engine_store.runner.play()
-
-                if play_type == PlayType.START:
-                    log.info(f'Starting run "{self._run_id}".')
-                    self._task_runner.run(self._run_protocol_and_insert_result)
-                else:
+                if self._engine_store.runner.was_started():
                     log.info(f'Resuming run "{self._run_id}".')
+                    self._engine_store.runner.play()
+                else:
+                    log.info(f'Starting run "{self._run_id}".')
+                    # TODO(mc, 2022-05-13): engine_store.runner.run could raise
+                    # the same errors as runner.play, but we are unable to catch them.
+                    # This unlikely to occur in production, but should be addressed.
+                    self._task_runner.run(self._run_protocol_and_insert_result)
 
             elif action_type == RunActionType.PAUSE:
                 log.info(f'Pausing run "{self._run_id}".')

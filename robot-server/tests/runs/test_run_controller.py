@@ -11,7 +11,7 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
     errors as pe_errors,
 )
-from opentrons.protocol_runner import PlayType, ProtocolRunResult
+from opentrons.protocol_runner import ProtocolRunResult
 
 from robot_server.service.task_runner import TaskRunner
 from robot_server.runs.action_models import RunAction, RunActionType
@@ -93,6 +93,8 @@ async def test_create_play_action_to_resume(
     subject: RunController,
 ) -> None:
     """It should resume a run."""
+    decoy.when(mock_engine_store.runner.was_started()).then_return(True)
+
     result = subject.create_action(
         action_id="some-action-id",
         action_type=RunActionType.PLAY,
@@ -121,7 +123,7 @@ async def test_create_play_action_to_start(
     subject: RunController,
 ) -> None:
     """It should start a run."""
-    decoy.when(mock_engine_store.runner.play()).then_return(PlayType.START)
+    decoy.when(mock_engine_store.runner.was_started()).then_return(False)
 
     result = subject.create_action(
         action_id="some-action-id",
@@ -227,6 +229,7 @@ async def test_action_not_allowed(
     exception: Exception,
 ) -> None:
     """It should raise a RunActionNotAllowedError if a play/pause action is rejected."""
+    decoy.when(mock_engine_store.runner.was_started()).then_return(True)
     decoy.when(mock_engine_store.runner.play()).then_raise(exception)
     decoy.when(mock_engine_store.runner.pause()).then_raise(exception)
 

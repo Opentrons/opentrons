@@ -108,6 +108,7 @@ class RunDataManager:
         run_data = await self._engine_store.create(
             run_id=run_id,
             labware_offsets=labware_offsets,
+            protocol=protocol,
         )
         run_resource = self._run_store.insert(
             run_id=run_id,
@@ -223,10 +224,12 @@ class RunDataManager:
         Raises:
             RunNotFoundError: The given run identifier was not found in the database.
         """
-        if self._engine_store.current_run_id == run_id:
-            return self._engine_store.engine.state_view.commands.get_slice(
+        if run_id == self._engine_store.current_run_id:
+            the_slice = self._engine_store.engine.state_view.commands.get_slice(
                 cursor=cursor, length=length
             )
+            return the_slice
+
         # Let exception propagate
         return self._run_store.get_commands_slice(
             run_id=run_id, cursor=cursor, length=length

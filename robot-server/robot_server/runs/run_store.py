@@ -274,10 +274,7 @@ class RunStore:
         self, cursor: Optional[int], length: int, run_id: str
     ) -> CommandSlice:
         """Get run commands slice from db."""
-        print("get_commands_slice")
         commands = self.get_run_commands(run_id=run_id)
-        print("commands slice")
-        print(commands)
         commands_length = len(commands)
         if cursor is None:
             cursor = commands_length - length
@@ -293,10 +290,8 @@ class RunStore:
 
     def get_command(self, run_id: str, command_id: str) -> Command:
         """Get run command by id."""
-        select_run_commands = (
-            sqlalchemy.select(run_table.c.commands)
-            .where(run_table.c.id == run_id)
-            .where(run_table.c.id == run_id)
+        select_run_commands = sqlalchemy.select(run_table.c.commands).where(
+            run_table.c.id == run_id
         )
         with self._sql_engine.begin() as transaction:
             try:
@@ -304,9 +299,10 @@ class RunStore:
             except sqlalchemy.exc.NoResultFound:
                 raise RunNotFoundError(run_id=run_id)
             try:
-                command = next(filter(lambda x: x["id"] == command_id, row.commands))
+                command = next(c for c in row.commands if c["id"] == command_id)
             except StopIteration:
                 raise CommandNotFoundError(command_id=command_id)
+
             return parse_obj_as(Command, command)  # type: ignore[arg-type]
 
     def remove(self, run_id: str) -> None:

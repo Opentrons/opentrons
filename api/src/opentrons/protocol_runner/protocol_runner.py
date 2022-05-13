@@ -1,5 +1,4 @@
 """Protocol run control and management."""
-from enum import Enum
 from typing import List, NamedTuple, Optional, cast
 
 from opentrons.hardware_control import HardwareControlAPI, ThreadManagedHardware
@@ -25,18 +24,6 @@ from .legacy_wrappers import (
     LegacyContextCreator,
     LegacyExecutor,
 )
-
-
-class PlayType(str, Enum):
-    """When issuing a `play`, what kind of action was taken.
-
-    Properties:
-        START: the run was not started, so this was the first "play".
-        RESUME: the run was already going, so this play "resumed" the run.
-    """
-
-    START = "start"
-    RESUME = "resume"
 
 
 class ProtocolRunResult(NamedTuple):
@@ -135,12 +122,10 @@ class ProtocolRunner:
             else:
                 self._load_legacy(protocol_source)
 
-    def play(self) -> PlayType:
+    def play(self) -> None:
         """Start or resume the run."""
-        play_type = PlayType.RESUME if self._was_started else PlayType.START
         self._was_started = True
         self._protocol_engine.play()
-        return play_type
 
     def pause(self) -> None:
         """Pause the run."""
@@ -166,9 +151,7 @@ class ProtocolRunner:
         if protocol_source:
             self.load(protocol_source)
 
-        if not self._was_started:
-            self.play()
-
+        self.play()
         self._task_queue.start()
         await self._task_queue.join()
 
