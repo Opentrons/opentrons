@@ -589,7 +589,6 @@ def test_get_commands_slice_from_db(
     run_command: commands.Command,
 ) -> None:
     """Should get a sliced command list from run store."""
-
     expected_commands_result = [
         commands.Pause(
             id="command-id-2",
@@ -605,7 +604,9 @@ def test_get_commands_slice_from_db(
         commands=expected_commands_result, cursor=1, total_length=3
     )
 
-    decoy.when(mock_run_store.get_commands_slice(run_id="run_id", cursor=1, length=2)).then_return(expected_command_slice)
+    decoy.when(
+        mock_run_store.get_commands_slice(run_id="run_id", cursor=1, length=2)
+    ).then_return(expected_command_slice)
     result = subject.get_commands_slice(run_id="run_id", cursor=1, length=2)
 
     assert expected_command_slice == result
@@ -633,9 +634,9 @@ def test_get_commands_slice_current_run(
         commands=expected_commands_result, cursor=1, total_length=3
     )
     decoy.when(mock_engine_store.current_run_id).then_return("run-id")
-    decoy.when(mock_engine_store.engine.state_view.commands.get_slice(1, 2)).then_return(
-        expected_command_slice
-    )
+    decoy.when(
+        mock_engine_store.engine.state_view.commands.get_slice(1, 2)
+    ).then_return(expected_command_slice)
 
     result = subject.get_commands_slice("run-id", 1, 2)
 
