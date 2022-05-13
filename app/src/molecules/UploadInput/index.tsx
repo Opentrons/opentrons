@@ -54,7 +54,6 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
     e.preventDefault()
     e.stopPropagation()
     const { files = [] } = 'dataTransfer' in e ? e.dataTransfer : {}
-    console.log('files', files[0])
     props.onUpload(files[0])
     setIsFileOverDropZone(false)
   }

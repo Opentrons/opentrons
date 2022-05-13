@@ -1,5 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
+import omit from 'lodash/omit'
 import { isEmpty, startCase } from 'lodash'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
@@ -127,19 +128,11 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
     protocolType: string
   ): string | JSX.Element => {
     if (protocolType === 'json') {
-      return description
+      return <StyledText as="p">{description}</StyledText>
     } else {
-      const filteredMetaData = Object.entries(metadata)
-        .map(e => ({
-          [e[0]]: e[1],
-        }))
-        .filter(
-          item =>
-            Object.keys(item)[0] !== 'protocolName' &&
-            Object.keys(item)[0] !== 'author' &&
-            Object.keys(item)[0] !== 'apiLevel' &&
-            Object.keys(item)[0] !== 'description'
-        )
+      const filteredMetaData = Object.entries(
+        omit(metadata, ['description', 'protocolName', 'author', 'apiLevel'])
+      ).map(item => ({ label: item[0], value: item[1] }))
 
       return (
         <Flex
@@ -148,14 +141,14 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
           data-testid={`ProtocolDetails_description`}
         >
           {description}
-          {filteredMetaData.map(item => {
+          {filteredMetaData.map((item, index) => {
             return (
-              <>
+              <React.Fragment key={index}>
                 <StyledText as="h6" marginTop={SPACING.spacing3}>
-                  {startCase(Object.keys(item)[0])}
+                  {startCase(item.label)}
                 </StyledText>
-                <StyledText as="p">{item[Object.keys(item)[0]]}</StyledText>
-              </>
+                <StyledText as="p">{item.value}</StyledText>
+              </React.Fragment>
             )
           })}
         </Flex>
@@ -165,9 +158,11 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      {isReadMore
-        ? description.slice(0, 160)
-        : getMetadataDetails(description, protocolType)}
+      {isReadMore ? (
+        <StyledText as="p">{description.slice(0, 160)}</StyledText>
+      ) : (
+        getMetadataDetails(description, protocolType)
+      )}
       {(description.length > 160 || protocolType === 'python') && (
         <Link
           role="button"
@@ -233,7 +228,7 @@ export function ProtocolDetails(
       })
     } else {
       return t('python_api_version', {
-        version: config.apiVersion.toString().replace(',', '.'),
+        version: config.apiVersion?.join('.'),
       })
     }
   }
@@ -244,8 +239,9 @@ export function ProtocolDetails(
     ? t('shared:no_data')
     : mostRecentAnalysis.metadata.author
   const lastAnalyzed =
-    format(new Date(mostRecentAnalysis.createdAt), 'MMMM dd, yyyy HH:mm') ??
-    t('shared:no_data')
+    mostRecentAnalysis.createdAt != null
+      ? format(new Date(mostRecentAnalysis.createdAt), 'MMMM dd, yyyy HH:mm')
+      : t('shared:no_data')
 
   const getTabContents = (): JSX.Element =>
     currentTab === 'labware' ? (
@@ -367,16 +363,14 @@ export function ProtocolDetails(
             data-testid={`ProtocolDetails_description`}
           >
             <StyledText as="h6">{t('description')}</StyledText>
-            <StyledText as="p">
-              {analysisStatus === 'loading' ? (
-                t('shared:loading')
-              ) : (
-                <ReadMoreContent
-                  metadata={mostRecentAnalysis.metadata}
-                  protocolType={mostRecentAnalysis.config.protocolType}
-                />
-              )}
-            </StyledText>
+            {analysisStatus === 'loading' ? (
+              <StyledText as="p">{t('shared:loading')}</StyledText>
+            ) : (
+              <ReadMoreContent
+                metadata={mostRecentAnalysis.metadata}
+                protocolType={mostRecentAnalysis.config.protocolType}
+              />
+            )}
           </Flex>
         </Flex>
       </Card>
