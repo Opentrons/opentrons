@@ -235,9 +235,6 @@ class RunDataManager:
 
         Args:
             run_id: ID of the run.
-
-        Raises:
-            RunNotFoundError: The given run identifier was not found in the database.
         """
         if self._engine_store.current_run_id == run_id:
             return self._engine_store.engine.state_view.commands.get_current()
