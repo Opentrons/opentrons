@@ -1,6 +1,6 @@
 """Utilities for calculating motion correctly."""
 
-from typing import Callable, Dict, Union, overload, Type, Tuple, List
+from typing import Callable, Dict, Union, overload, Type
 from collections import OrderedDict
 from opentrons.types import Mount, Point
 from opentrons.calibration_storage.types import AttitudeMatrix
