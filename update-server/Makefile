@@ -25,6 +25,7 @@ br_ssh_opts ?= $(default_ssh_opts)
 .PHONY: setup
 setup:
 	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip freeze
 
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true

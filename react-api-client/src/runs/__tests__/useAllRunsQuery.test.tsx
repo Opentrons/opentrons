@@ -7,7 +7,7 @@ import { useHost } from '../../api'
 import { useAllRunsQuery } from '..'
 import { mockRunsResponse } from '../__fixtures__'
 
-import type { HostConfig, Response, RunSummaries } from '@opentrons/api-client'
+import type { HostConfig, Response, Runs } from '@opentrons/api-client'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
@@ -52,7 +52,7 @@ describe('useAllRunsQuery hook', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetRuns)
       .calledWith(HOST_CONFIG)
-      .mockResolvedValue({ data: mockRunsResponse } as Response<RunSummaries>)
+      .mockResolvedValue({ data: mockRunsResponse } as Response<Runs>)
 
     const { result, waitFor } = renderHook(useAllRunsQuery, { wrapper })
 

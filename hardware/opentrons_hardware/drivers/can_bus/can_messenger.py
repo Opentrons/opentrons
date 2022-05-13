@@ -71,6 +71,17 @@ class CanMessenger:
             message=CanMessage(arbitration_id=arbitration_id, data=data)
         )
 
+    async def __aenter__(self) -> CanMessenger:
+        """Start messenger."""
+        self.start()
+        return self
+
+    async def __aexit__(
+        self, exc_type: type, exc_val: BaseException, exc_tb: Traceback
+    ) -> None:
+        """Stop messenger."""
+        await self.stop()
+
     def start(self) -> None:
         """Start the reader task."""
         if self._task:

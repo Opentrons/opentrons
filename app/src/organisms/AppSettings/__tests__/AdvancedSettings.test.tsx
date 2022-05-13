@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
@@ -48,6 +49,14 @@ const mockGetU2EWindowsDriverStatus = SystemInfo.getU2EWindowsDriverStatus as je
 
 const mockGetIsHeaterShakerAttached = Config.getIsHeaterShakerAttached as jest.MockedFunction<
   typeof Config.getIsHeaterShakerAttached
+>
+
+const mockGetPathToPythonOverride = Config.getPathToPythonOverride as jest.MockedFunction<
+  typeof Config.getPathToPythonOverride
+>
+
+const mockOpenPythonInterpreterDirectory = Config.openPythonInterpreterDirectory as jest.MockedFunction<
+  typeof Config.openPythonInterpreterDirectory
 >
 
 describe('AdvancedSettings', () => {
@@ -218,6 +227,38 @@ describe('AdvancedSettings', () => {
       name: 'show_heater_shaker_modal',
     })
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+  })
+
+  it('renders the path to python override text and button with no default path', () => {
+    mockGetPathToPythonOverride.mockReturnValue(null)
+    const [{ getByText, getByRole, getByTestId }] = render()
+    getByText('Override Path to Python')
+    getByText(
+      'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
+    )
+    getByText('override path')
+    getByText('No path specified')
+    const button = getByRole('button', { name: 'Add override path' })
+    const input = getByTestId('AdvancedSetting_pythonPathDirectoryInput')
+    input.click = jest.fn()
+    fireEvent.click(button)
+    expect(input.click).toHaveBeenCalled()
+  })
+
+  it('renders the path to python override text and button with a selected path', () => {
+    mockGetPathToPythonOverride.mockReturnValue('otherPath')
+    const [{ getByText, getByRole }] = render()
+    getByText('Override Path to Python')
+    getByText(
+      'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
+    )
+    getByText('override path')
+    const specifiedPath = getByText('otherPath')
+    const button = getByRole('button', { name: 'Reset to default' })
+    fireEvent.click(button)
+    expect(mockGetPathToPythonOverride).toHaveBeenCalled()
+    fireEvent.click(specifiedPath)
+    expect(mockOpenPythonInterpreterDirectory).toHaveBeenCalled()
   })
 
   it('renders the clear unavailable robots section', () => {
