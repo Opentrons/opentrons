@@ -4,6 +4,7 @@ Contains routes dealing primarily with `Run` models.
 """
 import logging
 from datetime import datetime
+from textwrap import dedent
 from typing import Optional, Union
 from typing_extensions import Literal
 
@@ -31,10 +32,11 @@ from robot_server.protocols import (
     get_protocol_store,
 )
 
+from ..run_auto_deleter import RunAutoDeleter
 from ..run_store import RunStore, RunResource, RunNotFoundError
 from ..run_models import Run, RunCreate, RunUpdate
 from ..engine_store import EngineStore, EngineConflictError, EngineMissingError
-from ..dependencies import get_run_store, get_engine_store
+from ..dependencies import get_run_auto_deleter, get_run_store, get_engine_store
 
 
 log = logging.getLogger(__name__)
@@ -118,7 +120,14 @@ async def get_run_data_from_url(
 @base_router.post(  # noqa: C901
     path="/runs",
     summary="Create a run",
-    description="Create a new run to track robot interaction.",
+    description=dedent(
+        """
+        Create a new run to track robot interaction.
+
+        When too many runs already exist, old ones will be automatically deleted
+        to make room for the new one.
+        """
+    ),
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
@@ -134,6 +143,7 @@ async def create_run(
     run_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     task_runner: TaskRunner = Depends(get_task_runner),
+    run_auto_deleter: RunAutoDeleter = Depends(get_run_auto_deleter),
 ) -> PydanticResponse[SimpleBody[Run]]:
     """Create a new run.
 
@@ -145,6 +155,8 @@ async def create_run(
         run_id: Generated ID to assign to the run.
         created_at: Timestamp to attach to created run.
         task_runner: Background task runner.
+        run_auto_deleter: An interface to delete old resources to make room for
+            the new run.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
     protocol_resource = None
@@ -166,6 +178,8 @@ async def create_run(
 
     if protocol_resource is not None:
         engine_store.runner.load(protocol_resource.source)
+
+    run_auto_deleter.make_room_for_new_run()
 
     run = RunResource(
         run_id=run_id,
