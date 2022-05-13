@@ -719,6 +719,6 @@ def minimal_module_def() -> ModuleDefinitionV3:
         "quirks": [],
         "slotTransforms": {},
         "compatibleWith": ["temperatureModuleV2"],
-        "cornerOffsetFromSlot": {"x": 0.1, "y": 0.1},
-        "twoDimensionalRendering": {}
+        "cornerOffsetFromSlot": {"x": 0.1, "y": 0.1, "z": 0.0},
+        "twoDimensionalRendering": {},
     }

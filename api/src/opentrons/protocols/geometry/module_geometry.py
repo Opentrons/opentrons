@@ -490,7 +490,7 @@ def load_module_from_definition(
             raise RuntimeError("The specified module definition is not valid.")
         # mypy can't tell these apart, but we've schema validated it - this is
         # the right type
-        v3def: "ModuleDefinitionV3" = definition    # type: ignore[assignment]
+        v3def: "ModuleDefinitionV3" = definition  # type: ignore[assignment]
         return _load_from_v3(v3def, parent, api_level, configuration)
 
     elif isinstance(schema, str):
@@ -525,7 +525,8 @@ def _load_v3_module_def(module_model: ModuleModel) -> "ModuleDefinitionV3":
     except module.ModuleNotFoundError:
         raise NoSuchModuleError(
             f"Could not find the module {module_model.value} in the "
-            f"specified API version.", module_model
+            f"specified API version.",
+            module_model,
         )
 
 

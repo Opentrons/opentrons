@@ -59,7 +59,6 @@ describe('validate all module specs with schema', () => {
     })
   })
 
-
   it('validate each module specs model matches its filename', () => {
     V2_MODULE_PATHS.forEach(modulePath => {
       const filename = path.parse(modulePath).name

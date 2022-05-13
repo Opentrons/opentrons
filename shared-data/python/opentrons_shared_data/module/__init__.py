@@ -8,7 +8,6 @@ from .dev_types import (
     SchemaVersions,
     ModuleSchema,
     SchemaV1,
-    SchemaV2,
     SchemaV3,
     ModuleDefinitionV1,
     ModuleDefinitionV3,

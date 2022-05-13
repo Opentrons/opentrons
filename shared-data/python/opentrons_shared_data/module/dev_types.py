@@ -3,7 +3,7 @@ opentrons_shared_data.module.dev_types: types requiring typing_extensions
 for modules
 """
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 from typing_extensions import Literal, TypedDict
 
 SchemaV1 = Literal["1"]
@@ -92,6 +92,22 @@ ModuleDefinitionV3 = TypedDict(
     },
 )
 
+# V2 is not used anymore. This type is preserved for historical purposes
+ModuleDefinitionV2 = TypedDict(
+    "ModuleDefinitionV2",
+    {
+        "$otSharedSchema": Literal["module/schemas/2"],
+        "moduleType": ModuleType,
+        "model": ModuleModel,
+        "labwareOffset": ModuleLabwareOffset,
+        "dimensions": ModuleDimensions,
+        "calibrationPoint": ModuleCalibrationPointOffset,
+        "displayName": str,
+        "quirks": List[str],
+        "slotTransforms": Dict[str, Dict[str, Dict[str, List[List[float]]]]],
+        "compatibleWith": List[ModuleModel],
+    },
+)
 
 ModuleDefinitionV1 = TypedDict(
     "ModuleDefinitionV1",
