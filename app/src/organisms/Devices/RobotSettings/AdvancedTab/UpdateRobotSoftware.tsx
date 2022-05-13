@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
-import { TertiaryButton } from '../../../../atoms/Buttons'
+import { TertiaryButton } from '../../../../atoms/buttons'
 import {
   getBuildrootUpdateDisplayInfo,
   startBuildrootUpdate,

@@ -20,7 +20,7 @@
   "multiple_modules_explanation": "To use more than one of the same module in a protocol, you first need to plug in the module that’s in the lowest numbered deck slot to the lowest numbered USB port on the OT-2. Continue in the same manner with additional modules.",
   "multiple_modules_link": "Learn more about using more than one module of the same type",
   "multiple_modules_example": "Your protocol has 2 Temperature Modules. The Temperature Module attached to the first port starting from the left will be related to the first Temperature Module in your protocol while the second Temperature Module loaded would be related to the Temperature Module connected to the next port to the right. If using a hub, follow the same logic with the port ordered.",
-  "offset_title": "Offset Data",
+  "offset_data": "Offset Data",
   "lpc_and_offset_data_title": "Labware Position Check and Labware Offset Data",
   "labware_position_check_text": "Labware Position Check is an optional workflow that helps you verify the position of each labware on the deck. During this check, you can create Labware Offsets that adjust how the robot moves to each labware in the X, Y and Z directions.",
   "magnetic_module_attention_warning": "<block>Opentrons recommends securing labware with the module’s bracket. <a>See how to secure labware to the Magnetic Module</a></block>",

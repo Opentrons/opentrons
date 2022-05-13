@@ -28,7 +28,7 @@ import {
 } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
 import { InputField } from '../../../atoms/InputField'
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 
 import type { TFunctionResult } from 'i18next'
 import type { MagneticModule } from '../../../redux/modules/types'

@@ -27,7 +27,7 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
-import { PrimaryButton, SecondaryButton } from '../../atoms/Buttons'
+import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { Modal } from '../../atoms/Modal'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'

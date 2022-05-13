@@ -29,6 +29,7 @@ from opentrons.protocol_engine.state import (
 )
 from opentrons.protocol_engine.execution.movement import (
     MovementHandler,
+    MoveRelativeData,
     SavedPositionData,
 )
 from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
@@ -272,11 +273,23 @@ async def test_move_relative(
         )
     )
 
-    await subject.move_relative(
+    # TODO(mc, 2022-05-13): the order of these calls is difficult to manage
+    # and test for. Ideally, `hardware.move_rel` would return the resulting position
+    decoy.when(
+        await hardware_api.gantry_position(
+            mount=Mount.LEFT,
+            critical_point=CriticalPoint.XY_CENTER,
+            fail_on_not_homed=True,
+        )
+    ).then_return(Point(x=1, y=2, z=3))
+
+    result = await subject.move_relative(
         pipette_id="pipette-id",
         axis=axis,
         distance=distance,
     )
+
+    assert result == MoveRelativeData(position=DeckPoint(x=1, y=2, z=3))
 
     decoy.verify(
         await hardware_api.move_rel(

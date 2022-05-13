@@ -37,6 +37,13 @@ class SavedPositionData:
     position: DeckPoint
 
 
+@dataclass(frozen=True)
+class MoveRelativeData:
+    """The result of a relative movement procedure."""
+
+    position: DeckPoint
+
+
 class MovementHandler:
     """Implementation logic for gantry movement."""
 
@@ -115,11 +122,12 @@ class MovementHandler:
         pipette_id: str,
         axis: MovementAxis,
         distance: float,
-    ) -> None:
+    ) -> MoveRelativeData:
         """Move a given pipette a relative amount in millimeters."""
         pipette_location = self._state_store.motion.get_pipette_location(
             pipette_id=pipette_id,
         )
+        pip_cp = pipette_location.critical_point
         hw_mount = pipette_location.mount.to_hw_mount()
         delta = Point(
             x=distance if axis == MovementAxis.X else 0,
@@ -133,8 +141,18 @@ class MovementHandler:
                 delta=delta,
                 fail_on_not_homed=True,
             )
+            point = await self._hardware_api.gantry_position(
+                mount=hw_mount,
+                critical_point=pip_cp,
+                fail_on_not_homed=True,
+            )
+
         except HardwareMustHomeError as e:
             raise MustHomeError(str(e)) from e
+
+        return MoveRelativeData(
+            position=DeckPoint(x=point.x, y=point.y, z=point.z),
+        )
 
     async def save_position(
         self,

@@ -21,7 +21,7 @@ import {
 
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { Slideout } from '../../atoms/Slideout'
-import { PrimaryButton } from '../../atoms/Buttons'
+import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'

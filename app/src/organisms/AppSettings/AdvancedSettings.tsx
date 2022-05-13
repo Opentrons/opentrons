@@ -29,7 +29,7 @@ import {
   OUTDATED,
 } from '../../redux/system-info'
 import { Divider } from '../../atoms/structure'
-import { TertiaryButton, ToggleButton } from '../../atoms/Buttons'
+import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 

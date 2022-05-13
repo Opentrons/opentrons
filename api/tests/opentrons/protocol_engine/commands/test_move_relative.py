@@ -1,8 +1,8 @@
 """Test move relative commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine.types import MovementAxis
-from opentrons.protocol_engine.execution import MovementHandler
+from opentrons.protocol_engine.types import DeckPoint, MovementAxis
+from opentrons.protocol_engine.execution import MovementHandler, MoveRelativeData
 
 from opentrons.protocol_engine.commands.move_relative import (
     MoveRelativeParams,
@@ -17,20 +17,20 @@ async def test_move_relative_implementation(
 ) -> None:
     """A MoveRelative command should have an execution implementation."""
     subject = MoveRelativeImplementation(movement=movement)
-
     data = MoveRelativeParams(
         pipetteId="pipette-id",
         axis=MovementAxis.X,
         distance=42.0,
     )
 
-    result = await subject.execute(data)
-
-    assert result == MoveRelativeResult()
-    decoy.verify(
+    decoy.when(
         await movement.move_relative(
             pipette_id="pipette-id",
             axis=MovementAxis.X,
             distance=42.0,
         )
-    )
+    ).then_return(MoveRelativeData(position=DeckPoint(x=1, y=2, z=3)))
+
+    result = await subject.execute(data)
+
+    assert result == MoveRelativeResult(position=DeckPoint(x=1, y=2, z=3))
