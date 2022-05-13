@@ -1,4 +1,5 @@
 import * as React from 'react'
+import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -12,6 +13,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { useProtocolDetailsForRun } from './hooks'
 import { OffsetVector } from '../../molecules/OffsetVector'
+import { getLabwareDefinition } from '../ReapplyOffsetsModal/hooks/useOffsetCandidatesForCurrentRun'
 import type { RunData } from '@opentrons/api-client'
 
 interface HistoricalRunOffsetDrawerProps {
@@ -23,10 +25,25 @@ export function HistoricalRunOffsetDrawer(
 ): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const { run } = props
-  const labwareOffsets = run.labwareOffsets
+  const allLabwareOffsets = run.labwareOffsets?.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )
+  const uniqueLabwareOffsets = allLabwareOffsets?.filter(
+    (offset, index, array) => {
+      return (
+        array.findIndex(
+          firstOffset =>
+            firstOffset.location.slotName === offset.location.slotName &&
+            firstOffset.definitionUri === offset.definitionUri
+        ) === index && !isEqual(offset.vector, { x: 0, y: 0, z: 0 })
+      )
+    }
+  )
+
   const protocolDetails = useProtocolDetailsForRun(run.id)
   const labwareDetails = protocolDetails.protocolData?.labware
-  if (labwareOffsets == null || labwareOffsets.length === 0) {
+
+  if (uniqueLabwareOffsets == null || uniqueLabwareOffsets.length === 0) {
     return (
       <Box
         backgroundColor={COLORS.medGrey}
@@ -82,8 +99,9 @@ export function HistoricalRunOffsetDrawer(
           {t('labware_offset_data')}
         </StyledText>
       </Flex>
-      {labwareOffsets.map((offset, index) => {
+      {uniqueLabwareOffsets.map((offset, index) => {
         let labwareName = offset.definitionUri
+        console.log()
         if (labwareDetails != null) {
           labwareName =
             Object.values(labwareDetails)?.find(labware =>
