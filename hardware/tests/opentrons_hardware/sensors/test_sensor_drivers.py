@@ -339,7 +339,6 @@ async def test_threshold(
     assert return_data == threshold
 
 
-<<<<<<< HEAD
 @pytest.mark.parametrize(
     argnames=["node_id", "timeout", "sensor"],
     argvalues=[

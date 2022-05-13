@@ -12,17 +12,21 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
 
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ReadFromSensorRequest,
+    PeripheralStatusRequest,
     SetSensorThresholdRequest,
     WriteToSensorRequest,
     BaselineSensorRequest,
     SensorThresholdResponse,
     ReadFromSensorResponse,
+    PeripheralStatusResponse,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     ReadFromSensorRequestPayload,
+    PeripheralStatusRequestPayload,
     SetSensorThresholdRequestPayload,
     WriteToSensorRequestPayload,
     BaselineSensorRequestPayload,
+    PeripheralStatusResponsePayload,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorTypeField,
@@ -168,4 +172,33 @@ class SensorScheduler:
                     return SensorDataType.build(response.payload.sensor_data)
                 elif isinstance(response, SensorThresholdResponse):
                     return SensorDataType.build(response.payload.threshold)
+                elif isinstrance(response, PeripheralStatusResponse):
+                    return SensorDataType.build(response.payload.status)
         return None
+
+    async def request_peripheral_status(
+        self,
+        sensor: SensorDataType,
+        node_id: NodeId,
+        can_messenger: CanMessenger,
+        timeout: int,
+    ) -> Optional[SensorDataType]:
+        """Send threshold message."""
+        with WaitableCallback(can_messenger) as reader:
+            status: Optional[SensorDataType] = None
+            await can_messenger.send(
+                node_id=node_id,
+                message=PeripheralStatusRequest(
+                    payload=PeripheralStatusRequestPayload(
+                        sensor=SensorTypeField(sensor.sensor_type),
+                    )
+                ),
+            )
+            try:
+                status = await asyncio.wait_for(
+                    self._wait_for_response(node_id, reader), timeout
+                )
+            except asyncio.TimeoutError:
+                log.warning("Sensor Read timed out")
+            finally:
+                return status
