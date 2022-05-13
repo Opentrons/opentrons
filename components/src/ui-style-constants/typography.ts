@@ -113,7 +113,7 @@ export const labelSemiBold = css`
 export const linkPSemibold = css`
   font-size: ${fontSizeP};
   font-weight: ${fontWeightSemiBold};
-  line-height: ${lineHeight16};
+  line-height: ${lineHeight20};
   color: ${COLORS.blue};
 
   &:hover {

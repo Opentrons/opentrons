@@ -37,7 +37,7 @@ export function PreviousVersionModal(
         <ExternalLink
           href={UNINSTALL_APP_URL}
           paddingBottom={SPACING.spacing3}
-          css={TYPOGRAPHY.linkPSemibold}
+          css={TYPOGRAPHY.linkPSemiBold}
           id="PreviousVersionModal_uninstallingAppLink"
         >
           {t('learn_uninstalling')}
@@ -45,7 +45,7 @@ export function PreviousVersionModal(
         <br />
         <ExternalLink
           href={PREVIOUS_RELEASES_URL}
-          css={TYPOGRAPHY.linkPSemibold}
+          css={TYPOGRAPHY.linkPSemiBold}
           id="PreviousVersionModal_previousReleases"
         >
           {t('previous_releases')}
