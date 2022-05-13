@@ -41,7 +41,7 @@ async def client_and_server(port: str) -> AsyncGenerator[ClientServerFixture, No
 
 
 async def test_runs_persist(client_and_server: ClientServerFixture) -> None:
-    """Test that protocols are persisted through dev server restart."""
+    """Test that runs are persisted through dev server restart."""
     client, server = client_and_server
 
     # create a run
@@ -49,52 +49,136 @@ async def test_runs_persist(client_and_server: ClientServerFixture) -> None:
     expected_run = create_run_response.json()["data"]
     run_id = expected_run["id"]
 
-    # create a command in that run
-    create_command_response = await client.post_run_command(
-        run_id=expected_run["id"],
-        req_body={"data": {"commandType": "home", "params": {}}},
-        params={"waitUntilComplete": True},
-    )
-    expected_command = create_command_response.json()["data"]
-    command_id = expected_command["id"]
-
     # fetch the same run and commands through various endpoints
     get_all_runs_response = await client.get_runs()
-    get_all_commands_response = await client.get_run_commands(run_id=run_id)
     get_run_response = await client.get_run(run_id=run_id)
-    get_command_response = await client.get_run_command(
-        run_id=run_id,
-        command_id=command_id,
-    )
 
     # ensure fetched resources match created resources
     assert get_all_runs_response.json()["data"] == [expected_run]
-    assert get_all_commands_response.json()["data"] == [
-        # NOTE: GET /run/:id/commands returns command summaries,
-        # which are commands without the `result` key
-        {k: v for k, v in expected_command.items() if k != "result"}
-    ]
     assert get_run_response.json()["data"] == expected_run
-    assert get_command_response.json()["data"] == expected_command
+
+    # persist the run by setting current: false
+    await client.patch_run(run_id=run_id, req_body={"data": {"current": False}})
 
     # reboot the server
     await client_and_server.restart()
 
     # fetch those same resources again
     get_all_persisted_runs_response = await client.get_runs()
-    get_all_persisted_commands_response = await client.get_run_commands(run_id=run_id)
-    get_persisted_run_response = await client.get_run(expected_run["id"])
-    get_persisted_command_response = await client.get_run_command(
-        expected_run["id"], expected_command["id"]
-    )
+    get_persisted_run_response = await client.get_run(run_id)
 
     # ensure the fetched resources still match the originally created ones
     # even through the server reboot
+    expected_run = dict(
+        expected_run,
+        status="stopped",
+        current=False,
+    )
+
     assert get_all_persisted_runs_response.json()["data"] == [expected_run]
+    assert get_persisted_run_response.json()["data"] == expected_run
+
+
+async def test_run_actions_labware_offsets_persist(
+    client_and_server: ClientServerFixture,
+) -> None:
+    """Test that run sub-resources are persisted through dev server restart."""
+    client, server = client_and_server
+
+    # create a run
+    create_run_response = await client.post_run(req_body={"data": {}})
+    run_id = create_run_response.json()["data"]["id"]
+
+    # create a labware offset and an action
+    await client.post_labware_offset(
+        run_id=run_id,
+        req_body={
+            "data": {
+                "definitionUri": "opentrons/opentrons_96_tiprack_300ul/1",
+                "location": {"slotName": "5"},
+                "vector": {"x": 1, "y": 2, "z": 3},
+            }
+        },
+    )
+    await client.post_run_action(
+        run_id=run_id,
+        req_body={"data": {"actionType": "stop"}},
+    )
+
+    # fetch the run with the actions and offsets added
+    get_run_response = await client.get_run(run_id=run_id)
+    expected_run = get_run_response.json()["data"]
+
+    # persist the run by setting current: false
+    await client.patch_run(run_id=run_id, req_body={"data": {"current": False}})
+
+    # reboot the server
+    await client_and_server.restart()
+
+    # fetch the run again
+    get_all_persisted_runs_response = await client.get_runs()
+    get_persisted_run_response = await client.get_run(run_id)
+
+    # ensure the persisted run matches the original
+    expected_run = dict(
+        expected_run,
+        status="stopped",
+        current=False,
+    )
+
+    assert get_all_persisted_runs_response.json()["data"] == [expected_run]
+    assert get_persisted_run_response.json()["data"] == expected_run
+
+
+@pytest.mark.xfail(strict=True)
+async def test_run_commands_persist(client_and_server: ClientServerFixture) -> None:
+    """Test that run commands are persisted through restart."""
+    client, server = client_and_server
+
+    # create a run
+    create_run_response = await client.post_run(req_body={"data": {}})
+    run_id = create_run_response.json()["data"]["id"]
+
+    # create a command in that run
+    create_command_response = await client.post_run_command(
+        run_id=run_id,
+        req_body={"data": {"commandType": "home", "params": {}}},
+        params={"waitUntilComplete": True},
+    )
+    expected_command = create_command_response.json()["data"]
+    command_id = expected_command["id"]
+
+    # fetch the same commands through various endpoints
+    get_all_commands_response = await client.get_run_commands(run_id=run_id)
+    get_command_response = await client.get_run_command(
+        run_id=run_id,
+        command_id=command_id,
+    )
+
+    # ensure fetched resources match created resources
+    assert get_all_commands_response.json()["data"] == [
+        # NOTE: GET /run/:id/commands returns command summaries,
+        # which are commands without the `result` key
+        {k: v for k, v in expected_command.items() if k != "result"}
+    ]
+    assert get_command_response.json()["data"] == expected_command
+
+    # persist the run by setting current: false
+    await client.patch_run(run_id=run_id, req_body={"data": {"current": False}})
+
+    # reboot the server
+    await client_and_server.restart()
+
+    # fetch those same resources again
+    get_all_persisted_commands_response = await client.get_run_commands(run_id=run_id)
+    get_persisted_command_response = await client.get_run_command(
+        run_id=run_id, command_id=command_id
+    )
+
+    # ensure the persisted resources still match the original ones
     assert get_all_persisted_commands_response.json()["data"] == [
         # NOTE: GET /run/:id/commands returns command summaries,
         # which are commands without the `result` key
         {k: v for k, v in expected_command.items() if k != "result"}
     ]
-    assert get_persisted_run_response.json()["data"] == expected_run
     assert get_persisted_command_response.json()["data"] == expected_command

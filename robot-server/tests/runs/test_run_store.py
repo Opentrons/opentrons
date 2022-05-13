@@ -81,18 +81,33 @@ def test_update_run_state(
     protocol_commands: List[pe_commands.Command],
 ) -> None:
     """It should be able to update a run state to the store."""
+    action = RunAction(
+        actionType=RunActionType.PLAY,
+        createdAt=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
+        id="action-id",
+    )
+
     subject.insert(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
-    subject.update_run_state(
+    subject.insert_action(run_id="run-id", action=action)
+
+    result = subject.update_run_state(
         run_id="run-id",
         run_data=protocol_run,
         commands=protocol_commands,
     )
     run_data_result = subject.get_run_data(run_id="run-id")
     commands_result = subject.get_run_commands(run_id="run-id")
+
+    assert result == RunResource(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        actions=[action],
+    )
     assert run_data_result == protocol_run
     assert commands_result == protocol_commands
 

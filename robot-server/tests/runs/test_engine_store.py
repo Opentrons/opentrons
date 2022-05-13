@@ -4,13 +4,9 @@ from decoy import Decoy
 
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import ProtocolEngine, ProtocolRunData
-from opentrons.protocol_runner import ProtocolRunner
+from opentrons.protocol_runner import ProtocolRunner, ProtocolRunResult
 
-from robot_server.runs.engine_store import (
-    EngineStore,
-    EngineMissingError,
-    EngineConflictError,
-)
+from robot_server.runs.engine_store import EngineStore, EngineConflictError
 
 
 @pytest.fixture
@@ -54,35 +50,20 @@ async def test_cannot_create_engine_if_active(subject: EngineStore) -> None:
     assert subject.current_run_id == "run-id-1"
 
 
-def test_raise_if_engine_does_not_exist(subject: EngineStore) -> None:
-    """It should raise if no engine exists when requested."""
-    assert subject.current_run_id is None
-
-    with pytest.raises(EngineMissingError):
-        subject.engine
-
-    with pytest.raises(EngineMissingError):
-        subject.runner
-
-
 async def test_clear_engine(subject: EngineStore) -> None:
     """It should clear a stored engine entry."""
     await subject.create(run_id="run-id")
     await subject.runner.run()
-    await subject.clear()
+    result = await subject.clear()
 
     assert subject.current_run_id is None
+    assert isinstance(result, ProtocolRunResult)
 
-    with pytest.raises(EngineMissingError):
+    with pytest.raises(AssertionError):
         subject.engine
 
-    with pytest.raises(EngineMissingError):
+    with pytest.raises(AssertionError):
         subject.runner
-
-
-async def test_clear_engine_noop(subject: EngineStore) -> None:
-    """It should noop if clear called and no stored engine entry."""
-    await subject.clear()
 
 
 async def test_clear_engine_not_stopped_or_idle(subject: EngineStore) -> None:
@@ -103,9 +84,9 @@ async def test_clear_idle_engine(subject: EngineStore) -> None:
     await subject.clear()
 
     # TODO: test engine finish is called
-    with pytest.raises(EngineMissingError):
+    with pytest.raises(AssertionError):
         subject.engine
-    with pytest.raises(EngineMissingError, match="Runner not yet created."):
+    with pytest.raises(AssertionError):
         subject.runner
 
 

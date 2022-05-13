@@ -105,7 +105,7 @@ class RunStore:
         ).where(run_table.c.id == run_id)
 
         select_actions = sqlalchemy.select(action_table).where(
-            action_table.c.id == run_id
+            action_table.c.run_id == run_id
         )
 
         with self._sql_engine.begin() as transaction:

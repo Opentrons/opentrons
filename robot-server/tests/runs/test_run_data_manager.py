@@ -4,6 +4,7 @@ from datetime import datetime
 from decoy import Decoy, matchers
 
 from opentrons.protocol_engine import EngineStatus, ProtocolRunData, commands
+from opentrons.protocol_runner import ProtocolRunResult
 
 from robot_server.runs.engine_store import EngineStore, EngineConflictError
 from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
@@ -373,12 +374,10 @@ async def test_update_current(
     """It should persist the current run and clear the engine on current=false."""
     run_id = "hello world"
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
-    decoy.when(mock_engine_store.engine.state_view.get_protocol_run_data()).then_return(
-        protocol_run_data
+    decoy.when(await mock_engine_store.clear()).then_return(
+        ProtocolRunResult(commands=[run_command], data=protocol_run_data)
     )
-    decoy.when(mock_engine_store.engine.state_view.commands.get_all()).then_return(
-        [run_command]
-    )
+
     decoy.when(
         mock_run_store.update_run_state(
             run_id=run_id, run_data=protocol_run_data, commands=[run_command]
@@ -386,10 +385,6 @@ async def test_update_current(
     ).then_return(run_resource)
 
     result = await subject.update(run_id=run_id, current=False)
-
-    decoy.verify(
-        await mock_engine_store.clear(),
-    )
 
     assert result == Run(
         current=False,

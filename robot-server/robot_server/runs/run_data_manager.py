@@ -175,18 +175,17 @@ class RunDataManager:
                 f"Cannot update {run_id} because it is not the current run."
             )
 
-        run_data = self._engine_store.engine.state_view.get_protocol_run_data()
         next_current = current if current is False else True
 
         if next_current is False:
-            commands = self._engine_store.engine.state_view.commands.get_all()
-            await self._engine_store.clear()
+            commands, run_data = await self._engine_store.clear()
             run_resource = self._run_store.update_run_state(
                 run_id=run_id,
                 run_data=run_data,
                 commands=commands,
             )
         else:
+            run_data = self._engine_store.engine.state_view.get_protocol_run_data()
             run_resource = self._run_store.get(run_id=run_id)
 
         return _build_run(
