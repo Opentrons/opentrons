@@ -27,6 +27,8 @@ import {
   useTipLengthCalibrations,
 } from '../../hooks'
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
+import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffsetCalibrationItems'
+import { TipLengthCalibrationItems } from '../CalibrationDetails/TipLengthCalibrationItems'
 
 jest.mock('file-saver')
 
@@ -38,6 +40,8 @@ jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/sessions/selectors')
 jest.mock('../../../../redux/custom-labware/selectors')
 jest.mock('../../hooks')
+jest.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
+jest.mock('../CalibrationDetails/TipLengthCalibrationItems')
 
 const mockDeckCalibrationModal = DeckCalibrationModal as jest.MockedFunction<
   typeof DeckCalibrationModal
@@ -54,6 +58,13 @@ const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunc
 >
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
+>
+
+const mockPipetteOffsetCalibrationItems = PipetteOffsetCalibrationItems as jest.MockedFunction<
+  typeof PipetteOffsetCalibrationItems
+>
+const mockTipLengthCalibrationItems = TipLengthCalibrationItems as jest.MockedFunction<
+  typeof TipLengthCalibrationItems
 >
 
 let mockTrackEvent: jest.Mock
@@ -103,6 +114,12 @@ describe('RobotSettingsCalibration', () => {
       mockTipLengthCalibration2,
       mockTipLengthCalibration3,
     ])
+    mockPipetteOffsetCalibrationItems.mockReturnValue(
+      <div>PipetteOffsetCalibrationItems</div>
+    )
+    mockTipLengthCalibrationItems.mockReturnValue(
+      <div>TipLengthCalibrationItems</div>
+    )
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -143,6 +160,7 @@ describe('RobotSettingsCalibration', () => {
     getByText(
       'Pipette offset calibration measures a pipette’s position relative to the pipette mount and the deck. You can recalibrate a pipette’s offset if its currently attached to this robot.'
     )
+    getByText('PipetteOffsetCalibrationItems')
   })
 
   it('renders Not calibrated yet when no pipette offset calibrations data', () => {
@@ -175,6 +193,7 @@ describe('RobotSettingsCalibration', () => {
     getByText(
       'Tip length calibration measures the distance between the bottom of the tip and the pipette’s nozzle. You can recalibrate a tip length if the pipette associated with it is currently attached to this robot. If you recalibrate a tip length, you will be prompted to recalibrate that pipette’s offset calibration.'
     )
+    getByText('PipetteOffsetCalibrationItems')
   })
 
   it('renders Not calibrated yet when no tip length calibrations data', () => {
