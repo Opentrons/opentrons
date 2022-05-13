@@ -67,15 +67,12 @@ export function TipLengthCalibrationItems({
     }
   )
 
-  // console.log('json', pipetteNameSpecs)
-  console.log('attatched', attachedPipettes.left)
-  console.log('tipLengthCalibrations', tipLengthCalibrations)
-
-  const checkAttathedPipetteWithDefaultData = (serialNumber: string): Mount => {
+  const checkMountWithAttachedPipettes = (serialNumber: string): Mount => {
     const keys = Object.keys(attachedPipettes)
     const mount = keys.find(key => {
-      const pipette = attachedPipettes.key
-      return pipette.id === serialNumber
+      const targetMount = key as Mount
+      const pipette = attachedPipettes[targetMount]
+      return pipette?.id === serialNumber
     })
     return mount as Mount
   }
@@ -123,9 +120,7 @@ export function TipLengthCalibrationItems({
                   mount={
                     calibration.mount != null
                       ? calibration.mount
-                      : checkAttathedPipetteWithDefaultData(
-                          calibration.serialNumber
-                        )
+                      : checkMountWithAttachedPipettes(calibration.serialNumber)
                   }
                 />
               </StyledTableCell>

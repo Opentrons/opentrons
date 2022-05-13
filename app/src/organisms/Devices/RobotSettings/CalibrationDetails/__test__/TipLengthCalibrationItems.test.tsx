@@ -50,7 +50,7 @@ const render = (
 ) => {
   return renderWithProviders(<TipLengthCalibrationItems {...props} />, {
     i18nInstance: i18n,
-  })[0]
+  })
 }
 describe('TipLengthCalibrationItems', () => {
   let props: React.ComponentProps<typeof TipLengthCalibrationItems>
@@ -64,20 +64,20 @@ describe('TipLengthCalibrationItems', () => {
   })
 
   it('should render table headers', () => {
-    const { getByText } = render(props)
+    const [{ getByText }] = render(props)
     getByText('Tip Rack')
     getByText('Pipette Model and Serial')
     getByText('Last Calibrated')
   })
 
   it('should render overFlow menu', () => {
-    const { getAllByRole } = render(props)
+    const [{ getAllByRole }] = render(props)
     const buttons = getAllByRole('button')
     expect(buttons).toHaveLength(2)
   })
 
   it('should render tip length calibrations data', () => {
-    const { getByText } = render(props)
+    const [{ getByText }] = render(props)
     // todo tiprack
     getByText('Mock-P1KSV222021011802')
     getByText('11/10/2022 18:14:01')

@@ -49,12 +49,6 @@ import type {
   SessionCommandString,
   DeckCalibrationSession,
 } from '../../../redux/sessions/types'
-// import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
-
-// import type {
-//   DeckCalibrationData,
-//   DeckCalibrationStatus,
-// } from '../../../redux/calibration/types'
 
 interface CalibrationProps {
   robotName: string
