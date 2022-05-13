@@ -239,7 +239,9 @@ class RunDataManager:
         Raises:
             RunNotFoundError: The given run identifier was not found in the database.
         """
-        raise NotImplementedError("TODO")
+        if self._engine_store.current_run_id == run_id:
+            return self._engine_store.engine.state_view.commands.get_current()
+        return None
 
     def get_command(self, run_id: str, command_id: str) -> Command:
         """Get a run's command by ID.

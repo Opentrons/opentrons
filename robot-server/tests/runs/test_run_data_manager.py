@@ -10,7 +10,8 @@ from opentrons.protocol_engine import (
     ProtocolRunData,
     commands,
     types as pe_types,
-    CommandSlice
+    CommandSlice,
+    CurrentCommand
 )
 
 from robot_server.protocols import ProtocolResource
@@ -19,6 +20,7 @@ from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentErro
 from robot_server.runs.run_models import Run
 from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError
 from robot_server.service.task_runner import TaskRunner
+from tests.runs.router.conftest import mock_run_data_manager
 
 
 @pytest.fixture
@@ -653,10 +655,34 @@ def test_get_commands_slice_current_run(decoy: Decoy, subject: RunDataManager, m
     assert expected_command_slice == result
 
 
-def test_get_commands_slice_from_db_run_not_found(decoy: Decoy, subject: RunDataManager, mock_run_store: RunStore,
-                                                  mock_engine_store: EngineStore) -> None:
+def test_get_commands_slice_from_db_run_not_found(decoy: Decoy, subject: RunDataManager, mock_run_store: RunStore) -> None:
     """Should get a sliced command list from run store"""
     decoy.when(mock_run_store.get_run_commands("run-id")).then_raise(RunNotFoundError(run_id="run-id"))
 
     with pytest.raises(RunNotFoundError):
         subject.get_commands_slice("run-id", 1, 2)
+
+
+def test_get_current_command(decoy: Decoy, subject: RunDataManager, mock_run_store: RunStore,
+                                                  mock_engine_store: EngineStore, run_command: commands.Command) -> None:
+    """Should get current command from engine store"""
+    expected_current = CurrentCommand(
+                    command_id=run_command.id,
+                    command_key=run_command.key,
+                    created_at=run_command.createdAt,
+                    index=0,
+                )
+    decoy.when(mock_engine_store.current_run_id).then_return("run-id")
+    decoy.when(mock_engine_store.engine.state_view.commands.get_current()).then_return(expected_current)
+    result = subject.get_current_command("run-id")
+
+    assert result == expected_current
+
+
+def test_get_current_command_not_current_run(decoy: Decoy, subject: RunDataManager, mock_run_store: RunStore,
+                                                  mock_engine_store: EngineStore) -> None:
+    """Should return None because the run is not current"""
+    decoy.when(mock_engine_store.current_run_id).then_return("not-run-id")
+    result = subject.get_current_command("run-id")
+
+    assert result == None
