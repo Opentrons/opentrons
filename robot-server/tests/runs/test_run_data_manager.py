@@ -10,6 +10,7 @@ from opentrons.protocol_engine import (
     ProtocolRunData,
     commands,
     types as pe_types,
+    CommandSlice
 )
 
 from robot_server.protocols import ProtocolResource
@@ -573,3 +574,40 @@ async def test_create_archives_existing(
             commands=[run_command],
         )
     )
+
+
+def test_get_commands_slice_from_db(decoy: Decoy, subject: RunDataManager, mock_run_store: RunStore, run_command: commands.Command) -> None:
+    """Should get a sliced command list from run store"""
+
+    commands_list = [commands.Pause(
+        id="command-id-1",
+        key="command-key",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=commands.CommandStatus.SUCCEEDED,
+        params=commands.PauseParams(message="Hello"),
+    ), commands.Pause(
+        id="command-id-2",
+        key="command-key",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=commands.CommandStatus.SUCCEEDED,
+        params=commands.PauseParams(message="Hello"),
+    ), run_command]
+
+    expected_commands_result = [commands.Pause(
+        id="command-id-2",
+        key="command-key",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=commands.CommandStatus.SUCCEEDED,
+        params=commands.PauseParams(message="Hello"),
+    ), run_command]
+
+    expected_command_slice = CommandSlice(
+        commands=expected_commands_result,
+        cursor=1,
+        total_length=3
+    )
+
+    decoy.when(mock_run_store.get_run_commands("run_id")).then_return(commands_list)
+    result = subject.get_commands_slice("run_id", 1, 2)
+
+    assert expected_command_slice == result

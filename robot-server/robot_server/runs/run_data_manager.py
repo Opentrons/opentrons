@@ -21,9 +21,9 @@ from .run_models import Run
 
 
 def _build_run(
-    run_resource: RunResource,
-    run_data: Optional[ProtocolRunData],
-    current: bool,
+        run_resource: RunResource,
+        run_data: Optional[ProtocolRunData],
+        current: bool,
 ) -> Run:
     run_data = run_data or ProtocolRunData.construct(
         status=EngineStatus.STOPPED,
@@ -63,7 +63,7 @@ class RunDataManager:
     """
 
     def __init__(
-        self, engine_store: EngineStore, run_store: RunStore, task_runner: TaskRunner
+            self, engine_store: EngineStore, run_store: RunStore, task_runner: TaskRunner
     ) -> None:
         self._engine_store = engine_store
         self._run_store = run_store
@@ -75,11 +75,11 @@ class RunDataManager:
         return self._engine_store.current_run_id
 
     async def create(
-        self,
-        run_id: str,
-        created_at: datetime,
-        labware_offsets: List[LabwareOffsetCreate],
-        protocol: Optional[ProtocolResource],
+            self,
+            run_id: str,
+            created_at: datetime,
+            labware_offsets: List[LabwareOffsetCreate],
+            protocol: Optional[ProtocolResource],
     ) -> Run:
         """Create a new, current run.
 
@@ -207,10 +207,10 @@ class RunDataManager:
         )
 
     def get_commands_slice(
-        self,
-        run_id: str,
-        cursor: Optional[int],
-        length: int,
+            self,
+            run_id: str,
+            cursor: Optional[int],
+            length: int,
     ) -> CommandSlice:
         """Get a slice of run commands.
 
@@ -222,13 +222,13 @@ class RunDataManager:
         Raises:
             RunNotFoundError: The given run identifier was not found in the database.
         """
-        raise NotImplementedError("TODO")
-        # if self._engine_store.current_run_id == run_id:
-        #     pass
-        # else:
-        #     # Let exception propagate
-        #     commands = self._run_store.get_run_commands(run_id)
-        # return self._engine_store.engine.state_view.commands.get_slice()
+        if self._engine_store.current_run_id == run_id:
+            commands = self._engine_store.engine.state_view.commands.get_all()
+        else:
+            # Let exception propagate
+            commands = self._run_store.get_run_commands(run_id)
+
+        return self._slice_commands(cursor=cursor, length=length, commands=commands)
 
     def get_current_command(self, run_id: str) -> Optional[CurrentCommand]:
         """Get the currently executing command, if any.
@@ -263,3 +263,21 @@ class RunDataManager:
             result = self._run_store.get_run_data(run_id)
 
         return result
+
+    def _slice_commands(self, cursor: Optional[int],
+                            length: int, commands: List[Command]) -> CommandSlice:
+        commands_length = len(commands)
+
+        if cursor is None:
+            cursor = commands_length - length
+
+        # start is inclusive, stop is exclusive
+        actual_cursor = max(0, min(cursor, commands_length - 1))
+        stop = min(commands_length, actual_cursor + length)
+        sliced_commands = commands[actual_cursor:stop]
+
+        return CommandSlice(
+            cursor=actual_cursor,
+            total_length=commands_length,
+            commands=sliced_commands
+        )
