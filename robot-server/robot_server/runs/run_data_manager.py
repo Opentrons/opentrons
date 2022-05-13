@@ -1,8 +1,10 @@
 """Manage current and historical run data."""
 from datetime import datetime
 from typing import List, Optional
+from typing_extensions import Literal
 
 from opentrons.protocol_engine import (
+    EngineStatus,
     LabwareOffsetCreate,
     ProtocolRunData,
     CommandSlice,
@@ -18,19 +20,35 @@ from .run_store import RunResource, RunStore
 from .run_models import Run
 
 
-def _build_run(run_resource: RunResource, run_data: ProtocolRunData) -> Run:
+def _build_run(
+    run_resource: RunResource,
+    run_data: Optional[ProtocolRunData],
+    current: bool,
+) -> Run:
+    run_data = run_data or ProtocolRunData.construct(
+        status=EngineStatus.STOPPED,
+        errors=[],
+        labware=[],
+        labwareOffsets=[],
+        pipettes=[],
+        modules=[],
+    )
     return Run.construct(
         id=run_resource.run_id,
         protocolId=run_resource.protocol_id,
         createdAt=run_resource.created_at,
-        current=run_resource.is_current,
         actions=run_resource.actions,
         status=run_data.status,
         errors=run_data.errors,
         labware=run_data.labware,
         labwareOffsets=run_data.labwareOffsets,
         pipettes=run_data.pipettes,
+        current=current,
     )
+
+
+class RunNotCurrentError(ValueError):
+    """Error raised when a requested run is not the current run."""
 
 
 class RunDataManager:
@@ -54,8 +72,7 @@ class RunDataManager:
     @property
     def current_run_id(self) -> Optional[str]:
         """The identifier of the current run, if any."""
-        # get from engine_store
-        raise NotImplementedError("TODO, maybe?")
+        return self._engine_store.current_run_id
 
     async def create(
         self,
@@ -80,16 +97,12 @@ class RunDataManager:
         """
         run_data = await self._engine_store.create(run_id)
         run_resource = self._run_store.insert(
-            RunResource(
-                run_id=run_id,
-                created_at=created_at,
-                protocol_id=protocol.protocol_id if protocol is not None else None,
-                actions=[],
-                is_current=True,
-            )
+            run_id=run_id,
+            created_at=created_at,
+            protocol_id=protocol.protocol_id if protocol is not None else None,
         )
 
-        return _build_run(run_resource, run_data)
+        return _build_run(run_resource=run_resource, run_data=run_data, current=True)
 
     def get(self, run_id: str) -> Run:
         """Get a run resource.
@@ -108,8 +121,9 @@ class RunDataManager:
         """
         run_resource = self._run_store.get(run_id)
         run_data = self._get_run_data(run_id)
+        current = run_id == self._engine_store.current_run_id
 
-        return _build_run(run_resource, run_data)
+        return _build_run(run_resource, run_data, current)
 
     def get_all(self) -> List[Run]:
         """Get current and stored run resources.
@@ -118,7 +132,11 @@ class RunDataManager:
             All run resources.
         """
         return [
-            _build_run(run_resource, self._get_run_data(run_resource.run_id))
+            _build_run(
+                run_resource=run_resource,
+                run_data=self._get_run_data(run_resource.run_id),
+                current=run_resource.run_id == self._engine_store.current_run_id,
+            )
             for run_resource in self._run_store.get_all()
         ]
 
@@ -133,12 +151,12 @@ class RunDataManager:
                 is not idle and cannot be deleted.
             RunNotFoundError: The given run identifier was not found in the database.
         """
-        raise NotImplementedError("TODO")
-        # await engine_store.clear()
-        # handle engine missing without propagating to client
-        # run_store.remove(run_id=runId)
+        if run_id == self._engine_store.current_run_id:
+            await self._engine_store.clear()
+        else:
+            self._run_store.remove(run_id)
 
-    async def get_or_archive(self, run_id: str, archive: bool) -> Run:
+    async def update(self, run_id: str, current: Optional[Literal[False]]) -> Run:
         """Get and potentially archive a run.
 
         Args:
@@ -148,21 +166,34 @@ class RunDataManager:
             The updated run.
 
         Raises:
-            RunNotFoundError: The given run identifier was not found in the database.
-            RunStopped: The given run is not the current run.
+            RunNotFoundError: The run identifier was not found in the database.
+            RunNotCurrentError: The run is not the current run.
+            EngineConflictError: The run cannot be updated because it is not idle.
         """
-        raise NotImplementedError("TODO")
-        # if update.current is False:
-        #     run_data = engine_store.archive(runId)
-        #     run_resource = run_store.update(run_id=runId, is_current=False)
+        if run_id != self._engine_store.current_run_id:
+            raise RunNotCurrentError(
+                f"Cannot update {run_id} because it is not the current run."
+            )
 
-        # else:
-        #     run_data = engine_store.get(runId)
-        #     run_resource = run_store.get(run_id=runId)
-        #     if run_resource.is_current is False:
-        #       raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
-        #             status.HTTP_409_CONFLICT
-        #         )
+        run_data = self._engine_store.engine.state_view.get_protocol_run_data()
+        next_current = current if current is False else True
+
+        if next_current is False:
+            commands = self._engine_store.engine.state_view.commands.get_all()
+            await self._engine_store.clear()
+            run_resource = self._run_store.update_run_state(
+                run_id=run_id,
+                run_data=run_data,
+                commands=commands,
+            )
+        else:
+            run_resource = self._run_store.get(run_id=run_id)
+
+        return _build_run(
+            run_resource=run_resource,
+            run_data=run_data,
+            current=next_current,
+        )
 
     def get_commands_slice(
         self,
@@ -212,10 +243,12 @@ class RunDataManager:
         """
         raise NotImplementedError("TODO")
 
-    def _get_run_data(self, run_id: str) -> ProtocolRunData:
-        if run_id == self._engine_store.current_run_id:
-            run_data = self._engine_store.engine.state_view.get_protocol_run_data()
-        else:
-            run_data = self._run_store.get_run_data(run_id)
+    def _get_run_data(self, run_id: str) -> Optional[ProtocolRunData]:
+        result: Optional[ProtocolRunData]
 
-        return run_data
+        if run_id == self._engine_store.current_run_id:
+            result = self._engine_store.engine.state_view.get_protocol_run_data()
+        else:
+            result = self._run_store.get_run_data(run_id)
+
+        return result

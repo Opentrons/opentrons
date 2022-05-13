@@ -5,12 +5,7 @@ from typing import List
 from sqlalchemy.engine import Engine
 
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
-from robot_server.runs.run_store import (
-    RunStore,
-    RunResource,
-    RunNotFoundError,
-    RunStateResource,
-)
+from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError
 from robot_server.runs.action_models import RunAction, RunActionType
 
 from opentrons.protocol_engine import (
@@ -42,18 +37,6 @@ def protocol_commands() -> List[pe_commands.Command]:
             result=pe_commands.PauseResult(),
         )
     ]
-
-
-@pytest.fixture
-def run_resource() -> RunResource:
-    """Return a run resource."""
-    return RunResource(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-        actions=[],
-        is_current=False,
-    )
 
 
 @pytest.fixture
@@ -95,60 +78,53 @@ def protocol_run() -> ProtocolRunData:
 def test_update_run_state(
     subject: RunStore,
     protocol_run: ProtocolRunData,
-    run_resource: RunResource,
+    protocol_commands: List[pe_commands.Command],
 ) -> None:
     """It should be able to update a run state to the store."""
-    subject.insert(run_resource)
-    engine_state = RunStateResource(
+    subject.insert(
         run_id="run-id",
-        protocol_run_data=protocol_run,
-        engine_status="idle",
-        commands=[],
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
     subject.update_run_state(
         run_id="run-id",
-        run_data=engine_state.protocol_run_data,
-        commands=engine_state.commands,
+        run_data=protocol_run,
+        commands=protocol_commands,
     )
     run_data_result = subject.get_run_data(run_id="run-id")
     commands_result = subject.get_run_commands(run_id="run-id")
     assert run_data_result == protocol_run
-    assert commands_result == engine_state.commands
-    assert run_data_result.status == engine_state.engine_status
+    assert commands_result == protocol_commands
 
 
 def test_update_state_run_not_found(
-    subject: RunStore, protocol_run: ProtocolRunData
+    subject: RunStore,
+    protocol_run: ProtocolRunData,
+    protocol_commands: List[pe_commands.Command],
 ) -> None:
     """It should be able to catch the exception raised by insert."""
-    engine_state = RunStateResource(
-        run_id="run-not-found",
-        protocol_run_data=protocol_run,
-        engine_status="idle",
-        _updated_at=datetime.now(timezone.utc),
-        commands=[],
-    )
-
     with pytest.raises(RunNotFoundError, match="run-not-found"):
         subject.update_run_state(
             run_id="run-not-found",
-            run_data=engine_state.protocol_run_data,
-            commands=engine_state.commands,
+            run_data=protocol_run,
+            commands=protocol_commands,
         )
 
 
 def test_add_run(subject: RunStore) -> None:
     """It should be able to add a new run to the store."""
-    run = RunResource(
+    result = subject.insert(
         run_id="run-id",
         protocol_id=None,
-        created_at=datetime.now(tz=timezone.utc),
-        actions=[],
-        is_current=True,
+        created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
     )
-    result = subject.insert(run)
 
-    assert result == run
+    assert result == RunResource(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
+        actions=[],
+    )
 
 
 def test_insert_actions_missing_run_id(subject: RunStore) -> None:
@@ -165,63 +141,30 @@ def test_insert_actions_missing_run_id(subject: RunStore) -> None:
 
 def test_insert_run_missing_protocol_id(subject: RunStore) -> None:
     """Should not be able to insert an action with a run id that does not exist."""
-    run = RunResource(
-        run_id="run-id",
-        protocol_id="missing-protocol-id",
-        created_at=datetime.now(),
-        actions=[],
-        is_current=True,
-    )
-
     with pytest.raises(ProtocolNotFoundError, match="missing-protocol-id"):
-        subject.insert(run)
-
-
-def test_update_active_run(subject: RunStore) -> None:
-    """It should be able to update a run in the store."""
-    run = RunResource(
-        run_id="identical-run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-        actions=[],
-        is_current=False,
-    )
-    updated_run = RunResource(
-        run_id="identical-run-id",
-        protocol_id=None,
-        created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
-        actions=[],
-        is_current=True,
-    )
-
-    subject.insert(run)
-
-    result = subject.update_active_run(
-        run_id=run.run_id,
-        is_current=updated_run.is_current,
-    )
-    assert result.is_current == updated_run.is_current
-
-
-def test_update_active_run_run_not_found(subject: RunStore) -> None:
-    """It should raise RunNotFound error."""
-    with pytest.raises(RunNotFoundError, match="run-id"):
-        subject.update_active_run(run_id="run-id", is_current=True)
+        subject.insert(
+            run_id="run-id",
+            protocol_id="missing-protocol-id",
+            created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        )
 
 
 def test_get_run_no_actions(subject: RunStore) -> None:
     """It can get a previously stored run entry."""
-    run = RunResource(
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+
+    result = subject.get("run-id")
+
+    assert result == RunResource(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[],
-        is_current=False,
     )
-    subject.insert(run)
-    result = subject.get(run_id="run-id")
-
-    assert result == run
 
 
 def test_get_run(subject: RunStore) -> None:
@@ -231,26 +174,23 @@ def test_get_run(subject: RunStore) -> None:
         createdAt=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
         id="action-id",
     )
-    run = RunResource(
+
+    subject.insert(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-        actions=[],
-        is_current=False,
     )
-    update_run = RunResource(
+
+    subject.insert_action("run-id", action)
+
+    result = subject.get(run_id="run-id")
+
+    assert result == RunResource(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[action],
-        is_current=False,
     )
-
-    subject.insert(run)
-    subject.insert_action(run.run_id, action)
-    result = subject.get(run_id="run-id")
-
-    assert result == update_run
 
 
 def test_get_run_missing(subject: RunStore) -> None:
@@ -261,49 +201,51 @@ def test_get_run_missing(subject: RunStore) -> None:
 
 def test_get_all_runs(subject: RunStore) -> None:
     """It can get all created runs."""
-    run_1 = RunResource(
+    subject.insert(
         run_id="run-id-1",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-        actions=[],
-        is_current=False,
     )
-    run_2 = RunResource(
+    subject.insert(
         run_id="run-id-2",
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
-        actions=[],
-        is_current=True,
     )
-
-    subject.insert(run_1)
-    subject.insert(run_2)
 
     result = subject.get_all()
 
-    assert result == [run_1, run_2]
+    assert result == [
+        RunResource(
+            run_id="run-id-1",
+            protocol_id=None,
+            created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+            actions=[],
+        ),
+        RunResource(
+            run_id="run-id-2",
+            protocol_id=None,
+            created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
+            actions=[],
+        ),
+    ]
 
 
 def test_remove_run(subject: RunStore) -> None:
-    """It can remove and return a previously stored run entry."""
+    """It can remove a previously stored run entry."""
     action = RunAction(
         actionType=RunActionType.PLAY,
         createdAt=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
         id="action-id",
     )
-    run = RunResource(
+
+    subject.insert(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-        actions=[action],
-        is_current=True,
     )
-
-    subject.insert(run)
     subject.insert_action(run_id="run-id", action=action)
-    result = subject.remove(run_id="run-id")
+    subject.remove(run_id="run-id")
 
-    assert result == run
     assert subject.get_all() == []
 
 
@@ -311,65 +253,6 @@ def test_remove_run_missing_id(subject: RunStore) -> None:
     """It raises if the run does not exist."""
     with pytest.raises(RunNotFoundError, match="run-id"):
         subject.remove(run_id="run-id")
-
-
-def test_add_run_current_run_deactivates(subject: RunStore) -> None:
-    """Adding a current run should mark all others as not current."""
-    actions = RunAction(
-        actionType=RunActionType.PLAY,
-        createdAt=datetime(year=2023, month=3, day=3, tzinfo=timezone.utc),
-        id="action-id",
-    )
-    run_1 = RunResource(
-        run_id="run-id-1",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-        actions=[actions],
-        is_current=True,
-    )
-    run_2 = RunResource(
-        run_id="run-id-2",
-        protocol_id=None,
-        created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
-        actions=[],
-        is_current=True,
-    )
-
-    subject.insert(run_1)
-    subject.insert(run_2)
-
-    assert subject.get("run-id-1").is_current is False
-    assert subject.get("run-id-2").is_current is True
-
-
-def test_update_active_run_deactivates(subject: RunStore) -> None:
-    """Updating active run should deactivate other runs."""
-    actions = RunAction(
-        actionType=RunActionType.PLAY,
-        createdAt=datetime(year=2023, month=3, day=3),
-        id="action-id",
-    )
-    run_1 = RunResource(
-        run_id="run-id-1",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-        actions=[actions],
-        is_current=True,
-    )
-    run_2 = RunResource(
-        run_id="run-id-2",
-        protocol_id=None,
-        created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
-        actions=[],
-        is_current=True,
-    )
-
-    subject.insert(run_1)
-    subject.insert(run_2)
-    subject.update_active_run(run_1.run_id, True)
-
-    assert subject.get("run-id-1").is_current is True
-    assert subject.get("run-id-2").is_current is False
 
 
 def test_insert_actions_no_run(subject: RunStore) -> None:
@@ -387,39 +270,74 @@ def test_insert_actions_no_run(subject: RunStore) -> None:
 def test_get_run_commands(
     subject: RunStore,
     protocol_run: ProtocolRunData,
-    run_resource: RunResource,
     protocol_commands: List[pe_commands.Command],
 ) -> None:
     """It should be able to get all stored run commands."""
-    subject.insert(run=run_resource)
-    subject.update_run_state(
-        run_id=run_resource.run_id, run_data=protocol_run, commands=protocol_commands
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
-    result = subject.get_run_commands(run_id=run_resource.run_id)
+    subject.update_run_state(
+        run_id="run-id",
+        run_data=protocol_run,
+        commands=protocol_commands,
+    )
+    result = subject.get_run_commands(run_id="run-id")
     assert result == protocol_commands
 
 
-def test_get_run_data(
-    subject: RunStore, protocol_run: ProtocolRunData, run_resource: RunResource
+def test_get_run_commands_none(
+    subject: RunStore,
+    protocol_run: ProtocolRunData,
+    protocol_commands: List[pe_commands.Command],
 ) -> None:
-    """It should be able to get store run data."""
-    subject.insert(run=run_resource)
-    subject.update_run_state(
-        run_id=run_resource.run_id, run_data=protocol_run, commands=[]
+    """It should return None if no commands stored."""
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
-    result = subject.get_run_data(run_id=run_resource.run_id)
+
+    result = subject.get_run_commands(run_id="run-id")
+    assert result == []
+
+
+def test_get_run_data(subject: RunStore, protocol_run: ProtocolRunData) -> None:
+    """It should be able to get store run data."""
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    subject.update_run_state(run_id="run-id", run_data=protocol_run, commands=[])
+    result = subject.get_run_data(run_id="run-id")
     assert result == protocol_run
 
 
-def test_has_run_id(subject: RunStore, run_resource: RunResource) -> None:
+def test_get_run_data_none(subject: RunStore) -> None:
+    """It should return None if no state data stored."""
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    result = subject.get_run_data(run_id="run-id")
+    assert result is None
+
+
+def test_has_run_id(subject: RunStore) -> None:
     """It should tell us if a given ID is in the store."""
-    subject.insert(run=run_resource)
-    result = subject.has(run_resource.run_id)
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    result = subject.has("run-id")
     assert result is True
 
 
-def test_has_no_run_id(subject: RunStore, run_resource: RunResource) -> None:
+def test_has_no_run_id(subject: RunStore) -> None:
     """It should tell us if a given ID is not in the store."""
-    subject.insert(run=run_resource)
     result = subject.has("no-run-id")
     assert result is False

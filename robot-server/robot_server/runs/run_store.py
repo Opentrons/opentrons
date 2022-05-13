@@ -1,7 +1,8 @@
 """Runs' on-db store."""
+from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
 
 import sqlalchemy
 from pydantic import parse_obj_as
@@ -28,11 +29,10 @@ class RunResource:
     protocol_id: Optional[str]
     created_at: datetime
     actions: List[RunAction]
-    is_current: bool
 
 
 @dataclass(frozen=True)
-class RunStateResource:
+class _RunStateResource:
     """An entry in the run state store, used to construct response models.
 
     This represents all run information derived from the run's ProtocolEngine.
@@ -67,28 +67,29 @@ class RunStore:
     def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
         """Initialize a RunStore with sql engine."""
         self._sql_engine = sql_engine
-        self._active_run: Optional[str] = None
 
     def update_run_state(
         self,
         run_id: str,
         run_data: ProtocolRunData,
         commands: List[Command],
-    ) -> None:
+    ) -> RunResource:
         """Update run table with run protocol_run_data to db.
 
-        Arguments:
-            protocol_run_data: Engine protocol_run_data resource to store.
+        Args:
+            run_id: The run to update
+            run_data: The run's equipment and status summary.
+            commands: The run's commands.
 
         Returns:
-            The engine protocol_run_data that was added to the store.
+            The run resource.
         """
-        statement = (
+        update_run = (
             sqlalchemy.update(run_table)
             .where(run_table.c.id == run_id)
             .values(
                 _convert_state_to_sql_values(
-                    state=RunStateResource(
+                    state=_RunStateResource(
                         commands=commands,
                         protocol_run_data=run_data,
                         run_id=run_id,
@@ -97,34 +98,27 @@ class RunStore:
                 )
             )
         )
-        with self._sql_engine.begin() as transaction:
-            result = transaction.execute(statement)
-            if result.rowcount == 0:
-                raise RunNotFoundError(run_id=run_id)
+        select_run_resource = sqlalchemy.select(
+            run_table.c.id,
+            run_table.c.protocol_id,
+            run_table.c.created_at,
+        ).where(run_table.c.id == run_id)
 
-    def get_run_data(self, run_id: str) -> ProtocolRunData:
-        """Get the archived run data of a run."""
-        statement = sqlalchemy.select(run_table.c.protocol_run_data).where(
-            run_table.c.id == run_id
+        select_actions = sqlalchemy.select(action_table).where(
+            action_table.c.id == run_id
         )
+
         with self._sql_engine.begin() as transaction:
+            transaction.execute(update_run)
+
             try:
-                row = transaction.execute(statement).one()
+                run_row = transaction.execute(select_run_resource).one()
             except sqlalchemy.exc.NoResultFound:
                 raise RunNotFoundError(run_id=run_id)
-            return _convert_sql_row_to_run_data(row)
 
-    def get_run_commands(self, run_id: str) -> List[Command]:
-        """Get the archived commands list of a run."""
-        statement = sqlalchemy.select(run_table.c.commands).where(
-            run_table.c.id == run_id
-        )
-        with self._sql_engine.begin() as transaction:
-            try:
-                row = transaction.execute(statement).one()
-            except sqlalchemy.exc.NoResultFound:
-                raise RunNotFoundError(run_id=run_id)
-            return _convert_sql_row_to_run_commands(row)
+            action_rows = transaction.execute(select_actions).all()
+
+        return _convert_row_to_run(row=run_row, action_rows=action_rows)
 
     def insert_action(self, run_id: str, action: RunAction) -> None:
         """Insert run action in the db.
@@ -133,30 +127,22 @@ class RunStore:
             run_id: current run id to get
             action: action to insert into the db
         """
+        insert = sqlalchemy.insert(action_table).values(
+            _convert_action_to_sql_values(run_id=run_id, action=action),
+        )
+
         with self._sql_engine.begin() as transaction:
             try:
-                _insert_action_no_transaction(run_id, action, transaction)
+                transaction.execute(insert)
             except sqlalchemy.exc.IntegrityError:
                 raise RunNotFoundError(run_id=run_id)
 
-    def update_active_run(self, run_id: str, is_current: bool) -> RunResource:
-        """Update current active run resource in memory.
-
-        Arguments:
-            run_id: run to update
-            is_current: is run active or not
-
-        Returns:
-            The resource that was updated.
-        """
-        # TODO (tz 4-13-22): Check if run exists before setting the current run.
-        if is_current is True:
-            self._active_run = run_id
-        elif is_current is False and self._active_run == run_id:
-            self._active_run = None
-        return self.get(run_id)
-
-    def insert(self, run: RunResource) -> RunResource:
+    def insert(
+        self,
+        run_id: str,
+        created_at: datetime,
+        protocol_id: Optional[str],
+    ) -> RunResource:
         """Insert run resource in the db.
 
         Arguments:
@@ -165,19 +151,24 @@ class RunStore:
         Returns:
             The resource that was added to the store.
         """
-        statement = sqlalchemy.insert(run_table).values(
+        run = RunResource(
+            run_id=run_id,
+            created_at=created_at,
+            protocol_id=protocol_id,
+            actions=[],
+        )
+        insert = sqlalchemy.insert(run_table).values(
             _convert_run_to_sql_values(run=run)
         )
+
         with self._sql_engine.begin() as transaction:
             try:
-                transaction.execute(statement)
+                transaction.execute(insert)
             except sqlalchemy.exc.IntegrityError:
                 assert (
                     run.protocol_id is not None
                 ), "Insert run failed due to unexpected IntegrityError"
                 raise ProtocolNotFoundError(protocol_id=run.protocol_id)
-
-        self.update_active_run(run_id=run.run_id, is_current=run.is_current)
 
         return run
 
@@ -200,20 +191,24 @@ class RunStore:
         Returns:
             The retrieved run entry from the db.
         """
-        statement = sqlalchemy.select(run_table).where(run_table.c.id == run_id)
+        select_run_resource = sqlalchemy.select(
+            run_table.c.id,
+            run_table.c.protocol_id,
+            run_table.c.created_at,
+        ).where(run_table.c.id == run_id)
+
+        select_actions = sqlalchemy.select(action_table).where(
+            action_table.c.run_id == run_id
+        )
+
         with self._sql_engine.begin() as transaction:
             try:
-                row_run = transaction.execute(statement).one()
+                run_row = transaction.execute(select_run_resource).one()
             except sqlalchemy.exc.NoResultFound as e:
                 raise RunNotFoundError(run_id) from e
+            action_rows = transaction.execute(select_actions).all()
 
-            actions = _get_actions_no_transaction(run_id, transaction)
-            run = _convert_sql_row_to_run(
-                row_run,
-                [_convert_sql_row_to_action(action) for action in actions],
-                self._active_run,
-            )
-        return run
+        return _convert_row_to_run(run_row, action_rows)
 
     def get_all(self) -> List[RunResource]:
         """Get all known run resources.
@@ -221,122 +216,106 @@ class RunStore:
         Returns:
             All stored run entries.
         """
-        statement = sqlalchemy.select(run_table)
-        with self._sql_engine.begin() as transaction:
-            runs = transaction.execute(statement).all()
-            return [
-                _convert_sql_row_to_run(
-                    sql_row=row,
-                    actions=[
-                        _convert_sql_row_to_action(sql_row=row)
-                        for row in _get_actions_no_transaction(row.id, transaction)
-                    ],
-                    current_run_id=self._active_run,
-                )
-                for row in runs
-            ]
+        select_runs = sqlalchemy.select(run_table)
+        select_actions = sqlalchemy.select(action_table)
+        actions_by_run_id = defaultdict(list)
 
-    def remove(self, run_id: str) -> RunResource:
+        with self._sql_engine.begin() as transaction:
+            runs = transaction.execute(select_runs).all()
+            actions = transaction.execute(select_actions).all()
+
+        for action_row in actions:
+            actions_by_run_id[action_row.run_id].append(action_row)
+
+        return [
+            _convert_row_to_run(
+                row=run_row,
+                action_rows=actions_by_run_id[run_row.id],
+            )
+            for run_row in runs
+        ]
+
+    def get_run_data(self, run_id: str) -> Optional[ProtocolRunData]:
+        """Get the archived run data of a run."""
+        select_run_data = sqlalchemy.select(run_table.c.protocol_run_data).where(
+            run_table.c.id == run_id
+        )
+
+        with self._sql_engine.begin() as transaction:
+            row = transaction.execute(select_run_data).one()
+
+        return (
+            ProtocolRunData.parse_obj(row.protocol_run_data)
+            if row.protocol_run_data is not None
+            else None
+        )
+
+    def get_run_commands(self, run_id: str) -> List[Command]:
+        """Get the archived commands list of a run."""
+        select_run_commands = sqlalchemy.select(run_table.c.commands).where(
+            run_table.c.id == run_id
+        )
+        with self._sql_engine.begin() as transaction:
+            try:
+                row = transaction.execute(select_run_commands).one()
+            except sqlalchemy.exc.NoResultFound:
+                raise RunNotFoundError(run_id=run_id)
+
+        return (
+            [
+                parse_obj_as(Command, command)  # type: ignore[arg-type]
+                for command in row.commands
+            ]
+            if row.commands is not None
+            else []
+        )
+
+    def remove(self, run_id: str) -> None:
         """Remove a run by its unique identifier.
 
         Arguments:
             run_id: The run's unique identifier.
 
-        Returns:
-            The run entry that was deleted.
-
         Raises:
             RunNotFoundError: The specified run ID was not found.
         """
-        select_run_statement = sqlalchemy.select(run_table).where(
-            run_table.c.id == run_id
-        )
-        select_action_statement = sqlalchemy.select(action_table).where(
-            action_table.c.run_id == run_id
-        )
-        delete_run_statement = sqlalchemy.delete(run_table).where(
-            run_table.c.id == run_id
-        )
-        delete_actions_statement = sqlalchemy.delete(action_table).where(
+        delete_run = sqlalchemy.delete(run_table).where(run_table.c.id == run_id)
+        delete_actions = sqlalchemy.delete(action_table).where(
             action_table.c.run_id == run_id
         )
         with self._sql_engine.begin() as transaction:
-            try:
-                # SQLite <3.35.0 doesn't support the RETURNING clause,
-                # so we do it ourselves with a separate SELECT.
-                row_to_delete = transaction.execute(select_run_statement).one()
-            except sqlalchemy.exc.NoResultFound as e:
-                raise RunNotFoundError(run_id) from e
-            actions = transaction.execute(select_action_statement).all()
-            transaction.execute(delete_actions_statement)
-            transaction.execute(delete_run_statement)
-        return _convert_sql_row_to_run(
-            row_to_delete,
-            [_convert_sql_row_to_action(action) for action in actions],
-            self._active_run,
-        )
+            transaction.execute(delete_actions)
+            result = transaction.execute(delete_run)
+
+            if result.rowcount < 1:
+                raise RunNotFoundError(run_id)
 
 
-def _get_actions_no_transaction(
-    run_id: str, transaction: sqlalchemy.engine.Connection
-) -> List[sqlalchemy.engine.Row]:
-    statement = action_table.select().where(action_table.c.run_id == run_id)
-    return transaction.execute(statement).all()
-
-
-def _insert_action_no_transaction(
-    run_id: str, action: RunAction, transaction: sqlalchemy.engine.Connection
-) -> None:
-    transaction.execute(
-        sqlalchemy.insert(action_table),
-        _convert_action_to_sql_values(run_id=run_id, action=action),
-    )
-
-
-def _convert_sql_row_to_run(
-    sql_row: sqlalchemy.engine.Row,
-    actions: List[RunAction],
-    current_run_id: Optional[str],
+def _convert_row_to_run(
+    row: sqlalchemy.engine.Row,
+    action_rows: List[sqlalchemy.engine.Row],
 ) -> RunResource:
-    run_id = sql_row.id
-    protocol_id = sql_row.protocol_id
-    created_at = ensure_utc_datetime(sql_row.created_at)
+    run_id = row.id
+    protocol_id = row.protocol_id
+    created_at = ensure_utc_datetime(row.created_at)
 
     assert isinstance(run_id, str), f"Run ID {run_id} is not a string"
     assert protocol_id is None or isinstance(
         protocol_id, str
     ), f"Protocol ID {protocol_id} is not a string or None"
 
-    is_current = current_run_id == run_id
-
     return RunResource(
         run_id=run_id,
         created_at=created_at,
-        actions=actions,
         protocol_id=protocol_id,
-        is_current=is_current,
-    )
-
-
-def _convert_commands_list_to_dict(commands: List[Command]) -> List[Dict[str, Any]]:
-    return [command.dict() for command in commands]
-
-
-def _convert_sql_row_to_run_data(sql_row: sqlalchemy.engine.Row) -> ProtocolRunData:
-    run_data = sql_row[0]
-    return parse_obj_as(ProtocolRunData, run_data)
-
-
-def _convert_sql_row_to_run_commands(sql_row: sqlalchemy.engine.Row) -> List[Command]:
-    return parse_obj_as(List[Command], sql_row[0])
-
-
-def _convert_sql_row_to_action(sql_row: sqlalchemy.engine.Row) -> RunAction:
-    # rely on Pydantic and Enum to raise if data shapes are wrong
-    return RunAction(
-        id=sql_row.id,
-        createdAt=ensure_utc_datetime(sql_row.created_at),
-        actionType=RunActionType(sql_row.action_type),
+        actions=[
+            RunAction(
+                id=action_row.id,
+                createdAt=ensure_utc_datetime(action_row.created_at),
+                actionType=RunActionType(action_row.action_type),
+            )
+            for action_row in action_rows
+        ],
     )
 
 
@@ -357,10 +336,10 @@ def _convert_action_to_sql_values(action: RunAction, run_id: str) -> Dict[str, o
     }
 
 
-def _convert_state_to_sql_values(state: RunStateResource) -> Dict[str, object]:
+def _convert_state_to_sql_values(state: _RunStateResource) -> Dict[str, object]:
     return {
         "protocol_run_data": state.protocol_run_data.dict(),
         "engine_status": state.engine_status,
-        "commands": _convert_commands_list_to_dict(state.commands),
+        "commands": [command.dict() for command in state.commands],
         "_updated_at": ensure_utc_datetime(state._updated_at),
     }

@@ -33,7 +33,7 @@ from robot_server.protocols import (
 from ..run_store import RunNotFoundError
 from ..run_models import Run, RunCreate, RunUpdate
 from ..engine_store import EngineConflictError
-from ..run_data_manager import RunDataManager
+from ..run_data_manager import RunDataManager, RunNotCurrentError
 from ..dependencies import get_run_data_manager
 
 log = logging.getLogger(__name__)
@@ -264,11 +264,13 @@ async def update_run(
         request_body: Update data from request body.
         run_data_manager: Current and historical run data management.
     """
-    should_archive = request_body.data.current is False
-
     try:
-        run_data = await run_data_manager.get_or_archive(runId, archive=should_archive)
+        run_data = await run_data_manager.update(
+            runId, current=request_body.data.current
+        )
     except EngineConflictError as e:
+        raise RunNotIdle(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
+    except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e

@@ -24,7 +24,7 @@ from robot_server.protocols import (
 )
 from robot_server.runs.run_models import Run, RunCreate, RunUpdate
 from robot_server.runs.engine_store import EngineConflictError
-from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
 from robot_server.runs.run_store import RunNotFoundError
 from robot_server.runs.router.base_router import (
     AllRunsLinks,
@@ -392,9 +392,9 @@ async def test_update_run_to_not_current(
         labwareOffsets=[],
     )
 
-    decoy.when(
-        await mock_run_data_manager.get_or_archive("run-id", archive=True)
-    ).then_return(expected_response)
+    decoy.when(await mock_run_data_manager.update("run-id", current=False)).then_return(
+        expected_response
+    )
 
     result = await update_run(
         runId="run-id",
@@ -424,9 +424,9 @@ async def test_update_current_none_noop(
         labwareOffsets=[],
     )
 
-    decoy.when(
-        await mock_run_data_manager.get_or_archive("run-id", archive=False)
-    ).then_return(expected_response)
+    decoy.when(await mock_run_data_manager.update("run-id", current=None)).then_return(
+        expected_response
+    )
 
     result = await update_run(
         runId="run-id",
@@ -438,14 +438,14 @@ async def test_update_current_none_noop(
     assert result.status_code == 200
 
 
-async def test_update_to_current_conflict(
+async def test_update_to_current_not_current(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 409 if attempting to update a not current run."""
     decoy.when(
-        await mock_run_data_manager.get_or_archive(run_id="run-id", archive=True)
-    ).then_raise(EngineConflictError("oh no"))
+        await mock_run_data_manager.update(run_id="run-id", current=False)
+    ).then_raise(RunNotCurrentError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await update_run(
@@ -458,13 +458,33 @@ async def test_update_to_current_conflict(
     assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
 
 
+async def test_update_to_current_conflict(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should 409 if attempting to un-current a run that is not idle."""
+    decoy.when(
+        await mock_run_data_manager.update(run_id="run-id", current=False)
+    ).then_raise(EngineConflictError("oh no"))
+
+    with pytest.raises(ApiError) as exc_info:
+        await update_run(
+            runId="run-id",
+            request_body=RequestModel(data=RunUpdate(current=False)),
+            run_data_manager=mock_run_data_manager,
+        )
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["id"] == "RunNotIdle"
+
+
 async def test_update_to_current_missing(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
 ) -> None:
-    """It should 409 if attempting to update a not current run."""
+    """It should 404 if attempting to update a missing run."""
     decoy.when(
-        await mock_run_data_manager.get_or_archive(run_id="run-id", archive=True)
+        await mock_run_data_manager.update(run_id="run-id", current=False)
     ).then_raise(RunNotFoundError(run_id="run-id"))
 
     with pytest.raises(ApiError) as exc_info:
