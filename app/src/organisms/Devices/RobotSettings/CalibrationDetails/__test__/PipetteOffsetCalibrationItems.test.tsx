@@ -3,11 +3,13 @@ import * as React from 'react'
 import { renderWithProviders, Mount } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
-import { PipetteOffsetCalItems } from '../PipetteOffsetCalItems'
+import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const render = (props: React.ComponentProps<typeof PipetteOffsetCalItems>) => {
-  return renderWithProviders(<PipetteOffsetCalItems {...props} />, {
+const render = (
+  props: React.ComponentProps<typeof PipetteOffsetCalibrationItems>
+) => {
+  return renderWithProviders(<PipetteOffsetCalibrationItems {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
@@ -37,8 +39,8 @@ jest.mock('../../../../../redux/config')
 jest.mock('../../../../../redux/sessions/selectors')
 jest.mock('../../../../../redux/discovery')
 
-describe('PipetteOffsetCalItems', () => {
-  let props: React.ComponentProps<typeof PipetteOffsetCalItems>
+describe('PipetteOffsetCalibrationItems', () => {
+  let props: React.ComponentProps<typeof PipetteOffsetCalibrationItems>
 
   beforeEach(() => {
     props = {

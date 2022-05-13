@@ -3,13 +3,14 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
-import { SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { SPACING, TYPOGRAPHY, Mount } from '@opentrons/components'
 
 import { StyledText } from '../../../../atoms/text'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated } from './utils'
 import { getDisplayNameForTipRack } from '../../../../pages/Robots/InstrumentSettings/utils'
 import { getCustomLabwareDefinitions } from '../../../../redux/custom-labware'
+import { useAttachedPipettes } from '../../hooks'
 
 import type {
   FormattedPipetteOffsetCalibration,
@@ -34,21 +35,22 @@ const StyledTableCell = styled.td`
   text-overflow: wrap;
 `
 
-interface TipLengthCallItemsProps {
+interface TipLengthCalibrationItemsProps {
   robotName: string
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
   formattedTipLengthCalibrations: FormattedTipLengthCalibration[]
 }
 
-export function TipLengthCalItems({
+export function TipLengthCalibrationItems({
   robotName,
   formattedPipetteOffsetCalibrations,
   formattedTipLengthCalibrations,
-}: TipLengthCallItemsProps): JSX.Element {
+}: TipLengthCalibrationItemsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const customLabwareDefs = useSelector((state: State) => {
     return getCustomLabwareDefinitions(state)
   })
+  const attachedPipettes = useAttachedPipettes(robotName)
   const tipLengthCalibrations = formattedTipLengthCalibrations.map(
     tipLength => {
       return {
@@ -64,6 +66,19 @@ export function TipLengthCalItems({
       }
     }
   )
+
+  // console.log('json', pipetteNameSpecs)
+  console.log('attatched', attachedPipettes.left)
+  console.log('tipLengthCalibrations', tipLengthCalibrations)
+
+  const checkAttathedPipetteWithDefaultData = (serialNumber: string): Mount => {
+    const keys = Object.keys(attachedPipettes)
+    const mount = keys.find(key => {
+      const pipette = attachedPipettes.key
+      return pipette.id === serialNumber
+    })
+    return mount as Mount
+  }
 
   return (
     <>
@@ -100,13 +115,18 @@ export function TipLengthCalItems({
                   {formatLastCalibrated(calibration.lastCalibrated)}
                 </StyledText>
               </StyledTableCell>
-
               <StyledTableCell>
                 <OverflowMenu
                   calType="tipLength"
                   robotName={robotName}
                   serialNumber={calibration.serialNumber}
-                  mount={calibration.mount}
+                  mount={
+                    calibration.mount != null
+                      ? calibration.mount
+                      : checkAttathedPipetteWithDefaultData(
+                          calibration.serialNumber
+                        )
+                  }
                 />
               </StyledTableCell>
             </StyledTableRow>

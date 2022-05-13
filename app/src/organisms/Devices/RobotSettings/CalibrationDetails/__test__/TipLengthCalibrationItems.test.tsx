@@ -2,7 +2,7 @@ import * as React from 'react'
 import { renderWithProviders, Mount } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 
-import { TipLengthCalItems } from '../TipLengthCalItems'
+import { TipLengthCalibrationItems } from '../TipLengthCalibrationItems'
 
 jest.mock('../../../../../redux/custom-labware/selectors')
 jest.mock('../../../../../redux/config')
@@ -45,13 +45,15 @@ const mockTipLengthCalibrations = [
 ]
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const render = (props: React.ComponentProps<typeof TipLengthCalItems>) => {
-  return renderWithProviders(<TipLengthCalItems {...props} />, {
+const render = (
+  props: React.ComponentProps<typeof TipLengthCalibrationItems>
+) => {
+  return renderWithProviders(<TipLengthCalibrationItems {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-describe('PipetteOffsetCalItems', () => {
-  let props: React.ComponentProps<typeof TipLengthCalItems>
+describe('TipLengthCalibrationItems', () => {
+  let props: React.ComponentProps<typeof TipLengthCalibrationItems>
 
   beforeEach(() => {
     props = {
