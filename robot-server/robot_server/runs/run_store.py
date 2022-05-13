@@ -8,7 +8,7 @@ import sqlalchemy
 from pydantic import parse_obj_as
 
 from opentrons.util.helpers import utc_now
-from opentrons.protocol_engine import ProtocolRunData
+from opentrons.protocol_engine import ProtocolRunData, CommandSlice
 from opentrons.protocol_engine.commands import Command
 
 from robot_server.persistence import run_table, action_table, ensure_utc_datetime
@@ -270,6 +270,27 @@ class RunStore:
             else []
         )
 
+    def get_commands_slice(self, cursor: Optional[int], length: int, run_id: str) -> CommandSlice:
+        """Get run commands slice from db"""
+        print("get_commands_slice")
+        commands = self.get_run_commands(run_id=run_id)
+        print("commands slice")
+        print(commands)
+        commands_length = len(commands)
+        if cursor is None:
+            cursor = commands_length - length
+
+        # start is inclusive, stop is exclusive
+        actual_cursor = max(0, min(cursor, commands_length - 1))
+        stop = min(commands_length, actual_cursor + length)
+        sliced_commands = commands[actual_cursor:stop]
+
+        return CommandSlice(
+            cursor=actual_cursor,
+            total_length=commands_length,
+            commands=sliced_commands
+        )
+
     def get_command(self, run_id: str, command_id: str) -> Command:
         """Get run command by id"""
         select_run_commands = sqlalchemy.select(run_table.c.commands).where(
@@ -280,14 +301,11 @@ class RunStore:
                 row = transaction.execute(select_run_commands).one()
             except sqlalchemy.exc.NoResultFound:
                 raise RunNotFoundError(run_id=run_id)
-
             try:
                 command = next(filter(lambda x: x['id'] == command_id, row.commands))
             except StopIteration:
                 raise CommandNotFoundError(command_id=command_id)
-
             return parse_obj_as(Command, command)
-
 
     def remove(self, run_id: str) -> None:
         """Remove a run by its unique identifier.

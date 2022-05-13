@@ -13,6 +13,7 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
     types as pe_types,
     ProtocolRunData,
+    CommandSlice
 )
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import EngineStatus
@@ -38,6 +39,14 @@ def protocol_commands() -> List[pe_commands.Command]:
         ),
         pe_commands.Pause(
             id="pause-2",
+            key="command-key",
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=pe_commands.PauseParams(message="hello world"),
+            result=pe_commands.PauseResult(),
+        ),
+        pe_commands.Pause(
+            id="pause-3",
             key="command-key",
             status=pe_commands.CommandStatus.SUCCEEDED,
             createdAt=datetime(year=2021, month=1, day=1),
@@ -387,7 +396,7 @@ def test_get_command_run_not_found(subject: RunStore) -> None:
 
 
 def test_get_command_command_not_found(subject: RunStore, protocol_commands: List[pe_commands.Command],
-                     protocol_run: ProtocolRunData) -> None:
+                                       protocol_run: ProtocolRunData) -> None:
     """Should raise CommandNotFoundError"""
     subject.insert(run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc))
     subject.update_run_state(
@@ -397,3 +406,29 @@ def test_get_command_command_not_found(subject: RunStore, protocol_commands: Lis
     )
     with pytest.raises(CommandNotFoundError):
         subject.get_command(run_id="run-id", command_id="pause-666")
+
+
+def test_get_commands_slice(subject: RunStore, protocol_commands: List[pe_commands.Command],
+                            protocol_run: ProtocolRunData) -> None:
+    expected_commands_result = [protocol_commands[1], protocol_commands[2]]
+    expected_command_slice = CommandSlice(
+        commands=expected_commands_result,
+        cursor=1,
+        total_length=3
+    )
+
+    subject.insert(run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc))
+    subject.update_run_state(
+        run_id="run-id",
+        run_data=protocol_run,
+        commands=protocol_commands,
+    )
+    result = subject.get_commands_slice(run_id="run-id", cursor=1, length=3)
+
+    assert expected_command_slice == result
+
+
+def test_get_commands_slice_run_not_found(subject: RunStore) -> None:
+    subject.insert(run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc))
+    with pytest.raises(RunNotFoundError):
+        subject.get_commands_slice(run_id="not-run-id", cursor=1, length=3)

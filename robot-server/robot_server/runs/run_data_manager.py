@@ -1,6 +1,8 @@
 """Manage current and historical run data."""
 from datetime import datetime
 from typing import List, Optional
+
+from sqlalchemy.engine import cursor
 from typing_extensions import Literal
 
 from opentrons.protocol_engine import (
@@ -223,12 +225,9 @@ class RunDataManager:
             RunNotFoundError: The given run identifier was not found in the database.
         """
         if self._engine_store.current_run_id == run_id:
-            commands = self._engine_store.engine.state_view.commands.get_all()
-        else:
-            # Let exception propagate
-            commands = self._run_store.get_run_commands(run_id)
-
-        return self._slice_commands(cursor=cursor, length=length, commands=commands)
+            return self._engine_store.engine.state_view.commands.get_slice(cursor=cursor, length=length)
+        # Let exception propagate
+        return self._run_store.get_commands_slice(run_id=run_id, cursor=cursor, length=length)
 
     def get_current_command(self, run_id: str) -> Optional[CurrentCommand]:
         """Get the currently executing command, if any.
@@ -265,21 +264,3 @@ class RunDataManager:
             result = self._run_store.get_run_data(run_id)
 
         return result
-
-    def _slice_commands(self, cursor: Optional[int],
-                            length: int, commands: List[Command]) -> CommandSlice:
-        commands_length = len(commands)
-
-        if cursor is None:
-            cursor = commands_length - length
-
-        # start is inclusive, stop is exclusive
-        actual_cursor = max(0, min(cursor, commands_length - 1))
-        stop = min(commands_length, actual_cursor + length)
-        sliced_commands = commands[actual_cursor:stop]
-
-        return CommandSlice(
-            cursor=actual_cursor,
-            total_length=commands_length,
-            commands=sliced_commands
-        )
