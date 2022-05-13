@@ -9,22 +9,25 @@ import {
   TYPOGRAPHY,
   BORDERS,
   JUSTIFY_FLEX_START,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { useProtocolDetailsForRun } from './hooks'
+import { Banner } from '../../atoms/Banner'
+import { useProtocolDetailsForRun, useDeckCalibrationData } from './hooks'
 import { OffsetVector } from '../../molecules/OffsetVector'
-import { getLabwareDefinition } from '../ReapplyOffsetsModal/hooks/useOffsetCandidatesForCurrentRun'
 import type { RunData } from '@opentrons/api-client'
 
 interface HistoricalRunOffsetDrawerProps {
   run: RunData
+  robotName: string
 }
 
 export function HistoricalRunOffsetDrawer(
   props: HistoricalRunOffsetDrawerProps
 ): JSX.Element | null {
   const { t } = useTranslation('run_details')
-  const { run } = props
+  const { run, robotName } = props
+  const [showOutOfDateBanner, setShowOutOfDateBanner] = React.useState(false)
   const allLabwareOffsets = run.labwareOffsets?.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
@@ -40,6 +43,12 @@ export function HistoricalRunOffsetDrawer(
     }
   )
 
+  const deckCalibrationData = useDeckCalibrationData(robotName)
+    .deckCalibrationData
+  const lastModifiedDeckCal =
+    deckCalibrationData != null && 'lastModified' in deckCalibrationData
+      ? deckCalibrationData.lastModified
+      : null
   const protocolDetails = useProtocolDetailsForRun(run.id)
   const labwareDetails = protocolDetails.protocolData?.labware
 
@@ -61,6 +70,15 @@ export function HistoricalRunOffsetDrawer(
       </Box>
     )
   }
+  if (
+    typeof lastModifiedDeckCal === 'string' &&
+    new Date(lastModifiedDeckCal).getTime() >
+      new Date(
+        uniqueLabwareOffsets[uniqueLabwareOffsets?.length - 1].createdAt
+      ).getTime()
+  ) {
+    setShowOutOfDateBanner(true)
+  }
 
   return (
     <Box
@@ -68,6 +86,20 @@ export function HistoricalRunOffsetDrawer(
       width="100%"
       padding={SPACING.spacing3}
     >
+      {showOutOfDateBanner && (
+        <Banner
+          type="warning"
+          marginLeft={SPACING.spacing5}
+          marginTop={SPACING.spacing3}
+        >
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {t('data_out_of_date')}
+            </StyledText>
+            <StyledText as="p">{t('robot_was_recalibrated')}</StyledText>
+          </Flex>
+        </Banner>
+      )}
       <Flex
         justifyContent={JUSTIFY_FLEX_START}
         borderBottom={BORDERS.lineBorder}

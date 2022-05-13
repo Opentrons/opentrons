@@ -71,6 +71,15 @@ export function HistoricalProtocolRun(
           {protocolName}
         </StyledText>
         <StyledText as="p" width="20%" textTransform="capitalize">
+          {runStatus === 'running' && (
+            <Icon
+              name="circle"
+              color={COLORS.blue}
+              size={SPACING.spacing2}
+              marginX={SPACING.spacing2}
+              marginBottom={SPACING.spacing2}
+            />
+          )}
           {runStatus != null ? t(`status_${runStatus}`) : ''}
         </StyledText>
         <StyledText as="p" width="20%">
@@ -83,7 +92,7 @@ export function HistoricalProtocolRun(
           robotIsBusy={robotIsBusy}
         />
       </Flex>
-      {offsetDrawerOpen && <OffsetDrawer run={run} />}
+      {offsetDrawerOpen && <OffsetDrawer run={run} robotName={robotName} />}
     </>
   )
 }
