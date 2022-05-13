@@ -656,8 +656,7 @@ def test_get_commands_slice_current_run(decoy: Decoy, subject: RunDataManager, m
 def test_get_commands_slice_from_db_run_not_found(decoy: Decoy, subject: RunDataManager, mock_run_store: RunStore,
                                                   mock_engine_store: EngineStore) -> None:
     """Should get a sliced command list from run store"""
-    decoy.when(mock_engine_store.current_run_id).then_return("run-id")
     decoy.when(mock_run_store.get_run_commands("run-id")).then_raise(RunNotFoundError(run_id="run-id"))
 
     with pytest.raises(RunNotFoundError):
-        subject.get_commands_slice("run_id", 1, 2)
+        subject.get_commands_slice("run-id", 1, 2)

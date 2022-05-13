@@ -212,9 +212,9 @@ async def get_run_commands(
             cursor=cursor,
             length=pageLength,
         )
-        current_command = run_data_manager.get_current_command(run_id=runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+    current_command = run_data_manager.get_current_command(run_id=runId)
 
     data = [
         RunCommandSummary.construct(
