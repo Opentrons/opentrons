@@ -26,7 +26,7 @@ describe('UnMatchedModuleWarning', () => {
   it('should render the correct body', () => {
     const { getByText } = render(props)
     getByText(
-      'If you’re having trouble connecting the modules specifed below, make sure the module’s generation (GEN1 vs GEN2) is correct.'
+      'If you’re having trouble connecting the modules specified below, make sure the module’s generation (GEN1 vs GEN2) is correct.'
     )
   })
 

@@ -296,8 +296,8 @@ export function AdvancedSettings(): JSX.Element {
               {t('usb_to_ethernet_adapter_info_description')}
             </StyledText>
             {driverOutdated && (
-              <Banner type="warning">
-                <Flex>
+              <Banner type="warning" marginTop={SPACING.spacing4}>
+                <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
                   <StyledText as="p" color={COLORS.darkBlack}>
                     {t('usb_to_ethernet_adapter_toast_message')}
                   </StyledText>
@@ -306,8 +306,6 @@ export function AdvancedSettings(): JSX.Element {
                     href={REALTEK_URL}
                     css={TYPOGRAPHY.pRegular}
                     color={COLORS.darkBlack}
-                    position="absolute"
-                    right={SPACING.spacing7}
                     textDecoration={TEXT_DECORATION_UNDERLINE}
                     id="AdvancedSettings_realtekLink"
                   >

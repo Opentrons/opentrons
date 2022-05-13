@@ -273,7 +273,7 @@ export function DeckCalibrationControl(props: Props): JSX.Element {
               },
             ]}
           >
-            <Text>{t('deck_calibration_error_occured')}</Text>
+            <Text>{t('deck_calibration_error_occurred')}</Text>
             <Text>
               {
                 // @ts-expect-error TODO use in operator to protect against non existent error
