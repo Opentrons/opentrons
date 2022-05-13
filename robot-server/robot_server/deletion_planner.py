@@ -1,4 +1,34 @@
-"""Plan auto-deletions of old SQL resources to make room for new ones."""
+"""Plan auto-deletions of old resources to make room for new ones.
+
+Over a robot's lifetime, clients can create thousands of protocols and runs.
+To save memory, filesystem space, and compute time, we need to stop these resources
+from accumulating indefinitely. Especially since we persist them across reboots.
+
+Our strategy is:
+
+1. Automatically delete stuff whenever a client tries to add something new, if needed.
+   Auto-deletion keeps things easy for the client.
+
+2. Delete the oldest things first.
+   They're least likely to be relevant to what the user is doing right now.
+
+3. Never delete a protocol that a run is currently linking to.
+   A client should be able to assume that if it follows a link from a run to a protocol,
+   that protocol will be there.
+
+   (Our SQL layer also enforces this, with foreign key constraints.)
+
+Note that (2) and (3) conflict. We can't always delete the oldest protocol,
+because a run (not necessarily the oldest run) might be using it.
+
+To work around this conflict, we must either delete every run that links to the
+oldest protocol, or delete the oldest *unused* protocol instead.
+We choose the latter because preserving a linear history of runs
+is more important than preserving a linear history of protocols.
+
+This module only handles the abstract planning of what to delete.
+Actual storage access is handled elsewhere.
+"""
 
 
 from typing import Sequence, Set
