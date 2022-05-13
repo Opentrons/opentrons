@@ -25,7 +25,7 @@ async def test_set_target_block_temperature(
 
     data = tc_commands.SetTargetBlockTemperatureParams(
         moduleId="input-thermocycler-id",
-        temperature=12.3,
+        celsius=12.3,
     )
     expected_result = tc_commands.SetTargetBlockTemperatureResult()
 
