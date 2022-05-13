@@ -7,7 +7,7 @@ import { useIsRobotViewable } from '../hooks'
 import { RecentProtocolRuns } from '../RecentProtocolRuns'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 
-import type { RunSummaries } from '@opentrons/api-client'
+import type { Runs } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../hooks')
@@ -48,7 +48,7 @@ describe('RecentProtocolRuns', () => {
   it('renders an empty state message when there are no runs', () => {
     mockUseAllRunsQuery.mockReturnValue({
       data: {},
-    } as UseQueryResult<RunSummaries>)
+    } as UseQueryResult<Runs>)
     const [{ getByText }] = render()
 
     getByText('No protocol runs yet!')
@@ -67,7 +67,7 @@ describe('RecentProtocolRuns', () => {
           },
         ],
       },
-    } as UseQueryResult<RunSummaries>)
+    } as UseQueryResult<Runs>)
     const [{ getByText }] = render()
     getByText(`otie's Protocol Runs`)
     getByText('Run ID')

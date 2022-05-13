@@ -4,7 +4,7 @@ import { i18n } from '../../../i18n'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
-import type { RunStatus } from '@opentrons/api-client'
+import type { RunStatus, RunData } from '@opentrons/api-client'
 
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../HistoricalProtocolRunOverflowMenu')
@@ -21,7 +21,7 @@ const run = {
   id: 'test_id',
   protocolId: 'test_protocol_id',
   status: 'succeeded' as RunStatus,
-}
+} as RunData
 const render = () => {
   return renderWithProviders(
     <HistoricalProtocolRun
