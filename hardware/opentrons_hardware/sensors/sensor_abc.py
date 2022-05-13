@@ -44,7 +44,7 @@ class AbstractBasicSensor(ABC):
         can_messenger: CanMessenger,
         node_id: NodeId,
         timeout: int = 1,
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[bool]:
         """Send a PeripheralStatusRequest and read the response message."""
         ...
 

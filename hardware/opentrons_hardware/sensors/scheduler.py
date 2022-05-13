@@ -4,7 +4,10 @@ import logging
 
 from typing import Optional
 
-from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings.constants import (
+    SensorType,
+    NodeId,
+)
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     WaitableCallback,
@@ -172,31 +175,41 @@ class SensorScheduler:
                     return SensorDataType.build(response.payload.sensor_data)
                 elif isinstance(response, SensorThresholdResponse):
                     return SensorDataType.build(response.payload.threshold)
-                elif isinstrance(response, PeripheralStatusResponse):
-                    return SensorDataType.build(response.payload.status)
+        return None
+
+    @staticmethod
+    async def _read_response(
+        node_id: NodeId,
+        reader: WaitableCallback,
+    ) -> Optional[bool]:
+        async for response, arbitration_id in reader:
+            if arbitration_id.parts.originating_node_id == node_id:
+                if isinstance(response, PeripheralStatusResponse):
+                    return bool(response.payload.status)
         return None
 
     async def request_peripheral_status(
         self,
-        sensor: SensorDataType,
+        sensor: SensorType,
         node_id: NodeId,
         can_messenger: CanMessenger,
         timeout: int,
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[bool]:
         """Send threshold message."""
         with WaitableCallback(can_messenger) as reader:
-            status: Optional[SensorDataType] = None
+            status = False
             await can_messenger.send(
                 node_id=node_id,
                 message=PeripheralStatusRequest(
                     payload=PeripheralStatusRequestPayload(
-                        sensor=SensorTypeField(sensor.sensor_type),
+                        sensor=SensorTypeField(sensor),
                     )
                 ),
             )
+
             try:
                 status = await asyncio.wait_for(
-                    self._wait_for_response(node_id, reader), timeout
+                    self._read_response(node_id, reader), timeout
                 )
             except asyncio.TimeoutError:
                 log.warning("Sensor Read timed out")
