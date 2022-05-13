@@ -318,8 +318,6 @@ export function RobotSettingsCalibration({
     checkPipetteCalibrationMissing()
   }, [pipettePresent, pipetteOffsetCalibrations])
 
-  console.log(attachedPipettes)
-
   return (
     <>
       <Portal level="top">
