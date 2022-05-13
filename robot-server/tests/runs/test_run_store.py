@@ -5,7 +5,7 @@ from typing import List
 from sqlalchemy.engine import Engine
 
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
-from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError
+from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError, CommandNotFoundError
 from robot_server.runs.action_models import RunAction, RunActionType
 
 from opentrons.protocol_engine import (
@@ -84,9 +84,9 @@ def protocol_run() -> ProtocolRunData:
 
 
 def test_update_run_state(
-    subject: RunStore,
-    protocol_run: ProtocolRunData,
-    protocol_commands: List[pe_commands.Command],
+        subject: RunStore,
+        protocol_run: ProtocolRunData,
+        protocol_commands: List[pe_commands.Command],
 ) -> None:
     """It should be able to update a run state to the store."""
     action = RunAction(
@@ -121,9 +121,9 @@ def test_update_run_state(
 
 
 def test_update_state_run_not_found(
-    subject: RunStore,
-    protocol_run: ProtocolRunData,
-    protocol_commands: List[pe_commands.Command],
+        subject: RunStore,
+        protocol_run: ProtocolRunData,
+        protocol_commands: List[pe_commands.Command],
 ) -> None:
     """It should be able to catch the exception raised by insert."""
     with pytest.raises(RunNotFoundError, match="run-not-found"):
@@ -291,9 +291,9 @@ def test_insert_actions_no_run(subject: RunStore) -> None:
 
 
 def test_get_run_commands(
-    subject: RunStore,
-    protocol_run: ProtocolRunData,
-    protocol_commands: List[pe_commands.Command],
+        subject: RunStore,
+        protocol_run: ProtocolRunData,
+        protocol_commands: List[pe_commands.Command],
 ) -> None:
     """It should be able to get all stored run commands."""
     subject.insert(
@@ -311,9 +311,9 @@ def test_get_run_commands(
 
 
 def test_get_run_commands_none(
-    subject: RunStore,
-    protocol_run: ProtocolRunData,
-    protocol_commands: List[pe_commands.Command],
+        subject: RunStore,
+        protocol_run: ProtocolRunData,
+        protocol_commands: List[pe_commands.Command],
 ) -> None:
     """It should return None if no commands stored."""
     subject.insert(
@@ -366,7 +366,8 @@ def test_has_no_run_id(subject: RunStore) -> None:
     assert result is False
 
 
-def test_get_command(subject: RunStore, protocol_commands: List[pe_commands.Command], protocol_run: ProtocolRunData) -> None:
+def test_get_command(subject: RunStore, protocol_commands: List[pe_commands.Command],
+                     protocol_run: ProtocolRunData) -> None:
     subject.insert(run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc))
     subject.update_run_state(
         run_id="run-id",
@@ -376,3 +377,23 @@ def test_get_command(subject: RunStore, protocol_commands: List[pe_commands.Comm
     result = subject.get_command(run_id="run-id", command_id="pause-2")
 
     assert result == protocol_commands[1]
+
+
+def test_get_command_run_not_found(subject: RunStore) -> None:
+    """Should raise RunNotFoundError"""
+    subject.insert(run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc))
+    with pytest.raises(RunNotFoundError):
+        subject.get_command(run_id="not-run-id", command_id="pause-2")
+
+
+def test_get_command_command_not_found(subject: RunStore, protocol_commands: List[pe_commands.Command],
+                     protocol_run: ProtocolRunData) -> None:
+    """Should raise CommandNotFoundError"""
+    subject.insert(run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc))
+    subject.update_run_state(
+        run_id="run-id",
+        run_data=protocol_run,
+        commands=protocol_commands,
+    )
+    with pytest.raises(CommandNotFoundError):
+        subject.get_command(run_id="run-id", command_id="pause-666")

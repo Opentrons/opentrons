@@ -277,16 +277,17 @@ class RunStore:
         ).where(run_table.c.id == run_id)
         with self._sql_engine.begin() as transaction:
             try:
-                row = transaction.execute(select_run_commands).first()
+                row = transaction.execute(select_run_commands).one()
             except sqlalchemy.exc.NoResultFound:
                 raise RunNotFoundError(run_id=run_id)
 
-            command = next(filter(lambda x: x['id'] == command_id, row.commands))
+            try:
+                command = next(filter(lambda x: x['id'] == command_id, row.commands))
+            except StopIteration:
+                raise CommandNotFoundError(command_id=command_id)
 
-            if command is not None:
-                return parse_obj_as(Command, command)
+            return parse_obj_as(Command, command)
 
-        raise CommandNotFoundError(command_id=command_id)
 
     def remove(self, run_id: str) -> None:
         """Remove a run by its unique identifier.
