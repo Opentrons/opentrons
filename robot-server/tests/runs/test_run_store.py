@@ -366,11 +366,13 @@ def test_has_no_run_id(subject: RunStore) -> None:
     assert result is False
 
 
-def test_get_command(subject: RunStore, run_resource: RunResource, protocol_commands: List[pe_commands.Command], protocol_run: ProtocolRunData) -> None:
-    subject.insert(run_id=run_resource.run_id, protocol_id=run_resource.protocol_id, created_at=run_resource.created_at)
+def test_get_command(subject: RunStore, protocol_commands: List[pe_commands.Command], protocol_run: ProtocolRunData) -> None:
+    subject.insert(run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc))
     subject.update_run_state(
-        run_id=run_resource.run_id,
+        run_id="run-id",
         run_data=protocol_run,
         commands=protocol_commands,
     )
-    subject.get_command(run_id="run-id", command_id="pause-2")
+    result = subject.get_command(run_id="run-id", command_id="pause-2")
+
+    assert result == protocol_commands[1]
