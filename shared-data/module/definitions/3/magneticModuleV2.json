@@ -1,5 +1,5 @@
 {
-  "$otSharedSchema": "module/schemas/2",
+  "$otSharedSchema": "module/schemas/3",
   "moduleType": "magneticModuleType",
   "model": "magneticModuleV2",
   "labwareOffset": {
@@ -55,21 +55,21 @@
     "ot2_short_trash": {
       "3": {
         "labwareOffset": [
-          [-1, 0, 0.25],
+          [-1, 0, 0.3],
           [0, 1, 0],
           [0, 0, 1]
         ]
       },
       "6": {
         "labwareOffset": [
-          [-1, 0, 0.25],
+          [-1, 0, 0.3],
           [0, 1, 0],
           [0, 0, 1]
         ]
       },
       "9": {
         "labwareOffset": [
-          [-1, 0, 0.25],
+          [-1, 0, 0.3],
           [0, 1, 0],
           [0, 0, 1]
         ]

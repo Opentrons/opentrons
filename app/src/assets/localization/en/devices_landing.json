@@ -15,7 +15,6 @@
   "learn_more_about_new_robot_setup": "Learn more about setting up a new robot",
   "learn_more_about_troubleshooting_connection": "Learn more about troubleshooting connection problems",
   "left_mount": "Left Mount",
-  "looking_for_robots": "Looking for robots...",
   "make_sure_robot_is_connected": "Make sure the robot is connected to this computer",
   "modules": "Modules",
   "no_robots_found": "No robots found",
@@ -37,5 +36,6 @@
   "disconnect_from_network": "Disconnect from network",
   "connect_to_network": "Connect to network",
   "home_gantry": "Home gantry",
-  "this_robot_has_connected_and_power_on_module": "This robot has a connected and powered on {{moduleName}}"
+  "this_robot_has_connected_and_power_on_module": "This robot has a connected and powered on {{moduleName}}",
+  "forget_unavailable_robot": "Forget unavailable robot"
 }

@@ -5,10 +5,11 @@ import argparse
 from enum import Enum
 from typing import Type, Sequence, Callable, Tuple
 from logging.config import dictConfig
+
+from opentrons_hardware.drivers.can_bus import build
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
-from opentrons_hardware.drivers.can_bus.build import build_driver
 
 from .sensor_utils import (
     SensorRun,
@@ -162,18 +163,15 @@ async def ui_task(can_driver: AbstractCanDriver) -> None:
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    driver = await build_driver(build_settings(args))
-
-    loop = asyncio.get_event_loop()
-    task = loop.create_task(ui_task(driver))
-    try:
-        await task
-    except KeyboardInterrupt:
-        task.cancel()
-    except asyncio.CancelledError:
-        pass
-    finally:
-        driver.shutdown()
+    async with build.driver(build_settings(args)) as driver:
+        loop = asyncio.get_event_loop()
+        task = loop.create_task(ui_task(driver))
+        try:
+            await task
+        except KeyboardInterrupt:
+            task.cancel()
+        except asyncio.CancelledError:
+            pass
 
 
 log = logging.getLogger(__name__)

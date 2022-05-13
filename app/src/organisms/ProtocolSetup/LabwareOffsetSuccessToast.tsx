@@ -2,7 +2,7 @@ import * as React from 'react'
 import { AlertItem } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useCurrentRun } from '../ProtocolUpload/hooks'
-import { getLatestLabwareOffsetCount } from './LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
+import { getLatestLabwareOffsetCount } from '../LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 
 import styles from './styles.css'
 

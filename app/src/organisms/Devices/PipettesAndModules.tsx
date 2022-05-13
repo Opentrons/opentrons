@@ -16,6 +16,8 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { Banner } from '../../atoms/Banner'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from './ModuleCard'
 import {
   useAttachedModules,
@@ -36,6 +38,8 @@ export function PipettesAndModules({
   const attachedModules = useAttachedModules(robotName)
   const attachedPipettes = useAttachedPipettes(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
+  const currentRunId = useCurrentRunId()
+
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
@@ -54,9 +58,21 @@ export function PipettesAndModules({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         minHeight={SIZE_3}
-        padding={SPACING.spacing3}
+        paddingX={SPACING.spacing3}
+        paddingBottom={SPACING.spacing3}
         width="100%"
+        flexDirection={DIRECTION_COLUMN}
       >
+        {currentRunId != null && (
+          <Flex
+            paddingBottom={SPACING.spacing4}
+            flexDirection={DIRECTION_COLUMN}
+            paddingX={SPACING.spacing2}
+            width="100%"
+          >
+            <Banner type="warning">{t('robot_control_not_available')}</Banner>
+          </Flex>
+        )}
         {/* TODO(jr, 4/15/22): This needs to be refactored to get a combined array of pipettes and modules so it can display with widths matching each column as the design shows */}
         {isRobotViewable ? (
           <Flex flexDirection={DIRECTION_COLUMN} width="100%">

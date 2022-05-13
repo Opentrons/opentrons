@@ -35,7 +35,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const apiName = definition.parameters.loadName
   const displayName = definition?.metadata.displayName
   const displayCategory = startCase(definition.metadata.displayCategory)
-  const isCustomDefinition = modified != null
+  const isCustomDefinition = definition.namespace !== 'opentrons'
 
   const handleCopyClick = async (e: React.MouseEvent): Promise<void> => {
     e.stopPropagation()

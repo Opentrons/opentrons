@@ -91,6 +91,11 @@ function Input(props: InputFieldProps): JSX.Element {
       ${error ? COLORS.error : COLORS.medGrey};
     font-size: ${TYPOGRAPHY.fontSizeP};
 
+    &:active {
+      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+        ${COLORS.darkGreyEnabled};
+    }
+
     & input {
       border-radius: inherit;
       color: ${COLORS.darkBlack};
@@ -135,19 +140,23 @@ function Input(props: InputFieldProps): JSX.Element {
             textAlign={TEXT_ALIGN_RIGHT}
             alignSelf={ALIGN_CENTER}
             color={COLORS.darkGreyEnabled}
-            fontSize={TYPOGRAPHY.fontSizeH6}
+            fontSize={TYPOGRAPHY.fontSizeLabel}
           >
             {props.units}
           </Flex>
         )}
       </Flex>
       <Flex
-        color={error ? COLORS.error : COLORS.darkGreyEnabled}
-        fontSize={TYPOGRAPHY.fontSizeH6}
+        color={COLORS.darkGreyEnabled}
+        fontSize={TYPOGRAPHY.fontSizeLabel}
         paddingTop={SPACING.spacing2}
+        flexDirection={DIRECTION_COLUMN}
       >
-        <span>{error ? props.error : props.caption}</span>
-        <span>{props.secondaryCaption}</span>
+        <Flex paddingBottom={SPACING.spacing2}>{props.caption}</Flex>
+        {props.secondaryCaption ? (
+          <Flex paddingBottom={SPACING.spacing2}>{props.secondaryCaption}</Flex>
+        ) : null}
+        <Flex color={COLORS.error}>{props.error}</Flex>
       </Flex>
     </Flex>
   )

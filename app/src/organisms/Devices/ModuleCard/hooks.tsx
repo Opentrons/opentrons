@@ -1,5 +1,8 @@
 import * as React from 'react'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  useCreateCommandMutation,
+  useCreateLiveCommandMutation,
+} from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
 import { useHoverTooltip } from '@opentrons/components'
 import {
@@ -28,29 +31,30 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 import type { AttachedModule } from '../../../redux/modules/types'
-import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
 
-export function useHeaterShakerFromProtocol(): ProtocolModuleInfo | null {
+export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
   const { protocolData } = useProtocolDetailsForRun(currentRunId)
-  if (protocolData == null) return null
+  if (protocolData == null) return false
   const protocolModulesInfo = getProtocolModulesInfo(
     protocolData,
     standardDeckDef as any
   )
-  const heaterShakerModule = protocolModulesInfo.find(
+  return protocolModulesInfo.some(
     module => module.moduleDef.model === 'heaterShakerModuleV1'
   )
-  if (heaterShakerModule == null) return null
-  return heaterShakerModule
 }
-interface LatchCommand {
+interface LatchControls {
   toggleLatch: () => void
   isLatchClosed: boolean
 }
 
-export function useLatchCommand(module: AttachedModule): LatchCommand {
+export function useLatchControls(
+  module: AttachedModule,
+  runId?: string | null
+): LatchControls {
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { createCommand } = useCreateCommandMutation()
 
   const isLatchClosed =
     module.moduleType === 'heaterShakerModuleType' &&
@@ -67,13 +71,24 @@ export function useLatchCommand(module: AttachedModule): LatchCommand {
   }
 
   const toggleLatch = (): void => {
-    createLiveCommand({
-      command: latchCommand,
-    }).catch((e: Error) => {
-      console.error(
-        `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
-      )
-    })
+    if (runId != null) {
+      createCommand({
+        runId: runId,
+        command: latchCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${latchCommand.commandType} and run id ${runId}: ${e.message}`
+        )
+      })
+    } else {
+      createLiveCommand({
+        command: latchCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
+        )
+      })
+    }
   }
   return { toggleLatch, isLatchClosed }
 }
@@ -92,6 +107,7 @@ interface ModuleOverflowMenu {
 
 export function useModuleOverflowMenu(
   module: AttachedModule,
+  runId: string | null = null,
   handleAboutClick: () => void,
   handleTestShakeClick: () => void,
   handleWizardClick: () => void,
@@ -99,7 +115,8 @@ export function useModuleOverflowMenu(
 ): ModuleOverflowMenu {
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { toggleLatch, isLatchClosed } = useLatchCommand(module)
+  const { createCommand } = useCreateCommandMutation()
+  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   let deactivateModuleCommandType: CreateCommand['commandType']
@@ -202,13 +219,24 @@ export function useModuleOverflowMenu(
   )
 
   const handleDeactivationCommand = (): void => {
-    createLiveCommand({
-      command: deactivateCommand,
-    }).catch((e: Error) => {
-      console.error(
-        `error setting module status with command type ${deactivateCommand.commandType}: ${e.message}`
-      )
-    })
+    if (runId != null) {
+      createCommand({
+        runId: runId,
+        command: deactivateCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${deactivateCommand.commandType} and run id ${runId}: ${e.message}`
+        )
+      })
+    } else {
+      createLiveCommand({
+        command: deactivateCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${deactivateCommand.commandType}: ${e.message}`
+        )
+      })
+    }
   }
 
   const onClick =

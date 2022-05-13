@@ -7,9 +7,9 @@ import { Navbar } from '../Navbar'
 import type { RouteProps } from '..//types'
 
 const ROUTE_PROPS: RouteProps[] = [
-  { name: 'foo', navLinkTo: '/foo', path: '/foo', component: () => null },
-  { name: 'bar', navLinkTo: '/bar', path: '/bar', component: () => null },
-  { name: 'baz', navLinkTo: '/baz', path: '/baz', component: () => null },
+  { name: 'foo', navLinkTo: '/foo', path: '/foo', Component: () => null },
+  { name: 'bar', navLinkTo: '/bar', path: '/bar', Component: () => null },
+  { name: 'baz', navLinkTo: '/baz', path: '/baz', Component: () => null },
 ]
 
 describe('Navbar', () => {

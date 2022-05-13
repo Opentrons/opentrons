@@ -40,7 +40,6 @@ import {
   mockStopRequestedRun,
   mockSucceededRun,
 } from '../../../../organisms/RunTimeControl/__fixtures__'
-import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
@@ -48,10 +47,11 @@ import { getIsHeaterShakerAttached } from '../../../../redux/config'
 import {
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
+  useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
   useAttachedModules,
 } from '../../hooks'
-import { useHeaterShakerFromProtocol } from '../../ModuleCard/hooks'
+import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
 import { formatTimestamp } from '../../utils'
 import { ProtocolRunHeader } from '../ProtocolRunHeader'
@@ -60,7 +60,6 @@ import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
-import type { ProtocolModuleInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
 
 const mockPush = jest.fn()
 
@@ -117,6 +116,9 @@ const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jes
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
 >
+const mockUseRunCreatedAtTimestamp = useRunCreatedAtTimestamp as jest.MockedFunction<
+  typeof useRunCreatedAtTimestamp
+>
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
 >
@@ -126,8 +128,8 @@ const mockConfirmCancelModal = ConfirmCancelModal as jest.MockedFunction<
 const mockMockHeaterShakerIsRunningModal = HeaterShakerIsRunningModal as jest.MockedFunction<
   typeof HeaterShakerIsRunningModal
 >
-const mockUseHeaterShakerFromProtocol = useHeaterShakerFromProtocol as jest.MockedFunction<
-  typeof useHeaterShakerFromProtocol
+const mockUseIsHeaterShakerInProtocol = useIsHeaterShakerInProtocol as jest.MockedFunction<
+  typeof useIsHeaterShakerInProtocol
 >
 const mockConfirmAttachmentModal = ConfirmAttachmentModal as jest.MockedFunction<
   typeof ConfirmAttachmentModal
@@ -138,6 +140,7 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
+const CREATED_AT = '03/03/2022 19:08:49'
 const STARTED_AT = '2022-03-03T19:09:40.620530+00:00'
 const COMPLETED_AT = '2022-03-03T19:39:53.620530+00:00'
 const PROTOCOL_NAME = 'A Protocol for Otie'
@@ -148,19 +151,6 @@ const PROTOCOL_DETAILS = {
   displayName: PROTOCOL_NAME,
   protocolData: simpleV6Protocol,
 }
-
-const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
-  moduleId: 'heater_shaker_id',
-  x: 0,
-  y: 0,
-  z: 0,
-  moduleDef: mockHeaterShaker as any,
-  nestedLabwareDef: heaterShakerCommands.labwareDefinitions['example/plate/1'],
-  nestedLabwareDisplayName: null,
-  nestedLabwareId: null,
-  protocolLoadOrder: 1,
-  slotName: '1',
-} as ProtocolModuleInfo
 
 const mockMovingHeaterShaker = {
   id: 'heatershaker_id',
@@ -214,7 +204,7 @@ describe('ProtocolRunHeader', () => {
     mockConfirmAttachmentModal.mockReturnValue(
       <div>mock confirm attachment modal</div>
     )
-    mockUseHeaterShakerFromProtocol.mockReturnValue(null)
+    mockUseIsHeaterShakerInProtocol.mockReturnValue(false)
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID)
     when(mockUseCloseCurrentRun).calledWith().mockReturnValue({
       isClosingCurrentRun: false,
@@ -239,6 +229,9 @@ describe('ProtocolRunHeader', () => {
       stoppedAt: null,
       completedAt: null,
     })
+    when(mockUseRunCreatedAtTimestamp)
+      .calledWith(RUN_ID)
+      .mockReturnValue(CREATED_AT)
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -265,7 +258,7 @@ describe('ProtocolRunHeader', () => {
 
     getByText('A Protocol for Otie')
     getByText('Run ID')
-    getByText(formatTimestamp(mockIdleUnstartedRun.createdAt))
+    getByText('03/03/2022 19:08:49')
     getByText('Status')
     getByText('Not started')
     getByText('Run Time')
@@ -280,14 +273,14 @@ describe('ProtocolRunHeader', () => {
     )
   })
 
-  it('renders a start run button and clear protocol button when run is ready to start', () => {
+  it('renders a start run button and cancel run button when run is ready to start', () => {
     const [{ getByRole, queryByText }] = render()
 
     getByRole('button', { name: 'Start run' })
-    expect(queryByText(formatTimestamp(STARTED_AT))).toBeFalsy()
-    expect(queryByText('Protocol start')).toBeFalsy()
-    expect(queryByText('Protocol end')).toBeFalsy()
-    getByRole('button', { name: 'Clear protocol' }).click()
+    queryByText(formatTimestamp(STARTED_AT))
+    queryByText('Protocol start')
+    queryByText('Protocol end')
+    getByRole('button', { name: 'Cancel run' }).click()
     expect(mockCloseCurrentRun).toBeCalled()
   })
 
@@ -332,7 +325,6 @@ describe('ProtocolRunHeader', () => {
     getByText(formatTimestamp(STARTED_AT))
     getByText('Protocol start')
     getByText('Protocol end')
-    expect(getByRole('button', { name: 'Clear protocol' })).toBeDisabled()
   })
 
   it('renders a cancel run button when running and shows a confirm cancel modal when clicked', () => {
@@ -418,13 +410,11 @@ describe('ProtocolRunHeader', () => {
       completedAt: COMPLETED_AT,
     })
 
-    const [{ getByRole, getByText }] = render()
+    const [{ getByText }] = render()
 
     getByText('Run again')
     getByText('Canceled')
     getByText(formatTimestamp(COMPLETED_AT))
-    getByRole('button', { name: 'Clear protocol' }).click()
-    expect(mockCloseCurrentRun).toBeCalled()
   })
 
   it('renders a Run Again button and end time when run has failed', () => {
@@ -441,13 +431,11 @@ describe('ProtocolRunHeader', () => {
       completedAt: COMPLETED_AT,
     })
 
-    const [{ getByRole, getByText }] = render()
+    const [{ getByText }] = render()
 
     getByText('Run again')
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
-    getByRole('button', { name: 'Clear protocol' }).click()
-    expect(mockCloseCurrentRun).toBeCalled()
   })
 
   it('renders a Run Again button and end time when run has succeeded', () => {
@@ -466,13 +454,11 @@ describe('ProtocolRunHeader', () => {
       completedAt: COMPLETED_AT,
     })
 
-    const [{ getByRole, getByText }] = render()
+    const [{ getByText }] = render()
 
     getByText('Run again')
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
-    getByRole('button', { name: 'Clear protocol' }).click()
-    expect(mockCloseCurrentRun).toBeCalled()
   })
 
   it('disables the Run Again button with tooltip for a completed run if the robot is busy', () => {
@@ -549,9 +535,7 @@ describe('ProtocolRunHeader', () => {
 
   it('renders the confirm attachment modal when there is a heater shaker in the protocol and the heater shaker is idle status', () => {
     mockUseAttachedModules.mockReturnValue([mockHeaterShaker])
-    mockUseHeaterShakerFromProtocol.mockReturnValue(
-      HEATER_SHAKER_PROTOCOL_MODULE_INFO
-    )
+    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
     const [{ getByText, getByRole }] = render()
 
     const button = getByRole('button', { name: 'Start run' })
@@ -559,12 +543,10 @@ describe('ProtocolRunHeader', () => {
     getByText('mock confirm attachment modal')
   })
 
-  it('does not render confirm attachment modal when there is a heater shaker in the protocol and the heater shaker is idle status', () => {
+  it('does NOT render confirm attachment modal when the user already confirmed the heater shaker is attached', () => {
     mockGetIsHeaterShakerAttached.mockReturnValue(true)
     mockUseAttachedModules.mockReturnValue([mockHeaterShaker])
-    mockUseHeaterShakerFromProtocol.mockReturnValue(
-      HEATER_SHAKER_PROTOCOL_MODULE_INFO
-    )
+    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Start run' })
     fireEvent.click(button)

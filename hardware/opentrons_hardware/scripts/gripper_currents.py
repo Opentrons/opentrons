@@ -6,19 +6,27 @@ import argparse
 
 from typing import Callable
 from logging.config import dictConfig
+
+from opentrons_hardware.drivers.can_bus import build
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SetupRequest,
     DisableMotorRequest,
+    ExecuteMoveGroupRequest,
+)
+from opentrons_hardware.firmware_bindings.messages.payloads import (
+    ExecuteMoveGroupRequestPayload,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
-from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.hardware_control.gripper_settings import (
     set_pwm_param,
     set_reference_voltage,
     grip,
     home,
+)
+from opentrons_hardware.firmware_bindings.utils import (
+    UInt8Field,
 )
 
 GetInputFunc = Callable[[str], str]
@@ -52,21 +60,28 @@ def in_green(s: str) -> str:
     return f"\033[92m{str(s)}\033[0m"
 
 
-async def run(args: argparse.Namespace) -> None:
-    """Entry point for script."""
-    os.system("cls")
-    os.system("clear")
+async def execute_move(messenger: CanMessenger) -> None:
+    """Send an execute move command."""
+    await messenger.send(
+        node_id=NodeId.broadcast,
+        message=ExecuteMoveGroupRequest(
+            payload=ExecuteMoveGroupRequestPayload(
+                group_id=UInt8Field(0),
+                start_trigger=UInt8Field(0),
+                cancel_trigger=UInt8Field(0),
+            )
+        ),
+    )
 
-    print("Gripper testing beings... \n")
+
+async def run_test(messenger: CanMessenger) -> None:
+    """Run test."""
+    print("Gripper testing begins... \n")
     print("Hints: \033[96mdefaults values\033[0m \n")
     v_ref = prompt_float_input(
         "Set reference voltage in A (float, \033[96m0.5A\033[0m)"
     )
     pwm_freq = prompt_int_input("Set PWM frequency in Hz (int, \033[96m32000Hz\033[0m)")
-
-    driver = await build_driver(build_settings(args))
-    messenger = CanMessenger(driver=driver)
-    messenger.start()
 
     try:
         await messenger.send(node_id=NodeId.gripper, message=SetupRequest())
@@ -80,19 +95,28 @@ async def run(args: argparse.Namespace) -> None:
 
             input(in_green("Press Enter to grip...\n"))
 
-            await grip(messenger)
+            await grip(messenger, 0, 0, 0, 0)
+            await execute_move(messenger)
 
             input(in_green("Press Enter to release...\n"))
 
-            await home(messenger)
+            await home(messenger, 0, 0, 0, 0)
+            await execute_move(messenger)
 
     except asyncio.CancelledError:
         pass
     finally:
         print("\nTesting finishes...\n")
         await messenger.send(node_id=NodeId.gripper, message=DisableMotorRequest())
-        await messenger.stop()
-        driver.shutdown()
+
+
+async def run(args: argparse.Namespace) -> None:
+    """Entry point for script."""
+    os.system("cls")
+    os.system("clear")
+
+    async with build.can_messenger(build_settings(args)) as messenger:
+        await run_test(messenger)
 
 
 log = logging.getLogger(__name__)

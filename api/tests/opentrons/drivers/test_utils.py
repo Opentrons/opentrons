@@ -94,26 +94,21 @@ def test_parse_hs_device_information_failure(input_str: str) -> None:
 
 
 @pytest.mark.parametrize(
-    argnames=["input_str", "expected_result", "zero_is_none"],
+    argnames=["input_str", "expected_result"],
     argvalues=[
-        ["T:none C:123.4", Temperature(target=None, current=123.4), False],
-        ["T:123.566 C:123.446", Temperature(target=123.57, current=123.45), False],
-        ["T:-123.566 C:-123.446", Temperature(target=-123.57, current=-123.45), False],
-        ["a:3 T:2. C:3 H:0 G:1", Temperature(target=2, current=3), False],
-        ["T:0 C:124", Temperature(target=0, current=124), False],
-        ["T:0 C:124", Temperature(target=None, current=124), True],
+        ["T:none C:123.4", Temperature(target=None, current=123.4)],
+        ["T:123.566 C:123.446", Temperature(target=123.57, current=123.45)],
+        ["T:-123.566 C:-123.446", Temperature(target=-123.57, current=-123.45)],
+        ["a:3 T:2. C:3 H:0 G:1", Temperature(target=2, current=3)],
+        ["T:0 C:124", Temperature(target=0, current=124)],
+        ["T:none C:124", Temperature(target=None, current=124)],
     ],
 )
 def test_parse_temperature_response_success(
-    input_str: str, expected_result: Temperature, zero_is_none: bool
+    input_str: str, expected_result: Temperature
 ) -> None:
     """It should parse temperature response."""
-    assert (
-        utils.parse_temperature_response(
-            input_str, 2, zero_target_is_unset=zero_is_none
-        )
-        == expected_result
-    )
+    assert utils.parse_temperature_response(input_str, 2) == expected_result
 
 
 @pytest.mark.parametrize(

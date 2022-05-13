@@ -116,6 +116,16 @@ async def test_home(subject: driver.HeaterShakerDriver, connection: AsyncMock) -
     connection.send_command.assert_called_once_with(command=expected, retries=0)
 
 
+async def test_deactivate_heater(
+    subject: driver.HeaterShakerDriver, connection: AsyncMock
+) -> None:
+    """It should send a deactivate-heater command"""
+    connection.send_command.return_value = "M106 ok\n"
+    await subject.deactivate_heater()
+    expected = CommandBuilder(terminator=driver.HS_COMMAND_TERMINATOR).add_gcode("M106")
+    connection.send_command.assert_called_once_with(command=expected, retries=0)
+
+
 async def test_get_device_info(
     subject: driver.HeaterShakerDriver, connection: AsyncMock
 ) -> None:

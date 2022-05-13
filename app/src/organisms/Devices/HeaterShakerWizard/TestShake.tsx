@@ -13,16 +13,16 @@ import {
   SPACING,
   Text,
   TYPOGRAPHY,
-  Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 import { RPM, HS_RPM_MAX, HS_RPM_MIN } from '@opentrons/shared-data'
-import { useLatchCommand } from '../ModuleCard/hooks'
-import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 import { TertiaryButton } from '../../../atoms/Buttons'
-import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { Divider } from '../../../atoms/structure'
 import { InputField } from '../../../atoms/InputField'
+import { Collapsible } from '../ModuleCard/Collapsible'
+import { useLatchControls } from '../ModuleCard/hooks'
+import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
@@ -44,7 +44,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   const [isExpanded, setExpanded] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { toggleLatch, isLatchClosed } = useLatchCommand(module)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const isShaking = module.data.speedStatus !== 'idle'
 
   const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
@@ -154,7 +154,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           {isLatchClosed ? t('open_labware_latch') : t('close_labware_latch')}
         </TertiaryButton>
         {isShaking ? (
-          <Tooltip {...tooltipProps}>
+          <Tooltip tooltipProps={tooltipProps} key={`TestShake_latch_btn`}>
             {t('cannot_open_latch', { ns: 'heater_shaker' })}
           </Tooltip>
         ) : null}
@@ -195,14 +195,14 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             {isShaking ? t('stop_shaking') : t('start_shaking')}
           </TertiaryButton>
           {!isLatchClosed ? (
-            <Tooltip {...tooltipProps}>
+            <Tooltip tooltipProps={tooltipProps} key={`TestShake_shake_btn`}>
               {t('cannot_shake', { ns: 'heater_shaker' })}
             </Tooltip>
           ) : null}
         </Flex>
       </Flex>
       <Divider marginY={SPACING.spacing4} />
-      <CollapsibleStep
+      <Collapsible
         expanded={isExpanded}
         title={t('troubleshooting')}
         toggleExpanded={() => setExpanded(!isExpanded)}
@@ -231,7 +231,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             {t('go_to_step_2')}
           </TertiaryButton>
         </Flex>
-      </CollapsibleStep>
+      </Collapsible>
       <Divider marginTop={SPACING.spacing4} marginBottom={SPACING.spacingXL} />
     </Flex>
   )

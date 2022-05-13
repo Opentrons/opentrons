@@ -71,6 +71,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteId,
     mount
   )
+  const badCalibration = pipetteOffsetCalibration?.status.markedBad
 
   const startPipetteOffsetCalibrationBlockModal = (
     hasBlockModalResponse: boolean | null
@@ -189,6 +190,29 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                       onClick={handleCalibrate}
                     >
                       {t('calibrate_now')}
+                    </Btn>
+                  </Flex>
+                </Banner>
+              </Flex>
+            ) : null}
+            {isDeckCalibrated &&
+            pipetteOffsetCalibration == null &&
+            badCalibration &&
+            showBanner ? (
+              <Flex paddingBottom={SPACING.spacing2}>
+                <Banner
+                  type="warning"
+                  onCloseClick={() => setShowBanner(false)}
+                >
+                  <Flex flexDirection={DIRECTION_COLUMN}>
+                    {t('pipette_cal_recommended')}
+                    <Btn
+                      textAlign={ALIGN_START}
+                      fontSize={TYPOGRAPHY.fontSizeP}
+                      textDecoration={TEXT_DECORATION_UNDERLINE}
+                      onClick={handleCalibrate}
+                    >
+                      {t('recalibrate_now')}
                     </Btn>
                   </Flex>
                 </Banner>
