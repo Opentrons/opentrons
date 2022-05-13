@@ -33,11 +33,6 @@ class SensorDataType:
 
     @overload
     @classmethod
-    def build(cls, data: UInt8Field) -> "SensorDataType":
-        ...
-
-    @overload
-    @classmethod
     def build(cls, data: List[int]) -> "SensorDataType":
         ...
 
@@ -52,8 +47,6 @@ class SensorDataType:
         if isinstance(data, list):
             backing = Int32Field(cls._convert_to_int(data))
         elif isinstance(data, Int32Field):
-            backing = data
-        elif isinstance(data, UInt8Field):
             backing = data
         else:
             backing = Int32Field(data)
