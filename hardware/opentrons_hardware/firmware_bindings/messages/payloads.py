@@ -153,7 +153,6 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 class EncoderPositionResponse(utils.BinarySerializable):
     """Read Encoder Position."""
 
-    # seq_id: utils.UInt8Field
     encoder_position: utils.UInt32Field
 
 
