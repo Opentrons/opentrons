@@ -581,7 +581,9 @@ class TipActionResponse:  # noqa: D101
 @dataclass
 class PeripheralStatusRequest:  # noqa: D101
     payload: payloads.PeripheralStatusRequestPayload
-    payload_type: Type[BinarySerializable] = payloads.PeripheralStatusRequestPayload
+    payload_type: Type[
+        payloads.PeripheralStatusRequestPayload
+    ] = payloads.PeripheralStatusRequestPayload
     message_id: Literal[
         MessageId.peripheral_status_request
     ] = MessageId.peripheral_status_request
@@ -590,7 +592,9 @@ class PeripheralStatusRequest:  # noqa: D101
 @dataclass
 class PeripheralStatusResponse:  # noqa: D101
     payload: payloads.PeripheralStatusResponsePayload
-    payload_type: Type[BinarySerializable] = payloads.PeripheralStatusResponsePayload
+    payload_type: Type[
+        payloads.PeripheralStatusRequestPayload
+    ] = payloads.PeripheralStatusResponsePayload
     message_id: Literal[
         MessageId.peripheral_status_response
     ] = MessageId.peripheral_status_response

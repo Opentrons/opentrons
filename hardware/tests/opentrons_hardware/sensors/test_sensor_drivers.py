@@ -30,8 +30,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ReadFromSensorResponse,
     SensorThresholdResponse,
     BindSensorOutputRequest,
-    PeripheralInfoRequest,
-    PeripheralInfoResponse,
+    PeripheralStatusRequest,
+    PeripheralStatusResponse,
 )
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
@@ -45,7 +45,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorTypeField,
     SensorOutputBindingField,
-    PeripheralInfoResponsePayload,
+    PeripheralStatusResponsePayload,
 )
 from opentrons_hardware.sensors.utils import SensorDataType
 from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
