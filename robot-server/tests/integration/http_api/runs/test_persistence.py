@@ -85,18 +85,30 @@ async def test_run_actions_labware_offsets_persist(
     """Test that run sub-resources are persisted through dev server restart."""
     client, server = client_and_server
 
-    # create a run
-    create_run_response = await client.post_run(req_body={"data": {}})
+    # create a run with offsets
+    create_run_response = await client.post_run(
+        req_body={
+            "data": {
+                "labwareOffsets": [
+                    {
+                        "definitionUri": "opentrons/opentrons_96_tiprack_300ul/1",
+                        "location": {"slotName": "1"},
+                        "vector": {"x": 1, "y": 2, "z": 3},
+                    }
+                ]
+            }
+        }
+    )
     run_id = create_run_response.json()["data"]["id"]
 
-    # create a labware offset and an action
+    # add another labware offset and an action
     await client.post_labware_offset(
         run_id=run_id,
         req_body={
             "data": {
                 "definitionUri": "opentrons/opentrons_96_tiprack_300ul/1",
-                "location": {"slotName": "5"},
-                "vector": {"x": 1, "y": 2, "z": 3},
+                "location": {"slotName": "2"},
+                "vector": {"x": 4, "y": 5, "z": 6},
             }
         },
     )

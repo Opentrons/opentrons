@@ -1,11 +1,12 @@
 """In-memory storage of ProtocolEngine instances."""
-from typing import NamedTuple, Optional
+from typing import List, NamedTuple, Optional
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_runner import ProtocolRunner, ProtocolRunResult
 from opentrons.protocol_engine import (
     ProtocolEngine,
     ProtocolRunData,
+    LabwareOffsetCreate,
     create_protocol_engine,
 )
 
@@ -84,27 +85,37 @@ class EngineStore:
 
         return engine
 
-    async def create(self, run_id: str) -> ProtocolRunData:
+    async def create(
+        self,
+        run_id: str,
+        labware_offsets: List[LabwareOffsetCreate],
+    ) -> ProtocolRunData:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
         Args:
             run_id: The run resource the engine is assigned to.
+            labware_offsets: Labware offsets to create the engine with.
 
         Returns:
-            The state view for the new ProtocolEngine.
+            The initial equipment and status summary of the engine.
 
         Raises:
             EngineConflictError: The current runner/engine pair is not idle, so
             a new set may not be created.
         """
         engine = await create_protocol_engine(hardware_api=self._hardware_api)
-        runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)
 
         if self._runner_engine_pair is not None:
             await self.clear()
 
+        runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)
+        for offset in labware_offsets:
+            engine.add_labware_offset(offset)
+
         self._runner_engine_pair = RunnerEnginePair(
-            run_id=run_id, runner=runner, engine=engine
+            run_id=run_id,
+            runner=runner,
+            engine=engine,
         )
 
         return engine.state_view.get_protocol_run_data()

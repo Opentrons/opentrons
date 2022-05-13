@@ -3,9 +3,16 @@ import pytest
 from datetime import datetime
 from decoy import Decoy, matchers
 
-from opentrons.protocol_engine import EngineStatus, ProtocolRunData, commands
+from opentrons.types import DeckSlotName
 from opentrons.protocol_runner import ProtocolRunResult
+from opentrons.protocol_engine import (
+    EngineStatus,
+    ProtocolRunData,
+    commands,
+    types as pe_types,
+)
 
+from robot_server.protocols import ProtocolResource
 from robot_server.runs.engine_store import EngineStore, EngineConflictError
 from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
 from robot_server.runs.run_models import Run
@@ -81,7 +88,7 @@ def subject(
     )
 
 
-async def test_create_and_get_active(
+async def test_create(
     decoy: Decoy,
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
@@ -93,7 +100,9 @@ async def test_create_and_get_active(
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
 
-    decoy.when(await mock_engine_store.create(run_id)).then_return(protocol_run_data)
+    decoy.when(
+        await mock_engine_store.create(run_id=run_id, labware_offsets=[])
+    ).then_return(protocol_run_data)
     decoy.when(
         mock_run_store.insert(
             run_id=run_id,
@@ -123,6 +132,64 @@ async def test_create_and_get_active(
     )
 
 
+async def test_create_with_options(
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
+    subject: RunDataManager,
+    protocol_run_data: ProtocolRunData,
+    run_resource: RunResource,
+) -> None:
+    """It should handle creation with a protocol and labware offsets."""
+    run_id = "hello world"
+    created_at = datetime(year=2021, month=1, day=1)
+
+    protocol = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2022, month=2, day=2),
+        source=None,  # type: ignore[arg-type]
+        protocol_key=None,
+    )
+
+    labware_offset = pe_types.LabwareOffsetCreate(
+        definitionUri="namespace/load_name/version",
+        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_5),
+        vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
+    )
+
+    decoy.when(
+        await mock_engine_store.create(run_id=run_id, labware_offsets=[labware_offset])
+    ).then_return(protocol_run_data)
+
+    decoy.when(
+        mock_run_store.insert(
+            run_id=run_id,
+            protocol_id="protocol-id",
+            created_at=created_at,
+        )
+    ).then_return(run_resource)
+
+    result = await subject.create(
+        run_id=run_id,
+        created_at=created_at,
+        labware_offsets=[labware_offset],
+        protocol=protocol,
+    )
+
+    assert result == Run(
+        id=run_resource.run_id,
+        protocolId=run_resource.protocol_id,
+        createdAt=run_resource.created_at,
+        current=True,
+        actions=run_resource.actions,
+        status=protocol_run_data.status,
+        errors=protocol_run_data.errors,
+        labware=protocol_run_data.labware,
+        labwareOffsets=protocol_run_data.labwareOffsets,
+        pipettes=protocol_run_data.pipettes,
+    )
+
+
 async def test_create_engine_error(
     decoy: Decoy,
     mock_engine_store: EngineStore,
@@ -133,7 +200,7 @@ async def test_create_engine_error(
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
 
-    decoy.when(await mock_engine_store.create(run_id)).then_raise(
+    decoy.when(await mock_engine_store.create(run_id, labware_offsets=[])).then_raise(
         EngineConflictError("oh no")
     )
 
