@@ -161,7 +161,7 @@ class PressureSensor(AbstractAdvancedSensor):
         can_messenger: CanMessenger,
         node_id: NodeId,
         timeout: int = 1,
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[bool]:
         """Send a PeripheralStatusRequest and read the response message."""
         return await self._scheduler.request_peripheral_status(
             self._sensor_type, node_id, can_messenger, timeout
