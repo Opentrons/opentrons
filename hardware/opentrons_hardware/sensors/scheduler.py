@@ -175,8 +175,17 @@ class SensorScheduler:
                     return SensorDataType.build(response.payload.sensor_data)
                 elif isinstance(response, SensorThresholdResponse):
                     return SensorDataType.build(response.payload.threshold)
-                elif isinstrance(response, PeripheralStatusResponse):
-                    return SensorDataType.build(response.payload.status)
+        return None
+
+    @staticmethod
+    async def _read_response(
+        node_id: NodeId,
+        reader: WaitableCallback,
+    ) -> Optional[bool]:
+        async for response, arbitration_id in reader:
+            if arbitration_id.parts.originating_node_id == node_id:
+                if isinstance(response, PeripheralStatusResponse):
+                    return bool(response.payload.status)
         return None
 
     @staticmethod
