@@ -38,15 +38,15 @@ const StyledTableCell = styled.td`
   text-overflow: wrap;
 `
 
-interface PipetteOffsetCalItemsProps {
+interface PipetteOffsetCalibrationItemsProps {
   robotName: string
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
 }
 
-export function PipetteOffsetCalItems({
+export function PipetteOffsetCalibrationItems({
   robotName,
   formattedPipetteOffsetCalibrations,
-}: PipetteOffsetCalItemsProps): JSX.Element {
+}: PipetteOffsetCalibrationItemsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
   const customLabwareDefs = useSelector((state: State) => {
@@ -82,7 +82,7 @@ export function PipetteOffsetCalItems({
               </StyledTableCell>
               <StyledTableCell>
                 <StyledText as="p">
-                  {calibration.tiprack &&
+                  {calibration.tiprack != null &&
                     getDisplayNameForTipRack(
                       calibration.tiprack,
                       customLabwareDefs
@@ -92,7 +92,7 @@ export function PipetteOffsetCalItems({
               <StyledTableCell>
                 <Flex alignItems={ALIGN_CENTER}>
                   {calibration.lastCalibrated != null &&
-                  !calibration.markedBad ? (
+                  !(calibration.markedBad ?? false) ? (
                     <>
                       <StyledText as="p">
                         {formatLastCalibrated(calibration.lastCalibrated)}
@@ -100,7 +100,7 @@ export function PipetteOffsetCalItems({
                     </>
                   ) : (
                     <>
-                      {calibration.markedBad ? (
+                      {calibration.markedBad ?? false ? (
                         <>
                           <Icon
                             name="alert-circle"

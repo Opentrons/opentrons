@@ -40,7 +40,7 @@ import {
 } from '../hooks'
 import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
-import { PipetteOffsetCalItems } from './CalibrationDetails/PipetteOffsetCalItems'
+import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalItems } from './CalibrationDetails/TipLengthCalItems'
 
 import type { State } from '../../../redux/types'
@@ -397,7 +397,7 @@ export function RobotSettingsCalibration({
               {t('pipette_offset_calibrations_description')}
             </StyledText>
             {pipetteOffsetCalibrations != null ? (
-              <PipetteOffsetCalItems
+              <PipetteOffsetCalibrationItems
                 robotName={robotName}
                 formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
               />
