@@ -56,9 +56,9 @@ class RunNotFoundError(ValueError):
 class CommandNotFoundError(ValueError):
     """Error raised when a given command ID is not found in the store."""
 
-    def __init__(self, run_id: str) -> None:
+    def __init__(self, command_id: str) -> None:
         """Initialize the error message from the missing ID."""
-        super().__init__(f"Run {run_id} was not found.")
+        super().__init__(f"Command {command_id} was not found.")
 
 
 class RunStore:
@@ -69,10 +69,10 @@ class RunStore:
         self._sql_engine = sql_engine
 
     def update_run_state(
-        self,
-        run_id: str,
-        run_data: ProtocolRunData,
-        commands: List[Command],
+            self,
+            run_id: str,
+            run_data: ProtocolRunData,
+            commands: List[Command],
     ) -> RunResource:
         """Update run table with run protocol_run_data to db.
 
@@ -86,8 +86,8 @@ class RunStore:
         """
         update_run = (
             sqlalchemy.update(run_table)
-            .where(run_table.c.id == run_id)
-            .values(
+                .where(run_table.c.id == run_id)
+                .values(
                 _convert_state_to_sql_values(
                     state=_RunStateResource(
                         commands=commands,
@@ -138,10 +138,10 @@ class RunStore:
                 raise RunNotFoundError(run_id=run_id)
 
     def insert(
-        self,
-        run_id: str,
-        created_at: datetime,
-        protocol_id: Optional[str],
+            self,
+            run_id: str,
+            created_at: datetime,
+            protocol_id: Optional[str],
     ) -> RunResource:
         """Insert run resource in the db.
 
@@ -166,7 +166,7 @@ class RunStore:
                 transaction.execute(insert)
             except sqlalchemy.exc.IntegrityError:
                 assert (
-                    run.protocol_id is not None
+                        run.protocol_id is not None
                 ), "Insert run failed due to unexpected IntegrityError"
                 raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
@@ -270,6 +270,10 @@ class RunStore:
             else []
         )
 
+    def get_command(self, run_id: str, command_id: str) -> Command:
+        """Get run command by id"""
+        raise NotImplementedError("TODO")
+
     def remove(self, run_id: str) -> None:
         """Remove a run by its unique identifier.
 
@@ -292,8 +296,8 @@ class RunStore:
 
 
 def _convert_row_to_run(
-    row: sqlalchemy.engine.Row,
-    action_rows: List[sqlalchemy.engine.Row],
+        row: sqlalchemy.engine.Row,
+        action_rows: List[sqlalchemy.engine.Row],
 ) -> RunResource:
     run_id = row.id
     protocol_id = row.protocol_id

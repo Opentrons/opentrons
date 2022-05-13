@@ -251,7 +251,10 @@ class RunDataManager:
             RunNotFoundError: The given run identifier was not found.
             CommandNotFoundError: The given command identifier was not found.
         """
-        raise NotImplementedError("TODO")
+        if self._engine_store.current_run_id == run_id:
+            return self._engine_store.engine.state_view.commands.get(command_id=command_id)
+
+        return self._run_store.get_command(run_id=run_id, command_id=command_id)
 
     def _get_run_data(self, run_id: str) -> Optional[ProtocolRunData]:
         result: Optional[ProtocolRunData]

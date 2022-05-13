@@ -18,9 +18,8 @@ from robot_server.protocols import ProtocolResource
 from robot_server.runs.engine_store import EngineStore, EngineConflictError
 from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
 from robot_server.runs.run_models import Run
-from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError
+from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError, CommandNotFoundError
 from robot_server.service.task_runner import TaskRunner
-from tests.runs.router.conftest import mock_run_data_manager
 
 
 @pytest.fixture
@@ -687,3 +686,43 @@ def test_get_current_command_not_current_run(decoy: Decoy, subject: RunDataManag
     result = subject.get_current_command("run-id")
 
     assert result is None
+
+
+def test_get_command_from_engine(decoy: Decoy, subject: RunDataManager, mock_run_store: RunStore,
+                             mock_engine_store: EngineStore, run_command: commands.Command) -> None:
+    """Should get command by id from engine store"""
+    decoy.when(mock_engine_store.current_run_id).then_return("run-id")
+    decoy.when(mock_engine_store.engine.state_view.commands.get("command-id")).then_return(run_command)
+    result = subject.get_command("run-id", "command-id")
+
+    assert result == run_command
+
+
+def test_get_command_from_db(decoy: Decoy, subject: RunDataManager, mock_run_store: RunStore,
+                             mock_engine_store: EngineStore, run_command: commands.Command) -> None:
+    """Should get command by id from engine store"""
+    decoy.when(mock_engine_store.current_run_id).then_return("not-run-id")
+    decoy.when(mock_run_store.get_command(run_id="run-id", command_id="command-id")).then_return(run_command)
+    result = subject.get_command("run-id", "command-id")
+
+    assert result == run_command
+
+
+def test_get_command_from_db_run_not_found(decoy: Decoy, subject: RunDataManager, mock_run_store: RunStore,
+                             mock_engine_store: EngineStore, run_command: commands.Command) -> None:
+    """Should get command by id from engine store"""
+    decoy.when(mock_engine_store.current_run_id).then_return("not-run-id")
+    decoy.when(mock_run_store.get_command(run_id="run-id", command_id="command-id")).then_raise(RunNotFoundError("run-id"))
+
+    with pytest.raises(RunNotFoundError):
+        subject.get_command("run-id", "command-id")
+
+
+def test_get_command_from_db_run_not_found(decoy: Decoy, subject: RunDataManager, mock_run_store: RunStore,
+                             mock_engine_store: EngineStore, run_command: commands.Command) -> None:
+    """Should get command by id from engine store"""
+    decoy.when(mock_engine_store.current_run_id).then_return("not-run-id")
+    decoy.when(mock_run_store.get_command(run_id="run-id", command_id="command-id")).then_raise(CommandNotFoundError(command_id="command-id"))
+
+    with pytest.raises(CommandNotFoundError):
+        subject.get_command("run-id", "command-id")
