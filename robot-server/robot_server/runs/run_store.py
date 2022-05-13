@@ -69,10 +69,10 @@ class RunStore:
         self._sql_engine = sql_engine
 
     def update_run_state(
-            self,
-            run_id: str,
-            run_data: ProtocolRunData,
-            commands: List[Command],
+        self,
+        run_id: str,
+        run_data: ProtocolRunData,
+        commands: List[Command],
     ) -> RunResource:
         """Update run table with run protocol_run_data to db.
 
@@ -86,8 +86,8 @@ class RunStore:
         """
         update_run = (
             sqlalchemy.update(run_table)
-                .where(run_table.c.id == run_id)
-                .values(
+            .where(run_table.c.id == run_id)
+            .values(
                 _convert_state_to_sql_values(
                     state=_RunStateResource(
                         commands=commands,
@@ -138,10 +138,10 @@ class RunStore:
                 raise RunNotFoundError(run_id=run_id)
 
     def insert(
-            self,
-            run_id: str,
-            created_at: datetime,
-            protocol_id: Optional[str],
+        self,
+        run_id: str,
+        created_at: datetime,
+        protocol_id: Optional[str],
     ) -> RunResource:
         """Insert run resource in the db.
 
@@ -166,7 +166,7 @@ class RunStore:
                 transaction.execute(insert)
             except sqlalchemy.exc.IntegrityError:
                 assert (
-                        run.protocol_id is not None
+                    run.protocol_id is not None
                 ), "Insert run failed due to unexpected IntegrityError"
                 raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
@@ -270,8 +270,10 @@ class RunStore:
             else []
         )
 
-    def get_commands_slice(self, cursor: Optional[int], length: int, run_id: str) -> CommandSlice:
-        """Get run commands slice from db"""
+    def get_commands_slice(
+        self, cursor: Optional[int], length: int, run_id: str
+    ) -> CommandSlice:
+        """Get run commands slice from db."""
         print("get_commands_slice")
         commands = self.get_run_commands(run_id=run_id)
         print("commands slice")
@@ -286,26 +288,26 @@ class RunStore:
         sliced_commands = commands[actual_cursor:stop]
 
         return CommandSlice(
-            cursor=actual_cursor,
-            total_length=commands_length,
-            commands=sliced_commands
+            cursor=actual_cursor, total_length=commands_length, commands=sliced_commands
         )
 
     def get_command(self, run_id: str, command_id: str) -> Command:
-        """Get run command by id"""
-        select_run_commands = sqlalchemy.select(run_table.c.commands).where(
-            run_table.c.id == run_id
-        ).where(run_table.c.id == run_id)
+        """Get run command by id."""
+        select_run_commands = (
+            sqlalchemy.select(run_table.c.commands)
+            .where(run_table.c.id == run_id)
+            .where(run_table.c.id == run_id)
+        )
         with self._sql_engine.begin() as transaction:
             try:
                 row = transaction.execute(select_run_commands).one()
             except sqlalchemy.exc.NoResultFound:
                 raise RunNotFoundError(run_id=run_id)
             try:
-                command = next(filter(lambda x: x['id'] == command_id, row.commands))
+                command = next(filter(lambda x: x["id"] == command_id, row.commands))
             except StopIteration:
                 raise CommandNotFoundError(command_id=command_id)
-            return parse_obj_as(Command, command)
+            return parse_obj_as(Command, command)  # type: ignore[arg-type]
 
     def remove(self, run_id: str) -> None:
         """Remove a run by its unique identifier.
@@ -329,8 +331,8 @@ class RunStore:
 
 
 def _convert_row_to_run(
-        row: sqlalchemy.engine.Row,
-        action_rows: List[sqlalchemy.engine.Row],
+    row: sqlalchemy.engine.Row,
+    action_rows: List[sqlalchemy.engine.Row],
 ) -> RunResource:
     run_id = row.id
     protocol_id = row.protocol_id
