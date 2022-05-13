@@ -16,7 +16,7 @@ from robot_server.protocols import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
 
 from .engine_store import EngineStore
-from .run_store import RunResource, RunStore
+from .run_store import RunResource, RunStore, RunNotFoundError
 from .run_models import Run
 
 

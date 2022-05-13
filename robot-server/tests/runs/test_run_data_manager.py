@@ -17,7 +17,7 @@ from robot_server.protocols import ProtocolResource
 from robot_server.runs.engine_store import EngineStore, EngineConflictError
 from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
 from robot_server.runs.run_models import Run
-from robot_server.runs.run_store import RunStore, RunResource
+from robot_server.runs.run_store import RunStore, RunResource, RunNotFoundError
 from robot_server.service.task_runner import TaskRunner
 
 
@@ -79,9 +79,9 @@ def run_command() -> commands.Command:
 
 @pytest.fixture
 def subject(
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    mock_task_runner: TaskRunner,
+        mock_engine_store: EngineStore,
+        mock_run_store: RunStore,
+        mock_task_runner: TaskRunner,
 ) -> RunDataManager:
     """Get a RunDataManager test subject."""
     return RunDataManager(
@@ -92,12 +92,12 @@ def subject(
 
 
 async def test_create(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    subject: RunDataManager,
-    protocol_run_data: ProtocolRunData,
-    run_resource: RunResource,
+        decoy: Decoy,
+        mock_engine_store: EngineStore,
+        mock_run_store: RunStore,
+        subject: RunDataManager,
+        protocol_run_data: ProtocolRunData,
+        run_resource: RunResource,
 ) -> None:
     """It should create an engine and a persisted run resource."""
     run_id = "hello world"
@@ -136,12 +136,12 @@ async def test_create(
 
 
 async def test_create_with_options(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    subject: RunDataManager,
-    protocol_run_data: ProtocolRunData,
-    run_resource: RunResource,
+        decoy: Decoy,
+        mock_engine_store: EngineStore,
+        mock_run_store: RunStore,
+        subject: RunDataManager,
+        protocol_run_data: ProtocolRunData,
+        run_resource: RunResource,
 ) -> None:
     """It should handle creation with a protocol and labware offsets."""
     run_id = "hello world"
@@ -194,10 +194,10 @@ async def test_create_with_options(
 
 
 async def test_create_engine_error(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    subject: RunDataManager,
+        decoy: Decoy,
+        mock_engine_store: EngineStore,
+        mock_run_store: RunStore,
+        subject: RunDataManager,
 ) -> None:
     """It should not create a resource if engine creation fails."""
     run_id = "hello world"
@@ -226,12 +226,12 @@ async def test_create_engine_error(
 
 
 async def test_get_current_run(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    subject: RunDataManager,
-    protocol_run_data: ProtocolRunData,
-    run_resource: RunResource,
+        decoy: Decoy,
+        mock_engine_store: EngineStore,
+        mock_run_store: RunStore,
+        subject: RunDataManager,
+        protocol_run_data: ProtocolRunData,
+        run_resource: RunResource,
 ) -> None:
     """It should get the current run from the engine."""
     run_id = "hello world"
@@ -260,12 +260,12 @@ async def test_get_current_run(
 
 
 async def test_get_historical_run(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    subject: RunDataManager,
-    protocol_run_data: ProtocolRunData,
-    run_resource: RunResource,
+        decoy: Decoy,
+        mock_engine_store: EngineStore,
+        mock_run_store: RunStore,
+        subject: RunDataManager,
+        protocol_run_data: ProtocolRunData,
+        run_resource: RunResource,
 ) -> None:
     """It should get a historical run from the store."""
     run_id = "hello world"
@@ -291,11 +291,11 @@ async def test_get_historical_run(
 
 
 async def test_get_historical_run_no_data(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    subject: RunDataManager,
-    run_resource: RunResource,
+        decoy: Decoy,
+        mock_engine_store: EngineStore,
+        mock_run_store: RunStore,
+        subject: RunDataManager,
+        run_resource: RunResource,
 ) -> None:
     """It should get a historical run from the store."""
     run_id = "hello world"
@@ -321,10 +321,10 @@ async def test_get_historical_run_no_data(
 
 
 async def test_get_all_runs(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    subject: RunDataManager,
+        decoy: Decoy,
+        mock_engine_store: EngineStore,
+        mock_run_store: RunStore,
+        subject: RunDataManager,
 ) -> None:
     """It should get all runs, including current and historical."""
     current_run_data = ProtocolRunData(
@@ -401,10 +401,10 @@ async def test_get_all_runs(
 
 
 async def test_delete_current_run(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    subject: RunDataManager,
+        decoy: Decoy,
+        mock_engine_store: EngineStore,
+        mock_run_store: RunStore,
+        subject: RunDataManager,
 ) -> None:
     """It should delete the current run from the engine."""
     run_id = "hello world"
@@ -417,10 +417,10 @@ async def test_delete_current_run(
 
 
 async def test_delete_historical_run(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    subject: RunDataManager,
+        decoy: Decoy,
+        mock_engine_store: EngineStore,
+        mock_run_store: RunStore,
+        subject: RunDataManager,
 ) -> None:
     """It should delete a historical run from the store."""
     run_id = "hello world"
@@ -433,13 +433,13 @@ async def test_delete_historical_run(
 
 
 async def test_update_current(
-    decoy: Decoy,
-    protocol_run_data: ProtocolRunData,
-    run_resource: RunResource,
-    run_command: commands.Command,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    subject: RunDataManager,
+        decoy: Decoy,
+        protocol_run_data: ProtocolRunData,
+        run_resource: RunResource,
+        run_command: commands.Command,
+        mock_engine_store: EngineStore,
+        mock_run_store: RunStore,
+        subject: RunDataManager,
 ) -> None:
     """It should persist the current run and clear the engine on current=false."""
     run_id = "hello world"
@@ -471,13 +471,13 @@ async def test_update_current(
 
 
 async def test_update_current_noop(
-    decoy: Decoy,
-    protocol_run_data: ProtocolRunData,
-    run_resource: RunResource,
-    run_command: commands.Command,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    subject: RunDataManager,
+        decoy: Decoy,
+        protocol_run_data: ProtocolRunData,
+        run_resource: RunResource,
+        run_command: commands.Command,
+        mock_engine_store: EngineStore,
+        mock_run_store: RunStore,
+        subject: RunDataManager,
 ) -> None:
     """It should noop on current=None."""
     run_id = "hello world"
@@ -514,13 +514,13 @@ async def test_update_current_noop(
 
 
 async def test_update_current_not_allowed(
-    decoy: Decoy,
-    protocol_run_data: ProtocolRunData,
-    run_resource: RunResource,
-    run_command: commands.Command,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    subject: RunDataManager,
+        decoy: Decoy,
+        protocol_run_data: ProtocolRunData,
+        run_resource: RunResource,
+        run_command: commands.Command,
+        mock_engine_store: EngineStore,
+        mock_run_store: RunStore,
+        subject: RunDataManager,
 ) -> None:
     """It should noop on current=None."""
     run_id = "hello world"
@@ -531,13 +531,13 @@ async def test_update_current_not_allowed(
 
 
 async def test_create_archives_existing(
-    decoy: Decoy,
-    protocol_run_data: ProtocolRunData,
-    run_resource: RunResource,
-    run_command: commands.Command,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    subject: RunDataManager,
+        decoy: Decoy,
+        protocol_run_data: ProtocolRunData,
+        run_resource: RunResource,
+        run_command: commands.Command,
+        mock_engine_store: EngineStore,
+        mock_run_store: RunStore,
+        subject: RunDataManager,
 ) -> None:
     """It should persist the previously current run when a new run is created."""
     run_id_old = "hello world"
@@ -576,7 +576,8 @@ async def test_create_archives_existing(
     )
 
 
-def test_get_commands_slice_from_db(decoy: Decoy, subject: RunDataManager, mock_run_store: RunStore, run_command: commands.Command) -> None:
+def test_get_commands_slice_from_db(decoy: Decoy, subject: RunDataManager, mock_run_store: RunStore,
+                                    run_command: commands.Command) -> None:
     """Should get a sliced command list from run store"""
 
     commands_list = [commands.Pause(
@@ -611,3 +612,52 @@ def test_get_commands_slice_from_db(decoy: Decoy, subject: RunDataManager, mock_
     result = subject.get_commands_slice("run_id", 1, 2)
 
     assert expected_command_slice == result
+
+
+def test_get_commands_slice_current_run(decoy: Decoy, subject: RunDataManager, mock_engine_store: EngineStore,
+                                        run_command: commands.Command) -> None:
+    """Should get a sliced command list from engine store"""
+
+    commands_list = [commands.Pause(
+        id="command-id-1",
+        key="command-key",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=commands.CommandStatus.SUCCEEDED,
+        params=commands.PauseParams(message="Hello"),
+    ), commands.Pause(
+        id="command-id-2",
+        key="command-key",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=commands.CommandStatus.SUCCEEDED,
+        params=commands.PauseParams(message="Hello"),
+    ), run_command]
+
+    expected_commands_result = [commands.Pause(
+        id="command-id-2",
+        key="command-key",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=commands.CommandStatus.SUCCEEDED,
+        params=commands.PauseParams(message="Hello"),
+    ), run_command]
+
+    expected_command_slice = CommandSlice(
+        commands=expected_commands_result,
+        cursor=1,
+        total_length=3
+    )
+    decoy.when(mock_engine_store.current_run_id).then_return("run-id")
+    decoy.when(mock_engine_store.engine.state_view.commands.get_all()).then_return(commands_list)
+
+    result = subject.get_commands_slice("run-id", 1, 2)
+
+    assert expected_command_slice == result
+
+
+def test_get_commands_slice_from_db_run_not_found(decoy: Decoy, subject: RunDataManager, mock_run_store: RunStore,
+                                                  mock_engine_store: EngineStore) -> None:
+    """Should get a sliced command list from run store"""
+    decoy.when(mock_engine_store.current_run_id).then_return("run-id")
+    decoy.when(mock_run_store.get_run_commands("run-id")).then_raise(RunNotFoundError(run_id="run-id"))
+
+    with pytest.raises(RunNotFoundError):
+        subject.get_commands_slice("run_id", 1, 2)
