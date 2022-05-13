@@ -33,8 +33,10 @@ class MoveRelativeResult(BaseModel):
 
     position: DeckPoint = Field(
         ...,
-        description="The (x,y,z) coordinates of the pipette's critical point "
-        "in deck space.",
+        description=(
+            "The (x,y,z) coordinates of the pipette's critical point in deck space"
+            " after the move was completed."
+        ),
     )
 
 

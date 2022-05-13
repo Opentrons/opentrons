@@ -141,15 +141,12 @@ class MovementHandler:
                 delta=delta,
                 fail_on_not_homed=True,
             )
-        except HardwareMustHomeError as e:
-            raise MustHomeError(str(e)) from e
-
-        try:
             point = await self._hardware_api.gantry_position(
                 mount=hw_mount,
                 critical_point=pip_cp,
                 fail_on_not_homed=True,
             )
+
         except HardwareMustHomeError as e:
             raise MustHomeError(str(e)) from e
 
