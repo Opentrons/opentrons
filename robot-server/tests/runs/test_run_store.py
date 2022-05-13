@@ -35,6 +35,14 @@ def protocol_commands() -> List[pe_commands.Command]:
             createdAt=datetime(year=2021, month=1, day=1),
             params=pe_commands.PauseParams(message="hello world"),
             result=pe_commands.PauseResult(),
+        ),
+        pe_commands.Pause(
+            id="pause-2",
+            key="command-key",
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=pe_commands.PauseParams(message="hello world"),
+            result=pe_commands.PauseResult(),
         )
     ]
 
@@ -356,3 +364,13 @@ def test_has_no_run_id(subject: RunStore) -> None:
     """It should tell us if a given ID is not in the store."""
     result = subject.has("no-run-id")
     assert result is False
+
+
+def test_get_command(subject: RunStore, run_resource: RunResource, protocol_commands: List[pe_commands.Command], protocol_run: ProtocolRunData) -> None:
+    subject.insert(run_id=run_resource.run_id, protocol_id=run_resource.protocol_id, created_at=run_resource.created_at)
+    subject.update_run_state(
+        run_id=run_resource.run_id,
+        run_data=protocol_run,
+        commands=protocol_commands,
+    )
+    subject.get_command(run_id="run-id", command_id="pause-2")
