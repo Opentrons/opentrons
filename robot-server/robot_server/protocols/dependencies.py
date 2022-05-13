@@ -25,7 +25,6 @@ from .analysis_store import AnalysisStore
 
 
 _PROTOCOL_FILES_SUBDIRECTORY: Final = "protocols"
-_MAXIMUM_UNUSED_PROTOCOLS = 5
 
 _log = logging.getLogger(__name__)
 
@@ -106,7 +105,5 @@ async def get_protocol_auto_deleter(
     """Get a `ProtocolAutoDeleter` to delete old protocols."""
     return ProtocolAutoDeleter(
         protocol_store=protocol_store,
-        deletion_planner=ProtocolDeletionPlanner(
-            maximum_unused_protocols=_MAXIMUM_UNUSED_PROTOCOLS
-        ),
+        deletion_planner=ProtocolDeletionPlanner(),
     )

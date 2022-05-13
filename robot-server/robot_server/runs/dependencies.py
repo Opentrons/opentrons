@@ -14,8 +14,6 @@ from .engine_store import EngineStore
 from .run_store import RunStore
 
 
-_MAXIMUM_RUNS = 20
-
 _run_store_accessor = AppStateAccessor[RunStore]("run_store")
 _engine_store_accessor = AppStateAccessor[EngineStore]("engine_store")
 
@@ -54,5 +52,5 @@ async def get_run_auto_deleter(
     """Get an `AutoDeleter` to delete old runs."""
     return RunAutoDeleter(
         run_store=run_store,
-        deletion_planner=RunDeletionPlanner(maximum_runs=_MAXIMUM_RUNS),
+        deletion_planner=RunDeletionPlanner(),
     )
