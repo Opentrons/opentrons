@@ -463,7 +463,6 @@ async def test_debug_poll(
                 binding=SensorOutputBindingField(SensorOutputBinding.none),
             )
         ),
-<<<<<<< HEAD
     )
 
 
@@ -508,6 +507,3 @@ async def test_peripheral_status(
     mock_messenger.send.side_effect = responder
     status = await sensor.get_device_status(mock_messenger, node_id, timeout)
     assert status
-=======
-    )
->>>>>>> 4026f4bc3 (starting on get_device_status)

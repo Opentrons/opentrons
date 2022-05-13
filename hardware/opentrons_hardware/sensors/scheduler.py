@@ -29,6 +29,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     SetSensorThresholdRequestPayload,
     WriteToSensorRequestPayload,
     BaselineSensorRequestPayload,
+    PeripheralStatusResponsePayload,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorTypeField,
@@ -174,6 +175,8 @@ class SensorScheduler:
                     return SensorDataType.build(response.payload.sensor_data)
                 elif isinstance(response, SensorThresholdResponse):
                     return SensorDataType.build(response.payload.threshold)
+                elif isinstrance(response, PeripheralStatusResponse):
+                    return SensorDataType.build(response.payload.status)
         return None
 
     @staticmethod
