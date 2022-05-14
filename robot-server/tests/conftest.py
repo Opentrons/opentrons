@@ -407,7 +407,7 @@ def clear_custom_tiprack_def_dir() -> Iterator[None]:
 
 
 @pytest.fixture
-def sql_engine_fixture(tmp_path: Path) -> Generator[Engine, None, None]:
+def sql_engine(tmp_path: Path) -> Generator[Engine, None, None]:
     """Return a set-up database to back the store."""
     db_file_path = tmp_path / "test.db"
     sql_engine = open_db_no_cleanup(db_file_path=db_file_path)

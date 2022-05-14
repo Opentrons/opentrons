@@ -45,7 +45,7 @@ import {
 import { useRunQuery } from '@opentrons/react-api-client'
 
 import { Banner } from '../../../atoms/Banner'
-import { PrimaryButton, SecondaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { useTrackEvent } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { StyledText } from '../../../atoms/text'

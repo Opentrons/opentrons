@@ -23,7 +23,7 @@ import {
   Text,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 
 import type { ThermocyclerModule } from '../../../redux/modules/types'
 import type {

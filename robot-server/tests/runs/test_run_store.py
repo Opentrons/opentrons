@@ -25,9 +25,9 @@ from opentrons.protocol_engine import EngineStatus
 
 
 @pytest.fixture
-def subject(sql_engine_fixture: Engine) -> RunStore:
+def subject(sql_engine: Engine) -> RunStore:
     """Get a ProtocolStore test subject."""
-    return RunStore(sql_engine=sql_engine_fixture)
+    return RunStore(sql_engine=sql_engine)
 
 
 @pytest.fixture

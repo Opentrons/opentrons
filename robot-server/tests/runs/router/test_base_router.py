@@ -22,6 +22,9 @@ from robot_server.protocols import (
     ProtocolResource,
     ProtocolNotFoundError,
 )
+
+from robot_server.runs.run_auto_deleter import RunAutoDeleter
+
 from robot_server.runs.run_models import Run, RunCreate, RunUpdate
 from robot_server.runs.engine_store import EngineConflictError
 from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
@@ -50,6 +53,7 @@ def labware_offset_create() -> LabwareOffsetCreate:
 async def test_create_run(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_run_auto_deleter: RunAutoDeleter,
     labware_offset_create: pe_types.LabwareOffsetCreate,
 ) -> None:
     """It should be able to create a basic run."""
@@ -85,16 +89,20 @@ async def test_create_run(
         run_data_manager=mock_run_data_manager,
         run_id=run_id,
         created_at=run_created_at,
+        run_auto_deleter=mock_run_auto_deleter,
     )
 
     assert result.content.data == expected_response
     assert result.status_code == 201
+
+    decoy.verify(mock_run_auto_deleter.make_room_for_new_run(), times=1)
 
 
 async def test_create_protocol_run(
     decoy: Decoy,
     mock_protocol_store: ProtocolStore,
     mock_run_data_manager: RunDataManager,
+    mock_run_auto_deleter: RunAutoDeleter,
 ) -> None:
     """It should be able to create a protocol run."""
     run_id = "run-id"
@@ -145,10 +153,13 @@ async def test_create_protocol_run(
         run_data_manager=mock_run_data_manager,
         run_id=run_id,
         created_at=run_created_at,
+        run_auto_deleter=mock_run_auto_deleter,
     )
 
     assert result.content.data == expected_response
     assert result.status_code == 201
+
+    decoy.verify(mock_run_auto_deleter.make_room_for_new_run(), times=1)
 
 
 async def test_create_protocol_run_bad_protocol_id(
@@ -173,6 +184,7 @@ async def test_create_protocol_run_bad_protocol_id(
 async def test_create_run_conflict(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_run_auto_deleter: RunAutoDeleter,
 ) -> None:
     """It should respond with a conflict error if multiple engines are created."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -192,6 +204,7 @@ async def test_create_run_conflict(
             created_at=created_at,
             request_body=None,
             run_data_manager=mock_run_data_manager,
+            run_auto_deleter=mock_run_auto_deleter,
         )
 
     assert exc_info.value.status_code == 409

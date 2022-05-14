@@ -207,6 +207,7 @@ const LabwarePositionCheckComponent = (
           title={titleText}
           jog={jog}
           runId={props.runId}
+          savePositionCommandData={savePositionCommandData}
         />
       </ModalPage>
     )

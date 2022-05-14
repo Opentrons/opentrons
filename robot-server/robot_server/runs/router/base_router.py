@@ -4,6 +4,7 @@ Contains routes dealing primarily with `Run` models.
 """
 import logging
 from datetime import datetime
+from textwrap import dedent
 from typing import Optional, Union
 from typing_extensions import Literal
 
@@ -31,10 +32,12 @@ from robot_server.protocols import (
 )
 
 from ..run_store import RunNotFoundError
+from ..run_auto_deleter import RunAutoDeleter
 from ..run_models import Run, RunCreate, RunUpdate
 from ..engine_store import EngineConflictError
 from ..run_data_manager import RunDataManager, RunNotCurrentError
-from ..dependencies import get_run_data_manager
+from ..dependencies import get_run_data_manager, get_run_auto_deleter
+
 
 log = logging.getLogger(__name__)
 base_router = APIRouter()
@@ -102,7 +105,14 @@ async def get_run_data_from_url(
 @base_router.post(
     path="/runs",
     summary="Create a run",
-    description="Create a new run to track robot interaction.",
+    description=dedent(
+        """
+        Create a new run to track robot interaction.
+
+        When too many runs already exist, old ones will be automatically deleted
+        to make room for the new one.
+        """
+    ),
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
@@ -116,6 +126,7 @@ async def create_run(
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     run_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
+    run_auto_deleter: RunAutoDeleter = Depends(get_run_auto_deleter),
 ) -> PydanticResponse[SimpleBody[Run]]:
     """Create a new run.
 
@@ -125,6 +136,8 @@ async def create_run(
         protocol_store: Protocol resource storage.
         run_id: Generated ID to assign to the run.
         created_at: Timestamp to attach to created run.
+        run_auto_deleter: An interface to delete old resources to make room for
+            the new run.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
     offsets = request_body.data.labwareOffsets if request_body is not None else []
@@ -135,6 +148,11 @@ async def create_run(
             protocol_resource = protocol_store.get(protocol_id=protocol_id)
         except ProtocolNotFoundError as e:
             raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+
+    # TODO(mc, 2022-05-13): move inside `RunDataManager` or return data
+    # to pass to `RunDataManager.create`. Right now, runs may be deleted
+    # even if a new create is unable to succeed due to a conflict
+    run_auto_deleter.make_room_for_new_run()
 
     try:
         run_data = await run_data_manager.create(
