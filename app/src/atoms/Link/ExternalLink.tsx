@@ -17,8 +17,8 @@ export interface ExternalLinkProps extends LinkProps {
 }
 
 export const ExternalLink = (props: ExternalLinkProps): JSX.Element => (
-  <Link external {...props} css={TYPOGRAPHY.linkPSemibold}>
-    <Flex alignItems={ALIGN_CENTER}>
+  <Link external {...props}>
+    <Flex alignItems={ALIGN_CENTER} css={TYPOGRAPHY.linkPSemiBold}>
       {props.children}
       <Icon
         width={SPACING.spacing3}

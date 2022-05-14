@@ -7,7 +7,6 @@ import {
   Flex,
   Link,
   ALIGN_CENTER,
-  COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -82,8 +81,7 @@ export function RobotSettingsCalibration({
               />
             ) : null}
             <Link
-              color={COLORS.blue}
-              css={TYPOGRAPHY.pRegular}
+              css={TYPOGRAPHY.linkPSemiBold}
               onClick={() => setShowDeckCalibrationModal(true)}
             >
               {t('see_how_robot_calibration_works')}

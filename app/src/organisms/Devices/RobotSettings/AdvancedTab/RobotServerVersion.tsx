@@ -73,6 +73,7 @@ export function RobotServerVersion({
               external
               href={GITHUB_LINK}
               id="AdvancedSettings_GitHubLink"
+              css={TYPOGRAPHY.linkPSemiBold}
             >{` ${t('shared:github')}`}</Link>
           </StyledText>
         </Box>

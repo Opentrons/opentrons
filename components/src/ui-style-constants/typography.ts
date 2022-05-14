@@ -110,7 +110,7 @@ export const labelSemiBold = css`
   line-height: ${lineHeight12};
 `
 
-export const linkPSemibold = css`
+export const linkPSemiBold = css`
   font-size: ${fontSizeP};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
