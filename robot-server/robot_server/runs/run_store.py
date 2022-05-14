@@ -250,58 +250,78 @@ class RunStore:
             else None
         )
 
-    def get_run_commands(self, run_id: str) -> List[Command]:
-        """Get the archived commands list of a run."""
+    def get_commands_slice(
+        self,
+        run_id: str,
+        length: int,
+        cursor: Optional[int],
+    ) -> CommandSlice:
+        """Get a slice of run commands from the store.
+
+        Args:
+            run_id: Run ID to pull commands from.
+            length: Number of commands to return.
+            cursor: The starting index of the slice in the whole collection.
+
+        Returns:
+            A collection of commands as well as the actual cursor used and
+            the total length of the collection.
+        """
         select_run_commands = sqlalchemy.select(run_table.c.commands).where(
             run_table.c.id == run_id
         )
+
         with self._sql_engine.begin() as transaction:
             try:
                 row = transaction.execute(select_run_commands).one()
             except sqlalchemy.exc.NoResultFound:
                 raise RunNotFoundError(run_id=run_id)
 
-        return (
-            [
-                parse_obj_as(Command, command)  # type: ignore[arg-type]
-                for command in row.commands
-            ]
-            if row.commands is not None
-            else []
-        )
-
-    def get_commands_slice(
-        self, cursor: Optional[int], length: int, run_id: str
-    ) -> CommandSlice:
-        """Get run commands slice from db."""
-        commands = self.get_run_commands(run_id=run_id)
-        commands_length = len(commands)
+        command_source_dicts = row.commands if row.commands is not None else []
+        commands_length = len(command_source_dicts)
         if cursor is None:
             cursor = commands_length - length
 
         # start is inclusive, stop is exclusive
         actual_cursor = max(0, min(cursor, commands_length - 1))
         stop = min(commands_length, actual_cursor + length)
-        sliced_commands = commands[actual_cursor:stop]
+        sliced_commands: List[Command] = [
+            parse_obj_as(Command, command)  # type: ignore[arg-type]
+            for command in command_source_dicts[actual_cursor:stop]
+        ]
 
         return CommandSlice(
-            cursor=actual_cursor, total_length=commands_length, commands=sliced_commands
+            cursor=actual_cursor,
+            total_length=commands_length,
+            commands=sliced_commands,
         )
 
     def get_command(self, run_id: str, command_id: str) -> Command:
-        """Get run command by id."""
+        """Get run command by id.
+
+        Args:
+            run_id: The run to pull the command from.
+            command_id: The specific command to pull.
+
+        Returns:
+            The command.
+
+        Raises:
+            RunNotFoundError: The given run ID was not found in the store.
+            CommandNotFoundError: The given command ID was not found in the store.
+        """
         select_run_commands = sqlalchemy.select(run_table.c.commands).where(
             run_table.c.id == run_id
         )
         with self._sql_engine.begin() as transaction:
             try:
                 row = transaction.execute(select_run_commands).one()
-            except sqlalchemy.exc.NoResultFound:
-                raise RunNotFoundError(run_id=run_id)
+            except sqlalchemy.exc.NoResultFound as e:
+                raise RunNotFoundError(run_id=run_id) from e
             try:
                 command = next(c for c in row.commands if c["id"] == command_id)
-            except StopIteration:
-                raise CommandNotFoundError(command_id=command_id)
+            except StopIteration as e:
+                raise CommandNotFoundError(command_id=command_id) from e
 
             return parse_obj_as(Command, command)  # type: ignore[arg-type]
 
