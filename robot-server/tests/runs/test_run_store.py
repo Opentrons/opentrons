@@ -1,7 +1,7 @@
 """Tests for robot_server.runs.run_store."""
 import pytest
 from datetime import datetime, timezone
-from typing import List
+from typing import List, Optional, Any
 from sqlalchemy.engine import Engine
 
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
@@ -399,21 +399,22 @@ def test_get_command(
     assert result == protocol_commands[1]
 
 
-def test_get_command_run_not_found(subject: RunStore) -> None:
-    """Should raise RunNotFoundError."""
-    subject.insert(
-        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
-    )
-    with pytest.raises(RunNotFoundError):
-        subject.get_command(run_id="not-run-id", command_id="pause-2")
-
-
-def test_get_command_command_not_found(
+@pytest.mark.parametrize(
+    "input_run_id, input_command_id, expected_exception",
+    [
+        ("not-run-id", "pause-1", RunNotFoundError),
+        ("run-id", "not-command-id", CommandNotFoundError),
+    ],
+)
+def test_get_command_raise_exception(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
     protocol_run: ProtocolRunData,
+    input_run_id: str,
+    input_command_id: str,
+    expected_exception: Any,
 ) -> None:
-    """Should raise CommandNotFoundError."""
+    """Should raise exception."""
     subject.insert(
         run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
     )
@@ -422,19 +423,102 @@ def test_get_command_command_not_found(
         run_data=protocol_run,
         commands=protocol_commands,
     )
-    with pytest.raises(CommandNotFoundError):
-        subject.get_command(run_id="run-id", command_id="pause-666")
+    with pytest.raises(expected_exception):
+        subject.get_command(run_id=input_run_id, command_id=input_command_id)
 
 
+@pytest.mark.parametrize(
+    "input_cursor, input_length, expected_cursor, expected_length, expected_commands_result",  # noqa: E501
+    [
+        (
+            1,
+            2,
+            1,
+            3,
+            [
+                pe_commands.Pause(
+                    id="pause-2",
+                    key="command-key",
+                    status=pe_commands.CommandStatus.SUCCEEDED,
+                    createdAt=datetime(year=2022, month=2, day=2),
+                    params=pe_commands.PauseParams(message="hey world"),
+                    result=pe_commands.PauseResult(),
+                ),
+                pe_commands.Pause(
+                    id="pause-3",
+                    key="command-key",
+                    status=pe_commands.CommandStatus.SUCCEEDED,
+                    createdAt=datetime(year=2023, month=3, day=3),
+                    params=pe_commands.PauseParams(message="sup world"),
+                    result=pe_commands.PauseResult(),
+                ),
+            ],
+        ),
+        (
+            0,
+            1,
+            0,
+            3,
+            [
+                pe_commands.Pause(
+                    id="pause-1",
+                    key="command-key",
+                    status=pe_commands.CommandStatus.SUCCEEDED,
+                    createdAt=datetime(year=2021, month=1, day=1),
+                    params=pe_commands.PauseParams(message="hello world"),
+                    result=pe_commands.PauseResult(),
+                )
+            ],
+        ),
+        (
+            None,
+            3,
+            0,
+            3,
+            [
+                pe_commands.Pause(
+                    id="pause-1",
+                    key="command-key",
+                    status=pe_commands.CommandStatus.SUCCEEDED,
+                    createdAt=datetime(year=2021, month=1, day=1),
+                    params=pe_commands.PauseParams(message="hello world"),
+                    result=pe_commands.PauseResult(),
+                ),
+                pe_commands.Pause(
+                    id="pause-2",
+                    key="command-key",
+                    status=pe_commands.CommandStatus.SUCCEEDED,
+                    createdAt=datetime(year=2022, month=2, day=2),
+                    params=pe_commands.PauseParams(message="hey world"),
+                    result=pe_commands.PauseResult(),
+                ),
+                pe_commands.Pause(
+                    id="pause-3",
+                    key="command-key",
+                    status=pe_commands.CommandStatus.SUCCEEDED,
+                    createdAt=datetime(year=2023, month=3, day=3),
+                    params=pe_commands.PauseParams(message="sup world"),
+                    result=pe_commands.PauseResult(),
+                ),
+            ],
+        ),
+    ],
+)
 def test_get_commands_slice(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
     protocol_run: ProtocolRunData,
+    input_cursor: Optional[int],
+    input_length: int,
+    expected_cursor: int,
+    expected_length: int,
+    expected_commands_result: List[pe_commands.Command],
 ) -> None:
     """Should return commands list sliced."""
-    expected_commands_result = [protocol_commands[1], protocol_commands[2]]
     expected_command_slice = CommandSlice(
-        commands=expected_commands_result, cursor=1, total_length=3
+        commands=expected_commands_result,
+        cursor=expected_cursor,
+        total_length=expected_length,
     )
 
     subject.insert(
@@ -445,7 +529,9 @@ def test_get_commands_slice(
         run_data=protocol_run,
         commands=protocol_commands,
     )
-    result = subject.get_commands_slice(run_id="run-id", cursor=1, length=3)
+    result = subject.get_commands_slice(
+        run_id="run-id", cursor=input_cursor, length=input_length
+    )
 
     assert expected_command_slice == result
 
