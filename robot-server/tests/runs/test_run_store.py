@@ -1,7 +1,7 @@
 """Tests for robot_server.runs.run_store."""
 import pytest
 from datetime import datetime, timezone
-from typing import List
+from typing import List, Optional
 from sqlalchemy.engine import Engine
 
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
@@ -122,7 +122,11 @@ def test_update_run_state(
         commands=protocol_commands,
     )
     run_data_result = subject.get_run_data(run_id="run-id")
-    commands_result = subject.get_run_commands(run_id="run-id")
+    commands_result = subject.get_commands_slice(
+        run_id="run-id",
+        length=len(protocol_commands),
+        cursor=0,
+    )
 
     assert result == RunResource(
         run_id="run-id",
@@ -131,7 +135,7 @@ def test_update_run_state(
         actions=[action],
     )
     assert run_data_result == protocol_run
-    assert commands_result == protocol_commands
+    assert commands_result.commands == protocol_commands
 
 
 def test_update_state_run_not_found(
@@ -304,42 +308,6 @@ def test_insert_actions_no_run(subject: RunStore) -> None:
         subject.insert_action(run_id="run-id-996", action=action)
 
 
-def test_get_run_commands(
-    subject: RunStore,
-    protocol_run: ProtocolRunData,
-    protocol_commands: List[pe_commands.Command],
-) -> None:
-    """It should be able to get all stored run commands."""
-    subject.insert(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-    )
-    subject.update_run_state(
-        run_id="run-id",
-        run_data=protocol_run,
-        commands=protocol_commands,
-    )
-    result = subject.get_run_commands(run_id="run-id")
-    assert result == protocol_commands
-
-
-def test_get_run_commands_none(
-    subject: RunStore,
-    protocol_run: ProtocolRunData,
-    protocol_commands: List[pe_commands.Command],
-) -> None:
-    """It should return None if no commands stored."""
-    subject.insert(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-    )
-
-    result = subject.get_run_commands(run_id="run-id")
-    assert result == []
-
-
 def test_get_run_data(subject: RunStore, protocol_run: ProtocolRunData) -> None:
     """It should be able to get store run data."""
     subject.insert(
@@ -426,28 +394,67 @@ def test_get_command_command_not_found(
         subject.get_command(run_id="run-id", command_id="pause-666")
 
 
+@pytest.mark.parametrize(
+    ("cursor", "page_length", "expected_cursor", "expected_page_length"),
+    [
+        (0, 3, 0, 3),
+        (1, 2, 1, 2),
+        (0, 999, 0, 3),
+        (1, 999, 1, 2),
+        (None, 3, 0, 3),
+        (None, 2, 1, 2),
+        (999, 2, 2, 1),
+    ],
+)
 def test_get_commands_slice(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
     protocol_run: ProtocolRunData,
+    cursor: Optional[int],
+    page_length: int,
+    expected_cursor: int,
+    expected_page_length: int,
 ) -> None:
     """Should return commands list sliced."""
-    expected_commands_result = [protocol_commands[1], protocol_commands[2]]
-    expected_command_slice = CommandSlice(
-        commands=expected_commands_result, cursor=1, total_length=3
-    )
-
     subject.insert(
-        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
     subject.update_run_state(
         run_id="run-id",
         run_data=protocol_run,
         commands=protocol_commands,
     )
-    result = subject.get_commands_slice(run_id="run-id", cursor=1, length=3)
+    result = subject.get_commands_slice(
+        run_id="run-id",
+        cursor=cursor,
+        length=page_length,
+    )
 
-    assert expected_command_slice == result
+    assert result == CommandSlice(
+        commands=protocol_commands[
+            expected_cursor : expected_cursor + expected_page_length
+        ],
+        cursor=expected_cursor,
+        total_length=3,
+    )
+
+
+def test_get_run_command_slice_none(
+    subject: RunStore,
+    protocol_run: ProtocolRunData,
+    protocol_commands: List[pe_commands.Command],
+) -> None:
+    """It should return None if no commands stored."""
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+
+    result = subject.get_commands_slice(run_id="run-id", length=999, cursor=None)
+    assert result == CommandSlice(commands=[], cursor=0, total_length=0)
 
 
 def test_get_commands_slice_run_not_found(subject: RunStore) -> None:
