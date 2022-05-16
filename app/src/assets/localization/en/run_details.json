@@ -91,5 +91,6 @@
   "location": "location",
   "apply_stored_data": "Apply stored data",
   "ignore_stored_data": "Ignore stored data",
-  "slot": "Slot {{slotName}}"
+  "slot": "Slot {{slotName}}",
+  "not_available_for_a_completed_run": "not available for a completed run"
 }
