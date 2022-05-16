@@ -72,7 +72,7 @@ export function useCreateRunFromProtocol(
       setRunCreationError(null)
       createProtocolRun(
         { files: [...srcFiles, ...customLabwareFiles], protocolKey },
-        ...(args ?? [])
+        ...args
       )
     },
     isCreatingRun: isCreatingProtocol || isCreatingRun,

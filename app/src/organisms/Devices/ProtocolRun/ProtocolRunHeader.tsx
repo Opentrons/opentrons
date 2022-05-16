@@ -387,7 +387,6 @@ export function ProtocolRunHeader({
       )}
 
       <Flex>
-        {/* TODO(bh, 2022-03-15) will update link to a protocol key stored locally when built */}
         {protocolKey != null ? (
           <Link to={`/protocols/${protocolKey}`}>
             <StyledText
@@ -399,7 +398,10 @@ export function ProtocolRunHeader({
             </StyledText>
           </Link>
         ) : (
-          <StyledText css={TYPOGRAPHY.h2SemiBold} id="ProtocolRunHeader_protocolName">
+          <StyledText
+            css={TYPOGRAPHY.h2SemiBold}
+            id="ProtocolRunHeader_protocolName"
+          >
             {displayName}
           </StyledText>
         )}

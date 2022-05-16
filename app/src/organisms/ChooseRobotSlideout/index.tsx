@@ -200,7 +200,7 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
   })
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-    createRunFromProtocolSource({files: srcFileObjects, protocolKey})
+    createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
   }
 
   return (

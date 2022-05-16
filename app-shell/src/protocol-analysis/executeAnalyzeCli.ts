@@ -7,7 +7,7 @@ export function executeAnalyzeCli(
   pythonPath: string,
   sourcePath: string,
   outputPath: string,
-  auxSourcePath?: string
+  ...auxSourcePaths: string[]
 ): Promise<void> {
   return execa(pythonPath, [
     '-m',
@@ -15,7 +15,7 @@ export function executeAnalyzeCli(
     'analyze',
     `--json-output=${outputPath}`,
     sourcePath,
-    auxSourcePath ?? '',
+    ...auxSourcePaths,
   ])
     .then(output => {
       log.debug('Output from opentrons.cli', { output })
