@@ -145,7 +145,7 @@ async def test_create_play_action_to_start(
     decoy.when(await mock_engine_store.runner.run()).then_return(
         ProtocolRunResult(
             commands=protocol_commands,
-            data=protocol_run_data,
+            state_snapshot=protocol_run_data,
         )
     )
 

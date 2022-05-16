@@ -144,4 +144,4 @@ class EngineStore:
         commands = state_view.commands.get_all()
         self._runner_engine_pair = None
 
-        return ProtocolRunResult(data=run_data, commands=commands)
+        return ProtocolRunResult(state_snapshot=run_data, commands=commands)

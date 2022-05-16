@@ -101,7 +101,7 @@ class RunDataManager:
             prev_run_result = await self._engine_store.clear()
             self._run_store.update_run_state(
                 run_id=prev_run_id,
-                run_data=prev_run_result.data,
+                run_data=prev_run_result.state_snapshot,
                 commands=prev_run_result.commands,
             )
 

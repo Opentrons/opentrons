@@ -96,7 +96,7 @@ async def test_analyze(
     decoy.when(await protocol_runner.run(protocol_resource.source)).then_return(
         ProtocolRunResult(
             commands=[analysis_command],
-            data=ProtocolRunData(
+            state_snapshot=ProtocolRunData(
                 status=EngineStatus.SUCCEEDED,
                 errors=[analysis_error],
                 labware=[analysis_labware],

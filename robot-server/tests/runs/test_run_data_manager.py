@@ -455,7 +455,7 @@ async def test_update_current(
     run_id = "hello world"
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
     decoy.when(await mock_engine_store.clear()).then_return(
-        ProtocolRunResult(commands=[run_command], data=protocol_run_data)
+        ProtocolRunResult(commands=[run_command], state_snapshot=protocol_run_data)
     )
 
     decoy.when(
@@ -555,7 +555,7 @@ async def test_create_archives_existing(
 
     decoy.when(mock_engine_store.current_run_id).then_return(run_id_old)
     decoy.when(await mock_engine_store.clear()).then_return(
-        ProtocolRunResult(commands=[run_command], data=protocol_run_data)
+        ProtocolRunResult(commands=[run_command], state_snapshot=protocol_run_data)
     )
 
     decoy.when(

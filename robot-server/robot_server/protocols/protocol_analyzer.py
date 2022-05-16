@@ -35,7 +35,7 @@ class ProtocolAnalyzer:
         await self._analysis_store.update(
             analysis_id=analysis_id,
             commands=result.commands,
-            labware=result.data.labware,
-            pipettes=result.data.pipettes,
-            errors=result.data.errors,
+            labware=result.state_snapshot.labware,
+            pipettes=result.state_snapshot.pipettes,
+            errors=result.state_snapshot.errors,
         )

@@ -75,8 +75,11 @@ async def test_runs_persist(client_and_server: ClientServerFixture) -> None:
     assert get_persisted_run_response.json()["data"] == expected_run
 
 
-async def test_runs_persist_via_actions_router(client_and_server: ClientServerFixture) -> None:
-    """Test that runs commands and state are persisted when calling play action through dev server restart."""
+async def test_runs_persist_via_actions_router(
+    client_and_server: ClientServerFixture,
+) -> None:
+    """Test that runs commands and state
+    are persisted when calling play action through dev server restart."""
     client, server = client_and_server
 
     # create a run

@@ -30,7 +30,7 @@ class ProtocolRunResult(NamedTuple):
     """Result data from a run, pulled from the ProtocolEngine."""
 
     commands: List[Command]
-    data: ProtocolRunData
+    state_snapshot: ProtocolRunData
 
 
 # TODO(mc, 2022-01-11): this class has become bloated. Split into an abstract
