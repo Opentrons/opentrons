@@ -143,6 +143,8 @@ async def create_run(
     offsets = request_body.data.labwareOffsets if request_body is not None else []
     protocol_resource = None
 
+    # TODO (tz, 5-16-22): same error raised twice.
+    #  Check if we can consolidate to one place.
     if protocol_id is not None:
         try:
             protocol_resource = protocol_store.get(protocol_id=protocol_id)
@@ -163,7 +165,8 @@ async def create_run(
         )
     except EngineConflictError as e:
         raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
-
+    except ProtocolNotFoundError as e:
+        raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
     log.info(f'Created protocol run "{run_id}" from protocol "{protocol_id}".')
 
     return await PydanticResponse.create(

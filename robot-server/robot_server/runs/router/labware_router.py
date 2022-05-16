@@ -13,7 +13,7 @@ from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResp
 from ..run_models import Run, LabwareDefinitionSummary
 from ..engine_store import EngineStore
 from ..dependencies import get_engine_store
-from .base_router import RunNotFound, RunNotIdle, get_run_data_from_url, RunStopped
+from .base_router import RunNotFound, RunStopped, RunNotIdle, get_run_data_from_url
 
 log = logging.getLogger(__name__)
 labware_router = APIRouter()
