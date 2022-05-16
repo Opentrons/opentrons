@@ -117,7 +117,7 @@ export function RobotSettingsAdvanced({
           requiredTimeout={false}
         />
       )}
-      <Box paddingX={SPACING.spacing4}>
+      <Box>
         {showRenameRobotSlideout && (
           <RenameRobotSlideout
             isExpanded={showRenameRobotSlideout}
