@@ -423,7 +423,9 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self._wait_for_labware_latch(HeaterShakerLabwareLatchStatus.IDLE_CLOSED)
 
     async def prep_for_update(self) -> str:
-        return "no"
+        await self._driver.enter_programming_mode()
+        new_port = await update.find_bootloader_port(True)
+        return new_port or self.port
 
 
 @dataclass

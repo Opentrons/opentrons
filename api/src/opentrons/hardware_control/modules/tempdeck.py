@@ -216,7 +216,7 @@ class TempDeck(mod_abc.AbstractModule):
             )
         await self._poller.stop_and_wait()
         await self._driver.enter_programming_mode()
-        new_port = await update.find_bootloader_port()
+        new_port = await update.find_bootloader_port(False)
         return new_port or self.port
 
     def has_available_update(self) -> bool:
