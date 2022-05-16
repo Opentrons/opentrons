@@ -102,6 +102,7 @@ class WellDefinition(BaseModel):
 class Liquid(BaseModel):
     displayName: str
     description: str
+    displayColor: str
 
 
 class Metadata(BaseModel):
