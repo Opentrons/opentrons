@@ -15,7 +15,7 @@ import { useRunStatus } from '../RunTimeControl/hooks'
 import { formatInterval } from '../RunTimeControl/utils'
 import { formatTimestamp } from './utils'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
-import { HistoricalRunOffsetDrawer as OffsetDrawer } from './HistoricalRunOffsetDrawer'
+import { HistoricalRunOffsetDrawer as OffsetDrawer } from './HistoricalProtocolRunOffsetDrawer'
 import type { RunData } from '@opentrons/api-client'
 
 const EMPTY_TIMESTAMP = '--:--:--'
@@ -25,6 +25,7 @@ interface HistoricalProtocolRunProps {
   protocolName: string
   robotName: string
   robotIsBusy: boolean
+  key: number
 }
 
 export function HistoricalProtocolRun(
@@ -64,13 +65,26 @@ export function HistoricalProtocolRun(
             marginRight={SPACING.spacing3}
           />
         </Box>
-        <StyledText as="p" width="25%">
+        <StyledText
+          as="p"
+          width="25%"
+          data-testid={`RecentProtocolRuns_Run_${props.key}`}
+        >
           {runDisplayName}
         </StyledText>
-        <StyledText as="p" width="35%">
+        <StyledText
+          as="p"
+          width="35%"
+          data-testid={`RecentProtocolRuns_Protocol_${props.key}`}
+        >
           {protocolName}
         </StyledText>
-        <StyledText as="p" width="20%" textTransform="capitalize">
+        <StyledText
+          as="p"
+          width="20%"
+          textTransform="capitalize"
+          data-testid={`RecentProtocolRuns_Status_${props.key}`}
+        >
           {runStatus === 'running' && (
             <Icon
               name="circle"
@@ -82,7 +96,11 @@ export function HistoricalProtocolRun(
           )}
           {runStatus != null ? t(`status_${runStatus}`) : ''}
         </StyledText>
-        <StyledText as="p" width="20%">
+        <StyledText
+          as="p"
+          width="20%"
+          data-testid={`RecentProtocolRuns_Duration`}
+        >
           {duration}
         </StyledText>
         <OverflowMenu
@@ -90,6 +108,7 @@ export function HistoricalProtocolRun(
           protocolName={protocolName}
           robotName={robotName}
           robotIsBusy={robotIsBusy}
+          data-testid={`RecentProtocolRuns_OverflowButton_${props.key}`}
         />
       </Flex>
       {offsetDrawerOpen && <OffsetDrawer run={run} robotName={robotName} />}

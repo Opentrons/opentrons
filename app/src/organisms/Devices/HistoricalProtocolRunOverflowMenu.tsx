@@ -78,14 +78,30 @@ export function HistoricalProtocolRunOverflowMenu(
           flexDirection={DIRECTION_COLUMN}
         >
           <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-log`}>
-            <MenuItem>{t('view_run_record')}</MenuItem>
+            <MenuItem
+              dataTest-id={`RecentProtocolRun_OverflowMenu_viewRunRecord`}
+            >
+              {t('view_run_record')}
+            </MenuItem>
           </NavLink>
-          <MenuItem onClick={reset} disabled={robotIsBusy}>
+          <MenuItem
+            onClick={reset}
+            disabled={robotIsBusy}
+            dataTest-id={`RecentProtocolRun_OverflowMenu_rerunNow`}
+          >
             {t('rerun_now')}
           </MenuItem>
-          <MenuItem onClick={onDownloadClick}>{t('download_run_log')}</MenuItem>
+          <MenuItem
+            dataTest-id={`RecentProtocolRun_OverflowMenu_downloadRunLog`}
+            onClick={onDownloadClick}
+          >
+            {t('download_run_log')}
+          </MenuItem>
           <Divider />
-          <MenuItem onClick={() => deleteRun(runId)}>
+          <MenuItem
+            onClick={() => deleteRun(runId)}
+            dataTest-id={`RecentProtocolRun_OverflowMenu_deleteRun`}
+          >
             {t('delete_run')}
           </MenuItem>
         </Flex>

@@ -95,7 +95,7 @@
   "confirm": "Confirm",
   "temperature": "Temperature",
   "recent_protocol_runs": "{{robotName}}'s Protocol Runs",
-  "run_id": "Run ID",
+  "run": "Run",
   "protocol": "Protocol",
   "status": "Status",
   "run_duration": "Run duration",

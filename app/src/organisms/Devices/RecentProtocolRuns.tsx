@@ -67,13 +67,15 @@ export function RecentProtocolRuns({
                 width="25%"
                 as="label"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                data-testid={`RecentProtocolRuns_RunTitle`}
               >
-                {t('run_id')}
+                {t('run')}
               </StyledText>
               <StyledText
                 as="label"
                 width="35%"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                data-testid={`RecentProtocolRuns_ProtocolTitle`}
               >
                 {t('protocol')}
               </StyledText>
@@ -81,6 +83,7 @@ export function RecentProtocolRuns({
                 as="label"
                 width="20%"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                data-testid={`RecentProtocolRuns_StatusTitle`}
               >
                 {t('status')}
               </StyledText>
@@ -89,6 +92,7 @@ export function RecentProtocolRuns({
                 width="20%"
                 marginRight="20px"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                data-testid={`RecentProtocolRuns_DurationTitle`}
               >
                 {t('run_duration')}
               </StyledText>
