@@ -289,15 +289,6 @@ export function ProtocolRunHeader({
           </Banner>
         )
       }
-      case RUN_STATUS_STOPPED: {
-        return (
-          <Banner type="warning">
-            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-              {`${t('run_canceled')}.`}
-            </Flex>
-          </Banner>
-        )
-      }
       case RUN_STATUS_SUCCEEDED: {
         return (
           <Banner type="success" onCloseClick={handleClearClick}>
@@ -402,6 +393,9 @@ export function ProtocolRunHeader({
       </Flex>
       {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
         <Banner type="warning">{t('close_door_to_resume')}</Banner>
+      ) : null}
+      {runStatus === RUN_STATUS_STOPPED ? (
+        <Banner type="warning">{`${t('run_canceled')}.`}</Banner>
       ) : null}
       {isCurrentRun ? <ClearProtocolBanner /> : null}
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
