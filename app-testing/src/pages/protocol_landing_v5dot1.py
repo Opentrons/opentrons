@@ -61,7 +61,7 @@ class ProtocolLanding:
             (By.XPATH, '//button[text()="Import"]'),
             "the import button on Protocol Landing Page.",
         )
-        return self.base.present_wrapper(header, 7)
+        return self.base.present_wrapper(header, 1)
 
     def get_deckMap_protocol_landing(self) -> Optional[WebElement]:
         """Get the deckmap on Protocol Landing Page."""
@@ -83,7 +83,7 @@ class ProtocolLanding:
             ),
             "the protocol name on Protocol Landing Page.",
         )
-        element = self.base.present_wrapper(header, 1)
+        element = self.base.clickable_wrapper(header, 1)
         if not element:
             return ""
         return element.text

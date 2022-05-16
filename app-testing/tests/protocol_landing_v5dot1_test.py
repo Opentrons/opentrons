@@ -79,6 +79,7 @@ def test_protocol_landing_v5dot1(
 
         # Verifying elements on Protocol Landing Page
         assert protocol_landing.get_import_button_protocol_landing().is_displayed()
+        time.sleep(2)
         assert protocol_landing.get_deckMap_protocol_landing().is_displayed()
         assert (
             protocol_landing.get_protocol_name_text_protocol_landing
