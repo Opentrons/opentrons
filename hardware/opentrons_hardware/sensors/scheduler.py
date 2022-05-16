@@ -29,7 +29,6 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     SetSensorThresholdRequestPayload,
     WriteToSensorRequestPayload,
     BaselineSensorRequestPayload,
-    PeripheralStatusResponsePayload,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorTypeField,
@@ -178,15 +177,16 @@ class SensorScheduler:
         return None
 
     @staticmethod
-    async def _read_response(
+    async def _read_peripheral_response(
         node_id: NodeId,
         reader: WaitableCallback,
-    ) -> Optional[bool]:
+    ) -> bool:
+        """Waits for and sends back PeripheralStatusResponse."""
         async for response, arbitration_id in reader:
             if arbitration_id.parts.originating_node_id == node_id:
                 if isinstance(response, PeripheralStatusResponse):
                     return bool(response.payload.status)
-        return None
+        return False
 
     @staticmethod
     async def _read_peripheral_response(
