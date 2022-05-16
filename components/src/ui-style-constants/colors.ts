@@ -54,6 +54,6 @@ export const warningText = '#7b5b09'
 export const warningBg = '#fffcf5'
 // note: warningDisabled = successDisabled
 
-export const alphaToOpacity35 = '59'
+export const alphaToOpacity35 = '35'
 
 export const backgroundOverlay = `${darkBlack}${alphaToOpacity35}`
