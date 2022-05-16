@@ -29,6 +29,7 @@ const render = () => {
       protocolName="my protocol"
       robotIsBusy={false}
       run={run}
+      key={1}
     />,
     {
       i18nInstance: i18n,
