@@ -128,6 +128,11 @@ def save_to_path(path: str, config: Config) -> None:
     Save the config file to a specific path (not what's in the config)
     """
     LOG.debug(f"Saving config to {path}")
+
+    dirname = os.path.dirname(path)
+    if dirname:
+        # Make sure the target directory exists before writing to file.
+        os.makedirs(dirname, exist_ok=True)
     with open(path, "w") as cf:
         cf.write(json.dumps({k: v for k, v in config._asdict().items() if k != "path"}))
 

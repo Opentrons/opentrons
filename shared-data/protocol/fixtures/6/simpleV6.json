@@ -1237,18 +1237,6 @@
   },
   "commands": [
     {
-      "commandType": "home",
-      "id": "00abc123",
-      "params": {}
-    },
-    {
-      "commandType": "home",
-      "id": "00abc123",
-      "params": {
-        "axes": ["x", "y", "leftZ", "rightZ", "leftPlunger", "rightPlunger"]
-      }
-    },
-    {
       "commandType": "loadPipette",
       "id": "0abc123",
       "params": {
@@ -1322,6 +1310,11 @@
           "B1": 100
         }
       }
+    },
+    {
+      "commandType": "home",
+      "id": "00abc123",
+      "params": {}
     },
     {
       "commandType": "pickUpTip",

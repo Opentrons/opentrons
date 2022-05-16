@@ -18,7 +18,7 @@ import {
   ALIGN_FLEX_END,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { SecondaryButton } from '../../atoms/Buttons'
+import { SecondaryButton } from '../../atoms/buttons'
 import { Toast } from '../../atoms/Toast'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'

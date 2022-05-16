@@ -7,7 +7,9 @@ from opentrons.hardware_control import HardwareControlAPI
 from robot_server.app_state import AppState, AppStateAccessor, get_app_state
 from robot_server.hardware import get_hardware
 from robot_server.persistence import get_sql_engine
+from robot_server.deletion_planner import RunDeletionPlanner
 
+from .run_auto_deleter import RunAutoDeleter
 from .engine_store import EngineStore
 from .run_store import RunStore
 
@@ -42,3 +44,13 @@ def get_engine_store(
         _engine_store_accessor.set_on(app_state, engine_store)
 
     return engine_store
+
+
+async def get_run_auto_deleter(
+    run_store: RunStore = Depends(get_run_store),
+) -> RunAutoDeleter:
+    """Get an `AutoDeleter` to delete old runs."""
+    return RunAutoDeleter(
+        run_store=run_store,
+        deletion_planner=RunDeletionPlanner(),
+    )

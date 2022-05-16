@@ -25,7 +25,7 @@ import {
 
 import type { StyleProps } from '@opentrons/components'
 import type { Dispatch } from '../../redux/types'
-import { AlertPrimaryButton, SecondaryButton } from '../../atoms/Buttons'
+import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 interface ProtocolOverflowMenuProps extends StyleProps {
@@ -67,7 +67,11 @@ export function ProtocolOverflowMenu(
   }
   return (
     <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
-      <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
+      <OverflowBtn
+        alignSelf={ALIGN_FLEX_END}
+        onClick={handleOverflowClick}
+        data-testid="ProtocolOverflowMenu_overflowBtn"
+      />
       {showOverflowMenu ? (
         <Flex
           width={SIZE_4}
@@ -80,11 +84,22 @@ export function ProtocolOverflowMenu(
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          <MenuItem onClick={handleClickShowInFolder}>
+          <MenuItem
+            onClick={handleClickShowInFolder}
+            data-testid="ProtocolOverflowMenu_showInFolder"
+          >
             {t('show_in_folder')}
           </MenuItem>
-          <MenuItem onClick={handleClickRun}>{t('run')}</MenuItem>
-          <MenuItem onClick={handleClickDelete}>
+          <MenuItem
+            onClick={handleClickRun}
+            data-testid="ProtocolOverflowMenu_run"
+          >
+            {t('run')}
+          </MenuItem>
+          <MenuItem
+            onClick={handleClickDelete}
+            data-testid="ProtocolOverflowMenu_deleteProtocol"
+          >
             {t('delete_protocol')}
           </MenuItem>
         </Flex>

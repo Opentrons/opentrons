@@ -28,6 +28,7 @@ import {
 } from '../../../../redux/modules/__fixtures__/index'
 import {
   useModuleRenderInfoForProtocolById,
+  useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
 import { SetupModules } from '../SetupModules'
@@ -65,6 +66,9 @@ const mockMultipleModulesModal = MultipleModulesModal as jest.MockedFunction<
 >
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
+>
+const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
+  typeof useRunHasStarted
 >
 const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
   typeof useUnmatchedModulesForProtocol
@@ -182,6 +186,7 @@ describe('SetupModules', () => {
     when(mockHeaterShakerBanner).mockReturnValue(
       <div>mock Heater Shaker Banner</div>
     )
+    when(mockUseRunHasStarted).calledWith(MOCK_RUN_ID).mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -254,6 +259,7 @@ describe('SetupModules', () => {
           isAttached: false,
           usbPort: null,
           hubPort: null,
+          runId: MOCK_RUN_ID,
         })
       )
       .mockReturnValue(<div>mock module info {mockMagneticModule.model}</div>)
@@ -297,6 +303,7 @@ describe('SetupModules', () => {
           isAttached: false,
           usbPort: null,
           hubPort: null,
+          runId: MOCK_RUN_ID,
         })
       )
       .mockReturnValue(<div>mock module info {mockMagneticModule.model}</div>)
@@ -308,6 +315,7 @@ describe('SetupModules', () => {
           isAttached: false,
           usbPort: null,
           hubPort: null,
+          runId: MOCK_RUN_ID,
         })
       )
       .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
@@ -385,6 +393,7 @@ describe('SetupModules', () => {
           isAttached: true,
           usbPort: mockMagneticModuleFixture.usbPort.port,
           hubPort: mockMagneticModuleFixture.usbPort.hub,
+          runId: MOCK_RUN_ID,
         })
       )
       .mockReturnValue(<div>mock module info {mockMagneticModule.model} </div>)
@@ -396,6 +405,7 @@ describe('SetupModules', () => {
           isAttached: true,
           usbPort: mockThermocyclerFixture.usbPort.port,
           hubPort: mockThermocyclerFixture.usbPort.hub,
+          runId: MOCK_RUN_ID,
         })
       )
       .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
@@ -405,6 +415,83 @@ describe('SetupModules', () => {
     const button = getByRole('button', { name: 'Proceed to labware setup' })
     expect(button).not.toBeDisabled()
   })
+
+  it('should render a deck WITH modules with CTA disabled if run has started', () => {
+    when(mockUseRunHasStarted).calledWith(MOCK_RUN_ID).mockReturnValue(true)
+    when(mockUseUnmatchedModulesForProtocol)
+      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
+      .mockReturnValue({
+        missingModuleIds: [],
+        remainingAttachedModules: [],
+      })
+
+    when(mockUseModuleRenderInfoForProtocolById)
+      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
+      .mockReturnValue({
+        [mockMagneticModule.moduleId]: {
+          moduleId: mockMagneticModule.moduleId,
+          x: MOCK_MAGNETIC_MODULE_COORDS[0],
+          y: MOCK_MAGNETIC_MODULE_COORDS[1],
+          z: MOCK_MAGNETIC_MODULE_COORDS[2],
+          moduleDef: mockMagneticModule as any,
+          nestedLabwareDef: null,
+          nestedLabwareId: null,
+          nestedLabwareDisplayName: null,
+          protocolLoadOrder: 1,
+          attachedModuleMatch: {
+            ...mockMagneticModuleFixture,
+            model: mockMagneticModule.model,
+          } as any,
+          slotName: '1',
+        },
+        [mockTCModule.moduleId]: {
+          moduleId: mockTCModule.moduleId,
+          x: MOCK_TC_COORDS[0],
+          y: MOCK_TC_COORDS[1],
+          z: MOCK_TC_COORDS[2],
+          moduleDef: mockTCModule,
+          nestedLabwareDef: null,
+          nestedLabwareId: null,
+          nestedLabwareDisplayName: null,
+          protocolLoadOrder: 0,
+          attachedModuleMatch: {
+            ...mockThermocyclerFixture,
+            model: mockTCModule.model,
+          } as any,
+          slotName: '7',
+        },
+      })
+
+    when(mockModuleInfo)
+      .calledWith(
+        componentPropsMatcher({
+          moduleModel: mockMagneticModule.model,
+          isAttached: true,
+          usbPort: mockMagneticModuleFixture.usbPort.port,
+          hubPort: mockMagneticModuleFixture.usbPort.hub,
+          runId: MOCK_RUN_ID,
+        })
+      )
+      .mockReturnValue(<div>mock module info {mockMagneticModule.model} </div>)
+
+    when(mockModuleInfo)
+      .calledWith(
+        componentPropsMatcher({
+          moduleModel: mockTCModule.model,
+          isAttached: true,
+          usbPort: mockThermocyclerFixture.usbPort.port,
+          hubPort: mockThermocyclerFixture.usbPort.hub,
+          runId: MOCK_RUN_ID,
+        })
+      )
+      .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
+
+    const { getByText, getByRole } = render(props)
+    getByText('mock module info magneticModuleV2')
+    const button = getByRole('button', { name: 'Proceed to labware setup' })
+    expect(button).toBeDisabled()
+  })
+
   it('renders Moam with the correct module in the correct slot', () => {
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
@@ -464,6 +551,7 @@ describe('SetupModules', () => {
           isAttached: true,
           usbPort: mockMagneticModuleFixture.usbPort.port,
           hubPort: mockMagneticModuleFixture.usbPort.hub,
+          runId: MOCK_RUN_ID,
         })
       )
       .mockReturnValue(<div>mock module info {mockMagneticModule.model} </div>)
@@ -475,6 +563,7 @@ describe('SetupModules', () => {
           isAttached: true,
           usbPort: dupModPort,
           hubPort: dupModHub,
+          runId: MOCK_RUN_ID,
         })
       )
       .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)

@@ -3,13 +3,15 @@ import * as React from 'react'
 
 import {
   Box,
-  SPACING_1,
+  SPACING,
+  Flex,
   SIZE_2,
-  PrimaryBtn,
   Icon,
   HandleKeypress,
   ALIGN_CENTER,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
+import { PrimaryButton } from '../../atoms/buttons'
 import { ControlContainer } from './ControlContainer'
 
 import type { IconName } from '@opentrons/components'
@@ -129,25 +131,35 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
       >
         <Box
           display="grid"
-          gridGap={SPACING_1}
-          gridTemplateRows="repeat(2, [row] 3rem)"
-          gridTemplateColumns="repeat(3, [col] 3rem)"
+          gridGap={SPACING.spacing1}
+          gridTemplateRows="repeat(2, [row] 2rem)"
+          gridTemplateColumns="repeat(3, [col] 2rem)"
         >
           {controls.map(
             ({ bearing, gridRow, gridColumn, iconName, axis, sign }) => (
-              <PrimaryBtn
+              <PrimaryButton
                 key={bearing}
                 title={bearing}
                 width={SIZE_2}
                 height={SIZE_2}
                 alignSelf={ALIGN_CENTER}
-                margin={SPACING_1}
+                margin={SPACING.spacing1}
                 padding={0}
                 onClick={() => props.jog(axis, sign, props.stepSize)}
                 {...{ gridRow, gridColumn }}
               >
-                <Icon name={iconName} backgroundColor={props.buttonColor} />
-              </PrimaryBtn>
+                <Flex
+                  alignItems={ALIGN_CENTER}
+                  justifyContent={JUSTIFY_CENTER}
+                  width="100%"
+                >
+                  <Icon
+                    size="1.5rem"
+                    name={iconName}
+                    backgroundColor={props.buttonColor}
+                  />
+                </Flex>
+              </PrimaryButton>
             )
           )}
         </Box>

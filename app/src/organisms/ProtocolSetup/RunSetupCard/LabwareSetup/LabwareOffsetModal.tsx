@@ -51,7 +51,7 @@ export const LabwareOffsetModal = (
           </Flex>
           <Trans
             t={t}
-            i18nKey={`position_offset_overiew_and_description`}
+            i18nKey={`position_offset_overview_and_description`}
             components={{
               h4: (
                 <Text

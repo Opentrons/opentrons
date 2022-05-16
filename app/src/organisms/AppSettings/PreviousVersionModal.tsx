@@ -10,7 +10,7 @@ import {
 
 import { Modal } from '../../atoms/Modal'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import { PrimaryButton } from '../../atoms/Buttons'
+import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 export const UNINSTALL_APP_URL =

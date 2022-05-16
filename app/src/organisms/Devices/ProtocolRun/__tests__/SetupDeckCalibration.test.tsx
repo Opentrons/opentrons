@@ -16,11 +16,12 @@ const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction
 >
 
 const ROBOT_NAME = 'otie'
+const RUN_ID = '1'
 
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <SetupDeckCalibration robotName={ROBOT_NAME} />
+      <SetupDeckCalibration robotName={ROBOT_NAME} runId={RUN_ID} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,

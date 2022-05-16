@@ -28,10 +28,6 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import { PrimaryButton } from '../../atoms/Buttons'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
-import {
-  useCloseCurrentRun,
-  useCurrentRunId,
-} from '../../organisms/ProtocolUpload/hooks'
 import { useAvailableAndUnavailableDevices } from '../../pages/Devices/DevicesLanding/hooks'
 import { getScanning, startDiscovery } from '../../redux/discovery'
 import { StoredProtocolData } from '../../redux/protocol-storage'
