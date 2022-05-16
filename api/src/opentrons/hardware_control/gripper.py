@@ -17,7 +17,7 @@ RECONFIG_KEYS = {"quirks"}
 mod_log = logging.getLogger(__name__)
 
 
-class Gripper(AbstractInstrument):
+class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
     """A class to gather and track gripper state and configs.
 
     This class should not touch hardware or call back out to the hardware
@@ -48,7 +48,7 @@ class Gripper(AbstractInstrument):
         return self._config
 
     def update_config_item(self, elem_name: str, elem_val: Any) -> None:
-        self._log.info("updated config: {}={}".format(elem_name, elem_val))
+        self._log.info(f"updated config: {elem_name}={elem_val}")
         self._config = replace(self._config, **{elem_name: elem_val})
         # Update the cached dict representation
         self._config_as_dict = asdict(self._config)
@@ -75,12 +75,10 @@ class Gripper(AbstractInstrument):
         return Point(0, 0, 0)
 
     def __str__(self) -> str:
-        return "{}".format(self._config.display_name)
+        return f"{self._config.display_name}"
 
     def __repr__(self) -> str:
-        return "<{}: {} {}>".format(
-            self.__class__.__name__, self._config.display_name, id(self)
-        )
+        return f"<{self.__class__.__name__}: {self._config.display_name} {id(self)}"
 
     def as_dict(self) -> "Gripper.DictType":
         self._config_as_dict.update(

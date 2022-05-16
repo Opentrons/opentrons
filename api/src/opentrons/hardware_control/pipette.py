@@ -34,7 +34,7 @@ RECONFIG_KEYS = {"quirks"}
 mod_log = logging.getLogger(__name__)
 
 
-class Pipette(AbstractInstrument):
+class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
     """A class to gather and track pipette state and configs.
 
     This class should not touch hardware or call back out to the hardware
