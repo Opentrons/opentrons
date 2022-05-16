@@ -8,7 +8,6 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
 )
 from opentrons_hardware.firmware_bindings.utils.binary_serializable import (
     Int32Field,
-    UInt8Field,
 )
 
 sensor_fixed_point_conversion: Final[float] = 2**16

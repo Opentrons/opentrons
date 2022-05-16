@@ -593,7 +593,7 @@ class PeripheralStatusRequest:  # noqa: D101
 class PeripheralStatusResponse:  # noqa: D101
     payload: payloads.PeripheralStatusResponsePayload
     payload_type: Type[
-        payloads.PeripheralStatusRequestPayload
+        payloads.PeripheralStatusResponsePayload
     ] = payloads.PeripheralStatusResponsePayload
     message_id: Literal[
         MessageId.peripheral_status_response
