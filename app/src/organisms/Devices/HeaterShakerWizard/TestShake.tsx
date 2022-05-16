@@ -195,7 +195,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             {isShaking ? t('stop_shaking') : t('start_shaking')}
           </TertiaryButton>
           {!isLatchClosed ? (
-            <Tooltip tooltipProps={tooltipProps} key={`TestShake_shake_btn`}>
+            <Tooltip tooltipProps={tooltipProps}>
               {t('cannot_shake', { ns: 'heater_shaker' })}
             </Tooltip>
           ) : null}
