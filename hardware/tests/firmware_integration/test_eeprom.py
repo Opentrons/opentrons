@@ -38,6 +38,7 @@ def filter_func(arb: ArbitrationId) -> bool:
     return bool(arb.parts.message_id == ReadFromEEPromResponse.message_id)
 
 
+@pytest.mark.requires_emulator
 @pytest.mark.can_filter_func.with_args(filter_func)
 @pytest.mark.parametrize(
     argnames=["address", "data"],
