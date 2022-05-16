@@ -35,7 +35,7 @@ export function DisableHoming({
         <StyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          paddingBottom={SPACING.spacing3}
+          paddingBottom={SPACING.spacing4}
           id="AdvancedSettings_disableHoming"
         >
           {t('disable_homing')}

@@ -49,7 +49,7 @@ export function Troubleshooting({
         <StyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacingM}
+          marginBottom={SPACING.spacing4}
         >
           {t('update_robot_software_troubleshooting')}
         </StyledText>

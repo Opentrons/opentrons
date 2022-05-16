@@ -63,7 +63,7 @@ export function UpdateRobotSoftware({
         <StyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing4}
           id="AdvancedSettings_updateRobotSoftware"
         >
           {t('update_robot_software')}

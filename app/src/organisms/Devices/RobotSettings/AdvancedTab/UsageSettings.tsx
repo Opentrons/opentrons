@@ -36,7 +36,7 @@ export function UsageSettings({
         <StyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          paddingBottom={SPACING.spacing3}
+          paddingBottom={SPACING.spacing4}
           id="AdvancedSettings_UsageSettings"
         >
           {t('usage_settings')}

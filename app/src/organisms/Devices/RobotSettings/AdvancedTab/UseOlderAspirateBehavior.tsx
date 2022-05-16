@@ -36,7 +36,7 @@ export function UseOlderAspirateBehavior({
         <StyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          paddingBottom={SPACING.spacing3}
+          paddingBottom={SPACING.spacing4}
           id="AdvancedSettings_devTools"
         >
           {t('use_older_aspirate')}

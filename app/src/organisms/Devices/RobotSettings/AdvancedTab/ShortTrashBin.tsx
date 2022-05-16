@@ -36,7 +36,7 @@ export function ShortTrashBin({
         <StyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          paddingBottom={SPACING.spacing3}
+          paddingBottom={SPACING.spacing4}
           id="AdvancedSettings_devTools"
         >
           {t('short_trash_bin')}
