@@ -15,7 +15,7 @@ import { useRunStatus } from '../RunTimeControl/hooks'
 import { formatInterval } from '../RunTimeControl/utils'
 import { formatTimestamp } from './utils'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
-import { HistoricalRunOffsetDrawer as OffsetDrawer } from './HistoricalProtocolRunOffsetDrawer'
+import { HistoricalProtocolRunOffsetDrawer as OffsetDrawer } from './HistoricalProtocolRunOffsetDrawer'
 import type { RunData } from '@opentrons/api-client'
 
 const EMPTY_TIMESTAMP = '--:--:--'

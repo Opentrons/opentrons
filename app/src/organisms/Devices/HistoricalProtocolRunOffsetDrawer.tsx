@@ -17,13 +17,13 @@ import { useProtocolDetailsForRun, useDeckCalibrationData } from './hooks'
 import { OffsetVector } from '../../molecules/OffsetVector'
 import type { RunData } from '@opentrons/api-client'
 
-interface HistoricalRunOffsetDrawerProps {
+interface HistoricalProtocolRunOffsetDrawerProps {
   run: RunData
   robotName: string
 }
 
-export function HistoricalRunOffsetDrawer(
-  props: HistoricalRunOffsetDrawerProps
+export function HistoricalProtocolRunOffsetDrawer(
+  props: HistoricalProtocolRunOffsetDrawerProps
 ): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const { run, robotName } = props
