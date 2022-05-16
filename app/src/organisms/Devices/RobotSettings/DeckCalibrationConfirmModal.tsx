@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 import { Modal } from '../../../atoms/Modal'
 import { StyledText } from '../../../atoms/text'
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 
 interface DeckCalibrationConfirmModalProps {
   confirm: () => unknown
