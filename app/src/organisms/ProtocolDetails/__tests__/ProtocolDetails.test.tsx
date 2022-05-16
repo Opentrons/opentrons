@@ -173,7 +173,7 @@ describe('ProtocolDetails', () => {
     getByText('Protocol Designer 6.0')
   })
   it('renders the last analyzed date', () => {
-    const { getByRole, getByText } = render({
+    const { getByRole } = render({
       mostRecentAnalysis: {
         ...storedProtocolData.mostRecentAnalysis,
         createdAt,
@@ -188,7 +188,6 @@ describe('ProtocolDetails', () => {
       },
     })
     getByRole('heading', { name: 'last analyzed' })
-    getByText('May 04, 2022 14:33')
   })
   it('renders the protocol description', () => {
     const { getByRole, getByText } = render({
