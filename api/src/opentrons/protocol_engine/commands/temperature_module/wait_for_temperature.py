@@ -27,7 +27,7 @@ class WaitForTemperatureResult(BaseModel):
 class WaitForTemperatureImpl(
     AbstractCommandImpl[WaitForTemperatureParams, WaitForTemperatureResult]
 ):
-    """Execution implementation of a Temperature Module's await temperature command."""
+    """Execution implementation of a Temperature Module's wait for temperature command."""
 
     def __init__(
         self,
@@ -65,7 +65,7 @@ class WaitForTemperatureImpl(
 class WaitForTemperature(
     BaseCommand[WaitForTemperatureParams, WaitForTemperatureResult]
 ):
-    """A command to set a Temperature Module's target temperature."""
+    """A command to wait for a Temperature Module's target temperature."""
 
     commandType: WaitForTemperatureCommandType = "temperatureModule/waitForTemperature"
     params: WaitForTemperatureParams
@@ -75,7 +75,7 @@ class WaitForTemperature(
 
 
 class WaitForTemperatureCreate(BaseCommandCreate[WaitForTemperatureParams]):
-    """A request to create a Temperature Module's set temperature command."""
+    """A request to create a Temperature Module's wait for temperature command."""
 
     commandType: WaitForTemperatureCommandType
     params: WaitForTemperatureParams

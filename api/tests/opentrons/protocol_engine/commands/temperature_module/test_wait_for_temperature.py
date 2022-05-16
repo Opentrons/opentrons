@@ -1,4 +1,4 @@
-"""Test Temperature Module's await temperature command implementation."""
+"""Test Temperature Module's wait for temperature command implementation."""
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import TempDeck
@@ -15,7 +15,7 @@ from opentrons.protocol_engine.commands.temperature_module.wait_for_temperature 
 )
 
 
-async def test_await_temperature(
+async def test_wait_for_temperature(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
