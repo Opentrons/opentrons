@@ -38,7 +38,7 @@ async def get_run_controller(
     """Get a RunController for the current run.
 
     This ensures that a run exists and is current at the time the request is
-    received. Depedendents should not assume that condition will necessarily
+    received. Dependents should not assume that condition will necessarily
     hold throughout the lifetime of the request handler.
     """
     if not run_store.has(runId):
