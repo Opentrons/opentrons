@@ -27,7 +27,7 @@ class WaitForTemperatureResult(BaseModel):
 class WaitForTemperatureImpl(
     AbstractCommandImpl[WaitForTemperatureParams, WaitForTemperatureResult]
 ):
-    """Execution implementation of a Temperature Module's wait for temperature command."""
+    """Execution implementation of Temperature Module's wait for temperature command."""
 
     def __init__(
         self,
