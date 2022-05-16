@@ -13,7 +13,6 @@ from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdPar
 from opentrons_hardware.firmware_bindings.constants import SensorType, NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
-
 )
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
@@ -46,7 +45,6 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorTypeField,
     SensorOutputBindingField,
-    PeripheralStatusResponsePayload,
 )
 from opentrons_hardware.sensors.utils import SensorDataType
 from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
