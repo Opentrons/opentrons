@@ -450,7 +450,7 @@ describe('useModuleOverflowMenu', () => {
     act(() => magMenu[0].onClick(false))
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'magneticModule/disengageMagnet',
+        commandType: 'magneticModule/disengage',
         params: {
           moduleId: mockMagDeckEngaged.id,
         },

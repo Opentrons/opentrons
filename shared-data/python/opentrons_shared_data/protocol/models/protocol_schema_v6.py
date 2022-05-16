@@ -53,7 +53,7 @@ class Params(BaseModel):
     temperature: Optional[float]
     celsius: Optional[float]
     rpm: Optional[float]
-    engageHeight: Optional[float]
+    height: Optional[float]
     offset: Optional[OffsetVector]
 
 

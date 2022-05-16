@@ -10,7 +10,7 @@ export const engageMagnet: CommandCreator<EngageMagnetArgs> = (
   prevRobotState
 ) => {
   const { module: moduleId, engageHeight } = args
-  const commandType = 'magneticModule/engageMagnet'
+  const commandType = 'magneticModule/engage'
 
   if (module === null) {
     return {
@@ -28,7 +28,7 @@ export const engageMagnet: CommandCreator<EngageMagnetArgs> = (
         commandType,
         params: {
           moduleId,
-          engageHeight,
+          height: engageHeight,
         },
       },
     ],
