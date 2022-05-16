@@ -29,6 +29,7 @@ export type RunStatus =
 export interface RunData {
   id: string
   createdAt: string
+  completedAt?: string
   current: boolean
   status: RunStatus
   actions: RunAction[]
