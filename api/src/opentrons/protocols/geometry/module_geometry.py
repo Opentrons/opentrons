@@ -194,6 +194,23 @@ class ModuleGeometry(DeckItem):
     def __repr__(self) -> str:
         return self._display_name
 
+    def __eq__(self, other: object) -> bool:
+        """Compare for object equality.
+
+        Verifies that the object is a ModuleGeometry and has the same module propeties.
+        """
+        return (
+            isinstance(other, ModuleGeometry)
+            and other._api_version == self._api_version
+            and other._parent == self._parent
+            and other._module_type == self._module_type
+            and other._display_name == self._display_name
+            and other._model == self._model
+            and other._offset == self._offset
+            and other._height == self._height
+            and other._over_labware == self._over_labware
+        )
+
 
 class ThermocyclerGeometry(ModuleGeometry):
     def __init__(
@@ -389,7 +406,7 @@ def _load_from_v3(
     api_level: APIVersion,
     configuration: GenericConfiguration,
 ) -> ModuleGeometry:
-    """Load a module geometry from a v2 or a v3 definition.
+    """Load a module geometry from a v3 definition.
 
     The definition should be schema checked before being passed to this
      function; all definitions passed here are assumed to be valid.

@@ -713,7 +713,12 @@ def minimal_module_def() -> ModuleDefinitionV3:
         "moduleType": "temperatureModuleType",
         "model": "temperatureModuleV1",
         "labwareOffset": {"x": -0.15, "y": -0.15, "z": 80.09},
-        "dimensions": {"bareOverallHeight": 84, "overLabwareHeight": 0},
+        "dimensions": {
+            "bareOverallHeight": 84,
+            "overLabwareHeight": 0,
+            "xDimension": 123,
+            "yDimension": 321,
+        },
         "calibrationPoint": {"x": 12.0, "y": 8.75, "z": 0.0},
         "displayName": "Sample Module",
         "quirks": [],
