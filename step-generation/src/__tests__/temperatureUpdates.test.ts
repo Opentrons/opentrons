@@ -55,7 +55,7 @@ describe('forSetTemperature', () => {
   it('module status is set to approaching and temp is set to target', () => {
     const params = {
       moduleId: temperatureModuleId,
-      temperature: temperature,
+      celsius: temperature,
     }
 
     const result = forSetTemperature(params, invariantContext, deactivatedRobot)
@@ -75,7 +75,7 @@ describe('forSetTemperature', () => {
     const newTemperature = 55
     const params = {
       moduleId: temperatureModuleId,
-      temperature: newTemperature,
+      celsius: newTemperature,
     }
 
     const result = forSetTemperature(
@@ -142,7 +142,7 @@ describe('forAwaitTemperature', () => {
     it(`update status to 'at target' when previous status is ${status} and the given target temp matches the previous target temp`, () => {
       const params = {
         moduleId: temperatureModuleId,
-        temperature: temperature,
+        celsius: temperature,
       }
 
       const prevRobotState = robotWithStatusAndTemp(
@@ -175,7 +175,7 @@ describe('forAwaitTemperature', () => {
   it(`keep status at 'appraoching target temperature' when actively approaching target`, () => {
     const params = {
       moduleId: temperatureModuleId,
-      temperature: 55,
+      celsius: 55,
     }
     const robotAtNonTargetTemp = robotWithStatusAndTemp(
       deactivatedRobot,

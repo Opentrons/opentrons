@@ -34,8 +34,9 @@
   "pause_protocol": "Pause protocol",
   "current_step_pause": "Current Step - Paused by User",
   "current_step_pause_timer": "Timer",
-  "user_paused_protocol": "User paused protocol",
+  "user_paused_protocol_for": "User paused protocol for",
   "step_failed": "Step failed",
+  "failed_step": "Failed step",
   "cancel_run_modal_heading": "Are you sure you want to cancel this run?",
   "cancel_run_modal_confirm": "yes, cancel run",
   "cancel_run_modal_back": "no, go back",
@@ -92,5 +93,8 @@
   "apply_stored_data": "Apply stored data",
   "ignore_stored_data": "Ignore stored data",
   "slot": "Slot {{slotName}}",
+  "no_offsets_available": "No Labware Offset data available",
+  "data_out_of_date": "This data is likely out of date",
+  "robot_was_recalibrated": "This robot was recalibrated after this Labware Offset data was stored.",
   "not_available_for_a_completed_run": "not available for a completed run"
 }
