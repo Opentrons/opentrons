@@ -75,6 +75,33 @@ async def test_runs_persist(client_and_server: ClientServerFixture) -> None:
     assert get_persisted_run_response.json()["data"] == expected_run
 
 
+async def test_runs_persist_via_actions_router(client_and_server: ClientServerFixture) -> None:
+    """Test that runs commands and state are persisted when calling play action through dev server restart."""
+    client, server = client_and_server
+
+    # create a run
+    create_run_response = await client.post_run(req_body={"data": {}})
+    run_id = create_run_response.json()["data"]["id"]
+
+    # persist the hitting actions router
+    await client.post_run_action(
+        run_id=run_id,
+        req_body={"data": {"actionType": "play"}},
+    )
+
+    # fetch the same run and commands through various endpoints
+    get_run_response = await client.get_run(run_id=run_id)
+    expected_run = dict(get_run_response.json()["data"], current=False)
+    # reboot the server
+    await client_and_server.restart()
+
+    # fetch those same resources again
+    get_persisted_run_response = await client.get_run(run_id)
+
+    # ensure the fetched resources still match the originally runs
+    assert get_persisted_run_response.json()["data"] == expected_run
+
+
 async def test_run_actions_labware_offsets_persist(
     client_and_server: ClientServerFixture,
 ) -> None:
