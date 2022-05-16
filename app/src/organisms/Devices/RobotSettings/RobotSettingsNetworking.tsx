@@ -64,7 +64,7 @@ export function RobotSettingsNetworking({
       <Flex marginBottom={SPACING.spacing4}>
         {wifi?.ipAddress != null ? (
           <Icon
-            width={SPACING.spacing4}
+            size={SPACING.spacing4}
             name="check-circle"
             color={COLORS.success}
             marginRight={SPACING.spacing3}
@@ -74,8 +74,7 @@ export function RobotSettingsNetworking({
           <Box height={SPACING.spacing4} width={SPACING.spacing5}></Box>
         )}
         <Icon
-          height="1.25rem"
-          width="1.25rem"
+          size="1.25rem"
           name="wifi"
           marginRight={SPACING.spacing3}
           data-testid="RobotSettings_Networking_wifi_icon"
@@ -137,7 +136,7 @@ export function RobotSettingsNetworking({
       <Flex marginTop={SPACING.spacing5} marginBottom={SPACING.spacing4}>
         {ethernet !== null && ethernet.ipAddress !== null ? (
           <Icon
-            width={SPACING.spacing4}
+            size={SPACING.spacing4}
             name="check-circle"
             color={COLORS.success}
             marginRight={SPACING.spacing3}
@@ -147,8 +146,7 @@ export function RobotSettingsNetworking({
           <Box height={SPACING.spacing4} width={SPACING.spacing4}></Box>
         )}
         <Icon
-          height="1.25rem"
-          width="1.25rem"
+          size="1.25rem"
           name="usb"
           marginRight={SPACING.spacing4}
           data-testid="RobotSettings_Networking_usb_icon"
