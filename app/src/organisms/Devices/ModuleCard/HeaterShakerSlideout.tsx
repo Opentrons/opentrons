@@ -99,6 +99,7 @@ export const HeaterShakerSlideout = (
         commandType: 'heaterShakerModule/startSetTargetTemperature',
         params: {
           moduleId: module.id,
+          // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10182 merges
           temperature: parseInt(hsValue),
         },
       }

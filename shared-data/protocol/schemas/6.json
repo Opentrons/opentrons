@@ -576,33 +576,35 @@
                 "enum": ["temperatureModule/setTargetTemperature"]
               },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Temperature Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" }
+                  "celsius": { "type": "number" }
                 }
               }
             }
           },
 
           {
-            "description": "Temperature Module Await Temperature: Delay protocol execution until the specified temperature is reached.",
+            "description": "Temperature Module Wait For Temperature: Delay protocol execution until the specified temperature is reached.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
-              "commandType": { "enum": ["temperatureModule/awaitTemperature"] },
+              "commandType": {
+                "enum": ["temperatureModule/waitForTemperature"]
+              },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Temperature Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" }
+                  "celsius": { "type": "number" }
                 }
               }
             }

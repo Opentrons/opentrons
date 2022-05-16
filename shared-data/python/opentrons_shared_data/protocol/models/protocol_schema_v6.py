@@ -51,6 +51,7 @@ class Params(BaseModel):
     distance: Optional[float]
     positionId: Optional[str]
     temperature: Optional[float]
+    celsius: Optional[float]
     rpm: Optional[float]
     engageHeight: Optional[float]
     offset: Optional[OffsetVector]

@@ -89,7 +89,7 @@ export interface TemperatureModuleDeactivateRunTimeCommand
 }
 export interface TemperatureModuleAwaitTemperatureCreateCommand
   extends CommonCommandCreateInfo {
-  commandType: 'temperatureModule/awaitTemperature'
+  commandType: 'temperatureModule/waitForTemperature'
   params: TemperatureParams
 }
 export interface TemperatureModuleAwaitTemperatureRunTimeCommand
@@ -271,7 +271,7 @@ export interface EngageMagnetParams {
 
 export interface TemperatureParams {
   moduleId: string
-  temperature: number
+  celsius: number
 }
 export interface ShakeSpeedParams {
   moduleId: string
