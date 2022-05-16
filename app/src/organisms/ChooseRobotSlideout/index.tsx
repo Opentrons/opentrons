@@ -25,7 +25,7 @@ import {
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
-import { PrimaryButton } from '../../atoms/Buttons'
+import { PrimaryButton } from '../../atoms/buttons'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
 import { useAvailableAndUnavailableDevices } from '../../pages/Devices/DevicesLanding/hooks'
