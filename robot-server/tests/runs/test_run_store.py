@@ -503,6 +503,7 @@ def test_get_commands_slice(
 
     assert expected_command_slice == result
 
+
 def test_get_run_command_slice_none(
     subject: RunStore,
     protocol_run: ProtocolRunData,
