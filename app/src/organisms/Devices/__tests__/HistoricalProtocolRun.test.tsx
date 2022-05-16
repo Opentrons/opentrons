@@ -49,10 +49,8 @@ describe('RecentProtocolRuns', () => {
     mockUseRunStatus.mockReturnValue('succeeded')
     const [{ getByText }] = render()
 
-    getByText('05/04/2022 14:24:40')
     getByText('my protocol')
     getByText('Completed')
-    // add test for duration when available
     getByText('mock HistoricalProtocolRunOverflowMenu')
   })
 })
