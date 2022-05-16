@@ -33,6 +33,7 @@ const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnaly
 const PROTOCOL_DETAILS = {
   displayName: 'Testosaur',
   protocolData: simpleV6Protocol,
+  protocolKey: 'fakeProtocolKey',
 }
 
 const render = () => {
@@ -55,6 +56,7 @@ describe('RobotStatusBanner', () => {
       .mockReturnValue({
         displayName: null,
         protocolData: {} as ProtocolAnalysisFile<{}>,
+        protocolKey: null,
       })
   })
   afterEach(() => {
