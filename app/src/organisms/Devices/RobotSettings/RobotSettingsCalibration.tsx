@@ -8,12 +8,14 @@ import {
   Flex,
   Link,
   ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   COLORS,
   SPACING,
   TYPOGRAPHY,
-  JUSTIFY_SPACE_BETWEEN,
   TEXT_DECORATION_UNDERLINE,
   useConditionalConfirm,
+  useHoverTooltip,
+  TOOLTIP_LEFT,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
@@ -28,7 +30,11 @@ import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
 import { getDeckCalibrationSession } from '../../../redux/sessions/deck-calibration/selectors'
 import { CONNECTABLE } from '../../../redux/discovery'
 import { selectors as robotSelectors } from '../../../redux/robot'
+
+import { Tooltip } from '../../../atoms/Tooltip'
+import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import * as RobotApi from '../../../redux/robot-api'
+import * as Config from '../../../redux/config'
 import * as Sessions from '../../../redux/sessions'
 import {
   useDeckCalibrationData,
@@ -46,12 +52,13 @@ import type {
   DeckCalibrationSession,
 } from '../../../redux/sessions/types'
 
-const spinnerCommandBlockList: SessionCommandString[] = [
-  Sessions.sharedCalCommands.JOG,
-]
 interface CalibrationProps {
   robotName: string
 }
+
+const spinnerCommandBlockList: SessionCommandString[] = [
+  Sessions.sharedCalCommands.JOG,
+]
 
 export function RobotSettingsCalibration({
   robotName,
@@ -65,14 +72,20 @@ export function RobotSettingsCalibration({
   const trackedRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_LEFT,
+  })
 
   const [
     showDeckCalibrationModal,
     setShowDeckCalibrationModal,
   ] = React.useState(false)
 
+  const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
+
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
+
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
@@ -112,10 +125,12 @@ export function RobotSettingsCalibration({
   )
 
   const isRunning = useSelector(robotSelectors.getIsRunning)
+
   const pipettePresent =
     attachedPipettes != null
       ? !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
       : false
+
   const isPending =
     useSelector<State, RequestState | null>(state =>
       trackedRequestId.current != null
@@ -159,6 +174,18 @@ export function RobotSettingsCalibration({
     confirm: confirmStart,
     // cancel: cancelStart,
   } = useConditionalConfirm(handleStartDeckCalSession, !!pipOffsetDataPresent)
+  const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
+
+  let buttonDisabledReason = null
+  if (notConnectable) {
+    buttonDisabledReason = t('shared:disabled_cannot_connect')
+  } else if (isRunning) {
+    buttonDisabledReason = t('shared:disabled_protocol_is_running')
+  } else if (!pipettePresent) {
+    buttonDisabledReason = t('shared:disabled_no_pipette_attached')
+  }
+
+  const healthCheckButtonDisabled = Boolean(buttonDisabledReason) || isPending
 
   const onClickSaveAs: React.MouseEventHandler = e => {
     e.preventDefault()
@@ -176,15 +203,6 @@ export function RobotSettingsCalibration({
       ]),
       `opentrons-${robotName}-calibration.json`
     )
-  }
-
-  let buttonDisabledReason = null
-  if (notConnectable) {
-    buttonDisabledReason = t('shared:disabled_cannot_connect')
-  } else if (isRunning) {
-    buttonDisabledReason = t('shared:disabled_protocol_is_running')
-  } else if (!pipettePresent) {
-    buttonDisabledReason = t('shared:disabled_no_pipette_attached')
   }
 
   const deckCalibrationButtonText = deckCalibrationData.isDeckCalibrated
@@ -208,6 +226,26 @@ export function RobotSettingsCalibration({
           date: formatLastModified(calibratedDate),
         })
       : t('not_calibrated')
+  const handleHealthCheck = (
+    hasBlockModalResponse: boolean | null = null
+  ): void => {
+    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
+      setShowCalBlockModal(true)
+    } else {
+      setShowCalBlockModal(false)
+      dispatchRequests(
+        Sessions.ensureSession(
+          robotName,
+          Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+          {
+            tipRacks: [],
+            hasCalibrationBlock: Boolean(
+              configHasCalibrationBlock ?? hasBlockModalResponse
+            ),
+          }
+        )
+      )
+    }
   }
 
   React.useEffect(() => {
@@ -227,6 +265,15 @@ export function RobotSettingsCalibration({
           isJogging={isJogging}
         />
       </Portal>
+        {showCalBlockModal ? (
+          <AskForCalibrationBlockModal
+            onResponse={handleHealthCheck}
+            titleBarTitle={t('robot_calibration:health_check_title')}
+            closePrompt={() => setShowCalBlockModal(false)}
+          />
+        ) : null}
+      </Portal>
+      {/* About Calibration this comment will removed when finish all sections */}
       <Box paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
@@ -271,6 +318,7 @@ export function RobotSettingsCalibration({
           </Flex>
         </Banner>
       )}
+      {/* Calibration Health Check this comment will removed when finish all sections */}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
@@ -291,6 +339,26 @@ export function RobotSettingsCalibration({
         </Flex>
       </Box>
       {/* TODO: 5/6/2022 kj the rest of sections will be solved other PRs */}
+              {t('calibration_health_check_title')}
+            </Box>
+            <StyledText as="p" marginBottom={SPACING.spacing3}>
+              {t('calibration_health_check_description')}
+            </StyledText>
+          </Box>
+          <TertiaryButton
+            {...targetProps}
+            onClick={() => handleHealthCheck(null)}
+            disabled={healthCheckButtonDisabled}
+          >
+            {t('health_check_button')}
+          </TertiaryButton>
+          {healthCheckButtonDisabled && (
+            <Tooltip tooltipProps={tooltipProps}>
+              {t('fully_calibrate_before_checking_health')}
+            </Tooltip>
+          )}
+        </Flex>
+      </Box>
     </>
   )
 }

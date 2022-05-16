@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { saveAs } from 'file-saver'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, waitFor } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -92,6 +93,7 @@ const render = () => {
 
 describe('RobotSettingsCalibration', () => {
   const realBlob = global.Blob
+
   beforeAll(() => {
     // @ts-expect-error(sa, 2021-6-28): not a valid blob interface
     global.Blob = function (content: any, options: any) {
@@ -126,6 +128,7 @@ describe('RobotSettingsCalibration', () => {
     ])
     mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
   })
+
   afterEach(() => {
     jest.resetAllMocks()
   })
@@ -240,5 +243,52 @@ describe('RobotSettingsCalibration', () => {
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Calibrate deck' })
     expect(button).toBeDisabled()
+  })
+
+  it('renders a title and description - Calibration Health Check section', () => {
+    const [{ getByText }] = render()
+    getByText('Calibration Health Check')
+    getByText(
+      'Check the accuracy of key calibration points without recalibrating the robot.'
+    )
+  })
+
+  it('renders a Check health button', () => {
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Check health' })
+    expect(button).not.toBeDisabled()
+  })
+
+  it('Health check button is disabled when a robot is unreachable', () => {
+    mockUseRobot.mockReturnValue(mockUnreachableRobot)
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Check health' })
+    expect(button).toBeDisabled()
+  })
+
+  it('Health check button is disabled when a robot is running', () => {
+    mockGetIsRunning.mockReturnValue(true)
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Check health' })
+    expect(button).toBeDisabled()
+  })
+
+  it('Health check button is disabled when pipette are not set', () => {
+    mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Check health' })
+    expect(button).toBeDisabled()
+  })
+
+  it('Health check button shows Tooltip when pipette are not set', async () => {
+    mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
+    const [{ getByRole, findByText }] = render()
+    const button = getByRole('button', { name: 'Check health' })
+    fireEvent.mouseMove(button)
+    await waitFor(() => {
+      findByText(
+        'Fully calibrate your robot before checking calibration health'
+      )
+    })
   })
 })
