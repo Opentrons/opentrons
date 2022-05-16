@@ -35,7 +35,7 @@ export function LegacySettings({
       <Box width="70%">
         <StyledText
           as="h2"
-          css={TYPOGRAPHY.h3SemiBold}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing4}
           id="AdvancedSettings_showLink"
         >
