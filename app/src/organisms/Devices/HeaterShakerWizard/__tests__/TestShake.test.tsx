@@ -9,7 +9,7 @@ import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 
-import type { ProtocolModuleInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../HeaterShakerModuleCard')

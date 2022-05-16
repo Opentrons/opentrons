@@ -7,17 +7,19 @@ import {
 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../../../i18n'
-import { useCurrentRun } from '../../../../ProtocolUpload/hooks'
-import { useProtocolDetailsForRun } from '../../../../Devices/hooks'
-import { getLabwareLocation } from '../../../utils/getLabwareLocation'
+import { i18n } from '../../../../i18n'
+import { useCurrentRun } from '../../../ProtocolUpload/hooks'
+import { useLabwareOffsetForLabware } from '../../../LabwarePositionCheck/hooks/useLabwareOffsetForLabware'
+import { useProtocolDetailsForRun } from '../../hooks'
+import { getLabwareLocation } from '../utils/getLabwareLocation'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import { getLabwareDefinitionUri } from '../../../utils/getLabwareDefinitionUri'
+import { getLabwareDefinitionUri } from '../utils/getLabwareDefinitionUri'
 
-jest.mock('../../../../ProtocolUpload/hooks')
-jest.mock('../../../utils/getLabwareLocation')
-jest.mock('../../../../Devices/hooks')
-jest.mock('../../../utils/getLabwareDefinitionUri')
+jest.mock('../../../ProtocolUpload/hooks')
+jest.mock('../../../LabwarePositionCheck/hooks/useLabwareOffsetForLabware')
+jest.mock('../utils/getLabwareLocation')
+jest.mock('../../hooks')
+jest.mock('../utils/getLabwareDefinitionUri')
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
@@ -46,6 +48,9 @@ const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
 >
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
+>
+const mockUseLabwareOffsetForLabware = useLabwareOffsetForLabware as jest.MockedFunction<
+  typeof useLabwareOffsetForLabware
 >
 const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
   typeof getLabwareLocation
@@ -93,6 +98,10 @@ describe('LabwareInfoOverlay', () => {
           modules: [],
         },
       } as any)
+
+    when(mockUseLabwareOffsetForLabware)
+      .calledWith(MOCK_RUN_ID, MOCK_LABWARE_ID)
+      .mockReturnValue({ vector: MOCK_LABWARE_VECTOR } as any)
 
     when(mockUseCurrentRun)
       .calledWith()

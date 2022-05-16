@@ -183,15 +183,6 @@ describe('IntroScreen', () => {
     render(props)
     expect(mockUseInterval.mock.calls[0][1]).toBe(INTERVAL_MS)
   })
-  it('should render offset deletion alert if there are previous offsets', () => {
-    when(mockGetLatestLabwareOffsetCount)
-      .calledWith(mockOffsets)
-      .mockReturnValue(2)
-    const { getByText } = render(props)
-    getByText(
-      'Once you begin Labware Position Check, previously created Labware Offsets will be discarded.'
-    )
-  })
   it('should not render offset deletion alert if there are no previous offsets', () => {
     when(mockGetLatestLabwareOffsetCount)
       .calledWith(mockOffsets)

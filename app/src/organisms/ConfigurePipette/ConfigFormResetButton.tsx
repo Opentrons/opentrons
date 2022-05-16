@@ -6,7 +6,7 @@ import {
   SPACING,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import { SecondaryButton } from '../../atoms/Buttons'
+import { SecondaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
 
 export interface ButtonProps {

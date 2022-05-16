@@ -6,8 +6,7 @@ from logging.config import dictConfig
 
 from typing_extensions import Final
 
-from opentrons_hardware.drivers.can_bus import CanMessenger
-from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.drivers.can_bus import build
 from opentrons_hardware.firmware_bindings import NodeId
 from opentrons_hardware.firmware_update.run import run_update
 from .can_args import add_can_args, build_settings
@@ -53,12 +52,7 @@ async def run(args: argparse.Namespace) -> None:
     timeout_seconds = args.timeout_seconds
     erase = not args.no_erase
 
-    driver = await build_driver(build_settings(args))
-
-    messenger = CanMessenger(driver)
-    messenger.start()
-
-    try:
+    async with build.can_messenger(build_settings(args)) as messenger:
         await run_update(
             messenger=messenger,
             node_id=target,
@@ -67,8 +61,6 @@ async def run(args: argparse.Namespace) -> None:
             timeout_seconds=timeout_seconds,
             erase=erase,
         )
-    finally:
-        await messenger.stop()
 
     logger.info("Done")
 

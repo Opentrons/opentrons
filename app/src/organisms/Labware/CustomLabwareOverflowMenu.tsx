@@ -16,7 +16,7 @@ import {
 } from '@opentrons/components'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { AlertPrimaryButton, SecondaryButton } from '../../atoms/Buttons'
+import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { Portal } from '../../App/portal'

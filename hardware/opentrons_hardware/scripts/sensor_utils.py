@@ -139,7 +139,7 @@ async def handle_capacitive_sensor(
         )
         csv = CSVFormatter.build(metadata, list(metadata.to_dict().keys()))
     # autozero
-    await capacitive.poll(messenger, pipette_mount, 10, timeout=10)
+    await capacitive.get_baseline(messenger, pipette_mount, 10, 10, timeout=10)
     end_time = start_time + timedelta(minutes=command.minutes)
     while datetime.now() < end_time:
         data = await capacitive.read(messenger, pipette_mount, offset=False, timeout=10)

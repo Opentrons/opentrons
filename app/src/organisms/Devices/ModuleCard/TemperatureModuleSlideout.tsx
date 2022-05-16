@@ -20,7 +20,7 @@ import {
   TEMP_MIN,
 } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 import { InputField } from '../../../atoms/InputField'
 import { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 

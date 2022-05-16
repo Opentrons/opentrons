@@ -1,7 +1,7 @@
 import isEqual from 'lodash/isEqual'
 import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 import { useProtocolDetailsForRun } from '../../Devices/hooks'
-import { getLabwareOffsetLocation } from '../../ProtocolSetup/utils/getLabwareOffsetLocation'
+import { getLabwareOffsetLocation } from '../../Devices/ProtocolRun/utils/getLabwareOffsetLocation'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useHistoricRunDetails } from './useHistoricRunDetails'
 

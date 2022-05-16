@@ -13,8 +13,8 @@ import type { Action, Dispatch } from '../types'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 
-const getDateFromAnalysisPath = (analysisPath: string): Date =>
-  new Date(path.basename(analysisPath, path.extname(analysisPath)))
+const getUnixTimeFromAnalysisPath = (analysisPath: string): number =>
+  Number(path.basename(analysisPath, path.extname(analysisPath)))
 
 const fetchProtocols = (
   dispatch: Dispatch,
@@ -34,8 +34,8 @@ const fetchProtocols = (
         >((acc, analysisFilePath) => {
           if (acc !== null) {
             if (
-              getDateFromAnalysisPath(analysisFilePath) >
-              getDateFromAnalysisPath(acc)
+              getUnixTimeFromAnalysisPath(analysisFilePath) >
+              getUnixTimeFromAnalysisPath(acc)
             ) {
               return analysisFilePath
             }

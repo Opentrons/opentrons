@@ -11,13 +11,10 @@ import argparse
 from logging.config import dictConfig
 from typing import TextIO, Optional
 
+from opentrons_hardware.drivers.can_bus import build, CanMessenger
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-from opentrons_hardware.drivers.can_bus.can_messenger import (
-    CanMessenger,
-)
-from opentrons_hardware.firmware_bindings.message import CanMessage
 
-from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.firmware_bindings.message import CanMessage
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 from .can_mon import task as monitor_task
@@ -76,24 +73,19 @@ async def input_task(
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    driver = await build_driver(build_settings(args))
-
-    messenger = CanMessenger(driver)
-    messenger.start()
-
-    try:
-        all_fut = asyncio.gather(
-            monitor_task(messenger, args.output),
-            input_task(driver, args.input, args.output),
-        )
-        await all_fut
-    except KeyboardInterrupt:
-        all_fut.cancel()
-    except asyncio.CancelledError:
-        pass
-    finally:
-        await messenger.stop()
-        driver.shutdown()
+    async with build.driver(build_settings(args)) as driver, CanMessenger(
+        driver
+    ) as messenger:
+        try:
+            all_fut = asyncio.gather(
+                monitor_task(messenger, args.output),
+                input_task(driver, args.input, args.output),
+            )
+            await all_fut
+        except KeyboardInterrupt:
+            all_fut.cancel()
+        except asyncio.CancelledError:
+            pass
 
 
 LOG_CONFIG = {

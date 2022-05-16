@@ -17,7 +17,7 @@ import {
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
-import { TertiaryButton } from '../../../atoms/Buttons'
+import { TertiaryButton } from '../../../atoms/buttons'
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'

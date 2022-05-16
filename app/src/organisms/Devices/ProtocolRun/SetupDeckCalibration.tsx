@@ -13,17 +13,19 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../../atoms/Buttons'
+import { TertiaryButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
 import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 
 interface SetupDeckCalibrationProps {
   robotName: string
+  runId: string
 }
 
 export function SetupDeckCalibration({
   robotName,
+  runId,
 }: SetupDeckCalibrationProps): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
 
@@ -63,6 +65,7 @@ export function SetupDeckCalibration({
             : null
         }
         button={isDeckCalibrated ? undefined : calibrateNowButton}
+        runId={runId}
       />
     </Flex>
   )

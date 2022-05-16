@@ -12,7 +12,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../atoms/Buttons'
+import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'

@@ -5,11 +5,13 @@ import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 import { protocolHasModules } from '@opentrons/shared-data'
 
 import { Line } from '../../../atoms/structure'
+import { InfoMessage } from '../../../molecules/InfoMessage'
 import {
   useDeckCalibrationData,
   useProtocolDetailsForRun,
   useRobot,
   useRunCalibrationStatus,
+  useRunHasStarted,
 } from '../hooks'
 import { SetupLabware } from './SetupLabware'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
@@ -41,6 +43,7 @@ export function ProtocolRunSetup({
   const robot = useRobot(robotName)
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
+  const runHasStarted = useRunHasStarted(runId)
 
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     null
@@ -119,6 +122,7 @@ export function ProtocolRunSetup({
       gridGap={SPACING.spacing4}
       margin={SPACING.spacing4}
     >
+      {runHasStarted ? <InfoMessage title={t('setup_is_view_only')} /> : null}
       {stepsKeysInOrder.map((stepKey, index) => (
         <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
           <SetupStep
@@ -132,7 +136,7 @@ export function ProtocolRunSetup({
                 : setExpandedStepKey(stepKey)
             }
             calibrationStatusComplete={
-              stepKey === ROBOT_CALIBRATION_STEP_KEY
+              stepKey === ROBOT_CALIBRATION_STEP_KEY && !runHasStarted
                 ? calibrationStatus.complete && isDeckCalibrated
                 : null
             }
