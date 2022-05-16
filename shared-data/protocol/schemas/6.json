@@ -533,12 +533,12 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["magneticModule/engageMagnet"]
+                "enum": ["magneticModule/engage"]
               },
               "params": {
-                "required": ["moduleId", "engageHeight"],
+                "required": ["moduleId", "height"],
                 "properties": {
-                  "engageHeight": {
+                  "height": {
                     "description": "How high, in millimeters, to raise the magnets.\n\nZero means the tops of the magnets are level with the ledge that the labware rests on. This will be slightly above the magnets' minimum height, the hardware home position. Negative values are allowed, to put the magnets below the ledge.\n\nUnits are always true millimeters. This is unlike certain labware definitions, engage commands in the Python Protocol API, and engage commands in older versions of the JSON protocol schema. Take care to convert properly.",
                     "type": "number"
                   },
@@ -558,7 +558,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["magneticModule/disengageMagnet"]
+                "enum": ["magneticModule/disengage"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -576,33 +576,35 @@
                 "enum": ["temperatureModule/setTargetTemperature"]
               },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Temperature Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" }
+                  "celsius": { "type": "number" }
                 }
               }
             }
           },
 
           {
-            "description": "Temperature Module Await Temperature: Delay protocol execution until the specified temperature is reached.",
+            "description": "Temperature Module Wait For Temperature: Delay protocol execution until the specified temperature is reached.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
-              "commandType": { "enum": ["temperatureModule/awaitTemperature"] },
+              "commandType": {
+                "enum": ["temperatureModule/waitForTemperature"]
+              },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Temperature Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" }
+                  "celsius": { "type": "number" }
                 }
               }
             }

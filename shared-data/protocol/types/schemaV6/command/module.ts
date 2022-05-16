@@ -2,7 +2,7 @@ import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 
 export type ModuleRunTimeCommand =
   | MagneticModuleEngageMagnetRunTimeCommand
-  | MagneticModuleDisengageMagnetRunTimeCommand
+  | MagneticModuleDisengageRunTimeCommand
   | TemperatureModuleSetTargetTemperatureRunTimeCommand
   | TemperatureModuleDeactivateRunTimeCommand
   | TemperatureModuleAwaitTemperatureRunTimeCommand
@@ -25,7 +25,7 @@ export type ModuleRunTimeCommand =
 
 export type ModuleCreateCommand =
   | MagneticModuleEngageMagnetCreateCommand
-  | MagneticModuleDisengageMagnetCreateCommand
+  | MagneticModuleDisengageCreateCommand
   | TemperatureModuleSetTargetTemperatureCreateCommand
   | TemperatureModuleDeactivateCreateCommand
   | TemperatureModuleAwaitTemperatureCreateCommand
@@ -49,7 +49,7 @@ export type ModuleCreateCommand =
 
 export interface MagneticModuleEngageMagnetCreateCommand
   extends CommonCommandCreateInfo {
-  commandType: 'magneticModule/engageMagnet'
+  commandType: 'magneticModule/engage'
   params: EngageMagnetParams
 }
 export interface MagneticModuleEngageMagnetRunTimeCommand
@@ -57,14 +57,14 @@ export interface MagneticModuleEngageMagnetRunTimeCommand
     MagneticModuleEngageMagnetCreateCommand {
   result: any
 }
-export interface MagneticModuleDisengageMagnetCreateCommand
+export interface MagneticModuleDisengageCreateCommand
   extends CommonCommandCreateInfo {
-  commandType: 'magneticModule/disengageMagnet'
+  commandType: 'magneticModule/disengage'
   params: ModuleOnlyParams
 }
-export interface MagneticModuleDisengageMagnetRunTimeCommand
+export interface MagneticModuleDisengageRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    MagneticModuleDisengageMagnetCreateCommand {
+    MagneticModuleDisengageCreateCommand {
   result: any
 }
 export interface TemperatureModuleSetTargetTemperatureCreateCommand
@@ -89,7 +89,7 @@ export interface TemperatureModuleDeactivateRunTimeCommand
 }
 export interface TemperatureModuleAwaitTemperatureCreateCommand
   extends CommonCommandCreateInfo {
-  commandType: 'temperatureModule/awaitTemperature'
+  commandType: 'temperatureModule/waitForTemperature'
   params: TemperatureParams
 }
 export interface TemperatureModuleAwaitTemperatureRunTimeCommand
@@ -266,12 +266,12 @@ export interface HeaterShakerStopShakeRunTimeCommand
 
 export interface EngageMagnetParams {
   moduleId: string
-  engageHeight: number
+  height: number
 }
 
 export interface TemperatureParams {
   moduleId: string
-  temperature: number
+  celsius: number
 }
 export interface ShakeSpeedParams {
   moduleId: string

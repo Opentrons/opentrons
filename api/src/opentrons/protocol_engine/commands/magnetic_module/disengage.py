@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
 
 
-DisengageCommandType = Literal["magneticModule/disengageMagnet"]
+DisengageCommandType = Literal["magneticModule/disengage"]
 
 
 class DisengageParams(BaseModel):
@@ -76,7 +76,7 @@ class DisengageImplementation(AbstractCommandImpl[DisengageParams, DisengageResu
 class Disengage(BaseCommand[DisengageParams, DisengageResult]):
     """A command to disengage a Magnetic Module's magnets."""
 
-    commandType: DisengageCommandType = "magneticModule/disengageMagnet"
+    commandType: DisengageCommandType = "magneticModule/disengage"
     params: DisengageParams
     result: Optional[DisengageResult]
 
@@ -86,7 +86,7 @@ class Disengage(BaseCommand[DisengageParams, DisengageResult]):
 class DisengageCreate(BaseCommandCreate[DisengageParams]):
     """A request to create a Magnetic Module disengage command."""
 
-    commandType: DisengageCommandType = "magneticModule/disengageMagnet"
+    commandType: DisengageCommandType = "magneticModule/disengage"
     params: DisengageParams
 
     _CommandCls: Type[Disengage] = Disengage

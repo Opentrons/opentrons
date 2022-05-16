@@ -284,9 +284,9 @@ export type PauseArgs = CommonArgs & {
     | undefined
 }
 
-export interface AwaitTemperatureArgs {
+export interface WaitForTemperatureArgs {
   module: string | null
-  commandCreatorFnName: 'awaitTemperature'
+  commandCreatorFnName: 'waitForTemperature'
   temperature: number
   message?: string
 }
@@ -388,7 +388,7 @@ export type CommandCreatorArgs =
   | EngageMagnetArgs
   | DisengageMagnetArgs
   | SetTemperatureArgs
-  | AwaitTemperatureArgs
+  | WaitForTemperatureArgs
   | DeactivateTemperatureArgs
   | ThermocyclerProfileStepArgs
   | ThermocyclerStateStepArgs

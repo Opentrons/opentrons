@@ -110,8 +110,8 @@ export interface PauseSubstepItem {
   substepType: 'pause'
   pauseStepArgs: PauseArgs // Pause substeps use same data as processed form
 }
-export interface AwaitTemperatureSubstepItem {
-  substepType: 'awaitTemperature'
+export interface WaitForTemperatureSubstepItem {
+  substepType: 'waitForTemperature'
   temperature: number
   labwareNickname: string | null | undefined
   moduleType: ModuleType
@@ -153,7 +153,7 @@ export type SubstepItemData =
   | PauseSubstepItem
   | MagnetSubstepItem
   | TemperatureSubstepItem
-  | AwaitTemperatureSubstepItem
+  | WaitForTemperatureSubstepItem
   | ThermocyclerProfileSubstepItem
   | ThermocyclerStateSubstepItem
   | HeaterShakerSubstepItem

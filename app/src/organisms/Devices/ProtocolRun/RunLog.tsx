@@ -14,7 +14,6 @@ import {
   DISPLAY_NONE,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_START,
   OVERFLOW_SCROLL,
   POSITION_FIXED,
   SIZE_1,
@@ -25,7 +24,11 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { RUN_STATUS_FAILED } from '@opentrons/api-client'
+import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
 import { useAllCommandsQuery } from '@opentrons/react-api-client'
 
 import { NAV_BAR_WIDTH } from '../../../App/constants'
@@ -64,7 +67,9 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   const { t } = useTranslation('run_details')
 
   const { protocolData } = useProtocolDetailsForRun(runId)
-  const { startedAt: runStartTime } = useRunTimestamps(runId)
+  const { pausedAt: runPauseTime, startedAt: runStartTime } = useRunTimestamps(
+    runId
+  )
   const runStatus = useRunStatus(runId)
   const runErrors = useRunErrors(runId)
 
@@ -414,21 +419,23 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
             runId={runId}
           />
         ) : null}
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
           <Box width="100%" height={`${topBufferHeightPx}px`} />
           {commandWindow?.map((command, index) => {
             const overallIndex = index + windowFirstCommandIndex
-            const isCurrentCommand = overallIndex === currentCommandIndex
+            const runHasFinished =
+              runStatus === RUN_STATUS_FAILED ||
+              runStatus === RUN_STATUS_STOPPED ||
+              runStatus === RUN_STATUS_SUCCEEDED
+            const isCurrentCommand =
+              overallIndex === currentCommandIndex && !runHasFinished
 
             return (
               <Flex
                 key={
                   command.analysisCommand?.id ?? command.runCommandSummary?.id
                 }
-                justifyContent={JUSTIFY_START}
-                flexDirection={DIRECTION_COLUMN}
                 ref={isCurrentCommand ? currentItemRef : undefined}
-                marginBottom={SPACING.spacing3}
               >
                 <StepItem
                   robotName={robotName}
@@ -438,6 +445,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
                   isMostRecentCommand={isCurrentCommand}
                   runStatus={runStatus}
                   stepNumber={overallIndex + 1}
+                  runPausedAt={runPauseTime}
                   runStartedAt={runStartTime}
                 />
               </Flex>

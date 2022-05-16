@@ -18,7 +18,7 @@ class SetTargetTemperatureParams(BaseModel):
     """Input parameters to set a Temperature Module's target temperature."""
 
     moduleId: str = Field(..., description="Unique ID of the Temperature Module.")
-    temperature: float = Field(..., description="Target temperature in °C.")
+    celsius: float = Field(..., description="Target temperature in °C.")
 
 
 class SetTargetTemperatureResult(BaseModel):
@@ -55,7 +55,7 @@ class SetTargetTemperatureImpl(
         )
 
         # Verify temperature from temperature module view
-        validated_temp = module_substate.validate_target_temperature(params.temperature)
+        validated_temp = module_substate.validate_target_temperature(params.celsius)
 
         # Allow propagation of ModuleNotAttachedError.
         temp_hardware_module = self._equipment.get_module_hardware_api(
