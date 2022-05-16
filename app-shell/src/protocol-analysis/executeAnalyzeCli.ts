@@ -6,7 +6,8 @@ const log = createLogger('protocol-analysis/executeAnalyzeCli')
 export function executeAnalyzeCli(
   pythonPath: string,
   sourcePath: string,
-  outputPath: string
+  outputPath: string,
+  auxSourcePath?: string
 ): Promise<void> {
   return execa(pythonPath, [
     '-m',
@@ -14,6 +15,7 @@ export function executeAnalyzeCli(
     'analyze',
     `--json-output=${outputPath}`,
     sourcePath,
+    auxSourcePath ?? '',
   ])
     .then(output => {
       log.debug('Output from opentrons.cli', { output })
