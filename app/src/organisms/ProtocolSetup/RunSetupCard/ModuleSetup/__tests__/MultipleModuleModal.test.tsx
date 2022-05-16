@@ -25,7 +25,7 @@ describe('MultipleModulesModal', () => {
   it('should render the correct body', () => {
     const { getByRole, getByText } = render(props)
     getByText(
-      'To use more than one of the same module in a protocol, you first need to plug in the module that’s in the lowest numbered deck slot to the lowest numbered USB port on the OT-2. Continue in the same manner with additional modules.'
+      'To use more than one of the same module in a protocol, you first need to plug in the module that’s called first in your protocol to the lowest numbered USB port on the OT-2. Continue in the same manner with additional modules.'
     )
     expect(getByRole('heading', { name: 'Example' })).toBeTruthy()
 

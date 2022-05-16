@@ -17,7 +17,7 @@
   "multiple_modules_help_link_title": "See How To Set Up Modules of the Same Type",
   "multiple_modules_modal_title": "Setting Up Modules of the Same Type",
   "labware_help_example": "<block>Alice is using a labware in Slot 6. During labware position check, she adjust the pipette position while checking the A1 of the labware to 0.2mm in X, and 1.2mm in Z. Later, Bob is preparing to run the same protocol on that robot. The labware offset that Alice created in Slot 6 will be applied for Bob’s protocol unless he changes or clears it.</block>",
-  "multiple_modules_explanation": "To use more than one of the same module in a protocol, you first need to plug in the module that’s in the lowest numbered deck slot to the lowest numbered USB port on the OT-2. Continue in the same manner with additional modules.",
+  "multiple_modules_explanation": "To use more than one of the same module in a protocol, you first need to plug in the module that’s called first in your protocol to the lowest numbered USB port on the OT-2. Continue in the same manner with additional modules.",
   "multiple_modules_link": "Learn more about using more than one module of the same type",
   "multiple_modules_example": "Your protocol has 2 Temperature Modules. The Temperature Module attached to the first port starting from the left will be related to the first Temperature Module in your protocol while the second Temperature Module loaded would be related to the Temperature Module connected to the next port to the right. If using a hub, follow the same logic with the port ordered.",
   "offset_data": "Offset Data",
