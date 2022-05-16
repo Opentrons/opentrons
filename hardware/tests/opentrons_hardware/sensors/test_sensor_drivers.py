@@ -30,7 +30,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SensorThresholdResponse,
     BindSensorOutputRequest,
     PeripheralStatusRequest,
-    PeripheralStatusRequest,
     PeripheralStatusResponse,
 )
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
