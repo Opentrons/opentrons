@@ -8,7 +8,7 @@ import {
   TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
-import { TertiaryButton } from '../../atoms/Buttons'
+import { TertiaryButton } from '../../atoms/buttons'
 
 export interface IpHostnameFieldProps {
   field: any

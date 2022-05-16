@@ -12,7 +12,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/Buttons'
+import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 const DROP_ZONE_STYLES = css`
@@ -54,7 +54,6 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
     e.preventDefault()
     e.stopPropagation()
     const { files = [] } = 'dataTransfer' in e ? e.dataTransfer : {}
-    console.log('files', files[0])
     props.onUpload(files[0])
     setIsFileOverDropZone(false)
   }

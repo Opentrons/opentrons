@@ -47,7 +47,7 @@ describe('HeaterShakerIsRunningModal', () => {
     const { getByText, getByTestId } = render(props)
 
     getByTestId('HeaterShakerIsRunning_warning_icon')
-    getByText('Heater Shaker Module is currently shaking')
+    getByText('Heater-Shaker Module is currently shaking')
   })
 
   it('renders the heater shaker module card and prompt', () => {

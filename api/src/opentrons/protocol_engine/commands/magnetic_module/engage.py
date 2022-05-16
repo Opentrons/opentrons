@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
 
 
-EngageCommandType = Literal["magneticModule/engageMagnet"]
+EngageCommandType = Literal["magneticModule/engage"]
 
 
 class EngageParams(BaseModel):
@@ -26,7 +26,7 @@ class EngageParams(BaseModel):
         ),
     )
 
-    engageHeight: float = Field(
+    height: float = Field(
         ...,
         description=(
             "How high, in millimeters, to raise the magnets."
@@ -82,7 +82,7 @@ class EngageImplementation(AbstractCommandImpl[EngageParams, EngageResult]):
         )
         # Allow propagation of EngageHeightOutOfRangeError.
         hardware_height = mag_module_substate.calculate_magnet_hardware_height(
-            mm_from_base=params.engageHeight,
+            mm_from_base=params.height,
         )
         # Allow propagation of ModuleNotAttachedError.
         hardware_module = self._equipment.get_module_hardware_api(
@@ -98,7 +98,7 @@ class EngageImplementation(AbstractCommandImpl[EngageParams, EngageResult]):
 class Engage(BaseCommand[EngageParams, EngageResult]):
     """A command to engage a Magnetic Module's magnets."""
 
-    commandType: EngageCommandType = "magneticModule/engageMagnet"
+    commandType: EngageCommandType = "magneticModule/engage"
     params: EngageParams
     result: Optional[EngageResult]
 
@@ -108,7 +108,7 @@ class Engage(BaseCommand[EngageParams, EngageResult]):
 class EngageCreate(BaseCommandCreate[EngageParams]):
     """A request to create a Magnetic Module engage command."""
 
-    commandType: EngageCommandType = "magneticModule/engageMagnet"
+    commandType: EngageCommandType = "magneticModule/engage"
     params: EngageParams
 
     _CommandCls: Type[Engage] = Engage

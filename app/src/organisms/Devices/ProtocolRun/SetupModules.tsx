@@ -9,7 +9,6 @@ import {
   RobotWorkSpace,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
-  Tooltip,
   useHoverTooltip,
   ALIGN_CENTER,
   COLORS,
@@ -19,13 +18,15 @@ import {
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { HeaterShakerBanner } from '../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
 import { ModuleInfo } from '../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
 import { UnMatchedModuleWarning } from '../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
 import { MultipleModulesModal } from '../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
 import {
   useModuleRenderInfoForProtocolById,
+  useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 
@@ -61,6 +62,7 @@ export const SetupModules = ({
     missingModuleIds,
     remainingAttachedModules,
   } = useUnmatchedModulesForProtocol(robotName, runId)
+  const runHasStarted = useRunHasStarted(runId)
 
   const [
     showMultipleModulesModal,
@@ -137,6 +139,7 @@ export const SetupModules = ({
                         isAttached={attachedModuleMatch != null}
                         usbPort={attachedModuleMatch?.usbPort.port ?? null}
                         hubPort={attachedModuleMatch?.usbPort.hub ?? null}
+                        runId={runId}
                       />
                     </Module>
                   </React.Fragment>
@@ -148,7 +151,7 @@ export const SetupModules = ({
       </RobotWorkSpace>
       <PrimaryButton
         title={t('proceed_to_labware_setup_step')}
-        disabled={missingModuleIds.length > 0}
+        disabled={missingModuleIds.length > 0 || runHasStarted}
         onClick={expandLabwareSetupStep}
         id={'ModuleSetup_proceedToLabwareSetup'}
         alignSelf={ALIGN_CENTER}
@@ -157,9 +160,11 @@ export const SetupModules = ({
       >
         {t('proceed_to_labware_setup_step')}
       </PrimaryButton>
-      {missingModuleIds.length > 0 ? (
-        <Tooltip {...tooltipProps}>
-          {t('plug_in_required_module', { count: missingModuleIds.length })}
+      {missingModuleIds.length > 0 || runHasStarted ? (
+        <Tooltip tooltipProps={tooltipProps}>
+          {runHasStarted
+            ? t('protocol_run_started')
+            : t('plug_in_required_module', { count: missingModuleIds.length })}
         </Tooltip>
       ) : null}
     </Flex>

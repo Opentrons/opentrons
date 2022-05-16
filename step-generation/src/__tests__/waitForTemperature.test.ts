@@ -3,17 +3,21 @@ import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '../constants'
+<<<<<<< HEAD:step-generation/src/__tests__/awaitTemperature.test.ts
 import { waitForTemperature } from '../commandCreators/atomic/awaitTemperature'
+=======
+import { waitForTemperature } from '../commandCreators/atomic/waitForTemperature'
+>>>>>>> edge:step-generation/src/__tests__/waitForTemperature.test.ts
 import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
 } from '../fixtures'
 import { WaitForTemperatureArgs, InvariantContext, RobotState } from '../types'
 
-describe('awaitTemperature', () => {
+describe('waitForTemperature', () => {
   const temperatureModuleId = 'temperatureModuleId'
   const thermocyclerId = 'thermocyclerId'
-  const commandCreatorFnName = 'awaitTemperature'
+  const commandCreatorFnName = 'waitForTemperature'
   const prevRobotTemp = 42
   const missingModuleError = {
     errors: [
@@ -57,10 +61,10 @@ describe('awaitTemperature', () => {
     const expected = {
       commands: [
         {
-          commandType: 'temperatureModule/awaitTemperature',
+          commandType: 'temperatureModule/waitForTemperature',
           params: {
             moduleId: temperatureModuleId,
-            temperature: 20,
+            celsius: 20,
           },
         },
       ],
@@ -92,7 +96,7 @@ describe('awaitTemperature', () => {
     const result = waitForTemperature(args, invariantContext, robotState)
     expect(result).toEqual(missingModuleError)
   })
-  it('returns awaitTemperature command creator when temperature module already at target temp and awaiting that same temp', () => {
+  it('returns waitForTemperature command creator when temperature module already at target temp and awaiting that same temp', () => {
     const temperature = 42
     const args: WaitForTemperatureArgs = {
       module: temperatureModuleId,
@@ -108,10 +112,10 @@ describe('awaitTemperature', () => {
     const expected = {
       commands: [
         {
-          commandType: 'temperatureModule/awaitTemperature',
+          commandType: 'temperatureModule/waitForTemperature',
           params: {
             moduleId: temperatureModuleId,
-            temperature: 42,
+            celsius: 42,
           },
         },
       ],

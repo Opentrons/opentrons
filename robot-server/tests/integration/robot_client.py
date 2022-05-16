@@ -2,7 +2,7 @@ from __future__ import annotations
 import asyncio
 
 from pathlib import Path
-from typing import AsyncGenerator, List
+from typing import AsyncGenerator, List, Optional
 import httpx
 from httpx import Response
 
@@ -147,6 +147,19 @@ class RobotClient:
         response = await self.httpx_client.get(
             url=f"{self.base_url}/protocols/{protocol_id}/analyses/{analysis_id}"
         )
+        response.raise_for_status()
+        return response
+
+    async def post_run(self, protocol_id: Optional[str]) -> Response:
+        response = await self.httpx_client.post(
+            url=f"{self.base_url}/runs",
+            json={"data": {"protocolId": protocol_id}},
+        )
+        response.raise_for_status()
+        return response
+
+    async def get_runs(self) -> Response:
+        response = await self.httpx_client.get(url=f"{self.base_url}/runs")
         response.raise_for_status()
         return response
 

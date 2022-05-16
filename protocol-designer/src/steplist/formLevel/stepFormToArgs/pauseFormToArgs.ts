@@ -18,7 +18,7 @@ export const pauseFormToArgs = (
   switch (formData.pauseAction) {
     case PAUSE_UNTIL_TEMP:
       return {
-        commandCreatorFnName: 'awaitTemperature',
+        commandCreatorFnName: 'waitForTemperature',
         temperature,
         module: formData.moduleId,
         message,

@@ -5,7 +5,7 @@ import { i18n } from '../../../i18n'
 import { CommandText } from '../CommandText'
 import { useProtocolDetails } from '../hooks'
 import { useLabwareRenderInfoById } from '../../ProtocolSetup/hooks'
-import { getLabwareLocation } from '../../ProtocolSetup/utils/getLabwareLocation'
+import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { ProtocolSetupInfo } from './../ProtocolSetupInfo'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command'
@@ -13,7 +13,7 @@ import { RunCommandSummary } from '@opentrons/api-client'
 
 jest.mock('../hooks')
 jest.mock('../../ProtocolSetup/hooks')
-jest.mock('../../ProtocolSetup/utils/getLabwareLocation')
+jest.mock('../../Devices/ProtocolRun/utils/getLabwareLocation')
 jest.mock('./../ProtocolSetupInfo')
 jest.mock('@opentrons/shared-data/js/helpers')
 

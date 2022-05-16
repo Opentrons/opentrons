@@ -20,7 +20,7 @@ import {
   TEMP_MIN,
 } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 import { InputField } from '../../../atoms/InputField'
 import { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
@@ -51,8 +51,7 @@ export const TemperatureModuleSlideout = (
         commandType: 'temperatureModule/setTargetTemperature',
         params: {
           moduleId: module.id,
-          // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10176 merges
-          temperature: parseInt(temperatureValue),
+          celsius: parseInt(temperatureValue),
         },
       }
       if (runId != null) {
@@ -94,7 +93,7 @@ export const TemperatureModuleSlideout = (
           disabled={temperatureValue === null || valueOutOfRange}
           data-testid={`TemperatureSlideout_btn_${module.serialNumber}`}
         >
-          {t('set_temp_slideout')}
+          {t('confirm')}
         </PrimaryButton>
       }
     >
@@ -114,12 +113,12 @@ export const TemperatureModuleSlideout = (
         data-testid={`TemperatureSlideout_input_field_${module.serialNumber}`}
       >
         <Text
-          fontWeight={FONT_WEIGHT_REGULAR}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.black}
           paddingBottom={SPACING.spacing3}
         >
-          {t('temperature')}
+          {t('set_temperature')}
         </Text>
         <InputField
           id={`${module.moduleModel}`}

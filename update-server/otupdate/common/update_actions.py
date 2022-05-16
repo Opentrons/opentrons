@@ -10,12 +10,19 @@ from aiohttp import web
 
 from .constants import APP_VARIABLE_PREFIX
 
+
+import logging
+
+
 FILE_ACTIONS_VARNAME = APP_VARIABLE_PREFIX + "fileactions"
+
+LOG = logging.getLogger(__name__)
 
 
 class Partition(NamedTuple):
     number: int
     path: str
+    mount_point: str = ""
 
 
 class UpdateActionsInterface:
@@ -35,11 +42,22 @@ class UpdateActionsInterface:
         filepath: str,
         progress_callback: Callable[[float], None],
         cert_path: Optional[str],
-    ):
+    ) -> Optional[str]:
+        """Worker for validation. Call in an executor (so it can return things)
+
+        - Unzips filepath to its directory
+        - Hashes the rootfs inside
+        - If requested, checks the signature of the hash
+        :param filepath: The path to the update zip file
+        :param progress_callback: The function to call with progress between 0
+                                  and 1.0. May never reach precisely 1.0, best
+                                  only for user information
+        :param cert_path: Path to an x.509 certificate to check the signature
+                          against. If ``None``, signature checking is disabled
+        :returns str: Path to the rootfs file to update
+
+        Will also raise an exception if validation fails
         """
-        Validate that the object is correct in some system-dependent way
-        """
-        ...
 
     @abc.abstractmethod
     def write_update(

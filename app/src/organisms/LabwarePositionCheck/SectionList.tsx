@@ -6,7 +6,6 @@ import {
   Box,
   ALIGN_CENTER,
   SIZE_1,
-  SPACING_2,
   C_WHITE,
   C_NEAR_WHITE,
   C_DARK_GRAY,
@@ -15,7 +14,7 @@ import {
   Text,
   C_DISABLED,
   Icon,
-  SPACING_3,
+  SPACING,
   COLOR_SUCCESS,
   C_SELECTED_DARK,
 } from '@opentrons/components'
@@ -41,7 +40,7 @@ export function SectionList(props: Props): JSX.Element {
   return (
     <Box
       fontSize={FONT_SIZE_CAPTION}
-      padding={SPACING_3}
+      padding={SPACING.spacing3}
       width="14rem"
       boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
       borderRadius="4px"
@@ -63,7 +62,11 @@ export function SectionList(props: Props): JSX.Element {
           backgroundColor = sectionTextColor
         }
         return (
-          <Flex key={index} padding={SPACING_2} alignItems={ALIGN_CENTER}>
+          <Flex
+            key={index}
+            padding={SPACING.spacing2}
+            alignItems={ALIGN_CENTER}
+          >
             <Box
               width={SIZE_1}
               height={SIZE_1}
@@ -71,7 +74,7 @@ export function SectionList(props: Props): JSX.Element {
               backgroundColor={backgroundColor}
               color={C_WHITE}
               borderRadius="50%"
-              marginRight={SPACING_2}
+              marginRight={SPACING.spacing2}
               textAlign={TEXT_ALIGN_CENTER}
             >
               {isCompleted ? (
@@ -80,7 +83,7 @@ export function SectionList(props: Props): JSX.Element {
                   width={SIZE_1}
                   height={SIZE_1}
                   lineHeight={SIZE_1}
-                  marginRight={SPACING_2}
+                  marginRight={SPACING.spacing2}
                   color={COLOR_SUCCESS}
                 />
               ) : (

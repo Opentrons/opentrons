@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   Icon,
@@ -9,16 +10,19 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TEXT_TRANSFORM_UPPERCASE,
   SIZE_1,
+  BORDERS,
   COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
+import { useRunHasStarted } from '../hooks'
 import { formatTimestamp } from '../utils'
 
 interface SetupCalibrationItemProps {
   calibratedDate: string | null
+  runId: string
   label?: string
   title?: string
   subText?: string
@@ -33,8 +37,11 @@ export function SetupCalibrationItem({
   calibratedDate,
   button,
   id,
+  runId,
 }: SetupCalibrationItemProps): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
+
+  const runHasStarted = useRunHasStarted(runId)
 
   const calibratedText =
     calibratedDate != null
@@ -43,9 +50,13 @@ export function SetupCalibrationItem({
         })
       : t('not_calibrated')
 
+  const calibrationDataNotAvailableText = runHasStarted ? (
+    <StyledText>{t('calibration_data_not_available')}</StyledText>
+  ) : null
   return (
     <Flex
       backgroundColor={COLORS.lightGrey}
+      borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       minHeight="2.5rem" // 40px
@@ -53,12 +64,14 @@ export function SetupCalibrationItem({
     >
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <Icon
-            size={SIZE_1}
-            color={calibratedDate != null ? COLORS.success : COLORS.warning}
-            marginRight={SPACING.spacing4}
-            name={calibratedDate != null ? 'check-circle' : 'alert-circle'}
-          />
+          {!runHasStarted ? (
+            <Icon
+              size={SIZE_1}
+              color={calibratedDate != null ? COLORS.success : COLORS.warning}
+              marginRight={SPACING.spacing4}
+              name={calibratedDate != null ? 'check-circle' : 'alert-circle'}
+            />
+          ) : null}
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
             {label != null && (
               <StyledText
@@ -76,7 +89,7 @@ export function SetupCalibrationItem({
               </StyledText>
             )}
             <StyledText as="label" color={COLORS.darkGreyEnabled}>
-              {subText ?? calibratedText}
+              {calibrationDataNotAvailableText ?? subText ?? calibratedText}
             </StyledText>
           </Flex>
         </Flex>

@@ -456,8 +456,7 @@ describe('steps actions', () => {
 
               params: {
                 moduleId: 'temperatureId',
-                // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10178 merges
-                temperature: 25,
+                celsius: 25,
               },
             },
           ],
@@ -506,7 +505,7 @@ describe('steps actions', () => {
                       commandType: 'temperatureModule/setTargetTemperature',
                       params: {
                         moduleId: 'temperatureId',
-                        temperature: 25,
+                        celsius: 25,
                       },
                     },
                   ],

@@ -25,8 +25,8 @@ export function LabwareOffsetSuccessToast(
       className={styles.sticky_alert}
       title={
         labwareOffsetCount === 0
-          ? t('labware_positon_check_complete_toast_no_offsets')
-          : t('labware_positon_check_complete_toast_with_offsets', {
+          ? t('labware_position_check_complete_toast_no_offsets')
+          : t('labware_position_check_complete_toast_with_offsets', {
               count: labwareOffsetCount,
             })
       }

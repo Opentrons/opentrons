@@ -36,7 +36,7 @@ describe('PowerOn', () => {
     }
     const { getByText } = render(props)
     getByText('Connected')
-    getByText('Heater Shaker Module GEN1')
+    getByText('Heater-Shaker Module GEN1')
     getByText('USB Port 1 via hub')
   })
 
@@ -46,7 +46,7 @@ describe('PowerOn', () => {
     }
     const { getByText } = render(props)
     getByText('Not connected')
-    getByText('Heater Shaker Module GEN1')
+    getByText('Heater-Shaker Module GEN1')
     getByText('No USB Port Yet')
   })
 })

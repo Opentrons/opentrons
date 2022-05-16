@@ -8,7 +8,6 @@ import type { CommandCreator, WaitForTemperatureArgs } from '../../types'
 import { getModuleState } from '../../robotStateSelectors'
 
 /** Set temperature target for specified module. */
-// @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10176 merges
 export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
   args,
   invariantContext,
@@ -59,10 +58,10 @@ export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
       return {
         commands: [
           {
-            commandType: 'temperatureModule/awaitTemperature',
+            commandType: 'temperatureModule/waitForTemperature',
             params: {
               moduleId: module,
-              temperature,
+              celsius: temperature,
             },
           },
         ],
@@ -75,7 +74,6 @@ export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
             commandType: 'heaterShaker/waitForTemperature',
             params: {
               moduleId: module,
-              celsius: temperature,
             },
           },
         ],
