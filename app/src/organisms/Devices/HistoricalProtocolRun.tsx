@@ -11,7 +11,6 @@ import {
   BORDERS,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { useRunStatus } from '../RunTimeControl/hooks'
 import { formatInterval } from '../RunTimeControl/utils'
 import { formatTimestamp } from './utils'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
@@ -34,7 +33,7 @@ export function HistoricalProtocolRun(
   const { t } = useTranslation('run_details')
   const { run, protocolName, robotIsBusy, robotName } = props
   const [offsetDrawerOpen, setOffsetDrawerOpen] = React.useState(false)
-  const runStatus = useRunStatus(run.id)
+  const runStatus = run.status
   const runDisplayName = formatTimestamp(run.createdAt)
   let duration = EMPTY_TIMESTAMP
   if (runStatus !== 'idle') {
