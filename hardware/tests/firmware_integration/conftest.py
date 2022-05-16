@@ -26,10 +26,8 @@ async def can_messenger(
     driver: AbstractCanDriver,
 ) -> AsyncIterator[CanMessenger]:
     """Create Can messenger."""
-    messenger = CanMessenger(driver)
-    messenger.start()
-    yield messenger
-    await messenger.stop()
+    async with CanMessenger(driver) as messenger:
+        yield messenger
 
 
 @pytest.fixture

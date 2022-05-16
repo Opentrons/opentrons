@@ -4,6 +4,7 @@ from decoy import Decoy
 
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols import ProtocolStore
+from robot_server.runs.run_auto_deleter import RunAutoDeleter
 from robot_server.runs.run_store import RunStore
 from robot_server.runs.engine_store import EngineStore
 
@@ -30,3 +31,9 @@ def mock_run_store(decoy: Decoy) -> RunStore:
 def mock_engine_store(decoy: Decoy) -> EngineStore:
     """Get a mock EngineStore interface."""
     return decoy.mock(cls=EngineStore)
+
+
+@pytest.fixture()
+def mock_run_auto_deleter(decoy: Decoy) -> RunAutoDeleter:
+    """Get a mock RunAutoDeleter interface."""
+    return decoy.mock(cls=RunAutoDeleter)

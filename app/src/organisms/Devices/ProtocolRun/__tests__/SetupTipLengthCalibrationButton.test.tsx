@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   renderWithProviders,
   useConditionalConfirm,
@@ -10,10 +9,9 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 
 import { i18n } from '../../../../i18n'
 import { AskForCalibrationBlockModal } from '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
-import { useRunStatus } from '../../../../organisms/RunTimeControl/hooks'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { getHasCalibrationBlock } from '../../../../redux/config'
-import { useDeckCalibrationData } from '../../hooks'
+import { useDeckCalibrationData, useRunHasStarted } from '../../hooks'
 import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -30,8 +28,8 @@ jest.mock('../../hooks')
 const mockUseConditionalConfirm = useConditionalConfirm as jest.MockedFunction<
   typeof useConditionalConfirm
 >
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
+const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
+  typeof useRunHasStarted
 >
 const mockGetHasCalibrationBlock = getHasCalibrationBlock as jest.MockedFunction<
   typeof getHasCalibrationBlock
@@ -78,7 +76,7 @@ describe('SetupTipLengthCalibrationButton', () => {
   }
 
   beforeEach(() => {
-    when(mockUseRunStatus).mockReturnValue(RUN_STATUS_IDLE)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
     when(mockUseConditionalConfirm).mockReturnValue({
       confirm: mockConfirm,
       showConfirmation: true,
@@ -112,7 +110,7 @@ describe('SetupTipLengthCalibrationButton', () => {
   })
 
   it('disables the recalibrate link if tip length calibrated and run started', () => {
-    when(mockUseRunStatus).mockReturnValue(RUN_STATUS_RUNNING)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
     const { getByText } = render({ hasCalibrated: true })
     const recalibrate = getByText('Recalibrate')
     recalibrate.click()

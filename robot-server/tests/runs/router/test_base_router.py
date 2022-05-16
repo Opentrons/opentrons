@@ -23,6 +23,9 @@ from robot_server.protocols import (
     ProtocolResource,
     ProtocolNotFoundError,
 )
+
+from robot_server.runs.run_auto_deleter import RunAutoDeleter
+
 from robot_server.runs.run_models import Run, RunCreate, RunUpdate
 
 from robot_server.runs.engine_store import (
@@ -84,6 +87,7 @@ async def test_create_run(
     mock_task_runner: TaskRunner,
     mock_run_store: RunStore,
     mock_engine_store: EngineStore,
+    mock_run_auto_deleter: RunAutoDeleter,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
@@ -130,6 +134,7 @@ async def test_create_run(
         task_runner=mock_task_runner,
         run_id=run_id,
         created_at=run_created_at,
+        run_auto_deleter=mock_run_auto_deleter,
     )
 
     assert result.content.data == expected_response
@@ -142,6 +147,7 @@ async def test_create_run(
             mock_engine_store.engine.add_labware_offset(r)
             for r in LABWARE_OFFSET_REQUESTS
         ],
+        mock_run_auto_deleter.make_room_for_new_run(),
         mock_run_store.insert(run=expected_run),
     )
 
@@ -152,6 +158,7 @@ async def test_create_protocol_run(
     mock_protocol_store: ProtocolStore,
     mock_engine_store: EngineStore,
     mock_task_runner: TaskRunner,
+    mock_run_auto_deleter: RunAutoDeleter,
 ) -> None:
     """It should be able to create a protocol run."""
     run_created_at = datetime(year=2021, month=1, day=1)
@@ -220,6 +227,7 @@ async def test_create_protocol_run(
         task_runner=mock_task_runner,
         run_id="run-id",
         created_at=run_created_at,
+        run_auto_deleter=mock_run_auto_deleter,
     )
 
     assert result.content.data == expected_response
@@ -233,6 +241,7 @@ async def test_create_protocol_run(
             for r in LABWARE_OFFSET_REQUESTS
         ],
         mock_engine_store.runner.load(protocol_resource.source),
+        mock_run_auto_deleter.make_room_for_new_run(),
         mock_run_store.insert(run=run),
     )
 

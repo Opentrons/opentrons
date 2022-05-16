@@ -9,6 +9,7 @@ import type { UseTooltipResultTooltipProps } from '@opentrons/components'
 export interface TooltipProps {
   children: React.ReactNode
   tooltipProps: UseTooltipResultTooltipProps & { visible: boolean }
+  key?: string
 }
 
 export function Tooltip(props: TooltipProps): JSX.Element {

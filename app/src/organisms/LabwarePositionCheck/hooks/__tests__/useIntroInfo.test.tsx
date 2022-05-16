@@ -5,19 +5,19 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { createStore, Store } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
 import { getPipetteNameSpecs, PipetteName } from '@opentrons/shared-data'
-import { getPipetteMount } from '../../../ProtocolSetup/utils/getPipetteMount'
+import { getPipetteMount } from '../../../Devices/ProtocolRun/utils/getPipetteMount'
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks/useProtocolDetailsForRun'
 import { useIntroInfo } from '../useIntroInfo'
-import { getLabwareLocation } from '../../../ProtocolSetup/utils/getLabwareLocation'
+import { getLabwareLocation } from '../../../Devices/ProtocolRun/utils/getLabwareLocation'
 import { getLabwarePositionCheckSteps } from '../../getLabwarePositionCheckSteps'
 import type { PickUpTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { LoadLabwareCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 jest.mock('@opentrons/shared-data')
 jest.mock('../../getLabwarePositionCheckSteps')
-jest.mock('../../../ProtocolSetup/utils/getPipetteMount')
-jest.mock('../../../ProtocolSetup/utils/getLabwareLocation')
+jest.mock('../../../Devices/ProtocolRun/utils/getPipetteMount')
+jest.mock('../../../Devices/ProtocolRun/utils/getLabwareLocation')
 jest.mock('../../../Devices/hooks/useProtocolDetailsForRun')
 jest.mock('../../../ProtocolUpload/hooks')
 

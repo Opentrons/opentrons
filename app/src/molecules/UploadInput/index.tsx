@@ -12,7 +12,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/Buttons'
+import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 const DROP_ZONE_STYLES = css`

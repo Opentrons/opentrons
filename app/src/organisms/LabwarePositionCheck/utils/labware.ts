@@ -10,8 +10,8 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwareToOrder } from '../types'
-import { getLabwareLocation } from '../../ProtocolSetup/utils/getLabwareLocation'
-import { getModuleInitialLoadInfo } from '../../ProtocolSetup/utils/getModuleInitialLoadInfo'
+import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
+import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
 
 export const tipRackOrderSort = (
   tiprack1: LabwareToOrder,

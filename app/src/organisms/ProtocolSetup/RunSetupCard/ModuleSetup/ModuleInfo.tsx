@@ -1,23 +1,16 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Text,
-  RobotCoordsForeignObject,
-  SPACING_1,
-  SPACING_3,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
   Flex,
   Icon,
-  FONT_STYLE_ITALIC,
-  FONT_SIZE_BODY_1,
-  FONT_SIZE_CAPTION,
-  COLOR_WARNING,
-  COLOR_SUCCESS,
+  RobotCoordsForeignObject,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
   JUSTIFY_CENTER,
-  FONT_WEIGHT_SEMIBOLD,
-  C_DARK_GRAY,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   ModuleModel,
@@ -25,15 +18,19 @@ import {
   getModuleDef2,
 } from '@opentrons/shared-data'
 
+import { StyledText } from '../../../../atoms/text'
+import { useRunHasStarted } from '../../../../organisms/Devices/hooks'
+
 export interface ModuleInfoProps {
   moduleModel: ModuleModel
   isAttached: boolean
   usbPort: number | null
   hubPort: number | null
+  runId?: string
 }
 
 export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
-  const { moduleModel, usbPort, hubPort, isAttached } = props
+  const { moduleModel, usbPort, hubPort, isAttached, runId = null } = props
   const moduleDef = getModuleDef2(moduleModel)
   const {
     xDimension,
@@ -42,6 +39,8 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
     labwareInterfaceXDimension,
   } = moduleDef.dimensions
   const { t } = useTranslation('protocol_setup')
+
+  const runHasStarted = useRunHasStarted(runId)
 
   let connectionStatus = t('no_usb_port_yet')
   if (usbPort === null && hubPort === null && isAttached) {
@@ -58,35 +57,50 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
       y={0}
       height={labwareInterfaceYDimension ?? yDimension}
       width={labwareInterfaceXDimension ?? xDimension}
-      flexProps={{ padding: SPACING_3 }}
+      flexProps={{ padding: SPACING.spacing4 }}
     >
-      <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
-        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <Icon
-            name={isAttached ? 'check-circle' : 'alert-circle'}
-            color={isAttached ? COLOR_SUCCESS : COLOR_WARNING}
-            key="icon"
-            size="10px"
-            marginRight={SPACING_1}
-          />
-          <Text color={C_DARK_GRAY} fontSize={FONT_SIZE_CAPTION}>
-            {!isAttached ? t('module_not_connected') : t('module_connected')}
-          </Text>
-        </Flex>
-        <Text
-          fontWeight={FONT_WEIGHT_SEMIBOLD}
-          color={C_DARK_GRAY}
-          fontSize={FONT_SIZE_BODY_1}
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing1}
+        justifyContent={JUSTIFY_CENTER}
+      >
+        {!runHasStarted ? (
+          <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+            <Icon
+              name={isAttached ? 'check-circle' : 'alert-circle'}
+              color={isAttached ? COLORS.success : COLORS.warning}
+              key="icon"
+              size="10px"
+              marginRight={SPACING.spacing2}
+            />
+            <StyledText
+              color={COLORS.darkGrey}
+              fontSize={TYPOGRAPHY.fontSizeCaption}
+            >
+              {!isAttached ? t('module_not_connected') : t('module_connected')}
+            </StyledText>
+          </Flex>
+        ) : null}
+        <StyledText
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          color={COLORS.darkGrey}
+          fontSize={TYPOGRAPHY.fontSizeLabel}
         >
           {getModuleDisplayName(moduleModel)}
-        </Text>
-        <Text
-          color={C_DARK_GRAY}
-          fontSize="0.5rem"
-          fontStyle={FONT_STYLE_ITALIC}
+        </StyledText>
+        <StyledText
+          color={COLORS.darkGrey}
+          fontSize={TYPOGRAPHY.fontSizeH6}
+          fontStyle={
+            runHasStarted
+              ? TYPOGRAPHY.fontStyleNormal
+              : TYPOGRAPHY.fontStyleItalic
+          }
         >
-          {connectionStatus}
-        </Text>
+          {runHasStarted
+            ? t('connection_info_not_available')
+            : connectionStatus}
+        </StyledText>
       </Flex>
     </RobotCoordsForeignObject>
   )

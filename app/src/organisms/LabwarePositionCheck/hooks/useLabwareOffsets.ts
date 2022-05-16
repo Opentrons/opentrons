@@ -6,14 +6,17 @@ import {
   getModuleType,
   ProtocolAnalysisFile,
   THERMOCYCLER_MODULE_TYPE,
+  getVectorSum,
 } from '@opentrons/shared-data'
-import { getLabwareLocation } from '../../ProtocolSetup/utils/getLabwareLocation'
-import { getLabwareOffsetLocation } from '../../ProtocolSetup/utils/getLabwareOffsetLocation'
-import { getModuleInitialLoadInfo } from '../../ProtocolSetup/utils/getModuleInitialLoadInfo'
-import { getLabwareDefinitionUri } from '../../ProtocolSetup/utils/getLabwareDefinitionUri'
+import { getLabwareOffsetLocation } from '../../Devices/ProtocolRun/utils/getLabwareOffsetLocation'
+import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
+import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
+import { getLabwareDefinitionUri } from '../../Devices/ProtocolRun/utils/getLabwareDefinitionUri'
 import { useOffsetDataByLabwareId } from '../../ProtocolUpload/hooks/useOffsetData'
 import type { LabwareOffsetLocation, VectorOffset } from '@opentrons/api-client'
 import type { SavePositionCommandData } from '../types'
+import { getCurrentOffsetForLabwareInLocation } from '../../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
+import { useCurrentRun } from '../../ProtocolUpload/hooks'
 
 const getDisplayLocation = (
   labwareId: string,
@@ -62,10 +65,11 @@ export const useLabwareOffsets = (
   savePositionCommandData: SavePositionCommandData,
   protocolData: ProtocolAnalysisFile
 ): Promise<LabwareOffsets> => {
+  const { t } = useTranslation('labware_position_check')
   const offsetDataByLabwareId = useOffsetDataByLabwareId(
     savePositionCommandData
   )
-  const { t } = useTranslation('labware_position_check')
+  const existingLabwareOffsets = useCurrentRun()?.data?.labwareOffsets ?? []
   return reduce<SavePositionCommandData, Promise<LabwareOffsets>>(
     savePositionCommandData,
     (labwareOffsets, _commandIds, labwareId) => {
@@ -88,17 +92,28 @@ export const useLabwareOffsets = (
         ...result[labwareId],
       }))
       return labwareOffsets.then(labwareOffsets =>
-        vectorPromise.then(vector => [
-          ...labwareOffsets,
-          {
-            labwareId,
-            labwareOffsetLocation,
+        vectorPromise.then(vector => {
+          const existingOffsetVector = getCurrentOffsetForLabwareInLocation(
+            existingLabwareOffsets,
             labwareDefinitionUri,
-            displayLocation,
-            displayName,
-            vector,
-          },
-        ])
+            labwareOffsetLocation
+          )
+
+          return [
+            ...labwareOffsets,
+            {
+              labwareId,
+              labwareOffsetLocation,
+              labwareDefinitionUri,
+              displayLocation,
+              displayName,
+              vector:
+                existingOffsetVector != null
+                  ? getVectorSum(existingOffsetVector.vector, vector)
+                  : vector,
+            },
+          ]
+        })
       )
     },
     Promise.resolve([])

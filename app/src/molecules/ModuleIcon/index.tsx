@@ -12,7 +12,6 @@ import type { AttachedModule } from '../../redux/modules/types'
 
 interface ModuleIconProps {
   module: AttachedModule
-  index: number
   tooltipText: string
 }
 

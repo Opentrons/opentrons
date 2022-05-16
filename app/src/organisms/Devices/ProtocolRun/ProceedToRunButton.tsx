@@ -2,13 +2,15 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
-import { Tooltip, useHoverTooltip } from '@opentrons/components'
+import { useHoverTooltip } from '@opentrons/components'
 
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { useTrackEvent } from '../../../redux/analytics'
 import {
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
+  useRunHasStarted,
 } from '../hooks'
 
 interface ProceedToRunButtonProps {
@@ -30,6 +32,8 @@ export function ProceedToRunButton({
     robotName,
     runId
   )
+  const runHasStarted = useRunHasStarted(runId)
+
   const calibrationIncomplete =
     missingModuleIds.length === 0 && !isCalibrationComplete
   const moduleSetupIncomplete =
@@ -38,7 +42,9 @@ export function ProceedToRunButton({
     missingModuleIds.length > 0 && !isCalibrationComplete
 
   let proceedToRunDisabledReason = null
-  if (moduleAndCalibrationIncomplete) {
+  if (runHasStarted) {
+    proceedToRunDisabledReason = t('protocol_run_started')
+  } else if (moduleAndCalibrationIncomplete) {
     proceedToRunDisabledReason = t(
       'run_disabled_modules_and_calibration_not_complete'
     )
@@ -66,7 +72,9 @@ export function ProceedToRunButton({
         {t('proceed_to_run')}
       </PrimaryButton>
       {proceedToRunDisabledReason != null && (
-        <Tooltip {...tooltipProps}>{proceedToRunDisabledReason}</Tooltip>
+        <Tooltip tooltipProps={tooltipProps}>
+          {proceedToRunDisabledReason}
+        </Tooltip>
       )}
     </Link>
   )

@@ -13,7 +13,7 @@ import {
   CheckboxField,
 } from '@opentrons/components'
 import { Slideout } from '../../../../../atoms/Slideout'
-import { PrimaryButton } from '../../../../../atoms/Buttons'
+import { PrimaryButton } from '../../../../../atoms/buttons'
 import { StyledText } from '../../../../../atoms/text'
 import { Divider } from '../../../../../atoms/structure'
 import { Banner } from '../../../../../atoms/Banner'

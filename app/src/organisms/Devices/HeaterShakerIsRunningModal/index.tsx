@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { Modal } from '../../../atoms/Modal'
-import { PrimaryButton, SecondaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { HeaterShakerModule } from '../../../redux/modules/types'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
 

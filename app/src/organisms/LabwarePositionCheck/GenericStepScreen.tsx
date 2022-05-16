@@ -4,21 +4,20 @@ import isEqual from 'lodash/isEqual'
 import {
   DIRECTION_COLUMN,
   Flex,
-  FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
   NewPrimaryBtn,
-  SPACING_3,
-  SPACING_4,
-  Text,
   TEXT_TRANSFORM_UPPERCASE,
   ALIGN_FLEX_START,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+import { StyledText } from '../../atoms/text'
 import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
 import { SectionList } from './SectionList'
 import { useIntroInfo, useLabwareIdsBySection, useSteps } from './hooks'
 import { DeckMap } from './DeckMap'
 import type { Jog } from '../../molecules/JogControls'
-import type { LabwarePositionCheckStep } from './types'
+import type { LabwarePositionCheckStep, SavePositionCommandData } from './types'
 
 interface GenericStepScreenProps {
   selectedStep: LabwarePositionCheckStep
@@ -27,6 +26,7 @@ interface GenericStepScreenProps {
   jog: Jog
   title: string
   runId: string
+  savePositionCommandData: SavePositionCommandData
 }
 export const GenericStepScreen = (
   props: GenericStepScreenProps
@@ -53,43 +53,40 @@ export const GenericStepScreen = (
   )
 
   return (
-    <Flex margin={SPACING_3} flexDirection={DIRECTION_COLUMN}>
-      <Text
-        as={'h3'}
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      <StyledText
+        as="h3"
         textTransform={TEXT_TRANSFORM_UPPERCASE}
-        fontWeight={FONT_WEIGHT_SEMIBOLD}
-        marginBottom={SPACING_3}
-        marginLeft={SPACING_3}
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {props.title}
-      </Text>
-      <Flex alignItems={ALIGN_FLEX_START} padding={SPACING_3}>
-        <Flex flexDirection={DIRECTION_COLUMN} paddingTop={SPACING_3}>
-          <Flex marginLeft={SPACING_4}>
-            <SectionList
-              primaryPipetteMount={primaryPipetteMount}
-              secondaryPipetteMount={secondaryPipetteMount}
-              sections={sections}
-              currentSection={props.selectedStep.section}
-              completedSections={completedSections}
-            />
-          </Flex>
-          <Flex justifyContent={JUSTIFY_CENTER} paddingTop={SPACING_3}>
+      </StyledText>
+      <Flex alignItems={ALIGN_FLEX_START} marginTop={SPACING.spacing4}>
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <SectionList
+            primaryPipetteMount={primaryPipetteMount}
+            secondaryPipetteMount={secondaryPipetteMount}
+            sections={sections}
+            currentSection={props.selectedStep.section}
+            completedSections={completedSections}
+          />
+          <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing4}>
             <DeckMap
               labwareIdsToHighlight={labwareIdsToHighlight}
               completedLabwareIds={completedLabwareIds}
             />
           </Flex>
         </Flex>
-        <Flex padding={SPACING_3}>
+        <Flex marginLeft={SPACING.spacing7}>
           <LabwarePositionCheckStepDetail
             selectedStep={props.selectedStep}
             jog={props.jog}
             runId={props.runId}
+            savePositionCommandData={props.savePositionCommandData}
           />
         </Flex>
       </Flex>
-      <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
+      <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing4}>
         <NewPrimaryBtn onClick={props.proceed}>{props.ctaText}</NewPrimaryBtn>
       </Flex>
     </Flex>

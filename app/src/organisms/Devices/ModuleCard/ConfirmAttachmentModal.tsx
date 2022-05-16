@@ -13,12 +13,11 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { SecondaryButton, PrimaryButton } from '../../../atoms/Buttons'
+import { SecondaryButton, PrimaryButton } from '../../../atoms/buttons'
 import { Modal } from '../../../atoms/Modal'
 import { Dispatch } from '../../../redux/types'
 import { UpdateConfigValueAction } from '../../../redux/config/types'
 import { updateConfigValue } from '../../../redux/config'
-import { useHeaterShakerFromProtocol } from './hooks'
 
 export function setHeaterShakerAttached(
   heaterShakerAttached: boolean
@@ -39,8 +38,6 @@ export const ConfirmAttachmentModal = (
   const { isProceedToRunModal, onCloseClick, onConfirmClick } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [isDismissed, setIsDismissed] = React.useState<boolean>(false)
-  const heaterShaker = useHeaterShakerFromProtocol()
-  const slotNumber = heaterShaker != null ? heaterShaker.slotName : null
   const dispatch = useDispatch<Dispatch>()
 
   const confirmAttached = (): void => {
@@ -66,8 +63,7 @@ export const ConfirmAttachmentModal = (
           {t(
             isProceedToRunModal
               ? 'module_anchors_extended'
-              : 'module_should_have_anchors',
-            { slot: slotNumber }
+              : 'module_should_have_anchors'
           )}
         </Text>
         <Text>{t('thermal_adapter_attached_to_module')}</Text>

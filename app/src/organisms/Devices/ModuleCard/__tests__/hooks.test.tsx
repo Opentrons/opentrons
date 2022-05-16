@@ -12,13 +12,13 @@ import {
 } from '@opentrons/react-api-client'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
-import { getProtocolModulesInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { useProtocolDetailsForRun } from '../../hooks'
 import {
   useLatchControls,
   useModuleOverflowMenu,
-  useHeaterShakerFromProtocol,
+  useIsHeaterShakerInProtocol,
 } from '../hooks'
 
 import {
@@ -32,7 +32,7 @@ import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../ProtocolSetup/utils/getProtocolModulesInfo')
+jest.mock('../../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../../hooks')
 
@@ -664,25 +664,25 @@ describe('useProtocolMetadata', () => {
     jest.restoreAllMocks()
   })
 
-  it('should return heater shaker slot number', () => {
+  it('should return true when a heater shaker is in the protocol', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
-    const { result } = renderHook(useHeaterShakerFromProtocol, { wrapper })
-    const heaterShaker = result.current
+    const { result } = renderHook(useIsHeaterShakerInProtocol, { wrapper })
+    const isHeaterShakerInProtocol = result.current
 
-    expect(heaterShaker?.slotName).toBe('1')
+    expect(isHeaterShakerInProtocol).toBe(true)
   })
 
-  it('should return undefined when heater shaker isnt in protocol', () => {
+  it('should return false when a heater shaker is NOT in the protocol', () => {
     mockGetProtocolModulesInfo.mockReturnValue([])
 
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
-    const { result } = renderHook(useHeaterShakerFromProtocol, { wrapper })
-    const heaterShaker = result.current
+    const { result } = renderHook(useIsHeaterShakerInProtocol, { wrapper })
+    const isHeaterShakerInProtocol = result.current
 
-    expect(heaterShaker?.slotName).toBe(undefined)
+    expect(isHeaterShakerInProtocol).toBe(false)
   })
 })
