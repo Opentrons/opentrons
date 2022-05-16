@@ -23,16 +23,16 @@ import { TertiaryButton } from '../../../atoms/buttons'
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { DeckCalibrationModal } from '../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
+import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
 import { formatLastModified } from '../../../organisms/CalibrationPanels/utils'
+import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import { useTrackEvent } from '../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
 import { getDeckCalibrationSession } from '../../../redux/sessions/deck-calibration/selectors'
 import { CONNECTABLE } from '../../../redux/discovery'
 import { selectors as robotSelectors } from '../../../redux/robot'
-
-import { Tooltip } from '../../../atoms/Tooltip'
-import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import * as RobotApi from '../../../redux/robot-api'
 import * as Config from '../../../redux/config'
 import * as Sessions from '../../../redux/sessions'
@@ -43,7 +43,7 @@ import {
   useTipLengthCalibrations,
   useAttachedPipettes,
 } from '../hooks'
-import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
+import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 
 import type { State } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
@@ -51,6 +51,7 @@ import type {
   SessionCommandString,
   DeckCalibrationSession,
 } from '../../../redux/sessions/types'
+import type { DeckCalibrationInfo } from '../../../redux/calibration/types'
 
 interface CalibrationProps {
   robotName: string
@@ -170,9 +171,9 @@ export function RobotSettingsCalibration({
   )
 
   const {
-    // showConfirmation: showConfirmStart,
+    showConfirmation: showConfirmStart,
     confirm: confirmStart,
-    // cancel: cancelStart,
+    cancel: cancelStart,
   } = useConditionalConfirm(handleStartDeckCalSession, !!pipOffsetDataPresent)
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
 
@@ -219,13 +220,15 @@ export function RobotSettingsCalibration({
     : buttonDisabledReason
 
   const deckLastModified = (): string => {
-    const calibratedDate =
-      deckCalibrationData.deckCalibrationData?.lastModified ?? null
+    const deckCalData = deckCalibrationData.deckCalibrationData as DeckCalibrationInfo
+    const calibratedDate = deckCalData?.lastModified ?? null
     return Boolean(calibratedDate)
       ? t('last_calibrated', {
           date: formatLastModified(calibratedDate),
         })
       : t('not_calibrated')
+  }
+
   const handleHealthCheck = (
     hasBlockModalResponse: boolean | null = null
   ): void => {
@@ -265,14 +268,22 @@ export function RobotSettingsCalibration({
           isJogging={isJogging}
         />
       </Portal>
-        {showCalBlockModal ? (
-          <AskForCalibrationBlockModal
-            onResponse={handleHealthCheck}
-            titleBarTitle={t('robot_calibration:health_check_title')}
-            closePrompt={() => setShowCalBlockModal(false)}
-          />
-        ) : null}
-      </Portal>
+
+      {showCalBlockModal ? (
+        <AskForCalibrationBlockModal
+          onResponse={handleHealthCheck}
+          titleBarTitle={t('robot_calibration:health_check_title')}
+          closePrompt={() => setShowCalBlockModal(false)}
+        />
+      ) : null}
+
+      {showConfirmStart ? (
+        <DeckCalibrationConfirmModal
+          confirm={confirmStart}
+          cancel={cancelStart}
+        />
+      ) : null}
+
       {/* About Calibration this comment will removed when finish all sections */}
       <Box paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -318,7 +329,6 @@ export function RobotSettingsCalibration({
           </Flex>
         </Banner>
       )}
-      {/* Calibration Health Check this comment will removed when finish all sections */}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
@@ -332,13 +342,17 @@ export function RobotSettingsCalibration({
           </Box>
           <TertiaryButton
             onClick={() => confirmStart()}
-            disabled={disabledOrBusyReason}
+            disabled={disabledOrBusyReason !== null}
           >
             {deckCalibrationButtonText}
           </TertiaryButton>
         </Flex>
       </Box>
-      {/* TODO: 5/6/2022 kj the rest of sections will be solved other PRs */}
+      <Line />
+      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Box marginRight={SPACING.spacing6}>
+            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
               {t('calibration_health_check_title')}
             </Box>
             <StyledText as="p" marginBottom={SPACING.spacing3}>
