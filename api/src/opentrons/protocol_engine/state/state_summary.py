@@ -12,7 +12,7 @@ from ..types import (
 )
 
 
-class ProtocolRunData(BaseModel):
+class StateSummary(BaseModel):
     """Data from a protocol run."""
 
     status: EngineStatus

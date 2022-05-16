@@ -15,7 +15,7 @@ from .state import (
     CommandSlice,
     CurrentCommand,
     EngineConfigs,
-    ProtocolRunData,
+    StateSummary,
 )
 from .plugins import AbstractPlugin
 
@@ -46,7 +46,7 @@ __all__ = [
     "create_protocol_engine",
     "ProtocolEngine",
     "EngineConfigs",
-    "ProtocolRunData",
+    "StateSummary",
     # error types
     "ProtocolEngineError",
     "ErrorOccurrence",

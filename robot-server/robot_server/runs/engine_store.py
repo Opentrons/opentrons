@@ -5,7 +5,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_runner import ProtocolRunner, ProtocolRunResult
 from opentrons.protocol_engine import (
     ProtocolEngine,
-    ProtocolRunData,
+    StateSummary,
     LabwareOffsetCreate,
     create_protocol_engine,
 )
@@ -90,7 +90,7 @@ class EngineStore:
         run_id: str,
         labware_offsets: List[LabwareOffsetCreate],
         protocol: Optional[ProtocolResource],
-    ) -> ProtocolRunData:
+    ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
         Args:
@@ -123,7 +123,7 @@ class EngineStore:
             engine=engine,
         )
 
-        return engine.state_view.get_protocol_run_data()
+        return engine.state_view.get_summary()
 
     async def clear(self) -> ProtocolRunResult:
         """Remove the persisted ProtocolEngine.
@@ -140,8 +140,8 @@ class EngineStore:
         else:
             raise EngineConflictError("Current run is not idle or stopped.")
 
-        run_data = state_view.get_protocol_run_data()
+        run_data = state_view.get_summary()
         commands = state_view.commands.get_all()
         self._runner_engine_pair = None
 
-        return ProtocolRunResult(state_snapshot=run_data, commands=commands)
+        return ProtocolRunResult(state_summary=run_data, commands=commands)

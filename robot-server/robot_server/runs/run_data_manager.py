@@ -7,7 +7,7 @@ from typing_extensions import Literal
 from opentrons.protocol_engine import (
     EngineStatus,
     LabwareOffsetCreate,
-    ProtocolRunData,
+    StateSummary,
     CommandSlice,
     CurrentCommand,
     Command,
@@ -23,10 +23,10 @@ from .run_models import Run
 
 def _build_run(
     run_resource: RunResource,
-    run_data: Optional[ProtocolRunData],
+    run_data: Optional[StateSummary],
     current: bool,
 ) -> Run:
-    run_data = run_data or ProtocolRunData.construct(
+    run_data = run_data or StateSummary.construct(
         status=EngineStatus.STOPPED,
         errors=[],
         labware=[],
@@ -101,7 +101,7 @@ class RunDataManager:
             prev_run_result = await self._engine_store.clear()
             self._run_store.update_run_state(
                 run_id=prev_run_id,
-                run_data=prev_run_result.state_snapshot,
+                run_data=prev_run_result.state_summary,
                 commands=prev_run_result.commands,
             )
 
@@ -199,7 +199,7 @@ class RunDataManager:
                 commands=commands,
             )
         else:
-            run_data = self._engine_store.engine.state_view.get_protocol_run_data()
+            run_data = self._engine_store.engine.state_view.get_summary()
             run_resource = self._run_store.get(run_id=run_id)
 
         return _build_run(
@@ -263,11 +263,11 @@ class RunDataManager:
 
         return self._run_store.get_command(run_id=run_id, command_id=command_id)
 
-    def _get_run_data(self, run_id: str) -> Optional[ProtocolRunData]:
-        result: Optional[ProtocolRunData]
+    def _get_run_data(self, run_id: str) -> Optional[StateSummary]:
+        result: Optional[StateSummary]
 
         if run_id == self._engine_store.current_run_id:
-            result = self._engine_store.engine.state_view.get_protocol_run_data()
+            result = self._engine_store.engine.state_view.get_summary()
         else:
             result = self._run_store.get_run_data(run_id)
 

@@ -7,7 +7,7 @@ from opentrons.types import DeckSlotName
 from opentrons.protocol_runner import ProtocolRunResult
 from opentrons.protocol_engine import (
     EngineStatus,
-    ProtocolRunData,
+    StateSummary,
     commands,
     types as pe_types,
     CommandSlice,
@@ -48,9 +48,9 @@ def mock_task_runner(decoy: Decoy) -> TaskRunner:
 
 
 @pytest.fixture
-def protocol_run_data() -> ProtocolRunData:
-    """Get a ProtocolRunData value object."""
-    return ProtocolRunData(
+def protocol_run_data() -> StateSummary:
+    """Get a StateSummary value object."""
+    return StateSummary(
         status=EngineStatus.IDLE,
         errors=[],
         labware=[],
@@ -62,7 +62,7 @@ def protocol_run_data() -> ProtocolRunData:
 
 @pytest.fixture
 def run_resource() -> RunResource:
-    """Get a ProtocolRunData value object."""
+    """Get a StateSummary value object."""
     return RunResource(
         run_id="hello from the other side",
         protocol_id=None,
@@ -102,7 +102,7 @@ async def test_create(
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
     subject: RunDataManager,
-    protocol_run_data: ProtocolRunData,
+    protocol_run_data: StateSummary,
     run_resource: RunResource,
 ) -> None:
     """It should create an engine and a persisted run resource."""
@@ -146,7 +146,7 @@ async def test_create_with_options(
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
     subject: RunDataManager,
-    protocol_run_data: ProtocolRunData,
+    protocol_run_data: StateSummary,
     run_resource: RunResource,
 ) -> None:
     """It should handle creation with a protocol and labware offsets."""
@@ -240,7 +240,7 @@ async def test_get_current_run(
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
     subject: RunDataManager,
-    protocol_run_data: ProtocolRunData,
+    protocol_run_data: StateSummary,
     run_resource: RunResource,
 ) -> None:
     """It should get the current run from the engine."""
@@ -248,7 +248,7 @@ async def test_get_current_run(
 
     decoy.when(mock_run_store.get(run_id)).then_return(run_resource)
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
-    decoy.when(mock_engine_store.engine.state_view.get_protocol_run_data()).then_return(
+    decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
         protocol_run_data
     )
 
@@ -274,7 +274,7 @@ async def test_get_historical_run(
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
     subject: RunDataManager,
-    protocol_run_data: ProtocolRunData,
+    protocol_run_data: StateSummary,
     run_resource: RunResource,
 ) -> None:
     """It should get a historical run from the store."""
@@ -337,7 +337,7 @@ async def test_get_all_runs(
     subject: RunDataManager,
 ) -> None:
     """It should get all runs, including current and historical."""
-    current_run_data = ProtocolRunData(
+    current_run_data = StateSummary(
         status=EngineStatus.IDLE,
         errors=[],
         labware=[],
@@ -346,7 +346,7 @@ async def test_get_all_runs(
         modules=[],
     )
 
-    historical_run_data = ProtocolRunData(
+    historical_run_data = StateSummary(
         status=EngineStatus.STOPPED,
         errors=[],
         labware=[],
@@ -370,7 +370,7 @@ async def test_get_all_runs(
     )
 
     decoy.when(mock_engine_store.current_run_id).then_return("current-run")
-    decoy.when(mock_engine_store.engine.state_view.get_protocol_run_data()).then_return(
+    decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
         current_run_data
     )
     decoy.when(mock_run_store.get_run_data("historical-run")).then_return(
@@ -444,7 +444,7 @@ async def test_delete_historical_run(
 
 async def test_update_current(
     decoy: Decoy,
-    protocol_run_data: ProtocolRunData,
+    protocol_run_data: StateSummary,
     run_resource: RunResource,
     run_command: commands.Command,
     mock_engine_store: EngineStore,
@@ -455,7 +455,7 @@ async def test_update_current(
     run_id = "hello world"
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
     decoy.when(await mock_engine_store.clear()).then_return(
-        ProtocolRunResult(commands=[run_command], state_snapshot=protocol_run_data)
+        ProtocolRunResult(commands=[run_command], state_summary=protocol_run_data)
     )
 
     decoy.when(
@@ -482,7 +482,7 @@ async def test_update_current(
 
 async def test_update_current_noop(
     decoy: Decoy,
-    protocol_run_data: ProtocolRunData,
+    protocol_run_data: StateSummary,
     run_resource: RunResource,
     run_command: commands.Command,
     mock_engine_store: EngineStore,
@@ -492,7 +492,7 @@ async def test_update_current_noop(
     """It should noop on current=None."""
     run_id = "hello world"
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
-    decoy.when(mock_engine_store.engine.state_view.get_protocol_run_data()).then_return(
+    decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
         protocol_run_data
     )
     decoy.when(mock_run_store.get(run_id)).then_return(run_resource)
@@ -525,7 +525,7 @@ async def test_update_current_noop(
 
 async def test_update_current_not_allowed(
     decoy: Decoy,
-    protocol_run_data: ProtocolRunData,
+    protocol_run_data: StateSummary,
     run_resource: RunResource,
     run_command: commands.Command,
     mock_engine_store: EngineStore,
@@ -542,7 +542,7 @@ async def test_update_current_not_allowed(
 
 async def test_create_archives_existing(
     decoy: Decoy,
-    protocol_run_data: ProtocolRunData,
+    protocol_run_data: StateSummary,
     run_resource: RunResource,
     run_command: commands.Command,
     mock_engine_store: EngineStore,
@@ -555,7 +555,7 @@ async def test_create_archives_existing(
 
     decoy.when(mock_engine_store.current_run_id).then_return(run_id_old)
     decoy.when(await mock_engine_store.clear()).then_return(
-        ProtocolRunResult(commands=[run_command], state_snapshot=protocol_run_data)
+        ProtocolRunResult(commands=[run_command], state_summary=protocol_run_data)
     )
 
     decoy.when(

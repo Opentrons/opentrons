@@ -9,7 +9,7 @@ from opentrons_shared_data import get_shared_data_root
 
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine import ProtocolEngine, ProtocolRunData, types as pe_types
+from opentrons.protocol_engine import ProtocolEngine, StateSummary, types as pe_types
 from opentrons.protocol_runner import ProtocolRunner, ProtocolRunResult
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 
@@ -40,7 +40,7 @@ async def test_create_engine(subject: EngineStore) -> None:
     result = await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
 
     assert subject.current_run_id == "run-id"
-    assert isinstance(result, ProtocolRunData)
+    assert isinstance(result, StateSummary)
     assert isinstance(subject.runner, ProtocolRunner)
     assert isinstance(subject.engine, ProtocolEngine)
 

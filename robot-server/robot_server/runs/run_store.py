@@ -8,7 +8,7 @@ import sqlalchemy
 from pydantic import parse_obj_as
 
 from opentrons.util.helpers import utc_now
-from opentrons.protocol_engine import ProtocolRunData, CommandSlice
+from opentrons.protocol_engine import StateSummary, CommandSlice
 from opentrons.protocol_engine.commands import Command
 
 from robot_server.persistence import run_table, action_table, ensure_utc_datetime
@@ -39,7 +39,7 @@ class _RunStateResource:
     """
 
     run_id: str
-    protocol_run_data: ProtocolRunData
+    protocol_run_data: StateSummary
     commands: List[Command]
     engine_status: str
     _updated_at: datetime = field(default_factory=utc_now)
@@ -71,7 +71,7 @@ class RunStore:
     def update_run_state(
         self,
         run_id: str,
-        run_data: ProtocolRunData,
+        run_data: StateSummary,
         commands: List[Command],
     ) -> RunResource:
         """Update run table with run protocol_run_data to db.
@@ -235,7 +235,7 @@ class RunStore:
             for run_row in runs
         ]
 
-    def get_run_data(self, run_id: str) -> Optional[ProtocolRunData]:
+    def get_run_data(self, run_id: str) -> Optional[StateSummary]:
         """Get the archived run data of a run."""
         select_run_data = sqlalchemy.select(run_table.c.protocol_run_data).where(
             run_table.c.id == run_id
@@ -245,7 +245,7 @@ class RunStore:
             row = transaction.execute(select_run_data).one()
 
         return (
-            ProtocolRunData.parse_obj(row.protocol_run_data)
+            StateSummary.parse_obj(row.protocol_run_data)
             if row.protocol_run_data is not None
             else None
         )

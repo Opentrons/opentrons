@@ -1,11 +1,11 @@
 """Protocol engine state module."""
 
 from .state import State, StateStore, StateView
+from .state_summary import StateSummary
 from .commands import CommandState, CommandView, CommandSlice, CurrentCommand
 from .labware import LabwareState, LabwareView
 from .pipettes import PipetteState, PipetteView, HardwarePipette, CurrentWell
 from .modules import ModuleState, ModuleView, HardwareModule
-from .protocol_run_data import ProtocolRunData
 from .module_substates import (
     MagneticModuleId,
     MagneticModuleSubState,
@@ -27,7 +27,7 @@ __all__ = [
     "State",
     "StateStore",
     "StateView",
-    "ProtocolRunData",
+    "StateSummary",
     # command state and values
     "CommandState",
     "CommandView",

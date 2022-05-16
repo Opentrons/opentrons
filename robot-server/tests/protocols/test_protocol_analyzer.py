@@ -10,7 +10,7 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
     types as pe_types,
 )
-from opentrons.protocol_engine import ProtocolRunData, EngineStatus
+from opentrons.protocol_engine import StateSummary, EngineStatus
 from opentrons.protocol_runner import ProtocolRunner, ProtocolRunResult
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
@@ -96,7 +96,7 @@ async def test_analyze(
     decoy.when(await protocol_runner.run(protocol_resource.source)).then_return(
         ProtocolRunResult(
             commands=[analysis_command],
-            state_snapshot=ProtocolRunData(
+            state_summary=StateSummary(
                 status=EngineStatus.SUCCEEDED,
                 errors=[analysis_error],
                 labware=[analysis_labware],

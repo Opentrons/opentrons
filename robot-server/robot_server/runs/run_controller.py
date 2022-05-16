@@ -90,6 +90,6 @@ class RunController:
         result = await self._engine_store.runner.run()
         self._run_store.update_run_state(
             run_id=self._run_id,
-            run_data=result.state_snapshot,
+            run_data=result.state_summary,
             commands=result.commands,
         )

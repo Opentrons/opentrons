@@ -17,7 +17,7 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
     errors as pe_errors,
     types as pe_types,
-    ProtocolRunData,
+    StateSummary,
     CommandSlice,
 )
 from opentrons.types import MountType, DeckSlotName
@@ -32,7 +32,7 @@ def subject(sql_engine: Engine) -> RunStore:
 
 @pytest.fixture
 def protocol_commands() -> List[pe_commands.Command]:
-    """Get a ProtocolRunData value object."""
+    """Get a StateSummary value object."""
     return [
         pe_commands.Pause(
             id="pause-1",
@@ -62,8 +62,8 @@ def protocol_commands() -> List[pe_commands.Command]:
 
 
 @pytest.fixture
-def protocol_run() -> ProtocolRunData:
-    """Get a ProtocolRunData test object."""
+def protocol_run() -> StateSummary:
+    """Get a StateSummary test object."""
     analysis_error = pe_errors.ErrorOccurrence(
         id="error-id",
         createdAt=datetime(year=2023, month=3, day=3),
@@ -85,7 +85,7 @@ def protocol_run() -> ProtocolRunData:
         mount=MountType.LEFT,
     )
 
-    return ProtocolRunData(
+    return StateSummary(
         errors=[analysis_error],
         labware=[analysis_labware],
         pipettes=[analysis_pipette],
@@ -99,7 +99,7 @@ def protocol_run() -> ProtocolRunData:
 
 def test_update_run_state(
     subject: RunStore,
-    protocol_run: ProtocolRunData,
+    protocol_run: StateSummary,
     protocol_commands: List[pe_commands.Command],
 ) -> None:
     """It should be able to update a run state to the store."""
@@ -140,7 +140,7 @@ def test_update_run_state(
 
 def test_update_state_run_not_found(
     subject: RunStore,
-    protocol_run: ProtocolRunData,
+    protocol_run: StateSummary,
     protocol_commands: List[pe_commands.Command],
 ) -> None:
     """It should be able to catch the exception raised by insert."""
@@ -308,7 +308,7 @@ def test_insert_actions_no_run(subject: RunStore) -> None:
         subject.insert_action(run_id="run-id-996", action=action)
 
 
-def test_get_run_data(subject: RunStore, protocol_run: ProtocolRunData) -> None:
+def test_get_run_data(subject: RunStore, protocol_run: StateSummary) -> None:
     """It should be able to get store run data."""
     subject.insert(
         run_id="run-id",
@@ -351,7 +351,7 @@ def test_has_no_run_id(subject: RunStore) -> None:
 def test_get_command(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
-    protocol_run: ProtocolRunData,
+    protocol_run: StateSummary,
 ) -> None:
     """Should return a run command from the db."""
     subject.insert(
@@ -377,7 +377,7 @@ def test_get_command(
 def test_get_command_raise_exception(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
-    protocol_run: ProtocolRunData,
+    protocol_run: StateSummary,
     input_run_id: str,
     input_command_id: str,
     expected_exception: Any,
@@ -475,7 +475,7 @@ def test_get_command_raise_exception(
 def test_get_commands_slice(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
-    protocol_run: ProtocolRunData,
+    protocol_run: StateSummary,
     input_cursor: Optional[int],
     input_length: int,
     expected_cursor: int,
@@ -506,7 +506,7 @@ def test_get_commands_slice(
 
 def test_get_run_command_slice_none(
     subject: RunStore,
-    protocol_run: ProtocolRunData,
+    protocol_run: StateSummary,
     protocol_commands: List[pe_commands.Command],
 ) -> None:
     """It should return None if no commands stored."""

@@ -18,7 +18,7 @@ from .modules import ModuleState, ModuleStore, ModuleView
 from .geometry import GeometryView
 from .motion import MotionView
 from .configs import EngineConfigs
-from .protocol_run_data import ProtocolRunData
+from .state_summary import StateSummary
 
 ReturnT = TypeVar("ReturnT")
 
@@ -80,9 +80,9 @@ class StateView(HasState[State]):
         """Get Protocol Engine configurations."""
         return self._configs
 
-    def get_protocol_run_data(self) -> ProtocolRunData:
+    def get_summary(self) -> StateSummary:
         """Get protocol run data."""
-        return ProtocolRunData(
+        return StateSummary(
             status=self.commands.get_status(),
             errors=self._commands.get_all_errors(),
             pipettes=self._pipettes.get_all(),

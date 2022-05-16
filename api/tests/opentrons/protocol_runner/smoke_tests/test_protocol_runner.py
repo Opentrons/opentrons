@@ -42,9 +42,9 @@ async def test_runner_with_python(
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)
     commands_result = result.commands
-    pipettes_result = result.data.pipettes
-    labware_result = result.data.labware
-    modules_result = result.data.modules
+    pipettes_result = result.state_summary.pipettes
+    labware_result = result.state_summary.labware
+    modules_result = result.state_summary.modules
 
     pipette_id_captor = matchers.Captor()
     labware_id_captor = matchers.Captor()
@@ -107,8 +107,8 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)
     commands_result = result.commands
-    pipettes_result = result.data.pipettes
-    labware_result = result.data.labware
+    pipettes_result = result.state_summary.pipettes
+    labware_result = result.state_summary.labware
 
     expected_pipette = LoadedPipette(
         id="pipette-id",
@@ -160,8 +160,8 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
     result = await subject.run(protocol_source)
 
     commands_result = result.commands
-    pipettes_result = result.data.pipettes
-    labware_result = result.data.labware
+    pipettes_result = result.state_summary.pipettes
+    labware_result = result.state_summary.labware
 
     pipette_id_captor = matchers.Captor()
     labware_id_captor = matchers.Captor()
@@ -215,8 +215,8 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
     result = await subject.run(protocol_source)
 
     commands_result = result.commands
-    pipettes_result = result.data.pipettes
-    labware_result = result.data.labware
+    pipettes_result = result.state_summary.pipettes
+    labware_result = result.state_summary.labware
 
     pipette_id_captor = matchers.Captor()
     labware_id_captor = matchers.Captor()

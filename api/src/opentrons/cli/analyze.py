@@ -84,7 +84,7 @@ async def _analyze(
             ),
             metadata=protocol_source.metadata,
             commands=analysis.commands,
-            errors=analysis.data.errors,
+            errors=analysis.state_summary.errors,
         )
 
         await json_output.write_text(

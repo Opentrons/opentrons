@@ -7,7 +7,7 @@ from decoy import Decoy, matchers
 
 from opentrons.protocol_engine import (
     EngineStatus,
-    ProtocolRunData,
+    StateSummary,
     commands as pe_commands,
     errors as pe_errors,
 )
@@ -47,9 +47,9 @@ def run_id() -> str:
 
 
 @pytest.fixture
-def protocol_run_data() -> ProtocolRunData:
-    """Get a ProtocolRunData value object."""
-    return ProtocolRunData(
+def protocol_run_data() -> StateSummary:
+    """Get a StateSummary value object."""
+    return StateSummary(
         status=EngineStatus.IDLE,
         errors=[],
         labware=[],
@@ -61,7 +61,7 @@ def protocol_run_data() -> ProtocolRunData:
 
 @pytest.fixture
 def protocol_commands() -> List[pe_commands.Command]:
-    """Get a ProtocolRunData value object."""
+    """Get a StateSummary value object."""
     return [
         pe_commands.Pause.construct(  # type: ignore[call-arg]
             params=pe_commands.PauseParams(message="hello world")
@@ -117,7 +117,7 @@ async def test_create_play_action_to_start(
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
-    protocol_run_data: ProtocolRunData,
+    protocol_run_data: StateSummary,
     protocol_commands: List[pe_commands.Command],
     run_id: str,
     subject: RunController,
@@ -145,7 +145,7 @@ async def test_create_play_action_to_start(
     decoy.when(await mock_engine_store.runner.run()).then_return(
         ProtocolRunResult(
             commands=protocol_commands,
-            state_snapshot=protocol_run_data,
+            state_summary=protocol_run_data,
         )
     )
 

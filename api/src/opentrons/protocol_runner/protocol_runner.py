@@ -7,7 +7,7 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
     JsonProtocolConfig,
 )
-from opentrons.protocol_engine import ProtocolEngine, ProtocolRunData, Command
+from opentrons.protocol_engine import ProtocolEngine, StateSummary, Command
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
@@ -30,7 +30,7 @@ class ProtocolRunResult(NamedTuple):
     """Result data from a run, pulled from the ProtocolEngine."""
 
     commands: List[Command]
-    state_snapshot: ProtocolRunData
+    state_summary: StateSummary
 
 
 # TODO(mc, 2022-01-11): this class has become bloated. Split into an abstract
@@ -155,9 +155,9 @@ class ProtocolRunner:
         self._task_queue.start()
         await self._task_queue.join()
 
-        run_data = self._protocol_engine.state_view.get_protocol_run_data()
+        run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        return ProtocolRunResult(commands=commands, data=run_data)
+        return ProtocolRunResult(commands=commands, state_summary=run_data)
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:
         protocol = self._json_file_reader.read(protocol_source)
