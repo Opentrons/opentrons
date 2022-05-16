@@ -29,7 +29,6 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     SetSensorThresholdRequestPayload,
     WriteToSensorRequestPayload,
     BaselineSensorRequestPayload,
-    PeripheralStatusResponsePayload,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorTypeField,
@@ -178,15 +177,16 @@ class SensorScheduler:
         return None
 
     @staticmethod
-    async def _read_response(
+    async def _read_peripheral_response(
         node_id: NodeId,
         reader: WaitableCallback,
-    ) -> Optional[bool]:
+    ) -> bool:
+        """Waits for and sends back PeripheralStatusResponse."""
         async for response, arbitration_id in reader:
             if arbitration_id.parts.originating_node_id == node_id:
                 if isinstance(response, PeripheralStatusResponse):
                     return bool(response.payload.status)
-        return None
+        return False
 
     async def request_peripheral_status(
         self,
@@ -194,7 +194,7 @@ class SensorScheduler:
         node_id: NodeId,
         can_messenger: CanMessenger,
         timeout: int,
-    ) -> Optional[bool]:
+    ) -> bool:
         """Send threshold message."""
         with WaitableCallback(can_messenger) as reader:
             status = False
@@ -208,9 +208,10 @@ class SensorScheduler:
             )
 
             try:
-                status = await asyncio.wait_for(
-                    self._read_response(node_id, reader), timeout
+                response = asyncio.wait_for(
+                    self._read_peripheral_response(node_id, reader), timeout
                 )
+                status = await response
             except asyncio.TimeoutError:
                 log.warning("Sensor Read timed out")
             finally:
