@@ -62,7 +62,7 @@ def get_app(
     config_obj = config.load(config_file_override)
 
     app = web.Application(middlewares=[log_error_middleware])
-    name = name_override or name_management.get_name()
+    name = name_override or name_management.get_pretty_hostname()
     boot_id = boot_id_override or control.get_boot_id()
     app[config.CONFIG_VARNAME] = config_obj
     app[constants.RESTART_LOCK_NAME] = asyncio.Lock()

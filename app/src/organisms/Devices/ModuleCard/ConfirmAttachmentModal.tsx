@@ -13,7 +13,7 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { SecondaryButton, PrimaryButton } from '../../../atoms/Buttons'
+import { SecondaryButton, PrimaryButton } from '../../../atoms/buttons'
 import { Modal } from '../../../atoms/Modal'
 import { Dispatch } from '../../../redux/types'
 import { UpdateConfigValueAction } from '../../../redux/config/types'

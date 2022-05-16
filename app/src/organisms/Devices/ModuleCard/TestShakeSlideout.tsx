@@ -27,7 +27,7 @@ import {
   RPM,
 } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
-import { PrimaryButton, TertiaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton, TertiaryButton } from '../../../atoms/buttons'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
 import { Divider } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
@@ -205,10 +205,7 @@ export const TestShakeSlideout = (
               : t('open', { ns: 'shared' })}
           </TertiaryButton>
           {isShaking ? (
-            <Tooltip
-              tooltipProps={tooltipProps}
-              key={`TestShakeSlideout_latch_btn`}
-            >
+            <Tooltip tooltipProps={tooltipProps}>
               {t('cannot_open_latch', { ns: 'heater_shaker' })}
             </Tooltip>
           ) : null}
@@ -260,10 +257,7 @@ export const TestShakeSlideout = (
               : t('start', { ns: 'shared' })}
           </TertiaryButton>
           {!isLatchClosed ? (
-            <Tooltip
-              tooltipProps={tooltipProps}
-              key={`TestShakeSlideout_shake_tn`}
-            >
+            <Tooltip tooltipProps={tooltipProps}>
               {t('cannot_shake', { ns: 'heater_shaker' })}
             </Tooltip>
           ) : null}

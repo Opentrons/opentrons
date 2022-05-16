@@ -14,7 +14,7 @@ import * as Config from '../../redux/config'
 
 import type { DevInternalFlag } from '../../redux/config/types'
 import { Divider } from '../../atoms/structure'
-import { ToggleButton } from '../../atoms/Buttons'
+import { ToggleButton } from '../../atoms/buttons'
 import { useTranslation } from 'react-i18next'
 
 export function FeatureFlags(): JSX.Element {

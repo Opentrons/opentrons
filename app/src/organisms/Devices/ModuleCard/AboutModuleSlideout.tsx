@@ -15,7 +15,7 @@ import {
   COLORS,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
 import { Slideout } from '../../../atoms/Slideout'
 import { Banner } from '../../../atoms/Banner'

@@ -14,7 +14,7 @@ import { AttachAdapter } from '../AttachAdapter'
 import { PowerOn } from '../PowerOn'
 import { TestShake } from '../TestShake'
 
-import type { ProtocolModuleInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 jest.mock('../Introduction')
 jest.mock('../KeyParts')

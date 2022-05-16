@@ -6,7 +6,7 @@ import {
   JUSTIFY_CENTER,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/Buttons'
+import { PrimaryButton } from '../../atoms/buttons'
 
 export interface ConfigFormSubmitButtonProps {
   disabled: boolean

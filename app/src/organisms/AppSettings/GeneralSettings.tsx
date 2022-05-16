@@ -18,7 +18,7 @@ import {
   COLORS,
   ALIGN_START,
 } from '@opentrons/components'
-import { TertiaryButton, ToggleButton } from '../../atoms/Buttons'
+import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
