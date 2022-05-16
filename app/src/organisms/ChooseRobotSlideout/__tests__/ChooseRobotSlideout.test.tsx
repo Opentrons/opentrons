@@ -171,26 +171,4 @@ describe('ChooseRobotSlideout', () => {
     proceedButton.click()
     expect(mockCreateRun).toBeCalled()
   })
-  it('launches the robot is busy modal when the selected robot is busy', () => {
-    mockUseCurrentRunId.mockReturnValue('1')
-    mockUseCurrentRunStatus.mockReturnValue('idle')
-    const [{ getByRole, getByText }] = render({
-      storedProtocolData: storedProtocolDataFixture,
-      onCloseClick: jest.fn(),
-      showSlideout: true,
-    })
-    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
-    expect(proceedButton).toBeDisabled()
-    const mockRobot = getByText('opentrons-robot-name')
-    mockRobot.click()
-    expect(proceedButton).not.toBeDisabled()
-    proceedButton.click()
-    getByText('opentrons-robot-name is busy')
-    getByText(
-      'opentrons-robot-name is busy with A Protocol for Otie in idle state. Do you want to clear it and proceed?'
-    )
-    getByRole('button', { name: 'View run details' })
-    getByRole('button', { name: 'Clear and proceed to setup' }).click()
-    expect(mockCloseCurrentRun).toBeCalled()
-  })
 })

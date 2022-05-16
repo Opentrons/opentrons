@@ -274,14 +274,14 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a start run button and cancel run button when run is ready to start', () => {
-    const [{ getByRole, queryByText }] = render()
+    const [{ getByRole, queryByText, getByText }] = render()
 
     getByRole('button', { name: 'Start run' })
     queryByText(formatTimestamp(STARTED_AT))
     queryByText('Protocol start')
     queryByText('Protocol end')
     getByRole('button', { name: 'Cancel run' }).click()
-    expect(mockCloseCurrentRun).toBeCalled()
+    getByText('Mock ConfirmCancelModal')
   })
 
   it('disables the Start Run button with tooltip if calibration is incomplete', () => {
@@ -496,10 +496,10 @@ describe('ProtocolRunHeader', () => {
 
   it('renders a clear protocol banner when run has failed', () => {
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_FAILED)
-    const [{ getByRole, getByText }] = render()
+    const [{ getByTestId, getByText }] = render()
 
-    getByText('Run failed. Clear protocol from robot to make it available.')
-    getByRole('link', { name: 'Clear protocol' }).click()
+    getByText('Run failed.')
+    getByTestId('Banner_close-button').click()
     expect(mockCloseCurrentRun).toBeCalled()
   })
 
@@ -507,21 +507,20 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_STOPPED)
-    const [{ getByRole, getByText }] = render()
+    const [{ queryByTestId, getByText }] = render()
 
-    getByText('Run canceled. Clear protocol from robot to make it available.')
-    getByRole('link', { name: 'Clear protocol' }).click()
-    expect(mockCloseCurrentRun).toBeCalled()
+    getByText('Run canceled.')
+    expect(queryByTestId('Banner_close-button')).not.toBeInTheDocument()
   })
 
   it('renders a clear protocol banner when run has succeeded', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_SUCCEEDED)
-    const [{ getByRole, getByText }] = render()
+    const [{ getByTestId, getByText }] = render()
 
-    getByText('Run completed. Clear protocol from robot to make it available.')
-    getByRole('link', { name: 'Clear protocol' }).click()
+    getByText('Run completed.')
+    getByTestId('Banner_close-button').click()
     expect(mockCloseCurrentRun).toBeCalled()
   })
 
