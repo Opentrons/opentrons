@@ -1,12 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Box,
-  Flex,
-  JUSTIFY_FLEX_END,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { Box, Flex, JUSTIFY_FLEX_END, SPACING } from '@opentrons/components'
 
 import { Modal } from '../../atoms/Modal'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
