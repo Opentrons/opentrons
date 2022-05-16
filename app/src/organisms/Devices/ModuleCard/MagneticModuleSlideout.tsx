@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  useCreateCommandMutation,
+  useCreateLiveCommandMutation,
+} from '@opentrons/react-api-client'
 import {
   Flex,
   Text,
@@ -25,7 +28,7 @@ import {
 } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
 import { InputField } from '../../../atoms/InputField'
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 
 import type { TFunctionResult } from 'i18next'
 import type { MagneticModule } from '../../../redux/modules/types'
@@ -64,14 +67,16 @@ interface MagneticModuleSlideoutProps {
   module: MagneticModule
   onCloseClick: () => unknown
   isExpanded: boolean
+  runId?: string
 }
 
 export const MagneticModuleSlideout = (
   props: MagneticModuleSlideoutProps
 ): JSX.Element | null => {
-  const { module, isExpanded, onCloseClick } = props
+  const { module, isExpanded, onCloseClick, runId } = props
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { createCommand } = useCreateCommandMutation()
   const [engageHeightValue, setEngageHeightValue] = React.useState<
     string | null
   >(null)
@@ -91,9 +96,9 @@ export const MagneticModuleSlideout = (
       break
     }
     case 'GEN 2': {
-      max = t('gen2_num_slideout', { num: info.maxHeight })
-      labwareBottom = t('gen2_num_slideout', { num: info.labwareBottomHeight })
-      disengageHeight = t('gen2_num_slideout', { num: info.disengagedHeight })
+      max = t('gen_2_num', { num: info.maxHeight })
+      labwareBottom = t('gen_2_num', { num: info.labwareBottomHeight })
+      disengageHeight = t('gen_2_num', { num: info.disengagedHeight })
     }
   }
 
@@ -107,24 +112,34 @@ export const MagneticModuleSlideout = (
   const handleSubmitHeight = (): void => {
     if (engageHeightValue != null) {
       const setEngageCommand: MagneticModuleEngageMagnetCreateCommand = {
-        commandType: 'magneticModule/engageMagnet',
+        commandType: 'magneticModule/engage',
         params: {
           moduleId: module.id,
-          engageHeight: parseInt(engageHeightValue),
+          height: parseInt(engageHeightValue),
         },
       }
-      createLiveCommand({ command: setEngageCommand }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${setEngageCommand.commandType}: ${e.message}`
+      if (runId != null) {
+        createCommand({ runId: runId, command: setEngageCommand }).catch(
+          (e: Error) => {
+            console.error(
+              `error setting module status with command type ${setEngageCommand.commandType} and run id ${runId}: ${e.message}`
+            )
+          }
         )
-      })
+      } else {
+        createLiveCommand({ command: setEngageCommand }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${setEngageCommand.commandType}: ${e.message}`
+          )
+        })
+      }
     }
     setEngageHeightValue(null)
   }
 
   return (
     <Slideout
-      title={t('set_engage_height_slideout', { name: moduleName })}
+      title={t('set_engage_height_for_module', { name: moduleName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
@@ -134,17 +149,18 @@ export const MagneticModuleSlideout = (
           disabled={engageHeightValue == null || errorMessage !== null}
           data-testid={`MagneticModuleSlideout_btn_${module.serialNumber}`}
         >
-          {t('set_engage_height')}
+          {t('confirm')}
         </PrimaryButton>
       }
     >
       <Text
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
+        color={COLORS.darkBlack}
         paddingTop={SPACING.spacing2}
         data-testid={`MagneticModuleSlideout_body_text_${module.serialNumber}`}
       >
-        {t('set_engage_height_slideout_body', {
+        {t('set_engage_height_and_enter_integer', {
           lower:
             module.moduleModel === MAGNETIC_MODULE_V1
               ? MAGNETIC_MODULE_V1_DISNEGAGED_HEIGHT
@@ -157,13 +173,14 @@ export const MagneticModuleSlideout = (
       </Text>
       <Text
         fontSize={TYPOGRAPHY.fontSizeH6}
+        color={COLORS.darkGreyEnabled}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         paddingTop={SPACING.spacing4}
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         paddingBottom={SPACING.spacing3}
         data-testid={`MagneticModuleSlideout_body_subtitle_${module.serialNumber}`}
       >
-        {t('set_engage_height_slideout_subtitle', { gen: info.version })}
+        {t('height_ranges', { gen: info.version })}
       </Text>
       <Flex
         backgroundColor={COLORS.background}
@@ -177,15 +194,9 @@ export const MagneticModuleSlideout = (
           flexDirection={DIRECTION_COLUMN}
           data-testid={`MagneticModuleSlideout_body_data_text_${module.serialNumber}`}
         >
-          <Text paddingBottom={SPACING.spacing3}>
-            {t('max_engage_height_slideout')}
-          </Text>
-          <Text paddingBottom={SPACING.spacing3}>
-            {t('labware_bottom_slideout')}
-          </Text>
-          <Text paddingBottom={SPACING.spacing3}>
-            {t('disengage_slideout')}
-          </Text>
+          <Text paddingBottom={SPACING.spacing3}>{t('max_engage_height')}</Text>
+          <Text paddingBottom={SPACING.spacing3}>{t('labware_bottom')}</Text>
+          <Text>{t('disengaged')}</Text>
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -193,8 +204,10 @@ export const MagneticModuleSlideout = (
           data-testid={`MagneticModuleSlideout_body_data_num_${module.serialNumber}`}
         >
           <Text paddingBottom={SPACING.spacing3}>{max}</Text>
-          <Text paddingBottom={SPACING.spacing3}>{labwareBottom}</Text>
-          <Text paddingBottom={SPACING.spacing3}>{disengageHeight}</Text>
+          <Text paddingBottom={SPACING.spacing3} paddingLeft={SPACING.spacing2}>
+            {labwareBottom}
+          </Text>
+          <Text>{disengageHeight}</Text>
         </Flex>
       </Flex>
       <Flex
@@ -203,12 +216,12 @@ export const MagneticModuleSlideout = (
         data-testid={`MagneticModuleSlideout_input_field_${module.serialNumber}`}
       >
         <Text
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.darkGrey}
           paddingBottom={SPACING.spacing3}
         >
-          {t('engage_height_slideout')}
+          {t('set_engage_height')}
         </Text>
         <InputField
           data-testid={`${module.moduleModel}`}

@@ -7,16 +7,19 @@ import asyncio
 import functools
 import logging
 import os
+from pathlib import Path
+
 from subprocess import CalledProcessError
 
 from typing import Optional
-
 
 from aiohttp import web, BodyPartReader
 
 from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
 from . import config, update_actions
 from .session import UpdateSession, Stages
+
+from otupdate.openembedded.updater import UPDATE_PKG
 
 SESSION_VARNAME = APP_VARIABLE_PREFIX + "session"
 LOG = logging.getLogger(__name__)
@@ -75,11 +78,18 @@ async def status(request: web.Request, session: UpdateSession) -> web.Response:
 
 
 async def _save_file(part: BodyPartReader, path: str):
+    # making sure directory exists first
+    Path(path).mkdir(parents=True, exist_ok=True)
     with open(os.path.join(path, part.name), "wb") as write:
         while not part.at_eof():
             chunk = await part.read_chunk()
             decoded = part.decode(chunk)
             write.write(decoded)
+    try:
+        for file in os.listdir(path):
+            LOG.info(f"file written, {file} to path, {path}")
+    except Exception:
+        LOG.exception("File not written")
 
 
 def _begin_write(
@@ -93,7 +103,10 @@ def _begin_write(
     session.set_stage(Stages.WRITING)
     write_future = asyncio.ensure_future(
         loop.run_in_executor(
-            None, actions.write_update, rootfs_file_path, session.set_progress
+            None,
+            actions.write_update,
+            rootfs_file_path,
+            session.set_progress,
         )
     )
 
@@ -157,10 +170,13 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
         )
     reader = await request.multipart()
     async for part in reader:
-        if part.name != "ot2-system.zip":
-            LOG.warning(f"Unknown field name {part.name} in file_upload, ignoring")
+        # TODO (al, 2022-04-18): This check should not be here. All ot2 and
+        #  ot3 disambiguation should happen in update actions.
+        if part.name != "ot2-system.zip" and part.name != UPDATE_PKG:
+            LOG.info(f"Unknown field name {part.name} in file_upload, ignoring")
             await part.release()
         else:
+            LOG.info(f"Writing {part.name}")
             await _save_file(part, session.download_path)
 
     maybe_actions = update_actions.UpdateActionsInterface.from_request(request)
@@ -177,7 +193,8 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
         session,
         config.config_from_request(request),
         asyncio.get_event_loop(),
-        os.path.join(session.download_path, "ot2-system.zip"),
+        # TODO (al, 2022-04-18): Use of part.name should not be here
+        os.path.join(session.download_path, part.name),
         maybe_actions,
     )
 

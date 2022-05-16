@@ -17,6 +17,7 @@ import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
 import { HeaterShakerModuleData } from '../HeaterShakerModuleData'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
+import { getIsHeaterShakerAttached } from '../../../../redux/config'
 import { ModuleCard } from '..'
 import {
   mockMagneticModule,
@@ -35,6 +36,7 @@ jest.mock('../MagneticModuleData')
 jest.mock('../TemperatureModuleData')
 jest.mock('../ThermocyclerModuleData')
 jest.mock('../HeaterShakerModuleData')
+jest.mock('../../../../redux/config')
 jest.mock('../ModuleOverflowMenu')
 jest.mock('../../../RunTimeControl/hooks')
 jest.mock('../FirmwareUpdateFailedModal')
@@ -62,6 +64,9 @@ const mockThermocyclerModuleData = ThermocyclerModuleData as jest.MockedFunction
 >
 const mockHeaterShakerModuleData = HeaterShakerModuleData as jest.MockedFunction<
   typeof HeaterShakerModuleData
+>
+const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
+  typeof getIsHeaterShakerAttached
 >
 const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
   typeof useCurrentRunStatus
@@ -199,12 +204,13 @@ describe('ModuleCard', () => {
   })
 
   it('renders information for a heater shaker module with mocked status', () => {
+    mockGetIsHeaterShakerAttached.mockReturnValue(true)
     const { getByText, getByAltText } = render({
       module: mockHeaterShaker,
       robotName: mockRobot.name,
     })
 
-    getByText('Heater Shaker Module GEN1')
+    getByText('Heater-Shaker Module GEN1')
     getByText('Mock Heater Shaker Module Data')
     getByText('usb port 1')
     getByAltText('heaterShakerModuleV1')

@@ -1,6 +1,8 @@
-"""Factory for building a driver."""
+"""Factory for building drivers and messengers."""
+from contextlib import asynccontextmanager
+from typing import AsyncIterator
 
-from . import settings
+from . import settings, CanMessenger
 from .abstract_driver import AbstractCanDriver
 from .socket_driver import SocketDriver
 from .driver import CanDriver
@@ -25,3 +27,25 @@ async def build_driver(driver_settings: settings.DriverSettings) -> AbstractCanD
             bitrate=driver_settings.bit_rate,
             channel=driver_settings.channel,
         )
+
+
+@asynccontextmanager
+async def driver(
+    driver_settings: settings.DriverSettings,
+) -> AsyncIterator[AbstractCanDriver]:
+    """Context manager creating a can driver."""
+    d = await build_driver(driver_settings)
+    try:
+        yield d
+    finally:
+        d.shutdown()
+
+
+@asynccontextmanager
+async def can_messenger(
+    driver_settings: settings.DriverSettings,
+) -> AsyncIterator[CanMessenger]:
+    """Context manager creating a can driver and messenger."""
+    async with driver(driver_settings) as d:
+        async with CanMessenger(d) as m:
+            yield m

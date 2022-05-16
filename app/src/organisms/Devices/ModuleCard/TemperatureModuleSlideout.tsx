@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  useCreateCommandMutation,
+  useCreateLiveCommandMutation,
+} from '@opentrons/react-api-client'
 import {
   Flex,
   Text,
@@ -17,7 +20,7 @@ import {
   TEMP_MIN,
 } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 import { InputField } from '../../../atoms/InputField'
 import { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
@@ -27,14 +30,16 @@ interface TemperatureModuleSlideoutProps {
   module: TemperatureModule
   onCloseClick: () => unknown
   isExpanded: boolean
+  runId?: string
 }
 
 export const TemperatureModuleSlideout = (
   props: TemperatureModuleSlideoutProps
 ): JSX.Element | null => {
-  const { module, onCloseClick, isExpanded } = props
+  const { module, onCloseClick, isExpanded, runId } = props
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { createCommand } = useCreateCommandMutation()
   const name = getModuleDisplayName(module.moduleModel)
   const [temperatureValue, setTemperatureValue] = React.useState<string | null>(
     null
@@ -46,17 +51,27 @@ export const TemperatureModuleSlideout = (
         commandType: 'temperatureModule/setTargetTemperature',
         params: {
           moduleId: module.id,
-          // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10176 merges
-          temperature: parseInt(temperatureValue),
+          celsius: parseInt(temperatureValue),
         },
       }
-      createLiveCommand({
-        command: saveTempCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${saveTempCommand.commandType}: ${e.message}`
-        )
-      })
+      if (runId != null) {
+        createCommand({
+          runId: runId,
+          command: saveTempCommand,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${saveTempCommand.commandType} and run id ${runId}: ${e.message}`
+          )
+        })
+      } else {
+        createLiveCommand({
+          command: saveTempCommand,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${saveTempCommand.commandType}: ${e.message}`
+          )
+        })
+      }
     }
     setTemperatureValue(null)
   }
@@ -78,7 +93,7 @@ export const TemperatureModuleSlideout = (
           disabled={temperatureValue === null || valueOutOfRange}
           data-testid={`TemperatureSlideout_btn_${module.serialNumber}`}
         >
-          {t('set_temp_slideout')}
+          {t('confirm')}
         </PrimaryButton>
       }
     >
@@ -98,12 +113,12 @@ export const TemperatureModuleSlideout = (
         data-testid={`TemperatureSlideout_input_field_${module.serialNumber}`}
       >
         <Text
-          fontWeight={FONT_WEIGHT_REGULAR}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.black}
           paddingBottom={SPACING.spacing3}
         >
-          {t('temperature')}
+          {t('set_temperature')}
         </Text>
         <InputField
           id={`${module.moduleModel}`}

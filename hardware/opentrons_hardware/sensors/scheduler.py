@@ -24,7 +24,9 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     WriteToSensorRequestPayload,
     BaselineSensorRequestPayload,
 )
-from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    SensorTypeField,
+)
 
 from opentrons_hardware.sensors.utils import (
     ReadSensorInformation,
@@ -38,7 +40,6 @@ from opentrons_hardware.firmware_bindings.utils import (
     UInt32Field,
     Int32Field,
 )
-
 
 log = logging.getLogger(__name__)
 
@@ -105,6 +106,28 @@ class SensorScheduler:
                 data = await asyncio.wait_for(
                     self._wait_for_response(sensor.node_id, reader), timeout
                 )
+                print("wait_for_response done")
+            except asyncio.TimeoutError:
+                log.warning("Sensor Read timed out")
+            finally:
+                return data
+
+    async def read(
+        self,
+        can_messenger: CanMessenger,
+        node_id: NodeId,
+    ) -> Optional[SensorDataType]:
+        """Helper function for the get_report sensor driver.
+
+        This simply retrieves CAN messages without first
+        sending a ReadFromSensorRequest.
+        """
+        data: Optional[SensorDataType] = SensorDataType.build(0)
+        with WaitableCallback(can_messenger) as reader:
+            try:
+                data = await self._wait_for_response(node_id, reader)
+                print(" read data = ", data)
+
             except asyncio.TimeoutError:
                 log.warning("Sensor Read timed out")
             finally:

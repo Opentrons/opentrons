@@ -1,3 +1,4 @@
+// @ts-nocheck TODO: remove this after https://github.com/Opentrons/opentrons/pull/10178 merges
 import merge from 'lodash/merge'
 import {
   THERMOCYCLER_MODULE_TYPE,

@@ -1,0 +1,9 @@
+{
+  "buildroot_version": "v1.0.1",
+  "buildroot_sha": "3c3fee1223123eef",
+  "opentrons_api_version": "v4.0.0",
+  "opentrons_api_sha": "99facd9d9",
+  "update_server_version": "v4.0.0",
+  "update_server_sha": "8888f8c8d8ac8",
+  "openembedded_version": "v2.0.2"
+}

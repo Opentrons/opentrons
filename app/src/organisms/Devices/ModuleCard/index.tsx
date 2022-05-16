@@ -76,11 +76,13 @@ import type { RequestState } from '../../../redux/robot-api/types'
 interface ModuleCardProps {
   module: AttachedModule
   robotName: string
+  runId?: string
+  slotName?: string
 }
 
 export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
-  const { module, robotName } = props
+  const { module, robotName, runId, slotName } = props
   const dispatch = useDispatch<Dispatch>()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
   const [showSlideout, setShowSlideout] = React.useState(false)
@@ -239,7 +241,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         {showWizard && (
           <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
         )}
-        {showSlideout && (
+        {showSlideout && runId != null ? (
+          <ModuleSlideout
+            module={module}
+            runId={runId}
+            isSecondary={hasSecondary}
+            showSlideout={showSlideout}
+            onCloseClick={() => setShowSlideout(false)}
+          />
+        ) : (
           <ModuleSlideout
             module={module}
             isSecondary={hasSecondary}
@@ -260,6 +270,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             module={module as HeaterShakerModule}
             isExpanded={showTestShake}
             onCloseClick={() => setShowTestShake(false)}
+            runId={runId}
           />
         )}
         <Box padding={`${SPACING.spacing4} ${SPACING.spacing3}`} width="100%">
@@ -359,15 +370,19 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     fontWeight={FONT_WEIGHT_REGULAR}
                     fontSize={FONT_SIZE_CAPTION}
                     paddingBottom={SPACING.spacing2}
-                    data-testid={`ModuleCard_usb_port_${module.serialNumber}`}
+                    data-testid={`module_card_usb_port_${module.serialNumber}`}
                   >
+                    {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
+                    slotName != null
+                      ? t('deck_slot', { slot: slotName }) + ' - '
+                      : null}
                     {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
                       port: module.usbPort.hub ?? module.usbPort.port,
                     })}
                   </Text>
                   <Flex
                     paddingBottom={SPACING.spacing2}
-                    data-testid={`ModuleCrd_display_name_${module.serialNumber}`}
+                    data-testid={`ModuleCard_display_name_${module.serialNumber}`}
                     fontSize={TYPOGRAPHY.fontSizeP}
                   >
                     <ModuleIcon
@@ -405,7 +420,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             }}
           />
           {isOverflowBtnDisabled && (
-            <Tooltip {...tooltipProps} key={`tooltip_${module.serialNumber}`}>
+            <Tooltip {...tooltipProps}>
               {t('module_actions_unavailable')}
             </Tooltip>
           )}
@@ -418,6 +433,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             <ModuleOverflowMenu
               handleAboutClick={handleAboutClick}
               module={module}
+              runId={runId}
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}
               handleWizardClick={handleWizardClick}
@@ -431,18 +447,20 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
 interface ModuleSlideoutProps {
   module: AttachedModule
+  runId?: string
   isSecondary: boolean
   showSlideout: boolean
   onCloseClick: () => unknown
 }
 
 const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
-  const { module, isSecondary, showSlideout, onCloseClick } = props
+  const { module, runId, isSecondary, showSlideout, onCloseClick } = props
 
   if (module.moduleType === THERMOCYCLER_MODULE_TYPE) {
     return (
       <ThermocyclerModuleSlideout
         module={module}
+        runId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
         isSecondaryTemp={isSecondary}
@@ -452,6 +470,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
     return (
       <MagneticModuleSlideout
         module={module}
+        runId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
       />
@@ -460,6 +479,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
     return (
       <TemperatureModuleSlideout
         module={module}
+        runId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
       />
@@ -468,6 +488,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
     return (
       <HeaterShakerSlideout
         module={module}
+        runId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
         isSetShake={isSecondary}

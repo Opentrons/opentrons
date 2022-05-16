@@ -4,15 +4,17 @@ Contains routes dealing primarily with `Run` models.
 """
 import logging
 from datetime import datetime
+from textwrap import dedent
 from typing import Optional, Union
 from typing_extensions import Literal
 
 from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel, Field
 
+from opentrons.protocol_engine import EngineStatus
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
-from robot_server.service.task_runner import TaskRunner
+from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
@@ -30,10 +32,11 @@ from robot_server.protocols import (
     get_protocol_store,
 )
 
+from ..run_auto_deleter import RunAutoDeleter
 from ..run_store import RunStore, RunResource, RunNotFoundError
-from ..run_models import Run, RunSummary, RunCreate, RunUpdate
-from ..engine_store import EngineStore, EngineConflictError
-from ..dependencies import get_run_store, get_engine_store
+from ..run_models import Run, RunCreate, RunUpdate
+from ..engine_store import EngineStore, EngineConflictError, EngineMissingError
+from ..dependencies import get_run_auto_deleter, get_run_store, get_engine_store
 
 
 log = logging.getLogger(__name__)
@@ -117,7 +120,14 @@ async def get_run_data_from_url(
 @base_router.post(  # noqa: C901
     path="/runs",
     summary="Create a run",
-    description="Create a new run to track robot interaction.",
+    description=dedent(
+        """
+        Create a new run to track robot interaction.
+
+        When too many runs already exist, old ones will be automatically deleted
+        to make room for the new one.
+        """
+    ),
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
@@ -132,7 +142,8 @@ async def create_run(
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     run_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
-    task_runner: TaskRunner = Depends(TaskRunner),
+    task_runner: TaskRunner = Depends(get_task_runner),
+    run_auto_deleter: RunAutoDeleter = Depends(get_run_auto_deleter),
 ) -> PydanticResponse[SimpleBody[Run]]:
     """Create a new run.
 
@@ -144,6 +155,8 @@ async def create_run(
         run_id: Generated ID to assign to the run.
         created_at: Timestamp to attach to created run.
         task_runner: Background task runner.
+        run_auto_deleter: An interface to delete old resources to make room for
+            the new run.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
     protocol_resource = None
@@ -165,6 +178,8 @@ async def create_run(
 
     if protocol_resource is not None:
         engine_store.runner.load(protocol_resource.source)
+
+    run_auto_deleter.make_room_for_new_run()
 
     run = RunResource(
         run_id=run_id,
@@ -204,13 +219,13 @@ async def create_run(
     summary="Get all runs",
     description="Get a list of all active and inactive runs.",
     responses={
-        status.HTTP_200_OK: {"model": MultiBody[RunSummary, AllRunsLinks]},
+        status.HTTP_200_OK: {"model": MultiBody[Run, AllRunsLinks]},
     },
 )
 async def get_runs(
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-) -> PydanticResponse[MultiBody[RunSummary, AllRunsLinks]]:
+) -> PydanticResponse[MultiBody[Run, AllRunsLinks]]:
     """Get all runs.
 
     Args:
@@ -222,13 +237,37 @@ async def get_runs(
 
     for run in run_store.get_all():
         run_id = run.run_id
-        engine_state = engine_store.get_state(run_id)
-        run_data = RunSummary.construct(
-            id=run_id,
+
+        # TODO(mc, 2022-05-06): remove this temporary try/except
+        # once run data persistence lands. This prevents 500 errors
+        # due to mismatch between SQL-backed `RunStore` and in-memory
+        # dictionary backed `EngineStore`.
+        # https://github.com/Opentrons/opentrons/pull/10187
+        try:
+            engine_state = engine_store.get_state(run_id)
+            errors = engine_state.commands.get_all_errors()
+            pipettes = engine_state.pipettes.get_all()
+            labware = engine_state.labware.get_all()
+            labwareOffsets = engine_state.labware.get_labware_offsets()
+            run_status = engine_state.commands.get_status()
+        except EngineMissingError:
+            errors = []
+            pipettes = []
+            labware = []
+            labwareOffsets = []
+            run_status = EngineStatus.STOPPED
+
+        run_data = Run.construct(
+            id=run.run_id,
             protocolId=run.protocol_id,
             createdAt=run.created_at,
             current=run.is_current,
-            status=engine_state.commands.get_status(),
+            actions=run.actions,
+            errors=errors,
+            pipettes=pipettes,
+            labware=labware,
+            labwareOffsets=labwareOffsets,
+            status=run_status,
         )
 
         data.append(run_data)

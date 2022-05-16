@@ -15,7 +15,7 @@ import {
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
-// import { SecondaryButton } from '../../../atoms/Buttons'
+// import { SecondaryButton } from '../../../atoms/buttons'
 import {
   fetchStatus,
   fetchWifiList,

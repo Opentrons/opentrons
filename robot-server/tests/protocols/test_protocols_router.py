@@ -22,6 +22,7 @@ from robot_server.service.json_api import SimpleEmptyBody, MultiBodyMeta
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols.analysis_store import AnalysisStore, AnalysisNotFoundError
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
+from robot_server.protocols.protocol_auto_deleter import ProtocolAutoDeleter
 from robot_server.protocols.analysis_models import (
     AnalysisStatus,
     AnalysisSummary,
@@ -80,6 +81,12 @@ def protocol_analyzer(decoy: Decoy) -> ProtocolAnalyzer:
 def task_runner(decoy: Decoy) -> TaskRunner:
     """Get a mocked out TaskRunner."""
     return decoy.mock(cls=TaskRunner)
+
+
+@pytest.fixture
+def protocol_auto_deleter(decoy: Decoy) -> ProtocolAutoDeleter:
+    """Get a mocked out AutoDeleter."""
+    return decoy.mock(cls=ProtocolAutoDeleter)
 
 
 async def test_get_protocols_no_protocols(
@@ -247,6 +254,7 @@ async def test_create_protocol(
     protocol_reader: ProtocolReader,
     protocol_analyzer: ProtocolAnalyzer,
     task_runner: TaskRunner,
+    protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should store an uploaded protocol file."""
     protocol_directory = Path("/dev/null")
@@ -299,6 +307,7 @@ async def test_create_protocol(
         protocol_reader=protocol_reader,
         protocol_analyzer=protocol_analyzer,
         task_runner=task_runner,
+        protocol_auto_deleter=protocol_auto_deleter,
         protocol_id="protocol-id",
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
@@ -316,6 +325,7 @@ async def test_create_protocol(
     assert result.status_code == 201
 
     decoy.verify(
+        protocol_auto_deleter.make_room_for_new_protocol(),
         protocol_store.insert(protocol_resource),
         task_runner.run(
             protocol_analyzer.analyze,
@@ -395,7 +405,9 @@ async def test_get_protocol_analyses(
     )
 
     decoy.when(protocol_store.has("protocol-id")).then_return(True)
-    decoy.when(analysis_store.get_by_protocol("protocol-id")).then_return([analysis])
+    decoy.when(await analysis_store.get_by_protocol("protocol-id")).then_return(
+        [analysis]
+    )
 
     result = await get_protocol_analyses(
         protocolId="protocol-id",
@@ -435,7 +447,7 @@ async def test_get_protocol_analysis_by_id(
     analysis = PendingAnalysis(id="analysis-id")
 
     decoy.when(protocol_store.has("protocol-id")).then_return(True)
-    decoy.when(analysis_store.get("analysis-id")).then_return(analysis)
+    decoy.when(await analysis_store.get("analysis-id")).then_return(analysis)
 
     result = await get_protocol_analysis_by_id(
         protocolId="protocol-id",
@@ -475,7 +487,7 @@ async def test_get_protocol_analysis_by_id_analysis_not_found(
 ) -> None:
     """It should get a single full analysis by ID."""
     decoy.when(protocol_store.has("protocol-id")).then_return(True)
-    decoy.when(analysis_store.get("analysis-id")).then_raise(
+    decoy.when(await analysis_store.get("analysis-id")).then_raise(
         AnalysisNotFoundError("oh no")
     )
 

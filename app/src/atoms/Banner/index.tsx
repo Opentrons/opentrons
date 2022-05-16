@@ -99,6 +99,7 @@ export function Banner(props: BannerProps): JSX.Element {
       </Flex>
       {props.onCloseClick && (
         <Btn
+          data-testid="Banner_close-button"
           onClick={props.onCloseClick}
           width={SPACING.spacing5}
           height={SPACING.spacing5}

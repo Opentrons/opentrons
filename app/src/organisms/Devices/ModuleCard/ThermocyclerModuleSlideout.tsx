@@ -8,7 +8,10 @@ import {
   TEMP_BLOCK_MAX,
   TEMP_MIN,
 } from '@opentrons/shared-data'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  useCreateCommandMutation,
+  useCreateLiveCommandMutation,
+} from '@opentrons/react-api-client'
 import { Slideout } from '../../../atoms/Slideout'
 import { InputField } from '../../../atoms/InputField'
 import {
@@ -20,7 +23,7 @@ import {
   Text,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 
 import type { ThermocyclerModule } from '../../../redux/modules/types'
 import type {
@@ -33,15 +36,17 @@ interface ThermocyclerModuleSlideoutProps {
   onCloseClick: () => unknown
   isExpanded: boolean
   isSecondaryTemp?: boolean
+  runId?: string
 }
 
 export const ThermocyclerModuleSlideout = (
   props: ThermocyclerModuleSlideoutProps
 ): JSX.Element | null => {
-  const { module, onCloseClick, isExpanded, isSecondaryTemp } = props
+  const { module, onCloseClick, isExpanded, isSecondaryTemp, runId } = props
   const { t } = useTranslation('device_details')
   const [tempValue, setTempValue] = React.useState<string | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { createCommand } = useCreateCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
   const tempRanges = getTCTempRange(isSecondaryTemp)
@@ -78,15 +83,28 @@ export const ThermocyclerModuleSlideout = (
           //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
         },
       }
-      createLiveCommand({
-        command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${
-            saveLidCommand.commandType ?? saveBlockCommand.commandType
-          }: ${e.message}`
-        )
-      })
+      if (runId != null) {
+        createCommand({
+          runId: runId,
+          command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${
+              saveLidCommand.commandType ?? saveBlockCommand.commandType
+            } and run id ${runId}: ${e.message}`
+          )
+        })
+      } else {
+        createLiveCommand({
+          command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${
+              saveLidCommand.commandType ?? saveBlockCommand.commandType
+            }: ${e.message}`
+          )
+        })
+      }
     }
     setTempValue(null)
   }
@@ -103,7 +121,7 @@ export const ThermocyclerModuleSlideout = (
           width="100%"
           data-testid={`ThermocyclerSlideout_btn_${module.serialNumber}`}
         >
-          {t('set_tc_temp_slideout', { part: modulePart })}
+          {t('confirm')}
         </PrimaryButton>
       }
     >
@@ -125,12 +143,12 @@ export const ThermocyclerModuleSlideout = (
         data-testid={`ThermocyclerSlideout_input_field_${module.serialNumber}`}
       >
         <Text
-          fontWeight={FONT_WEIGHT_REGULAR}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.darkGrey}
-          marginBottom={SPACING.spacing1}
+          paddingBottom={SPACING.spacing3}
         >
-          {t('temperature')}
+          {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}
         </Text>
         <InputField
           data-testid={`${module.moduleModel}_${isSecondaryTemp}`}

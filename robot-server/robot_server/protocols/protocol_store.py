@@ -11,7 +11,13 @@ from anyio import Path as AsyncPath, create_task_group
 import sqlalchemy
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
-from robot_server.persistence import protocol_table, ensure_utc_datetime
+from robot_server.persistence import (
+    analysis_table,
+    protocol_table,
+    run_table,
+    sqlite_rowid,
+    ensure_utc_datetime,
+)
 
 
 _log = getLogger(__name__)
@@ -25,6 +31,23 @@ class ProtocolResource:
     created_at: datetime
     source: ProtocolSource
     protocol_key: Optional[str]
+
+
+@dataclass(frozen=True)
+class ProtocolUsageInfo:
+    """Information about whether a particular protocol is being used by any runs.
+
+    See `ProtocolStore.get_usage_info()`.
+    """
+
+    protocol_id: str
+    """This protocol's ID."""
+
+    is_used_by_run: bool
+    """Whether any currently existing run uses this protocol.
+
+    A protocol counts as "used" even if the run that uses it is no longer active.
+    """
 
 
 class ProtocolNotFoundError(KeyError):
@@ -203,6 +226,41 @@ class ProtocolStore:
             source=deleted_source,
         )
 
+    def get_usage_info(self) -> List[ProtocolUsageInfo]:
+        """Return information about which protocols are currently being used by runs.
+
+        See the `runs` module for information about runs.
+
+        Results are ordered with the oldest-added protocol first.
+        """
+        select_all_protocol_ids = sqlalchemy.select(protocol_table.c.id).order_by(
+            sqlite_rowid
+        )
+        select_used_protocol_ids = sqlalchemy.select(run_table.c.protocol_id).where(
+            run_table.c.protocol_id.is_not(None)
+        )
+
+        with self._sql_engine.begin() as transaction:
+            all_protocol_ids: List[str] = (
+                transaction.execute(select_all_protocol_ids).scalars().all()
+            )
+            used_protocol_ids: Set[str] = set(
+                transaction.execute(select_used_protocol_ids).scalars().all()
+            )
+
+        # It's probably inefficient to do this processing in Python
+        # instead of as part of the SQL query.
+        # But the number of runs and protocols is on the order of 20, so it's fine.
+        usage_info = [
+            ProtocolUsageInfo(
+                protocol_id=protocol_id,
+                is_used_by_run=(protocol_id in used_protocol_ids),
+            )
+            for protocol_id in all_protocol_ids
+        ]
+
+        return usage_info
+
     def _sql_insert(self, resource: _DBProtocolResource) -> None:
         statement = sqlalchemy.insert(protocol_table).values(
             _convert_dataclass_to_sql_values(resource=resource)
@@ -237,7 +295,10 @@ class ProtocolStore:
         select_statement = sqlalchemy.select(protocol_table).where(
             protocol_table.c.id == protocol_id
         )
-        delete_statement = sqlalchemy.delete(protocol_table).where(
+        delete_analyses_statement = sqlalchemy.delete(analysis_table).where(
+            analysis_table.c.protocol_id == protocol_id
+        )
+        delete_protocol_statement = sqlalchemy.delete(protocol_table).where(
             protocol_table.c.id == protocol_id
         )
         with self._sql_engine.begin() as transaction:
@@ -247,7 +308,19 @@ class ProtocolStore:
                 row_to_delete = transaction.execute(select_statement).one()
             except sqlalchemy.exc.NoResultFound as e:
                 raise ProtocolNotFoundError(protocol_id=protocol_id) from e
-            transaction.execute(delete_statement)
+
+            # TODO(mm, 2022-04-28): Deleting analyses from the table is enough to
+            # avoid a SQL foreign key conflict. But, if this protocol had any *pending*
+            # analyses, they'll be left behind in the AnalysisStore, orphaned,
+            # since they're stored independently of this SQL table.
+            #
+            # To fix this, we'll need to either:
+            #
+            # * Merge the Store classes or otherwise give them access to each other.
+            # * Switch from SQLAlchemy Core to ORM and use cascade deletes.
+            transaction.execute(delete_analyses_statement)
+
+            transaction.execute(delete_protocol_statement)
 
         deleted_resource = _convert_sql_row_to_dataclass(sql_row=row_to_delete)
         return deleted_resource

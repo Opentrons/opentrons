@@ -7,7 +7,7 @@ import { disengageMagnet } from '../commandCreators/atomic/disengageMagnet'
 import { InvariantContext, RobotState } from '../types'
 const moduleId = 'magneticModuleId'
 const commandCreatorFnName = 'disengageMagnet'
-describe('engageMagnet', () => {
+describe('disengageMagnet', () => {
   let invariantContext: InvariantContext
   let robotState: RobotState
   beforeEach(() => {
@@ -26,7 +26,7 @@ describe('engageMagnet', () => {
       },
     }
   })
-  it('creates engage magnet command', () => {
+  it('creates disengage magnet command', () => {
     const module = moduleId
     const result = disengageMagnet(
       {
@@ -39,7 +39,7 @@ describe('engageMagnet', () => {
     expect(result).toEqual({
       commands: [
         {
-          commandType: 'magneticModule/disengageMagnet',
+          commandType: 'magneticModule/disengage',
           params: {
             moduleId: module,
           },
