@@ -5,10 +5,12 @@ import type { Protocol } from './types'
 
 export function createProtocol(
   config: HostConfig,
-  files: File[]
+  files: File[],
+  protocolKey?: string
 ): ResponsePromise<Protocol> {
   const formData = new FormData()
   files.forEach(file => formData.append('files', file, file.name))
+  if (protocolKey != null) formData.append('key', protocolKey)
 
   return request<Protocol, FormData>(POST, '/protocols', formData, config)
 }
