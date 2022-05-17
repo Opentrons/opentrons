@@ -16,19 +16,25 @@ from opentrons_shared_data.pipette.dev_types import (
 from opentrons.drivers.types import MoveSplit
 from opentrons.types import Mount
 from opentrons.config.pipette_config import PipetteConfig
+from opentrons.config.gripper_config import GripperConfig
 
 
-class InstrumentSpec(TypedDict):
+class PipetteSpec(TypedDict):
     model: Union[PipetteModel, None]
     id: Optional[str]
 
 
-class AttachedInstrument(TypedDict):
+class AttachedPipette(TypedDict):
     config: Optional[PipetteConfig]
     id: Optional[str]
 
 
-AttachedInstruments = Dict[Mount, AttachedInstrument]
+class AttachedGripper(TypedDict):
+    config: Optional[GripperConfig]
+    id: Optional[str]
+
+
+AttachedInstruments = Dict[Mount, AttachedPipette]
 
 
 EIGHT_CHANNELS = Literal[8]
