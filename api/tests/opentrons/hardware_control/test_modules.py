@@ -167,7 +167,7 @@ async def mod_thermocycler():
 
 
 async def test_module_update_integration(
-    monkeypatch, mod_tempdeck, mod_magdeck, mod_thermocycler
+    monkeypatch, mod_tempdeck, mod_magdeck, mod_thermocycler, mod_heatershaker
 ):
     from opentrons.hardware_control import modules
 
@@ -189,7 +189,7 @@ async def test_module_update_integration(
     )
     monkeypatch.setattr(modules.update, "upload_via_avrdude", upload_via_avrdude_mock)
 
-    async def mock_find_avrdude_bootloader_port(stm32_module: bool):
+    async def mock_find_avrdude_bootloader_port():
         return "ot_module_avrdude_bootloader1"
 
     monkeypatch.setattr(
@@ -215,7 +215,7 @@ async def test_module_update_integration(
     )
     monkeypatch.setattr(modules.update, "upload_via_bossa", upload_via_bossa_mock)
 
-    async def mock_find_bossa_bootloader_port(stm32_module: bool):
+    async def mock_find_bossa_bootloader_port():
         return "ot_module_bossa_bootloader1"
 
     monkeypatch.setattr(
@@ -225,6 +225,24 @@ async def test_module_update_integration(
     await modules.update_firmware(mod_thermocycler, "fake_fw_file_path", loop)
     upload_via_bossa_mock.assert_called_once_with(
         "ot_module_bossa_bootloader1", "fake_fw_file_path", bootloader_kwargs
+    )
+
+    # test heater-shaker module update with dfu bootloader
+    upload_via_dfu_mock = mock.Mock(
+        return_value=(async_return((True, "dfu bootloader worked")))
+    )
+    monkeypatch.setattr(modules.update, "upload_via_dfu", upload_via_dfu_mock)
+
+    async def mock_find_dfu_bootloader_port():
+        return "ot_module_dfu_bootloader1"
+
+    monkeypatch.setattr(
+        modules.update, "find_bootloader_port", mock_find_dfu_bootloader_port
+    )
+
+    await modules.update_firmware(mod_heatershaker, "fake_fw_file_path", loop)
+    upload_via_dfu_mock.assert_called_once_with(
+        "ot_module_dfu_bootloader1", "fake_fw_file_path", bootloader_kwargs
     )
 
 

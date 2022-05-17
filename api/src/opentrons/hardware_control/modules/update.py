@@ -31,7 +31,7 @@ async def update_firmware(
         raise UpdateError(res)
 
 
-async def find_bootloader_port(stm32_module: bool) -> str:
+async def find_bootloader_port() -> str:
     """
     Finds the port of an Opentrons Module that has entered its bootloader.
     The bootloader port shows up as 'ot_module_(avrdude|samba)_bootloader'
@@ -39,10 +39,7 @@ async def find_bootloader_port(stm32_module: bool) -> str:
     """
 
     for attempt in range(3):
-        if stm32_module:
-            bootloader_ports = glob("/dev/STM32*BOOTLOADER*")
-        else:
-            bootloader_ports = glob("/dev/ot_module_*_bootloader*")
+        bootloader_ports = glob("/dev/ot_module_*_bootloader*")
         if bootloader_ports:
             if len(bootloader_ports) == 1:
                 log.info(f"Found bootloader at port {bootloader_ports[0]}")
@@ -146,12 +143,10 @@ async def upload_via_bossa(
 async def upload_via_dfu(
     port: str, firmware_file_path: str, kwargs: Dict[str, Any]
 ) -> Tuple[bool, str]:
-    """Run firmware upload command for heater/shaker.
+    """Run firmware upload command for DFU.
 
     Returns tuple of success boolean and message from bootloader
     """
-    # dfu-util -a 0 -s 0x08000000:leave --dfuse-address 0x08000000
-    #   -D /path/to/heater-shaker-v0.4.3.bin -R
 
     dfu_args = [
         "dfu-util",
@@ -163,13 +158,12 @@ async def upload_via_dfu(
     ]
 
     proc = await asyncio.create_subprocess_exec(*dfu_args, **kwargs)
+    return_code = proc.returncode()
     stdout, stderr = await proc.communicate()
     res = stdout.decode()
-    if "File downloaded successfully" in res:
+    if return_code == 0:
         log.debug(res)
         return True, res
-    elif stderr:
-        log.error(f"Failed to update module firmware for {port}: {res}")
-        log.error(f"Error given: {stderr.decode()}")
+    else:
+        log.error(f"Failed to update module firmware for {port}: {res}. Error given: {stderr.decode()}")
         return False, res
-    return False, ""
