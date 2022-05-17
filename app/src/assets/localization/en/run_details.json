@@ -95,5 +95,6 @@
   "slot": "Slot {{slotName}}",
   "no_offsets_available": "No Labware Offset data available",
   "data_out_of_date": "This data is likely out of date",
-  "robot_was_recalibrated": "This robot was recalibrated after this Labware Offset data was stored."
+  "robot_was_recalibrated": "This robot was recalibrated after this Labware Offset data was stored.",
+  "not_available_for_a_completed_run": "not available for a completed run"
 }
