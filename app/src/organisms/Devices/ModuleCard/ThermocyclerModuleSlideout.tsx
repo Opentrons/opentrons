@@ -27,7 +27,7 @@ import { PrimaryButton } from '../../../atoms/buttons'
 
 import type { ThermocyclerModule } from '../../../redux/modules/types'
 import type {
-  TCSetTargetBlockTemperatureCreateCommand,
+  TCSetAndWaitForBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
@@ -72,15 +72,14 @@ export const ThermocyclerModuleSlideout = (
         commandType: 'thermocycler/setTargetLidTemperature',
         params: {
           moduleId: module.id,
-          // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10178 merges
-          temperature: parseInt(tempValue),
+          celsius: parseInt(tempValue),
         },
       }
-      const saveBlockCommand: TCSetTargetBlockTemperatureCreateCommand = {
-        commandType: 'thermocycler/setTargetBlockTemperature',
+      const saveBlockCommand: TCSetAndWaitForBlockTemperatureCreateCommand = {
+        commandType: 'thermocycler/setAndWaitForBlockTemperature',
         params: {
           moduleId: module.id,
-          temperature: parseInt(tempValue),
+          celsius: parseInt(tempValue),
           //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
         },
       }

@@ -1,7 +1,6 @@
 import type { TemperatureParams } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { CommandCreator } from '../../types'
-// @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10178 merges
-export const thermocyclerAwaitBlockTemperature: CommandCreator<TemperatureParams> = (
+export const thermocyclerWaitForBlockTemperature: CommandCreator<TemperatureParams> = (
   args,
   invariantContext,
   prevRobotState
@@ -9,10 +8,10 @@ export const thermocyclerAwaitBlockTemperature: CommandCreator<TemperatureParams
   return {
     commands: [
       {
-        commandType: 'thermocycler/awaitBlockTemperature',
+        commandType: 'thermocycler/waitForBlockTemperature',
         params: {
           moduleId: args.module,
-          temperature: args.temperature,
+          celsius: args.temperature,
         },
       },
     ],
