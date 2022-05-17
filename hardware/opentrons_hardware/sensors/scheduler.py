@@ -4,7 +4,10 @@ import logging
 
 from typing import Optional
 
-from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings.constants import (
+    SensorType,
+    NodeId,
+)
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     WaitableCallback,
@@ -12,14 +15,17 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
 
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ReadFromSensorRequest,
+    PeripheralStatusRequest,
     SetSensorThresholdRequest,
     WriteToSensorRequest,
     BaselineSensorRequest,
     SensorThresholdResponse,
     ReadFromSensorResponse,
+    PeripheralStatusResponse,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     ReadFromSensorRequestPayload,
+    PeripheralStatusRequestPayload,
     SetSensorThresholdRequestPayload,
     WriteToSensorRequestPayload,
     BaselineSensorRequestPayload,
@@ -169,3 +175,44 @@ class SensorScheduler:
                 elif isinstance(response, SensorThresholdResponse):
                     return SensorDataType.build(response.payload.threshold)
         return None
+
+    @staticmethod
+    async def _read_peripheral_response(
+        node_id: NodeId,
+        reader: WaitableCallback,
+    ) -> bool:
+        """Waits for and sends back PeripheralStatusResponse."""
+        async for response, arbitration_id in reader:
+            if arbitration_id.parts.originating_node_id == node_id:
+                if isinstance(response, PeripheralStatusResponse):
+                    return bool(response.payload.status)
+        return False
+
+    async def request_peripheral_status(
+        self,
+        sensor: SensorType,
+        node_id: NodeId,
+        can_messenger: CanMessenger,
+        timeout: int,
+    ) -> bool:
+        """Send threshold message."""
+        with WaitableCallback(can_messenger) as reader:
+            status = False
+            await can_messenger.send(
+                node_id=node_id,
+                message=PeripheralStatusRequest(
+                    payload=PeripheralStatusRequestPayload(
+                        sensor=SensorTypeField(sensor),
+                    )
+                ),
+            )
+
+            try:
+                response = asyncio.wait_for(
+                    self._read_peripheral_response(node_id, reader), timeout
+                )
+                status = await response
+            except asyncio.TimeoutError:
+                log.warning("Sensor Read timed out")
+            finally:
+                return status
