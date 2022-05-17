@@ -158,7 +158,7 @@ async def upload_via_dfu(
     ]
 
     proc = await asyncio.create_subprocess_exec(*dfu_args, **kwargs)
-    return_code = proc.returncode()
+    return_code = proc.returncode
     stdout, stderr = await proc.communicate()
     res = stdout.decode()
     if return_code == 0:
@@ -166,6 +166,7 @@ async def upload_via_dfu(
         return True, res
     else:
         log.error(
-            f"Failed to update module firmware for {port}: {res}. Error given: {stderr.decode()}"
+            f"Failed to update module firmware for {port}: {res}."
+            " Error given: {stderr.decode()}"
         )
         return False, res
