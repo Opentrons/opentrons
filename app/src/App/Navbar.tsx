@@ -128,10 +128,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         alignSelf={ALIGN_STRETCH}
         justifyContent={JUSTIFY_SPACE_EVENLY}
       >
-        <NavIconLink
-          data-testid="Navbar_settingsLink"
-          to="/app-settings/general"
-        >
+        <NavIconLink data-testid="Navbar_settingsLink" to="/app-settings">
           <NavbarIcon name="gear" />
         </NavIconLink>
         <IconLink href={SALESFORCE_HELP_LINK} external>
