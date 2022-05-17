@@ -22,7 +22,6 @@ def _make_dummy_run_resource(run_id: str) -> RunResource:
         protocol_id=None,
         created_at=datetime.min,
         actions=[],
-        is_current=False,
     )
 
 

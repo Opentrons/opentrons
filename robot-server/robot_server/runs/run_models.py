@@ -20,7 +20,7 @@ from .action_models import RunAction
 
 # TODO(mc, 2022-02-01): since the `/runs/:run_id/commands` response is now paginated,
 # this summary model is a lot less useful. Remove and replace with full `Command`
-# models once problematially large objects like full labware and module definitions
+# models once problematically large objects like full labware and module definitions
 # are no longer part of the public command.result API
 class RunCommandSummary(ResourceModel):
     """A stripped down model of a full Command for usage in a Run response."""

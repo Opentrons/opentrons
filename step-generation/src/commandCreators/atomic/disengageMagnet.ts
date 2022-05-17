@@ -10,7 +10,7 @@ export const disengageMagnet: CommandCreator<DisengageMagnetArgs> = (
   prevRobotState
 ) => {
   const { module: moduleId } = args
-  const commandType = 'magneticModule/disengageMagnet'
+  const commandType = 'magneticModule/disengage'
 
   if (module === null) {
     return {

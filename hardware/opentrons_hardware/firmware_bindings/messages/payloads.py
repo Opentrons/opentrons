@@ -421,3 +421,18 @@ class TipActionResponsePayload(MoveGroupResponsePayload):
     """A response that sends back whether tip action was successful."""
 
     success: utils.UInt8Field
+
+
+@dataclass
+class PeripheralStatusRequestPayload(utils.BinarySerializable):
+    """A request to get the initialization status of a peripheral device."""
+
+    sensor: SensorTypeField
+
+
+@dataclass
+class PeripheralStatusResponsePayload(utils.BinarySerializable):
+    """A response that sends back the initialization status of a peripheral device."""
+
+    sensor: SensorTypeField
+    status: utils.UInt8Field

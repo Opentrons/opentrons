@@ -1,12 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Box,
-  Flex,
-  JUSTIFY_FLEX_END,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { Box, Flex, JUSTIFY_FLEX_END, SPACING } from '@opentrons/components'
 
 import { Modal } from '../../atoms/Modal'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
@@ -37,7 +31,6 @@ export function PreviousVersionModal(
         <ExternalLink
           href={UNINSTALL_APP_URL}
           paddingBottom={SPACING.spacing3}
-          css={TYPOGRAPHY.linkPSemibold}
           id="PreviousVersionModal_uninstallingAppLink"
         >
           {t('learn_uninstalling')}
@@ -45,7 +38,6 @@ export function PreviousVersionModal(
         <br />
         <ExternalLink
           href={PREVIOUS_RELEASES_URL}
-          css={TYPOGRAPHY.linkPSemibold}
           id="PreviousVersionModal_previousReleases"
         >
           {t('previous_releases')}

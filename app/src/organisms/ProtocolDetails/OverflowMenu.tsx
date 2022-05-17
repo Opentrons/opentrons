@@ -78,7 +78,7 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
               <Divider />
               <MenuItem>
                 <ExternalLink
-                  css={TYPOGRAPHY.linkPSemibold}
+                  css={TYPOGRAPHY.linkPSemiBold}
                   href={'https://designer.opentrons.com/'}
                   id="Overflowmenu_protocol_designer"
                 >

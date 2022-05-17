@@ -10,11 +10,10 @@ from tests.conftest import MockCanMessageNotifier
 
 from opentrons_hardware.sensors import fdc1004, hdc2080, mmr920C04, sensor_abc
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
-from opentrons_hardware.firmware_bindings.constants import (
-    SensorType,
-    NodeId,
+from opentrons_hardware.firmware_bindings.constants import SensorType, NodeId
+from opentrons_hardware.drivers.can_bus.can_messenger import (
+    CanMessenger,
 )
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
     UInt16Field,
@@ -30,6 +29,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ReadFromSensorResponse,
     SensorThresholdResponse,
     BindSensorOutputRequest,
+    PeripheralStatusRequest,
+    PeripheralStatusResponse,
 )
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
@@ -39,6 +40,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     ReadFromSensorResponsePayload,
     SensorThresholdResponsePayload,
     BindSensorOutputRequestPayload,
+    PeripheralStatusResponsePayload,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorTypeField,
@@ -381,10 +383,10 @@ async def test_bind_to_sync(
 
 
 @pytest.mark.parametrize(
-    argnames=["sensor", "node_id", "sample_rate", "timeout"],
+    argnames=["sensor", "node_id", "timeout"],
     argvalues=[
-        [lazy_fixture("capacitive_sensor"), NodeId.pipette_right, 1000, 10],
-        [lazy_fixture("pressure_sensor"), NodeId.pipette_left, 2000, 2],
+        [lazy_fixture("capacitive_sensor"), NodeId.pipette_right, 10],
+        [lazy_fixture("pressure_sensor"), NodeId.pipette_left, 2],
     ],
 )
 async def test_get_baseline(
@@ -392,7 +394,6 @@ async def test_get_baseline(
     can_message_notifier: MockCanMessageNotifier,
     sensor: sensor_abc.AbstractAdvancedSensor,
     node_id: NodeId,
-    sample_rate: int,
     timeout: int,
 ) -> None:
     """Test for get_baseline.
@@ -436,7 +437,6 @@ async def test_get_baseline(
 )
 async def test_debug_poll(
     mock_messenger: mock.AsyncMock,
-    can_message_notifier: MockCanMessageNotifier,
     sensor: sensor_abc.AbstractAdvancedSensor,
     node_id: NodeId,
     timeout: int,
@@ -461,3 +461,46 @@ async def test_debug_poll(
             )
         ),
     )
+
+
+@pytest.mark.parametrize(
+    argnames=["sensor", "node_id", "timeout"],
+    argvalues=[
+        [lazy_fixture("capacitive_sensor"), NodeId.pipette_left, 2],
+        [lazy_fixture("pressure_sensor"), NodeId.pipette_right, 3],
+        [lazy_fixture("temperature_sensor"), NodeId.pipette_left, 2],
+        [lazy_fixture("humidity_sensor"), NodeId.pipette_right, 2],
+    ],
+)
+async def test_peripheral_status(
+    mock_messenger: mock.AsyncMock,
+    can_message_notifier: MockCanMessageNotifier,
+    sensor: sensor_abc.AbstractAdvancedSensor,
+    node_id: NodeId,
+    timeout: int,
+) -> None:
+    """Test for getting peripheral device status."""
+
+    def responder(node_id: NodeId, message: MessageDefinition) -> None:
+        """Message responder."""
+        if isinstance(message, PeripheralStatusRequest):
+            can_message_notifier.notify(
+                PeripheralStatusResponse(
+                    payload=PeripheralStatusResponsePayload(
+                        sensor=SensorTypeField(sensor._sensor_type),
+                        status=UInt8Field(0x1),
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=ReadFromSensorResponse.message_id,
+                        node_id=node_id,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
+
+    mock_messenger.send.side_effect = responder
+    status = await sensor.get_device_status(mock_messenger, node_id, timeout)
+    assert status

@@ -35,3 +35,14 @@ class EnvironmentSensor(AbstractBasicSensor):
         """Write to a register of the environment sensor."""
         write = WriteSensorInformation(self._sensor_type, node_id, data)
         await self._scheduler.send_write(write, can_messenger)
+
+    async def get_device_status(
+        self,
+        can_messenger: CanMessenger,
+        node_id: NodeId,
+        timeout: int = 1,
+    ) -> bool:
+        """Send a PeripheralStatusRequest and read the response message."""
+        return await self._scheduler.request_peripheral_status(
+            self._sensor_type, node_id, can_messenger, timeout
+        )

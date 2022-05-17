@@ -134,6 +134,8 @@ class MessageId(int, Enum):
     sensor_diagnostic_response = 0x89
     bind_sensor_output_request = 0x8A
     bind_sensor_output_response = 0x8B
+    peripheral_status_request = 0x8C
+    peripheral_status_response = 0x8D
 
 
 @unique

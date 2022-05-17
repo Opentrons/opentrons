@@ -537,12 +537,12 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["magneticModule/engageMagnet"]
+                "enum": ["magneticModule/engage"]
               },
               "params": {
-                "required": ["moduleId", "engageHeight"],
+                "required": ["moduleId", "height"],
                 "properties": {
-                  "engageHeight": {
+                  "height": {
                     "description": "How high, in millimeters, to raise the magnets.\n\nZero means the tops of the magnets are level with the ledge that the labware rests on. This will be slightly above the magnets' minimum height, the hardware home position. Negative values are allowed, to put the magnets below the ledge.\n\nUnits are always true millimeters. This is unlike certain labware definitions, engage commands in the Python Protocol API, and engage commands in older versions of the JSON protocol schema. Take care to convert properly.",
                     "type": "number"
                   },
@@ -562,7 +562,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["magneticModule/disengageMagnet"]
+                "enum": ["magneticModule/disengage"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -580,33 +580,35 @@
                 "enum": ["temperatureModule/setTargetTemperature"]
               },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Temperature Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" }
+                  "celsius": { "type": "number" }
                 }
               }
             }
           },
 
           {
-            "description": "Temperature Module Await Temperature: Delay protocol execution until the specified temperature is reached.",
+            "description": "Temperature Module Wait For Temperature: Delay protocol execution until the specified temperature is reached.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
-              "commandType": { "enum": ["temperatureModule/awaitTemperature"] },
+              "commandType": {
+                "enum": ["temperatureModule/waitForTemperature"]
+              },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Temperature Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" }
+                  "celsius": { "type": "number" }
                 }
               }
             }
@@ -626,22 +628,22 @@
           },
 
           {
-            "description": "Thermocycler Set Target Block Temperature: Well block will begin moving to the target temperature. This command is blocking, it delays protocol execution while approaching the target temperature.",
+            "description": "Thermocycler Set And Wait For Block Temperature: Well block will begin moving to the target temperature. This command is blocking, it delays protocol execution while approaching the target temperature.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["thermocycler/setTargetBlockTemperature"]
+                "enum": ["thermocycler/setAndWaitForBlockTemperature"]
               },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" },
+                  "celsius": { "type": "number" },
                   "volume": {
                     "type": "number"
                   }
@@ -660,13 +662,13 @@
                 "enum": ["thermocycler/setTargetLidTemperature"]
               },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" }
+                  "celsius": { "type": "number" }
                 }
               }
             }
@@ -678,15 +680,17 @@
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
-              "commandType": { "enum": ["thermocycler/awaitBlockTemperature"] },
+              "commandType": {
+                "enum": ["thermocycler/waitForBlockTemperature"]
+              },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" }
+                  "celsius": { "type": "number" }
                 }
               }
             }
@@ -698,15 +702,15 @@
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
-              "commandType": { "enum": ["thermocycler/awaitLidTemperature"] },
+              "commandType": { "enum": ["thermocycler/waitForLidTemperature"] },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" }
+                  "celsius": { "type": "number" }
                 }
               }
             }
