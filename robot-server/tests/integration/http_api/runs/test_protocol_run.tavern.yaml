@@ -1,0 +1,86 @@
+test_name: Upload and run a protocol.
+
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload simple, one comment protocol
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/simple.py'
+    response:
+      status_code: 201
+      save:
+        json:
+          protocol_id: data.id
+
+  - name: Create run from protocol
+    request:
+      url: '{host:s}:{port:d}/runs'
+      method: POST
+      json:
+        data:
+          protocolId: '{protocol_id}'
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      save:
+        json:
+          run_id: data.id
+      json:
+        data:
+          protocolId: '{protocol_id}'
+
+  - name: Run the protocol
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/actions'
+      method: POST
+      json:
+        data:
+          actionType: play
+    response:
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          actionType: play
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+
+  - name: Wait for the protocol to complete
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}'
+      method: GET
+    response:
+      strict:
+        - json:off
+      json:
+        data:
+          status: succeeded
+
+  - name: Verify commands were run
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      method: GET
+    response:
+      json:
+        links:
+          current: !anydict
+        meta:
+          cursor: 0
+          totalLength: 1
+        data:
+          - id: !anystr
+            key: !anystr
+            commandType: custom
+            status: succeeded
+            params:
+              legacyCommandType: 'command.COMMENT'
+              legacyCommandText: 'A single comment.'
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"

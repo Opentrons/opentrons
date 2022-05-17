@@ -47,7 +47,7 @@ stages:
           - id: '{protocol_id}'
             key: protocol_key
 
-  - name: Verify the key in GET /protocols/{id}
+  - name: Verify the key in GET /protocols/{protocol_id}
     request:
       url: '{host:s}:{port:d}/protocols/{protocol_id}'
       method: GET

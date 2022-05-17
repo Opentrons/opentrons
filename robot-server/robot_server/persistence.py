@@ -90,6 +90,14 @@ run_table = sqlalchemy.Table(
         sqlalchemy.ForeignKey("protocol.id"),
         nullable=True,
     ),
+    sqlalchemy.Column("protocol_run_data", sqlalchemy.PickleType, nullable=True),
+    sqlalchemy.Column("commands", sqlalchemy.PickleType, nullable=True),
+    sqlalchemy.Column("engine_status", sqlalchemy.String, nullable=True),
+    sqlalchemy.Column(
+        "_updated_at",
+        sqlalchemy.DateTime,
+        nullable=True,
+    ),
 )
 
 # TODO (tz: 4/8/22): add a column sequence_number for preserving the order of actions
