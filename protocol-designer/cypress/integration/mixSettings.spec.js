@@ -11,6 +11,12 @@ function importProtocol() {
       encoding: 'utf8',
     })
     cy.get('[data-test="ComputingSpinner"]').should('exist')
+    cy.get('div')
+      .contains(
+        'We have added new features since the last time this protocol was updated, but have not made any changes to existing protocol behavior'
+      )
+      .should('exist')
+    cy.get('button').contains('ok', { matchCase: false }).click()
     // wait until computation is done before proceeding, with generous timeout
     cy.get('[data-test="ComputingSpinner"]', { timeout: 30000 }).should(
       'not.exist'
@@ -308,14 +314,20 @@ describe('Advanced Settings for Mix Form', () => {
     cy.get('[data-test="StepItem_2"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
-    // Verify that trashId is selected
-    cy.get('[id=BlowoutLocationField_dropdown]').should('have.value', 'trashId')
+    // Verify that fixedTrash is selected
+    cy.get('[id=BlowoutLocationField_dropdown]').should(
+      'have.value',
+      'fixedTrash'
+    )
     // Click on step 3 to verify the batch editing
     cy.get('[data-test="StepItem_3"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
     // Verify that trash is selected for the blowout option
-    cy.get('[id=BlowoutLocationField_dropdown]').should('have.value', 'trashId')
+    cy.get('[id=BlowoutLocationField_dropdown]').should(
+      'have.value',
+      'fixedTrash'
+    )
   })
 
   it('verify well-order indeterminate state', () => {

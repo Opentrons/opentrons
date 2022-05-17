@@ -20,7 +20,7 @@ import {
 import attachHeaterShakerModule from '../../../assets/images/heater_shaker_module_diagram.svg'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import screwdriverOrientedLeft from '../../../assets/images/screwdriver_oriented_left.svg'
-import { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
+import { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 interface AttachModuleProps {
   moduleFromProtocol?: ProtocolModuleInfo
 }

@@ -3,11 +3,27 @@ import { i18n } from '../../../../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
 import { HeaterShakerBanner } from '../HeaterShakerBanner'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
-import {
-  mockApiHeaterShaker,
-  mockHeaterShaker,
-} from '../../../../../../redux/modules/__fixtures__'
+import { mockHeaterShaker } from '../../../../../../redux/modules/__fixtures__'
 import { ModuleRenderInfoForProtocol } from '../../../../../Devices/hooks'
+import { ModuleModel, ModuleType } from '@opentrons/shared-data'
+
+const mockHeaterShakerDefinition = {
+  moduleId: 'someHeaterShakerModule',
+  model: 'heaterShakerModuleV1' as ModuleModel,
+  type: 'heaterShakerModuleType' as ModuleType,
+  displayName: 'Heater Shaker Module',
+  labwareOffset: { x: 5, y: 5, z: 5 },
+  cornerOffsetFromSlot: { x: 1, y: 1, z: 1 },
+  dimensions: {
+    xDimension: 100,
+    yDimension: 100,
+    footprintXDimension: 50,
+    footprintYDimension: 50,
+    labwareInterfaceXDimension: 80,
+    labwareInterfaceYDimension: 120,
+  },
+  twoDimensionalRendering: { children: [] },
+}
 
 const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
   attachedModuleMatch: mockHeaterShaker,
@@ -15,7 +31,7 @@ const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
   x: 0,
   y: 0,
   z: 0,
-  moduleDef: mockApiHeaterShaker as any,
+  moduleDef: mockHeaterShakerDefinition as any,
   nestedLabwareDef: heaterShakerCommands.labwareDefinitions['example/plate/1'],
   nestedLabwareDisplayName: 'Source Plate',
   nestedLabwareId: null,
@@ -29,7 +45,7 @@ const HEATER_SHAKER_PROTOCOL_MODULE_INFO_2 = {
   x: 0,
   y: 0,
   z: 0,
-  moduleDef: mockApiHeaterShaker as any,
+  moduleDef: mockHeaterShakerDefinition as any,
   nestedLabwareDef: heaterShakerCommands.labwareDefinitions['example/plate/1'],
   nestedLabwareDisplayName: 'Source Plate',
   nestedLabwareId: null,
@@ -56,7 +72,7 @@ describe('HeaterShakerBanner', () => {
     const { getByText } = render(props)
     getByText('Attach HeaterShakerV1 to deck before proceeding to run')
     getByText(
-      'An improperly fastened Heater Shaker module can shake itself out of a deck slot.'
+      'An improperly fastened Heater-Shaker module can shake itself out of a deck slot.'
     )
   })
 
@@ -86,7 +102,7 @@ describe('HeaterShakerBanner', () => {
     }
 
     const { getByText } = render(props)
-    getByText('heatershaker in Slot 1')
-    getByText('heatershaker in Slot 3')
+    getByText('Heater Shaker Module in Slot 1')
+    getByText('Heater Shaker Module in Slot 3')
   })
 })

@@ -15,6 +15,7 @@ interface ModuleOverflowMenuProps {
   handleAboutClick: () => void
   handleTestShakeClick: () => void
   handleWizardClick: () => void
+  runId?: string
 }
 
 export const ModuleOverflowMenu = (
@@ -23,6 +24,7 @@ export const ModuleOverflowMenu = (
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const {
     module,
+    runId,
     handleSlideoutClick,
     handleAboutClick,
     handleTestShakeClick,
@@ -31,6 +33,7 @@ export const ModuleOverflowMenu = (
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { menuOverflowItemsByModuleType } = useModuleOverflowMenu(
     module,
+    runId,
     handleAboutClick,
     handleTestShakeClick,
     handleWizardClick,
@@ -43,26 +46,23 @@ export const ModuleOverflowMenu = (
         <MenuList
           buttons={[
             (menuOverflowItemsByModuleType[
-              module.type
+              module.moduleType
             ] as MenuItemsByModuleType[ModuleType]).map(
               (item: any, index: number) => {
                 return (
                   <>
                     <MenuItem
                       minWidth="10.6rem"
-                      key={`${index}_${module.model}`}
+                      key={`${index}_${module.moduleModel}`}
                       onClick={() => item.onClick(item.isSecondary)}
-                      data-testid={`module_setting_${module.model}`}
+                      data-testid={`module_setting_${module.moduleModel}`}
                       disabled={item.disabledReason}
                       {...targetProps}
                     >
                       {item.setSetting}
                     </MenuItem>
                     {item.disabledReason && (
-                      <Tooltip
-                        tooltipProps={tooltipProps}
-                        key={`tooltip_${index}_${module.model}`}
-                      >
+                      <Tooltip tooltipProps={tooltipProps}>
                         {t('cannot_shake', { ns: 'heater_shaker' })}
                       </Tooltip>
                     )}

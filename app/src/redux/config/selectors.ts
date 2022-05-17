@@ -1,3 +1,4 @@
+import { createSelector } from 'reselect'
 import type { DropdownOption } from '@opentrons/components'
 import type { State } from '../types'
 import type { Config, FeatureFlags, UpdateChannel } from './types'
@@ -25,9 +26,20 @@ export const getHasCalibrationBlock = (state: State): boolean | null => {
   return useTrashSurface === null ? null : !useTrashSurface
 }
 
+export const getIsHeaterShakerAttached = (state: State): boolean => {
+  return state.config?.modules.heaterShaker.isAttached ?? false
+}
+
 export const getIsLabwareOffsetCodeSnippetsOn = (state: State): boolean => {
   return state.config?.labware.showLabwareOffsetCodeSnippets ?? false
 }
+
+export const getPathToPythonOverride: (
+  state: State
+) => string | null = createSelector(
+  getConfig,
+  config => config?.python.pathToPythonOverride ?? null
+)
 
 const UPDATE_CHANNEL_OPTS = [
   { name: 'Stable', value: 'latest' as UpdateChannel },

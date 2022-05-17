@@ -1,5 +1,5 @@
 import { css } from 'styled-components'
-// import type { FlattenSimpleInterpolation } from 'styled-components'
+import { COLORS } from './'
 
 // Font Sizes
 export const fontSizeH1 = '1.188rem' // 19px
@@ -108,4 +108,15 @@ export const labelSemiBold = css`
   font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight12};
+`
+
+export const linkPSemiBold = css`
+  font-size: ${fontSizeP};
+  font-weight: ${fontWeightSemiBold};
+  line-height: ${lineHeight20};
+  color: ${COLORS.blue};
+
+  &:hover {
+    opacity: 70%;
+  }
 `

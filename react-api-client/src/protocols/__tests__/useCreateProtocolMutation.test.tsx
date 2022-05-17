@@ -36,7 +36,8 @@ const PROTOCOL_RESPONSE = {
     createdAt: 'now',
     protocolType: 'json',
     metadata: {},
-    analyses: {},
+    analysisSummaries: [],
+    files: [],
   },
 } as Protocol
 

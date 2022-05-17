@@ -10,7 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
-import { ToggleButton } from '../../../../atoms/Buttons'
+import { ToggleButton } from '../../../../atoms/buttons'
 import { updateSetting } from '../../../../redux/robot-settings'
 
 import type { Dispatch } from '../../../../redux/types'
@@ -34,9 +34,9 @@ export function UseOlderAspirateBehavior({
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
         <StyledText
-          as="h3"
+          as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          paddingBottom={SPACING.spacing3}
+          paddingBottom={SPACING.spacing4}
           id="AdvancedSettings_devTools"
         >
           {t('use_older_aspirate')}

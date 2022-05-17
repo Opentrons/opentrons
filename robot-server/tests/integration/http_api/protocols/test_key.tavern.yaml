@@ -29,7 +29,8 @@ stages:
             apiLevel: '2.6'
             protocolName: basic_transfer_standalone
             author: engineer@opentrons.com
-          analyses:
+          analyses: []
+          analysisSummaries:
             - id: !anystr
               status: pending
           key: protocol_key
@@ -46,7 +47,7 @@ stages:
           - id: '{protocol_id}'
             key: protocol_key
 
-  - name: Verify the key in GET /protocols/{id}
+  - name: Verify the key in GET /protocols/{protocol_id}
     request:
       url: '{host:s}:{port:d}/protocols/{protocol_id}'
       method: GET

@@ -5,7 +5,8 @@ import type {
 import type { RunTimeCommand, ProtocolAnalysisFile } from '../../protocol'
 import type { PipetteName } from '../pipettes'
 import type {
-  ProtocolResource,
+  PendingProtocolAnalysis,
+  CompletedProtocolAnalysis,
   LabwareDefinition2,
   ModuleModel,
 } from '../types'
@@ -13,13 +14,17 @@ import type {
 // and the protocol schema v6 interface. Much of this logic should be deleted once we resolve
 // these discrepencies on the server side
 const TRASH_ID = 'fixedTrash'
+
+/**
+ * @deprecated No longer necessary, do not use
+ */
 export const schemaV6Adapter = (
-  protocolAnalyses: ProtocolResource['analyses'][0]
-): ProtocolAnalysisFile<{}> => {
-  if (protocolAnalyses != null && protocolAnalyses.status === 'completed') {
+  protocolAnalysis: PendingProtocolAnalysis | CompletedProtocolAnalysis
+): ProtocolAnalysisFile<{}> | null => {
+  if (protocolAnalysis != null && protocolAnalysis.status === 'completed') {
     const pipettes: {
       [pipetteId: string]: { name: PipetteName }
-    } = protocolAnalyses.pipettes.reduce((acc, pipette) => {
+    } = protocolAnalysis.pipettes.reduce((acc, pipette) => {
       return {
         ...acc,
         [pipette.id]: {
@@ -33,13 +38,13 @@ export const schemaV6Adapter = (
         definitionId: string
         displayName?: string
       }
-    } = protocolAnalyses.labware.reduce((acc, labware) => {
+    } = protocolAnalysis.labware.reduce((acc, labware) => {
       const labwareId = labware.id
       if (labwareId === TRASH_ID) {
         return { ...acc }
       }
       const loadCommand: LoadLabwareRunTimeCommand | null =
-        protocolAnalyses.commands.find(
+        protocolAnalysis.commands.find(
           (command: RunTimeCommand): command is LoadLabwareRunTimeCommand =>
             command.commandType === 'loadLabware' &&
             command.result?.labwareId === labwareId
@@ -57,7 +62,7 @@ export const schemaV6Adapter = (
 
     const labwareDefinitions: {
       [definitionId: string]: LabwareDefinition2
-    } = protocolAnalyses.commands
+    } = protocolAnalysis.commands
       .filter(
         (command: RunTimeCommand): command is LoadLabwareRunTimeCommand =>
           command.commandType === 'loadLabware'
@@ -65,7 +70,7 @@ export const schemaV6Adapter = (
       .reduce((acc, command: LoadLabwareRunTimeCommand) => {
         const labwareDef: LabwareDefinition2 = command.result?.definition
         const labwareId = command.result?.labwareId ?? ''
-        const definitionUri = protocolAnalyses.labware.find(
+        const definitionUri = protocolAnalysis.labware.find(
           labware => labware.id === labwareId
         )?.definitionUri
         const definitionId = `${definitionUri}_id`
@@ -78,7 +83,7 @@ export const schemaV6Adapter = (
 
     const modules: {
       [moduleId: string]: { model: ModuleModel }
-    } = protocolAnalyses.commands
+    } = protocolAnalysis.commands
       .filter(
         (command: RunTimeCommand): command is LoadModuleRunTimeCommand =>
           command.commandType === 'loadModule'
@@ -99,9 +104,8 @@ export const schemaV6Adapter = (
       labware,
       modules,
       labwareDefinitions,
-      commands: protocolAnalyses.commands,
+      commands: protocolAnalysis.commands,
     }
   }
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  return {} as ProtocolAnalysisFile<{}>
+  return null
 }

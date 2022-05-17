@@ -32,7 +32,7 @@
           "stepType": "manualIntervention",
           "id": "__INITIAL_DECK_SETUP_STEP__",
           "labwareLocationUpdate": {
-            "trashId": "12",
+            "fixedTrash": "12",
             "50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1": "1",
             "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1": "10",
             "e24818a0-0042-11ec-8258-f7ffdf5ad45a": "2"
@@ -78,7 +78,7 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "20",
           "blowout_checkbox": false,
-          "blowout_location": "trashId",
+          "blowout_location": "fixedTrash",
           "preWetTip": false,
           "aspirate_airGap_checkbox": false,
           "aspirate_airGap_volume": "20",
@@ -126,7 +126,7 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "30",
           "blowout_checkbox": false,
-          "blowout_location": "trashId",
+          "blowout_location": "fixedTrash",
           "preWetTip": false,
           "aspirate_airGap_checkbox": false,
           "aspirate_airGap_volume": "30",
@@ -174,7 +174,7 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "30",
           "blowout_checkbox": false,
-          "blowout_location": "trashId",
+          "blowout_location": "fixedTrash",
           "preWetTip": false,
           "aspirate_airGap_checkbox": false,
           "aspirate_airGap_volume": "30",
@@ -222,7 +222,7 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "30",
           "blowout_checkbox": false,
-          "blowout_location": "trashId",
+          "blowout_location": "fixedTrash",
           "preWetTip": false,
           "aspirate_airGap_checkbox": false,
           "aspirate_airGap_volume": "30",
@@ -270,7 +270,7 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "30",
           "blowout_checkbox": false,
-          "blowout_location": "trashId",
+          "blowout_location": "fixedTrash",
           "preWetTip": false,
           "aspirate_airGap_checkbox": false,
           "aspirate_airGap_volume": "30",
@@ -318,7 +318,7 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "30",
           "blowout_checkbox": false,
-          "blowout_location": "trashId",
+          "blowout_location": "fixedTrash",
           "preWetTip": false,
           "aspirate_airGap_checkbox": false,
           "aspirate_airGap_volume": "30",
@@ -366,7 +366,7 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "30",
           "blowout_checkbox": false,
-          "blowout_location": "trashId",
+          "blowout_location": "fixedTrash",
           "preWetTip": false,
           "aspirate_airGap_checkbox": false,
           "aspirate_airGap_volume": "30",
@@ -414,7 +414,7 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "30",
           "blowout_checkbox": false,
-          "blowout_location": "trashId",
+          "blowout_location": "fixedTrash",
           "preWetTip": false,
           "aspirate_airGap_checkbox": false,
           "aspirate_airGap_volume": "30",
@@ -462,7 +462,7 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "30",
           "blowout_checkbox": false,
-          "blowout_location": "trashId",
+          "blowout_location": "fixedTrash",
           "preWetTip": false,
           "aspirate_airGap_checkbox": false,
           "aspirate_airGap_volume": "30",
@@ -510,7 +510,7 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "30",
           "blowout_checkbox": false,
-          "blowout_location": "trashId",
+          "blowout_location": "fixedTrash",
           "preWetTip": false,
           "aspirate_airGap_checkbox": false,
           "aspirate_airGap_volume": "30",
@@ -558,7 +558,7 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "30",
           "blowout_checkbox": false,
-          "blowout_location": "trashId",
+          "blowout_location": "fixedTrash",
           "preWetTip": false,
           "aspirate_airGap_checkbox": false,
           "aspirate_airGap_volume": "30",
@@ -606,7 +606,7 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "30",
           "blowout_checkbox": false,
-          "blowout_location": "trashId",
+          "blowout_location": "fixedTrash",
           "preWetTip": false,
           "aspirate_airGap_checkbox": false,
           "aspirate_airGap_volume": "30",
@@ -654,7 +654,7 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "30",
           "blowout_checkbox": false,
-          "blowout_location": "trashId",
+          "blowout_location": "fixedTrash",
           "preWetTip": false,
           "aspirate_airGap_checkbox": false,
           "aspirate_airGap_volume": "30",
@@ -698,7 +698,7 @@
     }
   },
   "labware": {
-    "trashId": {
+    "fixedTrash": {
       "displayName": "Trash",
       "definitionId": "opentrons/opentrons_1_trash_1100ml_fixed/1"
     },
@@ -1989,11 +1989,11 @@
       "commandType": "loadLabware",
       "id": "0abc3",
       "params": {
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "location": { "slotName": "12" }
       },
       "result": {
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "definition": {
           "ordering": [["A1"]],
           "metadata": {
@@ -4336,7 +4336,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "50d23e00-0042-11ec-8258-f7ffdf5ad45a",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -4390,7 +4390,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -4444,7 +4444,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -4498,7 +4498,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -4552,7 +4552,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -4606,7 +4606,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -4660,7 +4660,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -4714,7 +4714,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -4768,7 +4768,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -4822,7 +4822,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -4876,7 +4876,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -4930,7 +4930,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
@@ -5008,7 +5008,7 @@
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     }

@@ -1,6 +1,7 @@
 """Protocol engine state module."""
 
 from .state import State, StateStore, StateView
+from .state_summary import StateSummary
 from .commands import CommandState, CommandView, CommandSlice, CurrentCommand
 from .labware import LabwareState, LabwareView
 from .pipettes import PipetteState, PipetteView, HardwarePipette, CurrentWell
@@ -10,6 +11,10 @@ from .module_substates import (
     MagneticModuleSubState,
     HeaterShakerModuleId,
     HeaterShakerModuleSubState,
+    TemperatureModuleId,
+    TemperatureModuleSubState,
+    ThermocyclerModuleId,
+    ThermocyclerModuleSubState,
     ModuleSubStateType,
 )
 from .geometry import GeometryView, TipGeometry
@@ -22,6 +27,7 @@ __all__ = [
     "State",
     "StateStore",
     "StateView",
+    "StateSummary",
     # command state and values
     "CommandState",
     "CommandView",
@@ -43,6 +49,10 @@ __all__ = [
     "MagneticModuleSubState",
     "HeaterShakerModuleId",
     "HeaterShakerModuleSubState",
+    "TemperatureModuleId",
+    "TemperatureModuleSubState",
+    "ThermocyclerModuleId",
+    "ThermocyclerModuleSubState",
     "ModuleSubStateType",
     # computed geometry state
     "GeometryView",

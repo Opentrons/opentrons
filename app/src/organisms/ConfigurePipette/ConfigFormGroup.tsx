@@ -1,7 +1,14 @@
 import * as React from 'react'
 import { Field } from 'formik'
-import { FormGroup, InputField, CheckboxField } from '@opentrons/components'
-
+import {
+  FormGroup,
+  CheckboxField,
+  Flex,
+  DIRECTION_COLUMN,
+  SPACING,
+} from '@opentrons/components'
+import { InputField } from '../../atoms/InputField'
+import { StyledText } from '../../atoms/text'
 import styles from './styles.css'
 
 import type { FieldProps } from 'formik'
@@ -57,15 +64,21 @@ const FIELD_ID_PREFIX = '__PipetteConfig__'
 const makeId = (name: string): string => `${FIELD_ID_PREFIX}.${name}`
 
 export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
-  const { labelFor, label } = props
   return (
-    <div className={styles.form_row}>
-      {/* @ts-expect-error TODO: this label element's label prop doesn't do anything, remove it */}
-      <label label={label} htmlFor={labelFor} className={styles.form_label}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      paddingTop={SPACING.spacing2}
+      paddingBottom={SPACING.spacing2}
+    >
+      <StyledText
+        as="label"
+        id={props.labelFor}
+        paddingBottom={SPACING.spacing3}
+      >
         {props.label}
-      </label>
-      <div className={styles.form_input}>{props.children}</div>
-    </div>
+      </StyledText>
+      {props.children}
+    </Flex>
   )
 }
 
@@ -112,7 +125,7 @@ export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
   const { name, displayName } = field
   const id = makeId(name)
   return (
-    <ConfigFormRow label={displayName} labelFor={id}>
+    <Flex key={id} flexDirection="row" fontSize="11px">
       <Field name={name} type="checkbox">
         {(fieldProps: FieldProps) => (
           <CheckboxField
@@ -123,19 +136,24 @@ export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
           />
         )}
       </Field>
-    </ConfigFormRow>
+      <StyledText
+        paddingLeft={SPACING.spacing3}
+        paddingTop={SPACING.spacingXXS}
+      >
+        {displayName}
+      </StyledText>
+    </Flex>
   )
 }
 
 export interface ConfigQuirkGroupProps {
-  groupLabel: string
   quirks: DisplayQuirkFieldProps[]
 }
 
 export function ConfigQuirkGroup(props: ConfigQuirkGroupProps): JSX.Element {
-  const { groupLabel, quirks } = props
+  const { quirks } = props
   return (
-    <FormGroup label={groupLabel} className={styles.form_group}>
+    <FormGroup className={styles.form_group}>
       {quirks.map((field, index) => {
         return <ConfigCheckbox field={field} key={index} />
       })}

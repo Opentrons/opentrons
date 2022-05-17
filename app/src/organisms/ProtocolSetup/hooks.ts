@@ -4,15 +4,15 @@ import { checkModuleCompatibility } from '@opentrons/shared-data'
 import { useProtocolDetails } from '../RunDetails/hooks'
 import { useSelector } from 'react-redux'
 import { State } from '../../redux/types'
-import { getProtocolModulesInfo } from './utils/getProtocolModulesInfo'
-import { getLabwareRenderInfo } from './utils/getLabwareRenderInfo'
+import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { getAttachedModules } from '../../redux/modules'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
 import { AttachedModule } from '../../redux/modules/types'
 import { useCurrentProtocol } from '../ProtocolUpload/hooks'
 
-import type { ProtocolModuleInfo } from './utils/getProtocolModulesInfo'
-import type { LabwareRenderInfoById } from './utils/getLabwareRenderInfo'
+import type { ProtocolModuleInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import type { LabwareRenderInfoById } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
@@ -61,7 +61,7 @@ export function useModuleRenderInfoById(): {
         attachedModules.find(
           attachedMod =>
             checkModuleCompatibility(
-              attachedMod.model,
+              attachedMod.moduleModel,
               protocolMod.moduleDef.model
             ) && !matchedAmod.find(m => m === attachedMod)
         ) ?? null

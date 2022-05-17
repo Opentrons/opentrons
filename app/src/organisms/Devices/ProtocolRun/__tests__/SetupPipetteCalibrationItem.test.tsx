@@ -35,6 +35,7 @@ const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction
 >
 
 const ROBOT_NAME = 'otie'
+const RUN_ID = '1'
 
 describe('SetupPipetteCalibrationItem', () => {
   const render = ({
@@ -42,6 +43,7 @@ describe('SetupPipetteCalibrationItem', () => {
     index = 1,
     mount = 'left',
     robotName = ROBOT_NAME,
+    runId = RUN_ID,
   }: Partial<
     React.ComponentProps<typeof SetupPipetteCalibrationItem>
   > = {}) => {
@@ -52,6 +54,7 @@ describe('SetupPipetteCalibrationItem', () => {
           index,
           mount,
           robotName,
+          runId,
         }}
       />,
       { i18nInstance: i18n }

@@ -17,7 +17,7 @@ export const STD_SLOT_Y_DIM = 86
 export const STD_SLOT_DIVIDER_WIDTH = 4
 
 export const OPENTRONS_LABWARE_NAMESPACE = 'opentrons'
-export const FIXED_TRASH_ID = 'trashId'
+export const FIXED_TRASH_ID = 'fixedTrash'
 
 // TODO: IL 2020-02-19 These 3 constants are DEPRECATED because they're ambiguous model vs type.
 export const THERMOCYCLER: 'thermocycler' = 'thermocycler'
@@ -106,10 +106,12 @@ export const MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT = 0
 
 export const CELSIUS: '°C' = '°C'
 export const TEMP_MIN = 4
-export const TEMP_MAX = 95
+export const TEMP_MAX = 96
 export const TEMP_BLOCK_MAX = 99
 export const TEMP_LID_MIN = 37
 export const TEMP_LID_MAX = 110
+export const HS_TEMP_MIN = 37
+export const HS_TEMP_MAX = 95
 
 // Heater shaker module info
 export const RPM: 'RPM' = 'RPM'

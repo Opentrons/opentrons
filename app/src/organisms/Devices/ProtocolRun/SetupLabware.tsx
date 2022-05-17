@@ -5,7 +5,6 @@ import isEmpty from 'lodash/isEmpty'
 import some from 'lodash/some'
 import { useTranslation } from 'react-i18next'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Flex,
   Icon,
@@ -13,7 +12,6 @@ import {
   Link,
   Module,
   RobotWorkSpace,
-  Tooltip,
   useHoverTooltip,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -22,7 +20,6 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
-  SIZE_5,
   TEXT_TRANSFORM_CAPITALIZE,
   TOOLTIP_LEFT,
   COLORS,
@@ -35,30 +32,30 @@ import {
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 
-import { SecondaryButton } from '../../../atoms/Buttons'
+import { SecondaryButton } from '../../../atoms/buttons'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { StyledText } from '../../../atoms/text'
 import { useLPCSuccessToast } from '../../../organisms/ProtocolSetup/hooks'
-// TODO(bh: 2022/04/12): nested DeckMap needs robotName prop to remove connected robot reference
-import { LabwarePositionCheck } from '../../../organisms/ProtocolSetup/LabwarePositionCheck'
-import { ExtraAttentionWarning } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/ExtraAttentionWarning'
-import { LabwareInfoOverlay } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay'
+import { LabwarePositionCheck } from '../../../organisms/LabwarePositionCheck'
+import { ModuleExtraAttention } from './ModuleExtraAttention'
+import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
-// TODO(bh: 2022/04/12): remove current run and protocol references (can download offset data when not current run)
 import { DownloadOffsetDataModal } from '../../../organisms/ProtocolUpload/DownloadOffsetDataModal'
-import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
+import { ReapplyOffsetsModal } from '../../ReapplyOffsetsModal'
+import { useCurrentRun } from '../../ProtocolUpload/hooks'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
+  useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 import { ProceedToRunButton } from './ProceedToRunButton'
 
 import type { DeckDefinition } from '@opentrons/shared-data'
-
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
   'fixedBase',
@@ -98,7 +95,8 @@ export function SetupLabware({
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
-  const runStatus = useRunStatus(runId)
+  const runHasStarted = useRunHasStarted(runId)
+  const currentRun = useCurrentRun()
   const { protocolData } = useProtocolDetailsForRun(runId)
   const { t } = useTranslation('protocol_setup')
   const [
@@ -152,7 +150,7 @@ export function SetupLabware({
     lpcDisabledReason = t('lpc_disabled_calibration_not_complete')
   } else if (moduleSetupIncomplete) {
     lpcDisabledReason = t('lpc_disabled_modules_not_connected')
-  } else if (runStatus != null && runStatus !== RUN_STATUS_IDLE) {
+  } else if (runHasStarted) {
     lpcDisabledReason = t('labware_position_check_not_available')
   } else if (
     isEmpty(protocolData?.pipettes) ||
@@ -165,8 +163,14 @@ export function SetupLabware({
     lpcDisabledReason = t('lpc_disabled_no_tipracks_used')
   }
 
+  const showReapplyOffsetsModal =
+    currentRun?.data.id === runId &&
+    (currentRun?.data?.labwareOffsets == null ||
+      currentRun?.data?.labwareOffsets.length === 0)
+
   return (
     <>
+      {showReapplyOffsetsModal ? <ReapplyOffsetsModal runId={runId} /> : null}
       {showLabwareHelpModal && (
         <LabwareOffsetModal
           onCloseClick={() => setShowLabwareHelpModal(false)}
@@ -175,20 +179,25 @@ export function SetupLabware({
       {showLabwarePositionCheckModal && (
         <LabwarePositionCheck
           onCloseClick={() => setShowLabwarePositionCheckModal(false)}
+          runId={runId}
         />
       )}
       {downloadOffsetDataModal && (
         <DownloadOffsetDataModal
           onCloseClick={() => showDownloadOffsetDataModal(false)}
+          runId={runId}
         />
       )}
       <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
         <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing4}>
-          {moduleTypesThatRequireExtraAttention.length > 0 && (
-            <ExtraAttentionWarning
+          {!runHasStarted &&
+          moduleTypesThatRequireExtraAttention.length > 0 &&
+          moduleRenderInfoById ? (
+            <ModuleExtraAttention
               moduleTypes={moduleTypesThatRequireExtraAttention}
+              modulesInfo={moduleRenderInfoById}
             />
-          )}
+          ) : null}
           <RobotWorkSpace
             deckDef={(standardDeckDef as unknown) as DeckDefinition}
             viewBox={DECK_MAP_VIEWBOX}
@@ -228,6 +237,7 @@ export function SetupLabware({
                             definition={nestedLabwareDef}
                             labwareId={nestedLabwareId}
                             displayName={nestedLabwareDisplayName}
+                            runId={runId}
                           />
                         </React.Fragment>
                       ) : null}
@@ -247,6 +257,7 @@ export function SetupLabware({
                             definition={labwareDef}
                             labwareId={labwareId}
                             displayName={displayName}
+                            runId={runId}
                           />
                         </g>
                       </React.Fragment>
@@ -330,7 +341,7 @@ export function SetupLabware({
                     {t('run_labware_position_check')}
                   </SecondaryButton>
                   {lpcDisabledReason !== null ? (
-                    <Tooltip maxWidth={SIZE_5} {...tooltipProps}>
+                    <Tooltip tooltipProps={tooltipProps}>
                       {lpcDisabledReason}
                     </Tooltip>
                   ) : null}

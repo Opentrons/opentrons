@@ -25,30 +25,26 @@ export type CommonModuleInfo = Omit<
 >
 
 export interface TemperatureModule extends CommonModuleInfo {
-  type: typeof TEMPERATURE_MODULE_TYPE
-  model: TemperatureModuleModel
-  status: ApiTypes.TemperatureStatus
+  moduleType: typeof TEMPERATURE_MODULE_TYPE
+  moduleModel: TemperatureModuleModel
   data: ApiTypes.TemperatureData
 }
 
 export interface MagneticModule extends CommonModuleInfo {
-  type: typeof MAGNETIC_MODULE_TYPE
-  model: MagneticModuleModel
-  status: ApiTypes.MagneticStatus
+  moduleType: typeof MAGNETIC_MODULE_TYPE
+  moduleModel: MagneticModuleModel
   data: ApiTypes.MagneticData
 }
 
 export interface ThermocyclerModule extends CommonModuleInfo {
-  type: typeof THERMOCYCLER_MODULE_TYPE
-  model: ThermocyclerModuleModel
-  status: ApiTypes.ThermocyclerStatus
+  moduleType: typeof THERMOCYCLER_MODULE_TYPE
+  moduleModel: ThermocyclerModuleModel
   data: ApiTypes.ThermocyclerData
 }
 
 export interface HeaterShakerModule extends CommonModuleInfo {
-  type: typeof HEATERSHAKER_MODULE_TYPE
-  model: HeaterShakerModuleModel
-  status: ApiTypes.HeaterShakerStatus
+  moduleType: typeof HEATERSHAKER_MODULE_TYPE
+  moduleModel: HeaterShakerModuleModel
   data: ApiTypes.HeaterShakerData
 }
 

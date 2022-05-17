@@ -20,9 +20,16 @@ from opentrons.protocol_reader import (
 from robot_server.errors import ApiError
 from robot_server.service.json_api import SimpleEmptyBody, MultiBodyMeta
 from robot_server.service.task_runner import TaskRunner
-from robot_server.protocols.analysis_store import AnalysisStore
+from robot_server.protocols.analysis_store import AnalysisStore, AnalysisNotFoundError
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
-from robot_server.protocols.analysis_models import PendingAnalysis
+from robot_server.protocols.protocol_auto_deleter import ProtocolAutoDeleter
+from robot_server.protocols.analysis_models import (
+    AnalysisStatus,
+    AnalysisSummary,
+    CompletedAnalysis,
+    PendingAnalysis,
+    AnalysisResult,
+)
 
 from robot_server.protocols.protocol_models import (
     Metadata,
@@ -41,6 +48,8 @@ from robot_server.protocols.router import (
     get_protocols,
     get_protocol_by_id,
     delete_protocol_by_id,
+    get_protocol_analyses,
+    get_protocol_analysis_by_id,
 )
 
 
@@ -72,6 +81,12 @@ def protocol_analyzer(decoy: Decoy) -> ProtocolAnalyzer:
 def task_runner(decoy: Decoy) -> TaskRunner:
     """Get a mocked out TaskRunner."""
     return decoy.mock(cls=TaskRunner)
+
+
+@pytest.fixture
+def protocol_auto_deleter(decoy: Decoy) -> ProtocolAutoDeleter:
+    """Get a mocked out AutoDeleter."""
+    return decoy.mock(cls=ProtocolAutoDeleter)
 
 
 async def test_get_protocols_no_protocols(
@@ -124,15 +139,15 @@ async def test_get_protocols(
         protocol_key="dummy-key-222",
     )
 
-    analysis_1 = PendingAnalysis(id="analysis-id-abc")
-    analysis_2 = PendingAnalysis(id="analysis-id-123")
+    analysis_1 = AnalysisSummary(id="analysis-id-abc", status=AnalysisStatus.PENDING)
+    analysis_2 = AnalysisSummary(id="analysis-id-123", status=AnalysisStatus.PENDING)
 
     expected_protocol_1 = Protocol(
         id="abc",
         createdAt=created_at_1,
         protocolType=ProtocolType.PYTHON,
         metadata=Metadata(),
-        analyses=[analysis_1],
+        analysisSummaries=[analysis_1],
         files=[],
         key="dummy-key-111",
     )
@@ -141,14 +156,18 @@ async def test_get_protocols(
         createdAt=created_at_2,
         protocolType=ProtocolType.JSON,
         metadata=Metadata(),
-        analyses=[analysis_2],
+        analysisSummaries=[analysis_2],
         files=[],
         key="dummy-key-222",
     )
 
     decoy.when(protocol_store.get_all()).then_return([resource_1, resource_2])
-    decoy.when(analysis_store.get_by_protocol("abc")).then_return([analysis_1])
-    decoy.when(analysis_store.get_by_protocol("123")).then_return([analysis_2])
+    decoy.when(analysis_store.get_summaries_by_protocol("abc")).then_return(
+        [analysis_1]
+    )
+    decoy.when(analysis_store.get_summaries_by_protocol("123")).then_return(
+        [analysis_2]
+    )
 
     result = await get_protocols(
         protocol_store=protocol_store,
@@ -180,12 +199,15 @@ async def test_get_protocol_by_id(
         protocol_key="dummy-key-111",
     )
 
-    analysis = PendingAnalysis(id="analysis-id")
+    analysis_summary = AnalysisSummary(
+        id="analysis-id",
+        status=AnalysisStatus.COMPLETED,
+    )
 
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(resource)
-    decoy.when(analysis_store.get_by_protocol(protocol_id="protocol-id")).then_return(
-        [analysis]
-    )
+    decoy.when(
+        analysis_store.get_summaries_by_protocol(protocol_id="protocol-id")
+    ).then_return([analysis_summary])
 
     result = await get_protocol_by_id(
         "protocol-id",
@@ -198,7 +220,7 @@ async def test_get_protocol_by_id(
         createdAt=datetime(year=2021, month=1, day=1),
         protocolType=ProtocolType.PYTHON,
         metadata=Metadata(),
-        analyses=[analysis],
+        analysisSummaries=[analysis_summary],
         files=[],
         key="dummy-key-111",
     )
@@ -232,6 +254,7 @@ async def test_create_protocol(
     protocol_reader: ProtocolReader,
     protocol_analyzer: ProtocolAnalyzer,
     task_runner: TaskRunner,
+    protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
     """It should store an uploaded protocol file."""
     protocol_directory = Path("/dev/null")
@@ -259,7 +282,10 @@ async def test_create_protocol(
         protocol_key="dummy-key-111",
     )
 
-    analysis = PendingAnalysis(id="analysis-id")
+    pending_analysis = AnalysisSummary(
+        id="analysis-id",
+        status=AnalysisStatus.PENDING,
+    )
 
     decoy.when(
         await protocol_reader.read_and_save(
@@ -270,7 +296,7 @@ async def test_create_protocol(
 
     decoy.when(
         analysis_store.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
-    ).then_return([analysis])
+    ).then_return(pending_analysis)
 
     result = await create_protocol(
         files=[protocol_file],
@@ -281,6 +307,7 @@ async def test_create_protocol(
         protocol_reader=protocol_reader,
         protocol_analyzer=protocol_analyzer,
         task_runner=task_runner,
+        protocol_auto_deleter=protocol_auto_deleter,
         protocol_id="protocol-id",
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
@@ -291,13 +318,14 @@ async def test_create_protocol(
         createdAt=datetime(year=2021, month=1, day=1),
         protocolType=ProtocolType.JSON,
         metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
-        analyses=[analysis],
+        analysisSummaries=[pending_analysis],
         files=[ProtocolFile(name="foo.json", role=ProtocolFileRole.MAIN)],
         key="dummy-key-111",
     )
     assert result.status_code == 201
 
     decoy.verify(
+        protocol_auto_deleter.make_room_for_new_protocol(),
         protocol_store.insert(protocol_resource),
         task_runner.run(
             protocol_analyzer.analyze,
@@ -359,3 +387,117 @@ async def test_delete_protocol_not_found(
         await delete_protocol_by_id("protocol-id", protocol_store=protocol_store)
 
     assert exc_info.value.status_code == 404
+
+
+async def test_get_protocol_analyses(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+) -> None:
+    """It should get all analyses of a protocol."""
+    analysis = CompletedAnalysis(
+        id="analysis-id",
+        result=AnalysisResult.OK,
+        labware=[],
+        pipettes=[],
+        commands=[],
+        errors=[],
+    )
+
+    decoy.when(protocol_store.has("protocol-id")).then_return(True)
+    decoy.when(await analysis_store.get_by_protocol("protocol-id")).then_return(
+        [analysis]
+    )
+
+    result = await get_protocol_analyses(
+        protocolId="protocol-id",
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+    )
+
+    assert result.status_code == 200
+    assert result.content.data == [analysis]
+
+
+async def test_get_protocol_analyses_not_found(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+) -> None:
+    """It should 404 if protocol does not exist."""
+    decoy.when(protocol_store.has("protocol-id")).then_return(False)
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_protocol_analyses(
+            protocolId="protocol-id",
+            protocol_store=protocol_store,
+            analysis_store=analysis_store,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "ProtocolNotFound"
+
+
+async def test_get_protocol_analysis_by_id(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+) -> None:
+    """It should get a single full analysis by ID."""
+    analysis = PendingAnalysis(id="analysis-id")
+
+    decoy.when(protocol_store.has("protocol-id")).then_return(True)
+    decoy.when(await analysis_store.get("analysis-id")).then_return(analysis)
+
+    result = await get_protocol_analysis_by_id(
+        protocolId="protocol-id",
+        analysisId="analysis-id",
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+    )
+
+    assert result.status_code == 200
+    assert result.content.data == analysis
+
+
+async def test_get_protocol_analysis_by_id_protocol_not_found(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+) -> None:
+    """It should 404 if the protocol does not exist."""
+    decoy.when(protocol_store.has("protocol-id")).then_return(False)
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_protocol_analysis_by_id(
+            protocolId="protocol-id",
+            analysisId="analysis-id",
+            protocol_store=protocol_store,
+            analysis_store=analysis_store,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "ProtocolNotFound"
+
+
+async def test_get_protocol_analysis_by_id_analysis_not_found(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+) -> None:
+    """It should get a single full analysis by ID."""
+    decoy.when(protocol_store.has("protocol-id")).then_return(True)
+    decoy.when(await analysis_store.get("analysis-id")).then_raise(
+        AnalysisNotFoundError("oh no")
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_protocol_analysis_by_id(
+            protocolId="protocol-id",
+            analysisId="analysis-id",
+            protocol_store=protocol_store,
+            analysis_store=analysis_store,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "AnalysisNotFound"

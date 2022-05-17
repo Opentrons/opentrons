@@ -3,11 +3,11 @@
 import Store from 'electron-store'
 import get from 'lodash/get'
 import mergeOptions from 'merge-options'
+import { shell } from 'electron'
 import yargsParser from 'yargs-parser'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import * as Cfg from '@opentrons/app/src/redux/config'
-
 import { createLogger } from '../log'
 import { DEFAULTS_V0, migrate } from './migrate'
 import { shouldUpdate, getNextValue } from './update'
@@ -118,4 +118,18 @@ export function handleConfigChange(
   changeHandler: (newValue: any, oldValue: any) => unknown
 ): void {
   store().onDidChange(path, changeHandler)
+}
+
+export function registerPythonPath(): Dispatch {
+  return function handleActionForPython(action: Action) {
+    switch (action.type) {
+      case Cfg.OPEN_PYTHON_DIRECTORY: {
+        const dir = getFullConfig().python.pathToPythonOverride
+        if (dir != null) {
+          shell.openPath(dir)
+        }
+        break
+      }
+    }
+  }
 }

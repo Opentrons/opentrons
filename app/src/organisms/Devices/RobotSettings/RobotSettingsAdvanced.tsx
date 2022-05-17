@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { Box, SPACING } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { Box, SPACING, IconProps } from '@opentrons/components'
 import { Divider } from '../../../atoms/structure'
+import { Toast } from '../../../atoms/Toast'
 import { AboutRobotName } from './AdvancedTab/AboutRobotName'
 import { RobotInformation } from './AdvancedTab/RobotInformation'
 import { RobotServerVersion } from './AdvancedTab/RobotServerVersion'
@@ -37,6 +39,7 @@ interface RobotSettingsAdvancedProps {
 export function RobotSettingsAdvanced({
   robotName,
 }: RobotSettingsAdvancedProps): JSX.Element {
+  const { t } = useTranslation('device_settings')
   const [
     showRenameRobotSlideout,
     setShowRenameRobotSlideout,
@@ -53,6 +56,11 @@ export function RobotSettingsAdvanced({
     showSoftwareUpdateModal,
     setShowSoftwareUpdateModal,
   ] = React.useState<boolean>(false)
+  const [showDownloadToast, setShowDownloadToast] = React.useState<boolean>(
+    false
+  )
+
+  const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
 
   const robot = useRobot(robotName)
   const ipAddress = robot?.ip != null ? robot.ip : ''
@@ -83,10 +91,13 @@ export function RobotSettingsAdvanced({
     isConnected: boolean,
     options?: ResetConfigRequest
   ): void => {
-    if (connected && options != null) setResetOptions(options)
+    if (options != null) setResetOptions(options)
     setShowFactoryResetModal(true)
     setIsRobotConnected(isConnected ?? false)
   }
+
+  const updateDownloadLogsStatus = (isDownloading: boolean): void =>
+    setShowDownloadToast(isDownloading)
 
   return (
     <>
@@ -96,7 +107,17 @@ export function RobotSettingsAdvanced({
           closeModal={() => setShowSoftwareUpdateModal(false)}
         />
       )}
-      <Box paddingX={SPACING.spacing4}>
+      {showDownloadToast && (
+        <Toast
+          message={t('update_robot_software_download_logs_toast_message')}
+          type="info"
+          icon={toastIcon}
+          closeButton={false}
+          onClose={() => setShowDownloadToast(false)}
+          requiredTimeout={false}
+        />
+      )}
+      <Box>
         {showRenameRobotSlideout && (
           <RenameRobotSlideout
             isExpanded={showRenameRobotSlideout}
@@ -124,28 +145,31 @@ export function RobotSettingsAdvanced({
           robotName={robotName}
           updateIsExpanded={updateIsExpanded}
         />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <RobotServerVersion robotName={robotName} />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <RobotInformation robotName={robotName} />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <UsageSettings
           settings={findSettings('enableDoorSafetySwitch')}
           robotName={robotName}
         />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <DisableHoming
           settings={findSettings('disableHomeOnBoot')}
           robotName={robotName}
         />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <OpenJupyterControl robotIp={ipAddress} />
         <Divider marginY={SPACING.spacing5} />
         <UpdateRobotSoftware robotName={robotName} />
-        <Troubleshooting robot={robot as ViewableRobot} />
-        <Divider marginY={SPACING.spacing5} />
+        <Troubleshooting
+          robot={robot as ViewableRobot}
+          updateDownloadLogsStatus={updateDownloadLogsStatus}
+        />
+        <Divider marginY="2.5rem" />
         <FactoryReset updateIsExpanded={updateIsExpanded} />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <UseOlderProtocol
           settings={findSettings('disableFastProtocolUpload')}
           robotName={robotName}
@@ -154,12 +178,12 @@ export function RobotSettingsAdvanced({
           settings={findSettings('deckCalibrationDots')}
           robotName={robotName}
         />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <ShortTrashBin
           settings={findSettings('shortFixedTrash')}
           robotName={robotName}
         />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <UseOlderAspirateBehavior
           settings={findSettings('useOldAspirationFunctions')}
           robotName={robotName}

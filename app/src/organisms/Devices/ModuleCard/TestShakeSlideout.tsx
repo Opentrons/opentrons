@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  useCreateCommandMutation,
+  useCreateLiveCommandMutation,
+} from '@opentrons/react-api-client'
 import {
   Flex,
   Text,
@@ -14,8 +17,8 @@ import {
   SIZE_AUTO,
   ALIGN_FLEX_START,
   Link,
-  Tooltip,
   useHoverTooltip,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -24,13 +27,15 @@ import {
   RPM,
 } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
-import { PrimaryButton, TertiaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton, TertiaryButton } from '../../../atoms/buttons'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
 import { Divider } from '../../../atoms/structure'
-import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'
+import { StyledText } from '../../../atoms/text'
 import { InputField } from '../../../atoms/InputField'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { HeaterShakerWizard } from '../HeaterShakerWizard'
-import { useLatchCommand } from './hooks'
+import { useLatchControls } from './hooks'
+import { Collapsible } from './Collapsible'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
@@ -42,17 +47,19 @@ interface TestShakeSlideoutProps {
   module: HeaterShakerModule
   onCloseClick: () => unknown
   isExpanded: boolean
+  runId?: string
 }
 
 export const TestShakeSlideout = (
   props: TestShakeSlideoutProps
 ): JSX.Element | null => {
-  const { module, onCloseClick, isExpanded } = props
+  const { module, onCloseClick, isExpanded, runId } = props
   const { t } = useTranslation(['device_details', 'shared', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const name = getModuleDisplayName(module.model)
+  const { createCommand } = useCreateCommandMutation()
+  const name = getModuleDisplayName(module.moduleModel)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { toggleLatch, isLatchClosed } = useLatchCommand(module)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
 
   const [showCollapsed, setShowCollapsed] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
@@ -76,15 +83,28 @@ export const TestShakeSlideout = (
 
   const handleShakeCommand = (): void => {
     if (shakeValue !== null) {
-      createLiveCommand({
-        command: isShaking ? stopShakeCommand : setShakeCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${
-            stopShakeCommand.commandType ?? setShakeCommand.commandType
-          }: ${e.message}`
-        )
-      })
+      if (runId != null) {
+        createCommand({
+          runId: runId,
+          command: isShaking ? stopShakeCommand : setShakeCommand,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${
+              stopShakeCommand.commandType ?? setShakeCommand.commandType
+            }: ${e.message}`
+          )
+        })
+      } else {
+        createLiveCommand({
+          command: isShaking ? stopShakeCommand : setShakeCommand,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${
+              stopShakeCommand.commandType ?? setShakeCommand.commandType
+            }: ${e.message}`
+          )
+        })
+      }
     }
     setShakeValue(null)
   }
@@ -101,14 +121,16 @@ export const TestShakeSlideout = (
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
-        <PrimaryButton
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
-          width="100%"
-          onClick={onCloseClick}
-          data-testid={`Temp_Slideout_set_temp_btn_${name}`}
-        >
-          {t('close', { ns: 'shared' })}
-        </PrimaryButton>
+        <Flex marginTop={SPACING.spacing4}>
+          <PrimaryButton
+            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            width="100%"
+            onClick={onCloseClick}
+            data-testid={`Temp_Slideout_set_temp_btn_${name}`}
+          >
+            {t('close', { ns: 'shared' })}
+          </PrimaryButton>
+        </Flex>
       }
     >
       <Flex
@@ -116,7 +138,8 @@ export const TestShakeSlideout = (
         marginBottom={SPACING.spacing3}
         backgroundColor={COLORS.background}
         paddingY={SPACING.spacing4}
-        paddingX={SPACING.spacing4}
+        paddingLeft={SPACING.spacing2}
+        paddingRight={SPACING.spacing4}
         flexDirection={DIRECTION_ROW}
         data-testid={'test_shake_slideout_banner_info'}
       >
@@ -156,7 +179,7 @@ export const TestShakeSlideout = (
         <Flex
           flexDirection={DIRECTION_ROW}
           marginY={SPACING.spacingSM}
-          alignItems={ALIGN_FLEX_START}
+          alignItems={ALIGN_CENTER}
         >
           <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing3}>
             <Text
@@ -168,6 +191,7 @@ export const TestShakeSlideout = (
             </Text>
           </Flex>
           <TertiaryButton
+            marginTop={SPACING.spacing2}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
@@ -181,7 +205,7 @@ export const TestShakeSlideout = (
               : t('open', { ns: 'shared' })}
           </TertiaryButton>
           {isShaking ? (
-            <Tooltip {...tooltipProps}>
+            <Tooltip tooltipProps={tooltipProps}>
               {t('cannot_open_latch', { ns: 'heater_shaker' })}
             </Tooltip>
           ) : null}
@@ -233,7 +257,7 @@ export const TestShakeSlideout = (
               : t('start', { ns: 'shared' })}
           </TertiaryButton>
           {!isLatchClosed ? (
-            <Tooltip {...tooltipProps}>
+            <Tooltip tooltipProps={tooltipProps}>
               {t('cannot_shake', { ns: 'heater_shaker' })}
             </Tooltip>
           ) : null}
@@ -247,15 +271,16 @@ export const TestShakeSlideout = (
         paddingY={SPACING.spacing4}
         width="100%"
       >
-        <CollapsibleStep
+        <Collapsible
           expanded={showCollapsed}
           title={
-            <Text
+            <StyledText
               textTransform={TEXT_TRANSFORM_CAPITALIZE}
-              fontSize={TYPOGRAPHY.fontSizeP}
+              as="h4"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {t('troubleshooting', { ns: 'heater_shaker' })}
-            </Text>
+            </StyledText>
           }
           expandedIcon="chevron-up"
           collapsedIcon="chevron-down"
@@ -272,6 +297,7 @@ export const TestShakeSlideout = (
             <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
           )}
           <Link
+            marginTop={SPACING.spacing2}
             fontSize={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={COLORS.blue}
@@ -280,7 +306,7 @@ export const TestShakeSlideout = (
           >
             {t('go_to_attachment_instructions', { ns: 'heater_shaker' })}
           </Link>
-        </CollapsibleStep>
+        </Collapsible>
       </Flex>
     </Slideout>
   )

@@ -61,15 +61,14 @@ async def test_write_to_sensors(
 @pytest.mark.parametrize(
     argnames=["sensor_type", "expected_data"],
     argvalues=[
-        [SensorType.capacitive, 22400.12],
+        [SensorType.capacitive, 0.46],
         [SensorType.humidity, 83.92],
         [SensorType.temperature, 22.44],
-        [SensorType.pressure, 5141.51],
+        [SensorType.pressure, 5.88],
     ],
 )
 @pytest.mark.requires_emulator
 async def test_read_from_sensors(
-    loop: asyncio.BaseEventLoop,
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     sensor_type: SensorType,
@@ -96,13 +95,12 @@ async def test_read_from_sensors(
 @pytest.mark.parametrize(
     argnames=["sensor_type", "expected_value"],
     argvalues=[
-        [SensorType.capacitive, 22400.0],
-        [SensorType.pressure, 5141.51],
+        [SensorType.capacitive, 0.46],
+        [SensorType.pressure, 5.88],
     ],
 )
 @pytest.mark.requires_emulator
 async def test_baseline_poll_sensors(
-    loop: asyncio.BaseEventLoop,
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     sensor_type: SensorType,

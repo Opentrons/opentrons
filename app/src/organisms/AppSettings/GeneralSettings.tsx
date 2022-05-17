@@ -6,10 +6,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import {
   SPACING_AUTO,
   Flex,
-  AlertItem,
   useMountEffect,
   Box,
-  Text,
   Link,
   DIRECTION_ROW,
   ALIGN_CENTER,
@@ -20,9 +18,11 @@ import {
   COLORS,
   ALIGN_START,
 } from '@opentrons/components'
-import { TertiaryButton, ToggleButton } from '../../atoms/Buttons'
+import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
+import { Banner } from '../../atoms/Banner'
 import {
   CURRENT_VERSION,
   getAvailableShellUpdate,
@@ -44,11 +44,14 @@ import type { Dispatch, State } from '../../redux/types'
 const SOFTWARE_SYNC_URL =
   'https://support.opentrons.com/en/articles/1795303-get-started-update-your-ot-2#:~:text=It%E2%80%99s%20important%20to%20understand,that%20runs%20your%20protocols).'
 
+const GITHUB_LINK =
+  'https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md'
+
 const ENABLE_APP_UPDATE_NOTIFICATIONS = 'Enable app update notifications'
 const EVENT_APP_UPDATE_NOTIFICATIONS_TOGGLED = 'appUpdateNotificationsToggled'
 
 export function GeneralSettings(): JSX.Element {
-  const { t } = useTranslation('app_settings')
+  const { t } = useTranslation(['app_settings', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const trackEvent = useTrackEvent()
   const [
@@ -104,21 +107,18 @@ export function GeneralSettings(): JSX.Element {
             marginBottom={SPACING.spacing4}
             id="GeneralSettings_updatebanner"
           >
-            <AlertItem
+            <Banner
               type="warning"
-              title={
-                <>
-                  {t('update_available')}
-                  <Link
-                    textDecoration={TEXT_DECORATION_UNDERLINE}
-                    onClick={() => setShowUpdateModal(true)}
-                  >
-                    {t('view_update')}
-                  </Link>
-                </>
-              }
               onCloseClick={() => setShowUpdateBanner(false)}
-            />
+            >
+              {t('update_available')}
+              <Link
+                textDecoration={TEXT_DECORATION_UNDERLINE}
+                onClick={() => setShowUpdateModal(true)}
+              >
+                {t('view_update')}
+              </Link>
+            </Banner>
           </Box>
         )}
         <Flex
@@ -133,31 +133,44 @@ export function GeneralSettings(): JSX.Element {
               onCloseClick={() => setShowConnectRobotSlideout(false)}
             />
           )}
-          <Box width="70%">
-            <Text css={TYPOGRAPHY.h3SemiBold} paddingBottom={SPACING.spacing3}>
+          <Box width="65%">
+            <StyledText
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
+            >
               {t('software_version')}
-            </Text>
-            <Text
-              css={TYPOGRAPHY.pRegular}
+            </StyledText>
+            <StyledText
+              as="p"
               paddingBottom={SPACING.spacing3}
               id="GeneralSettings_currentVersion"
             >
               {CURRENT_VERSION}
-            </Text>
+            </StyledText>
+            <StyledText as="p">
+              {t('shared:view_latest_release_notes')}
+              <Link
+                external
+                href={GITHUB_LINK}
+                css={TYPOGRAPHY.linkPSemiBold}
+                id="AdvancedSettings_GitHubLink"
+              >{` ${t('shared:github')}`}</Link>
+            </StyledText>
+            <StyledText as="p" paddingY={SPACING.spacing3}>
+              {t('manage_versions')}
+            </StyledText>
             <Link
               role="button"
-              css={TYPOGRAPHY.pSemiBold}
-              color={COLORS.blue}
+              css={TYPOGRAPHY.linkPSemiBold}
               onClick={() => setShowPreviousVersionModal(true)}
               id="GeneralSettings_previousVersionLink"
             >
               {t('restore_previous')}
             </Link>
-            <Text css={TYPOGRAPHY.pRegular} paddingY={SPACING.spacing3}>
+            <StyledText as="p" paddingY={SPACING.spacing3}>
               {t('manage_versions')}
-            </Text>
+            </StyledText>
             <ExternalLink
-              css={TYPOGRAPHY.pSemiBold}
               href={SOFTWARE_SYNC_URL}
               id="GeneralSettings_appAndRobotSync"
             >
@@ -174,26 +187,29 @@ export function GeneralSettings(): JSX.Element {
               {t('view_software_update')}
             </TertiaryButton>
           ) : (
-            <Text
+            <StyledText
               fontSize={TYPOGRAPHY.fontSizeCaption}
               lineHeight={TYPOGRAPHY.lineHeight12}
               color={COLORS.darkGreyEnabled}
               paddingY={SPACING.spacing5}
             >
               {t('up_to_date')}
-            </Text>
+            </StyledText>
           )}
         </Flex>
         <Divider marginY={SPACING.spacing5} />
-        <Text css={TYPOGRAPHY.h3SemiBold} paddingBottom={SPACING.spacing3}>
+        <StyledText
+          css={TYPOGRAPHY.h3SemiBold}
+          paddingBottom={SPACING.spacing3}
+        >
           {t('update_alerts')}
-        </Text>
+        </StyledText>
         <Flex
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <Text css={TYPOGRAPHY.pRegular}>{t('receive_alert')}</Text>
+          <StyledText as="p">{t('receive_alert')}</StyledText>
           <ToggleButton
             label={ENABLE_APP_UPDATE_NOTIFICATIONS}
             marginRight={SPACING.spacing4}
@@ -208,9 +224,12 @@ export function GeneralSettings(): JSX.Element {
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <Text css={TYPOGRAPHY.h3SemiBold} paddingBottom={SPACING.spacing3}>
+          <StyledText
+            css={TYPOGRAPHY.h3SemiBold}
+            paddingBottom={SPACING.spacing3}
+          >
             {t('connect_ip')}
-          </Text>
+          </StyledText>
           <TertiaryButton
             marginLeft={SPACING_AUTO}
             id="GeneralSettings_setUpConnection"

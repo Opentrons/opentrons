@@ -143,3 +143,14 @@ def testing_partition(monkeypatch, tmpdir):
         "TWO", buildroot.file_actions.Partition(2, partfile)
     )
     return partfile
+
+
+@pytest.fixture
+def testing_partition2(monkeypatch, tmpdir):
+    partfile = os.path.join(tmpdir, "fake-partition")
+    find_unused = mock.Mock()
+    monkeypatch.setattr(buildroot.file_actions, "_find_unused_partition", find_unused)
+    find_unused.return_value = FakeRootPartElem(
+        "TWO", buildroot.file_actions.Partition(2, partfile)
+    )
+    return partfile

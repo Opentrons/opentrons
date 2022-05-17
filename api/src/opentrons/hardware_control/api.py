@@ -634,6 +634,7 @@ class API(
             x=cur_pos[Axis.X], y=cur_pos[Axis.Y], z=cur_pos[Axis.by_mount(mount)]
         )
 
+    # TODO(mc, 2022-05-13): return resulting gantry position
     async def move_to(
         self,
         mount: top_types.Mount,

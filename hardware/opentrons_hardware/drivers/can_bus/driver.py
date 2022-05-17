@@ -92,6 +92,7 @@ class CanDriver(AbstractCanDriver):
     def shutdown(self) -> None:
         """Stop the driver."""
         self._notifier.stop()
+        self._bus.shutdown()
 
     async def send(self, message: CanMessage) -> None:
         """Send a can message.

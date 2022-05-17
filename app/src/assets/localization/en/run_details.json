@@ -1,4 +1,5 @@
 {
+  "apply_stored_labware_offset_data": "Apply stored Labware Offset data?",
   "cancel_run": "Cancel run",
   "current_temperature": "Current: {{temperature}} °C",
   "module_slot_number": "Slot {{slot_number}}",
@@ -33,8 +34,9 @@
   "pause_protocol": "Pause protocol",
   "current_step_pause": "Current Step - Paused by User",
   "current_step_pause_timer": "Timer",
-  "user_paused_protocol": "User paused protocol",
+  "user_paused_protocol_for": "User paused protocol for",
   "step_failed": "Step failed",
+  "failed_step": "Failed step",
   "cancel_run_modal_heading": "Are you sure you want to cancel this run?",
   "cancel_run_modal_confirm": "yes, cancel run",
   "cancel_run_modal_back": "no, go back",
@@ -82,5 +84,17 @@
   "download_run_log": "Download run log",
   "jump_to_current_step": "Jump to current step",
   "run_has_diverged_from_predicted": "Run has diverged from predicted state. Cannot anticipate new steps.",
-  "unable_to_determine_steps": "Unable to determine steps"
+  "unable_to_determine_steps": "Unable to determine steps",
+  "robot_has_previous_offsets": "This robot has stored Labware Offset data from previous protocol runs. Do you want to apply that data to this protocol run? You can still adjust any offsets with Labware Position Check.",
+  "stored_labware_offset_data": "Stored Labware Offset data that applies to this protocol",
+  "labware": "labware",
+  "labware_offset_data": "labware offset data",
+  "location": "location",
+  "apply_stored_data": "Apply stored data",
+  "ignore_stored_data": "Ignore stored data",
+  "slot": "Slot {{slotName}}",
+  "no_offsets_available": "No Labware Offset data available",
+  "data_out_of_date": "This data is likely out of date",
+  "robot_was_recalibrated": "This robot was recalibrated after this Labware Offset data was stored.",
+  "not_available_for_a_completed_run": "not available for a completed run"
 }

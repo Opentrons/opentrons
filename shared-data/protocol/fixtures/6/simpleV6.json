@@ -26,7 +26,7 @@
     }
   },
   "labware": {
-    "trashId": {
+    "fixedTrash": {
       "displayName": "Trash",
       "definitionId": "opentrons/opentrons_1_trash_1100ml_fixed/1"
     },
@@ -1237,18 +1237,6 @@
   },
   "commands": [
     {
-      "commandType": "home",
-      "id": "00abc123",
-      "params": {}
-    },
-    {
-      "commandType": "home",
-      "id": "00abc123",
-      "params": {
-        "axes": ["x", "y", "leftZ", "rightZ", "leftPlunger", "rightPlunger"]
-      }
-    },
-    {
       "commandType": "loadPipette",
       "id": "0abc123",
       "params": {
@@ -1305,7 +1293,7 @@
       "commandType": "loadLabware",
       "id": "6abc123",
       "params": {
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "location": {
           "slotName": "12"
         }
@@ -1322,6 +1310,11 @@
           "B1": 100
         }
       }
+    },
+    {
+      "commandType": "home",
+      "id": "00abc123",
+      "params": {}
     },
     {
       "commandType": "pickUpTip",
@@ -1437,7 +1430,7 @@
       "id": "17abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },

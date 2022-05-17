@@ -11,7 +11,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
-import { TertiaryButton } from '../../../../atoms/Buttons'
+import { TertiaryButton } from '../../../../atoms/buttons'
 import { downloadLogs } from '../../../../redux/shell/robot-logs/actions'
 import { getRobotLogsDownloading } from '../../../../redux/shell/robot-logs/selectors'
 import { CONNECTABLE } from '../../../../redux/discovery'
@@ -20,33 +20,53 @@ import { ViewableRobot } from '../../../../redux/discovery/types'
 
 interface TroubleshootingProps {
   robot: ViewableRobot
+  updateDownloadLogsStatus: (status: boolean) => void
 }
 
-export function Troubleshooting({ robot }: TroubleshootingProps): JSX.Element {
+export function Troubleshooting({
+  robot,
+  updateDownloadLogsStatus,
+}: TroubleshootingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
-  const controlDisabled = robot?.status !== CONNECTABLE
-  const logsAvailable = robot?.health && robot?.health.logs
+  const { health, status } = robot
+  const controlDisabled = status !== CONNECTABLE
+  const logsAvailable = health != null && health.logs
   const robotLogsDownloading = useSelector(getRobotLogsDownloading)
+
+  const handleClick = (): void => {
+    updateDownloadLogsStatus(robotLogsDownloading)
+    dispatch(downloadLogs(robot))
+  }
+
+  React.useEffect(() => {
+    updateDownloadLogsStatus(robotLogsDownloading)
+  }, [robotLogsDownloading])
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
         <StyledText
-          as="h3"
+          as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacingM}
+          marginBottom={SPACING.spacing4}
         >
           {t('update_robot_software_troubleshooting')}
         </StyledText>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <StyledText
+          as="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          data-testid="RobotSettings_Troubleshooting"
+        >
           {t('update_robot_software_download_logs')}
         </StyledText>
       </Box>
       <TertiaryButton
-        disabled={controlDisabled || !logsAvailable || robotLogsDownloading}
+        disabled={
+          controlDisabled || logsAvailable == null || robotLogsDownloading
+        }
         marginLeft={SPACING_AUTO}
-        onClick={() => dispatch(downloadLogs(robot as ViewableRobot))}
+        onClick={() => handleClick()}
         id="AdvancedSettings_downloadLogsButton"
       >
         {t('update_robot_software_download_logs')}

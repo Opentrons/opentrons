@@ -26,7 +26,7 @@ async def test_magnetic_module_engage_implementation(
 
     params = EngageParams(
         moduleId="unverified-module-id",
-        engageHeight=3.14159,
+        height=3.14159,
     )
 
     verified_module_id = MagneticModuleId("module-id")

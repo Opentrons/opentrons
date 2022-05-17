@@ -13,6 +13,8 @@ export * from './parseProtocolData'
 export * from './volume'
 export * from './wellSets'
 export * from './getModuleVizDims'
+export * from './getVectorDifference'
+export * from './getVectorSum'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE

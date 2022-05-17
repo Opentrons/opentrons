@@ -29,6 +29,7 @@ export type RunStatus =
 export interface RunData {
   id: string
   createdAt: string
+  completedAt?: string
   current: boolean
   status: RunStatus
   actions: RunAction[]
@@ -37,14 +38,6 @@ export interface RunData {
   labware: unknown[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
-}
-
-export interface RunSummaryData {
-  id: string
-  createdAt: string
-  current: boolean
-  status: RunStatus
-  protocolId?: string
 }
 
 export interface VectorOffset {
@@ -64,13 +57,13 @@ export interface Run {
   data: RunData
 }
 
-export interface RunSummariesLinks {
+export interface RunsLinks {
   current?: ResourceLink
 }
 
-export interface RunSummaries {
-  data: RunSummaryData[]
-  links: RunSummariesLinks
+export interface Runs {
+  data: RunData[]
+  links: RunsLinks
 }
 
 export const RUN_ACTION_TYPE_PLAY: 'play' = 'play'

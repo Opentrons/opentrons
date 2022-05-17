@@ -20,7 +20,7 @@ from .action_models import RunAction
 
 # TODO(mc, 2022-02-01): since the `/runs/:run_id/commands` response is now paginated,
 # this summary model is a lot less useful. Remove and replace with full `Command`
-# models once problematially large objects like full labware and module definitions
+# models once problematically large objects like full labware and module definitions
 # are no longer part of the public command.result API
 class RunCommandSummary(ResourceModel):
     """A stripped down model of a full Command for usage in a Run response."""
@@ -48,28 +48,6 @@ class RunCommandSummary(ResourceModel):
     # TODO(mc, 2022-02-01): this does not allow the command summary object to
     # be narrowed based on `commandType`. Will be resolved by TODO above
     params: CommandParams = Field(..., description="Command execution parameters.")
-
-
-class RunSummary(ResourceModel):
-    """A stripped down model of a full Run for usage in a Runs collection response."""
-
-    id: str = Field(..., description="Unique run identifier.")
-    status: RunStatus = Field(..., description="Execution status of the run")
-    createdAt: datetime = Field(..., description="When the run was created")
-    current: bool = Field(
-        ...,
-        description=(
-            "Whether this run is currently controlling the robot."
-            " There can be, at most, one current run."
-        ),
-    )
-    protocolId: Optional[str] = Field(
-        None,
-        description=(
-            "Protocol resource being run, if any. If not present, the run may"
-            " still be used to execute protocol commands over HTTP."
-        ),
-    )
 
 
 class Run(ResourceModel):

@@ -26,7 +26,7 @@
     }
   },
   "labware": {
-    "trashId": {
+    "fixedTrash": {
       "displayName": "Trash",
       "definitionId": "opentrons/opentrons_1_trash_1100ml_fixed/1"
     },
@@ -1292,7 +1292,7 @@
       "commandType": "loadLabware",
       "id": "6abc123",
       "params": {
-        "labwareId": "trashId",
+        "labwareId": "fixedTrash",
         "location": {
           "slotName": "12"
         }
@@ -1362,15 +1362,15 @@
       "id": "12abc123",
       "params": {
         "moduleId": "temperatureModuleId",
-        "temperature": 80
+        "celsius": 80
       }
     },
     {
-      "commandType": "temperatureModule/awaitTemperature",
+      "commandType": "temperatureModule/waitForTemperature",
       "id": "13abc123",
       "params": {
         "moduleId": "temperatureModuleId",
-        "temperature": 80
+        "celsius": 80
       }
     },
     {
@@ -1381,15 +1381,15 @@
       }
     },
     {
-      "commandType": "magneticModule/engageMagnet",
+      "commandType": "magneticModule/engage",
       "id": "15abc123",
       "params": {
         "moduleId": "magneticModuleId",
-        "engageHeight": 10
+        "height": 10
       }
     },
     {
-      "commandType": "magneticModule/disengageMagnet",
+      "commandType": "magneticModule/disengage",
       "id": "16abc123",
       "params": {
         "moduleId": "magneticModuleId"

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Portal } from '../../../App/portal'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
 import { HEATERSHAKER_MODULE_TYPE } from '../../../redux/modules'
-import { PrimaryButton, SecondaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { useAttachedModules } from '../hooks'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
@@ -23,7 +23,7 @@ import {
 
 import type { NavRouteParams } from '../../../App/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import type { ThermalAdapterName } from '@opentrons/shared-data'
 
 interface HeaterShakerWizardProps {
@@ -43,7 +43,7 @@ export const HeaterShakerWizard = (
   const heaterShaker =
     attachedModules.find(
       (module): module is HeaterShakerModule =>
-        module.type === HEATERSHAKER_MODULE_TYPE
+        module.moduleType === HEATERSHAKER_MODULE_TYPE
     ) ?? null
 
   let isPrimaryCTAEnabled: boolean = true

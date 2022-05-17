@@ -1,7 +1,7 @@
 """Protocol file models."""
 from datetime import datetime
 from pydantic import BaseModel, Extra, Field
-from typing import Sequence, Optional
+from typing import Any, List, Optional
 
 from opentrons.protocol_reader import (
     ProtocolType as ProtocolType,
@@ -9,7 +9,7 @@ from opentrons.protocol_reader import (
 )
 
 from robot_server.service.json_api import ResourceModel
-from .analysis_models import ProtocolAnalysis
+from .analysis_models import AnalysisSummary
 
 
 class ProtocolFile(BaseModel):
@@ -61,7 +61,7 @@ class Protocol(ResourceModel):
         ),
     )
 
-    files: Sequence[ProtocolFile]
+    files: List[ProtocolFile]
 
     protocolType: ProtocolType = Field(
         ...,
@@ -72,11 +72,25 @@ class Protocol(ResourceModel):
     # be a better way (e.g. produce better OpenAPI) to represent an arbitrary JSON obj.
     metadata: Metadata
 
-    # TODO(mc, 2021-09-01): consider reporting summary objects here, with the
-    # option to `GET /protocols/:pid/analysis/:aid` if needed
-    analyses: Sequence[ProtocolAnalysis] = Field(
+    analyses: List[Any] = Field(
+        default_factory=list,
+        description=(
+            "This field was deprecated for performance reasons."
+            " It will always be returned as an empty list."
+            " Use `analysisSummaries` and `GET /protocols/:id/analyses` instead."
+        ),
+    )
+
+    analysisSummaries: List[AnalysisSummary] = Field(
         ...,
-        description="An analysis of how the protocol is expected to run.",
+        description=(
+            "Summaries of any analyses run to check how this protocol"
+            " is expected to run. For more detailed information,"
+            " use `GET /protocols/:id/analyses`."
+            "\n\n"
+            "Returned in order from the least-recently started analysis"
+            " to the most-recently started analysis."
+        ),
     )
 
     key: Optional[str] = None

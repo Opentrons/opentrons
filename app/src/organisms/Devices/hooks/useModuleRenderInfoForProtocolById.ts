@@ -1,10 +1,10 @@
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { checkModuleCompatibility } from '@opentrons/shared-data'
 
-import { getProtocolModulesInfo } from '../../../organisms/ProtocolSetup/utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 import { useAttachedModules, useProtocolDetailsForRun } from '.'
 
-import type { ProtocolModuleInfo } from '../../../organisms/ProtocolSetup/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 import type { AttachedModule } from '../../../redux/modules/types'
 
 export interface ModuleRenderInfoForProtocol extends ProtocolModuleInfo {
@@ -36,7 +36,7 @@ export function useModuleRenderInfoForProtocolById(
         attachedModules.find(
           attachedMod =>
             checkModuleCompatibility(
-              attachedMod.model,
+              attachedMod.moduleModel,
               protocolMod.moduleDef.model
             ) && !matchedAmod.find(m => m === attachedMod)
         ) ?? null
