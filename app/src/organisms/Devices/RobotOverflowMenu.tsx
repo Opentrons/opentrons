@@ -140,19 +140,20 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           {menuItems}
         </Flex>
       ) : null}
-      <MenuOverlayPortal />
-      {robot.status === CONNECTABLE ? (
-        <ChooseProtocolSlideout
-          robot={robot}
-          showSlideout={showChooseProtocolSlideout}
-          onCloseClick={() => setShowChooseProtocolSlideout(false)}
-        />
-      ) : null}
-      {showConnectionTroubleshootingModal ? (
-        <ConnectionTroubleshootingModal
-          onClose={() => setShowConnectionTroubleshootingModal(false)}
-        />
-      ) : null}
+      <MenuOverlayPortal>
+        {robot.status === CONNECTABLE ? (
+          <ChooseProtocolSlideout
+            robot={robot}
+            showSlideout={showChooseProtocolSlideout}
+            onCloseClick={() => setShowChooseProtocolSlideout(false)}
+          />
+        ) : null}
+        {showConnectionTroubleshootingModal ? (
+          <ConnectionTroubleshootingModal
+            onClose={() => setShowConnectionTroubleshootingModal(false)}
+          />
+        ) : null}
+      </MenuOverlayPortal>
     </Flex>
   )
 }

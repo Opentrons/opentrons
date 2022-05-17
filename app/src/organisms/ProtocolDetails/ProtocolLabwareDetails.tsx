@@ -186,13 +186,14 @@ export const LabwareDetailOverflowMenu = (
           </MenuItem>
         </Flex>
       ) : null}
-      <MenuOverlayPortal />
-      {showLabwareDetailSlideout ? (
-        <LabwareDetails
-          labware={labware}
-          onClose={() => setShowLabwareDetailSlideout(false)}
-        />
-      ) : null}
+      <MenuOverlayPortal>
+        {showLabwareDetailSlideout ? (
+          <LabwareDetails
+            labware={labware}
+            onClose={() => setShowLabwareDetailSlideout(false)}
+          />
+        ) : null}
+      </MenuOverlayPortal>
     </Flex>
   )
 }

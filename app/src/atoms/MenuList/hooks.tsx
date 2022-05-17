@@ -9,6 +9,10 @@ interface MenuHandleClickOutside {
   setShowOverflowMenu: React.Dispatch<React.SetStateAction<boolean>>
 }
 
+interface MenuOverlayPortalProps {
+  children?: React.ReactNode
+}
+
 export function useMenuHandleClickOutside(): MenuHandleClickOutside {
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
 
@@ -22,7 +26,7 @@ export function useMenuHandleClickOutside(): MenuHandleClickOutside {
     setShowOverflowMenu(false)
   }
 
-  const MenuOverlayPortal = (): JSX.Element => (
+  const MenuOverlayPortal = (props: MenuOverlayPortalProps): JSX.Element => (
     <Portal level="top">
       {showOverflowMenu ? (
         <Overlay
@@ -30,6 +34,7 @@ export function useMenuHandleClickOutside(): MenuHandleClickOutside {
           backgroundColor={COLORS.transparent}
         />
       ) : null}
+      {props.children}
     </Portal>
   )
 
