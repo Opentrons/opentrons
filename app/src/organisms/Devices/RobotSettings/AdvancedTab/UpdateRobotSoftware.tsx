@@ -61,7 +61,7 @@ export function UpdateRobotSoftware({
     >
       <Box width="70%">
         <StyledText
-          as="h3"
+          as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing4}
           id="AdvancedSettings_updateRobotSoftware"

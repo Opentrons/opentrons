@@ -81,7 +81,7 @@ export function FactoryResetModal({
                 onClick={closeModal}
                 textTransform={TEXT_TRANSFORM_CAPITALIZE}
                 marginRight={SPACING.spacing3}
-                css={TYPOGRAPHY.linkPSemibold}
+                css={TYPOGRAPHY.linkPSemiBold}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {t('shared:cancel')}

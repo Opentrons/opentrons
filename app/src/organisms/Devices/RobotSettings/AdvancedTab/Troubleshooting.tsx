@@ -47,9 +47,9 @@ export function Troubleshooting({
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
         <StyledText
-          as="h3"
+          as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacingM}
+          marginBottom={SPACING.spacing4}
         >
           {t('update_robot_software_troubleshooting')}
         </StyledText>

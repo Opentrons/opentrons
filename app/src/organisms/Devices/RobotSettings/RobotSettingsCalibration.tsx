@@ -9,7 +9,6 @@ import {
   Link,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  COLORS,
   SPACING,
   TYPOGRAPHY,
   TEXT_DECORATION_UNDERLINE,
@@ -300,8 +299,7 @@ export function RobotSettingsCalibration({
               />
             ) : null}
             <Link
-              color={COLORS.blue}
-              css={TYPOGRAPHY.pRegular}
+              css={TYPOGRAPHY.linkPSemiBold}
               onClick={() => setShowDeckCalibrationModal(true)}
             >
               {t('see_how_robot_calibration_works')}

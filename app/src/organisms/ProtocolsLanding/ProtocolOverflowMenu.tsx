@@ -133,7 +133,7 @@ export function ProtocolOverflowMenu(
                   }}
                   textTransform={TEXT_TRANSFORM_CAPITALIZE}
                   marginRight={SPACING.spacing5}
-                  css={TYPOGRAPHY.linkPSemibold}
+                  css={TYPOGRAPHY.linkPSemiBold}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   {t('shared:cancel')}
