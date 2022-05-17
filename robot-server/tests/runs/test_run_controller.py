@@ -47,7 +47,7 @@ def run_id() -> str:
 
 
 @pytest.fixture
-def protocol_run_data() -> StateSummary:
+def engine_state_summary() -> StateSummary:
     """Get a StateSummary value object."""
     return StateSummary(
         status=EngineStatus.IDLE,
@@ -117,7 +117,7 @@ async def test_create_play_action_to_start(
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
-    protocol_run_data: StateSummary,
+    engine_state_summary: StateSummary,
     protocol_commands: List[pe_commands.Command],
     run_id: str,
     subject: RunController,
@@ -145,7 +145,7 @@ async def test_create_play_action_to_start(
     decoy.when(await mock_engine_store.runner.run()).then_return(
         ProtocolRunResult(
             commands=protocol_commands,
-            state_summary=protocol_run_data,
+            state_summary=engine_state_summary,
         )
     )
 
@@ -154,7 +154,7 @@ async def test_create_play_action_to_start(
     decoy.verify(
         mock_run_store.update_run_state(
             run_id=run_id,
-            run_data=protocol_run_data,
+            summary=engine_state_summary,
             commands=protocol_commands,
         ),
         times=1,

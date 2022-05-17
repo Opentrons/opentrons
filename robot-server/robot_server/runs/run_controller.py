@@ -50,7 +50,6 @@ class RunController:
 
         Raises:
             RunNotFoundError: The given run identifier was not found in the database.
-            RunStopped: The given run is not the current run.
             RunActionNotAllowed: The following operation is not allowed
         """
         assert (
@@ -90,6 +89,6 @@ class RunController:
         result = await self._engine_store.runner.run()
         self._run_store.update_run_state(
             run_id=self._run_id,
-            run_data=result.state_summary,
+            summary=result.state_summary,
             commands=result.commands,
         )

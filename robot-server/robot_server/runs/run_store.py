@@ -71,18 +71,21 @@ class RunStore:
     def update_run_state(
         self,
         run_id: str,
-        run_data: StateSummary,
+        summary: StateSummary,
         commands: List[Command],
     ) -> RunResource:
-        """Update run table with run protocol_run_data to db.
+        """Update the run's state summary and commands list.
 
         Args:
             run_id: The run to update
-            run_data: The run's equipment and status summary.
+            summary: The run's equipment and status summary.
             commands: The run's commands.
 
         Returns:
             The run resource.
+
+        Raises:
+            RunNotFoundError: Run ID was not found in the database.
         """
         update_run = (
             sqlalchemy.update(run_table)
@@ -91,9 +94,9 @@ class RunStore:
                 _convert_state_to_sql_values(
                     state=_RunStateResource(
                         commands=commands,
-                        protocol_run_data=run_data,
+                        protocol_run_data=summary,
                         run_id=run_id,
-                        engine_status=run_data.status,
+                        engine_status=summary.status,
                     )
                 )
             )
@@ -121,11 +124,14 @@ class RunStore:
         return _convert_row_to_run(row=run_row, action_rows=action_rows)
 
     def insert_action(self, run_id: str, action: RunAction) -> None:
-        """Insert run action in the db.
+        """Insert a run action into the store.
 
-        Arguments:
-            run_id: current run id to get
-            action: action to insert into the db
+        Args:
+            run_id: Run to add the action to.
+            action: Action payload to persist.
+
+        Raises:
+            RunNotFoundError: The given run ID was not found in the store.
         """
         insert = sqlalchemy.insert(action_table).values(
             _convert_action_to_sql_values(run_id=run_id, action=action),
@@ -145,11 +151,17 @@ class RunStore:
     ) -> RunResource:
         """Insert run resource in the db.
 
-        Arguments:
-            run: Run resource to store.
+        Args:
+            run_id: Unique identifier to use for the run.
+            created_at: Run creation timestamp.
+            protocol_id: Protocol resource used by the run, if any.
 
         Returns:
             The resource that was added to the store.
+
+        Raises:
+            ProtocolNotFoundError: The given protocol ID was not
+                found in the store.
         """
         run = RunResource(
             run_id=run_id,
@@ -176,20 +188,19 @@ class RunStore:
         """Whether a given run exists in the store."""
         statement = sqlalchemy.select(run_table).where(run_table.c.id == run_id)
         with self._sql_engine.begin() as transaction:
-            try:
-                exists = transaction.execute(statement).first() is not None
-            except sqlalchemy.exc.NoResultFound:
-                return False
-            return exists
+            return transaction.execute(statement).first() is not None
 
     def get(self, run_id: str) -> RunResource:
         """Get a specific run entry by its identifier.
 
-        Arguments:
+        Args:
             run_id: Unique identifier of run entry to retrieve.
 
         Returns:
-            The retrieved run entry from the db.
+            The retrieved run entry.
+
+        Raises:
+            RunNotFoundError: The given run ID was not found.
         """
         select_run_resource = sqlalchemy.select(
             run_table.c.id,
@@ -235,8 +246,13 @@ class RunStore:
             for run_row in runs
         ]
 
-    def get_run_data(self, run_id: str) -> Optional[StateSummary]:
-        """Get the archived run data of a run."""
+    def get_state_summary(self, run_id: str) -> Optional[StateSummary]:
+        """Get the archived run state summary.
+
+        This is a summary of run's ProtocolEngine state,
+        captured when the run was archived. It contains
+        status, equipment, and error information.
+        """
         select_run_data = sqlalchemy.select(run_table.c.protocol_run_data).where(
             run_table.c.id == run_id
         )
@@ -266,6 +282,9 @@ class RunStore:
         Returns:
             A collection of commands as well as the actual cursor used and
             the total length of the collection.
+
+        Raises:
+            RunNotFoundError: The given run ID was not found.
         """
         select_run_commands = sqlalchemy.select(run_table.c.commands).where(
             run_table.c.id == run_id

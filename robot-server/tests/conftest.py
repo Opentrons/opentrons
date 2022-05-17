@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from fastapi import routing
 from mock import MagicMock
 from starlette.testclient import TestClient
-from typing import Any, Callable, Dict, Iterator, cast, Generator
+from typing import Any, Callable, Dict, Generator, Iterator, cast
 from typing_extensions import NoReturn
 from pathlib import Path
 from sqlalchemy.engine import Engine

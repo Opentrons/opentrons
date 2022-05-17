@@ -164,9 +164,10 @@ async def create_run(
             protocol=protocol_resource,
         )
     except EngineConflictError as e:
-        raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
+        raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
     except ProtocolNotFoundError as e:
-        raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+        raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+
     log.info(f'Created protocol run "{run_id}" from protocol "{protocol_id}".')
 
     return await PydanticResponse.create(

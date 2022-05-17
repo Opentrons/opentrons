@@ -82,7 +82,7 @@ class StateView(HasState[State]):
 
     def get_summary(self) -> StateSummary:
         """Get protocol run data."""
-        return StateSummary(
+        return StateSummary.construct(
             status=self.commands.get_status(),
             errors=self._commands.get_all_errors(),
             pipettes=self._pipettes.get_all(),

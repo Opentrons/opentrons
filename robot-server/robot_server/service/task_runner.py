@@ -13,7 +13,6 @@ from robot_server.app_state import AppState, AppStateAccessor, get_app_state
 
 log = getLogger(__name__)
 
-
 TaskFunc = Callable[..., Awaitable[Any]]
 
 _task_runner_accessor = AppStateAccessor["TaskRunner"]("task_runner")

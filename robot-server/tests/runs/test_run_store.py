@@ -1,7 +1,8 @@
 """Tests for robot_server.runs.run_store."""
-import pytest
 from datetime import datetime, timezone
-from typing import List, Optional, Any
+from typing import List, Optional, Type
+
+import pytest
 from sqlalchemy.engine import Engine
 
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
@@ -62,7 +63,7 @@ def protocol_commands() -> List[pe_commands.Command]:
 
 
 @pytest.fixture
-def protocol_run() -> StateSummary:
+def state_summary() -> StateSummary:
     """Get a StateSummary test object."""
     analysis_error = pe_errors.ErrorOccurrence(
         id="error-id",
@@ -99,7 +100,7 @@ def protocol_run() -> StateSummary:
 
 def test_update_run_state(
     subject: RunStore,
-    protocol_run: StateSummary,
+    state_summary: StateSummary,
     protocol_commands: List[pe_commands.Command],
 ) -> None:
     """It should be able to update a run state to the store."""
@@ -118,10 +119,10 @@ def test_update_run_state(
 
     result = subject.update_run_state(
         run_id="run-id",
-        run_data=protocol_run,
+        summary=state_summary,
         commands=protocol_commands,
     )
-    run_data_result = subject.get_run_data(run_id="run-id")
+    run_summary_result = subject.get_state_summary(run_id="run-id")
     commands_result = subject.get_commands_slice(
         run_id="run-id",
         length=len(protocol_commands),
@@ -134,20 +135,20 @@ def test_update_run_state(
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[action],
     )
-    assert run_data_result == protocol_run
+    assert run_summary_result == state_summary
     assert commands_result.commands == protocol_commands
 
 
 def test_update_state_run_not_found(
     subject: RunStore,
-    protocol_run: StateSummary,
+    state_summary: StateSummary,
     protocol_commands: List[pe_commands.Command],
 ) -> None:
     """It should be able to catch the exception raised by insert."""
     with pytest.raises(RunNotFoundError, match="run-not-found"):
         subject.update_run_state(
             run_id="run-not-found",
-            run_data=protocol_run,
+            summary=state_summary,
             commands=protocol_commands,
         )
 
@@ -308,26 +309,26 @@ def test_insert_actions_no_run(subject: RunStore) -> None:
         subject.insert_action(run_id="run-id-996", action=action)
 
 
-def test_get_run_data(subject: RunStore, protocol_run: StateSummary) -> None:
+def test_get_state_summary(subject: RunStore, state_summary: StateSummary) -> None:
     """It should be able to get store run data."""
     subject.insert(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
-    subject.update_run_state(run_id="run-id", run_data=protocol_run, commands=[])
-    result = subject.get_run_data(run_id="run-id")
-    assert result == protocol_run
+    subject.update_run_state(run_id="run-id", summary=state_summary, commands=[])
+    result = subject.get_state_summary(run_id="run-id")
+    assert result == state_summary
 
 
-def test_get_run_data_none(subject: RunStore) -> None:
+def test_get_state_summary_none(subject: RunStore) -> None:
     """It should return None if no state data stored."""
     subject.insert(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
-    result = subject.get_run_data(run_id="run-id")
+    result = subject.get_state_summary(run_id="run-id")
     assert result is None
 
 
@@ -351,7 +352,7 @@ def test_has_no_run_id(subject: RunStore) -> None:
 def test_get_command(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
-    protocol_run: StateSummary,
+    state_summary: StateSummary,
 ) -> None:
     """Should return a run command from the db."""
     subject.insert(
@@ -359,7 +360,7 @@ def test_get_command(
     )
     subject.update_run_state(
         run_id="run-id",
-        run_data=protocol_run,
+        summary=state_summary,
         commands=protocol_commands,
     )
     result = subject.get_command(run_id="run-id", command_id="pause-2")
@@ -377,10 +378,10 @@ def test_get_command(
 def test_get_command_raise_exception(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
-    protocol_run: StateSummary,
+    state_summary: StateSummary,
     input_run_id: str,
     input_command_id: str,
-    expected_exception: Any,
+    expected_exception: Type[Exception],
 ) -> None:
     """Should raise exception."""
     subject.insert(
@@ -388,127 +389,85 @@ def test_get_command_raise_exception(
     )
     subject.update_run_state(
         run_id="run-id",
-        run_data=protocol_run,
+        summary=state_summary,
         commands=protocol_commands,
     )
     with pytest.raises(expected_exception):
         subject.get_command(run_id=input_run_id, command_id=input_command_id)
 
 
-@pytest.mark.parametrize(
-    "input_cursor, input_length, expected_cursor, expected_length, expected_commands_result",  # noqa: E501
-    [
-        (
-            1,
-            2,
-            1,
-            3,
-            [
-                pe_commands.Pause(
-                    id="pause-2",
-                    key="command-key",
-                    status=pe_commands.CommandStatus.SUCCEEDED,
-                    createdAt=datetime(year=2022, month=2, day=2),
-                    params=pe_commands.PauseParams(message="hey world"),
-                    result=pe_commands.PauseResult(),
-                ),
-                pe_commands.Pause(
-                    id="pause-3",
-                    key="command-key",
-                    status=pe_commands.CommandStatus.SUCCEEDED,
-                    createdAt=datetime(year=2023, month=3, day=3),
-                    params=pe_commands.PauseParams(message="sup world"),
-                    result=pe_commands.PauseResult(),
-                ),
-            ],
-        ),
-        (
-            0,
-            1,
-            0,
-            3,
-            [
-                pe_commands.Pause(
-                    id="pause-1",
-                    key="command-key",
-                    status=pe_commands.CommandStatus.SUCCEEDED,
-                    createdAt=datetime(year=2021, month=1, day=1),
-                    params=pe_commands.PauseParams(message="hello world"),
-                    result=pe_commands.PauseResult(),
-                )
-            ],
-        ),
-        (
-            None,
-            3,
-            0,
-            3,
-            [
-                pe_commands.Pause(
-                    id="pause-1",
-                    key="command-key",
-                    status=pe_commands.CommandStatus.SUCCEEDED,
-                    createdAt=datetime(year=2021, month=1, day=1),
-                    params=pe_commands.PauseParams(message="hello world"),
-                    result=pe_commands.PauseResult(),
-                ),
-                pe_commands.Pause(
-                    id="pause-2",
-                    key="command-key",
-                    status=pe_commands.CommandStatus.SUCCEEDED,
-                    createdAt=datetime(year=2022, month=2, day=2),
-                    params=pe_commands.PauseParams(message="hey world"),
-                    result=pe_commands.PauseResult(),
-                ),
-                pe_commands.Pause(
-                    id="pause-3",
-                    key="command-key",
-                    status=pe_commands.CommandStatus.SUCCEEDED,
-                    createdAt=datetime(year=2023, month=3, day=3),
-                    params=pe_commands.PauseParams(message="sup world"),
-                    result=pe_commands.PauseResult(),
-                ),
-            ],
-        ),
-    ],
-)
-def test_get_commands_slice(
+def test_get_command_slice(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
-    protocol_run: StateSummary,
-    input_cursor: Optional[int],
-    input_length: int,
-    expected_cursor: int,
-    expected_length: int,
-    expected_commands_result: List[pe_commands.Command],
+    state_summary: StateSummary,
 ) -> None:
-    """Should return commands list sliced."""
-    expected_command_slice = CommandSlice(
-        commands=expected_commands_result,
-        cursor=expected_cursor,
-        total_length=expected_length,
-    )
-
+    """It should return slices of commands."""
     subject.insert(
-        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
     subject.update_run_state(
         run_id="run-id",
-        run_data=protocol_run,
+        summary=state_summary,
+        commands=protocol_commands,
+    )
+    result = subject.get_commands_slice(
+        run_id="run-id", cursor=0, length=len(protocol_commands)
+    )
+
+    assert result == CommandSlice(
+        cursor=0,
+        total_length=len(protocol_commands),
+        commands=protocol_commands,
+    )
+
+
+@pytest.mark.parametrize(
+    ("input_cursor", "input_length", "expected_cursor", "expected_command_ids"),
+    [
+        (0, 3, 0, ["pause-1", "pause-2", "pause-3"]),
+        (0, 1, 0, ["pause-1"]),
+        (1, 2, 1, ["pause-2", "pause-3"]),
+        (0, 999, 0, ["pause-1", "pause-2", "pause-3"]),
+        (1, 999, 1, ["pause-2", "pause-3"]),
+        (None, 3, 0, ["pause-1", "pause-2", "pause-3"]),
+        (None, 2, 1, ["pause-2", "pause-3"]),
+        (999, 2, 2, ["pause-3"]),
+    ],
+)
+def test_get_commands_slice_clamping(
+    subject: RunStore,
+    protocol_commands: List[pe_commands.Command],
+    state_summary: StateSummary,
+    input_cursor: Optional[int],
+    input_length: int,
+    expected_cursor: int,
+    expected_command_ids: List[str],
+) -> None:
+    """It should clamp slice cursor and page length."""
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    subject.update_run_state(
+        run_id="run-id",
+        summary=state_summary,
         commands=protocol_commands,
     )
     result = subject.get_commands_slice(
         run_id="run-id", cursor=input_cursor, length=input_length
     )
 
-    assert expected_command_slice == result
+    assert result.cursor == expected_cursor
+    assert result.total_length == len(protocol_commands)
+    assert [
+        result_command.id for result_command in result.commands
+    ] == expected_command_ids
 
 
-def test_get_run_command_slice_none(
-    subject: RunStore,
-    protocol_run: StateSummary,
-    protocol_commands: List[pe_commands.Command],
-) -> None:
+def test_get_run_command_slice_none(subject: RunStore) -> None:
     """It should return None if no commands stored."""
     subject.insert(
         run_id="run-id",

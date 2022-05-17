@@ -2,8 +2,6 @@
 from datetime import datetime
 from typing import List, Optional
 
-from typing_extensions import Literal
-
 from opentrons.protocol_engine import (
     EngineStatus,
     LabwareOffsetCreate,
@@ -23,10 +21,12 @@ from .run_models import Run
 
 def _build_run(
     run_resource: RunResource,
-    run_data: Optional[StateSummary],
+    state_summary: Optional[StateSummary],
     current: bool,
 ) -> Run:
-    run_data = run_data or StateSummary.construct(
+    # TODO(mc, 2022-05-16): improve persistence strategy
+    # such that this default summary object is not needed
+    state_summary = state_summary or StateSummary.construct(
         status=EngineStatus.STOPPED,
         errors=[],
         labware=[],
@@ -39,11 +39,11 @@ def _build_run(
         protocolId=run_resource.protocol_id,
         createdAt=run_resource.created_at,
         actions=run_resource.actions,
-        status=run_data.status,
-        errors=run_data.errors,
-        labware=run_data.labware,
-        labwareOffsets=run_data.labwareOffsets,
-        pipettes=run_data.pipettes,
+        status=state_summary.status,
+        errors=state_summary.errors,
+        labware=state_summary.labware,
+        labwareOffsets=state_summary.labwareOffsets,
+        pipettes=state_summary.pipettes,
         current=current,
     )
 
@@ -59,7 +59,7 @@ class RunDataManager:
     (historical runs). Returns `Run` response models to the router.
 
     Args:
-        engine_store: In-memory store the current run's ProtocolEngine.
+        engine_store: In-memory store of the current run's ProtocolEngine.
         run_store: Persistent database of current and historical run data.
     """
 
@@ -101,11 +101,11 @@ class RunDataManager:
             prev_run_result = await self._engine_store.clear()
             self._run_store.update_run_state(
                 run_id=prev_run_id,
-                run_data=prev_run_result.state_summary,
+                summary=prev_run_result.state_summary,
                 commands=prev_run_result.commands,
             )
 
-        run_data = await self._engine_store.create(
+        state_summary = await self._engine_store.create(
             run_id=run_id,
             labware_offsets=labware_offsets,
             protocol=protocol,
@@ -116,7 +116,11 @@ class RunDataManager:
             protocol_id=protocol.protocol_id if protocol is not None else None,
         )
 
-        return _build_run(run_resource=run_resource, run_data=run_data, current=True)
+        return _build_run(
+            run_resource=run_resource,
+            state_summary=state_summary,
+            current=True,
+        )
 
     def get(self, run_id: str) -> Run:
         """Get a run resource.
@@ -134,10 +138,10 @@ class RunDataManager:
             RunNotFoundError: The given run identifier does not exist.
         """
         run_resource = self._run_store.get(run_id)
-        run_data = self._get_run_data(run_id)
+        state_summary = self._get_state_summary(run_id)
         current = run_id == self._engine_store.current_run_id
 
-        return _build_run(run_resource, run_data, current)
+        return _build_run(run_resource, state_summary, current)
 
     def get_all(self) -> List[Run]:
         """Get current and stored run resources.
@@ -148,7 +152,7 @@ class RunDataManager:
         return [
             _build_run(
                 run_resource=run_resource,
-                run_data=self._get_run_data(run_resource.run_id),
+                state_summary=self._get_state_summary(run_resource.run_id),
                 current=run_resource.run_id == self._engine_store.current_run_id,
             )
             for run_resource in self._run_store.get_all()
@@ -170,7 +174,7 @@ class RunDataManager:
         else:
             self._run_store.remove(run_id)
 
-    async def update(self, run_id: str, current: Optional[Literal[False]]) -> Run:
+    async def update(self, run_id: str, current: Optional[bool]) -> Run:
         """Get and potentially archive a run.
 
         Args:
@@ -192,19 +196,19 @@ class RunDataManager:
         next_current = current if current is False else True
 
         if next_current is False:
-            commands, run_data = await self._engine_store.clear()
+            commands, state_summary = await self._engine_store.clear()
             run_resource = self._run_store.update_run_state(
                 run_id=run_id,
-                run_data=run_data,
+                summary=state_summary,
                 commands=commands,
             )
         else:
-            run_data = self._engine_store.engine.state_view.get_summary()
+            state_summary = self._engine_store.engine.state_view.get_summary()
             run_resource = self._run_store.get(run_id=run_id)
 
         return _build_run(
             run_resource=run_resource,
-            run_data=run_data,
+            state_summary=state_summary,
             current=next_current,
         )
 
@@ -263,12 +267,12 @@ class RunDataManager:
 
         return self._run_store.get_command(run_id=run_id, command_id=command_id)
 
-    def _get_run_data(self, run_id: str) -> Optional[StateSummary]:
+    def _get_state_summary(self, run_id: str) -> Optional[StateSummary]:
         result: Optional[StateSummary]
 
         if run_id == self._engine_store.current_run_id:
             result = self._engine_store.engine.state_view.get_summary()
         else:
-            result = self._run_store.get_run_data(run_id)
+            result = self._run_store.get_state_summary(run_id)
 
         return result

@@ -5,6 +5,7 @@ from decoy import Decoy
 
 from robot_server.errors import ApiError
 from robot_server.service.json_api import RequestModel
+from robot_server.runs.run_store import RunNotFoundError
 from robot_server.runs.run_controller import RunController, RunActionNotAllowedError
 
 from robot_server.runs.action_models import (
@@ -62,6 +63,7 @@ async def test_create_run_action(
     ("exception", "expected_error_id", "expected_status_code"),
     [
         (RunActionNotAllowedError("oh no"), "RunActionNotAllowed", 409),
+        (RunNotFoundError("oh no"), "RunNotFound", 404),
     ],
 )
 async def test_create_play_action_not_allowed(

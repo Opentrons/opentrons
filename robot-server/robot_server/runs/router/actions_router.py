@@ -12,7 +12,7 @@ from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResp
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 
 from ..engine_store import EngineStore
-from ..run_store import RunStore
+from ..run_store import RunStore, RunNotFoundError
 from ..run_controller import RunController, RunActionNotAllowedError
 from ..action_models import RunAction, RunActionCreate
 from ..dependencies import get_engine_store, get_run_store
@@ -96,7 +96,12 @@ async def create_run_action(
         )
 
     except RunActionNotAllowedError as e:
-        raise RunActionNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
+        raise RunActionNotAllowed(detail=str(e)).as_error(
+            status.HTTP_409_CONFLICT
+        ) from e
+
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=action),
