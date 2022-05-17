@@ -5,13 +5,12 @@ import { renderWithProviders, Mount } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const render = (
   props: React.ComponentProps<typeof PipetteOffsetCalibrationItems>
-) => {
+): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(<PipetteOffsetCalibrationItems {...props} />, {
     i18nInstance: i18n,
-  })[0]
+  })
 }
 
 const ROBOT_NAME = 'otie'
@@ -55,7 +54,7 @@ describe('PipetteOffsetCalibrationItems', () => {
   })
 
   it('should render table headers', () => {
-    const { getByText } = render(props)
+    const [{ getByText }] = render(props)
     getByText('Pipette Model and Serial')
     getByText('Mount')
     getByText('Tip Rack')
@@ -63,13 +62,13 @@ describe('PipetteOffsetCalibrationItems', () => {
   })
 
   it('should render overFlow menu', () => {
-    const { getAllByRole } = render(props)
+    const [{ getAllByRole }] = render(props)
     const buttons = getAllByRole('button')
     expect(buttons).toHaveLength(2)
   })
 
   it('should render pipette offset calibrations data - unknown custom tiprack', () => {
-    const { getByText } = render(props)
+    const [{ getByText }] = render(props)
     getByText('mockPipetteModelLeft')
     getByText('1234567')
     getByText('left')
@@ -93,7 +92,7 @@ describe('PipetteOffsetCalibrationItems', () => {
         },
       ],
     }
-    const { getByText } = render(props)
+    const [{ getByText }] = render(props)
     getByText('Missing calibration')
   })
 
@@ -111,7 +110,7 @@ describe('PipetteOffsetCalibrationItems', () => {
         },
       ],
     }
-    const { getByText } = render(props)
+    const [{ getByText }] = render(props)
     getByText('Recalibration recommended')
   })
 })

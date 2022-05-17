@@ -153,7 +153,6 @@ describe('RobotSettingsCalibration', () => {
     })
   })
 
-  // Pipette Offset Calibrations this comment will be removed when finish all sections
   it('renders a title and description - Pipette Offset Calibrations', () => {
     const [{ getByText }] = render()
     getByText('Pipette Offset Calibrations')

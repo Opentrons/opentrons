@@ -9,8 +9,9 @@ import { useCalibratePipetteOffset } from '../../../../CalibratePipetteOffset/us
 
 import { OverflowMenu } from '../OverflowMenu'
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const render = (props: React.ComponentProps<typeof OverflowMenu>) => {
+const render = (
+  props: React.ComponentProps<typeof OverflowMenu>
+): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(<OverflowMenu {...props} />, {
     i18nInstance: i18n,
   })
