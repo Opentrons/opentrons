@@ -19,7 +19,9 @@ import {
 import { storedProtocolData } from '../../../redux/protocol-storage/__fixtures__'
 import { ProtocolDetails } from '..'
 import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
+import { getValidCustomLabwareFiles } from '../../../redux/custom-labware/selectors'
 
+jest.mock('../../../redux/custom-labware/selectors')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/protocol-storage/selectors')
 jest.mock('../../../molecules/DeckThumbnail')
@@ -40,6 +42,7 @@ const mockDeckThumbnail = DeckThumbnail as jest.MockedFunction<
 const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as jest.MockedFunction<
   typeof getIsProtocolAnalysisInProgress
 >
+const mockGetValidCustomLabwareFiles = getValidCustomLabwareFiles as jest.MockedFunction<typeof getValidCustomLabwareFiles>
 
 const render = (
   props: Partial<React.ComponentProps<typeof ProtocolDetails>> = {}
@@ -62,6 +65,7 @@ const description = 'fake protocol description'
 
 describe('ProtocolDetails', () => {
   beforeEach(() => {
+    mockGetValidCustomLabwareFiles.mockReturnValue([])
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
