@@ -25,10 +25,18 @@ def database_v0(tmp_path: Path) -> Path:
     db_path = tmp_path / "migration-test-v0.db"
     sql_engine = create_sql_engine(db_path)
     sql_engine.execute("DROP TABLE migration")
-    sql_engine.execute("ALTER TABLE run DROP COLUMN state_summary")
-    sql_engine.execute("ALTER TABLE run DROP COLUMN commands")
-    sql_engine.execute("ALTER TABLE run DROP COLUMN engine_status")
-    sql_engine.execute("ALTER TABLE run DROP COLUMN _updated_at")
+    sql_engine.execute("DROP TABLE run")
+    sql_engine.execute(
+        """
+        CREATE TABLE run (
+            id VARCHAR NOT NULL,
+            created_at DATETIME NOT NULL,
+            protocol_id VARCHAR,
+            PRIMARY KEY (id),
+            FOREIGN KEY(protocol_id) REFERENCES protocol (id)
+        )
+        """
+    )
     sql_engine.dispose()
     return db_path
 
