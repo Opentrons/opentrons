@@ -36,6 +36,7 @@ export const forHeaterShakerSetTargetTemperature = (
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
+  // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10182 merges
   const { moduleId, temperature } = params
   const moduleState = _getHeaterShakerModuleState(robotState, moduleId)
 

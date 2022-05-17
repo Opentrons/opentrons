@@ -18,7 +18,7 @@ from .modules import ModuleState, ModuleStore, ModuleView
 from .geometry import GeometryView
 from .motion import MotionView
 from .configs import EngineConfigs
-
+from .state_summary import StateSummary
 
 ReturnT = TypeVar("ReturnT")
 
@@ -79,6 +79,17 @@ class StateView(HasState[State]):
     def get_configs(self) -> EngineConfigs:
         """Get Protocol Engine configurations."""
         return self._configs
+
+    def get_summary(self) -> StateSummary:
+        """Get protocol run data."""
+        return StateSummary.construct(
+            status=self.commands.get_status(),
+            errors=self._commands.get_all_errors(),
+            pipettes=self._pipettes.get_all(),
+            labware=self._labware.get_all(),
+            labwareOffsets=self._labware.get_labware_offsets(),
+            modules=self.modules.get_all(),
+        )
 
 
 class StateStore(StateView, ActionHandler):

@@ -2,7 +2,12 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import '@testing-library/jest-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { getIsTiprack, getPipetteNameSpecs } from '@opentrons/shared-data'
+import { useCommandQuery } from '@opentrons/react-api-client'
+import {
+  Coordinates,
+  getIsTiprack,
+  getPipetteNameSpecs,
+} from '@opentrons/shared-data'
 import {
   RobotWorkSpace,
   componentPropsMatcher,
@@ -16,8 +21,10 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { JogControls } from '../../../molecules/JogControls'
+import { OffsetVector } from '../../../molecules/OffsetVector'
 import { useProtocolDetailsForRun } from '../../Devices/hooks'
 import { LabwarePositionCheckStepDetail } from '../LabwarePositionCheckStepDetail'
+import { useLabwareOffsetForLabware } from '../hooks/useLabwareOffsetForLabware'
 import { StepDetailText } from '../StepDetailText'
 
 jest.mock('@opentrons/components', () => {
@@ -37,9 +44,12 @@ jest.mock('@opentrons/shared-data', () => {
     getIsTiprack: jest.fn(),
   }
 })
-jest.mock('../../Devices/hooks')
-jest.mock('../StepDetailText')
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../molecules/JogControls')
+jest.mock('../../Devices/hooks')
+jest.mock('../hooks/useLabwareOffsetForLabware')
+jest.mock('../StepDetailText')
+jest.mock('../../../molecules/OffsetVector')
 
 const mockStepDetailText = StepDetailText as jest.MockedFunction<
   typeof StepDetailText
@@ -53,6 +63,12 @@ const mockGetPipetteNameSpecs = getPipetteNameSpecs as jest.MockedFunction<
 const mockGetIsTiprack = getIsTiprack as jest.MockedFunction<
   typeof getIsTiprack
 >
+const mockUseCommandQuery = useCommandQuery as jest.MockedFunction<
+  typeof useCommandQuery
+>
+const mockUseLabwareOffsetForLabware = useLabwareOffsetForLabware as jest.MockedFunction<
+  typeof useLabwareOffsetForLabware
+>
 
 const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
   typeof RobotWorkSpace
@@ -62,6 +78,9 @@ const mockLabwareRender = LabwareRender as jest.MockedFunction<
 >
 const mockPipetteRender = PipetteRender as jest.MockedFunction<
   typeof PipetteRender
+>
+const mockOffsetVector = OffsetVector as jest.MockedFunction<
+  typeof OffsetVector
 >
 const mockJogControls = JogControls as jest.MockedFunction<typeof JogControls>
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
@@ -73,6 +92,8 @@ const LABWARE_DEF = {
   ordering: [['A1', 'A2']],
 }
 const MOCK_RUN_ID = 'fakeRunId'
+const mockStartingPosition: Coordinates = { x: 1, y: 2, z: 3 }
+const mockJoggedToPosition: Coordinates = { x: 2, y: 3, z: 4 }
 const mockLabwarePositionCheckStepTipRack = {
   labwareId:
     '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1',
@@ -101,8 +122,15 @@ describe('LabwarePositionCheckStepDetail', () => {
   beforeEach(() => {
     props = {
       selectedStep: mockLabwarePositionCheckStepTipRack,
-      jog: jest.fn() as any,
+      jog: jest
+        .fn()
+        .mockImplementation((_axis, _direction, _step, onSuccess) => {
+          onSuccess(mockJoggedToPosition)
+        }) as any,
       runId: MOCK_RUN_ID,
+      savePositionCommandData: {
+        [mockLabwarePositionCheckStepTipRack.labwareId]: ['commandId1'],
+      },
     }
     when(mockStepDetailText)
       .calledWith(
@@ -111,6 +139,21 @@ describe('LabwarePositionCheckStepDetail', () => {
         })
       )
       .mockReturnValue(<div>Mock Step Detail Text </div>)
+    when(mockUseLabwareOffsetForLabware)
+      .calledWith(MOCK_RUN_ID, mockLabwarePositionCheckStepTipRack.labwareId)
+      .mockReturnValue(null)
+    when(mockUseCommandQuery)
+      .calledWith(MOCK_RUN_ID, 'commandId1')
+      .mockReturnValue({
+        data: {
+          data: {
+            commandType: 'savePosition',
+            result: {
+              position: mockStartingPosition,
+            },
+          },
+        },
+      } as any)
     when(mockUseProtocolDetailsForRun)
       .calledWith(MOCK_RUN_ID)
       .mockReturnValue({
@@ -162,6 +205,14 @@ describe('LabwarePositionCheckStepDetail', () => {
         })
       )
       .mockReturnValue(<div>mock pipette render</div>)
+    when(mockOffsetVector)
+      .mockReturnValue(
+        <div>mockOffsetVector not being called with the correct props</div>
+      )
+      .calledWith(anyProps())
+      .mockImplementation(props => (
+        <div>{`x${props.x},y${props.y},z${props.z}`}</div>
+      ))
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -292,6 +343,47 @@ describe('LabwarePositionCheckStepDetail', () => {
       })
       fireEvent.click(revealJogControls)
       getByText('Mock Jog Controls')
+    })
+    it('renders identity offset and updates correctly after jog', () => {
+      mockJogControls.mockImplementation(props => (
+        <button onClick={() => props.jog('x', 1, 1)}>MOCK JOG BUTTON</button>
+      ))
+      const { getByText, getByRole } = render(props)
+      const revealJogControls = getByRole('link', {
+        name: 'Reveal jog controls',
+      })
+      getByText('x0,y0,z0')
+      fireEvent.click(revealJogControls)
+      const jogButton = getByRole('button', {
+        name: 'MOCK JOG BUTTON',
+      })
+      fireEvent.click(jogButton)
+      getByText('x1,y1,z1')
+    })
+    it('renders existing offset and updates correctly after jog', () => {
+      mockJogControls.mockImplementation(props => (
+        <button onClick={() => props.jog('x', 1, 1)}>MOCK JOG BUTTON</button>
+      ))
+      when(mockUseLabwareOffsetForLabware)
+        .calledWith(MOCK_RUN_ID, mockLabwarePositionCheckStepTipRack.labwareId)
+        .mockReturnValue({
+          id: 'fake_offset_id',
+          vector: { x: 4, y: 5, z: 6 },
+          createdAt: 'fakeTimestamp',
+          location: { slotName: '1' },
+          definitionUri: 'fakeUri',
+        })
+      const { getByText, getByRole } = render(props)
+      const revealJogControls = getByRole('link', {
+        name: 'Reveal jog controls',
+      })
+      getByText('x4,y5,z6')
+      fireEvent.click(revealJogControls)
+      const jogButton = getByRole('button', {
+        name: 'MOCK JOG BUTTON',
+      })
+      fireEvent.click(jogButton)
+      getByText('x5,y6,z7')
     })
   })
 })

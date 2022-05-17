@@ -2,7 +2,7 @@ import * as React from 'react'
 import { when } from 'jest-when'
 import { renderHook } from '@testing-library/react-hooks'
 import { I18nextProvider } from 'react-i18next'
-import { getLabwareLocation } from '../../../ProtocolSetup/utils/getLabwareLocation'
+import { getLabwareLocation } from '../../../Devices/ProtocolRun/utils/getLabwareLocation'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { i18n } from '../../../../i18n'
 import { useTitleText } from '../useLabwarePositionCheck'
@@ -13,7 +13,7 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 
 jest.mock('../../../Devices/hooks')
-jest.mock('../../../ProtocolSetup/utils/getLabwareLocation')
+jest.mock('../../../Devices/ProtocolRun/utils/getLabwareLocation')
 
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
@@ -35,6 +35,7 @@ describe('useTitleText', () => {
     when(mockUseProtocolDetailsForRun).calledWith(mockRunId).mockReturnValue({
       protocolData: mockProtocolData,
       displayName: 'mock display name',
+      protocolKey: 'fakeProtocolKey',
     })
     when(mockGetLabwareLocation)
       .calledWith(mockLabwareId, mockProtocolData.commands)

@@ -32,7 +32,10 @@ async def test_protocols_and_analyses_persist(
                 await robot_client.wait_until_alive()
             ), "Dev Robot never became available."
 
-            protocols_to_create = 13
+            # Must not be so high that the server runs out of room and starts
+            # auto-deleting old protocols.
+            protocols_to_create = 5
+
             for _ in range(protocols_to_create):
                 with protocol(secrets.token_urlsafe(16)) as file:
                     await robot_client.post_protocol([Path(file.name)])

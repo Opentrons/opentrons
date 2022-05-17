@@ -101,7 +101,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
                         moduleName: getModuleDisplayName(module.moduleModel),
                       }
                     )}
-                    index={i}
                     module={module}
                   />
                 ))}

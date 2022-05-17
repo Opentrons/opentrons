@@ -11,7 +11,13 @@ from anyio import Path as AsyncPath, create_task_group
 import sqlalchemy
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
-from robot_server.persistence import analysis_table, protocol_table, ensure_utc_datetime
+from robot_server.persistence import (
+    analysis_table,
+    protocol_table,
+    run_table,
+    sqlite_rowid,
+    ensure_utc_datetime,
+)
 
 
 _log = getLogger(__name__)
@@ -25,6 +31,23 @@ class ProtocolResource:
     created_at: datetime
     source: ProtocolSource
     protocol_key: Optional[str]
+
+
+@dataclass(frozen=True)
+class ProtocolUsageInfo:
+    """Information about whether a particular protocol is being used by any runs.
+
+    See `ProtocolStore.get_usage_info()`.
+    """
+
+    protocol_id: str
+    """This protocol's ID."""
+
+    is_used_by_run: bool
+    """Whether any currently existing run uses this protocol.
+
+    A protocol counts as "used" even if the run that uses it is no longer active.
+    """
 
 
 class ProtocolNotFoundError(KeyError):
@@ -202,6 +225,41 @@ class ProtocolStore:
             protocol_key=deleted_sql_resource.protocol_key,
             source=deleted_source,
         )
+
+    def get_usage_info(self) -> List[ProtocolUsageInfo]:
+        """Return information about which protocols are currently being used by runs.
+
+        See the `runs` module for information about runs.
+
+        Results are ordered with the oldest-added protocol first.
+        """
+        select_all_protocol_ids = sqlalchemy.select(protocol_table.c.id).order_by(
+            sqlite_rowid
+        )
+        select_used_protocol_ids = sqlalchemy.select(run_table.c.protocol_id).where(
+            run_table.c.protocol_id.is_not(None)
+        )
+
+        with self._sql_engine.begin() as transaction:
+            all_protocol_ids: List[str] = (
+                transaction.execute(select_all_protocol_ids).scalars().all()
+            )
+            used_protocol_ids: Set[str] = set(
+                transaction.execute(select_used_protocol_ids).scalars().all()
+            )
+
+        # It's probably inefficient to do this processing in Python
+        # instead of as part of the SQL query.
+        # But the number of runs and protocols is on the order of 20, so it's fine.
+        usage_info = [
+            ProtocolUsageInfo(
+                protocol_id=protocol_id,
+                is_used_by_run=(protocol_id in used_protocol_ids),
+            )
+            for protocol_id in all_protocol_ids
+        ]
+
+        return usage_info
 
     def _sql_insert(self, resource: _DBProtocolResource) -> None:
         statement = sqlalchemy.insert(protocol_table).values(

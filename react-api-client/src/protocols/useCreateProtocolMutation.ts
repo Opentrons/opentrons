@@ -10,18 +10,26 @@ import { useHost } from '../api'
 import type { AxiosError } from 'axios'
 import type { ErrorResponse, HostConfig, Protocol } from '@opentrons/api-client'
 
+export interface CreateProtocolVariables {
+  files: File[]
+  protocolKey?: string
+}
 export type UseCreateProtocolMutationResult = UseMutationResult<
   Protocol,
   AxiosError<ErrorResponse>,
-  File[]
+  CreateProtocolVariables
 > & {
-  createProtocol: UseMutateFunction<Protocol, AxiosError<ErrorResponse>, File[]>
+  createProtocol: UseMutateFunction<
+    Protocol,
+    AxiosError<ErrorResponse>,
+    CreateProtocolVariables
+  >
 }
 
 export type UseCreateProtocolMutationOptions = UseMutationOptions<
   Protocol,
   AxiosError<ErrorResponse>,
-  File[]
+  CreateProtocolVariables
 >
 
 export function useCreateProtocolMutation(
@@ -30,24 +38,30 @@ export function useCreateProtocolMutation(
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<Protocol, AxiosError<ErrorResponse>, File[]>(
+  const mutation = useMutation<
+    Protocol,
+    AxiosError<ErrorResponse>,
+    CreateProtocolVariables
+  >(
     [host, 'protocols'],
-    (protocolFiles: File[]) =>
-      createProtocol(host as HostConfig, protocolFiles).then(response => {
-        const protocolId = response.data.data.id
-        queryClient
-          .invalidateQueries([host, 'protocols'])
-          .then(() =>
-            queryClient.setQueryData(
-              [host, 'protocols', protocolId],
-              response.data
+    ({ files: protocolFiles, protocolKey }) =>
+      createProtocol(host as HostConfig, protocolFiles, protocolKey).then(
+        response => {
+          const protocolId = response.data.data.id
+          queryClient
+            .invalidateQueries([host, 'protocols'])
+            .then(() =>
+              queryClient.setQueryData(
+                [host, 'protocols', protocolId],
+                response.data
+              )
             )
-          )
-          .catch(e => {
-            console.error(e)
-          })
-        return response.data
-      }),
+            .catch(e => {
+              console.error(e)
+            })
+          return response.data
+        }
+      ),
     options
   )
   return {

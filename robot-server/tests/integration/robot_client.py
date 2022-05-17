@@ -1,13 +1,13 @@
 from __future__ import annotations
+
 import asyncio
-
-from pathlib import Path
-from typing import AsyncGenerator, List
-import httpx
-from httpx import Response
-
 import concurrent.futures
 import contextlib
+from pathlib import Path
+from typing import Any, AsyncGenerator, Dict, List
+
+import httpx
+from httpx import Response
 
 
 STARTUP_WAIT = 15
@@ -138,6 +138,92 @@ class RobotClient:
             file_payload.append(("files", open(file, "rb")))
         response = await self.httpx_client.post(
             url=f"{self.base_url}/protocols", files=file_payload
+        )
+        response.raise_for_status()
+        return response
+
+    async def get_runs(self) -> Response:
+        """GET /runs."""
+        response = await self.httpx_client.get(url=f"{self.base_url}/runs")
+        response.raise_for_status()
+        return response
+
+    async def post_run(self, req_body: Dict[str, object]) -> Response:
+        """POST /runs."""
+        response = await self.httpx_client.post(
+            url=f"{self.base_url}/runs", json=req_body
+        )
+        response.raise_for_status()
+        return response
+
+    async def patch_run(self, run_id: str, req_body: Dict[str, object]) -> Response:
+        """POST /runs."""
+        response = await self.httpx_client.patch(
+            url=f"{self.base_url}/runs/{run_id}",
+            json=req_body,
+        )
+        response.raise_for_status()
+        return response
+
+    async def get_run(self, run_id: str) -> Response:
+        """GET /runs/:run_id."""
+        response = await self.httpx_client.get(url=f"{self.base_url}/runs/{run_id}")
+        response.raise_for_status()
+        return response
+
+    async def post_run_command(
+        self,
+        run_id: str,
+        req_body: Dict[str, object],
+        params: Dict[str, Any],
+    ) -> Response:
+        """POST /runs/:run_id/commands."""
+        response = await self.httpx_client.post(
+            url=f"{self.base_url}/runs/{run_id}/commands",
+            json=req_body,
+            params=params,
+        )
+        response.raise_for_status()
+        return response
+
+    async def get_run_commands(self, run_id: str) -> Response:
+        """GET /runs/:run_id/commands."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/runs/{run_id}/commands",
+        )
+        response.raise_for_status()
+        return response
+
+    async def get_run_command(self, run_id: str, command_id: str) -> Response:
+        """GET /runs/:run_id/commands/:command_id."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/runs/{run_id}/commands/{command_id}",
+        )
+        response.raise_for_status()
+        return response
+
+    async def post_labware_offset(
+        self,
+        run_id: str,
+        req_body: Dict[str, object],
+    ) -> Response:
+        """POST /runs/:run_id/labware_offsets."""
+        response = await self.httpx_client.post(
+            url=f"{self.base_url}/runs/{run_id}/labware_offsets",
+            json=req_body,
+        )
+        response.raise_for_status()
+        return response
+
+    async def post_run_action(
+        self,
+        run_id: str,
+        req_body: Dict[str, object],
+    ) -> Response:
+        """POST /runs/:run_id/commands."""
+        response = await self.httpx_client.post(
+            url=f"{self.base_url}/runs/{run_id}/actions",
+            json=req_body,
         )
         response.raise_for_status()
         return response

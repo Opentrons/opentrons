@@ -37,6 +37,7 @@ const mockProtocolDetails: ProtocolDetails = {
     labwareDefinitions: protocolWithTC.labwareDefinitions,
   } as any,
   displayName: 'fake protocol name',
+  protocolKey: 'fakeProtocolKey',
 }
 
 describe('useClearAllOffsetsForCurrentRun', () => {

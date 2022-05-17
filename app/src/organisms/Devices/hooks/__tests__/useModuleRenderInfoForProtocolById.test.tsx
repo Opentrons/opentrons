@@ -4,7 +4,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 
-import { getProtocolModulesInfo } from '../../../../organisms/ProtocolSetup/utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '../../ProtocolRun/utils/getProtocolModulesInfo'
 
 import {
   mockMagneticModuleGen2,
@@ -24,7 +24,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { ProtocolDetails } from '..'
 
-jest.mock('../../../../organisms/ProtocolSetup/utils/getProtocolModulesInfo')
+jest.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../useAttachedModules')
 jest.mock('../useProtocolDetailsForRun')
 
@@ -43,6 +43,7 @@ const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnaly
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
   protocolData: simpleV6Protocol,
+  protocolKey: 'fakeProtocolKey',
 }
 
 const mockMagneticModuleDefinition = {

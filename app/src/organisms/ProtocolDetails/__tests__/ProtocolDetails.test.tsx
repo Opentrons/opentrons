@@ -19,7 +19,9 @@ import {
 import { storedProtocolData } from '../../../redux/protocol-storage/__fixtures__'
 import { ProtocolDetails } from '..'
 import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
+import { getValidCustomLabwareFiles } from '../../../redux/custom-labware/selectors'
 
+jest.mock('../../../redux/custom-labware/selectors')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/protocol-storage/selectors')
 jest.mock('../../../molecules/DeckThumbnail')
@@ -40,6 +42,9 @@ const mockDeckThumbnail = DeckThumbnail as jest.MockedFunction<
 const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as jest.MockedFunction<
   typeof getIsProtocolAnalysisInProgress
 >
+const mockGetValidCustomLabwareFiles = getValidCustomLabwareFiles as jest.MockedFunction<
+  typeof getValidCustomLabwareFiles
+>
 
 const render = (
   props: Partial<React.ComponentProps<typeof ProtocolDetails>> = {}
@@ -54,8 +59,15 @@ const render = (
   )[0]
 }
 
+const protocolType = 'json'
+const schemaVersion = 6
+const author = 'Otie'
+const createdAt = '2022-05-04T18:33:48.916159+00:00'
+const description = 'fake protocol description'
+
 describe('ProtocolDetails', () => {
   beforeEach(() => {
+    mockGetValidCustomLabwareFiles.mockReturnValue([])
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
@@ -72,27 +84,73 @@ describe('ProtocolDetails', () => {
     const { getByRole } = render({
       mostRecentAnalysis: {
         ...storedProtocolData.mostRecentAnalysis,
+        createdAt,
         metadata: {
           ...storedProtocolData.mostRecentAnalysis.metadata,
           protocolName,
         },
+        config: {
+          ...storedProtocolData.mostRecentAnalysis.config,
+          protocolType,
+          schemaVersion,
+        },
       },
     })
-    getByRole('heading', { name: protocolName })
+    getByRole('heading', { name: 'fakeProtocolDisplayName' })
   })
   it('renders protocol title as file name if not in metadata', () => {
-    const { getByRole } = render()
+    const { getByRole } = render({
+      mostRecentAnalysis: {
+        ...storedProtocolData.mostRecentAnalysis,
+        createdAt,
+        metadata: {
+          ...storedProtocolData.mostRecentAnalysis.metadata,
+          author,
+        },
+        config: {
+          ...storedProtocolData.mostRecentAnalysis.config,
+          protocolType,
+          schemaVersion,
+        },
+      },
+    })
     expect(
       getByRole('heading', { name: 'fakeSrcFileName' })
     ).toBeInTheDocument()
   })
   it('renders deck setup section', () => {
-    const { getByRole, getByText } = render()
+    const { getByRole, getByText } = render({
+      mostRecentAnalysis: {
+        ...storedProtocolData.mostRecentAnalysis,
+        createdAt,
+        metadata: {
+          ...storedProtocolData.mostRecentAnalysis.metadata,
+        },
+        config: {
+          ...storedProtocolData.mostRecentAnalysis.config,
+          protocolType,
+          schemaVersion,
+        },
+      },
+    })
     expect(getByRole('heading', { name: 'deck setup' })).toBeInTheDocument()
     expect(getByText('mock Deck Thumbnail')).toBeInTheDocument()
   })
   it('opens choose robot slideout when run protocol button is clicked', () => {
-    const { getByRole, queryByRole } = render()
+    const { getByRole, queryByRole } = render({
+      mostRecentAnalysis: {
+        ...storedProtocolData.mostRecentAnalysis,
+        createdAt,
+        metadata: {
+          ...storedProtocolData.mostRecentAnalysis.metadata,
+        },
+        config: {
+          ...storedProtocolData.mostRecentAnalysis.config,
+          protocolType,
+          schemaVersion,
+        },
+      },
+    })
     const runProtocolButton = getByRole('button', { name: 'Run protocol' })
     expect(
       queryByRole('heading', { name: 'Choose Robot to Run\nfakeSrcFileName' })
@@ -101,5 +159,59 @@ describe('ProtocolDetails', () => {
     expect(
       getByRole('heading', { name: 'Choose Robot to Run\nfakeSrcFileName' })
     ).toBeVisible()
+  })
+  it('renders the protocol creation method', () => {
+    const { getByRole, getByText } = render({
+      mostRecentAnalysis: {
+        ...storedProtocolData.mostRecentAnalysis,
+        createdAt,
+        metadata: {
+          ...storedProtocolData.mostRecentAnalysis.metadata,
+        },
+        config: {
+          ...storedProtocolData.mostRecentAnalysis.config,
+          protocolType,
+          schemaVersion,
+        },
+      },
+    })
+    getByRole('heading', { name: 'creation method' })
+    getByText('Protocol Designer 6.0')
+  })
+  it('renders the last analyzed date', () => {
+    const { getByRole } = render({
+      mostRecentAnalysis: {
+        ...storedProtocolData.mostRecentAnalysis,
+        createdAt,
+        metadata: {
+          ...storedProtocolData.mostRecentAnalysis.metadata,
+        },
+        config: {
+          ...storedProtocolData.mostRecentAnalysis.config,
+          protocolType,
+          schemaVersion,
+        },
+      },
+    })
+    getByRole('heading', { name: 'last analyzed' })
+  })
+  it('renders the protocol description', () => {
+    const { getByRole, getByText } = render({
+      mostRecentAnalysis: {
+        ...storedProtocolData.mostRecentAnalysis,
+        createdAt,
+        metadata: {
+          ...storedProtocolData.mostRecentAnalysis.metadata,
+          description,
+        },
+        config: {
+          ...storedProtocolData.mostRecentAnalysis.config,
+          protocolType,
+          schemaVersion,
+        },
+      },
+    })
+    getByRole('heading', { name: 'description' })
+    getByText('fake protocol description')
   })
 })

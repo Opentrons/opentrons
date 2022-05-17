@@ -25,7 +25,7 @@ import {
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { InputField } from '../../../atoms/InputField'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
@@ -99,6 +99,7 @@ export const HeaterShakerSlideout = (
         commandType: 'heaterShakerModule/startSetTargetTemperature',
         params: {
           moduleId: module.id,
+          // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10182 merges
           temperature: parseInt(hsValue),
         },
       }

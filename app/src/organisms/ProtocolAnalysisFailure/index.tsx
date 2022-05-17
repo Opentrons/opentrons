@@ -17,7 +17,7 @@ import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { Portal } from '../../App/portal'
 import { Modal } from '../../atoms/Modal'
-import { PrimaryButton } from '../../atoms/Buttons'
+import { PrimaryButton } from '../../atoms/buttons'
 
 import type { Dispatch } from '../../redux/types'
 import { analyzeProtocol } from '../../redux/protocol-storage'

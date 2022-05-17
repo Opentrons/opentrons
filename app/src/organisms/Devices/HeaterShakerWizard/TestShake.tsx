@@ -16,7 +16,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { RPM, HS_RPM_MAX, HS_RPM_MIN } from '@opentrons/shared-data'
-import { TertiaryButton } from '../../../atoms/Buttons'
+import { TertiaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { Divider } from '../../../atoms/structure'
 import { InputField } from '../../../atoms/InputField'
@@ -29,7 +29,7 @@ import type {
   HeaterShakerSetTargetShakeSpeedCreateCommand,
   HeaterShakerStopShakeCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 interface TestShakeProps {
   module: HeaterShakerModule
@@ -154,7 +154,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           {isLatchClosed ? t('open_labware_latch') : t('close_labware_latch')}
         </TertiaryButton>
         {isShaking ? (
-          <Tooltip tooltipProps={tooltipProps} key={`TestShake_latch_btn`}>
+          <Tooltip tooltipProps={tooltipProps}>
             {t('cannot_open_latch', { ns: 'heater_shaker' })}
           </Tooltip>
         ) : null}
@@ -195,7 +195,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             {isShaking ? t('stop_shaking') : t('start_shaking')}
           </TertiaryButton>
           {!isLatchClosed ? (
-            <Tooltip tooltipProps={tooltipProps} key={`TestShake_shake_btn`}>
+            <Tooltip tooltipProps={tooltipProps}>
               {t('cannot_shake', { ns: 'heater_shaker' })}
             </Tooltip>
           ) : null}

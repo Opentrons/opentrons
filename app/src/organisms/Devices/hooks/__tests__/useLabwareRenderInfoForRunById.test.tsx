@@ -4,13 +4,13 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 
-import { getLabwareRenderInfo } from '../../../../organisms/ProtocolSetup/utils/getLabwareRenderInfo'
+import { getLabwareRenderInfo } from '../../ProtocolRun/utils/getLabwareRenderInfo'
 import { useLabwareRenderInfoForRunById, useProtocolDetailsForRun } from '..'
 
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 import type { ProtocolDetails } from '..'
 
-jest.mock('../../../../organisms/ProtocolSetup/utils/getLabwareRenderInfo')
+jest.mock('../../ProtocolRun/utils/getLabwareRenderInfo')
 jest.mock('../useProtocolDetailsForRun')
 
 const mockGetLabwareRenderInfo = getLabwareRenderInfo as jest.MockedFunction<
@@ -25,6 +25,7 @@ const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnaly
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
   protocolData: simpleV6Protocol,
+  protocolKey: 'fakeProtocolKey',
 }
 
 // these are just taken from the ot-2 deck def for readability

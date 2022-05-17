@@ -19,7 +19,7 @@ import {
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
-import { TertiaryButton } from '../../../atoms/Buttons'
+import { TertiaryButton } from '../../../atoms/buttons'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../../organisms/CalibrationPanels'
