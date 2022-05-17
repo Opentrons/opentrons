@@ -150,7 +150,8 @@ async def upload_via_dfu(
 
     Returns tuple of success boolean and message from bootloader
     """
-    # dfu-util -a 0 -s 0x08000000:leave --dfuse-address 0x08000000 -D /path/to/heater-shaker-v0.4.3.bin -R
+    # dfu-util -a 0 -s 0x08000000:leave --dfuse-address 0x08000000
+    #   -D /path/to/heater-shaker-v0.4.3.bin -R
 
     dfu_args = [
         "dfu-util",
