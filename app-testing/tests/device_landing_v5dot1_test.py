@@ -59,7 +59,8 @@ def test_device_landing_v5dot1(
         device_landing: DeviceLanding = DeviceLanding(
             driver, console, request.node.nodeid
         )
-
+        left_menu: LeftMenu = LeftMenu(driver, console, request.node.nodeid)
+        left_menu.click_devices_button()
         assert device_landing.get_device_header().is_displayed()
         assert device_landing.get_how_to_setup_a_robot().is_displayed()
         device_landing.click_how_to_setup_a_robot()

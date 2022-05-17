@@ -50,7 +50,7 @@ class DeviceLanding:
     def get_robot_image(self) -> Optional[WebElement]:
         """Get the robot_image."""
         lights: Element = Element(
-            (By.ID, "RobotCard_opentrons-dev_robotImage"), f"Robot image."
+            (By.ID, "RobotCard_opentrons-dev_robotImage"), "Robot image."
         )
         return self.base.clickable_wrapper(lights, 5)
 
@@ -65,7 +65,7 @@ class DeviceLanding:
     def get_left_mount_pipette(self) -> Optional[WebElement]:
         """Get the left mount pipette."""
         text: Element = Element(
-            (By.ID, "RobotCard_opentrons-dev_leftMountPipette"), f"Left mount pipette."
+            (By.ID, "RobotCard_opentrons-dev_leftMountPipette"), "Left mount pipette."
         )
         return self.base.clickable_wrapper(text, 5)
 
@@ -73,15 +73,15 @@ class DeviceLanding:
         """Get the right mount pipette."""
         text: Element = Element(
             (By.ID, "RobotCard_opentrons-dev_rightMountPipette"),
-            f"Right mount pipette.",
+            "Right mount pipette.",
         )
         return self.base.clickable_wrapper(text, 5)
 
     def get_overflow_button_on_device_landing(self) -> Optional[WebElement]:
         """Get the overflow button on device landing page."""
         text: Element = Element(
-            (By.XPATH, f"//div[@data-testid='RobotCard_opentrons-dev_overflowMenu']"),
-            f"Get the overflow button on device landing page.",
+            (By.XPATH, "//div[@data-testid='RobotCard_opentrons-dev_overflowMenu']"),
+            "Get the overflow button on device landing page.",
         )
         return self.base.clickable_wrapper(text, 5)
 
@@ -93,14 +93,14 @@ class DeviceLanding:
 
     def get_device_header(self) -> Optional[WebElement]:
         """Get the device header."""
-        header: Element = Element((By.ID, "DevicesLanding_title"), f"Device header.")
+        header: Element = Element((By.ID, "DevicesLanding_title"), "Device header.")
         return self.base.clickable_wrapper(header, 5)
 
     def get_how_to_setup_a_robot(self) -> Optional[WebElement]:
         """Get the how to setup a robot."""
         header: Element = Element(
             (By.XPATH, '//a[text()="See how to set up a new robot"]'),
-            f"See how to set up a new robot.",
+            "See how to set up a new robot.",
         )
         return self.base.clickable_wrapper(header, 5)
 
@@ -108,7 +108,7 @@ class DeviceLanding:
         """Get the how to setup a robot."""
         header: Element = Element(
             (By.XPATH, '//h3[text()="How to setup a new robot"]'),
-            f"How to set up a new robot.",
+            "How to set up a new robot.",
         )
         return self.base.clickable_wrapper(header, 15)
 
@@ -119,7 +119,7 @@ class DeviceLanding:
                 By.XPATH,
                 '//a[contains(@href,"https://support.opentrons.com/en/collections/1559720-ot-2-get-started")]',
             ),
-            f"link for how to set up a new robot.",
+            "link for how to set up a new robot.",
         )
         return self.base.clickable_wrapper(header, 5)
 
@@ -136,7 +136,7 @@ class DeviceLanding:
                 By.XPATH,
                 '//button[text()="close"]',
             ),
-            f"Get the close button.",
+            "Get the close button.",
         )
         return self.base.clickable_wrapper(button, 5)
 
@@ -173,7 +173,7 @@ class DeviceLanding:
 
     def get_pipettes_and_modules_header_text(self) -> str:
         header: Element = Element(
-            (By.ID, "PipettesAndModules_title"), f"header 'Pipettes and Modules'"
+            (By.ID, "PipettesAndModules_title"), "header 'Pipettes and Modules'"
         )
         element = self.base.clickable_wrapper(header, 5)
         if not element:
@@ -184,13 +184,13 @@ class DeviceLanding:
         """Get the robot image on device detail page."""
         image: Element = Element(
             (By.ID, "RobotOverview_robotImage"),
-            f"the robot image on device detail page.",
+            "the robot image on device detail page.",
         )
         return self.base.clickable_wrapper(image, 5)
 
     def get_recent_protocol_runs_header_text(self) -> str:
         header: Element = Element(
-            (By.ID, "RecentProtocolRuns_title"), f"header 'Recent Protocol Runs'"
+            (By.ID, "RecentProtocolRuns_title"), "header 'Recent Protocol Runs'"
         )
         element = self.base.clickable_wrapper(header, 5)
         if not element:
@@ -200,24 +200,24 @@ class DeviceLanding:
     def get_mag_deck_image(self) -> Optional[WebElement]:
         """Get the mag deck image on device detail page."""
         image: Element = Element(
-            (By.XPATH, f"//img[@alt='magneticModuleV1']"),
-            f"the mag deck image on device detail page.",
+            (By.XPATH, "//img[@alt='magneticModuleV1']"),
+            "the mag deck image on device detail page.",
         )
         return self.base.clickable_wrapper(image, 5)
 
     def get_thermocycler_deck_image(self) -> Optional[WebElement]:
         """Get the thermocycler deck image on device detail page."""
         image: Element = Element(
-            (By.XPATH, f"//img[@alt='thermocyclerModuleV1']"),
-            f"the thermocycler deck image on device detail page.",
+            (By.XPATH, "//img[@alt='thermocyclerModuleV1']"),
+            "the thermocycler deck image on device detail page.",
         )
         return self.base.clickable_wrapper(image, 5)
 
     def get_tem_deck_image(self) -> Optional[WebElement]:
         """Get the temp deck image on device detail page."""
         image: Element = Element(
-            (By.XPATH, f"//img[@alt='temperatureModuleV1']"),
-            f"the temp deck image on device detail page.",
+            (By.XPATH, "//img[@alt='temperatureModuleV1']"),
+            "the temp deck image on device detail page.",
         )
         return self.base.clickable_wrapper(image, 5)
 
@@ -226,9 +226,9 @@ class DeviceLanding:
         text: Element = Element(
             (
                 By.XPATH,
-                f"//div[@data-testid='PipetteCard_display_name_P10 Single-Channel GEN1']",
+                "//div[@data-testid='PipetteCard_display_name_P10 Single-Channel GEN1']",
             ),
-            f"the left mount pipette on device detail page.",
+            "the left mount pipette on device detail page.",
         )
         return self.base.clickable_wrapper(text, 5)
 
@@ -237,9 +237,9 @@ class DeviceLanding:
         text: Element = Element(
             (
                 By.XPATH,
-                f"//div[@data-testid='Slideout_body_Choose protocol to Run on opentrons-dev']//div",
+                "//div[@data-testid='Slideout_body_Choose protocol to Run on opentrons-dev']//div",
             ),
-            f"the protocol name on device detail page slide out.",
+            "the protocol name on device detail page slide out.",
         )
         return self.base.clickable_wrapper(text, 5)
 
@@ -248,65 +248,65 @@ class DeviceLanding:
         text: Element = Element(
             (
                 By.XPATH,
-                f"//div[@data-testid='PipetteCard_display_name_P300 Single-Channel GEN1']",
+                "//div[@data-testid='PipetteCard_display_name_P300 Single-Channel GEN1']",
             ),
-            f"the right mount pipette on device detail page.",
+            "the right mount pipette on device detail page.",
         )
         return self.base.clickable_wrapper(text, 5)
 
     def get_mag_module_name(self) -> Optional[WebElement]:
         """Get the mag module name on device detail page."""
         image: Element = Element(
-            (By.XPATH, f"//p[text()='Magnetic Module GEN1']"),
-            f"the mag module name on device detail page.",
+            (By.XPATH, "//p[text()='Magnetic Module GEN1']"),
+            "the mag module name on device detail page.",
         )
         return self.base.clickable_wrapper(image, 5)
 
     def get_thermocycler_module_name(self) -> Optional[WebElement]:
         """Get the mag module name on device detail page."""
         image: Element = Element(
-            (By.XPATH, f"//p[text()='Thermocycler Module']"),
-            f"the mag module name on device detail page.",
+            (By.XPATH, "//p[text()='Thermocycler Module']"),
+            "the mag module name on device detail page.",
         )
         return self.base.clickable_wrapper(image, 5)
 
     def get_tem_module_name(self) -> Optional[WebElement]:
         """Get the mag module name on device detail page."""
         image: Element = Element(
-            (By.XPATH, f"//p[text()='Temperature Module GEN1']"),
-            f"the mag module name on device detail page.",
+            (By.XPATH, "//p[text()='Temperature Module GEN1']"),
+            "the mag module name on device detail page.",
         )
         return self.base.clickable_wrapper(image, 5)
 
     def get_current_step_text(self) -> Optional[WebElement]:
         """Get the current step text on run log."""
         text: Element = Element(
-            (By.XPATH, f"//p[text()='Current Step']"),
-            f"the current step text on run log.",
+            (By.XPATH, "//p[text()='Current Step']"),
+            "the current step text on run log.",
         )
         return self.base.clickable_wrapper(text, 5)
 
     def get_clear_button_run_page(self) -> Optional[WebElement]:
         """Get the clear button on run page."""
         button: Element = Element(
-            (By.ID, f"ProtocolRunHeader_closeRunButton"),
-            f"Get the clear button on run page.",
+            (By.ID, "ProtocolRunHeader_closeRunButton"),
+            "Get the clear button on run page.",
         )
         return self.base.clickable_wrapper(button, 10)
 
     def get_run_button(self) -> Optional[WebElement]:
         """Get the run button on run page."""
         button: Element = Element(
-            (By.ID, f"ProtocolRunHeader_runControlButton"),
-            f"Get the run button on run page.",
+            (By.ID, "ProtocolRunHeader_runControlButton"),
+            "Get the run button on run page.",
         )
         return self.base.clickable_wrapper(button, 5)
 
     def get_success_banner_run_page(self) -> Optional[WebElement]:
         """Get the success banner on run page."""
         banner: Element = Element(
-            (By.XPATH, f"//div[@data-testid='Banner_success']"),
-            f"Get the success banner on run page.",
+            (By.XPATH, "//div[@data-testid='Banner_success']"),
+            "Get the success banner on run page.",
         )
         return self.base.clickable_wrapper(banner, 5)
 
@@ -324,9 +324,9 @@ class DeviceLanding:
         button: Element = Element(
             (
                 By.ID,
-                f"RobotStatusBanner_opentrons-dev_robotName",
+                "RobotStatusBanner_opentrons-dev_robotName",
             ),
-            f"Clicking on dev robot in device landing page.'",
+            "Clicking on dev robot in device landing page.'",
         )
         self.base.click(button)
 
@@ -334,9 +334,9 @@ class DeviceLanding:
         button: Element = Element(
             (
                 By.ID,
-                f"RunLog_jumpToCurrentStep",
+                "RunLog_jumpToCurrentStep",
             ),
-            f"Clicking on jump to current step.'",
+            "Clicking on jump to current step.'",
         )
         self.base.click(button)
 
@@ -344,9 +344,9 @@ class DeviceLanding:
         button: Element = Element(
             (
                 By.XPATH,
-                f"//button[text()='Run a Protocol']",
+                "//button[text()='Run a Protocol']",
             ),
-            f"Button to go to setup for run page.'",
+            "Button to go to setup for run page.'",
         )
         self.base.click(button)
 
@@ -354,9 +354,9 @@ class DeviceLanding:
         button: Element = Element(
             (
                 By.XPATH,
-                f"//button[text()='Proceed to setup']",
+                "//button[text()='Proceed to setup']",
             ),
-            f"Button to Proceed to setup for set up run page.'",
+            "Button to Proceed to setup for set up run page.'",
         )
         self.base.clickable_wrapper(button, 10)
 
@@ -364,9 +364,9 @@ class DeviceLanding:
         button: Element = Element(
             (
                 By.ID,
-                f"ProtocolRunHeader_closeRunButton",
+                "ProtocolRunHeader_closeRunButton",
             ),
-            f"Button to clear the protocol from set up run page.'",
+            "Button to clear the protocol from set up run page.'",
         )
         self.base.clickable_wrapper(button, 5)
 
@@ -374,9 +374,9 @@ class DeviceLanding:
         button: Element = Element(
             (
                 By.XPATH,
-                f"//div[@data-testid='RobotCard_opentrons-dev_overflowMenu']//div//button",
+                "//div[@data-testid='RobotCard_opentrons-dev_overflowMenu']//div//button",
             ),
-            f"Button to select run protocol from robot landing overflow menu.'",
+            "Button to select run protocol from robot landing overflow menu.'",
         )
         self.base.clickable_wrapper(button, 5)
 
@@ -417,9 +417,9 @@ class DeviceLanding:
         close: Element = Element(
             (
                 By.ID,
-                f"ProtocolRunHeader_runControlButton",
+                "ProtocolRunHeader_runControlButton",
             ),
-            f"Button to start the run on run page.'",
+            "Button to start the run on run page.'",
         )
         self.base.click(close)
 
@@ -427,9 +427,9 @@ class DeviceLanding:
         close: Element = Element(
             (
                 By.XPATH,
-                f"//button[@data-testid='Slideout_icon_close_Set Engage Height for Magnetic Module GEN2']",
+                "//button[@data-testid='Slideout_icon_close_Set Engage Height for Magnetic Module GEN2']",
             ),
-            f"Button to close set engage height slideout.'",
+            "Button to close set engage height slideout.'",
         )
         self.base.click(close)
 
@@ -437,9 +437,9 @@ class DeviceLanding:
         engaged: Element = Element(
             (
                 By.XPATH,
-                f"//div[@data-testid='status_label+engaged']",
+                "//div[@data-testid='status_label+engaged']",
             ),
-            f"Indicator for the mag deck being engaged.'",
+            "Indicator for the mag deck being engaged.'",
         )
         return self.base.present_wrapper(engaged, 5, False) is not None
 
