@@ -52,6 +52,7 @@ class Params(BaseModel):
     positionId: Optional[str]
     temperature: Optional[float]
     celsius: Optional[float]
+    blockMaxVolumeUl: Optional[float]
     rpm: Optional[float]
     height: Optional[float]
     offset: Optional[OffsetVector]

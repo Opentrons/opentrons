@@ -1065,6 +1065,34 @@ def test_thermocycler_validate_target_block_temperature_raises(
         subject.validate_target_block_temperature(input_temperature)
 
 
+@pytest.mark.parametrize("input_volume", [10.0, 10.001, 50.0, 99.999, 100, 100.0])
+def test_thermocycler_validate_block_max_volume(
+    module_view_with_thermocycler: ModuleView,
+    input_volume: float,
+) -> None:
+    """It should return a valid m block temperature."""
+    subject = module_view_with_thermocycler.get_thermocycler_module_substate(
+        "module-id"
+    )
+    result = subject.validate_max_block_volume(input_volume)
+
+    assert result == input_volume
+
+
+@pytest.mark.parametrize("input_volume", [-0.001, 9.999, 100.001])
+def test_thermocycler_validate_block_max_volume_raises(
+    module_view_with_thermocycler: ModuleView,
+    input_volume: float,
+) -> None:
+    """It should raise on invalid block volume temperature."""
+    subject = module_view_with_thermocycler.get_thermocycler_module_substate(
+        "module-id"
+    )
+
+    with pytest.raises(errors.InvalidBlockVolumeError):
+        subject.validate_max_block_volume(input_volume)
+
+
 @pytest.mark.parametrize("input_temperature", [37, 37.0, 37.001, 109.999, 110, 110.0])
 def test_thermocycler_validate_target_lid_temperature(
     module_view_with_thermocycler: ModuleView,

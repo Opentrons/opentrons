@@ -29,6 +29,7 @@ from .exceptions import (
     NoTargetTemperatureSetError,
     InvalidTargetSpeedError,
     InvalidTargetTemperatureError,
+    InvalidBlockVolumeError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -63,6 +64,7 @@ __all__ = [
     "NoTargetTemperatureSetError",
     "InvalidTargetTemperatureError",
     "InvalidTargetSpeedError",
+    "InvalidBlockVolumeError",
     # error occurrence models
     "ErrorOccurrence",
 ]

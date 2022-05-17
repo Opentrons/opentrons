@@ -26,6 +26,7 @@ async def test_set_target_block_temperature(
     data = tc_commands.SetTargetBlockTemperatureParams(
         moduleId="input-thermocycler-id",
         celsius=12.3,
+        blockMaxVolumeUl=50.2,
     )
     expected_result = tc_commands.SetTargetBlockTemperatureResult()
 
@@ -45,6 +46,9 @@ async def test_set_target_block_temperature(
         45.6
     )
 
+    # Stub volume validation from hs module view
+    decoy.when(tc_module_substate.validate_max_block_volume(50.2)).then_return(77.6)
+
     # Get attached hardware modules
     decoy.when(
         equipment.get_module_hardware_api(ThermocyclerModuleId("thermocycler-id"))
@@ -52,5 +56,8 @@ async def test_set_target_block_temperature(
 
     result = await subject.execute(data)
 
-    decoy.verify(await tc_hardware.set_target_block_temperature(celsius=45.6), times=1)
+    decoy.verify(
+        await tc_hardware.set_target_block_temperature(celsius=45.6, volume=77.6),
+        times=1,
+    )
     assert result == expected_result
