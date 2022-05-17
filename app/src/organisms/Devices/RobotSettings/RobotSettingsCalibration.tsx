@@ -285,7 +285,7 @@ export function RobotSettingsCalibration({
     const pippets = []
     if (attachedPipettes != null) {
       pippets.push({
-        modelName: attachedPipettes.left?.modelSpecs.displayName,
+        modelName: attachedPipettes.left?.modelSpecs?.displayName,
         serialNumber: attachedPipettes.left?.id,
         mount: 'left' as Mount,
         tiprack: pipetteOffsetCalibrations?.find(
@@ -299,7 +299,7 @@ export function RobotSettingsCalibration({
         )?.status.markedBad,
       })
       pippets.push({
-        modelName: attachedPipettes.right?.modelSpecs.displayName,
+        modelName: attachedPipettes.right?.modelSpecs?.displayName,
         serialNumber: attachedPipettes.right?.id,
         mount: 'right' as Mount,
         tiprack: pipetteOffsetCalibrations?.find(

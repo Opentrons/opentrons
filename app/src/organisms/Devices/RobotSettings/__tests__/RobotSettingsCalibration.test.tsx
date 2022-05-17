@@ -41,17 +41,16 @@ import { TipLengthCalibrationItems } from '../CalibrationDetails/TipLengthCalibr
 import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
 
 jest.mock('file-saver')
-
 jest.mock(
   '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 )
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
-jest.mock('../../../../redux/custom-labware/selectors')
+jest.mock('../../../../redux/calibration')
 jest.mock('../../../../redux/robot/selectors')
 jest.mock('../../../../redux/sessions/selectors')
 jest.mock('../../../../redux/robot-api/selectors')
-jest.mock('../../../../redux/calibration')
+jest.mock('../../../../redux/custom-labware/selectors')
 jest.mock('../../hooks')
 jest.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
 jest.mock('../CalibrationDetails/TipLengthCalibrationItems')
@@ -60,7 +59,6 @@ const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
   right: mockAttachedPipette,
 } as any
-
 const mockDeckCalibrationModal = DeckCalibrationModal as jest.MockedFunction<
   typeof DeckCalibrationModal
 >
@@ -83,7 +81,6 @@ const mockGetIsRunning = RobotSelectors.getIsRunning as jest.MockedFunction<
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
 >
-
 const mockPipetteOffsetCalibrationItems = PipetteOffsetCalibrationItems as jest.MockedFunction<
   typeof PipetteOffsetCalibrationItems
 >
@@ -170,7 +167,6 @@ describe('RobotSettingsCalibration', () => {
 
   it('renders a download calibration data button', () => {
     const [{ getByText }] = render()
-
     const downloadButton = getByText('Download calibration data')
     downloadButton.click()
     expect(saveAs).toHaveBeenCalled()
@@ -212,7 +208,6 @@ describe('RobotSettingsCalibration', () => {
     getByText('Pipette Offset calibration recommended')
   })
 
-  // Tip Length Calibrations this comment will be removed when finish all sections
   it('renders a title and description - Tip Length Calibrations', () => {
     const [{ getByText }] = render()
     getByText('Tip Length Calibrations')
