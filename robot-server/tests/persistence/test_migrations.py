@@ -51,10 +51,13 @@ def database_v1(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def migrated_sql_engine(
-    database_path: Path,
-) -> Generator[sqlalchemy.engine.Engine, None, None]:
-    """Return a engine factory that will ensure database cleanup."""
+def subject(database_path: Path) -> Generator[sqlalchemy.engine.Engine, None, None]:
+    """Get a SQLEngine test subject.
+
+    The tests in this suite will use this SQLEngine to test
+    that migrations happen properly. For other tests, the `sql_engine`
+    fixture in `conftest.py` should be used, instead.
+    """
     engine = create_sql_engine(database_path)
     yield engine
     engine.dispose()
@@ -67,14 +70,13 @@ def migrated_sql_engine(
         lazy_fixture("database_v1"),
     ],
 )
-def test_migration(migrated_sql_engine: sqlalchemy.engine.Engine) -> None:
+def test_migration(subject: sqlalchemy.engine.Engine) -> None:
     """It should migrate a table."""
-    engine = migrated_sql_engine
-    migrations = engine.execute(sqlalchemy.select(migration_table)).all()
+    migrations = subject.execute(sqlalchemy.select(migration_table)).all()
 
     assert [m.version for m in migrations] == [1]
 
     # all table queries work without raising
     for table in TABLES:
-        values = engine.execute(sqlalchemy.select(table)).all()
+        values = subject.execute(sqlalchemy.select(table)).all()
         assert values == []

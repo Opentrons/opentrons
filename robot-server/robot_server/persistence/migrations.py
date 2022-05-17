@@ -54,11 +54,16 @@ def migrate(sql_engine: sqlalchemy.engine.Engine) -> None:
             if version < 1:
                 _migrate_0_to_1(transaction)
 
-        if version != _LATEST_SCHEMA_VERSION:
             _log.info(
                 f"Migrated database from schema {version}"
                 f" to version {_LATEST_SCHEMA_VERSION}"
             )
+        else:
+            _log.info(
+                f"Marking fresh database as schema version {_LATEST_SCHEMA_VERSION}"
+            )
+
+        if version != _LATEST_SCHEMA_VERSION:
             _insert_migration(transaction)
 
 
@@ -72,7 +77,12 @@ def _insert_migration(transaction: sqlalchemy.engine.Connection) -> None:
 
 
 def _get_schema_version(transaction: sqlalchemy.engine.Connection) -> Optional[int]:
-    """Get the starting version of the database."""
+    """Get the starting version of the database.
+
+    Returns:
+        The version found, or None if this is a fresh database that
+            the migration system has not yet marked.
+    """
     if _is_version_0(transaction):
         return 0
 
@@ -113,7 +123,7 @@ def _migrate_0_to_1(transaction: sqlalchemy.engine.Connection) -> None:
     """
     add_summary_column = sqlalchemy.text("ALTER TABLE run ADD state_summary BLOB")
     add_commands_column = sqlalchemy.text("ALTER TABLE run ADD commands BLOB")
-    add_status_column = sqlalchemy.text("ALTER TABLE run ADD engine_status BLOB")
+    add_status_column = sqlalchemy.text("ALTER TABLE run ADD engine_status STRING")
     add_updated_at_column = sqlalchemy.text("ALTER TABLE run ADD _updated_at DATETIME")
 
     transaction.execute(add_summary_column)
