@@ -8,7 +8,7 @@ const render = (props: React.ComponentProps<typeof MenuList>) => {
 
 const mockBtn = <div>mockBtn</div>
 
-describe(' MenuList', () => {
+describe('MenuList', () => {
   let props: React.ComponentProps<typeof MenuList>
   beforeEach(() => {
     props = {

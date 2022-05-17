@@ -39,6 +39,7 @@ const mockProtocolDetails: ProtocolDetails = {
     labwareDefinitions: protocolWithTC.labwareDefinitions,
   } as any,
   displayName: 'fake protocol name',
+  protocolKey: 'fakeProtocolKey',
 }
 const FAKE_OFFSET_TIPRACK_IN_2: LabwareOffset = {
   id: 'fakeOffsetId',

@@ -28,8 +28,8 @@ export function FactoryReset({
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
         <StyledText
-          as="h3"
-          css={TYPOGRAPHY.h3SemiBold}
+          as="h2"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing4}
           id="AdvancedSettings_factoryReset"
         >

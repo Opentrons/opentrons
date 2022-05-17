@@ -81,6 +81,7 @@ describe('ProtocolRunSetup', () => {
       .mockReturnValue({
         protocolData: (noModulesProtocol as unknown) as ProtocolAnalysisFile,
         displayName: 'mock display name',
+        protocolKey: 'fakeProtocolKey',
       })
     when(mockUseRobot)
       .calledWith(ROBOT_NAME)
@@ -187,6 +188,7 @@ describe('ProtocolRunSetup', () => {
         .mockReturnValue({
           protocolData: (withModulesProtocol as unknown) as ProtocolAnalysisFile,
           displayName: 'mock display name',
+          protocolKey: 'fakeProtocolKey',
         })
       when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
     })
@@ -235,6 +237,7 @@ describe('ProtocolRunSetup', () => {
             ),
           } as unknown) as ProtocolAnalysisFile,
           displayName: 'mock display name',
+          protocolKey: 'fakeProtocolKey',
         })
       const { getByText } = render()
 

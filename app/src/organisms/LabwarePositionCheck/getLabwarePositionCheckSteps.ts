@@ -26,7 +26,17 @@ export const getLabwarePositionCheckSteps = (
     )
     const pipettes = values(pipettesById)
     const pipetteNames = pipettes.map(({ name }) => name)
-    const labware = protocolData.labware
+    const labware = omitBy(
+      protocolData.labware,
+      (labware, id) =>
+        protocolData.labwareDefinitions[labware.definitionId]?.parameters
+          .isTiprack &&
+        !protocolData.commands.some(
+          command =>
+            command.commandType === 'pickUpTip' &&
+            command.params.labwareId === id
+        )
+    )
     const modules: ProtocolAnalysisFile['modules'] = protocolData.modules
     const labwareDefinitions = protocolData.labwareDefinitions
     const commands: RunTimeCommand[] = protocolData.commands

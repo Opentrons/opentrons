@@ -38,7 +38,7 @@ async def _create_runs(robot_client: RobotClient, num_runs: int) -> List[str]:
     """Upload several runs and return their IDs."""
     created_run_ids: List[str] = []
     for _ in range(num_runs):
-        response = await robot_client.post_run(protocol_id=None)
+        response = await robot_client.post_run(req_body={"data": {}})
         created_run_ids.append(response.json()["data"]["id"])
     return created_run_ids
 

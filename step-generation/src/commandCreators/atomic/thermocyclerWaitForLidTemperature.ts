@@ -1,6 +1,6 @@
 import type { TemperatureParams } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { CommandCreator } from '../../types'
-export const thermocyclerAwaitLidTemperature: CommandCreator<TemperatureParams> = (
+export const thermocyclerWaitForLidTemperature: CommandCreator<TemperatureParams> = (
   args,
   invariantContext,
   prevRobotState
@@ -8,10 +8,10 @@ export const thermocyclerAwaitLidTemperature: CommandCreator<TemperatureParams> 
   return {
     commands: [
       {
-        commandType: 'thermocycler/awaitLidTemperature',
+        commandType: 'thermocycler/waitForLidTemperature',
         params: {
           moduleId: args.module,
-          temperature: args.temperature,
+          celsius: args.temperature,
         },
       },
     ],

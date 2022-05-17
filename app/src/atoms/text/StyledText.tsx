@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Text, TYPOGRAPHY } from '@opentrons/components'
-import { FlattenSimpleInterpolation } from 'styled-components'
+import styled, { FlattenSimpleInterpolation } from 'styled-components'
 
 export interface Props extends React.ComponentProps<typeof Text> {
   children: React.ReactNode
@@ -20,17 +20,11 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
   labelSemiBold: TYPOGRAPHY.labelSemiBold,
 }
 
-export function StyledText(props: Props): JSX.Element {
-  const { as, fontWeight, children } = props
-  const css: FlattenSimpleInterpolation | undefined =
+export const StyledText = styled(Text)<Props>`
+  ${props =>
     styleMap[
-      `${String(as)}${
-        fontWeight === TYPOGRAPHY.fontWeightSemiBold ? 'SemiBold' : ''
+      `${String(props.as)}${
+        props.fontWeight === TYPOGRAPHY.fontWeightSemiBold ? 'SemiBold' : ''
       }`
-    ]
-  return (
-    <Text css={css} {...props}>
-      {children}
-    </Text>
-  )
-}
+    ]}
+`

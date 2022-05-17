@@ -11,12 +11,19 @@ import {
   ALIGN_FLEX_END,
   SIZE_4,
   useConditionalConfirm,
-  AlertModal,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
+  JUSTIFY_FLEX_END,
+  ALIGN_CENTER,
+  TYPOGRAPHY,
+  Link,
 } from '@opentrons/components'
+
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { AlertPrimaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { Modal } from '../../atoms/Modal'
 import { Portal } from '../../App/portal'
 import {
   removeProtocol,
@@ -25,8 +32,6 @@ import {
 
 import type { StyleProps } from '@opentrons/components'
 import type { Dispatch } from '../../redux/types'
-import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 
 interface ProtocolOverflowMenuProps extends StyleProps {
   protocolKey: string
@@ -107,37 +112,41 @@ export function ProtocolOverflowMenu(
 
       {showDeleteConfirmation ? (
         <Portal level="top">
-          <AlertModal
-            heading={t('should_delete_this_protocol')}
-            buttons={[
-              {
-                Component: () => (
-                  <SecondaryButton
-                    onClick={(e: React.MouseEvent) => {
-                      e.preventDefault()
-                      cancelDeleteProtocol()
-                    }}
-                    textTransform={TEXT_TRANSFORM_CAPITALIZE}
-                  >
-                    {t('shared:cancel')}
-                  </SecondaryButton>
-                ),
-              },
-              {
-                Component: () => (
-                  <AlertPrimaryButton
-                    onClick={handleClickDelete}
-                    marginLeft={SPACING.spacing3}
-                  >
-                    {t('yes_delete_this_protocol')}
-                  </AlertPrimaryButton>
-                ),
-              },
-            ]}
-            alertOverlay
+          <Modal
+            type="warning"
+            onClose={(e: React.MouseEvent) => {
+              e.preventDefault()
+              cancelDeleteProtocol()
+            }}
+            title={t('should_delete_this_protocol')}
           >
-            <StyledText as="p">{t('this_protocol_will_be_trashed')}</StyledText>
-          </AlertModal>
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <StyledText as="p" marginBottom={SPACING.spacing5}>
+                {t('this_protocol_will_be_trashed')}
+              </StyledText>
+              <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
+                <Link
+                  role="button"
+                  onClick={(e: React.MouseEvent) => {
+                    e.preventDefault()
+                    cancelDeleteProtocol()
+                  }}
+                  textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                  marginRight={SPACING.spacing5}
+                  css={TYPOGRAPHY.linkPSemiBold}
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
+                  {t('shared:cancel')}
+                </Link>
+                <AlertPrimaryButton
+                  backgroundColor={COLORS.error}
+                  onClick={handleClickDelete}
+                >
+                  {t('yes_delete_this_protocol')}
+                </AlertPrimaryButton>
+              </Flex>
+            </Flex>
+          </Modal>
         </Portal>
       ) : null}
     </Flex>

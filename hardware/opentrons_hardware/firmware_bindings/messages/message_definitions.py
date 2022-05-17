@@ -576,3 +576,25 @@ class TipActionResponse:  # noqa: D101
     message_id: Literal[
         MessageId.do_self_contained_tip_action_response
     ] = MessageId.do_self_contained_tip_action_response
+
+
+@dataclass
+class PeripheralStatusRequest:  # noqa: D101
+    payload: payloads.PeripheralStatusRequestPayload
+    payload_type: Type[
+        payloads.PeripheralStatusRequestPayload
+    ] = payloads.PeripheralStatusRequestPayload
+    message_id: Literal[
+        MessageId.peripheral_status_request
+    ] = MessageId.peripheral_status_request
+
+
+@dataclass
+class PeripheralStatusResponse:  # noqa: D101
+    payload: payloads.PeripheralStatusResponsePayload
+    payload_type: Type[
+        payloads.PeripheralStatusResponsePayload
+    ] = payloads.PeripheralStatusResponsePayload
+    message_id: Literal[
+        MessageId.peripheral_status_response
+    ] = MessageId.peripheral_status_response
