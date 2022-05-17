@@ -24,17 +24,43 @@ stages:
         data:
           protocolId: '{protocol_id}'
     response:
-      strict:
-        - json:off
       status_code: 201
-      save:
-        json:
-          run_id: data.id
       json:
         data:
+          id: !anystr
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          status: idle
+          current: True
+          actions: []
+          errors: []
+          pipettes: []
+          labware:
+            - id: !anystr
+              loadName: !anystr
+              definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+              location: !anydict
+          labwareOffsets: []
           protocolId: '{protocol_id}'
+      save:
+        json:
+          run_data: data
+          run_id: data.id
 
-  - name: Run the protocol
+  - name: Get the run we just created, by its ID
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        # Check that `data` is identical to the `data` we got in the response to creating the run.
+        data: !force_format_include '{run_data}'
+
+  # We can't easily check the response for `GET /runs` (all runs) because
+  # the run_server fixture has session scope and is is reused across tests,
+  # so other tests that create their own runs would interfere.
+
+  - name: Play the run
     request:
       url: '{host:s}:{port:d}/runs/{run_id}/actions'
       method: POST
@@ -48,6 +74,26 @@ stages:
           id: !anystr
           actionType: play
           createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+      save:
+        json:
+          play_action_id: data.id
+
+  - name: Get the run again and look for the play action we just created
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          actions:
+            - id: '{play_action_id}'
+              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+              actionType: play
+            # Other list items ignored because this stage disables strict checking.
+          # Other keys ignored because this stage disables strict checking.
 
   - name: Wait for the protocol to complete
     max_retries: 10
@@ -84,3 +130,10 @@ stages:
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
             startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
             completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+
+# todo(mm, 2022-05-17):
+# - Test command details
+# - Test that PATCH returns the same run, except with `current` set to false
+# - POST some labware offsets, test that they show up in the run,
+#   test that they show up in commands?
+#   Maybe put this in a different file?

@@ -46,16 +46,7 @@ async def test_runs_persist(client_and_server: ClientServerFixture) -> None:
 
     # create a run
     create_run_response = await client.post_run(req_body={"data": {}})
-    expected_run = create_run_response.json()["data"]
-    run_id = expected_run["id"]
-
-    # fetch the same run and commands through various endpoints
-    get_all_runs_response = await client.get_runs()
-    get_run_response = await client.get_run(run_id=run_id)
-
-    # ensure fetched resources match created resources
-    assert get_all_runs_response.json()["data"] == [expected_run]
-    assert get_run_response.json()["data"] == expected_run
+    run_id = create_run_response.json()["data"]["id"]
 
     # persist the run by setting current: false
     archive_run_response = await client.patch_run(
@@ -66,11 +57,11 @@ async def test_runs_persist(client_and_server: ClientServerFixture) -> None:
     # reboot the server
     await client_and_server.restart()
 
-    # fetch those same resources again
+    # fetch the run again, both by ID and by looking for it in the list of all runs
     get_all_persisted_runs_response = await client.get_runs()
     get_persisted_run_response = await client.get_run(run_id)
 
-    # ensure the fetched resources still match the originally runs
+    # ensure the fetched resources still match the originally archived run
     assert get_all_persisted_runs_response.json()["data"] == [expected_run]
     assert get_persisted_run_response.json()["data"] == expected_run
 
