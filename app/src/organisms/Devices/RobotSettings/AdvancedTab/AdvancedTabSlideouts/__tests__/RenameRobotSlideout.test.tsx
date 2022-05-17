@@ -73,9 +73,26 @@ describe('RobotSettings RenameRobotSlideout', () => {
     const [{ getByRole, findByText }] = render()
     const input = getByRole('textbox')
     fireEvent.change(input, {
-      target: { value: 'This is more than 35 characters This is a mock' },
+      target: { value: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' },
     })
-    expect(input).toHaveValue('This is more than 35 characters This is a mock')
+    expect(input).toHaveValue('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    const renameButton = getByRole('button', { name: 'Rename robot' })
+    const error = await findByText(
+      'Please enter 35 characters max using valid inputs: letters and numbers'
+    )
+    await waitFor(() => {
+      expect(renameButton).toBeDisabled()
+      expect(error).toBeInTheDocument()
+    })
+  })
+
+  it('button should be disabled and render the error message when a user tries to use space', async () => {
+    const [{ getByRole, findByText }] = render()
+    const input = getByRole('textbox')
+    fireEvent.change(input, {
+      target: { value: 'Hello world123' },
+    })
+    expect(input).toHaveValue('Hello world123')
     const renameButton = getByRole('button', { name: 'Rename robot' })
     const error = await findByText(
       'Please enter 35 characters max using valid inputs: letters and numbers'

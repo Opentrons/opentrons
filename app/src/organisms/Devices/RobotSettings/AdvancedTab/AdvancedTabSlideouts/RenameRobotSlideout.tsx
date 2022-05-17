@@ -33,7 +33,7 @@ interface FormikErrors {
    allow users to use alphabets(a-z & A-Z) and numbers
    https://github.com/Opentrons/opentrons/issues/10214
 */
-const REGEX_RENAME_ROBOT_PATTERN = /([a-zA-Z0-9]{0,35})/
+const REGEX_RENAME_ROBOT_PATTERN = /^([a-zA-Z0-9]{0,35})$/
 const regexPattern = new RegExp(REGEX_RENAME_ROBOT_PATTERN)
 
 export function RenameRobotSlideout({
