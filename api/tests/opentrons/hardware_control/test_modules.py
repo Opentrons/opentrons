@@ -189,7 +189,7 @@ async def test_module_update_integration(
     )
     monkeypatch.setattr(modules.update, "upload_via_avrdude", upload_via_avrdude_mock)
 
-    async def mock_find_avrdude_bootloader_port():
+    async def mock_find_avrdude_bootloader_port(stm32_module: bool):
         return "ot_module_avrdude_bootloader1"
 
     monkeypatch.setattr(
