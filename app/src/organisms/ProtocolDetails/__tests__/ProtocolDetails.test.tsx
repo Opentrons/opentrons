@@ -42,7 +42,9 @@ const mockDeckThumbnail = DeckThumbnail as jest.MockedFunction<
 const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as jest.MockedFunction<
   typeof getIsProtocolAnalysisInProgress
 >
-const mockGetValidCustomLabwareFiles = getValidCustomLabwareFiles as jest.MockedFunction<typeof getValidCustomLabwareFiles>
+const mockGetValidCustomLabwareFiles = getValidCustomLabwareFiles as jest.MockedFunction<
+  typeof getValidCustomLabwareFiles
+>
 
 const render = (
   props: Partial<React.ComponentProps<typeof ProtocolDetails>> = {}
