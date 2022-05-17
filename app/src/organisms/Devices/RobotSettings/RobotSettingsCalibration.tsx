@@ -15,6 +15,7 @@ import {
   useConditionalConfirm,
   useHoverTooltip,
   TOOLTIP_LEFT,
+  COLORS,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
