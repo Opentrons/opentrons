@@ -9,13 +9,14 @@ import {
   Link,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   TEXT_DECORATION_UNDERLINE,
-  useConditionalConfirm,
   useHoverTooltip,
   TOOLTIP_LEFT,
-  COLORS,
+  useConditionalConfirm,
+  Mount,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
@@ -28,6 +29,7 @@ import { DeckCalibrationModal } from '../../../organisms/ProtocolSetup/RunSetupC
 import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
 import { formatLastModified } from '../../../organisms/CalibrationPanels/utils'
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
+
 import { useTrackEvent } from '../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
 import { getDeckCalibrationSession } from '../../../redux/sessions/deck-calibration/selectors'
@@ -44,6 +46,8 @@ import {
   useAttachedPipettes,
 } from '../hooks'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
+import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
+import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 
 import type { State } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
@@ -55,6 +59,23 @@ import type { DeckCalibrationInfo } from '../../../redux/calibration/types'
 
 interface CalibrationProps {
   robotName: string
+}
+
+export interface FormattedPipetteOffsetCalibration {
+  modelName?: string
+  serialNumber?: string
+  mount: Mount
+  tiprack?: string
+  lastCalibrated?: string
+  markedBad?: boolean
+}
+
+export interface FormattedTipLengthCalibration {
+  tiprack: string
+  pipette: string
+  lastCalibrated: string
+  markedBad: boolean
+  uri?: string | null
 }
 
 const spinnerCommandBlockList: SessionCommandString[] = [
@@ -81,6 +102,14 @@ export function RobotSettingsCalibration({
     showDeckCalibrationModal,
     setShowDeckCalibrationModal,
   ] = React.useState(false)
+  const [
+    showPipetteOffsetCalibrationBanner,
+    setShowPipetteOffsetCalibrationBanner,
+  ] = React.useState<boolean>(false)
+  const [
+    pipetteOffsetCalBannerType,
+    setPipetteOffsetCalBannerType,
+  ] = React.useState<string>('')
 
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
 
@@ -146,6 +175,8 @@ export function RobotSettingsCalibration({
   )
   const createStatus = createRequest?.status
 
+  const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
+
   const isJogging =
     useSelector((state: State) =>
       jogRequestId.current != null
@@ -175,7 +206,6 @@ export function RobotSettingsCalibration({
     confirm: confirmStart,
     cancel: cancelStart,
   } = useConditionalConfirm(handleStartDeckCalSession, !!pipOffsetDataPresent)
-  const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
 
   let buttonDisabledReason = null
   if (notConnectable) {
@@ -251,11 +281,89 @@ export function RobotSettingsCalibration({
     }
   }
 
+  const formatPipetteOffsetCalibrations = (): FormattedPipetteOffsetCalibration[] => {
+    const pippets = []
+    if (attachedPipettes != null) {
+      pippets.push({
+        modelName: attachedPipettes.left?.modelSpecs?.displayName,
+        serialNumber: attachedPipettes.left?.id,
+        mount: 'left' as Mount,
+        tiprack: pipetteOffsetCalibrations?.find(
+          p => p.pipette === attachedPipettes.left?.id
+        )?.tiprackUri,
+        lastCalibrated: pipetteOffsetCalibrations?.find(
+          p => p.pipette === attachedPipettes.left?.id
+        )?.lastModified,
+        markedBad: pipetteOffsetCalibrations?.find(
+          p => p.pipette === attachedPipettes.left?.id
+        )?.status.markedBad,
+      })
+      pippets.push({
+        modelName: attachedPipettes.right?.modelSpecs?.displayName,
+        serialNumber: attachedPipettes.right?.id,
+        mount: 'right' as Mount,
+        tiprack: pipetteOffsetCalibrations?.find(
+          p => p.pipette === attachedPipettes.right?.id
+        )?.tiprackUri,
+        lastCalibrated: pipetteOffsetCalibrations?.find(
+          p => p.pipette === attachedPipettes.right?.id
+        )?.lastModified,
+        markedBad: pipetteOffsetCalibrations?.find(
+          p => p.pipette === attachedPipettes.right?.id
+        )?.status.markedBad,
+      })
+    }
+    return pippets
+  }
+
+  const formatTipLengthCalibrations = (): FormattedTipLengthCalibration[] => {
+    const tipLengths: FormattedTipLengthCalibration[] = []
+    tipLengthCalibrations?.map(tipLength =>
+      tipLengths.push({
+        tiprack: tipLength.tiprack,
+        pipette: tipLength.pipette,
+        lastCalibrated: tipLength.lastModified,
+        markedBad: tipLength.status.markedBad,
+        uri: tipLength.uri,
+      })
+    )
+    return tipLengths
+  }
+
+  const checkPipetteCalibrationMissing = (): void => {
+    if (
+      pipetteOffsetCalibrations === null ||
+      Object.values(pipetteOffsetCalibrations).length <= 1
+    ) {
+      setShowPipetteOffsetCalibrationBanner(true)
+      setPipetteOffsetCalBannerType('error')
+    } else {
+      const left = attachedPipettes?.left?.id
+      const right = attachedPipettes?.right?.id
+      const markedBads =
+        pipetteOffsetCalibrations?.filter(
+          p =>
+            (p.pipette === left && p.status.markedBad) ||
+            (p.pipette === right && p.status.markedBad)
+        ) ?? null
+      if (markedBads !== null) {
+        setShowPipetteOffsetCalibrationBanner(true)
+        setPipetteOffsetCalBannerType('warning')
+      } else {
+        setShowPipetteOffsetCalibrationBanner(false)
+      }
+    }
+  }
+
   React.useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
       createRequestId.current = null
     }
   }, [createStatus])
+
+  React.useEffect(() => {
+    checkPipetteCalibrationMissing()
+  }, [pipettePresent, pipetteOffsetCalibrations])
 
   return (
     <>
@@ -267,24 +375,20 @@ export function RobotSettingsCalibration({
           showSpinner={isPending}
           isJogging={isJogging}
         />
+        {showCalBlockModal ? (
+          <AskForCalibrationBlockModal
+            onResponse={handleHealthCheck}
+            titleBarTitle={t('robot_calibration:health_check_title')}
+            closePrompt={() => setShowCalBlockModal(false)}
+          />
+        ) : null}
+        {showConfirmStart && pipOffsetDataPresent && (
+          <DeckCalibrationConfirmModal
+            confirm={confirmStart}
+            cancel={cancelStart}
+          />
+        )}
       </Portal>
-
-      {showCalBlockModal ? (
-        <AskForCalibrationBlockModal
-          onResponse={handleHealthCheck}
-          titleBarTitle={t('robot_calibration:health_check_title')}
-          closePrompt={() => setShowCalBlockModal(false)}
-        />
-      ) : null}
-
-      {showConfirmStart ? (
-        <DeckCalibrationConfirmModal
-          confirm={confirmStart}
-          cancel={cancelStart}
-        />
-      ) : null}
-
-      {/* About Calibration this comment will removed when finish all sections */}
       <Box paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
@@ -312,6 +416,58 @@ export function RobotSettingsCalibration({
         </Flex>
       </Box>
       <Line />
+      {showPipetteOffsetCalibrationBanner && (
+        <Banner
+          type={pipetteOffsetCalBannerType === 'error' ? 'error' : 'warning'}
+        >
+          {pipetteOffsetCalBannerType === 'error'
+            ? t('pipette_offset_calibration_missing')
+            : t('pipette_offset_calibration_recommended')}
+        </Banner>
+      )}
+      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
+        <Flex alignItems={ALIGN_CENTER}>
+          <Box marginRight={SPACING.spacing6}>
+            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
+              {t('pipette_offset_calibrations_title')}
+            </Box>
+            <StyledText as="p" marginBottom={SPACING.spacing4}>
+              {t('pipette_offset_calibrations_description')}
+            </StyledText>
+            {pipetteOffsetCalibrations != null ? (
+              <PipetteOffsetCalibrationItems
+                robotName={robotName}
+                formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
+              />
+            ) : (
+              <StyledText as="label">{t('not_calibrated')}</StyledText>
+            )}
+          </Box>
+        </Flex>
+      </Box>
+      <Line />
+      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
+        <Flex alignItems={ALIGN_CENTER}>
+          <Box marginRight={SPACING.spacing6}>
+            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
+              {t('tip_length_calibrations_title')}
+            </Box>
+            <StyledText as="p" marginBottom={SPACING.spacing4}>
+              {t('tip_length_calibrations_description')}
+            </StyledText>
+            {tipLengthCalibrations != null &&
+            tipLengthCalibrations.length !== 0 ? (
+              <TipLengthCalibrationItems
+                robotName={robotName}
+                formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
+                formattedTipLengthCalibrations={formatTipLengthCalibrations()}
+              />
+            ) : (
+              <StyledText as="label">{t('not_calibrated')}</StyledText>
+            )}
+          </Box>
+        </Flex>
+      </Box>
       {deckCalibrationButtonText === t('deck_calibration_calibrate_button') && (
         <Banner type="error">
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
