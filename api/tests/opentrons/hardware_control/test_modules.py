@@ -215,7 +215,7 @@ async def test_module_update_integration(
     )
     monkeypatch.setattr(modules.update, "upload_via_bossa", upload_via_bossa_mock)
 
-    async def mock_find_bossa_bootloader_port():
+    async def mock_find_bossa_bootloader_port(stm32_module: bool):
         return "ot_module_bossa_bootloader1"
 
     monkeypatch.setattr(
