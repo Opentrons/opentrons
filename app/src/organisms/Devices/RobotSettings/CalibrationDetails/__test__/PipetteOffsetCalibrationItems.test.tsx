@@ -38,6 +38,7 @@ jest.mock('../../../../../redux/custom-labware/selectors')
 jest.mock('../../../../../redux/config')
 jest.mock('../../../../../redux/sessions/selectors')
 jest.mock('../../../../../redux/discovery')
+jest.mock('../../../../../assets/labware/findLabware')
 
 describe('PipetteOffsetCalibrationItems', () => {
   let props: React.ComponentProps<typeof PipetteOffsetCalibrationItems>

@@ -162,7 +162,7 @@ export function OverflowMenu({
     setShowOverflowMenu(!showOverflowMenu)
   }
 
-  // TODO 5/6/2021 kj: This is scoped out from 5.1
+  // TODO 5/6/2021 kj: This is scoped out from 6.0
   // const handleDeleteCalibrationData = (
   //   calType: 'pipetteOffset' | 'tipLength'
   // ): void => {
@@ -203,7 +203,7 @@ export function OverflowMenu({
           <MenuItem onClick={e => handleDownload(calType, e)}>
             {t('overflow_menu_download_calibration_data')}
           </MenuItem>
-          {/* TODO 5/6/2021 kj: This is scoped out from 5.1 */}
+          {/* TODO 5/6/2021 kj: This is scoped out from 6.0 */}
           {/* <Divider /> */}
           {/* <MenuItem onClick={() => handleDeleteCalibrationData(calType)}>
             {t('overflow_menu_delete_data')}
