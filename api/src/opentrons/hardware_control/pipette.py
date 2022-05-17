@@ -15,6 +15,7 @@ from opentrons.calibration_storage.types import PipetteOffsetByPipetteMount
 from opentrons.config import pipette_config, robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
 from opentrons.drivers.types import MoveSplit
+from .instrument_abc import AbstractInstrument
 from .types import CriticalPoint, BoardRevision, OT3AxisKind
 
 
@@ -33,7 +34,7 @@ RECONFIG_KEYS = {"quirks"}
 mod_log = logging.getLogger(__name__)
 
 
-class Pipette:
+class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
     """A class to gather and track pipette state and configs.
 
     This class should not touch hardware or call back out to the hardware
