@@ -188,18 +188,6 @@ class SensorScheduler:
                     return bool(response.payload.status)
         return False
 
-    @staticmethod
-    async def _read_peripheral_response(
-        node_id: NodeId,
-        reader: WaitableCallback,
-    ) -> bool:
-        """Waits for and sends back PeripheralStatusResponse."""
-        async for response, arbitration_id in reader:
-            if arbitration_id.parts.originating_node_id == node_id:
-                if isinstance(response, PeripheralStatusResponse):
-                    return bool(response.payload.status)
-        return False
-
     async def request_peripheral_status(
         self,
         sensor: SensorType,
