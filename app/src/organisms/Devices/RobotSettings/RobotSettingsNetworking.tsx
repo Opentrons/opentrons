@@ -85,7 +85,9 @@ export function RobotSettingsNetworking({
         </StyledText>
       </Flex>
       <Flex paddingLeft={SPACING.spacing7} marginBottom={SPACING.spacing3}>
-        <StyledText as="pSemiBold">{t('wireless_network_name')}</StyledText>
+        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {t('wireless_network_name')}
+        </StyledText>
       </Flex>
       <Box paddingLeft={SPACING.spacing7} marginBottom={SPACING.spacing4}>
         {wifi?.ipAddress != null ? (
