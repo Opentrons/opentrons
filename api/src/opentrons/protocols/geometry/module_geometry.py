@@ -194,10 +194,11 @@ class ModuleGeometry(DeckItem):
     def __repr__(self) -> str:
         return self._display_name
 
-    def __eq__(self, other: object) -> bool:
-        """Compare for object equality.
+    def has_same_initial_state_as(self, other: object) -> bool:
+        """Check whether this instance has the same initial state as another.
 
-        Verifies that the object is a ModuleGeometry and has the same module propeties.
+        Verifies if another ModuleGeometry instance was constructed with the same
+        module geometry constants as this instance.
         """
         return (
             isinstance(other, ModuleGeometry)

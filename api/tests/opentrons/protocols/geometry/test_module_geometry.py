@@ -22,19 +22,19 @@ def v1_mag_module_schema_v3_definition() -> ModuleDefinitionV3:
         "$otSharedSchema": "module/schemas/3",
         "moduleType": "magneticModuleType",
         "model": "magneticModuleV1",
-        "labwareOffset": {"x": -0.15, "y": -0.15, "z": 80.09},
+        "labwareOffset": {"x": 11.0, "y": 22.0, "z": 33.0},
         "dimensions": {
-            "bareOverallHeight": 84,
-            "overLabwareHeight": 0,
-            "xDimension": 123,
-            "yDimension": 321,
+            "bareOverallHeight": 123,
+            "overLabwareHeight": 234,
+            "xDimension": 345,
+            "yDimension": 456,
         },
-        "calibrationPoint": {"x": 12.0, "y": 8.75, "z": 0.0},
+        "calibrationPoint": {"x": 111, "y": 222, "z": 333},
         "displayName": "Sample Module",
         "quirks": [],
         "slotTransforms": {},
-        "compatibleWith": ["magneticModuleV2"],
-        "cornerOffsetFromSlot": {"x": 0.1, "y": 0.1, "z": 0.0},
+        "compatibleWith": ["someSimilarModule"],
+        "cornerOffsetFromSlot": {"x": 111, "y": 222, "z": 333},
         "twoDimensionalRendering": {},
     }
 
@@ -61,9 +61,9 @@ def v1_mag_module_schema_v1_definition() -> ModuleDefinitionV1:
             ModuleGeometry(
                 parent=Location(Point(0, 0, 0), labware=None),
                 api_level=APIVersion.from_string("2.3"),
-                offset=Point(-0.15, -0.15, 80.09),
-                overall_height=84,
-                height_over_labware=0,
+                offset=Point(11, 22, 33),
+                overall_height=123,
+                height_over_labware=234,
                 model=MagneticModuleModel.MAGNETIC_V1,
                 module_type=ModuleType.MAGNETIC,
                 display_name="Sample Module",
@@ -96,7 +96,7 @@ def test_load_module_from_definition(
         parent=Location(point=Point(0, 0, 0), labware=None),
         api_level=api_version,
     )
-    assert load_result == expected_geometry
+    assert load_result.has_same_initial_state_as(expected_geometry)
 
 
 def test_load_module_from_definition_raises(v1_mag_module_schema_v3_definition) -> None:
