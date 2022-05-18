@@ -70,10 +70,7 @@ async def get_all_pipette_offset_calibrations(
 @router.delete(
     "/calibration/pipette_offset",
     summary="Delete a pipette offset calibration",
-    description=(
-        "Delete one specific pipette calibration"
-        " by pipette serial and mount."
-    ),
+    description="Delete one specific pipette calibration by pipette serial and mount.",
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
 )
 async def delete_specific_pipette_offset_calibration(
