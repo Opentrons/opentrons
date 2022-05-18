@@ -32,7 +32,7 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
   const { protocolKey, protocolType } = props
   const { t } = useTranslation('protocol_details')
   const {
-    MenuOverlayPortal,
+    MenuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,
@@ -84,7 +84,7 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
           ) : null}
         </Flex>
       ) : null}
-      <MenuOverlayPortal />
+      <MenuOverlay />
     </Flex>
   )
 }

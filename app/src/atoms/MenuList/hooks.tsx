@@ -1,16 +1,11 @@
 import * as React from 'react'
-import { Portal } from '../../App/portal'
 import { COLORS, Overlay } from '@opentrons/components'
 
 interface MenuHandleClickOutside {
-  MenuOverlayPortal: React.FC
+  MenuOverlay: React.FC
   handleOverflowClick: React.MouseEventHandler<HTMLButtonElement>
   showOverflowMenu: boolean
   setShowOverflowMenu: React.Dispatch<React.SetStateAction<boolean>>
-}
-
-interface MenuOverlayPortalProps {
-  children?: React.ReactNode
 }
 
 export function useMenuHandleClickOutside(): MenuHandleClickOutside {
@@ -26,20 +21,19 @@ export function useMenuHandleClickOutside(): MenuHandleClickOutside {
     setShowOverflowMenu(false)
   }
 
-  const MenuOverlayPortal = (props: MenuOverlayPortalProps): JSX.Element => (
-    <Portal level="top">
+  const MenuOverlay = (): JSX.Element => (
+    <>
       {showOverflowMenu ? (
         <Overlay
           onClick={handleClickOutside}
           backgroundColor={COLORS.transparent}
         />
       ) : null}
-      {props.children}
-    </Portal>
+    </>
   )
 
   return {
-    MenuOverlayPortal,
+    MenuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,

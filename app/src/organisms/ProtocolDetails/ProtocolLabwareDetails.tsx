@@ -19,6 +19,7 @@ import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { Portal } from '../../App/portal'
 import { LabwareDetails } from '../Labware/LabwareDetails'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 
@@ -144,7 +145,7 @@ export const LabwareDetailOverflowMenu = (
   const { labware } = props
   const { t } = useTranslation('protocol_details')
   const {
-    MenuOverlayPortal,
+    MenuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,
@@ -186,14 +187,15 @@ export const LabwareDetailOverflowMenu = (
           </MenuItem>
         </Flex>
       ) : null}
-      <MenuOverlayPortal>
+      <Portal level="top">
+        <MenuOverlay />
         {showLabwareDetailSlideout ? (
           <LabwareDetails
             labware={labware}
             onClose={() => setShowLabwareDetailSlideout(false)}
           />
         ) : null}
-      </MenuOverlayPortal>
+      </Portal>
     </Flex>
   )
 }

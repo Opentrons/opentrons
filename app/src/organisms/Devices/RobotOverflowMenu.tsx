@@ -17,6 +17,7 @@ import { CONNECTABLE, removeRobot } from '../../redux/discovery'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { Portal } from '../../App/portal'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
@@ -25,6 +26,7 @@ import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { Dispatch } from '../../redux/types'
+
 interface RobotOverflowMenuProps extends StyleProps {
   robot: DiscoveredRobot
 }
@@ -33,7 +35,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   const { robot, ...styleProps } = props
   const { t } = useTranslation(['devices_landing', 'shared'])
   const {
-    MenuOverlayPortal,
+    MenuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,
@@ -140,7 +142,8 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           {menuItems}
         </Flex>
       ) : null}
-      <MenuOverlayPortal>
+      <Portal level="top">
+        <MenuOverlay />
         {robot.status === CONNECTABLE ? (
           <ChooseProtocolSlideout
             robot={robot}
@@ -153,7 +156,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
             onClose={() => setShowConnectionTroubleshootingModal(false)}
           />
         ) : null}
-      </MenuOverlayPortal>
+      </Portal>
     </Flex>
   )
 }

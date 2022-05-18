@@ -33,7 +33,7 @@ export const RobotOverviewOverflowMenu = (
   const { robot } = props
   const { t } = useTranslation(['devices_landing', 'robot_controls'])
   const {
-    MenuOverlayPortal,
+    MenuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,
@@ -105,7 +105,7 @@ export const RobotOverviewOverflowMenu = (
           </MenuItem>
         </Flex>
       ) : null}
-      <MenuOverlayPortal />
+      <MenuOverlay />
     </Flex>
   )
 }
