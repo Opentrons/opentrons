@@ -56,7 +56,7 @@ class ExecutionManager:
         async with self._condition:
             return self._state
 
-    async def register_cancellable_task(
+    def register_cancellable_task(
         self, task: "asyncio.Task[TaskContents]"
     ) -> "asyncio.Task[TaskContents]":
         self._cancellable_tasks.add(task)
