@@ -51,23 +51,23 @@ async def test_get_current_run_engine_from_url(
     assert result is mock_engine_store.engine
 
 
-async def test_get_current_run_engine_no_run(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-) -> None:
-    """It should 404 if the run is not in the store."""
-    decoy.when(mock_run_store.has("run-id")).then_return(False)
-
-    with pytest.raises(ApiError) as exc_info:
-        await get_current_run_engine_from_url(
-            runId="run-id",
-            engine_store=mock_engine_store,
-            run_store=mock_run_store,
-        )
-
-    assert exc_info.value.status_code == 404
-    assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+# async def test_get_current_run_engine_no_run(
+#     decoy: Decoy,
+#     mock_engine_store: EngineStore,
+#     mock_run_store: RunStore,
+# ) -> None:
+#     """It should 404 if the run is not in the store."""
+#     decoy.when(mock_run_store.has("run-id")).then_return(False)
+#
+#     with pytest.raises(ApiError) as exc_info:
+#         await get_current_run_engine_from_url(
+#             runId="run-id",
+#             engine_store=mock_engine_store,
+#             run_store=mock_run_store,
+#         )
+#
+#     assert exc_info.value.status_code == 404
+#     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
 
 
 async def test_get_current_run_engine_from_url_not_current(
