@@ -41,7 +41,11 @@ export function AvailableRobotOption(
       >
         <StyledText as="h6">{robotModel}</StyledText>
         <Box maxWidth="9.5rem">
-          <StyledText as="p" css={{ 'word-wrap': 'break-word' }} fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <StyledText
+            as="p"
+            css={{ 'word-wrap': 'break-word' }}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {robotName}
             <Icon
               // local boolean corresponds to a wired usb connection
