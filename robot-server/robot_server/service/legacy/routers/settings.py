@@ -34,9 +34,16 @@ from robot_server.service.legacy.models.settings import (
     AdvancedSetting,
 )
 
+from ..reset_options_manager import ResetOptionsManager
+
 log = logging.getLogger(__name__)
 
 router = APIRouter()
+
+
+def get_reset_options_manager() -> ResetOptionsManager:
+    """Get an `ResetOptionsManager` to navigate between resetting options."""
+    return ResetOptionsManager()
 
 
 @router.post(
@@ -193,10 +200,12 @@ async def get_settings_reset_options() -> FactoryResetOptions:
     "/settings/reset", description="Perform a factory reset of some robot data"
 )
 async def post_settings_reset_options(
-    factory_reset_commands: Dict[reset_util.ResetOptionId, bool]
+    factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
+    reset_options_manager: ResetOptionsManager = Depends(get_reset_options_manager),
 ) -> V1BasicResponse:
-    options = set(k for k, v in factory_reset_commands.items() if v)
-    reset_util.reset(options)
+    options = reset_options_manager.reset_options(factory_reset_commands)
+    # options = set(k for k, v in factory_reset_commands.items() if v)
+    # reset_util.reset(options)
 
     message = (
         "Options '{}' were reset".format(", ".join(o.name for o in options))

@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Set
 
 from opentrons.config import reset as reset_util
 from opentrons.config.reset import ResetOptionId
@@ -15,6 +15,7 @@ class ResetOptionsManager:
     Args:
         run_store: Persistentance reset layer.
     """
+
     # TODO (tz, 5-18-22): add run_store option through here and remove from api?
     def get_reset_options(self) -> FactoryResetOptions:
         """Get reset options from api layer"""
@@ -26,15 +27,21 @@ class ResetOptionsManager:
             ]
         )
 
-    def reset_options(self, factory_reset_commands: Dict[reset_util.ResetOptionId, bool]) -> None:
+    def reset_options(
+        self, factory_reset_commands: Dict[reset_util.ResetOptionId, bool]
+    ) -> Set[ResetOptionId]:
         """Redirect resetting options to api layer or run store layer."""
-        options = set(k for k, v in factory_reset_commands.items() if v and k != "dbHistory")
+        options = set(
+            k for k, v in factory_reset_commands.items() if v and k != "dbHistory"
+        )
 
         if len(options) > 0:
             print("resetting api")
             reset_util.reset(options)
 
-        if ('dbHistory', True) in factory_reset_commands.items():
+        if ("dbHistory", True) in factory_reset_commands.items():
             print("resetting db")
+            options.add(ResetOptionId.reset_db_history)
             reset_db()
 
+        return options
