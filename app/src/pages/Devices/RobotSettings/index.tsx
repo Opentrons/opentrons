@@ -41,7 +41,12 @@ export function RobotSettings(): JSX.Element | null {
   const robotSettingsContentByTab: {
     [K in RobotSettingsTab]: () => JSX.Element
   } = {
-    calibration: () => <RobotSettingsCalibration robotName={robotName} />,
+    calibration: () => (
+      <RobotSettingsCalibration
+        robotName={robotName}
+        updateRobotStatus={updateRobotStatus}
+      />
+    ),
     networking: () => <RobotSettingsNetworking robotName={robotName} />,
     advanced: () => (
       <RobotSettingsAdvanced

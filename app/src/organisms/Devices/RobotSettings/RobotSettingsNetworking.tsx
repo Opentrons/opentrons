@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
+
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -12,6 +13,8 @@ import {
   TYPOGRAPHY,
   useInterval,
 } from '@opentrons/components'
+import { useAllSessionsQuery } from '@opentrons/react-api-client'
+
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
@@ -25,6 +28,8 @@ import {
 } from '../../../redux/networking'
 // import * as RobotApi from '../../../redux/robot-api'
 import { TemporarySelectNetwork } from './TemporarySelectNetwork'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { checkIsRobotBusy } from './AdvancedTab/utils'
 
 import type { State, Dispatch } from '../../../redux/types'
 interface NetworkingProps {
@@ -45,6 +50,8 @@ export function RobotSettingsNetworking({
   const list = useSelector((state: State) => getWifiList(state, robotName))
   const dispatch = useDispatch<Dispatch>()
   // const [dispatchApi] = RobotApi.useDispatchApiRequest()
+  const isRobotBusy = useCurrentRunId() !== null
+  const allSessionsQueryResponse = useAllSessionsQuery()
 
   const { wifi, ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)

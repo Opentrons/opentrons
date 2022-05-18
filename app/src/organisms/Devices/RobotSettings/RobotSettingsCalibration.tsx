@@ -18,6 +18,7 @@ import {
   useConditionalConfirm,
   Mount,
 } from '@opentrons/components'
+import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import { Portal } from '../../../App/portal'
 import { TertiaryButton } from '../../../atoms/buttons'
@@ -48,6 +49,8 @@ import {
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { checkIsRobotBusy } from './AdvancedTab/utils'
 
 import type { State } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
@@ -59,6 +62,7 @@ import type { DeckCalibrationInfo } from '../../../redux/calibration/types'
 
 interface CalibrationProps {
   robotName: string
+  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 export interface FormattedPipetteOffsetCalibration {
@@ -84,6 +88,7 @@ const spinnerCommandBlockList: SessionCommandString[] = [
 
 export function RobotSettingsCalibration({
   robotName,
+  updateRobotStatus,
 }: CalibrationProps): JSX.Element {
   const { t } = useTranslation([
     'device_settings',
@@ -110,8 +115,10 @@ export function RobotSettingsCalibration({
     pipetteOffsetCalBannerType,
     setPipetteOffsetCalBannerType,
   ] = React.useState<string>('')
-
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
+
+  const isRobotBusy = useCurrentRunId() !== null
+  const allSessionsQueryResponse = useAllSessionsQuery()
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
@@ -262,22 +269,30 @@ export function RobotSettingsCalibration({
   const handleHealthCheck = (
     hasBlockModalResponse: boolean | null = null
   ): void => {
-    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
-      setShowCalBlockModal(true)
+    const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
+    if (isBusy) {
+      updateRobotStatus(true)
     } else {
-      setShowCalBlockModal(false)
-      dispatchRequests(
-        Sessions.ensureSession(
-          robotName,
-          Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
-          {
-            tipRacks: [],
-            hasCalibrationBlock: Boolean(
-              configHasCalibrationBlock ?? hasBlockModalResponse
-            ),
-          }
+      if (
+        hasBlockModalResponse === null &&
+        configHasCalibrationBlock === null
+      ) {
+        setShowCalBlockModal(true)
+      } else {
+        setShowCalBlockModal(false)
+        dispatchRequests(
+          Sessions.ensureSession(
+            robotName,
+            Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+            {
+              tipRacks: [],
+              hasCalibrationBlock: Boolean(
+                configHasCalibrationBlock ?? hasBlockModalResponse
+              ),
+            }
+          )
         )
-      )
+      }
     }
   }
 
@@ -352,6 +367,15 @@ export function RobotSettingsCalibration({
       } else {
         setShowPipetteOffsetCalibrationBanner(false)
       }
+    }
+  }
+
+  const handleClickDeckCalibration = (): void => {
+    const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
+    if (isBusy) {
+      updateRobotStatus(true)
+    } else {
+      confirmStart()
     }
   }
 
@@ -477,7 +501,8 @@ export function RobotSettingsCalibration({
               color={COLORS.darkBlack}
               css={TYPOGRAPHY.pRegular}
               textDecoration={TEXT_DECORATION_UNDERLINE}
-              onClick={() => confirmStart()}
+              // onClick={() => confirmStart()}
+              onClick={() => handleClickDeckCalibration()}
             >
               {t('calibrate_now')}
             </Link>
@@ -496,7 +521,8 @@ export function RobotSettingsCalibration({
             <StyledText as="label">{deckLastModified()}</StyledText>
           </Box>
           <TertiaryButton
-            onClick={() => confirmStart()}
+            // onClick={() => confirmStart()}
+            onClick={() => handleClickDeckCalibration()}
             disabled={disabledOrBusyReason !== null}
           >
             {deckCalibrationButtonText}
