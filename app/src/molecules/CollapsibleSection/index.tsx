@@ -14,13 +14,14 @@ import { StyledText } from '../../atoms/text'
 interface CollapsibleSectionProps extends StyleProps {
   title: string
   children: React.ReactNode
+  isExpandedInitially?: boolean
 }
 
 export function CollapsibleSection(
   props: CollapsibleSectionProps
 ): JSX.Element {
-  const { title, children, ...styleProps } = props
-  const [isExpanded, setIsExpanded] = React.useState(true)
+  const { title, children, isExpandedInitially = true, ...styleProps } = props
+  const [isExpanded, setIsExpanded] = React.useState(isExpandedInitially)
   return (
     <Flex flexDirection={DIRECTION_COLUMN} {...styleProps}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>

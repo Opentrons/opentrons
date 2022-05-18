@@ -15,6 +15,7 @@ import {
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import { CONNECTABLE, UNREACHABLE } from '../../../redux/discovery'
 import { useRobot } from '../../../organisms/Devices/hooks'
 import { Line } from '../../../atoms/structure'
 import { NavTab } from '../../../atoms/NavTab'
@@ -28,14 +29,21 @@ export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')
   const { robotName, robotSettingsTab } = useParams<NavRouteParams>()
   const robot = useRobot(robotName)
+  const isCalibrationDisabled = robot?.status !== CONNECTABLE
 
   const robotSettingsContentByTab: {
     [K in RobotSettingsTab]: () => JSX.Element
   } = {
     calibration: () => <RobotSettingsCalibration robotName={robotName} />,
-
     networking: () => <RobotSettingsNetworking robotName={robotName} />,
     advanced: () => <RobotSettingsAdvanced robotName={robotName} />,
+  }
+
+  if (robot?.status === UNREACHABLE){
+    return <Redirect to={`/devices/${robotName}`} />
+  }
+  if (robotSettingsTab === 'calibration' && isCalibrationDisabled) {
+    return <Redirect to={`/devices/${robotName}/robot-settings/networking`} />
   }
 
   const RobotSettingsContent =
@@ -70,10 +78,12 @@ export function RobotSettings(): JSX.Element | null {
             <NavTab
               to={`/devices/${robotName}/robot-settings/calibration`}
               tabName={t('calibration')}
+              disabled={isCalibrationDisabled}
             />
             <NavTab
               to={`/devices/${robotName}/robot-settings/networking`}
               tabName={t('networking')}
+              disabled={isNetworkingDisabled}
             />
             <NavTab
               to={`/devices/${robotName}/robot-settings/advanced`}

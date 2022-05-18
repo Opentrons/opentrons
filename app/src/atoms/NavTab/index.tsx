@@ -7,6 +7,7 @@ import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 interface NavTabProps {
   to: string
   tabName: string
+  disabled?: boolean
 }
 
 const StyledNavLink = styled(NavLink)`
@@ -20,9 +21,9 @@ const StyledNavLink = styled(NavLink)`
   }
 `
 
-export function NavTab({ to, tabName }: NavTabProps): JSX.Element {
+export function NavTab({ to, tabName, disabled = false }: NavTabProps): JSX.Element {
   return (
-    <StyledNavLink to={to} replace>
+    <StyledNavLink to={to} replace disabled={disabled} >
       {tabName}
     </StyledNavLink>
   )

@@ -15,6 +15,7 @@ import {
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { restartRobot } from '../../redux/robot-admin'
 import { home, ROBOT } from '../../redux/robot-controls'
+import { UNREACHABLE } from '../../redux/discovery'
 import { Portal } from '../../App/portal'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
@@ -36,7 +37,7 @@ export const RobotOverviewOverflowMenu = (
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
   const currentRunStatus = useCurrentRunStatus()
   const buttonDisabledReason =
-    currentRunStatus === RUN_STATUS_RUNNING || robot.status === 'unreachable'
+    currentRunStatus === RUN_STATUS_RUNNING || robot.status === UNREACHABLE
 
   const dispatch = useDispatch<Dispatch>()
 

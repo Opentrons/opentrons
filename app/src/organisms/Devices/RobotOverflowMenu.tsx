@@ -129,41 +129,43 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
         onClick={handleOverflowClick}
       />
       {showOverflowMenu ? (
-        <Flex
-          width={'11rem'}
-          zIndex={10}
-          borderRadius={'4px 4px 0px 0px'}
-          boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
-          position={POSITION_ABSOLUTE}
-          backgroundColor={COLORS.white}
-          top="2.6rem"
-          right={`calc(50% + ${SPACING.spacing2})`}
-          flexDirection={DIRECTION_COLUMN}
-          id={`RobotOverflowMenu_${robot.name}_buttons`}
-        >
-          {menuItems}
-        </Flex>
+        <>
+          <Flex
+            width={'11rem'}
+            zIndex={10}
+            borderRadius={'4px 4px 0px 0px'}
+            boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
+            position={POSITION_ABSOLUTE}
+            backgroundColor={COLORS.white}
+            top="2.6rem"
+            right={`calc(50% + ${SPACING.spacing2})`}
+            flexDirection={DIRECTION_COLUMN}
+            id={`RobotOverflowMenu_${robot.name}_buttons`}
+          >
+            {menuItems}
+          </Flex>
+          <Portal level="top">
+            {showOverflowMenu ? (
+              <Overlay
+                onClick={handleClickOutside}
+                backgroundColor={COLORS.transparent}
+              />
+            ) : null}
+            {robot.status === CONNECTABLE ? (
+              <ChooseProtocolSlideout
+                robot={robot}
+                showSlideout={showChooseProtocolSlideout}
+                onCloseClick={() => setShowChooseProtocolSlideout(false)}
+              />
+            ) : null}
+            {showConnectionTroubleshootingModal ? (
+              <ConnectionTroubleshootingModal
+                onClose={() => setShowConnectionTroubleshootingModal(false)}
+              />
+            ) : null}
+          </Portal>
+        </>
       ) : null}
-      <Portal level="top">
-        {showOverflowMenu ? (
-          <Overlay
-            onClick={handleClickOutside}
-            backgroundColor={COLORS.transparent}
-          />
-        ) : null}
-        {robot.status === CONNECTABLE ? (
-          <ChooseProtocolSlideout
-            robot={robot}
-            showSlideout={showChooseProtocolSlideout}
-            onCloseClick={() => setShowChooseProtocolSlideout(false)}
-          />
-        ) : null}
-        {showConnectionTroubleshootingModal ? (
-          <ConnectionTroubleshootingModal
-            onClose={() => setShowConnectionTroubleshootingModal(false)}
-          />
-        ) : null}
-      </Portal>
     </Flex>
   )
 }

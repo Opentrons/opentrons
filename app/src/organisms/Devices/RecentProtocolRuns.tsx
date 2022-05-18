@@ -135,7 +135,7 @@ export function RecentProtocolRuns({
             {t('offline_recent_protocol_runs')}
           </StyledText>
         )}
-        {(runs == null || runs.length === 0) && (
+        {isRobotViewable && (runs == null || runs.length === 0) && (
           <StyledText
             as="p"
             id="RecentProtocolRuns_no_runs"
