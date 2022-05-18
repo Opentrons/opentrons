@@ -111,12 +111,6 @@ class CommandState:
     even if INACTIVE.
     """
 
-    # is_hardware_stopped: bool
-    # """Whether the engine's hardware has ceased motion.
-    #
-    # Once set, this flag cannot be unset.
-    # """
-
     run_completed_at: Optional[datetime]
     """The time the run was completed.
 
@@ -151,7 +145,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
         """Initialize a CommandStore and its state."""
         self._state = CommandState(
             queue_status=QueueStatus.IMPLICITLY_ACTIVE,
-            # is_hardware_stopped=False,
             is_door_blocking=is_door_blocking,
             run_result=None,
             running_command_id=None,
@@ -309,7 +302,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
         elif isinstance(action, HardwareStoppedAction):
             self._state.queue_status = QueueStatus.INACTIVE
             self._state.run_result = self._state.run_result or RunResult.STOPPED
-            # self._state.is_hardware_stopped = True
             self._state.run_completed_at = self._module_utils.get_timestamp()
 
         elif isinstance(action, HardwareEventAction):

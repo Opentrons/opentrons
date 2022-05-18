@@ -1,7 +1,7 @@
 """Labware state store tests."""
 import pytest
 from contextlib import nullcontext as does_not_raise
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Dict, List, NamedTuple, Optional, Sequence, Type
 
 from opentrons.ordered_set import OrderedSet
