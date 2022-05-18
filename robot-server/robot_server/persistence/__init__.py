@@ -68,10 +68,14 @@ def get_sql_engine(
     # the lifetime of a dependency to the lifetime of the server app.
     # https://github.com/tiangolo/fastapi/issues/617
 
+def reset_db() -> None:
+    raise NotImplementedError()
+
 
 __all__ = [
     "get_persistence_directory",
     "get_sql_engine",
+    "reset_db",
     # database tables
     "protocol_table",
     "analysis_table",
