@@ -1,9 +1,12 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+
 import { Box, SPACING, IconProps } from '@opentrons/components'
+
 import { Divider } from '../../../atoms/structure'
 import { Toast } from '../../../atoms/Toast'
+import { useRobot } from '../hooks'
 import { AboutRobotName } from './AdvancedTab/AboutRobotName'
 import { RobotInformation } from './AdvancedTab/RobotInformation'
 import { RobotServerVersion } from './AdvancedTab/RobotServerVersion'
@@ -17,7 +20,6 @@ import { UseOlderProtocol } from './AdvancedTab/UseOlderProtocol'
 import { LegacySettings } from './AdvancedTab/LegacySettings'
 import { ShortTrashBin } from './AdvancedTab/ShortTrashBin'
 import { UseOlderAspirateBehavior } from './AdvancedTab/UseOlderAspirateBehavior'
-import { useRobot } from '../hooks'
 import { getRobotSettings } from '../../../redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
@@ -59,6 +61,7 @@ export function RobotSettingsAdvanced({
   const [showDownloadToast, setShowDownloadToast] = React.useState<boolean>(
     false
   )
+  const [showAlertToast, setShowAlertToast] = React.useState<boolean>(false)
 
   const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
 
@@ -99,6 +102,10 @@ export function RobotSettingsAdvanced({
   const updateDownloadLogsStatus = (isDownloading: boolean): void =>
     setShowDownloadToast(isDownloading)
 
+  const updateIsRobotBusy = (isRobotBusy: boolean): void => {
+    if (isRobotBusy) setShowAlertToast(true)
+  }
+
   return (
     <>
       {showSoftwareUpdateModal && (
@@ -115,6 +122,14 @@ export function RobotSettingsAdvanced({
           closeButton={false}
           onClose={() => setShowDownloadToast(false)}
           requiredTimeout={false}
+        />
+      )}
+      {showAlertToast && (
+        <Toast
+          message={'Robot is busy!!!'}
+          type="error"
+          closeButton={false}
+          onClose={() => setShowAlertToast(false)}
         />
       )}
       <Box>
@@ -144,6 +159,7 @@ export function RobotSettingsAdvanced({
         <AboutRobotName
           robotName={robotName}
           updateIsExpanded={updateIsExpanded}
+          updateIsRobotBusy={updateIsRobotBusy}
         />
         <Divider marginY="2.5rem" />
         <RobotServerVersion robotName={robotName} />
