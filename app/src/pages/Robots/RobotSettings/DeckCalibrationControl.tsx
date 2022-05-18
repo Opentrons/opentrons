@@ -165,7 +165,7 @@ export function DeckCalibrationControl(props: Props): JSX.Element {
     warningType = REQUIRED
   } else if (
     !Array.isArray(deckCalData) &&
-    deckCalData?.status &&
+    deckCalData?.status != null &&
     deckCalData.status.markedBad
   ) {
     warningType = RECOMMENDED
@@ -217,7 +217,7 @@ export function DeckCalibrationControl(props: Props): JSX.Element {
           <>
             <InlineCalibrationWarning warningType={warningType} />
             <Text>{t('deck_calibration_description')}</Text>
-            {deckCalData && deckCalStatus && (
+            {deckCalData != null && deckCalStatus && (
               <Text marginTop={SPACING_4} fontStyle={FONT_STYLE_ITALIC}>
                 {buildDeckLastCalibrated(deckCalData, deckCalStatus)}
               </Text>
@@ -275,12 +275,10 @@ export function DeckCalibrationControl(props: Props): JSX.Element {
           >
             <Text>{t('deck_calibration_error_occurred')}</Text>
             <Text>
-              {
-                // @ts-expect-error TODO use in operator to protect against non existent error
-                createRequest?.error &&
-                  // @ts-expect-error TODO use in operator to protect against non existent error
-                  RobotApi.getErrorResponseMessage(createRequest.error)
-              }
+              {createRequest != null &&
+                'error' in createRequest &&
+                createRequest.error != null &&
+                RobotApi.getErrorResponseMessage(createRequest.error)}
             </Text>
           </AlertModal>
         )}

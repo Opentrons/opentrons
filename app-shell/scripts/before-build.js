@@ -73,6 +73,8 @@ module.exports = function beforeBuild(context) {
     .then(() => {
       console.log('Standalone Python extracted, installing `opentrons` package')
 
+      // TODO(mc, 2022-05-16): explore virtualenvs for a more reliable
+      // implementation of this install
       return execa(
         HOST_PYTHON,
         [
@@ -81,6 +83,7 @@ module.exports = function beforeBuild(context) {
           'install',
           '--user',
           '--use-feature=in-tree-build',
+          '--force-reinstall',
           path.join(__dirname, '../../shared-data/python'),
           path.join(__dirname, '../../api'),
         ],
@@ -91,8 +94,9 @@ module.exports = function beforeBuild(context) {
         }
       )
     })
-    .then(() => {
+    .then(({ stdout }) => {
       console.log("`opentrons` package installed to app's Python environment")
+      console.debug('pip output:', stdout)
       // must return a truthy value, or else electron-builder will
       // skip installing project dependencies into the package
       return true
