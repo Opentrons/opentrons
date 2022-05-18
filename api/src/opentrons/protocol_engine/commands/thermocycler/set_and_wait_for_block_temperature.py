@@ -22,6 +22,11 @@ class SetAndWaitForBlockTemperatureParams(BaseModel):
 
     moduleId: str = Field(..., description="Unique ID of the Thermocycler Module.")
     celsius: float = Field(..., description="Target temperature in °C.")
+    blockMaxVolumeUl: Optional[float] = Field(
+        None,
+        description="Amount of liquid in uL of the most-full well"
+        " in labware loaded onto the thermocycler.",
+    )
 
 
 class SetAndWaitForBlockTemperatureResult(BaseModel):
@@ -56,12 +61,21 @@ class SetAndWaitForBlockTemperatureImpl(
         target_temperature = thermocycler_state.validate_target_block_temperature(
             params.celsius
         )
+        target_volume: Optional[float]
+        if params.blockMaxVolumeUl is not None:
+            target_volume = thermocycler_state.validate_max_block_volume(
+                params.blockMaxVolumeUl
+            )
+        else:
+            target_volume = None
         thermocycler_hardware = self._equipment.get_module_hardware_api(
             thermocycler_state.module_id
         )
 
         if thermocycler_hardware is not None:
-            await thermocycler_hardware.set_temperature(target_temperature)
+            await thermocycler_hardware.set_temperature(
+                target_temperature, volume=target_volume
+            )
 
         return SetAndWaitForBlockTemperatureResult()
 
