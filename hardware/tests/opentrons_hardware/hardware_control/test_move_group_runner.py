@@ -43,6 +43,26 @@ from opentrons_hardware.firmware_bindings.utils import (
 )
 
 
+def calc_duration(step: MoveGroupSingleAxisStep) -> int:
+    """Calculate duration."""
+    return int(step.duration_sec * interrupts_per_sec)
+
+
+def calc_velocity(step: MoveGroupSingleAxisStep) -> int:
+    """Calculate velocity."""
+    return int(step.velocity_mm_sec / interrupts_per_sec * (2**31))
+
+
+def calc_acceleration(step: MoveGroupSingleAxisStep) -> int:
+    """Calculate acceleration."""
+    return int(
+        step.acceleration_mm_sec_sq
+        / interrupts_per_sec
+        / interrupts_per_sec
+        * (2**31)
+    )
+
+
 @pytest.fixture
 def mock_can_messenger() -> AsyncMock:
     """Mock communication."""
@@ -177,25 +197,16 @@ async def test_home(
     """Test Home Request Functionality."""
     subject = MoveGroupRunner(move_groups=move_group_home_single)
     await subject._send_groups(can_messenger=mock_can_messenger)
+    step = move_group_home_single[0][0].get(NodeId.head)
+    assert isinstance(step, MoveGroupSingleAxisStep)
     mock_can_messenger.send.assert_any_call(
         node_id=NodeId.head,
         message=HomeRequest(
             payload=HomeRequestPayload(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
-                velocity=Int32Field(
-                    int(
-                        move_group_home_single[0][0][NodeId.head].velocity_mm_sec
-                        / interrupts_per_sec
-                        * (2**31)
-                    )
-                ),
-                duration=UInt32Field(
-                    int(
-                        move_group_home_single[0][0][NodeId.head].duration_sec
-                        * interrupts_per_sec
-                    )
-                ),
+                velocity=Int32Field(calc_velocity(step)),
+                duration=UInt32Field(calc_duration(step)),
             )
         ),
     )
@@ -207,6 +218,8 @@ async def test_single_send_setup_commands(
     """It should send all the move group set up commands."""
     subject = MoveGroupRunner(move_groups=move_group_single)
     await subject._send_groups(can_messenger=mock_can_messenger)
+    step = move_group_single[0][0].get(NodeId.head)
+    assert isinstance(step, MoveGroupSingleAxisStep)
     mock_can_messenger.send.assert_any_call(
         node_id=NodeId.head,
         message=AddLinearMoveRequest(
@@ -214,27 +227,9 @@ async def test_single_send_setup_commands(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
                 request_stop_condition=UInt8Field(0),
-                velocity=Int32Field(
-                    int(
-                        move_group_single[0][0][NodeId.head].velocity_mm_sec
-                        / interrupts_per_sec
-                        * (2**31)
-                    )
-                ),
-                acceleration=Int32Field(
-                    int(
-                        move_group_single[0][0][NodeId.head].acceleration_mm_sec_sq
-                        / interrupts_per_sec
-                        / interrupts_per_sec
-                        * (2**31)
-                    )
-                ),
-                duration=UInt32Field(
-                    int(
-                        move_group_single[0][0][NodeId.head].duration_sec
-                        * interrupts_per_sec
-                    )
-                ),
+                velocity=Int32Field(calc_velocity(step)),
+                acceleration=Int32Field(calc_acceleration(step)),
+                duration=UInt32Field(calc_duration(step)),
             )
         ),
     )
@@ -248,6 +243,8 @@ async def test_multi_send_setup_commands(
     await subject._send_groups(can_messenger=mock_can_messenger)
 
     # Group 0
+    step = move_group_multiple[0][0].get(NodeId.head)
+    assert isinstance(step, MoveGroupSingleAxisStep)
     mock_can_messenger.send.assert_any_call(
         node_id=NodeId.head,
         message=AddLinearMoveRequest(
@@ -255,32 +252,16 @@ async def test_multi_send_setup_commands(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
                 request_stop_condition=UInt8Field(0),
-                velocity=Int32Field(
-                    int(
-                        move_group_multiple[0][0][NodeId.head].velocity_mm_sec
-                        / interrupts_per_sec
-                        * (2**31)
-                    )
-                ),
-                acceleration=Int32Field(
-                    int(
-                        move_group_multiple[0][0][NodeId.head].acceleration_mm_sec_sq
-                        / interrupts_per_sec
-                        / interrupts_per_sec
-                        * (2**31)
-                    )
-                ),
-                duration=UInt32Field(
-                    int(
-                        move_group_multiple[0][0][NodeId.head].duration_sec
-                        * interrupts_per_sec
-                    )
-                ),
+                velocity=Int32Field(calc_velocity(step)),
+                acceleration=Int32Field(calc_acceleration(step)),
+                duration=UInt32Field(calc_duration(step)),
             )
         ),
     )
 
     # Group 1
+    step = move_group_multiple[1][0].get(NodeId.gantry_x)
+    assert isinstance(step, MoveGroupSingleAxisStep)
     mock_can_messenger.send.assert_any_call(
         node_id=NodeId.gantry_x,
         message=AddLinearMoveRequest(
@@ -288,33 +269,15 @@ async def test_multi_send_setup_commands(
                 group_id=UInt8Field(1),
                 seq_id=UInt8Field(0),
                 request_stop_condition=UInt8Field(0),
-                velocity=Int32Field(
-                    int(
-                        move_group_multiple[1][0][NodeId.gantry_x].velocity_mm_sec
-                        / interrupts_per_sec
-                        * (2**31)
-                    )
-                ),
-                acceleration=Int32Field(
-                    int(
-                        move_group_multiple[1][0][
-                            NodeId.gantry_x
-                        ].acceleration_mm_sec_sq
-                        / interrupts_per_sec
-                        / interrupts_per_sec
-                        * (2**31)
-                    )
-                ),
-                duration=UInt32Field(
-                    int(
-                        move_group_multiple[1][0][NodeId.gantry_x].duration_sec
-                        * interrupts_per_sec
-                    )
-                ),
+                velocity=Int32Field(calc_velocity(step)),
+                acceleration=Int32Field(calc_acceleration(step)),
+                duration=UInt32Field(calc_duration(step)),
             )
         ),
     )
 
+    step = move_group_multiple[1][0].get(NodeId.gantry_y)
+    assert isinstance(step, MoveGroupSingleAxisStep)
     mock_can_messenger.send.assert_any_call(
         node_id=NodeId.gantry_y,
         message=AddLinearMoveRequest(
@@ -322,34 +285,16 @@ async def test_multi_send_setup_commands(
                 group_id=UInt8Field(1),
                 seq_id=UInt8Field(0),
                 request_stop_condition=UInt8Field(0),
-                velocity=Int32Field(
-                    int(
-                        move_group_multiple[1][0][NodeId.gantry_y].velocity_mm_sec
-                        / interrupts_per_sec
-                        * (2**31)
-                    )
-                ),
-                acceleration=Int32Field(
-                    int(
-                        move_group_multiple[1][0][
-                            NodeId.gantry_y
-                        ].acceleration_mm_sec_sq
-                        / interrupts_per_sec
-                        / interrupts_per_sec
-                        * (2**31)
-                    )
-                ),
-                duration=UInt32Field(
-                    int(
-                        move_group_multiple[1][0][NodeId.gantry_y].duration_sec
-                        * interrupts_per_sec
-                    )
-                ),
+                velocity=Int32Field(calc_velocity(step)),
+                acceleration=Int32Field(calc_acceleration(step)),
+                duration=UInt32Field(calc_duration(step)),
             )
         ),
     )
 
     # Group 2
+    step = move_group_multiple[2][0].get(NodeId.pipette_left)
+    assert isinstance(step, MoveGroupSingleAxisStep)
     mock_can_messenger.send.assert_any_call(
         node_id=NodeId.pipette_left,
         message=AddLinearMoveRequest(
@@ -357,33 +302,15 @@ async def test_multi_send_setup_commands(
                 group_id=UInt8Field(2),
                 seq_id=UInt8Field(0),
                 request_stop_condition=UInt8Field(0),
-                velocity=Int32Field(
-                    int(
-                        move_group_multiple[2][0][NodeId.pipette_left].velocity_mm_sec
-                        / interrupts_per_sec
-                        * (2**31)
-                    )
-                ),
-                acceleration=Int32Field(
-                    int(
-                        move_group_multiple[2][0][
-                            NodeId.pipette_left
-                        ].acceleration_mm_sec_sq
-                        / interrupts_per_sec
-                        / interrupts_per_sec
-                        * (2**31)
-                    )
-                ),
-                duration=UInt32Field(
-                    int(
-                        move_group_multiple[2][0][NodeId.pipette_left].duration_sec
-                        * interrupts_per_sec
-                    )
-                ),
+                velocity=Int32Field(calc_velocity(step)),
+                acceleration=Int32Field(calc_acceleration(step)),
+                duration=UInt32Field(calc_duration(step)),
             )
         ),
     )
 
+    step = move_group_multiple[2][1].get(NodeId.pipette_left)
+    assert isinstance(step, MoveGroupSingleAxisStep)
     mock_can_messenger.send.assert_any_call(
         node_id=NodeId.pipette_left,
         message=AddLinearMoveRequest(
@@ -391,29 +318,9 @@ async def test_multi_send_setup_commands(
                 group_id=UInt8Field(2),
                 seq_id=UInt8Field(1),
                 request_stop_condition=UInt8Field(0),
-                velocity=Int32Field(
-                    int(
-                        move_group_multiple[2][1][NodeId.pipette_left].velocity_mm_sec
-                        / interrupts_per_sec
-                        * (2**31)
-                    )
-                ),
-                acceleration=Int32Field(
-                    int(
-                        move_group_multiple[2][1][
-                            NodeId.pipette_left
-                        ].acceleration_mm_sec_sq
-                        / interrupts_per_sec
-                        / interrupts_per_sec
-                        * (2**31)
-                    )
-                ),
-                duration=UInt32Field(
-                    int(
-                        move_group_multiple[2][1][NodeId.pipette_left].duration_sec
-                        * interrupts_per_sec
-                    )
-                ),
+                velocity=Int32Field(calc_velocity(step)),
+                acceleration=Int32Field(calc_acceleration(step)),
+                duration=UInt32Field(calc_duration(step)),
             )
         ),
     )
@@ -451,6 +358,7 @@ class MockSendMoveCompleter:
                 self._move_groups[message.payload.group_id.value]
             ):
                 for node, move in moves.items():
+                    assert isinstance(move, MoveGroupSingleAxisStep)
                     payload = MoveCompletedPayload(
                         group_id=message.payload.group_id,
                         seq_id=UInt8Field(seq_id),
