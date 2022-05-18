@@ -67,12 +67,8 @@ function startUp(): void {
 
   contextMenu({
     menu: actions => [
-      actions.copy({
-        transform: content => `modified_copy_${content}`,
-      }),
-      actions.lookUpSelection({
-        transform: content => `modified_copy_${content}`,
-      }),
+      actions.copy({}),
+      actions.lookUpSelection({}),
       actions.inspect(),
     ],
   })
