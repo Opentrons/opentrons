@@ -286,15 +286,12 @@ async def test_get_bundled_fw(monkeypatch, tmpdir):
     dummy_bogus_file = Path(tmpdir) / "thermoshaker@v6.6.6.bin"
     dummy_bogus_file.write_text("hello")
 
-    dummy_hs_file = Path(tmpdir) / "heater-shaker@v0.4.3.bin"
-    dummy_hs_file.write_text("hello")
-
     monkeypatch.setattr(modules.mod_abc, "ROBOT_FIRMWARE_DIR", Path(tmpdir))
     monkeypatch.setattr(modules.mod_abc, "IS_ROBOT", True)
 
     from opentrons.hardware_control import API
 
-    mods = ["tempdeck", "magdeck", "thermocycler", "heatershaker"]
+    mods = ["tempdeck", "magdeck", "thermocycler"]
     api = await API.build_hardware_simulator(attached_modules=mods)
     await asyncio.sleep(0.05)
 
@@ -306,9 +303,6 @@ async def test_get_bundled_fw(monkeypatch, tmpdir):
     )
     assert api.attached_modules[2].bundled_fw == BundledFirmware(
         version="0.1.2", path=dummy_tc_file
-    )
-    assert api.attached_modules[3].bundled_fw == BundledFirmware(
-        version="0.4.3", path=dummy_hs_file
     )
     for m in api.attached_modules:
         await m.cleanup()
