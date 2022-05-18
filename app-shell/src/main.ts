@@ -65,7 +65,17 @@ function startUp(): void {
 
   mainWindow.once('closed', () => (mainWindow = null))
 
-  contextMenu({ showInspectElement: config.devtools })
+  contextMenu({
+    menu: actions => [
+      actions.copy({
+        transform: content => `modified_copy_${content}`,
+      }),
+      actions.lookUpSelection({
+        transform: content => `modified_copy_${content}`,
+      }),
+      actions.inspect(),
+    ],
+  })
 
   initializeMenu()
   initializePython()
