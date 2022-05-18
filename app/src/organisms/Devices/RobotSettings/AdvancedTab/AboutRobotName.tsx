@@ -30,8 +30,7 @@ export function AboutRobotName({
   updateIsRobotBusy,
 }: AboutRobotNameProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  // const isRobotBusy = useCurrentRunId() !== null
-  const isRobotBusy = true
+  const isRobotBusy = useCurrentRunId() !== null
   const allSessionsQueryResponse = useAllSessionsQuery()
 
   const checkIsRobotBusy = (): boolean => {
