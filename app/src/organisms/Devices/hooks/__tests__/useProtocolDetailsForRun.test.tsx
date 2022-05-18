@@ -48,6 +48,7 @@ const PROTOCOL_RESPONSE = {
     id: '1',
     metadata: { protocolName: 'fake protocol' },
     analysisSummaries: [{ id: 'fake analysis', status: 'completed' }],
+    key: 'fakeProtocolKey',
   },
 } as Protocol
 
@@ -77,6 +78,7 @@ describe('useProtocolDetailsForRun hook', () => {
     expect(result.current).toStrictEqual({
       displayName: null,
       protocolData: null,
+      protocolKey: null,
     })
   })
 
@@ -108,6 +110,7 @@ describe('useProtocolDetailsForRun hook', () => {
     expect(result.current).toStrictEqual({
       displayName: 'fake protocol',
       protocolData: simpleV6Protocol,
+      protocolKey: 'fakeProtocolKey',
     })
   })
 })

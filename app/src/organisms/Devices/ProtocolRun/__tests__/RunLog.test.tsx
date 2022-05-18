@@ -66,6 +66,7 @@ describe('RunLog', () => {
     when(mockUseProtocolDetailsForRun).calledWith(RUN_ID).mockReturnValue({
       protocolData: _fixtureAnalysis,
       displayName: 'mock display name',
+      protocolKey: 'fakeProtocolKey',
     })
     when(mockUseAllCommandsQuery).mockReturnValue(({
       data: { data: runRecord.data.commands },
@@ -92,7 +93,7 @@ describe('RunLog', () => {
   it('renders null if protocol data is null', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
-      .mockReturnValue({ protocolData: null } as any)
+      .mockReturnValue({ protocolData: null, protocolKey: null } as any)
     const { container } = render()
     expect(container.firstChild).toBeNull()
   })

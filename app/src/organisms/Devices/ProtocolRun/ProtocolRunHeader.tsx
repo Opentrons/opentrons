@@ -41,7 +41,6 @@ import {
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
-import { useRunQuery } from '@opentrons/react-api-client'
 
 import { Banner } from '../../../atoms/Banner'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
@@ -121,9 +120,8 @@ export function ProtocolRunHeader({
   const trackEvent = useTrackEvent()
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
-  const runRecord = useRunQuery(runId)
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
-  const { displayName } = useProtocolDetailsForRun(runId)
+  const { displayName, protocolKey } = useProtocolDetailsForRun(runId)
   const runStatus = useRunStatus(runId)
 
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
@@ -380,16 +378,24 @@ export function ProtocolRunHeader({
       )}
 
       <Flex>
-        {/* TODO(bh, 2022-03-15) will update link to a protocol key stored locally when built */}
-        <Link to={`/protocols/${runRecord?.data?.data.protocolId}`}>
+        {protocolKey != null ? (
+          <Link to={`/protocols/${protocolKey}`}>
+            <StyledText
+              color={COLORS.blue}
+              css={TYPOGRAPHY.h2SemiBold}
+              id="ProtocolRunHeader_protocolName"
+            >
+              {displayName}
+            </StyledText>
+          </Link>
+        ) : (
           <StyledText
-            color={COLORS.blue}
             css={TYPOGRAPHY.h2SemiBold}
             id="ProtocolRunHeader_protocolName"
           >
             {displayName}
           </StyledText>
-        </Link>
+        )}
       </Flex>
       {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
         <Banner type="warning">{t('close_door_to_resume')}</Banner>

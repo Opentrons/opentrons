@@ -12,6 +12,7 @@ import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 export interface ProtocolDetails {
   displayName: string | null
   protocolData: ProtocolAnalysisFile<{}> | null
+  protocolKey: string | null
 }
 
 export function useProtocolDetailsForRun(
@@ -55,5 +56,6 @@ export function useProtocolDetailsForRun(
     displayName: displayName ?? null,
     protocolData:
       mostRecentAnalysis != null ? schemaV6Adapter(mostRecentAnalysis) : null,
+    protocolKey: protocolRecord?.data.key ?? null,
   }
 }

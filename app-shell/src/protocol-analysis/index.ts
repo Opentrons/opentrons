@@ -1,3 +1,5 @@
+import path from 'path'
+import globby from 'globby'
 import { createLogger } from '../log'
 import { getConfig } from '../config'
 
@@ -16,8 +18,19 @@ export function analyzeProtocolSource(
   sourcePath: string,
   outputPath: string
 ): Promise<void> {
+  const auxLabwareDirContents = globby.sync(
+    path.posix.join(getConfig().labware.directory, '**')
+  )
+
   return getPythonPath()
-    .then(pythonPath => executeAnalyzeCli(pythonPath, sourcePath, outputPath))
+    .then(pythonPath =>
+      executeAnalyzeCli(
+        pythonPath,
+        sourcePath,
+        outputPath,
+        ...auxLabwareDirContents
+      )
+    )
     .then(() => {
       log.debug(`Analysis of ${sourcePath} written to ${outputPath}`)
     })

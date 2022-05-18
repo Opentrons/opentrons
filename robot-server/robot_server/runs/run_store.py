@@ -1,6 +1,6 @@
 """Runs' on-db store."""
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional
 
@@ -29,20 +29,6 @@ class RunResource:
     protocol_id: Optional[str]
     created_at: datetime
     actions: List[RunAction]
-
-
-@dataclass(frozen=True)
-class _RunStateResource:
-    """An entry in the run state store, used to construct response models.
-
-    This represents all run information derived from the run's ProtocolEngine.
-    """
-
-    run_id: str
-    protocol_run_data: StateSummary
-    commands: List[Command]
-    engine_status: str
-    _updated_at: datetime = field(default_factory=utc_now)
 
 
 class RunNotFoundError(ValueError):
@@ -92,12 +78,10 @@ class RunStore:
             .where(run_table.c.id == run_id)
             .values(
                 _convert_state_to_sql_values(
-                    state=_RunStateResource(
-                        commands=commands,
-                        protocol_run_data=summary,
-                        run_id=run_id,
-                        engine_status=summary.status,
-                    )
+                    run_id=run_id,
+                    commands=commands,
+                    state_summary=summary,
+                    engine_status=summary.status,
                 )
             )
         )
@@ -253,7 +237,7 @@ class RunStore:
         captured when the run was archived. It contains
         status, equipment, and error information.
         """
-        select_run_data = sqlalchemy.select(run_table.c.protocol_run_data).where(
+        select_run_data = sqlalchemy.select(run_table.c.state_summary).where(
             run_table.c.id == run_id
         )
 
@@ -261,8 +245,8 @@ class RunStore:
             row = transaction.execute(select_run_data).one()
 
         return (
-            StateSummary.parse_obj(row.protocol_run_data)
-            if row.protocol_run_data is not None
+            StateSummary.parse_obj(row.state_summary)
+            if row.state_summary is not None
             else None
         )
 
@@ -410,10 +394,15 @@ def _convert_action_to_sql_values(action: RunAction, run_id: str) -> Dict[str, o
     }
 
 
-def _convert_state_to_sql_values(state: _RunStateResource) -> Dict[str, object]:
+def _convert_state_to_sql_values(
+    run_id: str,
+    state_summary: StateSummary,
+    commands: List[Command],
+    engine_status: str,
+) -> Dict[str, object]:
     return {
-        "protocol_run_data": state.protocol_run_data.dict(),
-        "engine_status": state.engine_status,
-        "commands": [command.dict() for command in state.commands],
-        "_updated_at": ensure_utc_datetime(state._updated_at),
+        "state_summary": state_summary.dict(),
+        "engine_status": engine_status,
+        "commands": [command.dict() for command in commands],
+        "_updated_at": utc_now(),
     }

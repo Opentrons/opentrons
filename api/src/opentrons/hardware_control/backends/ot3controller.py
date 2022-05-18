@@ -81,7 +81,7 @@ from opentrons_hardware.hardware_control.tools import detector, types as ohc_too
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
     from ..dev_types import (
-        AttachedInstrument,
+        AttachedPipette,
         InstrumentHardwareConfigs,
     )
     from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
@@ -325,7 +325,7 @@ class OT3Controller:
 
     async def get_attached_instruments(
         self, expected: Dict[OT3Mount, PipetteName]
-    ) -> Dict[OT3Mount, AttachedInstrument]:
+    ) -> Dict[OT3Mount, AttachedPipette]:
         """Get attached instruments.
 
         Args:
@@ -344,7 +344,7 @@ class OT3Controller:
 
         def _build_attached_instr(
             attached: ohc_tool_types.PipetteInformation,
-        ) -> AttachedInstrument:
+        ) -> AttachedPipette:
             return {
                 "config": pipette_config.load(
                     _synthesize_model_name(attached.name, attached.model)
@@ -354,7 +354,7 @@ class OT3Controller:
 
         def _generate_attached_instrs(
             attached: ohc_tool_types.ToolSummary,
-        ) -> Iterator[Tuple[OT3Mount, AttachedInstrument]]:
+        ) -> Iterator[Tuple[OT3Mount, AttachedPipette]]:
             if attached.left:
                 yield (OT3Mount.LEFT, _build_attached_instr(attached.left))
             if attached.right:
@@ -615,13 +615,9 @@ class OT3Controller:
         # when that method actually does canbus stuff
         instrs = await self.get_attached_instruments({})
         expected = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
-        if instrs.get(OT3Mount.LEFT, cast("AttachedInstrument", {})).get(
-            "config", None
-        ):
+        if instrs.get(OT3Mount.LEFT, cast("AttachedPipette", {})).get("config", None):
             expected.add(NodeId.pipette_left)
-        if instrs.get(OT3Mount.RIGHT, cast("AttachedInstrument", {})).get(
-            "config", None
-        ):
+        if instrs.get(OT3Mount.RIGHT, cast("AttachedPipette", {})).get("config", None):
             expected.add(NodeId.pipette_right)
         present = await probe(self._messenger, expected, timeout)
         self._present_nodes = self._replace_head_node(present)
