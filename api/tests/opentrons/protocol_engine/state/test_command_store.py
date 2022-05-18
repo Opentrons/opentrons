@@ -661,6 +661,7 @@ def test_handles_hardware_stopped() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.STOPPED,
+        # TODO (tz, 5-18-22): solve datetime compare
         run_completed_at=datetime.now(tz=timezone.utc),
         is_door_blocking=False,
         running_command_id=None,

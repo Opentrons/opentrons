@@ -200,7 +200,7 @@ def test_get_is_stopped() -> None:
     subject = get_command_view(run_completed_at=None)
     assert subject.get_is_stopped() is False
 
-    subject = get_command_view(run_completed_at=datetime.now(tz=timezone.utc))
+    subject = get_command_view(run_completed_at=datetime(year=2021, day=1, month=1))
     assert subject.get_is_stopped() is True
 
 
@@ -368,14 +368,14 @@ get_status_specs: List[GetStatusSpec] = [
     GetStatusSpec(
         subject=get_command_view(
             run_result=RunResult.FAILED,
-            run_completed_at=datetime.now(tz=timezone.utc),
+            run_completed_at=datetime(year=2021, day=1, month=1),
         ),
         expected_status=EngineStatus.FAILED,
     ),
     GetStatusSpec(
         subject=get_command_view(
             run_result=RunResult.SUCCEEDED,
-            run_completed_at=datetime.now(tz=timezone.utc),
+            run_completed_at=datetime(year=2021, day=1, month=1),
         ),
         expected_status=EngineStatus.SUCCEEDED,
     ),
@@ -389,7 +389,7 @@ get_status_specs: List[GetStatusSpec] = [
     GetStatusSpec(
         subject=get_command_view(
             run_result=RunResult.STOPPED,
-            run_completed_at=datetime.now(tz=timezone.utc),
+            run_completed_at=datetime(year=2021, day=1, month=1),
         ),
         expected_status=EngineStatus.STOPPED,
     ),
@@ -458,7 +458,7 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
     ),
     GetOkayToClearSpec(
         subject=get_command_view(
-            run_completed_at=datetime.now(tz=timezone.utc),
+            run_completed_at=datetime(year=2021, day=1, month=1),
         ),
         expected_is_okay=True,
     ),
