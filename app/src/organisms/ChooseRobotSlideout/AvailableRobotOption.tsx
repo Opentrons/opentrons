@@ -5,10 +5,10 @@ import {
   SPACING,
   Icon,
   Flex,
+  Box,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   SIZE_1,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
@@ -40,18 +40,23 @@ export function AvailableRobotOption(
         marginTop={SPACING.spacing3}
       >
         <StyledText as="h6">{robotModel}</StyledText>
-        <Flex alignItems={ALIGN_CENTER}>
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <Box maxWidth="9.5rem">
+          <StyledText
+            as="p"
+            css={{ 'word-wrap': 'break-word' }}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {robotName}
+            <Icon
+              // local boolean corresponds to a wired usb connection
+              aria-label={local ? 'usb' : 'wifi'}
+              marginBottom={`-${SPACING.spacing2}`}
+              marginLeft={SPACING.spacing3}
+              name={local ? 'usb' : 'wifi'}
+              size={SIZE_1}
+            />
           </StyledText>
-          <Icon
-            // local boolean corresponds to a wired usb connection
-            aria-label={local ? 'usb' : 'wifi'}
-            name={local ? 'usb' : 'wifi'}
-            size={SIZE_1}
-            marginLeft={SPACING.spacing3}
-          />
-        </Flex>
+        </Box>
       </Flex>
     </MiniCard>
   )
