@@ -166,6 +166,31 @@ async def mod_thermocycler():
     await thermocycler.cleanup()
 
 
+@pytest.fixture
+async def mod_heatershaker():
+    from opentrons.hardware_control import modules
+
+    loop = asyncio.get_running_loop()
+
+    usb_port = USBPort(
+        name="",
+        hub=None,
+        port_number=0,
+        device_path="/dev/ot_module_sim_heatershaker0",
+    )
+
+    heatershaker = await modules.build(
+        port="/dev/ot_module_sim_heatershaker0",
+        usb_port=usb_port,
+        which="heatershaker",
+        simulating=True,
+        loop=loop,
+        execution_manager=ExecutionManager(),
+    )
+    yield heatershaker
+    await heatershaker.cleanup()
+
+
 async def test_module_update_integration(
     monkeypatch, mod_tempdeck, mod_magdeck, mod_thermocycler, mod_heatershaker
 ):

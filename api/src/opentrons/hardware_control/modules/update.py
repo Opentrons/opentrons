@@ -166,7 +166,7 @@ async def upload_via_dfu(
         return True, res
     else:
         log.error(
-            f"Failed to update module firmware for {port}: {res}."
-            " Error given: {stderr.decode()}"
+            f"Failed to update module firmware for {port}: {res}. "
+            f"Error given: {stderr.decode()}"
         )
         return False, res
