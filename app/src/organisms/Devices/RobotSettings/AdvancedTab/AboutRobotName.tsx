@@ -15,6 +15,7 @@ import { useAllSessionsQuery } from '@opentrons/react-api-client'
 import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
+import { checkIsRobotBusy } from './utils'
 interface AboutRobotNameProps {
   robotName: string
   updateIsExpanded: (
@@ -33,19 +34,10 @@ export function AboutRobotName({
   const isRobotBusy = useCurrentRunId() !== null
   const allSessionsQueryResponse = useAllSessionsQuery()
 
-  const checkIsRobotBusy = (): boolean => {
-    // check robot is busy or there is a session => not allow to change the setting
-    const data =
-      allSessionsQueryResponse.data != null ? allSessionsQueryResponse.data : {}
-    console.log('length', Object.keys(data).length, Object.values(data).length)
-    return !(!isRobotBusy && Object.keys(data).length !== 0)
-  }
-
-  const handleClickRenameRobot = (): void => {
-    console.log('clicked')
-    const isRobotBusy = checkIsRobotBusy()
-    if (isRobotBusy) {
-      updateIsRobotBusy(isRobotBusy)
+  const handleClick = (): void => {
+    const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
+    if (isBusy) {
+      updateIsRobotBusy(true)
     } else {
       updateIsExpanded(true, 'renameRobot')
     }
@@ -73,8 +65,7 @@ export function AboutRobotName({
       </Box>
       <TertiaryButton
         marginLeft={SPACING_AUTO}
-        // onClick={() => updateIsExpanded(true, 'renameRobot')}
-        onClick={() => handleClickRenameRobot()}
+        onClick={() => handleClick()}
         id="RobotSettings_RenameRobot"
       >
         {t('robot_rename_button')}

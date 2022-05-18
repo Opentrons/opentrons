@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { css } from 'styled-components'
+
 import {
   Flex,
   ALIGN_CENTER,
@@ -13,6 +14,8 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
+import { useAllSessionsQuery } from '@opentrons/react-api-client'
+
 import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { TertiaryButton } from '../../../../atoms/buttons'
@@ -20,6 +23,8 @@ import {
   getBuildrootUpdateDisplayInfo,
   startBuildrootUpdate,
 } from '../../../../redux/buildroot'
+import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
+import { checkIsRobotBusy } from './utils'
 
 import type { State, Dispatch } from '../../../../redux/types'
 
@@ -32,10 +37,12 @@ const HIDDEN_CSS = css`
 
 interface UpdateRobotSoftwareProps {
   robotName: string
+  updateIsRobotBusy: (isRobotBusy: boolean) => void
 }
 
 export function UpdateRobotSoftware({
   robotName,
+  updateIsRobotBusy,
 }: UpdateRobotSoftwareProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
@@ -44,13 +51,20 @@ export function UpdateRobotSoftware({
   })
   const updateDisabled = updateFromFileDisabledReason !== null
   const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
+  const isRobotBusy = useCurrentRunId() !== null
+  const allSessionsQueryResponse = useAllSessionsQuery()
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
-    const { files } = event.target
-    if (files?.length === 1 && !updateDisabled) {
-      dispatch(startBuildrootUpdate(robotName, files[0].path))
+    const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
+    if (isBusy) {
+      updateIsRobotBusy(true)
+    } else {
+      const { files } = event.target
+      if (files?.length === 1 && !updateDisabled) {
+        dispatch(startBuildrootUpdate(robotName, files[0].path))
+      }
+      event.target.value = ''
     }
-    event.target.value = ''
   }
 
   return (
