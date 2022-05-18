@@ -80,10 +80,10 @@ async def get_current_run_engine_from_url(
         engine_store: Engine store to pull current run ProtocolEngine.
         run_store: Run data storage.
     """
-    if not run_store.has(runId):
-        raise RunNotFound(detail=f"Run {runId} not found.").as_error(
-            status.HTTP_404_NOT_FOUND
-        )
+    # if not run_store.has(runId):
+    #     raise RunNotFound(detail=f"Run {runId} not found.").as_error(
+    #         status.HTTP_404_NOT_FOUND
+    #     )
 
     if runId != engine_store.current_run_id:
         raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
