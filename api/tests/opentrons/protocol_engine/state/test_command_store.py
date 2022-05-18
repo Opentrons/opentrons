@@ -1,7 +1,7 @@
 """Tests for the command lifecycle state."""
 import pytest
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import NamedTuple, Type
 
 from opentrons.ordered_set import OrderedSet
@@ -47,7 +47,7 @@ def test_initial_state() -> None:
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.IMPLICITLY_ACTIVE,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         run_result=None,
         running_command_id=None,
@@ -381,7 +381,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -401,7 +401,7 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.ACTIVE,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -418,7 +418,7 @@ def test_command_store_handles_play_according_to_door_state() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=True,
         running_command_id=None,
         all_command_ids=[],
@@ -434,7 +434,7 @@ def test_command_store_handles_play_according_to_door_state() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.ACTIVE,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -454,7 +454,7 @@ def test_command_store_handles_finish_action() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.SUCCEEDED,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -484,7 +484,7 @@ def test_command_store_handles_stop_action() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.STOPPED,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -503,7 +503,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.SUCCEEDED,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -527,7 +527,7 @@ def test_command_store_ignores_known_finish_error() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.FAILED,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -551,7 +551,7 @@ def test_command_store_saves_unknown_finish_error() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.FAILED,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -579,7 +579,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.SUCCEEDED,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -600,7 +600,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.STOPPED,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -641,7 +641,7 @@ def test_command_store_handles_command_failed() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.IMPLICITLY_ACTIVE,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=["command-id"],
@@ -661,7 +661,7 @@ def test_handles_hardware_stopped() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.STOPPED,
-        is_hardware_stopped=True,
+        run_completed_at=datetime.now(tz=timezone.utc),
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -684,7 +684,7 @@ def test_handles_door_open_and_close_event() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=True,
         running_command_id=None,
         all_command_ids=[],
@@ -699,7 +699,7 @@ def test_handles_door_open_and_close_event() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -720,7 +720,7 @@ def test_handles_door_event_during_idle_run() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.IMPLICITLY_ACTIVE,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=True,
         running_command_id=None,
         all_command_ids=[],
@@ -734,7 +734,7 @@ def test_handles_door_event_during_idle_run() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.IMPLICITLY_ACTIVE,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],

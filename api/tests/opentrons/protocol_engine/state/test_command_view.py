@@ -1,7 +1,7 @@
 """Labware state store tests."""
 import pytest
 from contextlib import nullcontext as does_not_raise
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, NamedTuple, Optional, Sequence, Type
 
 from opentrons.ordered_set import OrderedSet
@@ -28,7 +28,7 @@ from .command_fixtures import (
 
 def get_command_view(
     queue_status: QueueStatus = QueueStatus.IMPLICITLY_ACTIVE,
-    is_hardware_stopped: bool = False,
+    run_completed_at: Optional[datetime] = None,
     is_door_blocking: bool = False,
     run_result: Optional[RunResult] = None,
     running_command_id: Optional[str] = None,
@@ -45,7 +45,7 @@ def get_command_view(
 
     state = CommandState(
         queue_status=queue_status,
-        is_hardware_stopped=is_hardware_stopped,
+        run_completed_at=run_completed_at,
         is_door_blocking=is_door_blocking,
         run_result=run_result,
         running_command_id=running_command_id,
@@ -197,10 +197,10 @@ def test_get_should_stop() -> None:
 
 def test_get_is_stopped() -> None:
     """It should return true if stop requested and no command running."""
-    subject = get_command_view(is_hardware_stopped=False)
+    subject = get_command_view(run_completed_at=None)
     assert subject.get_is_stopped() is False
 
-    subject = get_command_view(is_hardware_stopped=True)
+    subject = get_command_view(run_completed_at=datetime.now(tz=timezone.utc))
     assert subject.get_is_stopped() is True
 
 
@@ -347,7 +347,7 @@ get_status_specs: List[GetStatusSpec] = [
         subject=get_command_view(
             queue_status=QueueStatus.INACTIVE,
             run_result=RunResult.SUCCEEDED,
-            is_hardware_stopped=False,
+            run_completed_at=None,
         ),
         expected_status=EngineStatus.FINISHING,
     ),
@@ -355,7 +355,7 @@ get_status_specs: List[GetStatusSpec] = [
         subject=get_command_view(
             queue_status=QueueStatus.INACTIVE,
             run_result=RunResult.FAILED,
-            is_hardware_stopped=False,
+            run_completed_at=None,
         ),
         expected_status=EngineStatus.FINISHING,
     ),
@@ -368,28 +368,28 @@ get_status_specs: List[GetStatusSpec] = [
     GetStatusSpec(
         subject=get_command_view(
             run_result=RunResult.FAILED,
-            is_hardware_stopped=True,
+            run_completed_at=datetime.now(tz=timezone.utc),
         ),
         expected_status=EngineStatus.FAILED,
     ),
     GetStatusSpec(
         subject=get_command_view(
             run_result=RunResult.SUCCEEDED,
-            is_hardware_stopped=True,
+            run_completed_at=datetime.now(tz=timezone.utc),
         ),
         expected_status=EngineStatus.SUCCEEDED,
     ),
     GetStatusSpec(
         subject=get_command_view(
             run_result=RunResult.STOPPED,
-            is_hardware_stopped=False,
+            run_completed_at=None,
         ),
         expected_status=EngineStatus.STOP_REQUESTED,
     ),
     GetStatusSpec(
         subject=get_command_view(
             run_result=RunResult.STOPPED,
-            is_hardware_stopped=True,
+            run_completed_at=datetime.now(tz=timezone.utc),
         ),
         expected_status=EngineStatus.STOPPED,
     ),
@@ -458,7 +458,7 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
     ),
     GetOkayToClearSpec(
         subject=get_command_view(
-            is_hardware_stopped=True,
+            run_completed_at=datetime.now(tz=timezone.utc),
         ),
         expected_is_okay=True,
     ),

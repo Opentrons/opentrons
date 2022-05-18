@@ -10,6 +10,7 @@ from opentrons.ordered_set import OrderedSet
 
 from opentrons.hardware_control.types import DoorStateNotification, DoorState
 
+from ..resources import ModelUtils
 from ..actions import (
     Action,
     QueueCommandAction,
@@ -110,10 +111,16 @@ class CommandState:
     even if INACTIVE.
     """
 
-    is_hardware_stopped: bool
-    """Whether the engine's hardware has ceased motion.
+    # is_hardware_stopped: bool
+    # """Whether the engine's hardware has ceased motion.
+    #
+    # Once set, this flag cannot be unset.
+    # """
 
-    Once set, this flag cannot be unset.
+    run_completed_at: Optional[datetime]
+    """The time the run was completed.
+
+    Gets set when HardwareStoppedAction is called.
     """
 
     is_door_blocking: bool
@@ -137,12 +144,14 @@ class CommandStore(HasState[CommandState], HandlesActions):
     """Command state container."""
 
     _state: CommandState
+    # TODO (tz, 5-17-22): should this be injected from the protocol_engine?
+    _module_utils = ModelUtils()
 
     def __init__(self, is_door_blocking: bool = False) -> None:
         """Initialize a CommandStore and its state."""
         self._state = CommandState(
             queue_status=QueueStatus.IMPLICITLY_ACTIVE,
-            is_hardware_stopped=False,
+            # is_hardware_stopped=False,
             is_door_blocking=is_door_blocking,
             run_result=None,
             running_command_id=None,
@@ -150,6 +159,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             queued_command_ids=OrderedSet(),
             commands_by_id=OrderedDict(),
             errors_by_id={},
+            run_completed_at=None,
         )
 
     def handle_action(self, action: Action) -> None:  # noqa: C901
@@ -299,7 +309,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
         elif isinstance(action, HardwareStoppedAction):
             self._state.queue_status = QueueStatus.INACTIVE
             self._state.run_result = self._state.run_result or RunResult.STOPPED
-            self._state.is_hardware_stopped = True
+            # self._state.is_hardware_stopped = True
+            self._state.run_completed_at = self._module_utils.get_timestamp()
 
         elif isinstance(action, HardwareEventAction):
             if isinstance(action.event, DoorStateNotification):
@@ -480,7 +491,7 @@ class CommandView(HasState[CommandState]):
 
     def get_is_stopped(self) -> bool:
         """Get whether an engine stop has completed."""
-        return self._state.is_hardware_stopped
+        return self._state.run_completed_at is not None
 
     # TODO(mc, 2021-12-07): reject adding commands to a stopped engine
     def raise_if_stop_requested(self) -> None:
@@ -502,7 +513,7 @@ class CommandView(HasState[CommandState]):
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
         if self._state.run_result:
-            if not self._state.is_hardware_stopped:
+            if self._state.run_completed_at is None:
                 return (
                     EngineStatus.STOP_REQUESTED
                     if self._state.run_result == RunResult.STOPPED
