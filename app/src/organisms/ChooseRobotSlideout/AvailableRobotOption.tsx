@@ -40,14 +40,14 @@ export function AvailableRobotOption(
         marginTop={SPACING.spacing3}
       >
         <StyledText as="h6">{robotModel}</StyledText>
-        <Box>
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <Box maxWidth="9.5rem">
+          <StyledText as="p" css={{ 'word-wrap': 'break-word' }} fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {robotName}
-            &nbsp;&nbsp;
             <Icon
               // local boolean corresponds to a wired usb connection
               aria-label={local ? 'usb' : 'wifi'}
-              marginBottom="-0.25rem"
+              marginBottom={`-${SPACING.spacing2}`}
+              marginLeft={SPACING.spacing3}
               name={local ? 'usb' : 'wifi'}
               size={SIZE_1}
             />
