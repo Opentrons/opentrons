@@ -21,7 +21,7 @@ import {
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { Portal } from '../../../App/portal'
-import { TertiaryButton } from '../../../atoms/Buttons'
+import { TertiaryButton } from '../../../atoms/buttons'
 import { CalibratePipetteOffset } from '../../../organisms/CalibratePipetteOffset'
 import {
   CalibrateTipLength,

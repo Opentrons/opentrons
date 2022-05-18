@@ -5,13 +5,22 @@ import {
   useCreateProtocolMutation,
   useCreateRunMutation,
 } from '@opentrons/react-api-client'
+import { useSelector } from 'react-redux'
+import { getValidCustomLabwareFiles } from '../../redux/custom-labware/selectors'
 
 import type { UseMutateFunction } from 'react-query'
 import type { Protocol } from '@opentrons/api-client'
 import type { UseCreateRunMutationOptions } from '@opentrons/react-api-client/src/runs/useCreateRunMutation'
+import type { CreateProtocolVariables } from '@opentrons/react-api-client/src/protocols/useCreateProtocolMutation'
+import type { State } from '../../redux/types'
 
 export interface UseCreateRun {
-  createRun: UseMutateFunction<Protocol, unknown, File[], unknown>
+  createRunFromProtocolSource: UseMutateFunction<
+    Protocol,
+    unknown,
+    CreateProtocolVariables,
+    unknown
+  >
   isCreatingRun: boolean
   runCreationError: string | null
 }
@@ -23,6 +32,10 @@ export function useCreateRunFromProtocol(
   const queryClient = useQueryClient()
   const [runCreationError, setRunCreationError] = React.useState<string | null>(
     null
+  )
+
+  const customLabwareFiles = useSelector((state: State) =>
+    getValidCustomLabwareFiles(state)
   )
 
   const { createRun, isLoading: isCreatingRun } = useCreateRunMutation({
@@ -52,10 +65,15 @@ export function useCreateRunFromProtocol(
   })
 
   return {
-    createRun: (...args) => {
+    createRunFromProtocolSource: (
+      { files: srcFiles, protocolKey },
+      ...args
+    ) => {
       setRunCreationError(null)
-      // TODO: include protocol key in protocol record creation
-      createProtocolRun(...args)
+      createProtocolRun(
+        { files: [...srcFiles, ...customLabwareFiles], protocolKey },
+        ...args
+      )
     },
     isCreatingRun: isCreatingProtocol || isCreatingRun,
     runCreationError,

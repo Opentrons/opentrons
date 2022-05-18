@@ -4,8 +4,8 @@ import {
   ProtocolFile,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import { getPickUpTipCommandsWithPipette } from '../../ProtocolSetup/utils/getPickUpTipCommandsWithPipette'
-import { getTipracksVisited } from '../../ProtocolSetup/utils/getTipracksVisited'
+import { getPickUpTipCommandsWithPipette } from '../../Devices/ProtocolRun/utils/getPickUpTipCommandsWithPipette'
+import { getTipracksVisited } from '../../Devices/ProtocolRun/utils/getTipracksVisited'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 export const doesPipetteVisitAllTipracks = (

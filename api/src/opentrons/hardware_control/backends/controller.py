@@ -34,7 +34,7 @@ from ..types import AionotifyEvent, BoardRevision, Axis, DoorState
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
     from ..dev_types import (
-        AttachedInstrument,
+        AttachedPipette,
         AttachedInstruments,
         InstrumentHardwareConfigs,
     )
@@ -173,7 +173,7 @@ class Controller:
 
     async def _query_mount(
         self, mount: Mount, expected: Union[PipetteModel, PipetteName, None]
-    ) -> AttachedInstrument:
+    ) -> AttachedPipette:
         found_model: Optional[
             PipetteModel
         ] = await self._smoothie_driver.read_pipette_model(  # type: ignore

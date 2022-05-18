@@ -14,7 +14,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../atoms/Modal'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import { PrimaryButton } from '../../atoms/Buttons'
+import { PrimaryButton } from '../../atoms/buttons'
 
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
   'https://support.opentrons.com/en/articles/2687601-troubleshooting-connection-problems'

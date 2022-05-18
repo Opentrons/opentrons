@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
-import { TertiaryButton } from '../../../../atoms/Buttons'
+import { TertiaryButton } from '../../../../atoms/buttons'
 import {
   getBuildrootUpdateDisplayInfo,
   startBuildrootUpdate,
@@ -61,7 +61,7 @@ export function UpdateRobotSoftware({
     >
       <Box width="70%">
         <StyledText
-          as="h3"
+          as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing4}
           id="AdvancedSettings_updateRobotSoftware"

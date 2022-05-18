@@ -12,7 +12,7 @@ import {
 } from '@opentrons/react-api-client'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
-import { getProtocolModulesInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { useProtocolDetailsForRun } from '../../hooks'
 import {
@@ -32,7 +32,7 @@ import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../ProtocolSetup/utils/getProtocolModulesInfo')
+jest.mock('../../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../../hooks')
 
@@ -450,7 +450,7 @@ describe('useModuleOverflowMenu', () => {
     act(() => magMenu[0].onClick(false))
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'magneticModule/disengageMagnet',
+        commandType: 'magneticModule/disengage',
         params: {
           moduleId: mockMagDeckEngaged.id,
         },

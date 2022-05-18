@@ -2,7 +2,6 @@
 import pytest
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Generator
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_reader import (
@@ -16,23 +15,13 @@ from opentrons.protocol_reader import (
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
+    ProtocolUsageInfo,
     ProtocolNotFoundError,
 )
-from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
+
+from robot_server.runs.run_store import RunStore
 
 from sqlalchemy.engine import Engine as SQLEngine
-
-
-@pytest.fixture
-def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
-    """Return a set-up database to back the store."""
-    db_file_path = tmp_path / "test.db"
-    sql_engine = open_db_no_cleanup(db_file_path=db_file_path)
-    try:
-        add_tables_to_db(sql_engine)
-        yield sql_engine
-    finally:
-        sql_engine.dispose()
 
 
 @pytest.fixture
@@ -47,6 +36,12 @@ def protocol_file_directory(tmp_path: Path) -> Path:
 def subject(sql_engine: SQLEngine) -> ProtocolStore:
     """Get a ProtocolStore test subject."""
     return ProtocolStore.create_empty(sql_engine=sql_engine)
+
+
+@pytest.fixture
+def run_store(sql_engine: SQLEngine) -> RunStore:
+    """Get a RunStore linked to the same database as the subject ProtocolStore."""
+    return RunStore(sql_engine=sql_engine)
 
 
 async def test_insert_and_get_protocol(
@@ -208,3 +203,87 @@ async def test_remove_missing_protocol_raises(
     """It should raise an error when trying to remove missing protocol."""
     with pytest.raises(ProtocolNotFoundError, match="protocol-id"):
         subject.remove("protocol-id")
+
+
+def test_get_usage_info(
+    subject: ProtocolStore,
+    run_store: RunStore,
+) -> None:
+    """It should return which protocols are used by runs."""
+    # get_usage_info() should return an empty list when no protocols have been added.
+    assert subject.get_usage_info() == []
+
+    protocol_resource_1 = ProtocolResource(
+        protocol_id="protocol-id-1",
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        source=ProtocolSource(
+            directory=None,
+            main_file=Path("/dev/null"),
+            config=JsonProtocolConfig(schema_version=123),
+            files=[],
+            metadata={},
+            labware_definitions=[],
+        ),
+        protocol_key=None,
+    )
+    protocol_resource_2 = ProtocolResource(
+        protocol_id="protocol-id-2",
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        source=ProtocolSource(
+            directory=None,
+            main_file=Path("/dev/null"),
+            config=JsonProtocolConfig(schema_version=123),
+            files=[],
+            metadata={},
+            labware_definitions=[],
+        ),
+        protocol_key=None,
+    )
+
+    subject.insert(protocol_resource_1)
+    subject.insert(protocol_resource_2)
+
+    # get_usage_info() should return results in insertion order.
+    # Protocols not used by any runs should have is_used_by_run=False.
+    assert subject.get_usage_info() == [
+        ProtocolUsageInfo(
+            protocol_id="protocol-id-1",
+            is_used_by_run=False,
+        ),
+        ProtocolUsageInfo(
+            protocol_id="protocol-id-2",
+            is_used_by_run=False,
+        ),
+    ]
+
+    # When a run is added that uses a protocol,
+    # that protocol's is_used_by_run should become True.
+    run_store.insert(
+        run_id="run-id-1",
+        protocol_id="protocol-id-1",
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    assert subject.get_usage_info() == [
+        ProtocolUsageInfo(
+            protocol_id="protocol-id-1",
+            is_used_by_run=True,
+        ),
+        ProtocolUsageInfo(
+            protocol_id="protocol-id-2",
+            is_used_by_run=False,
+        ),
+    ]
+
+    # When no more runs use a protocol,
+    # that protocol's is_used_by_run should go back to being False.
+    run_store.remove(run_id="run-id-1")
+    assert subject.get_usage_info() == [
+        ProtocolUsageInfo(
+            protocol_id="protocol-id-1",
+            is_used_by_run=False,
+        ),
+        ProtocolUsageInfo(
+            protocol_id="protocol-id-2",
+            is_used_by_run=False,
+        ),
+    ]

@@ -13,7 +13,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { getProtocolModulesInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
@@ -24,7 +24,7 @@ import type {
   HeaterShakerDeactivateHeaterCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
   HeaterShakerStopShakeCreateCommand,
-  MagneticModuleDisengageMagnetCreateCommand,
+  MagneticModuleDisengageCreateCommand,
   TCDeactivateBlockCreateCommand,
   TCDeactivateLidCreateCommand,
   TemperatureModuleDeactivateCreateCommand,
@@ -126,7 +126,7 @@ export function useModuleOverflowMenu(
       break
     }
     case 'magneticModuleType': {
-      deactivateModuleCommandType = 'magneticModule/disengageMagnet'
+      deactivateModuleCommandType = 'magneticModule/disengage'
       break
     }
     case 'thermocyclerModuleType': {
@@ -148,7 +148,7 @@ export function useModuleOverflowMenu(
 
   const deactivateCommand:
     | TemperatureModuleDeactivateCreateCommand
-    | MagneticModuleDisengageMagnetCreateCommand
+    | MagneticModuleDisengageCreateCommand
     | HeaterShakerDeactivateHeaterCreateCommand
     | TCDeactivateLidCreateCommand
     | TCDeactivateBlockCreateCommand
@@ -176,10 +176,7 @@ export function useModuleOverflowMenu(
         })}
       </MenuItem>
       {isLatchDisabled ? (
-        <Tooltip
-          tooltipProps={tooltipProps}
-          key={`tooltip_latch_${module.moduleModel}`}
-        >
+        <Tooltip tooltipProps={tooltipProps}>
           {t('cannot_open_latch', { ns: 'heater_shaker' })}
         </Tooltip>
       ) : null}

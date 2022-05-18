@@ -10,7 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
-import { ToggleButton } from '../../../../atoms/Buttons'
+import { ToggleButton } from '../../../../atoms/buttons'
 import { updateSetting } from '../../../../redux/robot-settings'
 
 import type { Dispatch } from '../../../../redux/types'
@@ -33,9 +33,9 @@ export function DisableHoming({
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
         <StyledText
-          as="h3"
-          css={TYPOGRAPHY.h3SemiBold}
-          paddingBottom={SPACING.spacing3}
+          as="h2"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          paddingBottom={SPACING.spacing4}
           id="AdvancedSettings_disableHoming"
         >
           {t('disable_homing')}
@@ -45,7 +45,7 @@ export function DisableHoming({
       </Box>
       <ToggleButton
         label="disable_homing"
-        toggledOn={value === true}
+        toggledOn={value}
         onClick={() => dispatch(updateSetting(robotName, id, !value))}
         id="RobotSettings_disableHomingToggleButton"
       />
