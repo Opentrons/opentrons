@@ -236,7 +236,9 @@ class ProtocolStore:
             source=deleted_source,
         )
 
-    @lru_cache(maxsize=_CACHE_ENTRIES)
+    # Note that this is NOT cached like the other getters because we would need
+    # to invalidate the cache whenever the runs table changes, which is not something
+    # that this class can easily monitor.
     def get_usage_info(self) -> List[ProtocolUsageInfo]:
         """Return information about which protocols are currently being used by runs.
 
@@ -340,7 +342,6 @@ class ProtocolStore:
         self.get.cache_clear()
         self.get_all.cache_clear()
         self.has.cache_clear()
-        self.get_usage_info.cache_clear()
 
 
 # TODO(mm, 2022-04-18):
