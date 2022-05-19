@@ -118,6 +118,11 @@ class SerialField(utils.BinaryFieldBase[bytes]):
     NUM_BYTES = 12
     FORMAT = f"{NUM_BYTES}s"
 
+    @classmethod
+    def from_string(cls, t: str) -> SerialField:
+        """Create from a string."""
+        return cls(binascii.unhexlify(t)[: cls.NUM_BYTES])
+
 
 class SensorOutputBindingField(utils.UInt8Field):
     """sensor type."""
