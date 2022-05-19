@@ -34,16 +34,16 @@ from robot_server.service.legacy.models.settings import (
     AdvancedSetting,
 )
 
-from ..reset_options_manager import ResetOptionsManager
+from robot_server.persistence import ResetManager
 
 log = logging.getLogger(__name__)
 
 router = APIRouter()
 
 
-def get_reset_options_manager() -> ResetOptionsManager:
-    """Get an `ResetOptionsManager` to navigate between resetting options."""
-    return ResetOptionsManager()
+def get_reset_db_manager() -> ResetManager:
+    """Get an `ResetManager` to reset robot-server layer."""
+    return ResetManager()
 
 
 @router.post(
@@ -201,11 +201,16 @@ async def get_settings_reset_options() -> FactoryResetOptions:
 )
 async def post_settings_reset_options(
     factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
-    reset_options_manager: ResetOptionsManager = Depends(get_reset_options_manager),
+    reset_manager: ResetManager = Depends(get_reset_db_manager),
 ) -> V1BasicResponse:
-    options = reset_options_manager.reset_options(factory_reset_commands)
-    # options = set(k for k, v in factory_reset_commands.items() if v)
-    # reset_util.reset(options)
+    options = set(
+        k for k, v in factory_reset_commands.items() if v and k != "dbHistory"
+    )
+    reset_util.reset(options)
+
+    if ("dbHistory", True) in factory_reset_commands.items():
+        print("resetting db")
+        reset_manager.reset_db()
 
     message = (
         "Options '{}' were reset".format(", ".join(o.name for o in options))

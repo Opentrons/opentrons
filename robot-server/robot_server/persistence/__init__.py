@@ -78,14 +78,18 @@ def get_sql_engine(
 # delete the containing folder and then recreating it
 # acceptence test - factory reset http.
 # reboot and then check if its empty
-def reset_db() -> None:
-    raise NotImplementedError()
+class ResetManager:
+    """Dependency class to handle robot server reset options."""
+
+    def reset_db(self) -> None:
+        """Reset db file."""
+        raise NotImplementedError()
 
 
 __all__ = [
     "get_persistence_directory",
     "get_sql_engine",
-    "reset_db",
+    "ResetManager",
     # database tables
     "protocol_table",
     "analysis_table",
