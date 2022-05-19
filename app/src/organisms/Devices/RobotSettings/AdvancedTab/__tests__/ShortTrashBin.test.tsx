@@ -20,10 +20,16 @@ const mockSettings = {
   restart_required: false,
 }
 
+const mockUpdateRobotStatus = jest.fn()
+
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <ShortTrashBin settings={mockSettings} robotName="otie" />
+      <ShortTrashBin
+        settings={mockSettings}
+        robotName="otie"
+        updateIsRobotBusy={mockUpdateRobotStatus}
+      />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
@@ -60,5 +66,14 @@ describe('RobotSettings ShortTrashBin', () => {
     })
     fireEvent.click(toggleButton)
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+  })
+
+  it('should check robot status when clicking the toggle button', () => {
+    const [{ getByRole }] = render()
+    const toggleButton = getByRole('switch', {
+      name: 'short_trash_bin',
+    })
+    fireEvent.click(toggleButton)
+    expect(mockUpdateRobotStatus).toHaveBeenCalled()
   })
 })

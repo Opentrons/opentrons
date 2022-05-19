@@ -21,10 +21,16 @@ const mockSettings = {
   restart_required: false,
 }
 
+const mockUpdateRobotStatus = jest.fn()
+
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <LegacySettings settings={mockSettings} robotName="otie" />
+      <LegacySettings
+        settings={mockSettings}
+        robotName="otie"
+        updateIsRobotBusy={mockUpdateRobotStatus}
+      />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
@@ -62,5 +68,14 @@ describe('RobotSettings LegacySettings', () => {
     })
     fireEvent.click(toggleButton)
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+  })
+
+  it('should check robot status when clicking the toggle button', () => {
+    const [{ getByRole }] = render()
+    const toggleButton = getByRole('switch', {
+      name: 'legacy_settings',
+    })
+    fireEvent.click(toggleButton)
+    expect(mockUpdateRobotStatus).toHaveBeenCalled()
   })
 })

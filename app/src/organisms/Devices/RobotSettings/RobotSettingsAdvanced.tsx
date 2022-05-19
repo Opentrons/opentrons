@@ -7,7 +7,7 @@ import { Box, SPACING, IconProps } from '@opentrons/components'
 import { Divider } from '../../../atoms/structure'
 import { Toast } from '../../../atoms/Toast'
 import { useRobot } from '../hooks'
-import { AboutRobotName } from './AdvancedTab/AboutRobotName'
+import { DisplayRobotName } from './AdvancedTab/DisplayRobotName'
 import { RobotInformation } from './AdvancedTab/RobotInformation'
 import { RobotServerVersion } from './AdvancedTab/RobotServerVersion'
 import { UsageSettings } from './AdvancedTab/UsageSettings'
@@ -149,7 +149,7 @@ export function RobotSettingsAdvanced({
             resetOptions={resetOptions}
           />
         )}
-        <AboutRobotName
+        <DisplayRobotName
           robotName={robotName}
           updateIsExpanded={updateIsExpanded}
           updateIsRobotBusy={updateIsRobotBusy}

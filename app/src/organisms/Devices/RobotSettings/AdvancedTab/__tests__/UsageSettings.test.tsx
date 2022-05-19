@@ -22,10 +22,16 @@ const mockSettings = {
   restart_required: false,
 }
 
+const mockUpdateRobotStatus = jest.fn()
+
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <UsageSettings settings={mockSettings} robotName="otie" />
+      <UsageSettings
+        settings={mockSettings}
+        robotName="otie"
+        updateIsRobotBusy={mockUpdateRobotStatus}
+      />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
@@ -65,5 +71,14 @@ describe('RobotSettings DisableHoming', () => {
     })
     fireEvent.click(toggleButton)
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+  })
+
+  it('should check robot status when clicking the toggle button', () => {
+    const [{ getByRole }] = render()
+    const toggleButton = getByRole('switch', {
+      name: 'usage_settings_pause_protocol',
+    })
+    fireEvent.click(toggleButton)
+    expect(mockUpdateRobotStatus).toHaveBeenCalled()
   })
 })

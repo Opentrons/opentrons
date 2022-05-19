@@ -16,7 +16,7 @@ import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { checkIsRobotBusy } from './utils'
-interface AboutRobotNameProps {
+interface DisplayRobotNameProps {
   robotName: string
   updateIsExpanded: (
     isExpanded: boolean,
@@ -25,20 +25,23 @@ interface AboutRobotNameProps {
   updateIsRobotBusy: (isRobotBusy: boolean) => void
 }
 
-export function AboutRobotName({
+export function DisplayRobotName({
   robotName,
   updateIsExpanded,
   updateIsRobotBusy,
-}: AboutRobotNameProps): JSX.Element {
+}: DisplayRobotNameProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const isRobotBusy = useCurrentRunId() !== null
   const allSessionsQueryResponse = useAllSessionsQuery()
 
   const handleClick = (): void => {
+    console.log('handleClick')
     const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
     if (isBusy) {
+      console.log('1')
       updateIsRobotBusy(true)
     } else {
+      console.log('2')
       updateIsExpanded(true, 'renameRobot')
     }
   }
