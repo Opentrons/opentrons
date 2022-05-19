@@ -78,7 +78,7 @@ describe('RobotSettings UpdateRobotSoftware', () => {
     expect(link.closest('a')).toHaveAttribute('href', targetLink)
   })
 
-  it('should call robot status if a robot is busy', () => {
+  it('should call update robot status if a robot is busy', () => {
     const [{ getByLabelText }] = render()
     const button = getByLabelText('Browse file system')
     fireEvent.change(button)

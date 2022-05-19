@@ -90,7 +90,7 @@ describe('RobotSettings LegacySettings', () => {
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
   })
 
-  it('should check robot status when clicking the toggle button', () => {
+  it('should call update robot status if a robot is busy', () => {
     const [{ getByRole }] = render()
     const toggleButton = getByRole('switch', {
       name: 'legacy_settings',

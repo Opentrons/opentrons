@@ -87,7 +87,7 @@ describe('RobotSettings DisableHoming', () => {
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
   })
 
-  it('should check robot status if a robot is busy', () => {
+  it('should call update robot status if a robot is busy', () => {
     const [{ getByRole }] = render()
     const toggleButton = getByRole('switch', {
       name: 'disable_homing',

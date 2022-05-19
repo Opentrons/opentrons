@@ -91,7 +91,7 @@ describe('RobotSettings UseOlderAspirateBehavior', () => {
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
   })
 
-  it('should check robot status when clicking the toggle button', () => {
+  it('should call update robot status if a robot is busy', () => {
     const [{ getByRole }] = render()
     const toggleButton = getByRole('switch', {
       name: 'use_older_aspirate_behavior',
