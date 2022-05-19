@@ -1,4 +1,4 @@
-"""Command models to shake the Heater-Shaker Module."""
+"""Command models to set and wait for a shake speed for a Heater-Shaker Module."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type
@@ -11,11 +11,11 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-SetTargetShakeSpeedCommandType = Literal["heaterShakerModule/setTargetShakeSpeed"]
+SetAndWaitForShakeSpeedCommandType = Literal["heaterShakerModule/setAndWaitForShakeSpeed"]
 
 
-class SetTargetShakeSpeedParams(BaseModel):
-    """Input parameters to start shaking a Heater-Shaker Module."""
+class SetAndWaitForShakeSpeedParams(BaseModel):
+    """Input parameters to start and wait for a shake speed for a Heater-Shaker Module."""
 
     moduleId: str = Field(..., description="Unique ID of the Heater-Shaker Module.")
     # TODO(mc, 2022-02-24): for set temperature we use `temperature` (not `celsius`)
@@ -23,14 +23,14 @@ class SetTargetShakeSpeedParams(BaseModel):
     rpm: float = Field(..., description="Target speed in rotations per minute.")
 
 
-class SetTargetShakeSpeedResult(BaseModel):
-    """Result data from setting a Heater-Shaker's shake speed."""
+class SetAndWaitForShakeSpeedResult(BaseModel):
+    """Result data from setting and wait for a Heater-Shaker's shake speed."""
 
 
-class SetTargetShakeSpeedImpl(
-    AbstractCommandImpl[SetTargetShakeSpeedParams, SetTargetShakeSpeedResult]
+class SetAndWaitForShakeSpeedImpl(
+    AbstractCommandImpl[SetAndWaitForShakeSpeedParams, SetAndWaitForShakeSpeedResult]
 ):
-    """Execution implementation of a Heater-Shaker's shake command."""
+    """Execution implementation of Heater-Shaker's set and wait shake speed command."""
 
     def __init__(
         self,
@@ -43,9 +43,9 @@ class SetTargetShakeSpeedImpl(
 
     async def execute(
         self,
-        params: SetTargetShakeSpeedParams,
-    ) -> SetTargetShakeSpeedResult:
-        """Set a Heater-Shaker's target shake speed."""
+        params: SetAndWaitForShakeSpeedParams,
+    ) -> SetAndWaitForShakeSpeedResult:
+        """Set and wait for a Heater-Shaker's target shake speed."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
             module_id=params.moduleId
@@ -62,27 +62,27 @@ class SetTargetShakeSpeedImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.set_speed(rpm=validated_speed)
 
-        return SetTargetShakeSpeedResult()
+        return SetAndWaitForShakeSpeedResult()
 
 
-class SetTargetShakeSpeed(
-    BaseCommand[SetTargetShakeSpeedParams, SetTargetShakeSpeedResult]
+class SetAndWaitForShakeSpeed(
+    BaseCommand[SetAndWaitForShakeSpeedParams, SetAndWaitForShakeSpeedResult]
 ):
-    """A command to set a Heater-Shaker's shake speed."""
+    """A command to set and wait for a Heater-Shaker's shake speed."""
 
-    commandType: SetTargetShakeSpeedCommandType = (
-        "heaterShakerModule/setTargetShakeSpeed"
+    commandType: SetAndWaitForShakeSpeedCommandType = (
+        "heaterShakerModule/setAndWaitForShakeSpeed"
     )
-    params: SetTargetShakeSpeedParams
-    result: Optional[SetTargetShakeSpeedResult]
+    params: SetAndWaitForShakeSpeedParams
+    result: Optional[SetAndWaitForShakeSpeedResult]
 
-    _ImplementationCls: Type[SetTargetShakeSpeedImpl] = SetTargetShakeSpeedImpl
+    _ImplementationCls: Type[SetAndWaitForShakeSpeedImpl] = SetAndWaitForShakeSpeedImpl
 
 
-class SetTargetShakeSpeedCreate(BaseCommandCreate[SetTargetShakeSpeedParams]):
-    """A request to create a Heater-Shaker's set shake speed command."""
+class SetAndWaitForShakeSpeedCreate(BaseCommandCreate[SetAndWaitForShakeSpeedParams]):
+    """A request to create a Heater-Shaker's set and wait for shake speed command."""
 
-    commandType: SetTargetShakeSpeedCommandType
-    params: SetTargetShakeSpeedParams
+    commandType: SetAndWaitForShakeSpeedCommandType
+    params: SetAndWaitForShakeSpeedParams
 
-    _CommandCls: Type[SetTargetShakeSpeed] = SetTargetShakeSpeed
+    _CommandCls: Type[SetAndWaitForShakeSpeed] = SetAndWaitForShakeSpeed

@@ -11,18 +11,18 @@ from opentrons.protocol_engine.state.module_substates import (
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
 from opentrons.protocol_engine.commands.heater_shaker.set_target_shake_speed import (
-    SetTargetShakeSpeedImpl,
+    SetAndWaitForShakeSpeedImpl,
 )
 
 
-async def test_set_target_shake_speed(
+async def test_set_and_wait_for_shake_speed(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
 ) -> None:
     """It should be able to set the module's shake speed."""
-    subject = SetTargetShakeSpeedImpl(state_view=state_view, equipment=equipment)
-    data = heater_shaker.SetTargetShakeSpeedParams(
+    subject = SetAndWaitForShakeSpeedImpl(state_view=state_view, equipment=equipment)
+    data = heater_shaker.SetAndWaitForShakeSpeedParams(
         moduleId="input-heater-shaker-id",
         rpm=1234.56,
     )
@@ -50,4 +50,4 @@ async def test_set_target_shake_speed(
 
     result = await subject.execute(data)
     decoy.verify(await hs_hardware.set_speed(rpm=1234), times=1)
-    assert result == heater_shaker.SetTargetShakeSpeedResult()
+    assert result == heater_shaker.SetAndWaitForShakeSpeedResult()

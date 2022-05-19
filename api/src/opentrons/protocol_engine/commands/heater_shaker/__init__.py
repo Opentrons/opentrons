@@ -25,11 +25,11 @@ from .deactivate_heater import (
 )
 
 from .set_target_shake_speed import (
-    SetTargetShakeSpeed,
-    SetTargetShakeSpeedCreate,
-    SetTargetShakeSpeedParams,
-    SetTargetShakeSpeedResult,
-    SetTargetShakeSpeedCommandType,
+    SetAndWaitForShakeSpeed,
+    SetAndWaitForShakeSpeedCreate,
+    SetAndWaitForShakeSpeedParams,
+    SetAndWaitForShakeSpeedResult,
+    SetAndWaitForShakeSpeedCommandType,
 )
 
 from .stop_shake import (
@@ -75,12 +75,12 @@ __all__ = [
     "DeactivateHeaterParams",
     "DeactivateHeaterResult",
     "DeactivateHeaterCommandType",
-    # heaterShakerModule/setTargetShakeSpeed
-    "SetTargetShakeSpeed",
-    "SetTargetShakeSpeedCreate",
-    "SetTargetShakeSpeedParams",
-    "SetTargetShakeSpeedResult",
-    "SetTargetShakeSpeedCommandType",
+    # heaterShakerModule/setAndWaitForShakeSpeed
+    "SetAndWaitForShakeSpeed",
+    "SetAndWaitForShakeSpeedCreate",
+    "SetAndWaitForShakeSpeedParams",
+    "SetAndWaitForShakeSpeedResult",
+    "SetAndWaitForShakeSpeedCommandType",
     # heaterShakerModule/stopShake
     "StopShake",
     "StopShakeCreate",
