@@ -25,13 +25,13 @@ export function ConfigFormResetButton(props: ButtonProps): JSX.Element {
     >
       <SecondaryButton
         marginTop={SPACING.spacingSM}
-        marginBottom={SPACING.spacingSM}
+        marginBottom={SPACING.spacing4}
         onClick={onClick}
         disabled={disabled}
       >
         {t('reset_all')}
       </SecondaryButton>
-      <Divider />
+      <Divider marginY={0} />
     </Flex>
   )
 }

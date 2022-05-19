@@ -5,7 +5,6 @@ import {
   CheckboxField,
   Flex,
   DIRECTION_COLUMN,
-  COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -76,7 +75,6 @@ export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
         as="label"
         id={props.labelFor}
         paddingBottom={SPACING.spacing3}
-        color={COLORS.darkBlack}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {props.label}
