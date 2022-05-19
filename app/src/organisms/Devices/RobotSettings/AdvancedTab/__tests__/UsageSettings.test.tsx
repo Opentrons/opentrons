@@ -14,12 +14,11 @@ import { UsageSettings } from '../UsageSettings'
 
 import type { Sessions } from '@opentrons/api-client'
 
-const mockUpdateRobotStatus = jest.fn()
-
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../../redux/robot-settings/selectors')
 jest.mock('../../../../ProtocolUpload/hooks')
 
+const mockUpdateRobotStatus = jest.fn()
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
 >

@@ -18,6 +18,7 @@ jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../../redux/robot-settings/selectors')
 jest.mock('../../../../ProtocolUpload/hooks')
 
+const mockUpdateRobotStatus = jest.fn()
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
 >
@@ -35,8 +36,6 @@ const mockSettings = {
   value: true,
   restart_required: false,
 }
-
-const mockUpdateRobotStatus = jest.fn()
 
 const render = () => {
   return renderWithProviders(

@@ -1,12 +1,20 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
+import { UseQueryResult } from 'react-query'
+
 import { renderWithProviders } from '@opentrons/components'
+import { useAllSessionsQuery } from '@opentrons/react-api-client'
+
 import { i18n } from '../../../../../i18n'
 import { getBuildrootUpdateDisplayInfo } from '../../../../../redux/buildroot'
 import { useCurrentRunId } from '../../../../ProtocolUpload/hooks'
+
 import { UpdateRobotSoftware } from '../UpdateRobotSoftware'
 
+import type { Sessions } from '@opentrons/api-client'
+
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../../redux/robot-settings/selectors')
 jest.mock('../../../../../redux/discovery')
 jest.mock('../../../../../redux/buildroot/selectors')
@@ -18,6 +26,9 @@ const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.
 >
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
+>
+const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
+  typeof useAllSessionsQuery
 >
 
 const render = () => {
@@ -40,6 +51,9 @@ describe('RobotSettings UpdateRobotSoftware', () => {
       updateFromFileDisabledReason: null,
     })
     mockUseCurrentRunId.mockReturnValue('123')
+    mockUseAllSessionsQuery.mockReturnValue({
+      data: {},
+    } as UseQueryResult<Sessions, Error>)
   })
 
   afterEach(() => {
@@ -57,6 +71,7 @@ describe('RobotSettings UpdateRobotSoftware', () => {
   })
 
   it('should the link has the correct attribute', () => {
+    mockUseCurrentRunId.mockReturnValue(null)
     const [{ getByText }] = render()
     const targetLink = 'https://opentrons.com/ot-app/'
     const link = getByText('Launch Opentrons software update page')

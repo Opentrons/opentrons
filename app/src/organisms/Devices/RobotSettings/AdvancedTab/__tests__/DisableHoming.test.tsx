@@ -14,9 +14,9 @@ import { DisableHoming } from '../DisableHoming'
 
 import type { Sessions } from '@opentrons/api-client'
 
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../../redux/robot-settings/selectors')
 jest.mock('../../../../ProtocolUpload/hooks')
-jest.mock('@opentrons/react-api-client')
 
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings

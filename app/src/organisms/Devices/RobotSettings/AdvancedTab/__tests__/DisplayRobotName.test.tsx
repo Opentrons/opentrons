@@ -16,13 +16,12 @@ import type { Sessions } from '@opentrons/api-client'
 const mockUpdateIsEXpanded = jest.fn()
 const mockUpdateIsRobotBusy = jest.fn()
 
+jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../ProtocolUpload/hooks')
+
 const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
   typeof useAllSessionsQuery
 >
-
-jest.mock('../../../../ProtocolUpload/hooks')
-jest.mock('@opentrons/react-api-client')
-
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
