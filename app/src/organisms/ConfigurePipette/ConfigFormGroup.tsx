@@ -36,8 +36,6 @@ export interface ConfigFormGroupProps {
 
 export function ConfigFormGroup(props: ConfigFormGroupProps): JSX.Element {
   const { groupLabel, groupError, formFields } = props
-  console.log(groupLabel)
-
   const formattedError =
     groupError &&
     groupError.split('\n').map(function (item, key) {
