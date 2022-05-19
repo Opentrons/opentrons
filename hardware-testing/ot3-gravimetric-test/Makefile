@@ -5,16 +5,10 @@ include ../../scripts/python.mk
 
 SHX := npx shx
 
-# Find the version of the wheel from package.json using a helper script. We
-# use python here so we can use the same version normalization that will be
-# used to create the wheel.
-wheel_file = dist/$(call python_get_wheelname,hardware,opentrons_hardware,$(BUILD_NUMBER))
-
-
 # Find the version of the sdist from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the sdist.
-sdist_file = dist/$(call python_get_sdistname,hardware,opentrons_hardware)
+sdist_file = dist/ot3-gravimetric-test-0.0.1-py2.py3-none-any.whl
 
 
 # These variables can be overriden when make is invoked to customize the
@@ -54,13 +48,6 @@ teardown:
 .PHONY: clean
 clean:
 	$(clean_cmd)
-
-dist/opentrons_hardware-%-py2.py3-none-any.whl: setup.py $(ot_sources)
-	$(python) setup.py $(wheel_opts) bdist_wheel
-	$(SHX) rm -rf build
-	$(SHX) ls dist
-
-wheel: $(wheel_file)
 
 $(sdist_file): setup.py $(ot_sources)
 	$(python) setup.py sdist
