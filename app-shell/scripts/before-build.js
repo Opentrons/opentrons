@@ -37,8 +37,7 @@ const PYTHON_BY_PLATFORM = {
 }
 
 const PYTHON_DESTINATION = path.join(__dirname, '..')
-const PYTHON_SITE_PACKAGES_TARGET_POSIX = 'python/lib/python3.10/site-packages'
-const PYTHON_SITE_PACKAGES_TARGET_WINDOWS = 'python/Lib/site-packages'
+const PYTHON_POST_EXTRACT_LOCATION = path.join(PYTHON_DESTINATION, 'python')
 
 module.exports = function beforeBuild(context) {
   const { platform, arch } = context
@@ -74,21 +73,25 @@ module.exports = function beforeBuild(context) {
     .then(() => {
       console.log('Standalone Python extracted, installing `opentrons` package')
 
-      const sitePackages =
-        platformName === 'win32'
-          ? PYTHON_SITE_PACKAGES_TARGET_WINDOWS
-          : PYTHON_SITE_PACKAGES_TARGET_POSIX
-
       // TODO(mc, 2022-05-16): explore virtualenvs for a more reliable
       // implementation of this install
-      return execa(HOST_PYTHON, [
-        '-m',
-        'pip',
-        'install',
-        `--target=${path.join(PYTHON_DESTINATION, sitePackages)}`,
-        path.join(__dirname, '../../shared-data/python'),
-        path.join(__dirname, '../../api'),
-      ])
+      return execa(
+        HOST_PYTHON,
+        [
+          '-m',
+          'pip',
+          'install',
+          '--user',
+          '--ignore-installed',
+          path.join(__dirname, '../../shared-data/python'),
+          path.join(__dirname, '../../api'),
+        ],
+        {
+          env: {
+            PYTHONUSERBASE: PYTHON_POST_EXTRACT_LOCATION,
+          },
+        }
+      )
     })
     .then(({ stdout }) => {
       console.log("`opentrons` package installed to app's Python environment")
