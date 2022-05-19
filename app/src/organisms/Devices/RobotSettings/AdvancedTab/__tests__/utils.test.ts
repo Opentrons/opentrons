@@ -4,9 +4,6 @@ import { checkIsRobotBusy } from '../utils'
 
 import type { Sessions, SessionData } from '@opentrons/api-client'
 
-// jest.mock('@opentrons/react-api-client')
-// jest.mock('../../../../ProtocolUpload/hooks')
-
 describe('utils checkIsRobotBusy', () => {
   it('if session data is empty and no runId return false', () => {
     const mockAllSessionsQueryResponse = {
