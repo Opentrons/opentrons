@@ -494,7 +494,6 @@ export function RobotSettingsCalibration({
               color={COLORS.darkBlack}
               css={TYPOGRAPHY.pRegular}
               textDecoration={TEXT_DECORATION_UNDERLINE}
-              // onClick={() => confirmStart()}
               onClick={() => handleClickDeckCalibration()}
             >
               {t('calibrate_now')}
@@ -514,7 +513,6 @@ export function RobotSettingsCalibration({
             <StyledText as="label">{deckLastModified()}</StyledText>
           </Box>
           <TertiaryButton
-            // onClick={() => confirmStart()}
             onClick={() => handleClickDeckCalibration()}
             disabled={disabledOrBusyReason !== null}
           >
