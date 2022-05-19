@@ -61,7 +61,8 @@ class ThermocyclerModuleSubState:
             volume: The requested block max volume in uL.
 
         Raises:
-            InvalidBlockVolumeError: The given volume is outside the thermocycler's operating range.
+            InvalidBlockVolumeError: The given volume
+                is outside the thermocycler's operating range.
 
         Returns:
             The validated volume in uL.

@@ -130,7 +130,7 @@ class InvalidTargetTemperatureError(ProtocolEngineError):
 
 
 class InvalidBlockVolumeError(ProtocolEngineError):
-    """An error raised when attempting to set an invalid block max volume"""
+    """An error raised when attempting to set an invalid block max volume."""
 
 
 class InvalidTargetSpeedError(ProtocolEngineError):
