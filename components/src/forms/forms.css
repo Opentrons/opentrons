@@ -32,12 +32,8 @@
   @apply --font-form-default;
 
   font-weight: var(--fw-semibold);
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.5rem;
   text-transform: capitalize;
-
-  &::after {
-    content: ':';
-  }
 }
 
 .checkbox_icon {

@@ -58,7 +58,7 @@ export const PipetteSettingsSlideout = (
           components={{
             block: (
               <Text
-                fontSize={TYPOGRAPHY.fontSizeLabel}
+                fontSize={TYPOGRAPHY.fontSizeP}
                 paddingBottom={SPACING.spacingXS}
               />
             ),

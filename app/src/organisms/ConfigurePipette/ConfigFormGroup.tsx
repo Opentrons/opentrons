@@ -5,7 +5,9 @@ import {
   CheckboxField,
   Flex,
   DIRECTION_COLUMN,
+  COLORS,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { InputField } from '../../atoms/InputField'
 import { StyledText } from '../../atoms/text'
@@ -34,6 +36,8 @@ export interface ConfigFormGroupProps {
 
 export function ConfigFormGroup(props: ConfigFormGroupProps): JSX.Element {
   const { groupLabel, groupError, formFields } = props
+  console.log(groupLabel)
+
   const formattedError =
     groupError &&
     groupError.split('\n').map(function (item, key) {
@@ -74,6 +78,8 @@ export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
         as="label"
         id={props.labelFor}
         paddingBottom={SPACING.spacing3}
+        color={COLORS.darkBlack}
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {props.label}
       </StyledText>
@@ -84,11 +90,10 @@ export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
 
 export interface ConfigInputProps {
   field: DisplayFieldProps
-  className?: string
 }
 
 export function ConfigInput(props: ConfigInputProps): JSX.Element {
-  const { field, className } = props
+  const { field } = props
   const { name, units, displayName } = field
   const id = makeId(field.name)
   const _default = field.default.toString()
@@ -106,7 +111,6 @@ export function ConfigInput(props: ConfigInputProps): JSX.Element {
             error={fieldProps.form.errors[name]}
             {...{
               units,
-              className,
             }}
           />
         )}
