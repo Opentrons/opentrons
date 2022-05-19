@@ -9,19 +9,19 @@ Specify the port to establish Connection
 Author: Carlos Fernandez
 
 """
+from typing import Optional, List
 
-import serial
+import serial  # type: ignore[import]
 import time
 import re
 from statistics import mode
-from serial.serialutil import SerialException
-from typing import Any, Dict, Union, List, Optional, Tuple
+from serial.serialutil import SerialException    # type: ignore[import]
 import random
 
-from serial.tools.list_ports import comports
+from serial.tools.list_ports import comports    # type: ignore[import]
 
 
-class Radwag_ScaleError(Exception):
+class RadwagScaleError(Exception):
     def __init__(self, value):
         self.value = value
 
@@ -29,7 +29,7 @@ class Radwag_ScaleError(Exception):
         return 'Bad Scale Readings: ' + repr(self.value)
 
 
-class Radwag_Scale:
+class RadwagScale:
     def __init__(self, port='/dev/ttyUSB0', baudrate=9600):
         self.port = port
         self.baudrate = baudrate
@@ -42,7 +42,7 @@ class Radwag_Scale:
         self._limit_sensor = None
         self._location = "NY"
 
-    def scan_for_port(self, name: str) -> str:
+    def scan_for_port(self, name: str) -> Optional[str]:
         """This funtion scans for these individual ports by VID:PID names"""
         # There may be something wrong with particle counter and robot port
         instruments = {
@@ -168,7 +168,7 @@ class Radwag_Scale:
 
     def read_continuous(self) -> float:
         if not self.simulate:
-            masses = []
+            masses: List[float] = []
             while True:
                 if len(masses) == 10:
                     break
@@ -412,7 +412,7 @@ if __name__ == '__main__':
     # port = input("Enter port number, leave blank for '/dev/ttyUSB0/'\n").strip()
     # if port == '':
     com_port = "COM6"
-    scale = Radwag_Scale(port=com_port)
+    scale = RadwagScale(port=com_port)
     scale.simulate = False
     scale._location = 'CH'
     scale.connect()

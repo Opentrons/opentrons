@@ -6,12 +6,11 @@ relative humidity that is recorded onto the pipette results.
 """
 
 import os, time
-import serial
-from serial.serialutil import SerialException
+import serial    # type: ignore[import]
+from serial.serialutil import SerialException    # type: ignore[import]
 from datetime import datetime
 import csv
 import codecs
-from typing import Any, Dict, Optional, Union, List, Tuple
 import random
 
 addrs = {
@@ -27,9 +26,11 @@ addrs = {
         "10": "C74A",
         }
 
+
 class AsairSensorError(Exception):
     def __init__(self, ret_code: str = None) -> None:
         super().__init__()
+
 
 class AsairSensor:
     def __init__(self, port='/dev/ttyUSB0', baudrate = 9600, timeout=5):
@@ -66,11 +67,10 @@ class AsairSensor:
 
     def get_reading(self):
         if not self.simulate:
-            addrs[self.sensor_addr]
             data_packet = \
                 "{}0300000002{}".format(self.sensor_addr, addrs[self.sensor_addr])
             #print(data_packet)
-            command_bytes = codecs.decode(data_packet,'hex')
+            command_bytes = codecs.decode(data_packet, 'hex')
             #print(command_bytes)
             self.count = 0
             self.length = 0
@@ -106,6 +106,7 @@ class AsairSensor:
             temp = random.uniform(24.5, 25)
             relative_hum = random.uniform(45, 40)
             return temp, relative_hum
+
 
 if __name__ == '__main__':
     TH = AsairSensor(port="COM12")
