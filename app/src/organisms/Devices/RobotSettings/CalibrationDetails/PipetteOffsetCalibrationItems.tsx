@@ -147,7 +147,7 @@ PipetteOffsetCalibrationItemsProps): JSX.Element {
                 robotName={robotName}
                 serialNumber={calibration.serialNumber ?? null}
                 mount={calibration.mount}
-                updateRobotStatus={updateRobotStatus}
+                // updateRobotStatus={updateRobotStatus}
               />
             </StyledTableCell>
           </StyledTableRow>

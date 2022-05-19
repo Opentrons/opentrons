@@ -1,15 +1,31 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
+import { UseQueryResult } from 'react-query'
+
 import { renderWithProviders } from '@opentrons/components'
+import { useAllSessionsQuery } from '@opentrons/react-api-client'
+
 import { i18n } from '../../../../../i18n'
 import { getRobotSettings } from '../../../../../redux/robot-settings'
+import { useCurrentRunId } from '../../../../ProtocolUpload/hooks'
+
 import { UseOlderProtocol } from '../UseOlderProtocol'
 
+import type { Sessions } from '@opentrons/api-client'
+
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../../redux/robot-settings/selectors')
+jest.mock('../../../../ProtocolUpload/hooks')
 
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
+>
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
+>
+const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
+  typeof useAllSessionsQuery
 >
 
 const mockSettings = {
@@ -39,6 +55,9 @@ const render = () => {
 describe('RobotSettings ShortTrashBin', () => {
   beforeEach(() => {
     mockGetRobotSettings.mockReturnValue([mockSettings])
+    mockUseAllSessionsQuery.mockReturnValue({
+      data: {},
+    } as UseQueryResult<Sessions, Error>)
   })
 
   afterEach(() => {
@@ -64,6 +83,7 @@ describe('RobotSettings ShortTrashBin', () => {
       value: false,
     }
     mockGetRobotSettings.mockReturnValue([tempMockSettings])
+    mockUseCurrentRunId.mockReturnValue(null)
     const [{ getByRole }] = render()
     const toggleButton = getByRole('switch', {
       name: 'use_older_protocol_analysis_method',
