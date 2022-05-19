@@ -24,7 +24,7 @@ from .deactivate_heater import (
     DeactivateHeaterCommandType,
 )
 
-from .set_target_shake_speed import (
+from .set_and_wait_for_shake_speed import (
     SetAndWaitForShakeSpeed,
     SetAndWaitForShakeSpeedCreate,
     SetAndWaitForShakeSpeedParams,
