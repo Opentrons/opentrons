@@ -97,7 +97,7 @@ export const ThermocyclerModuleData = (
           fontSize={FONT_SIZE_CAPTION}
           marginBottom={SPACING.spacing1}
         >
-          {t(lidTarget === null ? 'na_temp' : 'target_temp', {
+          {t(lidTarget == null ? 'na_temp' : 'target_temp', {
             temp: lidTarget,
           })}
         </Text>
@@ -124,7 +124,7 @@ export const ThermocyclerModuleData = (
           fontSize={FONT_SIZE_CAPTION}
           marginBottom={SPACING.spacing1}
         >
-          {t(targetTemp === null ? 'na_temp' : 'target_temp', {
+          {t(targetTemp == null ? 'na_temp' : 'target_temp', {
             temp: targetTemp,
           })}
         </Text>
