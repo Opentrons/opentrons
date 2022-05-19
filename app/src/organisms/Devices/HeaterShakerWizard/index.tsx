@@ -64,7 +64,7 @@ export const HeaterShakerWizard = (
             labwareDefinition={labwareDef}
             thermalAdapterName={
               labwareDef != null
-                ? getAdapterName(labwareDef?.parameters.loadName)
+                ? getAdapterName(labwareDef.parameters.loadName)
                 : null
             }
           />
