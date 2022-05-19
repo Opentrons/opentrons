@@ -166,7 +166,7 @@ Sets the `webPreferences.webSecurity` option of the Electron [BrowserWindow][ele
 - JSON path: `ui.minWidth`
 - Default: `600`
 
-[BrowserWindow][electron-docs-browser-window] width at launch.
+[BrowserWindow][electron-docs-browser-window] minWidth at launch.
 
 ##### ui.height
 
