@@ -22,7 +22,7 @@ def subject(scale_connection: MagicMock) -> RadwagScale:
 
 def create_radwag_result_line(command: str, val: float) -> bytes:
     """Create a radwag protocol line."""
-    sign = ' '
+    sign = " "
     if val > 0:
         # sign = '+'
         pass
@@ -37,17 +37,25 @@ def create_radwag_result_line(command: str, val: float) -> bytes:
     return f"{command:3s}? {sign}{str(abs(val)).rjust(9)} {'g':3s}".encode()
 
 
-@pytest.mark.parametrize(argnames="masses,expected", argvalues=
-    [
+@pytest.mark.parametrize(
+    argnames="masses,expected",
+    argvalues=[
         # All the same
         [[5.5, 5.5, 5.5, 5.5], 5.5],
         # Remove outlier
         [[1.0, 12.0, 1.0], 1.0],
-    ]
-                         )
-def test_read_mass(subject: RadwagScale, scale_connection: MagicMock, masses: List[float], expected: float) -> None:
+    ],
+)
+def test_read_mass(
+    subject: RadwagScale,
+    scale_connection: MagicMock,
+    masses: List[float],
+    expected: float,
+) -> None:
     """It should read the mass and return the average."""
-    scale_connection.readline.side_effect = [create_radwag_result_line("SI", v) for v in masses]
+    scale_connection.readline.side_effect = [
+        create_radwag_result_line("SI", v) for v in masses
+    ]
 
     mass = subject.read_mass(samples=len(masses))
 

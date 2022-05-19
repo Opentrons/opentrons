@@ -73,7 +73,7 @@ lint:
 
 .PHONY: format
 format:
-	$(python) -m black gravimetric_test tests protocols
+	$(python) -m black gravimetric_test tests protocols setup.py
 
 
 .PHONY: push-no-restart
