@@ -2,8 +2,10 @@ import * as React from 'react'
 import { saveAs } from 'file-saver'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, waitFor } from '@testing-library/react'
+import { UseQueryResult } from 'react-query'
 
 import { renderWithProviders } from '@opentrons/components'
+import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
 import { DeckCalibrationModal } from '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
@@ -33,6 +35,7 @@ import {
   useTipLengthCalibrations,
   useAttachedPipettes,
 } from '../../hooks'
+import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
 import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffsetCalibrationItems'
@@ -41,6 +44,7 @@ import { TipLengthCalibrationItems } from '../CalibrationDetails/TipLengthCalibr
 import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
 
 jest.mock('file-saver')
+jest.mock('@opentrons/react-api-client')
 jest.mock(
   '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 )
@@ -54,6 +58,7 @@ jest.mock('../../../../redux/custom-labware/selectors')
 jest.mock('../../hooks')
 jest.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
 jest.mock('../CalibrationDetails/TipLengthCalibrationItems')
+jest.mock('../../../ProtocolUpload/hooks')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
