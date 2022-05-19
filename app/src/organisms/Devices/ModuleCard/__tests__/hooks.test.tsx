@@ -86,7 +86,7 @@ const mockHeatHeaterShaker = {
   data: {
     labwareLatchStatus: 'idle_open',
     speedStatus: 'idle',
-    temperatureStatus: 'idle',
+    temperatureStatus: 'holding at target',
     currentSpeed: null,
     currentTemperature: null,
     targetSpeed: null,
@@ -164,7 +164,7 @@ const mockTCBlockHeating = {
     lidTargetTemperature: null,
     lidTemperature: null,
     currentTemperature: null,
-    targetTemperature: null,
+    targetTemperature: 45,
     holdTime: null,
     rampRate: null,
     currentCycleIndex: null,
