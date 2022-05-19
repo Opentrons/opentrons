@@ -10,20 +10,20 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
-from opentrons.protocol_engine.commands.heater_shaker.await_temperature import (
-    AwaitTemperatureImpl,
+from opentrons.protocol_engine.commands.heater_shaker.wait_for_temperature import (
+    WaitForTemperatureImpl,
 )
 
 
-async def test_await_temperature(
+async def test_wait_for_temperature(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
 ) -> None:
     """It should be able to wait for the module's target temperature."""
-    subject = AwaitTemperatureImpl(state_view=state_view, equipment=equipment)
+    subject = WaitForTemperatureImpl(state_view=state_view, equipment=equipment)
 
-    data = heater_shaker.AwaitTemperatureParams(moduleId="heater-shaker-id")
+    data = heater_shaker.WaitForTemperatureParams(moduleId="heater-shaker-id")
 
     hs_module_substate = decoy.mock(cls=HeaterShakerModuleSubState)
     hs_hardware = decoy.mock(cls=HeaterShaker)
@@ -48,4 +48,4 @@ async def test_await_temperature(
     decoy.verify(
         await hs_hardware.await_temperature(awaiting_temperature=123.45), times=1
     )
-    assert result == heater_shaker.AwaitTemperatureResult()
+    assert result == heater_shaker.WaitForTemperatureResult()

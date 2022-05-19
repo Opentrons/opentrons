@@ -1,11 +1,11 @@
 """Heater-Shaker Module protocol commands."""
 
-from .await_temperature import (
-    AwaitTemperature,
-    AwaitTemperatureCreate,
-    AwaitTemperatureParams,
-    AwaitTemperatureResult,
-    AwaitTemperatureCommandType,
+from .wait_for_temperature import (
+    WaitForTemperature,
+    WaitForTemperatureCreate,
+    WaitForTemperatureParams,
+    WaitForTemperatureResult,
+    WaitForTemperatureCommandType,
 )
 
 from .set_target_temperature import (
@@ -57,12 +57,12 @@ from .close_latch import (
 )
 
 __all__ = [
-    # heaterShakerModule/awaitTemperature
-    "AwaitTemperature",
-    "AwaitTemperatureCreate",
-    "AwaitTemperatureParams",
-    "AwaitTemperatureResult",
-    "AwaitTemperatureCommandType",
+    # heaterShakerModule/waitForTemperature
+    "WaitForTemperature",
+    "WaitForTemperatureCreate",
+    "WaitForTemperatureParams",
+    "WaitForTemperatureResult",
+    "WaitForTemperatureCommandType",
     # heaterShakerModule/setTargetTemperature
     "SetTargetTemperature",
     "SetTargetTemperatureCreate",

@@ -1,4 +1,4 @@
-"""Command models to await a Heater-Shaker Module's target temperature."""
+"""Command models to wait for a Heater-Shaker Module's target temperature."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type
@@ -12,23 +12,23 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 
-AwaitTemperatureCommandType = Literal["heaterShakerModule/awaitTemperature"]
+WaitForTemperatureCommandType = Literal["heaterShakerModule/waitForTemperature"]
 
 
-class AwaitTemperatureParams(BaseModel):
-    """Input parameters to await a Heater-Shaker's target temperature."""
+class WaitForTemperatureParams(BaseModel):
+    """Input parameters to wait for a Heater-Shaker's target temperature."""
 
     moduleId: str = Field(..., description="Unique ID of the Heater-Shaker Module.")
 
 
-class AwaitTemperatureResult(BaseModel):
-    """Result data from awaiting a Heater-Shaker's target temperature."""
+class WaitForTemperatureResult(BaseModel):
+    """Result data from waiting for a Heater-Shaker's target temperature."""
 
 
-class AwaitTemperatureImpl(
-    AbstractCommandImpl[AwaitTemperatureParams, AwaitTemperatureResult]
+class WaitForTemperatureImpl(
+    AbstractCommandImpl[WaitForTemperatureParams, WaitForTemperatureResult]
 ):
-    """Execution implementation of a Heater-Shaker's await temperature command."""
+    """Execution implementation of a Heater-Shaker's wait for temperature command."""
 
     def __init__(
         self,
@@ -39,7 +39,7 @@ class AwaitTemperatureImpl(
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(self, params: AwaitTemperatureParams) -> AwaitTemperatureResult:
+    async def execute(self, params: WaitForTemperatureParams) -> WaitForTemperatureResult:
         """Wait for a Heater-Shaker's target temperature to be reached."""
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
             module_id=params.moduleId
@@ -54,23 +54,23 @@ class AwaitTemperatureImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.await_temperature(awaiting_temperature=target_temp)
 
-        return AwaitTemperatureResult()
+        return WaitForTemperatureResult()
 
 
-class AwaitTemperature(BaseCommand[AwaitTemperatureParams, AwaitTemperatureResult]):
+class WaitForTemperature(BaseCommand[WaitForTemperatureParams, WaitForTemperatureResult]):
     """A command to wait for a Heater-Shaker's target temperature to be reached."""
 
-    commandType: AwaitTemperatureCommandType = "heaterShakerModule/awaitTemperature"
-    params: AwaitTemperatureParams
-    result: Optional[AwaitTemperatureResult]
+    commandType: WaitForTemperatureCommandType = "heaterShakerModule/waitForTemperature"
+    params: WaitForTemperatureParams
+    result: Optional[WaitForTemperatureResult]
 
-    _ImplementationCls: Type[AwaitTemperatureImpl] = AwaitTemperatureImpl
+    _ImplementationCls: Type[WaitForTemperatureImpl] = WaitForTemperatureImpl
 
 
-class AwaitTemperatureCreate(BaseCommandCreate[AwaitTemperatureParams]):
-    """A request to create a Heater-Shaker's await temperature command."""
+class WaitForTemperatureCreate(BaseCommandCreate[WaitForTemperatureParams]):
+    """A request to create a Heater-Shaker's wait for temperature command."""
 
-    commandType: AwaitTemperatureCommandType
-    params: AwaitTemperatureParams
+    commandType: WaitForTemperatureCommandType
+    params: WaitForTemperatureParams
 
-    _CommandCls: Type[AwaitTemperature] = AwaitTemperature
+    _CommandCls: Type[WaitForTemperature] = WaitForTemperature
