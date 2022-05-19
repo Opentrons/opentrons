@@ -24,7 +24,9 @@ class DeactivateShakerResult(BaseModel):
     """Result data from deactivating shaker for a Heater-Shaker."""
 
 
-class DeactivateShakerImpl(AbstractCommandImpl[DeactivateShakerParams, DeactivateShakerResult]):
+class DeactivateShakerImpl(
+    AbstractCommandImpl[DeactivateShakerParams, DeactivateShakerResult]
+):
     """Execution implementation of a Heater-Shaker's deactivate shaker command."""
 
     def __init__(

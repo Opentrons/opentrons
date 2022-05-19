@@ -32,7 +32,7 @@ from .set_and_wait_for_shake_speed import (
     SetAndWaitForShakeSpeedCommandType,
 )
 
-from .stop_shake import (
+from .deactivate_shaker import (
     DeactivateShaker,
     DeactivateShakerCreate,
     DeactivateShakerParams,

@@ -39,7 +39,9 @@ class WaitForTemperatureImpl(
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(self, params: WaitForTemperatureParams) -> WaitForTemperatureResult:
+    async def execute(
+        self, params: WaitForTemperatureParams
+    ) -> WaitForTemperatureResult:
         """Wait for a Heater-Shaker's target temperature to be reached."""
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
             module_id=params.moduleId
@@ -57,7 +59,9 @@ class WaitForTemperatureImpl(
         return WaitForTemperatureResult()
 
 
-class WaitForTemperature(BaseCommand[WaitForTemperatureParams, WaitForTemperatureResult]):
+class WaitForTemperature(
+    BaseCommand[WaitForTemperatureParams, WaitForTemperatureResult]
+):
     """A command to wait for a Heater-Shaker's target temperature to be reached."""
 
     commandType: WaitForTemperatureCommandType = "heaterShakerModule/waitForTemperature"

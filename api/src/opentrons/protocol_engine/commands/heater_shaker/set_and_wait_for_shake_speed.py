@@ -11,7 +11,9 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-SetAndWaitForShakeSpeedCommandType = Literal["heaterShakerModule/setAndWaitForShakeSpeed"]
+SetAndWaitForShakeSpeedCommandType = Literal[
+    "heaterShakerModule/setAndWaitForShakeSpeed"
+]
 
 
 class SetAndWaitForShakeSpeedParams(BaseModel):

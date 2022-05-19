@@ -10,7 +10,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
-from opentrons.protocol_engine.commands.heater_shaker.stop_shake import (
+from opentrons.protocol_engine.commands.heater_shaker.deactivate_shaker import (
     DeactivateShakerImpl,
 )
 
@@ -47,7 +47,7 @@ async def test_deactivate_shaker(
     assert result == heater_shaker.DeactivateShakerResult()
 
 
-async def test_deactivate_shake_virtual(
+async def test_deactivate_shaker_virtual(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
