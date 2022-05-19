@@ -29,9 +29,9 @@ const PYTHON_BY_PLATFORM = {
   win32: {
     x64: {
       url:
-        'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-pc-windows-msvc-static-install_only.tar.gz',
+        'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-pc-windows-msvc-shared-install_only.tar.gz',
       sha256:
-        '3c3e6212fc983640bbe85b9cc60514f80d885892e072d43017b73e1b50a7ad02',
+        'ba593370742ed8a7bc70ce563dd6a53e30ece1f6881e3888d334c1b485b0d9d0',
     },
   },
 }
