@@ -52,7 +52,6 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
       </Text>
       <AttachedModuleItem step={t('1a')}>
         <Flex flexDirection={DIRECTION_ROW} marginLeft={SPACING.spacingXL}>
-          {/* TODO(sh, 2022-02-18): replace this image with the final version from design */}
           <img src={attachHeaterShakerModule} alt="Attach Module to Deck" />
           <img src={screwdriverOrientedLeft} alt="screwdriver_1a" />
           <Flex

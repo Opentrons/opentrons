@@ -6,6 +6,7 @@ import { Portal } from '../../../App/portal'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
 import { HEATERSHAKER_MODULE_TYPE } from '../../../redux/modules'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { useAttachedModules } from '../hooks'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
@@ -18,7 +19,6 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
-  Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 
@@ -138,7 +138,7 @@ export const HeaterShakerWizard = (
             >
               {buttonContent}
               {!isPrimaryCTAEnabled ? (
-                <Tooltip {...tooltipProps}>
+                <Tooltip tooltipProps={tooltipProps}>
                   {t('module_is_not_connected')}
                 </Tooltip>
               ) : null}
