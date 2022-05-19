@@ -92,13 +92,23 @@ const mockPipetteOffsetCalibrationItems = PipetteOffsetCalibrationItems as jest.
 const mockTipLengthCalibrationItems = TipLengthCalibrationItems as jest.MockedFunction<
   typeof TipLengthCalibrationItems
 >
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
+>
+const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
+  typeof useAllSessionsQuery
+>
 
 let mockTrackEvent: jest.Mock
+const mockUpdateRobotStatus = jest.fn()
 
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <RobotSettingsCalibration robotName="otie" />
+      <RobotSettingsCalibration
+        robotName="otie"
+        updateRobotStatus={mockUpdateRobotStatus}
+      />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -148,6 +158,10 @@ describe('RobotSettingsCalibration', () => {
       <div>TipLengthCalibrationItems</div>
     )
     mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
+    mockUseCurrentRunId.mockReturnValue('123')
+    mockUseAllSessionsQuery.mockReturnValue({
+      data: {},
+    } as UseQueryResult<Sessions, Error>)
   })
 
   afterEach(() => {
@@ -258,6 +272,17 @@ describe('RobotSettingsCalibration', () => {
     getByRole('button', { name: 'Calibrate now' })
   })
 
+  it('should call update robot status if a robot is busy - deck cal', () => {
+    mockUseDeckCalibrationData.mockReturnValue({
+      deckCalibrationData: null,
+      isDeckCalibrated: false,
+    })
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Calibrate now' })
+    fireEvent.click(button)
+    expect(mockUpdateRobotStatus).toHaveBeenCalled()
+  })
+
   it('recalibration button is disabled when a robot is unreachable', () => {
     mockUseRobot.mockReturnValue(mockUnreachableRobot)
     const [{ getByRole }] = render()
@@ -357,5 +382,11 @@ describe('RobotSettingsCalibration', () => {
         'Fully calibrate your robot before checking calibration health'
       )
     })
+  })
+  it('should call update robot status if a robot is busy - health check', () => {
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Check health' })
+    fireEvent.click(button)
+    expect(mockUpdateRobotStatus).toHaveBeenCalled()
   })
 })

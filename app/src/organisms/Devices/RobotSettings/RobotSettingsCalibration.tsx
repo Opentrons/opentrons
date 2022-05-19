@@ -462,7 +462,7 @@ export function RobotSettingsCalibration({
               <PipetteOffsetCalibrationItems
                 robotName={robotName}
                 formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
-                // updateRobotStatus={updateRobotStatus}
+                updateRobotStatus={updateRobotStatus}
               />
             ) : (
               <StyledText as="label">{t('not_calibrated')}</StyledText>
@@ -486,7 +486,7 @@ export function RobotSettingsCalibration({
                 robotName={robotName}
                 formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
                 formattedTipLengthCalibrations={formatTipLengthCalibrations()}
-                // updateRobotStatus={updateRobotStatus}
+                updateRobotStatus={updateRobotStatus}
               />
             ) : (
               <StyledText as="label">{t('not_calibrated')}</StyledText>
@@ -503,7 +503,6 @@ export function RobotSettingsCalibration({
               color={COLORS.darkBlack}
               css={TYPOGRAPHY.pRegular}
               textDecoration={TEXT_DECORATION_UNDERLINE}
-              // onClick={() => confirmStart()}
               onClick={() => handleClickDeckCalibration()}
             >
               {t('calibrate_now')}
@@ -523,7 +522,6 @@ export function RobotSettingsCalibration({
             <StyledText as="label">{deckLastModified()}</StyledText>
           </Box>
           <TertiaryButton
-            // onClick={() => confirmStart()}
             onClick={() => handleClickDeckCalibration()}
             disabled={disabledOrBusyReason !== null}
           >
