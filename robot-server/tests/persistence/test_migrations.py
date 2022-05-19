@@ -6,6 +6,7 @@ import pytest
 import sqlalchemy
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
+from robot_server.persistence import ResetManager
 from robot_server.persistence.database import create_sql_engine
 from robot_server.persistence.tables import (
     migration_table,
@@ -18,6 +19,11 @@ from robot_server.persistence.tables import (
 
 TABLES = [run_table, action_table, protocol_table, analysis_table]
 
+
+@pytest.fixture
+def reset_manager() -> ResetManager:
+    """"Get a ResetManager test subject."""
+    return ResetManager()
 
 @pytest.fixture
 def database_v0(tmp_path: Path) -> Path:
@@ -80,3 +86,12 @@ def test_migration(subject: sqlalchemy.engine.Engine) -> None:
     for table in TABLES:
         values = subject.execute(sqlalchemy.select(table)).all()
         assert values == []
+
+
+async def test_test_reset_db(reset_manager: ResetManager) -> None:
+    """Should delete persistance directory if a file makred to delete exists"""
+    await reset_manager.reset_db()
+
+
+async def test_test_reset_db_not_marked() -> None:
+    """Should keep persistance directory if a no file is makred to delete"""

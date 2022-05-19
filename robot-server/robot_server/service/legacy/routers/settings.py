@@ -210,7 +210,7 @@ async def post_settings_reset_options(
 
     if ("dbHistory", True) in factory_reset_commands.items():
         print("resetting db")
-        reset_manager.reset_db()
+        await reset_manager.reset_db()
 
     message = (
         "Options '{}' were reset".format(", ".join(o.name for o in options))

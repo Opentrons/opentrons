@@ -20,6 +20,7 @@ _protocol_directory_accessor = AppStateAccessor[Path]("protocol_directory")
 
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-robot-server-"
 _DATABASE_FILE: Final = "robot_server.db"
+_CLEAR_ON_REBOOT = "marked_to_delete.txt"
 
 _log = logging.getLogger(__name__)
 
@@ -69,7 +70,6 @@ def get_sql_engine(
     # https://github.com/tiangolo/fastapi/issues/617
 
 
-# FastAPI dependecy to reset_db
 # should depnd on the persistance directory
 # using Path for removing the file
 # Clear on next rebot static var
@@ -81,10 +81,16 @@ def get_sql_engine(
 class ResetManager:
     """Dependency class to handle robot server reset options."""
 
-    def reset_db(self) -> None:
+    @staticmethod
+    async def reset_db() -> None:
         """Reset db file."""
-        raise NotImplementedError()
-
+        persistence_directory = await get_persistence_directory()
+        print(persistence_directory)
+        file_path = f"{persistence_directory}/{_CLEAR_ON_REBOOT}"
+        try:
+            open(file_path, mode='x')
+        except OSError:
+            print ("Could not create file:", file_name)
 
 __all__ = [
     "get_persistence_directory",
