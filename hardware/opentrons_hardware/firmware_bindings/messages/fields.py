@@ -107,20 +107,8 @@ class PipetteNameField(utils.UInt16Field):
         return f"{self.__class__.__name__}(value={pipette_val})"
 
 
-class PipetteSerialField(utils.BinaryFieldBase[bytes]):
-    """The serial number of a pipette.
-
-    This is sized to handle only the datecode part of the serial
-    number; the full field can be synthesized from this, the
-    model number, and the name.
-    """
-
-    NUM_BYTES = 12
-    FORMAT = f"{NUM_BYTES}s"
-
-
-class GripperSerialField(utils.BinaryFieldBase[bytes]):
-    """The serial number of a gripper.
+class SerialField(utils.BinaryFieldBase[bytes]):
+    """The serial number of a pipette or gripper.
 
     This is sized to handle only the datecode part of the serial
     number; the full field can be synthesized from this, the
