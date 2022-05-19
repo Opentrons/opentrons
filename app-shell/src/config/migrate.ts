@@ -165,6 +165,12 @@ const toVersion6 = (prevConfig: ConfigV5): ConfigV6 => {
     modules: {
       heaterShaker: { isAttached: false },
     },
+    ui: {
+      ...prevConfig.ui,
+      width: 800,
+      minWidth: 600,
+      height: 760,
+    },
   }
 
   return nextConfig
