@@ -1,13 +1,18 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { saveAs } from 'file-saver'
+import { UseQueryResult } from 'react-query'
 
 import { renderWithProviders, Mount } from '@opentrons/components'
+import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../../i18n'
 import { useCalibratePipetteOffset } from '../../../../CalibratePipetteOffset/useCalibratePipetteOffset'
+import { useCurrentRunId } from '../../../../ProtocolUpload/hooks'
 
 import { OverflowMenu } from '../OverflowMenu'
+
+import type { Sessions } from '@opentrons/api-client'
 
 const render = (
   props: React.ComponentProps<typeof OverflowMenu>
@@ -22,15 +27,25 @@ const CAL_TYPE = 'pipetteOffset'
 
 const startCalibration = jest.fn()
 jest.mock('file-saver')
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../../redux/config')
 jest.mock('../../../../../redux/sessions/selectors')
 jest.mock('../../../../../redux/discovery')
 jest.mock('../../../../../redux/robot-api/selectors')
 jest.mock('../../../../CalibratePipetteOffset/useCalibratePipetteOffset')
+jest.mock('../../../../ProtocolUpload/hooks')
 
 const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFunction<
   typeof useCalibratePipetteOffset
 >
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
+>
+const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
+  typeof useAllSessionsQuery
+>
+
+const mockUpdateRobotStatus = jest.fn()
 
 describe('OverflowMenu', () => {
   let props: React.ComponentProps<typeof OverflowMenu>
@@ -41,8 +56,14 @@ describe('OverflowMenu', () => {
       robotName: ROBOT_NAME,
       serialNumber: 'P1KSV222021011802',
       mount: 'left' as Mount,
+      updateRobotStatus: mockUpdateRobotStatus,
     }
     mockUseCalibratePipetteOffset.mockReturnValue([startCalibration, null])
+    mockUseCurrentRunId.mockReturnValue('123')
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    mockUseAllSessionsQuery.mockReturnValue({
+      data: {},
+    } as UseQueryResult<Sessions, Error>)
   })
 
   afterEach(() => {
@@ -120,5 +141,14 @@ describe('OverflowMenu', () => {
     )
     fireEvent.click(calibrationButton)
     expect(startCalibration).toHaveBeenCalled()
+  })
+
+  it('should check robot status when clicking the toggle button', () => {
+    const [{ getByRole }] = render()
+    const toggleButton = getByRole('switch', {
+      name: 'short_trash_bin',
+    })
+    fireEvent.click(toggleButton)
+    expect(mockUpdateRobotStatus).toHaveBeenCalled()
   })
 })
