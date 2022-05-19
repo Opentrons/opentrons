@@ -210,7 +210,7 @@ class RadwagScale:
                 if raw_val[0] == '-':
                     sign = -1
                     raw_val = raw_val.replace('-', '')
-                    raw_val = float(raw_val) * sign
+                    raw_val = str(float(raw_val) * sign)
                 masses.append(float(raw_val))
                 # print(masses)
             # disregard readings and take 7-9 readings
