@@ -18,8 +18,8 @@ const WINDOW_OPTS = {
   show: false,
   useContentSize: true,
   width: config.width,
-  height: config.height,
   minWidth: config.minWidth,
+  height: config.height,
   // allow webPreferences to be set at launchtime from config
   webPreferences: Object.assign(
     {
