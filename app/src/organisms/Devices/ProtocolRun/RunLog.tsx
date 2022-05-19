@@ -40,6 +40,7 @@ import {
   useRunTimestamps,
 } from '../../../organisms/RunTimeControl/hooks'
 import { useProtocolDetailsForRun } from '../hooks'
+import { DownloadRunLogToast } from '../DownloadRunLogToast'
 import { RunLogProtocolSetupInfo } from './RunLogProtocolSetupInfo'
 import { StepItem } from './StepItem'
 
@@ -78,6 +79,10 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   const firstPostInitialPlayRunCommandIndex = React.useRef<number | null>(null)
   const [isDeterministic, setIsDeterministic] = React.useState<boolean>(true)
   const [windowIndex, setWindowIndex] = React.useState<number>(0)
+  const [
+    showDownloadRunLogToast,
+    setShowDownloadRunLogToast,
+  ] = React.useState<boolean>(false)
 
   const windowFirstCommandIndex = (WINDOW_SIZE - WINDOW_OVERLAP) * windowIndex
   const prePlayCommandCount =
@@ -312,7 +317,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   }
 
   const onClickDownloadRunLog = (): void => {
-    console.log('TODO: download run log')
+    setShowDownloadRunLogToast(true)
   }
 
   const isRunStarted = currentItemRef.current != null
@@ -356,6 +361,14 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
       width="100%"
       overflowY="hidden"
     >
+      {runTotalCommandCount != null && showDownloadRunLogToast ? (
+        <DownloadRunLogToast
+          robotName={robotName}
+          runId={runId}
+          pageLength={runTotalCommandCount}
+          onClose={() => setShowDownloadRunLogToast(false)}
+        />
+      ) : null}
       {jumpToCurrentStepButton}
       {isFirstWindow ? (
         <>
