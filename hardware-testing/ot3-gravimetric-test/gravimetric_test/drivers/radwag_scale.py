@@ -1,14 +1,12 @@
-#! /usr/bin/env python
+"""Radwag Scale Driver.
 
-"""
-Radwag Scale Driver
 The driver allows a user to retrieve raw data
 from the scale by using a USB connection.
 Specify the port to establish Connection
 
 Author: Carlos Fernandez
-
 """
+
 from typing import Optional, List
 
 import serial  # type: ignore[import]
@@ -22,15 +20,22 @@ from serial.tools.list_ports import comports  # type: ignore[import]
 
 
 class RadwagScaleError(Exception):
-    def __init__(self, value):
+    """Radwag exception."""
+
+    def __init__(self, value: str) -> None:
+        """Constructor."""
         self.value = value
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Convert to string."""
         return "Bad Scale Readings: " + repr(self.value)
 
 
 class RadwagScale:
-    def __init__(self, port="/dev/ttyUSB0", baudrate=9600):
+    """Radwag scale driver."""
+
+    def __init__(self, port: str = "/dev/ttyUSB0", baudrate: int = 9600) -> None:
+        """Constructor."""
         self.port = port
         self.baudrate = baudrate
         self.timeout = 0.1
@@ -43,12 +48,12 @@ class RadwagScale:
         self._location = "NY"
 
     def scan_for_port(self, name: str) -> Optional[str]:
-        """This funtion scans for these individual ports by VID:PID names"""
+        """This function scans for these individual ports by VID:PID names."""
         # There may be something wrong with particle counter and robot port
         instruments = {"sensor": "USB VID:PID=1A86:7523"}
         port = None
         ports = comports()
-        if name == "" or name == None:
+        if name == "" or name is None:
             raise Exception("No instrument was named!")
         port_list = []
         for com_port, desc, hwid in sorted(ports):
@@ -60,13 +65,14 @@ class RadwagScale:
                 port = port_list[vid][0]
         return port
 
-    def connect(self):
+    def connect(self) -> None:
+        """Connect to the device."""
         if self.simulate:
             print("Virtual Scale Port Connected")
         else:
             print("Scale Connection established: ", self.port)
             self._connect_to_port()
-            if self._location is not "NY":
+            if self._location != "NY":
                 self._limit_sensor = serial.Serial(
                     port=self.scan_for_port("sensor"),
                     baudrate=115200,
@@ -76,7 +82,8 @@ class RadwagScale:
                     timeout=0.1,
                 )
 
-    def _connect_to_port(self):
+    def _connect_to_port(self) -> None:
+        """Connect to the port."""
         try:
             self._scale = serial.Serial(
                 port=self.port,
@@ -92,8 +99,8 @@ class RadwagScale:
             error_msg += "2. CHeck if the assigned port is correct. \n"
             raise SerialException(error_msg)
 
-    # Obtain a single reading of scale
-    def read_mass(self, samples=2, retry=0):
+    def read_mass(self, samples: int = 2, retry: int = 0) -> float:
+        """Obtain a single reading of scale."""
         if not self.simulate:
             masses = []
             retry += 1
@@ -132,8 +139,8 @@ class RadwagScale:
         else:
             return random.uniform(2.5, 2.7)
 
-    def stable_read(self, samples=10):
-        """take 10 samples due to stablitiy of the scale"""
+    def stable_read(self, samples: int = 10) -> float:
+        """Take 10 samples due to stability of the scale."""
         if not self.simulate:
             masses = []
             stats_list = ["", "SU A", "ES", "SU E", "A"]
@@ -168,7 +175,8 @@ class RadwagScale:
         else:
             return random.uniform(2.5, 2.7)
 
-    def read_continuous(self) -> float:
+    def read_continuous(self) -> float:  # noqa: C901
+        """Read until 10 samples are received."""
         if not self.simulate:
             masses: List[float] = []
             while True:
@@ -231,12 +239,12 @@ class RadwagScale:
             time.sleep(0.5)
             return random.uniform(2.5, 2.7)
 
-    def beep_scale(self):
+    def beep_scale(self) -> None:
+        """Cause scale to beep."""
         self._scale.write("BP 500\r\n".encode("utf-8"))
 
-    """These commands open or close the evaporation trap lid"""
-
-    def open_lid(self):
+    def open_lid(self) -> None:
+        """Open the evaporation trap lid."""
         if not self.simulate:
             self._scale.flushInput()
             time.sleep(self._time_delay)
@@ -263,7 +271,8 @@ class RadwagScale:
         else:
             print("LID OPENED")
 
-    def close_lid(self):
+    def close_lid(self) -> None:
+        """Close the evaporation trap lid."""
         if not self.simulate:
             self._scale.flushInput()
             time.sleep(self._time_delay)
@@ -290,16 +299,14 @@ class RadwagScale:
         else:
             print("LID CLOSED")
 
-    """These commands open or close the glass enclosure door on the right side"""
-
-    def open_chamber(self):
+    def open_chamber(self) -> None:
+        """Open the glass enclosure door on the right side."""
         self._scale.flush()
         self._scale.flushInput()
         self._scale.flushOutput()
         self._scale.write("OD\r\n".encode("utf-8"))
         time.sleep(2)
         condition = True
-        count = 0
         while condition:
             response = self._scale.readline().decode("utf-8")
             print(response)
@@ -318,7 +325,8 @@ class RadwagScale:
             else:
                 raise Exception("Incorrect option {}".format(response))
 
-    def close_chamber(self):
+    def close_chamber(self) -> None:
+        """Close the glass enclosure door on the right side."""
         self._scale.flush()
         self._scale.flushInput()
         self._scale.flushOutput()
@@ -343,8 +351,9 @@ class RadwagScale:
             else:
                 raise Exception("Incorrect option {}".format(response))
 
-    def checkLidStatus(self):
-        if self._location is "NY":
+    def checkLidStatus(self) -> str:
+        """Check the lid status."""
+        if self._location == "NY":
             res = "CCOK OCOK"
             return res
         self._limit_sensor.flush()
@@ -354,8 +363,9 @@ class RadwagScale:
         # print(res)
         return res
 
-    def profile_mode(self, mode_string):
-        """
+    def profile_mode(self, mode_string: str) -> None:
+        """Set the profile mode.
+
         There are four different profiles the user can choose from
         Fast, Fast dosing, Precision, and User. The input string needs to have
         the first letter of the word captial.
@@ -376,21 +386,20 @@ class RadwagScale:
             response = "PROFILE OK\r\n"
             print(" Profile set: ", mode_string, response)
 
-    """strip outliners"""
-
-    def strip_outliners(self, masses):
+    def strip_outliners(self, masses: List[float]) -> List[float]:
+        """Strip outliners."""
         rounded_masses = [round(mass) for mass in masses]
         mode_mass = mode(rounded_masses)
         outliers_stripped = [mass for mass in masses if abs(mass - mode_mass) < 1]
         return outliers_stripped
 
-    def get_serial_number(self):
+    def get_serial_number(self) -> str:
+        """Get the device serial number."""
         if not self.simulate:
             self._scale.flush()
             self._scale.flushInput()
             self._scale.flushOutput()
             self._scale.write("NB\r\n".encode("utf-8"))
-            condition = True
             response = self._scale.readline().decode("utf-8").strip()
             response = response.replace('"', "")
             response = response.replace(" ", "-")
@@ -399,7 +408,8 @@ class RadwagScale:
             response = "NB-01-00101"
             return response
 
-    def tare_scale(self):
+    def tare_scale(self) -> None:
+        """Tare the scale."""
         if not self.simulate:
             self._scale.flush()
             self._scale.flushInput()
@@ -409,7 +419,8 @@ class RadwagScale:
         else:
             print("SCALE HAS BEEN TARE")
 
-    def disable_internal_adjustment(self):
+    def disable_internal_adjustment(self) -> None:
+        """Disable internal adjustments."""
         if not self.simulate:
             self._scale.flush()
             self._scale.flushInput()

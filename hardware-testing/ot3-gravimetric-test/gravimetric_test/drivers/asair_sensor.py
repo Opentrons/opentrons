@@ -1,17 +1,20 @@
-"""
-This libary is for the temperature and humidity sensor used with the
+"""Asair sensor driver.
+
+This libray is for the temperature and humidity sensor used with the
 pipette gravimetric fixture. The sensor outputs temperature and
 relative humidity that is recorded onto the pipette results.
-
 """
 
-import os, time
+import codecs
+import csv
+import os
+import random
+import time
+from datetime import datetime
+from typing import Tuple
+
 import serial  # type: ignore[import]
 from serial.serialutil import SerialException  # type: ignore[import]
-from datetime import datetime
-import csv
-import codecs
-import random
 
 addrs = {
     "01": "C40B",
@@ -28,12 +31,20 @@ addrs = {
 
 
 class AsairSensorError(Exception):
+    """Asair sensor error."""
+
     def __init__(self, ret_code: str = None) -> None:
-        super().__init__()
+        """Constructor."""
+        super().__init__(ret_code)
 
 
 class AsairSensor:
-    def __init__(self, port="/dev/ttyUSB0", baudrate=9600, timeout=5):
+    """Asair sensor driver."""
+
+    def __init__(
+        self, port: str = "/dev/ttyUSB0", baudrate: int = 9600, timeout: float = 5
+    ) -> None:
+        """Constructor."""
         self.port = port
         self.baudrate = baudrate
         self.timeout = timeout
@@ -43,15 +54,16 @@ class AsairSensor:
         self.simulate = False
         self._th_sensor = None
 
-    def connect(self):
+    def connect(self) -> None:
+        """Connect to sensor."""
         if self.simulate:
             print("Virtual Temp sensor Port Connected")
         else:
             print("TH Sensor Connection established: ", self.port)
             self._connect_to_port()
 
-    def _connect_to_port(self):
-        """Allows you to connect to a virtual port or port"""
+    def _connect_to_port(self) -> None:
+        """Allows you to connect to a virtual port or port."""
         try:
             self._th_sensor = serial.Serial(
                 port=self.port,
@@ -67,7 +79,8 @@ class AsairSensor:
             error_msg += "2. CHeck if the assigned port is correct. \n"
             raise SerialException(error_msg)
 
-    def get_reading(self):
+    def get_reading(self) -> Tuple[float, float]:
+        """Get a reading."""
         if not self.simulate:
             data_packet = "{}0300000002{}".format(
                 self.sensor_addr, addrs[self.sensor_addr]
@@ -119,12 +132,12 @@ if __name__ == "__main__":
         # make a dir
         ##########################################
         D = datetime.now().strftime("%y-%m-%d")
-        if not os.path.exists("./" + D):
-            os.makedirs("./" + D)
+        folder_name = os.path.join(".", D)
+        if not os.path.exists(folder_name):
+            os.makedirs(folder_name)
         ##########################################
         # compile csv file
         ##########################################
-        folder_name = ".\{}".format(D)
         file_name = folder_name + ".csv"
         hours = os.listdir(folder_name)
         print(hours)

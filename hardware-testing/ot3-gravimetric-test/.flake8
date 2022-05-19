@@ -2,7 +2,7 @@
 
 # set line-length for future black support
 # https://github.com/psf/black/blob/master/docs/compatible_configs.md
-max-line-length = 88
+max-line-length = 100
 
 # max cyclomatic complexity
 max-complexity = 9
