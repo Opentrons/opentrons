@@ -18,6 +18,7 @@ import { Divider } from '../../atoms/structure'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../RunTimeControl/hooks'
+import { RUN_LOG_WINDOW_SIZE } from './constants'
 import { DownloadRunLogToast } from './DownloadRunLogToast'
 import type { Run } from '@opentrons/api-client'
 
@@ -44,7 +45,7 @@ export function HistoricalProtocolRunOverflowMenu(
 
   const commands = useAllCommandsQuery(
     runId,
-    { cursor: 0, pageLength: 1 },
+    { cursor: 0, pageLength: RUN_LOG_WINDOW_SIZE },
     { staleTime: Infinity }
   )
   const runTotalCommandCount = commands?.data?.meta?.totalLength
