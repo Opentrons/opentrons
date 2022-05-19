@@ -40,12 +40,12 @@ from .deactivate_shaker import (
     DeactivateShakerCommandType,
 )
 
-from .open_latch import (
-    OpenLatch,
-    OpenLatchCreate,
-    OpenLatchParams,
-    OpenLatchResult,
-    OpenLatchCommandType,
+from .open_labware_latch import (
+    OpenLabwareLatch,
+    OpenLabwareLatchCreate,
+    OpenLabwareLatchParams,
+    OpenLabwareLatchResult,
+    OpenLabwareLatchCommandType,
 )
 
 from .close_latch import (
@@ -87,12 +87,12 @@ __all__ = [
     "DeactivateShakerParams",
     "DeactivateShakerResult",
     "DeactivateShakerCommandType",
-    # heaterShakerModule/openLatch
-    "OpenLatch",
-    "OpenLatchCreate",
-    "OpenLatchParams",
-    "OpenLatchResult",
-    "OpenLatchCommandType",
+    # heaterShakerModule/openLabwareLatch
+    "OpenLabwareLatch",
+    "OpenLabwareLatchCreate",
+    "OpenLabwareLatchParams",
+    "OpenLabwareLatchResult",
+    "OpenLabwareLatchCommandType",
     # heaterShakerModule/closeLatch
     "CloseLatch",
     "CloseLatchCreate",

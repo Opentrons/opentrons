@@ -20,7 +20,7 @@ StatelessCommandCreate = Union[
     commands.heater_shaker.SetAndWaitForShakeSpeedCreate,
     commands.heater_shaker.DeactivateHeaterCreate,
     commands.heater_shaker.DeactivateShakerCreate,
-    commands.heater_shaker.OpenLatchCreate,
+    commands.heater_shaker.OpenLabwareLatchCreate,
     commands.heater_shaker.CloseLatchCreate,
 ]
 
@@ -42,6 +42,6 @@ StatelessCommand = Union[
     commands.heater_shaker.SetAndWaitForShakeSpeed,
     commands.heater_shaker.DeactivateHeater,
     commands.heater_shaker.DeactivateShaker,
-    commands.heater_shaker.OpenLatch,
+    commands.heater_shaker.OpenLabwareLatch,
     commands.heater_shaker.CloseLatch,
 ]

@@ -1,4 +1,4 @@
-"""Test Heater Shaker open latch command implementation."""
+"""Test Heater Shaker open labware latch command implementation."""
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import HeaterShaker
@@ -10,19 +10,19 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
-from opentrons.protocol_engine.commands.heater_shaker.open_latch import (
-    OpenLatchImpl,
+from opentrons.protocol_engine.commands.heater_shaker.open_labware_latch import (
+    OpenLabwareLatchImpl,
 )
 
 
-async def test_open_latch(
+async def test_open_labware_latch(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
 ) -> None:
     """It should be able to open the module's labware latch."""
-    subject = OpenLatchImpl(state_view=state_view, equipment=equipment)
-    data = heater_shaker.OpenLatchParams(moduleId="input-heater-shaker-id")
+    subject = OpenLabwareLatchImpl(state_view=state_view, equipment=equipment)
+    data = heater_shaker.OpenLabwareLatchParams(moduleId="input-heater-shaker-id")
 
     hs_module_substate = decoy.mock(cls=HeaterShakerModuleSubState)
     hs_hardware = decoy.mock(cls=HeaterShaker)
@@ -44,4 +44,4 @@ async def test_open_latch(
 
     result = await subject.execute(data)
     decoy.verify(await hs_hardware.open_labware_latch(), times=1)
-    assert result == heater_shaker.OpenLatchResult()
+    assert result == heater_shaker.OpenLabwareLatchResult()
