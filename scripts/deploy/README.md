@@ -20,7 +20,7 @@ Before running any of these scripts, the release in question must be tagged and 
 This process is still manual. Check out the commit you would like to release, and:
 
 ```shell
-git tag -a ${name}@${version} -m 'chore(release): ${name} ${version}
+git tag -a ${name}@${version} -m 'chore(release): ${name} ${version}'
 git push --tags
 ```
 
