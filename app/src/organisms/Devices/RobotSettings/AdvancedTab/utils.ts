@@ -8,5 +8,9 @@ export const checkIsRobotBusy = (
   // check robot is busy or there is a session => not allow to change the setting
   const data =
     allSessionsQueryResponse.data != null ? allSessionsQueryResponse.data : {}
-  return !(!isRobotBusy && Object.keys(data).length !== 0)
+  if (isRobotBusy || Object.keys(data).length !== 0) {
+    return true
+  } else {
+    return false
+  }
 }
