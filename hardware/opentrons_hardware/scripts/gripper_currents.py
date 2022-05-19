@@ -95,7 +95,7 @@ async def run_test(messenger: CanMessenger) -> None:
 
             input(in_green("Press Enter to grip...\n"))
 
-            await grip(messenger, 0, 0, 0, 0)
+            await grip(messenger, 0, 0, 0, 0, 0)
             await execute_move(messenger)
 
             input(in_green("Press Enter to release...\n"))
