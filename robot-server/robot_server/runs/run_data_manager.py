@@ -204,7 +204,7 @@ class RunDataManager:
             )
         else:
             state_summary = self._engine_store.engine.state_view.get_summary()
-            run_resource = self._run_store.get(run_id=run_id)
+            run_resource = self._run_store.get(run_id)
 
         return _build_run(
             run_resource=run_resource,
