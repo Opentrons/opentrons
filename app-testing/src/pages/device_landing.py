@@ -4,6 +4,7 @@ from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.common.action_chains import ActionChains
 
 from src.driver.base import Base, Element
 
@@ -358,7 +359,7 @@ class DeviceLanding:
             ),
             "Button to Proceed to setup for set up run page.'",
         )
-        self.base.clickable_wrapper(button, 10)
+        self.base.click(button)
 
     def click_clear_protocol_button(self) -> None:
         button: Element = Element(
@@ -373,12 +374,12 @@ class DeviceLanding:
     def click_run_protocol_robot_landing_overflow_button(self) -> None:
         button: Element = Element(
             (
-                By.XPATH,
-                "//div[@data-testid='RobotCard_opentrons-dev_overflowMenu']//div//button",
+                By.ID,
+                "RobotStatusBanner_opentrons-dev_goToRun",
             ),
             "Button to select run protocol from robot landing overflow menu.'",
         )
-        self.base.clickable_wrapper(button, 5)
+        self.base.click(button)
 
     def click_mag_engage_height(self, module_serial: str) -> None:
         button: Element = Element(
