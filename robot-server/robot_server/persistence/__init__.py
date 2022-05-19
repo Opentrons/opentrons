@@ -69,6 +69,15 @@ def get_sql_engine(
     # https://github.com/tiangolo/fastapi/issues/617
 
 
+# FastAPI dependecy to reset_db
+# should depnd on the persistance directory
+# using Path for removing the file
+# Clear on next rebot static var
+# on boot if a file exist delete old file
+# to the depens file the returns the db file
+# delete the containing folder and then recreating it
+# acceptence test - factory reset http.
+# reboot and then check if its empty
 def reset_db() -> None:
     raise NotImplementedError()
 
