@@ -75,6 +75,7 @@ MessageDefinition = Union[
     defs.TipActionResponse,
     defs.PeripheralStatusRequest,
     defs.PeripheralStatusResponse,
+    defs.SetSerialNumber,
 ]
 
 

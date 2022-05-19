@@ -357,7 +357,7 @@ The ``mix`` command takes up to three arguments: ``mix(repetitions, volume, loca
 .. code-block:: python
 
     # mix 4 times, 100uL, in plate:A2
-    pipette.mix(4, 100, plate.['A2'])
+    pipette.mix(4, 100, plate['A2'])
     # mix 3 times, 50uL, in current location
     pipette.mix(3, 50)
     # mix 2 times, pipette's max volume, in current location
