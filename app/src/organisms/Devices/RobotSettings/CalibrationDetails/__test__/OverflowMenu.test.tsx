@@ -90,6 +90,7 @@ describe('OverflowMenu', () => {
   it('should call pipette offset calibration when clicking calibrate button', () => {
     const startCalibration = jest.fn()
     mockUseCalibratePipetteOffset.mockReturnValue([startCalibration, null])
+    mockUseCurrentRunId.mockReturnValue(null)
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
@@ -133,6 +134,7 @@ describe('OverflowMenu', () => {
       ...props,
       calType: 'tipLength',
     }
+    mockUseCurrentRunId.mockReturnValue(null)
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
@@ -143,12 +145,27 @@ describe('OverflowMenu', () => {
     expect(startCalibration).toHaveBeenCalled()
   })
 
-  it('should check robot status when clicking the toggle button', () => {
-    const [{ getByRole }] = render()
-    const toggleButton = getByRole('switch', {
-      name: 'short_trash_bin',
-    })
-    fireEvent.click(toggleButton)
+  it('should call update robot status if a robot is busy - pipette offset', () => {
+    const [{ getByText, getByLabelText }] = render(props)
+    const button = getByLabelText('CalibrationOverflowMenu_button')
+    fireEvent.click(button)
+    const calibrationButton = getByText('Recalibrate Pipette Offset')
+    fireEvent.click(calibrationButton)
+    expect(mockUpdateRobotStatus).toHaveBeenCalled()
+  })
+
+  it('should call update robot status if a robot is busy - tip length', () => {
+    props = {
+      ...props,
+      calType: 'tipLength',
+    }
+    const [{ getByText, getByLabelText }] = render(props)
+    const button = getByLabelText('CalibrationOverflowMenu_button')
+    fireEvent.click(button)
+    const calibrationButton = getByText(
+      'Recalibrate Tip Length and Pipette Offset'
+    )
+    fireEvent.click(calibrationButton)
     expect(mockUpdateRobotStatus).toHaveBeenCalled()
   })
 })
