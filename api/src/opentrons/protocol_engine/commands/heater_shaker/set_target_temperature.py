@@ -12,25 +12,25 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 
-StartSetTargetTemperatureCommandType = Literal[
-    "heaterShakerModule/startSetTargetTemperature"
+SetTargetTemperatureCommandType = Literal[
+    "heaterShakerModule/setTargetTemperature"
 ]
 
 
-class StartSetTargetTemperatureParams(BaseModel):
+class SetTargetTemperatureParams(BaseModel):
     """Input parameters to set a Heater-Shaker's target temperature."""
 
     moduleId: str = Field(..., description="Unique ID of the Heater-Shaker Module.")
-    temperature: float = Field(..., description="Target temperature in °C.")
+    celsius: float = Field(..., description="Target temperature in °C.")
 
 
-class StartSetTargetTemperatureResult(BaseModel):
+class SetTargetTemperatureResult(BaseModel):
     """Result data from setting a Heater-Shaker's target temperature."""
 
 
-class StartSetTargetTemperatureImpl(
+class SetTargetTemperatureImpl(
     AbstractCommandImpl[
-        StartSetTargetTemperatureParams, StartSetTargetTemperatureResult
+        SetTargetTemperatureParams, SetTargetTemperatureResult
     ]
 ):
     """Execution implementation of a Heater-Shaker's set temperature command."""
@@ -46,8 +46,8 @@ class StartSetTargetTemperatureImpl(
 
     async def execute(
         self,
-        params: StartSetTargetTemperatureParams,
-    ) -> StartSetTargetTemperatureResult:
+        params: SetTargetTemperatureParams,
+    ) -> SetTargetTemperatureResult:
         """Set a Heater-Shaker's target temperature."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
@@ -56,7 +56,7 @@ class StartSetTargetTemperatureImpl(
 
         # Verify temperature from hs module view
         validated_temp = hs_module_substate.validate_target_temperature(
-            params.temperature
+            params.celsius
         )
 
         # Allow propagation of ModuleNotAttachedError.
@@ -67,31 +67,31 @@ class StartSetTargetTemperatureImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.start_set_temperature(validated_temp)
 
-        return StartSetTargetTemperatureResult()
+        return SetTargetTemperatureResult()
 
 
-class StartSetTargetTemperature(
-    BaseCommand[StartSetTargetTemperatureParams, StartSetTargetTemperatureResult]
+class SetTargetTemperature(
+    BaseCommand[SetTargetTemperatureParams, SetTargetTemperatureResult]
 ):
     """A command to set a Heater-Shaker's target temperature."""
 
-    commandType: StartSetTargetTemperatureCommandType = (
-        "heaterShakerModule/startSetTargetTemperature"
+    commandType: SetTargetTemperatureCommandType = (
+        "heaterShakerModule/setTargetTemperature"
     )
-    params: StartSetTargetTemperatureParams
-    result: Optional[StartSetTargetTemperatureResult]
+    params: SetTargetTemperatureParams
+    result: Optional[SetTargetTemperatureResult]
 
     _ImplementationCls: Type[
-        StartSetTargetTemperatureImpl
-    ] = StartSetTargetTemperatureImpl
+        SetTargetTemperatureImpl
+    ] = SetTargetTemperatureImpl
 
 
-class StartSetTargetTemperatureCreate(
-    BaseCommandCreate[StartSetTargetTemperatureParams]
+class SetTargetTemperatureCreate(
+    BaseCommandCreate[SetTargetTemperatureParams]
 ):
     """A request to create a Heater-Shaker's set temperature command."""
 
-    commandType: StartSetTargetTemperatureCommandType
-    params: StartSetTargetTemperatureParams
+    commandType: SetTargetTemperatureCommandType
+    params: SetTargetTemperatureParams
 
-    _CommandCls: Type[StartSetTargetTemperature] = StartSetTargetTemperature
+    _CommandCls: Type[SetTargetTemperature] = SetTargetTemperature

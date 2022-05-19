@@ -8,12 +8,12 @@ from .await_temperature import (
     AwaitTemperatureCommandType,
 )
 
-from .start_set_target_temperature import (
-    StartSetTargetTemperature,
-    StartSetTargetTemperatureCreate,
-    StartSetTargetTemperatureParams,
-    StartSetTargetTemperatureResult,
-    StartSetTargetTemperatureCommandType,
+from .set_target_temperature import (
+    SetTargetTemperature,
+    SetTargetTemperatureCreate,
+    SetTargetTemperatureParams,
+    SetTargetTemperatureResult,
+    SetTargetTemperatureCommandType,
 )
 
 from .deactivate_heater import (
@@ -63,12 +63,12 @@ __all__ = [
     "AwaitTemperatureParams",
     "AwaitTemperatureResult",
     "AwaitTemperatureCommandType",
-    # heaterShakerModule/startSetTargetTemperature
-    "StartSetTargetTemperature",
-    "StartSetTargetTemperatureCreate",
-    "StartSetTargetTemperatureParams",
-    "StartSetTargetTemperatureResult",
-    "StartSetTargetTemperatureCommandType",
+    # heaterShakerModule/setTargetTemperature
+    "SetTargetTemperature",
+    "SetTargetTemperatureCreate",
+    "SetTargetTemperatureParams",
+    "SetTargetTemperatureResult",
+    "SetTargetTemperatureCommandType",
     # heaterShakerModule/deactivateHeater
     "DeactivateHeater",
     "DeactivateHeaterCreate",

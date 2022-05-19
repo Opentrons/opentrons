@@ -184,11 +184,11 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
             definition=heater_shaker_v1_def,
         ),
     )
-    set_temp_cmd = hs_commands.StartSetTargetTemperature.construct(  # type: ignore[call-arg]  # noqa: E501
-        params=hs_commands.StartSetTargetTemperatureParams(
-            moduleId="module-id", temperature=42
+    set_temp_cmd = hs_commands.SetTargetTemperature.construct(  # type: ignore[call-arg]  # noqa: E501
+        params=hs_commands.SetTargetTemperatureParams(
+            moduleId="module-id", celsius=42
         ),
-        result=hs_commands.StartSetTargetTemperatureResult(),
+        result=hs_commands.SetTargetTemperatureResult(),
     )
     deactivate_cmd = hs_commands.DeactivateHeater.construct(  # type: ignore[call-arg]
         params=hs_commands.DeactivateHeaterParams(moduleId="module-id"),
