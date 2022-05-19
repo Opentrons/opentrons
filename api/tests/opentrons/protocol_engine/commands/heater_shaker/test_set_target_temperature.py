@@ -15,7 +15,7 @@ from opentrons.protocol_engine.commands.heater_shaker.set_target_temperature imp
 )
 
 
-async def test_start_set_target_temperature(
+async def test_set_target_temperature(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,

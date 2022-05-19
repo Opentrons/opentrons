@@ -12,9 +12,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 
-SetTargetTemperatureCommandType = Literal[
-    "heaterShakerModule/setTargetTemperature"
-]
+SetTargetTemperatureCommandType = Literal["heaterShakerModule/setTargetTemperature"]
 
 
 class SetTargetTemperatureParams(BaseModel):
@@ -29,9 +27,7 @@ class SetTargetTemperatureResult(BaseModel):
 
 
 class SetTargetTemperatureImpl(
-    AbstractCommandImpl[
-        SetTargetTemperatureParams, SetTargetTemperatureResult
-    ]
+    AbstractCommandImpl[SetTargetTemperatureParams, SetTargetTemperatureResult]
 ):
     """Execution implementation of a Heater-Shaker's set temperature command."""
 
@@ -55,9 +51,7 @@ class SetTargetTemperatureImpl(
         )
 
         # Verify temperature from hs module view
-        validated_temp = hs_module_substate.validate_target_temperature(
-            params.celsius
-        )
+        validated_temp = hs_module_substate.validate_target_temperature(params.celsius)
 
         # Allow propagation of ModuleNotAttachedError.
         hs_hardware_module = self._equipment.get_module_hardware_api(
@@ -81,14 +75,10 @@ class SetTargetTemperature(
     params: SetTargetTemperatureParams
     result: Optional[SetTargetTemperatureResult]
 
-    _ImplementationCls: Type[
-        SetTargetTemperatureImpl
-    ] = SetTargetTemperatureImpl
+    _ImplementationCls: Type[SetTargetTemperatureImpl] = SetTargetTemperatureImpl
 
 
-class SetTargetTemperatureCreate(
-    BaseCommandCreate[SetTargetTemperatureParams]
-):
+class SetTargetTemperatureCreate(BaseCommandCreate[SetTargetTemperatureParams]):
     """A request to create a Heater-Shaker's set temperature command."""
 
     commandType: SetTargetTemperatureCommandType
