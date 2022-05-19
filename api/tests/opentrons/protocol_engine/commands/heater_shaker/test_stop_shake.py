@@ -1,4 +1,4 @@
-"""Test Heater Shaker stop shake command implementation."""
+"""Test Heater Shaker deactivate shake command implementation."""
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import HeaterShaker
@@ -11,18 +11,18 @@ from opentrons.protocol_engine.state.module_substates import (
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
 from opentrons.protocol_engine.commands.heater_shaker.stop_shake import (
-    StopShakeImpl,
+    DeactivateShakerImpl,
 )
 
 
-async def test_stop_shake(
+async def test_deactivate_shaker(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
 ) -> None:
-    """It should be able to stop the module's shake."""
-    subject = StopShakeImpl(state_view=state_view, equipment=equipment)
-    data = heater_shaker.StopShakeParams(moduleId="input-heater-shaker-id")
+    """It should be able to deactivate the module's shake."""
+    subject = DeactivateShakerImpl(state_view=state_view, equipment=equipment)
+    data = heater_shaker.DeactivateShakerParams(moduleId="input-heater-shaker-id")
 
     hs_module_substate = decoy.mock(cls=HeaterShakerModuleSubState)
     hs_hardware = decoy.mock(cls=HeaterShaker)
@@ -44,17 +44,17 @@ async def test_stop_shake(
 
     result = await subject.execute(data)
     decoy.verify(await hs_hardware.set_speed(rpm=0), times=1)
-    assert result == heater_shaker.StopShakeResult()
+    assert result == heater_shaker.DeactivateShakerResult()
 
 
-async def test_stop_shake_virtual(
+async def test_deactivate_shake_virtual(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
 ) -> None:
-    """It should be able to stop the module's shake."""
-    subject = StopShakeImpl(state_view=state_view, equipment=equipment)
-    data = heater_shaker.StopShakeParams(moduleId="input-heater-shaker-id")
+    """It should be able to deactivate the module's shake."""
+    subject = DeactivateShakerImpl(state_view=state_view, equipment=equipment)
+    data = heater_shaker.DeactivateShakerParams(moduleId="input-heater-shaker-id")
 
     hs_module_substate = decoy.mock(cls=HeaterShakerModuleSubState)
 
@@ -74,4 +74,4 @@ async def test_stop_shake_virtual(
     ).then_return(None)
 
     result = await subject.execute(data)
-    assert result == heater_shaker.StopShakeResult()
+    assert result == heater_shaker.DeactivateShakerResult()

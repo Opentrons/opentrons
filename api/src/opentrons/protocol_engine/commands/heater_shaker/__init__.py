@@ -33,11 +33,11 @@ from .set_and_wait_for_shake_speed import (
 )
 
 from .stop_shake import (
-    StopShake,
-    StopShakeCreate,
-    StopShakeParams,
-    StopShakeResult,
-    StopShakeCommandType,
+    DeactivateShaker,
+    DeactivateShakerCreate,
+    DeactivateShakerParams,
+    DeactivateShakerResult,
+    DeactivateShakerCommandType,
 )
 
 from .open_latch import (
@@ -81,12 +81,12 @@ __all__ = [
     "SetAndWaitForShakeSpeedParams",
     "SetAndWaitForShakeSpeedResult",
     "SetAndWaitForShakeSpeedCommandType",
-    # heaterShakerModule/stopShake
-    "StopShake",
-    "StopShakeCreate",
-    "StopShakeParams",
-    "StopShakeResult",
-    "StopShakeCommandType",
+    # heaterShakerModule/deactivateShaker
+    "DeactivateShaker",
+    "DeactivateShakerCreate",
+    "DeactivateShakerParams",
+    "DeactivateShakerResult",
+    "DeactivateShakerCommandType",
     # heaterShakerModule/openLatch
     "OpenLatch",
     "OpenLatchCreate",

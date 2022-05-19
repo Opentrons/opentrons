@@ -1,4 +1,4 @@
-"""Command models to stop shaking the Heater-Shaker Module."""
+"""Command models to deactivate shaker for the Heater-Shaker Module."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type
@@ -11,21 +11,21 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-StopShakeCommandType = Literal["heaterShakerModule/stopShake"]
+DeactivateShakerCommandType = Literal["heaterShakerModule/deactivateShaker"]
 
 
-class StopShakeParams(BaseModel):
-    """Input parameters to stop shaking a Heater-Shaker Module."""
+class DeactivateShakerParams(BaseModel):
+    """Input parameters to deactivate shaker for a Heater-Shaker Module."""
 
     moduleId: str = Field(..., description="Unique ID of the Heater-Shaker Module.")
 
 
-class StopShakeResult(BaseModel):
-    """Result data from stopping a Heater-Shaker's shake."""
+class DeactivateShakerResult(BaseModel):
+    """Result data from deactivating shaker for a Heater-Shaker."""
 
 
-class StopShakeImpl(AbstractCommandImpl[StopShakeParams, StopShakeResult]):
-    """Execution implementation of a Heater-Shaker's stop shake command."""
+class DeactivateShakerImpl(AbstractCommandImpl[DeactivateShakerParams, DeactivateShakerResult]):
+    """Execution implementation of a Heater-Shaker's deactivate shaker command."""
 
     def __init__(
         self,
@@ -36,8 +36,8 @@ class StopShakeImpl(AbstractCommandImpl[StopShakeParams, StopShakeResult]):
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(self, params: StopShakeParams) -> StopShakeResult:
-        """Stop a Heater-Shaker's shake."""
+    async def execute(self, params: DeactivateShakerParams) -> DeactivateShakerResult:
+        """Deactivate shaker for a Heater-Shaker."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
             module_id=params.moduleId
@@ -51,23 +51,23 @@ class StopShakeImpl(AbstractCommandImpl[StopShakeParams, StopShakeResult]):
         if hs_hardware_module is not None:
             await hs_hardware_module.set_speed(rpm=0)
 
-        return StopShakeResult()
+        return DeactivateShakerResult()
 
 
-class StopShake(BaseCommand[StopShakeParams, StopShakeResult]):
-    """A command to stop a Heater-Shaker's shake."""
+class DeactivateShaker(BaseCommand[DeactivateShakerParams, DeactivateShakerResult]):
+    """A command to deactivate shaker for a Heater-Shaker."""
 
-    commandType: StopShakeCommandType = "heaterShakerModule/stopShake"
-    params: StopShakeParams
-    result: Optional[StopShakeResult]
+    commandType: DeactivateShakerCommandType = "heaterShakerModule/deactivateShaker"
+    params: DeactivateShakerParams
+    result: Optional[DeactivateShakerResult]
 
-    _ImplementationCls: Type[StopShakeImpl] = StopShakeImpl
+    _ImplementationCls: Type[DeactivateShakerImpl] = DeactivateShakerImpl
 
 
-class StopShakeCreate(BaseCommandCreate[StopShakeParams]):
-    """A request to create a Heater-Shaker's stop shake command."""
+class DeactivateShakerCreate(BaseCommandCreate[DeactivateShakerParams]):
+    """A request to create a Heater-Shaker's deactivate shaker command."""
 
-    commandType: StopShakeCommandType
-    params: StopShakeParams
+    commandType: DeactivateShakerCommandType
+    params: DeactivateShakerParams
 
-    _CommandCls: Type[StopShake] = StopShake
+    _CommandCls: Type[DeactivateShaker] = DeactivateShaker
