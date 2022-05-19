@@ -42,6 +42,7 @@ import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffs
 import { TipLengthCalibrationItems } from '../CalibrationDetails/TipLengthCalibrationItems'
 
 import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
+import type { Sessions } from '@opentrons/api-client'
 
 jest.mock('file-saver')
 jest.mock('@opentrons/react-api-client')
