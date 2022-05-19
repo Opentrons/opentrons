@@ -96,8 +96,3 @@ push-no-restart: sdist Pipfile.lock
 .PHONY: push
 push-ot3: push-no-restart
 	$(call restart-server,$(host),,$(ssh_opts),"opentrons-robot-server")
-
-
-.PHONY: deploy
-deploy: wheel
-	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file))
