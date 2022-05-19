@@ -462,6 +462,7 @@ export function RobotSettingsCalibration({
               <PipetteOffsetCalibrationItems
                 robotName={robotName}
                 formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
+                updateRobotStatus={updateRobotStatus}
               />
             ) : (
               <StyledText as="label">{t('not_calibrated')}</StyledText>
@@ -485,6 +486,7 @@ export function RobotSettingsCalibration({
                 robotName={robotName}
                 formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
                 formattedTipLengthCalibrations={formatTipLengthCalibrations()}
+                updateRobotStatus={updateRobotStatus}
               />
             ) : (
               <StyledText as="label">{t('not_calibrated')}</StyledText>
