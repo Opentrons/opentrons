@@ -95,7 +95,6 @@ export const routes: RouteProps[] = [
 const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
 export const AppComponent = (): JSX.Element => {
-
   return (
     <>
       <GlobalStyle />
@@ -107,31 +106,31 @@ export const AppComponent = (): JSX.Element => {
         onDragOver={stopEvent}
         onDrop={stopEvent}
       >
-            <TopPortalRoot />
-            <Navbar routes={routes} />
-            <Box width="100%">
-              <Switch>
-                {routes.map(({ Component, exact, path }: RouteProps) => {
-                  return (
-                    <Route key={path} exact={exact} path={path}>
-                      <Breadcrumbs />
-                      <Box
-                        position={POSITION_RELATIVE}
-                        width="100%"
-                        height="100%"
-                        backgroundColor={COLORS.background}
-                        overflow={OVERFLOW_SCROLL}
-                      >
-                        <ModalPortalRoot />
-                        <Component />
-                      </Box>
-                    </Route>
-                  )
-                })}
-                <Redirect exact from="/" to="/protocols" />
-              </Switch>
-              <Alerts />
-            </Box>
+        <TopPortalRoot />
+        <Navbar routes={routes} />
+        <Box width="100%">
+          <Switch>
+            {routes.map(({ Component, exact, path }: RouteProps) => {
+              return (
+                <Route key={path} exact={exact} path={path}>
+                  <Breadcrumbs />
+                  <Box
+                    position={POSITION_RELATIVE}
+                    width="100%"
+                    height="100%"
+                    backgroundColor={COLORS.background}
+                    overflow={OVERFLOW_SCROLL}
+                  >
+                    <ModalPortalRoot />
+                    <Component />
+                  </Box>
+                </Route>
+              )
+            })}
+            <Redirect exact from="/" to="/protocols" />
+          </Switch>
+          <Alerts />
+        </Box>
       </Flex>
     </>
   )
