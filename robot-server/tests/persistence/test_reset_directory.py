@@ -46,5 +46,8 @@ async def test_delete_persistence_directory(reset_manager: ResetManager, tmp_pat
     assert Path(tmp_path).exists() is False
 
 
-async def test_delete_persistence_directory_directory_not_found(reset_manager: ResetManager, tmp_path: Path) -> None:
-        """Should raise an error that the directory does not exist."""
+async def test_delete_persistence_directory_not_found(reset_manager: ResetManager) -> None:
+    """Should make sure a directory that is not found is caught in OSError."""
+    result = await reset_persistence_directory(Path("/dir-not-found"))
+
+    assert result is False
