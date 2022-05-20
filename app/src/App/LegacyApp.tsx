@@ -10,10 +10,8 @@ import { Alerts } from '../organisms/Alerts'
 
 import { Robots } from '../pages/Robots'
 import { Upload } from '../pages/Upload'
-import { More } from '../pages/More'
 
 import { ConnectPanel } from '../pages/Robots/ConnectPanel'
-import { MorePanel } from '../pages/More/MorePanel'
 
 import { LegacyNavbar } from './LegacyNavbar'
 import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
@@ -31,7 +29,6 @@ export function LegacyApp(): JSX.Element {
       <LegacyNavbar />
       <Switch>
         <Route path="/robots/:name?" component={ConnectPanel} />
-        <Route path="/more" component={MorePanel} />
       </Switch>
       <TopPortalRoot />
       <Box position={POSITION_RELATIVE} width="100%" height="100%">
@@ -39,9 +36,6 @@ export function LegacyApp(): JSX.Element {
         <Switch>
           <Route path="/robots/:name?">
             <Robots />
-          </Route>
-          <Route path="/more">
-            <More />
           </Route>
           <Route path="/upload">
             <Upload />
