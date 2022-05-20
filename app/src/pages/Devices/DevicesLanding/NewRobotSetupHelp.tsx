@@ -33,7 +33,7 @@ export function NewRobotSetupHelp(): JSX.Element {
       >
         {t('see_how_to_setup_new_robot')}
       </Link>
-      <Portal>
+      <Portal level="top">
         {showNewRobotHelpModal ? (
           <Modal
             title={t('how_to_setup_a_robot')}
