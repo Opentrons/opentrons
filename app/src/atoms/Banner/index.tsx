@@ -87,6 +87,7 @@ export function Banner(props: BannerProps): JSX.Element {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
       padding={SPACING.spacing3}
+      onClick={e => e.stopPropagation()}
       data-testid={`Banner_${type}`}
       {...styleProps}
     >

@@ -52,7 +52,6 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
     mostRecentAnalysis,
     modified,
   } = props
-  const history = useHistory()
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
