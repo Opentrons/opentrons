@@ -4,12 +4,12 @@ marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Upload simple, one comment protocol
+  - name: Upload a protocol
     request:
       url: '{host:s}:{port:d}/protocols'
       method: POST
       files:
-        files: 'tests/integration/protocols/simple.py'
+        files: 'tests/integration/protocols/load_one_labware.py'
     response:
       status_code: 201
       save:
@@ -151,7 +151,7 @@ stages:
         data:
           status: succeeded
 
-  - name: Verify commands were run
+  - name: Verify commands succeeded with the expected results
     request:
       url: '{host:s}:{port:d}/runs/{run_id}/commands'
       method: GET
@@ -165,14 +165,48 @@ stages:
         data:
           - id: !anystr
             key: !anystr
-            commandType: custom
+            commandType: loadLabware
             status: succeeded
             params:
-              legacyCommandType: 'command.COMMENT'
-              legacyCommandText: 'A single comment.'
+              location:
+                slotName: '1'
+              loadName: 'biorad_96_wellplate_200ul_pcr'
+              namespace: 'opentrons'
+              version: 1
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
             startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
             completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+      save:
+        json:
+          load_labware_command_id: data[0].id
+
+  - name: Get full details of the load labware command and make sure the offset applied
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/commands/{load_labware_command_id}'
+      method: GET
+    response:
+      json:
+        data:
+          id: '{load_labware_command_id}'
+          key: !anystr
+          commandType: loadLabware
+          status: succeeded
+          params:
+            location:
+              slotName: '1'
+            loadName: 'biorad_96_wellplate_200ul_pcr'
+            namespace: 'opentrons'
+            version: 1
+          result:
+            labwareId: !anystr
+            # Labware definitions are inconveniently verbose to test,
+            # so we just trust that this is correct.
+            definition: !anydict
+            offsetId: '{labware_offset_id}'
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+
 
 # todo(mm, 2022-05-17):
 # - Test command details
