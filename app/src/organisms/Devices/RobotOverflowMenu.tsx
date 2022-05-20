@@ -53,12 +53,15 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
 
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
+    e.stopPropagation()
     setShowChooseProtocolSlideout(true)
     setShowOverflowMenu(!showOverflowMenu)
   }
   const handleClickConnectionTroubleshooting: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
+    e.stopPropagation()
     setShowConnectionTroubleshootingModal(true)
+    setShowOverflowMenu(!showOverflowMenu)
   }
 
   let menuItems: React.ReactNode
@@ -117,7 +120,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
       onClick={e => {
-        e.preventDefault()
+        e.stopPropagation()
       }}
       {...styleProps}
     >

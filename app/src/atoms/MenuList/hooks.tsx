@@ -13,11 +13,13 @@ export function useMenuHandleClickOutside(): MenuHandleClickOutside {
 
   const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
+    e.stopPropagation()
     setShowOverflowMenu(!showOverflowMenu)
   }
 
   const handleClickOutside: React.MouseEventHandler<HTMLDivElement> = e => {
     e.preventDefault()
+    e.stopPropagation()
     setShowOverflowMenu(false)
   }
 
