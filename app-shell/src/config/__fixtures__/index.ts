@@ -118,12 +118,6 @@ export const MOCK_CONFIG_V6: ConfigV6 = {
       isAttached: false,
     },
   },
-  ui: {
-    ...MOCK_CONFIG_V5.ui,
-    width: 800,
-    minWidth: 600,
-    height: 760,
-  },
 }
 
 export const MOCK_CONFIG_V7: ConfigV7 = {
