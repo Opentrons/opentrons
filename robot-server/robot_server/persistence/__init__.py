@@ -25,6 +25,11 @@ _CLEAR_ON_REBOOT = "marked_to_delete.txt"
 _log = logging.getLogger(__name__)
 
 
+async def reset_persistence_directory() -> Path:
+    """Delete dir content if marked to delete."""
+    raise NotImplementedError()
+
+
 async def get_persistence_directory(
     app_state: AppState = Depends(get_app_state),
 ) -> Path:
@@ -84,7 +89,6 @@ class ResetManager:
     @staticmethod
     async def reset_db(persistence_directory: Path) -> None:
         """Reset db file."""
-        # persistence_directory = await get_persistence_directory()
         file_name = Path(persistence_directory, _CLEAR_ON_REBOOT)
         print(file_name)
         try:

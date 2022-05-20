@@ -98,5 +98,5 @@ async def test_test_reset_db(reset_manager: ResetManager, tmp_path: Path) -> Non
     assert Path(tmp_path, _CLEAR_ON_REBOOT).exists() is True
 
 
-async def test_test_reset_db_not_marked() -> None:
-    """Should keep persistance directory if a no file is makred to delete."""
+async def test_delete_persistence_directory() -> None:
+    """Should keep persistence directory if a no file is makred to delete."""
