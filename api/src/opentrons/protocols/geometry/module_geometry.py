@@ -194,24 +194,6 @@ class ModuleGeometry(DeckItem):
     def __repr__(self) -> str:
         return self._display_name
 
-    def has_same_initial_state_as(self, other: object) -> bool:
-        """Check whether this instance has the same initial state as another.
-
-        Verifies if another ModuleGeometry instance was constructed with the same
-        module geometry constants as this instance.
-        """
-        return (
-            isinstance(other, ModuleGeometry)
-            and other._api_version == self._api_version
-            and other._parent == self._parent
-            and other._module_type == self._module_type
-            and other._display_name == self._display_name
-            and other._model == self._model
-            and other._offset == self._offset
-            and other._height == self._height
-            and other._over_labware == self._over_labware
-        )
-
 
 class ThermocyclerGeometry(ModuleGeometry):
     def __init__(

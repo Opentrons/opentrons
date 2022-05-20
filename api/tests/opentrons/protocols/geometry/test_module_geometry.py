@@ -96,7 +96,12 @@ def test_load_module_from_definition(
         parent=Location(point=Point(0, 0, 0), labware=None),
         api_level=api_version,
     )
-    assert load_result.has_same_initial_state_as(expected_geometry)
+    assert load_result.api_version == expected_geometry.api_version
+    assert load_result.parent == expected_geometry.parent
+    assert load_result.module_type == expected_geometry.module_type
+    assert load_result.model == expected_geometry.model
+    assert load_result.labware_offset == expected_geometry.labware_offset
+    assert load_result.highest_z == expected_geometry.highest_z
 
 
 def test_load_module_from_definition_raises(v1_mag_module_schema_v3_definition) -> None:
