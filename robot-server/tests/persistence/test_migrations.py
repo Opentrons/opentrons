@@ -90,7 +90,7 @@ def test_migration(subject: sqlalchemy.engine.Engine) -> None:
 
 async def test_test_reset_db(reset_manager: ResetManager) -> None:
     """Should delete persistance directory if a file makred to delete exists"""
-    await reset_manager.reset_db()
+    await reset_manager.reset_db("/Users/tamarzanzouri/temp_dir/")
 
 
 async def test_test_reset_db_not_marked() -> None:

@@ -82,14 +82,15 @@ class ResetManager:
     """Dependency class to handle robot server reset options."""
 
     @staticmethod
-    async def reset_db() -> None:
+    async def reset_db(persistence_directory: Path) -> None:
         """Reset db file."""
-        persistence_directory = await get_persistence_directory()
-        print(persistence_directory)
-        file_path = f"{persistence_directory}/{_CLEAR_ON_REBOOT}"
+        # persistence_directory = await get_persistence_directory()
+        file_name = Path(persistence_directory, _CLEAR_ON_REBOOT)
+        print(file_name)
         try:
-            open(file_path, mode='x')
-        except OSError:
+            Path(persistence_directory).mkdir(parents=True, exist_ok=True)
+            Path(file_name).open("w")
+        except FileExistsError:
             print ("Could not create file:", file_name)
 
 __all__ = [
