@@ -6,7 +6,7 @@ import {
   renderWithProviders,
 } from '@opentrons/components'
 import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'
-import { ModuleCard } from '../../ModuleCard'
+import { ModuleCard } from '../../../ModuleCard'
 import { useModuleRenderInfoForProtocolById } from '../../hooks'
 import {
   mockMagneticModuleGen2,
@@ -16,7 +16,7 @@ import {
 } from '../../../../redux/modules/__fixtures__'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
-jest.mock('../../ModuleCard')
+jest.mock('../../../ModuleCard')
 jest.mock('../../hooks')
 
 const mockModuleCard = ModuleCard as jest.MockedFunction<typeof ModuleCard>

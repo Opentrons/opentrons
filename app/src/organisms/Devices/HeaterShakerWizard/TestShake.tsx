@@ -20,8 +20,9 @@ import { TertiaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { Divider } from '../../../atoms/structure'
 import { InputField } from '../../../atoms/InputField'
-import { Collapsible } from '../ModuleCard/Collapsible'
-import { useLatchControls } from '../ModuleCard/hooks'
+import { Collapsible } from '../../ModuleCard/Collapsible'
+import { useLatchControls } from '../../ModuleCard/hooks'
+
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'

@@ -6,8 +6,8 @@ import {
   WRAP,
 } from '@opentrons/components'
 import * as React from 'react'
+import { ModuleCard } from '../../ModuleCard'
 import { useModuleRenderInfoForProtocolById } from '../hooks'
-import { ModuleCard } from '../ModuleCard'
 
 interface ProtocolRunModuleControlsProps {
   robotName: string

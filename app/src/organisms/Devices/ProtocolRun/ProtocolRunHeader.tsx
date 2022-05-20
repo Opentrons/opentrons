@@ -59,6 +59,8 @@ import {
   useRunTimestamps,
 } from '../../../organisms/RunTimeControl/hooks'
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
+import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
+import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
 
 import {
   useAttachedModules,
@@ -68,8 +70,6 @@ import {
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
-import { useIsHeaterShakerInProtocol } from '../ModuleCard/hooks'
-import { ConfirmAttachmentModal } from '../ModuleCard/ConfirmAttachmentModal'
 
 import type { Run } from '@opentrons/api-client'
 import type { HeaterShakerModule } from '../../../redux/modules/types'

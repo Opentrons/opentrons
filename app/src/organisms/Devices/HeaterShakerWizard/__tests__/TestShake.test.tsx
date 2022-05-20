@@ -3,7 +3,7 @@ import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
-import { useLatchControls } from '../../ModuleCard/hooks'
+import { useLatchControls } from '../../../ModuleCard/hooks'
 import { TestShake } from '../TestShake'
 import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
@@ -13,7 +13,7 @@ import type { ProtocolModuleInfo } from '../../../Devices/ProtocolRun/utils/getP
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../HeaterShakerModuleCard')
-jest.mock('../../ModuleCard/hooks')
+jest.mock('../../../ModuleCard/hooks')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation

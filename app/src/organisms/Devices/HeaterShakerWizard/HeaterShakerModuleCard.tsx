@@ -14,7 +14,7 @@ import {
   COLORS,
 } from '@opentrons/components'
 import heaterShakerModule from '../../../assets/images/heatershaker_module_transparent.svg'
-import { HeaterShakerModuleData } from '../ModuleCard/HeaterShakerModuleData'
+import { HeaterShakerModuleData } from '../../ModuleCard/HeaterShakerModuleData'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 
