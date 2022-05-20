@@ -176,12 +176,14 @@ class RobotClient:
         run_id: str,
         req_body: Dict[str, object],
         params: Dict[str, Any],
+        timeout_sec: float = 30.0,
     ) -> Response:
         """POST /runs/:run_id/commands."""
         response = await self.httpx_client.post(
             url=f"{self.base_url}/runs/{run_id}/commands",
             json=req_body,
             params=params,
+            timeout=timeout_sec,
         )
         response.raise_for_status()
         return response
@@ -251,5 +253,11 @@ class RobotClient:
             url=f"{self.base_url}/settings/reset",
             json=req_body,
         )
+        response.raise_for_status()
+        return response
+
+    async def get_modules(self) -> Response:
+        """GET /modules."""
+        response = await self.httpx_client.get(url=f"{self.base_url}/modules")
         response.raise_for_status()
         return response
