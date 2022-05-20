@@ -16,7 +16,7 @@ sdist_file = dist/ot3-gravimetric-test-0.0.1-py2.py3-none-any.whl
 # make test tests=tests/opentrons/tools/test_pipette_memory.py would run only the
 # specified test
 tests ?= tests
-cov_opts ?= --cov=opentrons_hardware --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+cov_opts ?= --cov=gravimetric_test --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 test_opts ?=
 
 # Host key location for buildroot robot
@@ -59,11 +59,11 @@ sdist: $(sdist_file)
 
 .PHONY: test
 test:
-	$(pytest) -m $(tests) $(test_opts)
+	$(pytest) $(tests) $(test_opts)
 
 .PHONY: test-cov
 test-cov:
-	$(pytest) -m $(tests) $(test_opts) $(cov_opts)
+	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: lint
 lint:
@@ -73,8 +73,7 @@ lint:
 
 .PHONY: format
 format:
-	$(python) -m black gravimetric_test tests protocols
-
+	$(python) -m black gravimetric_test tests protocols setup.py
 
 .PHONY: push-no-restart
 push-no-restart: sdist Pipfile.lock
