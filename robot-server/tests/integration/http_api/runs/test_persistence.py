@@ -1,4 +1,3 @@
-import asyncio
 from typing import AsyncGenerator, NamedTuple
 
 import anyio
@@ -146,11 +145,11 @@ async def test_run_actions_labware_offsets_persist(
     )
 
     # wait for the action to take effect
-    with anyio.fail_after(10):
+    with anyio.fail_after(5):
         while (await client.get_run(run_id=run_id)).json()["data"][
             "status"
         ] != "stopped":
-            await asyncio.sleep(1)
+            await anyio.sleep(0.1)
 
     # persist the run by setting current: false
     archive_run_response = await client.patch_run(
