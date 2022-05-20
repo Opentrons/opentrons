@@ -98,5 +98,18 @@ async def test_test_reset_db(reset_manager: ResetManager, tmp_path: Path) -> Non
     assert Path(tmp_path, _CLEAR_ON_REBOOT).exists() is True
 
 
+
+async def test_test_reset_db_file_exist(reset_manager: ResetManager, tmp_path: Path) -> None:
+    """Should raise an exception that the file already exists."""
+    assert Path(tmp_path, _CLEAR_ON_REBOOT).exists() is False
+
+    await reset_manager.reset_db(tmp_path)
+
+    assert Path(tmp_path, _CLEAR_ON_REBOOT).exists() is True
+
+    with pytest.raises(FileExistsError):
+        await reset_manager.reset_db(tmp_path)
+
+
 async def test_delete_persistence_directory() -> None:
-    """Should keep persistence directory if a no file is makred to delete."""
+    """Should make sure directory is empty."""
