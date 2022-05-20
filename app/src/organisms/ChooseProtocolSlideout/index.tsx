@@ -96,7 +96,11 @@ export function ChooseProtocolSlideout(
                 commands={storedProtocol.mostRecentAnalysis.commands}
               />
             </Flex>
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <StyledText
+              as="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              css={{ 'word-break': 'break-word' }}
+            >
               {storedProtocol.mostRecentAnalysis?.metadata?.protocolName ??
                 first(storedProtocol.srcFileNames) ??
                 storedProtocol.protocolKey}

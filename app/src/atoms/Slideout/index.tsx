@@ -111,8 +111,8 @@ export const Slideout = (props: Props): JSX.Element | null => {
               marginBottom={SPACING.spacing4}
             >
               <StyledText
-                color={COLORS.darkBlack}
                 as="h2"
+                css={{ 'word-break': 'break-word' }}
                 data-testid={`Slideout_title_${title}`}
               >
                 {title}
@@ -131,7 +131,9 @@ export const Slideout = (props: Props): JSX.Element | null => {
               </Flex>
             </Flex>
           ) : (
-            title
+            <React.Fragment css={{ 'word-wrap': 'break-word' }}>
+              title
+            </React.Fragment>
           )}
           <Divider marginY={0} color={COLORS.medGrey} />
           <Box
