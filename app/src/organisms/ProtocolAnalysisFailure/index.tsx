@@ -36,14 +36,18 @@ export function ProtocolAnalysisFailure(
 
   const handleClickShowDetails: React.MouseEventHandler = e => {
     e.preventDefault()
+    e.stopPropagation()
     setShowErrorDetails(true)
   }
   const handleClickHideDetails: React.MouseEventHandler = e => {
     e.preventDefault()
+    console.log('testing')
+    e.stopPropagation()
     setShowErrorDetails(false)
   }
   const handleClickReanalyze: React.MouseEventHandler = e => {
     e.preventDefault()
+    e.stopPropagation()
     dispatch(analyzeProtocol(protocolKey))
   }
   return (
