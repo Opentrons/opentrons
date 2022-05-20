@@ -57,43 +57,43 @@ from .close_labware_latch import (
 )
 
 __all__ = [
-    # heaterShakerModule/waitForTemperature
+    # heaterShaker/waitForTemperature
     "WaitForTemperature",
     "WaitForTemperatureCreate",
     "WaitForTemperatureParams",
     "WaitForTemperatureResult",
     "WaitForTemperatureCommandType",
-    # heaterShakerModule/setTargetTemperature
+    # heaterShaker/setTargetTemperature
     "SetTargetTemperature",
     "SetTargetTemperatureCreate",
     "SetTargetTemperatureParams",
     "SetTargetTemperatureResult",
     "SetTargetTemperatureCommandType",
-    # heaterShakerModule/deactivateHeater
+    # heaterShaker/deactivateHeater
     "DeactivateHeater",
     "DeactivateHeaterCreate",
     "DeactivateHeaterParams",
     "DeactivateHeaterResult",
     "DeactivateHeaterCommandType",
-    # heaterShakerModule/setAndWaitForShakeSpeed
+    # heaterShaker/setAndWaitForShakeSpeed
     "SetAndWaitForShakeSpeed",
     "SetAndWaitForShakeSpeedCreate",
     "SetAndWaitForShakeSpeedParams",
     "SetAndWaitForShakeSpeedResult",
     "SetAndWaitForShakeSpeedCommandType",
-    # heaterShakerModule/deactivateShaker
+    # heaterShaker/deactivateShaker
     "DeactivateShaker",
     "DeactivateShakerCreate",
     "DeactivateShakerParams",
     "DeactivateShakerResult",
     "DeactivateShakerCommandType",
-    # heaterShakerModule/openLabwareLatch
+    # heaterShaker/openLabwareLatch
     "OpenLabwareLatch",
     "OpenLabwareLatchCreate",
     "OpenLabwareLatchParams",
     "OpenLabwareLatchResult",
     "OpenLabwareLatchCommandType",
-    # heaterShakerModule/closeLabwareLatch
+    # heaterShaker/closeLabwareLatch
     "CloseLabwareLatch",
     "CloseLabwareLatchCreate",
     "CloseLabwareLatchParams",

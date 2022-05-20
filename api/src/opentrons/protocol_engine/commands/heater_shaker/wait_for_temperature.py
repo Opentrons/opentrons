@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 
-WaitForTemperatureCommandType = Literal["heaterShakerModule/waitForTemperature"]
+WaitForTemperatureCommandType = Literal["heaterShaker/waitForTemperature"]
 
 
 class WaitForTemperatureParams(BaseModel):
@@ -64,7 +64,7 @@ class WaitForTemperature(
 ):
     """A command to wait for a Heater-Shaker's target temperature to be reached."""
 
-    commandType: WaitForTemperatureCommandType = "heaterShakerModule/waitForTemperature"
+    commandType: WaitForTemperatureCommandType = "heaterShaker/waitForTemperature"
     params: WaitForTemperatureParams
     result: Optional[WaitForTemperatureResult]
 

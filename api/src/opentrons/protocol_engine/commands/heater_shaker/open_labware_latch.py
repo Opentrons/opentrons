@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-OpenLabwareLatchCommandType = Literal["heaterShakerModule/openLabwareLatch"]
+OpenLabwareLatchCommandType = Literal["heaterShaker/openLabwareLatch"]
 
 
 class OpenLabwareLatchParams(BaseModel):
@@ -24,7 +24,9 @@ class OpenLabwareLatchResult(BaseModel):
     """Result data from opening a Heater-Shaker's labware latch."""
 
 
-class OpenLabwareLatchImpl(AbstractCommandImpl[OpenLabwareLatchParams, OpenLabwareLatchResult]):
+class OpenLabwareLatchImpl(
+    AbstractCommandImpl[OpenLabwareLatchParams, OpenLabwareLatchResult]
+):
     """Execution implementation of a Heater-Shaker's open latch labware command."""
 
     def __init__(
@@ -57,7 +59,7 @@ class OpenLabwareLatchImpl(AbstractCommandImpl[OpenLabwareLatchParams, OpenLabwa
 class OpenLabwareLatch(BaseCommand[OpenLabwareLatchParams, OpenLabwareLatchResult]):
     """A command to open a Heater-Shaker's labware latch."""
 
-    commandType: OpenLabwareLatchCommandType = "heaterShakerModule/openLabwareLatch"
+    commandType: OpenLabwareLatchCommandType = "heaterShaker/openLabwareLatch"
     params: OpenLabwareLatchParams
     result: Optional[OpenLabwareLatchResult]
 

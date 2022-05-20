@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-DeactivateShakerCommandType = Literal["heaterShakerModule/deactivateShaker"]
+DeactivateShakerCommandType = Literal["heaterShaker/deactivateShaker"]
 
 
 class DeactivateShakerParams(BaseModel):
@@ -59,7 +59,7 @@ class DeactivateShakerImpl(
 class DeactivateShaker(BaseCommand[DeactivateShakerParams, DeactivateShakerResult]):
     """A command to deactivate shaker for a Heater-Shaker."""
 
-    commandType: DeactivateShakerCommandType = "heaterShakerModule/deactivateShaker"
+    commandType: DeactivateShakerCommandType = "heaterShaker/deactivateShaker"
     params: DeactivateShakerParams
     result: Optional[DeactivateShakerResult]
 

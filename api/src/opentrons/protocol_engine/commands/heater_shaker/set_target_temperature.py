@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 
-SetTargetTemperatureCommandType = Literal["heaterShakerModule/setTargetTemperature"]
+SetTargetTemperatureCommandType = Literal["heaterShaker/setTargetTemperature"]
 
 
 class SetTargetTemperatureParams(BaseModel):
@@ -69,9 +69,7 @@ class SetTargetTemperature(
 ):
     """A command to set a Heater-Shaker's target temperature."""
 
-    commandType: SetTargetTemperatureCommandType = (
-        "heaterShakerModule/setTargetTemperature"
-    )
+    commandType: SetTargetTemperatureCommandType = "heaterShaker/setTargetTemperature"
     params: SetTargetTemperatureParams
     result: Optional[SetTargetTemperatureResult]
 

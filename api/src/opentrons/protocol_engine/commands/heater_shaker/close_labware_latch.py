@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 
-CloseLabwareLatchCommandType = Literal["heaterShakerModule/closeLabwareLatch"]
+CloseLabwareLatchCommandType = Literal["heaterShaker/closeLabwareLatch"]
 
 
 class CloseLabwareLatchParams(BaseModel):
@@ -25,7 +25,9 @@ class CloseLabwareLatchResult(BaseModel):
     """Result data from closing a Heater-Shaker's labware latch."""
 
 
-class CloseLabwareLatchImpl(AbstractCommandImpl[CloseLabwareLatchParams, CloseLabwareLatchResult]):
+class CloseLabwareLatchImpl(
+    AbstractCommandImpl[CloseLabwareLatchParams, CloseLabwareLatchResult]
+):
     """Execution implementation of a Heater-Shaker's close labware latch command."""
 
     def __init__(
@@ -58,7 +60,7 @@ class CloseLabwareLatchImpl(AbstractCommandImpl[CloseLabwareLatchParams, CloseLa
 class CloseLabwareLatch(BaseCommand[CloseLabwareLatchParams, CloseLabwareLatchResult]):
     """A command to close a Heater-Shaker's latch."""
 
-    commandType: CloseLabwareLatchCommandType = "heaterShakerModule/closeLatch"
+    commandType: CloseLabwareLatchCommandType = "heaterShaker/closeLabwareLatch"
     params: CloseLabwareLatchParams
     result: Optional[CloseLabwareLatchResult]
 

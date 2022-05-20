@@ -11,9 +11,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-SetAndWaitForShakeSpeedCommandType = Literal[
-    "heaterShakerModule/setAndWaitForShakeSpeed"
-]
+SetAndWaitForShakeSpeedCommandType = Literal["heaterShaker/setAndWaitForShakeSpeed"]
 
 
 class SetAndWaitForShakeSpeedParams(BaseModel):
@@ -73,7 +71,7 @@ class SetAndWaitForShakeSpeed(
     """A command to set and wait for a Heater-Shaker's shake speed."""
 
     commandType: SetAndWaitForShakeSpeedCommandType = (
-        "heaterShakerModule/setAndWaitForShakeSpeed"
+        "heaterShaker/setAndWaitForShakeSpeed"
     )
     params: SetAndWaitForShakeSpeedParams
     result: Optional[SetAndWaitForShakeSpeedResult]
