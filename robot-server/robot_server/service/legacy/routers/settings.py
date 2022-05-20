@@ -204,7 +204,7 @@ async def get_settings_reset_options() -> FactoryResetOptions:
 async def post_settings_reset_options(
     factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
     reset_manager: ResetManager = Depends(get_reset_db_manager),
-    persistance_path: Path = Depends(get_persistence_directory),
+    persistence_path: Path = Depends(get_persistence_directory),
 ) -> V1BasicResponse:
     options = set(
         k for k, v in factory_reset_commands.items() if v and k != "dbHistory"
@@ -212,8 +212,7 @@ async def post_settings_reset_options(
     reset_util.reset(options)
 
     if ("dbHistory", True) in factory_reset_commands.items():
-        print("resetting db")
-        await reset_manager.reset_db(persistance_path)
+        await reset_manager.reset_db(persistence_path)
         options.add(reset_util.ResetOptionId.reset_db_history)
 
     message = (
