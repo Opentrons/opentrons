@@ -12,7 +12,6 @@ import {
   OVERFLOW_SCROLL,
 } from '@opentrons/components'
 
-import { useFeatureFlag } from '../redux/config'
 import { GlobalStyle } from '../atoms/GlobalStyle'
 import { Alerts } from '../organisms/Alerts'
 import { Breadcrumbs } from '../organisms/Breadcrumbs'
@@ -25,7 +24,6 @@ import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { AppSettings } from '../organisms/AppSettings'
 import { Labware } from '../pages/Labware'
 import { Navbar } from './Navbar'
-import { LegacyApp } from './LegacyApp'
 import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
 
 import type { RouteProps } from './types'
@@ -97,7 +95,6 @@ export const routes: RouteProps[] = [
 const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
 export const AppComponent = (): JSX.Element => {
-  const isLegacyApp = useFeatureFlag('hierarchyReorganization')
 
   return (
     <>
@@ -110,10 +107,6 @@ export const AppComponent = (): JSX.Element => {
         onDragOver={stopEvent}
         onDrop={stopEvent}
       >
-        {isLegacyApp ? (
-          <LegacyApp />
-        ) : (
-          <>
             <TopPortalRoot />
             <Navbar routes={routes} />
             <Box width="100%">
@@ -139,8 +132,6 @@ export const AppComponent = (): JSX.Element => {
               </Switch>
               <Alerts />
             </Box>
-          </>
-        )}
       </Flex>
     </>
   )
