@@ -178,6 +178,14 @@ eval "$(pyenv init -)"
 # ...
 ```
 
+#### 3. Install `jpeg` if on ARM Mac (M1)
+
+With the addition of pillow in `/hardware` [jpeg](https://formulae.brew.sh/formula/jpeg) is needed.
+
+```shell
+brew install jpeg
+```
+
 ### Windows
 
 **This section is a work in progress**
