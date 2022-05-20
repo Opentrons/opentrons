@@ -6,7 +6,7 @@ import pytest
 import sqlalchemy
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
-from robot_server.persistence import ResetManager
+from robot_server.persistence import ResetManager, _CLEAR_ON_REBOOT
 from robot_server.persistence.database import create_sql_engine
 from robot_server.persistence.tables import (
     migration_table,
@@ -90,7 +90,14 @@ def test_migration(subject: sqlalchemy.engine.Engine) -> None:
 
 async def test_test_reset_db(reset_manager: ResetManager) -> None:
     """Should delete persistance directory if a file makred to delete exists"""
-    await reset_manager.reset_db("/Users/tamarzanzouri/temp_dir/")
+    # TODO (tz, 5-19-22): inject temp path and change to fixture?
+    temp_path = "/Users/tamarzanzouri/temp_dir/"
+
+    assert Path(temp_path, _CLEAR_ON_REBOOT).exists() == False
+
+    await reset_manager.reset_db(temp_path)
+
+    assert Path(temp_path, _CLEAR_ON_REBOOT).exists() == True
 
 
 async def test_test_reset_db_not_marked() -> None:
