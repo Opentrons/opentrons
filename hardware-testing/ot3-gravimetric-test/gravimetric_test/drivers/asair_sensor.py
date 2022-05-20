@@ -11,7 +11,7 @@ import os
 import random
 import time
 from datetime import datetime
-from typing import Tuple
+from typing import Tuple, Optional
 
 import serial  # type: ignore[import]
 from serial.serialutil import SerialException  # type: ignore[import]
@@ -49,10 +49,8 @@ class AsairSensor:
         self.baudrate = baudrate
         self.timeout = timeout
         self.sensor_addr = "01"
-        self.length = None
-        self.count = None
         self.simulate = False
-        self._th_sensor = None
+        self._th_sensor: Optional[serial.Serial] = None
 
     def connect(self) -> None:
         """Connect to sensor."""
@@ -82,24 +80,26 @@ class AsairSensor:
     def get_reading(self) -> Tuple[float, float]:
         """Get a reading."""
         if not self.simulate:
+            assert self._th_sensor, "No connection"
+
             data_packet = "{}0300000002{}".format(
                 self.sensor_addr, addrs[self.sensor_addr]
             )
             # print(data_packet)
-            command_bytes = codecs.decode(data_packet, "hex")
+            command_bytes = codecs.decode(data_packet.encode(), "hex")
             # print(command_bytes)
-            self.count = 0
-            self.length = 0
+            count = 0
+            length = 0
             try:
-                self.count += 1
+                count += 1
                 self._th_sensor.flushInput()
                 self._th_sensor.flushOutput()
                 self._th_sensor.write(command_bytes)
                 time.sleep(0.1)
-                self.length = self._th_sensor.inWaiting()
-                if self.count == self.timeout:
-                    raise ("TH SENSOR TIMEOUT")
-                res = self._th_sensor.read(self.length)
+                length = self._th_sensor.inWaiting()
+                if count == self.timeout:
+                    raise RuntimeError("TH SENSOR TIMEOUT")
+                res = self._th_sensor.read(length)
                 res = codecs.encode(res, "hex")
                 # print("res: ",res)
                 temp = res[6:10]
@@ -112,7 +112,7 @@ class AsairSensor:
             except AsairSensorError as th_error:
                 self._th_sensor.close()
                 print("Error Occured")
-                raise AsairSensorError(th_error)
+                raise AsairSensorError(str(th_error))
 
             except SerialException:
                 error_msg = "Asair Sensor not connected "

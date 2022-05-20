@@ -42,9 +42,9 @@ class RadwagScale:
         self.max_tries = 25
         self.total_reads = 10
         self.simulate = False
-        self._scale = None
+        self._scale: Optional[serial.Serial] = None
         self._time_delay = 0.3
-        self._limit_sensor = None
+        self._limit_sensor: Optional[serial.Serial] = None
         self._location = "NY"
 
     def scan_for_port(self, name: str) -> Optional[str]:
@@ -102,6 +102,8 @@ class RadwagScale:
     def read_mass(self, samples: int = 2, retry: int = 0) -> float:
         """Obtain a single reading of scale."""
         if not self.simulate:
+            assert self._scale, "No connection"
+
             masses = []
             retry += 1
             try:
@@ -142,6 +144,8 @@ class RadwagScale:
     def stable_read(self, samples: int = 10) -> float:
         """Take 10 samples due to stability of the scale."""
         if not self.simulate:
+            assert self._scale, "No connection"
+
             masses = []
             stats_list = ["", "SU A", "ES", "SU E", "A"]
             for n in range(1, samples + 1):
@@ -178,6 +182,8 @@ class RadwagScale:
     def read_continuous(self) -> float:  # noqa: C901
         """Read until 10 samples are received."""
         if not self.simulate:
+            assert self._scale, "No connection"
+
             masses: List[float] = []
             while True:
                 if len(masses) == 10:
@@ -241,11 +247,14 @@ class RadwagScale:
 
     def beep_scale(self) -> None:
         """Cause scale to beep."""
+        assert self._scale, "No connection"
         self._scale.write("BP 500\r\n".encode("utf-8"))
 
     def open_lid(self) -> None:
         """Open the evaporation trap lid."""
         if not self.simulate:
+            assert self._scale, "No connection"
+
             self._scale.flushInput()
             time.sleep(self._time_delay)
             self._scale.write("OC\r\n".encode("utf-8"))
@@ -274,6 +283,8 @@ class RadwagScale:
     def close_lid(self) -> None:
         """Close the evaporation trap lid."""
         if not self.simulate:
+            assert self._scale, "No connection"
+
             self._scale.flushInput()
             time.sleep(self._time_delay)
             self._scale.write("CC\r\n".encode("utf-8"))
@@ -301,6 +312,8 @@ class RadwagScale:
 
     def open_chamber(self) -> None:
         """Open the glass enclosure door on the right side."""
+        assert self._scale, "No connection"
+
         self._scale.flush()
         self._scale.flushInput()
         self._scale.flushOutput()
@@ -327,6 +340,8 @@ class RadwagScale:
 
     def close_chamber(self) -> None:
         """Close the glass enclosure door on the right side."""
+        assert self._scale, "No connection"
+
         self._scale.flush()
         self._scale.flushInput()
         self._scale.flushOutput()
@@ -353,6 +368,8 @@ class RadwagScale:
 
     def checkLidStatus(self) -> str:
         """Check the lid status."""
+        assert self._limit_sensor, "No connection"
+
         if self._location == "NY":
             res = "CCOK OCOK"
             return res
@@ -371,6 +388,8 @@ class RadwagScale:
         the first letter of the word captial.
         """
         if not self.simulate:
+            assert self._scale, "No connection"
+
             time.sleep(1)
             self._scale.flush()
             self._scale.flushInput()
@@ -386,7 +405,8 @@ class RadwagScale:
             response = "PROFILE OK\r\n"
             print(" Profile set: ", mode_string, response)
 
-    def strip_outliners(self, masses: List[float]) -> List[float]:
+    @staticmethod
+    def strip_outliners(masses: List[float]) -> List[float]:
         """Strip outliners."""
         rounded_masses = [round(mass) for mass in masses]
         mode_mass = mode(rounded_masses)
@@ -396,6 +416,7 @@ class RadwagScale:
     def get_serial_number(self) -> str:
         """Get the device serial number."""
         if not self.simulate:
+            assert self._scale, "No connection"
             self._scale.flush()
             self._scale.flushInput()
             self._scale.flushOutput()
@@ -411,6 +432,7 @@ class RadwagScale:
     def tare_scale(self) -> None:
         """Tare the scale."""
         if not self.simulate:
+            assert self._scale, "No connection"
             self._scale.flush()
             self._scale.flushInput()
             self._scale.flushOutput()
@@ -422,6 +444,7 @@ class RadwagScale:
     def disable_internal_adjustment(self) -> None:
         """Disable internal adjustments."""
         if not self.simulate:
+            assert self._scale, "No connection"
             self._scale.flush()
             self._scale.flushInput()
             self._scale.flushOutput()
