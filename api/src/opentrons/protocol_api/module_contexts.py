@@ -230,7 +230,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
 
     A minimal protocol with a Temperature module would look like this:
 
-    .. code block:: python
+    .. code-block:: python
 
         def run(ctx):
             slot_number = 10

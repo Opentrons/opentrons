@@ -33,6 +33,9 @@ describe('UploadInput', () => {
     getByRole('button', { name: 'Choose File' })
     findByText('Drag and drop or')
     findByText('your files')
+    findByText(
+      'Valid file types: Python files (.py) or Protocol Designer files (.json)'
+    )
     getByRole('button', { name: 'browse' })
   })
 

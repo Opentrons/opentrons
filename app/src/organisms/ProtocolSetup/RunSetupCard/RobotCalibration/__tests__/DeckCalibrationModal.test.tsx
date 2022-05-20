@@ -54,7 +54,7 @@ describe('DeckCalibrationModal', () => {
         name: 'Learn more about robot calibration',
       }).getAttribute('href')
     ).toBe(
-      'https://support.opentrons.com/en/articles/3499692-how-positional-calibration-works-on-the-ot-2'
+      'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
     )
   })
   it('should call onCloseClick when the close button is pressed', () => {

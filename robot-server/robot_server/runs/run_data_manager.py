@@ -137,8 +137,8 @@ class RunDataManager:
         Raises:
             RunNotFoundError: The given run identifier does not exist.
         """
-        run_resource = self._run_store.get(run_id)
-        state_summary = self._get_state_summary(run_id)
+        run_resource = self._run_store.get(run_id=run_id)
+        state_summary = self._get_state_summary(run_id=run_id)
         current = run_id == self._engine_store.current_run_id
 
         return _build_run(run_resource, state_summary, current)
@@ -172,7 +172,7 @@ class RunDataManager:
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
         else:
-            self._run_store.remove(run_id)
+            self._run_store.remove(run_id=run_id)
 
     async def update(self, run_id: str, current: Optional[bool]) -> Run:
         """Get and potentially archive a run.
@@ -273,6 +273,6 @@ class RunDataManager:
         if run_id == self._engine_store.current_run_id:
             result = self._engine_store.engine.state_view.get_summary()
         else:
-            result = self._run_store.get_state_summary(run_id)
+            result = self._run_store.get_state_summary(run_id=run_id)
 
         return result

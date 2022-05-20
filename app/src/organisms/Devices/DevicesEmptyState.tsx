@@ -25,9 +25,9 @@ import {
 import { startDiscovery } from '../../redux/discovery'
 
 export const OT2_GET_STARTED_URL =
-  'https://support.opentrons.com/en/collections/1559720-ot-2-get-started'
+  'https://support.opentrons.com/s/ot2-get-started'
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
-  'https://support.opentrons.com/en/articles/2687601-troubleshooting-connection-problems'
+  'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'
 
 export function DevicesEmptyState(): JSX.Element {
   const { t } = useTranslation('devices_landing')

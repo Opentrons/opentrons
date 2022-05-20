@@ -29,8 +29,7 @@ import { CalibrationItem } from './CalibrationItem'
 import type { PipetteInfo } from '../hooks/useCurrentRunPipetteInfoByMount'
 
 const inexactPipetteSupportArticle =
-  'https://support.opentrons.com/en/articles/3450143-gen2-pipette-compatibility'
-
+  'https://support.opentrons.com/s/article/GEN2-pipette-compatibility'
 interface Props {
   pipetteInfo: PipetteInfo
   index: number

@@ -1,5 +1,5 @@
 """A collection of motions that define a single move."""
-from typing import List, Dict, Iterable
+from typing import List, Dict, Iterable, Union
 from dataclasses import dataclass
 import numpy as np
 from logging import getLogger
@@ -52,9 +52,22 @@ class MoveGroupSingleAxisStep:
     move_type: MoveType = MoveType.linear
 
 
+@dataclass(frozen=True)
+class MoveGroupSingleGripperStep:
+    """A single gripper move in a move group."""
+
+    duration_sec: np.float64
+    pwm_frequency: np.float32
+    pwm_duty_cycle: np.float32
+    stop_condition: MoveStopCondition = MoveStopCondition.none
+    move_type: MoveType = MoveType.linear
+
+
+SingleMoveStep = Union[MoveGroupSingleAxisStep, MoveGroupSingleGripperStep]
+
 MoveGroupStep = Dict[
     NodeId,
-    MoveGroupSingleAxisStep,
+    SingleMoveStep,
 ]
 
 MoveGroup = List[MoveGroupStep]
