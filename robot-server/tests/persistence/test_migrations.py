@@ -88,16 +88,14 @@ def test_migration(subject: sqlalchemy.engine.Engine) -> None:
         assert values == []
 
 
-async def test_test_reset_db(reset_manager: ResetManager) -> None:
+async def test_test_reset_db(reset_manager: ResetManager, tmp_path: Path) -> None:
     """Should delete persistance directory if a file makred to delete exists"""
-    # TODO (tz, 5-19-22): inject temp path and change to fixture?
-    temp_path = "/Users/tamarzanzouri/temp_dir/"
 
-    assert Path(temp_path, _CLEAR_ON_REBOOT).exists() == False
+    assert Path(tmp_path, _CLEAR_ON_REBOOT).exists() == False
 
-    await reset_manager.reset_db(temp_path)
+    await reset_manager.reset_db(tmp_path)
 
-    assert Path(temp_path, _CLEAR_ON_REBOOT).exists() == True
+    assert Path(tmp_path, _CLEAR_ON_REBOOT).exists() == True
 
 
 async def test_test_reset_db_not_marked() -> None:
