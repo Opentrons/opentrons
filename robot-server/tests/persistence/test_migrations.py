@@ -22,8 +22,9 @@ TABLES = [run_table, action_table, protocol_table, analysis_table]
 
 @pytest.fixture
 def reset_manager() -> ResetManager:
-    """"Get a ResetManager test subject."""
+    """Get a ResetManager test subject."""
     return ResetManager()
+
 
 @pytest.fixture
 def database_v0(tmp_path: Path) -> Path:
@@ -89,14 +90,13 @@ def test_migration(subject: sqlalchemy.engine.Engine) -> None:
 
 
 async def test_test_reset_db(reset_manager: ResetManager, tmp_path: Path) -> None:
-    """Should delete persistance directory if a file makred to delete exists"""
-
-    assert Path(tmp_path, _CLEAR_ON_REBOOT).exists() == False
+    """Should delete persistance directory if a file makred to delete exists."""
+    assert Path(tmp_path, _CLEAR_ON_REBOOT).exists() is False
 
     await reset_manager.reset_db(tmp_path)
 
-    assert Path(tmp_path, _CLEAR_ON_REBOOT).exists() == True
+    assert Path(tmp_path, _CLEAR_ON_REBOOT).exists() is True
 
 
 async def test_test_reset_db_not_marked() -> None:
-    """Should keep persistance directory if a no file is makred to delete"""
+    """Should keep persistance directory if a no file is makred to delete."""

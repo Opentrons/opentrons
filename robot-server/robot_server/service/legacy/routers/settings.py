@@ -1,6 +1,7 @@
 from dataclasses import asdict
 import logging
 from typing import Dict
+from pathlib import Path
 
 from starlette import status
 from fastapi import APIRouter, Depends
@@ -33,6 +34,7 @@ from robot_server.service.legacy.models.settings import (
     Links,
     AdvancedSetting,
 )
+from robot_server.persistence import get_persistence_directory
 
 from robot_server.persistence import ResetManager
 
@@ -202,6 +204,7 @@ async def get_settings_reset_options() -> FactoryResetOptions:
 async def post_settings_reset_options(
     factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
     reset_manager: ResetManager = Depends(get_reset_db_manager),
+    persistance_path: Path = Depends(get_persistence_directory),
 ) -> V1BasicResponse:
     options = set(
         k for k, v in factory_reset_commands.items() if v and k != "dbHistory"
@@ -210,7 +213,7 @@ async def post_settings_reset_options(
 
     if ("dbHistory", True) in factory_reset_commands.items():
         print("resetting db")
-        await reset_manager.reset_db()
+        await reset_manager.reset_db(persistance_path)
 
     message = (
         "Options '{}' were reset".format(", ".join(o.name for o in options))

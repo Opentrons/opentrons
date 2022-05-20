@@ -91,7 +91,8 @@ class ResetManager:
             Path(persistence_directory).mkdir(parents=True, exist_ok=True)
             Path(file_name).open("w")
         except FileExistsError:
-            print ("Could not create file:", file_name)
+            print("Could not create file:", file_name)
+
 
 __all__ = [
     "get_persistence_directory",
