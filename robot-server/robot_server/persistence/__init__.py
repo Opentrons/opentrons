@@ -25,15 +25,15 @@ _CLEAR_ON_REBOOT = "marked_to_delete.txt"
 _log = logging.getLogger(__name__)
 
 
-async def reset_persistence_directory(directory: Path) -> Path:
+async def reset_persistence_directory(directory: Path) -> None:
     """Delete dir content if marked to delete."""
     if Path(directory, _CLEAR_ON_REBOOT).exists():
         for item in directory.iterdir():
+            print(item)
             if item.is_dir():
-                rmdir(item)
+                item.rmdir()
             else:
                 item.unlink()
-        directory.rmdir()
 
 
 async def get_persistence_directory(
