@@ -81,7 +81,7 @@ class DeviceLanding:
     def get_overflow_button_on_device_landing(self) -> Optional[WebElement]:
         """Get the overflow button on device landing page."""
         text: Element = Element(
-            (By.XPATH, "//div[@data-testid='RobotCard_opentrons-dev_overflowMenu']"),
+            (By.XPATH, "//button[@aria-label='RobotOverflowMenu_button']"),
             "Get the overflow button on device landing page.",
         )
         return self.base.clickable_wrapper(text, 5)
@@ -311,6 +311,70 @@ class DeviceLanding:
         )
         return self.base.clickable_wrapper(banner, 5)
 
+    def get_run_title(self) -> Optional[WebElement]:
+        """Get the run title on recent run page."""
+        banner: Element = Element(
+            (By.XPATH, "//*[@data-testid='RecentProtocolRuns_RunTitle']"),
+            "the run title on recent run page.",
+        )
+        return self.base.clickable_wrapper(banner, 5)
+
+    def get_run_value(self) -> Optional[WebElement]:
+        """Get the run value on recent run page."""
+        banner: Element = Element(
+            (By.XPATH, "//*[@data-testid='RecentProtocolRuns_Run_undefined']"),
+            "the run value on recent run page.",
+        )
+        return self.base.clickable_wrapper(banner, 5)
+
+    def get_protocol_recent_run_title(self) -> Optional[WebElement]:
+        """Get the protocol run title on recent run page."""
+        banner: Element = Element(
+            (By.XPATH, "//*[@data-testid='RecentProtocolRuns_ProtocolTitle']"),
+            "the protocol title on recent run page.",
+        )
+        return self.base.clickable_wrapper(banner, 5)
+
+    def get_protocol_value(self) -> Optional[WebElement]:
+        """Get the protocol value on recent run page."""
+        banner: Element = Element(
+            (By.XPATH, "//*[@data-testid='RecentProtocolRuns_Protocol_undefined']"),
+            "the protocol value on recent run page.",
+        )
+        return self.base.clickable_wrapper(banner, 5)
+
+    def get_status_recent_run_title(self) -> Optional[WebElement]:
+        """Get the status run title on recent run page."""
+        banner: Element = Element(
+            (By.XPATH, "//*[@data-testid='RecentProtocolRuns_StatusTitle']"),
+            "the status title on recent run page.",
+        )
+        return self.base.clickable_wrapper(banner, 5)
+
+    def get_status_value(self) -> Optional[WebElement]:
+        """Get the status value on recent run page."""
+        banner: Element = Element(
+            (By.XPATH, "//*[@data-testid='RecentProtocolRuns_Status_undefined']"),
+            "the status value on recent run page.",
+        )
+        return self.base.clickable_wrapper(banner, 5)
+
+    def get_run_duration_title(self) -> Optional[WebElement]:
+        """Get the run duration title on recent run page."""
+        banner: Element = Element(
+            (By.XPATH, "//*[@data-testid='RecentProtocolRuns_DurationTitle']"),
+            "the run duration title on recent run page.",
+        )
+        return self.base.clickable_wrapper(banner, 5)
+
+    def get_run_duration_value(self) -> Optional[WebElement]:
+        """Get the run duration value on recent run page."""
+        banner: Element = Element(
+            (By.XPATH, "//*[@data-testid='RecentProtocolRuns_Duration']"),
+            "the run duration value on recent run page.",
+        )
+        return self.base.clickable_wrapper(banner, 5)
+
     def click_module_actions_button(self, module_serial: str) -> None:
         button: Element = Element(
             (
@@ -328,6 +392,26 @@ class DeviceLanding:
                 "RobotStatusBanner_opentrons-dev_robotName",
             ),
             "Clicking on dev robot in device landing page.'",
+        )
+        self.base.click(button)
+
+    def click_on_run_protocol_device_landing_page(self) -> None:
+        button: Element = Element(
+            (
+                By.XPATH,
+                '//button[@data-testid="RobotOverflowMenu_opentrons-dev_runProtocol"]',
+            ),
+            "Clicking on run protocol option in device landing page.'",
+        )
+        self.base.click(button)
+
+    def click_on_close_run_banner(self) -> None:
+        button: Element = Element(
+            (
+                By.XPATH,
+                '//button[@data-testid="Banner_close-button"]',
+            ),
+            "Clicking on close run button on run logs will uncurrent the run.'",
         )
         self.base.click(button)
 

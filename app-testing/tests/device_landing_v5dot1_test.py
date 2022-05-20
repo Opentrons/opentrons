@@ -63,10 +63,10 @@ def test_device_landing_v5dot1(
         left_menu.click_devices_button()
         assert device_landing.get_device_header().is_displayed()
         assert device_landing.get_how_to_setup_a_robot().is_displayed()
-        device_landing.click_how_to_setup_a_robot()
-        assert device_landing.get_setup_a_robot_header().is_displayed()
-        assert device_landing.get_link_to_setting_up_a_new_robot().is_displayed()
-        device_landing.click_close_button()
+        # device_landing.click_how_to_setup_a_robot()
+        # assert device_landing.get_setup_a_robot_header().is_displayed()
+        # assert device_landing.get_link_to_setting_up_a_new_robot().is_displayed()
+        # device_landing.click_close_button()
         for robot in robots:
             ot_robot = OtRobot(console, robot)
             console.print(
@@ -89,10 +89,6 @@ def test_device_landing_v5dot1(
                 device_landing.get_pipettes_and_modules_header_text()
                 == "Pipettes and Modules"
             )
-            assert (
-                device_landing.get_recent_protocol_runs_header_text()
-                == "Recent Protocol Runs"
-            )
             assert device_landing.get_left_mount_pipette_device_detail().is_displayed()
             assert device_landing.get_right_mount_pipette_device_detail().is_displayed()
             assert device_landing.get_mag_deck_image().is_displayed()
@@ -101,6 +97,20 @@ def test_device_landing_v5dot1(
             assert device_landing.get_thermocycler_module_name().is_displayed()
             assert device_landing.get_tem_deck_image().is_displayed()
             assert device_landing.get_tem_module_name().is_displayed()
+
+            # Verifying recent run components
+            assert (
+                device_landing.get_recent_protocol_runs_header_text()
+                == "opentrons-dev's Protocol Runs"
+            )
+            assert device_landing.get_run_title().is_displayed()
+            assert device_landing.get_protocol_recent_run_title().is_displayed()
+            assert device_landing.get_status_recent_run_title().is_displayed()
+            assert device_landing.get_run_duration_title().is_displayed()
+            assert device_landing.get_run_value().is_displayed()
+            assert device_landing.get_protocol_value().is_displayed()
+            assert device_landing.get_status_value().is_displayed()
+            assert device_landing.get_run_duration_value().is_displayed()
 
 
 @pytest.mark.v5dot1
@@ -137,7 +147,6 @@ def test_run_protocol_robot_detail_page_v5dot1(
         )
         input = protocol_file.get_drag_json_protocol()
         drag_and_drop_file(input, test_protocols["protocoluploadjson"])
-        time.sleep(3)  # waiting for protocol to analyze
         device_landing: DeviceLanding = DeviceLanding(
             driver, console, request.node.nodeid
         )
@@ -156,7 +165,6 @@ def test_run_protocol_robot_detail_page_v5dot1(
                 device_landing.get_protocol_name_device_detail_slideout().is_displayed()
             )
             device_landing.click_proceed_to_setup_button_device_landing_page()
-            time.sleep(2)
 
             # Verify the Setup for run page
             robot_calibrate = RobotCalibration(driver)
@@ -192,6 +200,20 @@ def test_run_protocol_robot_detail_page_v5dot1(
 
             # TC2 : Running the protocol from run page by clciking on Run again button
             device_landing.click_start_run_button()
+            assert device_landing.get_run_button().is_displayed()
+            device_landing.click_start_run_button()  # clicking on start run after clicking run again on  Run page
+            assert device_landing.get_run_button().is_displayed()
+            assert device_landing.get_success_banner_run_page().is_displayed()
+
+            # Uncurrent the run
+            device_landing.click_on_close_run_banner()
+
+            # Run the test case from recent run
+            left_menu.click_devices_button()
+            device_landing.base.click(
+                device_landing.expander(ot_robot.data.display_name)
+            )
+            # add a step for overflow button
             assert device_landing.get_run_button().is_displayed()
             device_landing.click_start_run_button()  # clicking on start run after clicking run again on  Run page
             assert device_landing.get_run_button().is_displayed()
@@ -248,11 +270,48 @@ def test_run_protocol_robot_landing_page_v5dot1(
             )
             left_menu.click_devices_button()
             assert device_landing.get_overflow_button_on_device_landing().is_displayed()
-            device_landing.click_run_protocol_robot_landing_overflow_button()  # clicking on run protocol from overflow menu on robot landing page
-            device_landing.click_start_run_button()
-            assert device_landing.get_run_button().is_displayed()
+            device_landing.click_overflow_menu_button_on_device_landing()
+            device_landing.click_on_run_protocol_device_landing_page()
+            assert (
+                device_landing.get_protocol_name_device_detail_slideout().is_displayed()
+            )
+            device_landing.click_proceed_to_setup_button_device_landing_page()
+
+            # Verify the Setup for run page
+            robot_calibrate = RobotCalibration(driver)
+            assert robot_calibrate.get_robot_calibration().text == "Robot Calibration"
+            robot_calibrate.click_robot_calibration()
+            assert robot_calibrate.get_deck_calibration().text == "Deck Calibration"
+            assert robot_calibrate.get_required_pipettes().text == "Required Pipettes"
+            assert (
+                robot_calibrate.get_calibration_ready_locator().text
+                == "Calibration Ready"
+            )
+            assert (
+                robot_calibrate.get_required_tip_length_calibration().text
+                == "Required Tip Length Calibrations"
+            )
+            module_setup = ModuleSetup(driver)
+            assert module_setup.get_proceed_to_module_setup().is_displayed()
+            module_setup.click_proceed_to_module_setup()
+            assert module_setup.get_module_setup_text_locator().text == "Module Setup"
+            assert module_setup.get_thermocycler_module().text == "Thermocycler Module"
+            assert module_setup.get_magetic_module().text == "Magnetic Module GEN1"
+            assert (
+                module_setup.get_temperature_module().text == "Temperature Module GEN1"
+            )
+            assert module_setup.get_proceed_to_labware_setup().is_displayed()
+            module_setup.click_proceed_to_labware_setup()
+            labware_setup = LabwareSetup(driver)
+            assert labware_setup.get_labware_setup_text().is_displayed()
+            labware_setup.click_proceed_to_run_button()
             device_landing.click_start_run_button()
             assert device_landing.get_run_button().is_displayed()
             assert device_landing.get_success_banner_run_page().is_displayed()
+
+            # Click on to jump current step
             device_landing.click_on_jump_to_current_step()
             assert device_landing.get_current_step_text().is_displayed()
+
+            # Uncurrent the run
+            device_landing.click_on_close_run_banner()
