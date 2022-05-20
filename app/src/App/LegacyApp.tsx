@@ -10,11 +10,9 @@ import { Alerts } from '../organisms/Alerts'
 
 import { Robots } from '../pages/Robots'
 import { Upload } from '../pages/Upload'
-import { Run } from '../pages/Run'
 import { More } from '../pages/More'
 
 import { ConnectPanel } from '../pages/Robots/ConnectPanel'
-import { RunPanel } from '../pages/Run/RunPanel'
 import { MorePanel } from '../pages/More/MorePanel'
 
 import { LegacyNavbar } from './LegacyNavbar'
@@ -34,7 +32,6 @@ export function LegacyApp(): JSX.Element {
       <Switch>
         <Route path="/robots/:name?" component={ConnectPanel} />
         <Route path="/more" component={MorePanel} />
-        <Route path="/run" component={RunPanel} />
       </Switch>
       <TopPortalRoot />
       <Box position={POSITION_RELATIVE} width="100%" height="100%">
@@ -48,9 +45,6 @@ export function LegacyApp(): JSX.Element {
           </Route>
           <Route path="/upload">
             <Upload />
-          </Route>
-          <Route path="/run">
-            <Run />
           </Route>
           <Redirect exact from="/" to="/robots" />
           {/* redirect after next gen app feature flag toggle */}
