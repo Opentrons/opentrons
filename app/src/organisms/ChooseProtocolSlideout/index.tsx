@@ -149,14 +149,14 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
   const { t } = useTranslation('protocol_details')
   const history = useHistory()
   const { protocolKey, srcFileObjects, robotName, ...buttonProps } = props
-  const { createRun } = useCreateRunFromProtocol({
+  const { createRunFromProtocolSource } = useCreateRunFromProtocol({
     onSuccess: ({ data: runData }) => {
       history.push(`/devices/${robotName}/protocol-runs/${runData.id}`)
     },
   })
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-    createRun(srcFileObjects)
+    createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
   }
 
   return (

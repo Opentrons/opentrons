@@ -75,7 +75,7 @@ class LabwareLanding:
         header: Element = Element(
             (
                 By.XPATH,
-                f"//p[@data-testid='Slideout_title_Import a Custom Labware Definition']",
+                f"//h2[@data-testid='Slideout_title_Import a Custom Labware Definition']",
             ),
             "Slideout_title_Import a Custom Labware Definition",
         )

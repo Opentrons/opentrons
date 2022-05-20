@@ -1,5 +1,6 @@
 from typing import AsyncGenerator, NamedTuple
 
+import anyio
 import pytest
 
 from tests.integration.dev_server import DevServer
@@ -133,6 +134,13 @@ async def test_run_actions_labware_offsets_persist(
         run_id=run_id,
         req_body={"data": {"actionType": "stop"}},
     )
+
+    # wait for the action to take effect
+    with anyio.fail_after(5):
+        while (await client.get_run(run_id=run_id)).json()["data"][
+            "status"
+        ] != "stopped":
+            await anyio.sleep(0.1)
 
     # persist the run by setting current: false
     archive_run_response = await client.patch_run(

@@ -67,9 +67,8 @@ describe('useCreateProtocolMutation hook', () => {
     })
 
     expect(result.current.data).toBeUndefined()
-    result.current.createProtocol(createProtocolData)
+    result.current.createProtocol({ files: createProtocolData })
     await waitFor(() => {
-      console.log(result.current.status)
       return result.current.status !== 'loading'
     })
     expect(result.current.data).toBeUndefined()
@@ -78,13 +77,34 @@ describe('useCreateProtocolMutation hook', () => {
   it('should create a protocol when calling the createProtocol callback', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockCreateProtocol)
-      .calledWith(HOST_CONFIG, createProtocolData)
+      .calledWith(HOST_CONFIG, createProtocolData, undefined)
       .mockResolvedValue({ data: PROTOCOL_RESPONSE } as Response<Protocol>)
 
     const { result, waitFor } = renderHook(() => useCreateProtocolMutation(), {
       wrapper,
     })
-    act(() => result.current.createProtocol(createProtocolData))
+    act(() => result.current.createProtocol({ files: createProtocolData }))
+
+    await waitFor(() => result.current.data != null)
+
+    expect(result.current.data).toEqual(PROTOCOL_RESPONSE)
+  })
+
+  it('should create a protocol with a protocolKey if included', async () => {
+    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
+    when(mockCreateProtocol)
+      .calledWith(HOST_CONFIG, createProtocolData, 'fakeProtocolKey')
+      .mockResolvedValue({ data: PROTOCOL_RESPONSE } as Response<Protocol>)
+
+    const { result, waitFor } = renderHook(() => useCreateProtocolMutation(), {
+      wrapper,
+    })
+    act(() =>
+      result.current.createProtocol({
+        files: createProtocolData,
+        protocolKey: 'fakeProtocolKey',
+      })
+    )
 
     await waitFor(() => result.current.data != null)
 

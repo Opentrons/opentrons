@@ -21,6 +21,7 @@ import {
 
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { AlertPrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../atoms/Modal'
@@ -43,7 +44,12 @@ export function ProtocolOverflowMenu(
 ): JSX.Element {
   const { protocolKey, handleRunProtocol } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
-  const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
+  const {
+    MenuOverlay,
+    handleOverflowClick,
+    showOverflowMenu,
+    setShowOverflowMenu,
+  } = useMenuHandleClickOutside()
   const dispatch = useDispatch<Dispatch>()
   const {
     confirm: confirmDeleteProtocol,
@@ -64,10 +70,6 @@ export function ProtocolOverflowMenu(
   const handleClickDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     confirmDeleteProtocol()
-    setShowOverflowMenu(!showOverflowMenu)
-  }
-  const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
     setShowOverflowMenu(!showOverflowMenu)
   }
   return (
@@ -149,6 +151,7 @@ export function ProtocolOverflowMenu(
           </Modal>
         </Portal>
       ) : null}
+      <MenuOverlay />
     </Flex>
   )
 }

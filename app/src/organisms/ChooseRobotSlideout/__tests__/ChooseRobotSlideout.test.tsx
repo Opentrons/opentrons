@@ -77,12 +77,12 @@ const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
 }
 
 let mockCloseCurrentRun: jest.Mock
-let mockCreateRun: jest.Mock
+let mockCreateRunFromProtocolSource: jest.Mock
 
 describe('ChooseRobotSlideout', () => {
   beforeEach(() => {
     mockCloseCurrentRun = jest.fn()
-    mockCreateRun = jest.fn()
+    mockCreateRunFromProtocolSource = jest.fn()
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
@@ -98,7 +98,7 @@ describe('ChooseRobotSlideout', () => {
       displayName: 'A Protocol for Otie',
     } as ProtocolDetails)
     mockUseCreateRunFromProtocol.mockReturnValue({
-      createRun: mockCreateRun,
+      createRunFromProtocolSource: mockCreateRunFromProtocolSource,
     } as any)
   })
   afterEach(() => {
@@ -169,6 +169,9 @@ describe('ChooseRobotSlideout', () => {
     mockRobot.click()
     expect(proceedButton).not.toBeDisabled()
     proceedButton.click()
-    expect(mockCreateRun).toBeCalled()
+    expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
+      files: [expect.any(File)],
+      protocolKey: storedProtocolDataFixture.protocolKey,
+    })
   })
 })

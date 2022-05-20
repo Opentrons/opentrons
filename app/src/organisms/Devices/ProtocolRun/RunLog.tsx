@@ -39,7 +39,9 @@ import {
   useRunStatus,
   useRunTimestamps,
 } from '../../../organisms/RunTimeControl/hooks'
+import { RUN_LOG_WINDOW_SIZE } from '../constants'
 import { useProtocolDetailsForRun } from '../hooks'
+import { DownloadRunLogToast } from '../DownloadRunLogToast'
 import { RunLogProtocolSetupInfo } from './RunLogProtocolSetupInfo'
 import { StepItem } from './StepItem'
 
@@ -47,12 +49,11 @@ import type { RunCommandSummary } from '@opentrons/api-client'
 import type { RunTimeCommand, CommandStatus } from '@opentrons/shared-data'
 
 const AVERAGE_ITEM_HEIGHT_PX = 52 // average px height of a command item
-const WINDOW_SIZE = 60 // number of command items rendered at a time
 const WINDOW_OVERLAP = 40 // number of command items that fall within two adjacent windows
 const NUM_EAGER_ITEMS = 5 // number of command items away from the end of the current window that will trigger a window transition if scrolled into view
 const COMMANDS_REFETCH_INTERVAL = 3000
 const AVERAGE_WINDOW_HEIGHT_PX =
-  (WINDOW_SIZE - WINDOW_OVERLAP) * AVERAGE_ITEM_HEIGHT_PX
+  (RUN_LOG_WINDOW_SIZE - WINDOW_OVERLAP) * AVERAGE_ITEM_HEIGHT_PX
 interface CommandRuntimeInfo {
   analysisCommand: RunTimeCommand | null // analysisCommand will only be null if protocol is nondeterministic
   runCommandSummary: RunCommandSummary | null
@@ -78,8 +79,13 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   const firstPostInitialPlayRunCommandIndex = React.useRef<number | null>(null)
   const [isDeterministic, setIsDeterministic] = React.useState<boolean>(true)
   const [windowIndex, setWindowIndex] = React.useState<number>(0)
+  const [
+    showDownloadRunLogToast,
+    setShowDownloadRunLogToast,
+  ] = React.useState<boolean>(false)
 
-  const windowFirstCommandIndex = (WINDOW_SIZE - WINDOW_OVERLAP) * windowIndex
+  const windowFirstCommandIndex =
+    (RUN_LOG_WINDOW_SIZE - WINDOW_OVERLAP) * windowIndex
   const prePlayCommandCount =
     firstPostInitialPlayRunCommandIndex.current != null
       ? firstPostInitialPlayRunCommandIndex.current
@@ -88,7 +94,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
     runId,
     {
       cursor: windowFirstCommandIndex + prePlayCommandCount,
-      pageLength: WINDOW_SIZE,
+      pageLength: RUN_LOG_WINDOW_SIZE,
     },
     {
       refetchInterval: COMMANDS_REFETCH_INTERVAL,
@@ -173,11 +179,11 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
 
   const commandWindow = currentCommandList.slice(
     windowFirstCommandIndex,
-    windowFirstCommandIndex + WINDOW_SIZE
+    windowFirstCommandIndex + RUN_LOG_WINDOW_SIZE
   )
   const isFirstWindow = windowIndex === 0
   const isFinalWindow =
-    currentCommandList.length <= windowFirstCommandIndex + WINDOW_SIZE
+    currentCommandList.length <= windowFirstCommandIndex + RUN_LOG_WINDOW_SIZE
 
   const currentCommandIndex = currentCommandList.findIndex(
     command => command?.analysisCommand?.key === currentCommandKey
@@ -228,14 +234,18 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   // actually want the first window that contains the current command, in order to show as many
   // commands as possible and avoid an extra small final window
   const isCurrentCommandInFinalWindow =
-    currentCommandList.length - 1 - currentCommandIndex <= WINDOW_SIZE
+    currentCommandList.length - 1 - currentCommandIndex <= RUN_LOG_WINDOW_SIZE
 
   const indexOfFirstWindowContainingCurrentCommand = Math.ceil(
-    (currentCommandIndex + 1 - WINDOW_SIZE) / (WINDOW_SIZE - WINDOW_OVERLAP)
+    (currentCommandIndex + 1 - RUN_LOG_WINDOW_SIZE) /
+      (RUN_LOG_WINDOW_SIZE - WINDOW_OVERLAP)
   )
   const indexOfLastWindowContainingCurrentCommand = Math.floor(
-    Math.max(currentCommandIndex + 1 - (WINDOW_SIZE - WINDOW_OVERLAP), 0) /
-      (WINDOW_SIZE - WINDOW_OVERLAP)
+    Math.max(
+      currentCommandIndex + 1 - (RUN_LOG_WINDOW_SIZE - WINDOW_OVERLAP),
+      0
+    ) /
+      (RUN_LOG_WINDOW_SIZE - WINDOW_OVERLAP)
   )
 
   // when we initially mount, if the current item is not in view, jump to it
@@ -272,22 +282,24 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
 
   const topBufferHeightPx = windowFirstCommandIndex * AVERAGE_ITEM_HEIGHT_PX
   const bottomBufferHeightPx =
-    (currentCommandList.length - (windowFirstCommandIndex + WINDOW_SIZE)) *
+    (currentCommandList.length -
+      (windowFirstCommandIndex + RUN_LOG_WINDOW_SIZE)) *
     AVERAGE_ITEM_HEIGHT_PX
 
   const onScroll = (): void => {
     if (listInnerRef.current) {
       const { scrollTop, clientHeight } = listInnerRef.current
       const potentialNextWindowFirstIndex =
-        windowFirstCommandIndex + (WINDOW_SIZE - WINDOW_OVERLAP)
+        windowFirstCommandIndex + (RUN_LOG_WINDOW_SIZE - WINDOW_OVERLAP)
       const potentialPrevWindowFirstIndex =
-        windowFirstCommandIndex - (WINDOW_SIZE - WINDOW_OVERLAP)
+        windowFirstCommandIndex - (RUN_LOG_WINDOW_SIZE - WINDOW_OVERLAP)
 
       const prevWindowBoundary =
         topBufferHeightPx + NUM_EAGER_ITEMS * AVERAGE_ITEM_HEIGHT_PX
       const nextWindowBoundary =
         topBufferHeightPx +
-        Math.max(WINDOW_SIZE - NUM_EAGER_ITEMS, 0) * AVERAGE_ITEM_HEIGHT_PX -
+        Math.max(RUN_LOG_WINDOW_SIZE - NUM_EAGER_ITEMS, 0) *
+          AVERAGE_ITEM_HEIGHT_PX -
         clientHeight
       if (
         !isFinalWindow &&
@@ -312,7 +324,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   }
 
   const onClickDownloadRunLog = (): void => {
-    console.log('TODO: download run log')
+    setShowDownloadRunLogToast(true)
   }
 
   const isRunStarted = currentItemRef.current != null
@@ -356,6 +368,14 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
       width="100%"
       overflowY="hidden"
     >
+      {runTotalCommandCount != null && showDownloadRunLogToast ? (
+        <DownloadRunLogToast
+          robotName={robotName}
+          runId={runId}
+          pageLength={runTotalCommandCount}
+          onClose={() => setShowDownloadRunLogToast(false)}
+        />
+      ) : null}
       {jumpToCurrentStepButton}
       {isFirstWindow ? (
         <>

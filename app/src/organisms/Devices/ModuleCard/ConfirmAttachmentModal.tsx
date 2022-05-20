@@ -45,6 +45,7 @@ export const ConfirmAttachmentModal = (
       dispatch(setHeaterShakerAttached(isDismissed))
     }
     onConfirmClick()
+    onCloseClick()
   }
 
   return (

@@ -10,7 +10,6 @@ import {
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
-  Overlay,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
@@ -22,10 +21,12 @@ import { Portal } from '../../App/portal'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
+import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 
 import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { Dispatch } from '../../redux/types'
+
 interface RobotOverflowMenuProps extends StyleProps {
   robot: DiscoveredRobot
 }
@@ -33,7 +34,12 @@ interface RobotOverflowMenuProps extends StyleProps {
 export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   const { robot, ...styleProps } = props
   const { t } = useTranslation(['devices_landing', 'shared'])
-  const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
+  const {
+    MenuOverlay,
+    handleOverflowClick,
+    showOverflowMenu,
+    setShowOverflowMenu,
+  } = useMenuHandleClickOutside()
   const dispatch = useDispatch<Dispatch>()
   const runId = useCurrentRunId()
   const [
@@ -49,14 +55,6 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
     e.preventDefault()
     setShowChooseProtocolSlideout(true)
     setShowOverflowMenu(!showOverflowMenu)
-  }
-  const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    setShowOverflowMenu(!showOverflowMenu)
-  }
-  const handleClickOutside: React.MouseEventHandler<HTMLDivElement> = e => {
-    e.preventDefault()
-    setShowOverflowMenu(false)
   }
   const handleClickConnectionTroubleshooting: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -145,12 +143,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
         </Flex>
       ) : null}
       <Portal level="top">
-        {showOverflowMenu ? (
-          <Overlay
-            onClick={handleClickOutside}
-            backgroundColor={COLORS.transparent}
-          />
-        ) : null}
+        <MenuOverlay />
         {robot.status === CONNECTABLE ? (
           <ChooseProtocolSlideout
             robot={robot}
