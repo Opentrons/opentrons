@@ -28,15 +28,11 @@ _log = logging.getLogger(__name__)
 
 async def reset_persistence_directory(directory: Path) -> None:
     """Delete dir content if marked to delete."""
-    for item in directory.iterdir():
-        print(item)
-        try:
-            if item.is_dir():
-                shutil.rmtree(item)
-            else:
-                item.unlink()
-        except OSError:
-            print("Could not delete item, ")
+    try:
+        shutil.rmtree(directory)
+    except OSError:
+        print("Could not delete item, ", directory)
+    print(f"directory {directory} we deleted successfully")
 
 
 async def get_persistence_directory(

@@ -122,6 +122,4 @@ async def test_delete_persistence_directory(reset_manager: ResetManager, tmp_pat
 
     await reset_persistence_directory(tmp_path)
 
-    assert len(os.listdir(tmp_path)) == 0
-
-    assert Path(tmp_path).exists() is True
+    assert Path(tmp_path).exists() is False
