@@ -121,22 +121,35 @@ stages:
         json:
           play_action_id: data.id
 
-  - name: Get the run again and look for the play action we just created
+  - name: Get the run again and look for the new labware offset and play action
     request:
       url: '{host:s}:{port:d}/runs/{run_id}'
       method: GET
     response:
+      status_code: 200
       strict:
         - json:off
-      status_code: 200
       json:
         data:
+          labwareOffsets:
+            - id: !anystr
+              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+              definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
+              location:
+                slotName: "1"
+              vector:
+                x: 1.11
+                y: 2.22
+                z: 3.33
+            # Extra offsets would be ignored because strict checking is disabled.
           actions:
             - id: '{play_action_id}'
               createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
               actionType: play
-            # Other list items ignored because this stage disables strict checking.
-          # Other keys ignored because this stage disables strict checking.
+            # Extra actions would be ignored because strict checking is disabled.
+          # Other fields are ignored. because strict checking is disabled.
+          # Note that since the run is still playing at this point, many of them
+          # (like status and labware) would be nondeterministic.
 
   - name: Wait for the protocol to complete
     max_retries: 10
