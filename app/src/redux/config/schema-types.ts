@@ -126,9 +126,13 @@ export interface ConfigV6 extends Omit<ConfigV5, 'version'> {
   modules: {
     heaterShaker: { isAttached: boolean }
   }
+}
+
+export interface ConfigV7 extends Omit<ConfigV6, 'version'> {
+  version: 7
   ui: ConfigV5['ui'] & {
     minWidth: number
   }
 }
 
-export type Config = ConfigV6
+export type Config = ConfigV7
