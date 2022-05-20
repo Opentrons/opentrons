@@ -6,7 +6,7 @@ Specify the port to establish Connection
 
 Author: Carlos Fernandez
 """
-
+import logging
 from typing import Optional, List
 
 import serial  # type: ignore[import]
@@ -17,6 +17,8 @@ from serial.serialutil import SerialException  # type: ignore[import]
 import random
 
 from serial.tools.list_ports import comports  # type: ignore[import]
+
+log = logging.getLogger(__name__)
 
 
 class RadwagScaleError(Exception):
@@ -57,9 +59,8 @@ class RadwagScale:
             raise Exception("No instrument was named!")
         port_list = []
         for com_port, desc, hwid in sorted(ports):
-            # print("{}: {} [{}]".format(com_port, desc, hwid))
+            log.debug(f"{com_port}: {desc} [{hwid}]")
             port_list.append((com_port, desc, hwid))
-            # print(port_list)
         for vid in range(len(port_list)):
             if instruments[name] in port_list[vid][2]:
                 port = port_list[vid][0]
@@ -68,9 +69,9 @@ class RadwagScale:
     def connect(self) -> None:
         """Connect to the device."""
         if self.simulate:
-            print("Virtual Scale Port Connected")
+            log.info("Virtual Scale Port Connected")
         else:
-            print("Scale Connection established: ", self.port)
+            log.info(f"Scale Connection established: {self.port}")
             self._connect_to_port()
             if self._location != "NY":
                 self._limit_sensor = serial.Serial(
@@ -112,10 +113,10 @@ class RadwagScale:
                     self._scale.flushInput()
                     self._scale.write("SI\r\n".encode("utf-8"))
                     raw_val = self._scale.readline().strip()
-                    # print("split into list", raw_val)
+                    log.debug(f"read mass response: {raw_val}")
                     (junk, val) = re.split("SI ", raw_val.decode("utf-8"))
                     if raw_val == "":
-                        print("Not data retrived")
+                        log.info("Not data retrieved")
                         self._scale.read_mass()
                     val = val.replace("SI", "")
                     val = val.replace("g", "")
@@ -123,10 +124,9 @@ class RadwagScale:
                     val = val.replace("--", "-")
                     val = val.replace("^", "")
                     val = val.replace("?", "")
-                    # print(val)
                     data = float(val)
+                    log.debug(f"read mass: {data}")
                     masses.append(data)
-                    # print(masses)
 
             except ValueError:
                 if retry > 3:
@@ -136,7 +136,7 @@ class RadwagScale:
 
             masses = self.strip_outliners(masses)
             clean_average = sum(masses) / len(masses)
-            # print(masses)
+            log.debug(f"returning masses: {masses}")
             return clean_average
         else:
             return random.uniform(2.5, 2.7)
@@ -198,7 +198,7 @@ class RadwagScale:
                     raw_val = ""
                     for r in self._scale.readlines():
                         raw_val = raw_val + r.decode("utf-8").strip()
-                    # print(raw_val)
+                    log.debug(f"read: {raw_val}")
                     raw_val = (
                         raw_val.replace("SU", " ")
                         .replace("A", " ")
@@ -209,7 +209,9 @@ class RadwagScale:
                         .replace(" ", "")
                         .replace("g", "")
                     )
-                    print("time_count:\t", times_count, "\tRaw scale reading", raw_val)
+                    log.debug(
+                        f"time_count: {times_count}, Raw scale reading: {raw_val}"
+                    )
                     times_count = times_count + 1
                     if len(raw_val.replace("-", "").replace("E", "")) > 6:
                         self._scale.flushOutput()
@@ -219,7 +221,6 @@ class RadwagScale:
                         self._scale.flushInput()
                         time.sleep(self._time_delay)
                         self._scale.write("SU\r\n".encode("utf-8"))
-                        # print("send SU again")
                     if times_count % 250 == 0:
                         self.open_lid()
                         time.sleep(2)
@@ -234,7 +235,6 @@ class RadwagScale:
                     raw_val = raw_val.replace("-", "")
                     raw_val = str(float(raw_val) * sign)
                 masses.append(float(raw_val))
-                # print(masses)
             # disregard readings and take 7-9 readings
             masses = masses[7:]
             masses = self.strip_outliners(masses)
@@ -266,11 +266,11 @@ class RadwagScale:
                 time.sleep(self._time_delay)
                 for r in self._scale.readlines():
                     response = response + r.decode("utf-8").strip()
-                print("response from while loop 1: ", response)
+                log.debug(f"response from while loop 1: {response}")
                 limit_state = self.checkLidStatus()
-                print(limit_state)
+                log.debug(f"limit_state: {limit_state}")
                 if "OK" in response and "OCOK" in limit_state:
-                    print("LID opened")
+                    log.debug("LID opened")
                     condition = False
                 if "E" in response:
                     self._scale.write("CC\r\n".encode("utf-8"))
@@ -278,7 +278,7 @@ class RadwagScale:
                     raise Exception("Open lid raise Error")
             time.sleep(1)
         else:
-            print("LID OPENED")
+            log.debug("LID OPENED")
 
     def close_lid(self) -> None:
         """Close the evaporation trap lid."""
@@ -296,11 +296,11 @@ class RadwagScale:
                 time.sleep(self._time_delay)
                 for r in self._scale.readlines():
                     response = response + r.decode("utf-8").strip()
-                print("response from while loop 2: ", response)
+                log.debug("fresponse from while loop 2: {response}")
                 limit_state = self.checkLidStatus()
-                print(limit_state)
+                log.debug(f"limit state: {limit_state}")
                 if "OK" in response and "CCOK" in limit_state:
-                    print("LID Closed")
+                    log.debug("LID Closed")
                     condition = False
                 if "E" in response:
                     self._scale.write("CC\r\n".encode("utf-8"))
@@ -308,7 +308,7 @@ class RadwagScale:
                     raise Exception("Close lid raise Error")
             time.sleep(1)
         else:
-            print("LID CLOSED")
+            log.debug("LID CLOSED")
 
     def open_chamber(self) -> None:
         """Open the glass enclosure door on the right side."""
@@ -322,19 +322,19 @@ class RadwagScale:
         condition = True
         while condition:
             response = self._scale.readline().decode("utf-8")
-            print(response)
+            log.debug(f"response: {response}")
             if response == "":
                 condition = False
             if response == "OD D\r\n":
-                print("LID already opened")
+                log.debug("LID already opened")
                 condition = False
             elif response == "OD E\r\n":
-                print(
+                log.warning(
                     "Error in course of command execution, \
                                                 no parameter or command format"
                 )
             elif response == "OD A\r\n":
-                print("Command understood and in progress")
+                log.debug("Command understood and in progress")
             else:
                 raise Exception("Incorrect option {}".format(response))
 
@@ -350,19 +350,19 @@ class RadwagScale:
         condition = True
         while condition:
             response = self._scale.readline().decode("utf-8")
-            # print(response)
+            log.debug(f"response: {response}")
             if response == "":
                 condition = False
             elif response == "CD D\r\n":
-                print("chamber already closed")
+                log.debug("chamber already closed")
                 condition = False
             elif response == "CD E\r\n":
-                print(
+                log.warning(
                     "Error in course of command execution, \
                                                 no parameter or command format"
                 )
             elif response == "CD A\r\n":
-                print("Command understood and in progress")
+                log.debug("Command understood and in progress")
             else:
                 raise Exception("Incorrect option {}".format(response))
 
@@ -377,7 +377,7 @@ class RadwagScale:
         self._limit_sensor.flushInput()
         self._limit_sensor.flushOutput()
         res = self._limit_sensor.readline().decode("utf-8").strip()
-        # print(res)
+        log.debug(f"response: {res}")
         return res
 
     def profile_mode(self, mode_string: str) -> None:
@@ -399,11 +399,11 @@ class RadwagScale:
             while condition:
                 response = self._scale.readline().decode("utf-8")
                 if response == "PROFILE OK\r\n":
-                    print(" Profile set: ", mode_string, response)
+                    log.debug(f"Profile set: {mode_string}, {response}")
                     condition = False
         else:
             response = "PROFILE OK\r\n"
-            print(" Profile set: ", mode_string, response)
+            log.debug(f"Profile set: {mode_string}, {response}")
 
     @staticmethod
     def strip_outliners(masses: List[float]) -> List[float]:
@@ -439,7 +439,7 @@ class RadwagScale:
             self._scale.write("T\r\n".encode("utf-8"))
             time.sleep(5)
         else:
-            print("SCALE HAS BEEN TARE")
+            log.debug("SCALE HAS BEEN TARE")
 
     def disable_internal_adjustment(self) -> None:
         """Disable internal adjustments."""
@@ -451,29 +451,18 @@ class RadwagScale:
             self._scale.write("IC1\r\n".encode("utf-8"))
             time.sleep(5)
         else:
-            print("DISABLED INTERNAL ADJUSTMENT")
+            log.debug("DISABLED INTERNAL ADJUSTMENT")
 
 
 if __name__ == "__main__":
-    # port = input("Enter port number, leave blank for '/dev/ttyUSB0/'\n").strip()
-    # if port == '':
     com_port = "COM6"
     scale = RadwagScale(port=com_port)
     scale.simulate = False
     scale._location = "CH"
     scale.connect()
-    # res = scale.scan_for_port('sensor')
-    # print(res)
-    # while True:
-    #     res = scale.checkLidStatus()
-    #     print(res)
-    #     time.sleep(0.2)
-    # print(time.tzname[time.daylight])
 
     while True:
-        # time.sleep(0.2)
         scale.close_lid()
-        # time.sleep(1)
         reading = scale.read_continuous()
         scale.open_lid()
         time.sleep(1)

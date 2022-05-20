@@ -25,12 +25,13 @@ def subject(scale_connection: MagicMock) -> RadwagScale:
 def create_radwag_result_line(command: str, val: float) -> bytes:
     """Create a radwag protocol line."""
     sign = " "
-    if val > 0:
-        # sign = '+'
-        pass
-    elif val < 0:
-        # sign = '-'
-        pass
+    # TODO (amit, 2022-05-20): Add sign to tests.
+    # if val > 0:
+    #     sign = '+'
+    # elif val < 0:
+    #     sign = '-'
+
+    # Format breakdown
     # 0-2 = command
     # 3 = stability
     # 5 = sign

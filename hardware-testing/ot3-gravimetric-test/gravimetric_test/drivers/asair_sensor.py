@@ -7,6 +7,7 @@ relative humidity that is recorded onto the pipette results.
 
 import codecs
 import csv
+import logging
 import os
 import random
 import time
@@ -15,6 +16,9 @@ from typing import Tuple, Optional
 
 import serial  # type: ignore[import]
 from serial.serialutil import SerialException  # type: ignore[import]
+
+log = logging.getLogger(__name__)
+
 
 addrs = {
     "01": "C40B",
@@ -55,9 +59,9 @@ class AsairSensor:
     def connect(self) -> None:
         """Connect to sensor."""
         if self.simulate:
-            print("Virtual Temp sensor Port Connected")
+            log.info("Virtual Temp sensor Port Connected")
         else:
-            print("TH Sensor Connection established: ", self.port)
+            log.info("TH Sensor Connection established: {self.port}")
             self._connect_to_port()
 
     def _connect_to_port(self) -> None:
@@ -85,11 +89,9 @@ class AsairSensor:
             data_packet = "{}0300000002{}".format(
                 self.sensor_addr, addrs[self.sensor_addr]
             )
-            # print(data_packet)
+            log.debug(f"sending {data_packet}")
             command_bytes = codecs.decode(data_packet.encode(), "hex")
-            # print(command_bytes)
             count = 0
-            length = 0
             try:
                 count += 1
                 self._th_sensor.flushInput()
@@ -100,18 +102,18 @@ class AsairSensor:
                 if count == self.timeout:
                     raise RuntimeError("TH SENSOR TIMEOUT")
                 res = self._th_sensor.read(length)
+                log.debug(f"received {res}")
                 res = codecs.encode(res, "hex")
-                # print("res: ",res)
                 temp = res[6:10]
-                # print("Temp: ", temp)
                 relative_hum = res[10:14]
+                log.info(f"Temp: {temp}, RelativeHum: {relative_hum}")
                 temp = float(int(temp, 16)) / 10
                 relative_hum = float(int(relative_hum, 16)) / 10
                 return temp, relative_hum
 
             except AsairSensorError as th_error:
                 self._th_sensor.close()
-                print("Error Occured")
+                log.exception("Error Occurred")
                 raise AsairSensorError(str(th_error))
 
             except SerialException:
@@ -126,7 +128,6 @@ class AsairSensor:
 
 if __name__ == "__main__":
     TH = AsairSensor(port="COM12")
-    # TH.connect("COM12")
     while True:
         ##########################################
         # make a dir
@@ -161,6 +162,5 @@ if __name__ == "__main__":
                 if T not in now:
                     break
                 h1, t1 = TH.get_reading()
-                # writer.writerow([now, t1,h1,t2,h2,t3,h3,t4,h4,t5,h5,t6,h6,t7,h7,t8,h8])
                 print("Time: {}, t1={},h1={}".format(now, t1, h1))
                 time.sleep(2)
