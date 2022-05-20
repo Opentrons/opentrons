@@ -1,4 +1,4 @@
-from typing import Any, Dict, cast, List
+from typing import Any, Dict, cast, List, Iterable, Tuple
 from typing_extensions import Final
 from dataclasses import asdict
 
@@ -328,4 +328,20 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
 
 
 def serialize(config: OT3Config) -> Dict[str, Any]:
-    return asdict(config)
+    def _build_dict(pairs: Iterable[Tuple[Any, Any]]) -> Dict[str, Any]:
+        def _normalize_key(key: Any) -> Any:
+            if isinstance(key, OT3AxisKind):
+                return key.name
+            return key
+
+        def _normalize_value(value: Any) -> Any:
+            if isinstance(value, dict):
+                return {
+                    _normalize_key(k): _normalize_value(v) for k, v in value.items()
+                }
+            else:
+                return value
+
+        return dict((_normalize_key(key), _normalize_value(val)) for key, val in pairs)
+
+    return asdict(config, dict_factory=_build_dict)
