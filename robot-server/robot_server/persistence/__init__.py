@@ -26,13 +26,15 @@ _CLEAR_ON_REBOOT = "marked_to_delete.txt"
 _log = logging.getLogger(__name__)
 
 
-async def reset_persistence_directory(directory: Path) -> None:
+async def reset_persistence_directory(directory: Path) -> bool:
     """Delete dir content if marked to delete."""
     try:
         shutil.rmtree(directory)
     except OSError:
-        print("Could not delete item, ", directory)
-    print(f"directory {directory} we deleted successfully")
+        print("Could reset directory, ", directory)
+        return False
+    print(f"directory {directory} we deleted successfully!")
+    return True
 
 
 async def get_persistence_directory(
