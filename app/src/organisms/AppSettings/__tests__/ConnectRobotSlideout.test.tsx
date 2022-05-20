@@ -95,7 +95,7 @@ describe('ConnectRobotSlideout', () => {
   it('renders the link and it has the correct href attribute', () => {
     const { getByText } = render(props)
     const targetLink =
-      'https://support.opentrons.com/en/articles/2934336-manually-adding-a-robot-s-ip-address'
+      'https://support.opentrons.com/s/article/Manually-adding-a-robot-s-IP-address'
     const link = getByText('Learn more about connecting a robot manually')
     expect(link.closest('a')).toHaveAttribute('href', targetLink)
   })

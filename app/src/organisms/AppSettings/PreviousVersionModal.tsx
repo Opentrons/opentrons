@@ -8,8 +8,7 @@ import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 export const UNINSTALL_APP_URL =
-  'https://support.opentrons.com/en/articles/2393514-uninstall-the-opentrons-app'
-
+  'https://support.opentrons.com/s/article/Uninstall-the-Opentrons-App'
 export const PREVIOUS_RELEASES_URL =
   'https://github.com/Opentrons/opentrons/releases'
 
