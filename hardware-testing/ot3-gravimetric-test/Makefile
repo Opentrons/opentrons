@@ -59,11 +59,11 @@ sdist: $(sdist_file)
 
 .PHONY: test
 test:
-	$(pytest) -m $(tests) $(test_opts)
+	$(pytest) $(tests) $(test_opts)
 
 .PHONY: test-cov
 test-cov:
-	$(pytest) -m $(tests) $(test_opts) $(cov_opts)
+	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: lint
 lint:
@@ -74,7 +74,6 @@ lint:
 .PHONY: format
 format:
 	$(python) -m black gravimetric_test tests protocols setup.py
-
 
 .PHONY: push-no-restart
 push-no-restart: sdist Pipfile.lock
