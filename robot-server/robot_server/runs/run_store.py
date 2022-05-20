@@ -18,6 +18,9 @@ from robot_server.protocols import ProtocolNotFoundError
 from .action_models import RunAction, RunActionType
 
 
+_CACHE_ENTRIES = 32
+
+
 @dataclass(frozen=True)
 class RunResource:
     """An entry in the run store, used to construct response models.
@@ -173,14 +176,14 @@ class RunStore:
         self._clear_caches()
         return run
 
-    @lru_cache(maxsize=32)
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def has(self, run_id: str) -> bool:
         """Whether a given run exists in the store."""
         statement = sqlalchemy.select(run_table.c.id).where(run_table.c.id == run_id)
         with self._sql_engine.begin() as transaction:
             return transaction.execute(statement).first() is not None
 
-    @lru_cache(maxsize=32)
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get(self, run_id: str) -> RunResource:
         """Get a specific run entry by its identifier.
 
@@ -212,7 +215,7 @@ class RunStore:
 
         return _convert_row_to_run(run_row, action_rows)
 
-    @lru_cache(maxsize=32)
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_all(self) -> List[RunResource]:
         """Get all known run resources.
 
@@ -238,7 +241,7 @@ class RunStore:
             for run_row in runs
         ]
 
-    @lru_cache(maxsize=32)
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_state_summary(self, run_id: str) -> Optional[StateSummary]:
         """Get the archived run state summary.
 
@@ -259,7 +262,7 @@ class RunStore:
             else None
         )
 
-    @lru_cache(maxsize=32)
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def _get_all_unparsed_commands(self, run_id: str) -> List[Dict[str, Any]]:
         select_run_commands = sqlalchemy.select(run_table.c.commands).where(
             run_table.c.id == run_id
@@ -314,7 +317,7 @@ class RunStore:
             commands=sliced_commands,
         )
 
-    @lru_cache(maxsize=32)
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_command(self, run_id: str, command_id: str) -> Command:
         """Get run command by id.
 
