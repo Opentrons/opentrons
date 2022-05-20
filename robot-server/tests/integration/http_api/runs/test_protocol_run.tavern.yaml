@@ -46,7 +46,7 @@ stages:
           run_data: data
           run_id: data.id
 
-  - name: Get the specific run we just created, by its ID
+  - name: Get the specific run we just created, by its ID, and make sure it's the same
     request:
       url: '{host:s}:{port:d}/runs/{run_id}'
       method: GET
