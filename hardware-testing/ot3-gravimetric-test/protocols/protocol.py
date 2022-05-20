@@ -1,7 +1,10 @@
-metadata = {
-	'protocolName': '',
-	'apiLevel': '2.12'
-}
+"""A protocol."""
 
-def run(protocol):
-  protocol.comment('done.')
+from opentrons.protocol_api import ProtocolContext
+
+metadata = {"protocolName": "", "apiLevel": "2.12"}
+
+
+def run(protocol: ProtocolContext) -> None:
+    """Run the protocol."""
+    protocol.comment("done.")

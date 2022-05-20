@@ -1,0 +1,66 @@
+# This workflow runs test and lint on branch pushes that touch the
+# ot3-gravimetric-testing project or its dependencies
+
+name: 'ot3-gravimetric-testing testing lint/test'
+
+on:
+  # Most of the time, we run on pull requests, which lets us handle external PRs
+  push:
+    paths:
+      - 'Makefile'
+      - 'hardware-testing/ot3-gravimetric-test/**'
+      - '.github/workflows/ot3-gravimentric-testing-lint-test.yaml'
+      - '.github/actions/python/**'
+    branches:
+      - 'edge'
+      - 'release'
+    tags-ignore:
+      - '*'
+  pull_request:
+    paths:
+      - 'Makefile'
+      - 'hardware-testing/ot3-gravimetric-test/**'
+      - '.github/workflows/ot3-gravimentric-testing-lint-test.yaml'
+      - '.github/actions/python/**'
+
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint-test:
+    name: 'ot3-gravimetric--testing package linting and tests'
+    timeout-minutes: 20
+    runs-on: 'ubuntu-20.04'
+    steps:
+      - name: Checkout opentrons repo
+        uses: 'actions/checkout@v2'
+
+      - name: Setup Node
+        uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+
+      - name: Setup Python
+        uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+
+      - name: Setup Project
+        uses: './.github/actions/python/setup'
+        with:
+          project: 'hardware-testing/ot3-gravimetric-test'
+
+      - name: Lint
+        run: make -C hardware-testing/ot3-gravimetric-test lint
+
+      - name: Test
+        run: make -C hardware-testing/ot3-gravimetric-test test-cov
+
+      - name: Coverage
+        uses: 'codecov/codecov-action@v2'
+        with:
+          files: ./hardware-testing/ot3-gravimetric-test/coverage.xml
+          flags: ot3-gravimetric-test
