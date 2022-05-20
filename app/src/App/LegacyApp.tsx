@@ -9,7 +9,6 @@ import { getConnectedRobot } from '../redux/discovery'
 import { Alerts } from '../organisms/Alerts'
 
 import { Robots } from '../pages/Robots'
-import { Upload } from '../pages/Upload'
 import { Run } from '../pages/Run'
 import { More } from '../pages/More'
 
