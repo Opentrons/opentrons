@@ -12,7 +12,7 @@ import { getShellUpdateState } from '../../../../redux/shell'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
 // import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
 
-import { UpdateBuildroot } from '../../../../pages/Robots/RobotSettings/UpdateBuildroot'
+import { UpdateBuildroot } from '../UpdateBuildroot'
 import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { PrimaryButton, SecondaryButton } from '../../../../atoms/buttons'
