@@ -73,6 +73,36 @@ stages:
         data:
           - !force_format_include '{run_data}'
 
+  - name: Add a labware offset to the run
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/labware_offsets'
+      method: POST
+      json:
+        data:
+          definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
+          location:
+            slotName: "1"
+          vector:
+            x: 1.11
+            y: 2.22
+            z: 3.33
+    response:
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
+          location:
+            slotName: "1"
+          vector:
+            x: 1.11
+            y: 2.22
+            z: 3.33
+      save:
+        json:
+          labware_offset_id: data.id
+
   - name: Play the run
     request:
       url: '{host:s}:{port:d}/runs/{run_id}/actions'
