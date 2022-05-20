@@ -51,7 +51,7 @@ export function HistoricalProtocolRunOverflowMenu(
   const runTotalCommandCount = commands?.data?.meta?.totalLength
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
+    <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE} data-testid="HistoricalProtocolRunOverflowMenu_OverflowMenu">
       <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
       {showOverflowMenu && (
         <MenuDropdown
