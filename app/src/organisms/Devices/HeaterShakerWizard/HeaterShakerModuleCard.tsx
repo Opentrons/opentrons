@@ -68,13 +68,7 @@ export const HeaterShakerModuleCard = (
             </Text>
           </Flex>
           <HeaterShakerModuleData
-            heaterStatus={module.data.temperatureStatus}
-            shakerStatus={module.data.speedStatus}
-            latchStatus={module.data.labwareLatchStatus}
-            targetTemp={module.data.targetTemperature}
-            currentTemp={module.data.currentTemperature}
-            targetSpeed={module.data.targetSpeed}
-            currentSpeed={module.data.currentSpeed}
+            moduleData={module.data}
             showTemperatureData={false}
           />
         </Flex>

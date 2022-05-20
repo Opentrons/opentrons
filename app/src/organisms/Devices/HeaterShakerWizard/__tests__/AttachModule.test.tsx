@@ -51,7 +51,7 @@ describe('AttachModule', () => {
     )
     getByText(
       nestedTextMatcher(
-        'Turn screws  counter clockwise to retract the anchors. The screws should not come out of the module.'
+        'Turn screws  counterclockwise to retract the anchors. The screws should not come out of the module.'
       )
     )
     getByText(
