@@ -65,7 +65,7 @@ const toastStyleByType: {
   },
   info: {
     iconName: 'information',
-    color: COLORS.darkBlack,
+    color: COLORS.darkGreyEnabled,
     backgroundColor: COLORS.greyDisabled,
   },
 }

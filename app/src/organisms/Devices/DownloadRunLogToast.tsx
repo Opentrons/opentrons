@@ -11,7 +11,7 @@ import { downloadFile } from './utils'
 interface DownloadRunLogToastProps {
   robotName: string
   runId: string
-  onClose: () => unknown
+  onClose: () => void
   pageLength: number
 }
 
