@@ -113,6 +113,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
               <StyledText
                 color={COLORS.darkBlack}
                 as="h2"
+                css={TYPOGRAPHY.h2SemiBold}
                 data-testid={`Slideout_title_${title}`}
               >
                 {title}
