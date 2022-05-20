@@ -215,6 +215,7 @@ def test_available_resets(api_client):
             "pipetteOffsetCalibrations",
             "bootScripts",
             "tipLengthCalibrations",
+            "dbHistory"
         ]
     ) == sorted([item["id"] for item in options_list])
 

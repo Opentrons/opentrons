@@ -104,7 +104,7 @@ class ResetManager:
         try:
             Path(persistence_directory).mkdir(parents=True, exist_ok=True)
             Path(file_name).open("w")
-        except FileExistsError:
+        except OSError:
             print("Could not create file:", file_name)
 
 

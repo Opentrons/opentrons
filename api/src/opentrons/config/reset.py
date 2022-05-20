@@ -49,7 +49,7 @@ _settings_reset_options = {
         description="Clear tip length calibrations (will also clear " "pipette offset)",
     ),
     ResetOptionId.reset_db_history: CommonResetOption(
-        name="ç",
+        name="Clear Data and Restart Robot",
         description="Clear run/protocols history"
     )
 }

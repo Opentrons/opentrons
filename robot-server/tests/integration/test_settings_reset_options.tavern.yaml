@@ -24,6 +24,9 @@ stages:
           - id: tipLengthCalibrations
             name: Tip Length Calibrations
             description: !re_search 'Clear tip length calibrations'
+          - id: dbHistory
+            name: Clear Data and Restart Robot
+            description: !re_search 'Clear run/protocols history'
 ---
 test_name: POST Reset bootScripts option
 marks:
