@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
+from functools import lru_cache
 from logging import getLogger
 from pathlib import Path
 from typing import Dict, List, Optional, Set
@@ -18,6 +19,9 @@ from robot_server.persistence import (
     sqlite_rowid,
     ensure_utc_datetime,
 )
+
+
+_CACHE_ENTRIES = 32
 
 
 _log = getLogger(__name__)
@@ -157,7 +161,9 @@ class ProtocolStore:
             )
         )
         self._sources_by_id[resource.protocol_id] = resource.source
+        self._clear_caches()
 
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get(self, protocol_id: str) -> ProtocolResource:
         """Get a single protocol by ID.
 
@@ -172,6 +178,7 @@ class ProtocolStore:
             source=self._sources_by_id[sql_resource.protocol_id],
         )
 
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_all(self) -> List[ProtocolResource]:
         """Get all protocols currently saved in this store."""
         all_sql_resources = self._sql_get_all()
@@ -185,6 +192,7 @@ class ProtocolStore:
             for r in all_sql_resources
         ]
 
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def has(self, protocol_id: str) -> bool:
         """Check for the presence of a protocol ID in the store."""
         statement = sqlalchemy.select(protocol_table).where(
@@ -219,6 +227,8 @@ class ProtocolStore:
         if protocol_dir:
             protocol_dir.rmdir()
 
+        self._clear_caches()
+
         return ProtocolResource(
             protocol_id=protocol_id,
             created_at=deleted_sql_resource.created_at,
@@ -226,6 +236,9 @@ class ProtocolStore:
             source=deleted_source,
         )
 
+    # Note that this is NOT cached like the other getters because we would need
+    # to invalidate the cache whenever the runs table changes, which is not something
+    # that this class can easily monitor.
     def get_usage_info(self) -> List[ProtocolUsageInfo]:
         """Return information about which protocols are currently being used by runs.
 
@@ -324,6 +337,11 @@ class ProtocolStore:
 
         deleted_resource = _convert_sql_row_to_dataclass(sql_row=row_to_delete)
         return deleted_resource
+
+    def _clear_caches(self) -> None:
+        self.get.cache_clear()
+        self.get_all.cache_clear()
+        self.has.cache_clear()
 
 
 # TODO(mm, 2022-04-18):

@@ -44,6 +44,7 @@ interface ProtocolCardProps extends StoredProtocolData {
 }
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
+  const history = useHistory()
   const {
     handleRunProtocol,
     protocolKey,

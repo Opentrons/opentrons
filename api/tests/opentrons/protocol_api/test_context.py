@@ -84,11 +84,13 @@ async def test_motion(ctx, hardware):
     old_pos = await hardware.current_position(instr._implementation.get_mount())
     instr.home()
     assert instr.move_to(Location(Point(0, 0, 0), None)) is instr
-    old_pos[Axis.X] = 0
-    old_pos[Axis.Y] = 0
-    old_pos[Axis.A] = 0
-    old_pos[Axis.C] = 2
-    assert await hardware.current_position(instr._implementation.get_mount()) == old_pos
+    old_pos[Axis.X] = 0.0
+    old_pos[Axis.Y] = 0.0
+    old_pos[Axis.A] = 0.0
+    old_pos[Axis.C] = 2.0
+    assert await hardware.current_position(
+        instr._implementation.get_mount()
+    ) == pytest.approx(old_pos)
 
 
 async def test_max_speeds(ctx, monkeypatch, hardware):
