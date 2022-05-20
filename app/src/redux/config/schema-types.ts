@@ -130,7 +130,7 @@ export interface ConfigV6 extends Omit<ConfigV5, 'version'> {
 
 export interface ConfigV7 extends Omit<ConfigV6, 'version'> {
   version: 7
-  ui: ConfigV5['ui'] & {
+  ui: ConfigV6['ui'] & {
     minWidth: number
   }
 }
