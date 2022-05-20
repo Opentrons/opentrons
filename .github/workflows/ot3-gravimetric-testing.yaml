@@ -8,7 +8,7 @@ on:
   push:
     paths:
       - 'Makefile'
-      - 'hardware-testing/ot3-gravimetric-testing/**'
+      - 'hardware-testing/ot3-gravimetric-test/**'
       - '.github/workflows/ot3-gravimentric-testing-lint-test.yaml'
       - '.github/actions/python/**'
     branches:
@@ -19,7 +19,7 @@ on:
   pull_request:
     paths:
       - 'Makefile'
-      - 'hardware-testing/ot3-gravimetric-testing/**'
+      - 'hardware-testing/ot3-gravimetric-test/**'
       - '.github/workflows/ot3-gravimentric-testing-lint-test.yaml'
       - '.github/actions/python/**'
 
@@ -51,7 +51,7 @@ jobs:
       - name: Setup Project
         uses: './.github/actions/python/setup'
         with:
-          project: 'hardware-testing/ot3-gravimetric-testing'
+          project: 'hardware-testing/ot3-gravimetric-test'
 
       - name: Lint
         run: make -C hardware-testing/ot3-gravimetric-test lint
@@ -62,5 +62,5 @@ jobs:
       - name: Coverage
         uses: 'codecov/codecov-action@v2'
         with:
-          files: ./hardware-testing/ot3-gravimetric-testing/coverage.xml
-          flags: ot3-gravimetric-testing
+          files: ./hardware-testing/ot3-gravimetric-test/coverage.xml
+          flags: ot3-gravimetric-test
