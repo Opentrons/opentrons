@@ -116,10 +116,12 @@ async def test_test_reset_db_file_exist(
 async def test_delete_persistence_directory(reset_manager: ResetManager, tmp_path: Path
 ) -> None:
     """Should make sure directory is empty."""
-    assert Path(tmp_path, _CLEAR_ON_REBOOT).exists() is False
+    tmp_path = Path("/Users/tamarzanzouri/temp_dir/")
 
     await reset_manager.reset_db(tmp_path)
 
     await reset_persistence_directory(tmp_path)
 
     assert len(os.listdir(tmp_path)) == 0
+
+    assert Path(tmp_path).exists() is True

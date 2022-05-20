@@ -2,6 +2,7 @@
 import logging
 from pathlib import Path
 from tempfile import mkdtemp
+import shutil
 
 import sqlalchemy
 from anyio import Path as AsyncPath
@@ -27,13 +28,15 @@ _log = logging.getLogger(__name__)
 
 async def reset_persistence_directory(directory: Path) -> None:
     """Delete dir content if marked to delete."""
-    if Path(directory, _CLEAR_ON_REBOOT).exists():
-        for item in directory.iterdir():
-            print(item)
+    for item in directory.iterdir():
+        print(item)
+        try:
             if item.is_dir():
-                item.rmdir()
+                shutil.rmtree(item)
             else:
                 item.unlink()
+        except OSError:
+            print("Could not delete item, ")
 
 
 async def get_persistence_directory(
@@ -55,6 +58,9 @@ async def get_persistence_directory(
             )
         else:
             persistence_dir = setting
+            if Path(persistence_dir, _CLEAR_ON_REBOOT).exists():
+                await reset_persistence_directory(persistence_dir)
+
             await AsyncPath(persistence_dir).mkdir(parents=True, exist_ok=True)
             _log.info(f"Using directory {persistence_dir} for persistence.")
 
