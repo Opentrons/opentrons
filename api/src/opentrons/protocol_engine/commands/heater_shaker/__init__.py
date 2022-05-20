@@ -48,12 +48,12 @@ from .open_labware_latch import (
     OpenLabwareLatchCommandType,
 )
 
-from .close_latch import (
-    CloseLatch,
-    CloseLatchCreate,
-    CloseLatchParams,
-    CloseLatchResult,
-    CloseLatchCommandType,
+from .close_labware_latch import (
+    CloseLabwareLatch,
+    CloseLabwareLatchCreate,
+    CloseLabwareLatchParams,
+    CloseLabwareLatchResult,
+    CloseLabwareLatchCommandType,
 )
 
 __all__ = [
@@ -93,10 +93,10 @@ __all__ = [
     "OpenLabwareLatchParams",
     "OpenLabwareLatchResult",
     "OpenLabwareLatchCommandType",
-    # heaterShakerModule/closeLatch
-    "CloseLatch",
-    "CloseLatchCreate",
-    "CloseLatchParams",
-    "CloseLatchResult",
-    "CloseLatchCommandType",
+    # heaterShakerModule/closeLabwareLatch
+    "CloseLabwareLatch",
+    "CloseLabwareLatchCreate",
+    "CloseLabwareLatchParams",
+    "CloseLabwareLatchResult",
+    "CloseLabwareLatchCommandType",
 ]

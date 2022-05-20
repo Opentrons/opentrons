@@ -1,4 +1,4 @@
-"""Command models to close the Heater-Shaker Module's latch."""
+"""Command models to close the Heater-Shaker Module's labware latch."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type
@@ -12,21 +12,21 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 
-CloseLatchCommandType = Literal["heaterShakerModule/closeLatch"]
+CloseLabwareLatchCommandType = Literal["heaterShakerModule/closeLabwareLatch"]
 
 
-class CloseLatchParams(BaseModel):
-    """Input parameters to close a Heater-Shaker Module's latch."""
+class CloseLabwareLatchParams(BaseModel):
+    """Input parameters to close a Heater-Shaker Module's labware latch."""
 
     moduleId: str = Field(..., description="Unique ID of the Heater-Shaker Module.")
 
 
-class CloseLatchResult(BaseModel):
-    """Result data from closing a Heater-Shaker's latch."""
+class CloseLabwareLatchResult(BaseModel):
+    """Result data from closing a Heater-Shaker's labware latch."""
 
 
-class CloseLatchImpl(AbstractCommandImpl[CloseLatchParams, CloseLatchResult]):
-    """Execution implementation of a Heater-Shaker's close latch command."""
+class CloseLabwareLatchImpl(AbstractCommandImpl[CloseLabwareLatchParams, CloseLabwareLatchResult]):
+    """Execution implementation of a Heater-Shaker's close labware latch command."""
 
     def __init__(
         self,
@@ -37,8 +37,8 @@ class CloseLatchImpl(AbstractCommandImpl[CloseLatchParams, CloseLatchResult]):
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(self, params: CloseLatchParams) -> CloseLatchResult:
-        """Close a Heater-Shaker's latch."""
+    async def execute(self, params: CloseLabwareLatchParams) -> CloseLabwareLatchResult:
+        """Close a Heater-Shaker's labware latch."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
             module_id=params.moduleId
@@ -52,23 +52,23 @@ class CloseLatchImpl(AbstractCommandImpl[CloseLatchParams, CloseLatchResult]):
         if hs_hardware_module is not None:
             await hs_hardware_module.close_labware_latch()
 
-        return CloseLatchResult()
+        return CloseLabwareLatchResult()
 
 
-class CloseLatch(BaseCommand[CloseLatchParams, CloseLatchResult]):
+class CloseLabwareLatch(BaseCommand[CloseLabwareLatchParams, CloseLabwareLatchResult]):
     """A command to close a Heater-Shaker's latch."""
 
-    commandType: CloseLatchCommandType = "heaterShakerModule/closeLatch"
-    params: CloseLatchParams
-    result: Optional[CloseLatchResult]
+    commandType: CloseLabwareLatchCommandType = "heaterShakerModule/closeLatch"
+    params: CloseLabwareLatchParams
+    result: Optional[CloseLabwareLatchResult]
 
-    _ImplementationCls: Type[CloseLatchImpl] = CloseLatchImpl
+    _ImplementationCls: Type[CloseLabwareLatchImpl] = CloseLabwareLatchImpl
 
 
-class CloseLatchCreate(BaseCommandCreate[CloseLatchParams]):
+class CloseLabwareLatchCreate(BaseCommandCreate[CloseLabwareLatchParams]):
     """A request to create a Heater-Shaker's close latch command."""
 
-    commandType: CloseLatchCommandType
-    params: CloseLatchParams
+    commandType: CloseLabwareLatchCommandType
+    params: CloseLabwareLatchParams
 
-    _CommandCls: Type[CloseLatch] = CloseLatch
+    _CommandCls: Type[CloseLabwareLatch] = CloseLabwareLatch
