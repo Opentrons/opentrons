@@ -3,6 +3,7 @@ import json
 import os
 
 import pytest
+from typing import Dict, Any
 
 from opentrons.config import CONFIG, robot_configs, defaults_ot2, defaults_ot3
 from opentrons.config.types import CurrentDict, GantryLoad, OT3Config
@@ -292,6 +293,16 @@ def test_dictify_roundtrip(config_dict):
     built_config = robot_configs.build_config(config_dict)
     new_saved_config = robot_configs.config_to_save(built_config)
     assert new_saved_config == config_dict
+
+
+@pytest.mark.parametrize("config_dict", [new_dummy_settings, ot3_dummy_settings])
+def test_json_roundtrip(config_dict: Dict[str, Any]) -> None:
+    built_config = robot_configs.build_config(config_dict)
+    config_dict = robot_configs.config_to_save(built_config)
+    jsonstr = robot_configs.json_to_save(config_dict)
+    reloaded = json.loads(jsonstr)
+    rebuilt = robot_configs.build_config(reloaded)
+    assert built_config == rebuilt
 
 
 def test_load_legacy_gantry_cal():
