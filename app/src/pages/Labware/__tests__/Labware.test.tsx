@@ -3,14 +3,14 @@ import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { LabwareCard } from '../LabwareCard'
-import { AddCustomLabware } from '../AddCustomLabware'
+import { LabwareCard } from '../../../organisms/LabwareCard'
+import { AddCustomLabware } from '../../../organisms/AddCustomLabware'
 import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
-import { Labware } from '../'
+import { Labware } from '..'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
 
-jest.mock('../LabwareCard')
-jest.mock('../AddCustomLabware')
+jest.mock('../../../organisms/LabwareCard')
+jest.mock('../../../organisms/AddCustomLabware')
 jest.mock('../hooks')
 jest.mock('../helpers/getAllDefs')
 

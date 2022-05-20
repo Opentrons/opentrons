@@ -16,10 +16,10 @@ import {
   ALIGN_CENTER,
   SIZE_1,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
-import { Slideout } from '../../../atoms/Slideout'
-import { getWellLabel } from '../helpers/labels'
-import { getUniqueWellProperties } from '../helpers/labwareInference'
+import { StyledText } from '../../atoms/text'
+import { Slideout } from '../../atoms/Slideout'
+import { getWellLabel } from './helpers/labels'
+import { getUniqueWellProperties } from './helpers/labwareInference'
 import { WellCount } from './WellCount'
 import { WellProperties } from './WellProperties'
 import { Dimensions } from './Dimensions'
@@ -28,8 +28,8 @@ import { WellSpacing } from './WellSpacing'
 import { ManufacturerDetails } from './ManufacturerDetails'
 import { InsertDetails } from './InsertDetails'
 import { Gallery } from './Gallery'
-import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
-import type { LabwareDefAndDate } from '../hooks'
+import { CustomLabwareOverflowMenu } from '../LabwareCard/CustomLabwareOverflowMenu'
+import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
 
 export interface LabwareDetailsProps {
   onClose: () => void

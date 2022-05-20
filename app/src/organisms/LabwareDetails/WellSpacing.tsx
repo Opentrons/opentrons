@@ -5,7 +5,7 @@ import { LabeledValue } from './StyledComponents/LabeledValue'
 import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
 import { getSpacingDiagram } from './measurementGuide'
 
-import type { LabwareWellGroupProperties } from '../types'
+import type { LabwareWellGroupProperties } from '../../pages/Labware/types'
 
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 

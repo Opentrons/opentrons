@@ -5,7 +5,7 @@ import { Box, SPACING } from '@opentrons/components'
 import { LabeledValue } from './StyledComponents/LabeledValue'
 import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
 import { getFootprintDiagram } from './measurementGuide'
-import type { LabwareDefinition } from '../types'
+import type { LabwareDefinition } from '../../pages/Labware/types'
 
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 

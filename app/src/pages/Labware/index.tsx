@@ -22,9 +22,9 @@ import { SecondaryButton } from '../../atoms/buttons'
 import { Toast } from '../../atoms/Toast'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
-import { LabwareCard } from './LabwareCard'
-import { AddCustomLabware } from './AddCustomLabware'
-import { LabwareDetails } from './LabwareDetails'
+import { LabwareCard } from '../../organisms/LabwareCard'
+import { AddCustomLabware } from '../../organisms/AddCustomLabware'
+import { LabwareDetails } from '../../organisms/LabwareDetails'
 import {
   LabwareDefAndDate,
   useAllLabware,

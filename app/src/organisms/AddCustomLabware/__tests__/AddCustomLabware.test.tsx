@@ -2,10 +2,10 @@ import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { AddCustomLabware } from '../AddCustomLabware'
+import { AddCustomLabware } from '../../AddCustomLabware'
 
 jest.mock('../../../redux/custom-labware')
-jest.mock('../helpers/getAllDefs')
+jest.mock('../../../pages/Labware/helpers/getAllDefs')
 
 const render = (props: React.ComponentProps<typeof AddCustomLabware>) => {
   return renderWithProviders(

@@ -22,7 +22,7 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
-import type { LabwareDefAndDate } from './hooks'
+import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
 
 export interface LabwareCardProps {
   labware: LabwareDefAndDate

@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 import { labwareImages } from './labware-images'
 
-import type { LabwareDefinition } from '../types'
+import type { LabwareDefinition } from '../../pages/Labware/types'
 
 export interface GalleryProps {
   definition: LabwareDefinition

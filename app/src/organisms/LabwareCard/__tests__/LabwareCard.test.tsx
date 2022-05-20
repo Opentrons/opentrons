@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { LabwareCard } from '../LabwareCard'
-import { useAllLabware } from '../hooks'
+import { LabwareCard } from '..'
+import { useAllLabware } from '../../../pages/Labware/hooks'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
 
-jest.mock('../hooks')
-jest.mock('../helpers/getAllDefs')
+jest.mock('../../../pages/Labware/hooks')
+jest.mock('../../../pages/Labware/helpers/getAllDefs')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -97,23 +96,4 @@ export function useNewLabwareName(): {
   const clearLabwareName = (): unknown => dispatch(clearNewLabwareName())
 
   return { newLabwareName, clearLabwareName }
-}
-
-export function useCloseOnOutsideClick(
-  ref: React.RefObject<HTMLInputElement>,
-  onClose: () => void
-): void {
-  const handleClick = (e: MouseEvent): void => {
-    // @ts-expect-error node and event target types are mismatched
-    if (ref.current != null && !ref.current.contains(e.target)) {
-      onClose()
-    }
-  }
-
-  React.useEffect(() => {
-    document.addEventListener('click', handleClick)
-    return () => {
-      document.removeEventListener('click', handleClick)
-    }
-  })
 }

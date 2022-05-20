@@ -6,7 +6,10 @@ import { LabeledValue } from './StyledComponents/LabeledValue'
 import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
 import { getMeasurementDiagram } from './measurementGuide'
 
-import type { LabwareWellGroupProperties, LabwareParameters } from '../types'
+import type {
+  LabwareWellGroupProperties,
+  LabwareParameters,
+} from '../../pages/Labware/types'
 
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 

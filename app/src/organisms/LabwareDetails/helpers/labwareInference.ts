@@ -8,7 +8,7 @@ import type {
   LabwareWellShapeProperties,
   LabwareWellGroupProperties,
   LabwareDefinition,
-} from '../types'
+} from '../../../pages/Labware/types'
 
 const ROUNDING_PRECISION = 2
 

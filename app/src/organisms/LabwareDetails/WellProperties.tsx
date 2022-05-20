@@ -11,13 +11,13 @@ import {
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { getDisplayVolume } from '@opentrons/shared-data'
-import { StyledText } from '../../../atoms/text'
+import { StyledText } from '../../atoms/text'
 
 import type {
   LabwareDefinition,
   LabwareWellGroupProperties,
   LabwareVolumeUnits,
-} from '../types'
+} from '../../pages/Labware/types'
 
 export interface AllWellPropertiesProps {
   definition: LabwareDefinition

@@ -11,8 +11,8 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
-import type { LabwareBrand } from '../types'
+import { StyledText } from '../../atoms/text'
+import type { LabwareBrand } from '../../pages/Labware/types'
 
 export interface ManufacturerDetailsProps {
   brand: LabwareBrand
