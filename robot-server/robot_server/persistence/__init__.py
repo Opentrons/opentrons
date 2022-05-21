@@ -33,7 +33,7 @@ async def reset_persistence_directory(directory: Path) -> bool:
     except OSError:
         print("Could reset directory, ", directory)
         return False
-    print(f"directory {directory} we deleted successfully!")
+    print(f"directory: {directory}, was deleted successfully!")
     return True
 
 
@@ -56,6 +56,7 @@ async def get_persistence_directory(
             )
         else:
             persistence_dir = setting
+            # Reset DB only if is not temporary dir
             if Path(persistence_dir, _CLEAR_ON_REBOOT).exists():
                 await reset_persistence_directory(persistence_dir)
 
@@ -98,7 +99,7 @@ class ResetManager:
 
     @staticmethod
     async def reset_db(persistence_directory: Path) -> None:
-        """Create an file to mark directory to delete."""
+        """Create a file to mark directory to delete."""
         file_name = Path(persistence_directory, _CLEAR_ON_REBOOT)
         print(file_name)
         try:
