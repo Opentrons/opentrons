@@ -39,7 +39,7 @@ export function ShortTrashBin({
   const isRobotBusy = useCurrentRunId() !== null
   const allSessionsQueryResponse = useAllSessionsQuery()
 
-  const handleClick = (): void => {
+  const handleClick: React.MouseEventHandler<Element> = () => {
     const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
     if (isBusy) {
       updateIsRobotBusy(true)
@@ -66,7 +66,7 @@ export function ShortTrashBin({
       <ToggleButton
         label="short_trash_bin"
         toggledOn={settings?.value === true}
-        onClick={() => handleClick()}
+        onClick={handleClick}
         id="AdvancedSettings_shortTrashBin"
       />
     </Flex>

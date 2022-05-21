@@ -39,7 +39,7 @@ export function DisableHoming({
   const isRobotBusy = useCurrentRunId() !== null
   const allSessionsQueryResponse = useAllSessionsQuery()
 
-  const handleClick = (): void => {
+  const handleClick: React.MouseEventHandler<Element> = () => {
     const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
     if (isBusy) {
       updateIsRobotBusy(true)
@@ -65,7 +65,7 @@ export function DisableHoming({
       <ToggleButton
         label="disable_homing"
         toggledOn={value}
-        onClick={() => handleClick()}
+        onClick={handleClick}
         id="RobotSettings_disableHomingToggleButton"
       />
     </Flex>

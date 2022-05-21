@@ -39,7 +39,7 @@ export function LegacySettings({
   const isRobotBusy = useCurrentRunId() !== null
   const allSessionsQueryResponse = useAllSessionsQuery()
 
-  const handleClick = (): void => {
+  const handleClick: React.MouseEventHandler<Element> = () => {
     const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
     if (isBusy) {
       updateIsRobotBusy(true)
@@ -67,7 +67,7 @@ export function LegacySettings({
       <ToggleButton
         label="legacy_settings"
         toggledOn={settings?.value === true}
-        onClick={() => handleClick()}
+        onClick={handleClick}
         id="RobotSettings_legacySettingsToggleButton"
       />
     </Flex>

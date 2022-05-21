@@ -38,7 +38,7 @@ export function UseOlderProtocol({
   const isRobotBusy = useCurrentRunId() !== null
   const allSessionsQueryResponse = useAllSessionsQuery()
 
-  const handleClick = (): void => {
+  const handleClick: React.MouseEventHandler<Element> = () => {
     const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
     if (isBusy) {
       updateIsRobotBusy(true)
@@ -69,7 +69,7 @@ export function UseOlderProtocol({
       <ToggleButton
         label="use_older_protocol_analysis_method"
         toggledOn={settings?.value === true}
-        onClick={() => handleClick()}
+        onClick={handleClick}
         id="RobotSettings_useOlderProtocolToggleButton"
       />
     </Flex>
