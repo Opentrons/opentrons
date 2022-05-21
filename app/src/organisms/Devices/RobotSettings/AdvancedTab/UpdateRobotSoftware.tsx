@@ -55,7 +55,6 @@ export function UpdateRobotSoftware({
   const allSessionsQueryResponse = useAllSessionsQuery()
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
-    console.log('clicked')
     const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
     if (isBusy) {
       updateIsRobotBusy(true)

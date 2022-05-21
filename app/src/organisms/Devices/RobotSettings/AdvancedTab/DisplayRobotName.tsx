@@ -35,13 +35,10 @@ export function DisplayRobotName({
   const allSessionsQueryResponse = useAllSessionsQuery()
 
   const handleClick = (): void => {
-    console.log('handleClick')
     const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
     if (isBusy) {
-      console.log('1')
       updateIsRobotBusy(true)
     } else {
-      console.log('2')
       updateIsExpanded(true, 'renameRobot')
     }
   }
