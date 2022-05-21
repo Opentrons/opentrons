@@ -34,7 +34,7 @@ export function DisplayRobotName({
   const isRobotBusy = useCurrentRunId() !== null
   const allSessionsQueryResponse = useAllSessionsQuery()
 
-  const handleClick = (): void => {
+  const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
     const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
     if (isBusy) {
       updateIsRobotBusy(true)
@@ -65,7 +65,7 @@ export function DisplayRobotName({
       </Box>
       <TertiaryButton
         marginLeft={SPACING_AUTO}
-        onClick={() => handleClick()}
+        onClick={handleClick}
         id="RobotSettings_RenameRobot"
       >
         {t('robot_rename_button')}

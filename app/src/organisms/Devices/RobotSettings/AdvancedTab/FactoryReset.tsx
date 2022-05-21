@@ -33,7 +33,7 @@ export function FactoryReset({
   const isRobotBusy = useCurrentRunId() !== null
   const allSessionsQueryResponse = useAllSessionsQuery()
 
-  const handleClick = (): void => {
+  const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
     const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
     if (isBusy) {
       updateIsRobotBusy(true)
@@ -57,7 +57,7 @@ export function FactoryReset({
       </Box>
       <TertiaryButton
         marginLeft={SPACING_AUTO}
-        onClick={() => handleClick()}
+        onClick={handleClick}
         id="RobotSettings_FactoryResetChooseButton"
       >
         {t('factory_reset_settings_button')}
