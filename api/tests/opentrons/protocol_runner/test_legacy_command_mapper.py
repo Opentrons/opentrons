@@ -27,7 +27,7 @@ from opentrons.protocol_runner.legacy_wrappers import (
     LegacyTemperatureModuleModel,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
+from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 from opentrons.types import DeckSlotName, Mount, MountType
 
 
@@ -295,7 +295,7 @@ def test_map_instrument_load() -> None:
 
 def test_map_module_load(
     decoy: Decoy,
-    minimal_module_def: ModuleDefinitionV2,
+    minimal_module_def: ModuleDefinitionV3,
     module_data_provider: ModuleDataProvider,
 ) -> None:
     """It should correctly map a module load."""

@@ -1,7 +1,7 @@
 {
-  "$otSharedSchema": "module/schemas/2",
+  "$otSharedSchema": "module/schemas/3",
   "moduleType": "compatibleModuleType",
-  "model": "compatibleGenerationV1",
+  "model": "compatibleGenerationV2",
   "labwareOffset": {
     "x": -1.45,
     "y": -0.15,
@@ -15,7 +15,7 @@
     "x": 11.7,
     "y": 8.75
   },
-  "displayName": "Compatible Across Generations",
+  "displayName": "Compatible Across Generations GEN2",
   "quirks": [],
   "slotTransforms": {
     "ot2_standard": {
@@ -65,5 +65,5 @@
       }
     }
   },
-  "compatibleWith": ["compatibleGenerationV2"]
+  "compatibleWith": ["compatibleGenerationV1"]
 }
