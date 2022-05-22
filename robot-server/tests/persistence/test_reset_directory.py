@@ -87,6 +87,12 @@ async def test_upload_protocols_and_reset_persistence_dir(
 
             await robot_client.post_setting_reset_options({"dbHistory": True})
 
+            result = await robot_client.get_protocols()
+
+            assert result.json()["data"]
+
+            assert os.listdir(f"{server.persistence_directory}/protocols/")
+
             server.stop()
             assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
 
@@ -102,8 +108,7 @@ async def test_upload_protocols_and_reset_persistence_dir(
 
             await asyncio.sleep(5)
 
-            print(os.listdir(server.persistence_directory))
-            assert len(os.listdir(server.persistence_directory)) == 1
+            assert os.listdir(f"{server.persistence_directory}/protocols/") == []
 
             server.stop()
 
