@@ -6,9 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Union, Optional, cast
 from typing_extensions import Literal
 
-from api.src.opentrons.config import gripper_config
-
-from . import CONFIG, defaults_ot3, defaults_ot2
+from . import CONFIG, defaults_ot3, defaults_ot2, gripper_config
 from .feature_flags import enable_ot3_hardware_controller
 from opentrons.hardware_control.types import BoardRevision
 from .types import CurrentDict, RobotConfig, AxisDict, OT3Config

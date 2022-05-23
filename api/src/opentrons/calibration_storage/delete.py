@@ -141,17 +141,19 @@ def delete_pipette_offset_file(pipette: str, mount: Mount) -> None:
         pass
 
 
+def _remove_json_files_in_directories(p: Path) -> None:
+    """Delete json file by the path"""
+    for item in p.iterdir():
+        if item.is_dir():
+            _remove_json_files_in_directories(item)
+        elif item.suffix == ".json":
+            item.unlink()
+
+
 def clear_pipette_offset_calibrations() -> None:
     """
     Delete all pipette offset calibration files.
     """
-
-    def _remove_json_files_in_directories(p: Path) -> None:
-        for item in p.iterdir():
-            if item.is_dir():
-                _remove_json_files_in_directories(item)
-            elif item.suffix == ".json":
-                item.unlink()
 
     offset_dir = config.get_opentrons_path("pipette_calibration_dir")
     try:
@@ -182,3 +184,15 @@ def delete_gripper_offset_file(gripper: str) -> None:
 
     if offset_path.exists():
         offset_path.unlink()
+
+
+def clear_gripper_offset_calibrations() -> None:
+    """
+    Delete all gripper offset calibration files.
+    """
+
+    offset_dir = config.get_opentrons_path("gripper_calibration_dir")
+    try:
+        _remove_json_files_in_directories(offset_dir)
+    except FileNotFoundError:
+        pass

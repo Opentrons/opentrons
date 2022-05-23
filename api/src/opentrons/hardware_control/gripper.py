@@ -42,9 +42,7 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         self._log = mod_log.getChild(
             self._gripper_id if self._gripper_id else "<unknown>"
         )
-        self._log.info(
-            f"loaded: {self._model}, gripper offset: {self._gripper_offset}"
-        )
+        self._log.info(f"loaded: {self._model}, gripper offset: {self._gripper_offset}")
         # cache a dict representation of config for improved performance of
         # as_dict.
         self._config_as_dict = asdict(config)
@@ -70,8 +68,9 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
     @property
     def gripper_id(self) -> Optional[str]:
         return self._gripper_id
-    
-    def update_gripper_offset(self, offset_cal: GripperOffsetCalibration):
+
+    def update_gripper_offset(self, offset_cal: GripperOffsetCalibration) -> None:
+        """Update gripper offset."""
         self._log.info(f"update gripper offset to: {offset_cal}")
         self._gripper_offset = offset_cal
 

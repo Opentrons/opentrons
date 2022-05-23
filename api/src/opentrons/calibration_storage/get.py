@@ -358,7 +358,7 @@ def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinitio
 
 
 def get_gripper_offset(
-    gripper_id: str
+    gripper_id: str,
 ) -> typing.Optional[local_types.GripperOffsetCalibration]:
     gripper_dir = config.get_opentrons_path("gripper_calibration_dir")
     offset_path = gripper_dir / f"{gripper_id}.json"

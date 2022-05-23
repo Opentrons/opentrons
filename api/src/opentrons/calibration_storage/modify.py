@@ -23,7 +23,7 @@ if typing.TYPE_CHECKING:
         DeckCalibrationData,
         PipetteCalibrationData,
         CalibrationStatusDict,
-        GripperCalibrationData
+        GripperCalibrationData,
     )
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 

@@ -162,8 +162,7 @@ class GripperOffsetCalibration:
     Class to store gripper offset calibration with gripper info
     """
 
-    gripper: str
     offset: GripperOffset
-    last_modified: datetime
     source: SourceType
-    statue: CalibrationStatus
+    status: CalibrationStatus
+    last_modified: typing.Optional[datetime] = None

@@ -201,9 +201,7 @@ def load_pipette_offset(
     return pip_cal_obj
 
 
-def load_gripper_offset(
-    gripper_id: Optional[str]
-) -> types.GripperOffsetCalibration:
+def load_gripper_offset(gripper_id: Optional[str]) -> types.GripperOffsetCalibration:
     # load default if gripper offset data do not exist
     grip_cal_obj = types.GripperOffsetCalibration(
         offset=default_gripper_offset(),
