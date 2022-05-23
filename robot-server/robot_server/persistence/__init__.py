@@ -50,7 +50,7 @@ async def get_persistence_directory(
             )
         else:
             persistence_dir = setting
-            # Reset DB only if is not temporary dir
+            # Reset persistence directory only if is not temporary dir and rebooted
             if await AsyncPath(persistence_dir / _RESET_MARKER_FILE).exists():
                 await _reset_persistence_directory(persistence_dir)
 
