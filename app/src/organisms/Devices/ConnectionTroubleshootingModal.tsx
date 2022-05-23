@@ -6,6 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Box,
+  Link,
   TYPOGRAPHY,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
@@ -13,11 +14,10 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../atoms/Modal'
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { PrimaryButton } from '../../atoms/buttons'
 
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
-  'https://support.opentrons.com/en/articles/2687601-troubleshooting-connection-problems'
+  'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'
 const SUPPORT_EMAIL = 'support@opentrons.com'
 
 interface Props {
@@ -50,12 +50,15 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
             support_email: SUPPORT_EMAIL,
           })}
         </StyledText>
-        <ExternalLink
+        <Link
+          external
+          css={TYPOGRAPHY.linkPSemiBold}
           href={NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF}
           marginTop={SPACING.spacing4}
+          marginBottom={SPACING.spacing5}
         >
           {t('learn_more_about_troubleshooting_connection')}
-        </ExternalLink>
+        </Link>
         <PrimaryButton
           onClick={() => props.onClose()}
           alignSelf={ALIGN_FLEX_END}

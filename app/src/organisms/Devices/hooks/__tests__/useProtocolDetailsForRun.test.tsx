@@ -60,10 +60,10 @@ describe('useProtocolDetailsForRun hook', () => {
       .calledWith(null, { staleTime: Infinity })
       .mockReturnValue({} as UseQueryResult<Run>)
     when(mockUseProtocolQuery)
-      .calledWith(null, { staleTime: Infinity }, true)
+      .calledWith(null, { staleTime: Infinity })
       .mockReturnValue({} as UseQueryResult<Protocol>)
     when(mockUseProtocolAnalysesQuery)
-      .calledWith(null, { staleTime: Infinity })
+      .calledWith(null, { staleTime: Infinity }, true)
       .mockReturnValue({
         data: { data: [] } as any,
       } as UseQueryResult<ProtocolAnalyses>)
@@ -94,10 +94,10 @@ describe('useProtocolDetailsForRun hook', () => {
         data: { data: { protocolId: PROTOCOL_ID } } as any,
       } as UseQueryResult<Run>)
     when(mockUseProtocolQuery)
-      .calledWith(PROTOCOL_ID, { staleTime: Infinity }, expect.any(Boolean))
+      .calledWith(PROTOCOL_ID, { staleTime: Infinity })
       .mockReturnValue({ data: PROTOCOL_RESPONSE } as UseQueryResult<Protocol>)
     when(mockUseProtocolAnalysesQuery)
-      .calledWith(PROTOCOL_ID, { staleTime: Infinity })
+      .calledWith(PROTOCOL_ID, { staleTime: Infinity }, expect.any(Boolean))
       .mockReturnValue({
         data: { data: [PROTOCOL_ANALYSIS as any] },
       } as UseQueryResult<ProtocolAnalyses>)

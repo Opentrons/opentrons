@@ -24,7 +24,8 @@
   },
   "calibrationPoint": {
     "x": 12.0,
-    "y": 8.75
+    "y": 8.75,
+    "z": 68.275
   },
   "displayName": "Heater-Shaker Module GEN1",
   "quirks": [],
