@@ -17,34 +17,33 @@ const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
 >
 
 describe('useIsRobotBusy', () => {
+  beforeEach(() => {
+    mockUseCurrentRunId.mockReturnValue('123')
+    mockUseAllSessionsQuery.mockReturnValue({
+      data: {},
+    } as UseQueryResult<Sessions, Error>)
+  })
 
-    beforeEach(() => {
-      mockUseCurrentRunId.mockReturnValue('123')
-      mockUseAllSessionsQuery.mockReturnValue({
-        data: {},
-      } as UseQueryResult<Sessions, Error>)
-    })
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
 
-    afterEach(() => {
-      jest.resetAllMocks()
-    })
+  it('returns true when current runId is not null', () => {
+    const result = useIsRobotBusy()
+    expect(result).toBe(true)
+  })
 
-    it('returns true when current runId is not null', () => {
-        const result = useIsRobotBusy()
-        expect(result).toBe(true)
-    })
+  it('returns true when sessions are not empty', () => {
+    const result = useIsRobotBusy()
+    expect(result).toBe(true)
+  })
 
-    it('returns true when sessions are not empty', () => {
-        const result = useIsRobotBusy()
-        expect(result).toBe(true)
-    })
-
-    it('returns false when current runId is null and sessions are empty', () => {
-        mockUseCurrentRunId.mockReturnValue(null)
-        mockUseAllSessionsQuery.mockReturnValue({
-            data: {},
-          } as UseQueryResult<Sessions, Error>)
-        const result = useIsRobotBusy()
-        expect(result).toBe(false)
-    })
+  it('returns false when current runId is null and sessions are empty', () => {
+    mockUseCurrentRunId.mockReturnValue(null)
+    mockUseAllSessionsQuery.mockReturnValue({
+      data: {},
+    } as UseQueryResult<Sessions, Error>)
+    const result = useIsRobotBusy()
+    expect(result).toBe(false)
+  })
 })
