@@ -155,3 +155,14 @@ class PressureSensor(AbstractAdvancedSensor):
                     )
                 ),
             )
+
+    async def get_device_status(
+        self,
+        can_messenger: CanMessenger,
+        node_id: NodeId,
+        timeout: int = 1,
+    ) -> bool:
+        """Send a PeripheralStatusRequest and read the response message."""
+        return await self._scheduler.request_peripheral_status(
+            self._sensor_type, node_id, can_messenger, timeout
+        )

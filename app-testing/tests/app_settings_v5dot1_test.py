@@ -30,9 +30,7 @@ def test_app_settings_v5dot1(
     """Test the initial load of the app with a docker or dev mode emulated robot."""
     os.environ["OT_APP_ANALYTICS__SEEN_OPT_IN"] = "true"
     # app should look on localhost for robots
-    os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"
-    # app should use the __DEV__ Hierarchy Reorganization
-    os.environ["OT_APP_DEV_INTERNAL__hierarchyReorganization"] = "false"
+    # os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"
     # Start chromedriver with our options and use the
     # context manager to ensure it quits.
     with webdriver.Chrome(options=chrome_options) as driver:

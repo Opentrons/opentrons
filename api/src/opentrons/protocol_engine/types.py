@@ -178,7 +178,7 @@ class ModuleModel(str, Enum):
     def is_thermocycler_module_model(
         cls, model: ModuleModel
     ) -> TypeGuard[ThermocyclerModuleModel]:
-        """Whether a given model is a Thermocyler Module."""
+        """Whether a given model is a Thermocycler Module."""
         return model == cls.THERMOCYCLER_MODULE_V1
 
     @classmethod
@@ -212,6 +212,7 @@ class ModuleCalibrationPoint(BaseModel):
 
     x: float
     y: float
+    z: float
 
 
 class LabwareOffsetVector(BaseModel):
@@ -280,7 +281,7 @@ class LabwareOffsetLocation(BaseModel):
             " if applicable."
             "\n\n"
             "Because of module compatibility, the model that the protocol requests"
-            " may not beexactly the same"
+            " may not be exactly the same"
             " as what it will find physically connected during execution."
             " For this labware offset to apply,"
             " this field must be the *requested* model, not the connected one."

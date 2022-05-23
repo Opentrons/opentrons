@@ -4,7 +4,7 @@
     "coordinates": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["x", "y"],
+      "required": ["x", "y", "z"],
       "properties": {
         "x": { "type": "number" },
         "y": { "type": "number" },
@@ -113,7 +113,10 @@
       "$ref": "#/definitions/coordinates",
       "description": "Position of left-front-bottom corner of entire module chassis to slot footprint origin (left-front-bottom)"
     },
-    "calibrationPoint": { "$ref": "#/definitions/coordinates" },
+    "calibrationPoint": {
+      "$ref": "#/definitions/coordinates",
+      "description": "A point on the module's interaction plane (where labware is placed) used for calibrating the module. Slated for future use (as of 2022-05-20)."
+    },
     "displayName": { "type": "string" },
     "quirks": {
       "type": "array",

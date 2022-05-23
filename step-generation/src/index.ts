@@ -1,6 +1,6 @@
 export {
   aspirate,
-  awaitTemperature,
+  waitForTemperature,
   blowout,
   consolidate,
   distribute,

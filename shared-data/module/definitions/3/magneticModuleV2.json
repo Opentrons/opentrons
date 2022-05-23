@@ -24,7 +24,8 @@
   },
   "calibrationPoint": {
     "x": 124.875,
-    "y": 2.75
+    "y": 2.75,
+    "z": 82.25
   },
   "displayName": "Magnetic Module GEN2",
   "quirks": [],

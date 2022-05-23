@@ -204,6 +204,7 @@ describe('RunLogProtocolSetupInfo', () => {
     when(mockUseProtocolDetailsForRun).calledWith(RUN_ID).mockReturnValue({
       protocolData: simpleV6Protocol,
       displayName: 'mock display name',
+      protocolKey: 'fakeProtocolKey',
     })
     const { getByText } = render(props)
     getByText(

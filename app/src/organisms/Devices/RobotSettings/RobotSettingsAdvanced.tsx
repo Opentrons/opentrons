@@ -117,7 +117,7 @@ export function RobotSettingsAdvanced({
           requiredTimeout={false}
         />
       )}
-      <Box paddingX={SPACING.spacing4}>
+      <Box>
         {showRenameRobotSlideout && (
           <RenameRobotSlideout
             isExpanded={showRenameRobotSlideout}
@@ -145,21 +145,21 @@ export function RobotSettingsAdvanced({
           robotName={robotName}
           updateIsExpanded={updateIsExpanded}
         />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <RobotServerVersion robotName={robotName} />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <RobotInformation robotName={robotName} />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <UsageSettings
           settings={findSettings('enableDoorSafetySwitch')}
           robotName={robotName}
         />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <DisableHoming
           settings={findSettings('disableHomeOnBoot')}
           robotName={robotName}
         />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <OpenJupyterControl robotIp={ipAddress} />
         <Divider marginY={SPACING.spacing5} />
         <UpdateRobotSoftware robotName={robotName} />
@@ -167,9 +167,9 @@ export function RobotSettingsAdvanced({
           robot={robot as ViewableRobot}
           updateDownloadLogsStatus={updateDownloadLogsStatus}
         />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <FactoryReset updateIsExpanded={updateIsExpanded} />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <UseOlderProtocol
           settings={findSettings('disableFastProtocolUpload')}
           robotName={robotName}
@@ -178,12 +178,12 @@ export function RobotSettingsAdvanced({
           settings={findSettings('deckCalibrationDots')}
           robotName={robotName}
         />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <ShortTrashBin
           settings={findSettings('shortFixedTrash')}
           robotName={robotName}
         />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY="2.5rem" />
         <UseOlderAspirateBehavior
           settings={findSettings('useOldAspirationFunctions')}
           robotName={robotName}

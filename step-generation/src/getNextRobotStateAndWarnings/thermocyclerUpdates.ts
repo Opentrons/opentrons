@@ -37,24 +37,24 @@ export const forThermocyclerSetTargetBlockTemperature = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, temperature } = params
+  const { moduleId, celsius } = params
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
 
-  moduleState.blockTargetTemp = temperature
+  moduleState.blockTargetTemp = celsius
 }
 export const forThermocyclerSetTargetLidTemperature = (
   params: TemperatureParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, temperature } = params
+  const { moduleId, celsius } = params
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
 
-  moduleState.lidTargetTemp = temperature
+  moduleState.lidTargetTemp = celsius
 }
 export const forThermocyclerAwaitBlockTemperature = (
   params: TemperatureParams,

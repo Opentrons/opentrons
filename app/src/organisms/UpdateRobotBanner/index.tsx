@@ -44,15 +44,16 @@ export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
     e.stopPropagation()
     setShowSoftwareUpdateModal(true)
   }
+  const handleCloseBanner: React.MouseEventHandler = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowUpdateBanner(false)
+  }
 
   return (
     <>
       {showUpdateBanner ? (
-        <Banner
-          type="warning"
-          onCloseClick={() => setShowUpdateBanner(false)}
-          {...styleProps}
-        >
+        <Banner type="warning" onCloseClick={handleCloseBanner} {...styleProps}>
           <StyledText as="p" marginRight={SPACING.spacing2}>
             {t('robot_server_versions_banner_title')}
           </StyledText>

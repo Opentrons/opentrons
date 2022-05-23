@@ -14,6 +14,7 @@ import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
+  mockPipetteOffsetCalibration4,
 } from '../../../../redux/calibration/pipette-offset/__fixtures__'
 import {
   mockTipLengthCalibration1,
@@ -32,25 +33,32 @@ import {
   useTipLengthCalibrations,
   useAttachedPipettes,
 } from '../../hooks'
+
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
+import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffsetCalibrationItems'
+import { TipLengthCalibrationItems } from '../CalibrationDetails/TipLengthCalibrationItems'
 
 import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
 
 jest.mock('file-saver')
-
 jest.mock(
   '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 )
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
+jest.mock('../../../../redux/calibration')
 jest.mock('../../../../redux/robot/selectors')
+jest.mock('../../../../redux/sessions/selectors')
+jest.mock('../../../../redux/robot-api/selectors')
+jest.mock('../../../../redux/custom-labware/selectors')
 jest.mock('../../hooks')
+jest.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
+jest.mock('../CalibrationDetails/TipLengthCalibrationItems')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
   right: mockAttachedPipette,
 } as any
-
 const mockDeckCalibrationModal = DeckCalibrationModal as jest.MockedFunction<
   typeof DeckCalibrationModal
 >
@@ -70,9 +78,14 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 const mockGetIsRunning = RobotSelectors.getIsRunning as jest.MockedFunction<
   typeof RobotSelectors.getIsRunning
 >
-
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
+>
+const mockPipetteOffsetCalibrationItems = PipetteOffsetCalibrationItems as jest.MockedFunction<
+  typeof PipetteOffsetCalibrationItems
+>
+const mockTipLengthCalibrationItems = TipLengthCalibrationItems as jest.MockedFunction<
+  typeof TipLengthCalibrationItems
 >
 
 let mockTrackEvent: jest.Mock
@@ -90,6 +103,7 @@ const render = () => {
 
 describe('RobotSettingsCalibration', () => {
   const realBlob = global.Blob
+
   beforeAll(() => {
     // @ts-expect-error(sa, 2021-6-28): not a valid blob interface
     global.Blob = function (content: any, options: any) {
@@ -122,13 +136,20 @@ describe('RobotSettingsCalibration', () => {
       mockTipLengthCalibration2,
       mockTipLengthCalibration3,
     ])
+    mockPipetteOffsetCalibrationItems.mockReturnValue(
+      <div>PipetteOffsetCalibrationItems</div>
+    )
+    mockTipLengthCalibrationItems.mockReturnValue(
+      <div>TipLengthCalibrationItems</div>
+    )
     mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
   })
+
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  it('renders a title and description', () => {
+  it('renders a title and description - About Calibration', () => {
     const [{ getByText }] = render()
     getByText('About Calibration')
     getByText(
@@ -146,7 +167,6 @@ describe('RobotSettingsCalibration', () => {
 
   it('renders a download calibration data button', () => {
     const [{ getByText }] = render()
-
     const downloadButton = getByText('Download calibration data')
     downloadButton.click()
     expect(saveAs).toHaveBeenCalled()
@@ -154,6 +174,137 @@ describe('RobotSettingsCalibration', () => {
       name: 'calibrationDataDownloaded',
       properties: {},
     })
+  })
+
+  it('renders a title and description - Pipette Offset Calibrations', () => {
+    const [{ getByText }] = render()
+    getByText('Pipette Offset Calibrations')
+    getByText(
+      'Pipette offset calibration measures a pipette’s position relative to the pipette mount and the deck. You can recalibrate a pipette’s offset if its currently attached to this robot.'
+    )
+    getByText('PipetteOffsetCalibrationItems')
+  })
+
+  it('renders Not calibrated yet when no pipette offset calibrations data', () => {
+    mockUsePipetteOffsetCalibrations.mockReturnValue(null)
+    const [{ getByText }] = render()
+    getByText('Not calibrated yet')
+  })
+
+  it('renders the error banner when calibration is missing', () => {
+    mockUsePipetteOffsetCalibrations.mockReturnValue(null)
+    const [{ getByText }] = render()
+    getByText('Pipette Offset calibration missing')
+  })
+
+  it('renders the warning banner when calibration is marked bad', () => {
+    mockUsePipetteOffsetCalibrations.mockReturnValue([
+      mockPipetteOffsetCalibration1,
+      mockPipetteOffsetCalibration2,
+      mockPipetteOffsetCalibration3,
+      mockPipetteOffsetCalibration4,
+    ])
+    const [{ getByText }] = render()
+    getByText('Pipette Offset calibration recommended')
+  })
+
+  it('renders a title and description - Tip Length Calibrations', () => {
+    const [{ getByText }] = render()
+    getByText('Tip Length Calibrations')
+    getByText(
+      'Tip length calibration measures the distance between the bottom of the tip and the pipette’s nozzle. You can recalibrate a tip length if the pipette associated with it is currently attached to this robot. If you recalibrate a tip length, you will be prompted to recalibrate that pipette’s offset calibration.'
+    )
+    getByText('PipetteOffsetCalibrationItems')
+  })
+
+  it('renders Not calibrated yet when no tip length calibrations data', () => {
+    mockUseTipLengthCalibrations.mockReturnValue(null)
+    const [{ getByText }] = render()
+    getByText('Not calibrated yet')
+  })
+
+  it('renders a title description and button - Deck Calibration', () => {
+    const [{ getByText, getByRole }] = render()
+    getByText('Deck Calibration')
+    getByText(
+      'Deck calibration measures the deck position relative to the gantry. This calibration is the foundation for tip length and pipette offset calibrations. Calibrate your deck during new robot setup. Redo deck calibration if you relocate your robot.'
+    )
+    getByRole('button', { name: 'Recalibrate deck' })
+    getByText('Last calibrated: September 15, 2021 00:00')
+  })
+
+  it('renders calibrate deck button when deck is not calibrated', () => {
+    mockUseDeckCalibrationData.mockReturnValue({
+      deckCalibrationData: null,
+      isDeckCalibrated: false,
+    })
+    const [{ getByRole, getByText }] = render()
+    getByRole('button', { name: 'Calibrate deck' })
+    getByText('Not calibrated yet')
+  })
+
+  it('renders the banner when deck is not calibrated', () => {
+    mockUseDeckCalibrationData.mockReturnValue({
+      deckCalibrationData: null,
+      isDeckCalibrated: false,
+    })
+    const [{ getByRole, getByText }] = render()
+    getByText('Deck Calibration missing')
+    getByRole('button', { name: 'Calibrate now' })
+  })
+
+  it('recalibration button is disabled when a robot is unreachable', () => {
+    mockUseRobot.mockReturnValue(mockUnreachableRobot)
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Recalibrate deck' })
+    expect(button).toBeDisabled()
+  })
+
+  it('recalibration button is disabled when a robot is running', () => {
+    mockGetIsRunning.mockReturnValue(true)
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Recalibrate deck' })
+    expect(button).toBeDisabled()
+  })
+
+  it('recalibration button is disabled when a robot pipettes are null', () => {
+    mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Recalibrate deck' })
+    expect(button).toBeDisabled()
+  })
+
+  it('calibration button is disabled when a robot is unreachable', () => {
+    mockUseRobot.mockReturnValue(mockUnreachableRobot)
+    mockUseDeckCalibrationData.mockReturnValue({
+      deckCalibrationData: null,
+      isDeckCalibrated: false,
+    })
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Calibrate deck' })
+    expect(button).toBeDisabled()
+  })
+
+  it('calibration button is disabled when a robot is running', () => {
+    mockGetIsRunning.mockReturnValue(true)
+    mockUseDeckCalibrationData.mockReturnValue({
+      deckCalibrationData: null,
+      isDeckCalibrated: false,
+    })
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Calibrate deck' })
+    expect(button).toBeDisabled()
+  })
+
+  it('calibration button is disabled when a robot pipettes are null', () => {
+    mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
+    mockUseDeckCalibrationData.mockReturnValue({
+      deckCalibrationData: null,
+      isDeckCalibrated: false,
+    })
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Calibrate deck' })
+    expect(button).toBeDisabled()
   })
 
   it('renders a title and description - Calibration Health Check section', () => {

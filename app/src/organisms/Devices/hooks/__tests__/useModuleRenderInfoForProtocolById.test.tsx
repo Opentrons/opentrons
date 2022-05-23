@@ -43,6 +43,7 @@ const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnaly
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
   protocolData: simpleV6Protocol,
+  protocolKey: 'fakeProtocolKey',
 }
 
 const mockMagneticModuleDefinition = {

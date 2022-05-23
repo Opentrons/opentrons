@@ -1,8 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
-
 import { StyledText } from '../../../atoms/text'
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 
@@ -29,17 +27,11 @@ export function StepTimer(props: TimerProps): JSX.Element {
       : EMPTY_TIMESTAMP
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing2}
-      marginRight={SPACING.spacing3}
-    >
-      <StyledText as="label" width="5rem">{`${t(
+    <>
+      <StyledText as="label">{`${t(
         'start_step_time'
       )}: ${startTime}`}</StyledText>
-      <StyledText as="label" width="5rem">{`${t(
-        'end_step_time'
-      )}: ${endTime}`}</StyledText>
-    </Flex>
+      <StyledText as="label">{`${t('end_step_time')}: ${endTime}`}</StyledText>
+    </>
   )
 }

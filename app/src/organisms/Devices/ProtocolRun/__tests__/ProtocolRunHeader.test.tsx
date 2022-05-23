@@ -30,7 +30,6 @@ import {
   useRunStatus,
 } from '../../../../organisms/RunTimeControl/hooks'
 import {
-  PROTOCOL_ID,
   mockFailedRun,
   mockIdleUnstartedRun,
   mockPausedRun,
@@ -150,6 +149,7 @@ const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnaly
 const PROTOCOL_DETAILS = {
   displayName: PROTOCOL_NAME,
   protocolData: simpleV6Protocol,
+  protocolKey: 'fakeProtocolKey',
 }
 
 const mockMovingHeaterShaker = {
@@ -269,8 +269,17 @@ describe('ProtocolRunHeader', () => {
 
     const protocolNameLink = getByRole('link', { name: 'A Protocol for Otie' })
     expect(protocolNameLink.getAttribute('href')).toBe(
-      `/protocols/${PROTOCOL_ID}`
+      `/protocols/${PROTOCOL_DETAILS.protocolKey}`
     )
+  })
+
+  it('does not render link to protocol detail page if protocol key is absent', () => {
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(RUN_ID)
+      .mockReturnValue({ ...PROTOCOL_DETAILS, protocolKey: null })
+    const [{ queryByRole }] = render()
+
+    expect(queryByRole('link', { name: 'A Protocol for Otie' })).toBeNull()
   })
 
   it('renders a start run button and cancel run button when run is ready to start', () => {

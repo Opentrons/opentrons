@@ -37,9 +37,9 @@ export function UseOlderProtocol({
     >
       <Box width="70%">
         <StyledText
-          as="h3"
+          as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          paddingBottom={SPACING.spacing3}
+          paddingBottom={SPACING.spacing4}
           id="AdvancedSettings_showLink"
         >
           {t('use_older_protocol_analysis_method')}

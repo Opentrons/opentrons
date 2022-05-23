@@ -41,7 +41,7 @@ export interface ModuleOnlyParams {
   module: string
 }
 
-export interface ThermocyclerSetTargetBlockTemperatureArgs {
+export interface ThermocyclerSetAndWaitForBlockTemperatureArgs {
   module: string
   temperature: number
   volume?: number
@@ -94,7 +94,7 @@ export type Command =
     }
   | {
       command: 'thermocycler/setTargetBlockTemperature'
-      params: ThermocyclerSetTargetBlockTemperatureArgs
+      params: ThermocyclerSetAndWaitForBlockTemperatureArgs
     }
   | {
       command: 'thermocycler/setTargetLidTemperature'

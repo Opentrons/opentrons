@@ -40,7 +40,7 @@ describe('MultipleModulesModal', () => {
         name: 'Learn more about using more than one module of the same type',
       }).getAttribute('href')
     ).toBe(
-      'https://support.opentrons.com/en/articles/5167312-using-modules-of-the-same-type-on-the-ot-2'
+      'https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2'
     )
   })
   it('should call onCloseClick when the close button is pressed', () => {

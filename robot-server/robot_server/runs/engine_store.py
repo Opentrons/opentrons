@@ -1,16 +1,17 @@
 """In-memory storage of ProtocolEngine instances."""
-from typing import Dict, NamedTuple, Optional
+from typing import List, NamedTuple, Optional
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine import ProtocolEngine, StateView, create_protocol_engine
-from opentrons.protocol_runner import ProtocolRunner
+from opentrons.protocol_runner import ProtocolRunner, ProtocolRunResult
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    StateSummary,
+    LabwareOffsetCreate,
+    create_protocol_engine,
+)
 
 
-class EngineMissingError(RuntimeError):
-    """An error raised if the engine somehow hasn't been initialized.
-
-    If this error is raised, it's almost certainly due to a software bug.
-    """
+from robot_server.protocols import ProtocolResource
 
 
 class EngineConflictError(RuntimeError):
@@ -24,11 +25,11 @@ class EngineConflictError(RuntimeError):
 class RunnerEnginePair(NamedTuple):
     """A stored ProtocolRunner/ProtocolEngine pair."""
 
+    run_id: str
     runner: ProtocolRunner
     engine: ProtocolEngine
 
 
-# TODO(mc, 2021-05-28): evaluate multi-engine logic, which this does not support
 class EngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
@@ -42,31 +43,27 @@ class EngineStore:
         self._hardware_api = hardware_api
         self._default_engine: Optional[ProtocolEngine] = None
         self._runner_engine_pair: Optional[RunnerEnginePair] = None
-        self._engines_by_run_id: Dict[str, ProtocolEngine] = {}
 
     @property
     def engine(self) -> ProtocolEngine:
-        """Get the "current" persisted ProtocolEngine.
-
-        Raises:
-            EngineMissingError: Engine has not yet been created and persisted.
-        """
-        if self._runner_engine_pair is None:
-            raise EngineMissingError("Engine not yet created.")
-
+        """Get the "current" persisted ProtocolEngine."""
+        assert self._runner_engine_pair is not None, "Engine not yet created."
         return self._runner_engine_pair.engine
 
     @property
     def runner(self) -> ProtocolRunner:
-        """Get the "current" persisted ProtocolRunner.
-
-        Raises:
-            EngineMissingError: Runner has not yet been created and persisted.
-        """
-        if self._runner_engine_pair is None:
-            raise EngineMissingError("Runner not yet created.")
-
+        """Get the "current" persisted ProtocolRunner."""
+        assert self._runner_engine_pair is not None, "Runner not yet created."
         return self._runner_engine_pair.runner
+
+    @property
+    def current_run_id(self) -> Optional[str]:
+        """Get the run identifier associated with the current engine/runner pair."""
+        return (
+            self._runner_engine_pair.run_id
+            if self._runner_engine_pair is not None
+            else None
+        )
 
     # TODO(mc, 2022-03-21): this resource locking is insufficient;
     # come up with something more sophisticated without race condition holes.
@@ -88,14 +85,21 @@ class EngineStore:
 
         return engine
 
-    async def create(self, run_id: str) -> StateView:
+    async def create(
+        self,
+        run_id: str,
+        labware_offsets: List[LabwareOffsetCreate],
+        protocol: Optional[ProtocolResource],
+    ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
         Args:
             run_id: The run resource the engine is assigned to.
+            labware_offsets: Labware offsets to create the engine with.
+            protocol: The protocol to load the runner with, if any.
 
         Returns:
-            The state view for the new ProtocolEngine.
+            The initial equipment and status summary of the engine.
 
         Raises:
             EngineConflictError: The current runner/engine pair is not idle, so
@@ -104,38 +108,40 @@ class EngineStore:
         engine = await create_protocol_engine(hardware_api=self._hardware_api)
         runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)
 
-        await self.clear()
+        if self._runner_engine_pair is not None:
+            raise EngineConflictError("Another run is currently active.")
 
-        self._runner_engine_pair = RunnerEnginePair(runner=runner, engine=engine)
-        self._engines_by_run_id[run_id] = engine
+        if protocol is not None:
+            runner.load(protocol.source)
 
-        return engine.state_view
+        for offset in labware_offsets:
+            engine.add_labware_offset(offset)
 
-    def get_state(self, run_id: str) -> StateView:
-        """Get a run's ProtocolEngine state.
+        self._runner_engine_pair = RunnerEnginePair(
+            run_id=run_id,
+            runner=runner,
+            engine=engine,
+        )
 
-        Args:
-            run_id: The run resource to retrieve engine state from.
+        return engine.state_view.get_summary()
 
-        Raises:
-            EngineMissingError: No engine found for the given run ID.
-        """
-        try:
-            return self._engines_by_run_id[run_id].state_view
-        except KeyError:
-            raise EngineMissingError(f"No engine state found for run {run_id}")
-
-    async def clear(self) -> None:
-        """Remove the persisted ProtocolEngine, if present, no-op otherwise.
+    async def clear(self) -> ProtocolRunResult:
+        """Remove the persisted ProtocolEngine.
 
         Raises:
             EngineConflictError: The current runner/engine pair is not idle, so
             they cannot be cleared.
         """
-        if self._runner_engine_pair is not None:
-            if self.engine.state_view.commands.get_is_okay_to_clear():
-                await self.engine.finish(drop_tips_and_home=False, set_run_status=False)
-            else:
-                raise EngineConflictError("Current run is not idle or stopped.")
+        engine = self.engine
+        state_view = engine.state_view
 
+        if state_view.commands.get_is_okay_to_clear():
+            await engine.finish(drop_tips_and_home=False, set_run_status=False)
+        else:
+            raise EngineConflictError("Current run is not idle or stopped.")
+
+        run_data = state_view.get_summary()
+        commands = state_view.commands.get_all()
         self._runner_engine_pair = None
+
+        return ProtocolRunResult(state_summary=run_data, commands=commands)

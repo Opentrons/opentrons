@@ -93,11 +93,11 @@ const mockDeactivateHeatHeaterShaker = {
   data: {
     labwareLatchStatus: 'idle_open',
     speedStatus: 'idle',
-    temperatureStatus: 'idle',
+    temperatureStatus: 'holding at target',
     currentSpeed: null,
     currentTemperature: null,
     targetSpeed: null,
-    targetTemp: null,
+    targetTemp: 45,
     errorDetails: null,
     status: 'heating',
   },

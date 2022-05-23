@@ -492,7 +492,7 @@ class CommandView(HasState[CommandState]):
             ProtocolEngineStoppedError: the engine has been stopped.
         """
         if self.get_stop_requested():
-            raise ProtocolEngineStoppedError("Cannot modify a stopped engine.")
+            raise ProtocolEngineStoppedError("A stop has already been requested.")
 
     def raise_if_paused_by_blocking_door(self) -> None:
         """Raise if the engine is currently paused by an open door."""
