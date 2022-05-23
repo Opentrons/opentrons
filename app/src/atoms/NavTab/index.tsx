@@ -10,7 +10,9 @@ interface NavTabProps {
   disabled?: boolean
 }
 
-const StyledNavLink = styled(NavLink)<React.ComponentProps<typeof NavLink> & {disabled: boolean}>`
+const StyledNavLink = styled(NavLink)<
+  React.ComponentProps<typeof NavLink> & { disabled: boolean }
+>`
   padding: 0 ${SPACING.spacing2} ${SPACING.spacing3};
   ${TYPOGRAPHY.labelSemiBold}
   color: ${COLORS.darkGreyEnabled};
