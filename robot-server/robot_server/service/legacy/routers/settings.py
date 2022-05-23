@@ -34,18 +34,11 @@ from robot_server.service.legacy.models.settings import (
     Links,
     AdvancedSetting,
 )
-from robot_server.persistence import get_persistence_directory, PersistenceResetter
+from robot_server.persistence import get_persistence_directory, PersistenceResetter, get_persistence_resetter
 
 log = logging.getLogger(__name__)
 
 router = APIRouter()
-
-
-def get_reset_db_manager(
-    persistence_directory: Path = Depends(get_persistence_directory),
-) -> PersistenceResetter:
-    """Get an `PersistenceResetter` to reset robot-server layer."""
-    return PersistenceResetter(persistence_directory)
 
 
 @router.post(
@@ -203,8 +196,7 @@ async def get_settings_reset_options() -> FactoryResetOptions:
 )
 async def post_settings_reset_options(
     factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
-    reset_manager: PersistenceResetter = Depends(get_reset_db_manager),
-    persistence_path: Path = Depends(get_persistence_directory),
+    persistence_resetter: PersistenceResetter = Depends(get_persistence_resetter),
 ) -> V1BasicResponse:
     options = set(
         k for k, v in factory_reset_commands.items() if v and k != "runsHistory"
@@ -212,7 +204,7 @@ async def post_settings_reset_options(
     reset_util.reset(options)
 
     if ("runsHistory", True) in factory_reset_commands.items():
-        await reset_manager.mark_directory_reset()
+        await persistence_resetter.mark_directory_reset()
         options.add(reset_util.ResetOptionId.runs_history)
 
     message = (

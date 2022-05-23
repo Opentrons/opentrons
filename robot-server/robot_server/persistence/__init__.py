@@ -26,11 +26,6 @@ _RESET_MARKER_FILE = "_TO_BE_DELETED_ON_REBOOT"
 _log = logging.getLogger(__name__)
 
 
-async def _reset_persistence_directory(directory: Path) -> None:
-    """Delete dir content if marked to delete."""
-    shutil.rmtree(directory)
-
-
 async def get_persistence_directory(
     app_state: AppState = Depends(get_app_state),
 ) -> Path:
@@ -52,7 +47,7 @@ async def get_persistence_directory(
             persistence_dir = setting
             # Reset persistence directory only if is not temporary dir and rebooted
             if await AsyncPath(persistence_dir / _RESET_MARKER_FILE).exists():
-                await _reset_persistence_directory(persistence_dir)
+                shutil.rmtree(persistence_dir)
 
             await AsyncPath(persistence_dir).mkdir(parents=True, exist_ok=True)
             _log.info(f"Using directory {persistence_dir} for persistence.")
@@ -104,10 +99,18 @@ class PersistenceResetter:
         )
 
 
+def get_persistence_resetter(
+    persistence_directory: Path = Depends(get_persistence_directory),
+) -> PersistenceResetter:
+    """Get an `PersistenceResetter` to reset robot-server layer."""
+    return PersistenceResetter(persistence_directory)
+
+
 __all__ = [
     "get_persistence_directory",
     "get_sql_engine",
     "PersistenceResetter",
+    "get_persistence_resetter",
     # database tables
     "protocol_table",
     "analysis_table",
