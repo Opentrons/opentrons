@@ -32,10 +32,12 @@ const HIDDEN_CSS = css`
 
 interface UpdateRobotSoftwareProps {
   robotName: string
+  onUpdateStart: () => void
 }
 
 export function UpdateRobotSoftware({
   robotName,
+  onUpdateStart,
 }: UpdateRobotSoftwareProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
@@ -49,6 +51,7 @@ export function UpdateRobotSoftware({
     const { files } = event.target
     if (files?.length === 1 && !updateDisabled) {
       dispatch(startBuildrootUpdate(robotName, files[0].path))
+      onUpdateStart()
     }
     event.target.value = ''
   }
