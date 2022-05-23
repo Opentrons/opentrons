@@ -99,7 +99,7 @@ export function ChooseProtocolSlideout(
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              css={{ 'word-break': 'break-word' }}
+              css={{ 'overflow-wrap': 'anywhere' }}
             >
               {storedProtocol.mostRecentAnalysis?.metadata?.protocolName ??
                 first(storedProtocol.srcFileNames) ??
