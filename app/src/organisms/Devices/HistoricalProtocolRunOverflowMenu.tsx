@@ -18,12 +18,12 @@ import { Divider } from '../../atoms/structure'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../RunTimeControl/hooks'
-import { downloadFile } from './utils'
-import type { Run, RunData } from '@opentrons/api-client'
+import { RUN_LOG_WINDOW_SIZE } from './constants'
+import { DownloadRunLogToast } from './DownloadRunLogToast'
+import type { Run } from '@opentrons/api-client'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
-  run: RunData
-  protocolName: string
+  runId: string
   robotName: string
   robotIsBusy: boolean
 }
@@ -31,32 +31,66 @@ export interface HistoricalProtocolRunOverflowMenuProps {
 export function HistoricalProtocolRunOverflowMenu(
   props: HistoricalProtocolRunOverflowMenuProps
 ): JSX.Element {
+  const { runId, robotName } = props
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
+  const [
+    showDownloadRunLogToast,
+    setShowDownloadRunLogToast,
+  ] = React.useState<boolean>(false)
   const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
     setShowOverflowMenu(!showOverflowMenu)
   }
+
+  const commands = useAllCommandsQuery(
+    runId,
+    { cursor: 0, pageLength: RUN_LOG_WINDOW_SIZE },
+    { staleTime: Infinity }
+  )
+  const runTotalCommandCount = commands?.data?.meta?.totalLength
+
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      position={POSITION_RELATIVE}
+      data-testid="HistoricalProtocolRunOverflowMenu_OverflowMenu"
+    >
       <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
       {showOverflowMenu && (
-        <MenuDropdown {...props} closeOverflowMenu={handleOverflowClick} />
+        <MenuDropdown
+          {...props}
+          closeOverflowMenu={handleOverflowClick}
+          setShowDownloadRunLogToast={setShowDownloadRunLogToast}
+        />
       )}
+      {runTotalCommandCount != null && showDownloadRunLogToast ? (
+        <DownloadRunLogToast
+          robotName={robotName}
+          runId={runId}
+          pageLength={runTotalCommandCount}
+          onClose={() => setShowDownloadRunLogToast(false)}
+        />
+      ) : null}
     </Flex>
   )
 }
 
 interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
   closeOverflowMenu: React.MouseEventHandler<HTMLButtonElement>
+  setShowDownloadRunLogToast: (showDownloadRunLogToastValue: boolean) => void
 }
 function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const history = useHistory()
 
-  const { run, robotName, protocolName, robotIsBusy, closeOverflowMenu } = props
-  const runId = run.id
-  const commands = useAllCommandsQuery(runId)
+  const {
+    runId,
+    robotName,
+    robotIsBusy,
+    closeOverflowMenu,
+    setShowDownloadRunLogToast,
+  } = props
 
   const onResetSuccess = (createRunResponse: Run): void =>
     history.push(
@@ -65,13 +99,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const onDownloadClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    const runDetails = {
-      ...run,
-      commands: commands,
-    }
-    const createdAt = new Date(run.createdAt).toISOString()
-    const fileName = `${robotName}_${protocolName}_${createdAt}.json`
-    downloadFile(runDetails, fileName)
+    setShowDownloadRunLogToast(true)
     closeOverflowMenu(e)
   }
   const { reset } = useRunControls(runId, onResetSuccess)

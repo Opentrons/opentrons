@@ -248,13 +248,13 @@ async def test_get_current_run(
     """It should get the current run from the engine."""
     run_id = "hello world"
 
-    decoy.when(mock_run_store.get(run_id)).then_return(run_resource)
+    decoy.when(mock_run_store.get(run_id=run_id)).then_return(run_resource)
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
     decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
         engine_state_summary
     )
 
-    result = subject.get(run_id)
+    result = subject.get(run_id=run_id)
 
     assert result == Run(
         current=True,
@@ -282,13 +282,13 @@ async def test_get_historical_run(
     """It should get a historical run from the store."""
     run_id = "hello world"
 
-    decoy.when(mock_run_store.get(run_id)).then_return(run_resource)
-    decoy.when(mock_run_store.get_state_summary(run_id)).then_return(
+    decoy.when(mock_run_store.get(run_id=run_id)).then_return(run_resource)
+    decoy.when(mock_run_store.get_state_summary(run_id=run_id)).then_return(
         engine_state_summary
     )
     decoy.when(mock_engine_store.current_run_id).then_return("some other id")
 
-    result = subject.get(run_id)
+    result = subject.get(run_id=run_id)
 
     assert result == Run(
         current=False,
@@ -314,11 +314,11 @@ async def test_get_historical_run_no_data(
     """It should get a historical run from the store."""
     run_id = "hello world"
 
-    decoy.when(mock_run_store.get(run_id)).then_return(run_resource)
-    decoy.when(mock_run_store.get_state_summary(run_id)).then_return(None)
+    decoy.when(mock_run_store.get(run_id=run_id)).then_return(run_resource)
+    decoy.when(mock_run_store.get_state_summary(run_id=run_id)).then_return(None)
     decoy.when(mock_engine_store.current_run_id).then_return("some other id")
 
-    result = subject.get(run_id)
+    result = subject.get(run_id=run_id)
 
     assert result == Run(
         current=False,
@@ -424,10 +424,10 @@ async def test_delete_current_run(
     run_id = "hello world"
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
 
-    await subject.delete(run_id)
+    await subject.delete(run_id=run_id)
 
     decoy.verify(await mock_engine_store.clear(), times=1)
-    decoy.verify(mock_run_store.remove(run_id), times=0)
+    decoy.verify(mock_run_store.remove(run_id=run_id), times=0)
 
 
 async def test_delete_historical_run(
@@ -440,10 +440,10 @@ async def test_delete_historical_run(
     run_id = "hello world"
     decoy.when(mock_engine_store.current_run_id).then_return("some other id")
 
-    await subject.delete(run_id)
+    await subject.delete(run_id=run_id)
 
     decoy.verify(await mock_engine_store.clear(), times=0)
-    decoy.verify(mock_run_store.remove(run_id), times=1)
+    decoy.verify(mock_run_store.remove(run_id=run_id), times=1)
 
 
 async def test_update_current(
@@ -503,7 +503,7 @@ async def test_update_current_noop(
     decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
         engine_state_summary
     )
-    decoy.when(mock_run_store.get(run_id)).then_return(run_resource)
+    decoy.when(mock_run_store.get(run_id=run_id)).then_return(run_resource)
 
     result = await subject.update(run_id=run_id, current=current)
 

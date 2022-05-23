@@ -136,7 +136,9 @@ async def test_create_protocol_run(
         status=pe_types.EngineStatus.IDLE,
     )
 
-    decoy.when(mock_protocol_store.get(protocol_id)).then_return(protocol_resource)
+    decoy.when(mock_protocol_store.get(protocol_id=protocol_id)).then_return(
+        protocol_resource
+    )
 
     decoy.when(
         await mock_run_data_manager.create(

@@ -59,16 +59,19 @@ export function ProtocolOverflowMenu(
 
   const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
+    e.stopPropagation()
     dispatch(viewProtocolSourceFolder(protocolKey))
     setShowOverflowMenu(!showOverflowMenu)
   }
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
+    e.stopPropagation()
     handleRunProtocol()
     setShowOverflowMenu(!showOverflowMenu)
   }
   const handleClickDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
+    e.stopPropagation()
     confirmDeleteProtocol()
     setShowOverflowMenu(!showOverflowMenu)
   }
@@ -118,6 +121,7 @@ export function ProtocolOverflowMenu(
             type="warning"
             onClose={(e: React.MouseEvent) => {
               e.preventDefault()
+              e.stopPropagation()
               cancelDeleteProtocol()
             }}
             title={t('should_delete_this_protocol')}
@@ -131,6 +135,7 @@ export function ProtocolOverflowMenu(
                   role="button"
                   onClick={(e: React.MouseEvent) => {
                     e.preventDefault()
+                    e.stopPropagation()
                     cancelDeleteProtocol()
                   }}
                   textTransform={TEXT_TRANSFORM_CAPITALIZE}
