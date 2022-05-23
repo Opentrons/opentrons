@@ -21,20 +21,14 @@ _protocol_directory_accessor = AppStateAccessor[Path]("protocol_directory")
 
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-robot-server-"
 _DATABASE_FILE: Final = "robot_server.db"
-_TO_BE_DELETED_ON_REBOOT = "marked_to_delete.txt"
+_RESET_MARKER_FILE = "_TO_BE_DELETED_ON_REBOOT"
 
 _log = logging.getLogger(__name__)
 
 
-async def _reset_persistence_directory(directory: Path) -> bool:
+async def _reset_persistence_directory(directory: Path) -> None:
     """Delete dir content if marked to delete."""
-    try:
-        shutil.rmtree(directory)
-    except OSError:
-        print("Couldn't reset directory, ", directory)
-        return False
-    print(f"directory: {directory}, was deleted successfully!")
-    return True
+    shutil.rmtree(directory)
 
 
 async def get_persistence_directory(
@@ -57,7 +51,7 @@ async def get_persistence_directory(
         else:
             persistence_dir = setting
             # Reset DB only if is not temporary dir
-            if await AsyncPath(persistence_dir / _TO_BE_DELETED_ON_REBOOT).exists():
+            if await AsyncPath(persistence_dir / _RESET_MARKER_FILE).exists():
                 await _reset_persistence_directory(persistence_dir)
 
             await AsyncPath(persistence_dir).mkdir(parents=True, exist_ok=True)
@@ -86,32 +80,34 @@ def get_sql_engine(
     # https://github.com/tiangolo/fastapi/issues/617
 
 
-class ResetManager:
+class PersistenceResetter:
     """Dependency class to handle robot server reset options."""
 
-    @staticmethod
-    async def mark_directory_reset(persistence_directory: Path) -> None:
+    def __init__(self, persistence_directory: Path) -> None:
+        self._persistence_directory = persistence_directory
+
+    async def mark_directory_reset(self) -> None:
         """Mark the persistence directory to be deleted (reset) on the next boot.
-        
+
         We defer deletions to the next boot instead of doing them immediately
         to avoid potential problems with ongoing HTTP requests, runs,
         background protocol analysis tasks, etc. trying to do stuff in here
         during and after the deletion.
         """
-        file = AsyncPath(persistence_directory / _TO_BE_DELETED_ON_REBOOT)
+        file = AsyncPath(self._persistence_directory / _RESET_MARKER_FILE)
         await file.write_text(
-            encoding="utf-8"
+            encoding="utf-8",
             data=(
                 "This file was placed here by robot-server.\n"
                 "It tells robot-server to clear this directory on the next boot."
-            )
+            ),
         )
 
 
 __all__ = [
     "get_persistence_directory",
     "get_sql_engine",
-    "ResetManager",
+    "PersistenceResetter",
     # database tables
     "protocol_table",
     "analysis_table",

@@ -244,7 +244,7 @@ class RobotClient:
 
     async def post_setting_reset_options(
         self,
-        req_body: Dict[str, object],
+        req_body: Dict[str, bool],
     ) -> Response:
         """POST /settings/reset."""
         response = await self.httpx_client.post(
