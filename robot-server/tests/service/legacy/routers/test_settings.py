@@ -256,7 +256,7 @@ def mock_reset():
                 ResetOptionId.deck_calibration,
                 ResetOptionId.pipette_offset,
                 ResetOptionId.tip_length_calibrations,
-                ResetOptionId.reset_db_history,
+                ResetOptionId.db_history,
             },
         ],
         [{"bootScripts": True}, {ResetOptionId.boot_scripts}],

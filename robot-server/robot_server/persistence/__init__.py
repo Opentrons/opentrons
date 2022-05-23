@@ -92,7 +92,7 @@ class ResetManager:
     @staticmethod
     async def reset_db(persistence_directory: Path) -> None:
         """Create a file to mark directory to delete."""
-        file_name = Path(persistence_directory, _CLEAR_ON_REBOOT)
+        file_name = Path(persistence_directory / _CLEAR_ON_REBOOT)
         print(file_name)
         try:
             Path(persistence_directory).mkdir(parents=True, exist_ok=True)
