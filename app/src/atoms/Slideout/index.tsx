@@ -11,7 +11,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   COLORS,
-  TYPOGRAPHY,
   Overlay,
   POSITION_FIXED,
 } from '@opentrons/components'
@@ -119,7 +118,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
               </StyledText>
               <Flex alignItems={ALIGN_CENTER}>
                 <Btn
-                  size={TYPOGRAPHY.lineHeight24}
+                  size={'1.25rem'}
                   onClick={onCloseClick}
                   aria-label="exit"
                   data-testid={`Slideout_icon_close_${

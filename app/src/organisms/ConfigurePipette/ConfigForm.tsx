@@ -220,12 +220,13 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
           //  TODO(jr, 4/19/22): add groupLabels to i18n
           return (
             <>
-              <ConfigFormResetButton
-                onClick={handleReset}
-                disabled={updateInProgress}
-              />
               <Form>
-                <Box overflowY="scroll" height="54vh">
+                <Box overflowY="scroll" height="81vh">
+                  {/* 81vh is approximate height to leave 1rem margin below the submit button */}
+                  <ConfigFormResetButton
+                    onClick={handleReset}
+                    disabled={updateInProgress}
+                  />
                   <FormColumn>
                     <ConfigFormGroup
                       groupLabel="Plunger Positions"

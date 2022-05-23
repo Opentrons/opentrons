@@ -6,6 +6,7 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TEXT_TRANSFORM_UPPERCASE,
+  Box,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 export interface ConfigFormSubmitButtonProps {
@@ -19,16 +20,17 @@ export function ConfigFormSubmitButton(
   const { t } = useTranslation('shared')
 
   return (
-    <Flex
-      justifyContent={JUSTIFY_CENTER}
-      flexDirection={DIRECTION_COLUMN}
-      textTransform={TEXT_TRANSFORM_UPPERCASE}
-      marginTop={SPACING.spacing4}
-      boxShadow={'0px -4px 12px rgba(0, 0, 0, 0.15)'}
-    >
-      <PrimaryButton type={'submit'} disabled={disabled}>
-        {t('confirm')}
-      </PrimaryButton>
-    </Flex>
+    <Box boxShadow={'0px -4px 12px rgba(0, 0, 0, 0.15)'}>
+      <Flex
+        justifyContent={JUSTIFY_CENTER}
+        flexDirection={DIRECTION_COLUMN}
+        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        marginTop={SPACING.spacing4}
+      >
+        <PrimaryButton type={'submit'} disabled={disabled}>
+          {t('confirm')}
+        </PrimaryButton>
+      </Flex>
+    </Box>
   )
 }

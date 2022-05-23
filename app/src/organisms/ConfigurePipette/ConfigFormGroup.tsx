@@ -46,7 +46,11 @@ export function ConfigFormGroup(props: ConfigFormGroupProps): JSX.Element {
       )
     })
   return (
-    <FormGroup label={groupLabel} className={styles.form_group}>
+    <FormGroup
+      label={groupLabel}
+      className={styles.form_group}
+      isPipetteSettingsSlideout={true}
+    >
       {groupError && <p className={styles.group_error}>{formattedError}</p>}
       {formFields.map((field, index) => {
         return <ConfigInput field={field} key={index} />
