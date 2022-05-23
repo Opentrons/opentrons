@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from gravimetric_test.drivers import RadwagScale
+from hardware_testing.drivers import RadwagScale
 
 
 @pytest.fixture

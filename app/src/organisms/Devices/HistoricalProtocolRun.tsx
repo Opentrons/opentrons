@@ -106,7 +106,6 @@ export function HistoricalProtocolRun(
           runId={run.id}
           robotName={robotName}
           robotIsBusy={robotIsBusy}
-          data-testid={`RecentProtocolRuns_OverflowButton_${props.key}`}
         />
       </Flex>
       {offsetDrawerOpen && <OffsetDrawer run={run} robotName={robotName} />}

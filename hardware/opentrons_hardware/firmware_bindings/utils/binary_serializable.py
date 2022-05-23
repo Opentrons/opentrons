@@ -3,7 +3,7 @@
 from __future__ import annotations
 import struct
 from dataclasses import dataclass, fields, astuple
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, Type
 
 
 class BinarySerializableException(BaseException):
@@ -30,6 +30,7 @@ T = TypeVar("T")
 class BinaryFieldBase(Generic[T]):
     """Binary serializable field."""
 
+    This = TypeVar("This", bound="BinaryFieldBase[T]")
     FORMAT = ""
     """The struct format string for this field."""
 
@@ -38,7 +39,7 @@ class BinaryFieldBase(Generic[T]):
         self._t = t
 
     @classmethod
-    def build(cls, t: T) -> BinaryFieldBase[T]:
+    def build(cls: Type[This], t: T) -> This:
         """Factory method.
 
         Args:
@@ -50,7 +51,7 @@ class BinaryFieldBase(Generic[T]):
         return cls(t)
 
     @classmethod
-    def from_string(cls, t: str) -> BinaryFieldBase[T]:
+    def from_string(cls: Type[This], t: str) -> This:
         """Create from a string.
 
         Args:
