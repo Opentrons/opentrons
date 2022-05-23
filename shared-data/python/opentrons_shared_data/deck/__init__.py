@@ -16,6 +16,8 @@ if TYPE_CHECKING:
         DeckSchemaVersion2,
     )
 
+DEFAULT_DECK_DEFINITION_VERSION = 3
+
 
 @overload
 def load(name: str, version: "DeckSchemaVersion1") -> "DeckDefinitionV1":
@@ -32,7 +34,7 @@ def load(name: str, version: int) -> "DeckDefinition":
     ...
 
 
-def load(name, version=2):
+def load(name, version=DEFAULT_DECK_DEFINITION_VERSION):
     return json.loads(load_shared_data(f"deck/definitions/{version}/{name}.json"))
 
 
