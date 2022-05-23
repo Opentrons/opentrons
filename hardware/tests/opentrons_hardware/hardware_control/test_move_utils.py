@@ -460,3 +460,78 @@ def test_get_unit_vector(x: List[float], y: List[float]) -> None:
     coord_1 = dict(zip(AXES, (np.float64(i) for i in y)))
     unit_v, _ = get_unit_vector(coord_1, coord_0)
     assert is_unit_vector(unit_v)
+
+
+def test_triangle_matching() -> None:
+    """Test that equal-endpoint triangle moves work.
+
+    An equal-endpoint triangle move is a move that has the same initial
+    and final velocities and reaches a third, higher, velocity in the middle.
+
+    When we compute move internal acceleration, we compute the accelerating
+    and decelerating legs first, trying to reach the highest velocity we can.
+    If that requires us to move farther than the input move allows, we
+    limit the max speed to the greater of the initial and final velocities -
+    guaranteed to be <= the problematic velocity. But if the initial and
+    final velocities are the same, the math gets thrown for a loop.
+
+    That shouldn't happen for equal-endpoint triangle moves though - the
+    conditions that create the overruns are very _inequal_ triangle moves.
+    But with slight numerical inaccuracy, it can, and that's the problem.
+
+    This test checks that equal-endpoint triangle moves do not have this
+    problematic behavior on a typical infringing move seen in the wild.
+    """
+    problematic_constraints: SystemConstraints[str] = {
+        "X": AxisConstraints.build(
+            max_acceleration=np.float64(100),
+            max_speed_discont=np.float64(40),
+            max_direction_change_speed_discont=np.float64(20),
+        ),
+        "Y": AxisConstraints.build(
+            max_acceleration=np.float64(100),
+            max_speed_discont=np.float64(40),
+            max_direction_change_speed_discont=np.float64(20),
+        ),
+        "Z": AxisConstraints.build(
+            max_acceleration=np.float64(100),
+            max_speed_discont=np.float64(40),
+            max_direction_change_speed_discont=np.float64(20),
+        ),
+    }
+    manager = MoveManager(problematic_constraints)
+    blended, moves = manager.plan_motion(
+        origin={
+            "X": np.float64(261.077),
+            "Y": np.float64(229.898),
+            "Z": np.float64(0.0),
+        },
+        target_list=[
+            MoveTarget(
+                position={
+                    "X": np.float64(261.105),
+                    "Y": np.float64(229.925),
+                    "Z": np.float64(149.80000000000004),
+                },
+                max_speed=np.float64(500),
+            ),
+        ],
+    )
+    assert len(moves) == 1 and len(moves[0]) == 1
+    active_move = moves[0][0]
+    # This should be an equal-leg triangle move, so
+    # - there should be  no coast phase
+    assert active_move.blocks[1].distance == 0
+    assert active_move.blocks[1].time == 0
+    # - the accelerate and decelerate legs should be equal
+    assert active_move.blocks[0].distance != 0
+    assert active_move.blocks[0].time != 0
+    assert active_move.blocks[0].initial_speed != 0
+    assert active_move.blocks[2].distance == active_move.blocks[0].distance
+    assert active_move.blocks[2].time != active_move.blocks[0].time
+    assert active_move.blocks[2].final_speed == pytest.approx(
+        active_move.blocks[0].initial_speed
+    )
+    assert active_move.blocks[0].distance + active_move.blocks[
+        2
+    ].distance == pytest.approx(active_move.distance)

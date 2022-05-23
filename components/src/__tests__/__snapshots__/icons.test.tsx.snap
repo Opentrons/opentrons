@@ -2299,11 +2299,11 @@ exports[`icons upload renders correctly 1`] = `
   className="sc-fznyAO c0 foo"
   fill="currentColor"
   version="1.1"
-  viewBox="0 0 24 24"
+  viewBox="0 0 48 48"
   xmlns="http://www.w3.org/2000/svg"
 >
   <path
-    d="M7.714 18.353v-8.47H2L12 0l10 9.882h-5.714v8.47H7.714zM2 24v-2.824h20V24H2z"
+    d="M25.4144 10.9998C24.6333 10.2188 23.367 10.2188 22.5859 10.9998L15.5859 17.9998L17.0002 19.4141L23 13.4142V32H25V13.4139L31.0002 19.4141L32.4144 17.9998L25.4144 10.9998ZM9 32.5V37.5H39V32.5H41V37.5C41 38.6046 40.1046 39.5 39 39.5H9C7.89543 39.5 7 38.6046 7 37.5V32.5H9Z"
     fillRule="evenodd"
   />
 </svg>

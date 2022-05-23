@@ -598,3 +598,10 @@ class PeripheralStatusResponse:  # noqa: D101
     message_id: Literal[
         MessageId.peripheral_status_response
     ] = MessageId.peripheral_status_response
+
+
+@dataclass
+class SetSerialNumber:  # noqa: D101
+    payload: payloads.SerialNumberPayload
+    payload_type: Type[payloads.SerialNumberPayload] = payloads.SerialNumberPayload
+    message_id: Literal[MessageId.set_serial_number] = MessageId.set_serial_number
