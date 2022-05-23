@@ -57,7 +57,7 @@ async def get_persistence_directory(
         else:
             persistence_dir = setting
             # Reset DB only if is not temporary dir
-            if Path(persistence_dir / _TO_BE_DELETED_ON_REBOOT).exists():
+            if await AsyncPath(persistence_dir / _TO_BE_DELETED_ON_REBOOT).exists():
                 await _reset_persistence_directory(persistence_dir)
 
             await AsyncPath(persistence_dir).mkdir(parents=True, exist_ok=True)
