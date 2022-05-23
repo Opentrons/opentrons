@@ -22,6 +22,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
+import type { ModuleModel } from '@opentrons/shared-data'
 import type { NavRouteParams } from '../../../App/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
@@ -54,6 +55,13 @@ export const HeaterShakerWizard = (
   const labwareDef =
     moduleFromProtocol != null ? moduleFromProtocol.nestedLabwareDef : null
 
+  let heaterShakerModel: ModuleModel
+  if (heaterShaker != null) {
+    heaterShakerModel = heaterShaker.moduleModel
+  } else if (moduleFromProtocol != null) {
+    heaterShakerModel = moduleFromProtocol.moduleDef.model
+  }
+
   let buttonContent = null
   const getWizardDisplayPage = (): JSX.Element | null => {
     switch (currentPage) {
@@ -62,6 +70,7 @@ export const HeaterShakerWizard = (
         return (
           <Introduction
             labwareDefinition={labwareDef}
+            moduleModel={heaterShakerModel}
             thermalAdapterName={
               labwareDef != null
                 ? getAdapterName(labwareDef.parameters.loadName)
