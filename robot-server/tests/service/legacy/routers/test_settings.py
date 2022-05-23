@@ -238,7 +238,7 @@ def mock_reset():
                 "bootScripts": False,
                 "pipetteOffsetCalibrations": False,
                 "tipLengthCalibrations": False,
-                "dbHistory": False
+                "dbHistory": False,
             },
             set(),
         ],
@@ -249,14 +249,14 @@ def mock_reset():
                 "pipetteOffsetCalibrations": True,
                 "tipLengthCalibrations": True,
                 "deckCalibration": True,
-                "dbHistory": True
+                "dbHistory": True,
             },
             {
                 ResetOptionId.boot_scripts,
                 ResetOptionId.deck_calibration,
                 ResetOptionId.pipette_offset,
                 ResetOptionId.tip_length_calibrations,
-                ResetOptionId.reset_db_history
+                ResetOptionId.reset_db_history,
             },
         ],
         [{"bootScripts": True}, {ResetOptionId.boot_scripts}],

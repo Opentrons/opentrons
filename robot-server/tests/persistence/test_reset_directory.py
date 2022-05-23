@@ -34,7 +34,7 @@ async def test_test_reset_db(reset_manager: ResetManager, tmp_path: Path) -> Non
 
 
 async def test_delete_persistence_directory(
-        reset_manager: ResetManager, tmp_path: Path
+    reset_manager: ResetManager, tmp_path: Path
 ) -> None:
     """Should make sure directory is empty."""
     await reset_manager.reset_db(tmp_path)
@@ -47,7 +47,7 @@ async def test_delete_persistence_directory(
 
 
 async def test_delete_persistence_directory_not_found(
-        reset_manager: ResetManager,
+    reset_manager: ResetManager,
 ) -> None:
     """Should make sure a directory that is not found is caught in OSError."""
     result = await reset_persistence_directory(Path("/dir-not-found"))
@@ -57,7 +57,7 @@ async def test_delete_persistence_directory_not_found(
 
 @pytest.mark.parametrize("protocol", [(get_py_protocol), (get_json_protocol)])
 async def test_upload_protocols_and_reset_persistence_dir(
-        protocol: Callable[[str], IO[bytes]]
+    protocol: Callable[[str], IO[bytes]]
 ) -> None:
     """Test protocol and analysis persistence.
 
@@ -66,7 +66,7 @@ async def test_upload_protocols_and_reset_persistence_dir(
     """
     port = "15555"
     async with RobotClient.make(
-            host="http://localhost", port=port, version="*"
+        host="http://localhost", port=port, version="*"
     ) as robot_client:
         assert (
             await robot_client.wait_until_dead()
