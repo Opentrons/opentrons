@@ -72,6 +72,9 @@ stages:
           # Check that at least one of the elements of `data` is
           # the run data returned from the original POST.
           - !force_format_include '{original_run_data}'
+        links:
+          current:
+            href: '/runs/{run_id}'
 
   - name: Add a labware offset to the run
     request:
