@@ -30,6 +30,7 @@ export function RobotSettings(): JSX.Element | null {
   const { robotName, robotSettingsTab } = useParams<NavRouteParams>()
   const robot = useRobot(robotName)
   const isCalibrationDisabled = robot?.status !== CONNECTABLE
+  const isNetworkingDisabled = robot?.status === UNREACHABLE
 
   const robotSettingsContentByTab: {
     [K in RobotSettingsTab]: () => JSX.Element

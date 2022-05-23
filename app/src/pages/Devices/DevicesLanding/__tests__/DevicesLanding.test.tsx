@@ -5,12 +5,16 @@ import { i18n } from '../../../../i18n'
 import { DevicesEmptyState } from '../../../../organisms/Devices/DevicesEmptyState'
 import { RobotCard } from '../../../../organisms/Devices/RobotCard'
 import {
+  getScanning,
+  getConnectableRobots,
+  getReachableRobots,
+  getUnreachableRobots,
+} from '../../../../redux/discovery'
+import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../../redux/discovery/__fixtures__'
-import { getScanning } from '../../../../redux/discovery'
-import { useAvailableAndUnavailableDevices } from '../hooks'
 import { DevicesLanding } from '..'
 
 jest.mock('../../../../organisms/Devices/DevicesEmptyState')
@@ -24,8 +28,14 @@ const mockRobotCard = RobotCard as jest.MockedFunction<typeof RobotCard>
 const mockDevicesEmptyState = DevicesEmptyState as jest.MockedFunction<
   typeof DevicesEmptyState
 >
-const mockUseAvailableAndUnavailableDevices = useAvailableAndUnavailableDevices as jest.MockedFunction<
-  typeof useAvailableAndUnavailableDevices
+const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
+  typeof getConnectableRobots
+>
+const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
+  typeof getReachableRobots
+>
+const mockGetUnreachableRobots = getUnreachableRobots as jest.MockedFunction<
+  typeof getUnreachableRobots
 >
 
 const render = () => {
@@ -41,13 +51,15 @@ describe('DevicesLanding', () => {
       <div>Mock Robot {name}</div>
     ))
     mockDevicesEmptyState.mockReturnValue(<div>Mock DevicesEmptyState</div>)
-    mockUseAvailableAndUnavailableDevices.mockReturnValue({
-      availableDevices: [{ ...mockConnectableRobot, name: 'connectableRobot' }],
-      unavailableDevices: [
-        { ...mockReachableRobot, name: 'reachableRobot' },
-        { ...mockUnreachableRobot, name: 'unreachableRobot' },
-      ],
-    })
+    mockGetConnectableRobots.mockReturnValue([
+      { ...mockConnectableRobot, name: 'connectableRobot' },
+    ])
+    mockGetReachableRobots.mockReturnValue([
+      { ...mockReachableRobot, name: 'reachableRobot' },
+    ])
+    mockGetUnreachableRobots.mockReturnValue([
+      { ...mockUnreachableRobot, name: 'unreachableRobot' },
+    ])
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -60,10 +72,9 @@ describe('DevicesLanding', () => {
   })
 
   it('renders the DevicesEmptyState when no robots are found', () => {
-    mockUseAvailableAndUnavailableDevices.mockReturnValue({
-      availableDevices: [],
-      unavailableDevices: [],
-    })
+    mockGetConnectableRobots.mockReturnValue([])
+    mockGetReachableRobots.mockReturnValue([])
+    mockGetUnreachableRobots.mockReturnValue([])
     const [{ getByText }] = render()
 
     getByText('Mock DevicesEmptyState')
@@ -79,10 +90,9 @@ describe('DevicesLanding', () => {
     getByText('Unavailable (2)')
   })
   it('does not render available or unavailable sections when none are present', () => {
-    mockUseAvailableAndUnavailableDevices.mockReturnValue({
-      availableDevices: [],
-      unavailableDevices: [],
-    })
+    mockGetConnectableRobots.mockReturnValue([])
+    mockGetReachableRobots.mockReturnValue([])
+    mockGetUnreachableRobots.mockReturnValue([])
     const [{ queryByText }] = render()
 
     expect(queryByText('Available')).toBeFalsy()

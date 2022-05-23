@@ -65,7 +65,7 @@ export function DevicesLanding(): JSX.Element {
         <NewRobotSetupHelp />
       </Flex>
       {isScanning && noRobots ? <DevicesLoadingState /> : null}
-      {noRobots ? (
+      {!isScanning && noRobots ? (
         <DevicesEmptyState />
       ) : (
         <>
