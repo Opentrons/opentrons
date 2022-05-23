@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
 import { useInterval } from '@opentrons/components'
-import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import * as RobotApi from '../../../redux/robot-api'
 import * as Networking from '../../../redux/networking'
@@ -12,8 +11,6 @@ import { SelectSsid } from './ConnectNetwork/SelectSsid'
 import { ConnectModal } from './ConnectNetwork/ConnectModal'
 import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
 import { ResultModal } from './ConnectNetwork/ResultModal'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { checkIsRobotBusy } from './AdvancedTab/utils'
 
 import { CONNECT, DISCONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
 
@@ -23,6 +20,7 @@ import type {
   WifiConfigureRequest,
   NetworkChangeState,
 } from './ConnectNetwork/types'
+import { useIsRobotBusy } from '../hooks'
 
 interface TempSelectNetworkProps {
   robotName: string
@@ -50,19 +48,13 @@ export const TemporarySelectNetwork = ({
   const [changeState, setChangeState] = React.useState<NetworkChangeState>({
     type: null,
   })
-
-  const isRobotBusy = useCurrentRunId() !== null
-  const allSessionsQueryResponse = useAllSessionsQuery()
-
+  const isBusy = useIsRobotBusy()
   const dispatch = useDispatch<Dispatch>()
-
   const [dispatchApi, requestIds] = RobotApi.useDispatchApiRequest()
-
   const requestState = useSelector((state: State) => {
     const lastId = last(requestIds)
     return lastId != null ? RobotApi.getRequestById(state, lastId) : null
   })
-
   const activeNetwork = list?.find(nw => nw.active)
 
   const handleDisconnect = (): void => {
@@ -94,7 +86,6 @@ export const TemporarySelectNetwork = ({
   }, [robotName, dispatch, changeState.type])
 
   const handleSelectConnect = (ssid: string): void => {
-    const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
     if (isBusy) {
       updateRobotStatus(true)
     } else {
@@ -111,7 +102,6 @@ export const TemporarySelectNetwork = ({
   }
 
   const handleSelectDisconnect = (): void => {
-    const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
     if (isBusy) {
       updateRobotStatus(true)
     } else {
@@ -122,7 +112,6 @@ export const TemporarySelectNetwork = ({
 
   const handleSelectJoinOther = (): void => {
     console.log('handleSelectJoinOther need to check robotStatus')
-    const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
     if (isBusy) {
       updateRobotStatus(true)
     } else {

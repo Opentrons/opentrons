@@ -2,10 +2,8 @@ import * as React from 'react'
 import { saveAs } from 'file-saver'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, waitFor } from '@testing-library/react'
-import { UseQueryResult } from 'react-query'
 
 import { renderWithProviders } from '@opentrons/components'
-import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
 import { DeckCalibrationModal } from '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
@@ -34,18 +32,16 @@ import {
   useRobot,
   useTipLengthCalibrations,
   useAttachedPipettes,
+  useIsRobotBusy,
 } from '../../hooks'
-import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
 import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from '../CalibrationDetails/TipLengthCalibrationItems'
 
 import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
-import type { Sessions } from '@opentrons/api-client'
 
 jest.mock('file-saver')
-jest.mock('@opentrons/react-api-client')
 jest.mock(
   '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 )
@@ -93,11 +89,8 @@ const mockPipetteOffsetCalibrationItems = PipetteOffsetCalibrationItems as jest.
 const mockTipLengthCalibrationItems = TipLengthCalibrationItems as jest.MockedFunction<
   typeof TipLengthCalibrationItems
 >
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
->
-const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
-  typeof useAllSessionsQuery
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 
 let mockTrackEvent: jest.Mock
@@ -159,10 +152,7 @@ describe('RobotSettingsCalibration', () => {
       <div>TipLengthCalibrationItems</div>
     )
     mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
-    mockUseCurrentRunId.mockReturnValue('123')
-    mockUseAllSessionsQuery.mockReturnValue({
-      data: {},
-    } as UseQueryResult<Sessions, Error>)
+    mockUseIsRobotBusy.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -278,6 +268,7 @@ describe('RobotSettingsCalibration', () => {
       deckCalibrationData: null,
       isDeckCalibrated: false,
     })
+    mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Calibrate now' })
     fireEvent.click(button)
@@ -385,6 +376,7 @@ describe('RobotSettingsCalibration', () => {
     })
   })
   it('should call update robot status if a robot is busy - health check', () => {
+    mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Check health' })
     fireEvent.click(button)

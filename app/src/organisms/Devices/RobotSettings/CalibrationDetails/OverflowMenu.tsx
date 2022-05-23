@@ -12,7 +12,6 @@ import {
   ALIGN_FLEX_END,
   Mount,
 } from '@opentrons/components'
-import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import { OverflowBtn } from '../../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../../atoms/MenuList/MenuItem'
@@ -26,12 +25,11 @@ import * as Config from '../../../../redux/config'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../redux/calibration'
 import {
+  useIsRobotBusy,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
 } from '../../hooks'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
-import { checkIsRobotBusy } from '../AdvancedTab/utils'
 
 import type { PipetteOffsetCalibration } from '../../../../redux/calibration/types'
 
@@ -77,8 +75,7 @@ export function OverflowMenu({
     setCalBlockModalState,
   ] = React.useState<CalBlockModalState>(CAL_BLOCK_MODAL_CLOSED)
 
-  const isRobotBusy = useCurrentRunId() !== null
-  const allSessionsQueryResponse = useAllSessionsQuery()
+  const isBusy = useIsRobotBusy()
   interface StartWizardOptions {
     keepTipLength: boolean
     hasBlockModalResponse?: boolean | null
@@ -125,7 +122,6 @@ export function OverflowMenu({
     e: React.MouseEvent
   ): void => {
     e.preventDefault()
-    const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
     if (isBusy) {
       updateRobotStatus(true)
     } else {

@@ -1,18 +1,14 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { saveAs } from 'file-saver'
-import { UseQueryResult } from 'react-query'
 
 import { renderWithProviders, Mount } from '@opentrons/components'
-import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../../i18n'
 import { useCalibratePipetteOffset } from '../../../../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { useCurrentRunId } from '../../../../ProtocolUpload/hooks'
+import { useIsRobotBusy } from '../../../hooks'
 
 import { OverflowMenu } from '../OverflowMenu'
-
-import type { Sessions } from '@opentrons/api-client'
 
 const render = (
   props: React.ComponentProps<typeof OverflowMenu>
@@ -34,15 +30,13 @@ jest.mock('../../../../../redux/discovery')
 jest.mock('../../../../../redux/robot-api/selectors')
 jest.mock('../../../../CalibratePipetteOffset/useCalibratePipetteOffset')
 jest.mock('../../../../ProtocolUpload/hooks')
+jest.mock('../../../hooks')
 
 const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFunction<
   typeof useCalibratePipetteOffset
 >
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
->
-const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
-  typeof useAllSessionsQuery
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 
 const mockUpdateRobotStatus = jest.fn()
@@ -59,11 +53,7 @@ describe('OverflowMenu', () => {
       updateRobotStatus: mockUpdateRobotStatus,
     }
     mockUseCalibratePipetteOffset.mockReturnValue([startCalibration, null])
-    mockUseCurrentRunId.mockReturnValue('123')
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    mockUseAllSessionsQuery.mockReturnValue({
-      data: {},
-    } as UseQueryResult<Sessions, Error>)
+    mockUseIsRobotBusy.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -90,7 +80,6 @@ describe('OverflowMenu', () => {
   it('should call pipette offset calibration when clicking calibrate button', () => {
     const startCalibration = jest.fn()
     mockUseCalibratePipetteOffset.mockReturnValue([startCalibration, null])
-    mockUseCurrentRunId.mockReturnValue(null)
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
@@ -134,7 +123,6 @@ describe('OverflowMenu', () => {
       ...props,
       calType: 'tipLength',
     }
-    mockUseCurrentRunId.mockReturnValue(null)
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
@@ -146,6 +134,7 @@ describe('OverflowMenu', () => {
   })
 
   it('should call update robot status if a robot is busy - pipette offset', () => {
+    mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
@@ -159,6 +148,7 @@ describe('OverflowMenu', () => {
       ...props,
       calType: 'tipLength',
     }
+    mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)

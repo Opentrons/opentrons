@@ -9,6 +9,7 @@ jest.mock('../../../../../redux/config')
 jest.mock('../../../../../redux/sessions/selectors')
 jest.mock('../../../../../redux/discovery')
 jest.mock('../../../../../assets/labware/findLabware')
+jest.mock('../../../hooks')
 
 const ROBOT_NAME = 'otie'
 
