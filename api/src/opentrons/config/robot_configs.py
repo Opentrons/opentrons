@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Union, Optional, cast
 from typing_extensions import Literal
 
+from api.src.opentrons.config import gripper_config
+
 from . import CONFIG, defaults_ot3, defaults_ot2
 from .feature_flags import enable_ot3_hardware_controller
 from opentrons.hardware_control.types import BoardRevision
@@ -177,3 +179,7 @@ def default_pipette_offset() -> List[float]:
         return defaults_ot3.DEFAULT_PIPETTE_OFFSET
     else:
         return defaults_ot2.DEFAULT_PIPETTE_OFFSET
+
+
+def default_gripper_offset() -> List[float]:
+    return gripper_config.GRIPPER_OFFSET_DEFAULT
