@@ -27,8 +27,7 @@ import RobotCalHelpImage from '../../../../assets/images/robot_calibration_help.
 import { Portal } from '../../../../App/portal'
 
 const robotCalHelpArticle =
-  'https://support.opentrons.com/en/articles/3499692-how-positional-calibration-works-on-the-ot-2'
-
+  'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
 interface DeckCalibrationModalProps {
   onCloseClick: () => unknown
 }

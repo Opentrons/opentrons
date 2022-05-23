@@ -6,7 +6,6 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  Overlay,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
@@ -16,11 +15,11 @@ import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { restartRobot } from '../../redux/robot-admin'
 import { home, ROBOT } from '../../redux/robot-controls'
 import { UNREACHABLE } from '../../redux/discovery'
-import { Portal } from '../../App/portal'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
+import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { Dispatch } from '../../redux/types'
@@ -34,31 +33,28 @@ export const RobotOverviewOverflowMenu = (
 ): JSX.Element => {
   const { robot } = props
   const { t } = useTranslation(['devices_landing', 'robot_controls'])
-  const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
+  const {
+    MenuOverlay,
+    handleOverflowClick,
+    showOverflowMenu,
+    setShowOverflowMenu,
+  } = useMenuHandleClickOutside()
   const currentRunStatus = useCurrentRunStatus()
   const buttonDisabledReason =
     currentRunStatus === RUN_STATUS_RUNNING || robot.status === UNREACHABLE
 
   const dispatch = useDispatch<Dispatch>()
 
-  const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    setShowOverflowMenu(!showOverflowMenu)
-  }
-
-  const handleClickOutside: React.MouseEventHandler<HTMLDivElement> = e => {
-    e.preventDefault()
-    setShowOverflowMenu(false)
-  }
-
   const handleClickRestart: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     dispatch(restartRobot(robot.name))
+    setShowOverflowMenu(false)
   }
 
   const handleClickHomeGantry: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     dispatch(home(robot.name, ROBOT))
+    setShowOverflowMenu(false)
   }
 
   return (
@@ -110,14 +106,7 @@ export const RobotOverviewOverflowMenu = (
           </MenuItem>
         </Flex>
       ) : null}
-      <Portal level="top">
-        {showOverflowMenu ? (
-          <Overlay
-            onClick={handleClickOutside}
-            backgroundColor={COLORS.transparent}
-          />
-        ) : null}
-      </Portal>
+      <MenuOverlay />
     </Flex>
   )
 }

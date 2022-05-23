@@ -9,10 +9,9 @@ import {
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
-  Overlay,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Portal } from '../../App/portal'
+import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
@@ -32,7 +31,12 @@ interface OverflowMenuProps {
 export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
   const { protocolKey, protocolType } = props
   const { t } = useTranslation('protocol_details')
-  const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
+  const {
+    MenuOverlay,
+    handleOverflowClick,
+    showOverflowMenu,
+    setShowOverflowMenu,
+  } = useMenuHandleClickOutside()
   const dispatch = useDispatch<Dispatch>()
 
   const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
@@ -44,15 +48,6 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
     e.preventDefault()
     dispatch(analyzeProtocol(protocolKey))
     setShowOverflowMenu(!showOverflowMenu)
-  }
-  const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    setShowOverflowMenu(!showOverflowMenu)
-  }
-
-  const handleClickOutside: React.MouseEventHandler<HTMLDivElement> = e => {
-    e.preventDefault()
-    setShowOverflowMenu(false)
   }
   return (
     <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
@@ -89,14 +84,7 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
           ) : null}
         </Flex>
       ) : null}
-      <Portal level="top">
-        {showOverflowMenu ? (
-          <Overlay
-            onClick={handleClickOutside}
-            backgroundColor={COLORS.transparent}
-          />
-        ) : null}
-      </Portal>
+      <MenuOverlay />
     </Flex>
   )
 }

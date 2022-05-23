@@ -41,7 +41,7 @@ describe('RerunningProtocolModal', () => {
         name: 'Learn more about Labware Offset Data',
       }).getAttribute('href')
     ).toBe(
-      'http://support.opentrons.com/en/articles/5742955-how-labware-offsets-work-on-the-ot-2'
+      'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
     )
   })
   it('should call onCloseClick when the close button is pressed', () => {

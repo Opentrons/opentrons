@@ -46,7 +46,7 @@ class ProtocolFile:
     @highlight
     def get_drag_json_protocol(self) -> WebElement:
         """Retrieve the Webelement input for drag and drop."""
-        input: WebElement = WebDriverWait(self.driver, 5).until(
+        input: WebElement = WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located(ProtocolFile.file_drag_locator)
         )
         return input

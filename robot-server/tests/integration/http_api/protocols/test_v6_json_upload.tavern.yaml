@@ -145,6 +145,7 @@ stages:
                     calibrationPoint:
                       x: 124.875
                       y: 2.75
+                      z: 82.25
                     displayName: Magnetic Module GEN2
                     quirks: []
                     slotTransforms:
@@ -247,6 +248,7 @@ stages:
                     calibrationPoint:
                       x: 11.7
                       y: 8.75
+                      z: 80.09
                     displayName: Temperature Module GEN2
                     quirks: []
                     slotTransforms:

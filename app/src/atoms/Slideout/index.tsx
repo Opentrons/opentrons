@@ -111,8 +111,8 @@ export const Slideout = (props: Props): JSX.Element | null => {
               marginBottom={SPACING.spacing4}
             >
               <StyledText
-                color={COLORS.darkBlack}
                 as="h2"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid={`Slideout_title_${title}`}
               >
                 {title}

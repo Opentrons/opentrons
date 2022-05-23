@@ -2,7 +2,8 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional
+from functools import lru_cache
+from typing import Any, Dict, List, Optional, cast
 
 import sqlalchemy
 from pydantic import parse_obj_as
@@ -15,6 +16,9 @@ from robot_server.persistence import run_table, action_table, ensure_utc_datetim
 from robot_server.protocols import ProtocolNotFoundError
 
 from .action_models import RunAction, RunActionType
+
+
+_CACHE_ENTRIES = 32
 
 
 @dataclass(frozen=True)
@@ -105,6 +109,7 @@ class RunStore:
 
             action_rows = transaction.execute(select_actions).all()
 
+        self._clear_caches()
         return _convert_row_to_run(row=run_row, action_rows=action_rows)
 
     def insert_action(self, run_id: str, action: RunAction) -> None:
@@ -126,6 +131,8 @@ class RunStore:
                 transaction.execute(insert)
             except sqlalchemy.exc.IntegrityError:
                 raise RunNotFoundError(run_id=run_id)
+
+        self._clear_caches()
 
     def insert(
         self,
@@ -166,14 +173,17 @@ class RunStore:
                 ), "Insert run failed due to unexpected IntegrityError"
                 raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
+        self._clear_caches()
         return run
 
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def has(self, run_id: str) -> bool:
         """Whether a given run exists in the store."""
-        statement = sqlalchemy.select(run_table).where(run_table.c.id == run_id)
+        statement = sqlalchemy.select(run_table.c.id).where(run_table.c.id == run_id)
         with self._sql_engine.begin() as transaction:
             return transaction.execute(statement).first() is not None
 
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get(self, run_id: str) -> RunResource:
         """Get a specific run entry by its identifier.
 
@@ -205,6 +215,7 @@ class RunStore:
 
         return _convert_row_to_run(run_row, action_rows)
 
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_all(self) -> List[RunResource]:
         """Get all known run resources.
 
@@ -230,6 +241,7 @@ class RunStore:
             for run_row in runs
         ]
 
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_state_summary(self, run_id: str) -> Optional[StateSummary]:
         """Get the archived run state summary.
 
@@ -248,6 +260,22 @@ class RunStore:
             StateSummary.parse_obj(row.state_summary)
             if row.state_summary is not None
             else None
+        )
+
+    @lru_cache(maxsize=_CACHE_ENTRIES)
+    def _get_all_unparsed_commands(self, run_id: str) -> List[Dict[str, Any]]:
+        select_run_commands = sqlalchemy.select(run_table.c.commands).where(
+            run_table.c.id == run_id
+        )
+
+        with self._sql_engine.begin() as transaction:
+            try:
+                row = transaction.execute(select_run_commands).one()
+            except sqlalchemy.exc.NoResultFound:
+                raise RunNotFoundError(run_id=run_id)
+
+        return (
+            cast(List[Dict[str, Any]], row.commands) if row.commands is not None else []
         )
 
     def get_commands_slice(
@@ -270,17 +298,7 @@ class RunStore:
         Raises:
             RunNotFoundError: The given run ID was not found.
         """
-        select_run_commands = sqlalchemy.select(run_table.c.commands).where(
-            run_table.c.id == run_id
-        )
-
-        with self._sql_engine.begin() as transaction:
-            try:
-                row = transaction.execute(select_run_commands).one()
-            except sqlalchemy.exc.NoResultFound:
-                raise RunNotFoundError(run_id=run_id)
-
-        command_source_dicts = row.commands if row.commands is not None else []
+        command_source_dicts = self._get_all_unparsed_commands(run_id)
         commands_length = len(command_source_dicts)
         if cursor is None:
             cursor = commands_length - length
@@ -299,6 +317,7 @@ class RunStore:
             commands=sliced_commands,
         )
 
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_command(self, run_id: str, command_id: str) -> Command:
         """Get run command by id.
 
@@ -321,12 +340,13 @@ class RunStore:
                 row = transaction.execute(select_run_commands).one()
             except sqlalchemy.exc.NoResultFound as e:
                 raise RunNotFoundError(run_id=run_id) from e
-            try:
-                command = next(c for c in row.commands if c["id"] == command_id)
-            except StopIteration as e:
-                raise CommandNotFoundError(command_id=command_id) from e
 
-            return parse_obj_as(Command, command)  # type: ignore[arg-type]
+        try:
+            command = next(c for c in row.commands if c["id"] == command_id)
+        except StopIteration as e:
+            raise CommandNotFoundError(command_id=command_id) from e
+
+        return parse_obj_as(Command, command)  # type: ignore[arg-type]
 
     def remove(self, run_id: str) -> None:
         """Remove a run by its unique identifier.
@@ -345,8 +365,18 @@ class RunStore:
             transaction.execute(delete_actions)
             result = transaction.execute(delete_run)
 
-            if result.rowcount < 1:
-                raise RunNotFoundError(run_id)
+        if result.rowcount < 1:
+            raise RunNotFoundError(run_id)
+
+        self._clear_caches()
+
+    def _clear_caches(self) -> None:
+        self.has.cache_clear()
+        self.get.cache_clear()
+        self.get_all.cache_clear()
+        self.get_state_summary.cache_clear()
+        self.get_command.cache_clear()
+        self._get_all_unparsed_commands.cache_clear()
 
 
 def _convert_row_to_run(

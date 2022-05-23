@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 import {
   Box,
@@ -35,7 +35,7 @@ import {
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
-// import { UpdateRobotBanner } from '../UpdateRobotBanner'
+import { UpdateRobotBanner } from '../UpdateRobotBanner'
 
 interface RobotCardProps {
   robot: DiscoveredRobot
@@ -44,25 +44,26 @@ interface RobotCardProps {
 export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const { robot } = props
   const { name: robotName = null, local } = robot
+  const history = useHistory()
   return robotName != null ? (
-    <Link to={`/devices/${robotName}`} style={{ color: 'inherit' }}>
-      <Flex
-        alignItems={ALIGN_CENTER}
-        backgroundColor={C_WHITE}
-        border={`1px solid ${C_MED_LIGHT_GRAY}`}
-        borderRadius={BORDERS.radiusSoftCorners}
-        flexDirection={DIRECTION_ROW}
-        marginBottom={SPACING.spacing3}
-        padding={SPACING.spacing3}
-        width="100%"
-      >
+    <Flex
+      alignItems={ALIGN_CENTER}
+      backgroundColor={C_WHITE}
+      border={`1px solid ${C_MED_LIGHT_GRAY}`}
+      borderRadius={BORDERS.radiusSoftCorners}
+      flexDirection={DIRECTION_ROW}
+      marginBottom={SPACING.spacing3}
+      padding={SPACING.spacing3}
+      width="100%"
+      onClick={() => history.push(`/devices/${robotName}`)}
+    >
         <img
           src={OT2_PNG}
           style={{ width: '6rem' }}
           id={`RobotCard_${robotName}_robotImage`}
         />
         <Box padding={SPACING.spacing3} width="100%">
-          {/* TODO: uncomment this when we prevent all nested clicks from triggering a route change * <UpdateRobotBanner robotName={robotName} marginBottom={SPACING.spacing3} /> */}
+          <UpdateRobotBanner robotName={robotName} marginBottom={SPACING.spacing3} />
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText
@@ -106,7 +107,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
         </Box>
         <RobotOverflowMenu robot={robot} alignSelf={ALIGN_START} />
       </Flex>
-    </Link>
   ) : null
 }
 
