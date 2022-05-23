@@ -212,7 +212,7 @@ async def post_settings_reset_options(
     reset_util.reset(options)
 
     if ("dbHistory", True) in factory_reset_commands.items():
-        await reset_manager.reset_db(persistence_path)
+        await reset_manager.mark_directory_reset(persistence_path)
         options.add(reset_util.ResetOptionId.db_history)
 
     message = (

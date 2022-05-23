@@ -21,7 +21,7 @@ _protocol_directory_accessor = AppStateAccessor[Path]("protocol_directory")
 
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-robot-server-"
 _DATABASE_FILE: Final = "robot_server.db"
-_CLEAR_ON_REBOOT = "marked_to_delete.txt"
+_TO_BE_DELETED_ON_REBOOT = "marked_to_delete.txt"
 
 _log = logging.getLogger(__name__)
 
@@ -57,7 +57,7 @@ async def get_persistence_directory(
         else:
             persistence_dir = setting
             # Reset DB only if is not temporary dir
-            if Path(persistence_dir / _CLEAR_ON_REBOOT).exists():
+            if Path(persistence_dir / _TO_BE_DELETED_ON_REBOOT).exists():
                 await reset_persistence_directory(persistence_dir)
 
             await AsyncPath(persistence_dir).mkdir(parents=True, exist_ok=True)
@@ -90,13 +90,12 @@ class ResetManager:
     """Dependency class to handle robot server reset options."""
 
     @staticmethod
-    async def reset_db(persistence_directory: Path) -> None:
+    async def mark_directory_reset(persistence_directory: Path) -> None:
         """Create a file to mark directory to delete."""
-        file_name = Path(persistence_directory / _CLEAR_ON_REBOOT)
+        file_name = Path(persistence_directory / _TO_BE_DELETED_ON_REBOOT)
         print(file_name)
         try:
-            Path(persistence_directory).mkdir(parents=True, exist_ok=True)
-            Path(file_name).open("w")
+            file_name.touch()
         except OSError:
             print("Could not create file:", file_name)
 
