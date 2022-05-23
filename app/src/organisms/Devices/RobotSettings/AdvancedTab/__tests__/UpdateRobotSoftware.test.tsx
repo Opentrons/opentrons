@@ -1,23 +1,26 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
+
 import { renderWithProviders } from '@opentrons/components'
+
 import { i18n } from '../../../../../i18n'
 import { getBuildrootUpdateDisplayInfo } from '../../../../../redux/buildroot'
-import { useCurrentRunId } from '../../../../ProtocolUpload/hooks'
+import { useIsRobotBusy } from '../../../hooks'
+
 import { UpdateRobotSoftware } from '../UpdateRobotSoftware'
 
 jest.mock('../../../../../redux/robot-settings/selectors')
 jest.mock('../../../../../redux/discovery')
 jest.mock('../../../../../redux/buildroot/selectors')
-jest.mock('../../../../ProtocolUpload/hooks')
+jest.mock('../../../hooks')
 
 const mockUpdateRobotStatus = jest.fn()
 const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
   typeof getBuildrootUpdateDisplayInfo
 >
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 
 const render = () => {
@@ -39,7 +42,7 @@ describe('RobotSettings UpdateRobotSoftware', () => {
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    mockUseCurrentRunId.mockReturnValue('123')
+    mockUseIsRobotBusy.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -63,7 +66,8 @@ describe('RobotSettings UpdateRobotSoftware', () => {
     expect(link.closest('a')).toHaveAttribute('href', targetLink)
   })
 
-  it('should call robot status if a robot is busy', () => {
+  it('should call update robot status if a robot is busy', () => {
+    mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByLabelText }] = render()
     const button = getByLabelText('Browse file system')
     fireEvent.change(button)

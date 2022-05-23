@@ -10,13 +10,11 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../../atoms/text'
 import { ToggleButton } from '../../../../atoms/buttons'
+import { useIsRobotBusy } from '../../hooks'
 import { updateSetting } from '../../../../redux/robot-settings'
-import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
-import { checkIsRobotBusy } from './utils'
 
 import type { Dispatch } from '../../../../redux/types'
 import type { RobotSettingsField } from '../../../../redux/robot-settings/types'
@@ -36,11 +34,9 @@ export function ShortTrashBin({
   const dispatch = useDispatch<Dispatch>()
   const value = settings?.value ? settings.value : false
   const id = settings?.id ? settings.id : 'shortTrashBin'
-  const isRobotBusy = useCurrentRunId() !== null
-  const allSessionsQueryResponse = useAllSessionsQuery()
+  const isBusy = useIsRobotBusy()
 
-  const handleClick = (): void => {
-    const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
+  const handleClick: React.MouseEventHandler<Element> = () => {
     if (isBusy) {
       updateIsRobotBusy(true)
     } else {
@@ -66,7 +62,7 @@ export function ShortTrashBin({
       <ToggleButton
         label="short_trash_bin"
         toggledOn={settings?.value === true}
-        onClick={() => handleClick()}
+        onClick={handleClick}
         id="AdvancedSettings_shortTrashBin"
       />
     </Flex>

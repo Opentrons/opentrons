@@ -4,7 +4,7 @@ from pydantic import BaseSettings, Field
 
 DEFAULT_INTERFACE: Final = "socketcan"
 
-DEFAULT_BITRATE: Final = 250000
+DEFAULT_BITRATE: Final = 500000
 
 DEFAULT_CHANNEL: Final = "can0"
 

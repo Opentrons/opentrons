@@ -43,7 +43,12 @@ async def set_pwm_param(
 
 
 async def grip(
-    can_messenger: CanMessenger, group_id: int, seq_id: int, freq: int, duty_cycle: int
+    can_messenger: CanMessenger,
+    group_id: int,
+    seq_id: int,
+    duration_sec: float,
+    freq: int,
+    duty_cycle: int,
 ) -> None:
     """Start grip motion."""
     await can_messenger.send(
@@ -52,7 +57,7 @@ async def grip(
             payload=payloads.GripperMoveRequestPayload(
                 group_id=UInt8Field(group_id),
                 seq_id=UInt8Field(seq_id),
-                duration=UInt32Field(0),
+                duration=UInt32Field(int(duration_sec * freq)),
                 freq=UInt32Field(freq),
                 duty_cycle=UInt32Field(duty_cycle),
             )

@@ -10,7 +10,7 @@ from mock import AsyncMock, call
 from opentrons_hardware.firmware_bindings.messages.fields import (
     ToolField,
     PipetteNameField,
-    PipetteSerialField,
+    SerialField,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt16Field
 from opentrons_hardware.hardware_control.tools import detector, types
@@ -149,7 +149,7 @@ async def test_sends_only_required_followups(
             payload = payloads.PipetteInfoResponsePayload(
                 pipette_name=PipetteNameField(PipetteName.p1000_single.value),
                 pipette_model=UInt16Field(2),
-                pipette_serial=PipetteSerialField(b"20220809A022"),
+                pipette_serial=SerialField(b"20220809A022"),
             )
             return [
                 (
@@ -221,7 +221,7 @@ async def test_sends_all_required_followups(
                                 PipetteName.p1000_single.value
                             ),
                             pipette_model=UInt16Field(2),
-                            pipette_serial=PipetteSerialField(b"20220809A022"),
+                            pipette_serial=SerialField(b"20220809A022"),
                         )
                     ),
                     NodeId.pipette_left,
@@ -234,7 +234,7 @@ async def test_sends_all_required_followups(
                                 PipetteName.p1000_multi.value
                             ),
                             pipette_model=UInt16Field(4),
-                            pipette_serial=PipetteSerialField(b"20231005A220"),
+                            pipette_serial=SerialField(b"20231005A220"),
                         )
                     ),
                     NodeId.pipette_right,
@@ -301,7 +301,7 @@ async def test_handles_bad_serials(
             payload = payloads.PipetteInfoResponsePayload(
                 pipette_name=PipetteNameField(PipetteName.p1000_multi.value),
                 pipette_model=UInt16Field(4),
-                pipette_serial=PipetteSerialField(
+                pipette_serial=SerialField(
                     b"\x00\x01\x02\x03\x04\0x05\x06\x07\x08\x09\x0a\x0b"
                 ),
             )

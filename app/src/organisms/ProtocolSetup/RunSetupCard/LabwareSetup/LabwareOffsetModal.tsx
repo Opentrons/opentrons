@@ -26,9 +26,9 @@ import { Portal } from '../../../../App/portal'
 import styles from '../../styles.css'
 
 const ROBOT_CAL_HELP_ARTICLE =
-  'https://support.opentrons.com/en/articles/3499692-how-positional-calibration-works-on-the-ot-2'
+  'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
 const OFFSET_DATA_HELP_ARTICLE =
-  'http://support.opentrons.com/en/articles/5742955-how-labware-offsets-work-on-the-ot-2'
+  'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
 interface LabwareOffsetModalProps {
   onCloseClick: () => unknown
 }

@@ -25,7 +25,7 @@ import { getScanning, startDiscovery } from '../../redux/discovery'
 import type { Dispatch, State } from '../../redux/types'
 
 const SUPPORT_PAGE_LINK =
-  'https://support.opentrons.com/en/articles/2934336-manually-adding-a-robot-s-ip-address'
+  'https://support.opentrons.com/s/article/Manually-adding-a-robot-s-IP-address'
 
 export interface ConnectRobotSlideoutProps {
   isExpanded: boolean

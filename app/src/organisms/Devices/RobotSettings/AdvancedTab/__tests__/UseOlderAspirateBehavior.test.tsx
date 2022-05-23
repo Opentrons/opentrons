@@ -1,31 +1,24 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
-import { UseQueryResult } from 'react-query'
 
 import { renderWithProviders } from '@opentrons/components'
-import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../../i18n'
+import { useIsRobotBusy } from '../../../hooks'
 import { getRobotSettings } from '../../../../../redux/robot-settings'
-import { useCurrentRunId } from '../../../../ProtocolUpload/hooks'
 
 import { UseOlderAspirateBehavior } from '../UseOlderAspirateBehavior'
 
-import type { Sessions } from '@opentrons/api-client'
-
-jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../../redux/robot-settings/selectors')
-jest.mock('../../../../ProtocolUpload/hooks')
+jest.mock('../../../hooks')
 
+const mockUpdateRobotStatus = jest.fn()
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
 >
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
->
-const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
-  typeof useAllSessionsQuery
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 
 const mockSettings = {
@@ -36,8 +29,6 @@ const mockSettings = {
   value: true,
   restart_required: false,
 }
-
-const mockUpdateRobotStatus = jest.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -55,10 +46,7 @@ const render = () => {
 describe('RobotSettings UseOlderAspirateBehavior', () => {
   beforeEach(() => {
     mockGetRobotSettings.mockReturnValue([mockSettings])
-    mockUseCurrentRunId.mockReturnValue('123')
-    mockUseAllSessionsQuery.mockReturnValue({
-      data: {},
-    } as UseQueryResult<Sessions, Error>)
+    mockUseIsRobotBusy.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -83,7 +71,6 @@ describe('RobotSettings UseOlderAspirateBehavior', () => {
       value: false,
     }
     mockGetRobotSettings.mockReturnValue([tempMockSettings])
-    mockUseCurrentRunId.mockReturnValue(null)
     const [{ getByRole }] = render()
     const toggleButton = getByRole('switch', {
       name: 'use_older_aspirate_behavior',
@@ -92,7 +79,8 @@ describe('RobotSettings UseOlderAspirateBehavior', () => {
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
   })
 
-  it('should check robot status when clicking the toggle button', () => {
+  it('should call update robot status if a robot is busy', () => {
+    mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByRole }] = render()
     const toggleButton = getByRole('switch', {
       name: 'use_older_aspirate_behavior',

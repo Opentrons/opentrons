@@ -4,12 +4,12 @@ import { useHost } from '../api'
 
 import type { UseQueryResult, UseQueryOptions } from 'react-query'
 
-export function useRunQuery(
+export function useRunQuery<TError = Error>(
   runId: string | null,
-  options: UseQueryOptions<Run> = {}
-): UseQueryResult<Run> {
+  options: UseQueryOptions<Run, TError> = {}
+): UseQueryResult<Run, TError> {
   const host = useHost()
-  const query = useQuery<Run>(
+  const query = useQuery<Run, TError>(
     [host, 'runs', runId, 'details'],
     () =>
       getRun(host as HostConfig, runId as string).then(

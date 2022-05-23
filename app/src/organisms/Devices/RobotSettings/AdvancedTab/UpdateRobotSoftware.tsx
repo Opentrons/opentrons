@@ -14,22 +14,19 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { TertiaryButton } from '../../../../atoms/buttons'
+import { useIsRobotBusy } from '../../hooks'
 import {
   getBuildrootUpdateDisplayInfo,
   startBuildrootUpdate,
 } from '../../../../redux/buildroot'
-import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
-import { checkIsRobotBusy } from './utils'
 
 import type { State, Dispatch } from '../../../../redux/types'
 
 const OT_APP_UPDATE_PAGE_LINK = 'https://opentrons.com/ot-app/'
-
 const HIDDEN_CSS = css`
   position: fixed;
   clip: rect(1px 1px 1px 1px);
@@ -51,12 +48,9 @@ export function UpdateRobotSoftware({
   })
   const updateDisabled = updateFromFileDisabledReason !== null
   const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
-  const isRobotBusy = useCurrentRunId() !== null
-  const allSessionsQueryResponse = useAllSessionsQuery()
+  const isBusy = useIsRobotBusy()
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
-    console.log('clicked')
-    const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
     if (isBusy) {
       updateIsRobotBusy(true)
     } else {

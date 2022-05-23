@@ -1,31 +1,21 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
-import { UseQueryResult } from 'react-query'
 
 import { renderWithProviders } from '@opentrons/components'
-import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../../i18n'
-import { useCurrentRunId } from '../../../../ProtocolUpload/hooks'
+import { useIsRobotBusy } from '../../../hooks'
 
 import { DisplayRobotName } from '../DisplayRobotName'
 
-import type { Sessions } from '@opentrons/api-client'
-
 const mockUpdateIsEXpanded = jest.fn()
 const mockUpdateIsRobotBusy = jest.fn()
-
-const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
-  typeof useAllSessionsQuery
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 
-jest.mock('../../../../ProtocolUpload/hooks')
-jest.mock('@opentrons/react-api-client')
-
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
->
+jest.mock('../../../hooks')
 
 const render = () => {
   return renderWithProviders(
@@ -42,10 +32,7 @@ const render = () => {
 
 describe('RobotSettings DisplayRobotName', () => {
   beforeEach(() => {
-    mockUseCurrentRunId.mockReturnValue(null)
-    mockUseAllSessionsQuery.mockReturnValue({
-      data: {},
-    } as UseQueryResult<Sessions, Error>)
+    mockUseIsRobotBusy.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -68,7 +55,7 @@ describe('RobotSettings DisplayRobotName', () => {
   })
 
   it('should call update robot status if a robot is busy', () => {
-    mockUseCurrentRunId.mockReturnValue('runId')
+    mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Rename robot' })
     fireEvent.click(button)

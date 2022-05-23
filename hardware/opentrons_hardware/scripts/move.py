@@ -12,7 +12,10 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SetupRequest,
     EnableMotorRequest,
 )
-from opentrons_hardware.hardware_control.motion import MoveGroupSingleAxisStep
+from opentrons_hardware.hardware_control.motion import (
+    MoveGroupSingleAxisStep,
+    MoveGroups,
+)
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
@@ -46,7 +49,7 @@ async def run_move(messenger: CanMessenger) -> None:
     await messenger.send(node_id=NodeId.broadcast, message=EnableMotorRequest())
 
     # TODO (al, 2021-11-11): Allow creating groups from command line or config file.
-    move_groups = [
+    move_groups: MoveGroups = [
         # Group 0
         [
             {
