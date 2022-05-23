@@ -124,6 +124,9 @@ stages:
         json:
           play_action_id: data.id
 
+  # While the protocol is ongoing, several fields (like labware)
+  # are nondeterministic depending on request timing.
+  # Wait for the protocol to complete so things settle.
   - name: Wait for the protocol to complete
     max_retries: 10
     delay_after: 0.1
