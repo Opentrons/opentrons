@@ -443,7 +443,13 @@ export function RobotSettingsCalibration({
               color={COLORS.darkBlack}
               css={TYPOGRAPHY.pRegular}
               textDecoration={TEXT_DECORATION_UNDERLINE}
-              onClick={() => confirmStart()}
+              onClick={() => {
+                if (isBusy) {
+                  updateRobotStatus(true)
+                } else {
+                  confirmStart()
+                }
+              }}
             >
               {t('calibrate_now')}
             </Link>
