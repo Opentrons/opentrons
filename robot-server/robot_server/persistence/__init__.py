@@ -93,7 +93,6 @@ class ResetManager:
     async def mark_directory_reset(persistence_directory: Path) -> None:
         """Create a file to mark directory to delete."""
         file_name = Path(persistence_directory / _TO_BE_DELETED_ON_REBOOT)
-        print(file_name)
         try:
             file_name.touch()
         except OSError:
