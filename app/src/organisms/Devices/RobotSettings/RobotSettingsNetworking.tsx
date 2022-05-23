@@ -137,7 +137,10 @@ export function RobotSettingsNetworking({
           </>
         ) : (
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <TemporarySelectNetwork robotName={robotName} />
+            <TemporarySelectNetwork
+              robotName={robotName}
+              updateRobotStatus={updateRobotStatus}
+            />
           </Flex>
         )}
       </Box>
