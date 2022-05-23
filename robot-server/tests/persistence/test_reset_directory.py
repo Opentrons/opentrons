@@ -116,7 +116,7 @@ async def test_upload_protocols_and_reset_persistence_dir(
 # async def test_protocol_labware_files_persist() -> None:
 #     """Upload a python protocol and 2 custom labware files.
 #
-#     Test that labware files are persisted on server restart.
+#     Test reset dir after restart.
 #     """
 #     port = "15556"
 #     async with RobotClient.make(
@@ -138,37 +138,36 @@ async def test_upload_protocols_and_reset_persistence_dir(
 #                     Path("./tests/integration/protocols/cpx_6_tuberack_100ul.json"),
 #                 ]
 #             )
-#             protocol_upload_json = protocol.json()
-#             protocol_id = protocol_upload_json["data"]["id"]
+#             await robot_client.post_setting_reset_options({"dbHistory": True})
 #
-#             result = await robot_client.get_protocol(protocol_id)
-#             protocol_detail = result.json()["data"]
-#             # The analysisSummaries field is nondeterministic because the observed
-#             # analysis statuses depend on request timing.
-#             # Since we already cover analysis persistence elsewhere in this file,
-#             # we can ignore the whole field in this test to avoid the nondeterminism.
-#             del protocol_detail["analysisSummaries"]
+#             result = await robot_client.get_protocols()
+#
+#             assert result.json()["data"]
+#
+#             assert os.listdir(f"{server.persistence_directory}/protocols/")
 #
 #             server.stop()
 #             assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
+#
 #             server.start()
+#
 #             assert (
 #                 await robot_client.wait_until_alive()
 #             ), "Dev Robot never became available."
 #
-#             result = await robot_client.get_protocol(protocol_id)
-#             restarted_protocol_detail = result.json()["data"]
-#             del restarted_protocol_detail["analysisSummaries"]
+#             result = await robot_client.get_protocols()
 #
-#             protocol_detail["files"].sort(key=lambda n: n["name"])
-#             restarted_protocol_detail["files"].sort(key=lambda n: n["name"])
-#             assert restarted_protocol_detail == protocol_detail
+#             assert result.json()["data"] == []
 #
-#             four_tuberack = Path(
-#                 f"{server.persistence_directory}/protocols/{protocol_id}/cpx_4_tuberack_100ul.json"  # noqa: E501
-#             )
-#             six_tuberack = Path(
-#                 f"{server.persistence_directory}/protocols/{protocol_id}/cpx_6_tuberack_100ul.json"  # noqa: E501
-#             )
-#             assert four_tuberack.is_file()
-#             assert six_tuberack.is_file()
+#             await asyncio.sleep(5)
+#
+#             assert os.listdir(f"{server.persistence_directory}/protocols/") == []
+#
+#             print(os.listdir(
+#                 f"{server.persistence_directory}/protocols/{result.json()['data'][0].id}/cpx_4_tuberack_100ul.json"  # noqa: E501
+#             ))
+#             print(os.listdir(Path(
+#                 f"{server.persistence_directory}/protocols/{result.json()['data'][0].id}/cpx_6_tuberack_100ul.json"  # noqa: E501
+#             )))
+#
+#             server.stop()
