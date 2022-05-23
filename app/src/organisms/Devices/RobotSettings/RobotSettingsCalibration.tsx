@@ -360,15 +360,15 @@ export function RobotSettingsCalibration({
     }
   }
 
-  const handleClickDeckCalibration = (): void => {
-    // const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
-    // if (isBusy) {
-    //   updateRobotStatus(true)
-    // } else {
-    // TODO: commented out lines will be use by the next PR
-    confirmStart()
-    // }
-  }
+  // TODO: commented out lines will be use by the next PR #10369
+  // const handleClickDeckCalibration = (): void => {
+  //   const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
+  //   if (isBusy) {
+  //     updateRobotStatus(true)
+  //   } else {
+  //   confirmStart()
+  //   }
+  // }
 
   React.useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
