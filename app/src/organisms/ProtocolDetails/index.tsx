@@ -228,7 +228,8 @@ export function ProtocolDetails(
       })
     } else {
       return t('python_api_version', {
-        version: config.apiVersion?.join('.'),
+        version:
+          config.apiVersion != null ? config.apiVersion?.join('.') : null,
       })
     }
   }
