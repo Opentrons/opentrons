@@ -93,7 +93,7 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
   ${styleProps}
 
   &:hover {
-    opacity: 80%;
+    opacity: 70%;
     box-shadow: 0 0 0;
   }
 
@@ -102,7 +102,7 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
   }
 
   &:disabled {
-    opacity: 40%;
+    opacity: 50%;
   }
 `
 
