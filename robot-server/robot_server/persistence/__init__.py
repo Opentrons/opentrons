@@ -91,12 +91,21 @@ class ResetManager:
 
     @staticmethod
     async def mark_directory_reset(persistence_directory: Path) -> None:
-        """Create a file to mark directory to delete."""
-        file_name = Path(persistence_directory / _TO_BE_DELETED_ON_REBOOT)
-        try:
-            file_name.touch()
-        except OSError:
-            print("Could not create file:", file_name)
+        """Mark the persistence directory to be deleted (reset) on the next boot.
+        
+        We defer deletions to the next boot instead of doing them immediately
+        to avoid potential problems with ongoing HTTP requests, runs,
+        background protocol analysis tasks, etc. trying to do stuff in here
+        during and after the deletion.
+        """
+        file = AsyncPath(persistence_directory / _TO_BE_DELETED_ON_REBOOT)
+        await file.write_text(
+            encoding="utf-8"
+            data=(
+                "This file was placed here by robot-server.\n"
+                "It tells robot-server to clear this directory on the next boot."
+            )
+        )
 
 
 __all__ = [
