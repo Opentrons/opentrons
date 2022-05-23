@@ -175,7 +175,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                     marginBottom={SPACING.spacing5}
                   />
                 ),
-                icon: <Icon name="counter-clockwise-arrow" size={'1.313rem'} />,
+                icon: <Icon name="clockwise-arrow" size={'1.313rem'} />,
               }}
             />
           </Flex>

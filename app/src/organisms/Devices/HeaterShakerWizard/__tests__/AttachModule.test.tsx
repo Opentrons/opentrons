@@ -56,7 +56,7 @@ describe('AttachModule', () => {
     )
     getByText(
       nestedTextMatcher(
-        'Orient your module such that the plugs for power and USB connection are outward.'
+        'Orient your module such that the power and USB ports are facing outward.'
       )
     )
     getByText(

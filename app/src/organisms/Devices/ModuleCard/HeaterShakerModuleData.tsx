@@ -39,6 +39,15 @@ const MODULE_STATUS_STYLING = css`
   }
 `
 
+const HS_MODULE_CARD_STYLING = css`
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+
+  @media (min-width: 800px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+`
+
 export const HeaterShakerModuleData = (
   props: HeaterShakerModuleDataProps
 ): JSX.Element | null => {
@@ -120,7 +129,9 @@ export const HeaterShakerModuleData = (
   }
 
   return (
-    <Flex css={MODULE_STATUS_STYLING}>
+    <Flex
+      css={showTemperatureData ? MODULE_STATUS_STYLING : HS_MODULE_CARD_STYLING}
+    >
       {showTemperatureData && (
         <Flex
           flexDirection={DIRECTION_COLUMN}
