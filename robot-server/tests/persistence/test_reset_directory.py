@@ -79,7 +79,7 @@ async def test_upload_protocols_and_reset_persistence_dir(
 
             # Must not be so high that the server runs out of room and starts
             # auto-deleting old protocols.
-            protocols_to_create = 1
+            protocols_to_create = 15
 
             for _ in range(protocols_to_create):
                 with protocol(secrets.token_urlsafe(16)) as file:
