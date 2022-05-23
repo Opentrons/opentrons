@@ -21,9 +21,13 @@ const StyledNavLink = styled(NavLink)`
   }
 `
 
-export function NavTab({ to, tabName, disabled = false }: NavTabProps): JSX.Element {
+export function NavTab({
+  to,
+  tabName,
+  disabled = false,
+}: NavTabProps): JSX.Element {
   return (
-    <StyledNavLink to={to} replace disabled={disabled} >
+    <StyledNavLink to={to} replace disabled={disabled}>
       {tabName}
     </StyledNavLink>
   )

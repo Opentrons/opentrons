@@ -39,7 +39,7 @@ export function RobotSettings(): JSX.Element | null {
     advanced: () => <RobotSettingsAdvanced robotName={robotName} />,
   }
 
-  if (robot?.status === UNREACHABLE){
+  if (robot?.status === UNREACHABLE) {
     return <Redirect to={`/devices/${robotName}`} />
   }
   if (robotSettingsTab === 'calibration' && isCalibrationDisabled) {

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 
 import {
   Box,
@@ -57,56 +57,59 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       width="100%"
       onClick={() => history.push(`/devices/${robotName}`)}
     >
-        <img
-          src={OT2_PNG}
-          style={{ width: '6rem' }}
-          id={`RobotCard_${robotName}_robotImage`}
+      <img
+        src={OT2_PNG}
+        style={{ width: '6rem' }}
+        id={`RobotCard_${robotName}_robotImage`}
+      />
+      <Box padding={SPACING.spacing3} width="100%">
+        <UpdateRobotBanner
+          robotName={robotName}
+          marginBottom={SPACING.spacing3}
         />
-        <Box padding={SPACING.spacing3} width="100%">
-          <UpdateRobotBanner robotName={robotName} marginBottom={SPACING.spacing3} />
-          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText
-                as="h6"
-                paddingBottom={SPACING.spacing1}
-                id={`RobotStatusBanner_${robotName}_robotModel`}
-              >
-                {/* robot_model can be seen in the health response, but only for "connectable" robots. Probably best to leave as "OT-2" for now */}
-                OT-2
-              </StyledText>
-              <Flex alignItems={ALIGN_CENTER} paddingBottom={SPACING.spacing4}>
-                <Flex alignItems={ALIGN_CENTER}>
-                  <StyledText
-                    as="h3"
-                    marginRight={SPACING.spacing4}
-                    id={`RobotStatusBanner_${robotName}_robotName`}
-                  >
-                    {robotName}
-                  </StyledText>
-                  {robot.status !== UNREACHABLE && local != null ? (
-                    <Icon
-                      // local boolean corresponds to a wired usb connection
-                      name={local ? 'usb' : 'wifi'}
-                      size={SIZE_1}
-                      marginRight={SPACING.spacing3}
-                    />
-                  ) : null}
-                </Flex>
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <StyledText
+              as="h6"
+              paddingBottom={SPACING.spacing1}
+              id={`RobotStatusBanner_${robotName}_robotModel`}
+            >
+              {/* robot_model can be seen in the health response, but only for "connectable" robots. Probably best to leave as "OT-2" for now */}
+              OT-2
+            </StyledText>
+            <Flex alignItems={ALIGN_CENTER} paddingBottom={SPACING.spacing4}>
+              <Flex alignItems={ALIGN_CENTER}>
+                <StyledText
+                  as="h3"
+                  marginRight={SPACING.spacing4}
+                  id={`RobotStatusBanner_${robotName}_robotName`}
+                >
+                  {robotName}
+                </StyledText>
+                {robot.status !== UNREACHABLE && local != null ? (
+                  <Icon
+                    // local boolean corresponds to a wired usb connection
+                    name={local ? 'usb' : 'wifi'}
+                    size={SIZE_1}
+                    marginRight={SPACING.spacing3}
+                  />
+                ) : null}
               </Flex>
             </Flex>
-            {robot.status === CONNECTABLE ? (
-              <RunningProtocolBanner robotName={robotName} />
-            ) : null}
           </Flex>
           {robot.status === CONNECTABLE ? (
-            <Flex>
-              <AttachedPipettes robotName={robotName} />
-              <AttachedModules robotName={robotName} />
-            </Flex>
+            <RunningProtocolBanner robotName={robotName} />
           ) : null}
-        </Box>
-        <RobotOverflowMenu robot={robot} alignSelf={ALIGN_START} />
-      </Flex>
+        </Flex>
+        {robot.status === CONNECTABLE ? (
+          <Flex>
+            <AttachedPipettes robotName={robotName} />
+            <AttachedModules robotName={robotName} />
+          </Flex>
+        ) : null}
+      </Box>
+      <RobotOverflowMenu robot={robot} alignSelf={ALIGN_START} />
+    </Flex>
   ) : null
 }
 
