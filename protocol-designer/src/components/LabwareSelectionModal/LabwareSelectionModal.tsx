@@ -370,7 +370,6 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
                               ? 'check-decagram'
                               : null
                           }
-                          disabled={isFiltered}
                           labwareDef={labwareDef}
                           selectLabware={selectLabware}
                           onMouseEnter={() => setPreviewedLabware(labwareDef)}
