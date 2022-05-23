@@ -29,7 +29,7 @@ class ResetOptionId(str, Enum):
     deck_calibration = "deckCalibration"
     pipette_offset = "pipetteOffsetCalibrations"
     tip_length_calibrations = "tipLengthCalibrations"
-    db_history = "dbHistory"
+    runs_history = "runsHistory"
 
 
 _settings_reset_options = {
@@ -48,7 +48,7 @@ _settings_reset_options = {
         name="Tip Length Calibrations",
         description="Clear tip length calibrations (will also clear " "pipette offset)",
     ),
-    ResetOptionId.db_history: CommonResetOption(
+    ResetOptionId.runs_history: CommonResetOption(
         name="Clear Runs History",
         description="Erase this device's stored history of protocols and runs.",
     ),

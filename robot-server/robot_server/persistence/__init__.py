@@ -26,7 +26,7 @@ _TO_BE_DELETED_ON_REBOOT = "marked_to_delete.txt"
 _log = logging.getLogger(__name__)
 
 
-async def reset_persistence_directory(directory: Path) -> bool:
+async def _reset_persistence_directory(directory: Path) -> bool:
     """Delete dir content if marked to delete."""
     try:
         shutil.rmtree(directory)
@@ -58,7 +58,7 @@ async def get_persistence_directory(
             persistence_dir = setting
             # Reset DB only if is not temporary dir
             if Path(persistence_dir / _TO_BE_DELETED_ON_REBOOT).exists():
-                await reset_persistence_directory(persistence_dir)
+                await _reset_persistence_directory(persistence_dir)
 
             await AsyncPath(persistence_dir).mkdir(parents=True, exist_ok=True)
             _log.info(f"Using directory {persistence_dir} for persistence.")

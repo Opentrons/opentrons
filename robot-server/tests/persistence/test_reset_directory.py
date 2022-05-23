@@ -10,7 +10,7 @@ from typing import Callable, IO
 from robot_server.persistence import (
     ResetManager,
     _TO_BE_DELETED_ON_REBOOT,
-    reset_persistence_directory,
+    _reset_persistence_directory,
 )
 
 from tests.integration.dev_server import DevServer
@@ -39,7 +39,7 @@ async def test_delete_persistence_directory(
     """Should make sure directory is empty."""
     await reset_manager.mark_directory_reset(tmp_path)
 
-    result = await reset_persistence_directory(tmp_path)
+    result = await _reset_persistence_directory(tmp_path)
 
     assert result is True
 
@@ -50,7 +50,7 @@ async def test_delete_persistence_directory_not_found(
     reset_manager: ResetManager,
 ) -> None:
     """Should make sure a directory that is not found is caught in OSError."""
-    result = await reset_persistence_directory(Path("/dir-not-found"))
+    result = await _reset_persistence_directory(Path("/dir-not-found"))
 
     assert result is False
 
@@ -85,7 +85,7 @@ async def test_upload_protocols_and_reset_persistence_dir(
                 with protocol(secrets.token_urlsafe(16)) as file:
                     await robot_client.post_protocol([Path(file.name)])
 
-            await robot_client.post_setting_reset_options({"dbHistory": True})
+            await robot_client.post_setting_reset_options({"runsHistory": True})
 
             result = await robot_client.get_protocols()
 
