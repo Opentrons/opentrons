@@ -10,12 +10,11 @@ import {
   SPACING_AUTO,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
-import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
-import { checkIsRobotBusy } from './utils'
+import { useIsRobotBusy } from '../../hooks'
+
 interface DisplayRobotNameProps {
   robotName: string
   updateIsExpanded: (
@@ -31,11 +30,9 @@ export function DisplayRobotName({
   updateIsRobotBusy,
 }: DisplayRobotNameProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const isRobotBusy = useCurrentRunId() !== null
-  const allSessionsQueryResponse = useAllSessionsQuery()
+  const isBusy = useIsRobotBusy()
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-    const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
     if (isBusy) {
       updateIsRobotBusy(true)
     } else {

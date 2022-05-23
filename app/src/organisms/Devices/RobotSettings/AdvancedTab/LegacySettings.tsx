@@ -10,13 +10,11 @@ import {
   TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
-import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../../atoms/text'
 import { ToggleButton } from '../../../../atoms/buttons'
+import { useIsRobotBusy } from '../../hooks'
 import { updateSetting } from '../../../../redux/robot-settings'
-import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
-import { checkIsRobotBusy } from './utils'
 
 import type { Dispatch } from '../../../../redux/types'
 import type { RobotSettingsField } from '../../../../redux/robot-settings/types'
@@ -36,11 +34,9 @@ export function LegacySettings({
   const dispatch = useDispatch<Dispatch>()
   const value = settings?.value ? settings.value : false
   const id = settings?.id ? settings.id : 'deckCalibrationDots'
-  const isRobotBusy = useCurrentRunId() !== null
-  const allSessionsQueryResponse = useAllSessionsQuery()
+  const isBusy = useIsRobotBusy()
 
   const handleClick: React.MouseEventHandler<Element> = () => {
-    const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
     if (isBusy) {
       updateIsRobotBusy(true)
     } else {
