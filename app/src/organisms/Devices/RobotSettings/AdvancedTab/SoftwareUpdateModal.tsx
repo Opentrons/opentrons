@@ -7,6 +7,7 @@ import {
   JUSTIFY_FLEX_END,
   TYPOGRAPHY,
   SPACING,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { getShellUpdateState } from '../../../../redux/shell'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
@@ -21,6 +22,7 @@ import { Modal } from '../../../../atoms/Modal'
 import { Divider } from '../../../../atoms/structure'
 import { useRobot } from '../../hooks'
 import { CONNECTABLE, REACHABLE } from '../../../../redux/discovery'
+import { Tooltip } from '../../../../atoms/Tooltip'
 
 const TECHNICAL_CHANGE_LOG_URL =
   'https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md'
@@ -48,6 +50,7 @@ export function SoftwareUpdateModal({
   //   const releaseNotes = updateInfo?.releaseNotes
   const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(false)
   const robot = useRobot(robotName)
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const handleCloseModal = (): void => {
     setShowUpdateModal(false)
@@ -124,9 +127,15 @@ export function SoftwareUpdateModal({
           <PrimaryButton
             onClick={handleLaunchUpdateModal}
             disabled={currentRunId != null}
+            {...targetProps}
           >
             {t('software_update_modal_update_button')}
           </PrimaryButton>
+          {currentRunId != null ? (
+            <Tooltip tooltipProps={tooltipProps}>
+              {t('software_update_modal_unable_to_update_with_run')}
+            </Tooltip>
+          ) : null}
         </Flex>
       </Flex>
     </Modal>

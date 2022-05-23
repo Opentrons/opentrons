@@ -138,5 +138,6 @@
   "software_update_modal_issue_tracker_link": "View Opentrons issue tracker",
   "software_update_modal_release_notes_link": "View full Opentrons release notes",
   "software_update_modal_remind_me_later_button": "Remind me later",
-  "software_update_modal_update_button": "Update robot now"
+  "software_update_modal_update_button": "Update robot now",
+  "software_update_modal_unable_to_update_with_run": "This robot cannot be updated while a protocol is running on it."
 }
