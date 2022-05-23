@@ -31,7 +31,6 @@ export interface BannerProps extends StyleProps {
   onCloseClick?: (() => unknown) | React.MouseEventHandler<HTMLButtonElement>
   /** Override the default Alert Icon */
   icon?: IconProps
-  onClick?: () => unknown
 }
 
 const BANNER_PROPS_BY_TYPE: Record<

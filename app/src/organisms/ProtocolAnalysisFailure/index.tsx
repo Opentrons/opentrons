@@ -41,7 +41,6 @@ export function ProtocolAnalysisFailure(
   }
   const handleClickHideDetails: React.MouseEventHandler = e => {
     e.preventDefault()
-    console.log('testing')
     e.stopPropagation()
     setShowErrorDetails(false)
   }
