@@ -10,9 +10,7 @@ import { useIsRobotBusy } from '../../../hooks'
 
 import { DisableHoming } from '../DisableHoming'
 
-jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../../redux/robot-settings/selectors')
-jest.mock('../../../../ProtocolUpload/hooks')
 jest.mock('../../../hooks')
 
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
