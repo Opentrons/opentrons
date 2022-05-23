@@ -19,7 +19,7 @@ The lab task that you’ll automate in this tutorial is `serial dilution`: takin
 Before You Begin
 ^^^^^^^^^^^^^^^^
 
-We’re going to be writing some Python code, but by no means do you need to be a Python expert to get started writing Opentrons protocols. You should know some basic Python syntax, like how it uses `indentation <https://docs.python.org/3/reference/lexical_analysis.html#indentation>`_ to group blocks of code, dot notation for `calling methods <https://docs.python.org/3/tutorial/classes.html#python-scopes-and-namespaces>`_, and the format of `lists <https://docs.python.org/3/tutorial/introduction.html#lists>`_ and `dictionaries <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_. We’ll also be using `common control structures <https://docs.python.org/3/tutorial/controlflow.html#if-statements>`_ like ``if`` statements and ``for`` loops. You should write your code in your favorite plaintext editor or IDE and be sure to save your work in a file with a ``.py`` extension, like ``dilution-tutorial.py``.
+We’re going to be writing some Python code, but by no means do you need to be a Python expert to get started writing Opentrons protocols. You should know some basic Python syntax, like how it uses `indentation <https://docs.python.org/3/reference/lexical_analysis.html#indentation>`_ to group blocks of code, dot notation for `calling methods <https://docs.python.org/3/tutorial/classes.html#method-objects>`_, and the format of `lists <https://docs.python.org/3/tutorial/introduction.html#lists>`_ and `dictionaries <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_. We’ll also be using `common control structures <https://docs.python.org/3/tutorial/controlflow.html#if-statements>`_ like ``if`` statements and ``for`` loops. You should write your code in your favorite plaintext editor or IDE and be sure to save your work in a file with a ``.py`` extension, like ``dilution-tutorial.py``.
 
 If you plan to run your protocol on an OT-2, you’ll want to have it ready with the right kind of hardware and labware:
 
@@ -47,6 +47,7 @@ Throughout this documentation you’ll see protocols that begin this way. It’s
 Everything else in the protocol file will be required. Next, you’ll specify the version of the API you’re using. Then comes the core of the protocol: defining a single ``run()`` function that provides the locations of your labware, states which kind of pipettes you’ll use, and finally issues the commands that the robot will perform.
 
 For this tutorial, you’ll write very little Python outside of the ``run()`` function. But for more complex applications it’s worth remembering that your protocol file *is* a Python script, so any Python code that can run on your robot can be a part of a protocol. 
+
 .. For more information, see Protocol Structure.
 
 Metadata
@@ -80,7 +81,7 @@ With your metadata defined, you can move on to creating the ``run()`` function f
 The ``run()`` function
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Now it’s time to actually instruct the OT-2 how to perform serial dilution. All of this information is contained in a single Python function, which has to be named ``run``. The ``run()`` function takes one argument, which is the *protocol context*. Many examples in these docs use the argument name ``protocol``, and sometimes they specify the argument’s type:
+Now it’s time to actually instruct the OT-2 how to perform serial dilution. All of this information is contained in a single Python function, which has to be named ``run``. This function takes one argument, which is the *protocol context*. Many examples in these docs use the argument name ``protocol``, and sometimes they specify the argument’s type:
 
 .. code-block:: python
 
@@ -91,7 +92,7 @@ With the protocol context argument named and typed, you can start calling method
 Labware
 -------
 
-For serial dilution, you need to load a tip rack, reservoir, and 96-well plate on the deck of your OT-2. Loading labware is done with the ``.load_labware`` method of the protocol context, which takes two arguments: the standard labware name as defined in the `Opentrons Labware Library <https://labware.opentrons.com/>`_, and the position where you will place the labware on the OT-2’s deck. If you’re using a different type of labware, find its name in the Labware Library and replace it in your code. Here’s how to load the labware into slots 1, 2, and 3 (repeating the ``def`` statement from above to show proper indenting):
+For serial dilution, you need to load a tip rack, reservoir, and 96-well plate on the deck of your OT-2. Loading labware is done with the :py:meth:`~.ProtocolContext.load_labware` method of the protocol context, which takes two arguments: the standard labware name as defined in the `Opentrons Labware Library <https://labware.opentrons.com/>`_, and the position where you will place the labware on the OT-2’s deck. Here’s how to load the labware into slots 1, 2, and 3 (repeating the ``def`` statement from above to show proper indenting):
 
 .. code-block:: python
 
@@ -99,6 +100,8 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
         tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
         reservoir = protocol.load_labware('nest_12_reservoir_15ml', 2)
         plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 3)
+        
+If you’re using a different model of labware, find its name in the Labware Library and replace it in your code.
 
 Now the robot will expect to find labware in a configuration that looks like this:
 
@@ -113,13 +116,13 @@ You may notice that this deck map doesn’t show where the liquids will be at th
 Pipettes
 --------
 
-Next you’ll specify what pipette to use in the protocol. Loading a pipette is done with the ``.load_instrument`` method, which takes three arguments: the name of the pipette, the mount it’s installed in, and the tip racks it should use when performing transfers. Load whatever pipette you have installed in your robot by using its :ref:`standard pipette name <new-pipette-models>`. Here’s how to load a P300 Single-Channel GEN2 pipette that’s installed in the left mount:
+Next you’ll specify what pipette to use in the protocol. Loading a pipette is done with the :py:meth:`.load_instrument` method, which takes three arguments: the name of the pipette, the mount it’s installed in, and the tip racks it should use when performing transfers. Load whatever pipette you have installed in your robot by using its :ref:`standard pipette name <new-pipette-models>`. Here’s how to load a P300 Single-Channel GEN2 pipette that’s installed in the left mount:
 
 .. code-block:: python
 
         p300 = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tiprack])
 
-Since the pipette is so fundamental to the protocol, it might seem like you should have specified it first. But there’s a good reason why pipettes are added after labware: you need to have already added ``tiprack`` in order to tell the pipette to use it. And now you won’t have to reference ``tiprack`` again in our code — it’s assigned to the ``p300`` pipette and the robot will know to use it when commanded to pick up tips.
+Since the pipette is so fundamental to the protocol, it might seem like you should have specified it first. But there’s a good reason why pipettes are added after labware: you need to have already added ``tiprack`` in order to tell the pipette to use it. And now you won’t have to reference ``tiprack`` again in your code — it’s assigned to the ``p300`` pipette and the robot will know to use it when commanded to pick up tips.
 
 .. note::
 
@@ -128,30 +131,30 @@ Since the pipette is so fundamental to the protocol, it might seem like you shou
 Commands
 --------
 
-Finally, all of your labware and hardware is in place, so it’s time to give the robot pipetting commands. Let’s break down the steps of the serial dilution process into three main phases:
+Finally, all of your labware and hardware is in place, so it’s time to give the robot pipetting commands. The required steps of the serial dilution process break down into three main phases:
 
 1. Measure out equal amounts of diluent from the reservoir to every well on the plate.
 2. Measure out equal amounts of solution from the reservoir into wells in the first column of the plate.
 3. Move a portion of the combined liquid from column 1 to 2, then from column 2 to 3, and so on all the way to column 12.
 
-Thanks to the flexibility of the ``.distribute`` and ``.transfer`` functions of the API, each of these phases can be accomplished with a single line of code! You’ll just have to write a few more lines of code to repeat the process for as many rows as you want to fill.
+Thanks to the flexibility of the :py:meth:`.distribute` and :py:meth:`.transfer` methods of the API, each of these phases can be accomplished with a single line of code! You’ll just have to write a few more lines of code to repeat the process for as many rows as you want to fill.
 
-Let’s start with the diluent. Since this phase takes a larger quantity of liquid and spreads it equally to many wells, the ``.distribute`` method is perfect:
+Let’s start with the diluent. Since this phase takes a larger quantity of liquid and spreads it equally to many wells, the ``distribute()`` method is perfect:
 
 .. code-block:: python
 
         p300.distribute(100, reservoir['A1'], plate.wells())
 
-Breaking down this single line of code shows the power of :ref:`complex transfer commands <v2-complex-commands>`. The first argument is the amount to transfer to each destination, 100 µL. The second argument is the source, column 1 of the reservoir (which is still specified with grid-style coordinates as ``A1`` — a reservoir only has an A row). The third argument is the destination. Here, calling the ``.wells()`` method of ``plate`` returns a list of *every well*, and the command will apply to all of them. In plain English, we’re instructing the robot, “For every well on our plate, aspirate 100 µL of fluid from column 1 of the reservoir and dispense it in the well.” That’s how we understand this line of code as scientists, yet the robot will understand and execute it as nearly 200 discrete actions.
+Breaking down this single line of code shows the power of :ref:`complex transfer commands <v2-complex-commands>`. The first argument is the amount to transfer to each destination, 100 µL. The second argument is the source, column 1 of the reservoir (which is still specified with grid-style coordinates as ``A1`` — a reservoir only has an A row). The third argument is the destination. Here, calling the :py:meth:`.wells` method of ``plate`` returns a list of *every well*, and the command will apply to all of them. In plain English, we’re instructing the robot, “For every well on our plate, aspirate 100 µL of fluid from column 1 of the reservoir and dispense it in the well.” That’s how we understand this line of code as scientists, yet the robot will understand and execute it as nearly 200 discrete actions.
 
-Now it’s time to start mixing in the solution. To do this row by row, nest the commands in a ``for`` loop. Using the Python ``range`` function is an easy way to repeat this block 8 times, once for each row. This also lets you use the repeat index ``i`` as the argument of ``plate.rows()`` to keep track of the current row:
+Now it’s time to start mixing in the solution. To do this row by row, nest the commands in a ``for`` loop. Using Python's built-in :py:class:`range` class is an easy way to repeat this block 8 times, once for each row. This also lets you use the repeat index ``i`` with ``plate.rows()`` to keep track of the current row:
 
 .. code-block:: python
 
         for i in range(8):
             row = plate.rows()[i]
 
-In each row, you first need to add solution. This will be similar to what you did with the diluent, but putting it only in column 1 of the plate. It’s best to mix the combined solution and diluent thoroughly, so use the ``.transfer`` method, which supports an additional mixing argument:
+In each row, you first need to add solution. This will be similar to what you did with the diluent, but putting it only in column 1 of the plate. It’s best to mix the combined solution and diluent thoroughly, so use the ``transfer()`` method, which supports an additional mixing argument:
 
 .. code-block:: python
 
@@ -159,17 +162,17 @@ In each row, you first need to add solution. This will be similar to what you di
 
 As before, the first argument specifies to transfer 100 µL. The second argument is the source, column 2 of the reservoir. The third argument is the destination, the element at index 0 of the current ``row``. Since Python lists are zero-indexed, but columns on labware start numbering at 1, this will be well A1 on the first time through the loop, B1 the second time, and so on. The fourth, optional ``mix_after`` argument specifies to mix 3 times with 50 µL of fluid each time.
 
-Finally, it’s time to dilute the solution down the row. One approach would be to nest another ``for`` loop here, but instead let’s use another feature of the ``.transfer`` function, taking lists as the source and destination arguments: 
+Finally, it’s time to dilute the solution down the row. One approach would be to nest another ``for`` loop here, but instead let’s use another feature of the ``transfer()`` method, taking lists as the source and destination arguments: 
 
 .. code-block:: python
 
             p300.transfer(100, row[:11], row[1:], mix_after=(3, 50))
 
-There’s some Python shorthand here, so let’s unpack it. You can get a range of indices from a list using the colon ``:`` operator, and omitting it at either end means “from the beginning” or “until the end” of the list. So the source is ``row[:11]``, from the beginning of the row until its 11th item. And the destination is ``row[1:]``, from index 1 (column 2!) until the end. Since both of these lists have 11 items, ``.transfer`` will *step through them in parallel*, and they’re constructed so when the source is 0, the destination is 1; when the source is 1, the destination is 2; and so on. This condenses all of the subsequent transfers down the row into a single line of code.
+There’s some Python shorthand here, so let’s unpack it. You can get a range of indices from a list using the colon ``:`` operator, and omitting it at either end means “from the beginning” or “until the end” of the list. So the source is ``row[:11]``, from the beginning of the row until its 11th item. And the destination is ``row[1:]``, from index 1 (column 2!) until the end. Since both of these lists have 11 items, ``transfer()`` will *step through them in parallel*, and they’re constructed so when the source is 0, the destination is 1; when the source is 1, the destination is 2; and so on. This condenses all of the subsequent transfers down the row into a single line of code.
 
 That’s it! If you’re using a single-channel pipette, you’re ready to try out your protocol. 
 
-If you’re using an 8-channel pipette, you’ll need to make a couple tweaks to the single-channel code we wrote above. The 8-channel pipette effectively implements the ``for`` loop in hardware, so you’ll need to remove it: 
+If you’re using an 8-channel pipette, you’ll need to make a couple tweaks to the single-channel code we wrote above. By accessing an entire column at once, the 8-channel pipette effectively implements the ``for`` loop in hardware, so you’ll need to remove it: 
 
 .. code-block:: python
 
