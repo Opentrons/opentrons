@@ -25,10 +25,8 @@ import {
 } from '../../../../redux/buildroot'
 
 import type { State, Dispatch } from '../../../../redux/types'
-import { useIsRobotBusy } from '../../hooks'
 
 const OT_APP_UPDATE_PAGE_LINK = 'https://opentrons.com/ot-app/'
-
 const HIDDEN_CSS = css`
   position: fixed;
   clip: rect(1px 1px 1px 1px);
@@ -50,7 +48,7 @@ export function UpdateRobotSoftware({
   })
   const updateDisabled = updateFromFileDisabledReason !== null
   const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
-  const = useIsRobotBusy()
+  const isBusy = useIsRobotBusy()
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
     if (isBusy) {
