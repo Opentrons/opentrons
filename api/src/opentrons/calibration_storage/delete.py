@@ -169,3 +169,16 @@ def delete_robot_deck_attitude() -> None:
     gantry_path = robot_dir / "deck_calibration.json"
     if gantry_path.exists():
         gantry_path.unlink()
+
+
+def delete_gripper_offset_file(gripper: str) -> None:
+    """
+    Delete gripper offset file based on gripper serial number
+
+    :param gripper: gripper serial number
+    """
+    offset_dir = config.get_opentrons_path("gripper_calibration_dir")
+    offset_path = offset_dir / f"{gripper}.json"
+
+    if offset_path.exists():
+        offset_path.unlink()

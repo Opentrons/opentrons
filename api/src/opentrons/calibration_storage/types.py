@@ -12,6 +12,7 @@ CalibrationID = typing.NewType("CalibrationID", str)
 StrPath = typing.Union[str, PathLike]
 AttitudeMatrix = typing.List[typing.List[float]]
 PipetteOffset = typing.List[float]
+GripperOffset = typing.List[float]
 
 
 class SourceType(str, Enum):
@@ -153,3 +154,16 @@ class PipetteOffsetCalibration:
     last_modified: datetime
     source: SourceType
     status: CalibrationStatus
+
+
+@dataclass
+class GripperOffsetCalibration:
+    """
+    Class to store gripper offset calibration with gripper info
+    """
+
+    gripper: str
+    offset: GripperOffset
+    last_modified: datetime
+    source: SourceType
+    statue: CalibrationStatus
