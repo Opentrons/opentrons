@@ -207,7 +207,7 @@ async def post_settings_reset_options(
     persistence_path: Path = Depends(get_persistence_directory),
 ) -> V1BasicResponse:
     options = set(
-        k for k, v in factory_reset_commands.items() if v and k != "dbHistory"
+        k for k, v in factory_reset_commands.items() if v and k != "runsHistory"
     )
     reset_util.reset(options)
 
