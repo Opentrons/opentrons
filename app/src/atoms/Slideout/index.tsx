@@ -13,6 +13,7 @@ import {
   COLORS,
   Overlay,
   POSITION_FIXED,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
