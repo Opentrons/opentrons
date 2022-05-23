@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { getAdapterName } from '@opentrons/shared-data'
 import { Portal } from '../../../App/portal'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
 import { HEATERSHAKER_MODULE_TYPE } from '../../../redux/modules'
@@ -23,8 +24,7 @@ import {
 
 import type { NavRouteParams } from '../../../App/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import type { ThermalAdapterName } from '@opentrons/shared-data'
+import type { ProtocolModuleInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
@@ -54,22 +54,6 @@ export const HeaterShakerWizard = (
   const labwareDef =
     moduleFromProtocol != null ? moduleFromProtocol.nestedLabwareDef : null
 
-  let adapterName: ThermalAdapterName | null = null
-  if (
-    labwareDef != null &&
-    labwareDef.parameters.loadName.includes('adapter')
-  ) {
-    if (labwareDef.parameters.loadName.includes('pcr')) {
-      adapterName = 'PCR Adapter'
-    } else if (labwareDef.parameters.loadName.includes('deepwell')) {
-      adapterName = 'Deep Well Adapter'
-    } else if (labwareDef.parameters.loadName.includes('96flatbottom')) {
-      adapterName = '96 Flat Bottom Adapter'
-    }
-  } else if (labwareDef != null) {
-    adapterName = 'Universal Flat Adapter'
-  }
-
   let buttonContent = null
   const getWizardDisplayPage = (): JSX.Element | null => {
     switch (currentPage) {
@@ -78,7 +62,11 @@ export const HeaterShakerWizard = (
         return (
           <Introduction
             labwareDefinition={labwareDef}
-            thermalAdapterName={adapterName}
+            thermalAdapterName={
+              labwareDef != null
+                ? getAdapterName(labwareDef.parameters.loadName)
+                : null
+            }
           />
         )
       case 1:
