@@ -46,6 +46,7 @@ describe('RecentProtocolRuns', () => {
     getByText('Robot must be on the network to see protocol runs')
   })
   it('renders an empty state message when there are no runs', () => {
+    mockUseIsRobotViewable.mockReturnValue(true)
     mockUseAllRunsQuery.mockReturnValue({
       data: {},
     } as UseQueryResult<Runs>)

@@ -27,6 +27,7 @@ import { CONNECTABLE, UNREACHABLE } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
+import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import {
   useAttachedModules,
   useAttachedPipettes,
@@ -35,7 +36,6 @@ import {
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
-import { UpdateRobotBanner } from '../UpdateRobotBanner'
 
 interface RobotCardProps {
   robot: DiscoveredRobot
