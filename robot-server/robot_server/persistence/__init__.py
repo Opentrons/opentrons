@@ -31,7 +31,7 @@ async def reset_persistence_directory(directory: Path) -> bool:
     try:
         shutil.rmtree(directory)
     except OSError:
-        print("Could reset directory, ", directory)
+        print("Couldn't reset directory, ", directory)
         return False
     print(f"directory: {directory}, was deleted successfully!")
     return True
