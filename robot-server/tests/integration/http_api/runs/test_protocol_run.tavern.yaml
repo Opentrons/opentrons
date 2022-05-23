@@ -128,6 +128,7 @@ stages:
       url: '{host:s}:{port:d}/runs/{run_id}'
       method: GET
     response:
+      status_code: 200
       strict:
         - json:off
       json:
@@ -139,6 +140,7 @@ stages:
       url: '{host:s}:{port:d}/runs/{run_id}/commands'
       method: GET
     response:
+      status_code: 200
       json:
         links:
           current: !anydict
@@ -168,6 +170,7 @@ stages:
       url: '{host:s}:{port:d}/runs/{run_id}/commands/{load_labware_command_id}'
       method: GET
     response:
+      status_code: 200
       json:
         data:
           id: '{load_labware_command_id}'
