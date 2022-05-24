@@ -195,10 +195,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                 </Banner>
               </Flex>
             ) : null}
-            {isDeckCalibrated &&
-            pipetteOffsetCalibration == null &&
-            badCalibration &&
-            showBanner ? (
+            {isDeckCalibrated && badCalibration && showBanner ? (
               <Flex paddingBottom={SPACING.spacing2}>
                 <Banner
                   type="warning"
