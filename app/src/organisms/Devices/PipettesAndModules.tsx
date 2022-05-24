@@ -35,8 +35,8 @@ export function PipettesAndModules({
 }: PipettesAndModulesProps): JSX.Element | null {
   const { t } = useTranslation('device_details')
 
-  const attachedModules = useAttachedModules(robotName)
-  const attachedPipettes = useAttachedPipettes(robotName)
+  const attachedModules = useAttachedModules()
+  const attachedPipettes = useAttachedPipettes()
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
 

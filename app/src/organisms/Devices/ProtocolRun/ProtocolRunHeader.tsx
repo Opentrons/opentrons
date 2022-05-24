@@ -167,7 +167,7 @@ export function ProtocolRunHeader({
   const [showIsShakingModal, setShowIsShakingModal] = React.useState<boolean>(
     false
   )
-  const attachedModules = useAttachedModules(robotName)
+  const attachedModules = useAttachedModules()
   const heaterShaker = attachedModules.find(
     (module): module is HeaterShakerModule =>
       module.moduleType === HEATERSHAKER_MODULE_TYPE

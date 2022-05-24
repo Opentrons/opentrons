@@ -23,7 +23,7 @@ export function useUnmatchedModulesForProtocol(
     robotName,
     runId
   )
-  const attachedModules = useAttachedModules(robotName)
+  const attachedModules = useAttachedModules()
   if (robot === null) {
     return { missingModuleIds: [], remainingAttachedModules: [] }
   }
