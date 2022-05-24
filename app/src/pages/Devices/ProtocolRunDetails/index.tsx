@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { isEmpty } from 'lodash'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import { NavLink, Redirect, useParams } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
@@ -19,6 +20,7 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  useInterval,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
@@ -33,8 +35,11 @@ import { RunLog } from '../../../organisms/Devices/ProtocolRun/RunLog'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
+import { fetchModules } from '../../../redux/modules'
+import { fetchPipettes } from '../../../redux/pipettes'
 
 import type { NavRouteParams, ProtocolRunDetailsTab } from '../../../App/types'
+import type { Dispatch } from '../../../redux/types'
 
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -113,6 +118,18 @@ export function ProtocolRunDetails(): JSX.Element | null {
   const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
 
   const robot = useRobot(robotName)
+  const dispatch = useDispatch<Dispatch>()
+  // TODO(BC, 2022-05-23): replace this with an interval query once pipettes and modules have been added to the react-api-client
+  useInterval(
+    () => {
+      if (robotName != null) {
+        dispatch(fetchModules(robotName))
+        dispatch(fetchPipettes(robotName))
+      }
+    },
+    5000,
+    true
+  )
 
   interface ProtocolRunDetailsTabProps {
     protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
