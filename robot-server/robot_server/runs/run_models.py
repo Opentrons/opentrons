@@ -92,9 +92,7 @@ class Run(ResourceModel):
     )
     completedAt: Optional[datetime] = Field(
         None,
-        description=(
-            "Run completed at timestamp."
-        ),
+        description=("Run completed at timestamp."),
     )
 
 

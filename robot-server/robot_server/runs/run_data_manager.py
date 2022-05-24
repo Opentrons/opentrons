@@ -32,7 +32,7 @@ def _build_run(
         labware=[],
         labwareOffsets=[],
         pipettes=[],
-        modules=[]
+        modules=[],
     )
     return Run.construct(
         id=run_resource.run_id,
@@ -45,7 +45,7 @@ def _build_run(
         labwareOffsets=state_summary.labwareOffsets,
         pipettes=state_summary.pipettes,
         current=current,
-        completedAt=state_summary.completedAt
+        completedAt=state_summary.completedAt,
     )
 
 
