@@ -197,16 +197,11 @@ async def post_settings_reset_options(
     factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
     persistence_resetter: PersistenceResetter = Depends(get_persistence_resetter),
 ) -> V1BasicResponse:
-    options = set(
-        k
-        for k, v in factory_reset_commands.items()
-        if v and k != reset_util.ResetOptionId.runs_history
-    )
+    options = set(k for k, v in factory_reset_commands.items() if v)
     reset_util.reset(options)
 
     if factory_reset_commands.get(reset_util.ResetOptionId.runs_history, False):
         await persistence_resetter.mark_directory_reset()
-        options.add(reset_util.ResetOptionId.runs_history)
 
     message = (
         "Options '{}' were reset".format(", ".join(o.name for o in options))
