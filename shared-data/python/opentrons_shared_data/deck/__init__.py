@@ -10,22 +10,15 @@ if TYPE_CHECKING:
     from .dev_types import (
         DeckSchema,
         DeckDefinition,
-        DeckDefinitionV1,
-        DeckDefinitionV2,
-        DeckSchemaVersion1,
-        DeckSchemaVersion2,
+        DeckDefinitionV3,
+        DeckSchemaVersion3,
     )
 
 DEFAULT_DECK_DEFINITION_VERSION = 3
 
 
 @overload
-def load(name: str, version: "DeckSchemaVersion1") -> "DeckDefinitionV1":
-    ...
-
-
-@overload
-def load(name: str, version: "DeckSchemaVersion2") -> "DeckDefinitionV2":
+def load(name: str, version: "DeckSchemaVersion3") -> "DeckDefinitionV3":
     ...
 
 
