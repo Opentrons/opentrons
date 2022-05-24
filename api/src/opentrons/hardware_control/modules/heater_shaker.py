@@ -30,6 +30,8 @@ class HeaterShakerError(RuntimeError):
 
 
 class HeaterShaker(mod_abc.AbstractModule):
+    """Heater-Shaker module class"""
+
     @classmethod
     async def build(
         cls,
@@ -451,7 +453,7 @@ class PollerReader(Reader[PollResult]):
 
 
 class HeaterShakerListener(WaitableListener[PollResult]):
-    """Tempdeck state listener."""
+    """Heater-Shaker state listener."""
 
     def __init__(
         self,

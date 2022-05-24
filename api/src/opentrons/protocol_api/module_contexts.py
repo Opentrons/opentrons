@@ -17,6 +17,7 @@ from .load_info import LabwareLoadInfo
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry,
     ThermocyclerGeometry,
+    HeaterShakerGeometry
 )
 from opentrons.protocols.api_support.util import requires_version
 
@@ -770,3 +771,98 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def current_step_index(self) -> Optional[int]:
         """Index of the current step within the current cycle"""
         return self._module.current_step_index
+
+
+class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
+    """An object representing a connected Heater-Shaker Module.
+
+    It should not be instantiated directly; instead, it should be
+    created through :py:meth:`.ProtocolContext.load_module`.
+
+    .. versionadded:: 2.13 ?? Bump up the API version?
+    """
+
+    def __init__(
+        self,
+        ctx: ProtocolContext,
+        # TODO(mc, 2022-02-05): this type annotation is misleading;
+        # a SynchronousAdapter wrapper is actually passed in
+        hw_module: modules.heater_shaker.HeaterShaker,
+        geometry: ModuleGeometry,
+        requested_as: ModuleModel,
+        at_version: APIVersion,
+        loop: asyncio.AbstractEventLoop,
+    ) -> None:
+        self._module = hw_module
+        self._loop = loop
+        super().__init__(ctx, geometry, requested_as, at_version)
+
+    # TODO: add command publisher
+    # TODO: add new API version requirement
+    def set_and_wait_for_temperature(self, celsius: float) -> None:
+        """Set and wait for target temperature.
+
+        Sets the heater-shaker target temperature and delays protocol execution
+        until target temperature has reached.
+
+        :param celsius: The target temperature, in °C in range 37°C to 95°C.
+        """
+        pass
+
+    # TODO: add command publisher
+    # TODO: add new API version requirement
+    def set_temperature(self, celsius: float) -> None:
+        """Set and wait for target temperature.
+
+        API v2 compatible alias for `set_and_wait_for_temperature`
+        Sets the heater-shaker target temperature and delays protocol execution
+        until target temperature has reached.
+
+        :param celsius: The target temperature, in °C in range 37°C to 95°C.
+        """
+        self.set_and_wait_for_temperature(celsius=celsius)
+
+    def set_target_temperature(self, celsius: float) -> None:
+        """Set target temperature and return immediately.
+
+        Sets the heater-shaker's target temperature and returns immediately without
+        waiting for the target to be reached. Does not delay the protocol until
+        target temperature has reached.
+        """
+        pass
+
+    def start_set_temperature(self, celsius: float) -> None:
+        """Set target temperature and return immediately.
+
+        API v2 compatible alias for `set_target_temperature`
+        """
+        self.set_target_temperature(celsius=celsius)
+
+    def set_shake_speed(self, rpm: int) -> None:
+        """Set and wait for target speed.
+
+        Set the heater shaker's target speed and wait until the specified speed has
+        reached. Delays protocol execution until the target speed has been achieved.
+        """
+        pass
+
+    def set_and_wait_for_shake_speed(self, rpm: int) -> None:
+        """ """
+
+    def wait_for_target_temperature(self) -> None:
+        """ """
+
+    def await_target_temperature(self) -> None:
+        """ """
+
+    def open_labware_latch(self) -> None:
+        """ """
+
+    def close_labware_latch(self) -> None:
+        """ """
+
+    def deactivate_shaker(self) -> None:
+        """ """
+
+    def deactivate_heater(self) -> None:
+        """ """

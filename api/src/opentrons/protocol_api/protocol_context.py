@@ -43,6 +43,7 @@ from .module_contexts import (
     MagneticModuleContext,
     TemperatureModuleContext,
     ThermocyclerContext,
+    HeaterShakerContext,
 )
 from .labware_offset_provider import (
     AbstractLabwareOffsetProvider,
@@ -57,7 +58,8 @@ logger = logging.getLogger(__name__)
 
 
 ModuleTypes = Union[
-    TemperatureModuleContext, MagneticModuleContext, ThermocyclerContext
+    TemperatureModuleContext, MagneticModuleContext,
+    ThermocyclerContext, HeaterShakerContext
 ]
 
 
@@ -460,9 +462,10 @@ class ProtocolContext(CommandPublisher):
                               pass in the key word value `semi`
         :type location: str or int or None
         :returns: The loaded and initialized module---a
-                  :py:class:`TemperatureModuleContext`,
+                  :py:class:`TemperatureModuleContext`, or
                   :py:class:`ThermocyclerContext`, or
-                  :py:class:`MagneticModuleContext`,
+                  :py:class:`MagneticModuleContext`, or
+                  :py:class:`HeaterShakerModuleContext`,
                   depending on what you requested with ``module_name``.
         """
         if self._api_version < APIVersion(2, 4) and configuration:
@@ -484,6 +487,7 @@ class ProtocolContext(CommandPublisher):
             ModuleType.MAGNETIC: MagneticModuleContext,
             ModuleType.TEMPERATURE: TemperatureModuleContext,
             ModuleType.THERMOCYCLER: ThermocyclerContext,
+            ModuleType.HEATER_SHAKER: HeaterShakerContext,
         }[load_result.type]
 
         module_context: ModuleTypes = mod_class(

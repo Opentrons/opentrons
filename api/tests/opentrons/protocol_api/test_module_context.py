@@ -11,6 +11,7 @@ from opentrons.hardware_control.modules.types import (
     TemperatureModuleModel,
     MagneticModuleModel,
     ThermocyclerModuleModel,
+    HeaterShakerModuleModel
 )
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocols.context.protocol_api.protocol_context import (
@@ -99,6 +100,26 @@ async def ctx_with_thermocycler(
     )
 
 
+@pytest.fixture
+async def ctx_with_heater_shaker(
+        mock_hardware: mock.AsyncMock, mock_module_controller: mock.MagicMock
+) -> ProtocolContext:
+    """Context fixture with a mock heater-shaker."""
+    mock_module_controller.model.return_value = "heaterShakerModuleV1"
+
+    def find_modules(resolved_model: ModuleModel, resolved_type: ModuleType):
+        if(
+            resolved_model == HeaterShakerModuleModel.HEATER_SHAKER_V1
+            and resolved_type == ModuleType.HEATER_SHAKER
+        ):
+            return [mock_module_controller], None
+        return []
+    mock_hardware.find_modules.side_effect = find_modules
+    return ProtocolContext(
+        implementation=ProtocolContextImplementation(sync_hardware=mock_hardware),
+    )
+
+
 def test_load_module(ctx_with_tempdeck):
     ctx_with_tempdeck.home()
     mod = ctx_with_tempdeck.load_module("tempdeck", 1)
@@ -150,11 +171,18 @@ def test_incorrect_module_error(ctx_with_tempdeck):
         ("magnetic module gen2", papi.MagneticModuleContext, "magneticModuleV2"),
         ("thermocycler", papi.ThermocyclerContext, "thermocyclerModuleV1"),
         ("thermocycler module", papi.ThermocyclerContext, "thermocyclerModuleV1"),
+        ("heaterShakerModuleV1", papi.HeaterShakerContext, "heaterShakerModuleV1")
     ],
 )
 def test_load_simulating_module(ctx, loadname, klass, model):
-    # Check that a known module will not throw an error if
-    # in simulation mode
+    """Check that a known module will not throw an error if in simulation mode.
+
+    Note: This is basically an integration test that checks that a module can be
+          loaded correctly. So it checks the `load_module` function all the way through
+          module instance creation, which includes fetching module definition, loading
+          geometry and finding attached modules or creating simulated module in order to
+          finally build an instance of the specified module.
+    """
     ctx.home()
     mod = ctx.load_module(loadname, 7)
     assert isinstance(mod, klass)
@@ -582,3 +610,7 @@ def test_thermocycler_flag_unsafe_move(ctx_with_thermocycler, mock_module_contro
         mod.flag_unsafe_move(with_tc_labware, without_tc_labware)
     with pytest.raises(RuntimeError, match="Cannot move to labware"):
         mod.flag_unsafe_move(without_tc_labware, with_tc_labware)
+
+
+def test_heater_shaker_context():
+    """Test heater-shaker"""
