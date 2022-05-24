@@ -8,7 +8,7 @@ import {
   RobotWorkSpace,
 } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { mockDefinition } from '../../../../redux/custom-labware/__fixtures__'
 import { Introduction } from '../Introduction'
 import type { ThermalAdapterName } from '@opentrons/shared-data'

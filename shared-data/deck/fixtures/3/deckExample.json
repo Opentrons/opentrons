@@ -22,7 +22,11 @@
           "zDimension": 0
         },
         "displayName": "Slot 1",
-        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType", "heaterShakerModuleType"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "2",
@@ -34,7 +38,11 @@
           "zDimension": 0
         },
         "displayName": "Slot 2",
-        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType", "heaterShakerModuleType"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "3",
@@ -46,7 +54,11 @@
           "zDimension": 0
         },
         "displayName": "Slot 3",
-        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType", "heaterShakerModuleType"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "4",
@@ -58,7 +70,11 @@
           "zDimension": 0
         },
         "displayName": "Slot 4",
-        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType", "heaterShakerModuleType"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "5",
@@ -70,7 +86,11 @@
           "zDimension": 0
         },
         "displayName": "Slot 5",
-        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType", "heaterShakerModuleType"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "6",
@@ -82,7 +102,11 @@
           "zDimension": 0
         },
         "displayName": "Slot 6",
-        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType", "heaterShakerModuleType"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "7",
@@ -111,7 +135,11 @@
           "zDimension": 0
         },
         "displayName": "Slot 8",
-        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType", "heaterShakerModuleType"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "9",
@@ -123,7 +151,11 @@
           "zDimension": 0
         },
         "displayName": "Slot 9",
-        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType", "heaterShakerModuleType"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "10",
@@ -135,7 +167,11 @@
           "zDimension": 0
         },
         "displayName": "Slot 10",
-        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType", "heaterShakerModuleType"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "11",
@@ -147,7 +183,11 @@
           "zDimension": 0
         },
         "displayName": "Slot 11",
-        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType", "heaterShakerModuleType"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "12",
@@ -158,7 +198,11 @@
           "zDimension": 0
         },
         "displayName": "Slot 12",
-        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType", "heaterShakerModuleType"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       }
     ],
     "calibrationPoints": [
