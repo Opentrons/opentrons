@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { UseQueryResult } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs, PipetteModelSpecs } from '@opentrons/shared-data'
 import { useAttachedPipettes } from '..'
-import { UseQueryResult } from 'react-query'
 import {
   pipetteResponseFixtureLeft,
   pipetteResponseFixtureRight,
