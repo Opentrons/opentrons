@@ -45,7 +45,7 @@ export function DeckCalibrationModal(
               <Icon name={'close'} size="0.75rem" />
             </Box>
           </Flex>
-          <StyledText as="p" marginTop={SPACING.spacing6}>
+          <StyledText as="p" marginTop={SPACING.spacing5}>
             {t('robot_cal_description')}
           </StyledText>
           <Link
@@ -61,7 +61,7 @@ export function DeckCalibrationModal(
               size="10px"
             />
           </Link>
-          <Box textAlign={ALIGN_CENTER} marginTop={SPACING.spacing6}>
+          <Box textAlign={ALIGN_CENTER} marginTop={SPACING.spacing5}>
             <img src={RobotCalHelpImage} width="100%" />
           </Box>
           <StyledText
