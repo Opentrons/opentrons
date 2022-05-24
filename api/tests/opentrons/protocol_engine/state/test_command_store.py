@@ -1,7 +1,7 @@
 """Tests for the command lifecycle state."""
 import pytest
 from collections import OrderedDict
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import NamedTuple, Type
 
 from opentrons.ordered_set import OrderedSet
