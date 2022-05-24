@@ -71,7 +71,9 @@ export function TipLengthCalibrationItems({
 
   const checkMountWithAttachedPipettes = (serialNumber: string): Mount => {
     return ['left', 'right'].find((mount, index) => {
-      const pipette = Object.values(attachedPipettes)[index]
+      const pipette = Object.values(
+        attachedPipettes != null && attachedPipettes
+      )[index]
       return pipette?.id === serialNumber
     }) as Mount
   }
