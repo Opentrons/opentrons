@@ -204,7 +204,7 @@ async def post_settings_reset_options(
     )
     reset_util.reset(options)
 
-    if ("runsHistory", True) in factory_reset_commands.items():
+    if factory_reset_commands.get(reset_util.ResetOptionId.runs_history, False):
         await persistence_resetter.mark_directory_reset()
         options.add(reset_util.ResetOptionId.runs_history)
 
