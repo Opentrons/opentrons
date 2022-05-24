@@ -31,7 +31,13 @@ from ..types import (
     LabwareOffsetVector,
 )
 from .. import errors
-from ..commands import Command, LoadModuleResult, heater_shaker, temperature_module
+from ..commands import (
+    Command,
+    LoadModuleResult,
+    heater_shaker,
+    temperature_module,
+    thermocycler,
+)
 from ..actions import Action, UpdateCommandAction, AddModuleAction
 from .abstract_store import HasState, HandlesActions
 from .module_substates import (
@@ -142,6 +148,15 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         ):
             self._handle_temperature_module_commands(command)
 
+        if isinstance(
+            command.result,
+            (
+                thermocycler.SetTargetBlockTemperatureResult,
+                thermocycler.DeactivateBlockResult,
+            ),
+        ):
+            self._handle_thermocycler_module_commands(command)
+
     def _add_module_substate(
         self,
         module_id: str,
@@ -175,6 +190,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         elif ModuleModel.is_thermocycler_module_model(model):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
+                target_block_temperature=None,
             )
 
     def _handle_heater_shaker_commands(
@@ -220,6 +236,28 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             self._state.substate_by_module_id[module_id] = TemperatureModuleSubState(
                 module_id=TemperatureModuleId(module_id),
                 plate_target_temperature=None,
+            )
+
+    def _handle_thermocycler_module_commands(
+        self,
+        command: Union[
+            thermocycler.SetTargetBlockTemperature, thermocycler.DeactivateBlock
+        ],
+    ) -> None:
+        module_id = command.params.moduleId
+        assert isinstance(
+            self._state.substate_by_module_id[module_id], ThermocyclerModuleSubState
+        ), f"{module_id} is not a thermocycler module."
+
+        if isinstance(command.result, thermocycler.SetTargetBlockTemperatureResult):
+            self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
+                module_id=ThermocyclerModuleId(module_id),
+                target_block_temperature=command.result.targetBlockTemperature,
+            )
+        elif isinstance(command.result, thermocycler.DeactivateBlockResult):
+            self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
+                module_id=ThermocyclerModuleId(module_id),
+                target_block_temperature=None,
             )
 
 

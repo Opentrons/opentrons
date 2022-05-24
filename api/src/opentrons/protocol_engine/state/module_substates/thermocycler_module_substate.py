@@ -1,10 +1,11 @@
 """Thermocycler Module sub-state."""
 from dataclasses import dataclass
-from typing import NewType
+from typing import NewType, Optional
 
 from opentrons.protocol_engine.errors import (
     InvalidTargetTemperatureError,
     InvalidBlockVolumeError,
+    NoTargetTemperatureSetError,
 )
 
 # TODO(mc, 2022-04-25): move to module definition
@@ -30,6 +31,7 @@ class ThermocyclerModuleSubState:
     """
 
     module_id: ThermocyclerModuleId
+    target_block_temperature: Optional[float]
 
     @staticmethod
     def validate_target_block_temperature(celsius: float) -> float:
@@ -96,3 +98,13 @@ class ThermocyclerModuleSubState:
             "Thermocycler lid temperature must be between"
             f" {LID_TARGET_MIN} and {LID_TARGET_MAX}, but got {celsius}."
         )
+
+    def get_target_block_temperature(self) -> float:
+        """Get the thermocycler's target block temperature."""
+        target = self.target_block_temperature
+
+        if target is None:
+            raise NoTargetTemperatureSetError(
+                f"Module {self.module_id} does not have a target block temperature set."
+            )
+        return target

@@ -1,4 +1,4 @@
-"""Test Thermocycler set block temperature command implementation."""
+"""Test Thermocycler wait for block temperature command implementation."""
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import Thermocycler
@@ -10,8 +10,8 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import thermocycler as tc_commands
-from opentrons.protocol_engine.commands.thermocycler.set_target_block_temperature import (  # noqa: E501
-    SetTargetBlockTemperatureImpl,
+from opentrons.protocol_engine.commands.thermocycler.wait_for_block_temperature import (  # noqa: E501
+    WaitForBlockTemperatureImpl,
 )
 
 
@@ -20,17 +20,13 @@ async def test_set_target_block_temperature(
     state_view: StateView,
     equipment: EquipmentHandler,
 ) -> None:
-    """It should be able to set the specified module's target temperature."""
-    subject = SetTargetBlockTemperatureImpl(state_view=state_view, equipment=equipment)
+    """It should be able to wait for the specified module's target temperature."""
+    subject = WaitForBlockTemperatureImpl(state_view=state_view, equipment=equipment)
 
-    data = tc_commands.SetTargetBlockTemperatureParams(
+    data = tc_commands.WaitForBlockTemperatureParams(
         moduleId="input-thermocycler-id",
-        celsius=12.3,
-        blockMaxVolumeUl=50.2,
     )
-    expected_result = tc_commands.SetTargetBlockTemperatureResult(
-        targetBlockTemperature=45.6
-    )
+    expected_result = tc_commands.WaitForBlockTemperatureResult()
 
     tc_module_substate = decoy.mock(cls=ThermocyclerModuleSubState)
     tc_hardware = decoy.mock(cls=Thermocycler)
@@ -39,17 +35,10 @@ async def test_set_target_block_temperature(
         state_view.modules.get_thermocycler_module_substate("input-thermocycler-id")
     ).then_return(tc_module_substate)
 
+    decoy.when(tc_module_substate.get_target_block_temperature()).then_return(76.6)
     decoy.when(tc_module_substate.module_id).then_return(
         ThermocyclerModuleId("thermocycler-id")
     )
-
-    # Stub temperature validation from hs module view
-    decoy.when(tc_module_substate.validate_target_block_temperature(12.3)).then_return(
-        45.6
-    )
-
-    # Stub volume validation from hs module view
-    decoy.when(tc_module_substate.validate_max_block_volume(50.2)).then_return(77.6)
 
     # Get attached hardware modules
     decoy.when(
@@ -58,8 +47,5 @@ async def test_set_target_block_temperature(
 
     result = await subject.execute(data)
 
-    decoy.verify(
-        await tc_hardware.set_target_block_temperature(celsius=45.6, volume=77.6),
-        times=1,
-    )
+    decoy.verify(await tc_hardware.wait_for_temperature(temperature=76.6), times=1)
     assert result == expected_result

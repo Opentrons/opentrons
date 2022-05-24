@@ -30,6 +30,12 @@ class SetTargetBlockTemperatureParams(BaseModel):
 class SetTargetBlockTemperatureResult(BaseModel):
     """Result data from setting a Thermocycler's target block temperature."""
 
+    targetBlockTemperature: float = Field(
+        ...,
+        description="The target block temperature that was set after validation "
+        "and type conversion (if any).",
+    )
+
 
 class SetTargetBlockTemperatureImpl(
     AbstractCommandImpl[
@@ -75,7 +81,9 @@ class SetTargetBlockTemperatureImpl(
                 target_temperature, volume=target_volume
             )
 
-        return SetTargetBlockTemperatureResult()
+        return SetTargetBlockTemperatureResult(
+            targetBlockTemperature=target_temperature
+        )
 
 
 class SetTargetBlockTemperature(

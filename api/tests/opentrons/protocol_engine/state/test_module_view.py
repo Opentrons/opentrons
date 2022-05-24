@@ -1018,6 +1018,54 @@ def test_tempdeck_get_plate_target_temperature_no_target(
         subject.get_plate_target_temperature()
 
 
+def test_thermocycler_get_target_block_temperature(
+    thermocycler_v1_def: ModuleDefinition,
+) -> None:
+    """It should return whether target temperature for thermocycler is set."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=thermocycler_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": ThermocyclerModuleSubState(
+                module_id=ThermocyclerModuleId("module-id"),
+                target_block_temperature=14,
+            )
+        },
+    )
+    subject = module_view.get_thermocycler_module_substate("module-id")
+    assert subject.get_target_block_temperature() == 14
+
+
+def test_thermocycler_get_target_block_temperature_no_target(
+    thermocycler_v1_def: ModuleDefinition,
+) -> None:
+    """It should raise if no target temperature is set."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=thermocycler_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": ThermocyclerModuleSubState(
+                module_id=ThermocyclerModuleId("module-id"),
+                target_block_temperature=None,
+            )
+        },
+    )
+    subject = module_view.get_thermocycler_module_substate("module-id")
+
+    with pytest.raises(errors.NoTargetTemperatureSetError):
+        subject.get_target_block_temperature()
+
+
 @pytest.fixture
 def module_view_with_thermocycler(thermocycler_v1_def: ModuleDefinition) -> ModuleView:
     """Get a module state view with a loaded thermocycler."""
@@ -1032,6 +1080,7 @@ def module_view_with_thermocycler(thermocycler_v1_def: ModuleDefinition) -> Modu
         substate_by_module_id={
             "module-id": ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
+                target_block_temperature=None,
             )
         },
     )
