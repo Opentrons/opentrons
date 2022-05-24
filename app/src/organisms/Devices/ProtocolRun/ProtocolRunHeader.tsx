@@ -121,7 +121,10 @@ export function ProtocolRunHeader({
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
-  const { displayName, protocolKey } = useProtocolDetailsForRun(runId)
+  const { protocolData, displayName, protocolKey } = useProtocolDetailsForRun(
+    runId
+  )
+  const isProtocolAnalyzing = protocolData == null
   const runStatus = useRunStatus(runId)
 
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
@@ -198,6 +201,7 @@ export function ProtocolRunHeader({
     !isSetupComplete ||
     isMutationLoading ||
     isRobotBusy ||
+    isProtocolAnalyzing ||
     runStatus === RUN_STATUS_FINISHING ||
     runStatus === RUN_STATUS_PAUSE_REQUESTED ||
     runStatus === RUN_STATUS_STOP_REQUESTED ||
@@ -237,6 +241,11 @@ export function ProtocolRunHeader({
       break
   }
 
+  if (isProtocolAnalyzing) {
+    buttonIconName = 'ot-spinner'
+    buttonText = t('analyzing_on_robot')
+  }
+
   let disableReason = null
   if (!isSetupComplete) {
     disableReason = t('setup_incomplete')
@@ -250,6 +259,7 @@ export function ProtocolRunHeader({
         name={buttonIconName}
         size={SIZE_1}
         marginRight={SPACING.spacing3}
+        spin={isProtocolAnalyzing}
       />
     ) : null
 

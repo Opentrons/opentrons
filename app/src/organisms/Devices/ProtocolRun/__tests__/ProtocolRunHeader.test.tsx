@@ -282,6 +282,19 @@ describe('ProtocolRunHeader', () => {
     expect(queryByRole('link', { name: 'A Protocol for Otie' })).toBeNull()
   })
 
+  it('renders a disabled "Analyzing on robot" button if robot-side analysis is not complete', () => {
+    when(mockUseProtocolDetailsForRun).calledWith(RUN_ID).mockReturnValue({
+      displayName: null,
+      protocolData: null,
+      protocolKey: null,
+    })
+
+    const [{ getByRole }] = render()
+
+    const button = getByRole('button', { name: 'Analyzing on robot' })
+    expect(button).toBeDisabled()
+  })
+
   it('renders a start run button and cancel run button when run is ready to start', () => {
     const [{ getByRole, queryByText, getByText }] = render()
 
