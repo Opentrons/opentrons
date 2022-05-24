@@ -411,6 +411,7 @@ get_status_specs: List[GetStatusSpec] = [
         subject=get_command_view(
             queue_status=QueueStatus.INACTIVE,
             is_door_blocking=False,
+            run_completed_at=datetime(year=2021, day=1, month=1)
         ),
         expected_status=EngineStatus.PAUSED,
     ),
