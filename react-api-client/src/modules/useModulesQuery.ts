@@ -3,7 +3,7 @@ import { getModules } from '@opentrons/api-client'
 import { useHost } from '../api'
 import type { HostConfig, AttachedModules } from '@opentrons/api-client'
 
-export function useAttachedModulesQuery(): UseQueryResult<AttachedModules> {
+export function useModulesQuery(): UseQueryResult<AttachedModules> {
   const host = useHost()
   const query = useQuery(
     [host, 'modules'],

@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
 import { AttachedModules, getModules } from '@opentrons/api-client'
 import { useHost } from '../../api'
-import { useAttachedModulesQuery } from '..'
+import { useModulesQuery } from '..'
 
 import type { HostConfig, Response } from '@opentrons/api-client'
 
@@ -99,7 +99,7 @@ const MODULES_RESPONSE = {
   ],
 } as AttachedModules
 
-describe('useAttachedModulesQuery hook', () => {
+describe('useModulesQuery hook', () => {
   let wrapper: React.FunctionComponent<{}>
 
   beforeEach(() => {
@@ -117,7 +117,7 @@ describe('useAttachedModulesQuery hook', () => {
   it('should return no data if no host', () => {
     when(mockUseHost).calledWith().mockReturnValue(null)
 
-    const { result } = renderHook(useAttachedModulesQuery, { wrapper })
+    const { result } = renderHook(useModulesQuery, { wrapper })
 
     expect(result.current.data).toBeUndefined()
   })
@@ -126,7 +126,7 @@ describe('useAttachedModulesQuery hook', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetModules).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
 
-    const { result } = renderHook(useAttachedModulesQuery, { wrapper })
+    const { result } = renderHook(useModulesQuery, { wrapper })
     expect(result.current.data).toBeUndefined()
   })
 
@@ -138,7 +138,7 @@ describe('useAttachedModulesQuery hook', () => {
         data: MODULES_RESPONSE,
       } as Response<AttachedModules>)
 
-    const { result, waitFor } = renderHook(useAttachedModulesQuery, { wrapper })
+    const { result, waitFor } = renderHook(useModulesQuery, { wrapper })
 
     await waitFor(() => result.current.data != null)
 

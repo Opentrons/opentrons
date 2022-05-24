@@ -1,1 +1,1 @@
-export { useAttachedPipettesQuery } from './useAttachedPipettesQuery'
+export { usePipettesQuery } from './usePipettesQuery'

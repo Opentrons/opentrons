@@ -6,7 +6,7 @@ import type {
   FetchPipettesResponseBody,
 } from '@opentrons/api-client'
 
-export function useAttachedPipettesQuery(): UseQueryResult<FetchPipettesResponseBody> {
+export function usePipettesQuery(): UseQueryResult<FetchPipettesResponseBody> {
   const host = useHost()
   const query = useQuery(
     [host, 'pipettes '],

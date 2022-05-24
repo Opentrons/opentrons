@@ -1,1 +1,1 @@
-export { useAttachedModulesQuery } from './useAttachedModulesQuery'
+export { useModulesQuery } from './useModulesQuery'

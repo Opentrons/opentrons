@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
 import { FetchPipettesResponseBody, getPipettes } from '@opentrons/api-client'
 import { useHost } from '../../api'
-import { useAttachedPipettesQuery } from '..'
+import { usePipettesQuery } from '..'
 
 import type { HostConfig, Response } from '@opentrons/api-client'
 
@@ -34,7 +34,7 @@ const PIPETTES_RESPONSE = {
   },
 } as FetchPipettesResponseBody
 
-describe('useAttachedPipettesQuery hook', () => {
+describe('usePipettesQuery hook', () => {
   let wrapper: React.FunctionComponent<{}>
 
   beforeEach(() => {
@@ -52,7 +52,7 @@ describe('useAttachedPipettesQuery hook', () => {
   it('should return no data if no host', () => {
     when(mockUseHost).calledWith().mockReturnValue(null)
 
-    const { result } = renderHook(useAttachedPipettesQuery, { wrapper })
+    const { result } = renderHook(usePipettesQuery, { wrapper })
 
     expect(result.current.data).toBeUndefined()
   })
@@ -61,7 +61,7 @@ describe('useAttachedPipettesQuery hook', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetPipettes).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
 
-    const { result } = renderHook(useAttachedPipettesQuery, { wrapper })
+    const { result } = renderHook(usePipettesQuery, { wrapper })
     expect(result.current.data).toBeUndefined()
   })
 
@@ -73,7 +73,7 @@ describe('useAttachedPipettesQuery hook', () => {
         data: PIPETTES_RESPONSE,
       } as Response<FetchPipettesResponseBody>)
 
-    const { result, waitFor } = renderHook(useAttachedPipettesQuery, {
+    const { result, waitFor } = renderHook(usePipettesQuery, {
       wrapper,
     })
 
