@@ -1,7 +1,7 @@
 """Tests for the ProtocolEngine class."""
 import pytest
 
-from datetime import datetime, timezone
+from datetime import datetime
 from decoy import Decoy
 from typing import Any
 
@@ -296,7 +296,7 @@ async def test_finish(
             drop_tips_and_home=drop_tips_and_home
         ),
         action_dispatcher.dispatch(
-            HardwareStoppedAction(completed_at=datetime.now(tz=timezone.utc))
+            HardwareStoppedAction(completed_at=datetime(2021, 1, 1, 0, 0))
         ),
         await plugin_starter.stop(),
     )
@@ -351,7 +351,7 @@ async def test_finish_with_error(
         await queue_worker.join(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
         action_dispatcher.dispatch(
-            HardwareStoppedAction(completed_at=datetime.now(tz=timezone.utc))
+            HardwareStoppedAction(completed_at=datetime(2021, 1, 1, 0, 0))
         ),
     )
 
@@ -378,7 +378,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
         hardware_event_forwarder.stop_soon(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
         action_dispatcher.dispatch(
-            HardwareStoppedAction(completed_at=datetime.now(tz=timezone.utc))
+            HardwareStoppedAction(completed_at=datetime(2021, 1, 1, 0, 0))
         ),
         await plugin_starter.stop(),
     )
