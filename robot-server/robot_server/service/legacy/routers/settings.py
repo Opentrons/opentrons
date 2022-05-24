@@ -1,7 +1,6 @@
 from dataclasses import asdict
 import logging
 from typing import Dict
-from pathlib import Path
 
 from starlette import status
 from fastapi import APIRouter, Depends
@@ -199,7 +198,9 @@ async def post_settings_reset_options(
     persistence_resetter: PersistenceResetter = Depends(get_persistence_resetter),
 ) -> V1BasicResponse:
     options = set(
-        k for k, v in factory_reset_commands.items() if v and k != reset_util.ResetOptionId.runs_history
+        k
+        for k, v in factory_reset_commands.items()
+        if v and k != reset_util.ResetOptionId.runs_history
     )
     reset_util.reset(options)
 
