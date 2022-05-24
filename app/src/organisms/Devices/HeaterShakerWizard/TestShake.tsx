@@ -149,15 +149,10 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           marginTop={SPACING.spacing4}
           onClick={toggleLatch}
           disabled={isShaking}
-          {...targetProps}
         >
           {isLatchClosed ? t('open_labware_latch') : t('close_labware_latch')}
         </TertiaryButton>
-        {isShaking ? (
-          <Tooltip tooltipProps={tooltipProps}>
-            {t('cannot_open_latch', { ns: 'heater_shaker' })}
-          </Tooltip>
-        ) : null}
+
         <Flex
           flexDirection={DIRECTION_ROW}
           marginY={SPACING.spacingL}
