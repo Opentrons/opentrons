@@ -6,6 +6,7 @@ class Formatter(argparse.RawTextHelpFormatter, argparse.RawDescriptionHelpFormat
 
 
 class BaseCli:
+    """A base cli for inheriting global flags."""
     def __init__(self) -> None:
         self.parser: argparse.ArgumentParser = argparse.ArgumentParser(
             formatter_class=Formatter,

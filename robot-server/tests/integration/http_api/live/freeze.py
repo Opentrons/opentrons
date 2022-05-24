@@ -6,8 +6,8 @@ from tests.integration.robot_client import RobotClient
 
 
 async def freeze(robot_ip: str) -> None:
-    """Run the series of commands to move a pipette to various wells
-    on a plate repetitively. This exposed a freezing issue"""
+    """Run the series of commands to repetitively move a pipette to various wells
+    on a plate. This exposed a freezing issue."""
     async with RobotClient.make(
         host=f"http://{robot_ip}", port=31950, version="*"
     ) as robot_client:
@@ -91,9 +91,8 @@ if __name__ == "__main__":
     cli = BaseCli()
     cli.parser.description = """
 1. Attach p20_single_gen2 pipette on the right.
-2. Place opentrons_96_tiprack_20ul tip rack in slot 8.
-3. Place nest_96_wellplate_100ul_pcr_full_skirt in slot 2.
-4. Complete Pipette offset and tip length calibrations.
+2. Have an empty deck.
+3. Or place nest_96_wellplate_100ul_pcr_full_skirt in slot 2.
 5. Run this without -h
 """
     args = cli.parser.parse_args()
