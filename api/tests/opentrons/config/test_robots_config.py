@@ -3,6 +3,7 @@ import json
 import os
 
 import pytest
+from typing import Dict, Any
 
 from opentrons.config import CONFIG, robot_configs, defaults_ot2, defaults_ot3
 from opentrons.config.types import CurrentDict, GantryLoad, OT3Config
@@ -98,163 +99,163 @@ ot3_dummy_settings = {
     "motion_settings": {
         "acceleration": {
             "none": {
-                OT3AxisKind.X: 3,
-                OT3AxisKind.Y: 2,
-                OT3AxisKind.Z: 15,
-                OT3AxisKind.P: 2,
+                "X": 3,
+                "Y": 2,
+                "Z": 15,
+                "P": 2,
             },
             "low_throughput": {
-                OT3AxisKind.X: 3,
-                OT3AxisKind.Y: 2,
-                OT3AxisKind.Z: 15,
-                OT3AxisKind.P: 15,
+                "X": 3,
+                "Y": 2,
+                "Z": 15,
+                "P": 15,
             },
             "high_throughput": {
-                OT3AxisKind.X: 3,
-                OT3AxisKind.Y: 2,
-                OT3AxisKind.Z: 15,
-                OT3AxisKind.P: 15,
+                "X": 3,
+                "Y": 2,
+                "Z": 15,
+                "P": 15,
             },
-            "two_low_throughput": {OT3AxisKind.X: 1.1, OT3AxisKind.Y: 2.2},
+            "two_low_throughput": {"X": 1.1, "Y": 2.2},
             "gripper": {
-                OT3AxisKind.Z: 2.8,
+                "Z": 2.8,
             },
         },
         "default_max_speed": {
             "none": {
-                OT3AxisKind.X: 1,
-                OT3AxisKind.Y: 2,
-                OT3AxisKind.Z: 3,
-                OT3AxisKind.P: 4,
+                "X": 1,
+                "Y": 2,
+                "Z": 3,
+                "P": 4,
             },
             "low_throughput": {
-                OT3AxisKind.X: 1,
-                OT3AxisKind.Y: 2,
-                OT3AxisKind.Z: 3,
-                OT3AxisKind.P: 4,
+                "X": 1,
+                "Y": 2,
+                "Z": 3,
+                "P": 4,
             },
             "high_throughput": {
-                OT3AxisKind.X: 1,
-                OT3AxisKind.Y: 2,
-                OT3AxisKind.Z: 3,
-                OT3AxisKind.P: 4,
+                "X": 1,
+                "Y": 2,
+                "Z": 3,
+                "P": 4,
             },
             "two_low_throughput": {
-                OT3AxisKind.X: 4,
-                OT3AxisKind.Y: 3,
-                OT3AxisKind.Z: 2,
-                OT3AxisKind.P: 1,
+                "X": 4,
+                "Y": 3,
+                "Z": 2,
+                "P": 1,
             },
-            "gripper": {OT3AxisKind.Z: 2.8},
+            "gripper": {"Z": 2.8},
         },
         "max_speed_discontinuity": {
             "none": {
-                OT3AxisKind.X: 10,
-                OT3AxisKind.Y: 20,
-                OT3AxisKind.Z: 30,
-                OT3AxisKind.P: 40,
+                "X": 10,
+                "Y": 20,
+                "Z": 30,
+                "P": 40,
             },
             "low_throughput": {
-                OT3AxisKind.X: 1,
-                OT3AxisKind.Y: 2,
-                OT3AxisKind.Z: 3,
-                OT3AxisKind.P: 6,
+                "X": 1,
+                "Y": 2,
+                "Z": 3,
+                "P": 6,
             },
             "high_throughput": {
-                OT3AxisKind.X: 1,
-                OT3AxisKind.Y: 2,
-                OT3AxisKind.Z: 3,
-                OT3AxisKind.P: 6,
+                "X": 1,
+                "Y": 2,
+                "Z": 3,
+                "P": 6,
             },
             "two_low_throughput": {
-                OT3AxisKind.X: 1,
-                OT3AxisKind.Y: 2,
-                OT3AxisKind.Z: 3,
-                OT3AxisKind.P: 6,
+                "X": 1,
+                "Y": 2,
+                "Z": 3,
+                "P": 6,
             },
-            "gripper": {OT3AxisKind.Z: 2.8},
+            "gripper": {"Z": 2.8},
         },
         "direction_change_speed_discontinuity": {
             "none": {
-                OT3AxisKind.X: 5,
-                OT3AxisKind.Y: 10,
-                OT3AxisKind.Z: 15,
-                OT3AxisKind.P: 20,
+                "X": 5,
+                "Y": 10,
+                "Z": 15,
+                "P": 20,
             },
             "low_throughput": {
-                OT3AxisKind.X: 0.8,
-                OT3AxisKind.Y: 1,
-                OT3AxisKind.Z: 2,
-                OT3AxisKind.P: 4,
+                "X": 0.8,
+                "Y": 1,
+                "Z": 2,
+                "P": 4,
             },
             "high_throughput": {
-                OT3AxisKind.X: 1,
-                OT3AxisKind.Y: 2,
-                OT3AxisKind.Z: 3,
-                OT3AxisKind.P: 6,
+                "X": 1,
+                "Y": 2,
+                "Z": 3,
+                "P": 6,
             },
             "two_low_throughput": {
-                OT3AxisKind.X: 0.5,
-                OT3AxisKind.Y: 1,
-                OT3AxisKind.Z: 1.5,
-                OT3AxisKind.P: 3,
+                "X": 0.5,
+                "Y": 1,
+                "Z": 1.5,
+                "P": 3,
             },
-            "gripper": {OT3AxisKind.Z: 2.8},
+            "gripper": {"Z": 2.8},
         },
     },
     "current_settings": {
         "hold_current": {
             "none": {
-                OT3AxisKind.X: 0.7,
-                OT3AxisKind.Y: 0.7,
-                OT3AxisKind.Z: 0.7,
-                OT3AxisKind.P: 0.8,
+                "X": 0.7,
+                "Y": 0.7,
+                "Z": 0.7,
+                "P": 0.8,
             },
             "low_throughput": {
-                OT3AxisKind.X: 0.7,
-                OT3AxisKind.Y: 0.7,
-                OT3AxisKind.Z: 0.7,
-                OT3AxisKind.P: 0.8,
+                "X": 0.7,
+                "Y": 0.7,
+                "Z": 0.7,
+                "P": 0.8,
             },
             "high_throughput": {
-                OT3AxisKind.X: 0.7,
-                OT3AxisKind.Y: 0.7,
-                OT3AxisKind.Z: 0.7,
-                OT3AxisKind.P: 0.8,
+                "X": 0.7,
+                "Y": 0.7,
+                "Z": 0.7,
+                "P": 0.8,
             },
             "two_low_throughput": {
-                OT3AxisKind.X: 0.7,
-                OT3AxisKind.Y: 0.7,
+                "X": 0.7,
+                "Y": 0.7,
             },
             "gripper": {
-                OT3AxisKind.Z: 0.7,
+                "Z": 0.7,
             },
         },
         "run_current": {
             "none": {
-                OT3AxisKind.X: 7.0,
-                OT3AxisKind.Y: 7.0,
-                OT3AxisKind.Z: 7.0,
-                OT3AxisKind.P: 5.0,
+                "X": 7.0,
+                "Y": 7.0,
+                "Z": 7.0,
+                "P": 5.0,
             },
             "low_throughput": {
-                OT3AxisKind.X: 1,
-                OT3AxisKind.Y: 2,
-                OT3AxisKind.Z: 3,
-                OT3AxisKind.P: 4.0,
+                "X": 1,
+                "Y": 2,
+                "Z": 3,
+                "P": 4.0,
             },
             "high_throughput": {
-                OT3AxisKind.X: 0.2,
-                OT3AxisKind.Y: 0.5,
-                OT3AxisKind.Z: 0.4,
-                OT3AxisKind.P: 2.0,
+                "X": 0.2,
+                "Y": 0.5,
+                "Z": 0.4,
+                "P": 2.0,
             },
             "two_low_throughput": {
-                OT3AxisKind.X: 9,
-                OT3AxisKind.Y: 0.1,
+                "X": 9,
+                "Y": 0.1,
             },
             "gripper": {
-                OT3AxisKind.Z: 10,
+                "Z": 10,
             },
         },
     },
@@ -292,6 +293,16 @@ def test_dictify_roundtrip(config_dict):
     built_config = robot_configs.build_config(config_dict)
     new_saved_config = robot_configs.config_to_save(built_config)
     assert new_saved_config == config_dict
+
+
+@pytest.mark.parametrize("config_dict", [new_dummy_settings, ot3_dummy_settings])
+def test_json_roundtrip(config_dict: Dict[str, Any]) -> None:
+    built_config = robot_configs.build_config(config_dict)
+    config_dict = robot_configs.config_to_save(built_config)
+    jsonstr = robot_configs.json_to_save(config_dict)
+    reloaded = json.loads(jsonstr)
+    rebuilt = robot_configs.build_config(reloaded)
+    assert built_config == rebuilt
 
 
 def test_load_legacy_gantry_cal():
@@ -366,9 +377,7 @@ def test_load_per_pipette_vals():
     )
 
     # altered values are preserved
-    mostly_right["motion_settings"]["acceleration"]["high_throughput"][
-        OT3AxisKind.X
-    ] -= 2
+    mostly_right["motion_settings"]["acceleration"]["high_throughput"]["X"] -= 2
     assert (
         defaults_ot3._build_default_bpk(
             mostly_right["motion_settings"]["acceleration"],
@@ -381,9 +390,7 @@ def test_load_per_pipette_vals():
     altered_default = copy.deepcopy(defaults_ot3.DEFAULT_ACCELERATIONS)
     altered_default.two_low_throughput.pop(OT3AxisKind.X, None)
 
-    mostly_right["motion_settings"]["acceleration"]["two_low_throughput"][
-        OT3AxisKind.X
-    ] = -72
+    mostly_right["motion_settings"]["acceleration"]["two_low_throughput"]["X"] = -72
     assert (
         defaults_ot3._build_default_bpk(
             mostly_right["motion_settings"]["acceleration"], altered_default

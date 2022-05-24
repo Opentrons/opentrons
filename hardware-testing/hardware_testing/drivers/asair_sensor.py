@@ -133,7 +133,7 @@ if __name__ == "__main__":
         # make a dir
         ##########################################
         D = datetime.now().strftime("%y-%m-%d")
-        folder_name = os.path.join(".", D)
+        folder_name = os.path.join("", D)
         if not os.path.exists(folder_name):
             os.makedirs(folder_name)
         ##########################################

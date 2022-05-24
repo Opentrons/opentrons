@@ -2,7 +2,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-from gravimetric_test.drivers import AsairSensor
+from hardware_testing.drivers import AsairSensor
 
 
 @pytest.fixture
