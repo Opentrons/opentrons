@@ -137,7 +137,7 @@ Finally, all of your labware and hardware is in place, so it’s time to give th
 2. Measure out equal amounts of solution from the reservoir into wells in the first column of the plate.
 3. Move a portion of the combined liquid from column 1 to 2, then from column 2 to 3, and so on all the way to column 12.
 
-Thanks to the flexibility of the API's :py:meth:`.transfer` method, which combines many :ref:`building block commands <v2-atomic-commands>` into a single call, each of these phases can be accomplished with a single line of code! You’ll just have to write a few more lines of code to repeat the process for as many rows as you want to fill.
+Thanks to the flexibility of the API's :py:meth:`.transfer` method, which combines many :ref:`building block commands <v2-atomic-commands>` into one call, each of these phases can be accomplished with a single line of code! You’ll just have to write a few more lines of code to repeat the process for as many rows as you want to fill.
 
 Let’s start with the diluent. This phase takes a larger quantity of liquid and spreads it equally to many wells. ``transfer()`` can handle this all at once, because it accepts either a single well or a list of wells for its source and destination:
 
