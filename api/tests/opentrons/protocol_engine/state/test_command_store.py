@@ -656,7 +656,7 @@ def test_command_store_handles_command_failed() -> None:
 def test_handles_hardware_stopped() -> None:
     """It should mark the hardware as stopped on HardwareStoppedAction."""
     subject = CommandStore()
-    completed_at = datetime.now(tz=timezone.utc)
+    completed_at = datetime(year=2021, day=1, month=1)
     subject.handle_action(HardwareStoppedAction(completed_at=completed_at))
 
     assert subject.state == CommandState(
