@@ -5,7 +5,6 @@ import {
   Link,
   Box,
   Icon,
-  SIZE_2,
   SIZE_4,
   DIRECTION_ROW,
   ALIGN_CENTER,
@@ -31,7 +30,7 @@ export function DeckCalibrationModal(
   const { t } = useTranslation(['protocol_setup', 'shared'])
   const { onCloseClick } = props
   return (
-    <Portal level={'top'}>
+    <Portal level="top">
       <Modal>
         <Box>
           <Flex
@@ -39,11 +38,11 @@ export function DeckCalibrationModal(
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
-            <StyledText as="h1" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {t('robot_cal_help_title')}
             </StyledText>
             <Box onClick={onCloseClick} id={'RobotCalModal_xButton'}>
-              <Icon name={'close'} size={SIZE_2} />
+              <Icon name={'close'} size="0.75rem" />
             </Box>
           </Flex>
           <StyledText as="p" marginTop={SPACING.spacing6}>
@@ -122,7 +121,7 @@ export function DeckCalibrationModal(
               {t('pipette_offset_cal_description_bullet_2')}
             </Flex>
           </StyledText>
-          <Box textAlign={ALIGN_CENTER} marginTop={SPACING.spacing6}>
+          <Box textAlign={ALIGN_CENTER} marginTop={SPACING.spacing5}>
             <PrimaryButton
               onClick={onCloseClick}
               width={SIZE_4}
