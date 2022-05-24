@@ -43,7 +43,7 @@ from opentrons.protocol_engine.actions import (
     QueueCommandAction,
     HardwareStoppedAction,
 )
-
+from opentrons.protocol_engine.resources import ModelUtils
 
 @pytest.fixture
 def state_store(decoy: Decoy) -> StateStore:
@@ -282,12 +282,17 @@ async def test_finish(
     hardware_stopper: HardwareStopper,
     drop_tips_and_home: bool,
     set_run_status: bool,
+    model_utils: ModelUtils,
 ) -> None:
     """It should be able to gracefully tell the engine it's done."""
     await subject.finish(
         drop_tips_and_home=drop_tips_and_home,
         set_run_status=set_run_status,
     )
+
+    completed_at = datetime(2021, 1, 1, 0, 0)
+
+    decoy.when(model_utils.get_timestamp()).then_return(completed_at)
 
     decoy.verify(
         action_dispatcher.dispatch(FinishAction(set_run_status=set_run_status)),
@@ -296,7 +301,7 @@ async def test_finish(
             drop_tips_and_home=drop_tips_and_home
         ),
         action_dispatcher.dispatch(
-            HardwareStoppedAction(completed_at=datetime(2021, 1, 1, 0, 0))
+            HardwareStoppedAction(completed_at=completed_at)
         ),
         await plugin_starter.stop(),
     )
@@ -365,11 +370,16 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     action_dispatcher: ActionDispatcher,
     plugin_starter: PluginStarter,
     subject: ProtocolEngine,
+    model_utils: ModelUtils
 ) -> None:
     """It should be able to stop the engine."""
     decoy.when(
         await queue_worker.join(),
     ).then_raise(RuntimeError("oh no"))
+
+    completed_at = datetime(2021, 1, 1, 0, 0)
+
+    decoy.when(model_utils.get_timestamp()).then_return(completed_at)
 
     with pytest.raises(RuntimeError, match="oh no"):
         await subject.finish()
@@ -378,7 +388,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
         hardware_event_forwarder.stop_soon(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
         action_dispatcher.dispatch(
-            HardwareStoppedAction(completed_at=datetime(2021, 1, 1, 0, 0))
+            HardwareStoppedAction(completed_at=completed_at)
         ),
         await plugin_starter.stop(),
     )
