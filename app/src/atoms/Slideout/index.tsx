@@ -112,6 +112,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
             >
               <StyledText
                 as="h2"
+                css={{ 'overflow-wrap': 'anywhere' }}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid={`Slideout_title_${title}`}
               >
@@ -131,7 +132,9 @@ export const Slideout = (props: Props): JSX.Element | null => {
               </Flex>
             </Flex>
           ) : (
-            title
+            <React.Fragment css={{ 'overflow-wrap': 'break-word' }}>
+              title
+            </React.Fragment>
           )}
           <Divider marginY={0} color={COLORS.medGrey} />
           <Box
