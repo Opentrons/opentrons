@@ -23,7 +23,7 @@ import {
   ModuleIcon,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
-import { Link } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import {
   parseInitialPipetteNamesByMount,
   parseAllRequiredModuleModels,
@@ -44,6 +44,7 @@ interface ProtocolCardProps extends StoredProtocolData {
 }
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
+  const history = useHistory()
   const {
     handleRunProtocol,
     protocolKey,
@@ -51,7 +52,6 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
     mostRecentAnalysis,
     modified,
   } = props
-
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
@@ -62,37 +62,36 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   )
 
   return (
-    <Link to={`/protocols/${protocolKey}`} style={{ color: 'inherit' }}>
-      <Flex
-        backgroundColor={COLORS.white}
-        border={`1px solid ${COLORS.medGrey}`}
-        borderRadius="4px"
-        flexDirection={DIRECTION_ROW}
-        marginBottom={SPACING.spacing3}
-        padding={SPACING.spacing4}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        width="100%"
-        position="relative"
+    <Flex
+      backgroundColor={COLORS.white}
+      border={`1px solid ${COLORS.medGrey}`}
+      borderRadius="4px"
+      flexDirection={DIRECTION_ROW}
+      marginBottom={SPACING.spacing3}
+      padding={SPACING.spacing4}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      width="100%"
+      position="relative"
+      onClick={() => history.push(`/protocols/${protocolKey}`)}
+    >
+      <AnalysisInfo
+        protocolKey={protocolKey}
+        mostRecentAnalysis={mostRecentAnalysis}
+        protocolDisplayName={protocolDisplayName}
+        isAnalyzing={isAnalyzing}
+        modified={modified}
+      />
+      <Box
+        position={POSITION_ABSOLUTE}
+        top={SPACING.spacing2}
+        right={SPACING.spacing2}
       >
-        <AnalysisInfo
+        <ProtocolOverflowMenu
           protocolKey={protocolKey}
-          mostRecentAnalysis={mostRecentAnalysis}
-          protocolDisplayName={protocolDisplayName}
-          isAnalyzing={isAnalyzing}
-          modified={modified}
+          handleRunProtocol={handleRunProtocol}
         />
-        <Box
-          position={POSITION_ABSOLUTE}
-          top={SPACING.spacing2}
-          right={SPACING.spacing2}
-        >
-          <ProtocolOverflowMenu
-            protocolKey={protocolKey}
-            handleRunProtocol={handleRunProtocol}
-          />
-        </Box>
-      </Flex>
-    </Link>
+      </Box>
+    </Flex>
   )
 }
 

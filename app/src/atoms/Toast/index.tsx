@@ -15,9 +15,11 @@ import {
 import type { IconProps } from '@opentrons/components'
 import { StyledText } from '../text'
 
+type ToastType = 'success' | 'warning' | 'error' | 'info'
+
 export interface ToastProps {
   message: string | JSX.Element
-  type?: 'success' | 'warning' | 'error' | 'info'
+  type: ToastType
   icon?: IconProps
   closeButton?: boolean
   onClose: () => void
@@ -38,24 +40,38 @@ const EXPANDED_STYLE = css`
     }
   }
 `
+
+const toastStyleByType: {
+  [k in ToastType]: {
+    iconName: IconName
+    color: string
+    backgroundColor: string
+  }
+} = {
+  error: {
+    iconName: 'alert-circle',
+    color: COLORS.error,
+    backgroundColor: COLORS.errorBg,
+  },
+  warning: {
+    iconName: 'alert-circle',
+    color: COLORS.warning,
+    backgroundColor: COLORS.warningBg,
+  },
+  success: {
+    iconName: 'check-circle',
+    color: COLORS.success,
+    backgroundColor: COLORS.successBg,
+  },
+  info: {
+    iconName: 'information',
+    color: COLORS.darkGreyEnabled,
+    backgroundColor: COLORS.greyDisabled,
+  },
+}
+
 export function Toast(props: ToastProps): JSX.Element {
   const { message, type, icon, closeButton, onClose, requiredTimeout } = props
-  let iconName: IconName = 'alert-circle'
-  let color = COLORS.error
-  let backgroundColor = COLORS.errorBg
-
-  if (type === 'warning') {
-    color = COLORS.warning
-    backgroundColor = COLORS.warningBg
-  } else if (type === 'success') {
-    iconName = 'check-circle'
-    color = COLORS.success
-    backgroundColor = COLORS.successBg
-  } else {
-    iconName = icon?.name != null ? icon.name : 'information'
-    color = COLORS.darkBlack
-    backgroundColor = COLORS.greyDisabled
-  }
 
   if (!(requiredTimeout ?? false)) {
     setTimeout(() => {
@@ -69,10 +85,10 @@ export function Toast(props: ToastProps): JSX.Element {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
       borderRadius={BORDERS.radiusSoftCorners}
-      borderColor={color}
+      borderColor={toastStyleByType[type].color}
       borderWidth={SPACING.spacingXXS}
       border={BORDER_STYLE_SOLID}
-      backgroundColor={backgroundColor}
+      backgroundColor={toastStyleByType[type].backgroundColor}
       paddingX={SPACING.spacing3}
       paddingY={SPACING.spacing2}
       right={SPACING.spacing4}
@@ -82,8 +98,8 @@ export function Toast(props: ToastProps): JSX.Element {
     >
       <Flex flexDirection="row">
         <Icon
-          name={iconName}
-          color={color}
+          name={icon?.name ?? toastStyleByType[type].iconName}
+          color={toastStyleByType[type].color}
           width={SPACING.spacing4}
           marginRight={SPACING.spacing3}
           spin={icon?.spin != null ? icon.spin : false}

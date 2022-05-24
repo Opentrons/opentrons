@@ -1,5 +1,6 @@
-from typing import AsyncGenerator, NamedTuple
+from typing import Any, AsyncGenerator, Dict, NamedTuple
 
+import anyio
 import pytest
 
 from tests.integration.dev_server import DevServer
@@ -40,22 +41,29 @@ async def client_and_server(port: str) -> AsyncGenerator[ClientServerFixture, No
             yield ClientServerFixture(client=client, server=server)
 
 
+async def _assert_run_persisted(
+    robot_client: RobotClient, expected_run_data: Dict[str, Any]
+) -> None:
+    """Fetch a run through various endpoints to ensure it was persisted.
+
+    Note: This only checks the fields of the run resource itself.
+    It does not check the run's commands, whichh are accessed through
+    separate endpoints.
+    """
+    run_id = expected_run_data["id"]
+    get_all_persisted_runs_response = await robot_client.get_runs()
+    get_persisted_run_response = await robot_client.get_run(run_id)
+    assert get_all_persisted_runs_response.json()["data"] == [expected_run_data]
+    assert get_persisted_run_response.json()["data"] == expected_run_data
+
+
 async def test_runs_persist(client_and_server: ClientServerFixture) -> None:
     """Test that runs are persisted through dev server restart."""
     client, server = client_and_server
 
     # create a run
     create_run_response = await client.post_run(req_body={"data": {}})
-    expected_run = create_run_response.json()["data"]
-    run_id = expected_run["id"]
-
-    # fetch the same run and commands through various endpoints
-    get_all_runs_response = await client.get_runs()
-    get_run_response = await client.get_run(run_id=run_id)
-
-    # ensure fetched resources match created resources
-    assert get_all_runs_response.json()["data"] == [expected_run]
-    assert get_run_response.json()["data"] == expected_run
+    run_id = create_run_response.json()["data"]["id"]
 
     # persist the run by setting current: false
     archive_run_response = await client.patch_run(
@@ -66,13 +74,8 @@ async def test_runs_persist(client_and_server: ClientServerFixture) -> None:
     # reboot the server
     await client_and_server.restart()
 
-    # fetch those same resources again
-    get_all_persisted_runs_response = await client.get_runs()
-    get_persisted_run_response = await client.get_run(run_id)
-
-    # ensure the fetched resources still match the originally runs
-    assert get_all_persisted_runs_response.json()["data"] == [expected_run]
-    assert get_persisted_run_response.json()["data"] == expected_run
+    # make sure the run persisted as we expect
+    await _assert_run_persisted(robot_client=client, expected_run_data=expected_run)
 
 
 async def test_runs_persist_via_actions_router(
@@ -86,26 +89,24 @@ async def test_runs_persist_via_actions_router(
     create_run_response = await client.post_run(req_body={"data": {}})
     run_id = create_run_response.json()["data"]["id"]
 
-    # persist the hitting actions router
+    # persist the run by hitting the actions router
     await client.post_run_action(
         run_id=run_id,
         req_body={"data": {"actionType": "play"}},
     )
 
-    # fetch the same run and commands through various endpoints
+    # fetch the updated run, which we expect to be persisted
     get_run_response = await client.get_run(run_id=run_id)
     expected_run = dict(get_run_response.json()["data"], current=False)
+
     # reboot the server
     await client_and_server.restart()
 
-    # fetch those same resources again
-    get_persisted_run_response = await client.get_run(run_id)
-
-    # ensure the fetched resources still match the originally runs
-    assert get_persisted_run_response.json()["data"] == expected_run
+    # make sure the run persisted as we expect
+    await _assert_run_persisted(robot_client=client, expected_run_data=expected_run)
 
 
-async def test_run_actions_labware_offsets_persist(
+async def test_run_actions_and_labware_offsets_persist(
     client_and_server: ClientServerFixture,
 ) -> None:
     """Test that run sub-resources are persisted through dev server restart."""
@@ -143,22 +144,27 @@ async def test_run_actions_labware_offsets_persist(
         req_body={"data": {"actionType": "stop"}},
     )
 
+    # wait for the action to take effect
+    with anyio.fail_after(5):
+        while (await client.get_run(run_id=run_id)).json()["data"][
+            "status"
+        ] != "stopped":
+            await anyio.sleep(0.1)
+
     # persist the run by setting current: false
     archive_run_response = await client.patch_run(
         run_id=run_id, req_body={"data": {"current": False}}
     )
+
+    # Other integration tests cover the fact that the actions and labware offsets
+    # that we added will show up in this data.
     expected_run = archive_run_response.json()["data"]
 
     # reboot the server
     await client_and_server.restart()
 
-    # fetch the run again
-    get_all_persisted_runs_response = await client.get_runs()
-    get_persisted_run_response = await client.get_run(run_id)
-
-    # ensure the persisted run matches the original
-    assert get_all_persisted_runs_response.json()["data"] == [expected_run]
-    assert get_persisted_run_response.json()["data"] == expected_run
+    # make sure the run persisted as we expect
+    await _assert_run_persisted(robot_client=client, expected_run_data=expected_run)
 
 
 async def test_run_commands_persist(client_and_server: ClientServerFixture) -> None:
@@ -178,34 +184,19 @@ async def test_run_commands_persist(client_and_server: ClientServerFixture) -> N
     expected_command = create_command_response.json()["data"]
     command_id = expected_command["id"]
 
-    # fetch the same commands through various endpoints
-    get_all_commands_response = await client.get_run_commands(run_id=run_id)
-    get_command_response = await client.get_run_command(
-        run_id=run_id,
-        command_id=command_id,
-    )
-
-    # ensure fetched resources match created resources
-    assert get_all_commands_response.json()["data"] == [
-        # NOTE: GET /run/:id/commands returns command summaries,
-        # which are commands without the `result` key
-        {k: v for k, v in expected_command.items() if k != "result"}
-    ]
-    assert get_command_response.json()["data"] == expected_command
-
     # persist the run by setting current: false
     await client.patch_run(run_id=run_id, req_body={"data": {"current": False}})
 
     # reboot the server
     await client_and_server.restart()
 
-    # fetch those same resources again
+    # fetch the command again through various endpoints
     get_all_persisted_commands_response = await client.get_run_commands(run_id=run_id)
     get_persisted_command_response = await client.get_run_command(
         run_id=run_id, command_id=command_id
     )
 
-    # ensure the persisted resources still match the original ones
+    # ensure the persisted commands still match the original ones
     assert get_all_persisted_commands_response.json()["data"] == [
         # NOTE: GET /run/:id/commands returns command summaries,
         # which are commands without the `result` key

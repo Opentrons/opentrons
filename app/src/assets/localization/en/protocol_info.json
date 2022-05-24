@@ -59,7 +59,7 @@
   "protocol_loading": "Opening Protocol On {{robot_name}}",
   "protocol_finishing": "Finishing Protocol On {{robot_name}}",
   "cancel_run": "Cancel Run",
-  "valid_file_types": "Valid file types: Python files (.py), Protocol Designer files (.json), or .zip files",
+  "valid_file_types": "Valid file types: Python files (.py) or Protocol Designer files (.json)",
   "protocols": "Protocols",
   "import": "Import",
   "all_protocols": "All Protocols",

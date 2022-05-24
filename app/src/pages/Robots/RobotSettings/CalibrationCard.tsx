@@ -49,8 +49,7 @@ interface Props {
 
 const DECK_CAL_STATUS_POLL_INTERVAL = 10000
 const CAL_ARTICLE_URL =
-  'https://support.opentrons.com/en/articles/3499692-how-calibration-works-on-the-ot-2'
-
+  'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
 const attachedPipetteCalPresent: (
   pipettes: AttachedPipettesByMount,
   pipetteCalibrations: PipetteCalibrationsByMount

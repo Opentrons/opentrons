@@ -3,7 +3,7 @@ opentrons_shared_data.module.dev_types: types requiring typing_extensions
 for modules
 """
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 from typing_extensions import Literal, TypedDict
 
 SchemaV1 = Literal["1"]
@@ -65,8 +65,12 @@ ModuleCalibrationPointOffset = TypedDict(
     "ModuleCalibrationPointOffset", {"x": float, "y": float}
 )
 
+ModuleCalibrationPointOffsetWithZ = TypedDict(
+    "ModuleCalibrationPointOffsetWithZ", {"x": float, "y": float, "z": float}
+)
+
 CornerOffsetFromSlot = TypedDict(
-    "CornerOffsetFromSlot", {"x": float, "y": float, "z": Optional[float]}
+    "CornerOffsetFromSlot", {"x": float, "y": float, "z": float}
 )
 
 # TODO(mc, 2022-03-18): potentially move from typed-dict to Pydantic
@@ -79,7 +83,7 @@ ModuleDefinitionV3 = TypedDict(
         "labwareOffset": ModuleLabwareOffset,
         "cornerOffsetFromSlot": CornerOffsetFromSlot,
         "dimensions": ModuleDimensions,
-        "calibrationPoint": ModuleCalibrationPointOffset,
+        "calibrationPoint": ModuleCalibrationPointOffsetWithZ,
         "displayName": str,
         "quirks": List[str],
         "slotTransforms": Dict[str, Dict[str, Dict[str, List[List[float]]]]],
@@ -88,7 +92,7 @@ ModuleDefinitionV3 = TypedDict(
     },
 )
 
-
+# V2 is not used anymore. This type is preserved for historical purposes
 ModuleDefinitionV2 = TypedDict(
     "ModuleDefinitionV2",
     {

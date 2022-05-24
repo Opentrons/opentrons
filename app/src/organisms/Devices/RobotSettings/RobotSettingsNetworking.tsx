@@ -34,7 +34,7 @@ interface NetworkingProps {
 // ToDo modify ConnectModal to align with new design
 // This is temporary until we can get the new design details
 const HELP_CENTER_URL =
-  'https://support.opentrons.com/en/articles/2687586-get-started-connect-to-your-ot-2-over-usb'
+  'https://support.opentrons.com/s/article/Get-started-Connect-to-your-OT-2-over-USB'
 const STATUS_REFRESH_MS = 5000
 const LIST_REFRESH_MS = 10000
 
@@ -85,7 +85,9 @@ export function RobotSettingsNetworking({
         </StyledText>
       </Flex>
       <Flex paddingLeft={SPACING.spacing7} marginBottom={SPACING.spacing3}>
-        <StyledText as="pSemiBold">{t('wireless_network_name')}</StyledText>
+        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {t('wireless_network_name')}
+        </StyledText>
       </Flex>
       <Box paddingLeft={SPACING.spacing7} marginBottom={SPACING.spacing4}>
         {wifi?.ipAddress != null ? (

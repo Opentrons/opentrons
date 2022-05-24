@@ -35,6 +35,7 @@ describe('useTitleText', () => {
     when(mockUseProtocolDetailsForRun).calledWith(mockRunId).mockReturnValue({
       protocolData: mockProtocolData,
       displayName: 'mock display name',
+      protocolKey: 'fakeProtocolKey',
     })
     when(mockGetLabwareLocation)
       .calledWith(mockLabwareId, mockProtocolData.commands)

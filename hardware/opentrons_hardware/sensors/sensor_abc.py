@@ -38,6 +38,16 @@ class AbstractBasicSensor(ABC):
         """Write a message to a given sensor."""
         ...
 
+    @abstractmethod
+    async def get_device_status(
+        self,
+        can_messenger: CanMessenger,
+        node_id: NodeId,
+        timeout: int = 1,
+    ) -> bool:
+        """Send a PeripheralStatusRequest and read the response message."""
+        ...
+
 
 class AbstractAdvancedSensor(AbstractBasicSensor):
     """Abstract base class for advanced sensors."""

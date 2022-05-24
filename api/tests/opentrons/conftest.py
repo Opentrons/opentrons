@@ -32,7 +32,7 @@ except (OSError, ModuleNotFoundError):
 
 from opentrons_shared_data.protocol.dev_types import JsonProtocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
+from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
 from opentrons import config
 from opentrons import hardware_control as hc
@@ -413,8 +413,8 @@ def get_json_protocol_fixture() -> Callable[[str, str, bool], Union[str, JsonPro
 
 
 @pytest.fixture()
-def get_module_fixture() -> Callable[[str], ModuleDefinitionV2]:
-    def _get_module_fixture(fixture_name: str) -> ModuleDefinitionV2:
+def get_module_fixture() -> Callable[[str], ModuleDefinitionV3]:
+    def _get_module_fixture(fixture_name: str) -> ModuleDefinitionV3:
         with open(
             pathlib.Path(__file__).parent
             / ".."
@@ -423,11 +423,11 @@ def get_module_fixture() -> Callable[[str], ModuleDefinitionV2]:
             / "shared-data"
             / "module"
             / "fixtures"
-            / "2"
+            / "3"
             / f"{fixture_name}.json",
             "rb",
         ) as f:
-            return cast(ModuleDefinitionV2, json.loads(f.read().decode("utf-8")))
+            return cast(ModuleDefinitionV3, json.loads(f.read().decode("utf-8")))
 
     return _get_module_fixture
 
@@ -707,16 +707,23 @@ def min_lw2(min_lw2_impl: LabwareImplementation) -> Labware:
 
 
 @pytest.fixture()
-def minimal_module_def() -> ModuleDefinitionV2:
+def minimal_module_def() -> ModuleDefinitionV3:
     return {
-        "$otSharedSchema": "module/schemas/2",
+        "$otSharedSchema": "module/schemas/3",
         "moduleType": "temperatureModuleType",
         "model": "temperatureModuleV1",
         "labwareOffset": {"x": -0.15, "y": -0.15, "z": 80.09},
-        "dimensions": {"bareOverallHeight": 84, "overLabwareHeight": 0},
-        "calibrationPoint": {"x": 12.0, "y": 8.75},
+        "dimensions": {
+            "bareOverallHeight": 84,
+            "overLabwareHeight": 0,
+            "xDimension": 123,
+            "yDimension": 321,
+        },
+        "calibrationPoint": {"x": 12.0, "y": 8.75, "z": 0.0},
         "displayName": "Sample Module",
         "quirks": [],
         "slotTransforms": {},
         "compatibleWith": ["temperatureModuleV2"],
+        "cornerOffsetFromSlot": {"x": 0.1, "y": 0.1, "z": 0.0},
+        "twoDimensionalRendering": {},
     }

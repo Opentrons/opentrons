@@ -8,7 +8,6 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  Overlay,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SIZE_5,
@@ -22,6 +21,7 @@ import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Portal } from '../../App/portal'
 import { LabwareDetails } from '../Labware/LabwareDetails'
+import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { LabwareDefAndDate } from '../Labware/hooks'
@@ -144,21 +144,16 @@ export const LabwareDetailOverflowMenu = (
 ): JSX.Element => {
   const { labware } = props
   const { t } = useTranslation('protocol_details')
-  const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
+  const {
+    MenuOverlay,
+    handleOverflowClick,
+    showOverflowMenu,
+    setShowOverflowMenu,
+  } = useMenuHandleClickOutside()
   const [
     showLabwareDetailSlideout,
     setShowLabwareDetailSlideout,
   ] = React.useState<boolean>(false)
-
-  const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    setShowOverflowMenu(!showOverflowMenu)
-  }
-
-  const handleClickOutside: React.MouseEventHandler<HTMLDivElement> = e => {
-    e.preventDefault()
-    setShowOverflowMenu(false)
-  }
 
   const handleClickMenuItem: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -193,12 +188,7 @@ export const LabwareDetailOverflowMenu = (
         </Flex>
       ) : null}
       <Portal level="top">
-        {showOverflowMenu ? (
-          <Overlay
-            onClick={handleClickOutside}
-            backgroundColor={COLORS.transparent}
-          />
-        ) : null}
+        <MenuOverlay />
         {showLabwareDetailSlideout ? (
           <LabwareDetails
             labware={labware}

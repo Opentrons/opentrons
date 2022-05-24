@@ -4,12 +4,12 @@ marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Upload simple, one comment protocol
+  - name: Upload a protocol
     request:
       url: '{host:s}:{port:d}/protocols'
       method: POST
       files:
-        files: 'tests/integration/protocols/simple.py'
+        files: 'tests/integration/protocols/load_one_labware.py'
     response:
       status_code: 201
       save:
@@ -24,17 +24,89 @@ stages:
         data:
           protocolId: '{protocol_id}'
     response:
-      strict:
-        - json:off
       status_code: 201
-      save:
-        json:
-          run_id: data.id
       json:
         data:
+          id: !anystr
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          status: idle
+          current: True
+          actions: []
+          errors: []
+          pipettes: []
+          labware:
+            - id: !anystr
+              loadName: !anystr
+              definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+              location: !anydict
+          labwareOffsets: []
           protocolId: '{protocol_id}'
+      save:
+        json:
+          original_run_data: data
+          run_id: data.id
 
-  - name: Run the protocol
+  - name: Get the specific run we just created, by its ID, and make sure it's the same
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        # Check that `data` is identical to the original POSTed run.
+        data: !force_format_include '{original_run_data}'
+
+  - name: Get all runs and make sure our new run is included
+    request:
+      url: '{host:s}:{port:d}/runs'
+      method: GET
+    response:
+      strict:
+        # The run_server fixture has session scope and is is reused across tests.
+        # So, other tests may create their own runs that will show up here.
+        # Ignore them.
+        - json:off
+      status_code: 200
+      json:
+        data:
+          # Check that at least one of the elements of `data` is
+          # the run data returned from the original POST.
+          - !force_format_include '{original_run_data}'
+        links:
+          current:
+            href: '/runs/{run_id}'
+
+  - name: Add a labware offset to the run
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/labware_offsets'
+      method: POST
+      json:
+        data:
+          definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
+          location:
+            slotName: "1"
+          vector:
+            x: 1.11
+            y: 2.22
+            z: 3.33
+    response:
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
+          location:
+            slotName: "1"
+          vector:
+            x: 1.11
+            y: 2.22
+            z: 3.33
+      save:
+        json:
+          labware_offset_id: data.id
+
+  - name: Play the run
     request:
       url: '{host:s}:{port:d}/runs/{run_id}/actions'
       method: POST
@@ -48,7 +120,13 @@ stages:
           id: !anystr
           actionType: play
           createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+      save:
+        json:
+          play_action_id: data.id
 
+  # While the protocol is ongoing, several fields (like labware)
+  # are nondeterministic depending on request timing.
+  # Wait for the protocol to complete so things settle.
   - name: Wait for the protocol to complete
     max_retries: 10
     delay_after: 0.1
@@ -56,17 +134,19 @@ stages:
       url: '{host:s}:{port:d}/runs/{run_id}'
       method: GET
     response:
+      status_code: 200
       strict:
         - json:off
       json:
         data:
           status: succeeded
 
-  - name: Verify commands were run
+  - name: Verify commands succeeded with the expected results
     request:
       url: '{host:s}:{port:d}/runs/{run_id}/commands'
       method: GET
     response:
+      status_code: 200
       json:
         links:
           current: !anydict
@@ -76,11 +156,108 @@ stages:
         data:
           - id: !anystr
             key: !anystr
-            commandType: custom
+            commandType: loadLabware
             status: succeeded
             params:
-              legacyCommandType: 'command.COMMENT'
-              legacyCommandText: 'A single comment.'
+              location:
+                slotName: '1'
+              loadName: 'biorad_96_wellplate_200ul_pcr'
+              namespace: 'opentrons'
+              version: 1
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
             startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
             completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+      save:
+        json:
+          load_labware_command_id: data[0].id
+
+  - name: Get full details of the load labware command and make sure the offset applied
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/commands/{load_labware_command_id}'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          id: '{load_labware_command_id}'
+          key: !anystr
+          commandType: loadLabware
+          status: succeeded
+          params:
+            location:
+              slotName: '1'
+            loadName: 'biorad_96_wellplate_200ul_pcr'
+            namespace: 'opentrons'
+            version: 1
+          result:
+            labwareId: !anystr
+            # Labware definitions are inconveniently verbose to test,
+            # so we just trust that this is correct.
+            definition: !anydict
+            offsetId: '{labware_offset_id}'
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+
+  - name: Mark the run as not-current and check its final data
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}'
+      method: PATCH
+      json:
+        data:
+          current: False
+    response:
+      status_code: 200
+      json:
+        data:
+          # Unchanged from when we originally POSTed the resource:
+          id: '{run_id}'
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          errors: []
+          pipettes: []
+          protocolId: '{protocol_id}'
+          # Changed in this PATCH:
+          current: False
+          # Changed when we POSTed a play action:
+          actions:
+            - id: '{play_action_id}'
+              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+              actionType: play
+          # Changed when we POSTed a labware offset:
+          labwareOffsets:
+            - id: '{labware_offset_id}'
+              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+              definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
+              location:
+                slotName: "1"
+              vector:
+                x: 1.11
+                y: 2.22
+                z: 3.33
+          # Changed during the run:
+          labware:
+            - id: !anystr
+              loadName: !anystr
+              definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+              location: !anydict
+            - id: !anystr
+              loadName: biorad_96_wellplate_200ul_pcr
+              definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
+              location:
+                slotName: '1'
+              offsetId: '{labware_offset_id}'
+          # Changed when the run completed:
+          status: succeeded
+      save:
+        json:
+          final_run_data: data
+
+  - name: Get the run by its ID one last time and make sure its data is the same
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        # Check that `data` is identical to the original POSTed run.
+        data: !force_format_include '{final_run_data}'

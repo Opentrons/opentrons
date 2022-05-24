@@ -40,6 +40,15 @@
   }
 }
 
+.form_group_label_pipette_settings_slideout {
+  @apply --font-form-default;
+
+  font-weight: var(--fw-semibold);
+  margin-bottom: 0.5rem;
+  text-transform: capitalize;
+  font-size: 13px;
+}
+
 .checkbox_icon {
   /* Icon for radiobutton and for checkbox */
   width: 1.25rem;
