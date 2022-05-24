@@ -173,9 +173,9 @@ def delete_robot_deck_attitude() -> None:
         gantry_path.unlink()
 
 
-def delete_gripper_offset_file(gripper: str) -> None:
+def delete_gripper_calibration_file(gripper: str) -> None:
     """
-    Delete gripper offset file based on gripper serial number
+    Delete gripper calibration offset file based on gripper serial number
 
     :param gripper: gripper serial number
     """
