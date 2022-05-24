@@ -811,34 +811,28 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
 
     # TODO: add command publisher
     # TODO: add new API version requirement
-    def set_temperature(self, celsius: float) -> None:
-        """Set and wait for target temperature.
-
-        API v2 compatible alias for `set_and_wait_for_temperature`
-        Sets the heater-shaker target temperature and delays protocol execution
-        until target temperature has reached.
-
-        :param celsius: The target temperature, in °C in range 37°C to 95°C.
-        """
-        self.set_and_wait_for_temperature(celsius=celsius)
-
     def set_target_temperature(self, celsius: float) -> None:
         """Set target temperature and return immediately.
 
         Sets the heater-shaker's target temperature and returns immediately without
         waiting for the target to be reached. Does not delay the protocol until
-        target temperature has reached.
+        target temperature has reached. Use `wait_for_target_temperature` to delay
+        protocol execution.
         """
         pass
 
-    def start_set_temperature(self, celsius: float) -> None:
-        """Set target temperature and return immediately.
+    # TODO: add command publisher
+    # TODO: add new API version requirement
+    def wait_for_target_temperature(self) -> None:
+        """Wait for target temperature.
 
-        API v2 compatible alias for `set_target_temperature`
+        Delays protocol execution until heater-shaker has reached its target
+        temperature. The module should have a target temperature set previously.
         """
-        self.set_target_temperature(celsius=celsius)
 
-    def set_shake_speed(self, rpm: int) -> None:
+    # TODO: add command publisher
+    # TODO: add new API version requirement
+    def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set and wait for target speed.
 
         Set the heater shaker's target speed and wait until the specified speed has
@@ -846,23 +840,29 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """
         pass
 
-    def set_and_wait_for_shake_speed(self, rpm: int) -> None:
-        """ """
-
-    def wait_for_target_temperature(self) -> None:
-        """ """
-
-    def await_target_temperature(self) -> None:
-        """ """
-
+    # TODO: add command publisher
+    # TODO: add new API version requirement
     def open_labware_latch(self) -> None:
-        """ """
+        """Open heater-shaker's labware latch.
 
+        Note that the labware latch needs to be closed before sending a shake command
+        and before pipetting to/from the H/S labware or labware on east and west of the
+        heater-shaker.
+
+        Raises an error when attempting to open latch while heater-shaker is shaking.
+        """
+
+    # TODO: add command publisher
+    # TODO: add new API version requirement
     def close_labware_latch(self) -> None:
-        """ """
+        """Close heater-shaker's labware latch """
 
+    # TODO: add command publisher
+    # TODO: add new API version requirement
     def deactivate_shaker(self) -> None:
-        """ """
+        """Stop shaking."""
 
+    # TODO: add command publisher
+    # TODO: add new API version requirement
     def deactivate_heater(self) -> None:
-        """ """
+        """Stop heating."""
