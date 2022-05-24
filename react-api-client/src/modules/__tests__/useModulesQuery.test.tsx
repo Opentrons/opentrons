@@ -2,15 +2,11 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
-import {
-  AttachedModules,
-  getModules,
-  mockModulesResponse,
-} from '@opentrons/api-client'
+import { getModules, mockModulesResponse } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useModulesQuery } from '..'
 
-import type { HostConfig, Response } from '@opentrons/api-client'
+import type { HostConfig, Response, Modules } from '@opentrons/api-client'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
@@ -19,7 +15,7 @@ const mockGetModules = getModules as jest.MockedFunction<typeof getModules>
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
-const MODULES_RESPONSE = { data: mockModulesResponse } as AttachedModules
+const MODULES_RESPONSE = { data: mockModulesResponse } as Modules
 
 describe('useModulesQuery hook', () => {
   let wrapper: React.FunctionComponent<{}>
@@ -58,7 +54,7 @@ describe('useModulesQuery hook', () => {
       .calledWith(HOST_CONFIG)
       .mockResolvedValue({
         data: MODULES_RESPONSE,
-      } as Response<AttachedModules>)
+      } as Response<Modules>)
 
     const { result, waitFor } = renderHook(useModulesQuery, { wrapper })
 

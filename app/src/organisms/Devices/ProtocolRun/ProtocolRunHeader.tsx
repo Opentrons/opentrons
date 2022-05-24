@@ -131,8 +131,8 @@ export function ProtocolRunHeader({
 
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
-  const _attachedPipettes =
-    usePipettesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
+  // NOTE: we are polling pipettes, though not using their value directly here
+  usePipettesQuery({ refetchInterval: EQUIPMENT_POLL_MS })
 
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
 

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { LEFT, RIGHT } from '@opentrons/shared-data'
+import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 import { useModulesQuery, usePipettesQuery } from '@opentrons/react-api-client'
 import {
   Flex,
@@ -35,8 +35,9 @@ export function PipettesAndModules({
 
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
-  const attachedPipettes =
-    usePipettesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
+  const attachedPipettes = usePipettesQuery({
+    refetchInterval: EQUIPMENT_POLL_MS,
+  })?.data ?? { left: undefined, right: undefined }
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
 
@@ -79,13 +80,22 @@ export function PipettesAndModules({
             <Flex flexDirection={DIRECTION_ROW}>
               <PipetteCard
                 pipetteId={attachedPipettes.left?.id}
-                pipetteInfo={attachedPipettes.left?.modelSpecs ?? null}
+                pipetteInfo={
+                  attachedPipettes.left?.model != null
+                    ? getPipetteModelSpecs(attachedPipettes.left?.model) ?? null
+                    : null
+                }
                 mount={LEFT}
                 robotName={robotName}
               />
               <PipetteCard
                 pipetteId={attachedPipettes.right?.id}
-                pipetteInfo={attachedPipettes.right?.modelSpecs ?? null}
+                pipetteInfo={
+                  attachedPipettes.right?.model != null
+                    ? getPipetteModelSpecs(attachedPipettes.right?.model) ??
+                      null
+                    : null
+                }
                 mount={RIGHT}
                 robotName={robotName}
               />

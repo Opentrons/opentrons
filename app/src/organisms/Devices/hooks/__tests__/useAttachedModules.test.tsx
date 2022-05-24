@@ -1,9 +1,11 @@
 import { resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
-import { mockModulesResponse, AttachedModules } from '@opentrons/api-client'
+import { mockModulesResponse } from '@opentrons/api-client'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import { useAttachedModules } from '..'
+
+import type { Modules } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 
@@ -21,7 +23,7 @@ describe('useAttachedModules hook', () => {
   it('returns attached modules', () => {
     mockUseModulesQuery.mockReturnValue({
       data: { data: mockModulesResponse },
-    } as UseQueryResult<AttachedModules, unknown>)
+    } as UseQueryResult<Modules, unknown>)
 
     const { result } = renderHook(() => useAttachedModules(), { wrapper })
 

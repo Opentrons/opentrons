@@ -65,8 +65,8 @@ describe('PipettesAndModules', () => {
           left: null,
           right: null,
         },
-      } as any,
-    })
+      },
+    } as any)
     mockPipetteCard.mockReturnValue(<div>Mock PipetteCard</div>)
     mockModuleCard.mockReturnValue(<div>Mock ModuleCard</div>)
     const [{ getByText }] = render()
@@ -84,8 +84,8 @@ describe('PipettesAndModules', () => {
           left: null,
           right: null,
         },
-      } as any,
-    })
+      },
+    } as any)
     mockPipetteCard.mockReturnValue(<div>Mock PipetteCard</div>)
     mockModuleCard.mockReturnValue(<div>Mock ModuleCard</div>)
     const [{ getAllByText }] = render()

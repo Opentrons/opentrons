@@ -214,8 +214,8 @@ describe('ProtocolRunHeader', () => {
           left: null,
           right: null,
         },
-      } as any,
-    })
+      },
+    } as any)
     mockGetIsHeaterShakerAttached.mockReturnValue(false)
     mockConfirmAttachmentModal.mockReturnValue(
       <div>mock confirm attachment modal</div>

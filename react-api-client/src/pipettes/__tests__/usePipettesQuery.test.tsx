@@ -2,11 +2,11 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
-import { FetchPipettesResponseBody, getPipettes } from '@opentrons/api-client'
+import { getPipettes } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { usePipettesQuery } from '..'
 
-import type { HostConfig, Response } from '@opentrons/api-client'
+import type { HostConfig, Pipettes, Response } from '@opentrons/api-client'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
@@ -15,7 +15,7 @@ const mockGetPipettes = getPipettes as jest.MockedFunction<typeof getPipettes>
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
-const PIPETTES_RESPONSE = {
+const PIPETTES_RESPONSE: Response<Pipettes> = {
   left: {
     model: 'p10_single_v1',
     name: 'p10_single',
@@ -32,7 +32,7 @@ const PIPETTES_RESPONSE = {
     plunger_axis: 'c',
     id: '321',
   },
-} as FetchPipettesResponseBody
+} as any
 
 describe('usePipettesQuery hook', () => {
   let wrapper: React.FunctionComponent<{}>
@@ -69,9 +69,7 @@ describe('usePipettesQuery hook', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetPipettes)
       .calledWith(HOST_CONFIG)
-      .mockResolvedValue({
-        data: PIPETTES_RESPONSE,
-      } as Response<FetchPipettesResponseBody>)
+      .mockResolvedValue(PIPETTES_RESPONSE)
 
     const { result, waitFor } = renderHook(usePipettesQuery, {
       wrapper,
