@@ -233,8 +233,8 @@ class ProtocolEngine:
             self._hardware_event_forwarder.stop_soon()
 
             await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
-
-            self._action_dispatcher.dispatch(HardwareStoppedAction())
+            completed_at = self._model_utils.get_timestamp()
+            self._action_dispatcher.dispatch(HardwareStoppedAction(completed_at=completed_at))
             await self._plugin_starter.stop()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:

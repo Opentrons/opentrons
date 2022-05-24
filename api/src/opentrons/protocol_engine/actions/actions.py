@@ -72,6 +72,7 @@ class FinishAction:
 @dataclass(frozen=True)
 class HardwareStoppedAction:
     """An action dispatched after hardware has successfully been stopped."""
+    completed_at: datetime
 
 
 @dataclass(frozen=True)

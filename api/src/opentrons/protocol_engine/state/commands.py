@@ -10,7 +10,6 @@ from opentrons.ordered_set import OrderedSet
 
 from opentrons.hardware_control.types import DoorStateNotification, DoorState
 
-from ..resources import ModelUtils
 from ..actions import (
     Action,
     QueueCommandAction,
@@ -138,8 +137,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
     """Command state container."""
 
     _state: CommandState
-    # TODO (tz, 5-17-22): should this be injected from the protocol_engine?
-    _module_utils = ModelUtils()
 
     def __init__(self, is_door_blocking: bool = False) -> None:
         """Initialize a CommandStore and its state."""
@@ -302,7 +299,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         elif isinstance(action, HardwareStoppedAction):
             self._state.queue_status = QueueStatus.INACTIVE
             self._state.run_result = self._state.run_result or RunResult.STOPPED
-            self._state.run_completed_at = self._module_utils.get_timestamp()
+            self._state.run_completed_at = action.completed_at
 
         elif isinstance(action, HardwareEventAction):
             if isinstance(action.event, DoorStateNotification):
