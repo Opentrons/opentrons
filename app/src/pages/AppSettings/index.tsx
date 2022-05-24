@@ -14,10 +14,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import * as Config from '../../redux/config'
-import { GeneralSettings } from './GeneralSettings'
-import { PrivacySettings } from './PrivacySettings'
-import { AdvancedSettings } from './AdvancedSettings'
-import { FeatureFlags } from './FeatureFlags'
+import { GeneralSettings } from '../../organisms/AppSettings/GeneralSettings'
+import { PrivacySettings } from '../../organisms/AppSettings/PrivacySettings'
+import { AdvancedSettings } from '../../organisms/AppSettings/AdvancedSettings'
+import { FeatureFlags } from '../../organisms/AppSettings/FeatureFlags'
 
 import { NavTab } from '../../atoms/NavTab'
 import { Line } from '../../atoms/structure'

@@ -4,10 +4,10 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import * as Config from '../../../redux/config'
-import { GeneralSettings } from '../GeneralSettings'
-import { PrivacySettings } from '../PrivacySettings'
-import { AdvancedSettings } from '../AdvancedSettings'
-import { FeatureFlags } from '../FeatureFlags'
+import { GeneralSettings } from '../../../organisms/AppSettings/GeneralSettings'
+import { PrivacySettings } from '../../../organisms/AppSettings/PrivacySettings'
+import { AdvancedSettings } from '../../../organisms/AppSettings/AdvancedSettings'
+import { FeatureFlags } from '../../../organisms/AppSettings/FeatureFlags'
 import { AppSettings } from '..'
 
 jest.mock('../../../redux/config')
@@ -32,7 +32,7 @@ const mockFeatureFlags = FeatureFlags as jest.MockedFunction<
   typeof FeatureFlags
 >
 
-const render = (path = '/') => {
+const render = (path = '/'): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
       <Route path="/app-settings/:appSettingsTab">
