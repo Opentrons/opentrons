@@ -133,7 +133,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
             </Flex>
           ) : (
             <React.Fragment css={{ 'overflow-wrap': 'break-word' }}>
-              title
+              {title}
             </React.Fragment>
           )}
           <Divider marginY={0} color={COLORS.medGrey} />
