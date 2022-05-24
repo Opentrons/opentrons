@@ -162,6 +162,14 @@ export const NewSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
     box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.23);
   }
 
+  &:pressed,
+  &:pressed {
+    border-width: '2px';
+    background-color: ${Styles.C_WHITE};
+    color: ${Styles.C_BLUE};
+    box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.23);
+  }
+
   &:active {
     border-width: '2px';
     background-color: ${Styles.C_WHITE};

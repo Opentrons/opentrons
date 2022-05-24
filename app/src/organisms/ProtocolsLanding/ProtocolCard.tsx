@@ -22,6 +22,7 @@ import {
   SIZE_3,
   ModuleIcon,
   POSITION_ABSOLUTE,
+  TEXT_ALIGN_RIGHT,
 } from '@opentrons/components'
 import { useHistory } from 'react-router-dom'
 import {
@@ -247,10 +248,14 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             marginRight={SPACING.spacing4}
             data-testid={`ProtocolCard_date_${protocolDisplayName}`}
           >
-            <StyledText as="h6" marginBottom={SPACING.spacing3}>
+            <StyledText as="h6" marginBottom={SPACING.spacing3}
+              color={COLORS.darkGreyEnabled}
+              textAlign={TEXT_ALIGN_RIGHT}>
               {t('updated')}
-            </StyledText>
-            <StyledText as="p">
+             </StyledText>
+            <StyledText as="p"
+              color={COLORS.darkGreyEnabled}
+              textAlign={TEXT_ALIGN_RIGHT}>
               {format(new Date(modified), 'MM/dd/yy HH:mm:ss')}
             </StyledText>
           </Flex>
