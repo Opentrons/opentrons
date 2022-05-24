@@ -66,7 +66,7 @@ const NavbarIcon = styled(Icon)`
   height: ${SIZE_2};
   padding: 0.375rem;
   border-radius: 50%;
-  color: #d0d3d5;
+  color: ${COLORS.medGrey};
   background-color: ${COLORS.transparent};
 
   &:hover,
