@@ -34,7 +34,7 @@ from robot_server.service.legacy.models.settings import (
     Links,
     AdvancedSetting,
 )
-from robot_server.persistence import get_persistence_directory, PersistenceResetter, get_persistence_resetter
+from robot_server.persistence import PersistenceResetter, get_persistence_resetter
 
 log = logging.getLogger(__name__)
 
