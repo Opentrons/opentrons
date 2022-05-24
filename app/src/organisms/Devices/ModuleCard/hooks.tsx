@@ -311,7 +311,8 @@ export function useModuleOverflowMenu(
         disabledReason:
           module.moduleType === HEATERSHAKER_MODULE_TYPE &&
           (module.data.labwareLatchStatus === 'idle_open' ||
-            module.data.labwareLatchStatus === 'opening'),
+            module.data.labwareLatchStatus === 'opening' ||
+            module.data.labwareLatchStatus === 'idle_unknown'),
         menuButtons: [
           labwareLatchBtn,
           aboutModuleBtn,
