@@ -119,6 +119,16 @@ describe('ProtocolRunSetup', () => {
     expect(container.firstChild).toBeNull()
   })
 
+  it('renders loading data message if robot-analyzed protocol data is null', () => {
+    when(mockUseProtocolDetailsForRun).calledWith(RUN_ID).mockReturnValue({
+      protocolData: null,
+      displayName: null,
+      protocolKey: null,
+    })
+    const { getByText } = render()
+    getByText('Loading data...')
+  })
+
   it('renders calibration ready when robot calibration complete', () => {
     const { getByText } = render()
     getByText('Calibration ready')
