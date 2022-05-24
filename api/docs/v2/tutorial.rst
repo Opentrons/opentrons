@@ -137,15 +137,15 @@ Finally, all of your labware and hardware is in place, so it’s time to give th
 2. Measure out equal amounts of solution from the reservoir into wells in the first column of the plate.
 3. Move a portion of the combined liquid from column 1 to 2, then from column 2 to 3, and so on all the way to column 12.
 
-Thanks to the flexibility of the :py:meth:`.distribute` and :py:meth:`.transfer` methods of the API, each of these phases can be accomplished with a single line of code! You’ll just have to write a few more lines of code to repeat the process for as many rows as you want to fill.
+Thanks to the flexibility of the API's :py:meth:`.transfer` method, which combines many :ref:`building block commands <v2-atomic-commands>` into a single call, each of these phases can be accomplished with a single line of code! You’ll just have to write a few more lines of code to repeat the process for as many rows as you want to fill.
 
-Let’s start with the diluent. Since this phase takes a larger quantity of liquid and spreads it equally to many wells, the ``distribute()`` method is perfect:
+Let’s start with the diluent. This phase takes a larger quantity of liquid and spreads it equally to many wells. ``transfer()`` can handle this all at once, because it accepts either a single well or a list of wells for its source and destination:
 
 .. code-block:: python
 
-        p300.distribute(100, reservoir['A1'], plate.wells())
+        p300.transfer(100, reservoir['A1'], plate.wells())
 
-Breaking down this single line of code shows the power of :ref:`complex transfer commands <v2-complex-commands>`. The first argument is the amount to transfer to each destination, 100 µL. The second argument is the source, column 1 of the reservoir (which is still specified with grid-style coordinates as ``A1`` — a reservoir only has an A row). The third argument is the destination. Here, calling the :py:meth:`.wells` method of ``plate`` returns a list of *every well*, and the command will apply to all of them. In plain English, we’re instructing the robot, “For every well on our plate, aspirate 100 µL of fluid from column 1 of the reservoir and dispense it in the well.” That’s how we understand this line of code as scientists, yet the robot will understand and execute it as nearly 200 discrete actions.
+Breaking down this single line of code shows the power of :ref:`complex commands <v2-complex-commands>`. The first argument is the amount to transfer to each destination, 100 µL. The second argument is the source, column 1 of the reservoir (which is still specified with grid-style coordinates as ``A1`` — a reservoir only has an A row). The third argument is the destination. Here, calling the :py:meth:`.wells` method of ``plate`` returns a list of *every well*, and the command will apply to all of them. In plain English, we’re instructing the robot, “For every well on our plate, aspirate 100 µL of fluid from column 1 of the reservoir and dispense it in the well.” That’s how we understand this line of code as scientists, yet the robot will understand and execute it as nearly 200 discrete actions.
 
 Now it’s time to start mixing in the solution. To do this row by row, nest the commands in a ``for`` loop. Using Python's built-in :py:class:`range` class is an easy way to repeat this block 8 times, once for each row. This also lets you use the repeat index ``i`` with ``plate.rows()`` to keep track of the current row:
 
