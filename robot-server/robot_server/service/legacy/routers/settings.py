@@ -203,6 +203,8 @@ async def post_settings_reset_options(
     if factory_reset_commands.get(reset_util.ResetOptionId.runs_history, False):
         await persistence_resetter.mark_directory_reset()
 
+    # TODO (tz, 5-24-22): The order of a set is undefined because set's aren't ordered.
+    # The message returned to the client will be printed in the wrong order.
     message = (
         "Options '{}' were reset".format(", ".join(o.name for o in options))
         if options
