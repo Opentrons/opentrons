@@ -179,5 +179,5 @@ def default_pipette_offset() -> List[float]:
         return defaults_ot2.DEFAULT_PIPETTE_OFFSET
 
 
-def default_gripper_offset() -> List[float]:
-    return gripper_config.GRIPPER_OFFSET_DEFAULT
+def default_gripper_calibration_offset() -> List[float]:
+    return gripper_config.DEFAULT_GRIPPER_CALIBRATION_OFFSET

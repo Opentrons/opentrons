@@ -357,9 +357,9 @@ def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinitio
         )
 
 
-def get_gripper_offset(
+def get_gripper_calibration_offset(
     gripper_id: str,
-) -> typing.Optional[local_types.GripperOffsetCalibration]:
+) -> typing.Optional[local_types.GripperCalibrationOffset]:
     gripper_dir = config.get_opentrons_path("gripper_calibration_dir")
     offset_path = gripper_dir / f"{gripper_id}.json"
     if offset_path.exists():
@@ -371,7 +371,7 @@ def get_gripper_offset(
             )
             return None
         assert "offset" in data.keys(), "Not valid gripper calibration data"
-        return local_types.GripperOffsetCalibration(
+        return local_types.GripperCalibrationOffset(
             offset=data["offset"],
             source=_get_calibration_source(data),
             last_modified=data["last_modified"],

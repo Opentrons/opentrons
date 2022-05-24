@@ -1,8 +1,8 @@
 from opentrons.types import Point
-from opentrons.hardware_control.robot_calibration import load_gripper_offset
+from opentrons.hardware_control.robot_calibration import load_gripper_calibration_offset
 from opentrons.hardware_control import gripper
 from opentrons.config import gripper_config
-from opentrons.calibration_storage.delete import clear_gripper_offset_calibrations
+from opentrons.calibration_storage.delete import clear_gripper_calibration_offsets
 
 
 fake_gripper_conf = gripper_config.GripperConfig(
@@ -17,7 +17,7 @@ fake_gripper_conf = gripper_config.GripperConfig(
     idle_current=0.0,
 )
 
-FAKE_OFFSET = load_gripper_offset("fakeid123")
+FAKE_OFFSET = load_gripper_calibration_offset("fakeid123")
 
 
 def test_config_update():
@@ -40,10 +40,13 @@ def test_critical_point():
     assert gripr.critical_point() == Point(0, 0, 0)
 
 
-def test_load_gripper_offset():
-    clear_gripper_offset_calibrations()
+def test_load_gripper_cal_offset():
+    clear_gripper_calibration_offsets()
     gripr = gripper.Gripper(
-        fake_gripper_conf, load_gripper_offset("fakeid123"), "fakeid123"
+        fake_gripper_conf, load_gripper_calibration_offset("fakeid123"), "fakeid123"
     )
     # if offset data do not exist, loaded values should match DEFAULT
-    assert gripr._gripper_offset.offset == gripper_config.GRIPPER_OFFSET_DEFAULT
+    assert (
+        gripr._calibration_offset.offset
+        == gripper_config.DEFAULT_GRIPPER_CALIBRATION_OFFSET
+    )

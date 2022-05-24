@@ -7,7 +7,7 @@ import logging
 from typing import Any, Dict, Optional, Union
 
 from opentrons.types import Point
-from opentrons.calibration_storage.types import GripperOffsetCalibration
+from opentrons.calibration_storage.types import GripperCalibrationOffset
 from opentrons.config import gripper_config
 from .instrument_abc import AbstractInstrument
 from .types import CriticalPoint
@@ -31,18 +31,20 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
     def __init__(
         self,
         config: gripper_config.GripperConfig,
-        gripper_offset_cal: GripperOffsetCalibration,
+        gripper_cal_offset: GripperCalibrationOffset,
         gripper_id: Optional[str] = None,
     ) -> None:
         self._config = config
         self._name = self._config.name
         self._model = self._config.model
-        self._gripper_offset = gripper_offset_cal
+        self._calibration_offset = gripper_cal_offset
         self._gripper_id = gripper_id
         self._log = mod_log.getChild(
             self._gripper_id if self._gripper_id else "<unknown>"
         )
-        self._log.info(f"loaded: {self._model}, gripper offset: {self._gripper_offset}")
+        self._log.info(
+            f"loaded: {self._model}, gripper offset: {self._calibration_offset}"
+        )
         # cache a dict representation of config for improved performance of
         # as_dict.
         self._config_as_dict = asdict(config)
@@ -69,10 +71,10 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
     def gripper_id(self) -> Optional[str]:
         return self._gripper_id
 
-    def update_gripper_offset(self, offset_cal: GripperOffsetCalibration) -> None:
-        """Update gripper offset."""
-        self._log.info(f"update gripper offset to: {offset_cal}")
-        self._gripper_offset = offset_cal
+    def update_calibration_offset(self, cal_offset: GripperCalibrationOffset) -> None:
+        """Update gripper calibration offset."""
+        self._log.info(f"update gripper offset to: {cal_offset}")
+        self._calibration_offset = cal_offset
 
     def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         """

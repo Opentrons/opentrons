@@ -186,9 +186,9 @@ def delete_gripper_offset_file(gripper: str) -> None:
         offset_path.unlink()
 
 
-def clear_gripper_offset_calibrations() -> None:
+def clear_gripper_calibration_offsets() -> None:
     """
-    Delete all gripper offset calibration files.
+    Delete all gripper calibration data files.
     """
 
     offset_dir = config.get_opentrons_path("gripper_calibration_dir")
