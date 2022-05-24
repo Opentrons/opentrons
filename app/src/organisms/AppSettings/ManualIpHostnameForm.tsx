@@ -42,7 +42,9 @@ const StyledInput = styled.input`
   border: 1px solid ${COLORS.medGrey};
 `
 
-export function ManualIpHostnameForm({setMostRecentAddition}:ManualIpHostnameFormProps): JSX.Element {
+export function ManualIpHostnameForm({
+  setMostRecentAddition,
+}: ManualIpHostnameFormProps): JSX.Element {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const addManualIpAndHostname = (ip: string): void => {
