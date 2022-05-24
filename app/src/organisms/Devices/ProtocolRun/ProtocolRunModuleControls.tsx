@@ -5,8 +5,14 @@ import {
   SPACING,
   WRAP,
 } from '@opentrons/components'
+import { useCreateCommandMutation } from '@opentrons/react-api-client'
+import { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import * as React from 'react'
-import { useModuleRenderInfoForProtocolById } from '../hooks'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import {
+  useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
+} from '../hooks'
 import { ModuleCard } from '../ModuleCard'
 
 interface ProtocolRunModuleControlsProps {
@@ -25,6 +31,51 @@ export const ProtocolRunModuleControls = ({
   const attachedModules = Object.values(moduleRenderInfoForProtocolById).filter(
     module => module.attachedModuleMatch != null
   )
+
+  const { protocolData } = useProtocolDetailsForRun(runId)
+  const { createCommand } = useCreateCommandMutation()
+
+  const loadCommands: LoadModuleRunTimeCommand[] = protocolData?.commands.filter(
+    command => command.commandType === 'loadModule'
+  )
+
+  const setupLoadCommands = loadCommands.map(command => {
+    const commandWithModuleId = {
+      ...command,
+      params: {
+        ...command.params,
+        moduleId: command.result?.moduleId,
+      },
+    }
+    return commandWithModuleId
+  })
+
+  setupLoadCommands.forEach(loadCommand => {
+    createCommand({
+      runId: runId,
+      command: loadCommand,
+    }).catch((e: Error) => {
+      console.error(`error issuing command to robot: ${e.message}`)
+    })
+  })
+
+  // const sendLoadCommand = (): void => {
+  //   createCommand({ runId: runId, command: setShakeCommand }).catch(
+  //     (e: Error) => {
+  //       console.error(
+  //         `error setting heater shaker shake speed: ${e.message} with run id ${runId}`
+  //       )
+  //     }
+  //   )
+  // }
+
+  // createCommand({
+  //   runId: currentRunId,
+  //   command: createCommandData(prepCommand),
+  // }).catch((e: Error) => {
+  //   console.error(`error issuing command to robot: ${e.message}`)
+  //   setError(e)
+  // })
 
   return (
     <Flex
