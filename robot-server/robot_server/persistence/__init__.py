@@ -103,7 +103,7 @@ class PersistenceResetter:
 def get_persistence_resetter(
     persistence_directory: Path = Depends(get_persistence_directory),
 ) -> PersistenceResetter:
-    """Get an `PersistenceResetter` to reset robot-server layer."""
+    """Get a `PersistenceResetter` to reset the robot-server's stored data."""
     return PersistenceResetter(persistence_directory)
 
 
