@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
+
 import {
   Flex,
   Box,
@@ -10,13 +11,14 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
 } from '@opentrons/components'
-import type { Dispatch, State } from '../../redux/types'
+
 import {
   toggleAnalyticsOptedIn,
   getAnalyticsOptedIn,
 } from '../../redux/analytics'
-
 import { ToggleButton } from '../../atoms/buttons'
+
+import type { Dispatch, State } from '../../redux/types'
 
 export function PrivacySettings(): JSX.Element {
   const { t } = useTranslation('app_settings')

@@ -18,6 +18,7 @@ import {
   COLORS,
   ALIGN_START,
 } from '@opentrons/components'
+
 import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
@@ -35,9 +36,9 @@ import {
   alertUnignored,
 } from '../../redux/alerts'
 import { useTrackEvent } from '../../redux/analytics'
-import { UpdateAppModal } from '../UpdateAppModal'
-import { PreviousVersionModal } from './PreviousVersionModal'
-import { ConnectRobotSlideout } from './ConnectRobotSlideout'
+import { UpdateAppModal } from '../../organisms/UpdateAppModal'
+import { PreviousVersionModal } from '../../organisms/AppSettings/PreviousVersionModal'
+import { ConnectRobotSlideout } from '../../organisms/AppSettings/ConnectRobotSlideout'
 
 import type { Dispatch, State } from '../../redux/types'
 

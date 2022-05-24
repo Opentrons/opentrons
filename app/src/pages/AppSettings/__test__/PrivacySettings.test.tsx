@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
@@ -8,7 +9,7 @@ import { PrivacySettings } from '../PrivacySettings'
 jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/config')
 
-const render = () => {
+const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(
     <MemoryRouter>
       <PrivacySettings />

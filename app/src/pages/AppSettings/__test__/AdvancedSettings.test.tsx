@@ -2,7 +2,9 @@ import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
+
 import { renderWithProviders } from '@opentrons/components'
+
 import { i18n } from '../../../i18n'
 import * as CustomLabware from '../../../redux/custom-labware'
 import * as Config from '../../../redux/config'
@@ -17,7 +19,7 @@ jest.mock('../../../redux/custom-labware')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/system-info')
 
-const render = () => {
+const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(
     <MemoryRouter>
       <AdvancedSettings />

@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import '@testing-library/jest-dom'
+
 import { renderWithProviders } from '@opentrons/components'
+
 import { i18n } from '../../../i18n'
 import * as Shell from '../../../redux/shell'
 import { GeneralSettings } from '../GeneralSettings'
@@ -10,7 +12,7 @@ jest.mock('../../../redux/config')
 jest.mock('../../../redux/shell')
 jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/alerts')
-jest.mock('../../UpdateAppModal', () => ({
+jest.mock('../../../organisms/UpdateAppModal', () => ({
   UpdateAppModal: () => null,
 }))
 
@@ -18,7 +20,7 @@ const getAvailableShellUpdate = Shell.getAvailableShellUpdate as jest.MockedFunc
   typeof Shell.getAvailableShellUpdate
 >
 
-const render = () => {
+const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(
     <MemoryRouter>
       <GeneralSettings />

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   DIRECTION_ROW,
@@ -8,14 +9,17 @@ import {
   TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
+
 import { TertiaryButton } from '../../atoms/buttons'
 
-export interface IpHostnameFieldProps {
+export interface ManualIpHostnameFieldProps {
   field: any
   inputRef: { current: null | HTMLInputElement }
 }
 
-export function IpHostnameField(props: IpHostnameFieldProps): JSX.Element {
+export function ManualIpHostnameField(
+  props: ManualIpHostnameFieldProps
+): JSX.Element {
   const { t } = useTranslation('app_settings')
   const { field, inputRef } = props
 

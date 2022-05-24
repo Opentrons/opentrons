@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import path from 'path'
 import { useSelector, useDispatch } from 'react-redux'
 import { css } from 'styled-components'
+
 import {
   Flex,
   Box,
@@ -19,6 +20,7 @@ import {
   DIRECTION_COLUMN,
   TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
+
 import * as Config from '../../redux/config'
 import * as Calibration from '../../redux/calibration'
 import * as CustomLabware from '../../redux/custom-labware'

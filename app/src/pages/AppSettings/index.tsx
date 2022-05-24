@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Redirect, useParams } from 'react-router-dom'
+
 import {
   Text,
   Box,
@@ -13,14 +14,15 @@ import {
   BORDERS,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import * as Config from '../../redux/config'
-import { GeneralSettings } from '../../organisms/AppSettings/GeneralSettings'
-import { PrivacySettings } from '../../organisms/AppSettings/PrivacySettings'
-import { AdvancedSettings } from '../../organisms/AppSettings/AdvancedSettings'
-import { FeatureFlags } from '../../organisms/AppSettings/FeatureFlags'
 
+import * as Config from '../../redux/config'
+import { GeneralSettings } from './GeneralSettings'
+import { PrivacySettings } from './PrivacySettings'
+import { AdvancedSettings } from './AdvancedSettings'
+import { FeatureFlags } from '../../organisms/AppSettings/FeatureFlags'
 import { NavTab } from '../../atoms/NavTab'
 import { Line } from '../../atoms/structure'
+
 import type { NavRouteParams, AppSettingsTab } from '../../App/types'
 
 export function AppSettings(): JSX.Element {

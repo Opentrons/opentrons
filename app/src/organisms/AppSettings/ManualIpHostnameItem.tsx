@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+
 import {
   Btn,
   Icon,
@@ -12,6 +13,7 @@ import {
   JUSTIFY_CENTER,
   SPACING,
 } from '@opentrons/components'
+
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 
@@ -23,7 +25,7 @@ const IpItem = styled.div`
   outline: 0;
   line-height: 2rem;
 `
-export interface IpHostnameItemProps {
+export interface ManualIpHostnameItemProps {
   candidate: string
   discovered: boolean
   removeIp: (ip: string) => unknown
@@ -31,15 +33,21 @@ export interface IpHostnameItemProps {
   isLast: boolean
 }
 
-export function IpHostnameItem(props: IpHostnameItemProps): JSX.Element {
+export function ManualIpHostnameItem({
+  candidate,
+  discovered,
+  removeIp,
+  justAdded,
+  isLast,
+}: ManualIpHostnameItemProps): JSX.Element {
   const remove = (): void => {
-    props.removeIp(props.candidate)
+    removeIp(candidate)
   }
   const { t } = useTranslation('app_settings')
   const getDiscoveryText = (): string | null => {
-    if (props.discovered) {
+    if (discovered) {
       return t('ip_available')
-    } else if (props.justAdded) {
+    } else if (justAdded) {
       return null
     } else {
       return t('ip_not_found')
@@ -53,9 +61,9 @@ export function IpHostnameItem(props: IpHostnameItemProps): JSX.Element {
           <StyledText
             as="p"
             data-testid={`ip-hostname`}
-            color={props.discovered ? COLORS.darkBlack : COLORS.successDisabled}
+            color={discovered ? COLORS.darkBlack : COLORS.successDisabled}
           >
-            {props.candidate}
+            {candidate}
           </StyledText>
         </IpItem>
         <Text
@@ -81,7 +89,7 @@ export function IpHostnameItem(props: IpHostnameItemProps): JSX.Element {
           <Icon name="close" />
         </Btn>
       </Flex>
-      {!props.isLast && <Divider width="100%" />}
+      {!isLast && <Divider width="100%" />}
     </>
   )
 }

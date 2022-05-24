@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
+
 import { renderWithProviders } from '@opentrons/components'
+
 import { i18n } from '../../../i18n'
 import * as Config from '../../../redux/config'
-import { GeneralSettings } from '../../../organisms/AppSettings/GeneralSettings'
-import { PrivacySettings } from '../../../organisms/AppSettings/PrivacySettings'
-import { AdvancedSettings } from '../../../organisms/AppSettings/AdvancedSettings'
+import { GeneralSettings } from '../GeneralSettings'
+import { PrivacySettings } from '../PrivacySettings'
+import { AdvancedSettings } from '../AdvancedSettings'
 import { FeatureFlags } from '../../../organisms/AppSettings/FeatureFlags'
 import { AppSettings } from '..'
 
@@ -14,7 +16,7 @@ jest.mock('../../../redux/config')
 jest.mock('../GeneralSettings')
 jest.mock('../PrivacySettings')
 jest.mock('../AdvancedSettings')
-jest.mock('../FeatureFlags')
+jest.mock('../../../organisms/AppSettings/FeatureFlags')
 
 const getDevtoolsEnabled = Config.getDevtoolsEnabled as jest.MockedFunction<
   typeof Config.getDevtoolsEnabled

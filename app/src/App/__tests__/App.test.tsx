@@ -11,7 +11,7 @@ import { DevicesLanding } from '../../pages/Devices/DevicesLanding'
 import { ProtocolsLanding } from '../../pages/Protocols/ProtocolsLanding'
 import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
-import { GeneralSettings } from '../../organisms/AppSettings/GeneralSettings'
+import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
 import { Alerts } from '../../organisms/Alerts'
 import { App } from '../'
 
@@ -24,7 +24,7 @@ jest.mock('../../pages/Devices/ProtocolRunDetails')
 jest.mock('../../pages/Devices/RobotSettings')
 jest.mock('../../organisms/Alerts')
 jest.mock('../../pages/Labware/helpers/getAllDefs')
-jest.mock('../../organisms/AppSettings/GeneralSettings')
+jest.mock('../../pages/AppSettings/GeneralSettings')
 jest.mock('../../redux/config')
 jest.mock('../hooks')
 
