@@ -3,17 +3,12 @@ import * as React from 'react'
 import { mountWithStore } from '@opentrons/components'
 import * as AppAlerts from '../../../redux/alerts'
 import { Alerts } from '..'
-import { LostConnectionAlert } from '../LostConnectionAlert'
 import { AnalyticsSettingsModal } from '../../AnalyticsSettingsModal'
 import { U2EDriverOutdatedAlert } from '../U2EDriverOutdatedAlert'
 import { UpdateAppModal } from '../../UpdateAppModal'
 
 import type { State } from '../../../redux/types'
 import type { AlertId } from '../../../redux/alerts/types'
-
-jest.mock('../LostConnectionAlert', () => ({
-  LostConnectionAlert: () => <></>,
-}))
 
 jest.mock('../../AnalyticsSettingsModal', () => ({
   AnalyticsSettingsModal: () => <></>,
@@ -55,13 +50,6 @@ describe('app-wide Alerts component', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
-  })
-
-  // TODO(mc, 2020-05-07): LostConnectionAlert currently controls its own
-  // render; move its logic into `state.alerts`
-  it('should render LostConnectionAlert', () => {
-    const { wrapper } = render()
-    expect(wrapper.exists(LostConnectionAlert)).toBe(true)
   })
 
   // TODO(mc, 2020-05-07): AnalyticsSettingsModal currently controls its own
