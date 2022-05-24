@@ -147,6 +147,7 @@ def test_run_protocol_robot_detail_page_v5dot1(
         )
         input = protocol_file.get_drag_json_protocol()
         drag_and_drop_file(input, test_protocols["protocoluploadjson"])
+        time.sleep(7)
         device_landing: DeviceLanding = DeviceLanding(
             driver, console, request.node.nodeid
         )
