@@ -47,6 +47,7 @@ async def get_persistence_directory(
             persistence_dir = setting
             # Reset persistence directory only if is not temporary dir and rebooted
             if await AsyncPath(persistence_dir / _RESET_MARKER_FILE).exists():
+                _log.info("Persistence directory was marked for reset. Deleting it.")
                 shutil.rmtree(persistence_dir)
 
             await AsyncPath(persistence_dir).mkdir(parents=True, exist_ok=True)
