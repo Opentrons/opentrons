@@ -34,7 +34,7 @@ const NavbarLink = styled(NavLink)`
 
   &:hover,
   &:focus {
-    background-color: ${COLORS.darkBlackHover};
+    background-color: ${COLORS.darkGreyHover};
   }
 
   &:active {
@@ -42,7 +42,7 @@ const NavbarLink = styled(NavLink)`
   }
 
   &.active {
-    background-color: ${COLORS.darkBlackSelected};
+    background-color: ${COLORS.darkGreyHover};
   }
   &.active:has(svg) {
     background-color: ${COLORS.darkBlack};
@@ -50,13 +50,13 @@ const NavbarLink = styled(NavLink)`
 `
 const NavIconLink = styled(NavLink)`
   &.active > svg {
-    color: ${COLORS.white};
+    color: ${COLORS.medGrey};
     background-color: ${COLORS.darkBlackSelected};
   }
 `
 const IconLink = styled(Link)`
   &.active > svg {
-    color: ${COLORS.white};
+    color: ${COLORS.medGrey};
     background-color: ${COLORS.darkBlackSelected};
   }
 `
@@ -71,17 +71,17 @@ const NavbarIcon = styled(Icon)`
 
   &:hover,
   &:focus {
-    color: ${COLORS.white};
+    color: ${COLORS.medGrey};
     background-color: ${COLORS.darkBlackHover};
   }
 
   &:active {
-    color: ${COLORS.white};
+    color: ${COLORS.medGrey};
     background-color: ${COLORS.darkBlackPressed};
   }
 
   &.active {
-    color: ${COLORS.white};
+    color: ${COLORS.medGrey};
     background-color: ${COLORS.darkBlackSelected};
   }
 `
