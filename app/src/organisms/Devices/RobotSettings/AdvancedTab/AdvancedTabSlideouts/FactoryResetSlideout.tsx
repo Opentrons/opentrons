@@ -13,6 +13,7 @@ import {
   CheckboxField,
   Box,
 } from '@opentrons/components'
+import { useAllRunsQuery } from '@opentrons/react-api-client'
 
 import { Slideout } from '../../../../../atoms/Slideout'
 import { PrimaryButton } from '../../../../../atoms/buttons'
@@ -52,6 +53,7 @@ export function FactoryResetSlideout({
   const robot = useRobot(robotName)
   const dispatch = useDispatch<Dispatch>()
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
+  const runsQueryResponse = useAllRunsQuery()
 
   // Calibration data
   const deckCalibrationData = useDeckCalibrationData(robotName)
@@ -90,12 +92,13 @@ export function FactoryResetSlideout({
     )
   }
 
-  // Need to specify what type of runHistory can be downloaded by this
   const downloadRunHistoryLogs: React.MouseEventHandler = e => {
     e.preventDefault()
+    const runsHistory =
+      runsQueryResponse != null ? runsQueryResponse.data?.data : []
     saveAs(
-      new Blob([JSON.stringify({})]),
-      `opentrons-${robotName}-runHistory.json`
+      new Blob([JSON.stringify(runsHistory)]),
+      `opentrons-${robotName}-runsHistory.json`
     )
   }
 
