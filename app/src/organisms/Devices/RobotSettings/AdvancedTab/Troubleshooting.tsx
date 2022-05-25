@@ -39,7 +39,8 @@ export function Troubleshooting({
 
   const handleClick = (): void => {
     updateDownloadLogsStatus(robotLogsDownloading)
-    if (!controlDisabled) dispatch(downloadLogs(robot))
+    if (!controlDisabled && robot?.status === CONNECTABLE)
+      dispatch(downloadLogs(robot))
   }
 
   React.useEffect(() => {
