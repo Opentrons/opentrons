@@ -8,14 +8,6 @@ from .set_target_block_temperature import (
     SetTargetBlockTemperatureCreate,
 )
 
-from .set_and_wait_for_block_temperature import (
-    SetAndWaitForBlockTemperatureCommandType,
-    SetAndWaitForBlockTemperatureParams,
-    SetAndWaitForBlockTemperatureResult,
-    SetAndWaitForBlockTemperature,
-    SetAndWaitForBlockTemperatureCreate,
-)
-
 from .wait_for_block_temperature import (
     WaitForBlockTemperatureCommandType,
     WaitForBlockTemperatureParams,
@@ -70,12 +62,6 @@ __all__ = [
     "WaitForBlockTemperatureResult",
     "WaitForBlockTemperature",
     "WaitForBlockTemperatureCreate",
-    # Set and wait for block temperature command models
-    "SetAndWaitForBlockTemperatureCommandType",
-    "SetAndWaitForBlockTemperatureParams",
-    "SetAndWaitForBlockTemperatureResult",
-    "SetAndWaitForBlockTemperature",
-    "SetAndWaitForBlockTemperatureCreate",
     # Set target lid temperature command models
     "SetTargetLidTemperatureCommandType",
     "SetTargetLidTemperatureParams",
