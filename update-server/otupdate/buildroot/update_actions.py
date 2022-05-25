@@ -150,7 +150,7 @@ class OT2UpdateActions(UpdateActionsInterface):
         else:
             LOG.info(f"commit_update: committed to booting {new}")
 
-    def write_machine_id(self, current_root: str, new_root: str):
+    def write_machine_id(self, current_root: str, new_root: str) -> None:
         """Update the machine id in target rootfs"""
         mid = open(os.path.join(current_root, "etc", "machine-id")).read()
         with open(os.path.join(new_root, "etc", "machine-id"), "w") as new_mid:
@@ -169,8 +169,8 @@ def write_file(
     outfile: str,
     progress_callback: Callable[[float], None],
     chunk_size: int = 1024,
-    file_size: int = None,
-):
+    file_size: Optional[int] = None,
+) -> None:
     """Write a file to another file with progress callbacks.
 
     :param infile: The input filepath
