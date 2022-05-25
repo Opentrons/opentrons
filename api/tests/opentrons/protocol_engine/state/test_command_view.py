@@ -29,6 +29,7 @@ from .command_fixtures import (
 def get_command_view(
     queue_status: QueueStatus = QueueStatus.IMPLICITLY_ACTIVE,
     run_completed_at: Optional[datetime] = None,
+    run_started_at: Optional[datetime] = None,
     is_door_blocking: bool = False,
     run_result: Optional[RunResult] = None,
     running_command_id: Optional[str] = None,
@@ -53,6 +54,7 @@ def get_command_view(
         errors_by_id=errors_by_id or {},
         all_command_ids=all_command_ids,
         commands_by_id=commands_by_id,
+        run_started_at=run_started_at,
     )
 
     return CommandView(state=state)

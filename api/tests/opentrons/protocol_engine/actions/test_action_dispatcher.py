@@ -1,5 +1,6 @@
 """Tests for the protocol engine's ActionDispatcher."""
 from decoy import Decoy
+from datetime import datetime
 
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
@@ -10,7 +11,7 @@ from opentrons.protocol_engine.actions import (
 
 def test_sink(decoy: Decoy) -> None:
     """It should send all actions to the sink handler."""
-    action = PlayAction()
+    action = PlayAction(started_at=datetime(year=2021, month=1, day=1))
 
     sink = decoy.mock(cls=ActionHandler)
     subject = ActionDispatcher(sink=sink)
@@ -22,7 +23,7 @@ def test_sink(decoy: Decoy) -> None:
 
 def test_add_handler(decoy: Decoy) -> None:
     """It should actions to handlers before the sink."""
-    action = PlayAction()
+    action = PlayAction(started_at=datetime(year=2021, month=1, day=1))
 
     handler_1 = decoy.mock(cls=ActionHandler)
     handler_2 = decoy.mock(cls=ActionHandler)
