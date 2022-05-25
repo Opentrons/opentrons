@@ -188,7 +188,7 @@ describe('FilePipettesModal', () => {
         [HEATERSHAKER_MODULE_TYPE]: {
           ...initialModuleValues[HEATERSHAKER_MODULE_TYPE],
           slot: '1',
-          onDeck: true
+          onDeck: true,
         },
       }
 
