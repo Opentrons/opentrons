@@ -12,7 +12,7 @@ import os
 import re
 import subprocess
 import tempfile
-from typing import Callable, Optional
+from typing import Callable, Optional, Iterator
 
 from otupdate.common.file_actions import (
     unzip_update,
@@ -121,7 +121,7 @@ class OT2UpdateActions(UpdateActionsInterface):
         return unused.value
 
     @contextlib.contextmanager
-    def mount_update(self):
+    def mount_update(self) -> Iterator[str]:
         """Mount the freshly-written partition r/w (to update machine-id).
 
         Should be used as a context manager, and the yielded value is the path
