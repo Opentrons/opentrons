@@ -110,10 +110,16 @@ class CommandState:
     even if INACTIVE.
     """
 
-    run_completed_at: Optional[datetime]
-    """The time the run was completed.
+    run_started_at: Optional[datetime]
+    """The time the run has started.
 
-    Gets set when HardwareStoppedAction is called.
+    Gets set when PlayAction is dispatched.
+    """
+
+    run_completed_at: Optional[datetime]
+    """The time the run has completed.
+
+    Gets set when HardwareStoppedAction is dispatched.
     """
 
     is_door_blocking: bool
@@ -150,6 +156,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             commands_by_id=OrderedDict(),
             errors_by_id={},
             run_completed_at=None,
+            run_started_at=None
         )
 
     def handle_action(self, action: Action) -> None:  # noqa: C901
@@ -258,7 +265,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     self._state.queue_status = QueueStatus.INACTIVE
                 else:
                     self._state.queue_status = QueueStatus.ACTIVE
-
+            self._state.run_started_at = action.started_at
         elif isinstance(action, PauseAction):
             self._state.queue_status = QueueStatus.INACTIVE
 
@@ -282,8 +289,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 # any `ProtocolEngineError`'s will be captured by `FailCommandAction`,
                 # so only capture unknown errors here
                 if action.error_details and not isinstance(
-                    action.error_details.error,
-                    ProtocolEngineError,
+                        action.error_details.error,
+                        ProtocolEngineError,
                 ):
                     error_id = action.error_details.error_id
                     created_at = action.error_details.created_at
@@ -340,9 +347,9 @@ class CommandView(HasState[CommandState]):
         ]
 
     def get_slice(
-        self,
-        cursor: Optional[int],
-        length: int,
+            self,
+            cursor: Optional[int],
+            length: int,
     ) -> CommandSlice:
         """Get a subset of commands around a given cursor.
 
@@ -440,8 +447,8 @@ class CommandView(HasState[CommandState]):
         """Get whether the engine is running and queued commands should be executed."""
         queue_status = self._state.queue_status
         return (
-            queue_status == QueueStatus.IMPLICITLY_ACTIVE
-            or queue_status == QueueStatus.ACTIVE
+                queue_status == QueueStatus.IMPLICITLY_ACTIVE
+                or queue_status == QueueStatus.ACTIVE
         )
 
     def get_is_complete(self, command_id: str) -> bool:
@@ -467,8 +474,8 @@ class CommandView(HasState[CommandState]):
         # Since every command is either queued, running, failed, or succeeded,
         # "none running and none queued" == "all succeeded or failed".
         return (
-            self._state.running_command_id is None
-            and len(self._state.queued_command_ids) == 0
+                self._state.running_command_id is None
+                and len(self._state.queued_command_ids) == 0
         )
 
     def get_stop_requested(self) -> bool:

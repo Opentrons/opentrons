@@ -90,6 +90,7 @@ class StateView(HasState[State]):
             labwareOffsets=self._labware.get_labware_offsets(),
             modules=self.modules.get_all(),
             completedAt=self._state.commands.run_completed_at,
+            startedAt=self._state.commands.run_started_at,
         )
 
 

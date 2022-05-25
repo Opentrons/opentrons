@@ -46,6 +46,7 @@ def _build_run(
         pipettes=state_summary.pipettes,
         current=current,
         completedAt=state_summary.completedAt,
+        startedAt=state_summary.startedAt,
     )
 
 
