@@ -12,11 +12,13 @@ from pathlib import Path
 from subprocess import CalledProcessError
 
 from typing import Optional
+from typing_extensions import Protocol
 
 from aiohttp import web, BodyPartReader
 
-from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
 from . import config, update_actions
+from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
+from .handler_type import HandlerType
 from .session import UpdateSession, Stages
 
 from otupdate.openembedded.updater import UPDATE_PKG
@@ -25,11 +27,23 @@ SESSION_VARNAME = APP_VARIABLE_PREFIX + "session"
 LOG = logging.getLogger(__name__)
 
 
+class _HandlerWithSessionType(Protocol):
+    """The type signature of an aiohttp request handler that also has a session arg.
+
+    See require_session().
+    """
+
+    async def __call__(
+        self, request: web.Request, session: UpdateSession
+    ) -> web.Response:
+        ...
+
+
 def session_from_request(request: web.Request) -> Optional[UpdateSession]:
     return request.app.get(SESSION_VARNAME, None)
 
 
-def require_session(handler):
+def require_session(handler: _HandlerWithSessionType) -> HandlerType:
     """Decorator to ensure a session is properly in the request"""
 
     @functools.wraps(handler)

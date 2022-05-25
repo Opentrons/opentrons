@@ -17,18 +17,13 @@ from typing import (
 
 from aiohttp import web
 
+from .handler_type import HandlerType
+
 
 LOG = logging.getLogger(__name__)
 
 
-class _HandlerT(Protocol):
-    """The type signature of an aiohttp request handler function."""
-
-    async def __call__(self, request: web.Request) -> web.Response:
-        ...
-
-
-def require_linklocal(handler: _HandlerT) -> _HandlerT:
+def require_linklocal(handler: HandlerType) -> HandlerType:
     """Ensure the decorated is only called if the request is linklocal.
 
     The host ip address should be in the X-Host-IP header (provided by nginx)
