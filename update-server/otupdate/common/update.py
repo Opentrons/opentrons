@@ -18,7 +18,7 @@ from aiohttp import web, BodyPartReader
 
 from . import config, update_actions
 from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
-from .handler_type import HandlerType
+from .handler_type import Handler
 from .session import UpdateSession, Stages
 
 from otupdate.openembedded.updater import UPDATE_PKG
@@ -27,7 +27,7 @@ SESSION_VARNAME = APP_VARIABLE_PREFIX + "session"
 LOG = logging.getLogger(__name__)
 
 
-class _HandlerWithSessionType(Protocol):
+class _HandlerWithSession(Protocol):
     """The type signature of an aiohttp request handler that also has a session arg.
 
     See require_session().
@@ -43,7 +43,7 @@ def session_from_request(request: web.Request) -> Optional[UpdateSession]:
     return request.app.get(SESSION_VARNAME, None)
 
 
-def require_session(handler: _HandlerWithSessionType) -> HandlerType:
+def require_session(handler: _HandlerWithSession) -> Handler:
     """Decorator to ensure a session is properly in the request"""
 
     @functools.wraps(handler)

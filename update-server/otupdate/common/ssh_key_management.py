@@ -17,13 +17,13 @@ from typing import (
 
 from aiohttp import web
 
-from .handler_type import HandlerType
+from .handler_type import Handler
 
 
 LOG = logging.getLogger(__name__)
 
 
-def require_linklocal(handler: HandlerType) -> HandlerType:
+def require_linklocal(handler: Handler) -> Handler:
     """Ensure the decorated is only called if the request is linklocal.
 
     The host ip address should be in the X-Host-IP header (provided by nginx)
