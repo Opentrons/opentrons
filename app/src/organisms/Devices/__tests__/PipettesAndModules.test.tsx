@@ -61,10 +61,8 @@ describe('PipettesAndModules', () => {
     } as any)
     mockUsePipettesQuery.mockReturnValue({
       data: {
-        data: {
-          left: null,
-          right: null,
-        },
+        left: null,
+        right: null,
       },
     } as any)
     mockPipetteCard.mockReturnValue(<div>Mock PipetteCard</div>)
@@ -80,10 +78,8 @@ describe('PipettesAndModules', () => {
     } as any)
     mockUsePipettesQuery.mockReturnValue({
       data: {
-        data: {
-          left: null,
-          right: null,
-        },
+        left: null,
+        right: null,
       },
     } as any)
     mockPipetteCard.mockReturnValue(<div>Mock PipetteCard</div>)
