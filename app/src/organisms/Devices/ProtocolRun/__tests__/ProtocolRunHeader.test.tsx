@@ -19,6 +19,7 @@ import {
   useRunQuery,
   useModulesQuery,
   usePipettesQuery,
+  useDismissCurrentRunMutation,
 } from '@opentrons/react-api-client'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 
@@ -126,6 +127,9 @@ const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
 >
 const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
   typeof usePipettesQuery
+>
+const mockUseDismissCurrentRunMutation = useDismissCurrentRunMutation as jest.MockedFunction<
+  typeof useDismissCurrentRunMutation
 >
 const mockConfirmCancelModal = ConfirmCancelModal as jest.MockedFunction<
   typeof ConfirmCancelModal
@@ -253,6 +257,11 @@ describe('ProtocolRunHeader', () => {
       .mockReturnValue({
         data: { data: mockIdleUnstartedRun },
       } as UseQueryResult<Run>)
+    when(mockUseDismissCurrentRunMutation)
+      .calledWith()
+      .mockReturnValue({
+        dismissCurrentRun: jest.fn(),
+      } as any)
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue(PROTOCOL_DETAILS)
@@ -319,6 +328,23 @@ describe('ProtocolRunHeader', () => {
     queryByText('Protocol end')
     getByRole('button', { name: 'Cancel run' }).click()
     getByText('Mock ConfirmCancelModal')
+  })
+
+  it('dismisses a current but canceled run', () => {
+    const dismissCurrentRun = jest.fn()
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_STOPPED)
+    when(mockUseDismissCurrentRunMutation)
+      .calledWith()
+      .mockReturnValue({ dismissCurrentRun } as any)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: { ...mockIdleUnstartedRun, current: true } },
+      } as UseQueryResult<Run>)
+    render()
+    expect(dismissCurrentRun).toHaveBeenCalledWith(RUN_ID)
   })
 
   it('disables the Start Run button with tooltip if calibration is incomplete', () => {
