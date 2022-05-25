@@ -5,7 +5,7 @@ update actions
 
 import abc
 import contextlib
-from typing import NamedTuple, Optional, Callable, Iterator
+from typing import Callable, Iterator, NamedTuple, Optional, cast
 from aiohttp import web
 
 from .constants import APP_VARIABLE_PREFIX
@@ -29,10 +29,13 @@ class UpdateActionsInterface:
     @staticmethod
     def from_request(request: web.Request) -> Optional["UpdateActionsInterface"]:
         """Get the update object from the aiohttp app store"""
-        return request.app.get(FILE_ACTIONS_VARNAME, None)
+        try:
+            return cast("UpdateActionsInterface", request.app[FILE_ACTIONS_VARNAME])
+        except KeyError:
+            return None
 
     @classmethod
-    def build_and_insert(cls, app: web.Application):
+    def build_and_insert(cls, app: web.Application) -> None:
         """Build the object and put it in the app store"""
         app[FILE_ACTIONS_VARNAME] = cls()
 
@@ -74,7 +77,7 @@ class UpdateActionsInterface:
 
     @abc.abstractmethod
     @contextlib.contextmanager
-    def mount_update(self) -> Iterator:
+    def mount_update(self) -> Iterator[str]:
         """
         Mount the fs to overwrite with the update
         """
