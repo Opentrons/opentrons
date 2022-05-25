@@ -33,7 +33,6 @@ export function Troubleshooting({
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
   const robot = useRobot(robotName)
-  console.log(robot?.status)
   const controlDisabled = robot?.status !== CONNECTABLE
   const logsAvailable = robot?.health != null && robot.health.logs
   const robotLogsDownloading = useSelector(getRobotLogsDownloading)
@@ -46,10 +45,6 @@ export function Troubleshooting({
   React.useEffect(() => {
     updateDownloadLogsStatus(robotLogsDownloading)
   }, [robotLogsDownloading, updateDownloadLogsStatus])
-
-  console.log('controlDisabled', controlDisabled)
-  console.log('logsAvailable', logsAvailable)
-  console.log('robotLogsDownloading', robotLogsDownloading)
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
