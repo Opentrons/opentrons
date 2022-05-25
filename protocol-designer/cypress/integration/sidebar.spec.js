@@ -33,7 +33,7 @@ describe('Desktop Navigation', () => {
       .should('have.prop', 'href')
       .and(
         'equal',
-        'https://support.opentrons.com/en/collections/493886-protocol-designer'
+        'https://support.opentrons.com/s/protocol-designer'
       )
   })
 
