@@ -18,7 +18,7 @@ export function useModuleRenderInfoForProtocolById(
   [moduleId: string]: ModuleRenderInfoForProtocol
 } {
   const { protocolData } = useProtocolDetailsForRun(runId)
-  const attachedModules = useAttachedModules(robotName)
+  const attachedModules = useAttachedModules()
   if (protocolData == null) return {}
 
   const protocolModulesInfo = getProtocolModulesInfo(

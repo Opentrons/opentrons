@@ -39,7 +39,7 @@ export const HeaterShakerWizard = (
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
   const { robotName } = useParams<NavRouteParams>()
-  const attachedModules = useAttachedModules(robotName)
+  const attachedModules = useAttachedModules()
   const [targetProps, tooltipProps] = useHoverTooltip()
   const heaterShaker =
     attachedModules.find(

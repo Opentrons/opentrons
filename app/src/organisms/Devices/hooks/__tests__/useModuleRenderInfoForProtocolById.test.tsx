@@ -109,7 +109,7 @@ const TEMPERATURE_MODULE_INFO = {
 describe('useModuleRenderInfoForProtocolById hook', () => {
   beforeEach(() => {
     when(mockUseAttachedModules)
-      .calledWith('otie')
+      .calledWith()
       .mockReturnValue([
         mockMagneticModuleGen2,
         mockTemperatureModuleGen2,

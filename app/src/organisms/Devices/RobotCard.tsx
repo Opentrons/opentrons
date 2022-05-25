@@ -36,8 +36,8 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const { robot } = props
   const { name = null, local } = robot
   const { t } = useTranslation('devices_landing')
-  const attachedModules = useAttachedModules(name)
-  const attachedPipettes = useAttachedPipettes(name)
+  const attachedModules = useAttachedModules()
+  const attachedPipettes = useAttachedPipettes()
   const history = useHistory()
 
   return name != null ? (

@@ -15,6 +15,7 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
+import { useModulesQuery, usePipettesQuery } from '@opentrons/react-api-client'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   Box,
@@ -61,7 +62,6 @@ import {
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 
 import {
-  useAttachedModules,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
@@ -73,6 +73,8 @@ import { ConfirmAttachmentModal } from '../ModuleCard/ConfirmAttachmentModal'
 
 import type { Run } from '@opentrons/api-client'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
+
+const EQUIPMENT_POLL_MS = 5000
 
 interface ProtocolRunHeaderProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
@@ -127,6 +129,11 @@ export function ProtocolRunHeader({
   const isProtocolAnalyzing = protocolData == null
   const runStatus = useRunStatus(runId)
 
+  const attachedModules =
+    useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
+  // NOTE: we are polling pipettes, though not using their value directly here
+  usePipettesQuery({ refetchInterval: EQUIPMENT_POLL_MS })
+
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
 
   const startedAtTimestamp =
@@ -167,7 +174,6 @@ export function ProtocolRunHeader({
   const [showIsShakingModal, setShowIsShakingModal] = React.useState<boolean>(
     false
   )
-  const attachedModules = useAttachedModules(robotName)
   const heaterShaker = attachedModules.find(
     (module): module is HeaterShakerModule =>
       module.moduleType === HEATERSHAKER_MODULE_TYPE
