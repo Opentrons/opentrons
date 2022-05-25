@@ -6,6 +6,7 @@ import {
 } from '@opentrons/react-api-client'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../../i18n'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { HeaterShakerSlideout } from '../HeaterShakerSlideout'
@@ -14,6 +15,7 @@ import { ConfirmAttachmentModal } from '../ConfirmAttachmentModal'
 jest.mock('@opentrons/react-api-client')
 jest.mock('../ConfirmAttachmentModal')
 jest.mock('../../../../redux/config')
+jest.mock('../useModuleIdFromRun')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -26,6 +28,9 @@ const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
 >
 const mockConfirmAttachmentModal = ConfirmAttachmentModal as jest.MockedFunction<
   typeof ConfirmAttachmentModal
+>
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
 >
 
 const render = (props: React.ComponentProps<typeof HeaterShakerSlideout>) => {
@@ -56,6 +61,9 @@ describe('HeaterShakerSlideout', () => {
     mockConfirmAttachmentModal.mockReturnValue(
       <div>mock confirm attachment modal</div>
     )
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'heatershaker_id',
+    })
   })
 
   afterEach(() => {
@@ -64,6 +72,7 @@ describe('HeaterShakerSlideout', () => {
 
   it('renders correct title and body for Heater shaker set shake', () => {
     props = {
+      robotName: 'Otie',
       module: mockHeaterShaker,
       isSetShake: true,
       isExpanded: true,
@@ -78,6 +87,7 @@ describe('HeaterShakerSlideout', () => {
 
   it('renders correct title and body for heatershaker set temperature', () => {
     props = {
+      robotName: 'Otie',
       module: mockHeaterShaker,
       isSetShake: false,
       isExpanded: true,
@@ -94,6 +104,7 @@ describe('HeaterShakerSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for set shake', () => {
     props = {
+      robotName: 'Otie',
       module: mockHeaterShaker,
       isSetShake: true,
       isExpanded: true,
@@ -111,6 +122,7 @@ describe('HeaterShakerSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for set temp', () => {
     props = {
+      robotName: 'Otie',
       module: mockHeaterShaker,
       isSetShake: false,
       isExpanded: true,
@@ -137,6 +149,7 @@ describe('HeaterShakerSlideout', () => {
   it('renders heater shaker form field and when button is clicked, confirm attachment modal is not rendered', () => {
     mockGetIsHeaterShakerAttached.mockReturnValue(true)
     props = {
+      robotName: 'Otie',
       module: mockHeaterShaker,
       isSetShake: true,
       isExpanded: true,
@@ -154,6 +167,7 @@ describe('HeaterShakerSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for set shake when there is a runId', () => {
     props = {
+      robotName: 'Otie',
       module: mockHeaterShaker,
       isSetShake: true,
       isExpanded: true,
@@ -172,6 +186,7 @@ describe('HeaterShakerSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for set temp when there is a runId', () => {
     props = {
+      robotName: 'Otie',
       module: mockHeaterShaker,
       isSetShake: false,
       isExpanded: true,

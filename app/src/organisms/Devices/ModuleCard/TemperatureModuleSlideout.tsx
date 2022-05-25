@@ -19,7 +19,7 @@ import {
   TEMP_MAX,
   TEMP_MIN,
 } from '@opentrons/shared-data'
-import { useModuleIdFromRun } from './hooks'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 import { Slideout } from '../../../atoms/Slideout'
 import { PrimaryButton } from '../../../atoms/buttons'
 import { InputField } from '../../../atoms/InputField'

@@ -24,8 +24,9 @@ import { Tooltip } from '../../../atoms/Tooltip'
 import { Divider } from '../../../atoms/structure'
 import { InputField } from '../../../atoms/InputField'
 import { Collapsible } from '../ModuleCard/Collapsible'
-import { useLatchControls, useModuleIdFromRun } from '../ModuleCard/hooks'
+import { useLatchControls } from '../ModuleCard/hooks'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
+import { useModuleIdFromRun } from '../ModuleCard/useModuleIdFromRun'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {

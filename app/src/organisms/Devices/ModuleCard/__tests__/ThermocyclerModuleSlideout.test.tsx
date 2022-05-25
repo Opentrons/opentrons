@@ -6,17 +6,22 @@ import {
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { ThermocyclerModuleSlideout } from '../ThermocyclerModuleSlideout'
 
 import { mockThermocycler } from '../../../../redux/modules/__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../useModuleIdFromRun')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
 const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
   typeof useCreateCommandMutation
+>
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
 >
 
 const render = (
@@ -43,6 +48,9 @@ describe('ThermocyclerModuleSlideout', () => {
     mockUseCommandMutation.mockReturnValue({
       createCommand: mockCreateCommand,
     } as any)
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'thermocycler_id',
+    })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -50,6 +58,7 @@ describe('ThermocyclerModuleSlideout', () => {
 
   it('renders correct title and body for Thermocycler Lid temperature', () => {
     props = {
+      robotName: 'Otie',
       module: mockThermocycler,
       isSecondaryTemp: true,
       isExpanded: true,
@@ -67,6 +76,7 @@ describe('ThermocyclerModuleSlideout', () => {
 
   it('renders correct title and body for Thermocycler Block Temperature', () => {
     props = {
+      robotName: 'Otie',
       module: mockThermocycler,
       isSecondaryTemp: false,
       isExpanded: true,
@@ -84,6 +94,7 @@ describe('ThermocyclerModuleSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for the TC Block', () => {
     props = {
+      robotName: 'Otie',
       module: mockThermocycler,
       isSecondaryTemp: false,
       isExpanded: true,
@@ -110,6 +121,7 @@ describe('ThermocyclerModuleSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for the TC Lid', () => {
     props = {
+      robotName: 'Otie',
       module: mockThermocycler,
       isSecondaryTemp: true,
       isExpanded: true,
@@ -136,6 +148,7 @@ describe('ThermocyclerModuleSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for the TC Block when there is a runId', () => {
     props = {
+      robotName: 'Otie',
       module: mockThermocycler,
       isSecondaryTemp: false,
       isExpanded: true,
@@ -164,6 +177,7 @@ describe('ThermocyclerModuleSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for the TC Lid when there is a runId', () => {
     props = {
+      robotName: 'Otie',
       module: mockThermocycler,
       isSecondaryTemp: true,
       isExpanded: true,

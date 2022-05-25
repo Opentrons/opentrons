@@ -6,6 +6,7 @@ import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
 
 import {
@@ -14,12 +15,16 @@ import {
 } from '../../../../redux/modules/__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../useModuleIdFromRun')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
 const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
   typeof useCreateCommandMutation
+>
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
 >
 
 const render = (props: React.ComponentProps<typeof MagneticModuleSlideout>) => {
@@ -35,6 +40,7 @@ describe('MagneticModuleSlideout', () => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     props = {
+      robotName: 'Otie',
       module: mockMagneticModule,
       isExpanded: true,
       onCloseClick: jest.fn(),
@@ -48,6 +54,7 @@ describe('MagneticModuleSlideout', () => {
     mockUseCommandMutation.mockReturnValue({
       createCommand: mockCreateCommand,
     } as any)
+    mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -73,6 +80,7 @@ describe('MagneticModuleSlideout', () => {
 
   it('renders correct title and body for a gen2 magnetic module', () => {
     props = {
+      robotName: 'Otie',
       module: mockMagneticModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),
@@ -115,6 +123,7 @@ describe('MagneticModuleSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field when there is a runId', () => {
     props = {
+      robotName: 'Otie',
       module: mockMagneticModule,
       isExpanded: true,
       onCloseClick: jest.fn(),

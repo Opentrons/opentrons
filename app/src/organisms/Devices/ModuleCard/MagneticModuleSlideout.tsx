@@ -4,7 +4,7 @@ import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
-import { useModuleIdFromRun } from './hooks'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 import {
   Flex,
   Text,

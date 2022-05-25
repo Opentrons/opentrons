@@ -24,7 +24,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../../atoms/buttons'
-import { useModuleIdFromRun } from './hooks'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type { ThermocyclerModule } from '../../../redux/modules/types'
 import type {

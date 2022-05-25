@@ -25,7 +25,7 @@ import {
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
-import { useModuleIdFromRun } from './hooks'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 import { PrimaryButton } from '../../../atoms/buttons'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { InputField } from '../../../atoms/InputField'

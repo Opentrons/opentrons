@@ -16,7 +16,8 @@ import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProto
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useAttachedModules, useProtocolDetailsForRun } from '../hooks'
+import { useProtocolDetailsForRun } from '../hooks'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type {
   HeaterShakerCloseLatchCreateCommand,
@@ -30,33 +31,6 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 import type { AttachedModule } from '../../../redux/modules/types'
-
-interface ModuleIdFromRun {
-  moduleIdFromRun: string
-}
-
-export function useModuleIdFromRun(
-  robotName: string,
-  module: AttachedModule,
-  runId: string | null
-): ModuleIdFromRun {
-  const { protocolData } = useProtocolDetailsForRun(runId)
-  const attachedModules = useAttachedModules(robotName)
-
-  const filteredModules = attachedModules.filter(
-    item => item.moduleModel === module.moduleModel
-  )
-  const loadModuleCommands = protocolData?.commands.filter(
-    command =>
-      command.commandType === 'loadModule' &&
-      command.params.model === module.moduleModel
-  )
-  const moduleIdFromRun =
-    loadModuleCommands != null &&
-    loadModuleCommands[filteredModules.indexOf(module)].result.moduleId
-
-  return { moduleIdFromRun }
-}
 
 export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
