@@ -9,7 +9,7 @@ export function usePipettesQuery(
 ): UseQueryResult<Pipettes> {
   const host = useHost()
   const query = useQuery<Pipettes>(
-    [host, 'pipettes '],
+    [host, 'pipettes'],
     () => getPipettes(host as HostConfig).then(response => response.data),
     { enabled: host !== null, ...options }
   )

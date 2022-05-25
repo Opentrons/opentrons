@@ -1,17 +1,6 @@
-import {
-  TEMPDECK,
-  MAGDECK,
-  THERMOCYCLER,
-  ModuleType,
-} from '@opentrons/shared-data'
+import { ModuleType } from '@opentrons/shared-data'
 
-import type {
-  MagneticModuleModel,
-  TemperatureModuleModel,
-  ThermocyclerModuleModel,
-  HeaterShakerModuleModel,
-  ModuleModel,
-} from '@opentrons/shared-data'
+import type { ModuleModel } from '@opentrons/shared-data'
 
 interface PhysicalPort {
   path: string | null
@@ -28,14 +17,6 @@ export interface ApiBaseModule {
   firmwareVersion: string
   hasAvailableUpdate: boolean
   usbPort: PhysicalPort
-}
-
-interface ApiBaseModuleLegacy {
-  serialNumber: string
-  moduleModel: string
-  firmwareVersion: string
-  usbPort: string
-  hasAvailableUpdate: boolean
 }
 
 export interface TemperatureData {
@@ -109,63 +90,3 @@ export type LatchStatus =
   | 'idle_closed'
   | 'idle_unknown'
   | 'unknown'
-
-export interface ApiTemperatureModule extends ApiBaseModule {
-  moduleModel: TemperatureModuleModel
-  name: typeof TEMPDECK
-  data: TemperatureData
-}
-
-export interface ApiTemperatureModuleLegacy extends ApiBaseModuleLegacy {
-  name: typeof TEMPDECK
-  data: TemperatureData
-}
-
-export interface ApiMagneticModule extends ApiBaseModule {
-  moduleModel: MagneticModuleModel
-  name: typeof MAGDECK
-  data: MagneticData
-}
-
-export interface ApiMagneticModuleLegacy extends ApiBaseModuleLegacy {
-  name: typeof MAGDECK
-  data: MagneticData
-}
-
-export interface ApiThermocyclerModule extends ApiBaseModule {
-  moduleModel: ThermocyclerModuleModel
-  name: typeof THERMOCYCLER
-  data: ThermocyclerData
-}
-
-export interface ApiThermocyclerModuleLegacy extends ApiBaseModuleLegacy {
-  name: typeof THERMOCYCLER
-  data: ThermocyclerData
-  status: ThermocyclerStatus
-}
-
-export interface ApiHeaterShakerModule extends ApiBaseModule {
-  moduleModel: HeaterShakerModuleModel
-  data: HeaterShakerData
-}
-
-export type ApiAttachedModule =
-  | ApiThermocyclerModule
-  | ApiMagneticModule
-  | ApiTemperatureModule
-  | ApiHeaterShakerModule
-
-export type ApiAttachedModuleLegacy =
-  | ApiThermocyclerModuleLegacy
-  | ApiTemperatureModuleLegacy
-  | ApiMagneticModuleLegacy
-
-export type ModuleCommand =
-  | 'set_temperature'
-  | 'set_block_temperature'
-  | 'set_lid_temperature'
-  | 'deactivate'
-  | 'deactivate_lid'
-  | 'deactivate_block'
-  | 'open'
-  | 'engage'
