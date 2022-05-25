@@ -53,8 +53,8 @@ test:
 
 .PHONY: lint
 lint:
-	$(python) -m black --check ./otupdate ./tests
 	$(python) -m mypy otupdate
+	$(python) -m black --check ./otupdate ./tests
 	$(python) -m flake8 otupdate tests
 
 .PHONY: format
