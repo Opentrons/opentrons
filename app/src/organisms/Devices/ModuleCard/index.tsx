@@ -184,13 +184,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       image = heaterShakerModule
       moduleData = (
         <HeaterShakerModuleData
-          heaterStatus={module.data.temperatureStatus}
-          shakerStatus={module.data.speedStatus}
-          latchStatus={module.data.labwareLatchStatus}
-          targetTemp={module.data.targetTemperature}
-          currentTemp={module.data.currentTemperature}
-          targetSpeed={module.data.targetSpeed}
-          currentSpeed={module.data.currentSpeed}
+          moduleData={module.data}
           showTemperatureData={true}
         />
       )
@@ -204,27 +198,18 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       setHasSecondary(false)
     }
     setShowSlideout(true)
-    setShowOverflowMenu(false)
-    setShowAboutModule(false)
   }
 
   const handleAboutClick = (): void => {
     setShowAboutModule(true)
-    setShowOverflowMenu(false)
-    setShowSlideout(false)
   }
 
   const handleTestShakeClick = (): void => {
     setShowTestShake(true)
-    setShowOverflowMenu(false)
-    setShowSlideout(false)
   }
 
   const handleWizardClick = (): void => {
     setShowWizard(true)
-    setShowTestShake(false)
-    setShowOverflowMenu(false)
-    setShowSlideout(false)
   }
 
   return (

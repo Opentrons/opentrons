@@ -14,11 +14,14 @@ from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry,
     ThermocyclerGeometry,
 )
-from opentrons_shared_data.deck import load as load_deck
+from opentrons_shared_data.deck import (
+    DEFAULT_DECK_DEFINITION_VERSION,
+    load as load_deck,
+)
 
 if TYPE_CHECKING:
     from opentrons_shared_data.deck.dev_types import (
-        SlotDefV2,
+        SlotDefV3,
     )
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -56,7 +59,7 @@ class Deck(UserDict):
         self._highest_z = 0.0
         if not load_name:
             load_name = deck_type()
-        self._definition = load_deck(load_name, 2)
+        self._definition = load_deck(load_name, DEFAULT_DECK_DEFINITION_VERSION)
         self._load_fixtures()
         self._thermocycler_present = False
 
@@ -187,7 +190,7 @@ class Deck(UserDict):
         for item in [lw for lw in self.data.values() if lw]:
             self._highest_z = max(item.highest_z, self._highest_z)
 
-    def get_slot_definition(self, slot_name) -> "SlotDefV2":
+    def get_slot_definition(self, slot_name) -> "SlotDefV3":
         slots = self._definition["locations"]["orderedSlots"]
         slot_def = next((slot for slot in slots if slot["id"] == slot_name), None)
         if not slot_def:
@@ -213,6 +216,7 @@ class Deck(UserDict):
             ModuleType.MAGNETIC: "Magnetic Module",
             ModuleType.THERMOCYCLER: "Thermocycler",
             ModuleType.TEMPERATURE: "Temperature Module",
+            ModuleType.HEATER_SHAKER: "Heater-Shaker",
         }
         if isinstance(location, str) or isinstance(location, int):
             slot_def = self.get_slot_definition(str(location))
@@ -248,7 +252,7 @@ class Deck(UserDict):
         return self._highest_z
 
     @property
-    def slots(self) -> List["SlotDefV2"]:
+    def slots(self) -> List["SlotDefV3"]:
         """Return the definition of the loaded robot deck."""
         return self._definition["locations"]["orderedSlots"]
 

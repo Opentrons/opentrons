@@ -15,7 +15,11 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
-import { useRunQuery } from '@opentrons/react-api-client'
+import {
+  useRunQuery,
+  useModulesQuery,
+  usePipettesQuery,
+} from '@opentrons/react-api-client'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 
 import { i18n } from '../../../../i18n'
@@ -48,7 +52,6 @@ import {
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
-  useAttachedModules,
 } from '../../hooks'
 import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
@@ -118,8 +121,11 @@ const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFuncti
 const mockUseRunCreatedAtTimestamp = useRunCreatedAtTimestamp as jest.MockedFunction<
   typeof useRunCreatedAtTimestamp
 >
-const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
-  typeof useAttachedModules
+const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
+  typeof useModulesQuery
+>
+const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
+  typeof usePipettesQuery
 >
 const mockConfirmCancelModal = ConfirmCancelModal as jest.MockedFunction<
   typeof ConfirmCancelModal
@@ -199,7 +205,17 @@ describe('ProtocolRunHeader', () => {
     mockMockHeaterShakerIsRunningModal.mockReturnValue(
       <div>Mock HeaterShakerIsRunningModal</div>
     )
-    mockUseAttachedModules.mockReturnValue([])
+    mockUseModulesQuery.mockReturnValue({
+      data: { data: [] },
+    } as any)
+    mockUsePipettesQuery.mockReturnValue({
+      data: {
+        data: {
+          left: null,
+          right: null,
+        },
+      },
+    } as any)
     mockGetIsHeaterShakerAttached.mockReturnValue(false)
     mockConfirmAttachmentModal.mockReturnValue(
       <div>mock confirm attachment modal</div>
@@ -246,7 +262,6 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ complete: true })
-    mockUseAttachedModules.mockReturnValue([mockHeaterShaker])
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -280,6 +295,19 @@ describe('ProtocolRunHeader', () => {
     const [{ queryByRole }] = render()
 
     expect(queryByRole('link', { name: 'A Protocol for Otie' })).toBeNull()
+  })
+
+  it('renders a disabled "Analyzing on robot" button if robot-side analysis is not complete', () => {
+    when(mockUseProtocolDetailsForRun).calledWith(RUN_ID).mockReturnValue({
+      displayName: null,
+      protocolData: null,
+      protocolKey: null,
+    })
+
+    const [{ getByRole }] = render()
+
+    const button = getByRole('button', { name: 'Analyzing on robot' })
+    expect(button).toBeDisabled()
   })
 
   it('renders a start run button and cancel run button when run is ready to start', () => {
@@ -534,7 +562,9 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', () => {
-    mockUseAttachedModules.mockReturnValue([mockMovingHeaterShaker])
+    mockUseModulesQuery.mockReturnValue({
+      data: { data: [mockMovingHeaterShaker] },
+    } as any)
     const [{ getByRole, getByText }] = render()
     const button = getByRole('button', { name: 'Start run' })
     fireEvent.click(button)
@@ -542,7 +572,9 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders the confirm attachment modal when there is a heater shaker in the protocol and the heater shaker is idle status', () => {
-    mockUseAttachedModules.mockReturnValue([mockHeaterShaker])
+    mockUseModulesQuery.mockReturnValue({
+      data: { data: [mockHeaterShaker] },
+    } as any)
     mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
     const [{ getByText, getByRole }] = render()
 
@@ -553,7 +585,9 @@ describe('ProtocolRunHeader', () => {
 
   it('does NOT render confirm attachment modal when the user already confirmed the heater shaker is attached', () => {
     mockGetIsHeaterShakerAttached.mockReturnValue(true)
-    mockUseAttachedModules.mockReturnValue([mockHeaterShaker])
+    mockUseModulesQuery.mockReturnValue({
+      data: { data: [mockHeaterShaker] },
+    } as any)
     mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Start run' })

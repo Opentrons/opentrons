@@ -215,6 +215,7 @@ def test_available_resets(api_client):
             "pipetteOffsetCalibrations",
             "bootScripts",
             "tipLengthCalibrations",
+            "runsHistory",
         ]
     ) == sorted([item["id"] for item in options_list])
 
@@ -237,6 +238,7 @@ def mock_reset():
                 "bootScripts": False,
                 "pipetteOffsetCalibrations": False,
                 "tipLengthCalibrations": False,
+                "runsHistory": False,
             },
             set(),
         ],
@@ -247,12 +249,14 @@ def mock_reset():
                 "pipetteOffsetCalibrations": True,
                 "tipLengthCalibrations": True,
                 "deckCalibration": True,
+                "runsHistory": True,
             },
             {
                 ResetOptionId.boot_scripts,
                 ResetOptionId.deck_calibration,
                 ResetOptionId.pipette_offset,
                 ResetOptionId.tip_length_calibrations,
+                ResetOptionId.runs_history,
             },
         ],
         [{"bootScripts": True}, {ResetOptionId.boot_scripts}],

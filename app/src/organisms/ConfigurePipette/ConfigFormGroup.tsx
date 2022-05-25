@@ -6,6 +6,7 @@ import {
   Flex,
   DIRECTION_COLUMN,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { InputField } from '../../atoms/InputField'
 import { StyledText } from '../../atoms/text'
@@ -45,7 +46,11 @@ export function ConfigFormGroup(props: ConfigFormGroupProps): JSX.Element {
       )
     })
   return (
-    <FormGroup label={groupLabel} className={styles.form_group}>
+    <FormGroup
+      label={groupLabel}
+      className={styles.form_group}
+      isPipetteSettingsSlideout={true}
+    >
       {groupError && <p className={styles.group_error}>{formattedError}</p>}
       {formFields.map((field, index) => {
         return <ConfigInput field={field} key={index} />
@@ -74,6 +79,7 @@ export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
         as="label"
         id={props.labelFor}
         paddingBottom={SPACING.spacing3}
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {props.label}
       </StyledText>
@@ -84,11 +90,10 @@ export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
 
 export interface ConfigInputProps {
   field: DisplayFieldProps
-  className?: string
 }
 
 export function ConfigInput(props: ConfigInputProps): JSX.Element {
-  const { field, className } = props
+  const { field } = props
   const { name, units, displayName } = field
   const id = makeId(field.name)
   const _default = field.default.toString()
@@ -106,7 +111,6 @@ export function ConfigInput(props: ConfigInputProps): JSX.Element {
             error={fieldProps.form.errors[name]}
             {...{
               units,
-              className,
             }}
           />
         )}

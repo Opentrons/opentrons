@@ -51,12 +51,12 @@ describe('AttachModule', () => {
     )
     getByText(
       nestedTextMatcher(
-        'Turn screws  counter clockwise to retract the anchors. The screws should not come out of the module.'
+        'Turn screws  counterclockwise to retract the anchors. The screws should not come out of the module.'
       )
     )
     getByText(
       nestedTextMatcher(
-        'Orient your module such that the plugs for power and USB connection are outward.'
+        'Orient your module such that the power and USB ports are facing outward.'
       )
     )
     getByText(
