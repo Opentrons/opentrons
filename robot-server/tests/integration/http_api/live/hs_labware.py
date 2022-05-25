@@ -1,9 +1,10 @@
 import asyncio
+from typing import Dict, List
 
 from tests.integration.http_api.live import util
 from tests.integration.http_api.live.base_cli import BaseCli
-from tests.integration.robot_client import RobotClient
 from tests.integration.http_api.live.robot_interactions import RobotInteractions
+from tests.integration.robot_client import RobotClient
 
 HS_SLOT = "2"
 TIPRACK = "opentrons_96_tiprack_20ul"
@@ -102,7 +103,19 @@ async def hs_measure(robot_ip: str, robot_port: str, labware: str) -> None:
             run_id=run_id, req_body=pickup_tip_command
         )
 
-        wells_on_hs = ["A1", "A12", "H1", "H12", "D6"]
+        mapping: Dict[str, List[str]] = {
+            "opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat": [
+                "A1",
+                "A12",
+                "H1",
+                "H12",
+                "D6",
+            ],
+            "opentrons_96_pcr_plate_adapter_nest_wellplate_100ul_pcr_full_skirt": [],
+            "opentrons_96_deepwell_adapter_nest_wellplate_2ml_deep": [],
+            "opentrons_flat_plate_adapter_corning_384_wellplate_112ul_flat": [],
+        }
+        wells_on_hs = mapping[labware]
         for well in wells_on_hs:
             move_to_well_command = {
                 "data": {
@@ -149,7 +162,7 @@ if __name__ == "__main__":
     cli = BaseCli()
     cli.parser.description = f"""
 Check HS Labware
-1. Change the constants to exchange in location, pipette, and/or tiprack.
+1. Change the constants to alter location, pipette, and/or tiprack.
 2. Attach {PIPETTE} pipette on the {PIPETTE_MOUNT}.
 3. Place {TIPRACK} tip rack in slot {TIPRACK_SLOT}.
 4. Complete pipette offset and tip length calibrations

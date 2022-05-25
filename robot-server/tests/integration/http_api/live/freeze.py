@@ -1,9 +1,9 @@
 import asyncio
-from anyio import create_task_group
 
+from anyio import create_task_group
+from tests.integration.http_api.live.base_cli import BaseCli
 from tests.integration.http_api.live.robot_interactions import RobotInteractions
 from tests.integration.http_api.live.util import log_response
-from tests.integration.http_api.live.base_cli import BaseCli
 from tests.integration.robot_client import RobotClient
 
 LABWARE = "nest_96_wellplate_100ul_pcr_full_skirt"
