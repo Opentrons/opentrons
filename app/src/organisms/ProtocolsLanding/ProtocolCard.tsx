@@ -20,6 +20,7 @@ import {
   JUSTIFY_CENTER,
   ALIGN_CENTER,
   SIZE_3,
+  SIZE_4,
   ModuleIcon,
   POSITION_ABSOLUTE,
   TEXT_ALIGN_RIGHT,
@@ -135,8 +136,8 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
       >
         {
           {
-            missing: <Icon name="ot-spinner" spin size={SIZE_3} />,
-            loading: <Icon name="ot-spinner" spin size={SIZE_3} />,
+            missing: <Icon name="ot-spinner" spin size={SIZE_4} />,
+            loading: <Icon name="ot-spinner" spin size={SIZE_4} />,
             error: <Box size="6rem" backgroundColor={COLORS.medGrey} />,
             complete: (
               <DeckThumbnail commands={mostRecentAnalysis?.commands ?? []} />
@@ -164,7 +165,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
         </StyledText>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           {analysisStatus === 'loading' ? (
-            <StyledText as="p" flex="1">
+            <StyledText as="p" flex="1" css={COLORS.darkGreyEnabled}>
               {t('loading_data')}
             </StyledText>
           ) : (
@@ -232,7 +233,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                         <ModuleIcon
                           key={index}
                           moduleType={moduleType}
-                          height="1rem"
+                          height="0.01rem"
                           marginRight={SPACING.spacing3}
                         />
                       ))}

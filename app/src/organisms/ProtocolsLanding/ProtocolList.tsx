@@ -140,7 +140,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
       <StyledText as="p" paddingBottom={SPACING.spacing4}>
         {t('all_protocols')}
       </StyledText>
-      <Flex flexDirection="column">
+      <Flex flexDirection="column" marginBottom="2.5rem">
         {sortedStoredProtocols.map(storedProtocol => (
           <ProtocolCard
             key={storedProtocol.protocolKey}
@@ -149,7 +149,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           />
         ))}
       </Flex>
-      <EmptyStateLinks title={t('create_or_download')} />
+      <EmptyStateLinks title={t('create_or_download')}/>
       <Slideout
         title={t('import_new_protocol')}
         isExpanded={showSlideout}

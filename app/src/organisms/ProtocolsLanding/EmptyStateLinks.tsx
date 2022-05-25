@@ -52,7 +52,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
           <Icon
             name={'open-in-new'}
             marginLeft={SPACING.spacing2}
-            size="0.75rem"
+            size="0.5rem"
           />
         </Link>
         <Link
@@ -71,7 +71,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
 
             name={'open-in-new'}
             marginLeft={SPACING.spacing2}
-            size="0.75rem"
+            size="0.5rem"
           />
           </Flex>
         </Link>
@@ -88,7 +88,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
           <Icon
             name={'open-in-new'}
             marginLeft={SPACING.spacing2}
-            size="0.75rem"
+            size="0.5rem"
           />
         </Link>
       </Flex>
