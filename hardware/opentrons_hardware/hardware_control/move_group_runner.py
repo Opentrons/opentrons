@@ -17,12 +17,15 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     HomeRequest,
     GripperGripRequest,
     GripperHomeRequest,
+    TipActionRequest,
+    TipActionResponse,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
     ExecuteMoveGroupRequestPayload,
     HomeRequestPayload,
     GripperMoveRequestPayload,
+    TipActionRequestPayload,
 )
 from .constants import interrupts_per_sec
 from opentrons_hardware.hardware_control.motion import (
@@ -186,7 +189,16 @@ class MoveGroupRunner:
                 ),
             )
             return HomeRequest(payload=home_payload)
-
+        elif step.move_type == MoveType.tip_action:
+            tip_action_payload = TipActionRequestPayload(
+                group_id=UInt8Field(group),
+                seq_id=UInt8Field(seq),
+                duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
+                velocity=self._convert_velocity(
+                    step.velocity_mm_sec, interrupts_per_sec
+                ),
+            )
+            return TipActionRequest(payload=tip_action_payload)
         else:
             linear_payload = AddLinearMoveRequestPayload(
                 request_stop_condition=UInt8Field(step.stop_condition),
@@ -271,6 +283,21 @@ class MoveScheduler:
                     condition = "Homing timed out."
                     log.warning(f"Homing failed. Condition: {condition}")
                     raise MoveConditionNotMet()
+        elif isinstance(message, TipActionResponse):
+            seq_id = message.payload.seq_id.value
+            group_id = message.payload.group_id.value
+            ack_id = message.payload.ack_id.value
+            limit_switch = bool(UInt8Field(2) == ack_id)
+            success = message.payload.success.value
+            # TODO need to add tip action type to the response message.
+            if limit_switch and not success:
+                condition = "Tip still detected."
+                log.warning(f"Drop tip failed. Condition {condition}")
+                raise MoveConditionNotMet()
+            elif not limit_switch and not success:
+                condition = "Tip not detected."
+                log.warning(f"Pick up tip failed. Condition {condition}")
+                raise MoveConditionNotMet()
 
     async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""

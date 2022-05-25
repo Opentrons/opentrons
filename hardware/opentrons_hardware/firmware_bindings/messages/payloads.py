@@ -419,7 +419,7 @@ class TipActionRequestPayload(AddToMoveGroupRequestPayload):
 
 
 @dataclass
-class TipActionResponsePayload(MoveGroupResponsePayload):
+class TipActionResponsePayload(MoveCompletedPayload):
     """A response that sends back whether tip action was successful."""
 
     success: utils.UInt8Field

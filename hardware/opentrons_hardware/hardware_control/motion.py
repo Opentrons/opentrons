@@ -28,6 +28,7 @@ class MoveType(int, Enum):
     linear = 0x0
     home = 0x1
     calibration = 0x2
+    tip_action = 0x3
 
     @classmethod
     def get_move_type(cls, condition: MoveStopCondition) -> "MoveType":
