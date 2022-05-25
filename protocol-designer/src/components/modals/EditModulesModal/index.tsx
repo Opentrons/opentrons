@@ -135,7 +135,6 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     }
 
     if (selectedModel === HEATERSHAKER_MODULE_V1) {
-      // heater shaker can only go in slot 1, so check labware in slot 2
       const labwareNextToHeaterShaker = getLabwareOnSlot(
         initialDeckSetup,
         getSlotNextTo(selectedSlot) ?? ''
