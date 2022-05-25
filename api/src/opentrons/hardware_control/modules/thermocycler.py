@@ -254,7 +254,7 @@ class Thermocycler(mod_abc.AbstractModule):
         await self.make_cancellable(task)
         await task
 
-    async def wait_for_temperature(
+    async def wait_for_block_temperature(
         self,
         temperature: float,
     ) -> None:

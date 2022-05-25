@@ -120,7 +120,7 @@ async def test_wait_for_temperatures(thermocycler: Thermocycler):
     """It should wait for temperature and be at holding status"""
     await thermocycler.set_target_block_temperature(40.0)
     await thermocycler.set_target_lid_temperature(50.0)
-    await thermocycler.wait_for_temperature(temperature=40.0)
+    await thermocycler.wait_for_block_temperature(temperature=40.0)
     await thermocycler.wait_for_lid_temperature(temperature=50.0)
     assert thermocycler.status == TemperatureStatus.HOLDING
     assert thermocycler.lid_temp_status == TemperatureStatus.HOLDING

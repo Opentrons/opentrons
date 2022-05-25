@@ -47,5 +47,5 @@ async def test_set_target_block_temperature(
 
     result = await subject.execute(data)
 
-    decoy.verify(await tc_hardware.wait_for_temperature(temperature=76.6), times=1)
+    decoy.verify(await tc_hardware.wait_for_block_temperature(temperature=76.6), times=1)
     assert result == expected_result
