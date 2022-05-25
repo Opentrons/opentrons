@@ -2,7 +2,7 @@ import assert from 'assert'
 import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
-import standardDeckDef from '../../deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '../../deck/definitions/3/ot2_standard.json'
 import type { DeckDefinition, LabwareDefinition2 } from '../types'
 import type { ThermalAdapterName } from '..'
 
