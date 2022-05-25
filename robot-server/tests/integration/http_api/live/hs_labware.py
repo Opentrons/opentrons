@@ -3,16 +3,26 @@ import asyncio
 from tests.integration.http_api.live import util
 from tests.integration.http_api.live.base_cli import BaseCli
 from tests.integration.robot_client import RobotClient
+from tests.integration.http_api.live.robot_interactions import RobotInteractions
+
+HS_SLOT = "2"
+TIPRACK = "opentrons_96_tiprack_20ul"
+TIPRACK_SLOT = "8"
+PIPETTE = "p20_single_gen2"
+PIPETTE_MOUNT = "right"
 
 
-async def hs_measure(robot_ip: str, labware: str) -> None:
+async def hs_measure(robot_ip: str, robot_port: str, labware: str) -> None:
     """Run the series of commands necessary to evaluate tip height against labware on the Heater Shaker."""  # noqa: E501
     async with RobotClient.make(
-        host=f"http://{robot_ip}", port=31950, version="*"
+        host=f"http://{robot_ip}", port=robot_port, version="*"
     ) as robot_client:
         await robot_client.wait_until_alive()
-        hs_id = await util.get_module_id(
-            robot_client=robot_client, module_model="heaterShakerModuleV1"
+        robot_interactions: RobotInteractions = RobotInteractions(
+            robot_client=robot_client
+        )
+        hs_id = await robot_interactions.get_module_id(
+            module_model="heaterShakerModuleV1"
         )
         run = await robot_client.post_run(req_body={"data": {}})
         await util.log_response(run)
@@ -22,13 +32,13 @@ async def hs_measure(robot_ip: str, labware: str) -> None:
                 "commandType": "loadModule",
                 "params": {
                     "model": "heaterShakerModuleV1",
-                    "location": {"slotName": "2"},
+                    "location": {"slotName": HS_SLOT},
                     "moduleId": hs_id,
                 },
             }
         }
-        await util.execute_command(
-            robot_client=robot_client, run_id=run_id, req_body=load_module_command
+        await robot_interactions.execute_command(
+            run_id=run_id, req_body=load_module_command
         )
 
         load_labware_command = {
@@ -43,53 +53,53 @@ async def hs_measure(robot_ip: str, labware: str) -> None:
                 },
             }
         }
-        await util.execute_command(
-            robot_client=robot_client, run_id=run_id, req_body=load_labware_command
+        await robot_interactions.execute_command(
+            run_id=run_id, req_body=load_labware_command
         )
 
         load_tiprack_command = {
             "data": {
                 "commandType": "loadLabware",
                 "params": {
-                    "location": {"slotName": "8"},
-                    "loadName": "opentrons_96_tiprack_20ul",
+                    "location": {"slotName": TIPRACK_SLOT},
+                    "loadName": TIPRACK,
                     "namespace": "opentrons",
                     "version": 1,
-                    "labwareId": "20ul_tips",
+                    "labwareId": "tips",
                 },
             }
         }
-        await util.execute_command(
-            robot_client=robot_client, run_id=run_id, req_body=load_tiprack_command
+        await robot_interactions.execute_command(
+            run_id=run_id, req_body=load_tiprack_command
         )
 
         load_pipette_command = {
             "data": {
                 "commandType": "loadPipette",
                 "params": {
-                    "pipetteName": "p20_single_gen2",
-                    "mount": "right",
-                    "pipetteId": "20ul_pipette",
+                    "pipetteName": PIPETTE,
+                    "mount": PIPETTE_MOUNT,
+                    "pipetteId": "pipette",
                 },
             }
         }
-        await util.execute_command(
-            robot_client=robot_client, run_id=run_id, req_body=load_pipette_command
+        await robot_interactions.execute_command(
+            run_id=run_id, req_body=load_pipette_command
         )
 
         pickup_tip_command = {
             "data": {
                 "commandType": "pickUpTip",
                 "params": {
-                    "pipetteId": "20ul_pipette",
-                    "labwareId": "20ul_tips",
+                    "pipetteId": "pipette",
+                    "labwareId": "tips",
                     "wellName": "A1",
                 },
             }
         }
         print("Picking up tip.")
-        await util.execute_command(
-            robot_client=robot_client, run_id=run_id, req_body=pickup_tip_command
+        await robot_interactions.execute_command(
+            run_id=run_id, req_body=pickup_tip_command
         )
 
         wells_on_hs = ["A1", "A12", "H1", "H12", "D6"]
@@ -98,30 +108,30 @@ async def hs_measure(robot_ip: str, labware: str) -> None:
                 "data": {
                     "commandType": "moveToWell",
                     "params": {
-                        "pipetteId": "20ul_pipette",
+                        "pipetteId": "pipette",
                         "labwareId": "target",
                         "wellName": well,
                     },
                 }
             }
-            await util.execute_command(
-                robot_client=robot_client, run_id=run_id, req_body=move_to_well_command
+            await robot_interactions.execute_command(
+                run_id=run_id, req_body=move_to_well_command
             )
-            await util.ainput(f"At well {well} press Enter to move to the next well.")
+            await util.prompt(f"At well {well} press Enter to move to the next well.")
 
         drop_tip_command = {
             "data": {
                 "commandType": "dropTip",
                 "params": {
-                    "pipetteId": "20ul_pipette",
-                    "labwareId": "20ul_tips",
+                    "pipetteId": "pipette",
+                    "labwareId": "tips",
                     "wellName": "A1",
                 },
             }
         }
         print("Dropping tip.")
-        await util.execute_command(
-            robot_client=robot_client, run_id=run_id, req_body=drop_tip_command
+        await robot_interactions.execute_command(
+            run_id=run_id, req_body=drop_tip_command
         )
 
         home_command = {
@@ -131,21 +141,20 @@ async def hs_measure(robot_ip: str, labware: str) -> None:
             }
         }
         print("Homing.")
-        await util.execute_command(
-            robot_client=robot_client, run_id=run_id, req_body=home_command
-        )
+        await robot_interactions.execute_command(run_id=run_id, req_body=home_command)
 
 
 if __name__ == "__main__":
 
     cli = BaseCli()
-    cli.parser.description = """
+    cli.parser.description = f"""
 Check HS Labware
-1. Attach p20_single_gen2 pipette on the right.
-2. Place opentrons_96_tiprack_20ul tip rack in slot 8.
-3. Complete pipette offset and tip length calibrations
-4. Place the Heater Shaker in slot 2
-5. Place the labware to test on top of the Heater Shaker.
+1. Change the constants to exchange in location, pipette, and/or tiprack.
+2. Attach {PIPETTE} pipette on the {PIPETTE_MOUNT}.
+3. Place {TIPRACK} tip rack in slot {TIPRACK_SLOT}.
+4. Complete pipette offset and tip length calibrations
+5. Place the Heater Shaker in slot {HS_SLOT}
+6. Place the labware to test on top of the Heater Shaker.
 """
 
     hs_labware = [
@@ -160,4 +169,8 @@ Check HS Labware
         help = help + lw + "\n"
     cli.parser.add_argument("--labware_key", type=str, help=help)
     args = cli.parser.parse_args()
-    asyncio.run(hs_measure(robot_ip=args.robot_ip, labware=args.labware_key))
+    asyncio.run(
+        hs_measure(
+            robot_ip=args.robot_ip, robot_port=args.robot_port, labware=args.labware_key
+        )
+    )

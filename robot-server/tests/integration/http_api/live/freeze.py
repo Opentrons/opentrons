@@ -1,20 +1,25 @@
 import asyncio
+from anyio import create_task_group
 
-from tests.integration.http_api.live import util
+from tests.integration.http_api.live.robot_interactions import RobotInteractions
+from tests.integration.http_api.live.util import log_response
 from tests.integration.http_api.live.base_cli import BaseCli
 from tests.integration.robot_client import RobotClient
 
 
-async def freeze(robot_ip: str) -> None:
+async def freeze(robot_ip: str, robot_port: str) -> None:
     """Run the series of commands to repetitively move a pipette to various wells
     on a plate. This exposed a freezing issue."""
     async with RobotClient.make(
-        host=f"http://{robot_ip}", port=31950, version="*"
+        host=f"http://{robot_ip}", port=robot_port, version="*"
     ) as robot_client:
         await robot_client.wait_until_alive()
+        robot_interactions: RobotInteractions = RobotInteractions(
+            robot_client=robot_client
+        )
         for _ in range(3):
             run = await robot_client.post_run(req_body={"data": {}})
-            await util.log_response(run)
+            await log_response(run)
             run_id = run.json()["data"]["id"]
 
             load_plate_command = {
@@ -29,8 +34,8 @@ async def freeze(robot_ip: str) -> None:
                     },
                 }
             }
-            await util.execute_command(
-                robot_client=robot_client, run_id=run_id, req_body=load_plate_command
+            await robot_interactions.execute_command(
+                run_id=run_id, req_body=load_plate_command
             )
 
             load_pipette_command = {
@@ -43,8 +48,8 @@ async def freeze(robot_ip: str) -> None:
                     },
                 }
             }
-            await util.execute_command(
-                robot_client=robot_client, run_id=run_id, req_body=load_pipette_command
+            await robot_interactions.execute_command(
+                run_id=run_id, req_body=load_pipette_command
             )
 
             wells_on_hs = ["A1", "A12", "H1", "H12", "D6"]
@@ -59,20 +64,12 @@ async def freeze(robot_ip: str) -> None:
                         },
                     }
                 }
-                command_task = asyncio.create_task(
-                    util.execute_command(
-                        robot_client=robot_client,
-                        run_id=run_id,
-                        req_body=move_to_well_command,
+                async with create_task_group() as tg:
+                    tg.start_soon(
+                        robot_interactions.execute_command, run_id, move_to_well_command
                     )
-                )
-                try:
-                    # this is a new run we just created and should have busted the cache
-                    await robot_client.get_run(run_id=run_id)
-                    # more queries of the run table for load
-                    await util.query_random_runs(robot_client=robot_client)
-                finally:
-                    await command_task
+                    tg.start_soon(robot_client.get_run, run_id)
+                    tg.start_soon(robot_interactions.query_random_runs)
 
         home_command = {
             "data": {
@@ -81,9 +78,7 @@ async def freeze(robot_ip: str) -> None:
             }
         }
         print("Homing.")
-        await util.execute_command(
-            robot_client=robot_client, run_id=run_id, req_body=home_command
-        )
+        await robot_interactions.execute_command(run_id=run_id, req_body=home_command)
 
 
 if __name__ == "__main__":
@@ -96,4 +91,4 @@ if __name__ == "__main__":
 5. Run this without -h
 """
     args = cli.parser.parse_args()
-    asyncio.run(freeze(robot_ip=args.robot_ip))
+    asyncio.run(freeze(robot_ip=args.robot_ip, robot_port=args.robot_port))
