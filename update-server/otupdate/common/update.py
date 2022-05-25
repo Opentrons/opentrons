@@ -91,7 +91,7 @@ async def status(request: web.Request, session: UpdateSession) -> web.Response:
     return web.json_response(data=session.state, status=200)
 
 
-async def _save_file(part: BodyPartReader, path: str):
+async def _save_file(part: BodyPartReader, path: str) -> None:
     # making sure directory exists first
     Path(path).mkdir(parents=True, exist_ok=True)
     with open(os.path.join(path, part.name), "wb") as write:
@@ -111,7 +111,7 @@ def _begin_write(
     loop: asyncio.AbstractEventLoop,
     rootfs_file_path: str,
     actions: update_actions.UpdateActionsInterface,
-):
+) -> None:
     """Start the write process."""
     session.set_progress(0)
     session.set_stage(Stages.WRITING)
@@ -140,7 +140,7 @@ def _begin_validation(
     loop: asyncio.AbstractEventLoop,
     downloaded_update_path: str,
     actions: update_actions.UpdateActionsInterface,
-) -> asyncio.futures.Future:
+) -> "asyncio.futures.Future[Optional[str]]":
     """Start the validation process."""
     session.set_stage(Stages.VALIDATING)
     cert_path = config.update_cert_path if config.signature_required else None
