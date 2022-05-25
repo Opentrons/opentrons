@@ -7,7 +7,6 @@ import {
   Flex,
   ALIGN_CENTER,
   ALIGN_START,
-  C_MED_LIGHT_GRAY,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   SPACING,
@@ -21,12 +20,12 @@ import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { StyledText } from '../../atoms/text'
 import { UNREACHABLE } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
+import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { useAttachedModules, useAttachedPipettes } from './hooks'
 import { RobotStatusBanner } from './RobotStatusBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
-import { UpdateRobotBanner } from '../UpdateRobotBanner'
 
 interface RobotCardProps {
   robot: DiscoveredRobot
@@ -44,7 +43,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.white}
-      border={`1px solid ${C_MED_LIGHT_GRAY}`}
+      border={`1px solid ${COLORS.medGrey}`}
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_ROW}
       marginBottom={SPACING.spacing3}
