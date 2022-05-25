@@ -67,6 +67,7 @@ export interface EditModulesFormValues {
   selectedSlot: string
 }
 
+// this util only works for outter slots (where we can safely place modules in PD)
 const getSlotNextTo = (slot: string): string | null => {
   const SLOT_ADJACENT_MAP: Record<string, string> = {
     '1': '2',
