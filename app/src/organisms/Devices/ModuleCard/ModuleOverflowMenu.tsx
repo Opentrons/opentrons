@@ -10,6 +10,7 @@ import type { AttachedModule } from '../../../redux/modules/types'
 import type { ModuleType } from '@opentrons/shared-data'
 
 interface ModuleOverflowMenuProps {
+  robotName: string
   module: AttachedModule
   handleSlideoutClick: () => void
   handleAboutClick: () => void
@@ -23,6 +24,7 @@ export const ModuleOverflowMenu = (
 ): JSX.Element | null => {
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const {
+    robotName,
     module,
     runId,
     handleSlideoutClick,
@@ -30,8 +32,10 @@ export const ModuleOverflowMenu = (
     handleTestShakeClick,
     handleWizardClick,
   } = props
+
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { menuOverflowItemsByModuleType } = useModuleOverflowMenu(
+    robotName,
     module,
     runId,
     handleAboutClick,

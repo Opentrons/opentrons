@@ -16,7 +16,7 @@ import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProto
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useProtocolDetailsForRun } from '../hooks'
+import { useAttachedModules, useProtocolDetailsForRun } from '../hooks'
 
 import type {
   HeaterShakerCloseLatchCreateCommand,
@@ -30,6 +30,33 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 import type { AttachedModule } from '../../../redux/modules/types'
+
+interface ModuleIdFromRun {
+  moduleIdFromRun: string
+}
+
+export function useModuleIdFromRun(
+  robotName: string,
+  module: AttachedModule,
+  runId: string | null
+): ModuleIdFromRun {
+  const { protocolData } = useProtocolDetailsForRun(runId)
+  const attachedModules = useAttachedModules(robotName)
+
+  const filteredModules = attachedModules.filter(
+    item => item.moduleModel === module.moduleModel
+  )
+  const loadModuleCommands = protocolData?.commands.filter(
+    command =>
+      command.commandType === 'loadModule' &&
+      command.params.model === module.moduleModel
+  )
+  const moduleIdFromRun =
+    loadModuleCommands != null &&
+    loadModuleCommands[filteredModules.indexOf(module)].result.moduleId
+
+  return { moduleIdFromRun }
+}
 
 export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
@@ -49,11 +76,17 @@ interface LatchControls {
 }
 
 export function useLatchControls(
+  robotName: string,
   module: AttachedModule,
   runId?: string | null
 ): LatchControls {
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    robotName,
+    module,
+    runId != null ? runId : null
+  )
 
   const isLatchClosed =
     module.moduleType === 'heaterShakerModuleType' &&
@@ -66,7 +99,7 @@ export function useLatchControls(
     commandType: isLatchClosed
       ? 'heaterShakerModule/openLatch'
       : 'heaterShakerModule/closeLatch',
-    params: { moduleId: module.id },
+    params: { moduleId: runId != null ? moduleIdFromRun : module.id },
   }
 
   const toggleLatch = (): void => {
@@ -113,6 +146,7 @@ type deactivateCommandTypes =
   | 'heaterShakerModule/deactivateHeater'
 
 export function useModuleOverflowMenu(
+  robotName: string,
   module: AttachedModule,
   runId: string | null = null,
   handleAboutClick: () => void,
@@ -123,8 +157,13 @@ export function useModuleOverflowMenu(
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
-  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
+  const { toggleLatch, isLatchClosed } = useLatchControls(
+    robotName,
+    module,
+    runId
+  )
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const { moduleIdFromRun } = useModuleIdFromRun(robotName, module, runId)
 
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
@@ -195,7 +234,7 @@ export function useModuleOverflowMenu(
       | TCDeactivateBlockCreateCommand
       | HeaterShakerStopShakeCreateCommand = {
       commandType: deactivateModuleCommandType,
-      params: { moduleId: module.id },
+      params: { moduleId: runId != null ? moduleIdFromRun : module.id },
     }
     if (runId != null) {
       createCommand({

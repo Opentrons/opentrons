@@ -25,6 +25,7 @@ import {
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
+import { useModuleIdFromRun } from './hooks'
 import { PrimaryButton } from '../../../atoms/buttons'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { InputField } from '../../../atoms/InputField'
@@ -37,6 +38,7 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface HeaterShakerSlideoutProps {
+  robotName: string
   module: HeaterShakerModule
   onCloseClick: () => unknown
   isExpanded: boolean
@@ -47,13 +49,25 @@ interface HeaterShakerSlideoutProps {
 export const HeaterShakerSlideout = (
   props: HeaterShakerSlideoutProps
 ): JSX.Element | null => {
-  const { module, onCloseClick, isExpanded, isSetShake, runId } = props
+  const {
+    robotName,
+    module,
+    onCloseClick,
+    isExpanded,
+    isSetShake,
+    runId,
+  } = props
   const { t } = useTranslation('device_details')
   const [hsValue, setHsValue] = React.useState<string | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    robotName,
+    module,
+    runId != null ? runId : null
+  )
   const modulePart = isSetShake ? t('shake_speed') : t('temperature')
 
   const sendShakeSpeedCommand = (): void => {
@@ -61,7 +75,7 @@ export const HeaterShakerSlideout = (
       const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
         commandType: 'heaterShakerModule/setTargetShakeSpeed',
         params: {
-          moduleId: module.id,
+          moduleId: runId != null ? moduleIdFromRun : module.id,
           rpm: parseInt(hsValue),
         },
       }
@@ -98,7 +112,7 @@ export const HeaterShakerSlideout = (
       const setTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
         commandType: 'heaterShakerModule/startSetTargetTemperature',
         params: {
-          moduleId: module.id,
+          moduleId: runId != null ? moduleIdFromRun : module.id,
           // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10182 merges
           temperature: parseInt(hsValue),
         },

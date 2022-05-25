@@ -238,11 +238,18 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         width={'100%'}
         data-testid={`ModuleCard_${module.serialNumber}`}
       >
-        {showWizard && (
-          <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
-        )}
+        {showWizard &&
+          (runId != null ? (
+            <HeaterShakerWizard
+              onCloseClick={() => setShowWizard(false)}
+              runId={runId}
+            />
+          ) : (
+            <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
+          ))}
         {showSlideout && runId != null ? (
           <ModuleSlideout
+            robotName={robotName}
             module={module}
             runId={runId}
             isSecondary={hasSecondary}
@@ -251,6 +258,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           />
         ) : (
           <ModuleSlideout
+            robotName={robotName}
             module={module}
             isSecondary={hasSecondary}
             showSlideout={showSlideout}
@@ -267,6 +275,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         )}
         {showTestShake && (
           <TestShakeSlideout
+            robotName={robotName}
             module={module as HeaterShakerModule}
             isExpanded={showTestShake}
             onCloseClick={() => setShowTestShake(false)}
@@ -431,6 +440,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             data-testid={`ModuleCard_overflow_menu_${module.serialNumber}`}
           >
             <ModuleOverflowMenu
+              robotName={robotName}
               handleAboutClick={handleAboutClick}
               module={module}
               runId={runId}
@@ -446,6 +456,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 }
 
 interface ModuleSlideoutProps {
+  robotName: string
   module: AttachedModule
   runId?: string
   isSecondary: boolean
@@ -454,11 +465,19 @@ interface ModuleSlideoutProps {
 }
 
 const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
-  const { module, runId, isSecondary, showSlideout, onCloseClick } = props
+  const {
+    robotName,
+    module,
+    runId,
+    isSecondary,
+    showSlideout,
+    onCloseClick,
+  } = props
 
   if (module.moduleType === THERMOCYCLER_MODULE_TYPE) {
     return (
       <ThermocyclerModuleSlideout
+        robotName={robotName}
         module={module}
         runId={runId}
         onCloseClick={onCloseClick}
@@ -469,6 +488,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
   } else if (module.moduleType === MAGNETIC_MODULE_TYPE) {
     return (
       <MagneticModuleSlideout
+        robotName={robotName}
         module={module}
         runId={runId}
         onCloseClick={onCloseClick}
@@ -478,6 +498,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
   } else if (module.moduleType === TEMPERATURE_MODULE_TYPE) {
     return (
       <TemperatureModuleSlideout
+        robotName={robotName}
         module={module}
         runId={runId}
         onCloseClick={onCloseClick}
@@ -487,6 +508,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
   } else {
     return (
       <HeaterShakerSlideout
+        robotName={robotName}
         module={module}
         runId={runId}
         onCloseClick={onCloseClick}

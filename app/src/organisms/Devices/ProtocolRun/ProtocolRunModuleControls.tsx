@@ -1,3 +1,4 @@
+import * as React from 'react'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -7,8 +8,6 @@ import {
 } from '@opentrons/components'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import * as React from 'react'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
@@ -37,45 +36,31 @@ export const ProtocolRunModuleControls = ({
 
   const loadCommands: LoadModuleRunTimeCommand[] = protocolData?.commands.filter(
     command => command.commandType === 'loadModule'
-  )
+  ) as LoadModuleRunTimeCommand[]
 
-  const setupLoadCommands = loadCommands.map(command => {
-    const commandWithModuleId = {
-      ...command,
-      params: {
-        ...command.params,
-        moduleId: command.result?.moduleId,
-      },
+  React.useEffect(() => {
+    if (protocolData != null) {
+      const setupLoadCommands = loadCommands.map(command => {
+        const commandWithModuleId = {
+          ...command,
+          params: {
+            ...command.params,
+            moduleId: command.result?.moduleId,
+          },
+        }
+        return commandWithModuleId
+      })
+
+      setupLoadCommands.forEach(loadCommand => {
+        createCommand({
+          runId: runId,
+          command: loadCommand,
+        }).catch((e: Error) => {
+          console.error(`error issuing command to robot: ${e.message}`)
+        })
+      })
     }
-    return commandWithModuleId
-  })
-
-  setupLoadCommands.forEach(loadCommand => {
-    createCommand({
-      runId: runId,
-      command: loadCommand,
-    }).catch((e: Error) => {
-      console.error(`error issuing command to robot: ${e.message}`)
-    })
-  })
-
-  // const sendLoadCommand = (): void => {
-  //   createCommand({ runId: runId, command: setShakeCommand }).catch(
-  //     (e: Error) => {
-  //       console.error(
-  //         `error setting heater shaker shake speed: ${e.message} with run id ${runId}`
-  //       )
-  //     }
-  //   )
-  // }
-
-  // createCommand({
-  //   runId: currentRunId,
-  //   command: createCommandData(prepCommand),
-  // }).catch((e: Error) => {
-  //   console.error(`error issuing command to robot: ${e.message}`)
-  //   setError(e)
-  // })
+  }, [])
 
   return (
     <Flex

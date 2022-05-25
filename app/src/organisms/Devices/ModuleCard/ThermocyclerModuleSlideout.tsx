@@ -24,6 +24,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../../atoms/buttons'
+import { useModuleIdFromRun } from './hooks'
 
 import type { ThermocyclerModule } from '../../../redux/modules/types'
 import type {
@@ -32,6 +33,7 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface ThermocyclerModuleSlideoutProps {
+  robotName: string
   module: ThermocyclerModule
   onCloseClick: () => unknown
   isExpanded: boolean
@@ -42,11 +44,23 @@ interface ThermocyclerModuleSlideoutProps {
 export const ThermocyclerModuleSlideout = (
   props: ThermocyclerModuleSlideoutProps
 ): JSX.Element | null => {
-  const { module, onCloseClick, isExpanded, isSecondaryTemp, runId } = props
+  const {
+    robotName,
+    module,
+    onCloseClick,
+    isExpanded,
+    isSecondaryTemp,
+    runId,
+  } = props
   const { t } = useTranslation('device_details')
   const [tempValue, setTempValue] = React.useState<string | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    robotName,
+    module,
+    runId != null ? runId : null
+  )
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
   const tempRanges = getTCTempRange(isSecondaryTemp)
@@ -71,14 +85,14 @@ export const ThermocyclerModuleSlideout = (
       const saveLidCommand: TCSetTargetLidTemperatureCreateCommand = {
         commandType: 'thermocycler/setTargetLidTemperature',
         params: {
-          moduleId: module.id,
+          moduleId: runId != null ? moduleIdFromRun : module.id,
           celsius: parseInt(tempValue),
         },
       }
       const saveBlockCommand: TCSetAndWaitForBlockTemperatureCreateCommand = {
         commandType: 'thermocycler/setAndWaitForBlockTemperature',
         params: {
-          moduleId: module.id,
+          moduleId: runId != null ? moduleIdFromRun : module.id,
           celsius: parseInt(tempValue),
           //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
         },

@@ -19,6 +19,7 @@ import {
   TEMP_MAX,
   TEMP_MIN,
 } from '@opentrons/shared-data'
+import { useModuleIdFromRun } from './hooks'
 import { Slideout } from '../../../atoms/Slideout'
 import { PrimaryButton } from '../../../atoms/buttons'
 import { InputField } from '../../../atoms/InputField'
@@ -27,6 +28,7 @@ import { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/s
 import type { TemperatureModule } from '../../../redux/modules/types'
 
 interface TemperatureModuleSlideoutProps {
+  robotName: string
   module: TemperatureModule
   onCloseClick: () => unknown
   isExpanded: boolean
@@ -36,10 +38,15 @@ interface TemperatureModuleSlideoutProps {
 export const TemperatureModuleSlideout = (
   props: TemperatureModuleSlideoutProps
 ): JSX.Element | null => {
-  const { module, onCloseClick, isExpanded, runId } = props
+  const { robotName, module, onCloseClick, isExpanded, runId } = props
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    robotName,
+    module,
+    runId != null ? runId : null
+  )
   const name = getModuleDisplayName(module.moduleModel)
   const [temperatureValue, setTemperatureValue] = React.useState<string | null>(
     null
@@ -50,7 +57,7 @@ export const TemperatureModuleSlideout = (
       const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand = {
         commandType: 'temperatureModule/setTargetTemperature',
         params: {
-          moduleId: module.id,
+          moduleId: runId != null ? moduleIdFromRun : module.id,
           celsius: parseInt(temperatureValue),
         },
       }

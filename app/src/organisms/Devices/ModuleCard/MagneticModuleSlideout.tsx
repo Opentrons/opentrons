@@ -4,6 +4,7 @@ import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
+import { useModuleIdFromRun } from './hooks'
 import {
   Flex,
   Text,
@@ -64,6 +65,7 @@ const getInfoByModel = (model: MagneticModuleModel): ModelContents => {
 }
 
 interface MagneticModuleSlideoutProps {
+  robotName: string
   module: MagneticModule
   onCloseClick: () => unknown
   isExpanded: boolean
@@ -73,13 +75,18 @@ interface MagneticModuleSlideoutProps {
 export const MagneticModuleSlideout = (
   props: MagneticModuleSlideoutProps
 ): JSX.Element | null => {
-  const { module, isExpanded, onCloseClick, runId } = props
+  const { robotName, module, isExpanded, onCloseClick, runId } = props
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
   const [engageHeightValue, setEngageHeightValue] = React.useState<
     string | null
   >(null)
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    robotName,
+    module,
+    runId != null ? runId : null
+  )
 
   const moduleName = getModuleDisplayName(module.moduleModel)
   const info = getInfoByModel(module.moduleModel)
@@ -114,7 +121,7 @@ export const MagneticModuleSlideout = (
       const setEngageCommand: MagneticModuleEngageMagnetCreateCommand = {
         commandType: 'magneticModule/engage',
         params: {
-          moduleId: module.id,
+          moduleId: runId != null ? moduleIdFromRun : module.id,
           height: parseInt(engageHeightValue),
         },
       }
