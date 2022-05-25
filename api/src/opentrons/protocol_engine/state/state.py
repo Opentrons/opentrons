@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from functools import partial
 from typing import Any, Callable, List, Optional, Sequence, TypeVar
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 
 from ..resources import DeckFixedLabware
 from ..actions import Action, ActionHandler
@@ -102,7 +102,7 @@ class StateStore(StateView, ActionHandler):
 
     def __init__(
         self,
-        deck_definition: DeckDefinitionV2,
+        deck_definition: DeckDefinitionV3,
         deck_fixed_labware: Sequence[DeckFixedLabware],
         is_door_blocking: bool,
         configs: EngineConfigs = EngineConfigs(),

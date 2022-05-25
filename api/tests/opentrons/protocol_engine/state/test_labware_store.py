@@ -4,7 +4,7 @@ import pytest
 from datetime import datetime
 
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 
@@ -29,7 +29,7 @@ from .command_fixtures import create_load_labware_command
 
 @pytest.fixture
 def subject(
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
     fixed_trash_def: LabwareDefinition,
 ) -> LabwareStore:
     """Get a LabwareStore test subject."""
@@ -46,7 +46,7 @@ def subject(
 
 
 def test_initial_state(
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
     fixed_trash_def: LabwareDefinition,
     subject: LabwareStore,
 ) -> None:
