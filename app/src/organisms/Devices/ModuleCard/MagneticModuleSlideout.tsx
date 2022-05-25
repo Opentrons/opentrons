@@ -65,7 +65,6 @@ const getInfoByModel = (model: MagneticModuleModel): ModelContents => {
 }
 
 interface MagneticModuleSlideoutProps {
-  robotName: string
   module: MagneticModule
   onCloseClick: () => unknown
   isExpanded: boolean
@@ -75,7 +74,7 @@ interface MagneticModuleSlideoutProps {
 export const MagneticModuleSlideout = (
   props: MagneticModuleSlideoutProps
 ): JSX.Element | null => {
-  const { robotName, module, isExpanded, onCloseClick, runId } = props
+  const { module, isExpanded, onCloseClick, runId } = props
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
@@ -83,7 +82,6 @@ export const MagneticModuleSlideout = (
     string | null
   >(null)
   const { moduleIdFromRun } = useModuleIdFromRun(
-    robotName,
     module,
     runId != null ? runId : null
   )

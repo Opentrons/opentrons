@@ -127,7 +127,6 @@ describe('TestShake', () => {
   let mockCreateCommand = jest.fn()
   beforeEach(() => {
     props = {
-      robotName: 'Otie',
       setCurrentPage: jest.fn(),
       module: mockHeaterShaker,
       moduleFromProtocol: undefined,
@@ -167,7 +166,6 @@ describe('TestShake', () => {
 
   it('renders labware name in the banner description when there is a protocol', () => {
     props = {
-      robotName: 'Otie',
       setCurrentPage: jest.fn(),
       module: mockHeaterShaker,
       moduleFromProtocol: HEATER_SHAKER_PROTOCOL_MODULE_INFO,
@@ -188,7 +186,6 @@ describe('TestShake', () => {
 
   it('renders the close labware latch button and is enabled when latch status is open', () => {
     props = {
-      robotName: 'Otie',
       module: mockHeaterShaker,
       setCurrentPage: jest.fn(),
       moduleFromProtocol: undefined,
@@ -206,7 +203,6 @@ describe('TestShake', () => {
 
   it('renders the start shaking button and is enabled', () => {
     props = {
-      robotName: 'Otie',
       module: mockCloseLatchHeaterShaker,
       setCurrentPage: jest.fn(),
       moduleFromProtocol: undefined,
@@ -245,7 +241,6 @@ describe('TestShake', () => {
 
   it('start shake button should be disabled if the labware latch is open', () => {
     props = {
-      robotName: 'Otie',
       module: mockOpenLatchHeaterShaker,
       setCurrentPage: jest.fn(),
       moduleFromProtocol: undefined,
@@ -263,7 +258,6 @@ describe('TestShake', () => {
 
   it('clicking the open latch button should open the heater shaker latch', () => {
     props = {
-      robotName: 'Otie',
       module: mockCloseLatchHeaterShaker,
       setCurrentPage: jest.fn(),
       moduleFromProtocol: undefined,
@@ -282,7 +276,6 @@ describe('TestShake', () => {
 
   it('clicking the close latch button should close the heater shaker latch', () => {
     props = {
-      robotName: 'Otie',
       module: mockOpenLatchHeaterShaker,
       setCurrentPage: jest.fn(),
       moduleFromProtocol: undefined,
@@ -301,7 +294,6 @@ describe('TestShake', () => {
 
   it('entering an input for shake speed and clicking start should begin shaking', () => {
     props = {
-      robotName: 'Otie',
       module: mockCloseLatchHeaterShaker,
       setCurrentPage: jest.fn(),
       moduleFromProtocol: undefined,
@@ -326,7 +318,6 @@ describe('TestShake', () => {
 
   it('when the heater shaker is shaking clicking stop should deactivate the shaking', () => {
     props = {
-      robotName: 'Otie',
       module: mockMovingHeaterShaker,
       setCurrentPage: jest.fn(),
       moduleFromProtocol: undefined,

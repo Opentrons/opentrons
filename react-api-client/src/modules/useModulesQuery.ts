@@ -15,7 +15,7 @@ export function useModulesQuery(
         const modules = response.data.data
         // this check will determine if the module response is v3 or v2
         // if v2, we will return an empty array
-        if ('id' in modules) {
+        if (modules.length > 0 && 'id' in modules[0]) {
           return response.data
         } else {
           return {

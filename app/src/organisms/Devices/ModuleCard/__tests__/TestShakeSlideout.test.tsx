@@ -111,7 +111,6 @@ describe('TestShakeSlideout', () => {
   let mockCreateCommand = jest.fn()
   beforeEach(() => {
     props = {
-      robotName: 'Otie',
       module: mockHeaterShaker,
       onCloseClick: jest.fn(),
       isExpanded: true,
@@ -188,7 +187,6 @@ describe('TestShakeSlideout', () => {
 
   it('start shake button should be disabled if the labware latch is open', () => {
     props = {
-      robotName: 'Otie',
       module: mockOpenLatchHeaterShaker,
       onCloseClick: jest.fn(),
       isExpanded: true,
@@ -205,7 +203,6 @@ describe('TestShakeSlideout', () => {
 
   it('open latch button should be disabled if the module is shaking', () => {
     props = {
-      robotName: 'Otie',
       module: mockMovingHeaterShaker,
       onCloseClick: jest.fn(),
       isExpanded: true,
@@ -218,7 +215,6 @@ describe('TestShakeSlideout', () => {
 
   it('renders the open labware latch button and clicking it opens the latch', () => {
     props = {
-      robotName: 'Otie',
       module: mockCloseLatchHeaterShaker,
       onCloseClick: jest.fn(),
       isExpanded: true,
@@ -232,7 +228,6 @@ describe('TestShakeSlideout', () => {
 
   it('entering an input for shake speed and clicking start should begin shaking', () => {
     props = {
-      robotName: 'Otie',
       module: mockHeaterShaker,
       onCloseClick: jest.fn(),
       isExpanded: true,
@@ -257,7 +252,6 @@ describe('TestShakeSlideout', () => {
 
   it('renders the open labware latch button and clicking it opens the latch when there is a runId', () => {
     props = {
-      robotName: 'Otie',
       module: mockCloseLatchHeaterShaker,
       onCloseClick: jest.fn(),
       isExpanded: true,
@@ -272,7 +266,6 @@ describe('TestShakeSlideout', () => {
 
   it('entering an input for shake speed and clicking start should begin shaking when there is a runId', () => {
     props = {
-      robotName: 'Otie',
       module: mockHeaterShaker,
       onCloseClick: jest.fn(),
       isExpanded: true,

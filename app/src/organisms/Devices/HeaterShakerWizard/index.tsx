@@ -97,7 +97,6 @@ export const HeaterShakerWizard = (
           // heaterShaker should never be null because isPrimaryCTAEnabled would be disabled otherwise
           heaterShaker != null ? (
             <TestShake
-              robotName={robotName}
               module={heaterShaker}
               setCurrentPage={setCurrentPage}
               moduleFromProtocol={moduleFromProtocol}

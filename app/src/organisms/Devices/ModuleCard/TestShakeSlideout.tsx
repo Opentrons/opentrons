@@ -45,7 +45,6 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface TestShakeSlideoutProps {
-  robotName: string
   module: HeaterShakerModule
   onCloseClick: () => unknown
   isExpanded: boolean
@@ -55,19 +54,14 @@ interface TestShakeSlideoutProps {
 export const TestShakeSlideout = (
   props: TestShakeSlideoutProps
 ): JSX.Element | null => {
-  const { robotName, module, onCloseClick, isExpanded, runId } = props
+  const { module, onCloseClick, isExpanded, runId } = props
   const { t } = useTranslation(['device_details', 'shared', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
   const name = getModuleDisplayName(module.moduleModel)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { toggleLatch, isLatchClosed } = useLatchControls(
-    robotName,
-    module,
-    runId
-  )
+  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const { moduleIdFromRun } = useModuleIdFromRun(
-    robotName,
     module,
     runId != null ? runId : null
   )

@@ -239,12 +239,9 @@ describe('useLatchControls', () => {
     mockUseModuleIdFromRun.mockReturnValue({
       moduleIdFromRun: 'heatershaker_id',
     })
-    const { result } = renderHook(
-      () => useLatchControls('Otie', mockHeaterShaker),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useLatchControls(mockHeaterShaker), {
+      wrapper,
+    })
     const { isLatchClosed } = result.current
 
     expect(isLatchClosed).toBe(false)
@@ -265,7 +262,7 @@ describe('useLatchControls', () => {
       </I18nextProvider>
     )
     const { result } = renderHook(
-      () => useLatchControls('Otie', mockCloseLatchHeaterShaker),
+      () => useLatchControls(mockCloseLatchHeaterShaker),
       {
         wrapper,
       }
@@ -317,7 +314,6 @@ describe('useModuleOverflowMenu', () => {
     const { result } = renderHook(
       () =>
         useModuleOverflowMenu(
-          'Otie',
           mockHeatHeaterShaker,
           null,
           jest.fn(),
@@ -352,7 +348,6 @@ describe('useModuleOverflowMenu', () => {
     const { result } = renderHook(
       () =>
         useModuleOverflowMenu(
-          'Otie',
           mockDeactivateShakeHeaterShaker,
           null,
           jest.fn(),
@@ -390,7 +385,6 @@ describe('useModuleOverflowMenu', () => {
     const { result } = renderHook(
       () =>
         useModuleOverflowMenu(
-          'Otie',
           mockHeaterShaker,
           null,
           mockAboutClick,
@@ -420,7 +414,6 @@ describe('useModuleOverflowMenu', () => {
     const { result } = renderHook(
       () =>
         useModuleOverflowMenu(
-          'Otie',
           mockMagneticModuleGen2,
           null,
           jest.fn(),
@@ -448,7 +441,6 @@ describe('useModuleOverflowMenu', () => {
     const { result } = renderHook(
       () =>
         useModuleOverflowMenu(
-          'Otie',
           mockMagDeckEngaged,
           null,
           jest.fn(),
@@ -484,7 +476,6 @@ describe('useModuleOverflowMenu', () => {
     const { result } = renderHook(
       () =>
         useModuleOverflowMenu(
-          'Otie',
           mockTemperatureModuleGen2,
           null,
           jest.fn(),
@@ -511,7 +502,6 @@ describe('useModuleOverflowMenu', () => {
     const { result } = renderHook(
       () =>
         useModuleOverflowMenu(
-          'Otie',
           mockTemperatureModuleHeating,
           null,
           jest.fn(),
@@ -546,7 +536,6 @@ describe('useModuleOverflowMenu', () => {
     const { result } = renderHook(
       () =>
         useModuleOverflowMenu(
-          'Otie',
           mockThermocycler,
           null,
           jest.fn(),
@@ -573,7 +562,6 @@ describe('useModuleOverflowMenu', () => {
     const { result } = renderHook(
       () =>
         useModuleOverflowMenu(
-          'Otie',
           mockTCBlockHeating,
           null,
           jest.fn(),
@@ -608,7 +596,6 @@ describe('useModuleOverflowMenu', () => {
     const { result } = renderHook(
       () =>
         useModuleOverflowMenu(
-          'Otie',
           mockTCLidHeating,
           null,
           jest.fn(),

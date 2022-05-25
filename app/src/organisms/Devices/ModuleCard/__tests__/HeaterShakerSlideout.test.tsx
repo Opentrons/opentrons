@@ -72,7 +72,6 @@ describe('HeaterShakerSlideout', () => {
 
   it('renders correct title and body for Heater shaker set shake', () => {
     props = {
-      robotName: 'Otie',
       module: mockHeaterShaker,
       isSetShake: true,
       isExpanded: true,
@@ -87,7 +86,6 @@ describe('HeaterShakerSlideout', () => {
 
   it('renders correct title and body for heatershaker set temperature', () => {
     props = {
-      robotName: 'Otie',
       module: mockHeaterShaker,
       isSetShake: false,
       isExpanded: true,
@@ -104,7 +102,6 @@ describe('HeaterShakerSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for set shake', () => {
     props = {
-      robotName: 'Otie',
       module: mockHeaterShaker,
       isSetShake: true,
       isExpanded: true,
@@ -122,7 +119,6 @@ describe('HeaterShakerSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for set temp', () => {
     props = {
-      robotName: 'Otie',
       module: mockHeaterShaker,
       isSetShake: false,
       isExpanded: true,
@@ -149,7 +145,6 @@ describe('HeaterShakerSlideout', () => {
   it('renders heater shaker form field and when button is clicked, confirm attachment modal is not rendered', () => {
     mockGetIsHeaterShakerAttached.mockReturnValue(true)
     props = {
-      robotName: 'Otie',
       module: mockHeaterShaker,
       isSetShake: true,
       isExpanded: true,
@@ -167,7 +162,6 @@ describe('HeaterShakerSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for set shake when there is a runId', () => {
     props = {
-      robotName: 'Otie',
       module: mockHeaterShaker,
       isSetShake: true,
       isExpanded: true,
@@ -186,7 +180,6 @@ describe('HeaterShakerSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for set temp when there is a runId', () => {
     props = {
-      robotName: 'Otie',
       module: mockHeaterShaker,
       isSetShake: false,
       isExpanded: true,

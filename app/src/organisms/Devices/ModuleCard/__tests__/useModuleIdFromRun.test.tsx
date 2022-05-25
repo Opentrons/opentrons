@@ -88,7 +88,7 @@ describe('useModuleIdFromRun', () => {
     )
     mockUseAttachedModules.mockReturnValue([mockMagneticModule])
     const { result } = renderHook(
-      () => useModuleIdFromRun('Otie', mockMagneticModule, RUN_ID),
+      () => useModuleIdFromRun(mockMagneticModule, RUN_ID),
       { wrapper }
     )
     const moduleIdFromRun = result.current

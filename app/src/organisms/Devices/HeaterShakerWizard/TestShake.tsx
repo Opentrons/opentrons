@@ -36,7 +36,6 @@ import type {
 import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 interface TestShakeProps {
-  robotName: string
   module: HeaterShakerModule
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
   moduleFromProtocol?: ProtocolModuleInfo
@@ -44,20 +43,15 @@ interface TestShakeProps {
 }
 
 export function TestShake(props: TestShakeProps): JSX.Element {
-  const { robotName, module, setCurrentPage, moduleFromProtocol, runId } = props
+  const { module, setCurrentPage, moduleFromProtocol, runId } = props
   const { t } = useTranslation(['heater_shaker', 'device_details'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
   const [isExpanded, setExpanded] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { toggleLatch, isLatchClosed } = useLatchControls(
-    robotName,
-    module,
-    runId
-  )
+  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const { moduleIdFromRun } = useModuleIdFromRun(
-    robotName,
     module,
     runId != null ? runId : null
   )

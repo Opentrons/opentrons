@@ -50,14 +50,12 @@ interface LatchControls {
 }
 
 export function useLatchControls(
-  robotName: string,
   module: AttachedModule,
   runId?: string | null
 ): LatchControls {
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
   const { moduleIdFromRun } = useModuleIdFromRun(
-    robotName,
     module,
     runId != null ? runId : null
   )
@@ -120,7 +118,6 @@ type deactivateCommandTypes =
   | 'heaterShakerModule/deactivateHeater'
 
 export function useModuleOverflowMenu(
-  robotName: string,
   module: AttachedModule,
   runId: string | null = null,
   handleAboutClick: () => void,
@@ -131,13 +128,9 @@ export function useModuleOverflowMenu(
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
-  const { toggleLatch, isLatchClosed } = useLatchControls(
-    robotName,
-    module,
-    runId
-  )
+  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { moduleIdFromRun } = useModuleIdFromRun(robotName, module, runId)
+  const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
 
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&

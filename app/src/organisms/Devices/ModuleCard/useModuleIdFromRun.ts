@@ -7,12 +7,11 @@ export interface ModuleIdFromRun {
 }
 
 export function useModuleIdFromRun(
-  robotName: string,
   module: AttachedModule,
   runId: string | null
 ): ModuleIdFromRun {
   const { protocolData } = useProtocolDetailsForRun(runId)
-  const attachedModules = useAttachedModules(robotName)
+  const attachedModules = useAttachedModules()
 
   const { compatibleWith } = getModuleDef2(module.moduleModel)
 

@@ -46,7 +46,6 @@ describe('TemperatureModuleSlideout', () => {
     mockCreateCommand = jest.fn()
     mockCreateCommand.mockResolvedValue(null)
     props = {
-      robotName: 'Otie',
       module: mockTemperatureModule,
       isExpanded: true,
       onCloseClick: jest.fn(),
@@ -75,7 +74,6 @@ describe('TemperatureModuleSlideout', () => {
 
   it('renders correct title and body for a gen2 temperature module', () => {
     props = {
-      robotName: 'Otie',
       module: mockTemperatureModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),
@@ -91,7 +89,6 @@ describe('TemperatureModuleSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field', () => {
     props = {
-      robotName: 'Otie',
       module: mockTemperatureModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),
@@ -117,7 +114,6 @@ describe('TemperatureModuleSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field and a run id is present', () => {
     props = {
-      robotName: 'Otie',
       module: mockTemperatureModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),

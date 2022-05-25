@@ -58,7 +58,6 @@ describe('ThermocyclerModuleSlideout', () => {
 
   it('renders correct title and body for Thermocycler Lid temperature', () => {
     props = {
-      robotName: 'Otie',
       module: mockThermocycler,
       isSecondaryTemp: true,
       isExpanded: true,
@@ -76,7 +75,6 @@ describe('ThermocyclerModuleSlideout', () => {
 
   it('renders correct title and body for Thermocycler Block Temperature', () => {
     props = {
-      robotName: 'Otie',
       module: mockThermocycler,
       isSecondaryTemp: false,
       isExpanded: true,
@@ -94,7 +92,6 @@ describe('ThermocyclerModuleSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for the TC Block', () => {
     props = {
-      robotName: 'Otie',
       module: mockThermocycler,
       isSecondaryTemp: false,
       isExpanded: true,
@@ -121,7 +118,6 @@ describe('ThermocyclerModuleSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for the TC Lid', () => {
     props = {
-      robotName: 'Otie',
       module: mockThermocycler,
       isSecondaryTemp: true,
       isExpanded: true,
@@ -148,7 +144,6 @@ describe('ThermocyclerModuleSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for the TC Block when there is a runId', () => {
     props = {
-      robotName: 'Otie',
       module: mockThermocycler,
       isSecondaryTemp: false,
       isExpanded: true,
@@ -177,7 +172,6 @@ describe('ThermocyclerModuleSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for the TC Lid when there is a runId', () => {
     props = {
-      robotName: 'Otie',
       module: mockThermocycler,
       isSecondaryTemp: true,
       isExpanded: true,

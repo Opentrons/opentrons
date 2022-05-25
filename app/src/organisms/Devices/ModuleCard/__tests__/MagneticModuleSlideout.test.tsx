@@ -40,7 +40,6 @@ describe('MagneticModuleSlideout', () => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     props = {
-      robotName: 'Otie',
       module: mockMagneticModule,
       isExpanded: true,
       onCloseClick: jest.fn(),
@@ -80,7 +79,6 @@ describe('MagneticModuleSlideout', () => {
 
   it('renders correct title and body for a gen2 magnetic module', () => {
     props = {
-      robotName: 'Otie',
       module: mockMagneticModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),
@@ -123,7 +121,6 @@ describe('MagneticModuleSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field when there is a runId', () => {
     props = {
-      robotName: 'Otie',
       module: mockMagneticModule,
       isExpanded: true,
       onCloseClick: jest.fn(),

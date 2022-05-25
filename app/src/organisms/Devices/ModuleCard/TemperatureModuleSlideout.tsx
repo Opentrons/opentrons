@@ -28,7 +28,6 @@ import { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/s
 import type { TemperatureModule } from '../../../redux/modules/types'
 
 interface TemperatureModuleSlideoutProps {
-  robotName: string
   module: TemperatureModule
   onCloseClick: () => unknown
   isExpanded: boolean
@@ -38,12 +37,11 @@ interface TemperatureModuleSlideoutProps {
 export const TemperatureModuleSlideout = (
   props: TemperatureModuleSlideoutProps
 ): JSX.Element | null => {
-  const { robotName, module, onCloseClick, isExpanded, runId } = props
+  const { module, onCloseClick, isExpanded, runId } = props
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
   const { moduleIdFromRun } = useModuleIdFromRun(
-    robotName,
     module,
     runId != null ? runId : null
   )

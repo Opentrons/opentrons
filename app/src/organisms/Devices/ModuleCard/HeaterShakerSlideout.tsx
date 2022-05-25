@@ -38,7 +38,6 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface HeaterShakerSlideoutProps {
-  robotName: string
   module: HeaterShakerModule
   onCloseClick: () => unknown
   isExpanded: boolean
@@ -49,14 +48,7 @@ interface HeaterShakerSlideoutProps {
 export const HeaterShakerSlideout = (
   props: HeaterShakerSlideoutProps
 ): JSX.Element | null => {
-  const {
-    robotName,
-    module,
-    onCloseClick,
-    isExpanded,
-    isSetShake,
-    runId,
-  } = props
+  const { module, onCloseClick, isExpanded, isSetShake, runId } = props
   const { t } = useTranslation('device_details')
   const [hsValue, setHsValue] = React.useState<string | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
@@ -64,7 +56,6 @@ export const HeaterShakerSlideout = (
   const moduleName = getModuleDisplayName(module.moduleModel)
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const { moduleIdFromRun } = useModuleIdFromRun(
-    robotName,
     module,
     runId != null ? runId : null
   )

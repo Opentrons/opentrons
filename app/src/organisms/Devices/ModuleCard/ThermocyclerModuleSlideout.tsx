@@ -33,7 +33,6 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface ThermocyclerModuleSlideoutProps {
-  robotName: string
   module: ThermocyclerModule
   onCloseClick: () => unknown
   isExpanded: boolean
@@ -44,20 +43,12 @@ interface ThermocyclerModuleSlideoutProps {
 export const ThermocyclerModuleSlideout = (
   props: ThermocyclerModuleSlideoutProps
 ): JSX.Element | null => {
-  const {
-    robotName,
-    module,
-    onCloseClick,
-    isExpanded,
-    isSecondaryTemp,
-    runId,
-  } = props
+  const { module, onCloseClick, isExpanded, isSecondaryTemp, runId } = props
   const { t } = useTranslation('device_details')
   const [tempValue, setTempValue] = React.useState<string | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
   const { moduleIdFromRun } = useModuleIdFromRun(
-    robotName,
     module,
     runId != null ? runId : null
   )
