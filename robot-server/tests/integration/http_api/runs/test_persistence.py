@@ -203,3 +203,32 @@ async def test_run_commands_persist(client_and_server: ClientServerFixture) -> N
         {k: v for k, v in expected_command.items() if k != "result"}
     ]
     assert get_persisted_command_response.json()["data"] == expected_command
+
+
+async def test_runs_completed_started_at_persist_via_actions_router(
+    client_and_server: ClientServerFixture,
+) -> None:
+    """Test that run_completed_at and run_starte_at
+    are persisted when calling play\\hardware
+    stopped action through dev server restart."""
+    client, server = client_and_server
+
+    # create a run
+    create_run_response = await client.post_run(req_body={"data": {}})
+    run_id = create_run_response.json()["data"]["id"]
+
+    # persist the run by hitting the actions router
+    await client.post_run_action(
+        run_id=run_id,
+        req_body={"data": {"actionType": "play"}},
+    )
+
+    # fetch the updated run, which we expect to be persisted
+    get_run_response = await client.get_run(run_id=run_id)
+    expected_run = dict(get_run_response.json()["data"], current=False)
+
+    # reboot the server
+    await client_and_server.restart()
+
+    # make sure the run persisted as we expect
+    await _assert_run_persisted(robot_client=client, expected_run_data=expected_run)
