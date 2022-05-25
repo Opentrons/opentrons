@@ -7,7 +7,6 @@ import {
   Flex,
   FONT_SIZE_CAPTION,
   SPACING,
-  C_MED_GRAY,
   Link,
   JUSTIFY_START,
   DIRECTION_ROW,
