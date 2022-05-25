@@ -1018,7 +1018,7 @@ def test_tempdeck_get_plate_target_temperature_no_target(
         subject.get_plate_target_temperature()
 
 
-def test_thermocycler_get_target_block_temperature(
+def test_thermocycler_get_target_temperatures(
     thermocycler_v1_def: ModuleDefinition,
 ) -> None:
     """It should return whether target temperature for thermocycler is set."""
@@ -1034,14 +1034,16 @@ def test_thermocycler_get_target_block_temperature(
             "module-id": ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
                 target_block_temperature=14,
+                target_lid_temperature=28,
             )
         },
     )
     subject = module_view.get_thermocycler_module_substate("module-id")
     assert subject.get_target_block_temperature() == 14
+    assert subject.get_target_lid_temperature() == 28
 
 
-def test_thermocycler_get_target_block_temperature_no_target(
+def test_thermocycler_get_target_temperatures_no_target(
     thermocycler_v1_def: ModuleDefinition,
 ) -> None:
     """It should raise if no target temperature is set."""
@@ -1057,6 +1059,7 @@ def test_thermocycler_get_target_block_temperature_no_target(
             "module-id": ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
                 target_block_temperature=None,
+                target_lid_temperature=None,
             )
         },
     )
@@ -1064,6 +1067,7 @@ def test_thermocycler_get_target_block_temperature_no_target(
 
     with pytest.raises(errors.NoTargetTemperatureSetError):
         subject.get_target_block_temperature()
+        subject.get_target_lid_temperature()
 
 
 @pytest.fixture
@@ -1081,6 +1085,7 @@ def module_view_with_thermocycler(thermocycler_v1_def: ModuleDefinition) -> Modu
             "module-id": ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
                 target_block_temperature=None,
+                target_lid_temperature=None,
             )
         },
     )

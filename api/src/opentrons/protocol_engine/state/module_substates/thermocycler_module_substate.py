@@ -32,6 +32,7 @@ class ThermocyclerModuleSubState:
 
     module_id: ThermocyclerModuleId
     target_block_temperature: Optional[float]
+    target_lid_temperature: Optional[float]
 
     @staticmethod
     def validate_target_block_temperature(celsius: float) -> float:
@@ -102,6 +103,16 @@ class ThermocyclerModuleSubState:
     def get_target_block_temperature(self) -> float:
         """Get the thermocycler's target block temperature."""
         target = self.target_block_temperature
+
+        if target is None:
+            raise NoTargetTemperatureSetError(
+                f"Module {self.module_id} does not have a target block temperature set."
+            )
+        return target
+
+    def get_target_lid_temperature(self) -> float:
+        """Get the thermocycler's target lid temperature."""
+        target = self.target_lid_temperature
 
         if target is None:
             raise NoTargetTemperatureSetError(

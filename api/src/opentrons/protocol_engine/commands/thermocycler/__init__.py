@@ -32,6 +32,14 @@ from .set_target_lid_temperature import (
     SetTargetLidTemperatureCreate,
 )
 
+from .wait_for_lid_temperature import (
+    WaitForLidTemperatureCommandType,
+    WaitForLidTemperatureParams,
+    WaitForLidTemperatureResult,
+    WaitForLidTemperature,
+    WaitForLidTemperatureCreate,
+)
+
 from .deactivate_block import (
     DeactivateBlockCommandType,
     DeactivateBlockParams,
@@ -74,6 +82,12 @@ __all__ = [
     "SetTargetLidTemperatureResult",
     "SetTargetLidTemperature",
     "SetTargetLidTemperatureCreate",
+    # Wait for lid temperature command models
+    "WaitForLidTemperatureCommandType",
+    "WaitForLidTemperatureParams",
+    "WaitForLidTemperatureResult",
+    "WaitForLidTemperature",
+    "WaitForLidTemperatureCreate",
     # Deactivate block command models
     "DeactivateBlockCommandType",
     "DeactivateBlockParams",

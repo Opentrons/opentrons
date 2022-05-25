@@ -25,6 +25,12 @@ class SetTargetLidTemperatureParams(BaseModel):
 class SetTargetLidTemperatureResult(BaseModel):
     """Result data from setting a Thermocycler's target lid temperature."""
 
+    targetLidTemperature: float = Field(
+        ...,
+        description="The target lid temperature that was set after validation "
+        "and type conversion (if any).",
+    )
+
 
 class SetTargetLidTemperatureImpl(
     AbstractCommandImpl[SetTargetLidTemperatureParams, SetTargetLidTemperatureResult]
@@ -58,7 +64,7 @@ class SetTargetLidTemperatureImpl(
         if thermocycler_hardware is not None:
             await thermocycler_hardware.set_target_lid_temperature(target_temperature)
 
-        return SetTargetLidTemperatureResult()
+        return SetTargetLidTemperatureResult(targetLidTemperature=target_temperature)
 
 
 class SetTargetLidTemperature(

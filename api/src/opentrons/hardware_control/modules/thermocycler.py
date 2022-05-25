@@ -332,6 +332,26 @@ class Thermocycler(mod_abc.AbstractModule):
         await self.make_cancellable(task)
         await task
 
+    async def wait_for_lid_temperature(self, temperature: float) -> None:
+        """Set the lid temperature in deg Celsius"""
+        await self.wait_for_is_running()
+
+        # Wait for target to be set
+        retries = 0
+        while self.lid_target != temperature:
+            await self.wait_for_is_running()
+            # Wait for the poller to update
+            await self.wait_next_poll()
+            retries += 1
+            if retries > TEMP_UPDATE_RETRIES:
+                raise ThermocyclerError(
+                    f"Thermocycler driver set the lid temp to T={temperature}"
+                    f"but status reads T={self.lid_target}"
+                )
+        task = self._loop.create_task(self._wait_for_lid_temp())
+        await self.make_cancellable(task)
+        await task
+
     # TODO(mc, 2022-04-25): de-duplicate with `set_temperature`
     async def set_target_block_temperature(
         self,

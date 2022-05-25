@@ -78,6 +78,7 @@ def test_initial_state() -> None:
             ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
                 target_block_temperature=None,
+                target_lid_temperature=None,
             ),
         ),
     ],
@@ -147,6 +148,7 @@ def test_load_module(
             ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
                 target_block_temperature=None,
+                target_lid_temperature=None,
             ),
         ),
     ],
@@ -283,9 +285,19 @@ def test_handle_thermocycler_block_temperature_commands(
         ),
         result=tc_commands.SetTargetBlockTemperatureResult(targetBlockTemperature=42.4),
     )
-    deactivate_cmd = tc_commands.DeactivateBlock.construct(  # type: ignore[call-arg]  # noqa: E501
+    deactivate_block_cmd = tc_commands.DeactivateBlock.construct(  # type: ignore[call-arg]  # noqa: E501
         params=tc_commands.DeactivateBlockParams(moduleId="module-id"),
         result=tc_commands.DeactivateBlockResult(),
+    )
+    set_lid_temp_cmd = tc_commands.SetTargetLidTemperature.construct(  # type: ignore[call-arg]  # noqa: E501
+        params=tc_commands.SetTargetLidTemperatureParams(
+            moduleId="module-id", celsius=35.3
+        ),
+        result=tc_commands.SetTargetLidTemperatureResult(targetLidTemperature=35.3),
+    )
+    deactivate_lid_cmd = tc_commands.DeactivateLid.construct(  # type: ignore[call-arg]  # noqa: E501
+        params=tc_commands.DeactivateLidParams(moduleId="module-id"),
+        result=tc_commands.DeactivateLidResult(),
     )
     subject = ModuleStore()
 
@@ -293,12 +305,32 @@ def test_handle_thermocycler_block_temperature_commands(
     subject.handle_action(actions.UpdateCommandAction(command=set_block_temp_cmd))
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
-            module_id=ThermocyclerModuleId("module-id"), target_block_temperature=42.4
+            module_id=ThermocyclerModuleId("module-id"),
+            target_block_temperature=42.4,
+            target_lid_temperature=None,
         )
     }
-    subject.handle_action(actions.UpdateCommandAction(command=deactivate_cmd))
+    subject.handle_action(actions.UpdateCommandAction(command=set_lid_temp_cmd))
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
-            module_id=ThermocyclerModuleId("module-id"), target_block_temperature=None
+            module_id=ThermocyclerModuleId("module-id"),
+            target_block_temperature=42.4,
+            target_lid_temperature=35.3,
+        )
+    }
+    subject.handle_action(actions.UpdateCommandAction(command=deactivate_lid_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": ThermocyclerModuleSubState(
+            module_id=ThermocyclerModuleId("module-id"),
+            target_block_temperature=42.4,
+            target_lid_temperature=None,
+        )
+    }
+    subject.handle_action(actions.UpdateCommandAction(command=deactivate_block_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": ThermocyclerModuleSubState(
+            module_id=ThermocyclerModuleId("module-id"),
+            target_block_temperature=None,
+            target_lid_temperature=None,
         )
     }

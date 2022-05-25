@@ -153,6 +153,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             (
                 thermocycler.SetTargetBlockTemperatureResult,
                 thermocycler.DeactivateBlockResult,
+                thermocycler.SetTargetLidTemperatureResult,
+                thermocycler.DeactivateLidResult,
             ),
         ):
             self._handle_thermocycler_module_commands(command)
@@ -191,6 +193,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
                 target_block_temperature=None,
+                target_lid_temperature=None,
             )
 
     def _handle_heater_shaker_commands(
@@ -241,23 +244,45 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def _handle_thermocycler_module_commands(
         self,
         command: Union[
-            thermocycler.SetTargetBlockTemperature, thermocycler.DeactivateBlock
+            thermocycler.SetTargetBlockTemperature,
+            thermocycler.DeactivateBlock,
+            thermocycler.SetTargetLidTemperature,
+            thermocycler.DeactivateLid,
         ],
     ) -> None:
         module_id = command.params.moduleId
+        thermocycler_substate = self._state.substate_by_module_id[module_id]
         assert isinstance(
-            self._state.substate_by_module_id[module_id], ThermocyclerModuleSubState
+            thermocycler_substate, ThermocyclerModuleSubState
         ), f"{module_id} is not a thermocycler module."
+
+        # Get current values to preserve target temperature not being set/deactivated
+        block_temperature = thermocycler_substate.target_block_temperature
+        lid_temperature = thermocycler_substate.target_lid_temperature
 
         if isinstance(command.result, thermocycler.SetTargetBlockTemperatureResult):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
                 target_block_temperature=command.result.targetBlockTemperature,
+                target_lid_temperature=lid_temperature,
             )
         elif isinstance(command.result, thermocycler.DeactivateBlockResult):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
                 target_block_temperature=None,
+                target_lid_temperature=lid_temperature,
+            )
+        elif isinstance(command.result, thermocycler.SetTargetLidTemperatureResult):
+            self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
+                module_id=ThermocyclerModuleId(module_id),
+                target_block_temperature=block_temperature,
+                target_lid_temperature=command.result.targetLidTemperature,
+            )
+        elif isinstance(command.result, thermocycler.DeactivateLidResult):
+            self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
+                module_id=ThermocyclerModuleId(module_id),
+                target_block_temperature=block_temperature,
+                target_lid_temperature=None,
             )
 
 
