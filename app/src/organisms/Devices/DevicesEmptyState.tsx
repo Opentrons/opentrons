@@ -21,8 +21,6 @@ import { startDiscovery } from '../../redux/discovery'
 import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
-export const OT2_GET_STARTED_URL =
-  'https://support.opentrons.com/s/ot2-get-started'
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'
 
@@ -64,21 +62,6 @@ export function DevicesEmptyState(): JSX.Element {
         alignItems={ALIGN_CENTER}
         marginBottom={'2rem'}
       >
-        {/* <Link
-          external
-          href={OT2_GET_STARTED_URL}
-          display="flex"
-          alignItems={ALIGN_CENTER}
-          color={COLORS.darkBlack}
-          fontSize={TYPOGRAPHY.fontSizeLabel}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          opacity={'70%'}
-          paddingBottom={SPACING_2}
-          id="DevicesEmptyState_settingUpNewRobot"
-        >
-          {t('setting_up_new_robot')}{' '}
-          <Icon name="open-in-new" size="0.5rem" marginLeft={SPACING_1} />
-        </Link> */}
         <Link
           external
           href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}

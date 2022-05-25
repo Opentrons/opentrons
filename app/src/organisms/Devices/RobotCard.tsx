@@ -8,10 +8,10 @@ import {
   ALIGN_CENTER,
   ALIGN_START,
   C_MED_LIGHT_GRAY,
-  C_WHITE,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   SPACING,
+  COLORS,
   TEXT_TRANSFORM_UPPERCASE,
   BORDERS,
 } from '@opentrons/components'
@@ -43,12 +43,12 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   return name != null ? (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={C_WHITE}
+      backgroundColor={COLORS.white}
       border={`1px solid ${C_MED_LIGHT_GRAY}`}
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_ROW}
       marginBottom={SPACING.spacing3}
-      padding={SPACING.spacing3}
+      padding={`${SPACING.spacing3} ${SPACING.spacing2} ${SPACING.spacing3} ${SPACING.spacing3}`}
       width="100%"
       onClick={() => history.push(`/devices/${name}`)}
     >
@@ -67,7 +67,11 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
             flexDirection={DIRECTION_COLUMN}
             paddingRight={SPACING.spacing4}
           >
-            <StyledText as="h6" textTransform={TEXT_TRANSFORM_UPPERCASE}>
+            <StyledText
+              as="h6"
+              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              color={COLORS.darkGreyEnabled}
+            >
               {t('left_mount')}
             </StyledText>
             <StyledText as="p" id={`RobotCard_${name}_leftMountPipette`}>
@@ -78,7 +82,11 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
             flexDirection={DIRECTION_COLUMN}
             paddingRight={SPACING.spacing4}
           >
-            <StyledText as="h6" textTransform={TEXT_TRANSFORM_UPPERCASE}>
+            <StyledText
+              as="h6"
+              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              color={COLORS.darkGreyEnabled}
+            >
               {t('right_mount')}
             </StyledText>
             <StyledText as="p" id={`RobotCard_${name}_rightMountPipette`}>
@@ -89,21 +97,28 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
             flexDirection={DIRECTION_COLUMN}
             paddingRight={SPACING.spacing4}
           >
-            <StyledText as="h6" textTransform={TEXT_TRANSFORM_UPPERCASE}>
+            <StyledText
+              as="h6"
+              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              color={COLORS.darkGreyEnabled}
+              marginBottom={SPACING.spacing1}
+            >
               {t('modules')}
             </StyledText>
             <Flex>
               {attachedModules.map((module, i) => (
-                <ModuleIcon
-                  key={`${module.moduleModel}_${i}_${name}`}
-                  tooltipText={t(
-                    'this_robot_has_connected_and_power_on_module',
-                    {
-                      moduleName: getModuleDisplayName(module.moduleModel),
-                    }
-                  )}
-                  module={module}
-                />
+                <Flex marginRight={SPACING.spacing1} key={i}>
+                  <ModuleIcon
+                    key={`${module.moduleModel}_${i}_${name}`}
+                    tooltipText={t(
+                      'this_robot_has_connected_and_power_on_module',
+                      {
+                        moduleName: getModuleDisplayName(module.moduleModel),
+                      }
+                    )}
+                    module={module}
+                  />
+                </Flex>
               ))}
             </Flex>
           </Flex>

@@ -55,7 +55,7 @@ export function DevicesLanding(): JSX.Element {
       {availableDevices.length > 0 ? (
         <>
           <CollapsibleSection
-            marginY={SPACING.spacing4}
+            marginTop={'2.1rem'}
             title={t('available', { count: availableDevices.length })}
           >
             {availableDevices.map(robot => (
@@ -64,7 +64,7 @@ export function DevicesLanding(): JSX.Element {
               </ApiHostProvider>
             ))}
           </CollapsibleSection>
-          {unavailableDevices.length > 0 ? <Divider /> : null}
+          <Divider />
         </>
       ) : null}
       {unavailableDevices.length > 0 ? (
