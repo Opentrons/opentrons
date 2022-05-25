@@ -31,10 +31,7 @@ describe('Desktop Navigation', () => {
       .contains('HELP')
       .parent()
       .should('have.prop', 'href')
-      .and(
-        'equal',
-        'https://support.opentrons.com/s/protocol-designer'
-      )
+      .and('equal', 'https://support.opentrons.com/s/protocol-designer')
   })
 
   it('contains a settings button', () => {
