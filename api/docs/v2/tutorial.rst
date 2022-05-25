@@ -203,16 +203,26 @@ All that remains is for the loop to repeat these steps, filling each row down th
 
 That’s it! If you’re using a single-channel pipette, you’re ready to try out your protocol. 
 
-If you’re using an 8-channel pipette, you’ll need to make a couple tweaks to the single-channel code we wrote above. By accessing an entire column at once, the 8-channel pipette effectively implements the ``for`` loop in hardware, so you’ll need to remove it: 
+8-Channel Pipette
+-----------------
+
+If you’re using an 8-channel pipette, you’ll need to make a couple tweaks to the single-channel code from above. Most importantly, whenever you target a well in row A of a plate with an 8-channel pipette, it will move its topmost tip to row A, lining itself up over the entire column.
+
+Thus, when adding the diluent, instead of targeting every well on the plate, you should only target the top row:
 
 .. code-block:: python
 
-        # no loop, 8-channel pipette
+		p300.transfer(100, reservoir['A1'], plate.rows()[0])  
+
+And by accessing an entire column at once, the 8-channel pipette effectively implements the ``for`` loop in hardware, so you’ll need to remove it: 
+
+.. code-block:: python
+
         row = plate.rows()[0]
         p300.transfer(100, reservoir['A2'], row[0], mix_after=(3, 50))
         p300.transfer(100, row[:11], row[1:], mix_after=(3, 50))
 
-Instead of tracking the current row in the ``row`` variable, this code sets it to always be row A (index 0). Whenever you target a well in row A of a plate with the 8-channel pipette, it will move its topmost tip to row A, lining itself up over the entire column.
+Instead of tracking the current row in the ``row`` variable, this code sets it to always be row A (index 0). 
 
 *****************
 Try Your Protocol
@@ -222,8 +232,8 @@ There are two ways to try out your protocol: simulation on your computer, or a l
 
 .. _tutorial-simulate:
 
-Simulate Your Protocol
-^^^^^^^^^^^^^^^^^^^^^^
+In Simulation
+^^^^^^^^^^^^^
 
 Simulation doesn’t require having an OT-2 connected to your computer. You just need to install the ``opentrons`` Python module using ``pip``. This will give you access to the ``opentrons_simulate`` command-line utility (``opentrons_simulate.exe`` on Windows). To see a text preview of the steps the OT-2 will take, ``cd`` to the directory where you saved your protocol file and run:
 
@@ -241,8 +251,8 @@ The ``-e`` flag estimates duration, and ``-o nothing`` suppresses printing the r
 
 If that’s too long, you can always cancel your run partway through or modify ``for i in range(8)`` to loop through fewer rows.
 
-Run Your Protocol on a Robot
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+On a Robot
+^^^^^^^^^^
 
 The simplest way to run your protocol on an OT-2 is to use the `Opentrons App <https://opentrons.com/ot-app>`_. Once you’ve installed the app and connected to your robot, navigate to the **Protocol** tab. Click **Choose File…** and open your protocol from the file picker. You should see “Protocol - Serial Dilution Tutorial” (or whatever ``protocolName`` you entered in the metadata) in a banner at the top of the page. 
 
