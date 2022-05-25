@@ -15,7 +15,7 @@ const mockGetPipettes = getPipettes as jest.MockedFunction<typeof getPipettes>
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
-const PIPETTES_RESPONSE: Response<Pipettes> = {
+const PIPETTES_RESPONSE: Pipettes = {
   left: {
     model: 'p10_single_v1',
     name: 'p10_single',
@@ -65,11 +65,11 @@ describe('usePipettesQuery hook', () => {
     expect(result.current.data).toBeUndefined()
   })
 
-  it('should return all current protocols', async () => {
+  it('should return all current attached pipettes', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetPipettes)
       .calledWith(HOST_CONFIG)
-      .mockResolvedValue(PIPETTES_RESPONSE)
+      .mockResolvedValue({ data: PIPETTES_RESPONSE } as Response<Pipettes>)
 
     const { result, waitFor } = renderHook(usePipettesQuery, {
       wrapper,
