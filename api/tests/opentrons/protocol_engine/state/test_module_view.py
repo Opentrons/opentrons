@@ -113,7 +113,6 @@ def test_get_module_data(tempdeck_v1_def: ModuleDefinition) -> None:
         model=ModuleModel.TEMPERATURE_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         serialNumber="serial-number",
-        definition=tempdeck_v1_def,
     )
 
 
@@ -172,14 +171,12 @@ def test_get_all_modules(
             serialNumber="serial-1",
             model=ModuleModel.TEMPERATURE_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            definition=tempdeck_v1_def,
         ),
         LoadedModule(
             id="module-2",
             serialNumber="serial-2",
             model=ModuleModel.TEMPERATURE_MODULE_V2,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-            definition=tempdeck_v2_def,
         ),
     ]
 
@@ -388,6 +385,9 @@ def test_get_properties_by_id(
     assert subject.get_location("module-2") == DeckSlotLocation(
         slotName=DeckSlotName.SLOT_2
     )
+
+    with pytest.raises(errors.ModuleNotLoadedError):
+        subject.get_definition("Not a module ID oh no")
 
 
 def test_get_plate_target_temperature(heater_shaker_v1_def: ModuleDefinition) -> None:
