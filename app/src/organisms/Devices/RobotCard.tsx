@@ -116,7 +116,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
 function AttachedModules(props: { robotName: string }): JSX.Element {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
-  const attachedModules = useAttachedModules(robotName)
+  const attachedModules = useAttachedModules()
   return (
     <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing4}>
       <StyledText as="h6" textTransform={TEXT_TRANSFORM_UPPERCASE}>
@@ -139,7 +139,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element {
 function AttachedPipettes(props: { robotName: string }): JSX.Element {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
-  const attachedPipettes = useAttachedPipettes(robotName)
+  const attachedPipettes = useAttachedPipettes()
   return (
     <>
       <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing4}>

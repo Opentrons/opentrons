@@ -1,4 +1,4 @@
-from typing import Any, Dict, cast, List
+from typing import Any, Dict, cast, List, Iterable, Tuple
 from typing_extensions import Final
 from dataclasses import asdict
 
@@ -30,26 +30,26 @@ DEFAULT_Z_RETRACT_DISTANCE: Final = 2
 
 DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     none={
-        OT3AxisKind.X: 100,
-        OT3AxisKind.Y: 100,
-        OT3AxisKind.Z: 100,
+        OT3AxisKind.X: 40,
+        OT3AxisKind.Y: 40,
+        OT3AxisKind.Z: 20,
         OT3AxisKind.P: 100,
     },
     high_throughput={
-        OT3AxisKind.X: 100,
-        OT3AxisKind.Y: 100,
-        OT3AxisKind.Z: 100,
+        OT3AxisKind.X: 40,
+        OT3AxisKind.Y: 40,
+        OT3AxisKind.Z: 20,
         OT3AxisKind.P: 100,
     },
     low_throughput={
-        OT3AxisKind.X: 100,
-        OT3AxisKind.Y: 100,
-        OT3AxisKind.Z: 100,
+        OT3AxisKind.X: 40,
+        OT3AxisKind.Y: 40,
+        OT3AxisKind.Z: 20,
         OT3AxisKind.P: 100,
     },
     two_low_throughput={
-        OT3AxisKind.X: 100,
-        OT3AxisKind.Y: 100,
+        OT3AxisKind.X: 40,
+        OT3AxisKind.Y: 40,
     },
     gripper={
         OT3AxisKind.Z: 100,
@@ -180,23 +180,23 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
         OT3AxisKind.P: 1.4,
     },
     high_throughput={
-        OT3AxisKind.X: 1.4,
-        OT3AxisKind.Y: 1.4,
-        OT3AxisKind.Z: 1.4,
-        OT3AxisKind.P: 1.4,
+        OT3AxisKind.X: 1.0,
+        OT3AxisKind.Y: 1.0,
+        OT3AxisKind.Z: 1.0,
+        OT3AxisKind.P: 1.0,
     },
     low_throughput={
-        OT3AxisKind.X: 1.4,
-        OT3AxisKind.Y: 1.4,
-        OT3AxisKind.Z: 1.4,
-        OT3AxisKind.P: 1.4,
+        OT3AxisKind.X: 1.0,
+        OT3AxisKind.Y: 1.0,
+        OT3AxisKind.Z: 1.0,
+        OT3AxisKind.P: 1.0,
     },
     two_low_throughput={
-        OT3AxisKind.X: 1.4,
-        OT3AxisKind.Y: 1.4,
+        OT3AxisKind.X: 1.0,
+        OT3AxisKind.Y: 1.0,
     },
     gripper={
-        OT3AxisKind.Z: 1.4,
+        OT3AxisKind.Z: 1.0,
     },
 )
 
@@ -328,4 +328,20 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
 
 
 def serialize(config: OT3Config) -> Dict[str, Any]:
-    return asdict(config)
+    def _build_dict(pairs: Iterable[Tuple[Any, Any]]) -> Dict[str, Any]:
+        def _normalize_key(key: Any) -> Any:
+            if isinstance(key, OT3AxisKind):
+                return key.name
+            return key
+
+        def _normalize_value(value: Any) -> Any:
+            if isinstance(value, dict):
+                return {
+                    _normalize_key(k): _normalize_value(v) for k, v in value.items()
+                }
+            else:
+                return value
+
+        return dict((_normalize_key(key), _normalize_value(val)) for key, val in pairs)
+
+    return asdict(config, dict_factory=_build_dict)

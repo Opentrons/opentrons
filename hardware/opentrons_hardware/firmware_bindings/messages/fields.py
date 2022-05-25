@@ -1,6 +1,8 @@
 """Custom payload fields."""
 from __future__ import annotations
 
+from typing import Iterable, List, Iterator
+
 import binascii
 import enum
 
@@ -126,6 +128,28 @@ class SerialField(utils.BinaryFieldBase[bytes]):
 
 class SensorOutputBindingField(utils.UInt8Field):
     """sensor type."""
+
+    @classmethod
+    def from_flags(
+        cls, flags: Iterable[SensorOutputBinding]
+    ) -> "SensorOutputBindingField":
+        """Build a binding with a set of flags."""
+        backing = 0
+        for flag in flags:
+            backing |= flag.value
+        return cls.build(backing)
+
+    def to_flags(self) -> List[SensorOutputBinding]:
+        """Get the list of flags in the binding."""
+
+        def _flags() -> Iterator[SensorOutputBinding]:
+            for flag in SensorOutputBinding:
+                if flag == SensorOutputBinding.none:
+                    continue
+                if bool(flag.value & self.value):
+                    yield flag
+
+        return list(_flags())
 
     def __repr__(self) -> str:
         """Print version flags."""

@@ -1,34 +1,32 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+import { useModulesQuery, usePipettesQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { Banner } from '../../../atoms/Banner'
 import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import {
-  useAttachedModules,
-  useAttachedPipettes,
-  useIsRobotViewable,
-} from '../hooks'
+import { useIsRobotViewable } from '../hooks'
 import { ModuleCard } from '../ModuleCard'
 import { PipettesAndModules } from '../PipettesAndModules'
 import { PipetteCard } from '../PipetteCard'
 
+jest.mock('@opentrons/react-api-client')
 jest.mock('../hooks')
 jest.mock('../ModuleCard')
 jest.mock('../PipetteCard')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../../atoms/Banner')
 
-const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
-  typeof useAttachedModules
+const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
+  typeof useModulesQuery
 >
 const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
   typeof useIsRobotViewable
 >
 const mockModuleCard = ModuleCard as jest.MockedFunction<typeof ModuleCard>
 const mockPipetteCard = PipetteCard as jest.MockedFunction<typeof PipetteCard>
-const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
-  typeof useAttachedPipettes
+const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
+  typeof usePipettesQuery
 >
 const mockBanner = Banner as jest.MockedFunction<typeof Banner>
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
@@ -58,11 +56,15 @@ describe('PipettesAndModules', () => {
 
   it('renders a Module card when a robot is viewable', () => {
     mockUseIsRobotViewable.mockReturnValue(true)
-    mockUseAttachedModules.mockReturnValue([mockMagneticModule])
-    mockUseAttachedPipettes.mockReturnValue({
-      left: null,
-      right: null,
-    })
+    mockUseModulesQuery.mockReturnValue({
+      data: { data: [mockMagneticModule] },
+    } as any)
+    mockUsePipettesQuery.mockReturnValue({
+      data: {
+        left: null,
+        right: null,
+      },
+    } as any)
     mockPipetteCard.mockReturnValue(<div>Mock PipetteCard</div>)
     mockModuleCard.mockReturnValue(<div>Mock ModuleCard</div>)
     const [{ getByText }] = render()
@@ -71,13 +73,17 @@ describe('PipettesAndModules', () => {
   })
   it('renders a pipette card when a robot is viewable', () => {
     mockUseIsRobotViewable.mockReturnValue(true)
-    mockUseAttachedModules.mockReturnValue([mockMagneticModule])
+    mockUseModulesQuery.mockReturnValue({
+      data: { data: [mockMagneticModule] },
+    } as any)
+    mockUsePipettesQuery.mockReturnValue({
+      data: {
+        left: null,
+        right: null,
+      },
+    } as any)
     mockPipetteCard.mockReturnValue(<div>Mock PipetteCard</div>)
     mockModuleCard.mockReturnValue(<div>Mock ModuleCard</div>)
-    mockUseAttachedPipettes.mockReturnValue({
-      left: null,
-      right: null,
-    })
     const [{ getAllByText }] = render()
     getAllByText('Mock PipetteCard')
   })

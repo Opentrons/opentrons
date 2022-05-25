@@ -43,7 +43,7 @@ export function AvailableRobotOption(
         <Box maxWidth="9.5rem">
           <StyledText
             as="p"
-            css={{ 'word-wrap': 'break-word' }}
+            css={{ 'overflow-wrap': 'break-word' }}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {robotName}
