@@ -642,7 +642,11 @@ class OT3Controller:
         self, mount: OT3Mount, distance_mm: float, speed_mm_per_s: float
     ) -> None:
         pos = await capacitive_probe(
-            self._messenger, sensor_node_for_mount(mount), distance_mm, speed_mm_per_s
+            self._messenger,
+            sensor_node_for_mount(mount),
+            distance_mm,
+            speed_mm_per_s,
+            log_sensor_values=True,
         )
 
         self._position[axis_to_node(OT3Axis.by_mount(mount))] = pos
