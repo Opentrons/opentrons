@@ -1,4 +1,5 @@
 from typing import Any, AsyncGenerator, Dict, NamedTuple
+from datetime import datetime
 
 import anyio
 import pytest
@@ -213,6 +214,8 @@ async def test_runs_completed_started_at_persist_via_actions_router(
     stopped action through dev server restart."""
     client, server = client_and_server
 
+    date_of_today = datetime.now().date()
+
     # create a run
     create_run_response = await client.post_run(req_body={"data": {}})
     run_id = create_run_response.json()["data"]["id"]
@@ -223,12 +226,30 @@ async def test_runs_completed_started_at_persist_via_actions_router(
         req_body={"data": {"actionType": "play"}},
     )
 
-    # fetch the updated run, which we expect to be persisted
-    get_run_response = await client.get_run(run_id=run_id)
-    expected_run = dict(get_run_response.json()["data"], current=False)
+    # persist the run by hitting the actions router
+    await client.post_run_action(
+        run_id=run_id,
+        req_body={"data": {"actionType": "stop"}},
+    )
+
+    # TODO (tz, 5-25-22): wait for hardware stopped action to be dispatched
+    await anyio.sleep(5.0)
+
+    await client.patch_run(run_id=run_id, req_body={"data": {"current": False}})
 
     # reboot the server
     await client_and_server.restart()
 
-    # make sure the run persisted as we expect
-    await _assert_run_persisted(robot_client=client, expected_run_data=expected_run)
+    # fetch the updated run, which we expect to be persisted
+    get_run_response = await client.get_run(run_id=run_id)
+    expected_run = dict(get_run_response.json()["data"], current=False)
+
+    assert (
+        datetime.strptime(expected_run["startedAt"], "%Y-%m-%dT%H:%M:%S.%f%z").date()
+        == date_of_today
+    )
+
+    assert (
+        datetime.strptime(expected_run["completedAt"], "%Y-%m-%dT%H:%M:%S.%f%z").date()
+        == date_of_today
+    )
