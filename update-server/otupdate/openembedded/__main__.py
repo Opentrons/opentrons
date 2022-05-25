@@ -11,7 +11,7 @@ from aiohttp import web
 LOG = logging.getLogger(__name__)
 
 
-def main():
+def main() -> None:
     parser = cli.build_root_parser()
     args = parser.parse_args()
     loop = asyncio.get_event_loop()
@@ -19,7 +19,7 @@ def main():
     systemd.configure_logging(getattr(logging, args.log_level.upper()))
 
     LOG.info("Setting hostname")
-    hostname = loop.run_until_complete(name_management.setup_hostname())
+    hostname = loop.run_until_complete(name_management.set_up_static_hostname())
     LOG.info(f"Set hostname to {hostname}")
 
     LOG.info("Building openembedded update server")
@@ -28,7 +28,7 @@ def main():
     systemd.notify_up()
 
     LOG.info(f"Starting openembedded update server on http://{args.host}:{args.port}")
-    web.run_app(app, host=args.host, port=args.port)
+    web.run_app(app, host=args.host, port=args.port)  # type: ignore[no-untyped-call]
 
 
 if __name__ == "__main__":
