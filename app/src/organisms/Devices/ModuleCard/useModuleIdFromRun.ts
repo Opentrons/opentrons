@@ -14,7 +14,9 @@ export function useModuleIdFromRun(
   const attachedModules = useAttachedModules(robotName)
 
   const filteredModules = attachedModules.filter(
-    item => item.moduleModel === module.moduleModel
+    item =>
+      item.moduleModel === module.moduleModel &&
+      item.serialNumber === module.serialNumber
   )
   const loadModuleCommands = protocolData?.commands.filter(
     command =>
