@@ -209,7 +209,7 @@ async def test_run_commands_persist(client_and_server: ClientServerFixture) -> N
 async def test_runs_completed_started_at_persist_via_actions_router(
     client_and_server: ClientServerFixture,
 ) -> None:
-    """Test that run_completed_at and run_starte_at
+    """Test that completedAt and startedAt
     are persisted when calling play\\hardware
     stopped action through dev server restart."""
     client, server = client_and_server
@@ -248,6 +248,39 @@ async def test_runs_completed_started_at_persist_via_actions_router(
         datetime.strptime(expected_run["startedAt"], "%Y-%m-%dT%H:%M:%S.%f%z").date()
         == date_of_today
     )
+
+    assert (
+        datetime.strptime(expected_run["completedAt"], "%Y-%m-%dT%H:%M:%S.%f%z").date()
+        == date_of_today
+    )
+
+    # make sure the time is different
+    assert expected_run["startedAt"] != expected_run["completedAt"]
+
+
+async def test_runs_completed_filled_started_at_none_persist(
+    client_and_server: ClientServerFixture,
+) -> None:
+    """Test that completedAt is today and startedAt is empty
+    are persisted through dev server restart."""
+    client, server = client_and_server
+
+    date_of_today = datetime.now().date()
+
+    # create a run
+    create_run_response = await client.post_run(req_body={"data": {}})
+    run_id = create_run_response.json()["data"]["id"]
+
+    await client.patch_run(run_id=run_id, req_body={"data": {"current": False}})
+
+    # reboot the server
+    await client_and_server.restart()
+
+    # fetch the updated run, which we expect to be persisted
+    get_run_response = await client.get_run(run_id=run_id)
+    expected_run = dict(get_run_response.json()["data"], current=False)
+
+    assert "startedAt" not in expected_run
 
     assert (
         datetime.strptime(expected_run["completedAt"], "%Y-%m-%dT%H:%M:%S.%f%z").date()
