@@ -10,7 +10,17 @@ export function useModulesQuery(
   const host = useHost()
   const query = useQuery<Modules>(
     [host, 'modules'],
-    () => getModules(host as HostConfig).then(response => response.data),
+    () =>
+      getModules(host as HostConfig).then(response => {
+        const modules = response.data.data
+        if ('id' in modules) {
+          return response.data
+        } else {
+          return {
+            data: [],
+          }
+        }
+      }),
     { enabled: host !== null, ...options }
   )
 
