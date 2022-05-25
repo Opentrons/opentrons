@@ -95,7 +95,7 @@ class OT2UpdateActions(UpdateActionsInterface):
         rootfs_filepath: str,
         progress_callback: Callable[[float], None],
         chunk_size: int = 1024,
-        file_size: int = None,
+        file_size: Optional[int] = None,
     ) -> Partition:
         """
         Write the new rootfs to the next root partition
