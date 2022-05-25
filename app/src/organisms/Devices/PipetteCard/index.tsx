@@ -50,7 +50,7 @@ interface PipetteCardProps {
   robotName: string
 }
 
-const FETCH_PIPETTE_CAL_MS = 1000
+const FETCH_PIPETTE_CAL_MS = 30000
 
 export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { t } = useTranslation('device_details')
@@ -83,7 +83,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     () => {
       dispatch(fetchPipetteOffsetCalibrations(robotName))
     },
-    FETCH_PIPETTE_CAL_MS,
+    pipetteOffsetCalibration === null ? 1000 : FETCH_PIPETTE_CAL_MS,
     true
   )
 
