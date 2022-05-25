@@ -70,11 +70,13 @@ async def freeze(robot_ip: str, robot_port: str) -> None:
                     }
                 }
                 async with create_task_group() as tg:
+                    # I am not sure if this is doing what I want.
+                    # I want synchronous traffic alongside the execute command call.
+                    tg.start_soon(robot_client.get_run, run_id)
+                    tg.start_soon(robot_interactions.query_random_runs)
                     tg.start_soon(
                         robot_interactions.execute_command, run_id, move_to_well_command
                     )
-                    tg.start_soon(robot_client.get_run, run_id)
-                    tg.start_soon(robot_interactions.query_random_runs)
 
         home_command = {
             "data": {
@@ -89,10 +91,10 @@ async def freeze(robot_ip: str, robot_port: str) -> None:
 if __name__ == "__main__":
 
     cli = BaseCli()
-    cli.parser.description = """
-1. Attach p20_single_gen2 pipette on the right.
+    cli.parser.description = f"""
+1. Attach {PIPETTE} pipette on the {PIPETTE_MOUNT}.
 2. Have an empty deck.
-3. Or place nest_96_wellplate_100ul_pcr_full_skirt in slot 2.
+3. Or place {LABWARE} in slot {LABWARE_SLOT}.
 5. Run this without -h
 """
     args = cli.parser.parse_args()

@@ -65,10 +65,10 @@ async def hs_commands(robot_ip: str, robot_port: str) -> None:
 if __name__ == "__main__":
 
     cli = BaseCli()
-    cli.parser.description = """
+    cli.parser.description = f"""
 Check HS Commands Live
 1. Have a heater shaker connected via USB and powered on.
-2. The code puts the HS is slot 2 but a pipette is not interacting with it.
+2. The code puts the HS is slot {HS_SLOT} but a pipette is not interacting with it.
 3. from the robot-server directory
 4. pipenv run python tests/integration/http_api/live/hs_commands.py --robot_ip ROBOT_IP
 5. look at robot-server/responses.log
