@@ -2,6 +2,7 @@ import assert from 'assert'
 import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
+import standardDeckDef from '../../deck/definitions/3/ot2_standard.json'
 import type { DeckDefinition, LabwareDefinition2 } from '../types'
 import type { ThermalAdapterName } from '..'
 
@@ -185,6 +186,48 @@ export const getSlotHasMatingSurfaceUnitVector = (
 
   return Boolean(matingSurfaceUnitVector)
 }
+
+export const getAreSlotsHorizontallyAdjacent = (
+  slotNameA?: string | null,
+  slotNameB?: string | null
+): boolean => {
+  if (slotNameA == null || slotNameB == null) {
+    return false
+  }
+  const slotANumber = parseInt(slotNameA)
+  const slotBNumber = parseInt(slotNameB)
+
+  if (isNaN(slotBNumber) || isNaN(slotANumber)) {
+    return false
+  }
+  const orderedSlots = standardDeckDef.locations.orderedSlots
+  // intentionally not substracting by 1 because trash (slot 12) should not count
+  const numSlots = orderedSlots.length
+
+  if (slotBNumber > numSlots || slotANumber > numSlots) {
+    return false
+  }
+  const slotWidth = orderedSlots[1].position[0] - orderedSlots[0].position[0]
+  const slotAPosition = orderedSlots[slotANumber - 1].position
+  const slotBPosition = orderedSlots[slotBNumber - 1].position
+
+  const yPositionSlotA = slotAPosition[1]
+  const yPositionSlotB = slotBPosition[1]
+
+  const xPositionSlotA = slotAPosition[0]
+  const xPositionSlotB = slotBPosition[0]
+
+  const areSlotsAdjacent =
+    yPositionSlotA === yPositionSlotB &&
+    Math.abs(xPositionSlotA - xPositionSlotB) === slotWidth
+
+  return areSlotsAdjacent
+}
+
+export const getIsLabwareAboveHeight = (
+  labwareDef: LabwareDefinition2,
+  height: number
+): boolean => labwareDef.dimensions.zDimension > height
 
 export const getAdapterName = (labwareLoadname: string): ThermalAdapterName => {
   let adapterName: ThermalAdapterName = 'Universal Flat Adapter'
