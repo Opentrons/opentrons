@@ -42,7 +42,7 @@ import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 interface PipetteCardProps {
   pipetteInfo: PipetteModelSpecs | null
-  pipetteId?: AttachedPipette['id']
+  pipetteId?: AttachedPipette['id'] | null
   mount: Mount
   robotName: string
 }

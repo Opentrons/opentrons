@@ -4,7 +4,7 @@ from decoy import Decoy
 from typing import cast
 
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import Point, DeckSlotName
@@ -44,7 +44,7 @@ def subject(labware_view: LabwareView, module_view: ModuleView) -> GeometryView:
 
 def test_get_labware_parent_position(
     decoy: Decoy,
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     subject: GeometryView,
@@ -69,7 +69,7 @@ def test_get_labware_parent_position(
 
 def test_get_labware_parent_position_on_module(
     decoy: Decoy,
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
@@ -102,7 +102,7 @@ def test_get_labware_parent_position_on_module(
 
 def test_get_labware_origin_position(
     decoy: Decoy,
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     subject: GeometryView,
@@ -137,7 +137,7 @@ def test_get_labware_origin_position(
 
 def test_get_labware_highest_z(
     decoy: Decoy,
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     subject: GeometryView,
@@ -169,7 +169,7 @@ def test_get_labware_highest_z(
 
 def test_get_module_labware_highest_z(
     decoy: Decoy,
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
@@ -209,7 +209,7 @@ def test_get_module_labware_highest_z(
 
 def test_get_all_labware_highest_z(
     decoy: Decoy,
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
     well_plate_def: LabwareDefinition,
     reservoir_def: LabwareDefinition,
     labware_view: LabwareView,
@@ -265,7 +265,7 @@ def test_get_all_labware_highest_z(
 def test_get_labware_position(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
     labware_view: LabwareView,
     subject: GeometryView,
 ) -> None:
@@ -301,7 +301,7 @@ def test_get_labware_position(
 def test_get_well_position(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
     labware_view: LabwareView,
     subject: GeometryView,
 ) -> None:
@@ -341,7 +341,7 @@ def test_get_well_position(
 def test_get_module_labware_well_position(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
     labware_view: LabwareView,
     module_view: ModuleView,
     subject: GeometryView,
@@ -388,7 +388,7 @@ def test_get_module_labware_well_position(
 def test_get_well_position_with_top_offset(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
     labware_view: LabwareView,
     subject: GeometryView,
 ) -> None:
@@ -435,7 +435,7 @@ def test_get_well_position_with_top_offset(
 def test_get_well_position_with_bottom_offset(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
     labware_view: LabwareView,
     subject: GeometryView,
 ) -> None:

@@ -258,7 +258,7 @@ export function useLabwarePositionCheck(
   const LPCSteps = useSteps(currentRunId)
   const dispatch = useDispatch()
   const robotName = host?.robotName ?? ''
-  const attachedModules = useAttachedModules(robotName)
+  const attachedModules = useAttachedModules()
 
   const LPCCommands = LPCSteps.reduce<LabwarePositionCheckCreateCommand[]>(
     (commands, currentStep) => {

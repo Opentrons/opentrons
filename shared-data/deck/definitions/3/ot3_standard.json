@@ -1,14 +1,14 @@
 {
-  "otId": "ot2_short_trash",
-  "schemaVersion": 1,
+  "otId": "ot3_standard",
+  "schemaVersion": 3,
   "cornerOffsetFromOrigin": [-115.65, -68.03, 0],
-  "dimensions": [624.3, 565.2, 0],
+  "dimensions": [580, 430, 0],
   "metadata": {
-    "displayName": "OT-2 Short-Trash Deck",
-    "tags": ["ot2", "12 slots", "short trash"]
+    "displayName": "OT-3 Standard Deck",
+    "tags": ["ot3", "12 slots", "standard"]
   },
   "robot": {
-    "model": "OT-2 Standard"
+    "model": "OT-3 Standard"
   },
   "locations": {
     "orderedSlots": [
@@ -22,11 +22,15 @@
           "zDimension": 0
         },
         "displayName": "Slot 1",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "2",
-        "position": [132.5, 0.0, 0.0],
+        "position": [145.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -34,11 +38,15 @@
           "zDimension": 0
         },
         "displayName": "Slot 2",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "3",
-        "position": [265.0, 0.0, 0.0],
+        "position": [290.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -46,11 +54,15 @@
           "zDimension": 0
         },
         "displayName": "Slot 3",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "4",
-        "position": [0.0, 90.5, 0.0],
+        "position": [0.0, 107, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -58,11 +70,15 @@
           "zDimension": 0
         },
         "displayName": "Slot 4",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "5",
-        "position": [132.5, 90.5, 0.0],
+        "position": [145.0, 107, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -70,11 +86,15 @@
           "zDimension": 0
         },
         "displayName": "Slot 5",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "6",
-        "position": [265.0, 90.5, 0.0],
+        "position": [290.0, 107, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -82,11 +102,15 @@
           "zDimension": 0
         },
         "displayName": "Slot 6",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "7",
-        "position": [0.0, 181.0, 0.0],
+        "position": [0.0, 214.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -94,11 +118,16 @@
           "zDimension": 0
         },
         "displayName": "Slot 7",
-        "compatibleModules": ["magdeck", "tempdeck", "thermocycler"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "thermocyclerModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "8",
-        "position": [132.5, 181.0, 0.0],
+        "position": [145.0, 214.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -106,11 +135,15 @@
           "zDimension": 0
         },
         "displayName": "Slot 8",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "9",
-        "position": [265.0, 181.0, 0.0],
+        "position": [290.0, 214.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -118,11 +151,15 @@
           "zDimension": 0
         },
         "displayName": "Slot 9",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "10",
-        "position": [0.0, 271.5, 0.0],
+        "position": [0.0, 321.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -130,11 +167,15 @@
           "zDimension": 0
         },
         "displayName": "Slot 10",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "11",
-        "position": [132.5, 271.5, 0.0],
+        "position": [145.0, 321.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -142,18 +183,22 @@
           "zDimension": 0
         },
         "displayName": "Slot 11",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       },
       {
         "id": "12",
-        "position": [265.0, 271.5, 0.0],
+        "position": [290.0, 321.0, 0.0],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
         },
         "displayName": "Slot 12",
-        "compatibleModules": []
+        "compatibleModuleTypes": []
       }
     ],
     "calibrationPoints": [
@@ -222,7 +267,7 @@
       {
         "id": "fixedTrash",
         "slot": "12",
-        "labware": "opentrons_1_trash_850ml_fixed",
+        "labware": "opentrons_1_trash_3200ml_fixed",
         "displayName": "Fixed Trash"
       }
     ]

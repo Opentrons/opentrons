@@ -19,7 +19,7 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { useModuleMatchResults } from '../hooks'
 import { useModuleRenderInfoById } from '../../hooks'
 import { fetchModules } from '../../../../redux/modules'
