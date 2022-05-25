@@ -6,6 +6,12 @@ from tests.integration.http_api.live.util import log_response
 from tests.integration.http_api.live.base_cli import BaseCli
 from tests.integration.robot_client import RobotClient
 
+LABWARE = "nest_96_wellplate_100ul_pcr_full_skirt"
+LABWARE_SLOT = "2"
+LABWARE_DESTINATION_WELLS = ["A1", "A12", "H1", "H12", "D6"]
+PIPETTE = "p20_single_gen2"
+PIPETTE_MOUNT = "right"
+
 
 async def freeze(robot_ip: str, robot_port: str) -> None:
     """Run the series of commands to repetitively move a pipette to various wells
@@ -26,8 +32,8 @@ async def freeze(robot_ip: str, robot_port: str) -> None:
                 "data": {
                     "commandType": "loadLabware",
                     "params": {
-                        "location": {"slotName": "2"},
-                        "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
+                        "location": {"slotName": LABWARE_SLOT},
+                        "loadName": LABWARE,
                         "namespace": "opentrons",
                         "version": 1,
                         "labwareId": "destination",
@@ -42,9 +48,9 @@ async def freeze(robot_ip: str, robot_port: str) -> None:
                 "data": {
                     "commandType": "loadPipette",
                     "params": {
-                        "pipetteName": "p20_single_gen2",
-                        "mount": "right",
-                        "pipetteId": "20ul_pipette",
+                        "pipetteName": PIPETTE,
+                        "mount": PIPETTE_MOUNT,
+                        "pipetteId": "pipette",
                     },
                 }
             }
@@ -52,13 +58,12 @@ async def freeze(robot_ip: str, robot_port: str) -> None:
                 run_id=run_id, req_body=load_pipette_command
             )
 
-            wells_on_hs = ["A1", "A12", "H1", "H12", "D6"]
-            for well in wells_on_hs:
+            for well in LABWARE_DESTINATION_WELLS:
                 move_to_well_command = {
                     "data": {
                         "commandType": "moveToWell",
                         "params": {
-                            "pipetteId": "20ul_pipette",
+                            "pipetteId": "pipette",
                             "labwareId": "destination",
                             "wellName": well,
                         },
