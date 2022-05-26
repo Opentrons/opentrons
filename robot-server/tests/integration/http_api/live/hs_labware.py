@@ -111,9 +111,27 @@ async def hs_measure(robot_ip: str, robot_port: str, labware: str) -> None:
                 "H12",
                 "D6",
             ],
-            "opentrons_96_pcr_plate_adapter_nest_wellplate_100ul_pcr_full_skirt": [],
-            "opentrons_96_deepwell_adapter_nest_wellplate_2ml_deep": [],
-            "opentrons_flat_plate_adapter_corning_384_wellplate_112ul_flat": [],
+            "opentrons_96_pcr_plate_adapter_nest_wellplate_100ul_pcr_full_skirt": [
+                "A1",
+                "A12",
+                "H1",
+                "H12",
+                "D6",
+            ],
+            "opentrons_96_deepwell_adapter_nest_wellplate_2ml_deep": [
+                "A1",
+                "A12",
+                "H1",
+                "H12",
+                "D6",
+            ],
+            "opentrons_flat_plate_adapter_corning_384_wellplate_112ul_flat": [
+                "A1",
+                "A24",
+                "P1",
+                "P24",
+                "H12",
+            ],
         }
         wells_on_hs = mapping[labware]
         for well in wells_on_hs:

@@ -53,3 +53,14 @@ class RobotInteractions:
         async with create_task_group() as tg:
             for run_id in random_runs:
                 tg.start_soon(_get_and_log_run, run_id)
+
+    async def get_module_data_by_id(self, module_id: str) -> Any:
+        """Given a moduleModel get the id of that module."""
+        modules = await self.robot_client.get_modules()
+        await log_response(modules)
+        data = [
+            module for module in modules.json()["data"] if module["id"] == module_id
+        ]
+        if len(data) == 0:
+            raise ValueError(f"No module attached to the robot has id of {module_id}")
+        return data[0]

@@ -1,4 +1,5 @@
 import asyncio
+import pprint
 
 from tests.integration.http_api.live import util
 from tests.integration.http_api.live.base_cli import BaseCli
@@ -60,6 +61,66 @@ async def hs_commands(robot_ip: str, robot_port: str) -> None:
         await robot_interactions.execute_command(
             run_id=run_id, req_body=open_latch_command
         )
+
+        hs_module_data = await robot_interactions.get_module_data_by_id(hs_id)
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(hs_module_data)
+
+        set_target_shake_speed_command = {
+            "data": {
+                "commandType": "heaterShakerModule/setTargetShakeSpeed",
+                "params": {
+                    "moduleId": hs_id,
+                    "rpm": 200,
+                },
+            }
+        }
+
+        stop_shake_command = {
+            "data": {
+                "commandType": "heaterShakerModule/stopShake",
+                "params": {
+                    "moduleId": hs_id,
+                },
+            }
+        }
+
+        set_target_temp_command = {
+            "data": {
+                "commandType": "heaterShakerModule/startSetTargetTemperature",
+                "params": {
+                    "moduleId": hs_id,
+                    "temperature": 25,
+                },
+            }
+        }
+
+        await_target_temp_command = {
+            "data": {
+                "commandType": "heaterShakerModule/awaitTemperature",
+                "params": {
+                    "moduleId": hs_id,
+                },
+            }
+        }
+
+        deactivate_heater_command = {
+            "data": {
+                "commandType": "heaterShakerModule/deactivateHeater",
+                "params": {
+                    "moduleId": hs_id,
+                },
+            }
+        }
+
+        for command in [
+            set_target_shake_speed_command,
+            stop_shake_command,
+            set_target_temp_command,
+            await_target_temp_command,
+            deactivate_heater_command,
+        ]:
+            await robot_interactions.execute_command(run_id=run_id, req_body=command)
 
 
 if __name__ == "__main__":
