@@ -21,6 +21,9 @@ from abc import ABC
 
 from serial.tools.list_ports import comports  # type: ignore[import]
 
+from hardware_testing.drivers.limit_sensor import LimitSensorBase, \
+    SimLimitSensor
+
 log = logging.getLogger(__name__)
 
 
@@ -101,15 +104,17 @@ class RadwagScaleBase(ABC):
 class RadwagScale(RadwagScaleBase):
     """Radwag scale driver."""
 
-    def __init__(self, connection: serial.Serial, time_delay:float) -> None:
+    def __init__(self, connection: serial.Serial, time_delay: float, limit_sensor: LimitSensorBase) -> None:
         """Constructor."""
         self._scale = connection
         self._time_delay = time_delay
+        self._limit_sensor = limit_sensor
 
     @classmethod
-    def create(cls, port: str, baudrate: int = 9600, timeout: float = .1, time_delay: float=.3) -> "RadwagScale":
+    def create(cls, port: str, baudrate: int = 9600, timeout: float = .1, time_delay: float=.3, limit_sensor: Optional[LimitSensorBase] = None) -> "RadwagScale":
         """Connect to the port."""
         try:
+            limit_sensor = limit_sensor or SimLimitSensor()
             conn= serial.Serial(
                 port=port,
                 baudrate=baudrate,
@@ -118,7 +123,7 @@ class RadwagScale(RadwagScaleBase):
                 bytesize=serial.EIGHTBITS,
                 timeout=timeout,
             )
-            return RadwagScale(conn, time_delay)
+            return RadwagScale(connection=conn, time_delay=time_delay, limit_sensor=limit_sensor)
         except SerialException:
             error_msg = "\nUnable to access Serial port to Scale: \n" \
                 "1. Check that the scale is plugged into the computer. \n" \
@@ -276,9 +281,7 @@ class RadwagScale(RadwagScaleBase):
             for r in self._scale.readlines():
                 response = response + r.decode("utf-8").strip()
             log.debug(f"response from while loop 1: {response}")
-            limit_state = self.checkLidStatus()
-            log.debug(f"limit_state: {limit_state}")
-            if "OK" in response and "OCOK" in limit_state:
+            if "OK" in response and self._limit_sensor.is_open():
                 log.debug("LID opened")
                 condition = False
             if "E" in response:
@@ -300,9 +303,7 @@ class RadwagScale(RadwagScaleBase):
             for r in self._scale.readlines():
                 response = response + r.decode("utf-8").strip()
             log.debug(f"response from while loop 2: {response}")
-            limit_state = self.checkLidStatus()
-            log.debug(f"limit state: {limit_state}")
-            if "OK" in response and "CCOK" in limit_state:
+            if "OK" in response and self._limit_sensor.is_closed():
                 log.debug("LID Closed")
                 condition = False
             if "E" in response:
@@ -361,20 +362,6 @@ class RadwagScale(RadwagScaleBase):
                 log.debug("Command understood and in progress")
             else:
                 raise Exception("Incorrect option {}".format(response))
-
-    def checkLidStatus(self) -> str:
-        """Check the lid status."""
-        assert self._limit_sensor, "No connection"
-
-        if self._location == "NY":
-            res = "CCOK OCOK"
-            return res
-        self._limit_sensor.flush()
-        self._limit_sensor.flushInput()
-        self._limit_sensor.flushOutput()
-        res = self._limit_sensor.readline().decode("utf-8").strip()
-        log.debug(f"response: {res}")
-        return res
 
     def profile_mode(self, mode_string: str) -> None:
         """Set the profile mode.
