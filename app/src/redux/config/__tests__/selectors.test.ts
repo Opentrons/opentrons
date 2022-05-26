@@ -123,4 +123,20 @@ describe('shell selectors', () => {
       expect(Selectors.getIsLabwareOffsetCodeSnippetsOn(state)).toEqual(false)
     })
   })
+
+  describe('getPathToPythonOverride', () => {
+    it('should return path if path is specified', () => {
+      const state: State = {
+        config: { python: { pathToPythonOverride: 'path' } },
+      } as any
+      expect(Selectors.getPathToPythonOverride(state)).toEqual('path')
+    })
+
+    it('should return null if saved value in config is null', () => {
+      const state: State = {
+        config: { python: { pathToPythonOverride: null } },
+      } as any
+      expect(Selectors.getPathToPythonOverride(state)).toEqual(null)
+    })
+  })
 })

@@ -199,7 +199,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 createdAt=action.created_at,
                 params=action.request.params,  # type: ignore[arg-type]
                 status=CommandStatus.QUEUED,
-                commandSource=CommandSource.SETUP,
+                source=CommandSource.SETUP,
             )
 
             next_index = len(self._state.all_command_ids)
@@ -258,7 +258,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 ),
             )
 
-            if prev_entry.command.commandSource == CommandSource.SETUP:
+            if prev_entry.command.source == CommandSource.SETUP:
                 other_command_ids_to_fail = [
                     *[i for i in self._state.queued_setup_command_ids],
                 ]
@@ -465,7 +465,7 @@ class CommandView(HasState[CommandState]):
             return next(iter(self._state.queued_command_ids), None)
 
     def get_is_okay_to_clear(self) -> bool:
-        """Get whether the engine is stopped or sitting idlly so it could be removed."""
+        """Get whether the engine is stopped or sitting idly so it could be removed."""
         if self.get_is_stopped():
             return True
         elif (
@@ -537,7 +537,7 @@ class CommandView(HasState[CommandState]):
             ProtocolEngineStoppedError: the engine has been stopped.
         """
         if self.get_stop_requested():
-            raise ProtocolEngineStoppedError("Cannot modify a stopped engine.")
+            raise ProtocolEngineStoppedError("A stop has already been requested.")
 
     def raise_if_paused_by_blocking_door(self) -> None:
         """Raise if the engine is currently paused by an open door."""

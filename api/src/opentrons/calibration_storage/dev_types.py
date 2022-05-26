@@ -4,7 +4,7 @@ from datetime import datetime
 
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
-from .types import AttitudeMatrix, PipetteOffset, SourceType
+from .types import AttitudeMatrix, PipetteOffset, GripperCalOffset, SourceType
 
 
 class CalibrationStatusDict(TypedDict):
@@ -61,6 +61,13 @@ class PipetteCalibrationData(TypedDict):
     offset: PipetteOffset
     tiprack: str
     uri: str
+    last_modified: datetime
+    source: SourceType
+    status: CalibrationStatusDict
+
+
+class GripperCalibrationData(TypedDict):
+    offset: GripperCalOffset
     last_modified: datetime
     source: SourceType
     status: CalibrationStatusDict

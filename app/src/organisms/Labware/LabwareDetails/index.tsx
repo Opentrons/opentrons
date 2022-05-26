@@ -49,7 +49,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const insertCategory = insert?.metadata.displayCategory
   const irregular = wellGroups.length > 1
   const isMultiRow = ordering.some(row => row.length > 1)
-  const isCustomDefinition = modified != null
+  const isCustomDefinition = definition.namespace !== 'opentrons'
 
   const slideoutHeader = (
     <Flex
@@ -104,7 +104,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         backgroundColor={COLORS.lightGrey}
         padding={SPACING.spacing4}
         marginBottom={SPACING.spacing5}
-        css={{ 'word-wrap': 'break-word' }}
+        css={{ 'overflow-wrap': 'break-word' }}
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
         <Link

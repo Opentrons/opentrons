@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
+  ALIGN_CENTER,
   Box,
   Flex,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SIZE_6,
   SPACING,
@@ -13,7 +15,6 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { RobotCard } from '../../../organisms/Devices/RobotCard'
 import { DevicesEmptyState } from '../../../organisms/Devices/DevicesEmptyState'
-import { Scanning } from '../../../organisms/Devices/Scanning'
 import { CollapsibleSection } from '../../../molecules/CollapsibleSection'
 import { getScanning } from '../../../redux/discovery'
 
@@ -34,22 +35,27 @@ export function DevicesLanding(): JSX.Element {
 
   return (
     <Box minWidth={SIZE_6} padding={`${SPACING.spacing3} ${SPACING.spacing4}`}>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <StyledText as="h3" id="DevicesLanding_title">
+      <Flex
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
+        marginTop={SPACING.spacing3}
+      >
+        <StyledText as="h1" id="DevicesLanding_title">
           {t('devices')}
         </StyledText>
         <NewRobotSetupHelp />
       </Flex>
-      {isScanning ? <Scanning /> : null}
       {!isScanning &&
       [...availableDevices, ...unavailableDevices].length === 0 ? (
-        <DevicesEmptyState />
+        <Flex height="93vh" justifyContent={JUSTIFY_CENTER}>
+          <DevicesEmptyState />
+        </Flex>
       ) : null}
 
       {availableDevices.length > 0 ? (
         <>
           <CollapsibleSection
-            marginY={SPACING.spacing4}
+            marginTop={'2.1rem'}
             title={t('available', { count: availableDevices.length })}
           >
             {availableDevices.map(robot => (
@@ -58,7 +64,7 @@ export function DevicesLanding(): JSX.Element {
               </ApiHostProvider>
             ))}
           </CollapsibleSection>
-          {unavailableDevices.length > 0 ? <Divider /> : null}
+          <Divider />
         </>
       ) : null}
       {unavailableDevices.length > 0 ? (

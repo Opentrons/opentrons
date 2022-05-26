@@ -2,7 +2,7 @@
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 
@@ -27,7 +27,7 @@ def subject(labware_data_provider: LabwareDataProvider) -> DeckDataProvider:
 
 
 async def test_get_deck_definition(
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
     subject: DeckDataProvider,
 ) -> None:
     """It should be able to load the deck definition."""
@@ -36,7 +36,7 @@ async def test_get_deck_definition(
 
 
 async def test_get_deck_definition_short_trash(
-    short_trash_deck_def: DeckDefinitionV2,
+    short_trash_deck_def: DeckDefinitionV3,
     subject: DeckDataProvider,
     short_trash_flag: None,
 ) -> None:
@@ -47,7 +47,7 @@ async def test_get_deck_definition_short_trash(
 
 async def test_get_deck_labware_fixtures(
     decoy: Decoy,
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
     fixed_trash_def: LabwareDefinition,
     labware_data_provider: LabwareDataProvider,
     subject: DeckDataProvider,
@@ -74,7 +74,7 @@ async def test_get_deck_labware_fixtures(
 
 async def test_get_deck_labware_fixtures_short_trash(
     decoy: Decoy,
-    short_trash_deck_def: DeckDefinitionV2,
+    short_trash_deck_def: DeckDefinitionV3,
     short_fixed_trash_def: LabwareDefinition,
     labware_data_provider: LabwareDataProvider,
     subject: DeckDataProvider,

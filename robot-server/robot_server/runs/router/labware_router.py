@@ -31,7 +31,7 @@ labware_router = APIRouter()
     ),
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
+        status.HTTP_201_CREATED: {"model": SimpleBody[LabwareOffset]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
     },

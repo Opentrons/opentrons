@@ -19,8 +19,7 @@ class SetTargetBlockTemperatureParams(BaseModel):
     """Input parameters to set a Thermocycler's target block temperature."""
 
     moduleId: str = Field(..., description="Unique ID of the Thermocycler Module.")
-    # TODO(mc, 2022-04-25): rename to "celsius"
-    temperature: float = Field(..., description="Target temperature in °C.")
+    celsius: float = Field(..., description="Target temperature in °C.")
 
 
 class SetTargetBlockTemperatureResult(BaseModel):
@@ -53,7 +52,7 @@ class SetTargetBlockTemperatureImpl(
             params.moduleId
         )
         target_temperature = thermocycler_state.validate_target_block_temperature(
-            params.temperature
+            params.celsius
         )
         thermocycler_hardware = self._equipment.get_module_hardware_api(
             thermocycler_state.module_id

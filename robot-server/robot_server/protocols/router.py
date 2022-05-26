@@ -1,6 +1,6 @@
 """Router for /protocols endpoints."""
 import logging
-import textwrap
+from textwrap import dedent
 from datetime import datetime
 from pathlib import Path
 
@@ -11,7 +11,7 @@ from typing_extensions import Literal
 from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
 
 from robot_server.errors import ErrorDetails, ErrorBody
-from robot_server.service.task_runner import TaskRunner
+from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.service.dependencies import get_unique_id, get_current_time
 from robot_server.service.json_api import (
     SimpleBody,
@@ -21,12 +21,19 @@ from robot_server.service.json_api import (
     PydanticResponse,
 )
 
+from .protocol_auto_deleter import ProtocolAutoDeleter
 from .protocol_models import Protocol, ProtocolFile, Metadata
 from .protocol_analyzer import ProtocolAnalyzer
 from .analysis_store import AnalysisStore, AnalysisNotFoundError
 from .analysis_models import ProtocolAnalysis
-from .protocol_store import ProtocolStore, ProtocolResource, ProtocolNotFoundError
+from .protocol_store import (
+    ProtocolStore,
+    ProtocolResource,
+    ProtocolNotFoundError,
+    ProtocolUsedByRunError,
+)
 from .dependencies import (
+    get_protocol_auto_deleter,
     get_protocol_reader,
     get_protocol_store,
     get_analysis_store,
@@ -59,18 +66,30 @@ class ProtocolFilesInvalid(ErrorDetails):
     title: str = "Protocol File(s) Invalid"
 
 
+class ProtocolUsedByRun(ErrorDetails):
+    """An error returned when a protocol is used by a run and cannot be deleted."""
+
+    id: Literal["ProtocolUsedByRun"] = "ProtocolUsedByRun"
+    title: str = "Protocol Used by Run"
+
+
 protocols_router = APIRouter()
 
 
 @protocols_router.post(
     path="/protocols",
     summary="Upload a protocol",
-    description=textwrap.dedent(
+    description=dedent(
         """
         Upload a protocol to your device. You may include the following files:
 
         - A single Python protocol file and 0 or more custom labware JSON files
         - A single JSON protocol file (any additional labware files will be ignored)
+
+        When too many protocols already exist, old ones will be automatically deleted
+        to make room for the new one.
+        A protocol will never be automatically deleted if there's a run
+        referring to it, though.
         """
     ),
     status_code=status.HTTP_201_CREATED,
@@ -91,7 +110,8 @@ async def create_protocol(
     analysis_store: AnalysisStore = Depends(get_analysis_store),
     protocol_reader: ProtocolReader = Depends(get_protocol_reader),
     protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
-    task_runner: TaskRunner = Depends(TaskRunner),
+    task_runner: TaskRunner = Depends(get_task_runner),
+    protocol_auto_deleter: ProtocolAutoDeleter = Depends(get_protocol_auto_deleter),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
@@ -107,6 +127,8 @@ async def create_protocol(
         protocol_reader: Protocol file reading interface.
         protocol_analyzer: Protocol analysis interface.
         task_runner: Background task runner.
+        protocol_auto_deleter: An interface to delete old resources to make room for
+            the new protocol.
         protocol_id: Unique identifier to attach to the protocol resource.
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
@@ -128,6 +150,7 @@ async def create_protocol(
         protocol_key=key,
     )
 
+    protocol_auto_deleter.make_room_for_new_protocol()
     protocol_store.insert(protocol_resource)
 
     task_runner.run(
@@ -245,6 +268,7 @@ async def get_protocol_by_id(
     responses={
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[ProtocolUsedByRun]},
     },
 )
 async def delete_protocol_by_id(
@@ -261,7 +285,10 @@ async def delete_protocol_by_id(
         protocol_store.remove(protocol_id=protocolId)
 
     except ProtocolNotFoundError as e:
-        raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+        raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+
+    except ProtocolUsedByRunError as e:
+        raise ProtocolUsedByRun(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
 
     return await PydanticResponse.create(
         content=SimpleEmptyBody.construct(),
@@ -284,6 +311,8 @@ async def get_protocol_analyses(
 ) -> PydanticResponse[SimpleMultiBody[ProtocolAnalysis]]:
     """Get a protocol's full analyses list.
 
+    Analyses are returned in order from least-recently started to most-recently started.
+
     Arguments:
         protocolId: Protocol identifier to delete, pulled from URL.
         protocol_store: Database of protocol resources.
@@ -294,7 +323,7 @@ async def get_protocol_analyses(
             status.HTTP_404_NOT_FOUND
         )
 
-    analyses = analysis_store.get_by_protocol(protocolId)
+    analyses = await analysis_store.get_by_protocol(protocolId)
 
     return await PydanticResponse.create(
         content=SimpleMultiBody.construct(
@@ -320,11 +349,11 @@ async def get_protocol_analysis_by_id(
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
 ) -> PydanticResponse[SimpleBody[ProtocolAnalysis]]:
-    """Get a protocol analysis by analyis ID.
+    """Get a protocol analysis by analysis ID.
 
     Arguments:
         protocolId: The ID of the protocol, pulled from the URL.
-        analysisId: THe ID of the analysis, pulled from the URL.
+        analysisId: The ID of the analysis, pulled from the URL.
         protocol_store: Protocol resource storage.
         analysis_store: Analysis resource storage.
     """
@@ -334,7 +363,9 @@ async def get_protocol_analysis_by_id(
         )
 
     try:
-        analysis = analysis_store.get(analysisId)
+        # TODO(mm, 2022-04-28): This will erroneously return an analysis even if
+        # this analysis isn't owned by this protocol. This should be an error.
+        analysis = await analysis_store.get(analysisId)
     except AnalysisNotFoundError as error:
         raise AnalysisNotFound(detail=str(error)).as_error(
             status.HTTP_404_NOT_FOUND

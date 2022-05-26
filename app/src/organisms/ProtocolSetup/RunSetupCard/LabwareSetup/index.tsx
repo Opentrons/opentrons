@@ -35,12 +35,11 @@ import {
   inferModuleOrientationFromXCoordinate,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
 import { useCurrentRunStatus } from '../../../RunTimeControl/hooks'
 import styles from '../../styles.css'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
-import { DownloadOffsetDataModal } from '../../../ProtocolUpload/DownloadOffsetDataModal'
 import {
   useModuleRenderInfoById,
   useLabwareRenderInfoById,
@@ -150,9 +149,9 @@ export const LabwareSetup = (): JSX.Element | null => {
         </p>
       )}
       {downloadOffsetDataModal && (
-        <DownloadOffsetDataModal
-          onCloseClick={() => showDownloadOffsetDataModal(false)}
-        />
+        <p>
+          deprecated entrypoint to download offset data, slated for deletion{' '}
+        </p>
       )}
       <Flex flex="1" maxHeight="100vh" flexDirection={DIRECTION_COLUMN}>
         {moduleTypesThatRequireExtraAttention.length > 0 && (

@@ -44,15 +44,55 @@ ModuleSlotTransform = TypedDict(
 ModuleLabwareOffset = TypedDict(
     "ModuleLabwareOffset", {"x": float, "y": float, "z": float}
 )
+
 ModuleDimensions = TypedDict(
     "ModuleDimensions",
-    {"bareOverallHeight": float, "overLabwareHeight": float, "lidHeight": float},
+    {
+        "bareOverallHeight": float,
+        "overLabwareHeight": float,
+        "lidHeight": float,
+        "xDimension": float,
+        "yDimension": float,
+        "footprintXDimension": float,
+        "footprintYDimension": float,
+        "labwareInterfaceXDimension": float,
+        "labwareInterfaceYDimension": float,
+    },
     total=False,
 )
+
 ModuleCalibrationPointOffset = TypedDict(
     "ModuleCalibrationPointOffset", {"x": float, "y": float}
 )
 
+ModuleCalibrationPointOffsetWithZ = TypedDict(
+    "ModuleCalibrationPointOffsetWithZ", {"x": float, "y": float, "z": float}
+)
+
+CornerOffsetFromSlot = TypedDict(
+    "CornerOffsetFromSlot", {"x": float, "y": float, "z": float}
+)
+
+# TODO(mc, 2022-03-18): potentially move from typed-dict to Pydantic
+ModuleDefinitionV3 = TypedDict(
+    "ModuleDefinitionV3",
+    {
+        "$otSharedSchema": Literal["module/schemas/3"],
+        "moduleType": ModuleType,
+        "model": ModuleModel,
+        "labwareOffset": ModuleLabwareOffset,
+        "cornerOffsetFromSlot": CornerOffsetFromSlot,
+        "dimensions": ModuleDimensions,
+        "calibrationPoint": ModuleCalibrationPointOffsetWithZ,
+        "displayName": str,
+        "quirks": List[str],
+        "slotTransforms": Dict[str, Dict[str, Dict[str, List[List[float]]]]],
+        "compatibleWith": List[ModuleModel],
+        "twoDimensionalRendering": Dict[str, Any],
+    },
+)
+
+# V2 is not used anymore. This type is preserved for historical purposes
 ModuleDefinitionV2 = TypedDict(
     "ModuleDefinitionV2",
     {
@@ -80,7 +120,3 @@ ModuleDefinitionV1 = TypedDict(
         "quirks": List[str],
     },
 )
-
-# TODO(mc, 2022-03-18): flesh this out; also potentially move
-# from typed-dict to Pydantic
-ModuleDefinitionV3 = ModuleDefinitionV2

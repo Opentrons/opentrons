@@ -23,11 +23,11 @@ import {
   Text,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 
 import type { ThermocyclerModule } from '../../../redux/modules/types'
 import type {
-  TCSetTargetBlockTemperatureCreateCommand,
+  TCSetAndWaitForBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
@@ -72,14 +72,14 @@ export const ThermocyclerModuleSlideout = (
         commandType: 'thermocycler/setTargetLidTemperature',
         params: {
           moduleId: module.id,
-          temperature: parseInt(tempValue),
+          celsius: parseInt(tempValue),
         },
       }
-      const saveBlockCommand: TCSetTargetBlockTemperatureCreateCommand = {
-        commandType: 'thermocycler/setTargetBlockTemperature',
+      const saveBlockCommand: TCSetAndWaitForBlockTemperatureCreateCommand = {
+        commandType: 'thermocycler/setAndWaitForBlockTemperature',
         params: {
           moduleId: module.id,
-          temperature: parseInt(tempValue),
+          celsius: parseInt(tempValue),
           //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
         },
       }
@@ -121,7 +121,7 @@ export const ThermocyclerModuleSlideout = (
           width="100%"
           data-testid={`ThermocyclerSlideout_btn_${module.serialNumber}`}
         >
-          {t('set_tc_temp_slideout', { part: modulePart })}
+          {t('confirm')}
         </PrimaryButton>
       }
     >
@@ -143,12 +143,12 @@ export const ThermocyclerModuleSlideout = (
         data-testid={`ThermocyclerSlideout_input_field_${module.serialNumber}`}
       >
         <Text
-          fontWeight={FONT_WEIGHT_REGULAR}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.darkGrey}
-          marginBottom={SPACING.spacing1}
+          paddingBottom={SPACING.spacing3}
         >
-          {t('temperature')}
+          {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}
         </Text>
         <InputField
           data-testid={`${module.moduleModel}_${isSecondaryTemp}`}

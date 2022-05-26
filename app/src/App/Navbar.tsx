@@ -6,6 +6,7 @@ import {
   Flex,
   COLORS,
   Icon,
+  Link,
   DIRECTION_COLUMN,
   FLEX_NONE,
   SPACING,
@@ -23,6 +24,8 @@ import { NAV_BAR_WIDTH } from './constants'
 
 import type { RouteProps } from './types'
 import { StyledText } from '../atoms/text'
+
+const SALESFORCE_HELP_LINK = 'https://support.opentrons.com/s/'
 
 const NavbarLink = styled(NavLink)`
   color: ${COLORS.white};
@@ -46,6 +49,12 @@ const NavbarLink = styled(NavLink)`
   }
 `
 const NavIconLink = styled(NavLink)`
+  &.active > svg {
+    color: ${COLORS.white};
+    background-color: ${COLORS.darkBlackSelected};
+  }
+`
+const IconLink = styled(Link)`
   &.active > svg {
     color: ${COLORS.white};
     background-color: ${COLORS.darkBlackSelected};
@@ -119,13 +128,15 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         alignSelf={ALIGN_STRETCH}
         justifyContent={JUSTIFY_SPACE_EVENLY}
       >
-        <NavIconLink
-          data-testid="Navbar_settingsLink"
-          to="/app-settings/general"
-        >
+        <NavIconLink data-testid="Navbar_settingsLink" to="/app-settings">
           <NavbarIcon name="gear" />
         </NavIconLink>
-        <NavbarIcon data-testid="Navbar_helpLink" name="question-mark-circle" />
+        <IconLink href={SALESFORCE_HELP_LINK} external>
+          <NavbarIcon
+            data-testid="Navbar_helpLink"
+            name="question-mark-circle"
+          />
+        </IconLink>
       </Flex>
     </Flex>
   )

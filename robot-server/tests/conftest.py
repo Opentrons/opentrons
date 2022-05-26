@@ -14,8 +14,10 @@ from datetime import datetime, timezone
 from fastapi import routing
 from mock import MagicMock
 from starlette.testclient import TestClient
-from typing import Any, Callable, Dict, Iterator, cast
+from typing import Any, Callable, Dict, Generator, Iterator, cast
 from typing_extensions import NoReturn
+from pathlib import Path
+from sqlalchemy.engine import Engine
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -31,6 +33,7 @@ from robot_server import app
 from robot_server.hardware import get_hardware
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 from robot_server.service.session.manager import SessionManager
+from robot_server.persistence.database import create_sql_engine
 
 test_router = routing.APIRouter()
 
@@ -41,6 +44,24 @@ async def always_raise() -> NoReturn:
 
 
 app.include_router(test_router)
+
+
+@pytest.fixture(autouse=True)
+def configure_test_logs(caplog: pytest.LogCaptureFixture) -> None:
+    """Configure which logs pytest captures and displays.
+
+    Because of the autouse=True, this automatically applies to each test.
+
+    By default, pytest displays log messages of level WARNING and above.
+    If you need to adjust this in the course of a debugging adventure,
+    you should normally do it by passing something like --log-level=DEBUG
+    to pytest on the command line.
+    """
+    # Fix up SQLAlchemy's logging so that it uses the same log level as everything else.
+    # By default, SQLAlchemy's logging is slightly unusual: it hides messages below
+    # WARNING, even if you pass --log-level=DEBUG to pytest on the command line.
+    # See: https://docs.sqlalchemy.org/en/14/core/engines.html#configuring-logging
+    caplog.set_level("NOTSET", logger="sqlalchemy")
 
 
 @pytest.fixture
@@ -383,3 +404,12 @@ def clear_custom_tiprack_def_dir() -> Iterator[None]:
         os.remove(tiprack_path)
     except FileNotFoundError:
         pass
+
+
+@pytest.fixture
+def sql_engine(tmp_path: Path) -> Generator[Engine, None, None]:
+    """Return a set-up database to back the store."""
+    db_file_path = tmp_path / "test.db"
+    sql_engine = create_sql_engine(db_file_path)
+    yield sql_engine
+    sql_engine.dispose()

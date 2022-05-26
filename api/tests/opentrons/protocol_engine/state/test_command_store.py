@@ -278,7 +278,7 @@ def test_setup_queue_action_updates_command_source() -> None:
         createdAt=datetime(year=2021, month=1, day=1),
         params=commands.PauseParams(),
         status=commands.CommandStatus.QUEUED,
-        commandSource=commands.CommandSource.SETUP,
+        source=commands.CommandSource.SETUP,
     )
 
     subject = CommandStore()
@@ -448,7 +448,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
             startedAt=datetime(year=2022, month=2, day=2),
             params=commands.PauseParams(),
             status=commands.CommandStatus.RUNNING,
-            commandSource=commands.CommandSource.SETUP,
+            source=commands.CommandSource.SETUP,
         )
     )
     failed_action_cmd_2 = FailCommandAction(
@@ -471,7 +471,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         completedAt=datetime(year=2023, month=3, day=3),
         params=commands.PauseParams(),
         status=commands.CommandStatus.FAILED,
-        commandSource=commands.CommandSource.SETUP,
+        source=commands.CommandSource.SETUP,
     )
     expected_failed_cmd_3 = commands.Pause(
         id="command-id-3",
@@ -481,7 +481,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         completedAt=datetime(year=2023, month=3, day=3),
         params=commands.PauseParams(),
         status=commands.CommandStatus.FAILED,
-        commandSource=commands.CommandSource.SETUP,
+        source=commands.CommandSource.SETUP,
     )
 
     subject = CommandStore()
@@ -587,7 +587,7 @@ def test_play_action_clears_setup_command_queue(pause_source: PauseSource) -> No
         createdAt=datetime(year=2021, month=1, day=1),
         params=commands.PauseParams(),
         status=commands.CommandStatus.QUEUED,
-        commandSource=commands.CommandSource.SETUP,
+        source=commands.CommandSource.SETUP,
     )
     queue_cmd = QueueSetupCommandAction(
         request=commands.PauseCreate(params=commands.PauseParams()),

@@ -14,7 +14,7 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../../../../atoms/text'
-import { PrimaryButton } from '../../../../../atoms/Buttons'
+import { PrimaryButton } from '../../../../../atoms/buttons'
 import { Modal } from '../../../../../atoms/Modal'
 import {
   useDispatchApiRequest,
@@ -81,8 +81,7 @@ export function FactoryResetModal({
                 onClick={closeModal}
                 textTransform={TEXT_TRANSFORM_CAPITALIZE}
                 marginRight={SPACING.spacing3}
-                color={COLORS.blue}
-                css={TYPOGRAPHY.fontSizeP}
+                css={TYPOGRAPHY.linkPSemiBold}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {t('shared:cancel')}

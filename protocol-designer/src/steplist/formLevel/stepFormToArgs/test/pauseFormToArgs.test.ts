@@ -7,7 +7,7 @@ import { FormData } from '../../../../form-types'
 import { pauseFormToArgs } from '../pauseFormToArgs'
 
 describe('pauseFormToArgs', () => {
-  it('returns awaitTemperature command creator when form specifies pause until temp', () => {
+  it('returns waitForTemperature command creator when form specifies pause until temp', () => {
     const formData: FormData = {
       stepType: 'pause',
       id: 'test_id',
@@ -17,7 +17,7 @@ describe('pauseFormToArgs', () => {
       moduleId: 'some_id',
     }
     const expected = {
-      commandCreatorFnName: 'awaitTemperature',
+      commandCreatorFnName: 'waitForTemperature',
       temperature: 20,
       message: 'pause message',
       module: 'some_id',

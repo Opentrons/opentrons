@@ -10,6 +10,8 @@ export const links = {
   customLabware: `https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions`,
   recommendedLabware:
     'https://support.opentrons.com/en/articles/4168748-labware-and-module-compatibility',
+  // TODO: fill in real url when it exists
+  heaterShakerLabware: '#',
   pipetteGen1MultiModuleCollision:
     'https://support.opentrons.com/en/articles/4168741-module-placement',
   betaReleases: `https://support.opentrons.com/en/articles/3854833-opentrons-beta-software-releases`,

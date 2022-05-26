@@ -19,7 +19,7 @@ import {
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
-import { TertiaryButton } from '../../../atoms/Buttons'
+import { TertiaryButton } from '../../../atoms/buttons'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../../organisms/CalibrationPanels'
@@ -33,19 +33,20 @@ import { SetupCalibrationItem } from './SetupCalibrationItem'
 import type { PipetteInfo } from '../hooks'
 
 const inexactPipetteSupportArticle =
-  'https://support.opentrons.com/en/articles/3450143-gen2-pipette-compatibility'
-
+  'https://support.opentrons.com/s/article/GEN2-pipette-compatibility'
 interface SetupPipetteCalibrationItemProps {
   pipetteInfo: PipetteInfo
   index: number
   mount: string
   robotName: string
+  runId: string
 }
 
 export function SetupPipetteCalibrationItem({
   pipetteInfo,
   mount,
   robotName,
+  runId,
 }: SetupPipetteCalibrationItemProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
@@ -170,6 +171,7 @@ export function SetupPipetteCalibrationItem({
       label={t(`devices_landing:${mount}_mount`)}
       title={pipetteInfo.pipetteSpecs?.displayName}
       id={`PipetteCalibration_${mount}MountTitle`}
+      runId={runId}
     />
   )
 }

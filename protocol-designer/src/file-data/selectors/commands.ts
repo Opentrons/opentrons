@@ -131,9 +131,9 @@ export const commandCreatorFromStepArgs = (
         args
       )
 
-    case 'awaitTemperature':
+    case 'waitForTemperature':
       return StepGeneration.curryCommandCreator(
-        StepGeneration.awaitTemperature,
+        StepGeneration.waitForTemperature,
         args
       )
 

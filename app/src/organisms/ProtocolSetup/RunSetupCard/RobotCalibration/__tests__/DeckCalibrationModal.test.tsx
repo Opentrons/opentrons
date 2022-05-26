@@ -23,7 +23,7 @@ describe('DeckCalibrationModal', () => {
   it('should render the correct body', () => {
     const { getByRole, getByText } = render(props)
     getByText(
-      'Robot calibration establishes how the OT-2 knows where it is in relation to the deck. Accurate Robot calibration is essential to run protocols sucessfully. Robot calibration has 3 parts: Deck calibration, Tip Length calibration and Pipette Offset calibration.'
+      'Robot calibration establishes how the OT-2 knows where it is in relation to the deck. Accurate Robot calibration is essential to run protocols successfully. Robot calibration has 3 parts: Deck calibration, Tip Length calibration and Pipette Offset calibration.'
     )
     expect(getByRole('heading', { name: 'Deck Calibration' })).toBeTruthy()
     getByText(
@@ -54,7 +54,7 @@ describe('DeckCalibrationModal', () => {
         name: 'Learn more about robot calibration',
       }).getAttribute('href')
     ).toBe(
-      'https://support.opentrons.com/en/articles/3499692-how-positional-calibration-works-on-the-ot-2'
+      'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
     )
   })
   it('should call onCloseClick when the close button is pressed', () => {

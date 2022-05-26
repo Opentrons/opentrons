@@ -1,18 +1,24 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { getStoredProtocols } from '../../../redux/protocol-storage'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
+import { useCreateRunFromProtocol } from '../../ChooseRobotSlideout/useCreateRunFromProtocol'
 import { ChooseProtocolSlideout } from '../'
 
+jest.mock('../../ChooseRobotSlideout/useCreateRunFromProtocol')
 jest.mock('../../../redux/protocol-storage')
 jest.mock('../../../molecules/DeckThumbnail')
 
 const mockGetStoredProtocols = getStoredProtocols as jest.MockedFunction<
   typeof getStoredProtocols
+>
+const mockUseCreateRunFromProtocol = useCreateRunFromProtocol as jest.MockedFunction<
+  typeof useCreateRunFromProtocol
 >
 const mockDeckThumbnail = DeckThumbnail as jest.MockedFunction<
   typeof DeckThumbnail
@@ -30,9 +36,14 @@ const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {
 }
 
 describe('ChooseProtocolSlideout', () => {
+  let mockCreateRunFromProtocol: jest.Mock
   beforeEach(() => {
+    mockCreateRunFromProtocol = jest.fn()
     mockGetStoredProtocols.mockReturnValue([storedProtocolDataFixture])
     mockDeckThumbnail.mockReturnValue(<div>mock Deck Thumbnail</div>)
+    mockUseCreateRunFromProtocol.mockReturnValue({
+      createRunFromProtocolSource: mockCreateRunFromProtocol,
+    } as any)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -78,5 +89,18 @@ describe('ChooseProtocolSlideout', () => {
     expect(
       getByRole('heading', { name: 'No protocols found' })
     ).toBeInTheDocument()
+  })
+  it('calls createRunFromProtocolSource if CTA clicked', () => {
+    const [{ getByRole }] = render({
+      robot: mockConnectableRobot,
+      onCloseClick: jest.fn(),
+      showSlideout: true,
+    })
+    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    fireEvent.click(proceedButton)
+    expect(mockCreateRunFromProtocol).toHaveBeenCalledWith({
+      files: [expect.any(File)],
+      protocolKey: storedProtocolDataFixture.protocolKey,
+    })
   })
 })

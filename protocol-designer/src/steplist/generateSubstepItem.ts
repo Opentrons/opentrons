@@ -400,11 +400,11 @@ export function generateSubstepItem(
     }
   }
 
-  if (stepArgs.commandCreatorFnName === 'awaitTemperature') {
+  if (stepArgs.commandCreatorFnName === 'waitForTemperature') {
     const moduleId = stepArgs.module
     const { type } = invariantContext.moduleEntities[moduleId as string]
     return {
-      substepType: 'awaitTemperature',
+      substepType: 'waitForTemperature',
       temperature: stepArgs.temperature,
       labwareNickname: labwareNames?.nickname,
       message: stepArgs.message,

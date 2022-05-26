@@ -348,7 +348,13 @@ def build_blocks(
         acceleration=-max_acceleration,
         distance=abs(max_speed_sq - final_speed_sq) / (2 * max_acceleration),
     )
-    if first.distance + final.distance > distance:
+    # the FLOAT_THRESHOLD here catches a numerical instability case where
+    # first.initial_speed and final.final_speed are almost exactly equal,
+    # and acceleration is low enough that this is a triangle move. in this
+    # case, sometimes numerical instability could cause the inequality
+    # to pass, and the code below subtracts the initial and final, and
+    # would come up with 0. Adding the threshold fixes the issue.
+    if first.distance + final.distance > (distance + FLOAT_THRESHOLD):
         # the math did not quite work out and we need to trim down our top speed.
         # This will be a suboptimal solution almost certainly, but it's better to
         # have a suboptimal solution that doesn't violate constraints than an
@@ -365,7 +371,7 @@ def build_blocks(
         final.initial_speed = first.final_speed
         final.distance = np.abs(max_speed_sq - final_speed_sq) / (2 * max_acceleration)
 
-    if first.distance + final.distance < distance:
+    if first.distance + final.distance < (distance - FLOAT_THRESHOLD):
         # we'll have a coast phase!
         coast = Block(
             initial_speed=final.initial_speed,

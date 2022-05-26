@@ -36,7 +36,12 @@ class CommandStatus(str, Enum):
 
 
 class CommandSource(str, Enum):
-    """Source that generated a given command."""
+    """Source that generated a given command.
+
+    Props:
+        PROTOCOL: the command is part of the protocol run itself.
+        SETUP: the command is part of the setup phase of a run.
+    """
 
     PROTOCOL = "protocol"
     SETUP = "setup"
@@ -106,8 +111,9 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
         None,
         description="Command execution completed timestamp, if completed",
     )
-    commandSource: Optional[CommandSource] = Field(
-        None, description="Source that generated this command."
+    source: Optional[CommandSource] = Field(
+        None,
+        description="Source that generated this command.",
     )
 
 

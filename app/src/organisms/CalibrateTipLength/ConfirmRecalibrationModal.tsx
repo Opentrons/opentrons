@@ -29,8 +29,8 @@ const THIS_LINK = 'this link'
 const CONTINUE = 'continue to calibrate tip length'
 const CANCEL = 'cancel'
 
-// TODO: This link needs to be real(er)
-const CALIBRATION_URL = 'https://support.opentrons.com/en/articles/4523313'
+const CALIBRATION_URL =
+  'https://support.opentrons.com/s/article/Recalibrating-tip-length-before-running-a-protocol'
 
 interface Props {
   confirm: () => unknown

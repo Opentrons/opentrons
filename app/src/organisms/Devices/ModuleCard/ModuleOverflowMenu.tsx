@@ -62,10 +62,7 @@ export const ModuleOverflowMenu = (
                       {item.setSetting}
                     </MenuItem>
                     {item.disabledReason && (
-                      <Tooltip
-                        tooltipProps={tooltipProps}
-                        key={`tooltip_${index}_${module.moduleModel}`}
-                      >
+                      <Tooltip tooltipProps={tooltipProps}>
                         {t('cannot_shake', { ns: 'heater_shaker' })}
                       </Tooltip>
                     )}

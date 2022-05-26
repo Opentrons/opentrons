@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { StyledText } from '../../../../atoms/text'
-import { TertiaryButton } from '../../../../atoms/Buttons'
+import { TertiaryButton } from '../../../../atoms/buttons'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 
 const EVENT_JUPYTER_OPEN = { name: 'jupyterOpen', properties: {} }
@@ -34,8 +34,8 @@ export function OpenJupyterControl({
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
         <StyledText
-          as="h3"
-          css={TYPOGRAPHY.h3SemiBold}
+          as="h2"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing4}
           id="AdvancedSettings_About"
         >

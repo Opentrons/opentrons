@@ -101,7 +101,7 @@ class AppSettings:
     def get_how_to_restore_software_version_modal(self) -> Optional[WebElement]:
         """Get the modal for How to Restore a Previous Software Version."""
         button: Element = Element(
-            (By.XPATH, '//p[text()="How to Restore a Previous Software Version"]'),
+            (By.XPATH, '//h3[text()="How to Restore a Previous Software Version"]'),
             "How to Restore a Previous Software Version modal",
         )
         return self.base.present_wrapper(button, 2)
@@ -160,7 +160,7 @@ class AppSettings:
         header: Element = Element(
             (
                 By.XPATH,
-                "//p[@data-testid='Slideout_title_Connect to a Robot via IP Address']",
+                "//h2[@data-testid='Slideout_title_Connect to a Robot via IP Address']",
             ),
             "connect to robot via IP address slideout header text",
         )

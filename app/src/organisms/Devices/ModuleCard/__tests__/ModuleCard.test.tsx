@@ -210,7 +210,7 @@ describe('ModuleCard', () => {
       robotName: mockRobot.name,
     })
 
-    getByText('Heater Shaker Module GEN1')
+    getByText('Heater-Shaker Module GEN1')
     getByText('Mock Heater Shaker Module Data')
     getByText('usb port 1')
     getByAltText('heaterShakerModuleV1')

@@ -42,7 +42,7 @@ import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 interface PipetteCardProps {
   pipetteInfo: PipetteModelSpecs | null
-  pipetteId?: AttachedPipette['id']
+  pipetteId?: AttachedPipette['id'] | null
   mount: Mount
   robotName: string
 }
@@ -71,6 +71,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteId,
     mount
   )
+  const badCalibration = pipetteOffsetCalibration?.status.markedBad
 
   const startPipetteOffsetCalibrationBlockModal = (
     hasBlockModalResponse: boolean | null
@@ -189,6 +190,26 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                       onClick={handleCalibrate}
                     >
                       {t('calibrate_now')}
+                    </Btn>
+                  </Flex>
+                </Banner>
+              </Flex>
+            ) : null}
+            {isDeckCalibrated && badCalibration && showBanner ? (
+              <Flex paddingBottom={SPACING.spacing2}>
+                <Banner
+                  type="warning"
+                  onCloseClick={() => setShowBanner(false)}
+                >
+                  <Flex flexDirection={DIRECTION_COLUMN}>
+                    {t('pipette_cal_recommended')}
+                    <Btn
+                      textAlign={ALIGN_START}
+                      fontSize={TYPOGRAPHY.fontSizeP}
+                      textDecoration={TEXT_DECORATION_UNDERLINE}
+                      onClick={handleCalibrate}
+                    >
+                      {t('recalibrate_now')}
                     </Btn>
                   </Flex>
                 </Banner>

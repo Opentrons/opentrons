@@ -10,7 +10,7 @@ export {
 
 export {
   aspirate,
-  awaitTemperature,
+  waitForTemperature,
   blowout,
   deactivateTemperature,
   delay,
