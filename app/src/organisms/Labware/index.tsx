@@ -141,6 +141,7 @@ export function Labware(): JSX.Element {
                 paddingLeft={SPACING.spacing3}
                 paddingRight={SPACING.spacing2}
                 paddingY={SPACING.spacing2}
+                data-testid="sortBy-label"
               >
                 {sortBy === 'alphabetical' ? t('alphabetical') : t('reverse')}
               </StyledText>
