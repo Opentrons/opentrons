@@ -62,7 +62,7 @@ class ProtocolNotFoundError(KeyError):
 
 
 class ProtocolUsedByRunError(ValueError):
-    """Error raised if a protocol cannot be deleted because it's use by a run."""
+    """Error raised if a protocol can't be deleted because it's used by a run."""
 
     def __init__(self, protocol_id: str) -> None:
         super().__init__(
