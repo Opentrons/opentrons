@@ -17,12 +17,13 @@ def scale_connection() -> MagicMock:
 @pytest.fixture
 def subject(scale_connection: MagicMock) -> RadwagScale:
     """Test subject."""
-    r = RadwagScale()
-    r._scale = scale_connection
+    r = RadwagScale(connection=scale_connection, time_delay=0)
     return r
 
 
-def create_radwag_result_line(command: str, val: float, stability_char: str = " ") -> bytes:
+def create_radwag_result_line(
+    command: str, val: float, stability_char: str = " "
+) -> bytes:
     """Create a radwag protocol line."""
     sign = " "
     # TODO (amit, 2022-05-20): Add sign to tests.
@@ -70,15 +71,19 @@ def test_read_mass(
     argnames="masses,expected",
     argvalues=[
         # drop all but last three
-        [[0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 5.5, 5.5, 5.5], 5.5],
+        [[5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5.5, 5.5, 5.5], 5.5],
         # All the same
         [[5.5, 5.5, 5.5, 5.5], 5.5],
         # Remove outlier
         [[1.0, 12.0, 1.0], 1.0],
     ],
 )
-def test_stable_read(subject:RadwagScale, scale_connection: MagicMock, masses: List[float],
-    expected: float)-> None:
+def test_stable_read(
+    subject: RadwagScale,
+    scale_connection: MagicMock,
+    masses: List[float],
+    expected: float,
+) -> None:
     """It should read samples."""
     scale_connection.readline.side_effect = [
         create_radwag_result_line("SU", v) for v in masses

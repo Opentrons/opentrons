@@ -38,8 +38,9 @@ class LimitSensor(LimitSensorBase):
         return res
 
     @classmethod
-    def create(cls, port: Optional[str], baud_rate=115200,
-               timeout: float = 0.1) -> "LimitSensor":
+    def create(
+        cls, port: Optional[str], baud_rate=115200, timeout: float = 0.1
+    ) -> "LimitSensor":
         """Connect and create a limit sensor
 
         :param port: Port. If None, the port will be searched for.
@@ -47,14 +48,16 @@ class LimitSensor(LimitSensorBase):
         :param timeout: Timeout in seconds.
         :return: Instance
         """
-        return LimitSensor(serial.Serial(
-            port=port if port else LimitSensor.scan_for_port("sensor"),
-            baudrate=baud_rate,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE,
-            bytesize=serial.EIGHTBITS,
-            timeout=timeout,
-        ))
+        return LimitSensor(
+            serial.Serial(
+                port=port if port else LimitSensor.scan_for_port("sensor"),
+                baudrate=baud_rate,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                bytesize=serial.EIGHTBITS,
+                timeout=timeout,
+            )
+        )
 
     @staticmethod
     def scan_for_port(name: str) -> Optional[str]:
