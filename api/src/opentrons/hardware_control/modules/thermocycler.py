@@ -285,7 +285,7 @@ class Thermocycler(mod_abc.AbstractModule):
                 )
 
         task = self._loop.create_task(self._wait_for_temp())
-        await self.make_cancellable(task)
+        self.make_cancellable(task)
         await task
 
     async def cycle_temperatures(
@@ -349,7 +349,7 @@ class Thermocycler(mod_abc.AbstractModule):
                     f"but status reads T={self.lid_target}"
                 )
         task = self._loop.create_task(self._wait_for_lid_temp())
-        await self.make_cancellable(task)
+        self.make_cancellable(task)
         await task
 
     # TODO(mc, 2022-04-25): de-duplicate with `set_temperature`
