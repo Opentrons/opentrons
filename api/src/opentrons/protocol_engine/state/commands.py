@@ -113,13 +113,13 @@ class CommandState:
     run_started_at: Optional[datetime]
     """The time the run has started.
 
-    Gets set when PlayAction is dispatched.
+    initialized when PlayAction is dispatched.
     """
 
     run_completed_at: Optional[datetime]
     """The time the run has completed.
 
-    Gets set when HardwareStoppedAction is dispatched.
+    initialized when HardwareStoppedAction is dispatched.
     """
 
     is_door_blocking: bool
@@ -509,7 +509,7 @@ class CommandView(HasState[CommandState]):
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
         if self._state.run_result:
-            if self._state.run_completed_at is None:
+            if not self.get_is_stopped():
                 return (
                     EngineStatus.STOP_REQUESTED
                     if self._state.run_result == RunResult.STOPPED
