@@ -19,6 +19,7 @@ class WaitForBlockTemperatureParams(BaseModel):
     """Input parameters to wait for Thermocycler's target block temperature."""
 
     moduleId: str = Field(..., description="Unique ID of the Thermocycler Module.")
+    celsius: Optional[float] = Field(None, description="Target temperature in °C.")
 
 
 class WaitForBlockTemperatureResult(BaseModel):
@@ -51,8 +52,13 @@ class WaitForBlockTemperatureImpl(
             params.moduleId
         )
 
-        # Raises error if no target temperature
-        target_temperature = thermocycler_state.get_target_block_temperature()
+        if params.celsius is None:
+            # Raises error if no target temperature
+            target_temperature = thermocycler_state.get_target_block_temperature()
+        else:
+            target_temperature = thermocycler_state.validate_target_block_temperature(
+                params.celsius
+            )
 
         thermocycler_hardware = self._equipment.get_module_hardware_api(
             thermocycler_state.module_id
