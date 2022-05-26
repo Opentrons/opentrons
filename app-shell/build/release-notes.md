@@ -1,4 +1,4 @@
-**For** more details about this release, please see the full [technical change
+For more details about this release, please see the full [technical change
 log][]. For a list of currently known issues, please see the [Opentrons issue tracker][].
 
 [technical change log]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
