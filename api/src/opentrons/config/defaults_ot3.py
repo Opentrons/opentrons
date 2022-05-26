@@ -22,7 +22,10 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
     z_offset=ZSenseSettings(
         point=(209, 170, 0),
         pass_settings=CapacitivePassSettings(
-            prep_distance_mm=3, max_overrun_distance_mm=3, speed_mm_per_s=1
+            prep_distance_mm=3,
+            max_overrun_distance_mm=3,
+            speed_mm_per_s=1,
+            sensor_threshold_pf=1.0,
         ),
     ),
     edge_sense=EdgeSenseSettings(
@@ -33,7 +36,10 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
         overrun_tolerance_mm=0.5,
         early_sense_tolerance_mm=0.2,
         pass_settings=CapacitivePassSettings(
-            prep_distance_mm=1, max_overrun_distance_mm=1, speed_mm_per_s=1
+            prep_distance_mm=1,
+            max_overrun_distance_mm=1,
+            speed_mm_per_s=1,
+            sensor_threshold_pf=1.0,
         ),
         search_initial_tolerance_mm=5.0,
         search_iteration_limit=10,
@@ -306,6 +312,9 @@ def _build_default_cap_pass(
             "max_overrun_distance_mm", default.max_overrun_distance_mm
         ),
         speed_mm_per_s=from_conf.get("speed_mm_per_s", default.speed_mm_per_s),
+        sensor_threshold_pf=from_conf.get(
+            "sensor_threshold_pf", default.sensor_threshold_pf
+        ),
     )
 
 
