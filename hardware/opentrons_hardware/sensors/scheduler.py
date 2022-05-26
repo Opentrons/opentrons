@@ -40,6 +40,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorTypeField,
     SensorOutputBindingField,
+    SensorThresholdModeField,
 )
 
 from opentrons_hardware.sensors.utils import (
@@ -54,7 +55,6 @@ from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
     UInt16Field,
     UInt32Field,
-    Int32Field,
 )
 
 log = logging.getLogger(__name__)
@@ -181,9 +181,8 @@ class SensorScheduler:
                 message=SetSensorThresholdRequest(
                     payload=SetSensorThresholdRequestPayload(
                         sensor=SensorTypeField(sensor.sensor_type),
-                        threshold=Int32Field(
-                            0 if sensor.data == "auto" else sensor.data.to_int
-                        ),
+                        threshold=sensor.data.backing,
+                        mode=SensorThresholdModeField(sensor.mode.value),
                     )
                 ),
             )
@@ -284,7 +283,6 @@ class SensorScheduler:
                 payload=BindSensorOutputRequestPayload(
                     sensor=SensorTypeField(target_sensor.sensor_type),
                     binding=SensorOutputBindingField.from_flags(flags),
-                    mode=UInt8Field(0)
                 )
             ),
         )

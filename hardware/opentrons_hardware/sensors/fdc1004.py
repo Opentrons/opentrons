@@ -6,7 +6,10 @@ from contextlib import asynccontextmanager
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
 )
-from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
+from opentrons_hardware.firmware_bindings.constants import (
+    SensorOutputBinding,
+    SensorThresholdMode,
+)
 from opentrons_hardware.firmware_bindings.constants import SensorType, NodeId
 from opentrons_hardware.sensors.utils import (
     ReadSensorInformation,
@@ -91,7 +94,9 @@ class CapacitiveSensor(AbstractAdvancedSensor):
         timeout: int = 1,
     ) -> Optional[SensorDataType]:
         """Send the zero threshold which the offset value is compared to."""
-        write = SensorThresholdInformation(self._sensor_type, node_id, threshold)
+        write = SensorThresholdInformation(
+            self._sensor_type, node_id, threshold, SensorThresholdMode.absolute
+        )
         threshold_data = await self._scheduler.send_threshold(
             write, can_messenger, timeout
         )
