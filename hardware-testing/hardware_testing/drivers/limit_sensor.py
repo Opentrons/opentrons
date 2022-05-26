@@ -1,3 +1,4 @@
+"""Limit sensor module."""
 import logging
 from abc import ABC, abstractmethod
 from typing import Optional
@@ -9,6 +10,8 @@ log = logging.getLogger(__name__)
 
 
 class LimitSensorBase(ABC):
+    """Base class if limit sensor driver."""
+
     @abstractmethod
     def read(self) -> bytes:
         """Read data from sensor."""
@@ -24,6 +27,8 @@ class LimitSensorBase(ABC):
 
 
 class LimitSensor(LimitSensorBase):
+    """Limit sensor driver."""
+
     def __init__(self, connection: serial.Serial) -> None:
         """Constructor."""
         self._connection = connection
@@ -39,9 +44,9 @@ class LimitSensor(LimitSensorBase):
 
     @classmethod
     def create(
-        cls, port: Optional[str], baud_rate=115200, timeout: float = 0.1
+        cls, port: Optional[str], baud_rate: int = 115200, timeout: float = 0.1
     ) -> "LimitSensor":
-        """Connect and create a limit sensor
+        """Connect and create a limit sensor.
 
         :param port: Port. If None, the port will be searched for.
         :param baud_rate: Baud rate.

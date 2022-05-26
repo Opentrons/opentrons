@@ -18,7 +18,9 @@ def scale_connection() -> MagicMock:
 @pytest.fixture
 def subject(scale_connection: MagicMock) -> RadwagScale:
     """Test subject."""
-    r = RadwagScale(connection=scale_connection, time_delay=0, limit_sensor=SimLimitSensor())
+    r = RadwagScale(
+        connection=scale_connection, time_delay=0, limit_sensor=SimLimitSensor()
+    )
     return r
 
 

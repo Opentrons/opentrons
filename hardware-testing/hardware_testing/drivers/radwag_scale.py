@@ -19,10 +19,7 @@ from serial.serialutil import SerialException  # type: ignore[import]
 import random
 from abc import ABC
 
-from serial.tools.list_ports import comports  # type: ignore[import]
-
-from hardware_testing.drivers.limit_sensor import LimitSensorBase, \
-    SimLimitSensor
+from hardware_testing.drivers.limit_sensor import LimitSensorBase, SimLimitSensor
 
 log = logging.getLogger(__name__)
 
@@ -44,10 +41,12 @@ class RadwagScaleBase(ABC):
 
     @abc.abstractmethod
     def read_mass(self, samples: int = 2, retry: int = 0) -> float:
+        """Read mass."""
         ...
 
     @abc.abstractmethod
     def stable_read(self, samples: int = 10) -> float:
+        """Stable read."""
         ...
 
     @abc.abstractmethod
@@ -104,18 +103,30 @@ class RadwagScaleBase(ABC):
 class RadwagScale(RadwagScaleBase):
     """Radwag scale driver."""
 
-    def __init__(self, connection: serial.Serial, time_delay: float, limit_sensor: LimitSensorBase) -> None:
+    def __init__(
+        self,
+        connection: serial.Serial,
+        time_delay: float,
+        limit_sensor: LimitSensorBase,
+    ) -> None:
         """Constructor."""
         self._scale = connection
         self._time_delay = time_delay
         self._limit_sensor = limit_sensor
 
     @classmethod
-    def create(cls, port: str, baudrate: int = 9600, timeout: float = .1, time_delay: float=.3, limit_sensor: Optional[LimitSensorBase] = None) -> "RadwagScale":
+    def create(
+        cls,
+        port: str,
+        baudrate: int = 9600,
+        timeout: float = 0.1,
+        time_delay: float = 0.3,
+        limit_sensor: Optional[LimitSensorBase] = None,
+    ) -> "RadwagScale":
         """Connect to the port."""
         try:
             limit_sensor = limit_sensor or SimLimitSensor()
-            conn= serial.Serial(
+            conn = serial.Serial(
                 port=port,
                 baudrate=baudrate,
                 parity=serial.PARITY_NONE,
@@ -123,11 +134,15 @@ class RadwagScale(RadwagScaleBase):
                 bytesize=serial.EIGHTBITS,
                 timeout=timeout,
             )
-            return RadwagScale(connection=conn, time_delay=time_delay, limit_sensor=limit_sensor)
+            return RadwagScale(
+                connection=conn, time_delay=time_delay, limit_sensor=limit_sensor
+            )
         except SerialException:
-            error_msg = "\nUnable to access Serial port to Scale: \n" \
-                "1. Check that the scale is plugged into the computer. \n" \
+            error_msg = (
+                "\nUnable to access Serial port to Scale: \n"
+                "1. Check that the scale is plugged into the computer. \n"
                 "2. Check if the assigned port is correct. \n"
+            )
             raise SerialException(error_msg)
 
     def read_mass(self, samples: int = 2, retry: int = 0) -> float:
@@ -215,7 +230,8 @@ class RadwagScale(RadwagScaleBase):
             while condition:
                 time.sleep(self._time_delay)
                 raw_val = ""
-                # TODO (amit, 2022-05-26): why is this a loop that creates a string of many responses?
+                # TODO (amit, 2022-05-26): why is this a loop that creates a
+                #  string of many responses?
                 for r in self._scale.readlines():
                     raw_val = raw_val + r.decode("utf-8").strip()
                 log.debug(f"read: {raw_val}")
@@ -229,9 +245,7 @@ class RadwagScale(RadwagScaleBase):
                     .replace(" ", "")
                     .replace("g", "")
                 )
-                log.debug(
-                    f"time_count: {times_count}, Raw scale reading: {raw_val}"
-                )
+                log.debug(f"time_count: {times_count}, Raw scale reading: {raw_val}")
                 times_count = times_count + 1
                 # TODO (amit, 2022-05-26): Why 6?
                 if len(raw_val.replace("-", "").replace("E", "")) > 6:
@@ -262,10 +276,6 @@ class RadwagScale(RadwagScaleBase):
         # Average the readings
         clean_average = sum(masses) / len(masses)
         return clean_average
-
-    def beep_scale(self) -> None:
-        """Cause scale to beep."""
-        self._scale.write("BP 500\r\n".encode("utf-8"))
 
     def open_lid(self) -> None:
         """Open the evaporation trap lid."""
@@ -429,7 +439,7 @@ class SimRadwagScale(RadwagScaleBase):
         """Simulate taking 10 samples due to stability of the scale."""
         return random.uniform(2.5, 2.7)
 
-    def read_continuous(self) -> float:  # noqa: C901
+    def read_continuous(self) -> float:
         """Read until 10 samples are received."""
         time.sleep(0.5)
         return random.uniform(2.5, 2.7)
