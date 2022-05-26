@@ -6,6 +6,7 @@ Specify the port to establish Connection
 
 Author: Carlos Fernandez
 """
+import abc
 import logging
 from typing import Optional, List
 
@@ -15,6 +16,7 @@ import re
 from statistics import mode
 from serial.serialutil import SerialException  # type: ignore[import]
 import random
+from abc import ABC
 
 from serial.tools.list_ports import comports  # type: ignore[import]
 
@@ -33,7 +35,69 @@ class RadwagScaleError(Exception):
         return "Bad Scale Readings: " + repr(self.value)
 
 
-class RadwagScale:
+class RadwagScaleBase(ABC):
+    """Abstract Radwag scale driver."""
+
+    @abc.abstractmethod
+    def read_mass(self, samples: int = 2, retry: int = 0) -> float:
+        ...
+
+    @abc.abstractmethod
+    def stable_read(self, samples: int = 10) -> float:
+        ...
+
+    @abc.abstractmethod
+    def read_continuous(self) -> float:
+        """Read until samples are received."""
+        ...
+
+    @abc.abstractmethod
+    def open_lid(self) -> None:
+        """Open the evaporation trap lid."""
+        ...
+
+    @abc.abstractmethod
+    def close_lid(self) -> None:
+        """Close the evaporation trap lid."""
+        ...
+
+    @abc.abstractmethod
+    def open_chamber(self) -> None:
+        """Open the glass enclosure door on the right side."""
+        ...
+
+    @abc.abstractmethod
+    def close_chamber(self) -> None:
+        """Close the glass enclosure door on the right side."""
+        ...
+
+    @abc.abstractmethod
+    def profile_mode(self, mode_string: str) -> None:
+        """Set the profile mode.
+
+        There are four different profiles the user can choose from
+        Fast, Fast dosing, Precision, and User. The input string needs to have
+        the first letter of the word capitalized.
+        """
+        ...
+
+    @abc.abstractmethod
+    def get_serial_number(self) -> str:
+        """Get the device serial number."""
+        ...
+
+    @abc.abstractmethod
+    def tare_scale(self) -> None:
+        """Tare the scale."""
+        ...
+
+    @abc.abstractmethod
+    def disable_internal_adjustment(self) -> None:
+        """Disable internal adjustments."""
+        ...
+
+
+class RadwagScale(RadwagScaleBase):
     """Radwag scale driver."""
 
     def __init__(self, port: str = "/dev/ttyUSB0", baudrate: int = 9600) -> None:
@@ -142,7 +206,7 @@ class RadwagScale:
             return random.uniform(2.5, 2.7)
 
     def stable_read(self, samples: int = 10) -> float:
-        """Take 10 samples due to stability of the scale."""
+        """Take samples due to stability of the scale."""
         if not self.simulate:
             assert self._scale, "No connection"
 
@@ -170,8 +234,10 @@ class RadwagScale:
                     val = val.replace("-", "")
                 val = float(val) * sign
                 masses.append(val)
-            # disregard readings and take 7-9 readings
-            masses = masses[7:]
+            # disregard all but the final X readings
+            NUM_SAMPLES_TO_DROP = 3
+            if samples > NUM_SAMPLES_TO_DROP:
+                masses = masses[samples-NUM_SAMPLES_TO_DROP:]
             masses = self.strip_outliners(masses)
             # Average the readings
             clean_average = sum(masses) / len(masses)
@@ -296,7 +362,7 @@ class RadwagScale:
                 time.sleep(self._time_delay)
                 for r in self._scale.readlines():
                     response = response + r.decode("utf-8").strip()
-                log.debug("fresponse from while loop 2: {response}")
+                log.debug(f"response from while loop 2: {response}")
                 limit_state = self.checkLidStatus()
                 log.debug(f"limit state: {limit_state}")
                 if "OK" in response and "CCOK" in limit_state:
@@ -336,7 +402,7 @@ class RadwagScale:
             elif response == "OD A\r\n":
                 log.debug("Command understood and in progress")
             else:
-                raise Exception("Incorrect option {}".format(response))
+                raise Exception(f"Incorrect option {response}")
 
     def close_chamber(self) -> None:
         """Close the glass enclosure door on the right side."""
@@ -454,15 +520,56 @@ class RadwagScale:
             log.debug("DISABLED INTERNAL ADJUSTMENT")
 
 
-if __name__ == "__main__":
-    com_port = "COM6"
-    scale = RadwagScale(port=com_port)
-    scale.simulate = False
-    scale._location = "CH"
-    scale.connect()
+class SimRadwagScale(RadwagScaleBase):
+    """Simulating Radwag scale driver."""
 
-    while True:
-        scale.close_lid()
-        reading = scale.read_continuous()
-        scale.open_lid()
-        time.sleep(1)
+    def read_mass(self, samples: int = 2, retry: int = 0) -> float:
+        """Obtain a single reading of scale."""
+        return random.uniform(2.5, 2.7)
+
+    def stable_read(self, samples: int = 10) -> float:
+        """Simulate taking 10 samples due to stability of the scale."""
+        return random.uniform(2.5, 2.7)
+
+    def read_continuous(self) -> float:  # noqa: C901
+        """Read until 10 samples are received."""
+        time.sleep(0.5)
+        return random.uniform(2.5, 2.7)
+
+    def open_lid(self) -> None:
+        """Open the evaporation trap lid."""
+        log.debug("LID OPENED")
+
+    def close_lid(self) -> None:
+        """Close the evaporation trap lid."""
+        log.debug("LID CLOSED")
+
+    def open_chamber(self) -> None:
+        """Open the glass enclosure door on the right side."""
+        log.debug("CHAMBER OPENED")
+
+    def close_chamber(self) -> None:
+        """Close the glass enclosure door on the right side."""
+        log.debug("CHAMBER CLOSED")
+
+    def profile_mode(self, mode_string: str) -> None:
+        """Set the profile mode.
+
+        There are four different profiles the user can choose from
+        Fast, Fast dosing, Precision, and User. The input string needs to have
+        the first letter of the word captial.
+        """
+        response = "PROFILE OK\r\n"
+        log.debug(f"Profile set: {mode_string}, {response}")
+
+    def get_serial_number(self) -> str:
+        """Get the device serial number."""
+        return  "NB-01-00101"
+
+    def tare_scale(self) -> None:
+        """Tare the scale."""
+        log.debug("SCALE HAS BEEN TARE")
+
+    def disable_internal_adjustment(self) -> None:
+        """Disable internal adjustments."""
+        log.debug("DISABLED INTERNAL ADJUSTMENT")

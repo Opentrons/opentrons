@@ -22,7 +22,7 @@ def subject(scale_connection: MagicMock) -> RadwagScale:
     return r
 
 
-def create_radwag_result_line(command: str, val: float) -> bytes:
+def create_radwag_result_line(command: str, val: float, stability_char: str = " ") -> bytes:
     """Create a radwag protocol line."""
     sign = " "
     # TODO (amit, 2022-05-20): Add sign to tests.
@@ -37,7 +37,7 @@ def create_radwag_result_line(command: str, val: float) -> bytes:
     # 5 = sign
     # 6-14 = data
     # 16-18 = unit
-    return f"{command:3s}? {sign}{str(abs(val)).rjust(9)} {'g':3s}".encode()
+    return f"{command:3s}{stability_char[0]} {sign}{str(abs(val)).rjust(9)} {'g':3s}".encode()
 
 
 @pytest.mark.parametrize(
@@ -62,5 +62,27 @@ def test_read_mass(
 
     mass = subject.read_mass(samples=len(masses))
 
+    assert mass == expected
+    assert scale_connection.readline.call_count == len(masses)
+
+
+@pytest.mark.parametrize(
+    argnames="masses,expected",
+    argvalues=[
+        # drop all but last three
+        [[0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 5.5, 5.5, 5.5], 5.5],
+        # All the same
+        [[5.5, 5.5, 5.5, 5.5], 5.5],
+        # Remove outlier
+        [[1.0, 12.0, 1.0], 1.0],
+    ],
+)
+def test_stable_read(subject:RadwagScale, scale_connection: MagicMock, masses: List[float],
+    expected: float)-> None:
+    """It should read samples."""
+    scale_connection.readline.side_effect = [
+        create_radwag_result_line("SU", v) for v in masses
+    ]
+    mass = subject.stable_read(len(masses))
     assert mass == expected
     assert scale_connection.readline.call_count == len(masses)

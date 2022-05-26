@@ -4,7 +4,7 @@ This libray is for the temperature and humidity sensor used with the
 pipette gravimetric fixture. The sensor outputs temperature and
 relative humidity that is recorded onto the pipette results.
 """
-
+import abc
 import codecs
 import logging
 import random
@@ -51,6 +51,7 @@ class Reading:
 class AsairSensorBase(ABC):
     """Abstract base class of sensor."""
 
+    @abc.abstractmethod
     def get_reading(self) -> Reading:
         """Get a temp and humidity reading."""
         ...
