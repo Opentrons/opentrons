@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 
 import { getLabwareRenderInfo } from '../../ProtocolRun/utils/getLabwareRenderInfo'

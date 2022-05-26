@@ -10,6 +10,7 @@ from typing_extensions import Literal, TypedDict
 from ..module.dev_types import ModuleType
 
 
+DeckSchemaVersion3 = Literal[3]
 DeckSchemaVersion2 = Literal[2]
 DeckSchemaVersion1 = Literal[1]
 
@@ -34,18 +35,7 @@ class BoundingBox(TypedDict):
     zDimension: float
 
 
-class SlotDefV1(TypedDict, total=False):
-    id: str
-    position: List[float]
-    boundingBox: BoundingBox
-    compatibleModules: List[
-        Union[Literal["magdeck"], Literal["tempdeck"], Literal["thermocycler"]]
-    ]
-    matingSurfaceUnitVector: List[Union[Literal[1], Literal[-1]]]
-    displayName: str
-
-
-class SlotDefV2(TypedDict, total=False):
+class SlotDefV3(TypedDict, total=False):
     id: str
     position: List[float]
     boundingBox: BoundingBox
@@ -58,6 +48,10 @@ class CalibrationPoint(TypedDict):
     id: str
     position: List[float]
     displayName: str
+
+
+class Feature(TypedDict):
+    footprint: str
 
 
 class FixedLabwareBySlot(TypedDict):
@@ -93,47 +87,21 @@ Fixture = Union[
 ]
 
 
-class LocationsV1(TypedDict):
-    orderedSlots: List[SlotDefV1]
+class LocationsV3(TypedDict):
+    orderedSlots: List[SlotDefV3]
     calibrationPoints: List[CalibrationPoint]
     fixtures: List[Fixture]
 
 
-class LocationsV2(TypedDict):
-    orderedSlots: List[SlotDefV2]
-    calibrationPoints: List[CalibrationPoint]
-    fixtures: List[Fixture]
-
-
-class FeatureV1(TypedDict):
-    footprint: str
-
-
-class FeatureV2(TypedDict, total=False):
-    footprint: str
-    correspondingLocation: str
-
-
-class DeckDefinitionV1(TypedDict, total=False):
+class DeckDefinitionV3(TypedDict):
     otId: str
-    schemaVersion: Literal[1]
+    schemaVersion: Literal[3]
     cornerOffsetFromOrigin: List[float]
     dimensions: List[float]
     metadata: Metadata
     robot: Robot
-    locations: LocationsV1
-    layers: Dict[str, List[FeatureV1]]
+    locations: LocationsV3
+    layers: Dict[str, List[Feature]]
 
 
-class DeckDefinitionV2(TypedDict):
-    otId: str
-    schemaVersion: Literal[2]
-    cornerOffsetFromOrigin: List[float]
-    dimensions: List[float]
-    metadata: Metadata
-    robot: Robot
-    locations: LocationsV2
-    layers: Dict[str, List[FeatureV1]]
-
-
-DeckDefinition = Union[DeckDefinitionV1, DeckDefinitionV2]
+DeckDefinition = DeckDefinitionV3

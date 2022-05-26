@@ -3,13 +3,14 @@ systemd bindings with fallbacks for test
 """
 
 import logging.config
+from typing import Dict, Union
 
 try:
     # systemd journal is available, we can use its handler
     import systemd.journal
     import systemd.daemon
 
-    def log_handler(topic_name: str, log_level: int):
+    def log_handler(topic_name: str, log_level: int) -> Dict[str, Union[int, str]]:
         return {
             "class": "systemd.journal.JournalHandler",
             "formatter": "message_only",
@@ -23,7 +24,7 @@ try:
     # dependent services until we actually say we're ready. By calling this
     # after we change the hostname, we make anything with an After= on us
     # be guaranteed to see the correct hostname
-    def notify_up():
+    def notify_up() -> None:
         systemd.daemon.notify("READY=1")
 
     SOURCE: str = "systemd"
@@ -31,20 +32,20 @@ try:
 except ImportError:
     # systemd journal isn't available, probably running tests
 
-    def log_handler(topic_name: str, log_level: int):
+    def log_handler(topic_name: str, log_level: int) -> Dict[str, Union[int, str]]:
         return {
             "class": "logging.StreamHandler",
             "formatter": "basic",
             "level": log_level,
         }
 
-    def notify_up():
+    def notify_up() -> None:
         pass
 
     SOURCE = "dummy"
 
 
-def configure_logging(level: int):
+def configure_logging(level: int) -> None:
     config = {
         "version": 1,
         "formatters": {

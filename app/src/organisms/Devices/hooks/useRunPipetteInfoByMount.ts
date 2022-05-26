@@ -39,7 +39,7 @@ export function useRunPipetteInfoByMount(
   [mount in Mount]: PipetteInfo | null
 } {
   const { protocolData } = useProtocolDetailsForRun(runId)
-  const attachedPipettes = useAttachedPipettes(robotName)
+  const attachedPipettes = useAttachedPipettes()
   const attachedPipetteCalibrations =
     useAttachedPipetteCalibrations(robotName) ?? EMPTY_MOUNTS
   const tipLengthCalibrations = useTipLengthCalibrations(robotName) ?? []

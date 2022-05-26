@@ -4,7 +4,7 @@ from typing import Callable, Optional
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.protocol_engine.state import State, StateStore
 from opentrons.protocol_engine.actions import PlayAction
 from opentrons.protocol_engine.state.change_notifier import ChangeNotifier
@@ -18,7 +18,7 @@ def change_notifier(decoy: Decoy) -> ChangeNotifier:
 
 @pytest.fixture
 def subject(
-    change_notifier: ChangeNotifier, standard_deck_def: DeckDefinitionV2
+    change_notifier: ChangeNotifier, standard_deck_def: DeckDefinitionV3
 ) -> StateStore:
     """Get a StateStore test subject."""
     return StateStore(

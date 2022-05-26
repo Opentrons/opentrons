@@ -52,7 +52,7 @@ TipLengthCalibrationItemsProps): JSX.Element {
   const customLabwareDefs = useSelector((state: State) => {
     return getCustomLabwareDefinitions(state)
   })
-  const attachedPipettes = useAttachedPipettes(robotName)
+  const attachedPipettes = useAttachedPipettes()
   const tipLengthCalibrations = formattedTipLengthCalibrations.map(
     tipLength => {
       return {

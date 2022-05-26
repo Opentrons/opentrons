@@ -42,7 +42,7 @@ import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 interface PipetteCardProps {
   pipetteInfo: PipetteModelSpecs | null
-  pipetteId?: AttachedPipette['id']
+  pipetteId?: AttachedPipette['id'] | null
   mount: Mount
   robotName: string
 }
@@ -195,10 +195,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                 </Banner>
               </Flex>
             ) : null}
-            {isDeckCalibrated &&
-            pipetteOffsetCalibration == null &&
-            badCalibration &&
-            showBanner ? (
+            {isDeckCalibrated && badCalibration && showBanner ? (
               <Flex paddingBottom={SPACING.spacing2}>
                 <Banner
                   type="warning"

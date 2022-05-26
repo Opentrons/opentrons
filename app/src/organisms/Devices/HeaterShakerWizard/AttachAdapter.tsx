@@ -11,7 +11,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import screwInAdapter from '@opentrons/app/src/assets/images/heater_shaker_screwdriver_adapter.png'
+import screwInAdapter from '@opentrons/app/src/assets/images/heater_shaker_adapter_screwdriver.png'
 import heaterShakerAdapterAlignment from '@opentrons/app/src/assets/images/heater_shaker_adapter_alignment.png'
 
 export function AttachAdapter(): JSX.Element {
@@ -40,7 +40,7 @@ export function AttachAdapter(): JSX.Element {
             padding={`${SPACING.spacing2} 5rem ${SPACING.spacing4} 3rem`}
             data-testid={`attach_adapter_screw_in_adapter_image`}
           >
-            <img src={screwInAdapter} alt="screw_in_adapter" />
+            <img height="160px" src={screwInAdapter} alt="screw_in_adapter" />
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN}>
             <Flex

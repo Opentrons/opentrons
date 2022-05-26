@@ -16,38 +16,38 @@ LOG = logging.getLogger(__name__)
 
 
 class FileMissing(ValueError):
-    def __init__(self, message):
+    def __init__(self, message: str) -> None:
         self.message = message
         self.short = "File Missing"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: {self.message}>"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.message
 
 
 class SignatureMismatch(ValueError):
-    def __init__(self, message):
+    def __init__(self, message: str) -> None:
         self.message = message
         self.short = "Signature Mismatch"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: {self.message}>"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.message
 
 
 class HashMismatch(ValueError):
-    def __init__(self, message):
+    def __init__(self, message: str) -> None:
         self.message = message
         self.short = "Hash Mismatch"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: {self.message}>"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.message
 
 
@@ -144,7 +144,7 @@ def hash_file(
     path: str,
     progress_callback: Callable[[float], None],
     chunk_size: int = 1024,
-    file_size: int = None,
+    file_size: Optional[int] = None,
     algo: str = "sha256",
 ) -> bytes:
     """

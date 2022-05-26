@@ -251,6 +251,13 @@ CONFIG_ELEMENTS = (
         "The dir where custom tiprack definitions for tip length "
         "calibration are stored",
     ),
+    ConfigElement(
+        "gripper_calibration_dir",
+        "Gripper Calibration Directory",
+        Path("robot") / "gripper",
+        ConfigElementType.DIR,
+        "The dir where gripper calibration is stored",
+    ),
 )
 #: The available configuration file elements to modify. All of these can be
 #: changed by editing opentrons.json, where the keys are the name elements,
