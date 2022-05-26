@@ -639,11 +639,16 @@ class OT3Controller:
         return {k: v for k, v in by_node.items() if k in self._present_nodes}
 
     async def capacitive_probe(
-        self, mount: OT3Mount, distance_mm: float, speed_mm_per_s: float
+        self,
+        mount: OT3Mount,
+        moving: OT3Axis,
+        distance_mm: float,
+        speed_mm_per_s: float,
     ) -> None:
         pos = await capacitive_probe(
             self._messenger,
             sensor_node_for_mount(mount),
+            axis_to_node(moving),
             distance_mm,
             speed_mm_per_s,
             log_sensor_values=True,

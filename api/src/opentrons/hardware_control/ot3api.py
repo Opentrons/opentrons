@@ -1229,33 +1229,54 @@ class OT3API(
         await self._instrument_handler.remove_tip(OT3Mount.from_mount(mount))
 
     async def capacitive_probe(
-        self, mount: OT3Mount, target_pos: float, pass_settings: CapacitivePassSettings
+        self,
+        mount: OT3Mount,
+        moving_axis: OT3Axis,
+        target_pos: float,
+        pass_settings: CapacitivePassSettings,
     ) -> float:
-        """Determine the position of the deck using the capacitive sensor.
+        """Determine the position of something using the capacitive sensor.
 
-        This function orchestrates detecting the position of whatever is under the
-        specified mount using the capacitive sensor on a pipette. It will move
-        the mount's critical point to a small distance below either
-        - by default, the current estimated position of the deck (e.g. 0)
-        - a specified absolute position in deck coordinates
-        while running the tool's capacitive sensor. When the sensor senses contact,
-        the mount stops. This function moves back up and returns the sensed position.
+        This function orchestrates detecting the position of a collision between the
+        capacitive probe on the tool on the specified mount, and some fixed element
+        of the robot.
+
+        When calling this function, the mount's probe critical point should already
+        be aligned in the probe axis with the item to be probed.
+
+        It will move the mount's probe critical point to a small distance behind
+        the expected position of the element (which is target_pos, in deck coordinates,
+        in the axis to be probed) while running the tool's capacitive sensor. When the
+        sensor senses contact, the mount stops.
+
+        This function moves away and returns the sensed position.
 
         This sensed position can be used in several ways, including
-        - To alter the z portion of the current mount's offset or of whatever was
-        targeted, if something was guaranteed to be physically present under the mount.
-        - To detect whether the mount was over solid material. If this function
-        returns a value far enough below the anticipated position, then it indicates
+        - To get an absolute position in deck coordinates of whatever was
+        targeted, if something was guaranteed to be physically present.
+        - To detect whether a collision occured at all. If this function
+        returns a value far enough past the anticipated position, then it indicates
         there was no material there.
         """
+        if moving_axis not in [
+            OT3Axis.X,
+            OT3Axis.Y,
+        ] and moving_axis != OT3Axis.by_mount(mount):
+            raise RuntimeError(
+                "Probing must be done with a gantry axis or the mount of the sensing"
+                " tool"
+            )
         here = await self.gantry_position(mount)
         self._log.info(f"probe start: at {here}")
-        target = here._replace(z=target_pos + pass_settings.prep_distance_mm)
+        target = moving_axis.offset_point(
+            here, target_pos + pass_settings.prep_distance_mm
+        )
         self._log.info(f"moving to {target}")
         await self.move_to(mount, target)
         self._log.info("doing probe")
         await self._backend.capacitive_probe(
             mount,
+            moving_axis,
             pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm,
             pass_settings.speed_mm_per_s,
         )
@@ -1269,4 +1290,4 @@ class OT3API(
         bottom_pos = await self.gantry_position(mount)
         self._log.info(f"position now {bottom_pos}, moving back to {target}")
         await self.move_to(mount, target)
-        return bottom_pos.z
+        return moving_axis.of_point(bottom_pos)
