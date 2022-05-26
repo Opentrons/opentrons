@@ -422,6 +422,7 @@ export interface ProtocolResource {
   metadata: ProtocolMetadata
   analysisSummaries: ProtocolAnalysisSummary[]
   files: ResourceFile[]
+  key?: string
 }
 
 export interface ProtocolAnalysesResource {

@@ -42,8 +42,7 @@ import { ConnectRobotSlideout } from './ConnectRobotSlideout'
 import type { Dispatch, State } from '../../redux/types'
 
 const SOFTWARE_SYNC_URL =
-  'https://support.opentrons.com/en/articles/1795303-get-started-update-your-ot-2#:~:text=It%E2%80%99s%20important%20to%20understand,that%20runs%20your%20protocols).'
-
+  'https://support.opentrons.com/s/article/Get-started-Update-your-OT-2'
 const GITHUB_LINK =
   'https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md'
 

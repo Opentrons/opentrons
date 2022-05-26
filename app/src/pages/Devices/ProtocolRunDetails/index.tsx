@@ -26,6 +26,7 @@ import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
   useRobot,
 } from '../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
@@ -73,18 +74,20 @@ const RoundNavLink = styled(NavLink)`
 
 interface RoundTabProps {
   id: string
+  disabled: boolean
   tabDisabledReason?: string
   to: string
   tabName: string
 }
 
 function RoundTab({
+  disabled,
   tabDisabledReason,
   to,
   tabName,
 }: RoundTabProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
-  return tabDisabledReason != null ? (
+  return disabled ? (
     <>
       <StyledText
         color={COLORS.successDisabled}
@@ -93,7 +96,9 @@ function RoundTab({
       >
         {tabName}
       </StyledText>
-      <Tooltip tooltipProps={tooltipProps}>{tabDisabledReason}</Tooltip>
+      {tabDisabledReason != null ? (
+        <Tooltip tooltipProps={tooltipProps}>{tabDisabledReason}</Tooltip>
+      ) : null}
     </>
   ) : (
     <RoundNavLink to={to} replace>
@@ -103,7 +108,6 @@ function RoundTab({
 }
 
 export function ProtocolRunDetails(): JSX.Element | null {
-  const { t } = useTranslation('run_details')
   const {
     robotName,
     runId,
@@ -172,11 +176,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
           <Flex>
             <SetupTab robotName={robotName} runId={runId} />
             <ModuleControlsTab robotName={robotName} runId={runId} />
-            <RoundTab
-              id="ProtocolRunDetails_runLogTab"
-              to={`/devices/${robotName}/protocol-runs/${runId}/run-log`}
-              tabName={t('run_log')}
-            />
+            <RunLogTab robotName={robotName} runId={runId} />
           </Flex>
           <Box
             backgroundColor={COLORS.white}
@@ -212,15 +212,17 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
 
+  const disabled = currentRunId !== runId
+  const tabDisabledReason = `${t('setup')} ${t(
+    'not_available_for_a_completed_run'
+  )}`
+
   return (
     <>
       <RoundTab
         id="ProtocolRunDetails_setupTab"
-        tabDisabledReason={
-          currentRunId !== runId
-            ? `${t('setup')} ${t('not_available_for_a_completed_run')}`
-            : undefined
-        }
+        disabled={disabled}
+        tabDisabledReason={tabDisabledReason}
         to={`/devices/${robotName}/protocol-runs/${runId}/setup`}
         tabName={t('setup')}
       />
@@ -248,17 +250,17 @@ const ModuleControlsTab = (
     runId
   )
 
+  const disabled = currentRunId !== runId
+  const tabDisabledReason = `${t('module_controls')} ${t(
+    'not_available_for_a_completed_run'
+  )}`
+
   return isEmpty(moduleRenderInfoForProtocolById) ? null : (
     <>
       <RoundTab
         id="ProtocolRunDetails_moduleControlsTab"
-        tabDisabledReason={
-          currentRunId !== runId
-            ? `${t('module_controls')} ${t(
-                'not_available_for_a_completed_run'
-              )}`
-            : undefined
-        }
+        disabled={disabled}
+        tabDisabledReason={tabDisabledReason}
         to={`/devices/${robotName}/protocol-runs/${runId}/module-controls`}
         tabName={t('module_controls')}
       />
@@ -267,5 +269,22 @@ const ModuleControlsTab = (
         <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/run-log`} />
       ) : null}
     </>
+  )
+}
+
+const RunLogTab = (props: SetupTabProps): JSX.Element | null => {
+  const { robotName, runId } = props
+  const { t } = useTranslation('run_details')
+  const { protocolData } = useProtocolDetailsForRun(runId)
+
+  const disabled = protocolData == null
+
+  return (
+    <RoundTab
+      id="ProtocolRunDetails_runLogTab"
+      disabled={disabled}
+      to={`/devices/${robotName}/protocol-runs/${runId}/run-log`}
+      tabName={t('run_log')}
+    />
   )
 }

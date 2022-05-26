@@ -1,6 +1,8 @@
 """Custom payload fields."""
 from __future__ import annotations
 
+from typing import Iterable, List, Iterator
+
 import binascii
 import enum
 
@@ -107,8 +109,8 @@ class PipetteNameField(utils.UInt16Field):
         return f"{self.__class__.__name__}(value={pipette_val})"
 
 
-class PipetteSerialField(utils.BinaryFieldBase[bytes]):
-    """The serial number of a pipette.
+class SerialField(utils.BinaryFieldBase[bytes]):
+    """The serial number of a pipette or gripper.
 
     This is sized to handle only the datecode part of the serial
     number; the full field can be synthesized from this, the
@@ -118,21 +120,36 @@ class PipetteSerialField(utils.BinaryFieldBase[bytes]):
     NUM_BYTES = 12
     FORMAT = f"{NUM_BYTES}s"
 
-
-class GripperSerialField(utils.BinaryFieldBase[bytes]):
-    """The serial number of a gripper.
-
-    This is sized to handle only the datecode part of the serial
-    number; the full field can be synthesized from this, the
-    model number, and the name.
-    """
-
-    NUM_BYTES = 12
-    FORMAT = f"{NUM_BYTES}s"
+    @classmethod
+    def from_string(cls, t: str) -> SerialField:
+        """Create from a string."""
+        return cls(binascii.unhexlify(t)[: cls.NUM_BYTES])
 
 
 class SensorOutputBindingField(utils.UInt8Field):
     """sensor type."""
+
+    @classmethod
+    def from_flags(
+        cls, flags: Iterable[SensorOutputBinding]
+    ) -> "SensorOutputBindingField":
+        """Build a binding with a set of flags."""
+        backing = 0
+        for flag in flags:
+            backing |= flag.value
+        return cls.build(backing)
+
+    def to_flags(self) -> List[SensorOutputBinding]:
+        """Get the list of flags in the binding."""
+
+        def _flags() -> Iterator[SensorOutputBinding]:
+            for flag in SensorOutputBinding:
+                if flag == SensorOutputBinding.none:
+                    continue
+                if bool(flag.value & self.value):
+                    yield flag
+
+        return list(_flags())
 
     def __repr__(self) -> str:
         """Print version flags."""

@@ -1,18 +1,11 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import {
-  Flex,
-  DIRECTION_COLUMN,
-  Text,
-  TYPOGRAPHY,
-  SPACING,
-  useInterval,
-} from '@opentrons/components'
+import { Flex, DIRECTION_COLUMN, useInterval } from '@opentrons/components'
 import { PipetteModelSpecs } from '@opentrons/shared-data'
 import { fetchPipetteSettings } from '../../../redux/pipettes'
-import { ConfigurePipette } from '../../ConfigurePipette'
 import { Slideout } from '../../../atoms/Slideout'
+import { ConfigurePipette } from '../../ConfigurePipette'
 
 import type { Mount } from '../../../redux/pipettes/types'
 import type { Dispatch } from '../../../redux/types'
@@ -52,18 +45,6 @@ export const PipetteSettingsSlideout = (
         flexDirection={DIRECTION_COLUMN}
         data-testid={`PipetteSettingsSlideout_${robotName}_${mount}`}
       >
-        <Trans
-          t={t}
-          i18nKey={'these_are_advanced_settings'}
-          components={{
-            block: (
-              <Text
-                fontSize={TYPOGRAPHY.fontSizeLabel}
-                paddingBottom={SPACING.spacingXS}
-              />
-            ),
-          }}
-        />
         <ConfigurePipette
           robotName={robotName}
           mount={mount}

@@ -3,7 +3,7 @@ import pytest
 from datetime import datetime
 from typing import Dict, Optional, cast
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName, Point
@@ -59,14 +59,14 @@ def get_labware_view(
     labware_by_id: Optional[Dict[str, LoadedLabware]] = None,
     labware_offsets_by_id: Optional[Dict[str, LabwareOffset]] = None,
     definitions_by_uri: Optional[Dict[str, LabwareDefinition]] = None,
-    deck_definition: Optional[DeckDefinitionV2] = None,
+    deck_definition: Optional[DeckDefinitionV3] = None,
 ) -> LabwareView:
     """Get a labware view test subject."""
     state = LabwareState(
         labware_by_id=labware_by_id or {},
         labware_offsets_by_id=labware_offsets_by_id or {},
         definitions_by_uri=definitions_by_uri or {},
-        deck_definition=deck_definition or cast(DeckDefinitionV2, {"fake": True}),
+        deck_definition=deck_definition or cast(DeckDefinitionV3, {"fake": True}),
     )
 
     return LabwareView(state=state)
@@ -368,14 +368,14 @@ def test_get_default_magnet_height() -> None:  # noqa: D103
     _ = subject.get_default_magnet_height("labware-id")
 
 
-def test_get_deck_definition(standard_deck_def: DeckDefinitionV2) -> None:
+def test_get_deck_definition(standard_deck_def: DeckDefinitionV3) -> None:
     """It should get the deck definition from the state."""
     subject = get_labware_view(deck_definition=standard_deck_def)
 
     assert subject.get_deck_definition() == standard_deck_def
 
 
-def test_get_slot_definition(standard_deck_def: DeckDefinitionV2) -> None:
+def test_get_slot_definition(standard_deck_def: DeckDefinitionV3) -> None:
     """It should return a deck slot's definition."""
     subject = get_labware_view(deck_definition=standard_deck_def)
 
@@ -386,7 +386,7 @@ def test_get_slot_definition(standard_deck_def: DeckDefinitionV2) -> None:
 
 
 def test_get_slot_definition_raises_with_bad_slot_name(
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
 ) -> None:
     """It should raise a SlotDoesNotExistError if a bad slot name is given."""
     subject = get_labware_view(deck_definition=standard_deck_def)
@@ -397,7 +397,7 @@ def test_get_slot_definition_raises_with_bad_slot_name(
         subject.get_slot_definition(42)  # type: ignore[arg-type]
 
 
-def test_get_slot_position(standard_deck_def: DeckDefinitionV2) -> None:
+def test_get_slot_position(standard_deck_def: DeckDefinitionV3) -> None:
     """It should get the absolute location of a deck slot's origin."""
     subject = get_labware_view(deck_definition=standard_deck_def)
 
@@ -407,7 +407,7 @@ def test_get_slot_position(standard_deck_def: DeckDefinitionV2) -> None:
     assert result == Point(x=slot_pos[0], y=slot_pos[1], z=slot_pos[2])
 
 
-def test_get_slot_center_position(standard_deck_def: DeckDefinitionV2) -> None:
+def test_get_slot_center_position(standard_deck_def: DeckDefinitionV3) -> None:
     """It should get the absolute location of a deck slot's center."""
     subject = get_labware_view(deck_definition=standard_deck_def)
 

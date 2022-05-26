@@ -15,6 +15,12 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
+import {
+  useDismissCurrentRunMutation,
+  useRunQuery,
+  useModulesQuery,
+  usePipettesQuery,
+} from '@opentrons/react-api-client'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   Box,
@@ -41,7 +47,6 @@ import {
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
-import { useRunQuery } from '@opentrons/react-api-client'
 
 import { Banner } from '../../../atoms/Banner'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
@@ -62,7 +67,6 @@ import {
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 
 import {
-  useAttachedModules,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
@@ -74,6 +78,8 @@ import { ConfirmAttachmentModal } from '../ModuleCard/ConfirmAttachmentModal'
 
 import type { Run } from '@opentrons/api-client'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
+
+const EQUIPMENT_POLL_MS = 5000
 
 interface ProtocolRunHeaderProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
@@ -121,12 +127,26 @@ export function ProtocolRunHeader({
   const trackEvent = useTrackEvent()
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
-  const runRecord = useRunQuery(runId)
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
-  const { displayName } = useProtocolDetailsForRun(runId)
+  const { protocolData, displayName, protocolKey } = useProtocolDetailsForRun(
+    runId
+  )
+  const isProtocolAnalyzing = protocolData == null
   const runStatus = useRunStatus(runId)
 
+  const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
+  const { dismissCurrentRun } = useDismissCurrentRunMutation()
+  const attachedModules =
+    useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
+  // NOTE: we are polling pipettes, though not using their value directly here
+  usePipettesQuery({ refetchInterval: EQUIPMENT_POLL_MS })
+
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
+  React.useEffect(() => {
+    if (runStatus === RUN_STATUS_STOPPED && isRunCurrent) {
+      runId != null && dismissCurrentRun(runId)
+    }
+  }, [runStatus, isRunCurrent, runId, dismissCurrentRun])
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : '--:--:--'
@@ -166,7 +186,6 @@ export function ProtocolRunHeader({
   const [showIsShakingModal, setShowIsShakingModal] = React.useState<boolean>(
     false
   )
-  const attachedModules = useAttachedModules(robotName)
   const heaterShaker = attachedModules.find(
     (module): module is HeaterShakerModule =>
       module.moduleType === HEATERSHAKER_MODULE_TYPE
@@ -197,9 +216,10 @@ export function ProtocolRunHeader({
   }
 
   const isRunControlButtonDisabled =
-    !isSetupComplete ||
+    (isCurrentRun && !isSetupComplete) ||
     isMutationLoading ||
     isRobotBusy ||
+    isProtocolAnalyzing ||
     runStatus === RUN_STATUS_FINISHING ||
     runStatus === RUN_STATUS_PAUSE_REQUESTED ||
     runStatus === RUN_STATUS_STOP_REQUESTED ||
@@ -239,8 +259,13 @@ export function ProtocolRunHeader({
       break
   }
 
+  if (isProtocolAnalyzing) {
+    buttonIconName = 'ot-spinner'
+    buttonText = t('analyzing_on_robot')
+  }
+
   let disableReason = null
-  if (!isSetupComplete) {
+  if (isCurrentRun && !isSetupComplete) {
     disableReason = t('setup_incomplete')
   } else if (isRobotBusy) {
     disableReason = t('robot_is_busy')
@@ -252,6 +277,7 @@ export function ProtocolRunHeader({
         name={buttonIconName}
         size={SIZE_1}
         marginRight={SPACING.spacing3}
+        spin={isProtocolAnalyzing}
       />
     ) : null
 
@@ -261,7 +287,7 @@ export function ProtocolRunHeader({
   ] = React.useState<boolean>(false)
 
   const handleCancelClick = (): void => {
-    pause()
+    if (runStatus === RUN_STATUS_RUNNING) pause()
     setShowConfirmCancelModal(true)
   }
 
@@ -380,16 +406,24 @@ export function ProtocolRunHeader({
       )}
 
       <Flex>
-        {/* TODO(bh, 2022-03-15) will update link to a protocol key stored locally when built */}
-        <Link to={`/protocols/${runRecord?.data?.data.protocolId}`}>
+        {protocolKey != null ? (
+          <Link to={`/protocols/${protocolKey}`}>
+            <StyledText
+              color={COLORS.blue}
+              css={TYPOGRAPHY.h2SemiBold}
+              id="ProtocolRunHeader_protocolName"
+            >
+              {displayName}
+            </StyledText>
+          </Link>
+        ) : (
           <StyledText
-            color={COLORS.blue}
             css={TYPOGRAPHY.h2SemiBold}
             id="ProtocolRunHeader_protocolName"
           >
             {displayName}
           </StyledText>
-        </Link>
+        )}
       </Flex>
       {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
         <Banner type="warning">{t('close_door_to_resume')}</Banner>

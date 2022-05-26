@@ -18,7 +18,7 @@ import {
   ModuleType,
 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
 import { i18n } from '../../../../i18n'
 import { useLPCSuccessToast } from '../../../ProtocolSetup/hooks'

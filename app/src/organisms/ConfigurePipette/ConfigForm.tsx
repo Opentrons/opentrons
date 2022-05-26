@@ -9,6 +9,7 @@ import pick from 'lodash/pick'
 import omit from 'lodash/omit'
 import set from 'lodash/set'
 import isEmpty from 'lodash/isEmpty'
+import { Box } from '@opentrons/components'
 import { ConfigFormResetButton } from './ConfigFormResetButton'
 import { ConfigFormSubmitButton } from './ConfigFormSubmitButton'
 import {
@@ -218,39 +219,44 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
           }
           //  TODO(jr, 4/19/22): add groupLabels to i18n
           return (
-            <Form>
-              <ConfigFormResetButton
-                onClick={handleReset}
-                disabled={updateInProgress}
-              />
-              <FormColumn>
-                <ConfigFormGroup
-                  groupLabel="Plunger Positions"
-                  groupError={errors.plungerError}
-                  formFields={plungerFields}
-                />
-                <ConfigFormGroup
-                  groupLabel="Tip Pickup / Drop"
-                  formFields={tipFields}
-                />
-                {quirksPresent && <ConfigQuirkGroup quirks={quirkFields} />}
-                {this.props.__showHiddenFields && (
-                  <ConfigFormGroup
-                    groupLabel="For Dev Use Only"
-                    formFields={devFields}
+            <>
+              <Form>
+                <Box overflowY="scroll" height="81vh">
+                  {/* 81vh is approximate height to leave 1rem margin below the submit button */}
+                  <ConfigFormResetButton
+                    onClick={handleReset}
+                    disabled={updateInProgress}
                   />
-                )}
-              </FormColumn>
-              <FormColumn>
-                <ConfigFormGroup
-                  groupLabel="Power / Force"
-                  formFields={powerFields}
-                />
-              </FormColumn>
+                  <FormColumn>
+                    <ConfigFormGroup
+                      groupLabel="Plunger Positions"
+                      groupError={errors.plungerError}
+                      formFields={plungerFields}
+                    />
+                    <ConfigFormGroup
+                      groupLabel="Tip Pickup / Drop"
+                      formFields={tipFields}
+                    />
+                    {quirksPresent && <ConfigQuirkGroup quirks={quirkFields} />}
+                    {this.props.__showHiddenFields && (
+                      <ConfigFormGroup
+                        groupLabel="For Dev Use Only"
+                        formFields={devFields}
+                      />
+                    )}
+                  </FormColumn>
+                  <FormColumn>
+                    <ConfigFormGroup
+                      groupLabel="Power / Force"
+                      formFields={powerFields}
+                    />
+                  </FormColumn>
+                </Box>
+              </Form>
               <ConfigFormSubmitButton
                 disabled={disableSubmit || updateInProgress}
               />
-            </Form>
+            </>
           )
         }}
       </Formik>

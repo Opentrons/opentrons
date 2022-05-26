@@ -17,7 +17,7 @@ import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { PrimaryButton } from '../../../atoms/buttons'
 
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
-  'https://support.opentrons.com/en/collections/1559720-ot-2-get-started'
+  'https://support.opentrons.com/s/ot2-get-started'
 
 export function NewRobotSetupHelp(): JSX.Element {
   const { t } = useTranslation(['devices_landing', 'shared'])
@@ -33,7 +33,7 @@ export function NewRobotSetupHelp(): JSX.Element {
       >
         {t('see_how_to_setup_new_robot')}
       </Link>
-      <Portal>
+      <Portal level="top">
         {showNewRobotHelpModal ? (
           <Modal
             title={t('how_to_setup_a_robot')}

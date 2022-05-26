@@ -1,10 +1,17 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
+import {
+  Flex,
+  ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  SPACING,
+} from '@opentrons/components'
 import { protocolHasModules } from '@opentrons/shared-data'
 
 import { Line } from '../../../atoms/structure'
+import { StyledText } from '../../../atoms/text'
 import { InfoMessage } from '../../../molecules/InfoMessage'
 import {
   useDeckCalibrationData,
@@ -122,32 +129,42 @@ export function ProtocolRunSetup({
       gridGap={SPACING.spacing4}
       margin={SPACING.spacing4}
     >
-      {runHasStarted ? <InfoMessage title={t('setup_is_view_only')} /> : null}
-      {stepsKeysInOrder.map((stepKey, index) => (
-        <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
-          <SetupStep
-            expanded={stepKey === expandedStepKey}
-            label={t('step', { index: index + 1 })}
-            title={t(`${stepKey}_title`)}
-            description={StepDetailMap[stepKey].description}
-            toggleExpanded={() =>
-              stepKey === expandedStepKey
-                ? setExpandedStepKey(null)
-                : setExpandedStepKey(stepKey)
-            }
-            calibrationStatusComplete={
-              stepKey === ROBOT_CALIBRATION_STEP_KEY && !runHasStarted
-                ? calibrationStatus.complete && isDeckCalibrated
-                : null
-            }
-          >
-            {StepDetailMap[stepKey].stepInternals}
-          </SetupStep>
-          {index !== stepsKeysInOrder.length - 1 ? (
-            <Line marginTop={SPACING.spacing5} />
+      {protocolData != null ? (
+        <>
+          {runHasStarted ? (
+            <InfoMessage title={t('setup_is_view_only')} />
           ) : null}
-        </Flex>
-      ))}
+          {stepsKeysInOrder.map((stepKey, index) => (
+            <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
+              <SetupStep
+                expanded={stepKey === expandedStepKey}
+                label={t('step', { index: index + 1 })}
+                title={t(`${stepKey}_title`)}
+                description={StepDetailMap[stepKey].description}
+                toggleExpanded={() =>
+                  stepKey === expandedStepKey
+                    ? setExpandedStepKey(null)
+                    : setExpandedStepKey(stepKey)
+                }
+                calibrationStatusComplete={
+                  stepKey === ROBOT_CALIBRATION_STEP_KEY && !runHasStarted
+                    ? calibrationStatus.complete && isDeckCalibrated
+                    : null
+                }
+              >
+                {StepDetailMap[stepKey].stepInternals}
+              </SetupStep>
+              {index !== stepsKeysInOrder.length - 1 ? (
+                <Line marginTop={SPACING.spacing5} />
+              ) : null}
+            </Flex>
+          ))}
+        </>
+      ) : (
+        <StyledText alignSelf={ALIGN_CENTER} color={COLORS.darkGreyEnabled}>
+          {t('loading_data')}
+        </StyledText>
+      )}
     </Flex>
   )
 }

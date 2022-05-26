@@ -17,6 +17,8 @@ export interface FormGroupProps {
   disabled?: boolean | null | undefined
   /** handlers for HoverTooltipComponent */
   hoverTooltipHandlers?: HoverTooltipHandlers | null | undefined
+  /** boolean indicating formGroup used in pipette Settings slideout */
+  isPipetteSettingsSlideout?: boolean
 }
 
 export function FormGroup(props: FormGroupProps): JSX.Element {
@@ -31,7 +33,11 @@ export function FormGroup(props: FormGroupProps): JSX.Element {
       {props.label && (
         <div
           {...props.hoverTooltipHandlers}
-          className={styles.form_group_label}
+          className={
+            props.isPipetteSettingsSlideout
+              ? styles.form_group_label_pipette_settings_slideout
+              : styles.form_group_label
+          }
         >
           {error && (
             <div className={styles.error_icon}>

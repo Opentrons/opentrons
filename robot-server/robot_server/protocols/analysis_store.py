@@ -63,6 +63,14 @@ class AnalysisNotFoundError(ValueError):
         super().__init__(f'Analysis "{analysis_id}" not found.')
 
 
+# TODO(mm, 2022-05-19): Unlike ProtocolStore and RunStore, this class doesn't
+# have an in-memory cache. This is because of implementation difficulties:
+# this class is currently the only one of the three to have any async methods,
+# which functools.lru_cache() doesn't support.
+#
+# We should have a consistent strategy across all stores.
+# Either figure out an in-memory cache that supports async methods,
+# or remove in-memory caching from all stores.
 class AnalysisStore:
     """Storage interface for protocol analyses.
 
