@@ -7,7 +7,6 @@ export type ModuleRunTimeCommand =
   | TemperatureModuleDeactivateRunTimeCommand
   | TemperatureModuleAwaitTemperatureRunTimeCommand
   | TCSetTargetBlockTemperatureRunTimeCommand
-  | TCSetAndWaitForTargetBlockTemperatureRunTimeCommand
   | TCSetTargetLidTemperatureRunTimeCommand
   | TCWaitForBlockTemperatureRunTimeCommand
   | TCWaitForLidTemperatureRunTimeCommand
@@ -31,7 +30,6 @@ export type ModuleCreateCommand =
   | TemperatureModuleDeactivateCreateCommand
   | TemperatureModuleAwaitTemperatureCreateCommand
   | TCSetTargetBlockTemperatureCreateCommand
-  | TCSetAndWaitForBlockTemperatureCreateCommand
   | TCSetTargetLidTemperatureCreateCommand
   | TCWaitForBlockTemperatureCreateCommand
   | TCWaitForLidTemperatureCreateCommand
@@ -109,16 +107,6 @@ export interface TCSetTargetBlockTemperatureRunTimeCommand
     TCSetTargetBlockTemperatureCreateCommand {
   result: any
 }
-export interface TCSetAndWaitForBlockTemperatureCreateCommand
-  extends CommonCommandCreateInfo {
-  commandType: 'thermocycler/setAndWaitForBlockTemperature'
-  params: ThermocyclerSetTargetBlockTemperatureParams
-}
-export interface TCSetAndWaitForTargetBlockTemperatureRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    TCSetAndWaitForBlockTemperatureCreateCommand {
-  result: any
-}
 export interface TCSetTargetLidTemperatureCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/setTargetLidTemperature'
@@ -132,7 +120,7 @@ export interface TCSetTargetLidTemperatureRunTimeCommand
 export interface TCWaitForBlockTemperatureCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/waitForBlockTemperature'
-  params: TemperatureParams
+  params: ModuleOnlyParams
 }
 export interface TCWaitForBlockTemperatureRunTimeCommand
   extends CommonCommandRunTimeInfo,
@@ -142,7 +130,7 @@ export interface TCWaitForBlockTemperatureRunTimeCommand
 export interface TCWaitForLidTemperatureCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/waitForLidTemperature'
-  params: TemperatureParams
+  params: ModuleOnlyParams
 }
 export interface TCWaitForLidTemperatureRunTimeCommand
   extends CommonCommandRunTimeInfo,

@@ -627,31 +627,6 @@
           },
 
           {
-            "description": "Thermocycler Set And Wait For Block Temperature: Well block will begin moving to the target temperature. This command is blocking, it delays protocol execution while approaching the target temperature.",
-            "type": "object",
-            "required": ["commandType", "params"],
-            "properties": {
-              "key": { "type": "string" },
-              "commandType": {
-                "enum": ["thermocycler/setAndWaitForBlockTemperature"]
-              },
-              "params": {
-                "required": ["moduleId"],
-                "properties": {
-                  "moduleId": {
-                    "type": "string",
-                    "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
-                  },
-                  "blockMaxVolumeUl": {
-                    "type": "number",
-                    "description": "Amount of liquid in uL of the most-full well in labware loaded onto the thermocycler."
-                  }
-                }
-              }
-            }
-          },
-
-          {
             "description": "Thermocycler Set Target Block Temperature: Well block will begin moving to the target temperature. This command is non-blocking, it does not delay protocol execution while approaching the target temperature.",
             "type": "object",
             "required": ["commandType", "params"],
@@ -731,13 +706,12 @@
               "key": { "type": "string" },
               "commandType": { "enum": ["thermocycler/waitForLidTemperature"] },
               "params": {
-                "required": ["moduleId", "celsius"],
+                "required": ["moduleId"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
-                  },
-                  "celsius": { "type": "number" }
+                  }
                 }
               }
             }

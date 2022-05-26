@@ -101,7 +101,7 @@ describe('thermocyclerStateStep', () => {
       thermocyclerStateDiff: { ...getInitialDiff(), setBlockTemperature: true },
       expected: [
         {
-          commandType: 'thermocycler/setAndWaitForBlockTemperature',
+          commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
             moduleId: thermocyclerId,
             celsius: 10,
@@ -111,7 +111,6 @@ describe('thermocyclerStateStep', () => {
           commandType: 'thermocycler/waitForBlockTemperature',
           params: {
             moduleId: thermocyclerId,
-            celsius: 10,
           },
         },
       ],
@@ -170,7 +169,6 @@ describe('thermocyclerStateStep', () => {
           commandType: 'thermocycler/waitForLidTemperature',
           params: {
             moduleId: thermocyclerId,
-            celsius: 10,
           },
         },
       ],
@@ -229,7 +227,6 @@ describe('thermocyclerStateStep', () => {
           commandType: 'thermocycler/waitForLidTemperature',
           params: {
             moduleId: thermocyclerId,
-            celsius: 10,
           },
         },
       ],
@@ -302,7 +299,7 @@ describe('thermocyclerStateStep', () => {
           },
         },
         {
-          commandType: 'thermocycler/setAndWaitForBlockTemperature',
+          commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
             moduleId: thermocyclerId,
             celsius: 10,
@@ -312,7 +309,6 @@ describe('thermocyclerStateStep', () => {
           commandType: 'thermocycler/waitForBlockTemperature',
           params: {
             moduleId: thermocyclerId,
-            celsius: 10,
           },
         },
         {
@@ -332,7 +328,6 @@ describe('thermocyclerStateStep', () => {
           commandType: 'thermocycler/waitForLidTemperature',
           params: {
             moduleId: thermocyclerId,
-            celsius: 20,
           },
         },
       ],
