@@ -29,6 +29,7 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   C_NEAR_WHITE,
   SPACING_7,
+  NewSecondaryBtn,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -259,7 +260,7 @@ export const LabwareSetup = (): JSX.Element | null => {
               {t('labware_help_link_title')}
             </Btn>
             <Flex justifyContent={JUSTIFY_CENTER}>
-              <
+            <NewSecondaryBtn
                 title={t('run_labware_position_check')}
                 onClick={() => {
                   setShowLabwarePositionCheckModal(true)
@@ -270,7 +271,7 @@ export const LabwareSetup = (): JSX.Element | null => {
                 disabled={lpcDisabledReason !== null}
               >
                 {t('run_labware_position_check')}
-              </>
+            </NewSecondaryBtn>
               {lpcDisabledReason !== null ? (
                 <Tooltip maxWidth={SPACING_7} {...tooltipProps}>
                   {lpcDisabledReason}
