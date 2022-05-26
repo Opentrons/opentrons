@@ -15,7 +15,12 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
-import { useModulesQuery, usePipettesQuery } from '@opentrons/react-api-client'
+import {
+  useDismissCurrentRunMutation,
+  useRunQuery,
+  useModulesQuery,
+  usePipettesQuery,
+} from '@opentrons/react-api-client'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   Box,
@@ -129,12 +134,19 @@ export function ProtocolRunHeader({
   const isProtocolAnalyzing = protocolData == null
   const runStatus = useRunStatus(runId)
 
+  const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
+  const { dismissCurrentRun } = useDismissCurrentRunMutation()
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   // NOTE: we are polling pipettes, though not using their value directly here
   usePipettesQuery({ refetchInterval: EQUIPMENT_POLL_MS })
 
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
+  React.useEffect(() => {
+    if (runStatus === RUN_STATUS_STOPPED && isRunCurrent) {
+      runId != null && dismissCurrentRun(runId)
+    }
+  }, [runStatus, isRunCurrent, runId, dismissCurrentRun])
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : '--:--:--'
@@ -204,7 +216,7 @@ export function ProtocolRunHeader({
   }
 
   const isRunControlButtonDisabled =
-    !isSetupComplete ||
+    (isCurrentRun && !isSetupComplete) ||
     isMutationLoading ||
     isRobotBusy ||
     isProtocolAnalyzing ||
@@ -253,7 +265,7 @@ export function ProtocolRunHeader({
   }
 
   let disableReason = null
-  if (!isSetupComplete) {
+  if (isCurrentRun && !isSetupComplete) {
     disableReason = t('setup_incomplete')
   } else if (isRobotBusy) {
     disableReason = t('robot_is_busy')
@@ -275,7 +287,7 @@ export function ProtocolRunHeader({
   ] = React.useState<boolean>(false)
 
   const handleCancelClick = (): void => {
-    pause()
+    if (runStatus === RUN_STATUS_RUNNING) pause()
     setShowConfirmCancelModal(true)
   }
 

@@ -41,6 +41,7 @@ from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
     ProtocolNotFoundError,
+    ProtocolUsedByRunError,
 )
 
 from robot_server.protocols.router import (
@@ -387,6 +388,23 @@ async def test_delete_protocol_not_found(
         await delete_protocol_by_id("protocol-id", protocol_store=protocol_store)
 
     assert exc_info.value.status_code == 404
+
+
+async def test_delete_protocol_run_exists(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+) -> None:
+    """It should 404 if the protocol to delete is not found."""
+    run_exists_error = ProtocolUsedByRunError("protocol-id")
+
+    decoy.when(protocol_store.remove(protocol_id="protocol-id")).then_raise(
+        run_exists_error
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await delete_protocol_by_id("protocol-id", protocol_store=protocol_store)
+
+    assert exc_info.value.status_code == 409
 
 
 async def test_get_protocol_analyses(
