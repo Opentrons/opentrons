@@ -284,6 +284,7 @@ class SensorScheduler:
                 payload=BindSensorOutputRequestPayload(
                     sensor=SensorTypeField(target_sensor.sensor_type),
                     binding=SensorOutputBindingField.from_flags(flags),
+                    mode=UInt8Field(0)
                 )
             ),
         )
