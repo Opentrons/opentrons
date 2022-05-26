@@ -30,6 +30,11 @@ const mockResetConfigOptions = [
     name: 'Calibration Bar',
     description: 'Calibration bar description',
   },
+  // {
+  //   id: 'RunsHistoryFooBar',
+  //   name: 'RunsHistory FooBar',
+  //   description: 'runsHistory fooBar description',
+  // },
 ]
 
 const render = () => {
@@ -57,9 +62,6 @@ describe('RobotSettings FactoryResetSlideout', () => {
 
   it('should render title, description, checkboxes, links and button', () => {
     const [{ getByText, getByRole, getAllByText, getByTestId }] = render()
-
-    // TODO: (koji, 4/28/22) after CPX team's update need to add items for Protocol Run History
-
     getByText('Factory Reset')
     getByText('Select the robot data to clear.')
     getByText('Factory resets cannot be undone')
@@ -67,6 +69,7 @@ describe('RobotSettings FactoryResetSlideout', () => {
     getByText(
       'Resetting Deck and/or Tip Length Calibration data will also clear Pipette Offset Calibration data.'
     )
+    getByText('Protocol Run History')
     getByText('Clear BootScript Foo')
     getByText('Clear Calibration Bar')
     const downloads = getAllByText('Download')
