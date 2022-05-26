@@ -10,8 +10,6 @@ from opentrons.protocol_engine.execution import CommandExecutor, QueueWorker
 class BreakLoopError(Exception):
     """An exception to break out of the worker's wait-for-new-command loop."""
 
-    pass
-
 
 @pytest.fixture
 def state_store(decoy: Decoy) -> StateStore:

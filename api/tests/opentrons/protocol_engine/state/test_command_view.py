@@ -27,7 +27,7 @@ from .command_fixtures import (
 
 
 def get_command_view(
-    queue_status: QueueStatus = QueueStatus.IMPLICITLY_ACTIVE,
+    queue_status: QueueStatus = QueueStatus.SETUP,
     is_hardware_stopped: bool = False,
     is_door_blocking: bool = False,
     run_result: Optional[RunResult] = None,
@@ -88,13 +88,10 @@ def test_get_all() -> None:
     assert subject.get_all() == [command_1, command_2, command_3]
 
 
-@pytest.mark.parametrize(
-    "queue_status", [QueueStatus.IMPLICITLY_ACTIVE, QueueStatus.ACTIVE]
-)
-def test_get_next_queued_returns_first_queued(queue_status: QueueStatus) -> None:
+def test_get_next_queued_returns_first_queued() -> None:
     """It should return the next queued command ID."""
     subject = get_command_view(
-        queue_status=queue_status,
+        queue_status=QueueStatus.RUNNING,
         queued_command_ids=["command-id-1", "command-id-2"],
     )
 
@@ -102,7 +99,8 @@ def test_get_next_queued_returns_first_queued(queue_status: QueueStatus) -> None
 
 
 @pytest.mark.parametrize(
-    "queue_status", [QueueStatus.IMPLICITLY_ACTIVE, QueueStatus.ACTIVE]
+    "queue_status",
+    [QueueStatus.SETUP, QueueStatus.RUNNING, QueueStatus.PAUSED],
 )
 def test_get_next_queued_prioritizes_setup_command_queue(
     queue_status: QueueStatus,
@@ -120,17 +118,18 @@ def test_get_next_queued_prioritizes_setup_command_queue(
 def test_get_next_queued_returns_none_when_no_pending() -> None:
     """It should return None if there are no queued commands."""
     subject = get_command_view(
-        queue_status=QueueStatus.ACTIVE,
+        queue_status=QueueStatus.RUNNING,
         queued_command_ids=[],
     )
 
     assert subject.get_next_queued() is None
 
 
-def test_get_next_queued_returns_none_if_not_running() -> None:
+@pytest.mark.parametrize("queue_status", [QueueStatus.SETUP, QueueStatus.PAUSED])
+def test_get_next_queued_returns_none_if_not_running(queue_status: QueueStatus) -> None:
     """It should return None if the engine is not running."""
     subject = get_command_view(
-        queue_status=QueueStatus.INACTIVE,
+        queue_status=queue_status,
         queued_command_ids=["command-id-1", "command-id-2"],
     )
     result = subject.get_next_queued()
@@ -149,13 +148,13 @@ def test_get_next_queued_raises_if_stopped(run_result: RunResult) -> None:
 
 def test_get_is_running_queue() -> None:
     """It should be able to get if the engine is running."""
-    subject = get_command_view(queue_status=QueueStatus.INACTIVE)
+    subject = get_command_view(queue_status=QueueStatus.PAUSED)
     assert subject.get_is_running() is False
 
-    subject = get_command_view(queue_status=QueueStatus.ACTIVE)
+    subject = get_command_view(queue_status=QueueStatus.RUNNING)
     assert subject.get_is_running() is True
 
-    subject = get_command_view(queue_status=QueueStatus.IMPLICITLY_ACTIVE)
+    subject = get_command_view(queue_status=QueueStatus.SETUP)
     assert subject.get_is_running() is False
 
 
@@ -271,7 +270,7 @@ class SetupCommandAllowedSpec(NamedTuple):
 command_allowed_specs: List[SetupCommandAllowedSpec] = [
     SetupCommandAllowedSpec(  # Status: RUNNING
         subject=get_command_view(
-            queue_status=QueueStatus.ACTIVE,
+            queue_status=QueueStatus.RUNNING,
             running_command_id=None,
             queued_command_ids=[],
         ),
@@ -279,7 +278,7 @@ command_allowed_specs: List[SetupCommandAllowedSpec] = [
     ),
     SetupCommandAllowedSpec(  # Status: IDLE
         subject=get_command_view(
-            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            queue_status=QueueStatus.SETUP,
             running_command_id=None,
             queued_command_ids=[],
         ),
@@ -287,7 +286,7 @@ command_allowed_specs: List[SetupCommandAllowedSpec] = [
     ),
     SetupCommandAllowedSpec(  # Status: PAUSED
         subject=get_command_view(
-            queue_status=QueueStatus.INACTIVE,
+            queue_status=QueueStatus.PAUSED,
         ),
         expected_error=None,
     ),
@@ -300,14 +299,14 @@ command_allowed_specs: List[SetupCommandAllowedSpec] = [
     ),
     SetupCommandAllowedSpec(  # Status: BLOCKED_BY_OPEN_DOOR
         subject=get_command_view(
-            queue_status=QueueStatus.INACTIVE,
+            queue_status=QueueStatus.PAUSED,
             is_door_blocking=True,
         ),
         expected_error=errors.SetupCommandNotAllowedError,
     ),
     SetupCommandAllowedSpec(  # Status: FINISHING
         subject=get_command_view(
-            queue_status=QueueStatus.INACTIVE,
+            queue_status=QueueStatus.PAUSED,
             run_result=RunResult.SUCCEEDED,
             is_hardware_stopped=False,
         ),
@@ -337,20 +336,18 @@ class PlayAllowedSpec(NamedTuple):
 
 play_allowed_specs: List[PlayAllowedSpec] = [
     PlayAllowedSpec(
-        subject=get_command_view(
-            is_door_blocking=True, queue_status=QueueStatus.IMPLICITLY_ACTIVE
-        ),
+        subject=get_command_view(is_door_blocking=True, queue_status=QueueStatus.SETUP),
         expected_error=None,
     ),
     PlayAllowedSpec(
         subject=get_command_view(
-            is_door_blocking=True, queue_status=QueueStatus.INACTIVE
+            is_door_blocking=True, queue_status=QueueStatus.PAUSED
         ),
         expected_error=errors.RobotDoorOpenError,
     ),
     PlayAllowedSpec(
         subject=get_command_view(
-            is_door_blocking=False, queue_status=QueueStatus.INACTIVE
+            is_door_blocking=False, queue_status=QueueStatus.PAUSED
         ),
         expected_error=None,
     ),
@@ -398,7 +395,7 @@ class GetStatusSpec(NamedTuple):
 get_status_specs: List[GetStatusSpec] = [
     GetStatusSpec(
         subject=get_command_view(
-            queue_status=QueueStatus.ACTIVE,
+            queue_status=QueueStatus.RUNNING,
             running_command_id=None,
             queued_command_ids=[],
         ),
@@ -406,7 +403,7 @@ get_status_specs: List[GetStatusSpec] = [
     ),
     GetStatusSpec(
         subject=get_command_view(
-            queue_status=QueueStatus.INACTIVE,
+            queue_status=QueueStatus.PAUSED,
             run_result=RunResult.SUCCEEDED,
             is_hardware_stopped=False,
         ),
@@ -414,7 +411,7 @@ get_status_specs: List[GetStatusSpec] = [
     ),
     GetStatusSpec(
         subject=get_command_view(
-            queue_status=QueueStatus.INACTIVE,
+            queue_status=QueueStatus.PAUSED,
             run_result=RunResult.FAILED,
             is_hardware_stopped=False,
         ),
@@ -422,7 +419,7 @@ get_status_specs: List[GetStatusSpec] = [
     ),
     GetStatusSpec(
         subject=get_command_view(
-            queue_status=QueueStatus.INACTIVE,
+            queue_status=QueueStatus.PAUSED,
         ),
         expected_status=EngineStatus.PAUSED,
     ),
@@ -456,28 +453,28 @@ get_status_specs: List[GetStatusSpec] = [
     ),
     GetStatusSpec(
         subject=get_command_view(
-            queue_status=QueueStatus.INACTIVE,
+            queue_status=QueueStatus.PAUSED,
             is_door_blocking=True,
         ),
         expected_status=EngineStatus.BLOCKED_BY_OPEN_DOOR,
     ),
     GetStatusSpec(
         subject=get_command_view(
-            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            queue_status=QueueStatus.SETUP,
             is_door_blocking=True,
         ),
         expected_status=EngineStatus.IDLE,
     ),
     GetStatusSpec(
         subject=get_command_view(
-            queue_status=QueueStatus.INACTIVE,
+            queue_status=QueueStatus.PAUSED,
             is_door_blocking=False,
         ),
         expected_status=EngineStatus.PAUSED,
     ),
     GetStatusSpec(
         subject=get_command_view(
-            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            queue_status=QueueStatus.SETUP,
             running_command_id="command-id",
             queued_command_ids=["command-id-1"],
             queued_setup_command_ids=["command-id-2"],
@@ -504,7 +501,7 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
     GetOkayToClearSpec(
         # Protocol not played yet, no commands queued or ran yet
         subject=get_command_view(
-            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            queue_status=QueueStatus.SETUP,
             running_command_id=None,
             queued_command_ids=[],
             queued_setup_command_ids=[],
@@ -515,7 +512,7 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
         # Protocol commands are queued but not played yet,
         # no setup commands queued or running
         subject=get_command_view(
-            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            queue_status=QueueStatus.SETUP,
             running_command_id=None,
             queued_setup_command_ids=[],
             queued_command_ids=["command-id"],
@@ -526,7 +523,7 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
     GetOkayToClearSpec(
         # Protocol not played yet, setup commands are queued
         subject=get_command_view(
-            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            queue_status=QueueStatus.SETUP,
             running_command_id=None,
             queued_setup_command_ids=["command-id"],
             commands=[create_queued_command(command_id="command-id")],

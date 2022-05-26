@@ -19,15 +19,6 @@ class UnexpectedProtocolError(ProtocolEngineError):
         self.original_error: Exception = original_error
 
 
-class UnexpectedEngineStatusError(ProtocolEngineError):
-    """An error raised when engine gets into an unexpected state.
-
-    This error is indicative of a software bug. If it happens, then it means that
-    we are not accounting for all the states/ situations that the commands &
-    command queues can get in.
-    """
-
-
 # TODO(mc, 2020-10-18): differentiate between pipette missing vs incorrect.
 # By comparison, loadModule uses ModuleAlreadyPresentError and ModuleNotAttachedError.
 class FailedToLoadPipetteError(ProtocolEngineError):

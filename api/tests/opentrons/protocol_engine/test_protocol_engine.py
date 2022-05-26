@@ -184,12 +184,12 @@ async def test_adding_setup_command_raises_when_engine_busy(
 ) -> None:
     """Test that adding a setup command fails when the engine is not idle/paused."""
     params = commands.HomeParams()
-    request = commands.HomeCreate(params=params)
+    request = commands.HomeCreate(params=params, source=commands.CommandSource.SETUP)
     decoy.when(state_store.commands.raise_if_not_paused_or_idle()).then_raise(
         SetupCommandNotAllowedError("oh no")
     )
     with pytest.raises(SetupCommandNotAllowedError):
-        subject.add_command(request, is_setup=True)
+        subject.add_command(request)
 
 
 async def test_add_and_execute_command(

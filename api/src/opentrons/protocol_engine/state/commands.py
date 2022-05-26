@@ -13,7 +13,6 @@ from opentrons.hardware_control.types import DoorStateNotification, DoorState
 from ..actions import (
     Action,
     QueueCommandAction,
-    QueueSetupCommandAction,
     UpdateCommandAction,
     FailCommandAction,
     PlayAction,
@@ -32,7 +31,6 @@ from ..errors import (
     ErrorOccurrence,
     RobotDoorOpenError,
     SetupCommandNotAllowedError,
-    UnexpectedEngineStatusError,
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
@@ -42,17 +40,21 @@ class QueueStatus(str, Enum):
     """Execution status of the command queue.
 
     Properties:
-        IMPLICITLY_ACTIVE: The queue has been created, and the engine
-            should pull commands off the queue to execute, but the queue
-            has not yet been told explicitly to run.
-        ACTIVE: The queue is running due to an explicit PlayAction.
-        INACTIVE: New commands should not be pulled off the queue, though
-            the latest command may be running if it was already processed.
+        SETUP: The engine has been created, but the run has not yet started.
+            New protocol commands may be enqueued but will wait to execute.
+            New setup commands may be enqueued and will execute immediately.
+        RUNNING: The queue is running though protocol commands.
+            New protocol commands may be enqueued and will execute immediately.
+            New setup commands may not be enqueued.
+        PAUSED: Execution of protocol commands has been paused.
+            New protocol commands may be enqueued but wait to execute.
+            New setup commands may be enqueued and will execute immediately.
+
     """
 
-    IMPLICITLY_ACTIVE = "implicitly-active"  # implies that the setup queue is active
-    ACTIVE = "active"
-    INACTIVE = "inactive"
+    SETUP = "setup"
+    RUNNING = "running"
+    PAUSED = "paused"
 
 
 class RunResult(str, Enum):
@@ -147,7 +149,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def __init__(self, is_door_blocking: bool = False) -> None:
         """Initialize a CommandStore and its state."""
         self._state = CommandState(
-            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            queue_status=QueueStatus.SETUP,
             is_hardware_stopped=False,
             is_door_blocking=is_door_blocking,
             run_result=None,
@@ -175,40 +177,21 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 key=action.command_key,
                 createdAt=action.created_at,
                 params=action.request.params,  # type: ignore[arg-type]
+                source=action.request.source,
                 status=CommandStatus.QUEUED,
             )
 
             next_index = len(self._state.all_command_ids)
             self._state.all_command_ids.append(action.command_id)
-            self._state.queued_command_ids.add(queued_command.id)
             self._state.commands_by_id[queued_command.id] = CommandEntry(
                 index=next_index,
                 command=queued_command,
             )
 
-        elif isinstance(action, QueueSetupCommandAction):
-            assert action.command_id not in self._state.commands_by_id
-
-            # TODO(mc, 2021-06-22): mypy has trouble with this automatic
-            # request > command mapping, figure out how to type precisely
-            # (or wait for a future mypy version that can figure it out).
-            # For now, unit tests cover mapping every request type
-            queued_command = action.request._CommandCls.construct(
-                id=action.command_id,
-                key=action.command_key,
-                createdAt=action.created_at,
-                params=action.request.params,  # type: ignore[arg-type]
-                status=CommandStatus.QUEUED,
-                source=CommandSource.SETUP,
-            )
-
-            next_index = len(self._state.all_command_ids)
-            self._state.all_command_ids.append(action.command_id)
-            self._state.queued_setup_command_ids.add(queued_command.id)
-            self._state.commands_by_id[queued_command.id] = CommandEntry(
-                index=next_index,
-                command=queued_command,
-            )
+            if action.request.source == CommandSource.SETUP:
+                self._state.queued_setup_command_ids.add(queued_command.id)
+            else:
+                self._state.queued_command_ids.add(queued_command.id)
 
         # TODO(mc, 2021-12-28): replace "UpdateCommandAction" with explicit
         # state change actions (e.g. RunCommandAction, SucceedCommandAction)
@@ -230,8 +213,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     command=command,
                 )
 
-            self._state.queued_command_ids.remove_if_found(command.id)
-            self._state.queued_setup_command_ids.remove_if_found(command.id)
+            self._state.queued_command_ids.discard(command.id)
+            self._state.queued_setup_command_ids.discard(command.id)
 
             if command.status == CommandStatus.RUNNING:
                 self._state.running_command_id = command.id
@@ -289,22 +272,22 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if not self._state.run_result:
                 if self._state.is_door_blocking:
                     # Always inactivate queue when door is blocking
-                    self._state.queue_status = QueueStatus.INACTIVE
+                    self._state.queue_status = QueueStatus.PAUSED
                 else:
-                    self._state.queue_status = QueueStatus.ACTIVE
+                    self._state.queue_status = QueueStatus.RUNNING
                     self._state.queued_setup_command_ids.clear()
 
         elif isinstance(action, PauseAction):
-            self._state.queue_status = QueueStatus.INACTIVE
+            self._state.queue_status = QueueStatus.PAUSED
 
         elif isinstance(action, StopAction):
             if not self._state.run_result:
-                self._state.queue_status = QueueStatus.INACTIVE
+                self._state.queue_status = QueueStatus.PAUSED
                 self._state.run_result = RunResult.STOPPED
 
         elif isinstance(action, FinishAction):
             if not self._state.run_result:
-                self._state.queue_status = QueueStatus.INACTIVE
+                self._state.queue_status = QueueStatus.PAUSED
                 if action.set_run_status:
                     self._state.run_result = (
                         RunResult.SUCCEEDED
@@ -332,7 +315,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     )
 
         elif isinstance(action, HardwareStoppedAction):
-            self._state.queue_status = QueueStatus.INACTIVE
+            self._state.queue_status = QueueStatus.PAUSED
             self._state.run_result = self._state.run_result or RunResult.STOPPED
             self._state.is_hardware_stopped = True
 
@@ -340,8 +323,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if isinstance(action.event, DoorStateNotification):
                 if action.event.blocking:
                     self._state.is_door_blocking = True
-                    if self._state.queue_status != QueueStatus.IMPLICITLY_ACTIVE:
-                        self._state.queue_status = QueueStatus.INACTIVE
+                    if self._state.queue_status != QueueStatus.SETUP:
+                        self._state.queue_status = QueueStatus.PAUSED
                 elif action.event.new_state == DoorState.CLOSED:
                     self._state.is_door_blocking = False
 
@@ -451,18 +434,18 @@ class CommandView(HasState[CommandState]):
         if self._state.run_result:
             raise ProtocolEngineStoppedError("Engine was stopped")
 
-        # Since a resume action empties the setup command queue, presence of
-        # setup commands in queue indicate that they were added when a protocol run was
-        # either idle or paused, and that the run is currently idle or paused or
-        # might be transitioning out of idle/pause. In such case, prioritize running
-        # the setup command instead of a queued protocol command.
+        # if there is a setup command queued, prioritize it
         next_setup_cmd = next(iter(self._state.queued_setup_command_ids), None)
         if next_setup_cmd:
             return next_setup_cmd
-        elif self._state.queue_status == QueueStatus.INACTIVE:
-            return None
-        else:
+
+        # if the queue is running, return the next protocol command
+        elif self._state.queue_status == QueueStatus.RUNNING:
             return next(iter(self._state.queued_command_ids), None)
+
+        # otherwise we've got nothing to do
+        else:
+            return None
 
     def get_is_okay_to_clear(self) -> bool:
         """Get whether the engine is stopped or sitting idly so it could be removed."""
@@ -483,11 +466,11 @@ class CommandView(HasState[CommandState]):
 
     def get_is_implicitly_active(self) -> bool:
         """Get whether the queue is implicitly active, i.e., never 'played'."""
-        return self._state.queue_status == QueueStatus.IMPLICITLY_ACTIVE
+        return self._state.queue_status == QueueStatus.SETUP
 
     def get_is_running(self) -> bool:
         """Get whether the protocol is running & queued commands should be executed."""
-        return self._state.queue_status == QueueStatus.ACTIVE
+        return self._state.queue_status == QueueStatus.RUNNING
 
     def get_is_complete(self, command_id: str) -> bool:
         """Get whether a given command is completed.
@@ -570,18 +553,13 @@ class CommandView(HasState[CommandState]):
             else:
                 return EngineStatus.STOPPED
 
-        elif self._state.queue_status == QueueStatus.ACTIVE:
+        elif self._state.queue_status == QueueStatus.RUNNING:
             return EngineStatus.RUNNING
 
-        elif self._state.queue_status == QueueStatus.INACTIVE:
+        elif self._state.queue_status == QueueStatus.PAUSED:
             if self._state.is_door_blocking:
                 return EngineStatus.BLOCKED_BY_OPEN_DOOR
             else:
                 return EngineStatus.PAUSED
 
-        elif self._state.queue_status == QueueStatus.IMPLICITLY_ACTIVE:
-            return EngineStatus.IDLE
-
-        raise UnexpectedEngineStatusError(
-            "Protocol engine has encountered an" " unexpected state."
-        )
+        return EngineStatus.IDLE

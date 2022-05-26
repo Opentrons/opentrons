@@ -1,5 +1,5 @@
 """ProtocolEngine class definition."""
-from typing import Dict, Optional, Union
+from typing import Dict, Optional
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
@@ -9,6 +9,7 @@ from .resources import ModelUtils, ModuleDataProvider
 from .commands import (
     Command,
     CommandCreate,
+    CommandSource,
 )
 from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri, ModuleModel
 from .execution import (
@@ -28,7 +29,6 @@ from .actions import (
     FinishAction,
     FinishErrorDetails,
     QueueCommandAction,
-    QueueSetupCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddModuleAction,
@@ -78,11 +78,6 @@ class ProtocolEngine:
             state_store=self._state_store,
             action_dispatcher=self._action_dispatcher,
         )
-        # self._setup_commands_queue_worker = create_queue_worker(
-        #     hardware_api=hardware_api,
-        #     state_store=state_store,
-        #     action_dispatcher=self._action_dispatcher
-        # )
         self._hardware_stopper = hardware_stopper or HardwareStopper(
             hardware_api=hardware_api, state_store=state_store
         )
@@ -96,7 +91,6 @@ class ProtocolEngine:
         self._module_data_provider = module_data_provider or ModuleDataProvider()
 
         self._queue_worker.start()
-        # self._setup_commands_queue_worker.start()
         self._hardware_event_forwarder.start()
 
     @property
@@ -124,40 +118,33 @@ class ProtocolEngine:
         self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(action)
 
-    def add_command(self, request: CommandCreate, is_setup: bool = False) -> Command:
+    def add_command(self, request: CommandCreate) -> Command:
         """Add a command to the `ProtocolEngine`'s queue.
 
         Arguments:
             request: The command type and payload data used to construct
                 the command in state.
-            is_setup: Whether the command is a setup command
+
         Returns:
             The full, newly queued command.
-        Raises: SetupCommandNotAllowed error if the command is a setup command and
-            the engine is not idle or paused.
+
+        Raises:
+            SetupCommandNotAllowed: the request specified a setup command,
+                but the engine was not idle or paused.
         """
         command_id = self._model_utils.generate_id()
-        action: Union[QueueCommandAction, QueueSetupCommandAction]
-        if is_setup:
+
+        if request.source == CommandSource.SETUP:
             self.state_view.commands.raise_if_not_paused_or_idle()
-            # add to setup command queue
-            action = QueueSetupCommandAction(
-                request=request,
-                command_id=command_id,
-                # TODO(mc, 2021-12-13): generate a command key from params and state
-                # https://github.com/Opentrons/opentrons/issues/8986
-                command_key=command_id,
-                created_at=self._model_utils.get_timestamp(),
-            )
-        else:
-            action = QueueCommandAction(
-                request=request,
-                command_id=command_id,
-                # TODO(mc, 2021-12-13): generate a command key from params and state
-                # https://github.com/Opentrons/opentrons/issues/8986
-                command_key=command_id,
-                created_at=self._model_utils.get_timestamp(),
-            )
+
+        action = QueueCommandAction(
+            request=request,
+            command_id=command_id,
+            # TODO(mc, 2021-12-13): generate a command key from params and state
+            # https://github.com/Opentrons/opentrons/issues/8986
+            command_key=command_id,
+            created_at=self._model_utils.get_timestamp(),
+        )
         self._action_dispatcher.dispatch(action)
         return self._state_store.commands.get(command_id)
 

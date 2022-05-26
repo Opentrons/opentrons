@@ -62,6 +62,21 @@ class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
         ),
     )
     params: CommandParamsT = Field(..., description="Command execution data payload")
+    source: Optional[CommandSource] = Field(
+        None,
+        description=(
+            "The source of the command to create. If not specified or `protocol`,"
+            " the command will be treated as part of the protocol run itself,"
+            " and added to the end of the existing command queue."
+            "\n\n"
+            "If `setup`, the command will be treated as part of run setup."
+            " A setup command may only be enqueued if the run has not started"
+            " or is currently paused."
+            "\n\n"
+            "Use setup commands for activities like pre-run calibration checks"
+            " and module setup, like pre-heating."
+        ),
+    )
 
 
 class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
@@ -113,7 +128,10 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
     )
     source: Optional[CommandSource] = Field(
         None,
-        description="Source that generated this command.",
+        description=(
+            "Source (run setup or protocol itself) that added this command,"
+            " if known."
+        ),
     )
 
 

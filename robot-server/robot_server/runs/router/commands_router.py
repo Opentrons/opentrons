@@ -156,15 +156,6 @@ async def create_run_command(
             " Inspect the returned command's `status` to detect the timeout."
         ),
     ),
-    isSetupCommand: bool = Query(
-        default=True,
-        description=(
-            "If `false`, then this command will be queued as part of protocol commands"
-            "\n\n"
-            "If `true`, and protocol is paused/ idle, then this command will be added "
-            "to a separate queue and will be executed immediately."
-        ),
-    ),
     protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
@@ -182,9 +173,12 @@ async def create_run_command(
             command will be enqueued.
     """
     try:
-        command = protocol_engine.add_command(
-            request_body.data, is_setup=isSetupCommand
-        )
+        # TODO(mc, 2022-05-26): increment the HTTP API version so that default
+        # behavior is to pass through `command_source` without overriding it
+        command_source = request_body.data.source or pe_commands.CommandSource.SETUP
+        command_create = request_body.data.copy(update={"source": command_source})
+        command = protocol_engine.add_command(command_create)
+
     except pe_errors.SetupCommandNotAllowedError as e:
         raise CommandNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 

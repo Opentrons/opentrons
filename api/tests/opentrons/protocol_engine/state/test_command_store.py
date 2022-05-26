@@ -21,7 +21,6 @@ from opentrons.protocol_engine.state.commands import (
 
 from opentrons.protocol_engine.actions import (
     QueueCommandAction,
-    QueueSetupCommandAction,
     UpdateCommandAction,
     FailCommandAction,
     PlayAction,
@@ -47,7 +46,7 @@ def test_initial_state() -> None:
     subject = CommandStore()
 
     assert subject.state == CommandState(
-        queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+        queue_status=QueueStatus.SETUP,
         is_hardware_stopped=False,
         is_door_blocking=False,
         run_result=None,
@@ -226,15 +225,21 @@ def test_command_queue_and_unqueue() -> None:
 
 
 def test_setup_command_queue_and_unqueue() -> None:
-    """It should queue on QueueSetupCommandAction and dequeue on UpdateCommandAction."""
-    queue_1 = QueueSetupCommandAction(
-        request=commands.PauseCreate(params=commands.PauseParams()),
+    """It should queue and dequeue on setup commands."""
+    queue_1 = QueueCommandAction(
+        request=commands.PauseCreate(
+            params=commands.PauseParams(),
+            source=commands.CommandSource.SETUP,
+        ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
         command_key="command-key-1",
     )
-    queue_2 = QueueSetupCommandAction(
-        request=commands.PauseCreate(params=commands.PauseParams()),
+    queue_2 = QueueCommandAction(
+        request=commands.PauseCreate(
+            params=commands.PauseParams(),
+            source=commands.CommandSource.SETUP,
+        ),
         created_at=datetime(year=2022, month=2, day=2),
         command_id="command-id-2",
         command_key="command-key-2",
@@ -265,8 +270,11 @@ def test_setup_command_queue_and_unqueue() -> None:
 
 def test_setup_queue_action_updates_command_source() -> None:
     """It should update command source correctly."""
-    queue_cmd = QueueSetupCommandAction(
-        request=commands.PauseCreate(params=commands.PauseParams()),
+    queue_cmd = QueueCommandAction(
+        request=commands.PauseCreate(
+            params=commands.PauseParams(),
+            source=commands.CommandSource.SETUP,
+        ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
         command_key="command-key-1",
@@ -427,14 +435,20 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         command_id="command-id-1",
         command_key="command-key-1",
     )
-    queue_action_2_setup = QueueSetupCommandAction(
-        request=commands.PauseCreate(params=commands.PauseParams()),
+    queue_action_2_setup = QueueCommandAction(
+        request=commands.PauseCreate(
+            params=commands.PauseParams(),
+            source=commands.CommandSource.SETUP,
+        ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-2",
         command_key="command-key-2",
     )
-    queue_action_3_setup = QueueSetupCommandAction(
-        request=commands.PauseCreate(params=commands.PauseParams()),
+    queue_action_3_setup = QueueCommandAction(
+        request=commands.PauseCreate(
+            params=commands.PauseParams(),
+            source=commands.CommandSource.SETUP,
+        ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-3",
         command_key="command-key-3",
@@ -544,7 +558,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
     subject.handle_action(PauseAction(source=pause_source))
 
     assert subject.state == CommandState(
-        queue_status=QueueStatus.INACTIVE,
+        queue_status=QueueStatus.PAUSED,
         run_result=None,
         is_hardware_stopped=False,
         is_door_blocking=False,
@@ -565,7 +579,7 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
     subject.handle_action(PlayAction())
 
     assert subject.state == CommandState(
-        queue_status=QueueStatus.ACTIVE,
+        queue_status=QueueStatus.RUNNING,
         run_result=None,
         is_hardware_stopped=False,
         is_door_blocking=False,
@@ -589,8 +603,11 @@ def test_play_action_clears_setup_command_queue(pause_source: PauseSource) -> No
         status=commands.CommandStatus.QUEUED,
         source=commands.CommandSource.SETUP,
     )
-    queue_cmd = QueueSetupCommandAction(
-        request=commands.PauseCreate(params=commands.PauseParams()),
+    queue_cmd = QueueCommandAction(
+        request=commands.PauseCreate(
+            params=commands.PauseParams(),
+            source=commands.CommandSource.SETUP,
+        ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
         command_key="command-key-1",
@@ -604,7 +621,7 @@ def test_play_action_clears_setup_command_queue(pause_source: PauseSource) -> No
     subject.handle_action(PlayAction())
 
     assert subject.state == CommandState(
-        queue_status=QueueStatus.ACTIVE,
+        queue_status=QueueStatus.RUNNING,
         run_result=None,
         is_hardware_stopped=False,
         is_door_blocking=False,
@@ -624,7 +641,7 @@ def test_command_store_handles_play_according_to_door_state() -> None:
     subject = CommandStore(is_door_blocking=True)
     subject.handle_action(PlayAction())
     assert subject.state == CommandState(
-        queue_status=QueueStatus.INACTIVE,
+        queue_status=QueueStatus.PAUSED,
         run_result=None,
         is_hardware_stopped=False,
         is_door_blocking=True,
@@ -641,7 +658,7 @@ def test_command_store_handles_play_according_to_door_state() -> None:
     subject.handle_action(PlayAction())
 
     assert subject.state == CommandState(
-        queue_status=QueueStatus.ACTIVE,
+        queue_status=QueueStatus.RUNNING,
         run_result=None,
         is_hardware_stopped=False,
         is_door_blocking=False,
@@ -662,7 +679,7 @@ def test_command_store_handles_finish_action() -> None:
     subject.handle_action(FinishAction())
 
     assert subject.state == CommandState(
-        queue_status=QueueStatus.INACTIVE,
+        queue_status=QueueStatus.PAUSED,
         run_result=RunResult.SUCCEEDED,
         is_hardware_stopped=False,
         is_door_blocking=False,
@@ -693,7 +710,7 @@ def test_command_store_handles_stop_action() -> None:
     subject.handle_action(StopAction())
 
     assert subject.state == CommandState(
-        queue_status=QueueStatus.INACTIVE,
+        queue_status=QueueStatus.PAUSED,
         run_result=RunResult.STOPPED,
         is_hardware_stopped=False,
         is_door_blocking=False,
@@ -713,7 +730,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
     subject.handle_action(PlayAction())
 
     assert subject.state == CommandState(
-        queue_status=QueueStatus.INACTIVE,
+        queue_status=QueueStatus.PAUSED,
         run_result=RunResult.SUCCEEDED,
         is_hardware_stopped=False,
         is_door_blocking=False,
@@ -738,7 +755,7 @@ def test_command_store_ignores_known_finish_error() -> None:
     subject.handle_action(FinishAction(error_details=error_details))
 
     assert subject.state == CommandState(
-        queue_status=QueueStatus.INACTIVE,
+        queue_status=QueueStatus.PAUSED,
         run_result=RunResult.FAILED,
         is_hardware_stopped=False,
         is_door_blocking=False,
@@ -763,7 +780,7 @@ def test_command_store_saves_unknown_finish_error() -> None:
     subject.handle_action(FinishAction(error_details=error_details))
 
     assert subject.state == CommandState(
-        queue_status=QueueStatus.INACTIVE,
+        queue_status=QueueStatus.PAUSED,
         run_result=RunResult.FAILED,
         is_hardware_stopped=False,
         is_door_blocking=False,
@@ -792,7 +809,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
     subject.handle_action(StopAction())
 
     assert subject.state == CommandState(
-        queue_status=QueueStatus.INACTIVE,
+        queue_status=QueueStatus.PAUSED,
         run_result=RunResult.SUCCEEDED,
         is_hardware_stopped=False,
         is_door_blocking=False,
@@ -814,7 +831,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
     subject.handle_action(FinishAction())
 
     assert subject.state == CommandState(
-        queue_status=QueueStatus.INACTIVE,
+        queue_status=QueueStatus.PAUSED,
         run_result=RunResult.STOPPED,
         is_hardware_stopped=False,
         is_door_blocking=False,
@@ -856,7 +873,7 @@ def test_command_store_handles_command_failed() -> None:
     )
 
     assert subject.state == CommandState(
-        queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+        queue_status=QueueStatus.SETUP,
         run_result=None,
         is_hardware_stopped=False,
         is_door_blocking=False,
@@ -877,7 +894,7 @@ def test_handles_hardware_stopped() -> None:
     subject.handle_action(HardwareStoppedAction())
 
     assert subject.state == CommandState(
-        queue_status=QueueStatus.INACTIVE,
+        queue_status=QueueStatus.PAUSED,
         run_result=RunResult.STOPPED,
         is_hardware_stopped=True,
         is_door_blocking=False,
@@ -901,7 +918,7 @@ def test_handles_door_open_and_close_event() -> None:
 
     # Pause queue and update state
     assert subject.state == CommandState(
-        queue_status=QueueStatus.INACTIVE,
+        queue_status=QueueStatus.PAUSED,
         run_result=None,
         is_hardware_stopped=False,
         is_door_blocking=True,
@@ -917,7 +934,7 @@ def test_handles_door_open_and_close_event() -> None:
 
     # Don't unpause but update state
     assert subject.state == CommandState(
-        queue_status=QueueStatus.INACTIVE,
+        queue_status=QueueStatus.PAUSED,
         run_result=None,
         is_hardware_stopped=False,
         is_door_blocking=False,
@@ -939,7 +956,7 @@ def test_handles_door_event_during_idle_run() -> None:
     subject.handle_action(HardwareEventAction(event=door_open_event))
 
     assert subject.state == CommandState(
-        queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+        queue_status=QueueStatus.SETUP,
         run_result=None,
         is_hardware_stopped=False,
         is_door_blocking=True,
@@ -954,7 +971,7 @@ def test_handles_door_event_during_idle_run() -> None:
     subject.handle_action(HardwareEventAction(event=door_close_event))
 
     assert subject.state == CommandState(
-        queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+        queue_status=QueueStatus.SETUP,
         run_result=None,
         is_hardware_stopped=False,
         is_door_blocking=False,

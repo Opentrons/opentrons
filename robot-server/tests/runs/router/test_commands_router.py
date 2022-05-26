@@ -119,13 +119,17 @@ async def test_create_run_command(
         return command_once_added
 
     decoy.when(
-        mock_protocol_engine.add_command(command_request, is_setup=False)
+        mock_protocol_engine.add_command(
+            pe_commands.PauseCreate(
+                params=pe_commands.PauseParams(message="Hello"),
+                source=pe_commands.CommandSource.SETUP,
+            )
+        )
     ).then_do(_stub_queued_command_state)
 
     result = await create_run_command(
         request_body=RequestModel(data=command_request),
         waitUntilComplete=False,
-        isSetupCommand=False,
         protocol_engine=mock_protocol_engine,
     )
 
@@ -140,7 +144,8 @@ async def test_create_run_command_blocking_completion(
 ) -> None:
     """It should be able to create a command and wait for it to execute."""
     command_request = pe_commands.PauseCreate(
-        params=pe_commands.PauseParams(message="Hello")
+        params=pe_commands.PauseParams(message="Hello"),
+        source=pe_commands.CommandSource.PROTOCOL,
     )
 
     command_once_added = pe_commands.Pause(
@@ -172,9 +177,9 @@ async def test_create_run_command_blocking_completion(
             mock_protocol_engine.state_view.commands.get("command-id")
         ).then_return(command_once_completed)
 
-    decoy.when(
-        mock_protocol_engine.add_command(command_request, is_setup=True)
-    ).then_do(_stub_queued_command_state)
+    decoy.when(mock_protocol_engine.add_command(command_request)).then_do(
+        _stub_queued_command_state
+    )
 
     decoy.when(await mock_protocol_engine.wait_for_command("command-id")).then_do(
         _stub_completed_command_state
@@ -184,7 +189,6 @@ async def test_create_run_command_blocking_completion(
         request_body=RequestModel(data=command_request),
         waitUntilComplete=True,
         timeout=999,
-        isSetupCommand=True,
         protocol_engine=mock_protocol_engine,
     )
 
@@ -198,18 +202,18 @@ async def test_add_conflicting_setup_command(
 ) -> None:
     """It should raise an error if the setup command cannot be added."""
     command_request = pe_commands.PauseCreate(
-        params=pe_commands.PauseParams(message="Hello")
+        params=pe_commands.PauseParams(message="Hello"),
+        source=pe_commands.CommandSource.SETUP,
     )
 
-    decoy.when(
-        mock_protocol_engine.add_command(command_request, is_setup=True)
-    ).then_raise(pe_errors.SetupCommandNotAllowedError("oh no"))
+    decoy.when(mock_protocol_engine.add_command(command_request)).then_raise(
+        pe_errors.SetupCommandNotAllowedError("oh no")
+    )
 
     with pytest.raises(ApiError) as exc_info:
         await create_run_command(
             request_body=RequestModel(data=command_request),
             waitUntilComplete=False,
-            isSetupCommand=True,
             protocol_engine=mock_protocol_engine,
         )
 

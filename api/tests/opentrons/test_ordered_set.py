@@ -86,14 +86,14 @@ def test_remove() -> None:
     assert list(subject) == [1, 3, 4, 5]
 
 
-def test_remove_if_found() -> None:
+def test_discard() -> None:
     """It should remove the element from the set, or noop if it's not present."""
     subject = OrderedSet([1, 2, 3, 4, 5])
 
-    subject.remove_if_found(2)
+    subject.discard(2)
     assert list(subject) == [1, 3, 4, 5]
 
-    subject.remove_if_found(2)  # Should just noop
+    subject.discard(2)  # Should just noop
     assert list(subject) == [1, 3, 4, 5]
 
 
