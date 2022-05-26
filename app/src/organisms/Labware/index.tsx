@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
+import { css } from 'styled-components'
+
 import {
   Box,
   Flex,
@@ -17,6 +19,7 @@ import {
   Icon,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
+
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/buttons'
 import { Toast } from '../../atoms/Toast'
@@ -31,6 +34,7 @@ import {
   useLabwareFailure,
   useNewLabwareName,
 } from './hooks'
+
 import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
 import type { LabwareFilter, LabwareSort } from './types'
 
@@ -48,6 +52,13 @@ const FILTER_OPTIONS: DropdownOption[] = []
 labwareDisplayCategoryFilters.forEach(category =>
   FILTER_OPTIONS.push({ name: startCase(category), value: category })
 )
+
+const LINK_STYLES = css`
+  opacity: 70%;
+  &:hover {
+    opacity: 100%;
+  }
+`
 
 export function Labware(): JSX.Element {
   const { t } = useTranslation('labware_landing')
@@ -207,19 +218,22 @@ export function Labware(): JSX.Element {
           >
             {t('create_new_def')}
           </StyledText>
-          <StyledText
-            css={TYPOGRAPHY.h6SemiBold}
-            color={COLORS.darkGreyEnabled}
+
+          <Link
+            external
+            href={LABWARE_CREATOR_HREF}
+            color={COLORS.darkBlack}
+            css={LINK_STYLES}
+            fontSize={TYPOGRAPHY.fontSizeLabel}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
-            <Link
-              href={LABWARE_CREATOR_HREF}
-              color={COLORS.darkGreyEnabled}
-              external
-            >
-              {t('open_labware_creator')}{' '}
-              <Icon name="open-in-new" height="10px"></Icon>
-            </Link>
-          </StyledText>
+            {t('open_labware_creator')}
+            <Icon
+              name="open-in-new"
+              size="0.5rem"
+              marginLeft={SPACING.spacing2}
+            />
+          </Link>
         </Flex>
       </Box>
       {showAddLabwareSlideout && (
