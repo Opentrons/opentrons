@@ -26,11 +26,11 @@ As a programmer, you can leverage the full power of Python for advanced automati
 Getting Started
 ---------------
 
-**New to Python protocols?** Check out the :ref:`writing` page first to get a sense of the typical structure of a protocol. 
+**New to Python protocols?** Check out the :ref:`tutorial` to learn about the different parts of a protocol file and build a working protocol from scratch. 
 
 If you want to **dive right into code**, take a look at our :ref:`new-examples` page and the comprehensive :ref:`protocol-api-reference`.
 
-When you're ready to **try out a protocol**, you can :ref:`simulate it on your computer <simulate-block>` — regardless of whether you're connected to an OT-2 robot. To run your protocol on a robot, download and use our latest `desktop app <https://www.opentrons.com/ot-app>`_.
+When you're ready to **run a protocol**, you can :ref:`simulate it on your computer <simulate-block>` — regardless of whether you're connected to an OT-2 robot. To run your protocol on a robot, download and use our latest `desktop app <https://www.opentrons.com/ot-app>`_.
 
 
 .. _overview-section-v2:
