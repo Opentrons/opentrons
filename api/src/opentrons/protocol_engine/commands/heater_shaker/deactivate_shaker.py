@@ -51,7 +51,7 @@ class DeactivateShakerImpl(
         )
 
         if hs_hardware_module is not None:
-            await hs_hardware_module.set_speed(rpm=0)
+            await hs_hardware_module.deactivate_shaker()
 
         return DeactivateShakerResult()
 

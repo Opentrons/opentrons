@@ -15,7 +15,7 @@ SetAndWaitForShakeSpeedCommandType = Literal["heaterShaker/setAndWaitForShakeSpe
 
 
 class SetAndWaitForShakeSpeedParams(BaseModel):
-    """Input parameters to start and wait for a shake speed for a Heater-Shaker Module."""
+    """Input parameters to set and wait for a shake speed for a Heater-Shaker Module."""
 
     moduleId: str = Field(..., description="Unique ID of the Heater-Shaker Module.")
     # TODO(mc, 2022-02-24): for set temperature we use `temperature` (not `celsius`)
@@ -24,7 +24,7 @@ class SetAndWaitForShakeSpeedParams(BaseModel):
 
 
 class SetAndWaitForShakeSpeedResult(BaseModel):
-    """Result data from setting and wait for a Heater-Shaker's shake speed."""
+    """Result data from setting and waiting for a Heater-Shaker's shake speed."""
 
 
 class SetAndWaitForShakeSpeedImpl(

@@ -43,7 +43,7 @@ async def test_deactivate_shaker(
     ).then_return(hs_hardware)
 
     result = await subject.execute(data)
-    decoy.verify(await hs_hardware.set_speed(rpm=0), times=1)
+    decoy.verify(await hs_hardware.deactivate_shaker(), times=1)
     assert result == heater_shaker.DeactivateShakerResult()
 
 

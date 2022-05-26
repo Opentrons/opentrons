@@ -10,7 +10,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
-from opentrons.protocol_engine.commands.heater_shaker.set_and_wait_for_shake_speed import (
+from opentrons.protocol_engine.commands.heater_shaker.set_and_wait_for_shake_speed import (  # noqa: E501
     SetAndWaitForShakeSpeedImpl,
 )
 
