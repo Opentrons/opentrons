@@ -32,6 +32,7 @@ from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
     MoveGroupSingleGripperStep,
+    MoveGroupTipActionStep,
     MoveType,
     SingleMoveStep,
 )
@@ -39,6 +40,9 @@ from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
     UInt32Field,
     Int32Field,
+)
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    PipetteTipActionTypeField,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
@@ -150,6 +154,8 @@ class MoveGroupRunner:
         """Return the correct payload type."""
         if isinstance(step, MoveGroupSingleAxisStep):
             return self._get_stepper_motor_message(step, group, seq)
+        elif isinstance(step, MoveGroupTipActionStep):
+            return self._get_tip_action_motor_message(step, group, seq)
         else:
             return self._get_brushed_motor_message(step, group, seq)
 
@@ -189,16 +195,6 @@ class MoveGroupRunner:
                 ),
             )
             return HomeRequest(payload=home_payload)
-        elif step.move_type == MoveType.tip_action:
-            tip_action_payload = TipActionRequestPayload(
-                group_id=UInt8Field(group),
-                seq_id=UInt8Field(seq),
-                duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
-                velocity=self._convert_velocity(
-                    step.velocity_mm_sec, interrupts_per_sec
-                ),
-            )
-            return TipActionRequest(payload=tip_action_payload)
         else:
             linear_payload = AddLinearMoveRequestPayload(
                 request_stop_condition=UInt8Field(step.stop_condition),
@@ -220,6 +216,18 @@ class MoveGroupRunner:
                 ),
             )
             return AddLinearMoveRequest(payload=linear_payload)
+
+    def _get_tip_action_motor_message(
+        self, step: MoveGroupTipActionStep, group: int, seq: int
+    ) -> TipActionRequest:
+        tip_action_payload = TipActionRequestPayload(
+            group_id=UInt8Field(group),
+            seq_id=UInt8Field(seq),
+            duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
+            velocity=self._convert_velocity(step.velocity_mm_sec, interrupts_per_sec),
+            action=PipetteTipActionTypeField(step.action),
+        )
+        return TipActionRequest(payload=tip_action_payload)
 
     async def _move(self, can_messenger: CanMessenger) -> _Completions:
         """Run all the move groups."""

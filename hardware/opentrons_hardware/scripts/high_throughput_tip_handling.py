@@ -1,5 +1,4 @@
 """A script for sending and receiving data from sensors on the OT3."""
-import os
 import logging
 import asyncio
 import argparse
@@ -13,12 +12,11 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     EnableMotorRequest,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteTipActionType
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 from opentrons_hardware.hardware_control.motion import (
-    MoveGroupSingleAxisStep,
-    MoveType,
-    MoveGroups,
+    MoveGroupTipActionStep,
+    MoveStopCondition,
 )
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 
@@ -65,20 +63,11 @@ def output_details(i: int, total_i: int) -> None:
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    os.system("cls")
-    os.system("clear")
-
     print("Test tip pick up for the 96 channel\n")
     reps = prompt_int_input("Number of repetitions for pick up and drop tip")
     delay = prompt_int_input("Delay in seconds between pick up and drop tip")
-    pipette_type = input("Please list pipette mount (right or left)")
-
-    if pipette_type == "right":
-        pipette_node = NodeId.pipette_right
-    elif pipette_type == "left":
-        pipette_node = NodeId.pipette_left
-    else:
-        raise ValueError("Unsupported pipette type")
+    # 96 channel can only be mounted to the right
+    pipette_node = NodeId.pipette_right
 
     driver = await build_driver(build_settings(args))
 
@@ -87,22 +76,35 @@ async def run(args: argparse.Namespace) -> None:
     await messenger.send(node_id=pipette_node, message=SetupRequest())
     await messenger.send(node_id=pipette_node, message=EnableMotorRequest())
 
-    move_groups: MoveGroups = []
-    move_groups.append(
-        [
-            {
-                pipette_node: MoveGroupSingleAxisStep(
-                    distance_mm=float64(0),
-                    velocity_mm_sec=float64(20.5),
-                    duration_sec=float64(3),
-                    move_type=MoveType.tip_action,
-                )
-            }
+    pick_up_tip_runner = MoveGroupRunner(
+        move_groups=[
+            [
+                {
+                    pipette_node: MoveGroupTipActionStep(
+                        distance_mm=float64(0),
+                        velocity_mm_sec=float64(20.5),
+                        duration_sec=float64(3),
+                        action=PipetteTipActionType.pick_up,
+                    )
+                }
+            ]
         ]
     )
-
-    pick_up_tip_runner = MoveGroupRunner(move_groups=move_groups)
-    drop_tip_runner = MoveGroupRunner(move_groups=move_groups)
+    drop_tip_runner = MoveGroupRunner(
+        move_groups=[
+            [
+                {
+                    pipette_node: MoveGroupTipActionStep(
+                        distance_mm=float64(0),
+                        velocity_mm_sec=float64(-20.5),
+                        duration_sec=float64(3),
+                        stop_condition=MoveStopCondition.limit_switch,
+                        action=PipetteTipActionType.drop,
+                    )
+                }
+            ]
+        ]
+    )
     try:
         for i in range(reps):
             output_details(i, reps)
