@@ -42,7 +42,7 @@ const NavbarLink = styled(NavLink)`
   }
 
   &.active {
-    background-color: ${COLORS.darkGreyHover};
+    background-color: ${COLORS.darkBlackSelected};
   }
   &.active:has(svg) {
     background-color: ${COLORS.darkBlack};
