@@ -40,9 +40,10 @@ export function ConfigurePipette(props: Props): JSX.Element {
   const pipette = useSelector(
     (state: State) => getAttachedPipettes(state, robotName)[mount]
   )
-  const settings = useSelector(
-    (state: State) => getAttachedPipetteSettings(state, robotName)[mount]
-  )
+  const settings = usePipetteSettingsQuery()
+  // //useSelector(
+  //   (state: State) => getAttachedPipetteSettings(state, robotName)[mount]
+  // )
 
   const updateSettings = (fields: PipetteSettingsFieldsUpdate): void => {
     if (pipette) {
