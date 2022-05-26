@@ -52,7 +52,8 @@ from .types import NodeDict
 
 log = logging.getLogger(__name__)
 
-_CompletionPacket = Tuple[ArbitrationId, MoveCompleted]
+_AcceptableMoves = Union[MoveCompleted, TipActionResponse]
+_CompletionPacket = Tuple[ArbitrationId, _AcceptableMoves]
 _Completions = List[_CompletionPacket]
 
 
@@ -264,48 +265,62 @@ class MoveScheduler:
         self._completion_queue: asyncio.Queue[_CompletionPacket] = asyncio.Queue()
         self._event = asyncio.Event()
 
+    def _remove_move_group(
+        self, message: _AcceptableMoves, arbitration_id: ArbitrationId
+    ) -> None:
+        seq_id = message.payload.seq_id.value
+        group_id = message.payload.group_id.value
+        node_id = arbitration_id.parts.originating_node_id
+        log.info(
+            f"Received completion for {node_id} group {group_id} seq {seq_id}"
+            ", which "
+            f"{'is' if (node_id, seq_id) in self._moves[group_id] else 'isn''t'}"
+            " in group"
+        )
+        self._moves[group_id].remove((node_id, seq_id))
+        self._completion_queue.put_nowait((arbitration_id, message))
+        if not self._moves[group_id]:
+            log.info(f"Move group {group_id} has completed.")
+            self._event.set()
+
+    def _handle_move_completed(self, message: MoveCompleted) -> None:
+        group_id = message.payload.group_id.value
+        ack_id = message.payload.ack_id.value
+        if self._stop_condition[
+            group_id
+        ] == MoveStopCondition.limit_switch and ack_id != UInt8Field(2):
+            if ack_id == UInt8Field(1):
+                condition = "Homing timed out."
+                log.warning(f"Homing failed. Condition: {condition}")
+                raise MoveConditionNotMet()
+
+    def _handle_tip_action(self, message: TipActionResponse) -> None:
+        group_id = message.payload.group_id.value
+        ack_id = message.payload.ack_id.value
+        limit_switch = bool(
+            self._stop_condition[group_id] == MoveStopCondition.limit_switch
+        )
+        success = message.payload.success.value
+        # TODO need to add tip action type to the response message.
+        if limit_switch and limit_switch != ack_id and not success:
+            condition = "Tip still detected."
+            log.warning(f"Drop tip failed. Condition {condition}")
+            raise MoveConditionNotMet()
+        elif not limit_switch and not success:
+            condition = "Tip not detected."
+            log.warning(f"Pick up tip failed. Condition {condition}")
+            raise MoveConditionNotMet()
+
     def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId
     ) -> None:
         """Incoming message handler."""
         if isinstance(message, MoveCompleted):
-            seq_id = message.payload.seq_id.value
-            group_id = message.payload.group_id.value
-            ack_id = message.payload.ack_id.value
-            node_id = arbitration_id.parts.originating_node_id
-            log.debug(
-                f"Received completion for {node_id} group {group_id} seq {seq_id}"
-                ", which "
-                f"{'is' if (node_id, seq_id) in self._moves[group_id] else 'isn''t'}"
-                " in group"
-            )
-            self._moves[group_id].remove((node_id, seq_id))
-            self._completion_queue.put_nowait((arbitration_id, message))
-            if not self._moves[group_id]:
-                log.info(f"Move group {group_id} has completed.")
-                self._event.set()
-            if self._stop_condition[
-                group_id
-            ] == MoveStopCondition.limit_switch and ack_id != UInt8Field(2):
-                if ack_id == UInt8Field(1):
-                    condition = "Homing timed out."
-                    log.warning(f"Homing failed. Condition: {condition}")
-                    raise MoveConditionNotMet()
+            self._remove_move_group(message, arbitration_id)
+            self._handle_move_completed(message)
         elif isinstance(message, TipActionResponse):
-            seq_id = message.payload.seq_id.value
-            group_id = message.payload.group_id.value
-            ack_id = message.payload.ack_id.value
-            limit_switch = bool(UInt8Field(2) == ack_id)
-            success = message.payload.success.value
-            # TODO need to add tip action type to the response message.
-            if limit_switch and not success:
-                condition = "Tip still detected."
-                log.warning(f"Drop tip failed. Condition {condition}")
-                raise MoveConditionNotMet()
-            elif not limit_switch and not success:
-                condition = "Tip not detected."
-                log.warning(f"Pick up tip failed. Condition {condition}")
-                raise MoveConditionNotMet()
+            self._remove_move_group(message, arbitration_id)
+            self._handle_tip_action(message)
 
     async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""
