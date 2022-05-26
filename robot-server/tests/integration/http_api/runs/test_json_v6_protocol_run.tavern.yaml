@@ -55,7 +55,7 @@ stages:
         links: {}
         meta:
           cursor: 0
-          totalLength: 14
+          totalLength: 13
         data:
           - id: !anystr
             key: !anystr
@@ -138,12 +138,6 @@ stages:
               version: 1
               labwareId: fixedTrash
               displayName: Trash
-          - id: !anystr
-            key: !anystr
-            commandType: home
-            createdAt: !anystr
-            status: queued
-            params: {}
           - id: !anystr
             key: !anystr
             commandType: pickUpTip
@@ -277,7 +271,7 @@ stages:
           current: !anydict
         meta:
           cursor: 0
-          totalLength: 14
+          totalLength: 13
         data:
           - id: !anystr
             key: !anystr
@@ -374,14 +368,6 @@ stages:
               version: 1
               labwareId: fixedTrash
               displayName: Trash
-          - id: !anystr
-            key: !anystr
-            commandType: home
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
-            status: succeeded
-            params: {}
           - id: !anystr
             key: !anystr
             commandType: pickUpTip

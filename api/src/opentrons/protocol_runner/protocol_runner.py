@@ -80,9 +80,7 @@ class ProtocolRunner:
                 labware_view=protocol_engine.state_view.labware,
             ),
         )
-        self._legacy_executor = legacy_executor or LegacyExecutor(
-            hardware_api=hardware_api
-        )
+        self._legacy_executor = legacy_executor or LegacyExecutor()
         self._was_started = False
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
@@ -151,6 +149,7 @@ class ProtocolRunner:
         if protocol_source:
             self.load(protocol_source)
 
+        await self._hardware_api.home()
         self.play()
         self._task_queue.start()
         await self._task_queue.join()

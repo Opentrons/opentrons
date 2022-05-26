@@ -104,8 +104,6 @@ class ProtocolEngine:
 
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
-        # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
-        # homed if necessary
         action = PlayAction()
         self._state_store.commands.raise_if_paused_by_blocking_door()
         self._state_store.commands.raise_if_stop_requested()

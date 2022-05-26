@@ -245,13 +245,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 other_command_ids_to_fail = [
                     *[i for i in self._state.queued_setup_command_ids],
                 ]
+                self._state.queued_setup_command_ids.clear()
             else:
                 other_command_ids_to_fail = [
                     *[i for i in self._state.queued_command_ids],
                 ]
                 self._state.queued_command_ids.clear()
 
-            self._state.queued_setup_command_ids.clear()
             for command_id in other_command_ids_to_fail:
                 prev_entry = self._state.commands_by_id[command_id]
 
@@ -275,7 +275,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     self._state.queue_status = QueueStatus.PAUSED
                 else:
                     self._state.queue_status = QueueStatus.RUNNING
-                    self._state.queued_setup_command_ids.clear()
 
         elif isinstance(action, PauseAction):
             self._state.queue_status = QueueStatus.PAUSED

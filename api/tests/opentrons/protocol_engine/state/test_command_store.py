@@ -573,7 +573,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
 
 @pytest.mark.parametrize("pause_source", PauseSource)
 def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
-    """It should set the running flag on play and clear the setup command queue."""
+    """It should set the running flag on play."""
     subject = CommandStore()
     subject.handle_action(PauseAction(source=pause_source))
     subject.handle_action(PlayAction())
@@ -588,50 +588,6 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
-        errors_by_id={},
-    )
-
-
-@pytest.mark.parametrize("pause_source", PauseSource)
-def test_play_action_clears_setup_command_queue(pause_source: PauseSource) -> None:
-    """Test that a play/resume clears the setup command queue."""
-    pause_cmd = commands.Pause(
-        id="command-id-1",
-        key="command-key-1",
-        createdAt=datetime(year=2021, month=1, day=1),
-        params=commands.PauseParams(),
-        status=commands.CommandStatus.QUEUED,
-        source=commands.CommandSource.SETUP,
-    )
-    queue_cmd = QueueCommandAction(
-        request=commands.PauseCreate(
-            params=commands.PauseParams(),
-            source=commands.CommandSource.SETUP,
-        ),
-        created_at=datetime(year=2021, month=1, day=1),
-        command_id="command-id-1",
-        command_key="command-key-1",
-    )
-
-    subject = CommandStore()
-    subject.handle_action(queue_cmd)
-    subject.handle_action(PauseAction(source=pause_source))
-    assert subject.state.queued_setup_command_ids == OrderedSet(["command-id-1"])
-
-    subject.handle_action(PlayAction())
-
-    assert subject.state == CommandState(
-        queue_status=QueueStatus.RUNNING,
-        run_result=None,
-        is_hardware_stopped=False,
-        is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=["command-id-1"],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id={
-            "command-id-1": CommandEntry(index=0, command=pause_cmd),
-        },
         errors_by_id={},
     )
 

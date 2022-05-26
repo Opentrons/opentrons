@@ -190,6 +190,7 @@ async def test_stop_never_started(
 
 async def test_run(
     decoy: Decoy,
+    hardware_api: HardwareAPI,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
     subject: ProtocolRunner,
@@ -200,6 +201,7 @@ async def test_run(
     assert subject.was_started() is True
 
     decoy.verify(
+        await hardware_api.home(),
         protocol_engine.play(),
         task_queue.start(),
         await task_queue.join(),

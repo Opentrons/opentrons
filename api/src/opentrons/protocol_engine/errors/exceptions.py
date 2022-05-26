@@ -90,7 +90,7 @@ class MustHomeError(ProtocolEngineError):
 
 
 class SetupCommandNotAllowedError(ProtocolEngineError):
-    """An error raised when adding a setup command to a non-idle/ non-paused engine."""
+    """An error raised when adding a setup command to a non-idle/non-paused engine."""
 
 
 class ProtocolEngineStoppedError(ProtocolEngineError):
