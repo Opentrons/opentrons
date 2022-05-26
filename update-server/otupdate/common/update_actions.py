@@ -3,9 +3,11 @@ otupdate.common.update_actions: abc and resources for system-specific
 update actions
 """
 
+from __future__ import annotations
+
 import abc
 import contextlib
-from typing import Callable, Iterator, NamedTuple, Optional, cast
+from typing import Callable, Generator, NamedTuple, Optional, cast
 from aiohttp import web
 
 from .constants import APP_VARIABLE_PREFIX
@@ -27,10 +29,10 @@ class Partition(NamedTuple):
 
 class UpdateActionsInterface:
     @staticmethod
-    def from_request(request: web.Request) -> Optional["UpdateActionsInterface"]:
+    def from_request(request: web.Request) -> Optional[UpdateActionsInterface]:
         """Get the update object from the aiohttp app store"""
         try:
-            return cast("UpdateActionsInterface", request.app[FILE_ACTIONS_VARNAME])
+            return cast(UpdateActionsInterface, request.app[FILE_ACTIONS_VARNAME])
         except KeyError:
             return None
 
@@ -77,7 +79,7 @@ class UpdateActionsInterface:
 
     @abc.abstractmethod
     @contextlib.contextmanager
-    def mount_update(self) -> Iterator[str]:
+    def mount_update(self) -> Generator[str, None, None]:
         """
         Mount the fs to overwrite with the update
         """
