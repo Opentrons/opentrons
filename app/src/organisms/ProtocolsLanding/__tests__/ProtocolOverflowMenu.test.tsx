@@ -76,7 +76,7 @@ describe('ProtocolOverflowMenu', () => {
     fireEvent.click(button)
     const deleteButton = getByText('Delete protocol')
     fireEvent.click(deleteButton)
-    getByText('Delete this protocol?')
+    getByText('Delete this protocol definition?')
     getByText(
       'This protocol will be moved to this computer’s trash and may be unrecoverable.'
     )
@@ -103,6 +103,8 @@ describe('ProtocolOverflowMenu', () => {
     fireEvent.click(deleteButton)
     const cancelButton = getByRole('button', { name: 'cancel' })
     fireEvent.click(cancelButton)
-    expect(queryByText('Delete this protocol?')).not.toBeInTheDocument()
+    expect(
+      queryByText('Delete this protocol definition?')
+    ).not.toBeInTheDocument()
   })
 })

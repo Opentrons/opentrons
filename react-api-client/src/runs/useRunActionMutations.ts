@@ -4,7 +4,6 @@ import {
   usePlayRunMutation,
   usePauseRunMutation,
   useStopRunMutation,
-  useDismissCurrentRunMutation,
 } from '..'
 
 interface UseRunActionMutations {
@@ -19,7 +18,6 @@ interface UseRunActionMutations {
 export function useRunActionMutations(runId: string): UseRunActionMutations {
   const host = useHost()
   const queryClient = useQueryClient()
-  const { dismissCurrentRun } = useDismissCurrentRunMutation()
 
   const onSuccess = (): void => {
     queryClient
@@ -37,11 +35,7 @@ export function useRunActionMutations(runId: string): UseRunActionMutations {
     onSuccess,
   })
 
-  const { stopRun, isLoading: isStopRunActionLoading } = useStopRunMutation({
-    onSuccess: (): void => {
-      dismissCurrentRun(runId, { onSuccess })
-    },
-  })
+  const { stopRun, isLoading: isStopRunActionLoading } = useStopRunMutation()
 
   return {
     playRun: () => playRun(runId),

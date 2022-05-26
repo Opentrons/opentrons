@@ -46,7 +46,12 @@ export function KeyParts(): JSX.Element {
         marginY={SPACING.spacing6}
         alignItems={ALIGN_FLEX_START}
       >
-        <img src={HeaterShakerKeyParts} alt="Heater Shaker Key Parts" />
+        <img
+          width="427px"
+          height="357px"
+          src={HeaterShakerKeyParts}
+          alt="Heater Shaker Key Parts"
+        />
 
         <Flex
           flexDirection={DIRECTION_COLUMN}

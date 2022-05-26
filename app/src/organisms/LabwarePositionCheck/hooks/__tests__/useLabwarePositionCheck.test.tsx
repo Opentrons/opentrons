@@ -83,7 +83,7 @@ describe('useLabwarePositionCheck', () => {
   let mockCreateLabwareDefinition: jest.Mock
   beforeEach(() => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockUseAttachedModules).calledWith(MOCK_ROBOT_NAME).mockReturnValue([])
+    when(mockUseAttachedModules).calledWith().mockReturnValue([])
     when(mockUseCurrentRunId).calledWith().mockReturnValue(MOCK_RUN_ID)
     when(mockUseProtocolDetailsForRun)
       .calledWith(MOCK_RUN_ID)

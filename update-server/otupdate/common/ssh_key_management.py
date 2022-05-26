@@ -7,15 +7,23 @@ import hashlib
 import ipaddress
 import logging
 import os
-from typing import List, Tuple
+from typing import (
+    Any,
+    Generator,
+    IO,
+    List,
+    Tuple,
+)
 
 from aiohttp import web
+
+from .handler_type import Handler
 
 
 LOG = logging.getLogger(__name__)
 
 
-def require_linklocal(handler):
+def require_linklocal(handler: Handler) -> Handler:
     """Ensure the decorated is only called if the request is linklocal.
 
     The host ip address should be in the X-Host-IP header (provided by nginx)
@@ -35,7 +43,9 @@ def require_linklocal(handler):
             ),
         }
         if not ipaddr_str:
-            return web.json_response(data=invalid_req_data, status=403)
+            return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
+                data=invalid_req_data, status=403
+            )
         try:
             addr = ipaddress.ip_address(ipaddr_str)
         except ValueError:
@@ -43,7 +53,9 @@ def require_linklocal(handler):
             raise
 
         if not addr.is_link_local:
-            return web.json_response(data=invalid_req_data, status=403)
+            return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
+                data=invalid_req_data, status=403
+            )
 
         return await handler(request)
 
@@ -51,7 +63,7 @@ def require_linklocal(handler):
 
 
 @contextlib.contextmanager
-def authorized_keys(mode="r"):
+def authorized_keys(mode: str = "r") -> Generator[IO[Any], None, None]:
     """Open the authorized_keys file. Separate function for mocking.
 
     :param mode: As :py:meth:`open`
@@ -74,7 +86,7 @@ def get_keys() -> List[Tuple[str, str]]:
         ]
 
 
-def remove_by_hash(hashval: str):
+def remove_by_hash(hashval: str) -> None:
     """Remove the key whose md5 sum matches hashval.
 
     :raises: KeyError if the hashval wasn't found
@@ -106,7 +118,7 @@ async def list_keys(request: web.Request) -> web.Response:
 
     (or 403 if not from the link-local connection)
     """
-    return web.json_response(
+    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
         {
             "public_keys": [
                 {"key_md5": details[0], "key": details[1]} for details in get_keys()
@@ -127,7 +139,9 @@ async def add(request: web.Request) -> web.Response:
     """
 
     def key_error(error: str, message: str) -> web.Response:
-        return web.json_response(data={"error": error, "message": message}, status=400)
+        return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
+            data={"error": error, "message": message}, status=400
+        )
 
     body = await request.json()
 
@@ -162,7 +176,7 @@ async def add(request: web.Request) -> web.Response:
         with authorized_keys("a") as ak:
             ak.write(f"{pubkey}\n")
 
-    return web.json_response(
+    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
         data={"message": f"Added key {hashval}", "key_md5": hashval}, status=201
     )
 
@@ -179,7 +193,7 @@ async def clear(request: web.Request) -> web.Response:
     with authorized_keys("w") as ak:
         ak.write("\n".join([]) + "\n")
 
-    return web.json_response(
+    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
         data={
             "message": "Keys cleared. " "Restart robot to take effect",
             "restart_url": "/server/restart",
@@ -206,7 +220,7 @@ async def remove(request: web.Request) -> web.Response:
             new_keys.append(key)
 
     if not found:
-        return web.json_response(
+        return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
             data={
                 "error": "invalid-key-hash",
                 "message": f"No such key md5 {requested_hash}",
@@ -217,7 +231,7 @@ async def remove(request: web.Request) -> web.Response:
     with authorized_keys("w") as ak:
         ak.write("\n".join(new_keys) + "\n")
 
-    return web.json_response(
+    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
         data={
             "message": f"Key {requested_hash} deleted. " "Restart robot to take effect",
             "restart_url": "/server/restart",

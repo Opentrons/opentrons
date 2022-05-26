@@ -150,9 +150,7 @@ export function RobotSettingsCalibration({
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
   const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
-  const attachedPipettes = useAttachedPipettes(
-    robot?.name != null ? robot.name : null
-  )
+  const attachedPipettes = useAttachedPipettes()
 
   const isRunning = useSelector(robotSelectors.getIsRunning)
 
@@ -416,6 +414,42 @@ export function RobotSettingsCalibration({
         </Flex>
       </Box>
       <Line />
+      {deckCalibrationButtonText === t('deck_calibration_calibrate_button') && (
+        <Banner type="error">
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+            <StyledText as="p">{t('deck_calibration_missing')}</StyledText>
+            <Link
+              role="button"
+              color={COLORS.darkBlack}
+              css={TYPOGRAPHY.pRegular}
+              textDecoration={TEXT_DECORATION_UNDERLINE}
+              onClick={() => confirmStart()}
+            >
+              {t('calibrate_now')}
+            </Link>
+          </Flex>
+        </Banner>
+      )}
+      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Box marginRight={SPACING.spacing6}>
+            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
+              {t('deck_calibration_title')}
+            </Box>
+            <StyledText as="p" marginBottom={SPACING.spacing3}>
+              {t('deck_calibration_description')}
+            </StyledText>
+            <StyledText as="label">{deckLastModified()}</StyledText>
+          </Box>
+          <TertiaryButton
+            onClick={() => confirmStart()}
+            disabled={disabledOrBusyReason !== null}
+          >
+            {deckCalibrationButtonText}
+          </TertiaryButton>
+        </Flex>
+      </Box>
+      <Line />
       {showPipetteOffsetCalibrationBanner && (
         <Banner
           type={pipetteOffsetCalBannerType === 'error' ? 'error' : 'warning'}
@@ -466,41 +500,6 @@ export function RobotSettingsCalibration({
               <StyledText as="label">{t('not_calibrated')}</StyledText>
             )}
           </Box>
-        </Flex>
-      </Box>
-      {deckCalibrationButtonText === t('deck_calibration_calibrate_button') && (
-        <Banner type="error">
-          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-            <StyledText as="p">{t('deck_calibration_missing')}</StyledText>
-            <Link
-              role="button"
-              color={COLORS.darkBlack}
-              css={TYPOGRAPHY.pRegular}
-              textDecoration={TEXT_DECORATION_UNDERLINE}
-              onClick={() => confirmStart()}
-            >
-              {t('calibrate_now')}
-            </Link>
-          </Flex>
-        </Banner>
-      )}
-      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box marginRight={SPACING.spacing6}>
-            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
-              {t('deck_calibration_title')}
-            </Box>
-            <StyledText as="p" marginBottom={SPACING.spacing3}>
-              {t('deck_calibration_description')}
-            </StyledText>
-            <StyledText as="label">{deckLastModified()}</StyledText>
-          </Box>
-          <TertiaryButton
-            onClick={() => confirmStart()}
-            disabled={disabledOrBusyReason !== null}
-          >
-            {deckCalibrationButtonText}
-          </TertiaryButton>
         </Flex>
       </Box>
       <Line />

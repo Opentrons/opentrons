@@ -111,5 +111,6 @@
   "thermocycler_extra_attention": "Labware must be secured with the module’s latch. Thermocycler lid must be open when robot moves to the slots it occupies. Opentrons will automatically open the lid to move to these slots during Labware Position Check.",
   "calibration_data_not_available": "Calibration data not available once run has started",
   "connection_info_not_available": "Connection info not available once run has started",
-  "setup_is_view_only": "Setup is view-only once run has started"
+  "setup_is_view_only": "Setup is view-only once run has started",
+  "loading_data": "Loading data..."
 }

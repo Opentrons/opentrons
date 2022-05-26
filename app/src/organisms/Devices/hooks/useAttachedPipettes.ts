@@ -1,29 +1,28 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
+import { usePipettesQuery } from '@opentrons/react-api-client'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import { fetchPipettes, getAttachedPipettes } from '../../../redux/pipettes'
-import { useDispatchApiRequest } from '../../../redux/robot-api'
-import { useRobot } from '.'
+import * as Constants from '../../../redux/pipettes/constants'
 
+import type { PipetteModel } from '@opentrons/shared-data'
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
-import type { State } from '../../../redux/types'
 
-export function useAttachedPipettes(
-  robotName: string | null
-): AttachedPipettesByMount {
-  const [dispatchRequest] = useDispatchApiRequest()
+export function useAttachedPipettes(): AttachedPipettesByMount {
+  const attachedPipettesResponse = usePipettesQuery().data
 
-  const robot = useRobot(robotName)
+  return Constants.PIPETTE_MOUNTS.reduce<AttachedPipettesByMount>(
+    (result, mount) => {
+      const attached = attachedPipettesResponse?.[mount] || null
+      const modelSpecs =
+        attached && attached.model
+          ? getPipetteModelSpecs(attached.model as PipetteModel)
+          : null
 
-  const attachedPipettes = useSelector((state: State) =>
-    getAttachedPipettes(state, robotName)
+      if (attached && attached.model && modelSpecs) {
+        result[mount] = { ...attached, modelSpecs }
+      }
+
+      return result
+    },
+    { left: null, right: null }
   )
-
-  React.useEffect(() => {
-    if (robotName != null) {
-      dispatchRequest(fetchPipettes(robotName))
-    }
-  }, [dispatchRequest, robotName, robot?.status])
-
-  return attachedPipettes
 }

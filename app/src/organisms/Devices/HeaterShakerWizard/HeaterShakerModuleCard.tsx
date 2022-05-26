@@ -13,6 +13,7 @@ import {
   ALIGN_FLEX_START,
   COLORS,
 } from '@opentrons/components'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 import heaterShakerModule from '../../../assets/images/heatershaker_module_transparent.svg'
 import { HeaterShakerModuleData } from '../ModuleCard/HeaterShakerModuleData'
 
@@ -41,7 +42,7 @@ export const HeaterShakerModuleCard = (
         paddingRight={SPACING.spacing3}
         alignItems={ALIGN_FLEX_START}
       >
-        <img src={heaterShakerModule} alt={'Heater Shaker'} />
+        <img src={heaterShakerModule} alt={'Heater-Shaker'} />
         <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing3}>
           <Text
             textTransform={TEXT_TRANSFORM_UPPERCASE}
@@ -57,20 +58,17 @@ export const HeaterShakerModuleCard = (
           <Flex paddingBottom={SPACING.spacing2}>
             <Icon
               name={'ot-heater-shaker'}
+              aria-label={'heater-shaker'}
               size={SIZE_1}
               marginRight={SPACING.spacing2}
               color={COLORS.darkGreyEnabled}
             />
-            <Text fontSize={TYPOGRAPHY.fontSizeP}>{'Heater/Shaker GENX'}</Text>
+            <Text fontSize={TYPOGRAPHY.fontSizeP}>
+              {getModuleDisplayName(module.moduleModel)}
+            </Text>
           </Flex>
           <HeaterShakerModuleData
-            heaterStatus={module.data.temperatureStatus}
-            shakerStatus={module.data.speedStatus}
-            latchStatus={module.data.labwareLatchStatus}
-            targetTemp={module.data.targetTemperature}
-            currentTemp={module.data.currentTemperature}
-            targetSpeed={module.data.targetSpeed}
-            currentSpeed={module.data.currentSpeed}
+            moduleData={module.data}
             showTemperatureData={false}
           />
         </Flex>

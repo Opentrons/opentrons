@@ -485,6 +485,30 @@ exports[`icons circle renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons clockwise-arrow renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className="sc-fznyAO c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 21 18"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M9 0C11.3869 0 13.6761 0.948211 15.364 2.63604C17.0518 4.32387 18 6.61305 18 9H21L17.11 12.89L17.04 13.03L13 9H16C16 7.14348 15.2625 5.36301 13.9497 4.05025C12.637 2.7375 10.8565 2 9 2C7.14348 2 5.36301 2.7375 4.05025 4.05025C2.7375 5.36301 2 7.14348 2 9C2 10.8565 2.7375 12.637 4.05025 13.9497C5.36301 15.2625 7.14348 16 9 16C10.93 16 12.68 15.21 13.94 13.94L15.36 15.36C13.73 17 11.5 18 9 18C6.61305 18 4.32387 17.0518 2.63604 15.364C0.948212 13.6761 0 11.3869 0 9C0 6.61305 0.948212 4.32387 2.63604 2.63604C4.32387 0.948211 6.61305 0 9 0Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons close renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
@@ -2299,11 +2323,11 @@ exports[`icons upload renders correctly 1`] = `
   className="sc-fznyAO c0 foo"
   fill="currentColor"
   version="1.1"
-  viewBox="0 0 24 24"
+  viewBox="0 0 48 48"
   xmlns="http://www.w3.org/2000/svg"
 >
   <path
-    d="M7.714 18.353v-8.47H2L12 0l10 9.882h-5.714v8.47H7.714zM2 24v-2.824h20V24H2z"
+    d="M25.4144 10.9998C24.6333 10.2188 23.367 10.2188 22.5859 10.9998L15.5859 17.9998L17.0002 19.4141L23 13.4142V32H25V13.4139L31.0002 19.4141L32.4144 17.9998L25.4144 10.9998ZM9 32.5V37.5H39V32.5H41V37.5C41 38.6046 40.1046 39.5 39 39.5H9C7.89543 39.5 7 38.6046 7 37.5V32.5H9Z"
     fillRule="evenodd"
   />
 </svg>

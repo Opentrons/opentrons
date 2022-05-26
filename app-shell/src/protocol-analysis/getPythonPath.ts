@@ -9,8 +9,8 @@ let pythonPath: string | null = null
 export function selectPythonPath(pythonOverride: string | null): void {
   // default candidates for posix and windows
   let candidates = [
-    path.join(process.resourcesPath ?? './', 'python', 'bin', 'python3'),
-    path.join(process.resourcesPath ?? './', 'python'),
+    path.join(process.resourcesPath ?? './', 'python/bin/python3'),
+    path.join(process.resourcesPath ?? './', 'python/python.exe'),
   ]
 
   // add override path, posix path, and windows path at front of candidates
@@ -18,7 +18,7 @@ export function selectPythonPath(pythonOverride: string | null): void {
     candidates = [
       pythonOverride,
       path.join(pythonOverride, 'bin/python3'),
-      path.join(pythonOverride, 'python'),
+      path.join(pythonOverride, 'python.exe'),
       ...candidates,
     ]
   }

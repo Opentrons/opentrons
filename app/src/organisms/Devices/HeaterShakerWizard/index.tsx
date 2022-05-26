@@ -1,10 +1,12 @@
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { getAdapterName } from '@opentrons/shared-data'
 import { Portal } from '../../../App/portal'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
 import { HEATERSHAKER_MODULE_TYPE } from '../../../redux/modules'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { useAttachedModules } from '../hooks'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
@@ -17,14 +19,13 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
-  Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 
+import type { ModuleModel } from '@opentrons/shared-data'
 import type { NavRouteParams } from '../../../App/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import type { ThermalAdapterName } from '@opentrons/shared-data'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
@@ -38,7 +39,7 @@ export const HeaterShakerWizard = (
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
   const { robotName } = useParams<NavRouteParams>()
-  const attachedModules = useAttachedModules(robotName)
+  const attachedModules = useAttachedModules()
   const [targetProps, tooltipProps] = useHoverTooltip()
   const heaterShaker =
     attachedModules.find(
@@ -54,20 +55,11 @@ export const HeaterShakerWizard = (
   const labwareDef =
     moduleFromProtocol != null ? moduleFromProtocol.nestedLabwareDef : null
 
-  let adapterName: ThermalAdapterName | null = null
-  if (
-    labwareDef != null &&
-    labwareDef.parameters.loadName.includes('adapter')
-  ) {
-    if (labwareDef.parameters.loadName.includes('pcr')) {
-      adapterName = 'PCR Adapter'
-    } else if (labwareDef.parameters.loadName.includes('deepwell')) {
-      adapterName = 'Deep Well Adapter'
-    } else if (labwareDef.parameters.loadName.includes('96flatbottom')) {
-      adapterName = '96 Flat Bottom Adapter'
-    }
-  } else if (labwareDef != null) {
-    adapterName = 'Universal Flat Adapter'
+  let heaterShakerModel: ModuleModel
+  if (heaterShaker != null) {
+    heaterShakerModel = heaterShaker.moduleModel
+  } else if (moduleFromProtocol != null) {
+    heaterShakerModel = moduleFromProtocol.moduleDef.model
   }
 
   let buttonContent = null
@@ -78,7 +70,12 @@ export const HeaterShakerWizard = (
         return (
           <Introduction
             labwareDefinition={labwareDef}
-            thermalAdapterName={adapterName}
+            moduleModel={heaterShakerModel}
+            thermalAdapterName={
+              labwareDef != null
+                ? getAdapterName(labwareDef.parameters.loadName)
+                : null
+            }
           />
         )
       case 1:
@@ -150,7 +147,7 @@ export const HeaterShakerWizard = (
             >
               {buttonContent}
               {!isPrimaryCTAEnabled ? (
-                <Tooltip {...tooltipProps}>
+                <Tooltip tooltipProps={tooltipProps}>
                   {t('module_is_not_connected')}
                 </Tooltip>
               ) : null}

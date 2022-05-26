@@ -76,7 +76,11 @@ export function ProtocolOverflowMenu(
     setShowOverflowMenu(!showOverflowMenu)
   }
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      position={POSITION_RELATIVE}
+      onClick={e => e.stopPropagation()}
+    >
       <OverflowBtn
         alignSelf={ALIGN_FLEX_END}
         onClick={handleOverflowClick}

@@ -9,6 +9,8 @@ log = logging.getLogger(__name__)
 GripperName = Literal["gripper"]
 GripperModel = Literal["gripper_v1"]
 
+DEFAULT_GRIPPER_CALIBRATION_OFFSET = [0.0, 0.0, 0.0]
+
 
 @dataclass(frozen=True)
 class GripperConfig:

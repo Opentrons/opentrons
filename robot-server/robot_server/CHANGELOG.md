@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.1.0-beta.0...v6.0.0-alpha.0) (2022-05-26)
+
+
+### Bug Fixes
+
+* **robot-server:** cancel background tasks when server shuts down ([#10052](https://github.com/Opentrons/opentrons/issues/10052)) ([9e20642](https://github.com/Opentrons/opentrons/commit/9e2064297fde04c291deaf3b75275f3a6cbaeb17))
+
+
+### Features
+
+* **app:** propose recent labware offsets to be reapplied for new protocol runs ([#10216](https://github.com/Opentrons/opentrons/issues/10216)) ([15c372c](https://github.com/Opentrons/opentrons/commit/15c372c523f376fcd592f784072aceb6254f108a)), closes [#9795](https://github.com/Opentrons/opentrons/issues/9795)
+* **robot-server:** add runs history removal to reset options ([#10395](https://github.com/Opentrons/opentrons/issues/10395)) ([e9294c3](https://github.com/Opentrons/opentrons/commit/e9294c3592783dcfdbcbc5ed91dcb60d37afe90e))
+* **robot-server:** Automatically delete old resources to make room for new ones ([#10248](https://github.com/Opentrons/opentrons/issues/10248)) ([9ab070f](https://github.com/Opentrons/opentrons/commit/9ab070fad8d932a153cbde5077a7674674d92c34)), closes [#9966](https://github.com/Opentrons/opentrons/issues/9966)
+* **robot-server:** persist previous run results and commands ([#10187](https://github.com/Opentrons/opentrons/issues/10187)) ([87677c6](https://github.com/Opentrons/opentrons/commit/87677c6919cb6257e8ad063b58b3faccea96d7fe)), closes [#8474](https://github.com/Opentrons/opentrons/issues/8474)
+* **robot-server:** Persist protocol analyses across reboots ([#10042](https://github.com/Opentrons/opentrons/issues/10042)) ([4f35cf4](https://github.com/Opentrons/opentrons/commit/4f35cf49abc5cae73ad8d6ac414bb5b1d3498c85)), closes [#9964](https://github.com/Opentrons/opentrons/issues/9964)
+
+
+
+
+
 # [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
 
 

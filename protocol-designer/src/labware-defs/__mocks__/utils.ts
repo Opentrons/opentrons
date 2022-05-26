@@ -23,6 +23,4 @@ export const getAllDefinitions = jest.fn(() => allLabware)
 
 export const _getSharedLabware = jest.fn(() => null)
 
-export const getOnlyLatestDefs = jest.fn(() => {
-  throw Error('getOnlyLatestDefs should not be used directly')
-})
+export const getOnlyLatestDefs = jest.fn(() => allLabware)
