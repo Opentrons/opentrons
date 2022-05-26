@@ -7,20 +7,26 @@ const overflowButtonStyles = css`
   max-height: ${SPACING.spacing6};
 
   &:hover {
-    background-color: ${COLORS.medGrey};
+    background-color: ${COLORS.darkGreyHover};
   }
 
   &:active {
-    background-color: ${COLORS.lightGreyHover};
-    box-shadow: 0 0 0 1px ${COLORS.lightGrey};
+    background-color: ${COLORS.darkBlack};
+    box-shadow: 0 0 0 1px ${COLORS.darkBlack};
   }
 
   &:active circle {
-    fill: ${COLORS.darkGreyPressed};
+    fill: ${COLORS.darkBlack};
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
+    box-shadow: 0 0 0 3px ${COLORS.darkGreyPressed};
+  }
+
+  &:enabled,
+  &.enabled {
+    fill-opacity: 0.5;
+    font-color: ${COLORS.darkGreyEnabled}
   }
 
   &:disabled,
