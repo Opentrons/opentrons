@@ -1268,7 +1268,7 @@ class OT3API(
             )
         here = await self.gantry_position(mount)
         self._log.info(f"probe start: at {here}")
-        target = moving_axis.offset_point(
+        target = moving_axis.set_in_point(
             here, target_pos + pass_settings.prep_distance_mm
         )
         self._log.info(f"moving to {target}")

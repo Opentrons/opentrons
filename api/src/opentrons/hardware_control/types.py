@@ -236,13 +236,13 @@ class OT3Axis(enum.Enum):
         else:
             raise KeyError(self)
 
-    def offset_point(self, point: top_types.Point, offset: float) -> top_types.Point:
+    def set_in_point(self, point: top_types.Point, position: float) -> top_types.Point:
         if OT3Axis.to_kind(self) == OT3AxisKind.Z:
-            return point + top_types.Point(0, 0, offset)
+            return point._replace(z=position)
         elif self == OT3Axis.X:
-            return point + top_types.Point(offset, 0, 0)
+            return point._replace(x=position)
         elif self == OT3Axis.Y:
-            return point + top_types.Point(0, offset, 0)
+            return point._replace(y=position)
         else:
             raise KeyError(self)
 
