@@ -547,7 +547,7 @@ def test_command_store_ignores_known_finish_error() -> None:
 
 
 def test_command_store_save_started_completed_run_timestamp() -> None:
-    """Should return a none empty run_completed_at and run_started_at"""
+    """Should return a none empty run_completed_at and run_started_at."""
     subject = CommandStore()
     date = datetime(year=2021, day=1, month=1)
     subject.handle_action(PlayAction(started_at=date))
