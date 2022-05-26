@@ -27,7 +27,6 @@ import { MenuItem } from '../../atoms/MenuList/MenuItem'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { ProtocolSort } from './hooks'
-import { reverse, sortBy } from 'lodash'
 
 interface ProtocolListProps {
   storedProtocols: StoredProtocolData[]
