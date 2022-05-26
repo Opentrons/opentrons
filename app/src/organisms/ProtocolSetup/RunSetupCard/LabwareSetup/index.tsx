@@ -260,7 +260,7 @@ export const LabwareSetup = (): JSX.Element | null => {
               {t('labware_help_link_title')}
             </Btn>
             <Flex justifyContent={JUSTIFY_CENTER}>
-            <NewSecondaryBtn
+              <NewSecondaryBtn
                 title={t('run_labware_position_check')}
                 onClick={() => {
                   setShowLabwarePositionCheckModal(true)
@@ -271,7 +271,7 @@ export const LabwareSetup = (): JSX.Element | null => {
                 disabled={lpcDisabledReason !== null}
               >
                 {t('run_labware_position_check')}
-            </NewSecondaryBtn>
+              </NewSecondaryBtn>
               {lpcDisabledReason !== null ? (
                 <Tooltip maxWidth={SPACING_7} {...tooltipProps}>
                   {lpcDisabledReason}

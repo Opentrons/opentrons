@@ -67,17 +67,17 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
           external
         >
           <Flex alignItems={ALIGN_CENTER} css={TYPOGRAPHY.darkLinkPSemiBold}>
-          {t('launch_protocol_designer')}
+            {t('launch_protocol_designer')}
 
-          <Icon
-            name={'open-in-new'}
-            marginLeft={SPACING.spacing2}
-            size="0.5rem"
-            opacity="0.7rem"
-          />
+            <Icon
+              name={'open-in-new'}
+              marginLeft={SPACING.spacing2}
+              size="0.5rem"
+              opacity="0.7rem"
+            />
           </Flex>
         </Link>
-        
+
         <Link
           fontSize={FONT_SIZE_CAPTION}
           css={TYPOGRAPHY.darkLinkPSemiBold}
