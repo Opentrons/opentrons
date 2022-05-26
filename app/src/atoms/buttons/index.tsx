@@ -85,7 +85,7 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
 
 export const SecondaryButton = styled(NewSecondaryBtn)`
   color: ${COLORS.blue};
-  border-radius: ${BORDERS.spacing5};
+  border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   ${TYPOGRAPHY.pSemiBold}
