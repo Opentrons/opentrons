@@ -123,15 +123,37 @@ export function Labware(): JSX.Element {
             alignItems={ALIGN_CENTER}
             onClick={toggleSetShowSortByMenu}
           >
-            <StyledText css={TYPOGRAPHY.pSemiBold}>{t('sort_by')} </StyledText>
-            <Icon
-              height={TYPOGRAPHY.lineHeight16}
-              name={showSortByMenu ? 'chevron-up' : 'chevron-down'}
-            />
+            <StyledText
+              css={TYPOGRAPHY.pSemiBold}
+              color={COLORS.darkGreyEnabled}
+            >
+              {t('sort_by')}
+            </StyledText>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              alignItems={ALIGN_CENTER}
+              backgroundColor={COLORS.medGrey}
+              borderRadius={BORDERS.radiusSoftCorners}
+              marginLeft={SPACING.spacing3}
+            >
+              <StyledText
+                css={TYPOGRAPHY.pSemiBold}
+                paddingLeft={SPACING.spacing3}
+                paddingRight={SPACING.spacing2}
+                paddingY={SPACING.spacing2}
+              >
+                {sortBy === 'alphabetical' ? t('alphabetical') : t('reverse')}
+              </StyledText>
+              <Icon
+                paddingRight={SPACING.spacing3}
+                height={TYPOGRAPHY.lineHeight16}
+                name={showSortByMenu ? 'chevron-up' : 'chevron-down'}
+              />
+            </Flex>
           </Flex>
           {showSortByMenu && (
             <Flex
-              width="9rem"
+              width="9.375rem"
               zIndex={2}
               borderRadius={BORDERS.radiusSoftCorners}
               boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}

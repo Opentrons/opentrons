@@ -27,6 +27,7 @@ import { MenuItem } from '../../atoms/MenuList/MenuItem'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { ProtocolSort } from './hooks'
+import { reverse, sortBy } from 'lodash'
 
 interface ProtocolListProps {
   storedProtocols: StoredProtocolData[]
@@ -48,6 +49,25 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   const handleClickOutside: React.MouseEventHandler<HTMLDivElement> = e => {
     e.preventDefault()
     setShowSortByMenu(false)
+  }
+
+  const sortByLabelType: {
+    [key in ProtocolSort]: {
+      label: string
+    }
+  } = {
+    alphabetical: {
+      label: t('labware_landing:alphabetical'),
+    },
+    recent: {
+      label: t('most_recent_updates'),
+    },
+    reverse: {
+      label: t('labware_landing:reverse'),
+    },
+    oldest: {
+      label: t('oldest_updates'),
+    },
   }
 
   return (
@@ -75,10 +95,27 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             <StyledText css={TYPOGRAPHY.pSemiBold}>
               {t('labware_landing:sort_by')}
             </StyledText>
-            <Icon
-              height={TYPOGRAPHY.lineHeight16}
-              name={showSortByMenu ? 'chevron-up' : 'chevron-down'}
-            />
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              alignItems={ALIGN_CENTER}
+              backgroundColor={COLORS.medGrey}
+              borderRadius={BORDERS.radiusSoftCorners}
+              marginLeft={SPACING.spacing3}
+            >
+              <StyledText
+                css={TYPOGRAPHY.pSemiBold}
+                paddingLeft={SPACING.spacing3}
+                paddingRight={SPACING.spacing2}
+                paddingY={SPACING.spacing2}
+              >
+                {sortByLabelType[sortBy].label}
+              </StyledText>
+              <Icon
+                paddingRight={SPACING.spacing3}
+                height={TYPOGRAPHY.lineHeight16}
+                name={showSortByMenu ? 'chevron-up' : 'chevron-down'}
+              />
+            </Flex>
           </Flex>
           {showSortByMenu && (
             <Flex
