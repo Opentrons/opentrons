@@ -97,7 +97,7 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
 .. code-block:: python
 
     def run(protocol: protocol_api.ProtocolContext):
-        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
+        tips = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
         reservoir = protocol.load_labware('nest_12_reservoir_15ml', 2)
         plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 3)
         
@@ -120,13 +120,13 @@ Next you’ll specify what pipette to use in the protocol. Loading a pipette is 
 
 .. code-block:: python
 
-        p300 = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tiprack])
+        p300 = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tips])
 
-Since the pipette is so fundamental to the protocol, it might seem like you should have specified it first. But there’s a good reason why pipettes are added after labware: you need to have already added ``tiprack`` in order to tell the pipette to use it. And now you won’t have to reference ``tiprack`` again in your code — it’s assigned to the ``p300`` pipette and the robot will know to use it when commanded to pick up tips.
+Since the pipette is so fundamental to the protocol, it might seem like you should have specified it first. But there’s a good reason why pipettes are added after labware: you need to have already added ``tips`` in order to tell the pipette to use it. And now you won’t have to reference ``tips`` again in your code — it’s assigned to the ``p300`` pipette and the robot will know to use it when commanded to pick up tips.
 
 .. note::
 
-    You may notice that the value of ``tip_racks`` is in brackets, indicating that it’s a list. This serial dilution protocol only uses one tip rack, but some protocols require more tips, so you can assign them to a pipette all at once, like ``tip_racks=[tiprack1, tiprack2]``.
+    You may notice that the value of ``tip_racks`` is in brackets, indicating that it’s a list. This serial dilution protocol only uses one tip rack, but some protocols require more tips, so you can assign them to a pipette all at once, like ``tip_racks=[tips1, tips2]``.
 
 Commands
 --------
