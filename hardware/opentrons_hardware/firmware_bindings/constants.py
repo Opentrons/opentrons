@@ -199,3 +199,11 @@ class SensorThresholdMode(int, Enum):
 
     absolute = 0x0
     auto_baseline = 0x1
+
+
+@unique
+class PipetteTipActionType(int, Enum):
+    """Links sensor threshold triggers to pins."""
+
+    pick_up = 0x0
+    drop = 0x01
