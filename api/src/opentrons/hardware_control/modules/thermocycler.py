@@ -325,7 +325,7 @@ class Thermocycler(mod_abc.AbstractModule):
             retries += 1
             if retries > TEMP_UPDATE_RETRIES:
                 raise ThermocyclerError(
-                    f"Thermocycler driver set the lid temp to T={temperature}"
+                    f"Thermocycler driver set the lid temp to T={temperature} "
                     f"but status reads T={self.lid_target}"
                 )
         task = self._loop.create_task(self._wait_for_lid_temp())
@@ -345,7 +345,7 @@ class Thermocycler(mod_abc.AbstractModule):
             retries += 1
             if retries > TEMP_UPDATE_RETRIES:
                 raise ThermocyclerError(
-                    f"Thermocycler driver set the lid temp to T={temperature}"
+                    f"Thermocycler driver set the lid temp to T={temperature} "
                     f"but status reads T={self.lid_target}"
                 )
         task = self._loop.create_task(self._wait_for_lid_temp())
