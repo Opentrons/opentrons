@@ -74,6 +74,8 @@ export function HistoricalProtocolRun(
         <StyledText
           as="p"
           width="35%"
+          css={{ 'overflow-wrap': 'anywhere' }}
+          paddingRight={SPACING.spacing3}
           data-testid={`RecentProtocolRuns_Protocol_${props.key}`}
         >
           {protocolName}

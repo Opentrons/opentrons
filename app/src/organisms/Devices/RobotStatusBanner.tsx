@@ -34,7 +34,11 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
   const RunningProtocolBanner = (): JSX.Element | null =>
     currentRunId != null ? (
       <Flex alignItems={ALIGN_CENTER}>
-        <StyledText as="label" paddingRight={SPACING.spacing3}>
+        <StyledText
+          as="label"
+          paddingRight={SPACING.spacing3}
+          css={{ 'overflow-wrap': 'anywhere' }}
+        >
           {`${displayName}; ${t(`run_details:status_${currentRunStatus}`)}`}
         </StyledText>
         <Link
@@ -65,6 +69,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
               as="h3"
               marginRight={SPACING.spacing3}
               id={`RobotStatusBanner_${name}_robotName`}
+              css={{ 'overflow-wrap': 'anywhere' }}
             >
               {name}
             </StyledText>
