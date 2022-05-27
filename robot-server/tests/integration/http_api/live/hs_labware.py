@@ -6,7 +6,10 @@ from tests.integration.http_api.live.base_cli import BaseCli
 from tests.integration.http_api.live.robot_interactions import RobotInteractions
 from tests.integration.robot_client import RobotClient
 
-HS_SLOT = "2"
+# Change the value for these constants to swap out
+# location/pipette/tiprack
+
+HS_SLOT = "1" # 1, 3, 6, 4 only
 TIPRACK = "opentrons_96_tiprack_20ul"
 TIPRACK_SLOT = "8"
 PIPETTE = "p20_single_gen2"
