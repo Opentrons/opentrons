@@ -1,6 +1,6 @@
 # Script for measurement of the Heater Shaker
 
-> Commands below are for a windows machine
+> Paths below are for a windows machine
 
 1. Open command line
 2. Have git installed
@@ -13,15 +13,18 @@
    1. `mkdir opentrons`
 6. go into that directory
    1. `cd opentrons`
-7. clone in the code
+7. clone the repository
    1. `git clone https://github.com/Opentrons/opentrons.git`
-8. move to the robot-server directory
-   1. `cd opentrons/robot-server`
-9. install this package
-   1.  `pipenv install -d`
-10. call the help text on the tool
-    1.  `pipenv run python tests/integration/http_api/live/hs_labware.py -h`
-11. follow the instructions
+8. move to the branch
+   1. `git pull origin`
+   2. `git switch 10313-hs-labware-script-2`
+9.  move to the robot-server directory
+   3. `cd .\opentrons\robot-server`
+10. install this package
+   4.  `pipenv install -d`
+11. call the help text on the tool
+    1.  `pipenv run python .\tests\integration\http_api\live\hs_labware.py -h`
+12. follow the instructions
     1.  change the constants (ALL_CAPS_VARIABLES) at the top of `robot-server/tests/integration/http_api/live/hs_labware.py` file per your robot setup.
-12. run the script
-    1.  `pipenv run python tests/integration/http_api/live/hs_labware.py --robot_ip 192.168.50.89 --labware_key opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat`
+13. run the script replacing the robot ip with your robot ip
+    1.  `pipenv run python .\tests\integration\http_api\live\hs_labware.py --robot_ip 192.168.50.89 --labware_key opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flatpipenv run python .\tests\integration\http_api\live\hs_labware.py`
