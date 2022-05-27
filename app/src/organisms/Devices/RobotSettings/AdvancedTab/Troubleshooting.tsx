@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
+
 import {
   Flex,
   ALIGN_CENTER,
@@ -10,38 +11,41 @@ import {
   SPACING_AUTO,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { downloadLogs } from '../../../../redux/shell/robot-logs/actions'
 import { getRobotLogsDownloading } from '../../../../redux/shell/robot-logs/selectors'
 import { CONNECTABLE } from '../../../../redux/discovery'
+import { useRobot } from '../../hooks'
+
 import type { Dispatch } from '../../../../redux/types'
-import { ViewableRobot } from '../../../../redux/discovery/types'
 
 interface TroubleshootingProps {
-  robot: ViewableRobot
+  robotName: string
   updateDownloadLogsStatus: (status: boolean) => void
 }
 
 export function Troubleshooting({
-  robot,
+  robotName,
   updateDownloadLogsStatus,
 }: TroubleshootingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
-  const { health, status } = robot
-  const controlDisabled = status !== CONNECTABLE
-  const logsAvailable = health != null && health.logs
+  const robot = useRobot(robotName)
+  const controlDisabled = robot?.status !== CONNECTABLE
+  const logsAvailable = robot?.health != null && robot.health.logs
   const robotLogsDownloading = useSelector(getRobotLogsDownloading)
 
   const handleClick = (): void => {
     updateDownloadLogsStatus(robotLogsDownloading)
-    dispatch(downloadLogs(robot))
+    if (!controlDisabled && robot?.status === CONNECTABLE)
+      dispatch(downloadLogs(robot))
   }
 
   React.useEffect(() => {
     updateDownloadLogsStatus(robotLogsDownloading)
-  }, [robotLogsDownloading])
+  }, [robotLogsDownloading, updateDownloadLogsStatus])
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
