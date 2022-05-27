@@ -110,16 +110,16 @@ class CommandState:
     even if INACTIVE.
     """
 
-    run_started_at: Optional[datetime]
+    _run_started_at: Optional[datetime]
     """The time the run was started.
 
     Set when the first `PlayAction` is dispatched.
     """
 
-    run_completed_at: Optional[datetime]
+    _run_completed_at: Optional[datetime]
     """The time the run has completed.
 
-    initialized when HardwareStoppedAction is dispatched.
+    Set when the first 'HardwareStoppedAction' is dispatched.
     """
 
     is_door_blocking: bool
@@ -138,6 +138,20 @@ class CommandState:
     are stored on the individual commands themselves.
     """
 
+    def get_run_started_at(self) -> Optional[datetime]:
+        return self._run_started_at
+
+    def set_run_started_at(self, value: datetime) -> None:
+        if self._run_started_at is None:
+            self._run_started_at = value
+
+    def get_run_completed_at(self) -> Optional[datetime]:
+        return self._run_completed_at
+
+    def set_run_completed_at(self, value: datetime) -> None:
+        if self._run_completed_at is None:
+            self._run_completed_at = value
+
 
 class CommandStore(HasState[CommandState], HandlesActions):
     """Command state container."""
@@ -155,8 +169,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
             queued_command_ids=OrderedSet(),
             commands_by_id=OrderedDict(),
             errors_by_id={},
-            run_completed_at=None,
-            run_started_at=None,
+            _run_completed_at=None,
+            _run_started_at=None,
         )
 
     def handle_action(self, action: Action) -> None:  # noqa: C901
@@ -265,7 +279,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     self._state.queue_status = QueueStatus.INACTIVE
                 else:
                     self._state.queue_status = QueueStatus.ACTIVE
-            self._state.run_started_at = action.started_at
+            self._state.set_run_started_at(action.started_at)
         elif isinstance(action, PauseAction):
             self._state.queue_status = QueueStatus.INACTIVE
 
@@ -306,7 +320,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         elif isinstance(action, HardwareStoppedAction):
             self._state.queue_status = QueueStatus.INACTIVE
             self._state.run_result = self._state.run_result or RunResult.STOPPED
-            self._state.run_completed_at = action.completed_at
+            self._state.set_run_completed_at(action.completed_at)
 
         elif isinstance(action, HardwareEventAction):
             if isinstance(action.event, DoorStateNotification):
@@ -487,7 +501,7 @@ class CommandView(HasState[CommandState]):
 
     def get_is_stopped(self) -> bool:
         """Get whether an engine stop has completed."""
-        return self._state.run_completed_at is not None
+        return self._state.get_run_completed_at() is not None
 
     # TODO(mc, 2021-12-07): reject adding commands to a stopped engine
     def raise_if_stop_requested(self) -> None:
