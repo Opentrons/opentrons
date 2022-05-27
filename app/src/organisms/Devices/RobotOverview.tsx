@@ -27,7 +27,7 @@ import { CONNECTABLE } from '../../redux/discovery'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { RobotStatusBanner } from './RobotStatusBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
-import { useLights, useRobot, useIsRobotViewable } from './hooks'
+import { useLights, useRobot } from './hooks'
 
 interface RobotOverviewProps {
   robotName: string
@@ -39,7 +39,6 @@ export function RobotOverview({
   const { t } = useTranslation('device_details')
 
   const robot = useRobot(robotName)
-  const isRobotViewable = useIsRobotViewable(robotName)
 
   const [
     showChooseProtocolSlideout,
@@ -82,7 +81,7 @@ export function RobotOverview({
               <ToggleButton
                 label={t('lights')}
                 toggledOn={lightsOn != null ? lightsOn : false}
-                disabled={lightsOn === null}
+                disabled={lightsOn === null || robot.status !== CONNECTABLE}
                 onClick={toggleLights}
                 size={SIZE_2}
                 marginRight={SPACING.spacing3}
@@ -93,7 +92,7 @@ export function RobotOverview({
           </Flex>
           <PrimaryButton
             textTransform={TEXT_TRANSFORM_NONE}
-            disabled={currentRunId != null || !isRobotViewable}
+            disabled={currentRunId != null || robot.status !== CONNECTABLE}
             onClick={() => {
               setShowChooseProtocolSlideout(true)
             }}
