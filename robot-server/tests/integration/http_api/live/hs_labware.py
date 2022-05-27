@@ -9,7 +9,7 @@ from tests.integration.robot_client import RobotClient
 # Change the value for these constants to swap out
 # location/pipette/tiprack
 
-HS_SLOT = "1" # 1, 3, 6, 4 only
+HS_SLOT = "1"  # 1, 3, 6, 4 only
 TIPRACK = "opentrons_96_tiprack_20ul"
 TIPRACK_SLOT = "8"
 PIPETTE = "p20_single_gen2"
