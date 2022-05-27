@@ -43,6 +43,11 @@ async def test_cli(
     return client
 
 
+def mock_root_fs_interface_() -> MagicMock:
+    """Mock RootFSInterface."""
+    return MagicMock(spec=RootFSInterface)
+
+
 @pytest.fixture
 def mock_root_fs_interface() -> MagicMock:
     """Mock RootFSInterface."""
