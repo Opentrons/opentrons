@@ -397,7 +397,6 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
 def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
     """It should set the running flag on play."""
     subject = CommandStore()
-    subject.handle_action(PauseAction(source=pause_source))
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
     assert subject.state == CommandState(
