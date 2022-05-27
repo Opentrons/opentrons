@@ -227,8 +227,9 @@ async def test_runs_completed_started_at_persist_via_actions_router(
         req_body={"data": {"actionType": "play"}},
     )
 
-    # persist the run by hitting the actions router
     expected_completed_at = datetime.now()
+
+    # persist the run by hitting the actions router
     await client.post_run_action(
         run_id=run_id,
         req_body={"data": {"actionType": "stop"}},
@@ -256,7 +257,6 @@ async def test_runs_completed_started_at_persist_via_actions_router(
         == pytest.approx(expected_completed_at.timestamp(), abs=2)
     )
 
-
     # make sure the times are in order
     assert run_data["startedAt"] < run_data["completedAt"]
 
@@ -268,8 +268,7 @@ async def test_runs_completed_filled_started_at_none_persist(
     are persisted through dev server restart."""
     client, server = client_and_server
 
-    date_of_today = datetime.now().date()
-
+    expected_completed_at = datetime.now()
     # create a run
     create_run_response = await client.post_run(req_body={"data": {}})
     run_id = create_run_response.json()["data"]["id"]
@@ -283,9 +282,9 @@ async def test_runs_completed_filled_started_at_none_persist(
     get_run_response = await client.get_run(run_id=run_id)
     run_data = get_run_response.json()["data"]
 
-    assert "startedAt" not in expected_run
+    assert "startedAt" not in run_data
 
     assert (
-        datetime.strptime(expected_run["completedAt"], "%Y-%m-%dT%H:%M:%S.%f%z").date()
-        == date_of_today
+            datetime.fromisoformat(run_data["completedAt"]).timestamp()
+            == pytest.approx(expected_completed_at.timestamp(), abs=2)
     )
