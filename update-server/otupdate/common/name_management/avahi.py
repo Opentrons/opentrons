@@ -6,7 +6,7 @@ from logging import getLogger
 from typing import Optional
 
 
-LOG = getLogger(__name__)
+_log = getLogger(__name__)
 
 
 try:
@@ -88,10 +88,10 @@ try:
         # https://github.com/Opentrons/opentrons/issues/10126
 
 except ImportError:
-    LOG.exception("Couldn't import dbus, name setting will be nonfunctional")
+    _log.exception("Couldn't import dbus, name setting will be nonfunctional")
 
     def _set_avahi_service_name_sync(new_service_name: str) -> None:
-        LOG.warning("Not setting name, dbus could not be imported")
+        _log.warning("Not setting name, dbus could not be imported")
 
 
 _BUS_LOCK = asyncio.Lock()
@@ -119,3 +119,21 @@ async def set_avahi_service_name(new_service_name: str) -> None:
         await asyncio.get_event_loop().run_in_executor(
             None, _set_avahi_service_name_sync, new_service_name
         )
+
+
+async def restart_daemon() -> None:
+    proc = await asyncio.create_subprocess_exec(
+        "systemctl",
+        "restart",
+        "avahi-daemon",
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await proc.communicate()
+    ret = proc.returncode
+    if ret != 0:
+        _log.error(
+            f"Error restarting avahi-daemon: {ret} "
+            f"stdout: {stdout!r} stderr: {stderr!r}"
+        )
+        raise RuntimeError("Error restarting avahi")

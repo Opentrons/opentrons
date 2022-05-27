@@ -10,8 +10,10 @@ import logging
 import os
 import urllib.parse
 
+from .avahi import restart_daemon as restart_avahi_daemon
 
-LOG = logging.getLogger(__name__)
+
+_log = logging.getLogger(__name__)
 
 
 async def set_up_static_hostname() -> str:
@@ -35,7 +37,7 @@ async def set_up_static_hostname() -> str:
     # First, we run hostnamed which will set the transient hostname
     # and loaded static hostname from the value we just wrote to
     # /etc/hostname
-    LOG.debug("Setting hostname")
+    _log.debug("Setting hostname")
     proc = await asyncio.create_subprocess_exec(
         "hostname",
         hostname,
@@ -45,29 +47,15 @@ async def set_up_static_hostname() -> str:
     stdout, stderr = await proc.communicate()
     ret = proc.returncode
     if ret != 0:
-        LOG.error(
+        _log.error(
             f"Error starting hostname: {ret} " f"stdout: {stdout!r} stderr: {stderr!r}"
         )
         raise RuntimeError("Couldn't run hostname")
 
     # Then, with the hostname set, we can restart avahi
-    LOG.debug("Restarting avahi")
-    proc = await asyncio.create_subprocess_exec(
-        "systemctl",
-        "restart",
-        "avahi-daemon",
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await proc.communicate()
-    ret = proc.returncode
-    if ret != 0:
-        LOG.error(
-            f"Error restarting avahi-daemon: {ret} "
-            f"stdout: {stdout!r} stderr: {stderr!r}"
-        )
-        raise RuntimeError("Error restarting avahi")
-    LOG.debug("Updated hostname and restarted avahi OK")
+    _log.debug("Restarting avahi")
+    await restart_avahi_daemon()
+    _log.debug("Updated hostname and restarted avahi OK")
 
     return hostname
 
@@ -85,16 +73,16 @@ def _choose_static_hostname() -> str:
         if serial:
             # TODO(mm, 2022-04-27): This uses the serial number even if it hasn't
             # been configured and is still the default, like "opentrons."
-            LOG.info("Using serial for hostname")
+            _log.info("Using serial for hostname")
             hn = "".join([c for c in urllib.parse.quote(serial, safe="") if c != "%"])
             if hn != serial:
-                LOG.warning(f"Reencoded serial to {hn}")
+                _log.warning(f"Reencoded serial to {hn}")
             return hn
 
         else:
-            LOG.info("Using machine-id for hostname: empty /var/serial")
+            _log.info("Using machine-id for hostname: empty /var/serial")
     else:
-        LOG.info("Using machine-id for hostname: no /var/serial")
+        _log.info("Using machine-id for hostname: no /var/serial")
 
     with open("/etc/machine-id") as f:
         return f.read().strip()[:6]
