@@ -41,11 +41,8 @@ The robot has several names associated with it, some of which we tie together.
   See `set_name_endpoint()`.
 """
 
-import asyncio
+
 import json
-import logging
-import os
-import urllib.parse
 
 from aiohttp import web
 
@@ -57,13 +54,6 @@ from .pretty_hostname import (
     persist_pretty_hostname,
 )
 from .static_hostname import set_up_static_hostname
-
-
-
-
-LOG = logging.getLogger(__name__)
-
-
 
 
 async def set_name(app: web.Application, new_name: str) -> str:
