@@ -23,8 +23,7 @@ const overflowButtonStyles = css`
     box-shadow: 0 0 0 3px ${COLORS.darkGreyPressed};
   }
 
-  &:enabled,
-  &.enabled {
+  &:enabled {
     fill-opacity: 0.5;
     font-color: ${COLORS.darkGreyEnabled};
   }

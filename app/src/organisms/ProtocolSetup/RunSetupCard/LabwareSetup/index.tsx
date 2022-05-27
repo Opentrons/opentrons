@@ -13,6 +13,7 @@ import {
   Link,
   Module,
   RobotWorkSpace,
+  NewSecondaryBtn,
   Text,
   Tooltip,
   useHoverTooltip,
@@ -29,7 +30,6 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   C_NEAR_WHITE,
   SPACING_7,
-  NewSecondaryBtn,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,

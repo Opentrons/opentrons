@@ -231,7 +231,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                         <ModuleIcon
                           key={index}
                           moduleType={moduleType}
-                          height="0.01rem"
+                          height="1rem"
                           marginRight={SPACING.spacing3}
                         />
                       ))}

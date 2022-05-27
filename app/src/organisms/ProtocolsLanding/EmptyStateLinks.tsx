@@ -45,7 +45,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
           href={PROTOCOL_LIBRARY_URL}
           id={'EmptyStateLinks_protocolLibraryButton'}
           marginRight={SPACING.spacing3}
-          opacity="0.7rem"
+          opacity="0.7"
           external
         >
           {t('browse_protocol_library')}
@@ -53,7 +53,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
             name={'open-in-new'}
             marginLeft={SPACING.spacing2}
             size="0.5rem"
-            opacity="0.7rem"
+            opacity="0.7"
           />
         </Link>
         <Link
@@ -63,7 +63,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
           marginRight={SPACING.spacing3}
           href={PROTOCOL_DESIGNER_URL}
           id={'EmptyStateLinks_protocolDesignerButton'}
-          opacity="0.7rem"
+          opacity="0.7"
           external
         >
           <Flex alignItems={ALIGN_CENTER} css={TYPOGRAPHY.darkLinkPSemiBold}>
@@ -73,7 +73,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
               name={'open-in-new'}
               marginLeft={SPACING.spacing2}
               size="0.5rem"
-              opacity="0.7rem"
+              opacity="0.7"
             />
           </Flex>
         </Link>
@@ -91,7 +91,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
             name={'open-in-new'}
             marginLeft={SPACING.spacing2}
             size="0.5rem"
-            opacity="0.7rem"
+            opacity="0.7"
           />
         </Link>
       </Flex>
