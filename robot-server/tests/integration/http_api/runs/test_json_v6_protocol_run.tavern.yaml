@@ -45,6 +45,32 @@ stages:
           labwareOffsets: []
           protocolId: '{protocol_id}'
 
+  - name: Execute a setup command
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: home
+          params: {}
+          source: setup
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: succeeded
+      save:
+        json:
+          setup_command_id: data.id
+          setup_command_key: data.key
+          setup_command_created_at: data.createdAt
+          setup_command_started_at: data.startedAt
+          setup_command_completed_at: data.completedAt
+
   - name: Fetch run commands
     request:
       url: '{host:s}:{port:d}/runs/{run_id}/commands'
@@ -52,10 +78,18 @@ stages:
     response:
       status_code: 200
       json:
-        links: {}
+        links:
+          current:
+            href: '/runs/{run_id}/commands/{setup_command_id}'
+            meta:
+              runId: '{run_id}'
+              commandId: '{setup_command_id}'
+              key: '{setup_command_key}'
+              createdAt: '{setup_command_created_at}'
+              index: 13
         meta:
           cursor: 0
-          totalLength: 13
+          totalLength: 14
         data:
           - id: !anystr
             key: !anystr
@@ -230,6 +264,15 @@ stages:
                   x: 0
                   y: 0
                   z: 0
+          - id: '{setup_command_id}'
+            key: '{setup_command_key}'
+            source: setup
+            commandType: home
+            createdAt: '{setup_command_created_at}'
+            startedAt: '{setup_command_started_at}'
+            completedAt: '{setup_command_completed_at}'
+            status: succeeded
+            params: {}
 
   - name: Play the run
     request:
@@ -271,7 +314,7 @@ stages:
           current: !anydict
         meta:
           cursor: 0
-          totalLength: 13
+          totalLength: 14
         data:
           - id: !anystr
             key: !anystr
@@ -472,3 +515,12 @@ stages:
                   x: 0
                   y: 0
                   z: 0
+          - id: '{setup_command_id}'
+            key: '{setup_command_key}'
+            source: setup
+            commandType: home
+            createdAt: '{setup_command_created_at}'
+            startedAt: '{setup_command_started_at}'
+            completedAt: '{setup_command_completed_at}'
+            status: succeeded
+            params: {}
