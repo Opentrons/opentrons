@@ -4,12 +4,13 @@ import asyncio
 from typing import Tuple
 from unittest import mock
 
-from aiohttp.test_utils import TestClient
+# Avoid pytest trying to collect TestClient because it begins with "Test".
+from aiohttp.test_utils import TestClient as HTTPTestClient
 
 from otupdate.common import control
 
 
-async def test_restart(test_cli: Tuple[TestClient, str], monkeypatch) -> None:
+async def test_restart(test_cli: Tuple[HTTPTestClient, str], monkeypatch) -> None:
     """It should restart the robot"""
     restart_mock = mock.Mock()
 
