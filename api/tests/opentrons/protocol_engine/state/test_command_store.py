@@ -556,7 +556,7 @@ def test_command_store_save_started_completed_run_timestamp() -> None:
     second_resume_time = datetime.now()
 
     subject.handle_action(PlayAction(requested_at=start_time))
-    subject.handle_action(PauseAction(source=PauseSource))
+    subject.handle_action(PauseAction(source=PauseSource.CLIENT))
 
     subject.handle_action(PlayAction(requested_at=resume_time))
     subject.handle_action(HardwareStoppedAction(completed_at=hardware_stopped_time))
