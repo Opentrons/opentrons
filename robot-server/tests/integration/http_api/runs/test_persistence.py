@@ -210,11 +210,12 @@ async def test_runs_completed_started_at_persist_via_actions_router(
     client_and_server: ClientServerFixture,
 ) -> None:
     """Test that completedAt and startedAt
-    are persisted when calling play\\hardware
-    stopped action through dev server restart."""
-    client, server = client_and_server
 
-    date_of_today = datetime.now().date()
+    are persisted when calling play\\hardware
+
+    stopped action through dev server restart.
+    """
+    client, server = client_and_server
 
     # create a run
     create_run_response = await client.post_run(req_body={"data": {}})
@@ -247,14 +248,12 @@ async def test_runs_completed_started_at_persist_via_actions_router(
     get_run_response = await client.get_run(run_id=run_id)
     run_data = get_run_response.json()["data"]
 
-    assert (
-        datetime.fromisoformat(run_data["startedAt"]).timestamp()
-        == pytest.approx(expected_started_at.timestamp(), abs=2)
+    assert datetime.fromisoformat(run_data["startedAt"]).timestamp() == pytest.approx(
+        expected_started_at.timestamp(), abs=2
     )
 
-    assert (
-        datetime.fromisoformat(run_data["completedAt"]).timestamp()
-        == pytest.approx(expected_completed_at.timestamp(), abs=2)
+    assert datetime.fromisoformat(run_data["completedAt"]).timestamp() == pytest.approx(
+        expected_completed_at.timestamp(), abs=2
     )
 
     # make sure the times are in order
@@ -265,7 +264,9 @@ async def test_runs_completed_filled_started_at_none_persist(
     client_and_server: ClientServerFixture,
 ) -> None:
     """Test that completedAt is today and startedAt is empty
-    are persisted through dev server restart."""
+
+    are persisted through dev server restart.
+    """
     client, server = client_and_server
 
     expected_completed_at = datetime.now()
@@ -284,7 +285,6 @@ async def test_runs_completed_filled_started_at_none_persist(
 
     assert "startedAt" not in run_data
 
-    assert (
-            datetime.fromisoformat(run_data["completedAt"]).timestamp()
-            == pytest.approx(expected_completed_at.timestamp(), abs=2)
+    assert datetime.fromisoformat(run_data["completedAt"]).timestamp() == pytest.approx(
+        expected_completed_at.timestamp(), abs=2
     )
