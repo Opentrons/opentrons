@@ -281,7 +281,7 @@ async def test_runs_completed_filled_started_at_none_persist(
 
     # fetch the updated run, which we expect to be persisted
     get_run_response = await client.get_run(run_id=run_id)
-    expected_run = dict(get_run_response.json()["data"], current=False)
+    run_data = get_run_response.json()["data"]
 
     assert "startedAt" not in expected_run
 
