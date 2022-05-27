@@ -112,7 +112,8 @@ async def set_avahi_service_name(new_service_name: str) -> None:
     it's a human-readable string of mostly arbitrary Unicode,
     at most 63 octets (not 63 code points or 63 characters!) long.
     (See: https://datatracker.ietf.org/doc/html/rfc6763#section-4.1.1)
-    Avahi will raise an error if it thinks the new service name is invalid.
+    Avahi will raise an exception through this function if it thinks
+    the new service name is invalid.
     """
     async with _BUS_LOCK:
         await asyncio.get_event_loop().run_in_executor(
