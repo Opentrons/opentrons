@@ -38,12 +38,14 @@ import { selectors as robotSelectors } from '../../../redux/robot'
 import * as RobotApi from '../../../redux/robot-api'
 import * as Config from '../../../redux/config'
 import * as Sessions from '../../../redux/sessions'
+import * as Calibration from '../../../redux/calibration'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
   useAttachedPipettes,
+  useDeckCalibrationStatus,
 } from '../hooks'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
@@ -115,6 +117,7 @@ export function RobotSettingsCalibration({
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
+  const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -387,6 +390,7 @@ export function RobotSettingsCalibration({
           />
         )}
       </Portal>
+      {/* Calibration Data Download Section */}
       <Box paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
@@ -414,7 +418,29 @@ export function RobotSettingsCalibration({
         </Flex>
       </Box>
       <Line />
-      {deckCalibrationButtonText === t('deck_calibration_calibrate_button') && (
+      {/* DeckCalibration Section */}
+      {deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_OK &&
+        !Array.isArray(deckCalibrationData.deckCalibrationData) &&
+        deckCalibrationData?.deckCalibrationData?.status != null &&
+        deckCalibrationData?.deckCalibrationData?.status.markedBad && (
+          <Banner type="warning">
+            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+              <StyledText as="p">
+                {t('deck_calibration_recommended')}
+              </StyledText>
+              <Link
+                role="button"
+                color={COLORS.darkBlack}
+                css={TYPOGRAPHY.pRegular}
+                textDecoration={TEXT_DECORATION_UNDERLINE}
+                onClick={() => confirmStart()}
+              >
+                {t('recalibrate_now')}
+              </Link>
+            </Flex>
+          </Banner>
+        )}
+      {deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_OK && (
         <Banner type="error">
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
             <StyledText as="p">{t('deck_calibration_missing')}</StyledText>
@@ -450,6 +476,7 @@ export function RobotSettingsCalibration({
         </Flex>
       </Box>
       <Line />
+      {/* Pipette Offset Calibration Section */}
       {showPipetteOffsetCalibrationBanner && (
         <Banner
           type={pipetteOffsetCalBannerType === 'error' ? 'error' : 'warning'}
@@ -480,6 +507,7 @@ export function RobotSettingsCalibration({
         </Flex>
       </Box>
       <Line />
+      {/* Tip Length Calibration Section */}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER}>
           <Box marginRight={SPACING.spacing6}>
@@ -503,6 +531,7 @@ export function RobotSettingsCalibration({
         </Flex>
       </Box>
       <Line />
+      {/* Calibration Health Check Section */}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
