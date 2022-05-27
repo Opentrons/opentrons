@@ -6,6 +6,7 @@ Welcome
 
     self
     tutorial
+    writing
     versioning
     new_labware
     new_modules
