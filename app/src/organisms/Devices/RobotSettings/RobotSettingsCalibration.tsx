@@ -18,6 +18,7 @@ import {
   useConditionalConfirm,
   Mount,
   AlertModal,
+  useInterval,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
@@ -84,6 +85,8 @@ export interface FormattedTipLengthCalibration {
 const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
+
+const CALIBRATION_STATUS_POLL_MS = 5000
 
 export function RobotSettingsCalibration({
   robotName,
@@ -368,6 +371,12 @@ export function RobotSettingsCalibration({
     checkPipetteCalibrationMissing()
   }, [pipettePresent, pipetteOffsetCalibrations])
 
+  useInterval(
+    () => dispatch(Calibration.fetchCalibrationStatus(robotName)),
+    CALIBRATION_STATUS_POLL_MS,
+    true
+  )
+
   return (
     <>
       <Portal level="top">
@@ -445,7 +454,8 @@ export function RobotSettingsCalibration({
       </Box>
       <Line />
       {/* DeckCalibration Section */}
-      {deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_OK &&
+      {deckCalibrationStatus &&
+        deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_OK &&
         !Array.isArray(deckCalibrationData.deckCalibrationData) &&
         deckCalibrationData?.deckCalibrationData?.status != null &&
         deckCalibrationData?.deckCalibrationData?.status.markedBad && (
@@ -466,22 +476,23 @@ export function RobotSettingsCalibration({
             </Flex>
           </Banner>
         )}
-      {deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_OK && (
-        <Banner type="error">
-          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-            <StyledText as="p">{t('deck_calibration_missing')}</StyledText>
-            <Link
-              role="button"
-              color={COLORS.darkBlack}
-              css={TYPOGRAPHY.pRegular}
-              textDecoration={TEXT_DECORATION_UNDERLINE}
-              onClick={confirmStart}
-            >
-              {t('calibrate_now')}
-            </Link>
-          </Flex>
-        </Banner>
-      )}
+      {deckCalibrationStatus &&
+        deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_OK && (
+          <Banner type="error">
+            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+              <StyledText as="p">{t('deck_calibration_missing')}</StyledText>
+              <Link
+                role="button"
+                color={COLORS.darkBlack}
+                css={TYPOGRAPHY.pRegular}
+                textDecoration={TEXT_DECORATION_UNDERLINE}
+                onClick={confirmStart}
+              >
+                {t('calibrate_now')}
+              </Link>
+            </Flex>
+          </Banner>
+        )}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
