@@ -3,12 +3,12 @@
 from typing import cast, Iterator
 import pytest
 from mock import AsyncMock, patch
-from opentrons.types import Point
 from opentrons.config.types import GantryLoad, CapacitivePassSettings
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
+from opentrons.hardware_control.backends.ot3utils import axis_to_node
 
 
 @pytest.fixture
@@ -49,7 +49,13 @@ def mock_backend_capacitive_probe(
     with patch.object(
         backend, "capacitive_probe", AsyncMock(spec=backend.capacitive_probe)
     ) as mock_probe:
-        mock_probe.return_value = Point(1, 2, 3)
+
+        def _update_position(
+            mount: OT3Mount, moving: OT3Axis, distance_mm: float, speed_mm_per_s: float
+        ) -> None:
+            ot3_hardware._backend._position[axis_to_node(moving)] += distance_mm / 2
+
+        mock_probe.side_effect = _update_position
         yield mock_probe
 
 
@@ -79,9 +85,13 @@ async def test_capacitive_probe(
         speed_mm_per_s=4,
         sensor_threshold_pf=1.0,
     )
-
     res = await ot3_hardware.capacitive_probe(mount, moving, 2, fake_settings)
-    assert res == pytest.approx(3 + moving.of_point(here))
+    # in reality, this value would be the previous position + the value
+    # updated in ot3controller.capacitive_probe, and it kind of is here, but that
+    # previous position is always 0. This is a test of ot3api though and checking
+    # that the mock got called correctly and the resulting output was handled
+    # correctly, by asking for backend._position afterwards, is good enough.
+    assert res == pytest.approx(1.5)
     mock_backend_capacitive_probe.assert_called_once_with(mount, moving, 3, 4)
     for call in mock_move_to.call_args_list:
         if moving in [OT3Axis.Z_R, OT3Axis.Z_L]:

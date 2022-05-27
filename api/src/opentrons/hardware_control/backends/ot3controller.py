@@ -654,4 +654,4 @@ class OT3Controller:
             log_sensor_values=True,
         )
 
-        self._position[axis_to_node(OT3Axis.by_mount(mount))] = pos
+        self._position[axis_to_node(moving)] = pos
