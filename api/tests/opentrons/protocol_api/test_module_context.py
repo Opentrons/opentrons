@@ -13,12 +13,18 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,
     HeaterShakerModuleModel
 )
-from opentrons.protocol_api import ProtocolContext
+from opentrons.protocol_api import ProtocolContext, module_contexts
 from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
+from opentrons.protocol_api.module_validation_and_errors import validate_heater_shaker_temperature
 from opentrons_shared_data import load_shared_data
 from opentrons.types import Point, Location
+
+
+# @pytest.fixture
+# def mock_temp_validator() -> mock.MagicMock:
+#     return mock.MagicMock(spec=validate_heater_shaker_temperature)
 
 
 @pytest.fixture
@@ -102,7 +108,9 @@ async def ctx_with_thermocycler(
 
 @pytest.fixture
 async def ctx_with_heater_shaker(
-        mock_hardware: mock.AsyncMock, mock_module_controller: mock.MagicMock
+        mock_hardware: mock.AsyncMock,
+        mock_module_controller: mock.MagicMock,
+        # mock_temp_validator: mock.MagicMock
 ) -> ProtocolContext:
     """Context fixture with a mock heater-shaker."""
     mock_module_controller.model.return_value = "heaterShakerModuleV1"
@@ -119,6 +127,8 @@ async def ctx_with_heater_shaker(
         implementation=ProtocolContextImplementation(sync_hardware=mock_hardware),
     )
 
+
+# ______ load_module tests _______
 
 def test_load_module(ctx_with_tempdeck):
     ctx_with_tempdeck.home()
@@ -190,6 +200,8 @@ def test_load_simulating_module(ctx, loadname, klass, model):
     assert mod._module.model() == model
 
 
+# ________ Temperature Module tests _________
+
 def test_tempdeck(ctx_with_tempdeck, mock_module_controller):
     mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
     assert ctx_with_tempdeck.deck[1] == mod._geometry
@@ -233,6 +245,8 @@ def test_tempdeck_status(ctx_with_tempdeck, mock_module_controller):
     type(mock_module_controller).status = m
     assert mod.status == "some status"
 
+
+# _________ Magnetic Module tests __________
 
 def test_magdeck(ctx_with_magdeck, mock_module_controller):
     mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
@@ -285,6 +299,8 @@ def test_magdeck_calibrate(ctx_with_magdeck, mock_module_controller):
     )
     mock_module_controller.calibrate.assert_called_once()
 
+
+# _________ Thermocycler tests __________
 
 def test_thermocycler(ctx_with_thermocycler, mock_module_controller):
     mod = ctx_with_thermocycler.load_module("thermocycler")
@@ -444,6 +460,179 @@ def test_thermocycler_profile(ctx_with_thermocycler, mock_module_controller):
     )
 
 
+def test_thermocycler_semi_plate_configuration(ctx):
+    labware_name = "nest_96_wellplate_100ul_pcr_full_skirt"
+    mod = ctx.load_module("thermocycler", configuration="semi")
+    assert mod._geometry.labware_offset == Point(-23.28, 82.56, 97.8)
+
+    tc_labware = mod.load_labware(labware_name)
+
+    other_labware = ctx.load_labware(labware_name, 2)
+    without_first_two_cols = other_labware.wells()[16::]
+    for tc_well, other_well in zip(tc_labware.wells(), without_first_two_cols):
+        tc_well_name = tc_well.display_name.split()[0]
+        other_well_name = other_well.display_name.split()[0]
+        assert tc_well_name == other_well_name
+
+
+def test_thermocycler_flag_unsafe_move(ctx_with_thermocycler, mock_module_controller):
+    """Flag unsafe should raise if the lid is open and source or target is
+    the labware on thermocycler."""
+    mod = ctx_with_thermocycler.load_module("thermocycler", configuration="semi")
+    labware_name = "nest_96_wellplate_100ul_pcr_full_skirt"
+    tc_labware = mod.load_labware(labware_name)
+
+    with_tc_labware = Location(None, tc_labware)  # type: ignore[arg-type]
+    without_tc_labware = Location(None, None)  # type: ignore[arg-type]
+
+    m = mock.PropertyMock(return_value="closed")
+    type(mock_module_controller).lid_status = m
+
+    with pytest.raises(RuntimeError, match="Cannot move to labware"):
+        mod.flag_unsafe_move(with_tc_labware, without_tc_labware)
+    with pytest.raises(RuntimeError, match="Cannot move to labware"):
+        mod.flag_unsafe_move(without_tc_labware, with_tc_labware)
+
+
+# __________ Heater Shaker tests __________
+
+def test_heater_shaker_loading(
+        ctx_with_heater_shaker: ProtocolContext,
+        mock_module_controller: mock.MagicMock
+) -> None:
+    """It should load a heater-shaker in the specified slot."""
+    mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 3)
+    assert ctx_with_heater_shaker.deck[3] == mod.geometry
+
+
+def test_heater_shaker_set_target_temperature(
+        ctx_with_heater_shaker: ProtocolContext,
+        mock_module_controller: mock.MagicMock,
+        # mock_validator: mock.MagicMock
+) -> None:
+    """It should issue a hw control command to set validated target temperature."""
+    with mock.patch(
+            "opentrons.protocol_api.module_contexts.validate_heater_shaker_temperature"
+    ) as mock_validator:
+        mock_validator.return_value = 10
+        hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
+        hs_mod.set_target_temperature(celsius=50)
+        mock_validator.assert_called_once_with(celsius=50)
+        mock_module_controller.start_set_temperature.assert_called_once_with(celsius=10)
+
+
+def test_heater_shaker_wait_for_temperature(
+        ctx_with_heater_shaker: ProtocolContext,
+        mock_module_controller: mock.MagicMock
+) -> None:
+    """It should issue a hardware control wait for temperature."""
+    mock_target_temp = mock.PropertyMock(return_value=100)
+    type(mock_module_controller).target_temperature = mock_target_temp
+
+    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
+    hs_mod.wait_for_temperature()
+    mock_module_controller.await_temperature.assert_called_once_with(
+        awaiting_temperature=100)
+
+
+def test_heater_shaker_set_and_wait_for_temperature(
+        ctx_with_heater_shaker: ProtocolContext,
+        mock_module_controller: mock.MagicMock
+) -> None:
+    """It should issue a set and wait for the target temperature."""
+    mock_target_temp = mock.PropertyMock(return_value=100)
+    type(mock_module_controller).target_temperature = mock_target_temp
+
+    with mock.patch(
+            "opentrons.protocol_api.module_contexts.validate_heater_shaker_temperature"
+    ) as mock_validator:
+        mock_validator.return_value = 11
+        hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
+        hs_mod.set_and_wait_for_temperature(celsius=50)
+        mock_validator.assert_called_once_with(celsius=50)
+        mock_module_controller.start_set_temperature.assert_called_once_with(celsius=11)
+        mock_module_controller.await_temperature.assert_called_once_with(
+            awaiting_temperature=100
+        )
+
+
+def test_heater_shaker_temperature_properties(
+        ctx_with_heater_shaker: ProtocolContext,
+        mock_module_controller: mock.MagicMock
+) -> None:
+    """It should return the correct target and current temperature values."""
+    mock_target_temp = mock.PropertyMock(return_value=100)
+    type(mock_module_controller).target_temperature = mock_target_temp
+    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
+    target_temp = hs_mod.target_temperature
+    assert target_temp == 100
+
+
+def test_heater_shaker_set_and_wait_for_shake_speed(
+        ctx_with_heater_shaker: ProtocolContext,
+        mock_module_controller: mock.MagicMock
+) -> None:
+    """It should issue a blocking set target shake speed."""
+    with mock.patch(
+            "opentrons.protocol_api.module_contexts.validate_heater_shaker_speed"
+    ) as mock_validator:
+        mock_validator.return_value = 10
+        hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
+        hs_mod.set_and_wait_for_shake_speed(rpm=400)
+        mock_validator.assert_called_once_with(rpm=400)
+        mock_module_controller.set_speed.assert_called_once_with(rpm=10)
+
+
+def test_heater_shaker_open_labware_latch(
+        ctx_with_heater_shaker: ProtocolContext,
+        mock_module_controller: mock.MagicMock
+) -> None:
+    """It should issue a labware latch open command."""
+    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
+    hs_mod.open_labware_latch()
+    mock_module_controller.open_labware_latch.assert_called_once()
+
+
+def test_heater_shaker_open_labware_latch_raises(
+        ctx_with_heater_shaker: ProtocolContext,
+        mock_module_controller: mock.MagicMock
+) -> None:
+    """It should raise when opening latch during a shake."""
+    # TODO: write test
+
+
+def test_heater_shaker_close_labware_latch(
+        ctx_with_heater_shaker: ProtocolContext,
+        mock_module_controller: mock.MagicMock
+) -> None:
+    """It should issue a labware latch close command."""
+    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
+    hs_mod.close_labware_latch()
+    mock_module_controller.close_labware_latch.assert_called_once()
+
+
+def test_heater_shaker_deactivate_heater(
+        ctx_with_heater_shaker: ProtocolContext,
+        mock_module_controller: mock.MagicMock
+) -> None:
+    """It should issue a deactivate heater hw control command."""
+    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
+    hs_mod.deactivate_heater()
+    mock_module_controller.deactivate_heater.assert_called_once()
+
+
+def test_heater_shaker_deactivate_shaker(
+        ctx_with_heater_shaker: ProtocolContext,
+        mock_module_controller: mock.MagicMock
+) -> None:
+    """It should issue a deactivate shaker hw control command."""
+    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
+    hs_mod.deactivate_shaker()
+    mock_module_controller.deactivate_shaker.assert_called_once()
+
+# __________ Testing loading Labware on modules ___________
+
+
 def test_module_load_labware(ctx_with_tempdeck):
     labware_name = "corning_96_wellplate_360ul_flat"
     # TODO Ian 2019-05-29 load fixtures, not real defs
@@ -576,41 +765,3 @@ def test_module_compatibility(get_module_fixture, monkeypatch):
         DummyEnum("compatibleGenerationV1"),  # type: ignore[arg-type]
         DummyEnum("incompatibleGenerationV1"),  # type: ignore[arg-type]
     )
-
-
-def test_thermocycler_semi_plate_configuration(ctx):
-    labware_name = "nest_96_wellplate_100ul_pcr_full_skirt"
-    mod = ctx.load_module("thermocycler", configuration="semi")
-    assert mod._geometry.labware_offset == Point(-23.28, 82.56, 97.8)
-
-    tc_labware = mod.load_labware(labware_name)
-
-    other_labware = ctx.load_labware(labware_name, 2)
-    without_first_two_cols = other_labware.wells()[16::]
-    for tc_well, other_well in zip(tc_labware.wells(), without_first_two_cols):
-        tc_well_name = tc_well.display_name.split()[0]
-        other_well_name = other_well.display_name.split()[0]
-        assert tc_well_name == other_well_name
-
-
-def test_thermocycler_flag_unsafe_move(ctx_with_thermocycler, mock_module_controller):
-    """Flag unsafe should raise if the lid is open and source or target is
-    the labware on thermocycler."""
-    mod = ctx_with_thermocycler.load_module("thermocycler", configuration="semi")
-    labware_name = "nest_96_wellplate_100ul_pcr_full_skirt"
-    tc_labware = mod.load_labware(labware_name)
-
-    with_tc_labware = Location(None, tc_labware)  # type: ignore[arg-type]
-    without_tc_labware = Location(None, None)  # type: ignore[arg-type]
-
-    m = mock.PropertyMock(return_value="closed")
-    type(mock_module_controller).lid_status = m
-
-    with pytest.raises(RuntimeError, match="Cannot move to labware"):
-        mod.flag_unsafe_move(with_tc_labware, without_tc_labware)
-    with pytest.raises(RuntimeError, match="Cannot move to labware"):
-        mod.flag_unsafe_move(without_tc_labware, with_tc_labware)
-
-
-def test_heater_shaker_context():
-    """Test heater-shaker"""

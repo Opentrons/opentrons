@@ -672,6 +672,7 @@ def resolve_module_model(module_model_or_load_name: str) -> ModuleModel:
         "temperature module gen2": TemperatureModuleModel.TEMPERATURE_V2,
         "thermocycler": ThermocyclerModuleModel.THERMOCYCLER_V1,
         "thermocycler module": ThermocyclerModuleModel.THERMOCYCLER_V1,
+        # No alias for heater-shaker. Use heater-shaker model name for loading.
     }
 
     lower_name = module_model_or_load_name.lower()

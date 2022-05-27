@@ -12,6 +12,10 @@ from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
 
+from .module_validation_and_errors import (
+    validate_heater_shaker_temperature,
+    validate_heater_shaker_speed
+)
 from .labware import Labware, load, load_from_definition
 from .load_info import LabwareLoadInfo
 from opentrons.protocols.geometry.module_geometry import (
@@ -779,7 +783,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     It should not be instantiated directly; instead, it should be
     created through :py:meth:`.ProtocolContext.load_module`.
 
-    .. versionadded:: 2.13 ?? Bump up the API version?
+    .. versionadded:: 2.13
     """
 
     def __init__(
@@ -797,8 +801,14 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         self._loop = loop
         super().__init__(ctx, geometry, requested_as, at_version)
 
+    @property
+    @requires_version(2, 13)
+    def target_temperature(self):
+        """Target temperature of the Heater-Shaker."""
+        return self._module.target_temperature
+
     # TODO: add command publisher
-    # TODO: add new API version requirement
+    @requires_version(2, 13)
     def set_and_wait_for_temperature(self, celsius: float) -> None:
         """Set and wait for target temperature.
 
@@ -807,10 +817,11 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
 
         :param celsius: The target temperature, in °C in range 37°C to 95°C.
         """
-        pass
+        self.set_target_temperature(celsius=celsius)
+        self.wait_for_temperature()
 
     # TODO: add command publisher
-    # TODO: add new API version requirement
+    @requires_version(2, 13)
     def set_target_temperature(self, celsius: float) -> None:
         """Set target temperature and return immediately.
 
@@ -819,29 +830,32 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         target temperature has reached. Use `wait_for_target_temperature` to delay
         protocol execution.
         """
-        pass
+        validated_temp = validate_heater_shaker_temperature(celsius=celsius)
+        self._module.start_set_temperature(celsius=validated_temp)
 
     # TODO: add command publisher
-    # TODO: add new API version requirement
-    def wait_for_target_temperature(self) -> None:
+    @requires_version(2, 13)
+    def wait_for_temperature(self) -> None:
         """Wait for target temperature.
 
         Delays protocol execution until heater-shaker has reached its target
         temperature. The module should have a target temperature set previously.
         """
+        self._module.await_temperature(awaiting_temperature=self.target_temperature)
 
     # TODO: add command publisher
-    # TODO: add new API version requirement
+    @requires_version(2, 13)
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set and wait for target speed.
 
         Set the heater shaker's target speed and wait until the specified speed has
         reached. Delays protocol execution until the target speed has been achieved.
         """
-        pass
+        validated_speed = validate_heater_shaker_speed(rpm=rpm)
+        self._module.set_speed(rpm=validated_speed)
 
     # TODO: add command publisher
-    # TODO: add new API version requirement
+    @requires_version(2, 13)
     def open_labware_latch(self) -> None:
         """Open heater-shaker's labware latch.
 
@@ -851,18 +865,23 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
 
         Raises an error when attempting to open latch while heater-shaker is shaking.
         """
+        # TODO: Raise error when module is shaking
+        self._module.open_labware_latch()
 
     # TODO: add command publisher
-    # TODO: add new API version requirement
+    @requires_version(2, 13)
     def close_labware_latch(self) -> None:
         """Close heater-shaker's labware latch """
+        self._module.close_labware_latch()
 
     # TODO: add command publisher
-    # TODO: add new API version requirement
+    @requires_version(2, 13)
     def deactivate_shaker(self) -> None:
         """Stop shaking."""
+        self._module.deactivate_shaker()
 
     # TODO: add command publisher
-    # TODO: add new API version requirement
+    @requires_version(2, 13)
     def deactivate_heater(self) -> None:
         """Stop heating."""
+        self._module.deactivate_heater()
