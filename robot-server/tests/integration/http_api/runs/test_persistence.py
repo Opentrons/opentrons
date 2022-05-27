@@ -221,12 +221,14 @@ async def test_runs_completed_started_at_persist_via_actions_router(
     run_id = create_run_response.json()["data"]["id"]
 
     # persist the run by hitting the actions router
+    expected_started_at = datetime.now()
     await client.post_run_action(
         run_id=run_id,
         req_body={"data": {"actionType": "play"}},
     )
 
     # persist the run by hitting the actions router
+    expected_completed_at = datetime.now()
     await client.post_run_action(
         run_id=run_id,
         req_body={"data": {"actionType": "stop"}},
