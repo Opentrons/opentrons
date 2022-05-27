@@ -236,8 +236,12 @@ async def test_runs_completed_started_at_persist_via_actions_router(
         req_body={"data": {"actionType": "stop"}},
     )
 
-    # TODO (tz, 5-25-22): wait for hardware stopped action to be dispatched
-    await anyio.sleep(0.1)
+    # wait for the action to take effect
+    with anyio.fail_after(5):
+        while (await client.get_run(run_id=run_id)).json()["data"][
+            "status"
+        ] != "stopped":
+            await anyio.sleep(0.1)
 
     await client.patch_run(run_id=run_id, req_body={"data": {"current": False}})
 
