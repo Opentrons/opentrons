@@ -18,20 +18,18 @@ import { usePipetteSettingsQuery } from '@opentrons/react-api-client/src/pipette
 import type { State } from '../../redux/types'
 import type {
   AttachedPipette,
-  Mount,
   PipetteSettingsFieldsUpdate,
 } from '../../redux/pipettes/types'
 
 const PIPETTE_SETTINGS_POLL_MS = 5000
 interface Props {
   robotName: string
-  mount: Mount
   closeModal: () => unknown
   pipetteId: AttachedPipette['id']
 }
 
 export function ConfigurePipette(props: Props): JSX.Element {
-  const { robotName, mount, closeModal, pipetteId } = props
+  const { robotName, closeModal, pipetteId } = props
   const { t } = useTranslation('device_details')
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const settings = usePipetteSettingsQuery({
@@ -40,11 +38,9 @@ export function ConfigurePipette(props: Props): JSX.Element {
   const updateSettings = (fields: PipetteSettingsFieldsUpdate): void => {
     dispatchRequest(updatePipetteSettings(robotName, pipetteId, fields))
   }
-
-  console.log(settings)
+  const latestRequestId = last(requestIds)
   const updateRequest = useSelector((state: State) =>
-    // @ts-expect-error(sa, 2021-05-27): avoiding src code change, verify last(requestIds) is not undefined
-    getRequestById(state, last(requestIds))
+    latestRequestId != null ? getRequestById(state, latestRequestId) : null
   )
 
   const updateError: string | null =
@@ -64,7 +60,6 @@ export function ConfigurePipette(props: Props): JSX.Element {
   }, [updateRequest, closeModal])
 
   console.log(updateRequest)
-  console.log(updateSettings)
   return (
     <Box zIndex={1}>
       {updateError && <ConfigErrorBanner message={updateError} />}

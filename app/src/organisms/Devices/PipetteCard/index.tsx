@@ -140,7 +140,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       )}
       {showSlideout && pipetteInfo != null && pipetteId != null && (
         <PipetteSettingsSlideout
-          mount={mount}
           robotName={robotName}
           pipetteName={pipetteInfo.displayName}
           onCloseClick={() => setShowSlideout(false)}

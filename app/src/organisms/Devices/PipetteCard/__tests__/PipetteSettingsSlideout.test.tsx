@@ -27,7 +27,7 @@ describe('PipetteSettingsSlideout', () => {
   let props: React.ComponentProps<typeof PipetteSettingsSlideout>
   beforeEach(() => {
     props = {
-      mount: 'left',
+      pipetteId: 'id',
       robotName: mockRobotName,
       pipetteName: mockLeftSpecs.displayName,
       isExpanded: true,
