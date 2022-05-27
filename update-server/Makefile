@@ -53,7 +53,6 @@ test:
 
 .PHONY: lint
 lint:
-# TODO(mm, 2022-05-26): Also check ./tests with mypy.
 	$(python) -m mypy otupdate
 	$(python) -m black --check ./otupdate ./tests
 	$(python) -m flake8 otupdate tests
