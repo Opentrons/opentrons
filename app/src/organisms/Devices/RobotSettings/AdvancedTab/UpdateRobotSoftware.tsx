@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
-import { TertiaryButton } from '../../../../atoms/Buttons'
+import { TertiaryButton } from '../../../../atoms/buttons'
 import {
   getBuildrootUpdateDisplayInfo,
   startBuildrootUpdate,
@@ -32,10 +32,12 @@ const HIDDEN_CSS = css`
 
 interface UpdateRobotSoftwareProps {
   robotName: string
+  onUpdateStart: () => void
 }
 
 export function UpdateRobotSoftware({
   robotName,
+  onUpdateStart,
 }: UpdateRobotSoftwareProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
@@ -49,6 +51,7 @@ export function UpdateRobotSoftware({
     const { files } = event.target
     if (files?.length === 1 && !updateDisabled) {
       dispatch(startBuildrootUpdate(robotName, files[0].path))
+      onUpdateStart()
     }
     event.target.value = ''
   }
@@ -61,7 +64,7 @@ export function UpdateRobotSoftware({
     >
       <Box width="70%">
         <StyledText
-          as="h3"
+          as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing4}
           id="AdvancedSettings_updateRobotSoftware"

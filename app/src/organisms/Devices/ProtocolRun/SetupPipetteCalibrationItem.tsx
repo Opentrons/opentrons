@@ -19,7 +19,7 @@ import {
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
-import { TertiaryButton } from '../../../atoms/Buttons'
+import { TertiaryButton } from '../../../atoms/buttons'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../../organisms/CalibrationPanels'
@@ -33,8 +33,7 @@ import { SetupCalibrationItem } from './SetupCalibrationItem'
 import type { PipetteInfo } from '../hooks'
 
 const inexactPipetteSupportArticle =
-  'https://support.opentrons.com/en/articles/3450143-gen2-pipette-compatibility'
-
+  'https://support.opentrons.com/s/article/GEN2-pipette-compatibility'
 interface SetupPipetteCalibrationItemProps {
   pipetteInfo: PipetteInfo
   index: number

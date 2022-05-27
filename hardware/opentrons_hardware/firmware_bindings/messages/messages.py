@@ -75,6 +75,9 @@ MessageDefinition = Union[
     defs.BindSensorOutputRequest,
     defs.TipActionRequest,
     defs.TipActionResponse,
+    defs.PeripheralStatusRequest,
+    defs.PeripheralStatusResponse,
+    defs.SetSerialNumber,
 ]
 
 

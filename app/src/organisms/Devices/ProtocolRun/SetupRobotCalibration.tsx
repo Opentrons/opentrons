@@ -9,7 +9,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { useTrackEvent } from '../../../redux/analytics'
 import { useDeckCalibrationData, useRunHasStarted } from '../hooks'

@@ -18,13 +18,13 @@ import {
   ModuleType,
 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
 import { i18n } from '../../../../i18n'
 import { useLPCSuccessToast } from '../../../ProtocolSetup/hooks'
 import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
 import { ModuleExtraAttention } from '../ModuleExtraAttention'
-import { LabwareInfoOverlay } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay'
+import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
@@ -59,7 +59,7 @@ jest.mock('../../../ProtocolSetup/hooks')
 jest.mock('../../../ProtocolSetup/LabwareOffsetSuccessToast')
 jest.mock('../../../LabwarePositionCheck')
 jest.mock('../ModuleExtraAttention')
-jest.mock('../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay')
+jest.mock('../LabwareInfoOverlay')
 jest.mock('../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal')
 jest.mock(
   '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'

@@ -6,6 +6,7 @@ import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
 
 import {
@@ -14,12 +15,16 @@ import {
 } from '../../../../redux/modules/__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../useModuleIdFromRun')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
 const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
   typeof useCreateCommandMutation
+>
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
 >
 
 const render = (props: React.ComponentProps<typeof MagneticModuleSlideout>) => {
@@ -48,6 +53,7 @@ describe('MagneticModuleSlideout', () => {
     mockUseCommandMutation.mockReturnValue({
       createCommand: mockCreateCommand,
     } as any)
+    mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -103,10 +109,10 @@ describe('MagneticModuleSlideout', () => {
     fireEvent.click(button)
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'magneticModule/engageMagnet',
+        commandType: 'magneticModule/engage',
         params: {
           moduleId: 'magdeck_id',
-          engageHeight: 10,
+          height: 10,
         },
       },
     })
@@ -130,10 +136,10 @@ describe('MagneticModuleSlideout', () => {
     expect(mockCreateCommand).toHaveBeenCalledWith({
       runId: props.runId,
       command: {
-        commandType: 'magneticModule/engageMagnet',
+        commandType: 'magneticModule/engage',
         params: {
           moduleId: 'magdeck_id',
-          engageHeight: 10,
+          height: 10,
         },
       },
     })

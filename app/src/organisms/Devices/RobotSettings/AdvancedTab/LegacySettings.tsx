@@ -10,7 +10,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
-import { ToggleButton } from '../../../../atoms/Buttons'
+import { ToggleButton } from '../../../../atoms/buttons'
 import { updateSetting } from '../../../../redux/robot-settings'
 
 import type { Dispatch } from '../../../../redux/types'
@@ -35,7 +35,7 @@ export function LegacySettings({
       <Box width="70%">
         <StyledText
           as="h2"
-          css={TYPOGRAPHY.h3SemiBold}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing4}
           id="AdvancedSettings_showLink"
         >

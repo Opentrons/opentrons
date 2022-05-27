@@ -67,6 +67,7 @@ function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
       <Box
         paddingRight={SPACING.spacing2}
         textTransform={TYPOGRAPHY.textTransformNone}
+        css={TYPOGRAPHY.labelRegular}
       >
         {crumbDisplayNameByParam[crumbName] ?? crumbName}
       </Box>

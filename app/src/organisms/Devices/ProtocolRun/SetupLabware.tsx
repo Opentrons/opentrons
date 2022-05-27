@@ -30,15 +30,15 @@ import {
   inferModuleOrientationFromXCoordinate,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
-import { SecondaryButton } from '../../../atoms/Buttons'
+import { SecondaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { StyledText } from '../../../atoms/text'
 import { useLPCSuccessToast } from '../../../organisms/ProtocolSetup/hooks'
 import { LabwarePositionCheck } from '../../../organisms/LabwarePositionCheck'
 import { ModuleExtraAttention } from './ModuleExtraAttention'
-import { LabwareInfoOverlay } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay'
+import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import { DownloadOffsetDataModal } from '../../../organisms/ProtocolUpload/DownloadOffsetDataModal'

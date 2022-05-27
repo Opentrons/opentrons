@@ -3,7 +3,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import API as HardwareAPI
@@ -16,7 +16,7 @@ from opentrons.protocol_engine.types import DeckSlotLocation, LoadedLabware
 
 async def test_create_engine_initializes_state_with_deck_geometry(
     hardware_api: HardwareAPI,
-    standard_deck_def: DeckDefinitionV2,
+    standard_deck_def: DeckDefinitionV3,
     fixed_trash_def: LabwareDefinition,
 ) -> None:
     """It should load deck geometry data into the store on create."""

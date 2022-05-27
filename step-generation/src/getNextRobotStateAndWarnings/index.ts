@@ -68,11 +68,11 @@ function _getNextRobotStateAndWarningsSingleCommand(
       forPickUpTip(command.params, invariantContext, robotStateAndWarnings)
       break
 
-    case 'magneticModule/engageMagnet':
+    case 'magneticModule/engage':
       forEngageMagnet(command.params, invariantContext, robotStateAndWarnings)
       break
 
-    case 'magneticModule/disengageMagnet':
+    case 'magneticModule/disengage':
       forDisengageMagnet(
         command.params,
         invariantContext,
@@ -98,7 +98,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
-    case 'temperatureModule/awaitTemperature':
+    case 'temperatureModule/waitForTemperature':
       forAwaitTemperature(
         command.params,
         invariantContext,
@@ -122,7 +122,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
-    case 'thermocycler/awaitBlockTemperature':
+    case 'thermocycler/waitForBlockTemperature':
       forThermocyclerAwaitBlockTemperature(
         command.params,
         invariantContext,
@@ -130,7 +130,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
-    case 'thermocycler/awaitLidTemperature':
+    case 'thermocycler/waitForLidTemperature':
       forThermocyclerAwaitLidTemperature(
         command.params,
         invariantContext,

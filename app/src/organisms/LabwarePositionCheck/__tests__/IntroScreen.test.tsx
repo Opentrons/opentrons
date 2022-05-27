@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
@@ -182,15 +182,6 @@ describe('IntroScreen', () => {
   it('should should rotate through the active section', () => {
     render(props)
     expect(mockUseInterval.mock.calls[0][1]).toBe(INTERVAL_MS)
-  })
-  it('should render offset deletion alert if there are previous offsets', () => {
-    when(mockGetLatestLabwareOffsetCount)
-      .calledWith(mockOffsets)
-      .mockReturnValue(2)
-    const { getByText } = render(props)
-    getByText(
-      'Once you begin Labware Position Check, previously created Labware Offsets will be discarded.'
-    )
   })
   it('should not render offset deletion alert if there are no previous offsets', () => {
     when(mockGetLatestLabwareOffsetCount)

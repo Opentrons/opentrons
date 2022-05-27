@@ -46,7 +46,8 @@
   "liquids": {
     "waterId": {
       "displayName": "Water",
-      "description": "Liquid H2O"
+      "description": "Liquid H2O",
+      "displayColor": "#7332a8"
     }
   },
   "labwareDefinitions": {
@@ -1237,18 +1238,6 @@
   },
   "commands": [
     {
-      "commandType": "home",
-      "id": "00abc123",
-      "params": {}
-    },
-    {
-      "commandType": "home",
-      "id": "00abc123",
-      "params": {
-        "axes": ["x", "y", "leftZ", "rightZ", "leftPlunger", "rightPlunger"]
-      }
-    },
-    {
       "commandType": "loadPipette",
       "id": "0abc123",
       "params": {
@@ -1322,6 +1311,11 @@
           "B1": 100
         }
       }
+    },
+    {
+      "commandType": "home",
+      "id": "00abc123",
+      "params": {}
     },
     {
       "commandType": "pickUpTip",

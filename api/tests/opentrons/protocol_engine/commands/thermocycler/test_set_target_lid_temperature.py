@@ -25,9 +25,11 @@ async def test_set_target_lid_temperature(
 
     data = tc_commands.SetTargetLidTemperatureParams(
         moduleId="input-thermocycler-id",
-        temperature=12.3,
+        celsius=12.3,
     )
-    expected_result = tc_commands.SetTargetLidTemperatureResult()
+    expected_result = tc_commands.SetTargetLidTemperatureResult(
+        targetLidTemperature=45.6
+    )
 
     tc_module_substate = decoy.mock(cls=ThermocyclerModuleSubState)
     tc_hardware = decoy.mock(cls=Thermocycler)

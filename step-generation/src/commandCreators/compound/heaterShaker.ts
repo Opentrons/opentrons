@@ -10,8 +10,8 @@ import { getModuleState } from '../../robotStateSelectors'
 import { heaterShakerOpenLatch } from '../atomic/heaterShakerOpenLatch'
 import { heaterShakerCloseLatch } from '../atomic/heaterShakerCloseLatch'
 import { heaterShakerDeactivateHeater } from '../atomic/heaterShakerDeactivateHeater'
-import { setTemperature as heaterShakerSetTemperature } from '../atomic/setTemperature'
-import { awaitTemperature as heaterShakerAwaitTemperature } from '../atomic'
+import { setTemperature } from '../atomic/setTemperature'
+import { waitForTemperature } from '../atomic'
 import { heaterShakerStopShake } from '../atomic/heaterShakerStopShake'
 import { heaterShakerSetTargetShakeSpeed } from '../atomic/heaterShakerSetTargetShakeSpeed'
 
@@ -55,7 +55,7 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
     )
   } else {
     commandCreators.push(
-      curryCommandCreator(heaterShakerSetTemperature, {
+      curryCommandCreator(setTemperature, {
         module: args.module,
         targetTemperature: args.targetTemperature,
         commandCreatorFnName: 'setTemperature',
@@ -63,9 +63,10 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
     )
 
     commandCreators.push(
-      curryCommandCreator(heaterShakerAwaitTemperature, {
+      curryCommandCreator(waitForTemperature, {
         module: args.module,
         temperature: args.targetTemperature,
+        // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10182 merges
         commandCreatorFnName: 'awaitTemperature',
       })
     )

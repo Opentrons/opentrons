@@ -83,7 +83,7 @@ try:
 
     _BUS_STATE: Optional[DBusState] = None
 
-    def _set_avahi_service_name_sync(new_service_name: str):
+    def _set_avahi_service_name_sync(new_service_name: str) -> None:
         """The synchronous implementation of setting the Avahi service name.
 
         The dbus module doesn't natively support async/await.
@@ -136,7 +136,7 @@ try:
 except ImportError:
     LOG.exception("Couldn't import dbus, name setting will be nonfunctional")
 
-    def _set_avahi_service_name_sync(new_service_name: str):
+    def _set_avahi_service_name_sync(new_service_name: str) -> None:
         LOG.warning("Not setting name, dbus could not be imported")
 
 
@@ -249,7 +249,7 @@ async def set_up_static_hostname() -> str:
     return hostname
 
 
-def _rewrite_machine_info(new_pretty_hostname: str):
+def _rewrite_machine_info(new_pretty_hostname: str) -> None:
     """Write a new value for the pretty hostname.
 
     :raises OSError: If the new value could not be written.
@@ -287,7 +287,7 @@ def _rewrite_machine_info_str(
     return new_contents
 
 
-def get_pretty_hostname(default: str = "no name set"):
+def get_pretty_hostname(default: str = "no name set") -> str:
     """Get the currently-configured pretty hostname"""
     try:
         with open("/etc/machine-info") as emi:
@@ -356,7 +356,9 @@ async def set_name_endpoint(request: web.Request) -> web.Response:
     """
 
     def build_400(msg: str) -> web.Response:
-        return web.json_response(data={"message": msg}, status=400)
+        return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
+            data={"message": msg}, status=400
+        )
 
     try:
         body = await request.json()
@@ -376,7 +378,9 @@ async def set_name_endpoint(request: web.Request) -> web.Response:
     new_name = await set_name(app=request.app, new_name=name_to_set)
 
     request.app[DEVICE_NAME_VARNAME] = new_name
-    return web.json_response(data={"name": new_name}, status=200)
+    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
+        data={"name": new_name}, status=200
+    )
 
 
 async def get_name_endpoint(request: web.Request) -> web.Response:
@@ -387,6 +391,6 @@ async def get_name_endpoint(request: web.Request) -> web.Response:
 
     GET /server/name -> 200 OK, {'name': robot name}
     """
-    return web.json_response(
+    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
         data={"name": request.app[DEVICE_NAME_VARNAME]}, status=200
     )

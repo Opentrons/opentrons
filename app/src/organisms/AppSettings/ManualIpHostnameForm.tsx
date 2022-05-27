@@ -11,7 +11,7 @@ import {
   Text,
   COLORS,
 } from '@opentrons/components'
-import { TertiaryButton } from '../../atoms/Buttons'
+import { TertiaryButton } from '../../atoms/buttons'
 import { addManualIp } from '../../redux/config'
 import { startDiscovery } from '../../redux/discovery'
 

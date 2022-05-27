@@ -82,7 +82,14 @@ export function BaseModal(props: BaseModalProps): JSX.Element {
   const headerStyle = props.noHeaderStyles === true ? null : HEADER_STYLE
 
   return (
-    <Flex {...BASE_STYLE} backgroundColor={overlayColor} zIndex={zIndex}>
+    <Flex
+      {...BASE_STYLE}
+      backgroundColor={overlayColor}
+      zIndex={zIndex}
+      onClick={e => {
+        e.stopPropagation()
+      }}
+    >
       <Box {...MODAL_STYLE} {...styleProps}>
         {header != null ? <Box {...headerStyle}>{header}</Box> : null}
         <Box {...CONTENT_STYLE}>{children}</Box>

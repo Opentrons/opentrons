@@ -29,6 +29,7 @@ class ResetOptionId(str, Enum):
     deck_calibration = "deckCalibration"
     pipette_offset = "pipetteOffsetCalibrations"
     tip_length_calibrations = "tipLengthCalibrations"
+    runs_history = "runsHistory"
 
 
 _settings_reset_options = {
@@ -46,6 +47,14 @@ _settings_reset_options = {
     ResetOptionId.tip_length_calibrations: CommonResetOption(
         name="Tip Length Calibrations",
         description="Clear tip length calibrations (will also clear " "pipette offset)",
+    ),
+    # TODO(mm, 2022-05-23): Run and protocol history is a robot-server thing,
+    # and is not a concept known to this package (the `opentrons` library).
+    # This option is defined here only as a convenience for robot-server.
+    # Find a way to split thing up and define this in robot-server instead.
+    ResetOptionId.runs_history: CommonResetOption(
+        name="Clear Runs History",
+        description="Erase this device's stored history of protocols and runs.",
     ),
 }
 

@@ -15,17 +15,22 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     MoveCompleted,
     ExecuteMoveGroupRequest,
     HomeRequest,
+    GripperGripRequest,
+    GripperHomeRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
     ExecuteMoveGroupRequestPayload,
     HomeRequestPayload,
+    GripperMoveRequestPayload,
 )
 from .constants import interrupts_per_sec
 from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
+    MoveGroupSingleGripperStep,
     MoveType,
+    SingleMoveStep,
 )
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
@@ -142,9 +147,40 @@ class MoveGroupRunner:
         return Int32Field(int((velocity / interrupts) * (2**31)))
 
     def _get_message_type(
-        self, step: MoveGroupSingleAxisStep, group: int, seq: int
+        self, step: SingleMoveStep, group: int, seq: int
     ) -> MessageDefinition:
         """Return the correct payload type."""
+        if isinstance(step, MoveGroupSingleAxisStep):
+            return self._get_stepper_motor_message(step, group, seq)
+        else:
+            return self._get_brushed_motor_message(step, group, seq)
+
+    def _get_brushed_motor_message(
+        self, step: MoveGroupSingleGripperStep, group: int, seq: int
+    ) -> MessageDefinition:
+        if step.move_type == MoveType.home:
+            home_payload = GripperMoveRequestPayload(
+                group_id=UInt8Field(group),
+                seq_id=UInt8Field(seq),
+                duration=UInt32Field(int(step.duration_sec * step.pwm_frequency)),
+                freq=UInt32Field(int(step.pwm_frequency)),
+                duty_cycle=UInt32Field(int(step.pwm_duty_cycle)),
+            )
+            return GripperHomeRequest(payload=home_payload)
+
+        else:
+            linear_payload = GripperMoveRequestPayload(
+                group_id=UInt8Field(group),
+                seq_id=UInt8Field(seq),
+                duration=UInt32Field(int(step.duration_sec * step.pwm_frequency)),
+                freq=UInt32Field(int(step.pwm_frequency)),
+                duty_cycle=UInt32Field(int(step.pwm_duty_cycle)),
+            )
+            return GripperGripRequest(payload=linear_payload)
+
+    def _get_stepper_motor_message(
+        self, step: MoveGroupSingleAxisStep, group: int, seq: int
+    ) -> MessageDefinition:
         if step.move_type == MoveType.home:
             home_payload = HomeRequestPayload(
                 group_id=UInt8Field(group),
@@ -209,7 +245,7 @@ class MoveScheduler:
 
             self._moves.append(move_set)
             self._durations.append(duration)
-        log.info(f"Move scheduler running for groups {move_groups}")
+        log.debug(f"Move scheduler running for groups {move_groups}")
         self._completion_queue: asyncio.Queue[_CompletionPacket] = asyncio.Queue()
         self._event = asyncio.Event()
 
@@ -222,7 +258,7 @@ class MoveScheduler:
             group_id = message.payload.group_id.value
             ack_id = message.payload.ack_id.value
             node_id = arbitration_id.parts.originating_node_id
-            log.info(
+            log.debug(
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
                 ", which "
                 f"{'is' if (node_id, seq_id) in self._moves[group_id] else 'isn''t'}"

@@ -5,7 +5,6 @@ import { i18n } from '../../../i18n'
 import { startDiscovery } from '../../../redux/discovery'
 import {
   DevicesEmptyState,
-  OT2_GET_STARTED_URL,
   TROUBLESHOOTING_CONNECTION_PROBLEMS_URL,
 } from '../DevicesEmptyState'
 
@@ -38,13 +37,8 @@ describe('DevicesEmptyState', () => {
     expect(mockStartDiscovery).toBeCalled()
   })
 
-  it('links to support documents', () => {
+  it('link to support documents', () => {
     const [{ getByRole }] = render()
-
-    const settingUpLink = getByRole('link', {
-      name: 'Learn about setting up a new robot',
-    })
-    expect(settingUpLink.getAttribute('href')).toBe(OT2_GET_STARTED_URL)
 
     const troubleshootingLink = getByRole('link', {
       name: 'Learn more about troubleshooting connection problems',

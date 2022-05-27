@@ -81,6 +81,7 @@ describe('ProtocolRunSetup', () => {
       .mockReturnValue({
         protocolData: (noModulesProtocol as unknown) as ProtocolAnalysisFile,
         displayName: 'mock display name',
+        protocolKey: 'fakeProtocolKey',
       })
     when(mockUseRobot)
       .calledWith(ROBOT_NAME)
@@ -116,6 +117,16 @@ describe('ProtocolRunSetup', () => {
     when(mockUseRobot).calledWith(ROBOT_NAME).mockReturnValue(null)
     const { container } = render()
     expect(container.firstChild).toBeNull()
+  })
+
+  it('renders loading data message if robot-analyzed protocol data is null', () => {
+    when(mockUseProtocolDetailsForRun).calledWith(RUN_ID).mockReturnValue({
+      protocolData: null,
+      displayName: null,
+      protocolKey: null,
+    })
+    const { getByText } = render()
+    getByText('Loading data...')
   })
 
   it('renders calibration ready when robot calibration complete', () => {
@@ -187,6 +198,7 @@ describe('ProtocolRunSetup', () => {
         .mockReturnValue({
           protocolData: (withModulesProtocol as unknown) as ProtocolAnalysisFile,
           displayName: 'mock display name',
+          protocolKey: 'fakeProtocolKey',
         })
       when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
     })
@@ -235,6 +247,7 @@ describe('ProtocolRunSetup', () => {
             ),
           } as unknown) as ProtocolAnalysisFile,
           displayName: 'mock display name',
+          protocolKey: 'fakeProtocolKey',
         })
       const { getByText } = render()
 

@@ -24,6 +24,7 @@ from .ot3utils import (
     create_move_group,
     get_current_settings,
     node_to_axis,
+    axis_to_node,
 )
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
@@ -47,8 +48,8 @@ from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 from opentrons.hardware_control.dev_types import (
     InstrumentHardwareConfigs,
-    InstrumentSpec,
-    AttachedInstrument,
+    PipetteSpec,
+    AttachedPipette,
 )
 from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 
@@ -117,7 +118,7 @@ class OT3Simulator:
 
         def _sanitize_attached_instrument(
             passed_ai: Optional[Dict[str, Optional[str]]] = None
-        ) -> InstrumentSpec:
+        ) -> PipetteSpec:
             if not passed_ai or not passed_ai.get("model"):
                 return {"model": None, "id": None}
             if passed_ai["model"] in pipette_config.config_models:
@@ -229,7 +230,7 @@ class OT3Simulator:
 
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]
-    ) -> AttachedInstrument:
+    ) -> AttachedPipette:
         init_instr = self._attached_instruments.get(mount, {"model": None, "id": None})
         found_model = init_instr["model"]
         back_compat: List["PipetteName"] = []
@@ -280,7 +281,7 @@ class OT3Simulator:
 
     async def get_attached_instruments(
         self, expected: Dict[OT3Mount, PipetteName]
-    ) -> Dict[OT3Mount, AttachedInstrument]:
+    ) -> Dict[OT3Mount, AttachedPipette]:
         """Get attached instruments.
 
         Args:
@@ -413,3 +414,8 @@ class OT3Simulator:
         if self._attached_instruments[OT3Mount.RIGHT].get("model", None):
             nodes.add(NodeId.pipette_right)
         self._present_nodes = nodes
+
+    async def capacitive_probe(
+        self, mount: OT3Mount, distance_mm: float, speed_mm_per_s: float
+    ) -> None:
+        self._position[axis_to_node(OT3Axis.by_mount(mount))] += distance_mm

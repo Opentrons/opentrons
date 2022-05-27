@@ -1,3 +1,4 @@
+// @ts-nocheck TODO: remove this after https://github.com/Opentrons/opentrons/pull/10178 merges
 import { thermocyclerStateDiff, Diff } from '../utils/thermocyclerStateDiff'
 import { thermocyclerStateStep } from '../commandCreators/compound/thermocyclerStateStep'
 import { getStateAndContextTempTCModules, getSuccessResult } from '../fixtures'
@@ -103,14 +104,13 @@ describe('thermocyclerStateStep', () => {
           commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
             moduleId: thermocyclerId,
-            temperature: 10,
+            celsius: 10,
           },
         },
         {
-          commandType: 'thermocycler/awaitBlockTemperature',
+          commandType: 'thermocycler/waitForBlockTemperature',
           params: {
             moduleId: thermocyclerId,
-            temperature: 10,
           },
         },
       ],
@@ -162,14 +162,13 @@ describe('thermocyclerStateStep', () => {
           commandType: 'thermocycler/setTargetLidTemperature',
           params: {
             moduleId: thermocyclerId,
-            temperature: 10,
+            celsius: 10,
           },
         },
         {
-          commandType: 'thermocycler/awaitLidTemperature',
+          commandType: 'thermocycler/waitForLidTemperature',
           params: {
             moduleId: thermocyclerId,
-            temperature: 10,
           },
         },
       ],
@@ -221,14 +220,13 @@ describe('thermocyclerStateStep', () => {
           commandType: 'thermocycler/setTargetLidTemperature',
           params: {
             moduleId: thermocyclerId,
-            temperature: 10,
+            celsius: 10,
           },
         },
         {
-          commandType: 'thermocycler/awaitLidTemperature',
+          commandType: 'thermocycler/waitForLidTemperature',
           params: {
             moduleId: thermocyclerId,
-            temperature: 10,
           },
         },
       ],
@@ -304,14 +302,13 @@ describe('thermocyclerStateStep', () => {
           commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
             moduleId: thermocyclerId,
-            temperature: 10,
+            celsius: 10,
           },
         },
         {
-          commandType: 'thermocycler/awaitBlockTemperature',
+          commandType: 'thermocycler/waitForBlockTemperature',
           params: {
             moduleId: thermocyclerId,
-            temperature: 10,
           },
         },
         {
@@ -324,14 +321,13 @@ describe('thermocyclerStateStep', () => {
           commandType: 'thermocycler/setTargetLidTemperature',
           params: {
             moduleId: thermocyclerId,
-            temperature: 20,
+            celsius: 20,
           },
         },
         {
-          commandType: 'thermocycler/awaitLidTemperature',
+          commandType: 'thermocycler/waitForLidTemperature',
           params: {
             moduleId: thermocyclerId,
-            temperature: 20,
           },
         },
       ],

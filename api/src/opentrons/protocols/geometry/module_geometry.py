@@ -29,7 +29,7 @@ from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import (
     MAX_SUPPORTED_VERSION,
-    V2_MODULE_DEF_VERSION,
+    POST_V1_MODULE_DEF_VERSION,
 )
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocol_api.labware import Labware
@@ -39,7 +39,7 @@ from .types import GenericConfiguration, ThermocyclerConfiguration
 if TYPE_CHECKING:
     from opentrons_shared_data.module.dev_types import (
         ModuleDefinitionV1,
-        ModuleDefinitionV2,
+        ModuleDefinitionV3,
     )
 
 
@@ -70,6 +70,7 @@ class NoSuchModuleError(Exception):
         return self.message
 
 
+# TODO (spp, 2022-05-09): add tests
 class ModuleGeometry(DeckItem):
     """
     This class represents an active peripheral, such as an Opentrons Magnetic
@@ -382,13 +383,13 @@ def _load_from_v1(
     return mod
 
 
-def _load_from_v2(
-    definition: "ModuleDefinitionV2",
+def _load_from_v3(
+    definition: "ModuleDefinitionV3",
     parent: Location,
     api_level: APIVersion,
     configuration: GenericConfiguration,
 ) -> ModuleGeometry:
-    """Load a module geometry from a v2 definition.
+    """Load a module geometry from a v3 definition.
 
     The definition should be schema checked before being passed to this
      function; all definitions passed here are assumed to be valid.
@@ -449,7 +450,7 @@ def _load_from_v2(
 
 
 def load_module_from_definition(
-    definition: Union["ModuleDefinitionV1", "ModuleDefinitionV2"],
+    definition: Union["ModuleDefinitionV1", "ModuleDefinitionV3"],
     parent: Location,
     api_level: APIVersion = None,
     configuration: GenericConfiguration = ThermocyclerConfiguration.FULL,
@@ -479,8 +480,9 @@ def load_module_from_definition(
         # presence or absence of keys
         v1def: "ModuleDefinitionV1" = definition  # type: ignore
         return _load_from_v1(v1def, parent, api_level)
-    if schema == "module/schemas/2":
-        schema_doc = module.load_schema("2")
+
+    if schema == "module/schemas/3":
+        schema_doc = module.load_schema("3")
         try:
             jsonschema.validate(definition, schema_doc)
         except jsonschema.ValidationError:
@@ -488,8 +490,9 @@ def load_module_from_definition(
             raise RuntimeError("The specified module definition is not valid.")
         # mypy can't tell these apart, but we've schema validated it - this is
         # the right type
-        v2def: "ModuleDefinitionV2" = definition  # type: ignore
-        return _load_from_v2(v2def, parent, api_level, configuration)
+        v3def: "ModuleDefinitionV3" = definition  # type: ignore[assignment]
+        return _load_from_v3(v3def, parent, api_level, configuration)
+
     elif isinstance(schema, str):
         maybe_schema = re.match("^module/schemas/([0-9]+)$", schema)
         if maybe_schema:
@@ -516,39 +519,41 @@ def _load_v1_module_def(module_model: ModuleModel) -> "ModuleDefinitionV1":
     return module.load_definition("1", name)
 
 
-def _load_v2_module_def(module_model: ModuleModel) -> "ModuleDefinitionV2":
+def _load_v3_module_def(module_model: ModuleModel) -> "ModuleDefinitionV3":
     try:
-        return module.load_definition("2", module_model.value)
+        return module.load_definition("3", module_model.value)
     except module.ModuleNotFoundError:
         raise NoSuchModuleError(
-            f"Could not find the module {module_model.value}.", module_model
+            f"Could not find the module {module_model.value} in the "
+            f"specified API version.",
+            module_model,
         )
 
 
 @functools.lru_cache(maxsize=128)
 def _load_module_definition(
     api_level: APIVersion, module_model: ModuleModel
-) -> Union["ModuleDefinitionV2", "ModuleDefinitionV1"]:
+) -> Union["ModuleDefinitionV3", "ModuleDefinitionV1"]:
     """
     Load the appropriate module definition for this api version
     """
 
-    if api_level < V2_MODULE_DEF_VERSION:
+    if api_level < POST_V1_MODULE_DEF_VERSION:
         try:
             return _load_v1_module_def(module_model)
         except NoSuchModuleError:
             try:
-                dname = _load_v2_module_def(module_model)["displayName"]
+                dname = _load_v3_module_def(module_model)["displayName"]
             except NoSuchModuleError:
                 dname = module_model.value
             raise NoSuchModuleError(
                 f"API version {api_level} does not support the module "
                 f"{dname}. Please use at least version "
-                f"{V2_MODULE_DEF_VERSION} to use this module.",
+                f"{POST_V1_MODULE_DEF_VERSION} to use this module.",
                 module_model,
             )
     else:
-        return _load_v2_module_def(module_model)
+        return _load_v3_module_def(module_model)
 
 
 def load_module(
@@ -635,11 +640,11 @@ def resolve_module_model(module_model_or_load_name: str) -> ModuleModel:
 
 
 def resolve_module_type(module_model: ModuleModel) -> ModuleType:
-    return ModuleType(_load_v2_module_def(module_model)["moduleType"])
+    return ModuleType(_load_v3_module_def(module_model)["moduleType"])
 
 
 def models_compatible(model_a: ModuleModel, model_b: ModuleModel) -> bool:
     """Check if two module models may be considered the same"""
     if model_a == model_b:
         return True
-    return model_b.value in _load_v2_module_def(model_a)["compatibleWith"]
+    return model_b.value in _load_v3_module_def(model_a)["compatibleWith"]

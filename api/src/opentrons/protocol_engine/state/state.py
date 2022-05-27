@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from functools import partial
 from typing import Any, Callable, List, Optional, Sequence, TypeVar
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 
 from ..resources import DeckFixedLabware
 from ..actions import Action, ActionHandler
@@ -18,7 +18,7 @@ from .modules import ModuleState, ModuleStore, ModuleView
 from .geometry import GeometryView
 from .motion import MotionView
 from .configs import EngineConfigs
-
+from .state_summary import StateSummary
 
 ReturnT = TypeVar("ReturnT")
 
@@ -80,6 +80,17 @@ class StateView(HasState[State]):
         """Get Protocol Engine configurations."""
         return self._configs
 
+    def get_summary(self) -> StateSummary:
+        """Get protocol run data."""
+        return StateSummary.construct(
+            status=self.commands.get_status(),
+            errors=self._commands.get_all_errors(),
+            pipettes=self._pipettes.get_all(),
+            labware=self._labware.get_all(),
+            labwareOffsets=self._labware.get_labware_offsets(),
+            modules=self.modules.get_all(),
+        )
+
 
 class StateStore(StateView, ActionHandler):
     """ProtocolEngine state store.
@@ -91,7 +102,7 @@ class StateStore(StateView, ActionHandler):
 
     def __init__(
         self,
-        deck_definition: DeckDefinitionV2,
+        deck_definition: DeckDefinitionV3,
         deck_fixed_labware: Sequence[DeckFixedLabware],
         is_door_blocking: bool,
         configs: EngineConfigs = EngineConfigs(),

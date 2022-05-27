@@ -5,6 +5,8 @@ and expose it to a python commandline.
 """
 
 import os
+from functools import partial, wraps
+import asyncio
 
 has_robot_server = True
 if os.environ.get("OPENTRONS_SIMULATION"):
@@ -22,25 +24,52 @@ else:
 
 from code import interact  # noqa: E402
 from subprocess import run  # noqa: E402
-from typing import Union, Type  # noqa: E402
+from typing import Union, Type, Any, cast  # noqa: E402
 import logging  # noqa: E402
 
 from opentrons.types import Mount, Point  # noqa: E402
 from opentrons.hardware_control.types import Axis  # noqa: E402
 from opentrons.config.feature_flags import enable_ot3_hardware_controller  # noqa: E402
 from opentrons.hardware_control.types import OT3Axis, OT3Mount  # noqa: E402
+from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
+    calibrate_mount,
+    find_edge,
+    find_deck_position,
+)
+from opentrons.hardware_control.protocols import HardwareControlAPI  # noqa: E402
+from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
 
 if enable_ot3_hardware_controller():
     from opentrons.hardware_control.ot3api import OT3API
 
     HCApi: Union[Type[OT3API], Type["API"]] = OT3API
+
+    def do_calibration(
+        api: ThreadManager[OT3API], mount: OT3Mount, tip_length: float
+    ) -> Point:
+        api.sync.add_tip(mount, tip_length)
+        try:
+            result = asyncio.get_event_loop().run_until_complete(
+                calibrate_mount(cast(OT3API, api), mount)
+            )
+        finally:
+            api.sync.remove_tip(mount)
+        return result
+
+    def wrap_async_util_fn(fn: Any, *bind_args: Any, **bind_kwargs: Any) -> Any:
+        @wraps(fn)
+        def synchronizer(*args: Any, **kwargs: Any) -> Any:
+            return asyncio.get_event_loop().run_until_complete(
+                fn(*bind_args, *args, **bind_kwargs, **kwargs)
+            )
+
+        return synchronizer
+
 else:
     from opentrons.hardware_control.api import API
 
     HCApi = API
 
-from opentrons.hardware_control.protocols import HardwareControlAPI  # noqa: E402
-from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
 
 logging.basicConfig(level=logging.INFO)
 
@@ -68,6 +97,10 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "Axis": Axis,
             "OT3Axis": OT3Axis,
             "OT3Mount": OT3Mount,
+            "calibrate_mount": wrap_async_util_fn(calibrate_mount, api),
+            "find_edge": wrap_async_util_fn(find_edge, api),
+            "find_deck_position": wrap_async_util_fn(find_deck_position, api),
+            "do_calibration": partial(do_calibration, api),
         },
     )
 
@@ -76,6 +109,5 @@ if __name__ == "__main__":
     if has_robot_server:
         stop_server()
     api_tm = build_api()
-    api_tm.sync.cache_instruments()
     do_interact(api_tm)
     api_tm.clean_up()

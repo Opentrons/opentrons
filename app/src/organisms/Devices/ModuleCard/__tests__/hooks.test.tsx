@@ -12,7 +12,7 @@ import {
 } from '@opentrons/react-api-client'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
-import { getProtocolModulesInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { useProtocolDetailsForRun } from '../../hooks'
 import {
@@ -20,6 +20,7 @@ import {
   useModuleOverflowMenu,
   useIsHeaterShakerInProtocol,
 } from '../hooks'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
 
 import {
   mockHeaterShaker,
@@ -32,9 +33,10 @@ import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../ProtocolSetup/utils/getProtocolModulesInfo')
+jest.mock('../../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../../hooks')
+jest.mock('../useModuleIdFromRun')
 
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
@@ -51,6 +53,9 @@ const mockUseCreateCommandMutation = useCreateCommandMutation as jest.MockedFunc
 >
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
+>
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
 >
 
 const mockCloseLatchHeaterShaker = {
@@ -86,7 +91,7 @@ const mockHeatHeaterShaker = {
   data: {
     labwareLatchStatus: 'idle_open',
     speedStatus: 'idle',
-    temperatureStatus: 'idle',
+    temperatureStatus: 'holding at target',
     currentSpeed: null,
     currentTemperature: null,
     targetSpeed: null,
@@ -164,7 +169,7 @@ const mockTCBlockHeating = {
     lidTargetTemperature: null,
     lidTemperature: null,
     currentTemperature: null,
-    targetTemperature: null,
+    targetTemperature: 45,
     holdTime: null,
     rampRate: null,
     currentCycleIndex: null,
@@ -231,6 +236,9 @@ describe('useLatchControls', () => {
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
     )
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'heatershaker_id',
+    })
     const { result } = renderHook(() => useLatchControls(mockHeaterShaker), {
       wrapper,
     })
@@ -450,7 +458,7 @@ describe('useModuleOverflowMenu', () => {
     act(() => magMenu[0].onClick(false))
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'magneticModule/disengageMagnet',
+        commandType: 'magneticModule/disengage',
         params: {
           moduleId: mockMagDeckEngaged.id,
         },

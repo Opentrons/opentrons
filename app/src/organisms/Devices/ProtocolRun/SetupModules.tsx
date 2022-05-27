@@ -16,9 +16,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { HeaterShakerBanner } from '../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/HeaterShakerSetupWizard/HeaterShakerBanner'
 import { ModuleInfo } from '../../../organisms/ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
@@ -90,6 +90,7 @@ export const SetupModules = ({
         <HeaterShakerBanner
           displayName={heaterShakerModules[0]?.moduleDef.displayName}
           modules={heaterShakerModules}
+          runId={runId}
         />
       ) : null}
       {showMultipleModulesModal ? (

@@ -63,5 +63,5 @@ async def test_legacy_custom_labware(custom_labware_protocol_files: List[Path]) 
         offsetId=None,
     )
 
-    assert result.errors == []
-    assert expected_labware in result.labware
+    assert result.state_summary.errors == []
+    assert expected_labware in result.state_summary.labware

@@ -7,16 +7,16 @@ import {
   RUN_STATUS_IDLE,
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_PAUSED,
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import {
   Flex,
   Icon,
+  useInterval,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  FONT_SIZE_BODY_1,
   JUSTIFY_SPACE_BETWEEN,
+  SIZE_1,
   SIZE_2,
   TEXT_TRANSFORM_UPPERCASE,
   BORDERS,
@@ -26,6 +26,7 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
+import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 import { StepText } from './StepText'
 import { StepTimer } from './StepTimer'
 
@@ -42,6 +43,7 @@ export interface StepItemProps {
   runId: string
   runStatus: RunStatus
   stepNumber: number
+  runPausedAt: string | null
   runStartedAt: string | null
   isMostRecentCommand: boolean
 }
@@ -49,7 +51,6 @@ export interface StepItemProps {
 const WRAPPER_STYLE_BY_STATUS: {
   [status in CommandStatus]: {
     border: string
-    borderRadius?: string
     backgroundColor: string
     color: string
   }
@@ -61,7 +62,6 @@ const WRAPPER_STYLE_BY_STATUS: {
   },
   running: {
     border: `1px solid ${COLORS.blue}`,
-    borderRadius: BORDERS.radiusSoftCorners,
     backgroundColor: COLORS.lightBlue,
     color: COLORS.darkBlack,
   },
@@ -72,7 +72,6 @@ const WRAPPER_STYLE_BY_STATUS: {
   },
   failed: {
     border: `1px solid ${COLORS.error}`,
-    borderRadius: BORDERS.radiusSoftCorners,
     backgroundColor: COLORS.errorBg,
     color: COLORS.darkBlack,
   },
@@ -86,6 +85,7 @@ export function StepItemComponent(props: StepItemProps): JSX.Element | null {
     runId,
     runStatus,
     stepNumber,
+    runPausedAt,
     runStartedAt,
     isMostRecentCommand,
   } = props
@@ -117,81 +117,106 @@ export function StepItemComponent(props: StepItemProps): JSX.Element | null {
     isComment = runCommandSummary.result.legacyCommandType === 'command.COMMENT'
   }
 
-  const isPause =
-    analysisCommand?.commandType === 'pause' ||
-    runCommandSummary?.commandType === 'pause'
-
   const WRAPPER_STYLE = css`
-    font-size: ${FONT_SIZE_BODY_1};
+    font-size: ${TYPOGRAPHY.fontSizeP};
     background-color: ${WRAPPER_STYLE_BY_STATUS[commandStatus].backgroundColor};
     border: ${WRAPPER_STYLE_BY_STATUS[commandStatus].border};
-    border-radius: ${WRAPPER_STYLE_BY_STATUS[commandStatus].borderRadius};
+    border-radius: ${BORDERS.radiusSoftCorners};
     padding: ${SPACING.spacing3};
     color: ${WRAPPER_STYLE_BY_STATUS[commandStatus].color};
     flex-direction: ${DIRECTION_COLUMN};
     width: 100%;
   `
+
   return (
-    <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_ROW}>
-      <StyledText fontSize={TYPOGRAPHY.fontSizeCaption} width={SIZE_2}>
-        {stepNumber}
-      </StyledText>
-      <Flex css={WRAPPER_STYLE}>
-        {commandStatus === 'running' ? (
-          <CurrentCommandLabel runStatus={runStatus} />
-        ) : null}
+    <Flex
+      alignItems={ALIGN_CENTER}
+      flexDirection={DIRECTION_ROW}
+      minHeight="3rem"
+      width="100%"
+    >
+      <Flex minWidth={SIZE_2}>
+        <StyledText fontSize={TYPOGRAPHY.fontSizeCaption}>
+          {stepNumber}
+        </StyledText>
+      </Flex>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing2}
+        width="100%"
+      >
         {commandStatus === 'failed' ? <CommandFailedMessage /> : null}
-        {isComment ? (
+        <Flex css={WRAPPER_STYLE}>
           <Flex
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
-            fontSize={TYPOGRAPHY.fontSizeCaption}
-            color={COLORS.darkGreyEnabled}
-            marginBottom={SPACING.spacing2}
+            flexDirection={DIRECTION_ROW}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            alignItems={ALIGN_CENTER}
           >
-            {t('comment_step')}
+            <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing2}
+                marginRight={SPACING.spacing3}
+                minWidth="5rem"
+              >
+                {!isComment ? (
+                  <StepTimer
+                    commandStartedAt={runCommandSummary?.startedAt ?? null}
+                    commandCompletedAt={runCommandSummary?.completedAt ?? null}
+                    runStartedAt={runStartedAt}
+                  />
+                ) : (
+                  <StyledText
+                    as="h6"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    textTransform={TEXT_TRANSFORM_UPPERCASE}
+                  >
+                    {t('comment_step')}
+                  </StyledText>
+                )}
+              </Flex>
+              <Flex flexDirection={DIRECTION_COLUMN}>
+                <StepText
+                  analysisCommand={analysisCommand}
+                  robotName={robotName}
+                  runCommand={runCommandSummary}
+                  runId={runId}
+                />
+                {runPausedAt != null && isMostRecentCommand ? (
+                  <Flex alignItems={ALIGN_CENTER}>
+                    <Icon
+                      name="pause-circle"
+                      width={SIZE_1}
+                      marginRight={SPACING.spacing2}
+                    />
+                    <PauseTimer pausedAt={runPausedAt} />
+                  </Flex>
+                ) : null}
+              </Flex>
+            </Flex>
+            {/* TODO(bh, 2022-03-24): expandable step (UI polish) */}
           </Flex>
-        ) : null}
-        {isPause ? (
-          <Flex
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
-            fontSize={TYPOGRAPHY.fontSizeCaption}
-            color={COLORS.darkGreyEnabled}
-            marginBottom={SPACING.spacing2}
-          >
-            <Icon
-              name="pause"
-              width={SPACING.spacing4}
-              marginRight={SPACING.spacing3}
-              color={COLORS.darkGreyEnabled}
-            />
-            {t('pause_protocol')}
-          </Flex>
-        ) : null}
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          alignItems={ALIGN_CENTER}
-          minHeight="1.75rem"
-        >
-          <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-            {!isComment ? (
-              <StepTimer
-                commandStartedAt={runCommandSummary?.startedAt ?? null}
-                commandCompletedAt={runCommandSummary?.completedAt ?? null}
-                runStartedAt={runStartedAt}
-              />
-            ) : null}
-            <StepText
-              analysisCommand={analysisCommand}
-              robotName={robotName}
-              runCommand={runCommandSummary}
-              runId={runId}
-            />
-          </Flex>
-          {/* TODO(bh, 2022-03-24): expandable step (UI polish) */}
         </Flex>
       </Flex>
     </Flex>
+  )
+}
+
+interface PauseTimerProps {
+  pausedAt: string
+}
+
+function PauseTimer({ pausedAt }: PauseTimerProps): JSX.Element {
+  const { t } = useTranslation('run_details')
+
+  const [now, setNow] = React.useState(Date())
+  useInterval(() => setNow(Date()), 500, true)
+
+  return (
+    <StyledText>{`${t('user_paused_protocol_for')} ${formatInterval(
+      pausedAt,
+      now
+    )}`}</StyledText>
   )
 }
 
@@ -216,45 +241,11 @@ export const StepItem = React.memo(
   }
 )
 
-interface CurrentCommandLabelProps {
-  runStatus?: RunStatus
-}
-
-function CurrentCommandLabel(props: CurrentCommandLabelProps): JSX.Element {
-  const { t } = useTranslation('run_details')
-  const getCommandTypeLabel = (): string => {
-    if (
-      props.runStatus === RUN_STATUS_PAUSED ||
-      props.runStatus === RUN_STATUS_PAUSE_REQUESTED
-    ) {
-      return t('current_step_pause')
-    } else if (props.runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR) {
-      return t('door_open_pause')
-    } else {
-      return t('current_step')
-    }
-  }
-  return (
-    <StyledText
-      fontWeight={TYPOGRAPHY.fontWeightBold}
-      marginBottom={SPACING.spacing2}
-      marginTop={SPACING.spacing2}
-      textTransform={TEXT_TRANSFORM_UPPERCASE}
-      fontSize={TYPOGRAPHY.fontSizeCaption}
-    >
-      {getCommandTypeLabel()}
-    </StyledText>
-  )
-}
-
 function CommandFailedMessage(): JSX.Element {
   const { t } = useTranslation('run_details')
   return (
-    <Flex flexDirection={DIRECTION_ROW} color={COLORS.error}>
-      <Flex margin={SPACING.spacing2} width={SPACING.spacing4}>
-        <Icon name="information" />
-      </Flex>
-      <Flex alignItems={ALIGN_CENTER}>{t('step_failed')}</Flex>
-    </Flex>
+    <StyledText as="label" color={COLORS.errorText}>
+      {t('failed_step')}
+    </StyledText>
   )
 }

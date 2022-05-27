@@ -70,7 +70,7 @@ class LegacyFileReader:
     def read(protocol_source: ProtocolSource) -> LegacyProtocol:
         """Read a PAPIv2 protocol into a datastructure."""
         protocol_file_path = protocol_source.main_file
-        protocol_contents = protocol_file_path.read_text()
+        protocol_contents = protocol_file_path.read_text(encoding="utf-8")
 
         return parse(
             protocol_file=protocol_contents,
@@ -129,7 +129,7 @@ class LegacyContextCreator:
 
 
 class LegacySimulatingContextCreator(LegacyContextCreator):
-    """Interface to construct PAPIv2 contexts using simlulating implementations.
+    """Interface to construct PAPIv2 contexts using simulating implementations.
 
     Avoids some calls to the hardware API for performance.
     See `opentrons.protocols.context.simulator`.

@@ -11,9 +11,9 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   COLORS,
-  TYPOGRAPHY,
   Overlay,
   POSITION_FIXED,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
@@ -111,15 +111,16 @@ export const Slideout = (props: Props): JSX.Element | null => {
               marginBottom={SPACING.spacing4}
             >
               <StyledText
-                color={COLORS.darkBlack}
                 as="h2"
+                css={{ 'overflow-wrap': 'anywhere' }}
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid={`Slideout_title_${title}`}
               >
                 {title}
               </StyledText>
               <Flex alignItems={ALIGN_CENTER}>
                 <Btn
-                  size={TYPOGRAPHY.lineHeight24}
+                  size={'1.25rem'}
                   onClick={onCloseClick}
                   aria-label="exit"
                   data-testid={`Slideout_icon_close_${
@@ -131,7 +132,9 @@ export const Slideout = (props: Props): JSX.Element | null => {
               </Flex>
             </Flex>
           ) : (
-            title
+            <React.Fragment css={{ 'overflow-wrap': 'break-word' }}>
+              {title}
+            </React.Fragment>
           )}
           <Divider marginY={0} color={COLORS.medGrey} />
           <Box
