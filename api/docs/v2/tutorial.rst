@@ -9,7 +9,7 @@ Introduction
 ************
 
 
-This tutorial   guide you through creating a Python protocol file from scratch. At the end of this process you’ll have a complete protocol that can run on an OT-2 robot. If you don’t have an OT-2 yet (or if you’re away from your lab, or if your robot is in use) you can use the same file to :ref:`simulate the protocol <tutorial-simulate>` on your computer instead. 
+This tutorial will guide you through creating a Python protocol file from scratch. At the end of this process you’ll have a complete protocol that can run on an OT-2 robot. If you don’t have an OT-2 yet (or if you’re away from your lab, or if your robot is in use) you can use the same file to :ref:`simulate the protocol <tutorial-simulate>` on your computer instead. 
 
 What You’ll Automate
 ^^^^^^^^^^^^^^^^^^^^
