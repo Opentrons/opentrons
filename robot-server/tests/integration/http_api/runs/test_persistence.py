@@ -100,6 +100,13 @@ async def test_runs_persist_via_actions_router(
     get_run_response = await client.get_run(run_id=run_id)
     expected_run = dict(get_run_response.json()["data"], current=False)
 
+    # wait for the action to take effect
+    with anyio.fail_after(5):
+        while (await client.get_run(run_id=run_id)).json()["data"][
+            "status"
+        ] != "succeeded":
+            await anyio.sleep(0.1)
+
     # reboot the server
     await client_and_server.restart()
 
