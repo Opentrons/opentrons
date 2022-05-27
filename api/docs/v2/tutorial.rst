@@ -9,7 +9,7 @@ Introduction
 ************
 
 
-This tutorial will guide you through creating a Python protocol file from scratch. At the end of this process you’ll have a complete protocol that can run on an OT-2 robot. If you don’t have an OT-2 yet (or if you’re away from your lab, or if your robot is in use) you can use the same file to :ref:`simulate the protocol <tutorial-simulate>` on your computer instead. 
+This tutorial   guide you through creating a Python protocol file from scratch. At the end of this process you’ll have a complete protocol that can run on an OT-2 robot. If you don’t have an OT-2 yet (or if you’re away from your lab, or if your robot is in use) you can use the same file to :ref:`simulate the protocol <tutorial-simulate>` on your computer instead. 
 
 What You’ll Automate
 ^^^^^^^^^^^^^^^^^^^^
@@ -19,7 +19,7 @@ The lab task that you’ll automate in this tutorial is `serial dilution`: takin
 Before You Begin
 ^^^^^^^^^^^^^^^^
 
-We’re going to be writing some Python code, but by no means do you need to be a Python expert to get started writing Opentrons protocols. You should know some basic Python syntax, like how it uses `indentation <https://docs.python.org/3/reference/lexical_analysis.html#indentation>`_ to group blocks of code, dot notation for `calling methods <https://docs.python.org/3/tutorial/classes.html#method-objects>`_, and the format of `lists <https://docs.python.org/3/tutorial/introduction.html#lists>`_ and `dictionaries <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_. We’ll also be using `common control structures <https://docs.python.org/3/tutorial/controlflow.html#if-statements>`_ like ``if`` statements and ``for`` loops. You should write your code in your favorite plaintext editor or IDE and be sure to save your work in a file with a ``.py`` extension, like ``dilution-tutorial.py``.
+You're going to write some Python code, but by no means do you need to be a Python expert to get started writing Opentrons protocols. You should know some basic Python syntax, like how it uses `indentation <https://docs.python.org/3/reference/lexical_analysis.html#indentation>`_ to group blocks of code, dot notation for `calling methods <https://docs.python.org/3/tutorial/classes.html#method-objects>`_, and the format of `lists <https://docs.python.org/3/tutorial/introduction.html#lists>`_ and `dictionaries <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_. You’ll also be using `common control structures <https://docs.python.org/3/tutorial/controlflow.html#if-statements>`_ like ``if`` statements and ``for`` loops. You should write your code in your favorite plaintext editor or IDE and be sure to save your work in a file with a ``.py`` extension, like ``dilution-tutorial.py``.
 
 If you plan to run your protocol on an OT-2, you’ll want to have it ready with the right kind of hardware and labware:
 
@@ -92,7 +92,7 @@ With the protocol context argument named and typed, you can start calling method
 Labware
 -------
 
-For serial dilution, you need to load a tip rack, reservoir, and 96-well plate on the deck of your OT-2. Loading labware is done with the :py:meth:`~.ProtocolContext.load_labware` method of the protocol context, which takes two arguments: the standard labware name as defined in the `Opentrons Labware Library <https://labware.opentrons.com/>`_, and the position where you will place the labware on the OT-2’s deck. Here’s how to load the labware into slots 1, 2, and 3 (repeating the ``def`` statement from above to show proper indenting):
+For serial dilution, you need to load a tip rack, reservoir, and 96-well plate on the deck of your OT-2. Loading labware is done with the :py:meth:`~.ProtocolContext.load_labware` method of the protocol context, which takes two arguments: the standard labware name as defined in the `Opentrons Labware Library <https://labware.opentrons.com/>`_, and the position where you'll place the labware on the OT-2’s deck. Here’s how to load the labware into slots 1, 2, and 3 (repeating the ``def`` statement from above to show proper indenting):
 
 .. code-block:: python
 
@@ -152,7 +152,7 @@ Breaking down this single line of code shows the power of :ref:`complex commands
     :align: center
     :alt: Animation showing an empty well plate followed by the plate with diluent in every well.
 
-In plain English, we’re instructing the robot, “For every well on our plate, aspirate 100 µL of fluid from column 1 of the reservoir and dispense it in the well.” That’s how we understand this line of code as scientists, yet the robot will understand and execute it as nearly 200 discrete actions.
+In plain English, you've instructed the robot, “For every well on the plate, aspirate 100 µL of fluid from column 1 of the reservoir and dispense it in the well.” That’s how we understand this line of code as scientists, yet the robot will understand and execute it as nearly 200 discrete actions.
 
 Now it’s time to start mixing in the solution. To do this row by row, nest the commands in a ``for`` loop: 
 
@@ -230,6 +230,11 @@ Try Your Protocol
 
 There are two ways to try out your protocol: simulation on your computer, or a live run on an OT-2. Even if you plan to run your protocol on a robot, it’s a good idea to check the simulation output first.
 
+If you get any errors in simulation, or you don't get the outcome you expected when running your protocol, you can check your code against these reference protocols on GitHub:
+
+- `Single-channel serial dilution <https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/dilution_tutorial.py>`_
+- `8-channel serial dilution <https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/dilution_tutorial_multi.py>`_
+
 .. _tutorial-simulate:
 
 In Simulation
@@ -266,3 +271,9 @@ When it’s all done, check the results of your serial dilution procedure — yo
     :name: Result of Serial Dilution
     :align: center
     :alt: An overhead view of a well plate on the metal OT-2 deck, with dark blue liquid in the leftmost column smoothly transitioning to very light blue in the rightmost column.
+
+**********
+Next Steps
+**********
+
+This tutorial has relied heavily on the ``transfer()`` method, but there's much more that the Python Protocol API can do. Many advanced applications use :ref:`building block commands <v2-atomic-commands>` for finer control over the robot. These commands let you aspirate and dispense separately, add air gaps, blow out excess liquid, move the pipette to any location, and more. For protocols that use Opentrons :ref:`new_modules`, there are methods to control their behavior. And all of the API's classes and methods are catalogued in the :ref:`protocol-api-reference`.
