@@ -416,7 +416,8 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
 def test_command_store_handles_play_according_to_door_state() -> None:
     """It should inactivate/activate command queue according to door state."""
     subject = CommandStore(is_door_blocking=True)
-    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
+    start_time = datetime.now()
+    subject.handle_action(PlayAction(requested_at=start_time))
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
         run_result=None,
@@ -427,18 +428,19 @@ def test_command_store_handles_play_according_to_door_state() -> None:
         queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
-        run_started_at=datetime(year=2021, month=1, day=1),
+        run_started_at=start_time,
     )
 
     door_close_event = DoorStateNotification(new_state=DoorState.CLOSED, blocking=False)
     subject.handle_action(HardwareEventAction(event=door_close_event))
-    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
+    resume_start_time = datetime.now()
+    subject.handle_action(PlayAction(requested_at=resume_start_time))
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.ACTIVE,
         run_result=None,
         run_completed_at=None,
-        run_started_at=datetime(year=2021, month=1, day=1),
+        run_started_at=start_time,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
