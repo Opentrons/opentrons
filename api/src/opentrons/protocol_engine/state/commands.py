@@ -119,7 +119,7 @@ class CommandState:
     run_completed_at: Optional[datetime]
     """The time the run has completed.
 
-    Set when the first 'HardwareStoppedAction' is dispatched.
+    Set when 'HardwareStoppedAction' is dispatched.
     """
 
     is_door_blocking: bool
