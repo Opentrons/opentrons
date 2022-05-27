@@ -244,20 +244,21 @@ async def test_runs_completed_started_at_persist_via_actions_router(
 
     # fetch the updated run, which we expect to be persisted
     get_run_response = await client.get_run(run_id=run_id)
-    expected_run = dict(get_run_response.json()["data"], current=False)
+    run_data = get_run_response.json()["data"]
 
     assert (
-        datetime.strptime(expected_run["startedAt"], "%Y-%m-%dT%H:%M:%S.%f%z").date()
-        == date_of_today
+        datetime.fromisoformat(run_data["startedAt"]).timestamp()
+        == pytest.approx(expected_started_at.timestamp(), abs=2)
     )
 
     assert (
-        datetime.strptime(expected_run["completedAt"], "%Y-%m-%dT%H:%M:%S.%f%z").date()
-        == date_of_today
+        datetime.fromisoformat(run_data["completedAt"]).timestamp()
+        == pytest.approx(expected_completed_at.timestamp(), abs=2)
     )
 
-    # make sure the time is different
-    assert expected_run["startedAt"] != expected_run["completedAt"]
+
+    # make sure the times are in order
+    assert run_data["startedAt"] < run_data["completedAt"]
 
 
 async def test_runs_completed_filled_started_at_none_persist(
