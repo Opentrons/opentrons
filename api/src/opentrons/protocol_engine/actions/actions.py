@@ -20,7 +20,7 @@ from ..types import LabwareOffsetCreate, ModuleDefinition
 class PlayAction:
     """Start or resume processing commands in the engine."""
 
-    started_at: datetime
+    requested_at: datetime
 
 
 class PauseSource(str, Enum):

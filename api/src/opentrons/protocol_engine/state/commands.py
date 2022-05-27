@@ -266,7 +266,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 else:
                     self._state.queue_status = QueueStatus.ACTIVE
                 self._state.run_started_at = (
-                    self._state.run_started_at or action.started_at
+                    self._state.run_started_at or action.requested_at
                 )
         elif isinstance(action, PauseAction):
             self._state.queue_status = QueueStatus.INACTIVE

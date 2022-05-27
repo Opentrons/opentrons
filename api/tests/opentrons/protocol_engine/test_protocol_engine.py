@@ -254,7 +254,7 @@ def test_play(
         state_store.commands.raise_if_paused_by_blocking_door(),
         state_store.commands.raise_if_stop_requested(),
         action_dispatcher.dispatch(
-            PlayAction(started_at=datetime(year=2021, month=1, day=1))
+            PlayAction(requested_at=datetime(year=2021, month=1, day=1))
         ),
     )
 

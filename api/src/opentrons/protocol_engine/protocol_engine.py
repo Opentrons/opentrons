@@ -103,10 +103,10 @@ class ProtocolEngine:
 
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
-        started_at = self._model_utils.get_timestamp()
+        requested_at = self._model_utils.get_timestamp()
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
         # homed if necessary
-        action = PlayAction(started_at=started_at)
+        action = PlayAction(requested_at=requested_at)
         self._state_store.commands.raise_if_paused_by_blocking_door()
         self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(action)

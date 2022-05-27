@@ -29,7 +29,7 @@ def test_configure(
     decoy: Decoy, state_view: StateView, action_dispatcher: ActionDispatcher
 ) -> None:
     """The engine should be able to configure the plugin."""
-    action = PlayAction(started_at=datetime(year=2021, month=1, day=1))
+    action = PlayAction(requested_at=datetime(year=2021, month=1, day=1))
 
     subject = _MyPlugin()
     subject._configure(

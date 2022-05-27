@@ -398,7 +398,7 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
     """It should set the running flag on play."""
     subject = CommandStore()
     subject.handle_action(PauseAction(source=pause_source))
-    subject.handle_action(PlayAction(started_at=datetime(year=2021, month=1, day=1)))
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.ACTIVE,
@@ -417,7 +417,7 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
 def test_command_store_handles_play_according_to_door_state() -> None:
     """It should inactivate/activate command queue according to door state."""
     subject = CommandStore(is_door_blocking=True)
-    subject.handle_action(PlayAction(started_at=datetime(year=2021, month=1, day=1)))
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
         run_result=None,
@@ -433,7 +433,7 @@ def test_command_store_handles_play_according_to_door_state() -> None:
 
     door_close_event = DoorStateNotification(new_state=DoorState.CLOSED, blocking=False)
     subject.handle_action(HardwareEventAction(event=door_close_event))
-    subject.handle_action(PlayAction(started_at=datetime(year=2021, month=1, day=1)))
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.ACTIVE,
@@ -453,7 +453,7 @@ def test_command_store_handles_finish_action() -> None:
     """It should change to a succeeded state with FinishAction."""
     subject = CommandStore()
 
-    subject.handle_action(PlayAction(started_at=datetime(year=2021, month=1, day=1)))
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction())
 
     assert subject.state == CommandState(
@@ -474,7 +474,7 @@ def test_command_store_handles_finish_action_with_stopped() -> None:
     """It should change to a stopped state if FinishAction has set_run_status=False."""
     subject = CommandStore()
 
-    subject.handle_action(PlayAction(started_at=datetime(year=2021, month=1, day=1)))
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction(set_run_status=False))
 
     assert subject.state.run_result == RunResult.STOPPED
@@ -484,7 +484,7 @@ def test_command_store_handles_stop_action() -> None:
     """It should mark the engine as non-gracefully stopped on StopAction."""
     subject = CommandStore()
 
-    subject.handle_action(PlayAction(started_at=datetime(year=2021, month=1, day=1)))
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(StopAction())
 
     assert subject.state == CommandState(
@@ -505,7 +505,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
     """It should reject a play action after finish."""
     subject = CommandStore()
     subject.handle_action(FinishAction())
-    subject.handle_action(PlayAction(started_at=datetime(year=2021, month=1, day=1)))
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
@@ -550,7 +550,7 @@ def test_command_store_save_started_completed_run_timestamp() -> None:
     """Should return a none empty run_completed_at and run_started_at."""
     subject = CommandStore()
     date = datetime(year=2021, day=1, month=1)
-    subject.handle_action(PlayAction(started_at=date))
+    subject.handle_action(PlayAction(requested_at=date))
     subject.handle_action(HardwareStoppedAction(completed_at=date))
 
     assert subject.state == CommandState(
@@ -603,7 +603,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
     """It should no-op on stop if already gracefully finished."""
     subject = CommandStore()
 
-    subject.handle_action(PlayAction(started_at=datetime(year=2021, month=1, day=1)))
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction())
     subject.handle_action(StopAction())
 
@@ -625,7 +625,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
     """It should no-op on finish if already ungracefully stopped."""
     subject = CommandStore()
 
-    subject.handle_action(PlayAction(started_at=datetime(year=2021, month=1, day=1)))
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(StopAction())
     subject.handle_action(FinishAction())
 
@@ -713,7 +713,7 @@ def test_handles_door_open_and_close_event() -> None:
     door_open_event = DoorStateNotification(new_state=DoorState.OPEN, blocking=True)
     door_close_event = DoorStateNotification(new_state=DoorState.CLOSED, blocking=False)
 
-    subject.handle_action(PlayAction(started_at=datetime(year=2021, month=1, day=1)))
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(HardwareEventAction(event=door_open_event))
 
     # Pause queue and update state
