@@ -32,8 +32,7 @@ class SetTargetBlockTemperatureResult(BaseModel):
 
     targetBlockTemperature: float = Field(
         ...,
-        description="The target block temperature that was set after validation "
-        "and type conversion (if any).",
+        description="The target block temperature that was set after validation.",
     )
 
 

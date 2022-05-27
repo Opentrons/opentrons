@@ -27,8 +27,7 @@ class SetTargetLidTemperatureResult(BaseModel):
 
     targetLidTemperature: float = Field(
         ...,
-        description="The target lid temperature that was set after validation "
-        "and type conversion (if any).",
+        description="The target lid temperature that was set after validation.",
     )
 
 
