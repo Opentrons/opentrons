@@ -7,12 +7,14 @@ import {
   WRAP,
 } from '@opentrons/components'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
-import { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
 } from '../hooks'
 import { ModuleCard } from '../ModuleCard'
+
+import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 
 interface ProtocolRunModuleControlsProps {
   robotName: string
@@ -34,9 +36,13 @@ export const ProtocolRunModuleControls = ({
   const { protocolData } = useProtocolDetailsForRun(runId)
   const { createCommand } = useCreateCommandMutation()
 
-  const loadCommands: LoadModuleRunTimeCommand[] = protocolData?.commands.filter(
-    command => command.commandType === 'loadModule'
-  ) as LoadModuleRunTimeCommand[]
+  const loadCommands: LoadModuleRunTimeCommand[] =
+    protocolData !== null
+      ? protocolData?.commands.filter(
+          (command: RunTimeCommand): command is LoadModuleRunTimeCommand =>
+            command.commandType === 'loadModule'
+        )
+      : []
 
   React.useEffect(() => {
     if (protocolData != null) {
