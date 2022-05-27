@@ -550,21 +550,30 @@ def test_command_store_ignores_known_finish_error() -> None:
 def test_command_store_save_started_completed_run_timestamp() -> None:
     """Should return a none empty run_completed_at and run_started_at."""
     subject = CommandStore()
-    date = datetime(year=2021, day=1, month=1)
-    subject.handle_action(PlayAction(requested_at=date))
-    subject.handle_action(HardwareStoppedAction(completed_at=date))
+    start_time = datetime.now()
+    hardware_stopped_time = datetime.now()
+    resume_time = datetime.now()
+    second_resume_time = datetime.now()
+
+    subject.handle_action(PlayAction(requested_at=start_time))
+    subject.handle_action(PauseAction(source=PauseSource))
+
+    subject.handle_action(PlayAction(requested_at=resume_time))
+    subject.handle_action(HardwareStoppedAction(completed_at=hardware_stopped_time))
+
+    subject.handle_action(PlayAction(requested_at=second_resume_time))
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.STOPPED,
-        run_completed_at=date,
+        run_completed_at=hardware_stopped_time,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
-        run_started_at=date,
+        run_started_at=start_time,
     )
 
 
