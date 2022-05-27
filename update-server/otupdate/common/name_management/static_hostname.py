@@ -1,3 +1,10 @@
+"""Control the machine's static hostname.
+
+See the `name_management` package docstring for background on the static hostname
+and how it's distinct from other names on the machine.
+"""
+
+
 import asyncio
 import logging
 import os

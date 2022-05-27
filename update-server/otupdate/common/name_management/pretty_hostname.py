@@ -1,3 +1,10 @@
+"""Read and write the machine's pretty hostname.
+
+See the `name_management` package docstring for background on the pretty hostname
+and how it's distinct from other names on the machine.
+"""
+
+
 from logging import getLogger
 
 

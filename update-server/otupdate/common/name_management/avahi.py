@@ -1,3 +1,6 @@
+"""Control the Avahi daemon."""
+
+
 import asyncio
 from logging import getLogger
 from typing import Optional
@@ -96,6 +99,9 @@ _BUS_LOCK = asyncio.Lock()
 
 async def set_avahi_service_name(new_service_name: str) -> None:
     """Set the Avahi service name.
+
+    See the `name_management` package docstring for background on the service name
+    and how it's distinct from other names on the machine.
 
     The new service name will only apply to the current boot.
 
