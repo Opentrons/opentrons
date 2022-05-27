@@ -227,6 +227,7 @@ class MoveGroupRunner:
             duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
             velocity=self._convert_velocity(step.velocity_mm_sec, interrupts_per_sec),
             action=PipetteTipActionTypeField(step.action),
+            request_stop_condition=UInt8Field(step.stop_condition),
         )
         return TipActionRequest(payload=tip_action_payload)
 

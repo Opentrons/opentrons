@@ -418,6 +418,7 @@ class TipActionRequestPayload(AddToMoveGroupRequestPayload):
 
     velocity: utils.Int32Field
     action: PipetteTipActionTypeField
+    request_stop_condition: utils.UInt8Field
 
 
 @dataclass
