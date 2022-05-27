@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.1.0-beta.0...v6.0.0-alpha.0) (2022-05-26)
+
+
+### Bug Fixes
+
+* **protocol-designer:** delay when offset length is falsey ([#10016](https://github.com/Opentrons/opentrons/issues/10016)) ([1c13967](https://github.com/Opentrons/opentrons/commit/1c139676fcc3fea28f29c1b49bff6452514475b0)), closes [#815](https://github.com/Opentrons/opentrons/issues/815)
+
+
+### Features
+
+* **protocol-designer:** add labware placement restrictions east west of heater-shaker ([#10410](https://github.com/Opentrons/opentrons/issues/10410)) ([e1a8887](https://github.com/Opentrons/opentrons/commit/e1a88879941ae3e9da025f10aaac191452e3f938)), closes [#10255](https://github.com/Opentrons/opentrons/issues/10255)
+* **protocol-designer, step-generation, shared-data:** rename trash labware id to match protocol engine usage ([#10132](https://github.com/Opentrons/opentrons/issues/10132)) ([2136030](https://github.com/Opentrons/opentrons/commit/21360302a0a67a544ebde9f114d5eb31d61af659)), closes [#10017](https://github.com/Opentrons/opentrons/issues/10017)
+* **shared-data:** add heater-shaker labware w/ adapter definitions ([#9917](https://github.com/Opentrons/opentrons/issues/9917)) ([859fe69](https://github.com/Opentrons/opentrons/commit/859fe69789fbf1d065420fce07dcd7a940e2c09c))
+* **shared-data, protocol-designer:** add liquid color to schema v6 ([#10294](https://github.com/Opentrons/opentrons/issues/10294)) ([c8ee567](https://github.com/Opentrons/opentrons/commit/c8ee5675f725e36578d0aca024e4bcd838030bf8))
+
+
+
+
+
 # [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
 
 

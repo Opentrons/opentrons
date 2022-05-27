@@ -24,6 +24,7 @@ from .ot3utils import (
     create_move_group,
     get_current_settings,
     node_to_axis,
+    axis_to_node,
 )
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
@@ -406,3 +407,8 @@ class OT3Simulator:
         if self._attached_instruments[OT3Mount.RIGHT].get("model", None):
             nodes.add(NodeId.pipette_right)
         self._present_nodes = nodes
+
+    async def capacitive_probe(
+        self, mount: OT3Mount, distance_mm: float, speed_mm_per_s: float
+    ) -> None:
+        self._position[axis_to_node(OT3Axis.by_mount(mount))] += distance_mm

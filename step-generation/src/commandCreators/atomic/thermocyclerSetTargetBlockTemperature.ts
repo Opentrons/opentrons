@@ -1,0 +1,25 @@
+import type { ThermocyclerSetBlockTemperatureArgs } from '@opentrons/shared-data/protocol/types/schemaV4'
+import type { CommandCreator } from '../../types'
+export const thermocyclerSetTargetBlockTemperature: CommandCreator<ThermocyclerSetBlockTemperatureArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
+) => {
+  if (args.volume !== undefined) {
+    console.warn(
+      `'volume' param not implemented for thermocycler/setTargetBlockTemperature, should not be set!`
+    )
+  }
+
+  return {
+    commands: [
+      {
+        commandType: 'thermocycler/setTargetBlockTemperature',
+        params: {
+          moduleId: args.module,
+          celsius: args.temperature,
+        },
+      },
+    ],
+  }
+}

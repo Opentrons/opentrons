@@ -58,13 +58,14 @@ describe('Labware', () => {
   })
 
   it('renders correct title, import button and labware cards', () => {
-    const [{ getByText, getByRole }] = render()
+    const [{ getByText, getByRole, getByTestId }] = render()
     getByText('labware')
     getByText('Mock Labware Card')
     getByRole('button', { name: 'Import' })
     getByText('Category')
     getByText('All')
     getByText('Sort by')
+    expect(getByTestId('sortBy-label')).toHaveTextContent('Alphabetical')
   })
   it('renders AddCustomLabware slideout when import button is clicked', () => {
     const [{ getByText, getByRole, queryByText }] = render()
@@ -115,10 +116,20 @@ describe('Labware', () => {
   })
   it('renders sort by menu when sort is clicked', () => {
     const [{ getByText, getByRole }] = render()
-    const sort = getByText('Sort by')
+    const sort = getByText('Alphabetical')
     fireEvent.click(sort)
-    getByText('Alphabetical')
     getByRole('button', { name: 'Alphabetical' })
     getByRole('button', { name: 'Reverse alphabetical' })
+  })
+
+  it('renders selected sort by menu when one menu is clicked', () => {
+    const [{ getByText, getByRole, getByTestId }] = render()
+    const sort = getByText('Alphabetical')
+    fireEvent.click(sort)
+    const reverse = getByRole('button', { name: 'Reverse alphabetical' })
+    fireEvent.click(reverse)
+    expect(getByTestId('sortBy-label')).toHaveTextContent(
+      'Reverse alphabetical'
+    )
   })
 })

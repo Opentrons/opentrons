@@ -40,7 +40,7 @@ def main() -> None:
     systemd.notify_up()
 
     LOG.info(f"Starting buildroot update server on http://{args.host}:{args.port}")
-    web.run_app(app, host=args.host, port=args.port)
+    web.run_app(app, host=args.host, port=args.port)  # type: ignore[no-untyped-call]
 
 
 if __name__ == "__main__":

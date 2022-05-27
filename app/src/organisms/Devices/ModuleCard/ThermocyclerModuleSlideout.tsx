@@ -28,7 +28,7 @@ import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type { ThermocyclerModule } from '../../../redux/modules/types'
 import type {
-  TCSetAndWaitForBlockTemperatureCreateCommand,
+  TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
@@ -80,8 +80,8 @@ export const ThermocyclerModuleSlideout = (
           celsius: parseInt(tempValue),
         },
       }
-      const saveBlockCommand: TCSetAndWaitForBlockTemperatureCreateCommand = {
-        commandType: 'thermocycler/setAndWaitForBlockTemperature',
+      const saveBlockCommand: TCSetTargetBlockTemperatureCreateCommand = {
+        commandType: 'thermocycler/setTargetBlockTemperature',
         params: {
           moduleId: runId != null ? moduleIdFromRun : module.id,
           celsius: parseInt(tempValue),

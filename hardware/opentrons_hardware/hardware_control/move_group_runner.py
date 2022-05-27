@@ -240,7 +240,7 @@ class MoveScheduler:
 
             self._moves.append(move_set)
             self._durations.append(duration)
-        log.info(f"Move scheduler running for groups {move_groups}")
+        log.debug(f"Move scheduler running for groups {move_groups}")
         self._completion_queue: asyncio.Queue[_CompletionPacket] = asyncio.Queue()
         self._event = asyncio.Event()
 
@@ -253,7 +253,7 @@ class MoveScheduler:
             group_id = message.payload.group_id.value
             ack_id = message.payload.ack_id.value
             node_id = arbitration_id.parts.originating_node_id
-            log.info(
+            log.debug(
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
                 ", which "
                 f"{'is' if (node_id, seq_id) in self._moves[group_id] else 'isn''t'}"
