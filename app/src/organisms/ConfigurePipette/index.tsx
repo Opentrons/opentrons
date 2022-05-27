@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import last from 'lodash/last'
 import { useTranslation } from 'react-i18next'
 import { Box } from '@opentrons/components'
+import { usePipetteSettingsQuery } from '@opentrons/react-api-client'
 import {
   SUCCESS,
   FAILURE,
@@ -14,7 +15,6 @@ import { updatePipetteSettings } from '../../redux/pipettes'
 import { useFeatureFlag } from '../../redux/config'
 import { ConfigForm } from './ConfigForm'
 import { ConfigErrorBanner } from './ConfigErrorBanner'
-import { usePipetteSettingsQuery } from '@opentrons/react-api-client/src/pipettes/usePipetteSettingsQuery'
 import type { State } from '../../redux/types'
 import type {
   AttachedPipette,
@@ -59,20 +59,19 @@ export function ConfigurePipette(props: Props): JSX.Element {
     }
   }, [updateRequest, closeModal])
 
-  console.log(updateRequest)
   return (
     <Box zIndex={1}>
       {updateError && <ConfigErrorBanner message={updateError} />}
-      {settings != null ? (
+      {settings != null && pipetteId != null && (
         <ConfigForm
-          //  @ts-expect-error: settings is already being checked to not equal null on line 78
+          //  @ts-expect-error: pipetteId and settings should not be undefined
           settings={settings[pipetteId].fields}
           updateInProgress={updateRequest?.status === PENDING}
           updateSettings={updateSettings}
           closeModal={closeModal}
           __showHiddenFields={__showHiddenFields}
         />
-      ) : null}
+      )}
     </Box>
   )
 }
