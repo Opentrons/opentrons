@@ -10,6 +10,7 @@ from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import module_geometry
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.modules.types import ThermocyclerModuleModel
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 tall_lw_name = "opentrons_96_tiprack_1000ul"
@@ -44,7 +45,7 @@ def test_slot_names():
         d["ahgoasia"] = "nope"
 
 
-def test_slot_collisions():
+def test_slot_collisions_module_first():
     d = Deck()
     mod_slot = "7"
     mod = module_geometry.load_module(
@@ -66,6 +67,18 @@ def test_slot_collisions():
     d[lw_slot] = lw
 
     assert lw_slot in d
+
+
+@pytest.mark.parametrize("labware_slot", ["7", "8", "10", "11"])
+def test_slot_collisions_labware_first(labware_slot: str):
+    deck = Deck()
+    deck[labware_slot] = labware.load(labware_name, deck.position_for(labware_slot))
+
+    with pytest.raises(ValueError):
+        deck["7"] = module_geometry.load_module(
+            ThermocyclerModuleModel.THERMOCYCLER_V1,
+            deck.position_for("7"),
+        )
 
 
 def test_highest_z():
