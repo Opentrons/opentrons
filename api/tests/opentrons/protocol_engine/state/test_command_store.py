@@ -416,7 +416,7 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
 def test_command_store_handles_play_according_to_door_state() -> None:
     """It should inactivate/activate command queue according to door state."""
     subject = CommandStore(is_door_blocking=True)
-    start_time = datetime.now()
+    start_time = datetime(year=2021, month=1, day=1)
     subject.handle_action(PlayAction(requested_at=start_time))
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
@@ -433,7 +433,7 @@ def test_command_store_handles_play_according_to_door_state() -> None:
 
     door_close_event = DoorStateNotification(new_state=DoorState.CLOSED, blocking=False)
     subject.handle_action(HardwareEventAction(event=door_close_event))
-    resume_start_time = datetime.now()
+    resume_start_time = datetime(year=2021, month=1, day=2)
     subject.handle_action(PlayAction(requested_at=resume_start_time))
 
     assert subject.state == CommandState(
@@ -550,10 +550,10 @@ def test_command_store_ignores_known_finish_error() -> None:
 def test_command_store_save_started_completed_run_timestamp() -> None:
     """Should return a none empty run_completed_at and run_started_at."""
     subject = CommandStore()
-    start_time = datetime.now()
-    hardware_stopped_time = datetime.now()
-    resume_time = datetime.now()
-    second_resume_time = datetime.now()
+    start_time = datetime(year=2021, month=1, day=1)
+    hardware_stopped_time = datetime(year=2021, month=1, day=2)
+    resume_time = datetime(year=2021, month=1, day=3)
+    second_resume_time = datetime(year=2021, month=1, day=4)
 
     subject.handle_action(PlayAction(requested_at=start_time))
     subject.handle_action(PauseAction(source=PauseSource.CLIENT))
