@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.1.0-beta.0...v6.0.0-alpha.0) (2022-05-26)
+
+
+### Bug Fixes
+
+* **app:** remove copy link from context menu ([#10328](https://github.com/Opentrons/opentrons/issues/10328)) ([4237331](https://github.com/Opentrons/opentrons/commit/4237331d025decab22d1f148c306b0d17f46f98c))
+* **app-shell:** ensure Windows build can analyze protocols ([#10347](https://github.com/Opentrons/opentrons/issues/10347)) ([66a96bc](https://github.com/Opentrons/opentrons/commit/66a96bc9e76911a3a63b9dae5730607c5ee4cebc)), closes [#10378](https://github.com/Opentrons/opentrons/issues/10378)
+
+
+### Features
+
+* **app:** add protocol overview section ([#10212](https://github.com/Opentrons/opentrons/issues/10212)) ([1066ff0](https://github.com/Opentrons/opentrons/commit/1066ff0238e091c9bcfeac23e729a4b74a063211)), closes [#8821](https://github.com/Opentrons/opentrons/issues/8821)
+* **app:** edit Robot Overflow Menu, Pipette Card banner and Advanced Settings ([#10188](https://github.com/Opentrons/opentrons/issues/10188)) ([e21d8db](https://github.com/Opentrons/opentrons/commit/e21d8db51eac5818477264a45ef12c0a2d15fb72)), closes [#10117](https://github.com/Opentrons/opentrons/issues/10117) [#8673](https://github.com/Opentrons/opentrons/issues/8673)
+* **app:** wire up don't show me again checkbox for HS modal ([#10139](https://github.com/Opentrons/opentrons/issues/10139)) ([f86b664](https://github.com/Opentrons/opentrons/commit/f86b6646b9fb15cd493bb5302cf4e5dd222ae0f3)), closes [#9814](https://github.com/Opentrons/opentrons/issues/9814)
+* **app-shell, app:** change window width, height; add minWidth ([#10343](https://github.com/Opentrons/opentrons/issues/10343)) ([69685e3](https://github.com/Opentrons/opentrons/commit/69685e38a786a23de4bcf251cee39a00c7314aa7))
+
+
+
+
+
 # [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
 
 

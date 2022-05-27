@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.1.0-beta.0...v6.0.0-alpha.0) (2022-05-26)
+
+
+### Bug Fixes
+
+* **app:** fix robot settings rename a robot name ([#10044](https://github.com/Opentrons/opentrons/issues/10044)) ([c561f2d](https://github.com/Opentrons/opentrons/commit/c561f2d61b2921de52e8df9ad42d07877c2cdcf3))
+
+
+### Features
+
+* **app:** device Details historical run log ([#10287](https://github.com/Opentrons/opentrons/issues/10287)) ([4d39ae0](https://github.com/Opentrons/opentrons/commit/4d39ae0595fb59437ea51baee892ff8bf869a34e)), closes [#8696](https://github.com/Opentrons/opentrons/issues/8696)
+* **app:** propose recent labware offsets to be reapplied for new protocol runs ([#10216](https://github.com/Opentrons/opentrons/issues/10216)) ([15c372c](https://github.com/Opentrons/opentrons/commit/15c372c523f376fcd592f784072aceb6254f108a)), closes [#9795](https://github.com/Opentrons/opentrons/issues/9795)
+
+
+
+
+
 # [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
 
 

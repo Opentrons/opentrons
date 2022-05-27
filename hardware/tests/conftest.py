@@ -25,7 +25,7 @@ class MockCanMessageNotifier:
     def add_listener(
         self,
         listener: MessageListenerCallback,
-        filter: Optional[MessageListenerCallbackFilter],
+        filter: Optional[MessageListenerCallbackFilter] = None,
     ) -> None:
         """Add listener."""
         self._listeners.append(listener)

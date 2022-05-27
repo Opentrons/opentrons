@@ -58,8 +58,12 @@ export function DevicesLanding(): JSX.Element {
 
   return (
     <Box minWidth={SIZE_6} padding={`${SPACING.spacing3} ${SPACING.spacing4}`}>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <StyledText as="h3" id="DevicesLanding_title">
+      <Flex
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
+        marginTop={SPACING.spacing3}
+      >
+        <StyledText as="h1" id="DevicesLanding_title">
           {t('devices')}
         </StyledText>
         <NewRobotSetupHelp />
