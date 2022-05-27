@@ -517,7 +517,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         queued_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
-        run_started_at=datetime(year=2021, month=1, day=1),
+        run_started_at=None,
     )
 
 
