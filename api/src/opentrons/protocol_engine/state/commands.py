@@ -113,7 +113,7 @@ class CommandState:
     run_started_at: Optional[datetime]
     """The time the run was started.
 
-    initialized when PlayAction is dispatched.
+    Set when the first `PlayAction` is dispatched.
     """
 
     run_completed_at: Optional[datetime]
