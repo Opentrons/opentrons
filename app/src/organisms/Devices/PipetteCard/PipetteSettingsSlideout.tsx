@@ -7,7 +7,7 @@ import { fetchPipetteSettings } from '../../../redux/pipettes'
 import { Slideout } from '../../../atoms/Slideout'
 import { ConfigurePipette } from '../../ConfigurePipette'
 
-import type { Mount } from '../../../redux/pipettes/types'
+import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
 import type { Dispatch } from '../../../redux/types'
 
 const FETCH_PIPETTES_INTERVAL_MS = 5000
@@ -18,12 +18,20 @@ interface PipetteSettingsSlideoutProps {
   pipetteName: PipetteModelSpecs['displayName']
   onCloseClick: () => unknown
   isExpanded: boolean
+  pipetteId: AttachedPipette['id']
 }
 
 export const PipetteSettingsSlideout = (
   props: PipetteSettingsSlideoutProps
 ): JSX.Element | null => {
-  const { pipetteName, mount, robotName, isExpanded, onCloseClick } = props
+  const {
+    pipetteName,
+    mount,
+    robotName,
+    isExpanded,
+    pipetteId,
+    onCloseClick,
+  } = props
   const { t } = useTranslation('device_details')
   const dispatch = useDispatch<Dispatch>()
 
@@ -49,6 +57,7 @@ export const PipetteSettingsSlideout = (
           robotName={robotName}
           mount={mount}
           closeModal={onCloseClick}
+          pipetteId={pipetteId}
         />
       </Flex>
     </Slideout>

@@ -138,13 +138,14 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           closeModal={() => setChangePipette(false)}
         />
       )}
-      {showSlideout && pipetteInfo != null && (
+      {showSlideout && pipetteInfo != null && pipetteId != null && (
         <PipetteSettingsSlideout
           mount={mount}
           robotName={robotName}
           pipetteName={pipetteInfo.displayName}
           onCloseClick={() => setShowSlideout(false)}
           isExpanded={true}
+          pipetteId={pipetteId}
         />
       )}
       {PipetteOffsetCalibrationWizard}

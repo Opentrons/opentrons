@@ -62,7 +62,7 @@ interface QuirksField {
 type PipetteSettingsFieldsMap = QuirksField & {
   [fieldId: string]: PipetteSettingsField
 }
-interface IndividualPipetteSettings {
+export interface IndividualPipetteSettings {
   info: { name: string | null | undefined; model: string | null | undefined }
   fields: PipetteSettingsFieldsMap
 }

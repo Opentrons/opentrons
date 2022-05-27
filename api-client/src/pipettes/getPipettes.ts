@@ -7,3 +7,4 @@ import type { Pipettes } from './types'
 export function getPipettes(config: HostConfig): ResponsePromise<Pipettes> {
   return request<Pipettes>(GET, `/pipettes`, null, config)
 }
+

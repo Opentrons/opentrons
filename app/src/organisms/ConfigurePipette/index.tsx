@@ -10,47 +10,38 @@ import {
   useDispatchApiRequest,
   getRequestById,
 } from '../../redux/robot-api'
-import {
-  getAttachedPipettes,
-  getAttachedPipetteSettings,
-  updatePipetteSettings,
-} from '../../redux/pipettes'
+import { updatePipetteSettings } from '../../redux/pipettes'
 import { useFeatureFlag } from '../../redux/config'
 import { ConfigForm } from './ConfigForm'
 import { ConfigErrorBanner } from './ConfigErrorBanner'
-
+import { usePipetteSettingsQuery } from '@opentrons/react-api-client/src/pipettes/usePipetteSettingsQuery'
 import type { State } from '../../redux/types'
-
 import type {
+  AttachedPipette,
   Mount,
   PipetteSettingsFieldsUpdate,
 } from '../../redux/pipettes/types'
 
+const PIPETTE_SETTINGS_POLL_MS = 5000
 interface Props {
   robotName: string
   mount: Mount
   closeModal: () => unknown
+  pipetteId: AttachedPipette['id']
 }
 
 export function ConfigurePipette(props: Props): JSX.Element {
-  const { robotName, mount, closeModal } = props
+  const { robotName, mount, closeModal, pipetteId } = props
   const { t } = useTranslation('device_details')
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
-
-  const pipette = useSelector(
-    (state: State) => getAttachedPipettes(state, robotName)[mount]
-  )
-  const settings = usePipetteSettingsQuery()
-  // //useSelector(
-  //   (state: State) => getAttachedPipetteSettings(state, robotName)[mount]
-  // )
-
+  const settings = usePipetteSettingsQuery({
+    refetchInterval: PIPETTE_SETTINGS_POLL_MS,
+  })?.data
   const updateSettings = (fields: PipetteSettingsFieldsUpdate): void => {
-    if (pipette) {
-      dispatchRequest(updatePipetteSettings(robotName, pipette.id, fields))
-    }
+    dispatchRequest(updatePipetteSettings(robotName, pipetteId, fields))
   }
 
+  console.log(settings)
   const updateRequest = useSelector((state: State) =>
     // @ts-expect-error(sa, 2021-05-27): avoiding src code change, verify last(requestIds) is not undefined
     getRequestById(state, last(requestIds))
@@ -72,18 +63,21 @@ export function ConfigurePipette(props: Props): JSX.Element {
     }
   }, [updateRequest, closeModal])
 
+  console.log(updateRequest)
+  console.log(updateSettings)
   return (
     <Box zIndex={1}>
       {updateError && <ConfigErrorBanner message={updateError} />}
-      {settings && (
+      {settings != null ? (
         <ConfigForm
-          settings={settings}
+          //  @ts-expect-error: settings is already being checked to not equal null on line 78
+          settings={settings[pipetteId].fields}
           updateInProgress={updateRequest?.status === PENDING}
           updateSettings={updateSettings}
           closeModal={closeModal}
           __showHiddenFields={__showHiddenFields}
         />
-      )}
+      ) : null}
     </Box>
   )
 }
