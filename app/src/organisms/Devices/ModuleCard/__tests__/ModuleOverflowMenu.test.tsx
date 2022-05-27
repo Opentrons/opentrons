@@ -9,6 +9,13 @@ import {
   mockHeaterShaker,
 } from '../../../../redux/modules/__fixtures__'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
+
+jest.mock('../useModuleIdFromRun')
+
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
+>
 
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
   return renderWithProviders(<ModuleOverflowMenu {...props} />, {
@@ -164,6 +171,7 @@ const mockTCBlockHeating = {
 describe('ModuleOverflowMenu', () => {
   let props: React.ComponentProps<typeof ModuleOverflowMenu>
   beforeEach(() => {
+    mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
     props = {
       module: mockMagneticModule,
       handleSlideoutClick: jest.fn(),

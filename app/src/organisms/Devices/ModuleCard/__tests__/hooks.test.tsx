@@ -20,6 +20,7 @@ import {
   useModuleOverflowMenu,
   useIsHeaterShakerInProtocol,
 } from '../hooks'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
 
 import {
   mockHeaterShaker,
@@ -35,6 +36,7 @@ jest.mock('@opentrons/react-api-client')
 jest.mock('../../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../../hooks')
+jest.mock('../useModuleIdFromRun')
 
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
@@ -51,6 +53,9 @@ const mockUseCreateCommandMutation = useCreateCommandMutation as jest.MockedFunc
 >
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
+>
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
 >
 
 const mockCloseLatchHeaterShaker = {
@@ -231,6 +236,9 @@ describe('useLatchControls', () => {
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
     )
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'heatershaker_id',
+    })
     const { result } = renderHook(() => useLatchControls(mockHeaterShaker), {
       wrapper,
     })

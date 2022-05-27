@@ -6,17 +6,22 @@ import {
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { ThermocyclerModuleSlideout } from '../ThermocyclerModuleSlideout'
 
 import { mockThermocycler } from '../../../../redux/modules/__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../useModuleIdFromRun')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
 const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
   typeof useCreateCommandMutation
+>
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
 >
 
 const render = (
@@ -43,6 +48,9 @@ describe('ThermocyclerModuleSlideout', () => {
     mockUseCommandMutation.mockReturnValue({
       createCommand: mockCreateCommand,
     } as any)
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'thermocycler_id',
+    })
   })
   afterEach(() => {
     jest.resetAllMocks()
