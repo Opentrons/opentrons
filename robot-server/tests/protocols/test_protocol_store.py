@@ -17,6 +17,7 @@ from robot_server.protocols.protocol_store import (
     ProtocolResource,
     ProtocolUsageInfo,
     ProtocolNotFoundError,
+    ProtocolUsedByRunError,
 )
 
 from robot_server.runs.run_store import RunStore
@@ -197,11 +198,41 @@ async def test_remove_protocol(
         subject.get("protocol-id")
 
 
-async def test_remove_missing_protocol_raises(
+def test_remove_missing_protocol_raises(
     subject: ProtocolStore,
 ) -> None:
     """It should raise an error when trying to remove missing protocol."""
     with pytest.raises(ProtocolNotFoundError, match="protocol-id"):
+        subject.remove("protocol-id")
+
+
+def test_remove_protocol_conflict(
+    run_store: RunStore,
+    subject: ProtocolStore,
+) -> None:
+    """It should raise an error when removing a protocol with a run."""
+    protocol_resource = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        source=ProtocolSource(
+            directory=None,
+            main_file=Path("/dev/null"),
+            config=JsonProtocolConfig(schema_version=123),
+            files=[],
+            metadata={},
+            labware_definitions=[],
+        ),
+        protocol_key=None,
+    )
+
+    subject.insert(protocol_resource)
+    run_store.insert(
+        run_id="run-id",
+        protocol_id="protocol-id",
+        created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
+    )
+
+    with pytest.raises(ProtocolUsedByRunError, match="protocol-id"):
         subject.remove("protocol-id")
 
 
