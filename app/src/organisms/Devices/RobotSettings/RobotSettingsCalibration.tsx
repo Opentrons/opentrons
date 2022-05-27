@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { saveAs } from 'file-saver'
 import { useTranslation } from 'react-i18next'
 
@@ -17,6 +17,7 @@ import {
   TOOLTIP_LEFT,
   useConditionalConfirm,
   Mount,
+  AlertModal,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
@@ -51,7 +52,7 @@ import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 
-import type { State } from '../../../redux/types'
+import type { State, Dispatch } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
 import type {
   SessionCommandString,
@@ -118,6 +119,7 @@ export function RobotSettingsCalibration({
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
+  const dispatch = useDispatch<Dispatch>()
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -389,6 +391,30 @@ export function RobotSettingsCalibration({
             cancel={cancelStart}
           />
         )}
+        {createStatus === RobotApi.FAILURE && (
+          <AlertModal
+            alertOverlay
+            heading={t('deck_calibration_failure')}
+            buttons={[
+              {
+                children: t('shared:ok'),
+                onClick: () => {
+                  createRequestId.current &&
+                    dispatch(RobotApi.dismissRequest(createRequestId.current))
+                  createRequestId.current = null
+                },
+              },
+            ]}
+          >
+            <StyledText>{t('deck_calibration_error_occurred')}</StyledText>
+            <StyledText>
+              {createRequest != null &&
+                'error' in createRequest &&
+                createRequest.error != null &&
+                RobotApi.getErrorResponseMessage(createRequest.error)}
+            </StyledText>
+          </AlertModal>
+        )}
       </Portal>
       {/* Calibration Data Download Section */}
       <Box paddingBottom={SPACING.spacing5}>
@@ -433,7 +459,7 @@ export function RobotSettingsCalibration({
                 color={COLORS.darkBlack}
                 css={TYPOGRAPHY.pRegular}
                 textDecoration={TEXT_DECORATION_UNDERLINE}
-                onClick={() => confirmStart()}
+                onClick={confirmStart}
               >
                 {t('recalibrate_now')}
               </Link>
@@ -449,7 +475,7 @@ export function RobotSettingsCalibration({
               color={COLORS.darkBlack}
               css={TYPOGRAPHY.pRegular}
               textDecoration={TEXT_DECORATION_UNDERLINE}
-              onClick={() => confirmStart()}
+              onClick={confirmStart}
             >
               {t('calibrate_now')}
             </Link>
@@ -468,7 +494,7 @@ export function RobotSettingsCalibration({
             <StyledText as="label">{deckLastModified()}</StyledText>
           </Box>
           <TertiaryButton
-            onClick={() => confirmStart()}
+            onClick={confirmStart}
             disabled={disabledOrBusyReason !== null}
           >
             {deckCalibrationButtonText}
