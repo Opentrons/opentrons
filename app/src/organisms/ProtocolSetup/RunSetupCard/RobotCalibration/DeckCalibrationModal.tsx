@@ -1,13 +1,11 @@
 import * as React from 'react'
-import { useTranslation, Trans } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
   Flex,
   Box,
-  DIRECTION_ROW,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   SPACING,
@@ -91,11 +89,7 @@ export function DeckCalibrationModal({
               t('pipette_offset_cal_description_bullet_3'),
             ]}
           />
-          <Divider
-            // width="100%"
-            marginTop="2.5rem"
-            marginBottom={SPACING.spacing4}
-          />
+          <Divider marginTop="2.5rem" marginBottom={SPACING.spacing4} />
           <PrimaryButton
             onClick={onClose}
             alignSelf={ALIGN_FLEX_END}
