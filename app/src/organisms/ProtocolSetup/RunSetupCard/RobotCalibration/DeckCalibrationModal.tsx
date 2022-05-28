@@ -52,6 +52,7 @@ export function DeckCalibrationModal({
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginTop={SPACING.spacing4}
+            role="heading"
           >
             {t('deck_calibration_title')}
           </StyledText>
@@ -66,6 +67,7 @@ export function DeckCalibrationModal({
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginTop={SPACING.spacing4}
+            role="heading"
           >
             {t('tip_length_cal_title')}
           </StyledText>
@@ -78,6 +80,7 @@ export function DeckCalibrationModal({
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginTop={SPACING.spacing4}
+            role="heading"
           >
             {t('pipette_offset_cal')}
           </StyledText>
