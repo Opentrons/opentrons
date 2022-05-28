@@ -398,7 +398,7 @@ export function RobotSettingsCalibration({
             </StyledText>
             {showDeckCalibrationModal ? (
               <DeckCalibrationModal
-                onClose={() => setShowDeckCalibrationModal(false)}
+                onCloseClick={() => setShowDeckCalibrationModal(false)}
               />
             ) : null}
             <Link
