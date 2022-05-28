@@ -247,7 +247,8 @@ async def test_runs_completed_started_at_persist_via_actions_router(
     with anyio.fail_after(5):
         while (await client.get_run(run_id=run_id)).json()["data"][
             "status"
-            # TODO (tz: 5-27-22): Should test against stopped status or separate tests
+            # TODO (tz: 5-27-22): Should test against stopped status or separate tests. 
+            # If a run was played, stop action will not trigger a stopped status.
         ] != "succeeded":
             await anyio.sleep(0.1)
 
