@@ -50,9 +50,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
     <Box>
       <React.Fragment>
         {helpModalIsOpen && (
-          <DeckCalibrationModal
-            onCloseClick={() => setHelpModalIsOpen(false)}
-          />
+          <DeckCalibrationModal onClose={() => setHelpModalIsOpen(false)} />
         )}
         <Flex
           marginTop={SPACING_3}

@@ -37,8 +37,8 @@ describe('DeckCalibration', () => {
           onCloseClick: expect.anything(),
         })
       )
-      .mockImplementation(({ onCloseClick }) => (
-        <div onClick={onCloseClick}>mock deckCalibration modal</div>
+      .mockImplementation(({ onClose }) => (
+        <div onClick={onClose}>mock deckCalibration modal</div>
       ))
   })
 
