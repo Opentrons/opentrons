@@ -9,7 +9,6 @@ import { i18n } from '../../../../i18n'
 import { DeckCalibrationModal } from '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { useTrackEvent } from '../../../../redux/analytics'
 import * as RobotSelectors from '../../../../redux/robot/selectors'
-import * as Calibration from '../../../../redux/calibration'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import {
   mockPipetteOffsetCalibration1,
@@ -88,9 +87,6 @@ const mockPipetteOffsetCalibrationItems = PipetteOffsetCalibrationItems as jest.
 >
 const mockTipLengthCalibrationItems = TipLengthCalibrationItems as jest.MockedFunction<
   typeof TipLengthCalibrationItems
->
-const mockGetDeckCalibrationStatus = Calibration.getDeckCalibrationStatus as jest.MockedFunction<
-  typeof Calibration.getDeckCalibrationStatus
 >
 
 let mockTrackEvent: jest.Mock
