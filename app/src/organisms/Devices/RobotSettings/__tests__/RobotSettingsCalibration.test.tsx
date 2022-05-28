@@ -9,6 +9,7 @@ import { i18n } from '../../../../i18n'
 import { DeckCalibrationModal } from '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { useTrackEvent } from '../../../../redux/analytics'
 import * as RobotSelectors from '../../../../redux/robot/selectors'
+import * as Calibration from '../../../../redux/calibration'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import {
   mockPipetteOffsetCalibration1,
@@ -47,6 +48,7 @@ jest.mock(
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/calibration')
+jest.mock('../../../../redux/pipettes')
 jest.mock('../../../../redux/robot/selectors')
 jest.mock('../../../../redux/sessions/selectors')
 jest.mock('../../../../redux/robot-api/selectors')
@@ -86,6 +88,9 @@ const mockPipetteOffsetCalibrationItems = PipetteOffsetCalibrationItems as jest.
 >
 const mockTipLengthCalibrationItems = TipLengthCalibrationItems as jest.MockedFunction<
   typeof TipLengthCalibrationItems
+>
+const mockGetDeckCalibrationStatus = Calibration.getDeckCalibrationStatus as jest.MockedFunction<
+  typeof Calibration.getDeckCalibrationStatus
 >
 
 let mockTrackEvent: jest.Mock
@@ -318,7 +323,7 @@ describe('RobotSettingsCalibration', () => {
   it('renders a Check health button', () => {
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Check health' })
-    expect(button).not.toBeDisabled()
+    expect(button).toBeDisabled()
   })
 
   it('Health check button is disabled when a robot is unreachable', () => {
@@ -353,4 +358,5 @@ describe('RobotSettingsCalibration', () => {
       )
     })
   })
+  // TODO kj 5/27/2022 more tests for health check will be added
 })
