@@ -184,13 +184,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       image = heaterShakerModule
       moduleData = (
         <HeaterShakerModuleData
-          heaterStatus={module.data.temperatureStatus}
-          shakerStatus={module.data.speedStatus}
-          latchStatus={module.data.labwareLatchStatus}
-          targetTemp={module.data.targetTemperature}
-          currentTemp={module.data.currentTemperature}
-          targetSpeed={module.data.targetSpeed}
-          currentSpeed={module.data.currentSpeed}
+          moduleData={module.data}
           showTemperatureData={true}
         />
       )
@@ -204,27 +198,18 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       setHasSecondary(false)
     }
     setShowSlideout(true)
-    setShowOverflowMenu(false)
-    setShowAboutModule(false)
   }
 
   const handleAboutClick = (): void => {
     setShowAboutModule(true)
-    setShowOverflowMenu(false)
-    setShowSlideout(false)
   }
 
   const handleTestShakeClick = (): void => {
     setShowTestShake(true)
-    setShowOverflowMenu(false)
-    setShowSlideout(false)
   }
 
   const handleWizardClick = (): void => {
     setShowWizard(true)
-    setShowTestShake(false)
-    setShowOverflowMenu(false)
-    setShowSlideout(false)
   }
 
   return (
@@ -238,9 +223,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         width={'100%'}
         data-testid={`ModuleCard_${module.serialNumber}`}
       >
-        {showWizard && (
-          <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
-        )}
+        {showWizard &&
+          (runId != null ? (
+            <HeaterShakerWizard
+              onCloseClick={() => setShowWizard(false)}
+              runId={runId}
+            />
+          ) : (
+            <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
+          ))}
         {showSlideout && runId != null ? (
           <ModuleSlideout
             module={module}

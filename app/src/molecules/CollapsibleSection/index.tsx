@@ -4,7 +4,6 @@ import {
   Flex,
   Btn,
   Icon,
-  SIZE_1,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   StyleProps,
@@ -28,7 +27,7 @@ export function CollapsibleSection(
           {title}
         </StyledText>
         <Btn onClick={() => setIsExpanded(!isExpanded)}>
-          <Icon size={SIZE_1} name={isExpanded ? 'minus' : 'plus'} />
+          <Icon size={'1.5rem'} name={isExpanded ? 'minus' : 'plus'} />
         </Btn>
       </Flex>
       {isExpanded ? children : null}

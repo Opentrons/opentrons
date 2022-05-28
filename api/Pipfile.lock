@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b26a61f15831acd4c9d33ee68d6e4c43b7f1dff56f24d42048d486004cdab8bf"
+            "sha256": "275f41afefbd2f076d15de37c8b48bf37964217a0379e8dfb355218fb940371c"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -108,10 +108,11 @@
         },
         "certifi": {
             "hashes": [
-                "sha256:78884e7c1d4b00ce3cea67b44566851c4343c120abd683433ce934a68ea58872",
-                "sha256:d62a0163eb4c2344ac042ab2bdf75399a71a2d8c7d47eac2e2ee91b9d6339569"
+                "sha256:9c5705e395cd70084351dd8ad5c41e65655e08ce46f2ec9cf6c2c08390f71eb7",
+                "sha256:f1d53542ee8cbedbe2118b5686372fb33c297fcd6379b050cca0ef13a597382a"
             ],
-            "version": "==2021.10.8"
+            "markers": "python_version >= '3.6'",
+            "version": "==2022.5.18.1"
         },
         "charset-normalizer": {
             "hashes": [
@@ -176,11 +177,11 @@
         },
         "decoy": {
             "hashes": [
-                "sha256:1c25fd1b6d248be25c5f501db1e20cf3cb9de29f547e616dc2cdf4b6dfb3bbe6",
-                "sha256:c93133d92896343e72fcc1ae85e71438b3d27e9229ba273a3811283d5e9614b8"
+                "sha256:599d6f4b6e67b74a3d8edf7a432b0b7d5d3c0296f7733fe96f2f4be4360bbfec",
+                "sha256:d84bd95816339ab2fda65aa6ced3291a0739bbc83ca82344c8543a801a082d56"
             ],
             "index": "pypi",
-            "version": "==1.10.2"
+            "version": "==1.10.3"
         },
         "docutils": {
             "hashes": [
@@ -224,10 +225,11 @@
         },
         "flake8-noqa": {
             "hashes": [
-                "sha256:629b87b542f9b4cbd7ee6de10b2c669e460a200145a7577b98092b7e94373153"
+                "sha256:02f6a10d0e59c0d50682a8c2799bf788dc7ae0eed27a4400ea66ea18ab42397c",
+                "sha256:48acd5b35a098f7c0b6eb948d4797303695cc7735365c571b4eef7e65a712fa2"
             ],
             "index": "pypi",
-            "version": "==1.2.1"
+            "version": "==1.2.2"
         },
         "idna": {
             "hashes": [
@@ -247,11 +249,11 @@
         },
         "importlib-metadata": {
             "hashes": [
-                "sha256:1208431ca90a8cca1a6b8af391bb53c1a2db74e5d1cef6ddced95d4b2062edc6",
-                "sha256:ea4c597ebf37142f827b8f39299579e31685c31d3a438b59f469406afd0f2539"
+                "sha256:5d26852efe48c0a32b0509ffbc583fda1a2266545a78d104a6f4aff3db17d700",
+                "sha256:c58c8eb8a762858f49e18436ff552e83914778e50e9d2f1660535ffb364552ec"
             ],
             "markers": "python_version < '3.8'",
-            "version": "==4.11.3"
+            "version": "==4.11.4"
         },
         "iniconfig": {
             "hashes": [

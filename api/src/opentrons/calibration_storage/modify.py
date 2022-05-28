@@ -23,6 +23,7 @@ if typing.TYPE_CHECKING:
         DeckCalibrationData,
         PipetteCalibrationData,
         CalibrationStatusDict,
+        GripperCalibrationData,
     )
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -281,6 +282,31 @@ def save_pipette_calibration(
     }
     io.save_to_file(offset_path, offset_dict)
     _add_to_pipette_offset_index_file(pip_id, mount)
+
+
+def save_gripper_calibration(
+    offset: Point,
+    gripper_id: str,
+    cal_status: typing.Optional[local_types.CalibrationStatus] = None,
+) -> None:
+    gripper_dir = config.get_opentrons_path("gripper_calibration_dir")
+    gripper_dir.mkdir(parents=True, exist_ok=True)
+    gripper_path = gripper_dir / f"{gripper_id}.json"
+    if cal_status:
+        status = cal_status
+    else:
+        status = local_types.CalibrationStatus()
+    status_dict: "CalibrationStatusDict" = helpers.convert_to_dict(  # type: ignore[assignment]  # noqa: E501
+        status
+    )
+
+    offset_dict: "GripperCalibrationData" = {
+        "offset": [offset.x, offset.y, offset.z],
+        "last_modified": utc_now(),
+        "source": local_types.SourceType.user,
+        "status": status_dict,
+    }
+    io.save_to_file(gripper_path, offset_dict)
 
 
 @typing.overload

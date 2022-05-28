@@ -58,10 +58,29 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blue};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
+  line-height: ${TYPOGRAPHY.lineHeight20};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   ${TYPOGRAPHY.pSemiBold}
 
   ${styleProps}
+
+  &:focus {
+    box-shadow: 0 0 0 3px ${COLORS.warning};
+  }
+
+  &:hover {
+    background-color: ${COLORS.blueHover};
+    box-shadow: 0 0 0;
+  }
+
+  &:active {
+    background-color: ${COLORS.bluePressed};
+  }
+
+  &:disabled {
+    background-color: ${COLORS.greyDisabled};
+    color: ${COLORS.disabled};
+  }
 `
 
 export const SecondaryButton = styled(NewSecondaryBtn)`
@@ -72,6 +91,19 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
   ${TYPOGRAPHY.pSemiBold}
 
   ${styleProps}
+
+  &:hover {
+    opacity: 70%;
+    box-shadow: 0 0 0;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 3px ${COLORS.warning};
+  }
+
+  &:disabled {
+    opacity: 50%;
+  }
 `
 
 export const ToggleButton = (props: ToggleBtnProps): JSX.Element => {

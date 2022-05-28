@@ -1,5 +1,5 @@
 import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/6/transferSettings.json'
-import _standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import _standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { getLabwareRenderInfo } from '../../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'

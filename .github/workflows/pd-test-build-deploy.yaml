@@ -75,7 +75,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        os: ['ubuntu-18.04', 'macos-latest']
+        os: ['ubuntu-18.04']
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v2'

@@ -19,6 +19,7 @@ import {
   TEMP_MAX,
   TEMP_MIN,
 } from '@opentrons/shared-data'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 import { Slideout } from '../../../atoms/Slideout'
 import { PrimaryButton } from '../../../atoms/buttons'
 import { InputField } from '../../../atoms/InputField'
@@ -40,6 +41,10 @@ export const TemperatureModuleSlideout = (
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    module,
+    runId != null ? runId : null
+  )
   const name = getModuleDisplayName(module.moduleModel)
   const [temperatureValue, setTemperatureValue] = React.useState<string | null>(
     null
@@ -50,7 +55,7 @@ export const TemperatureModuleSlideout = (
       const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand = {
         commandType: 'temperatureModule/setTargetTemperature',
         params: {
-          moduleId: module.id,
+          moduleId: runId != null ? moduleIdFromRun : module.id,
           celsius: parseInt(temperatureValue),
         },
       }

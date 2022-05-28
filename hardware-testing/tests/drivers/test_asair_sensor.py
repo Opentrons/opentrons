@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from hardware_testing.drivers import AsairSensor
+from hardware_testing.drivers.asair_sensor import Reading
 
 
 @pytest.fixture
@@ -14,9 +15,7 @@ def connection() -> MagicMock:
 @pytest.fixture
 def subject(connection: MagicMock) -> AsairSensor:
     """Test subject."""
-    subject = AsairSensor()
-    subject._th_sensor = connection
-    return subject
+    return AsairSensor(connection)
 
 
 def test_reading(subject: AsairSensor, connection: MagicMock) -> None:
@@ -24,7 +23,7 @@ def test_reading(subject: AsairSensor, connection: MagicMock) -> None:
     data = b"\x00\x00\x00" + b"\x00\x0a" + b"\x00\x1e"
     connection.read.return_value = data
     connection.inWaiting.return_value = len(data)
-    assert subject.get_reading() == (
+    assert subject.get_reading() == Reading(
         1.0,
         3.0,
     )

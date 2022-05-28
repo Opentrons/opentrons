@@ -22,7 +22,7 @@ import {
   createIrregularLabware,
   createRegularLabware,
 } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { IRREGULAR_OPTIONS, REGULAR_OPTIONS } from './fixtures'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
