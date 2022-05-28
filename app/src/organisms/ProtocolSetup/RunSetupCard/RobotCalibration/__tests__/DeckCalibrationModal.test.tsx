@@ -30,7 +30,7 @@ describe('DeckCalibrationModal', () => {
     getByText(
       'This measures the deck X and Y values relative to the gantry. Deck Calibration is the foundation for Tip Length Calibration and Pipette Offset Calibration.'
     )
-    getByText('Perform Deck Calibration during new robot setup')
+    getByText('Perform Deck Calibration during new robot setup.')
     getByText('Redo Deck Calibration if you relocate your robot.')
     expect(
       getByRole('heading', { name: 'Tip Length Calibration' })
@@ -45,7 +45,7 @@ describe('DeckCalibrationModal', () => {
       getByRole('heading', { name: 'Pipette Offset Calibration' })
     ).toBeTruthy()
     getByText(
-      'This measures a pipette’s X, Y and Z values in relation to the pipette mount and the deck. Pipette Offset Calibration relies on Deck Calibration and Tip Length Calibration. '
+      'This measures a pipette’s X, Y and Z values in relation to the pipette mount and the deck. Pipette Offset Calibration relies on Deck Calibration and Tip Length Calibration.'
     )
     getByText(
       'Perform Pipette Offset calibration the first time you attach a pipette to a new mount.'
