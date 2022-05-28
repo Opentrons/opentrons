@@ -361,6 +361,22 @@ export function RobotSettingsCalibration({
     }
   }
 
+  const checkDeckCalibrationStatus = (): 'error' | 'warning' | null => {
+    if (
+      deckCalibrationStatus &&
+      deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_OK
+    ) {
+      return 'error'
+    } else if (
+      !Array.isArray(deckCalibrationData.deckCalibrationData) &&
+      deckCalibrationData?.deckCalibrationData?.status != null &&
+      deckCalibrationData?.deckCalibrationData?.status.markedBad
+    ) {
+      return 'warning'
+    } else {
+      return null
+    }
+  }
   React.useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
       createRequestId.current = null
@@ -454,45 +470,31 @@ export function RobotSettingsCalibration({
       </Box>
       <Line />
       {/* DeckCalibration Section */}
-      {deckCalibrationStatus &&
-        deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_OK &&
-        !Array.isArray(deckCalibrationData.deckCalibrationData) &&
-        deckCalibrationData?.deckCalibrationData?.status != null &&
-        deckCalibrationData?.deckCalibrationData?.status.markedBad && (
-          <Banner type="warning">
-            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-              <StyledText as="p">
-                {t('deck_calibration_recommended')}
-              </StyledText>
-              <Link
-                role="button"
-                color={COLORS.darkBlack}
-                css={TYPOGRAPHY.pRegular}
-                textDecoration={TEXT_DECORATION_UNDERLINE}
-                onClick={confirmStart}
-              >
-                {t('recalibrate_now')}
-              </Link>
-            </Flex>
-          </Banner>
-        )}
-      {deckCalibrationStatus &&
-        deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_OK && (
-          <Banner type="error">
-            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-              <StyledText as="p">{t('deck_calibration_missing')}</StyledText>
-              <Link
-                role="button"
-                color={COLORS.darkBlack}
-                css={TYPOGRAPHY.pRegular}
-                textDecoration={TEXT_DECORATION_UNDERLINE}
-                onClick={confirmStart}
-              >
-                {t('calibrate_now')}
-              </Link>
-            </Flex>
-          </Banner>
-        )}
+      {checkDeckCalibrationStatus() !== null && (
+        <Banner
+          marginTop={SPACING.spacing5}
+          type={checkDeckCalibrationStatus() === 'error' ? 'error' : 'warning'}
+        >
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+            <StyledText as="p">
+              {checkDeckCalibrationStatus() === 'error'
+                ? t('deck_calibration_missing')
+                : t('deck_calibration_recommended')}
+            </StyledText>
+            <Link
+              role="button"
+              color={COLORS.darkBlack}
+              css={TYPOGRAPHY.pRegular}
+              textDecoration={TEXT_DECORATION_UNDERLINE}
+              onClick={confirmStart}
+            >
+              {checkDeckCalibrationStatus() === 'error'
+                ? t('calibrate_now')
+                : t('recalibrate_now')}
+            </Link>
+          </Flex>
+        </Banner>
+      )}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>

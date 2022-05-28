@@ -260,14 +260,12 @@ describe('RobotSettingsCalibration', () => {
       isDeckCalibrated: false,
     })
     const [{ getByRole, getByText }] = render()
-    getByText('Deck Calibration missing')
+    getByText('Deck calibration missing')
     getByRole('button', { name: 'Calibrate now' })
   })
 
   it('renders the warning banner when deck calibration is not good', () => {
-    mockUseDeckCalibrationStatus.mockReturnValue(
-      Calibration.DECK_CAL_STATUS_IDENTITY
-    )
+    mockUseDeckCalibrationStatus.mockReturnValue(Calibration.DECK_CAL_STATUS_OK)
     mockUseDeckCalibrationData.mockReturnValue({
       deckCalibrationData: mockWarningDeckCalData,
       isDeckCalibrated: true,
