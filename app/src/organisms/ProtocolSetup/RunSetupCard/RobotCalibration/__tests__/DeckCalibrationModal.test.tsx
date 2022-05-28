@@ -13,7 +13,7 @@ const render = (props: React.ComponentProps<typeof DeckCalibrationModal>) => {
 describe('DeckCalibrationModal', () => {
   let props: React.ComponentProps<typeof DeckCalibrationModal>
   beforeEach(() => {
-    props = { onClose: jest.fn() }
+    props = { onCloseClick: jest.fn() }
   })
 
   it('should render the correct header', () => {
@@ -71,9 +71,9 @@ describe('DeckCalibrationModal', () => {
 
   it('should call onCloseClick when the close button is pressed', () => {
     const { getByRole } = render(props)
-    expect(props.onClose).not.toHaveBeenCalled()
+    expect(props.onCloseClick).not.toHaveBeenCalled()
     const closeButton = getByRole('button', { name: 'close' })
     fireEvent.click(closeButton)
-    expect(props.onClose).toHaveBeenCalled()
+    expect(props.onCloseClick).toHaveBeenCalled()
   })
 })

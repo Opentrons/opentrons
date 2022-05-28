@@ -24,16 +24,16 @@ import { Divider } from '../../../../atoms/structure'
 const ROBOT_CAL_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
 interface DeckCalibrationModalProps {
-  onClose: () => void
+  onCloseClick: () => unknown
 }
 
 export function DeckCalibrationModal({
-  onClose,
+  onCloseClick,
 }: DeckCalibrationModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'shared'])
   return (
     <Portal level="top">
-      <Modal title={t('robot_cal_help_title')} onClose={onClose}>
+      <Modal title={t('robot_cal_help_title')} onClose={onCloseClick}>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText as="p" marginBottom={SPACING.spacing4}>
             {t('robot_cal_description')}
@@ -94,7 +94,7 @@ export function DeckCalibrationModal({
           />
           <Divider marginTop="2.5rem" marginBottom={SPACING.spacing4} />
           <PrimaryButton
-            onClick={onClose}
+            onClick={onCloseClick}
             alignSelf={ALIGN_FLEX_END}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
           >
