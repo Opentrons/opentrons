@@ -30,11 +30,11 @@ const mockResetConfigOptions = [
     name: 'Calibration Bar',
     description: 'Calibration bar description',
   },
-  // {
-  //   id: 'RunsHistoryFooBar',
-  //   name: 'RunsHistory FooBar',
-  //   description: 'runsHistory fooBar description',
-  // },
+  {
+    id: 'runsHistoryFooBar',
+    name: 'RunsHistory FooBar',
+    description: 'runsHistory fooBar description',
+  },
 ]
 
 const render = () => {
@@ -72,6 +72,7 @@ describe('RobotSettings FactoryResetSlideout', () => {
     getByText('Protocol Run History')
     getByText('Clear BootScript Foo')
     getByText('Clear Calibration Bar')
+    getByText('RunsHistory FooBar')
     const downloads = getAllByText('Download')
     expect(downloads.length).toBe(2)
     getByRole('checkbox', { name: 'Clear Calibration Bar' })
