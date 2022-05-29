@@ -56,10 +56,12 @@ export function GeneralSettings(): JSX.Element {
   const [
     showPreviousVersionModal,
     setShowPreviousVersionModal,
-  ] = React.useState(false)
+  ] = React.useState<boolean>(false)
   const updateAvailable = Boolean(useSelector(getAvailableShellUpdate))
-  const [showUpdateModal, setShowUpdateModal] = React.useState(updateAvailable)
-  const [showUpdateBanner, setShowUpdateBanner] = React.useState(
+  const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(
+    updateAvailable
+  )
+  const [showUpdateBanner, setShowUpdateBanner] = React.useState<boolean>(
     updateAvailable
   )
   const [
