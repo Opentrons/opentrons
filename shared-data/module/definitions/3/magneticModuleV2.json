@@ -28,7 +28,7 @@
     "z": 82.25
   },
   "config": {
-    "max_engage_height": 25
+    "maxEngageHeight": 25
   },
   "displayName": "Magnetic Module GEN2",
   "quirks": [],

@@ -28,8 +28,8 @@
     "z": 80.09
   },
   "config": {
-    "min_temperature": 9,
-    "max_temperature": 99
+    "minTemperature": 9,
+    "maxTemperature": 99
   },
   "displayName": "Temperature Module GEN2",
   "quirks": [],
