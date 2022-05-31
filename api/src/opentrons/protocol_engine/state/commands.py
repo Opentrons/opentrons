@@ -444,6 +444,11 @@ class CommandView(HasState[CommandState]):
             or queue_status == QueueStatus.ACTIVE
         )
 
+    def get_is_active(self) -> bool:
+        """Get whether the engine is active and queued commands should be executed."""
+        queue_status = self._state.queue_status
+        return (queue_status == QueueStatus.ACTIVE)
+
     def get_is_complete(self, command_id: str) -> bool:
         """Get whether a given command is completed.
 
@@ -481,6 +486,17 @@ class CommandView(HasState[CommandState]):
     def get_is_stopped(self) -> bool:
         """Get whether an engine stop has completed."""
         return self._state.is_hardware_stopped
+
+    def raise_if_not_started(self) -> None:
+        """Raise if a run has not started.
+
+        Mainly used to validate if an Action is allowed, raising if not.
+
+        Raises:
+            ProtocolEngineStoppedError: the engine has been stopped.
+        """
+        if not self.get_is_active():
+            raise ProtocolEngineStoppedError("A stop has already been requested.")
 
     # TODO(mc, 2021-12-07): reject adding commands to a stopped engine
     def raise_if_stop_requested(self) -> None:

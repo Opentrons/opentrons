@@ -270,6 +270,11 @@ def test_pause(
     )
 
 
+def test_pause_run_not_started(decoy: Decoy) -> None:
+    """Should raise an ProtocolEngineStoppedError error."""
+    raise NotImplementedError()
+
+
 @pytest.mark.parametrize("drop_tips_and_home", [True, False])
 @pytest.mark.parametrize("set_run_status", [True, False])
 async def test_finish(

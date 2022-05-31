@@ -114,6 +114,7 @@ class ProtocolEngine:
     def pause(self) -> None:
         """Pause executing commands in the queue."""
         action = PauseAction(source=PauseSource.CLIENT)
+        self._state_store.commands.raise_if_not_started()
         self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(action)
 
