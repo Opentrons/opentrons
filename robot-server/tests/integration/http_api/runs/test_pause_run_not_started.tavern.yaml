@@ -1,4 +1,4 @@
-test_name: Alter the value of run status and current
+test_name: Make sure a non active run cannot be paused
 
 marks:
   - usefixtures:
@@ -23,19 +23,6 @@ stages:
       save:
         json:
           run_id: data.id
-  - name: Patch the Run
-    request:
-      url: '{host:s}:{port:d}/runs/{run_id}'
-      json:
-        data: { 'current': true }
-      method: PATCH
-    response:
-      strict:
-        - json:off
-      status_code: 200
-      json:
-        data:
-          id: "{run_id}"
   - name: Issue pause to a none active run
     request:
       url: '{host:s}:{port:d}/runs/{run_id}/actions'
@@ -45,3 +32,8 @@ stages:
       method: POST
     response:
       status_code: 409
+      json:
+        errors:
+          - id: 'RunActionNotAllowed'
+            title: 'Run Action Not Allowed'
+            detail: 'Cannot pause a run that was not started.'
