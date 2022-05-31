@@ -26,7 +26,6 @@ export interface ModalProps extends BaseModalProps {
   title?: React.ReactNode
   children?: React.ReactNode
   icon?: IconProps
-  maxHeight?: string
 }
 
 const closeIconStyles = css`
@@ -94,10 +93,10 @@ export const Modal = (props: ModalProps): JSX.Element => {
       width="31.25rem"
       noHeaderStyles
       header={header}
-      maxHeight={maxHeight && maxHeight}
       css={css`
         border-radius: ${BORDERS.radiusSoftCorners};
         box-shadow: ${BORDERS.smallDropShadow};
+        max-height: ${maxHeight};
       `}
     >
       {children}
