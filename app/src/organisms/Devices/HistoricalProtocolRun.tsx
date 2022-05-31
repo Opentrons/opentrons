@@ -31,11 +31,11 @@ const CLICK_STYLE = css`
 
 interface HistoricalProtocolRunProps {
   run: RunData
-  protocolKey?: string
   protocolName: string
   robotName: string
   robotIsBusy: boolean
   key: number
+  protocolKey?: string
 }
 
 export function HistoricalProtocolRun(
@@ -58,10 +58,9 @@ export function HistoricalProtocolRun(
       duration = formatInterval(run.createdAt, new Date().toString())
     }
   }
-  const protocolKeys = storedProtocols.map(({ protocolKey }) => protocolKey)
-  const protocolKeyInStoredKeys = Object.values(protocolKeys).find(
-    key => key === protocolKey
-  )
+  const protocolKeyInStoredKeys = storedProtocols
+    .map(({ protocolKey }) => protocolKey)
+    .find(key => key === protocolKey)
 
   return (
     <>
