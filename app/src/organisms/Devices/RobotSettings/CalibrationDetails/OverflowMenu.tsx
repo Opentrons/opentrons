@@ -74,8 +74,8 @@ export function OverflowMenu({
     calBlockModalState,
     setCalBlockModalState,
   ] = React.useState<CalBlockModalState>(CAL_BLOCK_MODAL_CLOSED)
-
   const isBusy = useIsRobotBusy()
+
   interface StartWizardOptions {
     keepTipLength: boolean
     hasBlockModalResponse?: boolean | null

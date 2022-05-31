@@ -9,7 +9,11 @@ import { i18n } from '../../../../i18n'
 import { DeckCalibrationModal } from '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { useTrackEvent } from '../../../../redux/analytics'
 import * as RobotSelectors from '../../../../redux/robot/selectors'
-import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
+import * as Calibration from '../../../../redux/calibration'
+import {
+  mockDeckCalData,
+  mockWarningDeckCalData,
+} from '../../../../redux/calibration/__fixtures__'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
@@ -33,6 +37,7 @@ import {
   useTipLengthCalibrations,
   useAttachedPipettes,
   useIsRobotBusy,
+  useDeckCalibrationStatus,
 } from '../../hooks'
 
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
@@ -91,6 +96,9 @@ const mockTipLengthCalibrationItems = TipLengthCalibrationItems as jest.MockedFu
 >
 const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
   typeof useIsRobotBusy
+>
+const mockUseDeckCalibrationStatus = useDeckCalibrationStatus as jest.MockedFunction<
+  typeof useDeckCalibrationStatus
 >
 
 let mockTrackEvent: jest.Mock
@@ -253,13 +261,16 @@ describe('RobotSettingsCalibration', () => {
     getByText('Not calibrated yet')
   })
 
-  it('renders the banner when deck is not calibrated', () => {
+  it('renders the error banner when deck is not calibrated', () => {
+    mockUseDeckCalibrationStatus.mockReturnValue(
+      Calibration.DECK_CAL_STATUS_IDENTITY
+    )
     mockUseDeckCalibrationData.mockReturnValue({
       deckCalibrationData: null,
       isDeckCalibrated: false,
     })
     const [{ getByRole, getByText }] = render()
-    getByText('Deck Calibration missing')
+    getByText('Deck calibration missing')
     getByRole('button', { name: 'Calibrate now' })
   })
 
@@ -273,6 +284,17 @@ describe('RobotSettingsCalibration', () => {
     const button = getByRole('button', { name: 'Calibrate now' })
     fireEvent.click(button)
     expect(mockUpdateRobotStatus).toHaveBeenCalled()
+  })
+
+  it('renders the warning banner when deck calibration is not good', () => {
+    mockUseDeckCalibrationStatus.mockReturnValue(Calibration.DECK_CAL_STATUS_OK)
+    mockUseDeckCalibrationData.mockReturnValue({
+      deckCalibrationData: mockWarningDeckCalData,
+      isDeckCalibrated: true,
+    })
+    const [{ getByRole, getByText }] = render()
+    getByText('Deck calibration recommended')
+    getByRole('button', { name: 'Recalibrate now' })
   })
 
   it('recalibration button is disabled when a robot is unreachable', () => {
