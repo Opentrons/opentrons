@@ -131,8 +131,8 @@ class Deck(UserDict):
                 for item in sublist
             ]
             raise ValueError(
-                f"Could not load {val} because slot {key}"
-                f" is obscured by {', '.join(flattened_overlappers)}"
+                f"Could not load {val} because it would"
+                f" interfere with {', '.join(flattened_overlappers)}"
             )
         self.data[slot_key_int] = val
         self._highest_z = max(val.highest_z, self._highest_z)
