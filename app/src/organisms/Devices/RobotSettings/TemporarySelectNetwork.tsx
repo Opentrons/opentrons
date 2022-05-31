@@ -111,7 +111,6 @@ export const TemporarySelectNetwork = ({
   }
 
   const handleSelectJoinOther = (): void => {
-    console.log('handleSelectJoinOther need to check robotStatus')
     if (isBusy) {
       updateRobotStatus(true)
     } else {
