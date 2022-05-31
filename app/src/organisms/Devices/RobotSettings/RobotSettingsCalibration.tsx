@@ -361,7 +361,7 @@ export function RobotSettingsCalibration({
 
   React.useEffect(() => {
     checkPipetteCalibrationMissing()
-  }, [pipettePresent, pipetteOffsetCalibrations])
+  }, [pipetteOffsetCalibrations])
 
   return (
     <>
