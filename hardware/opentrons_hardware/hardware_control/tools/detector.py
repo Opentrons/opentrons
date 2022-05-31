@@ -100,11 +100,9 @@ class OneshotToolDetector:
                     pipette_to_ret[
                         NodeId(arbitration_id.parts.originating_node_id)
                     ] = PipetteInformation(
-                        name=PipetteName(response.payload.pipette_name.value),
-                        model=response.payload.pipette_model.value,
-                        serial=_decode_or_default(
-                            response.payload.pipette_serial.value
-                        ),
+                        name=PipetteName(response.payload.name.value),
+                        model=response.payload.model.value,
+                        serial=_decode_or_default(response.payload.serial.value),
                     )
                     break
                 elif isinstance(response, message_definitions.GripperInfoResponse):
