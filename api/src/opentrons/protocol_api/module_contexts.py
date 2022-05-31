@@ -803,9 +803,70 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
 
     @property
     @requires_version(2, 13)
-    def target_temperature(self):
-        """Target temperature of the Heater-Shaker."""
+    def target_temperature(self) -> Optional[float]:
+        """Target temperature of the heater-shaker's plate."""
         return self._module.target_temperature
+
+    @property
+    @requires_version(2, 13)
+    def current_temperature(self) -> float:
+        """Current temperature of the heater-shaker's plate."""
+        return self._module.temperature
+
+    @property
+    @requires_version(2, 13)
+    def current_speed(self) -> int:
+        """Current speed of the heater-shaker's plate."""
+        return self._module.speed
+
+    @property
+    @requires_version(2, 13)
+    def target_speed(self) -> int:
+        """Target speed of the heater-shaker's plate."""
+        return self._module.target_speed
+
+    @property
+    @requires_version(2, 13)
+    def temperature_status(self) -> str:
+        """Heater-shaker's temperature status string.
+
+        Returns one of these possible status values:
+        - "holding at target"
+        - "cooling"
+        - "heating"
+        - "idle"
+        - "error"
+        """
+        return self._module.temperature_status.value
+
+    @property
+    @requires_version(2, 13)
+    def speed_status(self) -> str:
+        """Heater-shaker's speed status string.
+
+        Returns one of these possible status values:
+        - "holding at target"
+        - "speeding up"
+        - "slowing down"
+        - "idle"
+        - "error"
+        """
+        return self._module.speed_status.value
+
+    @property
+    @requires_version(2, 13)
+    def labware_latch_status(self) -> str:
+        """Heater-shaker's labware latch status string.
+
+        Returns one of these possible status values:
+        - "opening": latch is opening
+        - "idle_open": latch is open and idle
+        - "closing": latch is closing
+        - "idle_closed": latch is closed and idle
+        - "idle_unknown": status upon reset
+        - "unknown": latch status cannot be reached, likely due to an error
+        """
+        return self._module.labware_latch_status.value
 
     # TODO: add command publisher
     @requires_version(2, 13)
