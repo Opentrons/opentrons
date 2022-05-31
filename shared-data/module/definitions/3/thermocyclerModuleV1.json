@@ -26,6 +26,14 @@
     "y": 64.93,
     "z": 97.8
   },
+  "config": {
+    "min_block_temperature": 0,
+    "max_block_temperature": 99,
+    "min_lid_temperature": 37,
+    "max_lid_temperature": 110,
+    "min_block_volume": 0,
+    "max_block_volume": 100
+  },
   "displayName": "Thermocycler Module",
   "quirks": [],
   "slotTransforms": {},

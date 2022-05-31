@@ -27,6 +27,12 @@
     "y": 8.75,
     "z": 68.275
   },
+  "config": {
+    "min_plate_temperature": 37,
+    "max_plate_temperature": 95,
+    "min_shake_speed": 200,
+    "max_shake_speed": 3000
+  },
   "displayName": "Heater-Shaker Module GEN1",
   "quirks": [],
   "slotTransforms": {
