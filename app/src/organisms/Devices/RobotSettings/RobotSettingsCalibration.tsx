@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { saveAs } from 'file-saver'
 import { useTranslation } from 'react-i18next'
 
@@ -17,6 +17,7 @@ import {
   TOOLTIP_LEFT,
   useConditionalConfirm,
   Mount,
+  useInterval,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
@@ -38,6 +39,7 @@ import { selectors as robotSelectors } from '../../../redux/robot'
 import * as RobotApi from '../../../redux/robot-api'
 import * as Config from '../../../redux/config'
 import * as Sessions from '../../../redux/sessions'
+import * as Calibration from '../../../redux/calibration'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
@@ -49,13 +51,15 @@ import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 
-import type { State } from '../../../redux/types'
+import type { State, Dispatch } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
 import type {
   SessionCommandString,
   DeckCalibrationSession,
 } from '../../../redux/sessions/types'
 import type { DeckCalibrationInfo } from '../../../redux/calibration/types'
+
+const CALS_FETCH_MS = 5000
 
 interface CalibrationProps {
   robotName: string
@@ -115,6 +119,7 @@ export function RobotSettingsCalibration({
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
+  const dispatch = useDispatch<Dispatch>()
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -359,9 +364,14 @@ export function RobotSettingsCalibration({
     }
   }, [createStatus])
 
-  React.useEffect(() => {
-    checkPipetteCalibrationMissing()
-  }, [pipetteOffsetCalibrations])
+  useInterval(
+    () => {
+      dispatch(Calibration.fetchPipetteOffsetCalibrations(robotName))
+      checkPipetteCalibrationMissing()
+    },
+    CALS_FETCH_MS,
+    true
+  )
 
   return (
     <>
