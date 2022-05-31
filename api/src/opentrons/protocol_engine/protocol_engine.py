@@ -103,9 +103,10 @@ class ProtocolEngine:
 
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
+        requested_at = self._model_utils.get_timestamp()
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
         # homed if necessary
-        action = PlayAction()
+        action = PlayAction(requested_at=requested_at)
         self._state_store.commands.raise_if_paused_by_blocking_door()
         self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(action)
@@ -234,7 +235,10 @@ class ProtocolEngine:
 
             await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
 
-            self._action_dispatcher.dispatch(HardwareStoppedAction())
+            completed_at = self._model_utils.get_timestamp()
+            self._action_dispatcher.dispatch(
+                HardwareStoppedAction(completed_at=completed_at)
+            )
             await self._plugin_starter.stop()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
