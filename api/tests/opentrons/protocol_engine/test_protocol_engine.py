@@ -348,7 +348,8 @@ async def test_finish_with_error(
 
     decoy.when(model_utils.generate_id()).then_return("error-id")
     decoy.when(model_utils.get_timestamp()).then_return(
-        datetime(year=2021, month=1, day=1)
+        datetime(year=2021, month=1, day=1),
+        datetime(year=2022, month=2, day=2)
     )
 
     await subject.finish(error=error)
@@ -357,10 +358,10 @@ async def test_finish_with_error(
         action_dispatcher.dispatch(
             FinishAction(error_details=expected_error_details, set_run_status=True)
         ),
-        await queue_worker.join(),
+        await queue_worker.join()
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
         action_dispatcher.dispatch(
-            HardwareStoppedAction(completed_at=datetime(2021, 1, 1, 0, 0))
+            HardwareStoppedAction(completed_at=datetime(year=2022, month=2, day=2))
         ),
     )
 
