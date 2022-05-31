@@ -68,6 +68,7 @@ async def test_create_run(
         actions=[],
         errors=[],
         pipettes=[],
+        modules=[],
         labware=[],
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
@@ -131,6 +132,7 @@ async def test_create_protocol_run(
         actions=[],
         errors=[],
         pipettes=[],
+        modules=[],
         labware=[],
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
@@ -227,6 +229,7 @@ async def test_get_run_data_from_url(
         actions=[],
         errors=[],
         pipettes=[],
+        modules=[],
         labware=[],
         labwareOffsets=[],
     )
@@ -271,6 +274,7 @@ async def test_get_run() -> None:
         actions=[],
         errors=[],
         pipettes=[],
+        modules=[],
         labware=[],
         labwareOffsets=[],
     )
@@ -314,6 +318,7 @@ async def test_get_runs_not_empty(
         actions=[],
         errors=[],
         pipettes=[],
+        modules=[],
         labware=[],
         labwareOffsets=[],
     )
@@ -327,6 +332,7 @@ async def test_get_runs_not_empty(
         actions=[],
         errors=[],
         pipettes=[],
+        modules=[],
         labware=[],
         labwareOffsets=[],
     )
@@ -403,6 +409,7 @@ async def test_update_run_to_not_current(
         actions=[],
         errors=[],
         pipettes=[],
+        modules=[],
         labware=[],
         labwareOffsets=[],
     )
@@ -435,6 +442,7 @@ async def test_update_current_none_noop(
         actions=[],
         errors=[],
         pipettes=[],
+        modules=[],
         labware=[],
         labwareOffsets=[],
     )
