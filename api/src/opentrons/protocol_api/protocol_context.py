@@ -16,7 +16,6 @@ from typing import (
 from collections import OrderedDict
 
 from opentrons import types
-from opentrons.config.feature_flags import enable_heater_shaker_python_api
 from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
@@ -28,7 +27,6 @@ from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
     requires_version,
     APIVersionError,
-    UnsupportedAPIError,
 )
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.context.protocol import AbstractProtocol
@@ -480,13 +478,6 @@ class ProtocolContext(CommandPublisher):
             )
 
         requested_model = resolve_module_model(module_name)
-
-        if (
-            requested_model.value == "heaterShakerModuleV1"
-            and not enable_heater_shaker_python_api()
-        ):
-            raise UnsupportedAPIError("Heater-Shaker module is not supported yet.")
-
         load_result = self._implementation.load_module(
             model=requested_model, location=location, configuration=configuration
         )
