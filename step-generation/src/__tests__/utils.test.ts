@@ -6,7 +6,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   LabwareDefinition2,
   getIsLabwareAboveHeight,
-  MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
+  MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
 } from '@opentrons/shared-data'
 import {
   fixtureP10Single,
