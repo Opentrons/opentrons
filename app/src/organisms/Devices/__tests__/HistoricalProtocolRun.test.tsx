@@ -72,13 +72,8 @@ describe('RecentProtocolRuns', () => {
     const protocolBtn = getByText('my protocol')
     getByText('Completed')
     getByText('mock HistoricalProtocolRunOverflowMenu')
-    const runBtn = getByText('05/04/2022 14:24:40')
     fireEvent.click(protocolBtn)
     expect(mockPush).toHaveBeenCalledWith('/protocols/protocolKeyStub')
-    fireEvent.click(runBtn)
-    expect(mockPush).toHaveBeenCalledWith(
-      'otie/protocol-runs/test_id/protocolRunDetailsTab?'
-    )
   })
   it('renders buttons that are not clickable when the protocol was deleted from the app directory', () => {
     mockGetStoredProtocols.mockReturnValue([storedProtocolDataFixture])
@@ -94,12 +89,7 @@ describe('RecentProtocolRuns', () => {
     const protocolBtn = getByText('my protocol')
     getByText('Completed')
     getByText('mock HistoricalProtocolRunOverflowMenu')
-    const runBtn = getByText('05/04/2022 14:24:40')
     fireEvent.click(protocolBtn)
     expect(mockPush).not.toHaveBeenCalledWith('/protocols/12345')
-    fireEvent.click(runBtn)
-    expect(mockPush).not.toHaveBeenCalledWith(
-      'otie/protocol-runs/test_id/protocolRunDetailsTab?'
-    )
   })
 })
