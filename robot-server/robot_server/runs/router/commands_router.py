@@ -167,8 +167,6 @@ async def create_run_command(
             Else, return immediately. Comes from a query parameter in the URL.
         timeout: The maximum time, in seconds, to wait before returning.
             Comes from a query parameter in the URL.
-        isSetupCommand: Whether this command is part of a protocol or is a setup command
-            that should be executed immediately.
         protocol_engine: The run's `ProtocolEngine` on which the new
             command will be enqueued.
     """

@@ -440,14 +440,10 @@ class CommandView(HasState[CommandState]):
 
         # if the queue is running, return the next protocol command
         if self._state.queue_status == QueueStatus.RUNNING:
-             return next(iter(self._state.queued_command_ids), None)
-        # otherwise we've got nothing to do
-        return None
             return next(iter(self._state.queued_command_ids), None)
 
         # otherwise we've got nothing to do
-        else:
-            return None
+        return None
 
     def get_is_okay_to_clear(self) -> bool:
         """Get whether the engine is stopped or sitting idly so it could be removed."""
