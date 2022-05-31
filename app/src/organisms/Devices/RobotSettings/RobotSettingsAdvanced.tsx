@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
+
 import { Box, SPACING, IconProps } from '@opentrons/components'
+
 import { Divider } from '../../../atoms/structure'
 import { Toast } from '../../../atoms/Toast'
 import { AboutRobotName } from './AdvancedTab/AboutRobotName'
@@ -62,7 +65,7 @@ export function RobotSettingsAdvanced({
   )
 
   const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
-
+  const history = useHistory()
   const robot = useRobot(robotName)
   const ipAddress = robot?.ip != null ? robot.ip : ''
   const settings = useSelector<State, RobotSettings>((state: State) =>
@@ -95,6 +98,7 @@ export function RobotSettingsAdvanced({
     if (options != null) setResetOptions(options)
     setShowFactoryResetModal(true)
     setIsRobotConnected(isConnected ?? false)
+    history.push(`/devices/`)
   }
 
   const updateDownloadLogsStatus = (isDownloading: boolean): void =>
