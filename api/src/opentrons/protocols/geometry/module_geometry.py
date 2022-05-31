@@ -486,7 +486,7 @@ def _load_from_v3(
             lid_height=definition["dimensions"]["lidHeight"],
             configuration=configuration,
         )
-    elif definition["moduleType"] == ModuleType.HEATER_SHAKER:
+    elif definition["moduleType"] == ModuleType.HEATER_SHAKER.value:
         return HeaterShakerGeometry(
             parent=parent,
             api_level=api_level,
@@ -660,7 +660,7 @@ def resolve_module_model(module_model_or_load_name: str) -> ModuleModel:
         "temperatureModuleV1": TemperatureModuleModel.TEMPERATURE_V1,
         "temperatureModuleV2": TemperatureModuleModel.TEMPERATURE_V2,
         "thermocyclerModuleV1": ThermocyclerModuleModel.THERMOCYCLER_V1,
-        "heaterShakerModuleV1": HeaterShakerModuleModel.HEATER_SHAKER_V1
+        "heaterShakerModuleV1": HeaterShakerModuleModel.HEATER_SHAKER_V1,
     }
 
     alias_map: Mapping[str, ModuleModel] = {

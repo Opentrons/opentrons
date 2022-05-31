@@ -15,7 +15,7 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.geometry.module_geometry import (
     load_module_from_definition,
     ModuleGeometry,
-    HeaterShakerGeometry
+    HeaterShakerGeometry,
 )
 from opentrons_shared_data.module.dev_types import (
     ModuleDefinitionV3,
@@ -100,7 +100,7 @@ def v1_mag_module_schema_v1_definition() -> ModuleDefinitionV1:
                 module_type=ModuleType.MAGNETIC,
                 display_name="Sample Module",
             ),
-            "Sample Module on "
+            "Sample Module on ",
         ),
         (
             APIVersion.from_string("2.2"),
@@ -115,7 +115,7 @@ def v1_mag_module_schema_v1_definition() -> ModuleDefinitionV1:
                 module_type=ModuleType.MAGNETIC,
                 display_name="Sample Old Module",
             ),
-            "Sample Old Module on "
+            "Sample Old Module on ",
         ),
         (
             APIVersion.from_string("2.12"),
@@ -130,8 +130,8 @@ def v1_mag_module_schema_v1_definition() -> ModuleDefinitionV1:
                 module_type=ModuleType.HEATER_SHAKER,
                 display_name="Sample H/S Module",
             ),
-            "Sample H/S Module on "
-        )
+            "Sample H/S Module on ",
+        ),
     ],
 )
 def test_load_mag_module_from_definition(
@@ -178,7 +178,7 @@ def test_heater_shaker_geometry_properties() -> None:
         overall_height=111,
         height_over_labware=222,
         parent=Location(point=Point(1, 2, 3), labware=None),
-        api_level=APIVersion.from_string("22.22")
+        api_level=APIVersion.from_string("22.22"),
     )
     assert subject.model == HeaterShakerModuleModel.HEATER_SHAKER_V1
     assert subject.labware is None

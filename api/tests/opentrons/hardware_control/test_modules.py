@@ -3,7 +3,6 @@ import pytest
 
 from pathlib import Path
 from unittest import mock
-from typing import List
 
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import ModuleAtPort
@@ -21,7 +20,7 @@ from opentrons.hardware_control.modules import (
     MagDeck,
     Thermocycler,
     HeaterShaker,
-    AbstractModule
+    AbstractModule,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 
@@ -81,22 +80,33 @@ async def test_module_caching():
 
 @pytest.mark.parametrize(
     argnames=[
-        "module_model", "module_type", "expected_found_type", "expected_found_number"],
+        "module_model",
+        "module_type",
+        "expected_found_type",
+        "expected_found_number",
+    ],
     argvalues=[
         (MagneticModuleModel.MAGNETIC_V1, ModuleType.MAGNETIC, MagDeck, 2),
-        (TemperatureModuleModel.TEMPERATURE_V2, ModuleType.TEMPERATURE,
-         TempDeck, 2),
-        (ThermocyclerModuleModel.THERMOCYCLER_V1, ModuleType.THERMOCYCLER,
-         Thermocycler, 1),
-        (HeaterShakerModuleModel.HEATER_SHAKER_V1, ModuleType.HEATER_SHAKER,
-         HeaterShaker, 1)
-    ]
+        (TemperatureModuleModel.TEMPERATURE_V2, ModuleType.TEMPERATURE, TempDeck, 2),
+        (
+            ThermocyclerModuleModel.THERMOCYCLER_V1,
+            ModuleType.THERMOCYCLER,
+            Thermocycler,
+            1,
+        ),
+        (
+            HeaterShakerModuleModel.HEATER_SHAKER_V1,
+            ModuleType.HEATER_SHAKER,
+            HeaterShaker,
+            1,
+        ),
+    ],
 )
 async def test_filtering_modules(
-        module_model: ModuleModel,
-        module_type: ModuleType,
-        expected_found_type: AbstractModule,
-        expected_found_number: int
+    module_model: ModuleModel,
+    module_type: ModuleType,
+    expected_found_type: AbstractModule,
+    expected_found_number: int,
 ) -> None:
     """It should parse available modules and filter out the specified ones."""
     import opentrons.hardware_control as hardware_control
@@ -128,16 +138,22 @@ async def test_filtering_modules(
     argvalues=[
         (MagneticModuleModel.MAGNETIC_V1, ModuleType.MAGNETIC, MagDeck),
         (TemperatureModuleModel.TEMPERATURE_V1, ModuleType.TEMPERATURE, TempDeck),
-        (ThermocyclerModuleModel.THERMOCYCLER_V1, ModuleType.THERMOCYCLER, Thermocycler
-         ),
-        (HeaterShakerModuleModel.HEATER_SHAKER_V1, ModuleType.HEATER_SHAKER,
-         HeaterShaker)
-    ]
+        (
+            ThermocyclerModuleModel.THERMOCYCLER_V1,
+            ModuleType.THERMOCYCLER,
+            Thermocycler,
+        ),
+        (
+            HeaterShakerModuleModel.HEATER_SHAKER_V1,
+            ModuleType.HEATER_SHAKER,
+            HeaterShaker,
+        ),
+    ],
 )
 async def test_get_simulating_module(
-        module_model: ModuleModel,
-        module_type: ModuleType,
-        expected_sim_type: AbstractModule
+    module_model: ModuleModel,
+    module_type: ModuleType,
+    expected_sim_type: AbstractModule,
 ) -> None:
     """It should create simulating module instance for specified module."""
     import opentrons.hardware_control as hardware_control

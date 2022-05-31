@@ -16,5 +16,5 @@ __all__ = [
     "ThermocyclerContext",
     "MagneticModuleContext",
     "TemperatureModuleContext",
-    "HeaterShakerContext"
+    "HeaterShakerContext",
 ]

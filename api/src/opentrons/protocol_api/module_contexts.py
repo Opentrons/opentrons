@@ -14,14 +14,14 @@ from opentrons.protocols.api_support.types import APIVersion
 
 from .module_validation_and_errors import (
     validate_heater_shaker_temperature,
-    validate_heater_shaker_speed
+    validate_heater_shaker_speed,
 )
 from .labware import Labware, load, load_from_definition
 from .load_info import LabwareLoadInfo
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry,
     ThermocyclerGeometry,
-    HeaterShakerGeometry
+    HeaterShakerGeometry,
 )
 from opentrons.protocols.api_support.util import requires_version
 
@@ -41,6 +41,10 @@ MAGDECK_HALF_MM_LABWARE = [
 MODULE_LOG = logging.getLogger(__name__)
 
 GeometryType = TypeVar("GeometryType", bound=ModuleGeometry)
+
+
+class NoTargetTemperatureSetError(RuntimeError):
+    """An error raised when awaiting temperature when no target was set."""
 
 
 class ModuleContext(CommandPublisher, Generic[GeometryType]):
@@ -792,7 +796,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         # TODO(mc, 2022-02-05): this type annotation is misleading;
         # a SynchronousAdapter wrapper is actually passed in
         hw_module: modules.heater_shaker.HeaterShaker,
-        geometry: ModuleGeometry,
+        geometry: HeaterShakerGeometry,
         requested_as: ModuleModel,
         at_version: APIVersion,
         loop: asyncio.AbstractEventLoop,
@@ -801,31 +805,31 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         self._loop = loop
         super().__init__(ctx, geometry, requested_as, at_version)
 
-    @property
+    @property  # type: ignore[misc]
     @requires_version(2, 13)
     def target_temperature(self) -> Optional[float]:
         """Target temperature of the heater-shaker's plate."""
         return self._module.target_temperature
 
-    @property
+    @property  # type: ignore[misc]
     @requires_version(2, 13)
     def current_temperature(self) -> float:
         """Current temperature of the heater-shaker's plate."""
         return self._module.temperature
 
-    @property
+    @property  # type: ignore[misc]
     @requires_version(2, 13)
     def current_speed(self) -> int:
         """Current speed of the heater-shaker's plate."""
         return self._module.speed
 
-    @property
+    @property  # type: ignore[misc]
     @requires_version(2, 13)
-    def target_speed(self) -> int:
+    def target_speed(self) -> Optional[int]:
         """Target speed of the heater-shaker's plate."""
         return self._module.target_speed
 
-    @property
+    @property  # type: ignore[misc]
     @requires_version(2, 13)
     def temperature_status(self) -> str:
         """Heater-shaker's temperature status string.
@@ -839,7 +843,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """
         return self._module.temperature_status.value
 
-    @property
+    @property  # type: ignore[misc]
     @requires_version(2, 13)
     def speed_status(self) -> str:
         """Heater-shaker's speed status string.
@@ -853,7 +857,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """
         return self._module.speed_status.value
 
-    @property
+    @property  # type: ignore[misc]
     @requires_version(2, 13)
     def labware_latch_status(self) -> str:
         """Heater-shaker's labware latch status string.
@@ -902,6 +906,10 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         Delays protocol execution until heater-shaker has reached its target
         temperature. The module should have a target temperature set previously.
         """
+        if self.target_temperature is None:
+            raise NoTargetTemperatureSetError(
+                f"Heater-shaker module {self} does not have a target temperature set."
+            )
         self._module.await_temperature(awaiting_temperature=self.target_temperature)
 
     # TODO: add command publisher
@@ -932,7 +940,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     # TODO: add command publisher
     @requires_version(2, 13)
     def close_labware_latch(self) -> None:
-        """Close heater-shaker's labware latch """
+        """Close heater-shaker's labware latch"""
         self._module.close_labware_latch()
 
     # TODO: add command publisher

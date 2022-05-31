@@ -170,7 +170,7 @@ class AttachedModulesControl:
             modules.types.ModuleType.MAGNETIC: "magdeck",
             modules.types.ModuleType.TEMPERATURE: "tempdeck",
             modules.types.ModuleType.THERMOCYCLER: "thermocycler",
-            modules.types.ModuleType.HEATER_SHAKER: "heatershaker"
+            modules.types.ModuleType.HEATER_SHAKER: "heatershaker",
         }[resolved_type]
         for module in self.available_modules:
             if mod_type == module.name():

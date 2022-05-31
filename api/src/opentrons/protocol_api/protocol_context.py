@@ -58,8 +58,10 @@ logger = logging.getLogger(__name__)
 
 
 ModuleTypes = Union[
-    TemperatureModuleContext, MagneticModuleContext,
-    ThermocyclerContext, HeaterShakerContext
+    TemperatureModuleContext,
+    MagneticModuleContext,
+    ThermocyclerContext,
+    HeaterShakerContext,
 ]
 
 
