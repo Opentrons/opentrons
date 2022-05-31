@@ -1268,16 +1268,24 @@ class OT3API(
             )
         here = await self.gantry_position(mount)
         self._log.info(f"probe start: at {here}")
-        target = moving_axis.set_in_point(
-            here, target_pos + pass_settings.prep_distance_mm
-        )
-        self._log.info(f"moving to {target}")
-        await self.move_to(mount, target)
+        origin_pos = moving_axis.of_point(here)
+        if origin_pos < target_pos:
+            pass_start = target_pos - pass_settings.prep_distance_mm
+            pass_distance = (
+                target_pos - pass_start + pass_settings.max_overrun_distance_mm
+            )
+        else:
+            pass_start = target_pos + pass_settings.prep_distance_mm
+            pass_distance = (
+                target_pos - pass_start - pass_settings.max_overrun_distance_mm
+            )
+        pass_start_pos = moving_axis.set_in_point(here, pass_start)
+        await self.move_to(mount, pass_start_pos)
         self._log.info("doing probe")
         await self._backend.capacitive_probe(
             mount,
             moving_axis,
-            pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm,
+            pass_distance,
             pass_settings.speed_mm_per_s,
         )
         machine_pos = await self._backend.update_position()
@@ -1287,7 +1295,7 @@ class OT3API(
             self._transforms.carriage_offset,
             OT3Axis,
         )
-        bottom_pos = await self.gantry_position(mount)
-        self._log.info(f"position now {bottom_pos}, moving back to {target}")
-        await self.move_to(mount, target)
-        return moving_axis.of_point(bottom_pos)
+        end_pos = await self.gantry_position(mount)
+        self._log.info(f"position now {end_pos}, moving back to {pass_start_pos}")
+        await self.move_to(mount, pass_start_pos)
+        return moving_axis.of_point(end_pos)
