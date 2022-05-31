@@ -2,6 +2,8 @@ import pytest
 import json
 import mock
 
+from typing import AsyncGenerator
+
 import opentrons.protocol_api as papi
 import opentrons.protocols.geometry as papi_geometry
 
@@ -27,7 +29,7 @@ from opentrons.protocol_api.module_contexts import (
 from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
-from opentrons.protocols.api_support import types as api_types, util as api_util
+from opentrons.protocols.api_support import util as api_util
 from opentrons_shared_data import load_shared_data
 
 
@@ -111,14 +113,10 @@ async def ctx_with_thermocycler(
 
 
 @pytest.fixture
-# TODO: Remove this patch once H/S is released
-@mock.patch(
-    "opentrons.protocol_api.protocol_context.MAX_SUPPORTED_VERSION",
-    api_types.APIVersion(2, 13),
-)
 async def ctx_with_heater_shaker(
     mock_hardware: mock.AsyncMock,
     mock_module_controller: mock.MagicMock,
+    enable_heater_shaker_python_api: AsyncGenerator[None, None],
 ) -> ProtocolContext:
     """Context fixture with a mock heater-shaker."""
     mock_module_controller.model.return_value = "heaterShakerModuleV1"
@@ -194,7 +192,9 @@ def test_incorrect_module_error(ctx_with_tempdeck):
         ("heaterShakerModuleV1", papi.HeaterShakerContext, "heaterShakerModuleV1"),
     ],
 )
-def test_load_simulating_module(ctx, loadname, klass, model):
+def test_load_simulating_module(
+    ctx, enable_heater_shaker_python_api, loadname, klass, model
+):
     """Check that a known module will not throw an error if in simulation mode.
 
     Note: This is basically an integration test that checks that a module can be
@@ -519,15 +519,10 @@ def test_heater_shaker_loading(
     assert ctx_with_heater_shaker.deck[3] == mod.geometry
 
 
-def test_executing_heater_shaker_command_fails_prerelease(
+def test_loading_heater_shaker_fails_prerelease(
     mock_hardware: mock.AsyncMock, mock_module_controller: mock.MagicMock
 ) -> None:
-    """It should raise an error if h/s command issued in a pre-release API version.
-
-    If this test fails in an API Version prior to H/S release, then it indicates that
-    API version was bumped up without updating the version requirement decorator
-    for H/S.
-    """
+    """It should raise an error if h/s command issued without feature flag enabled."""
     mock_module_controller.model.return_value = "heaterShakerModuleV1"
 
     def find_modules(resolved_model: ModuleModel, resolved_type: ModuleType):
@@ -543,9 +538,8 @@ def test_executing_heater_shaker_command_fails_prerelease(
         implementation=ProtocolContextImplementation(sync_hardware=mock_hardware)
     )
 
-    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-    with pytest.raises(api_util.APIVersionError):
-        hs_mod.set_target_temperature(celsius=50)  # type: ignore[union-attr]
+    with pytest.raises(api_util.UnsupportedAPIError):
+        ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
 
 
 def test_heater_shaker_set_target_temperature(
