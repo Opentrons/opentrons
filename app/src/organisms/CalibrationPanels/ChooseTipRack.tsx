@@ -29,6 +29,8 @@ import {
   SecondaryBtn,
   SIZE_5,
 } from '@opentrons/components'
+import { usePipettesQuery } from '@opentrons/react-api-client'
+
 import * as Sessions from '../../redux/sessions'
 import { NeedHelpLink } from './NeedHelpLink'
 import { ChosenTipRackRender } from './ChosenTipRackRender'
@@ -79,6 +81,8 @@ const introContentByType = (sessionType: SessionType): string => {
   }
 }
 
+const EQUIPMENT_POLL_MS = 5000
+
 function formatOptionsFromLabwareDef(lw: LabwareDefinition2): SelectOption {
   return {
     value: getLabwareDefURI(lw),
@@ -109,12 +113,9 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
     defaultTipracks,
   } = props
 
-  const pipSerial = useSelector(
-    (state: State) =>
-      robotName != null &&
-      getAttachedPipettes(state, robotName)[mount] != null &&
-      getAttachedPipettes(state, robotName)[mount]?.id
-  )
+  const pipSerial = usePipettesQuery({
+    refetchInterval: EQUIPMENT_POLL_MS,
+  })?.data?.[mount].id
 
   const pipetteOffsetCal = useSelector((state: State) =>
     robotName && pipSerial
