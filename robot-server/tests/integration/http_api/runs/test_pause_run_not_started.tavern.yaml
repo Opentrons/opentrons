@@ -1,0 +1,34 @@
+test_name: Alter the value of run status and current
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: Create Empty Run
+    request:
+      url: '{host:s}:{port:d}/runs'
+      json:
+        data: {}
+      method: POST
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          status: idle
+          current: true
+      save:
+        json:
+          run_id: data.id
+  - name: Issue stop pause to Run that was not started
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/actions'
+      json:
+        data:
+          actionType: pause
+      method: POST
+    response:
+      status_code: 409
