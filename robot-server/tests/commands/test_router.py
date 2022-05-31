@@ -59,23 +59,6 @@ async def test_create_command(
     decoy.verify(await protocol_engine.wait_for_command("abc123"), times=0)
 
 
-async def test_create_pause_command_run_not_started(
-    decoy: Decoy,
-    protocol_engine: ProtocolEngine,
-) -> None:
-    """It should raise a 409. trying to pause a not started run."""
-    pause_params = pe_commands.PauseParams()
-    command_create = pe_commands.PauseCreate(params=pause_params)
-
-    with pytest.raises(ApiError):
-        result = await create_command(
-            RequestModel(data=command_create),
-            waitUntilComplete=False,
-            timeout=42,
-            engine=protocol_engine,
-        )
-
-
 async def test_create_command_wait_for_complete(
     decoy: Decoy,
     protocol_engine: ProtocolEngine,
