@@ -30,6 +30,7 @@ from ..errors import (
     ProtocolEngineStoppedError,
     ErrorOccurrence,
     RobotDoorOpenError,
+    RunNotStartedError,
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions

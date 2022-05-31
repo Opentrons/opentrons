@@ -30,7 +30,7 @@ from .exceptions import (
     InvalidTargetSpeedError,
     InvalidTargetTemperatureError,
     InvalidBlockVolumeError,
-    RunNotStartedError
+    RunNotStartedError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -68,5 +68,5 @@ __all__ = [
     "InvalidBlockVolumeError",
     # error occurrence models
     "ErrorOccurrence",
-    "RunNotStartedError"
+    "RunNotStartedError",
 ]
