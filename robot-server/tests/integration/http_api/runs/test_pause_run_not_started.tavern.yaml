@@ -23,6 +23,19 @@ stages:
       save:
         json:
           run_id: data.id
+  - name: Patch the Run
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}'
+      json:
+        data: { 'current': true }
+      method: PATCH
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          id: "{run_id}"
   - name: Issue pause to a none active run
     request:
       url: '{host:s}:{port:d}/runs/{run_id}/actions'
