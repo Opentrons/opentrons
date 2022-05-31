@@ -28,7 +28,8 @@ from .command_fixtures import (
 
 def get_command_view(
     queue_status: QueueStatus = QueueStatus.SETUP,
-    is_hardware_stopped: bool = False,
+    run_completed_at: Optional[datetime] = None,
+    run_started_at: Optional[datetime] = None,
     is_door_blocking: bool = False,
     run_result: Optional[RunResult] = None,
     running_command_id: Optional[str] = None,
@@ -46,7 +47,7 @@ def get_command_view(
 
     state = CommandState(
         queue_status=queue_status,
-        is_hardware_stopped=is_hardware_stopped,
+        run_completed_at=run_completed_at,
         is_door_blocking=is_door_blocking,
         run_result=run_result,
         running_command_id=running_command_id,
@@ -55,6 +56,7 @@ def get_command_view(
         errors_by_id=errors_by_id or {},
         all_command_ids=all_command_ids,
         commands_by_id=commands_by_id,
+        run_started_at=run_started_at,
     )
 
     return CommandView(state=state)
@@ -214,10 +216,10 @@ def test_get_should_stop() -> None:
 
 def test_get_is_stopped() -> None:
     """It should return true if stop requested and no command running."""
-    subject = get_command_view(is_hardware_stopped=False)
+    subject = get_command_view(run_completed_at=None)
     assert subject.get_is_stopped() is False
 
-    subject = get_command_view(is_hardware_stopped=True)
+    subject = get_command_view(run_completed_at=datetime(year=2021, day=1, month=1))
     assert subject.get_is_stopped() is True
 
 
@@ -293,7 +295,7 @@ command_allowed_specs: List[SetupCommandAllowedSpec] = [
     SetupCommandAllowedSpec(  # Status: FAILED
         subject=get_command_view(
             run_result=RunResult.FAILED,
-            is_hardware_stopped=True,
+            run_completed_at=datetime(year=2021, month=1, day=1),
         ),
         expected_error=errors.SetupCommandNotAllowedError,
     ),
@@ -308,7 +310,7 @@ command_allowed_specs: List[SetupCommandAllowedSpec] = [
         subject=get_command_view(
             queue_status=QueueStatus.PAUSED,
             run_result=RunResult.SUCCEEDED,
-            is_hardware_stopped=False,
+            run_completed_at=None,
         ),
         expected_error=errors.SetupCommandNotAllowedError,
     ),
@@ -405,7 +407,7 @@ get_status_specs: List[GetStatusSpec] = [
         subject=get_command_view(
             queue_status=QueueStatus.PAUSED,
             run_result=RunResult.SUCCEEDED,
-            is_hardware_stopped=False,
+            run_completed_at=None,
         ),
         expected_status=EngineStatus.FINISHING,
     ),
@@ -413,7 +415,7 @@ get_status_specs: List[GetStatusSpec] = [
         subject=get_command_view(
             queue_status=QueueStatus.PAUSED,
             run_result=RunResult.FAILED,
-            is_hardware_stopped=False,
+            run_completed_at=None,
         ),
         expected_status=EngineStatus.FINISHING,
     ),
@@ -426,28 +428,28 @@ get_status_specs: List[GetStatusSpec] = [
     GetStatusSpec(
         subject=get_command_view(
             run_result=RunResult.FAILED,
-            is_hardware_stopped=True,
+            run_completed_at=datetime(year=2021, day=1, month=1),
         ),
         expected_status=EngineStatus.FAILED,
     ),
     GetStatusSpec(
         subject=get_command_view(
             run_result=RunResult.SUCCEEDED,
-            is_hardware_stopped=True,
+            run_completed_at=datetime(year=2021, day=1, month=1),
         ),
         expected_status=EngineStatus.SUCCEEDED,
     ),
     GetStatusSpec(
         subject=get_command_view(
             run_result=RunResult.STOPPED,
-            is_hardware_stopped=False,
+            run_completed_at=None,
         ),
         expected_status=EngineStatus.STOP_REQUESTED,
     ),
     GetStatusSpec(
         subject=get_command_view(
             run_result=RunResult.STOPPED,
-            is_hardware_stopped=True,
+            run_completed_at=datetime(year=2021, day=1, month=1),
         ),
         expected_status=EngineStatus.STOPPED,
     ),
@@ -469,6 +471,7 @@ get_status_specs: List[GetStatusSpec] = [
         subject=get_command_view(
             queue_status=QueueStatus.PAUSED,
             is_door_blocking=False,
+            run_completed_at=datetime(year=2021, day=1, month=1),
         ),
         expected_status=EngineStatus.PAUSED,
     ),
@@ -533,7 +536,7 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
     GetOkayToClearSpec(
         # Protocol is stopped
         subject=get_command_view(
-            is_hardware_stopped=True,
+            run_completed_at=datetime(year=2021, day=1, month=1),
         ),
         expected_is_okay=True,
     ),

@@ -56,10 +56,12 @@ export function GeneralSettings(): JSX.Element {
   const [
     showPreviousVersionModal,
     setShowPreviousVersionModal,
-  ] = React.useState(false)
+  ] = React.useState<boolean>(false)
   const updateAvailable = Boolean(useSelector(getAvailableShellUpdate))
-  const [showUpdateModal, setShowUpdateModal] = React.useState(updateAvailable)
-  const [showUpdateBanner, setShowUpdateBanner] = React.useState(
+  const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(
+    updateAvailable
+  )
+  const [showUpdateBanner, setShowUpdateBanner] = React.useState<boolean>(
     updateAvailable
   )
   const [
@@ -120,44 +122,69 @@ export function GeneralSettings(): JSX.Element {
             </Banner>
           </Box>
         )}
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          alignItems={updateAvailable ? ALIGN_CENTER : ALIGN_START}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacing4}
-        >
-          {showConnectRobotSlideout && (
-            <ConnectRobotSlideout
-              isExpanded={showConnectRobotSlideout}
-              onCloseClick={() => setShowConnectRobotSlideout(false)}
-            />
-          )}
-          <Box width="65%">
-            <StyledText
-              css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
-            >
-              {t('software_version')}
-            </StyledText>
-            <StyledText
-              as="p"
-              paddingBottom={SPACING.spacing3}
-              id="GeneralSettings_currentVersion"
-            >
-              {CURRENT_VERSION}
-            </StyledText>
-            <StyledText as="p">
-              {t('shared:view_latest_release_notes')}
-              <Link
-                external
-                href={GITHUB_LINK}
-                css={TYPOGRAPHY.linkPSemiBold}
-                id="AdvancedSettings_GitHubLink"
-              >{` ${t('shared:github')}`}</Link>
-            </StyledText>
+        <Box>
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            alignItems={updateAvailable ? ALIGN_CENTER : ALIGN_START}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            gridGap={SPACING.spacing4}
+          >
+            {showConnectRobotSlideout && (
+              <ConnectRobotSlideout
+                isExpanded={showConnectRobotSlideout}
+                onCloseClick={() => setShowConnectRobotSlideout(false)}
+              />
+            )}
+            <Box width="65%">
+              <StyledText
+                css={TYPOGRAPHY.h3SemiBold}
+                paddingBottom={SPACING.spacing3}
+              >
+                {t('software_version')}
+              </StyledText>
+              <StyledText
+                as="p"
+                paddingBottom={SPACING.spacing3}
+                id="GeneralSettings_currentVersion"
+              >
+                {CURRENT_VERSION}
+              </StyledText>
+              <StyledText as="p">
+                {t('shared:view_latest_release_notes')}
+                <Link
+                  external
+                  href={GITHUB_LINK}
+                  css={TYPOGRAPHY.linkPSemiBold}
+                  id="GeneralSettings_GitHubLink"
+                >{` ${t('shared:github')}`}</Link>
+              </StyledText>
+            </Box>
+            {updateAvailable ? (
+              <TertiaryButton
+                disabled={!updateAvailable}
+                marginLeft={SPACING_AUTO}
+                onClick={() => setShowUpdateModal(true)}
+                id="GeneralSettings_softwareUpdate"
+              >
+                {t('view_software_update')}
+              </TertiaryButton>
+            ) : (
+              <StyledText
+                fontSize={TYPOGRAPHY.fontSizeLabel}
+                lineHeight={TYPOGRAPHY.lineHeight12}
+                color={COLORS.darkGreyEnabled}
+                paddingY={SPACING.spacing5}
+              >
+                {t('up_to_date')}
+              </StyledText>
+            )}
+          </Flex>
+          <Box width="70%">
             <StyledText as="p" paddingY={SPACING.spacing3}>
               {t('manage_versions')}
             </StyledText>
+          </Box>
+          <Box>
             <Link
               role="button"
               css={TYPOGRAPHY.linkPSemiBold}
@@ -166,9 +193,6 @@ export function GeneralSettings(): JSX.Element {
             >
               {t('restore_previous')}
             </Link>
-            <StyledText as="p" paddingY={SPACING.spacing3}>
-              {t('manage_versions')}
-            </StyledText>
             <ExternalLink
               href={SOFTWARE_SYNC_URL}
               id="GeneralSettings_appAndRobotSync"
@@ -176,26 +200,7 @@ export function GeneralSettings(): JSX.Element {
               {t('versions_sync')}
             </ExternalLink>
           </Box>
-          {updateAvailable ? (
-            <TertiaryButton
-              disabled={!updateAvailable}
-              marginLeft={SPACING_AUTO}
-              onClick={() => setShowUpdateModal(true)}
-              id="GeneralSettings_softwareUpdate"
-            >
-              {t('view_software_update')}
-            </TertiaryButton>
-          ) : (
-            <StyledText
-              fontSize={TYPOGRAPHY.fontSizeCaption}
-              lineHeight={TYPOGRAPHY.lineHeight12}
-              color={COLORS.darkGreyEnabled}
-              paddingY={SPACING.spacing5}
-            >
-              {t('up_to_date')}
-            </StyledText>
-          )}
-        </Flex>
+        </Box>
         <Divider marginY={SPACING.spacing5} />
         <StyledText
           css={TYPOGRAPHY.h3SemiBold}

@@ -100,6 +100,14 @@ class Run(ResourceModel):
             " still be used to execute protocol commands over HTTP."
         ),
     )
+    completedAt: Optional[datetime] = Field(
+        None,
+        description="Run completed at timestamp.",
+    )
+    startedAt: Optional[datetime] = Field(
+        None,
+        description="Run started at timestamp.",
+    )
 
 
 class RunCreate(BaseModel):

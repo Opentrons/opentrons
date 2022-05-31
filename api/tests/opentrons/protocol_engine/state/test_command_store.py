@@ -47,7 +47,8 @@ def test_initial_state() -> None:
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.SETUP,
-        is_hardware_stopped=False,
+        run_completed_at=None,
+        run_started_at=None,
         is_door_blocking=False,
         run_result=None,
         running_command_id=None,
@@ -560,7 +561,8 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.PAUSED,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
+        run_started_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -575,13 +577,12 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
 def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
     """It should set the running flag on play."""
     subject = CommandStore()
-    subject.handle_action(PauseAction(source=pause_source))
-    subject.handle_action(PlayAction())
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.RUNNING,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -589,17 +590,19 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
+        run_started_at=datetime(year=2021, month=1, day=1),
     )
 
 
 def test_command_store_handles_play_according_to_door_state() -> None:
     """It should inactivate/activate command queue according to door state."""
     subject = CommandStore(is_door_blocking=True)
-    subject.handle_action(PlayAction())
+    start_time = datetime(year=2021, month=1, day=1)
+    subject.handle_action(PlayAction(requested_at=start_time))
     assert subject.state == CommandState(
         queue_status=QueueStatus.PAUSED,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=True,
         running_command_id=None,
         all_command_ids=[],
@@ -607,16 +610,19 @@ def test_command_store_handles_play_according_to_door_state() -> None:
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
+        run_started_at=start_time,
     )
 
     door_close_event = DoorStateNotification(new_state=DoorState.CLOSED, blocking=False)
     subject.handle_action(HardwareEventAction(event=door_close_event))
-    subject.handle_action(PlayAction())
+    resume_start_time = datetime(year=2021, month=1, day=2)
+    subject.handle_action(PlayAction(requested_at=resume_start_time))
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.RUNNING,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
+        run_started_at=start_time,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -631,13 +637,13 @@ def test_command_store_handles_finish_action() -> None:
     """It should change to a succeeded state with FinishAction."""
     subject = CommandStore()
 
-    subject.handle_action(PlayAction())
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction())
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.PAUSED,
         run_result=RunResult.SUCCEEDED,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -645,6 +651,7 @@ def test_command_store_handles_finish_action() -> None:
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
+        run_started_at=datetime(year=2021, month=1, day=1),
     )
 
 
@@ -652,7 +659,7 @@ def test_command_store_handles_finish_action_with_stopped() -> None:
     """It should change to a stopped state if FinishAction has set_run_status=False."""
     subject = CommandStore()
 
-    subject.handle_action(PlayAction())
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction(set_run_status=False))
 
     assert subject.state.run_result == RunResult.STOPPED
@@ -662,13 +669,13 @@ def test_command_store_handles_stop_action() -> None:
     """It should mark the engine as non-gracefully stopped on StopAction."""
     subject = CommandStore()
 
-    subject.handle_action(PlayAction())
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(StopAction())
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.PAUSED,
         run_result=RunResult.STOPPED,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -676,6 +683,7 @@ def test_command_store_handles_stop_action() -> None:
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
+        run_started_at=datetime(year=2021, month=1, day=1),
     )
 
 
@@ -683,12 +691,12 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
     """It should reject a play action after finish."""
     subject = CommandStore()
     subject.handle_action(FinishAction())
-    subject.handle_action(PlayAction())
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.PAUSED,
         run_result=RunResult.SUCCEEDED,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -696,6 +704,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
+        run_started_at=None,
     )
 
 
@@ -713,7 +722,7 @@ def test_command_store_ignores_known_finish_error() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.PAUSED,
         run_result=RunResult.FAILED,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -721,6 +730,38 @@ def test_command_store_ignores_known_finish_error() -> None:
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
+        run_started_at=None,
+    )
+
+
+def test_command_store_save_started_completed_run_timestamp() -> None:
+    """Should return a none empty run_completed_at and run_started_at."""
+    subject = CommandStore()
+    start_time = datetime(year=2021, month=1, day=1)
+    hardware_stopped_time = datetime(year=2021, month=1, day=2)
+    resume_time = datetime(year=2021, month=1, day=3)
+    second_resume_time = datetime(year=2021, month=1, day=4)
+
+    subject.handle_action(PlayAction(requested_at=start_time))
+    subject.handle_action(PauseAction(source=PauseSource.CLIENT))
+
+    subject.handle_action(PlayAction(requested_at=resume_time))
+    subject.handle_action(HardwareStoppedAction(completed_at=hardware_stopped_time))
+
+    subject.handle_action(PlayAction(requested_at=second_resume_time))
+
+    assert subject.state == CommandState(
+        queue_status=QueueStatus.PAUSED,
+        run_result=RunResult.STOPPED,
+        run_completed_at=hardware_stopped_time,
+        is_door_blocking=False,
+        running_command_id=None,
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
+        commands_by_id=OrderedDict(),
+        errors_by_id={},
+        run_started_at=start_time,
     )
 
 
@@ -738,7 +779,7 @@ def test_command_store_saves_unknown_finish_error() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.PAUSED,
         run_result=RunResult.FAILED,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -753,6 +794,7 @@ def test_command_store_saves_unknown_finish_error() -> None:
                 detail="oh no",
             )
         },
+        run_started_at=None,
     )
 
 
@@ -760,14 +802,14 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
     """It should no-op on stop if already gracefully finished."""
     subject = CommandStore()
 
-    subject.handle_action(PlayAction())
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction())
     subject.handle_action(StopAction())
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.PAUSED,
         run_result=RunResult.SUCCEEDED,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -775,6 +817,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
+        run_started_at=datetime(year=2021, month=1, day=1),
     )
 
 
@@ -782,14 +825,14 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
     """It should no-op on finish if already ungracefully stopped."""
     subject = CommandStore()
 
-    subject.handle_action(PlayAction())
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(StopAction())
     subject.handle_action(FinishAction())
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.PAUSED,
         run_result=RunResult.STOPPED,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -797,6 +840,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
+        run_started_at=datetime(year=2021, month=1, day=1),
     )
 
 
@@ -831,7 +875,7 @@ def test_command_store_handles_command_failed() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.SETUP,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=["command-id"],
@@ -841,18 +885,20 @@ def test_command_store_handles_command_failed() -> None:
             "command-id": CommandEntry(index=0, command=expected_failed_command),
         },
         errors_by_id={},
+        run_started_at=None,
     )
 
 
 def test_handles_hardware_stopped() -> None:
     """It should mark the hardware as stopped on HardwareStoppedAction."""
     subject = CommandStore()
-    subject.handle_action(HardwareStoppedAction())
+    completed_at = datetime(year=2021, day=1, month=1)
+    subject.handle_action(HardwareStoppedAction(completed_at=completed_at))
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.PAUSED,
         run_result=RunResult.STOPPED,
-        is_hardware_stopped=True,
+        run_completed_at=completed_at,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -860,6 +906,7 @@ def test_handles_hardware_stopped() -> None:
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
+        run_started_at=None,
     )
 
 
@@ -869,14 +916,14 @@ def test_handles_door_open_and_close_event() -> None:
     door_open_event = DoorStateNotification(new_state=DoorState.OPEN, blocking=True)
     door_close_event = DoorStateNotification(new_state=DoorState.CLOSED, blocking=False)
 
-    subject.handle_action(PlayAction())
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(HardwareEventAction(event=door_open_event))
 
     # Pause queue and update state
     assert subject.state == CommandState(
         queue_status=QueueStatus.PAUSED,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=True,
         running_command_id=None,
         all_command_ids=[],
@@ -884,6 +931,7 @@ def test_handles_door_open_and_close_event() -> None:
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
+        run_started_at=datetime(year=2021, month=1, day=1),
     )
 
     subject.handle_action(HardwareEventAction(event=door_close_event))
@@ -892,7 +940,7 @@ def test_handles_door_open_and_close_event() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.PAUSED,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -900,6 +948,7 @@ def test_handles_door_open_and_close_event() -> None:
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
+        run_started_at=datetime(year=2021, month=1, day=1),
     )
 
 
@@ -914,7 +963,7 @@ def test_handles_door_event_during_idle_run() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.SETUP,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=True,
         running_command_id=None,
         all_command_ids=[],
@@ -922,6 +971,7 @@ def test_handles_door_event_during_idle_run() -> None:
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
+        run_started_at=None,
     )
 
     subject.handle_action(HardwareEventAction(event=door_close_event))
@@ -929,7 +979,7 @@ def test_handles_door_event_during_idle_run() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.SETUP,
         run_result=None,
-        is_hardware_stopped=False,
+        run_completed_at=None,
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
@@ -937,4 +987,5 @@ def test_handles_door_event_during_idle_run() -> None:
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
+        run_started_at=None,
     )

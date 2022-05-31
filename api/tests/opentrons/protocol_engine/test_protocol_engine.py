@@ -257,14 +257,20 @@ def test_play(
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     subject: ProtocolEngine,
+    model_utils: ModelUtils,
 ) -> None:
     """It should be able to start executing queued commands."""
+    decoy.when(model_utils.get_timestamp()).then_return(
+        datetime(year=2021, month=1, day=1)
+    )
     subject.play()
 
     decoy.verify(
         state_store.commands.raise_if_paused_by_blocking_door(),
         state_store.commands.raise_if_stop_requested(),
-        action_dispatcher.dispatch(PlayAction()),
+        action_dispatcher.dispatch(
+            PlayAction(requested_at=datetime(year=2021, month=1, day=1))
+        ),
     )
 
 
@@ -297,8 +303,13 @@ async def test_finish(
     hardware_stopper: HardwareStopper,
     drop_tips_and_home: bool,
     set_run_status: bool,
+    model_utils: ModelUtils,
 ) -> None:
     """It should be able to gracefully tell the engine it's done."""
+    completed_at = datetime(2021, 1, 1, 0, 0)
+
+    decoy.when(model_utils.get_timestamp()).then_return(completed_at)
+
     await subject.finish(
         drop_tips_and_home=drop_tips_and_home,
         set_run_status=set_run_status,
@@ -310,7 +321,7 @@ async def test_finish(
         await hardware_stopper.do_stop_and_recover(
             drop_tips_and_home=drop_tips_and_home
         ),
-        action_dispatcher.dispatch(HardwareStoppedAction()),
+        action_dispatcher.dispatch(HardwareStoppedAction(completed_at=completed_at)),
         await plugin_starter.stop(),
     )
 
@@ -352,7 +363,7 @@ async def test_finish_with_error(
 
     decoy.when(model_utils.generate_id()).then_return("error-id")
     decoy.when(model_utils.get_timestamp()).then_return(
-        datetime(year=2021, month=1, day=1)
+        datetime(year=2021, month=1, day=1), datetime(year=2022, month=2, day=2)
     )
 
     await subject.finish(error=error)
@@ -363,7 +374,9 @@ async def test_finish_with_error(
         ),
         await queue_worker.join(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
-        action_dispatcher.dispatch(HardwareStoppedAction()),
+        action_dispatcher.dispatch(
+            HardwareStoppedAction(completed_at=datetime(year=2022, month=2, day=2))
+        ),
     )
 
 
@@ -376,11 +389,16 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     action_dispatcher: ActionDispatcher,
     plugin_starter: PluginStarter,
     subject: ProtocolEngine,
+    model_utils: ModelUtils,
 ) -> None:
     """It should be able to stop the engine."""
     decoy.when(
         await queue_worker.join(),
     ).then_raise(RuntimeError("oh no"))
+
+    completed_at = datetime(2021, 1, 1, 0, 0)
+
+    decoy.when(model_utils.get_timestamp()).then_return(completed_at)
 
     with pytest.raises(RuntimeError, match="oh no"):
         await subject.finish()
@@ -388,7 +406,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     decoy.verify(
         hardware_event_forwarder.stop_soon(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
-        action_dispatcher.dispatch(HardwareStoppedAction()),
+        action_dispatcher.dispatch(HardwareStoppedAction(completed_at=completed_at)),
         await plugin_starter.stop(),
     )
 
