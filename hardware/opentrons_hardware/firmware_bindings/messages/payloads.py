@@ -74,7 +74,7 @@ class GetSpeedResponsePayload(utils.BinarySerializable):
 class EEPromReadPayload(utils.BinarySerializable):
     """Eeprom read request payload ."""
 
-    address: utils.UInt8Field
+    address: utils.UInt16Field
     data_length: utils.UInt8Field
 
 
