@@ -8,14 +8,13 @@ HEATER_SHAKER_SPEED_MAX = 3000
 
 
 class InvalidTargetTemperatureError(ValueError):
-    """An error raised when attampting to set an invalid target temperature."""
+    """An error raised when attempting to set an invalid target temperature."""
 
 
 class InvalidTargetSpeedError(ValueError):
     """An error raised when attempting to set an invalid target speed."""
 
 
-# TODO: Add tests
 def validate_heater_shaker_temperature(celsius: float) -> float:
     """Verify that the target temperature being set is valid for heater-shaker."""
     if HEATER_SHAKER_TEMPERATURE_MIN <= celsius <= HEATER_SHAKER_TEMPERATURE_MAX:
