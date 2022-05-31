@@ -487,6 +487,7 @@ class CommandView(HasState[CommandState]):
         """Get whether an engine stop has completed."""
         return self._state.is_hardware_stopped
 
+    # TODO (tz, 5-31-22): change to is_running? after mc PR is merged
     def raise_if_not_started(self) -> None:
         """Raise if a run has not started.
 
