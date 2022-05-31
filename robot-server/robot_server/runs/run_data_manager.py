@@ -44,6 +44,7 @@ def _build_run(
         labware=state_summary.labware,
         labwareOffsets=state_summary.labwareOffsets,
         pipettes=state_summary.pipettes,
+        modules=state_summary.modules,
         current=current,
     )
 
