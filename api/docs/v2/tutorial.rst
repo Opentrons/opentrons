@@ -9,7 +9,7 @@ Introduction
 ************
 
 
-This tutorial will guide you through creating a Python protocol file from scratch. At the end of this process you’ll have a complete protocol that can run on an OT-2 robot. If you don’t have an OT-2 yet (or if you’re away from your lab, or if your robot is in use) you can use the same file to :ref:`simulate the protocol <tutorial-simulate>` on your computer instead. 
+This tutorial will guide you through creating a Python protocol file from scratch. At the end of this process you’ll have a complete protocol that can run on an OT-2 robot. If you don’t have an OT-2 yet (or if you’re away from your lab, or if your robot is in use) you can use the same file to simulate the protocol on your computer instead. 
 
 What You’ll Automate
 ^^^^^^^^^^^^^^^^^^^^
@@ -19,7 +19,9 @@ The lab task that you’ll automate in this tutorial is `serial dilution`: takin
 Before You Begin
 ^^^^^^^^^^^^^^^^
 
-You're going to write some Python code, but by no means do you need to be a Python expert to get started writing Opentrons protocols. You should know some basic Python syntax, like how it uses `indentation <https://docs.python.org/3/reference/lexical_analysis.html#indentation>`_ to group blocks of code, dot notation for `calling methods <https://docs.python.org/3/tutorial/classes.html#method-objects>`_, and the format of `lists <https://docs.python.org/3/tutorial/introduction.html#lists>`_ and `dictionaries <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_. You’ll also be using `common control structures <https://docs.python.org/3/tutorial/controlflow.html#if-statements>`_ like ``if`` statements and ``for`` loops. You should write your code in your favorite plaintext editor or IDE and be sure to save your work in a file with a ``.py`` extension, like ``dilution-tutorial.py``.
+You're going to write some Python code, but by no means do you need to be a Python expert to get started writing Opentrons protocols. You should know some basic Python syntax, like how it uses `indentation <https://docs.python.org/3/reference/lexical_analysis.html#indentation>`_ to group blocks of code, dot notation for `calling methods <https://docs.python.org/3/tutorial/classes.html#method-objects>`_, and the format of `lists <https://docs.python.org/3/tutorial/introduction.html#lists>`_ and `dictionaries <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_. You’ll also be using `common control structures <https://docs.python.org/3/tutorial/controlflow.html#if-statements>`_ like ``if`` statements and ``for`` loops. 
+
+To run your code, make sure that you have installed `Python 3 <https://wiki.python.org/moin/BeginnersGuide/Download>`_ and the `pip package installer <https://pip.pypa.io/en/stable/getting-started/>`_. You should write your code in your favorite plaintext editor or IDE and be sure to save your work in a file with a ``.py`` extension, like ``dilution-tutorial.py``.
 
 If you plan to run your protocol on an OT-2, you’ll want to have it ready with the right kind of hardware and labware:
 
@@ -78,8 +80,8 @@ You can use this dictionary to include any other information you like. The field
 
 With your metadata defined, you can move on to creating the ``run()`` function for your protocol.
 
-The run() function
-^^^^^^^^^^^^^^^^^^
+The ``run()`` function
+^^^^^^^^^^^^^^^^^^^^^^
 
 Now it’s time to actually instruct the OT-2 how to perform serial dilution. All of this information is contained in a single Python function, which has to be named ``run``. This function takes one argument, which is the *protocol context*. Many examples in these docs use the argument name ``protocol``, and sometimes they specify the argument’s type:
 
