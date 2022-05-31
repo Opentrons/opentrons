@@ -37,6 +37,7 @@ stages:
           actions: []
           errors: []
           pipettes: []
+          modules: []
           labware:
             - id: !anystr
               loadName: !anystr
