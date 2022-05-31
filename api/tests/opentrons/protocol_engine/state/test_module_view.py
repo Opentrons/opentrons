@@ -113,7 +113,6 @@ def test_get_module_data(tempdeck_v1_def: ModuleDefinition) -> None:
         model=ModuleModel.TEMPERATURE_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         serialNumber="serial-number",
-        definition=tempdeck_v1_def,
     )
 
 
@@ -172,14 +171,12 @@ def test_get_all_modules(
             serialNumber="serial-1",
             model=ModuleModel.TEMPERATURE_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            definition=tempdeck_v1_def,
         ),
         LoadedModule(
             id="module-2",
             serialNumber="serial-2",
             model=ModuleModel.TEMPERATURE_MODULE_V2,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-            definition=tempdeck_v2_def,
         ),
     ]
 
@@ -388,6 +385,9 @@ def test_get_properties_by_id(
     assert subject.get_location("module-2") == DeckSlotLocation(
         slotName=DeckSlotName.SLOT_2
     )
+
+    with pytest.raises(errors.ModuleNotLoadedError):
+        subject.get_definition("Not a module ID oh no")
 
 
 def test_get_plate_target_temperature(heater_shaker_v1_def: ModuleDefinition) -> None:
@@ -1018,6 +1018,58 @@ def test_tempdeck_get_plate_target_temperature_no_target(
         subject.get_plate_target_temperature()
 
 
+def test_thermocycler_get_target_temperatures(
+    thermocycler_v1_def: ModuleDefinition,
+) -> None:
+    """It should return whether target temperature for thermocycler is set."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=thermocycler_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": ThermocyclerModuleSubState(
+                module_id=ThermocyclerModuleId("module-id"),
+                target_block_temperature=14,
+                target_lid_temperature=28,
+            )
+        },
+    )
+    subject = module_view.get_thermocycler_module_substate("module-id")
+    assert subject.get_target_block_temperature() == 14
+    assert subject.get_target_lid_temperature() == 28
+
+
+def test_thermocycler_get_target_temperatures_no_target(
+    thermocycler_v1_def: ModuleDefinition,
+) -> None:
+    """It should raise if no target temperature is set."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=thermocycler_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": ThermocyclerModuleSubState(
+                module_id=ThermocyclerModuleId("module-id"),
+                target_block_temperature=None,
+                target_lid_temperature=None,
+            )
+        },
+    )
+    subject = module_view.get_thermocycler_module_substate("module-id")
+
+    with pytest.raises(errors.NoTargetTemperatureSetError):
+        subject.get_target_block_temperature()
+        subject.get_target_lid_temperature()
+
+
 @pytest.fixture
 def module_view_with_thermocycler(thermocycler_v1_def: ModuleDefinition) -> ModuleView:
     """Get a module state view with a loaded thermocycler."""
@@ -1032,6 +1084,8 @@ def module_view_with_thermocycler(thermocycler_v1_def: ModuleDefinition) -> Modu
         substate_by_module_id={
             "module-id": ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
+                target_block_temperature=None,
+                target_lid_temperature=None,
             )
         },
     )
@@ -1063,6 +1117,34 @@ def test_thermocycler_validate_target_block_temperature_raises(
 
     with pytest.raises(errors.InvalidTargetTemperatureError):
         subject.validate_target_block_temperature(input_temperature)
+
+
+@pytest.mark.parametrize("input_volume", [0, 0.0, 0.001, 50.0, 99.999, 100, 100.0])
+def test_thermocycler_validate_block_max_volume(
+    module_view_with_thermocycler: ModuleView,
+    input_volume: float,
+) -> None:
+    """It should return a validated max block volume value."""
+    subject = module_view_with_thermocycler.get_thermocycler_module_substate(
+        "module-id"
+    )
+    result = subject.validate_max_block_volume(input_volume)
+
+    assert result == input_volume
+
+
+@pytest.mark.parametrize("input_volume", [-10, -0.001, 100.001])
+def test_thermocycler_validate_block_max_volume_raises(
+    module_view_with_thermocycler: ModuleView,
+    input_volume: float,
+) -> None:
+    """It should raise on invalid block volume temperature."""
+    subject = module_view_with_thermocycler.get_thermocycler_module_substate(
+        "module-id"
+    )
+
+    with pytest.raises(errors.InvalidBlockVolumeError):
+        subject.validate_max_block_volume(input_volume)
 
 
 @pytest.mark.parametrize("input_temperature", [37, 37.0, 37.001, 109.999, 110, 110.0])

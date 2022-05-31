@@ -178,6 +178,14 @@ eval "$(pyenv init -)"
 # ...
 ```
 
+#### 3. Install `jpeg` if on ARM Mac (M1)
+
+`/hardware` depends on the Python library Pillow. On ARM Macs, `pip` will build Pillow from source, which requires [jpeg](https://formulae.brew.sh/formula/jpeg) to be installed.
+
+```shell
+brew install jpeg
+```
+
 ### Windows
 
 **This section is a work in progress**

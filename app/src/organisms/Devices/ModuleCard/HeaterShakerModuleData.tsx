@@ -20,15 +20,10 @@ import type {
   SpeedStatus,
   TemperatureStatus,
 } from '../../../redux/modules/api-types'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
 
 interface HeaterShakerModuleDataProps {
-  heaterStatus: TemperatureStatus
-  shakerStatus: SpeedStatus
-  latchStatus: LatchStatus
-  targetTemp: number | null
-  currentTemp: number | null
-  targetSpeed: number | null
-  currentSpeed: number | null
+  moduleData: HeaterShakerModule['data']
   showTemperatureData?: boolean
 }
 
@@ -44,21 +39,21 @@ const MODULE_STATUS_STYLING = css`
   }
 `
 
+const HS_MODULE_CARD_STYLING = css`
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+
+  @media (min-width: 800px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+`
+
 export const HeaterShakerModuleData = (
   props: HeaterShakerModuleDataProps
 ): JSX.Element | null => {
-  const {
-    heaterStatus,
-    shakerStatus,
-    latchStatus,
-    targetTemp,
-    currentTemp,
-    targetSpeed,
-    currentSpeed,
-    showTemperatureData,
-  } = props
+  const { moduleData, showTemperatureData } = props
   const { t } = useTranslation(['device_details', 'heater_shaker', 'shared'])
-  const isShaking = shakerStatus !== 'idle'
+  const isShaking = moduleData.speedStatus !== 'idle'
 
   const getStatusLabelProps = (
     status: SpeedStatus | TemperatureStatus
@@ -134,7 +129,9 @@ export const HeaterShakerModuleData = (
   }
 
   return (
-    <Flex css={MODULE_STATUS_STYLING}>
+    <Flex
+      css={showTemperatureData ? MODULE_STATUS_STYLING : HS_MODULE_CARD_STYLING}
+    >
       {showTemperatureData && (
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -151,20 +148,23 @@ export const HeaterShakerModuleData = (
             {t('heater')}
           </Text>
           <StatusLabel
-            status={heaterStatus}
-            {...getStatusLabelProps(heaterStatus)}
+            status={moduleData.temperatureStatus}
+            {...getStatusLabelProps(moduleData.temperatureStatus)}
           />
           <Text
             title="heater_target_temp"
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginBottom={SPACING.spacing1}
           >
-            {t(targetTemp != null ? 'target_temp' : 'na_temp', {
-              temp: targetTemp,
-            })}
+            {t(
+              moduleData.targetTemperature != null ? 'target_temp' : 'na_temp',
+              {
+                temp: moduleData.targetTemperature,
+              }
+            )}
           </Text>
           <Text title="heater_temp" fontSize={TYPOGRAPHY.fontSizeH6}>
-            {t('current_temp', { temp: currentTemp })}
+            {t('current_temp', { temp: moduleData.currentTemperature })}
           </Text>
         </Flex>
       )}
@@ -182,8 +182,8 @@ export const HeaterShakerModuleData = (
           {t('shaker')}
         </Text>
         <StatusLabel
-          status={shakerStatus}
-          {...getStatusLabelProps(shakerStatus)}
+          status={moduleData.speedStatus}
+          {...getStatusLabelProps(moduleData.speedStatus)}
         />
 
         <Text
@@ -191,12 +191,12 @@ export const HeaterShakerModuleData = (
           fontSize={TYPOGRAPHY.fontSizeH6}
           marginBottom={SPACING.spacing1}
         >
-          {t(targetSpeed != null ? 'target_speed' : 'na_speed', {
-            speed: targetSpeed,
+          {t(moduleData.targetSpeed != null ? 'target_speed' : 'na_speed', {
+            speed: moduleData.targetSpeed,
           })}
         </Text>
         <Text title="shaker_current_speed" fontSize={TYPOGRAPHY.fontSizeH6}>
-          {t('current_speed', { speed: currentSpeed })}
+          {t('current_speed', { speed: moduleData.currentSpeed })}
         </Text>
       </Flex>
 
@@ -230,7 +230,7 @@ export const HeaterShakerModuleData = (
                 size={SIZE_1}
               />
             )}
-            {getLatchStatus(latchStatus)}
+            {getLatchStatus(moduleData.labwareLatchStatus)}
           </Flex>
         </Flex>
       </Flex>

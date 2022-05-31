@@ -129,8 +129,8 @@ class RunStore:
         with self._sql_engine.begin() as transaction:
             try:
                 transaction.execute(insert)
-            except sqlalchemy.exc.IntegrityError:
-                raise RunNotFoundError(run_id=run_id)
+            except sqlalchemy.exc.IntegrityError as e:
+                raise RunNotFoundError(run_id=run_id) from e
 
         self._clear_caches()
 

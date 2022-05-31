@@ -8,7 +8,11 @@ from typing import Iterator, List, Any, Dict
 
 from opentrons_hardware.drivers.can_bus import build, CanMessenger
 from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32Field
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorType,
+    SensorThresholdMode,
+)
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.hardware_control.network import probe
 import opentrons_hardware.sensors.utils as sensor_utils
@@ -134,6 +138,7 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
         threshold=Int32Field(
             int(args.threshold * sensor_utils.sensor_fixed_point_conversion)
         ),
+        mode=fields.SensorThresholdModeField(SensorThresholdMode.auto_baseline),
     )
     threshold_message = message_definitions.SetSensorThresholdRequest(
         payload=threshold_payload

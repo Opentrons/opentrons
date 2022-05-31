@@ -96,7 +96,7 @@ describe('useRunPipetteInfoByMount hook', () => {
       .calledWith('otie')
       .mockReturnValue(PIPETTE_CALIBRATIONS)
     when(mockUseAttachedPipettes)
-      .calledWith('otie')
+      .calledWith()
       .mockReturnValue(ATTACHED_PIPETTES)
     when(mockUseTipLengthCalibrations)
       .calledWith('otie')

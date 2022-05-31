@@ -55,8 +55,8 @@ export function useUpdateRobotNameMutation(
               response.data
             )
           )
-          .catch(e => {
-            console.error(e)
+          .catch((e: Error) => {
+            throw e
           })
         return response.data
       }),

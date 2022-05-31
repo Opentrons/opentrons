@@ -43,12 +43,6 @@ describe('PipetteSettingsSlideout', () => {
     const { getByText, getByRole } = render(props)
 
     getByText('Left Pipette Settings')
-    getByText(
-      'These are advanced settings. Please do not attempt to adjust without assistance from Opentrons Support. Changing these settings may affect the lifespan of your pipette.'
-    )
-    getByText(
-      'These settings do not override any pipette settings defined in protocols.'
-    )
     getByText('mock configure pipette')
     const button = getByRole('button', { name: /exit/i })
     fireEvent.click(button)

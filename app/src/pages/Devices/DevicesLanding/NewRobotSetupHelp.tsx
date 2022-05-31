@@ -30,6 +30,7 @@ export function NewRobotSetupHelp(): JSX.Element {
       <Link
         css={TYPOGRAPHY.labelSemiBold}
         onClick={() => setShowNewRobotHelpModal(true)}
+        opacity={'70%'}
       >
         {t('see_how_to_setup_new_robot')}
       </Link>
