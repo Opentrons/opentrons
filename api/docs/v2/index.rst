@@ -5,6 +5,7 @@ Welcome
 .. toctree::
 
     self
+    tutorial
     versioning
     new_labware
     new_modules

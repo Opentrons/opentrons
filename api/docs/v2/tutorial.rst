@@ -78,8 +78,8 @@ You can use this dictionary to include any other information you like. The field
 
 With your metadata defined, you can move on to creating the ``run()`` function for your protocol.
 
-The ``run()`` function
-^^^^^^^^^^^^^^^^^^^^^^
+The run() function
+^^^^^^^^^^^^^^^^^^
 
 Now it’s time to actually instruct the OT-2 how to perform serial dilution. All of this information is contained in a single Python function, which has to be named ``run``. This function takes one argument, which is the *protocol context*. Many examples in these docs use the argument name ``protocol``, and sometimes they specify the argument’s type:
 
