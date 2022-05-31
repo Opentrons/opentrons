@@ -72,6 +72,7 @@
   "see_how_robot_calibration_works": "See how robot calibration works",
   "robot_settings_advanced_unknown": "Unknown",
   "about_advanced": "About",
+  "some_robot_controls_are_not_available": "Some robot controls are not available when run is in progress",
   "robot_name": "Robot Name",
   "robot_rename_button": "Rename robot",
   "robot_server_versions": "Robot Server Versions",

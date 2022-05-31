@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
+
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -12,6 +13,7 @@ import {
   TYPOGRAPHY,
   useInterval,
 } from '@opentrons/components'
+
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'

@@ -15,6 +15,8 @@ import {
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import { StyledText } from '../../../atoms/text'
+import { Banner } from '../../../atoms/Banner'
 import { useRobot } from '../../../organisms/Devices/hooks'
 import { Line } from '../../../atoms/structure'
 import { NavTab } from '../../../atoms/NavTab'
@@ -28,14 +30,30 @@ export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')
   const { robotName, robotSettingsTab } = useParams<NavRouteParams>()
   const robot = useRobot(robotName)
+  const [showRobotBusyBanner, setShowRobotBusyBanner] = React.useState<boolean>(
+    false
+  )
+
+  const updateRobotStatus = (isRobotBusy: boolean): void => {
+    if (isRobotBusy) setShowRobotBusyBanner(true)
+  }
 
   const robotSettingsContentByTab: {
     [K in RobotSettingsTab]: () => JSX.Element
   } = {
-    calibration: () => <RobotSettingsCalibration robotName={robotName} />,
-
+    calibration: () => (
+      <RobotSettingsCalibration
+        robotName={robotName}
+        // updateRobotStatus={updateRobotStatus}
+      />
+    ),
     networking: () => <RobotSettingsNetworking robotName={robotName} />,
-    advanced: () => <RobotSettingsAdvanced robotName={robotName} />,
+    advanced: () => (
+      <RobotSettingsAdvanced
+        robotName={robotName}
+        updateRobotStatus={updateRobotStatus}
+      />
+    ),
   }
 
   const RobotSettingsContent =
@@ -66,6 +84,13 @@ export function RobotSettings(): JSX.Element | null {
           >
             {t('robot_settings')}
           </Box>
+          {showRobotBusyBanner && (
+            <Banner type="warning" marginBottom={SPACING.spacing4}>
+              <StyledText as="p">
+                {t('some_robot_controls_are_not_available')}
+              </StyledText>
+            </Banner>
+          )}
           <Flex gridGap={SPACING.spacing4}>
             <NavTab
               to={`/devices/${robotName}/robot-settings/calibration`}

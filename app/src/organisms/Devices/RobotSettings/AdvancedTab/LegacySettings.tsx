@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   ALIGN_CENTER,
@@ -9,8 +10,10 @@ import {
   TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
+
 import { StyledText } from '../../../../atoms/text'
 import { ToggleButton } from '../../../../atoms/buttons'
+import { useIsRobotBusy } from '../../hooks'
 import { updateSetting } from '../../../../redux/robot-settings'
 
 import type { Dispatch } from '../../../../redux/types'
@@ -19,16 +22,27 @@ import type { RobotSettingsField } from '../../../../redux/robot-settings/types'
 interface LegacySettingsProps {
   settings: RobotSettingsField | undefined
   robotName: string
+  updateIsRobotBusy: (isRobotBusy: boolean) => void
 }
 
 export function LegacySettings({
   settings,
   robotName,
+  updateIsRobotBusy,
 }: LegacySettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
   const value = settings?.value ? settings.value : false
   const id = settings?.id ? settings.id : 'deckCalibrationDots'
+  const isBusy = useIsRobotBusy()
+
+  const handleClick: React.MouseEventHandler<Element> = () => {
+    if (isBusy) {
+      updateIsRobotBusy(true)
+    } else {
+      dispatch(updateSetting(robotName, id, !value))
+    }
+  }
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -49,7 +63,7 @@ export function LegacySettings({
       <ToggleButton
         label="legacy_settings"
         toggledOn={settings?.value === true}
-        onClick={() => dispatch(updateSetting(robotName, id, !value))}
+        onClick={handleClick}
         id="RobotSettings_legacySettingsToggleButton"
       />
     </Flex>
