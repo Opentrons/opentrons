@@ -24,10 +24,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../../atoms/buttons'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type { ThermocyclerModule } from '../../../redux/modules/types'
 import type {
-  TCSetAndWaitForBlockTemperatureCreateCommand,
+  TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
@@ -47,6 +48,10 @@ export const ThermocyclerModuleSlideout = (
   const [tempValue, setTempValue] = React.useState<string | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    module,
+    runId != null ? runId : null
+  )
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
   const tempRanges = getTCTempRange(isSecondaryTemp)
@@ -71,14 +76,14 @@ export const ThermocyclerModuleSlideout = (
       const saveLidCommand: TCSetTargetLidTemperatureCreateCommand = {
         commandType: 'thermocycler/setTargetLidTemperature',
         params: {
-          moduleId: module.id,
+          moduleId: runId != null ? moduleIdFromRun : module.id,
           celsius: parseInt(tempValue),
         },
       }
-      const saveBlockCommand: TCSetAndWaitForBlockTemperatureCreateCommand = {
-        commandType: 'thermocycler/setAndWaitForBlockTemperature',
+      const saveBlockCommand: TCSetTargetBlockTemperatureCreateCommand = {
+        commandType: 'thermocycler/setTargetBlockTemperature',
         params: {
-          moduleId: module.id,
+          moduleId: runId != null ? moduleIdFromRun : module.id,
           celsius: parseInt(tempValue),
           //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
         },
