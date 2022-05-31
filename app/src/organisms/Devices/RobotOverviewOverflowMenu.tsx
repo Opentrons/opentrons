@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
   COLORS,
@@ -10,22 +10,29 @@ import {
   POSITION_RELATIVE,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
+  useInterval,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import { checkShellUpdate } from '../../redux/shell'
 import { restartRobot } from '../../redux/robot-admin'
 import { home, ROBOT } from '../../redux/robot-controls'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { Portal } from '../../App/portal'
+import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
+import { SoftwareUpdateModal } from './RobotSettings/AdvancedTab/SoftwareUpdateModal'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch, State } from '../../redux/types'
 
 interface RobotOverviewOverflowMenuProps {
   robot: DiscoveredRobot
 }
+
+const UPDATE_RECHECK_DELAY_MS = 60000
 
 export const RobotOverviewOverflowMenu = (
   props: RobotOverviewOverflowMenuProps
@@ -43,6 +50,9 @@ export const RobotOverviewOverflowMenu = (
     currentRunStatus === RUN_STATUS_RUNNING || robot.status === 'unreachable'
 
   const dispatch = useDispatch<Dispatch>()
+  const checkAppUpdate = React.useCallback(() => dispatch(checkShellUpdate()), [
+    dispatch,
+  ])
 
   const handleClickRestart: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -56,6 +66,22 @@ export const RobotOverviewOverflowMenu = (
     setShowOverflowMenu(false)
   }
 
+  const [
+    showSoftwareUpdateModal,
+    setShowSoftwareUpdateModal,
+  ] = React.useState<boolean>(false)
+
+  useInterval(checkAppUpdate, UPDATE_RECHECK_DELAY_MS)
+
+  const handleLaunchModal: React.MouseEventHandler = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowSoftwareUpdateModal(true)
+  }
+  const { autoUpdateAction } = useSelector((state: State) => {
+    return getBuildrootUpdateDisplayInfo(state, robot.name)
+  })
+
   return (
     <Flex
       data-testid={`RobotOverview_overflowMenu`}
@@ -64,6 +90,14 @@ export const RobotOverviewOverflowMenu = (
         e.preventDefault()
       }}
     >
+      {showSoftwareUpdateModal ? (
+        <Portal level="top">
+          <SoftwareUpdateModal
+            robotName={robot.name}
+            closeModal={() => setShowSoftwareUpdateModal(false)}
+          />
+        </Portal>
+      ) : null}
       <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
       {showOverflowMenu ? (
         <Flex
@@ -77,20 +111,27 @@ export const RobotOverviewOverflowMenu = (
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          {/* TODO(sh, 2022-04-19): complete wiring up menu items below and disabled reasons */}
-          <MenuItem disabled={buttonDisabledReason}>
-            {t('update_robot_software')}
-          </MenuItem>
+          {autoUpdateAction === 'upgrade' ? (
+            <MenuItem
+              disabled={buttonDisabledReason}
+              onClick={handleLaunchModal}
+              data-testid={`RobotOverviewOverflowMenu_updateSoftware_${robot.name}`}
+            >
+              {t('update_robot_software')}
+            </MenuItem>
+          ) : null}
           <MenuItem
             onClick={handleClickRestart}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
             disabled={buttonDisabledReason}
+            data-testid={`RobotOverviewOverflowMenu_restartRobot_${robot.name}`}
           >
             {t('robot_controls:restart_label')}
           </MenuItem>
           <MenuItem
             onClick={handleClickHomeGantry}
             disabled={buttonDisabledReason}
+            data-testid={`RobotOverviewOverflowMenu_homeGantry_${robot.name}`}
           >
             {t('home_gantry')}
           </MenuItem>
@@ -100,6 +141,7 @@ export const RobotOverviewOverflowMenu = (
             as={Link}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
             disabled={buttonDisabledReason}
+            data-testid={`RobotOverviewOverflowMenu_robotSettings_${robot.name}`}
           >
             {t('robot_settings')}
           </MenuItem>
