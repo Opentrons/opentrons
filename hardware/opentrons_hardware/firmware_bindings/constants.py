@@ -61,6 +61,7 @@ class MessageId(int, Enum):
     gripper_info_request = 0x308
     gripper_info_response = 0x309
     set_serial_number = 0x30A
+    instrument_info_request = 0x30B
 
     stop_request = 0x00
 

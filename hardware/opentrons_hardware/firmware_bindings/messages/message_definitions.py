@@ -605,3 +605,10 @@ class SetSerialNumber:  # noqa: D101
     payload: payloads.SerialNumberPayload
     payload_type: Type[payloads.SerialNumberPayload] = payloads.SerialNumberPayload
     message_id: Literal[MessageId.set_serial_number] = MessageId.set_serial_number
+
+
+@dataclass
+class InstrumentInfoRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.instrument_info_request
+    ] = MessageId.instrument_info_request
