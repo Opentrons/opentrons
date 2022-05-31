@@ -6,7 +6,7 @@ from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, cast
 
 from opentrons import types
 from opentrons.hardware_control import modules
-from opentrons.hardware_control.modules import ModuleModel
+from opentrons.hardware_control.modules import ModuleModel, types as module_types
 from opentrons.hardware_control.types import Axis
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
@@ -45,6 +45,10 @@ GeometryType = TypeVar("GeometryType", bound=ModuleGeometry)
 
 class NoTargetTemperatureSetError(RuntimeError):
     """An error raised when awaiting temperature when no target was set."""
+
+
+class CannotPerformModuleAction(RuntimeError):
+    """An error raised when attempting to execute an invalid module action."""
 
 
 class ModuleContext(CommandPublisher, Generic[GeometryType]):
@@ -920,6 +924,8 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         Set the heater shaker's target speed and wait until the specified speed has
         reached. Delays protocol execution until the target speed has been achieved.
         """
+        # TODO: Figure out whether to raise error when latch is open or
+        #  whether to issue close latch behind the scenes
         validated_speed = validate_heater_shaker_speed(rpm=rpm)
         self._module.set_speed(rpm=validated_speed)
 
@@ -934,7 +940,11 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
 
         Raises an error when attempting to open latch while heater-shaker is shaking.
         """
-        # TODO: Raise error when module is shaking
+        if self._module.speed_status != module_types.SpeedStatus.IDLE:
+            # TODO: What to do when speed status is ERROR?
+            raise CannotPerformModuleAction(
+                """Cannot open labware latch while module is shaking."""
+            )
         self._module.open_labware_latch()
 
     # TODO: add command publisher

@@ -20,7 +20,10 @@ from opentrons.hardware_control.modules.types import (
 )
 
 from opentrons.protocol_api import ProtocolContext
-from opentrons.protocol_api.module_contexts import NoTargetTemperatureSetError
+from opentrons.protocol_api.module_contexts import (
+    NoTargetTemperatureSetError,
+    CannotPerformModuleAction,
+)
 from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
@@ -685,16 +688,35 @@ def test_heater_shaker_open_labware_latch(
     ctx_with_heater_shaker: ProtocolContext, mock_module_controller: mock.MagicMock
 ) -> None:
     """It should issue a labware latch open command."""
+    mock_speed_status = mock.PropertyMock(return_value=SpeedStatus.IDLE)
+    type(mock_module_controller).speed_status = mock_speed_status
+
     hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
     hs_mod.open_labware_latch()  # type: ignore[union-attr]
     mock_module_controller.open_labware_latch.assert_called_once()
 
 
+@pytest.mark.parametrize(
+    "speed_status",
+    [
+        SpeedStatus.DECELERATING,
+        SpeedStatus.ACCELERATING,
+        SpeedStatus.HOLDING,
+        SpeedStatus.ERROR,
+    ],
+)
 def test_heater_shaker_open_labware_latch_raises(
-    ctx_with_heater_shaker: ProtocolContext, mock_module_controller: mock.MagicMock
+    ctx_with_heater_shaker: ProtocolContext,
+    mock_module_controller: mock.MagicMock,
+    speed_status: SpeedStatus,
 ) -> None:
     """It should raise when opening latch during a shake."""
-    # TODO: write test
+    mock_speed_status = mock.PropertyMock(return_value=speed_status)
+    type(mock_module_controller).speed_status = mock_speed_status
+
+    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
+    with pytest.raises(CannotPerformModuleAction):
+        hs_mod.open_labware_latch()  # type: ignore[union-attr]
 
 
 def test_heater_shaker_close_labware_latch(
