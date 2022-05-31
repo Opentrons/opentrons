@@ -11,7 +11,7 @@ from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands
-from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
+from opentrons.protocol_engine.errors import RunNotStartedError
 from opentrons.protocol_engine.types import (
     LabwareOffset,
     LabwareOffsetCreate,
@@ -277,12 +277,12 @@ def test_pause_run_not_started(
     state_store: StateStore,
     subject: ProtocolEngine,
 ) -> None:
-    """Should raise an ProtocolEngineStoppedError error."""
+    """Should raise an RunNotStartedError error."""
     decoy.when(state_store.commands.raise_if_not_started()).then_raise(
-        ProtocolEngineStoppedError("A stop has already been requested.")
+        RunNotStartedError("Cannot pause a run that was not started.")
     )
 
-    with pytest.raises(ProtocolEngineStoppedError):
+    with pytest.raises(RunNotStartedError):
         subject.pause()
 
 

@@ -494,10 +494,10 @@ class CommandView(HasState[CommandState]):
         Mainly used to validate if an Action is allowed, raising if not.
 
         Raises:
-            ProtocolEngineStoppedError: the engine has been stopped.
+            RunNotStartedError: Run is not started, therefor cannot be stopped.
         """
         if not self.get_is_active():
-            raise ProtocolEngineStoppedError("A stop has already been requested.")
+            raise RunNotStartedError("Cannot pause a run that was not started.")
 
     # TODO(mc, 2021-12-07): reject adding commands to a stopped engine
     def raise_if_stop_requested(self) -> None:
