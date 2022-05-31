@@ -42,7 +42,7 @@ async def test_set_serial(
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     node_id: NodeId,
-    info_request_type: Type[MessageDefinition],
+    info_request_type: Union[Type[GripperInfoRequest], Type[PipetteInfoRequest]],
     info_response_type: Type[MessageDefinition],
 ) -> None:
     """It should write a serial number and read it back."""
@@ -56,5 +56,7 @@ async def test_set_serial(
 
         assert arbitration_id.parts.originating_node_id == node_id
         assert arbitration_id.parts.message_id == info_response_type.message_id
-        assert isinstance(response, GripperInfoResponse) or isinstance(response, PipetteInfoResponse)
+        assert isinstance(response, GripperInfoResponse) or isinstance(
+            response, PipetteInfoResponse
+        )
         assert response.payload.serial == s.serial
