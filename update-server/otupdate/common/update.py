@@ -12,11 +12,13 @@ from pathlib import Path
 from subprocess import CalledProcessError
 
 from typing import Optional
+from typing_extensions import Protocol
 
 from aiohttp import web, BodyPartReader
 
-from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
 from . import config, update_actions
+from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
+from .handler_type import Handler
 from .session import UpdateSession, Stages
 
 from otupdate.openembedded.updater import UPDATE_PKG
@@ -25,11 +27,23 @@ SESSION_VARNAME = APP_VARIABLE_PREFIX + "session"
 LOG = logging.getLogger(__name__)
 
 
+class _HandlerWithSession(Protocol):
+    """The type signature of an aiohttp request handler that also has a session arg.
+
+    See require_session().
+    """
+
+    async def __call__(
+        self, request: web.Request, session: UpdateSession
+    ) -> web.Response:
+        ...
+
+
 def session_from_request(request: web.Request) -> Optional[UpdateSession]:
     return request.app.get(SESSION_VARNAME, None)
 
 
-def require_session(handler):
+def require_session(handler: _HandlerWithSession) -> Handler:
     """Decorator to ensure a session is properly in the request"""
 
     @functools.wraps(handler)
@@ -77,7 +91,7 @@ async def status(request: web.Request, session: UpdateSession) -> web.Response:
     return web.json_response(data=session.state, status=200)
 
 
-async def _save_file(part: BodyPartReader, path: str):
+async def _save_file(part: BodyPartReader, path: str) -> None:
     # making sure directory exists first
     Path(path).mkdir(parents=True, exist_ok=True)
     with open(os.path.join(path, part.name), "wb") as write:
@@ -97,7 +111,7 @@ def _begin_write(
     loop: asyncio.AbstractEventLoop,
     rootfs_file_path: str,
     actions: update_actions.UpdateActionsInterface,
-):
+) -> None:
     """Start the write process."""
     session.set_progress(0)
     session.set_stage(Stages.WRITING)
@@ -126,7 +140,7 @@ def _begin_validation(
     loop: asyncio.AbstractEventLoop,
     downloaded_update_path: str,
     actions: update_actions.UpdateActionsInterface,
-) -> asyncio.futures.Future:
+) -> "asyncio.futures.Future[Optional[str]]":
     """Start the validation process."""
     session.set_stage(Stages.VALIDATING)
     cert_path = config.update_cert_path if config.signature_required else None

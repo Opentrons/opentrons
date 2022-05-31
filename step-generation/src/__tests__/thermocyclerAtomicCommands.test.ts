@@ -1,4 +1,4 @@
-import { thermocyclerSetAndWaitForBlockTemperature } from '../commandCreators/atomic/thermocyclerSetAndWaitForBlockTemperature'
+import { thermocyclerSetTargetBlockTemperature } from '../commandCreators/atomic/thermocyclerSetTargetBlockTemperature'
 import { thermocyclerSetTargetLidTemperature } from '../commandCreators/atomic/thermocyclerSetTargetLidTemperature'
 import { thermocyclerWaitForBlockTemperature } from '../commandCreators/atomic/thermocyclerWaitForBlockTemperature'
 import { thermocyclerWaitForLidTemperature } from '../commandCreators/atomic/thermocyclerWaitForLidTemperature'
@@ -38,8 +38,8 @@ describe('thermocycler atomic commands', () => {
   // the command creator takes, so tests are type-safe
   const testCasesSetBlock = [
     {
-      commandCreator: thermocyclerSetAndWaitForBlockTemperature,
-      expectedType: 'thermocycler/setAndWaitForBlockTemperature',
+      commandCreator: thermocyclerSetTargetBlockTemperature,
+      expectedType: 'thermocycler/setTargetBlockTemperature',
       params: {
         module,
         temperature,
@@ -60,7 +60,6 @@ describe('thermocycler atomic commands', () => {
       expectedType: 'thermocycler/waitForBlockTemperature',
       params: {
         module,
-        temperature,
       },
     },
     {
@@ -68,7 +67,6 @@ describe('thermocycler atomic commands', () => {
       expectedType: 'thermocycler/waitForLidTemperature',
       params: {
         module,
-        temperature,
       },
     },
   ]

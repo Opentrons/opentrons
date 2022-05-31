@@ -347,7 +347,9 @@ class InstrumentHandlerProvider(Generic[MountType]):
             instr_dict["has_tip"] = True
             instr_dict["tip_length"] = tip_length
         else:
-            self._ihp_log.warning("attach tip called while tip already attached")
+            self._ihp_log.warning(
+                "attach tip called while tip already attached to {instr}"
+            )
 
     async def remove_tip(self, mount: MountType) -> None:
         instr = self._attached_instruments[mount]

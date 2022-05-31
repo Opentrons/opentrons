@@ -25,6 +25,7 @@ import {
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 import { PrimaryButton } from '../../../atoms/buttons'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { InputField } from '../../../atoms/InputField'
@@ -54,6 +55,10 @@ export const HeaterShakerSlideout = (
   const { createCommand } = useCreateCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    module,
+    runId != null ? runId : null
+  )
   const modulePart = isSetShake ? t('shake_speed') : t('temperature')
 
   const sendShakeSpeedCommand = (): void => {
@@ -61,7 +66,7 @@ export const HeaterShakerSlideout = (
       const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
         commandType: 'heaterShakerModule/setTargetShakeSpeed',
         params: {
-          moduleId: module.id,
+          moduleId: runId != null ? moduleIdFromRun : module.id,
           rpm: parseInt(hsValue),
         },
       }
@@ -98,7 +103,7 @@ export const HeaterShakerSlideout = (
       const setTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
         commandType: 'heaterShakerModule/startSetTargetTemperature',
         params: {
-          moduleId: module.id,
+          moduleId: runId != null ? moduleIdFromRun : module.id,
           // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10182 merges
           temperature: parseInt(hsValue),
         },

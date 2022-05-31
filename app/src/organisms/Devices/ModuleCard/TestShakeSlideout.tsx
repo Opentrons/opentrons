@@ -35,6 +35,7 @@ import { InputField } from '../../../atoms/InputField'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { HeaterShakerWizard } from '../HeaterShakerWizard'
 import { useLatchControls } from './hooks'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 import { Collapsible } from './Collapsible'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
@@ -60,6 +61,10 @@ export const TestShakeSlideout = (
   const name = getModuleDisplayName(module.moduleModel)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    module,
+    runId != null ? runId : null
+  )
 
   const [showCollapsed, setShowCollapsed] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
@@ -69,7 +74,7 @@ export const TestShakeSlideout = (
   const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
     commandType: 'heaterShakerModule/setTargetShakeSpeed',
     params: {
-      moduleId: module.id,
+      moduleId: runId != null ? moduleIdFromRun : module.id,
       rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
     },
   }
@@ -77,34 +82,32 @@ export const TestShakeSlideout = (
   const stopShakeCommand: HeaterShakerStopShakeCreateCommand = {
     commandType: 'heaterShakerModule/stopShake',
     params: {
-      moduleId: module.id,
+      moduleId: runId != null ? moduleIdFromRun : module.id,
     },
   }
 
   const handleShakeCommand = (): void => {
-    if (shakeValue !== null) {
-      if (runId != null) {
-        createCommand({
-          runId: runId,
-          command: isShaking ? stopShakeCommand : setShakeCommand,
-        }).catch((e: Error) => {
-          console.error(
-            `error setting module status with command type ${
-              stopShakeCommand.commandType ?? setShakeCommand.commandType
-            }: ${e.message}`
-          )
-        })
-      } else {
-        createLiveCommand({
-          command: isShaking ? stopShakeCommand : setShakeCommand,
-        }).catch((e: Error) => {
-          console.error(
-            `error setting module status with command type ${
-              stopShakeCommand.commandType ?? setShakeCommand.commandType
-            }: ${e.message}`
-          )
-        })
-      }
+    if (runId != null) {
+      createCommand({
+        runId: runId,
+        command: isShaking ? stopShakeCommand : setShakeCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${
+            stopShakeCommand.commandType ?? setShakeCommand.commandType
+          }: ${e.message}`
+        )
+      })
+    } else {
+      createLiveCommand({
+        command: isShaking ? stopShakeCommand : setShakeCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${
+            stopShakeCommand.commandType ?? setShakeCommand.commandType
+          }: ${e.message}`
+        )
+      })
     }
     setShakeValue(null)
   }
@@ -249,7 +252,7 @@ export const TestShakeSlideout = (
             marginTop={SPACING.spacing3}
             paddingX={SPACING.spacing4}
             onClick={handleShakeCommand}
-            disabled={!isLatchClosed}
+            disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
             {...targetProps}
           >
             {isShaking

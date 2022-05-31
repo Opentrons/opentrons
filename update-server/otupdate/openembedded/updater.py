@@ -233,7 +233,7 @@ class Updater(UpdateActionsInterface):
         rootfs_filepath: str,
         progress_callback: Callable[[float], None],
         chunk_size: int = 1024,
-        file_size: int = None,
+        file_size: Optional[int] = None,
     ) -> Partition:
         self.decomp_and_write(rootfs_filepath, progress_callback)
         unused_partition = self.part_mngr.find_unused_partition(

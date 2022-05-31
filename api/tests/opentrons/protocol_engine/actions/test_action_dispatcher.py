@@ -4,13 +4,13 @@ from decoy import Decoy
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
     ActionHandler,
-    PlayAction,
+    StopAction,
 )
 
 
 def test_sink(decoy: Decoy) -> None:
     """It should send all actions to the sink handler."""
-    action = PlayAction()
+    action = StopAction()
 
     sink = decoy.mock(cls=ActionHandler)
     subject = ActionDispatcher(sink=sink)
@@ -22,7 +22,7 @@ def test_sink(decoy: Decoy) -> None:
 
 def test_add_handler(decoy: Decoy) -> None:
     """It should actions to handlers before the sink."""
-    action = PlayAction()
+    action = StopAction()
 
     handler_1 = decoy.mock(cls=ActionHandler)
     handler_2 = decoy.mock(cls=ActionHandler)

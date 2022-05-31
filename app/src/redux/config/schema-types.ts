@@ -128,4 +128,11 @@ export interface ConfigV6 extends Omit<ConfigV5, 'version'> {
   }
 }
 
-export type Config = ConfigV6
+export interface ConfigV7 extends Omit<ConfigV6, 'version'> {
+  version: 7
+  ui: ConfigV6['ui'] & {
+    minWidth: number
+  }
+}
+
+export type Config = ConfigV7

@@ -20,7 +20,12 @@ from typing import (
 from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
 from opentrons.config import robot_configs
-from opentrons.config.types import RobotConfig, OT3Config, GantryLoad
+from opentrons.config.types import (
+    RobotConfig,
+    OT3Config,
+    GantryLoad,
+    CapacitivePassSettings,
+)
 from .backends.ot3utils import get_system_constraints
 from opentrons_hardware.hardware_control.motion_planning import (
     MoveManager,
@@ -737,7 +742,10 @@ class OT3API(
         except ZeroLengthMoveError as zero_length_error:
             self._log.info(f"{str(zero_length_error)}, ignoring")
             return
-
+        self._log.info(
+            f"move: {target_position} becomes {machine_pos} from {origin} "
+            f"requiring {moves}"
+        )
         async with contextlib.AsyncExitStack() as stack:
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)
@@ -1219,3 +1227,46 @@ class OT3API(
 
     async def remove_tip(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         await self._instrument_handler.remove_tip(OT3Mount.from_mount(mount))
+
+    async def capacitive_probe(
+        self, mount: OT3Mount, target_pos: float, pass_settings: CapacitivePassSettings
+    ) -> float:
+        """Determine the position of the deck using the capacitive sensor.
+
+        This function orchestrates detecting the position of whatever is under the
+        specified mount using the capacitive sensor on a pipette. It will move
+        the mount's critical point to a small distance below either
+        - by default, the current estimated position of the deck (e.g. 0)
+        - a specified absolute position in deck coordinates
+        while running the tool's capacitive sensor. When the sensor senses contact,
+        the mount stops. This function moves back up and returns the sensed position.
+
+        This sensed position can be used in several ways, including
+        - To alter the z portion of the current mount's offset or of whatever was
+        targeted, if something was guaranteed to be physically present under the mount.
+        - To detect whether the mount was over solid material. If this function
+        returns a value far enough below the anticipated position, then it indicates
+        there was no material there.
+        """
+        here = await self.gantry_position(mount)
+        self._log.info(f"probe start: at {here}")
+        target = here._replace(z=target_pos + pass_settings.prep_distance_mm)
+        self._log.info(f"moving to {target}")
+        await self.move_to(mount, target)
+        self._log.info("doing probe")
+        await self._backend.capacitive_probe(
+            mount,
+            pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm,
+            pass_settings.speed_mm_per_s,
+        )
+        machine_pos = await self._backend.update_position()
+        self._current_position = deck_from_machine(
+            machine_pos,
+            self._transforms.deck_calibration.attitude,
+            self._transforms.carriage_offset,
+            OT3Axis,
+        )
+        bottom_pos = await self.gantry_position(mount)
+        self._log.info(f"position now {bottom_pos}, moving back to {target}")
+        await self.move_to(mount, target)
+        return bottom_pos.z

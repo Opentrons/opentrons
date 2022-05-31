@@ -20,19 +20,19 @@ import { UseOlderProtocol } from './AdvancedTab/UseOlderProtocol'
 import { LegacySettings } from './AdvancedTab/LegacySettings'
 import { ShortTrashBin } from './AdvancedTab/ShortTrashBin'
 import { UseOlderAspirateBehavior } from './AdvancedTab/UseOlderAspirateBehavior'
+import { UpdateBuildroot } from '../../../pages/Robots/RobotSettings/UpdateBuildroot'
 import { getRobotSettings } from '../../../redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
 import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
-import { SoftwareUpdateModal } from './AdvancedTab/SoftwareUpdateModal'
 
 import type { State } from '../../../redux/types'
-import type { ViewableRobot } from '../../../redux/discovery/types'
 import type {
   RobotSettings,
   RobotSettingsField,
 } from '../../../redux/robot-settings/types'
 import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
+import { UNREACHABLE } from '../../../redux/discovery'
 
 interface RobotSettingsAdvancedProps {
   robotName: string
@@ -109,12 +109,14 @@ export function RobotSettingsAdvanced({
 
   return (
     <>
-      {showSoftwareUpdateModal && (
-        <SoftwareUpdateModal
-          robotName={robotName}
-          closeModal={() => setShowSoftwareUpdateModal(false)}
+      {showSoftwareUpdateModal &&
+      robot != null &&
+      robot.status !== UNREACHABLE ? (
+        <UpdateBuildroot
+          robot={robot}
+          close={() => setShowSoftwareUpdateModal(false)}
         />
-      )}
+      ) : null}
       {showDownloadToast && (
         <Toast
           message={t('update_robot_software_download_logs_toast_message')}
@@ -176,9 +178,10 @@ export function RobotSettingsAdvanced({
         <UpdateRobotSoftware
           robotName={robotName}
           updateIsRobotBusy={updateIsRobotBusy}
+          onUpdateStart={() => setShowSoftwareUpdateModal(true)}
         />
         <Troubleshooting
-          robot={robot as ViewableRobot}
+          robotName={robotName}
           updateDownloadLogsStatus={updateDownloadLogsStatus}
         />
         <Divider marginY="2.5rem" />

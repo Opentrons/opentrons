@@ -7,28 +7,31 @@ import {
   Flex,
   Icon,
   Link,
-  NewPrimaryBtn,
-  Text,
   ALIGN_CENTER,
-  C_BLUE,
   DIRECTION_COLUMN,
-  FONT_SIZE_BODY_1,
   FONT_WEIGHT_REGULAR,
-  FONT_WEIGHT_SEMIBOLD,
-  JUSTIFY_CENTER,
-  SPACING_1,
-  SPACING_2,
-  SPACING_3,
   SPACING_5,
+  JUSTIFY_SPACE_BETWEEN,
+  COLORS,
+  TYPOGRAPHY,
+  SPACING,
 } from '@opentrons/components'
+import { css } from 'styled-components'
 
 import { startDiscovery } from '../../redux/discovery'
+import { PrimaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
 
-export const OT2_GET_STARTED_URL =
-  'https://support.opentrons.com/s/ot2-get-started'
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'
 
+const LINK_STYLES = css`
+  opacity: 70%;
+
+  &:hover {
+    opacity: 100%;
+  }
+`
 export function DevicesEmptyState(): JSX.Element {
   const { t } = useTranslation('devices_landing')
   const dispatch = useDispatch()
@@ -38,54 +41,54 @@ export function DevicesEmptyState(): JSX.Element {
   }
   return (
     <Flex
-      alignItems={ALIGN_CENTER}
       flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_CENTER}
-      padding={`${SPACING_5} 0`}
+      paddingTop={SPACING_5}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
     >
-      <Text
-        as="h3"
-        fontWeight={FONT_WEIGHT_REGULAR}
-        paddingBottom={SPACING_2}
-        id="DevicesEmptyState_noRobotsFound"
-      >
-        {t('no_robots_found')}
-      </Text>
-      <Box paddingBottom={SPACING_3}>
-        <NewPrimaryBtn
-          onClick={handleRefresh}
-          id="DevicesEmptyState_refreshButton"
+      <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
+        <StyledText
+          as="h1"
+          fontWeight={FONT_WEIGHT_REGULAR}
+          paddingBottom={SPACING.spacing4}
+          id="DevicesEmptyState_noRobotsFound"
+          marginTop="20vh"
         >
-          {t('refresh')}
-        </NewPrimaryBtn>
-      </Box>
-      <Link
-        external
-        href={OT2_GET_STARTED_URL}
-        display="flex"
+          {t('no_robots_found')}
+        </StyledText>
+        <Box paddingBottom={SPACING.spacing4}>
+          <PrimaryButton
+            onClick={handleRefresh}
+            id="DevicesEmptyState_refreshButton"
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+          >
+            {t('refresh')}
+          </PrimaryButton>
+        </Box>
+      </Flex>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
-        color={C_BLUE}
-        fontSize={FONT_SIZE_BODY_1}
-        fontWeight={FONT_WEIGHT_SEMIBOLD}
-        paddingBottom={SPACING_2}
-        id="DevicesEmptyState_settingUpNewRobot"
+        marginBottom={SPACING.spacing6}
       >
-        {t('setting_up_new_robot')}{' '}
-        <Icon name="open-in-new" size="0.675rem" marginLeft={SPACING_1} />
-      </Link>
-      <Link
-        external
-        href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
-        display="flex"
-        alignItems={ALIGN_CENTER}
-        color={C_BLUE}
-        fontSize={FONT_SIZE_BODY_1}
-        fontWeight={FONT_WEIGHT_SEMIBOLD}
-        id="DevicesEmptyState_troubleshootingConnectionProblems"
-      >
-        {t('troubleshooting_connection_problems')}
-        <Icon name="open-in-new" size="0.675rem" marginLeft={SPACING_1} />
-      </Link>
+        <Link
+          css={LINK_STYLES}
+          external
+          href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
+          display="flex"
+          alignItems={ALIGN_CENTER}
+          color={COLORS.darkBlack}
+          fontSize={TYPOGRAPHY.fontSizeLabel}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          id="DevicesEmptyState_troubleshootingConnectionProblems"
+        >
+          {t('troubleshooting_connection_problems')}
+          <Icon
+            name="open-in-new"
+            size="0.5rem"
+            marginLeft={SPACING.spacing2}
+          />
+        </Link>
+      </Flex>
     </Flex>
   )
 }

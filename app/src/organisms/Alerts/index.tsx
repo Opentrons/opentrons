@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import head from 'lodash/head'
 
 import * as AppAlerts from '../../redux/alerts'
-import { LostConnectionAlert } from './LostConnectionAlert'
 import { AnalyticsSettingsModal } from '../AnalyticsSettingsModal'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
@@ -27,9 +26,6 @@ export function Alerts(): JSX.Element {
 
   return (
     <>
-      {/* TODO(mc, 2020-05-07): LostConnectionAlert currently controls its own
-          render; move its logic into `state.alerts` */}
-      <LostConnectionAlert />
       {/* TODO(mc, 2020-05-07): AnalyticsSettingsModal currently controls its
           own render; move its logic into `state.alerts` */}
       <AnalyticsSettingsModal />

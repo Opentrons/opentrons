@@ -16,6 +16,7 @@ from .fields import (
     SensorOutputBindingField,
     EepromDataField,
     SerialField,
+    SensorThresholdModeField,
 )
 from .. import utils
 
@@ -73,7 +74,7 @@ class GetSpeedResponsePayload(utils.BinarySerializable):
 class EEPromReadPayload(utils.BinarySerializable):
     """Eeprom read request payload ."""
 
-    address: utils.UInt8Field
+    address: utils.UInt16Field
     data_length: utils.UInt8Field
 
 
@@ -325,6 +326,7 @@ class SetSensorThresholdRequestPayload(utils.BinarySerializable):
 
     sensor: SensorTypeField
     threshold: utils.Int32Field
+    mode: SensorThresholdModeField
 
 
 @dataclass
@@ -333,6 +335,7 @@ class SensorThresholdResponsePayload(utils.BinarySerializable):
 
     sensor: SensorTypeField
     threshold: utils.Int32Field
+    mode: SensorThresholdModeField
 
 
 @dataclass

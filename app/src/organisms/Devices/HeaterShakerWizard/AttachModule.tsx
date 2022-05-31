@@ -18,7 +18,7 @@ import {
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import attachHeaterShakerModule from '../../../assets/images/heater_shaker_module_diagram.svg'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import screwdriverOrientedLeft from '../../../assets/images/screwdriver_oriented_left.svg'
 import { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 interface AttachModuleProps {
@@ -52,7 +52,6 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
       </Text>
       <AttachedModuleItem step={t('1a')}>
         <Flex flexDirection={DIRECTION_ROW} marginLeft={SPACING.spacingXL}>
-          {/* TODO(sh, 2022-02-18): replace this image with the final version from design */}
           <img src={attachHeaterShakerModule} alt="Attach Module to Deck" />
           <img src={screwdriverOrientedLeft} alt="screwdriver_1a" />
           <Flex
@@ -176,7 +175,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                     marginBottom={SPACING.spacing5}
                   />
                 ),
-                icon: <Icon name="counter-clockwise-arrow" size={'1.313rem'} />,
+                icon: <Icon name="clockwise-arrow" size={'1.313rem'} />,
               }}
             />
           </Flex>
