@@ -4,15 +4,13 @@ This libray is for the temperature and humidity sensor used with the
 pipette gravimetric fixture. The sensor outputs temperature and
 relative humidity that is recorded onto the pipette results.
 """
-
+import abc
 import codecs
-import csv
 import logging
-import os
 import random
 import time
-from datetime import datetime
-from typing import Tuple, Optional
+from abc import ABC
+from dataclasses import dataclass
 
 import serial  # type: ignore[import]
 from serial.serialutil import SerialException  # type: ignore[import]
@@ -42,125 +40,109 @@ class AsairSensorError(Exception):
         super().__init__(ret_code)
 
 
-class AsairSensor:
+@dataclass
+class Reading:
+    """An asair sensor reading."""
+
+    temperature: float
+    relative_humidity: float
+
+
+class AsairSensorBase(ABC):
+    """Abstract base class of sensor."""
+
+    @abc.abstractmethod
+    def get_reading(self) -> Reading:
+        """Get a temp and humidity reading."""
+        ...
+
+
+class AsairSensor(AsairSensorBase):
     """Asair sensor driver."""
 
-    def __init__(
-        self, port: str = "/dev/ttyUSB0", baudrate: int = 9600, timeout: float = 5
-    ) -> None:
-        """Constructor."""
-        self.port = port
-        self.baudrate = baudrate
-        self.timeout = timeout
-        self.sensor_addr = "01"
-        self.simulate = False
-        self._th_sensor: Optional[serial.Serial] = None
+    def __init__(self, connection: serial.Serial, sensor_address: str = "01") -> None:
+        """Constructor.
 
-    def connect(self) -> None:
-        """Connect to sensor."""
-        if self.simulate:
-            log.info("Virtual Temp sensor Port Connected")
-        else:
-            log.info("TH Sensor Connection established: {self.port}")
-            self._connect_to_port()
+        :param connection: The serial connection
+        :param sensor_address: The sensor address
+        """
+        self._sensor_address = sensor_address
+        self._th_sensor = connection
 
-    def _connect_to_port(self) -> None:
-        """Allows you to connect to a virtual port or port."""
+    @classmethod
+    def connect(
+        cls,
+        port: str,
+        baudrate: int = 9600,
+        timeout: float = 5,
+        sensor_address: str = "01",
+    ) -> "AsairSensor":
+        """Create a driver.
+
+        :param port: Port to connect to
+        :param baudrate: The baud rate
+        :param timeout: Timeout
+        :param sensor_address: The sensor address
+        :return: Connected driver.
+        """
         try:
-            self._th_sensor = serial.Serial(
-                port=self.port,
-                baudrate=self.baudrate,
+            connection = serial.Serial(
+                port=port,
+                baudrate=baudrate,
                 parity=serial.PARITY_NONE,
                 stopbits=serial.STOPBITS_ONE,
                 bytesize=serial.EIGHTBITS,
-                timeout=self.timeout,
+                timeout=timeout,
             )
+            return cls(connection, sensor_address)
         except SerialException:
-            error_msg = "\nUnable to access Serial port to Scale: \n"
-            error_msg += "1. Check that the scale is plugged into the computer. \n"
-            error_msg += "2. CHeck if the assigned port is correct. \n"
+            error_msg = (
+                "Unable to access Serial port to Scale: \n"
+                "1. Check that the scale is plugged into the computer. \n"
+                "2. Check if the assigned port is correct. \n"
+            )
             raise SerialException(error_msg)
 
-    def get_reading(self) -> Tuple[float, float]:
+    def get_reading(self) -> Reading:
         """Get a reading."""
-        if not self.simulate:
-            assert self._th_sensor, "No connection"
+        data_packet = "{}0300000002{}".format(
+            self._sensor_address, addrs[self._sensor_address]
+        )
+        log.debug(f"sending {data_packet}")
+        command_bytes = codecs.decode(data_packet.encode(), "hex")
+        try:
+            self._th_sensor.flushInput()
+            self._th_sensor.flushOutput()
+            self._th_sensor.write(command_bytes)
+            time.sleep(0.1)
 
-            data_packet = "{}0300000002{}".format(
-                self.sensor_addr, addrs[self.sensor_addr]
-            )
-            log.debug(f"sending {data_packet}")
-            command_bytes = codecs.decode(data_packet.encode(), "hex")
-            count = 0
-            try:
-                count += 1
-                self._th_sensor.flushInput()
-                self._th_sensor.flushOutput()
-                self._th_sensor.write(command_bytes)
-                time.sleep(0.1)
-                length = self._th_sensor.inWaiting()
-                if count == self.timeout:
-                    raise RuntimeError("TH SENSOR TIMEOUT")
-                res = self._th_sensor.read(length)
-                log.debug(f"received {res}")
-                res = codecs.encode(res, "hex")
-                temp = res[6:10]
-                relative_hum = res[10:14]
-                log.info(f"Temp: {temp}, RelativeHum: {relative_hum}")
-                temp = float(int(temp, 16)) / 10
-                relative_hum = float(int(relative_hum, 16)) / 10
-                return temp, relative_hum
+            length = self._th_sensor.inWaiting()
+            res = self._th_sensor.read(length)
+            log.debug(f"received {res}")
 
-            except AsairSensorError as th_error:
-                self._th_sensor.close()
-                log.exception("Error Occurred")
-                raise AsairSensorError(str(th_error))
+            res = codecs.encode(res, "hex")
+            temp = res[6:10]
+            relative_hum = res[10:14]
+            log.info(f"Temp: {temp}, RelativeHum: {relative_hum}")
 
-            except SerialException:
-                error_msg = "Asair Sensor not connected "
-                error_msg += "or check if Port number is correct!. "
-                raise SerialException(error_msg)
-        else:
-            temp = random.uniform(24.5, 25)
-            relative_hum = random.uniform(45, 40)
-            return temp, relative_hum
+            temp = float(int(temp, 16)) / 10
+            relative_hum = float(int(relative_hum, 16)) / 10
+            return Reading(temperature=temp, relative_humidity=relative_hum)
+
+        except (IndexError, ValueError) as e:
+            log.exception("Bad value read")
+            raise AsairSensorError(str(e))
+        except SerialException:
+            log.exception("Communication error")
+            error_msg = "Asair Sensor not connected. Check if port number is correct."
+            raise AsairSensorError(error_msg)
 
 
-if __name__ == "__main__":
-    TH = AsairSensor(port="COM12")
-    while True:
-        ##########################################
-        # make a dir
-        ##########################################
-        D = datetime.now().strftime("%y-%m-%d")
-        folder_name = os.path.join("", D)
-        if not os.path.exists(folder_name):
-            os.makedirs(folder_name)
-        ##########################################
-        # compile csv file
-        ##########################################
-        file_name = folder_name + ".csv"
-        hours = os.listdir(folder_name)
-        print(hours)
-        with open(file_name, "w", newline="") as f:
-            writer = csv.writer(f, delimiter=",", quoting=csv.QUOTE_NONE)
-            for h in hours:
-                hour_path = os.path.join(folder_name, h)
-                print(hour_path)
-                f = open(hour_path, "r", newline="")
-                csv_f = csv.reader(f)
-                for row in csv_f:
-                    writer.writerow(row)
-        ##########################################
-        # get read from sensor
-        ##########################################
-        T = datetime.now().strftime("%H")
-        with open("./{}/{}.csv".format(D, T), "a+", newline="") as f:
-            writer = csv.writer(f, delimiter=",", quoting=csv.QUOTE_NONE)
-            while True:
-                now = datetime.now().strftime("%H:%M:%S")
-                if T not in now:
-                    break
-                h1, t1 = TH.get_reading()
-                print("Time: {}, t1={},h1={}".format(now, t1, h1))
-                time.sleep(2)
+class SimAsairSensor(AsairSensorBase):
+    """Simulating Asair sensor driver."""
+
+    def get_reading(self) -> Reading:
+        """Get a reading."""
+        temp = random.uniform(24.5, 25)
+        relative_hum = random.uniform(45, 40)
+        return Reading(temperature=temp, relative_humidity=relative_hum)

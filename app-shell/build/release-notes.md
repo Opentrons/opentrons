@@ -14,6 +14,7 @@ After you update your app, please be sure to update any OT-2's you will be using
 The 6.0.0 release reshapes the main navigational structure. We're very excited for you to try this new experience out, and we appreciate your feedback (and patience) as you use this new software.
 
 This is alpha software! You may experience unexpected crashes or missing features not detailed here. Please see the [issue tracker][] for more details and to leave feedback.
+
 [issue tracker]: https://github.com/Opentrons/opentrons/issues/new?assignees=y3rsh%2Cnusrat813&labels=6.0-feedback&template=testing_feedback.yml&title=6.0+Feedback%3A++%3Ctitle%3E
 
 ## New Features
@@ -29,7 +30,7 @@ Keep an eye on this space as we release new versions of the alpha.
 
 ## Known Issues
 
-This alpha is a work in progress! We'll be addressing the following features and issues in upcoming releases of 6.0.0.
+This alpha is a work in progress! We'll be addressing issues found in alpha testing in upcoming releases of 6.0.0.
 
 ---
 

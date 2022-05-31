@@ -30,12 +30,13 @@ import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProt
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
   moduleFromProtocol?: ProtocolModuleInfo
+  runId?: string
 }
 
 export const HeaterShakerWizard = (
   props: HeaterShakerWizardProps
 ): JSX.Element | null => {
-  const { onCloseClick, moduleFromProtocol } = props
+  const { onCloseClick, moduleFromProtocol, runId } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
   const { robotName } = useParams<NavRouteParams>()
@@ -99,6 +100,7 @@ export const HeaterShakerWizard = (
               module={heaterShaker}
               setCurrentPage={setCurrentPage}
               moduleFromProtocol={moduleFromProtocol}
+              runId={runId}
             />
           ) : null
         )

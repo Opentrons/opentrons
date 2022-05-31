@@ -1,28 +1,39 @@
 import * as React from 'react'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  useCreateCommandMutation,
+  useCreateLiveCommandMutation,
+} from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
 import { useLatchControls } from '../../ModuleCard/hooks'
 import { TestShake } from '../TestShake'
 import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
+import { useModuleIdFromRun } from '../../ModuleCard/useModuleIdFromRun'
 
 import type { ProtocolModuleInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../HeaterShakerModuleCard')
 jest.mock('../../ModuleCard/hooks')
+jest.mock('../../ModuleCard/useModuleIdFromRun')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
+>
+const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
+  typeof useCreateCommandMutation
 >
 const mockUseLatchControls = useLatchControls as jest.MockedFunction<
   typeof useLatchControls
 >
 const mockHeaterShakerModuleCard = HeaterShakerModuleCard as jest.MockedFunction<
   typeof HeaterShakerModuleCard
+>
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
 >
 
 const render = (props: React.ComponentProps<typeof TestShake>) => {
@@ -113,6 +124,7 @@ const mockMovingHeaterShaker = {
 describe('TestShake', () => {
   let props: React.ComponentProps<typeof TestShake>
   let mockCreateLiveCommand = jest.fn()
+  let mockCreateCommand = jest.fn()
   beforeEach(() => {
     props = {
       setCurrentPage: jest.fn(),
@@ -124,6 +136,10 @@ describe('TestShake', () => {
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
+    mockCreateCommand = jest.fn()
+    mockUseCommandMutation.mockReturnValue({
+      createCommand: mockCreateCommand,
+    } as any)
     mockHeaterShakerModuleCard.mockReturnValue(
       <div>Mock Heater Shaker Module Card</div>
     )
@@ -131,6 +147,9 @@ describe('TestShake', () => {
       handleLatch: jest.fn(),
       isLatchClosed: true,
     } as any)
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'heatershaker_id',
+    })
   })
   it('renders the correct title', () => {
     const { getByText } = render(props)
@@ -191,7 +210,7 @@ describe('TestShake', () => {
 
     const { getByRole } = render(props)
     const button = getByRole('button', { name: /Start Shaking/i })
-    expect(button).toBeEnabled()
+    expect(button).toBeDisabled()
   })
 
   it('renders an input field for speed setting', () => {

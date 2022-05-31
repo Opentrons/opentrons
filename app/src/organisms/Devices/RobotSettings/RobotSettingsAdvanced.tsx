@@ -27,7 +27,6 @@ import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/Factory
 import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
 
 import type { State } from '../../../redux/types'
-import type { ViewableRobot } from '../../../redux/discovery/types'
 import type {
   RobotSettings,
   RobotSettingsField,
@@ -182,7 +181,7 @@ export function RobotSettingsAdvanced({
           onUpdateStart={() => setShowSoftwareUpdateModal(true)}
         />
         <Troubleshooting
-          robot={robot as ViewableRobot}
+          robotName={robotName}
           updateDownloadLogsStatus={updateDownloadLogsStatus}
         />
         <Divider marginY="2.5rem" />

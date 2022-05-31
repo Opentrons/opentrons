@@ -2,7 +2,7 @@ import functools
 import logging
 from collections import UserDict
 from dataclasses import dataclass
-from typing import Optional, List, Dict, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, List, Dict, Set
 
 from opentrons import types
 from opentrons.protocol_api.labware import load as load_lw, Labware
@@ -112,26 +112,27 @@ class Deck(UserDict):
         slot_key_int = self._check_name(key)
         item = self.data.get(slot_key_int)
 
-        overlapping_items = self.get_collisions_for_item(slot_key_int, val)
+        overlapping_items = self._get_collisions_for_item(slot_key_int, val)
         if item is not None:
             if slot_key_int == 12:
                 if FIXED_TRASH_ID in item.parameters.get("quirks", []):
                     pass
                 else:
-                    raise ValueError(f"Deck location {key} " "is for fixed trash only")
+                    raise ValueError(f"Deck slot {key} is for fixed trash only")
             else:
                 raise ValueError(
-                    f"Deck location {key} already"
-                    f"  has an item: {self.data[slot_key_int]}"
+                    f"Deck slot {key} already"
+                    f" has an item: {self.data[slot_key_int].load_name}"
                 )
         elif overlapping_items:
             flattened_overlappers = [
-                repr(item) for sublist in overlapping_items.values() for item in sublist
+                f"{item.load_name} in slot {slot}"
+                for slot, sublist in overlapping_items.items()
+                for item in sublist
             ]
             raise ValueError(
-                f"Could not load {val} as deck location {key} "
-                "is obscured by "
-                f'{", ".join(flattened_overlappers)}'
+                f"Could not load {val} because it would"
+                f" interfere with {', '.join(flattened_overlappers)}"
             )
         self.data[slot_key_int] = val
         self._highest_z = max(val.highest_z, self._highest_z)
@@ -238,7 +239,7 @@ class Deck(UserDict):
                 return valid_slots[0]
             elif not valid_slots:
                 raise ValueError(
-                    "A {dn_from_type[module_type]} cannot be used with this " "deck"
+                    "A {dn_from_type[module_type]} cannot be used with this deck"
                 )
             else:
                 raise AssertionError(
@@ -286,28 +287,30 @@ class Deck(UserDict):
         }
         return [s for s in self.data.keys() if s not in fixture_slots]
 
-    def get_collisions_for_item(
+    def _get_collisions_for_item(
         self, slot_key: types.DeckLocation, item: DeckItem
     ) -> Dict[types.DeckLocation, List[DeckItem]]:
-        """Return the loaded deck items that collide
-        with the given item.
-        """
+        """Return the loaded deck items that collide with the given item."""
 
-        def get_item_covered_slot_keys(sk, i):
+        def get_item_covered_slot_keys(sk, i) -> Set[str]:
             if isinstance(i, ThermocyclerGeometry):
                 return i.covered_slots
             elif i is not None:
                 return set([sk])
             else:
-                return set([])
+                return set()
 
         item_slot_keys = get_item_covered_slot_keys(slot_key, item)
-
         colliding_items: Dict[types.DeckLocation, List[DeckItem]] = {}
-        for sk, i in self.data.items():
-            covered_sks = get_item_covered_slot_keys(sk, i)
-            if item_slot_keys.issubset(covered_sks):
-                colliding_items.setdefault(sk, []).append(i)
+
+        for slot_key, existing_item in self.data.items():
+            occupied_slot_keys = get_item_covered_slot_keys(slot_key, existing_item)
+            conflicting_slot_keys = occupied_slot_keys & item_slot_keys
+
+            if len(conflicting_slot_keys) > 0:
+                for conflict in conflicting_slot_keys:
+                    colliding_items.setdefault(conflict, []).append(existing_item)
+
         return colliding_items
 
     @property

@@ -30,6 +30,7 @@ export const ModuleOverflowMenu = (
     handleTestShakeClick,
     handleWizardClick,
   } = props
+
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { menuOverflowItemsByModuleType } = useModuleOverflowMenu(
     module,

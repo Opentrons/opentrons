@@ -3,11 +3,16 @@ from typing import Union, Dict
 from logging import getLogger
 from numpy import float64
 from typing_extensions import Literal
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorType,
+    SensorThresholdMode,
+)
 from opentrons_hardware.sensors.scheduler import SensorScheduler
 from opentrons_hardware.sensors.utils import (
     SensorInformation,
     SensorThresholdInformation,
+    SensorDataType,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.hardware_control.motion import MoveStopCondition, create_step
@@ -28,6 +33,7 @@ async def capacitive_probe(
     tool: ProbeTarget,
     distance: float,
     speed: float,
+    relative_threshold_pf: float = 1.0,
     log_sensor_values: bool = False,
 ) -> float:
     """Move the specified tool down until its capacitive sensor triggers.
@@ -39,7 +45,10 @@ async def capacitive_probe(
     sensor_scheduler = SensorScheduler()
     threshold = await sensor_scheduler.send_threshold(
         SensorThresholdInformation(
-            sensor_type=SensorType.capacitive, node_id=tool, data="auto"
+            sensor_type=SensorType.capacitive,
+            node_id=tool,
+            data=SensorDataType.build(relative_threshold_pf),
+            mode=SensorThresholdMode.auto_baseline,
         ),
         messenger,
     )
