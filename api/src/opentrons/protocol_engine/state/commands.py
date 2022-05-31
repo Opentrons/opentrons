@@ -439,7 +439,10 @@ class CommandView(HasState[CommandState]):
             return next_setup_cmd
 
         # if the queue is running, return the next protocol command
-        elif self._state.queue_status == QueueStatus.RUNNING:
+        if self._state.queue_status == QueueStatus.RUNNING:
+             return next(iter(self._state.queued_command_ids), None)
+        # otherwise we've got nothing to do
+        return None
             return next(iter(self._state.queued_command_ids), None)
 
         # otherwise we've got nothing to do
