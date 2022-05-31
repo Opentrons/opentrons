@@ -67,7 +67,8 @@ def get_app(
     app[config.CONFIG_VARNAME] = config_obj
     app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
     app[constants.DEVICE_BOOT_ID_NAME] = boot_id
-    app[constants.DEVICE_NAME_VARNAME] = name
+    # FIX BEFORE MERGE
+    # app[constants.DEVICE_NAME_VARNAME] = name
 
     LOG.info(
         "Setup: "

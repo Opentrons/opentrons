@@ -18,23 +18,14 @@ def main() -> None:
     loop = asyncio.get_event_loop()
     systemd.configure_logging(getattr(logging, args.log_level.upper()))
 
+    # Because this involves restarting Avahi, this must happen early,
+    # before the NameManager starts up and connects to Avahi.
     LOG.info("Setting static hostname")
-    hostname = loop.run_until_complete(name_management.set_up_static_hostname())
-    LOG.info(f"Set static hostname to {hostname}")
+    static_hostname = loop.run_until_complete(name_management.set_up_static_hostname())
+    LOG.info(f"Set static hostname to {static_hostname}")
 
     LOG.info("Building buildroot update server")
     app = get_app(args.version_file, args.config_file)
-
-    name = app[constants.DEVICE_NAME_VARNAME]  # Set by get_app().
-
-    LOG.info(f"Setting Avahi service name to {name}")
-    try:
-        loop.run_until_complete(name_management.set_avahi_service_name(name))
-    except Exception:
-        LOG.exception(
-            "Error setting the Avahi service name."
-            " mDNS + DNS-SD advertisement may not work."
-        )
 
     LOG.info(f"Notifying {systemd.SOURCE} that service is up")
     systemd.notify_up()

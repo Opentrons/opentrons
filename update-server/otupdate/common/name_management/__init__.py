@@ -41,28 +41,14 @@ The robot has several names associated with it, some of which we tie together.
   See `set_name_endpoint()`.
 """
 
+from __future__ import annotations
 
 import json
 
 from aiohttp import web
 
-from ..constants import DEVICE_NAME_VARNAME
-
-from .avahi import set_avahi_service_name
-from .pretty_hostname import (
-    get_pretty_hostname,
-    persist_pretty_hostname,
-)
+from .name_manager import NameManager, build_and_insert
 from .static_hostname import set_up_static_hostname
-
-
-async def set_name(app: web.Application, new_name: str) -> str:
-    """See `set_name_endpoint()`."""
-    await set_avahi_service_name(new_name)
-    # Setting the Avahi service name can fail if Avahi doesn't like the new name.
-    # Persist only after it succeeds, so we don't persist something invalid.
-    persisted_pretty_hostname = await persist_pretty_hostname(new_name)
-    return persisted_pretty_hostname
 
 
 async def set_name_endpoint(request: web.Request) -> web.Response:
@@ -104,9 +90,9 @@ async def set_name_endpoint(request: web.Request) -> web.Response:
     if not isinstance(name_to_set, str):
         return build_400('"name" key is not a string"')
 
-    new_name = await set_name(app=request.app, new_name=name_to_set)
+    name_manager = NameManager.from_request(request)
+    new_name = await name_manager.set_name(new_name=name_to_set)
 
-    request.app[DEVICE_NAME_VARNAME] = new_name
     return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
         data={"name": new_name}, status=200
     )
@@ -120,15 +106,16 @@ async def get_name_endpoint(request: web.Request) -> web.Response:
 
     GET /server/name -> 200 OK, {'name': robot name}
     """
+    name_manager = NameManager.from_request(request)
     return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
-        data={"name": request.app[DEVICE_NAME_VARNAME]}, status=200
+        data={"name": name_manager.get_name()}, status=200
     )
 
 
 __all__ = [
-    "get_pretty_hostname",
+    "NameManager",
+    "build_and_insert",
     "set_up_static_hostname",
-    "set_avahi_service_name",
     "get_name_endpoint",
     "set_name_endpoint",
 ]

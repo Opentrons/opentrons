@@ -1,8 +1,9 @@
 """ update-server implementation for buildroot systems """
 import asyncio
 import logging
+import textwrap
 import json
-from typing import Any, Mapping, Optional
+from typing import Any, AsyncGenerator, Mapping, Optional
 from aiohttp import web
 
 from otupdate.common import (
@@ -12,6 +13,7 @@ from otupdate.common import (
     name_management,
     constants,
     update,
+    systemd,
 )
 from . import update_actions
 
@@ -52,40 +54,60 @@ def get_app(
         system_version_file = BR_BUILTIN_VERSION_FILE
 
     version = get_version(system_version_file)
-    name = name_override or name_management.get_pretty_hostname()
     boot_id = boot_id_override or control.get_boot_id()
     config_obj = config.load(config_file_override)
 
-    LOG.info(
-        "Setup: "
-        + "\n\t".join(
-            [
-                f"Device name: {name}",
-                "Buildroot version:         "
-                f'{version.get("buildroot_version", "unknown")}',
-                "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
-                "API version:               "
-                f'{version.get("opentrons_api_version", "unknown")}',
-                "\t(from git sha      "
-                f'{version.get("opentrons_api_sha", "unknown")}',
-                "Update server version:     "
-                f'{version.get("update_server_version", "unknown")}',
-                "\t(from git sha      "
-                f'{version.get("update_server_sha", "unknown")}',
-                "Smoothie firmware version: TODO",
-            ]
-        )
-    )
-
-    if not loop:
-        loop = asyncio.get_event_loop()
-
     app = web.Application(middlewares=[log_error_middleware])
-    app[config.CONFIG_VARNAME] = config_obj
-    app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
-    app[constants.DEVICE_BOOT_ID_NAME] = boot_id
-    app[constants.DEVICE_NAME_VARNAME] = name
-    update_actions.OT2UpdateActions.build_and_insert(app)
+
+    async def _setup_and_cleanup_ctx(
+        app: web.Application
+    ) -> AsyncGenerator[None, None]:
+        # Stuff everything inside here so that:
+        # - Getting the order right is more foolproof
+        # - We can log it all together
+
+        # FIX BEFORE MERGE: Do name override.
+
+        app[config.CONFIG_VARNAME] = config_obj
+        app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
+        app[constants.DEVICE_BOOT_ID_NAME] = boot_id
+
+        update_actions.OT2UpdateActions.build_and_insert(app)
+
+        async with name_management.build_and_insert(app):
+            name = name_management.NameManager.from_app(app).get_name()
+            LOG.info(
+                "Setup: "
+                + "\n\t".join(
+                    [
+                        f"Device name: {name}",
+                        "Buildroot version:         "
+                        f'{version.get("buildroot_version", "unknown")}',
+                        "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
+                        "API version:               "
+                        f'{version.get("opentrons_api_version", "unknown")}',
+                        "\t(from git sha      "
+                        f'{version.get("opentrons_api_sha", "unknown")}',
+                        "Update server version:     "
+                        f'{version.get("update_server_version", "unknown")}',
+                        "\t(from git sha      "
+                        f'{version.get("update_server_sha", "unknown")}',
+                        "Smoothie firmware version: TODO",
+                    ]
+                )
+            )
+
+            LOG.info(f"Notifying {systemd.SOURCE} that service is up.")
+            systemd.notify_up()
+
+            LOG.info(f"Serving requests.")
+            yield
+            LOG.info("Running teardown code.")
+
+        LOG.info("Done running teardown code.")
+
+    app.cleanup_ctx.append(_setup_and_cleanup_ctx)
+
     app.router.add_routes(
         [
             web.get(
