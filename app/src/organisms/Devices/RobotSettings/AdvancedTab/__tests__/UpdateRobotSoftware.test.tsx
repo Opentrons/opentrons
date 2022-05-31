@@ -23,12 +23,15 @@ const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
   typeof useIsRobotBusy
 >
 
+const mockOnUpdateStart = jest.fn()
+
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
       <UpdateRobotSoftware
         robotName="otie"
         updateIsRobotBusy={mockUpdateRobotStatus}
+        onUpdateStart={mockOnUpdateStart}
       />
     </MemoryRouter>,
     { i18nInstance: i18n }
