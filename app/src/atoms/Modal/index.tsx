@@ -91,7 +91,6 @@ export const Modal = (props: ModalProps): JSX.Element => {
   return (
     <BaseModal
       width="31.25rem"
-      maxHeight="28.125rem"
       noHeaderStyles
       header={header}
       css={css`

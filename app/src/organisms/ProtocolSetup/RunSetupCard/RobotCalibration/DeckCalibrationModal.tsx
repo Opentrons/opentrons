@@ -34,7 +34,10 @@ export function DeckCalibrationModal({
   return (
     <Portal level="top">
       <Modal title={t('robot_cal_help_title')} onClose={onCloseClick}>
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          css={{ 'max-height': '28.125rem' }}
+        >
           <StyledText as="p" marginBottom={SPACING.spacing4}>
             {t('robot_cal_description')}
           </StyledText>
