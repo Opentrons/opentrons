@@ -358,7 +358,7 @@ async def test_finish_with_error(
         action_dispatcher.dispatch(
             FinishAction(error_details=expected_error_details, set_run_status=True)
         ),
-        await queue_worker.join()
+        await queue_worker.join(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
         action_dispatcher.dispatch(
             HardwareStoppedAction(completed_at=datetime(year=2022, month=2, day=2))
