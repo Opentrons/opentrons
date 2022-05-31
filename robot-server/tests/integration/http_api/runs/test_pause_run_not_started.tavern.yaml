@@ -23,7 +23,7 @@ stages:
       save:
         json:
           run_id: data.id
-  - name: Issue stop pause to Run that was not started
+  - name: Issue pause to a none active run
     request:
       url: '{host:s}:{port:d}/runs/{run_id}/actions'
       json:
