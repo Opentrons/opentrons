@@ -40,6 +40,7 @@ export const PipetteSettingsSlideout = (
       title={t('pipette_settings', { pipetteName: pipetteName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
+      padding={'0'}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}

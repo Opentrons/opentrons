@@ -221,8 +221,8 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
           return (
             <>
               <Form>
-                <Box overflowY="scroll" height="81vh">
-                  {/* 81vh is approximate height to leave 1rem margin below the submit button */}
+                <Box overflowY="scroll" height="83.5vh" padding={'1rem'}>
+                  {/* 83.5vh is approximate height to leave 1rem margin below the submit button */}
                   <ConfigFormResetButton
                     onClick={handleReset}
                     disabled={updateInProgress}
