@@ -12,6 +12,7 @@ from opentrons.protocol_engine import (
     ErrorOccurrence,
     LoadedPipette,
     LoadedLabware,
+    LoadedModule,
     LabwareOffset,
     LabwareOffsetCreate,
 )
@@ -79,6 +80,10 @@ class Run(ResourceModel):
     pipettes: List[LoadedPipette] = Field(
         ...,
         description="Pipettes that have been loaded into the run.",
+    )
+    modules: List[LoadedModule] = Field(
+        ...,
+        description="Modules that have been loaded into the run.",
     )
     labware: List[LoadedLabware] = Field(
         ...,

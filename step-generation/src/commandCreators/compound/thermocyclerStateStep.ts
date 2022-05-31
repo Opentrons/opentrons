@@ -8,7 +8,7 @@ import { thermocyclerCloseLid } from '../atomic/thermocyclerCloseLid'
 import { thermocyclerDeactivateBlock } from '../atomic/thermocyclerDeactivateBlock'
 import { thermocyclerDeactivateLid } from '../atomic/thermocyclerDeactivateLid'
 import { thermocyclerOpenLid } from '../atomic/thermocyclerOpenLid'
-import { thermocyclerSetAndWaitForBlockTemperature } from '../atomic/thermocyclerSetAndWaitForBlockTemperature'
+import { thermocyclerSetTargetBlockTemperature } from '../atomic/thermocyclerSetTargetBlockTemperature'
 import { thermocyclerSetTargetLidTemperature } from '../atomic/thermocyclerSetTargetLidTemperature'
 import type {
   CommandCreator,
@@ -65,7 +65,7 @@ export const thermocyclerStateStep: CommandCreator<ThermocyclerStateStepArgs> = 
 
   if (blockTargetTemp !== null && setBlockTemperature) {
     commandCreators.push(
-      curryCommandCreator(thermocyclerSetAndWaitForBlockTemperature, {
+      curryCommandCreator(thermocyclerSetTargetBlockTemperature, {
         module: args.module,
         temperature: blockTargetTemp,
       })

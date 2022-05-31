@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { LEFT } from '../../../redux/pipettes'
+import { useSelector, useDispatch } from 'react-redux'
 import {
   Box,
   Flex,
@@ -12,6 +11,7 @@ import {
   SPACING,
   FONT_WEIGHT_REGULAR,
   FONT_SIZE_CAPTION,
+  useInterval,
   TYPOGRAPHY,
   COLORS,
   useOnClickOutside,
@@ -20,11 +20,13 @@ import {
   Btn,
   TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
+import { LEFT } from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { Portal } from '../../../App/portal'
 import { StyledText } from '../../../atoms/text'
 import { getHasCalibrationBlock } from '../../../redux/config'
 import { Banner } from '../../../atoms/Banner'
+import { fetchPipetteOffsetCalibrations } from '../../../redux/calibration'
 import { ChangePipette } from '../../ChangePipette'
 import { useCalibratePipetteOffset } from '../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import {
@@ -39,6 +41,7 @@ import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
 import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type { Dispatch } from '../../../redux/types'
 
 interface PipetteCardProps {
   pipetteInfo: PipetteModelSpecs | null
@@ -47,10 +50,13 @@ interface PipetteCardProps {
   robotName: string
 }
 
+const FETCH_PIPETTE_CAL_MS = 30000
+
 export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { t } = useTranslation('device_details')
   const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
   const { pipetteInfo, mount, robotName, pipetteId } = props
+  const dispatch = useDispatch<Dispatch>()
   const pipetteName = pipetteInfo?.displayName
   const pipetteOverflowWrapperRef = useOnClickOutside({
     onClickOutside: () => setShowOverflowMenu(false),
@@ -66,11 +72,21 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     startPipetteOffsetCalibration,
     PipetteOffsetCalibrationWizard,
   ] = useCalibratePipetteOffset(robotName, { mount })
+
   const pipetteOffsetCalibration = usePipetteOffsetCalibration(
     robotName,
     pipetteId,
     mount
   )
+
+  useInterval(
+    () => {
+      dispatch(fetchPipetteOffsetCalibrations(robotName))
+    },
+    pipetteOffsetCalibration === null ? 1000 : FETCH_PIPETTE_CAL_MS,
+    true
+  )
+
   const badCalibration = pipetteOffsetCalibration?.status.markedBad
 
   const startPipetteOffsetCalibrationBlockModal = (

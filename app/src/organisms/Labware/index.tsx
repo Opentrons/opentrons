@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
+import { css } from 'styled-components'
+
 import {
   Box,
   Flex,
@@ -17,6 +19,7 @@ import {
   Icon,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
+
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/buttons'
 import { Toast } from '../../atoms/Toast'
@@ -31,6 +34,7 @@ import {
   useLabwareFailure,
   useNewLabwareName,
 } from './hooks'
+
 import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
 import type { LabwareFilter, LabwareSort } from './types'
 
@@ -48,6 +52,13 @@ const FILTER_OPTIONS: DropdownOption[] = []
 labwareDisplayCategoryFilters.forEach(category =>
   FILTER_OPTIONS.push({ name: startCase(category), value: category })
 )
+
+const LINK_STYLES = css`
+  opacity: 70%;
+  &:hover {
+    opacity: 100%;
+  }
+`
 
 export function Labware(): JSX.Element {
   const { t } = useTranslation('labware_landing')
@@ -123,15 +134,38 @@ export function Labware(): JSX.Element {
             alignItems={ALIGN_CENTER}
             onClick={toggleSetShowSortByMenu}
           >
-            <StyledText css={TYPOGRAPHY.pSemiBold}>{t('sort_by')} </StyledText>
-            <Icon
-              height={TYPOGRAPHY.lineHeight16}
-              name={showSortByMenu ? 'chevron-up' : 'chevron-down'}
-            />
+            <StyledText
+              css={TYPOGRAPHY.pSemiBold}
+              color={COLORS.darkGreyEnabled}
+            >
+              {t('sort_by')}
+            </StyledText>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              alignItems={ALIGN_CENTER}
+              backgroundColor={COLORS.medGrey}
+              borderRadius={BORDERS.radiusSoftCorners}
+              marginLeft={SPACING.spacing3}
+            >
+              <StyledText
+                css={TYPOGRAPHY.pSemiBold}
+                paddingLeft={SPACING.spacing3}
+                paddingRight={SPACING.spacing2}
+                paddingY={SPACING.spacing2}
+                data-testid="sortBy-label"
+              >
+                {sortBy === 'alphabetical' ? t('alphabetical') : t('reverse')}
+              </StyledText>
+              <Icon
+                paddingRight={SPACING.spacing3}
+                height={TYPOGRAPHY.lineHeight16}
+                name={showSortByMenu ? 'chevron-up' : 'chevron-down'}
+              />
+            </Flex>
           </Flex>
           {showSortByMenu && (
             <Flex
-              width="9rem"
+              width="9.375rem"
               zIndex={2}
               borderRadius={BORDERS.radiusSoftCorners}
               boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
@@ -184,19 +218,22 @@ export function Labware(): JSX.Element {
           >
             {t('create_new_def')}
           </StyledText>
-          <StyledText
-            css={TYPOGRAPHY.h6SemiBold}
-            color={COLORS.darkGreyEnabled}
+
+          <Link
+            external
+            href={LABWARE_CREATOR_HREF}
+            color={COLORS.darkBlack}
+            css={LINK_STYLES}
+            fontSize={TYPOGRAPHY.fontSizeLabel}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
-            <Link
-              href={LABWARE_CREATOR_HREF}
-              color={COLORS.darkGreyEnabled}
-              external
-            >
-              {t('open_labware_creator')}{' '}
-              <Icon name="open-in-new" height="10px"></Icon>
-            </Link>
-          </StyledText>
+            {t('open_labware_creator')}
+            <Icon
+              name="open-in-new"
+              size="0.5rem"
+              marginLeft={SPACING.spacing2}
+            />
+          </Link>
         </Flex>
       </Box>
       {showAddLabwareSlideout && (
