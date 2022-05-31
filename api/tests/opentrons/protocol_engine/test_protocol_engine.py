@@ -11,6 +11,7 @@ from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands
+from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 from opentrons.protocol_engine.types import (
     LabwareOffset,
     LabwareOffsetCreate,
@@ -265,14 +266,24 @@ def test_pause(
     subject.pause()
 
     decoy.verify(
+        state_store.commands.raise_if_not_started(),
         state_store.commands.raise_if_stop_requested(),
         action_dispatcher.dispatch(expected_action),
     )
 
 
-def test_pause_run_not_started(decoy: Decoy) -> None:
+def test_pause_run_not_started(
+    decoy: Decoy,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+) -> None:
     """Should raise an ProtocolEngineStoppedError error."""
-    raise NotImplementedError()
+    decoy.when(state_store.commands.raise_if_not_started()).then_raise(
+        ProtocolEngineStoppedError("A stop has already been requested.")
+    )
+
+    with pytest.raises(ProtocolEngineStoppedError):
+        subject.pause()
 
 
 @pytest.mark.parametrize("drop_tips_and_home", [True, False])

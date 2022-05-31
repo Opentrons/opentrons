@@ -447,7 +447,7 @@ class CommandView(HasState[CommandState]):
     def get_is_active(self) -> bool:
         """Get whether the engine is active and queued commands should be executed."""
         queue_status = self._state.queue_status
-        return (queue_status == QueueStatus.ACTIVE)
+        return queue_status == QueueStatus.ACTIVE
 
     def get_is_complete(self, command_id: str) -> bool:
         """Get whether a given command is completed.
