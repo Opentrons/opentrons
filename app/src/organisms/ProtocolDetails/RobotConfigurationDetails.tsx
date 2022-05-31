@@ -48,7 +48,7 @@ export const RobotConfigurationDetails = (
         label={t('left_mount')}
         item={
           getPipetteNameSpecs(leftMountPipetteName as PipetteName)
-            ?.displayName ?? t('shared:empty')
+            ?.displayName ?? t('shared:not_used')
         }
       />
       <Divider width="100%" />
@@ -56,7 +56,7 @@ export const RobotConfigurationDetails = (
         label={t('right_mount')}
         item={
           getPipetteNameSpecs(rightMountPipetteName as PipetteName)
-            ?.displayName ?? t('shared:empty')
+            ?.displayName ?? t('shared:not_used')
         }
       />
       {requiredModuleDetails != null
