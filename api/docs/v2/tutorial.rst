@@ -21,7 +21,7 @@ Before You Begin
 
 You're going to write some Python code, but by no means do you need to be a Python expert to get started writing Opentrons protocols. You should know some basic Python syntax, like how it uses `indentation <https://docs.python.org/3/reference/lexical_analysis.html#indentation>`_ to group blocks of code, dot notation for `calling methods <https://docs.python.org/3/tutorial/classes.html#method-objects>`_, and the format of `lists <https://docs.python.org/3/tutorial/introduction.html#lists>`_ and `dictionaries <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_. You’ll also be using `common control structures <https://docs.python.org/3/tutorial/controlflow.html#if-statements>`_ like ``if`` statements and ``for`` loops. 
 
-To run your code, make sure that you have installed `Python 3 <https://wiki.python.org/moin/BeginnersGuide/Download>`_ and the `pip package installer <https://pip.pypa.io/en/stable/getting-started/>`_. You should write your code in your favorite plaintext editor or IDE and be sure to save your work in a file with a ``.py`` extension, like ``dilution-tutorial.py``.
+To run your code, make sure that you've installed `Python 3 <https://wiki.python.org/moin/BeginnersGuide/Download>`_ and the `pip package installer <https://pip.pypa.io/en/stable/getting-started/>`_. You should write your code in your favorite plaintext editor or IDE and save it in a file with a ``.py`` extension, like ``dilution-tutorial.py``.
 
 If you plan to run your protocol on an OT-2, you’ll want to have it ready with the right kind of hardware and labware:
 
@@ -48,14 +48,14 @@ Throughout this documentation you’ll see protocols that begin this way. It’s
 
 Everything else in the protocol file will be required. Next, you’ll specify the version of the API you’re using. Then comes the core of the protocol: defining a single ``run()`` function that provides the locations of your labware, states which kind of pipettes you’ll use, and finally issues the commands that the robot will perform.
 
-For this tutorial, you’ll write very little Python outside of the ``run()`` function. But for more complex applications it’s worth remembering that your protocol file *is* a Python script, so any Python code that can run on your robot can be a part of a protocol. 
+For this tutorial, you’ll write very little Python outside of the ``run()`` function. But for more complex applications it’s worth remembering that your protocol file *is* a Python script, so any Python code that can run on the OT-2 can be a part of a protocol. 
 
 .. For more information, see Protocol Structure.
 
 Metadata
 ^^^^^^^^
 
-Every protocol needs to have a metadata dictionary with information about the protocol. At minimum, you need to specify what version of the API the protocol requires. If you plan to share your protocols, you should specify the lowest API version that includes all the features your protocol uses. For this tutorial, you can just use the latest version of the API:
+Every protocol needs to have a metadata dictionary with information about the protocol. At minimum, you need to specify what :ref:`version <version-table>` of the API the protocol requires. If you plan to share your protocols, you should specify the lowest API version that includes all the features your protocol uses. For this tutorial, you can just use the latest version of the API:
 
 .. code-block:: python
     :substitutions:
@@ -124,7 +124,7 @@ Next you’ll specify what pipette to use in the protocol. Loading a pipette is 
 
         p300 = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tips])
 
-Since the pipette is so fundamental to the protocol, it might seem like you should have specified it first. But there’s a good reason why pipettes are added after labware: you need to have already added ``tips`` in order to tell the pipette to use it. And now you won’t have to reference ``tips`` again in your code — it’s assigned to the ``p300`` pipette and the robot will know to use it when commanded to pick up tips.
+Since the pipette is so fundamental to the protocol, it might seem like you should have specified it first. But there’s a good reason why pipettes are loaded after labware: you need to have already loaded ``tips`` in order to tell the pipette to use it. And now you won’t have to reference ``tips`` again in your code — it’s assigned to the ``p300`` pipette and the robot will know to use it when commanded to pick up tips.
 
 .. note::
 
