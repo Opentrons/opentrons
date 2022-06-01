@@ -60,7 +60,6 @@ class MessageId(int, Enum):
     pipette_info_response = 0x307
     gripper_info_response = 0x308
     set_serial_number = 0x30A
-    instrument_info_request = 0x30B
 
     stop_request = 0x00
 
