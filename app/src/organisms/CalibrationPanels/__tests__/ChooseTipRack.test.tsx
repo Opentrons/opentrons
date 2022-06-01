@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { mountWithStore } from '@opentrons/components'
+import { usePipettesQuery } from '@opentrons/react-api-client'
 
 import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
 import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
@@ -12,13 +13,13 @@ import {
   getTipLengthCalibrations,
 } from '../../../redux/calibration'
 import { getCustomTipRackDefinitions } from '../../../redux/custom-labware'
-import { getAttachedPipettes } from '../../../redux/pipettes'
 
 import { ChooseTipRack } from '../ChooseTipRack'
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
 import type { ReactWrapper } from 'enzyme'
 import type { WrapperWithStore } from '@opentrons/components'
 
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../redux/pipettes/selectors')
 jest.mock('../../../redux/calibration/')
 jest.mock('../../../redux/custom-labware/selectors')
@@ -40,8 +41,8 @@ const mockGetTipLengthCalibrations = getTipLengthCalibrations as jest.MockedFunc
   typeof getTipLengthCalibrations
 >
 
-const mockGetAttachedPipettes = getAttachedPipettes as jest.MockedFunction<
-  typeof getAttachedPipettes
+const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
+  typeof usePipettesQuery
 >
 
 const mockGetCustomTipRackDefinitions = getCustomTipRackDefinitions as jest.MockedFunction<
@@ -61,7 +62,9 @@ describe('ChooseTipRack', () => {
     mockGetCalibrationForPipette.mockReturnValue(null)
     mockGetTipLengthForPipetteAndTiprack.mockReturnValue(null)
     mockGetTipLengthCalibrations.mockReturnValue([])
-    mockGetAttachedPipettes.mockReturnValue(mockAttachedPipettes)
+    mockUsePipettesQuery.mockReturnValue({
+      data: mockAttachedPipettes,
+    } as any)
     mockGetCustomTipRackDefinitions.mockReturnValue([
       mockTipRackDefinition,
       mockDeckCalTipRack.definition,
