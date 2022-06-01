@@ -6,10 +6,7 @@ import {
   lightGrey,
   medGrey,
 } from '@opentrons/components/src/ui-style-constants/colors'
-
-interface ButtonGroupProps {
-  children: React.ReactNode
-}
+import { PrimaryButton } from '../../atoms/buttons'
 
 const BUTTON_GROUP_STYLES = css`
   border: 1px ${medGrey} solid;
@@ -20,8 +17,6 @@ const BUTTON_GROUP_STYLES = css`
     height: 28px;
     width: auto;
     border: none;
-    background-color: inherit;
-    color: ${COLORS.black};
     font-weight: 400;
     font-size: 11px;
     line-height: 14px;
@@ -34,10 +29,11 @@ const BUTTON_GROUP_STYLES = css`
 
     &:hover {
       background-color: ${lightGrey};
+      color: ${COLORS.black};
       box-shadow: 0 0 0;
     }
 
-    &:active {
+    &.active {
       background-color: ${blue};
       color: ${COLORS.white};
     }
@@ -57,6 +53,42 @@ const BUTTON_GROUP_STYLES = css`
   }
 `
 
-export function ButtonGroup(props: ButtonGroupProps): JSX.Element {
-  return <Flex css={BUTTON_GROUP_STYLES}>{props.children}</Flex>
+const ACTIVE_STYLE = css`
+  background-color: ${blue};
+  color: ${COLORS.white};
+  pointer-events: none;
+`
+
+const DEFAULT_STYLE = css`
+  background-color: ${COLORS.white};
+  color: ${COLORS.black};
+`
+
+export const useToggleGroup = (
+  left: string,
+  right: string
+): [string, React.ReactNode] => {
+  const [selectedValue, setSelectedValue] = React.useState<
+    typeof left | typeof right
+  >(left)
+
+  return [
+    selectedValue,
+    <Flex css={BUTTON_GROUP_STYLES} key="toggleGroup">
+      <PrimaryButton
+        css={selectedValue === left ? ACTIVE_STYLE : DEFAULT_STYLE}
+        key={left}
+        onClick={() => setSelectedValue(left)}
+      >
+        {left}
+      </PrimaryButton>
+      <PrimaryButton
+        css={selectedValue === right ? ACTIVE_STYLE : DEFAULT_STYLE}
+        key={right}
+        onClick={() => setSelectedValue(right)}
+      >
+        {right}
+      </PrimaryButton>
+    </Flex>,
+  ]
 }
