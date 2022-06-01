@@ -7,31 +7,30 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { useIsRobotBusy } from '../../../hooks'
 
-import { FactoryReset } from '../FactoryReset'
+import { DisplayRobotName } from '../DisplayRobotName'
 
 const mockUpdateIsEXpanded = jest.fn()
-const mockUpdateRobotStatus = jest.fn()
-
-jest.mock('../../../hooks')
-jest.mock('../../../../ProtocolUpload/hooks')
-
+const mockUpdateIsRobotBusy = jest.fn()
 const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
   typeof useIsRobotBusy
 >
 
+jest.mock('../../../hooks')
+
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <FactoryReset
+      <DisplayRobotName
+        robotName="otie"
         updateIsExpanded={mockUpdateIsEXpanded}
-        updateIsRobotBusy={mockUpdateRobotStatus}
+        updateIsRobotBusy={mockUpdateIsRobotBusy}
       />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
 }
 
-describe('RobotSettings FactoryReset', () => {
+describe('RobotSettings DisplayRobotName', () => {
   beforeEach(() => {
     mockUseIsRobotBusy.mockReturnValue(false)
   })
@@ -42,31 +41,24 @@ describe('RobotSettings FactoryReset', () => {
 
   it('should render title, description, and butoon', () => {
     const [{ getByText, getByRole }] = render()
-    getByText('Factory reset')
-    getByText(
-      'Reset labware calibration, boot scripts, and/or robot calibration to factory settings.'
-    )
-    expect(
-      getByRole('button', { name: 'Choose reset settings' })
-    ).toBeInTheDocument()
+    getByText('About')
+    getByText('Robot Name')
+    getByText('otie')
+    getByRole('button', { name: 'Rename robot' })
   })
 
   it('should render a slideout when clicking the button', () => {
     const [{ getByRole }] = render()
-    const factoryResetChooseButton = getByRole('button', {
-      name: 'Choose reset settings',
-    })
-    fireEvent.click(factoryResetChooseButton)
+    const button = getByRole('button', { name: 'Rename robot' })
+    fireEvent.click(button)
     expect(mockUpdateIsEXpanded).toHaveBeenCalled()
   })
 
   it('should call update robot status if a robot is busy', () => {
     mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByRole }] = render()
-    const button = getByRole('button', {
-      name: 'Choose reset settings',
-    })
+    const button = getByRole('button', { name: 'Rename robot' })
     fireEvent.click(button)
-    expect(mockUpdateRobotStatus).toHaveBeenCalled()
+    expect(mockUpdateIsRobotBusy).toHaveBeenCalled()
   })
 })

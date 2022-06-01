@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   ALIGN_CENTER,
@@ -9,22 +10,35 @@ import {
   SPACING_AUTO,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
+import { useIsRobotBusy } from '../../hooks'
 
-interface AboutRobotNameProps {
+interface DisplayRobotNameProps {
   robotName: string
   updateIsExpanded: (
     isExpanded: boolean,
     type: 'factoryReset' | 'renameRobot'
   ) => void
+  updateIsRobotBusy: (isRobotBusy: boolean) => void
 }
 
-export function AboutRobotName({
+export function DisplayRobotName({
   robotName,
   updateIsExpanded,
-}: AboutRobotNameProps): JSX.Element {
+  updateIsRobotBusy,
+}: DisplayRobotNameProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const isBusy = useIsRobotBusy()
+
+  const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
+    if (isBusy) {
+      updateIsRobotBusy(true)
+    } else {
+      updateIsExpanded(true, 'renameRobot')
+    }
+  }
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -48,7 +62,7 @@ export function AboutRobotName({
       </Box>
       <TertiaryButton
         marginLeft={SPACING_AUTO}
-        onClick={() => updateIsExpanded(true, 'renameRobot')}
+        onClick={handleClick}
         id="RobotSettings_RenameRobot"
       >
         {t('robot_rename_button')}

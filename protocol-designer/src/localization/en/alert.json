@@ -121,6 +121,9 @@
       "HEATER_SHAKER_IS_SHAKING": {
         "title": "Heater-Shaker is shaking",
         "body": "A pipette cannot interact with labware on the Heater-Shaker Module while it is shaking."
+      },
+      "TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER": {
+        "body": "The Heater-Shaker labware latch will collide with labware over 53 mm. Move labware to a different slot."
       }
     },
     "warning": {
