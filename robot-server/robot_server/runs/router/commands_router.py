@@ -170,11 +170,12 @@ async def create_run_command(
         protocol_engine: The run's `ProtocolEngine` on which the new
             command will be enqueued.
     """
+    # TODO(mc, 2022-05-26): increment the HTTP API version so that default
+    # behavior is to pass through `command_source` without overriding it
+    command_source = request_body.data.source or pe_commands.CommandSource.SETUP
+    command_create = request_body.data.copy(update={"source": command_source})
+    
     try:
-        # TODO(mc, 2022-05-26): increment the HTTP API version so that default
-        # behavior is to pass through `command_source` without overriding it
-        command_source = request_body.data.source or pe_commands.CommandSource.SETUP
-        command_create = request_body.data.copy(update={"source": command_source})
         command = protocol_engine.add_command(command_create)
 
     except pe_errors.SetupCommandNotAllowedError as e:
