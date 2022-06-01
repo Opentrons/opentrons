@@ -92,16 +92,13 @@ const spinnerCommandBlockList: SessionCommandString[] = [
 const attachedPipetteCalPresent: (
   pipettes: AttachedPipettesByMount,
   pipetteCalibrations: PipetteCalibrationsByMount
-) => boolean = (pipettes, pipetteCalibrations) => {
-  for (const m of Pipettes.PIPETTE_MOUNTS) {
-    if (pipettes[m]) {
-      if (!pipetteCalibrations[m].offset || !pipetteCalibrations[m].tipLength) {
-        return false
-      }
-    }
-  }
-  return true
-}
+) => boolean = (pipettes, pipetteCalibrations) =>
+  Pipettes.PIPETTE_MOUNTS.some(
+    mount =>
+      pipettes[mount] != null &&
+      (!pipetteCalibrations[mount].offset ||
+        !pipetteCalibrations[mount].tipLength)
+  )
 
 export function RobotSettingsCalibration({
   robotName,
