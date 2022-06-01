@@ -5,6 +5,7 @@ import {
   thermocyclerPipetteCollision,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestWithLatchOpen,
 } from '../../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { AspirateParams } from '@opentrons/shared-data/protocol/types/schemaV3'
@@ -89,6 +90,14 @@ export const aspirate: CommandCreator<AspirateParams> = (
     )
   ) {
     errors.push(errorCreators.heaterShakerIsShaking())
+  }
+  if (
+    getIsHeaterShakerEastWestWithLatchOpen(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerEastWestWithLatchOpen())
   }
 
   if (errors.length === 0 && pipetteSpec && pipetteSpec.maxVolume < volume) {
