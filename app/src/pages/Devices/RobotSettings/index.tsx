@@ -47,7 +47,12 @@ export function RobotSettings(): JSX.Element | null {
         updateRobotStatus={updateRobotStatus}
       />
     ),
-    networking: () => <RobotSettingsNetworking robotName={robotName} />,
+    networking: () => (
+      <RobotSettingsNetworking
+        robotName={robotName}
+        updateRobotStatus={updateRobotStatus}
+      />
+    ),
     advanced: () => (
       <RobotSettingsAdvanced
         robotName={robotName}
