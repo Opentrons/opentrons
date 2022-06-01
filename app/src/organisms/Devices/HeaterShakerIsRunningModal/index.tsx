@@ -17,7 +17,7 @@ import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { HeaterShakerModule } from '../../../redux/modules/types'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
 
-import type { HeaterShakerStopShakeCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface HeaterShakerIsRunningModalProps {
   closeModal: () => void
@@ -45,8 +45,8 @@ export const HeaterShakerIsRunningModal = (
     </Flex>
   )
 
-  const stopShakeCommand: HeaterShakerStopShakeCreateCommand = {
-    commandType: 'heaterShakerModule/stopShake',
+  const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
+    commandType: 'heaterShaker/deactivateShaker',
     params: {
       moduleId: module.id,
     },

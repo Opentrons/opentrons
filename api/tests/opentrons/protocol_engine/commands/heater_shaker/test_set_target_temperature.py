@@ -10,22 +10,22 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
-from opentrons.protocol_engine.commands.heater_shaker.start_set_target_temperature import (  # noqa: E501
-    StartSetTargetTemperatureImpl,
+from opentrons.protocol_engine.commands.heater_shaker.set_target_temperature import (  # noqa: E501
+    SetTargetTemperatureImpl,
 )
 
 
-async def test_start_set_target_temperature(
+async def test_set_target_temperature(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
 ) -> None:
     """It should be able to set the specified module's target temperature."""
-    subject = StartSetTargetTemperatureImpl(state_view=state_view, equipment=equipment)
+    subject = SetTargetTemperatureImpl(state_view=state_view, equipment=equipment)
 
-    data = heater_shaker.StartSetTargetTemperatureParams(
+    data = heater_shaker.SetTargetTemperatureParams(
         moduleId="input-heater-shaker-id",
-        temperature=12.3,
+        celsius=12.3,
     )
 
     hs_module_substate = decoy.mock(cls=HeaterShakerModuleSubState)
@@ -53,4 +53,4 @@ async def test_start_set_target_temperature(
 
     result = await subject.execute(data)
     decoy.verify(await hs_hardware.start_set_temperature(celsius=45.6), times=1)
-    assert result == heater_shaker.StartSetTargetTemperatureResult()
+    assert result == heater_shaker.SetTargetTemperatureResult()

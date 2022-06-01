@@ -16,12 +16,12 @@ StatelessCommandCreate = Union[
     # TODO(mc, 2022-03-18): implement these commands
     # commands.thermocycler.OpenLidCreate,
     # commands.thermocycler.CloseLidCreate,
-    commands.heater_shaker.StartSetTargetTemperatureCreate,
-    commands.heater_shaker.SetTargetShakeSpeedCreate,
+    commands.heater_shaker.SetTargetTemperatureCreate,
+    commands.heater_shaker.SetAndWaitForShakeSpeedCreate,
     commands.heater_shaker.DeactivateHeaterCreate,
-    commands.heater_shaker.StopShakeCreate,
-    commands.heater_shaker.OpenLatchCreate,
-    commands.heater_shaker.CloseLatchCreate,
+    commands.heater_shaker.DeactivateShakerCreate,
+    commands.heater_shaker.OpenLabwareLatchCreate,
+    commands.heater_shaker.CloseLabwareLatchCreate,
 ]
 
 StatelessCommand = Union[
@@ -38,10 +38,10 @@ StatelessCommand = Union[
     # TODO(mc, 2022-03-18): implement these commands
     # commands.thermocycler.OpenLid,
     # commands.thermocycler.CloseLid,
-    commands.heater_shaker.StartSetTargetTemperature,
-    commands.heater_shaker.SetTargetShakeSpeed,
+    commands.heater_shaker.SetTargetTemperature,
+    commands.heater_shaker.SetAndWaitForShakeSpeed,
     commands.heater_shaker.DeactivateHeater,
-    commands.heater_shaker.StopShake,
-    commands.heater_shaker.OpenLatch,
-    commands.heater_shaker.CloseLatch,
+    commands.heater_shaker.DeactivateShaker,
+    commands.heater_shaker.OpenLabwareLatch,
+    commands.heater_shaker.CloseLabwareLatch,
 ]
