@@ -20,6 +20,7 @@ describe('DeckCalibrationModal', () => {
     const { getByText } = render(props)
     getByText('See How Robot Calibration Works')
   })
+
   it('should render the correct body', () => {
     const { getByRole, getByText } = render(props)
     getByText(
@@ -27,26 +28,36 @@ describe('DeckCalibrationModal', () => {
     )
     expect(getByRole('heading', { name: 'Deck Calibration' })).toBeTruthy()
     getByText(
-      'This measures the deck X and Y values relative to the gantry. This calibration is the foundation for Tip Length and Pipette Offset calibrations. Calibrate your deck during new robot setup. Redo Deck calibration if you relocate your robot.'
+      'This measures the deck X and Y values relative to the gantry. Deck Calibration is the foundation for Tip Length Calibration and Pipette Offset Calibration.'
     )
+    getByText('Perform Deck Calibration during new robot setup.')
+    getByText('Redo Deck Calibration if you relocate your robot.')
     expect(
       getByRole('heading', { name: 'Tip Length Calibration' })
     ).toBeTruthy()
     getByText(
-      'This measures the Z distance between the bottom of the tip and the pipette’s nozzle. Calibrate tip length for each new tip type used on a pipette. If you redo the tip length calibration for the tip you used to calibrate a pipette, you will also have to redo that pipette offset calibration.'
+      'This measures the Z distance between the bottom of the tip and the pipette’s nozzle. If you redo the tip length calibration for the tip you used to calibrate a pipette, you will also have to redo that Pipette Offset Calibration.'
+    )
+    getByText(
+      'Perform Tip Length Calibration for each new tip type used on a pipette.'
     )
     expect(
       getByRole('heading', { name: 'Pipette Offset Calibration' })
     ).toBeTruthy()
     getByText(
-      'This measures a pipette’s X, Y and Z values in relation to the pipette mount and the deck. Pipette offset calibration relies on Deck calibration and Tip Length calibration. Perform Pipette Offset calibration the first time you attach it to a new mount.'
+      'This measures a pipette’s X, Y and Z values in relation to the pipette mount and the deck. Pipette Offset Calibration relies on Deck Calibration and Tip Length Calibration.'
     )
-    getByText('Redo Pipette Offset calibration after:')
-    getByText('Performing Deck calibration')
     getByText(
-      'Redoing Tip Length calibration for the tip you used to calibration pipette'
+      'Perform Pipette Offset calibration the first time you attach a pipette to a new mount.'
+    )
+    getByText(
+      'Redo Pipette Offset Calibration after performing Deck Calibration.'
+    )
+    getByText(
+      'Redo Pipette Offset Calibration after performing Tip Length Calibration for the tip you used to calibrate the pipette.'
     )
   })
+
   it('should render a link to the learn more page', () => {
     const { getByRole } = render(props)
     expect(
@@ -57,6 +68,7 @@ describe('DeckCalibrationModal', () => {
       'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
     )
   })
+
   it('should call onCloseClick when the close button is pressed', () => {
     const { getByRole } = render(props)
     expect(props.onCloseClick).not.toHaveBeenCalled()
