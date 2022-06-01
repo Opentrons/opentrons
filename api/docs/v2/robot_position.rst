@@ -241,7 +241,7 @@ The OT-2's gantry usually moves as fast as it can given its construction: 400 mm
         
 .. warning::
 
-The default of 400 mm/s was chosen because it is the maximum speed Opentrons knows will work with the gantry. Your specific robot may be able to move faster, but you shouldn't increase this value above 400 unless instructed by Opentrons Support.
+	The default of 400 mm/s was chosen because it is the maximum speed Opentrons knows will work with the gantry. Your specific robot may be able to move faster, but you shouldn't increase this value above 400 unless instructed by Opentrons Support.
 
 
 .. versionadded:: 2.0

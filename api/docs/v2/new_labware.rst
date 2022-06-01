@@ -252,7 +252,7 @@ Use :py:meth:`.Well.length` to get the length of a given well in mm. Length is d
 
 Width
 ^^^^^
-Use :py:meth:`.Well.width` to get the width of a given well in mm. Width is defined as the distance along the robot's y-axis (front to back). This method only works with rectangular wells. If the well is not rectangular, the value returned will be ``None``. Use diameter (see above) for circular wells.
+Use :py:meth:`.Well.width` to get the width of a given well in mm. Width is defined as the distance along the y-axis (front to back). This method only works with rectangular wells. If the well is not rectangular, the value returned will be ``None``. Use diameter (see above) for circular wells.
 
 
 .. code-block:: python
@@ -269,11 +269,3 @@ Use :py:meth:`.Well.width` to get the width of a given well in mm. Width is defi
 
 .. versionadded:: 2.9
 
-
-.. _using_lpc:
-
-****************************
-Using Labware Position Check
-****************************
-
-TK when testable in 5.1
