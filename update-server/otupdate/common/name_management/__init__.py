@@ -47,7 +47,7 @@ import json
 
 from aiohttp import web
 
-from .name_manager import NameManager, build_and_insert
+from .name_manager import NameManager, build_name_manager
 from .static_hostname import set_up_static_hostname
 
 
@@ -114,7 +114,7 @@ async def get_name_endpoint(request: web.Request) -> web.Response:
 
 __all__ = [
     "NameManager",
-    "build_and_insert",
+    "build_name_manager",
     "set_up_static_hostname",
     "get_name_endpoint",
     "set_name_endpoint",

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager
 from logging import getLogger
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 
 from aiohttp import web
 
@@ -15,21 +16,7 @@ _NAME_MANAGER_VARNAME = APP_VARIABLE_PREFIX + "name_manager"
 _log = getLogger(__name__)
 
 
-class NameManager:
-    def __init__(self, avahi_client: AvahiClient) -> None:
-        """For internal use by this class only."""
-        self._avahi_client = avahi_client
-
-    @classmethod
-    @asynccontextmanager
-    async def build(
-        cls, avahi_client: AvahiClient
-    ) -> AsyncGenerator[NameManager, None]:
-        name_manager = NameManager(avahi_client)
-        async with avahi_client.collision_callback(name_manager._on_avahi_collision):
-            await avahi_client.start_advertising(service_name=name_manager.get_name())
-            yield name_manager
-
+class NameManager(ABC):
     @classmethod
     def from_request(cls, request: web.Request) -> NameManager:
         return cls.from_app(request.app)
@@ -41,6 +28,33 @@ class NameManager:
             name_manager, NameManager
         ), f"Unexpected type {type(name_manager)}. Incorrect Application setup?"
         return name_manager
+
+    def install_on_app(self, app: web.Application) -> None:
+        app[_NAME_MANAGER_VARNAME] = self
+
+    @abstractmethod
+    async def set_name(self, new_name: str) -> str:
+        pass
+
+    @abstractmethod
+    def get_name(self) -> str:
+        pass
+
+
+class RealNameManager(NameManager):
+    def __init__(self, avahi_client: AvahiClient) -> None:
+        """For internal use by this class only."""
+        self._avahi_client = avahi_client
+
+    @classmethod
+    @asynccontextmanager
+    async def build(
+        cls, avahi_client: AvahiClient
+    ) -> AsyncGenerator[NameManager, None]:
+        name_manager = cls(avahi_client)
+        async with avahi_client.collision_callback(name_manager._on_avahi_collision):
+            await avahi_client.start_advertising(service_name=name_manager.get_name())
+            yield name_manager
 
     async def set_name(self, new_name: str) -> str:
         """See `set_name_endpoint()`."""
@@ -69,9 +83,28 @@ class NameManager:
         await self.set_name(new_name=alternative_name)
 
 
+class FakeNameManager(NameManager):
+    def __init__(self, name_override: str) -> None:
+        self._name_override = name_override
+
+    async def set_name(self, new_name: str) -> str:
+        raise NotImplementedError(
+            "Can't change the name when it's been overridden for testing."
+        )
+
+    def get_name(self) -> str:
+        return self._name_override
+
+
 @asynccontextmanager
-async def build_and_insert(app: web.Application) -> AsyncGenerator[None, None]:
-    avahi_client = await AvahiClient.connect()
-    async with NameManager.build(avahi_client=avahi_client) as name_manager:
-        app[_NAME_MANAGER_VARNAME] = name_manager
-        yield
+async def build_name_manager(
+    name_override: Optional[str],
+) -> AsyncGenerator[NameManager, None]:
+    if name_override is None:
+        avahi_client = await AvahiClient.connect()
+        async with RealNameManager.build(
+            avahi_client=avahi_client
+        ) as real_name_manager:
+            yield real_name_manager
+    else:
+        yield FakeNameManager(name_override=name_override)

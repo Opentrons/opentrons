@@ -55,40 +55,55 @@ def get_app(
         system_version_file = OE_BUILTIN_VERSION_FILE
 
     version = get_version_dict(system_version_file)
+    boot_id = boot_id_override or control.get_boot_id()
     config_obj = config.load(config_file_override)
 
     app = web.Application(middlewares=[log_error_middleware])
-    name = name_override or name_management.get_pretty_hostname()
-    boot_id = boot_id_override or control.get_boot_id()
-    app[config.CONFIG_VARNAME] = config_obj
-    app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
-    app[constants.DEVICE_BOOT_ID_NAME] = boot_id
-    # FIX BEFORE MERGE
-    # app[constants.DEVICE_NAME_VARNAME] = name
 
-    LOG.info(
-        "Setup: "
-        + "\n\t".join(
-            [
-                f"Device name: {name}",
-                "Buildroot version:         "
-                f'{version.get("buildroot_version", "unknown")}',
-                "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
-                "API version:               "
-                f'{version.get("opentrons_api_version", "unknown")}',
-                "\t(from git sha      "
-                f'{version.get("opentrons_api_sha", "unknown")}',
-                "Update server version:     "
-                f'{version.get("update_server_version", "unknown")}',
-                "\t(from git sha      "
-                f'{version.get("update_server_sha", "unknown")}',
-            ]
-        )
-    )
-    rfs = RootFSInterface()
-    part_mgr = PartitionManager()
-    updater = Updater(rfs, part_mgr)
-    app[FILE_ACTIONS_VARNAME] = updater
+    async def set_up_and_tear_down(app: web.Application) -> AsyncGenerator[None, None]:
+        app[config.CONFIG_VARNAME] = config_obj
+        app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
+        app[constants.DEVICE_BOOT_ID_NAME] = boot_id
+
+        rfs = RootFSInterface()
+        part_mgr = PartitionManager()
+        updater = Updater(rfs, part_mgr)
+        app[FILE_ACTIONS_VARNAME] = updater
+
+        async with name_management.build_name_manager(
+            name_override=name_override
+        ) as name_manager:
+            name_manager.install_on_app(app)
+            initial_name = name_manager.get_name()
+
+            LOG.info(
+                "Setup: "
+                + "\n\t".join(
+                    [
+                        f"Device name: {initial_name}",
+                        "Buildroot version:         "
+                        f'{version.get("buildroot_version", "unknown")}',
+                        "\t(from git sha      "
+                        f'{version.get("buildroot_sha", "unknown")}',
+                        "API version:               "
+                        f'{version.get("opentrons_api_version", "unknown")}',
+                        "\t(from git sha      "
+                        f'{version.get("opentrons_api_sha", "unknown")}',
+                        "Update server version:     "
+                        f'{version.get("update_server_version", "unknown")}',
+                        "\t(from git sha      "
+                        f'{version.get("update_server_sha", "unknown")}',
+                    ]
+                )
+            )
+
+            LOG.info(f"Notifying {systemd.SOURCE} that service is up.")
+            systemd.notify_up()
+
+            yield
+
+    app.cleanup_ctx.append(set_up_and_tear_down)
+
     app.router.add_routes(
         [
             web.get(
@@ -109,6 +124,7 @@ def get_app(
             web.get("/server/name", name_management.get_name_endpoint),
         ]
     )
+
     return app
 
 
