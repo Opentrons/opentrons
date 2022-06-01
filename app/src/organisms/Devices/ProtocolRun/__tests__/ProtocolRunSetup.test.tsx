@@ -30,6 +30,7 @@ jest.mock('../../hooks')
 jest.mock('../SetupLabware')
 jest.mock('../SetupRobotCalibration')
 jest.mock('../SetupModules')
+jest.mock('../../../../redux/config')
 
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
