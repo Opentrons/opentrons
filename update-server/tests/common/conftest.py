@@ -23,7 +23,7 @@ one_up = os.path.abspath(os.path.join(__file__, "../../"))
 
 @pytest.fixture(params=[openembedded, buildroot])
 async def test_cli(
-    aiohttp_client, loop, otupdate_config, request, version_file_path
+    aiohttp_client, otupdate_config, request, version_file_path
 ) -> Tuple[TestClient, str]:
     """
     Build an app using dummy versions, then build a test client and return it
@@ -34,9 +34,8 @@ async def test_cli(
         config_file_override=otupdate_config,
         name_override="opentrons-test",
         boot_id_override="dummy-boot-id-abc123",
-        loop=loop,
     )
-    client = await loop.create_task(aiohttp_client(app))
+    client = await aiohttp_client(app)
     return client, cli_client_pkg.__name__
 
 

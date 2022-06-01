@@ -43,7 +43,6 @@ def get_app(
     config_file_override: Optional[str] = None,
     name_override: Optional[str] = None,
     boot_id_override: Optional[str] = None,
-    loop: Optional[asyncio.AbstractEventLoop] = None,  # TODO: Remove?
 ) -> web.Application:
     """Build and return the aiohttp.web.Application that runs the server
 

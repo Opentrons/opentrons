@@ -10,9 +10,7 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 
 
 @pytest.fixture
-async def test_cli(
-    aiohttp_client, loop, otupdate_config, monkeypatch, version_file_path
-):
+async def test_cli(aiohttp_client, otupdate_config, monkeypatch, version_file_path):
     """
     Build an app using dummy versions, then build a test client and return it
     """
@@ -21,9 +19,8 @@ async def test_cli(
         config_file_override=otupdate_config,
         name_override="opentrons-test",
         boot_id_override="dummy-boot-id-abc123",
-        loop=loop,
     )
-    client = await loop.create_task(aiohttp_client(app))
+    client = await aiohttp_client(app)
     return client
 
 

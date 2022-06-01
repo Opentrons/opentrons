@@ -49,17 +49,12 @@ def get_app(
     config_file_override: Optional[str] = None,
     name_override: Optional[str] = None,
     boot_id_override: Optional[str] = None,
-    loop: Optional[asyncio.AbstractEventLoop] = None,
 ) -> web.Application:
     """Build and return the aiohttp.web.Application that runs the server"""
     if not system_version_file:
         system_version_file = OE_BUILTIN_VERSION_FILE
 
     version = get_version_dict(system_version_file)
-
-    if not loop:
-        loop = asyncio.get_event_loop()
-
     config_obj = config.load(config_file_override)
 
     app = web.Application(middlewares=[log_error_middleware])
