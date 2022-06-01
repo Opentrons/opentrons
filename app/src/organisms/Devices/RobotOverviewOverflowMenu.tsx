@@ -15,6 +15,8 @@ import {
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { checkShellUpdate } from '../../redux/shell'
 import { restartRobot } from '../../redux/robot-admin'
+import { UpdateBuildroot } from '../../pages/Robots/RobotSettings/UpdateBuildroot'
+import { UNREACHABLE } from '../../redux/discovery'
 import { home, ROBOT } from '../../redux/robot-controls'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Portal } from '../../App/portal'
@@ -23,7 +25,6 @@ import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { SoftwareUpdateModal } from './RobotSettings/AdvancedTab/SoftwareUpdateModal'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { Dispatch, State } from '../../redux/types'
@@ -73,11 +74,12 @@ export const RobotOverviewOverflowMenu = (
 
   useInterval(checkAppUpdate, UPDATE_RECHECK_DELAY_MS)
 
-  const handleLaunchModal: React.MouseEventHandler = e => {
+  const handleClickUpdateBuildroot: React.MouseEventHandler = e => {
     e.preventDefault()
     e.stopPropagation()
     setShowSoftwareUpdateModal(true)
   }
+
   const { autoUpdateAction } = useSelector((state: State) => {
     return getBuildrootUpdateDisplayInfo(state, robot.name)
   })
@@ -90,11 +92,13 @@ export const RobotOverviewOverflowMenu = (
         e.preventDefault()
       }}
     >
-      {showSoftwareUpdateModal ? (
+      {showSoftwareUpdateModal &&
+      robot != null &&
+      robot.status !== UNREACHABLE ? (
         <Portal level="top">
-          <SoftwareUpdateModal
-            robotName={robot.name}
-            closeModal={() => setShowSoftwareUpdateModal(false)}
+          <UpdateBuildroot
+            robot={robot}
+            close={() => setShowSoftwareUpdateModal(false)}
           />
         </Portal>
       ) : null}
@@ -114,7 +118,7 @@ export const RobotOverviewOverflowMenu = (
           {autoUpdateAction === 'upgrade' ? (
             <MenuItem
               disabled={buttonDisabledReason}
-              onClick={handleLaunchModal}
+              onClick={handleClickUpdateBuildroot}
               data-testid={`RobotOverviewOverflowMenu_updateSoftware_${robot.name}`}
             >
               {t('update_robot_software')}
