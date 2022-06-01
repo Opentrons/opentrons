@@ -3,17 +3,18 @@ import { renderWithProviders } from '@opentrons/components'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import * as Buildroot from '../../../redux/buildroot'
-import { SoftwareUpdateModal } from '../../Devices/RobotSettings/AdvancedTab/SoftwareUpdateModal'
+import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import { UpdateBuildroot } from '../../../pages/Robots/RobotSettings/UpdateBuildroot'
 import { UpdateRobotBanner } from '..'
 
-jest.mock('../../Devices/RobotSettings/AdvancedTab/SoftwareUpdateModal')
+jest.mock('../../../pages/Robots/RobotSettings/UpdateBuildroot')
 jest.mock('../../../redux/buildroot')
 
 const getBuildrootUpdateDisplayInfo = Buildroot.getBuildrootUpdateDisplayInfo as jest.MockedFunction<
   typeof Buildroot.getBuildrootUpdateDisplayInfo
 >
-const mockSoftwareUpdateModal = SoftwareUpdateModal as jest.MockedFunction<
-  typeof SoftwareUpdateModal
+const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
+  typeof UpdateBuildroot
 >
 const render = (props: React.ComponentProps<typeof UpdateRobotBanner>) => {
   return renderWithProviders(<UpdateRobotBanner {...props} />, {
@@ -26,11 +27,9 @@ describe('UpdateRobotBanner', () => {
 
   beforeEach(() => {
     props = {
-      robotName: 'otie',
+      robot: mockConnectableRobot,
     }
-    mockSoftwareUpdateModal.mockReturnValue(
-      <div>mock software update modal</div>
-    )
+    mockUpdateBuildroot.mockReturnValue(<div>mockUpdateBuildroot</div>)
     getBuildrootUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: 'upgrade',
       autoUpdateDisabledReason: null,
@@ -47,7 +46,7 @@ describe('UpdateRobotBanner', () => {
     getByText('A software update is available for this robot.')
     const btn = getByRole('button', { name: 'View update' })
     fireEvent.click(btn)
-    getByText('mock software update modal')
+    getByText('mockUpdateBuildroot')
   })
 
   it('should render nothing if update is not available when autoUpdateAction returns reinstall', () => {

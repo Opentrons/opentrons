@@ -57,7 +57,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
         id={`RobotCard_${name}_robotImage`}
       />
       <Box padding={SPACING.spacing3} width="100%">
-        <UpdateRobotBanner robotName={name} marginBottom={SPACING.spacing3} />
+        <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing3} />
         {robot.status !== UNREACHABLE ? (
           <RobotStatusBanner name={name} local={local} />
         ) : null}
