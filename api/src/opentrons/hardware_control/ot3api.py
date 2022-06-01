@@ -79,6 +79,7 @@ from .motion_utilities import (
     offset_for_mount,
     deck_from_machine,
     machine_from_deck,
+    machine_vector_from_deck_vector,
 )
 
 from opentrons_shared_data.pipette.dev_types import (
@@ -1266,26 +1267,32 @@ class OT3API(
                 "Probing must be done with a gantry axis or the mount of the sensing"
                 " tool"
             )
+
         here = await self.gantry_position(mount)
-        self._log.info(f"probe start: at {here}")
         origin_pos = moving_axis.of_point(here)
         if origin_pos < target_pos:
             pass_start = target_pos - pass_settings.prep_distance_mm
             pass_distance = (
-                target_pos - pass_start + pass_settings.max_overrun_distance_mm
+                pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
             )
         else:
+
             pass_start = target_pos + pass_settings.prep_distance_mm
-            pass_distance = (
-                target_pos - pass_start - pass_settings.max_overrun_distance_mm
+            pass_distance = -1.0 * (
+                pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
             )
+        machine_pass_distance = moving_axis.of_point(
+            machine_vector_from_deck_vector(
+                moving_axis.set_in_point(top_types.Point(0, 0, 0), pass_distance),
+                self._transforms.deck_calibration.attitude,
+            )
+        )
         pass_start_pos = moving_axis.set_in_point(here, pass_start)
         await self.move_to(mount, pass_start_pos)
-        self._log.info("doing probe")
         await self._backend.capacitive_probe(
             mount,
             moving_axis,
-            pass_distance,
+            machine_pass_distance,
             pass_settings.speed_mm_per_s,
         )
         machine_pos = await self._backend.update_position()
@@ -1296,6 +1303,5 @@ class OT3API(
             OT3Axis,
         )
         end_pos = await self.gantry_position(mount)
-        self._log.info(f"position now {end_pos}, moving back to {pass_start_pos}")
         await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos)

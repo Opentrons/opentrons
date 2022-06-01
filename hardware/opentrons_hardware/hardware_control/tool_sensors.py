@@ -2,6 +2,7 @@
 from typing import Union
 from logging import getLogger
 from numpy import float64
+from math import copysign
 from typing_extensions import Literal
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -35,6 +36,9 @@ async def capacitive_probe(
 
     Moves down by the specified distance at the specified speed until the
     capacitive sensor triggers and returns the position afterward.
+
+    The direction is sgn(distance)*sgn(speed), so you can set the direction
+    either by negating speed or negating distance.
     """
     sensor_scheduler = SensorScheduler()
     threshold = await sensor_scheduler.send_threshold(
@@ -50,8 +54,8 @@ async def capacitive_probe(
         raise RuntimeError("Could not set threshold for probe")
     LOG.info(f"starting capacitive probe with threshold {threshold.to_float()}")
     pass_group = create_step(
-        distance={mover: float64(distance)},
-        velocity={mover: float64(speed)},
+        distance={mover: float64(abs(distance))},
+        velocity={mover: float64(speed * copysign(1.0, distance))},
         acceleration={},
         duration=float64(distance / speed),
         present_nodes=[mover],

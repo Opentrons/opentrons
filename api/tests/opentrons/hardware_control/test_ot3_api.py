@@ -112,11 +112,11 @@ async def test_capacitive_probe(
     # previous position is always 0. This is a test of ot3api though and checking
     # that the mock got called correctly and the resulting output was handled
     # correctly, by asking for backend._position afterwards, is good enough.
-    assert res == pytest.approx(4.5)
+    assert res == pytest.approx(1.5)
 
     # This is a negative probe because the current position is the home position
     # which is very large.
-    mock_backend_capacitive_probe.assert_called_once_with(mount, moving, -3, 4)
+    mock_backend_capacitive_probe.assert_called_once_with(mount, moving, 3, 4)
 
     original = moving.set_in_point(here, 0)
     for call in mock_move_to.call_args_list:
@@ -134,26 +134,27 @@ Direction = Union[Literal[0.0], Literal[1.0], Literal[-1.0]]
         # in the fake_settings fixture.
         # The origin is to the left of the target, exactly on
         # the prep point. Prep should not move, and the probe
-        # should be left-to-right (positive)
-        (1, Point(0, 0, 0), 0.0, 1.0),
+        # should be left-to-right (positive in deck coords,
+        # negative in machine coords)
+        (1, Point(0, 0, 0), 0.0, -1.0),
         # The origin is to the left of the target and the left
         # of the prep point. Prep should move left-to-right
-        # (positive), and so should probe.
-        (2, Point(0, 0, 0), 1.0, 1.0),
+        # and so should probe
+        (2, Point(0, 0, 0), 1.0, -1.0),
         # The origin is to the left of the target and the right
         # of the prep point. Prep should move right-to-left
         # (negative) and probe should move left-to-right
-        # (positive)
-        (0.5, Point(0, 0, 0), -1.0, 1.0),
+        (0.5, Point(0, 0, 0), -1.0, -1.0),
         # Origin to the right of target, on prep point. No prep,
-        # negative probe
-        (0, Point(1, 0, 0), 0.0, -1.0),
+        # probe is right-to-left (negative in deck coords,
+        # positive in machine coords)
+        (0, Point(1, 0, 0), 0.0, 1.0),
         # Origin to the right of target and prep point. Negative
-        # prep, negative probe.
-        (-1, Point(1, 0, 0), -1.0, -1.0),
+        # prep, right-to-left probe
+        (-1, Point(1, 0, 0), -1.0, 1.0),
         # Origin to the right of target and the left of prep.
-        # Positive prep, negative probe.
-        (0.5, Point(1, 0, 0), 1.0, -1.0),
+        # Positive prep, right-to-left probe
+        (0.5, Point(1, 0, 0), 1.0, 1.0),
     ],
 )
 async def test_probe_direction(
