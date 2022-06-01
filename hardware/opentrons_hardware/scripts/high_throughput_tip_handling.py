@@ -51,11 +51,6 @@ def prompt_int_input(prompt_name: str) -> int:
         raise InvalidInput(e)
 
 
-def in_green(s: str) -> str:
-    """Return string formatted in red."""
-    return f"\033[92m{str(s)}\033[0m"
-
-
 def output_details(i: int, total_i: int) -> None:
     """Print out test details."""
     print(f"\n\033[95mRound {i}/{total_i}:\033[0m")
