@@ -260,11 +260,6 @@ export function RobotSettingsCalibration({
   const healthCheckButtonDisabled =
     Boolean(buttonDisabledReason) || isPending || checkHealthCheckIsPossible
 
-  console.log('buttonDisabledReason: ', buttonDisabledReason)
-  console.log('Boolean(buttonDisabledReason): ', Boolean(buttonDisabledReason))
-  console.log('isPending: ', isPending)
-  console.log('checkHealthCheckIsPossible: ', checkHealthCheckIsPossible)
-
   const onClickSaveAs: React.MouseEventHandler = e => {
     e.preventDefault()
     doTrackEvent({
