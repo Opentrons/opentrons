@@ -79,7 +79,10 @@ from opentrons_hardware.hardware_control.motion import (
 from opentrons_hardware.hardware_control.types import NodeMap
 from opentrons_hardware.hardware_control.tools import detector, types as ohc_tool_types
 
-from opentrons_hardware.hardware_control.tool_sensors import capacitive_probe
+from opentrons_hardware.hardware_control.tool_sensors import (
+    capacitive_probe,
+    capacitive_pass,
+)
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
@@ -655,3 +658,20 @@ class OT3Controller:
         )
 
         self._position[axis_to_node(moving)] = pos
+
+    async def capacitive_pass(
+        self,
+        mount: OT3Mount,
+        moving: OT3Axis,
+        distance_mm: float,
+        speed_mm_per_s: float,
+    ) -> List[float]:
+        data = await capacitive_pass(
+            self._messenger,
+            sensor_node_for_mount(mount),
+            axis_to_node(moving),
+            distance_mm,
+            speed_mm_per_s,
+        )
+        self._position[axis_to_node(moving)] += distance_mm
+        return data

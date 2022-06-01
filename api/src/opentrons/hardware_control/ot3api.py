@@ -1305,3 +1305,32 @@ class OT3API(
         end_pos = await self.gantry_position(mount)
         await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos)
+
+    async def capacitive_sweep(
+        self,
+        mount: OT3Mount,
+        moving_axis: OT3Axis,
+        begin: top_types.Point,
+        end: top_types.Point,
+        speed_mm_s: float,
+    ) -> List[float]:
+        if moving_axis not in [
+            OT3Axis.X,
+            OT3Axis.Y,
+        ] and moving_axis != OT3Axis.by_mount(mount):
+            raise RuntimeError(
+                "Probing must be done with a gantry axis or the mount of the sensing"
+                " tool"
+            )
+        sweep_distance = moving_axis.of_point(
+            machine_vector_from_deck_vector(
+                end - begin, self._transforms.deck_calibration.attitude
+            )
+        )
+
+        await self.move_to(mount, begin)
+        values = await self._backend.capacitive_pass(
+            mount, moving_axis, sweep_distance, speed_mm_s
+        )
+        await self.move_to(mount, begin)
+        return values
