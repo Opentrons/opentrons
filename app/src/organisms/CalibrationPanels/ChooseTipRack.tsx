@@ -35,7 +35,6 @@ import * as Sessions from '../../redux/sessions'
 import { NeedHelpLink } from './NeedHelpLink'
 import { ChosenTipRackRender } from './ChosenTipRackRender'
 import { getCustomTipRackDefinitions } from '../../redux/custom-labware'
-import { getAttachedPipettes } from '../../redux/pipettes'
 import {
   getCalibrationForPipette,
   getTipLengthCalibrations,
