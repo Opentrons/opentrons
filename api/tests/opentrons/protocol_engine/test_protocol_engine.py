@@ -266,8 +266,7 @@ def test_pause(
     subject.pause()
 
     decoy.verify(
-        state_store.commands.raise_if_not_started(),
-        state_store.commands.raise_if_stop_requested(),
+        state_store.commands.raise_if_pause_not_allowed(),
         action_dispatcher.dispatch(expected_action),
     )
 
@@ -278,7 +277,7 @@ def test_pause_run_not_started(
     subject: ProtocolEngine,
 ) -> None:
     """Should raise an RunNotStartedError error."""
-    decoy.when(state_store.commands.raise_if_not_started()).then_raise(
+    decoy.when(state_store.commands.raise_if_pause_not_allowed()).then_raise(
         RunNotStartedError("Cannot pause a run that was not started.")
     )
 
