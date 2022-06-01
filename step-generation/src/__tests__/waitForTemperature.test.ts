@@ -3,11 +3,7 @@ import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '../constants'
-<<<<<<< HEAD:step-generation/src/__tests__/awaitTemperature.test.ts
-import { waitForTemperature } from '../commandCreators/atomic/awaitTemperature'
-=======
 import { waitForTemperature } from '../commandCreators/atomic/waitForTemperature'
->>>>>>> edge:step-generation/src/__tests__/waitForTemperature.test.ts
 import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,

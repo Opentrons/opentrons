@@ -71,7 +71,7 @@ export function useLatchControls(
     commandType: isLatchClosed
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',
-    params: { moduleId: module.id },
+    params: { moduleId: runId != null ? moduleIdFromRun : module.id },
   }
 
   const toggleLatch = (): void => {
@@ -302,8 +302,7 @@ export function useModuleOverflowMenu(
           module.moduleType === HEATERSHAKER_MODULE_TYPE &&
           module.data.temperatureStatus !== 'idle' &&
           module.data.status !== 'idle'
-            ? () =>
-                handleDeactivationCommand('heaterShaker/deactivateHeater')
+            ? () => handleDeactivationCommand('heaterShaker/deactivateHeater')
             : () => handleSlideoutClick(false),
       },
       {
