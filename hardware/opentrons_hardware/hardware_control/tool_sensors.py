@@ -57,7 +57,7 @@ async def capacitive_probe(
         distance={mover: float64(abs(distance))},
         velocity={mover: float64(speed * copysign(1.0, distance))},
         acceleration={},
-        duration=float64(distance / speed),
+        duration=float64(abs(distance / speed)),
         present_nodes=[mover],
         stop_condition=MoveStopCondition.cap_sensor,
     )

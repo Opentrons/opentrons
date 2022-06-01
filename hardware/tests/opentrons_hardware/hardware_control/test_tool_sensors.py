@@ -96,6 +96,7 @@ async def test_capacitive_probe(
     def move_responder(
         node_id: NodeId, message: MessageDefinition
     ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
+        message.payload.serialize()
         if isinstance(message, ExecuteMoveGroupRequest):
             return [
                 (
