@@ -66,8 +66,7 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
       curryCommandCreator(waitForTemperature, {
         module: args.module,
         temperature: args.targetTemperature,
-        // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10182 merges
-        commandCreatorFnName: 'awaitTemperature',
+        commandCreatorFnName: 'waitForTemperature',
       })
     )
   }
