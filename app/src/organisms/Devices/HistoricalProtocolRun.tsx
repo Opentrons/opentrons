@@ -58,9 +58,9 @@ export function HistoricalProtocolRun(
       duration = formatInterval(run.createdAt, new Date().toString())
     }
   }
-  const protocolKeyInStoredKeys = storedProtocols
-    .map(({ protocolKey }) => protocolKey)
-    .find(key => key === protocolKey)
+  const protocolKeyInStoredKeys = storedProtocols.find(
+    ({ protocolKey: key }) => protocolKey === key
+  )
 
   return (
     <>
@@ -83,49 +83,40 @@ export function HistoricalProtocolRun(
             marginRight={SPACING.spacing3}
           />
         </Box>
+        <StyledText
+          as="p"
+          width="25%"
+          data-testid={`RecentProtocolRuns_Run_${key}`}
+          onClick={() =>
+            history.push(
+              `${robotName}/protocol-runs/${run.id}/protocolRunDetailsTab?`
+            )
+          }
+          css={css`
+            cursor: pointer;
+          `}
+        >
+          {runDisplayName}
+        </StyledText>
         {protocolKeyInStoredKeys != null ? (
-          <>
-            <StyledText
-              as="p"
-              width="25%"
-              data-testid={`RecentProtocolRuns_Run_${key}`}
-              onClick={() =>
-                history.push(
-                  `${robotName}/protocol-runs/${run.id}/protocolRunDetailsTab?`
-                )
-              }
-              css={CLICK_STYLE}
-            >
-              {runDisplayName}
-            </StyledText>
-            <StyledText
-              as="p"
-              width="35%"
-              data-testid={`RecentProtocolRuns_Protocol_${props.key}`}
-              onClick={() => history.push(`/protocols/${protocolKey}`)}
-              css={CLICK_STYLE}
-            >
-              {protocolName}
-            </StyledText>
-          </>
+          <StyledText
+            as="p"
+            width="35%"
+            data-testid={`RecentProtocolRuns_Protocol_${props.key}`}
+            onClick={() => history.push(`/protocols/${protocolKey}`)}
+            css={CLICK_STYLE}
+          >
+            {protocolName}
+          </StyledText>
         ) : (
-          <>
-            <StyledText
-              as="p"
-              width="25%"
-              data-testid={`RecentProtocolRuns_Run_${key}`}
-            >
-              {runDisplayName}
-            </StyledText>
-            <StyledText
-              as="p"
-              width="35%"
-              data-testid={`RecentProtocolRuns_Protocol_${props.key}`}
-              css={{ 'overflow-wrap': 'anywhere' }}
-            >
-              {protocolName}
-            </StyledText>
-          </>
+          <StyledText
+            as="p"
+            width="35%"
+            data-testid={`RecentProtocolRuns_Protocol_${props.key}`}
+            css={{ 'overflow-wrap': 'anywhere' }}
+          >
+            {protocolName}
+          </StyledText>
         )}
         <StyledText
           as="p"
