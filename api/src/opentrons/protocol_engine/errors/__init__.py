@@ -66,7 +66,7 @@ __all__ = [
     "InvalidTargetTemperatureError",
     "InvalidTargetSpeedError",
     "InvalidBlockVolumeError",
+    "RunNotStartedError",
     # error occurrence models
     "ErrorOccurrence",
-    "RunNotStartedError",
 ]
