@@ -14,6 +14,7 @@ from opentrons.hardware_control.modules.types import (
     TemperatureModuleModel as LegacyTemperatureModuleModel,
     MagneticModuleModel as LegacyMagneticModuleModel,
     ThermocyclerModuleModel as LegacyThermocyclerModuleModel,
+    HeaterShakerModuleModel as LegacyHeaterShakerModuleModel,
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.context.protocol_api.protocol_context import (
@@ -175,6 +176,7 @@ __all__ = [
     "LegacyMagneticModuleModel",
     "LegacyTemperatureModuleModel",
     "LegacyThermocyclerModuleModel",
+    "LegacyHeaterShakerModuleModel",
     # legacy typed dicts
     "LegacyLabwareDefinition",
 ]
