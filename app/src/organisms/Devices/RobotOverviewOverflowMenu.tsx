@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -11,15 +11,14 @@ import {
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
-import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { restartRobot } from '../../redux/robot-admin'
 import { home, ROBOT } from '../../redux/robot-controls'
-import { UNREACHABLE } from '../../redux/discovery'
+import { UNREACHABLE, CONNECTABLE, REACHABLE } from '../../redux/discovery'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
-import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
+import { useIsRobotBusy } from './hooks'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { Dispatch } from '../../redux/types'
@@ -39,9 +38,8 @@ export const RobotOverviewOverflowMenu = (
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
-  const currentRunStatus = useCurrentRunStatus()
-  const buttonDisabledReason =
-    currentRunStatus === RUN_STATUS_RUNNING || robot.status === UNREACHABLE
+  const history = useHistory()
+  const isRobotBusy = useIsRobotBusy()
 
   const dispatch = useDispatch<Dispatch>()
 
@@ -65,7 +63,7 @@ export const RobotOverviewOverflowMenu = (
         e.preventDefault()
       }}
     >
-      <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
+      <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} disabled={robot.status === UNREACHABLE}/>
       {showOverflowMenu ? (
         <Flex
           width={'12rem'}
@@ -78,29 +76,27 @@ export const RobotOverviewOverflowMenu = (
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          {/* TODO(sh, 2022-04-19): complete wiring up menu items below and disabled reasons */}
-          <MenuItem disabled={buttonDisabledReason}>
+          <MenuItem disabled={isRobotBusy || robot?.status !== CONNECTABLE}>
             {t('update_robot_software')}
           </MenuItem>
           <MenuItem
             onClick={handleClickRestart}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            disabled={buttonDisabledReason}
+            disabled={isRobotBusy || robot?.status !== CONNECTABLE}
           >
             {t('robot_controls:restart_label')}
           </MenuItem>
           <MenuItem
             onClick={handleClickHomeGantry}
-            disabled={buttonDisabledReason}
+            disabled={isRobotBusy || robot?.status !== CONNECTABLE}
           >
             {t('home_gantry')}
           </MenuItem>
           <Divider marginY={'0'} />
           <MenuItem
-            to={`/devices/${robot.name}/robot-settings`}
-            as={Link}
+            onClick={() => history.push(`/devices/${robot.name}/robot-settings`)}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            disabled={buttonDisabledReason}
+            disabled={robot == null || robot?.status === UNREACHABLE || (robot?.status === REACHABLE && robot?.serverHealthStatus !== 'ok')}
           >
             {t('robot_settings')}
           </MenuItem>

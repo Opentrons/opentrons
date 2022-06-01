@@ -8,7 +8,7 @@ import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { useLights, useRobot, useIsRobotViewable } from '../hooks'
+import { useLights, useRobot } from '../hooks'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 import { RobotOverview } from '../RobotOverview'
@@ -25,9 +25,6 @@ const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
 
 const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
-  typeof useIsRobotViewable
->
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
@@ -72,7 +69,6 @@ describe('RobotOverview', () => {
     ))
     mockUpdateRobotBanner.mockReturnValue(<div>Mock UpdateRobotBanner</div>)
     mockUseCurrentRunId.mockReturnValue(null)
-    mockUseIsRobotViewable.mockReturnValue(true)
     mockRobotOverviewOverflowMenu.mockReturnValue(
       <div>mock RobotOverviewOverflowMenu</div>
     )

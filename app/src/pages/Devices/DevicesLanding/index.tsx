@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import partition from 'lodash/partition'
 
 import {
   Box,
@@ -42,16 +43,19 @@ export function DevicesLanding(): JSX.Element {
   const healthyReachableRobots = useSelector((state: State) =>
     getConnectableRobots(state)
   )
-  const unhealthyReachableRobots = useSelector((state: State) =>
+  const reachableRobots = useSelector((state: State) =>
     getReachableRobots(state)
   )
   const unreachableRobots = useSelector((state: State) =>
     getUnreachableRobots(state)
   )
 
+  const [unhealthyReachableRobots, recentlySeenRobots] = partition(reachableRobots, robot => robot.healthStatus === 'ok')
+
   const noRobots =
     [
       ...healthyReachableRobots,
+      ...recentlySeenRobots,
       ...unhealthyReachableRobots,
       ...unreachableRobots,
     ].length === 0
@@ -75,9 +79,14 @@ export function DevicesLanding(): JSX.Element {
         <>
           <CollapsibleSection
             marginY={SPACING.spacing4}
-            title={t('available', { count: healthyReachableRobots.length })}
+            title={t('available', { count: [...healthyReachableRobots, ...unhealthyReachableRobots].length })}
           >
             {healthyReachableRobots.map(robot => (
+              <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
+                <RobotCard robot={robot} />
+              </ApiHostProvider>
+            ))}
+            {unhealthyReachableRobots.map(robot => (
               <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
                 <RobotCard robot={robot} />
               </ApiHostProvider>
@@ -87,14 +96,12 @@ export function DevicesLanding(): JSX.Element {
           <CollapsibleSection
             marginY={SPACING.spacing4}
             title={t('unavailable', {
-              count: [...unhealthyReachableRobots, ...unreachableRobots].length,
+              count: [...recentlySeenRobots, ...unreachableRobots].length,
             })}
             isExpandedInitially={healthyReachableRobots.length === 0}
           >
-            {unhealthyReachableRobots.map(robot => (
-              <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
-                <RobotCard robot={robot} />
-              </ApiHostProvider>
+            {recentlySeenRobots.map(robot => (
+              <RobotCard key={robot.name} robot={{...robot, local: null}} />
             ))}
             {unreachableRobots.map(robot => (
               <RobotCard key={robot.name} robot={robot} />

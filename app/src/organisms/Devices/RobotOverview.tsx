@@ -26,6 +26,7 @@ import { Portal } from '../../App/portal'
 import { CONNECTABLE } from '../../redux/discovery'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { RobotStatusBanner } from './RobotStatusBanner'
+import { ReachableBanner } from './ReachableBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
 import { useLights, useRobot } from './hooks'
 
@@ -36,16 +37,14 @@ interface RobotOverviewProps {
 export function RobotOverview({
   robotName,
 }: RobotOverviewProps): JSX.Element | null {
-  const { t } = useTranslation('device_details')
+  const { t } = useTranslation(['device_details', 'shared'])
 
   const robot = useRobot(robotName)
-
   const [
     showChooseProtocolSlideout,
     setShowChooseProtocolSlideout,
   ] = React.useState<boolean>(false)
   const { lightsOn, toggleLights } = useLights(robotName)
-
   const currentRunId = useCurrentRunId()
 
   return robot != null ? (
@@ -64,6 +63,7 @@ export function RobotOverview({
         id="RobotOverview_robotImage"
       />
       <Box padding={SPACING.spacing3} width="100%">
+        <ReachableBanner robot={robot} />
         <UpdateRobotBanner
           robotName={robot.name}
           marginBottom={SPACING.spacing3}

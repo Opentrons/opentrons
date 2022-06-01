@@ -32,6 +32,7 @@ import {
   useAttachedPipettes,
   useProtocolDetailsForRun,
 } from './hooks'
+import { ReachableBanner } from './ReachableBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
@@ -44,6 +45,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const { robot } = props
   const { name: robotName = null, local } = robot
   const history = useHistory()
+  const { t } = useTranslation('devices_landing')
   return robotName != null ? (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -55,6 +57,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       padding={`${SPACING.spacing3} ${SPACING.spacing2} ${SPACING.spacing3} ${SPACING.spacing3}`}
       width="100%"
       onClick={() => history.push(`/devices/${robotName}`)}
+      cursor="pointer"
     >
       <img
         src={OT2_PNG}
@@ -66,6 +69,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
           robotName={robotName}
           marginBottom={SPACING.spacing3}
         />
+        <ReachableBanner robot={robot} />
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText
@@ -96,6 +100,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
               </Flex>
             </Flex>
           </Flex>
+
           {robot.status === CONNECTABLE ? (
             <RunningProtocolBanner robotName={robotName} />
           ) : null}
@@ -112,11 +117,11 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   ) : null
 }
 
-function AttachedModules(props: { robotName: string }): JSX.Element {
+function AttachedModules(props: { robotName: string }): JSX.Element | null{
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
   const attachedModules = useAttachedModules()
-  return (
+  return attachedModules.length > 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing4}>
       <StyledText
         as="h6"
@@ -138,7 +143,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element {
         ))}
       </Flex>
     </Flex>
-  )
+  ): null
 }
 function AttachedPipettes(props: { robotName: string }): JSX.Element {
   const { robotName } = props
