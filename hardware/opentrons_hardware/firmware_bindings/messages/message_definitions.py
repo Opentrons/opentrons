@@ -463,11 +463,6 @@ class SensorDiagnosticResponse:  # noqa: D101
 
 
 @dataclass
-class PipetteInfoRequest(EmptyPayloadMessage):  # noqa: D101
-    message_id: Literal[MessageId.pipette_info_request] = MessageId.pipette_info_request
-
-
-@dataclass
 class PipetteInfoResponse:  # noqa: D101
     payload: payloads.PipetteInfoResponsePayload
     payload_type: Type[
@@ -538,11 +533,6 @@ class BindSensorOutputResponse:  # noqa: D101
     message_id: Literal[
         MessageId.bind_sensor_output_response
     ] = MessageId.bind_sensor_output_response
-
-
-@dataclass
-class GripperInfoRequest(EmptyPayloadMessage):  # noqa: D101
-    message_id: Literal[MessageId.gripper_info_request] = MessageId.gripper_info_request
 
 
 @dataclass
