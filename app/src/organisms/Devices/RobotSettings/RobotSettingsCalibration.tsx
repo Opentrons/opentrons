@@ -48,12 +48,11 @@ import {
   useTipLengthCalibrations,
   useAttachedPipettes,
   useDeckCalibrationStatus,
+  useIsRobotBusy,
 } from '../hooks'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
-// import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-// import { checkIsRobotBusy } from './AdvancedTab/utils'
 
 import type { State, Dispatch } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
@@ -65,6 +64,7 @@ import type { DeckCalibrationInfo } from '../../../redux/calibration/types'
 
 interface CalibrationProps {
   robotName: string
+  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 export interface FormattedPipetteOffsetCalibration {
@@ -92,6 +92,7 @@ const CALIBRATION_STATUS_POLL_MS = 5000
 
 export function RobotSettingsCalibration({
   robotName,
+  updateRobotStatus,
 }: CalibrationProps): JSX.Element {
   const { t } = useTranslation([
     'device_settings',
@@ -119,6 +120,7 @@ export function RobotSettingsCalibration({
     setPipetteOffsetCalBannerType,
   ] = React.useState<string>('')
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
+  const isBusy = useIsRobotBusy()
 
   // The followings will be use by the next PR
   // const isRobotBusy = useCurrentRunId() !== null
@@ -273,22 +275,29 @@ export function RobotSettingsCalibration({
   const handleHealthCheck = (
     hasBlockModalResponse: boolean | null = null
   ): void => {
-    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
-      setShowCalBlockModal(true)
+    if (isBusy) {
+      updateRobotStatus(true)
     } else {
-      setShowCalBlockModal(false)
-      dispatchRequests(
-        Sessions.ensureSession(
-          robotName,
-          Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
-          {
-            tipRacks: [],
-            hasCalibrationBlock: Boolean(
-              configHasCalibrationBlock ?? hasBlockModalResponse
-            ),
-          }
+      if (
+        hasBlockModalResponse === null &&
+        configHasCalibrationBlock === null
+      ) {
+        setShowCalBlockModal(true)
+      } else {
+        setShowCalBlockModal(false)
+        dispatchRequests(
+          Sessions.ensureSession(
+            robotName,
+            Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+            {
+              tipRacks: [],
+              hasCalibrationBlock: Boolean(
+                configHasCalibrationBlock ?? hasBlockModalResponse
+              ),
+            }
+          )
         )
-      )
+      }
     }
   }
 
@@ -363,6 +372,14 @@ export function RobotSettingsCalibration({
       } else {
         setShowPipetteOffsetCalibrationBanner(false)
       }
+    }
+  }
+
+  const handleClickDeckCalibration = (): void => {
+    if (isBusy) {
+      updateRobotStatus(true)
+    } else {
+      confirmStart()
     }
   }
 
@@ -491,7 +508,7 @@ export function RobotSettingsCalibration({
               color={COLORS.darkBlack}
               css={TYPOGRAPHY.pRegular}
               textDecoration={TEXT_DECORATION_UNDERLINE}
-              onClick={confirmStart}
+              onClick={() => handleClickDeckCalibration()}
             >
               {checkDeckCalibrationStatus() === 'error'
                 ? t('calibrate_now')
@@ -512,7 +529,7 @@ export function RobotSettingsCalibration({
             <StyledText as="label">{deckLastModified()}</StyledText>
           </Box>
           <TertiaryButton
-            onClick={confirmStart}
+            onClick={() => handleClickDeckCalibration()}
             disabled={disabledOrBusyReason !== null}
           >
             {deckCalibrationButtonText}
@@ -543,7 +560,7 @@ export function RobotSettingsCalibration({
               <PipetteOffsetCalibrationItems
                 robotName={robotName}
                 formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
-                // updateRobotStatus={updateRobotStatus}
+                updateRobotStatus={updateRobotStatus}
               />
             ) : (
               <StyledText as="label">{t('not_calibrated')}</StyledText>
@@ -568,7 +585,7 @@ export function RobotSettingsCalibration({
                 robotName={robotName}
                 formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
                 formattedTipLengthCalibrations={formatTipLengthCalibrations()}
-                // updateRobotStatus={updateRobotStatus}
+                updateRobotStatus={updateRobotStatus}
               />
             ) : (
               <StyledText as="label">{t('not_calibrated')}</StyledText>

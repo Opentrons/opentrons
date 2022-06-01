@@ -39,15 +39,15 @@ interface TipLengthCalibrationItemsProps {
   robotName: string
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
   formattedTipLengthCalibrations: FormattedTipLengthCalibration[]
-  // updateRobotStatus: (isRobotBusy: boolean) => void
+  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 export function TipLengthCalibrationItems({
   robotName,
   formattedPipetteOffsetCalibrations,
   formattedTipLengthCalibrations,
-}: // updateRobotStatus,
-TipLengthCalibrationItemsProps): JSX.Element {
+  updateRobotStatus,
+}: TipLengthCalibrationItemsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const customLabwareDefs = useSelector((state: State) => {
     return getCustomLabwareDefinitions(state)
@@ -71,7 +71,9 @@ TipLengthCalibrationItemsProps): JSX.Element {
 
   const checkMountWithAttachedPipettes = (serialNumber: string): Mount => {
     return ['left', 'right'].find((mount, index) => {
-      const pipette = Object.values(attachedPipettes)[index]
+      const pipette = Object.values(
+        attachedPipettes != null && attachedPipettes
+      )[index]
       return pipette?.id === serialNumber
     }) as Mount
   }
@@ -120,7 +122,7 @@ TipLengthCalibrationItemsProps): JSX.Element {
                     ? calibration.mount
                     : checkMountWithAttachedPipettes(calibration.serialNumber)
                 }
-                // updateRobotStatus={updateRobotStatus}
+                updateRobotStatus={updateRobotStatus}
               />
             </StyledTableCell>
           </StyledTableRow>

@@ -44,10 +44,15 @@ export function RobotSettings(): JSX.Element | null {
     calibration: () => (
       <RobotSettingsCalibration
         robotName={robotName}
-        // updateRobotStatus={updateRobotStatus}
+        updateRobotStatus={updateRobotStatus}
       />
     ),
-    networking: () => <RobotSettingsNetworking robotName={robotName} />,
+    networking: () => (
+      <RobotSettingsNetworking
+        robotName={robotName}
+        updateRobotStatus={updateRobotStatus}
+      />
+    ),
     advanced: () => (
       <RobotSettingsAdvanced
         robotName={robotName}

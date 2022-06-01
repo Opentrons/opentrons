@@ -36,6 +36,7 @@ import {
   useRobot,
   useTipLengthCalibrations,
   useAttachedPipettes,
+  useIsRobotBusy,
   useDeckCalibrationStatus,
 } from '../../hooks'
 
@@ -59,6 +60,7 @@ jest.mock('../../../../redux/custom-labware/selectors')
 jest.mock('../../hooks')
 jest.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
 jest.mock('../CalibrationDetails/TipLengthCalibrationItems')
+jest.mock('../../../ProtocolUpload/hooks')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
@@ -92,16 +94,23 @@ const mockPipetteOffsetCalibrationItems = PipetteOffsetCalibrationItems as jest.
 const mockTipLengthCalibrationItems = TipLengthCalibrationItems as jest.MockedFunction<
   typeof TipLengthCalibrationItems
 >
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
+>
 const mockUseDeckCalibrationStatus = useDeckCalibrationStatus as jest.MockedFunction<
   typeof useDeckCalibrationStatus
 >
 
 let mockTrackEvent: jest.Mock
+const mockUpdateRobotStatus = jest.fn()
 
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <RobotSettingsCalibration robotName="otie" />
+      <RobotSettingsCalibration
+        robotName="otie"
+        updateRobotStatus={mockUpdateRobotStatus}
+      />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -151,6 +160,7 @@ describe('RobotSettingsCalibration', () => {
       <div>TipLengthCalibrationItems</div>
     )
     mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
+    mockUseIsRobotBusy.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -264,6 +274,14 @@ describe('RobotSettingsCalibration', () => {
     getByRole('button', { name: 'Calibrate now' })
   })
 
+  it('should call update robot status if a robot is busy - deck cal', () => {
+    mockUseIsRobotBusy.mockReturnValue(true)
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Recalibrate deck' })
+    fireEvent.click(button)
+    expect(mockUpdateRobotStatus).toHaveBeenCalled()
+  })
+
   it('renders the warning banner when deck calibration is not good', () => {
     mockUseDeckCalibrationStatus.mockReturnValue(Calibration.DECK_CAL_STATUS_OK)
     mockUseDeckCalibrationData.mockReturnValue({
@@ -374,5 +392,12 @@ describe('RobotSettingsCalibration', () => {
         'Fully calibrate your robot before checking calibration health'
       )
     })
+  })
+  it('should call update robot status if a robot is busy - health check', () => {
+    mockUseIsRobotBusy.mockReturnValue(true)
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Check health' })
+    fireEvent.click(button)
+    expect(mockUpdateRobotStatus).toHaveBeenCalled()
   })
 })

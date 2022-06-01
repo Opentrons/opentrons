@@ -42,14 +42,14 @@ const StyledTableCell = styled.td`
 interface PipetteOffsetCalibrationItemsProps {
   robotName: string
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
-  // updateRobotStatus: (isRobotBusy: boolean) => void
+  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 export function PipetteOffsetCalibrationItems({
   robotName,
   formattedPipetteOffsetCalibrations,
-}: // updateRobotStatus,
-PipetteOffsetCalibrationItemsProps): JSX.Element {
+  updateRobotStatus,
+}: PipetteOffsetCalibrationItemsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
   const customLabwareDefs = useSelector((state: State) => {
@@ -147,7 +147,7 @@ PipetteOffsetCalibrationItemsProps): JSX.Element {
                 robotName={robotName}
                 serialNumber={calibration.serialNumber ?? null}
                 mount={calibration.mount}
-                // updateRobotStatus={updateRobotStatus}
+                updateRobotStatus={updateRobotStatus}
               />
             </StyledTableCell>
           </StyledTableRow>

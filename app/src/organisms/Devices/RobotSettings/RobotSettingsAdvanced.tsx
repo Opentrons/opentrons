@@ -103,7 +103,6 @@ export function RobotSettingsAdvanced({
     setShowDownloadToast(isDownloading)
 
   const updateIsRobotBusy = (isRobotBusy: boolean): void => {
-    console.log('updated', isRobotBusy) // TODO kj remove
     updateRobotStatus(isRobotBusy)
   }
 

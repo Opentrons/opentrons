@@ -12,7 +12,6 @@ import {
   ALIGN_FLEX_END,
   Mount,
 } from '@opentrons/components'
-// import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
 import { OverflowBtn } from '../../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../../atoms/MenuList/MenuItem'
@@ -26,12 +25,11 @@ import * as Config from '../../../../redux/config'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../redux/calibration'
 import {
+  useIsRobotBusy,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
 } from '../../hooks'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
-// import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
-// import { checkIsRobotBusy } from '../AdvancedTab/utils'
 
 import type { PipetteOffsetCalibration } from '../../../../redux/calibration/types'
 
@@ -52,7 +50,7 @@ interface OverflowMenuProps {
   robotName: string
   serialNumber: string | null
   mount: Mount
-  // updateRobotStatus: (isRobotBusy: boolean) => void
+  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 export function OverflowMenu({
@@ -60,8 +58,8 @@ export function OverflowMenu({
   robotName,
   serialNumber,
   mount,
-}: // updateRobotStatus,
-OverflowMenuProps): JSX.Element {
+  updateRobotStatus,
+}: OverflowMenuProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
@@ -76,9 +74,8 @@ OverflowMenuProps): JSX.Element {
     calBlockModalState,
     setCalBlockModalState,
   ] = React.useState<CalBlockModalState>(CAL_BLOCK_MODAL_CLOSED)
+  const isBusy = useIsRobotBusy()
 
-  // const isRobotBusy = useCurrentRunId() !== null
-  // const allSessionsQueryResponse = useAllSessionsQuery()
   interface StartWizardOptions {
     keepTipLength: boolean
     hasBlockModalResponse?: boolean | null
@@ -125,26 +122,24 @@ OverflowMenuProps): JSX.Element {
     e: React.MouseEvent
   ): void => {
     e.preventDefault()
-    // The following is used by the next PR: kj
-    // const isBusy = checkIsRobotBusy(allSessionsQueryResponse, isRobotBusy)
-    // if (isBusy) {
-    //   updateRobotStatus(true)
-    // } else {
-    if (calType === 'pipetteOffset') {
-      if (checkPipetteCalibrations != null) {
-        // recalibrate pipette offset
-        startPipetteOffsetCalibration({
-          withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
-        })
-      } else {
-        // calibrate pipette offset with a wizard since not calibrated yet
-        startPipetteOffsetPossibleTLC({ keepTipLength: true })
-      }
+    if (isBusy) {
+      updateRobotStatus(true)
     } else {
-      startPipetteOffsetPossibleTLC({ keepTipLength: false })
+      if (calType === 'pipetteOffset') {
+        if (checkPipetteCalibrations != null) {
+          // recalibrate pipette offset
+          startPipetteOffsetCalibration({
+            withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
+          })
+        } else {
+          // calibrate pipette offset with a wizard since not calibrated yet
+          startPipetteOffsetPossibleTLC({ keepTipLength: true })
+        }
+      } else {
+        startPipetteOffsetPossibleTLC({ keepTipLength: false })
+      }
+      setShowOverflowMenu(!showOverflowMenu)
     }
-    setShowOverflowMenu(!showOverflowMenu)
-    // }
   }
 
   const handleDownload = (

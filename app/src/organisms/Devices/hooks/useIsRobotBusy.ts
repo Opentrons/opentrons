@@ -7,6 +7,7 @@ export function useIsRobotBusy(): boolean {
   const allSessionsQueryResponse = useAllSessionsQuery()
   return (
     robotHasCurrentRun ||
-    Object.keys(allSessionsQueryResponse?.data ?? {}).length !== 0
+    (allSessionsQueryResponse?.data?.data != null &&
+      allSessionsQueryResponse?.data?.data?.length !== 0)
   )
 }
