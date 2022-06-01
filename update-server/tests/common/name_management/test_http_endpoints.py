@@ -1,8 +1,6 @@
-import asyncio
 from unittest.mock import MagicMock
 
 import pytest
-from aiohttp import web
 
 from otupdate.common.name_management import NameManager
 

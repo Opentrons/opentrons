@@ -1,19 +1,18 @@
 """ update-server implementation for buildroot systems """
 import asyncio
 import logging
-import textwrap
 import json
 from typing import Any, AsyncGenerator, Mapping, Optional
 from aiohttp import web
 
 from otupdate.common import (
     config,
-    control,
-    ssh_key_management,
-    name_management,
     constants,
-    update,
+    control,
+    name_management,
+    ssh_key_management,
     systemd,
+    update,
 )
 from . import update_actions
 
@@ -44,7 +43,7 @@ def get_app(
     config_file_override: Optional[str] = None,
     name_override: Optional[str] = None,
     boot_id_override: Optional[str] = None,
-    loop: Optional[asyncio.AbstractEventLoop] = None,
+    loop: Optional[asyncio.AbstractEventLoop] = None,  # TODO: Remove?
 ) -> web.Application:
     """Build and return the aiohttp.web.Application that runs the server
 
@@ -59,14 +58,10 @@ def get_app(
 
     app = web.Application(middlewares=[log_error_middleware])
 
-    async def _setup_and_cleanup_ctx(
-        app: web.Application
-    ) -> AsyncGenerator[None, None]:
+    async def set_up_and_tear_down(app: web.Application) -> AsyncGenerator[None, None]:
         # Stuff everything inside here so that:
         # - Getting the order right is more foolproof
         # - We can log it all together
-
-        # FIX BEFORE MERGE: Do name override.
 
         app[config.CONFIG_VARNAME] = config_obj
         app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
@@ -74,16 +69,21 @@ def get_app(
 
         update_actions.OT2UpdateActions.build_and_insert(app)
 
-        async with name_management.build_and_insert(app):
-            name = name_management.NameManager.from_app(app).get_name()
+        async with name_management.build_name_manager(
+            name_override=name_override
+        ) as name_manager:
+            name_manager.install_on_app(app)
+            initial_name = name_manager.get_name()
+
             LOG.info(
                 "Setup: "
                 + "\n\t".join(
                     [
-                        f"Device name: {name}",
+                        f"Device name: {initial_name}",
                         "Buildroot version:         "
                         f'{version.get("buildroot_version", "unknown")}',
-                        "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
+                        "\t(from git sha      "
+                        f'{version.get("buildroot_sha", "unknown")}',
                         "API version:               "
                         f'{version.get("opentrons_api_version", "unknown")}',
                         "\t(from git sha      "
@@ -100,13 +100,9 @@ def get_app(
             LOG.info(f"Notifying {systemd.SOURCE} that service is up.")
             systemd.notify_up()
 
-            LOG.info(f"Serving requests.")
             yield
-            LOG.info("Running teardown code.")
 
-        LOG.info("Done running teardown code.")
-
-    app.cleanup_ctx.append(_setup_and_cleanup_ctx)
+    app.cleanup_ctx.append(set_up_and_tear_down)
 
     app.router.add_routes(
         [
@@ -128,6 +124,7 @@ def get_app(
             web.get("/server/name", name_management.get_name_endpoint),
         ]
     )
+
     return app
 
 

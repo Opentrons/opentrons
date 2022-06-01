@@ -3,11 +3,10 @@
 
 from __future__ import annotations
 
-import abc
 import asyncio
 import contextlib
 import logging
-from typing import AsyncGenerator, Awaitable, Callable, Optional, cast
+from typing import AsyncGenerator, Awaitable, Callable, cast
 
 
 _COLLISION_POLL_INTERVAL = 5
@@ -171,7 +170,7 @@ else:
             domainname = self._server.GetDomainName()
 
             self._entry_group.Reset()
-            _log.info(f"Reset entry group.")
+            _log.info("Reset entry group.")
 
             # TODO(mm, 2022-05-06): This isn't exception-safe.
             # We've already reset the entry group, so if this fails
@@ -194,7 +193,7 @@ else:
 
             self._entry_group.Commit()
 
-            _log.info(f"Committed.")
+            _log.info("Committed.")
 
         def alternative_service_name(self, current_service_name: str) -> str:
             result = self._server.GetAlternativeServiceName(current_service_name)

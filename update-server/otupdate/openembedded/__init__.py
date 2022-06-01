@@ -3,14 +3,15 @@ import asyncio
 import logging
 import json
 from aiohttp import web
-from typing import Optional, Mapping, Any
+from typing import AsyncGenerator, Optional, Mapping, Any
 
 from otupdate.common import (
     config,
     constants,
     control,
-    ssh_key_management,
     name_management,
+    ssh_key_management,
+    systemd,
     update,
 )
 

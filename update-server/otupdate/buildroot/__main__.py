@@ -4,7 +4,7 @@ Entrypoint for the buildroot update server
 import asyncio
 import logging
 
-from . import get_app, constants
+from . import get_app
 
 from otupdate.common import name_management, cli, systemd
 from aiohttp import web
