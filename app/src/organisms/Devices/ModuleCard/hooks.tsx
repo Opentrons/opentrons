@@ -17,6 +17,7 @@ import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useProtocolDetailsForRun } from '../hooks'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type {
   HeaterShakerCloseLatchCreateCommand,
@@ -54,6 +55,10 @@ export function useLatchControls(
 ): LatchControls {
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    module,
+    runId != null ? runId : null
+  )
 
   const isLatchClosed =
     module.moduleType === 'heaterShakerModuleType' &&
@@ -66,7 +71,7 @@ export function useLatchControls(
     commandType: isLatchClosed
       ? 'heaterShakerModule/openLatch'
       : 'heaterShakerModule/closeLatch',
-    params: { moduleId: module.id },
+    params: { moduleId: runId != null ? moduleIdFromRun : module.id },
   }
 
   const toggleLatch = (): void => {
@@ -125,6 +130,7 @@ export function useModuleOverflowMenu(
   const { createCommand } = useCreateCommandMutation()
   const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
 
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
@@ -195,7 +201,7 @@ export function useModuleOverflowMenu(
       | TCDeactivateBlockCreateCommand
       | HeaterShakerStopShakeCreateCommand = {
       commandType: deactivateModuleCommandType,
-      params: { moduleId: module.id },
+      params: { moduleId: runId != null ? moduleIdFromRun : module.id },
     }
     if (runId != null) {
       createCommand({
@@ -311,7 +317,8 @@ export function useModuleOverflowMenu(
         disabledReason:
           module.moduleType === HEATERSHAKER_MODULE_TYPE &&
           (module.data.labwareLatchStatus === 'idle_open' ||
-            module.data.labwareLatchStatus === 'opening'),
+            module.data.labwareLatchStatus === 'opening' ||
+            module.data.labwareLatchStatus === 'idle_unknown'),
         menuButtons: [
           labwareLatchBtn,
           aboutModuleBtn,

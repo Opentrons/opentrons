@@ -61,7 +61,10 @@ async def test_capacitive_probe(
     await ot3_hardware.home()
     here = await ot3_hardware.gantry_position(OT3Mount.RIGHT)
     fake_settings = CapacitivePassSettings(
-        prep_distance_mm=1, max_overrun_distance_mm=2, speed_mm_per_s=4
+        prep_distance_mm=1,
+        max_overrun_distance_mm=2,
+        speed_mm_per_s=4,
+        sensor_threshold_pf=1.0,
     )
 
     res = await ot3_hardware.capacitive_probe(OT3Mount.RIGHT, 2, fake_settings)

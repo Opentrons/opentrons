@@ -126,6 +126,7 @@ class CapacitivePassSettings:
     prep_distance_mm: float
     max_overrun_distance_mm: float
     speed_mm_per_s: float
+    sensor_threshold_pf: float
 
 
 @dataclass(frozen=True)

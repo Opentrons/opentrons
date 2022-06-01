@@ -11,6 +11,7 @@ from opentrons.protocol_engine import (
     ErrorOccurrence,
     LoadedPipette,
     LoadedLabware,
+    LoadedModule,
     LabwareOffset,
     LabwareOffsetCreate,
 )
@@ -75,6 +76,10 @@ class Run(ResourceModel):
         ...,
         description="Pipettes that have been loaded into the run.",
     )
+    modules: List[LoadedModule] = Field(
+        ...,
+        description="Modules that have been loaded into the run.",
+    )
     labware: List[LoadedLabware] = Field(
         ...,
         description="Labware that has been loaded into the run.",
@@ -89,6 +94,14 @@ class Run(ResourceModel):
             "Protocol resource being run, if any. If not present, the run may"
             " still be used to execute protocol commands over HTTP."
         ),
+    )
+    completedAt: Optional[datetime] = Field(
+        None,
+        description="Run completed at timestamp.",
+    )
+    startedAt: Optional[datetime] = Field(
+        None,
+        description="Run started at timestamp.",
     )
 
 

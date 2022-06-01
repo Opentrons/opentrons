@@ -45,7 +45,7 @@ const closeIconStyles = css`
 `
 
 export const Modal = (props: ModalProps): JSX.Element => {
-  const { type = 'info', onClose, title, children } = props
+  const { type = 'info', onClose, title, children, maxHeight } = props
   const header =
     title != null ? (
       <>
@@ -90,12 +90,13 @@ export const Modal = (props: ModalProps): JSX.Element => {
 
   return (
     <BaseModal
-      width={'31.25rem'}
+      width="31.25rem"
       noHeaderStyles
       header={header}
       css={css`
         border-radius: ${BORDERS.radiusSoftCorners};
         box-shadow: ${BORDERS.smallDropShadow};
+        max-height: ${maxHeight};
       `}
     >
       {children}

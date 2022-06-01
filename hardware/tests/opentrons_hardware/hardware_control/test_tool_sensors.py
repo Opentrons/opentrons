@@ -20,7 +20,11 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
     ProbeTarget,
 )
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorType,
+    SensorThresholdMode,
+)
 from opentrons_hardware.sensors.scheduler import SensorScheduler
 from opentrons_hardware.sensors.utils import (
     SensorThresholdInformation,
@@ -40,7 +44,7 @@ def mock_sensor_threshold() -> Iterator[AsyncMock]:
         async def echo_value(
             info: SensorThresholdInformation, messenger: CanMessenger
         ) -> SensorDataType:
-            if info.data == "auto":
+            if info.mode == SensorThresholdMode.auto_baseline:
                 return SensorDataType.build(11)
             return info.data
 
@@ -113,7 +117,10 @@ async def test_capacitive_probe(
     assert result == 10  # this comes from the current_position_um above
     # this mock assert is annoying because something's __eq__ doesn't work
     assert mock_sensor_threshold.call_args_list[0][0][0] == SensorThresholdInformation(
-        sensor_type=SensorType.capacitive, node_id=target_node, data="auto"
+        sensor_type=SensorType.capacitive,
+        node_id=target_node,
+        data=SensorDataType.build(1.0),
+        mode=SensorThresholdMode.auto_baseline,
     )
     # this mock assert is annoying because, see below
     mock_bind_sync.assert_called_once_with(

@@ -191,3 +191,19 @@ class SensorOutputBinding(int, Enum):
     none = 0x0
     sync = 0x01
     report = 0x02
+
+
+@unique
+class SensorThresholdMode(int, Enum):
+    """How a sensor's threshold should be interpreted."""
+
+    absolute = 0x0
+    auto_baseline = 0x1
+
+
+@unique
+class PipetteTipActionType(int, Enum):
+    """Tip action types."""
+
+    pick_up = 0x0
+    drop = 0x01

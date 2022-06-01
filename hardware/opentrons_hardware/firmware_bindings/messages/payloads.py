@@ -16,6 +16,8 @@ from .fields import (
     SensorOutputBindingField,
     EepromDataField,
     SerialField,
+    SensorThresholdModeField,
+    PipetteTipActionTypeField,
 )
 from .. import utils
 
@@ -73,7 +75,7 @@ class GetSpeedResponsePayload(utils.BinarySerializable):
 class EEPromReadPayload(utils.BinarySerializable):
     """Eeprom read request payload ."""
 
-    address: utils.UInt8Field
+    address: utils.UInt16Field
     data_length: utils.UInt8Field
 
 
@@ -325,6 +327,7 @@ class SetSensorThresholdRequestPayload(utils.BinarySerializable):
 
     sensor: SensorTypeField
     threshold: utils.Int32Field
+    mode: SensorThresholdModeField
 
 
 @dataclass
@@ -333,6 +336,7 @@ class SensorThresholdResponsePayload(utils.BinarySerializable):
 
     sensor: SensorTypeField
     threshold: utils.Int32Field
+    mode: SensorThresholdModeField
 
 
 @dataclass
@@ -413,12 +417,15 @@ class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     """A request to perform a tip action."""
 
     velocity: utils.Int32Field
+    action: PipetteTipActionTypeField
+    request_stop_condition: utils.UInt8Field
 
 
 @dataclass
-class TipActionResponsePayload(MoveGroupResponsePayload):
+class TipActionResponsePayload(MoveCompletedPayload):
     """A response that sends back whether tip action was successful."""
 
+    action: PipetteTipActionTypeField
     success: utils.UInt8Field
 
 

@@ -6,6 +6,7 @@ import {
 } from '@opentrons/react-api-client'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../../i18n'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { HeaterShakerSlideout } from '../HeaterShakerSlideout'
@@ -14,6 +15,7 @@ import { ConfirmAttachmentModal } from '../ConfirmAttachmentModal'
 jest.mock('@opentrons/react-api-client')
 jest.mock('../ConfirmAttachmentModal')
 jest.mock('../../../../redux/config')
+jest.mock('../useModuleIdFromRun')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -26,6 +28,9 @@ const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
 >
 const mockConfirmAttachmentModal = ConfirmAttachmentModal as jest.MockedFunction<
   typeof ConfirmAttachmentModal
+>
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
 >
 
 const render = (props: React.ComponentProps<typeof HeaterShakerSlideout>) => {
@@ -56,6 +61,9 @@ describe('HeaterShakerSlideout', () => {
     mockConfirmAttachmentModal.mockReturnValue(
       <div>mock confirm attachment modal</div>
     )
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'heatershaker_id',
+    })
   })
 
   afterEach(() => {

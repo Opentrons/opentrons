@@ -1,14 +1,20 @@
 """Thermocycler Module sub-state."""
 from dataclasses import dataclass
-from typing import NewType
+from typing import NewType, Optional
 
-from opentrons.protocol_engine.errors import InvalidTargetTemperatureError
+from opentrons.protocol_engine.errors import (
+    InvalidTargetTemperatureError,
+    InvalidBlockVolumeError,
+    NoTargetTemperatureSetError,
+)
 
 # TODO(mc, 2022-04-25): move to module definition
 # https://github.com/Opentrons/opentrons/issues/9800
 from opentrons.drivers.thermocycler.driver import (
     BLOCK_TARGET_MIN,
     BLOCK_TARGET_MAX,
+    BLOCK_VOL_MIN,
+    BLOCK_VOL_MAX,
     LID_TARGET_MIN,
     LID_TARGET_MAX,
 )
@@ -25,6 +31,8 @@ class ThermocyclerModuleSubState:
     """
 
     module_id: ThermocyclerModuleId
+    target_block_temperature: Optional[float]
+    target_lid_temperature: Optional[float]
 
     @staticmethod
     def validate_target_block_temperature(celsius: float) -> float:
@@ -49,6 +57,28 @@ class ThermocyclerModuleSubState:
         )
 
     @staticmethod
+    def validate_max_block_volume(volume: float) -> float:
+        """Validate a given target block max volume.
+
+        Args:
+            volume: The requested block max volume in uL.
+
+        Raises:
+            InvalidBlockVolumeError: The given volume
+                is outside the thermocycler's operating range.
+
+        Returns:
+            The validated volume in uL.
+        """
+        if BLOCK_VOL_MIN <= volume <= BLOCK_VOL_MAX:
+            return volume
+
+        raise InvalidBlockVolumeError(
+            "Thermocycler max block volume must be between"
+            f" {BLOCK_VOL_MIN} and {BLOCK_VOL_MAX}, but got {volume}."
+        )
+
+    @staticmethod
     def validate_target_lid_temperature(celsius: float) -> float:
         """Validate a given target lid temperature.
 
@@ -69,3 +99,23 @@ class ThermocyclerModuleSubState:
             "Thermocycler lid temperature must be between"
             f" {LID_TARGET_MIN} and {LID_TARGET_MAX}, but got {celsius}."
         )
+
+    def get_target_block_temperature(self) -> float:
+        """Get the thermocycler's target block temperature."""
+        target = self.target_block_temperature
+
+        if target is None:
+            raise NoTargetTemperatureSetError(
+                f"Module {self.module_id} does not have a target block temperature set."
+            )
+        return target
+
+    def get_target_lid_temperature(self) -> float:
+        """Get the thermocycler's target lid temperature."""
+        target = self.target_lid_temperature
+
+        if target is None:
+            raise NoTargetTemperatureSetError(
+                f"Module {self.module_id} does not have a target block temperature set."
+            )
+        return target

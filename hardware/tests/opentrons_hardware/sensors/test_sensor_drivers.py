@@ -318,6 +318,7 @@ async def test_threshold(
                     payload=SensorThresholdResponsePayload(
                         threshold=message.payload.threshold,
                         sensor=SensorTypeField(sensor._sensor_type),
+                        mode=message.payload.mode,
                     )
                 ),
                 ArbitrationId(

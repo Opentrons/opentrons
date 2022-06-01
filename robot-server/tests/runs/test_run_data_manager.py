@@ -14,6 +14,11 @@ from opentrons.protocol_engine import (
     types as pe_types,
     CommandSlice,
     CurrentCommand,
+    ErrorOccurrence,
+    LoadedLabware,
+    LoadedPipette,
+    LoadedModule,
+    LabwareOffset,
 )
 
 from robot_server.protocols import ProtocolResource
@@ -54,11 +59,11 @@ def engine_state_summary() -> StateSummary:
     """Get a StateSummary value object."""
     return StateSummary(
         status=EngineStatus.IDLE,
-        errors=[],
-        labware=[],
-        labwareOffsets=[],
-        pipettes=[],
-        modules=[],
+        errors=[ErrorOccurrence.construct(id="some-error-id")],  # type: ignore[call-arg]  # noqa: E501
+        labware=[LoadedLabware.construct(id="some-labware-id")],  # type: ignore[call-arg]  # noqa: E501
+        labwareOffsets=[LabwareOffset.construct(id="some-labware-offset-id")],  # type: ignore[call-arg]  # noqa: E501
+        pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]  # noqa: E501
+        modules=[LoadedModule.construct(id="some-module-id")],  # type: ignore[call-arg]  # noqa: E501
     )
 
 
@@ -140,6 +145,7 @@ async def test_create(
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
+        modules=engine_state_summary.modules,
     )
 
 
@@ -202,6 +208,7 @@ async def test_create_with_options(
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
+        modules=engine_state_summary.modules,
     )
 
 
@@ -267,6 +274,7 @@ async def test_get_current_run(
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
+        modules=engine_state_summary.modules,
     )
     assert subject.current_run_id == run_id
 
@@ -301,6 +309,7 @@ async def test_get_historical_run(
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
+        modules=engine_state_summary.modules,
     )
 
 
@@ -331,6 +340,7 @@ async def test_get_historical_run_no_data(
         labware=[],
         labwareOffsets=[],
         pipettes=[],
+        modules=[],
     )
 
 
@@ -343,20 +353,20 @@ async def test_get_all_runs(
     """It should get all runs, including current and historical."""
     current_run_data = StateSummary(
         status=EngineStatus.IDLE,
-        errors=[],
-        labware=[],
-        labwareOffsets=[],
-        pipettes=[],
-        modules=[],
+        errors=[ErrorOccurrence.construct(id="current-error-id")],  # type: ignore[call-arg]  # noqa: E501
+        labware=[LoadedLabware.construct(id="current-labware-id")],  # type: ignore[call-arg]  # noqa: E501
+        labwareOffsets=[LabwareOffset.construct(id="current-labware-offset-id")],  # type: ignore[call-arg]  # noqa: E501
+        pipettes=[LoadedPipette.construct(id="current-pipette-id")],  # type: ignore[call-arg]  # noqa: E501
+        modules=[LoadedModule.construct(id="current-module-id")],  # type: ignore[call-arg]  # noqa: E501
     )
 
     historical_run_data = StateSummary(
         status=EngineStatus.STOPPED,
-        errors=[],
-        labware=[],
-        labwareOffsets=[],
-        pipettes=[],
-        modules=[],
+        errors=[ErrorOccurrence.construct(id="old-error-id")],  # type: ignore[call-arg]  # noqa: E501
+        labware=[LoadedLabware.construct(id="old-labware-id")],  # type: ignore[call-arg]  # noqa: E501
+        labwareOffsets=[LabwareOffset.construct(id="old-labware-offset-id")],  # type: ignore[call-arg]  # noqa: E501
+        pipettes=[LoadedPipette.construct(id="old-pipette-id")],  # type: ignore[call-arg]  # noqa: E501
+        modules=[LoadedModule.construct(id="old-module-id")],  # type: ignore[call-arg]  # noqa: E501
     )
 
     current_run_resource = RunResource(
@@ -398,6 +408,7 @@ async def test_get_all_runs(
             labware=historical_run_data.labware,
             labwareOffsets=historical_run_data.labwareOffsets,
             pipettes=historical_run_data.pipettes,
+            modules=historical_run_data.modules,
         ),
         Run(
             current=True,
@@ -410,6 +421,7 @@ async def test_get_all_runs(
             labware=current_run_data.labware,
             labwareOffsets=current_run_data.labwareOffsets,
             pipettes=current_run_data.pipettes,
+            modules=current_run_data.modules,
         ),
     ]
 
@@ -483,6 +495,7 @@ async def test_update_current(
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
+        modules=engine_state_summary.modules,
     )
 
 
@@ -528,6 +541,7 @@ async def test_update_current_noop(
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
+        modules=engine_state_summary.modules,
     )
 
 
