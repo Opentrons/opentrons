@@ -34,7 +34,12 @@ export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
   ] = React.useState<boolean>(false)
 
   // check for available updates
-  useInterval(checkAppUpdate, UPDATE_RECHECK_DELAY_MS)
+  useInterval(
+    checkAppUpdate,
+    autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
+      ? 1000
+      : UPDATE_RECHECK_DELAY_MS
+  )
 
   const handleLaunchModal: React.MouseEventHandler = e => {
     e.preventDefault()
@@ -48,7 +53,7 @@ export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
 
   return (
     <>
-      {autoUpdateAction === 'upgrade' ? (
+      {autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade' ? (
         <Banner type="warning" onCloseClick={handleCloseBanner} {...styleProps}>
           <StyledText as="p" marginRight={SPACING.spacing2}>
             {t('robot_server_versions_banner_title')}

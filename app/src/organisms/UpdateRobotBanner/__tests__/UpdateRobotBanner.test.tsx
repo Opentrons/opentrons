@@ -68,9 +68,7 @@ describe('UpdateRobotBanner', () => {
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    const bannerText = screen.queryByText(
-      'A software update is available for this robot.'
-    )
-    expect(bannerText).toBeNull()
+    const { getByText } = render(props)
+    getByText('A software update is available for this robot.')
   })
 })
