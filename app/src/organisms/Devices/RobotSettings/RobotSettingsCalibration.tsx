@@ -366,7 +366,7 @@ export function RobotSettingsCalibration({
             (p.pipette === left && p.status.markedBad) ||
             (p.pipette === right && p.status.markedBad)
         ) ?? null
-      if (markedBads.length !== 0) {
+      if (markedBads !== null) {
         setShowPipetteOffsetCalibrationBanner(true)
         setPipetteOffsetCalBannerType('warning')
       } else {
