@@ -10,6 +10,7 @@ import {
 } from '../../../../redux/robot-api'
 import { Toast } from '../../../../atoms/Toast'
 import { useCurrentRunStatus } from '../../../RunTimeControl/hooks'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import * as RobotApi from '../../../../redux/robot-api'
 import { MagneticModuleData } from '../MagneticModuleData'
 import { TemperatureModuleData } from '../TemperatureModuleData'
@@ -42,6 +43,7 @@ jest.mock('../../../RunTimeControl/hooks')
 jest.mock('../FirmwareUpdateFailedModal')
 jest.mock('../../../../redux/robot-api')
 jest.mock('../../../../atoms/Toast')
+jest.mock('../useModuleIdFromRun')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
@@ -50,6 +52,9 @@ jest.mock('react-router-dom', () => {
   }
 })
 
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
+>
 const mockMagneticModuleData = MagneticModuleData as jest.MockedFunction<
   typeof MagneticModuleData
 >
@@ -156,17 +161,18 @@ describe('ModuleCard', () => {
   })
 
   it('renders information for a magnetic module with mocked status', () => {
+    mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
     const { getByText, getByAltText } = render({
       module: mockMagneticModule,
       robotName: mockRobot.name,
     })
-
     getByText('Magnetic Module GEN1')
     getByText('Mock Magnetic Module Data')
     getByText('usb port 1')
     getByAltText('magneticModuleV1')
   })
   it('renders information if module is connected via hub', () => {
+    mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
     const { getByText, getByAltText } = render({
       module: mockMagneticModuleHub,
       robotName: mockRobot.name,
@@ -180,6 +186,7 @@ describe('ModuleCard', () => {
     mockTemperatureModuleData.mockReturnValue(
       <div>Mock Temperature Module Data</div>
     )
+    mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'tempdeck_id' })
 
     const { getByText, getByAltText } = render({
       module: mockTemperatureModuleGen2,
@@ -192,6 +199,9 @@ describe('ModuleCard', () => {
   })
 
   it('renders information for a thermocycler module with mocked status', () => {
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'thermocycler_id',
+    })
     const { getByText, getByAltText } = render({
       module: mockThermocycler,
       robotName: mockRobot.name,
@@ -205,6 +215,9 @@ describe('ModuleCard', () => {
 
   it('renders information for a heater shaker module with mocked status', () => {
     mockGetIsHeaterShakerAttached.mockReturnValue(true)
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'heatershaker_id',
+    })
     const { getByText, getByAltText } = render({
       module: mockHeaterShaker,
       robotName: mockRobot.name,
@@ -217,6 +230,7 @@ describe('ModuleCard', () => {
   })
 
   it('renders kebab icon and is clickable', () => {
+    mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
     const { getByRole, getByText } = render({
       module: mockMagneticModule,
       robotName: mockRobot.name,
@@ -234,7 +248,7 @@ describe('ModuleCard', () => {
     when(mockUseCurrentRunStatus)
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_RUNNING)
-
+    mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
     const { getByRole, getByText } = render({
       module: mockMagneticModule,
       robotName: mockRobot.name,
@@ -247,6 +261,9 @@ describe('ModuleCard', () => {
   })
 
   it('renders information for a heater shaker module when it is hot, showing the too hot banner', () => {
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'heatershaker_id',
+    })
     const { getByText } = render({
       module: mockHotHeaterShaker,
       robotName: mockRobot.name,
@@ -254,6 +271,9 @@ describe('ModuleCard', () => {
     getByText(nestedTextMatcher('Module is hot to the touch'))
   })
   it('renders information success toast when update has completed', () => {
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'heatershaker_id',
+    })
     mockGetRequestById.mockReturnValue({
       status: RobotApi.SUCCESS,
       response: {
@@ -270,6 +290,7 @@ describe('ModuleCard', () => {
     getByText('mock toast')
   })
   it('renders information for a magnetic module when an update is available so update banner renders', () => {
+    mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
     const { getByText } = render({
       module: mockMagneticModuleHub,
       robotName: mockRobot.name,
@@ -290,6 +311,7 @@ describe('ModuleCard', () => {
       },
       error: { message: 'ruh roh' },
     })
+    mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
 
     const { getByText } = render({
       module: mockMagneticModuleHub,
@@ -305,6 +327,7 @@ describe('ModuleCard', () => {
     mockGetRequestById.mockReturnValue({
       status: RobotApi.PENDING,
     })
+    mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
     const { getByText, getByLabelText } = render({
       module: mockMagneticModuleHub,
       robotName: mockRobot.name,

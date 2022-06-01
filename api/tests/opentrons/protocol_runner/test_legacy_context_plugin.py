@@ -86,7 +86,7 @@ def test_play_action(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should resume the hardware controller upon a play action."""
-    action = pe_actions.PlayAction()
+    action = pe_actions.PlayAction(requested_at=datetime(year=2021, month=1, day=1))
     subject.handle_action(action)
 
     decoy.verify(hardware_api.resume(PauseType.PAUSE))
@@ -99,7 +99,7 @@ def test_play_pauses_when_door_is_open(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should not play the hardware controller when door is blocking."""
-    action = pe_actions.PlayAction()
+    action = pe_actions.PlayAction(requested_at=datetime(year=2021, month=1, day=1))
 
     decoy.when(state_view.commands.get_is_door_blocking()).then_return(True)
     subject.handle_action(action)

@@ -2,7 +2,11 @@
 import asyncio
 
 import pytest
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorType,
+    SensorThresholdMode,
+)
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BaselineSensorRequest,
     ReadFromSensorRequest,
@@ -17,7 +21,10 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     SetSensorThresholdRequestPayload,
     WriteToSensorRequestPayload,
 )
-from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    SensorTypeField,
+    SensorThresholdModeField,
+)
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
     UInt16Field,
@@ -146,7 +153,9 @@ async def test_set_threshold_sensors(
     """We should be able to set thresholds for the pressure and capacitive sensor."""
     set_threshold = SetSensorThresholdRequest(
         payload=SetSensorThresholdRequestPayload(
-            sensor=SensorTypeField(sensor_type), threshold=Int32Field(0x1)
+            sensor=SensorTypeField(sensor_type),
+            threshold=Int32Field(0x1),
+            mode=SensorThresholdModeField(SensorThresholdMode.absolute.value),
         )
     )
     await can_messenger.send(node_id=NodeId.pipette_left, message=set_threshold)

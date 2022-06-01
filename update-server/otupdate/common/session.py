@@ -47,23 +47,23 @@ class UpdateSession:
         self._rootfs_file: Optional[str] = None
         LOG.info(f"update session: created {self._token}")
 
-    def _setup_dl_area(self):
+    def _setup_dl_area(self) -> None:
         if os.path.exists(self._storage_path):
             shutil.rmtree(self._storage_path)
         os.makedirs(self._storage_path, mode=0o700, exist_ok=True)
 
-    def __del__(self):
+    def __del__(self) -> None:
         if hasattr(self, "_storage_path"):
             shutil.rmtree(self._storage_path)
         LOG.info(f"Update session: removed {getattr(self, '_token', '<unknown>')}")
 
-    def set_stage(self, stage: Stages):
+    def set_stage(self, stage: Stages) -> None:
         """Convenience method to set the stage and lookup message"""
         assert stage in Stages
         LOG.info(f"Update session: stage {self._stage.name}->{stage.name}")
         self._stage = stage
 
-    def set_error(self, error_shortmsg: str, error_longmsg: str):
+    def set_error(self, error_shortmsg: str, error_longmsg: str) -> None:
         """Set the stage to error and add a message"""
         LOG.error(
             f"Update session: error in stage {self._stage.name}: "

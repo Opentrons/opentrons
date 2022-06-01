@@ -10,6 +10,7 @@ import {
   SIZE_1,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  COLORS,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
@@ -33,7 +34,11 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
   const RunningProtocolBanner = (): JSX.Element | null =>
     currentRunId != null ? (
       <Flex alignItems={ALIGN_CENTER}>
-        <StyledText as="label" paddingRight={SPACING.spacing3}>
+        <StyledText
+          as="label"
+          paddingRight={SPACING.spacing3}
+          css={{ 'overflow-wrap': 'anywhere' }}
+        >
           {`${displayName}; ${t(`run_details:status_${currentRunStatus}`)}`}
         </StyledText>
         <Link
@@ -52,6 +57,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText
           as="h6"
+          color={COLORS.darkGreyEnabled}
           paddingBottom={SPACING.spacing1}
           id={`RobotStatusBanner_${name}_robotModel`}
         >
@@ -61,8 +67,9 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
           <Flex alignItems={ALIGN_CENTER}>
             <StyledText
               as="h3"
-              marginRight={SPACING.spacing4}
+              marginRight={SPACING.spacing3}
               id={`RobotStatusBanner_${name}_robotName`}
+              css={{ 'overflow-wrap': 'anywhere' }}
             >
               {name}
             </StyledText>

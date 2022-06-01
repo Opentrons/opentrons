@@ -6,15 +6,16 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 5.1.0-beta.0
+# Opentrons App Changes in 6.0.0-alpha.0
 
-Welcome to the beta release of v5.1.0 release of the Opentrons App!
+Welcome to the alpha release of v6.0.0 release of the Opentrons App!
 
-After you update your app, please be sure to update any OT-2's you will be using with this beta.
-The 5.1.0 release reshapes the main navigational structure. We're very excited for you to try this new experience out, and we appreciate your feedback (and patience) as you use this new software.
+After you update your app, please be sure to update any OT-2's you will be using with this alpha.
+The 6.0.0 release reshapes the main navigational structure. We're very excited for you to try this new experience out, and we appreciate your feedback (and patience) as you use this new software.
 
-This is beta software! You may experience unexpected crashes or missing features not detailed here. Please see the [issue tracker][] for more details and to leave feedback.
-[issue tracker]: https://github.com/Opentrons/opentrons/issues/new?assignees=y3rsh%2Cnusrat813&labels=5.1-feedback&template=testing_feedback.yml&title=5.1+Feedback%3A++%3Ctitle%3E
+This is alpha software! You may experience unexpected crashes or missing features not detailed here. Please see the [issue tracker][] for more details and to leave feedback.
+
+[issue tracker]: https://github.com/Opentrons/opentrons/issues/new?assignees=y3rsh%2Cnusrat813&labels=6.0-feedback&template=testing_feedback.yml&title=6.0+Feedback%3A++%3Ctitle%3E
 
 ## New Features
 
@@ -25,17 +26,11 @@ This is beta software! You may experience unexpected crashes or missing features
 
 ## Bug Fixes
 
-Keep an eye on this space as we release new versions of the beta.
+Keep an eye on this space as we release new versions of the alpha.
 
 ## Known Issues
 
-This beta is a work in progress! We'll be addressing the following features and issues in upcoming releases of 5.1.0.
-
-- You will not be able to view historical protocol runs on a Device Detail Page
-- You will not be able to Factory Reset
-- You will not be able to specify an alternate path to a local python interpreter
-- Portions of the Protocol Detail page are currently in development
-- Magnetic Module Set Engage Height controls may not function properly
+This alpha is a work in progress! We'll be addressing issues found in alpha testing in upcoming releases of 6.0.0.
 
 ---
 

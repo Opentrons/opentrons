@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.1.0-beta.0...v6.0.0-alpha.0) (2022-05-26)
+
+
+### Bug Fixes
+
+* **app:** App fix modal dialogs to delete protocol ([#10291](https://github.com/Opentrons/opentrons/issues/10291)) ([2580809](https://github.com/Opentrons/opentrons/commit/258080906c77fa582dbf725f62e164ce1e0f66b4))
+* **app:** App fix robot settings design feedback ([#10290](https://github.com/Opentrons/opentrons/issues/10290)) ([bb1d78d](https://github.com/Opentrons/opentrons/commit/bb1d78dc2627b3fee050726f48b01eef72eb4fb5))
+* **app:** fix propagation issues with overflow menu modals ([#10364](https://github.com/Opentrons/opentrons/issues/10364)) ([425ec48](https://github.com/Opentrons/opentrons/commit/425ec4824993956efc2b99aa95a39a49b05ef05d)), closes [#10206](https://github.com/Opentrons/opentrons/issues/10206)
+* **app:** Modify labware card and slideout style ([#10101](https://github.com/Opentrons/opentrons/issues/10101)) ([f7baa38](https://github.com/Opentrons/opentrons/commit/f7baa38744a77c3a2a9ff9af809e4c0ed2a5767d))
+* **components:** update labware render story to match new component interface ([#10169](https://github.com/Opentrons/opentrons/issues/10169)) ([6b77e75](https://github.com/Opentrons/opentrons/commit/6b77e75b676ff39b3971f524f089c66a909033dc))
+
+
+### Features
+
+* **app:** module slideout QA feedback touchups  ([#10110](https://github.com/Opentrons/opentrons/issues/10110)) ([a9b0738](https://github.com/Opentrons/opentrons/commit/a9b073854bd9d51ba79bfc25a24b07b3b30b3a07)), closes [#9869](https://github.com/Opentrons/opentrons/issues/9869)
+* **shared-data:** add H/S to deck definition, bump deck definition schema ([#10417](https://github.com/Opentrons/opentrons/issues/10417)) ([183a1ac](https://github.com/Opentrons/opentrons/commit/183a1acd2db56750148d59a6058345aa32618311))
+
+
+
+
+
 # [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
 
 

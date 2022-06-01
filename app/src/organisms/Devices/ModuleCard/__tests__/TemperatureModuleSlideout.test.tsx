@@ -7,18 +7,23 @@ import {
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { TemperatureModuleSlideout } from '../TemperatureModuleSlideout'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import {
   mockTemperatureModule,
   mockTemperatureModuleGen2,
 } from '../../../../redux/modules/__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../useModuleIdFromRun')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
 const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
   typeof useCreateCommandMutation
+>
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
 >
 
 const render = (
@@ -51,6 +56,7 @@ describe('TemperatureModuleSlideout', () => {
     mockUseCommandMutation.mockReturnValue({
       createCommand: mockCreateCommand,
     } as any)
+    mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'tempdeck_id' })
   })
   afterEach(() => {
     jest.resetAllMocks()

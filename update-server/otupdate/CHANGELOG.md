@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.1.0-beta.0...v6.0.0-alpha.0) (2022-05-26)
+
+
+### Bug Fixes
+
+* **update-server:** Avoid bricking when given a bad name ([#10219](https://github.com/Opentrons/opentrons/issues/10219)) ([b71278f](https://github.com/Opentrons/opentrons/commit/b71278f481f56269a1de67372eb40d6ed3f25923)), closes [#9960](https://github.com/Opentrons/opentrons/issues/9960) [#10198](https://github.com/Opentrons/opentrons/issues/10198)
+
+
+### Features
+
+* **update-server:** ot3 support ([#10011](https://github.com/Opentrons/opentrons/issues/10011)) ([c1b3a55](https://github.com/Opentrons/opentrons/commit/c1b3a55381b45f7dfa0c26d81f37f95ec1622fb7)), closes [#9732](https://github.com/Opentrons/opentrons/issues/9732) [#9830](https://github.com/Opentrons/opentrons/issues/9830) [#10115](https://github.com/Opentrons/opentrons/issues/10115) [#10252](https://github.com/Opentrons/opentrons/issues/10252)
+
+
+
+
+
 # [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
 
 **Note:** Version bump only for package @opentrons/update-server

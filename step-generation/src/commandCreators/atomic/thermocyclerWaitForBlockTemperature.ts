@@ -1,6 +1,6 @@
-import type { TemperatureParams } from '@opentrons/shared-data/protocol/types/schemaV4'
+import type { ModuleOnlyParams } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { CommandCreator } from '../../types'
-export const thermocyclerWaitForBlockTemperature: CommandCreator<TemperatureParams> = (
+export const thermocyclerWaitForBlockTemperature: CommandCreator<ModuleOnlyParams> = (
   args,
   invariantContext,
   prevRobotState
@@ -11,7 +11,6 @@ export const thermocyclerWaitForBlockTemperature: CommandCreator<TemperaturePara
         commandType: 'thermocycler/waitForBlockTemperature',
         params: {
           moduleId: args.module,
-          celsius: args.temperature,
         },
       },
     ],
