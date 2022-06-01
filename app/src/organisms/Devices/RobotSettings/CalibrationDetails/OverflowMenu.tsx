@@ -122,6 +122,7 @@ export function OverflowMenu({
     e: React.MouseEvent
   ): void => {
     e.preventDefault()
+    console.log(isBusy)
     if (isBusy) {
       updateRobotStatus(true)
     } else {

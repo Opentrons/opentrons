@@ -48,11 +48,11 @@ import {
   useTipLengthCalibrations,
   useAttachedPipettes,
   useDeckCalibrationStatus,
+  useIsRobotBusy,
 } from '../hooks'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
-import { useIsRobotBusy } from '../hooks/useIsRobotBusy'
 
 import type { State, Dispatch } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'

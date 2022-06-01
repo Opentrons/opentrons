@@ -11,7 +11,7 @@ import { SelectSsid } from './ConnectNetwork/SelectSsid'
 import { ConnectModal } from './ConnectNetwork/ConnectModal'
 import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
 import { ResultModal } from './ConnectNetwork/ResultModal'
-
+import { useIsRobotBusy } from '../hooks'
 import { CONNECT, DISCONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
 
 import type { State, Dispatch } from '../../../redux/types'
@@ -20,7 +20,6 @@ import type {
   WifiConfigureRequest,
   NetworkChangeState,
 } from './ConnectNetwork/types'
-import { useIsRobotBusy } from '../hooks'
 
 interface TempSelectNetworkProps {
   robotName: string

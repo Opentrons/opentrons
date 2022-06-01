@@ -36,6 +36,8 @@ export function DisableHoming({
   const id = settings?.id ? settings.id : 'disableHomeOnBoot'
   const isBusy = useIsRobotBusy()
 
+  console.log('isBusy', isBusy)
+
   const handleClick: React.MouseEventHandler<Element> = () => {
     if (isBusy) {
       updateIsRobotBusy(true)
