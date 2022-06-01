@@ -21,7 +21,12 @@ class WaitForTemperatureParams(BaseModel):
     moduleId: str = Field(..., description="Unique ID of the Heater-Shaker Module.")
     celsius: Optional[float] = Field(
         None,
-        description="Target temperature in °C. If not specified, will default to the module's target temperature. Specifying a celsius parameter other than the target temperature could lead to unpredictable behavior and hence is not recommended for use. This parameter can be removed in a future version without prior notice.",
+        description="Target temperature in °C. If not specified, will "
+        "default to the module's target temperature. "
+        "Specifying a celsius parameter other than the target temperature "
+        "could lead to unpredictable behavior and hence is not "
+        "recommended for use. This parameter can be removed in a "
+        "future version without prior notice.",
     )
 
 
