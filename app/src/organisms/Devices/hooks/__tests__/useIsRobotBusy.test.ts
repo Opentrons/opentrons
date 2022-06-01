@@ -40,18 +40,18 @@ describe('useIsRobotBusy', () => {
 
   it('returns false when current runId is null and sessions are empty', () => {
     mockUseCurrentRunId.mockReturnValue(null)
-    mockUseAllSessionsQuery.mockReturnValue({
-        data: [
-          {
-            "id": "test",
-            "createdAt": "2019-08-24T14:15:22Z",
-            "details": {},
-            "sessionType": "calibrationCheck",
-            "createParams": {}
-          },
-        ],
-        "links": {},
-      } as unknown as UseQueryResult<Sessions, Error>)
+    mockUseAllSessionsQuery.mockReturnValue(({
+      data: [
+        {
+          id: 'test',
+          createdAt: '2019-08-24T14:15:22Z',
+          details: {},
+          sessionType: 'calibrationCheck',
+          createParams: {},
+        },
+      ],
+      links: {},
+    } as unknown) as UseQueryResult<Sessions, Error>)
     const result = useIsRobotBusy()
     expect(result).toBe(false)
   })
