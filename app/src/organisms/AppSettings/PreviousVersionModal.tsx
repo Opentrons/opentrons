@@ -1,12 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Box,
-  Flex,
-  JUSTIFY_FLEX_END,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { Box, Flex, JUSTIFY_FLEX_END, SPACING } from '@opentrons/components'
 
 import { Modal } from '../../atoms/Modal'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
@@ -14,8 +8,7 @@ import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 export const UNINSTALL_APP_URL =
-  'https://support.opentrons.com/en/articles/2393514-uninstall-the-opentrons-app'
-
+  'https://support.opentrons.com/s/article/Uninstall-the-Opentrons-App'
 export const PREVIOUS_RELEASES_URL =
   'https://github.com/Opentrons/opentrons/releases'
 
@@ -37,7 +30,6 @@ export function PreviousVersionModal(
         <ExternalLink
           href={UNINSTALL_APP_URL}
           paddingBottom={SPACING.spacing3}
-          css={TYPOGRAPHY.linkPSemibold}
           id="PreviousVersionModal_uninstallingAppLink"
         >
           {t('learn_uninstalling')}
@@ -45,7 +37,6 @@ export function PreviousVersionModal(
         <br />
         <ExternalLink
           href={PREVIOUS_RELEASES_URL}
-          css={TYPOGRAPHY.linkPSemibold}
           id="PreviousVersionModal_previousReleases"
         >
           {t('previous_releases')}

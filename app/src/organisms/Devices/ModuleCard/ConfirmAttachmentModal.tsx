@@ -12,8 +12,10 @@ import {
   TYPOGRAPHY,
   TEXT_TRANSFORM_CAPITALIZE,
   DIRECTION_COLUMN,
+  Btn,
+  COLORS,
 } from '@opentrons/components'
-import { SecondaryButton, PrimaryButton } from '../../../atoms/buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 import { Modal } from '../../../atoms/Modal'
 import { Dispatch } from '../../../redux/types'
 import { UpdateConfigValueAction } from '../../../redux/config/types'
@@ -45,6 +47,7 @@ export const ConfirmAttachmentModal = (
       dispatch(setHeaterShakerAttached(isDismissed))
     }
     onConfirmClick()
+    onCloseClick()
   }
 
   return (
@@ -101,12 +104,15 @@ export const ConfirmAttachmentModal = (
             isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
           }`}
         >
-          <SecondaryButton
+          <Btn
             onClick={onCloseClick}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            color={COLORS.blue}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            marginRight={SPACING.spacing6}
           >
             {t('shared:cancel')}
-          </SecondaryButton>
+          </Btn>
         </Flex>
 
         <Flex

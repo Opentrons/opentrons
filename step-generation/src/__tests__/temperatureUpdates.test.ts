@@ -1,4 +1,3 @@
-// @ts-nocheck TODO: remove this after https://github.com/Opentrons/opentrons/pull/10176 merges
 import {
   TEMPERATURE_DEACTIVATED,
   TEMPERATURE_APPROACHING_TARGET,

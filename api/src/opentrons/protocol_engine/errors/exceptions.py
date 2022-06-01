@@ -126,7 +126,11 @@ class NoTargetTemperatureSetError(ProtocolEngineError):
 
 
 class InvalidTargetTemperatureError(ProtocolEngineError):
-    """An error raised when attampting to set an invalid target temperature."""
+    """An error raised when attempting to set an invalid target temperature."""
+
+
+class InvalidBlockVolumeError(ProtocolEngineError):
+    """An error raised when attempting to set an invalid block max volume."""
 
 
 class InvalidTargetSpeedError(ProtocolEngineError):

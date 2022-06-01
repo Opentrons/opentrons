@@ -86,7 +86,7 @@ describe('thermocycler state updaters', () => {
     {
       params: {
         moduleId,
-        temperature: 42,
+        celsius: 42,
       },
       moduleStateBefore: {
         blockTargetTemp: null,
@@ -103,7 +103,7 @@ describe('thermocycler state updaters', () => {
     {
       params: {
         moduleId,
-        temperature: 42,
+        celsius: 42,
       },
       moduleStateBefore: {
         lidTargetTemp: null,
@@ -118,7 +118,7 @@ describe('thermocycler state updaters', () => {
     {
       params: {
         moduleId,
-        temperature: 42,
+        celsius: 42,
       },
       moduleStateBefore: {
         lidTargetTemp: 41,
@@ -136,7 +136,7 @@ describe('thermocycler state updaters', () => {
     {
       params: {
         moduleId,
-        temperature: 41,
+        celsius: 41,
       },
       moduleStateBefore: {
         lidTargetTemp: 41,

@@ -146,7 +146,9 @@ Command = Union[
     temperature_module.WaitForTemperature,
     temperature_module.DeactivateTemperature,
     thermocycler.SetTargetBlockTemperature,
+    thermocycler.WaitForBlockTemperature,
     thermocycler.SetTargetLidTemperature,
+    thermocycler.WaitForLidTemperature,
     thermocycler.DeactivateBlock,
     thermocycler.DeactivateLid,
 ]
@@ -179,7 +181,9 @@ CommandParams = Union[
     temperature_module.WaitForTemperatureParams,
     temperature_module.DeactivateTemperatureParams,
     thermocycler.SetTargetBlockTemperatureParams,
+    thermocycler.WaitForBlockTemperatureParams,
     thermocycler.SetTargetLidTemperatureParams,
+    thermocycler.WaitForLidTemperatureParams,
     thermocycler.DeactivateBlockParams,
     thermocycler.DeactivateLidParams,
 ]
@@ -212,7 +216,9 @@ CommandType = Union[
     temperature_module.WaitForTemperatureCommandType,
     temperature_module.DeactivateTemperatureCommandType,
     thermocycler.SetTargetBlockTemperatureCommandType,
+    thermocycler.WaitForBlockTemperatureCommandType,
     thermocycler.SetTargetLidTemperatureCommandType,
+    thermocycler.WaitForLidTemperatureCommandType,
     thermocycler.DeactivateBlockCommandType,
     thermocycler.DeactivateLidCommandType,
 ]
@@ -244,7 +250,9 @@ CommandCreate = Union[
     temperature_module.WaitForTemperatureCreate,
     temperature_module.DeactivateTemperatureCreate,
     thermocycler.SetTargetBlockTemperatureCreate,
+    thermocycler.WaitForBlockTemperatureCreate,
     thermocycler.SetTargetLidTemperatureCreate,
+    thermocycler.WaitForLidTemperatureCreate,
     thermocycler.DeactivateBlockCreate,
     thermocycler.DeactivateLidCreate,
 ]
@@ -277,7 +285,9 @@ CommandResult = Union[
     temperature_module.WaitForTemperatureResult,
     temperature_module.DeactivateTemperatureResult,
     thermocycler.SetTargetBlockTemperatureResult,
+    thermocycler.WaitForBlockTemperatureResult,
     thermocycler.SetTargetLidTemperatureResult,
+    thermocycler.WaitForLidTemperatureResult,
     thermocycler.DeactivateBlockResult,
     thermocycler.DeactivateLidResult,
 ]

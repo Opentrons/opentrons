@@ -166,7 +166,7 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
       {(description.length > 160 || protocolType === 'python') && (
         <Link
           role="button"
-          css={TYPOGRAPHY.linkPSemibold}
+          css={TYPOGRAPHY.linkPSemiBold}
           marginTop={SPACING.spacing3}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
           onClick={() => setIsReadMore(!isReadMore)}
@@ -228,7 +228,8 @@ export function ProtocolDetails(
       })
     } else {
       return t('python_api_version', {
-        version: config.apiVersion?.join('.'),
+        version:
+          config.apiVersion != null ? config.apiVersion?.join('.') : null,
       })
     }
   }

@@ -1,23 +1,8 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useModulesQuery } from '@opentrons/react-api-client'
+import type { AttachedModule } from '@opentrons/api-client'
 
-import { fetchModules, getAttachedModules } from '../../../redux/modules'
-import { useDispatchApiRequest } from '../../../redux/robot-api'
+export function useAttachedModules(): AttachedModule[] {
+  const attachedModulesResponse = useModulesQuery()
 
-import type { AttachedModule } from '../../../redux/modules/types'
-import type { State } from '../../../redux/types'
-
-// TODO: immediately move this to the react-api-client
-export function useAttachedModules(robotName: string | null): AttachedModule[] {
-  const [dispatchRequest] = useDispatchApiRequest()
-
-  const attachedModules = useSelector((state: State) =>
-    getAttachedModules(state, robotName)
-  )
-
-  React.useEffect(() => {
-    robotName != null && dispatchRequest(fetchModules(robotName))
-  }, [robotName])
-
-  return attachedModules
+  return attachedModulesResponse.data?.data || []
 }

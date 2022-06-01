@@ -13,10 +13,10 @@ from .fields import (
     ErrorCodeField,
     SensorTypeField,
     PipetteNameField,
-    PipetteSerialField,
-    GripperSerialField,
     SensorOutputBindingField,
     EepromDataField,
+    SerialField,
+    SensorThresholdModeField,
 )
 from .. import utils
 
@@ -74,7 +74,7 @@ class GetSpeedResponsePayload(utils.BinarySerializable):
 class EEPromReadPayload(utils.BinarySerializable):
     """Eeprom read request payload ."""
 
-    address: utils.UInt8Field
+    address: utils.UInt16Field
     data_length: utils.UInt8Field
 
 
@@ -326,6 +326,7 @@ class SetSensorThresholdRequestPayload(utils.BinarySerializable):
 
     sensor: SensorTypeField
     threshold: utils.Int32Field
+    mode: SensorThresholdModeField
 
 
 @dataclass
@@ -334,6 +335,7 @@ class SensorThresholdResponsePayload(utils.BinarySerializable):
 
     sensor: SensorTypeField
     threshold: utils.Int32Field
+    mode: SensorThresholdModeField
 
 
 @dataclass
@@ -375,7 +377,7 @@ class PipetteInfoResponsePayload(utils.BinarySerializable):
 
     pipette_name: PipetteNameField
     pipette_model: utils.UInt16Field
-    pipette_serial: PipetteSerialField
+    pipette_serial: SerialField
 
 
 @dataclass
@@ -398,7 +400,7 @@ class GripperInfoResponsePayload(utils.BinarySerializable):
     """A response carrying data about an attached gripper."""
 
     gripper_model: utils.UInt16Field
-    gripper_serial: GripperSerialField
+    gripper_serial: SerialField
 
 
 @dataclass
@@ -421,3 +423,25 @@ class TipActionResponsePayload(MoveGroupResponsePayload):
     """A response that sends back whether tip action was successful."""
 
     success: utils.UInt8Field
+
+
+@dataclass
+class PeripheralStatusRequestPayload(utils.BinarySerializable):
+    """A request to get the initialization status of a peripheral device."""
+
+    sensor: SensorTypeField
+
+
+@dataclass
+class PeripheralStatusResponsePayload(utils.BinarySerializable):
+    """A response that sends back the initialization status of a peripheral device."""
+
+    sensor: SensorTypeField
+    status: utils.UInt8Field
+
+
+@dataclass
+class SerialNumberPayload(utils.BinarySerializable):
+    """A payload with a serial number."""
+
+    serial: SerialField

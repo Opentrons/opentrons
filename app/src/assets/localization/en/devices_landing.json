@@ -3,7 +3,7 @@
   "available": "Available ({{count}})",
   "check_same_network": "Check that the computer and robot are on the same network",
   "connection_troubleshooting_intro": "If you're having trouble with the robot's connection, try these troubleshooting tasks. First, double check that the robot is powered on.",
-  "contact_support_for_connection_help": "If none of these work, contact Opentrons Support for help (via the chat link in this app, or by emailing {{support_email}}",
+  "contact_support_for_connection_help": "If none of these work, contact Opentrons Support for help (via the question mark link in this app, or by emailing {{support_email}}",
   "devices": "Devices",
   "empty": "Empty",
   "go_to_run": "Go to Run",

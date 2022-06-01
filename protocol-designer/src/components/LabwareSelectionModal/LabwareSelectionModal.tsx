@@ -10,10 +10,12 @@ import {
 import {
   getLabwareDefURI,
   getLabwareDefIsStandard,
+  getIsLabwareAboveHeight,
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
+  MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   LabwareDefinition2,
   ModuleType,
 } from '@opentrons/shared-data'
@@ -44,6 +46,7 @@ export interface Props {
   moduleType?: ModuleType | null
   /** tipracks that may be added to deck (depends on pipette<>tiprack assignment) */
   permittedTipracks: string[]
+  isNextToHeaterShaker: boolean
 }
 
 const LABWARE_CREATOR_URL = 'https://labware.opentrons.com/create'
@@ -100,6 +103,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
     parentSlot,
     moduleType,
     selectLabware,
+    isNextToHeaterShaker,
   } = props
 
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
@@ -111,6 +115,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
   const [filterRecommended, setFilterRecommended] = React.useState<boolean>(
     false
   )
+  const [filterHeight, setFilterHeight] = React.useState<boolean>(false)
   const [enqueuedLabwareType, setEnqueuedLabwareType] = React.useState<
     string | null
   >(null)
@@ -148,7 +153,8 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
   // if you're adding labware to a module, check the recommended filter by default
   React.useEffect(() => {
     setFilterRecommended(moduleType != null)
-  }, [moduleType])
+    setFilterHeight(isNextToHeaterShaker)
+  }, [moduleType, isNextToHeaterShaker])
 
   const getLabwareCompatible = React.useCallback(
     (def: LabwareDefinition2) => {
@@ -161,12 +167,31 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
     [moduleType]
   )
 
-  const getLabwareDisabled = React.useCallback(
+  const getIsLabwareFiltered = React.useCallback(
     (labwareDef: LabwareDefinition2) =>
       (filterRecommended && !getLabwareIsRecommended(labwareDef, moduleType)) ||
+      (filterHeight &&
+        getIsLabwareAboveHeight(
+          labwareDef,
+          MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
+        )) ||
       !getLabwareCompatible(labwareDef),
-    [filterRecommended, getLabwareCompatible, moduleType]
+    [filterRecommended, filterHeight, getLabwareCompatible, moduleType]
   )
+
+  const getTitleText = (): string => {
+    if (isNextToHeaterShaker) {
+      return `Slot ${slot}, Labware to the side of ${i18n.t(
+        `modules.module_long_names.heaterShakerModuleType`
+      )}`
+    }
+    if (parentSlot != null && moduleType != null) {
+      return `Slot ${
+        parentSlot === SPAN7_8_10_11_SLOT ? '7' : parentSlot
+      }, ${i18n.t(`modules.module_long_names.${moduleType}`)} Labware`
+    }
+    return `Slot ${slot} Labware`
+  }
 
   const customLabwareURIs: string[] = React.useMemo(
     () => Object.keys(customLabwareDefs),
@@ -207,13 +232,13 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
             ? {
                 ...acc,
                 [category]: labwareByCategory[category].some(
-                  def => !getLabwareDisabled(def)
+                  def => !getIsLabwareFiltered(def)
                 ),
               }
             : acc,
         {}
       ),
-    [labwareByCategory, getLabwareDisabled]
+    [labwareByCategory, getIsLabwareFiltered]
   )
 
   const wrapperRef: React.RefObject<HTMLDivElement> = useOnClickOutside({
@@ -232,28 +257,48 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
     setSelectedCategory(selectedCategory === category ? null : category)
   }
 
-  const recommendedFilterCheckbox = moduleType ? (
-    <div>
-      <div className={styles.filters_heading}>Filters</div>
-      <div className={styles.filters_section}>
-        <CheckboxField
-          className={styles.filter_checkbox}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setFilterRecommended(e.currentTarget.checked)
-          }
-          value={filterRecommended}
-        />
-        <Icon className={styles.icon} name="check-decagram" />
-        <span className={styles.filters_section_copy}>
-          {i18n.t('modal.labware_selection.recommended_labware_filter')}{' '}
-          <KnowledgeBaseLink className={styles.link} to="recommendedLabware">
-            here
-          </KnowledgeBaseLink>
-          .
-        </span>
-      </div>
-    </div>
-  ) : null
+  const getFilterCheckbox = (): JSX.Element | null => {
+    if (isNextToHeaterShaker || moduleType != null) {
+      return (
+        <div>
+          <div className={styles.filters_heading}>Filters</div>
+          <div className={styles.filters_section}>
+            <CheckboxField
+              className={styles.filter_checkbox}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                isNextToHeaterShaker
+                  ? setFilterHeight(e.currentTarget.checked)
+                  : setFilterRecommended(e.currentTarget.checked)
+              }
+              value={isNextToHeaterShaker ? filterHeight : filterRecommended}
+            />
+            {isNextToHeaterShaker && (
+              <Icon className={styles.icon} name="check-decagram" />
+            )}
+            <span className={styles.filters_section_copy}>
+              {i18n.t(
+                isNextToHeaterShaker
+                  ? 'modal.labware_selection.heater_shaker_labware_filter'
+                  : 'modal.labware_selection.recommended_labware_filter'
+              )}{' '}
+              <KnowledgeBaseLink
+                className={styles.link}
+                to={
+                  isNextToHeaterShaker
+                    ? 'heaterShakerLabware'
+                    : 'recommendedLabware'
+                }
+              >
+                here
+              </KnowledgeBaseLink>
+              .
+            </span>
+          </div>
+        </div>
+      )
+    }
+    return null
+  }
 
   let moduleCompatibility: React.ComponentProps<
     typeof LabwarePreview
@@ -278,14 +323,8 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
       </Portal>
       {blockingCustomLabwareHint}
       <div ref={wrapperRef} className={styles.labware_dropdown}>
-        <div className={styles.title}>
-          {parentSlot != null && moduleType != null
-            ? `Slot ${
-                parentSlot === SPAN7_8_10_11_SLOT ? '7' : parentSlot
-              }, ${i18n.t(`modules.module_long_names.${moduleType}`)} Labware`
-            : `Slot ${slot} Labware`}
-        </div>
-        {recommendedFilterCheckbox}
+        <div className={styles.title}>{getTitleText()}</div>
+        {getFilterCheckbox()}
         <ul>
           {customLabwareURIs.length > 0 ? (
             <PDTitledList
@@ -320,28 +359,26 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
                   onClick={makeToggleCategory(category)}
                   inert={!isPopulated}
                 >
-                  {labwareByCategory[category] &&
-                    labwareByCategory[category].map((labwareDef, index) => {
-                      const isDisabled = getLabwareDisabled(labwareDef)
-                      if (!isDisabled) {
-                        return (
-                          <LabwareItem
-                            key={index}
-                            icon={
-                              getLabwareIsRecommended(labwareDef, moduleType)
-                                ? 'check-decagram'
-                                : null
-                            }
-                            disabled={isDisabled}
-                            labwareDef={labwareDef}
-                            selectLabware={selectLabware}
-                            onMouseEnter={() => setPreviewedLabware(labwareDef)}
-                            // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
-                            onMouseLeave={() => setPreviewedLabware()}
-                          />
-                        )
-                      }
-                    })}
+                  {labwareByCategory[category]?.map((labwareDef, index) => {
+                    const isFiltered = getIsLabwareFiltered(labwareDef)
+                    if (!isFiltered) {
+                      return (
+                        <LabwareItem
+                          key={index}
+                          icon={
+                            getLabwareIsRecommended(labwareDef, moduleType)
+                              ? 'check-decagram'
+                              : null
+                          }
+                          labwareDef={labwareDef}
+                          selectLabware={selectLabware}
+                          onMouseEnter={() => setPreviewedLabware(labwareDef)}
+                          // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
+                          onMouseLeave={() => setPreviewedLabware()}
+                        />
+                      )
+                    }
+                  })}
                 </PDTitledList>
               )
             }

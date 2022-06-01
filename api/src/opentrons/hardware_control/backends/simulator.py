@@ -23,9 +23,9 @@ from ..module_control import AttachedModulesControl
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName
     from ..dev_types import (
-        AttachedInstrument,
+        AttachedPipette,
         AttachedInstruments,
-        InstrumentSpec,
+        PipetteSpec,
         InstrumentHardwareConfigs,
     )
     from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
@@ -119,7 +119,7 @@ class Simulator:
 
         def _sanitize_attached_instrument(
             passed_ai: Optional[Dict[str, Optional[str]]] = None
-        ) -> InstrumentSpec:
+        ) -> PipetteSpec:
             if not passed_ai or not passed_ai.get("model"):
                 return {"model": None, "id": None}
             if passed_ai["model"] in config_models:
@@ -209,7 +209,7 @@ class Simulator:
 
     def _attached_to_mount(
         self, mount: types.Mount, expected_instr: Optional[PipetteName]
-    ) -> AttachedInstrument:
+    ) -> AttachedPipette:
         init_instr = self._attached_instruments.get(mount, {"model": None, "id": None})
         found_model = init_instr["model"]
         back_compat: List["PipetteName"] = []

@@ -21,6 +21,7 @@ import {
 
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { AlertPrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../atoms/Modal'
@@ -43,7 +44,12 @@ export function ProtocolOverflowMenu(
 ): JSX.Element {
   const { protocolKey, handleRunProtocol } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
-  const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
+  const {
+    MenuOverlay,
+    handleOverflowClick,
+    showOverflowMenu,
+    setShowOverflowMenu,
+  } = useMenuHandleClickOutside()
   const dispatch = useDispatch<Dispatch>()
   const {
     confirm: confirmDeleteProtocol,
@@ -53,25 +59,28 @@ export function ProtocolOverflowMenu(
 
   const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
+    e.stopPropagation()
     dispatch(viewProtocolSourceFolder(protocolKey))
     setShowOverflowMenu(!showOverflowMenu)
   }
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
+    e.stopPropagation()
     handleRunProtocol()
     setShowOverflowMenu(!showOverflowMenu)
   }
   const handleClickDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
+    e.stopPropagation()
     confirmDeleteProtocol()
     setShowOverflowMenu(!showOverflowMenu)
   }
-  const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    setShowOverflowMenu(!showOverflowMenu)
-  }
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      position={POSITION_RELATIVE}
+      onClick={e => e.stopPropagation()}
+    >
       <OverflowBtn
         alignSelf={ALIGN_FLEX_END}
         onClick={handleOverflowClick}
@@ -90,16 +99,16 @@ export function ProtocolOverflowMenu(
           flexDirection={DIRECTION_COLUMN}
         >
           <MenuItem
-            onClick={handleClickShowInFolder}
-            data-testid="ProtocolOverflowMenu_showInFolder"
-          >
-            {t('show_in_folder')}
-          </MenuItem>
-          <MenuItem
             onClick={handleClickRun}
             data-testid="ProtocolOverflowMenu_run"
           >
             {t('run')}
+          </MenuItem>
+          <MenuItem
+            onClick={handleClickShowInFolder}
+            data-testid="ProtocolOverflowMenu_showInFolder"
+          >
+            {t('show_in_folder')}
           </MenuItem>
           <MenuItem
             onClick={handleClickDelete}
@@ -116,6 +125,7 @@ export function ProtocolOverflowMenu(
             type="warning"
             onClose={(e: React.MouseEvent) => {
               e.preventDefault()
+              e.stopPropagation()
               cancelDeleteProtocol()
             }}
             title={t('should_delete_this_protocol')}
@@ -129,11 +139,12 @@ export function ProtocolOverflowMenu(
                   role="button"
                   onClick={(e: React.MouseEvent) => {
                     e.preventDefault()
+                    e.stopPropagation()
                     cancelDeleteProtocol()
                   }}
                   textTransform={TEXT_TRANSFORM_CAPITALIZE}
                   marginRight={SPACING.spacing5}
-                  css={TYPOGRAPHY.linkPSemibold}
+                  css={TYPOGRAPHY.linkPSemiBold}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   {t('shared:cancel')}
@@ -149,6 +160,7 @@ export function ProtocolOverflowMenu(
           </Modal>
         </Portal>
       ) : null}
+      <MenuOverlay />
     </Flex>
   )
 }

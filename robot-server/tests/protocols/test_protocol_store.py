@@ -2,7 +2,6 @@
 import pytest
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Generator
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_reader import (
@@ -18,23 +17,12 @@ from robot_server.protocols.protocol_store import (
     ProtocolResource,
     ProtocolUsageInfo,
     ProtocolNotFoundError,
+    ProtocolUsedByRunError,
 )
-from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
-from robot_server.runs.run_store import RunResource, RunStore
+
+from robot_server.runs.run_store import RunStore
 
 from sqlalchemy.engine import Engine as SQLEngine
-
-
-@pytest.fixture
-def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
-    """Return a set-up database to back the store."""
-    db_file_path = tmp_path / "test.db"
-    sql_engine = open_db_no_cleanup(db_file_path=db_file_path)
-    try:
-        add_tables_to_db(sql_engine)
-        yield sql_engine
-    finally:
-        sql_engine.dispose()
 
 
 @pytest.fixture
@@ -210,11 +198,41 @@ async def test_remove_protocol(
         subject.get("protocol-id")
 
 
-async def test_remove_missing_protocol_raises(
+def test_remove_missing_protocol_raises(
     subject: ProtocolStore,
 ) -> None:
     """It should raise an error when trying to remove missing protocol."""
     with pytest.raises(ProtocolNotFoundError, match="protocol-id"):
+        subject.remove("protocol-id")
+
+
+def test_remove_protocol_conflict(
+    run_store: RunStore,
+    subject: ProtocolStore,
+) -> None:
+    """It should raise an error when removing a protocol with a run."""
+    protocol_resource = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        source=ProtocolSource(
+            directory=None,
+            main_file=Path("/dev/null"),
+            config=JsonProtocolConfig(schema_version=123),
+            files=[],
+            metadata={},
+            labware_definitions=[],
+        ),
+        protocol_key=None,
+    )
+
+    subject.insert(protocol_resource)
+    run_store.insert(
+        run_id="run-id",
+        protocol_id="protocol-id",
+        created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
+    )
+
+    with pytest.raises(ProtocolUsedByRunError, match="protocol-id"):
         subject.remove("protocol-id")
 
 
@@ -272,13 +290,9 @@ def test_get_usage_info(
     # When a run is added that uses a protocol,
     # that protocol's is_used_by_run should become True.
     run_store.insert(
-        RunResource(
-            run_id="run-id-1",
-            protocol_id="protocol-id-1",
-            created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-            actions=[],
-            is_current=False,
-        )
+        run_id="run-id-1",
+        protocol_id="protocol-id-1",
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
     assert subject.get_usage_info() == [
         ProtocolUsageInfo(

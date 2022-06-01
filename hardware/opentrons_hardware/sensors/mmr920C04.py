@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from opentrons_hardware.firmware_bindings.constants import (
     SensorType,
     NodeId,
+    SensorThresholdMode,
 )
 from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
 from opentrons_hardware.sensors.utils import (
@@ -13,6 +14,7 @@ from opentrons_hardware.sensors.utils import (
     PollSensorInformation,
     WriteSensorInformation,
     SensorDataType,
+    SensorThresholdInformation,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     BindSensorOutputRequestPayload,
@@ -118,7 +120,9 @@ class PressureSensor(AbstractAdvancedSensor):
         timeout: int = 1,
     ) -> Optional[SensorDataType]:
         """Send the zero threshold which the offset value is compared to."""
-        write = WriteSensorInformation(self._sensor_type, node_id, threshold)
+        write = SensorThresholdInformation(
+            self._sensor_type, node_id, threshold, SensorThresholdMode.absolute
+        )
         threshold_data = await self._scheduler.send_threshold(
             write, can_messenger, timeout
         )
@@ -155,3 +159,14 @@ class PressureSensor(AbstractAdvancedSensor):
                     )
                 ),
             )
+
+    async def get_device_status(
+        self,
+        can_messenger: CanMessenger,
+        node_id: NodeId,
+        timeout: int = 1,
+    ) -> bool:
+        """Send a PeripheralStatusRequest and read the response message."""
+        return await self._scheduler.request_peripheral_status(
+            self._sensor_type, node_id, can_messenger, timeout
+        )

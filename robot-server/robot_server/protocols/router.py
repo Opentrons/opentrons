@@ -26,7 +26,12 @@ from .protocol_models import Protocol, ProtocolFile, Metadata
 from .protocol_analyzer import ProtocolAnalyzer
 from .analysis_store import AnalysisStore, AnalysisNotFoundError
 from .analysis_models import ProtocolAnalysis
-from .protocol_store import ProtocolStore, ProtocolResource, ProtocolNotFoundError
+from .protocol_store import (
+    ProtocolStore,
+    ProtocolResource,
+    ProtocolNotFoundError,
+    ProtocolUsedByRunError,
+)
 from .dependencies import (
     get_protocol_auto_deleter,
     get_protocol_reader,
@@ -59,6 +64,13 @@ class ProtocolFilesInvalid(ErrorDetails):
 
     id: Literal["ProtocolFilesInvalid"] = "ProtocolFilesInvalid"
     title: str = "Protocol File(s) Invalid"
+
+
+class ProtocolUsedByRun(ErrorDetails):
+    """An error returned when a protocol is used by a run and cannot be deleted."""
+
+    id: Literal["ProtocolUsedByRun"] = "ProtocolUsedByRun"
+    title: str = "Protocol Used by Run"
 
 
 protocols_router = APIRouter()
@@ -256,6 +268,7 @@ async def get_protocol_by_id(
     responses={
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[ProtocolUsedByRun]},
     },
 )
 async def delete_protocol_by_id(
@@ -272,7 +285,10 @@ async def delete_protocol_by_id(
         protocol_store.remove(protocol_id=protocolId)
 
     except ProtocolNotFoundError as e:
-        raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+        raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+
+    except ProtocolUsedByRunError as e:
+        raise ProtocolUsedByRun(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
 
     return await PydanticResponse.create(
         content=SimpleEmptyBody.construct(),
@@ -333,7 +349,7 @@ async def get_protocol_analysis_by_id(
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
 ) -> PydanticResponse[SimpleBody[ProtocolAnalysis]]:
-    """Get a protocol analysis by analyis ID.
+    """Get a protocol analysis by analysis ID.
 
     Arguments:
         protocolId: The ID of the protocol, pulled from the URL.

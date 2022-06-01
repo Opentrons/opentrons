@@ -1,10 +1,5 @@
 import type { TemperatureParams } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { CommandCreator } from '../../types'
-<<<<<<< HEAD
-// @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10182 merges
-=======
-// @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10178 merges
->>>>>>> edge
 export const thermocyclerAwaitBlockTemperature: CommandCreator<TemperatureParams> = (
   args,
   invariantContext,

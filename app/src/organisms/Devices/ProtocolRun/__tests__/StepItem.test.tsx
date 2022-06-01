@@ -55,19 +55,6 @@ const MOCK_COMMENT_COMMAND_SUMMARY: RunCommandSummary = {
   status: 'queued',
 } as any
 
-const MOCK_PAUSE_COMMAND: RunTimeCommand = {
-  id: 'PAUSE',
-  commandType: 'pause',
-  params: {},
-  status: 'queued',
-  result: {},
-} as any
-const MOCK_PAUSE_COMMAND_SUMMARY: RunCommandSummary = {
-  id: 'PAUSE',
-  commandType: 'pause',
-  status: 'queued',
-} as any
-
 describe('Run Log StepItem', () => {
   beforeEach(() => {
     mockStepText.mockReturnValue(<div>Mock RunTimeCommand Text</div>)
@@ -84,8 +71,9 @@ describe('Run Log StepItem', () => {
       stepNumber: 1,
       isMostRecentCommand: true,
       runStartedAt: 'fake_timestamp',
+      runPausedAt: null,
     })
-    getByText('Step failed')
+    getByText('Failed step')
     getByText('Mock RunTimeCommand Text')
     getByText('Mock RunTimeCommand Timer')
   })
@@ -98,23 +86,9 @@ describe('Run Log StepItem', () => {
       isMostRecentCommand: true,
       stepNumber: 1,
       runStartedAt: 'fake_timestamp',
+      runPausedAt: null,
     } as React.ComponentProps<typeof StepItem>
     const { getByText } = render(props)
-    getByText('Mock RunTimeCommand Timer')
-    getByText('Mock RunTimeCommand Text')
-  })
-
-  it('renders the correct running status', () => {
-    const props = {
-      runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'running' },
-      analysisCommand: MOCK_ANALYSIS_COMMAND,
-      runStatus: 'running',
-      stepNumber: 1,
-      isMostRecentCommand: true,
-      runStartedAt: 'fake_timestamp',
-    } as React.ComponentProps<typeof StepItem>
-    const { getByText } = render(props)
-    getByText('Current Step')
     getByText('Mock RunTimeCommand Timer')
     getByText('Mock RunTimeCommand Text')
   })
@@ -127,6 +101,7 @@ describe('Run Log StepItem', () => {
       isMostRecentCommand: false,
       stepNumber: 1,
       runStartedAt: 'fake_timestamp',
+      runPausedAt: null,
     } as React.ComponentProps<typeof StepItem>
     const { getByText, queryByText } = render(props)
     getByText('Mock RunTimeCommand Text')
@@ -141,9 +116,10 @@ describe('Run Log StepItem', () => {
       isMostRecentCommand: true,
       stepNumber: 1,
       runStartedAt: 'fake_timestamp',
+      runPausedAt: '2022-05-16T19:15:39.572996+00:00',
     } as React.ComponentProps<typeof StepItem>
-    const { getByText } = render(props)
-    getByText('Current Step - Paused by User')
+    const { getByText, queryByText } = render(props)
+    queryByText('User paused protocol for')
     getByText('Mock RunTimeCommand Text')
     getByText('Mock RunTimeCommand Timer')
   })
@@ -157,8 +133,8 @@ describe('Run Log StepItem', () => {
       stepNumber: 1,
       runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof StepItem>
-    const { getByText } = render(props)
-    getByText('Current Step - Paused - Door Open')
+    const { getByText, queryByText } = render(props)
+    queryByText('User paused protocol for')
     getByText('Mock RunTimeCommand Text')
     getByText('Mock RunTimeCommand Timer')
   })
@@ -176,18 +152,5 @@ describe('Run Log StepItem', () => {
     getByText('Comment')
     getByText('Mock RunTimeCommand Text')
     expect(queryByText('Mock RunTimeCommand Timer')).toBeFalsy()
-  })
-
-  it('renders the pause text when the command is a pause', () => {
-    const props = {
-      runCommandSummary: MOCK_PAUSE_COMMAND_SUMMARY,
-      analysisCommand: MOCK_PAUSE_COMMAND,
-      runStatus: 'paused',
-      isMostRecentCommand: true,
-      stepNumber: 1,
-      runStartedAt: 'fake_timestamp',
-    } as React.ComponentProps<typeof StepItem>
-    const { getByText } = render(props)
-    getByText('Pause protocol')
   })
 })

@@ -1,6 +1,7 @@
 """Tests for ProtocolEngine plugins."""
 import pytest
 from decoy import Decoy
+from datetime import datetime
 
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
@@ -25,12 +26,10 @@ class _MyPlugin(AbstractPlugin):
 
 
 def test_configure(
-    decoy: Decoy,
-    state_view: StateView,
-    action_dispatcher: ActionDispatcher,
+    decoy: Decoy, state_view: StateView, action_dispatcher: ActionDispatcher
 ) -> None:
     """The engine should be able to configure the plugin."""
-    action = PlayAction()
+    action = PlayAction(requested_at=datetime(year=2021, month=1, day=1))
 
     subject = _MyPlugin()
     subject._configure(
