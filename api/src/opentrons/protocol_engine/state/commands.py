@@ -489,6 +489,7 @@ class CommandView(HasState[CommandState]):
         return self._state.is_hardware_stopped
 
     def raise_if_pause_not_allowed(self) -> None:
+        """Raise if pausing a run is not allowed."""
         self.raise_if_not_started()
         self.raise_if_stop_requested()
 
