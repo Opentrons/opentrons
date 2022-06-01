@@ -136,7 +136,7 @@ describe('HeaterShakerSlideout', () => {
         commandType: 'heaterShaker/setTargetTemperature',
         params: {
           moduleId: 'heatershaker_id',
-          celsius: 20,
+          celsius: 40,
         },
       },
     })
@@ -199,7 +199,7 @@ describe('HeaterShakerSlideout', () => {
         commandType: 'heaterShaker/setTargetTemperature',
         params: {
           moduleId: 'heatershaker_id',
-          celsius: 20,
+          celsius: 40,
         },
       },
     })
