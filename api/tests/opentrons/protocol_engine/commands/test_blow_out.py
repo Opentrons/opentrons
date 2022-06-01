@@ -1,4 +1,8 @@
 """Test blow-out command."""
+from decoy import Decoy
+
+from opentrons.protocol_engine import WellLocation, WellOrigin
+from opentrons.protocol_engine.commands import BlowOutCreate, BlowOutResult
 
 
 def test_blow_out_request() -> None:

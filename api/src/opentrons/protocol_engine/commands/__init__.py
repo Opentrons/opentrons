@@ -139,6 +139,13 @@ from .set_rail_lights import (
     SetRailLightsCommandType,
 )
 
+from .blow_out import (
+    BlowOutParams,
+    BlowOut,
+    BlowOutResult,
+    BlowOutCreate,
+    BlowOutCommandType
+)
 
 __all__ = [
     # command type unions
@@ -240,4 +247,7 @@ __all__ = [
     "magnetic_module",
     "temperature_module",
     "thermocycler",
+    # blow out command models
+    "BlowOutResult",
+    "BlowOutCreate"
 ]
