@@ -73,10 +73,10 @@ class CanDriver(AbstractCanDriver):
             # Special FDCAN parameters for use of PCAN driver.
             extra_kwargs = {
                 "f_clock_mhz": 20,
-                "nom_brp": 5,
-                "nom_tseg1": 13,
-                "nom_tseg2": 2,
-                "nom_sjw": 16,
+                "nom_brp": 2,
+                "nom_tseg1": 15,
+                "nom_tseg2": 4,
+                "nom_sjw": 1,
             }
         return CanDriver(
             bus=Bus(
