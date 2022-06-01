@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 export const KNOWLEDGEBASE_ROOT_URL =
-  'https://support.opentrons.com/en/collections/493886-protocol-designer'
+  'https://support.opentrons.com/s/protocol-designer'
 
 export const links = {
   airGap: `https://support.opentrons.com/en/articles/4398106-air-gap`,

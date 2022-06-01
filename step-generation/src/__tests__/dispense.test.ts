@@ -1,7 +1,9 @@
+import { when } from 'jest-when'
 import {
   thermocyclerPipetteCollision,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestWithLatchOpen,
 } from '../utils'
 import {
   getInitialRobotStateStandard,
@@ -19,6 +21,8 @@ import type { AspDispAirgapParams as V3AspDispAirgapParams } from '@opentrons/sh
 jest.mock('../utils/thermocyclerPipetteCollision')
 jest.mock('../utils/pipetteIntoHeaterShakerLatchOpen')
 jest.mock('../utils/pipetteIntoHeaterShakerWhileShaking')
+jest.mock('../utils/getIsHeaterShakerEastWestWithLatchOpen')
+
 const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
   typeof thermocyclerPipetteCollision
 >
@@ -27,6 +31,9 @@ const mockPipetteIntoHeaterShakerLatchOpen = pipetteIntoHeaterShakerLatchOpen as
 >
 const mockPipetteIntoHeaterShakerWhileShaking = pipetteIntoHeaterShakerWhileShaking as jest.MockedFunction<
   typeof pipetteIntoHeaterShakerWhileShaking
+>
+const mockGetIsHeaterShakerEastWestWithLatchOpen = getIsHeaterShakerEastWestWithLatchOpen as jest.MockedFunction<
+  typeof getIsHeaterShakerEastWestWithLatchOpen
 >
 describe('dispense', () => {
   let initialRobotState: RobotState
@@ -151,6 +158,20 @@ describe('dispense', () => {
       expect(res.errors).toHaveLength(1)
       expect(res.errors[0]).toMatchObject({
         type: 'HEATER_SHAKER_IS_SHAKING',
+      })
+    })
+    it('should return an error when dispensing east/west of a heater shaker with its latch open', () => {
+      when(mockGetIsHeaterShakerEastWestWithLatchOpen)
+        .calledWith(
+          robotStateWithTip.modules,
+          robotStateWithTip.labware[SOURCE_LABWARE]
+        )
+        .mockReturnValue(true)
+
+      const result = dispense(params, invariantContext, robotStateWithTip)
+      expect(getErrorResult(result).errors).toHaveLength(1)
+      expect(getErrorResult(result).errors[0]).toMatchObject({
+        type: 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN',
       })
     })
   })

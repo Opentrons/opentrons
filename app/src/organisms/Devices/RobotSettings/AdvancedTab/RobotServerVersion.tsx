@@ -40,9 +40,9 @@ export function RobotServerVersion({
 
   return (
     <>
-      {autoUpdateAction !== 'reinstall' ? (
+      {autoUpdateAction !== 'reinstall' && robot != null ? (
         <Box marginBottom={SPACING.spacing4} width="100%">
-          <UpdateRobotBanner robotName={robotName} />
+          <UpdateRobotBanner robot={robot} />
         </Box>
       ) : (
         // TODO: add reinstall option
