@@ -275,13 +275,9 @@ describe('RobotSettingsCalibration', () => {
   })
 
   it('should call update robot status if a robot is busy - deck cal', () => {
-    mockUseDeckCalibrationData.mockReturnValue({
-      deckCalibrationData: null,
-      isDeckCalibrated: false,
-    })
     mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Calibrate now' })
+    const button = getByRole('button', { name: 'Recalibrate deck' })
     fireEvent.click(button)
     expect(mockUpdateRobotStatus).toHaveBeenCalled()
   })
