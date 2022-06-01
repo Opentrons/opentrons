@@ -1,9 +1,10 @@
 """Router for /runs commands endpoints."""
-from anyio import move_on_after
+import textwrap
 from datetime import datetime
 from typing import Optional, Union
 from typing_extensions import Final, Literal
 
+from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
 from pydantic import BaseModel, Field
 
@@ -114,9 +115,23 @@ async def get_current_run_engine_from_url(
 @commands_router.post(
     path="/runs/{runId}/commands",
     summary="Enqueue a protocol command",
-    description=(
-        "Add a single protocol command to the run. "
-        "The command is placed at the back of the queue."
+    description=textwrap.dedent(
+        """
+        Add a single protocol command to the run. A run may have two command types:
+
+        - Setup commands (`data.source == "setup"`)
+        - Protocol commands (`data.source == "protocol"`)
+
+        Setup commands may be enqueued while the run is idle or paused.
+        Protocol commands may be enqueued anytime using this endpoint,
+        but they may interfere with commands from the protocol itself.
+
+        Once enqueued, setup commands will execute immediately with priority,
+        while protocol commands will wait until a `play` action is issued.
+        A play action may be issued while setup commands are still queued,
+        in which case all setup commands will finish executing before
+        the run moves on to protocol commands.
+        """
     ),
     status_code=status.HTTP_201_CREATED,
     responses={
@@ -142,8 +157,7 @@ async def create_run_command(
         description=(
             "If `waitUntilComplete` is `true`,"
             " the maximum number of milliseconds to wait before returning."
-            "\n\n"
-            "Ignored if `waitUntilComplete` is `false`."
+            " Ignored if `waitUntilComplete` is `false`."
             "\n\n"
             "The timer starts when the new command is enqueued,"
             " *not* when it starts running."
@@ -174,7 +188,7 @@ async def create_run_command(
     # behavior is to pass through `command_source` without overriding it
     command_source = request_body.data.source or pe_commands.CommandSource.SETUP
     command_create = request_body.data.copy(update={"source": command_source})
-    
+
     try:
         command = protocol_engine.add_command(command_create)
 
