@@ -56,11 +56,23 @@ class AvahiClient:
         return cls(sync_client=sync_client)
 
     async def start_advertising(self, service_name: str) -> None:
-        """
-        To document:
-        * Picks up current static hostname and domain
-        * Replaces an existing advertisement if there is one
-        * Advertisement will automatically stop upon collision
+        """Start advertising the machine over mDNS + DNS-SD.
+
+        Since the Avahi service name corresponds to the DNS-SD instance name,
+        it's a human-readable string of mostly arbitrary Unicode,
+        at most 63 octets (not 63 code points or 63 characters!) long.
+        (See: https://datatracker.ietf.org/doc/html/rfc6763#section-4.1.1)
+        Avahi will raise an exception through this method if it thinks
+        the new service name is invalid.
+
+        Avahi will stop advertising the machine when either of these happen:
+
+        * This process dies.
+        * We have a name collision with another device on the network.
+          See `collision_callback()`.
+
+        It's safe to call this more than once. If we're already advertising,
+        the existing service name will be replaced with the new one.
         """
         async with self._lock:
             await asyncio.get_running_loop().run_in_executor(
