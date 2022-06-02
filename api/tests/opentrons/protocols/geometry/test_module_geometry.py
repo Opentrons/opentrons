@@ -134,7 +134,7 @@ def v1_mag_module_schema_v1_definition() -> ModuleDefinitionV1:
         ),
     ],
 )
-def test_load_mag_module_from_definition(
+def test_load_module_from_definition(
     api_version: APIVersion,
     module_definition: Union[ModuleDefinitionV1, ModuleDefinitionV3],
     expected_geometry: ModuleGeometry,
