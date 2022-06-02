@@ -151,16 +151,16 @@ def thermocycler_close() -> command_types.ThermocyclerCloseCommand:
     text = "Closing Thermocycler lid"
     return {"name": command_types.THERMOCYCLER_CLOSE, "payload": {"text": text}}
 
-def heatershaker_set_and_wait_for_temperature() -> command_types.HeaterShakerSetAndWaitForTemperature:
-    text = ""
+def heatershaker_set_and_wait_for_temperature(temperature:float) -> command_types.HeaterShakerSetAndWaitForTemperature:
+    text = f"Setting Temperature of Heater Shaker to {temperature} °C and waiting until reached"
     return {"name":command_types.HeaterShakerSetAndWaitForTemperature, "paylod": {"text":text}}
 
-def heatershaker_set_target_temperature() -> command_types.HeaterShakerSetTargetTemperature:
-    text = ""
+def heatershaker_set_target_temperature(temperature:float) -> command_types.HeaterShakerSetTargetTemperature:
+    text = f"Setting Temperature of Heater Shaker to {temperature} °C"
     return {"name":command_types.HeaterShakerSetTargetTemperature, "paylod": {"text":text}}
 
 def heatershaker_wait_for_temperature() -> command_types.HeaterShakerWaitForTemperature:
-    text = ""
+    text = "Waiting for Heater Shaker to reach target temperature"
     return {"name":command_types.HeaterShakerWaitForTemperature, "paylod": {"text":text}}
 
 def heatershaker_set_and_wait_for_shake_speed() -> command_types.HeaterShakerSetAndWaitForShake_speed:
@@ -168,18 +168,18 @@ def heatershaker_set_and_wait_for_shake_speed() -> command_types.HeaterShakerSet
     return {"name":command_types.HeaterShakerSetAndWaitForShakeSpeed, "paylod": {"text":text}}
 
 def heatershaker_open_labware_latch() -> command_types.HeaterShakerOpenLabwareLatch:
-    text = ""
+    text = "Unlatching Labware on Heater Shaker"
     return {"name":command_types.HeaterShakerOpenLabwareLatch, "paylod": {"text":text}}
 
 def heatershaker_close_labware_latch() -> command_types.HeaterShakerCloseLabwareLatch:
-    text = ""
+    text = "Latching Labware on Heater Shaker"
     return {"name":command_types.HeaterShakerCloseLabwareLatch, "paylod": {"text":text}}
 
 def heatershaker_deactivate_shaker() -> command_types.HeaterShakerDeactivateShaker:
-    text = ""
+    text = "Deactivating Shaker"
     return {"name":command_types.HeaterShakerDeactivateShaker, "paylod": {"text":text}}
 
 def heatershaker_deactivate_heater() -> command_types.HeaterShakerDeactivateHeater:
-    text = ""
+    text = "Deactivating Heater"
     return {"name":command_types.HeaterShakerDeactivateHeater, "paylod": {"text":text}}
 
