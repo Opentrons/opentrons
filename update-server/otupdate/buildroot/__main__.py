@@ -16,6 +16,7 @@ def main() -> None:
     parser = cli.build_root_parser()
     args = parser.parse_args()
     loop = asyncio.get_event_loop()
+
     systemd.configure_logging(getattr(logging, args.log_level.upper()))
 
     # Because this involves restarting Avahi, this must happen early,

@@ -3,8 +3,9 @@ Entrypoint for the openembedded update server
 """
 import asyncio
 import logging
-import logging.config
+
 from . import get_app
+
 from otupdate.common import name_management, cli, systemd
 from aiohttp import web
 
@@ -18,9 +19,11 @@ def main() -> None:
 
     systemd.configure_logging(getattr(logging, args.log_level.upper()))
 
-    LOG.info("Setting hostname")
-    hostname = loop.run_until_complete(name_management.set_up_static_hostname())
-    LOG.info(f"Set hostname to {hostname}")
+    # Because this involves restarting Avahi, this must happen early,
+    # before the NameSynchronizer starts up and connects to Avahi.
+    LOG.info("Setting static hostname")
+    static_hostname = loop.run_until_complete(name_management.set_up_static_hostname())
+    LOG.info(f"Set static hostname to {static_hostname}")
 
     LOG.info("Building openembedded update server")
     app = get_app(args.version_file, args.config_file)
