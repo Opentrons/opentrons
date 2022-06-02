@@ -4,7 +4,10 @@ import {
   useRunQuery,
 } from '@opentrons/react-api-client'
 
-import type { AnalysisError } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  AnalysisError,
+} from '@opentrons/shared-data'
 
 export interface ProtocolAnalysisErrors {
   analysisErrors: AnalysisError[] | null
@@ -23,7 +26,8 @@ export function useProtocolAnalysisErrors(
     return { analysisErrors: null }
   }
 
-  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
+  const mostRecentAnalysis: CompletedProtocolAnalysis =
+    last(protocolAnalyses?.data ?? []) ?? null
 
   return {
     analysisErrors: mostRecentAnalysis?.errors || null,

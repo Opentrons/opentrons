@@ -19,7 +19,7 @@ import type { AnalysisError } from '@opentrons/shared-data'
 interface ProtocolAnalysisErrorModalProps {
   displayName: string | null
   errors: AnalysisError[]
-  onClose: () => void
+  onClose: React.MouseEventHandler<HTMLButtonElement>
   robotName: string
 }
 
