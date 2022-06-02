@@ -12,7 +12,7 @@ from .avahi import AvahiClient
 from .pretty_hostname import get_pretty_hostname, persist_pretty_hostname
 
 
-_name_synchronizer_VARNAME = APP_VARIABLE_PREFIX + "name_synchronizer"
+_NAME_SYNCHRONIZER_VARNAME = APP_VARIABLE_PREFIX + "name_synchronizer"
 _log = getLogger(__name__)
 
 
@@ -49,7 +49,7 @@ class NameSynchronizer(ABC):
         The singleton NameSynchronizer is expected to have been installed on the
         aiohttp.Application already via `install_on_app()`.
         """
-        name_synchronizer = request.app.get(_name_synchronizer_VARNAME, None)
+        name_synchronizer = request.app.get(_NAME_SYNCHRONIZER_VARNAME, None)
         assert isinstance(
             name_synchronizer, NameSynchronizer
         ), f"Unexpected type {type(name_synchronizer)}. Incorrect Application setup?"
@@ -61,7 +61,7 @@ class NameSynchronizer(ABC):
 
         This should be done as part of server startup.
         """
-        app[_name_synchronizer_VARNAME] = self
+        app[_NAME_SYNCHRONIZER_VARNAME] = self
 
     @abstractmethod
     async def set_name(self, new_name: str) -> str:
