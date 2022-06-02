@@ -147,9 +147,9 @@ async def test_sends_only_required_followups(
     ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
         if isinstance(message, message_definitions.InstrumentInfoRequest):
             payload = payloads.PipetteInfoResponsePayload(
-                pipette_name=PipetteNameField(PipetteName.p1000_single.value),
-                pipette_model=UInt16Field(2),
-                pipette_serial=SerialField(b"20220809A022"),
+                name=PipetteNameField(PipetteName.p1000_single.value),
+                model=UInt16Field(2),
+                serial=SerialField(b"20220809A022"),
             )
             return [
                 (
@@ -218,11 +218,9 @@ async def test_sends_all_required_followups(
                     NodeId.host,
                     message_definitions.PipetteInfoResponse(
                         payload=payloads.PipetteInfoResponsePayload(
-                            pipette_name=PipetteNameField(
-                                PipetteName.p1000_single.value
-                            ),
-                            pipette_model=UInt16Field(2),
-                            pipette_serial=SerialField(b"20220809A022"),
+                            name=PipetteNameField(PipetteName.p1000_single.value),
+                            model=UInt16Field(2),
+                            serial=SerialField(b"20220809A022"),
                         )
                     ),
                     NodeId.pipette_left,
@@ -231,11 +229,9 @@ async def test_sends_all_required_followups(
                     NodeId.host,
                     message_definitions.PipetteInfoResponse(
                         payload=payloads.PipetteInfoResponsePayload(
-                            pipette_name=PipetteNameField(
-                                PipetteName.p1000_multi.value
-                            ),
-                            pipette_model=UInt16Field(4),
-                            pipette_serial=SerialField(b"20231005A220"),
+                            name=PipetteNameField(PipetteName.p1000_multi.value),
+                            model=UInt16Field(4),
+                            serial=SerialField(b"20231005A220"),
                         )
                     ),
                     NodeId.pipette_right,
@@ -244,8 +240,8 @@ async def test_sends_all_required_followups(
                     NodeId.host,
                     message_definitions.GripperInfoResponse(
                         payload=payloads.GripperInfoResponsePayload(
-                            gripper_model=UInt16Field(1),
-                            gripper_serial=SerialField(b"20220531A01"),
+                            model=UInt16Field(1),
+                            serial=SerialField(b"20220531A01"),
                         )
                     ),
                     NodeId.gripper,
@@ -311,9 +307,9 @@ async def test_handles_bad_serials(
     ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
         if isinstance(message, message_definitions.InstrumentInfoRequest):
             payload = payloads.PipetteInfoResponsePayload(
-                pipette_name=PipetteNameField(PipetteName.p1000_multi.value),
-                pipette_model=UInt16Field(4),
-                pipette_serial=SerialField(
+                name=PipetteNameField(PipetteName.p1000_multi.value),
+                model=UInt16Field(4),
+                serial=SerialField(
                     b"\x00\x01\x02\x03\x04\0x05\x06\x07\x08\x09\x0a\x0b"
                 ),
             )
