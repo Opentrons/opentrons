@@ -144,7 +144,8 @@ from .blow_out import (
     BlowOut,
     BlowOutResult,
     BlowOutCreate,
-    BlowOutCommandType
+    BlowOutCommandType,
+    BlowOutImplementation
 )
 
 __all__ = [
@@ -249,5 +250,7 @@ __all__ = [
     "thermocycler",
     # blow out command models
     "BlowOutResult",
-    "BlowOutCreate"
+    "BlowOutCreate",
+    "BlowOutImplementation",
+    "BlowOutParams"
 ]

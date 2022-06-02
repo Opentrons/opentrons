@@ -247,3 +247,7 @@ class PipettingHandler:
         await self._hardware_api.dispense(mount=hw_pipette.mount, volume=volume)
 
         return volume
+
+    async def blow_out(self) -> None:
+        """Blow out liquid from location"""
+        raise NotImplementedError()
