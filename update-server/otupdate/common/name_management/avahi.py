@@ -49,7 +49,6 @@ class AvahiClient:
 
     @classmethod
     async def connect(cls) -> AvahiClient:
-        # TODO: Handle case when dbus isn't available.
         sync_client = await asyncio.get_running_loop().run_in_executor(
             executor=None,
             func=_SyncClient.connect,
