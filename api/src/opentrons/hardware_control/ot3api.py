@@ -373,6 +373,7 @@ class OT3API(
         """Compute the gantry load based on attached instruments."""
         left = instruments.get(OT3Mount.LEFT)
         right = instruments.get(OT3Mount.RIGHT)
+        gripper = instruments.get(OT3Mount.GRIPPER)
         if left and right:
             # Only low-throughputs can have the two-instrument case
             return GantryLoad.TWO_LOW_THROUGHPUT
@@ -387,6 +388,9 @@ class OT3API(
                 return GantryLoad.LOW_THROUGHPUT
             else:
                 return GantryLoad.HIGH_THROUGHPUT
+        if gripper:
+            # only a gripper is attached
+            return GantryLoad.GRIPPER
         return GantryLoad.NONE
 
     async def cache_instruments(
