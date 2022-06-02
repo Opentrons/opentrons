@@ -84,8 +84,10 @@ class NameSynchronizer(ABC):
 
 
 class RealNameSynchronizer(NameSynchronizer):
+    """A functioning implementation of NameSynchronizer, to run in production."""
+
     def __init__(self, avahi_client: AvahiClient) -> None:
-        """For internal use by this class only."""
+        """For internal use by this class only. Use `build()` instead."""
         self._avahi_client = avahi_client
 
     @classmethod
@@ -93,6 +95,18 @@ class RealNameSynchronizer(NameSynchronizer):
     async def build(
         cls, avahi_client: AvahiClient
     ) -> AsyncGenerator[NameSynchronizer, None]:
+        """Build a RealNameSynchronizer and keep it running in the background.
+
+        Avahi advertisements will start as soon as this context manager is entered.
+        The pretty hostname will be used as the Avahi service name.
+
+        While this context manager remains entered, Avahi will be monitored in the
+        background to see if this device's name ever collides with another device on
+        the network. If that ever happens, a new name will be chosen automatically,
+        which will be visible through `get_name()`.
+
+        Collision monitoring will stop when this context manager exits.
+        """
         name_synchronizer = cls(avahi_client)
         async with avahi_client.collision_callback(
             name_synchronizer._on_avahi_collision
@@ -103,7 +117,6 @@ class RealNameSynchronizer(NameSynchronizer):
             yield name_synchronizer
 
     async def set_name(self, new_name: str) -> str:
-        """See `set_name_endpoint()`."""
         await self._avahi_client.start_advertising(service_name=new_name)
         # Setting the Avahi service name can fail if Avahi doesn't like the new name.
         # Persist only after it succeeds, so we don't persist something invalid.
@@ -115,16 +128,16 @@ class RealNameSynchronizer(NameSynchronizer):
 
     async def _on_avahi_collision(self) -> None:
         current_name = self.get_name()
+
         # Assume that the service name was the thing that collided.
         # Theoretically it also could have been the static hostname,
         # but our static hostnames are unique in practice, so that's unlikely.
-
-        # TODO: Is this some kind of race condition?
         alternative_name = await self._avahi_client.alternative_service_name(
             current_name
         )
         _log.info(
-            f"Name collision detected by Avahi. Changing name to {alternative_name}."
+            f"Name collision detected by Avahi."
+            f" Changing name from {current_name} to {alternative_name}."
         )
 
         # Setting the new name includes persisting it for the next boot.
@@ -159,6 +172,7 @@ class FakeNameSynchronizer(NameSynchronizer):
 async def build_name_synchronizer(
     name_override: Optional[str],
 ) -> AsyncGenerator[NameSynchronizer, None]:
+    """Return a RealNameSynchronizer for production or FakeNameManager for testing."""
     if name_override is None:
         avahi_client = await AvahiClient.connect()
         async with RealNameSynchronizer.build(
