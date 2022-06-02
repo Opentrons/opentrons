@@ -196,7 +196,6 @@ const toVersion8 = (prevConfig: ConfigV7): ConfigV8 => {
     ui: {
       ...prevConfig.ui,
       width: 1024,
-      minWidth: 600,
       height: 768,
     },
   }

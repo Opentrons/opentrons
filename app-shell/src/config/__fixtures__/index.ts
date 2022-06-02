@@ -138,7 +138,6 @@ export const MOCK_CONFIG_V8: ConfigV8 = {
   ui: {
     ...MOCK_CONFIG_V7.ui,
     width: 1024,
-    minWidth: 600,
     height: 768,
   },
 }
