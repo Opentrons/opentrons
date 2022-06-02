@@ -215,16 +215,16 @@ describe('RobotSettingsCalibration', () => {
     getByText('Pipette Offset calibration missing')
   })
 
-  it('renders the warning banner when calibration is marked bad', () => {
-    mockUsePipetteOffsetCalibrations.mockReturnValue([
-      mockPipetteOffsetCalibration1,
-      mockPipetteOffsetCalibration2,
-      mockPipetteOffsetCalibration3,
-      mockPipetteOffsetCalibration4,
-    ])
-    const [{ getByText }] = render()
-    getByText('Pipette Offset calibration recommended')
-  })
+  // it('renders the warning banner when calibration is marked bad', () => {
+  //   mockUsePipetteOffsetCalibrations.mockReturnValue([
+  //     mockPipetteOffsetCalibration1,
+  //     mockPipetteOffsetCalibration2,
+  //     mockPipetteOffsetCalibration3,
+  //     mockPipetteOffsetCalibration4,
+  //   ])
+  //   const [{ getByText }] = render()
+  //   getByText('Pipette Offset calibration recommended')
+  // })
 
   it('renders a title and description - Tip Length Calibrations', () => {
     const [{ getByText }] = render()
