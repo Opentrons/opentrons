@@ -218,22 +218,12 @@ describe('RobotSettingsCalibration', () => {
 
   // it('renders the warning banner when calibration is marked bad', () => {
   //   mockUsePipetteOffsetCalibrations.mockReturnValue([
-  //     mockPipetteOffsetCalibration1,
-  //     mockPipetteOffsetCalibration2,
-  //     mockPipetteOffsetCalibration3,
   //     mockPipetteOffsetCalibration4,
+  //     mockPipetteOffsetCalibration5,
   //   ])
   //   const [{ getByText }] = render()
   //   getByText('Pipette Offset calibration recommended')
   // })
-  it('renders the warning banner when calibration is marked bad', () => {
-    mockUsePipetteOffsetCalibrations.mockReturnValue([
-      mockPipetteOffsetCalibration4,
-      mockPipetteOffsetCalibration5,
-    ])
-    const [{ getByText }] = render()
-    getByText('Pipette Offset calibration recommended')
-  })
 
   it('renders a title and description - Tip Length Calibrations', () => {
     const [{ getByText }] = render()
@@ -403,6 +393,7 @@ describe('RobotSettingsCalibration', () => {
     })
   })
   it('should call update robot status if a robot is busy - health check', () => {
+    mockGetIsRunning.mockReturnValue(false)
     mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Check health' })
