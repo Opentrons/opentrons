@@ -51,17 +51,6 @@ export function InstrumentSettings(
             />
           )}
         />
-        <Route
-          path={`${path}/configure-pipette/:mount${RE_MOUNT}`}
-          render={routeProps => (
-            <ConfigurePipette
-              robotName={robotName}
-              // @ts-expect-error not a valid Mount type
-              mount={routeProps.match.params.mount}
-              closeModal={routeProps.history.goBack}
-            />
-          )}
-        />
       </Switch>
     </>
   )
