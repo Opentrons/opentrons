@@ -33,7 +33,7 @@ import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
-  HeaterShakerSetTargetShakeSpeedCreateCommand,
+  HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
   HeaterShakerStartSetTargetTemperatureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
@@ -63,8 +63,8 @@ export const HeaterShakerSlideout = (
 
   const sendShakeSpeedCommand = (): void => {
     if (hsValue != null && isSetShake) {
-      const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
-        commandType: 'heaterShakerModule/setTargetShakeSpeed',
+      const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
+        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
         params: {
           moduleId: runId != null ? moduleIdFromRun : module.id,
           rpm: parseInt(hsValue),
@@ -101,11 +101,10 @@ export const HeaterShakerSlideout = (
   const sendSetTemperatureOrShakeCommand = (): void => {
     if (hsValue != null && !isSetShake) {
       const setTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
-        commandType: 'heaterShakerModule/startSetTargetTemperature',
+        commandType: 'heaterShaker/setTargetTemperature',
         params: {
           moduleId: runId != null ? moduleIdFromRun : module.id,
-          // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10182 merges
-          temperature: parseInt(hsValue),
+          celsius: parseInt(hsValue),
         },
       }
       if (runId != null) {

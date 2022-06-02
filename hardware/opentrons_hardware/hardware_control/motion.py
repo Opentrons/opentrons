@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import numpy as np
 from logging import getLogger
 from enum import Enum, unique
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteTipActionType
 
 LOG = getLogger(__name__)
 
@@ -53,6 +53,16 @@ class MoveGroupSingleAxisStep:
 
 
 @dataclass(frozen=True)
+class MoveGroupTipActionStep:
+    """A single tip handling action that requires movement in a move group."""
+
+    velocity_mm_sec: np.float64
+    duration_sec: np.float64
+    action: PipetteTipActionType
+    stop_condition: MoveStopCondition
+
+
+@dataclass(frozen=True)
 class MoveGroupSingleGripperStep:
     """A single gripper move in a move group."""
 
@@ -63,7 +73,9 @@ class MoveGroupSingleGripperStep:
     move_type: MoveType = MoveType.linear
 
 
-SingleMoveStep = Union[MoveGroupSingleAxisStep, MoveGroupSingleGripperStep]
+SingleMoveStep = Union[
+    MoveGroupSingleAxisStep, MoveGroupSingleGripperStep, MoveGroupTipActionStep
+]
 
 MoveGroupStep = Dict[
     NodeId,
@@ -129,5 +141,29 @@ def create_home_step(
             duration_sec=abs(distance[axis] / velocity[axis]),
             stop_condition=MoveStopCondition.limit_switch,
             move_type=MoveType.home,
+        )
+    return step
+
+
+def create_tip_action_step(
+    velocity: Dict[NodeId, np.float64],
+    duration: np.float64,
+    present_nodes: Iterable[NodeId],
+    action: PipetteTipActionType,
+) -> MoveGroupStep:
+    """Creates a step for tip handling actions that require motor movement."""
+    ordered_nodes = sorted(present_nodes, key=lambda node: node.value)
+    step: MoveGroupStep = {}
+    stop_condition = (
+        MoveStopCondition.limit_switch
+        if action == PipetteTipActionType.drop
+        else MoveStopCondition.none
+    )
+    for axis_node in ordered_nodes:
+        step[axis_node] = MoveGroupTipActionStep(
+            velocity_mm_sec=velocity.get(axis_node, np.float64(0)),
+            duration_sec=duration,
+            stop_condition=stop_condition,
+            action=action,
         )
     return step

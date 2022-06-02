@@ -70,11 +70,13 @@ def mock_bind_sync() -> Iterator[AsyncMock]:
 
 
 @pytest.mark.parametrize(
-    "target_node,motor_node",
+    "target_node,motor_node,distance,speed,",
     [
-        (NodeId.pipette_left, NodeId.head_l),
-        (NodeId.pipette_right, NodeId.head_r),
-        (NodeId.gripper, NodeId.gripper_z),
+        (NodeId.pipette_left, NodeId.head_l, 10, 10),
+        (NodeId.pipette_right, NodeId.head_r, 10, -10),
+        (NodeId.gripper, NodeId.gripper_z, -10, 10),
+        (NodeId.pipette_left, NodeId.gantry_x, -10, -10),
+        (NodeId.gripper, NodeId.gantry_y, 10, 10),
     ],
 )
 async def test_capacitive_probe(
@@ -85,6 +87,8 @@ async def test_capacitive_probe(
     target_node: ProbeTarget,
     motor_node: NodeId,
     caplog: Any,
+    distance: float,
+    speed: float,
 ) -> None:
     """Test that capacitive_probe targets the right nodes."""
     caplog.set_level(logging.INFO)
@@ -92,6 +96,7 @@ async def test_capacitive_probe(
     def move_responder(
         node_id: NodeId, message: MessageDefinition
     ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
+        message.payload.serialize()
         if isinstance(message, ExecuteMoveGroupRequest):
             return [
                 (
@@ -113,7 +118,9 @@ async def test_capacitive_probe(
 
     message_send_loopback.add_responder(move_responder)
 
-    result = await capacitive_probe(mock_messenger, target_node, 10, 10)
+    result = await capacitive_probe(
+        mock_messenger, target_node, motor_node, distance, speed
+    )
     assert result == 10  # this comes from the current_position_um above
     # this mock assert is annoying because something's __eq__ doesn't work
     assert mock_sensor_threshold.call_args_list[0][0][0] == SensorThresholdInformation(

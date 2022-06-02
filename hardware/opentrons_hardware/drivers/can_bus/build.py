@@ -26,6 +26,8 @@ async def build_driver(driver_settings: settings.DriverSettings) -> AbstractCanD
             interface=driver_settings.interface,
             bitrate=driver_settings.bit_rate,
             channel=driver_settings.channel,
+            fcan_clock=driver_settings.fcan_clock,
+            sample_rate=driver_settings.sample_rate,
         )
 
 
