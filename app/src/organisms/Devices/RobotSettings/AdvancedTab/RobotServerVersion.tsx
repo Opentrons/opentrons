@@ -12,13 +12,15 @@ import {
   Link,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { useRobot } from '../../hooks'
+import { UpdateBuildroot } from '../../../../pages/Robots/RobotSettings/UpdateBuildroot'
+import { Portal } from '../../../../App/portal'
 import { StyledText } from '../../../../atoms/text'
-import { getRobotApiVersion } from '../../../../redux/discovery'
+import { getRobotApiVersion, UNREACHABLE } from '../../../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
+import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
+import { useRobot } from '../../hooks'
 
 import type { State } from '../../../../redux/types'
-import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
 
 interface RobotServerVersionProps {
   robotName: string
@@ -35,14 +37,35 @@ export function RobotServerVersion({
   const { autoUpdateAction } = useSelector((state: State) => {
     return getBuildrootUpdateDisplayInfo(state, robotName)
   })
+  const [
+    showSoftwareUpdateModal,
+    setShowSoftwareUpdateModal,
+  ] = React.useState<boolean>(false)
+
+  const handleLaunchRobotUpdateModal = (): void => {
+    setShowSoftwareUpdateModal(true)
+  }
   const robotServerVersion =
     robot?.status != null ? getRobotApiVersion(robot) : null
 
   return (
     <>
+      {showSoftwareUpdateModal &&
+      robot != null &&
+      robot.status !== UNREACHABLE ? (
+        <Portal level="top">
+          <UpdateBuildroot
+            robot={robot}
+            close={() => setShowSoftwareUpdateModal(false)}
+          />
+        </Portal>
+      ) : null}
       {autoUpdateAction !== 'reinstall' && robot != null ? (
         <Box marginBottom={SPACING.spacing4} width="100%">
-          <UpdateRobotBanner robot={robot} />
+          <UpdateRobotBanner
+            robot={robot}
+            handleLaunchRobotUpdateModal={handleLaunchRobotUpdateModal}
+          />
         </Box>
       ) : (
         // TODO: add reinstall option
