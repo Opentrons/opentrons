@@ -35,7 +35,7 @@ class CommandStatus(str, Enum):
     FAILED = "failed"
 
 
-class CommandSource(str, Enum):
+class CommandIntent(str, Enum):
     """Source that generated a given command.
 
     Props:
@@ -62,10 +62,10 @@ class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
         ),
     )
     params: CommandParamsT = Field(..., description="Command execution data payload")
-    source: Optional[CommandSource] = Field(
+    intent: Optional[CommandIntent] = Field(
         None,
         description=(
-            "The source of the command to create. If not specified or `protocol`,"
+            "The reason the command was added. If not specified or `protocol`,"
             " the command will be treated as part of the protocol run itself,"
             " and added to the end of the existing command queue."
             "\n\n"
@@ -126,7 +126,7 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
         None,
         description="Command execution completed timestamp, if completed",
     )
-    source: Optional[CommandSource] = Field(
+    intent: Optional[CommandIntent] = Field(
         None,
         description=(
             "Source (run setup or protocol itself) that added this command,"

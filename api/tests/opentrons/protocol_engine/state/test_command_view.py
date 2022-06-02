@@ -334,7 +334,8 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         subject=get_command_view(queue_status=QueueStatus.RUNNING),
         action=QueueCommandAction(
             request=cmd.HomeCreate(
-                params=cmd.HomeParams(), source=cmd.CommandSource.SETUP
+                params=cmd.HomeParams(),
+                intent=cmd.CommandIntent.SETUP,
             ),
             command_id="command-id",
             command_key="command-key",

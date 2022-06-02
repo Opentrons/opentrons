@@ -23,7 +23,7 @@ from .command import (
     BaseCommand,
     BaseCommandCreate,
     CommandStatus,
-    CommandSource,
+    CommandIntent,
 )
 
 from .command_unions import (
@@ -158,7 +158,7 @@ __all__ = [
     "BaseCommand",
     "BaseCommandCreate",
     "CommandStatus",
-    "CommandSource",
+    "CommandIntent",
     # aspirate command models
     "Aspirate",
     "AspirateCreate",

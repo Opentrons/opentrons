@@ -230,7 +230,7 @@ def test_setup_command_queue_and_unqueue() -> None:
     queue_1 = QueueCommandAction(
         request=commands.PauseCreate(
             params=commands.PauseParams(),
-            source=commands.CommandSource.SETUP,
+            intent=commands.CommandIntent.SETUP,
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
@@ -239,7 +239,7 @@ def test_setup_command_queue_and_unqueue() -> None:
     queue_2 = QueueCommandAction(
         request=commands.PauseCreate(
             params=commands.PauseParams(),
-            source=commands.CommandSource.SETUP,
+            intent=commands.CommandIntent.SETUP,
         ),
         created_at=datetime(year=2022, month=2, day=2),
         command_id="command-id-2",
@@ -269,12 +269,12 @@ def test_setup_command_queue_and_unqueue() -> None:
     assert subject.state.queued_setup_command_ids == OrderedSet()
 
 
-def test_setup_queue_action_updates_command_source() -> None:
+def test_setup_queue_action_updates_command_intent() -> None:
     """It should update command source correctly."""
     queue_cmd = QueueCommandAction(
         request=commands.PauseCreate(
             params=commands.PauseParams(),
-            source=commands.CommandSource.SETUP,
+            intent=commands.CommandIntent.SETUP,
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
@@ -287,7 +287,7 @@ def test_setup_queue_action_updates_command_source() -> None:
         createdAt=datetime(year=2021, month=1, day=1),
         params=commands.PauseParams(),
         status=commands.CommandStatus.QUEUED,
-        source=commands.CommandSource.SETUP,
+        intent=commands.CommandIntent.SETUP,
     )
 
     subject = CommandStore()
@@ -439,7 +439,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
     queue_action_2_setup = QueueCommandAction(
         request=commands.PauseCreate(
             params=commands.PauseParams(),
-            source=commands.CommandSource.SETUP,
+            intent=commands.CommandIntent.SETUP,
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-2",
@@ -448,7 +448,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
     queue_action_3_setup = QueueCommandAction(
         request=commands.PauseCreate(
             params=commands.PauseParams(),
-            source=commands.CommandSource.SETUP,
+            intent=commands.CommandIntent.SETUP,
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-3",
@@ -463,7 +463,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
             startedAt=datetime(year=2022, month=2, day=2),
             params=commands.PauseParams(),
             status=commands.CommandStatus.RUNNING,
-            source=commands.CommandSource.SETUP,
+            intent=commands.CommandIntent.SETUP,
         )
     )
     failed_action_cmd_2 = FailCommandAction(
@@ -486,7 +486,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         completedAt=datetime(year=2023, month=3, day=3),
         params=commands.PauseParams(),
         status=commands.CommandStatus.FAILED,
-        source=commands.CommandSource.SETUP,
+        intent=commands.CommandIntent.SETUP,
     )
     expected_failed_cmd_3 = commands.Pause(
         id="command-id-3",
@@ -496,7 +496,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         completedAt=datetime(year=2023, month=3, day=3),
         params=commands.PauseParams(),
         status=commands.CommandStatus.FAILED,
-        source=commands.CommandSource.SETUP,
+        intent=commands.CommandIntent.SETUP,
     )
 
     subject = CommandStore()

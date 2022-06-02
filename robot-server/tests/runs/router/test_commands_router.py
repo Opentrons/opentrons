@@ -122,7 +122,7 @@ async def test_create_run_command(
         mock_protocol_engine.add_command(
             pe_commands.PauseCreate(
                 params=pe_commands.PauseParams(message="Hello"),
-                source=pe_commands.CommandSource.SETUP,
+                intent=pe_commands.CommandIntent.SETUP,
             )
         )
     ).then_do(_stub_queued_command_state)
@@ -145,7 +145,7 @@ async def test_create_run_command_blocking_completion(
     """It should be able to create a command and wait for it to execute."""
     command_request = pe_commands.PauseCreate(
         params=pe_commands.PauseParams(message="Hello"),
-        source=pe_commands.CommandSource.PROTOCOL,
+        intent=pe_commands.CommandIntent.PROTOCOL,
     )
 
     command_once_added = pe_commands.Pause(
@@ -203,7 +203,7 @@ async def test_add_conflicting_setup_command(
     """It should raise an error if the setup command cannot be added."""
     command_request = pe_commands.PauseCreate(
         params=pe_commands.PauseParams(message="Hello"),
-        source=pe_commands.CommandSource.SETUP,
+        intent=pe_commands.CommandIntent.SETUP,
     )
 
     decoy.when(mock_protocol_engine.add_command(command_request)).then_raise(
@@ -228,7 +228,7 @@ async def test_get_run_commands(
     command = pe_commands.Pause(
         id="command-id",
         key="command-key",
-        source=pe_commands.CommandSource.PROTOCOL,
+        intent=pe_commands.CommandIntent.PROTOCOL,
         status=pe_commands.CommandStatus.FAILED,
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
@@ -270,7 +270,7 @@ async def test_get_run_commands(
             id="command-id",
             key="command-key",
             commandType="pause",
-            source=pe_commands.CommandSource.PROTOCOL,
+            intent=pe_commands.CommandIntent.PROTOCOL,
             createdAt=datetime(year=2021, month=1, day=1),
             startedAt=datetime(year=2022, month=2, day=2),
             completedAt=datetime(year=2023, month=3, day=3),

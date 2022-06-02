@@ -56,7 +56,7 @@ stages:
         data:
           commandType: home
           params: {}
-          source: setup
+          intent: setup
     response:
       strict:
         - json:off
@@ -267,7 +267,7 @@ stages:
                   z: 0
           - id: '{setup_command_id}'
             key: '{setup_command_key}'
-            source: setup
+            intent: setup
             commandType: home
             createdAt: '{setup_command_created_at}'
             startedAt: '{setup_command_started_at}'
@@ -518,7 +518,7 @@ stages:
                   z: 0
           - id: '{setup_command_id}'
             key: '{setup_command_key}'
-            source: setup
+            intent: setup
             commandType: home
             createdAt: '{setup_command_created_at}'
             startedAt: '{setup_command_started_at}'

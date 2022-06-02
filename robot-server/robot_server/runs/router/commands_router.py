@@ -117,20 +117,29 @@ async def get_current_run_engine_from_url(
     summary="Enqueue a command",
     description=textwrap.dedent(
         """
-        Add a single command to the run. A run may have two command types:
+        Add a single command to the run. You can add commands to a run
+        for two reasons:
 
         - Setup commands (`data.source == "setup"`)
         - Protocol commands (`data.source == "protocol"`)
 
         Setup commands may be enqueued while the run is idle or paused.
-        Protocol commands may be enqueued anytime using this endpoint,
-        but they may interfere with commands from the protocol itself.
+        You could use setup commands to prepare a module or
+        run labware calibration procedures.
+
+        Protocol commands may be enqueued anytime using this endpoint.
+        You can create a protocol purely over HTTP using protocol commands.
+        If you are running a protocol from a file(s), then you will likely
+        not need to enqueue protocol commands using this endpoint.
 
         Once enqueued, setup commands will execute immediately with priority,
         while protocol commands will wait until a `play` action is issued.
         A play action may be issued while setup commands are still queued,
         in which case all setup commands will finish executing before
         the run moves on to protocol commands.
+
+        If you are running a protocol file(s), use caution with this endpoint,
+        as added commands may interfere with commands added by the protocol
         """
     ),
     status_code=status.HTTP_201_CREATED,
@@ -185,9 +194,9 @@ async def create_run_command(
             command will be enqueued.
     """
     # TODO(mc, 2022-05-26): increment the HTTP API version so that default
-    # behavior is to pass through `command_source` without overriding it
-    command_source = request_body.data.source or pe_commands.CommandSource.SETUP
-    command_create = request_body.data.copy(update={"source": command_source})
+    # behavior is to pass through `command_intent` without overriding it
+    command_intent = request_body.data.intent or pe_commands.CommandIntent.SETUP
+    command_create = request_body.data.copy(update={"intent": command_intent})
 
     try:
         command = protocol_engine.add_command(command_create)
@@ -263,7 +272,7 @@ async def get_run_commands(
             id=c.id,
             key=c.key,
             commandType=c.commandType,
-            source=c.source,
+            intent=c.intent,
             status=c.status,
             createdAt=c.createdAt,
             startedAt=c.startedAt,

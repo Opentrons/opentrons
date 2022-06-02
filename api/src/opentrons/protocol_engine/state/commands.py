@@ -23,7 +23,7 @@ from ..actions import (
     HardwareEventAction,
 )
 
-from ..commands import Command, CommandStatus, CommandSource
+from ..commands import Command, CommandStatus, CommandIntent
 from ..errors import (
     ProtocolEngineError,
     CommandDoesNotExistError,
@@ -184,7 +184,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 key=action.command_key,
                 createdAt=action.created_at,
                 params=action.request.params,  # type: ignore[arg-type]
-                source=action.request.source,
+                intent=action.request.intent,
                 status=CommandStatus.QUEUED,
             )
 
@@ -195,7 +195,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 command=queued_command,
             )
 
-            if action.request.source == CommandSource.SETUP:
+            if action.request.intent == CommandIntent.SETUP:
                 self._state.queued_setup_command_ids.add(queued_command.id)
             else:
                 self._state.queued_command_ids.add(queued_command.id)
@@ -248,7 +248,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 ),
             )
 
-            if prev_entry.command.source == CommandSource.SETUP:
+            if prev_entry.command.intent == CommandIntent.SETUP:
                 other_command_ids_to_fail = [
                     *[i for i in self._state.queued_setup_command_ids],
                 ]
@@ -547,7 +547,7 @@ class CommandView(HasState[CommandState]):
 
         elif (
             isinstance(action, QueueCommandAction)
-            and action.request.source == CommandSource.SETUP
+            and action.request.intent == CommandIntent.SETUP
         ):
             if self._state.queue_status == QueueStatus.RUNNING:
                 raise SetupCommandNotAllowedError(

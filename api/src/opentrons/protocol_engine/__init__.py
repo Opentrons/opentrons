@@ -14,7 +14,7 @@ from .commands import (
     CommandCreate,
     CommandStatus,
     CommandType,
-    CommandSource,
+    CommandIntent,
 )
 from .state import (
     State,
@@ -63,7 +63,7 @@ __all__ = [
     "CommandCreate",
     "CommandStatus",
     "CommandType",
-    "CommandSource",
+    "CommandIntent",
     # state interfaces and models
     "State",
     "StateView",

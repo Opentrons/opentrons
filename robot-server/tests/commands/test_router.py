@@ -47,7 +47,7 @@ async def test_create_command(
         protocol_engine.add_command(
             pe_commands.HomeCreate(
                 params=pe_commands.HomeParams(),
-                source=pe_commands.CommandSource.SETUP,
+                intent=pe_commands.CommandIntent.SETUP,
             )
         )
     ).then_do(_stub_queued_command_state)
@@ -71,7 +71,7 @@ async def test_create_command_wait_for_complete(
     """It should be able to create a command."""
     command_create = pe_commands.HomeCreate(
         params=pe_commands.HomeParams(),
-        source=pe_commands.CommandSource.SETUP,
+        intent=pe_commands.CommandIntent.SETUP,
     )
     queued_command = pe_commands.Home(
         id="abc123",
