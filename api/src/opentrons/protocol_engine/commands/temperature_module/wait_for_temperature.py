@@ -18,7 +18,7 @@ class WaitForTemperatureParams(BaseModel):
     """Input parameters to wait for a Temperature Module's target temperature."""
 
     moduleId: str = Field(..., description="Unique ID of the Temperature Module.")
-    celsius: Optional[float] =  Field(
+    celsius: Optional[float] = Field(
         None,
         description="Target temperature in °C. If not specified, will "
         "default to the module's target temperature. "
