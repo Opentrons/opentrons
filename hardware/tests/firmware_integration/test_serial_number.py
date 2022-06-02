@@ -1,6 +1,6 @@
 """Test serial number setting."""
 import asyncio
-from typing import Type, Union
+from typing import Type
 
 import pytest
 
@@ -9,9 +9,8 @@ from opentrons_hardware.firmware_bindings.messages.fields import SerialField
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     GripperInfoResponse,
     PipetteInfoResponse,
-    PipetteInfoRequest,
-    GripperInfoRequest,
     SetSerialNumber,
+    InstrumentInfoRequest,
 )
 
 from opentrons_hardware.firmware_bindings import NodeId, ArbitrationId
@@ -30,10 +29,10 @@ def filter_func(arb: ArbitrationId) -> bool:
 
 
 @pytest.mark.parametrize(
-    argnames=["node_id", "info_request_type", "info_response_type"],
+    argnames=["node_id", "info_response_type"],
     argvalues=[
-        [NodeId.gripper, GripperInfoRequest, GripperInfoResponse],
-        [NodeId.pipette_left, PipetteInfoRequest, PipetteInfoResponse],
+        [NodeId.gripper, GripperInfoResponse],
+        [NodeId.pipette_left, PipetteInfoResponse],
     ],
 )
 @pytest.mark.requires_emulator
@@ -42,7 +41,6 @@ async def test_set_serial(
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     node_id: NodeId,
-    info_request_type: Union[Type[GripperInfoRequest], Type[PipetteInfoRequest]],
     info_response_type: Type[MessageDefinition],
 ) -> None:
     """It should write a serial number and read it back."""
@@ -51,7 +49,7 @@ async def test_set_serial(
         s = SerialNumberPayload(serial=SerialField(sn))
 
         await can_messenger.send(node_id=node_id, message=SetSerialNumber(payload=s))
-        await can_messenger.send(node_id=node_id, message=info_request_type())
+        await can_messenger.send(node_id=node_id, message=InstrumentInfoRequest())
         response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
 
         assert arbitration_id.parts.originating_node_id == node_id

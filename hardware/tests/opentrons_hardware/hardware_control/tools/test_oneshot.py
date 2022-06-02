@@ -240,8 +240,8 @@ async def test_sends_all_required_followups(
                     NodeId.host,
                     message_definitions.GripperInfoResponse(
                         payload=payloads.GripperInfoResponsePayload(
-                            gripper_model=UInt16Field(1),
-                            gripper_serial=SerialField(b"20220531A01"),
+                            model=UInt16Field(1),
+                            serial=SerialField(b"20220531A01"),
                         )
                     ),
                     NodeId.gripper,

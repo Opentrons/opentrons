@@ -109,10 +109,8 @@ class OneshotToolDetector:
                     gripper_to_ret[
                         NodeId(arbitration_id.parts.originating_node_id)
                     ] = GripperInformation(
-                        model=response.payload.gripper_model.value,
-                        serial=_decode_or_default(
-                            response.payload.gripper_serial.value
-                        ),
+                        model=response.payload.model.value,
+                        serial=_decode_or_default(response.payload.serial.value),
                     )
                     break
         return pipette_to_ret, gripper_to_ret
