@@ -876,7 +876,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """
         return self._module.labware_latch_status.value
 
-    # TODO: add command publisher
+    @publish(command=cmds.heater_shaker_set_and_wait_for_temperature)
     @requires_version(2, 13)
     def set_and_wait_for_temperature(self, celsius: float) -> None:
         """Set and wait for target temperature.
@@ -889,7 +889,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         self.set_target_temperature(celsius=celsius)
         self.wait_for_temperature()
 
-    # TODO: add command publisher
+    @publish(command=cmds.heater_shaker_set_target_temperature)
     @requires_version(2, 13)
     def set_target_temperature(self, celsius: float) -> None:
         """Set target temperature and return immediately.
@@ -902,7 +902,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         validated_temp = validate_heater_shaker_temperature(celsius=celsius)
         self._module.start_set_temperature(celsius=validated_temp)
 
-    # TODO: add command publisher
+    @publish(command=cmds.heater_shaker_wait_for_temperature)
     @requires_version(2, 13)
     def wait_for_temperature(self) -> None:
         """Wait for target temperature.
@@ -916,7 +916,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
             )
         self._module.await_temperature(awaiting_temperature=self.target_temperature)
 
-    # TODO: add command publisher
+    @publish(command=cmds.heater_shaker_set_and_wait_for_shake_speed)
     @requires_version(2, 13)
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set and wait for target speed.
@@ -929,7 +929,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         validated_speed = validate_heater_shaker_speed(rpm=rpm)
         self._module.set_speed(rpm=validated_speed)
 
-    # TODO: add command publisher
+    @publish(command=cmds.heater_shaker_open_labware_latch)
     @requires_version(2, 13)
     def open_labware_latch(self) -> None:
         """Open heater-shaker's labware latch.
@@ -947,19 +947,19 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
             )
         self._module.open_labware_latch()
 
-    # TODO: add command publisher
+    @publish(command=cmds.heater_shaker_close_labware_latch)
     @requires_version(2, 13)
     def close_labware_latch(self) -> None:
         """Close heater-shaker's labware latch"""
         self._module.close_labware_latch()
 
-    # TODO: add command publisher
+    @publish(command=cmds.heater_shaker_deactivate_shaker)
     @requires_version(2, 13)
     def deactivate_shaker(self) -> None:
         """Stop shaking."""
         self._module.deactivate_shaker()
 
-    # TODO: add command publisher
+    @publish(command=cmds.heater_shaker_deactivate_heater)
     @requires_version(2, 13)
     def deactivate_heater(self) -> None:
         """Stop heating."""
