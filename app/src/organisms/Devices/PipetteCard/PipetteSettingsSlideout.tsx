@@ -1,14 +1,27 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
-import { Flex, DIRECTION_COLUMN, useInterval } from '@opentrons/components'
+import { last } from 'lodash'
+import { useDispatch, useSelector } from 'react-redux'
+import { Flex, useInterval } from '@opentrons/components'
 import { PipetteModelSpecs } from '@opentrons/shared-data'
-import { fetchPipetteSettings } from '../../../redux/pipettes'
+import {
+  fetchPipetteSettings,
+  updatePipetteSettings,
+} from '../../../redux/pipettes'
 import { Slideout } from '../../../atoms/Slideout'
+import {
+  getRequestById,
+  PENDING,
+  useDispatchApiRequest,
+} from '../../../redux/robot-api'
+import { ConfigFormSubmitButton } from '../../ConfigurePipette/ConfigFormSubmitButton'
 import { ConfigurePipette } from '../../ConfigurePipette'
 
-import type { AttachedPipette } from '../../../redux/pipettes/types'
-import type { Dispatch } from '../../../redux/types'
+import type {
+  AttachedPipette,
+  PipetteSettingsFieldsUpdate,
+} from '../../../redux/pipettes/types'
+import type { Dispatch, State } from '../../../redux/types'
 
 const FETCH_PIPETTES_INTERVAL_MS = 5000
 
@@ -26,6 +39,14 @@ export const PipetteSettingsSlideout = (
   const { pipetteName, robotName, isExpanded, pipetteId, onCloseClick } = props
   const { t } = useTranslation('device_details')
   const dispatch = useDispatch<Dispatch>()
+  const [dispatchRequest, requestIds] = useDispatchApiRequest()
+  const updateSettings = (fields: PipetteSettingsFieldsUpdate): void => {
+    dispatchRequest(updatePipetteSettings(robotName, pipetteId, fields))
+  }
+  const latestRequestId = last(requestIds)
+  const updateRequest = useSelector((state: State) =>
+    latestRequestId != null ? getRequestById(state, latestRequestId) : null
+  )
 
   useInterval(
     () => {
@@ -41,15 +62,16 @@ export const PipetteSettingsSlideout = (
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       padding={'0'}
+      footer={
+        <ConfigFormSubmitButton disabled={updateRequest?.status === PENDING} />
+      }
     >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        data-testid={`PipetteSettingsSlideout_${robotName}_${pipetteId}`}
-      >
+      <Flex data-testid={`PipetteSettingsSlideout_${robotName}_${pipetteId}`}>
         <ConfigurePipette
-          robotName={robotName}
           closeModal={onCloseClick}
           pipetteId={pipetteId}
+          updateRequest={updateRequest}
+          updateSettings={updateSettings}
         />
       </Flex>
     </Slideout>

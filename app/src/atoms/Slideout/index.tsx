@@ -140,7 +140,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
           )}
           <Divider marginY={0} color={COLORS.medGrey} />
           <Box
-            padding={props.padding ?? SPACING.spacing4}
+            padding={SPACING.spacing4}
             flex="1 1 auto"
             overflowY="scroll"
             data-testid={`Slideout_body_${
@@ -150,7 +150,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
             {children}
           </Box>
           {footer != null ? (
-            <Box paddingX={SPACING.spacing4} flex="0 0 auto">
+            <Box paddingX={props.padding ?? SPACING.spacing4} flex="0 0 auto">
               {footer}
             </Box>
           ) : null}
