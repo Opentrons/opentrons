@@ -119,5 +119,7 @@
   "setup_is_view_only": "Setup is view-only once run has started",
   "loading_data": "Loading data...",
   "liquid_setup_step_title": "Initial Liquid Setup",
-  "liquid_setup_step_description": "View liquid starting locations and volumes"
+  "liquid_setup_step_description": "View liquid starting locations and volumes",
+  "list_view": "List View",
+  "map_view": "Map View"
 }

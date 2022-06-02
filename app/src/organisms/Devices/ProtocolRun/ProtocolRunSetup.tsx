@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
 } from '@opentrons/components'
-import { protocolHasModules, protocolHasLiquids } from '@opentrons/shared-data'
+import { protocolHasModules } from '@opentrons/shared-data'
 import { useFeatureFlag } from '../../../redux/config'
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
@@ -66,10 +66,11 @@ export function ProtocolRunSetup({
     let nextStepKeysInOrder = stepsKeysInOrder
     const showModuleSetup =
       protocolData != null && protocolHasModules(protocolData)
-    const showLiquidSetup =
-      liquidSetupEnabled &&
-      protocolData != null &&
-      protocolHasLiquids(protocolData)
+    const showLiquidSetup = liquidSetupEnabled
+    // uncomment this once we start getting liquids back from protocol data
+    // &&
+    // protocolData != null &&
+    // protocolHasLiquids(protocolData)
     if (showModuleSetup && showLiquidSetup) {
       nextStepKeysInOrder = [
         ROBOT_CALIBRATION_STEP_KEY,
