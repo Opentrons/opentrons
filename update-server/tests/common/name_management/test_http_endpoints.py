@@ -2,17 +2,19 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from otupdate.common.name_management import NameManager
+from otupdate.common.name_management import NameSynchronizer
 
 
 @pytest.fixture
-def mock_name_manager():
-    return MagicMock(spec=NameManager)
+def mock_name_synchronizer():
+    return MagicMock(spec=NameSynchronizer)
 
 
-async def test_get_name(test_cli, monkeypatch, mock_name_manager) -> None:
-    mock_name_manager.get_name.return_value = "the returned name"
-    monkeypatch.setattr(NameManager, "from_request", lambda request: mock_name_manager)
+async def test_get_name(test_cli, monkeypatch, mock_name_synchronizer) -> None:
+    mock_name_synchronizer.get_name.return_value = "the returned name"
+    monkeypatch.setattr(
+        NameSynchronizer, "from_request", lambda request: mock_name_synchronizer
+    )
 
     response = await (test_cli[0].get("/server/name"))
     assert response.status == 200
@@ -20,12 +22,14 @@ async def test_get_name(test_cli, monkeypatch, mock_name_manager) -> None:
     assert body["name"] == "the returned name"
 
 
-async def test_set_name_valid(test_cli, monkeypatch, mock_name_manager) -> None:
+async def test_set_name_valid(test_cli, monkeypatch, mock_name_synchronizer) -> None:
     async def mock_set_name(new_name: str) -> str:
         return "the returned name"
 
-    mock_name_manager.set_name = mock_set_name
-    monkeypatch.setattr(NameManager, "from_request", lambda request: mock_name_manager)
+    mock_name_synchronizer.set_name = mock_set_name
+    monkeypatch.setattr(
+        NameSynchronizer, "from_request", lambda request: mock_name_synchronizer
+    )
 
     response = await test_cli[0].post("/server/name", json={"name": "the input name"})
     assert response.status == 200

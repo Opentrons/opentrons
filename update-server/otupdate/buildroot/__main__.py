@@ -19,7 +19,7 @@ def main() -> None:
     systemd.configure_logging(getattr(logging, args.log_level.upper()))
 
     # Because this involves restarting Avahi, this must happen early,
-    # before the NameManager starts up and connects to Avahi.
+    # before the NameSynchronizer starts up and connects to Avahi.
     LOG.info("Setting static hostname")
     static_hostname = loop.run_until_complete(name_management.set_up_static_hostname())
     LOG.info(f"Set static hostname to {static_hostname}")

@@ -47,7 +47,7 @@ import json
 
 from aiohttp import web
 
-from .name_manager import NameManager, build_name_manager
+from .name_synchronizer import NameSynchronizer, build_name_synchronizer
 from .static_hostname import set_up_static_hostname
 
 
@@ -90,8 +90,8 @@ async def set_name_endpoint(request: web.Request) -> web.Response:
     if not isinstance(name_to_set, str):
         return build_400('"name" key is not a string"')
 
-    name_manager = NameManager.from_request(request)
-    new_name = await name_manager.set_name(new_name=name_to_set)
+    name_synchronizer = NameSynchronizer.from_request(request)
+    new_name = await name_synchronizer.set_name(new_name=name_to_set)
 
     return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
         data={"name": new_name}, status=200
@@ -106,15 +106,15 @@ async def get_name_endpoint(request: web.Request) -> web.Response:
 
     GET /server/name -> 200 OK, {'name': robot name}
     """
-    name_manager = NameManager.from_request(request)
+    name_synchronizer = NameSynchronizer.from_request(request)
     return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
-        data={"name": name_manager.get_name()}, status=200
+        data={"name": name_synchronizer.get_name()}, status=200
     )
 
 
 __all__ = [
-    "NameManager",
-    "build_name_manager",
+    "NameSynchronizer",
+    "build_name_synchronizer",
     "set_up_static_hostname",
     "get_name_endpoint",
     "set_name_endpoint",

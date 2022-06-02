@@ -68,11 +68,11 @@ def get_app(
 
         update_actions.OT2UpdateActions.build_and_insert(app)
 
-        async with name_management.build_name_manager(
+        async with name_management.build_name_synchronizer(
             name_override=name_override
-        ) as name_manager:
-            name_manager.install_on_app(app)
-            initial_name = name_manager.get_name()
+        ) as name_synchronizer:
+            name_synchronizer.install_on_app(app)
+            initial_name = name_synchronizer.get_name()
 
             LOG.info(
                 "Setup: "

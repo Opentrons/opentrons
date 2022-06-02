@@ -12,25 +12,25 @@ from .avahi import AvahiClient
 from .pretty_hostname import get_pretty_hostname, persist_pretty_hostname
 
 
-_NAME_MANAGER_VARNAME = APP_VARIABLE_PREFIX + "name_manager"
+_name_synchronizer_VARNAME = APP_VARIABLE_PREFIX + "name_synchronizer"
 _log = getLogger(__name__)
 
 
-class NameManager(ABC):
+class NameSynchronizer(ABC):
     @classmethod
-    def from_request(cls, request: web.Request) -> NameManager:
+    def from_request(cls, request: web.Request) -> NameSynchronizer:
         return cls.from_app(request.app)
 
     @staticmethod
-    def from_app(app: web.Application) -> NameManager:
-        name_manager = app.get(_NAME_MANAGER_VARNAME, None)
+    def from_app(app: web.Application) -> NameSynchronizer:
+        name_synchronizer = app.get(_name_synchronizer_VARNAME, None)
         assert isinstance(
-            name_manager, NameManager
-        ), f"Unexpected type {type(name_manager)}. Incorrect Application setup?"
-        return name_manager
+            name_synchronizer, NameSynchronizer
+        ), f"Unexpected type {type(name_synchronizer)}. Incorrect Application setup?"
+        return name_synchronizer
 
     def install_on_app(self, app: web.Application) -> None:
-        app[_NAME_MANAGER_VARNAME] = self
+        app[_name_synchronizer_VARNAME] = self
 
     @abstractmethod
     async def set_name(self, new_name: str) -> str:
@@ -41,7 +41,7 @@ class NameManager(ABC):
         pass
 
 
-class RealNameManager(NameManager):
+class RealNameSynchronizer(NameSynchronizer):
     def __init__(self, avahi_client: AvahiClient) -> None:
         """For internal use by this class only."""
         self._avahi_client = avahi_client
@@ -50,11 +50,15 @@ class RealNameManager(NameManager):
     @asynccontextmanager
     async def build(
         cls, avahi_client: AvahiClient
-    ) -> AsyncGenerator[NameManager, None]:
-        name_manager = cls(avahi_client)
-        async with avahi_client.collision_callback(name_manager._on_avahi_collision):
-            await avahi_client.start_advertising(service_name=name_manager.get_name())
-            yield name_manager
+    ) -> AsyncGenerator[NameSynchronizer, None]:
+        name_synchronizer = cls(avahi_client)
+        async with avahi_client.collision_callback(
+            name_synchronizer._on_avahi_collision
+        ):
+            await avahi_client.start_advertising(
+                service_name=name_synchronizer.get_name()
+            )
+            yield name_synchronizer
 
     async def set_name(self, new_name: str) -> str:
         """See `set_name_endpoint()`."""
@@ -90,7 +94,7 @@ class RealNameManager(NameManager):
         await self.set_name(new_name=alternative_name)
 
 
-class FakeNameManager(NameManager):
+class FakeNameSynchronizer(NameSynchronizer):
     def __init__(self, name_override: str) -> None:
         self._name_override = name_override
 
@@ -104,14 +108,14 @@ class FakeNameManager(NameManager):
 
 
 @asynccontextmanager
-async def build_name_manager(
+async def build_name_synchronizer(
     name_override: Optional[str],
-) -> AsyncGenerator[NameManager, None]:
+) -> AsyncGenerator[NameSynchronizer, None]:
     if name_override is None:
         avahi_client = await AvahiClient.connect()
-        async with RealNameManager.build(
+        async with RealNameSynchronizer.build(
             avahi_client=avahi_client
-        ) as real_name_manager:
-            yield real_name_manager
+        ) as real_name_synchronizer:
+            yield real_name_synchronizer
     else:
-        yield FakeNameManager(name_override=name_override)
+        yield FakeNameSynchronizer(name_override=name_override)

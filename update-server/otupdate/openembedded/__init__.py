@@ -70,11 +70,11 @@ def get_app(
         updater = Updater(rfs, part_mgr)
         app[FILE_ACTIONS_VARNAME] = updater
 
-        async with name_management.build_name_manager(
+        async with name_management.build_name_synchronizer(
             name_override=name_override
-        ) as name_manager:
-            name_manager.install_on_app(app)
-            initial_name = name_manager.get_name()
+        ) as name_synchronizer:
+            name_synchronizer.install_on_app(app)
+            initial_name = name_synchronizer.get_name()
 
             LOG.info(
                 "Setup: "

@@ -13,7 +13,7 @@ from typing import Callable, Coroutine, Mapping, Any
 from aiohttp import web
 
 from .constants import RESTART_LOCK_NAME, DEVICE_BOOT_ID_NAME
-from .name_management import NameManager
+from .name_management import NameSynchronizer
 
 LOG = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ def build_health_endpoint(
             {
                 **health_response,
                 **{
-                    "name": NameManager.from_request(request).get_name(),
+                    "name": NameSynchronizer.from_request(request).get_name(),
                     "serialNumber": get_serial(),
                     "bootId": request.app[DEVICE_BOOT_ID_NAME],
                 },
