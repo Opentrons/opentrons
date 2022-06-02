@@ -4,7 +4,7 @@ from collections import OrderedDict
 from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Mapping, Optional
+from typing import Dict, List, Mapping, Optional, Union
 
 from opentrons.ordered_set import OrderedSet
 
@@ -23,14 +23,15 @@ from ..actions import (
     HardwareEventAction,
 )
 
-from ..commands import Command, CommandStatus
+from ..commands import Command, CommandStatus, CommandIntent
 from ..errors import (
     ProtocolEngineError,
     CommandDoesNotExistError,
-    ProtocolEngineStoppedError,
+    RunStoppedError,
     ErrorOccurrence,
     RobotDoorOpenError,
-    RunNotStartedError,
+    SetupCommandNotAllowedError,
+    PauseNotAllowedError,
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
@@ -40,17 +41,20 @@ class QueueStatus(str, Enum):
     """Execution status of the command queue.
 
     Properties:
-        IMPLICITLY_ACTIVE: The queue has been created, and the engine
-            should pull commands off the queue to execute, but the queue
-            has not yet been told explicitly to run.
-        ACTIVE: The queue is running due to an explicit PlayAction.
-        INACTIVE: New commands should not be pulled off the queue, though
-            the latest command may be running if it was already processed.
+        SETUP: The engine has been created, but the run has not yet started.
+            New protocol commands may be enqueued but will wait to execute.
+            New setup commands may be enqueued and will execute immediately.
+        RUNNING: The queue is running though protocol commands.
+            New protocol commands may be enqueued and will execute immediately.
+            New setup commands may not be enqueued.
+        PAUSED: Execution of protocol commands has been paused.
+            New protocol commands may be enqueued but wait to execute.
+            New setup commands may be enqueued and will execute immediately.
     """
 
-    IMPLICITLY_ACTIVE = "implicitly-active"
-    ACTIVE = "active"
-    INACTIVE = "inactive"
+    SETUP = "setup"
+    RUNNING = "running"
+    PAUSED = "paused"
 
 
 class RunResult(str, Enum):
@@ -97,6 +101,9 @@ class CommandState:
 
     queued_command_ids: OrderedSet[str]
     """The IDs of queued commands, in FIFO order"""
+
+    queued_setup_command_ids: OrderedSet[str]
+    """The IDs of queued setup commands, in FIFO order"""
 
     running_command_id: Optional[str]
     """The ID of the currently running command, if any"""
@@ -148,12 +155,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def __init__(self, is_door_blocking: bool = False) -> None:
         """Initialize a CommandStore and its state."""
         self._state = CommandState(
-            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            queue_status=QueueStatus.SETUP,
             is_door_blocking=is_door_blocking,
             run_result=None,
             running_command_id=None,
             all_command_ids=[],
             queued_command_ids=OrderedSet(),
+            queued_setup_command_ids=OrderedSet(),
             commands_by_id=OrderedDict(),
             errors_by_id={},
             run_completed_at=None,
@@ -176,16 +184,21 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 key=action.command_key,
                 createdAt=action.created_at,
                 params=action.request.params,  # type: ignore[arg-type]
+                intent=action.request.intent,
                 status=CommandStatus.QUEUED,
             )
 
             next_index = len(self._state.all_command_ids)
             self._state.all_command_ids.append(action.command_id)
-            self._state.queued_command_ids.add(queued_command.id)
             self._state.commands_by_id[queued_command.id] = CommandEntry(
                 index=next_index,
                 command=queued_command,
             )
+
+            if action.request.intent == CommandIntent.SETUP:
+                self._state.queued_setup_command_ids.add(queued_command.id)
+            else:
+                self._state.queued_command_ids.add(queued_command.id)
 
         # TODO(mc, 2021-12-28): replace "UpdateCommandAction" with explicit
         # state change actions (e.g. RunCommandAction, SucceedCommandAction)
@@ -207,10 +220,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     command=command,
                 )
 
-            try:
-                self._state.queued_command_ids.remove(command.id)
-            except KeyError:
-                pass
+            self._state.queued_command_ids.discard(command.id)
+            self._state.queued_setup_command_ids.discard(command.id)
 
             if command.status == CommandStatus.RUNNING:
                 self._state.running_command_id = command.id
@@ -237,9 +248,16 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 ),
             )
 
-            other_command_ids_to_fail = [
-                *[i for i in self._state.queued_command_ids],
-            ]
+            if prev_entry.command.intent == CommandIntent.SETUP:
+                other_command_ids_to_fail = [
+                    *[i for i in self._state.queued_setup_command_ids],
+                ]
+                self._state.queued_setup_command_ids.clear()
+            else:
+                other_command_ids_to_fail = [
+                    *[i for i in self._state.queued_command_ids],
+                ]
+                self._state.queued_command_ids.clear()
 
             for command_id in other_command_ids_to_fail:
                 prev_entry = self._state.commands_by_id[command_id]
@@ -257,29 +275,28 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if self._state.running_command_id == action.command_id:
                 self._state.running_command_id = None
 
-            self._state.queued_command_ids.clear()
-
         elif isinstance(action, PlayAction):
             if not self._state.run_result:
-                if self._state.is_door_blocking:
-                    # Always inactivate queue when door is blocking
-                    self._state.queue_status = QueueStatus.INACTIVE
-                else:
-                    self._state.queue_status = QueueStatus.ACTIVE
                 self._state.run_started_at = (
                     self._state.run_started_at or action.requested_at
                 )
+                if self._state.is_door_blocking:
+                    # Always inactivate queue when door is blocking
+                    self._state.queue_status = QueueStatus.PAUSED
+                else:
+                    self._state.queue_status = QueueStatus.RUNNING
+
         elif isinstance(action, PauseAction):
-            self._state.queue_status = QueueStatus.INACTIVE
+            self._state.queue_status = QueueStatus.PAUSED
 
         elif isinstance(action, StopAction):
             if not self._state.run_result:
-                self._state.queue_status = QueueStatus.INACTIVE
+                self._state.queue_status = QueueStatus.PAUSED
                 self._state.run_result = RunResult.STOPPED
 
         elif isinstance(action, FinishAction):
             if not self._state.run_result:
-                self._state.queue_status = QueueStatus.INACTIVE
+                self._state.queue_status = QueueStatus.PAUSED
                 if action.set_run_status:
                     self._state.run_result = (
                         RunResult.SUCCEEDED
@@ -307,7 +324,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     )
 
         elif isinstance(action, HardwareStoppedAction):
-            self._state.queue_status = QueueStatus.INACTIVE
+            self._state.queue_status = QueueStatus.PAUSED
             self._state.run_result = self._state.run_result or RunResult.STOPPED
             self._state.run_completed_at = action.completed_at
 
@@ -315,8 +332,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if isinstance(action.event, DoorStateNotification):
                 if action.event.blocking:
                     self._state.is_door_blocking = True
-                    if self._state.queue_status != QueueStatus.IMPLICITLY_ACTIVE:
-                        self._state.queue_status = QueueStatus.INACTIVE
+                    if self._state.queue_status != QueueStatus.SETUP:
+                        self._state.queue_status = QueueStatus.PAUSED
                 elif action.event.new_state == DoorState.CLOSED:
                     self._state.is_door_blocking = False
 
@@ -420,20 +437,33 @@ class CommandView(HasState[CommandState]):
             The ID of the earliest queued command, if any.
 
         Raises:
-            ProtocolEngineStoppedError: The engine is currently stopped, so
+            RunStoppedError: The engine is currently stopped, so
                 there are not queued commands.
         """
         if self._state.run_result:
-            raise ProtocolEngineStoppedError("Engine was stopped")
+            raise RunStoppedError("Engine was stopped")
 
-        if self._state.queue_status == QueueStatus.INACTIVE:
-            return None
+        # if there is a setup command queued, prioritize it
+        next_setup_cmd = next(iter(self._state.queued_setup_command_ids), None)
+        if next_setup_cmd:
+            return next_setup_cmd
 
-        return next(iter(self._state.queued_command_ids), None)
+        # if the queue is running, return the next protocol command
+        if self._state.queue_status == QueueStatus.RUNNING:
+            return next(iter(self._state.queued_command_ids), None)
+
+        # otherwise we've got nothing to do
+        return None
 
     def get_is_okay_to_clear(self) -> bool:
-        """Get whether the engine is stopped or unplayed so it could be removed."""
-        if self.get_is_stopped() or self.get_status() == EngineStatus.IDLE:
+        """Get whether the engine is stopped or sitting idly so it could be removed."""
+        if self.get_is_stopped():
+            return True
+        elif (
+            self.get_status() == EngineStatus.IDLE
+            and self._state.running_command_id is None
+            and len(self._state.queued_setup_command_ids) == 0
+        ):
             return True
         else:
             return False
@@ -444,20 +474,11 @@ class CommandView(HasState[CommandState]):
 
     def get_is_implicitly_active(self) -> bool:
         """Get whether the queue is implicitly active, i.e., never 'played'."""
-        return self._state.queue_status == QueueStatus.IMPLICITLY_ACTIVE
+        return self._state.queue_status == QueueStatus.SETUP
 
     def get_is_running(self) -> bool:
-        """Get whether the engine is running and queued commands should be executed."""
-        queue_status = self._state.queue_status
-        return (
-            queue_status == QueueStatus.IMPLICITLY_ACTIVE
-            or queue_status == QueueStatus.ACTIVE
-        )
-
-    def get_is_active(self) -> bool:
-        """Get whether the engine is active and queued commands should be executed."""
-        queue_status = self._state.queue_status
-        return queue_status == QueueStatus.ACTIVE
+        """Get whether the protocol is running & queued commands should be executed."""
+        return self._state.queue_status == QueueStatus.RUNNING
 
     def get_is_complete(self, command_id: str) -> bool:
         """Get whether a given command is completed.
@@ -497,39 +518,43 @@ class CommandView(HasState[CommandState]):
         """Get whether an engine stop has completed."""
         return self._state.run_completed_at is not None
 
-    def raise_if_pause_not_allowed(self) -> None:
-        """Raise if pausing a run is not allowed."""
-        self.raise_if_not_started()
-        self.raise_if_stop_requested()
+    def validate_action_allowed(
+        self,
+        action: Union[PlayAction, PauseAction, StopAction, QueueCommandAction],
+    ) -> Union[PlayAction, PauseAction, StopAction, QueueCommandAction]:
+        """Validate whether a given control action is allowed.
 
-    # TODO (tz, 5-31-22): change to is_running? after mc PR is merged
-    def raise_if_not_started(self) -> None:
-        """Raise if a run has not started.
-
-        Mainly used to validate if an Action is allowed, raising if not.
+        Returns:
+            The action, if valid.
 
         Raises:
-            RunNotStartedError: Run is not started, therefor cannot be stopped.
-        """
-        if not self.get_is_active():
-            raise RunNotStartedError("Cannot pause a run that was not started.")
-
-    # TODO(mc, 2021-12-07): reject adding commands to a stopped engine
-    def raise_if_stop_requested(self) -> None:
-        """Raise if a stop has already been requested.
-
-        Mainly used to validate if an Action is allowed, raising if not.
-
-        Raises:
-            ProtocolEngineStoppedError: the engine has been stopped.
+            RunStoppedError: The engine has been stopped.
+            RobotDoorOpenError: Cannot resume because the front door is open.
+            PauseNotAllowedError: The engine is not running, so cannot be paused.
+            SetupCommandNotAllowedError: The engine is running, so a setup command
+                may not be added.
         """
         if self.get_stop_requested():
-            raise ProtocolEngineStoppedError("A stop has already been requested.")
+            raise RunStoppedError("The run has already stopped.")
 
-    def raise_if_paused_by_blocking_door(self) -> None:
-        """Raise if the engine is currently paused by an open door."""
-        if self.get_status() == EngineStatus.BLOCKED_BY_OPEN_DOOR:
-            raise RobotDoorOpenError("Front door or top window is currently open.")
+        elif isinstance(action, PlayAction):
+            if self.get_status() == EngineStatus.BLOCKED_BY_OPEN_DOOR:
+                raise RobotDoorOpenError("Front door or top window is currently open.")
+
+        elif isinstance(action, PauseAction):
+            if not self.get_is_running():
+                raise PauseNotAllowedError("Cannot pause a run that is not running.")
+
+        elif (
+            isinstance(action, QueueCommandAction)
+            and action.request.intent == CommandIntent.SETUP
+        ):
+            if self._state.queue_status == QueueStatus.RUNNING:
+                raise SetupCommandNotAllowedError(
+                    "Setup commands are not allowed while running."
+                )
+
+        return action
 
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
@@ -547,20 +572,13 @@ class CommandView(HasState[CommandState]):
             else:
                 return EngineStatus.STOPPED
 
-        elif self._state.queue_status == QueueStatus.ACTIVE:
+        elif self._state.queue_status == QueueStatus.RUNNING:
             return EngineStatus.RUNNING
 
-        elif self._state.queue_status == QueueStatus.INACTIVE:
+        elif self._state.queue_status == QueueStatus.PAUSED:
             if self._state.is_door_blocking:
                 return EngineStatus.BLOCKED_BY_OPEN_DOOR
             else:
                 return EngineStatus.PAUSED
 
-        else:
-            any_running = self._state.running_command_id is not None
-            any_queued = len(self._state.queued_command_ids) > 0
-
-            if any_running or any_queued:
-                return EngineStatus.RUNNING
-            else:
-                return EngineStatus.IDLE
+        return EngineStatus.IDLE

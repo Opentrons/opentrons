@@ -11,7 +11,6 @@ from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands
-from opentrons.protocol_engine.errors import RunNotStartedError
 from opentrons.protocol_engine.types import (
     LabwareOffset,
     LabwareOffsetCreate,
@@ -163,10 +162,28 @@ def test_add_command(
         decoy.when(state_store.commands.get("command-id")).then_return(queued)
 
     decoy.when(
-        action_dispatcher.dispatch(
+        state_store.commands.validate_action_allowed(
             QueueCommandAction(
                 command_id="command-id",
                 command_key="command-id",
+                created_at=created_at,
+                request=request,
+            )
+        )
+    ).then_return(
+        QueueCommandAction(
+            command_id="command-id-validated",
+            command_key="command-id-validated",
+            created_at=created_at,
+            request=request,
+        )
+    )
+
+    decoy.when(
+        action_dispatcher.dispatch(
+            QueueCommandAction(
+                command_id="command-id-validated",
+                command_key="command-id-validated",
                 created_at=created_at,
                 request=request,
             )
@@ -216,10 +233,28 @@ async def test_add_and_execute_command(
         return True
 
     decoy.when(
-        action_dispatcher.dispatch(
+        state_store.commands.validate_action_allowed(
             QueueCommandAction(
                 command_id="command-id",
                 command_key="command-id",
+                created_at=created_at,
+                request=request,
+            )
+        )
+    ).then_return(
+        QueueCommandAction(
+            command_id="command-id-validated",
+            command_key="command-id-validated",
+            created_at=created_at,
+            request=request,
+        )
+    )
+
+    decoy.when(
+        action_dispatcher.dispatch(
+            QueueCommandAction(
+                command_id="command-id-validated",
+                command_key="command-id-validated",
                 created_at=created_at,
                 request=request,
             )
@@ -242,21 +277,27 @@ def test_play(
     decoy: Decoy,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
-    subject: ProtocolEngine,
     model_utils: ModelUtils,
+    queue_worker: QueueWorker,
+    subject: ProtocolEngine,
 ) -> None:
     """It should be able to start executing queued commands."""
     decoy.when(model_utils.get_timestamp()).then_return(
         datetime(year=2021, month=1, day=1)
     )
+    decoy.when(
+        state_store.commands.validate_action_allowed(
+            PlayAction(requested_at=datetime(year=2021, month=1, day=1))
+        ),
+    ).then_return(PlayAction(requested_at=datetime(year=2022, month=2, day=2)))
+
     subject.play()
 
     decoy.verify(
-        state_store.commands.raise_if_paused_by_blocking_door(),
-        state_store.commands.raise_if_stop_requested(),
         action_dispatcher.dispatch(
-            PlayAction(requested_at=datetime(year=2021, month=1, day=1))
+            PlayAction(requested_at=datetime(year=2022, month=2, day=2))
         ),
+        queue_worker.start(),
     )
 
 
@@ -269,26 +310,15 @@ def test_pause(
     """It should be able to pause executing queued commands."""
     expected_action = PauseAction(source=PauseSource.CLIENT)
 
+    decoy.when(
+        state_store.commands.validate_action_allowed(expected_action),
+    ).then_return(expected_action)
+
     subject.pause()
 
     decoy.verify(
-        state_store.commands.raise_if_pause_not_allowed(),
         action_dispatcher.dispatch(expected_action),
     )
-
-
-def test_pause_run_not_started(
-    decoy: Decoy,
-    state_store: StateStore,
-    subject: ProtocolEngine,
-) -> None:
-    """Should raise an RunNotStartedError error."""
-    decoy.when(state_store.commands.raise_if_pause_not_allowed()).then_raise(
-        RunNotStartedError("Cannot pause a run that was not started.")
-    )
-
-    with pytest.raises(RunNotStartedError):
-        subject.pause()
 
 
 @pytest.mark.parametrize("drop_tips_and_home", [True, False])
@@ -429,14 +459,21 @@ async def test_stop(
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
     hardware_api: HardwareControlAPI,
-    subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
+    state_store: StateStore,
+    subject: ProtocolEngine,
 ) -> None:
     """It should be able to stop the engine and halt the hardware."""
+    expected_action = StopAction()
+
+    decoy.when(
+        state_store.commands.validate_action_allowed(expected_action),
+    ).then_return(expected_action)
+
     await subject.stop()
 
     decoy.verify(
-        action_dispatcher.dispatch(StopAction()),
+        action_dispatcher.dispatch(expected_action),
         queue_worker.cancel(),
         await hardware_stopper.do_halt(),
     )
