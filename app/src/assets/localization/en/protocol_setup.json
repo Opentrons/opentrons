@@ -112,5 +112,6 @@
   "calibration_data_not_available": "Calibration data not available once run has started",
   "connection_info_not_available": "Connection info not available once run has started",
   "setup_is_view_only": "Setup is view-only once run has started",
-  "loading_data": "Loading data..."
+  "loading_data": "Loading data...",
+  "protocol_analysis_failed": "Protocol analysis failed"
 }

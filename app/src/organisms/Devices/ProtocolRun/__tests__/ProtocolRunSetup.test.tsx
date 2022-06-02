@@ -18,6 +18,7 @@ import {
   useRobot,
   useRunCalibrationStatus,
   useRunHasStarted,
+  useProtocolAnalysisErrors,
 } from '../../hooks'
 import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
@@ -36,6 +37,9 @@ const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction
 >
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
+>
+const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFunction<
+  typeof useProtocolAnalysisErrors
 >
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
@@ -83,6 +87,9 @@ describe('ProtocolRunSetup', () => {
         displayName: 'mock display name',
         protocolKey: 'fakeProtocolKey',
       })
+    when(mockUseProtocolAnalysisErrors).calledWith(RUN_ID).mockReturnValue({
+      analysisErrors: null,
+    })
     when(mockUseRobot)
       .calledWith(ROBOT_NAME)
       .mockReturnValue(mockConnectedRobot)

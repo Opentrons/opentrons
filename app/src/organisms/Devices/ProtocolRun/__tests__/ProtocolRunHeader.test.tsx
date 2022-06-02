@@ -50,6 +50,7 @@ import { getIsHeaterShakerAttached } from '../../../../redux/config'
 
 import {
   useProtocolDetailsForRun,
+  useProtocolAnalysisErrors,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
@@ -111,6 +112,9 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
 >
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
+>
+const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFunction<
+  typeof useProtocolAnalysisErrors
 >
 const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
@@ -224,6 +228,9 @@ describe('ProtocolRunHeader', () => {
     mockConfirmAttachmentModal.mockReturnValue(
       <div>mock confirm attachment modal</div>
     )
+    when(mockUseProtocolAnalysisErrors).calledWith(RUN_ID).mockReturnValue({
+      analysisErrors: null,
+    })
     mockUseIsHeaterShakerInProtocol.mockReturnValue(false)
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID)
     when(mockUseCloseCurrentRun).calledWith().mockReturnValue({
