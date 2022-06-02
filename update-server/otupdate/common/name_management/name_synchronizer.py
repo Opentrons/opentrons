@@ -137,6 +137,12 @@ class RealNameSynchronizer(NameSynchronizer):
 
 
 class FakeNameSynchronizer(NameSynchronizer):
+    """A dummy implementation of NameSynchronizer to use in integration tests.
+
+    update-server's integration tests run on systems where we don't have access to
+    an Avahi daemon. So RealNameSynchronizer wouldn't work.
+    """
+
     def __init__(self, name_override: str) -> None:
         self._name_override = name_override
 
