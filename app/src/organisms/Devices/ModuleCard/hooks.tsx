@@ -23,7 +23,7 @@ import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateHeaterCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-  HeaterShakerStopShakeCreateCommand,
+  HeaterShakerDeactivateShakerCreateCommand,
   MagneticModuleDisengageCreateCommand,
   TCDeactivateBlockCreateCommand,
   TCDeactivateLidCreateCommand,
@@ -69,8 +69,8 @@ export function useLatchControls(
     | HeaterShakerOpenLatchCreateCommand
     | HeaterShakerCloseLatchCreateCommand = {
     commandType: isLatchClosed
-      ? 'heaterShakerModule/openLatch'
-      : 'heaterShakerModule/closeLatch',
+      ? 'heaterShaker/openLabwareLatch'
+      : 'heaterShaker/closeLabwareLatch',
     params: { moduleId: runId != null ? moduleIdFromRun : module.id },
   }
 
@@ -114,8 +114,8 @@ type deactivateCommandTypes =
   | 'thermocycler/deactivateBlock'
   | 'temperatureModule/deactivate'
   | 'magneticModule/disengage'
-  | 'heaterShakerModule/stopShake'
-  | 'heaterShakerModule/deactivateHeater'
+  | 'heaterShaker/deactivateShaker'
+  | 'heaterShaker/deactivateHeater'
 
 export function useModuleOverflowMenu(
   module: AttachedModule,
@@ -199,7 +199,7 @@ export function useModuleOverflowMenu(
       | HeaterShakerDeactivateHeaterCreateCommand
       | TCDeactivateLidCreateCommand
       | TCDeactivateBlockCreateCommand
-      | HeaterShakerStopShakeCreateCommand = {
+      | HeaterShakerDeactivateShakerCreateCommand = {
       commandType: deactivateModuleCommandType,
       params: { moduleId: runId != null ? moduleIdFromRun : module.id },
     }
@@ -302,8 +302,7 @@ export function useModuleOverflowMenu(
           module.moduleType === HEATERSHAKER_MODULE_TYPE &&
           module.data.temperatureStatus !== 'idle' &&
           module.data.status !== 'idle'
-            ? () =>
-                handleDeactivationCommand('heaterShakerModule/deactivateHeater')
+            ? () => handleDeactivationCommand('heaterShaker/deactivateHeater')
             : () => handleSlideoutClick(false),
       },
       {
@@ -328,7 +327,7 @@ export function useModuleOverflowMenu(
         onClick:
           module.moduleType === HEATERSHAKER_MODULE_TYPE &&
           module.data.speedStatus !== 'idle'
-            ? () => handleDeactivationCommand('heaterShakerModule/stopShake')
+            ? () => handleDeactivationCommand('heaterShaker/deactivateShaker')
             : () => handleSlideoutClick(true),
       },
     ],

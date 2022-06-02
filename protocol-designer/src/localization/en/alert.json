@@ -124,6 +124,9 @@
       },
       "TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER": {
         "body": "The Heater-Shaker labware latch will collide with labware over 53 mm. Move labware to a different slot."
+      },
+      "HEATER_SHAKER_EAST_WEST_LATCH_OPEN": {
+        "body": "Pipettes cannot access labware on, or to the left or right of, the Heater-Shaker while the labware latch is open. Create a step before this one that closes the latch."
       }
     },
     "warning": {
@@ -147,6 +150,10 @@
     "SLOT_OCCUPIED": {
       "title": "Cannot place module",
       "body": "Slot {{selectedSlot}} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue."
+    },
+    "HEATER_SHAKER_ADJACENT_LABWARE_TOO_TALL": {
+      "title": "Cannot place module",
+      "body": "Slot {{selectedSlot}} is occupied by labware over 53mm tall. The Heater-Shaker's labware latch risks collision with this labware."
     }
   },
   "export_warnings": {

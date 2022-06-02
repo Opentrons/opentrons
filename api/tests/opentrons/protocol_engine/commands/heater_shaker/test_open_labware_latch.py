@@ -1,4 +1,4 @@
-"""Test Heater Shaker set shake speed command implementation."""
+"""Test Heater Shaker open labware latch command implementation."""
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import HeaterShaker
@@ -10,22 +10,19 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
-from opentrons.protocol_engine.commands.heater_shaker.set_target_shake_speed import (
-    SetTargetShakeSpeedImpl,
+from opentrons.protocol_engine.commands.heater_shaker.open_labware_latch import (
+    OpenLabwareLatchImpl,
 )
 
 
-async def test_set_target_shake_speed(
+async def test_open_labware_latch(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
 ) -> None:
-    """It should be able to set the module's shake speed."""
-    subject = SetTargetShakeSpeedImpl(state_view=state_view, equipment=equipment)
-    data = heater_shaker.SetTargetShakeSpeedParams(
-        moduleId="input-heater-shaker-id",
-        rpm=1234.56,
-    )
+    """It should be able to open the module's labware latch."""
+    subject = OpenLabwareLatchImpl(state_view=state_view, equipment=equipment)
+    data = heater_shaker.OpenLabwareLatchParams(moduleId="input-heater-shaker-id")
 
     hs_module_substate = decoy.mock(cls=HeaterShakerModuleSubState)
     hs_hardware = decoy.mock(cls=HeaterShaker)
@@ -40,14 +37,11 @@ async def test_set_target_shake_speed(
         HeaterShakerModuleId("heater-shaker-id")
     )
 
-    # Stub speed validation from hs module view
-    decoy.when(hs_module_substate.validate_target_speed(rpm=1234.56)).then_return(1234)
-
-    # Get attached hardware modules
+    # Get stubbed hardware module
     decoy.when(
         equipment.get_module_hardware_api(HeaterShakerModuleId("heater-shaker-id"))
     ).then_return(hs_hardware)
 
     result = await subject.execute(data)
-    decoy.verify(await hs_hardware.set_speed(rpm=1234), times=1)
-    assert result == heater_shaker.SetTargetShakeSpeedResult()
+    decoy.verify(await hs_hardware.open_labware_latch(), times=1)
+    assert result == heater_shaker.OpenLabwareLatchResult()

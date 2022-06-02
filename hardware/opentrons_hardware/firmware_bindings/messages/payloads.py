@@ -17,6 +17,7 @@ from .fields import (
     EepromDataField,
     SerialField,
     SensorThresholdModeField,
+    PipetteTipActionTypeField,
 )
 from .. import utils
 
@@ -416,12 +417,15 @@ class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     """A request to perform a tip action."""
 
     velocity: utils.Int32Field
+    action: PipetteTipActionTypeField
+    request_stop_condition: utils.UInt8Field
 
 
 @dataclass
-class TipActionResponsePayload(MoveGroupResponsePayload):
+class TipActionResponsePayload(MoveCompletedPayload):
     """A response that sends back whether tip action was successful."""
 
+    action: PipetteTipActionTypeField
     success: utils.UInt8Field
 
 
