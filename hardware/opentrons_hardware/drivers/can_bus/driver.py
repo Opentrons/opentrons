@@ -58,6 +58,7 @@ class CanDriver(AbstractCanDriver):
         bitrate: Optional[int] = None,
         fcan_clock: Optional[int] = None,
         sample_rate: Optional[float] = None,
+        jump_width: Optional[int] = None,
     ) -> CanDriver:
         """Build a CanDriver.
 
@@ -68,6 +69,7 @@ class CanDriver(AbstractCanDriver):
             channel: Optional channel
             fcan_clock: The clock used by the can analyzer, defaults to 20MHz
             sample_rate: The sample rate in which to sample the data, defaults to 87.5
+            jump_width: The max time the sampling period can be lengthened or shortened
 
         Returns:
             A CanDriver instance.
@@ -76,7 +78,9 @@ class CanDriver(AbstractCanDriver):
         extra_kwargs: Union[PCANParameters, Dict[Any, Any]] = {}
         if interface == "pcan":
             # Special FDCAN parameters for use of PCAN driver.
-            extra_kwargs = calculate_fdcan_parameters(fcan_clock, bitrate, sample_rate)
+            extra_kwargs = calculate_fdcan_parameters(
+                fcan_clock, bitrate, sample_rate, jump_width
+            )
 
         return CanDriver(
             bus=Bus(

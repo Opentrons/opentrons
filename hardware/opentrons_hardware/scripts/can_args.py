@@ -63,6 +63,13 @@ def add_can_args(parser: ArgumentParser) -> ArgumentParser:
         required=False,
         help="Sample rate for can analyzer, only for pcan interface",
     )
+    parser.add_argument(
+        "--jump_width",
+        type=int,
+        default=settings.DEFAULT_JUMP_WIDTH_SEG,
+        required=False,
+        help="Jump width seg for can analyzer, only for pcan interface",
+    )
     return parser
 
 
