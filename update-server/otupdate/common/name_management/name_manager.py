@@ -80,6 +80,13 @@ class RealNameManager(NameManager):
         _log.info(
             f"Name collision detected by Avahi. Changing name to {alternative_name}."
         )
+
+        # Setting the new name includes persisting it for the next boot.
+        #
+        # Persisting the new name is recommended in the mDNS spec
+        # (https://datatracker.ietf.org/doc/html/rfc6762#section-9).
+        # It prevents two machines with the same name from flipping
+        # which one is #1 and which one is #2 every time they reboot.
         await self.set_name(new_name=alternative_name)
 
 
