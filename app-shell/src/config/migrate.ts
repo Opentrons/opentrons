@@ -243,6 +243,7 @@ export function migrate(
   // loop through the migrations, skipping any migrations that are unnecessary
   for (let i: number = prevVersion; i < MIGRATIONS.length; i++) {
     const migrateVersion = MIGRATIONS[i]
+    // @ts-expect-error (sh: 01-24-2021): migrateVersion function input typed to never
     result = migrateVersion(result)
   }
 
