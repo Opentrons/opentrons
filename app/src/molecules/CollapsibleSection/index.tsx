@@ -27,7 +27,7 @@ export function CollapsibleSection(
         <StyledText as="p" marginBottom={SPACING.spacing4}>
           {title}
         </StyledText>
-        <Btn onClick={() => setIsExpanded(!isExpanded)}>
+        <Btn onClick={() => setIsExpanded(!isExpanded)} data-testid={isExpanded ? `CollapsibleSection_collapse_${title}` : `CollapsibleSection_expand_${title}`} >
           <Icon size={'1.5rem'} name={isExpanded ? 'minus' : 'plus'} />
         </Btn>
       </Flex>

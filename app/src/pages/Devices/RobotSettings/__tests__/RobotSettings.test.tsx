@@ -7,13 +7,17 @@ import { i18n } from '../../../../i18n'
 import { RobotSettingsCalibration } from '../../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
 import { RobotSettingsNetworking } from '../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsAdvanced } from '../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
+import { useRobot } from '../../../../organisms/Devices/hooks'
 import { RobotSettings } from '..'
+import { when } from 'jest-when'
+import { mockConnectableRobot, mockReachableRobot, mockUnreachableRobot } from '../../../../redux/discovery/__fixtures__'
 
 jest.mock(
   '../../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
 )
 jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking')
 jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced')
+jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../redux/discovery/selectors')
 
 const mockRobotSettingsCalibration = RobotSettingsCalibration as jest.MockedFunction<
@@ -25,12 +29,18 @@ const mockRobotSettingsNetworking = RobotSettingsNetworking as jest.MockedFuncti
 const mockRobotSettingsAdvanced = RobotSettingsAdvanced as jest.MockedFunction<
   typeof RobotSettingsAdvanced
 >
+const mockUseRobot = useRobot as jest.MockedFunction<
+  typeof useRobot
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
       <Route path="/devices/:robotName/robot-settings/:robotSettingsTab">
         <RobotSettings />
+      </Route>
+      <Route path="/devices/:robotName">
+        <div>mock device details</div>
       </Route>
     </MemoryRouter>,
     {
@@ -41,6 +51,7 @@ const render = (path = '/') => {
 
 describe('RobotSettings', () => {
   beforeEach(() => {
+    when(mockUseRobot).calledWith('otie').mockReturnValue(mockConnectableRobot)
     mockRobotSettingsCalibration.mockReturnValue(
       <div>Mock RobotSettingsCalibration</div>
     )
@@ -62,6 +73,30 @@ describe('RobotSettings', () => {
     getByText('Calibration')
     getByText('Networking')
     getByText('Advanced')
+  })
+
+  it('redirects to device details if robot is unreachable', () => {
+    when(mockUseRobot).calledWith('otie').mockReturnValue(mockUnreachableRobot)
+    const [{ getByText }] = render('/devices/otie/robot-settings/calibration')
+    getByText('mock device details')
+  })
+
+  it('redirects to device details if robot is null', () => {
+    when(mockUseRobot).calledWith('otie').mockReturnValue(null)
+    const [{ getByText  }] = render('/devices/otie/robot-settings/calibration')
+    getByText('mock device details')
+  })
+
+  it('redirects to device details if robot is reachable but server is down', () => {
+    when(mockUseRobot).calledWith('otie').mockReturnValue({...mockReachableRobot, serverHealthStatus: 'notOk'})
+    const [{ getByText  }] = render('/devices/otie/robot-settings/calibration')
+    getByText('mock device details')
+  })
+
+  it('redirects to networking tab if robot not connectable', () => {
+    when(mockUseRobot).calledWith('otie').mockReturnValue(mockReachableRobot)
+    const [{ getByText  }] = render('/devices/otie/robot-settings/calibration')
+    getByText('Mock RobotSettingsNetworking')
   })
 
   it('renders calibration content when the calibration tab is clicked', () => {
@@ -104,4 +139,5 @@ describe('RobotSettings', () => {
     AdvancedTab.click()
     getByText('Mock RobotSettingsAdvanced')
   })
+
 })

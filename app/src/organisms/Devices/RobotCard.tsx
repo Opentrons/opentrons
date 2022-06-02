@@ -45,7 +45,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const { robot } = props
   const { name: robotName = null, local } = robot
   const history = useHistory()
-  const { t } = useTranslation('devices_landing')
   return robotName != null ? (
     <Flex
       alignItems={ALIGN_CENTER}

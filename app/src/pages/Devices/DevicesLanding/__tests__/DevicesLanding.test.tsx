@@ -16,11 +16,11 @@ import {
   mockUnreachableRobot,
 } from '../../../../redux/discovery/__fixtures__'
 import { DevicesLanding } from '..'
+import { fireEvent } from '@testing-library/react'
 
 jest.mock('../../../../organisms/Devices/DevicesEmptyState')
 jest.mock('../../../../organisms/Devices/RobotCard')
 jest.mock('../../../../redux/discovery')
-jest.mock('../hooks')
 
 const mockGetScanning = getScanning as jest.MockedFunction<typeof getScanning>
 
@@ -81,13 +81,20 @@ describe('DevicesLanding', () => {
   })
 
   it('renders available and unavailable sections when both are present', () => {
-    const [{ getByText }] = render()
+    const [{ getByText, getByTestId, queryByText}] = render()
 
     getByText('Mock Robot connectableRobot')
     getByText('Available (1)')
+    getByText('Unavailable (2)')
+
+    expect(queryByText('Mock Robot unreachableRobot')).toBeNull()
+    expect(queryByText('Mock Robot reachableRobot')).toBeNull()
+
+    const expandButton = getByTestId('CollapsibleSection_expand_Unavailable (2)')
+    fireEvent.click(expandButton)
+
     getByText('Mock Robot unreachableRobot')
     getByText('Mock Robot reachableRobot')
-    getByText('Unavailable (2)')
   })
   it('does not render available or unavailable sections when none are present', () => {
     mockGetConnectableRobots.mockReturnValue([])
