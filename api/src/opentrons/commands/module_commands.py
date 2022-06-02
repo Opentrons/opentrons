@@ -156,7 +156,7 @@ def heater_shaker_set_and_wait_for_temperature(temperature:float) -> command_typ
     return {"name":command_types.HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE, "paylod": {"text":text}}
 
 def heater_shaker_set_target_temperature(temperature:float) -> command_types.HeaterShakerSetTargetTemperatureCommand:
-    text = f"Setting Temperature of Heater Shaker to {temperature} °C"
+    text = f"Setting Target Temperature of Heater Shaker to {temperature} °C"
     return {"name":command_types.HEATER_SHAKER_SET_TARGET_TEMPERATURE, "paylod": {"text":text}}
 
 def heater_shaker_wait_for_temperature() -> command_types.HeaterShakerWaitForTemperatureCommand:
