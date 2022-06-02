@@ -8,6 +8,13 @@ import contextlib
 import logging
 from typing import AsyncGenerator, Awaitable, Callable, cast
 
+try:
+    import dbus
+
+    _DBUS_AVAILABLE = True
+except ImportError:
+    _DBUS_AVAILABLE = False
+
 
 _COLLISION_POLL_INTERVAL = 5
 
@@ -142,112 +149,96 @@ class AvahiClient:
 CollisionCallback = Callable[[], Awaitable[None]]
 
 
-try:
-    import dbus
-except ImportError:
-    _avahi_available = False
-else:
-    _avahi_available = True
+class _SyncClient:
+    """A non-async wrapper around Avahi's D-Bus API.
 
-    class _SyncClient:
+    Since methods of this class do blocking I/O, they should be offloaded to a thread
+    and not called directly inside an async event loop. But they're not safe to call
+    concurrently from multiple threads, so the calls should be serialized with a lock.
+    """
+
+    # For general semantics of the methods we're calling on dbus proxies,
+    # see Avahi's API docs. For example:
+    # https://www.avahi.org/doxygen/html/index.html#good_publish
+    # It's mostly in terms of the C API, but the semantics should be the same.
+
+    # For exact method names and argument types, see Avahi's D-Bus bindings,
+    # which they specify across several XML files. For example:
+    # https://github.com/lathiat/avahi/blob/v0.7/avahi-daemon/org.freedesktop.Avahi.EntryGroup.xml
+
+    def __init__(
+        self,
+        bus: dbus.SystemBus,
+        server: dbus.Interface,
+        entry_group: dbus.Interface,
+    ) -> None:
+        """For internal use by this class only. Use `connect()` instead.
+
+        Args:
+            bus: The system bus instance.
+            server: An org.freedesktop.Avahi.Server interface.
+            entry_group: An org.freedesktop.Avahi.EntryGroup interface.
         """
-        To document:
-        Does I/O and is not thread-safe.
-        dbus module doesn't natively support async/await.
-        """
+        self._bus = bus
+        self._server = server
+        self._entry_group = entry_group
 
-        # For semantics of the methods we're calling, see Avahi's API docs.
-        # For example: https://www.avahi.org/doxygen/html/index.html#good_publish
-        # It's mostly in terms of the C API, but the semantics should be the same.
-        #
-        # For exact method names and argument types, see Avahi's D-Bus bindings,
-        # which they specify across several machine-readable files. For example:
-        # https://github.com/lathiat/avahi/blob/v0.7/avahi-daemon/org.freedesktop.Avahi.EntryGroup.xml
-        def __init__(
-            self,
-            bus: dbus.SystemBus,
-            server: dbus.Interface,
-            entry_group: dbus.Interface,
-        ) -> None:
-            """For internal use by this class only. Use `connect()` instead.
+    @classmethod
+    def connect(cls) -> _SyncClient:
+        bus = dbus.SystemBus()
+        server_obj = bus.get_object("org.freedesktop.Avahi", "/")
+        server_if = dbus.Interface(server_obj, "org.freedesktop.Avahi.Server")
+        entry_group_path = server_if.EntryGroupNew()
+        entry_group_obj = bus.get_object("org.freedesktop.Avahi", entry_group_path)
+        entry_group_if = dbus.Interface(
+            entry_group_obj, "org.freedesktop.Avahi.EntryGroup"
+        )
+        return cls(
+            bus=bus,
+            server=server_if,
+            entry_group=entry_group_if,
+        )
 
-            Args:
-                bus: The system bus instance.
-                server: An org.freedesktop.Avahi.Server interface.
-                entry_group: An org.freedesktop.Avahi.EntryGroup interface.
-            """
-            self._bus = bus
-            self._server = server
-            self._entry_group = entry_group
+    def start_advertising(self, service_name: str) -> None:
+        # TODO(mm, 2022-05-26): Can we leave these as the empty string?
+        # The avahi_entry_group_add_service() C API recommends passing NULL
+        # to let the daemon decide these values.
+        hostname = self._server.GetHostName()
+        domainname = self._server.GetDomainName()
 
-        @classmethod
-        def connect(cls) -> _SyncClient:
-            _log.info("Connecting to Avahi daemon.")
+        self._entry_group.Reset()
 
-            bus = dbus.SystemBus()
-            server_obj = bus.get_object("org.freedesktop.Avahi", "/")
-            server_if = dbus.Interface(server_obj, "org.freedesktop.Avahi.Server")
-            entry_group_path = server_if.EntryGroupNew()
-            entry_group_obj = bus.get_object("org.freedesktop.Avahi", entry_group_path)
-            entry_group_if = dbus.Interface(
-                entry_group_obj, "org.freedesktop.Avahi.EntryGroup"
-            )
-            return cls(
-                bus=bus,
-                server=server_if,
-                entry_group=entry_group_if,
-            )
+        # TODO(mm, 2022-05-06): Can this be made exception-safe?
+        # We've already reset the entry group, so if this fails
+        # (for example because Avahi doesn't like the new name),
+        # we'll be left with no entry group,
+        # and Avahi will stop advertising the machine.
+        self._entry_group.AddService(
+            dbus.Int32(-1),  # avahi.IF_UNSPEC
+            dbus.Int32(-1),  # avahi.PROTO_UNSPEC
+            dbus.UInt32(0),  # flags
+            service_name,  # sname
+            "_http._tcp",  # stype
+            domainname,  # sdomain (.local)
+            f"{hostname}.{domainname}",  # shost (hostname.local)
+            dbus.UInt16(31950),  # port
+            dbus.Array([], signature="ay"),
+        )
 
-        def start_advertising(self, service_name: str) -> None:
-            _log.info(f"Starting advertising with name {service_name}.")
-            # TODO(mm, 2022-05-26): Can we leave these as the empty string?
-            # The avahi_entry_group_add_service() C API recommends passing NULL
-            # to let the daemon decide these values.
-            hostname = self._server.GetHostName()
-            domainname = self._server.GetDomainName()
+        self._entry_group.Commit()
 
-            self._entry_group.Reset()
-            _log.info("Reset entry group.")
+    def alternative_service_name(self, current_service_name: str) -> str:
+        result = self._server.GetAlternativeServiceName(current_service_name)
+        assert isinstance(result, str)
+        return result
 
-            # TODO(mm, 2022-05-06): This isn't exception-safe.
-            # We've already reset the entry group, so if this fails
-            # (for example because Avahi doesn't like the new name),
-            # we'll be left with no entry group,
-            # and Avahi will stop advertising the machine.
-            self._entry_group.AddService(
-                dbus.Int32(-1),  # avahi.IF_UNSPEC
-                dbus.Int32(-1),  # avahi.PROTO_UNSPEC
-                dbus.UInt32(0),  # flags
-                service_name,  # sname
-                "_http._tcp",  # stype
-                domainname,  # sdomain (.local)
-                f"{hostname}.{domainname}",  # shost (hostname.local)
-                dbus.UInt16(31950),  # port
-                dbus.Array([], signature="ay"),
-            )
+    def is_collided(self) -> bool:
+        state = self._entry_group.GetState()
 
-            _log.info(f"Added service with {hostname} {domainname}.")
+        # "3" comes from AVAHI_ENTRY_GROUP_COLLISION being index 3 in this enum:
+        # https://github.com/lathiat/avahi/blob/v0.8/avahi-common/defs.h#L234
+        avahi_entry_group_collision = dbus.Int32(3)
 
-            self._entry_group.Commit()
-
-            _log.info("Committed.")
-
-        def alternative_service_name(self, current_service_name: str) -> str:
-            result = self._server.GetAlternativeServiceName(current_service_name)
-            assert isinstance(result, str)
-            return result
-
-        def is_collided(self) -> bool:
-            """
-            To document:
-            Will be the case if another device on the network has
-            the same service name or host.
-            """
-
-            state = self._entry_group.GetState()
-
-            # The value 3 comes from:
-            # https://github.com/lathiat/avahi/blob/v0.8/avahi-common/defs.h#L234
-            avahi_entry_group_collision = dbus.Int32(3)
-
-            return cast(bool, state == avahi_entry_group_collision)
+        # Cast for when type-checking is run on dev machines without dbus,
+        # where the type-checker will see this expression as `Any == Any`.
+        return cast(bool, state == avahi_entry_group_collision)
