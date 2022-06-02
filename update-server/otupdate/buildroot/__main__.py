@@ -27,9 +27,6 @@ def main() -> None:
     LOG.info("Building buildroot update server")
     app = get_app(args.version_file, args.config_file)
 
-    LOG.info(f"Notifying {systemd.SOURCE} that service is up")
-    systemd.notify_up()
-
     LOG.info(f"Starting buildroot update server on http://{args.host}:{args.port}")
     web.run_app(app, host=args.host, port=args.port)  # type: ignore[no-untyped-call]
 
