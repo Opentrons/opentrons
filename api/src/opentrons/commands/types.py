@@ -40,6 +40,15 @@ MOVE_TO: Final = "command.MOVE_TO"
 
 # Modules #
 
+HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE: Final = "command.HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE"
+HEATER_SHAKER_SET_TARGET_TEMPERATURE: Final = "command.HEATER_SHAKER_SET_TARGET_TEMPERATURE"
+HEATER_SHAKER_WAIT_FOR_TEMPERATURE: Final = "command.HEATER_SHAKER_WAIT_FOR_TEMPERATURE"
+HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED: Final = "command.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED"
+HEATER_SHAKER_OPEN_LABWARE_LATCH: Final = "command.HEATER_SHAKER_OPEN_LABWARE_LATCH"
+HEATER_SHAKER_CLOSE_LABWARE_LATCH: Final = "command.HEATER_SHAKER_CLOSE_LABWARE_LATCH"
+HEATER_SHAKER_DEACTIVATE_SHAKER: Final = "command.HEATER_SHAKER_DEACTIVATE_SHAKER"
+HEATER_SHAKER_DEACTIVATE_HEATER: Final = "command.HEATER_SHAKER_DEACTIVATE_HEATER"
+
 MAGDECK_CALIBRATE: Final = "command.MAGDECK_CALIBRATE"
 MAGDECK_DISENGAGE: Final = "command.MAGDECK_DISENGAGE"
 MAGDECK_ENGAGE: Final = "command.MAGDECK_ENGAGE"
@@ -135,6 +144,64 @@ class ResumeCommandPayload(TextOnlyPayload):
 class ResumeCommand(TypedDict):
     name: Literal["command.RESUME"]
     payload: ResumeCommandPayload
+
+
+class HeaterShakerSetAndWaitForTemperaturePayload(TextOnlyPayload):
+    pass
+
+class HeaterShakerSetAndWaitForTemperature(TypedDict):
+    name: Literal["command.HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE"]
+    payload: HeaterShakerSetAndWaitForTemperaturePayload
+
+class HeaterShakerSetTargetTemperaturePayload(TextOnlyPayload):
+    pass
+
+class HeaterShakerSetTargetTemperature(TypedDict):
+    name: Literal["command.HEATER_SHAKER_SET_TARGET_TEMPERATURE"]
+    payload: HeaterShakerSetTargetTemperaturePayload
+
+class HeaterShakerWaitForTemperaturePayload(TextOnlyPayload):
+    pass
+
+class HeaterShakerWaitForTemperature(TypedDict):
+    name: Literal["command.HEATER_SHAKER_WAIT_FOR_TEMPERATURE"]
+    payload: HeaterShakerWaitForTemperaturePayload
+
+class HeaterShakerSetAndWaitForShakeSpeedPayload(TextOnlyPayload):
+    pass
+
+class HeaterShakerSetAndWaitForShakeSpeed(TypedDict):
+    name: Literal["command.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED"]
+    payload: HeaterShakerSetAndWaitForShakeSpeedPayload
+
+class HeaterShakerOpenLabwareLatchPayload(TextOnlyPayload):
+    pass
+
+class HeaterShakerOpenLabwareLatch(TypedDict):
+    name: Literal["command.HEATER_SHAKER_OPEN_LABWARE_LATCH"]
+    payload: HeaterShakerOpenLabwareLatchPayload
+
+class HeaterShakerCloseLabwareLatchPayload(TextOnlyPayload):
+    pass
+
+class HeaterShakerCloseLabwareLatch(TypedDict):
+    name: Literal["command.HEATER_SHAKER_CLOSE_LABWARE_LATCH"]
+    payload: HeaterShakerCloseLabwareLatchPayload
+
+class HeaterShakerDeactivateShakerPayload(TextOnlyPayload):
+    pass
+
+class HeaterShakerDeactivateShaker(TypedDict):
+    name: Literal["command.HEATER_SHAKER_DEACTIVATE_SHAKER"]
+    payload: HeaterShakerDeactivateShakerPayload
+
+class HeaterShakerDeactivateHeaterPayload(TextOnlyPayload):
+    pass
+
+class HeaterShakerDeactivateHeater(TypedDict):
+    name: Literal["command.HEATER_SHAKER_DEACTIVATE_HEATER"]
+    payload: HeaterShakerDeactivateHeaterPayload
+
 
 
 class MagdeckEngageCommandPayload(TextOnlyPayload):
@@ -454,6 +521,14 @@ Command = Union[
     DispenseCommand,
     AspirateCommand,
     HomeCommand,
+    HeaterShakerSetAndWaitForTemperature,
+    HeaterShakerSetTargetTemperature,
+    HeaterShakerWaitForTemperature,
+    HeaterShakerSetAndWaitForShakeSpeed,
+    HeaterShakerOpenLabwareLatch,
+    HeaterShakerCloseLabwareLatch,
+    HeaterShakerDeactivateShaker,
+    HeaterShakerDeactivateHeater,
     ThermocyclerCloseCommand,
     ThermocyclerWaitForLidTempCommand,
     ThermocyclerDeactivateCommand,
@@ -482,6 +557,14 @@ Command = Union[
 CommandPayload = Union[
     CommentCommandPayload,
     ResumeCommandPayload,
+    HeaterShakerSetAndWaitForTemperaturePayload,
+    HeaterShakerSetTargetTemperaturePayload,
+    HeaterShakerWaitForTemperaturePayload,
+    HeaterShakerSetAndWaitForShakeSpeedPayload,
+    HeaterShakerOpenLabwareLatchPayload,
+    HeaterShakerCloseLabwareLatchPayload,
+    HeaterShakerDeactivateShakerPayload,
+    HeaterShakerDeactivateHeaterPayload,
     MagdeckEngageCommandPayload,
     MagdeckDisengageCommandPayload,
     MagdeckCalibrateCommandPayload,
