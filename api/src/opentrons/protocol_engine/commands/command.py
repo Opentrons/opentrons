@@ -129,8 +129,10 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
     intent: Optional[CommandIntent] = Field(
         None,
         description=(
-            "Source (run setup or protocol itself) that added this command,"
-            " if known."
+            "The reason the command was added to the run."
+            " If not specified or `protocol`, it is part of the protocol itself."
+            " If `setup`, it was added as part of setup; for example,"
+            " a command that is part of a calibration procedure."
         ),
     )
 
