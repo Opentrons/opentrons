@@ -32,7 +32,7 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
         self._pipetting = pipetting
 
     async def execute(self, params: BlowOutParams) -> BlowOutResult:
-        """Move to and blow-out to the requested well."""
+        """Move to and blow-out the requested well."""
         await self._pipetting.blow_out(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,

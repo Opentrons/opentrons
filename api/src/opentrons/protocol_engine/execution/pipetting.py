@@ -248,6 +248,6 @@ class PipettingHandler:
 
         return volume
 
-    async def blow_out(self) -> None:
+    async def blow_out(self, pipette_id: str, labware_id: str, well_name: str, well_location: WellLocation) -> None:
         """Blow out liquid from location"""
         raise NotImplementedError()
