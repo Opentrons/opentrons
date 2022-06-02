@@ -50,7 +50,10 @@ export function DevicesLanding(): JSX.Element {
     getUnreachableRobots(state)
   )
 
-  const [unhealthyReachableRobots, recentlySeenRobots] = partition(reachableRobots, robot => robot.healthStatus === 'ok')
+  const [unhealthyReachableRobots, recentlySeenRobots] = partition(
+    reachableRobots,
+    robot => robot.healthStatus === 'ok'
+  )
 
   const noRobots =
     [
@@ -79,7 +82,10 @@ export function DevicesLanding(): JSX.Element {
         <>
           <CollapsibleSection
             marginY={SPACING.spacing4}
-            title={t('available', { count: [...healthyReachableRobots, ...unhealthyReachableRobots].length })}
+            title={t('available', {
+              count: [...healthyReachableRobots, ...unhealthyReachableRobots]
+                .length,
+            })}
           >
             {healthyReachableRobots.map(robot => (
               <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
@@ -101,7 +107,7 @@ export function DevicesLanding(): JSX.Element {
             isExpandedInitially={healthyReachableRobots.length === 0}
           >
             {recentlySeenRobots.map(robot => (
-              <RobotCard key={robot.name} robot={{...robot, local: null}} />
+              <RobotCard key={robot.name} robot={{ ...robot, local: null }} />
             ))}
             {unreachableRobots.map(robot => (
               <RobotCard key={robot.name} robot={robot} />

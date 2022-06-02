@@ -63,7 +63,11 @@ export const RobotOverviewOverflowMenu = (
         e.preventDefault()
       }}
     >
-      <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} disabled={robot.status === UNREACHABLE}/>
+      <OverflowBtn
+        aria-label="overflow"
+        onClick={handleOverflowClick}
+        disabled={robot.status === UNREACHABLE}
+      />
       {showOverflowMenu ? (
         <Flex
           width={'12rem'}
@@ -94,9 +98,16 @@ export const RobotOverviewOverflowMenu = (
           </MenuItem>
           <Divider marginY={'0'} />
           <MenuItem
-            onClick={() => history.push(`/devices/${robot.name}/robot-settings`)}
+            onClick={() =>
+              history.push(`/devices/${robot.name}/robot-settings`)
+            }
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            disabled={robot == null || robot?.status === UNREACHABLE || (robot?.status === REACHABLE && robot?.serverHealthStatus !== 'ok')}
+            disabled={
+              robot == null ||
+              robot?.status === UNREACHABLE ||
+              (robot?.status === REACHABLE &&
+                robot?.serverHealthStatus !== 'ok')
+            }
           >
             {t('robot_settings')}
           </MenuItem>

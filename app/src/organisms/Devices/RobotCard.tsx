@@ -117,7 +117,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   ) : null
 }
 
-function AttachedModules(props: { robotName: string }): JSX.Element | null{
+function AttachedModules(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
   const attachedModules = useAttachedModules()
@@ -143,7 +143,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null{
         ))}
       </Flex>
     </Flex>
-  ): null
+  ) : null
 }
 function AttachedPipettes(props: { robotName: string }): JSX.Element {
   const { robotName } = props

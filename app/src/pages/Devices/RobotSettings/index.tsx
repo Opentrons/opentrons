@@ -65,7 +65,11 @@ export function RobotSettings(): JSX.Element | null {
     ),
   }
 
-  if (robot == null || robot?.status === UNREACHABLE || (robot?.status === REACHABLE && robot?.serverHealthStatus !== 'ok') ) {
+  if (
+    robot == null ||
+    robot?.status === UNREACHABLE ||
+    (robot?.status === REACHABLE && robot?.serverHealthStatus !== 'ok')
+  ) {
     return <Redirect to={`/devices/${robotName}`} />
   }
   if (robotSettingsTab === 'calibration' && isCalibrationDisabled) {
