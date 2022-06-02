@@ -149,56 +149,56 @@ class ResumeCommand(TypedDict):
 class HeaterShakerSetAndWaitForTemperaturePayload(TextOnlyPayload):
     pass
 
-class HeaterShakerSetAndWaitForTemperature(TypedDict):
+class HeaterShakerSetAndWaitForTemperatureCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE"]
     payload: HeaterShakerSetAndWaitForTemperaturePayload
 
 class HeaterShakerSetTargetTemperaturePayload(TextOnlyPayload):
     pass
 
-class HeaterShakerSetTargetTemperature(TypedDict):
+class HeaterShakerSetTargetTemperatureCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_SET_TARGET_TEMPERATURE"]
     payload: HeaterShakerSetTargetTemperaturePayload
 
 class HeaterShakerWaitForTemperaturePayload(TextOnlyPayload):
     pass
 
-class HeaterShakerWaitForTemperature(TypedDict):
+class HeaterShakerWaitForTemperatureCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_WAIT_FOR_TEMPERATURE"]
     payload: HeaterShakerWaitForTemperaturePayload
 
 class HeaterShakerSetAndWaitForShakeSpeedPayload(TextOnlyPayload):
     pass
 
-class HeaterShakerSetAndWaitForShakeSpeed(TypedDict):
+class HeaterShakerSetAndWaitForShakeSpeedCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED"]
     payload: HeaterShakerSetAndWaitForShakeSpeedPayload
 
 class HeaterShakerOpenLabwareLatchPayload(TextOnlyPayload):
     pass
 
-class HeaterShakerOpenLabwareLatch(TypedDict):
+class HeaterShakerOpenLabwareLatchCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_OPEN_LABWARE_LATCH"]
     payload: HeaterShakerOpenLabwareLatchPayload
 
 class HeaterShakerCloseLabwareLatchPayload(TextOnlyPayload):
     pass
 
-class HeaterShakerCloseLabwareLatch(TypedDict):
+class HeaterShakerCloseLabwareLatchCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_CLOSE_LABWARE_LATCH"]
     payload: HeaterShakerCloseLabwareLatchPayload
 
 class HeaterShakerDeactivateShakerPayload(TextOnlyPayload):
     pass
 
-class HeaterShakerDeactivateShaker(TypedDict):
+class HeaterShakerDeactivateShakerCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_DEACTIVATE_SHAKER"]
     payload: HeaterShakerDeactivateShakerPayload
 
 class HeaterShakerDeactivateHeaterPayload(TextOnlyPayload):
     pass
 
-class HeaterShakerDeactivateHeater(TypedDict):
+class HeaterShakerDeactivateHeaterCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_DEACTIVATE_HEATER"]
     payload: HeaterShakerDeactivateHeaterPayload
 
@@ -663,6 +663,29 @@ class AspirateMessage(CommandMessageFields, AspirateCommand):
 class HomeMessage(CommandMessageFields, HomeCommand):
     pass
 
+class HeaterShakerSetAndWaitForTemperatureMessage(CommandMessageFields, HeaterShakerSetAndWaitForTemperatureCommand):
+    pass
+
+class HeaterShakerSetTargetTemperatureMessage(CommandMessageFields, HeaterShakerSetTargetTemperatureCommand):
+    pass
+
+class HeaterShakerWaitForTemperatureMessage(CommandMessageFields, HeaterShakerWaitForTemperatureCommand):
+    pass
+
+class HeaterShakerSetAndWaitForShakeSpeedMessage(CommandMessageFields, HeaterShakerSetAndWaitForShakeSpeedCommand):
+    pass
+
+class HeaterShakerOpenLabwareLatchMessage(CommandMessageFields, HeaterShakerOpenLabwareLatchCommand):
+    pass
+
+class HeaterShakerCloseLabwareLatchMessage(CommandMessageFields, HeaterShakerCloseLabwareLatchCommand):
+    pass
+
+class HeaterShakerDeactivateShakerMessage(CommandMessageFields, HeaterShakerDeactivateShakerCommand):
+    pass
+
+class HeaterShakerDeactivateHeaterMessage(CommandMessageFields, HeaterShakerDeactivateHeaterCommand):
+    pass
 
 class ThermocyclerCloseMessage(CommandMessageFields, ThermocyclerCloseCommand):
     pass
@@ -780,6 +803,14 @@ CommandMessage = Union[
     DispenseMessage,
     AspirateMessage,
     HomeMessage,
+    HeaterShakerSetAndWaitForTemperatureMessage,
+    HeaterShakerSetTargetTemperatureMessage,
+    HeaterShakerWaitForTemperatureMessage,
+    HeaterShakerSetAndWaitForShakeSpeedMessage,
+    HeaterShakerOpenLabwareLatchMessage,
+    HeaterShakerCloseLabwareLatchMessage,
+    HeaterShakerDeactivateShakerMessage,
+    HeaterShakerDeactivateHeaterMessage,
     ThermocyclerCloseMessage,
     ThermocyclerWaitForLidTempMessage,
     ThermocyclerDeactivateMessage,
