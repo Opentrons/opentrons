@@ -17,28 +17,70 @@ _log = getLogger(__name__)
 
 
 class NameSynchronizer(ABC):
+    """Keep the machine's human-readable names in sync with each other.
+
+    This ties the pretty hostname and the Avahi service name together,
+    so they always have the same value.
+
+    The `set_name()` and `get_name()` methods are intended for use by HTTP
+    endpoints, which makes for a total of three names tied together,
+    if you also count the name available over HTTP.
+
+    See the `name_management` package docstring for an overview of these various names.
+
+    Tying all of these names together...
+
+    * Is important to avoid confusing the client-side discovery client,
+      at least at the time of writing.
+      https://github.com/Opentrons/opentrons/issues/10199
+
+    * Helps maintain a conceptually simple interface.
+      There is one name accessible in three separate ways,
+      rather than three separate names.
+
+    * Implements the DNS-SD spec's recommendation to make the DNS-SD instance name
+      configurable. https://datatracker.ietf.org/doc/html/rfc6763#section-4.1.1
+    """
+
     @classmethod
     def from_request(cls, request: web.Request) -> NameSynchronizer:
-        return cls.from_app(request.app)
+        """Return the server's singleton NameSynchronizer from a request.
 
-    @staticmethod
-    def from_app(app: web.Application) -> NameSynchronizer:
-        name_synchronizer = app.get(_name_synchronizer_VARNAME, None)
+        The singleton NameSynchronizer is expected to have been installed on the
+        aiohttp.Application already via `install_on_app()`.
+        """
+        name_synchronizer = request.app.get(_name_synchronizer_VARNAME, None)
         assert isinstance(
             name_synchronizer, NameSynchronizer
         ), f"Unexpected type {type(name_synchronizer)}. Incorrect Application setup?"
         return name_synchronizer
 
     def install_on_app(self, app: web.Application) -> None:
+        """Install this NameSynchronizer on `app` for later retrieval via
+        `from_request()`.
+
+        This should be done as part of server startup.
+        """
         app[_name_synchronizer_VARNAME] = self
 
     @abstractmethod
     async def set_name(self, new_name: str) -> str:
-        pass
+        """Set the machine's human-readable name.
+
+        This first sets thhe Avahi service name, and then persists it
+        as the pretty hostname.
+
+        Returns the new name. This is normally the same as the requested name,
+        but it it might be different if it had to be truncated, sanitized, etc.
+        """
 
     @abstractmethod
     def get_name(self) -> str:
-        pass
+        """Return the machine's current human-readable name.
+
+        Note that this can change even if you haven't called `set_name()`,
+        if it was necessary to avoid conflicts with other devices on the network.
+        """
 
 
 class RealNameSynchronizer(NameSynchronizer):
