@@ -9,6 +9,7 @@ import {
   thermocyclerPipetteCollision,
   pipetteIntoHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestWithLatchOpen,
+  pipetteAdjacentHeaterShakerWhileShaking,
 } from '../utils'
 import {
   getInitialRobotStateStandard,
@@ -30,6 +31,7 @@ jest.mock('../utils/thermocyclerPipetteCollision')
 jest.mock('../utils/pipetteIntoHeaterShakerLatchOpen')
 jest.mock('../utils/pipetteIntoHeaterShakerWhileShaking')
 jest.mock('../utils/getIsHeaterShakerEastWestWithLatchOpen')
+jest.mock('../utils/pipetteAdjacentHeaterShakerWhileShaking')
 
 const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
   typeof thermocyclerPipetteCollision
@@ -42,6 +44,9 @@ const mockPipetteIntoHeaterShakerWhileShaking = pipetteIntoHeaterShakerWhileShak
 >
 const mockGetIsHeaterShakerEastWestWithLatchOpen = getIsHeaterShakerEastWestWithLatchOpen as jest.MockedFunction<
   typeof getIsHeaterShakerEastWestWithLatchOpen
+>
+const mockPipetteAdjacentHeaterShakerWhileShaking = pipetteAdjacentHeaterShakerWhileShaking as jest.MockedFunction<
+  typeof pipetteAdjacentHeaterShakerWhileShaking
 >
 
 describe('aspirate', () => {
@@ -293,6 +298,30 @@ describe('aspirate', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN',
+    })
+  })
+  it('should return an error when aspirating north/south/east/west of a heater shaker while it is shaking', () => {
+    when(mockPipetteAdjacentHeaterShakerWhileShaking)
+      .calledWith(
+        robotStateWithTip.modules,
+        robotStateWithTip.labware[SOURCE_LABWARE]
+      )
+      .mockReturnValue(true)
+
+    const result = aspirate(
+      {
+        ...flowRateAndOffsets,
+        pipette: DEFAULT_PIPETTE,
+        volume: 50,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      } as AspDispAirgapParams,
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING',
     })
   })
 })

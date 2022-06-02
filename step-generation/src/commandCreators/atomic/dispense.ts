@@ -5,6 +5,7 @@ import {
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestWithLatchOpen,
+  pipetteAdjacentHeaterShakerWhileShaking,
 } from '../../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { DispenseParams } from '@opentrons/shared-data/protocol/types/schemaV3'
@@ -79,6 +80,15 @@ export const dispense: CommandCreator<DispenseParams> = (
     )
   ) {
     errors.push(errorCreators.heaterShakerIsShaking())
+  }
+
+  if (
+    pipetteAdjacentHeaterShakerWhileShaking(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
   }
 
   if (
