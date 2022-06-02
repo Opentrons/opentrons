@@ -51,6 +51,7 @@ import {
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useRunHasStarted,
+  useStoredProtocolAnalysis,
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 import { ProceedToRunButton } from './ProceedToRunButton'
@@ -97,7 +98,12 @@ export function SetupLabware({
   })
   const runHasStarted = useRunHasStarted(runId)
   const currentRun = useCurrentRun()
-  const { protocolData } = useProtocolDetailsForRun(runId)
+  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
+    runId
+  )
+  const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
+  const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
+
   const { t } = useTranslation('protocol_setup')
   const [
     showLabwareHelpModal,
