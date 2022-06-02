@@ -11,12 +11,12 @@ export function useSortedProtocols(
     const protocolNameA = getProtocolDisplayName(
       a.protocolKey,
       a.srcFileNames,
-      a.mostRecentAnalysis
+      a?.mostRecentAnalysis
     )
     const protocolNameB = getProtocolDisplayName(
       b.protocolKey,
       b.srcFileNames,
-      b.mostRecentAnalysis
+      b?.mostRecentAnalysis
     )
 
     if (sortBy === 'alphabetical') {

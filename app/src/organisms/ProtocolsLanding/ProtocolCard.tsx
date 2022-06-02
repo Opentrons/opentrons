@@ -100,7 +100,7 @@ interface AnalysisInfoProps {
   protocolDisplayName: string
   modified: number
   isAnalyzing: boolean
-  mostRecentAnalysis?: ProtocolAnalysisOutput
+  mostRecentAnalysis?: ProtocolAnalysisOutput | null
 }
 function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   const {
