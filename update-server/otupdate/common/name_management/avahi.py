@@ -72,29 +72,51 @@ class AvahiClient:
     async def collision_callback(
         self, callback: CollisionCallback
     ) -> AsyncGenerator[None, None]:
-        """
-        To document:
-        * Potentially duplicate collision events if resolving a collision takes too long
-        * May cancel callback when this exits
-        """
+        """Be informed of name collisions.
 
-        async def _poll_and_call_back() -> None:
-            _log.info("Beginning polling.")
-            while True:
-                if await self._is_collided():
-                    await callback()  # TODO: Log exception?
-                await asyncio.sleep(_COLLISION_POLL_INTERVAL)
+        Background:
+        The Avahi service name and the static hostname that this client advertises
+        must be unique on the network. When Avahi detects a collision, it will stop
+        advertising until we fix the conflict by giving it a different name.
 
-        background_task = asyncio.create_task(_poll_and_call_back())
+        While this context manager is entered, `callback()` will be called
+        whenever a collision happens. You should then call `start_advertising()`
+        with a new name to resume advertising.
+
+        If `callback()` raises an exception, it's logged but otherwise ignored.
+        """
+        # Ideally, instead of polling, we'd listen to the EntryGroup.StateChanged
+        # signal. But receiving signals through the dbus library requires a 3rd-party
+        # event loop like GLib's.
+        background_task = asyncio.create_task(
+            self._poll_infinitely_for_collision(callback=callback)
+        )
 
         try:
             yield
-
         finally:
             background_task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
                 await background_task
 
+    async def _poll_infinitely_for_collision(self, callback: CollisionCallback) -> None:
+        while True:
+            is_collided = await self._is_collided()
+
+            if is_collided:
+                try:
+                    await callback()
+                except asyncio.CancelledError:
+                    # If it raises CancelledError, this task is being cancelled.
+                    # Let the CancelledError propagate and break the loop
+                    # so we don't accidentally suppress the cancellation.
+                    raise
+                except Exception:
+                    # If it raises any other Exception, it's unexpected.
+                    # Log it and keep polling.
+                    _log.exception("Exception while handling Avahi name collision.")
+
+            await asyncio.sleep(_COLLISION_POLL_INTERVAL)
     async def _is_collided(self) -> bool:
         async with self._lock:
             return await asyncio.get_running_loop().run_in_executor(
