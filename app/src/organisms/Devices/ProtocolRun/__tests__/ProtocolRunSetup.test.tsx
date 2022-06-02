@@ -295,15 +295,6 @@ describe('ProtocolRunSetup', () => {
         'Position full tip racks and labware in the deck slots as shown in the deck map.'
       )
     })
-    // it('renders correct text for liquids', () => {
-    //   when(mockUseFeatureFlag)
-    //     .calledWith('enableLiquidSetup')
-    //     .mockReturnValue(true)
-    //   const { getByText } = render()
-    //   getByText('STEP 4')
-    //   getByText('Initial liquid setup')
-    //   getByText('View Liquid starting locations and volumes')
-    // })
     it('renders view-only info message if run has started', async () => {
       when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
 

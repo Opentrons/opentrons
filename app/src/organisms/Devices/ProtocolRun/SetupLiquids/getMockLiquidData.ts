@@ -1,3 +1,4 @@
+// this file will be replaced once we are able to pull real data from protocol analysis
 const mockLiquids = {
   '0': {
     displayName: 'liquid1',
@@ -90,7 +91,6 @@ interface Liquid {
   labwareId: string
   volumeByWell: any
 }
-// this file will be replaced once we are able to pull real data from protocol analysis
 
 export function getMockLiquidData(): Liquid[] | null {
   const loadLiquidCommands = mockCommands.filter(
@@ -100,10 +100,10 @@ export function getMockLiquidData(): Liquid[] | null {
   const liquids: Liquid[] = []
   loadLiquidCommands.forEach(command => {
     const liquidId = command.params.liquidId
-    const liquidIndes = mockLiquidEntries.findIndex(
+    const liquidIndex = mockLiquidEntries.findIndex(
       liquid => liquidId === liquid[0]
     )
-    const liquidValue = mockLiquidEntries[liquidIndes][1]
+    const liquidValue = mockLiquidEntries[liquidIndex][1]
     liquids.push({
       liquidId: liquidId ?? '',
       displayName: liquidValue.displayName,
