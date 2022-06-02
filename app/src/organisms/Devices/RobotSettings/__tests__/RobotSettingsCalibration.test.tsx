@@ -19,8 +19,8 @@ import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
-  mockPipetteOffsetCalibration4,
-  mockPipetteOffsetCalibration5,
+  // mockPipetteOffsetCalibration4,
+  // mockPipetteOffsetCalibration5,
 } from '../../../../redux/calibration/pipette-offset/__fixtures__'
 import {
   mockTipLengthCalibration1,
