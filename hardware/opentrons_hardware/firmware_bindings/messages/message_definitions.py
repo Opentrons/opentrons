@@ -598,7 +598,13 @@ class SetSerialNumber:  # noqa: D101
 
 
 @dataclass
-class InstrumentInfoRequest(EmptyPayloadMessage):  # noqa: D101
+class InstrumentInfoRequest(EmptyPayloadMessage):
+    """Prompt pipettes and grippers to respond.
+
+    Pipette should respond with PipetteInfoResponse.
+    Gripper should respond with GripperInfoResponse.
+    """
+
     message_id: Literal[
         MessageId.instrument_info_request
     ] = MessageId.instrument_info_request
