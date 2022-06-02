@@ -56,7 +56,7 @@ stages:
             value: !anything
           - id: enableHeaterShakerPAPI
             old_id: Null
-            title: Enable Heater-Shaker python API support
+            title: Enable Heater-Shaker Python API support
             description: !re_search 'Opentrons internal setting to test new module'
             restart_required: false
             value: !anything
