@@ -139,6 +139,7 @@ class AvahiClient:
                     _log.exception("Exception while handling Avahi name collision.")
 
             await asyncio.sleep(_COLLISION_POLL_INTERVAL)
+
     async def _is_collided(self) -> bool:
         async with self._lock:
             return await asyncio.get_running_loop().run_in_executor(
