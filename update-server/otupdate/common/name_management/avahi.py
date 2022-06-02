@@ -16,6 +16,7 @@ _log = logging.getLogger(__name__)
 
 
 async def restart_daemon() -> None:
+    """Restart the system's Avahi daemon and wait for it to come back up."""
     proc = await asyncio.create_subprocess_exec(
         "systemctl",
         "restart",
