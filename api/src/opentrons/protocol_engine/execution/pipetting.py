@@ -250,4 +250,17 @@ class PipettingHandler:
 
     async def blow_out(self, pipette_id: str, labware_id: str, well_name: str, well_location: WellLocation) -> None:
         """Blow out liquid from location"""
-        raise NotImplementedError()
+        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware_api.attached_instruments,
+        )
+
+        await self._movement_handler.move_to_well(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+        )
+
+        await self._hardware_api.blow_out(mount=hw_pipette.mount)
+
