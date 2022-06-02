@@ -12,15 +12,13 @@ _SetElementT = TypeVar("_SetElementT", bound=Hashable)
 # If this proves insufficient, we can get many methods for free
 # by subclassing collections.abc.MutableSet.
 class OrderedSet(Generic[_SetElementT]):
-    """A set that preserves the order in which elements are added."""
+    """A set that preserves the order in which elements are added.
+
+    Args:
+        source_iterable: An ordered iterable of initial elements.
+    """
 
     def __init__(self, source_iterable: Iterable[_SetElementT] = tuple()) -> None:
-        """Inititalize the set.
-
-        Args:
-            source_iterable: An iterable with elements to initialize the set with,
-                in order.
-        """
         self._elements: Dict[_SetElementT, Literal[True]] = {}
         for element in source_iterable:
             self.add(element)
@@ -40,6 +38,13 @@ class OrderedSet(Generic[_SetElementT]):
             KeyError: If ``element`` is not in the set.
         """
         del self._elements[element]
+
+    def discard(self, element: _SetElementT) -> None:
+        """Remove ``element`` from the set, if it is present."""
+        try:
+            self.remove(element)
+        except KeyError:
+            pass
 
     def clear(self) -> None:
         """Remove all elements from the set."""

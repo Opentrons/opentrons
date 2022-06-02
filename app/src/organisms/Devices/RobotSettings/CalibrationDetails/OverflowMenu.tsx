@@ -25,6 +25,7 @@ import * as Config from '../../../../redux/config'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../redux/calibration'
 import {
+  useIsRobotBusy,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
 } from '../../hooks'
@@ -49,6 +50,7 @@ interface OverflowMenuProps {
   robotName: string
   serialNumber: string | null
   mount: Mount
+  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 export function OverflowMenu({
@@ -56,6 +58,7 @@ export function OverflowMenu({
   robotName,
   serialNumber,
   mount,
+  updateRobotStatus,
 }: OverflowMenuProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
@@ -71,6 +74,8 @@ export function OverflowMenu({
     calBlockModalState,
     setCalBlockModalState,
   ] = React.useState<CalBlockModalState>(CAL_BLOCK_MODAL_CLOSED)
+  const isBusy = useIsRobotBusy()
+
   interface StartWizardOptions {
     keepTipLength: boolean
     hasBlockModalResponse?: boolean | null
@@ -117,20 +122,24 @@ export function OverflowMenu({
     e: React.MouseEvent
   ): void => {
     e.preventDefault()
-    if (calType === 'pipetteOffset') {
-      if (checkPipetteCalibrations != null) {
-        // recalibrate pipette offset
-        startPipetteOffsetCalibration({
-          withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
-        })
-      } else {
-        // calibrate pipette offset with a wizard since not calibrated yet
-        startPipetteOffsetPossibleTLC({ keepTipLength: true })
-      }
+    if (isBusy) {
+      updateRobotStatus(true)
     } else {
-      startPipetteOffsetPossibleTLC({ keepTipLength: false })
+      if (calType === 'pipetteOffset') {
+        if (checkPipetteCalibrations != null) {
+          // recalibrate pipette offset
+          startPipetteOffsetCalibration({
+            withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
+          })
+        } else {
+          // calibrate pipette offset with a wizard since not calibrated yet
+          startPipetteOffsetPossibleTLC({ keepTipLength: true })
+        }
+      } else {
+        startPipetteOffsetPossibleTLC({ keepTipLength: false })
+      }
+      setShowOverflowMenu(!showOverflowMenu)
     }
-    setShowOverflowMenu(!showOverflowMenu)
   }
 
   const handleDownload = (

@@ -117,6 +117,25 @@
       "$ref": "#/definitions/coordinates",
       "description": "A point on the module's interaction plane (where labware is placed) used for calibrating the module. Slated for future use (as of 2022-05-20)."
     },
+    "config": {
+      "type": "object",
+      "description": "Module's hardware-defined constraints",
+      "properties": {
+        "minPlateTemperature": { "type": "number" },
+        "maxPlateTemperature": { "type": "number" },
+        "minShakeSpeed": { "type": "number" },
+        "maxShakeSpeed": { "type": "number" },
+        "maxEngageHeight": { "type": "number" },
+        "minTemperature": { "type": "number" },
+        "maxTemperature": { "type": "number" },
+        "minBlockTemperature": { "type": "number" },
+        "maxBlockTemperature": { "type": "number" },
+        "minLidTemperature": { "type": "number" },
+        "maxLidTemperature": { "type": "number" },
+        "minBlockVolume": { "type": "number" },
+        "maxBlockVolume": { "type": "number" }
+      }
+    },
     "displayName": { "type": "string" },
     "quirks": {
       "type": "array",

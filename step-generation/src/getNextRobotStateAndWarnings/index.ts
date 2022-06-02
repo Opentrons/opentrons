@@ -185,42 +185,42 @@ function _getNextRobotStateAndWarningsSingleCommand(
         robotStateAndWarnings
       )
       break
-    case 'heaterShakerModule/deactivateHeater':
+    case 'heaterShaker/deactivateHeater':
       forHeaterShakerDeactivateHeater(
         command.params,
         invariantContext,
         robotStateAndWarnings
       )
       break
-    case 'heaterShakerModule/startSetTargetTemperature':
+    case 'heaterShaker/setTargetTemperature':
       forHeaterShakerSetTargetTemperature(
         command.params,
         invariantContext,
         robotStateAndWarnings
       )
       break
-    case 'heaterShakerModule/setTargetShakeSpeed':
+    case 'heaterShaker/setAndWaitForShakeSpeed':
       forHeaterShakerSetTargetShakeSpeed(
         command.params,
         invariantContext,
         robotStateAndWarnings
       )
       break
-    case 'heaterShakerModule/stopShake':
+    case 'heaterShaker/deactivateShaker':
       forHeaterShakerStopShake(
         command.params,
         invariantContext,
         robotStateAndWarnings
       )
       break
-    case 'heaterShakerModule/openLatch':
+    case 'heaterShaker/openLabwareLatch':
       forHeaterShakerOpenLatch(
         command.params,
         invariantContext,
         robotStateAndWarnings
       )
       break
-    case 'heaterShakerModule/closeLatch':
+    case 'heaterShaker/closeLabwareLatch':
       forHeaterShakerCloseLatch(
         command.params,
         invariantContext,
@@ -228,7 +228,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
     //  no state updates required
-    case 'heaterShakerModule/awaitTemperature':
+    case 'heaterShaker/waitForTemperature':
       break
     default:
       assert(

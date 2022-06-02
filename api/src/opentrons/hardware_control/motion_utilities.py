@@ -381,3 +381,10 @@ def deck_from_machine(  # type: ignore[no-untyped-def]
     }
     deck_pos.update(plunger_axes)
     return deck_pos
+
+
+def machine_vector_from_deck_vector(
+    machine_vector: Point, attitude: AttitudeMatrix
+) -> Point:
+    """Take a vector and pass it through the attitude matrix."""
+    return machine_point_from_deck_point(machine_vector, attitude, Point(0, 0, 0))

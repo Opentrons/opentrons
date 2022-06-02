@@ -728,6 +728,7 @@ def minimal_module_def() -> ModuleDefinitionV3:
             "yDimension": 321,
         },
         "calibrationPoint": {"x": 12.0, "y": 8.75, "z": 0.0},
+        "config": {},
         "displayName": "Sample Module",
         "quirks": [],
         "slotTransforms": {},

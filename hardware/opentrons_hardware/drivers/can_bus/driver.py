@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import asyncio
 import platform
-from typing import Optional
+from typing import Optional, Union, Dict, Any
 
 from can import Notifier, Bus, AsyncBufferedReader, Message
 
@@ -11,6 +11,7 @@ from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.message import CanMessage
 from .errors import ErrorFrameCanError
 from .abstract_driver import AbstractCanDriver
+from .settings import calculate_fdcan_parameters, PCANParameters
 
 log = logging.getLogger(__name__)
 
@@ -55,6 +56,9 @@ class CanDriver(AbstractCanDriver):
         interface: str,
         channel: Optional[str] = None,
         bitrate: Optional[int] = None,
+        fcan_clock: Optional[int] = None,
+        sample_rate: Optional[float] = None,
+        jump_width: Optional[int] = None,
     ) -> CanDriver:
         """Build a CanDriver.
 
@@ -63,21 +67,21 @@ class CanDriver(AbstractCanDriver):
             interface: The interface for pycan to use.
                 see https://python-can.readthedocs.io/en/master/interfaces.html
             channel: Optional channel
+            fcan_clock: The clock used by the can analyzer, defaults to 20MHz
+            sample_rate: The sample rate in which to sample the data, defaults to 87.5
+            jump_width: The max time the sampling period can be lengthened or shortened
 
         Returns:
             A CanDriver instance.
         """
         log.info(f"CAN connect: {interface}-{channel}-{bitrate}")
-        extra_kwargs = {}
+        extra_kwargs: Union[PCANParameters, Dict[Any, Any]] = {}
         if interface == "pcan":
             # Special FDCAN parameters for use of PCAN driver.
-            extra_kwargs = {
-                "f_clock_mhz": 20,
-                "nom_brp": 5,
-                "nom_tseg1": 13,
-                "nom_tseg2": 2,
-                "nom_sjw": 16,
-            }
+            extra_kwargs = calculate_fdcan_parameters(
+                fcan_clock, bitrate, sample_rate, jump_width
+            )
+
         return CanDriver(
             bus=Bus(
                 channel=channel,

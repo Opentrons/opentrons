@@ -27,6 +27,10 @@
     "y": 8.75,
     "z": 80.09
   },
+  "config": {
+    "minTemperature": 9,
+    "maxTemperature": 99
+  },
   "displayName": "Temperature Module GEN1",
   "quirks": [],
   "slotTransforms": {},

@@ -16,7 +16,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     EEPromDataPayload,
     EEPromReadPayload,
 )
-from opentrons_hardware.firmware_bindings.utils import UInt8Field
+from opentrons_hardware.firmware_bindings.utils import UInt8Field, UInt16Field
 
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 
@@ -63,7 +63,7 @@ async def test_read_write(
         node_id=eeprom_node_id,
         message=WriteToEEPromRequest(
             payload=EEPromDataPayload(
-                address=UInt8Field(address),
+                address=UInt16Field(address),
                 data_length=UInt8Field(len(data)),
                 data=EepromDataField(data),
             )
@@ -72,7 +72,7 @@ async def test_read_write(
 
     read_message = ReadFromEEPromRequest(
         payload=EEPromReadPayload(
-            address=UInt8Field(address), data_length=UInt8Field(len(data))
+            address=UInt16Field(address), data_length=UInt8Field(len(data))
         )
     )
     await can_messenger.send(node_id=eeprom_node_id, message=read_message)

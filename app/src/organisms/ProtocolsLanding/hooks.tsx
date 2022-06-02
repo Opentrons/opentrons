@@ -20,6 +20,9 @@ export function useSortedProtocols(
     )
 
     if (sortBy === 'alphabetical') {
+      if (protocolNameA.toLowerCase() === protocolNameB.toLowerCase()) {
+        return b.modified - a.modified
+      }
       return protocolNameA.toLowerCase() > protocolNameB.toLowerCase() ? 1 : -1
     } else if (sortBy === 'reverse') {
       return protocolNameA.toLowerCase() > protocolNameB.toLowerCase() ? -1 : 1

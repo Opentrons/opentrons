@@ -1,4 +1,3 @@
-import asyncio
 import os
 
 import pytest
@@ -46,7 +45,6 @@ async def test_upload_protocols_and_reset_persistence_dir(
             result = await robot_client.get_protocols()
 
             assert result.json()["data"]
-
             assert os.listdir(f"{server.persistence_directory}/protocols/")
 
             server.stop()
@@ -61,9 +59,6 @@ async def test_upload_protocols_and_reset_persistence_dir(
             result = await robot_client.get_protocols()
 
             assert result.json()["data"] == []
-
-            await asyncio.sleep(5)
-
             assert os.listdir(f"{server.persistence_directory}/protocols/") == []
 
             server.stop()
