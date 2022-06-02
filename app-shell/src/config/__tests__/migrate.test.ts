@@ -69,7 +69,7 @@ describe('config migration', () => {
     expect(result).toEqual(MOCK_CONFIG_V8)
   })
 
-  it('should keep version 7', () => {
+  it('should migrate version 7 to latest', () => {
     const v7Config = MOCK_CONFIG_V7
     const result = migrate(v7Config)
 
