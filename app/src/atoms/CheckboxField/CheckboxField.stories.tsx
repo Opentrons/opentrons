@@ -1,11 +1,11 @@
 import * as React from 'react'
 
-import { BlueCheckboxField as CheckboxFieldComponent } from './BlueCheckboxField'
+import { CheckboxField as CheckboxFieldComponent } from './index'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Library/Molecules/Forms/Blue Checkbox Field',
+  title: 'Library/Molecules/Forms/Checkbox Field',
   component: CheckboxFieldComponent,
 } as Meta
 
@@ -24,8 +24,8 @@ const Template: Story<
     />
   )
 }
-export const BlueCheckboxField = Template.bind({})
-BlueCheckboxField.args = {
+export const CheckboxField = Template.bind({})
+CheckboxField.args = {
   label: 'Remember this setting?',
   isIndeterminate: false,
 }

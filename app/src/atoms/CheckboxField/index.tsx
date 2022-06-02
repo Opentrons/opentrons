@@ -1,20 +1,8 @@
 import * as React from 'react'
-import { Icon } from '../icons'
 import { css } from 'styled-components'
-import {
-  blue,
-  blueHover,
-  bluePressed,
-  darkGreyEnabled,
-  darkGreyHover,
-  darkGreyPressed,
-  disabled,
-  warning,
-} from '../ui-style-constants/colors'
-import { Box } from '..'
-import { spacingXXS } from '../ui-style-constants/spacing'
+import { Icon, COLORS, Box, SPACING } from '@opentrons/components'
 
-export interface BlueCheckboxFieldProps {
+export interface CheckboxFieldProps {
   /** change handler */
   onChange: React.ChangeEventHandler
   /** checkbox is checked if value is true */
@@ -37,8 +25,8 @@ const INPUT_STYLE = css`
   position: absolute;
   overflow: hidden;
   clip: rect(0 0 0 0);
-  height: ${spacingXXS};
-  width: ${spacingXXS};
+  height: ${SPACING.spacingXXS};
+  width: ${SPACING.spacingXXS};
   margin: -1px;
   padding: 0;
   border: 0;
@@ -54,55 +42,55 @@ const OUTER_STYLE = css`
 const INNER_STYLE_VALUE = css`
   width: 1.25rem;
   min-width: 1.25rem;
-  color: ${blue};
+  color: ${COLORS.blue};
   display: flex;
-  border-radius: ${spacingXXS};
+  border-radius: ${SPACING.spacingXXS};
   justify-content: center;
   align-items: center;
 
   &:hover {
     cursor: pointer;
-    color: ${blueHover};
+    color: ${COLORS.blueHover};
   }
 
   &:active {
-    color: ${bluePressed};
+    color: ${COLORS.bluePressed};
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${warning};
+    box-shadow: 0 0 0 3px ${COLORS.warning};
   }
   &:disabled {
-    color: ${disabled};
+    color: ${COLORS.disabled};
   }
 `
 
 const INNER_STYLE_NO_VALUE = css`
   width: 1.25rem;
   min-width: 1.25rem;
-  color: ${darkGreyEnabled};
+  color: ${COLORS.darkGreyEnabled};
   display: flex;
-  border-radius: ${spacingXXS};
+  border-radius: ${SPACING.spacingXXS};
   justify-content: center;
   align-items: center;
 
   &:hover {
     cursor: pointer;
-    color: ${darkGreyHover};
+    color: ${COLORS.darkGreyHover};
   }
 
   &:active {
-    color: ${darkGreyPressed};
+    color: ${COLORS.darkGreyPressed};
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${warning};
+    box-shadow: 0 0 0 3px ${COLORS.warning};
   }
   &:disabled {
-    color: ${disabled};
+    color: ${COLORS.disabled};
   }
 `
-export function BlueCheckboxField(props: BlueCheckboxFieldProps): JSX.Element {
+export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
   const indeterminate = props.isIndeterminate ? 'true' : undefined
 
   return (

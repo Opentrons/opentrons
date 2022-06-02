@@ -5,11 +5,11 @@ import {
   Flex,
   DIRECTION_COLUMN,
   SPACING,
-  BlueCheckboxField,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { InputField } from '../../atoms/InputField'
 import { StyledText } from '../../atoms/text'
+import { CheckboxField } from '../../atoms/CheckboxField'
 import styles from './styles.css'
 
 import type { FieldProps } from 'formik'
@@ -131,7 +131,7 @@ export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
     <Flex key={id} flexDirection="row" fontSize="11px">
       <Field name={name} type="checkbox">
         {(fieldProps: FieldProps) => (
-          <BlueCheckboxField
+          <CheckboxField
             name={fieldProps.field.name}
             onChange={fieldProps.field.onChange}
             value={fieldProps.field.checked}
