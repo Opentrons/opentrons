@@ -114,10 +114,10 @@ async def get_current_run_engine_from_url(
 
 @commands_router.post(
     path="/runs/{runId}/commands",
-    summary="Enqueue a protocol command",
+    summary="Enqueue a command",
     description=textwrap.dedent(
         """
-        Add a single protocol command to the run. A run may have two command types:
+        Add a single command to the run. A run may have two command types:
 
         - Setup commands (`data.source == "setup"`)
         - Protocol commands (`data.source == "protocol"`)
