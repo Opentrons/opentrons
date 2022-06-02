@@ -150,3 +150,36 @@ def thermocycler_wait_for_lid_temp() -> command_types.ThermocyclerWaitForLidTemp
 def thermocycler_close() -> command_types.ThermocyclerCloseCommand:
     text = "Closing Thermocycler lid"
     return {"name": command_types.THERMOCYCLER_CLOSE, "payload": {"text": text}}
+
+def heatershaker_set_and_wait_for_temperature() -> command_types.HeaterShakerSetAndWaitForTemperature:
+    text = ""
+    return {"name":command_types.HeaterShakerSetAndWaitForTemperature, "paylod": {"text":text}}
+
+def heatershaker_set_target_temperature() -> command_types.HeaterShakerSetTargetTemperature:
+    text = ""
+    return {"name":command_types.HeaterShakerSetTargetTemperature, "paylod": {"text":text}}
+
+def heatershaker_wait_for_temperature() -> command_types.HeaterShakerWaitForTemperature:
+    text = ""
+    return {"name":command_types.HeaterShakerWaitForTemperature, "paylod": {"text":text}}
+
+def heatershaker_set_and_wait_for_shake_speed() -> command_types.HeaterShakerSetAndWaitForShake_speed:
+    text = ""
+    return {"name":command_types.HeaterShakerSetAndWaitForShakeSpeed, "paylod": {"text":text}}
+
+def heatershaker_open_labware_latch() -> command_types.HeaterShakerOpenLabwareLatch:
+    text = ""
+    return {"name":command_types.HeaterShakerOpenLabwareLatch, "paylod": {"text":text}}
+
+def heatershaker_close_labware_latch() -> command_types.HeaterShakerCloseLabwareLatch:
+    text = ""
+    return {"name":command_types.HeaterShakerCloseLabwareLatch, "paylod": {"text":text}}
+
+def heatershaker_deactivate_shaker() -> command_types.HeaterShakerDeactivateShaker:
+    text = ""
+    return {"name":command_types.HeaterShakerDeactivateShaker, "paylod": {"text":text}}
+
+def heatershaker_deactivate_heater() -> command_types.HeaterShakerDeactivateHeater:
+    text = ""
+    return {"name":command_types.HeaterShakerDeactivateHeater, "paylod": {"text":text}}
+
