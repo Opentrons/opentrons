@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 import {
   Flex,
@@ -11,9 +12,12 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
+import * as TipLength from '../../../redux/calibration/tip-length'
 import { useRunPipetteInfoByMount } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import { SetupTipLengthCalibrationButton } from './SetupTipLengthCalibrationButton'
+
+import type { Dispatch } from '../../../redux/types'
 
 interface SetupTipLengthCalibrationProps {
   robotName: string
@@ -25,8 +29,13 @@ export function SetupTipLengthCalibration({
   runId,
 }: SetupTipLengthCalibrationProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
+  const dispatch = useDispatch<Dispatch>()
 
   const runPipetteInfoByMount = useRunPipetteInfoByMount(robotName, runId)
+
+  React.useEffect(() => {
+    robotName && dispatch(TipLength.fetchTipLengthCalibrations(robotName))
+  }, [dispatch, robotName])
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
