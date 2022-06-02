@@ -58,10 +58,6 @@ def get_app(
     app = web.Application(middlewares=[log_error_middleware])
 
     async def set_up_and_tear_down(app: web.Application) -> AsyncGenerator[None, None]:
-        # Stuff everything inside here so that:
-        # - Getting the order right is more foolproof
-        # - We can log it all together
-
         app[config.CONFIG_VARNAME] = config_obj
         app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
         app[constants.DEVICE_BOOT_ID_NAME] = boot_id
