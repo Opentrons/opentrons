@@ -18,7 +18,7 @@ from .exceptions import (
     SlotDoesNotExistError,
     FailedToPlanMoveError,
     MustHomeError,
-    ProtocolEngineStoppedError,
+    RunStoppedError,
     SetupCommandNotAllowedError,
     WellOriginNotAllowedError,
     ModuleNotAttachedError,
@@ -31,7 +31,7 @@ from .exceptions import (
     InvalidTargetSpeedError,
     InvalidTargetTemperatureError,
     InvalidBlockVolumeError,
-    EngineNotRunningError,
+    PauseNotAllowedError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -55,7 +55,7 @@ __all__ = [
     "SlotDoesNotExistError",
     "FailedToPlanMoveError",
     "MustHomeError",
-    "ProtocolEngineStoppedError",
+    "RunStoppedError",
     "SetupCommandNotAllowedError",
     "WellOriginNotAllowedError",
     "ModuleNotAttachedError",
@@ -68,7 +68,7 @@ __all__ = [
     "InvalidTargetTemperatureError",
     "InvalidTargetSpeedError",
     "InvalidBlockVolumeError",
-    "EngineNotRunningError",
+    "PauseNotAllowedError",
     # error occurrence models
     "ErrorOccurrence",
 ]

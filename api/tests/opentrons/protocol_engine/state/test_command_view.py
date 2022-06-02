@@ -151,7 +151,7 @@ def test_get_next_queued_raises_if_stopped(run_result: RunResult) -> None:
     """It should raise if an engine stop has been requested."""
     subject = get_command_view(run_result=run_result)
 
-    with pytest.raises(errors.ProtocolEngineStoppedError):
+    with pytest.raises(errors.RunStoppedError):
         subject.get_next_queued()
 
 
@@ -292,31 +292,31 @@ action_allowed_specs: List[ActionAllowedSpec] = [
     ActionAllowedSpec(
         subject=get_command_view(run_result=RunResult.STOPPED),
         action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
-        expected_error=errors.ProtocolEngineStoppedError,
+        expected_error=errors.RunStoppedError,
     ),
     # pause is disallowed if stop has been requested
     ActionAllowedSpec(
         subject=get_command_view(run_result=RunResult.STOPPED),
         action=PauseAction(source=PauseSource.CLIENT),
-        expected_error=errors.ProtocolEngineStoppedError,
+        expected_error=errors.RunStoppedError,
     ),
     # pause is disallowed if engine is not running
     ActionAllowedSpec(
         subject=get_command_view(queue_status=QueueStatus.SETUP),
         action=PauseAction(source=PauseSource.CLIENT),
-        expected_error=errors.EngineNotRunningError,
+        expected_error=errors.PauseNotAllowedError,
     ),
     # pause is disallowed if engine is already paused
     ActionAllowedSpec(
         subject=get_command_view(queue_status=QueueStatus.PAUSED),
         action=PauseAction(source=PauseSource.CLIENT),
-        expected_error=errors.EngineNotRunningError,
+        expected_error=errors.PauseNotAllowedError,
     ),
     # stop is disallowed if stop has already been requested
     ActionAllowedSpec(
         subject=get_command_view(run_result=RunResult.STOPPED),
         action=StopAction(),
-        expected_error=errors.ProtocolEngineStoppedError,
+        expected_error=errors.RunStoppedError,
     ),
     # queue command action is disallowed if stop has already been requested
     ActionAllowedSpec(
@@ -327,7 +327,7 @@ action_allowed_specs: List[ActionAllowedSpec] = [
             command_key="command-key",
             created_at=datetime(year=2021, month=1, day=1),
         ),
-        expected_error=errors.ProtocolEngineStoppedError,
+        expected_error=errors.RunStoppedError,
     ),
     # queue setup command is disallowed if running
     ActionAllowedSpec(

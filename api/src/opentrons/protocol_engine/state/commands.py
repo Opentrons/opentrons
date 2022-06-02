@@ -27,11 +27,11 @@ from ..commands import Command, CommandStatus, CommandSource
 from ..errors import (
     ProtocolEngineError,
     CommandDoesNotExistError,
-    ProtocolEngineStoppedError,
+    RunStoppedError,
     ErrorOccurrence,
     RobotDoorOpenError,
     SetupCommandNotAllowedError,
-    EngineNotRunningError,
+    PauseNotAllowedError,
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
@@ -437,11 +437,11 @@ class CommandView(HasState[CommandState]):
             The ID of the earliest queued command, if any.
 
         Raises:
-            ProtocolEngineStoppedError: The engine is currently stopped, so
+            RunStoppedError: The engine is currently stopped, so
                 there are not queued commands.
         """
         if self._state.run_result:
-            raise ProtocolEngineStoppedError("Engine was stopped")
+            raise RunStoppedError("Engine was stopped")
 
         # if there is a setup command queued, prioritize it
         next_setup_cmd = next(iter(self._state.queued_setup_command_ids), None)
@@ -528,14 +528,14 @@ class CommandView(HasState[CommandState]):
             The action, if valid.
 
         Raises:
-            ProtocolEngineStoppedError: The engine has been stopped.
+            RunStoppedError: The engine has been stopped.
             RobotDoorOpenError: Cannot resume because the front door is open.
-            EngineNotRunningError: The engine is not running, so cannot be paused.
+            PauseNotAllowedError: The engine is not running, so cannot be paused.
             SetupCommandNotAllowedError: The engine is running, so a setup command
                 may not be added.
         """
         if self.get_stop_requested():
-            raise ProtocolEngineStoppedError("The run has already stopped.")
+            raise RunStoppedError("The run has already stopped.")
 
         elif isinstance(action, PlayAction):
             if self.get_status() == EngineStatus.BLOCKED_BY_OPEN_DOOR:
@@ -543,7 +543,7 @@ class CommandView(HasState[CommandState]):
 
         elif isinstance(action, PauseAction):
             if not self.get_is_running():
-                raise EngineNotRunningError("Cannot pause a run that is not running.")
+                raise PauseNotAllowedError("Cannot pause a run that is not running.")
 
         elif (
             isinstance(action, QueueCommandAction)

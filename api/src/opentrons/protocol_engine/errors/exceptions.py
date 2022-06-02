@@ -93,8 +93,12 @@ class SetupCommandNotAllowedError(ProtocolEngineError):
     """An error raised when adding a setup command to a non-idle/non-paused engine."""
 
 
-class ProtocolEngineStoppedError(ProtocolEngineError):
-    """An error raised when attempting an invalid action with a stopped engine."""
+class PauseNotAllowedError(ProtocolEngineError):
+    """An error raised when attempting to pause a run that is not running."""
+
+
+class RunStoppedError(ProtocolEngineError):
+    """An error raised when attempting to interact with a stopped engine."""
 
 
 class WellOriginNotAllowedError(ProtocolEngineError):
@@ -139,7 +143,3 @@ class InvalidBlockVolumeError(ProtocolEngineError):
 
 class InvalidTargetSpeedError(ProtocolEngineError):
     """An error raised when attempting to set an invalid target speed."""
-
-
-class EngineNotRunningError(ProtocolEngineError):
-    """An error raised when attempting to pause a run that is not started."""
