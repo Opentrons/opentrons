@@ -5,7 +5,6 @@ import { LEFT, RIGHT } from '../../../redux/pipettes'
 import { AttachedPipettesCard } from './AttachedPipettesCard'
 import { CardContainer, CardRow } from '../../../atoms/layout'
 import { ChangePipette } from '../../../organisms/ChangePipette'
-import { ConfigurePipette } from '../../../organisms/ConfigurePipette'
 import { Page } from '../../../atoms/Page'
 
 export interface InstrumentSettingsProps {
