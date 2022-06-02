@@ -84,6 +84,7 @@ ModuleDefinitionV3 = TypedDict(
         "cornerOffsetFromSlot": CornerOffsetFromSlot,
         "dimensions": ModuleDimensions,
         "calibrationPoint": ModuleCalibrationPointOffsetWithZ,
+        "config": Dict[str, int],
         "displayName": str,
         "quirks": List[str],
         "slotTransforms": Dict[str, Dict[str, Dict[str, List[List[float]]]]],
