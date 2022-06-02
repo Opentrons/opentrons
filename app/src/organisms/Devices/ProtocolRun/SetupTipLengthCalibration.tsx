@@ -8,6 +8,7 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  useInterval,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -19,6 +20,7 @@ import { SetupTipLengthCalibrationButton } from './SetupTipLengthCalibrationButt
 
 import type { Dispatch } from '../../../redux/types'
 
+const CALIBRATIONS_FETCH_MS = 5000
 interface SetupTipLengthCalibrationProps {
   robotName: string
   runId: string
@@ -30,12 +32,15 @@ export function SetupTipLengthCalibration({
 }: SetupTipLengthCalibrationProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
   const dispatch = useDispatch<Dispatch>()
-
   const runPipetteInfoByMount = useRunPipetteInfoByMount(robotName, runId)
 
-  React.useEffect(() => {
-    robotName && dispatch(TipLength.fetchTipLengthCalibrations(robotName))
-  }, [dispatch, robotName])
+  useInterval(
+    () =>
+      robotName != null &&
+      dispatch(TipLength.fetchTipLengthCalibrations(robotName)),
+    CALIBRATIONS_FETCH_MS,
+    true
+  )
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
