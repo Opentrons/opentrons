@@ -2,11 +2,18 @@
 import pytest
 from contextlib import nullcontext as does_not_raise
 from datetime import datetime
-from typing import Dict, List, NamedTuple, Optional, Sequence, Type
+from typing import Dict, List, NamedTuple, Optional, Sequence, Type, Union
 
 from opentrons.ordered_set import OrderedSet
 
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
+from opentrons.protocol_engine.actions import (
+    PlayAction,
+    PauseAction,
+    PauseSource,
+    StopAction,
+    QueueCommandAction,
+)
 
 from opentrons.protocol_engine.state.commands import (
     CommandState,
@@ -227,25 +234,113 @@ class ActionAllowedSpec(NamedTuple):
     """Spec data to test CommandView.validate_action_allowed."""
 
     subject: CommandView
+    action: Union[PlayAction, PauseAction, StopAction, QueueCommandAction]
     expected_error: Optional[Type[errors.ProtocolEngineError]]
 
 
 action_allowed_specs: List[ActionAllowedSpec] = [
+    # play is allowed if the engine is idle
     ActionAllowedSpec(
-        subject=get_command_view(run_result=None),
+        subject=get_command_view(queue_status=QueueStatus.SETUP),
+        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
         expected_error=None,
     ),
+    # play is allowed if engine is idle, even if door is blocking
+    ActionAllowedSpec(
+        subject=get_command_view(is_door_blocking=True, queue_status=QueueStatus.SETUP),
+        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
+        expected_error=None,
+    ),
+    # play is allowed if the engine is paused
+    ActionAllowedSpec(
+        subject=get_command_view(queue_status=QueueStatus.PAUSED),
+        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
+        expected_error=None,
+    ),
+    # pause is allowed if the engine is running
+    ActionAllowedSpec(
+        subject=get_command_view(queue_status=QueueStatus.RUNNING),
+        action=PauseAction(source=PauseSource.CLIENT),
+        expected_error=None,
+    ),
+    # stop is usually allowed
+    ActionAllowedSpec(
+        subject=get_command_view(),
+        action=StopAction(),
+        expected_error=None,
+    ),
+    # queue command is usually allowed
+    ActionAllowedSpec(
+        subject=get_command_view(),
+        action=QueueCommandAction(
+            request=cmd.HomeCreate(params=cmd.HomeParams()),
+            command_id="command-id",
+            command_key="command-key",
+            created_at=datetime(year=2021, month=1, day=1),
+        ),
+        expected_error=None,
+    ),
+    # play is disallowed if paused and door is blocking
+    ActionAllowedSpec(
+        subject=get_command_view(
+            is_door_blocking=True, queue_status=QueueStatus.PAUSED
+        ),
+        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
+        expected_error=errors.RobotDoorOpenError,
+    ),
+    # play is disallowed if stop has been requested
     ActionAllowedSpec(
         subject=get_command_view(run_result=RunResult.STOPPED),
+        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
         expected_error=errors.ProtocolEngineStoppedError,
     ),
+    # pause is disallowed if stop has been requested
     ActionAllowedSpec(
-        subject=get_command_view(run_result=RunResult.SUCCEEDED),
+        subject=get_command_view(run_result=RunResult.STOPPED),
+        action=PauseAction(source=PauseSource.CLIENT),
         expected_error=errors.ProtocolEngineStoppedError,
     ),
+    # pause is disallowed if engine is not running
     ActionAllowedSpec(
-        subject=get_command_view(run_result=RunResult.FAILED),
+        subject=get_command_view(queue_status=QueueStatus.SETUP),
+        action=PauseAction(source=PauseSource.CLIENT),
+        expected_error=errors.EngineNotRunningError,
+    ),
+    # pause is disallowed if engine is already paused
+    ActionAllowedSpec(
+        subject=get_command_view(queue_status=QueueStatus.PAUSED),
+        action=PauseAction(source=PauseSource.CLIENT),
+        expected_error=errors.EngineNotRunningError,
+    ),
+    # stop is disallowed if stop has already been requested
+    ActionAllowedSpec(
+        subject=get_command_view(run_result=RunResult.STOPPED),
+        action=StopAction(),
         expected_error=errors.ProtocolEngineStoppedError,
+    ),
+    # queue command action is disallowed if stop has already been requested
+    ActionAllowedSpec(
+        subject=get_command_view(run_result=RunResult.STOPPED),
+        action=QueueCommandAction(
+            request=cmd.HomeCreate(params=cmd.HomeParams()),
+            command_id="command-id",
+            command_key="command-key",
+            created_at=datetime(year=2021, month=1, day=1),
+        ),
+        expected_error=errors.ProtocolEngineStoppedError,
+    ),
+    # queue setup command is disallowed if running
+    ActionAllowedSpec(
+        subject=get_command_view(queue_status=QueueStatus.RUNNING),
+        action=QueueCommandAction(
+            request=cmd.HomeCreate(
+                params=cmd.HomeParams(), source=cmd.CommandSource.SETUP
+            ),
+            command_id="command-id",
+            command_key="command-key",
+            created_at=datetime(year=2021, month=1, day=1),
+        ),
+        expected_error=errors.SetupCommandNotAllowedError,
     ),
 ]
 
@@ -253,118 +348,17 @@ action_allowed_specs: List[ActionAllowedSpec] = [
 @pytest.mark.parametrize(ActionAllowedSpec._fields, action_allowed_specs)
 def test_validate_action_allowed(
     subject: CommandView,
+    action: Union[PlayAction, PauseAction, StopAction],
     expected_error: Optional[Type[errors.ProtocolEngineError]],
 ) -> None:
-    """It should validate allowed play/pause actions."""
+    """It should validate allowed play/pause/stop actions."""
     expectation = pytest.raises(expected_error) if expected_error else does_not_raise()
 
     with expectation:  # type: ignore[attr-defined]
-        subject.raise_if_stop_requested()
+        result = subject.validate_action_allowed(action)
 
-
-class SetupCommandAllowedSpec(NamedTuple):
-    """Spec data to test raise_if_not_paused_or_idle."""
-
-    subject: CommandView
-    expected_error: Optional[Type[errors.ProtocolEngineError]]
-
-
-command_allowed_specs: List[SetupCommandAllowedSpec] = [
-    SetupCommandAllowedSpec(  # Status: RUNNING
-        subject=get_command_view(
-            queue_status=QueueStatus.RUNNING,
-            running_command_id=None,
-            queued_command_ids=[],
-        ),
-        expected_error=errors.SetupCommandNotAllowedError,
-    ),
-    SetupCommandAllowedSpec(  # Status: IDLE
-        subject=get_command_view(
-            queue_status=QueueStatus.SETUP,
-            running_command_id=None,
-            queued_command_ids=[],
-        ),
-        expected_error=None,
-    ),
-    SetupCommandAllowedSpec(  # Status: PAUSED
-        subject=get_command_view(
-            queue_status=QueueStatus.PAUSED,
-        ),
-        expected_error=None,
-    ),
-    SetupCommandAllowedSpec(  # Status: FAILED
-        subject=get_command_view(
-            run_result=RunResult.FAILED,
-            run_completed_at=datetime(year=2021, month=1, day=1),
-        ),
-        expected_error=errors.SetupCommandNotAllowedError,
-    ),
-    SetupCommandAllowedSpec(  # Status: BLOCKED_BY_OPEN_DOOR
-        subject=get_command_view(
-            queue_status=QueueStatus.PAUSED,
-            is_door_blocking=True,
-        ),
-        expected_error=errors.SetupCommandNotAllowedError,
-    ),
-    SetupCommandAllowedSpec(  # Status: FINISHING
-        subject=get_command_view(
-            queue_status=QueueStatus.PAUSED,
-            run_result=RunResult.SUCCEEDED,
-            run_completed_at=None,
-        ),
-        expected_error=errors.SetupCommandNotAllowedError,
-    ),
-]
-
-
-@pytest.mark.parametrize(SetupCommandAllowedSpec._fields, command_allowed_specs)
-def test_raise_unless_engine_paused_or_idle(
-    subject: CommandView,
-    expected_error: Optional[Type[errors.SetupCommandNotAllowedError]],
-) -> None:
-    """It should validate if a setup command can be run."""
-    expectation = pytest.raises(expected_error) if expected_error else does_not_raise()
-
-    with expectation:  # type: ignore[attr-defined]
-        subject.raise_if_not_paused_or_idle()
-
-
-class PlayAllowedSpec(NamedTuple):
-    """Spec data to test CommandView.validate_action_allowed."""
-
-    subject: CommandView
-    expected_error: Optional[Type[errors.RobotDoorOpenError]]
-
-
-play_allowed_specs: List[PlayAllowedSpec] = [
-    PlayAllowedSpec(
-        subject=get_command_view(is_door_blocking=True, queue_status=QueueStatus.SETUP),
-        expected_error=None,
-    ),
-    PlayAllowedSpec(
-        subject=get_command_view(
-            is_door_blocking=True, queue_status=QueueStatus.PAUSED
-        ),
-        expected_error=errors.RobotDoorOpenError,
-    ),
-    PlayAllowedSpec(
-        subject=get_command_view(
-            is_door_blocking=False, queue_status=QueueStatus.PAUSED
-        ),
-        expected_error=None,
-    ),
-]
-
-
-@pytest.mark.parametrize(PlayAllowedSpec._fields, play_allowed_specs)
-def test_validate_action_for_door_status(
-    subject: CommandView, expected_error: Optional[Type[errors.RobotDoorOpenError]]
-) -> None:
-    """It should raise error if playing when door open."""
-    expectation = pytest.raises(expected_error) if expected_error else does_not_raise()
-
-    with expectation:  # type: ignore[attr-defined]
-        subject.raise_if_paused_by_blocking_door()
+    if expected_error is None:
+        assert result == action
 
 
 def test_get_errors() -> None:
@@ -545,7 +539,7 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
 
 @pytest.mark.parametrize(GetOkayToClearSpec._fields, get_okay_to_clear_specs)
 def test_get_okay_to_clear(subject: CommandView, expected_is_okay: bool) -> None:
-    """It should okay only an unstarted or stopped engine to clear."""
+    """It should report whether an engine is ok to clear."""
     assert subject.get_is_okay_to_clear() is expected_is_okay
 
 

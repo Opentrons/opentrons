@@ -4,7 +4,7 @@ from collections import OrderedDict
 from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Mapping, Optional
+from typing import Dict, List, Mapping, Optional, Union
 
 from opentrons.ordered_set import OrderedSet
 
@@ -31,6 +31,7 @@ from ..errors import (
     ErrorOccurrence,
     RobotDoorOpenError,
     SetupCommandNotAllowedError,
+    EngineNotRunningError,
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
@@ -49,7 +50,6 @@ class QueueStatus(str, Enum):
         PAUSED: Execution of protocol commands has been paused.
             New protocol commands may be enqueued but wait to execute.
             New setup commands may be enqueued and will execute immediately.
-
     """
 
     SETUP = "setup"
@@ -518,32 +518,43 @@ class CommandView(HasState[CommandState]):
         """Get whether an engine stop has completed."""
         return self._state.run_completed_at is not None
 
-    # TODO(mc, 2021-12-07): reject adding commands to a stopped engine
-    def raise_if_stop_requested(self) -> None:
-        """Raise if a stop has already been requested.
+    def validate_action_allowed(
+        self,
+        action: Union[PlayAction, PauseAction, StopAction, QueueCommandAction],
+    ) -> Union[PlayAction, PauseAction, StopAction, QueueCommandAction]:
+        """Validate whether a given control action is allowed.
 
-        Mainly used to validate if an Action is allowed, raising if not.
+        Returns:
+            The action, if valid.
 
         Raises:
-            ProtocolEngineStoppedError: the engine has been stopped.
+            ProtocolEngineStoppedError: The engine has been stopped.
+            RobotDoorOpenError: Cannot resume because the front door is open.
+            EngineNotRunningError: The engine is not running, so cannot be paused.
+            SetupCommandNotAllowedError: The engine is running, so a setup command
+                may not be added.
         """
         if self.get_stop_requested():
-            raise ProtocolEngineStoppedError("A stop has already been requested.")
+            raise ProtocolEngineStoppedError("The run has already stopped.")
 
-    def raise_if_paused_by_blocking_door(self) -> None:
-        """Raise if the engine is currently paused by an open door."""
-        if self.get_status() == EngineStatus.BLOCKED_BY_OPEN_DOOR:
-            raise RobotDoorOpenError("Front door or top window is currently open.")
+        elif isinstance(action, PlayAction):
+            if self.get_status() == EngineStatus.BLOCKED_BY_OPEN_DOOR:
+                raise RobotDoorOpenError("Front door or top window is currently open.")
 
-    def raise_if_not_paused_or_idle(self) -> None:
-        """Raise if the engine is neither paused nor idle."""
-        if not (
-            self.get_status() == EngineStatus.PAUSED
-            or self.get_status() == EngineStatus.IDLE
+        elif isinstance(action, PauseAction):
+            if not self.get_is_running():
+                raise EngineNotRunningError("Cannot pause a run that is not running.")
+
+        elif (
+            isinstance(action, QueueCommandAction)
+            and action.request.source == CommandSource.SETUP
         ):
-            raise SetupCommandNotAllowedError(
-                "Setup command can only be run when the" "engine is paused or idle."
-            )
+            if self._state.queue_status == QueueStatus.RUNNING:
+                raise SetupCommandNotAllowedError(
+                    "Setup commands are not allowed while running."
+                )
+
+        return action
 
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""

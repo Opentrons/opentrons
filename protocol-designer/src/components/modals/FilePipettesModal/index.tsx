@@ -18,6 +18,7 @@ import {
   OutlineButton,
 } from '@opentrons/components'
 import {
+  HEATERSHAKER_MODULE_V1,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -98,8 +99,8 @@ const initialFormState: FormState = {
     },
     [HEATERSHAKER_MODULE_TYPE]: {
       onDeck: false,
-      model: null,
-      slot: '6',
+      model: HEATERSHAKER_MODULE_V1,
+      slot: '1',
     },
   },
 }
@@ -225,6 +226,16 @@ export class FilePipettesModal extends React.Component<Props, State> {
           ]
         : acc
     }, [])
+    const heaterShakerIndex = modules.findIndex(
+      hwModule => hwModule.type === HEATERSHAKER_MODULE_TYPE
+    )
+    const magModIndex = modules.findIndex(
+      hwModule => hwModule.type === MAGNETIC_MODULE_TYPE
+    )
+    if (heaterShakerIndex > -1 && magModIndex > -1) {
+      // if both are present, move the Mag mod to slot 9, since both can't be in slot 1
+      modules[magModIndex].slot = '9'
+    }
     this.props.onSave({ modules, newProtocolFields, pipettes })
   }
 

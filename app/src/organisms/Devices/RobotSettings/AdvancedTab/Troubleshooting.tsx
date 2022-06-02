@@ -37,7 +37,7 @@ export function Troubleshooting({
   const logsAvailable = robot?.health != null && robot.health.logs
   const robotLogsDownloading = useSelector(getRobotLogsDownloading)
 
-  const handleClick = (): void => {
+  const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
     updateDownloadLogsStatus(robotLogsDownloading)
     if (!controlDisabled && robot?.status === CONNECTABLE)
       dispatch(downloadLogs(robot))
@@ -70,7 +70,7 @@ export function Troubleshooting({
           controlDisabled || logsAvailable == null || robotLogsDownloading
         }
         marginLeft={SPACING_AUTO}
-        onClick={() => handleClick()}
+        onClick={handleClick}
         id="AdvancedSettings_downloadLogsButton"
       >
         {t('update_robot_software_download_logs')}

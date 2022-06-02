@@ -38,6 +38,9 @@ jest.mock('../../../../../redux/config')
 jest.mock('../../../../../redux/sessions/selectors')
 jest.mock('../../../../../redux/discovery')
 jest.mock('../../../../../assets/labware/findLabware')
+jest.mock('../../../hooks')
+
+const mockUpdateRobotStatus = jest.fn()
 
 describe('PipetteOffsetCalibrationItems', () => {
   let props: React.ComponentProps<typeof PipetteOffsetCalibrationItems>
@@ -46,6 +49,7 @@ describe('PipetteOffsetCalibrationItems', () => {
     props = {
       robotName: ROBOT_NAME,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
+      updateRobotStatus: mockUpdateRobotStatus,
     }
   })
 

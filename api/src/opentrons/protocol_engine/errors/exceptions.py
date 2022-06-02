@@ -139,3 +139,7 @@ class InvalidBlockVolumeError(ProtocolEngineError):
 
 class InvalidTargetSpeedError(ProtocolEngineError):
     """An error raised when attempting to set an invalid target speed."""
+
+
+class EngineNotRunningError(ProtocolEngineError):
+    """An error raised when attempting to pause a run that is not started."""

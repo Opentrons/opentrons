@@ -9,6 +9,7 @@ jest.mock('../../../../../redux/config')
 jest.mock('../../../../../redux/sessions/selectors')
 jest.mock('../../../../../redux/discovery')
 jest.mock('../../../../../assets/labware/findLabware')
+jest.mock('../../../hooks')
 
 const ROBOT_NAME = 'otie'
 
@@ -45,10 +46,11 @@ const mockTipLengthCalibrations = [
   },
 ]
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+const mockUpdateRobotStatus = jest.fn()
+
 const render = (
   props: React.ComponentProps<typeof TipLengthCalibrationItems>
-) => {
+): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(<TipLengthCalibrationItems {...props} />, {
     i18nInstance: i18n,
   })
@@ -61,6 +63,7 @@ describe('TipLengthCalibrationItems', () => {
       robotName: ROBOT_NAME,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
       formattedTipLengthCalibrations: mockTipLengthCalibrations,
+      updateRobotStatus: mockUpdateRobotStatus,
     }
   })
 
