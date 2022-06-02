@@ -28,17 +28,17 @@ class NameSynchronizer(ABC):
 
     See the `name_management` package docstring for an overview of these various names.
 
-    Tying all of these names together...
+    We tie all of these names together because
 
-    * Is important to avoid confusing the client-side discovery client,
+    * It's important to avoid confusing the client-side discovery client,
       at least at the time of writing.
       https://github.com/Opentrons/opentrons/issues/10199
 
-    * Helps maintain a conceptually simple interface.
+    * It helps maintain a conceptually simple interface.
       There is one name accessible in three separate ways,
       rather than three separate names.
 
-    * Implements the DNS-SD spec's recommendation to make the DNS-SD instance name
+    * It implements the DNS-SD spec's recommendation to make the DNS-SD instance name
       configurable. https://datatracker.ietf.org/doc/html/rfc6763#section-4.1.1
     """
 
