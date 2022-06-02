@@ -100,7 +100,7 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
       ) : (
         <Icon
           css={props.value ? INNER_STYLE_VALUE : INNER_STYLE_NO_VALUE}
-          name={props.value ? 'checkbox-marked' : 'checkbox-blank-outline'}
+          name={props.value ? 'ot-checkbox' : 'checkbox-blank-outline'}
           width="100%"
         />
       )}
