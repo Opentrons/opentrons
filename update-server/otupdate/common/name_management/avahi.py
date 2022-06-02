@@ -61,12 +61,26 @@ class AvahiClient:
             )
 
     async def alternative_service_name(self, current_service_name: str) -> str:
+        """Return an alternative to the given Avahi service name.
+
+        This is useful for fixing name collisions with other things on the network.
+        For example:
+
+            alternative_service_name("Foo") == "Foo #2"
+            alternative_service_name("Foo #2") == "Foo #3"
+
+        Appending incrementing integers like this, instead of using something like
+        the machine's serial number, follows a recommendation in the DNS-SD spec:
+        https://datatracker.ietf.org/doc/html/rfc6763#appendix-D
+        """
+        # We delegate to the Avahi daemon to find the alternative name for us.
+        # We could compute it ourselves, but getting Avahi to do it is convenient
+        # because it handles edge cases like appending "#2" to a name that already has
+        # the maximum length.
         async with self._lock:
             return await asyncio.get_running_loop().run_in_executor(
                 None, self._sync_client.alternative_service_name, current_service_name
             )
-        # Also document why we ask Avahi to do this for us.
-        # Test whether Avahi gracefully handles overlong names.
 
     @contextlib.asynccontextmanager
     async def collision_callback(
