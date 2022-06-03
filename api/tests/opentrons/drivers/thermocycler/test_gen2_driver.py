@@ -14,30 +14,13 @@ def connection() -> AsyncMock:
 
 
 @pytest.fixture
-def subject(connection: AsyncMock) -> driver.ThermocyclerDriver:
+def subject(connection: AsyncMock) -> driver.ThermocyclerDriverV2:
     connection.send_command.return_value = ""
-    return driver.ThermocyclerDriver(connection)
-
-
-@pytest.mark.parametrize(
-    "response,expected",
-    [
-        ("serial:abc model:def version:ghi\r\nok\r\nok\r\n", False),
-        ("M115 FW:abc HW:def SerialNo:ghi OK\n", True),
-    ],
-)
-async def test_factory_check_for_gen2(
-    connection: AsyncMock, response: str, expected: bool
-) -> None:
-    """The factory should detect the correct class type"""
-    connection.send_command.return_value = response
-    assert expected == await driver.ThermocyclerDriverFactory.is_gen2_thermocycler(
-        connection
-    )
+    return driver.ThermocyclerDriverV2(connection)
 
 
 async def test_open_lid(
-    subject: driver.ThermocyclerDriver, connection: AsyncMock
+    subject: driver.ThermocyclerDriverV2, connection: AsyncMock
 ) -> None:
     """It should send an open lid command."""
     await subject.open_lid()
@@ -50,7 +33,7 @@ async def test_open_lid(
 
 
 async def test_close_lid(
-    subject: driver.ThermocyclerDriver, connection: AsyncMock
+    subject: driver.ThermocyclerDriverV2, connection: AsyncMock
 ) -> None:
     """It should send a close lid command."""
     await subject.close_lid()
@@ -63,10 +46,10 @@ async def test_close_lid(
 
 
 async def test_get_lid_status(
-    subject: driver.ThermocyclerDriver, connection: AsyncMock
+    subject: driver.ThermocyclerDriverV2, connection: AsyncMock
 ) -> None:
     """It should send a get lid status command and parse response."""
-    connection.send_command.return_value = "Lid:open\r\nok\r\nok\r\n"
+    connection.send_command.return_value = "M119 Lid:open Seal:engaged OK\n"
 
     response = await subject.get_lid_status()
 
@@ -87,7 +70,7 @@ async def test_get_lid_status(
     ],
 )
 async def test_set_lid_temp(
-    subject: driver.ThermocyclerDriver,
+    subject: driver.ThermocyclerDriverV2,
     connection: AsyncMock,
     requested_temp: float,
     actual_temp: float,
@@ -105,10 +88,10 @@ async def test_set_lid_temp(
 
 
 async def test_get_lid_temp(
-    subject: driver.ThermocyclerDriver, connection: AsyncMock
+    subject: driver.ThermocyclerDriverV2, connection: AsyncMock
 ) -> None:
     """It should send a get lid temperature command and parse response."""
-    connection.send_command.return_value = "T:100.000 C:22.041\r\nok\r\nok\r\n'"
+    connection.send_command.return_value = "M141 T:100.000 C:22.041 OK\n'"
 
     response = await subject.get_lid_temperature()
 
@@ -132,7 +115,7 @@ async def test_get_lid_temp(
     ],
 )
 async def test_set_plate_temp(
-    subject: driver.ThermocyclerDriver,
+    subject: driver.ThermocyclerDriverV2,
     connection: AsyncMock,
     temp: float,
     hold_time: Optional[float],
@@ -152,10 +135,12 @@ async def test_set_plate_temp(
 
 
 async def test_get_plate_temp(
-    subject: driver.ThermocyclerDriver, connection: AsyncMock
+    subject: driver.ThermocyclerDriverV2, connection: AsyncMock
 ) -> None:
     """It should send a command to get the plate temperature and parse the response."""
-    connection.send_command.return_value = "T:30.000 C:23.317 H:120\r\nok\r\nok\r\n"
+    connection.send_command.return_value = (
+        "M105 T:30.000 C:23.317 H:120 Total_H:120 At_target?:0 OK\n"
+    )
 
     response = await subject.get_plate_temperature()
 
@@ -168,22 +153,16 @@ async def test_get_plate_temp(
 
 
 async def test_set_ramp_rate(
-    subject: driver.ThermocyclerDriver, connection: AsyncMock
+    subject: driver.ThermocyclerDriverV2, connection: AsyncMock
 ) -> None:
-    """It should send a set ramp rate command."""
+    """It should not send a set ramp rate command."""
     await subject.set_ramp_rate(ramp_rate=22)
 
-    expected = (
-        CommandBuilder(terminator=driver.TC_COMMAND_TERMINATOR)
-        .add_gcode(gcode="M566")
-        .add_float(prefix="S", value=22, precision=TC_GCODE_ROUNDING_PRECISION)
-    )
-
-    connection.send_command.assert_called_once_with(command=expected, retries=3)
+    assert not connection.send_command.called
 
 
 async def test_deactivate_all(
-    subject: driver.ThermocyclerDriver, connection: AsyncMock
+    subject: driver.ThermocyclerDriverV2, connection: AsyncMock
 ) -> None:
     """It should send a deactivate all command."""
     await subject.deactivate_all()
@@ -196,7 +175,7 @@ async def test_deactivate_all(
 
 
 async def test_deactivate_lid(
-    subject: driver.ThermocyclerDriver, connection: AsyncMock
+    subject: driver.ThermocyclerDriverV2, connection: AsyncMock
 ) -> None:
     """It should send a deactivate lid command."""
     await subject.deactivate_lid()
@@ -209,7 +188,7 @@ async def test_deactivate_lid(
 
 
 async def test_deactivate_block(
-    subject: driver.ThermocyclerDriver, connection: AsyncMock
+    subject: driver.ThermocyclerDriverV2, connection: AsyncMock
 ) -> None:
     """It should send a deactivate block command."""
     await subject.deactivate_block()
@@ -222,10 +201,12 @@ async def test_deactivate_block(
 
 
 async def test_device_info(
-    subject: driver.ThermocyclerDriver, connection: AsyncMock
+    subject: driver.ThermocyclerDriverV2, connection: AsyncMock
 ) -> None:
     """It should send a get device info command and parse response."""
-    connection.send_command.return_value = "serial:s model:m version:v"
+    connection.send_command.return_value = (
+        "M115 FW:(dev)--b4eeff7 HW:Opentrons-thermocycler-gen2 SerialNo:EMPTYSN OK\n"
+    )
 
     device_info = await subject.get_device_info()
 
@@ -235,4 +216,26 @@ async def test_device_info(
 
     connection.send_command.assert_called_once_with(command=expected, retries=3)
 
-    assert device_info == {"serial": "s", "model": "m", "version": "v"}
+    assert device_info == {
+        "serial": "EMPTYSN",
+        "model": "Opentrons-thermocycler-gen2",
+        "version": "(dev)--b4eeff7",
+    }
+
+
+async def test_enter_bootloader(
+    subject: driver.ThermocyclerDriverV2, connection: AsyncMock
+) -> None:
+    """It should send the bootloader command and close the connection"""
+
+    await subject.enter_programming_mode()
+
+    expected = CommandBuilder(terminator=driver.TC_COMMAND_TERMINATOR).add_gcode(
+        gcode="dfu"
+    )
+
+    connection.send_command.assert_called_once_with(
+        command=expected, retries=3, timeout=1
+    )
+
+    assert connection.close.called

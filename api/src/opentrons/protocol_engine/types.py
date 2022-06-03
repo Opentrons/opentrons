@@ -145,6 +145,7 @@ class ModuleModel(str, Enum):
     MAGNETIC_MODULE_V1 = "magneticModuleV1"
     MAGNETIC_MODULE_V2 = "magneticModuleV2"
     THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
+    THERMOCYCLER_MODULE_V2 = "thermocyclerModuleV2"
     HEATER_SHAKER_MODULE_V1 = "heaterShakerModuleV1"
 
     def as_type(self) -> ModuleType:
@@ -178,8 +179,8 @@ class ModuleModel(str, Enum):
     def is_thermocycler_module_model(
         cls, model: ModuleModel
     ) -> TypeGuard[ThermocyclerModuleModel]:
-        """Whether a given model is a Thermocycler Module."""
-        return model == cls.THERMOCYCLER_MODULE_V1
+        """Whether a given model is a Thermocyler Module."""
+        return model in [cls.THERMOCYCLER_MODULE_V1, cls.THERMOCYCLER_MODULE_V2]
 
     @classmethod
     def is_heater_shaker_module_model(
@@ -195,7 +196,9 @@ TemperatureModuleModel = Literal[
 MagneticModuleModel = Literal[
     ModuleModel.MAGNETIC_MODULE_V1, ModuleModel.MAGNETIC_MODULE_V2
 ]
-ThermocyclerModuleModel = Literal[ModuleModel.THERMOCYCLER_MODULE_V1]
+ThermocyclerModuleModel = Literal[
+    ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2
+]
 HeaterShakerModuleModel = Literal[ModuleModel.HEATER_SHAKER_MODULE_V1]
 
 
