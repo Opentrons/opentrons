@@ -11,9 +11,9 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   COLORS,
-  TYPOGRAPHY,
   Overlay,
   POSITION_FIXED,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
@@ -64,6 +64,17 @@ const COLLAPSED_STYLE = css`
   }
 `
 
+const CLOSE_ICON_STYLE = css`
+  border-radius: 50%;
+
+  &:hover {
+    background: #16212d26;
+  }
+  &:active {
+    background: #16212d40;
+  }
+`
+
 export const Slideout = (props: Props): JSX.Element | null => {
   const { isExpanded, title, onCloseClick, children, footer } = props
   return (
@@ -99,24 +110,31 @@ export const Slideout = (props: Props): JSX.Element | null => {
               paddingX={SPACING.spacing4}
               marginBottom={SPACING.spacing4}
             >
-              <StyledText as="h2" data-testid={`Slideout_title_${title}`}>
+              <StyledText
+                as="h2"
+                css={{ 'overflow-wrap': 'anywhere' }}
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                data-testid={`Slideout_title_${title}`}
+              >
                 {title}
               </StyledText>
               <Flex alignItems={ALIGN_CENTER}>
                 <Btn
-                  size={TYPOGRAPHY.lineHeight24}
+                  size={'1.25rem'}
                   onClick={onCloseClick}
                   aria-label="exit"
                   data-testid={`Slideout_icon_close_${
                     typeof title === 'string' ? title : ''
                   }`}
                 >
-                  <Icon name="close" />
+                  <Icon name="close" css={CLOSE_ICON_STYLE} />
                 </Btn>
               </Flex>
             </Flex>
           ) : (
-            title
+            <React.Fragment css={{ 'overflow-wrap': 'break-word' }}>
+              {title}
+            </React.Fragment>
           )}
           <Divider marginY={0} color={COLORS.medGrey} />
           <Box

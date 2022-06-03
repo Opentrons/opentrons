@@ -6,17 +6,22 @@ import {
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { ThermocyclerModuleSlideout } from '../ThermocyclerModuleSlideout'
 
 import { mockThermocycler } from '../../../../redux/modules/__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../useModuleIdFromRun')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
 const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
   typeof useCreateCommandMutation
+>
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
 >
 
 const render = (
@@ -43,6 +48,9 @@ describe('ThermocyclerModuleSlideout', () => {
     mockUseCommandMutation.mockReturnValue({
       createCommand: mockCreateCommand,
     } as any)
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'thermocycler_id',
+    })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -61,8 +69,8 @@ describe('ThermocyclerModuleSlideout', () => {
     getByText(
       'Pre heat or cool your Thermocycler Lid. Enter a whole number between 37 °C and 110 °C.'
     )
-    getByText('Temperature')
-    getByText('Set Lid Temperature')
+    getByText('Set lid temperature')
+    getByText('Confirm')
   })
 
   it('renders correct title and body for Thermocycler Block Temperature', () => {
@@ -78,8 +86,8 @@ describe('ThermocyclerModuleSlideout', () => {
     getByText(
       'Pre heat or cool your Thermocycler Block. Enter a whole number between 4 °C and 99 °C.'
     )
-    getByText('Temperature')
-    getByText('Set Block Temperature')
+    getByText('Set block temperature')
+    getByText('Confirm')
   })
 
   it('renders the button and it is not clickable until there is something in form field for the TC Block', () => {
@@ -90,7 +98,7 @@ describe('ThermocyclerModuleSlideout', () => {
       onCloseClick: jest.fn(),
     }
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Block Temperature' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('thermocyclerModuleV1_false')
     fireEvent.change(input, { target: { value: '45' } })
     expect(button).toBeEnabled()
@@ -101,7 +109,7 @@ describe('ThermocyclerModuleSlideout', () => {
         commandType: 'thermocycler/setTargetBlockTemperature',
         params: {
           moduleId: mockThermocycler.id,
-          temperature: 45,
+          celsius: 45,
         },
       },
     })
@@ -116,7 +124,7 @@ describe('ThermocyclerModuleSlideout', () => {
       onCloseClick: jest.fn(),
     }
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Lid Temperature' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('thermocyclerModuleV1_true')
     fireEvent.change(input, { target: { value: '45' } })
     expect(button).toBeEnabled()
@@ -127,7 +135,7 @@ describe('ThermocyclerModuleSlideout', () => {
         commandType: 'thermocycler/setTargetLidTemperature',
         params: {
           moduleId: mockThermocycler.id,
-          temperature: 45,
+          celsius: 45,
         },
       },
     })
@@ -143,7 +151,7 @@ describe('ThermocyclerModuleSlideout', () => {
       runId: 'test123',
     }
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Block Temperature' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('thermocyclerModuleV1_false')
     fireEvent.change(input, { target: { value: '45' } })
     expect(button).toBeEnabled()
@@ -155,7 +163,7 @@ describe('ThermocyclerModuleSlideout', () => {
         commandType: 'thermocycler/setTargetBlockTemperature',
         params: {
           moduleId: mockThermocycler.id,
-          temperature: 45,
+          celsius: 45,
         },
       },
     })
@@ -171,7 +179,7 @@ describe('ThermocyclerModuleSlideout', () => {
       runId: 'test123',
     }
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Lid Temperature' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('thermocyclerModuleV1_true')
     fireEvent.change(input, { target: { value: '45' } })
     expect(button).toBeEnabled()
@@ -183,7 +191,7 @@ describe('ThermocyclerModuleSlideout', () => {
         commandType: 'thermocycler/setTargetLidTemperature',
         params: {
           moduleId: mockThermocycler.id,
-          temperature: 45,
+          celsius: 45,
         },
       },
     })

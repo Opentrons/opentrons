@@ -3,7 +3,8 @@ import asyncio
 import argparse
 import datetime
 
-from opentrons_hardware.drivers.can_bus.can_messenger import (
+from opentrons_hardware.drivers.can_bus import (
+    build,
     CanMessenger,
     WaitableCallback,
 )
@@ -19,7 +20,6 @@ from opentrons_hardware.sensors.utils import (
     sensor_fixed_point_conversion,
 )
 
-from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 
@@ -34,6 +34,7 @@ async def do_run(
     threshold_payload = payloads.SetSensorThresholdRequestPayload(
         sensor=fields.SensorTypeField(constants.SensorType.capacitive),
         threshold=Int32Field(int(threshold * sensor_fixed_point_conversion)),
+        mode=fields.SensorThresholdModeField(constants.SensorThresholdMode.absolute),
     )
     threshold_message = message_definitions.SetSensorThresholdRequest(
         payload=threshold_payload
@@ -67,14 +68,12 @@ async def do_run(
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    driver = await build_driver(build_settings(args))
     target = constants.NodeId["pipette_" + args.mount]
     sensor = constants.SensorType[args.sensor]
 
-    messenger = CanMessenger(driver)
-    messenger.start()
-    with WaitableCallback(messenger) as reader:
-        return await do_run(messenger, reader, target, sensor, args.threshold)
+    async with build.can_messenger(build_settings(args)) as messenger:
+        with WaitableCallback(messenger) as reader:
+            return await do_run(messenger, reader, target, sensor, args.threshold)
 
 
 def main() -> None:

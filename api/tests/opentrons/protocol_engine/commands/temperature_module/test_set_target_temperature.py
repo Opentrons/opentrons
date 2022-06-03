@@ -25,7 +25,7 @@ async def test_set_target_temperature(
 
     data = temperature_module.SetTargetTemperatureParams(
         moduleId="tempdeck-id",
-        temperature=1.23,
+        celsius=1.23,
     )
 
     module_substate = decoy.mock(cls=TemperatureModuleSubState)

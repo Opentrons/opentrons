@@ -174,7 +174,7 @@ class SyncClient:
         """Execute a ``MagneticModuleEngage`` command and return the result."""
         request = commands.magnetic_module.EngageCreate(
             params=commands.magnetic_module.EngageParams(
-                moduleId=module_id, engageHeight=engage_height
+                moduleId=module_id, height=engage_height
             )
         )
         result = self._transport.execute_command(request=request)

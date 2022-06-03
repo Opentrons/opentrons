@@ -25,6 +25,7 @@ br_ssh_opts ?= $(default_ssh_opts)
 .PHONY: setup
 setup:
 	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip freeze
 
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
@@ -52,9 +53,9 @@ test:
 
 .PHONY: lint
 lint:
+	$(python) -m mypy otupdate
 	$(python) -m black --check ./otupdate ./tests
 	$(python) -m flake8 otupdate tests
-	$(python) -m mypy otupdate
 
 .PHONY: format
 format:

@@ -10,9 +10,9 @@ import {
   RPM,
   CELSIUS,
   HS_RPM_MAX,
-  TEMP_MAX,
   HS_RPM_MIN,
-  TEMP_MIN,
+  HS_TEMP_MIN,
+  HS_TEMP_MAX,
 } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
 import {
@@ -25,14 +25,15 @@ import {
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
+import { PrimaryButton } from '../../../atoms/buttons'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { InputField } from '../../../atoms/InputField'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
-  HeaterShakerSetTargetShakeSpeedCreateCommand,
+  HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
   HeaterShakerStartSetTargetTemperatureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
@@ -54,14 +55,18 @@ export const HeaterShakerSlideout = (
   const { createCommand } = useCreateCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    module,
+    runId != null ? runId : null
+  )
   const modulePart = isSetShake ? t('shake_speed') : t('temperature')
 
   const sendShakeSpeedCommand = (): void => {
     if (hsValue != null && isSetShake) {
-      const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
-        commandType: 'heaterShakerModule/setTargetShakeSpeed',
+      const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
+        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
         params: {
-          moduleId: module.id,
+          moduleId: runId != null ? moduleIdFromRun : module.id,
           rpm: parseInt(hsValue),
         },
       }
@@ -96,10 +101,10 @@ export const HeaterShakerSlideout = (
   const sendSetTemperatureOrShakeCommand = (): void => {
     if (hsValue != null && !isSetShake) {
       const setTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
-        commandType: 'heaterShakerModule/startSetTargetTemperature',
+        commandType: 'heaterShaker/setTargetTemperature',
         params: {
-          moduleId: module.id,
-          temperature: parseInt(hsValue),
+          moduleId: runId != null ? moduleIdFromRun : module.id,
+          celsius: parseInt(hsValue),
         },
       }
       if (runId != null) {
@@ -133,13 +138,13 @@ export const HeaterShakerSlideout = (
   } else {
     errorMessage =
       hsValue != null &&
-      (parseInt(hsValue) < TEMP_MIN || parseInt(hsValue) > TEMP_MAX)
+      (parseInt(hsValue) < HS_TEMP_MIN || parseInt(hsValue) > HS_TEMP_MAX)
         ? t('input_out_of_range')
         : null
   }
 
-  const inputMax = isSetShake ? HS_RPM_MAX : TEMP_MAX
-  const inputMin = isSetShake ? HS_RPM_MIN : TEMP_MIN
+  const inputMax = isSetShake ? HS_RPM_MAX : HS_TEMP_MAX
+  const inputMin = isSetShake ? HS_RPM_MIN : HS_TEMP_MIN
   const unit = isSetShake ? RPM : CELSIUS
 
   return (
@@ -165,7 +170,7 @@ export const HeaterShakerSlideout = (
             width="100%"
             data-testid={`HeaterShakerSlideout_btn_${module.serialNumber}`}
           >
-            {t('set_temp_or_shake', { part: modulePart })}
+            {t('confirm')}
           </PrimaryButton>
         }
       >
@@ -183,10 +188,10 @@ export const HeaterShakerSlideout = (
           data-testid={`HeaterShakerSlideout_input_field_${module.serialNumber}`}
         >
           <Text
-            fontWeight={FONT_WEIGHT_REGULAR}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             fontSize={TYPOGRAPHY.fontSizeH6}
             color={COLORS.darkGrey}
-            marginBottom={SPACING.spacing1}
+            marginBottom={SPACING.spacing3}
           >
             {isSetShake ? t('set_shake_speed') : t('set_block_temp')}
           </Text>

@@ -40,9 +40,9 @@ export function RobotServerVersion({
 
   return (
     <>
-      {autoUpdateAction !== 'reinstall' ? (
+      {autoUpdateAction !== 'reinstall' && robot != null ? (
         <Box marginBottom={SPACING.spacing4} width="100%">
-          <UpdateRobotBanner robotName={robotName} />
+          <UpdateRobotBanner robot={robot} />
         </Box>
       ) : (
         // TODO: add reinstall option
@@ -55,9 +55,9 @@ export function RobotServerVersion({
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Box width="70%">
           <StyledText
-            as="h3"
-            css={TYPOGRAPHY.h3SemiBold}
-            paddingBottom={SPACING.spacing3}
+            as="h2"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            paddingBottom={SPACING.spacing4}
             id="AdvancedSettings_RobotServerVersion"
           >
             {t('robot_server_versions')}
@@ -73,6 +73,7 @@ export function RobotServerVersion({
               external
               href={GITHUB_LINK}
               id="AdvancedSettings_GitHubLink"
+              css={TYPOGRAPHY.linkPSemiBold}
             >{` ${t('shared:github')}`}</Link>
           </StyledText>
         </Box>

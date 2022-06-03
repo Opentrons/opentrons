@@ -1,9 +1,9 @@
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
-import { getLabwareRenderInfo } from '../../../organisms/ProtocolSetup/utils/getLabwareRenderInfo'
+import { getLabwareRenderInfo } from '../ProtocolRun/utils/getLabwareRenderInfo'
 import { useProtocolDetailsForRun } from '.'
 
-import type { LabwareRenderInfoById } from '../../../organisms/ProtocolSetup/utils/getLabwareRenderInfo'
+import type { LabwareRenderInfoById } from '../ProtocolRun/utils/getLabwareRenderInfo'
 
 export function useLabwareRenderInfoForRunById(
   runId: string

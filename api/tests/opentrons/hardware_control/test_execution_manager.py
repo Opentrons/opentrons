@@ -58,7 +58,7 @@ async def test_cancel_tasks():
     loop = asyncio.get_running_loop()
 
     cancellable_task = loop.create_task(fake_task())
-    await exec_mgr.register_cancellable_task(cancellable_task)
+    exec_mgr.register_cancellable_task(cancellable_task)
 
     other_task = loop.create_task(fake_task())
 

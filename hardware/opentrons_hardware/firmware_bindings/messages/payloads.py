@@ -13,10 +13,11 @@ from .fields import (
     ErrorCodeField,
     SensorTypeField,
     PipetteNameField,
-    PipetteSerialField,
-    GripperSerialField,
     SensorOutputBindingField,
     EepromDataField,
+    SerialField,
+    SensorThresholdModeField,
+    PipetteTipActionTypeField,
 )
 from .. import utils
 
@@ -79,7 +80,7 @@ class EEPromReadPayload(utils.BinarySerializable):
 
 
 @dataclass
-class EEProDataPayload(EEPromReadPayload):
+class EEPromDataPayload(EEPromReadPayload):
     """Eeprom payload with data."""
 
     data: EepromDataField
@@ -326,6 +327,7 @@ class SetSensorThresholdRequestPayload(utils.BinarySerializable):
 
     sensor: SensorTypeField
     threshold: utils.Int32Field
+    mode: SensorThresholdModeField
 
 
 @dataclass
@@ -334,6 +336,7 @@ class SensorThresholdResponsePayload(utils.BinarySerializable):
 
     sensor: SensorTypeField
     threshold: utils.Int32Field
+    mode: SensorThresholdModeField
 
 
 @dataclass
@@ -373,9 +376,9 @@ class BindSensorOutputResponsePayload(utils.BinarySerializable):
 class PipetteInfoResponsePayload(utils.BinarySerializable):
     """A response carrying data about an attached pipette."""
 
-    pipette_name: PipetteNameField
-    pipette_model: utils.UInt16Field
-    pipette_serial: PipetteSerialField
+    name: PipetteNameField
+    model: utils.UInt16Field
+    serial: SerialField
 
 
 @dataclass
@@ -397,8 +400,8 @@ class BrushedMotorPwmPayload(utils.BinarySerializable):
 class GripperInfoResponsePayload(utils.BinarySerializable):
     """A response carrying data about an attached gripper."""
 
-    gripper_model: utils.UInt16Field
-    gripper_serial: GripperSerialField
+    model: utils.UInt16Field
+    serial: SerialField
 
 
 @dataclass
@@ -414,10 +417,35 @@ class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     """A request to perform a tip action."""
 
     velocity: utils.Int32Field
+    action: PipetteTipActionTypeField
+    request_stop_condition: utils.UInt8Field
 
 
 @dataclass
-class TipActionResponsePayload(MoveGroupResponsePayload):
+class TipActionResponsePayload(MoveCompletedPayload):
     """A response that sends back whether tip action was successful."""
 
+    action: PipetteTipActionTypeField
     success: utils.UInt8Field
+
+
+@dataclass
+class PeripheralStatusRequestPayload(utils.BinarySerializable):
+    """A request to get the initialization status of a peripheral device."""
+
+    sensor: SensorTypeField
+
+
+@dataclass
+class PeripheralStatusResponsePayload(utils.BinarySerializable):
+    """A response that sends back the initialization status of a peripheral device."""
+
+    sensor: SensorTypeField
+    status: utils.UInt8Field
+
+
+@dataclass
+class SerialNumberPayload(utils.BinarySerializable):
+    """A payload with a serial number."""
+
+    serial: SerialField

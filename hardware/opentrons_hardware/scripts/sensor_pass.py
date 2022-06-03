@@ -6,10 +6,13 @@ from numpy import float64
 from logging.config import dictConfig
 from typing import Iterator, List, Any, Dict
 
-from opentrons_hardware.drivers.can_bus.build import build_driver
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
+from opentrons_hardware.drivers.can_bus import build, CanMessenger
 from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32Field
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorType,
+    SensorThresholdMode,
+)
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.hardware_control.network import probe
 import opentrons_hardware.sensors.utils as sensor_utils
@@ -89,15 +92,11 @@ class Capturer:
             )
 
 
-async def run(args: argparse.Namespace) -> None:
-    """Entry point for script."""
-    driver = await build_driver(build_settings(args))
-    messenger = CanMessenger(driver=driver)
-    messenger.start()
-
+async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
+    """Run the test."""
     target_z = NodeId["head_" + args.mount[0]]
     target_pipette = NodeId["pipette_" + args.mount]
-    found = await probe(messenger, set((NodeId.head, target_pipette)), 10)
+    found = await probe(messenger, {NodeId.head, target_pipette}, 10)
     if NodeId.head not in found or target_pipette not in found:
         raise RuntimeError(f"could not find targets for {args.mount} in {found}")
 
@@ -139,6 +138,7 @@ async def run(args: argparse.Namespace) -> None:
         threshold=Int32Field(
             int(args.threshold * sensor_utils.sensor_fixed_point_conversion)
         ),
+        mode=fields.SensorThresholdModeField(SensorThresholdMode.auto_baseline),
     )
     threshold_message = message_definitions.SetSensorThresholdRequest(
         payload=threshold_payload
@@ -171,8 +171,12 @@ async def run(args: argparse.Namespace) -> None:
     runner = MoveGroupRunner(move_groups=[move_groups[0]])
     await runner.run(can_messenger=messenger)
     await messenger.send(NodeId.broadcast, message_definitions.DisableMotorRequest())
-    await messenger.stop()
-    driver.shutdown()
+
+
+async def run(args: argparse.Namespace) -> None:
+    """Entry point for script."""
+    async with build.can_messenger(build_settings(args)) as messenger:
+        await run_test(messenger, args)
 
 
 def main() -> None:

@@ -16,7 +16,7 @@ from opentrons.protocol_engine import ModuleDefinition
 @pytest.fixture(scope="session")
 def tempdeck_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 tempdeck."""
-    definition = load_shared_data("module/definitions/2/temperatureModuleV1.json")
+    definition = load_shared_data("module/definitions/3/temperatureModuleV1.json")
     return ModuleDefinition.parse_raw(definition)
 
 

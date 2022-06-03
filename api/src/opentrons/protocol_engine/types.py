@@ -215,6 +215,7 @@ class ModuleCalibrationPoint(BaseModel):
 
     x: float
     y: float
+    z: float
 
 
 class LabwareOffsetVector(BaseModel):
@@ -261,7 +262,6 @@ class LoadedModule(BaseModel):
     id: str
     model: ModuleModel
     location: Optional[DeckSlotLocation]
-    definition: ModuleDefinition
     serialNumber: str
 
 
@@ -283,7 +283,7 @@ class LabwareOffsetLocation(BaseModel):
             " if applicable."
             "\n\n"
             "Because of module compatibility, the model that the protocol requests"
-            " may not beexactly the same"
+            " may not be exactly the same"
             " as what it will find physically connected during execution."
             " For this labware offset to apply,"
             " this field must be the *requested* model, not the connected one."

@@ -87,6 +87,7 @@ const modifiedSimpleV6Protocol = (_uncastedModifiedSimpleV6Protocol as any) as P
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
   protocolData: modifiedSimpleV6Protocol,
+  protocolKey: 'fakeProtocolKey',
 }
 
 describe('useRunPipetteInfoByMount hook', () => {
@@ -95,7 +96,7 @@ describe('useRunPipetteInfoByMount hook', () => {
       .calledWith('otie')
       .mockReturnValue(PIPETTE_CALIBRATIONS)
     when(mockUseAttachedPipettes)
-      .calledWith('otie')
+      .calledWith()
       .mockReturnValue(ATTACHED_PIPETTES)
     when(mockUseTipLengthCalibrations)
       .calledWith('otie')

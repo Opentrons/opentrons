@@ -2,6 +2,8 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
+import { useHistory } from 'react-router-dom'
+
 import {
   Flex,
   COLORS,
@@ -14,7 +16,7 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../../../../atoms/text'
-import { PrimaryButton } from '../../../../../atoms/Buttons'
+import { PrimaryButton } from '../../../../../atoms/buttons'
 import { Modal } from '../../../../../atoms/Modal'
 import {
   useDispatchApiRequest,
@@ -46,6 +48,7 @@ export function FactoryResetModal({
     color: COLORS.blue,
   }
   const { t } = useTranslation(['device_settings', 'shared'])
+  const history = useHistory()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const resetRequestStatus = useSelector((state: State) => {
     const lastId = last(requestIds)
@@ -53,8 +56,10 @@ export function FactoryResetModal({
   })?.status
 
   const triggerReset = (): void => {
-    if (resetOptions != null)
+    if (resetOptions != null) {
       dispatchRequest(resetConfig(robotName, resetOptions))
+      history.push(`/devices/`)
+    }
   }
 
   React.useEffect(() => {
@@ -81,8 +86,7 @@ export function FactoryResetModal({
                 onClick={closeModal}
                 textTransform={TEXT_TRANSFORM_CAPITALIZE}
                 marginRight={SPACING.spacing3}
-                color={COLORS.blue}
-                css={TYPOGRAPHY.fontSizeP}
+                css={TYPOGRAPHY.linkPSemiBold}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {t('shared:cancel')}

@@ -49,6 +49,27 @@ def add_can_args(parser: ArgumentParser) -> ArgumentParser:
         required=False,
         help=f"host to connect to for {settings.OPENTRONS_INTERFACE} interface",
     )
+    parser.add_argument(
+        "--fcan_clk",
+        type=int,
+        default=settings.DEFAULT_FDCAN_CLK,
+        required=False,
+        help="Clock (MHz) for can analyzer, only for pcan interface",
+    )
+    parser.add_argument(
+        "--sample_rate",
+        type=float,
+        default=settings.DEFAULT_SAMPLE_RATE,
+        required=False,
+        help="Sample rate for can analyzer, only for pcan interface",
+    )
+    parser.add_argument(
+        "--jump_width",
+        type=int,
+        default=settings.DEFAULT_JUMP_WIDTH_SEG,
+        required=False,
+        help="Jump width seg for can analyzer, only for pcan interface",
+    )
     return parser
 
 

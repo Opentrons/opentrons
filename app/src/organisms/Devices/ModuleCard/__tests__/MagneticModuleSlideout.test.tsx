@@ -6,6 +6,7 @@ import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
 
 import {
@@ -14,12 +15,16 @@ import {
 } from '../../../../redux/modules/__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../useModuleIdFromRun')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
 const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
   typeof useCreateCommandMutation
+>
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
 >
 
 const render = (props: React.ComponentProps<typeof MagneticModuleSlideout>) => {
@@ -48,6 +53,7 @@ describe('MagneticModuleSlideout', () => {
     mockUseCommandMutation.mockReturnValue({
       createCommand: mockCreateCommand,
     } as any)
+    mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -67,8 +73,8 @@ describe('MagneticModuleSlideout', () => {
     getByText('40')
     getByText('0')
     getByText('-5')
-    getByText('Engage height')
     getByText('Set Engage Height')
+    getByText('Confirm')
   })
 
   it('renders correct title and body for a gen2 magnetic module', () => {
@@ -90,23 +96,23 @@ describe('MagneticModuleSlideout', () => {
     getByText('16 mm')
     getByText('0 mm')
     getByText('-4 mm')
-    getByText('Engage height')
     getByText('Set Engage Height')
+    getByText('Confirm')
   })
 
   it('renders the button and it is not clickable until there is something in form field', () => {
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Engage Height' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('magneticModuleV1')
     fireEvent.change(input, { target: { value: '10' } })
     expect(button).toBeEnabled()
     fireEvent.click(button)
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'magneticModule/engageMagnet',
+        commandType: 'magneticModule/engage',
         params: {
           moduleId: 'magdeck_id',
-          engageHeight: 10,
+          height: 10,
         },
       },
     })
@@ -122,7 +128,7 @@ describe('MagneticModuleSlideout', () => {
     }
 
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Engage Height' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('magneticModuleV1')
     fireEvent.change(input, { target: { value: '10' } })
     expect(button).toBeEnabled()
@@ -130,10 +136,10 @@ describe('MagneticModuleSlideout', () => {
     expect(mockCreateCommand).toHaveBeenCalledWith({
       runId: props.runId,
       command: {
-        commandType: 'magneticModule/engageMagnet',
+        commandType: 'magneticModule/engage',
         params: {
           moduleId: 'magdeck_id',
-          engageHeight: 10,
+          height: 10,
         },
       },
     })

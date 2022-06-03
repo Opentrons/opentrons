@@ -2,17 +2,17 @@
 import asyncio
 import logging
 import json
-from typing import Mapping
+from typing import Any, Mapping, Optional
 from aiohttp import web
 
 from otupdate.common import (
     config,
+    control,
     ssh_key_management,
     name_management,
     constants,
     update,
 )
-from . import control
 from . import update_actions
 
 
@@ -38,11 +38,11 @@ def get_version(version_file: str) -> Mapping[str, str]:
 
 
 def get_app(
-    system_version_file: str = None,
-    config_file_override: str = None,
-    name_override: str = None,
-    boot_id_override: str = None,
-    loop: asyncio.AbstractEventLoop = None,
+    system_version_file: Optional[str] = None,
+    config_file_override: Optional[str] = None,
+    name_override: Optional[str] = None,
+    boot_id_override: Optional[str] = None,
+    loop: Optional[asyncio.AbstractEventLoop] = None,
 ) -> web.Application:
     """Build and return the aiohttp.web.Application that runs the server
 
@@ -52,7 +52,7 @@ def get_app(
         system_version_file = BR_BUILTIN_VERSION_FILE
 
     version = get_version(system_version_file)
-    name = name_override or name_management.get_name()
+    name = name_override or name_management.get_pretty_hostname()
     boot_id = boot_id_override or control.get_boot_id()
     config_obj = config.load(config_file_override)
 
@@ -88,7 +88,10 @@ def get_app(
     update_actions.OT2UpdateActions.build_and_insert(app)
     app.router.add_routes(
         [
-            web.get("/server/update/health", control.build_health_endpoint(version)),
+            web.get(
+                "/server/update/health",
+                control.build_health_endpoint(health_response(version_dict=version)),
+            ),
             web.post("/server/update/begin", update.begin),
             web.post("/server/update/cancel", update.cancel),
             web.get("/server/update/{session}/status", update.status),
@@ -104,3 +107,17 @@ def get_app(
         ]
     )
     return app
+
+
+def health_response(version_dict: Mapping[str, str]) -> Mapping[str, Any]:
+    """Create the buildroot specific health response."""
+    return {
+        "updateServerVersion": version_dict.get("update_server_version", "unknown"),
+        "apiServerVersion": version_dict.get("opentrons_api_version", "unknown"),
+        "smoothieVersion": "unimplemented",
+        "systemVersion": version_dict.get("buildroot_version", "unknown"),
+        "capabilities": {
+            "buildrootUpdate": "/server/update/begin",
+            "restart": "/server/restart",
+        },
+    }

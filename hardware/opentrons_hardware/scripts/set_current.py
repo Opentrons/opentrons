@@ -7,10 +7,9 @@ import logging
 from logging.config import dictConfig
 from typing import Dict, Tuple
 
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
+from opentrons_hardware.drivers.can_bus import build
 from opentrons_hardware.firmware_bindings.constants import NodeId
 
-from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.hardware_control.current_settings import set_currents
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
@@ -41,10 +40,6 @@ LOG_CONFIG = {
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    driver = await build_driver(build_settings(args))
-    messenger = CanMessenger(driver=driver)
-    messenger.start()
-
     with open(args.params_file_path, "r") as f:
         current_params = json.load(f)
 
@@ -52,13 +47,11 @@ async def run(args: argparse.Namespace) -> None:
     for k, v in current_params.items():
         currents[NodeId[k]] = (float(v["hold_current"]), float(v["run_current"]))
 
-    try:
-        await set_currents(messenger, currents)
-    except asyncio.CancelledError:
-        pass
-    finally:
-        await messenger.stop()
-        driver.shutdown()
+    async with build.can_messenger(build_settings(args)) as messenger:
+        try:
+            await set_currents(messenger, currents)
+        except asyncio.CancelledError:
+            pass
 
 
 def main() -> None:

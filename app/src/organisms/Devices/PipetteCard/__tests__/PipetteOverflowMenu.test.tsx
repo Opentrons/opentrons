@@ -38,7 +38,7 @@ describe('PipetteOverflowMenu', () => {
     const { getByRole } = render(props)
     const calibrate = getByRole('button', { name: 'Calibrate pipette offset' })
     const detach = getByRole('button', { name: 'Detach pipette' })
-    const settings = getByRole('button', { name: 'View pipette settings' })
+    const settings = getByRole('button', { name: 'Pipette Settings' })
     const about = getByRole('button', { name: 'About pipette' })
     fireEvent.click(detach)
     expect(props.handleChangePipette).toHaveBeenCalled()

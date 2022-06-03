@@ -2,8 +2,16 @@
 from dataclasses import dataclass
 from typing import List, overload
 from typing_extensions import Final
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
-from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32Field
+
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorType,
+    SensorThresholdMode,
+)
+
+from opentrons_hardware.firmware_bindings.utils.binary_serializable import (
+    Int32Field,
+)
 
 sensor_fixed_point_conversion: Final[float] = 2**16
 
@@ -18,6 +26,11 @@ class SensorDataType:
     @overload
     @classmethod
     def build(cls, data: int) -> "SensorDataType":
+        ...
+
+    @overload
+    @classmethod
+    def build(cls, data: float) -> "SensorDataType":
         ...
 
     @overload
@@ -37,6 +50,8 @@ class SensorDataType:
             backing = Int32Field(cls._convert_to_int(data))
         elif isinstance(data, Int32Field):
             backing = data
+        elif isinstance(data, float):
+            backing = Int32Field(int(data * sensor_fixed_point_conversion))
         else:
             backing = Int32Field(data)
         as_int = int(backing.value)
@@ -70,6 +85,14 @@ class WriteSensorInformation(SensorInformation):
     """Write sensor information."""
 
     data: SensorDataType
+
+
+@dataclass
+class SensorThresholdInformation(SensorInformation):
+    """Set a sensor threshold or request an autoset."""
+
+    data: SensorDataType
+    mode: SensorThresholdMode
 
 
 @dataclass

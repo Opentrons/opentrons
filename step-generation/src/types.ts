@@ -284,9 +284,9 @@ export type PauseArgs = CommonArgs & {
     | undefined
 }
 
-export interface AwaitTemperatureArgs {
+export interface WaitForTemperatureArgs {
   module: string | null
-  commandCreatorFnName: 'awaitTemperature'
+  commandCreatorFnName: 'waitForTemperature'
   temperature: number
   message?: string
 }
@@ -388,7 +388,7 @@ export type CommandCreatorArgs =
   | EngageMagnetArgs
   | DisengageMagnetArgs
   | SetTemperatureArgs
-  | AwaitTemperatureArgs
+  | WaitForTemperatureArgs
   | DeactivateTemperatureArgs
   | ThermocyclerProfileStepArgs
   | ThermocyclerStateStepArgs
@@ -475,6 +475,10 @@ export type ErrorType =
   | 'INVALID_SLOT'
   | 'HEATER_SHAKER_LATCH_OPEN'
   | 'HEATER_SHAKER_IS_SHAKING'
+  | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
+  | 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN'
+  | 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING'
+
 export interface CommandCreatorError {
   message: string
   type: ErrorType

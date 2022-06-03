@@ -13,7 +13,7 @@ describe('KeyParts', () => {
   it('renders correct title, image and body', () => {
     const { getByText, getByAltText, getByTestId } = render()
 
-    getByText('Key Heater Shaker parts and terminology')
+    getByText('Key Heater-Shaker parts and terminology')
     getByText(
       nestedTextMatcher(
         'Orient the module so its power ports face away from you.'
@@ -33,10 +33,10 @@ describe('KeyParts', () => {
       )
     )
     getByText(
-      'The screw above each anchor is used to extend and retract them. See animation below.'
+      'To extend and retract each anchor, turn the screw above it. See animation below.'
     )
     getByText(
-      'Extending the bolts slightly increases the module’s footprint, which allows it to be more firmly attached to the edges of a slot.'
+      'Extending the anchors increases the module’s footprint, which more firmly attaches it to the slot.'
     )
     getByAltText('Heater Shaker Key Parts')
 

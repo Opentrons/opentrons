@@ -12,13 +12,13 @@ import os
 import re
 import subprocess
 import tempfile
-from typing import Callable, Optional
+from typing import Callable, Generator, Optional
 
 from otupdate.common.file_actions import (
     unzip_update,
     hash_file,
-    verify_signature,
     HashMismatch,
+    verify_signature,
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
 
@@ -40,7 +40,7 @@ class OT2UpdateActions(UpdateActionsInterface):
         filepath: str,
         progress_callback: Callable[[float], None],
         cert_path: Optional[str],
-    ):
+    ) -> Optional[str]:
         """Worker for validation. Call in an executor (so it can return things)
 
         - Unzips filepath to its directory
@@ -52,6 +52,7 @@ class OT2UpdateActions(UpdateActionsInterface):
                                   only for user information
         :param cert_path: Path to an x.509 certificate to check the signature
                           against. If ``None``, signature checking is disabled
+
         :returns str: Path to the rootfs file to update
 
         Will also raise an exception if validation fails
@@ -94,7 +95,7 @@ class OT2UpdateActions(UpdateActionsInterface):
         rootfs_filepath: str,
         progress_callback: Callable[[float], None],
         chunk_size: int = 1024,
-        file_size: int = None,
+        file_size: Optional[int] = None,
     ) -> Partition:
         """
         Write the new rootfs to the next root partition
@@ -120,14 +121,12 @@ class OT2UpdateActions(UpdateActionsInterface):
         return unused.value
 
     @contextlib.contextmanager
-    def mount_update(self):
+    def mount_update(self) -> Generator[str, None, None]:
         """Mount the freshly-written partition r/w (to update machine-id).
 
         Should be used as a context manager, and the yielded value is the path
         to the mount. When the context manager exits, the partition will be
         unmounted again and its mountpoint removed.
-
-        :param mountpoint_in: The directory in which to create the mountpoint.
         """
         unused = _find_unused_partition()
         part_path = unused.value.path
@@ -151,7 +150,7 @@ class OT2UpdateActions(UpdateActionsInterface):
         else:
             LOG.info(f"commit_update: committed to booting {new}")
 
-    def write_machine_id(self, current_root: str, new_root: str):
+    def write_machine_id(self, current_root: str, new_root: str) -> None:
         """Update the machine id in target rootfs"""
         mid = open(os.path.join(current_root, "etc", "machine-id")).read()
         with open(os.path.join(new_root, "etc", "machine-id"), "w") as new_mid:
@@ -170,8 +169,8 @@ def write_file(
     outfile: str,
     progress_callback: Callable[[float], None],
     chunk_size: int = 1024,
-    file_size: int = None,
-):
+    file_size: Optional[int] = None,
+) -> None:
     """Write a file to another file with progress callbacks.
 
     :param infile: The input filepath

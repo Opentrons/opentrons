@@ -5,7 +5,6 @@ import isEmpty from 'lodash/isEmpty'
 import some from 'lodash/some'
 import { useTranslation } from 'react-i18next'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Flex,
   Icon,
@@ -13,7 +12,6 @@ import {
   Link,
   Module,
   RobotWorkSpace,
-  Tooltip,
   useHoverTooltip,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -22,7 +20,6 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
-  SIZE_5,
   TEXT_TRANSFORM_CAPITALIZE,
   TOOLTIP_LEFT,
   COLORS,
@@ -33,30 +30,32 @@ import {
   inferModuleOrientationFromXCoordinate,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
-import { SecondaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { StyledText } from '../../../atoms/text'
 import { useLPCSuccessToast } from '../../../organisms/ProtocolSetup/hooks'
-import { LabwarePositionCheck } from '../../../organisms/ProtocolSetup/LabwarePositionCheck'
+import { LabwarePositionCheck } from '../../../organisms/LabwarePositionCheck'
 import { ModuleExtraAttention } from './ModuleExtraAttention'
-import { LabwareInfoOverlay } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay'
+import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../organisms/ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import { DownloadOffsetDataModal } from '../../../organisms/ProtocolUpload/DownloadOffsetDataModal'
-import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
+import { ReapplyOffsetsModal } from '../../ReapplyOffsetsModal'
+import { useCurrentRun } from '../../ProtocolUpload/hooks'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
+  useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 import { ProceedToRunButton } from './ProceedToRunButton'
-
+import type { StepKey } from './ProtocolRunSetup'
 import type { DeckDefinition } from '@opentrons/shared-data'
-
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
   'fixedBase',
@@ -73,12 +72,16 @@ interface SetupLabwareProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
   robotName: string
   runId: string
+  nextStep: StepKey | null
+  expandStep: (step: StepKey) => void
 }
 
 export function SetupLabware({
   protocolRunHeaderRef,
   robotName,
   runId,
+  nextStep,
+  expandStep,
 }: SetupLabwareProps): JSX.Element {
   const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
     robotName,
@@ -96,7 +99,8 @@ export function SetupLabware({
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
-  const runStatus = useRunStatus(runId)
+  const runHasStarted = useRunHasStarted(runId)
+  const currentRun = useCurrentRun()
   const { protocolData } = useProtocolDetailsForRun(runId)
   const { t } = useTranslation('protocol_setup')
   const [
@@ -150,7 +154,7 @@ export function SetupLabware({
     lpcDisabledReason = t('lpc_disabled_calibration_not_complete')
   } else if (moduleSetupIncomplete) {
     lpcDisabledReason = t('lpc_disabled_modules_not_connected')
-  } else if (runStatus != null && runStatus !== RUN_STATUS_IDLE) {
+  } else if (runHasStarted) {
     lpcDisabledReason = t('labware_position_check_not_available')
   } else if (
     isEmpty(protocolData?.pipettes) ||
@@ -162,8 +166,15 @@ export function SetupLabware({
   } else if (!tipsArePickedUp) {
     lpcDisabledReason = t('lpc_disabled_no_tipracks_used')
   }
+
+  const showReapplyOffsetsModal =
+    currentRun?.data.id === runId &&
+    (currentRun?.data?.labwareOffsets == null ||
+      currentRun?.data?.labwareOffsets.length === 0)
+
   return (
     <>
+      {showReapplyOffsetsModal ? <ReapplyOffsetsModal runId={runId} /> : null}
       {showLabwareHelpModal && (
         <LabwareOffsetModal
           onCloseClick={() => setShowLabwareHelpModal(false)}
@@ -183,7 +194,8 @@ export function SetupLabware({
       )}
       <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
         <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing4}>
-          {moduleTypesThatRequireExtraAttention.length > 0 &&
+          {!runHasStarted &&
+          moduleTypesThatRequireExtraAttention.length > 0 &&
           moduleRenderInfoById ? (
             <ModuleExtraAttention
               moduleTypes={moduleTypesThatRequireExtraAttention}
@@ -333,7 +345,7 @@ export function SetupLabware({
                     {t('run_labware_position_check')}
                   </SecondaryButton>
                   {lpcDisabledReason !== null ? (
-                    <Tooltip maxWidth={SIZE_5} {...tooltipProps}>
+                    <Tooltip tooltipProps={tooltipProps}>
                       {lpcDisabledReason}
                     </Tooltip>
                   ) : null}
@@ -343,11 +355,17 @@ export function SetupLabware({
           </Flex>
         </Flex>
         <Flex justifyContent={JUSTIFY_CENTER}>
-          <ProceedToRunButton
-            protocolRunHeaderRef={protocolRunHeaderRef}
-            robotName={robotName}
-            runId={runId}
-          />
+          {nextStep == null ? (
+            <ProceedToRunButton
+              protocolRunHeaderRef={protocolRunHeaderRef}
+              robotName={robotName}
+              runId={runId}
+            />
+          ) : (
+            <PrimaryButton onClick={() => expandStep(nextStep)}>
+              {t('proceed_to_liquid_setup_step')}
+            </PrimaryButton>
+          )}
         </Flex>
       </Flex>
     </>

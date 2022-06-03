@@ -12,11 +12,12 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/Buttons'
+import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 const DROP_ZONE_STYLES = css`
   display: flex;
+  cursor: pointer;
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_CENTER};
   width: 100%;
@@ -25,6 +26,12 @@ const DROP_ZONE_STYLES = css`
   border-radius: ${BORDERS.radiusSoftCorners};
   text-align: center;
   background-color: ${COLORS.white};
+
+  &:hover,
+  &:focus-within {
+    background-color: ${COLORS.lightBlue};
+    border: 2px dashed ${COLORS.blue};
+  }
 `
 const DRAG_OVER_STYLES = css`
   background-color: ${COLORS.lightBlue};
@@ -54,7 +61,6 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
     e.preventDefault()
     e.stopPropagation()
     const { files = [] } = 'dataTransfer' in e ? e.dataTransfer : {}
-    console.log('files', files[0])
     props.onUpload(files[0])
     setIsFileOverDropZone(false)
   }

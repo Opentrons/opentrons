@@ -87,7 +87,7 @@ describe('heater shaker state updaters', () => {
     {
       params: {
         moduleId: moduleId,
-        temperature: 50,
+        celsius: 50,
       },
       moduleStateBefore: {
         targetTemp: null,

@@ -263,7 +263,7 @@ class HeaterShaker(mod_abc.AbstractModule):
                 await self.wait_next_poll()
 
         task = self._loop.create_task(_wait())
-        await self.make_cancellable(task)
+        self.make_cancellable(task)
         await task
 
     async def start_set_temperature(self, celsius: float) -> None:
@@ -308,7 +308,7 @@ class HeaterShaker(mod_abc.AbstractModule):
                     await self.wait_next_poll()
 
         t = self._loop.create_task(_await_temperature())
-        await self.make_cancellable(t)
+        self.make_cancellable(t)
         await t
 
     async def set_speed(self, rpm: int) -> None:
@@ -332,7 +332,7 @@ class HeaterShaker(mod_abc.AbstractModule):
                 await self.wait_next_poll()
 
         task = self._loop.create_task(_wait())
-        await self.make_cancellable(task)
+        self.make_cancellable(task)
         await task
 
     async def start_set_speed(self, rpm: int) -> None:
@@ -371,7 +371,7 @@ class HeaterShaker(mod_abc.AbstractModule):
                     await self.wait_next_poll()
 
         t = self._loop.create_task(_await_speed())
-        await self.make_cancellable(t)
+        self.make_cancellable(t)
         await t
 
     async def await_speed_and_temperature(self, temperature: float, speed: int) -> None:
@@ -395,9 +395,21 @@ class HeaterShaker(mod_abc.AbstractModule):
     async def deactivate(self) -> None:
         """Stop heating/cooling; stop shaking and home the plate"""
         await self.wait_for_is_running()
-        # TODO (spp, 2022-3-22): Use a separate gcode for deactivating heating
-        await self._driver.set_temperature(0)
+        await self._driver.deactivate_heater()
         await self._driver.home()
+        await self.wait_next_poll()
+
+    async def deactivate_heater(self) -> None:
+        """Stop heating/cooling"""
+        await self.wait_for_is_running()
+        await self._driver.deactivate_heater()
+        await self.wait_next_poll()
+
+    async def deactivate_shaker(self) -> None:
+        """Stop shaking and home the plate"""
+        await self.wait_for_is_running()
+        await self._driver.home()
+        await self.wait_next_poll()
 
     async def open_labware_latch(self) -> None:
         await self.wait_for_is_running()

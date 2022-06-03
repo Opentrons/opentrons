@@ -7,18 +7,23 @@ import {
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { TemperatureModuleSlideout } from '../TemperatureModuleSlideout'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import {
   mockTemperatureModule,
   mockTemperatureModuleGen2,
 } from '../../../../redux/modules/__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../useModuleIdFromRun')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
 const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
   typeof useCreateCommandMutation
+>
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
 >
 
 const render = (
@@ -51,6 +56,7 @@ describe('TemperatureModuleSlideout', () => {
     mockUseCommandMutation.mockReturnValue({
       createCommand: mockCreateCommand,
     } as any)
+    mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'tempdeck_id' })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -63,7 +69,7 @@ describe('TemperatureModuleSlideout', () => {
     getByText(
       'Pre heat or cool your Temperature Module GEN1. Enter a whole number between 4 °C and 96 °C.'
     )
-    getByText('Temperature')
+    getByText('Set temperature')
   })
 
   it('renders correct title and body for a gen2 temperature module', () => {
@@ -78,7 +84,7 @@ describe('TemperatureModuleSlideout', () => {
     getByText(
       'Pre heat or cool your Temperature Module GEN2. Enter a whole number between 4 °C and 96 °C.'
     )
-    getByText('Temperature')
+    getByText('Set temperature')
   })
 
   it('renders the button and it is not clickable until there is something in form field', () => {
@@ -88,7 +94,7 @@ describe('TemperatureModuleSlideout', () => {
       onCloseClick: jest.fn(),
     }
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Temperature' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('temperatureModuleV2')
     fireEvent.change(input, { target: { value: '20' } })
     expect(button).toBeEnabled()
@@ -99,7 +105,7 @@ describe('TemperatureModuleSlideout', () => {
         commandType: 'temperatureModule/setTargetTemperature',
         params: {
           moduleId: mockTemperatureModule.id,
-          temperature: 20,
+          celsius: 20,
         },
       },
     })
@@ -114,7 +120,7 @@ describe('TemperatureModuleSlideout', () => {
       runId: 'test123',
     }
     const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Set Temperature' })
+    const button = getByRole('button', { name: 'Confirm' })
     const input = getByTestId('temperatureModuleV2')
     fireEvent.change(input, { target: { value: '20' } })
     expect(button).toBeEnabled()
@@ -126,7 +132,7 @@ describe('TemperatureModuleSlideout', () => {
         commandType: 'temperatureModule/setTargetTemperature',
         params: {
           moduleId: mockTemperatureModule.id,
-          temperature: 20,
+          celsius: 20,
         },
       },
     })

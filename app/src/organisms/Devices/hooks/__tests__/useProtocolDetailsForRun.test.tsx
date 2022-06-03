@@ -48,6 +48,7 @@ const PROTOCOL_RESPONSE = {
     id: '1',
     metadata: { protocolName: 'fake protocol' },
     analysisSummaries: [{ id: 'fake analysis', status: 'completed' }],
+    key: 'fakeProtocolKey',
   },
 } as Protocol
 
@@ -56,13 +57,13 @@ const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnaly
 describe('useProtocolDetailsForRun hook', () => {
   beforeEach(() => {
     when(mockUseRunQuery)
-      .calledWith(null)
+      .calledWith(null, { staleTime: Infinity })
       .mockReturnValue({} as UseQueryResult<Run>)
     when(mockUseProtocolQuery)
-      .calledWith(null, { staleTime: Infinity }, true)
+      .calledWith(null, { staleTime: Infinity })
       .mockReturnValue({} as UseQueryResult<Protocol>)
     when(mockUseProtocolAnalysesQuery)
-      .calledWith(null, { staleTime: Infinity })
+      .calledWith(null, { staleTime: Infinity }, true)
       .mockReturnValue({
         data: { data: [] } as any,
       } as UseQueryResult<ProtocolAnalyses>)
@@ -77,6 +78,7 @@ describe('useProtocolDetailsForRun hook', () => {
     expect(result.current).toStrictEqual({
       displayName: null,
       protocolData: null,
+      protocolKey: null,
     })
   })
 
@@ -87,15 +89,15 @@ describe('useProtocolDetailsForRun hook', () => {
       status: 'completed',
     } as CompletedProtocolAnalysis
     when(mockUseRunQuery)
-      .calledWith(RUN_ID_2)
+      .calledWith(RUN_ID_2, { staleTime: Infinity })
       .mockReturnValue({
         data: { data: { protocolId: PROTOCOL_ID } } as any,
       } as UseQueryResult<Run>)
     when(mockUseProtocolQuery)
-      .calledWith(PROTOCOL_ID, { staleTime: Infinity }, expect.any(Boolean))
+      .calledWith(PROTOCOL_ID, { staleTime: Infinity })
       .mockReturnValue({ data: PROTOCOL_RESPONSE } as UseQueryResult<Protocol>)
     when(mockUseProtocolAnalysesQuery)
-      .calledWith(PROTOCOL_ID, { staleTime: Infinity })
+      .calledWith(PROTOCOL_ID, { staleTime: Infinity }, expect.any(Boolean))
       .mockReturnValue({
         data: { data: [PROTOCOL_ANALYSIS as any] },
       } as UseQueryResult<ProtocolAnalyses>)
@@ -108,6 +110,7 @@ describe('useProtocolDetailsForRun hook', () => {
     expect(result.current).toStrictEqual({
       displayName: 'fake protocol',
       protocolData: simpleV6Protocol,
+      protocolKey: 'fakeProtocolKey',
     })
   })
 })
