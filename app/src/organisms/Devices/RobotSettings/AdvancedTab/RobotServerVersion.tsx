@@ -18,6 +18,7 @@ import { StyledText } from '../../../../atoms/text'
 import { getRobotApiVersion, UNREACHABLE } from '../../../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
+import { useIsRobotBusy } from '../../hooks/useIsRobotBusy'
 import { useRobot } from '../../hooks'
 
 import type { State } from '../../../../redux/types'
@@ -34,6 +35,7 @@ export function RobotServerVersion({
 }: RobotServerVersionProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const robot = useRobot(robotName)
+  const isBusy = useIsRobotBusy()
   const { autoUpdateAction } = useSelector((state: State) => {
     return getBuildrootUpdateDisplayInfo(state, robotName)
   })
@@ -60,7 +62,7 @@ export function RobotServerVersion({
           />
         </Portal>
       ) : null}
-      {autoUpdateAction !== 'reinstall' && robot != null ? (
+      {autoUpdateAction !== 'reinstall' && robot != null && !isBusy ? (
         <Box marginBottom={SPACING.spacing4} width="100%">
           <UpdateRobotBanner
             robot={robot}
