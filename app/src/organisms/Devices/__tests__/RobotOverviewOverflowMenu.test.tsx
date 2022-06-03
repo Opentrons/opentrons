@@ -9,7 +9,10 @@ import { home } from '../../../redux/robot-controls'
 import { UpdateBuildroot } from '../../../pages/Robots/RobotSettings/UpdateBuildroot'
 import * as Buildroot from '../../../redux/buildroot'
 import { restartRobot } from '../../../redux/robot-admin'
-import { mockConnectableRobot, mockReachableRobot } from '../../../redux/discovery/__fixtures__'
+import {
+  mockConnectableRobot,
+  mockReachableRobot,
+} from '../../../redux/discovery/__fixtures__'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 import { useIsRobotBusy } from '../hooks'
@@ -31,7 +34,9 @@ const mockHome = home as jest.MockedFunction<typeof home>
 const mockRestartRobot = restartRobot as jest.MockedFunction<
   typeof restartRobot
 >
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<typeof useIsRobotBusy>
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
+>
 const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
   typeof UpdateBuildroot
 >
@@ -165,6 +170,6 @@ describe('RobotOverviewOverflowMenu', () => {
     fireEvent.click(btn)
     getByRole('button', { name: 'restart robot' })
     getByRole('button', { name: 'Home gantry' })
-    getByRole('link', { name: 'robot settings' })
+    getByRole('button', { name: 'robot settings' })
   })
 })

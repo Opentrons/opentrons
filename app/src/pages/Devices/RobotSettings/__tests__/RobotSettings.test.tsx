@@ -10,7 +10,11 @@ import { RobotSettingsAdvanced } from '../../../../organisms/Devices/RobotSettin
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { RobotSettings } from '..'
 import { when } from 'jest-when'
-import { mockConnectableRobot, mockReachableRobot, mockUnreachableRobot } from '../../../../redux/discovery/__fixtures__'
+import {
+  mockConnectableRobot,
+  mockReachableRobot,
+  mockUnreachableRobot,
+} from '../../../../redux/discovery/__fixtures__'
 
 jest.mock(
   '../../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
@@ -29,9 +33,7 @@ const mockRobotSettingsNetworking = RobotSettingsNetworking as jest.MockedFuncti
 const mockRobotSettingsAdvanced = RobotSettingsAdvanced as jest.MockedFunction<
   typeof RobotSettingsAdvanced
 >
-const mockUseRobot = useRobot as jest.MockedFunction<
-  typeof useRobot
->
+const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -83,19 +85,21 @@ describe('RobotSettings', () => {
 
   it('redirects to device details if robot is null', () => {
     when(mockUseRobot).calledWith('otie').mockReturnValue(null)
-    const [{ getByText  }] = render('/devices/otie/robot-settings/calibration')
+    const [{ getByText }] = render('/devices/otie/robot-settings/calibration')
     getByText('mock device details')
   })
 
   it('redirects to device details if robot is reachable but server is down', () => {
-    when(mockUseRobot).calledWith('otie').mockReturnValue({...mockReachableRobot, serverHealthStatus: 'notOk'})
-    const [{ getByText  }] = render('/devices/otie/robot-settings/calibration')
+    when(mockUseRobot)
+      .calledWith('otie')
+      .mockReturnValue({ ...mockReachableRobot, serverHealthStatus: 'notOk' })
+    const [{ getByText }] = render('/devices/otie/robot-settings/calibration')
     getByText('mock device details')
   })
 
   it('redirects to networking tab if robot not connectable', () => {
     when(mockUseRobot).calledWith('otie').mockReturnValue(mockReachableRobot)
-    const [{ getByText  }] = render('/devices/otie/robot-settings/calibration')
+    const [{ getByText }] = render('/devices/otie/robot-settings/calibration')
     getByText('Mock RobotSettingsNetworking')
   })
 
@@ -139,5 +143,4 @@ describe('RobotSettings', () => {
     AdvancedTab.click()
     getByText('Mock RobotSettingsAdvanced')
   })
-
 })

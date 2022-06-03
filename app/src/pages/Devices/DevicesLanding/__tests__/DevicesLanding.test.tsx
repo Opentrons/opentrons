@@ -81,7 +81,7 @@ describe('DevicesLanding', () => {
   })
 
   it('renders available and unavailable sections when both are present', () => {
-    const [{ getByText, getByTestId, queryByText}] = render()
+    const [{ getByText, getByTestId, queryByText }] = render()
 
     getByText('Mock Robot connectableRobot')
     getByText('Available (1)')
@@ -90,7 +90,9 @@ describe('DevicesLanding', () => {
     expect(queryByText('Mock Robot unreachableRobot')).toBeNull()
     expect(queryByText('Mock Robot reachableRobot')).toBeNull()
 
-    const expandButton = getByTestId('CollapsibleSection_expand_Unavailable (2)')
+    const expandButton = getByTestId(
+      'CollapsibleSection_expand_Unavailable (2)'
+    )
     fireEvent.click(expandButton)
 
     getByText('Mock Robot unreachableRobot')
