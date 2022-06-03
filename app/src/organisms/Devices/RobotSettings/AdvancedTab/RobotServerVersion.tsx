@@ -21,7 +21,6 @@ import { useIsRobotBusy } from '../../hooks/useIsRobotBusy'
 import { useRobot } from '../../hooks'
 import { UpdateBuildroot } from '../UpdateBuildroot'
 
-
 import type { State } from '../../../../redux/types'
 
 interface RobotServerVersionProps {
