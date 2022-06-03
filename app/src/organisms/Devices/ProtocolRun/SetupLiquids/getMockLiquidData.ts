@@ -15,6 +15,11 @@ const mockLiquids = {
     description: 'sample',
     displayColor: '#ff4888',
   },
+  '3': {
+    displayName: 'liquid 4',
+    description: 'sample 4',
+    displayColor: '#ff4888',
+  },
 }
 const mockCommands = [
   {
@@ -81,9 +86,19 @@ const mockCommands = [
       volumeByWell: { A1: 20, B1: 20, A2: 20, B2: 20 },
     },
   },
+  {
+    commandType: 'loadLiquid',
+    key: '61731404-e1d8-11ec-8729-359ce212bee2',
+    params: {
+      liquidId: '3',
+      labwareId:
+        '08433310-e1d8-11ec-8729-359ce212aee2:opentrons/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic/1',
+      volumeByWell: { A2: 20, B2: 20, A3: 20, B3: 20 },
+    },
+  },
 ]
 
-interface Liquid {
+export interface Liquid {
   liquidId: string
   displayName: string
   description: string
