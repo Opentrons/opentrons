@@ -152,13 +152,13 @@ def thermocycler_close() -> command_types.ThermocyclerCloseCommand:
     text = "Closing Thermocycler lid"
     return {"name": command_types.THERMOCYCLER_CLOSE, "payload": {"text": text}}
 
-def heater_shaker_set_and_wait_for_temperature(temperature:float) -> command_types.HeaterShakerSetAndWaitForTemperatureCommand:
+def heater_shaker_set_and_wait_for_temperature(temperature: float) -> command_types.HeaterShakerSetAndWaitForTemperatureCommand:
     # given rounding precision 2, formats float 1.23456 as 1.23
     formatted_temp = format(temperature,f'.{utils.HS_GCODE_ROUNDING_PRECISION}f')
     text = f"Setting Temperature of Heater Shaker to {formatted_temp} °C and waiting until reached"
     return {"name":command_types.HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE, "payload": {"text":text}}
 
-def heater_shaker_set_target_temperature(temperature:float) -> command_types.HeaterShakerSetTargetTemperatureCommand:
+def heater_shaker_set_target_temperature(temperature: float) -> command_types.HeaterShakerSetTargetTemperatureCommand:
     formatted_temp = format(temperature,f'.{utils.HS_GCODE_ROUNDING_PRECISION}f')
     text = f"Setting Target Temperature of Heater Shaker to {formatted_temp} °C"
     return {"name":command_types.HEATER_SHAKER_SET_TARGET_TEMPERATURE, "payload": {"text":text}}
@@ -167,8 +167,8 @@ def heater_shaker_wait_for_temperature() -> command_types.HeaterShakerWaitForTem
     text = "Waiting for Heater Shaker to reach target temperature"
     return {"name":command_types.HEATER_SHAKER_WAIT_FOR_TEMPERATURE, "payload": {"text":text}}
 
-def heater_shaker_set_and_wait_for_shake_speed() -> command_types.HeaterShakerSetAndWaitForShakeSpeedCommand:
-    text = ""
+def heater_shaker_set_and_wait_for_shake_speed(rpm: int) -> command_types.HeaterShakerSetAndWaitForShakeSpeedCommand:
+    text = f"Setting Heater Shaker to Shake at {rpm} RPM and waiting until reached"
     return {"name":command_types.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED, "payload": {"text":text}}
 
 def heater_shaker_open_labware_latch() -> command_types.HeaterShakerOpenLabwareLatchCommand:

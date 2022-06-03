@@ -147,6 +147,7 @@ class ResumeCommand(TypedDict):
 
 
 class HeaterShakerSetAndWaitForTemperaturePayload(TextOnlyPayload):
+    temperature: float
     pass
 
 class HeaterShakerSetAndWaitForTemperatureCommand(TypedDict):
@@ -154,6 +155,7 @@ class HeaterShakerSetAndWaitForTemperatureCommand(TypedDict):
     payload: HeaterShakerSetAndWaitForTemperaturePayload
 
 class HeaterShakerSetTargetTemperaturePayload(TextOnlyPayload):
+    temperature: float
     pass
 
 class HeaterShakerSetTargetTemperatureCommand(TypedDict):
@@ -168,6 +170,7 @@ class HeaterShakerWaitForTemperatureCommand(TypedDict):
     payload: HeaterShakerWaitForTemperaturePayload
 
 class HeaterShakerSetAndWaitForShakeSpeedPayload(TextOnlyPayload):
+    rpm: int
     pass
 
 class HeaterShakerSetAndWaitForShakeSpeedCommand(TypedDict):
