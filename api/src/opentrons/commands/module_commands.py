@@ -22,8 +22,8 @@ def magdeck_calibrate() -> command_types.MagdeckCalibrateCommand:
 
 
 def tempdeck_set_temp(celsius: float) -> command_types.TempdeckSetTempCommand:
-    temp = format(celsius,f'.{utils.TEMPDECK_GCODE_ROUNDING_PRECISION}f')
-    # temp = round(float(celsius), utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
+    # TODO: SB 2022-06-03 Investigate if we should change this to match hs style below
+    temp = round(float(celsius), utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
     text = (
         f"Setting Temperature Module temperature "
         f"to {temp} °C (rounded off to nearest integer)"
