@@ -94,7 +94,7 @@ class RealNameSynchronizer(NameSynchronizer):
     @asynccontextmanager
     async def build(
         cls, avahi_client: AvahiClient
-    ) -> AsyncGenerator[NameSynchronizer, None]:
+    ) -> AsyncGenerator[RealNameSynchronizer, None]:
         """Build a RealNameSynchronizer and keep it running in the background.
 
         Avahi advertisements will start as soon as this context manager is entered.
