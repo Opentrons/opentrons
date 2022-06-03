@@ -141,3 +141,4 @@ export interface ConfigV8 extends Omit<ConfigV7, 'version'> {
 }
 
 export type Config = ConfigV8
+
