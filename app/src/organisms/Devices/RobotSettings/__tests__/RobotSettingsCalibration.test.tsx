@@ -58,7 +58,7 @@ jest.mock(
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/calibration/selectors')
-jest.mock('../../../../redux/pipettes/selectors')
+jest.mock('../../../../redux/pipettes')
 jest.mock('../../../../redux/calibration/tip-length/selectors')
 jest.mock('../../../../redux/calibration/pipette-offset/selectors')
 jest.mock('../../../../redux/robot/selectors')
@@ -297,17 +297,7 @@ describe('RobotSettingsCalibration', () => {
     getByRole('button', { name: 'Calibrate now' })
   })
 
-  // TODO kj 06/02/2022 temporarily skip this case and this will be solved by another PR
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip('should call update robot status if a robot is busy - deck cal', () => {
-    mockUseDeckCalibrationStatus.mockReturnValue(
-      Calibration.DECK_CAL_STATUS_IDENTITY
-    )
-    mockUseDeckCalibrationData.mockReturnValue({
-      deckCalibrationData: mockWarningDeckCalData,
-      isDeckCalibrated: true,
-    })
-    mockGetIsRunning.mockReturnValue(false)
+  it('should call update robot status if a robot is busy - deck cal', () => {
     mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Recalibrate deck' })
@@ -391,7 +381,7 @@ describe('RobotSettingsCalibration', () => {
   it('renders a Check health button', () => {
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Check health' })
-    expect(button).toBeDisabled()
+    expect(button).not.toBeDisabled()
   })
 
   it('Health check button is disabled when a robot is unreachable', () => {
