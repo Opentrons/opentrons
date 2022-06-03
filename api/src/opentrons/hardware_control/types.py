@@ -183,7 +183,7 @@ class OT3Axis(enum.Enum):
             checked_mount = OT3Mount.from_mount(mount)
         else:
             checked_mount = mount
-        pm = {OT3Mount.LEFT: cls.P_L, OT3Mount.RIGHT: cls.P_R, OT3Mount.GRIPPER: cls.G}
+        pm = {OT3Mount.LEFT: cls.P_L, OT3Mount.RIGHT: cls.P_R, OT3Mount.GRIPPER: cls.Z_G}
         return pm[checked_mount]
 
     @classmethod

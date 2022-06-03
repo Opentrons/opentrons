@@ -19,6 +19,7 @@ from opentrons_hardware.hardware_control.tools.detector import OneshotToolDetect
 from opentrons_hardware.hardware_control.tools.types import (
     ToolSummary,
     PipetteInformation,
+    GripperInformation,
 )
 
 
@@ -83,7 +84,7 @@ def mock_tool_detector(controller: OT3Controller):
     ) as md:
 
         md.return_value = ToolSummary(
-            right=None, left=None, gripper=ToolType.nothing_attached
+            right=None, left=None, gripper=None,
         )
 
         yield md
@@ -239,7 +240,7 @@ async def test_get_attached_instruments(
     controller: OT3Controller, mock_tool_detector: OneshotToolDetector
 ):
     async def fake_probe(can_messenger, expected, timeout):
-        return set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head))
+        return set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head, NodeId.gripper))
 
     with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
         assert await controller.get_attached_instruments({}) == {}
@@ -247,14 +248,16 @@ async def test_get_attached_instruments(
     mock_tool_detector.return_value = ToolSummary(
         left=PipetteInformation(name=PipetteName.p1000_single, model=0, serial="hello"),
         right=None,
-        gripper=ToolType.nothing_attached,
+        gripper=GripperInformation(model=1, serial="fake_serial"),
     )
 
     with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
         detected = await controller.get_attached_instruments({})
-    assert list(detected.keys()) == [OT3Mount.LEFT]
+    assert list(detected.keys()) == [OT3Mount.LEFT, OT3Mount.GRIPPER]
     assert detected[OT3Mount.LEFT]["id"] == "hello"
     assert detected[OT3Mount.LEFT]["config"].name == "p1000_single_gen3"
+    assert detected[OT3Mount.GRIPPER]["id"] == "fake_serial"
+    assert detected[OT3Mount.GRIPPER]["config"].name == "gripper"
 
 
 def test_nodeid_replace_head():
