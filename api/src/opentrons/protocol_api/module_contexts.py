@@ -5,6 +5,7 @@ import logging
 from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, cast
 
 from opentrons import types
+from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control import modules
 from opentrons.hardware_control.modules import ModuleModel, types as module_types
 from opentrons.hardware_control.types import Axis
@@ -927,10 +928,17 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         Set the heater shaker's target speed and wait until the specified speed has
         reached. Delays protocol execution until the target speed has been achieved.
         """
-        # TODO: Figure out whether to raise error when latch is open or
-        #  whether to issue close latch behind the scenes
-        validated_speed = validate_heater_shaker_speed(rpm=rpm)
-        self._module.set_speed(rpm=validated_speed)
+        if (
+            self._module.labware_latch_status
+            == HeaterShakerLabwareLatchStatus.IDLE_CLOSED
+        ):
+            validated_speed = validate_heater_shaker_speed(rpm=rpm)
+            self._module.set_speed(rpm=validated_speed)
+        else:
+            # TODO: Figure out whether to issue close latch behind the scenes instead
+            raise CannotPerformModuleAction(
+                "Cannot start H/S shake unless labware" " latch is closed."
+            )
 
     # TODO: add command publisher
     @requires_heatershaker_ff  # TODO: replace with API version requirement

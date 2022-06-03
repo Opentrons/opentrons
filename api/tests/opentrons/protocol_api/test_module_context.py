@@ -667,6 +667,11 @@ def test_heater_shaker_set_and_wait_for_shake_speed(
     ctx_with_heater_shaker: ProtocolContext, mock_module_controller: mock.MagicMock
 ) -> None:
     """It should issue a blocking set target shake speed."""
+    mock_latch_status = mock.PropertyMock(
+        return_value=HeaterShakerLabwareLatchStatus.IDLE_CLOSED
+    )
+    type(mock_module_controller).labware_latch_status = mock_latch_status
+
     with mock.patch(
         "opentrons.protocol_api.module_contexts.validate_heater_shaker_speed"
     ) as mock_validator:
@@ -675,6 +680,30 @@ def test_heater_shaker_set_and_wait_for_shake_speed(
         hs_mod.set_and_wait_for_shake_speed(rpm=400)  # type: ignore[union-attr]
         mock_validator.assert_called_once_with(rpm=400)
         mock_module_controller.set_speed.assert_called_once_with(rpm=10)
+
+
+@pytest.mark.parametrize(
+    "latch_status",
+    [
+        HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
+        HeaterShakerLabwareLatchStatus.UNKNOWN,
+        HeaterShakerLabwareLatchStatus.CLOSING,
+        HeaterShakerLabwareLatchStatus.IDLE_OPEN,
+        HeaterShakerLabwareLatchStatus.OPENING,
+    ],
+)
+def test_heater_shaker_set_and_wait_for_shake_speed_raises(
+    ctx_with_heater_shaker: ProtocolContext,
+    mock_module_controller: mock.MagicMock,
+    latch_status: HeaterShakerLabwareLatchStatus,
+) -> None:
+    """It should raise an error while setting speed when labware latch not closed."""
+    mock_latch_status = mock.PropertyMock(return_value=latch_status)
+    type(mock_module_controller).labware_latch_status = mock_latch_status
+
+    with pytest.raises(CannotPerformModuleAction):
+        hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
+        hs_mod.set_and_wait_for_shake_speed(rpm=400)  # type: ignore[union-attr]
 
 
 def test_heater_shaker_open_labware_latch(
