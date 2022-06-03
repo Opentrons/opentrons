@@ -399,9 +399,16 @@ export function RobotSettingsCalibration({
   }
 
   const checkPipetteCalibrationMissing = (): void => {
+    // checked the number of attached pipettes
+    const numberOfAttached = Object.keys(attachedPipettes)
+      .map(mount => attachedPipettes[mount as Mount] != null)
+      .filter(x => x).length
+    const isPipettesNumberMatched =
+      numberOfAttached === formatPipetteOffsetCalibrations().length
     if (
       pipetteOffsetCalibrations === null ||
-      Object.values(pipetteOffsetCalibrations).length <= 1
+      (Object.values(pipetteOffsetCalibrations).length <= 1 &&
+        isPipettesNumberMatched)
     ) {
       setShowPipetteOffsetCalibrationBanner(true)
       setPipetteOffsetCalBannerType('error')
@@ -414,7 +421,7 @@ export function RobotSettingsCalibration({
             (p.pipette === left && p.status.markedBad) ||
             (p.pipette === right && p.status.markedBad)
         ) ?? null
-      if (markedBads.length !== 0) {
+      if (markedBads.length !== 0 && isPipettesNumberMatched) {
         setShowPipetteOffsetCalibrationBanner(true)
         setPipetteOffsetCalBannerType('warning')
       } else {
