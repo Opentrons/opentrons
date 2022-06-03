@@ -8,7 +8,7 @@ import {
   SPACING,
   COLORS,
   TYPOGRAPHY,
-  OVERLAY_BLACK_90,
+  OVERLAY_BLACK_70,
   DISPLAY_FLEX,
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
@@ -41,7 +41,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
 
   return (
     <Box
-      backgroundColor={OVERLAY_BLACK_90}
+      backgroundColor={OVERLAY_BLACK_70}
       borderRadius={`0 0 0.4rem 0.4rem`}
       fontSize={FONT_SIZE_CAPTION}
       padding={SPACING.spacing2}

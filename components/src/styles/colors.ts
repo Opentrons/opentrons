@@ -48,6 +48,9 @@ export const OVERLAY_GRAY_90 = 'rgba(127, 127, 127, 0.9)'
 // darkest modal overlay used
 export const OVERLAY_BLACK_90 = 'rgba(0, 0, 0, 0.9)'
 
+// 70 percent opacity overlay
+export const OVERLAY_BLACK_70 = 'rgba(0, 0, 0, 0.7)'
+
 // opacities
 export const OPACITY_DISABLED = 0.3
 
