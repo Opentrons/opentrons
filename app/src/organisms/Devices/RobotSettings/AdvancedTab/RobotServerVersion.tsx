@@ -12,7 +12,6 @@ import {
   Link,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { UpdateBuildroot } from '../../../../pages/Robots/RobotSettings/UpdateBuildroot'
 import { Portal } from '../../../../App/portal'
 import { StyledText } from '../../../../atoms/text'
 import { getRobotApiVersion, UNREACHABLE } from '../../../../redux/discovery'
@@ -20,6 +19,8 @@ import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
 import { useIsRobotBusy } from '../../hooks/useIsRobotBusy'
 import { useRobot } from '../../hooks'
+import { UpdateBuildroot } from '../UpdateBuildroot'
+
 
 import type { State } from '../../../../redux/types'
 

@@ -20,12 +20,12 @@ import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { StyledText } from '../../atoms/text'
 import { UNREACHABLE } from '../../redux/discovery'
 import { Portal } from '../../App/portal'
-import { UpdateBuildroot } from '../../pages/Robots/RobotSettings/UpdateBuildroot'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { useAttachedModules, useAttachedPipettes } from './hooks'
 import { RobotStatusBanner } from './RobotStatusBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
+import { UpdateBuildroot } from './RobotSettings/UpdateBuildroot/index'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 

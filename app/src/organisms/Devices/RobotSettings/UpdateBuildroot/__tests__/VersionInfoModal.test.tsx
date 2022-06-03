@@ -9,7 +9,7 @@ import { mockReachableRobot } from '../../../../../redux/discovery/__fixtures__'
 import { UPGRADE, DOWNGRADE, REINSTALL } from '../../../../../redux/buildroot'
 import * as Shell from '../../../../../redux/shell'
 import { Portal } from '../../../../../App/portal'
-import { UpdateAppModal } from '../../../../../organisms/UpdateAppModal'
+import { UpdateAppModal } from '../../../../UpdateAppModal'
 import { VersionList } from '../VersionList'
 import { SyncRobotMessage } from '../SyncRobotMessage'
 import { SkipAppUpdateMessage } from '../SkipAppUpdateMessage'
@@ -18,7 +18,7 @@ import { VersionInfoModal } from '../VersionInfoModal'
 import type { State, Action } from '../../../../../redux/types'
 
 jest.mock('../../../../../redux/shell/update')
-jest.mock('../../../../../organisms/UpdateAppModal', () => ({
+jest.mock('../../../../UpdateAppModal', () => ({
   UpdateAppModal: () => null,
 }))
 

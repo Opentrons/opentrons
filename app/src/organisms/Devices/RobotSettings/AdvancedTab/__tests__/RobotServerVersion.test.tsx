@@ -4,14 +4,14 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { getRobotApiVersion } from '../../../../../redux/discovery'
-import { UpdateBuildroot } from '../../../../../pages/Robots/RobotSettings/UpdateBuildroot'
 import { getBuildrootUpdateDisplayInfo } from '../../../../../redux/buildroot'
 import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
 import { useIsRobotBusy, useRobot } from '../../../hooks'
+import { UpdateBuildroot } from '../../UpdateBuildroot'
 import { RobotServerVersion } from '../RobotServerVersion'
 
 jest.mock('../../../hooks')
-jest.mock('../../../../../pages/Robots/RobotSettings/UpdateBuildroot')
+jest.mock('../../UpdateBuildroot')
 jest.mock('../../../../../redux/buildroot/selectors')
 jest.mock('../../../../../redux/discovery/selectors')
 
