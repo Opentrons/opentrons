@@ -43,11 +43,24 @@ def mock_avahi_client(decoy: Decoy) -> AvahiClient:
     return decoy.mock(cls=AvahiClient)
 
 
-def test_build_and_startup() -> None:
-    # It should start advertising with the current pretty hostname
-    # as the Avahi service name.
-    raise NotImplementedError()
-    # decoy.verify(await mock_avahi_client.start_advertising("initial name"))
+async def test_advertises_name(
+    mock_get_pretty_hostname: Callable[[], str],
+    monkeypatch_get_pretty_hostname: None,
+    mock_persist_pretty_hostname: Callable[[str], str],
+    monkeypatch_persist_pretty_hostname: None,
+    mock_avahi_client: AvahiClient,
+    decoy: Decoy,
+) -> None:
+    decoy.when(mock_get_pretty_hostname()).then_return("initial name")
+    decoy.when(
+        mock_avahi_client.collision_callback(matchers.Anything())
+    ).then_enter_with(
+        # https://github.com/mcous/decoy/issues/135
+        "<value unused>"
+    )
+
+    async with RealNameSynchronizer.build(avahi_client=mock_avahi_client) as subject:
+        decoy.verify(await mock_avahi_client.start_advertising("initial name"))
 
 
 async def test_collision_handling(
@@ -102,10 +115,87 @@ async def test_collision_handling(
     )
 
 
-def test_set() -> None:
-    # Test when given a name that Avahi doesn't like.
-    raise NotImplementedError()
+async def test_set(
+    mock_get_pretty_hostname: Callable[[], str],
+    monkeypatch_get_pretty_hostname: None,
+    mock_persist_pretty_hostname: Callable[[str], str],
+    monkeypatch_persist_pretty_hostname: None,
+    mock_avahi_client: AvahiClient,
+    decoy: Decoy,
+) -> None:
+    """It should set the new name as the Avahi service name and then as the pretty
+    hostname.
+    """
+    decoy.when(mock_get_pretty_hostname()).then_return("initial name")
+    decoy.when(
+        mock_avahi_client.collision_callback(matchers.Anything())
+    ).then_enter_with(
+        # https://github.com/mcous/decoy/issues/135
+        "<value unused>"
+    )
+
+    async with RealNameSynchronizer.build(avahi_client=mock_avahi_client) as subject:
+        await subject.set_name("new name")
+
+    decoy.verify(
+        await mock_avahi_client.start_advertising("new name"),
+        await mock_persist_pretty_hostname("new name"),
+    )
 
 
-def test_get() -> None:
-    raise NotImplementedError()
+async def test_set_does_not_persist_invalid_avahi_service_name(
+    mock_get_pretty_hostname: Callable[[], str],
+    monkeypatch_get_pretty_hostname: None,
+    mock_persist_pretty_hostname: Callable[[str], str],
+    monkeypatch_persist_pretty_hostname: None,
+    mock_avahi_client: AvahiClient,
+    decoy: Decoy,
+) -> None:
+    """It should not persist any name that's not valid as an Avahi service name.
+
+    Covers this bug:
+    https://github.com/Opentrons/opentrons/issues/9960
+    """
+
+    decoy.when(mock_get_pretty_hostname()).then_return("initial name, no danger")
+    decoy.when(
+        mock_avahi_client.collision_callback(matchers.Anything())
+    ).then_enter_with(
+        # https://github.com/mcous/decoy/issues/135
+        "<value unused>"
+    )
+
+    decoy.when(
+        await mock_avahi_client.start_advertising("danger!")
+    ).then_raise(Exception("oh the humanity"))
+
+    async with RealNameSynchronizer.build(avahi_client=mock_avahi_client) as subject:
+        with pytest.raises(Exception, match="oh the humanity"):
+            await subject.set_name("danger!")
+
+    decoy.verify(
+        await mock_persist_pretty_hostname(matchers.Anything()),
+        times=0
+    )
+
+
+async def test_get(
+    mock_get_pretty_hostname: Callable[[], str],
+    monkeypatch_get_pretty_hostname: None,
+    mock_persist_pretty_hostname: Callable[[str], str],
+    monkeypatch_persist_pretty_hostname: None,
+    mock_avahi_client: AvahiClient,
+    decoy: Decoy,
+) -> None:
+    decoy.when(mock_get_pretty_hostname()).then_return("initial name, no danger")
+    decoy.when(
+        mock_avahi_client.collision_callback(matchers.Anything())
+    ).then_enter_with(
+        # https://github.com/mcous/decoy/issues/135
+        "<value unused>"
+    )
+
+    decoy.when(mock_get_pretty_hostname()).then_return("the current name")
+
+    async with RealNameSynchronizer.build(avahi_client=mock_avahi_client) as subject:
+        assert subject.get_name() == "the current name"
