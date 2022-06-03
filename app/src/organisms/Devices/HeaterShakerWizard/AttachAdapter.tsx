@@ -111,9 +111,11 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
                 ? t('open_labware_latch')
                 : t('close_labware_latch')}
             </TertiaryButton>
-            <Tooltip tooltipProps={tooltipProps}>
-              {t('cannot_open_latch')}
-            </Tooltip>
+            {isShaking ? (
+              <Tooltip tooltipProps={tooltipProps}>
+                {t('cannot_open_latch')}
+              </Tooltip>
+            ) : null}
           </Flex>
         </Flex>
       </Flex>
