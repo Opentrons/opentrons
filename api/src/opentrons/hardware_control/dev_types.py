@@ -36,6 +36,7 @@ class AttachedGripper(TypedDict):
 
 AttachedInstruments = Dict[Mount, AttachedPipette]
 
+OT3AttachedInstruments = Union[AttachedPipette, AttachedGripper]
 
 EIGHT_CHANNELS = Literal[8]
 ONE_CHANNEL = Literal[1]
