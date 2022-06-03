@@ -120,7 +120,7 @@ class RealNameSynchronizer(NameSynchronizer):
         await self._avahi_client.start_advertising(service_name=new_name)
         # Setting the Avahi service name can fail if Avahi doesn't like the new name.
         # Persist only after it succeeds, so we don't persist something invalid.
-        persisted_pretty_hostname = await persist_pretty_hostname(new_name)
+        persisted_pretty_hostname = persist_pretty_hostname(new_name)
         return persisted_pretty_hostname
 
     def get_name(self) -> str:
