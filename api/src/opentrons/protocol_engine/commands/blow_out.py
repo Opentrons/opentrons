@@ -44,7 +44,7 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
             pipetteId=params.pipetteId,
             labwareId=params.labwareId,
             wellName=params.wellName,
-            wellLocation=params.wellLocation
+            wellLocation=params.wellLocation,
         )
 
 
