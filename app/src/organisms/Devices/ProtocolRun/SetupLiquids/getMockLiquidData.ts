@@ -107,7 +107,7 @@ const mockCommands = [
     params: {
       liquidId: '3',
       labwareId:
-        '08433310-e1d8-11ec-8729-359ce212aee2:opentrons/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic/1',
+        'b1e79d50-e112-11ec-8729-359ce212aee2:opentrons/eppendorf_96_tiprack_10ul_eptips/1',
       volumeByWell: { A2: 20, B2: 20, A3: 20, B3: 20 },
     },
   },
@@ -134,7 +134,7 @@ export interface Liquid {
   }>
 }
 
-export function getMockLiquidData(): Liquid[] | null {
+export function getMockLiquidData(): Liquid[] {
   const loadLiquidCommands = mockCommands.filter(
     command => command.commandType === 'loadLiquid'
   )
