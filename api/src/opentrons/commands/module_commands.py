@@ -22,7 +22,8 @@ def magdeck_calibrate() -> command_types.MagdeckCalibrateCommand:
 
 
 def tempdeck_set_temp(celsius: float) -> command_types.TempdeckSetTempCommand:
-    temp = round(float(celsius), utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
+    temp = format(celsius,f'.{utils.TEMPDECK_GCODE_ROUNDING_PRECISION}f')
+    # temp = round(float(celsius), utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
     text = (
         f"Setting Temperature Module temperature "
         f"to {temp} °C (rounded off to nearest integer)"
@@ -152,11 +153,14 @@ def thermocycler_close() -> command_types.ThermocyclerCloseCommand:
     return {"name": command_types.THERMOCYCLER_CLOSE, "payload": {"text": text}}
 
 def heater_shaker_set_and_wait_for_temperature(temperature:float) -> command_types.HeaterShakerSetAndWaitForTemperatureCommand:
-    text = f"Setting Temperature of Heater Shaker to {temperature} °C and waiting until reached"
+    # given rounding precision 2, formats float 1.23456 as 1.23
+    formatted_temp = format(temperature,f'.{utils.HS_GCODE_ROUNDING_PRECISION}f')
+    text = f"Setting Temperature of Heater Shaker to {formatted_temp} °C and waiting until reached"
     return {"name":command_types.HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE, "payload": {"text":text}}
 
 def heater_shaker_set_target_temperature(temperature:float) -> command_types.HeaterShakerSetTargetTemperatureCommand:
-    text = f"Setting Target Temperature of Heater Shaker to {temperature} °C"
+    formatted_temp = format(temperature,f'.{utils.HS_GCODE_ROUNDING_PRECISION}f')
+    text = f"Setting Target Temperature of Heater Shaker to {formatted_temp} °C"
     return {"name":command_types.HEATER_SHAKER_SET_TARGET_TEMPERATURE, "payload": {"text":text}}
 
 def heater_shaker_wait_for_temperature() -> command_types.HeaterShakerWaitForTemperatureCommand:
