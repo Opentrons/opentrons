@@ -166,12 +166,17 @@ export function parseInitialLoadedLabwareById(
   return reduce<LoadLabwareRunTimeCommand, LoadedLabwareById>(
     loadLabwareCommandsReversed,
     (acc, command) => {
-      const labwareId = command.result.labwareId ?? ''
-      if (labwareId === 'fixedTrash') {
+      const quirks = command.result.definition.parameters.quirks ?? []
+      if (quirks.includes('fixedTrash')) {
         return { ...acc }
       }
-
-      const definitionId = `${command.result.definition.namespace}/${command.result.definition.parameters.loadName}/${command.result.definition.version}_id`
+      const labwareId = command.result.labwareId ?? ''
+      const {
+        namespace,
+        version,
+        parameters: { loadName },
+      } = command.result.definition
+      const definitionId = `${namespace}/${loadName}/${version}_id`
 
       return {
         ...acc,
@@ -201,6 +206,10 @@ export function parseInitialLoadedLabwareDefinitionsById(
   return reduce<LoadLabwareRunTimeCommand, LoadedLabwareDefinitionsById>(
     loadLabwareCommandsReversed,
     (acc, command) => {
+      const quirks = command.result.definition.parameters.quirks ?? []
+      if (quirks.includes('fixedTrash')) {
+        return { ...acc }
+      }
       const labwareDef: LabwareDefinition2 = command.result?.definition
       const labwareId = command.result?.labwareId ?? ''
       const definitionId = labware[labwareId]?.definitionId
