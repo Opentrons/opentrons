@@ -128,6 +128,6 @@ export const darkLinkPSemiBold = css`
   color: ${COLORS.darkBlack};
 
   &:hover {
-    opacity: 1%;
+    opacity: 1;
   }
 `
