@@ -12,6 +12,7 @@ const BUTTON_GROUP_STYLES = css`
   border: 1px ${medGrey} solid;
   border-radius: ${BORDERS.radiusSoftCorners};
   margin-top: -1px;
+  display: inline-block;
 
   button {
     height: 28px;

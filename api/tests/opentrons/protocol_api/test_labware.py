@@ -536,6 +536,7 @@ def test_module_load_v2(module_model) -> None:
         "temperatureModuleV1",
         "temperatureModuleV2",
         "thermocyclerModuleV1",
+        "thermocyclerModuleV2",
     ],
 )
 def test_module_load_labware(module_name) -> None:

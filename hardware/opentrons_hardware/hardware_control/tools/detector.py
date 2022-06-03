@@ -2,14 +2,18 @@
 
 import logging
 import asyncio
-from typing import AsyncIterator, Set, Dict
+from typing import AsyncIterator, Set, Dict, Tuple
 
 from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
 from opentrons_hardware.firmware_bindings.constants import ToolType, PipetteName
 from opentrons_hardware.firmware_bindings.messages import message_definitions
 from opentrons_hardware.firmware_bindings import NodeId
 from opentrons_hardware.drivers.can_bus import CanMessenger
-from .types import PipetteInformation, ToolSummary
+from .types import (
+    PipetteInformation,
+    ToolSummary,
+    GripperInformation,
+)
 
 from opentrons_hardware.hardware_control.tools.types import ToolDetectionResult
 
@@ -78,8 +82,9 @@ class OneshotToolDetector:
     @staticmethod
     async def _await_responses(
         callback: WaitableCallback, for_nodes: Set[NodeId]
-    ) -> Dict[NodeId, PipetteInformation]:
-        to_ret: Dict[NodeId, PipetteInformation] = {}
+    ) -> Tuple[Dict[NodeId, PipetteInformation], Dict[NodeId, GripperInformation]]:
+        pipette_to_ret: Dict[NodeId, PipetteInformation] = {}
+        gripper_to_ret: Dict[NodeId, GripperInformation] = {}
 
         def _decode_or_default(orig: bytes) -> str:
             try:
@@ -87,20 +92,28 @@ class OneshotToolDetector:
             except UnicodeDecodeError:
                 return repr(orig)
 
-        while not for_nodes.issubset(set(to_ret.keys())):
+        while not for_nodes.issubset(
+            set(pipette_to_ret.keys()).union(gripper_to_ret.keys())
+        ):
             async for response, arbitration_id in callback:
                 if isinstance(response, message_definitions.PipetteInfoResponse):
-                    to_ret[
+                    pipette_to_ret[
                         NodeId(arbitration_id.parts.originating_node_id)
                     ] = PipetteInformation(
-                        name=PipetteName(response.payload.pipette_name.value),
-                        model=response.payload.pipette_model.value,
-                        serial=_decode_or_default(
-                            response.payload.pipette_serial.value
-                        ),
+                        name=PipetteName(response.payload.name.value),
+                        model=response.payload.model.value,
+                        serial=_decode_or_default(response.payload.serial.value),
                     )
                     break
-        return to_ret
+                elif isinstance(response, message_definitions.GripperInfoResponse):
+                    gripper_to_ret[
+                        NodeId(arbitration_id.parts.originating_node_id)
+                    ] = GripperInformation(
+                        model=response.payload.model.value,
+                        serial=_decode_or_default(response.payload.serial.value),
+                    )
+                    break
+        return pipette_to_ret, gripper_to_ret
 
     async def detect(self, timeout_sec: float = 1.0) -> ToolSummary:
         """Run once and detect tools."""
@@ -122,16 +135,17 @@ class OneshotToolDetector:
                 should_respond.add(NodeId.pipette_left)
             if _should_query(attached.right):
                 should_respond.add(NodeId.pipette_right)
-
+            if _should_query(attached.gripper):
+                should_respond.add(NodeId.gripper)
             await self._messenger.send(
                 node_id=NodeId.broadcast,
-                message=message_definitions.PipetteInfoRequest(),
+                message=message_definitions.InstrumentInfoRequest(),
             )
-            all_responses = await asyncio.wait_for(
+            pipette_res, gripper_res = await asyncio.wait_for(
                 self._await_responses(wc, should_respond), timeout=timeout_sec
             )
         return ToolSummary(
-            left=all_responses.get(NodeId.pipette_left, None),
-            right=all_responses.get(NodeId.pipette_right, None),
-            gripper=attached.gripper,
+            left=pipette_res.get(NodeId.pipette_left, None),
+            right=pipette_res.get(NodeId.pipette_right, None),
+            gripper=gripper_res.get(NodeId.gripper, None),
         )

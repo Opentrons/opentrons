@@ -43,9 +43,14 @@ async def test_create_command(
         )
         return queued_command
 
-    decoy.when(protocol_engine.add_command(command_create)).then_do(
-        _stub_queued_command_state
-    )
+    decoy.when(
+        protocol_engine.add_command(
+            pe_commands.HomeCreate(
+                params=pe_commands.HomeParams(),
+                intent=pe_commands.CommandIntent.SETUP,
+            )
+        )
+    ).then_do(_stub_queued_command_state)
 
     result = await create_command(
         RequestModel(data=command_create),
@@ -64,7 +69,10 @@ async def test_create_command_wait_for_complete(
     protocol_engine: ProtocolEngine,
 ) -> None:
     """It should be able to create a command."""
-    command_create = pe_commands.HomeCreate(params=pe_commands.HomeParams())
+    command_create = pe_commands.HomeCreate(
+        params=pe_commands.HomeParams(),
+        intent=pe_commands.CommandIntent.SETUP,
+    )
     queued_command = pe_commands.Home(
         id="abc123",
         key="command-key",
