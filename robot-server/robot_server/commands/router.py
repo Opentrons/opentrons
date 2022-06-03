@@ -5,7 +5,7 @@ from typing_extensions import Final, Literal
 from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
 
-from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_engine import ProtocolEngine, CommandIntent
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
 from robot_server.errors import ErrorDetails, ErrorBody
@@ -81,7 +81,8 @@ async def create_command(
             Comes from a query parameter in the URL.
         engine: The `ProtocolEngine` on which the command will be enqueued.
     """
-    command = engine.add_command(request_body.data)
+    command_create = request_body.data.copy(update={"intent": CommandIntent.SETUP})
+    command = engine.add_command(command_create)
 
     if waitUntilComplete:
         with move_on_after(timeout / 1000.0):
@@ -113,7 +114,7 @@ async def get_commands_list(
         None,
         description=(
             "The starting index of the desired first command in the list."
-            " If unspecicifed, a cursor will be selected automatically"
+            " If unspecified, a cursor will be selected automatically"
             " based on the next queued or more recently executed command."
         ),
     ),

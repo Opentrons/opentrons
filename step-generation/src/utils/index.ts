@@ -8,6 +8,7 @@ import { pipetteIntoHeaterShakerWhileShaking } from './pipetteIntoHeaterShakerWh
 import { orderWells } from './orderWells'
 import { getIsTallLabwareEastWestOfHeaterShaker } from './getIsTallLabwareEastWestOfHeaterShaker'
 import { getIsHeaterShakerEastWestWithLatchOpen } from './getIsHeaterShakerEastWestWithLatchOpen'
+import { pipetteAdjacentHeaterShakerWhileShaking } from './pipetteAdjacentHeaterShakerWhileShaking'
 export {
   commandCreatorsTimeline,
   curryCommandCreator,
@@ -17,6 +18,7 @@ export {
   thermocyclerPipetteCollision,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
+  pipetteAdjacentHeaterShakerWhileShaking,
   getIsTallLabwareEastWestOfHeaterShaker,
   getIsHeaterShakerEastWestWithLatchOpen,
 }

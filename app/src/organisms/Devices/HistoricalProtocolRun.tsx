@@ -1,5 +1,8 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+import { useHistory } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import {
   Flex,
   Box,
@@ -11,13 +14,20 @@ import {
   BORDERS,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
+import { getStoredProtocols } from '../../redux/protocol-storage'
 import { formatInterval } from '../RunTimeControl/utils'
 import { formatTimestamp } from './utils'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
 import { HistoricalProtocolRunOffsetDrawer as OffsetDrawer } from './HistoricalProtocolRunOffsetDrawer'
 import type { RunData } from '@opentrons/api-client'
+import type { State } from '../../redux/types'
 
 const EMPTY_TIMESTAMP = '--:--:--'
+
+const CLICK_STYLE = css`
+  cursor: pointer;
+  overflow-wrap: anywhere;
+`
 
 interface HistoricalProtocolRunProps {
   run: RunData
@@ -25,14 +35,19 @@ interface HistoricalProtocolRunProps {
   robotName: string
   robotIsBusy: boolean
   key: number
+  protocolKey?: string
 }
 
 export function HistoricalProtocolRun(
   props: HistoricalProtocolRunProps
 ): JSX.Element | null {
   const { t } = useTranslation('run_details')
-  const { run, protocolName, robotIsBusy, robotName } = props
+  const { run, protocolName, robotIsBusy, robotName, protocolKey, key } = props
+  const history = useHistory()
   const [offsetDrawerOpen, setOffsetDrawerOpen] = React.useState(false)
+  const storedProtocols = useSelector((state: State) =>
+    getStoredProtocols(state)
+  )
   const runStatus = run.status
   const runDisplayName = formatTimestamp(run.createdAt)
   let duration = EMPTY_TIMESTAMP
@@ -43,6 +58,10 @@ export function HistoricalProtocolRun(
       duration = formatInterval(run.createdAt, new Date().toString())
     }
   }
+  const protocolKeyInStoredKeys = storedProtocols.find(
+    ({ protocolKey: key }) => protocolKey === key
+  )
+
   return (
     <>
       <Flex
@@ -67,19 +86,38 @@ export function HistoricalProtocolRun(
         <StyledText
           as="p"
           width="25%"
-          data-testid={`RecentProtocolRuns_Run_${props.key}`}
+          data-testid={`RecentProtocolRuns_Run_${key}`}
+          onClick={() =>
+            history.push(
+              `${robotName}/protocol-runs/${run.id}/protocolRunDetailsTab?`
+            )
+          }
+          css={css`
+            cursor: pointer;
+          `}
         >
           {runDisplayName}
         </StyledText>
-        <StyledText
-          as="p"
-          width="35%"
-          css={{ 'overflow-wrap': 'anywhere' }}
-          paddingRight={SPACING.spacing3}
-          data-testid={`RecentProtocolRuns_Protocol_${props.key}`}
-        >
-          {protocolName}
-        </StyledText>
+        {protocolKeyInStoredKeys != null ? (
+          <StyledText
+            as="p"
+            width="35%"
+            data-testid={`RecentProtocolRuns_Protocol_${props.key}`}
+            onClick={() => history.push(`/protocols/${protocolKey}`)}
+            css={CLICK_STYLE}
+          >
+            {protocolName}
+          </StyledText>
+        ) : (
+          <StyledText
+            as="p"
+            width="35%"
+            data-testid={`RecentProtocolRuns_Protocol_${props.key}`}
+            css={{ 'overflow-wrap': 'anywhere' }}
+          >
+            {protocolName}
+          </StyledText>
+        )}
         <StyledText
           as="p"
           width="20%"

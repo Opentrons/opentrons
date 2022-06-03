@@ -376,9 +376,9 @@ class BindSensorOutputResponsePayload(utils.BinarySerializable):
 class PipetteInfoResponsePayload(utils.BinarySerializable):
     """A response carrying data about an attached pipette."""
 
-    pipette_name: PipetteNameField
-    pipette_model: utils.UInt16Field
-    pipette_serial: SerialField
+    name: PipetteNameField
+    model: utils.UInt16Field
+    serial: SerialField
 
 
 @dataclass
@@ -400,8 +400,8 @@ class BrushedMotorPwmPayload(utils.BinarySerializable):
 class GripperInfoResponsePayload(utils.BinarySerializable):
     """A response carrying data about an attached gripper."""
 
-    gripper_model: utils.UInt16Field
-    gripper_serial: SerialField
+    model: utils.UInt16Field
+    serial: SerialField
 
 
 @dataclass

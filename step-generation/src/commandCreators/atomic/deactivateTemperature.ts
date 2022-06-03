@@ -51,7 +51,7 @@ export const deactivateTemperature: CommandCreator<DeactivateTemperatureArgs> = 
     return {
       commands: [
         {
-          commandType: 'heaterShakerModule/deactivateHeater',
+          commandType: 'heaterShaker/deactivateHeater',
           params,
         },
       ],

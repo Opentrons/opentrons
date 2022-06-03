@@ -1,4 +1,4 @@
-from typing import Any, AsyncGenerator, Dict, NamedTuple
+from typing import Any, AsyncGenerator, Dict, NamedTuple, cast
 from datetime import datetime
 
 import anyio
@@ -42,13 +42,29 @@ async def client_and_server(port: str) -> AsyncGenerator[ClientServerFixture, No
             yield ClientServerFixture(client=client, server=server)
 
 
+async def _wait_until_status(
+    robot_client: RobotClient,
+    run_id: str,
+    expected_status: str,
+) -> Dict[str, Any]:
+    """Wait until a run achieves the expected status, returning its data."""
+    with anyio.fail_after(1.0):
+        get_run_response = await robot_client.get_run(run_id=run_id)
+
+        while get_run_response.json()["data"]["status"] != expected_status:
+            await anyio.sleep(0.1)
+            get_run_response = await robot_client.get_run(run_id=run_id)
+
+    return cast(Dict[str, Any], get_run_response.json()["data"])
+
+
 async def _assert_run_persisted(
     robot_client: RobotClient, expected_run_data: Dict[str, Any]
 ) -> None:
     """Fetch a run through various endpoints to ensure it was persisted.
 
     Note: This only checks the fields of the run resource itself.
-    It does not check the run's commands, whichh are accessed through
+    It does not check the run's commands, which are accessed through
     separate endpoints.
     """
     run_id = expected_run_data["id"]
@@ -96,16 +112,12 @@ async def test_runs_persist_via_actions_router(
         req_body={"data": {"actionType": "play"}},
     )
 
-    # fetch the updated run, which we expect to be persisted
-    get_run_response = await client.get_run(run_id=run_id)
-    expected_run = dict(get_run_response.json()["data"], current=False)
+    # wait for the run to succeed due to the run completed
+    completed_run_data = await _wait_until_status(client, run_id, "succeeded")
 
-    # wait for the action to take effect
-    with anyio.fail_after(5):
-        while (await client.get_run(run_id=run_id)).json()["data"][
-            "status"
-        ] != "succeeded":
-            await anyio.sleep(0.1)
+    # our expected run is the last fetched run, with current: false
+    # since it's a persisted, historical run
+    expected_run = dict(completed_run_data, current=False)
 
     # reboot the server
     await client_and_server.restart()
@@ -152,12 +164,8 @@ async def test_run_actions_and_labware_offsets_persist(
         req_body={"data": {"actionType": "stop"}},
     )
 
-    # wait for the action to take effect
-    with anyio.fail_after(5):
-        while (await client.get_run(run_id=run_id)).json()["data"][
-            "status"
-        ] != "stopped":
-            await anyio.sleep(0.1)
+    # wait for the stop action to take effect
+    await _wait_until_status(client, run_id, "stopped")
 
     # persist the run by setting current: false
     archive_run_response = await client.patch_run(
@@ -216,12 +224,7 @@ async def test_run_commands_persist(client_and_server: ClientServerFixture) -> N
 async def test_runs_completed_started_at_persist_via_actions_router(
     client_and_server: ClientServerFixture,
 ) -> None:
-    """Test that completedAt and startedAt
-
-    are persisted when calling play\\hardware
-
-    stopped action through dev server restart.
-    """
+    """Test that startedAt and completedAt are be persisted via play action."""
     client, server = client_and_server
 
     # create a run
@@ -235,24 +238,10 @@ async def test_runs_completed_started_at_persist_via_actions_router(
         req_body={"data": {"actionType": "play"}},
     )
 
+    # wait for the run to completed via play action
+    await _wait_until_status(client, run_id, "succeeded")
+
     expected_completed_at = datetime.now()
-
-    # persist the run by hitting the actions router
-    await client.post_run_action(
-        run_id=run_id,
-        req_body={"data": {"actionType": "stop"}},
-    )
-
-    # wait for the action to take effect
-    with anyio.fail_after(5):
-        while (await client.get_run(run_id=run_id)).json()["data"][
-            "status"
-            # TODO (tz: 5-27-22): Should test against stopped status or separate tests.
-            # If a run was played, stop action will not trigger a stopped status.
-        ] != "succeeded":
-            await anyio.sleep(0.1)
-
-    await client.patch_run(run_id=run_id, req_body={"data": {"current": False}})
 
     # reboot the server
     await client_and_server.restart()
@@ -276,18 +265,16 @@ async def test_runs_completed_started_at_persist_via_actions_router(
 async def test_runs_completed_filled_started_at_none_persist(
     client_and_server: ClientServerFixture,
 ) -> None:
-    """Test that completedAt is today and startedAt is empty
-
-    are persisted through dev server restart.
-    """
+    """Test that completedAt is persisted via PATCH to not current."""
     client, server = client_and_server
 
-    expected_completed_at = datetime.now()
     # create a run
     create_run_response = await client.post_run(req_body={"data": {}})
     run_id = create_run_response.json()["data"]["id"]
 
+    # persist the run via PATCH
     await client.patch_run(run_id=run_id, req_body={"data": {"current": False}})
+    expected_completed_at = datetime.now()
 
     # reboot the server
     await client_and_server.restart()
@@ -297,7 +284,6 @@ async def test_runs_completed_filled_started_at_none_persist(
     run_data = get_run_response.json()["data"]
 
     assert "startedAt" not in run_data
-
     assert datetime.fromisoformat(run_data["completedAt"]).timestamp() == pytest.approx(
         expected_completed_at.timestamp(), abs=2
     )

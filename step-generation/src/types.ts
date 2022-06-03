@@ -477,6 +477,7 @@ export type ErrorType =
   | 'HEATER_SHAKER_IS_SHAKING'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
   | 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN'
+  | 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING'
 
 export interface CommandCreatorError {
   message: string

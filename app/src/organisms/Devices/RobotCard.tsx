@@ -64,10 +64,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
         id={`RobotCard_${robotName}_robotImage`}
       />
       <Box padding={SPACING.spacing3} width="100%">
-        <UpdateRobotBanner
-          robotName={robotName}
-          marginBottom={SPACING.spacing3}
-        />
+        <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing3} />
         <ReachableBanner robot={robot} />
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex flexDirection={DIRECTION_COLUMN}>

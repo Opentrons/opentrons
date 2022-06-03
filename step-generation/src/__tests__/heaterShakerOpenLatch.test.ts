@@ -96,7 +96,7 @@ describe('heaterShakerOpenLatch', () => {
     expect(result).toEqual({
       commands: [
         {
-          commandType: 'heaterShakerModule/openLatch',
+          commandType: 'heaterShaker/openLabwareLatch',
           params: { moduleId: 'heaterShakerId' },
         },
       ],

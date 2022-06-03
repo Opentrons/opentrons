@@ -64,10 +64,9 @@ export function RobotOverview({
       />
       <Box padding={SPACING.spacing3} width="100%">
         <ReachableBanner robot={robot} />
-        <UpdateRobotBanner
-          robotName={robot.name}
-          marginBottom={SPACING.spacing3}
-        />
+        {robot != null ? (
+          <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing3} />
+        ) : null}
         <RobotStatusBanner name={robot.name} local={robot.local} />
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex

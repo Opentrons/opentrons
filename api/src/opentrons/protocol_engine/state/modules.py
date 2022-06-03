@@ -133,7 +133,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         if isinstance(
             command.result,
             (
-                heater_shaker.StartSetTargetTemperatureResult,
+                heater_shaker.SetTargetTemperatureResult,
                 heater_shaker.DeactivateHeaterResult,
             ),
         ):
@@ -199,7 +199,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def _handle_heater_shaker_commands(
         self,
         command: Union[
-            heater_shaker.StartSetTargetTemperature, heater_shaker.DeactivateHeater
+            heater_shaker.SetTargetTemperature, heater_shaker.DeactivateHeater
         ],
     ) -> None:
         module_id = command.params.moduleId
@@ -207,10 +207,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             self._state.substate_by_module_id[module_id], HeaterShakerModuleSubState
         ), f"{module_id} is not heater-shaker."
 
-        if isinstance(command.result, heater_shaker.StartSetTargetTemperatureResult):
+        if isinstance(command.result, heater_shaker.SetTargetTemperatureResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                plate_target_temperature=command.params.temperature,
+                plate_target_temperature=command.params.celsius,
             )
         elif isinstance(command.result, heater_shaker.DeactivateHeaterResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(

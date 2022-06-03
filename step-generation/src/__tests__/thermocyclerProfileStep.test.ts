@@ -1,4 +1,3 @@
-// @ts-nocheck TODO: remove this after https://github.com/Opentrons/opentrons/pull/10178 merges
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import { thermocyclerProfileStep } from '../commandCreators/compound/thermocyclerProfileStep'
 import {
