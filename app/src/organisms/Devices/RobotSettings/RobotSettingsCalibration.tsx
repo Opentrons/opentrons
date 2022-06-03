@@ -184,7 +184,7 @@ export function RobotSettingsCalibration({
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
   const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
-  const attachedPipettes = useAttachedPipettes(robot?.name)
+  const attachedPipettes = useAttachedPipettes()
 
   const isRunning = useSelector(robotSelectors.getIsRunning)
 
