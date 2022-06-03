@@ -26,6 +26,7 @@ class ModuleName(str, Enum):
     MAGNETIC_MODULE = "magnetic module"
     MAGNETIC_MODULE_GEN2 = "magnetic module gen2"
     THERMOCYCLER_MODULE = "thermocycler module"
+    THERMOCYCLER_MODULE_GEN2 = "thermocycler module gen2"
 
     @classmethod
     def to_model(cls, value: str) -> ModuleModel:
@@ -43,6 +44,9 @@ class ModuleName(str, Enum):
 
         elif value == cls.THERMOCYCLER_MODULE or value == "thermocycler":
             return ModuleModel.THERMOCYCLER_MODULE_V1
+
+        elif value == cls.THERMOCYCLER_MODULE_GEN2:
+            return ModuleModel.THERMOCYCLER_MODULE_V2
 
         else:
             return ModuleModel(value)

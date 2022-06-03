@@ -189,6 +189,7 @@ def test_incorrect_module_error(ctx_with_tempdeck):
         ("magnetic module gen2", papi.MagneticModuleContext, "magneticModuleV2"),
         ("thermocycler", papi.ThermocyclerContext, "thermocyclerModuleV1"),
         ("thermocycler module", papi.ThermocyclerContext, "thermocyclerModuleV1"),
+        ("thermocycler module gen2", papi.ThermocyclerContext, "thermocyclerModuleV2"),
         ("heaterShakerModuleV1", papi.HeaterShakerContext, "heaterShakerModuleV1"),
     ],
 )

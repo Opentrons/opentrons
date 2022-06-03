@@ -110,7 +110,10 @@ class ThermocyclerMovementFlagger:
             return None  # Labware not on a module.
 
         module_model = self._state_store.modules.get_model(module_id=module_id)
-        if module_model != PEModuleModel.THERMOCYCLER_MODULE_V1:
+        if module_model not in [
+            PEModuleModel.THERMOCYCLER_MODULE_V1,
+            PEModuleModel.THERMOCYCLER_MODULE_V2,
+        ]:
             return None  # Labware on a module, but not a Thermocycler.
 
         thermocycler_serial = self._state_store.modules.get_serial_number(
