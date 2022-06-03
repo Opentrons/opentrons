@@ -48,9 +48,9 @@ import {
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
+  useAttachedPipettes,
   useDeckCalibrationStatus,
   useIsRobotBusy,
-  useAttachedPipettes,
 } from '../hooks'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
