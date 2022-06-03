@@ -64,7 +64,7 @@ export function HistoricalProtocolRunOverflowMenu(
       {showOverflowMenu && (
         <div
           ref={protocolRunOverflowWrapperRef}
-          data-testid={`HistoricalProtoclRunOverflowMenu_${runId}`}
+          data-testid={`HistoricalProtocolRunOverflowMenu_${runId}`}
         >
           <MenuDropdown
             {...props}
@@ -113,12 +113,6 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   }
   const { reset } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
-
-  React.useEffect(() => {
-    if (runId !== null) {
-      deleteRun(runId)
-    }
-  }, [runId, deleteRun])
 
   return (
     <Flex

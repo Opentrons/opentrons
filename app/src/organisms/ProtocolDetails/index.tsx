@@ -341,7 +341,7 @@ export function ProtocolDetails(
             onClick={() => setShowSlideout(true)}
             data-testid={`ProtocolDetails_runProtocol`}
           >
-            {t('run_a_protocol')}
+            {t('run_protocol')}
           </PrimaryButton>
         </Flex>
         <Divider marginY={SPACING.spacing4} />

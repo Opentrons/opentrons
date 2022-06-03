@@ -151,7 +151,7 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    const runProtocolButton = getByRole('button', { name: 'Run a protocol' })
+    const runProtocolButton = getByRole('button', { name: 'Run protocol' })
     expect(
       queryByRole('heading', { name: 'Choose Robot to Run\nfakeSrcFileName' })
     ).toBeNull()
