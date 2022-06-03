@@ -18,7 +18,7 @@ const mockLiquids = {
   '3': {
     displayName: 'liquid 4',
     description: 'sample 4',
-    displayColor: '#ff4888',
+    displayColor: '#50d5ff',
   },
 }
 const mockCommands = [

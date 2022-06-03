@@ -1,6 +1,5 @@
 import * as React from 'react'
 import sum from 'lodash/sum'
-import { useTranslation } from 'react-i18next'
 import {
   Flex,
   SPACING,
@@ -27,7 +26,7 @@ interface SetupLiquidsListProps {
 
 const HIDE_SCROLLBAR = css`
   ::-webkit-scrollbar {
-    display: none; /* for Chrome, Safari, and Opera */
+    display: none;
   }
 `
 
@@ -37,7 +36,7 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
     <Flex
       css={HIDE_SCROLLBAR}
       flexDirection={DIRECTION_COLUMN}
-      height="300px"
+      maxHeight={'31.25rem'}
       overflowY={'auto'}
     >
       {liquids?.map(liquid => (
@@ -62,18 +61,15 @@ interface LiquidsListItemProps {
 
 export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
   const { description, displayColor, displayName, volume } = props
-  const { t } = useTranslation('protocol_setup')
   return (
     <Flex
-      border={`1px solid ${COLORS.medGrey}`}
-      borderRadius={BORDERS.radiusSoftCorners}
+      css={BORDERS.cardOutlineBorder}
       flexDirection={DIRECTION_ROW}
       marginBottom={SPACING.spacing3}
       padding={SPACING.spacing4}
     >
       <Flex
-        border={`1px solid ${COLORS.medGrey}`}
-        borderRadius={BORDERS.radiusSoftCorners}
+        css={BORDERS.cardOutlineBorder}
         padding={'0.75rem'}
         height={'max-content'}
       >
@@ -106,7 +102,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
         marginLeft={SIZE_AUTO}
       >
         <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
-          {t('volume_with_units', { volume: volume, units: MICRO_LITERS })}
+          {volume} {MICRO_LITERS}
         </StyledText>
       </Flex>
     </Flex>
