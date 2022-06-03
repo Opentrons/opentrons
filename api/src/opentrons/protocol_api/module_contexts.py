@@ -888,6 +888,8 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         Sets the heater-shaker target temperature and delays protocol execution
         until target temperature has reached.
 
+        Note: The H/S truncates the temperature param to 2 decimal places
+
         :param celsius: The target temperature, in °C in range 37°C to 95°C.
         """
         self.set_target_temperature(celsius=celsius)
@@ -902,6 +904,8 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         waiting for the target to be reached. Does not delay the protocol until
         target temperature has reached. Use `wait_for_target_temperature` to delay
         protocol execution.
+
+        Note: The H/S truncates the temperature param to 2 decimal places
         """
         validated_temp = validate_heater_shaker_temperature(celsius=celsius)
         self._module.start_set_temperature(celsius=validated_temp)
