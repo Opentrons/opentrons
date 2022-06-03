@@ -69,6 +69,20 @@ describe('DevicesLanding', () => {
     getByText('Mock DevicesEmptyState')
   })
 
+  it('renders the Looking for robots copy when scanning is true', () => {
+    mockGetScanning.mockReturnValue(true)
+    const [{ getByText }] = render()
+
+    getByText('Looking for robots...')
+  })
+
+  it('renders the Icon when scanning is true', () => {
+    mockGetScanning.mockReturnValue(true)
+    const [{ getByLabelText }] = render()
+
+    getByLabelText('ot-spinner')
+  })
+
   it('renders available and unavailable sections when both are present', () => {
     const [{ getByText }] = render()
 
