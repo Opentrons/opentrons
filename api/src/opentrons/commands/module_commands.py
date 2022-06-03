@@ -153,33 +153,33 @@ def thermocycler_close() -> command_types.ThermocyclerCloseCommand:
 
 def heater_shaker_set_and_wait_for_temperature(temperature:float) -> command_types.HeaterShakerSetAndWaitForTemperatureCommand:
     text = f"Setting Temperature of Heater Shaker to {temperature} °C and waiting until reached"
-    return {"name":command_types.HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE, "paylod": {"text":text}}
+    return {"name":command_types.HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE, "payload": {"text":text}}
 
 def heater_shaker_set_target_temperature(temperature:float) -> command_types.HeaterShakerSetTargetTemperatureCommand:
     text = f"Setting Target Temperature of Heater Shaker to {temperature} °C"
-    return {"name":command_types.HEATER_SHAKER_SET_TARGET_TEMPERATURE, "paylod": {"text":text}}
+    return {"name":command_types.HEATER_SHAKER_SET_TARGET_TEMPERATURE, "payload": {"text":text}}
 
 def heater_shaker_wait_for_temperature() -> command_types.HeaterShakerWaitForTemperatureCommand:
     text = "Waiting for Heater Shaker to reach target temperature"
-    return {"name":command_types.HEATER_SHAKER_WAIT_FOR_TEMPERATURE, "paylod": {"text":text}}
+    return {"name":command_types.HEATER_SHAKER_WAIT_FOR_TEMPERATURE, "payload": {"text":text}}
 
 def heater_shaker_set_and_wait_for_shake_speed() -> command_types.HeaterShakerSetAndWaitForShakeSpeedCommand:
     text = ""
-    return {"name":command_types.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED, "paylod": {"text":text}}
+    return {"name":command_types.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED, "payload": {"text":text}}
 
 def heater_shaker_open_labware_latch() -> command_types.HeaterShakerOpenLabwareLatchCommand:
     text = "Unlatching Labware on Heater Shaker"
-    return {"name":command_types.HEATER_SHAKER_OPEN_LABWARE_LATCH, "paylod": {"text":text}}
+    return {"name":command_types.HEATER_SHAKER_OPEN_LABWARE_LATCH, "payload": {"text":text}}
 
 def heater_shaker_close_labware_latch() -> command_types.HeaterShakerCloseLabwareLatchCommand:
     text = "Latching Labware on Heater Shaker"
-    return {"name":command_types.HEATER_SHAKER_CLOSE_LABWARE_LATCH, "paylod": {"text":text}}
+    return {"name":command_types.HEATER_SHAKER_CLOSE_LABWARE_LATCH, "payload": {"text":text}}
 
 def heater_shaker_deactivate_shaker() -> command_types.HeaterShakerDeactivateShakerCommand:
     text = "Deactivating Shaker"
-    return {"name":command_types.HEATER_SHAKER_DEACTIVATE_SHAKER, "paylod": {"text":text}}
+    return {"name":command_types.HEATER_SHAKER_DEACTIVATE_SHAKER, "payload": {"text":text}}
 
 def heater_shaker_deactivate_heater() -> command_types.HeaterShakerDeactivateHeaterCommand:
     text = "Deactivating Heater"
-    return {"name":command_types.HEATER_SHAKER_DEACTIVATE_HEATER, "paylod": {"text":text}}
+    return {"name":command_types.HEATER_SHAKER_DEACTIVATE_HEATER, "payload": {"text":text}}
 
