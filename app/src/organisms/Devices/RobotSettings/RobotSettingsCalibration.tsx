@@ -106,8 +106,6 @@ const attachedPipetteCalPresent: (
         pipetteCalibrations[mount]?.tipLength == null)
   )
 
-const CALIBRATION_STATUS_POLL_MS = 5000
-
 export function RobotSettingsCalibration({
   robotName,
   updateRobotStatus,
