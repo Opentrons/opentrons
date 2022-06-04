@@ -8,7 +8,7 @@ export const heaterShakerDeactivateHeater: CommandCreator<ModuleOnlyParams> = (
   return {
     commands: [
       {
-        commandType: 'heaterShakerModule/deactivateHeater',
+        commandType: 'heaterShaker/deactivateHeater',
         params: {
           moduleId: args.moduleId,
         },

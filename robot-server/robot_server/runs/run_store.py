@@ -129,8 +129,8 @@ class RunStore:
         with self._sql_engine.begin() as transaction:
             try:
                 transaction.execute(insert)
-            except sqlalchemy.exc.IntegrityError:
-                raise RunNotFoundError(run_id=run_id)
+            except sqlalchemy.exc.IntegrityError as e:
+                raise RunNotFoundError(run_id=run_id) from e
 
         self._clear_caches()
 
@@ -298,8 +298,8 @@ class RunStore:
         Raises:
             RunNotFoundError: The given run ID was not found.
         """
-        command_source_dicts = self._get_all_unparsed_commands(run_id)
-        commands_length = len(command_source_dicts)
+        command_intent_dicts = self._get_all_unparsed_commands(run_id)
+        commands_length = len(command_intent_dicts)
         if cursor is None:
             cursor = commands_length - length
 
@@ -308,7 +308,7 @@ class RunStore:
         stop = min(commands_length, actual_cursor + length)
         sliced_commands: List[Command] = [
             parse_obj_as(Command, command)  # type: ignore[arg-type]
-            for command in command_source_dicts[actual_cursor:stop]
+            for command in command_intent_dicts[actual_cursor:stop]
         ]
 
         return CommandSlice(

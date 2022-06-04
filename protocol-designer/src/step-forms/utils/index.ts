@@ -132,9 +132,10 @@ export const getSlotIsEmpty = (
 export const getLabwareOnSlot = (
   initialDeckSetup: InitialDeckSetup,
   slot: string
-): LabwareOnDeckType => {
-  // @ts-expect-error(sa, 2021-6-10): find could return undefined, need to null check
-  return find(initialDeckSetup.labware, labware => labware.slot === slot)
+): LabwareOnDeckType | null => {
+  return (
+    find(initialDeckSetup.labware, labware => labware.slot === slot) ?? null
+  )
 }
 export const getIsCrashablePipetteSelected = (
   pipettesByMount: FormPipettesByMount

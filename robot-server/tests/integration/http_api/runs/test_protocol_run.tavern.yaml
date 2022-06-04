@@ -34,6 +34,7 @@ stages:
           actions: []
           errors: []
           pipettes: []
+          modules: []
           labware:
             - id: !anystr
               loadName: !anystr
@@ -84,7 +85,7 @@ stages:
         data:
           definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
           location:
-            slotName: "1"
+            slotName: '1'
           vector:
             x: 1.11
             y: 2.22
@@ -97,7 +98,7 @@ stages:
           createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
           definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
           location:
-            slotName: "1"
+            slotName: '1'
           vector:
             x: 1.11
             y: 2.22
@@ -213,8 +214,11 @@ stages:
           # Unchanged from when we originally POSTed the resource:
           id: '{run_id}'
           createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
           errors: []
           pipettes: []
+          modules: []
           protocolId: '{protocol_id}'
           # Changed in this PATCH:
           current: False
@@ -229,7 +233,7 @@ stages:
               createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
               definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
               location:
-                slotName: "1"
+                slotName: '1'
               vector:
                 x: 1.11
                 y: 2.22
@@ -261,3 +265,15 @@ stages:
       json:
         # Check that `data` is identical to the original POSTed run.
         data: !force_format_include '{final_run_data}'
+
+  - name: Verify underlying protocol cannot be deleted
+    request:
+      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      method: DELETE
+    response:
+      status_code: 409
+      json:
+        errors:
+          - id: 'ProtocolUsedByRun'
+            title: 'Protocol Used by Run'
+            detail: 'Protocol {protocol_id} is used by a run and cannot be deleted.'

@@ -12,6 +12,8 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorType,
     PipetteName,
     SensorOutputBinding,
+    SensorThresholdMode,
+    PipetteTipActionType,
 )
 
 
@@ -126,6 +128,18 @@ class SerialField(utils.BinaryFieldBase[bytes]):
         return cls(binascii.unhexlify(t)[: cls.NUM_BYTES])
 
 
+class SensorThresholdModeField(utils.UInt8Field):
+    """sensor threshold mode."""
+
+    def __repr__(self) -> str:
+        """Print sensor."""
+        try:
+            sensor_val = SensorThresholdMode(self.value).name
+        except ValueError:
+            sensor_val = str(self.value)
+        return f"{self.__class__.__name__}(value={sensor_val})"
+
+
 class SensorOutputBindingField(utils.UInt8Field):
     """sensor type."""
 
@@ -169,3 +183,15 @@ class EepromDataField(utils.BinaryFieldBase[bytes]):
     def from_string(cls, t: str) -> EepromDataField:
         """Create from a string."""
         return cls(binascii.unhexlify(t)[: cls.NUM_BYTES])
+
+
+class PipetteTipActionTypeField(utils.UInt8Field):
+    """pipette tip action type."""
+
+    def __repr__(self) -> str:
+        """Print tip action."""
+        try:
+            action_type = PipetteTipActionType(self.value).name
+        except ValueError:
+            action_type = str(self.value)
+        return f"{self.__class__.__name__}(value={action_type})"

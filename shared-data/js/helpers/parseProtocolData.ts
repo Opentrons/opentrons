@@ -132,6 +132,12 @@ export function protocolHasModules(
   return 'modules' in protocol && Object.entries(protocol.modules).length > 0
 }
 
+export function protocolHasLiquids(
+  protocol: ProtocolAnalysisFile<{}>
+): boolean {
+  return 'liquids' in protocol && Object.entries(protocol.liquids).length > 0
+}
+
 export function getProtocolDesignerApplicationName(
   protocol: JsonProtocolFile
 ): string | null {

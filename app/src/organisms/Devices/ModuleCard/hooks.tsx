@@ -17,12 +17,13 @@ import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useProtocolDetailsForRun } from '../hooks'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateHeaterCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-  HeaterShakerStopShakeCreateCommand,
+  HeaterShakerDeactivateShakerCreateCommand,
   MagneticModuleDisengageCreateCommand,
   TCDeactivateBlockCreateCommand,
   TCDeactivateLidCreateCommand,
@@ -54,6 +55,10 @@ export function useLatchControls(
 ): LatchControls {
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    module,
+    runId != null ? runId : null
+  )
 
   const isLatchClosed =
     module.moduleType === 'heaterShakerModuleType' &&
@@ -64,9 +69,9 @@ export function useLatchControls(
     | HeaterShakerOpenLatchCreateCommand
     | HeaterShakerCloseLatchCreateCommand = {
     commandType: isLatchClosed
-      ? 'heaterShakerModule/openLatch'
-      : 'heaterShakerModule/closeLatch',
-    params: { moduleId: module.id },
+      ? 'heaterShaker/openLabwareLatch'
+      : 'heaterShaker/closeLabwareLatch',
+    params: { moduleId: runId != null ? moduleIdFromRun : module.id },
   }
 
   const toggleLatch = (): void => {
@@ -109,8 +114,8 @@ type deactivateCommandTypes =
   | 'thermocycler/deactivateBlock'
   | 'temperatureModule/deactivate'
   | 'magneticModule/disengage'
-  | 'heaterShakerModule/stopShake'
-  | 'heaterShakerModule/deactivateHeater'
+  | 'heaterShaker/deactivateShaker'
+  | 'heaterShaker/deactivateHeater'
 
 export function useModuleOverflowMenu(
   module: AttachedModule,
@@ -125,6 +130,7 @@ export function useModuleOverflowMenu(
   const { createCommand } = useCreateCommandMutation()
   const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
 
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
@@ -193,9 +199,9 @@ export function useModuleOverflowMenu(
       | HeaterShakerDeactivateHeaterCreateCommand
       | TCDeactivateLidCreateCommand
       | TCDeactivateBlockCreateCommand
-      | HeaterShakerStopShakeCreateCommand = {
+      | HeaterShakerDeactivateShakerCreateCommand = {
       commandType: deactivateModuleCommandType,
-      params: { moduleId: module.id },
+      params: { moduleId: runId != null ? moduleIdFromRun : module.id },
     }
     if (runId != null) {
       createCommand({
@@ -296,8 +302,7 @@ export function useModuleOverflowMenu(
           module.moduleType === HEATERSHAKER_MODULE_TYPE &&
           module.data.temperatureStatus !== 'idle' &&
           module.data.status !== 'idle'
-            ? () =>
-                handleDeactivationCommand('heaterShakerModule/deactivateHeater')
+            ? () => handleDeactivationCommand('heaterShaker/deactivateHeater')
             : () => handleSlideoutClick(false),
       },
       {
@@ -311,7 +316,8 @@ export function useModuleOverflowMenu(
         disabledReason:
           module.moduleType === HEATERSHAKER_MODULE_TYPE &&
           (module.data.labwareLatchStatus === 'idle_open' ||
-            module.data.labwareLatchStatus === 'opening'),
+            module.data.labwareLatchStatus === 'opening' ||
+            module.data.labwareLatchStatus === 'idle_unknown'),
         menuButtons: [
           labwareLatchBtn,
           aboutModuleBtn,
@@ -321,7 +327,7 @@ export function useModuleOverflowMenu(
         onClick:
           module.moduleType === HEATERSHAKER_MODULE_TYPE &&
           module.data.speedStatus !== 'idle'
-            ? () => handleDeactivationCommand('heaterShakerModule/stopShake')
+            ? () => handleDeactivationCommand('heaterShaker/deactivateShaker')
             : () => handleSlideoutClick(true),
       },
     ],

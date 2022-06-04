@@ -52,7 +52,8 @@ export function ProtocolAnalysisErrorModal({
         ))}
         <Flex justifyContent={JUSTIFY_FLEX_END}>
           <PrimaryButton
-            data-testid="ProtocolRunDetails_closeAnalysisErrorModal"
+            role="button"
+            aria-label="close_analysis_error_modal"
             marginTop={SPACING.spacing4}
             padding={`${SPACING.spacing3} ${SPACING.spacing7}`}
             onClick={onClose}

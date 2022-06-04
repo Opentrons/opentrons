@@ -86,3 +86,22 @@ export const mockDeckCalData: DeckCalibrationInfo = {
     markedAt: '',
   },
 }
+
+export const mockWarningDeckCalData: DeckCalibrationInfo = {
+  type: 'affine',
+  matrix: [
+    [1.0, 0.0, 0.0, 0.0],
+    [0.0, 1.0, 0.0, 0.0],
+    [0.0, 0.0, 1.0, 0.0],
+    [0.0, 0.0, 0.0, 1.0],
+  ],
+  lastModified: 'September 22, 2222',
+  pipetteCalibratedWith: null,
+  tiprack: null,
+  source: 'user',
+  status: {
+    markedBad: true,
+    source: 'unknown',
+    markedAt: '',
+  },
+}

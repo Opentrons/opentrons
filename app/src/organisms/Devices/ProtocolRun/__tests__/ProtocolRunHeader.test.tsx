@@ -627,4 +627,38 @@ describe('ProtocolRunHeader', () => {
     fireEvent.click(button)
     expect(mockUseRunControls).toHaveBeenCalled()
   })
+
+  it('renders analysis error modal if there is an analysis error', async () => {
+    when(mockUseProtocolAnalysisErrors)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        analysisErrors: [
+          {
+            id: 'error_id',
+            detail: 'protocol analysis error',
+            errorType: 'analysis',
+            createdAt: '100000',
+          },
+        ],
+      })
+    const [{ getByText }] = render()
+    getByText('protocol analysis error')
+  })
+
+  it('renders analysis error banner if there is an analysis error', async () => {
+    when(mockUseProtocolAnalysisErrors)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        analysisErrors: [
+          {
+            id: 'error_id',
+            detail: 'protocol analysis error',
+            errorType: 'analysis',
+            createdAt: '100000',
+          },
+        ],
+      })
+    const [{ getByText }] = render()
+    getByText('Protocol analysis failed.')
+  })
 })

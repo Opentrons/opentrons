@@ -44,11 +44,11 @@ def get_version_dict(version_file: Optional[str]) -> Mapping[str, str]:
 
 
 def get_app(
-    system_version_file: str = None,
-    config_file_override: str = None,
-    name_override: str = None,
-    boot_id_override: str = None,
-    loop: asyncio.AbstractEventLoop = None,
+    system_version_file: Optional[str] = None,
+    config_file_override: Optional[str] = None,
+    name_override: Optional[str] = None,
+    boot_id_override: Optional[str] = None,
+    loop: Optional[asyncio.AbstractEventLoop] = None,
 ) -> web.Application:
     """Build and return the aiohttp.web.Application that runs the server"""
     if not system_version_file:

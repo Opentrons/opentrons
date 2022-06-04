@@ -1,3 +1,4 @@
+import * as React from 'react'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -5,9 +6,15 @@ import {
   SPACING,
   WRAP,
 } from '@opentrons/components'
-import * as React from 'react'
-import { useModuleRenderInfoForProtocolById } from '../hooks'
+import { useCreateCommandMutation } from '@opentrons/react-api-client'
+import {
+  useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
+} from '../hooks'
 import { ModuleCard } from '../ModuleCard'
+
+import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 
 interface ProtocolRunModuleControlsProps {
   robotName: string
@@ -25,6 +32,41 @@ export const ProtocolRunModuleControls = ({
   const attachedModules = Object.values(moduleRenderInfoForProtocolById).filter(
     module => module.attachedModuleMatch != null
   )
+
+  const { protocolData } = useProtocolDetailsForRun(runId)
+  const { createCommand } = useCreateCommandMutation()
+
+  const loadCommands: LoadModuleRunTimeCommand[] =
+    protocolData !== null
+      ? protocolData?.commands.filter(
+          (command: RunTimeCommand): command is LoadModuleRunTimeCommand =>
+            command.commandType === 'loadModule'
+        )
+      : []
+
+  React.useEffect(() => {
+    if (protocolData != null) {
+      const setupLoadCommands = loadCommands.map(command => {
+        const commandWithModuleId = {
+          ...command,
+          params: {
+            ...command.params,
+            moduleId: command.result?.moduleId,
+          },
+        }
+        return commandWithModuleId
+      })
+
+      setupLoadCommands.forEach(loadCommand => {
+        createCommand({
+          runId: runId,
+          command: loadCommand,
+        }).catch((e: Error) => {
+          console.error(`error issuing command to robot: ${e.message}`)
+        })
+      })
+    }
+  }, [])
 
   return (
     <Flex

@@ -9,7 +9,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { protocolHasModules } from '@opentrons/shared-data'
-
+import { useFeatureFlag } from '../../../redux/config'
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { InfoMessage } from '../../../molecules/InfoMessage'
@@ -25,15 +25,17 @@ import { SetupLabware } from './SetupLabware'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
 import { SetupModules } from './SetupModules'
 import { SetupStep } from './SetupStep'
-
+import { SetupLiquids } from './SetupLiquids'
 const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
 const MODULE_SETUP_KEY = 'module_setup_step' as const
 const LABWARE_SETUP_KEY = 'labware_setup_step' as const
+const LIQUID_SETUP_KEY = 'liquid_setup_step' as const
 
 export type StepKey =
   | typeof ROBOT_CALIBRATION_STEP_KEY
   | typeof MODULE_SETUP_KEY
   | typeof LABWARE_SETUP_KEY
+  | typeof LIQUID_SETUP_KEY
 
 interface ProtocolRunSetupProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
@@ -53,6 +55,7 @@ export function ProtocolRunSetup({
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
   const runHasStarted = useRunHasStarted(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
+  const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     null
   )
@@ -63,11 +66,31 @@ export function ProtocolRunSetup({
 
   React.useEffect(() => {
     let nextStepKeysInOrder = stepsKeysInOrder
-    if (protocolData != null && protocolHasModules(protocolData)) {
+    const showModuleSetup =
+      protocolData != null && protocolHasModules(protocolData)
+    const showLiquidSetup = liquidSetupEnabled
+    // uncomment this once we start getting liquids back from protocol data
+    // &&
+    // protocolData != null &&
+    // protocolHasLiquids(protocolData)
+    if (showModuleSetup && showLiquidSetup) {
       nextStepKeysInOrder = [
         ROBOT_CALIBRATION_STEP_KEY,
         MODULE_SETUP_KEY,
         LABWARE_SETUP_KEY,
+        LIQUID_SETUP_KEY,
+      ]
+    } else if (showModuleSetup) {
+      nextStepKeysInOrder = [
+        ROBOT_CALIBRATION_STEP_KEY,
+        MODULE_SETUP_KEY,
+        LABWARE_SETUP_KEY,
+      ]
+    } else if (showLiquidSetup) {
+      nextStepKeysInOrder = [
+        ROBOT_CALIBRATION_STEP_KEY,
+        LABWARE_SETUP_KEY,
+        LIQUID_SETUP_KEY,
       ]
     }
     setStepKeysInOrder(nextStepKeysInOrder)
@@ -118,9 +141,26 @@ export function ProtocolRunSetup({
           protocolRunHeaderRef={protocolRunHeaderRef}
           robotName={robotName}
           runId={runId}
+          nextStep={
+            stepsKeysInOrder.findIndex(v => v === LABWARE_SETUP_KEY) ===
+            stepsKeysInOrder.length - 1
+              ? null
+              : LIQUID_SETUP_KEY
+          }
+          expandStep={nextStep => setExpandedStepKey(nextStep)}
         />
       ),
       description: t(`${LABWARE_SETUP_KEY}_description`),
+    },
+    [LIQUID_SETUP_KEY]: {
+      stepInternals: (
+        <SetupLiquids
+          protocolRunHeaderRef={protocolRunHeaderRef}
+          robotName={robotName}
+          runId={runId}
+        />
+      ),
+      description: t(`${LIQUID_SETUP_KEY}_description`),
     },
   }
 

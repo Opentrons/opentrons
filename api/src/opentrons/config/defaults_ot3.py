@@ -10,10 +10,41 @@ from .types import (
     OT3MotionSettings,
     OT3Transform,
     Offset,
+    OT3CalibrationSettings,
+    CapacitivePassSettings,
+    ZSenseSettings,
+    EdgeSenseSettings,
 )
 
 DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 
+DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSettings(
+    z_offset=ZSenseSettings(
+        point=(209, 170, 0),
+        pass_settings=CapacitivePassSettings(
+            prep_distance_mm=3,
+            max_overrun_distance_mm=3,
+            speed_mm_per_s=1,
+            sensor_threshold_pf=1.0,
+        ),
+    ),
+    edge_sense=EdgeSenseSettings(
+        plus_x_pos=(219, 150, 0),
+        minus_x_pos=(199, 150, 0),
+        plus_y_pos=(209, 160, 0),
+        minus_y_pos=(209, 140, 0),
+        overrun_tolerance_mm=0.5,
+        early_sense_tolerance_mm=0.2,
+        pass_settings=CapacitivePassSettings(
+            prep_distance_mm=1,
+            max_overrun_distance_mm=1,
+            speed_mm_per_s=1,
+            sensor_threshold_pf=1.0,
+        ),
+        search_initial_tolerance_mm=5.0,
+        search_iteration_limit=10,
+    ),
+)
 
 ROBOT_CONFIG_VERSION: Final = 1
 DEFAULT_LOG_LEVEL: Final = "INFO"
@@ -272,6 +303,67 @@ def _build_default_transform(
     return cast(OT3Transform, from_conf)
 
 
+def _build_default_cap_pass(
+    from_conf: Any, default: CapacitivePassSettings
+) -> CapacitivePassSettings:
+    return CapacitivePassSettings(
+        prep_distance_mm=from_conf.get("prep_distance_mm", default.prep_distance_mm),
+        max_overrun_distance_mm=from_conf.get(
+            "max_overrun_distance_mm", default.max_overrun_distance_mm
+        ),
+        speed_mm_per_s=from_conf.get("speed_mm_per_s", default.speed_mm_per_s),
+        sensor_threshold_pf=from_conf.get(
+            "sensor_threshold_pf", default.sensor_threshold_pf
+        ),
+    )
+
+
+def _build_default_z_pass(from_conf: Any, default: ZSenseSettings) -> ZSenseSettings:
+    return ZSenseSettings(
+        point=from_conf.get("point", default.point),
+        pass_settings=_build_default_cap_pass(
+            from_conf.get("pass_settings", {}), default.pass_settings
+        ),
+    )
+
+
+def _build_default_edge_sense(
+    from_conf: Any, default: EdgeSenseSettings
+) -> EdgeSenseSettings:
+    return EdgeSenseSettings(
+        plus_x_pos=from_conf.get("plus_x_pos", default.plus_x_pos),
+        minus_x_pos=from_conf.get("minus_x_pos", default.minus_x_pos),
+        plus_y_pos=from_conf.get("plus_y_pos", default.plus_y_pos),
+        minus_y_pos=from_conf.get("minus_y_pos", default.minus_y_pos),
+        overrun_tolerance_mm=from_conf.get(
+            "overrun_tolerance_mm", default.overrun_tolerance_mm
+        ),
+        early_sense_tolerance_mm=from_conf.get(
+            "early_sense_tolerance_mm", default.early_sense_tolerance_mm
+        ),
+        pass_settings=_build_default_cap_pass(
+            from_conf.get("pass_settings", {}), default.pass_settings
+        ),
+        search_initial_tolerance_mm=from_conf.get(
+            "search_initial_tolerance_mm", default.search_initial_tolerance_mm
+        ),
+        search_iteration_limit=from_conf.get(
+            "search_iteration_limit", default.search_iteration_limit
+        ),
+    )
+
+
+def _build_default_calibration(
+    from_conf: Any, default: OT3CalibrationSettings
+) -> OT3CalibrationSettings:
+    return OT3CalibrationSettings(
+        z_offset=_build_default_z_pass(from_conf.get("z_offset", {}), default.z_offset),
+        edge_sense=_build_default_edge_sense(
+            from_conf.get("edge_sense", {}), default.edge_sense
+        ),
+    )
+
+
 def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
     motion_settings = robot_settings.get("motion_settings", {})
     current_settings = robot_settings.get("current_settings", {})
@@ -323,6 +415,9 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
         ),
         gripper_mount_offset=_build_default_offset(
             robot_settings.get("gripper_mount_offset", []), DEFAULT_GRIPPER_MOUNT_OFFSET
+        ),
+        calibration=_build_default_calibration(
+            robot_settings.get("calibration", {}), DEFAULT_CALIBRATION_SETTINGS
         ),
     )
 

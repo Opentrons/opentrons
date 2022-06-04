@@ -7,6 +7,7 @@ from opentrons.hardware_control.types import (
     OT3AxisMap,
     CurrentConfig,
     OT3SubSystem,
+    OT3Mount,
 )
 import numpy as np
 
@@ -18,6 +19,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     CoordinateValue,
 )
+from opentrons_hardware.hardware_control.tool_sensors import ProbeTarget
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     unit_vector_multiplication,
 )
@@ -214,3 +216,14 @@ def axis_convert(
         if node_is_axis(node):
             ret[node_to_axis(node)] = value
     return ret
+
+
+_sensor_node_lookup: Dict[OT3Mount, ProbeTarget] = {
+    OT3Mount.LEFT: NodeId.pipette_left,
+    OT3Mount.RIGHT: NodeId.pipette_right,
+    OT3Mount.GRIPPER: NodeId.gripper,
+}
+
+
+def sensor_node_for_mount(mount: OT3Mount) -> ProbeTarget:
+    return _sensor_node_lookup[mount]

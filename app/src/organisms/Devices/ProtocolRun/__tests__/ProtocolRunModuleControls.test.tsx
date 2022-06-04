@@ -7,14 +7,22 @@ import {
 } from '@opentrons/components'
 import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'
 import { ModuleCard } from '../../ModuleCard'
-import { useModuleRenderInfoForProtocolById } from '../../hooks'
+import {
+  useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
+} from '../../hooks'
 import {
   mockMagneticModuleGen2,
   mockTemperatureModuleGen2,
   mockThermocycler,
   mockHeaterShaker,
 } from '../../../../redux/modules/__fixtures__'
-import { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import fixtureAnalysis from '../../../../organisms/RunDetails/__fixtures__/analysis.json'
+import {
+  ModuleModel,
+  ModuleType,
+  ProtocolAnalysisFile,
+} from '@opentrons/shared-data'
 
 jest.mock('../../ModuleCard')
 jest.mock('../../hooks')
@@ -23,6 +31,11 @@ const mockModuleCard = ModuleCard as jest.MockedFunction<typeof ModuleCard>
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
 >
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
+>
+
+const _fixtureAnalysis = (fixtureAnalysis as unknown) as ProtocolAnalysisFile
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = 'test123'
@@ -63,6 +76,14 @@ const render = (
 }
 
 describe('ProtocolRunModuleControls', () => {
+  beforeEach(() => {
+    when(mockUseProtocolDetailsForRun).calledWith(RUN_ID).mockReturnValue({
+      protocolData: _fixtureAnalysis,
+      displayName: 'mock display name',
+      protocolKey: 'fakeProtocolKey',
+    })
+  })
+
   afterEach(() => {
     jest.resetAllMocks()
     resetAllWhenMocks()

@@ -4,7 +4,7 @@ from logging import getLogger
 from typing import Optional
 
 from ..state import StateStore
-from ..errors import ProtocolEngineStoppedError
+from ..errors import RunStoppedError
 from .command_executor import CommandExecutor
 
 
@@ -60,7 +60,7 @@ class QueueWorker:
 
             try:
                 await worker_task
-            except (ProtocolEngineStoppedError, asyncio.CancelledError):
+            except (RunStoppedError, asyncio.CancelledError):
                 pass
             except Exception as e:
                 log.error("Unhandled exception in QueueWorker job", exc_info=e)

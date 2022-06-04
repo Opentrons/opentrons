@@ -25,6 +25,7 @@ import {
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 import { PrimaryButton } from '../../../atoms/buttons'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { InputField } from '../../../atoms/InputField'
@@ -32,7 +33,7 @@ import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
-  HeaterShakerSetTargetShakeSpeedCreateCommand,
+  HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
   HeaterShakerStartSetTargetTemperatureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
@@ -54,14 +55,18 @@ export const HeaterShakerSlideout = (
   const { createCommand } = useCreateCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    module,
+    runId != null ? runId : null
+  )
   const modulePart = isSetShake ? t('shake_speed') : t('temperature')
 
   const sendShakeSpeedCommand = (): void => {
     if (hsValue != null && isSetShake) {
-      const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
-        commandType: 'heaterShakerModule/setTargetShakeSpeed',
+      const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
+        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
         params: {
-          moduleId: module.id,
+          moduleId: runId != null ? moduleIdFromRun : module.id,
           rpm: parseInt(hsValue),
         },
       }
@@ -96,11 +101,10 @@ export const HeaterShakerSlideout = (
   const sendSetTemperatureOrShakeCommand = (): void => {
     if (hsValue != null && !isSetShake) {
       const setTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
-        commandType: 'heaterShakerModule/startSetTargetTemperature',
+        commandType: 'heaterShaker/setTargetTemperature',
         params: {
-          moduleId: module.id,
-          // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10182 merges
-          temperature: parseInt(hsValue),
+          moduleId: runId != null ? moduleIdFromRun : module.id,
+          celsius: parseInt(hsValue),
         },
       }
       if (runId != null) {

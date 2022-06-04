@@ -4,6 +4,8 @@ import {
   thermocyclerPipetteCollision,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  pipetteAdjacentHeaterShakerWhileShaking,
 } from '../../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { MoveToWellParams as v5MoveToWellParams } from '@opentrons/shared-data/protocol/types/schemaV5'
@@ -80,6 +82,24 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
     )
   ) {
     errors.push(errorCreators.heaterShakerIsShaking())
+  }
+
+  if (
+    pipetteAdjacentHeaterShakerWhileShaking(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
+  }
+
+  if (
+    getIsHeaterShakerEastWestWithLatchOpen(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerEastWestWithLatchOpen())
   }
 
   if (errors.length > 0) {

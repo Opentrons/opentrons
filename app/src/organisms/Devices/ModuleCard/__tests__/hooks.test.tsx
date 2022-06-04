@@ -20,6 +20,7 @@ import {
   useModuleOverflowMenu,
   useIsHeaterShakerInProtocol,
 } from '../hooks'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
 
 import {
   mockHeaterShaker,
@@ -35,6 +36,7 @@ jest.mock('@opentrons/react-api-client')
 jest.mock('../../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../../hooks')
+jest.mock('../useModuleIdFromRun')
 
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
@@ -51,6 +53,9 @@ const mockUseCreateCommandMutation = useCreateCommandMutation as jest.MockedFunc
 >
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
+>
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
 >
 
 const mockCloseLatchHeaterShaker = {
@@ -231,6 +236,9 @@ describe('useLatchControls', () => {
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
     )
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'heatershaker_id',
+    })
     const { result } = renderHook(() => useLatchControls(mockHeaterShaker), {
       wrapper,
     })
@@ -240,7 +248,7 @@ describe('useLatchControls', () => {
     act(() => result.current.toggleLatch())
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'heaterShakerModule/closeLatch',
+        commandType: 'heaterShaker/closeLabwareLatch',
         params: {
           moduleId: mockHeaterShaker.id,
         },
@@ -265,7 +273,7 @@ describe('useLatchControls', () => {
     act(() => result.current.toggleLatch())
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'heaterShakerModule/openLatch',
+        commandType: 'heaterShaker/openLabwareLatch',
         params: {
           moduleId: mockCloseLatchHeaterShaker.id,
         },
@@ -324,7 +332,7 @@ describe('useModuleOverflowMenu', () => {
     act(() => heaterShakerMenu[0].onClick(false))
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'heaterShakerModule/deactivateHeater',
+        commandType: 'heaterShaker/deactivateHeater',
         params: {
           moduleId: mockHeatHeaterShaker.id,
         },
@@ -357,7 +365,7 @@ describe('useModuleOverflowMenu', () => {
     act(() => heaterShakerMenu[1].onClick(true))
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'heaterShakerModule/stopShake',
+        commandType: 'heaterShaker/deactivateShaker',
         params: {
           moduleId: mockDeactivateShakeHeaterShaker.id,
         },

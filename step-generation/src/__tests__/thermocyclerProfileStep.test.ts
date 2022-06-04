@@ -1,4 +1,3 @@
-// @ts-nocheck TODO: remove this after https://github.com/Opentrons/opentrons/pull/10178 merges
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import { thermocyclerProfileStep } from '../commandCreators/compound/thermocyclerProfileStep'
 import {
@@ -52,7 +51,6 @@ describe('thermocyclerProfileStep', () => {
           commandType: 'thermocycler/waitForLidTemperature',
           params: {
             moduleId: 'thermocyclerId',
-            celsius: 55,
           },
         },
         {
@@ -76,7 +74,7 @@ describe('thermocyclerProfileStep', () => {
           },
         },
         {
-          commandType: 'thermocycler/setAndWaitForBlockTemperature',
+          commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
@@ -86,7 +84,6 @@ describe('thermocyclerProfileStep', () => {
           commandType: 'thermocycler/waitForBlockTemperature',
           params: {
             moduleId: 'thermocyclerId',
-            celsius: 4,
           },
         },
         {
@@ -138,7 +135,7 @@ describe('thermocyclerProfileStep', () => {
           },
         },
         {
-          commandType: 'thermocycler/setAndWaitForBlockTemperature',
+          commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
@@ -148,7 +145,6 @@ describe('thermocyclerProfileStep', () => {
           commandType: 'thermocycler/waitForBlockTemperature',
           params: {
             moduleId: 'thermocyclerId',
-            celsius: 4,
           },
         },
         {
@@ -206,7 +202,7 @@ describe('thermocyclerProfileStep', () => {
           },
         },
         {
-          commandType: 'thermocycler/setAndWaitForBlockTemperature',
+          commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
@@ -216,7 +212,6 @@ describe('thermocyclerProfileStep', () => {
           commandType: 'thermocycler/waitForBlockTemperature',
           params: {
             moduleId: 'thermocyclerId',
-            celsius: 4,
           },
         },
         {
@@ -268,7 +263,7 @@ describe('thermocyclerProfileStep', () => {
           },
         },
         {
-          commandType: 'thermocycler/setAndWaitForBlockTemperature',
+          commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
@@ -278,7 +273,6 @@ describe('thermocyclerProfileStep', () => {
           commandType: 'thermocycler/waitForBlockTemperature',
           params: {
             moduleId: 'thermocyclerId',
-            celsius: 4,
           },
         },
         {

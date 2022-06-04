@@ -54,6 +54,7 @@ export function ProtocolAnalysisErrorBanner(
                 <Btn
                   as="a"
                   role="button"
+                  aria-label="error_link"
                   textDecoration={TEXT_DECORATION_UNDERLINE}
                   onClick={handleToggleDetails}
                 />
@@ -76,6 +77,8 @@ export function ProtocolAnalysisErrorBanner(
             ))}
             <Flex justifyContent={JUSTIFY_FLEX_END}>
               <PrimaryButton
+                role="button"
+                aria-label="close_modal_button"
                 onClick={handleToggleDetails}
                 textTransform={TEXT_TRANSFORM_CAPITALIZE}
                 marginTop={SPACING.spacing4}
