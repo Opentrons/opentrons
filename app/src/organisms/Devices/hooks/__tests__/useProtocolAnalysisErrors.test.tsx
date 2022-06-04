@@ -12,7 +12,10 @@ import { useProtocolAnalysisErrors } from '..'
 import { RUN_ID_2 } from '../../../../organisms/RunTimeControl/__fixtures__'
 
 import type { Run, ProtocolAnalyses } from '@opentrons/api-client'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  PendingProtocolAnalysis,
+} from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 
@@ -37,12 +40,47 @@ describe('useProtocolAnalysisErrors hook', () => {
     resetAllWhenMocks()
   })
 
+  it('returns null when protocol id is null', async () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2, { staleTime: Infinity })
+      .mockReturnValue({
+        data: { data: { protocolId: null } } as any,
+      } as UseQueryResult<Run>)
+    const { result } = renderHook(() => useProtocolAnalysisErrors(RUN_ID_2))
+    expect(result.current).toStrictEqual({
+      analysisErrors: null,
+    })
+  })
+
   it('returns null when there are no errors', async () => {
     const PROTOCOL_ID = 'fake_protocol_id'
     const PROTOCOL_ANALYSIS = {
       id: 'fake analysis',
       status: 'completed',
     } as CompletedProtocolAnalysis
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2, { staleTime: Infinity })
+      .mockReturnValue({
+        data: { data: { protocolId: PROTOCOL_ID } } as any,
+      } as UseQueryResult<Run>)
+    when(mockUseProtocolAnalysesQuery)
+      .calledWith(PROTOCOL_ID, { staleTime: Infinity })
+      .mockReturnValue({
+        data: { data: [PROTOCOL_ANALYSIS as any] },
+      } as UseQueryResult<ProtocolAnalyses>)
+
+    const { result } = renderHook(() => useProtocolAnalysisErrors(RUN_ID_2))
+    expect(result.current).toStrictEqual({
+      analysisErrors: null,
+    })
+  })
+
+  it('returns null when analysis status is not complete', async () => {
+    const PROTOCOL_ID = 'fake_protocol_id'
+    const PROTOCOL_ANALYSIS = {
+      id: 'fake analysis',
+      status: 'pending',
+    } as PendingProtocolAnalysis
     when(mockUseRunQuery)
       .calledWith(RUN_ID_2, { staleTime: Infinity })
       .mockReturnValue({
