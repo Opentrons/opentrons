@@ -14,14 +14,6 @@ import { RUN_ID_2 } from '../../../../organisms/RunTimeControl/__fixtures__'
 import type { Run, ProtocolAnalyses } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/shared-data', () => {
-  const actualSharedData = jest.requireActual('@opentrons/shared-data')
-  return {
-    ...actualSharedData,
-    schemaV6Adapter: jest.fn(),
-  }
-})
-
 jest.mock('@opentrons/react-api-client')
 
 const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
