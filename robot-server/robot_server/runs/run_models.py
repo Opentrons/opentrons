@@ -5,6 +5,7 @@ from typing import List, Optional
 
 from opentrons.protocol_engine import (
     CommandStatus,
+    CommandIntent,
     CommandType,
     CommandParams,
     EngineStatus as RunStatus,
@@ -49,6 +50,10 @@ class RunCommandSummary(ResourceModel):
     # TODO(mc, 2022-02-01): this does not allow the command summary object to
     # be narrowed based on `commandType`. Will be resolved by TODO above
     params: CommandParams = Field(..., description="Command execution parameters.")
+    intent: Optional[CommandIntent] = Field(
+        None,
+        description="Why this command was added to the run.",
+    )
 
 
 class Run(ResourceModel):
