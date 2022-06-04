@@ -117,11 +117,19 @@ from .save_position import (
     SavePositionResult,
     SavePositionCommandType,
 )
+from .blow_out import (
+    BlowOutParams,
+    BlowOut,
+    BlowOutCreate,
+    BlowOutCommandType,
+    BlowOutResult,
+)
 
 Command = Union[
     Aspirate,
     Custom,
     Dispense,
+    BlowOut,
     DropTip,
     Home,
     LoadLabware,
@@ -157,6 +165,7 @@ CommandParams = Union[
     AspirateParams,
     CustomParams,
     DispenseParams,
+    BlowOutParams,
     DropTipParams,
     HomeParams,
     LoadLabwareParams,
@@ -192,6 +201,7 @@ CommandType = Union[
     AspirateCommandType,
     CustomCommandType,
     DispenseCommandType,
+    BlowOutCommandType,
     DropTipCommandType,
     HomeCommandType,
     LoadLabwareCommandType,
@@ -226,6 +236,7 @@ CommandType = Union[
 CommandCreate = Union[
     AspirateCreate,
     DispenseCreate,
+    BlowOutCreate,
     DropTipCreate,
     HomeCreate,
     LoadLabwareCreate,
@@ -261,6 +272,7 @@ CommandResult = Union[
     AspirateResult,
     CustomResult,
     DispenseResult,
+    BlowOutResult,
     DropTipResult,
     HomeResult,
     LoadLabwareResult,

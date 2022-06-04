@@ -18,6 +18,7 @@ from ..commands import (
     PickUpTipResult,
     DropTipResult,
     HomeResult,
+    BlowOutResult,
 )
 from ..actions import Action, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
@@ -78,6 +79,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 DropTipResult,
                 AspirateResult,
                 DispenseResult,
+                BlowOutResult,
             ),
         ):
             self._state.current_well = CurrentWell(
