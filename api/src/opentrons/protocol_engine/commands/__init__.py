@@ -144,6 +144,7 @@ from .blow_out import (
     BlowOutResult,
     BlowOutCreate,
     BlowOutImplementation,
+    BlowOut,
 )
 
 __all__ = [
