@@ -133,10 +133,10 @@ describe('HeaterShakerSlideout', () => {
 
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'heaterShakerModule/startSetTargetTemperature',
+        commandType: 'heaterShaker/setTargetTemperature',
         params: {
           moduleId: 'heatershaker_id',
-          temperature: 40,
+          celsius: 40,
         },
       },
     })
@@ -196,10 +196,10 @@ describe('HeaterShakerSlideout', () => {
     expect(mockCreateCommand).toHaveBeenCalledWith({
       runId: props.runId,
       command: {
-        commandType: 'heaterShakerModule/startSetTargetTemperature',
+        commandType: 'heaterShaker/setTargetTemperature',
         params: {
           moduleId: 'heatershaker_id',
-          temperature: 40,
+          celsius: 40,
         },
       },
     })

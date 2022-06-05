@@ -127,6 +127,10 @@
       },
       "HEATER_SHAKER_EAST_WEST_LATCH_OPEN": {
         "body": "Pipettes cannot access labware on, or to the left or right of, the Heater-Shaker while the labware latch is open. Create a step before this one that closes the latch."
+      },
+      "HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING": {
+        "title": "The Heater-Shaker is shaking",
+        "body": "Pipettes cannot access labware on or adjacent to the Heater-Shaker while it is shaking. Create a step before this one that deactivates the shaker."
       }
     },
     "warning": {

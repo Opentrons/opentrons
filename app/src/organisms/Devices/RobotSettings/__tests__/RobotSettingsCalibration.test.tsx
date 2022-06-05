@@ -20,6 +20,7 @@ import {
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
   mockPipetteOffsetCalibration4,
+  mockPipetteOffsetCalibration5,
 } from '../../../../redux/calibration/pipette-offset/__fixtures__'
 import {
   mockTipLengthCalibration1,
@@ -241,10 +242,8 @@ describe('RobotSettingsCalibration', () => {
 
   it('renders the warning banner when calibration is marked bad', () => {
     mockUsePipetteOffsetCalibrations.mockReturnValue([
-      mockPipetteOffsetCalibration1,
-      mockPipetteOffsetCalibration2,
-      mockPipetteOffsetCalibration3,
       mockPipetteOffsetCalibration4,
+      mockPipetteOffsetCalibration5,
     ])
     const [{ getByText }] = render()
     getByText('Pipette Offset calibration recommended')

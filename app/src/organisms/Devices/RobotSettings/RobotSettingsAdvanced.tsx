@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import { Box, SPACING, IconProps } from '@opentrons/components'
@@ -21,12 +21,12 @@ import { LegacySettings } from './AdvancedTab/LegacySettings'
 import { ShortTrashBin } from './AdvancedTab/ShortTrashBin'
 import { UseOlderAspirateBehavior } from './AdvancedTab/UseOlderAspirateBehavior'
 import { UpdateBuildroot } from '../../../pages/Robots/RobotSettings/UpdateBuildroot'
-import { getRobotSettings } from '../../../redux/robot-settings'
+import { getRobotSettings, fetchSettings } from '../../../redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
 import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
 
-import type { State } from '../../../redux/types'
+import type { State, Dispatch } from '../../../redux/types'
 import type {
   RobotSettings,
   RobotSettingsField,
@@ -105,6 +105,12 @@ export function RobotSettingsAdvanced({
   const updateIsRobotBusy = (isRobotBusy: boolean): void => {
     updateRobotStatus(isRobotBusy)
   }
+
+  const dispatch = useDispatch<Dispatch>()
+
+  React.useEffect(() => {
+    dispatch(fetchSettings(robotName))
+  }, [dispatch, robotName])
 
   return (
     <>

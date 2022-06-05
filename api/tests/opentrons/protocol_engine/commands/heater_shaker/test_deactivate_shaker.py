@@ -1,4 +1,4 @@
-"""Test Heater Shaker close latch command implementation."""
+"""Test Heater Shaker deactivate shake command implementation."""
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import HeaterShaker
@@ -10,22 +10,22 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
-from opentrons.protocol_engine.commands.heater_shaker.close_latch import (
-    CloseLatchImpl,
+from opentrons.protocol_engine.commands.heater_shaker.deactivate_shaker import (
+    DeactivateShakerImpl,
 )
 
 
-async def test_close_latch(
+async def test_deactivate_shaker(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
 ) -> None:
-    """It should be able to close the module's labware latch."""
-    subject = CloseLatchImpl(state_view=state_view, equipment=equipment)
-    data = heater_shaker.CloseLatchParams(moduleId="input-heater-shaker-id")
+    """It should be able to deactivate the module's shake."""
+    subject = DeactivateShakerImpl(state_view=state_view, equipment=equipment)
+    data = heater_shaker.DeactivateShakerParams(moduleId="input-heater-shaker-id")
 
     hs_module_substate = decoy.mock(cls=HeaterShakerModuleSubState)
-    heater_shaker_hardware = decoy.mock(cls=HeaterShaker)
+    hs_hardware = decoy.mock(cls=HeaterShaker)
 
     decoy.when(
         state_view.modules.get_heater_shaker_module_substate(
@@ -37,23 +37,24 @@ async def test_close_latch(
         HeaterShakerModuleId("heater-shaker-id")
     )
 
+    # Get stubbed hardware module from hs module view
     decoy.when(
         equipment.get_module_hardware_api(HeaterShakerModuleId("heater-shaker-id"))
-    ).then_return(heater_shaker_hardware)
+    ).then_return(hs_hardware)
 
     result = await subject.execute(data)
-    decoy.verify(await heater_shaker_hardware.close_labware_latch(), times=1)
-    assert result == heater_shaker.CloseLatchResult()
+    decoy.verify(await hs_hardware.deactivate_shaker(), times=1)
+    assert result == heater_shaker.DeactivateShakerResult()
 
 
-async def test_close_latch_virtual(
+async def test_deactivate_shaker_virtual(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
 ) -> None:
-    """It should no-op for virtual modules."""
-    subject = CloseLatchImpl(state_view=state_view, equipment=equipment)
-    data = heater_shaker.CloseLatchParams(moduleId="input-heater-shaker-id")
+    """It should be able to deactivate the module's shake."""
+    subject = DeactivateShakerImpl(state_view=state_view, equipment=equipment)
+    data = heater_shaker.DeactivateShakerParams(moduleId="input-heater-shaker-id")
 
     hs_module_substate = decoy.mock(cls=HeaterShakerModuleSubState)
 
@@ -67,10 +68,10 @@ async def test_close_latch_virtual(
         HeaterShakerModuleId("heater-shaker-id")
     )
 
+    # Get stubbed hardware module from hs module view
     decoy.when(
         equipment.get_module_hardware_api(HeaterShakerModuleId("heater-shaker-id"))
     ).then_return(None)
 
     result = await subject.execute(data)
-
-    assert result == heater_shaker.CloseLatchResult()
+    assert result == heater_shaker.DeactivateShakerResult()

@@ -15,6 +15,14 @@ class ToolDetectionResult:
 
 
 @dataclass(frozen=True)
+class GripperInformation:
+    """Model the information you can retrieve from a gripper."""
+
+    model: int
+    serial: str
+
+
+@dataclass(frozen=True)
 class PipetteInformation:
     """Model the information you can retrieve from a pipette."""
 
@@ -29,4 +37,4 @@ class ToolSummary:
 
     left: Optional[PipetteInformation]
     right: Optional[PipetteInformation]
-    gripper: ToolType
+    gripper: Optional[GripperInformation]

@@ -214,8 +214,8 @@ async def test_create_stop_action(
     ("action_type", "exception"),
     [
         (RunActionType.PLAY, pe_errors.RobotDoorOpenError("oh no")),
-        (RunActionType.PLAY, pe_errors.ProtocolEngineStoppedError("oh no")),
-        (RunActionType.PAUSE, pe_errors.ProtocolEngineStoppedError("oh no")),
+        (RunActionType.PLAY, pe_errors.RunStoppedError("oh no")),
+        (RunActionType.PAUSE, pe_errors.RunStoppedError("oh no")),
     ],
 )
 async def test_action_not_allowed(

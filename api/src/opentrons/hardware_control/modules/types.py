@@ -53,6 +53,7 @@ class TemperatureModuleModel(str, Enum):
 
 class ThermocyclerModuleModel(str, Enum):
     THERMOCYCLER_V1: str = "thermocyclerModuleV1"
+    THERMOCYCLER_V2: str = "thermocyclerModuleV2"
 
 
 class HeaterShakerModuleModel(str, Enum):
