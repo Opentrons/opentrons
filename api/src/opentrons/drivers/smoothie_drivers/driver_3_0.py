@@ -1316,21 +1316,6 @@ class SmoothieDriver:
             and ((since_moved[ax] is None) or (split.after_time < since_moved[ax]))  # type: ignore[operator]  # noqa: E501
         }
 
-        # when splitting a movement, make sure to also split the movement
-        # of other moving axes
-        if split_target:
-            # NOTE: assumes A/B axes are never moving at the same time...
-            if 'A' in split_target:
-                split_ax = 'A'
-            else:
-                split_ax = 'B'
-            dist = backlash_target.get(split_ax, moving_target[split_ax]) - self.position[split_ax]
-            perc_of_total_move = abs(split_target[split_ax] / dist)
-            for ax in moving_axes:
-                dist = backlash_target.get(ax, moving_target[ax]) - self.position[ax]
-                split_dist_on_ax = dist * perc_of_total_move
-                split_target[ax] = split_dist_on_ax
-
         split_command_string = create_coords_list(split_target)
         primary_with_backlash_command_string = create_coords_list(moving_with_backlash_target)
         backlash_correction_command_string = create_coords_list(backlash_correction_target)
