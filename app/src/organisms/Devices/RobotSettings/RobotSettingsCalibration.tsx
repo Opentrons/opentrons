@@ -413,13 +413,6 @@ export function RobotSettingsCalibration({
   }
 
   React.useEffect(() => {
-    robotName && dispatch(Pipettes.fetchPipettes(robotName))
-    robotName &&
-      dispatch(PipetteOffset.fetchPipetteOffsetCalibrations(robotName))
-    robotName && dispatch(TipLength.fetchTipLengthCalibrations(robotName))
-  }, [dispatch, robotName, status])
-
-  React.useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
       createRequestId.current = null
     }
@@ -430,7 +423,12 @@ export function RobotSettingsCalibration({
   }, [pipettePresent, pipetteOffsetCalibrations])
 
   useInterval(
-    () => dispatch(Calibration.fetchCalibrationStatus(robotName)),
+    () => {
+      dispatch(Calibration.fetchCalibrationStatus(robotName))
+      dispatch(Pipettes.fetchPipettes(robotName))
+      dispatch(PipetteOffset.fetchPipetteOffsetCalibrations(robotName))
+      dispatch(TipLength.fetchTipLengthCalibrations(robotName))
+    },
     CALIBRATION_STATUS_POLL_MS,
     true
   )
