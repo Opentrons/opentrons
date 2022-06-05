@@ -13,8 +13,6 @@ import {
   SPACING,
   TYPOGRAPHY,
   TEXT_DECORATION_UNDERLINE,
-  useHoverTooltip,
-  TOOLTIP_LEFT,
   useConditionalConfirm,
   Mount,
   SpinnerModalPage,
@@ -27,11 +25,9 @@ import { TertiaryButton } from '../../../atoms/buttons'
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
-import { Tooltip } from '../../../atoms/Tooltip'
 import { DeckCalibrationModal } from '../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
 import { formatLastModified } from '../../../organisms/CalibrationPanels/utils'
-import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import { CheckCalibration } from '../../../organisms/CheckCalibration'
 import { useTrackEvent } from '../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
@@ -39,7 +35,6 @@ import { getDeckCalibrationSession } from '../../../redux/sessions/deck-calibrat
 import { CONNECTABLE } from '../../../redux/discovery'
 import { selectors as robotSelectors } from '../../../redux/robot'
 import * as RobotApi from '../../../redux/robot-api'
-import * as Config from '../../../redux/config'
 import * as Sessions from '../../../redux/sessions'
 import * as Calibration from '../../../redux/calibration'
 import * as Pipettes from '../../../redux/pipettes'
@@ -56,6 +51,7 @@ import {
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
+import { CalibrationHealthCheck } from './CalibrationDetails/CalibrationHealthCheck'
 
 import type { State, Dispatch } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
@@ -121,9 +117,6 @@ export function RobotSettingsCalibration({
   const trackedRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
-  const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: TOOLTIP_LEFT,
-  })
 
   const [
     showDeckCalibrationModal,
@@ -137,7 +130,6 @@ export function RobotSettingsCalibration({
     pipetteOffsetCalBannerType,
     setPipetteOffsetCalBannerType,
   ] = React.useState<string>('')
-  const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
   const isBusy = useIsRobotBusy()
 
   const robot = useRobot(robotName)
@@ -212,8 +204,6 @@ export function RobotSettingsCalibration({
       : null
   )
   const createStatus = createRequest?.status
-
-  const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
 
   const isJogging =
     useSelector((state: State) =>
@@ -322,35 +312,6 @@ export function RobotSettingsCalibration({
     }
     return null
   })
-
-  const handleHealthCheck = (
-    hasBlockModalResponse: boolean | null = null
-  ): void => {
-    if (isBusy) {
-      updateRobotStatus(true)
-    } else {
-      if (
-        hasBlockModalResponse === null &&
-        configHasCalibrationBlock === null
-      ) {
-        setShowCalBlockModal(true)
-      } else {
-        setShowCalBlockModal(false)
-        dispatchRequests(
-          Sessions.ensureSession(
-            robotName,
-            Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
-            {
-              tipRacks: [],
-              hasCalibrationBlock: Boolean(
-                configHasCalibrationBlock ?? hasBlockModalResponse
-              ),
-            }
-          )
-        )
-      }
-    }
-  }
 
   const formatPipetteOffsetCalibrations = (): FormattedPipetteOffsetCalibration[] => {
     const pippets = []
@@ -484,13 +445,6 @@ export function RobotSettingsCalibration({
           showSpinner={isPending}
           isJogging={isJogging}
         />
-        {showCalBlockModal ? (
-          <AskForCalibrationBlockModal
-            onResponse={handleHealthCheck}
-            titleBarTitle={t('robot_calibration:health_check_title')}
-            closePrompt={() => setShowCalBlockModal(false)}
-          />
-        ) : null}
         {showConfirmStart && pipOffsetDataPresent && (
           <DeckCalibrationConfirmModal
             confirm={confirmStart}
@@ -673,30 +627,11 @@ export function RobotSettingsCalibration({
       </Box>
       <Line />
       {/* Calibration Health Check Section */}
-      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box marginRight={SPACING.spacing6}>
-            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
-              {t('calibration_health_check_title')}
-            </Box>
-            <StyledText as="p" marginBottom={SPACING.spacing3}>
-              {t('calibration_health_check_description')}
-            </StyledText>
-          </Box>
-          <TertiaryButton
-            {...targetProps}
-            onClick={() => handleHealthCheck(null)}
-            disabled={calCheckButtonDisabled}
-          >
-            {t('health_check_button')}
-          </TertiaryButton>
-          {calCheckButtonDisabled && (
-            <Tooltip tooltipProps={tooltipProps}>
-              {t('fully_calibrate_before_checking_health')}
-            </Tooltip>
-          )}
-        </Flex>
-      </Box>
+      <CalibrationHealthCheck
+        robotName={robotName}
+        calCheckButtonDisabled={calCheckButtonDisabled}
+        updateRobotStatus={updateRobotStatus}
+      />
     </>
   )
 }
