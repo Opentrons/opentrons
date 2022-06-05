@@ -1270,11 +1270,22 @@ class SmoothieDriver:
             log.info(f"No axes move in {target} from position {self.position}")
             return
 
-        backlash_target = {
-            axis: value + PLUNGER_BACKLASH_MM
+        # Multi-axis movements should include the added backlash.
+        # After all axes arrive at target, finally then apply
+        # a backlash correction to just the plunger axes
+        plunger_backlash_axes = [
+            axis
             for axis, value in target.items()
             if axis in "BC" and self.position[axis] < value
+        ]
+        backlash_target = {
+            ax: moving_target[ax]
+            for ax in plunger_backlash_axes
         }
+        moving_target.update({
+            ax: moving_target[ax] + PLUNGER_BACKLASH_MM
+            for ax in plunger_backlash_axes
+        })
 
         # whatever else we do to our motion target, if nothing moves in the
         # input we will not command it to move
@@ -1282,14 +1293,6 @@ class SmoothieDriver:
 
         # cache which axes move because we might take them out of moving target
         moving_axes = list(moving_target.keys())
-
-        # the "target" movement (all axes) should include the
-        # BC backlash coordinate. Then after all axes arrive, apply
-        # just the backlash correction to the BC axes
-        moving_with_backlash_target = moving_target.copy()
-        moving_with_backlash_target.update(backlash_target)
-        backlash_correction_target = {
-            ax: moving_target[ax] for ax in backlash_target.keys() if ax in 'BC'}
 
         def build_split(here: float, dest: float, split_distance: float) -> float:
             """Return the destination for the split move"""
@@ -1303,7 +1306,7 @@ class SmoothieDriver:
         split_target = {
             ax: build_split(
                 self.position[ax],
-                backlash_target.get(ax, moving_target[ax]),
+                moving_target[ax],
                 split.split_distance,
             )
             for ax, split in self._move_split_config.items()
@@ -1317,8 +1320,8 @@ class SmoothieDriver:
         }
 
         split_command_string = create_coords_list(split_target)
-        primary_with_backlash_command_string = create_coords_list(moving_with_backlash_target)
-        backlash_correction_command_string = create_coords_list(backlash_correction_target)
+        primary_command_string = create_coords_list(moving_target)
+        backlash_command_string = create_coords_list(backlash_target)
 
         self.dwell_axes("".join(non_moving_axes))
         self.activate_axes("".join(moving_axes))
@@ -1373,10 +1376,12 @@ class SmoothieDriver:
         # introduce the standard currents
         command.add_builder(builder=self._generate_current_command())
 
-        command.add_gcode(GCODE.MOVE).add_builder(builder=primary_with_backlash_command_string)
-        if backlash_correction_command_string:
+        # move to target position, including any added backlash to B/C axes
+        command.add_gcode(GCODE.MOVE).add_builder(builder=primary_command_string)
+        if backlash_command_string:
+            # correct the B/C positions
             command.add_gcode(gcode=GCODE.MOVE).add_builder(
-                builder=backlash_correction_command_string
+                builder=backlash_command_string
             )
 
         if checked_speed != self._combined_speed:
