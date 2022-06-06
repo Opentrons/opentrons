@@ -26,9 +26,7 @@ async def main() -> NoReturn:
     static_hostname = await name_management.set_up_static_hostname()
     LOG.info(f"Set static hostname to {static_hostname}")
 
-    async with name_management.build_name_synchronizer(
-        name_override=None
-    ) as name_synchronizer:
+    async with name_management.NameSynchronizer.start() as name_synchronizer:
         LOG.info("Building buildroot update server")
         app = get_app(
             system_version_file=args.version_file,

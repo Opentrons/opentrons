@@ -49,7 +49,6 @@ from aiohttp import web
 
 from .name_synchronizer import (
     NameSynchronizer,
-    build_name_synchronizer,
     install_name_synchronizer,
     get_name_synchronizer,
 )
@@ -119,7 +118,6 @@ async def get_name_endpoint(request: web.Request) -> web.Response:
 
 __all__ = [
     "NameSynchronizer",
-    "build_name_synchronizer",
     "install_name_synchronizer",
     "get_name_synchronizer",
     "set_up_static_hostname",

@@ -27,7 +27,7 @@ class NameSynchronizer:
 
     See the `name_management` package docstring for an overview of these various names.
 
-    We tie all of these names together because
+    We tie all of these names together because:
 
     * It's important to avoid confusing the client-side discovery client,
       at least at the time of writing.
@@ -42,15 +42,15 @@ class NameSynchronizer:
     """
 
     def __init__(self, avahi_client: AvahiClient) -> None:
-        """For internal use by this class only. Use `build()` instead."""
+        """For internal use by this class only. Use `start()` instead."""
         self._avahi_client = avahi_client
 
     @classmethod
     @asynccontextmanager
-    async def build(
-        cls, avahi_client: AvahiClient
+    async def start(
+        cls, avahi_client: Optional[AvahiClient] = None
     ) -> AsyncGenerator[NameSynchronizer, None]:
-        """Build a RealNameSynchronizer and keep it running in the background.
+        """Build a NameSynchronizer and keep it running in the background.
 
         Avahi advertisements will start as soon as this context manager is entered.
         The pretty hostname will be used as the Avahi service name.
@@ -61,7 +61,15 @@ class NameSynchronizer:
         which will be visible through `get_name()`.
 
         Collision monitoring will stop when this context manager exits.
+
+        Args:
+            avahi_client: The interface for communicating with Avahi.
+                Changeable for testing this class; should normally be left as
+                the default.
         """
+        if avahi_client is None:
+            avahi_client = await AvahiClient.connect()
+
         name_synchronizer = cls(avahi_client)
         async with avahi_client.collision_callback(
             name_synchronizer._on_avahi_collision
@@ -139,19 +147,3 @@ def get_name_synchronizer(request: web.Request) -> NameSynchronizer:
         name_synchronizer, NameSynchronizer
     ), f"Unexpected type {type(name_synchronizer)}. Incorrect Application setup?"
     return name_synchronizer
-
-
-@asynccontextmanager
-async def build_name_synchronizer(
-    name_override: Optional[str],
-) -> AsyncGenerator[NameSynchronizer, None]:
-    """Return a RealNameSynchronizer for production or FakeNameManager for testing."""
-    if name_override is None:
-        avahi_client = await AvahiClient.connect()
-        async with NameSynchronizer.build(
-            avahi_client=avahi_client
-        ) as real_name_synchronizer:
-            yield real_name_synchronizer
-    else:
-        assert False  # TODO
-        # yield FakeNameSynchronizer(name_override=name_override)
