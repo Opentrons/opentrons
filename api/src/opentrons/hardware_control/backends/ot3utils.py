@@ -53,7 +53,15 @@ def axis_nodes() -> List["NodeId"]:
 
 
 def node_axes() -> List[OT3Axis]:
-    return [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.P_L, OT3Axis.P_R, OT3Axis.Z_G]
+    return [
+        OT3Axis.X,
+        OT3Axis.Y,
+        OT3Axis.Z_L,
+        OT3Axis.Z_R,
+        OT3Axis.P_L,
+        OT3Axis.P_R,
+        OT3Axis.Z_G,
+    ]
 
 
 def home_axes() -> List[OT3Axis]:

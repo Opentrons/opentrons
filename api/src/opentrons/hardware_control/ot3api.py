@@ -5,6 +5,8 @@ from dataclasses import replace
 import logging
 from collections import OrderedDict
 from typing import (
+    Mapping,
+    cast,
     Callable,
     Dict,
     Union,
@@ -86,7 +88,7 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
 
-from .dev_types import PipetteDict
+from .dev_types import AttachedPipette, PipetteDict, InstrumentDict, GripperDict
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
 )
@@ -368,12 +370,12 @@ class OT3API(
 
     @staticmethod
     def _gantry_load_from_instruments(
-        instruments: Dict[OT3Mount, PipetteDict]
+        instruments: Mapping[OT3Mount, InstrumentDict]
     ) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
-        left = instruments.get(OT3Mount.LEFT)
-        right = instruments.get(OT3Mount.RIGHT)
-        gripper = instruments.get(OT3Mount.GRIPPER)
+        left = cast(PipetteDict, instruments.get(OT3Mount.LEFT))
+        right = cast(PipetteDict, instruments.get(OT3Mount.RIGHT))
+        gripper = cast(GripperDict, instruments.get(OT3Mount.GRIPPER))
         if left and right:
             # Only low-throughputs can have the two-instrument case
             return GantryLoad.TWO_LOW_THROUGHPUT
@@ -413,6 +415,7 @@ class OT3API(
         for mount, instrument_data in found.items():
             if mount == OT3Mount.GRIPPER:
                 continue
+            instrument_data = cast(AttachedPipette, instrument_data)
             config = instrument_data.get("config")
             req_instr = checked_require.get(mount, None)
             pip_id = instrument_data.get("id")

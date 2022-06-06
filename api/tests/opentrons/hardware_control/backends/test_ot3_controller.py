@@ -7,7 +7,7 @@ from opentrons.hardware_control.backends.ot3utils import (
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons.config.types import OT3Config
 from opentrons.config.robot_configs import build_config_ot3
-from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteName, ToolType
+from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteName
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons.hardware_control.types import OT3Axis, OT3Mount
 
@@ -84,7 +84,9 @@ def mock_tool_detector(controller: OT3Controller):
     ) as md:
 
         md.return_value = ToolSummary(
-            right=None, left=None, gripper=None,
+            right=None,
+            left=None,
+            gripper=None,
         )
 
         yield md

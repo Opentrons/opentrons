@@ -337,7 +337,7 @@ class OT3Controller:
             expected: Which mounts are expected.
 
         Returns:
-            A map of mount to pipette name.
+            A map of mount to instrument name.
         """
         await self._probe_core()
         attached = await self._tool_detector.detect()
@@ -377,8 +377,7 @@ class OT3Controller:
 
         current_tools = dict(_generate_attached_instrs(attached))
         self._present_nodes -= set(
-            axis_to_node(OT3Axis.of_main_tool_actuator(mount))
-            for mount in (OT3Mount.RIGHT, OT3Mount.LEFT, OT3Mount.GRIPPER)
+            axis_to_node(OT3Axis.of_main_tool_actuator(mount)) for mount in OT3Mount
         )
         for mount in current_tools.keys():
             self._present_nodes.add(axis_to_node(OT3Axis.of_main_tool_actuator(mount)))
