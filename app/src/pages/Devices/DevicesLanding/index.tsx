@@ -8,6 +8,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
   SIZE_2,
   SIZE_6,

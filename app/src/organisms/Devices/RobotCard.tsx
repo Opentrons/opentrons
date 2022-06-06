@@ -187,7 +187,7 @@ function RunningProtocolBanner(props: {
   return currentRunId != null &&
     currentRunStatus != null &&
     displayName != null ? (
-    <Flex alignItems={ALIGN_CENTER}>
+    <Flex alignItems={ALIGN_CENTER} onClick={e => e.stopPropagation()}>
       <StyledText as="label" paddingRight={SPACING.spacing3}>
         {`${displayName}; ${t(`run_details:status_${currentRunStatus}`)}`}
       </StyledText>
