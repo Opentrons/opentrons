@@ -13,6 +13,7 @@ import type {
   ConfigV5,
   ConfigV6,
   ConfigV7,
+  ConfigV8,
 } from '@opentrons/app/src/redux/config/types'
 
 // base config v0 defaults
@@ -187,6 +188,20 @@ const toVersion7 = (prevConfig: ConfigV6): ConfigV7 => {
   return nextConfig
 }
 
+// config version 8 migration and defaults
+const toVersion8 = (prevConfig: ConfigV7): ConfigV8 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 8 as const,
+    ui: {
+      ...prevConfig.ui,
+      width: 1024,
+      height: 768,
+    },
+  }
+
+  return nextConfig
+}
 const MIGRATIONS: [
   (prevConfig: ConfigV0) => ConfigV1,
   (prevConfig: ConfigV1) => ConfigV2,
@@ -194,7 +209,8 @@ const MIGRATIONS: [
   (prevConfig: ConfigV3) => ConfigV4,
   (prevConfig: ConfigV4) => ConfigV5,
   (prevConfig: ConfigV5) => ConfigV6,
-  (prevConfig: ConfigV6) => ConfigV7
+  (prevConfig: ConfigV6) => ConfigV7,
+  (prevConfig: ConfigV7) => ConfigV8
 ] = [
   toVersion1,
   toVersion2,
@@ -203,6 +219,7 @@ const MIGRATIONS: [
   toVersion5,
   toVersion6,
   toVersion7,
+  toVersion8,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
@@ -217,6 +234,7 @@ export function migrate(
     | ConfigV5
     | ConfigV6
     | ConfigV7
+    | ConfigV8
 ): Config {
   const prevVersion = prevConfig.version
   let result = prevConfig

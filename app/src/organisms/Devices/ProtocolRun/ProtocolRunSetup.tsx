@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { parseAllRequiredModuleModels } from '@opentrons/api-client'
 import {
   Flex,
   ALIGN_CENTER,
@@ -8,7 +9,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
 } from '@opentrons/components'
-import { protocolHasModules } from '@opentrons/shared-data'
+
 import { useFeatureFlag } from '../../../redux/config'
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
@@ -20,6 +21,7 @@ import {
   useRunCalibrationStatus,
   useRunHasStarted,
   useProtocolAnalysisErrors,
+  useStoredProtocolAnalysis,
 } from '../hooks'
 import { SetupLabware } from './SetupLabware'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
@@ -49,7 +51,12 @@ export function ProtocolRunSetup({
   runId,
 }: ProtocolRunSetupProps): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
-  const { protocolData } = useProtocolDetailsForRun(runId)
+  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
+    runId
+  )
+  const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
+  const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
+  const modules = parseAllRequiredModuleModels(protocolData?.commands ?? [])
   const robot = useRobot(robotName)
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
@@ -66,8 +73,7 @@ export function ProtocolRunSetup({
 
   React.useEffect(() => {
     let nextStepKeysInOrder = stepsKeysInOrder
-    const showModuleSetup =
-      protocolData != null && protocolHasModules(protocolData)
+    const showModuleSetup = protocolData != null && modules.length > 0
     const showLiquidSetup = liquidSetupEnabled
     // uncomment this once we start getting liquids back from protocol data
     // &&
@@ -129,10 +135,7 @@ export function ProtocolRunSetup({
         />
       ),
       description: t(`${MODULE_SETUP_KEY}_description`, {
-        count:
-          protocolData != null && 'modules' in protocolData
-            ? Object.keys(protocolData.modules).length
-            : 0,
+        count: modules.length,
       }),
     },
     [LABWARE_SETUP_KEY]: {

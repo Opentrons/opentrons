@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Flex,
   Icon,
@@ -42,7 +43,9 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
           {`${displayName}; ${t(`run_details:status_${currentRunStatus}`)}`}
         </StyledText>
         <Link
-          to={`/devices/${name}/protocol-runs/${currentRunId}/run-log`}
+          to={`/devices/${name}/protocol-runs/${currentRunId}/${
+            currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-log'
+          }`}
           id={`RobotStatusBanner_${name}_goToRun`}
         >
           <TertiaryButton>{t('go_to_run')}</TertiaryButton>

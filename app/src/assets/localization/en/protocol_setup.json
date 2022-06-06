@@ -94,6 +94,7 @@
   "protocol_upload_revamp_feedback": "Have feedback about this experience?",
   "feedback_form_link": "Let us know!",
   "labware_position_check_not_available": "Labware Position Check is not available after run has started",
+  "labware_position_check_not_available_analyzing_on_robot": "Labware Position Check is not available while protocol is analyzing on robot",
   "recalibrating_tip_length_not_available": "Recalibrating a tip length is not available once a run has started",
   "recalibrating_not_available": "Recalibrating Tip Length calibrations and Labware Position Check is not available.",
   "protocol_can_be_closed": "This protocol can now be closed.",

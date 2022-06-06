@@ -27,7 +27,7 @@ describe('OverflowBtn', () => {
 
     expect(getByRole('button')).toHaveStyleRule(
       'background-color',
-      COLORS.medGrey,
+      COLORS.darkGreyHover,
       {
         modifier: ':hover',
       }
@@ -41,7 +41,7 @@ describe('OverflowBtn', () => {
 
     expect(getByRole('button')).toHaveStyleRule(
       'background-color',
-      COLORS.lightGreyHover,
+      COLORS.darkBlack,
       {
         modifier: ':active',
       }
@@ -55,7 +55,7 @@ describe('OverflowBtn', () => {
 
     expect(getByRole('button')).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${COLORS.warning}`,
+      `0 0 0 3px ${COLORS.darkGreyPressed}`,
       {
         modifier: ':focus',
       }

@@ -1,14 +1,20 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { SPACING, TYPOGRAPHY, Btn, useInterval } from '@opentrons/components'
+import {
+  Flex,
+  SPACING,
+  TYPOGRAPHY,
+  Btn,
+  useInterval,
+} from '@opentrons/components'
 import { Portal } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
-import { UpdateBuildroot } from '../../pages/Robots/RobotSettings/UpdateBuildroot'
 import { UNREACHABLE } from '../../redux/discovery'
 import { checkShellUpdate } from '../../redux/shell'
 import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+import { UpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'
 
 import type { StyleProps } from '@opentrons/components'
 import type { State, Dispatch } from '../../redux/types'
@@ -42,7 +48,6 @@ export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
       ? 1000
       : UPDATE_RECHECK_DELAY_MS
   )
-
   const handleLaunchModal: React.MouseEventHandler = e => {
     e.preventDefault()
     e.stopPropagation()
@@ -54,7 +59,7 @@ export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
   }
 
   return (
-    <>
+    <Flex onClick={e => e.stopPropagation()}>
       {autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade' ? (
         <Banner type="warning" onCloseClick={handleCloseBanner} {...styleProps}>
           <StyledText as="p" marginRight={SPACING.spacing2}>
@@ -79,6 +84,6 @@ export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
           />
         </Portal>
       ) : null}
-    </>
+    </Flex>
   )
 }

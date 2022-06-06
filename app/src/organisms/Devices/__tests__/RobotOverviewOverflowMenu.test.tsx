@@ -6,18 +6,18 @@ import { renderWithProviders } from '@opentrons/components'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
 import { home } from '../../../redux/robot-controls'
-import { UpdateBuildroot } from '../../../pages/Robots/RobotSettings/UpdateBuildroot'
 import * as Buildroot from '../../../redux/buildroot'
 import { restartRobot } from '../../../redux/robot-admin'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
+import { UpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
 
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/robot-admin')
 jest.mock('../../../redux/buildroot')
-jest.mock('../../../pages/Robots/RobotSettings/UpdateBuildroot')
+jest.mock('../RobotSettings/UpdateBuildroot')
 
 const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
   typeof useCurrentRunStatus

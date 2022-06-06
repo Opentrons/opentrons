@@ -2,7 +2,6 @@ import * as React from 'react'
 import { Field } from 'formik'
 import {
   FormGroup,
-  CheckboxField,
   Flex,
   DIRECTION_COLUMN,
   SPACING,
@@ -10,6 +9,7 @@ import {
 } from '@opentrons/components'
 import { InputField } from '../../atoms/InputField'
 import { StyledText } from '../../atoms/text'
+import { CheckboxField } from '../../atoms/CheckboxField'
 import styles from './styles.css'
 
 import type { FieldProps } from 'formik'
@@ -121,11 +121,10 @@ export function ConfigInput(props: ConfigInputProps): JSX.Element {
 
 export interface ConfigCheckboxProps {
   field: DisplayQuirkFieldProps
-  className?: string
 }
 
 export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
-  const { field, className } = props
+  const { field } = props
   const { name, displayName } = field
   const id = makeId(name)
   return (
@@ -136,7 +135,6 @@ export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
             name={fieldProps.field.name}
             onChange={fieldProps.field.onChange}
             value={fieldProps.field.checked}
-            className={className}
           />
         )}
       </Field>

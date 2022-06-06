@@ -110,14 +110,14 @@ describe('RobotOverview', () => {
   it('renders a Run a Protocol button', () => {
     const [{ getByText }] = render()
 
-    getByText('Run a Protocol')
+    getByText('Run a protocol')
   })
 
   it('renders a choose protocol slideout hidden by default, expanded after launch', () => {
     const [{ getByText, getByRole }] = render()
 
     getByText('Mock Choose Protocol Slideout hidden')
-    const runButton = getByRole('button', { name: 'Run a Protocol' })
+    const runButton = getByRole('button', { name: 'Run a protocol' })
     fireEvent.click(runButton)
     getByText('Mock Choose Protocol Slideout showing')
   })
