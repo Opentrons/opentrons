@@ -74,7 +74,7 @@ export function DownloadRunLogToast({
       icon={isError ? undefined : toastIcon}
       closeButton={isError}
       onClose={onClose}
-      requiredTimeout={true}
+      disableTimeout={true}
     />
   )
 }
