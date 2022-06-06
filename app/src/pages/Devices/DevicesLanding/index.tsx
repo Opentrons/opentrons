@@ -68,7 +68,6 @@ export function DevicesLanding(): JSX.Element {
           />
         </Flex>
       ) : null}
-
       {availableDevices.length > 0 ? (
         <>
           <CollapsibleSection
