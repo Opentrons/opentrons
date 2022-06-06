@@ -176,16 +176,16 @@ async def test_collision_handling(
 
     # Expect the subject to do:
     #
-    #     with avahi_client.collsion_callback(some_callback_func):
+    #     with avahi_client.listen_for_collisions(some_callback_func):
     #         ...
     #
     # When it does, save the function that it provided as `some_callback_func`
     # into `collision_callback_captor.value`.
-    mock_collision_subscription_context_manager = decoy.mock()
+    mock_listen_context_manager = decoy.mock()
     collision_callback_captor = matchers.Captor()
     decoy.when(
         mock_avahi_client.listen_for_collisions(collision_callback_captor)
-    ).then_return(mock_collision_subscription_context_manager)
+    ).then_return(mock_listen_context_manager)
 
     async with NameSynchronizer.start(avahi_client=mock_avahi_client):
         captured_collision_callback = collision_callback_captor.value
@@ -195,7 +195,7 @@ async def test_collision_handling(
         # ensuring its collision handling has run to completion before we assert stuff.
 
     decoy.verify(
-        await mock_collision_subscription_context_manager.__aenter__(),
+        await mock_listen_context_manager.__aenter__(),
         await mock_avahi_client.start_advertising("initial name"),
         # The subject should only persist the alternative name *after*
         # the Avahi client accepts it for advertisement,
