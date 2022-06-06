@@ -197,9 +197,10 @@ async def test_collision_handling(
     decoy.verify(
         await mock_collision_subscription_context_manager.__aenter__(),
         await mock_avahi_client.start_advertising("initial name"),
-        # Asserting that the subject advertised the alternative name before persisting
-        # it is one way to ensurethat it doesn't persist invalid names that can't be
-        # advertised.  https://github.com/Opentrons/opentrons/issues/9960.
+        # The subject should only persist the alternative name *after*
+        # the Avahi client accepts it for advertisement,
+        # just in case the alternative name turns out to be invalid in some way.
+        # https://github.com/Opentrons/opentrons/issues/9960
         await mock_avahi_client.start_advertising("alternative name"),
         mock_persist_pretty_hostname("alternative name"),
     )

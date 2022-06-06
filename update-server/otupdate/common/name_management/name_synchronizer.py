@@ -82,7 +82,7 @@ class NameSynchronizer:
     async def set_name(self, new_name: str) -> str:
         """Set the machine's human-readable name.
 
-        This first sets thhe Avahi service name, and then persists it
+        This first sets the Avahi service name, and then persists it
         as the pretty hostname.
 
         Returns the new name. This is normally the same as the requested name,
