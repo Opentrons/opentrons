@@ -239,7 +239,7 @@ export function RobotSettingsCalibration({
     pipetteCalPresent &&
     pipettePresent
 
-  const calCheckButtonDisabled = healthCheckIsPossible
+  const calCheckButtonDisabled = Boolean(healthCheckIsPossible)
     ? Boolean(buttonDisabledReason)
     : true
 
@@ -383,7 +383,7 @@ export function RobotSettingsCalibration({
 
   const checkDeckCalibrationStatus = (): 'error' | 'warning' | null => {
     if (
-      deckCalibrationStatus &&
+      deckCalibrationStatus != null &&
       deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_OK
     ) {
       return 'error'
@@ -462,7 +462,7 @@ export function RobotSettingsCalibration({
               {
                 children: t('shared:ok'),
                 onClick: () => {
-                  createRequestId.current &&
+                  createRequestId.current != null &&
                     dispatch(RobotApi.dismissRequest(createRequestId.current))
                   createRequestId.current = null
                 },
