@@ -8,7 +8,7 @@ from typing import NoReturn
 from . import get_app
 
 from otupdate.common import name_management, cli, systemd
-from otupdate.common.run_application import run_application
+from otupdate.common.run_application import run_and_notify_up
 
 
 LOG = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ async def main() -> NoReturn:
         LOG.info(
             f"Starting openembedded update server on http://{args.host}:{args.port}"
         )
-        await run_application(app=app, host=args.host, port=args.port)
+        await run_and_notify_up(app=app, host=args.host, port=args.port)
 
 
 if __name__ == "__main__":
