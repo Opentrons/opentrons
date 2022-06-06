@@ -140,15 +140,17 @@ async def test_advertises_initial_name(
     """
 
     decoy.when(mock_get_pretty_hostname()).then_return("initial name")
-    decoy.when(
-        mock_avahi_client.collision_callback(matchers.Anything())
-    ).then_enter_with(
-        # https://github.com/mcous/decoy/issues/135
-        "<value unused>"  # type: ignore[arg-type]
+    mock_collision_subscription_context_manager = decoy.mock()
+    decoy.when(mock_avahi_client.collision_callback(matchers.Anything())).then_return(
+        mock_collision_subscription_context_manager
     )
 
     async with RealNameSynchronizer.build(avahi_client=mock_avahi_client):
-        decoy.verify(await mock_avahi_client.start_advertising("initial name"))
+        decoy.verify(
+            # It should only start advertising after subscribing to collisions.
+            await mock_collision_subscription_context_manager.__aenter__(),
+            await mock_avahi_client.start_advertising("initial name"),
+        )
 
 
 async def test_collision_handling(
@@ -179,12 +181,12 @@ async def test_collision_handling(
     #
     # When it does, save the function that it provided as `some_callback_func`
     # into `collision_callback_captor.value`.
+    mock_collision_subscription_context_manager = decoy.mock()
     collision_callback_captor = matchers.Captor()
     decoy.when(
         mock_avahi_client.collision_callback(collision_callback_captor)
-    ).then_enter_with(
-        # https://github.com/mcous/decoy/issues/135
-        "<value unused>"  # type: ignore[arg-type]
+    ).then_return(
+        mock_collision_subscription_context_manager
     )
 
     async with RealNameSynchronizer.build(avahi_client=mock_avahi_client):
@@ -195,9 +197,11 @@ async def test_collision_handling(
         # ensuring its collision handling has run to completion before we assert stuff.
 
     decoy.verify(
-        # Asserting this exact order is one way to make sure the subject avoids
-        # persisting invalid names that can't be advertised.
-        # https://github.com/Opentrons/opentrons/issues/9960.
+        await mock_collision_subscription_context_manager.__aenter__(),
+        await mock_avahi_client.start_advertising("initial name"),
+        # Asserting that the subject advertised the alternative name before persisting
+        # it is one way to ensurethat it doesn't persist invalid names that can't be
+        # advertised.  https://github.com/Opentrons/opentrons/issues/9960.
         await mock_avahi_client.start_advertising("alternative name"),
         mock_persist_pretty_hostname("alternative name"),
     )
