@@ -129,7 +129,7 @@ export function RobotSettingsAdvanced({
           icon={toastIcon}
           closeButton={false}
           onClose={() => setShowDownloadToast(false)}
-          requiredTimeout={true}
+          requiredTimeout={false}
         />
       )}
       <Box>

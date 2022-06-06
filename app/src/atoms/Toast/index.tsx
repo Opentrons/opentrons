@@ -73,7 +73,7 @@ const toastStyleByType: {
 export function Toast(props: ToastProps): JSX.Element {
   const { message, type, icon, closeButton, onClose, requiredTimeout } = props
 
-  if (!(requiredTimeout ?? false)) {
+  if ((requiredTimeout ?? true) || requiredTimeout == null) {
     setTimeout(() => {
       onClose()
     }, 3000)
