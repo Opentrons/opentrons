@@ -1,20 +1,30 @@
 """Test blow-out command."""
 from decoy import Decoy
 
-from opentrons.protocol_engine.execution import PipettingHandler
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.commands import (
     BlowOutResult,
     BlowOutImplementation,
     BlowOutParams,
 )
+from opentrons.protocol_engine.execution import (
+    MovementHandler,
+)
+
+from opentrons.hardware_control import HardwareControlAPI
 
 
 async def test_blow_out_implementation(
-    decoy: Decoy, pipetting: PipettingHandler
+    decoy: Decoy,
+    state_view: StateView,
+    hardware_api: HardwareControlAPI,
+    movement: MovementHandler,
 ) -> None:
     """A PickUpTipCreate should have an execution implementation."""
-    subject = BlowOutImplementation(pipetting=pipetting)
+    subject = BlowOutImplementation(
+        state_view=state_view, hardware_api=hardware_api, movement=movement
+    )
 
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
 
