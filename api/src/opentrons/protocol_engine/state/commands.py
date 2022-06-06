@@ -519,7 +519,7 @@ class CommandView(HasState[CommandState]):
         return self._state.run_completed_at is not None
 
     def get_is_started(self) -> bool:
-        """Get whether run engine has started."""
+        """Get whether engine has started."""
         return self._state.run_started_at is not None
 
     def validate_action_allowed(
