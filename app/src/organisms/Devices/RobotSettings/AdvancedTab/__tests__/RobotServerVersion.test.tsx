@@ -11,9 +11,9 @@ import { UpdateBuildroot } from '../../UpdateBuildroot'
 import { RobotServerVersion } from '../RobotServerVersion'
 
 jest.mock('../../../hooks')
-jest.mock('../../UpdateBuildroot')
 jest.mock('../../../../../redux/buildroot/selectors')
 jest.mock('../../../../../redux/discovery/selectors')
+jest.mock('../../UpdateBuildroot')
 
 const mockGetRobotApiVersion = getRobotApiVersion as jest.MockedFunction<
   typeof getRobotApiVersion
