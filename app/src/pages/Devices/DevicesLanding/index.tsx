@@ -54,7 +54,8 @@ export function DevicesLanding(): JSX.Element {
           <DevicesEmptyState />
         </Flex>
       ) : null}
-      {isScanning && availableDevices?.length === 0 ? (
+      {isScanning &&
+      [...availableDevices, ...unavailableDevices].length === 0 ? (
         <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
           <StyledText as="h1" marginTop="20vh">
             {t('looking_for_robots')}
