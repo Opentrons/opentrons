@@ -41,26 +41,26 @@ export function useStoredProtocolAnalysis(
     useSelector((state: State) => getStoredProtocol(state, protocolKey))
       ?.mostRecentAnalysis ?? null
 
-  const pipettes = parseInitialPipetteNamesById(
+  const pipettesNamesById = parseInitialPipetteNamesById(
     storedProtocolAnalysis?.commands ?? []
   )
-  const modules = parseAllRequiredModuleModelsById(
+  const moduleModelsById = parseAllRequiredModuleModelsById(
     storedProtocolAnalysis?.commands ?? []
   )
-  const labware = parseInitialLoadedLabwareById(
+  const labwareById = parseInitialLoadedLabwareById(
     storedProtocolAnalysis?.commands ?? []
   )
-  const labwareDefinitions = parseInitialLoadedLabwareDefinitionsById(
+  const labwareDefinitionsById = parseInitialLoadedLabwareDefinitionsById(
     storedProtocolAnalysis?.commands ?? []
   )
 
   return storedProtocolAnalysis != null
     ? {
         ...storedProtocolAnalysis,
-        pipettes,
-        modules,
-        labware,
-        labwareDefinitions,
+        pipettes: pipettesNamesById,
+        modules: moduleModelsById,
+        labware: labwareById,
+        labwareDefinitions: labwareDefinitionsById,
       }
     : null
 }
