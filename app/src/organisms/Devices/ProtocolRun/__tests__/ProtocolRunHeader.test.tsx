@@ -628,7 +628,7 @@ describe('ProtocolRunHeader', () => {
     expect(mockUseRunControls).toHaveBeenCalled()
   })
 
-  it('renders analysis error modal if there is an analysis error', async () => {
+  it('renders analysis error modal if there is an analysis error', () => {
     when(mockUseProtocolAnalysisErrors)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -645,7 +645,7 @@ describe('ProtocolRunHeader', () => {
     getByText('protocol analysis error')
   })
 
-  it('renders analysis error banner if there is an analysis error', async () => {
+  it('renders analysis error banner if there is an analysis error', () => {
     when(mockUseProtocolAnalysisErrors)
       .calledWith(RUN_ID)
       .mockReturnValue({

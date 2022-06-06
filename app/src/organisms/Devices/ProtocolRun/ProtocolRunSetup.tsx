@@ -175,7 +175,7 @@ export function ProtocolRunSetup({
           {runHasStarted ? (
             <InfoMessage title={t('setup_is_view_only')} />
           ) : null}
-          {analysisErrors && analysisErrors?.length > 0 ? (
+          {analysisErrors != null && analysisErrors?.length > 0 ? (
             <StyledText alignSelf={ALIGN_CENTER} color={COLORS.darkGreyEnabled}>
               {t('protocol_analysis_failed')}
             </StyledText>

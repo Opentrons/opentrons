@@ -40,7 +40,7 @@ describe('useProtocolAnalysisErrors hook', () => {
     resetAllWhenMocks()
   })
 
-  it('returns null when protocol id is null', async () => {
+  it('returns null when protocol id is null', () => {
     when(mockUseRunQuery)
       .calledWith(RUN_ID_2, { staleTime: Infinity })
       .mockReturnValue({
