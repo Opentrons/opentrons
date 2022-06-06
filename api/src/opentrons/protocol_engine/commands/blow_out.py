@@ -20,13 +20,13 @@ class BlowOutParams(BasePipettingParams):
 
 
 class BlowOutResult(BasePipettingParams):
-    """Result data from the execution of a Blow-out command."""
+    """Result data from the execution of a blow-out command."""
 
     pass
 
 
 class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
-    """Dispense command implementation."""
+    """BlowOut command implementation."""
 
     def __init__(self, pipetting: PipettingHandler, **kwargs: object) -> None:
         self._pipetting = pipetting
@@ -49,7 +49,7 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
 
 
 class BlowOut(BaseCommand[BlowOutParams, BlowOutResult]):
-    """Dispense command model."""
+    """blow-out command model."""
 
     commandType: BlowOutCommandType = "blow-out"
     params: BlowOutParams
@@ -59,7 +59,7 @@ class BlowOut(BaseCommand[BlowOutParams, BlowOutResult]):
 
 
 class BlowOutCreate(BaseCommandCreate[BlowOutParams]):
-    """Create dispense command request model."""
+    """Create blow-out command request model."""
 
     commandType: BlowOutCommandType = "blow-out"
     params: BlowOutParams
