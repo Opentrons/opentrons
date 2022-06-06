@@ -108,7 +108,7 @@ export function PipetteOffsetCalibrationItems({
                           name="alert-circle"
                           backgroundColor={COLORS.warningBg}
                           color={COLORS.warning}
-                          height={SPACING.spacing2}
+                          size={SPACING.spacing4}
                         />
                         <StyledText
                           as="p"
@@ -125,7 +125,7 @@ export function PipetteOffsetCalibrationItems({
                           name="alert-circle"
                           backgroundColor={COLORS.errorBg}
                           color={COLORS.error}
-                          height={SPACING.spacing4}
+                          size={SPACING.spacing4}
                         />
                         <StyledText
                           as="p"
