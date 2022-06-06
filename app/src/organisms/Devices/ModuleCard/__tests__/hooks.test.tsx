@@ -248,7 +248,7 @@ describe('useLatchControls', () => {
     act(() => result.current.toggleLatch())
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'heaterShakerModule/closeLatch',
+        commandType: 'heaterShaker/closeLabwareLatch',
         params: {
           moduleId: mockHeaterShaker.id,
         },
@@ -273,7 +273,7 @@ describe('useLatchControls', () => {
     act(() => result.current.toggleLatch())
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'heaterShakerModule/openLatch',
+        commandType: 'heaterShaker/openLabwareLatch',
         params: {
           moduleId: mockCloseLatchHeaterShaker.id,
         },
@@ -332,7 +332,7 @@ describe('useModuleOverflowMenu', () => {
     act(() => heaterShakerMenu[0].onClick(false))
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'heaterShakerModule/deactivateHeater',
+        commandType: 'heaterShaker/deactivateHeater',
         params: {
           moduleId: mockHeatHeaterShaker.id,
         },
@@ -365,7 +365,7 @@ describe('useModuleOverflowMenu', () => {
     act(() => heaterShakerMenu[1].onClick(true))
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'heaterShakerModule/stopShake',
+        commandType: 'heaterShaker/deactivateShaker',
         params: {
           moduleId: mockDeactivateShakeHeaterShaker.id,
         },

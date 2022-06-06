@@ -12,13 +12,14 @@ import {
   Link,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { useRobot } from '../../hooks'
 import { StyledText } from '../../../../atoms/text'
 import { getRobotApiVersion } from '../../../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
+import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
+import { useIsRobotBusy } from '../../hooks/useIsRobotBusy'
+import { useRobot } from '../../hooks'
 
 import type { State } from '../../../../redux/types'
-import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
 
 interface RobotServerVersionProps {
   robotName: string
@@ -32,6 +33,7 @@ export function RobotServerVersion({
 }: RobotServerVersionProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const robot = useRobot(robotName)
+  const isBusy = useIsRobotBusy()
   const { autoUpdateAction } = useSelector((state: State) => {
     return getBuildrootUpdateDisplayInfo(state, robotName)
   })
@@ -40,9 +42,9 @@ export function RobotServerVersion({
 
   return (
     <>
-      {autoUpdateAction !== 'reinstall' ? (
+      {autoUpdateAction !== 'reinstall' && robot != null && !isBusy ? (
         <Box marginBottom={SPACING.spacing4} width="100%">
-          <UpdateRobotBanner robotName={robotName} />
+          <UpdateRobotBanner robot={robot} />
         </Box>
       ) : (
         // TODO: add reinstall option

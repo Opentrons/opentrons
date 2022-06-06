@@ -9,6 +9,7 @@ import {
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
   COLORS,
+  useOnClickOutside,
 } from '@opentrons/components'
 import {
   useDeleteRunMutation,
@@ -33,6 +34,9 @@ export function HistoricalProtocolRunOverflowMenu(
 ): JSX.Element {
   const { runId, robotName } = props
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
+  const protocolRunOverflowWrapperRef = useOnClickOutside({
+    onClickOutside: () => setShowOverflowMenu(false),
+  }) as React.RefObject<HTMLDivElement>
   const [
     showDownloadRunLogToast,
     setShowDownloadRunLogToast,
@@ -58,11 +62,16 @@ export function HistoricalProtocolRunOverflowMenu(
     >
       <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
       {showOverflowMenu && (
-        <MenuDropdown
-          {...props}
-          closeOverflowMenu={handleOverflowClick}
-          setShowDownloadRunLogToast={setShowDownloadRunLogToast}
-        />
+        <div
+          ref={protocolRunOverflowWrapperRef}
+          data-testid={`HistoricalProtocolRunOverflowMenu_${runId}`}
+        >
+          <MenuDropdown
+            {...props}
+            closeOverflowMenu={handleOverflowClick}
+            setShowDownloadRunLogToast={setShowDownloadRunLogToast}
+          />
+        </div>
       )}
       {runTotalCommandCount != null && showDownloadRunLogToast ? (
         <DownloadRunLogToast
@@ -104,6 +113,14 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   }
   const { reset } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
+
+  const handleDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    deleteRun(runId)
+    closeOverflowMenu(e)
+  }
+
   return (
     <Flex
       width="11.625rem"
@@ -115,29 +132,30 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       top={SPACING.spacing6}
       right={0}
       flexDirection={DIRECTION_COLUMN}
+      height="10.5rem"
     >
       <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-log`}>
-        <MenuItem dataTest-id={`RecentProtocolRun_OverflowMenu_viewRunRecord`}>
+        <MenuItem data-testid={`RecentProtocolRun_OverflowMenu_viewRunRecord`}>
           {t('view_run_record')}
         </MenuItem>
       </NavLink>
       <MenuItem
         onClick={reset}
         disabled={robotIsBusy}
-        dataTest-id={`RecentProtocolRun_OverflowMenu_rerunNow`}
+        data-testid={`RecentProtocolRun_OverflowMenu_rerunNow`}
       >
         {t('rerun_now')}
       </MenuItem>
       <MenuItem
-        dataTest-id={`RecentProtocolRun_OverflowMenu_downloadRunLog`}
+        data-testid={`RecentProtocolRun_OverflowMenu_downloadRunLog`}
         onClick={onDownloadClick}
       >
         {t('download_run_log')}
       </MenuItem>
       <Divider />
       <MenuItem
-        onClick={() => deleteRun(runId)}
-        dataTest-id={`RecentProtocolRun_OverflowMenu_deleteRun`}
+        onClick={handleDelete}
+        data-testid={`RecentProtocolRun_OverflowMenu_deleteRun`}
       >
         {t('delete_run')}
       </MenuItem>

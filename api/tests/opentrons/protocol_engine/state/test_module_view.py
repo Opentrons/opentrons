@@ -113,7 +113,6 @@ def test_get_module_data(tempdeck_v1_def: ModuleDefinition) -> None:
         model=ModuleModel.TEMPERATURE_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         serialNumber="serial-number",
-        definition=tempdeck_v1_def,
     )
 
 
@@ -172,14 +171,12 @@ def test_get_all_modules(
             serialNumber="serial-1",
             model=ModuleModel.TEMPERATURE_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            definition=tempdeck_v1_def,
         ),
         LoadedModule(
             id="module-2",
             serialNumber="serial-2",
             model=ModuleModel.TEMPERATURE_MODULE_V2,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-            definition=tempdeck_v2_def,
         ),
     ]
 
@@ -389,6 +386,9 @@ def test_get_properties_by_id(
         slotName=DeckSlotName.SLOT_2
     )
 
+    with pytest.raises(errors.ModuleNotLoadedError):
+        subject.get_definition("Not a module ID oh no")
+
 
 def test_get_plate_target_temperature(heater_shaker_v1_def: ModuleDefinition) -> None:
     """It should return whether target temperature is set."""
@@ -563,6 +563,7 @@ def test_select_hardware_module_to_load_rejects_missing() -> None:
         (ModuleModel.MAGNETIC_MODULE_V1, lazy_fixture("magdeck_v1_def")),
         (ModuleModel.MAGNETIC_MODULE_V2, lazy_fixture("magdeck_v2_def")),
         (ModuleModel.THERMOCYCLER_MODULE_V1, lazy_fixture("thermocycler_v1_def")),
+        (ModuleModel.THERMOCYCLER_MODULE_V2, lazy_fixture("thermocycler_v2_def")),
     ],
 )
 def test_select_hardware_module_to_load(

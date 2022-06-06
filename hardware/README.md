@@ -28,13 +28,9 @@ sudo ip link set vcan0 up fd on
 
 ### opentrons_sim_can_bus
 
-This portable alternative to `vcan` runs a simulated CAN network using a socket server. This supports the `opentrons_sock` interface.
-
-### opentrons_sim_can_bus
-
 The preferred method of software CAN bus simulation is SocketCAN's vcan. But it is only available on linux.
 
-This alternative to `vcan` runs a simulated CAN network using a socket server. This supports the `opentrons_sock` interface.
+This portable alternative to `vcan` runs a simulated CAN network using a socket server. This supports the `opentrons_sock` interface.
 
 #### Usage
 

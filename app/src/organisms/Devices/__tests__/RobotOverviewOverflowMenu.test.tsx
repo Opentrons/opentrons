@@ -6,21 +6,31 @@ import { renderWithProviders } from '@opentrons/components'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
 import { home } from '../../../redux/robot-controls'
+import * as Buildroot from '../../../redux/buildroot'
 import { restartRobot } from '../../../redux/robot-admin'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
+import { UpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
 
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/robot-admin')
+jest.mock('../../../redux/buildroot')
+jest.mock('../RobotSettings/UpdateBuildroot')
 
 const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
   typeof useCurrentRunStatus
 >
+const getBuildrootUpdateDisplayInfo = Buildroot.getBuildrootUpdateDisplayInfo as jest.MockedFunction<
+  typeof Buildroot.getBuildrootUpdateDisplayInfo
+>
 const mockHome = home as jest.MockedFunction<typeof home>
 const mockRestartRobot = restartRobot as jest.MockedFunction<
   typeof restartRobot
+>
+const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
+  typeof UpdateBuildroot
 >
 
 const render = (
@@ -40,14 +50,20 @@ describe('RobotOverviewOverflowMenu', () => {
   let props: React.ComponentProps<typeof RobotOverviewOverflowMenu>
   beforeEach(() => {
     props = { robot: mockConnectableRobot }
+    when(getBuildrootUpdateDisplayInfo).mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
     when(mockUseCurrentRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
+    when(mockUpdateBuildroot).mockReturnValue(<div>mock update buildroot</div>)
   })
   afterEach(() => {
     resetAllWhenMocks()
   })
 
   it('should render enabled buttons in the menu when the status is idle', () => {
-    const { getByRole } = render(props)
+    const { getByRole, getByText } = render(props)
 
     const btn = getByRole('button')
     fireEvent.click(btn)
@@ -63,6 +79,8 @@ describe('RobotOverviewOverflowMenu', () => {
     expect(restartBtn).toBeEnabled()
     expect(homeBtn).toBeEnabled()
     expect(settingsBtn).toBeEnabled()
+    fireEvent.click(updateRobotSoftwareBtn)
+    getByText('mock update buildroot')
   })
 
   it('should render disabled buttons in the menu when the run status is running', () => {
@@ -108,5 +126,18 @@ describe('RobotOverviewOverflowMenu', () => {
     fireEvent.click(restartBtn)
 
     expect(mockRestartRobot).toBeCalled()
+  })
+  it('render overflow menu buttons without the update robot software button', () => {
+    when(getBuildrootUpdateDisplayInfo).mockReturnValue({
+      autoUpdateAction: 'reinstall',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+    const { getByRole } = render(props)
+    const btn = getByRole('button')
+    fireEvent.click(btn)
+    getByRole('button', { name: 'restart robot' })
+    getByRole('button', { name: 'Home gantry' })
+    getByRole('link', { name: 'robot settings' })
   })
 })

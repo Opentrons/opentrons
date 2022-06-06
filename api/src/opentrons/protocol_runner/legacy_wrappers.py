@@ -8,7 +8,7 @@ from opentrons_shared_data.labware.dev_types import (
 
 from opentrons.calibration_storage.helpers import uri_from_details
 
-from opentrons.hardware_control import SyncHardwareAPI, HardwareControlAPI
+from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import (
     ModuleModel as LegacyModuleModel,
     TemperatureModuleModel as LegacyTemperatureModuleModel,
@@ -141,18 +141,9 @@ class LegacySimulatingContextCreator(LegacyContextCreator):
 class LegacyExecutor:
     """Interface to execute Protocol API v2 protocols in a child thread."""
 
-    def __init__(self, hardware_api: HardwareControlAPI) -> None:
-        self._hardware_api = hardware_api
-
-    async def execute(
-        self,
-        protocol: LegacyProtocol,
-        context: LegacyProtocolContext,
-    ) -> None:
+    @staticmethod
+    async def execute(protocol: LegacyProtocol, context: LegacyProtocolContext) -> None:
         """Execute a PAPIv2 protocol with a given ProtocolContext in a child thread."""
-        # NOTE: this initial home is to match the previous behavior of the
-        # RPC session, which called `ctx.home` before calling `run_protocol`
-        await self._hardware_api.home()
         await to_thread.run_sync(run_protocol, protocol, context)
 
 

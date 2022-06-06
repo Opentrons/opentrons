@@ -34,6 +34,7 @@ stages:
           actions: []
           errors: []
           pipettes: []
+          modules: []
           labware:
             - id: !anystr
               loadName: !anystr
@@ -213,8 +214,11 @@ stages:
           # Unchanged from when we originally POSTed the resource:
           id: '{run_id}'
           createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
           errors: []
           pipettes: []
+          modules: []
           protocolId: '{protocol_id}'
           # Changed in this PATCH:
           current: False

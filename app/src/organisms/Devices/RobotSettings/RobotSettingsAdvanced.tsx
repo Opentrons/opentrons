@@ -1,10 +1,13 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+
 import { Box, SPACING, IconProps } from '@opentrons/components'
+
 import { Divider } from '../../../atoms/structure'
 import { Toast } from '../../../atoms/Toast'
-import { AboutRobotName } from './AdvancedTab/AboutRobotName'
+import { useRobot } from '../hooks'
+import { DisplayRobotName } from './AdvancedTab/DisplayRobotName'
 import { RobotInformation } from './AdvancedTab/RobotInformation'
 import { RobotServerVersion } from './AdvancedTab/RobotServerVersion'
 import { UsageSettings } from './AdvancedTab/UsageSettings'
@@ -17,14 +20,13 @@ import { UseOlderProtocol } from './AdvancedTab/UseOlderProtocol'
 import { LegacySettings } from './AdvancedTab/LegacySettings'
 import { ShortTrashBin } from './AdvancedTab/ShortTrashBin'
 import { UseOlderAspirateBehavior } from './AdvancedTab/UseOlderAspirateBehavior'
-import { useRobot } from '../hooks'
-import { UpdateBuildroot } from '../../../pages/Robots/RobotSettings/UpdateBuildroot'
-import { getRobotSettings } from '../../../redux/robot-settings'
+import { getRobotSettings, fetchSettings } from '../../../redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
 import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
+import { UpdateBuildroot } from './UpdateBuildroot'
 
-import type { State } from '../../../redux/types'
+import type { State, Dispatch } from '../../../redux/types'
 import type {
   RobotSettings,
   RobotSettingsField,
@@ -34,10 +36,12 @@ import { UNREACHABLE } from '../../../redux/discovery'
 
 interface RobotSettingsAdvancedProps {
   robotName: string
+  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 export function RobotSettingsAdvanced({
   robotName,
+  updateRobotStatus,
 }: RobotSettingsAdvancedProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [
@@ -61,7 +65,6 @@ export function RobotSettingsAdvanced({
   )
 
   const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
-
   const robot = useRobot(robotName)
   const ipAddress = robot?.ip != null ? robot.ip : ''
   const settings = useSelector<State, RobotSettings>((state: State) =>
@@ -99,6 +102,16 @@ export function RobotSettingsAdvanced({
   const updateDownloadLogsStatus = (isDownloading: boolean): void =>
     setShowDownloadToast(isDownloading)
 
+  const updateIsRobotBusy = (isRobotBusy: boolean): void => {
+    updateRobotStatus(isRobotBusy)
+  }
+
+  const dispatch = useDispatch<Dispatch>()
+
+  React.useEffect(() => {
+    dispatch(fetchSettings(robotName))
+  }, [dispatch, robotName])
+
   return (
     <>
       {showSoftwareUpdateModal &&
@@ -116,7 +129,7 @@ export function RobotSettingsAdvanced({
           icon={toastIcon}
           closeButton={false}
           onClose={() => setShowDownloadToast(false)}
-          requiredTimeout={false}
+          disableTimeout={true}
         />
       )}
       <Box>
@@ -143,9 +156,10 @@ export function RobotSettingsAdvanced({
             resetOptions={resetOptions}
           />
         )}
-        <AboutRobotName
+        <DisplayRobotName
           robotName={robotName}
           updateIsExpanded={updateIsExpanded}
+          updateIsRobotBusy={updateIsRobotBusy}
         />
         <Divider marginY="2.5rem" />
         <RobotServerVersion robotName={robotName} />
@@ -155,17 +169,20 @@ export function RobotSettingsAdvanced({
         <UsageSettings
           settings={findSettings('enableDoorSafetySwitch')}
           robotName={robotName}
+          updateIsRobotBusy={updateIsRobotBusy}
         />
         <Divider marginY="2.5rem" />
         <DisableHoming
           settings={findSettings('disableHomeOnBoot')}
           robotName={robotName}
+          updateIsRobotBusy={updateIsRobotBusy}
         />
         <Divider marginY="2.5rem" />
         <OpenJupyterControl robotIp={ipAddress} />
         <Divider marginY={SPACING.spacing5} />
         <UpdateRobotSoftware
           robotName={robotName}
+          updateIsRobotBusy={updateIsRobotBusy}
           onUpdateStart={() => setShowSoftwareUpdateModal(true)}
         />
         <Troubleshooting
@@ -173,25 +190,32 @@ export function RobotSettingsAdvanced({
           updateDownloadLogsStatus={updateDownloadLogsStatus}
         />
         <Divider marginY="2.5rem" />
-        <FactoryReset updateIsExpanded={updateIsExpanded} />
+        <FactoryReset
+          updateIsExpanded={updateIsExpanded}
+          updateIsRobotBusy={updateIsRobotBusy}
+        />
         <Divider marginY="2.5rem" />
         <UseOlderProtocol
           settings={findSettings('disableFastProtocolUpload')}
           robotName={robotName}
+          updateIsRobotBusy={updateIsRobotBusy}
         />
         <LegacySettings
           settings={findSettings('deckCalibrationDots')}
           robotName={robotName}
+          updateIsRobotBusy={updateIsRobotBusy}
         />
         <Divider marginY="2.5rem" />
         <ShortTrashBin
           settings={findSettings('shortFixedTrash')}
           robotName={robotName}
+          updateIsRobotBusy={updateIsRobotBusy}
         />
         <Divider marginY="2.5rem" />
         <UseOlderAspirateBehavior
           settings={findSettings('useOldAspirationFunctions')}
           robotName={robotName}
+          updateIsRobotBusy={updateIsRobotBusy}
         />
       </Box>
     </>

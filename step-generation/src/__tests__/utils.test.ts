@@ -1,9 +1,13 @@
+import { when, resetAllWhenMocks } from 'jest-when'
 import {
   getLabwareDefURI,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
   LabwareDefinition2,
+  getIsLabwareAboveHeight,
+  MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
+  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   fixtureP10Single,
@@ -26,19 +30,39 @@ import {
   splitLiquid,
 } from '../utils/misc'
 import { Diff, thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
+import { getIsTallLabwareEastWestOfHeaterShaker } from '../utils/getIsTallLabwareEastWestOfHeaterShaker'
 import { DEFAULT_CONFIG } from '../fixtures'
-import { orderWells, thermocyclerPipetteCollision } from '../utils'
-import type { RobotState } from '../'
 import {
+  getIsHeaterShakerEastWestWithLatchOpen,
+  orderWells,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+} from '../utils'
+import type { RobotState } from '../'
+import type {
+  LabwareEntities,
+  LabwareTemporalProperties,
   ThermocyclerModuleState,
   ThermocyclerStateStepArgs,
   WellOrderOption,
 } from '../types'
 
+jest.mock('@opentrons/shared-data', () => {
+  const actualSharedData = jest.requireActual('@opentrons/shared-data')
+  return {
+    ...actualSharedData,
+    getIsLabwareAboveHeight: jest.fn(),
+  }
+})
+
 const fixtureTrash = _fixtureTrash as LabwareDefinition2
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixtureTiprack10ul = _fixtureTiprack10ul as LabwareDefinition2
 const fixtureTiprack300ul = _fixtureTiprack300ul as LabwareDefinition2
+
+const mockGetIsLabwareAboveHeight = getIsLabwareAboveHeight as jest.MockedFunction<
+  typeof getIsLabwareAboveHeight
+>
 
 describe('splitLiquid', () => {
   const singleIngred = {
@@ -847,5 +871,190 @@ describe('orderWells', () => {
         )
       })
     })
+  })
+})
+describe('getIsTallLabwareEastWestOfHeaterShaker', () => {
+  const fakeLabwareDef: any = {}
+  let labwareEntities: LabwareEntities
+  let labwareState: RobotState['labware']
+  beforeEach(() => {
+    labwareState = {
+      labwareId: { slot: '2' },
+    }
+    labwareEntities = {
+      labwareId: {
+        id: 'labwareId',
+        labwareDefURI: 'some_uri',
+        def: fakeLabwareDef,
+      },
+    }
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+  it('should return true when there is tall labware next to a heater shaker', () => {
+    when(mockGetIsLabwareAboveHeight)
+      .calledWith(fakeLabwareDef, MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM)
+      .mockReturnValue(true)
+    expect(
+      getIsTallLabwareEastWestOfHeaterShaker(labwareState, labwareEntities, '1')
+    ).toBe(true)
+  })
+  it('should return false when there is NO tall labware', () => {
+    when(mockGetIsLabwareAboveHeight)
+      .calledWith(
+        expect.any(Object),
+        MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
+      )
+      .mockReturnValue(false)
+    expect(
+      getIsTallLabwareEastWestOfHeaterShaker(labwareState, labwareEntities, '1')
+    ).toBe(false)
+  })
+  it('should return false when there is NO labware next to a heater shaker', () => {
+    labwareState.labwareId.slot = '9'
+    when(mockGetIsLabwareAboveHeight)
+      .calledWith(
+        expect.any(Object),
+        MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
+      )
+      .mockReturnValue(true)
+    expect(
+      getIsTallLabwareEastWestOfHeaterShaker(labwareState, labwareEntities, '1')
+    ).toBe(false)
+  })
+})
+describe('getIsHeaterShakerEastWestWithLatchOpen', () => {
+  let labwareTemporalProperties: LabwareTemporalProperties
+  let modules: RobotState['modules']
+  beforeEach(() => {
+    labwareTemporalProperties = { slot: '2' }
+    modules = {
+      heaterShakerId: {
+        slot: '1',
+        moduleState: {
+          type: HEATERSHAKER_MODULE_TYPE,
+          targetTemp: null,
+          targetSpeed: null,
+          latchOpen: true,
+        },
+      },
+    }
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+  it('should return true when there is heater shaker with its latch open next to the labware', () => {
+    expect(
+      getIsHeaterShakerEastWestWithLatchOpen(modules, labwareTemporalProperties)
+    ).toBe(true)
+  })
+  it('should return false when there is no heater shaker in the protocol', () => {
+    modules = {}
+    expect(
+      getIsHeaterShakerEastWestWithLatchOpen(modules, labwareTemporalProperties)
+    ).toBe(false)
+  })
+  it('should return false when the heater shaker is not next to the labware', () => {
+    modules.heaterShakerId.slot = '6'
+    expect(
+      getIsHeaterShakerEastWestWithLatchOpen(modules, labwareTemporalProperties)
+    ).toBe(false)
+  })
+  it('should return false when the heater shaker slot is closed', () => {
+    ;(modules.heaterShakerId.moduleState as any).latchOpen = false
+    expect(
+      getIsHeaterShakerEastWestWithLatchOpen(modules, labwareTemporalProperties)
+    ).toBe(false)
+  })
+})
+describe('pipetteAdjacentHeaterShakerWhileShaking', () => {
+  let labwareTemporalProperties: LabwareTemporalProperties
+  let modules: RobotState['modules']
+  beforeEach(() => {
+    labwareTemporalProperties = { slot: '2' }
+    modules = {
+      heaterShakerId: {
+        slot: '1',
+        moduleState: {
+          type: HEATERSHAKER_MODULE_TYPE,
+          targetTemp: null,
+          targetSpeed: null,
+          latchOpen: null,
+        },
+      },
+    }
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+  it('should return false when there are no modules', () => {
+    modules = {}
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(
+        modules,
+        labwareTemporalProperties
+      )
+    ).toBe(false)
+  })
+  it('should return false when there is no heater shaker ajacent to labware', () => {
+    labwareTemporalProperties.slot = '9'
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(
+        modules,
+        labwareTemporalProperties
+      )
+    ).toBe(false)
+  })
+  it('should return false when the heater shaker is not shaking', () => {
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(
+        modules,
+        labwareTemporalProperties
+      )
+    ).toBe(false)
+  })
+  it('should return true when there is a heater shaker north of labware shaking', () => {
+    modules.heaterShakerId.slot = '5'
+    ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(
+        modules,
+        labwareTemporalProperties
+      )
+    ).toBe(true)
+  })
+  it('should return true when there is a heater shaker south of labware shaking', () => {
+    labwareTemporalProperties.slot = '9'
+    modules.heaterShakerId.slot = '6'
+    ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(
+        modules,
+        labwareTemporalProperties
+      )
+    ).toBe(true)
+  })
+  it('should return true when there is a heater shaker east of labware shaking', () => {
+    labwareTemporalProperties.slot = '5'
+    modules.heaterShakerId.slot = '6'
+    ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(
+        modules,
+        labwareTemporalProperties
+      )
+    ).toBe(true)
+  })
+  it('should return true when there is a heater shaker west of labware shaking', () => {
+    labwareTemporalProperties.slot = '5'
+    modules.heaterShakerId.slot = '4'
+    ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(
+        modules,
+        labwareTemporalProperties
+      )
+    ).toBe(true)
   })
 })

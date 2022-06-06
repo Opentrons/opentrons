@@ -10,11 +10,17 @@ import {
 } from '../../../../redux/modules/__fixtures__'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
+import { useIsRobotBusy } from '../../hooks'
 
 jest.mock('../useModuleIdFromRun')
+jest.mock('../../hooks')
 
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun
+>
+
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
@@ -55,6 +61,28 @@ const mockOpenLatchHeaterShaker = {
   hasAvailableUpdate: true,
   data: {
     labwareLatchStatus: 'idle_open',
+    speedStatus: 'idle',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemperature: null,
+    targetSpeed: null,
+    targetTemp: null,
+    errorDetails: null,
+    status: 'idle',
+  },
+  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
+} as any
+
+const mockUnknownLatchHeaterShaker = {
+  id: 'heatershaker_id',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_unknown',
     speedStatus: 'idle',
     temperatureStatus: 'idle',
     currentSpeed: null,
@@ -339,6 +367,22 @@ describe('ModuleOverflowMenu', () => {
     fireEvent.click(btn)
   })
 
+  it('renders heater shaker set shake speed button disabled when labware latch status is unknown', () => {
+    props = {
+      module: mockUnknownLatchHeaterShaker,
+      handleSlideoutClick: jest.fn(),
+      handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
+    }
+    const { getByRole } = render(props)
+    expect(
+      getByRole('button', {
+        name: 'Set shake speed',
+      })
+    ).toBeDisabled()
+  })
+
   it('renders heater shaker overflow menu and deactivates heater when status changes', () => {
     props = {
       module: mockDeactivateHeatHeaterShaker,
@@ -409,5 +453,24 @@ describe('ModuleOverflowMenu', () => {
     })
     expect(btn).not.toBeDisabled()
     fireEvent.click(btn)
+  })
+
+  it('should disable module control buttons when the robot is busy', () => {
+    mockUseIsRobotBusy.mockReturnValue(true)
+
+    props = {
+      module: mockTCBlockHeating,
+      handleSlideoutClick: jest.fn(),
+      handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
+    }
+
+    const { getByRole } = render(props)
+
+    const btn = getByRole('button', {
+      name: 'Deactivate block',
+    })
+    expect(btn).toBeDisabled()
   })
 })

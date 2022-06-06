@@ -9,6 +9,7 @@ import type {
   ProtocolAnalysisFile,
   ModuleModel,
 } from '@opentrons/shared-data'
+import type { StoredProtocolAnalysis } from '../../hooks'
 
 export interface ProtocolModuleInfo {
   moduleId: string
@@ -24,7 +25,7 @@ export interface ProtocolModuleInfo {
 }
 
 export const getProtocolModulesInfo = (
-  protocolData: ProtocolAnalysisFile<{}>,
+  protocolData: ProtocolAnalysisFile<{}> | StoredProtocolAnalysis,
   deckDef: DeckDefinition
 ): ProtocolModuleInfo[] => {
   if (protocolData != null && 'modules' in protocolData) {

@@ -18,6 +18,15 @@ class WaitForTemperatureParams(BaseModel):
     """Input parameters to wait for a Temperature Module's target temperature."""
 
     moduleId: str = Field(..., description="Unique ID of the Temperature Module.")
+    celsius: Optional[float] = Field(
+        None,
+        description="Target temperature in °C. If not specified, will "
+        "default to the module's target temperature. "
+        "Specifying a celsius parameter other than the target temperature "
+        "could lead to unpredictable behavior and hence is not "
+        "recommended for use. This parameter can be removed in a "
+        "future version without prior notice.",
+    )
 
 
 class WaitForTemperatureResult(BaseModel):
@@ -47,8 +56,11 @@ class WaitForTemperatureImpl(
             module_id=params.moduleId
         )
 
-        # Raises error if no target temperature
-        target_temp = module_substate.get_plate_target_temperature()
+        if params.celsius is None:
+            # Raises error if no target temperature
+            target_temp = module_substate.get_plate_target_temperature()
+        else:
+            target_temp = module_substate.validate_target_temperature(params.celsius)
 
         # Allow propagation of ModuleNotAttachedError.
         temp_hardware_module = self._equipment.get_module_hardware_api(

@@ -34,13 +34,13 @@ negotiate and migrate requests and responses to a version both parties understan
 """
 
 MIN_API_VERSION_HEADER: Final[str] = "Opentrons-Min-Version"
-"""Header to specify the server's minumum supported HTTP API version.
+"""Header to specify the server's minimum supported HTTP API version.
 
 Mandatory in all responses, not used in requests.
 """
 
 LATEST_API_VERSION_HEADER_VALUE: Literal["*"] = "*"
-"""Version head value meaning 'give me the latest avilable version'"""
+"""Version header value meaning 'give me the latest available version'"""
 
 
 class OutdatedApiVersionResponse(ErrorDetails):

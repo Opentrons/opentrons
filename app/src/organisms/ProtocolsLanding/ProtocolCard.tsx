@@ -19,9 +19,10 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
-  SIZE_3,
+  SIZE_4,
   ModuleIcon,
   POSITION_ABSOLUTE,
+  TEXT_ALIGN_RIGHT,
 } from '@opentrons/components'
 import { useHistory } from 'react-router-dom'
 import {
@@ -133,8 +134,8 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
       >
         {
           {
-            missing: <Icon name="ot-spinner" spin size={SIZE_3} />,
-            loading: <Icon name="ot-spinner" spin size={SIZE_3} />,
+            missing: <Icon name="ot-spinner" spin size={SIZE_4} />,
+            loading: <Icon name="ot-spinner" spin size={SIZE_4} />,
             error: <Box size="6rem" backgroundColor={COLORS.medGrey} />,
             complete: (
               <DeckThumbnail commands={mostRecentAnalysis?.commands ?? []} />
@@ -162,7 +163,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
         </StyledText>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           {analysisStatus === 'loading' ? (
-            <StyledText as="p" flex="1">
+            <StyledText as="p" flex="1" css={COLORS.darkGreyEnabled}>
               {t('loading_data')}
             </StyledText>
           ) : (
@@ -186,7 +187,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                         leftMountPipetteName != null
                           ? getPipetteNameSpecs(leftMountPipetteName)
                               ?.displayName
-                          : t('not_used'),
+                          : t('shared:not_used'),
                     }[analysisStatus]
                   }
                 </StyledText>
@@ -210,7 +211,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                         rightMountPipetteName != null
                           ? getPipetteNameSpecs(rightMountPipetteName)
                               ?.displayName
-                          : t('not_used'),
+                          : t('shared:not_used'),
                     }[analysisStatus]
                   }
                 </StyledText>
@@ -246,10 +247,19 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             marginRight={SPACING.spacing4}
             data-testid={`ProtocolCard_date_${protocolDisplayName}`}
           >
-            <StyledText as="h6" marginBottom={SPACING.spacing3}>
+            <StyledText
+              as="h6"
+              marginBottom={SPACING.spacing3}
+              color={COLORS.darkGreyEnabled}
+              textAlign={TEXT_ALIGN_RIGHT}
+            >
               {t('updated')}
             </StyledText>
-            <StyledText as="p">
+            <StyledText
+              as="p"
+              color={COLORS.darkGreyEnabled}
+              textAlign={TEXT_ALIGN_RIGHT}
+            >
               {format(new Date(modified), 'MM/dd/yy HH:mm:ss')}
             </StyledText>
           </Flex>

@@ -6,8 +6,11 @@ import {
   ALIGN_CENTER,
   Box,
   Flex,
+  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  DIRECTION_COLUMN,
+  SIZE_2,
   SIZE_6,
   SPACING,
 } from '@opentrons/components'
@@ -51,7 +54,21 @@ export function DevicesLanding(): JSX.Element {
           <DevicesEmptyState />
         </Flex>
       ) : null}
-
+      {isScanning &&
+      [...availableDevices, ...unavailableDevices].length === 0 ? (
+        <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
+          <StyledText as="h1" marginTop="20vh">
+            {t('looking_for_robots')}
+          </StyledText>
+          <Icon
+            name="ot-spinner"
+            aria-label="ot-spinner"
+            size={SIZE_2}
+            marginTop={SPACING.spacing4}
+            spin
+          />
+        </Flex>
+      ) : null}
       {availableDevices.length > 0 ? (
         <>
           <CollapsibleSection

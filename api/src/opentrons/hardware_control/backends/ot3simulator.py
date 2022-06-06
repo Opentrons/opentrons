@@ -416,6 +416,10 @@ class OT3Simulator:
         self._present_nodes = nodes
 
     async def capacitive_probe(
-        self, mount: OT3Mount, distance_mm: float, speed_mm_per_s: float
+        self,
+        mount: OT3Mount,
+        moving: OT3Axis,
+        distance_mm: float,
+        speed_mm_per_s: float,
     ) -> None:
-        self._position[axis_to_node(OT3Axis.by_mount(mount))] += distance_mm
+        self._position[axis_to_node(moving)] += distance_mm

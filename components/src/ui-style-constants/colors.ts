@@ -22,7 +22,7 @@ export const darkBlackSelected = '#39495B'
 // note: darkBlackDisabled = greyDisabled
 
 export const darkGrey = '#4a4a4a'
-export const darkGreyHover = '#24313F'
+export const darkGreyHover = '#646468'
 export const darkGreyPressed = '#646668'
 export const darkGreyEnabled = '#707075'
 // note: darkGreyDisabled = greyDisabled
@@ -33,7 +33,7 @@ export const greyPressed = '#8d8d91'
 export const greyDisabled = '#eaeaeb'
 
 export const lightGrey = '#f8f8f8'
-export const lightGreyHover = '#3314202c'
+export const lightGreyHover = '#16212d26'
 
 export const yellow = '#f2b53c'
 export const yellowHover = '#eca20f'

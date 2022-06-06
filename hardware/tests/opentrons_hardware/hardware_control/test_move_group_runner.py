@@ -1,6 +1,6 @@
 """Tests for the move scheduler."""
 import pytest
-from typing import List, Tuple, Any
+from typing import List, Any
 from numpy import float64
 from mock import AsyncMock, call, MagicMock
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
@@ -30,6 +30,7 @@ from opentrons_hardware.hardware_control.motion import (
 from opentrons_hardware.hardware_control.move_group_runner import (
     MoveGroupRunner,
     MoveScheduler,
+    _CompletionPacket,
 )
 from opentrons_hardware.hardware_control.types import NodeMap
 from opentrons_hardware.firmware_bindings.messages import (
@@ -549,8 +550,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
     ],
 )
 def test_accumulate_move_completions(
-    completions: List[Tuple[ArbitrationId, MoveCompleted]],
-    position_map: NodeMap[Tuple[float, float]],
+    completions: List[_CompletionPacket], position_map: NodeMap[Tuple[float, float]]
 ) -> None:
     """Build correct move results."""
     assert MoveGroupRunner._accumulate_move_completions(completions) == position_map

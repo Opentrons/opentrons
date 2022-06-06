@@ -48,6 +48,8 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 
+import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
+import { ProtocolAnalysisErrorModal } from './ProtocolAnalysisErrorModal'
 import { Banner } from '../../../atoms/Banner'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { useTrackEvent } from '../../../redux/analytics'
@@ -68,6 +70,7 @@ import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 
 import {
   useProtocolDetailsForRun,
+  useProtocolAnalysisErrors,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
@@ -133,7 +136,7 @@ export function ProtocolRunHeader({
   )
   const isProtocolAnalyzing = protocolData == null
   const runStatus = useRunStatus(runId)
-
+  const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
   const { dismissCurrentRun } = useDismissCurrentRunMutation()
   const attachedModules =
@@ -206,6 +209,20 @@ export function ProtocolRunHeader({
     handleProceedToRunClick,
     !configHasHeaterShakerAttached
   )
+
+  const [showAnalysisErrorModal, setShowAnalysisErrorModal] = React.useState(
+    false
+  )
+  const handleErrorModalCloseClick: React.MouseEventHandler = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowAnalysisErrorModal(false)
+  }
+  React.useEffect(() => {
+    if (analysisErrors != null && analysisErrors?.length > 0) {
+      setShowAnalysisErrorModal(true)
+    }
+  }, [analysisErrors])
 
   const handlePlayButtonClick = (): void => {
     if (isShaking) {
@@ -404,6 +421,16 @@ export function ProtocolRunHeader({
           onConfirmClick={handleProceedToRunClick}
         />
       )}
+      {showAnalysisErrorModal &&
+        analysisErrors &&
+        analysisErrors?.length > 0 && (
+          <ProtocolAnalysisErrorModal
+            displayName={displayName}
+            errors={analysisErrors}
+            onClose={handleErrorModalCloseClick}
+            robotName={robotName}
+          />
+        )}
 
       <Flex>
         {protocolKey != null ? (
@@ -425,6 +452,9 @@ export function ProtocolRunHeader({
           </StyledText>
         )}
       </Flex>
+      {analysisErrors && analysisErrors?.length > 0 && (
+        <ProtocolAnalysisErrorBanner errors={analysisErrors} />
+      )}
       {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
         <Banner type="warning">{t('close_door_to_resume')}</Banner>
       ) : null}

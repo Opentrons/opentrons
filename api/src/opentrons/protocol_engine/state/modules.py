@@ -133,7 +133,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         if isinstance(
             command.result,
             (
-                heater_shaker.StartSetTargetTemperatureResult,
+                heater_shaker.SetTargetTemperatureResult,
                 heater_shaker.DeactivateHeaterResult,
             ),
         ):
@@ -199,7 +199,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def _handle_heater_shaker_commands(
         self,
         command: Union[
-            heater_shaker.StartSetTargetTemperature, heater_shaker.DeactivateHeater
+            heater_shaker.SetTargetTemperature, heater_shaker.DeactivateHeater
         ],
     ) -> None:
         module_id = command.params.moduleId
@@ -207,10 +207,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             self._state.substate_by_module_id[module_id], HeaterShakerModuleSubState
         ), f"{module_id} is not heater-shaker."
 
-        if isinstance(command.result, heater_shaker.StartSetTargetTemperatureResult):
+        if isinstance(command.result, heater_shaker.SetTargetTemperatureResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                plate_target_temperature=command.params.temperature,
+                plate_target_temperature=command.params.celsius,
             )
         elif isinstance(command.result, heater_shaker.DeactivateHeaterResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
@@ -313,7 +313,6 @@ class ModuleView(HasState[ModuleState]):
             location=location,
             model=attached_module.definition.model,
             serialNumber=attached_module.serial_number,
-            definition=attached_module.definition,
         )
 
     def get_all(self) -> List[LoadedModule]:
@@ -431,11 +430,16 @@ class ModuleView(HasState[ModuleState]):
 
     def get_definition(self, module_id: str) -> ModuleDefinition:
         """Module definition by ID."""
-        return self.get(module_id).definition
+        try:
+            attached_module = self._state.hardware_by_module_id[module_id]
+        except KeyError as e:
+            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+
+        return attached_module.definition
 
     def get_dimensions(self, module_id: str) -> ModuleDimensions:
         """Get the specified module's dimensions."""
-        return self.get(module_id).definition.dimensions
+        return self.get_definition(module_id).dimensions
 
     # TODO(mc, 2022-01-19): this method is missing unit test coverage
     def get_module_offset(self, module_id: str) -> LabwareOffsetVector:

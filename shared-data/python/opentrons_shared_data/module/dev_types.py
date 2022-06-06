@@ -27,7 +27,7 @@ ModuleType = Union[
 
 MagneticModuleModel = Literal["magneticModuleV1", "magneticModuleV2"]
 TemperatureModuleModel = Literal["temperatureModuleV1", "temperatureModuleV2"]
-ThermocyclerModuleModel = Literal["thermocyclerModuleV1"]
+ThermocyclerModuleModel = Literal["thermocyclerModuleV1", "thermocyclerModuleV2"]
 HeaterShakerModuleModel = Literal["heaterShakerModuleV1"]
 
 ModuleModel = Union[
@@ -84,6 +84,7 @@ ModuleDefinitionV3 = TypedDict(
         "cornerOffsetFromSlot": CornerOffsetFromSlot,
         "dimensions": ModuleDimensions,
         "calibrationPoint": ModuleCalibrationPointOffsetWithZ,
+        "config": Dict[str, int],
         "displayName": str,
         "quirks": List[str],
         "slotTransforms": Dict[str, Dict[str, Dict[str, List[List[float]]]]],

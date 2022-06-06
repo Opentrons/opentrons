@@ -94,21 +94,21 @@ export function ProtocolOverflowMenu(
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
-          top="3rem"
+          top="3.25rem"
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          <MenuItem
-            onClick={handleClickShowInFolder}
-            data-testid="ProtocolOverflowMenu_showInFolder"
-          >
-            {t('show_in_folder')}
-          </MenuItem>
           <MenuItem
             onClick={handleClickRun}
             data-testid="ProtocolOverflowMenu_run"
           >
             {t('run')}
+          </MenuItem>
+          <MenuItem
+            onClick={handleClickShowInFolder}
+            data-testid="ProtocolOverflowMenu_showInFolder"
+          >
+            {t('show_in_folder')}
           </MenuItem>
           <MenuItem
             onClick={handleClickDelete}
