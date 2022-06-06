@@ -73,10 +73,7 @@ async def started_up_subject(
     # and expect to be able to enter its result as a context manager.
     decoy.when(
         mock_avahi_client.collision_callback(matchers.Anything())
-    ).then_enter_with(
-        # https://github.com/mcous/decoy/issues/135
-        "<value unused>"  # type: ignore[arg-type]
-    )
+    ).then_enter_with(None)
 
     async with RealNameSynchronizer.build(avahi_client=mock_avahi_client) as subject:
         yield subject
