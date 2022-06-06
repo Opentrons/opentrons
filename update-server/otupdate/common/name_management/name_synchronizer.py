@@ -92,6 +92,10 @@ class NameSynchronizer:
         # Setting the Avahi service name can fail if Avahi doesn't like the new name.
         # Persist only after it succeeds, so we don't persist something invalid.
         persisted_pretty_hostname = persist_pretty_hostname(new_name)
+        _log.info(
+            f"Changed name to {repr(new_name)}"
+            f" (persisted {repr(persisted_pretty_hostname)})."
+        )
         return persisted_pretty_hostname
 
     def get_name(self) -> str:
@@ -113,7 +117,7 @@ class NameSynchronizer:
         )
         _log.info(
             f"Name collision detected by Avahi."
-            f" Changing name from {current_name} to {alternative_name}."
+            f" Changing name from {repr(current_name)} to {repr(alternative_name)}."
         )
 
         # Setting the new name includes persisting it for the next boot.
