@@ -401,9 +401,11 @@ export function RobotSettingsCalibration({
 
   const checkPipetteCalibrationMissing = (): void => {
     // checked the number of attached pipettes
-    const numberOfAttached = Object.keys(attachedPipettes)
-      .map(mount => attachedPipettes[mount as Mount] != null)
-      .filter(x => x).length
+    const numberOfAttached =
+      attachedPipettes != null &&
+      Object.keys(attachedPipettes)
+        .map(mount => attachedPipettes[mount as Mount] != null)
+        .filter(x => x).length
     const isPipettesNumberMatched =
       numberOfAttached === formatPipetteOffsetCalibrations().length
     if (
