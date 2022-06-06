@@ -73,6 +73,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       width="100%"
       position="relative"
+      cursor="pointer"
       onClick={() => history.push(`/protocols/${protocolKey}`)}
     >
       <AnalysisInfo
