@@ -26,8 +26,8 @@ interface Props {
   //  isExpanded is for collapse and expand animation
   isExpanded?: boolean
   footer?: React.ReactNode
-  //  optional padding to change padding on children (usage in PipetteSettingsSlideout)
-  padding?: string | number
+  //  optional padding to change padding on children (usage in PipetteSettingsSlideout footer)
+  pipetteSettingsSlideoutFooterPadding?: string | number
 }
 
 const EXPANDED_STYLE = css`
@@ -150,7 +150,12 @@ export const Slideout = (props: Props): JSX.Element | null => {
             {children}
           </Box>
           {footer != null ? (
-            <Box paddingX={props.padding ?? SPACING.spacing4} flex="0 0 auto">
+            <Box
+              paddingX={
+                props.pipetteSettingsSlideoutFooterPadding ?? SPACING.spacing4
+              }
+              flex="0 0 auto"
+            >
               {footer}
             </Box>
           ) : null}

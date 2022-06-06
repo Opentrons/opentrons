@@ -61,7 +61,7 @@ export const PipetteSettingsSlideout = (
       title={t('pipette_settings', { pipetteName: pipetteName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      padding={'0'}
+      pipetteSettingsSlideoutFooterPadding={'0'}
       footer={
         <ConfigFormSubmitButton disabled={updateRequest?.status === PENDING} />
       }

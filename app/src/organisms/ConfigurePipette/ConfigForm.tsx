@@ -41,6 +41,7 @@ export interface ConfigFormProps {
   updateInProgress: boolean
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => unknown
   closeModal: () => unknown
+  groupLabels: string[]
   __showHiddenFields: boolean
 }
 
@@ -214,7 +215,6 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
             })
             formProps.resetForm({ values: newValues })
           }
-          //  TODO(jr, 4/19/22): add groupLabels to i18n
           return (
             <Box overflowY="scroll">
               <Form>
@@ -224,25 +224,25 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
                 />
                 <FormColumn>
                   <ConfigFormGroup
-                    groupLabel="Plunger Positions"
+                    groupLabel={this.props.groupLabels[0]}
                     groupError={errors.plungerError}
                     formFields={plungerFields}
                   />
                   <ConfigFormGroup
-                    groupLabel="Tip Pickup / Drop"
+                    groupLabel={this.props.groupLabels[1]}
                     formFields={tipFields}
                   />
                   {quirksPresent && <ConfigQuirkGroup quirks={quirkFields} />}
                   {this.props.__showHiddenFields && (
                     <ConfigFormGroup
-                      groupLabel="For Dev Use Only"
+                      groupLabel={this.props.groupLabels[2]}
                       formFields={devFields}
                     />
                   )}
                 </FormColumn>
                 <FormColumn>
                   <ConfigFormGroup
-                    groupLabel="Power / Force"
+                    groupLabel={this.props.groupLabels[3]}
                     formFields={powerFields}
                   />
                 </FormColumn>

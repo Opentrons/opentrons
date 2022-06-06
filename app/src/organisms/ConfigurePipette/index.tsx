@@ -26,6 +26,12 @@ export function ConfigurePipette(props: Props): JSX.Element {
   const settings = usePipetteSettingsQuery({
     refetchInterval: PIPETTE_SETTINGS_POLL_MS,
   })?.data
+  const groupLabels = [
+    t('plunger_positions'),
+    t('tip_pickup_drop'),
+    t('for_dev_use_only'),
+    t('power_force'),
+  ]
 
   const updateError: string | null =
     updateRequest && updateRequest.status === FAILURE
@@ -53,6 +59,7 @@ export function ConfigurePipette(props: Props): JSX.Element {
           updateInProgress={updateRequest?.status === PENDING}
           updateSettings={updateSettings}
           closeModal={closeModal}
+          groupLabels={groupLabels}
           __showHiddenFields={__showHiddenFields}
         />
       )}
