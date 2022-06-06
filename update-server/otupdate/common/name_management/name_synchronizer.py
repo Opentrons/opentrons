@@ -71,8 +71,8 @@ class NameSynchronizer:
             avahi_client = await AvahiClient.connect()
 
         name_synchronizer = cls(avahi_client)
-        async with avahi_client.collision_callback(
-            name_synchronizer._on_avahi_collision
+        async with avahi_client.listen_for_collisions(
+            callback=name_synchronizer._on_avahi_collision
         ):
             await avahi_client.start_advertising(
                 service_name=name_synchronizer.get_name()

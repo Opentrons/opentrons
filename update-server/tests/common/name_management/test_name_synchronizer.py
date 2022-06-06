@@ -69,10 +69,10 @@ async def started_up_subject(
     Tests that need to operate in the subject's startup phase itself
     should build the subject manually instead of using this fixture.
     """
-    # NameSynchronizer.start() will call mock_avahi_client.collision_callback()
+    # NameSynchronizer.start() will call mock_avahi_client.listen_for_collisions()
     # and expect to be able to enter its result as a context manager.
     decoy.when(
-        mock_avahi_client.collision_callback(matchers.Anything())
+        mock_avahi_client.listen_for_collisions(matchers.Anything())
     ).then_enter_with(None)
 
     async with NameSynchronizer.start(avahi_client=mock_avahi_client) as subject:
@@ -141,9 +141,9 @@ async def test_advertises_initial_name(
 
     decoy.when(mock_get_pretty_hostname()).then_return("initial name")
     mock_collision_subscription_context_manager = decoy.mock()
-    decoy.when(mock_avahi_client.collision_callback(matchers.Anything())).then_return(
-        mock_collision_subscription_context_manager
-    )
+    decoy.when(
+        mock_avahi_client.listen_for_collisions(matchers.Anything())
+    ).then_return(mock_collision_subscription_context_manager)
 
     async with NameSynchronizer.start(avahi_client=mock_avahi_client):
         decoy.verify(
@@ -184,7 +184,7 @@ async def test_collision_handling(
     mock_collision_subscription_context_manager = decoy.mock()
     collision_callback_captor = matchers.Captor()
     decoy.when(
-        mock_avahi_client.collision_callback(collision_callback_captor)
+        mock_avahi_client.listen_for_collisions(collision_callback_captor)
     ).then_return(mock_collision_subscription_context_manager)
 
     async with NameSynchronizer.start(avahi_client=mock_avahi_client):

@@ -69,7 +69,7 @@ class AvahiClient:
 
         * This process dies.
         * We have a name collision with another device on the network.
-          See `collision_callback()`.
+          See `listen_for_collisions()`.
 
         It's safe to call this more than once. If we're already advertising,
         the existing service name will be replaced with the new one.
@@ -102,7 +102,7 @@ class AvahiClient:
             )
 
     @contextlib.asynccontextmanager
-    async def collision_callback(
+    async def listen_for_collisions(
         self, callback: CollisionCallback
     ) -> AsyncGenerator[None, None]:
         """Be informed of name collisions.
