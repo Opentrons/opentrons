@@ -1,6 +1,7 @@
 """Functions and utilites for OT3 calibration."""
 from typing_extensions import Final, Literal
-from typing import Union, Tuple, List
+from typing import Union, Tuple, List, Dict, Any, Optional
+import datetime
 import numpy as np
 from enum import Enum
 from math import copysign, floor
@@ -48,12 +49,9 @@ async def find_deck_position(hcapi: OT3API, mount: OT3Mount) -> float:
     z_offset_settings = hcapi.config.calibration.z_offset
     await hcapi.home_z()
     here = await hcapi.gantry_position(mount)
-    LOG.info(f"my gantry position after home is {here}")
     z_prep_point = Point(*z_offset_settings.point)
     above_point = z_prep_point._replace(z=here.z)
-    LOG.info(f"moving to {above_point}")
     await hcapi.move_to(mount, above_point)
-    LOG.info("probing")
     deck_z = await hcapi.capacitive_probe(
         mount, OT3Axis.by_mount(mount), z_prep_point.z, z_offset_settings.pass_settings
     )
@@ -255,18 +253,27 @@ async def find_axis_center(
     )
 
     left_edge, right_edge = _edges_from_data(
-        data, axis.of_point(end) - axis.of_point(start)
+        data,
+        axis.of_point(end) - axis.of_point(start),
+        {
+            "axis": axis.name,
+            "speed": edge_settings.pass_settings.speed_mm_per_s,
+            "start_absolute": axis.of_point(start),
+            "end_absolute": axis.of_point(end),
+        },
     )
     nominal_width = axis.of_point(plus_edge_nominal) - axis.of_point(minus_edge_nominal)
     detected_width = right_edge - left_edge
     left_edge_absolute = axis.of_point(start) + left_edge
-    right_edge_absolute = axis.of_point(end) + right_edge
+    right_edge_absolute = axis.of_point(start) + right_edge
     if abs(detected_width - nominal_width) > WIDTH_TOLERANCE_MM:
         raise InaccurateNonContactSweepError(nominal_width, detected_width)
     return (left_edge_absolute + right_edge_absolute) / 2
 
 
-def _edges_from_data(data: List[float], distance: float) -> Tuple[float, float]:
+def _edges_from_data(
+    data: List[float], distance: float, log_metadata: Optional[Dict[str, Any]] = None
+) -> Tuple[float, float]:
     """
     Postprocess the capacitance data taken from a sweep to find the calibration slot.
 
@@ -287,16 +294,13 @@ def _edges_from_data(data: List[float], distance: float) -> Tuple[float, float]:
     the timeseries data and set the locations of the edges as the locations of the
     extrema of the difference of the series.
     """
-    LOG.debug(
-        json.dumps(
-            {"details": {"type": "slot sweep"}, "data": data, "distance": distance}
-        )
-    )
+    now_str = datetime.datetime.now().strftime("%d-%m-%y-%H:%M:%S")
+
     average_width_samples = (int(floor(0.05 * len(data))) // 2) * 2
     average_difference_kernel = np.concatenate(  # type: ignore
         (
-            np.full(average_width_samples / 2, 1 / average_width_samples),
-            np.full(average_width_samples / 2, -1 / average_width_samples),
+            np.full(average_width_samples // 2, 1 / average_width_samples),
+            np.full(average_width_samples // 2, -1 / average_width_samples),
         )
     )
     differenced = np.convolve(np.array(data), average_difference_kernel, mode="valid")
@@ -316,11 +320,31 @@ def _edges_from_data(data: List[float], distance: float) -> Tuple[float, float]:
     left_edge = left_edge_offset + distance_prefix
     right_edge_offset = right_edge_sample * mm_per_elem
     right_edge = right_edge_offset + distance_prefix
+    json.dump(
+        {
+            "metadata": log_metadata,
+            "inputs": {
+                "raw_data": data,
+                "distance": distance,
+                "kernel_width": len(average_difference_kernel),
+            },
+            "outputs": {
+                "differenced_data": [d for d in differenced],
+                "mm_per_elem": mm_per_elem,
+                "distance_prefix": distance_prefix,
+                "right_edge_offset": right_edge_offset,
+                "left_edge_offset": left_edge_offset,
+                "left_edge": left_edge,
+                "right_edge": right_edge,
+            },
+        },
+        open(f"/data/sweep_{now_str}.json", "w"),
+    )
     LOG.info(
-        "Found edges ({left_edge:.3f}, {right_edge:.3f}) "
-        "from offsets ({left_edge_offset:.3f}, {right_edge_offset:.3f}) "
-        "with {len(data)} cap samples over {distance}mm "
-        "using a kernel width of {len(average_difference_kernel)}"
+        f"Found edges ({left_edge:.3f}, {right_edge:.3f}) "
+        f"from offsets ({left_edge_offset:.3f}, {right_edge_offset:.3f}) "
+        f"with {len(data)} cap samples over {distance}mm "
+        f"using a kernel width of {len(average_difference_kernel)}"
     )
     return float(left_edge), float(right_edge)
 
