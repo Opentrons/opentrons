@@ -43,8 +43,6 @@ import * as Config from '../../../redux/config'
 import * as Sessions from '../../../redux/sessions'
 import * as Calibration from '../../../redux/calibration'
 import * as Pipettes from '../../../redux/pipettes'
-import * as PipetteOffset from '../../../redux/calibration/pipette-offset'
-import * as TipLength from '../../../redux/calibration/tip-length'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
@@ -68,6 +66,8 @@ import type {
   AttachedPipettesByMount,
   PipetteCalibrationsByMount,
 } from '../../../redux/pipettes/types'
+
+const CALS_FETCH_MS = 5000
 
 interface CalibrationProps {
   robotName: string
@@ -105,8 +105,6 @@ const attachedPipetteCalPresent: (
       (pipetteCalibrations[mount]?.offset == null ||
         pipetteCalibrations[mount]?.tipLength == null)
   )
-
-const CALIBRATION_STATUS_POLL_MS = 5000
 
 export function RobotSettingsCalibration({
   robotName,
@@ -402,9 +400,18 @@ export function RobotSettingsCalibration({
   }
 
   const checkPipetteCalibrationMissing = (): void => {
+    // checked the number of attached pipettes
+    const numberOfAttached =
+      attachedPipettes != null &&
+      Object.keys(attachedPipettes)
+        .map(mount => attachedPipettes[mount as Mount] != null)
+        .filter(x => x).length
+    const isPipettesNumberMatched =
+      numberOfAttached === formatPipetteOffsetCalibrations().length
     if (
       pipetteOffsetCalibrations === null ||
-      Object.values(pipetteOffsetCalibrations).length <= 1
+      (Object.values(pipetteOffsetCalibrations).length <= 1 &&
+        isPipettesNumberMatched)
     ) {
       setShowPipetteOffsetCalibrationBanner(true)
       setPipetteOffsetCalBannerType('error')
@@ -417,7 +424,7 @@ export function RobotSettingsCalibration({
             (p.pipette === left && p.status.markedBad) ||
             (p.pipette === right && p.status.markedBad)
         ) ?? null
-      if (markedBads !== null) {
+      if (markedBads.length !== 0 && isPipettesNumberMatched) {
         setShowPipetteOffsetCalibrationBanner(true)
         setPipetteOffsetCalBannerType('warning')
       } else {
@@ -452,25 +459,19 @@ export function RobotSettingsCalibration({
   }
 
   React.useEffect(() => {
-    robotName && dispatch(Pipettes.fetchPipettes(robotName))
-    robotName &&
-      dispatch(PipetteOffset.fetchPipetteOffsetCalibrations(robotName))
-    robotName && dispatch(TipLength.fetchTipLengthCalibrations(robotName))
-  }, [dispatch, robotName, status])
-
-  React.useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
       createRequestId.current = null
     }
   }, [createStatus])
 
-  React.useEffect(() => {
-    checkPipetteCalibrationMissing()
-  }, [pipettePresent, pipetteOffsetCalibrations])
-
   useInterval(
-    () => dispatch(Calibration.fetchCalibrationStatus(robotName)),
-    CALIBRATION_STATUS_POLL_MS,
+    () => {
+      dispatch(Calibration.fetchCalibrationStatus(robotName))
+      dispatch(Calibration.fetchPipetteOffsetCalibrations(robotName))
+      dispatch(Calibration.fetchTipLengthCalibrations(robotName))
+      checkPipetteCalibrationMissing()
+    },
+    CALS_FETCH_MS,
     true
   )
 
