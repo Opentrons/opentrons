@@ -230,6 +230,15 @@ def test_get_is_stopped() -> None:
     assert subject.get_is_stopped() is True
 
 
+def test_get_is_started() -> None:
+    """It should return true if start requested and no command running."""
+    subject = get_command_view(run_started_at=None)
+    assert subject.get_is_started() is False
+
+    subject = get_command_view(run_started_at=datetime(year=2021, day=1, month=1))
+    assert subject.get_is_started() is True
+
+
 class ActionAllowedSpec(NamedTuple):
     """Spec data to test CommandView.validate_action_allowed."""
 
