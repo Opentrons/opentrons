@@ -5,7 +5,7 @@ Welcome
 .. toctree::
 
     self
-    writing
+    tutorial
     versioning
     new_labware
     new_modules
@@ -26,7 +26,7 @@ As a programmer, you can leverage the full power of Python for advanced automati
 Getting Started
 ---------------
 
-**New to Python protocols?** Check out the :ref:`writing` page first to get a sense of the typical structure of a protocol. 
+**New to Python protocols?** Check out the :ref:`tutorial` to learn about the different parts of a protocol file and build a working protocol from scratch. 
 
 If you want to **dive right into code**, take a look at our :ref:`new-examples` page and the comprehensive :ref:`protocol-api-reference`.
 

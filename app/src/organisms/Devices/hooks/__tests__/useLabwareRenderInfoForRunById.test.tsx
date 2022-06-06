@@ -5,19 +5,27 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_stand
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 
 import { getLabwareRenderInfo } from '../../ProtocolRun/utils/getLabwareRenderInfo'
-import { useLabwareRenderInfoForRunById, useProtocolDetailsForRun } from '..'
+import {
+  useLabwareRenderInfoForRunById,
+  useProtocolDetailsForRun,
+  useStoredProtocolAnalysis,
+} from '..'
 
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
-import type { ProtocolDetails } from '..'
+import type { ProtocolDetails, StoredProtocolAnalysis } from '..'
 
 jest.mock('../../ProtocolRun/utils/getLabwareRenderInfo')
 jest.mock('../useProtocolDetailsForRun')
+jest.mock('../useStoredProtocolAnalysis')
 
 const mockGetLabwareRenderInfo = getLabwareRenderInfo as jest.MockedFunction<
   typeof getLabwareRenderInfo
 >
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
+>
+const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
+  typeof useStoredProtocolAnalysis
 >
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
@@ -107,6 +115,9 @@ describe('useLabwareRenderInfoForRunById hook', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith('1')
       .mockReturnValue(PROTOCOL_DETAILS)
+    when(mockUseStoredProtocolAnalysis)
+      .calledWith('1')
+      .mockReturnValue((PROTOCOL_DETAILS as unknown) as StoredProtocolAnalysis)
     when(mockGetLabwareRenderInfo)
       .calledWith(simpleV6Protocol, standardDeckDef as any)
       .mockReturnValue(LABWARE_RENDER_INFO)
@@ -119,6 +130,7 @@ describe('useLabwareRenderInfoForRunById hook', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith('1')
       .mockReturnValue({} as ProtocolDetails)
+    when(mockUseStoredProtocolAnalysis).calledWith('1').mockReturnValue(null)
     const { result } = renderHook(() => useLabwareRenderInfoForRunById('1'))
     expect(result.current).toStrictEqual({})
   })

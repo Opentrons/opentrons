@@ -11,6 +11,7 @@ import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup
 import { ProceedToRunButton } from '../ProceedToRunButton'
 import { SetupLiquidsList } from './SetupLiquidsList'
 import { SetupLiquidsMap } from './SetupLiquidsMap'
+import { getMockLiquidData } from './getMockLiquidData'
 
 interface SetupLiquidsProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
@@ -24,25 +25,27 @@ export function SetupLiquids(props: SetupLiquidsProps): JSX.Element {
     t('list_view'),
     t('map_view')
   )
+  const liquidsData = getMockLiquidData()
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_CENTER}
-      alignItems={ALIGN_CENTER}
-      marginTop={SPACING.spacing4}
-      gridGap={SPACING.spacing6}
+      marginTop={SPACING.spacing6}
+      gridGap={SPACING.spacing4}
     >
       {toggleGroup}
       {selectedValue === t('list_view') ? (
-        <SetupLiquidsList />
+        <SetupLiquidsList liquids={liquidsData} />
       ) : (
         <SetupLiquidsMap />
       )}
-      <ProceedToRunButton
-        protocolRunHeaderRef={props.protocolRunHeaderRef}
-        robotName={props.robotName}
-        runId={props.runId}
-      />
+      <Flex alignSelf={ALIGN_CENTER}>
+        <ProceedToRunButton
+          protocolRunHeaderRef={props.protocolRunHeaderRef}
+          robotName={props.robotName}
+          runId={props.runId}
+        />
+      </Flex>
     </Flex>
   )
 }

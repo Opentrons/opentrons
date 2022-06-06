@@ -70,7 +70,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           onClick={handleClickRun}
           data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
         >
-          {t('run_protocol')}
+          {t('run_a_protocol')}
         </MenuItem>
         <Divider marginY={'0'} />
         <MenuItem

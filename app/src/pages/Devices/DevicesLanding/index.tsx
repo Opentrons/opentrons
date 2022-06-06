@@ -8,10 +8,8 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_CENTER,
-  ALIGN_CENTER,
   DIRECTION_COLUMN,
-  SIZE_3,
+  SIZE_2,
   SIZE_6,
   SPACING,
 } from '@opentrons/components'
@@ -122,15 +120,17 @@ export function DevicesLanding(): JSX.Element {
 function DevicesLoadingState(): JSX.Element {
   const { t } = useTranslation('devices_landing')
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_CENTER}
-      alignItems={ALIGN_CENTER}
-    >
-      <StyledText as="h3" marginBottom={SPACING.spacing3}>
+    <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
+      <StyledText as="h1" marginTop="20vh">
         {t('looking_for_robots')}
       </StyledText>
-      <Icon name="ot-spinner" spin size={SIZE_3} />
+      <Icon
+        name="ot-spinner"
+        aria-label="ot-spinner"
+        spin
+        size={SIZE_2}
+        marginTop={SPACING.spacing4}
+      />
       <ExternalLink
         href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
         id="DevicesEmptyState_troubleshootingConnectionProblems"
