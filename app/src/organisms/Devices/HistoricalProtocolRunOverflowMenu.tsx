@@ -114,6 +114,13 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { reset } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
 
+  const handleDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    deleteRun(runId)
+    closeOverflowMenu(e)
+  }
+
   return (
     <Flex
       width="11.625rem"
@@ -147,7 +154,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       </MenuItem>
       <Divider />
       <MenuItem
-        onClick={() => deleteRun(runId)}
+        onClick={handleDelete}
         data-testid={`RecentProtocolRun_OverflowMenu_deleteRun`}
       >
         {t('delete_run')}
