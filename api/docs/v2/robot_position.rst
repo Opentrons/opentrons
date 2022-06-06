@@ -224,20 +224,13 @@ The OT-2's gantry usually moves as fast as it can given its construction: 400 mm
 
 .. code-block:: python
     :substitutions:
-
-    from opentrons import protocol_api, types
-
-    metadata = {'apiLevel': '|apiLevel|'}
-
-    def run(protocol: protocol_api.ProtocolContext):
-        pipette = protocol.load_instrument('p300_single', 'right')
         
-        # move to 50 mm above the front left of slot 5 at default speed
-        pipette.move_to(protocol.deck.position_for('5').move(types.Point(z=50)))
-        # slow down the pipette
-        pipette.default_speed = 100
-        # move to 50 mm above the front left of slot 9 much more slowly
-        pipette.move_to(protocol.deck.position_for('9').move(types.Point(z=50)))
+	# move to the first well at default speed
+	pipette.move_to(plate['A1'].top())
+	# slow down the pipette
+	pipette.default_speed = 100
+	# move to the last well much more slowly
+	pipette.move_to(plate['H12'].top())
         
 .. warning::
 
