@@ -20,6 +20,7 @@ import {
   useRobot,
   useRunCalibrationStatus,
   useRunHasStarted,
+  useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
 } from '../hooks'
 import { SetupLabware } from './SetupLabware'
@@ -60,6 +61,7 @@ export function ProtocolRunSetup({
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
   const runHasStarted = useRunHasStarted(runId)
+  const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     null
@@ -176,31 +178,37 @@ export function ProtocolRunSetup({
           {runHasStarted ? (
             <InfoMessage title={t('setup_is_view_only')} />
           ) : null}
-          {stepsKeysInOrder.map((stepKey, index) => (
-            <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
-              <SetupStep
-                expanded={stepKey === expandedStepKey}
-                label={t('step', { index: index + 1 })}
-                title={t(`${stepKey}_title`)}
-                description={StepDetailMap[stepKey].description}
-                toggleExpanded={() =>
-                  stepKey === expandedStepKey
-                    ? setExpandedStepKey(null)
-                    : setExpandedStepKey(stepKey)
-                }
-                calibrationStatusComplete={
-                  stepKey === ROBOT_CALIBRATION_STEP_KEY && !runHasStarted
-                    ? calibrationStatus.complete && isDeckCalibrated
-                    : null
-                }
-              >
-                {StepDetailMap[stepKey].stepInternals}
-              </SetupStep>
-              {index !== stepsKeysInOrder.length - 1 ? (
-                <Line marginTop={SPACING.spacing5} />
-              ) : null}
-            </Flex>
-          ))}
+          {analysisErrors != null && analysisErrors?.length > 0 ? (
+            <StyledText alignSelf={ALIGN_CENTER} color={COLORS.darkGreyEnabled}>
+              {t('protocol_analysis_failed')}
+            </StyledText>
+          ) : (
+            stepsKeysInOrder.map((stepKey, index) => (
+              <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
+                <SetupStep
+                  expanded={stepKey === expandedStepKey}
+                  label={t('step', { index: index + 1 })}
+                  title={t(`${stepKey}_title`)}
+                  description={StepDetailMap[stepKey].description}
+                  toggleExpanded={() =>
+                    stepKey === expandedStepKey
+                      ? setExpandedStepKey(null)
+                      : setExpandedStepKey(stepKey)
+                  }
+                  calibrationStatusComplete={
+                    stepKey === ROBOT_CALIBRATION_STEP_KEY && !runHasStarted
+                      ? calibrationStatus.complete && isDeckCalibrated
+                      : null
+                  }
+                >
+                  {StepDetailMap[stepKey].stepInternals}
+                </SetupStep>
+                {index !== stepsKeysInOrder.length - 1 ? (
+                  <Line marginTop={SPACING.spacing5} />
+                ) : null}
+              </Flex>
+            ))
+          )}
         </>
       ) : (
         <StyledText alignSelf={ALIGN_CENTER} color={COLORS.darkGreyEnabled}>

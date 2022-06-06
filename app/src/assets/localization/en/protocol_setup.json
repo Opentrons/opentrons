@@ -119,6 +119,7 @@
   "connection_info_not_available": "Connection info not available once run has started",
   "setup_is_view_only": "Setup is view-only once run has started",
   "loading_data": "Loading data...",
+  "protocol_analysis_failed": "Protocol analysis failed",
   "liquid_setup_step_title": "Initial Liquid Setup",
   "liquid_setup_step_description": "View liquid starting locations and volumes",
   "list_view": "List View",
