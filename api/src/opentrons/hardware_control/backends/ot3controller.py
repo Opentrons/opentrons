@@ -633,6 +633,10 @@ class OT3Controller:
             expected.add(NodeId.pipette_left)
         if instrs.get(OT3Mount.RIGHT, cast("AttachedPipette", {})).get("config", None):
             expected.add(NodeId.pipette_right)
+        if instrs.get(OT3Mount.GRIPPER, cast("AttachedGripper", {})).get(
+            "config", None
+        ):
+            expected.add(NodeId.gripper)
         present = await probe(self._messenger, expected, timeout)
         self._present_nodes = self._replace_head_node(present)
 

@@ -19,9 +19,16 @@ from opentrons.config.pipette_config import PipetteConfig
 from opentrons.config.gripper_config import GripperConfig, GripperName, GripperModel
 
 
-class PipetteSpec(TypedDict):
-    model: Union[PipetteModel, None]
+class InstrumentSpec(TypedDict):
     id: Optional[str]
+
+
+class PipetteSpec(InstrumentSpec):
+    model: Union[PipetteModel, None]
+
+
+class GripperSpec(InstrumentSpec):
+    model: Union[GripperModel, None]
 
 
 class AttachedPipette(TypedDict):
