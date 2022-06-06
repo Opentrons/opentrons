@@ -52,6 +52,7 @@ import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 import { CalibrationHealthCheck } from './CalibrationDetails/CalibrationHealthCheck'
+import { attachedPipetteCalPresent } from './CalibrationDetails/utils'
 
 import type { State, Dispatch } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
@@ -60,10 +61,6 @@ import type {
   DeckCalibrationSession,
 } from '../../../redux/sessions/types'
 import type { DeckCalibrationInfo } from '../../../redux/calibration/types'
-import type {
-  AttachedPipettesByMount,
-  PipetteCalibrationsByMount,
-} from '../../../redux/pipettes/types'
 
 interface CalibrationProps {
   robotName: string
@@ -90,17 +87,6 @@ export interface FormattedTipLengthCalibration {
 const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
-
-const attachedPipetteCalPresent: (
-  pipettes: AttachedPipettesByMount,
-  pipetteCalibrations: PipetteCalibrationsByMount
-) => boolean = (pipettes, pipetteCalibrations) =>
-  !Pipettes.PIPETTE_MOUNTS.some(
-    mount =>
-      pipettes?.[mount] != null &&
-      (pipetteCalibrations[mount]?.offset == null ||
-        pipetteCalibrations[mount]?.tipLength == null)
-  )
 
 const CALIBRATION_STATUS_POLL_MS = 5000
 
