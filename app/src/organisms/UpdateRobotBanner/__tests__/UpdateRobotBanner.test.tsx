@@ -4,11 +4,11 @@ import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import * as Buildroot from '../../../redux/buildroot'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { UpdateBuildroot } from '../../../pages/Robots/RobotSettings/UpdateBuildroot'
+import { UpdateBuildroot } from '../../Devices/RobotSettings/UpdateBuildroot'
 import { UpdateRobotBanner } from '..'
 
-jest.mock('../../../pages/Robots/RobotSettings/UpdateBuildroot')
 jest.mock('../../../redux/buildroot')
+jest.mock('../../Devices/RobotSettings/UpdateBuildroot')
 
 const getBuildrootUpdateDisplayInfo = Buildroot.getBuildrootUpdateDisplayInfo as jest.MockedFunction<
   typeof Buildroot.getBuildrootUpdateDisplayInfo

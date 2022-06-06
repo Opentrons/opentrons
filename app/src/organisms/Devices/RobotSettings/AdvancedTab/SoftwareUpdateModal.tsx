@@ -12,15 +12,15 @@ import { getShellUpdateState } from '../../../../redux/shell'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
 // import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
 
-import { UpdateBuildroot } from '../../../../pages/Robots/RobotSettings/UpdateBuildroot'
 import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { PrimaryButton, SecondaryButton } from '../../../../atoms/buttons'
 import { Banner } from '../../../../atoms/Banner'
 import { Modal } from '../../../../atoms/Modal'
+import { CONNECTABLE, REACHABLE } from '../../../../redux/discovery'
 import { Divider } from '../../../../atoms/structure'
 import { useRobot } from '../../hooks'
-import { CONNECTABLE, REACHABLE } from '../../../../redux/discovery'
+import { UpdateBuildroot } from '../UpdateBuildroot'
 
 const TECHNICAL_CHANGE_LOG_URL =
   'https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md'
