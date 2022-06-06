@@ -217,12 +217,7 @@ def create_blow_out_command(
         wellName=well_name,
         wellLocation=well_location or WellLocation(),
     )
-    result = cmd.BlowOutResult(
-        pipetteId=pipette_id,
-        labwareId=labware_id,
-        wellName=well_name,
-        wellLocation=well_location or WellLocation(),
-    )
+    result = cmd.BlowOutResult()
 
     return cmd.BlowOut(
         id="command-id",

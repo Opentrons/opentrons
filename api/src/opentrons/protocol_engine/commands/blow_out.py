@@ -2,6 +2,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
+from pydantic import BaseModel
 
 from .pipetting_common import BasePipettingParams
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
@@ -19,7 +20,7 @@ class BlowOutParams(BasePipettingParams):
     pass
 
 
-class BlowOutResult(BasePipettingParams):
+class BlowOutResult(BaseModel):
     """Result data from the execution of a blow-out command."""
 
     pass
@@ -40,12 +41,7 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
             well_location=params.wellLocation,
         )
 
-        return BlowOutResult(
-            pipetteId=params.pipetteId,
-            labwareId=params.labwareId,
-            wellName=params.wellName,
-            wellLocation=params.wellLocation,
-        )
+        return BlowOutResult()
 
 
 class BlowOut(BaseCommand[BlowOutParams, BlowOutResult]):

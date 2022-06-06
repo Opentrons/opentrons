@@ -252,4 +252,5 @@ __all__ = [
     "BlowOutCreate",
     "BlowOutImplementation",
     "BlowOutParams",
+    "BlowOut",
 ]

@@ -24,9 +24,4 @@ async def test_blow_out_implementation(
 
     result = await subject.execute(data)
 
-    assert result == BlowOutResult(
-        pipetteId="abc",
-        labwareId="123",
-        wellName="A3",
-        wellLocation=location,
-    )
+    assert result == BlowOutResult()

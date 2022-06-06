@@ -161,7 +161,7 @@ class SyncClient:
         well_name: str,
         well_location: WellLocation,
     ) -> commands.BlowOutResult:
-        """Execute a ``Dispense`` command and return the result."""
+        """Execute a ``BlowOut`` command and return the result."""
         request = commands.BlowOutCreate(
             params=commands.BlowOutParams(
                 pipetteId=pipette_id,
