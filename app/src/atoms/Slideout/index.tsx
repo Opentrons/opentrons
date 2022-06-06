@@ -26,8 +26,6 @@ interface Props {
   //  isExpanded is for collapse and expand animation
   isExpanded?: boolean
   footer?: React.ReactNode
-  //  optional padding to change padding on children (usage in PipetteSettingsSlideout footer)
-  pipetteSettingsSlideoutFooterPadding?: string | number
 }
 
 const EXPANDED_STYLE = css`
@@ -151,10 +149,11 @@ export const Slideout = (props: Props): JSX.Element | null => {
           </Box>
           {footer != null ? (
             <Box
-              paddingX={
-                props.pipetteSettingsSlideoutFooterPadding ?? SPACING.spacing4
-              }
+              paddingTop={SPACING.spacing4}
+              paddingX={SPACING.spacing4}
               flex="0 0 auto"
+              //  TODO(jr, 6/6/22): add logic to hide this boxShadow if the children box is already scrolled to the max
+              boxShadow={'0px -4px 12px rgba(0, 0, 0, 0.15)'}
             >
               {footer}
             </Box>
