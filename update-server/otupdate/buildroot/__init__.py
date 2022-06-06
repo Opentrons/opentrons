@@ -2,7 +2,8 @@
 import asyncio
 import logging
 import json
-from typing import Any, AsyncGenerator, Mapping, Optional
+from typing import Any, Mapping, Optional
+
 from aiohttp import web
 
 from otupdate.common import (
@@ -11,7 +12,6 @@ from otupdate.common import (
     control,
     name_management,
     ssh_key_management,
-    systemd,
     update,
 )
 from . import update_actions
@@ -39,6 +39,7 @@ def get_version(version_file: str) -> Mapping[str, str]:
 
 
 def get_app(
+    name_synchronizer: name_management.NameSynchronizer,
     system_version_file: Optional[str] = None,
     config_file_override: Optional[str] = None,
     name_override: Optional[str] = None,
@@ -57,47 +58,11 @@ def get_app(
 
     app = web.Application(middlewares=[log_error_middleware])
 
-    async def set_up_and_tear_down(app: web.Application) -> AsyncGenerator[None, None]:
-        app[config.CONFIG_VARNAME] = config_obj
-        app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
-        app[constants.DEVICE_BOOT_ID_NAME] = boot_id
-
-        update_actions.OT2UpdateActions.build_and_insert(app)
-
-        async with name_management.build_name_synchronizer(
-            name_override=name_override
-        ) as name_synchronizer:
-            name_synchronizer.install_on_app(app)
-            initial_name = name_synchronizer.get_name()
-
-            LOG.info(
-                "Setup: "
-                + "\n\t".join(
-                    [
-                        f"Device name: {initial_name}",
-                        "Buildroot version:         "
-                        f'{version.get("buildroot_version", "unknown")}',
-                        "\t(from git sha      "
-                        f'{version.get("buildroot_sha", "unknown")}',
-                        "API version:               "
-                        f'{version.get("opentrons_api_version", "unknown")}',
-                        "\t(from git sha      "
-                        f'{version.get("opentrons_api_sha", "unknown")}',
-                        "Update server version:     "
-                        f'{version.get("update_server_version", "unknown")}',
-                        "\t(from git sha      "
-                        f'{version.get("update_server_sha", "unknown")}',
-                        "Smoothie firmware version: TODO",
-                    ]
-                )
-            )
-
-            LOG.info(f"Notifying {systemd.SOURCE} that service is up.")
-            systemd.notify_up()
-
-            yield
-
-    app.cleanup_ctx.append(set_up_and_tear_down)
+    app[config.CONFIG_VARNAME] = config_obj
+    app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
+    app[constants.DEVICE_BOOT_ID_NAME] = boot_id
+    update_actions.OT2UpdateActions.build_and_insert(app)
+    name_management.install_name_synchronizer(name_synchronizer, app)
 
     app.router.add_routes(
         [
@@ -118,6 +83,27 @@ def get_app(
             web.post("/server/name", name_management.set_name_endpoint),
             web.get("/server/name", name_management.get_name_endpoint),
         ]
+    )
+
+    LOG.info(
+        "Setup: "
+        + "\n\t".join(
+            [
+                f"Device name: {name_synchronizer.get_name()}",
+                "Buildroot version:         "
+                f'{version.get("buildroot_version", "unknown")}',
+                "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
+                "API version:               "
+                f'{version.get("opentrons_api_version", "unknown")}',
+                "\t(from git sha      "
+                f'{version.get("opentrons_api_sha", "unknown")}',
+                "Update server version:     "
+                f'{version.get("update_server_version", "unknown")}',
+                "\t(from git sha      "
+                f'{version.get("update_server_sha", "unknown")}',
+                "Smoothie firmware version: TODO",
+            ]
+        )
     )
 
     return app

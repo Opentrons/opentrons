@@ -5,7 +5,7 @@ import pytest
 from decoy import Decoy, matchers
 
 from otupdate.common.name_management import name_synchronizer
-from otupdate.common.name_management.name_synchronizer import RealNameSynchronizer
+from otupdate.common.name_management.name_synchronizer import NameSynchronizer
 from otupdate.common.name_management.avahi import AvahiClient
 from otupdate.common.name_management.pretty_hostname import (
     get_pretty_hostname as real_get_pretty_hostname,
@@ -62,25 +62,25 @@ async def started_up_subject(
     mock_avahi_client: AvahiClient,
     decoy: Decoy,
     loop: asyncio.AbstractEventLoop,  # Required by aiohttp for async fixtures.
-) -> AsyncGenerator[RealNameSynchronizer, None]:
-    """Return a subject RealNameSynchronizer that's set up with mock dependencies,
+) -> AsyncGenerator[NameSynchronizer, None]:
+    """Return a subject NameSynchronizer that's set up with mock dependencies,
     and that's already started up and running.
 
     Tests that need to operate in the subject's startup phase itself
     should build the subject manually instead of using this fixture.
     """
-    # RealNameSynchronizer.build() will call mock_avahi_client.collision_callback()
+    # NameSynchronizer.build() will call mock_avahi_client.collision_callback()
     # and expect to be able to enter its result as a context manager.
     decoy.when(
         mock_avahi_client.collision_callback(matchers.Anything())
     ).then_enter_with(None)
 
-    async with RealNameSynchronizer.build(avahi_client=mock_avahi_client) as subject:
+    async with NameSynchronizer.build(avahi_client=mock_avahi_client) as subject:
         yield subject
 
 
 async def test_set(
-    started_up_subject: RealNameSynchronizer,
+    started_up_subject: NameSynchronizer,
     mock_persist_pretty_hostname: _PERSIST_PRETTY_HOSTNAME_SIGNATURE,
     mock_avahi_client: AvahiClient,
     decoy: Decoy,
@@ -97,7 +97,7 @@ async def test_set(
 
 
 async def test_set_does_not_persist_invalid_avahi_service_name(
-    started_up_subject: RealNameSynchronizer,
+    started_up_subject: NameSynchronizer,
     mock_persist_pretty_hostname: _PERSIST_PRETTY_HOSTNAME_SIGNATURE,
     mock_avahi_client: AvahiClient,
     decoy: Decoy,
@@ -118,7 +118,7 @@ async def test_set_does_not_persist_invalid_avahi_service_name(
 
 
 async def test_get(
-    started_up_subject: RealNameSynchronizer,
+    started_up_subject: NameSynchronizer,
     mock_get_pretty_hostname: _GET_PRETTY_HOSTNAME_SIGNATURE,
     decoy: Decoy,
 ) -> None:
@@ -127,7 +127,7 @@ async def test_get(
 
 
 async def test_advertises_initial_name(
-    started_up_subject: RealNameSynchronizer,
+    started_up_subject: NameSynchronizer,
     mock_get_pretty_hostname: _GET_PRETTY_HOSTNAME_SIGNATURE,
     monkeypatch_get_pretty_hostname: None,
     mock_persist_pretty_hostname: _PERSIST_PRETTY_HOSTNAME_SIGNATURE,
@@ -145,7 +145,7 @@ async def test_advertises_initial_name(
         mock_collision_subscription_context_manager
     )
 
-    async with RealNameSynchronizer.build(avahi_client=mock_avahi_client):
+    async with NameSynchronizer.build(avahi_client=mock_avahi_client):
         decoy.verify(
             # It should only start advertising after subscribing to collisions.
             await mock_collision_subscription_context_manager.__aenter__(),
@@ -185,11 +185,9 @@ async def test_collision_handling(
     collision_callback_captor = matchers.Captor()
     decoy.when(
         mock_avahi_client.collision_callback(collision_callback_captor)
-    ).then_return(
-        mock_collision_subscription_context_manager
-    )
+    ).then_return(mock_collision_subscription_context_manager)
 
-    async with RealNameSynchronizer.build(avahi_client=mock_avahi_client):
+    async with NameSynchronizer.build(avahi_client=mock_avahi_client):
         captured_collision_callback = collision_callback_captor.value
         # Prompt the subject to run its collision-handling logic.
         await captured_collision_callback()

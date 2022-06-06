@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager
 from logging import getLogger
 from typing import AsyncGenerator, Optional
@@ -16,7 +15,7 @@ _NAME_SYNCHRONIZER_VARNAME = APP_VARIABLE_PREFIX + "name_synchronizer"
 _log = getLogger(__name__)
 
 
-class NameSynchronizer(ABC):
+class NameSynchronizer:
     """Keep the machine's human-readable names in sync with each other.
 
     This ties the pretty hostname and the Avahi service name together,
@@ -42,50 +41,6 @@ class NameSynchronizer(ABC):
       configurable. https://datatracker.ietf.org/doc/html/rfc6763#section-4.1.1
     """
 
-    @classmethod
-    def from_request(cls, request: web.Request) -> NameSynchronizer:
-        """Return the server's singleton NameSynchronizer from a request.
-
-        The singleton NameSynchronizer is expected to have been installed on the
-        aiohttp.Application already via `install_on_app()`.
-        """
-        name_synchronizer = request.app.get(_NAME_SYNCHRONIZER_VARNAME, None)
-        assert isinstance(
-            name_synchronizer, NameSynchronizer
-        ), f"Unexpected type {type(name_synchronizer)}. Incorrect Application setup?"
-        return name_synchronizer
-
-    def install_on_app(self, app: web.Application) -> None:
-        """Install this NameSynchronizer on `app` for later retrieval via
-        `from_request()`.
-
-        This should be done as part of server startup.
-        """
-        app[_NAME_SYNCHRONIZER_VARNAME] = self
-
-    @abstractmethod
-    async def set_name(self, new_name: str) -> str:
-        """Set the machine's human-readable name.
-
-        This first sets thhe Avahi service name, and then persists it
-        as the pretty hostname.
-
-        Returns the new name. This is normally the same as the requested name,
-        but it it might be different if it had to be truncated, sanitized, etc.
-        """
-
-    @abstractmethod
-    def get_name(self) -> str:
-        """Return the machine's current human-readable name.
-
-        Note that this can change even if you haven't called `set_name()`,
-        if it was necessary to avoid conflicts with other devices on the network.
-        """
-
-
-class RealNameSynchronizer(NameSynchronizer):
-    """A functioning implementation of NameSynchronizer, to run in production."""
-
     def __init__(self, avahi_client: AvahiClient) -> None:
         """For internal use by this class only. Use `build()` instead."""
         self._avahi_client = avahi_client
@@ -94,7 +49,7 @@ class RealNameSynchronizer(NameSynchronizer):
     @asynccontextmanager
     async def build(
         cls, avahi_client: AvahiClient
-    ) -> AsyncGenerator[RealNameSynchronizer, None]:
+    ) -> AsyncGenerator[NameSynchronizer, None]:
         """Build a RealNameSynchronizer and keep it running in the background.
 
         Avahi advertisements will start as soon as this context manager is entered.
@@ -117,6 +72,14 @@ class RealNameSynchronizer(NameSynchronizer):
             yield name_synchronizer
 
     async def set_name(self, new_name: str) -> str:
+        """Set the machine's human-readable name.
+
+        This first sets thhe Avahi service name, and then persists it
+        as the pretty hostname.
+
+        Returns the new name. This is normally the same as the requested name,
+        but it it might be different if it had to be truncated, sanitized, etc.
+        """
         await self._avahi_client.start_advertising(service_name=new_name)
         # Setting the Avahi service name can fail if Avahi doesn't like the new name.
         # Persist only after it succeeds, so we don't persist something invalid.
@@ -124,6 +87,11 @@ class RealNameSynchronizer(NameSynchronizer):
         return persisted_pretty_hostname
 
     def get_name(self) -> str:
+        """Return the machine's current human-readable name.
+
+        Note that this can change even if you haven't called `set_name()`,
+        if it was necessary to avoid conflicts with other devices on the network.
+        """
         return get_pretty_hostname()
 
     async def _on_avahi_collision(self) -> None:
@@ -149,23 +117,28 @@ class RealNameSynchronizer(NameSynchronizer):
         await self.set_name(new_name=alternative_name)
 
 
-class FakeNameSynchronizer(NameSynchronizer):
-    """A dummy implementation of NameSynchronizer to use in integration tests.
+def install_name_synchronizer(
+    name_synchronizer: NameSynchronizer, app: web.Application
+) -> None:
+    """Install a NameSynchronizer on `app` for later retrieval
+    via get_name_synchronizer().
 
-    update-server's integration tests run on systems where we don't have access to
-    an Avahi daemon. So RealNameSynchronizer wouldn't work.
+    This should be done as part of server startup.
     """
+    app[_NAME_SYNCHRONIZER_VARNAME] = name_synchronizer
 
-    def __init__(self, name_override: str) -> None:
-        self._name_override = name_override
 
-    async def set_name(self, new_name: str) -> str:
-        raise NotImplementedError(
-            "Can't change the name when it's been overridden for testing."
-        )
+def get_name_synchronizer(request: web.Request) -> NameSynchronizer:
+    """Return the server's singleton NameSynchronizer from a request.
 
-    def get_name(self) -> str:
-        return self._name_override
+    The singleton NameSynchronizer is expected to have been installed on the
+    aiohttp.Application already via install_name_synchronizer().
+    """
+    name_synchronizer = request.app.get(_NAME_SYNCHRONIZER_VARNAME, None)
+    assert isinstance(
+        name_synchronizer, NameSynchronizer
+    ), f"Unexpected type {type(name_synchronizer)}. Incorrect Application setup?"
+    return name_synchronizer
 
 
 @asynccontextmanager
@@ -175,9 +148,10 @@ async def build_name_synchronizer(
     """Return a RealNameSynchronizer for production or FakeNameManager for testing."""
     if name_override is None:
         avahi_client = await AvahiClient.connect()
-        async with RealNameSynchronizer.build(
+        async with NameSynchronizer.build(
             avahi_client=avahi_client
         ) as real_name_synchronizer:
             yield real_name_synchronizer
     else:
-        yield FakeNameSynchronizer(name_override=name_override)
+        assert False  # TODO
+        # yield FakeNameSynchronizer(name_override=name_override)
