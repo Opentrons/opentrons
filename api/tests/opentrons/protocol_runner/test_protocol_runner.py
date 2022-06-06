@@ -200,7 +200,6 @@ async def test_run(
     subject: ProtocolRunner,
 ) -> None:
     """It should run a protocol to completion."""
-
     decoy.when(protocol_engine.state_view.commands.get_is_started()).then_return(
         False, True
     )
