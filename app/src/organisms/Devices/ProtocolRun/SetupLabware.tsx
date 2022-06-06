@@ -162,6 +162,10 @@ export function SetupLabware({
     lpcDisabledReason = t('lpc_disabled_modules_not_connected')
   } else if (runHasStarted) {
     lpcDisabledReason = t('labware_position_check_not_available')
+  } else if (robotProtocolAnalysis == null) {
+    lpcDisabledReason = t(
+      'labware_position_check_not_available_analyzing_on_robot'
+    )
   } else if (
     isEmpty(protocolData?.pipettes) ||
     isEmpty(protocolData?.labware)
