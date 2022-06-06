@@ -143,3 +143,15 @@ class InvalidBlockVolumeError(ProtocolEngineError):
 
 class InvalidTargetSpeedError(ProtocolEngineError):
     """An error raised when attempting to set an invalid target speed."""
+
+
+class ProtocolCommandFailedError(ProtocolEngineError):
+    """An error raised if a fatal command execution error has occurred.
+
+    Args:
+        command_id: The ID of the command that failed.
+    """
+
+    def __init__(self, command_id: str) -> None:
+        super().__init__(f"Command {command_id} failed to execute")
+        self.command_id = command_id
