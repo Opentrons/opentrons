@@ -36,4 +36,4 @@ stages:
         errors:
           - id: 'RunActionNotAllowed'
             title: 'Run Action Not Allowed'
-            detail: 'Cannot pause a run that was not started.'
+            detail: 'Cannot pause a run that is not running.'

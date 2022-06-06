@@ -130,3 +130,9 @@ async def test_read_timeout_dont_override(
         await subject.read_until(b"")
 
     mock_timeout_prop.assert_called_once()
+
+
+def test_reset_input_buffer(mock_serial: MagicMock, subject: AsyncSerial):
+    """It should call the underlying serial port's Reset function"""
+    subject.reset_input_buffer()
+    mock_serial.reset_input_buffer.assert_called_once()

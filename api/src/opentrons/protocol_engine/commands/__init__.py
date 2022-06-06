@@ -18,7 +18,13 @@ from . import magnetic_module
 from . import temperature_module
 from . import thermocycler
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, CommandStatus
+from .command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    CommandStatus,
+    CommandIntent,
+)
 
 from .command_unions import (
     Command,
@@ -152,6 +158,7 @@ __all__ = [
     "BaseCommand",
     "BaseCommandCreate",
     "CommandStatus",
+    "CommandIntent",
     # aspirate command models
     "Aspirate",
     "AspirateCreate",

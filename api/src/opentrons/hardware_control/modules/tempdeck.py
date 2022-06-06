@@ -111,8 +111,7 @@ class TempDeck(mod_abc.AbstractModule):
     def model(self) -> str:
         return self._model_from_revision(self._device_info.get("model"))
 
-    @classmethod
-    def bootloader(cls) -> types.UploadFunction:
+    def bootloader(self) -> types.UploadFunction:
         return update.upload_via_avrdude
 
     async def wait_next_poll(self) -> None:

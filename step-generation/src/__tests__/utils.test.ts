@@ -35,6 +35,7 @@ import { DEFAULT_CONFIG } from '../fixtures'
 import {
   getIsHeaterShakerEastWestWithLatchOpen,
   orderWells,
+  pipetteAdjacentHeaterShakerWhileShaking,
   thermocyclerPipetteCollision,
 } from '../utils'
 import type { RobotState } from '../'
@@ -965,5 +966,95 @@ describe('getIsHeaterShakerEastWestWithLatchOpen', () => {
     expect(
       getIsHeaterShakerEastWestWithLatchOpen(modules, labwareTemporalProperties)
     ).toBe(false)
+  })
+})
+describe('pipetteAdjacentHeaterShakerWhileShaking', () => {
+  let labwareTemporalProperties: LabwareTemporalProperties
+  let modules: RobotState['modules']
+  beforeEach(() => {
+    labwareTemporalProperties = { slot: '2' }
+    modules = {
+      heaterShakerId: {
+        slot: '1',
+        moduleState: {
+          type: HEATERSHAKER_MODULE_TYPE,
+          targetTemp: null,
+          targetSpeed: null,
+          latchOpen: null,
+        },
+      },
+    }
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+  it('should return false when there are no modules', () => {
+    modules = {}
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(
+        modules,
+        labwareTemporalProperties
+      )
+    ).toBe(false)
+  })
+  it('should return false when there is no heater shaker ajacent to labware', () => {
+    labwareTemporalProperties.slot = '9'
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(
+        modules,
+        labwareTemporalProperties
+      )
+    ).toBe(false)
+  })
+  it('should return false when the heater shaker is not shaking', () => {
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(
+        modules,
+        labwareTemporalProperties
+      )
+    ).toBe(false)
+  })
+  it('should return true when there is a heater shaker north of labware shaking', () => {
+    modules.heaterShakerId.slot = '5'
+    ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(
+        modules,
+        labwareTemporalProperties
+      )
+    ).toBe(true)
+  })
+  it('should return true when there is a heater shaker south of labware shaking', () => {
+    labwareTemporalProperties.slot = '9'
+    modules.heaterShakerId.slot = '6'
+    ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(
+        modules,
+        labwareTemporalProperties
+      )
+    ).toBe(true)
+  })
+  it('should return true when there is a heater shaker east of labware shaking', () => {
+    labwareTemporalProperties.slot = '5'
+    modules.heaterShakerId.slot = '6'
+    ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(
+        modules,
+        labwareTemporalProperties
+      )
+    ).toBe(true)
+  })
+  it('should return true when there is a heater shaker west of labware shaking', () => {
+    labwareTemporalProperties.slot = '5'
+    modules.heaterShakerId.slot = '4'
+    ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(
+        modules,
+        labwareTemporalProperties
+      )
+    ).toBe(true)
   })
 })

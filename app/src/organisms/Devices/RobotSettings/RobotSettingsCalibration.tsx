@@ -48,7 +48,6 @@ import {
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
-  useAttachedPipettes,
   useDeckCalibrationStatus,
   useIsRobotBusy,
 } from '../hooks'
@@ -184,7 +183,9 @@ export function RobotSettingsCalibration({
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
   const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
-  const attachedPipettes = useAttachedPipettes()
+  const attachedPipettes = useSelector((state: State) => {
+    return Pipettes.getAttachedPipettes(state, robotName)
+  })
 
   const isRunning = useSelector(robotSelectors.getIsRunning)
 
@@ -465,6 +466,7 @@ export function RobotSettingsCalibration({
     () => {
       dispatch(Calibration.fetchCalibrationStatus(robotName))
       dispatch(Calibration.fetchPipetteOffsetCalibrations(robotName))
+      dispatch(Calibration.fetchTipLengthCalibrations(robotName))
       checkPipetteCalibrationMissing()
     },
     CALS_FETCH_MS,

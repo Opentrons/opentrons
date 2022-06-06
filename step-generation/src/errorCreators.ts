@@ -149,3 +149,10 @@ export const heaterShakerEastWestWithLatchOpen = (): CommandCreatorError => {
     message: 'The Heater-Shaker labware latch is open',
   }
 }
+
+export const heaterShakerNorthSouthEastWestShaking = (): CommandCreatorError => {
+  return {
+    type: 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING',
+    message: 'The Heater-Shaker is shaking',
+  }
+}

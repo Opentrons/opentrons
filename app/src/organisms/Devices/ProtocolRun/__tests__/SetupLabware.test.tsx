@@ -193,6 +193,8 @@ const render = () => {
         protocolRunHeaderRef={null}
         robotName={ROBOT_NAME}
         runId={RUN_ID}
+        nextStep={null}
+        expandStep={() => null}
       />
     </StaticRouter>,
     {
