@@ -69,15 +69,27 @@ describe('DevicesLanding', () => {
     getByText('Mock DevicesEmptyState')
   })
 
-  it('renders the Looking for robots copy when scanning is true', () => {
+  it('renders the Looking for robots copy when scanning is true and there are no available devices', () => {
     mockGetScanning.mockReturnValue(true)
+    mockUseAvailableAndUnavailableDevices.mockReturnValue({
+      availableDevices: [],
+      unavailableDevices: [
+        { ...mockUnreachableRobot, name: 'unreachableRobot' },
+      ],
+    })
     const [{ getByText }] = render()
 
     getByText('Looking for robots...')
   })
 
-  it('renders the Icon when scanning is true', () => {
+  it('renders the Icon when scanning is true and there are no available devices', () => {
     mockGetScanning.mockReturnValue(true)
+    mockUseAvailableAndUnavailableDevices.mockReturnValue({
+      availableDevices: [],
+      unavailableDevices: [
+        { ...mockUnreachableRobot, name: 'unreachableRobot' },
+      ],
+    })
     const [{ getByLabelText }] = render()
 
     getByLabelText('ot-spinner')
