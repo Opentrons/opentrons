@@ -528,6 +528,7 @@ class OT3API(
             await self._move(target_pos, acquire_lock=False, home_flagged_axes=False)
 
             await self.current_position(mount=checked_mount, refresh=True)
+            await self.encoder_current_position(mount=checked_mount, refresh=True)
 
     @lru_cache(1)
     def _carriage_offset(self) -> top_types.Point:
@@ -597,8 +598,11 @@ class OT3API(
         elif not self._encoder_current_position and not refresh:
             raise MustHomeError("Encoder position is unknown; please home motors.")
         async with self._motion_lock:
-            self._encoder_current_position = (
-                await self._backend.update_encoder_position()
+            self._encoder_current_position = deck_from_machine(
+                await self._backend.update_encoder_position(),
+                self._transforms.deck_calibration.attitude,
+                self._transforms.carriage_offset,
+                OT3Axis,
             )
             ot3pos = self._effector_pos_from_carriage_pos(
                 OT3Mount.from_mount(mount),
@@ -643,6 +647,11 @@ class OT3API(
             refresh,
             fail_on_not_homed,
         )
+        await self.encoder_current_position(mount,
+                                            critical_point,
+                                            refresh,
+                                            fail_on_not_homed,
+                                        )
         if isinstance(mount, OT3Mount):
             old_mount = mount.to_mount()
         else:
@@ -788,12 +797,14 @@ class OT3API(
                 await stack.enter_async_context(self._motion_lock)
             try:
                 await self._backend.move(origin, moves[0])
+                encoder_pos = await self._backend.update_encoder_position()
             except Exception:
                 self._log.exception("Move failed")
                 self._current_position.clear()
                 raise
             else:
                 self._current_position.update(target_position)
+                self._encoder_current_position.update(encoder_pos)
 
     @ExecutionManagerProvider.wait_for_running
     async def home(
