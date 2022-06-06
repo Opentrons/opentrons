@@ -20,6 +20,7 @@ import {
   useRobot,
   useRunCalibrationStatus,
   useRunHasStarted,
+  useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
 } from '../../hooks'
 import { SetupLabware } from '../SetupLabware'
@@ -44,6 +45,9 @@ const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction
 >
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
+>
+const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFunction<
+  typeof useProtocolAnalysisErrors
 >
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
@@ -105,6 +109,9 @@ describe('ProtocolRunSetup', () => {
         displayName: 'mock display name',
         protocolKey: 'fakeProtocolKey',
       })
+    when(mockUseProtocolAnalysisErrors).calledWith(RUN_ID).mockReturnValue({
+      analysisErrors: null,
+    })
     when(mockUseStoredProtocolAnalysis)
       .calledWith(RUN_ID)
       .mockReturnValue((noModulesProtocol as unknown) as StoredProtocolAnalysis)
@@ -326,6 +333,23 @@ describe('ProtocolRunSetup', () => {
       expect(getByText('Mock SetupModules')).not.toBeVisible()
       expect(getByText('Mock SetupLabware')).not.toBeVisible()
       getByText('Setup is view-only once run has started')
+    })
+
+    it('renders analysis error message if there is an analysis error', async () => {
+      when(mockUseProtocolAnalysisErrors)
+        .calledWith(RUN_ID)
+        .mockReturnValue({
+          analysisErrors: [
+            {
+              id: 'error_id',
+              detail: 'protocol analysis error',
+              errorType: 'analysis',
+              createdAt: '100000',
+            },
+          ],
+        })
+      const { getByText } = render()
+      getByText('Protocol analysis failed')
     })
   })
 })

@@ -98,5 +98,9 @@
   "data_out_of_date": "This data is likely out of date",
   "robot_was_recalibrated": "This robot was recalibrated after this Labware Offset data was stored.",
   "not_available_for_a_completed_run": "not available for a completed run",
-  "analyzing_on_robot": "Analyzing on robot"
+  "analyzing_on_robot": "Analyzing on robot",
+  "analysis_failure_on_robot": "An error occurred while attempting to analyze {{protocolName}} on {{robotName}}. Fix the following error and try running this protocol again.",
+  "protocol_analysis_failure": "Protocol analysis failure",
+  "protocol_analysis_failed": "Protocol analysis failed.",
+  "view_analysis_error_details": "View <errorLink>error details</errorLink>"
 }
