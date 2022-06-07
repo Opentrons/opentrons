@@ -518,7 +518,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       padding={`0.75rem ${SPACING.spacing3}`}
-      backgroundColor={COLORS.lightGrey}
+      backgroundColor={COLORS.background}
       width="100%"
       alignSelf={ALIGN_STRETCH}
       alignItems={ALIGN_STRETCH}

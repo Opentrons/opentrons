@@ -35,7 +35,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${COLORS.focus};
   }
 
   &:disabled {
@@ -65,7 +65,7 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   ${styleProps}
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${COLORS.focus};
   }
 
   &:hover {
@@ -98,7 +98,7 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${COLORS.focus};
   }
 
   &:disabled {

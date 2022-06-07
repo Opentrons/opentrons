@@ -348,7 +348,7 @@ export function ProtocolRunHeader({
   const ProtocolRunningContent = (): JSX.Element | null =>
     runStatus != null ? (
       <Flex
-        backgroundColor={COLORS.lightGrey}
+        backgroundColor={COLORS.background}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         padding={SPACING.spacing3}
       >

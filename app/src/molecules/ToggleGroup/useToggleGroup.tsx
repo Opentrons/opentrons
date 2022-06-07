@@ -2,8 +2,8 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { BORDERS, COLORS, Flex } from '@opentrons/components'
 import {
-  blue,
-  lightGrey,
+  blueEnabled,
+  background,
   medGrey,
 } from '@opentrons/components/src/ui-style-constants/colors'
 import { PrimaryButton } from '../../atoms/buttons'
@@ -29,13 +29,13 @@ const BUTTON_GROUP_STYLES = css`
     }
 
     &:hover {
-      background-color: ${lightGrey};
+      background-color: ${background};
       color: ${COLORS.black};
       box-shadow: 0 0 0;
     }
 
     &.active {
-      background-color: ${blue};
+      background-color: ${blueEnabled};
       color: ${COLORS.white};
     }
 
@@ -55,7 +55,7 @@ const BUTTON_GROUP_STYLES = css`
 `
 
 const ACTIVE_STYLE = css`
-  background-color: ${blue};
+  background-color: ${blueEnabled};
   color: ${COLORS.white};
   pointer-events: none;
 `

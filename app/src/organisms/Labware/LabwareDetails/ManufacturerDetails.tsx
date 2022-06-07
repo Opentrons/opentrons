@@ -28,7 +28,7 @@ export function ManufacturerDetails(
     brandName === 'all' || brandName === 'generic' ? t(brandName) : brandName
 
   return (
-    <Box backgroundColor={COLORS.lightGrey} padding={SPACING.spacing4}>
+    <Box backgroundColor={COLORS.background} padding={SPACING.spacing4}>
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}

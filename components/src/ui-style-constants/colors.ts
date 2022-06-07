@@ -27,6 +27,7 @@ export const dandelionYellowPressed = '#eca20f'
 // colors grey
 export const lightGreyEnabled = '#16212d26'
 export const lightGreyHover = '#16212d40'
+export const lightGreyPressed = '#16212d40' // need confirmation from mel
 export const medGreyEnabled = '#e3e3e3'
 export const medGreyHover = '#b8b8b8'
 export const medGreyPressed = '#5a5a5e'
@@ -94,8 +95,8 @@ export const greyHover = '#acacaf'
 export const greyPressed = '#8d8d91'
 export const greyDisabled = '#eaeaeb'
 
-export const lightGrey = '#f8f8f8'
-export const lightGreyHover = '#16212d26'
+// export const lightGrey = '#f8f8f8'
+// export const lightGreyHover = '#16212d26'
 
 // export const yellow = '#f2b53c'
 // export const yellowHover = '#eca20f'
