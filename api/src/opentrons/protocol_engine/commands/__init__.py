@@ -145,6 +145,13 @@ from .set_rail_lights import (
     SetRailLightsCommandType,
 )
 
+from .touch_tip import (
+    TouchTip,
+    TouchTipParams,
+    TouchTipCreate,
+    TouchTipResult,
+    TouchTipCommandType,
+)
 
 __all__ = [
     # command type unions
@@ -242,6 +249,12 @@ __all__ = [
     "SetRailLightsCreate",
     "SetRailLightsResult",
     "SetRailLightsCommandType",
+    # touch tip command models
+    "TouchTip",
+    "TouchTipParams",
+    "TouchTipCreate",
+    "TouchTipResult",
+    "TouchTipCommandType",
     # module command bundles
     "heater_shaker",
     "magnetic_module",
