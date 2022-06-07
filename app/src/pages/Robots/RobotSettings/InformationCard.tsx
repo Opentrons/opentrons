@@ -16,7 +16,7 @@ import {
   FLEX_NONE,
   SPACING_AUTO,
   SPACING_3,
-  useMountEffect
+  useMountEffect,
 } from '@opentrons/components'
 
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
