@@ -30,7 +30,7 @@ const SALESFORCE_HELP_LINK = 'https://support.opentrons.com/s/'
 const NavbarLink = styled(NavLink)`
   color: ${COLORS.white};
   align-self: ${ALIGN_STRETCH};
-  background-color: ${COLORS.darkBlack};
+  background-color: ${COLORS.darkBlackEnabled};
 
   &:hover,
   &:focus {
@@ -45,7 +45,7 @@ const NavbarLink = styled(NavLink)`
     background-color: ${COLORS.darkBlackSelected};
   }
   &.active:has(svg) {
-    background-color: ${COLORS.darkBlack};
+    background-color: ${COLORS.darkBlackEnabled};
   }
 `
 const NavIconLink = styled(NavLink)`
@@ -97,7 +97,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
   )
   return (
     <Flex
-      backgroundColor={COLORS.darkBlack}
+      backgroundColor={COLORS.darkBlackEnabled}
       css={TYPOGRAPHY.h3Regular}
       flexDirection={DIRECTION_COLUMN}
       flex={FLEX_NONE}

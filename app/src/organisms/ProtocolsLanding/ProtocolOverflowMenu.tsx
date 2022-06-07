@@ -150,7 +150,7 @@ export function ProtocolOverflowMenu(
                   {t('shared:cancel')}
                 </Link>
                 <AlertPrimaryButton
-                  backgroundColor={COLORS.error}
+                  backgroundColor={COLORS.errorEnabled}
                   onClick={handleClickDelete}
                 >
                   {t('yes_delete_this_protocol')}

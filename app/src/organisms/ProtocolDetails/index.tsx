@@ -68,7 +68,7 @@ const currentTabStyle = css`
   border-top: ${BORDERS.lineBorder};
   border-left: ${BORDERS.lineBorder};
   border-right: ${BORDERS.lineBorder};
-  color: ${COLORS.blue};
+  color: ${COLORS.blueEnabled};
 
   /* extend below the tab when active to flow into the content */
   &:after {

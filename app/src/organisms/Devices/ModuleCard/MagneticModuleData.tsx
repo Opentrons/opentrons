@@ -25,7 +25,7 @@ export const MagneticModuleData = (
       <StatusLabel
         status={moduleStatus}
         backgroundColor={COLORS.medBlue}
-        iconColor={COLORS.blue}
+        iconColor={COLORS.blueEnabled}
         pulse={moduleStatus === 'engaged'}
       />
       <Text fontSize={FONT_SIZE_CAPTION} data-testid={`mag_module_data`}>

@@ -123,7 +123,7 @@ export function RenameRobotSlideout({
           {t('rename_robot_input_limitation_label')}
         </StyledText>
         {formik.errors.newRobotName && (
-          <StyledText as="label" color={COLORS.error}>
+          <StyledText as="label" color={COLORS.errorEnabled}>
             {formik.errors.newRobotName}
           </StyledText>
         )}

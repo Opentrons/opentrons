@@ -67,7 +67,11 @@ export function SetupCalibrationItem({
           {!runHasStarted ? (
             <Icon
               size={SIZE_1}
-              color={calibratedDate != null ? COLORS.success : COLORS.warning}
+              color={
+                calibratedDate != null
+                  ? COLORS.successEnabled
+                  : COLORS.warningEnabled
+              }
               marginRight={SPACING.spacing4}
               name={calibratedDate != null ? 'check-circle' : 'alert-circle'}
             />
@@ -84,7 +88,7 @@ export function SetupCalibrationItem({
               </StyledText>
             )}
             {title != null && (
-              <StyledText as="p" color={COLORS.darkBlack} id={id}>
+              <StyledText as="p" color={COLORS.darkBlackEnabled} id={id}>
                 {title}
               </StyledText>
             )}

@@ -427,7 +427,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
           ? runErrors.map(({ detail, errorType }, index) => (
               <StyledText
                 key={index}
-                color={COLORS.error}
+                color={COLORS.errorEnabled}
                 marginBottom={SPACING.spacing3}
               >{`${errorType}: ${detail}`}</StyledText>
             ))
@@ -483,7 +483,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
               </StyledText>
             ) : (
               <Flex justifyContent={JUSTIFY_CENTER} padding={SPACING.spacing3}>
-                <StyledText as="p" color={COLORS.darkBlack}>
+                <StyledText as="p" color={COLORS.darkBlackEnabled}>
                   {t('run_has_diverged_from_predicted')}
                 </StyledText>
               </Flex>

@@ -30,12 +30,12 @@ const DROP_ZONE_STYLES = css`
   &:hover,
   &:focus-within {
     background-color: ${COLORS.lightBlue};
-    border: 2px dashed ${COLORS.blue};
+    border: 2px dashed ${COLORS.blueEnabled};
   }
 `
 const DRAG_OVER_STYLES = css`
   background-color: ${COLORS.lightBlue};
-  border: 2px dashed ${COLORS.blue};
+  border: 2px dashed ${COLORS.blueEnabled};
 `
 
 const INPUT_STYLES = css`

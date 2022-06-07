@@ -107,7 +107,7 @@ export const ConfirmAttachmentModal = (
           <Btn
             onClick={onCloseClick}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            color={COLORS.blue}
+            color={COLORS.blueEnabled}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginRight={SPACING.spacing6}
           >

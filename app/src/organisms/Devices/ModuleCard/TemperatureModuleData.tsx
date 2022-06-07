@@ -31,12 +31,12 @@ export const TemperatureModuleData = (
     case 'idle': {
       backgroundColor = COLORS.medGrey
       iconColor = COLORS.darkGrey
-      textColor = COLORS.darkBlack
+      textColor = COLORS.darkBlackEnabled
       break
     }
     case 'holding at target': {
       backgroundColor = COLORS.medBlue
-      iconColor = COLORS.blue
+      iconColor = COLORS.blueEnabled
       break
     }
     case 'cooling':

@@ -42,7 +42,7 @@ const OUTER_STYLE = css`
 const INNER_STYLE_VALUE = css`
   width: 1.25rem;
   min-width: 1.25rem;
-  color: ${COLORS.blue};
+  color: ${COLORS.blueEnabled};
   display: flex;
   border-radius: ${SPACING.spacingXXS};
   justify-content: center;
@@ -58,7 +58,7 @@ const INNER_STYLE_VALUE = css`
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
+    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
   }
   &:disabled {
     color: ${COLORS.disabled};
@@ -84,7 +84,7 @@ const INNER_STYLE_NO_VALUE = css`
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
+    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
   }
   &:disabled {
     color: ${COLORS.disabled};

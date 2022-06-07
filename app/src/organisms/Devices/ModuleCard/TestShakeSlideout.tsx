@@ -170,7 +170,7 @@ export const TestShakeSlideout = (
         <Text
           fontSize={TYPOGRAPHY.fontSizeP}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkBlack}
+          color={COLORS.darkBlackEnabled}
         >
           {t('module_controls')}
         </Text>
@@ -186,7 +186,7 @@ export const TestShakeSlideout = (
             <Text
               fontSize={TYPOGRAPHY.fontSizeP}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.darkBlack}
+              color={COLORS.darkBlackEnabled}
             >
               {t('labware_latch', { ns: 'heater_shaker' })}
             </Text>
@@ -215,7 +215,7 @@ export const TestShakeSlideout = (
         <Text
           fontSize={TYPOGRAPHY.fontSizeP}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkBlack}
+          color={COLORS.darkBlackEnabled}
           marginTop={SPACING.spacing4}
         >
           {t('shake_speed', { ns: 'heater_shaker' })}
@@ -299,9 +299,7 @@ export const TestShakeSlideout = (
           )}
           <Link
             marginTop={SPACING.spacing2}
-            fontSize={TYPOGRAPHY.fontSizeP}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            color={COLORS.blue}
+            css={TYPOGRAPHY.linkPSemiBold}
             id={'HeaterShaker_Attachment_Instructions'}
             onClick={() => setShowWizard(true)}
           >

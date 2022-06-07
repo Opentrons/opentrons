@@ -72,7 +72,11 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       {!isCustomDefinition && (
         <>
           <StyledText as="label" id="LabwareDetails_opentronsDef">
-            <Icon color={COLORS.blue} name="check-decagram" height=".7rem" />{' '}
+            <Icon
+              color={COLORS.blueEnabled}
+              name="check-decagram"
+              height=".7rem"
+            />{' '}
             {t('opentrons_def')}
           </StyledText>
         </>

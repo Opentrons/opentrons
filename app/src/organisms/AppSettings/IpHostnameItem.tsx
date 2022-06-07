@@ -53,7 +53,11 @@ export function IpHostnameItem(props: IpHostnameItemProps): JSX.Element {
           <StyledText
             as="p"
             data-testid={`ip-hostname`}
-            color={props.discovered ? COLORS.darkBlack : COLORS.successDisabled}
+            color={
+              props.discovered
+                ? COLORS.darkBlackEnabled
+                : COLORS.successDisabled
+            }
           >
             {props.candidate}
           </StyledText>

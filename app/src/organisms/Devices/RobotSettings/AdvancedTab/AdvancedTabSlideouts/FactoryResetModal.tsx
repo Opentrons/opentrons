@@ -45,7 +45,7 @@ export function FactoryResetModal({
 }: FactoryResetModalProps): JSX.Element {
   const reconnectModalIcon: IconProps = {
     name: 'alert-circle',
-    color: COLORS.blue,
+    color: COLORS.blueEnabled,
   }
   const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
@@ -92,7 +92,7 @@ export function FactoryResetModal({
                 {t('shared:cancel')}
               </Link>
               <PrimaryButton
-                backgroundColor={COLORS.error}
+                backgroundColor={COLORS.errorEnabled}
                 onClick={triggerReset}
                 disabled={PENDING_STATUS}
               >

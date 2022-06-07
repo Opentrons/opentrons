@@ -29,7 +29,7 @@ export function PowerOn(props: PowerOnProps): JSX.Element {
   return (
     <React.Fragment>
       <Flex
-        color={COLORS.darkBlack}
+        color={COLORS.darkBlackEnabled}
         flexDirection={DIRECTION_COLUMN}
         marginBottom="4rem"
         data-testid={`heater_shaker_power_on_text`}

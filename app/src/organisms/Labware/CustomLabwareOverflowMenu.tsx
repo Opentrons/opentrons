@@ -97,7 +97,7 @@ export function CustomLabwareOverflowMenu(
           <MenuItem onClick={handleClickDelete}>{t('delete')}</MenuItem>
           <Divider />
           <MenuItem onClick={handleClickLabwareCreator}>
-            <StyledText color={COLORS.blue}>
+            <StyledText color={COLORS.blueEnabled}>
               {t('open_labware_creator')}
               <Icon name="open-in-new" height={SPACING.spacingSM}></Icon>
             </StyledText>

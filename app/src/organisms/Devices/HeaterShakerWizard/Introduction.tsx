@@ -131,7 +131,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
     <Flex
       padding={TYPOGRAPHY.lineHeight20}
       flexDirection={DIRECTION_COLUMN}
-      color={COLORS.darkBlack}
+      color={COLORS.darkBlackEnabled}
       fontWeight={TYPOGRAPHY.fontWeightRegular}
       marginBottom={labwareDefinition != null ? '4.313rem' : '9.375rem'}
     >

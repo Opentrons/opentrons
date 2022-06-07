@@ -307,7 +307,7 @@ export function SetupLabware({
               >
                 <StyledText
                   css={TYPOGRAPHY.h3SemiBold}
-                  color={COLORS.darkBlack}
+                  color={COLORS.darkBlackEnabled}
                 >
                   {t('lpc_and_offset_data_title')}
                 </StyledText>
@@ -315,7 +315,7 @@ export function SetupLabware({
                   <Link
                     role="link"
                     css={TYPOGRAPHY.labelSemiBold}
-                    color={COLORS.darkBlack}
+                    color={COLORS.darkBlackEnabled}
                     onClick={() => showDownloadOffsetDataModal(true)}
                     id={'DownloadOffsetData'}
                   >
@@ -323,7 +323,10 @@ export function SetupLabware({
                   </Link>
                 ) : null}
               </Flex>
-              <StyledText color={COLORS.darkBlack} css={TYPOGRAPHY.pRegular}>
+              <StyledText
+                color={COLORS.darkBlackEnabled}
+                css={TYPOGRAPHY.pRegular}
+              >
                 {t('labware_position_check_text')}
               </StyledText>
               <Flex
@@ -334,7 +337,7 @@ export function SetupLabware({
                 <Link
                   role="link"
                   css={TYPOGRAPHY.labelSemiBold}
-                  color={COLORS.darkBlack}
+                  color={COLORS.darkBlackEnabled}
                   onClick={() => setShowLabwareHelpModal(true)}
                   data-test={'LabwareSetup_helpLink'}
                 >

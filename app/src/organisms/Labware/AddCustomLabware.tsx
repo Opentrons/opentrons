@@ -54,7 +54,7 @@ export function AddCustomLabware(props: AddCustomLabwareProps): JSX.Element {
                 components={{
                   a: (
                     <Link
-                      color={COLORS.blue}
+                      color={COLORS.blueEnabled}
                       onClick={() => dispatch(addCustomLabware())}
                       role="button"
                     />

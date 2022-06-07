@@ -18,7 +18,7 @@ const StyledNavLink = styled(NavLink)<
   color: ${COLORS.darkGreyEnabled};
 
   &.active {
-    color: ${COLORS.darkBlack};
+    color: ${COLORS.darkBlackEnabled};
     ${BORDERS.tabBorder}
   }
 `

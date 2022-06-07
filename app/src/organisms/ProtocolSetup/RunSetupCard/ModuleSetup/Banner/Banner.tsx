@@ -47,7 +47,7 @@ export function Banner(props: BannerProps): JSX.Element | null {
             <Text
               fontSize={TYPOGRAPHY.fontSizeH3}
               data-testid={`banner_title_${title}`}
-              color={COLORS.darkBlack}
+              color={COLORS.darkBlackEnabled}
             >
               {title}
             </Text>
@@ -72,7 +72,7 @@ export const BannerItem = (props: BannerItemProps): JSX.Element => {
       <Text
         fontSize={TYPOGRAPHY.fontSizeP}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        color={COLORS.darkBlack}
+        color={COLORS.darkBlackEnabled}
         paddingTop={SPACING.spacing4}
       >
         {props.title}
@@ -91,7 +91,7 @@ export const BannerItem = (props: BannerItemProps): JSX.Element => {
           {props.body}
         </Text>
         <NewPrimaryBtn
-          backgroundColor={COLORS.blue}
+          backgroundColor={COLORS.blueEnabled}
           borderRadius={SPACING.spacingM}
           textTransform={TEXT_TRANSFORM_NONE}
           css={TYPOGRAPHY.labelRegular}

@@ -131,7 +131,7 @@ export function ChooseRobotSlideout(
             <Icon name="ot-spinner" spin size={SIZE_1} />
           ) : (
             <Link
-              color={COLORS.blue}
+              color={COLORS.blueEnabled}
               onClick={() => dispatch(startDiscovery())}
               textTransform={TEXT_TRANSFORM_CAPITALIZE}
               role="button"

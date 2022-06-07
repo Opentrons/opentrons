@@ -113,7 +113,7 @@ function RunTimer({
     startedAt != null ? formatInterval(startedAt, endTime) : '--:--:--'
 
   return (
-    <StyledText css={TYPOGRAPHY.pRegular} color={COLORS.darkBlack}>
+    <StyledText css={TYPOGRAPHY.pRegular} color={COLORS.darkBlackEnabled}>
       {runTime}
     </StyledText>
   )
@@ -364,7 +364,7 @@ export function ProtocolRunHeader({
             </StyledText>
             <StyledText
               css={TYPOGRAPHY.pRegular}
-              color={COLORS.darkBlack}
+              color={COLORS.darkBlackEnabled}
               id="ProtocolRunHeader_protocolStart"
             >
               {startedAtTimestamp}
@@ -381,7 +381,7 @@ export function ProtocolRunHeader({
             </StyledText>
             <StyledText
               css={TYPOGRAPHY.pRegular}
-              color={COLORS.darkBlack}
+              color={COLORS.darkBlackEnabled}
               id="ProtocolRunHeader_protocolEnd"
             >
               {completedAtTimestamp}
@@ -436,7 +436,7 @@ export function ProtocolRunHeader({
         {protocolKey != null ? (
           <Link to={`/protocols/${protocolKey}`}>
             <StyledText
-              color={COLORS.blue}
+              color={COLORS.blueEnabled}
               css={TYPOGRAPHY.h2SemiBold}
               id="ProtocolRunHeader_protocolName"
             >
@@ -475,7 +475,7 @@ export function ProtocolRunHeader({
           {/* this is the createdAt timestamp, not the run id */}
           <StyledText
             css={TYPOGRAPHY.pRegular}
-            color={COLORS.darkBlack}
+            color={COLORS.darkBlackEnabled}
             id="ProtocolRunHeader_runRecordId"
           >
             {createdAtTimestamp}
@@ -494,14 +494,14 @@ export function ProtocolRunHeader({
             {runStatus === RUN_STATUS_RUNNING ? (
               <Icon
                 name="circle"
-                color={COLORS.blue}
+                color={COLORS.blueEnabled}
                 size={SPACING.spacing2}
                 marginRight={SPACING.spacing2}
                 data-testid="running_circle"
               >
                 <animate
                   attributeName="fill"
-                  values={`${COLORS.blue}; transparent`}
+                  values={`${COLORS.blueEnabled}; transparent`}
                   dur="1s"
                   calcMode="discrete"
                   repeatCount="indefinite"
@@ -511,7 +511,7 @@ export function ProtocolRunHeader({
             ) : null}
             <StyledText
               css={TYPOGRAPHY.pRegular}
-              color={COLORS.darkBlack}
+              color={COLORS.darkBlackEnabled}
               id="ProtocolRunHeader_runStatus"
             >
               {runStatus != null ? t(`status_${runStatus}`) : ''}

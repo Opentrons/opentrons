@@ -65,7 +65,8 @@ export function ManualIpHostnameForm(props: Props): JSX.Element {
       if (!ip) {
         errors.ip = t('add_ip_error')
         const inputForm = document.getElementById('ip')
-        if (inputForm) inputForm.style.border = `1px solid ${COLORS.error}`
+        if (inputForm)
+          inputForm.style.border = `1px solid ${COLORS.errorEnabled}`
       }
       return errors
     },
@@ -104,7 +105,7 @@ export function ManualIpHostnameForm(props: Props): JSX.Element {
           lineHeight={TYPOGRAPHY.lineHeight12}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           fontStyle={TYPOGRAPHY.fontStyleNormal}
-          color={COLORS.error}
+          color={COLORS.errorEnabled}
         >
           {formik.errors.ip}
         </Text>

@@ -24,11 +24,11 @@ const unselectedOptionStyles = css`
 `
 const selectedOptionStyles = css`
   ${unselectedOptionStyles}
-  border: 1px solid ${COLORS.blue};
+  border: 1px solid ${COLORS.blueEnabled};
   background-color: ${COLORS.lightBlue};
 
   &:hover {
-    border: 1px solid ${COLORS.blue};
+    border: 1px solid ${COLORS.blueEnabled};
     background-color: ${COLORS.lightBlue};
   }
 `

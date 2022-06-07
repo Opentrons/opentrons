@@ -114,18 +114,19 @@ export const linkPSemiBold = css`
   font-size: ${fontSizeP};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${COLORS.blue};
+  color: ${COLORS.blueEnabled};
 
   &:hover {
     opacity: 70%;
   }
 `
 
+// TODO - this should extend the linkPSemiBold style
 export const darkLinkPSemiBold = css`
   font-size: ${fontSizeP};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${COLORS.darkBlack};
+  color: ${COLORS.darkBlackEnabled};
 
   &:hover {
     opacity: 1;

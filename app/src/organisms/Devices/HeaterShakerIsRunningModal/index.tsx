@@ -38,7 +38,7 @@ export const HeaterShakerIsRunningModal = (
         name="alert-circle"
         marginX={SPACING.spacing3}
         size={SPACING.spacingM}
-        color={COLORS.warning}
+        color={COLORS.warningEnabled}
         data-testid={'HeaterShakerIsRunning_warning_icon'}
       />
       {t('heater_shaker_is_shaking')}
@@ -73,7 +73,7 @@ export const HeaterShakerIsRunningModal = (
       <Box>
         <HeaterShakerModuleCard module={module} />
       </Box>
-      <Text fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.darkBlack}>
+      <Text fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.darkBlackEnabled}>
         {t('continue_shaking_protocol_start_prompt')}
       </Text>
 

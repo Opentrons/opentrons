@@ -43,7 +43,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
 
   return (
     <Flex
-      color={COLORS.darkBlack}
+      color={COLORS.darkBlackEnabled}
       flexDirection={DIRECTION_COLUMN}
       fontSize={TYPOGRAPHY.fontSizeH2}
     >

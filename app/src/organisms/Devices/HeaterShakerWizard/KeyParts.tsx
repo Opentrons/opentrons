@@ -20,7 +20,7 @@ export function KeyParts(): JSX.Element {
   return (
     <>
       <Text
-        color={COLORS.darkBlack}
+        color={COLORS.darkBlackEnabled}
         paddingTop={SPACING.spacing3}
         fontWeight={TYPOGRAPHY.fontWeightBold}
         data-testid={'heater_shaker_wizard_keyparts_title'}
@@ -28,7 +28,7 @@ export function KeyParts(): JSX.Element {
         {t('heater_shaker_key_parts')}
       </Text>
       <Text
-        color={COLORS.darkBlack}
+        color={COLORS.darkBlackEnabled}
         paddingTop={SPACING.spacing3}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         data-testid={'heater_shaker_wizard_keyparts_subtitle'}

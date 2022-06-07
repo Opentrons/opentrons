@@ -41,7 +41,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
         <Link
           fontSize={FONT_SIZE_CAPTION}
           css={TYPOGRAPHY.darkLinkPSemiBold}
-          color={COLORS.darkBlack}
+          color={COLORS.darkBlackEnabled}
           href={PROTOCOL_LIBRARY_URL}
           id={'EmptyStateLinks_protocolLibraryButton'}
           marginRight={SPACING.spacing3}
@@ -59,7 +59,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
         <Link
           fontSize={FONT_SIZE_CAPTION}
           css={TYPOGRAPHY.darkLinkPSemiBold}
-          color={COLORS.darkBlack}
+          color={COLORS.darkBlackEnabled}
           marginRight={SPACING.spacing3}
           href={PROTOCOL_DESIGNER_URL}
           id={'EmptyStateLinks_protocolDesignerButton'}
@@ -81,7 +81,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
         <Link
           fontSize={FONT_SIZE_CAPTION}
           css={TYPOGRAPHY.darkLinkPSemiBold}
-          color={COLORS.darkBlack}
+          color={COLORS.darkBlackEnabled}
           href={API_DOCS_URL}
           id={'EmptyStateLinks_apiDocsButton'}
           external

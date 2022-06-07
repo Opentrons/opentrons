@@ -85,7 +85,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 <>
                   <StyledText as="h6" id="LabwareCard_opentronsDef">
                     <Icon
-                      color={COLORS.blue}
+                      color={COLORS.blueEnabled}
                       name="check-decagram"
                       height=".7rem"
                     />{' '}

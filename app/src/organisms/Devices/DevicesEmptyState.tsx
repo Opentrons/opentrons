@@ -76,7 +76,7 @@ export function DevicesEmptyState(): JSX.Element {
           href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
           display="flex"
           alignItems={ALIGN_CENTER}
-          color={COLORS.darkBlack}
+          color={COLORS.darkBlackEnabled}
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           id="DevicesEmptyState_troubleshootingConnectionProblems"

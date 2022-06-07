@@ -14,7 +14,7 @@ import {
 import { ToggleBtn, ToggleBtnProps } from '../ToggleBtn'
 
 export const TertiaryButton = styled(NewPrimaryBtn)`
-  background-color: ${COLORS.blue};
+  background-color: ${COLORS.blueEnabled};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
   color: ${COLORS.background};
@@ -35,7 +35,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
+    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
   }
 
   &:disabled {
@@ -45,7 +45,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
 `
 
 export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
-  background-color: ${COLORS.error};
+  background-color: ${COLORS.errorEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
@@ -55,7 +55,7 @@ export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
 `
 
 export const PrimaryButton = styled(NewPrimaryBtn)`
-  background-color: ${COLORS.blue};
+  background-color: ${COLORS.blueEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   line-height: ${TYPOGRAPHY.lineHeight20};
@@ -65,7 +65,7 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   ${styleProps}
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
+    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
   }
 
   &:hover {
@@ -84,7 +84,7 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
 `
 
 export const SecondaryButton = styled(NewSecondaryBtn)`
-  color: ${COLORS.blue};
+  color: ${COLORS.blueEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
@@ -98,7 +98,7 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
+    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
   }
 
   &:disabled {
@@ -107,6 +107,6 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
 `
 
 export const ToggleButton = (props: ToggleBtnProps): JSX.Element => {
-  const color = props.toggledOn ? COLORS.blue : COLORS.darkGrey
+  const color = props.toggledOn ? COLORS.blueEnabled : COLORS.darkGrey
   return <ToggleBtn size={SIZE_2} color={color} {...props} />
 }

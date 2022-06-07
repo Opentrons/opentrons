@@ -77,7 +77,7 @@ export function SetupStep({
                 {label}
               </StyledText>
               <StyledText
-                color={COLORS.darkBlack}
+                color={COLORS.darkBlackEnabled}
                 css={TYPOGRAPHY.h3SemiBold}
                 marginBottom={SPACING.spacing2}
                 id={`CollapsibleStep_${title}`}
@@ -86,7 +86,7 @@ export function SetupStep({
               </StyledText>
               <StyledText
                 as="p"
-                color={COLORS.darkBlack}
+                color={COLORS.darkBlackEnabled}
                 id={`CollapsibleStep_${description}`}
               >
                 {description}
@@ -99,8 +99,8 @@ export function SetupStep({
                     size={SIZE_1}
                     color={
                       calibrationStatusComplete
-                        ? COLORS.success
-                        : COLORS.warning
+                        ? COLORS.successEnabled
+                        : COLORS.warningEnabled
                     }
                     marginRight={SPACING.spacing3}
                     name={
@@ -124,7 +124,7 @@ export function SetupStep({
                 </Flex>
               ) : null}
               <Icon
-                color={COLORS.darkBlack}
+                color={COLORS.darkBlackEnabled}
                 size={SIZE_1}
                 name={expanded ? 'minus' : 'plus'}
                 margin={SPACING.spacing2}

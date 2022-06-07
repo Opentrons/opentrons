@@ -107,7 +107,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Text
-        color={COLORS.darkBlack}
+        color={COLORS.darkBlackEnabled}
         fontSize={TYPOGRAPHY.fontSizeH2}
         fontWeight={700}
       >

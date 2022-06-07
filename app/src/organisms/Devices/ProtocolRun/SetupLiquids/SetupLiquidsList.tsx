@@ -93,7 +93,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
         </StyledText>
       </Flex>
       <Flex
-        backgroundColor={COLORS.darkBlack + '1A'}
+        backgroundColor={COLORS.darkBlackEnabled + '1A'}
         borderRadius={BORDERS.radiusSoftCorners}
         height={'max-content'}
         paddingY={SPACING.spacing2}

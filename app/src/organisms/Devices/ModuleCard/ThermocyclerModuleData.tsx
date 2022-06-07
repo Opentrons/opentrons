@@ -53,12 +53,12 @@ export const ThermocyclerModuleData = (
       case 'idle': {
         StatusLabelProps.backgroundColor = COLORS.medGrey
         StatusLabelProps.iconColor = COLORS.darkGrey
-        StatusLabelProps.textColor = COLORS.darkBlack
+        StatusLabelProps.textColor = COLORS.darkBlackEnabled
         break
       }
       case 'holding at target': {
         StatusLabelProps.backgroundColor = COLORS.medBlue
-        StatusLabelProps.iconColor = COLORS.blue
+        StatusLabelProps.iconColor = COLORS.blueEnabled
         break
       }
       case 'cooling':
@@ -68,8 +68,8 @@ export const ThermocyclerModuleData = (
         break
       }
       case 'error': {
-        StatusLabelProps.backgroundColor = COLORS.warningBg
-        StatusLabelProps.iconColor = COLORS.warning
+        StatusLabelProps.backgroundColor = COLORS.warningBackground
+        StatusLabelProps.iconColor = COLORS.warningEnabled
         StatusLabelProps.textColor = COLORS.warningText
       }
     }

@@ -107,7 +107,7 @@ export const LabwarePositionCheckStepDetail = (
   const wellStroke: WellStroke = wellsToHighlight.reduce(
     (acc, wellName) => ({
       ...acc,
-      [wellName]: COLORS.blue,
+      [wellName]: COLORS.blueEnabled,
     }),
     {}
   )
@@ -206,7 +206,7 @@ export const LabwarePositionCheckStepDetail = (
             <Link
               role={'link'}
               fontSize={FONT_SIZE_BODY_2}
-              color={COLORS.blue}
+              color={COLORS.blueEnabled}
               onClick={() => setShowJogControls(true)}
               id={`LabwarePositionCheckStepDetail_reveal_jog_controls`}
             >
@@ -220,7 +220,7 @@ export const LabwarePositionCheckStepDetail = (
             stepSizes={[0.1, 1, 10]}
             planes={[HORIZONTAL_PLANE, VERTICAL_PLANE]}
             width="100%"
-            directionControlButtonColor={COLORS.blue}
+            directionControlButtonColor={COLORS.blueEnabled}
             isLPC={true}
           />
         ) : null}

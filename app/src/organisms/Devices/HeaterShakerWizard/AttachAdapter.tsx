@@ -19,7 +19,7 @@ export function AttachAdapter(): JSX.Element {
 
   return (
     <Flex
-      color={COLORS.darkBlack}
+      color={COLORS.darkBlackEnabled}
       flexDirection={DIRECTION_COLUMN}
       fontSize={TYPOGRAPHY.fontSizeH2}
       fontWeight={700}

@@ -222,7 +222,7 @@ export function Labware(): JSX.Element {
           <Link
             external
             href={LABWARE_CREATOR_HREF}
-            color={COLORS.darkBlack}
+            color={COLORS.darkBlackEnabled}
             css={LINK_STYLES}
             fontSize={TYPOGRAPHY.fontSizeLabel}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
