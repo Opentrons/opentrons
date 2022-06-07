@@ -31,7 +31,7 @@ const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 
 interface CustomLabwareOverflowMenuProps {
   filename: string
-  onDelete: () => void
+  onDelete?: () => void
 }
 
 export function CustomLabwareOverflowMenu(
@@ -50,7 +50,7 @@ export function CustomLabwareOverflowMenu(
     cancel: cancelDeleteLabware,
   } = useConditionalConfirm(() => {
     dispatch(deleteCustomLabwareFile(filename))
-    onDelete()
+    onDelete?.()
   }, true)
   const handleOpenInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
