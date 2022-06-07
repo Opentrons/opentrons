@@ -198,13 +198,13 @@ export function RobotSettingsCalibration({
 
   const isPending =
     useSelector<State, RequestState | null>(state =>
-      trackedRequestId.current
+      trackedRequestId.current != null
         ? RobotApi.getRequestById(state, trackedRequestId.current)
         : null
     )?.status === RobotApi.PENDING
 
   const createRequest = useSelector((state: State) =>
-    createRequestId.current
+    createRequestId.current != null
       ? RobotApi.getRequestById(state, createRequestId.current)
       : null
   )
@@ -215,7 +215,7 @@ export function RobotSettingsCalibration({
 
   const isJogging =
     useSelector((state: State) =>
-      jogRequestId.current
+      jogRequestId.current != null
         ? RobotApi.getRequestById(state, jogRequestId.current)
         : null
     )?.status === RobotApi.PENDING
