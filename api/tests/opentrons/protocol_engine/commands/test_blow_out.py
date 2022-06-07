@@ -57,11 +57,11 @@ async def test_blow_out_implementation(
     mock_hw_pipettes: MockPipettes,
 ) -> None:
     """A PickUpTipCreate should have an execution implementation."""
-    subject = decoy.mock(cls=BlowOutImplementation)
+    subject = BlowOutImplementation(state_view=state_view, movement=movement, hardware_api=hardware_api)
 
     left_pipette = HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
 
-    decoy.when(hardware_api.attached_instruments).then_return(MockPipettes)
+    location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
 
     decoy.when(
         state_view.pipettes.get_hardware_pipette(
@@ -72,18 +72,16 @@ async def test_blow_out_implementation(
         HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
     )
 
-    location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
-
     data = BlowOutParams(
         pipetteId="abc", labwareId="123", wellName="A3", wellLocation=location
     )
 
     result = await subject.execute(data)
 
-    assert result == BlowOutResult()
+    assert isinstance(result, BlowOutResult)
 
     decoy.verify(
-        await state_view.pipettes.get_hardware_pipette(pipette_id="pipette-id", attached_pipettes=mock_hw_pipettes.by_mount),
+        state_view.pipettes.get_hardware_pipette(pipette_id="pipette-id", attached_pipettes=mock_hw_pipettes.by_mount),
         await movement.move_to_well(
             pipette_id="pipette-id",
             labware_id="labware-id",
