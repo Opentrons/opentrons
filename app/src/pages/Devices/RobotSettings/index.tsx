@@ -30,7 +30,7 @@ import type { NavRouteParams, RobotSettingsTab } from '../../../App/types'
 
 export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')
-  const { robotName, robotSettingsTab } = useParams<NavRouteParams>()
+  const { robotName, robotSettingsTab, runId } = useParams<NavRouteParams>()
   const robot = useRobot(robotName)
   const isCalibrationDisabled = robot?.status !== CONNECTABLE
   const isNetworkingDisabled = robot?.status === UNREACHABLE
@@ -49,6 +49,7 @@ export function RobotSettings(): JSX.Element | null {
       <RobotSettingsCalibration
         robotName={robotName}
         updateRobotStatus={updateRobotStatus}
+        runId={runId}
       />
     ),
     networking: () => (

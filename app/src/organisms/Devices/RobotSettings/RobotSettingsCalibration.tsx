@@ -52,6 +52,7 @@ import {
   useIsRobotBusy,
   useAttachedPipettes,
   useAttachedPipetteCalibrations,
+  useRunHasStarted,
 } from '../hooks'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
@@ -74,6 +75,7 @@ const CALS_FETCH_MS = 5000
 interface CalibrationProps {
   robotName: string
   updateRobotStatus: (isRobotBusy: boolean) => void
+  runId: string
 }
 
 export interface FormattedPipetteOffsetCalibration {
@@ -111,6 +113,7 @@ const attachedPipetteCalPresent: (
 export function RobotSettingsCalibration({
   robotName,
   updateRobotStatus,
+  runId,
 }: CalibrationProps): JSX.Element {
   const { t } = useTranslation([
     'device_settings',
@@ -138,6 +141,7 @@ export function RobotSettingsCalibration({
     setPipetteOffsetCalBannerType,
   ] = React.useState<string>('')
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
+  const runHasStarted = useRunHasStarted(runId)
   const isBusy = useIsRobotBusy()
 
   const robot = useRobot(robotName)
@@ -434,7 +438,7 @@ export function RobotSettingsCalibration({
   }
 
   const handleClickDeckCalibration = (): void => {
-    if (isBusy) {
+    if (runHasStarted) {
       updateRobotStatus(true)
     } else {
       confirmStart()

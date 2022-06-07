@@ -32,6 +32,7 @@ import {
   mockUnreachableRobot,
 } from '../../../../redux/discovery/__fixtures__'
 import { mockAttachedPipette } from '../../../../redux/pipettes/__fixtures__'
+import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
@@ -40,6 +41,7 @@ import {
   useAttachedPipettes,
   useIsRobotBusy,
   useDeckCalibrationStatus,
+  useRunHasStarted,
 } from '../../hooks'
 
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
@@ -126,6 +128,9 @@ const mockGetAttachedPipettes = Pipettes.getAttachedPipettes as jest.MockedFunct
 const mockGetAttachedPipetteCalibrations = Pipettes.getAttachedPipetteCalibrations as jest.MockedFunction<
   typeof Pipettes.getAttachedPipetteCalibrations
 >
+const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
+  typeof useRunHasStarted
+>
 
 let mockTrackEvent: jest.Mock
 const mockUpdateRobotStatus = jest.fn()
@@ -136,6 +141,7 @@ const render = () => {
       <RobotSettingsCalibration
         robotName="otie"
         updateRobotStatus={mockUpdateRobotStatus}
+        runId={RUN_ID_1}
       />
     </MemoryRouter>,
     {
@@ -160,6 +166,7 @@ describe('RobotSettingsCalibration', () => {
 
   beforeEach(() => {
     mockTrackEvent = jest.fn()
+    mockUseRunHasStarted.mockReturnValue(false)
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockDeckCalibrationModal.mockReturnValue(
       <div>Mock DeckCalibrationModal</div>
