@@ -194,27 +194,28 @@ export function RobotSettingsCalibration({
   )
 
   const pipettePresent =
-    !(attachedPipettes?.left == null) || !(attachedPipettes?.right == null)
+    !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
 
   const isPending =
     useSelector<State, RequestState | null>(state =>
-      trackedRequestId.current != null
+      trackedRequestId.current
         ? RobotApi.getRequestById(state, trackedRequestId.current)
         : null
     )?.status === RobotApi.PENDING
 
   const createRequest = useSelector((state: State) =>
-    createRequestId.current != null
+    createRequestId.current
       ? RobotApi.getRequestById(state, createRequestId.current)
       : null
   )
+
   const createStatus = createRequest?.status
 
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
 
   const isJogging =
     useSelector((state: State) =>
-      jogRequestId.current != null
+      jogRequestId.current
         ? RobotApi.getRequestById(state, jogRequestId.current)
         : null
     )?.status === RobotApi.PENDING
@@ -609,7 +610,7 @@ export function RobotSettingsCalibration({
           </Box>
           <TertiaryButton
             onClick={() => handleClickDeckCalibration()}
-            disabled={disabledOrBusyReason !== null}
+            disabled={disabledOrBusyReason != null}
           >
             {deckCalibrationButtonText}
           </TertiaryButton>
