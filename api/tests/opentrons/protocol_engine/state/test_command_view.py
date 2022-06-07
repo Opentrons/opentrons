@@ -233,10 +233,10 @@ def test_get_is_stopped() -> None:
 def test_get_is_started() -> None:
     """It should return true if start requested and no command running."""
     subject = get_command_view(run_started_at=None)
-    assert subject.get_is_started() is False
+    assert subject.has_been_played() is False
 
     subject = get_command_view(run_started_at=datetime(year=2021, day=1, month=1))
-    assert subject.get_is_started() is True
+    assert subject.has_been_played() is True
 
 
 class ActionAllowedSpec(NamedTuple):

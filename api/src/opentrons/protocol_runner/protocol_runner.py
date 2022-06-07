@@ -90,7 +90,7 @@ class ProtocolRunner:
 
         This value is latched; once it is True, it will never become False.
         """
-        return self._protocol_engine.state_view.commands.get_is_started()
+        return self._protocol_engine.state_view.commands.has_been_played()
 
     def load(self, protocol_source: ProtocolSource) -> None:
         """Load a ProtocolSource into managed ProtocolEngine.

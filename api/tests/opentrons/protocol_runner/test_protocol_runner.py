@@ -167,7 +167,7 @@ async def test_stop(
     subject: ProtocolRunner,
 ) -> None:
     """It should halt a protocol run with stop."""
-    decoy.when(protocol_engine.state_view.commands.get_is_started()).then_return(True)
+    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(True)
 
     subject.play()
     await subject.stop()
@@ -182,7 +182,7 @@ async def test_stop_never_started(
     subject: ProtocolRunner,
 ) -> None:
     """It should clean up rather than halt if the runner was never started."""
-    decoy.when(protocol_engine.state_view.commands.get_is_started()).then_return(False)
+    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(False)
 
     await subject.stop()
 
@@ -200,7 +200,7 @@ async def test_run(
     subject: ProtocolRunner,
 ) -> None:
     """It should run a protocol to completion."""
-    decoy.when(protocol_engine.state_view.commands.get_is_started()).then_return(
+    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(
         False, True
     )
 
