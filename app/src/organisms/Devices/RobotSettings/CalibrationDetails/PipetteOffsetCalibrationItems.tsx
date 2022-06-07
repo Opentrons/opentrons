@@ -18,6 +18,7 @@ import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated } from './utils'
 import { getDisplayNameForTipRack } from '../../../../pages/Robots/InstrumentSettings/utils'
 import { getCustomLabwareDefinitions } from '../../../../redux/custom-labware'
+import { useAttachedPipettes } from '../../hooks'
 
 import type { State } from '../../../../redux/types'
 import type { FormattedPipetteOffsetCalibration } from '../RobotSettingsCalibration'
@@ -55,6 +56,7 @@ export function PipetteOffsetCalibrationItems({
   const customLabwareDefs = useSelector((state: State) => {
     return getCustomLabwareDefinitions(state)
   })
+  const attachedPipettes = useAttachedPipettes()
 
   return (
     <StyledTable>
@@ -92,54 +94,56 @@ export function PipetteOffsetCalibrationItems({
               </StyledText>
             </StyledTableCell>
             <StyledTableCell>
-              <Flex alignItems={ALIGN_CENTER}>
-                {calibration.lastCalibrated != null &&
-                !(calibration.markedBad ?? false) ? (
-                  <>
-                    <StyledText as="p">
-                      {formatLastCalibrated(calibration.lastCalibrated)}
-                    </StyledText>
-                  </>
-                ) : (
-                  <>
-                    {calibration.markedBad ?? false ? (
-                      <>
-                        <Icon
-                          name="alert-circle"
-                          backgroundColor={COLORS.warningBg}
-                          color={COLORS.warning}
-                          size={SPACING.spacing4}
-                        />
-                        <StyledText
-                          as="p"
-                          marginLeft={SPACING.spacing2}
-                          width="100%"
-                          color={COLORS.warningText}
-                        >
-                          {t('recalibration_recommended')}
-                        </StyledText>
-                      </>
-                    ) : (
-                      <>
-                        <Icon
-                          name="alert-circle"
-                          backgroundColor={COLORS.errorBg}
-                          color={COLORS.error}
-                          size={SPACING.spacing4}
-                        />
-                        <StyledText
-                          as="p"
-                          marginLeft={SPACING.spacing2}
-                          width="100%"
-                          color={COLORS.errorText}
-                        >
-                          {t('missing_calibration')}
-                        </StyledText>
-                      </>
-                    )}
-                  </>
-                )}
-              </Flex>
+              {attachedPipettes[calibration.mount] != null && (
+                <Flex alignItems={ALIGN_CENTER}>
+                  {calibration.lastCalibrated != null &&
+                  !(calibration.markedBad ?? false) ? (
+                    <>
+                      <StyledText as="p">
+                        {formatLastCalibrated(calibration.lastCalibrated)}
+                      </StyledText>
+                    </>
+                  ) : (
+                    <>
+                      {calibration.markedBad ?? false ? (
+                        <>
+                          <Icon
+                            name="alert-circle"
+                            backgroundColor={COLORS.warningBg}
+                            color={COLORS.warning}
+                            size={SPACING.spacing4}
+                          />
+                          <StyledText
+                            as="p"
+                            marginLeft={SPACING.spacing2}
+                            width="100%"
+                            color={COLORS.warningText}
+                          >
+                            {t('recalibration_recommended')}
+                          </StyledText>
+                        </>
+                      ) : (
+                        <>
+                          <Icon
+                            name="alert-circle"
+                            backgroundColor={COLORS.errorBg}
+                            color={COLORS.error}
+                            size={SPACING.spacing4}
+                          />
+                          <StyledText
+                            as="p"
+                            marginLeft={SPACING.spacing2}
+                            width="100%"
+                            color={COLORS.errorText}
+                          >
+                            {t('missing_calibration')}
+                          </StyledText>
+                        </>
+                      )}
+                    </>
+                  )}
+                </Flex>
+              )}
             </StyledTableCell>
             <StyledTableCell>
               <OverflowMenu
