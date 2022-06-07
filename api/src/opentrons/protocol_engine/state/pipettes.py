@@ -126,6 +126,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             # it won't harm the state.
             self._state.attached_tip_labware_by_id.pop(pipette_id, None)
 
+        elif isinstance(command.result, BlowOutResult):
+            pipette_id = command.params.pipetteId
+            self._state.aspirated_volume_by_id[pipette_id] = 0
+
 
 class PipetteView(HasState[PipetteState]):
     """Read-only view of computed pipettes state."""
