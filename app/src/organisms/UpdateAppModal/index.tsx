@@ -28,7 +28,6 @@ import {
   Flex,
   Icon,
   SecondaryBtn,
-  COLORS,
   Text,
 } from '@opentrons/components'
 
@@ -158,7 +157,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   // component built with BaseModal
   return (
     <BaseModal
-      overlayColor="rgba(115,115,115,0.9)"
+      overlayColor="#737373e6"
       maxWidth="38rem"
       fontSize={FONT_SIZE_BODY_2}
       header={
