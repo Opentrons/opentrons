@@ -11,7 +11,6 @@ import {
   Box,
   SecondaryBtn,
   Tooltip,
-  useInterval,
   useHoverTooltip,
   ALIGN_FLEX_START,
   FLEX_NONE,
@@ -36,8 +35,6 @@ export interface InformationCardProps {
   updateUrl: string
 }
 
-const UPDATE_RECHECK_DELAY_MS = 60000
-
 export function InformationCard(props: InformationCardProps): JSX.Element {
   const { robot, updateUrl } = props
   const { t } = useTranslation(['robot_info', 'shared'])
@@ -50,9 +47,6 @@ export function InformationCard(props: InformationCardProps): JSX.Element {
   )
 
   const dispatch = useDispatch<Dispatch>()
-  const checkAppUpdate = React.useCallback(() => dispatch(checkShellUpdate()), [
-    dispatch,
-  ])
 
   const { displayName } = robot
   const unknown = t('shared:unknown')
@@ -68,8 +62,9 @@ export function InformationCard(props: InformationCardProps): JSX.Element {
 
   const updateDisabled = autoUpdateDisabledReason !== null
 
-  // check for available updates on an interval
-  useInterval(checkAppUpdate, UPDATE_RECHECK_DELAY_MS)
+  useMountEffect(() => {
+    dispatch(checkShellUpdate())
+  })
 
   return (
     <Card title={t('title')}>
