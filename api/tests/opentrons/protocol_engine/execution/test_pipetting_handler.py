@@ -543,45 +543,45 @@ async def test_handle_add_tip_length_fallback(
     )
 
 
-async def test_handle_blow_out_request(
-    decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    movement_handler: MovementHandler,
-    mock_hw_pipettes: MockPipettes,
-    subject: PipettingHandler,
-) -> None:
-    """It should be able to blow-out a well."""
-    well_location = WellLocation(
-        origin=WellOrigin.BOTTOM,
-        offset=WellOffset(x=0, y=0, z=1),
-    )
-
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(
-            mount=Mount.RIGHT,
-            config=mock_hw_pipettes.right_config,
-        )
-    )
-
-    await subject.blow_out(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="C6",
-        well_location=well_location,
-    )
-
-    decoy.verify(
-        await movement_handler.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="C6",
-            well_location=well_location,
-        ),
-        await hardware_api.blow_out(mount=Mount.RIGHT),
-    )
+# async def test_handle_blow_out_request(
+#     decoy: Decoy,
+#     state_store: StateStore,
+#     hardware_api: HardwareAPI,
+#     movement_handler: MovementHandler,
+#     mock_hw_pipettes: MockPipettes,
+#     subject: PipettingHandler,
+# ) -> None:
+#     """It should be able to blow-out a well."""
+#     well_location = WellLocation(
+#         origin=WellOrigin.BOTTOM,
+#         offset=WellOffset(x=0, y=0, z=1),
+#     )
+#
+#     decoy.when(
+#         state_store.pipettes.get_hardware_pipette(
+#             pipette_id="pipette-id",
+#             attached_pipettes=mock_hw_pipettes.by_mount,
+#         )
+#     ).then_return(
+#         HardwarePipette(
+#             mount=Mount.RIGHT,
+#             config=mock_hw_pipettes.right_config,
+#         )
+#     )
+#
+#     await subject.blow_out(
+#         pipette_id="pipette-id",
+#         labware_id="labware-id",
+#         well_name="C6",
+#         well_location=well_location,
+#     )
+#
+#     decoy.verify(
+#         await movement_handler.move_to_well(
+#             pipette_id="pipette-id",
+#             labware_id="labware-id",
+#             well_name="C6",
+#             well_location=well_location,
+#         ),
+#         await hardware_api.blow_out(mount=Mount.RIGHT),
+#     )

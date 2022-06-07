@@ -6,14 +6,13 @@ from pydantic import BaseModel
 
 from .pipetting_common import BasePipettingParams
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from ..state import StateView
 
 from opentrons.hardware_control import HardwareControlAPI
 
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
-
+    from ..state import StateView
 
 BlowOutCommandType = Literal["blow-out"]
 
@@ -46,10 +45,10 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
 
     async def execute(self, params: BlowOutParams) -> BlowOutResult:
         """Move to and blow-out the requested well."""
-        hw_pipette = self._state_view.pipettes.get_hardware_pipette(
-            pipette_id=params.pipetteId,
-            attached_pipettes=self._hardware_api.attached_instruments,
-        )
+        # hw_pipette = self._state_view.pipettes.get_hardware_pipette(
+        #     pipette_id=params.pipetteId,
+        #     attached_pipettes=self._hardware_api.attached_instruments,
+        # )
 
         await self._movement.move_to_well(
             pipette_id=params.pipetteId,
@@ -58,7 +57,7 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
             well_location=params.wellLocation,
         )
 
-        await self._hardware_api.blow_out(mount=hw_pipette.mount)
+        # await self._hardware_api.blow_out(mount=hw_pipette.mount)
 
         return BlowOutResult()
 

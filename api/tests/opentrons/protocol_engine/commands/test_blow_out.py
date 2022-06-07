@@ -35,3 +35,14 @@ async def test_blow_out_implementation(
     result = await subject.execute(data)
 
     assert result == BlowOutResult()
+
+    # decoy.verify(
+    #     await state_view.pipettes.get_hardware_pipette(pipette_id="pipette-id"),
+    #     await movement.move_to_well(
+    #         pipette_id="pipette-id",
+    #         labware_id="labware-id",
+    #         well_name="C6",
+    #         well_location=location,
+    #     ),
+    #     await hardware_api.blow_out(mount=Mount.RIGHT),
+    # )
