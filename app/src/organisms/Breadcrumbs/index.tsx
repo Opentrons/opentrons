@@ -46,7 +46,7 @@ function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
       ? getProtocolDisplayName(
           storedProtocol.protocolKey,
           storedProtocol.srcFileNames,
-          storedProtocol?.mostRecentAnalysis
+          storedProtocol.mostRecentAnalysis
         )
       : protocolKey
 

@@ -67,7 +67,9 @@ export function RobotOverview({
         {robot != null ? (
           <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing3} />
         ) : null}
-        <RobotStatusBanner name={robot.name} local={robot.local} />
+        {robot?.status === CONNECTABLE ? (
+          <RobotStatusBanner name={robot.name} local={robot.local} />
+        ) : null}
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
