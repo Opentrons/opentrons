@@ -75,7 +75,7 @@ export function PipetteOffsetCalibrationItems({
       <tbody>
         {formattedPipetteOffsetCalibrations.map(
           (calibration, index) =>
-            attachedPipettes[calibration.mount] != null && (
+            attachedPipettes?.[calibration.mount] != null && (
               <StyledTableRow key={index}>
                 <StyledTableCell>
                   <StyledText as="p">{calibration.modelName}</StyledText>

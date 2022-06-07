@@ -3,7 +3,14 @@ import * as React from 'react'
 import { renderWithProviders, Mount } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
+import { mockAttachedPipette } from '../../../../../redux/pipettes/__fixtures__'
+import { useAttachedPipettes } from '../../../hooks'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
+
+import type {
+  AttachedPipettesByMount,
+  // PipetteCalibrationsByMount,
+} from '../../../../../redux/pipettes/types'
 
 const render = (
   props: React.ComponentProps<typeof PipetteOffsetCalibrationItems>
@@ -40,12 +47,20 @@ jest.mock('../../../../../redux/discovery')
 jest.mock('../../../../../assets/labware/findLabware')
 jest.mock('../../../hooks')
 
+const mockAttachedPipettes: AttachedPipettesByMount = {
+  left: mockAttachedPipette,
+  right: mockAttachedPipette,
+} as any
 const mockUpdateRobotStatus = jest.fn()
+const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
+  typeof useAttachedPipettes
+>
 
 describe('PipetteOffsetCalibrationItems', () => {
   let props: React.ComponentProps<typeof PipetteOffsetCalibrationItems>
 
   beforeEach(() => {
+    mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
     props = {
       robotName: ROBOT_NAME,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
