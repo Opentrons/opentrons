@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -12,18 +12,17 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   useInterval,
 } from '@opentrons/components'
-import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { checkShellUpdate } from '../../redux/shell'
 import { restartRobot } from '../../redux/robot-admin'
-import { UNREACHABLE } from '../../redux/discovery'
 import { home, ROBOT } from '../../redux/robot-controls'
+import { UNREACHABLE, CONNECTABLE, REACHABLE } from '../../redux/discovery'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Portal } from '../../App/portal'
 import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
-import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
+import { useIsRobotBusy } from './hooks'
 import { UpdateBuildroot } from './RobotSettings/UpdateBuildroot'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
@@ -46,9 +45,8 @@ export const RobotOverviewOverflowMenu = (
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
-  const currentRunStatus = useCurrentRunStatus()
-  const buttonDisabledReason =
-    currentRunStatus === RUN_STATUS_RUNNING || robot.status === 'unreachable'
+  const history = useHistory()
+  const isRobotBusy = useIsRobotBusy()
 
   const dispatch = useDispatch<Dispatch>()
   const checkAppUpdate = React.useCallback(() => dispatch(checkShellUpdate()), [
@@ -102,7 +100,11 @@ export const RobotOverviewOverflowMenu = (
           />
         </Portal>
       ) : null}
-      <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
+      <OverflowBtn
+        aria-label="overflow"
+        onClick={handleOverflowClick}
+        disabled={robot.status === UNREACHABLE}
+      />
       {showOverflowMenu ? (
         <Flex
           width={'12rem'}
@@ -117,7 +119,7 @@ export const RobotOverviewOverflowMenu = (
         >
           {autoUpdateAction === 'upgrade' ? (
             <MenuItem
-              disabled={buttonDisabledReason}
+              disabled={isRobotBusy || robot?.status !== CONNECTABLE}
               onClick={handleClickUpdateBuildroot}
               data-testid={`RobotOverviewOverflowMenu_updateSoftware_${robot.name}`}
             >
@@ -127,24 +129,30 @@ export const RobotOverviewOverflowMenu = (
           <MenuItem
             onClick={handleClickRestart}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            disabled={buttonDisabledReason}
+            disabled={isRobotBusy || robot?.status !== CONNECTABLE}
             data-testid={`RobotOverviewOverflowMenu_restartRobot_${robot.name}`}
           >
             {t('robot_controls:restart_label')}
           </MenuItem>
           <MenuItem
             onClick={handleClickHomeGantry}
-            disabled={buttonDisabledReason}
+            disabled={isRobotBusy || robot?.status !== CONNECTABLE}
             data-testid={`RobotOverviewOverflowMenu_homeGantry_${robot.name}`}
           >
             {t('home_gantry')}
           </MenuItem>
           <Divider marginY={'0'} />
           <MenuItem
-            to={`/devices/${robot.name}/robot-settings`}
-            as={Link}
+            onClick={() =>
+              history.push(`/devices/${robot.name}/robot-settings`)
+            }
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            disabled={buttonDisabledReason}
+            disabled={
+              robot == null ||
+              robot?.status === UNREACHABLE ||
+              (robot?.status === REACHABLE &&
+                robot?.serverHealthStatus !== 'ok')
+            }
             data-testid={`RobotOverviewOverflowMenu_robotSettings_${robot.name}`}
           >
             {t('robot_settings')}

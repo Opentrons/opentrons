@@ -26,8 +26,9 @@ import { Portal } from '../../App/portal'
 import { CONNECTABLE } from '../../redux/discovery'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { RobotStatusBanner } from './RobotStatusBanner'
+import { ReachableBanner } from './ReachableBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
-import { useLights, useRobot, useIsRobotViewable } from './hooks'
+import { useLights, useRobot } from './hooks'
 
 interface RobotOverviewProps {
   robotName: string
@@ -36,17 +37,14 @@ interface RobotOverviewProps {
 export function RobotOverview({
   robotName,
 }: RobotOverviewProps): JSX.Element | null {
-  const { t } = useTranslation('device_details')
+  const { t } = useTranslation(['device_details', 'shared'])
 
   const robot = useRobot(robotName)
-  const isRobotViewable = useIsRobotViewable(robotName)
-
   const [
     showChooseProtocolSlideout,
     setShowChooseProtocolSlideout,
   ] = React.useState<boolean>(false)
   const { lightsOn, toggleLights } = useLights(robotName)
-
   const currentRunId = useCurrentRunId()
 
   return robot != null ? (
@@ -65,10 +63,13 @@ export function RobotOverview({
         id="RobotOverview_robotImage"
       />
       <Box padding={SPACING.spacing3} width="100%">
+        <ReachableBanner robot={robot} />
         {robot != null ? (
           <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing3} />
         ) : null}
-        <RobotStatusBanner name={robot.name} local={robot.local} />
+        {robot?.status === CONNECTABLE ? (
+          <RobotStatusBanner name={robot.name} local={robot.local} />
+        ) : null}
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -81,7 +82,7 @@ export function RobotOverview({
               <ToggleButton
                 label={t('lights')}
                 toggledOn={lightsOn != null ? lightsOn : false}
-                disabled={lightsOn === null}
+                disabled={lightsOn === null || robot.status !== CONNECTABLE}
                 onClick={toggleLights}
                 size={SIZE_2}
                 marginRight={SPACING.spacing3}
@@ -92,7 +93,7 @@ export function RobotOverview({
           </Flex>
           <PrimaryButton
             textTransform={TEXT_TRANSFORM_NONE}
-            disabled={currentRunId != null || !isRobotViewable}
+            disabled={currentRunId != null || robot.status !== CONNECTABLE}
             onClick={() => {
               setShowChooseProtocolSlideout(true)
             }}
