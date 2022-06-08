@@ -49,7 +49,7 @@ class QueueStatus(str, Enum):
             New setup commands may not be enqueued.
         PAUSED: Execution of protocol commands has been paused.
             New protocol commands may be enqueued but wait to execute.
-            New setup commands may be enqueued and will execute immediately.
+            New setup commands may not be enqueued.
     """
 
     SETUP = "setup"
@@ -445,7 +445,7 @@ class CommandView(HasState[CommandState]):
 
         # if there is a setup command queued, prioritize it
         next_setup_cmd = next(iter(self._state.queued_setup_command_ids), None)
-        if next_setup_cmd:
+        if self._state.queue_status != QueueStatus.PAUSED and next_setup_cmd:
             return next_setup_cmd
 
         # if the queue is running, return the next protocol command
@@ -549,9 +549,9 @@ class CommandView(HasState[CommandState]):
             isinstance(action, QueueCommandAction)
             and action.request.intent == CommandIntent.SETUP
         ):
-            if self._state.queue_status == QueueStatus.RUNNING:
+            if self._state.queue_status != QueueStatus.SETUP:
                 raise SetupCommandNotAllowedError(
-                    "Setup commands are not allowed while running."
+                    "Setup commands are not allowed after run has started."
                 )
 
         return action
