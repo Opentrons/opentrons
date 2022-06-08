@@ -10,7 +10,7 @@ import {
   POSITION_RELATIVE,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
-  useInterval,
+  useMountEffect,
 } from '@opentrons/components'
 import { checkShellUpdate } from '../../redux/shell'
 import { restartRobot } from '../../redux/robot-admin'
@@ -32,8 +32,6 @@ interface RobotOverviewOverflowMenuProps {
   robot: DiscoveredRobot
 }
 
-const UPDATE_RECHECK_DELAY_MS = 60000
-
 export const RobotOverviewOverflowMenu = (
   props: RobotOverviewOverflowMenuProps
 ): JSX.Element => {
@@ -49,9 +47,6 @@ export const RobotOverviewOverflowMenu = (
   const isRobotBusy = useIsRobotBusy()
 
   const dispatch = useDispatch<Dispatch>()
-  const checkAppUpdate = React.useCallback(() => dispatch(checkShellUpdate()), [
-    dispatch,
-  ])
 
   const handleClickRestart: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -70,7 +65,9 @@ export const RobotOverviewOverflowMenu = (
     setShowSoftwareUpdateModal,
   ] = React.useState<boolean>(false)
 
-  useInterval(checkAppUpdate, UPDATE_RECHECK_DELAY_MS)
+  useMountEffect(() => {
+    dispatch(checkShellUpdate())
+  })
 
   const handleClickUpdateBuildroot: React.MouseEventHandler = e => {
     e.preventDefault()
