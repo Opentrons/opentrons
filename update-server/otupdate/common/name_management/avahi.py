@@ -6,6 +6,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import logging
+import re
 from typing import AsyncGenerator, Awaitable, Callable, cast
 
 try:
@@ -17,6 +18,16 @@ except ImportError:
 
 
 _COLLISION_POLL_INTERVAL = 5
+
+SERVICE_NAME_MAXIMUM_OCTETS = 63
+"""The maximum length of an Avahi service name.
+
+Measured in octets (bytes) -- not code points or characters!
+
+This comes from the DNS-SD specification on instance names,
+which Avahi service names correspond to, under the hood.
+https://datatracker.ietf.org/doc/html/rfc6763#section-4.1.1
+"""
 
 
 _log = logging.getLogger(__name__)
@@ -60,8 +71,8 @@ class AvahiClient:
 
         Since the Avahi service name corresponds to the DNS-SD instance name,
         it's a human-readable string of mostly arbitrary Unicode,
-        at most 63 octets (not 63 code points or 63 characters!) long.
-        (See: https://datatracker.ietf.org/doc/html/rfc6763#section-4.1.1)
+        at most SERVICE_NAME_MAXIMUM_OCTETS long.
+
         Avahi will raise an exception through this method if it thinks
         the new service name is invalid.
 
@@ -169,7 +180,65 @@ def alternative_service_name(current_service_name: str) -> str:
       so we especially can't use that.
       https://github.com/Opentrons/opentrons/issues/10672
     """
-    raise NotImplementedError()
+    separator = "Num"
+
+    pattern = f"(?P<base_name>.*){separator}(?P<sequence_number>[0-9]+)"
+    match = re.fullmatch(
+        pattern=pattern, string=current_service_name, flags=re.DOTALL
+    )
+    if match is None:
+        base_name = current_service_name
+        next_sequence_number = 2
+    else:
+        base_name = match["base_name"]
+        next_sequence_number = int(match["sequence_number"]) + 1
+
+    new_suffix = f"{separator}{next_sequence_number}"
+
+    octets_needed_for_suffix = len(new_suffix.encode("utf-8"))
+    octets_available_for_base_name = (
+        SERVICE_NAME_MAXIMUM_OCTETS - octets_needed_for_suffix
+    )
+
+    if octets_available_for_base_name >= 0:
+        truncated_base_name = _truncate_by_utf8_octets(
+            s=base_name, maximum_utf8_octets=octets_available_for_base_name
+        )
+        result = f"{truncated_base_name}{new_suffix}"
+    else:
+        # Edge case: The sequence number was already so high, incrementing it added a
+        # new digit that we don't have room for. Roll back to zero instead.
+        result = f"{separator}0"
+
+    assert len(result.encode("utf-8")) <= SERVICE_NAME_MAXIMUM_OCTETS
+    return result
+
+
+def _truncate_by_utf8_octets(s: str, maximum_utf8_octets: int) -> str:
+    """Truncate a string so it's no longer than the given number of octets when
+    encoded as UTF-8.
+
+    This takes care to avoid truncating in the middle of a multi-byte code point.
+    So the output is always valid Unicode.
+
+    However, it may split up multi-code-point sequences
+    that a human would inituitively see as a single character.
+    For example, it's possible to encode "é" as two code points:
+
+    1. U+0061 Latin Small Letter E
+    2. U+0306 Combining Acute Accent
+
+    And this may truncate in between them, leaving an unaccented "e" in the output.
+    (If we care to fix this, we should look into preserving grapheme clusters:
+    https://unicode.org/reports/tr29/)
+    """
+    encoded = s.encode("utf-8")[:maximum_utf8_octets]
+    return encoded.decode(
+        "utf-8",
+        # Silently discard any trailing junk left over
+        # from truncating in the middle of a code point.
+        errors="ignore",
+    )
 
 
 class _SyncClient:
