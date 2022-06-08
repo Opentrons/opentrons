@@ -24,7 +24,7 @@ async def test_blow_out_implementation(
     hardware_api: HardwareControlAPI,
     movement: MovementHandler,
 ) -> None:
-    """A BlowOutCreate should have an execution implementation."""
+    """Test BlowOut command execution."""
     subject = BlowOutImplementation(
         state_view=state_view, movement=movement, hardware_api=hardware_api
     )
