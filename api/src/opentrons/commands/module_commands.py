@@ -153,13 +153,13 @@ def thermocycler_close() -> command_types.ThermocyclerCloseCommand:
     return {"name": command_types.THERMOCYCLER_CLOSE, "payload": {"text": text}}
 
 def heater_shaker_set_and_wait_for_temperature(temperature: float) -> command_types.HeaterShakerSetAndWaitForTemperatureCommand:
-    # given rounding precision 2, formats float 1.23456 as 1.23
-    formatted_temp = format(temperature,f'.{utils.HS_GCODE_ROUNDING_PRECISION}f')
+    # mimicking firmware behavior
+    formatted_temp = math.trunc(temperature)
     text = f"Setting Temperature of Heater Shaker to {formatted_temp} °C and waiting until reached"
     return {"name":command_types.HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE, "payload": {"text":text}}
 
 def heater_shaker_set_target_temperature(temperature: float) -> command_types.HeaterShakerSetTargetTemperatureCommand:
-    formatted_temp = format(temperature,f'.{utils.HS_GCODE_ROUNDING_PRECISION}f')
+    formatted_temp = math.trunc(temperature)
     text = f"Setting Target Temperature of Heater Shaker to {formatted_temp} °C"
     return {"name":command_types.HEATER_SHAKER_SET_TARGET_TEMPERATURE, "payload": {"text":text}}
 
