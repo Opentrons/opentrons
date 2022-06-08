@@ -11,7 +11,6 @@ libsystemd-dev
 RUN git clone https://github.com/pyenv/pyenv.git ~/.pyenv 
 ENV PYENV_ROOT $HOME/.pyenv
 ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
-RUN pyenv install 3.7.10
 RUN pyenv install 3.7.13
 
 #nvm
@@ -19,5 +18,6 @@ SHELL ["/bin/bash", "--login", "-i", "-c"]
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash 
 RUN source /root/.bashrc && nvm install 14 && nvm use 14 && npm install --global yarn
 
-COPY ../../../../ .
-RUN pip install pipenv && make setup
+COPY ./ .
+RUN git clone https://github.com/Opentrons/opentrons.git && cd opentrons && git checkout $GITHUB_SHA && \
+pip install pipenv && make setup
