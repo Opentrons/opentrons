@@ -9,6 +9,6 @@ inputs:
     required: false
 runs:
   using: 'docker'
-  image: '../../../../Dockerfile.dev'
+  image: 'Dockerfile'
   args: 
   - 'make -C ${{ inputs.project}} setup'

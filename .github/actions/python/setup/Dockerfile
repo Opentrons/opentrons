@@ -19,5 +19,5 @@ SHELL ["/bin/bash", "--login", "-i", "-c"]
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash 
 RUN source /root/.bashrc && nvm install 14 && nvm use 14 && npm install --global yarn
 
-COPY ./ .
+COPY ../../../../ .
 RUN pip install pipenv && make setup
