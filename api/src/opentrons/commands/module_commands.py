@@ -1,4 +1,5 @@
 from typing import List
+from math import trunc
 
 from opentrons.drivers import utils
 from opentrons.hardware_control.modules import ThermocyclerStep
@@ -157,7 +158,7 @@ def heater_shaker_set_and_wait_for_temperature(
     temperature: float,
 ) -> command_types.HeaterShakerSetAndWaitForTemperatureCommand:
     # mimicking firmware behavior
-    formatted_temp = math.trunc(temperature)
+    formatted_temp = trunc(temperature)
     text = f"Setting Temperature of Heater Shaker to {formatted_temp} °C and waiting until reached"
     return {
         "name": command_types.HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE,
@@ -168,7 +169,7 @@ def heater_shaker_set_and_wait_for_temperature(
 def heater_shaker_set_target_temperature(
     temperature: float,
 ) -> command_types.HeaterShakerSetTargetTemperatureCommand:
-    formatted_temp = math.trunc(temperature)
+    formatted_temp = trunc(temperature)
     text = f"Setting Target Temperature of Heater Shaker to {formatted_temp} °C"
     return {
         "name": command_types.HEATER_SHAKER_SET_TARGET_TEMPERATURE,
