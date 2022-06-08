@@ -7,6 +7,7 @@ import {
   TYPOGRAPHY,
   Btn,
   useInterval,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { Portal } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
@@ -59,8 +60,10 @@ export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
   }
 
   return (
-    <Flex onClick={e => e.stopPropagation()}>
-      {autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade' ? (
+    <Flex onClick={e => e.stopPropagation()} flexDirection={DIRECTION_COLUMN}>
+      {(autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade') &&
+      robot !== null &&
+      robot.healthStatus === 'ok' ? (
         <Banner type="warning" onCloseClick={handleCloseBanner} {...styleProps}>
           <StyledText as="p" marginRight={SPACING.spacing2}>
             {t('robot_server_versions_banner_title')}
