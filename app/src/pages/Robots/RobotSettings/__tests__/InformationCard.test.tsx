@@ -12,7 +12,6 @@ import { i18n } from '../../../../i18n'
 import * as Buildroot from '../../../../redux/buildroot'
 import * as Discovery from '../../../../redux/discovery'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
-import { checkShellUpdate } from '../../../../redux/shell'
 import { LabeledValue } from '../../../../atoms/structure'
 import { InformationCard } from '../InformationCard'
 
