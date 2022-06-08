@@ -52,7 +52,6 @@ def test_alternative_service_name_sequencing() -> None:
             # easiest to implement.
             "Num0",
         ),
-
     ],
 )
 def test_alternative_service_name_truncation(

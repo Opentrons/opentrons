@@ -183,9 +183,7 @@ def alternative_service_name(current_service_name: str) -> str:
     separator = "Num"
 
     pattern = f"(?P<base_name>.*){separator}(?P<sequence_number>[0-9]+)"
-    match = re.fullmatch(
-        pattern=pattern, string=current_service_name, flags=re.DOTALL
-    )
+    match = re.fullmatch(pattern=pattern, string=current_service_name, flags=re.DOTALL)
     if match is None:
         base_name = current_service_name
         next_sequence_number = 2
