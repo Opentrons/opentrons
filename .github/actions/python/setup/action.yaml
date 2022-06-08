@@ -14,6 +14,6 @@ inputs:
     default: github.sha
 runs:
   using: 'docker'
-  image: 'docker://otsam/otbuildy:0.0.1'
+  image: 'docker://otsam/otbuildy:0.0.2'
   args: 
   - 'git clone https://github.com/Opentrons/opentrons.git && cd opentrons && git checkout ${{inputs.sha}} && make -C ${{ inputs.project}} ${{inputs.target}}'
