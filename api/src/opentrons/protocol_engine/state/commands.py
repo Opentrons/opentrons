@@ -239,7 +239,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             prev_entry = self._state.commands_by_id[action.command_id]
             self._state.commands_by_id[action.command_id] = CommandEntry(
                 index=prev_entry.index,
-                # TODO(mc, 2022-06-06): add new "canclled" status or similar
+                # TODO(mc, 2022-06-06): add new "cancelled" status or similar
                 # and don't set `completedAt` in commands other than the
                 # specific one that failed
                 command=prev_entry.command.copy(
