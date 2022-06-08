@@ -66,9 +66,6 @@ async def test_blow_out_implementation(
     assert result == BlowOutResult()
 
     decoy.verify(
-        state_view.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id", attached_pipettes=pipette_dict_by_mount
-        ),
         await movement.move_to_well(
             pipette_id="pipette-id",
             labware_id="labware-id",
