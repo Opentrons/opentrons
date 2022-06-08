@@ -109,7 +109,7 @@ def test_get_next_queued_returns_first_queued() -> None:
 
 @pytest.mark.parametrize(
     "queue_status",
-    [QueueStatus.SETUP, QueueStatus.RUNNING, QueueStatus.PAUSED],
+    [QueueStatus.SETUP, QueueStatus.RUNNING],
 )
 def test_get_next_queued_prioritizes_setup_command_queue(
     queue_status: QueueStatus,
@@ -136,9 +136,22 @@ def test_get_next_queued_returns_none_when_no_pending() -> None:
 
 @pytest.mark.parametrize("queue_status", [QueueStatus.SETUP, QueueStatus.PAUSED])
 def test_get_next_queued_returns_none_if_not_running(queue_status: QueueStatus) -> None:
-    """It should return None if the engine is not running."""
+    """It should not return protocol commands if the engine is not running."""
     subject = get_command_view(
         queue_status=queue_status,
+        queued_setup_command_ids=[],
+        queued_command_ids=["command-id-1", "command-id-2"],
+    )
+    result = subject.get_next_queued()
+
+    assert result is None
+
+
+def test_get_next_queued_returns_no_commands_if_paused() -> None:
+    """It should not return any type of command if the engine is paused."""
+    subject = get_command_view(
+        queue_status=QueueStatus.PAUSED,
+        queued_setup_command_ids=["setup-id-1", "setup-id-2"],
         queued_command_ids=["command-id-1", "command-id-2"],
     )
     result = subject.get_next_queued()
@@ -319,9 +332,9 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         action=StopAction(),
         expected_error=None,
     ),
-    # queue command is usually allowed
+    # queue command is allowed during setup
     ActionAllowedSpec(
-        subject=get_command_view(),
+        subject=get_command_view(queue_status=QueueStatus.SETUP),
         action=QueueCommandAction(
             request=cmd.HomeCreate(params=cmd.HomeParams()),
             command_id="command-id",
@@ -378,6 +391,20 @@ action_allowed_specs: List[ActionAllowedSpec] = [
             created_at=datetime(year=2021, month=1, day=1),
         ),
         expected_error=errors.RunStoppedError,
+    ),
+    # queue setup command is disallowed if paused
+    ActionAllowedSpec(
+        subject=get_command_view(queue_status=QueueStatus.PAUSED),
+        action=QueueCommandAction(
+            request=cmd.HomeCreate(
+                params=cmd.HomeParams(),
+                intent=cmd.CommandIntent.SETUP,
+            ),
+            command_id="command-id",
+            command_key="command-key",
+            created_at=datetime(year=2021, month=1, day=1),
+        ),
+        expected_error=errors.SetupCommandNotAllowedError,
     ),
     # queue setup command is disallowed if running
     ActionAllowedSpec(
