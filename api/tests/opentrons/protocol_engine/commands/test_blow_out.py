@@ -29,16 +29,8 @@ async def test_blow_out_implementation(
         state_view=state_view, movement=movement, hardware_api=hardware_api
     )
 
-    left_config: PipetteDict = field(
-        default_factory=lambda: cast(
-            PipetteDict, {"name": "p300_single", "pipette_id": "123"}
-        )
-    )
-    right_config: PipetteDict = field(
-        default_factory=lambda: cast(
-            PipetteDict, {"name": "p300_multi", "pipette_id": "abc"}
-        )
-    )
+    left_config = cast(PipetteDict, {"name": "p300_single", "pipette_id": "123"})
+    right_config = cast(PipetteDict, {"name": "p300_multi", "pipette_id": "abc"})
 
     pipette_dict_by_mount = {Mount.LEFT: left_config, Mount.RIGHT: right_config}
 
