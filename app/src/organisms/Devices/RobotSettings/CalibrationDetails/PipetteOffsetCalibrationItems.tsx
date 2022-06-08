@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+
 import {
   Flex,
   ALIGN_CENTER,
@@ -41,11 +42,13 @@ const StyledTableCell = styled.td`
 interface PipetteOffsetCalibrationItemsProps {
   robotName: string
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
+  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 export function PipetteOffsetCalibrationItems({
   robotName,
   formattedPipetteOffsetCalibrations,
+  updateRobotStatus,
 }: PipetteOffsetCalibrationItemsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -144,6 +147,7 @@ export function PipetteOffsetCalibrationItems({
                 robotName={robotName}
                 serialNumber={calibration.serialNumber ?? null}
                 mount={calibration.mount}
+                updateRobotStatus={updateRobotStatus}
               />
             </StyledTableCell>
           </StyledTableRow>

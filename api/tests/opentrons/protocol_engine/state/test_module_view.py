@@ -563,6 +563,7 @@ def test_select_hardware_module_to_load_rejects_missing() -> None:
         (ModuleModel.MAGNETIC_MODULE_V1, lazy_fixture("magdeck_v1_def")),
         (ModuleModel.MAGNETIC_MODULE_V2, lazy_fixture("magdeck_v2_def")),
         (ModuleModel.THERMOCYCLER_MODULE_V1, lazy_fixture("thermocycler_v1_def")),
+        (ModuleModel.THERMOCYCLER_MODULE_V2, lazy_fixture("thermocycler_v2_def")),
     ],
 )
 def test_select_hardware_module_to_load(

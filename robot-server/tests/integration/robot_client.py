@@ -10,8 +10,8 @@ import httpx
 from httpx import Response
 
 
-STARTUP_WAIT = 15
-SHUTDOWN_WAIT = 15
+STARTUP_WAIT = 20
+SHUTDOWN_WAIT = 20
 
 
 class RobotClient:

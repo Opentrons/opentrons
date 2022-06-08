@@ -3,15 +3,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
 import { useInterval } from '@opentrons/components'
+
 import * as RobotApi from '../../../redux/robot-api'
 import * as Networking from '../../../redux/networking'
 import { Portal } from '../../../App/portal'
-
 import { SelectSsid } from './ConnectNetwork/SelectSsid'
 import { ConnectModal } from './ConnectNetwork/ConnectModal'
 import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
 import { ResultModal } from './ConnectNetwork/ResultModal'
-
+import { useIsRobotBusy } from '../hooks'
 import { CONNECT, DISCONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
 
 import type { State, Dispatch } from '../../../redux/types'
@@ -23,12 +23,14 @@ import type {
 
 interface TempSelectNetworkProps {
   robotName: string
+  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 const LIST_REFRESH_MS = 10000
 
 export const TemporarySelectNetwork = ({
   robotName,
+  updateRobotStatus,
 }: TempSelectNetworkProps): JSX.Element => {
   const list = useSelector((state: State) =>
     Networking.getWifiList(state, robotName)
@@ -42,20 +44,16 @@ export const TemporarySelectNetwork = ({
   const canDisconnect = useSelector((state: State) =>
     Networking.getCanDisconnect(state, robotName)
   )
-
   const [changeState, setChangeState] = React.useState<NetworkChangeState>({
     type: null,
   })
-
+  const isBusy = useIsRobotBusy()
   const dispatch = useDispatch<Dispatch>()
-
   const [dispatchApi, requestIds] = RobotApi.useDispatchApiRequest()
-
   const requestState = useSelector((state: State) => {
     const lastId = last(requestIds)
     return lastId != null ? RobotApi.getRequestById(state, lastId) : null
   })
-
   const activeNetwork = list?.find(nw => nw.active)
 
   const handleDisconnect = (): void => {
@@ -87,26 +85,36 @@ export const TemporarySelectNetwork = ({
   }, [robotName, dispatch, changeState.type])
 
   const handleSelectConnect = (ssid: string): void => {
-    const network = list.find((nw: WifiNetwork) => nw.ssid === ssid)
+    if (isBusy) {
+      updateRobotStatus(true)
+    } else {
+      const network = list.find((nw: WifiNetwork) => nw.ssid === ssid)
+      if (network != null) {
+        const { ssid, securityType } = network
 
-    if (network != null) {
-      const { ssid, securityType } = network
-
-      if (securityType === Networking.SECURITY_NONE) {
-        handleConnect({ ssid, securityType, hidden: false })
+        if (securityType === Networking.SECURITY_NONE) {
+          handleConnect({ ssid, securityType, hidden: false })
+        }
+        setChangeState({ type: CONNECT, ssid, network })
       }
-
-      setChangeState({ type: CONNECT, ssid, network })
     }
   }
 
   const handleSelectDisconnect = (): void => {
-    const ssid = activeNetwork?.ssid
-    ssid != null && setChangeState({ type: DISCONNECT, ssid })
+    if (isBusy) {
+      updateRobotStatus(true)
+    } else {
+      const ssid = activeNetwork?.ssid
+      ssid != null && setChangeState({ type: DISCONNECT, ssid })
+    }
   }
 
   const handleSelectJoinOther = (): void => {
-    setChangeState({ type: JOIN_OTHER, ssid: null })
+    if (isBusy) {
+      updateRobotStatus(true)
+    } else {
+      setChangeState({ type: JOIN_OTHER, ssid: null })
+    }
   }
 
   const handleDone = (): void => {
@@ -129,7 +137,7 @@ export const TemporarySelectNetwork = ({
       />
       {changeState.type && (
         <Portal>
-          {requestState ? (
+          {requestState != null ? (
             <ResultModal
               type={changeState.type}
               ssid={changeState.ssid}

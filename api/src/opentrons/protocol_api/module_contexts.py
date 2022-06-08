@@ -5,6 +5,7 @@ import logging
 from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, cast
 
 from opentrons import types
+from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control import modules
 from opentrons.hardware_control.modules import ModuleModel, types as module_types
 from opentrons.hardware_control.types import Axis
@@ -23,7 +24,10 @@ from opentrons.protocols.geometry.module_geometry import (
     ThermocyclerGeometry,
     HeaterShakerGeometry,
 )
-from opentrons.protocols.api_support.util import requires_version
+from opentrons.protocols.api_support.util import (
+    requires_version,
+    requires_heatershaker_ff,
+)
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
@@ -810,31 +814,31 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         super().__init__(ctx, geometry, requested_as, at_version)
 
     @property  # type: ignore[misc]
-    @requires_version(2, 13)
+    @requires_heatershaker_ff  # TODO: replace with API version requirement
     def target_temperature(self) -> Optional[float]:
         """Target temperature of the heater-shaker's plate."""
         return self._module.target_temperature
 
     @property  # type: ignore[misc]
-    @requires_version(2, 13)
+    @requires_heatershaker_ff  # TODO: replace with API version requirement
     def current_temperature(self) -> float:
         """Current temperature of the heater-shaker's plate."""
         return self._module.temperature
 
     @property  # type: ignore[misc]
-    @requires_version(2, 13)
+    @requires_heatershaker_ff  # TODO: replace with API version requirement
     def current_speed(self) -> int:
         """Current speed of the heater-shaker's plate."""
         return self._module.speed
 
     @property  # type: ignore[misc]
-    @requires_version(2, 13)
+    @requires_heatershaker_ff  # TODO: replace with API version requirement
     def target_speed(self) -> Optional[int]:
         """Target speed of the heater-shaker's plate."""
         return self._module.target_speed
 
     @property  # type: ignore[misc]
-    @requires_version(2, 13)
+    @requires_heatershaker_ff  # TODO: replace with API version requirement
     def temperature_status(self) -> str:
         """Heater-shaker's temperature status string.
 
@@ -848,7 +852,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         return self._module.temperature_status.value
 
     @property  # type: ignore[misc]
-    @requires_version(2, 13)
+    @requires_heatershaker_ff  # TODO: replace with API version requirement
     def speed_status(self) -> str:
         """Heater-shaker's speed status string.
 
@@ -862,7 +866,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         return self._module.speed_status.value
 
     @property  # type: ignore[misc]
-    @requires_version(2, 13)
+    @requires_heatershaker_ff  # TODO: replace with API version requirement
     def labware_latch_status(self) -> str:
         """Heater-shaker's labware latch status string.
 
@@ -877,12 +881,14 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         return self._module.labware_latch_status.value
 
     @publish(command=cmds.heater_shaker_set_and_wait_for_temperature)
-    @requires_version(2, 13)
+    @requires_heatershaker_ff  # TODO: replace with API version requirement
     def set_and_wait_for_temperature(self, celsius: float) -> None:
         """Set and wait for target temperature.
 
         Sets the heater-shaker target temperature and delays protocol execution
         until target temperature has reached.
+
+        Note: The H/S truncates the temperature param to 2 decimal places
 
         :param celsius: The target temperature, in °C in range 37°C to 95°C.
         """
@@ -890,7 +896,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         self.wait_for_temperature()
 
     @publish(command=cmds.heater_shaker_set_target_temperature)
-    @requires_version(2, 13)
+    @requires_heatershaker_ff  # TODO: replace with API version requirement
     def set_target_temperature(self, celsius: float) -> None:
         """Set target temperature and return immediately.
 
@@ -898,12 +904,14 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         waiting for the target to be reached. Does not delay the protocol until
         target temperature has reached. Use `wait_for_target_temperature` to delay
         protocol execution.
+
+        Note: The H/S truncates the temperature param to 2 decimal places
         """
         validated_temp = validate_heater_shaker_temperature(celsius=celsius)
         self._module.start_set_temperature(celsius=validated_temp)
 
     @publish(command=cmds.heater_shaker_wait_for_temperature)
-    @requires_version(2, 13)
+    @requires_heatershaker_ff  # TODO: replace with API version requirement
     def wait_for_temperature(self) -> None:
         """Wait for target temperature.
 
@@ -917,20 +925,27 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         self._module.await_temperature(awaiting_temperature=self.target_temperature)
 
     @publish(command=cmds.heater_shaker_set_and_wait_for_shake_speed)
-    @requires_version(2, 13)
+    @requires_heatershaker_ff  # TODO: replace with API version requirement
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set and wait for target speed.
 
         Set the heater shaker's target speed and wait until the specified speed has
         reached. Delays protocol execution until the target speed has been achieved.
         """
-        # TODO: Figure out whether to raise error when latch is open or
-        #  whether to issue close latch behind the scenes
-        validated_speed = validate_heater_shaker_speed(rpm=rpm)
-        self._module.set_speed(rpm=validated_speed)
+        if (
+            self._module.labware_latch_status
+            == HeaterShakerLabwareLatchStatus.IDLE_CLOSED
+        ):
+            validated_speed = validate_heater_shaker_speed(rpm=rpm)
+            self._module.set_speed(rpm=validated_speed)
+        else:
+            # TODO: Figure out whether to issue close latch behind the scenes instead
+            raise CannotPerformModuleAction(
+                "Cannot start H/S shake unless labware" " latch is closed."
+            )
 
     @publish(command=cmds.heater_shaker_open_labware_latch)
-    @requires_version(2, 13)
+    @requires_heatershaker_ff  # TODO: replace with API version requirement
     def open_labware_latch(self) -> None:
         """Open heater-shaker's labware latch.
 
@@ -948,19 +963,19 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         self._module.open_labware_latch()
 
     @publish(command=cmds.heater_shaker_close_labware_latch)
-    @requires_version(2, 13)
+    @requires_heatershaker_ff  # TODO: replace with API version requirement
     def close_labware_latch(self) -> None:
         """Close heater-shaker's labware latch"""
         self._module.close_labware_latch()
 
     @publish(command=cmds.heater_shaker_deactivate_shaker)
-    @requires_version(2, 13)
+    @requires_heatershaker_ff  # TODO: replace with API version requirement
     def deactivate_shaker(self) -> None:
         """Stop shaking."""
         self._module.deactivate_shaker()
 
     @publish(command=cmds.heater_shaker_deactivate_heater)
-    @requires_version(2, 13)
+    @requires_heatershaker_ff  # TODO: replace with API version requirement
     def deactivate_heater(self) -> None:
         """Stop heating."""
         self._module.deactivate_heater()

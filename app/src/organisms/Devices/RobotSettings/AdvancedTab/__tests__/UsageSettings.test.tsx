@@ -1,16 +1,24 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
+
 import { renderWithProviders } from '@opentrons/components'
+
 import { i18n } from '../../../../../i18n'
+import { useIsRobotBusy } from '../../../hooks'
 import { getRobotSettings } from '../../../../../redux/robot-settings'
 
 import { UsageSettings } from '../UsageSettings'
 
 jest.mock('../../../../../redux/robot-settings/selectors')
+jest.mock('../../../hooks')
 
+const mockUpdateRobotStatus = jest.fn()
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
+>
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 
 const mockSettings = {
@@ -25,7 +33,11 @@ const mockSettings = {
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <UsageSettings settings={mockSettings} robotName="otie" />
+      <UsageSettings
+        settings={mockSettings}
+        robotName="otie"
+        updateIsRobotBusy={mockUpdateRobotStatus}
+      />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
@@ -34,6 +46,7 @@ const render = () => {
 describe('RobotSettings DisableHoming', () => {
   beforeEach(() => {
     mockGetRobotSettings.mockReturnValue([mockSettings])
+    mockUseIsRobotBusy.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -65,5 +78,15 @@ describe('RobotSettings DisableHoming', () => {
     })
     fireEvent.click(toggleButton)
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+  })
+
+  it('should call update robot status if a robot is busy', () => {
+    mockUseIsRobotBusy.mockReturnValue(true)
+    const [{ getByRole }] = render()
+    const toggleButton = getByRole('switch', {
+      name: 'usage_settings_pause_protocol',
+    })
+    fireEvent.click(toggleButton)
+    expect(mockUpdateRobotStatus).toHaveBeenCalled()
   })
 })

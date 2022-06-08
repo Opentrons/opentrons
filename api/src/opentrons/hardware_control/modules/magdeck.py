@@ -95,8 +95,7 @@ class MagDeck(mod_abc.AbstractModule):
         """Get the model."""
         return self._model_from_revision(self._device_info.get("model"))
 
-    @classmethod
-    def bootloader(cls) -> types.UploadFunction:
+    def bootloader(self) -> types.UploadFunction:
         """Get the bootloating method."""
         return update.upload_via_avrdude
 

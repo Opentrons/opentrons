@@ -466,10 +466,11 @@ class ProtocolContext(CommandPublisher):
         :returns: The loaded and initialized module---a
                   :py:class:`TemperatureModuleContext`, or
                   :py:class:`ThermocyclerContext`, or
-                  :py:class:`MagneticModuleContext`, or
-                  :py:class:`HeaterShakerModuleContext`,
+                  :py:class:`MagneticModuleContext`
                   depending on what you requested with ``module_name``.
         """
+        # TODO: add heater-shaker to the returns values in above docstring
+
         if self._api_version < APIVersion(2, 4) and configuration:
             raise APIVersionError(
                 f"You have specified API {self._api_version}, but you are"
@@ -477,7 +478,6 @@ class ProtocolContext(CommandPublisher):
             )
 
         requested_model = resolve_module_model(module_name)
-
         load_result = self._implementation.load_module(
             model=requested_model, location=location, configuration=configuration
         )

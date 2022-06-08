@@ -3,14 +3,12 @@ import pytest
 from decoy import Decoy, matchers
 
 from opentrons.protocol_engine.state import StateStore
-from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
+from opentrons.protocol_engine.errors import RunStoppedError
 from opentrons.protocol_engine.execution import CommandExecutor, QueueWorker
 
 
 class BreakLoopError(Exception):
     """An exception to break out of the worker's wait-for-new-command loop."""
-
-    pass
 
 
 @pytest.fixture
@@ -129,10 +127,10 @@ async def test_engine_stopped_exception_breaks_loop_gracefully(
     command_executor: CommandExecutor,
     subject: QueueWorker,
 ) -> None:
-    """It should `join` gracefully if a ProtocolEngineStoppedError is raised."""
+    """It should `join` gracefully if a RunStoppedError is raised."""
     decoy.when(
         await state_store.wait_for(condition=state_store.commands.get_next_queued)
-    ).then_raise(ProtocolEngineStoppedError("oh no"))
+    ).then_raise(RunStoppedError("oh no"))
 
     subject.start()
     await subject.join()
