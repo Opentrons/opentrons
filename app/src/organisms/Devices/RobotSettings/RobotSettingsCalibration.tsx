@@ -43,6 +43,8 @@ import * as Config from '../../../redux/config'
 import * as Sessions from '../../../redux/sessions'
 import * as Calibration from '../../../redux/calibration'
 import * as Pipettes from '../../../redux/pipettes'
+import * as PipetteOffset from '../../../redux/calibration/pipette-offset'
+import * as TipLength from '../../../redux/calibration/tip-length'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
@@ -470,6 +472,8 @@ export function RobotSettingsCalibration({
       dispatch(Calibration.fetchCalibrationStatus(robotName))
       dispatch(Calibration.fetchPipetteOffsetCalibrations(robotName))
       dispatch(Calibration.fetchTipLengthCalibrations(robotName))
+      dispatch(PipetteOffset.fetchPipetteOffsetCalibrations(robotName))
+      dispatch(TipLength.fetchTipLengthCalibrations(robotName))
       checkPipetteCalibrationMissing()
     },
     CALS_FETCH_MS,
