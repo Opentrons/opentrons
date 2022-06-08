@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import partition from 'lodash/partition'
 
 import {
@@ -13,6 +13,7 @@ import {
   SIZE_2,
   SIZE_6,
   SPACING,
+  useInterval,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import {
@@ -21,6 +22,7 @@ import {
   getReachableRobots,
   getUnreachableRobots,
 } from '../../../redux/discovery'
+import * as Config from '../../../redux/config'
 import { RobotCard } from '../../../organisms/Devices/RobotCard'
 import { DevicesEmptyState } from '../../../organisms/Devices/DevicesEmptyState'
 import { CollapsibleSection } from '../../../molecules/CollapsibleSection'
@@ -30,7 +32,7 @@ import { StyledText } from '../../../atoms/text'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { NewRobotSetupHelp } from './NewRobotSetupHelp'
 
-import type { State } from '../../../redux/types'
+import type { Dispatch, State } from '../../../redux/types'
 
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/en/articles/2687601-troubleshooting-connection-problems'
@@ -48,6 +50,7 @@ export function DevicesLanding(): JSX.Element {
   const unreachableRobots = useSelector((state: State) =>
     getUnreachableRobots(state)
   )
+  const dispatch = useDispatch<Dispatch>()
 
   const [unhealthyReachableRobots, recentlySeenRobots] = partition(
     reachableRobots,
@@ -61,6 +64,19 @@ export function DevicesLanding(): JSX.Element {
       ...unhealthyReachableRobots,
       ...unreachableRobots,
     ].length === 0
+
+  const displayUnavailRobots = useSelector((state: State) => {
+    return Config.getConfig(state)?.discovery.disableCache ?? false
+  })
+
+  React.useEffect(() => {
+    dispatch(
+      Config.updateConfigValue(
+        'discovery.disableCache',
+        Boolean(!displayUnavailRobots)
+      )
+    )
+  }, [displayUnavailRobots, dispatch])
 
   return (
     <Box minWidth={SIZE_6} padding={`${SPACING.spacing3} ${SPACING.spacing4}`}>
