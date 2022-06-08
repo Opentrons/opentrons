@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import partition from 'lodash/partition'
 
 import {
