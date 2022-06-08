@@ -464,7 +464,8 @@ export function RobotSettingsCalibration({
     }
   }, [createStatus])
 
-  // Note this
+  // Note: following fetch need to reflect the latest state of calibrations
+  // when a user does calibration or rename a robot.
   useInterval(
     () => {
       dispatch(Calibration.fetchCalibrationStatus(robotName))
