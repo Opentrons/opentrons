@@ -24,6 +24,6 @@ export const MenuItem: BtnComponent = styled(Btn)`
 
   &:disabled,
   &.disabled {
-    color: ${COLORS.greyDisabled};
+    color: ${COLORS.darkGreyDisabled};
   }
 `

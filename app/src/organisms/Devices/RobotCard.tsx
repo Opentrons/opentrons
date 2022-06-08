@@ -49,7 +49,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.white}
-      border={`1px solid ${COLORS.medGrey}`}
+      border={`1px solid ${COLORS.medGreyEnabled}`}
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_ROW}
       marginBottom={SPACING.spacing3}

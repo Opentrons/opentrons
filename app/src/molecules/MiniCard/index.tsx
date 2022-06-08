@@ -10,7 +10,7 @@ interface MiniCardProps {
 }
 const unselectedOptionStyles = css`
   background-color: ${COLORS.white};
-  border: 1px solid ${COLORS.medGrey};
+  border: 1px solid ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing3};
   margin-bottom: ${SPACING.spacing3};

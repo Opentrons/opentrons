@@ -136,7 +136,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
               {title}
             </React.Fragment>
           )}
-          <Divider marginY={0} color={COLORS.medGrey} />
+          <Divider marginY={0} color={COLORS.medGreyEnabled} />
           <Box
             padding={SPACING.spacing4}
             flex="1 1 auto"

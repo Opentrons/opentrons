@@ -200,14 +200,14 @@ function AttachedModuleItem(props: AttachedModuleItemProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_ROW} marginTop={'0.625rem'}>
       <Text
-        color={COLORS.darkGrey}
+        color={COLORS.darkGreyEnabled}
         paddingRight={SPACING.spacing4}
         data-testid={`attach_module_${step}`}
       >
         {step}
       </Text>
       <Flex
-        border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}
+        border={`${SPACING.spacingXXS} solid ${COLORS.medGreyEnabled}`}
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         padding={`${SPACING.spacing4} ${SPACING.spacingM} ${SPACING.spacingM} ${SPACING.spacing4}`}

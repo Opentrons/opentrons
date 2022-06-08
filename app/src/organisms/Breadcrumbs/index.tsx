@@ -100,7 +100,7 @@ export function Breadcrumbs(): JSX.Element | null {
       <Flex
         alignItems={ALIGN_FLEX_START}
         backgroundColor={COLORS.white}
-        borderBottom={`1px solid ${COLORS.medGrey}`}
+        borderBottom={`1px solid ${COLORS.medGreyEnabled}`}
         css={TYPOGRAPHY.labelRegular}
         flexDirection={DIRECTION_ROW}
         padding={`${SPACING.spacing2} 0 ${SPACING.spacing2} ${SPACING.spacing3}`}

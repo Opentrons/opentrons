@@ -22,7 +22,7 @@ const DROP_ZONE_STYLES = css`
   align-items: ${ALIGN_CENTER};
   width: 100%;
   padding: ${SPACING.spacing6};
-  border: 2px dashed ${COLORS.medGrey};
+  border: 2px dashed ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   text-align: center;
   background-color: ${COLORS.white};

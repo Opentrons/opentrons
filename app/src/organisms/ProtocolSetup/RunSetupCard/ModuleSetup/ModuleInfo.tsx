@@ -74,7 +74,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
               marginRight={SPACING.spacing2}
             />
             <StyledText
-              color={COLORS.darkGrey}
+              color={COLORS.darkGreyEnabled}
               fontSize={TYPOGRAPHY.fontSizeCaption}
             >
               {!isAttached ? t('module_not_connected') : t('module_connected')}
@@ -83,13 +83,13 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
         ) : null}
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkGrey}
+          color={COLORS.darkGreyEnabled}
           fontSize={TYPOGRAPHY.fontSizeLabel}
         >
           {getModuleDisplayName(moduleModel)}
         </StyledText>
         <StyledText
-          color={COLORS.darkGrey}
+          color={COLORS.darkGreyEnabled}
           fontSize={TYPOGRAPHY.fontSizeH6}
           fontStyle={
             runHasStarted

@@ -39,8 +39,8 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   }
 
   &:disabled {
-    background-color: ${COLORS.greyDisabled};
-    color: ${COLORS.disabled};
+    background-color: ${COLORS.darkGreyDisabled};
+    color: ${COLORS.errorDisabled};
   }
 `
 
@@ -78,8 +78,8 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   }
 
   &:disabled {
-    background-color: ${COLORS.greyDisabled};
-    color: ${COLORS.disabled};
+    background-color: ${COLORS.darkGreyDisabled};
+    color: ${COLORS.errorDisabled};
   }
 `
 
@@ -107,6 +107,6 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
 `
 
 export const ToggleButton = (props: ToggleBtnProps): JSX.Element => {
-  const color = props.toggledOn ? COLORS.blueEnabled : COLORS.darkGrey
+  const color = props.toggledOn ? COLORS.blueEnabled : COLORS.darkGreyEnabled
   return <ToggleBtn size={SIZE_2} color={color} {...props} />
 }

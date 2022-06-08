@@ -26,7 +26,7 @@ const style = css`
   font-size: ${TYPOGRAPHY.fontSizeP};
   padding-bottom: ${TYPOGRAPHY.fontSizeH6};
   background-color: transparent;
-  color: ${COLORS.darkBlack};
+  color: ${COLORS.darkBlackEnabled};
   padding-left: ${TYPOGRAPHY.fontSizeLabel};
   padding-right: ${TYPOGRAPHY.fontSizeLabel};
   padding-top: ${SPACING.spacing3};
@@ -37,7 +37,7 @@ const style = css`
 
   &:disabled,
   &.disabled {
-    color: ${COLORS.greyDisabled};
+    color: ${COLORS.darkGreyDisabled};
   }
 `
 const btn = <Flex css={style}>{'Example menu btn'}</Flex>

@@ -61,7 +61,7 @@ const INNER_STYLE_VALUE = css`
     box-shadow: 0 0 0 3px ${COLORS.focus};
   }
   &:disabled {
-    color: ${COLORS.disabled};
+    color: ${COLORS.bluePressed};
   }
 `
 
@@ -87,7 +87,7 @@ const INNER_STYLE_NO_VALUE = css`
     box-shadow: 0 0 0 3px ${COLORS.focus};
   }
   &:disabled {
-    color: ${COLORS.disabled};
+    color: ${COLORS.darkGreyPressed};
   }
 `
 export function CheckboxField(props: CheckboxFieldProps): JSX.Element {

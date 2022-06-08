@@ -156,8 +156,8 @@ export const LabwarePositionCheckStepDetail = (
                 wellStroke={wellStroke}
                 wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
                 highlightedWellLabels={{ wells: wellsToHighlight }}
-                labwareStroke={COLORS.medGrey}
-                wellLabelColor={COLORS.medGrey}
+                labwareStroke={COLORS.medGreyEnabled}
+                wellLabelColor={COLORS.medGreyEnabled}
               />
               <PipetteRender
                 labwareDef={labwareDef}

@@ -97,7 +97,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
-              backgroundColor={COLORS.medGrey}
+              backgroundColor={COLORS.medGreyEnabled}
               borderRadius={BORDERS.radiusSoftCorners}
               marginLeft={SPACING.spacing3}
             >

@@ -7,21 +7,21 @@ const overflowButtonStyles = css`
   max-height: ${SPACING.spacing6};
 
   &:hover {
-    background-color: ${COLORS.lightGreyHover};
+    background-color: ${COLORS.lightGreyEnabled};
   }
 
   &:active {
-    background-color: ${COLORS.darkBlackEnabled};
-    box-shadow: 0 0 0 1px ${COLORS.darkBlackEnabled};
+    background-color: ${COLORS.lightGreyHover};
+    box-shadow: 0 0 0 1px ${COLORS.lightGreyHover};
   }
 
   &:active circle {
     fill: ${COLORS.darkGreyPressed};
-    background-color: ${COLORS.lightGreyPressed};
+    background-color: ${COLORS.lightGreyHover};
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.focus};
+    box-shadow: 0 0 0 3px ${COLORS.darkGreyPressed};
   }
 
   &:enabled {
@@ -32,7 +32,7 @@ const overflowButtonStyles = css`
   &:disabled,
   &.disabled {
     fill: ${COLORS.errorDisabled};
-    fill-opacity: 0.5; // Need?
+    fill-opacity: 0.5;
   }
 `
 
@@ -43,7 +43,7 @@ export const OverflowBtn = React.forwardRef(
         width="19"
         height="31"
         viewBox="0 0 19 31"
-        fill={COLORS.darkGrey}
+        fill={COLORS.darkGreyEnabled}
         xmlns="http://www.w3.org/2000/svg"
       >
         <circle cx="9.5" cy="9.5" r="1.5" />

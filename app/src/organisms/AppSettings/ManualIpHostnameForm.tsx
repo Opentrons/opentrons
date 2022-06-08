@@ -37,7 +37,7 @@ const StyledInput = styled.input`
   width: 100%;
   flex: 6;
   margin: ${SPACING.spacing2} 0;
-  border: 1px solid ${COLORS.medGrey};
+  border: 1px solid ${COLORS.medGreyEnabled};
 `
 
 export function ManualIpHostnameForm(props: Props): JSX.Element {
@@ -54,7 +54,8 @@ export function ManualIpHostnameForm(props: Props): JSX.Element {
     onSubmit: (values, { resetForm }) => {
       const ip = values.ip.trim()
       const inputForm = document.getElementById('ip')
-      if (inputForm) inputForm.style.border = `1px solid ${COLORS.medGrey}`
+      if (inputForm)
+        inputForm.style.border = `1px solid ${COLORS.medGreyEnabled}`
       addManualIpAndHostname(ip)
       props.setMostRecentAddition(ip)
       resetForm({ values: undefined })

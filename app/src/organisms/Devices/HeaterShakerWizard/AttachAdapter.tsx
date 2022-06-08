@@ -29,13 +29,13 @@ export function AttachAdapter(): JSX.Element {
       </Flex>
       <Flex flexDirection={DIRECTION_ROW}>
         <Text
-          color={COLORS.darkGrey}
+          color={COLORS.darkGreyEnabled}
           paddingRight={SPACING.spacing4}
           data-testid={`attach_adapter_2a`}
         >
           {t('2a')}
         </Text>
-        <Flex border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}>
+        <Flex border={`${SPACING.spacingXXS} solid ${COLORS.medGreyEnabled}`}>
           <Flex
             padding={`${SPACING.spacing2} 5rem ${SPACING.spacing4} 3rem`}
             data-testid={`attach_adapter_screw_in_adapter_image`}
@@ -89,14 +89,14 @@ export function AttachAdapter(): JSX.Element {
       </Flex>
       <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacingSM}>
         <Text
-          color={COLORS.darkGrey}
+          color={COLORS.darkGreyEnabled}
           paddingRight={SPACING.spacing4}
           data-testid={`attach_adapter_2b`}
         >
           {t('2b')}
         </Text>
         <Flex
-          border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}
+          border={`${SPACING.spacingXXS} solid ${COLORS.medGreyEnabled}`}
           width="100%"
         >
           <Flex
@@ -124,14 +124,14 @@ export function AttachAdapter(): JSX.Element {
       </Flex>
       <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacingSM}>
         <Text
-          color={COLORS.darkGrey}
+          color={COLORS.darkGreyEnabled}
           paddingRight={SPACING.spacing4}
           data-testid={`attach_adapter_3a`}
         >
           {t('2c')}
         </Text>
         <Flex
-          border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}
+          border={`${SPACING.spacingXXS} solid ${COLORS.medGreyEnabled}`}
           flexDirection={DIRECTION_COLUMN}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           padding={`${SPACING.spacing4} ${SPACING.spacingM} ${SPACING.spacingM} ${SPACING.spacing4}`}

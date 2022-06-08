@@ -52,7 +52,7 @@ export const ModuleExtraAttention = (
       {modulesThatRequireExtraAttention.map((module, index) => {
         return (
           <React.Fragment key={index}>
-            {index > 0 && <Divider color={COLORS.medGrey} />}
+            {index > 0 && <Divider color={COLORS.medGreyEnabled} />}
             {
               <ModuleExtraAttentionItem
                 moduleInfo={module}

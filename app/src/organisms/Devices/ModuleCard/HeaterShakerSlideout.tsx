@@ -190,7 +190,7 @@ export const HeaterShakerSlideout = (
           <Text
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             fontSize={TYPOGRAPHY.fontSizeH6}
-            color={COLORS.darkGrey}
+            color={COLORS.darkGreyEnabled}
             marginBottom={SPACING.spacing3}
           >
             {isSetShake ? t('set_shake_speed') : t('set_block_temp')}

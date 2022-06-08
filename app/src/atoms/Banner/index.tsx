@@ -54,7 +54,7 @@ const BANNER_PROPS_BY_TYPE: Record<
   },
   updating: {
     icon: { name: 'ot-spinner' },
-    backgroundColor: COLORS.greyDisabled,
+    backgroundColor: COLORS.darkGreyDisabled,
     color: COLORS.darkGreyEnabled,
   },
   informing: {

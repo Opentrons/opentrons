@@ -38,7 +38,7 @@ const NavbarLink = styled(NavLink)`
   }
 
   &:active {
-    background-color: ${COLORS.darkBlackPressed};
+    background-color: ${COLORS.darkBlackEnabled};
   }
 
   &.active {
@@ -50,13 +50,13 @@ const NavbarLink = styled(NavLink)`
 `
 const NavIconLink = styled(NavLink)`
   &.active > svg {
-    color: ${COLORS.medGrey};
+    color: ${COLORS.medGreyEnabled};
     background-color: ${COLORS.darkBlackSelected};
   }
 `
 const IconLink = styled(Link)`
   &.active > svg {
-    color: ${COLORS.medGrey};
+    color: ${COLORS.medGreyEnabled};
     background-color: ${COLORS.darkBlackSelected};
   }
 `
@@ -66,22 +66,22 @@ const NavbarIcon = styled(Icon)`
   height: ${SIZE_2};
   padding: 0.375rem;
   border-radius: 50%;
-  color: ${COLORS.medGrey};
+  color: ${COLORS.medGreyEnabled};
   background-color: ${COLORS.transparent};
 
   &:hover,
   &:focus {
-    color: ${COLORS.medGrey};
-    background-color: ${COLORS.darkBlackHover};
+    color: ${COLORS.medGreyEnabled};
+    background-color: ${COLORS.darkBlackLight};
   }
 
   &:active {
-    color: ${COLORS.medGrey};
-    background-color: ${COLORS.darkBlackPressed};
+    color: ${COLORS.medGreyEnabled};
+    background-color: ${COLORS.darkBlackEnabled};
   }
 
   &.active {
-    color: ${COLORS.medGrey};
+    color: ${COLORS.medGreyEnabled};
     background-color: ${COLORS.darkBlackSelected};
   }
 `

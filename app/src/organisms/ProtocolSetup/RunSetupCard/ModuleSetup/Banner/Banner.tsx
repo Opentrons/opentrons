@@ -83,7 +83,7 @@ export const BannerItem = (props: BannerItemProps): JSX.Element => {
       >
         <Text
           marginTop={SPACING.spacing3}
-          color={COLORS.darkGrey}
+          color={COLORS.darkGreyEnabled}
           fontSize={TYPOGRAPHY.fontSizeP}
           maxWidth={SIZE_6}
           data-testid={`banner_subtitle_${props.title}`}

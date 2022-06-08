@@ -415,9 +415,15 @@ export function ProtocolDetails(
           <Box padding={SPACING.spacing4} backgroundColor={COLORS.white}>
             {
               {
-                missing: <Box size="15rem" backgroundColor={COLORS.medGrey} />,
-                loading: <Box size="15rem" backgroundColor={COLORS.medGrey} />,
-                error: <Box size="15rem" backgroundColor={COLORS.medGrey} />,
+                missing: (
+                  <Box size="15rem" backgroundColor={COLORS.medGreyEnabled} />
+                ),
+                loading: (
+                  <Box size="15rem" backgroundColor={COLORS.medGreyEnabled} />
+                ),
+                error: (
+                  <Box size="15rem" backgroundColor={COLORS.medGreyEnabled} />
+                ),
                 complete: (
                   <DeckThumbnail
                     commands={mostRecentAnalysis?.commands ?? []}
@@ -456,7 +462,7 @@ export function ProtocolDetails(
           </Flex>
           <Box
             backgroundColor={COLORS.white}
-            border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGrey}`}
+            border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
             // remove left upper corner border radius when first tab is active
             borderRadius={`${
               currentTab === 'robot_config' ? '0' : BORDERS.radiusSoftCorners

@@ -88,7 +88,7 @@ function Input(props: InputFieldProps): JSX.Element {
     border-radius: ${SPACING.spacing2};
     padding: ${SPACING.spacing3};
     border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
-      ${error ? COLORS.errorEnabled : COLORS.medGrey};
+      ${error ? COLORS.errorEnabled : COLORS.medGreyEnabled};
     font-size: ${TYPOGRAPHY.fontSizeP};
 
     &:active {
@@ -116,7 +116,8 @@ function Input(props: InputFieldProps): JSX.Element {
       border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.blueEnabled};
     }
     &:disabled {
-      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.greyDisabled};
+      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+        ${COLORS.darkGreyDisabled};
     }
     input[type='number']::-webkit-inner-spin-button,
     input[type='number']::-webkit-outer-spin-button {

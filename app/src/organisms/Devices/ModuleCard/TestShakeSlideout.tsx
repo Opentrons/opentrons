@@ -159,7 +159,7 @@ export const TestShakeSlideout = (
         </Flex>
       </Flex>
       <Flex
-        border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}
+        border={`${SPACING.spacingXXS} solid ${COLORS.medGreyEnabled}`}
         borderRadius={SPACING.spacing2}
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -211,7 +211,7 @@ export const TestShakeSlideout = (
             </Tooltip>
           ) : null}
         </Flex>
-        <Divider color={COLORS.medGrey} />
+        <Divider color={COLORS.medGreyEnabled} />
         <Text
           fontSize={TYPOGRAPHY.fontSizeP}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -265,7 +265,7 @@ export const TestShakeSlideout = (
         </Flex>
       </Flex>
       <Flex
-        border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}
+        border={`${SPACING.spacingXXS} solid ${COLORS.medGreyEnabled}`}
         borderRadius={SPACING.spacing2}
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
