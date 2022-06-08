@@ -1,6 +1,5 @@
 """Test blow-out command."""
 from decoy import Decoy
-from dataclasses import field
 from typing import cast
 
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset

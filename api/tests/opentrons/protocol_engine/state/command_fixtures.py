@@ -274,3 +274,28 @@ def create_move_to_well_command(
         params=params,
         result=result,
     )
+
+
+def create_blow_out_command(
+    pipette_id: str,
+    labware_id: str = "labware-id",
+    well_name: str = "A1",
+    well_location: Optional[WellLocation] = None,
+) -> cmd.BlowOut:
+    """Get a completed BlowOut command."""
+    params = cmd.BlowOutParams(
+        pipetteId=pipette_id,
+        labwareId=labware_id,
+        wellName=well_name,
+        wellLocation=well_location or WellLocation(),
+    )
+    result = cmd.BlowOutResult()
+
+    return cmd.BlowOut(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
