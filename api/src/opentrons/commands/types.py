@@ -153,7 +153,6 @@ class ResumeCommand(TypedDict):
 
 
 class HeaterShakerSetAndWaitForTemperaturePayload(TextOnlyPayload):
-    temperature: float
     pass
 
 
@@ -163,7 +162,6 @@ class HeaterShakerSetAndWaitForTemperatureCommand(TypedDict):
 
 
 class HeaterShakerSetTargetTemperaturePayload(TextOnlyPayload):
-    temperature: float
     pass
 
 
@@ -182,7 +180,6 @@ class HeaterShakerWaitForTemperatureCommand(TypedDict):
 
 
 class HeaterShakerSetAndWaitForShakeSpeedPayload(TextOnlyPayload):
-    rpm: int
     pass
 
 
@@ -544,14 +541,14 @@ Command = Union[
     DispenseCommand,
     AspirateCommand,
     HomeCommand,
-    HeaterShakerSetAndWaitForTemperature,
-    HeaterShakerSetTargetTemperature,
-    HeaterShakerWaitForTemperature,
-    HeaterShakerSetAndWaitForShakeSpeed,
-    HeaterShakerOpenLabwareLatch,
-    HeaterShakerCloseLabwareLatch,
-    HeaterShakerDeactivateShaker,
-    HeaterShakerDeactivateHeater,
+    HeaterShakerSetAndWaitForTemperatureCommand,
+    HeaterShakerSetTargetTemperatureCommand,
+    HeaterShakerWaitForTemperatureCommand,
+    HeaterShakerSetAndWaitForShakeSpeedCommand,
+    HeaterShakerOpenLabwareLatchCommand,
+    HeaterShakerCloseLabwareLatchCommand,
+    HeaterShakerDeactivateShakerCommand,
+    HeaterShakerDeactivateHeaterCommand,
     ThermocyclerCloseCommand,
     ThermocyclerWaitForLidTempCommand,
     ThermocyclerDeactivateCommand,
