@@ -48,11 +48,20 @@ def axis_nodes() -> List["NodeId"]:
         NodeId.head_r,
         NodeId.pipette_left,
         NodeId.pipette_right,
+        NodeId.gripper_z,
     ]
 
 
 def node_axes() -> List[OT3Axis]:
-    return [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.P_L, OT3Axis.P_R]
+    return [
+        OT3Axis.X,
+        OT3Axis.Y,
+        OT3Axis.Z_L,
+        OT3Axis.Z_R,
+        OT3Axis.P_L,
+        OT3Axis.P_R,
+        OT3Axis.Z_G,
+    ]
 
 
 def home_axes() -> List[OT3Axis]:
@@ -75,7 +84,8 @@ def axis_to_node(axis: OT3Axis) -> "NodeId":
         OT3Axis.Z_R: NodeId.head_r,
         OT3Axis.P_L: NodeId.pipette_left,
         OT3Axis.P_R: NodeId.pipette_right,
-        OT3Axis.Z_G: NodeId.gripper,
+        OT3Axis.Z_G: NodeId.gripper_z,
+        OT3Axis.G: NodeId.gripper_g,
     }
     return anm[axis]
 
@@ -88,7 +98,8 @@ def node_to_axis(node: "NodeId") -> OT3Axis:
         NodeId.head_r: OT3Axis.Z_R,
         NodeId.pipette_left: OT3Axis.P_L,
         NodeId.pipette_right: OT3Axis.P_R,
-        NodeId.gripper: OT3Axis.Z_G,
+        NodeId.gripper_z: OT3Axis.Z_G,
+        NodeId.gripper_g: OT3Axis.G,
     }
     return nam[node]
 

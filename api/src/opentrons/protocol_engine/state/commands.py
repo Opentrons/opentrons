@@ -25,13 +25,13 @@ from ..actions import (
 
 from ..commands import Command, CommandStatus, CommandIntent
 from ..errors import (
-    ProtocolEngineError,
     CommandDoesNotExistError,
     RunStoppedError,
     ErrorOccurrence,
     RobotDoorOpenError,
     SetupCommandNotAllowedError,
     PauseNotAllowedError,
+    ProtocolCommandFailedError,
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
@@ -239,6 +239,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
             prev_entry = self._state.commands_by_id[action.command_id]
             self._state.commands_by_id[action.command_id] = CommandEntry(
                 index=prev_entry.index,
+                # TODO(mc, 2022-06-06): add new "cancelled" status or similar
+                # and don't set `completedAt` in commands other than the
+                # specific one that failed
                 command=prev_entry.command.copy(
                     update={
                         "error": error_occurrence,
@@ -306,12 +309,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 else:
                     self._state.run_result = RunResult.STOPPED
 
-                # any `ProtocolEngineError`'s will be captured by `FailCommandAction`,
-                # so only capture unknown errors here
-                if action.error_details and not isinstance(
-                    action.error_details.error,
-                    ProtocolEngineError,
-                ):
+                if action.error_details:
                     error_id = action.error_details.error_id
                     created_at = action.error_details.created_at
                     error = action.error_details.error
@@ -498,14 +496,20 @@ class CommandView(HasState[CommandState]):
     def get_all_complete(self) -> bool:
         """Get whether all added commands have completed.
 
-        See `get_is_complete()` for what counts as "completed."
+        Raises:
+            CommandExecutionFailedError: if any added command failed.
         """
-        # Since every command is either queued, running, failed, or succeeded,
-        # "none running and none queued" == "all succeeded or failed".
-        return (
-            self._state.running_command_id is None
-            and len(self._state.queued_command_ids) == 0
-        )
+        no_command_running = self._state.running_command_id is None
+        no_command_queued = len(self._state.queued_command_ids) == 0
+
+        if no_command_running and no_command_queued:
+            for command_id in self._state.all_command_ids:
+                command = self._state.commands_by_id[command_id].command
+                if command.error and command.intent != CommandIntent.SETUP:
+                    raise ProtocolCommandFailedError(command_id=command_id)
+            return True
+        else:
+            return False
 
     def get_stop_requested(self) -> bool:
         """Get whether an engine stop has been requested.
@@ -517,6 +521,10 @@ class CommandView(HasState[CommandState]):
     def get_is_stopped(self) -> bool:
         """Get whether an engine stop has completed."""
         return self._state.run_completed_at is not None
+
+    def has_been_played(self) -> bool:
+        """Get whether engine has started."""
+        return self._state.run_started_at is not None
 
     def validate_action_allowed(
         self,

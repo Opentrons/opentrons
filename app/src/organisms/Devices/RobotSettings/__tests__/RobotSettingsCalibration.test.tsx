@@ -271,7 +271,7 @@ describe('RobotSettingsCalibration', () => {
     getByText(
       'Deck calibration measures the deck position relative to the gantry. This calibration is the foundation for tip length and pipette offset calibrations. Calibrate your deck during new robot setup. Redo deck calibration if you relocate your robot.'
     )
-    getByRole('button', { name: 'Recalibrate deck' })
+    getByRole('button', { name: 'Calibrate deck' })
     getByText('Last calibrated: September 15, 2021 00:00')
   })
 
@@ -298,9 +298,7 @@ describe('RobotSettingsCalibration', () => {
     getByRole('button', { name: 'Calibrate now' })
   })
 
-  // TODO kj 06/02/2022 temporarily skip this case and this will be solved by another PR
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip('should call update robot status if a robot is busy - deck cal', () => {
+  it('should call update robot status if a robot is busy - deck cal', () => {
     mockUseDeckCalibrationStatus.mockReturnValue(
       Calibration.DECK_CAL_STATUS_IDENTITY
     )
@@ -311,7 +309,7 @@ describe('RobotSettingsCalibration', () => {
     mockGetIsRunning.mockReturnValue(false)
     mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Recalibrate deck' })
+    const button = getByRole('button', { name: 'Calibrate deck' })
     fireEvent.click(button)
     expect(mockUpdateRobotStatus).toHaveBeenCalled()
   })
@@ -330,21 +328,21 @@ describe('RobotSettingsCalibration', () => {
   it('recalibration button is disabled when a robot is unreachable', () => {
     mockUseRobot.mockReturnValue(mockUnreachableRobot)
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Recalibrate deck' })
+    const button = getByRole('button', { name: 'Calibrate deck' })
     expect(button).toBeDisabled()
   })
 
   it('recalibration button is disabled when a robot is running', () => {
     mockGetIsRunning.mockReturnValue(true)
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Recalibrate deck' })
+    const button = getByRole('button', { name: 'Calibrate deck' })
     expect(button).toBeDisabled()
   })
 
-  it('recalibration button is disabled when a robot pipettes are null', () => {
+  it('deck calibration button is disabled when a robot pipettes are null', () => {
     mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Recalibrate deck' })
+    const button = getByRole('button', { name: 'Calibrate deck' })
     expect(button).toBeDisabled()
   })
 
@@ -392,7 +390,7 @@ describe('RobotSettingsCalibration', () => {
   it('renders a Check health button', () => {
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Check health' })
-    expect(button).toBeDisabled()
+    expect(button).not.toBeDisabled()
   })
 
   it('Health check button is disabled when a robot is unreachable', () => {

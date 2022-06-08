@@ -50,6 +50,7 @@ import {
   useTipLengthCalibrations,
   useDeckCalibrationStatus,
   useIsRobotBusy,
+  useAttachedPipettes,
 } from '../hooks'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
@@ -183,9 +184,7 @@ export function RobotSettingsCalibration({
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
   const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
-  const attachedPipettes = useSelector((state: State) => {
-    return Pipettes.getAttachedPipettes(state, robotName)
-  })
+  const attachedPipettes = useAttachedPipettes()
 
   const isRunning = useSelector(robotSelectors.getIsRunning)
 
@@ -195,7 +194,7 @@ export function RobotSettingsCalibration({
   )
 
   const pipettePresent =
-    !(attachedPipettes?.left == null) || !(attachedPipettes?.right == null)
+    !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
 
   const isPending =
     useSelector<State, RequestState | null>(state =>
@@ -209,6 +208,7 @@ export function RobotSettingsCalibration({
       ? RobotApi.getRequestById(state, createRequestId.current)
       : null
   )
+
   const createStatus = createRequest?.status
 
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
@@ -283,9 +283,10 @@ export function RobotSettingsCalibration({
     )
   }
 
-  const deckCalibrationButtonText = deckCalibrationData.isDeckCalibrated
-    ? t('deck_calibration_recalibrate_button')
-    : t('deck_calibration_calibrate_button')
+  const deckCalibrationButtonText =
+    deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_IDENTITY
+      ? t('deck_calibration_recalibrate_button')
+      : t('deck_calibration_calibrate_button')
 
   const disabledOrBusyReason = isPending
     ? t('robot_calibration:deck_calibration_spinner', {
@@ -520,7 +521,7 @@ export function RobotSettingsCalibration({
         {createStatus === RobotApi.FAILURE && (
           <AlertModal
             alertOverlay
-            heading={t('deck_calibration_failure')}
+            heading={t('robot_calibration:deck_calibration_failure')}
             buttons={[
               {
                 children: t('shared:ok'),
@@ -609,7 +610,7 @@ export function RobotSettingsCalibration({
           </Box>
           <TertiaryButton
             onClick={() => handleClickDeckCalibration()}
-            disabled={disabledOrBusyReason !== null}
+            disabled={disabledOrBusyReason != null}
           >
             {deckCalibrationButtonText}
           </TertiaryButton>

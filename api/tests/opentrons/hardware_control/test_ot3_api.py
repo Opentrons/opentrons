@@ -1,12 +1,12 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
-from typing import cast, Iterator, Union
+from typing import cast, Iterator, Union, Dict
 from typing_extensions import Literal
 from math import copysign
 import pytest
 from mock import AsyncMock, patch
 from opentrons.config.types import GantryLoad, CapacitivePassSettings
-from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.dev_types import InstrumentDict
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
@@ -58,13 +58,31 @@ def mock_gantry_position(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncM
             GantryLoad.TWO_LOW_THROUGHPUT,
         ),
         ({}, GantryLoad.NONE),
+        ({OT3Mount.GRIPPER: {"name": "gripper"}}, GantryLoad.GRIPPER),
         ({OT3Mount.LEFT: {"channels": 1}}, GantryLoad.LOW_THROUGHPUT),
         ({OT3Mount.RIGHT: {"channels": 8}}, GantryLoad.LOW_THROUGHPUT),
         ({OT3Mount.RIGHT: {"channels": 96}}, GantryLoad.HIGH_THROUGHPUT),
+        (
+            {OT3Mount.LEFT: {"channels": 1}, OT3Mount.GRIPPER: {"name": "gripper"}},
+            GantryLoad.LOW_THROUGHPUT,
+        ),
+        (
+            {OT3Mount.RIGHT: {"channels": 8}, OT3Mount.GRIPPER: {"name": "gripper"}},
+            GantryLoad.LOW_THROUGHPUT,
+        ),
+        (
+            {OT3Mount.RIGHT: {"channels": 96}, OT3Mount.GRIPPER: {"name": "gripper"}},
+            GantryLoad.HIGH_THROUGHPUT,
+        ),
     ),
 )
 def test_gantry_load_transform(attached, load):
-    assert OT3API._gantry_load_from_instruments(cast(PipetteDict, attached)) == load
+    assert (
+        OT3API._gantry_load_from_instruments(
+            cast(Dict[OT3Mount, InstrumentDict], attached)
+        )
+        == load
+    )
 
 
 @pytest.fixture

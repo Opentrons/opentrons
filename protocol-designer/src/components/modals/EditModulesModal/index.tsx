@@ -153,6 +153,7 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
         initialDeckSetup,
         getSlotNextTo(selectedSlot) ?? ''
       )
+
       const isHeaterShakerAdjacentToAnotherModule = some(
         initialDeckSetup.modules,
         hwModule => getAreSlotsAdjacent(hwModule.slot, selectedSlot)
