@@ -140,7 +140,7 @@ export function RobotSettingsCalibration({
     setPipetteOffsetCalBannerType,
   ] = React.useState<string>('')
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
-  const isRunHasStartedAAndRobotBusy = useRobotBusyAndRunStarted()
+  const isRobotBusyAndRunStarted = useRobotBusyAndRunStarted()
   const isBusy = useIsRobotBusy()
 
   const robot = useRobot(robotName)
@@ -437,7 +437,7 @@ export function RobotSettingsCalibration({
   }
 
   const handleClickDeckCalibration = (): void => {
-    if (isRunHasStartedAAndRobotBusy) {
+    if (isRobotBusyAndRunStarted) {
       updateRobotStatus(true)
     } else {
       confirmStart()
