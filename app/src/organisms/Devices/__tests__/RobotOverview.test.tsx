@@ -8,12 +8,18 @@ import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import { useDispatchApiRequest } from '../../../redux/robot-api'
+import { fetchLights } from '../../../redux/robot-controls'
 import { useLights, useRobot } from '../hooks'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 import { RobotOverview } from '../RobotOverview'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 
+import type { DispatchApiRequestType } from '../../../redux/robot-api'
+
+jest.mock('../../../redux/robot-api')
+jest.mock('../../../redux/robot-controls')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 jest.mock('../RobotStatusBanner')
@@ -40,6 +46,10 @@ const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
 const mockRobotOverviewOverflowMenu = RobotOverviewOverflowMenu as jest.MockedFunction<
   typeof RobotOverviewOverflowMenu
 >
+const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
+  typeof useDispatchApiRequest
+>
+const mockFetchLights = fetchLights as jest.MockedFunction<typeof fetchLights>
 
 const mockToggleLights = jest.fn()
 
@@ -55,7 +65,11 @@ const render = () => {
 }
 
 describe('RobotOverview', () => {
+  let dispatchApiRequest: DispatchApiRequestType
+
   beforeEach(() => {
+    dispatchApiRequest = jest.fn()
+    mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
     mockUseLights.mockReturnValue({
       lightsOn: false,
       toggleLights: mockToggleLights,
@@ -91,6 +105,11 @@ describe('RobotOverview', () => {
   it('renders a UpdateRobotBanner component', () => {
     const [{ getByText }] = render()
     getByText('Mock UpdateRobotBanner')
+  })
+
+  it('fetches lights status', () => {
+    render()
+    expect(dispatchApiRequest).toBeCalledWith(mockFetchLights('otie'))
   })
 
   it('renders a lights toggle button', () => {

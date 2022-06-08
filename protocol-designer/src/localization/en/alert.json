@@ -158,6 +158,14 @@
     "HEATER_SHAKER_ADJACENT_LABWARE_TOO_TALL": {
       "title": "Cannot place module",
       "body": "Slot {{selectedSlot}} is occupied by labware over 53mm tall. The Heater-Shaker's labware latch risks collision with this labware."
+    },
+    "HEATER_SHAKER_ADJACENT_TO_ANOTHER_MODULE": {
+      "title": "Cannot place module",
+      "body": "Slot {{selectedSlot}} is occupied by a module. The Heater-Shaker cannot be placed in front of or behind another module."
+    },
+    "HEATER_SHAKER_ADJACENT_TO_MODULE": {
+      "title": "Cannot place module",
+      "body": "Slot {{selectedSlot}} is occupied by a Heater-Shaker. Other modules cannot be placed in front of or behind a Heater-Shaker."
     }
   },
   "export_warnings": {
