@@ -156,3 +156,10 @@ export const heaterShakerNorthSouthEastWestShaking = (): CommandCreatorError => 
     message: 'The Heater-Shaker is shaking',
   }
 }
+
+export const heaterShakerEastWestOfMultiChannelPipette = (): CommandCreatorError => {
+  return {
+    type: 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL',
+    message: 'The Heater-Shaker is shaking',
+  }
+}
