@@ -47,7 +47,7 @@ def test_alternative_service_name_sequencing() -> None:
             # and no room left to increment the sequence number.
             # Pathological, but maybe someone "clever" set the name to this manually.
             "Num999999999999999999999999999999999999999999999999999999999999",
-            # Incremented the sequence number and truncated the trailing zero.
+            # Rolled back to 0.
             # This is an arbitrary solution and it can change according to whatever's
             # easiest to implement.
             "Num0",
