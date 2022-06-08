@@ -22,7 +22,7 @@ _COLLISION_POLL_INTERVAL = 5
 SERVICE_NAME_MAXIMUM_OCTETS = 63
 """The maximum length of an Avahi service name.
 
-Measured in octets (bytes) -- not code points or characters!
+Measured in UTF-8 octets (bytes) -- not code points or characters!
 
 This comes from the DNS-SD specification on instance names,
 which Avahi service names correspond to, under the hood.
