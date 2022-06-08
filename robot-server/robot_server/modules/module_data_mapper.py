@@ -53,11 +53,12 @@ class ModuleDataMapper:
 
         # rely on Pydantic to check/coerce data fields from dicts at run time
         if module_type == ModuleType.MAGNETIC:
+            height = cast(float, live_data["data"].get("height"))
             module_cls = MagneticModule
             module_data = MagneticModuleData(
                 status=MagneticStatus(live_data["status"]),
                 engaged=cast(bool, live_data["data"].get("engaged")),
-                height=cast(float, live_data["data"].get("height")),
+                height=height/2 if module_model == ModuleModel.MAGNETIC_MODULE_V1 else height,
             )
 
         elif module_type == ModuleType.TEMPERATURE:
