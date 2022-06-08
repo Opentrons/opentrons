@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from ..execution import MovementHandler
     from ..state import StateView
 
-BlowOutCommandType = Literal["blow-out"]
+BlowOutCommandType = Literal["blowout"]
 
 
 class BlowOutParams(BasePipettingParams):
