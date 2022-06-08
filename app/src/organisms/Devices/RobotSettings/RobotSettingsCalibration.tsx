@@ -147,10 +147,6 @@ export function RobotSettingsCalibration({
   const deckCalStatus = useSelector((state: State) => {
     return Calibration.getDeckCalibrationStatus(state, robotName)
   })
-  // const attachedPipetteCalibrations = useSelector((state: State) => {
-  //   return Pipettes.getAttachedPipetteCalibrations(state, robotName)
-  // })
-
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
   const dispatch = useDispatch<Dispatch>()
 
@@ -266,25 +262,9 @@ export function RobotSettingsCalibration({
     pipetteCalPresent &&
     pipettePresent
 
-  // console.log(
-  //   'first',
-  //   !([
-  //     Calibration.DECK_CAL_STATUS_SINGULARITY,
-  //     Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
-  //     Calibration.DECK_CAL_STATUS_IDENTITY,
-  //   ] as Array<typeof deckCalStatus>).includes(deckCalStatus)
-  // )
-  // console.log('second', pipetteCalPresent)
-  // console.log('third', pipettePresent)
-
   const calCheckButtonDisabled = healthCheckIsPossible
     ? Boolean(buttonDisabledReason) || isPending
     : true
-
-  // console.log('healthCheckIsPossible', healthCheckIsPossible)
-  // console.log('buttonDisabledReason', buttonDisabledReason)
-  // console.log('isPending', isPending)
-  // console.log('calCheckButtonDisabled', calCheckButtonDisabled)
 
   const onClickSaveAs: React.MouseEventHandler = e => {
     e.preventDefault()
