@@ -63,7 +63,7 @@ async def test_blow_out_implementation(
 
     result = await subject.execute(data)
 
-    assert isinstance(result, BlowOutResult)
+    assert result == BlowOutResult()
 
     decoy.verify(
         state_view.pipettes.get_hardware_pipette(
