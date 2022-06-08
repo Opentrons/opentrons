@@ -79,28 +79,6 @@ class AvahiClient:
                 None, self._sync_client.start_advertising, service_name
             )
 
-    async def alternative_service_name(self, current_service_name: str) -> str:
-        """Return an alternative to the given Avahi service name.
-
-        This is useful for fixing name collisions with other things on the network.
-        For example:
-
-            alternative_service_name("Foo") == "Foo #2"
-            alternative_service_name("Foo #2") == "Foo #3"
-
-        Appending incrementing integers like this, instead of using something like
-        the machine's serial number, follows a recommendation in the DNS-SD spec:
-        https://datatracker.ietf.org/doc/html/rfc6763#appendix-D
-        """
-        # We delegate to the Avahi daemon to find the alternative name for us.
-        # We could compute it ourselves, but getting Avahi to do it is convenient
-        # because it handles edge cases like appending "#2" to a name that already has
-        # the maximum length.
-        async with self._lock:
-            return await asyncio.get_running_loop().run_in_executor(
-                None, self._sync_client.alternative_service_name, current_service_name
-            )
-
     @contextlib.asynccontextmanager
     async def listen_for_collisions(
         self, callback: CollisionCallback
@@ -159,6 +137,39 @@ class AvahiClient:
 
 
 CollisionCallback = Callable[[], Awaitable[None]]
+
+
+# TODO(mm, 2022-06-08): Delegate to Avahi instead of implementing this ourselves
+# when it becomes safe for our names to have spaces and number signs.
+# See code history on https://github.com/Opentrons/opentrons/pull/10559.
+def alternative_service_name(current_service_name: str) -> str:
+    """Return an alternative to the given Avahi service name.
+
+    This is useful for fixing name collisions with other things on the network.
+    For example:
+
+        alternative_service_name("Foo") == "FooNum2"
+        alternative_service_name("FooNum2") == "FooNum3"
+
+    Appending incrementing integers like this, instead of using something like
+    the machine's serial number, follows a recommendation in the DNS-SD spec:
+    https://datatracker.ietf.org/doc/html/rfc6763#appendix-D
+
+    We use "Num" as a separator because:
+
+    * Having some separator is good to avoid accidentally "incrementing" names that are
+      serial numbers; we don't want OT2CEP20200827B10 to become OT2CEP20200827B11.
+
+    * The Opentrons App is temporarily limiting user-input names to alphanumeric
+      characters while other server-side bugs are being resolved.
+      So, the names that we generate here should also be alphanumeric.
+      https://github.com/Opentrons/opentrons/issues/10214
+
+    * The number sign (#) character in particular breaks the Opentrons App,
+      so we especially can't use that.
+      https://github.com/Opentrons/opentrons/issues/10672
+    """
+    raise NotImplementedError()
 
 
 class _SyncClient:
@@ -238,11 +249,6 @@ class _SyncClient:
         )
 
         self._entry_group.Commit()
-
-    def alternative_service_name(self, current_service_name: str) -> str:
-        result = self._server.GetAlternativeServiceName(current_service_name)
-        assert isinstance(result, str)
-        return result
 
     def is_collided(self) -> bool:
         state = self._entry_group.GetState()

@@ -7,7 +7,7 @@ from typing import AsyncGenerator, Optional
 from aiohttp import web
 
 from otupdate.common.constants import APP_VARIABLE_PREFIX
-from .avahi import AvahiClient
+from .avahi import AvahiClient, alternative_service_name
 from .pretty_hostname import get_pretty_hostname, persist_pretty_hostname
 
 
@@ -112,9 +112,7 @@ class NameSynchronizer:
         # Assume that the service name was the thing that collided.
         # Theoretically it also could have been the static hostname,
         # but our static hostnames are unique in practice, so that's unlikely.
-        alternative_name = await self._avahi_client.alternative_service_name(
-            current_name
-        )
+        alternative_name = alternative_service_name(current_name)
         _log.info(
             f"Name collision detected by Avahi."
             f" Changing name from {repr(current_name)} to {repr(alternative_name)}."

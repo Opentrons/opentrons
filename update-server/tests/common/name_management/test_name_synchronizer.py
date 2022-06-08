@@ -6,7 +6,10 @@ from decoy import Decoy, matchers
 
 from otupdate.common.name_management import name_synchronizer
 from otupdate.common.name_management.name_synchronizer import NameSynchronizer
-from otupdate.common.name_management.avahi import AvahiClient
+from otupdate.common.name_management.avahi import (
+    AvahiClient,
+    alternative_service_name as real_alternative_service_name,
+)
 from otupdate.common.name_management.pretty_hostname import (
     get_pretty_hostname as real_get_pretty_hostname,
     persist_pretty_hostname as real_persist_pretty_hostname,
@@ -15,6 +18,7 @@ from otupdate.common.name_management.pretty_hostname import (
 
 _GET_PRETTY_HOSTNAME_SIGNATURE = Callable[[], str]
 _PERSIST_PRETTY_HOSTNAME_SIGNATURE = Callable[[str], str]
+_ALTERNATIVE_SERVICE_NAME_SIGNATURE = Callable[[str], str]
 
 
 @pytest.fixture
@@ -46,6 +50,22 @@ def monkeypatch_persist_pretty_hostname(
     """Replace the real persist_pretty_hostname with our mock."""
     monkeypatch.setattr(
         name_synchronizer, "persist_pretty_hostname", mock_persist_pretty_hostname
+    )
+
+
+@pytest.fixture
+def mock_alternative_service_name(decoy: Decoy) -> _ALTERNATIVE_SERVICE_NAME_SIGNATURE:
+    """Return a mock in the shape of the alternative_service_name() function."""
+    return decoy.mock(func=real_alternative_service_name)
+
+
+@pytest.fixture
+def monkeypatch_alternative_service_name(
+    monkeypatch: Any, mock_alternative_service_name: _ALTERNATIVE_SERVICE_NAME_SIGNATURE
+) -> None:
+    """Replace the real alternative_service_name() with our mock."""
+    monkeypatch.setattr(
+        name_synchronizer, "alternative_service_name", mock_alternative_service_name
     )
 
 
@@ -158,6 +178,8 @@ async def test_collision_handling(
     monkeypatch_get_pretty_hostname: None,
     mock_persist_pretty_hostname: _PERSIST_PRETTY_HOSTNAME_SIGNATURE,
     monkeypatch_persist_pretty_hostname: None,
+    mock_alternative_service_name: _ALTERNATIVE_SERVICE_NAME_SIGNATURE,
+    monkeypatch_alternative_service_name: None,
     mock_avahi_client: AvahiClient,
     decoy: Decoy,
 ) -> None:
@@ -170,9 +192,9 @@ async def test_collision_handling(
     3. Persist it as the pretty hostname.
     """
     decoy.when(mock_get_pretty_hostname()).then_return("initial name")
-    decoy.when(
-        await mock_avahi_client.alternative_service_name("initial name")
-    ).then_return("alternative name")
+    decoy.when(mock_alternative_service_name("initial name")).then_return(
+        "alternative name"
+    )
 
     # Expect the subject to do:
     #
