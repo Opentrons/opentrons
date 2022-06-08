@@ -242,15 +242,15 @@ __all__ = [
     "SetRailLightsCreate",
     "SetRailLightsResult",
     "SetRailLightsCommandType",
-    # module command bundles
-    "heater_shaker",
-    "magnetic_module",
-    "temperature_module",
-    "thermocycler",
     # blow out command models
     "BlowOutResult",
     "BlowOutCreate",
     "BlowOutImplementation",
     "BlowOutParams",
     "BlowOut",
+    # module command bundles
+    "heater_shaker",
+    "magnetic_module",
+    "temperature_module",
+    "thermocycler",
 ]
