@@ -313,6 +313,7 @@ describe('RobotSettingsCalibration', () => {
       deckCalibrationData: mockWarningDeckCalData,
       isDeckCalibrated: true,
     })
+    mockUseRunHasStarted.mockReturnValue(true)
     mockGetIsRunning.mockReturnValue(false)
     mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByRole }] = render()
