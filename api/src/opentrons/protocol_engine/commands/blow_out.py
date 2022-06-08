@@ -18,7 +18,7 @@ BlowOutCommandType = Literal["blow-out"]
 
 
 class BlowOutParams(BasePipettingParams):
-    """Payload required to blow-out to a specific well."""
+    """Payload required to blow-out a specific well."""
 
     pass
 
