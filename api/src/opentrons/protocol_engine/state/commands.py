@@ -518,6 +518,10 @@ class CommandView(HasState[CommandState]):
         """Get whether an engine stop has completed."""
         return self._state.run_completed_at is not None
 
+    def has_been_played(self) -> bool:
+        """Get whether engine has started."""
+        return self._state.run_started_at is not None
+
     def validate_action_allowed(
         self,
         action: Union[PlayAction, PauseAction, StopAction, QueueCommandAction],
