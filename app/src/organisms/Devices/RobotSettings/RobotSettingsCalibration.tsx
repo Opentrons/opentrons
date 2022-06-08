@@ -53,6 +53,7 @@ import {
   useDeckCalibrationStatus,
   useIsRobotBusy,
   useAttachedPipettes,
+  useAttachedPipetteCalibrations,
 } from '../hooks'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
@@ -146,9 +147,10 @@ export function RobotSettingsCalibration({
   const deckCalStatus = useSelector((state: State) => {
     return Calibration.getDeckCalibrationStatus(state, robotName)
   })
-  const attachedPipetteCalibrations = useSelector((state: State) => {
-    return Pipettes.getAttachedPipetteCalibrations(state, robotName)
-  })
+  // const attachedPipetteCalibrations = useSelector((state: State) => {
+  //   return Pipettes.getAttachedPipetteCalibrations(state, robotName)
+  // })
+
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
   const dispatch = useDispatch<Dispatch>()
 
@@ -187,6 +189,7 @@ export function RobotSettingsCalibration({
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
   const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
   const attachedPipettes = useAttachedPipettes()
+  const attachedPipetteCalibrations = useAttachedPipetteCalibrations(robotName)
 
   const isRunning = useSelector(robotSelectors.getIsRunning)
 
@@ -263,9 +266,25 @@ export function RobotSettingsCalibration({
     pipetteCalPresent &&
     pipettePresent
 
+  // console.log(
+  //   'first',
+  //   !([
+  //     Calibration.DECK_CAL_STATUS_SINGULARITY,
+  //     Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
+  //     Calibration.DECK_CAL_STATUS_IDENTITY,
+  //   ] as Array<typeof deckCalStatus>).includes(deckCalStatus)
+  // )
+  // console.log('second', pipetteCalPresent)
+  // console.log('third', pipettePresent)
+
   const calCheckButtonDisabled = healthCheckIsPossible
-    ? Boolean(buttonDisabledReason)
+    ? Boolean(buttonDisabledReason) || isPending
     : true
+
+  // console.log('healthCheckIsPossible', healthCheckIsPossible)
+  // console.log('buttonDisabledReason', buttonDisabledReason)
+  // console.log('isPending', isPending)
+  // console.log('calCheckButtonDisabled', calCheckButtonDisabled)
 
   const onClickSaveAs: React.MouseEventHandler = e => {
     e.preventDefault()
