@@ -4,11 +4,12 @@ inputs:
   project:
     description: 'Which project (by subdirectory) to set up'
     required: true
-  python-version:
-    description: "What Python version to use to create the project's virtual environment"
+  target:
+    description: 'Which makefile operation to preform'
     required: false
+    default: 'setup'
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args: 
-  - 'make -C ${{ inputs.project}} setup'
+  - 'make -C ${{ inputs.project}} ${{inputs.target}}'

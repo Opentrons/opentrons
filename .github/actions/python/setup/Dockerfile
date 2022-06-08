@@ -20,4 +20,6 @@ RUN source /root/.bashrc && nvm install 14 && nvm use 14 && npm install --global
 
 COPY ./ .
 RUN git clone https://github.com/Opentrons/opentrons.git && cd opentrons && git checkout $GITHUB_SHA && \
-pip install pipenv && make setup
+pip install pipenv
+WORKDIR /opentrons
+ENTRYPOINT [ "/bin/bash" ]
