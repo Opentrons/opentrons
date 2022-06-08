@@ -40,10 +40,16 @@ MOVE_TO: Final = "command.MOVE_TO"
 
 # Modules #
 
-HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE: Final = "command.HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE"
-HEATER_SHAKER_SET_TARGET_TEMPERATURE: Final = "command.HEATER_SHAKER_SET_TARGET_TEMPERATURE"
+HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE: Final = (
+    "command.HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE"
+)
+HEATER_SHAKER_SET_TARGET_TEMPERATURE: Final = (
+    "command.HEATER_SHAKER_SET_TARGET_TEMPERATURE"
+)
 HEATER_SHAKER_WAIT_FOR_TEMPERATURE: Final = "command.HEATER_SHAKER_WAIT_FOR_TEMPERATURE"
-HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED: Final = "command.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED"
+HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED: Final = (
+    "command.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED"
+)
 HEATER_SHAKER_OPEN_LABWARE_LATCH: Final = "command.HEATER_SHAKER_OPEN_LABWARE_LATCH"
 HEATER_SHAKER_CLOSE_LABWARE_LATCH: Final = "command.HEATER_SHAKER_CLOSE_LABWARE_LATCH"
 HEATER_SHAKER_DEACTIVATE_SHAKER: Final = "command.HEATER_SHAKER_DEACTIVATE_SHAKER"
@@ -150,61 +156,75 @@ class HeaterShakerSetAndWaitForTemperaturePayload(TextOnlyPayload):
     temperature: float
     pass
 
+
 class HeaterShakerSetAndWaitForTemperatureCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE"]
     payload: HeaterShakerSetAndWaitForTemperaturePayload
+
 
 class HeaterShakerSetTargetTemperaturePayload(TextOnlyPayload):
     temperature: float
     pass
 
+
 class HeaterShakerSetTargetTemperatureCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_SET_TARGET_TEMPERATURE"]
     payload: HeaterShakerSetTargetTemperaturePayload
 
+
 class HeaterShakerWaitForTemperaturePayload(TextOnlyPayload):
     pass
+
 
 class HeaterShakerWaitForTemperatureCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_WAIT_FOR_TEMPERATURE"]
     payload: HeaterShakerWaitForTemperaturePayload
 
+
 class HeaterShakerSetAndWaitForShakeSpeedPayload(TextOnlyPayload):
     rpm: int
     pass
+
 
 class HeaterShakerSetAndWaitForShakeSpeedCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED"]
     payload: HeaterShakerSetAndWaitForShakeSpeedPayload
 
+
 class HeaterShakerOpenLabwareLatchPayload(TextOnlyPayload):
     pass
+
 
 class HeaterShakerOpenLabwareLatchCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_OPEN_LABWARE_LATCH"]
     payload: HeaterShakerOpenLabwareLatchPayload
 
+
 class HeaterShakerCloseLabwareLatchPayload(TextOnlyPayload):
     pass
+
 
 class HeaterShakerCloseLabwareLatchCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_CLOSE_LABWARE_LATCH"]
     payload: HeaterShakerCloseLabwareLatchPayload
 
+
 class HeaterShakerDeactivateShakerPayload(TextOnlyPayload):
     pass
+
 
 class HeaterShakerDeactivateShakerCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_DEACTIVATE_SHAKER"]
     payload: HeaterShakerDeactivateShakerPayload
 
+
 class HeaterShakerDeactivateHeaterPayload(TextOnlyPayload):
     pass
+
 
 class HeaterShakerDeactivateHeaterCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_DEACTIVATE_HEATER"]
     payload: HeaterShakerDeactivateHeaterPayload
-
 
 
 class MagdeckEngageCommandPayload(TextOnlyPayload):
@@ -666,29 +686,54 @@ class AspirateMessage(CommandMessageFields, AspirateCommand):
 class HomeMessage(CommandMessageFields, HomeCommand):
     pass
 
-class HeaterShakerSetAndWaitForTemperatureMessage(CommandMessageFields, HeaterShakerSetAndWaitForTemperatureCommand):
+
+class HeaterShakerSetAndWaitForTemperatureMessage(
+    CommandMessageFields, HeaterShakerSetAndWaitForTemperatureCommand
+):
     pass
 
-class HeaterShakerSetTargetTemperatureMessage(CommandMessageFields, HeaterShakerSetTargetTemperatureCommand):
+
+class HeaterShakerSetTargetTemperatureMessage(
+    CommandMessageFields, HeaterShakerSetTargetTemperatureCommand
+):
     pass
 
-class HeaterShakerWaitForTemperatureMessage(CommandMessageFields, HeaterShakerWaitForTemperatureCommand):
+
+class HeaterShakerWaitForTemperatureMessage(
+    CommandMessageFields, HeaterShakerWaitForTemperatureCommand
+):
     pass
 
-class HeaterShakerSetAndWaitForShakeSpeedMessage(CommandMessageFields, HeaterShakerSetAndWaitForShakeSpeedCommand):
+
+class HeaterShakerSetAndWaitForShakeSpeedMessage(
+    CommandMessageFields, HeaterShakerSetAndWaitForShakeSpeedCommand
+):
     pass
 
-class HeaterShakerOpenLabwareLatchMessage(CommandMessageFields, HeaterShakerOpenLabwareLatchCommand):
+
+class HeaterShakerOpenLabwareLatchMessage(
+    CommandMessageFields, HeaterShakerOpenLabwareLatchCommand
+):
     pass
 
-class HeaterShakerCloseLabwareLatchMessage(CommandMessageFields, HeaterShakerCloseLabwareLatchCommand):
+
+class HeaterShakerCloseLabwareLatchMessage(
+    CommandMessageFields, HeaterShakerCloseLabwareLatchCommand
+):
     pass
 
-class HeaterShakerDeactivateShakerMessage(CommandMessageFields, HeaterShakerDeactivateShakerCommand):
+
+class HeaterShakerDeactivateShakerMessage(
+    CommandMessageFields, HeaterShakerDeactivateShakerCommand
+):
     pass
 
-class HeaterShakerDeactivateHeaterMessage(CommandMessageFields, HeaterShakerDeactivateHeaterCommand):
+
+class HeaterShakerDeactivateHeaterMessage(
+    CommandMessageFields, HeaterShakerDeactivateHeaterCommand
+):
     pass
+
 
 class ThermocyclerCloseMessage(CommandMessageFields, ThermocyclerCloseCommand):
     pass
