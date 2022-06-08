@@ -13,7 +13,6 @@ import {
   SIZE_2,
   SIZE_6,
   SPACING,
-  useInterval,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import {
@@ -21,7 +20,6 @@ import {
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
-  clearDiscoveryCache,
 } from '../../../redux/discovery'
 import * as Config from '../../../redux/config'
 import { RobotCard } from '../../../organisms/Devices/RobotCard'
@@ -33,12 +31,10 @@ import { StyledText } from '../../../atoms/text'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { NewRobotSetupHelp } from './NewRobotSetupHelp'
 
-import type { Dispatch, State } from '../../../redux/types'
+import type { State } from '../../../redux/types'
 
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/en/articles/2687601-troubleshooting-connection-problems'
-
-const CLEAR_CACHE_POLL_MS = 5000
 
 export function DevicesLanding(): JSX.Element {
   const { t } = useTranslation('devices_landing')
@@ -53,8 +49,6 @@ export function DevicesLanding(): JSX.Element {
   const unreachableRobots = useSelector((state: State) =>
     getUnreachableRobots(state)
   )
-  const dispatch = useDispatch<Dispatch>()
-
   const [unhealthyReachableRobots, recentlySeenRobots] = partition(
     reachableRobots,
     robot => robot.healthStatus === 'ok'
@@ -71,17 +65,6 @@ export function DevicesLanding(): JSX.Element {
   const displayUnavailRobots = useSelector((state: State) => {
     return Config.getConfig(state)?.discovery.disableCache ?? false
   })
-
-  const isRobotsUnavail =
-    recentlySeenRobots.length > 0 || unreachableRobots.length > 0
-
-  useInterval(
-    () => {
-      dispatch(clearDiscoveryCache())
-    },
-    isRobotsUnavail && displayUnavailRobots ? CLEAR_CACHE_POLL_MS : null,
-    true
-  )
 
   return (
     <Box minWidth={SIZE_6} padding={`${SPACING.spacing3} ${SPACING.spacing4}`}>
@@ -122,16 +105,25 @@ export function DevicesLanding(): JSX.Element {
           <CollapsibleSection
             marginY={SPACING.spacing4}
             title={t('unavailable', {
-              count: [...recentlySeenRobots, ...unreachableRobots].length,
+              count: !displayUnavailRobots
+                ? [...recentlySeenRobots, ...unreachableRobots].length
+                : 0,
             })}
             isExpandedInitially={healthyReachableRobots.length === 0}
           >
-            {recentlySeenRobots.map(robot => (
-              <RobotCard key={robot.name} robot={{ ...robot, local: null }} />
-            ))}
-            {unreachableRobots.map(robot => (
-              <RobotCard key={robot.name} robot={robot} />
-            ))}
+            {!displayUnavailRobots ? (
+              <>
+                {recentlySeenRobots.map(robot => (
+                  <RobotCard
+                    key={robot.name}
+                    robot={{ ...robot, local: null }}
+                  />
+                ))}
+                {unreachableRobots.map(robot => (
+                  <RobotCard key={robot.name} robot={robot} />
+                ))}
+              </>
+            ) : null}
           </CollapsibleSection>
         </>
       )}
