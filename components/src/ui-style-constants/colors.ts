@@ -60,7 +60,17 @@ export const transparent = 'transparent'
 export const alphaToOpacity35 = '35'
 export const backgroundOverlay = `${darkBlackEnabled}${alphaToOpacity35}`
 
-// colors liquid to be added
+// colors pd liquid
+export const electricPurple ='#b925ff'
+export const goldenYellow = '#ffd600'
+export const aquamarine = '#9dffd8'
+export const orangePeel = '#ff9900'
+export const skyBlue = '#50d5ff'
+export const popPink = '#ff80f5'
+export const richBlue = '#0380fb'
+export const springGreen = '#7eff42'
+export const tartRed = '#ff4f4f'
+export const whaleGrey = '#9395a0'
 
 // colors fundamentals
 // export const background = '#f8f8f8'
