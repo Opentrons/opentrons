@@ -75,7 +75,7 @@ class BlowOut(BaseCommand[BlowOutParams, BlowOutResult]):
 class BlowOutCreate(BaseCommandCreate[BlowOutParams]):
     """Create blow-out command request model."""
 
-    commandType: BlowOutCommandType = "blow-out"
+    commandType: BlowOutCommandType = "blowout"
     params: BlowOutParams
 
     _CommandCls: Type[BlowOut] = BlowOut
