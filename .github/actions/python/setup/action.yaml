@@ -11,7 +11,7 @@ inputs:
   sha:
     description: 'SHA of commit'
     required: false
-    default: github.sha
+    default: ${{github.sha}}
 runs:
   using: 'docker'
   image: 'docker://otsam/otbuildy:0.0.2'
