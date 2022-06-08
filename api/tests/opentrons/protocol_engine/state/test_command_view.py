@@ -185,9 +185,7 @@ def test_get_is_complete() -> None:
 
 
 def test_get_all_complete() -> None:
-    """It should return true if no commands queued or running."""
-    running_command = create_running_command(command_id="command-id-2")
-
+    """It should return True if no commands queued or running."""
     subject = get_command_view(queued_command_ids=[])
     assert subject.get_all_complete() is True
 
@@ -199,11 +197,54 @@ def test_get_all_complete() -> None:
     )
     assert subject.get_all_complete() is False
 
+
+def test_get_all_complete_fatal_command_failure() -> None:
+    """It should raise an error if any protocol commands failed."""
+    completed_command = create_succeeded_command(command_id="command-id-1")
+    failed_command = create_failed_command(
+        command_id="command-id-2",
+        error=errors.ErrorOccurrence(
+            id="some-error-id",
+            errorType="PrettyBadError",
+            createdAt=datetime(year=2021, month=1, day=1),
+            detail="Oh no",
+        ),
+    )
+
     subject = get_command_view(
         queued_command_ids=[],
-        commands=[running_command],
+        running_command_id=None,
+        commands=[completed_command, failed_command],
     )
-    assert subject.get_all_complete() is True
+
+    with pytest.raises(errors.ProtocolCommandFailedError) as exc_info:
+        subject.get_all_complete()
+
+    assert exc_info.value.command_id == "command-id-2"
+
+
+def test_get_all_complete_setup_not_fatal() -> None:
+    """It should not call setup command fatal."""
+    completed_command = create_succeeded_command(command_id="command-id-1")
+    failed_command = create_failed_command(
+        command_id="command-id-2",
+        intent=cmd.CommandIntent.SETUP,
+        error=errors.ErrorOccurrence(
+            id="some-error-id",
+            errorType="PrettyBadError",
+            createdAt=datetime(year=2021, month=1, day=1),
+            detail="Oh no",
+        ),
+    )
+
+    subject = get_command_view(
+        queued_command_ids=[],
+        running_command_id=None,
+        commands=[completed_command, failed_command],
+    )
+
+    result = subject.get_all_complete()
+    assert result is True
 
 
 def test_get_should_stop() -> None:
