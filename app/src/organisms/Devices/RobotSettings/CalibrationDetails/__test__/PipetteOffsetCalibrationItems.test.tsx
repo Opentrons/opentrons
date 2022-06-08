@@ -7,10 +7,7 @@ import { mockAttachedPipette } from '../../../../../redux/pipettes/__fixtures__'
 import { useAttachedPipettes } from '../../../hooks'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 
-import type {
-  AttachedPipettesByMount,
-  // PipetteCalibrationsByMount,
-} from '../../../../../redux/pipettes/types'
+import type { AttachedPipettesByMount } from '../../../../../redux/pipettes/types'
 
 const render = (
   props: React.ComponentProps<typeof PipetteOffsetCalibrationItems>
