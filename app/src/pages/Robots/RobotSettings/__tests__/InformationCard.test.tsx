@@ -75,15 +75,6 @@ describe('InformationCard', () => {
     jest.resetAllMocks()
   })
 
-  it('checks for update availability on an interval', () => {
-    const { store } = render()
-
-    expect(store.dispatch).not.toHaveBeenCalledWith(checkShellUpdate())
-    jest.advanceTimersByTime(60001)
-    expect(store.dispatch).toHaveBeenCalledTimes(1)
-    expect(store.dispatch).toHaveBeenCalledWith(checkShellUpdate())
-  })
-
   it('should show the robot displayName in a LabeledValue', () => {
     const { wrapper } = render()
 
