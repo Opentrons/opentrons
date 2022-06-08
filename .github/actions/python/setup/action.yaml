@@ -10,6 +10,6 @@ inputs:
     default: 'setup'
 runs:
   using: 'docker'
-  image: 'Dockerfile'
+  image: 'docker://otsam/otbuildy:0.0.1'
   args: 
-  - 'make -C ${{ inputs.project}} ${{inputs.target}}'
+  - 'git clone https://github.com/Opentrons/opentrons.git && cd opentrons && git checkout ${{GITHUB_SHA}} && make -C ${{ inputs.project}} ${{inputs.target}}'

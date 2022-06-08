@@ -19,7 +19,3 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | b
 RUN source /root/.bashrc && nvm install 14 && nvm use 14 && npm install --global yarn
 
 COPY ./ .
-RUN git clone https://github.com/Opentrons/opentrons.git && cd opentrons && git checkout $GITHUB_SHA && \
-pip install pipenv
-WORKDIR /opentrons
-ENTRYPOINT [ "/bin/bash" ]
