@@ -21,6 +21,7 @@ import {
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
+  clearDiscoveryCache,
 } from '../../../redux/discovery'
 import * as Config from '../../../redux/config'
 import { RobotCard } from '../../../organisms/Devices/RobotCard'
@@ -36,6 +37,8 @@ import type { Dispatch, State } from '../../../redux/types'
 
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/en/articles/2687601-troubleshooting-connection-problems'
+
+const CLEAR_CACHE_POLL_MS = 5000
 
 export function DevicesLanding(): JSX.Element {
   const { t } = useTranslation('devices_landing')
@@ -69,14 +72,16 @@ export function DevicesLanding(): JSX.Element {
     return Config.getConfig(state)?.discovery.disableCache ?? false
   })
 
-  React.useEffect(() => {
-    dispatch(
-      Config.updateConfigValue(
-        'discovery.disableCache',
-        Boolean(!displayUnavailRobots)
-      )
-    )
-  }, [displayUnavailRobots, dispatch])
+  const isRobotsUnavail =
+    recentlySeenRobots.length > 0 || unreachableRobots.length > 0
+
+  useInterval(
+    () => {
+      dispatch(clearDiscoveryCache())
+    },
+    isRobotsUnavail && displayUnavailRobots ? CLEAR_CACHE_POLL_MS : null,
+    true
+  )
 
   return (
     <Box minWidth={SIZE_6} padding={`${SPACING.spacing3} ${SPACING.spacing4}`}>

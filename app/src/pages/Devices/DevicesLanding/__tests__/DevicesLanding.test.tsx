@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
 
 import { i18n } from '../../../../i18n'
 import { DevicesEmptyState } from '../../../../organisms/Devices/DevicesEmptyState'
@@ -15,14 +16,17 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../../redux/discovery/__fixtures__'
+import { getConfig } from '../../../../redux/config'
 import { DevicesLanding } from '..'
-import { fireEvent } from '@testing-library/react'
 
 jest.mock('../../../../organisms/Devices/DevicesEmptyState')
 jest.mock('../../../../organisms/Devices/RobotCard')
 jest.mock('../../../../redux/discovery')
+jest.mock('../../../../redux/config')
 
 const mockGetScanning = getScanning as jest.MockedFunction<typeof getScanning>
+
+const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 
 const mockRobotCard = RobotCard as jest.MockedFunction<typeof RobotCard>
 const mockDevicesEmptyState = DevicesEmptyState as jest.MockedFunction<
@@ -46,6 +50,7 @@ const render = () => {
 
 describe('DevicesLanding', () => {
   beforeEach(() => {
+    mockGetConfig.mockReturnValue(null)
     mockGetScanning.mockReturnValue(false)
     mockRobotCard.mockImplementation(({ robot: { name } }) => (
       <div>Mock Robot {name}</div>
