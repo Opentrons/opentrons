@@ -103,8 +103,12 @@ export function AdvancedSettings(): JSX.Element {
     unreachableRobots.length > 0 || recentlySeenRobots.length > 0
 
   const handleDeleteUnavailRobots = (): void => {
-    isUnavailableRobots ? setShowSuccessToast(true) : setShowErrorToast(true)
-    dispatch(clearDiscoveryCache())
+    if (isUnavailableRobots) {
+      setShowSuccessToast(true)
+      dispatch(clearDiscoveryCache())
+    } else {
+      setShowErrorToast(true)
+    }
   }
 
   const {
