@@ -3,14 +3,21 @@ import { renderWithProviders, Mount } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 
 import { TipLengthCalibrationItems } from '../TipLengthCalibrationItems'
+import { OverflowMenu } from '../OverflowMenu'
 
 jest.mock('../../../../../redux/custom-labware/selectors')
 jest.mock('../../../../../redux/config')
 jest.mock('../../../../../redux/sessions/selectors')
 jest.mock('../../../../../redux/discovery')
 jest.mock('../../../../../assets/labware/findLabware')
+jest.mock('../../../hooks')
+jest.mock('../OverflowMenu')
 
 const ROBOT_NAME = 'otie'
+
+const mockOverflowMenu = OverflowMenu as jest.MockedFunction<
+  typeof OverflowMenu
+>
 
 const mockPipetteOffsetCalibrations = [
   {
@@ -58,6 +65,7 @@ describe('TipLengthCalibrationItems', () => {
   let props: React.ComponentProps<typeof TipLengthCalibrationItems>
 
   beforeEach(() => {
+    mockOverflowMenu.mockReturnValue(<div>mock overflow menu</div>)
     props = {
       robotName: ROBOT_NAME,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
@@ -74,9 +82,8 @@ describe('TipLengthCalibrationItems', () => {
   })
 
   it('should render overFlow menu', () => {
-    const [{ getAllByRole }] = render(props)
-    const buttons = getAllByRole('button')
-    expect(buttons).toHaveLength(2)
+    const [{ queryAllByText }] = render(props)
+    expect(queryAllByText('mock overflow menu')).toHaveLength(2)
   })
 
   it('should render tip length calibrations data', () => {
