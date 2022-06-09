@@ -197,8 +197,25 @@ class PipetteContext:  # noqa: D101
         v_offset: float = -1.0,
         speed: float = 60.0,
     ) -> PipetteContext:
-        # TODO: https://github.com/Opentrons/opentrons/issues/9526
-        raise NotImplementedError()
+
+        if location is None:
+            raise NotImplementedError("Not including location not yet supported in PE.")
+        if radius != 1.0:
+            raise NotImplementedError("Radius adjustment not yet supported in PE.")
+        if v_offset != -1.0:
+            raise NotImplementedError("Vertical offset not yet supported in PE.")
+        if speed != 60.0:
+            raise NotImplementedError("Speed parameter not yet supported in PE.")
+
+        self._engine_client.touch_tip(
+            pipette_id=self._pipette_id,
+            labware_id=location.parent.labware_id,
+            well_name=location.well_name,
+            well_location=WellLocation(
+                origin=WellOrigin.BOTTOM,
+                offset=WellOffset(x=0, y=0, z=1),
+            ),
+        )
 
     def air_gap(  # noqa: D102
         self,

@@ -247,6 +247,40 @@ def test_dispense(
     assert result == response
 
 
+def test_touch_tip(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a dispense command."""
+    request = commands.TouchTipCreate(
+        params=commands.TouchTipParams(
+            pipetteId="123",
+            labwareId="456",
+            wellName="A2",
+            wellLocation=WellLocation(
+                origin=WellOrigin.BOTTOM,
+                offset=WellOffset(x=0, y=0, z=1),
+            ),
+        )
+    )
+
+    response = commands.TouchTipResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.touch_tip(
+        pipette_id="123",
+        labware_id="456",
+        well_name="A2",
+        well_location=WellLocation(
+            origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
+        ),
+    )
+
+    assert result == response
+
+
 def test_pause(
     decoy: Decoy,
     transport: AbstractSyncTransport,

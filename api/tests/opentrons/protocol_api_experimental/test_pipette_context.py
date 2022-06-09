@@ -150,3 +150,27 @@ def test_dispense(
             volume=10,
         )
     )
+
+
+def test_touch_tip(
+    decoy: Decoy,
+    engine_client: EngineClient,
+    pipette_id: str,
+    labware_id: str,
+    well: Well,
+    subject: PipetteContext,
+) -> None:
+    """It should send a touch tip command."""
+    subject.touch_tip(location=well)
+
+    decoy.verify(
+        engine_client.touch_tip(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well.well_name,
+            well_location=WellLocation(
+                origin=WellOrigin.BOTTOM,
+                offset=WellOffset(x=0, y=0, z=1),
+            ),
+        )
+    )
