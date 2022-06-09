@@ -151,6 +151,7 @@ def test_dispense(
         )
     )
 
+
 def test_blow_out(
     decoy: Decoy,
     engine_client: EngineClient,
@@ -167,6 +168,6 @@ def test_blow_out(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well.well_name,
-            well_location=WellLocation()
+            well_location=WellLocation(),
         )
     )
