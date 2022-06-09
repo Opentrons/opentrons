@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2022-06-09)
+
+
+### Bug Fixes
+
+* **app:** App fix deck cal button disabled issue ([#10650](https://github.com/Opentrons/opentrons/issues/10650)) ([5819011](https://github.com/Opentrons/opentrons/commit/5819011c5e4ddec6afeb1d7e5527d5f9754ba47c)), closes [#10638](https://github.com/Opentrons/opentrons/issues/10638)
+* **app:** App fix one attached pipette cal display issue ([#10657](https://github.com/Opentrons/opentrons/issues/10657)) ([c5df074](https://github.com/Opentrons/opentrons/commit/c5df074471a041548f84e84369429791a50ed21c)), closes [#10574](https://github.com/Opentrons/opentrons/issues/10574)
+* **app:** check for sw updates with regular top level poll ([#10659](https://github.com/Opentrons/opentrons/issues/10659)) ([62f4476](https://github.com/Opentrons/opentrons/commit/62f4476febd45adbf4dcc39feac8084af2360833))
+* **app:** close labware slideout when labware deleted ([#10663](https://github.com/Opentrons/opentrons/issues/10663)) ([4ce9d70](https://github.com/Opentrons/opentrons/commit/4ce9d70872a6138bf72063efbf18e176722ca427)), closes [#10482](https://github.com/Opentrons/opentrons/issues/10482)
+* **app:** close pipette and module overflow menus on click ([#10662](https://github.com/Opentrons/opentrons/issues/10662)) ([edb5482](https://github.com/Opentrons/opentrons/commit/edb548282052d35f875ba0129d90f8676ed17b37)), closes [#10639](https://github.com/Opentrons/opentrons/issues/10639)
+* **app:** disallow run level module control while the run is paused ([#10685](https://github.com/Opentrons/opentrons/issues/10685)) ([212a0f4](https://github.com/Opentrons/opentrons/commit/212a0f4798e5937cba0a4a2c25be379fd5c25722)), closes [#10647](https://github.com/Opentrons/opentrons/issues/10647)
+* **app:** fix pipette offset cal data fetch issue on RobotSettings ([#10680](https://github.com/Opentrons/opentrons/issues/10680)) ([c11da0c](https://github.com/Opentrons/opentrons/commit/c11da0ca04fe4d78a8f80668e0ae58df9c6d5942)), closes [#10676](https://github.com/Opentrons/opentrons/issues/10676)
+* **app:** fix refresh robots spinner spacing and double icon ([#10646](https://github.com/Opentrons/opentrons/issues/10646)) ([33df1aa](https://github.com/Opentrons/opentrons/commit/33df1aa4f5a540d7b0409cdc1577324ca8ce1460)), closes [#10483](https://github.com/Opentrons/opentrons/issues/10483)
+* **app:** robot Update banner renders when bot is unavailable fix ([#10673](https://github.com/Opentrons/opentrons/issues/10673)) ([f8f8425](https://github.com/Opentrons/opentrons/commit/f8f84256f7d51783f05d40e3b0624c8cfffac4ee)), closes [#10670](https://github.com/Opentrons/opentrons/issues/10670)
+* **app:** this will fix overflow menu overlapping issue on RobotSettings Calibration Tab ([#10661](https://github.com/Opentrons/opentrons/issues/10661)) ([44f9e81](https://github.com/Opentrons/opentrons/commit/44f9e8126006b0406139418af46607f3f7770646)), closes [#10640](https://github.com/Opentrons/opentrons/issues/10640)
+
+
+### Features
+
+* **app:** wire up Modal warning for Clear unavailable robots list button ([#10648](https://github.com/Opentrons/opentrons/issues/10648)) ([a701e09](https://github.com/Opentrons/opentrons/commit/a701e097bd0d7b2730a8dc5dced94bdaf6dfc79a)), closes [#10511](https://github.com/Opentrons/opentrons/issues/10511)
+
+
+
+
+
 # [6.0.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.0...v6.0.0-alpha.1) (2022-06-07)
 
 
