@@ -362,10 +362,13 @@ export function AdvancedSettings(): JSX.Element {
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_unavailableRobots"
             >
-              {t('display_unavail_robots')}
+              {t('display_robot_caching')}
+            </StyledText>
+            <StyledText as="p" marginBottom={SPACING.spacing4}>
+              {t('note_this_will_clear_caching')}
             </StyledText>
             <StyledText as="p">
-              {t('display_unavail_robots_description')}
+              {t('display_robot_caching_descriptions')}
             </StyledText>
           </Box>
           <ToggleButton

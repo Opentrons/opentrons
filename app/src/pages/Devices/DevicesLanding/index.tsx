@@ -21,7 +21,6 @@ import {
   getReachableRobots,
   getUnreachableRobots,
 } from '../../../redux/discovery'
-import * as Config from '../../../redux/config'
 import { RobotCard } from '../../../organisms/Devices/RobotCard'
 import { DevicesEmptyState } from '../../../organisms/Devices/DevicesEmptyState'
 import { CollapsibleSection } from '../../../molecules/CollapsibleSection'
@@ -49,6 +48,7 @@ export function DevicesLanding(): JSX.Element {
   const unreachableRobots = useSelector((state: State) =>
     getUnreachableRobots(state)
   )
+
   const [unhealthyReachableRobots, recentlySeenRobots] = partition(
     reachableRobots,
     robot => robot.healthStatus === 'ok'
@@ -61,10 +61,6 @@ export function DevicesLanding(): JSX.Element {
       ...unhealthyReachableRobots,
       ...unreachableRobots,
     ].length === 0
-
-  const dontDisplayUnavailRobots = useSelector((state: State) => {
-    return Config.getConfig(state)?.discovery.disableCache ?? false
-  })
 
   return (
     <Box minWidth={SIZE_6} padding={`${SPACING.spacing3} ${SPACING.spacing4}`}>
@@ -105,25 +101,16 @@ export function DevicesLanding(): JSX.Element {
           <CollapsibleSection
             marginY={SPACING.spacing4}
             title={t('unavailable', {
-              count: dontDisplayUnavailRobots
-                ? 0
-                : [...recentlySeenRobots, ...unreachableRobots].length,
+              count: [...recentlySeenRobots, ...unreachableRobots].length,
             })}
             isExpandedInitially={healthyReachableRobots.length === 0}
           >
-            {dontDisplayUnavailRobots ? null : (
-              <>
-                {recentlySeenRobots.map(robot => (
-                  <RobotCard
-                    key={robot.name}
-                    robot={{ ...robot, local: null }}
-                  />
-                ))}
-                {unreachableRobots.map(robot => (
-                  <RobotCard key={robot.name} robot={robot} />
-                ))}
-              </>
-            )}
+            {recentlySeenRobots.map(robot => (
+              <RobotCard key={robot.name} robot={{ ...robot, local: null }} />
+            ))}
+            {unreachableRobots.map(robot => (
+              <RobotCard key={robot.name} robot={robot} />
+            ))}
           </CollapsibleSection>
         </>
       )}
