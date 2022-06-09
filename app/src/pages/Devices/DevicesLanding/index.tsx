@@ -62,8 +62,8 @@ export function DevicesLanding(): JSX.Element {
       ...unreachableRobots,
     ].length === 0
 
-  const displayUnavailRobots = useSelector((state: State) => {
-    return Config.getConfig(state)?.discovery.disableCache ? false : true
+  const dontDisplayUnavailRobots = useSelector((state: State) => {
+    return Config.getConfig(state)?.discovery.disableCache ?? false
   })
 
   return (
@@ -105,13 +105,13 @@ export function DevicesLanding(): JSX.Element {
           <CollapsibleSection
             marginY={SPACING.spacing4}
             title={t('unavailable', {
-              count: displayUnavailRobots
-                ? [...recentlySeenRobots, ...unreachableRobots].length
-                : 0,
+              count: dontDisplayUnavailRobots
+                ? 0
+                : [...recentlySeenRobots, ...unreachableRobots].length,
             })}
             isExpandedInitially={healthyReachableRobots.length === 0}
           >
-            {displayUnavailRobots ? (
+            {dontDisplayUnavailRobots ? null : (
               <>
                 {recentlySeenRobots.map(robot => (
                   <RobotCard
@@ -123,7 +123,7 @@ export function DevicesLanding(): JSX.Element {
                   <RobotCard key={robot.name} robot={robot} />
                 ))}
               </>
-            ) : null}
+            )}
           </CollapsibleSection>
         </>
       )}
