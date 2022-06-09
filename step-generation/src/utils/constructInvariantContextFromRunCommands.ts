@@ -8,10 +8,10 @@ import { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/s
 import { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import { InvariantContext } from '../types'
 
-function constructInvariantContextFromRunCommands(
+export function constructInvariantContextFromRunCommands(
   commands: RunTimeCommand[]
 ): InvariantContext {
-  return commands.reduce<InvariantContext>(
+  return commands.reduce(
     (acc, command) => {
       if (command.commandType === 'loadLabware') {
         return {
@@ -49,7 +49,7 @@ function constructInvariantContextFromRunCommands(
             ? commands.find(
                 (c): c is LoadLabwareRunTimeCommand =>
                   c.commandType === 'loadLabware' &&
-                  c.result.labwareId === labwareIreId
+                  c.result.labwareId === labwareId
               )?.result.definition ?? null
             : null
 
