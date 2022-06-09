@@ -188,7 +188,20 @@ class PipetteContext:  # noqa: D101
         location: Optional[Union[types.Location, Well]] = None,
     ) -> PipetteContext:
         # TODO: https://github.com/opentrons/opentrons/issues/9524
-        raise NotImplementedError()
+        if isinstance(location, types.Location):
+            raise NotImplementedError()
+
+        if isinstance(location, Well):
+            self._engine_client.blow_out(
+                pipette_id=self._pipette_id,
+                labware_id=location.parent.labware_id,
+                well_name=location.well_name,
+            )
+        else:
+            # TODO(tz, 2022-06-09): Handle logic in case location is None
+            raise NotImplementedError()
+
+        return self
 
     def touch_tip(  # noqa: D102
         self,
