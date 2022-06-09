@@ -3,7 +3,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .pipetting_common import BaseLiquidHandlingParams, BaseLiquidHandlingResult
+from .pipetting_common import (
+    PipetteIdMixin,
+    VolumeMixin,
+    WellLocationMixin,
+    BaseLiquidHandlingResult,
+)
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -13,7 +18,7 @@ if TYPE_CHECKING:
 DispenseCommandType = Literal["dispense"]
 
 
-class DispenseParams(BaseLiquidHandlingParams):
+class DispenseParams(PipetteIdMixin, VolumeMixin, WellLocationMixin):
     """Payload required to dispense to a specific well."""
 
     pass
