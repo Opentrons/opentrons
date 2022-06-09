@@ -155,6 +155,28 @@ INVALID_TEST_PARAMS = [
             )
         ),
     ),
+    (
+        protocol_schema_v6.Command(
+            commandType="blowout",
+            params=protocol_schema_v6.Params(
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                wellName="A1",
+                wellLocation=protocol_schema_v6.WellLocation(
+                    origin="bottom",
+                    offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=7.89),
+                ),
+            ),
+        ),
+        pe_commands.BlowOutCreate(
+            params=pe_commands.BlowOutParams(
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                wellName="A1",
+                wellLocation=WellLocation(),
+            )
+        )
+    ),
 ]
 
 VALID_TEST_PARAMS = [
