@@ -3,7 +3,7 @@ import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 
-export function useRunStartedAndSessionsQueryNotNull(): boolean {
+export function useRunStartedOrLegacySessionInProgress(): boolean {
   const runId = useCurrentRunId()
   const runStatus = useRunStatus(runId)
   const allSessionsQueryResponse = useAllSessionsQuery()

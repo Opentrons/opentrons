@@ -39,7 +39,7 @@ import {
   useAttachedPipettes,
   useIsRobotBusy,
   useDeckCalibrationStatus,
-  useRunStartedAndSessionsQueryNotNull,
+  useRunStartedOrLegacySessionInProgress,
 } from '../../hooks'
 
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
@@ -119,8 +119,8 @@ const mockGetAttachedPipettes = Pipettes.getAttachedPipettes as jest.MockedFunct
 const mockGetAttachedPipetteCalibrations = Pipettes.getAttachedPipetteCalibrations as jest.MockedFunction<
   typeof Pipettes.getAttachedPipetteCalibrations
 >
-const mockUseRunStartedAndSessionsQueryNotNull = useRunStartedAndSessionsQueryNotNull as jest.MockedFunction<
-  typeof useRunStartedAndSessionsQueryNotNull
+const mockUseRunStartedOrLegacySessionInProgress = useRunStartedOrLegacySessionInProgress as jest.MockedFunction<
+  typeof useRunStartedOrLegacySessionInProgress
 >
 
 let mockTrackEvent: jest.Mock
@@ -156,7 +156,7 @@ describe('RobotSettingsCalibration', () => {
 
   beforeEach(() => {
     mockTrackEvent = jest.fn()
-    mockUseRunStartedAndSessionsQueryNotNull.mockReturnValue(false)
+    mockUseRunStartedOrLegacySessionInProgress.mockReturnValue(false)
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockUseDeckCalibrationData.mockReturnValue({
       deckCalibrationData: mockDeckCalData,
@@ -292,7 +292,7 @@ describe('RobotSettingsCalibration', () => {
       deckCalibrationData: mockWarningDeckCalData,
       isDeckCalibrated: true,
     })
-    mockUseRunStartedAndSessionsQueryNotNull.mockReturnValue(true)
+    mockUseRunStartedOrLegacySessionInProgress.mockReturnValue(true)
     mockGetIsRunning.mockReturnValue(false)
     mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByRole }] = render()

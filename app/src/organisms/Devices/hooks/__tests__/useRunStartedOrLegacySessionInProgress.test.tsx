@@ -4,7 +4,7 @@ import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../../RunTimeControl/hooks'
-import { useRunStartedAndSessionsQueryNotNull } from '..'
+import { useRunStartedOrLegacySessionInProgress } from '..'
 
 import type { Sessions } from '@opentrons/api-client'
 
@@ -22,30 +22,25 @@ const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
   typeof useAllSessionsQuery
 >
 
-describe('useRunStartedAndSessionsQueryNotNull', () => {
+describe('useRunStartedOrLegacySessionInProgress', () => {
   beforeEach(() => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
     mockUseCurrentRunId.mockReturnValue('123')
-    mockUseAllSessionsQuery.mockReturnValue({
-      data: {},
-    } as UseQueryResult<Sessions, Error>)
+    mockUseAllSessionsQuery.mockReturnValue(({
+      data: [],
+      links: null,
+    } as unknown) as UseQueryResult<Sessions, Error>)
   })
-
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  it('returns true when current run status is not idle', () => {
-    const result = useRunStartedAndSessionsQueryNotNull()
+  it('returns true when current run status is not idle or sessions are empty', () => {
+    const result = useRunStartedOrLegacySessionInProgress()
     expect(result).toBe(true)
   })
 
-  it('returns true when sessions are not empty', () => {
-    const result = useRunStartedAndSessionsQueryNotNull()
-    expect(result).toBe(true)
-  })
-
-  it('returns false when run status is idle and sessions are empty', () => {
+  it('returns false when run status is idle or sessions are not empty', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
     mockUseAllSessionsQuery.mockReturnValue(({
       data: [
@@ -59,7 +54,7 @@ describe('useRunStartedAndSessionsQueryNotNull', () => {
       ],
       links: {},
     } as unknown) as UseQueryResult<Sessions, Error>)
-    const result = useRunStartedAndSessionsQueryNotNull()
+    const result = useRunStartedOrLegacySessionInProgress()
     expect(result).toBe(false)
   })
 })
