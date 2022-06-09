@@ -35,6 +35,7 @@ import {
   alertUnignored,
 } from '../../redux/alerts'
 import { useTrackEvent } from '../../redux/analytics'
+import { Portal } from '../../App/portal'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { PreviousVersionModal } from './PreviousVersionModal'
 import { ConnectRobotSlideout } from './ConnectRobotSlideout'
@@ -244,7 +245,9 @@ export function GeneralSettings(): JSX.Element {
         </Flex>
       </Box>
       {showUpdateModal ? (
-        <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />
+        <Portal level="top">
+          <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />
+        </Portal>
       ) : null}
       {showPreviousVersionModal ? (
         <PreviousVersionModal

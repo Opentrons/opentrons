@@ -5,6 +5,9 @@ import {
   thermocyclerPipetteCollision,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestMultiChannelPipette,
 } from '../../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { AspirateParams } from '@opentrons/shared-data/protocol/types/schemaV3'
@@ -90,7 +93,32 @@ export const aspirate: CommandCreator<AspirateParams> = (
   ) {
     errors.push(errorCreators.heaterShakerIsShaking())
   }
+  if (
+    pipetteAdjacentHeaterShakerWhileShaking(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]?.slot
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
+  }
+  if (
+    getIsHeaterShakerEastWestWithLatchOpen(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]?.slot
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerEastWestWithLatchOpen())
+  }
 
+  if (
+    getIsHeaterShakerEastWestMultiChannelPipette(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]?.slot,
+      pipetteSpec
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerEastWestOfMultiChannelPipette())
+  }
   if (errors.length === 0 && pipetteSpec && pipetteSpec.maxVolume < volume) {
     errors.push(
       errorCreators.pipetteVolumeExceeded({

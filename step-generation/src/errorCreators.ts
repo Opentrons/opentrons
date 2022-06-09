@@ -142,3 +142,24 @@ export const tallLabwareEastWestOfHeaterShaker = (
     message: `Labware over 53 mm is ${position} of this Heater-Shaker module.`,
   }
 }
+
+export const heaterShakerEastWestWithLatchOpen = (): CommandCreatorError => {
+  return {
+    type: 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN',
+    message: 'The Heater-Shaker labware latch is open',
+  }
+}
+
+export const heaterShakerNorthSouthEastWestShaking = (): CommandCreatorError => {
+  return {
+    type: 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING',
+    message: 'The Heater-Shaker is shaking',
+  }
+}
+
+export const heaterShakerEastWestOfMultiChannelPipette = (): CommandCreatorError => {
+  return {
+    type: 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL',
+    message: 'The Heater-Shaker is shaking',
+  }
+}

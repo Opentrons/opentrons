@@ -62,6 +62,7 @@ def create_failed_command(
     completed_at: datetime = datetime(year=2022, month=2, day=2),
     params: Optional[BaseModel] = None,
     error: Optional[ErrorOccurrence] = None,
+    intent: Optional[cmd.CommandIntent] = None,
 ) -> cmd.Command:
     """Given command data, build a failed command model."""
     return cast(
@@ -75,6 +76,7 @@ def create_failed_command(
             status=cmd.CommandStatus.FAILED,
             params=params or BaseModel(),
             error=error,
+            intent=intent,
         ),
     )
 

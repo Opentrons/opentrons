@@ -11,6 +11,7 @@ import {
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
   Mount,
+  useOnClickOutside,
 } from '@opentrons/components'
 
 import { OverflowBtn } from '../../../../atoms/MenuList/OverflowBtn'
@@ -63,6 +64,9 @@ export function OverflowMenu({
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
+  const calsOverflowWrapperRef = useOnClickOutside({
+    onClickOutside: () => setShowOverflowMenu(false),
+  }) as React.RefObject<HTMLDivElement>
   const [
     startPipetteOffsetCalibration,
     PipetteOffsetCalibrationWizard,
@@ -138,8 +142,8 @@ export function OverflowMenu({
       } else {
         startPipetteOffsetPossibleTLC({ keepTipLength: false })
       }
-      setShowOverflowMenu(!showOverflowMenu)
     }
+    setShowOverflowMenu(!showOverflowMenu)
   }
 
   const handleDownload = (
@@ -168,6 +172,7 @@ export function OverflowMenu({
 
   const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
+    e.stopPropagation()
     setShowOverflowMenu(!showOverflowMenu)
   }
 
@@ -192,6 +197,7 @@ export function OverflowMenu({
       />
       {showOverflowMenu ? (
         <Flex
+          ref={calsOverflowWrapperRef}
           width={calType === 'pipetteOffset' ? '11.25rem' : '17.25rem'}
           zIndex={10}
           borderRadius={'4px 4px 0px 0px'}

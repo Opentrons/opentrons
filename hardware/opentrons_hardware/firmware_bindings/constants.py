@@ -56,10 +56,9 @@ class MessageId(int, Enum):
     device_info_response = 0x303
     task_info_request = 0x304
     task_info_response = 0x305
-    pipette_info_request = 0x306
+    instrument_info_request = 0x306
     pipette_info_response = 0x307
-    gripper_info_request = 0x308
-    gripper_info_response = 0x309
+    gripper_info_response = 0x308
     set_serial_number = 0x30A
 
     stop_request = 0x00

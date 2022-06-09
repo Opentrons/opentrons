@@ -43,6 +43,7 @@
   "plug_in_required_module_plural": "Plug in and power up the required modules to continue",
   "proceed_to_labware_setup_step": "Proceed to labware setup",
   "proceed_to_module_setup_step": "Proceed to module setup",
+  "proceed_to_liquid_setup_step": "Proceed to liquid setup",
   "attach_pipette_cta": "Attach Pipette",
   "attach_pipette_calibration": "Attach pipette to see calibration information",
   "pipette_missing": "Pipette missing",
@@ -93,6 +94,7 @@
   "protocol_upload_revamp_feedback": "Have feedback about this experience?",
   "feedback_form_link": "Let us know!",
   "labware_position_check_not_available": "Labware Position Check is not available after run has started",
+  "labware_position_check_not_available_analyzing_on_robot": "Labware Position Check is not available while protocol is analyzing on robot",
   "recalibrating_tip_length_not_available": "Recalibrating a tip length is not available once a run has started",
   "recalibrating_not_available": "Recalibrating Tip Length calibrations and Labware Position Check is not available.",
   "protocol_can_be_closed": "This protocol can now be closed.",
@@ -116,5 +118,10 @@
   "calibration_data_not_available": "Calibration data not available once run has started",
   "connection_info_not_available": "Connection info not available once run has started",
   "setup_is_view_only": "Setup is view-only once run has started",
-  "loading_data": "Loading data..."
+  "loading_data": "Loading data...",
+  "protocol_analysis_failed": "Protocol analysis failed",
+  "liquid_setup_step_title": "Initial Liquid Setup",
+  "liquid_setup_step_description": "View liquid starting locations and volumes",
+  "list_view": "List View",
+  "map_view": "Map View"
 }

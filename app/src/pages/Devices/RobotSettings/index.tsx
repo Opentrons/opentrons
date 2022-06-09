@@ -15,6 +15,7 @@ import {
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import { CONNECTABLE, UNREACHABLE, REACHABLE } from '../../../redux/discovery'
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { useRobot } from '../../../organisms/Devices/hooks'
@@ -23,6 +24,7 @@ import { NavTab } from '../../../atoms/NavTab'
 import { RobotSettingsCalibration } from '../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
 import { RobotSettingsAdvanced } from '../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsNetworking } from '../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
+import { ReachableBanner } from '../../../organisms/Devices/ReachableBanner'
 
 import type { NavRouteParams, RobotSettingsTab } from '../../../App/types'
 
@@ -30,6 +32,8 @@ export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')
   const { robotName, robotSettingsTab } = useParams<NavRouteParams>()
   const robot = useRobot(robotName)
+  const isCalibrationDisabled = robot?.status !== CONNECTABLE
+  const isNetworkingDisabled = robot?.status === UNREACHABLE
   const [showRobotBusyBanner, setShowRobotBusyBanner] = React.useState<boolean>(
     false
   )
@@ -61,6 +65,17 @@ export function RobotSettings(): JSX.Element | null {
     ),
   }
 
+  if (
+    robot == null ||
+    robot?.status === UNREACHABLE ||
+    (robot?.status === REACHABLE && robot?.serverHealthStatus !== 'ok')
+  ) {
+    return <Redirect to={`/devices/${robotName}`} />
+  }
+  if (robotSettingsTab === 'calibration' && isCalibrationDisabled) {
+    return <Redirect to={`/devices/${robotName}/robot-settings/networking`} />
+  }
+
   const RobotSettingsContent =
     robotSettingsContentByTab[robotSettingsTab] ??
     // default to the calibration tab if no tab or nonexistent tab is passed as a param
@@ -89,6 +104,7 @@ export function RobotSettings(): JSX.Element | null {
           >
             {t('robot_settings')}
           </Box>
+          <ReachableBanner robot={robot} />
           {showRobotBusyBanner && (
             <Banner type="warning" marginBottom={SPACING.spacing4}>
               <StyledText as="p">
@@ -100,10 +116,12 @@ export function RobotSettings(): JSX.Element | null {
             <NavTab
               to={`/devices/${robotName}/robot-settings/calibration`}
               tabName={t('calibration')}
+              disabled={isCalibrationDisabled}
             />
             <NavTab
               to={`/devices/${robotName}/robot-settings/networking`}
               tabName={t('networking')}
+              disabled={isNetworkingDisabled}
             />
             <NavTab
               to={`/devices/${robotName}/robot-settings/advanced`}

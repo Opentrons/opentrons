@@ -86,6 +86,17 @@ def test_remove() -> None:
     assert list(subject) == [1, 3, 4, 5]
 
 
+def test_discard() -> None:
+    """It should remove the element from the set, or noop if it's not present."""
+    subject = OrderedSet([1, 2, 3, 4, 5])
+
+    subject.discard(2)
+    assert list(subject) == [1, 3, 4, 5]
+
+    subject.discard(2)  # Should just noop
+    assert list(subject) == [1, 3, 4, 5]
+
+
 def test_length() -> None:
     """The length should be the number of unique elements currently in the set."""
     subject = OrderedSet[str]()

@@ -1361,7 +1361,7 @@
       }
     },
     {
-      "commandType": "heaterShakerModule/setTargetShakeSpeed",
+      "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "id": "13abc123",
       "params": {
         "moduleId": "heaterShakerId",
@@ -1369,22 +1369,36 @@
       }
     },
     {
-      "commandType": "heaterShakerModule/startSetTargetTemperature",
+      "commandType": "heaterShaker/setTargetTemperature",
       "id": "14abc123",
       "params": {
         "moduleId": "heaterShakerId",
-        "temperature": 42
+        "celsius": 42
       }
     },
     {
-      "commandType": "heaterShakerModule/awaitTemperature",
+      "commandType": "heaterShaker/waitForTemperature",
       "id": "15abc123",
       "params": {
         "moduleId": "heaterShakerId"
       }
     },
     {
-      "commandType": "heaterShakerModule/deactivateHeater",
+      "commandType": "heaterShaker/openLabwareLatch",
+      "id": "16abc123",
+      "params": {
+        "moduleId": "heaterShakerId"
+      }
+    },
+    {
+      "commandType": "heaterShaker/closeLabwareLatch",
+      "id": "17abc123",
+      "params": {
+        "moduleId": "heaterShakerId"
+      }
+    },
+    {
+      "commandType": "heaterShaker/deactivateHeater",
       "id": "16abc123",
       "params": {
         "moduleId": "heaterShakerId"

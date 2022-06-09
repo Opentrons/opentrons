@@ -5,7 +5,6 @@ import { LEFT, RIGHT } from '../../../redux/pipettes'
 import { AttachedPipettesCard } from './AttachedPipettesCard'
 import { CardContainer, CardRow } from '../../../atoms/layout'
 import { ChangePipette } from '../../../organisms/ChangePipette'
-import { ConfigurePipette } from '../../../organisms/ConfigurePipette'
 import { Page } from '../../../atoms/Page'
 
 export interface InstrumentSettingsProps {
@@ -44,17 +43,6 @@ export function InstrumentSettings(
           path={`${path}/change-pipette/:mount${RE_MOUNT}`}
           render={routeProps => (
             <ChangePipette
-              robotName={robotName}
-              // @ts-expect-error not a valid Mount type
-              mount={routeProps.match.params.mount}
-              closeModal={routeProps.history.goBack}
-            />
-          )}
-        />
-        <Route
-          path={`${path}/configure-pipette/:mount${RE_MOUNT}`}
-          render={routeProps => (
-            <ConfigurePipette
               robotName={robotName}
               // @ts-expect-error not a valid Mount type
               mount={routeProps.match.params.mount}

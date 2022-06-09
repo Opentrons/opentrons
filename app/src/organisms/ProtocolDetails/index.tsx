@@ -200,20 +200,34 @@ export function ProtocolDetails(
       ? parseInitialPipetteNamesByMount(mostRecentAnalysis.commands)
       : { left: null, right: null }
 
-  const requiredModuleDetails = map(
-    parseInitialLoadedModulesBySlot(
-      mostRecentAnalysis.commands != null ? mostRecentAnalysis.commands : []
-    )
-  )
+  const requiredModuleDetails =
+    mostRecentAnalysis != null
+      ? map(
+          parseInitialLoadedModulesBySlot(
+            mostRecentAnalysis.commands != null
+              ? mostRecentAnalysis.commands
+              : []
+          )
+        )
+      : []
 
-  const requiredLabwareDetails = map({
-    ...parseInitialLoadedLabwareByModuleId(
-      mostRecentAnalysis.commands != null ? mostRecentAnalysis.commands : []
-    ),
-    ...parseInitialLoadedLabwareBySlot(
-      mostRecentAnalysis.commands != null ? mostRecentAnalysis.commands : []
-    ),
-  }).filter(labware => labware.result.definition.parameters.format !== 'trash')
+  const requiredLabwareDetails =
+    mostRecentAnalysis != null
+      ? map({
+          ...parseInitialLoadedLabwareByModuleId(
+            mostRecentAnalysis.commands != null
+              ? mostRecentAnalysis.commands
+              : []
+          ),
+          ...parseInitialLoadedLabwareBySlot(
+            mostRecentAnalysis.commands != null
+              ? mostRecentAnalysis.commands
+              : []
+          ),
+        }).filter(
+          labware => labware.result.definition.parameters.format !== 'trash'
+        )
+      : []
 
   const protocolDisplayName = getProtocolDisplayName(
     protocolKey,
@@ -235,12 +249,15 @@ export function ProtocolDetails(
   }
 
   const creationMethod =
-    getCreationMethod(mostRecentAnalysis.config) ?? t('shared:no_data')
-  const author = isEmpty(mostRecentAnalysis.metadata.author)
-    ? t('shared:no_data')
-    : mostRecentAnalysis.metadata.author
+    mostRecentAnalysis != null
+      ? getCreationMethod(mostRecentAnalysis.config) ?? t('shared:no_data')
+      : t('shared:no_data')
+  const author =
+    mostRecentAnalysis != null
+      ? mostRecentAnalysis?.metadata?.author ?? t('shared:no_data')
+      : t('shared:no_data')
   const lastAnalyzed =
-    mostRecentAnalysis.createdAt != null
+    mostRecentAnalysis?.createdAt != null
       ? format(new Date(mostRecentAnalysis.createdAt), 'MMMM dd, yyyy HH:mm')
       : t('shared:no_data')
 
@@ -293,7 +310,7 @@ export function ProtocolDetails(
           </StyledText>
           <OverflowMenu
             protocolKey={protocolKey}
-            protocolType={mostRecentAnalysis.config.protocolType}
+            protocolType={mostRecentAnalysis?.config?.protocolType ?? 'python'}
             data-testid={`ProtocolDetails_overFlowMenu`}
           />
         </Flex>
@@ -366,12 +383,13 @@ export function ProtocolDetails(
             <StyledText as="h6">{t('description')}</StyledText>
             {analysisStatus === 'loading' ? (
               <StyledText as="p">{t('shared:loading')}</StyledText>
-            ) : (
+            ) : null}
+            {mostRecentAnalysis != null ? (
               <ReadMoreContent
                 metadata={mostRecentAnalysis.metadata}
                 protocolType={mostRecentAnalysis.config.protocolType}
               />
-            )}
+            ) : null}
           </Flex>
         </Flex>
       </Card>

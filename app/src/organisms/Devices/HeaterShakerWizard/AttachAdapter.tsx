@@ -9,13 +9,28 @@ import {
   Icon,
   TYPOGRAPHY,
   SPACING,
+  SIZE_AUTO,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import screwInAdapter from '@opentrons/app/src/assets/images/heater_shaker_adapter_screwdriver.png'
 import heaterShakerAdapterAlignment from '@opentrons/app/src/assets/images/heater_shaker_adapter_alignment.png'
+import { TertiaryButton } from '../../../atoms/buttons'
+import { Tooltip } from '../../../atoms/Tooltip'
+import { useLatchControls } from '../ModuleCard/hooks'
 
-export function AttachAdapter(): JSX.Element {
+import type { HeaterShakerModule } from '../../../redux/modules/types'
+
+interface AttachAdapterProps {
+  module: HeaterShakerModule
+  runId?: string
+}
+export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
+  const { module, runId } = props
   const { t } = useTranslation('heater_shaker')
+  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
+  const [targetProps, tooltipProps] = useHoverTooltip()
+  const isShaking = module.data.speedStatus !== 'idle'
 
   return (
     <Flex
@@ -25,7 +40,7 @@ export function AttachAdapter(): JSX.Element {
       fontWeight={700}
     >
       <Flex paddingBottom={SPACING.spacingL}>
-        {t('step_2_of_4_attach_adapter')}
+        {t('step_3_of_4_attach_adapter')}
       </Flex>
       <Flex flexDirection={DIRECTION_ROW}>
         <Text
@@ -33,7 +48,7 @@ export function AttachAdapter(): JSX.Element {
           paddingRight={SPACING.spacing4}
           data-testid={`attach_adapter_2a`}
         >
-          {t('2a')}
+          {t('3a')}
         </Text>
         <Flex border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}>
           <Flex
@@ -84,6 +99,23 @@ export function AttachAdapter(): JSX.Element {
                 </Text>
               </Flex>
             </Flex>
+            <TertiaryButton
+              marginLeft={SIZE_AUTO}
+              marginRight={SPACING.spacingSM}
+              marginY={SPACING.spacing4}
+              onClick={toggleLatch}
+              disabled={isShaking}
+              {...targetProps}
+            >
+              {isLatchClosed
+                ? t('open_labware_latch')
+                : t('close_labware_latch')}
+            </TertiaryButton>
+            {isShaking ? (
+              <Tooltip tooltipProps={tooltipProps}>
+                {t('cannot_open_latch')}
+              </Tooltip>
+            ) : null}
           </Flex>
         </Flex>
       </Flex>
@@ -93,7 +125,7 @@ export function AttachAdapter(): JSX.Element {
           paddingRight={SPACING.spacing4}
           data-testid={`attach_adapter_2b`}
         >
-          {t('2b')}
+          {t('3b')}
         </Text>
         <Flex
           border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}
@@ -128,7 +160,7 @@ export function AttachAdapter(): JSX.Element {
           paddingRight={SPACING.spacing4}
           data-testid={`attach_adapter_3a`}
         >
-          {t('2c')}
+          {t('3c')}
         </Text>
         <Flex
           border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}

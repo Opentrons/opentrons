@@ -6,10 +6,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 
 from .resources import ModelUtils, ModuleDataProvider
-from .commands import (
-    Command,
-    CommandCreate,
-)
+from .commands import Command, CommandCreate
 from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri, ModuleModel
 from .execution import (
     QueueWorker,
@@ -106,16 +103,17 @@ class ProtocolEngine:
         requested_at = self._model_utils.get_timestamp()
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
         # homed if necessary
-        action = PlayAction(requested_at=requested_at)
-        self._state_store.commands.raise_if_paused_by_blocking_door()
-        self._state_store.commands.raise_if_stop_requested()
+        action = self._state_store.commands.validate_action_allowed(
+            PlayAction(requested_at=requested_at)
+        )
         self._action_dispatcher.dispatch(action)
         self._queue_worker.start()
 
     def pause(self) -> None:
         """Pause executing commands in the queue."""
-        action = PauseAction(source=PauseSource.CLIENT)
-        self._state_store.commands.raise_if_stop_requested()
+        action = self._state_store.commands.validate_action_allowed(
+            PauseAction(source=PauseSource.CLIENT)
+        )
         self._action_dispatcher.dispatch(action)
 
     def add_command(self, request: CommandCreate) -> Command:
@@ -127,15 +125,22 @@ class ProtocolEngine:
 
         Returns:
             The full, newly queued command.
+
+        Raises:
+            SetupCommandNotAllowed: the request specified a setup command,
+                but the engine was not idle or paused.
         """
         command_id = self._model_utils.generate_id()
-        action = QueueCommandAction(
-            request=request,
-            command_id=command_id,
-            # TODO(mc, 2021-12-13): generate a command key from params and state
-            # https://github.com/Opentrons/opentrons/issues/8986
-            command_key=command_id,
-            created_at=self._model_utils.get_timestamp(),
+
+        action = self.state_view.commands.validate_action_allowed(
+            QueueCommandAction(
+                request=request,
+                command_id=command_id,
+                # TODO(mc, 2021-12-13): generate a command key from params and state
+                # https://github.com/Opentrons/opentrons/issues/8986
+                command_key=command_id,
+                created_at=self._model_utils.get_timestamp(),
+            )
         )
         self._action_dispatcher.dispatch(action)
         return self._state_store.commands.get(command_id)
@@ -172,15 +177,16 @@ class ProtocolEngine:
         After a `stop`, you must still call `finish` to give the engine a chance
         to clean up resources and propagate errors.
         """
-        self._state_store.commands.raise_if_stop_requested()
-        self._action_dispatcher.dispatch(StopAction())
+        action = self._state_store.commands.validate_action_allowed(StopAction())
+        self._action_dispatcher.dispatch(action)
         self._queue_worker.cancel()
         await self._hardware_stopper.do_halt()
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
 
-        This will happen if all commands are executed or if one command fails.
+        Raises:
+            CommandExecutionFailedError: if any protocol command failed.
         """
         await self._state_store.wait_for(
             condition=self._state_store.commands.get_all_complete

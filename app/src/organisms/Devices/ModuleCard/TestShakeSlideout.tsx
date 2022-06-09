@@ -40,8 +40,8 @@ import { Collapsible } from './Collapsible'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
-  HeaterShakerSetTargetShakeSpeedCreateCommand,
-  HeaterShakerStopShakeCreateCommand,
+  HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
+  HeaterShakerDeactivateShakerCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface TestShakeSlideoutProps {
@@ -71,16 +71,16 @@ export const TestShakeSlideout = (
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const isShaking = module.data.speedStatus !== 'idle'
 
-  const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
-    commandType: 'heaterShakerModule/setTargetShakeSpeed',
+  const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
+    commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
       moduleId: runId != null ? moduleIdFromRun : module.id,
       rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
     },
   }
 
-  const stopShakeCommand: HeaterShakerStopShakeCreateCommand = {
-    commandType: 'heaterShakerModule/stopShake',
+  const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
+    commandType: 'heaterShaker/deactivateShaker',
     params: {
       moduleId: runId != null ? moduleIdFromRun : module.id,
     },
@@ -124,16 +124,14 @@ export const TestShakeSlideout = (
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
-        <Flex marginTop={SPACING.spacing4}>
-          <PrimaryButton
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            width="100%"
-            onClick={onCloseClick}
-            data-testid={`Temp_Slideout_set_temp_btn_${name}`}
-          >
-            {t('close', { ns: 'shared' })}
-          </PrimaryButton>
-        </Flex>
+        <PrimaryButton
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          width="100%"
+          onClick={onCloseClick}
+          data-testid={`Temp_Slideout_set_temp_btn_${name}`}
+        >
+          {t('close', { ns: 'shared' })}
+        </PrimaryButton>
       }
     >
       <Flex
