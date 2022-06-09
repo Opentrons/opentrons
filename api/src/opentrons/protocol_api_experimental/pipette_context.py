@@ -188,9 +188,6 @@ class PipetteContext:  # noqa: D101
         location: Optional[Union[types.Location, Well]] = None,
     ) -> PipetteContext:
         # TODO: https://github.com/opentrons/opentrons/issues/9524
-        if isinstance(location, types.Location):
-            raise NotImplementedError()
-
         if isinstance(location, Well):
             self._engine_client.blow_out(
                 pipette_id=self._pipette_id,
@@ -200,7 +197,8 @@ class PipetteContext:  # noqa: D101
                 well_location=WellLocation(),
             )
         else:
-            # TODO(tz, 2022-06-09): Handle logic in case location is None
+            # TODO(tz, 2022-06-09): Handle logic in case location
+            #  is types.Location or is None
             raise NotImplementedError()
 
         return self
