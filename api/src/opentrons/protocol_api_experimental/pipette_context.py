@@ -193,7 +193,6 @@ class PipetteContext:  # noqa: D101
                 pipette_id=self._pipette_id,
                 labware_id=location.parent.labware_id,
                 well_name=location.well_name,
-                # TODO (tz, 2022-06-09): Should this be declared as nullable?
                 well_location=WellLocation(),
             )
         else:
