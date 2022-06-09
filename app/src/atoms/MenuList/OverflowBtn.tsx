@@ -7,11 +7,11 @@ const overflowButtonStyles = css`
   max-height: ${SPACING.spacing6};
 
   &:hover {
-    background-color: ${COLORS.darkGreyHover};
+    background-color: #16212d15;
   }
 
   &:active {
-    background-color: ${COLORS.darkBlack};
+    background-color: #16212d25;
     box-shadow: 0 0 0 1px ${COLORS.darkBlack};
   }
 
@@ -20,7 +20,7 @@ const overflowButtonStyles = css`
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.darkGreyPressed};
+    box-shadow: 0 0 0 3px ${COLORS.warning};
   }
 
   &:enabled {
