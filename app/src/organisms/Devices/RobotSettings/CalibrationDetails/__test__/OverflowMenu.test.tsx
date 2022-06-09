@@ -5,8 +5,9 @@ import { saveAs } from 'file-saver'
 import { renderWithProviders, Mount } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
+import { mockDeckCalData } from '../../../../../redux/calibration/__fixtures__'
 import { useCalibratePipetteOffset } from '../../../../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { useIsRobotBusy } from '../../../hooks'
+import { useDeckCalibrationData, useIsRobotBusy } from '../../../hooks'
 
 import { OverflowMenu } from '../OverflowMenu'
 
@@ -38,6 +39,9 @@ const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFu
 const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
   typeof useIsRobotBusy
 >
+const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
+  typeof useDeckCalibrationData
+>
 
 const mockUpdateRobotStatus = jest.fn()
 
@@ -48,12 +52,15 @@ describe('OverflowMenu', () => {
     props = {
       calType: CAL_TYPE,
       robotName: ROBOT_NAME,
-      serialNumber: 'P1KSV222021011802',
       mount: 'left' as Mount,
       updateRobotStatus: mockUpdateRobotStatus,
     }
     mockUseCalibratePipetteOffset.mockReturnValue([startCalibration, null])
     mockUseIsRobotBusy.mockReturnValue(false)
+    mockUseDeckCalibrationData.mockReturnValue({
+      isDeckCalibrated: true,
+      deckCalibrationData: mockDeckCalData,
+    })
   })
 
   afterEach(() => {
@@ -64,7 +71,7 @@ describe('OverflowMenu', () => {
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
-    getByText('Recalibrate Pipette Offset')
+    getByText('Calibrate Pipette Offset')
     getByText('Download calibration data')
   })
 
@@ -83,7 +90,7 @@ describe('OverflowMenu', () => {
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
-    const calibrationButton = getByText('Recalibrate Pipette Offset')
+    const calibrationButton = getByText('Calibrate Pipette Offset')
     fireEvent.click(calibrationButton)
     expect(startCalibration).toHaveBeenCalled()
   })
@@ -138,7 +145,7 @@ describe('OverflowMenu', () => {
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
-    const calibrationButton = getByText('Recalibrate Pipette Offset')
+    const calibrationButton = getByText('Calibrate Pipette Offset')
     fireEvent.click(calibrationButton)
     expect(mockUpdateRobotStatus).toHaveBeenCalled()
   })

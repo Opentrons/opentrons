@@ -12,6 +12,7 @@ import {
   ALIGN_FLEX_END,
   Mount,
   useOnClickOutside,
+  useConditionalConfirm,
 } from '@opentrons/components'
 
 import { OverflowBtn } from '../../../../atoms/MenuList/OverflowBtn'
@@ -26,13 +27,13 @@ import * as Config from '../../../../redux/config'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../redux/calibration'
 import {
+  useDeckCalibrationData,
   useIsRobotBusy,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
 } from '../../hooks'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
-
-import type { PipetteOffsetCalibration } from '../../../../redux/calibration/types'
+import { DeckCalibrationConfirmModal } from '../DeckCalibrationConfirmModal'
 
 const CAL_BLOCK_MODAL_CLOSED: 'cal_block_modal_closed' =
   'cal_block_modal_closed'
@@ -49,7 +50,6 @@ type CalBlockModalState =
 interface OverflowMenuProps {
   calType: 'pipetteOffset' | 'tipLength'
   robotName: string
-  serialNumber: string | null
   mount: Mount
   updateRobotStatus: (isRobotBusy: boolean) => void
 }
@@ -57,13 +57,14 @@ interface OverflowMenuProps {
 export function OverflowMenu({
   calType,
   robotName,
-  serialNumber,
   mount,
   updateRobotStatus,
 }: OverflowMenuProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
+  const { isDeckCalibrated } = useDeckCalibrationData(robotName)
+
   const calsOverflowWrapperRef = useOnClickOutside({
     onClickOutside: () => setShowOverflowMenu(false),
   }) as React.RefObject<HTMLDivElement>
@@ -72,6 +73,7 @@ export function OverflowMenu({
     PipetteOffsetCalibrationWizard,
   ] = useCalibratePipetteOffset(robotName, { mount })
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robotName)
+
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
   const [
@@ -108,18 +110,18 @@ export function OverflowMenu({
     }
   }
 
-  const checkPipetteCalibrations = (): PipetteOffsetCalibration | null => {
-    if (pipetteOffsetCalibrations == null) {
-      return null
-    } else {
-      const applicablePipetteOffsetCalibration = pipetteOffsetCalibrations?.find(
-        pipetteOffsetCalibration =>
-          pipetteOffsetCalibration.mount === mount &&
-          pipetteOffsetCalibration.pipette === serialNumber
-      )
-      return applicablePipetteOffsetCalibration ?? null
-    }
-  }
+  const pipetteCalPresent = pipetteOffsetCalibrations?.find(
+    p => p.mount === mount
+  )
+
+  const {
+    showConfirmation: showConfirmStart,
+    confirm: confirmStart,
+    cancel: cancelStart,
+  } = useConditionalConfirm(
+    () => startPipetteOffsetPossibleTLC({ keepTipLength: true }),
+    !isDeckCalibrated
+  )
 
   const handleCalibration = (
     calType: 'pipetteOffset' | 'tipLength',
@@ -130,17 +132,17 @@ export function OverflowMenu({
       updateRobotStatus(true)
     } else {
       if (calType === 'pipetteOffset') {
-        if (checkPipetteCalibrations != null) {
-          // recalibrate pipette offset
+        if (pipetteCalPresent != null) {
           startPipetteOffsetCalibration({
             withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
           })
         } else {
           // calibrate pipette offset with a wizard since not calibrated yet
-          startPipetteOffsetPossibleTLC({ keepTipLength: true })
+          confirmStart()
         }
       } else {
-        startPipetteOffsetPossibleTLC({ keepTipLength: false })
+        // calibrate pipette offset with a wizard since not calibrated yet
+        startPipetteOffsetPossibleTLC({ keepTipLength: true })
       }
     }
     setShowOverflowMenu(!showOverflowMenu)
@@ -195,6 +197,15 @@ export function OverflowMenu({
         aria-label="CalibrationOverflowMenu_button"
         onClick={handleOverflowClick}
       />
+      {showConfirmStart && !isDeckCalibrated && (
+        <Portal level="top">
+          <DeckCalibrationConfirmModal
+            confirm={confirmStart}
+            cancel={cancelStart}
+          />
+        </Portal>
+      )}
+
       {showOverflowMenu ? (
         <Flex
           ref={calsOverflowWrapperRef}
@@ -210,7 +221,7 @@ export function OverflowMenu({
         >
           <MenuItem onClick={e => handleCalibration(calType, e)}>
             {calType === 'pipetteOffset'
-              ? checkPipetteCalibrations != null
+              ? pipetteCalPresent != null
                 ? t('overflow_menu_recalibrate_pipette')
                 : t('overflow_menu_calibrate_pipette')
               : t('overflow_menu_recalibrate_tip_and_pipette')}
@@ -221,8 +232,8 @@ export function OverflowMenu({
           {/* TODO 5/6/2021 kj: This is scoped out from 6.0 */}
           {/* <Divider /> */}
           {/* <MenuItem onClick={() => handleDeleteCalibrationData(calType)}>
-            {t('overflow_menu_delete_data')}
-          </MenuItem> */}
+          {t('overflow_menu_delete_data')}
+        </MenuItem> */}
         </Flex>
       ) : null}
       {PipetteOffsetCalibrationWizard}

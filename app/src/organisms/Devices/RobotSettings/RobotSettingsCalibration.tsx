@@ -15,7 +15,6 @@ import {
   TEXT_DECORATION_UNDERLINE,
   useHoverTooltip,
   TOOLTIP_LEFT,
-  useConditionalConfirm,
   Mount,
   SpinnerModalPage,
   AlertModal,
@@ -55,7 +54,6 @@ import {
   useRunHasStarted,
   useRobotBusyAndRunStarted,
 } from '../hooks'
-import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 
@@ -228,22 +226,11 @@ export function RobotSettingsCalibration({
     )
   }
 
-  const pipOffsetDataPresent =
-    pipetteOffsetCalibrations != null
-      ? pipetteOffsetCalibrations.length > 0
-      : false
-
   const deckCalibrationSession: DeckCalibrationSession | null = useSelector(
     (state: State) => {
       return getDeckCalibrationSession(state, robotName)
     }
   )
-
-  const {
-    showConfirmation: showConfirmStart,
-    confirm: confirmStart,
-    cancel: cancelStart,
-  } = useConditionalConfirm(handleStartDeckCalSession, !!pipOffsetDataPresent)
 
   let buttonDisabledReason: string | null = null
   if (notConnectable) {
@@ -440,7 +427,7 @@ export function RobotSettingsCalibration({
     if (isRobotBusyAndRunStarted) {
       updateRobotStatus(true)
     } else {
-      confirmStart()
+      handleStartDeckCalSession()
     }
   }
 
@@ -497,16 +484,11 @@ export function RobotSettingsCalibration({
             closePrompt={() => setShowCalBlockModal(false)}
           />
         ) : null}
-        {showConfirmStart && pipOffsetDataPresent && (
-          <DeckCalibrationConfirmModal
-            confirm={confirmStart}
-            cancel={cancelStart}
-          />
-        )}
+
         {createStatus === RobotApi.PENDING ? (
           <SpinnerModalPage
             titleBar={{
-              title: t('health_check_title'),
+              title: t('robot_calibration:health_check_title'),
               back: {
                 disabled: true,
                 title: t('shared:exit'),
