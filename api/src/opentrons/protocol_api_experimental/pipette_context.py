@@ -199,7 +199,9 @@ class PipetteContext:  # noqa: D101
         else:
             # TODO(tz, 2022-06-09): Handle logic in case location
             #  is types.Location or is None
-            raise NotImplementedError()
+            raise NotImplementedError(
+                "Blowout locations other than Wells are currently unsupported."
+            )
 
         return self
 
