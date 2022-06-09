@@ -82,6 +82,11 @@ const initialFormState: FormState = {
     right: { pipetteName: '', tiprackDefURI: null },
   },
   modulesByType: {
+    [HEATERSHAKER_MODULE_TYPE]: {
+      onDeck: false,
+      model: HEATERSHAKER_MODULE_V1,
+      slot: '1',
+    },
     [MAGNETIC_MODULE_TYPE]: {
       onDeck: false,
       model: null,
@@ -96,11 +101,6 @@ const initialFormState: FormState = {
       onDeck: false,
       model: THERMOCYCLER_MODULE_V1, // Default to GEN1 for TC only
       slot: SPAN7_8_10_11_SLOT,
-    },
-    [HEATERSHAKER_MODULE_TYPE]: {
-      onDeck: false,
-      model: HEATERSHAKER_MODULE_V1,
-      slot: '1',
     },
   },
 }
