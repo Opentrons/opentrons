@@ -134,7 +134,7 @@ class PipetteOffsetCalibrationUserFlow:
             CalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,
             CalibrationCommand.move_to_deck: self.move_to_deck,
             CalibrationCommand.move_to_point_one: self.move_to_point_one,
-            CalibrationCommand.set_has_calibration_block: self.set_has_calibration_block,  # noqa: E501
+            CalibrationCommand.set_has_calibration_block: self.set_has_calibration_block,
             CalibrationCommand.exit: self.exit_session,
             CalibrationCommand.invalidate_last_action: self.invalidate_last_action,
         }

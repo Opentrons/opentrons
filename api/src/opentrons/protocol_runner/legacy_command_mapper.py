@@ -44,10 +44,10 @@ class LegacyContextCommandError(ProtocolEngineError):
 _LEGACY_TO_PE_MODULE: Dict[LegacyModuleModel, pe_types.ModuleModel] = {
     LegacyMagneticModuleModel.MAGNETIC_V1: pe_types.ModuleModel.MAGNETIC_MODULE_V1,
     LegacyMagneticModuleModel.MAGNETIC_V2: pe_types.ModuleModel.MAGNETIC_MODULE_V2,
-    LegacyTemperatureModuleModel.TEMPERATURE_V1: pe_types.ModuleModel.TEMPERATURE_MODULE_V1,  # noqa: E501
-    LegacyTemperatureModuleModel.TEMPERATURE_V2: pe_types.ModuleModel.TEMPERATURE_MODULE_V2,  # noqa: E501
-    LegacyThermocyclerModuleModel.THERMOCYCLER_V1: pe_types.ModuleModel.THERMOCYCLER_MODULE_V1,  # noqa: E501
-    LegacyThermocyclerModuleModel.THERMOCYCLER_V2: pe_types.ModuleModel.THERMOCYCLER_MODULE_V2,  # noqa: E501
+    LegacyTemperatureModuleModel.TEMPERATURE_V1: pe_types.ModuleModel.TEMPERATURE_MODULE_V1,
+    LegacyTemperatureModuleModel.TEMPERATURE_V2: pe_types.ModuleModel.TEMPERATURE_MODULE_V2,
+    LegacyThermocyclerModuleModel.THERMOCYCLER_V1: pe_types.ModuleModel.THERMOCYCLER_MODULE_V1,
+    LegacyThermocyclerModuleModel.THERMOCYCLER_V2: pe_types.ModuleModel.THERMOCYCLER_MODULE_V2,
 }
 
 _HIGHER_ORDER_COMMAND_TYPES = {
@@ -203,7 +203,7 @@ class LegacyCommandMapper:
             else:
                 raise Exception("Unknown pick_up_tip location.")
             mount = MountType(pipette.mount)
-            slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type] # noqa: E501
+            slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
             well_name = well.well_name
             labware_id = self._labware_id_by_slot[slot]
             pipette_id = self._pipette_id_by_mount[mount]
@@ -225,14 +225,14 @@ class LegacyCommandMapper:
             and "instrument" in command["payload"]
             and "location" in command["payload"]
         ):
-            pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore  # noqa: E501
+            pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore
             location = command["payload"].get("location")
             if isinstance(location, Location):
                 well = location.labware.as_well()
             else:
                 raise Exception("Unknown drop_tip location.")
             mount = MountType(pipette.mount)
-            slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type] # noqa: E501
+            slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
             well_name = well.well_name
             labware_id = self._labware_id_by_slot[slot]
             pipette_id = self._pipette_id_by_mount[mount]

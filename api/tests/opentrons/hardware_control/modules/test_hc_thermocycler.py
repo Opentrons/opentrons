@@ -200,7 +200,7 @@ async def test_set_temperature_fuzzy(
     # Test hold_time < _hold_time_fuzzy_seconds. Here we know
     # that wait_for_hold will be called with the direct hold
     # time rather than increments of 0.1
-    set_temperature_subject._wait_for_hold = mock.AsyncMock()  # type: ignore[assignment]  # noqa: E501
+    set_temperature_subject._wait_for_hold = mock.AsyncMock()  # type: ignore[assignment]
     await set_temperature_subject.set_temperature(40, hold_time_seconds=2)
     set_temperature_subject._wait_for_hold.assert_called_once_with(2)
     set_plate_temp_spy.assert_called_once_with(temp=40, hold_time=2, volume=None)

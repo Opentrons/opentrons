@@ -105,9 +105,9 @@ class DeckCalibrationUserFlow:
             CalibrationCommand.move_to_deck: self.move_to_deck,
             CalibrationCommand.move_to_point_one: self.move_to_point_one,
             DeckCalibrationCommand.move_to_point_two: self.move_to_point_two,
-            DeckCalibrationCommand.move_to_point_three: self.move_to_point_three,  # noqa: E501
+            DeckCalibrationCommand.move_to_point_three: self.move_to_point_three,
             CalibrationCommand.exit: self.exit_session,
-            CalibrationCommand.invalidate_last_action: self.invalidate_last_action,  # noqa: E501
+            CalibrationCommand.invalidate_last_action: self.invalidate_last_action,
         }
         self.hardware.set_robot_calibration(
             robot_cal.build_temporary_identity_calibration()

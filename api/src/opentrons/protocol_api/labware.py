@@ -397,7 +397,7 @@ class Labware(DeckItem):
         if not args:
             res = self._implementation.get_wells()
         elif isinstance(args[0], int):
-            res = [self._implementation.get_wells()[idx] for idx in args]  # type: ignore[index]  # noqa: E501
+            res = [self._implementation.get_wells()[idx] for idx in args]  # type: ignore[index]
         elif isinstance(args[0], str):
             by_name = self._implementation.get_wells_by_name()
             res = [by_name[idx] for idx in args]  # type: ignore[index]
