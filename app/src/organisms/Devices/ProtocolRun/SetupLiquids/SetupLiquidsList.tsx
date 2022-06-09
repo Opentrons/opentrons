@@ -70,9 +70,17 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
   const { description, displayColor, displayName, locations } = props
   const [openItem, setOpenItem] = React.useState(false)
   const { t } = useTranslation('protocol_setup')
+  const LIQUID_CARD_STYLE = css`
+    ${BORDERS.cardOutlineBorder}
+
+    &:hover {
+      background-color: ${COLORS.background};
+      border: 1px solid ${COLORS.medGreyHover};
+    }
+  `
   return (
     <Box
-      css={BORDERS.cardOutlineBorder}
+      css={LIQUID_CARD_STYLE}
       marginBottom={SPACING.spacing3}
       padding={SPACING.spacing4}
       onClick={() => setOpenItem(!openItem)}
