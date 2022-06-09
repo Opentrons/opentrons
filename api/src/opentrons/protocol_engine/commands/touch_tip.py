@@ -8,8 +8,6 @@ from .pipetting_common import BasePipettingParams
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 from ..errors import TouchTipDisabledError, LabwareIsTipRackError
 
-from opentrons.hardware_control import HardwareControlAPI
-
 if TYPE_CHECKING:
     from ..execution import PipettingHandler
     from ..state import StateView
@@ -49,7 +47,7 @@ class TouchTipImplementation(AbstractCommandImpl[TouchTipParams, TouchTipResult]
             )
 
         if self._state_view.labware.is_tiprack(labware_id=params.labwareId):
-            raise LabwareIsTipRackError(f"Cannot touch tip on tiprack")
+            raise LabwareIsTipRackError("Cannot touch tip on tiprack")
 
         await self._pipetting.touch_tip(
             pipette_id=params.pipetteId,

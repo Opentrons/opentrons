@@ -553,7 +553,6 @@ async def test_touch_tip(
     subject: PipettingHandler,
 ) -> None:
     """It should be able to touch tip to the edges of a well."""
-
     decoy.when(
         state_store.motion.get_pipette_location(
             pipette_id="pipette-id",

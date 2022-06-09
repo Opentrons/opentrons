@@ -64,7 +64,7 @@ class LabwareIsTipRackError(ProtocolEngineError):
 
 
 class TouchTipDisabledError(ProtocolEngineError):
-    """An error raised when touch tip is used on well with touchTipDisabled quirk"""
+    """An error raised when touch tip is used on well with touchTipDisabled quirk."""
 
 
 class WellDoesNotExistError(ProtocolEngineError):
