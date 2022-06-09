@@ -163,3 +163,10 @@ export const heaterShakerEastWestOfMultiChannelPipette = (): CommandCreatorError
     message: 'The Heater-Shaker is shaking',
   }
 }
+
+export const heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = (): CommandCreatorError => {
+  return {
+    type: 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL',
+    message: '8-Channel pipette cannot access labware',
+  }
+}
