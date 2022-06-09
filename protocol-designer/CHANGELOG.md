@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2022-06-09)
+
+
+### Features
+
+* **protocol-designer:** disable placing module next to heater shaker ([#10660](https://github.com/Opentrons/opentrons/issues/10660)) ([b96b410](https://github.com/Opentrons/opentrons/commit/b96b410599c823bd6efbb02d8b749e4a89db0fa6)), closes [#10449](https://github.com/Opentrons/opentrons/issues/10449) [#10450](https://github.com/Opentrons/opentrons/issues/10450)
+* **step-generation:** raise timeline error when pipetting E/W of H-S with multi channel pipette ([#10681](https://github.com/Opentrons/opentrons/issues/10681)) ([3ea88a2](https://github.com/Opentrons/opentrons/commit/3ea88a260ebbfedc7c7fcda194ab5d37e1b22774)), closes [#10442](https://github.com/Opentrons/opentrons/issues/10442)
+
+
+
+
+
 # [6.0.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.0...v6.0.0-alpha.1) (2022-06-07)
 
 
