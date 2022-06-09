@@ -133,7 +133,7 @@ export function OverflowMenu({
     } else {
       if (calType === 'pipetteOffset') {
         if (pipetteCalPresent != null) {
-          // calibrate pipette offset with a wizard since not calibrated yet
+          // calibrate pipette offset
           startPipetteOffsetCalibration({
             withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
           })
