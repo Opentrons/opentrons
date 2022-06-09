@@ -175,7 +175,7 @@ INVALID_TEST_PARAMS = [
                 wellName="A1",
                 wellLocation=WellLocation(),
             )
-        )
+        ),
     ),
 ]
 
@@ -356,7 +356,7 @@ VALID_TEST_PARAMS = [
                     offset=WellOffset(x=0, y=0, z=7.89),
                 ),
             )
-        )
+        ),
     ),
 ]
 
