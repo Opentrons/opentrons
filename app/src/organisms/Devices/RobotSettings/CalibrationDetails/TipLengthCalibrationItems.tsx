@@ -116,6 +116,7 @@ export function TipLengthCalibrationItems({
               <OverflowMenu
                 calType="tipLength"
                 robotName={robotName}
+                serialNumber={calibration.serialNumber}
                 mount={
                   calibration.mount != null
                     ? calibration.mount

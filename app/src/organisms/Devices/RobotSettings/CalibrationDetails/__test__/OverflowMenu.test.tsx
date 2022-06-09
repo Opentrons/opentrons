@@ -53,6 +53,7 @@ describe('OverflowMenu', () => {
       calType: CAL_TYPE,
       robotName: ROBOT_NAME,
       mount: 'left' as Mount,
+      serialNumber: 'serialNumber',
       updateRobotStatus: mockUpdateRobotStatus,
     }
     mockUseCalibratePipetteOffset.mockReturnValue([startCalibration, null])

@@ -51,6 +51,7 @@ interface OverflowMenuProps {
   calType: 'pipetteOffset' | 'tipLength'
   robotName: string
   mount: Mount
+  serialNumber: string | null
   updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
@@ -58,6 +59,7 @@ export function OverflowMenu({
   calType,
   robotName,
   mount,
+  serialNumber,
   updateRobotStatus,
 }: OverflowMenuProps): JSX.Element {
   const { t } = useTranslation('device_settings')
@@ -110,8 +112,8 @@ export function OverflowMenu({
     }
   }
 
-  const pipetteCalPresent = pipetteOffsetCalibrations?.find(
-    p => p.mount === mount
+  const applicablePipetteOffsetCal = pipetteOffsetCalibrations?.find(
+    p => p.mount === mount && p.pipette === serialNumber
   )
 
   const {
@@ -132,8 +134,8 @@ export function OverflowMenu({
       updateRobotStatus(true)
     } else {
       if (calType === 'pipetteOffset') {
-        if (pipetteCalPresent != null) {
-          // calibrate pipette offset
+        if (applicablePipetteOffsetCal != null) {
+          // recalibrate pipette offset
           startPipetteOffsetCalibration({
             withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
           })
@@ -142,7 +144,7 @@ export function OverflowMenu({
           confirmStart()
         }
       } else {
-        startPipetteOffsetPossibleTLC({ keepTipLength: true })
+        startPipetteOffsetPossibleTLC({ keepTipLength: false })
       }
     }
     setShowOverflowMenu(!showOverflowMenu)
@@ -221,7 +223,7 @@ export function OverflowMenu({
         >
           <MenuItem onClick={e => handleCalibration(calType, e)}>
             {calType === 'pipetteOffset'
-              ? pipetteCalPresent != null
+              ? applicablePipetteOffsetCal != null
                 ? t('overflow_menu_recalibrate_pipette')
                 : t('overflow_menu_calibrate_pipette')
               : t('overflow_menu_recalibrate_tip_and_pipette')}

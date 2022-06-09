@@ -150,6 +150,7 @@ export function PipetteOffsetCalibrationItems({
                     calType="pipetteOffset"
                     robotName={robotName}
                     mount={calibration.mount}
+                    serialNumber={calibration.serialNumber ?? null}
                     updateRobotStatus={updateRobotStatus}
                   />
                 </StyledTableCell>
