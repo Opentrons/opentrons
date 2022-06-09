@@ -49,7 +49,7 @@ describe('useIsRobotViewable hook', () => {
     expect(result.current).toEqual(false)
   })
 
-  it('returns true when given a reachable robot name', () => {
+  it('returns false when given a reachable robot name', () => {
     when(mockGetDiscoverableRobotByName)
       .calledWith(undefined as any, 'otie')
       .mockReturnValue(mockReachableRobot)
@@ -58,7 +58,7 @@ describe('useIsRobotViewable hook', () => {
       wrapper,
     })
 
-    expect(result.current).toEqual(true)
+    expect(result.current).toEqual(false)
   })
 
   it('returns true when given a connectable robot name', () => {

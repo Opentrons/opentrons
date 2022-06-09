@@ -1,12 +1,7 @@
-import React from 'react'
 import { useSelector } from 'react-redux'
 
 import { useDispatchApiRequest } from '../../../redux/robot-api'
-import {
-  fetchLights,
-  updateLights,
-  getLightsOn,
-} from '../../../redux/robot-controls'
+import { updateLights, getLightsOn } from '../../../redux/robot-controls'
 
 import type { State } from '../../../redux/types'
 
@@ -20,12 +15,6 @@ export function useLights(
   const toggleLights = (): void => {
     dispatchRequest(updateLights(robotName, !lightsOn))
   }
-
-  React.useEffect(() => {
-    if (robotName != null) {
-      dispatchRequest(fetchLights(robotName))
-    }
-  }, [dispatchRequest, robotName])
 
   return { lightsOn, toggleLights }
 }

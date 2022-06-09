@@ -1157,6 +1157,30 @@ exports[`icons ot-calibrate renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons ot-checkbox renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className="sc-fznyAO c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="-1 -1 16 16"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M 10.3839,4.5 5.5,9.38388 2.61612,6.5 3.5,5.61612 l 2,2 4,-4 z M 1.5,0 C 0.671573,0 0,0.671573 0,1.5 v 10 C 0,12.3284 0.671573,13 1.5,13 h 10 C 12.3284,13 13,12.3284 13,11.5 V 1.5 C 13,0.671573 12.3284,0 11.5,0 Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons ot-click-and-drag renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;

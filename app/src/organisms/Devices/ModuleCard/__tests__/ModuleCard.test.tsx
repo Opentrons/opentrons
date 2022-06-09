@@ -229,9 +229,9 @@ describe('ModuleCard', () => {
     getByAltText('heaterShakerModuleV1')
   })
 
-  it('renders kebab icon and is clickable', () => {
+  it('renders kebab icon, opens and closes overflow menu on click', () => {
     mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
-    const { getByRole, getByText } = render({
+    const { getByRole, getByText, queryByText } = render({
       module: mockMagneticModule,
       robotName: mockRobot.name,
     })
@@ -241,7 +241,9 @@ describe('ModuleCard', () => {
     getByText('Magnetic Module GEN1')
     fireEvent.click(overflowButton)
     expect(overflowButton).not.toBeDisabled()
-    getByText('mock module overflow menu')
+    const overflowMenu = getByText('mock module overflow menu')
+    overflowMenu.click()
+    expect(queryByText('mock module overflow menu')).toBeNull()
   })
 
   it('renders kebab icon and it is disabled when run is in progress', () => {

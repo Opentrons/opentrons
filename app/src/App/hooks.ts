@@ -1,14 +1,18 @@
-import { useSelector } from 'react-redux'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useInterval } from '@opentrons/components'
 import {
   getNavbarLocations,
   getConnectedRobotPipettesMatch,
   getConnectedRobotPipettesCalibrated,
   getDeckCalibrationOk,
 } from '../redux/nav'
+import { checkShellUpdate } from '../redux/shell'
 import { getConnectedRobot } from '../redux/discovery'
 import { useIsProtocolRunLoaded } from '../organisms/ProtocolUpload/hooks'
 
+import type { Dispatch } from '../redux/types'
 import type { NavLocation } from '../redux/nav/types'
 
 export function useRunLocation(): NavLocation {
@@ -44,4 +48,13 @@ export function useNavLocations(): NavLocation[] {
   const navLocations = [robots, upload, runLocation, more]
 
   return navLocations
+}
+
+const UPDATE_RECHECK_INTERVAL_MS = 60000
+export function useSoftwareUpdatePoll(): void {
+  const dispatch = useDispatch<Dispatch>()
+  const checkAppUpdate = React.useCallback(() => dispatch(checkShellUpdate()), [
+    dispatch,
+  ])
+  useInterval(checkAppUpdate, UPDATE_RECHECK_INTERVAL_MS)
 }

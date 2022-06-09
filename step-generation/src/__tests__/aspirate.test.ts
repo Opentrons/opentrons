@@ -10,6 +10,7 @@ import {
   pipetteIntoHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestWithLatchOpen,
   pipetteAdjacentHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestMultiChannelPipette,
 } from '../utils'
 import {
   getInitialRobotStateStandard,
@@ -28,10 +29,7 @@ const fixtureTiprack10ul = _fixtureTiprack10ul as LabwareDefinition2
 const fixtureTiprack1000ul = _fixtureTiprack1000ul as LabwareDefinition2
 
 jest.mock('../utils/thermocyclerPipetteCollision')
-jest.mock('../utils/pipetteIntoHeaterShakerLatchOpen')
-jest.mock('../utils/pipetteIntoHeaterShakerWhileShaking')
-jest.mock('../utils/getIsHeaterShakerEastWestWithLatchOpen')
-jest.mock('../utils/pipetteAdjacentHeaterShakerWhileShaking')
+jest.mock('../utils/heaterShakerCollision')
 
 const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
   typeof thermocyclerPipetteCollision
@@ -44,6 +42,9 @@ const mockPipetteIntoHeaterShakerWhileShaking = pipetteIntoHeaterShakerWhileShak
 >
 const mockGetIsHeaterShakerEastWestWithLatchOpen = getIsHeaterShakerEastWestWithLatchOpen as jest.MockedFunction<
   typeof getIsHeaterShakerEastWestWithLatchOpen
+>
+const mockGetIsHeaterShakerEastWestMultiChannelPipette = getIsHeaterShakerEastWestMultiChannelPipette as jest.MockedFunction<
+  typeof getIsHeaterShakerEastWestMultiChannelPipette
 >
 const mockPipetteAdjacentHeaterShakerWhileShaking = pipetteAdjacentHeaterShakerWhileShaking as jest.MockedFunction<
   typeof pipetteAdjacentHeaterShakerWhileShaking
@@ -276,11 +277,36 @@ describe('aspirate', () => {
       type: 'HEATER_SHAKER_IS_SHAKING',
     })
   })
+  it('should return an error when aspirating east/west of a heater shaker with a multi channel pipette', () => {
+    when(mockGetIsHeaterShakerEastWestMultiChannelPipette)
+      .calledWith(
+        robotStateWithTip.modules,
+        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        expect.anything()
+      )
+      .mockReturnValue(true)
+
+    const result = aspirate(
+      {
+        ...flowRateAndOffsets,
+        pipette: DEFAULT_PIPETTE,
+        volume: 50,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      } as AspDispAirgapParams,
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL',
+    })
+  })
   it('should return an error when aspirating east/west of a heater shaker with its latch open', () => {
     when(mockGetIsHeaterShakerEastWestWithLatchOpen)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE]
+        robotStateWithTip.labware[SOURCE_LABWARE].slot
       )
       .mockReturnValue(true)
 
@@ -304,7 +330,7 @@ describe('aspirate', () => {
     when(mockPipetteAdjacentHeaterShakerWhileShaking)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE]
+        robotStateWithTip.labware[SOURCE_LABWARE].slot
       )
       .mockReturnValue(true)
 

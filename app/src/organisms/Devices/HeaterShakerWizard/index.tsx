@@ -50,7 +50,7 @@ export const HeaterShakerWizard = (
 
   let isPrimaryCTAEnabled: boolean = true
 
-  if (currentPage === 4) {
+  if (currentPage === 3) {
     isPrimaryCTAEnabled = Boolean(heaterShaker)
   }
   const labwareDef =
@@ -83,14 +83,19 @@ export const HeaterShakerWizard = (
         buttonContent = t('btn_begin_attachment')
         return <KeyParts />
       case 2:
-        buttonContent = t('btn_thermal_adapter')
+        buttonContent = t('btn_power_module')
         return <AttachModule moduleFromProtocol={moduleFromProtocol} />
       case 3:
-        buttonContent = t('btn_power_module')
-        return <AttachAdapter />
+        buttonContent = t('btn_thermal_adapter')
+        return <PowerOn attachedModule={heaterShaker} />
       case 4:
         buttonContent = t('btn_test_shake')
-        return <PowerOn attachedModule={heaterShaker} />
+        return (
+          // heaterShaker should never be null because isPrimaryCTAEnabled would be disabled otherwise
+          heaterShaker != null ? (
+            <AttachAdapter module={heaterShaker} runId={runId} />
+          ) : null
+        )
       case 5:
         buttonContent = t('complete')
         return (

@@ -708,32 +708,6 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
     )
 
 
-def test_command_store_ignores_known_finish_error() -> None:
-    """It not store a ProtocolEngineError that comes in with the stop action."""
-    subject = CommandStore()
-    error_details = FinishErrorDetails(
-        error=errors.ProtocolEngineError("oh no"),
-        error_id="error-id",
-        created_at=datetime(year=2021, month=1, day=1),
-    )
-
-    subject.handle_action(FinishAction(error_details=error_details))
-
-    assert subject.state == CommandState(
-        queue_status=QueueStatus.PAUSED,
-        run_result=RunResult.FAILED,
-        run_completed_at=None,
-        is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
-        errors_by_id={},
-        run_started_at=None,
-    )
-
-
 def test_command_store_save_started_completed_run_timestamp() -> None:
     """Should return a none empty run_completed_at and run_started_at."""
     subject = CommandStore()

@@ -51,6 +51,7 @@ import {
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useRunHasStarted,
+  useStoredProtocolAnalysis,
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 import { ProceedToRunButton } from './ProceedToRunButton'
@@ -101,7 +102,12 @@ export function SetupLabware({
   })
   const runHasStarted = useRunHasStarted(runId)
   const currentRun = useCurrentRun()
-  const { protocolData } = useProtocolDetailsForRun(runId)
+  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
+    runId
+  )
+  const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
+  const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
+
   const { t } = useTranslation('protocol_setup')
   const [
     showLabwareHelpModal,
@@ -156,6 +162,10 @@ export function SetupLabware({
     lpcDisabledReason = t('lpc_disabled_modules_not_connected')
   } else if (runHasStarted) {
     lpcDisabledReason = t('labware_position_check_not_available')
+  } else if (robotProtocolAnalysis == null) {
+    lpcDisabledReason = t(
+      'labware_position_check_not_available_analyzing_on_robot'
+    )
   } else if (
     isEmpty(protocolData?.pipettes) ||
     isEmpty(protocolData?.labware)

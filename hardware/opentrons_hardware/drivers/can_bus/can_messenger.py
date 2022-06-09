@@ -138,7 +138,7 @@ class CanMessenger:
                     for listener, filter in self._listeners.values():
                         if filter and not filter(message.arbitration_id):
                             continue
-                        listener(message_definition(payload=build), message.arbitration_id)  # type: ignore[arg-type]  # noqa: E501
+                        listener(message_definition(payload=build), message.arbitration_id)  # type: ignore[arg-type]
                 except BinarySerializableException:
                     log.exception(f"Failed to build from {message}")
             else:

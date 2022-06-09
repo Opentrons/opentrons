@@ -6,18 +6,23 @@ import { renderWithProviders } from '@opentrons/components'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
 import { home } from '../../../redux/robot-controls'
-import { UpdateBuildroot } from '../../../pages/Robots/RobotSettings/UpdateBuildroot'
 import * as Buildroot from '../../../redux/buildroot'
 import { restartRobot } from '../../../redux/robot-admin'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import {
+  mockConnectableRobot,
+  mockReachableRobot,
+} from '../../../redux/discovery/__fixtures__'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
+import { useIsRobotBusy } from '../hooks'
+import { UpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
 
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/robot-admin')
+jest.mock('../hooks')
 jest.mock('../../../redux/buildroot')
-jest.mock('../../../pages/Robots/RobotSettings/UpdateBuildroot')
+jest.mock('../RobotSettings/UpdateBuildroot')
 
 const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
   typeof useCurrentRunStatus
@@ -28,6 +33,9 @@ const getBuildrootUpdateDisplayInfo = Buildroot.getBuildrootUpdateDisplayInfo as
 const mockHome = home as jest.MockedFunction<typeof home>
 const mockRestartRobot = restartRobot as jest.MockedFunction<
   typeof restartRobot
+>
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
   typeof UpdateBuildroot
@@ -56,6 +64,7 @@ describe('RobotOverviewOverflowMenu', () => {
       updateFromFileDisabledReason: null,
     })
     when(mockUseCurrentRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
+    when(mockUseIsRobotBusy).calledWith().mockReturnValue(false)
     when(mockUpdateBuildroot).mockReturnValue(<div>mock update buildroot</div>)
   })
   afterEach(() => {
@@ -73,7 +82,7 @@ describe('RobotOverviewOverflowMenu', () => {
     })
     const restartBtn = getByRole('button', { name: 'restart robot' })
     const homeBtn = getByRole('button', { name: 'Home gantry' })
-    const settingsBtn = getByRole('link', { name: 'robot settings' })
+    const settingsBtn = getByRole('button', { name: 'robot settings' })
 
     expect(updateRobotSoftwareBtn).toBeEnabled()
     expect(restartBtn).toBeEnabled()
@@ -83,12 +92,35 @@ describe('RobotOverviewOverflowMenu', () => {
     getByText('mock update buildroot')
   })
 
-  it('should render disabled buttons in the menu when the run status is running', () => {
+  it('should render disabled buttons in the menu when the robot is busy', () => {
+    when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
     when(mockUseCurrentRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_RUNNING)
 
     const { getByRole } = render(props)
+
+    const btn = getByRole('button')
+    fireEvent.click(btn)
+
+    const updateRobotSoftwareBtn = getByRole('button', {
+      name: 'Update robot software',
+    })
+    const restartBtn = getByRole('button', { name: 'restart robot' })
+    const homeBtn = getByRole('button', { name: 'Home gantry' })
+
+    expect(updateRobotSoftwareBtn).toBeDisabled()
+    expect(restartBtn).toBeDisabled()
+    expect(homeBtn).toBeDisabled()
+  })
+
+  it('should render disabled buttons in the menu when the robot is not connectable', () => {
+    when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
+    when(mockUseCurrentRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_RUNNING)
+
+    const { getByRole } = render({ robot: mockReachableRobot })
 
     const btn = getByRole('button')
     fireEvent.click(btn)
@@ -138,6 +170,6 @@ describe('RobotOverviewOverflowMenu', () => {
     fireEvent.click(btn)
     getByRole('button', { name: 'restart robot' })
     getByRole('button', { name: 'Home gantry' })
-    getByRole('link', { name: 'robot settings' })
+    getByRole('button', { name: 'robot settings' })
   })
 })

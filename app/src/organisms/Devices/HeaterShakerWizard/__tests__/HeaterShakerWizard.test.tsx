@@ -90,13 +90,13 @@ describe('HeaterShakerWizard', () => {
     fireEvent.click(button)
     getByText('Mock Attach Module')
 
-    button = getByRole('button', { name: 'Continue to attach thermal adapter' })
-    fireEvent.click(button)
-    getByText('Mock Attach Adapter')
-
     button = getByRole('button', { name: 'Continue to power on module' })
     fireEvent.click(button)
     getByText('Mock Power On')
+
+    button = getByRole('button', { name: 'Continue to attach thermal adapter' })
+    fireEvent.click(button)
+    getByText('Mock Attach Adapter')
 
     button = getByRole('button', { name: 'Continue to test shake' })
     fireEvent.click(button)
@@ -132,13 +132,13 @@ describe('HeaterShakerWizard', () => {
     fireEvent.click(button)
     getByText('Mock Attach Module')
 
-    button = getByRole('button', { name: 'Continue to attach thermal adapter' })
-    fireEvent.click(button)
-    getByText('Mock Attach Adapter')
-
     button = getByRole('button', { name: 'Continue to power on module' })
     fireEvent.click(button)
     getByText('Mock Power On')
+
+    button = getByRole('button', { name: 'Continue to attach thermal adapter' })
+    fireEvent.click(button)
+    getByText('Mock Attach Adapter')
 
     button = getByRole('button', { name: 'Continue to test shake' })
     fireEvent.click(button)
@@ -160,15 +160,11 @@ describe('HeaterShakerWizard', () => {
     fireEvent.click(button)
     getByText('Mock Attach Module')
 
-    button = getByRole('button', { name: 'Continue to attach thermal adapter' })
-    fireEvent.click(button)
-    getByText('Mock Attach Adapter')
-
     button = getByRole('button', { name: 'Continue to power on module' })
     fireEvent.click(button)
     getByText('Mock Power On')
 
-    button = getByRole('button', { name: 'Continue to test shake' })
+    button = getByRole('button', { name: 'Continue to attach thermal adapter' })
     expect(button).toBeDisabled()
   })
 })

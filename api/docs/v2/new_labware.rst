@@ -1,13 +1,13 @@
 .. _new-labware:
 
-########
+#######
 Labware
-########
+#######
 
 
 When writing a protocol, you must inform the Protocol API about the labware you will be placing on the OT-2's deck.
 
-When you load labware, you specify the name of the labware (e.g. ``'corning_96_wellplate_360ul_flat'``), and the slot on the OT-2's deck in which it will be placed (e.g. ``'2'``). The first place to look for the names of labware should always be the `Opentrons Labware Library <https://labware.opentrons.com>`_, where Opentrons maintains a database of labware, their names in the API, what they look like, manufacturer part numbers, and more. In this example, we’ll use ``'corning_96_wellplate_360ul_flat'`` (`an ANSI standard 96-well plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_) and ``'opentrons_96_tiprack_300ul'`` (`the Opentrons standard 300 µL tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_).
+When you load labware, you specify the name of the labware (e.g. ``corning_96_wellplate_360ul_flat``), and the slot on the OT-2's deck in which it will be placed (e.g. ``2``). The first place to look for the names of labware should always be the `Opentrons Labware Library <https://labware.opentrons.com>`_, where Opentrons maintains a database of labware, their names in the API, what they look like, manufacturer part numbers, and more. In this example, we’ll use ``'corning_96_wellplate_360ul_flat'`` (`an ANSI standard 96-well plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_) and ``'opentrons_96_tiprack_300ul'`` (`the Opentrons standard 300 µL tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_).
 
 In the example given in the :ref:`overview-section-v2` section, we loaded labware like this:
 
@@ -200,144 +200,18 @@ and it will return the individual well objects in row A.
 
 
 .. _v2-location-within-wells:
-
-********************************
-Specifying Position Within Wells
-********************************
-
-The functions listed above (in the :ref:`new-well-access` section) return objects
-(or lists, lists of lists, dictionaries, or dictionaries of lists of objects)
-representing wells. These are :py:class:`opentrons.protocol_api.labware.Well`
-objects.
-:py:class:`.Well` objects have some useful methods on them, which allow
-you to more closely specify the location to which the OT-2 should move *inside*
-a given well.
-
-Each of these methods returns an object called a :py:class:`opentrons.types.Location`,
-which encapsulates a position in deck coordinates (see :ref:`protocol-api-deck-coords`)
-and a well with which it is associated. This lets you further manipulate the
-positions returned by these methods. All :py:class:`.InstrumentContext` methods that
-involve positions accept these :py:class:`.Location` objects.
-
-
-Position Modifiers
-^^^^^^^^^^^^^^^^^^
-
-Top
----
-
-The method :py:meth:`.Well.top` returns a position at the top center of the well. This
-is a good position to use for :ref:`new-blow-out` or any other operation where you
-don't want to be contacting the liquid. In addition, :py:meth:`.Well.top` takes an
-optional argument ``z``, which is a distance in mm to move relative to the top
-vertically (positive numbers move up, and negative numbers move down):
-
-.. code-block:: python
-
-   plate['A1'].top()     # This is the top center of the well
-   plate['A1'].top(z=1)  # This is 1mm above the top center of the well
-   plate['A1'].top(z=-1) # This is 1mm below the top center of the well
-
-.. versionadded:: 2.0
-
-Bottom
-------
-
-The method :py:meth:`.Well.bottom` returns a position at the bottom center of the
-well. This is a good position to start when considering where to aspirate,
-or any other operation where you want to be contacting the liquid. In addition,
-:py:meth:`.Well.bottom` takes an optional argument ``z``, which is a distance in mm
-to move relative to the bottom vertically (positive numbers move up, and negative
-numbers move down):
-
-.. code-block:: python
-
-   plate['A1'].bottom()     # This is the bottom center of the well
-   plate['A1'].bottom(z=1)  # This is 1mm above the bottom center of the well
-   plate['A1'].bottom(z=-1) # This is 1mm below the bottom center of the well.
-                            # this may be dangerous!
-
-
-.. warning::
-
-    Negative ``z`` arguments to :py:meth:`.Well.bottom` may cause the tip to
-    collide with the bottom of the well. The OT-2 has no sensors to detect this,
-    and if it happens, the pipette that collided will be too high in z until the next time it picks up a tip.
-
-
-.. note::
-
-   If you are using this to change the position at which the robot does
-   :ref:`new-aspirate` or :ref:`new-dispense` throughout the protocol, consider
-   setting the default aspirate or dispense offset with
-   :py:obj:`.InstrumentContext.well_bottom_clearance`
-   (see :ref:`new-default-op-positions`).
-
-.. versionadded:: 2.0
-
-Center
-------
-
-The method :py:meth:`.Well.center` returns a position centered in the well both
-vertically and horizontally. This can be a good place to start for precise
-control of positions within the well for unusual or custom labware.
-
-.. code-block:: python
-
-   plate['A1'].center() # This is the vertical and horizontal center of the well
-
-.. versionadded:: 2.0
-
-
-Manipulating Positions
-^^^^^^^^^^^^^^^^^^^^^^
-
-The objects returned by the position modifier functions are all instances of
-:py:class:`opentrons.types.Location`, which are
-`named tuples <https://docs.python.org/3/library/collections.html#collections.namedtuple>`_
-representing the combination of a point in space (another named tuple) and
-a reference to the associated :py:class:`.Well` (or :py:class:`.Labware`, or
-slot name, depending on context).
-
-To adjust the position within a well, you can use :py:meth:`.Location.move`.
-Pass it a :py:class:`opentrons.types.Point` representing a 3-dimensional offset.
-It will return a new location, representing the original location with that offset applied.
-
-For example:
-
-.. code-block:: python
-    :substitutions:
-
-    from opentrons import types
-
-    metadata = {'apiLevel': '|apiLevel|'}
-
-    def run(protocol):
-        plate = protocol.load_labware(
-        'corning_24_wellplate_3.4ml_flat', location='1')
-
-        # Get the center of well A1.
-        center_location = plate['A1'].center()
-
-        # Get a location 1 mm right, 1 mm back, and 1 mm up from the center of well A1.
-        adjusted_location = center_location.move(types.Point(x=1, y=1, z=1))
-
-        # Move to 1 mm right, 1 mm back, and 1 mm up from the center of well A1.
-        pipette.move_to(adjusted_location)
-
-.. versionadded:: 2.0
-
-
 .. _new-labware-well-properties:
 
-Well Properties
-^^^^^^^^^^^^^^^
-Sometimes you may need access to information about a given well in a labware, such as the depth or diameter.
+***************
+Well Dimensions
+***************
+
+The functions in the :ref:`new-well-access` section above return a single :py:class:`.Well` object or a larger object representing many wells. :py:class:`.Well` objects have methods that provide information about their physical shape, such as the depth or diameter, as specified in their corresponding labware definition. These properties can be used for different applications, such as calculating the volume of a well or a :ref:`position-relative-labware`.
 
 Depth
------
-The distance, in mm, between the very top of the well and the very bottom. For example, if you have a conical
-shaped well the depth is measured from the top to bottom-center of the cone well.
+^^^^^
+
+Use :py:meth:`.Well.depth` to get the distance in mm between the very top of the well and the very bottom. For example, a conical well's depth is measured from the top center to the bottom center of the well.
 
 .. code-block:: python
     :substitutions:
@@ -346,12 +220,11 @@ shaped well the depth is measured from the top to bottom-center of the cone well
 
     def run(protocol):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '1')
-        depth = plate['A1'].depth
+        depth = plate['A1'].depth # 10.67
 
 Diameter
---------
-The diameter of a given well, in mm, which is only relevant for labware with circular wells. If
-the well is not circular, the value returned will be ``None``.
+^^^^^^^^
+Use :py:meth:`.Well.diameter` to get the diameter of a given well in mm. Since diameter is a circular measurement, this method only works for labware with circular wells. If the well is not circular, the value returned will be ``None``. Use length and width (see below) for non-circular wells.
 
 .. code-block:: python
     :substitutions:
@@ -360,13 +233,12 @@ the well is not circular, the value returned will be ``None``.
 
     def run(protocol):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '1')
-        depth = plate['A1'].diameter
+        diameter = plate['A1'].diameter	# 6.86
 
 
 Length
-------
-The length of a given well, which is only relevant for labware with square wells. If
-the well is not rectangular, the value returned will be ``None``.
+^^^^^^
+Use :py:meth:`.Well.length` to get the length of a given well in mm. Length is defined as the distance along the robot's x-axis (left to right). This method only works with rectangular wells. If the well is not rectangular, the value returned will be ``None``. Use diameter (see above) for circular wells.
 
 .. code-block:: python
     :substitutions:
@@ -375,13 +247,13 @@ the well is not rectangular, the value returned will be ``None``.
 
     def run(protocol):
         plate = protocol.load_labware('nest_12_reservoir_15ml', '1')
-        length = plate['A1'].length
+        length = plate['A1'].length	# 8.2
 
 
 Width
------
-The width of a given well, which is only relevant for labware with square wells. If
-the well is not rectangular, the value returned will be ``None``.
+^^^^^
+Use :py:meth:`.Well.width` to get the width of a given well in mm. Width is defined as the distance along the y-axis (front to back). This method only works with rectangular wells. If the well is not rectangular, the value returned will be ``None``. Use diameter (see above) for circular wells.
+
 
 .. code-block:: python
     :substitutions:
@@ -390,11 +262,10 @@ the well is not rectangular, the value returned will be ``None``.
 
     def run(protocol):
         plate = protocol.load_labware('nest_12_reservoir_15ml', '1')
-        width = plate['A1'].width
+        width = plate['A1'].width	# 71.2
 
 
-These properties can be used for different applications, such as customizing tip location
-or calculating the volume of a well.
 
 
 .. versionadded:: 2.9
+

@@ -8,12 +8,18 @@ import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { useLights, useRobot, useIsRobotViewable } from '../hooks'
+import { useDispatchApiRequest } from '../../../redux/robot-api'
+import { fetchLights } from '../../../redux/robot-controls'
+import { useLights, useRobot } from '../hooks'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 import { RobotOverview } from '../RobotOverview'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 
+import type { DispatchApiRequestType } from '../../../redux/robot-api'
+
+jest.mock('../../../redux/robot-api')
+jest.mock('../../../redux/robot-controls')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 jest.mock('../RobotStatusBanner')
@@ -25,9 +31,6 @@ const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
 
 const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
-  typeof useIsRobotViewable
->
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
@@ -43,6 +46,10 @@ const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
 const mockRobotOverviewOverflowMenu = RobotOverviewOverflowMenu as jest.MockedFunction<
   typeof RobotOverviewOverflowMenu
 >
+const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
+  typeof useDispatchApiRequest
+>
+const mockFetchLights = fetchLights as jest.MockedFunction<typeof fetchLights>
 
 const mockToggleLights = jest.fn()
 
@@ -58,7 +65,11 @@ const render = () => {
 }
 
 describe('RobotOverview', () => {
+  let dispatchApiRequest: DispatchApiRequestType
+
   beforeEach(() => {
+    dispatchApiRequest = jest.fn()
+    mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
     mockUseLights.mockReturnValue({
       lightsOn: false,
       toggleLights: mockToggleLights,
@@ -72,7 +83,6 @@ describe('RobotOverview', () => {
     ))
     mockUpdateRobotBanner.mockReturnValue(<div>Mock UpdateRobotBanner</div>)
     mockUseCurrentRunId.mockReturnValue(null)
-    mockUseIsRobotViewable.mockReturnValue(true)
     mockRobotOverviewOverflowMenu.mockReturnValue(
       <div>mock RobotOverviewOverflowMenu</div>
     )
@@ -97,6 +107,11 @@ describe('RobotOverview', () => {
     getByText('Mock UpdateRobotBanner')
   })
 
+  it('fetches lights status', () => {
+    render()
+    expect(dispatchApiRequest).toBeCalledWith(mockFetchLights('otie'))
+  })
+
   it('renders a lights toggle button', () => {
     const [{ getByRole, getByText }] = render()
 
@@ -110,14 +125,14 @@ describe('RobotOverview', () => {
   it('renders a Run a Protocol button', () => {
     const [{ getByText }] = render()
 
-    getByText('Run a Protocol')
+    getByText('Run a protocol')
   })
 
   it('renders a choose protocol slideout hidden by default, expanded after launch', () => {
     const [{ getByText, getByRole }] = render()
 
     getByText('Mock Choose Protocol Slideout hidden')
-    const runButton = getByRole('button', { name: 'Run a Protocol' })
+    const runButton = getByRole('button', { name: 'Run a protocol' })
     fireEvent.click(runButton)
     getByText('Mock Choose Protocol Slideout showing')
   })

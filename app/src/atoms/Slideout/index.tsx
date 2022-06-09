@@ -148,7 +148,13 @@ export const Slideout = (props: Props): JSX.Element | null => {
             {children}
           </Box>
           {footer != null ? (
-            <Box paddingX={SPACING.spacing4} flex="0 0 auto">
+            <Box
+              paddingTop={SPACING.spacing4}
+              paddingX={SPACING.spacing4}
+              flex="0 0 auto"
+              //  TODO(jr, 6/6/22): add logic to hide this boxShadow if the children box is already scrolled to the max
+              boxShadow={'0px -4px 12px rgba(0, 0, 0, 0.15)'}
+            >
               {footer}
             </Box>
           ) : null}

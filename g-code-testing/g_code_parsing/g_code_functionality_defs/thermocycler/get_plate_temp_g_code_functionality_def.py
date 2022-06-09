@@ -3,7 +3,7 @@ from typing import Dict
 from string import Template
 from distutils.util import strtobool
 from opentrons.drivers.utils import parse_key_values
-from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (  # noqa: E501
+from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     GCodeFunctionalityDefBase,
 )
 

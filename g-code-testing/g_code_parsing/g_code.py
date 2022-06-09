@@ -10,7 +10,7 @@ from opentrons.drivers.thermocycler.driver import GCODE as THERMOCYCLER_G_CODE
 from opentrons.drivers.heater_shaker.driver import GCODE as HEATER_SHAKER_G_CODE
 from g_code_parsing.utils import reverse_enum
 from opentrons.hardware_control.emulation.parser import Parser
-from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (  # noqa: E501
+from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     Explanation,
 )
 from g_code_parsing.g_code_functionality_defs import (
@@ -37,39 +37,39 @@ class GCode:
         SMOOTHIE_G_CODE.HOME.name: smoothie.HomeGCodeFunctionalityDef,
         SMOOTHIE_G_CODE.SET_CURRENT.name: smoothie.SetCurrentGCodeFunctionalityDef,
         SMOOTHIE_G_CODE.DWELL.name: smoothie.DwellGCodeFunctionalityDef,
-        SMOOTHIE_G_CODE.CURRENT_POSITION.name: smoothie.CurrentPositionGCodeFunctionalityDef,  # noqa: E501
-        SMOOTHIE_G_CODE.LIMIT_SWITCH_STATUS.name: smoothie.LimitSwitchStatusGCodeFunctionalityDef,  # noqa: E501
+        SMOOTHIE_G_CODE.CURRENT_POSITION.name: smoothie.CurrentPositionGCodeFunctionalityDef,
+        SMOOTHIE_G_CODE.LIMIT_SWITCH_STATUS.name: smoothie.LimitSwitchStatusGCodeFunctionalityDef,
         SMOOTHIE_G_CODE.PROBE.name: smoothie.ProbeGCodeFunctionalityDef,
-        SMOOTHIE_G_CODE.ABSOLUTE_COORDS.name: smoothie.AbsoluteCoordinateModeGCodeFunctionalityDef,  # noqa: E501
-        SMOOTHIE_G_CODE.RELATIVE_COORDS.name: smoothie.RelativeCoordinateModeGCodeFunctionalityDef,  # noqa: E501
-        SMOOTHIE_G_CODE.RESET_FROM_ERROR.name: smoothie.ResetFromErrorGCodeFunctionalityDef,  # noqa: E501
+        SMOOTHIE_G_CODE.ABSOLUTE_COORDS.name: smoothie.AbsoluteCoordinateModeGCodeFunctionalityDef,
+        SMOOTHIE_G_CODE.RELATIVE_COORDS.name: smoothie.RelativeCoordinateModeGCodeFunctionalityDef,
+        SMOOTHIE_G_CODE.RESET_FROM_ERROR.name: smoothie.ResetFromErrorGCodeFunctionalityDef,
         SMOOTHIE_G_CODE.PUSH_SPEED.name: smoothie.PushSpeedGCodeFunctionalityDef,
         SMOOTHIE_G_CODE.POP_SPEED.name: smoothie.PopSpeedGCodeFunctionalityDef,
         SMOOTHIE_G_CODE.STEPS_PER_MM.name: smoothie.StepsPerMMGCodeFunctionalityDef,
         SMOOTHIE_G_CODE.SET_MAX_SPEED.name: smoothie.SetMaxSpeedGCodeFunctionalityDef,
         SMOOTHIE_G_CODE.ACCELERATION.name: smoothie.AccelerationGCodeFunctionalityDef,
-        SMOOTHIE_G_CODE.DISENGAGE_MOTOR.name: smoothie.DisengageMotorGCodeFunctionalityDef,  # noqa: E501
+        SMOOTHIE_G_CODE.DISENGAGE_MOTOR.name: smoothie.DisengageMotorGCodeFunctionalityDef,
         SMOOTHIE_G_CODE.HOMING_STATUS.name: smoothie.HomingStatusGCodeFunctionalityDef,
-        SMOOTHIE_G_CODE.MICROSTEPPING_B_DISABLE.name: smoothie.MicrosteppingBDisableGCodeFunctionalityDef,  # noqa: E501
-        SMOOTHIE_G_CODE.MICROSTEPPING_B_ENABLE.name: smoothie.MicrosteppingBEnableGCodeFunctionalityDef,  # noqa: E501
-        SMOOTHIE_G_CODE.MICROSTEPPING_C_DISABLE.name: smoothie.MicrosteppingCDisableGCodeFunctionalityDef,  # noqa: E501
-        SMOOTHIE_G_CODE.MICROSTEPPING_C_ENABLE.name: smoothie.MicrosteppingCEnableGCodeFunctionalityDef,  # noqa: E501
+        SMOOTHIE_G_CODE.MICROSTEPPING_B_DISABLE.name: smoothie.MicrosteppingBDisableGCodeFunctionalityDef,
+        SMOOTHIE_G_CODE.MICROSTEPPING_B_ENABLE.name: smoothie.MicrosteppingBEnableGCodeFunctionalityDef,
+        SMOOTHIE_G_CODE.MICROSTEPPING_C_DISABLE.name: smoothie.MicrosteppingCDisableGCodeFunctionalityDef,
+        SMOOTHIE_G_CODE.MICROSTEPPING_C_ENABLE.name: smoothie.MicrosteppingCEnableGCodeFunctionalityDef,
         SMOOTHIE_G_CODE.PIPETTE_HOME.name: smoothie.SetPipetteHomeGCodeFunctionalityDef,
-        SMOOTHIE_G_CODE.PIPETTE_RETRACT.name: smoothie.SetPipetteRetractGCodeFunctionalityDef,  # noqa: E501
-        SMOOTHIE_G_CODE.PIPETTE_DEBOUNCE.name: smoothie.SetPipetteDebounceGCodeFunctionalityDef,  # noqa: E501
-        SMOOTHIE_G_CODE.PIPETTE_MAX_TRAVEL.name: smoothie.SetPipetteMaxTravelGCodeFunctionalityDef,  # noqa: E501
-        SMOOTHIE_G_CODE.READ_INSTRUMENT_MODEL.name: smoothie.ReadInstrumentModelGCodeFunctionalityDef,  # noqa: E501
-        SMOOTHIE_G_CODE.READ_INSTRUMENT_ID.name: smoothie.ReadInstrumentIDGCodeFunctionalityDef,  # noqa: E501
-        SMOOTHIE_G_CODE.WRITE_INSTRUMENT_ID.name: smoothie.WriteInstrumentIDGCodeFunctionalityDef,  # noqa: E501
-        SMOOTHIE_G_CODE.WRITE_INSTRUMENT_MODEL.name: smoothie.WriteInstrumentModelGCodeFunctionalityDef,  # noqa: E501
+        SMOOTHIE_G_CODE.PIPETTE_RETRACT.name: smoothie.SetPipetteRetractGCodeFunctionalityDef,
+        SMOOTHIE_G_CODE.PIPETTE_DEBOUNCE.name: smoothie.SetPipetteDebounceGCodeFunctionalityDef,
+        SMOOTHIE_G_CODE.PIPETTE_MAX_TRAVEL.name: smoothie.SetPipetteMaxTravelGCodeFunctionalityDef,
+        SMOOTHIE_G_CODE.READ_INSTRUMENT_MODEL.name: smoothie.ReadInstrumentModelGCodeFunctionalityDef,
+        SMOOTHIE_G_CODE.READ_INSTRUMENT_ID.name: smoothie.ReadInstrumentIDGCodeFunctionalityDef,
+        SMOOTHIE_G_CODE.WRITE_INSTRUMENT_ID.name: smoothie.WriteInstrumentIDGCodeFunctionalityDef,
+        SMOOTHIE_G_CODE.WRITE_INSTRUMENT_MODEL.name: smoothie.WriteInstrumentModelGCodeFunctionalityDef,
     }
 
     MAGDECK_G_CODE_EXPLANATION_MAPPING = {
         MAGDECK_G_CODE.HOME.name: magdeck.HomeGCodeFunctionalityDef,
         MAGDECK_G_CODE.MOVE.name: magdeck.MoveGCodeFunctionalityDef,
-        MAGDECK_G_CODE.GET_CURRENT_POSITION.name: magdeck.CurrentPositionGCodeFunctionalityDef,  # noqa: E501
+        MAGDECK_G_CODE.GET_CURRENT_POSITION.name: magdeck.CurrentPositionGCodeFunctionalityDef,
         MAGDECK_G_CODE.PROBE_PLATE.name: magdeck.ProbeGCodeFunctionalityDef,
-        MAGDECK_G_CODE.GET_PLATE_HEIGHT.name: magdeck.GetPlateHeightGCodeFunctionalityDef,  # noqa: E501
+        MAGDECK_G_CODE.GET_PLATE_HEIGHT.name: magdeck.GetPlateHeightGCodeFunctionalityDef,
         MAGDECK_G_CODE.DEVICE_INFO.name: magdeck.DeviceInfoGCodeFunctionalityDef,
     }
 
@@ -82,30 +82,30 @@ class GCode:
 
     THERMOCYCLER_G_CODE_EXPLANATION_MAPPING = {
         THERMOCYCLER_G_CODE.CLOSE_LID.name: thermocycler.CloseLidGCodeFunctionalityDef,
-        THERMOCYCLER_G_CODE.DEVICE_INFO.name: thermocycler.DeviceInfoGCodeFunctionalityDef,  # noqa: E501
-        THERMOCYCLER_G_CODE.GET_PLATE_TEMP.name: thermocycler.GetPlateTempGCodeFunctionalityDef,  # noqa: E501
-        THERMOCYCLER_G_CODE.GET_LID_STATUS.name: thermocycler.LidStatusGCodeFunctionalityDef,  # noqa: E501
+        THERMOCYCLER_G_CODE.DEVICE_INFO.name: thermocycler.DeviceInfoGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.GET_PLATE_TEMP.name: thermocycler.GetPlateTempGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.GET_LID_STATUS.name: thermocycler.LidStatusGCodeFunctionalityDef,
         THERMOCYCLER_G_CODE.OPEN_LID.name: thermocycler.OpenLidGCodeFunctionalityDef,
-        THERMOCYCLER_G_CODE.SET_PLATE_TEMP.name: thermocycler.SetPlateTempGCodeFunctionalityDef,  # noqa: E501
-        THERMOCYCLER_G_CODE.SET_LID_TEMP.name: thermocycler.SetLidTempGCodeFunctionalityDef,  # noqa: E501
-        THERMOCYCLER_G_CODE.GET_LID_TEMP.name: thermocycler.GetLidTempGCodeFunctionalityDef,  # noqa: E501
-        THERMOCYCLER_G_CODE.SET_RAMP_RATE.name: thermocycler.SetRampRateGCodeFunctionalityDef,  # noqa: E501
-        THERMOCYCLER_G_CODE.DEACTIVATE_LID.name: thermocycler.DeactivateLidGCodeFunctionalityDef,  # noqa: E501
-        THERMOCYCLER_G_CODE.DEACTIVATE_BLOCK.name: thermocycler.DeactivateBlockGCodeFunctionalityDef,  # noqa: E501
-        THERMOCYCLER_G_CODE.DEACTIVATE_ALL.name: thermocycler.DeactivateAllGCodeFunctionalityDef,  # noqa: E501
-        THERMOCYCLER_G_CODE.EDIT_PID_PARAMS.name: thermocycler.EditPIDParamsGCodeFunctionalityDef,  # noqa: E501
+        THERMOCYCLER_G_CODE.SET_PLATE_TEMP.name: thermocycler.SetPlateTempGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.SET_LID_TEMP.name: thermocycler.SetLidTempGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.GET_LID_TEMP.name: thermocycler.GetLidTempGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.SET_RAMP_RATE.name: thermocycler.SetRampRateGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.DEACTIVATE_LID.name: thermocycler.DeactivateLidGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.DEACTIVATE_BLOCK.name: thermocycler.DeactivateBlockGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.DEACTIVATE_ALL.name: thermocycler.DeactivateAllGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.EDIT_PID_PARAMS.name: thermocycler.EditPIDParamsGCodeFunctionalityDef,
     }
 
     HEATER_SHAKER_G_CODE_EXPLANATION_MAPPING = {
         HEATER_SHAKER_G_CODE.SET_RPM.name: heater_shaker.SetRPMGCodeFunctionalityDef,
         HEATER_SHAKER_G_CODE.GET_RPM.name: heater_shaker.GetRPMGCodeFunctionalityDef,
-        HEATER_SHAKER_G_CODE.SET_TEMPERATURE.name: heater_shaker.SetTempGCodeFunctionalityDef,  # noqa: E501
-        HEATER_SHAKER_G_CODE.GET_TEMPERATURE.name: heater_shaker.GetTempGCodeFunctionalityDef,  # noqa: E501
+        HEATER_SHAKER_G_CODE.SET_TEMPERATURE.name: heater_shaker.SetTempGCodeFunctionalityDef,
+        HEATER_SHAKER_G_CODE.GET_TEMPERATURE.name: heater_shaker.GetTempGCodeFunctionalityDef,
         HEATER_SHAKER_G_CODE.HOME.name: heater_shaker.HomeGCodeFunctionalityDef,
-        HEATER_SHAKER_G_CODE.GET_VERSION.name: heater_shaker.GetVersionGCodeFunctionalityDef,  # noqa: E501
-        HEATER_SHAKER_G_CODE.OPEN_LABWARE_LATCH.name: heater_shaker.OpenLabwareLatchGCodeFunctionalityDef,  # noqa: E501
-        HEATER_SHAKER_G_CODE.CLOSE_LABWARE_LATCH.name: heater_shaker.CloseLabwareLatchGCodeFunctionalityDef,  # noqa: E501
-        HEATER_SHAKER_G_CODE.GET_LABWARE_LATCH_STATE.name: heater_shaker.GetLabwareLatchStateGCodeFunctionalityDef,  # noqa: E501
+        HEATER_SHAKER_G_CODE.GET_VERSION.name: heater_shaker.GetVersionGCodeFunctionalityDef,
+        HEATER_SHAKER_G_CODE.OPEN_LABWARE_LATCH.name: heater_shaker.OpenLabwareLatchGCodeFunctionalityDef,
+        HEATER_SHAKER_G_CODE.CLOSE_LABWARE_LATCH.name: heater_shaker.CloseLabwareLatchGCodeFunctionalityDef,
+        HEATER_SHAKER_G_CODE.GET_LABWARE_LATCH_STATE.name: heater_shaker.GetLabwareLatchStateGCodeFunctionalityDef,
     }
 
     # Smoothie G-Code Parsing Characters

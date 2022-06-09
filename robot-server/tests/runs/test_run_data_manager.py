@@ -59,11 +59,11 @@ def engine_state_summary() -> StateSummary:
     """Get a StateSummary value object."""
     return StateSummary(
         status=EngineStatus.IDLE,
-        errors=[ErrorOccurrence.construct(id="some-error-id")],  # type: ignore[call-arg]  # noqa: E501
-        labware=[LoadedLabware.construct(id="some-labware-id")],  # type: ignore[call-arg]  # noqa: E501
-        labwareOffsets=[LabwareOffset.construct(id="some-labware-offset-id")],  # type: ignore[call-arg]  # noqa: E501
-        pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]  # noqa: E501
-        modules=[LoadedModule.construct(id="some-module-id")],  # type: ignore[call-arg]  # noqa: E501
+        errors=[ErrorOccurrence.construct(id="some-error-id")],  # type: ignore[call-arg]
+        labware=[LoadedLabware.construct(id="some-labware-id")],  # type: ignore[call-arg]
+        labwareOffsets=[LabwareOffset.construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
+        pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]
+        modules=[LoadedModule.construct(id="some-module-id")],  # type: ignore[call-arg]
     )
 
 
@@ -353,20 +353,20 @@ async def test_get_all_runs(
     """It should get all runs, including current and historical."""
     current_run_data = StateSummary(
         status=EngineStatus.IDLE,
-        errors=[ErrorOccurrence.construct(id="current-error-id")],  # type: ignore[call-arg]  # noqa: E501
-        labware=[LoadedLabware.construct(id="current-labware-id")],  # type: ignore[call-arg]  # noqa: E501
-        labwareOffsets=[LabwareOffset.construct(id="current-labware-offset-id")],  # type: ignore[call-arg]  # noqa: E501
-        pipettes=[LoadedPipette.construct(id="current-pipette-id")],  # type: ignore[call-arg]  # noqa: E501
-        modules=[LoadedModule.construct(id="current-module-id")],  # type: ignore[call-arg]  # noqa: E501
+        errors=[ErrorOccurrence.construct(id="current-error-id")],  # type: ignore[call-arg]
+        labware=[LoadedLabware.construct(id="current-labware-id")],  # type: ignore[call-arg]
+        labwareOffsets=[LabwareOffset.construct(id="current-labware-offset-id")],  # type: ignore[call-arg]
+        pipettes=[LoadedPipette.construct(id="current-pipette-id")],  # type: ignore[call-arg]
+        modules=[LoadedModule.construct(id="current-module-id")],  # type: ignore[call-arg]
     )
 
     historical_run_data = StateSummary(
         status=EngineStatus.STOPPED,
-        errors=[ErrorOccurrence.construct(id="old-error-id")],  # type: ignore[call-arg]  # noqa: E501
-        labware=[LoadedLabware.construct(id="old-labware-id")],  # type: ignore[call-arg]  # noqa: E501
-        labwareOffsets=[LabwareOffset.construct(id="old-labware-offset-id")],  # type: ignore[call-arg]  # noqa: E501
-        pipettes=[LoadedPipette.construct(id="old-pipette-id")],  # type: ignore[call-arg]  # noqa: E501
-        modules=[LoadedModule.construct(id="old-module-id")],  # type: ignore[call-arg]  # noqa: E501
+        errors=[ErrorOccurrence.construct(id="old-error-id")],  # type: ignore[call-arg]
+        labware=[LoadedLabware.construct(id="old-labware-id")],  # type: ignore[call-arg]
+        labwareOffsets=[LabwareOffset.construct(id="old-labware-offset-id")],  # type: ignore[call-arg]
+        pipettes=[LoadedPipette.construct(id="old-pipette-id")],  # type: ignore[call-arg]
+        modules=[LoadedModule.construct(id="old-module-id")],  # type: ignore[call-arg]
     )
 
     current_run_resource = RunResource(
