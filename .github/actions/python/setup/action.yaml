@@ -8,13 +8,8 @@ inputs:
     description: 'Which makefile operation to preform'
     required: false
     default: 'setup'
-  sha:
-    description: 'SHA of commit'
-    required: false
-    default: ${{github.sha}}
 runs:
   using: 'docker'
   image: 'docker://otsam/otbuildy:0.0.2'
-  entrypoint: '/bin/bash -C'
   args: 
-  - "git clone https://github.com/Opentrons/opentrons.git && cd opentrons && git checkout ${{inputs.sha}} && make -C ${{ inputs.project}} ${{inputs.target}}"
+  - "git clone https://github.com/Opentrons/opentrons.git && cd opentrons && git checkout ${inputs.sha} && make -C ${{ inputs.project}} ${{inputs.target}}"
