@@ -31,7 +31,7 @@ def get_pretty_hostname(default: str = "no name set") -> str:
     return default
 
 
-async def persist_pretty_hostname(name: str) -> str:
+def persist_pretty_hostname(name: str) -> str:
     """Change the robot's pretty hostname.
 
     Writes the new name to /etc/machine-info so it persists across reboots.
