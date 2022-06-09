@@ -82,7 +82,7 @@ async def test_get_modules_maps_data_and_id(
         data=MagneticModuleData(
             status=MagneticStatus.ENGAGED,
             engaged=True,
-            height=101,
+            height=21,
         ),
     )
 
