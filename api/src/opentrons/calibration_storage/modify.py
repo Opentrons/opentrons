@@ -117,7 +117,7 @@ def create_tip_length_data(
         status = cal_status
     else:
         status = local_types.CalibrationStatus()
-    status_dict: "CalibrationStatusDict" = helpers.convert_to_dict(  # type: ignore[assignment]  # noqa: E501
+    status_dict: "CalibrationStatusDict" = helpers.convert_to_dict(  # type: ignore[assignment]
         status
     )
 
@@ -223,7 +223,7 @@ def save_robot_deck_attitude(
         status = cal_status
     else:
         status = local_types.CalibrationStatus()
-    status_dict: "CalibrationStatusDict" = helpers.convert_to_dict(  # type: ignore[assignment]  # noqa: E501
+    status_dict: "CalibrationStatusDict" = helpers.convert_to_dict(  # type: ignore[assignment]
         status
     )
 
@@ -268,7 +268,7 @@ def save_pipette_calibration(
         status = cal_status
     else:
         status = local_types.CalibrationStatus()
-    status_dict: "CalibrationStatusDict" = helpers.convert_to_dict(  # type: ignore[assignment]  # noqa: E501
+    status_dict: "CalibrationStatusDict" = helpers.convert_to_dict(  # type: ignore[assignment]
         status
     )
     offset_path = pip_dir / f"{pip_id}.json"
@@ -296,7 +296,7 @@ def save_gripper_calibration(
         status = cal_status
     else:
         status = local_types.CalibrationStatus()
-    status_dict: "CalibrationStatusDict" = helpers.convert_to_dict(  # type: ignore[assignment]  # noqa: E501
+    status_dict: "CalibrationStatusDict" = helpers.convert_to_dict(  # type: ignore[assignment]
         status
     )
 

@@ -69,9 +69,9 @@ class TipCalibrationUserFlow:
             CalibrationCommand.pick_up_tip: self.pick_up_tip,
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
             CalibrationCommand.save_offset: self.save_offset,
-            CalibrationCommand.move_to_reference_point: self.move_to_reference_point,  # noqa: E501
-            CalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,  # noqa: E501
-            CalibrationCommand.invalidate_last_action: self.invalidate_last_action,  # noqa: E501
+            CalibrationCommand.move_to_reference_point: self.move_to_reference_point,
+            CalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,
+            CalibrationCommand.invalidate_last_action: self.invalidate_last_action,
             CalibrationCommand.exit: self.exit_session,
         }
         self._default_tipracks = util.get_default_tipracks(
