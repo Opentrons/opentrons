@@ -18,4 +18,6 @@ SHELL ["/bin/bash", "--login", "-i", "-c"]
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash 
 RUN source /root/.bashrc && nvm install 14 && nvm use 14 && npm install --global yarn
 
-COPY ./ .
+RUN git clone https://github.com/Opentrons/opentrons.git
+WORKDIR /opentrons
+CMD ["/bin/bash","-c", "git checkout ${GITHUB_SHA} && make -C ${INPUT_PROJECT} ${INPUT_TARGET}"]
