@@ -10,19 +10,13 @@ from opentrons.protocol_engine.execution import (
     RunControlHandler,
     RailLightsHandler,
 )
-from opentrons.protocol_engine.state import StateView, LabwareView
+from opentrons.protocol_engine.state import StateView
 
 
 @pytest.fixture
 def state_view(decoy: Decoy) -> StateView:
     """Get a mocked out StateView."""
     return decoy.mock(cls=StateView)
-
-
-@pytest.fixture
-def labware_view(decoy: Decoy) -> LabwareView:
-    """Get a mock in the shape of a LabwareView."""
-    return decoy.mock(cls=LabwareView)
 
 
 @pytest.fixture

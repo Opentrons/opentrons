@@ -3,7 +3,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine import WellLocation, WellOffset
 from opentrons.protocol_engine.execution import PipettingHandler
-from opentrons.protocol_engine.state import LabwareView
+from opentrons.protocol_engine.state import StateView
 
 from opentrons.protocol_engine.commands.touch_tip import (
     TouchTipParams,
@@ -15,10 +15,10 @@ from opentrons.protocol_engine.commands.touch_tip import (
 async def test_touch_tip_implementation(
     decoy: Decoy,
     pipetting: PipettingHandler,
-    labware_view: LabwareView,
+    state_view: StateView,
 ) -> None:
     """A TouchTip command should have an execution implementation."""
-    subject = TouchTipImplementation(pipetting=pipetting, labware=labware_view)
+    subject = TouchTipImplementation(pipetting=pipetting, state_view=state_view)
 
     data = TouchTipParams(
         pipetteId="abc",
