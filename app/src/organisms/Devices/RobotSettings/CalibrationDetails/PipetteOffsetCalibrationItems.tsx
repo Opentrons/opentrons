@@ -149,8 +149,8 @@ export function PipetteOffsetCalibrationItems({
                   <OverflowMenu
                     calType="pipetteOffset"
                     robotName={robotName}
-                    serialNumber={calibration.serialNumber ?? null}
                     mount={calibration.mount}
+                    serialNumber={calibration.serialNumber ?? null}
                     updateRobotStatus={updateRobotStatus}
                   />
                 </StyledTableCell>
