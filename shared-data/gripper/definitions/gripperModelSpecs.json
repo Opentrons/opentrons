@@ -1,0 +1,53 @@
+{
+  "config": {
+    "gripper_v1": {
+      "name": "gripper",
+      "idleCurrent": {
+        "value": 0.1,
+        "min": 0.02,
+        "max": 1.0,
+        "units": "amps",
+        "type": "float"
+      },
+      "activeCurrent": {
+        "value": 0.8,
+        "min": 0.02,
+        "max": 2.0,
+        "units": "amps",
+        "type": "float"
+      },
+      "referenceVoltage": {
+        "value": 2.6,
+        "min": 0.5,
+        "max": 3.3,
+        "units": "volt",
+        "type": "float"
+      },
+      "pwmFrequency": {
+        "value": 32000,
+        "min": 1000,
+        "max": 32000,
+        "units": "hertz",
+        "type": "int"
+      },
+      "dutyCycle": {
+        "value": 50,
+        "min": 10,
+        "max": 90,
+        "units": "percentage",
+        "type": "int"
+      },
+      "baseOffsetFromMount": [6.775, 87.325, 32.05],
+      "jawCenterOffsetFromBase": [8.5, 2.5, 86],
+      "pinOneOffsetFromBase": [23, 73.37920159, 95],
+      "pinTwoOffsetFromBase": [23, 78.37920159, 95]
+    }
+  },
+  "mutableConfigs": [
+    "idleCurrent",
+    "activeCurrent",
+    "referenceVoltage",
+    "pwmFrequency",
+    "dutyCycle"
+  ]
+}

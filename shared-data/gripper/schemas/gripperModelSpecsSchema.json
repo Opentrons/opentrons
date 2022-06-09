@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+
+  "definitions": {
+    "positiveNumber": {
+      "type": "number",
+      "minimum": 0
+    },
+    "idleCurrentRange": {
+      "type": "number",
+      "minimum": 0.01,
+      "maximum": 1.0
+    },
+    "referenceVoltageRange": {
+      "type": "number",
+      "minimum": 0.01,
+      "maximum": 3.3
+    },
+    "pwmFrequencyRange": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 32000
+    },
+    "percentage": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "xyzArray": {
+      "type": "array",
+      "description": "Array of 3 numbers, [x, y, z]",
+      "items": { "type": "number" },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "editConfigurations": {
+      "type": "object",
+      "description": "Object allowing you to modify a config",
+      "required": ["value"],
+      "properties": {
+        "value": { "type": ["number", "array"] },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "units": { "type": "string" },
+        "type": { "type": "string" },
+        "displayName": { "type": "string" }
+      }
+    }
+  },
+
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["config", "mutableConfigs"],
+  "properties": {
+    "config": {
+      "description": "Version-level gripper specifications, which may vary across different versions of the same pipette",
+      "type": "object",
+      "$comment": "Example key: 'gripper_v1'",
+      "patternProperties": {
+        ".*": {
+          "required": [
+            "name",
+            "idleCurrent",
+            "activeCurrent",
+            "referenceVoltage",
+            "pwmFrequency",
+            "dutyCycle",
+            "baseOffsetFromMount",
+            "jawCenterOffsetFromBase",
+            "pinOneOffsetFromBase",
+            "pinTwoOffsetFromBase"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "description": "reference to name of this version, should match a key in corresponding gripperNameSpecs.json file",
+              "type": "string"
+            },
+            "idleCurrent": { "$ref": "#/definitions/idleCurrentRange" },
+            "activeCurrent": { "$ref": "#/definitions/editConfigurations" },
+            "referenceVoltage": {
+              "$ref": "#/definitions/referenceVoltageRange"
+            },
+            "pwmFrequency": { "$ref": "#/definitions/pwmFrequencyRange" },
+            "dutyCycle": { "$ref": "#/definitions/percentage" },
+            "baseOffsetFromMount": { "$ref": "#/definitions/xyzArray" },
+            "jawCenterOffsetFromBase": { "$ref": "#/definitions/xyzArray" },
+            "pinOneOffsetFromBase": { "$ref": "#/definitions/xyzArray" },
+            "pinTwoOffsetFromBase": { "$ref": "#/definitions/xyzArray" }
+          }
+        }
+      }
+    },
+    "mutableConfigs": {
+      "type": "array",
+      "description": "Array of mutable configs for a given gripper",
+      "items": { "type": "string" }
+    },
+    "validQuirks": {
+      "type": "array",
+      "description": "Array of valid quirks for a given gripper",
+      "items": { "type": "string" }
+    }
+  }
+}
