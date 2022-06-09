@@ -133,6 +133,7 @@ export function OverflowMenu({
     } else {
       if (calType === 'pipetteOffset') {
         if (pipetteCalPresent != null) {
+          // calibrate pipette offset with a wizard since not calibrated yet
           startPipetteOffsetCalibration({
             withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
           })
@@ -141,7 +142,6 @@ export function OverflowMenu({
           confirmStart()
         }
       } else {
-        // calibrate pipette offset with a wizard since not calibrated yet
         startPipetteOffsetPossibleTLC({ keepTipLength: true })
       }
     }
