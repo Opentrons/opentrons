@@ -51,6 +51,7 @@ import {
   useDeckCalibrationStatus,
   useIsRobotBusy,
   useAttachedPipettes,
+  useAttachedPipetteCalibrations,
 } from '../hooks'
 import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
@@ -144,9 +145,6 @@ export function RobotSettingsCalibration({
   const deckCalStatus = useSelector((state: State) => {
     return Calibration.getDeckCalibrationStatus(state, robotName)
   })
-  const attachedPipetteCalibrations = useSelector((state: State) => {
-    return Pipettes.getAttachedPipetteCalibrations(state, robotName)
-  })
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
   const dispatch = useDispatch<Dispatch>()
 
@@ -185,6 +183,7 @@ export function RobotSettingsCalibration({
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
   const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
   const attachedPipettes = useAttachedPipettes()
+  const attachedPipetteCalibrations = useAttachedPipetteCalibrations(robotName)
 
   const isRunning = useSelector(robotSelectors.getIsRunning)
 
@@ -262,7 +261,7 @@ export function RobotSettingsCalibration({
     pipettePresent
 
   const calCheckButtonDisabled = healthCheckIsPossible
-    ? Boolean(buttonDisabledReason)
+    ? Boolean(buttonDisabledReason) || isPending
     : true
 
   const onClickSaveAs: React.MouseEventHandler = e => {
@@ -465,6 +464,8 @@ export function RobotSettingsCalibration({
     }
   }, [createStatus])
 
+  // Note: following fetch need to reflect the latest state of calibrations
+  // when a user does calibration or rename a robot.
   useInterval(
     () => {
       dispatch(Calibration.fetchCalibrationStatus(robotName))
