@@ -140,8 +140,7 @@ class GeometryView:
         self,
         labware_id: str,
         well_name: str,
-        well_location: Optional[WellLocation],
-        radius: float = 1.0,
+        well_location: WellLocation,
     ) -> List[Point]:
         """Get list of absolute positions of four cardinal edges and center of well."""
         well_def = self._labware.get_well_definition(labware_id, well_name)
@@ -159,8 +158,8 @@ class GeometryView:
         else:
             raise ValueError(f'Shape "{well_def.shape}" is not a supported well shape')
 
-        x_offset = (x_size / 2.0) * radius
-        y_offset = (y_size / 2.0) * radius
+        x_offset = x_size / 2.0
+        y_offset = y_size / 2.0
         center = self.get_well_position(labware_id, well_name, well_location)
         # TODO question: should the pipette position end in the center?
         return [

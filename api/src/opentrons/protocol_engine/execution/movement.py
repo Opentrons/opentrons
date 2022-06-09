@@ -117,53 +117,6 @@ class MovementHandler:
                 critical_point=wp.critical_point,
             )
 
-    async def move_to_edges(
-        self,
-        pipette_id: str,
-        labware_id: str,
-        well_name: str,
-        well_location: WellLocation,
-        current_well: CurrentWell,
-    ) -> None:
-        """Move to the four cardinal edges/walls of a well."""
-        await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
-            labware_id=labware_id
-        )
-
-        # get the pipette's mount and current critical point, if applicable
-        pipette_location = self._state_store.motion.get_pipette_location(
-            pipette_id=pipette_id,
-            current_well=current_well,
-        )
-        hw_mount = pipette_location.mount.to_hw_mount()
-        origin_cp = pipette_location.critical_point
-
-        # get the origin of the movement from the hardware controller
-        origin = await self._hardware_api.gantry_position(
-            mount=hw_mount,
-            critical_point=origin_cp,
-        )
-        max_travel_z = self._hardware_api.get_instrument_max_height(mount=hw_mount)
-        # calculate the movement's waypoints
-        waypoints = self._state_store.motion.get_edge_waypoints(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-            well_location=well_location,
-            origin=origin,
-            origin_cp=origin_cp,
-            max_travel_z=max_travel_z,
-            current_well=current_well,
-        )
-
-        # move through the waypoints
-        for wp in waypoints:
-            await self._hardware_api.move_to(
-                mount=hw_mount,
-                abs_position=wp.position,
-                critical_point=wp.critical_point,
-            )
-
     async def move_relative(
         self,
         pipette_id: str,
