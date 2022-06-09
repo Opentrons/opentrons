@@ -34,13 +34,13 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
       paddingBottom={SPACING.spacing3}
       width="96.5%"
     >
-      <StyledText role="complementary" as="h5" marginBottom={SPACING.spacing3}>
+      <StyledText role="complementary" as="h5" fontWeight={TYPOGRAPHY.fontWeightSemiBold} marginBottom={SPACING.spacing3}>
         {props.title}
       </StyledText>
       <Flex justifyContent={JUSTIFY_START} flexDirection={DIRECTION_ROW}>
         <Link
           fontSize={FONT_SIZE_CAPTION}
-          css={TYPOGRAPHY.darkLinkPSemiBold}
+          css={TYPOGRAPHY.labelSemiBold}
           color={COLORS.darkBlack}
           href={PROTOCOL_LIBRARY_URL}
           id={'EmptyStateLinks_protocolLibraryButton'}
@@ -58,7 +58,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
         </Link>
         <Link
           fontSize={FONT_SIZE_CAPTION}
-          css={TYPOGRAPHY.darkLinkPSemiBold}
+          css={TYPOGRAPHY.labelSemiBold}
           color={COLORS.darkBlack}
           marginRight={SPACING.spacing3}
           href={PROTOCOL_DESIGNER_URL}
@@ -66,7 +66,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
           opacity="0.7"
           external
         >
-          <Flex alignItems={ALIGN_CENTER} css={TYPOGRAPHY.darkLinkPSemiBold}>
+          <Flex alignItems={ALIGN_CENTER} css={TYPOGRAPHY.labelSemiBold}>
             {t('launch_protocol_designer')}
 
             <Icon
@@ -80,7 +80,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
 
         <Link
           fontSize={FONT_SIZE_CAPTION}
-          css={TYPOGRAPHY.darkLinkPSemiBold}
+          css={TYPOGRAPHY.labelSemiBold}
           color={COLORS.darkBlack}
           href={API_DOCS_URL}
           id={'EmptyStateLinks_apiDocsButton'}
