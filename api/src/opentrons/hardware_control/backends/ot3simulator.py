@@ -457,3 +457,13 @@ class OT3Simulator:
         speed_mm_per_s: float,
     ) -> None:
         self._position[axis_to_node(moving)] += distance_mm
+
+    async def capacitive_pass(
+        self,
+        mount: OT3Mount,
+        moving: OT3Axis,
+        distance_mm: float,
+        speed_mm_per_s: float,
+    ) -> List[float]:
+        self._position[axis_to_node(moving)] += distance_mm
+        return []
