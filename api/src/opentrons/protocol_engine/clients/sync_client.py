@@ -159,7 +159,7 @@ class SyncClient:
         pipette_id: str,
         labware_id: str,
         well_name: str,
-        well_location: WellLocation
+        well_location: WellLocation,
     ) -> commands.TouchTipResult:
         """Execute a ``Touch Tip`` command and return the result."""
         request = commands.TouchTipCreate(

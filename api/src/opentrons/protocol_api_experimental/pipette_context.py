@@ -216,6 +216,7 @@ class PipetteContext:  # noqa: D101
                 offset=WellOffset(x=0, y=0, z=1),
             ),
         )
+        return self
 
     def air_gap(  # noqa: D102
         self,
