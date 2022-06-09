@@ -51,7 +51,6 @@ import {
   useIsRobotBusy,
   useAttachedPipettes,
   useAttachedPipetteCalibrations,
-  useRunHasStarted,
   useRunStartedAndSessionsQueryNotNull,
 } from '../hooks'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
