@@ -3,33 +3,42 @@ Entrypoint for the openembedded update server
 """
 import asyncio
 import logging
-import logging.config
+from typing import NoReturn
+
 from . import get_app
+
 from otupdate.common import name_management, cli, systemd
-from aiohttp import web
+from otupdate.common.run_application import run_and_notify_up
+
 
 LOG = logging.getLogger(__name__)
 
 
-def main() -> None:
+async def main() -> NoReturn:
     parser = cli.build_root_parser()
     args = parser.parse_args()
-    loop = asyncio.get_event_loop()
 
     systemd.configure_logging(getattr(logging, args.log_level.upper()))
 
-    LOG.info("Setting hostname")
-    hostname = loop.run_until_complete(name_management.set_up_static_hostname())
-    LOG.info(f"Set hostname to {hostname}")
+    # Because this involves restarting Avahi, this must happen early,
+    # before the NameSynchronizer starts up and connects to Avahi.
+    LOG.info("Setting static hostname")
+    static_hostname = await name_management.set_up_static_hostname()
+    LOG.info(f"Set static hostname to {static_hostname}")
 
-    LOG.info("Building openembedded update server")
-    app = get_app(args.version_file, args.config_file)
+    async with name_management.NameSynchronizer.start() as name_synchronizer:
+        LOG.info("Building openembedded update server")
+        app = get_app(
+            system_version_file=args.version_file,
+            config_file_override=args.config_file,
+            name_synchronizer=name_synchronizer,
+        )
 
-    systemd.notify_up()
-
-    LOG.info(f"Starting openembedded update server on http://{args.host}:{args.port}")
-    web.run_app(app, host=args.host, port=args.port)  # type: ignore[no-untyped-call]
+        LOG.info(
+            f"Starting openembedded update server on http://{args.host}:{args.port}"
+        )
+        await run_and_notify_up(app=app, host=args.host, port=args.port)
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
