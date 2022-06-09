@@ -52,7 +52,7 @@ import {
   useAttachedPipettes,
   useAttachedPipetteCalibrations,
   useRunHasStarted,
-  useRobotBusyAndRunStarted,
+  useRunStartedAndSessionsQueryNotNull,
 } from '../hooks'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
@@ -138,7 +138,7 @@ export function RobotSettingsCalibration({
     setPipetteOffsetCalBannerType,
   ] = React.useState<string>('')
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
-  const isRobotBusyAndRunStarted = useRobotBusyAndRunStarted()
+  const isRunStartedAndSessionsQueryNotNull = useRunStartedAndSessionsQueryNotNull()
   const isBusy = useIsRobotBusy()
 
   const robot = useRobot(robotName)
@@ -424,7 +424,7 @@ export function RobotSettingsCalibration({
   }
 
   const handleClickDeckCalibration = (): void => {
-    if (isRobotBusyAndRunStarted) {
+    if (isRunStartedAndSessionsQueryNotNull) {
       updateRobotStatus(true)
     } else {
       handleStartDeckCalSession()

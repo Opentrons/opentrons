@@ -4,7 +4,7 @@ import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../../RunTimeControl/hooks'
-import { useRobotBusyAndRunStarted } from '..'
+import { useRunStartedAndSessionsQueryNotNull } from '..'
 
 import type { Sessions } from '@opentrons/api-client'
 
@@ -22,7 +22,7 @@ const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
   typeof useAllSessionsQuery
 >
 
-describe('useRobotBusyAndRunStarted', () => {
+describe('useRunStartedAndSessionsQueryNotNull', () => {
   beforeEach(() => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
     mockUseCurrentRunId.mockReturnValue('123')
@@ -36,12 +36,12 @@ describe('useRobotBusyAndRunStarted', () => {
   })
 
   it('returns true when current run status is not idle', () => {
-    const result = useRobotBusyAndRunStarted()
+    const result = useRunStartedAndSessionsQueryNotNull()
     expect(result).toBe(true)
   })
 
   it('returns true when sessions are not empty', () => {
-    const result = useRobotBusyAndRunStarted()
+    const result = useRunStartedAndSessionsQueryNotNull()
     expect(result).toBe(true)
   })
 
@@ -59,7 +59,7 @@ describe('useRobotBusyAndRunStarted', () => {
       ],
       links: {},
     } as unknown) as UseQueryResult<Sessions, Error>)
-    const result = useRobotBusyAndRunStarted()
+    const result = useRunStartedAndSessionsQueryNotNull()
     expect(result).toBe(false)
   })
 })
