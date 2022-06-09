@@ -31,7 +31,7 @@ async def run_and_notify_up(app: web.Application, host: str, port: int) -> NoRet
             # It seems like there should be a better way of doing this,
             # but this is what the docs recommend.
             # https://docs.aiohttp.org/en/stable/web_advanced.html#application-runners
-            await asyncio.sleep(3600)
+            await asyncio.sleep(10)
 
     finally:
         await runner.cleanup()  # type: ignore[no-untyped-call]
