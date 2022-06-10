@@ -340,10 +340,7 @@ def test_blow_out(
             pipetteId="123",
             labwareId="456",
             wellName="A2",
-            wellLocation=WellLocation(
-                origin=WellOrigin.BOTTOM,
-                offset=WellOffset(x=0, y=0, z=1),
-            ),
+            wellLocation=WellLocation(),
         )
     )
 
