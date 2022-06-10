@@ -70,9 +70,7 @@ export function RenameRobotSlideout({
       if (!regexPattern.test(newName)) {
         errors.newRobotName = t('rename_robot_input_limitation_detail')
       }
-      if (
-        healthyReachableRobots.find(robot => newName === robot.name) != null
-      ) {
+      if (healthyReachableRobots.some(robot => newName === robot.name)) {
         errors.newRobotName = t('robot_name_already_exists')
       }
       return errors
