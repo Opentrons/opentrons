@@ -174,10 +174,14 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_leftMount_${protocolDisplayName}`}
               >
-                <StyledText as="h6" marginBottom={SPACING.spacing3} css={COLORS.darkGreyEnabled}>
+                <StyledText
+                  as="h6"
+                  marginBottom={SPACING.spacing3}
+                  css={COLORS.darkGreyEnabled}
+                >
                   {t('left_mount')}
                 </StyledText>
-                <StyledText as="p">
+                <StyledText as="p" marginTop={SPACING.spacing2}>
                   {
                     {
                       missing: t('no_data'),
@@ -257,7 +261,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               font-size="0.688rem"
               line-height="0.75rem"
               font-style="normal"
-            >    
+            >
               {t('updated')}
             </StyledText>
             <StyledText
