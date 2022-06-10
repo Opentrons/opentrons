@@ -108,7 +108,6 @@ class JsonCommandTranslator:
             "loadLiquid",
             "delay",
             "touchTip",
-            "blowout",
             "moveToSlot",
             "moveToCoordinates",
         ]

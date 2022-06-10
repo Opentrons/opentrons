@@ -145,6 +145,13 @@ from .set_rail_lights import (
     SetRailLightsCommandType,
 )
 
+from .blow_out import (
+    BlowOutParams,
+    BlowOutResult,
+    BlowOutCreate,
+    BlowOutImplementation,
+    BlowOut,
+)
 
 __all__ = [
     # command type unions
@@ -242,6 +249,12 @@ __all__ = [
     "SetRailLightsCreate",
     "SetRailLightsResult",
     "SetRailLightsCommandType",
+    # blow out command models
+    "BlowOutResult",
+    "BlowOutCreate",
+    "BlowOutImplementation",
+    "BlowOutParams",
+    "BlowOut",
     # module command bundles
     "heater_shaker",
     "magnetic_module",
