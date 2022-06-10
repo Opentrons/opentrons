@@ -58,7 +58,6 @@ export function RenameRobotSlideout({
   const reachableRobots = useSelector((state: State) =>
     getReachableRobots(state)
   )
-
   const unreachableRobots = useSelector((state: State) =>
     getUnreachableRobots(state)
   )
@@ -71,11 +70,11 @@ export function RenameRobotSlideout({
       const newName = values.newRobotName
       console.log('form robotName', robotName)
       setPreviousRobotName(robotName)
-      const duplicatedName = unreachableRobots.find(
+      const sameNameRobotInUnavailable = unreachableRobots.find(
         robot => robot.name === newName
       )
-      if (duplicatedName != null) {
-        dispatch(removeRobot(previousRobotName))
+      if (sameNameRobotInUnavailable != null) {
+        dispatch(removeRobot(sameNameRobotInUnavailable.name))
       }
       updateRobotName(newName)
       resetForm({ values: { newRobotName: '' } })
@@ -99,8 +98,7 @@ export function RenameRobotSlideout({
 
   const { updateRobotName } = useUpdateRobotNameMutation({
     onSuccess: (data: UpdatedRobotName) => {
-      // remove the previous robot name from the list
-      // console.log('previousRobotName', previousRobotName)
+      // TODO: 6/10/2022 kj for the robot name, we need to use GET: /server/name
       // data.name != null && history.push(`/devices/${data.name}/robot-settings`)
       // TODO 6/9/2022 kj this is a temporary fix to avoid the issue
       // https://github.com/Opentrons/opentrons/issues/10709
