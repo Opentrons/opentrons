@@ -68,13 +68,15 @@ export interface HeaterShakerModuleState {
   targetSpeed: number | null
   latchOpen: boolean | null
 }
+
+export type ModuleState =
+  | MagneticModuleState
+  | TemperatureModuleState
+  | ThermocyclerModuleState
+  | HeaterShakerModuleState
 export interface ModuleTemporalProperties {
   slot: DeckSlot
-  moduleState:
-    | MagneticModuleState
-    | TemperatureModuleState
-    | ThermocyclerModuleState
-    | HeaterShakerModuleState
+  moduleState: ModuleState
 }
 
 export interface LabwareEntity {

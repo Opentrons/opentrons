@@ -1,7 +1,21 @@
 import {
   MAGNETIC_MODULE_V1,
   TEMPERATURE_MODULE_V1,
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
+import type { ModuleType } from '@opentrons/shared-data'
+import type {
+  MagneticModuleState,
+  TemperatureModuleState,
+  ThermocyclerModuleState,
+  HeaterShakerModuleState,
+  ModuleState,
+} from './types'
+
 // Temperature statuses
 export const TEMPERATURE_DEACTIVATED: 'TEMPERATURE_DEACTIVATED' =
   'TEMPERATURE_DEACTIVATED'
@@ -15,3 +29,34 @@ export const MODULES_WITH_COLLISION_ISSUES = [
   TEMPERATURE_MODULE_V1,
 ]
 export const FIXED_TRASH_ID: 'fixedTrash' = 'fixedTrash'
+
+export const MAGNETIC_MODULE_INITIAL_STATE: MagneticModuleState = {
+  type: MAGNETIC_MODULE_TYPE,
+  engaged: false,
+}
+export const TEMPERATURE_MODULE_INITIAL_STATE: TemperatureModuleState = {
+  type: TEMPERATURE_MODULE_TYPE,
+  status: TEMPERATURE_DEACTIVATED,
+  targetTemperature: null,
+}
+export const THERMOCYCLER_MODULE_INITIAL_STATE: ThermocyclerModuleState = {
+  type: THERMOCYCLER_MODULE_TYPE,
+  blockTargetTemp: null,
+  lidTargetTemp: null,
+  lidOpen: null,
+}
+export const HEATERSHAKER_MODULE_INITIAL_STATE: HeaterShakerModuleState = {
+  type: HEATERSHAKER_MODULE_TYPE,
+  targetTemp: null,
+  targetSpeed: null,
+  latchOpen: null,
+}
+
+export const MODULE_INITIAL_STATE_BY_TYPE: {
+  [moduleType in ModuleType]: ModuleState
+} = {
+  [MAGNETIC_MODULE_TYPE]: MAGNETIC_MODULE_INITIAL_STATE,
+  [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_INITIAL_STATE,
+  [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_INITIAL_STATE,
+  [HEATERSHAKER_MODULE_TYPE]: HEATERSHAKER_MODULE_INITIAL_STATE,
+}

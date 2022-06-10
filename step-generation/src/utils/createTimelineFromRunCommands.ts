@@ -1,15 +1,16 @@
 import { RunTimeCommand } from '@opentrons/shared-data'
 
+import { getNextRobotStateAndWarningsSingleCommand } from '../getNextRobotStateAndWarnings'
+import { MODULE_INITIAL_STATE_BY_TYPE } from '../constants'
+import { constructInvariantContextFromRunCommands } from './constructInvariantContextFromRunCommands'
 import { makeInitialRobotState } from './misc'
 
 import type { RobotState, Timeline } from '../types'
-import { getNextRobotStateAndWarningsSingleCommand } from '../getNextRobotStateAndWarnings'
 
 export function createTimelineFromRunCommands(
   commands: RunTimeCommand[]
 ): Timeline {
   const invariantContext = constructInvariantContextFromRunCommands(commands)
-
   const pipetteLocations = commands.reduce<RobotState['pipettes']>(
     (acc, command) => {
       if (command.commandType === 'loadPipette') {
@@ -20,6 +21,7 @@ export function createTimelineFromRunCommands(
           },
         }
       }
+      return acc
     },
     {}
   )
@@ -37,6 +39,26 @@ export function createTimelineFromRunCommands(
           },
         }
       }
+      return acc
+    },
+    {}
+  )
+
+  const moduleLocations = commands.reduce<RobotState['modules']>(
+    (acc, command) => {
+      if (command.commandType === 'loadModule') {
+        return {
+          ...acc,
+          [command.result.moduleId]: {
+            slot: command.params.location.slotName,
+            moduleState:
+              MODULE_INITIAL_STATE_BY_TYPE[
+                command.result.definition.moduleType
+              ],
+          },
+        }
+      }
+      return acc
     },
     {}
   )
