@@ -13,11 +13,13 @@ const overflowButtonStyles = css`
     fill: ${COLORS.darkGreyHover};
   }
 
-  &:active {
+  &:active,
+  &:focus {
     background-color: #16212d40;
   }
 
-  &:active circle {
+  &:active circle,
+  &:focus circle {
     fill: ${COLORS.darkGreyPressed};
   }
 
