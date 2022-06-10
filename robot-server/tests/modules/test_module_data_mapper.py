@@ -1,5 +1,6 @@
 """Tests for robot_server.modules.module_data_mapper."""
 import pytest
+from typing import Dict
 
 from opentrons.protocol_engine import ModuleModel
 from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
@@ -29,17 +30,35 @@ from robot_server.modules.module_models import (
 
 
 @pytest.mark.parametrize(
-    "input_model",
-    ["magneticModuleV1", "magneticModuleV2"],
-)
-@pytest.mark.parametrize(
-    "input_data",
+    ("input_model", "input_data", "output_data"),
     [
-        {"status": "engaged", "data": {"engaged": True, "height": 42}},
-        {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
+        (
+            "magneticModuleV1",
+            {"status": "engaged", "data": {"engaged": True, "height": 42}},
+            {"data": {"height": 21}},
+        ),
+        (
+            "magneticModuleV1",
+            {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
+            {"data": {"height": 0.0}},
+        ),
+        (
+            "magneticModuleV2",
+            {"status": "engaged", "data": {"engaged": True, "height": 42}},
+            {"data": {"height": 42}},
+        ),
+        (
+            "magneticModuleV2",
+            {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
+            {"data": {"height": 0.0}},
+        ),
     ],
 )
-def test_maps_magnetic_module_data(input_model: str, input_data: LiveData) -> None:
+def test_maps_magnetic_module_data(
+    input_model: str,
+    input_data: LiveData,
+    output_data: Dict[str, float],
+) -> None:
     """It should map hardware data to a magnetic module."""
     module_identity = ModuleIdentity(
         module_id="module-id",
@@ -76,7 +95,7 @@ def test_maps_magnetic_module_data(input_model: str, input_data: LiveData) -> No
         data=MagneticModuleData(
             status=MagneticStatus(input_data["status"]),
             engaged=input_data["data"]["engaged"],  # type: ignore[arg-type]
-            height=input_data["data"]["height"],  # type: ignore[arg-type]
+            height=output_data["data"]["height"],  # type: ignore[index]
         ),
     )
 
