@@ -123,7 +123,7 @@ async def get_current_run_engine_from_url(
         - Setup commands (`data.source == "setup"`)
         - Protocol commands (`data.source == "protocol"`)
 
-        Setup commands may be enqueued while the run is idle or paused.
+        Setup commands may be enqueued before the run has been started.
         You could use setup commands to prepare a module or
         run labware calibration procedures.
 
@@ -146,7 +146,9 @@ async def get_current_run_engine_from_url(
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[pe_commands.Command]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
-        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorBody[Union[RunStopped, CommandNotAllowed]]
+        },
     },
 )
 async def create_run_command(

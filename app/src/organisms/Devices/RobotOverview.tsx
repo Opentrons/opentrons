@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Box,
   Flex,
+  useInterval,
   ALIGN_CENTER,
   ALIGN_START,
   C_MED_LIGHT_GRAY,
@@ -20,6 +21,8 @@ import {
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { ToggleButton, PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
+import { useDispatchApiRequest } from '../../redux/robot-api'
+import { fetchLights } from '../../redux/robot-controls'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
 import { Portal } from '../../App/portal'
@@ -28,7 +31,9 @@ import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { RobotStatusBanner } from './RobotStatusBanner'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
-import { useLights, useRobot } from './hooks'
+import { useIsRobotBusy, useLights, useRobot } from './hooks'
+
+const EQUIPMENT_POLL_MS = 5000
 
 interface RobotOverviewProps {
   robotName: string
@@ -38,6 +43,7 @@ export function RobotOverview({
   robotName,
 }: RobotOverviewProps): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
+  const [dispatchRequest] = useDispatchApiRequest()
 
   const robot = useRobot(robotName)
   const [
@@ -46,6 +52,15 @@ export function RobotOverview({
   ] = React.useState<boolean>(false)
   const { lightsOn, toggleLights } = useLights(robotName)
   const currentRunId = useCurrentRunId()
+  const isRobotBusy = useIsRobotBusy()
+
+  useInterval(
+    () => {
+      dispatchRequest(fetchLights(robotName))
+    },
+    EQUIPMENT_POLL_MS,
+    true
+  )
 
   return robot != null ? (
     <Flex
@@ -64,7 +79,7 @@ export function RobotOverview({
       />
       <Box padding={SPACING.spacing3} width="100%">
         <ReachableBanner robot={robot} />
-        {robot != null ? (
+        {robot != null && !isRobotBusy ? (
           <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing3} />
         ) : null}
         {robot?.status === CONNECTABLE ? (

@@ -31,12 +31,13 @@ const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 
 interface CustomLabwareOverflowMenuProps {
   filename: string
+  onDelete?: () => void
 }
 
 export function CustomLabwareOverflowMenu(
   props: CustomLabwareOverflowMenuProps
 ): JSX.Element {
-  const { filename } = props
+  const { filename, onDelete } = props
   const { t } = useTranslation(['labware_landing'])
   const dispatch = useDispatch<Dispatch>()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
@@ -47,10 +48,10 @@ export function CustomLabwareOverflowMenu(
     confirm: confirmDeleteLabware,
     showConfirmation: showDeleteConfirmation,
     cancel: cancelDeleteLabware,
-  } = useConditionalConfirm(
-    () => dispatch(deleteCustomLabwareFile(filename)),
-    true
-  )
+  } = useConditionalConfirm(() => {
+    dispatch(deleteCustomLabwareFile(filename))
+    onDelete?.()
+  }, true)
   const handleOpenInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()

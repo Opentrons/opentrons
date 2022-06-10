@@ -121,27 +121,26 @@ export function DevicesLanding(): JSX.Element {
 function DevicesLoadingState(): JSX.Element {
   const { t } = useTranslation('devices_landing')
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
-      <StyledText as="h1" marginTop="20vh">
-        {t('looking_for_robots')}
-      </StyledText>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      alignItems={ALIGN_CENTER}
+      marginTop="10vh"
+      marginBottom="10vh"
+    >
+      <StyledText as="h1">{t('looking_for_robots')}</StyledText>
       <Icon
         name="ot-spinner"
         aria-label="ot-spinner"
         spin
         size={SIZE_2}
         marginTop={SPACING.spacing4}
+        marginBottom={SPACING.spacing4}
       />
       <ExternalLink
         href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
         id="DevicesEmptyState_troubleshootingConnectionProblems"
       >
         {t('troubleshooting_connection_problems')}
-        <Icon
-          name="open-in-new"
-          size="0.675rem"
-          marginLeft={SPACING.spacing2}
-        />
       </ExternalLink>
     </Flex>
   )

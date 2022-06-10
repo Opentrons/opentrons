@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2022-06-09)
+
+
+### Bug Fixes
+
+* **api:** delete legacy deck calibration file ([#10656](https://github.com/Opentrons/opentrons/issues/10656)) ([787c3a5](https://github.com/Opentrons/opentrons/commit/787c3a5a5586678fc0d74b497b80687ae7ec58f4))
+* **api:** mark JSONv6 run as failed if queued protocol command fails ([#10629](https://github.com/Opentrons/opentrons/issues/10629)) ([a521e16](https://github.com/Opentrons/opentrons/commit/a521e16c0b8c47006198a2479d0c71954db11016)), closes [#9888](https://github.com/Opentrons/opentrons/issues/9888)
+* **engine:** disallow setup commands while run is paused ([#10675](https://github.com/Opentrons/opentrons/issues/10675)) ([bd3a4e1](https://github.com/Opentrons/opentrons/commit/bd3a4e146ace8157687cf6913ec3794bae0f4411))
+
+
+### Features
+
+* **api, ot3:** add gripper to get_attached_instruments  ([#10619](https://github.com/Opentrons/opentrons/issues/10619)) ([212dfc5](https://github.com/Opentrons/opentrons/commit/212dfc540f29fe05cc56335560fb22a70e7bf9b5))
+
+
+
+
+
 # [6.0.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.0...v6.0.0-alpha.1) (2022-06-07)
 
 

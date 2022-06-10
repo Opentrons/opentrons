@@ -73,9 +73,9 @@ export function RenameRobotSlideout({
       // remove the previous robot name from the list
       dispatch(removeRobot(previousRobotName))
       // data.name != null && history.push(`/devices/${data.name}/robot-settings`)
-      // TODO kj: this is a temporary fix to avoid Download logs button disabled issue
-      // Once fix react tree rendering issue, the push direction will be switched to robot-settings
-      data.name != null && history.push(`/devices/${data.name}`)
+      // TODO 6/9/2022 kj this is a temporary fix to avoid the issue
+      // https://github.com/Opentrons/opentrons/issues/10709
+      data.name != null && history.push(`/devices`)
     },
     onError: (error: Error) => {
       // TODO kj 5/25/2022: when a user lost connection while the user is renaming a robot,

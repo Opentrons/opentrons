@@ -10,7 +10,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import thermocycler as tc_commands
-from opentrons.protocol_engine.commands.thermocycler.wait_for_block_temperature import (  # noqa: E501
+from opentrons.protocol_engine.commands.thermocycler.wait_for_block_temperature import (
     WaitForBlockTemperatureImpl,
 )
 

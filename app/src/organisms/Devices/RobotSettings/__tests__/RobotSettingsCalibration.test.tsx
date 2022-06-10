@@ -6,7 +6,6 @@ import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
-import { DeckCalibrationModal } from '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { useTrackEvent } from '../../../../redux/analytics'
 import * as RobotSelectors from '../../../../redux/robot/selectors'
 import * as Calibration from '../../../../redux/calibration'
@@ -40,6 +39,7 @@ import {
   useAttachedPipettes,
   useIsRobotBusy,
   useDeckCalibrationStatus,
+  useRunStartedOrLegacySessionInProgress,
 } from '../../hooks'
 
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
@@ -52,9 +52,6 @@ import type {
 } from '../../../../redux/pipettes/types'
 
 jest.mock('file-saver')
-jest.mock(
-  '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
-)
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/calibration/selectors')
@@ -85,10 +82,6 @@ const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = {
     tipLength: mockTipLengthCalibration2,
   },
 } as any
-
-const mockDeckCalibrationModal = DeckCalibrationModal as jest.MockedFunction<
-  typeof DeckCalibrationModal
->
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
 >
@@ -126,6 +119,9 @@ const mockGetAttachedPipettes = Pipettes.getAttachedPipettes as jest.MockedFunct
 const mockGetAttachedPipetteCalibrations = Pipettes.getAttachedPipetteCalibrations as jest.MockedFunction<
   typeof Pipettes.getAttachedPipetteCalibrations
 >
+const mockUseRunStartedOrLegacySessionInProgress = useRunStartedOrLegacySessionInProgress as jest.MockedFunction<
+  typeof useRunStartedOrLegacySessionInProgress
+>
 
 let mockTrackEvent: jest.Mock
 const mockUpdateRobotStatus = jest.fn()
@@ -160,10 +156,8 @@ describe('RobotSettingsCalibration', () => {
 
   beforeEach(() => {
     mockTrackEvent = jest.fn()
+    mockUseRunStartedOrLegacySessionInProgress.mockReturnValue(false)
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    mockDeckCalibrationModal.mockReturnValue(
-      <div>Mock DeckCalibrationModal</div>
-    )
     mockUseDeckCalibrationData.mockReturnValue({
       deckCalibrationData: mockDeckCalData,
       isDeckCalibrated: true,
@@ -199,14 +193,6 @@ describe('RobotSettingsCalibration', () => {
     getByText(
       'For the robot to move accurately and precisely, you need to calibrate it. Positional calibration happens in three parts: deck calibration, pipette offset calibration and tip length calibration.'
     )
-  })
-
-  it('renders a clickable link to the deck calibration modal', () => {
-    const [{ getByText, queryByText }] = render()
-    expect(queryByText('Mock DeckCalibrationModal')).toBeFalsy()
-    const modalLink = getByText('See how robot calibration works')
-    modalLink.click()
-    getByText('Mock DeckCalibrationModal')
   })
 
   it('renders a download calibration data button', () => {
@@ -271,7 +257,7 @@ describe('RobotSettingsCalibration', () => {
     getByText(
       'Deck calibration measures the deck position relative to the gantry. This calibration is the foundation for tip length and pipette offset calibrations. Calibrate your deck during new robot setup. Redo deck calibration if you relocate your robot.'
     )
-    getByRole('button', { name: 'Recalibrate deck' })
+    getByRole('button', { name: 'Calibrate deck' })
     getByText('Last calibrated: September 15, 2021 00:00')
   })
 
@@ -298,9 +284,7 @@ describe('RobotSettingsCalibration', () => {
     getByRole('button', { name: 'Calibrate now' })
   })
 
-  // TODO kj 06/02/2022 temporarily skip this case and this will be solved by another PR
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip('should call update robot status if a robot is busy - deck cal', () => {
+  it('should call update robot status if a robot is busy - deck cal', () => {
     mockUseDeckCalibrationStatus.mockReturnValue(
       Calibration.DECK_CAL_STATUS_IDENTITY
     )
@@ -308,10 +292,11 @@ describe('RobotSettingsCalibration', () => {
       deckCalibrationData: mockWarningDeckCalData,
       isDeckCalibrated: true,
     })
+    mockUseRunStartedOrLegacySessionInProgress.mockReturnValue(true)
     mockGetIsRunning.mockReturnValue(false)
     mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Recalibrate deck' })
+    const button = getByRole('button', { name: 'Calibrate deck' })
     fireEvent.click(button)
     expect(mockUpdateRobotStatus).toHaveBeenCalled()
   })
@@ -330,21 +315,21 @@ describe('RobotSettingsCalibration', () => {
   it('recalibration button is disabled when a robot is unreachable', () => {
     mockUseRobot.mockReturnValue(mockUnreachableRobot)
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Recalibrate deck' })
+    const button = getByRole('button', { name: 'Calibrate deck' })
     expect(button).toBeDisabled()
   })
 
   it('recalibration button is disabled when a robot is running', () => {
     mockGetIsRunning.mockReturnValue(true)
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Recalibrate deck' })
+    const button = getByRole('button', { name: 'Calibrate deck' })
     expect(button).toBeDisabled()
   })
 
-  it('recalibration button is disabled when a robot pipettes are null', () => {
+  it('deck calibration button is disabled when a robot pipettes are null', () => {
     mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Recalibrate deck' })
+    const button = getByRole('button', { name: 'Calibrate deck' })
     expect(button).toBeDisabled()
   })
 
@@ -392,7 +377,7 @@ describe('RobotSettingsCalibration', () => {
   it('renders a Check health button', () => {
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Check health' })
-    expect(button).toBeDisabled()
+    expect(button).not.toBeDisabled()
   })
 
   it('Health check button is disabled when a robot is unreachable', () => {

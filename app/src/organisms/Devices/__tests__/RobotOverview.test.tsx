@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -8,12 +8,18 @@ import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { useLights, useRobot } from '../hooks'
+import { useDispatchApiRequest } from '../../../redux/robot-api'
+import { fetchLights } from '../../../redux/robot-controls'
+import { useIsRobotBusy, useLights, useRobot } from '../hooks'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 import { RobotOverview } from '../RobotOverview'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 
+import type { DispatchApiRequestType } from '../../../redux/robot-api'
+
+jest.mock('../../../redux/robot-api')
+jest.mock('../../../redux/robot-controls')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 jest.mock('../RobotStatusBanner')
@@ -23,6 +29,9 @@ jest.mock('../RobotOverviewOverflowMenu')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
 
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
+>
 const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
@@ -40,6 +49,10 @@ const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
 const mockRobotOverviewOverflowMenu = RobotOverviewOverflowMenu as jest.MockedFunction<
   typeof RobotOverviewOverflowMenu
 >
+const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
+  typeof useDispatchApiRequest
+>
+const mockFetchLights = fetchLights as jest.MockedFunction<typeof fetchLights>
 
 const mockToggleLights = jest.fn()
 
@@ -55,7 +68,12 @@ const render = () => {
 }
 
 describe('RobotOverview', () => {
+  let dispatchApiRequest: DispatchApiRequestType
+
   beforeEach(() => {
+    dispatchApiRequest = jest.fn()
+    mockUseIsRobotBusy.mockReturnValue(false)
+    mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
     mockUseLights.mockReturnValue({
       lightsOn: false,
       toggleLights: mockToggleLights,
@@ -91,6 +109,16 @@ describe('RobotOverview', () => {
   it('renders a UpdateRobotBanner component', () => {
     const [{ getByText }] = render()
     getByText('Mock UpdateRobotBanner')
+  })
+
+  it('does not render a UpdateRobotBanner component when robot is busy', () => {
+    mockUseIsRobotBusy.mockReturnValue(true)
+    expect(screen.queryByText('Mock UpdateRobotBanner')).toBeNull()
+  })
+
+  it('fetches lights status', () => {
+    render()
+    expect(dispatchApiRequest).toBeCalledWith(mockFetchLights('otie'))
   })
 
   it('renders a lights toggle button', () => {

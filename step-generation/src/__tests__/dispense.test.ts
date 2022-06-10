@@ -5,6 +5,8 @@ import {
   pipetteIntoHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestWithLatchOpen,
   pipetteAdjacentHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
 } from '../utils'
 import {
   getInitialRobotStateStandard,
@@ -20,10 +22,7 @@ import { InvariantContext, RobotState } from '../types'
 import type { AspDispAirgapParams as V3AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 
 jest.mock('../utils/thermocyclerPipetteCollision')
-jest.mock('../utils/pipetteIntoHeaterShakerLatchOpen')
-jest.mock('../utils/pipetteIntoHeaterShakerWhileShaking')
-jest.mock('../utils/getIsHeaterShakerEastWestWithLatchOpen')
-jest.mock('../utils/pipetteAdjacentHeaterShakerWhileShaking')
+jest.mock('../utils/heaterShakerCollision')
 
 const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
   typeof thermocyclerPipetteCollision
@@ -37,8 +36,14 @@ const mockPipetteIntoHeaterShakerWhileShaking = pipetteIntoHeaterShakerWhileShak
 const mockGetIsHeaterShakerEastWestWithLatchOpen = getIsHeaterShakerEastWestWithLatchOpen as jest.MockedFunction<
   typeof getIsHeaterShakerEastWestWithLatchOpen
 >
+const mockGetIsHeaterShakerEastWestMultiChannelPipette = getIsHeaterShakerEastWestMultiChannelPipette as jest.MockedFunction<
+  typeof getIsHeaterShakerEastWestMultiChannelPipette
+>
 const mockPipetteAdjacentHeaterShakerWhileShaking = pipetteAdjacentHeaterShakerWhileShaking as jest.MockedFunction<
   typeof pipetteAdjacentHeaterShakerWhileShaking
+>
+const mockGetIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette as jest.MockedFunction<
+  typeof getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette
 >
 
 describe('dispense', () => {
@@ -170,7 +175,7 @@ describe('dispense', () => {
       when(mockGetIsHeaterShakerEastWestWithLatchOpen)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE]
+          robotStateWithTip.labware[SOURCE_LABWARE].slot
         )
         .mockReturnValue(true)
 
@@ -180,11 +185,26 @@ describe('dispense', () => {
         type: 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN',
       })
     })
+    it('should return an error when dispensing east/west of a heater shaker with a multi channel pipette', () => {
+      when(mockGetIsHeaterShakerEastWestMultiChannelPipette)
+        .calledWith(
+          robotStateWithTip.modules,
+          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          expect.anything()
+        )
+        .mockReturnValue(true)
+
+      const result = dispense(params, invariantContext, robotStateWithTip)
+      expect(getErrorResult(result).errors).toHaveLength(1)
+      expect(getErrorResult(result).errors[0]).toMatchObject({
+        type: 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL',
+      })
+    })
     it('should return an error when dispensing north/south/east/west of a heater shaker while it is shaking', () => {
       when(mockPipetteAdjacentHeaterShakerWhileShaking)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE]
+          robotStateWithTip.labware[SOURCE_LABWARE].slot
         )
         .mockReturnValue(true)
 
@@ -192,6 +212,22 @@ describe('dispense', () => {
       expect(getErrorResult(result).errors).toHaveLength(1)
       expect(getErrorResult(result).errors[0]).toMatchObject({
         type: 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING',
+      })
+    })
+    it('should return an error when dispensing north/south of a heater shaker into a non tiprack using a multi channel pipette', () => {
+      when(mockGetIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
+        .calledWith(
+          robotStateWithTip.modules,
+          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          expect.anything(),
+          expect.anything()
+        )
+        .mockReturnValue(true)
+
+      const result = dispense(params, invariantContext, robotStateWithTip)
+      expect(getErrorResult(result).errors).toHaveLength(1)
+      expect(getErrorResult(result).errors[0]).toMatchObject({
+        type: 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL',
       })
     })
   })

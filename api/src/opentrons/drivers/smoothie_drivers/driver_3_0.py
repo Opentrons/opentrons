@@ -1305,7 +1305,7 @@ class SmoothieDriver:
             # - we have a split configuration
             and split
             # - it's been long enough since the last time it moved
-            and ((since_moved[ax] is None) or (split.after_time < since_moved[ax]))  # type: ignore[operator]  # noqa: E501
+            and ((since_moved[ax] is None) or (split.after_time < since_moved[ax]))  # type: ignore[operator]
         }
 
         split_command_string = create_coords_list(split_target)

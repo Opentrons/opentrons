@@ -10,7 +10,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import thermocycler as tc_commands
-from opentrons.protocol_engine.commands.thermocycler.set_target_lid_temperature import (  # noqa: E501
+from opentrons.protocol_engine.commands.thermocycler.set_target_lid_temperature import (
     SetTargetLidTemperatureImpl,
 )
 

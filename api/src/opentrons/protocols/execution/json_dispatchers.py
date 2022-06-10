@@ -60,9 +60,9 @@ magnetic_module_command_map: "JsonV4MagneticModuleDispatch" = {
 }
 
 temperature_module_command_map: "JsonV4TemperatureModuleDispatch" = {
-    JsonTemperatureModuleCommand.temperatureModuleSetTargetTemperature.value: _temperature_module_set_temp,  # noqa: E501
-    JsonTemperatureModuleCommand.temperatureModuleDeactivate.value: _temperature_module_deactivate,  # noqa: E501
-    JsonTemperatureModuleCommand.temperatureModuleAwaitTemperature.value: _temperature_module_await_temp,  # noqa: E501
+    JsonTemperatureModuleCommand.temperatureModuleSetTargetTemperature.value: _temperature_module_set_temp,
+    JsonTemperatureModuleCommand.temperatureModuleDeactivate.value: _temperature_module_deactivate,
+    JsonTemperatureModuleCommand.temperatureModuleAwaitTemperature.value: _temperature_module_await_temp,
 }
 
 
@@ -73,10 +73,10 @@ def tc_do_nothing(module: ThermocyclerContext, params) -> None:
 thermocycler_module_command_map: "JsonV4ThermocyclerDispatch" = {
     JsonThermocyclerCommand.thermocyclerCloseLid.value: _thermocycler_close_lid,
     JsonThermocyclerCommand.thermocyclerOpenLid.value: _thermocycler_open_lid,
-    JsonThermocyclerCommand.thermocyclerDeactivateBlock.value: _thermocycler_deactivate_block,  # noqa: E501
-    JsonThermocyclerCommand.thermocyclerDeactivateLid.value: _thermocycler_deactivate_lid,  # noqa: E501
-    JsonThermocyclerCommand.thermocyclerSetTargetBlockTemperature.value: _thermocycler_set_block_temperature,  # noqa: E501
-    JsonThermocyclerCommand.thermocyclerSetTargetLidTemperature.value: _thermocycler_set_lid_temperature,  # noqa: E501
+    JsonThermocyclerCommand.thermocyclerDeactivateBlock.value: _thermocycler_deactivate_block,
+    JsonThermocyclerCommand.thermocyclerDeactivateLid.value: _thermocycler_deactivate_lid,
+    JsonThermocyclerCommand.thermocyclerSetTargetBlockTemperature.value: _thermocycler_set_block_temperature,
+    JsonThermocyclerCommand.thermocyclerSetTargetLidTemperature.value: _thermocycler_set_lid_temperature,
     JsonThermocyclerCommand.thermocyclerRunProfile.value: _thermocycler_run_profile,
     # NOTE: the thermocyclerAwaitX commands are expected to always
     # follow a corresponding SetX command, which is implemented as

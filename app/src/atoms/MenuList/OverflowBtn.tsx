@@ -9,30 +9,30 @@ const overflowButtonStyles = css`
   &:hover {
     background-color: ${COLORS.lightGreyEnabled};
   }
-
-  &:active {
-    background-color: ${COLORS.lightGreyHover};
-    box-shadow: 0 0 0 1px ${COLORS.lightGreyHover};
+  &:hover circle {
+    fill: ${COLORS.darkGreyHover};
   }
 
-  &:active circle {
-    fill: ${COLORS.darkGreyPressed};
-    background-color: ${COLORS.lightGreyHover};
-  }
-
+  &:active,
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.darkGreyPressed};
+    background-color: ${COLORS.lightGreyHover};
   }
 
-  &:enabled {
-    fill-opacity: 0.5;
-    font-color: ${COLORS.darkGreyEnabled};
+  &:active circle,
+  &:focus circle {
+    fill: ${COLORS.darkGreyPressed};
   }
 
-  &:disabled,
-  &.disabled {
-    fill: ${COLORS.errorDisabled};
-    fill-opacity: 0.5;
+  &:focus-visible {
+    box-shadow: 0 0 0 3px ${COLORS.focus};
+  }
+
+  &:focus-visible circle {
+    fill: ${COLORS.darkGreyHover};
+  }
+
+  &:disabled circle {
+    fill: ${COLORS.errorText};
   }
 `
 

@@ -95,7 +95,10 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           >
             {t('last_updated')} {format(new Date(modified), 'MM/dd/yyyy')}
           </StyledText>
-          <CustomLabwareOverflowMenu filename={filename} />
+          <CustomLabwareOverflowMenu
+            filename={filename}
+            onDelete={props.onClose}
+          />
         </Flex>
       )}
     </Flex>

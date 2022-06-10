@@ -29,6 +29,7 @@ import { LegacyApp } from './LegacyApp'
 import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
 
 import type { RouteProps } from './types'
+import { useSoftwareUpdatePoll } from './hooks'
 
 export const routes: RouteProps[] = [
   {
@@ -98,6 +99,7 @@ const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
 export const AppComponent = (): JSX.Element => {
   const isLegacyApp = useFeatureFlag('hierarchyReorganization')
+  useSoftwareUpdatePoll()
 
   return (
     <>

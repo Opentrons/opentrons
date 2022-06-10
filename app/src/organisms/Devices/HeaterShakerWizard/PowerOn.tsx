@@ -36,7 +36,7 @@ export function PowerOn(props: PowerOnProps): JSX.Element {
       >
         <Trans
           t={t}
-          i18nKey="step_3_power_on"
+          i18nKey="step_2_power_on"
           components={{
             strong: <Text fontWeight={700} paddingBottom={SPACING.spacingSM} />,
             block: <span />,

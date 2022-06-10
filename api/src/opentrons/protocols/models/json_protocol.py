@@ -46,10 +46,10 @@ CommandThermocyclerSetTargetBlock: dev_types.ThermocyclerSetTargetBlockCommandId
 CommandThermocyclerSetTargetLid: dev_types.ThermocyclerSetTargetLidCommandId = (
     "thermocycler/setTargetLidTemperature"
 )
-CommandThermocyclerAwaitLidTemperature: dev_types.ThermocyclerAwaitLidTemperatureCommandId = (  # noqa: E501
+CommandThermocyclerAwaitLidTemperature: dev_types.ThermocyclerAwaitLidTemperatureCommandId = (
     "thermocycler/awaitLidTemperature"
 )
-CommandThermocyclerAwaitBlockTemperature: dev_types.ThermocyclerAwaitBlockTemperatureCommandId = (  # noqa: E501
+CommandThermocyclerAwaitBlockTemperature: dev_types.ThermocyclerAwaitBlockTemperatureCommandId = (
     "thermocycler/awaitBlockTemperature"
 )
 CommandThermocyclerDeactivateBlock: dev_types.ThermocyclerDeactivateBlockCommandId = (

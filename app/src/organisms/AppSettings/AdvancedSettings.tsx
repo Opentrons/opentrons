@@ -18,18 +18,34 @@ import {
   TYPOGRAPHY,
   DIRECTION_COLUMN,
   TEXT_DECORATION_UNDERLINE,
+  useConditionalConfirm,
+  TEXT_TRANSFORM_CAPITALIZE,
+  JUSTIFY_FLEX_END,
+  Btn,
+  DIRECTION_ROW,
 } from '@opentrons/components'
 import * as Config from '../../redux/config'
 import * as Calibration from '../../redux/calibration'
 import * as CustomLabware from '../../redux/custom-labware'
-import { clearDiscoveryCache } from '../../redux/discovery'
+import {
+  clearDiscoveryCache,
+  getReachableRobots,
+  getUnreachableRobots,
+} from '../../redux/discovery'
+import { Modal } from '../../atoms/Modal'
+import { Portal } from '../../App/portal'
+import { Toast } from '../../atoms/Toast'
 import {
   getU2EAdapterDevice,
   getU2EWindowsDriverStatus,
   OUTDATED,
 } from '../../redux/system-info'
 import { Divider } from '../../atoms/structure'
-import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
+import {
+  AlertPrimaryButton,
+  TertiaryButton,
+  ToggleButton,
+} from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 
@@ -52,7 +68,7 @@ type BlockSelection =
   | typeof ALWAYS_PROMPT
 
 export function AdvancedSettings(): JSX.Element {
-  const { t } = useTranslation('app_settings')
+  const { t } = useTranslation(['app_settings', 'shared'])
   const pythonDirectoryFileInput = React.useRef<HTMLInputElement>(null)
   const useTrashSurfaceForTipCal = useSelector((state: State) =>
     Config.getUseTrashSurfaceForTipCal(state)
@@ -72,6 +88,34 @@ export function AdvancedSettings(): JSX.Element {
   const pathToPythonInterpreter = useSelector(Config.getPathToPythonOverride)
 
   const dispatch = useDispatch<Dispatch>()
+  const [showSuccessToast, setShowSuccessToast] = React.useState(false)
+  const [showErrorToast, setShowErrorToast] = React.useState(false)
+  const reachableRobots = useSelector((state: State) =>
+    getReachableRobots(state)
+  )
+  const unreachableRobots = useSelector((state: State) =>
+    getUnreachableRobots(state)
+  )
+  const recentlySeenRobots = reachableRobots.filter(
+    robot => robot.healthStatus !== 'ok'
+  )
+  const isUnavailableRobots =
+    unreachableRobots.length > 0 || recentlySeenRobots.length > 0
+
+  const handleDeleteUnavailRobots = (): void => {
+    if (isUnavailableRobots) {
+      setShowSuccessToast(true)
+      dispatch(clearDiscoveryCache())
+    } else {
+      setShowErrorToast(true)
+    }
+  }
+
+  const {
+    confirm: confirmDeleteUnavailRobots,
+    showConfirmation: showConfirmDeleteUnavailRobots,
+    cancel: cancelExit,
+  } = useConditionalConfirm(handleDeleteUnavailRobots, true)
 
   const handleUseTrashSelection = (selection: BlockSelection): void => {
     switch (selection) {
@@ -144,6 +188,57 @@ export function AdvancedSettings(): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           gridGap={SPACING.spacing4}
         >
+          {showSuccessToast && (
+            <Toast
+              message={t('successfully_deleted_unavail_robots')}
+              type={'success'}
+              onClose={() => setShowSuccessToast(false)}
+            />
+          )}
+          {showErrorToast && (
+            <Toast
+              message={t('no_unavail_robots_to_clear')}
+              type={'error'}
+              onClose={() => setShowErrorToast(false)}
+            />
+          )}
+          {showConfirmDeleteUnavailRobots ? (
+            <Portal level="top">
+              <Modal
+                type="warning"
+                title={t('clear_unavailable_robots')}
+                onClose={cancelExit}
+              >
+                <StyledText as="p">{t('clearing_cannot_be_undone')}</StyledText>
+                <Flex
+                  flexDirection={DIRECTION_ROW}
+                  paddingTop={SPACING.spacingXL}
+                  justifyContent={JUSTIFY_FLEX_END}
+                >
+                  <Flex
+                    paddingRight={SPACING.spacing2}
+                    data-testid={`AdvancedSettings_ConfirmClear_Cancel
+                    `}
+                  >
+                    <Btn
+                      onClick={cancelExit}
+                      textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                      color={COLORS.blue}
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                      marginRight={SPACING.spacing6}
+                    >
+                      {t('shared:cancel')}
+                    </Btn>
+                  </Flex>
+                  <Flex data-testid={`AdvancedSettings_ConfirmClear_Proceed`}>
+                    <AlertPrimaryButton onClick={confirmDeleteUnavailRobots}>
+                      {t('clear_confirm')}
+                    </AlertPrimaryButton>
+                  </Flex>
+                </Flex>
+              </Modal>
+            </Portal>
+          ) : null}
           <Box width="70%">
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
@@ -414,7 +509,7 @@ export function AdvancedSettings(): JSX.Element {
           </Box>
           <TertiaryButton
             marginLeft={SPACING_AUTO}
-            onClick={() => dispatch(clearDiscoveryCache())}
+            onClick={confirmDeleteUnavailRobots}
             id="AdvancedSettings_clearUnavailableRobots"
           >
             {t('clear_robots_button')}

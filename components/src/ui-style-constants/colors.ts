@@ -61,7 +61,7 @@ export const alphaToOpacity35 = '35'
 export const backgroundOverlay = `${darkBlackEnabled}${alphaToOpacity35}`
 
 // colors pd liquid
-export const electricPurple ='#b925ff'
+export const electricPurple = '#b925ff'
 export const goldenYellow = '#ffd600'
 export const aquamarine = '#9dffd8'
 export const orangePeel = '#ff9900'

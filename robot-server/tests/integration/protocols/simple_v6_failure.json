@@ -1,0 +1,113 @@
+{
+  "$otSharedSchema": "#/protocol/schemas/6",
+  "schemaVersion": 6,
+  "metadata": {
+    "protocolName": "Simple failure test",
+    "author": "Opentrons Engineering <engineering@opentrons.com>",
+    "description": "A short test protocol that will fail.",
+    "created": 1223131231,
+    "tags": []
+  },
+  "robot": {
+    "model": "OT-2 Standard",
+    "deckId": "ot2_standard"
+  },
+  "pipettes": {
+    "pipetteId": {
+      "name": "p10_single"
+    }
+  },
+  "modules": {},
+  "labware": {
+    "tipRackId": {
+      "displayName": "Tip Rack",
+      "definitionId": "fixture/fixture_1_tiprack_10ul/1"
+    }
+  },
+  "liquids": {},
+  "labwareDefinitions": {
+    "fixture/fixture_1_tiprack_10ul/1": {
+      "ordering": [["A1"]],
+      "brand": {
+        "brand": "Fixture"
+      },
+      "metadata": {
+        "displayName": "Fixture 1 Tip Rack 10 µL",
+        "displayCategory": "tipRack",
+        "displayVolumeUnits": "µL",
+        "tags": []
+      },
+      "dimensions": {
+        "xDimension": 127.76,
+        "yDimension": 85.48,
+        "zDimension": 64.69
+      },
+      "wells": {
+        "A1": {
+          "depth": 39.2,
+          "shape": "circular",
+          "diameter": 3.27,
+          "totalLiquidVolume": 10,
+          "x": 14.38,
+          "y": 74.24,
+          "z": 25.49
+        }
+      },
+      "groups": [
+        {
+          "metadata": {},
+          "wells": ["A1"]
+        }
+      ],
+      "parameters": {
+        "format": "irregular",
+        "isTiprack": true,
+        "tipLength": 39.2,
+        "tipOverlap": 3.29,
+        "isMagneticModuleCompatible": false,
+        "loadName": "fixture_1_tiprack_10ul"
+      },
+      "namespace": "fixture",
+      "version": 1,
+      "schemaVersion": 2,
+      "cornerOffsetFromSlot": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    }
+  },
+  "commands": [
+    {
+      "commandType": "loadLabware",
+      "params": {
+        "labwareId": "tipRackId",
+        "location": { "slotName": "8" }
+      }
+    },
+    {
+      "commandType": "loadPipette",
+      "params": {
+        "pipetteId": "pipetteId",
+        "mount": "left"
+      }
+    },
+    {
+      "commandType": "dropTip",
+      "params": {
+        "pipetteId": "pipetteId",
+        "labwareId": "tipRackId",
+        "wellName": "A1"
+      }
+    },
+    {
+      "commandType": "pickUpTip",
+      "params": {
+        "pipetteId": "pipetteId",
+        "labwareId": "tipRackId",
+        "wellName": "A1"
+      }
+    }
+  ],
+  "commandAnnotations": []
+}
