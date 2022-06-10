@@ -54,15 +54,22 @@ class ModuleDataMapper:
         # rely on Pydantic to check/coerce data fields from dicts at run time
         if module_type == ModuleType.MAGNETIC:
             module_cls = MagneticModule
-            live_data_height = cast(float, live_data["data"].get("height"))
+
+            live_data_height = live_data["data"].get("height")
+
+            assert isinstance(
+                live_data_height, (int, float)
+            ), f"Expected magnetic module height, got {live_data_height}"
+
+            # Magnetic module v1 reports height incorrectly
+            # Divide reported distance by half to get actual height
+            if module_model == ModuleModel.MAGNETIC_MODULE_V1:
+                live_data_height = live_data_height / 2
+
             module_data = MagneticModuleData(
                 status=MagneticStatus(live_data["status"]),
                 engaged=cast(bool, live_data["data"].get("engaged")),
-                # Calculate adjustments for MAGNETIC_MODULE_V1
-                # https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/protocol_engine/state/module_substates/magnetic_module_substate.py#L43
-                height=live_data_height / 2
-                if module_model == ModuleModel.MAGNETIC_MODULE_V1
-                else live_data_height,
+                height=live_data_height,
             )
 
         elif module_type == ModuleType.TEMPERATURE:
