@@ -205,14 +205,14 @@ describe('FilePipettesModal', () => {
       expect(props.onSave).toHaveBeenCalledWith({
         modules: [
           {
-            type: MAGNETIC_MODULE_TYPE,
-            model: MAGNETIC_MODULE_V1,
-            slot: '9',
-          },
-          {
             type: HEATERSHAKER_MODULE_TYPE,
             model: HEATERSHAKER_MODULE_V1,
             slot: '1',
+          },
+          {
+            type: MAGNETIC_MODULE_TYPE,
+            model: MAGNETIC_MODULE_V1,
+            slot: '9',
           },
         ],
         newProtocolFields: { name: '' },

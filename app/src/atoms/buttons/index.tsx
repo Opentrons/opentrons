@@ -34,7 +34,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
     background-color: ${COLORS.bluePressed};
   }
 
-  &:focus {
+  &:focus-visible {
     box-shadow: 0 0 0 3px ${COLORS.warning};
   }
 
@@ -64,7 +64,7 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
 
   ${styleProps}
 
-  &:focus {
+  &:focus-visible {
     box-shadow: 0 0 0 3px ${COLORS.warning};
   }
 
@@ -97,7 +97,7 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
     box-shadow: 0 0 0;
   }
 
-  &:focus {
+  &:focus-visible {
     box-shadow: 0 0 0 3px ${COLORS.warning};
   }
 
