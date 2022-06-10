@@ -352,9 +352,7 @@ def test_blow_out(
         pipette_id="123",
         labware_id="456",
         well_name="A2",
-        well_location=WellLocation(
-            origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
-        ),
+        well_location=WellLocation(),
     )
 
     assert result == response
