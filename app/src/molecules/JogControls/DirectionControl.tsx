@@ -167,5 +167,3 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
     </ControlContainer>
   )
 }
-
-
