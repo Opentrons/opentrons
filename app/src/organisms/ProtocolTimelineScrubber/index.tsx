@@ -1,6 +1,14 @@
 import * as React from 'react'
 import map from 'lodash/map'
-import { RobotWorkSpace, Module, LabwareRender } from '@opentrons/components'
+import {
+  RobotWorkSpace,
+  Module,
+  LabwareRender,
+  Flex,
+  Text,
+  DIRECTION_COLUMN,
+  SPACING,
+} from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { createTimelineFromRunCommands } from '@opentrons/step-generation'
 import {
@@ -39,62 +47,75 @@ export function ProtocolTimelineScrubber(
 
   const { timeline, invariantContext } = createTimelineFromRunCommands(commands)
   const currentCommandTimelineFrame = timeline[currentCommandIndex]
-  const { robotState } = currentCommandTimelineFrame
+  const { robotState, command } = currentCommandTimelineFrame
 
   return (
-    <RobotWorkSpace
-      deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-      deckDef={deckDef}
-      viewBox={`${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
-    >
-      {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
-        <>
-          {map(robotState.modules, (module, moduleId) => {
-            const slot = deckSlotsById[module.slot]
-            const labwareInModuleId =
-              Object.entries(robotState.labware).find(
-                ([labwareId, labware]) => {
-                  console.log(labware, moduleId, labwareId)
-                  return labware.slot === moduleId
-                }
-              )?.[0] ?? null
-            return (
-              <Module
-                x={slot.position[0]}
-                y={slot.position[1]}
-                orientation={inferModuleOrientationFromXCoordinate(
-                  slot.position[0]
-                )}
-                def={getModuleDef2(
-                  invariantContext.moduleEntities[moduleId].model
-                )}
-                innerProps={{}} // TODO: wire up module state
-              >
-                {labwareInModuleId != null ? (
-                  <LabwareRender
-                    definition={
-                      invariantContext.labwareEntities[labwareInModuleId].def
-                    }
-                  />
-                ) : null}
-              </Module>
-            )
-          })}
-          {map(robotState.labware, (labware, labwareId) => {
-            if (labware.slot in robotState.modules || labwareId === 'fixedTrash') return null
-            const slot = deckSlotsById[labware.slot]
-            const definition =
-              invariantContext.labwareEntities[labwareId].def
-            return (
-              <g
-                transform={`translate(${slot.position[0]},${slot.position[1]})`}
-              >
-                <LabwareRender definition={definition} />
-              </g>
-            )
-          })}
-        </>
-      )}
-    </RobotWorkSpace>
+    <Flex size="500px" flexDirection={DIRECTION_COLUMN}>
+      <input
+        type="range"
+        min={0}
+        max={commands.length - 1}
+        value={currentCommandIndex}
+        onChange={e => setCurrentCommandIndex(Number(e.target.value))}
+      />
+
+      <Text as="h3">Current Command</Text>
+      <Text marginLeft={SPACING.spacing3}>index: {currentCommandIndex}</Text>
+      <Text marginLeft={SPACING.spacing3}>type: {command.commandType}</Text>
+      <RobotWorkSpace
+        deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
+        deckDef={deckDef}
+        viewBox={`${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
+      >
+        {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
+          <>
+            {map(robotState.modules, (module, moduleId) => {
+              const slot = deckSlotsById[module.slot]
+              const labwareInModuleId =
+                Object.entries(robotState.labware).find(
+                  ([labwareId, labware]) => labware.slot === moduleId
+                )?.[0] ?? null
+              return (
+                <Module
+                  x={slot.position[0]}
+                  y={slot.position[1]}
+                  orientation={inferModuleOrientationFromXCoordinate(
+                    slot.position[0]
+                  )}
+                  def={getModuleDef2(
+                    invariantContext.moduleEntities[moduleId].model
+                  )}
+                  innerProps={{}} // TODO: wire up module state
+                >
+                  {labwareInModuleId != null ? (
+                    <LabwareRender
+                      definition={
+                        invariantContext.labwareEntities[labwareInModuleId].def
+                      }
+                    />
+                  ) : null}
+                </Module>
+              )
+            })}
+            {map(robotState.labware, (labware, labwareId) => {
+              if (
+                labware.slot in robotState.modules ||
+                labwareId === 'fixedTrash'
+              )
+                return null
+              const slot = deckSlotsById[labware.slot]
+              const definition = invariantContext.labwareEntities[labwareId].def
+              return (
+                <g
+                  transform={`translate(${slot.position[0]},${slot.position[1]})`}
+                >
+                  <LabwareRender definition={definition} />
+                </g>
+              )
+            })}
+          </>
+        )}
+      </RobotWorkSpace>
+    </Flex>
   )
 }

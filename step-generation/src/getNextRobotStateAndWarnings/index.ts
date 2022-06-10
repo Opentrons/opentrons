@@ -1,6 +1,7 @@
 import assert from 'assert'
 import produce from 'immer'
 import { stripNoOpCommands } from '../utils/stripNoOpCommands'
+import { forLoadLiquid } from './forLoadLiquid'
 import { forAspirate } from './forAspirate'
 import { forDispense } from './forDispense'
 import { forBlowout } from './forBlowout'
@@ -83,7 +84,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'loadPipette':
     case 'loadLabware':
     case 'loadModule':
-    case 'loadLiquid':
     case 'home':
     case 'pause':
     case 'moveRelative':
@@ -92,6 +92,10 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'delay':
     case 'moveToWell':
       // these commands don't have any effects on the state
+      break
+
+    case 'loadLiquid':
+      forLoadLiquid(command.params, invariantContext, robotStateAndWarnings)
       break
 
     case 'temperatureModule/setTargetTemperature':
