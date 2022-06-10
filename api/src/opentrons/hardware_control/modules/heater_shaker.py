@@ -2,7 +2,8 @@ import asyncio
 import logging
 from anyio import create_task_group
 from dataclasses import dataclass
-from typing import Optional, Mapping, Callable
+from contextlib import contextmanager
+from typing import Optional, Mapping, Callable, Tuple, Iterator, Type
 from typing_extensions import Final
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.heater_shaker.driver import HeaterShakerDriver
@@ -90,7 +91,11 @@ class HeaterShaker(mod_abc.AbstractModule):
         poll_time_s = polling_period or POLL_PERIOD
         self._device_info = device_info
         self._driver = driver
-        self._listener = HeaterShakerListener(loop=loop)
+
+        self._listener = HeaterShakerListener(
+            loop=loop, interrupt_callback=self._poll_exc_handler
+        )
+
         self._poller = Poller(
             reader=PollerReader(driver=self._driver),
             interval_seconds=poll_time_s,
@@ -98,6 +103,48 @@ class HeaterShaker(mod_abc.AbstractModule):
         )
         # TODO (spp, 2022-02-23): refine this to include user-facing error message.
         self._error_status: Optional[str] = None
+
+    def _poll_exc_handler(self, exc: Exception) -> None:
+        log.error(exc)
+        self._error_status = self._exc_to_errorstr(exc)
+
+    @staticmethod
+    def _exc_to_errorstr(exc: Exception) -> str:
+        try:
+            return str(exc.args[0])
+        except Exception:
+            return repr(exc)
+
+    @contextmanager
+    def _guard_exc_to_error_state(
+        self,
+        catchlist: Optional[Tuple[Type[Exception]]] = None,
+        ignorelist: Optional[Tuple[Type[Exception]]] = None,
+    ) -> Iterator[None]:
+        """Turn an exception into an error state and reraise.
+
+        If specified, catchlist makes this only handle the specified
+        exception types.
+
+        If specified, ignorelist makes this handle any exception type
+        not in ignorelist.
+
+        If both are specified, catchlist takes precedence and ignorelist
+        is ignored.
+
+        If neither is specified, all exceptions are handled.
+
+        Handling is done with isinstance checks, so inserting an exception
+        widely used as a base class in either list may be a bad idea.
+        """
+        try:
+            yield
+        except Exception as exc:
+            if catchlist and isinstance(exc, catchlist):
+                self._error_status = self._exc_to_errorstr(exc)
+            elif ignorelist and not isinstance(exc, ignorelist):
+                self._error_status = self._exc_to_errorstr(exc)
+            raise
 
     async def cleanup(self) -> None:
         """Stop the poller task"""
@@ -223,14 +270,13 @@ class HeaterShaker(mod_abc.AbstractModule):
         """Module status or error state details."""
         # TODO (spp, 2022-2-22): Does this make sense as the overarching 'status'?
         #  Or maybe consolidate the above 3 statuses into this one?
-        if (
+        if self._error_status:
+            return HeaterShakerStatus.ERROR
+        elif (
             self.temperature_status == TemperatureStatus.IDLE
             and self.speed_status == SpeedStatus.IDLE
         ):
             return HeaterShakerStatus.IDLE
-        elif self._error_status:
-            # TODO (spp, 2022-02-23): actually implement error checking
-            return HeaterShakerStatus.ERROR
         else:
             return HeaterShakerStatus.RUNNING
 
@@ -253,18 +299,20 @@ class HeaterShaker(mod_abc.AbstractModule):
         the requested temperature or an error occurs. To start heating
         but not wait until heating is complete, see start_set_temperature.
         """
-        await self.wait_for_is_running()
-        await self._driver.set_temperature(temperature=celsius)
-        await self.wait_next_poll()
 
         async def _wait() -> None:
             # Wait until we reach the target temperature.
             while self.temperature_status != TemperatureStatus.HOLDING:
                 await self.wait_next_poll()
 
-        task = self._loop.create_task(_wait())
-        self.make_cancellable(task)
-        await task
+        with self._guard_exc_to_error_state(ignorelist=(asyncio.CancelledError,)):
+            await self.wait_for_is_running()
+            await self._driver.set_temperature(temperature=celsius)
+            await self.wait_next_poll()
+
+            task = self._loop.create_task(_wait())
+            self.make_cancellable(task)
+            await task
 
     async def start_set_temperature(self, celsius: float) -> None:
         """
@@ -284,8 +332,9 @@ class HeaterShaker(mod_abc.AbstractModule):
         set_temperature.
 
         """
-        await self.wait_for_is_running()
-        await self._driver.set_temperature(celsius)
+        with self._guard_exc_to_error_state():
+            await self.wait_for_is_running()
+            await self._driver.set_temperature(celsius)
 
     async def await_temperature(self, awaiting_temperature: float) -> None:
         """Await temperature in degree Celsius.
@@ -296,9 +345,6 @@ class HeaterShaker(mod_abc.AbstractModule):
         if self.is_simulated:
             return
 
-        await self.wait_for_is_running()
-        await self.wait_next_poll()
-
         async def _await_temperature() -> None:
             if self.temperature_status == TemperatureStatus.HEATING:
                 while self.temperature < awaiting_temperature:
@@ -307,9 +353,13 @@ class HeaterShaker(mod_abc.AbstractModule):
                 while self.temperature > awaiting_temperature:
                     await self.wait_next_poll()
 
-        t = self._loop.create_task(_await_temperature())
-        self.make_cancellable(t)
-        await t
+        with self._guard_exc_to_error_state(ignorelist=(asyncio.CancelledError,)):
+            await self.wait_for_is_running()
+            await self.wait_next_poll()
+
+            t = self._loop.create_task(_await_temperature())
+            self.make_cancellable(t)
+            await t
 
     async def set_speed(self, rpm: int) -> None:
         """
@@ -322,18 +372,20 @@ class HeaterShaker(mod_abc.AbstractModule):
         the speed or an error occurs. To start spinning but not wait
         until the final speed is reached, see start_set_speed.
         """
-        await self.wait_for_is_running()
-        await self._driver.set_rpm(rpm)
-        await self.wait_next_poll()
 
         async def _wait() -> None:
             # Wait until we reach the target speed.
             while self.speed_status != SpeedStatus.HOLDING:
                 await self.wait_next_poll()
 
-        task = self._loop.create_task(_wait())
-        self.make_cancellable(task)
-        await task
+        with self._guard_exc_to_error_state(ignorelist=(asyncio.CancelledError,)):
+            await self.wait_for_is_running()
+            await self._driver.set_rpm(rpm)
+            await self.wait_next_poll()
+
+            task = self._loop.create_task(_wait())
+            self.make_cancellable(task)
+            await task
 
     async def start_set_speed(self, rpm: int) -> None:
         """
@@ -348,8 +400,9 @@ class HeaterShaker(mod_abc.AbstractModule):
          await_speed. To set speed and wait in the same call, see
          set_speed.
         """
-        await self.wait_for_is_running()
-        await self._driver.set_rpm(rpm)
+        with self._guard_exc_to_error_state():
+            await self.wait_for_is_running()
+            await self._driver.set_rpm(rpm)
 
     async def await_speed(self, awaiting_speed: int) -> None:
         """Wait until specified RPM speed is reached.
@@ -359,9 +412,6 @@ class HeaterShaker(mod_abc.AbstractModule):
         if self.is_simulated:
             return
 
-        await self.wait_for_is_running()
-        await self.wait_next_poll()
-
         async def _await_speed() -> None:
             if self.speed_status == SpeedStatus.ACCELERATING:
                 while self.speed < awaiting_speed:
@@ -370,9 +420,13 @@ class HeaterShaker(mod_abc.AbstractModule):
                 while self.speed > awaiting_speed:
                     await self.wait_next_poll()
 
-        t = self._loop.create_task(_await_speed())
-        self.make_cancellable(t)
-        await t
+        with self._guard_exc_to_error_state(ignorelist=(asyncio.CancelledError,)):
+            await self.wait_for_is_running()
+            await self.wait_next_poll()
+
+            t = self._loop.create_task(_await_speed())
+            self.make_cancellable(t)
+            await t
 
     async def await_speed_and_temperature(self, temperature: float, speed: int) -> None:
         """Wait for previously-started speed and temperature commands to complete.
@@ -394,35 +448,45 @@ class HeaterShaker(mod_abc.AbstractModule):
 
     async def deactivate(self) -> None:
         """Stop heating/cooling; stop shaking and home the plate"""
-        await self.wait_for_is_running()
-        await self._driver.deactivate_heater()
-        await self._driver.home()
-        await self.wait_next_poll()
+        with self._guard_exc_to_error_state():
+            await self.wait_for_is_running()
+            await self._driver.deactivate_heater()
+            await self._driver.home()
+            await self.wait_next_poll()
 
     async def deactivate_heater(self) -> None:
         """Stop heating/cooling"""
-        await self.wait_for_is_running()
-        await self._driver.deactivate_heater()
-        await self.wait_next_poll()
+        with self._guard_exc_to_error_state():
+            await self.wait_for_is_running()
+            await self._driver.deactivate_heater()
+            await self.wait_next_poll()
 
     async def deactivate_shaker(self) -> None:
         """Stop shaking and home the plate"""
-        await self.wait_for_is_running()
-        await self._driver.home()
-        await self.wait_next_poll()
+        with self._guard_exc_to_error_state():
+            await self.wait_for_is_running()
+            await self._driver.home()
+            await self.wait_next_poll()
 
     async def open_labware_latch(self) -> None:
-        await self.wait_for_is_running()
-        await self._driver.open_labware_latch()
-        await self._wait_for_labware_latch(HeaterShakerLabwareLatchStatus.IDLE_OPEN)
+        with self._guard_exc_to_error_state():
+            await self.wait_for_is_running()
+            await self._driver.open_labware_latch()
+            await self._wait_for_labware_latch(HeaterShakerLabwareLatchStatus.IDLE_OPEN)
 
     async def close_labware_latch(self) -> None:
-        await self.wait_for_is_running()
-        await self._driver.close_labware_latch()
-        await self._wait_for_labware_latch(HeaterShakerLabwareLatchStatus.IDLE_CLOSED)
+        with self._guard_exc_to_error_state():
+            await self.wait_for_is_running()
+            await self._driver.close_labware_latch()
+            await self._wait_for_labware_latch(
+                HeaterShakerLabwareLatchStatus.IDLE_CLOSED
+            )
 
     async def prep_for_update(self) -> str:
         return "no"
+
+    async def clear_error(self) -> None:
+        self._error_status = None
 
 
 @dataclass
