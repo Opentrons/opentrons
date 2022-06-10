@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.2...v6.0.0-beta.0) (2022-06-10)
+
+
+### Bug Fixes
+
+* **app:** temporary redirect to devices page ([#10712](https://github.com/Opentrons/opentrons/issues/10712)) ([4eaedbe](https://github.com/Opentrons/opentrons/commit/4eaedbea2fa7d08a614c2633d7cb6a74955d4095)), closes [#10709](https://github.com/Opentrons/opentrons/issues/10709)
+* **app:** update robot banner no longer accessible when robot is busy ([#10717](https://github.com/Opentrons/opentrons/issues/10717)) ([bb700df](https://github.com/Opentrons/opentrons/commit/bb700df918ee8ebfcb34f80add01f18fe4de1562)), closes [#10311](https://github.com/Opentrons/opentrons/issues/10311)
+* **discovery-client:** fix off by one error in remove logic ([#10711](https://github.com/Opentrons/opentrons/issues/10711)) ([70cb3cb](https://github.com/Opentrons/opentrons/commit/70cb3cba7a78ab3fff5858b41590920e408cc884))
+* **update-server:** Keep name deconflicted with other devices on the network ([#10559](https://github.com/Opentrons/opentrons/issues/10559)) ([d40e435](https://github.com/Opentrons/opentrons/commit/d40e435eea5d135057176dfbec848732e8d24d9c)), closes [#10126](https://github.com/Opentrons/opentrons/issues/10126)
+
+
+### Features
+
+* **engine:** allow blow out command in Protocol API  ([#10623](https://github.com/Opentrons/opentrons/issues/10623)) ([bf4e89d](https://github.com/Opentrons/opentrons/commit/bf4e89dc355f4bbc03430c18c95b2b96f151dd0a))
+* **protocol-designer:** restrict H-S slot access and reorder components ([#10705](https://github.com/Opentrons/opentrons/issues/10705)) ([84d6873](https://github.com/Opentrons/opentrons/commit/84d68735afd7b0564f4e790b497fb27919365f86)), closes [#9993](https://github.com/Opentrons/opentrons/issues/9993)
+* **step-generation:** add multi channel N/S access timeline error for heater shaker ([#10697](https://github.com/Opentrons/opentrons/issues/10697)) ([15f47dd](https://github.com/Opentrons/opentrons/commit/15f47dd0343536a05a45a750a7e48b1318ccc80e)), closes [#10448](https://github.com/Opentrons/opentrons/issues/10448)
+
+
+
+
+
 # [6.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2022-06-09)
 
 
