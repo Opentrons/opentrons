@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.2...v6.0.0-beta.0) (2022-06-10)
+
+
+### Features
+
+* **engine:** allow blow out command in Protocol API  ([#10623](https://github.com/Opentrons/opentrons/issues/10623)) ([bf4e89d](https://github.com/Opentrons/opentrons/commit/bf4e89dc355f4bbc03430c18c95b2b96f151dd0a))
+
+
+
+
+
 # [6.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2022-06-09)
 
 

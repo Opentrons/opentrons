@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.2...v6.0.0-beta.0) (2022-06-10)
+
+
+### Features
+
+* **protocol-designer:** restrict H-S slot access and reorder components ([#10705](https://github.com/Opentrons/opentrons/issues/10705)) ([84d6873](https://github.com/Opentrons/opentrons/commit/84d68735afd7b0564f4e790b497fb27919365f86)), closes [#9993](https://github.com/Opentrons/opentrons/issues/9993)
+* **step-generation:** add multi channel N/S access timeline error for heater shaker ([#10697](https://github.com/Opentrons/opentrons/issues/10697)) ([15f47dd](https://github.com/Opentrons/opentrons/commit/15f47dd0343536a05a45a750a7e48b1318ccc80e)), closes [#10448](https://github.com/Opentrons/opentrons/issues/10448)
+
+
+
+
+
 # [6.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2022-06-09)
 
 
