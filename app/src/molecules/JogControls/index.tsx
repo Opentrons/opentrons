@@ -13,6 +13,7 @@ import {
 
 import type { Jog, Plane, StepSize } from './types'
 import type { StyleProps } from '@opentrons/components'
+import { SPACING } from '@opentrons/components'
 
 export type { Jog }
 export interface JogControlsProps extends StyleProps {
@@ -44,6 +45,7 @@ export function JogControls(props: JogControlsProps): JSX.Element {
     <Flex
       justifyContent={JUSTIFY_CENTER}
       alignSelf={ALIGN_STRETCH}
+      marginBottom={SPACING.spacing5}
       {...styleProps}
     >
       <StepSizeControl
