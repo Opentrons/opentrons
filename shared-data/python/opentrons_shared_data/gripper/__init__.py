@@ -1,10 +1,7 @@
+"""opentrons_shared_data.pipette: functions and types for pipette config."""
 from __future__ import annotations
-
-"""
-opentrons_shared_data.pipette: functions and types for pipette config
-"""
 import copy
-from typing import TYPE_CHECKING
+from typing import Optional, cast, TYPE_CHECKING
 import json
 from functools import lru_cache
 
@@ -21,31 +18,37 @@ if TYPE_CHECKING:
 
 
 def model_config() -> GripperModelSpecs:
-    """Load the per-gripper-model config file from within the wheel"""
+    """Load the per-gripper-model config file from within the wheel."""
     return copy.deepcopy(_model_config())
 
 
 @lru_cache(maxsize=None)
 def _model_config() -> GripperModelSpecs:
-    return json.loads(
-        load_shared_data("gripper/definitions/gripperModelSpecs.json") or "{}"
+    return cast(
+        "GripperModelSpecs",
+        json.loads(
+            load_shared_data("gripper/definitions/gripperModelSpecs.json") or "{}"
+        ),
     )
 
 
 def name_config() -> GripperNameSpecs:
-    """Load the per-gripper-name config file from within the wheel"""
+    """Load the per-gripper-name config file from within the wheel."""
     return _name_config()
 
 
 @lru_cache(maxsize=None)
 def _name_config() -> GripperNameSpecs:
-    return json.loads(
-        load_shared_data("gripper/definitions/gripperNameSpecs.json") or "{}"
+    return cast(
+        "GripperNameSpecs",
+        json.loads(
+            load_shared_data("gripper/definitions/gripperNameSpecs.json") or "{}"
+        ),
     )
 
 
 def fuse_specs(
-    gripper_model: GripperModel, gripper_name: GripperName = None
+    gripper_model: GripperModel, gripper_name: Optional[GripperName] = None
 ) -> GripperFusedSpec:
     """Combine the model and name spec for a given model.
 
@@ -57,12 +60,12 @@ def fuse_specs(
 
 @lru_cache(maxsize=None)
 def _fuse_specs_cached(
-    gripper_model: GripperModel, gripper_name: GripperName = None
+    gripper_model: GripperModel, gripper_name: Optional[GripperName] = None
 ) -> GripperFusedSpec:
-    """
-    Do the work of fusing the specs inside an lru cache. This can't be the
-    function that's directly called because we want to return a new object
-    all the time, hence the wrapper.
+    """Do the work of fusing the specs inside an lru cache.
+
+    This can't be the function that's directly called because we want to
+    return a new object all the time, hence the wrapper.
     """
     model_data = _model_config()["config"][gripper_model]
     gripper_name = gripper_name or model_data["name"]
@@ -80,6 +83,6 @@ def _fuse_specs_cached(
     return {**model_data, **name_data}  # type: ignore
 
 
-def dummy_model_for_name(gripper_name: GripperName) -> GripperModel:
+def dummy_model_for_name(gripper_name: GripperName) -> "GripperModel":
+    """Create dummy gripper model."""
     return gripper_name + "_v1"  # type: ignore
-

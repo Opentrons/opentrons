@@ -1,6 +1,4 @@
-"""
-opentrons_shared_data.gripper.dev_types: types for gripper config that
-require typing_extensions.
+"""Types for gripper config that require typing_extensions.
 
 This module should only be imported if typing.TYPE_CHECKING is True.
 """
@@ -24,6 +22,8 @@ ConfigUnit = Union[
 
 
 class GripperCustomizableConfigElementFloat(TypedDict):
+    """Customizable floats."""
+
     value: float
     min: float
     max: float
@@ -32,6 +32,8 @@ class GripperCustomizableConfigElementFloat(TypedDict):
 
 
 class GripperCustomizableConfigElementInt(TypedDict):
+    """Customizable ints."""
+
     value: int
     min: int
     max: int
@@ -40,6 +42,8 @@ class GripperCustomizableConfigElementInt(TypedDict):
 
 
 class GripperNameSpec(TypedDict):
+    """Names for gripper."""
+
     displayName: str
     displayCategory: DisplayCategory
 
@@ -48,6 +52,8 @@ GripperNameSpecs = Dict[GripperName, GripperNameSpec]
 
 
 class GripperModelSpec(TypedDict, total=False):
+    """Gripper specs based on model."""
+
     name: GripperName
     idleCurrent: GripperCustomizableConfigElementFloat
     activeCurrent: GripperCustomizableConfigElementFloat
@@ -60,10 +66,14 @@ class GripperModelSpec(TypedDict, total=False):
     pinTwoOffsetFromBase: List[float]
 
 
-class GripperFusedSpec(GripperNameSpec, GripperModelSpec, total=False):
-    pass
-
-
 class GripperModelSpecs(TypedDict):
+    """Gripper model specs with mutable configs."""
+
     config: Dict[GripperModel, GripperModelSpec]
     mutableConfigs: List[str]
+
+
+class GripperFusedSpec(GripperNameSpec, GripperModelSpec, total=False):
+    """Gripper fused spec."""
+
+    pass
