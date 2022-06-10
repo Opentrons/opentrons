@@ -161,7 +161,6 @@ class GeometryView:
         x_offset = x_size / 2.0
         y_offset = y_size / 2.0
         center = self.get_well_position(labware_id, well_name, well_location)
-        # TODO question: should the pipette position end in the center?
         return [
             center + Point(x=x_offset, y=0, z=0),  # right
             center + Point(x=-x_offset, y=0, z=0),  # left
