@@ -3,8 +3,19 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../../i18n'
+import { getConnectableRobots } from '../../../../../../redux/discovery'
+import {
+  mockConnectableRobot,
+  mockUnreachableRobot,
+} from '../../../../../../redux/discovery/__fixtures__'
 
 import { RenameRobotSlideout } from '../RenameRobotSlideout'
+
+jest.mock('../../../../../../redux/discovery')
+
+const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
+  typeof getConnectableRobots
+>
 
 const mockOnCloseClick = jest.fn()
 const render = () => {
@@ -21,7 +32,9 @@ const render = () => {
 }
 
 describe('RobotSettings RenameRobotSlideout', () => {
-  beforeEach(() => {})
+  beforeEach(() => {
+    mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
+  })
 
   afterEach(() => {
     jest.resetAllMocks()
@@ -114,6 +127,21 @@ describe('RobotSettings RenameRobotSlideout', () => {
     const error = await findByText(
       'Please enter 35 characters max using valid inputs: letters and numbers'
     )
+    await waitFor(() => {
+      expect(renameButton).toBeDisabled()
+      expect(error).toBeInTheDocument()
+    })
+  })
+
+  it('button should be disabled and render the error message when a user tries to use existing name in the same network', async () => {
+    const [{ getByRole, findByText }] = render()
+    const input = getByRole('textbox')
+    fireEvent.change(input, {
+      target: { value: 'opentrons-robot-name' },
+    })
+    expect(input).toHaveValue('opentrons-robot-name')
+    const renameButton = getByRole('button', { name: 'Rename robot' })
+    const error = await findByText('Robot name already exists')
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
       expect(error).toBeInTheDocument()

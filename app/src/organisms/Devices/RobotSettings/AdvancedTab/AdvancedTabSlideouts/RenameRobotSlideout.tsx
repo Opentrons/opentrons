@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useFormik } from 'formik'
@@ -11,14 +11,17 @@ import {
   COLORS,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
-import { removeRobot } from '../../../../../redux/discovery'
+import {
+  removeRobot,
+  getConnectableRobots,
+} from '../../../../../redux/discovery'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
 import { PrimaryButton } from '../../../../../atoms/buttons'
 import { InputField } from '../../../../../atoms/InputField'
 
 import type { UpdatedRobotName } from '@opentrons/api-client'
-import type { Dispatch } from '../../../../../redux/types'
+import type { State, Dispatch } from '../../../../../redux/types'
 interface RenameRobotSlideoutProps {
   isExpanded: boolean
   onCloseClick: () => void
@@ -47,6 +50,9 @@ export function RenameRobotSlideout({
   )
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
+  const healthyReachableRobots = useSelector((state: State) =>
+    getConnectableRobots(state)
+  )
 
   const formik = useFormik({
     initialValues: {
@@ -63,6 +69,11 @@ export function RenameRobotSlideout({
       const newName = values.newRobotName
       if (!regexPattern.test(newName)) {
         errors.newRobotName = t('rename_robot_input_limitation_detail')
+      }
+      if (
+        healthyReachableRobots.find(robot => newName === robot.name) != null
+      ) {
+        errors.newRobotName = t('robot_name_already_exists')
       }
       return errors
     },
