@@ -297,7 +297,7 @@ def create_blow_out_command(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
-        createdAt=datetime.now(),
+        createdAt=datetime(year=2022, month=1, day=1),
         params=params,
         result=result,
     )
