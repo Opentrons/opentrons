@@ -25,7 +25,7 @@ describe('PowerOn', () => {
   it('renders correct title and body when protocol has not been uploaded', () => {
     const { getByText } = render(props)
 
-    getByText('Step 3 of 4: Power on the module')
+    getByText('Step 2 of 4: Power on the module')
     getByText('Connect your module to the robot and and power it on.')
   })
 

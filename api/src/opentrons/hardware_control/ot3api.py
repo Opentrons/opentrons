@@ -5,6 +5,8 @@ from dataclasses import replace
 import logging
 from collections import OrderedDict
 from typing import (
+    Mapping,
+    cast,
     Callable,
     Dict,
     Union,
@@ -79,13 +81,14 @@ from .motion_utilities import (
     offset_for_mount,
     deck_from_machine,
     machine_from_deck,
+    machine_vector_from_deck_vector,
 )
 
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
 
-from .dev_types import PipetteDict
+from .dev_types import AttachedPipette, PipetteDict, InstrumentDict, GripperDict
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
 )
@@ -367,11 +370,12 @@ class OT3API(
 
     @staticmethod
     def _gantry_load_from_instruments(
-        instruments: Dict[OT3Mount, PipetteDict]
+        instruments: Mapping[OT3Mount, InstrumentDict]
     ) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
-        left = instruments.get(OT3Mount.LEFT)
-        right = instruments.get(OT3Mount.RIGHT)
+        left = cast(PipetteDict, instruments.get(OT3Mount.LEFT))
+        right = cast(PipetteDict, instruments.get(OT3Mount.RIGHT))
+        gripper = cast(GripperDict, instruments.get(OT3Mount.GRIPPER))
         if left and right:
             # Only low-throughputs can have the two-instrument case
             return GantryLoad.TWO_LOW_THROUGHPUT
@@ -386,6 +390,9 @@ class OT3API(
                 return GantryLoad.LOW_THROUGHPUT
             else:
                 return GantryLoad.HIGH_THROUGHPUT
+        if gripper:
+            # only a gripper is attached
+            return GantryLoad.GRIPPER
         return GantryLoad.NONE
 
     async def cache_instruments(
@@ -408,6 +415,7 @@ class OT3API(
         for mount, instrument_data in found.items():
             if mount == OT3Mount.GRIPPER:
                 continue
+            instrument_data = cast(AttachedPipette, instrument_data)
             config = instrument_data.get("config")
             req_instr = checked_require.get(mount, None)
             pip_id = instrument_data.get("id")
@@ -1229,34 +1237,69 @@ class OT3API(
         await self._instrument_handler.remove_tip(OT3Mount.from_mount(mount))
 
     async def capacitive_probe(
-        self, mount: OT3Mount, target_pos: float, pass_settings: CapacitivePassSettings
+        self,
+        mount: OT3Mount,
+        moving_axis: OT3Axis,
+        target_pos: float,
+        pass_settings: CapacitivePassSettings,
     ) -> float:
-        """Determine the position of the deck using the capacitive sensor.
+        """Determine the position of something using the capacitive sensor.
 
-        This function orchestrates detecting the position of whatever is under the
-        specified mount using the capacitive sensor on a pipette. It will move
-        the mount's critical point to a small distance below either
-        - by default, the current estimated position of the deck (e.g. 0)
-        - a specified absolute position in deck coordinates
-        while running the tool's capacitive sensor. When the sensor senses contact,
-        the mount stops. This function moves back up and returns the sensed position.
+        This function orchestrates detecting the position of a collision between the
+        capacitive probe on the tool on the specified mount, and some fixed element
+        of the robot.
+
+        When calling this function, the mount's probe critical point should already
+        be aligned in the probe axis with the item to be probed.
+
+        It will move the mount's probe critical point to a small distance behind
+        the expected position of the element (which is target_pos, in deck coordinates,
+        in the axis to be probed) while running the tool's capacitive sensor. When the
+        sensor senses contact, the mount stops.
+
+        This function moves away and returns the sensed position.
 
         This sensed position can be used in several ways, including
-        - To alter the z portion of the current mount's offset or of whatever was
-        targeted, if something was guaranteed to be physically present under the mount.
-        - To detect whether the mount was over solid material. If this function
-        returns a value far enough below the anticipated position, then it indicates
+        - To get an absolute position in deck coordinates of whatever was
+        targeted, if something was guaranteed to be physically present.
+        - To detect whether a collision occured at all. If this function
+        returns a value far enough past the anticipated position, then it indicates
         there was no material there.
         """
+        if moving_axis not in [
+            OT3Axis.X,
+            OT3Axis.Y,
+        ] and moving_axis != OT3Axis.by_mount(mount):
+            raise RuntimeError(
+                "Probing must be done with a gantry axis or the mount of the sensing"
+                " tool"
+            )
+
         here = await self.gantry_position(mount)
-        self._log.info(f"probe start: at {here}")
-        target = here._replace(z=target_pos + pass_settings.prep_distance_mm)
-        self._log.info(f"moving to {target}")
-        await self.move_to(mount, target)
-        self._log.info("doing probe")
+        origin_pos = moving_axis.of_point(here)
+        if origin_pos < target_pos:
+            pass_start = target_pos - pass_settings.prep_distance_mm
+            pass_distance = (
+                pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
+            )
+        else:
+
+            pass_start = target_pos + pass_settings.prep_distance_mm
+            pass_distance = -1.0 * (
+                pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
+            )
+        machine_pass_distance = moving_axis.of_point(
+            machine_vector_from_deck_vector(
+                moving_axis.set_in_point(top_types.Point(0, 0, 0), pass_distance),
+                self._transforms.deck_calibration.attitude,
+            )
+        )
+        pass_start_pos = moving_axis.set_in_point(here, pass_start)
+        await self.move_to(mount, pass_start_pos)
         await self._backend.capacitive_probe(
             mount,
-            pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm,
+            moving_axis,
+            machine_pass_distance,
             pass_settings.speed_mm_per_s,
         )
         machine_pos = await self._backend.update_position()
@@ -1266,7 +1309,35 @@ class OT3API(
             self._transforms.carriage_offset,
             OT3Axis,
         )
-        bottom_pos = await self.gantry_position(mount)
-        self._log.info(f"position now {bottom_pos}, moving back to {target}")
-        await self.move_to(mount, target)
-        return bottom_pos.z
+        end_pos = await self.gantry_position(mount)
+        await self.move_to(mount, pass_start_pos)
+        return moving_axis.of_point(end_pos)
+
+    async def capacitive_sweep(
+        self,
+        mount: OT3Mount,
+        moving_axis: OT3Axis,
+        begin: top_types.Point,
+        end: top_types.Point,
+        speed_mm_s: float,
+    ) -> List[float]:
+        if moving_axis not in [
+            OT3Axis.X,
+            OT3Axis.Y,
+        ] and moving_axis != OT3Axis.by_mount(mount):
+            raise RuntimeError(
+                "Probing must be done with a gantry axis or the mount of the sensing"
+                " tool"
+            )
+        sweep_distance = moving_axis.of_point(
+            machine_vector_from_deck_vector(
+                end - begin, self._transforms.deck_calibration.attitude
+            )
+        )
+
+        await self.move_to(mount, begin)
+        values = await self._backend.capacitive_pass(
+            mount, moving_axis, sweep_distance, speed_mm_s
+        )
+        await self.move_to(mount, begin)
+        return values

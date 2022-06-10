@@ -327,3 +327,32 @@ def test_thermocycler_deactivate_lid(
     result = subject.thermocycler_deactivate_lid(module_id="module-id")
 
     assert result == response
+
+
+def test_blow_out(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a blow_out command."""
+    request = commands.BlowOutCreate(
+        params=commands.BlowOutParams(
+            pipetteId="123",
+            labwareId="456",
+            wellName="A2",
+            wellLocation=WellLocation(),
+        )
+    )
+
+    response = commands.BlowOutResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.blow_out(
+        pipette_id="123",
+        labware_id="456",
+        well_name="A2",
+        well_location=WellLocation(),
+    )
+
+    assert result == response

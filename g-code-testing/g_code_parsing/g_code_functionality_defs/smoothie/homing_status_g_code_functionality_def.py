@@ -1,6 +1,6 @@
 import re
 from typing import Dict
-from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (  # noqa: E501
+from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     GCodeFunctionalityDefBase,
 )
 

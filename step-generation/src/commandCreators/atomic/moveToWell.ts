@@ -4,6 +4,10 @@ import {
   thermocyclerPipetteCollision,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
 } from '../../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { MoveToWellParams as v5MoveToWellParams } from '@opentrons/shared-data/protocol/types/schemaV5'
@@ -80,6 +84,47 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
     )
   ) {
     errors.push(errorCreators.heaterShakerIsShaking())
+  }
+
+  if (
+    pipetteAdjacentHeaterShakerWhileShaking(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]?.slot
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
+  }
+
+  if (
+    getIsHeaterShakerEastWestWithLatchOpen(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]?.slot
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerEastWestWithLatchOpen())
+  }
+
+  if (
+    getIsHeaterShakerEastWestMultiChannelPipette(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]?.slot,
+      pipetteSpec
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerEastWestOfMultiChannelPipette())
+  }
+
+  if (
+    getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]?.slot,
+      pipetteSpec,
+      invariantContext.labwareEntities[labware]
+    )
+  ) {
+    errors.push(
+      errorCreators.heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette()
+    )
   }
 
   if (errors.length > 0) {

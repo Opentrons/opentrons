@@ -6,9 +6,6 @@ APP_VARIABLE_PREFIX = "com.opentrons.otupdate.buildroot."
 RESTART_LOCK_NAME = APP_VARIABLE_PREFIX + "restartlock"
 #: Name for the asyncio lock in the application dictlike
 
-DEVICE_NAME_VARNAME = APP_VARIABLE_PREFIX + "name"
-#: Name for the device
-
 DEVICE_BOOT_ID_NAME = APP_VARIABLE_PREFIX + "boot_id"
 #: A random string that changes every time the device boots.
 #:

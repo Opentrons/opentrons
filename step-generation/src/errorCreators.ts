@@ -133,3 +133,40 @@ export const heaterShakerIsShaking = (): CommandCreatorError => {
     message: 'Attempted to pipette into a heater-shaker when it is shaking.',
   }
 }
+
+export const tallLabwareEastWestOfHeaterShaker = (
+  position: 'left' | 'right'
+): CommandCreatorError => {
+  return {
+    type: 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER',
+    message: `Labware over 53 mm is ${position} of this Heater-Shaker module.`,
+  }
+}
+
+export const heaterShakerEastWestWithLatchOpen = (): CommandCreatorError => {
+  return {
+    type: 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN',
+    message: 'The Heater-Shaker labware latch is open',
+  }
+}
+
+export const heaterShakerNorthSouthEastWestShaking = (): CommandCreatorError => {
+  return {
+    type: 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING',
+    message: 'The Heater-Shaker is shaking',
+  }
+}
+
+export const heaterShakerEastWestOfMultiChannelPipette = (): CommandCreatorError => {
+  return {
+    type: 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL',
+    message: 'The Heater-Shaker is shaking',
+  }
+}
+
+export const heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = (): CommandCreatorError => {
+  return {
+    type: 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL',
+    message: '8-Channel pipette cannot access labware',
+  }
+}

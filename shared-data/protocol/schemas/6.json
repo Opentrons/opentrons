@@ -602,13 +602,12 @@
                 "enum": ["temperatureModule/waitForTemperature"]
               },
               "params": {
-                "required": ["moduleId", "celsius"],
+                "required": ["moduleId"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Temperature Module to target. Must be a key from the top level 'modules' object"
-                  },
-                  "celsius": { "type": "number" }
+                  }
                 }
               }
             }
@@ -628,13 +627,13 @@
           },
 
           {
-            "description": "Thermocycler Set And Wait For Block Temperature: Well block will begin moving to the target temperature. This command is blocking, it delays protocol execution while approaching the target temperature.",
+            "description": "Thermocycler Set Target Block Temperature: Well block will begin moving to the target temperature. This command is non-blocking, it does not delay protocol execution while approaching the target temperature.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["thermocycler/setAndWaitForBlockTemperature"]
+                "enum": ["thermocycler/setTargetBlockTemperature"]
               },
               "params": {
                 "required": ["moduleId", "celsius"],
@@ -643,9 +642,13 @@
                     "type": "string",
                     "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "celsius": { "type": "number" },
-                  "volume": {
-                    "type": "number"
+                  "celsius": {
+                    "type": "number",
+                    "description": "Target temperature in °C."
+                  },
+                  "blockMaxVolumeUl": {
+                    "type": "number",
+                    "description": "Amount of liquid in uL of the most-full well in labware loaded onto the thermocycler."
                   }
                 }
               }
@@ -675,7 +678,7 @@
           },
 
           {
-            "description": "Thermocycler Await Block Temperature: Delay protocol execution until the specified well block target temperature is reached.",
+            "description": "Thermocycler Wait For Block Temperature: Delay protocol execution until the specified well block target temperature is reached.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
@@ -684,33 +687,31 @@
                 "enum": ["thermocycler/waitForBlockTemperature"]
               },
               "params": {
-                "required": ["moduleId", "celsius"],
+                "required": ["moduleId"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
-                  },
-                  "celsius": { "type": "number" }
+                  }
                 }
               }
             }
           },
 
           {
-            "description": "Thermocycler Await Lid Temperature: Delay protocol execution until the specified lid target temperature is reached.",
+            "description": "Thermocycler Wait For Lid Temperature: Delay protocol execution until the specified lid target temperature is reached.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
               "commandType": { "enum": ["thermocycler/waitForLidTemperature"] },
               "params": {
-                "required": ["moduleId", "celsius"],
+                "required": ["moduleId"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
-                  },
-                  "celsius": { "type": "number" }
+                  }
                 }
               }
             }
@@ -828,16 +829,16 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/startSetTargetTemperature"]
+                "enum": ["heaterShaker/setTargetTemperature"]
               },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Heater Shaker Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": {
+                  "celsius": {
                     "type": "number",
                     "description": "target temperature to heat to in °C"
                   }
@@ -853,7 +854,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/setTargetShakeSpeed"]
+                "enum": ["heaterShaker/setAndWaitForShakeSpeed"]
               },
               "params": {
                 "required": ["moduleId", "rpm"],
@@ -872,13 +873,13 @@
           },
 
           {
-            "description": "Heater Shaker Module Await Temperature: Delay protocol execution until the previously supplied startSetTargetTemperature command's temperature parameter has been reached. Errors if no target temperature was set previously.",
+            "description": "Heater Shaker Module Wait For Temperature: Delay protocol execution until the previously supplied startSetTargetTemperature command's temperature parameter has been reached. Errors if no target temperature was set previously.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/awaitTemperature"]
+                "enum": ["heaterShaker/waitForTemperature"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -893,7 +894,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/deactivateHeater"]
+                "enum": ["heaterShaker/deactivateHeater"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -902,13 +903,13 @@
           },
 
           {
-            "description": "Heater Shaker Module Stop Shake: Module will stop actively shaking and ramp down to a still state",
+            "description": "Heater Shaker Module Deactivate Shaker: Module will stop actively shaking and ramp down to a still state",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/stopShake"]
+                "enum": ["heaterShaker/deactivateShaker"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -923,7 +924,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/openLatch"]
+                "enum": ["heaterShaker/openLabwareLatch"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -938,7 +939,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/closeLatch"]
+                "enum": ["heaterShaker/closeLabwareLatch"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"

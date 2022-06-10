@@ -10,6 +10,7 @@ export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'enableBundleUpload'
   | 'hierarchyReorganization'
+  | 'enableLiquidSetup'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
@@ -135,4 +136,8 @@ export interface ConfigV7 extends Omit<ConfigV6, 'version'> {
   }
 }
 
-export type Config = ConfigV7
+export interface ConfigV8 extends Omit<ConfigV7, 'version'> {
+  version: 8
+}
+
+export type Config = ConfigV8

@@ -38,7 +38,7 @@ async def find_deck_position(hcapi: OT3API, mount: OT3Mount) -> float:
     await hcapi.move_to(mount, above_point)
     LOG.info("probing")
     deck_z = await hcapi.capacitive_probe(
-        mount, z_prep_point.z, z_offset_settings.pass_settings
+        mount, OT3Axis.by_mount(mount), z_prep_point.z, z_offset_settings.pass_settings
     )
     LOG.info(f"autocalibration: found deck at {deck_z}")
     await hcapi.move_to(mount, z_prep_point + Point(0, 0, CAL_TRANSIT_HEIGHT))
@@ -118,7 +118,10 @@ async def find_edge(
         check_prep = checking_pos._replace(z=CAL_TRANSIT_HEIGHT)
         await hcapi.move_to(mount, check_prep)
         interaction_pos = await hcapi.capacitive_probe(
-            mount, slot_edge_nominal.z, edge_settings.pass_settings
+            mount,
+            OT3Axis.by_mount(mount),
+            slot_edge_nominal.z,
+            edge_settings.pass_settings,
         )
         await hcapi.move_to(mount, check_prep)
         if (

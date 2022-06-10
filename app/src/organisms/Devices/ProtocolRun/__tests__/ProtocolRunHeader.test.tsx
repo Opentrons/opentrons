@@ -50,6 +50,7 @@ import { getIsHeaterShakerAttached } from '../../../../redux/config'
 
 import {
   useProtocolDetailsForRun,
+  useProtocolAnalysisErrors,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
@@ -111,6 +112,9 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
 >
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
+>
+const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFunction<
+  typeof useProtocolAnalysisErrors
 >
 const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
@@ -224,6 +228,9 @@ describe('ProtocolRunHeader', () => {
     mockConfirmAttachmentModal.mockReturnValue(
       <div>mock confirm attachment modal</div>
     )
+    when(mockUseProtocolAnalysisErrors).calledWith(RUN_ID).mockReturnValue({
+      analysisErrors: null,
+    })
     mockUseIsHeaterShakerInProtocol.mockReturnValue(false)
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID)
     when(mockUseCloseCurrentRun).calledWith().mockReturnValue({
@@ -619,5 +626,39 @@ describe('ProtocolRunHeader', () => {
     const button = getByRole('button', { name: 'Start run' })
     fireEvent.click(button)
     expect(mockUseRunControls).toHaveBeenCalled()
+  })
+
+  it('renders analysis error modal if there is an analysis error', () => {
+    when(mockUseProtocolAnalysisErrors)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        analysisErrors: [
+          {
+            id: 'error_id',
+            detail: 'protocol analysis error',
+            errorType: 'analysis',
+            createdAt: '100000',
+          },
+        ],
+      })
+    const [{ getByText }] = render()
+    getByText('protocol analysis error')
+  })
+
+  it('renders analysis error banner if there is an analysis error', () => {
+    when(mockUseProtocolAnalysisErrors)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        analysisErrors: [
+          {
+            id: 'error_id',
+            detail: 'protocol analysis error',
+            errorType: 'analysis',
+            createdAt: '100000',
+          },
+        ],
+      })
+    const [{ getByText }] = render()
+    getByText('Protocol analysis failed.')
   })
 })

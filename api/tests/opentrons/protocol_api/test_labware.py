@@ -82,7 +82,7 @@ def test_well_init() -> None:
             name="A1",
         ),
     )
-    assert well1.geometry.diameter == test_data[well_name]["diameter"]  # type: ignore[typeddict-item]  # noqa: E501
+    assert well1.geometry.diameter == test_data[well_name]["diameter"]  # type: ignore[typeddict-item]
     assert well1.geometry._length is None
     assert well1.geometry._width is None
 
@@ -101,8 +101,8 @@ def test_well_init() -> None:
         ),
     )
     assert well2.geometry.diameter is None
-    assert well2.geometry._length == test_data[well2_name]["xDimension"]  # type: ignore[typeddict-item]  # noqa: E501
-    assert well2.geometry._width == test_data[well2_name]["yDimension"]  # type: ignore[typeddict-item]  # noqa: E501
+    assert well2.geometry._length == test_data[well2_name]["xDimension"]  # type: ignore[typeddict-item]
+    assert well2.geometry._width == test_data[well2_name]["yDimension"]  # type: ignore[typeddict-item]
 
 
 def test_top() -> None:
@@ -536,6 +536,7 @@ def test_module_load_v2(module_model) -> None:
         "temperatureModuleV1",
         "temperatureModuleV2",
         "thermocyclerModuleV1",
+        "thermocyclerModuleV2",
     ],
 )
 def test_module_load_labware(module_name) -> None:

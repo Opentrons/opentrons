@@ -106,7 +106,7 @@ if __name__ == "__main__":
         },
         project_urls={
             "opentrons.com": "https://www.opentrons.com",
-            "Source Code On Github": "https://github.com/Opentrons/opentrons/tree/edge/api",  # noqa: E501
+            "Source Code On Github": "https://github.com/Opentrons/opentrons/tree/edge/api",
             "Documentation": "https://docs.opentrons.com",
         },
     )

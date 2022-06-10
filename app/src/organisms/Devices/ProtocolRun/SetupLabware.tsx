@@ -32,7 +32,7 @@ import {
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
-import { SecondaryButton } from '../../../atoms/buttons'
+import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { StyledText } from '../../../atoms/text'
 import { useLPCSuccessToast } from '../../../organisms/ProtocolSetup/hooks'
@@ -51,10 +51,11 @@ import {
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useRunHasStarted,
+  useStoredProtocolAnalysis,
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 import { ProceedToRunButton } from './ProceedToRunButton'
-
+import type { StepKey } from './ProtocolRunSetup'
 import type { DeckDefinition } from '@opentrons/shared-data'
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -72,12 +73,16 @@ interface SetupLabwareProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
   robotName: string
   runId: string
+  nextStep: StepKey | null
+  expandStep: (step: StepKey) => void
 }
 
 export function SetupLabware({
   protocolRunHeaderRef,
   robotName,
   runId,
+  nextStep,
+  expandStep,
 }: SetupLabwareProps): JSX.Element {
   const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
     robotName,
@@ -97,7 +102,12 @@ export function SetupLabware({
   })
   const runHasStarted = useRunHasStarted(runId)
   const currentRun = useCurrentRun()
-  const { protocolData } = useProtocolDetailsForRun(runId)
+  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
+    runId
+  )
+  const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
+  const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
+
   const { t } = useTranslation('protocol_setup')
   const [
     showLabwareHelpModal,
@@ -152,6 +162,10 @@ export function SetupLabware({
     lpcDisabledReason = t('lpc_disabled_modules_not_connected')
   } else if (runHasStarted) {
     lpcDisabledReason = t('labware_position_check_not_available')
+  } else if (robotProtocolAnalysis == null) {
+    lpcDisabledReason = t(
+      'labware_position_check_not_available_analyzing_on_robot'
+    )
   } else if (
     isEmpty(protocolData?.pipettes) ||
     isEmpty(protocolData?.labware)
@@ -351,11 +365,17 @@ export function SetupLabware({
           </Flex>
         </Flex>
         <Flex justifyContent={JUSTIFY_CENTER}>
-          <ProceedToRunButton
-            protocolRunHeaderRef={protocolRunHeaderRef}
-            robotName={robotName}
-            runId={runId}
-          />
+          {nextStep == null ? (
+            <ProceedToRunButton
+              protocolRunHeaderRef={protocolRunHeaderRef}
+              robotName={robotName}
+              runId={runId}
+            />
+          ) : (
+            <PrimaryButton onClick={() => expandStep(nextStep)}>
+              {t('proceed_to_liquid_setup_step')}
+            </PrimaryButton>
+          )}
         </Flex>
       </Flex>
     </>

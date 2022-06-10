@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Box,
   Flex,
+  useInterval,
   ALIGN_CENTER,
   ALIGN_START,
   C_MED_LIGHT_GRAY,
@@ -20,14 +21,19 @@ import {
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { ToggleButton, PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
+import { useDispatchApiRequest } from '../../redux/robot-api'
+import { fetchLights } from '../../redux/robot-controls'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
 import { Portal } from '../../App/portal'
 import { CONNECTABLE } from '../../redux/discovery'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { RobotStatusBanner } from './RobotStatusBanner'
+import { ReachableBanner } from './ReachableBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
-import { useLights, useRobot, useIsRobotViewable } from './hooks'
+import { useIsRobotBusy, useLights, useRobot } from './hooks'
+
+const EQUIPMENT_POLL_MS = 5000
 
 interface RobotOverviewProps {
   robotName: string
@@ -36,18 +42,25 @@ interface RobotOverviewProps {
 export function RobotOverview({
   robotName,
 }: RobotOverviewProps): JSX.Element | null {
-  const { t } = useTranslation('device_details')
+  const { t } = useTranslation(['device_details', 'shared'])
+  const [dispatchRequest] = useDispatchApiRequest()
 
   const robot = useRobot(robotName)
-  const isRobotViewable = useIsRobotViewable(robotName)
-
   const [
     showChooseProtocolSlideout,
     setShowChooseProtocolSlideout,
   ] = React.useState<boolean>(false)
   const { lightsOn, toggleLights } = useLights(robotName)
-
   const currentRunId = useCurrentRunId()
+  const isRobotBusy = useIsRobotBusy()
+
+  useInterval(
+    () => {
+      dispatchRequest(fetchLights(robotName))
+    },
+    EQUIPMENT_POLL_MS,
+    true
+  )
 
   return robot != null ? (
     <Flex
@@ -65,11 +78,13 @@ export function RobotOverview({
         id="RobotOverview_robotImage"
       />
       <Box padding={SPACING.spacing3} width="100%">
-        <UpdateRobotBanner
-          robotName={robot.name}
-          marginBottom={SPACING.spacing3}
-        />
-        <RobotStatusBanner name={robot.name} local={robot.local} />
+        <ReachableBanner robot={robot} />
+        {robot != null && !isRobotBusy ? (
+          <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing3} />
+        ) : null}
+        {robot?.status === CONNECTABLE ? (
+          <RobotStatusBanner name={robot.name} local={robot.local} />
+        ) : null}
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -82,7 +97,7 @@ export function RobotOverview({
               <ToggleButton
                 label={t('lights')}
                 toggledOn={lightsOn != null ? lightsOn : false}
-                disabled={lightsOn === null}
+                disabled={lightsOn === null || robot.status !== CONNECTABLE}
                 onClick={toggleLights}
                 size={SIZE_2}
                 marginRight={SPACING.spacing3}
@@ -93,7 +108,7 @@ export function RobotOverview({
           </Flex>
           <PrimaryButton
             textTransform={TEXT_TRANSFORM_NONE}
-            disabled={currentRunId != null || !isRobotViewable}
+            disabled={currentRunId != null || robot.status !== CONNECTABLE}
             onClick={() => {
               setShowChooseProtocolSlideout(true)
             }}

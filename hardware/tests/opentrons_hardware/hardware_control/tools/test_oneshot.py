@@ -62,7 +62,7 @@ async def test_suppresses_undefined(
 
     assert tools.left is None
     assert tools.right is None
-    assert tools.gripper == ToolType.undefined_tool
+    assert tools.gripper is None
     # Only the tools request should be sent - no followups for mounts with nothing on
     # them
     assert await mock_messenger.send.called_once_with(
@@ -104,7 +104,7 @@ async def test_handles_not_attached(
 
     assert tools.left is None
     assert tools.right is None
-    assert tools.gripper == ToolType.nothing_attached
+    assert tools.gripper is None
 
     # Only the tools request should be sent - no followups for mounts with nothing on
     # them
@@ -142,14 +142,14 @@ async def test_sends_only_required_followups(
             ]
         return []
 
-    def pipette_info_responder(
+    def instrument_info_responder(
         node_id: NodeId, message: MessageDefinition
     ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
-        if isinstance(message, message_definitions.PipetteInfoRequest):
+        if isinstance(message, message_definitions.InstrumentInfoRequest):
             payload = payloads.PipetteInfoResponsePayload(
-                pipette_name=PipetteNameField(PipetteName.p1000_single.value),
-                pipette_model=UInt16Field(2),
-                pipette_serial=SerialField(b"20220809A022"),
+                name=PipetteNameField(PipetteName.p1000_single.value),
+                model=UInt16Field(2),
+                serial=SerialField(b"20220809A022"),
             )
             return [
                 (
@@ -161,7 +161,7 @@ async def test_sends_only_required_followups(
         return []
 
     message_send_loopback.add_responder(attached_tool_responder)
-    message_send_loopback.add_responder(pipette_info_responder)
+    message_send_loopback.add_responder(instrument_info_responder)
 
     tools = await subject.detect()
 
@@ -169,6 +169,7 @@ async def test_sends_only_required_followups(
     assert tools.right == types.PipetteInformation(
         name=PipetteName.p1000_single, model=2, serial="20220809A022"
     )
+    assert tools.gripper is None
 
     assert mock_messenger.send.mock_calls == [
         call(
@@ -177,7 +178,7 @@ async def test_sends_only_required_followups(
         ),
         call(
             node_id=NodeId.broadcast,
-            message=message_definitions.PipetteInfoRequest(),
+            message=message_definitions.InstrumentInfoRequest(),
         ),
     ]
 
@@ -200,7 +201,7 @@ async def test_sends_all_required_followups(
                         payload=payloads.ToolsDetectedNotificationPayload(
                             z_motor=ToolField(ToolType.pipette_single_chan.value),
                             a_motor=ToolField(ToolType.pipette_multi_chan.value),
-                            gripper=ToolField(ToolType.nothing_attached.value),
+                            gripper=ToolField(ToolType.gripper.value),
                         )
                     ),
                     NodeId.head,
@@ -208,20 +209,18 @@ async def test_sends_all_required_followups(
             ]
         return []
 
-    def pipette_info_responder(
+    def instrument_info_responder(
         node_id: NodeId, message: MessageDefinition
     ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
-        if isinstance(message, message_definitions.PipetteInfoRequest):
+        if isinstance(message, message_definitions.InstrumentInfoRequest):
             return [
                 (
                     NodeId.host,
                     message_definitions.PipetteInfoResponse(
                         payload=payloads.PipetteInfoResponsePayload(
-                            pipette_name=PipetteNameField(
-                                PipetteName.p1000_single.value
-                            ),
-                            pipette_model=UInt16Field(2),
-                            pipette_serial=SerialField(b"20220809A022"),
+                            name=PipetteNameField(PipetteName.p1000_single.value),
+                            model=UInt16Field(2),
+                            serial=SerialField(b"20220809A022"),
                         )
                     ),
                     NodeId.pipette_left,
@@ -230,20 +229,28 @@ async def test_sends_all_required_followups(
                     NodeId.host,
                     message_definitions.PipetteInfoResponse(
                         payload=payloads.PipetteInfoResponsePayload(
-                            pipette_name=PipetteNameField(
-                                PipetteName.p1000_multi.value
-                            ),
-                            pipette_model=UInt16Field(4),
-                            pipette_serial=SerialField(b"20231005A220"),
+                            name=PipetteNameField(PipetteName.p1000_multi.value),
+                            model=UInt16Field(4),
+                            serial=SerialField(b"20231005A220"),
                         )
                     ),
                     NodeId.pipette_right,
+                ),
+                (
+                    NodeId.host,
+                    message_definitions.GripperInfoResponse(
+                        payload=payloads.GripperInfoResponsePayload(
+                            model=UInt16Field(1),
+                            serial=SerialField(b"20220531A01"),
+                        )
+                    ),
+                    NodeId.gripper,
                 ),
             ]
         return []
 
     message_send_loopback.add_responder(attached_tool_responder)
-    message_send_loopback.add_responder(pipette_info_responder)
+    message_send_loopback.add_responder(instrument_info_responder)
 
     tools = await subject.detect()
 
@@ -253,6 +260,7 @@ async def test_sends_all_required_followups(
     assert tools.right == types.PipetteInformation(
         name=PipetteName.p1000_multi, model=4, serial="20231005A220"
     )
+    assert tools.gripper == types.GripperInformation(model=1, serial="20220531A01")
 
     assert mock_messenger.send.mock_calls == [
         call(
@@ -263,7 +271,7 @@ async def test_sends_all_required_followups(
         ),
         call(
             node_id=NodeId.broadcast,
-            message=message_definitions.PipetteInfoRequest(),
+            message=message_definitions.InstrumentInfoRequest(),
         ),
     ]
 
@@ -297,11 +305,11 @@ async def test_handles_bad_serials(
     def pipette_info_responder(
         node_id: NodeId, message: MessageDefinition
     ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
-        if isinstance(message, message_definitions.PipetteInfoRequest):
+        if isinstance(message, message_definitions.InstrumentInfoRequest):
             payload = payloads.PipetteInfoResponsePayload(
-                pipette_name=PipetteNameField(PipetteName.p1000_multi.value),
-                pipette_model=UInt16Field(4),
-                pipette_serial=SerialField(
+                name=PipetteNameField(PipetteName.p1000_multi.value),
+                model=UInt16Field(4),
+                serial=SerialField(
                     b"\x00\x01\x02\x03\x04\0x05\x06\x07\x08\x09\x0a\x0b"
                 ),
             )

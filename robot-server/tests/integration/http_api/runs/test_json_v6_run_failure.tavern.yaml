@@ -1,0 +1,139 @@
+test_name: Upload and run a JSON v6 protocol that should fail.
+
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload a protocol
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/simple_v6_failure.json'
+    response:
+      status_code: 201
+      save:
+        json:
+          protocol_id: data.id
+
+  - name: Create run from protocol
+    request:
+      url: '{host:s}:{port:d}/runs'
+      method: POST
+      json:
+        data:
+          protocolId: '{protocol_id}'
+    response:
+      status_code: 201
+      save:
+        json:
+          run_id: data.id
+
+  - name: Play the run
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/actions'
+      method: POST
+      json:
+        data:
+          actionType: play
+    response:
+      status_code: 201
+      strict:
+        - json:off
+
+  - name: Wait for the protocol to complete
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          status: failed
+          errors:
+            - id: !anystr
+              errorType: ProtocolCommandFailedError
+              createdAt: !anystr
+              detail: !re_search '^Command [a-f0-9-]+ failed to execute$'
+
+  - name: Verify commands contain the expected results
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        links:
+          current: !anydict
+        meta:
+          cursor: 0
+          totalLength: 4
+        data:
+          - id: !anystr
+            key: !anystr
+            commandType: loadLabware
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              location:
+                slotName: '8'
+              loadName: fixture_1_tiprack_10ul
+              namespace: fixture
+              version: 1
+              labwareId: tipRackId
+              displayName: Tip Rack
+          - id: !anystr
+            key: !anystr
+            commandType: loadPipette
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              pipetteName: p10_single
+              mount: left
+              pipetteId: pipetteId
+          - id: !anystr
+            key: !anystr
+            commandType: dropTip
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: failed
+            error:
+              id: !anystr
+              errorType: UnexpectedProtocolError
+              createdAt: !anystr
+              detail: 'Cannot perform DROPTIP without a tip attached'
+            params:
+              pipetteId: pipetteId
+              labwareId: tipRackId
+              wellName: A1
+              wellLocation:
+                origin: top
+                offset:
+                  x: 0
+                  y: 0
+                  z: 0
+          - id: !anystr
+            key: !anystr
+            commandType: pickUpTip
+            createdAt: !anystr
+            completedAt: !anystr
+            status: failed
+            params:
+              pipetteId: pipetteId
+              labwareId: tipRackId
+              wellName: A1
+              wellLocation:
+                origin: top
+                offset:
+                  x: 0
+                  y: 0
+                  z: 0

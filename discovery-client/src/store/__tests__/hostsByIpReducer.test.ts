@@ -525,6 +525,25 @@ describe('hostsByIp reducer', () => {
         serverHealthError: null,
         robotName: 'opentrons-dev',
       },
+    }
+    const nextState = hostsByIpReducer(initialState, action)
+
+    expect(nextState).toEqual({})
+  })
+
+  it('should handle "client:REMOVE_ROBOT" with multiple matching hosts', () => {
+    const action = Actions.removeRobot('opentrons-dev')
+    const initialState = {
+      '127.0.0.1': {
+        ip: '127.0.0.1',
+        port: 31950,
+        seen: false,
+        healthStatus: null,
+        serverHealthStatus: null,
+        healthError: null,
+        serverHealthError: null,
+        robotName: 'opentrons-dev',
+      },
       '127.0.0.2': {
         ip: '127.0.0.2',
         port: 31950,

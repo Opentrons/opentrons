@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
+
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -12,6 +13,7 @@ import {
   TYPOGRAPHY,
   useInterval,
 } from '@opentrons/components'
+
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
@@ -29,6 +31,7 @@ import { TemporarySelectNetwork } from './TemporarySelectNetwork'
 import type { State, Dispatch } from '../../../redux/types'
 interface NetworkingProps {
   robotName: string
+  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 // ToDo modify ConnectModal to align with new design
@@ -40,6 +43,7 @@ const LIST_REFRESH_MS = 10000
 
 export function RobotSettingsNetworking({
   robotName,
+  updateRobotStatus,
 }: NetworkingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const list = useSelector((state: State) => getWifiList(state, robotName))
@@ -94,7 +98,10 @@ export function RobotSettingsNetworking({
           <>
             <Flex marginBottom={SPACING.spacing5}>
               <Box width="25%" marginRight={SPACING.spacing3}>
-                <TemporarySelectNetwork robotName={robotName} />
+                <TemporarySelectNetwork
+                  robotName={robotName}
+                  updateRobotStatus={updateRobotStatus}
+                />
               </Box>
             </Flex>
             <Flex>
@@ -130,7 +137,10 @@ export function RobotSettingsNetworking({
           </>
         ) : (
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <TemporarySelectNetwork robotName={robotName} />
+            <TemporarySelectNetwork
+              robotName={robotName}
+              updateRobotStatus={updateRobotStatus}
+            />
           </Flex>
         )}
       </Box>

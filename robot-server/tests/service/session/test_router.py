@@ -116,7 +116,7 @@ def test_sessions_create(sessions_api_client, mock_session_manager, mock_session
         },
         "links": {
             "commandExecute": {
-                "href": f"/sessions/{mock_session.meta.identifier}/commands/execute",  # noqa: E501
+                "href": f"/sessions/{mock_session.meta.identifier}/commands/execute",
                 "meta": None,
             },
             "self": {
@@ -222,7 +222,7 @@ def test_sessions_get(sessions_api_client, mock_session_manager, mock_session):
         },
         "links": {
             "commandExecute": {
-                "href": f"/sessions/{mock_session.meta.identifier}/commands/execute",  # noqa: E501
+                "href": f"/sessions/{mock_session.meta.identifier}/commands/execute",
                 "meta": None,
             },
             "self": {
@@ -285,7 +285,7 @@ def test_sessions_execute_command_no_session(sessions_api_client, mock_session_m
             {
                 "id": "UncategorizedError",
                 "title": "Resource Not Found",
-                "detail": "Resource type 'session' with id '1234' was not found",  # noqa: E501
+                "detail": "Resource type 'session' with id '1234' was not found",
             }
         ],
         "links": {
@@ -333,7 +333,7 @@ def test_sessions_execute_command(
         },
         "links": {
             "commandExecute": {
-                "href": f"/sessions/{mock_session.meta.identifier}/commands/execute",  # noqa: E501
+                "href": f"/sessions/{mock_session.meta.identifier}/commands/execute",
                 "meta": None,
             },
             "self": {

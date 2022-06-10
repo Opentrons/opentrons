@@ -3,7 +3,12 @@ import * as React from 'react'
 import { renderWithProviders, Mount } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
+import { mockAttachedPipette } from '../../../../../redux/pipettes/__fixtures__'
+import { useAttachedPipettes } from '../../../hooks'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
+import { OverflowMenu } from '../OverflowMenu'
+
+import type { AttachedPipettesByMount } from '../../../../../redux/pipettes/types'
 
 const render = (
   props: React.ComponentProps<typeof PipetteOffsetCalibrationItems>
@@ -38,14 +43,31 @@ jest.mock('../../../../../redux/config')
 jest.mock('../../../../../redux/sessions/selectors')
 jest.mock('../../../../../redux/discovery')
 jest.mock('../../../../../assets/labware/findLabware')
+jest.mock('../../../hooks')
+jest.mock('../OverflowMenu')
+
+const mockAttachedPipettes: AttachedPipettesByMount = {
+  left: mockAttachedPipette,
+  right: mockAttachedPipette,
+} as any
+const mockUpdateRobotStatus = jest.fn()
+const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
+  typeof useAttachedPipettes
+>
+const mockOverflowMenu = OverflowMenu as jest.MockedFunction<
+  typeof OverflowMenu
+>
 
 describe('PipetteOffsetCalibrationItems', () => {
   let props: React.ComponentProps<typeof PipetteOffsetCalibrationItems>
 
   beforeEach(() => {
+    mockOverflowMenu.mockReturnValue(<div>mock overflow menu</div>)
+    mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
     props = {
       robotName: ROBOT_NAME,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
+      updateRobotStatus: mockUpdateRobotStatus,
     }
   })
 
@@ -62,9 +84,8 @@ describe('PipetteOffsetCalibrationItems', () => {
   })
 
   it('should render overFlow menu', () => {
-    const [{ getAllByRole }] = render(props)
-    const buttons = getAllByRole('button')
-    expect(buttons).toHaveLength(2)
+    const [{ queryAllByText }] = render(props)
+    expect(queryAllByText('mock overflow menu')).toHaveLength(2)
   })
 
   it('should render pipette offset calibrations data - unknown custom tiprack', () => {

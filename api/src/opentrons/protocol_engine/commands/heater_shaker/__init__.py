@@ -1,19 +1,19 @@
 """Heater-Shaker Module protocol commands."""
 
-from .await_temperature import (
-    AwaitTemperature,
-    AwaitTemperatureCreate,
-    AwaitTemperatureParams,
-    AwaitTemperatureResult,
-    AwaitTemperatureCommandType,
+from .wait_for_temperature import (
+    WaitForTemperature,
+    WaitForTemperatureCreate,
+    WaitForTemperatureParams,
+    WaitForTemperatureResult,
+    WaitForTemperatureCommandType,
 )
 
-from .start_set_target_temperature import (
-    StartSetTargetTemperature,
-    StartSetTargetTemperatureCreate,
-    StartSetTargetTemperatureParams,
-    StartSetTargetTemperatureResult,
-    StartSetTargetTemperatureCommandType,
+from .set_target_temperature import (
+    SetTargetTemperature,
+    SetTargetTemperatureCreate,
+    SetTargetTemperatureParams,
+    SetTargetTemperatureResult,
+    SetTargetTemperatureCommandType,
 )
 
 from .deactivate_heater import (
@@ -24,79 +24,79 @@ from .deactivate_heater import (
     DeactivateHeaterCommandType,
 )
 
-from .set_target_shake_speed import (
-    SetTargetShakeSpeed,
-    SetTargetShakeSpeedCreate,
-    SetTargetShakeSpeedParams,
-    SetTargetShakeSpeedResult,
-    SetTargetShakeSpeedCommandType,
+from .set_and_wait_for_shake_speed import (
+    SetAndWaitForShakeSpeed,
+    SetAndWaitForShakeSpeedCreate,
+    SetAndWaitForShakeSpeedParams,
+    SetAndWaitForShakeSpeedResult,
+    SetAndWaitForShakeSpeedCommandType,
 )
 
-from .stop_shake import (
-    StopShake,
-    StopShakeCreate,
-    StopShakeParams,
-    StopShakeResult,
-    StopShakeCommandType,
+from .deactivate_shaker import (
+    DeactivateShaker,
+    DeactivateShakerCreate,
+    DeactivateShakerParams,
+    DeactivateShakerResult,
+    DeactivateShakerCommandType,
 )
 
-from .open_latch import (
-    OpenLatch,
-    OpenLatchCreate,
-    OpenLatchParams,
-    OpenLatchResult,
-    OpenLatchCommandType,
+from .open_labware_latch import (
+    OpenLabwareLatch,
+    OpenLabwareLatchCreate,
+    OpenLabwareLatchParams,
+    OpenLabwareLatchResult,
+    OpenLabwareLatchCommandType,
 )
 
-from .close_latch import (
-    CloseLatch,
-    CloseLatchCreate,
-    CloseLatchParams,
-    CloseLatchResult,
-    CloseLatchCommandType,
+from .close_labware_latch import (
+    CloseLabwareLatch,
+    CloseLabwareLatchCreate,
+    CloseLabwareLatchParams,
+    CloseLabwareLatchResult,
+    CloseLabwareLatchCommandType,
 )
 
 __all__ = [
-    # heaterShakerModule/awaitTemperature
-    "AwaitTemperature",
-    "AwaitTemperatureCreate",
-    "AwaitTemperatureParams",
-    "AwaitTemperatureResult",
-    "AwaitTemperatureCommandType",
-    # heaterShakerModule/startSetTargetTemperature
-    "StartSetTargetTemperature",
-    "StartSetTargetTemperatureCreate",
-    "StartSetTargetTemperatureParams",
-    "StartSetTargetTemperatureResult",
-    "StartSetTargetTemperatureCommandType",
-    # heaterShakerModule/deactivateHeater
+    # heaterShaker/waitForTemperature
+    "WaitForTemperature",
+    "WaitForTemperatureCreate",
+    "WaitForTemperatureParams",
+    "WaitForTemperatureResult",
+    "WaitForTemperatureCommandType",
+    # heaterShaker/setTargetTemperature
+    "SetTargetTemperature",
+    "SetTargetTemperatureCreate",
+    "SetTargetTemperatureParams",
+    "SetTargetTemperatureResult",
+    "SetTargetTemperatureCommandType",
+    # heaterShaker/deactivateHeater
     "DeactivateHeater",
     "DeactivateHeaterCreate",
     "DeactivateHeaterParams",
     "DeactivateHeaterResult",
     "DeactivateHeaterCommandType",
-    # heaterShakerModule/setTargetShakeSpeed
-    "SetTargetShakeSpeed",
-    "SetTargetShakeSpeedCreate",
-    "SetTargetShakeSpeedParams",
-    "SetTargetShakeSpeedResult",
-    "SetTargetShakeSpeedCommandType",
-    # heaterShakerModule/stopShake
-    "StopShake",
-    "StopShakeCreate",
-    "StopShakeParams",
-    "StopShakeResult",
-    "StopShakeCommandType",
-    # heaterShakerModule/openLatch
-    "OpenLatch",
-    "OpenLatchCreate",
-    "OpenLatchParams",
-    "OpenLatchResult",
-    "OpenLatchCommandType",
-    # heaterShakerModule/closeLatch
-    "CloseLatch",
-    "CloseLatchCreate",
-    "CloseLatchParams",
-    "CloseLatchResult",
-    "CloseLatchCommandType",
+    # heaterShaker/setAndWaitForShakeSpeed
+    "SetAndWaitForShakeSpeed",
+    "SetAndWaitForShakeSpeedCreate",
+    "SetAndWaitForShakeSpeedParams",
+    "SetAndWaitForShakeSpeedResult",
+    "SetAndWaitForShakeSpeedCommandType",
+    # heaterShaker/deactivateShaker
+    "DeactivateShaker",
+    "DeactivateShakerCreate",
+    "DeactivateShakerParams",
+    "DeactivateShakerResult",
+    "DeactivateShakerCommandType",
+    # heaterShaker/openLabwareLatch
+    "OpenLabwareLatch",
+    "OpenLabwareLatchCreate",
+    "OpenLabwareLatchParams",
+    "OpenLabwareLatchResult",
+    "OpenLabwareLatchCommandType",
+    # heaterShaker/closeLabwareLatch
+    "CloseLabwareLatch",
+    "CloseLabwareLatchCreate",
+    "CloseLabwareLatchParams",
+    "CloseLabwareLatchResult",
+    "CloseLabwareLatchCommandType",
 ]

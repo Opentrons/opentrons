@@ -2,7 +2,11 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_stand
 import { checkModuleCompatibility } from '@opentrons/shared-data'
 
 import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
-import { useAttachedModules, useProtocolDetailsForRun } from '.'
+import {
+  useAttachedModules,
+  useProtocolDetailsForRun,
+  useStoredProtocolAnalysis,
+} from '.'
 
 import type { ProtocolModuleInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 import type { AttachedModule } from '../../../redux/modules/types'
@@ -17,7 +21,11 @@ export function useModuleRenderInfoForProtocolById(
 ): {
   [moduleId: string]: ModuleRenderInfoForProtocol
 } {
-  const { protocolData } = useProtocolDetailsForRun(runId)
+  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
+    runId
+  )
+  const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
+  const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const attachedModules = useAttachedModules()
   if (protocolData == null) return {}
 

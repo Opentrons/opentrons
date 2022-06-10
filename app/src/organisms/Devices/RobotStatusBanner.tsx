@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Flex,
   Icon,
@@ -34,11 +35,17 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
   const RunningProtocolBanner = (): JSX.Element | null =>
     currentRunId != null ? (
       <Flex alignItems={ALIGN_CENTER}>
-        <StyledText as="label" paddingRight={SPACING.spacing3}>
+        <StyledText
+          as="label"
+          paddingRight={SPACING.spacing3}
+          css={{ 'overflow-wrap': 'anywhere' }}
+        >
           {`${displayName}; ${t(`run_details:status_${currentRunStatus}`)}`}
         </StyledText>
         <Link
-          to={`/devices/${name}/protocol-runs/${currentRunId}/run-log`}
+          to={`/devices/${name}/protocol-runs/${currentRunId}/${
+            currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-log'
+          }`}
           id={`RobotStatusBanner_${name}_goToRun`}
         >
           <TertiaryButton>{t('go_to_run')}</TertiaryButton>
@@ -65,6 +72,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
               as="h3"
               marginRight={SPACING.spacing3}
               id={`RobotStatusBanner_${name}_robotName`}
+              css={{ 'overflow-wrap': 'anywhere' }}
             >
               {name}
             </StyledText>

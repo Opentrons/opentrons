@@ -13,11 +13,13 @@ from typing import (
     AsyncIterator,
     cast,
     Set,
+    Union,
+    Mapping,
 )
 
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
-from opentrons.config import pipette_config
+from opentrons.config import pipette_config, gripper_config
 from opentrons_shared_data.pipette import dummy_model_for_name
 from .ot3utils import (
     axis_convert,
@@ -49,7 +51,10 @@ from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 from opentrons.hardware_control.dev_types import (
     InstrumentHardwareConfigs,
     PipetteSpec,
+    GripperSpec,
     AttachedPipette,
+    AttachedGripper,
+    OT3AttachedInstruments,
 )
 from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 
@@ -116,17 +121,26 @@ class OT3Simulator:
         self._stubbed_attached_modules = attached_modules
 
         def _sanitize_attached_instrument(
-            passed_ai: Optional[Dict[str, Optional[str]]] = None
-        ) -> PipetteSpec:
+            mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
+        ) -> Union[PipetteSpec, GripperSpec]:
+            if mount is OT3Mount.GRIPPER:
+                gripper_spec: GripperSpec = {"model": None, "id": None}
+                if passed_ai and passed_ai.get("model"):
+                    gripper_spec["model"] = "gripper_v1"
+                    gripper_spec["id"] = passed_ai.get("id")
+                return gripper_spec
+
+            pipette_spec: PipetteSpec = {"model": None, "id": None}
             if not passed_ai or not passed_ai.get("model"):
-                return {"model": None, "id": None}
+                return pipette_spec
             if passed_ai["model"] in pipette_config.config_models:
                 return passed_ai  # type: ignore
             if passed_ai["model"] in pipette_config.config_names:
-                return {
-                    "model": dummy_model_for_name(passed_ai["model"]),  # type: ignore
-                    "id": passed_ai.get("id"),
-                }
+                pipette_spec["model"] = dummy_model_for_name(
+                    passed_ai["model"]  # type: ignore
+                )
+                pipette_spec["id"] = passed_ai.get("id")
+                return pipette_spec
             raise KeyError(
                 "If you specify attached_instruments, the model "
                 "should be pipette names or pipette models, but "
@@ -134,7 +148,7 @@ class OT3Simulator:
             )
 
         self._attached_instruments = {
-            m: _sanitize_attached_instrument(attached_instruments.get(m))
+            m: _sanitize_attached_instrument(m, attached_instruments.get(m))
             for m in OT3Mount
         }
         self._module_controls: Optional[AttachedModulesControl] = None
@@ -223,8 +237,29 @@ class OT3Simulator:
 
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]
+    ) -> OT3AttachedInstruments:
+        init_instr = self._attached_instruments.get(
+            mount, {"model": None, "id": None}  # type: ignore
+        )
+        if mount is OT3Mount.GRIPPER:
+            return self._attached_gripper_to_mount(cast(GripperSpec, init_instr))
+        return self._attached_pipette_to_mount(
+            mount, cast(PipetteSpec, init_instr), expected_instr
+        )
+
+    def _attached_gripper_to_mount(self, init_instr: GripperSpec) -> AttachedGripper:
+        found_model = init_instr["model"]
+        if found_model:
+            return {"config": gripper_config.load(), "id": init_instr["id"]}
+        else:
+            return {"config": None, "id": None}
+
+    def _attached_pipette_to_mount(
+        self,
+        mount: OT3Mount,
+        init_instr: PipetteSpec,
+        expected_instr: Optional[PipetteName],
     ) -> AttachedPipette:
-        init_instr = self._attached_instruments.get(mount, {"model": None, "id": None})
         found_model = init_instr["model"]
         back_compat: List["PipetteName"] = []
         if found_model:
@@ -273,8 +308,8 @@ class OT3Simulator:
             return {"config": None, "id": None}
 
     async def get_attached_instruments(
-        self, expected: Dict[OT3Mount, PipetteName]
-    ) -> Dict[OT3Mount, AttachedPipette]:
+        self, expected: Mapping[OT3Mount, Optional[PipetteName]]
+    ) -> Mapping[OT3Mount, OT3AttachedInstruments]:
         """Get attached instruments.
 
         Args:
@@ -323,6 +358,7 @@ class OT3Simulator:
             OT3Axis.P_R: phony_bounds,
             OT3Axis.Y: phony_bounds,
             OT3Axis.X: phony_bounds,
+            OT3Axis.Z_G: phony_bounds,
         }
 
     def single_boundary(self, boundary: int) -> OT3AxisMap[float]:
@@ -392,6 +428,7 @@ class OT3Simulator:
             NodeId.gantry_y: 0,
             NodeId.pipette_left: 0,
             NodeId.pipette_right: 0,
+            NodeId.gripper_z: 0,
         }
 
     @staticmethod
@@ -406,9 +443,27 @@ class OT3Simulator:
             nodes.add(NodeId.pipette_left)
         if self._attached_instruments[OT3Mount.RIGHT].get("model", None):
             nodes.add(NodeId.pipette_right)
+        if self._attached_instruments.get(
+            OT3Mount.GRIPPER
+        ) and self._attached_instruments[OT3Mount.GRIPPER].get("model", None):
+            nodes.add(NodeId.gripper)
         self._present_nodes = nodes
 
     async def capacitive_probe(
-        self, mount: OT3Mount, distance_mm: float, speed_mm_per_s: float
+        self,
+        mount: OT3Mount,
+        moving: OT3Axis,
+        distance_mm: float,
+        speed_mm_per_s: float,
     ) -> None:
-        self._position[axis_to_node(OT3Axis.by_mount(mount))] += distance_mm
+        self._position[axis_to_node(moving)] += distance_mm
+
+    async def capacitive_pass(
+        self,
+        mount: OT3Mount,
+        moving: OT3Axis,
+        distance_mm: float,
+        speed_mm_per_s: float,
+    ) -> List[float]:
+        self._position[axis_to_node(moving)] += distance_mm
+        return []

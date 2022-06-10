@@ -61,6 +61,22 @@ export const mockPipetteOffsetCalibration3: PipetteOffsetCalibration = {
 
 export const mockPipetteOffsetCalibration4: PipetteOffsetCalibration = {
   pipette: 'P1KVS2108052020A02',
+  mount: 'left',
+  offset: [4.0, 6.0, 8.0],
+  tiprackUri: 'opentrons/opentrons_96_tiprack_1000ul/1',
+  tiprack: 'asdakjsdhalksjdhlakjsdhalkhsd',
+  lastModified: '2020-09-10T05:13',
+  source: 'user',
+  status: {
+    markedBad: true,
+    source: 'unknown',
+    markedAt: '',
+  },
+  id: 'some id',
+}
+
+export const mockPipetteOffsetCalibration5: PipetteOffsetCalibration = {
+  pipette: 'P1KVS2108052020A02',
   mount: 'right',
   offset: [4.0, 6.0, 8.0],
   tiprackUri: 'opentrons/opentrons_96_tiprack_1000ul/1',
