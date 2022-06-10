@@ -6,7 +6,7 @@ import { i18n } from '../../../../../../i18n'
 import { getConnectableRobots } from '../../../../../../redux/discovery'
 import {
   mockConnectableRobot,
-  mockUnreachableRobot,
+  // mockUnreachableRobot,
 } from '../../../../../../redux/discovery/__fixtures__'
 
 import { RenameRobotSlideout } from '../RenameRobotSlideout'

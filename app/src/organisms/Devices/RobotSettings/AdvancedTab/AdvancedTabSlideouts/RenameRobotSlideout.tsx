@@ -14,6 +14,8 @@ import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import {
   removeRobot,
   getConnectableRobots,
+  getReachableRobots,
+  getUnreachableRobots,
 } from '../../../../../redux/discovery'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
@@ -50,8 +52,15 @@ export function RenameRobotSlideout({
   )
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
-  const healthyReachableRobots = useSelector((state: State) =>
+  const connectableRobots = useSelector((state: State) =>
     getConnectableRobots(state)
+  )
+  const reachableRobots = useSelector((state: State) =>
+    getReachableRobots(state)
+  )
+
+  const unreachableRobots = useSelector((state: State) =>
+    getUnreachableRobots(state)
   )
 
   const formik = useFormik({
@@ -60,7 +69,14 @@ export function RenameRobotSlideout({
     },
     onSubmit: (values, { resetForm }) => {
       const newName = values.newRobotName
+      console.log('form robotName', robotName)
       setPreviousRobotName(robotName)
+      const duplicatedName = unreachableRobots.find(
+        robot => robot.name === newName
+      )
+      if (duplicatedName != null) {
+        dispatch(removeRobot(previousRobotName))
+      }
       updateRobotName(newName)
       resetForm({ values: { newRobotName: '' } })
     },
@@ -70,7 +86,11 @@ export function RenameRobotSlideout({
       if (!regexPattern.test(newName)) {
         errors.newRobotName = t('rename_robot_input_limitation_detail')
       }
-      if (healthyReachableRobots.some(robot => newName === robot.name)) {
+      if (
+        [...connectableRobots, ...reachableRobots].some(
+          robot => newName === robot.name
+        )
+      ) {
         errors.newRobotName = t('robot_name_already_exists')
       }
       return errors
@@ -80,11 +100,12 @@ export function RenameRobotSlideout({
   const { updateRobotName } = useUpdateRobotNameMutation({
     onSuccess: (data: UpdatedRobotName) => {
       // remove the previous robot name from the list
-      dispatch(removeRobot(previousRobotName))
+      // console.log('previousRobotName', previousRobotName)
       // data.name != null && history.push(`/devices/${data.name}/robot-settings`)
       // TODO 6/9/2022 kj this is a temporary fix to avoid the issue
       // https://github.com/Opentrons/opentrons/issues/10709
       data.name != null && history.push(`/devices`)
+      dispatch(removeRobot(previousRobotName))
     },
     onError: (error: Error) => {
       // TODO kj 5/25/2022: when a user lost connection while the user is renaming a robot,
