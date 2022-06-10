@@ -39,6 +39,7 @@ import { Portal } from '../../App/portal'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { PreviousVersionModal } from './PreviousVersionModal'
 import { ConnectRobotSlideout } from './ConnectRobotSlideout'
+import * as Config from '../../redux/config'
 
 import type { Dispatch, State } from '../../redux/types'
 
@@ -76,6 +77,10 @@ export function GeneralSettings(): JSX.Element {
     return ignored !== null ? !ignored : null
   })
 
+  const channelConfigValue = useSelector((state: State) => {
+    return Config.getConfig(state)?.update.channel
+  })
+
   const handleToggle = (): void => {
     if (enabled !== null) {
       dispatch(
@@ -97,6 +102,7 @@ export function GeneralSettings(): JSX.Element {
   useMountEffect(() => {
     dispatch(checkShellUpdate())
   })
+
   return (
     <>
       <Box
@@ -104,7 +110,7 @@ export function GeneralSettings(): JSX.Element {
         paddingX={SPACING.spacing4}
         paddingY={SPACING.spacing5}
       >
-        {showUpdateBanner && (
+        {showUpdateBanner && channelConfigValue !== 'latest' && (
           <Box
             marginBottom={SPACING.spacing4}
             id="GeneralSettings_updatebanner"
@@ -123,6 +129,7 @@ export function GeneralSettings(): JSX.Element {
             </Banner>
           </Box>
         )}
+
         <Box>
           <Flex
             flexDirection={DIRECTION_ROW}
@@ -160,7 +167,7 @@ export function GeneralSettings(): JSX.Element {
                 >{` ${t('shared:github')}`}</Link>
               </StyledText>
             </Box>
-            {updateAvailable ? (
+            {updateAvailable && channelConfigValue !== 'latest' ? (
               <TertiaryButton
                 disabled={!updateAvailable}
                 marginLeft={SPACING_AUTO}
@@ -203,28 +210,33 @@ export function GeneralSettings(): JSX.Element {
           </Box>
         </Box>
         <Divider marginY={SPACING.spacing5} />
-        <StyledText
-          css={TYPOGRAPHY.h3SemiBold}
-          paddingBottom={SPACING.spacing3}
-        >
-          {t('update_alerts')}
-        </StyledText>
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          alignItems={ALIGN_CENTER}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-        >
-          <StyledText as="p">{t('receive_alert')}</StyledText>
-          <ToggleButton
-            label={ENABLE_APP_UPDATE_NOTIFICATIONS}
-            marginRight={SPACING.spacing4}
-            disabled={enabled === null}
-            toggledOn={enabled === true}
-            onClick={handleToggle}
-            id="GeneralSettings_softwareUpdateAlerts"
-          />
-        </Flex>
+        {channelConfigValue !== 'latest' ? (
+          <>
+            <StyledText
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
+            >
+              {t('update_alerts')}
+            </StyledText>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              alignItems={ALIGN_CENTER}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+            >
+              <StyledText as="p">{t('receive_alert')}</StyledText>
+              <ToggleButton
+                label={ENABLE_APP_UPDATE_NOTIFICATIONS}
+                marginRight={SPACING.spacing4}
+                disabled={enabled === null}
+                toggledOn={enabled === true}
+                onClick={handleToggle}
+                id="GeneralSettings_softwareUpdateAlerts"
+              />
+            </Flex>
+          </>
+        ) : null}
         <Divider marginY={SPACING.spacing5} />
+
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -244,7 +256,7 @@ export function GeneralSettings(): JSX.Element {
           </TertiaryButton>
         </Flex>
       </Box>
-      {showUpdateModal ? (
+      {showUpdateModal && channelConfigValue !== 'latest' ? (
         <Portal level="top">
           <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />
         </Portal>
