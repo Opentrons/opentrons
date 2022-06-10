@@ -223,7 +223,7 @@ export function AdvancedSettings(): JSX.Element {
                     <Btn
                       onClick={cancelExit}
                       textTransform={TEXT_TRANSFORM_CAPITALIZE}
-                      color={COLORS.blue}
+                      color={COLORS.blueEnabled}
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                       marginRight={SPACING.spacing6}
                     >

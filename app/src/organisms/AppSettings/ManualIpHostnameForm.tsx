@@ -54,8 +54,9 @@ export function ManualIpHostnameForm(props: Props): JSX.Element {
     onSubmit: (values, { resetForm }) => {
       const ip = values.ip.trim()
       const inputForm = document.getElementById('ip')
-      if (inputForm)
+      if (inputForm != null) {
         inputForm.style.border = `1px solid ${COLORS.medGreyEnabled}`
+      }
       addManualIpAndHostname(ip)
       props.setMostRecentAddition(ip)
       resetForm({ values: undefined })
@@ -66,7 +67,7 @@ export function ManualIpHostnameForm(props: Props): JSX.Element {
       if (!ip) {
         errors.ip = t('add_ip_error')
         const inputForm = document.getElementById('ip')
-        if (inputForm)
+        if (inputForm != null)
           inputForm.style.border = `1px solid ${COLORS.errorEnabled}`
       }
       return errors
