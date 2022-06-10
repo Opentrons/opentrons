@@ -8,6 +8,7 @@ import {
   getIsHeaterShakerEastWestWithLatchOpen,
   pipetteAdjacentHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
 } from '../utils'
 import {
   getRobotStateWithTipStandard,
@@ -39,6 +40,9 @@ const mockGetIsHeaterShakerEastWestMultiChannelPipette = getIsHeaterShakerEastWe
 >
 const mockPipetteAdjacentHeaterShakerWhileShaking = pipetteAdjacentHeaterShakerWhileShaking as jest.MockedFunction<
   typeof pipetteAdjacentHeaterShakerWhileShaking
+>
+const mockGetIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette as jest.MockedFunction<
+  typeof getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette
 >
 
 describe('moveToWell', () => {
@@ -378,6 +382,30 @@ describe('moveToWell', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING',
+    })
+  })
+  it('should return an error when moving to labware north/south of a heater shaker into a non tiprack using a multi channel pipette', () => {
+    when(mockGetIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
+      .calledWith(
+        robotStateWithTip.modules,
+        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        expect.anything(),
+        expect.anything()
+      )
+      .mockReturnValue(true)
+
+    const result = moveToWell(
+      {
+        pipette: DEFAULT_PIPETTE,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL',
     })
   })
 })
