@@ -5,11 +5,23 @@ import { MODULE_INITIAL_STATE_BY_TYPE } from '../constants'
 import { constructInvariantContextFromRunCommands } from './constructInvariantContextFromRunCommands'
 import { makeInitialRobotState } from './misc'
 
-import type { RobotState, Timeline } from '../types'
+import type {
+  InvariantContext,
+  RobotState,
+  RobotStateAndWarnings,
+} from '../types'
+
+type RunCommandTimelineFrame = RobotStateAndWarnings & {
+  command: RunTimeCommand
+}
+interface RunCommandTimeline {
+  timeline: RunCommandTimelineFrame[]
+  invariantContext: InvariantContext
+}
 
 export function createTimelineFromRunCommands(
   commands: RunTimeCommand[]
-): Timeline {
+): RunCommandTimeline {
   const invariantContext = constructInvariantContextFromRunCommands(commands)
   const pipetteLocations = commands.reduce<RobotState['pipettes']>(
     (acc, command) => {
@@ -68,11 +80,15 @@ export function createTimelineFromRunCommands(
     moduleLocations,
     pipetteLocations,
   })
-  return commands.map(command =>
-    getNextRobotStateAndWarningsSingleCommand(
+  return {
+    timeline: commands.map(command => ({
+      ...getNextRobotStateAndWarningsSingleCommand(
+        command,
+        invariantContext,
+        initialRobotState
+      ),
       command,
-      invariantContext,
-      initialRobotState
-    )
-  )
+    })),
+    invariantContext,
+  }
 }

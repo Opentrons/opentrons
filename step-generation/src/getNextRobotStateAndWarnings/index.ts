@@ -80,6 +80,14 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
+    case 'loadPipette':
+    case 'loadLabware':
+    case 'loadModule':
+    case 'loadLiquid':
+    case 'home':
+    case 'pause':
+    case 'moveRelative':
+    case 'savePosition':
     case 'touchTip':
     case 'delay':
     case 'moveToWell':

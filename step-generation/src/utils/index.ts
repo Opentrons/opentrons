@@ -15,3 +15,4 @@ export {
 export * from './commandCreatorArgsGetters'
 export * from './misc'
 export * from './heaterShakerCollision'
+export * from './createTimelineFromRunCommands'

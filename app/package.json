@@ -23,6 +23,7 @@
     "@opentrons/components": "6.0.0-alpha.1",
     "@opentrons/react-api-client": "6.0.0-alpha.1",
     "@opentrons/shared-data": "6.0.0-alpha.1",
+    "@opentrons/step-generation": "6.0.0-alpha.1",
     "@thi.ng/paths": "1.6.5",
     "classnames": "2.2.5",
     "connected-react-router": "6.8.0",
