@@ -43,7 +43,7 @@ class TouchTipImplementation(AbstractCommandImpl[TouchTipParams, TouchTipResult]
             labware_id=params.labwareId, quirk="touchTipDisabled"
         ):
             raise TouchTipDisabledError(
-                f"Labware {params.labwareId} has quirk touchTipDisabled"
+                f"Touch tip not allowed on labware {params.labwareId}"
             )
 
         if self._state_view.labware.is_tiprack(labware_id=params.labwareId):

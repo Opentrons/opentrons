@@ -569,14 +569,13 @@ async def test_touch_tip(
         )
     )
 
-    edge_points = [Point(x=i, y=i + 1, z=i + 2) for i in range(0, 13, 3)]
     decoy.when(
         state_store.geometry.get_well_edges(
             labware_id="labware-id",
             well_name="A3",
             well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
         )
-    ).then_return(edge_points)
+    ).then_return([Point(x=0, y=1, z=2), Point(x=3, y=4, z=5)])
 
     await subject.touch_tip(
         pipette_id="pipette-id",
@@ -601,20 +600,5 @@ async def test_touch_tip(
             mount=Mount.LEFT,
             critical_point=CriticalPoint.XY_CENTER,
             abs_position=Point(x=3, y=4, z=5),
-        ),
-        await hardware_api.move_to(
-            mount=Mount.LEFT,
-            critical_point=CriticalPoint.XY_CENTER,
-            abs_position=Point(x=6, y=7, z=8),
-        ),
-        await hardware_api.move_to(
-            mount=Mount.LEFT,
-            critical_point=CriticalPoint.XY_CENTER,
-            abs_position=Point(x=9, y=10, z=11),
-        ),
-        await hardware_api.move_to(
-            mount=Mount.LEFT,
-            critical_point=CriticalPoint.XY_CENTER,
-            abs_position=Point(x=12, y=13, z=14),
         ),
     )

@@ -161,7 +161,7 @@ def test_touch_tip(
     subject: PipetteContext,
 ) -> None:
     """It should send a touch tip command."""
-    subject.touch_tip(location=well)
+    subject.touch_tip(location=well, v_offset=-0.5)
 
     decoy.verify(
         engine_client.touch_tip(
@@ -170,7 +170,7 @@ def test_touch_tip(
             well_name=well.well_name,
             well_location=WellLocation(
                 origin=WellOrigin.BOTTOM,
-                offset=WellOffset(x=0, y=0, z=1),
+                offset=WellOffset(x=0, y=0, z=-0.5),
             ),
         )
     )

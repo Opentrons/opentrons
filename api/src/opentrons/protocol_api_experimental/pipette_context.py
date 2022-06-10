@@ -202,8 +202,6 @@ class PipetteContext:  # noqa: D101
             raise NotImplementedError("Not including location not yet supported in PE.")
         if radius != 1.0:
             raise NotImplementedError("Radius adjustment not yet supported in PE.")
-        if v_offset != -1.0:
-            raise NotImplementedError("Vertical offset not yet supported in PE.")
         if speed != 60.0:
             raise NotImplementedError("Speed parameter not yet supported in PE.")
 
@@ -213,7 +211,7 @@ class PipetteContext:  # noqa: D101
             well_name=location.well_name,
             well_location=WellLocation(
                 origin=WellOrigin.BOTTOM,
-                offset=WellOffset(x=0, y=0, z=1),
+                offset=WellOffset(x=0, y=0, z=v_offset),
             ),
         )
         return self

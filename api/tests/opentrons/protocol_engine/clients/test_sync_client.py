@@ -252,16 +252,13 @@ def test_touch_tip(
     transport: AbstractSyncTransport,
     subject: SyncClient,
 ) -> None:
-    """It should execute a dispense command."""
+    """It should execute a touch tip command."""
     request = commands.TouchTipCreate(
         params=commands.TouchTipParams(
             pipetteId="123",
             labwareId="456",
             wellName="A2",
-            wellLocation=WellLocation(
-                origin=WellOrigin.BOTTOM,
-                offset=WellOffset(x=0, y=0, z=1),
-            ),
+            wellLocation=WellLocation(),
         )
     )
 
@@ -273,9 +270,7 @@ def test_touch_tip(
         pipette_id="123",
         labware_id="456",
         well_name="A2",
-        well_location=WellLocation(
-            origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
-        ),
+        well_location=WellLocation(),
     )
 
     assert result == response
