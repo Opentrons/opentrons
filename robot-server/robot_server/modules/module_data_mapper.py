@@ -58,6 +58,8 @@ class ModuleDataMapper:
             module_data = MagneticModuleData(
                 status=MagneticStatus(live_data["status"]),
                 engaged=cast(bool, live_data["data"].get("engaged")),
+                # Calculate adjustments for MAGNETIC_MODULE_V1
+                # https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/protocol_engine/state/module_substates/magnetic_module_substate.py#L43
                 height=live_data_height / 2
                 if module_model == ModuleModel.MAGNETIC_MODULE_V1
                 else live_data_height,
