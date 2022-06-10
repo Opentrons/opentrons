@@ -57,7 +57,7 @@ describe('OverflowBtn', () => {
       'box-shadow',
       `0 0 0 3px ${COLORS.warning}`,
       {
-        modifier: ':focus',
+        modifier: ':focus-visible',
       }
     )
   })
@@ -67,8 +67,8 @@ describe('OverflowBtn', () => {
       onClick: jest.fn(),
     })
 
-    expect(getByRole('button')).toHaveStyleRule('fill-opacity', '0.5', {
-      modifier: ':disabled',
+    expect(getByRole('button')).toHaveStyleRule('fill', `${COLORS.errorText}`, {
+      modifier: ':disabled circle',
     })
   })
 })

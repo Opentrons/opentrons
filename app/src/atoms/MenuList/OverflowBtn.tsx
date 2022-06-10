@@ -9,27 +9,28 @@ const overflowButtonStyles = css`
   &:hover {
     background-color: #16212d26;
   }
+  &:hover circle {
+    fill: ${COLORS.darkGreyHover};
+  }
 
   &:active {
     background-color: #16212d40;
   }
 
   &:active circle {
-    fill: ${COLORS.darkBlack};
+    fill: ${COLORS.darkGreyPressed};
   }
 
-  &:focus {
+  &:focus-visible {
     box-shadow: 0 0 0 3px ${COLORS.warning};
   }
 
-  &:enabled {
-    fill-opacity: 0.5;
-    font-color: ${COLORS.darkGreyEnabled};
+  &:focus-visible circle {
+    fill: ${COLORS.darkGreyHover};
   }
 
-  &:disabled,
-  &.disabled {
-    fill-opacity: 0.5;
+  &:disabled circle {
+    fill: ${COLORS.errorText};
   }
 `
 
@@ -40,7 +41,7 @@ export const OverflowBtn = React.forwardRef(
         width="19"
         height="31"
         viewBox="0 0 19 31"
-        fill={COLORS.darkGrey}
+        fill={COLORS.darkGreyEnabled}
         xmlns="http://www.w3.org/2000/svg"
       >
         <circle cx="9.5" cy="9.5" r="1.5" />
