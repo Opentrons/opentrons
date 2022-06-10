@@ -107,7 +107,6 @@ class JsonCommandTranslator:
         exclude_commands = [
             "loadLiquid",
             "delay",
-            "blowout",
             "moveToSlot",
             "moveToCoordinates",
         ]

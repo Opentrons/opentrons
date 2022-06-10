@@ -153,6 +153,14 @@ from .touch_tip import (
     TouchTipCommandType,
 )
 
+from .blow_out import (
+    BlowOutParams,
+    BlowOutResult,
+    BlowOutCreate,
+    BlowOutImplementation,
+    BlowOut,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -255,6 +263,12 @@ __all__ = [
     "TouchTipCreate",
     "TouchTipResult",
     "TouchTipCommandType",
+    # blow out command models
+    "BlowOutResult",
+    "BlowOutCreate",
+    "BlowOutImplementation",
+    "BlowOutParams",
+    "BlowOut",
     # module command bundles
     "heater_shaker",
     "magnetic_module",
