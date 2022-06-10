@@ -1716,6 +1716,24 @@ stages:
                 completedAt: !anystr
               - id: !anystr
                 createdAt: !anystr
+                commandType: touchTip
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                  labwareId: destPlateId
+                  wellName: B1
+                  wellLocation:
+                    origin: bottom
+                    offset:
+                      x: 0
+                      y: 0
+                      z: 11
+                result: { }
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
                 commandType: moveToWell
                 key: !anystr
                 status: succeeded
