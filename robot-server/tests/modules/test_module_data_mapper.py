@@ -1,6 +1,5 @@
 """Tests for robot_server.modules.module_data_mapper."""
 import pytest
-from typing import Dict
 
 from opentrons.protocol_engine import ModuleModel
 from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
@@ -30,34 +29,50 @@ from robot_server.modules.module_models import (
 
 
 @pytest.mark.parametrize(
-    ("input_model", "input_data", "output_data"),
+    ("input_model", "input_data", "expected_output_data"),
     [
         (
             "magneticModuleV1",
             {"status": "engaged", "data": {"engaged": True, "height": 42}},
-            {"data": {"height": 21}},
+            MagneticModuleData(
+                status=MagneticStatus.ENGAGED,
+                engaged=True,
+                height=21,
+            ),
         ),
         (
             "magneticModuleV1",
             {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
-            {"data": {"height": 0.0}},
+            MagneticModuleData(
+                status=MagneticStatus.DISENGAGED,
+                engaged=False,
+                height=0.0,
+            ),
         ),
         (
             "magneticModuleV2",
             {"status": "engaged", "data": {"engaged": True, "height": 42}},
-            {"data": {"height": 42}},
+            MagneticModuleData(
+                status=MagneticStatus.ENGAGED,
+                engaged=True,
+                height=42,
+            ),
         ),
         (
             "magneticModuleV2",
             {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
-            {"data": {"height": 0.0}},
+            MagneticModuleData(
+                status=MagneticStatus.DISENGAGED,
+                engaged=False,
+                height=0.0,
+            ),
         ),
     ],
 )
 def test_maps_magnetic_module_data(
     input_model: str,
     input_data: LiveData,
-    output_data: Dict[str, float],
+    expected_output_data: MagneticModuleData,
 ) -> None:
     """It should map hardware data to a magnetic module."""
     module_identity = ModuleIdentity(
@@ -92,11 +107,7 @@ def test_maps_magnetic_module_data(
         moduleType=ModuleType.MAGNETIC,
         moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
         usbPort=UsbPort(port=101, hub=202, path="/dev/null"),
-        data=MagneticModuleData(
-            status=MagneticStatus(input_data["status"]),
-            engaged=input_data["data"]["engaged"],  # type: ignore[arg-type]
-            height=output_data["data"]["height"],  # type: ignore[index]
-        ),
+        data=expected_output_data,
     )
 
 
