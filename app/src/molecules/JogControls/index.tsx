@@ -1,7 +1,12 @@
 // jog controls component
 import * as React from 'react'
 
-import { Flex, JUSTIFY_CENTER, ALIGN_STRETCH } from '@opentrons/components'
+import {
+  SPACING,
+  Flex,
+  JUSTIFY_CENTER,
+  ALIGN_STRETCH,
+} from '@opentrons/components'
 
 import { DirectionControl } from './DirectionControl'
 import { StepSizeControl } from './StepSizeControl'
@@ -13,7 +18,6 @@ import {
 
 import type { Jog, Plane, StepSize } from './types'
 import type { StyleProps } from '@opentrons/components'
-import { SPACING } from '@opentrons/components'
 
 export type { Jog }
 export interface JogControlsProps extends StyleProps {
