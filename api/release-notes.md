@@ -16,10 +16,6 @@ In conjunction with changes on the app side, the 6.0.0 release reshapes the way 
 
 - The OT-2 will retain the past 20 protocol runs on the robot, even across reboots.
 
-## Known Issues
-
-This beta is a work in progress! We'll be addressing issues in upcoming releases of 6.0.0.
-
 ---
 
 ## OT-2 Software Changes in 5.0.2

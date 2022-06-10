@@ -38,14 +38,6 @@ This is beta software! You may experience unexpected crashes or missing features
 	- When re-running a protocol, the app will now automatically recommend stored Labware Offset data that applies to the same labware and deck slot.
 	- When performing a Labware Position Check, see live offset values as you jog the pipette.
 
-## Bug Fixes
-
-Keep an eye on this space as we release new versions of the beta.
-
-## Known Issues
-
-This beta is a work in progress! We'll be addressing issues found in beta testing in upcoming releases of 6.0.0.
-
 ---
 
 ## Opentrons App Changes in 5.0.2
