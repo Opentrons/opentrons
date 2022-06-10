@@ -130,7 +130,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
           </StyledText>
         </Flex>
       </Flex>
-      {openItem ? (
+      {openItem && (
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Flex
             flexDirection={DIRECTION_ROW}
@@ -191,7 +191,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
             )
           })}
         </Flex>
-      ) : null}
+      )}
     </Box>
   )
 }
