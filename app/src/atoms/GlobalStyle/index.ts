@@ -1,5 +1,5 @@
 import { createGlobalStyle } from 'styled-components'
-import { C_DARK_GRAY } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
 import 'typeface-open-sans'
 
 export const GlobalStyle = createGlobalStyle`
@@ -14,7 +14,7 @@ export const GlobalStyle = createGlobalStyle`
   body {
     width: 100%;
     height: 100%;
-    color: ${C_DARK_GRAY};
+    color: ${COLORS.darkBlack};
   }
 
   a {

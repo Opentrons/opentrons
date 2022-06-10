@@ -66,13 +66,15 @@ MessageDefinition = Union[
     defs.SensorDiagnosticRequest,
     defs.SensorDiagnosticResponse,
     defs.HomeRequest,
-    defs.PipetteInfoRequest,
     defs.PipetteInfoResponse,
-    defs.GripperInfoRequest,
     defs.GripperInfoResponse,
     defs.BindSensorOutputRequest,
     defs.TipActionRequest,
     defs.TipActionResponse,
+    defs.PeripheralStatusRequest,
+    defs.PeripheralStatusResponse,
+    defs.SetSerialNumber,
+    defs.InstrumentInfoRequest,
 ]
 
 

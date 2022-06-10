@@ -6,18 +6,22 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 6.0.0
+# Opentrons App Changes in 6.0.0-beta.0
 
-Welcome to the v6.0.0 release of the Opentrons App! This release focuses on a visual redesign of the app that offers more ways to manage protocols even when you're not connected to a robot.
+Welcome to the v6.0.0 beta release of the Opentrons App! This release focuses on a visual redesign of the app that offers more ways to manage protocols even when you're not connected to a robot.
 
 This release includes updates to the robot operating system, so be sure to update any OT-2s before running protocols with this version of the app.
+
+This is beta software! You may experience unexpected crashes or missing features not detailed here. Please see the [issue tracker][] for more details and to leave feedback.
+
+[issue tracker]: https://github.com/Opentrons/opentrons/issues/new?assignees=y3rsh%2Cnusrat813&labels=6.0-feedback&template=testing_feedback.yml&title=6.0+Feedback%3A++%3Ctitle%3E
 
 ## New Features
 
 - Updated design: A more polished and modern design, built around the new, always-accessible Protocols, Labware, and Devices sections.
 - Protocols section
 	- Import multiple protocols and manage them all in one place.
-	- In-app protocol analysis lets you import Python and JSON protocol files without connecting to a robot. 
+	- In-app protocol analysis lets you import Python and JSON protocol files without connecting to a robot.
 	- View deck setup, required hardware, and protocol metadata — before, during, or after a run.
 - Labware section
 	- Browse labware definitions from the Opentrons Labware Library right in the app.
@@ -33,6 +37,14 @@ This release includes updates to the robot operating system, so be sure to updat
 - Labware Position Check
 	- When re-running a protocol, the app will now automatically recommend stored Labware Offset data that applies to the same labware and deck slot.
 	- When performing a Labware Position Check, see live offset values as you jog the pipette.
+
+## Bug Fixes
+
+Keep an eye on this space as we release new versions of the beta.
+
+## Known Issues
+
+This beta is a work in progress! We'll be addressing issues found in beta testing in upcoming releases of 6.0.0.
 
 ---
 

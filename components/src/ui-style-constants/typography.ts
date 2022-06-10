@@ -110,13 +110,24 @@ export const labelSemiBold = css`
   line-height: ${lineHeight12};
 `
 
-export const linkPSemibold = css`
+export const linkPSemiBold = css`
   font-size: ${fontSizeP};
   font-weight: ${fontWeightSemiBold};
-  line-height: ${lineHeight16};
+  line-height: ${lineHeight20};
   color: ${COLORS.blue};
 
   &:hover {
     opacity: 70%;
+  }
+`
+
+export const darkLinkPSemiBold = css`
+  font-size: ${fontSizeP};
+  font-weight: ${fontWeightSemiBold};
+  line-height: ${lineHeight20};
+  color: ${COLORS.darkBlack};
+
+  &:hover {
+    opacity: 1;
   }
 `

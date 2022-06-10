@@ -91,7 +91,10 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           >
             {t('last_updated')} {format(new Date(modified), 'MM/dd/yyyy')}
           </StyledText>
-          <CustomLabwareOverflowMenu filename={filename} />
+          <CustomLabwareOverflowMenu
+            filename={filename}
+            onDelete={props.onClose}
+          />
         </Flex>
       )}
     </Flex>
@@ -104,7 +107,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         backgroundColor={COLORS.lightGrey}
         padding={SPACING.spacing4}
         marginBottom={SPACING.spacing5}
-        css={{ 'word-wrap': 'break-word' }}
+        css={{ 'overflow-wrap': 'break-word' }}
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
         <Link

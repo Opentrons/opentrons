@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import path from 'path'
 import { useSelector, useDispatch } from 'react-redux'
 import { css } from 'styled-components'
 import {
@@ -17,18 +18,34 @@ import {
   TYPOGRAPHY,
   DIRECTION_COLUMN,
   TEXT_DECORATION_UNDERLINE,
+  useConditionalConfirm,
+  TEXT_TRANSFORM_CAPITALIZE,
+  JUSTIFY_FLEX_END,
+  Btn,
+  DIRECTION_ROW,
 } from '@opentrons/components'
 import * as Config from '../../redux/config'
 import * as Calibration from '../../redux/calibration'
 import * as CustomLabware from '../../redux/custom-labware'
-import { clearDiscoveryCache } from '../../redux/discovery'
+import {
+  clearDiscoveryCache,
+  getReachableRobots,
+  getUnreachableRobots,
+} from '../../redux/discovery'
+import { Modal } from '../../atoms/Modal'
+import { Portal } from '../../App/portal'
+import { Toast } from '../../atoms/Toast'
 import {
   getU2EAdapterDevice,
   getU2EWindowsDriverStatus,
   OUTDATED,
 } from '../../redux/system-info'
 import { Divider } from '../../atoms/structure'
-import { TertiaryButton, ToggleButton } from '../../atoms/Buttons'
+import {
+  AlertPrimaryButton,
+  TertiaryButton,
+  ToggleButton,
+} from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 
@@ -40,13 +57,19 @@ const ALWAYS_TRASH: 'always-trash' = 'always-trash'
 const ALWAYS_PROMPT: 'always-prompt' = 'always-prompt'
 const REALTEK_URL = 'https://www.realtek.com/en/'
 
+const INPUT_STYLES = css`
+  position: fixed;
+  clip: rect(1px 1px 1px 1px);
+`
+
 type BlockSelection =
   | typeof ALWAYS_BLOCK
   | typeof ALWAYS_TRASH
   | typeof ALWAYS_PROMPT
 
 export function AdvancedSettings(): JSX.Element {
-  const { t } = useTranslation('app_settings')
+  const { t } = useTranslation(['app_settings', 'shared'])
+  const pythonDirectoryFileInput = React.useRef<HTMLInputElement>(null)
   const useTrashSurfaceForTipCal = useSelector((state: State) =>
     Config.getUseTrashSurfaceForTipCal(state)
   )
@@ -62,7 +85,37 @@ export function AdvancedSettings(): JSX.Element {
   const isHeaterShakerAttachmentModalVisible = useSelector(
     Config.getIsHeaterShakerAttached
   )
+  const pathToPythonInterpreter = useSelector(Config.getPathToPythonOverride)
+
   const dispatch = useDispatch<Dispatch>()
+  const [showSuccessToast, setShowSuccessToast] = React.useState(false)
+  const [showErrorToast, setShowErrorToast] = React.useState(false)
+  const reachableRobots = useSelector((state: State) =>
+    getReachableRobots(state)
+  )
+  const unreachableRobots = useSelector((state: State) =>
+    getUnreachableRobots(state)
+  )
+  const recentlySeenRobots = reachableRobots.filter(
+    robot => robot.healthStatus !== 'ok'
+  )
+  const isUnavailableRobots =
+    unreachableRobots.length > 0 || recentlySeenRobots.length > 0
+
+  const handleDeleteUnavailRobots = (): void => {
+    if (isUnavailableRobots) {
+      setShowSuccessToast(true)
+      dispatch(clearDiscoveryCache())
+    } else {
+      setShowErrorToast(true)
+    }
+  }
+
+  const {
+    confirm: confirmDeleteUnavailRobots,
+    showConfirmation: showConfirmDeleteUnavailRobots,
+    cancel: cancelExit,
+  } = useConditionalConfirm(handleDeleteUnavailRobots, true)
 
   const handleUseTrashSelection = (selection: BlockSelection): void => {
     switch (selection) {
@@ -100,6 +153,26 @@ export function AdvancedSettings(): JSX.Element {
       )
     )
 
+  //  TODO(jr, 5/6/22): find another way to get webkitdirectory to work in the input DOM https://github.com/facebook/react/issues/3468
+  React.useEffect(() => {
+    if (pythonDirectoryFileInput.current !== null) {
+      pythonDirectoryFileInput.current.setAttribute('directory', 'true')
+      pythonDirectoryFileInput.current.setAttribute('webkitdirectory', 'true')
+    }
+  }, [pythonDirectoryFileInput])
+
+  const handleClickPythonDirectoryChange: React.MouseEventHandler<HTMLButtonElement> = _event => {
+    pythonDirectoryFileInput.current?.click()
+  }
+
+  const setPythonInterpreterDirectory: React.ChangeEventHandler<HTMLInputElement> = event => {
+    const { files = [] } = event.target ?? {}
+    const dirName =
+      files?.[0]?.path != null ? path.dirname(files?.[0]?.path) : null
+    dispatch(Config.updateConfigValue('python.pathToPythonOverride', dirName))
+    event.target.value = ''
+  }
+
   const toggleDevtools = (): unknown => dispatch(Config.toggleDevtools())
   const handleChannel: React.ChangeEventHandler<HTMLSelectElement> = event =>
     dispatch(Config.updateConfigValue('update.channel', event.target.value))
@@ -115,6 +188,57 @@ export function AdvancedSettings(): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           gridGap={SPACING.spacing4}
         >
+          {showSuccessToast && (
+            <Toast
+              message={t('successfully_deleted_unavail_robots')}
+              type={'success'}
+              onClose={() => setShowSuccessToast(false)}
+            />
+          )}
+          {showErrorToast && (
+            <Toast
+              message={t('no_unavail_robots_to_clear')}
+              type={'error'}
+              onClose={() => setShowErrorToast(false)}
+            />
+          )}
+          {showConfirmDeleteUnavailRobots ? (
+            <Portal level="top">
+              <Modal
+                type="warning"
+                title={t('clear_unavailable_robots')}
+                onClose={cancelExit}
+              >
+                <StyledText as="p">{t('clearing_cannot_be_undone')}</StyledText>
+                <Flex
+                  flexDirection={DIRECTION_ROW}
+                  paddingTop={SPACING.spacingXL}
+                  justifyContent={JUSTIFY_FLEX_END}
+                >
+                  <Flex
+                    paddingRight={SPACING.spacing2}
+                    data-testid={`AdvancedSettings_ConfirmClear_Cancel
+                    `}
+                  >
+                    <Btn
+                      onClick={cancelExit}
+                      textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                      color={COLORS.blue}
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                      marginRight={SPACING.spacing6}
+                    >
+                      {t('shared:cancel')}
+                    </Btn>
+                  </Flex>
+                  <Flex data-testid={`AdvancedSettings_ConfirmClear_Proceed`}>
+                    <AlertPrimaryButton onClick={confirmDeleteUnavailRobots}>
+                      {t('clear_confirm')}
+                    </AlertPrimaryButton>
+                  </Flex>
+                </Flex>
+              </Modal>
+            </Portal>
+          ) : null}
           <Box width="70%">
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
@@ -267,8 +391,8 @@ export function AdvancedSettings(): JSX.Element {
               {t('usb_to_ethernet_adapter_info_description')}
             </StyledText>
             {driverOutdated && (
-              <Banner type="warning">
-                <Flex>
+              <Banner type="warning" marginTop={SPACING.spacing4}>
+                <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
                   <StyledText as="p" color={COLORS.darkBlack}>
                     {t('usb_to_ethernet_adapter_toast_message')}
                   </StyledText>
@@ -277,8 +401,6 @@ export function AdvancedSettings(): JSX.Element {
                     href={REALTEK_URL}
                     css={TYPOGRAPHY.pRegular}
                     color={COLORS.darkBlack}
-                    position="absolute"
-                    right={SPACING.spacing7}
                     textDecoration={TEXT_DECORATION_UNDERLINE}
                     id="AdvancedSettings_realtekLink"
                   >
@@ -387,11 +509,82 @@ export function AdvancedSettings(): JSX.Element {
           </Box>
           <TertiaryButton
             marginLeft={SPACING_AUTO}
-            onClick={() => dispatch(clearDiscoveryCache())}
+            onClick={confirmDeleteUnavailRobots}
             id="AdvancedSettings_clearUnavailableRobots"
           >
             {t('clear_robots_button')}
           </TertiaryButton>
+        </Flex>
+        <Divider marginY={SPACING.spacing5} />
+
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Box width="70%">
+            <StyledText
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
+              id="AdvancedSettings_overridePathToPython"
+            >
+              {t('override_path_to_python')}
+            </StyledText>
+            <StyledText as="p" paddingBottom={SPACING.spacing3}>
+              {t('opentrons_app_will_use_interpreter')}
+            </StyledText>
+            <StyledText
+              as="h6"
+              textTransform={TYPOGRAPHY.textTransformUppercase}
+              color={COLORS.darkGreyEnabled}
+              paddingBottom={SPACING.spacing2}
+            >
+              {t('override_path')}
+            </StyledText>
+            {pathToPythonInterpreter !== null ? (
+              <Link
+                css={TYPOGRAPHY.pRegular}
+                external
+                color={COLORS.darkBlack}
+                onClick={() =>
+                  dispatch(Config.openPythonInterpreterDirectory())
+                }
+                id="AdvancedSettings_sourceFolderLinkPython"
+              >
+                {pathToPythonInterpreter}
+                <Icon
+                  height="0.75rem"
+                  marginLeft={SPACING.spacing3}
+                  name="open-in-new"
+                />
+              </Link>
+            ) : (
+              <StyledText as="p">{t('no_specified_folder')}</StyledText>
+            )}
+          </Box>
+          {pathToPythonInterpreter !== null ? (
+            <TertiaryButton
+              marginLeft={SPACING_AUTO}
+              onClick={() =>
+                dispatch(Config.resetConfigValue('python.pathToPythonOverride'))
+              }
+              id="AdvancedSettings_changePythonInterpreterSource"
+            >
+              {t('reset_to_default')}
+            </TertiaryButton>
+          ) : (
+            <TertiaryButton
+              marginLeft={SPACING_AUTO}
+              onClick={handleClickPythonDirectoryChange}
+              id="AdvancedSettings_changePythonInterpreterSource"
+            >
+              {t('add_override_path')}
+            </TertiaryButton>
+          )}
+          <input
+            id="AdvancedSetting_pythonPathDirectoryInput"
+            data-testid="AdvancedSetting_pythonPathDirectoryInput"
+            type="file"
+            css={INPUT_STYLES}
+            ref={pythonDirectoryFileInput}
+            onChange={setPythonInterpreterDirectory}
+          />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>

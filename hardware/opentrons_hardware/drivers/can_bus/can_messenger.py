@@ -63,13 +63,24 @@ class CanMessenger:
             )
         )
         data = message.payload.serialize()
-        log.info(
+        log.debug(
             f"Sending -->\n\tarbitration_id: {arbitration_id},\n\t"
             f"payload: {message.payload}"
         )
         await self._drive.send(
             message=CanMessage(arbitration_id=arbitration_id, data=data)
         )
+
+    async def __aenter__(self) -> CanMessenger:
+        """Start messenger."""
+        self.start()
+        return self
+
+    async def __aexit__(
+        self, exc_type: type, exc_val: BaseException, exc_tb: Traceback
+    ) -> None:
+        """Stop messenger."""
+        await self.stop()
 
     def start(self) -> None:
         """Start the reader task."""
@@ -120,14 +131,14 @@ class CanMessenger:
             if message_definition:
                 try:
                     build = message_definition.payload_type.build(message.data)
-                    log.info(
+                    log.debug(
                         f"Received <--\n\tarbitration_id: {message.arbitration_id},\n\t"
                         f"payload: {build}"
                     )
                     for listener, filter in self._listeners.values():
                         if filter and not filter(message.arbitration_id):
                             continue
-                        listener(message_definition(payload=build), message.arbitration_id)  # type: ignore[arg-type]  # noqa: E501
+                        listener(message_definition(payload=build), message.arbitration_id)  # type: ignore[arg-type]
                 except BinarySerializableException:
                     log.exception(f"Failed to build from {message}")
             else:

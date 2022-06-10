@@ -4,20 +4,20 @@ import asyncio
 import logging
 from numpy import float64
 from logging.config import dictConfig
-from typing import Optional
 
-from opentrons_hardware.drivers.can_bus import CanDriver
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
+from opentrons_hardware.drivers.can_bus import build, CanMessenger
 from opentrons_hardware.firmware_bindings.constants import NodeId
 
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SetupRequest,
     EnableMotorRequest,
 )
-from opentrons_hardware.hardware_control.motion import MoveGroupSingleAxisStep
+from opentrons_hardware.hardware_control.motion import (
+    MoveGroupSingleAxisStep,
+    MoveGroups,
+)
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
-from opentrons_hardware.scripts.can_args import add_can_args
-
+from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 log = logging.getLogger(__name__)
 
@@ -43,20 +43,13 @@ LOG_CONFIG = {
 }
 
 
-async def run(interface: str, bitrate: int, channel: Optional[str] = None) -> None:
-    """Entry point for script."""
-    log.info(f"Connecting to {interface} {bitrate} {channel}")
-    driver = await CanDriver.build(
-        bitrate=bitrate, interface=interface, channel=channel
-    )
-    messenger = CanMessenger(driver=driver)
-    messenger.start()
-
+async def run_move(messenger: CanMessenger) -> None:
+    """Run the move."""
     await messenger.send(node_id=NodeId.broadcast, message=SetupRequest())
     await messenger.send(node_id=NodeId.broadcast, message=EnableMotorRequest())
 
     # TODO (al, 2021-11-11): Allow creating groups from command line or config file.
-    move_groups = [
+    move_groups: MoveGroups = [
         # Group 0
         [
             {
@@ -99,9 +92,12 @@ async def run(interface: str, bitrate: int, channel: Optional[str] = None) -> No
         await runner.run(can_messenger=messenger)
     except asyncio.CancelledError:
         pass
-    finally:
-        await messenger.stop()
-        driver.shutdown()
+
+
+async def run(args: argparse.Namespace) -> None:
+    """Entry point for script."""
+    async with build.can_messenger(build_settings(args)) as messenger:
+        await run_move(messenger)
 
 
 def main() -> None:
@@ -113,7 +109,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    asyncio.run(run(args.interface, args.bitrate, args.channel))
+    asyncio.run(run(args))
 
 
 if __name__ == "__main__":

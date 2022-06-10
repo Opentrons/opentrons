@@ -186,7 +186,7 @@ async def test_key_lifecycle(wifi_keys_tempdir):
 
         # We should not be able to upload a duplicate
         # TODO(mc, 2021-09-12): use pathlib
-        with open(os.path.join(source_td, "test1.pem"), "rb") as f:  # type: ignore[assignment]  # noqa: E501
+        with open(os.path.join(source_td, "test1.pem"), "rb") as f:  # type: ignore[assignment]
             add_response = wifi.add_key("test1.pem", f.read())  # type: ignore[arg-type]
             assert add_response.created is False
 

@@ -42,10 +42,10 @@ export const robotStateTimeline: Timeline = {
     {
       commands: [
         {
-          commandType: 'magneticModule/engageMagnet',
+          commandType: 'magneticModule/engage',
           params: {
             moduleId: 'magneticModuleId',
-            engageHeight: 16,
+            height: 16,
           },
         },
       ],

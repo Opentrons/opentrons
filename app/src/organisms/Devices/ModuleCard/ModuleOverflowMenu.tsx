@@ -8,6 +8,7 @@ import { MenuItemsByModuleType, useModuleOverflowMenu } from './hooks'
 
 import type { AttachedModule } from '../../../redux/modules/types'
 import type { ModuleType } from '@opentrons/shared-data'
+import { useIsRobotBusy } from '../hooks'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
@@ -30,6 +31,7 @@ export const ModuleOverflowMenu = (
     handleTestShakeClick,
     handleWizardClick,
   } = props
+
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { menuOverflowItemsByModuleType } = useModuleOverflowMenu(
     module,
@@ -39,7 +41,7 @@ export const ModuleOverflowMenu = (
     handleWizardClick,
     handleSlideoutClick
   )
-
+  const isBusy = useIsRobotBusy() && runId == null
   return (
     <>
       <Flex position={POSITION_RELATIVE}>
@@ -56,16 +58,13 @@ export const ModuleOverflowMenu = (
                       key={`${index}_${module.moduleModel}`}
                       onClick={() => item.onClick(item.isSecondary)}
                       data-testid={`module_setting_${module.moduleModel}`}
-                      disabled={item.disabledReason}
+                      disabled={item.disabledReason || isBusy}
                       {...targetProps}
                     >
                       {item.setSetting}
                     </MenuItem>
                     {item.disabledReason && (
-                      <Tooltip
-                        tooltipProps={tooltipProps}
-                        key={`tooltip_${index}_${module.moduleModel}`}
-                      >
+                      <Tooltip tooltipProps={tooltipProps}>
                         {t('cannot_shake', { ns: 'heater_shaker' })}
                       </Tooltip>
                     )}

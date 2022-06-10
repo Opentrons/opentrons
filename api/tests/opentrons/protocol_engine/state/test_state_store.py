@@ -1,10 +1,11 @@
 """Tests for the top-level StateStore/StateView."""
 from typing import Callable, Optional
+from datetime import datetime
 
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.protocol_engine.state import State, StateStore
 from opentrons.protocol_engine.actions import PlayAction
 from opentrons.protocol_engine.state.change_notifier import ChangeNotifier
@@ -18,7 +19,7 @@ def change_notifier(decoy: Decoy) -> ChangeNotifier:
 
 @pytest.fixture
 def subject(
-    change_notifier: ChangeNotifier, standard_deck_def: DeckDefinitionV2
+    change_notifier: ChangeNotifier, standard_deck_def: DeckDefinitionV3
 ) -> StateStore:
     """Get a StateStore test subject."""
     return StateStore(
@@ -39,7 +40,7 @@ def test_has_state(subject: StateStore) -> None:
 def test_state_is_immutable(subject: StateStore) -> None:
     """It should treat the state as immutable."""
     result_1 = subject.state
-    subject.handle_action(PlayAction())
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     result_2 = subject.state
 
     assert result_1 is not result_2
@@ -52,7 +53,7 @@ def test_notify_on_state_change(
 ) -> None:
     """It should notify state changes when actions are handled."""
     decoy.verify(change_notifier.notify(), times=0)
-    subject.handle_action(PlayAction())
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     decoy.verify(change_notifier.notify(), times=1)
 
 

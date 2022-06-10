@@ -36,10 +36,10 @@ export const forHeaterShakerSetTargetTemperature = (
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId, temperature } = params
+  const { moduleId, celsius } = params
   const moduleState = _getHeaterShakerModuleState(robotState, moduleId)
 
-  moduleState.targetTemp = temperature
+  moduleState.targetTemp = celsius
 }
 
 export const forHeaterShakerAwaitTemperature = (

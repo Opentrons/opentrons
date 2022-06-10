@@ -21,7 +21,7 @@ import {
 
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { Slideout } from '../../atoms/Slideout'
-import { PrimaryButton } from '../../atoms/Buttons'
+import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
@@ -93,10 +93,14 @@ export function ChooseProtocolSlideout(
               alignItems={ALIGN_CENTER}
             >
               <DeckThumbnail
-                commands={storedProtocol.mostRecentAnalysis.commands}
+                commands={storedProtocol.mostRecentAnalysis?.commands ?? []}
               />
             </Flex>
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <StyledText
+              as="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              css={{ 'overflow-wrap': 'anywhere' }}
+            >
               {storedProtocol.mostRecentAnalysis?.metadata?.protocolName ??
                 first(storedProtocol.srcFileNames) ??
                 storedProtocol.protocolKey}
@@ -149,14 +153,14 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
   const { t } = useTranslation('protocol_details')
   const history = useHistory()
   const { protocolKey, srcFileObjects, robotName, ...buttonProps } = props
-  const { createRun } = useCreateRunFromProtocol({
+  const { createRunFromProtocolSource } = useCreateRunFromProtocol({
     onSuccess: ({ data: runData }) => {
       history.push(`/devices/${robotName}/protocol-runs/${runData.id}`)
     },
   })
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-    createRun(srcFileObjects)
+    createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
   }
 
   return (

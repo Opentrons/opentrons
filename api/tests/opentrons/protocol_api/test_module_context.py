@@ -150,6 +150,7 @@ def test_incorrect_module_error(ctx_with_tempdeck):
         ("magnetic module gen2", papi.MagneticModuleContext, "magneticModuleV2"),
         ("thermocycler", papi.ThermocyclerContext, "thermocyclerModuleV1"),
         ("thermocycler module", papi.ThermocyclerContext, "thermocyclerModuleV1"),
+        ("thermocycler module gen2", papi.ThermocyclerContext, "thermocyclerModuleV2"),
     ],
 )
 def test_load_simulating_module(ctx, loadname, klass, model):
@@ -522,7 +523,7 @@ def test_module_compatibility(get_module_fixture, monkeypatch):
         return get_module_fixture(model.value)
 
     monkeypatch.setattr(
-        papi_geometry.module_geometry, "_load_v2_module_def", load_fixtures
+        papi_geometry.module_geometry, "_load_v3_module_def", load_fixtures
     )
 
     class DummyEnum:

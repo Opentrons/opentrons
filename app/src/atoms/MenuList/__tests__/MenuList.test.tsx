@@ -6,9 +6,9 @@ const render = (props: React.ComponentProps<typeof MenuList>) => {
   return renderWithProviders(<MenuList {...props} />)[0]
 }
 
-const mockBtn = <div>mockBtn</div>
+const mockBtn = <div key="fakeKey">mockBtn</div>
 
-describe(' MenuList', () => {
+describe('MenuList', () => {
   let props: React.ComponentProps<typeof MenuList>
   beforeEach(() => {
     props = {

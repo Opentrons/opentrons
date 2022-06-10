@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import reduce from 'lodash/reduce'
 import isEqual from 'lodash/isEqual'
 import { getCommand } from '@opentrons/api-client'
 import {
+  Coordinates,
   getLabwareDefIsStandard,
   getLabwareDisplayName,
   IDENTITY_VECTOR,
@@ -12,7 +12,6 @@ import {
 } from '@opentrons/shared-data'
 import {
   useHost,
-  useCreateLabwareOffsetMutation,
   useCreateLabwareDefinitionMutation,
   useCreateCommandMutation,
 } from '@opentrons/react-api-client'
@@ -27,16 +26,13 @@ import {
   useAttachedModules,
   useProtocolDetailsForRun,
 } from '../../Devices/hooks'
-import { getLabwareLocation } from '../../ProtocolSetup/utils/getLabwareLocation'
-import { getLabwareDefinitionUri } from '../../ProtocolSetup/utils/getLabwareDefinitionUri'
-import { getModuleInitialLoadInfo } from '../../ProtocolSetup/utils/getModuleInitialLoadInfo'
-import { getLabwareOffsetLocation } from '../../ProtocolSetup/utils/getLabwareOffsetLocation'
+import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
+import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
 import { useSteps } from './useSteps'
 import type {
   HostConfig,
   RunCommandSummary,
   VectorOffset,
-  LabwareOffsetCreateData,
 } from '@opentrons/api-client'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
@@ -100,8 +96,14 @@ const useLpcCtaText = (
   if (command == null) return ''
   const commands = protocolData?.commands ?? []
   switch (command.commandType) {
-    case 'dropTip':
-      return t('confirm_position_and_return_tip')
+    case 'dropTip': {
+      const labwareId = command.params.labwareId
+      const labwareLocation = getLabwareLocation(labwareId, commands)
+      return t('confirm_position_and_return_tip', {
+        next_slot:
+          'slotName' in labwareLocation ? labwareLocation.slotName : '',
+      })
+    }
     case 'moveToWell': {
       const labwareId = command.params.labwareId
       const labwareLocation = getLabwareLocation(labwareId, commands)
@@ -250,14 +252,13 @@ export function useLabwarePositionCheck(
   const { protocolData } = useProtocolDetailsForRun(currentRunId)
   const protocolType = useCurrentProtocol()?.data.protocolType
   const { createLabwareDefinition } = useCreateLabwareDefinitionMutation()
-  const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const { createCommand } = useCreateCommandMutation()
   const host = useHost()
   const trackEvent = useTrackEvent()
   const LPCSteps = useSteps(currentRunId)
   const dispatch = useDispatch()
   const robotName = host?.robotName ?? ''
-  const attachedModules = useAttachedModules(robotName)
+  const attachedModules = useAttachedModules()
 
   const LPCCommands = LPCSteps.reduce<LabwarePositionCheckCreateCommand[]>(
     (commands, currentStep) => {
@@ -535,40 +536,6 @@ export function useLabwarePositionCheck(
   const beginLPC = (): void => {
     trackEvent({ name: 'LabwarePositionCheckStarted', properties: {} })
     setIsLoading(true)
-    // first clear all previous labware offsets for each labware
-    const identityLabwareOffsets: LabwareOffsetCreateData[] =
-      protocolData != null
-        ? reduce<ProtocolFile<{}>['labware'], LabwareOffsetCreateData[]>(
-            protocolData?.labware,
-            (acc, _, labwareId) => {
-              const identityOffset = {
-                definitionUri: getLabwareDefinitionUri(
-                  labwareId,
-                  protocolData.labware,
-                  protocolData.labwareDefinitions
-                ),
-                location: getLabwareOffsetLocation(
-                  labwareId,
-                  protocolData?.commands ?? [],
-                  protocolData?.modules ?? {}
-                ),
-                vector: IDENTITY_VECTOR,
-              }
-              return [...acc, identityOffset]
-            },
-            []
-          )
-        : []
-
-    identityLabwareOffsets.forEach(identityOffsetEntry => {
-      createLabwareOffset({
-        runId: currentRunId,
-        data: identityOffsetEntry,
-      }).catch((e: Error) => {
-        console.error(`error clearing labware offsets: ${e.message}`)
-        setError(e)
-      })
-    })
     // load custom labware definitions that come from python protocols first, so that subsequent load labware commands can reference them
     const customLabwareDefinitions: LabwareDefinition2[] =
       protocolType === 'python' && protocolData != null
@@ -686,7 +653,12 @@ export function useLabwarePositionCheck(
       })
   }
 
-  const jog = (axis: Axis, dir: Sign, step: StepSize): void => {
+  const jog = (
+    axis: Axis,
+    dir: Sign,
+    step: StepSize,
+    onSuccess?: (position: Coordinates | null) => void
+  ): void => {
     // if a jog is currently in flight, return early
     if (isJogging.current) return
     const moveRelCommand: CreateCommand = {
@@ -704,7 +676,8 @@ export function useLabwarePositionCheck(
       waitUntilComplete: true,
       timeout: JOG_COMMAND_TIMEOUT,
     })
-      .then(() => {
+      .then(data => {
+        onSuccess != null && onSuccess(data?.data?.result?.position ?? null)
         isJogging.current = false
       })
       .catch((e: Error) => {

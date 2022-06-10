@@ -21,17 +21,16 @@ export const setTemperature: CommandCreator<SetTemperatureArgs> = (
   }
 
   const moduleType = invariantContext.moduleEntities[module]?.type
-  const params = {
-    moduleId: module,
-    temperature: targetTemperature,
-  }
 
   if (moduleType === TEMPERATURE_MODULE_TYPE) {
     return {
       commands: [
         {
           commandType: 'temperatureModule/setTargetTemperature',
-          params,
+          params: {
+            moduleId: module,
+            celsius: targetTemperature,
+          },
         },
       ],
     }
@@ -45,8 +44,11 @@ export const setTemperature: CommandCreator<SetTemperatureArgs> = (
     return {
       commands: [
         {
-          commandType: 'heaterShakerModule/startSetTargetTemperature',
-          params,
+          commandType: 'heaterShaker/setTargetTemperature',
+          params: {
+            moduleId: module,
+            celsius: targetTemperature,
+          },
         },
       ],
     }

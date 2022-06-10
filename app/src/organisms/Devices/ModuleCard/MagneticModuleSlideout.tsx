@@ -4,6 +4,7 @@ import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 import {
   Flex,
   Text,
@@ -28,7 +29,7 @@ import {
 } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
 import { InputField } from '../../../atoms/InputField'
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 
 import type { TFunctionResult } from 'i18next'
 import type { MagneticModule } from '../../../redux/modules/types'
@@ -80,6 +81,10 @@ export const MagneticModuleSlideout = (
   const [engageHeightValue, setEngageHeightValue] = React.useState<
     string | null
   >(null)
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    module,
+    runId != null ? runId : null
+  )
 
   const moduleName = getModuleDisplayName(module.moduleModel)
   const info = getInfoByModel(module.moduleModel)
@@ -112,10 +117,10 @@ export const MagneticModuleSlideout = (
   const handleSubmitHeight = (): void => {
     if (engageHeightValue != null) {
       const setEngageCommand: MagneticModuleEngageMagnetCreateCommand = {
-        commandType: 'magneticModule/engageMagnet',
+        commandType: 'magneticModule/engage',
         params: {
-          moduleId: module.id,
-          engageHeight: parseInt(engageHeightValue),
+          moduleId: runId != null ? moduleIdFromRun : module.id,
+          height: parseInt(engageHeightValue),
         },
       }
       if (runId != null) {

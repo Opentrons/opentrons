@@ -1362,15 +1362,15 @@
       "id": "12abc123",
       "params": {
         "moduleId": "temperatureModuleId",
-        "temperature": 80
+        "celsius": 80
       }
     },
     {
-      "commandType": "temperatureModule/awaitTemperature",
+      "commandType": "temperatureModule/waitForTemperature",
       "id": "13abc123",
       "params": {
         "moduleId": "temperatureModuleId",
-        "temperature": 80
+        "celsius": 80
       }
     },
     {
@@ -1381,15 +1381,15 @@
       }
     },
     {
-      "commandType": "magneticModule/engageMagnet",
+      "commandType": "magneticModule/engage",
       "id": "15abc123",
       "params": {
         "moduleId": "magneticModuleId",
-        "engageHeight": 10
+        "height": 10
       }
     },
     {
-      "commandType": "magneticModule/disengageMagnet",
+      "commandType": "magneticModule/disengage",
       "id": "16abc123",
       "params": {
         "moduleId": "magneticModuleId"

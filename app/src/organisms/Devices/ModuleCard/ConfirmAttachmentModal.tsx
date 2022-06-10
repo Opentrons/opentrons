@@ -12,13 +12,14 @@ import {
   TYPOGRAPHY,
   TEXT_TRANSFORM_CAPITALIZE,
   DIRECTION_COLUMN,
+  Btn,
+  COLORS,
 } from '@opentrons/components'
-import { SecondaryButton, PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 import { Modal } from '../../../atoms/Modal'
 import { Dispatch } from '../../../redux/types'
 import { UpdateConfigValueAction } from '../../../redux/config/types'
 import { updateConfigValue } from '../../../redux/config'
-import { useHeaterShakerFromProtocol } from './hooks'
 
 export function setHeaterShakerAttached(
   heaterShakerAttached: boolean
@@ -39,8 +40,6 @@ export const ConfirmAttachmentModal = (
   const { isProceedToRunModal, onCloseClick, onConfirmClick } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [isDismissed, setIsDismissed] = React.useState<boolean>(false)
-  const heaterShaker = useHeaterShakerFromProtocol()
-  const slotNumber = heaterShaker != null ? heaterShaker.slotName : null
   const dispatch = useDispatch<Dispatch>()
 
   const confirmAttached = (): void => {
@@ -48,6 +47,7 @@ export const ConfirmAttachmentModal = (
       dispatch(setHeaterShakerAttached(isDismissed))
     }
     onConfirmClick()
+    onCloseClick()
   }
 
   return (
@@ -66,8 +66,7 @@ export const ConfirmAttachmentModal = (
           {t(
             isProceedToRunModal
               ? 'module_anchors_extended'
-              : 'module_should_have_anchors',
-            { slot: slotNumber }
+              : 'module_should_have_anchors'
           )}
         </Text>
         <Text>{t('thermal_adapter_attached_to_module')}</Text>
@@ -105,12 +104,15 @@ export const ConfirmAttachmentModal = (
             isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
           }`}
         >
-          <SecondaryButton
+          <Btn
             onClick={onCloseClick}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            color={COLORS.blue}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            marginRight={SPACING.spacing6}
           >
             {t('shared:cancel')}
-          </SecondaryButton>
+          </Btn>
         </Flex>
 
         <Flex

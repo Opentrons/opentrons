@@ -145,6 +145,7 @@ class ModuleModel(str, Enum):
     MAGNETIC_MODULE_V1 = "magneticModuleV1"
     MAGNETIC_MODULE_V2 = "magneticModuleV2"
     THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
+    THERMOCYCLER_MODULE_V2 = "thermocyclerModuleV2"
     HEATER_SHAKER_MODULE_V1 = "heaterShakerModuleV1"
 
     def as_type(self) -> ModuleType:
@@ -179,7 +180,7 @@ class ModuleModel(str, Enum):
         cls, model: ModuleModel
     ) -> TypeGuard[ThermocyclerModuleModel]:
         """Whether a given model is a Thermocyler Module."""
-        return model == cls.THERMOCYCLER_MODULE_V1
+        return model in [cls.THERMOCYCLER_MODULE_V1, cls.THERMOCYCLER_MODULE_V2]
 
     @classmethod
     def is_heater_shaker_module_model(
@@ -195,7 +196,9 @@ TemperatureModuleModel = Literal[
 MagneticModuleModel = Literal[
     ModuleModel.MAGNETIC_MODULE_V1, ModuleModel.MAGNETIC_MODULE_V2
 ]
-ThermocyclerModuleModel = Literal[ModuleModel.THERMOCYCLER_MODULE_V1]
+ThermocyclerModuleModel = Literal[
+    ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2
+]
 HeaterShakerModuleModel = Literal[ModuleModel.HEATER_SHAKER_MODULE_V1]
 
 
@@ -212,6 +215,7 @@ class ModuleCalibrationPoint(BaseModel):
 
     x: float
     y: float
+    z: float
 
 
 class LabwareOffsetVector(BaseModel):
@@ -258,7 +262,6 @@ class LoadedModule(BaseModel):
     id: str
     model: ModuleModel
     location: Optional[DeckSlotLocation]
-    definition: ModuleDefinition
     serialNumber: str
 
 
@@ -280,7 +283,7 @@ class LabwareOffsetLocation(BaseModel):
             " if applicable."
             "\n\n"
             "Because of module compatibility, the model that the protocol requests"
-            " may not beexactly the same"
+            " may not be exactly the same"
             " as what it will find physically connected during execution."
             " For this labware offset to apply,"
             " this field must be the *requested* model, not the connected one."

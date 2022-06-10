@@ -1,6 +1,5 @@
 """Protocol run control and management."""
-from dataclasses import dataclass
-from typing import List, Optional, cast
+from typing import List, NamedTuple, Optional, cast
 
 from opentrons.hardware_control import HardwareControlAPI, ThreadManagedHardware
 from opentrons.protocol_reader import (
@@ -8,14 +7,7 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
     JsonProtocolConfig,
 )
-from opentrons.protocol_engine import (
-    ProtocolEngine,
-    Command,
-    ErrorOccurrence,
-    LoadedLabware,
-    LoadedModule,
-    LoadedPipette,
-)
+from opentrons.protocol_engine import ProtocolEngine, StateSummary, Command
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
@@ -34,15 +26,11 @@ from .legacy_wrappers import (
 )
 
 
-@dataclass(frozen=True)
-class ProtocolRunData:
-    """Data from a protocol run."""
+class ProtocolRunResult(NamedTuple):
+    """Result data from a run, pulled from the ProtocolEngine."""
 
     commands: List[Command]
-    errors: List[ErrorOccurrence]
-    labware: List[LoadedLabware]
-    pipettes: List[LoadedPipette]
-    modules: List[LoadedModule]
+    state_summary: StateSummary
 
 
 # TODO(mc, 2022-01-11): this class has become bloated. Split into an abstract
@@ -92,10 +80,7 @@ class ProtocolRunner:
                 labware_view=protocol_engine.state_view.labware,
             ),
         )
-        self._legacy_executor = legacy_executor or LegacyExecutor(
-            hardware_api=hardware_api
-        )
-        self._was_started = False
+        self._legacy_executor = legacy_executor or LegacyExecutor()
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
@@ -105,7 +90,7 @@ class ProtocolRunner:
 
         This value is latched; once it is True, it will never become False.
         """
-        return self._was_started
+        return self._protocol_engine.state_view.commands.has_been_played()
 
     def load(self, protocol_source: ProtocolSource) -> None:
         """Load a ProtocolSource into managed ProtocolEngine.
@@ -136,7 +121,6 @@ class ProtocolRunner:
 
     def play(self) -> None:
         """Start or resume the run."""
-        self._was_started = True
         self._protocol_engine.play()
 
     def pause(self) -> None:
@@ -145,7 +129,7 @@ class ProtocolRunner:
 
     async def stop(self) -> None:
         """Stop (cancel) the run."""
-        if self._was_started:
+        if self.was_started():
             await self._protocol_engine.stop()
         else:
             await self._protocol_engine.finish(
@@ -156,24 +140,21 @@ class ProtocolRunner:
     async def run(
         self,
         protocol_source: Optional[ProtocolSource] = None,
-    ) -> ProtocolRunData:
+    ) -> ProtocolRunResult:
         """Run a given protocol to completion."""
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
         if protocol_source:
             self.load(protocol_source)
 
+        await self._hardware_api.home()
         self.play()
         self._task_queue.start()
         await self._task_queue.join()
 
-        return ProtocolRunData(
-            commands=self._protocol_engine.state_view.commands.get_all(),
-            errors=self._protocol_engine.state_view.commands.get_all_errors(),
-            labware=self._protocol_engine.state_view.labware.get_all(),
-            pipettes=self._protocol_engine.state_view.pipettes.get_all(),
-            modules=self._protocol_engine.state_view.modules.get_all(),
-        )
+        run_data = self._protocol_engine.state_view.get_summary()
+        commands = self._protocol_engine.state_view.commands.get_all()
+        return ProtocolRunResult(commands=commands, state_summary=run_data)
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:
         protocol = self._json_file_reader.read(protocol_source)

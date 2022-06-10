@@ -56,10 +56,10 @@ class MessageId(int, Enum):
     device_info_response = 0x303
     task_info_request = 0x304
     task_info_response = 0x305
-    pipette_info_request = 0x306
+    instrument_info_request = 0x306
     pipette_info_response = 0x307
-    gripper_info_request = 0x308
-    gripper_info_response = 0x309
+    gripper_info_response = 0x308
+    set_serial_number = 0x30A
 
     stop_request = 0x00
 
@@ -134,6 +134,8 @@ class MessageId(int, Enum):
     sensor_diagnostic_response = 0x89
     bind_sensor_output_request = 0x8A
     bind_sensor_output_response = 0x8B
+    peripheral_status_request = 0x8C
+    peripheral_status_response = 0x8D
 
 
 @unique
@@ -185,5 +187,22 @@ class PipetteName(int, Enum):
 class SensorOutputBinding(int, Enum):
     """Links sensor threshold triggers to pins."""
 
+    none = 0x0
     sync = 0x01
     report = 0x02
+
+
+@unique
+class SensorThresholdMode(int, Enum):
+    """How a sensor's threshold should be interpreted."""
+
+    absolute = 0x0
+    auto_baseline = 0x1
+
+
+@unique
+class PipetteTipActionType(int, Enum):
+    """Tip action types."""
+
+    pick_up = 0x0
+    drop = 0x01

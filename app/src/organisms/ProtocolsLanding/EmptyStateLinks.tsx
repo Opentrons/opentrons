@@ -1,12 +1,12 @@
 import * as React from 'react'
-
 import { useTranslation } from 'react-i18next'
 import {
+  COLORS,
+  TYPOGRAPHY,
   Icon,
   Flex,
   FONT_SIZE_CAPTION,
   SPACING,
-  C_MED_GRAY,
   Link,
   JUSTIFY_START,
   DIRECTION_ROW,
@@ -40,37 +40,48 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
       <Flex justifyContent={JUSTIFY_START} flexDirection={DIRECTION_ROW}>
         <Link
           fontSize={FONT_SIZE_CAPTION}
-          color={C_MED_GRAY}
+          css={TYPOGRAPHY.darkLinkPSemiBold}
+          color={COLORS.darkBlack}
           href={PROTOCOL_LIBRARY_URL}
           id={'EmptyStateLinks_protocolLibraryButton'}
           marginRight={SPACING.spacing3}
+          opacity="0.7"
           external
         >
           {t('browse_protocol_library')}
           <Icon
             name={'open-in-new'}
             marginLeft={SPACING.spacing2}
-            size="10px"
+            size="0.5rem"
+            opacity="0.7"
           />
         </Link>
         <Link
           fontSize={FONT_SIZE_CAPTION}
-          color={C_MED_GRAY}
+          css={TYPOGRAPHY.darkLinkPSemiBold}
+          color={COLORS.darkBlack}
           marginRight={SPACING.spacing3}
           href={PROTOCOL_DESIGNER_URL}
           id={'EmptyStateLinks_protocolDesignerButton'}
+          opacity="0.7"
           external
         >
-          {t('launch_protocol_designer')}
-          <Icon
-            name={'open-in-new'}
-            marginLeft={SPACING.spacing2}
-            size="10px"
-          />
+          <Flex alignItems={ALIGN_CENTER} css={TYPOGRAPHY.darkLinkPSemiBold}>
+            {t('launch_protocol_designer')}
+
+            <Icon
+              name={'open-in-new'}
+              marginLeft={SPACING.spacing2}
+              size="0.5rem"
+              opacity="0.7"
+            />
+          </Flex>
         </Link>
+
         <Link
           fontSize={FONT_SIZE_CAPTION}
-          color={C_MED_GRAY}
+          css={TYPOGRAPHY.darkLinkPSemiBold}
+          color={COLORS.darkBlack}
           href={API_DOCS_URL}
           id={'EmptyStateLinks_apiDocsButton'}
           external
@@ -79,7 +90,8 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
           <Icon
             name={'open-in-new'}
             marginLeft={SPACING.spacing2}
-            size="10px"
+            size="0.5rem"
+            opacity="0.7"
           />
         </Link>
       </Flex>

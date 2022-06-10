@@ -71,6 +71,52 @@ describe('getLabwarePositionCheckSteps', () => {
       commands: protocolWithOnePipette.commands,
     })
   })
+  it('should not include labware that are tip racks and are unused in protocol', () => {
+    const mockPipette =
+      protocolWithOnePipette.pipettes[
+        Object.keys(protocolWithOnePipette.pipettes)[0]
+      ]
+    when(mockGetPrimaryPipetteId)
+      .calledWith(
+        protocolWithOnePipette.pipettes,
+        protocolWithOnePipette.commands
+      )
+      .mockReturnValue('pipetteId')
+
+    const protocolWithUnusedTipRack = {
+      ...protocolWithOnePipette,
+      labware: {
+        ...protocolWithOnePipette.labware,
+        unusedTipRackId: {
+          definitionId: 'bogusDefinitionId',
+        },
+      },
+      labwareDefinitions: {
+        ...protocolWithOnePipette.labwareDefinitions,
+        bogusDefinitionId: { parameters: { isTiprack: true } } as any,
+      },
+    }
+
+    when(mockGetPipetteWorkflow)
+      .calledWith({
+        pipetteNames: [mockPipette.name],
+        primaryPipetteId: 'pipetteId',
+        labware: protocolWithOnePipette.labware,
+        labwareDefinitions: protocolWithOnePipette.labwareDefinitions,
+        commands: protocolWithOnePipette.commands,
+      })
+      .mockReturnValue(1)
+
+    getLabwarePositionCheckSteps(protocolWithUnusedTipRack)
+
+    expect(mockGetOnePipettePositionCheckSteps).toHaveBeenCalledWith({
+      primaryPipetteId: 'pipetteId',
+      labware: protocolWithOnePipette.labware,
+      labwareDefinitions: protocolWithOnePipette.labwareDefinitions,
+      modules: protocolWithOnePipette.modules,
+      commands: protocolWithOnePipette.commands,
+    })
+  })
   it('should generate commands with the one pipette workflow when there are two pipettes in the protocol but only one is used', () => {
     const leftPipetteId = '50d23e00-0042-11ec-8258-f7ffdf5ad45a'
     const rightPipetteId = 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a'

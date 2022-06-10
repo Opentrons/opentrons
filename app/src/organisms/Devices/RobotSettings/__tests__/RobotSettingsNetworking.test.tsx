@@ -11,6 +11,8 @@ import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
 jest.mock('../../../../redux/networking/selectors')
 jest.mock('../../../../redux/robot-api/selectors')
 
+const mockUpdateRobotStatus = jest.fn()
+
 const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
   typeof Networking.getNetworkInterfaces
 >
@@ -22,7 +24,10 @@ const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <RobotSettingsNetworking robotName="otie" />
+      <RobotSettingsNetworking
+        robotName="otie"
+        updateRobotStatus={mockUpdateRobotStatus}
+      />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -192,7 +197,7 @@ describe('RobotSettingsNetworking', () => {
 
   it('should render the right links to external resouce and internal resource', () => {
     const usbExternalLink =
-      'https://support.opentrons.com/en/articles/2687586-get-started-connect-to-your-ot-2-over-usb'
+      'https://support.opentrons.com/s/article/Get-started-Connect-to-your-OT-2-over-USB'
     const usbInternalLink = '/app-settings/advanced'
     const [{ getByText }] = render()
     const externalLink = getByText('Learn about connecting to a robot via USB')

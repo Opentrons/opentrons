@@ -154,6 +154,25 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.DispenseResult, result)
 
+    def blow_out(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+    ) -> commands.BlowOutResult:
+        """Execute a ``BlowOut`` command and return the result."""
+        request = commands.BlowOutCreate(
+            params=commands.BlowOutParams(
+                pipetteId=pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.BlowOutResult, result)
+
     def pause(self, message: Optional[str]) -> commands.PauseResult:
         """Execute a ``Pause`` command and return the result."""
         request = commands.PauseCreate(params=commands.PauseParams(message=message))
@@ -174,7 +193,7 @@ class SyncClient:
         """Execute a ``MagneticModuleEngage`` command and return the result."""
         request = commands.magnetic_module.EngageCreate(
             params=commands.magnetic_module.EngageParams(
-                moduleId=module_id, engageHeight=engage_height
+                moduleId=module_id, height=engage_height
             )
         )
         result = self._transport.execute_command(request=request)

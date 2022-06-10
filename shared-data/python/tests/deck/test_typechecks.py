@@ -3,8 +3,8 @@ import sys
 import pytest
 import typeguard
 
-from opentrons_shared_data.deck import load
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV1, DeckDefinitionV2
+from opentrons_shared_data.deck import load as load_deck_definition
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 
 from . import list_deck_def_paths
 
@@ -15,13 +15,7 @@ pytestmark = pytest.mark.xfail(
 )
 
 
-@pytest.mark.parametrize("defname", list_deck_def_paths(2))
-def test_v2_defs(defname):
-    defn = load(defname, 2)
-    typeguard.check_type("defn", defn, DeckDefinitionV2)
-
-
-@pytest.mark.parametrize("defname", list_deck_def_paths(1))
-def test_v1_defs(defname):
-    defn = load(defname, 1)
-    typeguard.check_type("defn", defn, DeckDefinitionV1)
+@pytest.mark.parametrize("defname", list_deck_def_paths(version=3))
+def test_v3_defs(defname):
+    defn = load_deck_definition(name=defname, version=3)
+    typeguard.check_type("defn", defn, DeckDefinitionV3)

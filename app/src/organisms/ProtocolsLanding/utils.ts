@@ -5,7 +5,7 @@ type AnalysisStatus = 'missing' | 'loading' | 'error' | 'complete'
 
 export function getAnalysisStatus(
   isAnalyzing: boolean,
-  analysis?: ProtocolAnalysisOutput
+  analysis?: ProtocolAnalysisOutput | null
 ): AnalysisStatus {
   if (isAnalyzing) {
     return 'loading'
@@ -19,7 +19,7 @@ export function getAnalysisStatus(
 export function getProtocolDisplayName(
   protocolKey: string,
   srcFileNames: string[],
-  analysis?: ProtocolAnalysisOutput
+  analysis?: ProtocolAnalysisOutput | null
 ): string {
   return analysis?.metadata?.protocolName ?? first(srcFileNames) ?? protocolKey
 }

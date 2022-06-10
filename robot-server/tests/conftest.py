@@ -14,8 +14,10 @@ from datetime import datetime, timezone
 from fastapi import routing
 from mock import MagicMock
 from starlette.testclient import TestClient
-from typing import Any, Callable, Dict, Iterator, cast
+from typing import Any, Callable, Dict, Generator, Iterator, cast
 from typing_extensions import NoReturn
+from pathlib import Path
+from sqlalchemy.engine import Engine
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -31,6 +33,7 @@ from robot_server import app
 from robot_server.hardware import get_hardware
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 from robot_server.service.session.manager import SessionManager
+from robot_server.persistence.database import create_sql_engine
 
 test_router = routing.APIRouter()
 
@@ -401,3 +404,12 @@ def clear_custom_tiprack_def_dir() -> Iterator[None]:
         os.remove(tiprack_path)
     except FileNotFoundError:
         pass
+
+
+@pytest.fixture
+def sql_engine(tmp_path: Path) -> Generator[Engine, None, None]:
+    """Return a set-up database to back the store."""
+    db_file_path = tmp_path / "test.db"
+    sql_engine = create_sql_engine(db_file_path)
+    yield sql_engine
+    sql_engine.dispose()

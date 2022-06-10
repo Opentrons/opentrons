@@ -1,6 +1,9 @@
 import React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  useCreateCommandMutation,
+  useCreateLiveCommandMutation,
+} from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -16,54 +19,72 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { RPM, HS_RPM_MAX, HS_RPM_MIN } from '@opentrons/shared-data'
-import { TertiaryButton } from '../../../atoms/Buttons'
+import { TertiaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { Divider } from '../../../atoms/structure'
 import { InputField } from '../../../atoms/InputField'
 import { Collapsible } from '../ModuleCard/Collapsible'
 import { useLatchControls } from '../ModuleCard/hooks'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
+import { useModuleIdFromRun } from '../ModuleCard/useModuleIdFromRun'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
-  HeaterShakerSetTargetShakeSpeedCreateCommand,
-  HeaterShakerStopShakeCreateCommand,
+  HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
+  HeaterShakerDeactivateShakerCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type { ProtocolModuleInfo } from '../../ProtocolSetup/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 interface TestShakeProps {
   module: HeaterShakerModule
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
   moduleFromProtocol?: ProtocolModuleInfo
+  runId?: string
 }
 
 export function TestShake(props: TestShakeProps): JSX.Element {
-  const { module, setCurrentPage, moduleFromProtocol } = props
+  const { module, setCurrentPage, moduleFromProtocol, runId } = props
   const { t } = useTranslation(['heater_shaker', 'device_details'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { createCommand } = useCreateCommandMutation()
   const [isExpanded, setExpanded] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { toggleLatch, isLatchClosed } = useLatchControls(module)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    module,
+    runId != null ? runId : null
+  )
   const isShaking = module.data.speedStatus !== 'idle'
 
-  const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
-    commandType: 'heaterShakerModule/setTargetShakeSpeed',
+  const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
+    commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
-      moduleId: module.id,
+      moduleId: runId != null ? moduleIdFromRun : module.id,
       rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
     },
   }
 
-  const stopShakeCommand: HeaterShakerStopShakeCreateCommand = {
-    commandType: 'heaterShakerModule/stopShake',
+  const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
+    commandType: 'heaterShaker/deactivateShaker',
     params: {
-      moduleId: module.id,
+      moduleId: runId != null ? moduleIdFromRun : module.id,
     },
   }
 
   const handleShakeCommand = (): void => {
-    if (shakeValue !== null) {
+    if (runId != null) {
+      createCommand({
+        runId: runId,
+        command: isShaking ? stopShakeCommand : setShakeCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${
+            stopShakeCommand.commandType ?? setShakeCommand.commandType
+          } and run id ${runId}: ${e.message}`
+        )
+      })
+    } else {
       createLiveCommand({
         command: isShaking ? stopShakeCommand : setShakeCommand,
       }).catch((e: Error) => {
@@ -149,15 +170,10 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           marginTop={SPACING.spacing4}
           onClick={toggleLatch}
           disabled={isShaking}
-          {...targetProps}
         >
           {isLatchClosed ? t('open_labware_latch') : t('close_labware_latch')}
         </TertiaryButton>
-        {isShaking ? (
-          <Tooltip tooltipProps={tooltipProps} key={`TestShake_latch_btn`}>
-            {t('cannot_open_latch', { ns: 'heater_shaker' })}
-          </Tooltip>
-        ) : null}
+
         <Flex
           flexDirection={DIRECTION_ROW}
           marginY={SPACING.spacingL}
@@ -189,13 +205,13 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             marginLeft={SIZE_AUTO}
             marginTop={SPACING.spacing4}
             onClick={handleShakeCommand}
-            disabled={!isLatchClosed}
+            disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
             {...targetProps}
           >
             {isShaking ? t('stop_shaking') : t('start_shaking')}
           </TertiaryButton>
           {!isLatchClosed ? (
-            <Tooltip tooltipProps={tooltipProps} key={`TestShake_shake_btn`}>
+            <Tooltip tooltipProps={tooltipProps}>
               {t('cannot_shake', { ns: 'heater_shaker' })}
             </Tooltip>
           ) : null}

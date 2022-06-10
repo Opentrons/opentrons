@@ -89,8 +89,16 @@ class MustHomeError(ProtocolEngineError):
     """An error raised when motors must be homed due to unknown current position."""
 
 
-class ProtocolEngineStoppedError(ProtocolEngineError):
-    """An error raised when attempting an invalid action with a stopped engine."""
+class SetupCommandNotAllowedError(ProtocolEngineError):
+    """An error raised when adding a setup command to a non-idle/non-paused engine."""
+
+
+class PauseNotAllowedError(ProtocolEngineError):
+    """An error raised when attempting to pause a run that is not running."""
+
+
+class RunStoppedError(ProtocolEngineError):
+    """An error raised when attempting to interact with a stopped engine."""
 
 
 class WellOriginNotAllowedError(ProtocolEngineError):
@@ -126,8 +134,24 @@ class NoTargetTemperatureSetError(ProtocolEngineError):
 
 
 class InvalidTargetTemperatureError(ProtocolEngineError):
-    """An error raised when attampting to set an invalid target temperature."""
+    """An error raised when attempting to set an invalid target temperature."""
+
+
+class InvalidBlockVolumeError(ProtocolEngineError):
+    """An error raised when attempting to set an invalid block max volume."""
 
 
 class InvalidTargetSpeedError(ProtocolEngineError):
     """An error raised when attempting to set an invalid target speed."""
+
+
+class ProtocolCommandFailedError(ProtocolEngineError):
+    """An error raised if a fatal command execution error has occurred.
+
+    Args:
+        command_id: The ID of the command that failed.
+    """
+
+    def __init__(self, command_id: str) -> None:
+        super().__init__(f"Command {command_id} failed to execute")
+        self.command_id = command_id

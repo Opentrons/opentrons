@@ -1,6 +1,6 @@
-import type { ThermocyclerSetTargetBlockTemperatureArgs } from '@opentrons/shared-data/protocol/types/schemaV4'
+import type { ThermocyclerSetBlockTemperatureArgs } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { CommandCreator } from '../../types'
-export const thermocyclerSetTargetBlockTemperature: CommandCreator<ThermocyclerSetTargetBlockTemperatureArgs> = (
+export const thermocyclerSetTargetBlockTemperature: CommandCreator<ThermocyclerSetBlockTemperatureArgs> = (
   args,
   invariantContext,
   prevRobotState
@@ -17,7 +17,7 @@ export const thermocyclerSetTargetBlockTemperature: CommandCreator<ThermocyclerS
         commandType: 'thermocycler/setTargetBlockTemperature',
         params: {
           moduleId: args.module,
-          temperature: args.temperature, // NOTE(IL, 2020-05-11): 'volume' param supported in schema but not implemented, so don't use it
+          celsius: args.temperature,
         },
       },
     ],

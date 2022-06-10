@@ -10,6 +10,7 @@
     "view_measurements": "view measurements",
     "creating_labware_defs": "Access the Labware Creator",
     "recommended_labware_filter": "Show only recommended labware. Read more",
+    "heater_shaker_labware_filter": "Showing only labware that fit next to the Heater-Shaker Module. Read more",
     "module_compatibility": {
       "recommended": "Recommended for use on this module",
       "potentiallyCompatible": "Potentially compatible with this module",

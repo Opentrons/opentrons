@@ -7042,15 +7042,15 @@
       "commandType": "thermocycler/setTargetLidTemperature",
       "params": {
         "moduleId": "18f0c1b0-0122-11ec-88a3-f1745cf9b36c:thermocyclerModuleType",
-        "temperature": 50
+        "celsius": 50
       }
     },
     {
       "id": "63",
-      "commandType": "thermocycler/awaitLidTemperature",
+      "commandType": "thermocycler/waitForLidTemperature",
       "params": {
         "moduleId": "18f0c1b0-0122-11ec-88a3-f1745cf9b36c:thermocyclerModuleType",
-        "temperature": 50
+        "celsius": 50
       }
     }
   ]

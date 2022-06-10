@@ -1,10 +1,14 @@
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { checkModuleCompatibility } from '@opentrons/shared-data'
 
-import { getProtocolModulesInfo } from '../../../organisms/ProtocolSetup/utils/getProtocolModulesInfo'
-import { useAttachedModules, useProtocolDetailsForRun } from '.'
+import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
+import {
+  useAttachedModules,
+  useProtocolDetailsForRun,
+  useStoredProtocolAnalysis,
+} from '.'
 
-import type { ProtocolModuleInfo } from '../../../organisms/ProtocolSetup/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 import type { AttachedModule } from '../../../redux/modules/types'
 
 export interface ModuleRenderInfoForProtocol extends ProtocolModuleInfo {
@@ -17,8 +21,12 @@ export function useModuleRenderInfoForProtocolById(
 ): {
   [moduleId: string]: ModuleRenderInfoForProtocol
 } {
-  const { protocolData } = useProtocolDetailsForRun(runId)
-  const attachedModules = useAttachedModules(robotName)
+  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
+    runId
+  )
+  const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
+  const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
+  const attachedModules = useAttachedModules()
   if (protocolData == null) return {}
 
   const protocolModulesInfo = getProtocolModulesInfo(

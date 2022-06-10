@@ -143,6 +143,7 @@ class ProtocolContext:
         module_name: Union[
             Literal[ModuleName.THERMOCYCLER_MODULE],
             Literal[ModuleModel.THERMOCYCLER_MODULE_V1],
+            Literal[ModuleModel.THERMOCYCLER_MODULE_V2],
         ],
     ) -> ThermocyclerModuleContext:
         ...

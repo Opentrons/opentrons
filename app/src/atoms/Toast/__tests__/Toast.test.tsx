@@ -115,13 +115,14 @@ describe('Toast', () => {
     expect(props.onClose).toHaveBeenCalled()
   })
 
-  it('should stay more than 3 seconds when requiredTimeout is false', () => {
+  it('should stay more than 3 seconds when requiredTimeout is true', async () => {
+    jest.useFakeTimers()
     props = {
       message: 'test message',
       type: 'info',
       closeButton: false,
       onClose: jest.fn(),
-      requiredTimeout: false,
+      disableTimeout: true,
     }
     const { getByText } = render(props)
     getByText('test message')
@@ -133,5 +134,26 @@ describe('Toast', () => {
       jest.advanceTimersByTime(3000)
     })
     expect(props.onClose).not.toHaveBeenCalled()
+  })
+
+  it('should not stay more than 3 seconds when requiredTimeout is false', async () => {
+    jest.useFakeTimers()
+    props = {
+      message: 'test message',
+      type: 'info',
+      closeButton: false,
+      onClose: jest.fn(),
+      disableTimeout: false,
+    }
+    const { getByText } = render(props)
+    getByText('test message')
+    act(() => {
+      jest.advanceTimersByTime(100)
+    })
+    expect(props.onClose).not.toHaveBeenCalled()
+    act(() => {
+      jest.advanceTimersByTime(3000)
+    })
+    expect(props.onClose).toHaveBeenCalled()
   })
 })

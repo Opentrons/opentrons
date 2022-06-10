@@ -14,6 +14,7 @@ import {
   useRunStatus,
   useRunTimestamps,
 } from '../../../../organisms/RunTimeControl/hooks'
+import { DownloadRunLogToast } from '../../DownloadRunLogToast'
 import { useProtocolDetailsForRun } from '../../hooks'
 import { RunLogProtocolSetupInfo } from '../RunLogProtocolSetupInfo'
 import { StepItemComponent as StepItem } from '../StepItem'
@@ -26,6 +27,7 @@ import type { RunTimestamps } from '../../../../organisms/RunTimeControl/hooks'
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../organisms/Labware/helpers/getAllDefs')
 jest.mock('../../../../organisms/RunTimeControl/hooks')
+jest.mock('../../DownloadRunLogToast')
 jest.mock('../../hooks')
 jest.mock('../RunLogProtocolSetupInfo')
 jest.mock('../StepItem')
@@ -49,6 +51,9 @@ const mockRunLogProtocolSetupInfo = RunLogProtocolSetupInfo as jest.MockedFuncti
   typeof RunLogProtocolSetupInfo
 >
 const mockStepItem = StepItem as jest.MockedFunction<typeof StepItem>
+const mockDownloadRunLogToast = DownloadRunLogToast as jest.MockedFunction<
+  typeof DownloadRunLogToast
+>
 
 const _fixtureAnalysis = (fixtureAnalysis as unknown) as ProtocolAnalysisFile
 
@@ -66,9 +71,10 @@ describe('RunLog', () => {
     when(mockUseProtocolDetailsForRun).calledWith(RUN_ID).mockReturnValue({
       protocolData: _fixtureAnalysis,
       displayName: 'mock display name',
+      protocolKey: 'fakeProtocolKey',
     })
     when(mockUseAllCommandsQuery).mockReturnValue(({
-      data: { data: runRecord.data.commands },
+      data: { data: runRecord.data.commands, meta: { totalLength: 14 } },
     } as unknown) as UseQueryResult<CommandsData>)
     when(mockUseRunErrors).calledWith(RUN_ID).mockReturnValue([])
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue('idle')
@@ -78,6 +84,9 @@ describe('RunLog', () => {
 
     when(mockStepItem).mockReturnValue(
       <div>Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1</div>
+    )
+    when(mockDownloadRunLogToast).mockReturnValue(
+      <div>Mock DownloadRunLogToast</div>
     )
     when(mockUseRunTimestamps)
       .calledWith(RUN_ID)
@@ -92,7 +101,7 @@ describe('RunLog', () => {
   it('renders null if protocol data is null', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
-      .mockReturnValue({ protocolData: null } as any)
+      .mockReturnValue({ protocolData: null, protocolKey: null } as any)
     const { container } = render()
     expect(container.firstChild).toBeNull()
   })
@@ -156,5 +165,12 @@ describe('RunLog', () => {
 
     queryByText(`${fixtureErrors[0].errorType}: ${fixtureErrors[0].detail}`)
     queryByText(`${fixtureErrors[1].errorType}: ${fixtureErrors[1].detail}`)
+  })
+  it('renders the download run log toast when download run log clicked', () => {
+    const { getByText, queryByText } = render()
+
+    expect(queryByText('Mock DownloadRunLogToast')).toBeNull()
+    getByText('Download run log').click()
+    getByText('Mock DownloadRunLogToast')
   })
 })

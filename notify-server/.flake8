@@ -1,4 +1,11 @@
 [flake8]
-ignore = ANN101, ANN102
 
-max-line-length = 88
+extend-ignore =
+    # defer formatting concerns to black
+    # E203: space around `:` operator
+    # E501: maximum line length
+    E203,
+    E501,
+    # do not require type annotations for self nor cls
+    ANN101,
+    ANN102

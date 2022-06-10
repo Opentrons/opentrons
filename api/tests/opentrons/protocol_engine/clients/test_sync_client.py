@@ -286,9 +286,7 @@ def test_magnetic_module_engage(
 ) -> None:
     """It should execute a Magnetic Module engage command."""
     request = commands.magnetic_module.EngageCreate(
-        params=commands.magnetic_module.EngageParams(
-            moduleId="module-id", engageHeight=12.34
-        )
+        params=commands.magnetic_module.EngageParams(moduleId="module-id", height=12.34)
     )
     response = commands.magnetic_module.EngageResult()
 
@@ -327,5 +325,34 @@ def test_thermocycler_deactivate_lid(
     response = commands.thermocycler.DeactivateLidResult()
     decoy.when(transport.execute_command(request=request)).then_return(response)
     result = subject.thermocycler_deactivate_lid(module_id="module-id")
+
+    assert result == response
+
+
+def test_blow_out(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a blow_out command."""
+    request = commands.BlowOutCreate(
+        params=commands.BlowOutParams(
+            pipetteId="123",
+            labwareId="456",
+            wellName="A2",
+            wellLocation=WellLocation(),
+        )
+    )
+
+    response = commands.BlowOutResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.blow_out(
+        pipette_id="123",
+        labware_id="456",
+        well_name="A2",
+        well_location=WellLocation(),
+    )
 
     assert result == response

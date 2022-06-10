@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 export const KNOWLEDGEBASE_ROOT_URL =
-  'https://support.opentrons.com/en/collections/493886-protocol-designer'
+  'https://support.opentrons.com/s/protocol-designer'
 
 export const links = {
   airGap: `https://support.opentrons.com/en/articles/4398106-air-gap`,
@@ -10,6 +10,8 @@ export const links = {
   customLabware: `https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions`,
   recommendedLabware:
     'https://support.opentrons.com/en/articles/4168748-labware-and-module-compatibility',
+  // TODO: fill in real url when it exists
+  heaterShakerLabware: '#',
   pipetteGen1MultiModuleCollision:
     'https://support.opentrons.com/en/articles/4168741-module-placement',
   betaReleases: `https://support.opentrons.com/en/articles/3854833-opentrons-beta-software-releases`,

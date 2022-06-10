@@ -2,24 +2,34 @@ import * as React from 'react'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
+import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 
 import { i18n } from '../../../../i18n'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import {
   useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
   useRobot,
 } from '../../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
+import { ProtocolRunModuleControls } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunSetup } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { RunLog } from '../../../../organisms/Devices/ProtocolRun/RunLog'
+import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
+import { useRunStatus } from '../../../../organisms/RunTimeControl/hooks'
 import { ProtocolRunDetails } from '..'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
+
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup')
 jest.mock('../../../../organisms/Devices/ProtocolRun/RunLog')
-jest.mock('../../../../organisms/Labware/helpers/getAllDefs')
+jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls')
+jest.mock('../../../../organisms/ProtocolUpload/hooks')
+jest.mock('../../../../organisms/RunTimeControl/hooks')
 
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockProtocolRunHeader = ProtocolRunHeader as jest.MockedFunction<
@@ -29,8 +39,20 @@ const mockRunLog = RunLog as jest.MockedFunction<typeof RunLog>
 const mockProtocolRunSetup = ProtocolRunSetup as jest.MockedFunction<
   typeof ProtocolRunSetup
 >
+const mockProtocolRunModuleControls = ProtocolRunModuleControls as jest.MockedFunction<
+  typeof ProtocolRunModuleControls
+>
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
+>
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
+>
+const mockUseRunStatus = useRunStatus as jest.MockedFunction<
+  typeof useRunStatus
+>
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
 >
 
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
@@ -65,12 +87,18 @@ const render = (path = '/') => {
   )
 }
 
+const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
+
 describe('ProtocolRunDetails', () => {
   beforeEach(() => {
     mockUseRobot.mockReturnValue(mockConnectableRobot)
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
     mockProtocolRunHeader.mockReturnValue(<div>Mock ProtocolRunHeader</div>)
     mockRunLog.mockReturnValue(<div>Mock RunLog</div>)
     mockProtocolRunSetup.mockReturnValue(<div>Mock ProtocolRunSetup</div>)
+    mockProtocolRunModuleControls.mockReturnValue(
+      <div>Mock ProtocolRunModuleControls</div>
+    )
     mockUseModuleRenderInfoForProtocolById.mockReturnValue({
       [mockMagneticModule.moduleId]: {
         moduleId: mockMagneticModule.moduleId,
@@ -84,6 +112,12 @@ describe('ProtocolRunDetails', () => {
         attachedModuleMatch: null,
       },
     } as any)
+    mockUseCurrentRunId.mockReturnValue(RUN_ID)
+    mockUseProtocolDetailsForRun.mockReturnValue({
+      protocolData: (noModulesProtocol as unknown) as ProtocolAnalysisFile,
+      displayName: 'mock display name',
+      protocolKey: 'fakeProtocolKey',
+    })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -92,7 +126,7 @@ describe('ProtocolRunDetails', () => {
   it('does not render a ProtocolRunHeader when a robot is not found', () => {
     mockUseRobot.mockReturnValue(null)
     const [{ queryByText }] = render(
-      '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/setup'
+      `/devices/otie/protocol-runs/${RUN_ID}/setup`
     )
 
     expect(queryByText('Mock ProtocolRunHeader')).toBeFalsy()
@@ -100,7 +134,7 @@ describe('ProtocolRunDetails', () => {
 
   it('renders a ProtocolRunHeader when a robot is found', () => {
     const [{ getByText }] = render(
-      '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/setup'
+      `/devices/otie/protocol-runs/${RUN_ID}/setup`
     )
 
     getByText('Mock ProtocolRunHeader')
@@ -108,7 +142,7 @@ describe('ProtocolRunDetails', () => {
 
   it('renders navigation tabs', () => {
     const [{ getByText }] = render(
-      '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/setup'
+      `/devices/otie/protocol-runs/${RUN_ID}/setup`
     )
 
     getByText('Setup')
@@ -118,7 +152,7 @@ describe('ProtocolRunDetails', () => {
 
   it('defaults to setup content when given an unspecified tab', () => {
     const [{ getByText }] = render(
-      '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/this-is-not-a-real-tab'
+      `/devices/otie/protocol-runs/${RUN_ID}/this-is-not-a-real-tab`
     )
 
     getByText('Mock ProtocolRunSetup')
@@ -126,7 +160,7 @@ describe('ProtocolRunDetails', () => {
 
   it('renders a run log when the run log tab is clicked', () => {
     const [{ getByText, queryByText }] = render(
-      '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
+      `/devices/otie/protocol-runs/${RUN_ID}`
     )
 
     expect(queryByText('Mock RunLog')).toBeFalsy()
@@ -137,7 +171,7 @@ describe('ProtocolRunDetails', () => {
 
   it('renders protocol run setup when the setup tab is clicked', () => {
     const [{ getByText, queryByText }] = render(
-      '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
+      `/devices/otie/protocol-runs/${RUN_ID}`
     )
 
     const setupTab = getByText('Setup')
@@ -149,11 +183,83 @@ describe('ProtocolRunDetails', () => {
     getByText('Mock ProtocolRunSetup')
   })
 
+  it('renders module controls when the module controls tab is clicked', () => {
+    const [{ getByText, queryByText }] = render(
+      `/devices/otie/protocol-runs/${RUN_ID}`
+    )
+
+    const moduleTab = getByText('Module Controls')
+    getByText('Mock ProtocolRunSetup')
+    expect(queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
+    moduleTab.click()
+    getByText('Mock ProtocolRunModuleControls')
+    expect(queryByText('Mock ProtocolRunSetup')).toBeFalsy()
+  })
+
   it('should NOT render module controls when there are no modules', () => {
     mockUseModuleRenderInfoForProtocolById.mockReturnValue({})
     const [{ queryByText }] = render(
-      '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/setup'
+      `/devices/otie/protocol-runs/${RUN_ID}/setup`
     )
     expect(queryByText('Module Controls')).toBeNull()
+  })
+
+  it('disables protocol run setup and module controls tabs when the run is not current', () => {
+    mockUseCurrentRunId.mockReturnValue(null)
+    const [{ getByText, queryByText }] = render(
+      `/devices/otie/protocol-runs/${RUN_ID}`
+    )
+
+    const setupTab = getByText('Setup')
+    const moduleTab = getByText('Module Controls')
+    const runTab = getByText('Run Log')
+    runTab.click()
+    getByText('Mock RunLog')
+    expect(queryByText('Mock ProtocolRunSetup')).toBeFalsy()
+    expect(queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
+    setupTab.click()
+    expect(queryByText('Mock ProtocolRunSetup')).toBeFalsy()
+    moduleTab.click()
+    expect(queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
+  })
+
+  it('disables module controls tab when the run current but not idle', () => {
+    mockUseCurrentRunId.mockReturnValue(RUN_ID)
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
+    const [{ getByText, queryByText }] = render(
+      `/devices/otie/protocol-runs/${RUN_ID}`
+    )
+
+    const moduleTab = getByText('Module Controls')
+    expect(queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
+    moduleTab.click()
+    expect(queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
+  })
+
+  it('disables run log tab if robot-analyzed protocol data is null', () => {
+    mockUseProtocolDetailsForRun.mockReturnValue({
+      protocolData: null,
+      displayName: null,
+      protocolKey: null,
+    })
+    const [{ getByText, queryByText }] = render(
+      `/devices/otie/protocol-runs/${RUN_ID}`
+    )
+
+    const runTab = getByText('Run Log')
+    getByText('Mock ProtocolRunSetup')
+    expect(queryByText('Mock RunLog')).toBeFalsy()
+    runTab.click()
+    expect(queryByText('Mock RunLog')).toBeFalsy()
+  })
+
+  it('redirects to the run log tab when the run is not current', () => {
+    mockUseCurrentRunId.mockReturnValue(null)
+    const [{ getByText, queryByText }] = render(
+      `/devices/otie/protocol-runs/${RUN_ID}/setup`
+    )
+
+    getByText('Mock RunLog')
+    expect(queryByText('Mock ProtocolRunSetup')).toBeFalsy()
   })
 })

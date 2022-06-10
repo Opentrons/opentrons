@@ -11,7 +11,7 @@ import {
   COLORS,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../../atoms/Buttons'
+import { PrimaryButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
 import { Modal } from '../../../atoms/Modal'
 

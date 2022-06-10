@@ -78,7 +78,7 @@ To upgrade your protocol to Python API Version {1} or above, please view our doc
 Please contact support@opentrons.com to retrieve the previous software version and be guided
 through the downgrade process.
 
-"""  # noqa: E501
+"""
 
 
 class MalformedProtocolError(Exception):

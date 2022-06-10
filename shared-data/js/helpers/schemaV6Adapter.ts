@@ -20,7 +20,7 @@ const TRASH_ID = 'fixedTrash'
  */
 export const schemaV6Adapter = (
   protocolAnalysis: PendingProtocolAnalysis | CompletedProtocolAnalysis
-): ProtocolAnalysisFile<{}> => {
+): ProtocolAnalysisFile<{}> | null => {
   if (protocolAnalysis != null && protocolAnalysis.status === 'completed') {
     const pipettes: {
       [pipetteId: string]: { name: PipetteName }
@@ -107,6 +107,5 @@ export const schemaV6Adapter = (
       commands: protocolAnalysis.commands,
     }
   }
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  return {} as ProtocolAnalysisFile<{}>
+  return null
 }

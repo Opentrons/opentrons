@@ -1,5 +1,4 @@
 from typing import Optional
-
 import pytest
 from mock import AsyncMock
 from opentrons.drivers.asyncio.communication.serial_connection import SerialConnection
@@ -18,6 +17,23 @@ def connection() -> AsyncMock:
 def subject(connection: AsyncMock) -> driver.ThermocyclerDriver:
     connection.send_command.return_value = ""
     return driver.ThermocyclerDriver(connection)
+
+
+@pytest.mark.parametrize(
+    "response,expected",
+    [
+        ("serial:abc model:def version:ghi\r\nok\r\nok\r\n", False),
+        ("M115 FW:abc HW:def SerialNo:ghi OK\n", True),
+    ],
+)
+async def test_factory_check_for_gen2(
+    connection: AsyncMock, response: str, expected: bool
+) -> None:
+    """The factory should detect the correct class type"""
+    connection.send_command.return_value = response
+    assert expected == await driver.ThermocyclerDriverFactory.is_gen2_thermocycler(
+        connection
+    )
 
 
 async def test_open_lid(
@@ -91,7 +107,7 @@ async def test_set_lid_temp(
 async def test_get_lid_temp(
     subject: driver.ThermocyclerDriver, connection: AsyncMock
 ) -> None:
-    """It should send a get lid temperate command and parse response."""
+    """It should send a get lid temperature command and parse response."""
     connection.send_command.return_value = "T:100.000 C:22.041\r\nok\r\nok\r\n'"
 
     response = await subject.get_lid_temperature()

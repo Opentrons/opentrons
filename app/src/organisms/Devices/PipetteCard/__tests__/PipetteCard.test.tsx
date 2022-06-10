@@ -13,13 +13,16 @@ import {
   usePipetteOffsetCalibration,
 } from '../../hooks'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
+import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { PipetteCard } from '..'
+
 import {
   mockLeftSpecs,
   mockRightSpecs,
 } from '../../../../redux/pipettes/__fixtures__'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
+
+import type { DeckCalibrationInfo } from '../../../../redux/calibration/api-types'
 
 jest.mock('../PipetteOverflowMenu')
 jest.mock('../../../../redux/config')
@@ -58,6 +61,24 @@ const render = (props: React.ComponentProps<typeof PipetteCard>) => {
   })[0]
 }
 
+const mockBadDeckCal: DeckCalibrationInfo = {
+  type: 'affine',
+  matrix: [
+    [1.0, 0.0, 0.0, 0.0],
+    [0.0, 1.0, 0.0, 0.0],
+    [0.0, 0.0, 1.0, 0.0],
+    [0.0, 0.0, 0.0, 1.0],
+  ],
+  lastModified: 'September 15, 2021',
+  pipetteCalibratedWith: null,
+  tiprack: null,
+  source: 'user',
+  status: {
+    markedBad: true,
+    source: 'unknown',
+    markedAt: '',
+  },
+}
 const mockRobotName = 'mockRobotName'
 describe('PipetteCard', () => {
   let startWizard: any
@@ -133,6 +154,21 @@ describe('PipetteCard', () => {
     getByText('Right Pipette')
     getByText('mock banner')
   })
+  it('renders information for a right pipette with bad deck cal banner', () => {
+    when(mockUseDeckCalibrationData).calledWith(mockRobotName).mockReturnValue({
+      isDeckCalibrated: true,
+      deckCalibrationData: mockBadDeckCal,
+    })
+    const { getByText } = render({
+      pipetteInfo: mockRightSpecs,
+      mount: RIGHT,
+      robotName: mockRobotName,
+      pipetteId: 'id',
+    })
+    getByText('right Mount')
+    getByText('Right Pipette')
+    getByText('mock banner')
+  })
   it('renders information for no pipette on right Mount', () => {
     const { getByText } = render({
       pipetteInfo: null,
@@ -151,8 +187,8 @@ describe('PipetteCard', () => {
     getByText('left Mount')
     getByText('Empty')
   })
-  it('renders kebab icon and is clickable', () => {
-    const { getByRole, getByText } = render({
+  it('renders kebab icon, opens and closes overflow menu on click', () => {
+    const { getByRole, getByText, queryByText } = render({
       pipetteInfo: mockRightSpecs,
       mount: RIGHT,
       robotName: mockRobotName,
@@ -164,6 +200,8 @@ describe('PipetteCard', () => {
 
     fireEvent.click(overflowButton)
     expect(overflowButton).not.toBeDisabled()
-    getByText('mock pipette overflow menu')
+    const overflowMenu = getByText('mock pipette overflow menu')
+    overflowMenu.click()
+    expect(queryByText('mock pipette overflow menu')).toBeNull()
   })
 })

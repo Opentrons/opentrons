@@ -133,12 +133,7 @@ export function SetupStep({
           </Flex>
         </Flex>
       </Btn>
-      <Box
-        css={expanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
-        marginLeft={SPACING.spacing4}
-      >
-        {children}
-      </Box>
+      <Box css={expanded ? EXPANDED_STYLE : COLLAPSED_STYLE}>{children}</Box>
     </Flex>
   )
 }

@@ -8,9 +8,8 @@ import keys from 'lodash/keys'
 import pick from 'lodash/pick'
 import omit from 'lodash/omit'
 import set from 'lodash/set'
-import isEmpty from 'lodash/isEmpty'
+import { Box } from '@opentrons/components'
 import { ConfigFormResetButton } from './ConfigFormResetButton'
-import { ConfigFormSubmitButton } from './ConfigFormSubmitButton'
 import {
   ConfigFormGroup,
   FormColumn,
@@ -42,6 +41,7 @@ export interface ConfigFormProps {
   updateInProgress: boolean
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => unknown
   closeModal: () => unknown
+  groupLabels: string[]
   __showHiddenFields: boolean
 }
 
@@ -204,7 +204,6 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
       >
         {(formProps: FormikProps<FormValues>) => {
           const { errors, values } = formProps
-          const disableSubmit = !isEmpty(errors)
           const handleReset = (): void => {
             const newValues = mapValues(values, v => {
               if (typeof v === 'boolean') {
@@ -216,41 +215,39 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
             })
             formProps.resetForm({ values: newValues })
           }
-          //  TODO(jr, 4/19/22): add groupLabels to i18n
           return (
-            <Form>
-              <ConfigFormResetButton
-                onClick={handleReset}
-                disabled={updateInProgress}
-              />
-              <FormColumn>
-                <ConfigFormGroup
-                  groupLabel="Plunger Positions"
-                  groupError={errors.plungerError}
-                  formFields={plungerFields}
+            <Box overflowY="scroll">
+              <Form>
+                <ConfigFormResetButton
+                  onClick={handleReset}
+                  disabled={updateInProgress}
                 />
-                <ConfigFormGroup
-                  groupLabel="Tip Pickup / Drop"
-                  formFields={tipFields}
-                />
-                {quirksPresent && <ConfigQuirkGroup quirks={quirkFields} />}
-                {this.props.__showHiddenFields && (
+                <FormColumn>
                   <ConfigFormGroup
-                    groupLabel="For Dev Use Only"
-                    formFields={devFields}
+                    groupLabel={this.props.groupLabels[0]}
+                    groupError={errors.plungerError}
+                    formFields={plungerFields}
                   />
-                )}
-              </FormColumn>
-              <FormColumn>
-                <ConfigFormGroup
-                  groupLabel="Power / Force"
-                  formFields={powerFields}
-                />
-              </FormColumn>
-              <ConfigFormSubmitButton
-                disabled={disableSubmit || updateInProgress}
-              />
-            </Form>
+                  <ConfigFormGroup
+                    groupLabel={this.props.groupLabels[1]}
+                    formFields={tipFields}
+                  />
+                  {quirksPresent && <ConfigQuirkGroup quirks={quirkFields} />}
+                  {this.props.__showHiddenFields && (
+                    <ConfigFormGroup
+                      groupLabel={this.props.groupLabels[2]}
+                      formFields={devFields}
+                    />
+                  )}
+                </FormColumn>
+                <FormColumn>
+                  <ConfigFormGroup
+                    groupLabel={this.props.groupLabels[3]}
+                    formFields={powerFields}
+                  />
+                </FormColumn>
+              </Form>
+            </Box>
           )
         }}
       </Formik>

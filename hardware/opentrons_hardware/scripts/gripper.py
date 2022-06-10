@@ -6,6 +6,8 @@ import argparse
 
 from typing import Callable
 from logging.config import dictConfig
+
+from opentrons_hardware.drivers.can_bus import build
 from opentrons_hardware.firmware_bindings.messages import payloads
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SetupRequest,
@@ -15,7 +17,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
-from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.hardware_control.gripper_settings import (
     set_pwm_param,
     set_reference_voltage,
@@ -82,18 +83,11 @@ def output_details(i: int, freq: int, duty_cycle: int, v_ref: float) -> None:
     print(f"PWM: {freq}Hz {duty_cycle}%\n")
 
 
-async def run(args: argparse.Namespace) -> None:
-    """Entry point for script."""
-    os.system("cls")
-    os.system("clear")
-
-    print("Gripper testing beings... \n")
+async def run_test(messenger: CanMessenger) -> None:
+    """Run the for test."""
+    print("Gripper testing begins... \n")
     pwm_freq = prompt_int_input("PWM frequency in Hz (int)")
     pwm_duty = prompt_int_input("PWM duty cycle in % (int)")
-
-    driver = await build_driver(build_settings(args))
-    messenger = CanMessenger(driver=driver)
-    messenger.start()
 
     """Setup gripper"""
     try:
@@ -106,7 +100,7 @@ async def run(args: argparse.Namespace) -> None:
 
             input(in_green("Press Enter to grip...\n"))
 
-            await grip(messenger, 0, 0, 0, 0)
+            await grip(messenger, 0, 0, 0, 0, 0)
             await execute_move(messenger)
 
             input(in_green("Press Enter to release...\n"))
@@ -119,8 +113,15 @@ async def run(args: argparse.Namespace) -> None:
     finally:
         print("\nTesting finishes...\n")
         await messenger.send(node_id=NodeId.gripper, message=DisableMotorRequest())
-        await messenger.stop()
-        driver.shutdown()
+
+
+async def run(args: argparse.Namespace) -> None:
+    """Entry point for script."""
+    os.system("cls")
+    os.system("clear")
+
+    async with build.can_messenger(build_settings(args)) as messenger:
+        await run_test(messenger)
 
 
 log = logging.getLogger(__name__)
