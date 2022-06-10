@@ -36,7 +36,7 @@ class CommandStatus(str, Enum):
 
 
 class CommandIntent(str, Enum):
-    """Source that generated a given command.
+    """Run intent for a given command.
 
     Props:
         PROTOCOL: the command is part of the protocol run itself.
@@ -70,8 +70,7 @@ class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
             " and added to the end of the existing command queue."
             "\n\n"
             "If `setup`, the command will be treated as part of run setup."
-            " A setup command may only be enqueued if the run has not started"
-            " or is currently paused."
+            " A setup command may only be enqueued if the run has not started."
             "\n\n"
             "Use setup commands for activities like pre-run calibration checks"
             " and module setup, like pre-heating."

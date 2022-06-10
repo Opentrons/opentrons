@@ -10,7 +10,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import temperature_module
-from opentrons.protocol_engine.commands.temperature_module.set_target_temperature import (  # noqa: E501
+from opentrons.protocol_engine.commands.temperature_module.set_target_temperature import (
     SetTargetTemperatureImpl,
 )
 

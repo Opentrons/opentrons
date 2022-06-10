@@ -22,6 +22,7 @@ import {
   useTipLengthCalibrations,
   useProtocolDetailsForRun,
   useRunPipetteInfoByMount,
+  useStoredProtocolAnalysis,
 } from '..'
 import _uncastedModifiedSimpleV6Protocol from '../__fixtures__/modifiedSimpleV6.json'
 
@@ -30,7 +31,7 @@ import type {
   PipetteNameSpecs,
   ProtocolAnalysisFile,
 } from '@opentrons/shared-data'
-import type { PipetteInfo, ProtocolDetails } from '..'
+import type { PipetteInfo, ProtocolDetails, StoredProtocolAnalysis } from '..'
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
@@ -43,6 +44,7 @@ jest.mock('../useAttachedPipetteCalibrations')
 jest.mock('../useAttachedPipettes')
 jest.mock('../useTipLengthCalibrations')
 jest.mock('../useProtocolDetailsForRun')
+jest.mock('../useStoredProtocolAnalysis')
 
 const mockGetPipetteNameSpecs = getPipetteNameSpecs as jest.MockedFunction<
   typeof getPipetteNameSpecs
@@ -58,6 +60,9 @@ const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunc
 >
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
+>
+const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
+  typeof useStoredProtocolAnalysis
 >
 
 const PIPETTE_CALIBRATIONS = {
@@ -104,6 +109,9 @@ describe('useRunPipetteInfoByMount hook', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith('1')
       .mockReturnValue(PROTOCOL_DETAILS)
+    when(mockUseStoredProtocolAnalysis)
+      .calledWith('1')
+      .mockReturnValue((PROTOCOL_DETAILS as unknown) as StoredProtocolAnalysis)
     when(mockGetPipetteNameSpecs)
       .calledWith('p10_single')
       .mockReturnValue({
@@ -119,6 +127,7 @@ describe('useRunPipetteInfoByMount hook', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith('1')
       .mockReturnValue({} as ProtocolDetails)
+    when(mockUseStoredProtocolAnalysis).calledWith('1').mockReturnValue(null)
     const { result } = renderHook(() => useRunPipetteInfoByMount('otie', '1'))
     expect(result.current).toStrictEqual({
       left: null,

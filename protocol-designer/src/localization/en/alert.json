@@ -131,6 +131,10 @@
       "HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING": {
         "title": "The Heater-Shaker is shaking",
         "body": "Pipettes cannot access labware on or adjacent to the Heater-Shaker while it is shaking. Create a step before this one that deactivates the shaker."
+      },
+      "HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL": {
+        "title": "8-Channel pipette cannot access labware",
+        "body": "8-Channel pipettes cannot access labware or tip racks to the left or right of a Heater-Shaker GEN1 module. Move labware to a different slot to access it with an 8-Channel pipette."
       }
     },
     "warning": {
@@ -158,6 +162,14 @@
     "HEATER_SHAKER_ADJACENT_LABWARE_TOO_TALL": {
       "title": "Cannot place module",
       "body": "Slot {{selectedSlot}} is occupied by labware over 53mm tall. The Heater-Shaker's labware latch risks collision with this labware."
+    },
+    "HEATER_SHAKER_ADJACENT_TO_ANOTHER_MODULE": {
+      "title": "Cannot place module",
+      "body": "Slot {{selectedSlot}} is occupied by a module. The Heater-Shaker cannot be placed in front of or behind another module."
+    },
+    "HEATER_SHAKER_ADJACENT_TO_MODULE": {
+      "title": "Cannot place module",
+      "body": "Slot {{selectedSlot}} is occupied by a Heater-Shaker. Other modules cannot be placed in front of or behind a Heater-Shaker."
     }
   },
   "export_warnings": {

@@ -75,7 +75,7 @@ def _dev_log_config(log_level: int) -> Dict[str, Any]:
         "disable_existing_loggers": False,
         "formatters": {
             "basic": {
-                "format": "%(asctime)s %(name)s %(levelname)s [Line %(lineno)s] %(message)s"  # noqa: E501
+                "format": "%(asctime)s %(name)s %(levelname)s [Line %(lineno)s] %(message)s"
             },
         },
         "handlers": {

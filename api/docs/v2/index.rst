@@ -5,16 +5,17 @@ Welcome
 .. toctree::
 
     self
-    writing
+    tutorial
     versioning
     new_labware
     new_modules
     new_pipette
     new_atomic_commands
     new_complex_commands
-    new_protocol_api
-    new_examples
+    robot_position
     new_advanced_running
+    new_examples
+    new_protocol_api
 
 The OT-2 Python Protocol API is a Python framework designed to make it easy to write automated biology lab protocols that use the OT-2 robot and optional hardware modules. We’ve designed the API to be accessible to anyone with basic Python and wet-lab skills. 
 
@@ -26,7 +27,7 @@ As a programmer, you can leverage the full power of Python for advanced automati
 Getting Started
 ---------------
 
-**New to Python protocols?** Check out the :ref:`writing` page first to get a sense of the typical structure of a protocol. 
+**New to Python protocols?** Check out the :ref:`tutorial` to learn about the different parts of a protocol file and build a working protocol from scratch. 
 
 If you want to **dive right into code**, take a look at our :ref:`new-examples` page and the comprehensive :ref:`protocol-api-reference`.
 

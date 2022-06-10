@@ -69,6 +69,7 @@ def mock_home(ot3_hardware):
             OT3Axis.Z_R: 0,
             OT3Axis.P_L: 0,
             OT3Axis.P_R: 0,
+            OT3Axis.Z_G: 0,
         }
         yield mock_home
 

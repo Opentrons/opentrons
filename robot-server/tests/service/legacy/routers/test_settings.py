@@ -340,7 +340,7 @@ def test_set_log_level(
 @pytest.fixture
 def mock_get_all_adv_settings():
     with patch(
-        "robot_server.service.legacy.routers.settings.advanced_settings.get_all_adv_settings"  # noqa: E501
+        "robot_server.service.legacy.routers.settings.advanced_settings.get_all_adv_settings"
     ) as p:
         p.return_value = {
             s.id: advanced_settings.Setting(value=False, definition=s)
@@ -352,7 +352,7 @@ def mock_get_all_adv_settings():
 @pytest.fixture
 def mock_is_restart_required():
     with patch(
-        "robot_server.service.legacy.routers.settings.advanced_settings.is_restart_required"  # noqa: E501
+        "robot_server.service.legacy.routers.settings.advanced_settings.is_restart_required"
     ) as p:
         yield p
 

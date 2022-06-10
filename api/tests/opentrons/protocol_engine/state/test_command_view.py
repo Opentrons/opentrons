@@ -109,7 +109,7 @@ def test_get_next_queued_returns_first_queued() -> None:
 
 @pytest.mark.parametrize(
     "queue_status",
-    [QueueStatus.SETUP, QueueStatus.RUNNING, QueueStatus.PAUSED],
+    [QueueStatus.SETUP, QueueStatus.RUNNING],
 )
 def test_get_next_queued_prioritizes_setup_command_queue(
     queue_status: QueueStatus,
@@ -136,9 +136,22 @@ def test_get_next_queued_returns_none_when_no_pending() -> None:
 
 @pytest.mark.parametrize("queue_status", [QueueStatus.SETUP, QueueStatus.PAUSED])
 def test_get_next_queued_returns_none_if_not_running(queue_status: QueueStatus) -> None:
-    """It should return None if the engine is not running."""
+    """It should not return protocol commands if the engine is not running."""
     subject = get_command_view(
         queue_status=queue_status,
+        queued_setup_command_ids=[],
+        queued_command_ids=["command-id-1", "command-id-2"],
+    )
+    result = subject.get_next_queued()
+
+    assert result is None
+
+
+def test_get_next_queued_returns_no_commands_if_paused() -> None:
+    """It should not return any type of command if the engine is paused."""
+    subject = get_command_view(
+        queue_status=QueueStatus.PAUSED,
+        queued_setup_command_ids=["setup-id-1", "setup-id-2"],
         queued_command_ids=["command-id-1", "command-id-2"],
     )
     result = subject.get_next_queued()
@@ -185,9 +198,7 @@ def test_get_is_complete() -> None:
 
 
 def test_get_all_complete() -> None:
-    """It should return true if no commands queued or running."""
-    running_command = create_running_command(command_id="command-id-2")
-
+    """It should return True if no commands queued or running."""
     subject = get_command_view(queued_command_ids=[])
     assert subject.get_all_complete() is True
 
@@ -199,11 +210,54 @@ def test_get_all_complete() -> None:
     )
     assert subject.get_all_complete() is False
 
+
+def test_get_all_complete_fatal_command_failure() -> None:
+    """It should raise an error if any protocol commands failed."""
+    completed_command = create_succeeded_command(command_id="command-id-1")
+    failed_command = create_failed_command(
+        command_id="command-id-2",
+        error=errors.ErrorOccurrence(
+            id="some-error-id",
+            errorType="PrettyBadError",
+            createdAt=datetime(year=2021, month=1, day=1),
+            detail="Oh no",
+        ),
+    )
+
     subject = get_command_view(
         queued_command_ids=[],
-        commands=[running_command],
+        running_command_id=None,
+        commands=[completed_command, failed_command],
     )
-    assert subject.get_all_complete() is True
+
+    with pytest.raises(errors.ProtocolCommandFailedError) as exc_info:
+        subject.get_all_complete()
+
+    assert exc_info.value.command_id == "command-id-2"
+
+
+def test_get_all_complete_setup_not_fatal() -> None:
+    """It should not call setup command fatal."""
+    completed_command = create_succeeded_command(command_id="command-id-1")
+    failed_command = create_failed_command(
+        command_id="command-id-2",
+        intent=cmd.CommandIntent.SETUP,
+        error=errors.ErrorOccurrence(
+            id="some-error-id",
+            errorType="PrettyBadError",
+            createdAt=datetime(year=2021, month=1, day=1),
+            detail="Oh no",
+        ),
+    )
+
+    subject = get_command_view(
+        queued_command_ids=[],
+        running_command_id=None,
+        commands=[completed_command, failed_command],
+    )
+
+    result = subject.get_all_complete()
+    assert result is True
 
 
 def test_get_should_stop() -> None:
@@ -228,6 +282,15 @@ def test_get_is_stopped() -> None:
 
     subject = get_command_view(run_completed_at=datetime(year=2021, day=1, month=1))
     assert subject.get_is_stopped() is True
+
+
+def test_get_is_started() -> None:
+    """It should return true if start requested and no command running."""
+    subject = get_command_view(run_started_at=None)
+    assert subject.has_been_played() is False
+
+    subject = get_command_view(run_started_at=datetime(year=2021, day=1, month=1))
+    assert subject.has_been_played() is True
 
 
 class ActionAllowedSpec(NamedTuple):
@@ -269,9 +332,9 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         action=StopAction(),
         expected_error=None,
     ),
-    # queue command is usually allowed
+    # queue command is allowed during setup
     ActionAllowedSpec(
-        subject=get_command_view(),
+        subject=get_command_view(queue_status=QueueStatus.SETUP),
         action=QueueCommandAction(
             request=cmd.HomeCreate(params=cmd.HomeParams()),
             command_id="command-id",
@@ -328,6 +391,20 @@ action_allowed_specs: List[ActionAllowedSpec] = [
             created_at=datetime(year=2021, month=1, day=1),
         ),
         expected_error=errors.RunStoppedError,
+    ),
+    # queue setup command is disallowed if paused
+    ActionAllowedSpec(
+        subject=get_command_view(queue_status=QueueStatus.PAUSED),
+        action=QueueCommandAction(
+            request=cmd.HomeCreate(
+                params=cmd.HomeParams(),
+                intent=cmd.CommandIntent.SETUP,
+            ),
+            command_id="command-id",
+            command_key="command-key",
+            created_at=datetime(year=2021, month=1, day=1),
+        ),
+        expected_error=errors.SetupCommandNotAllowedError,
     ),
     # queue setup command is disallowed if running
     ActionAllowedSpec(

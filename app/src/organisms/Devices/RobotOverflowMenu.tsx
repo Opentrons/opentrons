@@ -55,13 +55,11 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
     e.preventDefault()
     e.stopPropagation()
     setShowChooseProtocolSlideout(true)
-    setShowOverflowMenu(!showOverflowMenu)
   }
   const handleClickConnectionTroubleshooting: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
     setShowConnectionTroubleshootingModal(true)
-    setShowOverflowMenu(!showOverflowMenu)
   }
 
   let menuItems: React.ReactNode
@@ -72,7 +70,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           onClick={handleClickRun}
           data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
         >
-          {t('run_protocol')}
+          {t('run_a_protocol')}
         </MenuItem>
         <Divider marginY={'0'} />
         <MenuItem
@@ -130,36 +128,46 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
         onClick={handleOverflowClick}
       />
       {showOverflowMenu ? (
-        <Flex
-          width={'11rem'}
-          zIndex={10}
-          borderRadius={'4px 4px 0px 0px'}
-          boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
-          position={POSITION_ABSOLUTE}
-          backgroundColor={COLORS.white}
-          top="2.6rem"
-          right={`calc(50% + ${SPACING.spacing2})`}
-          flexDirection={DIRECTION_COLUMN}
-          id={`RobotOverflowMenu_${robot.name}_buttons`}
-        >
-          {menuItems}
-        </Flex>
+        <>
+          {!showConnectionTroubleshootingModal ? (
+            <Flex
+              width={'11rem'}
+              zIndex={10}
+              borderRadius={'4px 4px 0px 0px'}
+              boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
+              position={POSITION_ABSOLUTE}
+              backgroundColor={COLORS.white}
+              top="2.6rem"
+              right={`calc(50% + ${SPACING.spacing2})`}
+              flexDirection={DIRECTION_COLUMN}
+              id={`RobotOverflowMenu_${robot.name}_buttons`}
+            >
+              {menuItems}
+            </Flex>
+          ) : null}
+          <Portal level="top">
+            <MenuOverlay />
+            {robot.status === CONNECTABLE ? (
+              <ChooseProtocolSlideout
+                robot={robot}
+                showSlideout={showChooseProtocolSlideout}
+                onCloseClick={() => {
+                  setShowChooseProtocolSlideout(false)
+                  setShowOverflowMenu(!showOverflowMenu)
+                }}
+              />
+            ) : null}
+            {showConnectionTroubleshootingModal ? (
+              <ConnectionTroubleshootingModal
+                onClose={() => {
+                  setShowConnectionTroubleshootingModal(false)
+                  setShowOverflowMenu(!showOverflowMenu)
+                }}
+              />
+            ) : null}
+          </Portal>
+        </>
       ) : null}
-      <Portal level="top">
-        <MenuOverlay />
-        {robot.status === CONNECTABLE ? (
-          <ChooseProtocolSlideout
-            robot={robot}
-            showSlideout={showChooseProtocolSlideout}
-            onCloseClick={() => setShowChooseProtocolSlideout(false)}
-          />
-        ) : null}
-        {showConnectionTroubleshootingModal ? (
-          <ConnectionTroubleshootingModal
-            onClose={() => setShowConnectionTroubleshootingModal(false)}
-          />
-        ) : null}
-      </Portal>
     </Flex>
   )
 }

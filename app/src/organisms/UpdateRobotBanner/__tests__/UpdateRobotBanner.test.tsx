@@ -3,12 +3,15 @@ import { renderWithProviders } from '@opentrons/components'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import * as Buildroot from '../../../redux/buildroot'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { UpdateBuildroot } from '../../../pages/Robots/RobotSettings/UpdateBuildroot'
+import {
+  mockConnectableRobot,
+  mockReachableRobot,
+} from '../../../redux/discovery/__fixtures__'
+import { UpdateBuildroot } from '../../Devices/RobotSettings/UpdateBuildroot'
 import { UpdateRobotBanner } from '..'
 
-jest.mock('../../../pages/Robots/RobotSettings/UpdateBuildroot')
 jest.mock('../../../redux/buildroot')
+jest.mock('../../Devices/RobotSettings/UpdateBuildroot')
 
 const getBuildrootUpdateDisplayInfo = Buildroot.getBuildrootUpdateDisplayInfo as jest.MockedFunction<
   typeof Buildroot.getBuildrootUpdateDisplayInfo
@@ -69,5 +72,15 @@ describe('UpdateRobotBanner', () => {
     })
     const { getByText } = render(props)
     getByText('A software update is available for this robot.')
+  })
+
+  it('should render nothing if robot health status is not ok', () => {
+    props = {
+      robot: mockReachableRobot,
+    }
+    const bannerText = screen.queryByText(
+      'A software update is available for this robot.'
+    )
+    expect(bannerText).toBeNull()
   })
 })

@@ -1,12 +1,12 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
-from typing import cast, Iterator, Union
+from typing import cast, Iterator, Union, Dict
 from typing_extensions import Literal
 from math import copysign
 import pytest
 from mock import AsyncMock, patch
 from opentrons.config.types import GantryLoad, CapacitivePassSettings
-from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.dev_types import InstrumentDict
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
@@ -58,13 +58,31 @@ def mock_gantry_position(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncM
             GantryLoad.TWO_LOW_THROUGHPUT,
         ),
         ({}, GantryLoad.NONE),
+        ({OT3Mount.GRIPPER: {"name": "gripper"}}, GantryLoad.GRIPPER),
         ({OT3Mount.LEFT: {"channels": 1}}, GantryLoad.LOW_THROUGHPUT),
         ({OT3Mount.RIGHT: {"channels": 8}}, GantryLoad.LOW_THROUGHPUT),
         ({OT3Mount.RIGHT: {"channels": 96}}, GantryLoad.HIGH_THROUGHPUT),
+        (
+            {OT3Mount.LEFT: {"channels": 1}, OT3Mount.GRIPPER: {"name": "gripper"}},
+            GantryLoad.LOW_THROUGHPUT,
+        ),
+        (
+            {OT3Mount.RIGHT: {"channels": 8}, OT3Mount.GRIPPER: {"name": "gripper"}},
+            GantryLoad.LOW_THROUGHPUT,
+        ),
+        (
+            {OT3Mount.RIGHT: {"channels": 96}, OT3Mount.GRIPPER: {"name": "gripper"}},
+            GantryLoad.HIGH_THROUGHPUT,
+        ),
     ),
 )
 def test_gantry_load_transform(attached, load):
-    assert OT3API._gantry_load_from_instruments(cast(PipetteDict, attached)) == load
+    assert (
+        OT3API._gantry_load_from_instruments(
+            cast(Dict[OT3Mount, InstrumentDict], attached)
+        )
+        == load
+    )
 
 
 @pytest.fixture
@@ -82,7 +100,27 @@ def mock_backend_capacitive_probe(
             ot3_hardware._backend._position[axis_to_node(moving)] += distance_mm / 2
 
         mock_probe.side_effect = _update_position
+
         yield mock_probe
+
+
+@pytest.fixture
+def mock_backend_capacitive_pass(
+    ot3_hardware: ThreadManager[OT3API],
+) -> Iterator[AsyncMock]:
+    backend = ot3_hardware.managed_obj._backend
+    with patch.object(
+        backend, "capacitive_pass", AsyncMock(spec=backend.capacitive_pass)
+    ) as mock_pass:
+
+        async def _update_position(
+            mount: OT3Mount, moving: OT3Axis, distance_mm: float, speed_mm_per_s: float
+        ) -> None:
+            ot3_hardware._backend._position[axis_to_node(moving)] += distance_mm / 2
+            return [1, 2, 3, 4, 5, 6, 8]
+
+        mock_pass.side_effect = _update_position
+        yield mock_pass
 
 
 @pytest.mark.parametrize(
@@ -204,5 +242,57 @@ async def test_capacitive_probe_invalid_axes(
 ) -> None:
     with pytest.raises(RuntimeError, match=r"Probing must be done with.*"):
         await ot3_hardware.capacitive_probe(mount, moving, 2, fake_settings)
+    mock_move_to.assert_not_called()
+    mock_backend_capacitive_probe.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "axis,begin,end,distance",
+    [
+        # Points must be passed through the attitude transform and therefore
+        # flipped
+        (OT3Axis.X, Point(0, 0, 0), Point(1, 0, 0), -1),
+        (OT3Axis.Y, Point(0, 0, 0), Point(0, -1, 0), 1),
+    ],
+)
+async def test_capacitive_sweep(
+    axis: OT3Axis,
+    begin: Point,
+    end: Point,
+    distance: float,
+    ot3_hardware: ThreadManager[OT3API],
+    mock_move_to: AsyncMock,
+    mock_backend_capacitive_pass: AsyncMock,
+) -> None:
+    data = await ot3_hardware.capacitive_sweep(OT3Mount.RIGHT, axis, begin, end, 3)
+    assert data == [1, 2, 3, 4, 5, 6, 8]
+    mock_backend_capacitive_pass.assert_called_once_with(
+        OT3Mount.RIGHT, axis, distance, 3
+    )
+
+
+@pytest.mark.parametrize(
+    "mount,moving",
+    (
+        [OT3Mount.RIGHT, OT3Axis.Z_L],
+        [OT3Mount.LEFT, OT3Axis.Z_R],
+        [OT3Mount.RIGHT, OT3Axis.P_L],
+        [OT3Mount.RIGHT, OT3Axis.P_R],
+        [OT3Mount.LEFT, OT3Axis.P_L],
+        [OT3Mount.RIGHT, OT3Axis.P_R],
+    ),
+)
+async def test_capacitive_sweep_invalid_axes(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_move_to: AsyncMock,
+    mock_backend_capacitive_probe: AsyncMock,
+    mount: OT3Mount,
+    moving: OT3Axis,
+    fake_settings: CapacitivePassSettings,
+) -> None:
+    with pytest.raises(RuntimeError, match=r"Probing must be done with.*"):
+        await ot3_hardware.capacitive_sweep(
+            mount, moving, Point(0, 0, 0), Point(1, 0, 0), 2
+        )
     mock_move_to.assert_not_called()
     mock_backend_capacitive_probe.assert_not_called()

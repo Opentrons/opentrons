@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { isEmpty } from 'lodash'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import { NavLink, Redirect, useParams } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
@@ -21,6 +22,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
@@ -34,8 +36,11 @@ import { RunLog } from '../../../organisms/Devices/ProtocolRun/RunLog'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
+import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
+import { fetchProtocols } from '../../../redux/protocol-storage'
 
 import type { NavRouteParams, ProtocolRunDetailsTab } from '../../../App/types'
+import type { Dispatch } from '../../../redux/types'
 
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -113,6 +118,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
     runId,
     protocolRunDetailsTab,
   } = useParams<NavRouteParams>()
+  const dispatch = useDispatch<Dispatch>()
 
   const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
 
@@ -150,6 +156,10 @@ export function ProtocolRunDetails(): JSX.Element | null {
     (() => (
       <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
     ))
+
+  React.useEffect(() => {
+    dispatch(fetchProtocols())
+  }, [dispatch])
 
   return robot != null ? (
     <ApiHostProvider
@@ -245,12 +255,13 @@ const ModuleControlsTab = (
   const { robotName, runId } = props
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
+  const runStatus = useRunStatus(runId)
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
     robotName,
     runId
   )
 
-  const disabled = currentRunId !== runId
+  const disabled = currentRunId !== runId || runStatus !== RUN_STATUS_IDLE
   const tabDisabledReason = `${t('module_controls')} ${t(
     'not_available_for_a_completed_run'
   )}`
@@ -264,7 +275,7 @@ const ModuleControlsTab = (
         to={`/devices/${robotName}/protocol-runs/${runId}/module-controls`}
         tabName={t('module_controls')}
       />
-      {currentRunId !== runId ? (
+      {disabled ? (
         // redirect to run log if not current run
         <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/run-log`} />
       ) : null}

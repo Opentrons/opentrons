@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Form, Formik, useFormikContext } from 'formik'
+import some from 'lodash/some'
 import cx from 'classnames'
 import {
   Modal,
@@ -11,14 +12,14 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import {
-  getIsLabwareAboveHeight,
+  getAreSlotsAdjacent,
   THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   THERMOCYCLER_MODULE_V1,
   ModuleType,
   ModuleModel,
-  MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
@@ -65,21 +66,6 @@ type EditModulesModalComponentProps = EditModulesModalProps & {
 export interface EditModulesFormValues {
   selectedModel: ModuleModel | null
   selectedSlot: string
-}
-
-// this util only works for outter slots (where we can safely place modules in PD)
-const getSlotNextTo = (slot: string): string | null => {
-  const SLOT_ADJACENT_MAP: Record<string, string> = {
-    '1': '2',
-    '3': '2',
-    '4': '5',
-    '6': '5',
-    '7': '8',
-    '9': '8',
-    '10': '11',
-  }
-
-  return SLOT_ADJACENT_MAP[slot] ?? null
 }
 
 export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
@@ -133,27 +119,31 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     if (!selectedModel) {
       errors.selectedModel = i18n.t('alert.field.required')
     }
+    const isModuleAdjacentToHeaterShaker = some(
+      initialDeckSetup.modules,
+      hwModule =>
+        hwModule.type === HEATERSHAKER_MODULE_TYPE &&
+        getAreSlotsAdjacent(hwModule.slot, selectedSlot)
+    )
 
-    if (selectedModel === HEATERSHAKER_MODULE_V1) {
-      const labwareNextToHeaterShaker = getLabwareOnSlot(
-        initialDeckSetup,
-        getSlotNextTo(selectedSlot) ?? ''
+    if (isModuleAdjacentToHeaterShaker) {
+      errors.selectedSlot = i18n.t(
+        'alert.module_placement.HEATER_SHAKER_ADJACENT_TO_MODULE.body',
+        { selectedSlot }
       )
-      if (
-        labwareNextToHeaterShaker &&
-        getIsLabwareAboveHeight(
-          labwareNextToHeaterShaker.def,
-          MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
-        )
-      ) {
+    } else if (selectedModel === HEATERSHAKER_MODULE_V1) {
+      const isHeaterShakerAdjacentToAnotherModule = some(
+        initialDeckSetup.modules,
+        hwModule => getAreSlotsAdjacent(hwModule.slot, selectedSlot)
+      )
+
+      if (isHeaterShakerAdjacentToAnotherModule) {
         errors.selectedSlot = i18n.t(
-          'alert.module_placement.HEATER_SHAKER_ADJACENT_LABWARE_TOO_TALL.body',
+          'alert.module_placement.HEATER_SHAKER_ADJACENT_TO_ANOTHER_MODULE.body',
           { selectedSlot }
         )
       }
-    }
-
-    if (hasSlotIssue(selectedSlot)) {
+    } else if (hasSlotIssue(selectedSlot)) {
       errors.selectedSlot = i18n.t(
         'alert.module_placement.SLOT_OCCUPIED.body',
         { selectedSlot }

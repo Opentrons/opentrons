@@ -3,12 +3,13 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 
-from typing import Optional, Type, TypeVar, Callable, AsyncIterator
+from typing import Optional, Type, TypeVar, Callable, AsyncIterator, cast
 
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     SensorOutputBinding,
     SensorType,
+    MessageId,
 )
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 
@@ -293,6 +294,58 @@ class SensorScheduler:
         finally:
             if log:
                 can_messenger.remove_listener(self._log_sensor_output)
+            await can_messenger.send(
+                node_id=target_sensor.node_id,
+                message=BindSensorOutputRequest(
+                    payload=BindSensorOutputRequestPayload(
+                        sensor=SensorTypeField(target_sensor.sensor_type),
+                        binding=SensorOutputBindingField(
+                            SensorOutputBinding.none.value
+                        ),
+                    )
+                ),
+            )
+
+    @asynccontextmanager
+    async def capture_output(
+        self,
+        target_sensor: SensorInformation,
+        can_messenger: CanMessenger,
+    ) -> AsyncIterator["asyncio.Queue[float]"]:
+        """While acquired, capture the sensor's logging output."""
+        response_queue: "asyncio.Queue[float]" = asyncio.Queue()
+
+        def _logging_listener(
+            message: MessageDefinition, arb_id: ArbitrationId
+        ) -> None:
+            payload = cast(ReadFromSensorResponse, message).payload
+            response_queue.put_nowait(
+                SensorDataType.build(payload.sensor_data).to_float()
+            )
+
+        def _filter(arbitration_id: ArbitrationId) -> bool:
+            return (
+                NodeId(arbitration_id.parts.originating_node_id)
+                == target_sensor.node_id
+            ) and (
+                MessageId(arbitration_id.parts.message_id)
+                == MessageId.read_sensor_response
+            )
+
+        can_messenger.add_listener(_logging_listener, _filter)
+        await can_messenger.send(
+            node_id=target_sensor.node_id,
+            message=BindSensorOutputRequest(
+                payload=BindSensorOutputRequestPayload(
+                    sensor=SensorTypeField(target_sensor.sensor_type),
+                    binding=SensorOutputBindingField(SensorOutputBinding.report.value),
+                )
+            ),
+        )
+        try:
+            yield response_queue
+        finally:
+            can_messenger.remove_listener(_logging_listener)
             await can_messenger.send(
                 node_id=target_sensor.node_id,
                 message=BindSensorOutputRequest(
