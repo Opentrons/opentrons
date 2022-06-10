@@ -5,7 +5,7 @@ import { useHost } from '../api'
 export function useAllRunsQuery(): UseQueryResult<Runs> {
   const host = useHost()
   const query = useQuery(
-    [host, 'runs', 'details'],
+    [host, 'runs', '`details`'],
     () => getRuns(host as HostConfig).then(response => response.data),
     { enabled: host !== null }
   )

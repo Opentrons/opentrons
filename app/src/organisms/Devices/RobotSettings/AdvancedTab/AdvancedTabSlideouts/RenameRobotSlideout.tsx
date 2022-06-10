@@ -10,7 +10,11 @@ import {
   SPACING,
   COLORS,
 } from '@opentrons/components'
-import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
+
+import {
+  useUpdateRobotNameMutation,
+  useRobotName,
+} from '@opentrons/react-api-client'
 import { removeRobot } from '../../../../../redux/discovery'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
@@ -47,6 +51,9 @@ export function RenameRobotSlideout({
   )
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
+
+  const currentRobotName = useRobotName()
+  console.log('currentRobotName', currentRobotName)
 
   const formik = useFormik({
     initialValues: {
