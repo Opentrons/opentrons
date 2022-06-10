@@ -63,7 +63,7 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
 
 
 class BlowOut(BaseCommand[BlowOutParams, BlowOutResult]):
-    """blow-out command model."""
+    """Blow-out command model."""
 
     commandType: BlowOutCommandType = "blowout"
     params: BlowOutParams
