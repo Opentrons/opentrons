@@ -26,7 +26,7 @@ import { Banner } from '../../atoms/Banner'
 import {
   CURRENT_VERSION,
   checkShellUpdate,
-  getShellUpdateState,
+  getAvailableShellUpdate,
 } from '../../redux/shell'
 import {
   ALERT_APP_UPDATE_AVAILABLE,
@@ -39,7 +39,6 @@ import { Portal } from '../../App/portal'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { PreviousVersionModal } from './PreviousVersionModal'
 import { ConnectRobotSlideout } from './ConnectRobotSlideout'
-import * as Config from '../../redux/config'
 
 import type { Dispatch, State } from '../../redux/types'
 
@@ -59,18 +58,13 @@ export function GeneralSettings(): JSX.Element {
     showPreviousVersionModal,
     setShowPreviousVersionModal,
   ] = React.useState<boolean>(false)
-  const updateState = useSelector(getShellUpdateState)
-  const { available, info: updateInfo } = updateState
+  const updateAvailable = Boolean(useSelector(getAvailableShellUpdate))
   const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(
-    available
+    updateAvailable
   )
   const [showUpdateBanner, setShowUpdateBanner] = React.useState<boolean>(
-    available
+    updateAvailable
   )
-  const version =
-    updateInfo != null && 'version' in updateInfo ? updateInfo.version : null
-  const isUnstable =
-    version != null && (version.includes('beta') || version.includes('alpha'))
 
   const [
     showConnectRobotSlideout,
@@ -81,10 +75,6 @@ export function GeneralSettings(): JSX.Element {
   const enabled = useSelector((s: State) => {
     const ignored = getAlertIsPermanentlyIgnored(s, ALERT_APP_UPDATE_AVAILABLE)
     return ignored !== null ? !ignored : null
-  })
-
-  const channelConfigValue = useSelector((state: State) => {
-    return Config.getConfig(state)?.update.channel
   })
 
   const handleToggle = (): void => {
@@ -116,7 +106,7 @@ export function GeneralSettings(): JSX.Element {
         paddingX={SPACING.spacing4}
         paddingY={SPACING.spacing5}
       >
-        {showUpdateBanner && (
+        {showUpdateBanner && enabled && (
           <Box
             marginBottom={SPACING.spacing4}
             id="GeneralSettings_updatebanner"
@@ -139,7 +129,7 @@ export function GeneralSettings(): JSX.Element {
         <Box>
           <Flex
             flexDirection={DIRECTION_ROW}
-            alignItems={available ? ALIGN_CENTER : ALIGN_START}
+            alignItems={updateAvailable ? ALIGN_CENTER : ALIGN_START}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             gridGap={SPACING.spacing4}
           >
@@ -173,9 +163,9 @@ export function GeneralSettings(): JSX.Element {
                 >{` ${t('shared:github')}`}</Link>
               </StyledText>
             </Box>
-            {available ? (
+            {updateAvailable ? (
               <TertiaryButton
-                disabled={!available}
+                disabled={!updateAvailable}
                 marginLeft={SPACING_AUTO}
                 onClick={() => setShowUpdateModal(true)}
                 id="GeneralSettings_softwareUpdate"
@@ -260,9 +250,7 @@ export function GeneralSettings(): JSX.Element {
           </TertiaryButton>
         </Flex>
       </Box>
-      {showUpdateModal &&
-      (channelConfigValue !== 'latest' ||
-        (channelConfigValue === 'latest' && !isUnstable)) ? (
+      {showUpdateModal && enabled ? (
         <Portal level="top">
           <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />
         </Portal>

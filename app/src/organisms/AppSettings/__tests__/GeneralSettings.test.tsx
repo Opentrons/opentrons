@@ -4,11 +4,9 @@ import { screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { getConfig } from '../../../redux/config'
+import { getAlertIsPermanentlyIgnored } from '../../../redux/alerts'
 import * as Shell from '../../../redux/shell'
 import { GeneralSettings } from '../GeneralSettings'
-import type { Config } from '@opentrons/app/src/redux/config/schema-types'
-import type { ShellUpdateState } from '../../../redux/shell/types'
 
 jest.mock('../../../redux/config')
 jest.mock('../../../redux/shell')
@@ -18,10 +16,12 @@ jest.mock('../../UpdateAppModal', () => ({
   UpdateAppModal: () => null,
 }))
 
-const getShellUpdateState = Shell.getShellUpdateState as jest.MockedFunction<
-  typeof Shell.getShellUpdateState
+const getAvailableShellUpdate = Shell.getAvailableShellUpdate as jest.MockedFunction<
+  typeof Shell.getAvailableShellUpdate
 >
-const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+const mockGetAlertIsPermanentlyIgnored = getAlertIsPermanentlyIgnored as jest.MockedFunction<
+  typeof getAlertIsPermanentlyIgnored
+>
 
 const render = () => {
   return renderWithProviders(
@@ -36,13 +36,8 @@ const render = () => {
 
 describe('GeneralSettings', () => {
   beforeEach(() => {
-    getShellUpdateState.mockReturnValue({
-      available: false,
-      info: null,
-    } as ShellUpdateState)
-    mockGetConfig.mockReturnValue({
-      update: { channel: 'beta' },
-    } as Config)
+    getAvailableShellUpdate.mockReturnValue(null)
+    mockGetAlertIsPermanentlyIgnored.mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -72,35 +67,19 @@ describe('GeneralSettings', () => {
     })
   })
 
-  it('renders correct info if there is update available and channel is beta', () => {
-    getShellUpdateState.mockReturnValue({
-      available: true,
-      info: { version: '6.0.0-beta.0' },
-    } as ShellUpdateState)
+  it('renders correct info if there is update available', () => {
+    getAvailableShellUpdate.mockReturnValue('5.0.0-beta.8')
     const [{ getByRole }] = render()
     getByRole('button', { name: 'View software update' })
   })
 
-  it('renders correct info if there is update available and channel is stable', () => {
-    mockGetConfig.mockReturnValue({
-      update: { channel: 'latest' },
-    } as Config)
-    getShellUpdateState.mockReturnValue({
-      available: true,
-      info: { version: '6.0.0' },
-    } as ShellUpdateState)
-    const [{ getByRole }] = render()
-    getByRole('button', { name: 'View software update' })
+  it('renders correct info if there is no update available', () => {
+    expect(screen.queryByText('View software update')).toBeNull()
   })
 
-  it('renders correct info if there is beta update available but the channel is stable', () => {
-    mockGetConfig.mockReturnValue({
-      update: { channel: 'latest' },
-    } as Config)
-    getShellUpdateState.mockReturnValue({
-      available: true,
-      info: { version: '6.0.0-beta.0' },
-    } as ShellUpdateState)
+  it('renders correct info if there is update available but alert ignored enabled', () => {
+    getAvailableShellUpdate.mockReturnValue('5.0.0-beta.8')
+    mockGetAlertIsPermanentlyIgnored.mockReturnValue(true)
     expect(screen.queryByText('View software update')).toBeNull()
   })
 
