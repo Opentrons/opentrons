@@ -99,16 +99,16 @@ export function ProtocolOverflowMenu(
           flexDirection={DIRECTION_COLUMN}
         >
           <MenuItem
-            onClick={handleClickShowInFolder}
-            data-testid="ProtocolOverflowMenu_showInFolder"
-          >
-            {t('show_in_folder')}
-          </MenuItem>
-          <MenuItem
             onClick={handleClickRun}
             data-testid="ProtocolOverflowMenu_run"
           >
             {t('run')}
+          </MenuItem>
+          <MenuItem
+            onClick={handleClickShowInFolder}
+            data-testid="ProtocolOverflowMenu_showInFolder"
+          >
+            {t('show_in_folder')}
           </MenuItem>
           <MenuItem
             onClick={handleClickDelete}

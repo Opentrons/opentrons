@@ -24,7 +24,7 @@
   "right_mount": "Right Mount",
   "robot_settings": "robot settings",
   "running": "running",
-  "run_protocol": "Run protocol",
+  "run_a_protocol": "Run a protocol",
   "see_how_to_setup_new_robot": "See how to set up a new robot",
   "setting_up_new_robot": "Learn about setting up a new robot",
   "troubleshooting_connection_problems": "Learn more about troubleshooting connection problems",
@@ -37,5 +37,6 @@
   "connect_to_network": "Connect to network",
   "home_gantry": "Home gantry",
   "this_robot_has_connected_and_power_on_module": "This robot has a connected and powered on {{moduleName}}",
-  "forget_unavailable_robot": "Forget unavailable robot"
+  "forget_unavailable_robot": "Forget unavailable robot",
+  "looking_for_robots": "Looking for robots..."
 }

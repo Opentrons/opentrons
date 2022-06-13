@@ -15,10 +15,10 @@ import * as Settings from '../../../../redux/robot-settings'
 
 import { Page } from '../../../../atoms/Page'
 import { ErrorModal } from '../../../../molecules/modals'
+import { UpdateBuildroot } from '../../../../organisms/Devices/RobotSettings/UpdateBuildroot'
 import { ReachableRobotBanner } from '../ReachableRobotBanner'
 import { ConnectBanner } from '../ConnectBanner'
 import { RestartRequiredBanner } from '../RestartRequiredBanner'
-import { UpdateBuildroot } from '../UpdateBuildroot'
 import { ResetRobotModal } from '../ResetRobotModal'
 import { RobotSettings } from '..'
 
@@ -32,9 +32,12 @@ jest.mock('../../../../redux/robot-settings/selectors')
 jest.mock('../../../../redux/robot/selectors')
 
 // emulate shallow render
-jest.mock('../UpdateBuildroot', () => ({
-  UpdateBuildroot: () => <></>,
-}))
+jest.mock(
+  '../../../../organisms/Devices/RobotSettings/UpdateBuildroot',
+  () => ({
+    UpdateBuildroot: () => <></>,
+  })
+)
 
 jest.mock('../ResetRobotModal', () => ({
   ResetRobotModal: () => <></>,

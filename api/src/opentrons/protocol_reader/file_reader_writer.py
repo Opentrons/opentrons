@@ -63,7 +63,7 @@ class FileReaderWriter:
 
             if filename.lower().endswith(".json"):
                 try:
-                    data = parse_raw_as(BufferedJsonFileData, contents)  # type: ignore[arg-type]  # noqa: E501
+                    data = parse_raw_as(BufferedJsonFileData, contents)  # type: ignore[arg-type]
 
                 # unlike other Pydantic functions/methods, `parse_raw_as` can
                 # raise both JSONDecodeError and ValidationError separately

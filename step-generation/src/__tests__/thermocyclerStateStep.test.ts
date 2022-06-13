@@ -1,4 +1,3 @@
-// @ts-nocheck TODO: remove this after https://github.com/Opentrons/opentrons/pull/10178 merges
 import { thermocyclerStateDiff, Diff } from '../utils/thermocyclerStateDiff'
 import { thermocyclerStateStep } from '../commandCreators/compound/thermocyclerStateStep'
 import { getStateAndContextTempTCModules, getSuccessResult } from '../fixtures'
@@ -101,7 +100,7 @@ describe('thermocyclerStateStep', () => {
       thermocyclerStateDiff: { ...getInitialDiff(), setBlockTemperature: true },
       expected: [
         {
-          commandType: 'thermocycler/setAndWaitForBlockTemperature',
+          commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
             moduleId: thermocyclerId,
             celsius: 10,
@@ -111,7 +110,6 @@ describe('thermocyclerStateStep', () => {
           commandType: 'thermocycler/waitForBlockTemperature',
           params: {
             moduleId: thermocyclerId,
-            celsius: 10,
           },
         },
       ],
@@ -170,7 +168,6 @@ describe('thermocyclerStateStep', () => {
           commandType: 'thermocycler/waitForLidTemperature',
           params: {
             moduleId: thermocyclerId,
-            celsius: 10,
           },
         },
       ],
@@ -229,7 +226,6 @@ describe('thermocyclerStateStep', () => {
           commandType: 'thermocycler/waitForLidTemperature',
           params: {
             moduleId: thermocyclerId,
-            celsius: 10,
           },
         },
       ],
@@ -302,7 +298,7 @@ describe('thermocyclerStateStep', () => {
           },
         },
         {
-          commandType: 'thermocycler/setAndWaitForBlockTemperature',
+          commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
             moduleId: thermocyclerId,
             celsius: 10,
@@ -312,7 +308,6 @@ describe('thermocyclerStateStep', () => {
           commandType: 'thermocycler/waitForBlockTemperature',
           params: {
             moduleId: thermocyclerId,
-            celsius: 10,
           },
         },
         {
@@ -332,7 +327,6 @@ describe('thermocyclerStateStep', () => {
           commandType: 'thermocycler/waitForLidTemperature',
           params: {
             moduleId: thermocyclerId,
-            celsius: 20,
           },
         },
       ],

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Form, Formik, useFormikContext } from 'formik'
+import some from 'lodash/some'
 import cx from 'classnames'
 import {
   Modal,
@@ -11,8 +12,11 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import {
+  getAreSlotsAdjacent,
   THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_V1,
   THERMOCYCLER_MODULE_V1,
   ModuleType,
   ModuleModel,
@@ -115,8 +119,31 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     if (!selectedModel) {
       errors.selectedModel = i18n.t('alert.field.required')
     }
+    const isModuleAdjacentToHeaterShaker = some(
+      initialDeckSetup.modules,
+      hwModule =>
+        hwModule.type === HEATERSHAKER_MODULE_TYPE &&
+        getAreSlotsAdjacent(hwModule.slot, selectedSlot)
+    )
 
-    if (hasSlotIssue(selectedSlot)) {
+    if (isModuleAdjacentToHeaterShaker) {
+      errors.selectedSlot = i18n.t(
+        'alert.module_placement.HEATER_SHAKER_ADJACENT_TO_MODULE.body',
+        { selectedSlot }
+      )
+    } else if (selectedModel === HEATERSHAKER_MODULE_V1) {
+      const isHeaterShakerAdjacentToAnotherModule = some(
+        initialDeckSetup.modules,
+        hwModule => getAreSlotsAdjacent(hwModule.slot, selectedSlot)
+      )
+
+      if (isHeaterShakerAdjacentToAnotherModule) {
+        errors.selectedSlot = i18n.t(
+          'alert.module_placement.HEATER_SHAKER_ADJACENT_TO_ANOTHER_MODULE.body',
+          { selectedSlot }
+        )
+      }
+    } else if (hasSlotIssue(selectedSlot)) {
       errors.selectedSlot = i18n.t(
         'alert.module_placement.SLOT_OCCUPIED.body',
         { selectedSlot }

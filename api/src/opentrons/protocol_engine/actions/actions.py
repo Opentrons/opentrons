@@ -20,6 +20,8 @@ from ..types import LabwareOffsetCreate, ModuleDefinition
 class PlayAction:
     """Start or resume processing commands in the engine."""
 
+    requested_at: datetime
+
 
 class PauseSource(str, Enum):
     """The source of a PauseAction.
@@ -72,6 +74,8 @@ class FinishAction:
 @dataclass(frozen=True)
 class HardwareStoppedAction:
     """An action dispatched after hardware has successfully been stopped."""
+
+    completed_at: datetime
 
 
 @dataclass(frozen=True)

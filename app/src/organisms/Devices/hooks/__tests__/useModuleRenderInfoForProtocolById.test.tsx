@@ -15,6 +15,7 @@ import {
   useAttachedModules,
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
+  useStoredProtocolAnalysis,
 } from '..'
 
 import type {
@@ -22,11 +23,12 @@ import type {
   ModuleType,
   ProtocolAnalysisFile,
 } from '@opentrons/shared-data'
-import type { ProtocolDetails } from '..'
+import type { ProtocolDetails, StoredProtocolAnalysis } from '..'
 
 jest.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../useAttachedModules')
 jest.mock('../useProtocolDetailsForRun')
+jest.mock('../useStoredProtocolAnalysis')
 
 const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
   typeof getProtocolModulesInfo
@@ -36,6 +38,9 @@ const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
 >
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
+>
+const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
+  typeof useStoredProtocolAnalysis
 >
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
@@ -118,6 +123,9 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith('1')
       .mockReturnValue(PROTOCOL_DETAILS)
+    when(mockUseStoredProtocolAnalysis)
+      .calledWith('1')
+      .mockReturnValue((PROTOCOL_DETAILS as unknown) as StoredProtocolAnalysis)
     when(mockGetProtocolModulesInfo)
       .calledWith(simpleV6Protocol, standardDeckDef as any)
       .mockReturnValue([TEMPERATURE_MODULE_INFO, MAGNETIC_MODULE_INFO])
@@ -130,6 +138,7 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith('1')
       .mockReturnValue({} as ProtocolDetails)
+    when(mockUseStoredProtocolAnalysis).calledWith('1').mockReturnValue(null)
     const { result } = renderHook(() =>
       useModuleRenderInfoForProtocolById('otie', '1')
     )

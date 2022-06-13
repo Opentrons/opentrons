@@ -44,7 +44,7 @@ export const setTemperature: CommandCreator<SetTemperatureArgs> = (
     return {
       commands: [
         {
-          commandType: 'heaterShakerModule/startSetTargetTemperature',
+          commandType: 'heaterShaker/setTargetTemperature',
           params: {
             moduleId: module,
             celsius: targetTemperature,

@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { getShellUpdateState } from '../../../../redux/shell'
-import { AboutRobotName } from '../AdvancedTab/AboutRobotName'
+import { DisplayRobotName } from '../AdvancedTab/DisplayRobotName'
 import { DisableHoming } from '../AdvancedTab/DisableHoming'
 import { FactoryReset } from '../AdvancedTab/FactoryReset'
 import { LegacySettings } from '../AdvancedTab/LegacySettings'
@@ -27,7 +27,7 @@ jest.mock('../../../../redux/shell/update', () => ({
   ...jest.requireActual<{}>('../../../../redux/shell/update'),
   getShellUpdateState: jest.fn(),
 }))
-jest.mock('../AdvancedTab/AboutRobotName')
+jest.mock('../AdvancedTab/DisplayRobotName')
 jest.mock('../AdvancedTab/DisableHoming')
 jest.mock('../AdvancedTab/FactoryReset')
 jest.mock('../AdvancedTab/LegacySettings')
@@ -45,8 +45,8 @@ const mockGetShellUpdateState = getShellUpdateState as jest.MockedFunction<
   typeof getShellUpdateState
 >
 
-const mockAboutRobotName = AboutRobotName as jest.MockedFunction<
-  typeof AboutRobotName
+const mockAboutRobotName = DisplayRobotName as jest.MockedFunction<
+  typeof DisplayRobotName
 >
 const mockDisableHoming = DisableHoming as jest.MockedFunction<
   typeof DisableHoming
@@ -85,10 +85,15 @@ const mockUseOlderProtocol = UseOlderProtocol as jest.MockedFunction<
   typeof UseOlderProtocol
 >
 
+const mockUpdateRobotStatus = jest.fn()
+
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <RobotSettingsAdvanced robotName="otie" />
+      <RobotSettingsAdvanced
+        robotName="otie"
+        updateRobotStatus={mockUpdateRobotStatus}
+      />
     </MemoryRouter>,
     {
       i18nInstance: i18n,

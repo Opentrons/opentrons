@@ -80,10 +80,16 @@
   "__dev_internal__hierarchyReorganization": "revert to legacy hierarchy organization",
   "__dev_internal__allPipetteConfig": "All Pipette Config",
   "__dev_internal__enableBundleUpload": "Enable Bundle Upload",
+  "__dev_internal__enableLiquidSetup": "Enable Liquid Setup",
   "override_path_to_python": "Override Path to Python",
   "opentrons_app_will_use_interpreter": "If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.",
   "override_path": "override path",
   "no_specified_folder": "No path specified",
   "add_override_path": "Add override path",
-  "reset_to_default": "Reset to default"
+  "reset_to_default": "Reset to default",
+  "clear_unavailable_robots": "Clear unavailable robots?",
+  "clear_confirm": "Clear unavailable robots",
+  "clearing_cannot_be_undone": "Clearing the list of unavailable robots on the Devices page cannot be undone.",
+  "successfully_deleted_unavail_robots": "Successfully deleted unavailable robots",
+  "no_unavail_robots_to_clear": "No unavailable robots to clear"
 }

@@ -128,15 +128,15 @@ class CheckCalibrationUserFlow:
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
             CheckCalibrationCommand.compare_point: self.update_comparison_map,
             CalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,
-            CalibrationCommand.move_to_reference_point: self.move_to_reference_point,  # noqa: E501
+            CalibrationCommand.move_to_reference_point: self.move_to_reference_point,
             CalibrationCommand.move_to_deck: self.move_to_deck,
             CalibrationCommand.move_to_point_one: self.move_to_point_one,
             DeckCalibrationCommand.move_to_point_two: self.move_to_point_two,
-            DeckCalibrationCommand.move_to_point_three: self.move_to_point_three,  # noqa: E501
+            DeckCalibrationCommand.move_to_point_three: self.move_to_point_three,
             CheckCalibrationCommand.switch_pipette: self.change_active_pipette,
             CheckCalibrationCommand.return_tip: self.return_tip,
             CheckCalibrationCommand.transition: self.transition,
-            CalibrationCommand.invalidate_last_action: self.invalidate_last_action,  # noqa: E501
+            CalibrationCommand.invalidate_last_action: self.invalidate_last_action,
             CalibrationCommand.exit: self.exit_session,
         }
         self._supported_commands = SupportedCommands(namespace="calibration")

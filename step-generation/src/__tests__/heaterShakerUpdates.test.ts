@@ -87,8 +87,7 @@ describe('heater shaker state updaters', () => {
     {
       params: {
         moduleId: moduleId,
-        // @ts-expect-error TODO: remove this after https://github.com/Opentrons/opentrons/pull/10182 merges
-        temperature: 50,
+        celsius: 50,
       },
       moduleStateBefore: {
         targetTemp: null,

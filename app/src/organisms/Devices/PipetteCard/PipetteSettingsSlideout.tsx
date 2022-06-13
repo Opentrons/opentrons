@@ -1,31 +1,52 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
-import { Flex, DIRECTION_COLUMN, useInterval } from '@opentrons/components'
+import { last } from 'lodash'
+import { useDispatch, useSelector } from 'react-redux'
+import { Flex, useInterval } from '@opentrons/components'
 import { PipetteModelSpecs } from '@opentrons/shared-data'
-import { fetchPipetteSettings } from '../../../redux/pipettes'
+import {
+  fetchPipetteSettings,
+  updatePipetteSettings,
+} from '../../../redux/pipettes'
 import { Slideout } from '../../../atoms/Slideout'
+import {
+  getRequestById,
+  PENDING,
+  useDispatchApiRequest,
+} from '../../../redux/robot-api'
+import { ConfigFormSubmitButton } from '../../ConfigurePipette/ConfigFormSubmitButton'
 import { ConfigurePipette } from '../../ConfigurePipette'
 
-import type { Mount } from '../../../redux/pipettes/types'
-import type { Dispatch } from '../../../redux/types'
+import type {
+  AttachedPipette,
+  PipetteSettingsFieldsUpdate,
+} from '../../../redux/pipettes/types'
+import type { Dispatch, State } from '../../../redux/types'
 
 const FETCH_PIPETTES_INTERVAL_MS = 5000
 
 interface PipetteSettingsSlideoutProps {
   robotName: string
-  mount: Mount
   pipetteName: PipetteModelSpecs['displayName']
   onCloseClick: () => unknown
   isExpanded: boolean
+  pipetteId: AttachedPipette['id']
 }
 
 export const PipetteSettingsSlideout = (
   props: PipetteSettingsSlideoutProps
 ): JSX.Element | null => {
-  const { pipetteName, mount, robotName, isExpanded, onCloseClick } = props
+  const { pipetteName, robotName, isExpanded, pipetteId, onCloseClick } = props
   const { t } = useTranslation('device_details')
   const dispatch = useDispatch<Dispatch>()
+  const [dispatchRequest, requestIds] = useDispatchApiRequest()
+  const updateSettings = (fields: PipetteSettingsFieldsUpdate): void => {
+    dispatchRequest(updatePipetteSettings(robotName, pipetteId, fields))
+  }
+  const latestRequestId = last(requestIds)
+  const updateRequest = useSelector((state: State) =>
+    latestRequestId != null ? getRequestById(state, latestRequestId) : null
+  )
 
   useInterval(
     () => {
@@ -40,15 +61,16 @@ export const PipetteSettingsSlideout = (
       title={t('pipette_settings', { pipetteName: pipetteName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
+      footer={
+        <ConfigFormSubmitButton disabled={updateRequest?.status === PENDING} />
+      }
     >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        data-testid={`PipetteSettingsSlideout_${robotName}_${mount}`}
-      >
+      <Flex data-testid={`PipetteSettingsSlideout_${robotName}_${pipetteId}`}>
         <ConfigurePipette
-          robotName={robotName}
-          mount={mount}
           closeModal={onCloseClick}
+          pipetteId={pipetteId}
+          updateRequest={updateRequest}
+          updateSettings={updateSettings}
         />
       </Flex>
     </Slideout>

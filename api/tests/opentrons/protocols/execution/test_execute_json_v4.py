@@ -70,9 +70,9 @@ def magnetic_module_command_map(mockObj):
 @pytest.fixture
 def temperature_module_command_map(mockObj):
     mock_temperature_module_command_map = {
-        JTMC.temperatureModuleSetTargetTemperature.value: mockObj._temperature_module_set_temp,  # noqa: E501
+        JTMC.temperatureModuleSetTargetTemperature.value: mockObj._temperature_module_set_temp,
         JTMC.temperatureModuleDeactivate.value: mockObj._temperature_module_deactivate,
-        JTMC.temperatureModuleAwaitTemperature.value: mockObj._temperature_module_await_temp,  # noqa: E501
+        JTMC.temperatureModuleAwaitTemperature.value: mockObj._temperature_module_await_temp,
     }
     return mock_temperature_module_command_map
 
@@ -84,8 +84,8 @@ def thermocycler_module_command_map(mockObj):
         JTHC.thermocyclerOpenLid.value: mockObj._thermocycler_open_lid,
         JTHC.thermocyclerDeactivateBlock.value: mockObj._thermocycler_deactivate_block,
         JTHC.thermocyclerDeactivateLid.value: mockObj._thermocycler_deactivate_lid,
-        JTHC.thermocyclerSetTargetBlockTemperature.value: mockObj._thermocycler_set_block_temperature,  # noqa: E501
-        JTHC.thermocyclerSetTargetLidTemperature.value: mockObj._thermocycler_set_lid_temperature,  # noqa: E501
+        JTHC.thermocyclerSetTargetBlockTemperature.value: mockObj._thermocycler_set_block_temperature,
+        JTHC.thermocyclerSetTargetLidTemperature.value: mockObj._thermocycler_set_lid_temperature,
         JTHC.thermocyclerRunProfile.value: mockObj._thermocycler_run_profile,
         # NOTE: the thermocyclerAwaitX commands are expected to always
         # follow a corresponding SetX command, which is implemented as

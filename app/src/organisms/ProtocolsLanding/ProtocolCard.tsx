@@ -73,6 +73,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       width="100%"
       position="relative"
+      cursor="pointer"
       onClick={() => history.push(`/protocols/${protocolKey}`)}
     >
       <AnalysisInfo
@@ -101,7 +102,7 @@ interface AnalysisInfoProps {
   protocolDisplayName: string
   modified: number
   isAnalyzing: boolean
-  mostRecentAnalysis?: ProtocolAnalysisOutput
+  mostRecentAnalysis?: ProtocolAnalysisOutput | null
 }
 function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   const {
@@ -187,7 +188,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                         leftMountPipetteName != null
                           ? getPipetteNameSpecs(leftMountPipetteName)
                               ?.displayName
-                          : t('not_used'),
+                          : t('shared:not_used'),
                     }[analysisStatus]
                   }
                 </StyledText>
@@ -211,7 +212,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                         rightMountPipetteName != null
                           ? getPipetteNameSpecs(rightMountPipetteName)
                               ?.displayName
-                          : t('not_used'),
+                          : t('shared:not_used'),
                     }[analysisStatus]
                   }
                 </StyledText>

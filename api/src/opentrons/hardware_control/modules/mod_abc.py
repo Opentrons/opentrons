@@ -171,9 +171,8 @@ class AbstractModule(abc.ABC):
         """A shortname used for looking up firmware, among other things"""
         pass
 
-    @classmethod
     @abc.abstractmethod
-    def bootloader(cls) -> UploadFunction:
+    def bootloader(self) -> UploadFunction:
         """Method used to upload file to this module's bootloader."""
         pass
 

@@ -35,12 +35,13 @@ import { InputField } from '../../../atoms/InputField'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { HeaterShakerWizard } from '../HeaterShakerWizard'
 import { useLatchControls } from './hooks'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 import { Collapsible } from './Collapsible'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
-  HeaterShakerSetTargetShakeSpeedCreateCommand,
-  HeaterShakerStopShakeCreateCommand,
+  HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
+  HeaterShakerDeactivateShakerCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface TestShakeSlideoutProps {
@@ -60,51 +61,53 @@ export const TestShakeSlideout = (
   const name = getModuleDisplayName(module.moduleModel)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    module,
+    runId != null ? runId : null
+  )
 
   const [showCollapsed, setShowCollapsed] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const isShaking = module.data.speedStatus !== 'idle'
 
-  const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
-    commandType: 'heaterShakerModule/setTargetShakeSpeed',
+  const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
+    commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
-      moduleId: module.id,
+      moduleId: runId != null ? moduleIdFromRun : module.id,
       rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
     },
   }
 
-  const stopShakeCommand: HeaterShakerStopShakeCreateCommand = {
-    commandType: 'heaterShakerModule/stopShake',
+  const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
+    commandType: 'heaterShaker/deactivateShaker',
     params: {
-      moduleId: module.id,
+      moduleId: runId != null ? moduleIdFromRun : module.id,
     },
   }
 
   const handleShakeCommand = (): void => {
-    if (shakeValue !== null) {
-      if (runId != null) {
-        createCommand({
-          runId: runId,
-          command: isShaking ? stopShakeCommand : setShakeCommand,
-        }).catch((e: Error) => {
-          console.error(
-            `error setting module status with command type ${
-              stopShakeCommand.commandType ?? setShakeCommand.commandType
-            }: ${e.message}`
-          )
-        })
-      } else {
-        createLiveCommand({
-          command: isShaking ? stopShakeCommand : setShakeCommand,
-        }).catch((e: Error) => {
-          console.error(
-            `error setting module status with command type ${
-              stopShakeCommand.commandType ?? setShakeCommand.commandType
-            }: ${e.message}`
-          )
-        })
-      }
+    if (runId != null) {
+      createCommand({
+        runId: runId,
+        command: isShaking ? stopShakeCommand : setShakeCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${
+            stopShakeCommand.commandType ?? setShakeCommand.commandType
+          }: ${e.message}`
+        )
+      })
+    } else {
+      createLiveCommand({
+        command: isShaking ? stopShakeCommand : setShakeCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${
+            stopShakeCommand.commandType ?? setShakeCommand.commandType
+          }: ${e.message}`
+        )
+      })
     }
     setShakeValue(null)
   }
@@ -121,16 +124,14 @@ export const TestShakeSlideout = (
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
-        <Flex marginTop={SPACING.spacing4}>
-          <PrimaryButton
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            width="100%"
-            onClick={onCloseClick}
-            data-testid={`Temp_Slideout_set_temp_btn_${name}`}
-          >
-            {t('close', { ns: 'shared' })}
-          </PrimaryButton>
-        </Flex>
+        <PrimaryButton
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          width="100%"
+          onClick={onCloseClick}
+          data-testid={`Temp_Slideout_set_temp_btn_${name}`}
+        >
+          {t('close', { ns: 'shared' })}
+        </PrimaryButton>
       }
     >
       <Flex
@@ -249,7 +250,7 @@ export const TestShakeSlideout = (
             marginTop={SPACING.spacing3}
             paddingX={SPACING.spacing4}
             onClick={handleShakeCommand}
-            disabled={!isLatchClosed}
+            disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
             {...targetProps}
           >
             {isShaking

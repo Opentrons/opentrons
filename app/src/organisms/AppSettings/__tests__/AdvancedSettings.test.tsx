@@ -2,8 +2,19 @@ import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { renderWithProviders } from '@opentrons/components'
+import {
+  renderWithProviders,
+  useConditionalConfirm,
+} from '@opentrons/components'
+import {
+  getReachableRobots,
+  getUnreachableRobots,
+} from '../../../redux/discovery'
 import { i18n } from '../../../i18n'
+import {
+  mockReachableRobot,
+  mockUnreachableRobot,
+} from '../../../redux/discovery/__fixtures__'
 import * as CustomLabware from '../../../redux/custom-labware'
 import * as Config from '../../../redux/config'
 import * as SystemInfo from '../../../redux/system-info'
@@ -16,6 +27,7 @@ jest.mock('../../../redux/calibration')
 jest.mock('../../../redux/custom-labware')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/system-info')
+jest.mock('@opentrons/components/src/hooks')
 
 const render = () => {
   return renderWithProviders(
@@ -28,6 +40,15 @@ const render = () => {
   )
 }
 
+const mockGetUnreachableRobots = getUnreachableRobots as jest.MockedFunction<
+  typeof getUnreachableRobots
+>
+const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
+  typeof getReachableRobots
+>
+const mockUseConditionalConfirm = useConditionalConfirm as jest.MockedFunction<
+  typeof useConditionalConfirm
+>
 const getCustomLabwarePath = CustomLabware.getCustomLabwareDirectory as jest.MockedFunction<
   typeof CustomLabware.getCustomLabwareDirectory
 >
@@ -59,6 +80,9 @@ const mockOpenPythonInterpreterDirectory = Config.openPythonInterpreterDirectory
   typeof Config.openPythonInterpreterDirectory
 >
 
+const mockConfirm = jest.fn()
+const mockCancel = jest.fn()
+
 describe('AdvancedSettings', () => {
   beforeEach(() => {
     getCustomLabwarePath.mockReturnValue('')
@@ -71,7 +95,14 @@ describe('AdvancedSettings', () => {
       { name: 'Alpha', value: 'alpha' },
     ])
     mockGetU2EAdapterDevice.mockReturnValue(Fixtures.mockWindowsRealtekDevice)
+    mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
+    mockGetReachableRobots.mockReturnValue([mockReachableRobot])
     mockGetU2EWindowsDriverStatus.mockReturnValue(SystemInfo.OUTDATED)
+    mockUseConditionalConfirm.mockReturnValue({
+      confirm: mockConfirm,
+      showConfirmation: true,
+      cancel: mockCancel,
+    })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -266,9 +297,24 @@ describe('AdvancedSettings', () => {
     getByText(
       'Clear the list of unavailable robots on the Devices page. This action cannot be undone.'
     )
-    getByRole('button', {
+    const btn = getByRole('button', {
       name: 'Clear unavailable robots list',
     })
+    fireEvent.click(btn)
+    getByText('Clear unavailable robots?')
+    getByText(
+      'Clearing the list of unavailable robots on the Devices page cannot be undone.'
+    )
+    const closeBtn = getByRole('button', {
+      name: 'cancel',
+    })
+    const proceedBtn = getByRole('button', {
+      name: 'Clear unavailable robots',
+    })
+    fireEvent.click(closeBtn)
+    expect(mockCancel).toHaveBeenCalled()
+    fireEvent.click(proceedBtn)
+    expect(mockConfirm).toHaveBeenCalled()
   })
   it('renders the developer tools section', () => {
     const [{ getByText, getByRole }] = render()

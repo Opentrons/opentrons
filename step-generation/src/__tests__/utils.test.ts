@@ -1,9 +1,14 @@
+import { when, resetAllWhenMocks } from 'jest-when'
 import {
   getLabwareDefURI,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
   LabwareDefinition2,
+  getIsLabwareAboveHeight,
+  MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
+  HEATERSHAKER_MODULE_TYPE,
+  PipetteNameSpecs,
 } from '@opentrons/shared-data'
 import {
   fixtureP10Single,
@@ -13,6 +18,7 @@ import _fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixture_tra
 import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import _fixtureTiprack10ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import pipetteNameSpecsFixtures from '@opentrons/shared-data/pipette/fixtures/name/pipetteNameSpecFixtures.json'
 import { FIXED_TRASH_ID, TEMPERATURE_DEACTIVATED } from '../constants'
 import {
   AIR,
@@ -27,18 +33,40 @@ import {
 } from '../utils/misc'
 import { Diff, thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 import { DEFAULT_CONFIG } from '../fixtures'
-import { orderWells, thermocyclerPipetteCollision } from '../utils'
-import type { RobotState } from '../'
 import {
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsTallLabwareEastWestOfHeaterShaker,
+  orderWells,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+} from '../utils'
+import type { RobotState } from '../'
+import type {
+  LabwareEntities,
+  LabwareEntity,
   ThermocyclerModuleState,
   ThermocyclerStateStepArgs,
   WellOrderOption,
 } from '../types'
+import { getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette } from '../utils/heaterShakerCollision'
+
+jest.mock('@opentrons/shared-data', () => {
+  const actualSharedData = jest.requireActual('@opentrons/shared-data')
+  return {
+    ...actualSharedData,
+    getIsLabwareAboveHeight: jest.fn(),
+  }
+})
 
 const fixtureTrash = _fixtureTrash as LabwareDefinition2
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixtureTiprack10ul = _fixtureTiprack10ul as LabwareDefinition2
 const fixtureTiprack300ul = _fixtureTiprack300ul as LabwareDefinition2
+
+const mockGetIsLabwareAboveHeight = getIsLabwareAboveHeight as jest.MockedFunction<
+  typeof getIsLabwareAboveHeight
+>
 
 describe('splitLiquid', () => {
   const singleIngred = {
@@ -847,5 +875,254 @@ describe('orderWells', () => {
         )
       })
     })
+  })
+})
+describe('getIsTallLabwareEastWestOfHeaterShaker', () => {
+  const fakeLabwareDef: any = {}
+  let labwareEntities: LabwareEntities
+  let labwareState: RobotState['labware']
+  beforeEach(() => {
+    labwareState = {
+      labwareId: { slot: '2' },
+    }
+    labwareEntities = {
+      labwareId: {
+        id: 'labwareId',
+        labwareDefURI: 'some_uri',
+        def: fakeLabwareDef,
+      },
+    }
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+  it('should return true when there is tall labware next to a heater shaker', () => {
+    when(mockGetIsLabwareAboveHeight)
+      .calledWith(fakeLabwareDef, MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM)
+      .mockReturnValue(true)
+    expect(
+      getIsTallLabwareEastWestOfHeaterShaker(labwareState, labwareEntities, '1')
+    ).toBe(true)
+  })
+  it('should return false when there is NO tall labware', () => {
+    when(mockGetIsLabwareAboveHeight)
+      .calledWith(
+        expect.any(Object),
+        MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
+      )
+      .mockReturnValue(false)
+    expect(
+      getIsTallLabwareEastWestOfHeaterShaker(labwareState, labwareEntities, '1')
+    ).toBe(false)
+  })
+  it('should return false when there is NO labware next to a heater shaker', () => {
+    labwareState.labwareId.slot = '9'
+    when(mockGetIsLabwareAboveHeight)
+      .calledWith(
+        expect.any(Object),
+        MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
+      )
+      .mockReturnValue(true)
+    expect(
+      getIsTallLabwareEastWestOfHeaterShaker(labwareState, labwareEntities, '1')
+    ).toBe(false)
+  })
+})
+describe('getIsHeaterShakerEastWestWithLatchOpen', () => {
+  let slot: string
+  let modules: RobotState['modules']
+  beforeEach(() => {
+    slot = '2'
+    modules = {
+      heaterShakerId: {
+        slot: '1',
+        moduleState: {
+          type: HEATERSHAKER_MODULE_TYPE,
+          targetTemp: null,
+          targetSpeed: null,
+          latchOpen: true,
+        },
+      },
+    }
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+  it('should return true when there is heater shaker with its latch open next to the labware', () => {
+    expect(getIsHeaterShakerEastWestWithLatchOpen(modules, slot)).toBe(true)
+  })
+  it('should return false when there is no heater shaker in the protocol', () => {
+    modules = {}
+    expect(getIsHeaterShakerEastWestWithLatchOpen(modules, slot)).toBe(false)
+  })
+  it('should return false when the heater shaker is not next to the labware', () => {
+    modules.heaterShakerId.slot = '6'
+    expect(getIsHeaterShakerEastWestWithLatchOpen(modules, slot)).toBe(false)
+  })
+  it('should return false when the heater shaker slot is closed', () => {
+    ;(modules.heaterShakerId.moduleState as any).latchOpen = false
+    expect(getIsHeaterShakerEastWestWithLatchOpen(modules, slot)).toBe(false)
+  })
+})
+describe('getIsHeaterShakerEastWestMultiChannelPipette', () => {
+  let slot: string
+  let modules: RobotState['modules']
+  let pipetteSpecs: PipetteNameSpecs
+  beforeEach(() => {
+    slot = '2'
+    modules = {
+      heaterShakerId: {
+        slot: '1',
+        moduleState: {
+          type: HEATERSHAKER_MODULE_TYPE,
+          targetTemp: null,
+          targetSpeed: null,
+          latchOpen: true,
+        },
+      },
+    }
+    pipetteSpecs = pipetteNameSpecsFixtures.p10_multi as PipetteNameSpecs
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+  it('should return true when there is a heater shaker east west and the pipette is a multi channel', () => {
+    expect(
+      getIsHeaterShakerEastWestMultiChannelPipette(modules, slot, pipetteSpecs)
+    ).toBe(true)
+  })
+  it('should return false when there the pipette is not a multi channel', () => {
+    pipetteSpecs = pipetteNameSpecsFixtures.p1000_single as PipetteNameSpecs
+    expect(
+      getIsHeaterShakerEastWestMultiChannelPipette(modules, slot, pipetteSpecs)
+    ).toBe(false)
+  })
+  it('should return false when the HS is not next to the slot', () => {
+    pipetteSpecs = pipetteNameSpecsFixtures.p1000_single as PipetteNameSpecs
+    slot = '11'
+    expect(
+      getIsHeaterShakerEastWestMultiChannelPipette(modules, slot, pipetteSpecs)
+    ).toBe(false)
+  })
+})
+describe('getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette', () => {
+  let slot: string
+  let modules: RobotState['modules']
+  let pipetteSpecs: PipetteNameSpecs
+  let labwareEntity: LabwareEntity
+  beforeEach(() => {
+    slot = '4'
+    modules = {
+      heaterShakerId: {
+        slot: '1',
+        moduleState: {
+          type: HEATERSHAKER_MODULE_TYPE,
+          targetTemp: null,
+          targetSpeed: null,
+          latchOpen: true,
+        },
+      },
+    }
+    pipetteSpecs = pipetteNameSpecsFixtures.p10_multi as PipetteNameSpecs
+    labwareEntity = {
+      id: 'fixture96PlateId',
+      labwareDefURI: getLabwareDefURI(fixture96Plate),
+      def: fixture96Plate,
+    }
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+  it('should return true when there is a heater shaker north/south and the pipette is a multi channel and the labware is not a tiprack', () => {
+    expect(
+      getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
+        modules,
+        slot,
+        pipetteSpecs,
+        labwareEntity
+      )
+    ).toBe(true)
+  })
+  it('should return false when the labware is not a tiprack', () => {
+    labwareEntity = {
+      id: 'fixtureTiprack10ulId',
+      labwareDefURI: getLabwareDefURI(fixtureTiprack10ul),
+      def: fixtureTiprack10ul,
+    }
+    expect(
+      getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
+        modules,
+        slot,
+        pipetteSpecs,
+        labwareEntity
+      )
+    ).toBe(false)
+  })
+  it('should return false when the labware is not north/south of a heater shaker', () => {
+    slot = '2'
+    expect(
+      getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
+        modules,
+        slot,
+        pipetteSpecs,
+        labwareEntity
+      )
+    ).toBe(false)
+  })
+})
+
+describe('pipetteAdjacentHeaterShakerWhileShaking', () => {
+  let slot: string
+  let modules: RobotState['modules']
+  beforeEach(() => {
+    slot = '2'
+    modules = {
+      heaterShakerId: {
+        slot: '1',
+        moduleState: {
+          type: HEATERSHAKER_MODULE_TYPE,
+          targetTemp: null,
+          targetSpeed: null,
+          latchOpen: null,
+        },
+      },
+    }
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+  it('should return false when there are no modules', () => {
+    modules = {}
+    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(false)
+  })
+  it('should return false when there is no heater shaker ajacent to labware', () => {
+    slot = '9'
+    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(false)
+  })
+  it('should return false when the heater shaker is not shaking', () => {
+    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(false)
+  })
+  it('should return true when there is a heater shaker north of labware shaking', () => {
+    modules.heaterShakerId.slot = '5'
+    ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
+    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(true)
+  })
+  it('should return true when there is a heater shaker south of labware shaking', () => {
+    slot = '9'
+    modules.heaterShakerId.slot = '6'
+    ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
+    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(true)
+  })
+  it('should return true when there is a heater shaker east of labware shaking', () => {
+    slot = '5'
+    modules.heaterShakerId.slot = '6'
+    ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
+    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(true)
+  })
+  it('should return true when there is a heater shaker west of labware shaking', () => {
+    slot = '5'
+    modules.heaterShakerId.slot = '4'
+    ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
+    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(true)
   })
 })

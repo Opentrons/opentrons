@@ -315,7 +315,7 @@ describe('steps actions', () => {
         {
           commands: [
             {
-              commandType: 'heaterShakerModule/awaitTemperature',
+              commandType: 'heaterShaker/waitForTemperature',
 
               params: {
                 moduleId: 'heaterShakerId',
@@ -362,7 +362,7 @@ describe('steps actions', () => {
                 {
                   commands: [
                     {
-                      commandType: 'heaterShakerModule/awaitTemperature',
+                      commandType: 'heaterShaker/waitForTemperature',
                       params: {
                         moduleId: 'heaterShakerId',
                       },

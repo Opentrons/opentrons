@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { saveAs } from 'file-saver'
 import { useTranslation } from 'react-i18next'
 
@@ -15,8 +15,10 @@ import {
   TEXT_DECORATION_UNDERLINE,
   useHoverTooltip,
   TOOLTIP_LEFT,
-  useConditionalConfirm,
   Mount,
+  SpinnerModalPage,
+  AlertModal,
+  useInterval,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
@@ -29,7 +31,7 @@ import { DeckCalibrationModal } from '../../../organisms/ProtocolSetup/RunSetupC
 import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
 import { formatLastModified } from '../../../organisms/CalibrationPanels/utils'
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
-
+import { CheckCalibration } from '../../../organisms/CheckCalibration'
 import { useTrackEvent } from '../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
 import { getDeckCalibrationSession } from '../../../redux/sessions/deck-calibration/selectors'
@@ -38,27 +40,39 @@ import { selectors as robotSelectors } from '../../../redux/robot'
 import * as RobotApi from '../../../redux/robot-api'
 import * as Config from '../../../redux/config'
 import * as Sessions from '../../../redux/sessions'
+import * as Calibration from '../../../redux/calibration'
+import * as Pipettes from '../../../redux/pipettes'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
+  useDeckCalibrationStatus,
+  useIsRobotBusy,
   useAttachedPipettes,
+  useAttachedPipetteCalibrations,
+  useRunStartedOrLegacySessionInProgress,
 } from '../hooks'
-import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 
-import type { State } from '../../../redux/types'
+import type { State, Dispatch } from '../../../redux/types'
 import type { RequestState } from '../../../redux/robot-api/types'
 import type {
   SessionCommandString,
   DeckCalibrationSession,
 } from '../../../redux/sessions/types'
 import type { DeckCalibrationInfo } from '../../../redux/calibration/types'
+import type {
+  AttachedPipettesByMount,
+  PipetteCalibrationsByMount,
+} from '../../../redux/pipettes/types'
+
+const CALS_FETCH_MS = 5000
 
 interface CalibrationProps {
   robotName: string
+  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 export interface FormattedPipetteOffsetCalibration {
@@ -82,8 +96,20 @@ const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
 
+const attachedPipetteCalPresent: (
+  pipettes: AttachedPipettesByMount,
+  pipetteCalibrations: PipetteCalibrationsByMount
+) => boolean = (pipettes, pipetteCalibrations) =>
+  !Pipettes.PIPETTE_MOUNTS.some(
+    mount =>
+      pipettes?.[mount] != null &&
+      (pipetteCalibrations[mount]?.offset == null ||
+        pipetteCalibrations[mount]?.tipLength == null)
+  )
+
 export function RobotSettingsCalibration({
   robotName,
+  updateRobotStatus,
 }: CalibrationProps): JSX.Element {
   const { t } = useTranslation([
     'device_settings',
@@ -110,11 +136,17 @@ export function RobotSettingsCalibration({
     pipetteOffsetCalBannerType,
     setPipetteOffsetCalBannerType,
   ] = React.useState<string>('')
-
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
+  const isRunStartedOrLegacySessionInProgress = useRunStartedOrLegacySessionInProgress()
+  const isBusy = useIsRobotBusy()
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
+  const deckCalStatus = useSelector((state: State) => {
+    return Calibration.getDeckCalibrationStatus(state, robotName)
+  })
+  const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
+  const dispatch = useDispatch<Dispatch>()
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -151,13 +183,17 @@ export function RobotSettingsCalibration({
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
   const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
   const attachedPipettes = useAttachedPipettes()
+  const attachedPipetteCalibrations = useAttachedPipetteCalibrations(robotName)
 
   const isRunning = useSelector(robotSelectors.getIsRunning)
 
+  const pipetteCalPresent = attachedPipetteCalPresent(
+    attachedPipettes,
+    attachedPipetteCalibrations
+  )
+
   const pipettePresent =
-    attachedPipettes != null
-      ? !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
-      : false
+    !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
 
   const isPending =
     useSelector<State, RequestState | null>(state =>
@@ -171,6 +207,7 @@ export function RobotSettingsCalibration({
       ? RobotApi.getRequestById(state, createRequestId.current)
       : null
   )
+
   const createStatus = createRequest?.status
 
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
@@ -188,24 +225,13 @@ export function RobotSettingsCalibration({
     )
   }
 
-  const pipOffsetDataPresent =
-    pipetteOffsetCalibrations != null
-      ? pipetteOffsetCalibrations.length > 0
-      : false
-
   const deckCalibrationSession: DeckCalibrationSession | null = useSelector(
     (state: State) => {
       return getDeckCalibrationSession(state, robotName)
     }
   )
 
-  const {
-    showConfirmation: showConfirmStart,
-    confirm: confirmStart,
-    cancel: cancelStart,
-  } = useConditionalConfirm(handleStartDeckCalSession, !!pipOffsetDataPresent)
-
-  let buttonDisabledReason = null
+  let buttonDisabledReason: string | null = null
   if (notConnectable) {
     buttonDisabledReason = t('shared:disabled_cannot_connect')
   } else if (isRunning) {
@@ -214,7 +240,18 @@ export function RobotSettingsCalibration({
     buttonDisabledReason = t('shared:disabled_no_pipette_attached')
   }
 
-  const healthCheckButtonDisabled = Boolean(buttonDisabledReason) || isPending
+  const healthCheckIsPossible =
+    !([
+      Calibration.DECK_CAL_STATUS_SINGULARITY,
+      Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
+      Calibration.DECK_CAL_STATUS_IDENTITY,
+    ] as Array<typeof deckCalStatus>).includes(deckCalStatus) &&
+    pipetteCalPresent &&
+    pipettePresent
+
+  const calCheckButtonDisabled = healthCheckIsPossible
+    ? Boolean(buttonDisabledReason) || isPending
+    : true
 
   const onClickSaveAs: React.MouseEventHandler = e => {
     e.preventDefault()
@@ -234,9 +271,10 @@ export function RobotSettingsCalibration({
     )
   }
 
-  const deckCalibrationButtonText = deckCalibrationData.isDeckCalibrated
-    ? t('deck_calibration_recalibrate_button')
-    : t('deck_calibration_calibrate_button')
+  const deckCalibrationButtonText =
+    deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_IDENTITY
+      ? t('deck_calibration_recalibrate_button')
+      : t('deck_calibration_calibrate_button')
 
   const disabledOrBusyReason = isPending
     ? t('robot_calibration:deck_calibration_spinner', {
@@ -257,25 +295,47 @@ export function RobotSettingsCalibration({
       : t('not_calibrated')
   }
 
+  const checkHealthSession = useSelector((state: State) => {
+    const session: Sessions.Session | null = Sessions.getRobotSessionOfType(
+      state,
+      robotName,
+      Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
+    )
+    if (
+      session &&
+      session.sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
+    ) {
+      return session
+    }
+    return null
+  })
+
   const handleHealthCheck = (
     hasBlockModalResponse: boolean | null = null
   ): void => {
-    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
-      setShowCalBlockModal(true)
+    if (isBusy) {
+      updateRobotStatus(true)
     } else {
-      setShowCalBlockModal(false)
-      dispatchRequests(
-        Sessions.ensureSession(
-          robotName,
-          Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
-          {
-            tipRacks: [],
-            hasCalibrationBlock: Boolean(
-              configHasCalibrationBlock ?? hasBlockModalResponse
-            ),
-          }
+      if (
+        hasBlockModalResponse === null &&
+        configHasCalibrationBlock === null
+      ) {
+        setShowCalBlockModal(true)
+      } else {
+        setShowCalBlockModal(false)
+        dispatchRequests(
+          Sessions.ensureSession(
+            robotName,
+            Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+            {
+              tipRacks: [],
+              hasCalibrationBlock: Boolean(
+                configHasCalibrationBlock ?? hasBlockModalResponse
+              ),
+            }
+          )
         )
-      )
+      }
     }
   }
 
@@ -329,9 +389,18 @@ export function RobotSettingsCalibration({
   }
 
   const checkPipetteCalibrationMissing = (): void => {
+    // checked the number of attached pipettes
+    const numberOfAttached =
+      attachedPipettes != null &&
+      Object.keys(attachedPipettes)
+        .map(mount => attachedPipettes[mount as Mount] != null)
+        .filter(x => x).length
+    const isPipettesNumberMatched =
+      numberOfAttached === formatPipetteOffsetCalibrations().length
     if (
       pipetteOffsetCalibrations === null ||
-      Object.values(pipetteOffsetCalibrations).length <= 1
+      (Object.values(pipetteOffsetCalibrations).length <= 1 &&
+        isPipettesNumberMatched)
     ) {
       setShowPipetteOffsetCalibrationBanner(true)
       setPipetteOffsetCalBannerType('error')
@@ -344,12 +413,37 @@ export function RobotSettingsCalibration({
             (p.pipette === left && p.status.markedBad) ||
             (p.pipette === right && p.status.markedBad)
         ) ?? null
-      if (markedBads !== null) {
+      if (markedBads.length !== 0 && isPipettesNumberMatched) {
         setShowPipetteOffsetCalibrationBanner(true)
         setPipetteOffsetCalBannerType('warning')
       } else {
         setShowPipetteOffsetCalibrationBanner(false)
       }
+    }
+  }
+
+  const handleClickDeckCalibration = (): void => {
+    if (isRunStartedOrLegacySessionInProgress) {
+      updateRobotStatus(true)
+    } else {
+      handleStartDeckCalSession()
+    }
+  }
+
+  const checkDeckCalibrationStatus = (): 'error' | 'warning' | null => {
+    if (
+      deckCalibrationStatus &&
+      deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_OK
+    ) {
+      return 'error'
+    } else if (
+      !Array.isArray(deckCalibrationData.deckCalibrationData) &&
+      deckCalibrationData?.deckCalibrationData?.status != null &&
+      deckCalibrationData?.deckCalibrationData?.status.markedBad
+    ) {
+      return 'warning'
+    } else {
+      return null
     }
   }
 
@@ -359,9 +453,18 @@ export function RobotSettingsCalibration({
     }
   }, [createStatus])
 
-  React.useEffect(() => {
-    checkPipetteCalibrationMissing()
-  }, [pipettePresent, pipetteOffsetCalibrations])
+  // Note: following fetch need to reflect the latest state of calibrations
+  // when a user does calibration or rename a robot.
+  useInterval(
+    () => {
+      dispatch(Calibration.fetchCalibrationStatus(robotName))
+      dispatch(Calibration.fetchPipetteOffsetCalibrations(robotName))
+      dispatch(Calibration.fetchTipLengthCalibrations(robotName))
+      checkPipetteCalibrationMissing()
+    },
+    CALS_FETCH_MS,
+    true
+  )
 
   return (
     <>
@@ -380,13 +483,52 @@ export function RobotSettingsCalibration({
             closePrompt={() => setShowCalBlockModal(false)}
           />
         ) : null}
-        {showConfirmStart && pipOffsetDataPresent && (
-          <DeckCalibrationConfirmModal
-            confirm={confirmStart}
-            cancel={cancelStart}
+
+        {createStatus === RobotApi.PENDING ? (
+          <SpinnerModalPage
+            titleBar={{
+              title: t('robot_calibration:health_check_title'),
+              back: {
+                disabled: true,
+                title: t('shared:exit'),
+                children: t('shared:exit'),
+              },
+            }}
           />
+        ) : null}
+        <CheckCalibration
+          session={checkHealthSession}
+          robotName={robotName}
+          dispatchRequests={dispatchRequests}
+          showSpinner={isPending}
+          isJogging={isJogging}
+        />
+        {createStatus === RobotApi.FAILURE && (
+          <AlertModal
+            alertOverlay
+            heading={t('robot_calibration:deck_calibration_failure')}
+            buttons={[
+              {
+                children: t('shared:ok'),
+                onClick: () => {
+                  createRequestId.current &&
+                    dispatch(RobotApi.dismissRequest(createRequestId.current))
+                  createRequestId.current = null
+                },
+              },
+            ]}
+          >
+            <StyledText>{t('deck_calibration_error_occurred')}</StyledText>
+            <StyledText>
+              {createRequest != null &&
+                'error' in createRequest &&
+                createRequest.error != null &&
+                RobotApi.getErrorResponseMessage(createRequest.error)}
+            </StyledText>
+          </AlertModal>
         )}
       </Portal>
+      {/* Calibration Data Download Section */}
       <Box paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
@@ -414,18 +556,28 @@ export function RobotSettingsCalibration({
         </Flex>
       </Box>
       <Line />
-      {deckCalibrationButtonText === t('deck_calibration_calibrate_button') && (
-        <Banner type="error">
+      {/* DeckCalibration Section */}
+      {checkDeckCalibrationStatus() !== null && (
+        <Banner
+          marginTop={SPACING.spacing5}
+          type={checkDeckCalibrationStatus() === 'error' ? 'error' : 'warning'}
+        >
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-            <StyledText as="p">{t('deck_calibration_missing')}</StyledText>
+            <StyledText as="p">
+              {checkDeckCalibrationStatus() === 'error'
+                ? t('deck_calibration_missing')
+                : t('deck_calibration_recommended')}
+            </StyledText>
             <Link
               role="button"
               color={COLORS.darkBlack}
               css={TYPOGRAPHY.pRegular}
               textDecoration={TEXT_DECORATION_UNDERLINE}
-              onClick={() => confirmStart()}
+              onClick={() => handleClickDeckCalibration()}
             >
-              {t('calibrate_now')}
+              {checkDeckCalibrationStatus() === 'error'
+                ? t('calibrate_now')
+                : t('recalibrate_now')}
             </Link>
           </Flex>
         </Banner>
@@ -442,14 +594,15 @@ export function RobotSettingsCalibration({
             <StyledText as="label">{deckLastModified()}</StyledText>
           </Box>
           <TertiaryButton
-            onClick={() => confirmStart()}
-            disabled={disabledOrBusyReason !== null}
+            onClick={() => handleClickDeckCalibration()}
+            disabled={disabledOrBusyReason != null}
           >
             {deckCalibrationButtonText}
           </TertiaryButton>
         </Flex>
       </Box>
       <Line />
+      {/* Pipette Offset Calibration Section */}
       {showPipetteOffsetCalibrationBanner && (
         <Banner
           type={pipetteOffsetCalBannerType === 'error' ? 'error' : 'warning'}
@@ -472,6 +625,7 @@ export function RobotSettingsCalibration({
               <PipetteOffsetCalibrationItems
                 robotName={robotName}
                 formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
+                updateRobotStatus={updateRobotStatus}
               />
             ) : (
               <StyledText as="label">{t('not_calibrated')}</StyledText>
@@ -480,6 +634,7 @@ export function RobotSettingsCalibration({
         </Flex>
       </Box>
       <Line />
+      {/* Tip Length Calibration Section */}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER}>
           <Box marginRight={SPACING.spacing6}>
@@ -495,6 +650,7 @@ export function RobotSettingsCalibration({
                 robotName={robotName}
                 formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
                 formattedTipLengthCalibrations={formatTipLengthCalibrations()}
+                updateRobotStatus={updateRobotStatus}
               />
             ) : (
               <StyledText as="label">{t('not_calibrated')}</StyledText>
@@ -503,6 +659,7 @@ export function RobotSettingsCalibration({
         </Flex>
       </Box>
       <Line />
+      {/* Calibration Health Check Section */}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
@@ -516,11 +673,11 @@ export function RobotSettingsCalibration({
           <TertiaryButton
             {...targetProps}
             onClick={() => handleHealthCheck(null)}
-            disabled={healthCheckButtonDisabled}
+            disabled={calCheckButtonDisabled}
           >
             {t('health_check_button')}
           </TertiaryButton>
-          {healthCheckButtonDisabled && (
+          {calCheckButtonDisabled && (
             <Tooltip tooltipProps={tooltipProps}>
               {t('fully_calibrate_before_checking_health')}
             </Tooltip>

@@ -217,12 +217,55 @@ export const getAreSlotsHorizontallyAdjacent = (
   const xPositionSlotA = slotAPosition[0]
   const xPositionSlotB = slotBPosition[0]
 
-  const areSlotsAdjacent =
+  const areSlotsHorizontallyAdjacent =
     yPositionSlotA === yPositionSlotB &&
     Math.abs(xPositionSlotA - xPositionSlotB) === slotWidth
 
-  return areSlotsAdjacent
+  return areSlotsHorizontallyAdjacent
 }
+export const getAreSlotsVerticallyAdjacent = (
+  slotNameA?: string | null,
+  slotNameB?: string | null
+): boolean => {
+  if (slotNameA == null || slotNameB == null) {
+    return false
+  }
+  const slotANumber = parseInt(slotNameA)
+  const slotBNumber = parseInt(slotNameB)
+
+  if (isNaN(slotBNumber) || isNaN(slotANumber)) {
+    return false
+  }
+  const orderedSlots = standardDeckDef.locations.orderedSlots
+  // intentionally not substracting by 1 because trash (slot 12) should not count
+  const numSlots = orderedSlots.length
+
+  if (slotBNumber > numSlots || slotANumber > numSlots) {
+    return false
+  }
+  // take the y coord of slot 4, and subtact from y coord of slot 1
+  const slotHeight = orderedSlots[3].position[1] - orderedSlots[0].position[1]
+  const slotAPosition = orderedSlots[slotANumber - 1].position
+  const slotBPosition = orderedSlots[slotBNumber - 1].position
+
+  const yPositionSlotA = slotAPosition[1]
+  const yPositionSlotB = slotBPosition[1]
+
+  const xPositionSlotA = slotAPosition[0]
+  const xPositionSlotB = slotBPosition[0]
+
+  const areSlotsVerticallyAdjacent =
+    xPositionSlotA === xPositionSlotB &&
+    Math.abs(yPositionSlotA - yPositionSlotB) === slotHeight
+
+  return areSlotsVerticallyAdjacent
+}
+export const getAreSlotsAdjacent = (
+  slotNameA?: string | null,
+  slotNameB?: string | null
+): boolean =>
+  getAreSlotsHorizontallyAdjacent(slotNameA, slotNameB) ||
+  getAreSlotsVerticallyAdjacent(slotNameA, slotNameB)
 
 export const getIsLabwareAboveHeight = (
   labwareDef: LabwareDefinition2,

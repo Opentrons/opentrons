@@ -223,9 +223,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         width={'100%'}
         data-testid={`ModuleCard_${module.serialNumber}`}
       >
-        {showWizard && (
-          <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
-        )}
+        {showWizard &&
+          (runId != null ? (
+            <HeaterShakerWizard
+              onCloseClick={() => setShowWizard(false)}
+              runId={runId}
+            />
+          ) : (
+            <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
+          ))}
         {showSlideout && runId != null ? (
           <ModuleSlideout
             module={module}
@@ -411,9 +417,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           )}
         </Box>
         {showOverflowMenu && (
-          <div
+          <Box
             ref={moduleOverflowWrapperRef}
             data-testid={`ModuleCard_overflow_menu_${module.serialNumber}`}
+            onClick={() => setShowOverflowMenu(false)}
           >
             <ModuleOverflowMenu
               handleAboutClick={handleAboutClick}
@@ -423,7 +430,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               handleTestShakeClick={handleTestShakeClick}
               handleWizardClick={handleWizardClick}
             />
-          </div>
+          </Box>
         )}
       </Flex>
     </React.Fragment>

@@ -136,7 +136,6 @@ export function HistoricalProtocolRunOffsetDrawer(
       </Flex>
       {uniqueLabwareOffsets.map((offset, index) => {
         let labwareName = offset.definitionUri
-        console.log()
         if (labwareDetails != null) {
           labwareName =
             Object.values(labwareDetails)?.find(labware =>

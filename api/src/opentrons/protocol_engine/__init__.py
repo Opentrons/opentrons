@@ -8,7 +8,14 @@ protocol state and side-effects like robot movements.
 from .create_protocol_engine import create_protocol_engine
 from .protocol_engine import ProtocolEngine
 from .errors import ProtocolEngineError, ErrorOccurrence
-from .commands import Command, CommandParams, CommandCreate, CommandStatus, CommandType
+from .commands import (
+    Command,
+    CommandParams,
+    CommandCreate,
+    CommandStatus,
+    CommandType,
+    CommandIntent,
+)
 from .state import (
     State,
     StateView,
@@ -56,6 +63,7 @@ __all__ = [
     "CommandCreate",
     "CommandStatus",
     "CommandType",
+    "CommandIntent",
     # state interfaces and models
     "State",
     "StateView",

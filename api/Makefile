@@ -136,20 +136,11 @@ docs/build/html/hardware: docs/hardware src/opentrons/hardware_control
 	$(SHX) mkdir $@/_images/
 	$(SHX) cp docs/img/lightbulb.jpg $@/_images/
 
-docs/build/pdf/OpentronsPythonAPIV%.pdf: docs/v%
-	$(sphinx_build_allow_warnings) -b latex -d docs/build/doctrees $< $(@D)
-	$(MAKE) -C $(@D) all-pdf $(if $(CI),>/dev/null,|| $(SHX) echo "latex build failed (pdflatex not installed?)")
-	$(SHX) ls $(@D)/*.pdf $(if $(CI),,|| $(SHX) echo "no pdf produced")
-
-docs/build/pdf/OT2HardwareControl.pdf: docs/hardware
-	$(sphinx_build_allow_warnings) -b latex -d docs/build/doctrees $< $(@D)
-	$(MAKE) -C $(@D) all-pdf $(if $(CI),>/dev/null,|| $(SHX) echo "latex build failed (pdflatex not installed)")
-
-docs/dist/v%: docs/build/html/v% docs/build/pdf/OpentronsPythonAPIV%.pdf
+docs/dist/v%: docs/build/html/v%
 	$(SHX) mkdir -p $@
 	$(SHX) cp -R $^ $(@D) $(if $(CI),,|| true)
 
-docs/dist/hardware: docs/build/html/hardware docs/build/pdf/OT2HardwareControl.pdf
+docs/dist/hardware: docs/build/html/hardware
 	$(SHX) mkdir -p $@
 	$(SHX) cp -R $^ $(@D) $(if $(CI),,|| true)
 

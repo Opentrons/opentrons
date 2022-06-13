@@ -31,6 +31,7 @@ def run() -> Run:
         errors=[],
         pipettes=[],
         labware=[],
+        modules=[],
         labwareOffsets=[],
         protocolId=None,
     )

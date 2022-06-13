@@ -9,11 +9,13 @@ import {
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_V2,
+  getIsLabwareAboveHeight,
 } from '@opentrons/shared-data'
 import {
   getMockDeckSetup,
   getMockMagneticModule,
   getMockTemperatureModule,
+  getMockHeaterShakerModule,
   // @ts-expect-error(sa, 2021-6-27): TODO: add another ts config for /fixtures, or move them into src
 } from '../../../../../fixtures/state/deck'
 import {
@@ -36,6 +38,13 @@ import { ModelDropdown } from '../ModelDropdown'
 import { SlotDropdown } from '../SlotDropdown'
 import { ConnectedSlotMap } from '../ConnectedSlotMap'
 
+jest.mock('@opentrons/shared-data', () => {
+  const actualSharedData = jest.requireActual('@opentrons/shared-data')
+  return {
+    ...actualSharedData,
+    getIsLabwareAboveHeight: jest.fn(),
+  }
+})
 jest.mock('../../../../utils/labwareModuleCompatibility')
 jest.mock('../../../../feature-flags')
 jest.mock('../../../../step-forms/selectors')
@@ -62,6 +71,8 @@ const getSlotIsEmptyMock: jest.MockedFunction<any> = getSlotIsEmpty
 
 const getLabwareOnSlotMock: jest.MockedFunction<any> = getLabwareOnSlot
 
+const getIsLabwareAboveHeightMock: jest.MockedFunction<any> = getIsLabwareAboveHeight
+
 describe('Edit Modules Modal', () => {
   let mockStore: any
   let props: EditModulesModalProps
@@ -69,6 +80,7 @@ describe('Edit Modules Modal', () => {
     getInitialDeckSetupMock.mockReturnValue(getMockDeckSetup())
     getSlotsBlockedBySpanningMock.mockReturnValue([])
     getLabwareOnSlotMock.mockReturnValue({})
+    getIsLabwareAboveHeightMock.mockReturnValue(false)
     props = {
       moduleOnDeck: null,
       moduleType: MAGNETIC_MODULE_TYPE,
@@ -152,6 +164,40 @@ describe('Edit Modules Modal', () => {
       const wrapper = render(props)
       expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toMatch(
         'labware incompatible'
+      )
+    })
+
+    it('should error when selecting a heater shaker and there is a module adjacent', () => {
+      const initialDeckSetup = getMockDeckSetup()
+      getInitialDeckSetupMock.mockReturnValue({
+        ...initialDeckSetup,
+        modules: {
+          ...initialDeckSetup.modules,
+          mag_mod: {
+            // move the mag mod to slot 2 (next to H-S)
+            slot: '2',
+          },
+        },
+      })
+      props.moduleOnDeck = getMockHeaterShakerModule()
+      const wrapper = render(props)
+      expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toMatch(
+        'The Heater-Shaker cannot be placed in front of or behind another module'
+      )
+    })
+    it('should error when selecting a module when there is a heater shaker adjacent', () => {
+      const initialDeckSetup = getMockDeckSetup()
+      getInitialDeckSetupMock.mockReturnValue({
+        ...initialDeckSetup,
+        modules: {
+          ...initialDeckSetup.modules,
+          hs_mod: { ...getMockHeaterShakerModule(), slot: '10' },
+        },
+      })
+      props.moduleOnDeck = getMockMagneticModule()
+      const wrapper = render(props)
+      expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toMatch(
+        'Other modules cannot be placed in front of or behind a Heater-Shaker.'
       )
     })
     it('should NOT error when labware is compatible', () => {

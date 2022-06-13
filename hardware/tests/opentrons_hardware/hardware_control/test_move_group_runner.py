@@ -1,6 +1,6 @@
 """Tests for the move scheduler."""
 import pytest
-from typing import List, Tuple, Any
+from typing import List, Any
 from numpy import float64
 from mock import AsyncMock, call, MagicMock
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
@@ -30,6 +30,7 @@ from opentrons_hardware.hardware_control.motion import (
 from opentrons_hardware.hardware_control.move_group_runner import (
     MoveGroupRunner,
     MoveScheduler,
+    _CompletionPacket,
 )
 from opentrons_hardware.hardware_control.types import NodeMap
 from opentrons_hardware.firmware_bindings.messages import (
@@ -173,9 +174,8 @@ async def test_single_group_clear(
     """It should send a clear group command before setup."""
     subject = MoveGroupRunner(move_groups=move_group_single)
     await subject._clear_groups(can_messenger=mock_can_messenger)
-    mock_can_messenger.send.assert_called_once_with(
-        node_id=NodeId.broadcast,
-        message=md.ClearAllMoveGroupsRequest(),
+    mock_can_messenger.send.assert_has_calls(
+        [call(node_id=NodeId.broadcast, message=md.ClearAllMoveGroupsRequest())],
     )
 
 
@@ -184,10 +184,9 @@ async def test_multi_group_clear(
 ) -> None:
     """It should send a clear group command before setup."""
     subject = MoveGroupRunner(move_groups=move_group_multiple)
-    await subject._clear_groups(can_messenger=mock_can_messenger)
-    mock_can_messenger.send.assert_called_once_with(
-        node_id=NodeId.broadcast,
-        message=md.ClearAllMoveGroupsRequest(),
+    await subject.prep(can_messenger=mock_can_messenger)
+    mock_can_messenger.send.assert_has_calls(
+        [call(node_id=NodeId.broadcast, message=md.ClearAllMoveGroupsRequest())],
     )
 
 
@@ -196,7 +195,7 @@ async def test_home(
 ) -> None:
     """Test Home Request Functionality."""
     subject = MoveGroupRunner(move_groups=move_group_home_single)
-    await subject._send_groups(can_messenger=mock_can_messenger)
+    await subject.prep(can_messenger=mock_can_messenger)
     step = move_group_home_single[0][0].get(NodeId.head)
     assert isinstance(step, MoveGroupSingleAxisStep)
     mock_can_messenger.send.assert_any_call(
@@ -217,7 +216,7 @@ async def test_single_send_setup_commands(
 ) -> None:
     """It should send all the move group set up commands."""
     subject = MoveGroupRunner(move_groups=move_group_single)
-    await subject._send_groups(can_messenger=mock_can_messenger)
+    await subject.prep(can_messenger=mock_can_messenger)
     step = move_group_single[0][0].get(NodeId.head)
     assert isinstance(step, MoveGroupSingleAxisStep)
     mock_can_messenger.send.assert_any_call(
@@ -240,7 +239,7 @@ async def test_multi_send_setup_commands(
 ) -> None:
     """It should send all the move group set up commands."""
     subject = MoveGroupRunner(move_groups=move_group_multiple)
-    await subject._send_groups(can_messenger=mock_can_messenger)
+    await subject.prep(can_messenger=mock_can_messenger)
 
     # Group 0
     step = move_group_multiple[0][0].get(NodeId.head)
@@ -549,7 +548,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
     ],
 )
 def test_accumulate_move_completions(
-    completions: List[Tuple[ArbitrationId, MoveCompleted]], position_map: NodeMap[float]
+    completions: List[_CompletionPacket], position_map: NodeMap[float]
 ) -> None:
     """Build correct move results."""
     assert MoveGroupRunner._accumulate_move_completions(completions) == position_map
