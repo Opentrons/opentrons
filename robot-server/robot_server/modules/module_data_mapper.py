@@ -66,7 +66,7 @@ class ModuleDataMapper:
             # Also, magnetic module v1 reports height in half millimeters
             height_from_base = live_data_height - OFFSET_TO_LABWARE_BOTTOM[model]
             if module_model == ModuleModel.MAGNETIC_MODULE_V1:
-                height_from_base = height_from_base / 2
+                height_from_base /= 2
 
             module_data = MagneticModuleData(
                 status=MagneticStatus(live_data["status"]),
