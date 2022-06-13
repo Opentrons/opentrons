@@ -9,10 +9,12 @@ import type { State, Dispatch } from '../../redux/types'
 
 interface IpHostnameListProps {
   mostRecentAddition: string | null
+  setMostRecentDiscovered: (discovered: boolean) => void
 }
 
 export function IpHostnameList({
   mostRecentAddition,
+  setMostRecentDiscovered,
 }: IpHostnameListProps): JSX.Element {
   const candidates = useSelector(
     (state: State) => getConfig(state)?.discovery.candidates ?? []
@@ -24,7 +26,15 @@ export function IpHostnameList({
     <>
       {candidates
         .map<[string, boolean]>(candidate => {
-          const discovered = robots.some(robot => robot.ip === candidate)
+          const discovered = robots.some(robot => {
+            if (robot.ip === candidate) {
+              setMostRecentDiscovered(true)
+              return true
+            } else {
+              setMostRecentDiscovered(false)
+              return false
+            }
+          })
           return [candidate, discovered]
         })
         .sort(([_candidateA, aDiscovered], [_candidateB, bDiscovered]) =>

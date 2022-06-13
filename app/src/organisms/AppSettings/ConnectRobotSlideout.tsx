@@ -39,6 +39,9 @@ export function ConnectRobotSlideout({
   const [mostRecentAddition, setMostRecentAddition] = React.useState<
     string | null
   >(null)
+  const [mostRecentDiscovered, setMostRecentDiscovered] = React.useState<
+    boolean | null
+  >(null)
   const { t } = useTranslation(['app_settings', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const refreshDiscovery = (): unknown => dispatch(startDiscovery())
@@ -61,12 +64,13 @@ export function ConnectRobotSlideout({
 
   console.log('isScanning', isScanning)
   console.log('mostRecentAddition', mostRecentAddition)
+  console.log('mostRecentDiscovered', mostRecentDiscovered)
 
-  React.useEffect(() => {
-    if (!isScanning) {
-      setMostRecentAddition(null)
-    }
-  }, [isScanning])
+  // React.useEffect(() => {
+  //   if (!isScanning) {
+  //     setMostRecentAddition(null)
+  //   }
+  // }, [isScanning])
 
   React.useEffect(() => {
     dispatch(startDiscovery())
@@ -120,7 +124,23 @@ export function ConnectRobotSlideout({
             </Flex>
           ) : (
             [
-              mostRecentAddition != null ? (
+              // mostRecentAddition != null && !(mostRecentDiscovered ?? false) ? (
+              //   <>
+              //     <StyledText
+              //       as="p"
+              //       color={COLORS.darkGreyEnabled}
+              //       margin={`0 ${SPACING.spacing2}`}
+              //     >
+              //       {t('discovery_timeout')}
+              //     </StyledText>
+              //     {displayLinkButton(t('try_again'))}
+              //   </>
+              // ) : (
+              //   displayLinkButton(t('shared:refresh'))
+              // ),
+
+              mostRecentAddition == null ||
+              (mostRecentAddition != null && mostRecentDiscovered === true) ? (
                 displayLinkButton(t('shared:refresh'))
               ) : (
                 <>
@@ -137,7 +157,10 @@ export function ConnectRobotSlideout({
             ]
           )}
         </Flex>
-        <IpHostnameList mostRecentAddition={mostRecentAddition} />
+        <IpHostnameList
+          mostRecentAddition={mostRecentAddition}
+          setMostRecentDiscovered={setMostRecentDiscovered}
+        />
       </Flex>
     </Slideout>
   )

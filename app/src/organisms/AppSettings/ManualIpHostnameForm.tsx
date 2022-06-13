@@ -79,7 +79,8 @@ export function ManualIpHostnameForm({
     onSubmit: (values, { resetForm }) => {
       const ip = values.ip.trim()
       const inputForm = document.getElementById('ip')
-      if (inputForm) inputForm.style.border = `1px solid ${COLORS.medGrey}`
+      if (inputForm != null)
+        inputForm.style.border = `1px solid ${COLORS.medGrey}`
       addManualIpAndHostname(ip)
       setMostRecentAddition(ip)
       resetForm({ values: undefined })
@@ -90,7 +91,8 @@ export function ManualIpHostnameForm({
       if (!ip) {
         errors.ip = t('add_ip_error')
         const inputForm = document.getElementById('ip')
-        if (inputForm) inputForm.style.border = `1px solid ${COLORS.error}`
+        if (inputForm != null)
+          inputForm.style.border = `1px solid ${COLORS.error}`
       }
       return errors
     },
@@ -122,7 +124,7 @@ export function ManualIpHostnameForm({
           {t('add_ip_button')}
         </TertiaryButton>
       </FlexForm>
-      {formik.errors.ip && (
+      {formik.errors.ip != null && (
         <StyledText
           as="label"
           marginTop={SPACING.spacing2}
