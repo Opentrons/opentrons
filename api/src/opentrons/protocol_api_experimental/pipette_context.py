@@ -224,7 +224,7 @@ class PipetteContext:  # noqa: D101
             labware_id=location.parent.labware_id,
             well_name=location.well_name,
             well_location=WellLocation(
-                origin=WellOrigin.BOTTOM,
+                origin=WellOrigin.TOP,
                 offset=WellOffset(x=0, y=0, z=v_offset),
             ),
         )

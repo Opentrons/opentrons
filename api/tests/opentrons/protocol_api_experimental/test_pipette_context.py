@@ -190,7 +190,7 @@ def test_touch_tip(
             labware_id=labware_id,
             well_name=well.well_name,
             well_location=WellLocation(
-                origin=WellOrigin.BOTTOM,
+                origin=WellOrigin.TOP,
                 offset=WellOffset(x=0, y=0, z=-0.5),
             ),
         )
