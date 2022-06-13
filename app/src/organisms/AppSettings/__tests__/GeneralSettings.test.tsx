@@ -1,10 +1,14 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
+import { getConfig } from '../../../redux/config'
 import * as Shell from '../../../redux/shell'
 import { GeneralSettings } from '../GeneralSettings'
+import type { Config } from '@opentrons/app/src/redux/config/schema-types'
+import type { ShellUpdateState } from '../../../redux/shell/types'
 
 jest.mock('../../../redux/config')
 jest.mock('../../../redux/shell')
@@ -14,9 +18,10 @@ jest.mock('../../UpdateAppModal', () => ({
   UpdateAppModal: () => null,
 }))
 
-const getAvailableShellUpdate = Shell.getAvailableShellUpdate as jest.MockedFunction<
-  typeof Shell.getAvailableShellUpdate
+const getShellUpdateState = Shell.getShellUpdateState as jest.MockedFunction<
+  typeof Shell.getShellUpdateState
 >
+const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 
 const render = () => {
   return renderWithProviders(
@@ -31,7 +36,13 @@ const render = () => {
 
 describe('GeneralSettings', () => {
   beforeEach(() => {
-    getAvailableShellUpdate.mockReturnValue(null)
+    getShellUpdateState.mockReturnValue({
+      available: false,
+      info: null,
+    } as ShellUpdateState)
+    mockGetConfig.mockReturnValue({
+      update: { channel: 'beta' },
+    } as Config)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -61,10 +72,36 @@ describe('GeneralSettings', () => {
     })
   })
 
-  it('renders correct info if there is update available', () => {
-    getAvailableShellUpdate.mockReturnValue('5.0.0-beta.8')
+  it('renders correct info if there is update available and channel is beta', () => {
+    getShellUpdateState.mockReturnValue({
+      available: true,
+      info: { version: '6.0.0-beta.0' },
+    } as ShellUpdateState)
     const [{ getByRole }] = render()
     getByRole('button', { name: 'View software update' })
+  })
+
+  it('renders correct info if there is update available and channel is stable', () => {
+    mockGetConfig.mockReturnValue({
+      update: { channel: 'latest' },
+    } as Config)
+    getShellUpdateState.mockReturnValue({
+      available: true,
+      info: { version: '6.0.0' },
+    } as ShellUpdateState)
+    const [{ getByRole }] = render()
+    getByRole('button', { name: 'View software update' })
+  })
+
+  it('renders correct info if there is beta update available but the channel is stable', () => {
+    mockGetConfig.mockReturnValue({
+      update: { channel: 'latest' },
+    } as Config)
+    getShellUpdateState.mockReturnValue({
+      available: true,
+      info: { version: '6.0.0-beta.0' },
+    } as ShellUpdateState)
+    expect(screen.queryByText('View software update')).toBeNull()
   })
 
   it('renders the text and toggle for update alert section', () => {
