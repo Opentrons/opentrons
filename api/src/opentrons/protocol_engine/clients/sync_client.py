@@ -7,6 +7,7 @@ from .. import commands
 from ..state import StateView
 from ..types import (
     DeckSlotLocation,
+    DeckPoint,
     LabwareLocation,
     ModuleModel,
     PipetteName,
@@ -153,6 +154,17 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.DispenseResult, result)
+
+    def move_to_coordinates(
+        self,
+        pipette_id: str,
+        coordinates: DeckPoint,
+        minimum_z_height: Optional[float],
+        force_direct: bool,
+    ) -> None:
+        """Execute a `MoveToCoordinates`` command and return the result."""
+        # TODO(mm, 2022-06-10): Implement when moveToCoordinates exists.
+        raise NotImplementedError()
 
     def pause(self, message: Optional[str]) -> commands.PauseResult:
         """Execute a ``Pause`` command and return the result."""
