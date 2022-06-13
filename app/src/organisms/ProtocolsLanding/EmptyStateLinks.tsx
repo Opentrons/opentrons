@@ -87,8 +87,10 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
           fontSize={FONT_SIZE_CAPTION}
           css={TYPOGRAPHY.labelSemiBold}
           color={COLORS.darkBlack}
+          marginRight={SPACING.spacing3}
           href={API_DOCS_URL}
           id={'EmptyStateLinks_apiDocsButton'}
+          opacity="0.7"
           external
         >
           {t('open_api_docs')}
