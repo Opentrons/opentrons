@@ -78,6 +78,7 @@ export const RobotOverviewOverflowMenu = (
   const { autoUpdateAction } = useSelector((state: State) => {
     return getBuildrootUpdateDisplayInfo(state, robot.name)
   })
+  const isRobotInUse = isRobotBusy || robot?.status !== CONNECTABLE
 
   return (
     <Flex
@@ -114,30 +115,31 @@ export const RobotOverviewOverflowMenu = (
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          {autoUpdateAction === 'upgrade' ? (
+          {autoUpdateAction === 'upgrade' && !isRobotInUse ? (
             <MenuItem
-              disabled={isRobotBusy || robot?.status !== CONNECTABLE}
               onClick={handleClickUpdateBuildroot}
               data-testid={`RobotOverviewOverflowMenu_updateSoftware_${robot.name}`}
             >
               {t('update_robot_software')}
             </MenuItem>
           ) : null}
-          <MenuItem
-            onClick={handleClickRestart}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            disabled={isRobotBusy || robot?.status !== CONNECTABLE}
-            data-testid={`RobotOverviewOverflowMenu_restartRobot_${robot.name}`}
-          >
-            {t('robot_controls:restart_label')}
-          </MenuItem>
-          <MenuItem
-            onClick={handleClickHomeGantry}
-            disabled={isRobotBusy || robot?.status !== CONNECTABLE}
-            data-testid={`RobotOverviewOverflowMenu_homeGantry_${robot.name}`}
-          >
-            {t('home_gantry')}
-          </MenuItem>
+          {isRobotInUse ? null : (
+            <>
+              <MenuItem
+                onClick={handleClickRestart}
+                textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                data-testid={`RobotOverviewOverflowMenu_restartRobot_${robot.name}`}
+              >
+                {t('robot_controls:restart_label')}
+              </MenuItem>
+              <MenuItem
+                onClick={handleClickHomeGantry}
+                data-testid={`RobotOverviewOverflowMenu_homeGantry_${robot.name}`}
+              >
+                {t('home_gantry')}
+              </MenuItem>
+            </>
+          )}
           <Divider marginY={'0'} />
           <MenuItem
             onClick={() =>

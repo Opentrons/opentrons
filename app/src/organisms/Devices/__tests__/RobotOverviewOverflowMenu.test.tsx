@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
@@ -92,7 +92,7 @@ describe('RobotOverviewOverflowMenu', () => {
     getByText('mock update buildroot')
   })
 
-  it('should render disabled buttons in the menu when the robot is busy', () => {
+  it('should not render the menu items when robot is busy', () => {
     when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
     when(mockUseCurrentRunStatus)
       .calledWith()
@@ -103,18 +103,12 @@ describe('RobotOverviewOverflowMenu', () => {
     const btn = getByRole('button')
     fireEvent.click(btn)
 
-    const updateRobotSoftwareBtn = getByRole('button', {
-      name: 'Update robot software',
-    })
-    const restartBtn = getByRole('button', { name: 'restart robot' })
-    const homeBtn = getByRole('button', { name: 'Home gantry' })
-
-    expect(updateRobotSoftwareBtn).toBeDisabled()
-    expect(restartBtn).toBeDisabled()
-    expect(homeBtn).toBeDisabled()
+    expect(screen.queryByText('Update robot software')).toBeNull()
+    expect(screen.queryByText('restart robot')).toBeNull()
+    expect(screen.queryByText('Home gantry')).toBeNull()
   })
 
-  it('should render disabled buttons in the menu when the robot is not connectable', () => {
+  it('should rnot render menu items when the robot is not connectable', () => {
     when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
     when(mockUseCurrentRunStatus)
       .calledWith()
@@ -125,15 +119,9 @@ describe('RobotOverviewOverflowMenu', () => {
     const btn = getByRole('button')
     fireEvent.click(btn)
 
-    const updateRobotSoftwareBtn = getByRole('button', {
-      name: 'Update robot software',
-    })
-    const restartBtn = getByRole('button', { name: 'restart robot' })
-    const homeBtn = getByRole('button', { name: 'Home gantry' })
-
-    expect(updateRobotSoftwareBtn).toBeDisabled()
-    expect(restartBtn).toBeDisabled()
-    expect(homeBtn).toBeDisabled()
+    expect(screen.queryByText('Update robot software')).toBeNull()
+    expect(screen.queryByText('restart robot')).toBeNull()
+    expect(screen.queryByText('Home gantry')).toBeNull()
   })
 
   it('clicking home gantry should home the gantry', () => {
