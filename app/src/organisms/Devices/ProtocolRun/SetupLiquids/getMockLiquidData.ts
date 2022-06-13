@@ -131,7 +131,7 @@ export interface Liquid {
     slotName: string
     labwareName: string
     volumeByWell: { [well: string]: number }
-    labwareId: string
+    labwareId?: string
   }>
 }
 
@@ -155,6 +155,7 @@ export function getMockLiquidData(): Liquid[] {
       slotName: string
       labwareName: string
       volumeByWell: { [well: string]: number }
+      labwareId?: string
     }> = []
     commandsByLiquidId.forEach(command => {
       const labwareIndex = mockLabwareEntries.findIndex(
