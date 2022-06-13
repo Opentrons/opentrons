@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Any, Dict
 
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
@@ -11,7 +11,7 @@ def migrated_file_version() -> int:
 
 
 @pytest.fixture
-def default_file_settings() -> Dict[str, Optional[bool]]:
+def default_file_settings() -> Dict[str, Any]:
     return {
         "shortFixedTrash": None,
         "deckCalibrationDots": None,
@@ -26,12 +26,12 @@ def default_file_settings() -> Dict[str, Optional[bool]]:
 
 
 @pytest.fixture
-def empty_settings():
+def empty_settings() -> Dict[str, Any]:
     return {}
 
 
 @pytest.fixture
-def version_less():
+def version_less() -> Dict[str, Any]:
     return {
         "shortFixedTrash": True,
         "calibrateToBottom": True,
@@ -42,7 +42,7 @@ def version_less():
 
 
 @pytest.fixture
-def v1_config():
+def v1_config() -> Dict[str, Any]:
     return {
         "_version": 1,
         "shortFixedTrash": True,
@@ -55,7 +55,7 @@ def v1_config():
 
 
 @pytest.fixture
-def v2_config(v1_config):
+def v2_config(v1_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v1_config.copy()
     r.update(
         {
@@ -67,21 +67,21 @@ def v2_config(v1_config):
 
 
 @pytest.fixture
-def v3_config(v2_config):
+def v3_config(v2_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v2_config.copy()
     r.update({"_version": 3, "enableApi1BackCompat": False})
     return r
 
 
 @pytest.fixture
-def v4_config(v3_config):
+def v4_config(v3_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v3_config.copy()
     r.update({"_version": 4, "useV1HttpApi": False})
     return r
 
 
 @pytest.fixture
-def v5_config(v4_config):
+def v5_config(v4_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v4_config.copy()
     r.update(
         {
@@ -93,7 +93,7 @@ def v5_config(v4_config):
 
 
 @pytest.fixture
-def v6_config(v5_config):
+def v6_config(v5_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v5_config.copy()
     r.update(
         {
@@ -105,7 +105,7 @@ def v6_config(v5_config):
 
 
 @pytest.fixture
-def v7_config(v6_config):
+def v7_config(v6_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v6_config.copy()
     r.update(
         {
@@ -117,7 +117,7 @@ def v7_config(v6_config):
 
 
 @pytest.fixture
-def v8_config(v7_config):
+def v8_config(v7_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v7_config.copy()
     r.update(
         {
@@ -129,7 +129,7 @@ def v8_config(v7_config):
 
 
 @pytest.fixture
-def v9_config(v8_config):
+def v9_config(v8_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v8_config.copy()
     r.update(
         {
@@ -141,7 +141,7 @@ def v9_config(v8_config):
 
 
 @pytest.fixture
-def v10_config(v9_config):
+def v10_config(v9_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v9_config.copy()
     r.pop("useProtocolApi2")
     r.pop("enableApi1BackCompat")
@@ -158,7 +158,7 @@ def v10_config(v9_config):
 
 
 @pytest.fixture
-def v11_config(v10_config):
+def v11_config(v10_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v10_config.copy()
     r.pop("enableProtocolEngine")
     r.update({"_version": 11})
@@ -166,7 +166,7 @@ def v11_config(v10_config):
 
 
 @pytest.fixture
-def v12_config(v11_config):
+def v12_config(v11_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v11_config.copy()
     r.update(
         {
@@ -178,7 +178,7 @@ def v12_config(v11_config):
 
 
 @pytest.fixture
-def v13_config(v12_config):
+def v13_config(v12_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v12_config.copy()
     r.pop("calibrateToBottom")
     r.update({"_version": 13})
@@ -186,7 +186,7 @@ def v13_config(v12_config):
 
 
 @pytest.fixture
-def v14_config(v13_config):
+def v14_config(v13_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v13_config.copy()
     r.pop("enableHttpProtocolSessions")
     r.update({"_version": 14})
@@ -227,11 +227,15 @@ def v15_config(v14_config):
         lazy_fixture("v15_config"),
     ],
 )
-def old_settings(request):
-    return request.param
+def old_settings(request: pytest.FixtureRequest) -> Dict[str, Any]:
+    return request.param  # type: ignore[attr-defined, no-any-return]
 
 
-def test_migrations(old_settings, migrated_file_version, default_file_settings):
+def test_migrations(
+    old_settings: Dict[str, Any],
+    migrated_file_version: int,
+    default_file_settings: Dict[str, Any],
+) -> None:
     settings, version = _migrate(old_settings)
 
     expected = default_file_settings.copy()
@@ -247,7 +251,10 @@ def test_migrations(old_settings, migrated_file_version, default_file_settings):
     assert settings == expected
 
 
-def test_migrates_versionless_old_config(migrated_file_version, default_file_settings):
+def test_migrates_versionless_old_config(
+    migrated_file_version: int,
+    default_file_settings: Dict[str, Any],
+) -> None:
     settings, version = _migrate(
         {
             "short-fixed-trash": False,
@@ -270,7 +277,10 @@ def test_migrates_versionless_old_config(migrated_file_version, default_file_set
     assert settings == expected
 
 
-def test_ignores_invalid_keys(migrated_file_version, default_file_settings):
+def test_ignores_invalid_keys(
+    migrated_file_version: int,
+    default_file_settings: Dict[str, Any],
+) -> None:
     settings, version = _migrate(
         {
             "split-labware-def": True,
@@ -282,7 +292,7 @@ def test_ignores_invalid_keys(migrated_file_version, default_file_settings):
     assert settings == default_file_settings
 
 
-def test_ensures_config():
+def test_ensures_config() -> None:
     assert _ensure(
         {"_version": 3, "shortFixedTrash": False, "disableLogAggregation": True}
     ) == {
