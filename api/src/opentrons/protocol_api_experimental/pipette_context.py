@@ -15,6 +15,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 # decouple from the v2 opentrons.protocol_api?
 from opentrons.protocol_api.instrument_context import AdvancedLiquidHandling
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_engine import DeckPoint
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 # todo(mm, 2021-04-09): How customer-facing are these classes? Should they be
@@ -109,6 +110,7 @@ class PipetteContext:  # noqa: D101
             )
 
         if isinstance(location, Well):
+            # If we need to recover from a prior blowout, let Protocol Engine do it.
             self._engine_client.aspirate(
                 pipette_id=self._pipette_id,
                 labware_id=location.parent.labware_id,
@@ -122,14 +124,69 @@ class PipetteContext:  # noqa: D101
                 ),
                 volume=volume,
             )
-        else:
-            # TODO(mm, 2021-04-14):
-            #   * If location is None, use current location.
-            #   * If location is a Location (possibly deck coords, or possibly
-            #     something like well.top()), use that.
-            # https://github.com/Opentrons/opentrons/issues/9509
-            raise NotImplementedError(
-                "locations other than Wells are currently unsupported."
+
+        elif isinstance(location, types.Location):
+            if location.labware.is_well:
+                # TODO(mm, 2022-06-10): The given location is deck coordinates
+                # associated with a specific well. Convert those coords to be relative
+                # to the given well. Pass that relative offset to Protocol Engine.
+                raise NotImplementedError(
+                    "Aspirating from a non-default location within a well"
+                    " is not currently supported."
+                )
+
+            else:
+                # The given location is either:
+                # * Pure deck coordinates, not associated with any logical location.
+                # * Deck coordinates associated with a logical location that doesn't
+                #   help us here, like a module or deck slot.
+
+                self._engine_client.move_to_coordinates(
+                    pipette_id=self._pipette_id,
+                    coordinates=DeckPoint(
+                        x=location.point.x, y=location.point.y, z=location.point.z
+                    ),
+                    minimum_z_height=None,
+                    force_direct=False,
+                )
+
+                # TODO(mm, 2022-06-10):
+                #
+                # If we need to recover the plunger from a prior blowout,
+                # this aspirate will raise a HW controller error.
+                #
+                # APIv2's behavior is to recover in-place before doing this,
+                # avoiding the error. We can't do that here because there's no
+                # Protocol Engine command to recover from a blowout in-place.
+                #
+                # Either:
+                # * Add a Protocol Engine command to recover from a blowout in-place.
+                # * Change PAPIv3's blowout behavior so that we don't have to recover
+                #   from blowouts here.
+                # * Commit Protocol Engine to PAPIv2's blowout behavior and make
+                #   aspirate_in_place() do the recovery internally.
+                self._engine_client.aspirate_in_place(
+                    pipette_id=self._pipette_id, volume=volume
+                )
+
+        else:  # location is None
+            # TODO(mm, 2022-06-10):
+            #
+            # If we need to recover the plunger from a prior blowout,
+            # this aspirate will raise a HW controller error.
+            #
+            # APIv2's behavior is to recover in-place before doing this,
+            # avoiding the error. We can't do that here because there's no
+            # Protocol Engine command to recover from a blowout in-place.
+            #
+            # Either:
+            # * Add a Protocol Engine command to recover from a blowout in-place.
+            # * Change PAPIv3's blowout behavior so that we don't have to recover
+            #   from blowouts here.
+            # * Commit Protocol Engine to PAPIv2's blowout behavior and make
+            #   aspirate_in_place() do the recovery internally.
+            self._engine_client.aspirate_in_place(
+                pipette_id=self._pipette_id, volume=volume
             )
 
         return self

@@ -179,7 +179,7 @@ class PipettingHandler:
         well_location: WellLocation,
         volume: float,
     ) -> float:
-        """Aspirate liquid from a well."""
+        """Move to a well and aspirate liquid from it."""
         # get mount and config data from state and hardware controller
         hw_pipette = self._state_store.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
@@ -221,6 +221,19 @@ class PipettingHandler:
 
         await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)
 
+        return volume
+
+    async def aspirate_in_place(
+        self,
+        pipette_id: str,
+        volume: float,
+    ) -> float:
+        """Aspirate liquid without moving the pipette."""
+        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware_api.attached_instruments,
+        )
+        await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)
         return volume
 
     async def dispense(

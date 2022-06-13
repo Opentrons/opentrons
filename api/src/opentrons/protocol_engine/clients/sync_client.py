@@ -134,6 +134,21 @@ class SyncClient:
 
         return cast(commands.AspirateResult, result)
 
+    def aspirate_in_place(
+        self,
+        pipette_id: str,
+        volume: float,
+    ) -> commands.AspirateInPlaceResult:
+        """Execute an ``AspirateInPlace`` command and return the result."""
+        request = commands.AspirateInPlaceCreate(
+            params=commands.AspirateInPlaceParams(
+                pipetteId=pipette_id,
+                volume=volume,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.AspirateInPlaceResult, result)
+
     def dispense(
         self,
         pipette_id: str,

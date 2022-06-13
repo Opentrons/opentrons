@@ -23,6 +23,14 @@ from .aspirate import (
     AspirateCommandType,
 )
 
+from .aspirate_in_place import (
+    AspirateInPlace,
+    AspirateInPlaceParams,
+    AspirateInPlaceCreate,
+    AspirateInPlaceResult,
+    AspirateInPlaceCommandType,
+)
+
 from .custom import (
     Custom,
     CustomParams,
@@ -120,6 +128,7 @@ from .save_position import (
 
 Command = Union[
     Aspirate,
+    AspirateInPlace,
     Custom,
     Dispense,
     DropTip,
@@ -155,6 +164,7 @@ Command = Union[
 
 CommandParams = Union[
     AspirateParams,
+    AspirateInPlaceParams,
     CustomParams,
     DispenseParams,
     DropTipParams,
@@ -190,6 +200,7 @@ CommandParams = Union[
 
 CommandType = Union[
     AspirateCommandType,
+    AspirateInPlaceCommandType,
     CustomCommandType,
     DispenseCommandType,
     DropTipCommandType,
@@ -225,6 +236,7 @@ CommandType = Union[
 
 CommandCreate = Union[
     AspirateCreate,
+    AspirateInPlaceCreate,
     DispenseCreate,
     DropTipCreate,
     HomeCreate,
@@ -259,6 +271,7 @@ CommandCreate = Union[
 
 CommandResult = Union[
     AspirateResult,
+    AspirateInPlaceResult,
     CustomResult,
     DispenseResult,
     DropTipResult,

@@ -42,6 +42,14 @@ from .aspirate import (
     AspirateCommandType,
 )
 
+from .aspirate_in_place import (
+    AspirateInPlace,
+    AspirateInPlaceParams,
+    AspirateInPlaceCreate,
+    AspirateInPlaceResult,
+    AspirateInPlaceCommandType,
+)
+
 from .custom import (
     Custom,
     CustomParams,
@@ -165,6 +173,12 @@ __all__ = [
     "AspirateParams",
     "AspirateResult",
     "AspirateCommandType",
+    # aspirate-in-place command models
+    "AspirateInPlace",
+    "AspirateInPlaceCreate",
+    "AspirateInPlaceParams",
+    "AspirateInPlaceResult",
+    "AspirateInPlaceCommandType",
     # custom command models
     "Custom",
     "CustomParams",
