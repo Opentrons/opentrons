@@ -16,9 +16,11 @@ import {
   SIZE_AUTO,
   JUSTIFY_SPACE_BETWEEN,
   Box,
+  Overlay,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { StyledText } from '../../../../atoms/text'
+import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
 
 import type { Liquid } from './getMockLiquidData'
 
@@ -69,6 +71,10 @@ interface LiquidsListItemProps {
 export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
   const { description, displayColor, displayName, locations } = props
   const [openItem, setOpenItem] = React.useState(false)
+  const [
+    showLiquidLabwareDetails,
+    setShowLiquidLabwareDetails,
+  ] = React.useState(false)
   const { t } = useTranslation('protocol_setup')
   const LIQUID_CARD_STYLE = css`
     ${BORDERS.cardOutlineBorder}
@@ -78,6 +84,18 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       border: 1px solid ${COLORS.medGreyHover};
     }
   `
+  const LIQUID_CARD_ITEM_STYLE = css`
+    ${BORDERS.cardOutlineBorder}
+
+    &:hover {
+      cursor: pointer;
+      border: 1px solid ${COLORS.medGreyHover};
+    }
+  `
+  const handleClickOutside: React.MouseEventHandler<HTMLDivElement> = e => {
+    e.preventDefault()
+    setShowLiquidLabwareDetails(!showLiquidLabwareDetails)
+  }
   return (
     <Box
       css={LIQUID_CARD_STYLE}
@@ -130,6 +148,17 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
           </StyledText>
         </Flex>
       </Flex>
+      {showLiquidLabwareDetails && (
+        <>
+          <LiquidsLabwareDetailsModal
+            closeModal={() => setShowLiquidLabwareDetails(false)}
+          />
+          <Overlay
+            onClick={handleClickOutside}
+            backgroundColor={COLORS.transparent}
+          />
+        </>
+      )}
       {openItem && (
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Flex
@@ -162,12 +191,14 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
           {locations.map((location, index) => {
             return (
               <Box
+                css={LIQUID_CARD_ITEM_STYLE}
                 key={index}
                 borderRadius={'4px'}
                 marginY={SPACING.spacing3}
                 padding={SPACING.spacing4}
                 backgroundColor={COLORS.white}
                 data-testid={`LiquidsListItem_slotRow_${index}`}
+                onClick={() => setShowLiquidLabwareDetails(true)}
               >
                 <Flex
                   flexDirection={DIRECTION_ROW}
