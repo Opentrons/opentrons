@@ -110,6 +110,14 @@ from .pick_up_tip import (
     PickUpTipCommandType,
 )
 
+from .touch_tip import (
+    TouchTip,
+    TouchTipParams,
+    TouchTipCreate,
+    TouchTipResult,
+    TouchTipCommandType,
+)
+
 from .save_position import (
     SavePosition,
     SavePositionParams,
@@ -142,6 +150,7 @@ Command = Union[
     PickUpTip,
     SavePosition,
     SetRailLights,
+    TouchTip,
     heater_shaker.WaitForTemperature,
     heater_shaker.SetTargetTemperature,
     heater_shaker.DeactivateHeater,
@@ -178,6 +187,7 @@ CommandParams = Union[
     PickUpTipParams,
     SavePositionParams,
     SetRailLightsParams,
+    TouchTipParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -214,6 +224,7 @@ CommandType = Union[
     PickUpTipCommandType,
     SavePositionCommandType,
     SetRailLightsCommandType,
+    TouchTipCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -249,6 +260,7 @@ CommandCreate = Union[
     PickUpTipCreate,
     SavePositionCreate,
     SetRailLightsCreate,
+    TouchTipCreate,
     heater_shaker.WaitForTemperatureCreate,
     heater_shaker.SetTargetTemperatureCreate,
     heater_shaker.DeactivateHeaterCreate,
@@ -285,6 +297,7 @@ CommandResult = Union[
     PickUpTipResult,
     SavePositionResult,
     SetRailLightsResult,
+    TouchTipResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,
