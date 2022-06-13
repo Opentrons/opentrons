@@ -155,10 +155,10 @@ def thermocycler_close() -> command_types.ThermocyclerCloseCommand:
 
 
 def heater_shaker_set_and_wait_for_temperature(
-    temperature: float,
+    celsius: float,
 ) -> command_types.HeaterShakerSetAndWaitForTemperatureCommand:
     # mimicking firmware behavior
-    formatted_temp = trunc(temperature)
+    formatted_temp = trunc(celsius)
     text = f"Setting Temperature of Heater Shaker to {formatted_temp} °C and waiting until reached"
     return {
         "name": command_types.HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE,
@@ -167,9 +167,9 @@ def heater_shaker_set_and_wait_for_temperature(
 
 
 def heater_shaker_set_target_temperature(
-    temperature: float,
+    celsius: float,
 ) -> command_types.HeaterShakerSetTargetTemperatureCommand:
-    formatted_temp = trunc(temperature)
+    formatted_temp = trunc(celsius)
     text = f"Setting Target Temperature of Heater Shaker to {formatted_temp} °C"
     return {
         "name": command_types.HEATER_SHAKER_SET_TARGET_TEMPERATURE,

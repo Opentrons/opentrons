@@ -194,7 +194,7 @@ def v14_config(v13_config: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @pytest.fixture
-def v15_config(v14_config):
+def v15_config(v14_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v14_config.copy()
     r.update(
         {

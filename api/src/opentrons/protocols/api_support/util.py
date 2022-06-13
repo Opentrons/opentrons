@@ -377,6 +377,7 @@ def requires_heatershaker_ff(decorated_obj: FuncT) -> FuncT:
     feature flag is set.
     """
 
+    @functools.wraps(decorated_obj)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         if not enable_heater_shaker_python_api():
             raise UnsupportedAPIError("This API feature is not available yet.")
