@@ -58,6 +58,19 @@ class ChildThreadTransport(AbstractSyncTransport):
     @property
     def state(self) -> StateView:
         """Get a view of the Protocol Engine's state."""
+        # TODO(mm, 2022-06-10): This may not be thread-safe.
+        #
+        # * The main thread will be doing things that cause state_view to be modified,
+        #   like accepting actions over HTTP.
+        # * This method will give the child thread will access to that same raw
+        #   state_view, which it will access without synchronization.
+        #
+        # We could either:
+        #
+        # * Return an independent copy of state_view to the child thread.
+        # * Have the child thread synchronize its access to state_view, e.g. by
+        #   taking a lock.
+        # * Design state_view for safe multi-threaded access.
         return self._engine.state_view
 
     def execute_command(self, request: CommandCreate) -> CommandResult:
