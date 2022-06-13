@@ -8,7 +8,7 @@ import {
 } from '@opentrons/components'
 
 import { Portal } from '../../App/portal'
-import { useStopRunMutation } from '@opentrons/react-api-client'
+import { useRunControls } from '../RunTimeControl/hooks'
 
 export interface ConfirmCancelModalProps {
   onClose: () => unknown
@@ -19,11 +19,11 @@ export function ConfirmCancelModal(
   props: ConfirmCancelModalProps
 ): JSX.Element {
   const { onClose, runId } = props
-  const { stopRun } = useStopRunMutation()
+  const { stop } = useRunControls(runId)
   const { t } = useTranslation('run_details')
 
   const cancel = (): void => {
-    runId != null && stopRun(runId)
+    runId != null && stop()
     onClose()
   }
 

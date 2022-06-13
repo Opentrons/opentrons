@@ -7,6 +7,7 @@ import {
   RUN_STATUS_IDLE,
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_PAUSED,
+  RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 import {
   Flex,
@@ -127,7 +128,7 @@ export function StepItemComponent(props: StepItemProps): JSX.Element | null {
     flex-direction: ${DIRECTION_COLUMN};
     width: 100%;
   `
-
+  
   return (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -182,7 +183,9 @@ export function StepItemComponent(props: StepItemProps): JSX.Element | null {
                   runCommand={runCommandSummary}
                   runId={runId}
                 />
-                {runPausedAt != null && isMostRecentCommand ? (
+                {runPausedAt != null &&
+                runStatus !== RUN_STATUS_STOP_REQUESTED &&
+                isMostRecentCommand ? (
                   <Flex alignItems={ALIGN_CENTER}>
                     <Icon
                       name="pause-circle"
