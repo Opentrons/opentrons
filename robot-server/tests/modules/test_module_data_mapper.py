@@ -33,20 +33,29 @@ from robot_server.modules.module_models import (
     [
         (
             "magneticModuleV1",
-            {"status": "engaged", "data": {"engaged": True, "height": 42}},
+            {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
             MagneticModuleData(
-                status=MagneticStatus.ENGAGED,
-                engaged=True,
-                height=21,
+                status=MagneticStatus.DISENGAGED,
+                engaged=False,
+                height=-2.5,
             ),
         ),
         (
             "magneticModuleV1",
+            {"status": "engaged", "data": {"engaged": True, "height": 42}},
+            MagneticModuleData(
+                status=MagneticStatus.ENGAGED,
+                engaged=True,
+                height=18.5,
+            ),
+        ),
+        (
+            "magneticModuleV2",
             {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
             MagneticModuleData(
                 status=MagneticStatus.DISENGAGED,
                 engaged=False,
-                height=0.0,
+                height=-2.5,
             ),
         ),
         (
@@ -55,16 +64,7 @@ from robot_server.modules.module_models import (
             MagneticModuleData(
                 status=MagneticStatus.ENGAGED,
                 engaged=True,
-                height=42,
-            ),
-        ),
-        (
-            "magneticModuleV2",
-            {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
-            MagneticModuleData(
-                status=MagneticStatus.DISENGAGED,
-                engaged=False,
-                height=0.0,
+                height=39.5,
             ),
         ),
     ],
