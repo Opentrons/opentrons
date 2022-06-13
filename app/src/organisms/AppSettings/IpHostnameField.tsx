@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   DIRECTION_ROW,
@@ -8,9 +9,10 @@ import {
   TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
+
 import { TertiaryButton } from '../../atoms/buttons'
 
-export interface IpHostnameFieldProps {
+interface IpHostnameFieldProps {
   field: any
   inputRef: { current: null | HTMLInputElement }
 }

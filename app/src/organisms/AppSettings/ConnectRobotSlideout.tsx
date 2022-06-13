@@ -26,7 +26,7 @@ import type { Dispatch, State } from '../../redux/types'
 const SUPPORT_PAGE_LINK =
   'https://support.opentrons.com/s/article/Manually-adding-a-robot-s-IP-address'
 
-export interface ConnectRobotSlideoutProps {
+interface ConnectRobotSlideoutProps {
   isExpanded: boolean
   onCloseClick: () => void
 }

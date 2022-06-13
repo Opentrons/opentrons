@@ -7,8 +7,6 @@ import { getScanning, getViewableRobots } from '../../../redux/discovery'
 import { getConfig } from '../../../redux/config'
 import { ConnectRobotSlideout } from '../ConnectRobotSlideout'
 
-import type { ConnectRobotSlideoutProps } from '../ConnectRobotSlideout'
-
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/config')
 
@@ -61,7 +59,7 @@ describe('ConnectRobotSlideout', () => {
       checkIpAndHostname: jest.fn(),
       isExpanded: true,
       onCloseClick: jest.fn(),
-    } as ConnectRobotSlideoutProps
+    } as React.ComponentProps<typeof ConnectRobotSlideout>
   })
 
   afterEach(() => {
