@@ -45,6 +45,8 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
   )
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
 
+  const [hoverLabwareId, setHoverLabwareId] = React.useState('')
+
   return (
     <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
       <RobotWorkSpace
@@ -98,28 +100,40 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
               ({ x, y, labwareDef, displayName }, labwareId) => {
                 let wellFill = {}
                 liquids.forEach(liquid => {
-                  if (liquid.labwareId === labwareId) {
-                    const liquidWellFill = { ...liquid.volumeByWell }
-                    Object.keys(liquidWellFill).forEach(key => {
-                      liquidWellFill[key] = liquid?.displayColor
-                    })
-                    wellFill = { ...wellFill, ...liquidWellFill }
-                  }
+                  liquid.locations.forEach(location => {
+                    if (location.labwareId === labwareId) {
+                      const liquidWellFill: {
+                        [well: string]: number | string
+                      } = { ...location.volumeByWell }
+                      Object.keys(liquidWellFill).forEach(key => {
+                        liquidWellFill[key] = liquid?.displayColor
+                      })
+                      wellFill = { ...wellFill, ...liquidWellFill }
+                    }
+                  })
                 })
+                const labwareHasLiquid = wellFill != null
                 return (
                   <React.Fragment
                     key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
                   >
-                    <g transform={`translate(${x},${y})`}>
+                    <g
+                      transform={`translate(${x},${y})`}
+                      onMouseEnter={() => setHoverLabwareId(labwareId)}
+                      onMouseLeave={() => setHoverLabwareId('')}
+                    >
                       <LabwareRender
                         definition={labwareDef}
-                        wellFill={wellFill != null ? wellFill : undefined}
+                        wellFill={labwareHasLiquid ? wellFill : undefined}
+                        hover={labwareId === hoverLabwareId && labwareHasLiquid}
                       />
                       <LabwareInfoOverlay
                         definition={labwareDef}
                         labwareId={labwareId}
                         displayName={displayName}
                         runId={runId}
+                        hover={labwareId === hoverLabwareId && labwareHasLiquid}
+                        labwareHasLiquid={labwareHasLiquid}
                       />
                     </g>
                   </React.Fragment>

@@ -131,6 +131,7 @@ export interface Liquid {
     slotName: string
     labwareName: string
     volumeByWell: { [well: string]: number }
+    labwareId: string
   }>
 }
 
@@ -176,6 +177,7 @@ export function getMockLiquidData(): Liquid[] {
         slotName: slot,
         labwareName: displayName,
         volumeByWell: volumeByWell,
+        labwareId: command.params.labwareId,
       })
     })
 
