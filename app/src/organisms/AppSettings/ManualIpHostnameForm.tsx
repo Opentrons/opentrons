@@ -21,14 +21,6 @@ import { startDiscovery } from '../../redux/discovery'
 
 import type { Dispatch } from '../../redux/types'
 
-interface FormikErrors {
-  ip?: string
-}
-
-interface ManualIpHostnameFormProps {
-  setMostRecentAddition: (ip: string) => void
-}
-
 const FlexForm = styled.form`
   display: flex;
   flex-direction: row;
@@ -63,6 +55,13 @@ const StyledInput = styled.input`
     border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.greyDisabled};
   }
 `
+
+interface FormikErrors {
+  ip?: string
+}
+interface ManualIpHostnameFormProps {
+  setMostRecentAddition: (ip: string) => void
+}
 
 export function ManualIpHostnameForm({
   setMostRecentAddition,

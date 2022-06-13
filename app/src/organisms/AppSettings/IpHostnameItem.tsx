@@ -56,7 +56,7 @@ export function IpHostnameItem({
   const { t } = useTranslation('app_settings')
   const getDiscoveryText = (): string | null => {
     if (discovered) {
-      return t('available')
+      return t('ip_available')
     } else if (justAdded) {
       return null
     } else {

@@ -59,6 +59,9 @@ export function ConnectRobotSlideout({
     )
   }
 
+  console.log('isScanning', isScanning)
+  console.log('mostRecentAddition', mostRecentAddition)
+
   React.useEffect(() => {
     if (!isScanning) {
       setMostRecentAddition(null)
