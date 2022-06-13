@@ -1,18 +1,18 @@
-import { UseQueryResult } from 'react-query'
+import * as React from 'react'
+import { Provider } from 'react-redux'
+import { createStore, Store } from 'redux'
 import { useAllSessionsQuery } from '@opentrons/react-api-client'
-
+import { renderHook } from '@testing-library/react-hooks'
+import { getAlertIsPermanentlyIgnored } from '../../../../redux/alerts'
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
-import * as Alerts from '../../../../redux/alerts'
 import { useRobotBusyAndUpdateAlertEnabled } from '..'
 
 import type { Sessions } from '@opentrons/api-client'
-import type { State } from '../../../../redux/types'
+import type { UseQueryResult } from 'react-query'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../../../../redux/alerts')
-
-const MOCK_STATE: State = {} as any
 
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
@@ -20,40 +20,48 @@ const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
 const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
   typeof useAllSessionsQuery
 >
-const mockGetAlertIsPermanentlyIgnored = Alerts.getAlertIsPermanentlyIgnored as jest.MockedFunction<
-  typeof Alerts.getAlertIsPermanentlyIgnored
+const mockGetAlertIsPermanentlyIgnored = getAlertIsPermanentlyIgnored as jest.MockedFunction<
+  typeof getAlertIsPermanentlyIgnored
 >
 
+const store: Store<any> = createStore(jest.fn(), {})
+
 describe('useRobotBusyAndUpdateAlertEnabled', () => {
+  let wrapper: React.FunctionComponent<{}>
+
   beforeEach(() => {
-    mockGetAlertIsPermanentlyIgnored.mockImplementation((state, alertId) => {
-      expect(state).toBe(MOCK_STATE)
-      expect(alertId).toBe(Alerts.ALERT_APP_UPDATE_AVAILABLE)
-      return null
-    })
+    mockGetAlertIsPermanentlyIgnored.mockReturnValue(null)
     mockUseCurrentRunId.mockReturnValue('123')
     mockUseAllSessionsQuery.mockReturnValue(({
       data: [],
       links: null,
     } as unknown) as UseQueryResult<Sessions, Error>)
+    wrapper = ({ children }) => <Provider store={store}>{children}</Provider>
   })
 
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  it('returns isRobotBusy true and isUpdateAlertEnabled null when current runId is not null and getAlertIsPermanentlyIgnored is null', () => {
-    const result = useRobotBusyAndUpdateAlertEnabled()
-    expect(result).toBe({ isRobotBusy: true, isUpdateAlertEnabled: null })
+  it('returns isRobotBusy true and isUpdateAlertEnabled true when current runId is not null and getAlertIsPermanentlyIgnored is null', () => {
+    const { result } = renderHook(() => useRobotBusyAndUpdateAlertEnabled(), {
+      wrapper,
+    })
+
+    expect(result.current.isRobotBusy).toBe(true)
+    expect(result.current.isUpdateAlertEnabled).toBe(null)
   })
 
-  it('returns isRobotBusy true and isUpdateAlertEnabled false when sessions are empty and getAlertIsPermanentlyIgnored is false', () => {
+  it('returns isRobotBusy true and isUpdateAlertEnabled true when sessions are empty and getAlertIsPermanentlyIgnored is false', () => {
     mockGetAlertIsPermanentlyIgnored.mockReturnValue(false)
-    const result = useRobotBusyAndUpdateAlertEnabled()
-    expect(result).toBe({ isRobotBusy: true, isUpdateAlertEnabled: false })
+    const { result } = renderHook(() => useRobotBusyAndUpdateAlertEnabled(), {
+      wrapper,
+    })
+    expect(result.current.isRobotBusy).toBe(true)
+    expect(result.current.isUpdateAlertEnabled).toBe(true)
   })
 
-  it('returns isRobotBusy false and isUpdateAlertEnabled true when current runId is null and sessions are not empty and getAlertIsPermanentlyIgnored is true', () => {
+  it('returns isRobotBusy false and isUpdateAlertEnabled false when current runId is null and sessions are not empty and getAlertIsPermanentlyIgnored is true', () => {
     mockGetAlertIsPermanentlyIgnored.mockReturnValue(true)
     mockUseCurrentRunId.mockReturnValue(null)
     mockUseAllSessionsQuery.mockReturnValue(({
@@ -68,7 +76,10 @@ describe('useRobotBusyAndUpdateAlertEnabled', () => {
       ],
       links: {},
     } as unknown) as UseQueryResult<Sessions, Error>)
-    const result = useRobotBusyAndUpdateAlertEnabled()
-    expect(result).toBe({ isRobotBusy: false, isUpdateAlertEnabled: true })
+    const { result } = renderHook(() => useRobotBusyAndUpdateAlertEnabled(), {
+      wrapper,
+    })
+    expect(result.current.isRobotBusy).toBe(false)
+    expect(result.current.isUpdateAlertEnabled).toBe(false)
   })
 })
