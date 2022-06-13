@@ -157,7 +157,6 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   // component built with BaseModal
   return (
     <BaseModal
-      marginY="5rem"
       overlayColor="#737373e6"
       maxWidth="38rem"
       fontSize={FONT_SIZE_BODY_2}
