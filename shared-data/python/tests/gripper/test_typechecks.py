@@ -1,52 +1,76 @@
-import sys
-from typing import Iterator, Tuple
-
 import pytest
-import typeguard
-
-from opentrons_shared_data.gripper import (
-    model_config,
-    name_config,
-    fuse_specs,
-    dummy_model_for_name,
-)
-
-from opentrons_shared_data.gripper.dev_types import (
-    GripperModelSpecs,
-    GripperNameSpecs,
-    GripperFusedSpec,
-    GripperModel,
-    GripperName,
-)
-
-pytestmark = pytest.mark.xfail(
-    condition=sys.version_info >= (3, 10),
-    reason="https://github.com/agronholm/typeguard/issues/242",
-)
+from opentrons_shared_data import gripper
+from opentrons_shared_data.gripper import dev_types
 
 
-def test_model_config_check() -> None:
-    defdict = model_config()
-    typeguard.check_type("defdict", defdict, GripperModelSpecs)
+GRIPPER_DEF = {
+    "$otSharedSchema": "gripper/schemas/1",
+    "model": "gripperV1",
+    "displayName": "Gripper GEN1",
+    "idleCurrent": {
+        "value": 0.1,
+        "min": 0.02,
+        "max": 1.0,
+        "units": "amps",
+        "type": "float",
+    },
+    "activeCurrent": {
+        "value": 0.8,
+        "min": 0.02,
+        "max": 2.0,
+        "units": "amps",
+        "type": "float",
+    },
+    "referenceVoltage": {
+        "value": 2.6,
+        "min": 0.5,
+        "max": 3.3,
+        "units": "volt",
+        "type": "float",
+    },
+    "pwmFrequency": {
+        "value": 32000,
+        "min": 1000,
+        "max": 32000,
+        "units": "hertz",
+        "type": "int",
+    },
+    "dutyCycle": {
+        "value": 50,
+        "min": 10,
+        "max": 90,
+        "units": "percentage",
+        "type": "int",
+    },
+    "baseOffsetFromMount": {"x": 6.775, "y": 87.325, "z": 32.05},
+    "jawCenterOffsetFromBase": {"x": 8.5, "y": 2.5, "z": 86},
+    "pinOneOffsetFromBase": {"x": 23, "y": 73.37920159, "z": 95},
+    "pinTwoOffsetFromBase": {"x": 23, "y": 78.37920159, "z": 95},
+    "quirks": [],
+}
 
 
-def test_name_config_check() -> None:
-    defdict = name_config()
-    typeguard.check_type("defdict", defdict, GripperNameSpecs)
+def test_gripper_definition() -> None:
+    gripper_def = gripper.load_definition(
+        dev_types.GripperSchemaVersion.v1, dev_types.GripperModel.v1
+    )
+    assert isinstance(gripper_def, dev_types.GripperDefinitionV1)
 
 
-def build_model_name_pairs() -> Iterator[Tuple[GripperModel, GripperName]]:
-    for model, conf in model_config()["config"].items():
-        yield model, conf["name"]
+def test_gripper_definition_type() -> None:
+    assert dev_types.GripperDefinitionV1.from_dict(GRIPPER_DEF)
 
+    # missing key
+    del GRIPPER_DEF["idleCurrent"]
+    with pytest.raises(dev_types.InvalidGripperDefinition):
+        assert dev_types.GripperDefinitionV1.from_dict(GRIPPER_DEF)
 
-@pytest.mark.parametrize("model,name", list(build_model_name_pairs()))
-def test_fuse(model: GripperModel, name: GripperName) -> None:
-    defdict = fuse_specs(model, name)
-    typeguard.check_type("defdict", defdict, GripperFusedSpec)
-
-
-@pytest.mark.parametrize("name", list(name_config().keys()))
-def test_model_for_name(name: GripperName) -> None:
-    model = dummy_model_for_name(name)
-    assert model in model_config()["config"]
+    # add back in missing values
+    GRIPPER_DEF["idleCurrent"] = {
+        "value": 0.01,
+        "min": 0.02,
+        "max": 1.0,
+        "units": "amps",
+        "type": "float",
+    }
+    assert dev_types.GripperDefinitionV1.from_dict(GRIPPER_DEF)

@@ -1,27 +1,51 @@
-"""Types for gripper config that require typing_extensions.
+"""opentrons_shared_data.gripper.dev_types: gripper types."""
 
-This module should only be imported if typing.TYPE_CHECKING is True.
-"""
-from typing import Dict, List, Union, NewType
+from typing import Any, Dict, List, NamedTuple
+from dataclasses import dataclass
+from enum import Enum
 
-from typing_extensions import Literal, TypedDict
+from typing_extensions import Literal
 
 
-GripperName = Literal["gripper"]
-
-GripperModel = NewType("GripperModel", str)
-
-DisplayCategory = Literal["GEN1"]
-
-ConfigUnit = Union[
-    Literal["amps"],
-    Literal["hertz"],  # PWM frequency
-    Literal["percentage"],  # Duty cycle
-    Literal["volt"],  # Reference voltage
+ConfigUnit = Literal[
+    "amps",
+    "hertz",  # PWM frequency
+    "percentage",  # Duty cycle
+    "volt",  # Reference voltage
 ]
 
 
-class GripperCustomizableConfigElementFloat(TypedDict):
+class InvalidGripperDefinition(Exception):
+    """Incorrect gripper definition."""
+
+    pass
+
+
+class GripperModel(str, Enum):
+    """Gripper models."""
+
+    v1 = "gripperV1"
+
+
+class GripperSchemaVersion(str, Enum):
+    """Gripper schema versions."""
+
+    v1 = "1"
+
+
+GripperSchema = Dict[str, Any]
+
+
+class GripperOffset(NamedTuple):
+    """Offset values for gripper."""
+
+    x: float
+    y: float
+    z: float
+
+
+@dataclass
+class GripperCustomizableFloat:
     """Customizable floats."""
 
     value: float
@@ -31,7 +55,8 @@ class GripperCustomizableConfigElementFloat(TypedDict):
     type: Literal["float"]
 
 
-class GripperCustomizableConfigElementInt(TypedDict):
+@dataclass
+class GripperCustomizableInt:
     """Customizable ints."""
 
     value: int
@@ -41,39 +66,42 @@ class GripperCustomizableConfigElementInt(TypedDict):
     type: Literal["int"]
 
 
-class GripperNameSpec(TypedDict):
-    """Names for gripper."""
+@dataclass
+class GripperDefinitionV1:
+    """Gripper v1 definition."""
 
-    displayName: str
-    displayCategory: DisplayCategory
+    display_name: str
+    model: GripperModel
+    idle_current: GripperCustomizableFloat
+    active_current: GripperCustomizableFloat
+    reference_voltage: GripperCustomizableFloat
+    pwm_frequency: GripperCustomizableInt
+    duty_cycle: GripperCustomizableInt
+    base_offset_from_mount: GripperOffset
+    jaw_center_offset_from_base: GripperOffset
+    pin_one_offset_from_base: GripperOffset
+    pin_two_offset_from_base: GripperOffset
+    quirks: List[str]
 
-
-GripperNameSpecs = Dict[GripperName, GripperNameSpec]
-
-
-class GripperModelSpec(TypedDict, total=False):
-    """Gripper specs based on model."""
-
-    name: GripperName
-    idleCurrent: GripperCustomizableConfigElementFloat
-    activeCurrent: GripperCustomizableConfigElementFloat
-    referenceVoltage: GripperCustomizableConfigElementFloat
-    pwmFrequency: GripperCustomizableConfigElementInt
-    dutyCycle: GripperCustomizableConfigElementInt
-    baseOffsetFromMount: List[float]
-    jawCenterOffsetFromBase: List[float]
-    pinOneOffsetFromBase: List[float]
-    pinTwoOffsetFromBase: List[float]
-
-
-class GripperModelSpecs(TypedDict):
-    """Gripper model specs with mutable configs."""
-
-    config: Dict[GripperModel, GripperModelSpec]
-    mutableConfigs: List[str]
-
-
-class GripperFusedSpec(GripperNameSpec, GripperModelSpec, total=False):
-    """Gripper fused spec."""
-
-    pass
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "GripperDefinitionV1":
+        """Create GripperDefinitionV1 from object loaded from json file."""
+        try:
+            return cls(
+                display_name=data["displayName"],
+                model=GripperModel(data["model"]),
+                idle_current=GripperCustomizableFloat(**data["idleCurrent"]),
+                active_current=GripperCustomizableFloat(**data["activeCurrent"]),
+                reference_voltage=GripperCustomizableFloat(**data["referenceVoltage"]),
+                pwm_frequency=GripperCustomizableInt(**data["pwmFrequency"]),
+                duty_cycle=GripperCustomizableInt(**data["dutyCycle"]),
+                base_offset_from_mount=GripperOffset(**data["baseOffsetFromMount"]),
+                jaw_center_offset_from_base=GripperOffset(
+                    **data["jawCenterOffsetFromBase"]
+                ),
+                pin_one_offset_from_base=GripperOffset(**data["pinOneOffsetFromBase"]),
+                pin_two_offset_from_base=GripperOffset(**data["pinTwoOffsetFromBase"]),
+                quirks=data["quirks"],
+            )
+        except (KeyError) as e:
+            raise InvalidGripperDefinition(e)
