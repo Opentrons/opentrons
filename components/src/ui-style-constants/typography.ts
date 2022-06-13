@@ -122,12 +122,13 @@ export const linkPSemiBold = css`
 `
 
 export const darkLinkPSemiBold = css`
-  font-size: ${fontSizeP};
+  font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
   color: ${COLORS.darkBlack};
+  opacity: 0.7;
 
   &:hover {
-    opacity: 0.7;
+    opacity: 1;
   }
 `

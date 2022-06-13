@@ -55,13 +55,12 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   font-weight: ${TYPOGRAPHY.pSemiBold};
    &:enabled {
     align-items={TYPOGRAPHY.textAlignCenter}
-    borderRadius={SPACING.spacing2}
+    background-color={COLORS.transparent}
    }
 
    &:hover {
     align-items={TYPOGRAPHY.textAlignCenter}
-    borderRadius={SPACING.spacing2}
-   }
+    }
   `
 
   const sortByLabelType: {
@@ -181,7 +180,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           {showSortByMenu ? (
             <Overlay
               onClick={handleClickOutside}
-              backgroundColor={COLORS.darkGreyEnabled}
+              backgroundColor={COLORS.transparent}
             />
           ) : null}
           <SecondaryButton onClick={() => setShowSlideout(true)}>

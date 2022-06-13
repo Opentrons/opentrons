@@ -34,6 +34,10 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
     background-color: ${COLORS.bluePressed};
   }
 
+  &:enabled {
+    background-color: ${COLORS.transparent};
+  }
+
   &:focus {
     box-shadow: 0 0 0 3px ${COLORS.warning};
   }
