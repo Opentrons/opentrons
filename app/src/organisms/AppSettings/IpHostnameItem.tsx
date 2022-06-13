@@ -5,7 +5,6 @@ import {
   Btn,
   Icon,
   COLORS,
-  Text,
   TYPOGRAPHY,
   Flex,
   JUSTIFY_FLEX_START,
@@ -64,19 +63,15 @@ export function IpHostnameItem({
             {candidate}
           </StyledText>
         </IpItem>
-        <Text
-          fontSize={TYPOGRAPHY.fontSizeH6}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          lineHeight={TYPOGRAPHY.lineHeight12}
-          textTransform={TYPOGRAPHY.textTransformNone}
-          fontStyle={TYPOGRAPHY.fontStyleNormal}
+        <StyledText
+          as="label"
           color={COLORS.darkGreyEnabled}
           css={`
             white-space: nowrap;
           `}
         >
           {getDiscoveryText()}
-        </Text>
+        </StyledText>
         <Btn
           size={TYPOGRAPHY.lineHeight20}
           color={COLORS.darkBlack}

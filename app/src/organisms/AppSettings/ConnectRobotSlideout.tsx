@@ -6,7 +6,6 @@ import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   SPACING,
-  Text,
   TYPOGRAPHY,
   COLORS,
   Icon,
@@ -64,6 +63,10 @@ export function ConnectRobotSlideout({
     }
   }, [isScanning])
 
+  React.useEffect(() => {
+    dispatch(startDiscovery())
+  }, [dispatch])
+
   return (
     <Slideout
       title={t('connect_ip')}
@@ -76,12 +79,10 @@ export function ConnectRobotSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <Text fontSize={TYPOGRAPHY.fontSizeP} marginBottom={SPACING.spacing3}>
+        <StyledText as="p" marginBottom={SPACING.spacing3}>
           {t('ip_description_first')}
-        </Text>
-        <Text fontSize={TYPOGRAPHY.fontSizeP}>
-          {t('ip_description_second')}
-        </Text>
+        </StyledText>
+        <StyledText as="p">{t('ip_description_second')}</StyledText>
         <ExternalLink
           href={SUPPORT_PAGE_LINK}
           css={TYPOGRAPHY.pSemiBold}
@@ -91,7 +92,9 @@ export function ConnectRobotSlideout({
           {t('connect_ip_link')}
         </ExternalLink>
         <Divider marginY={SPACING.spacing5} />
-        <Text css={TYPOGRAPHY.pSemiBold}>{t('add_ip_hostname')}</Text>
+        <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+          {t('add_ip_hostname')}
+        </StyledText>
         <ManualIpHostnameForm setMostRecentAddition={setMostRecentAddition} />
 
         <Flex
