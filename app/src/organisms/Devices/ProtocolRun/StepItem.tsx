@@ -128,7 +128,7 @@ export function StepItemComponent(props: StepItemProps): JSX.Element | null {
     flex-direction: ${DIRECTION_COLUMN};
     width: 100%;
   `
-  
+
   return (
     <Flex
       alignItems={ALIGN_CENTER}
