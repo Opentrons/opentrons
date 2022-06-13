@@ -6,7 +6,6 @@ import {
   Icon,
   Flex,
   FONT_SIZE_CAPTION,
-  fontSizeLabel,
   SPACING,
   Link,
   JUSTIFY_START,
@@ -37,7 +36,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
     >
       <StyledText
         role="complementary"
-        css={TYPOGRAPHY.pSemiBold}
+        as="label"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginBottom={SPACING.spacing3}
       >
@@ -85,7 +84,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
         </Link>
 
         <Link
-          fontSize={fontSizeLabel}
+          fontSize={TYPOGRAPHY.fontSizeLabel}
           css={TYPOGRAPHY.labelSemiBold}
           color={COLORS.darkBlack}
           marginRight={SPACING.spacing3}
