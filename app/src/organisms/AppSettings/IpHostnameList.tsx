@@ -6,17 +6,19 @@ import { IpHostnameItem } from './IpHostnameItem'
 
 import type { State, Dispatch } from '../../redux/types'
 
-interface Props {
+interface IpHostnameListProps {
   mostRecentAddition: string | null
 }
 
-export function IpHostnameList(props: Props): JSX.Element {
+export function IpHostnameList({
+  mostRecentAddition,
+}: IpHostnameListProps): JSX.Element {
   const candidates = useSelector(
     (state: State) => getConfig(state)?.discovery.candidates ?? []
   )
   const robots = useSelector((state: State) => getViewableRobots(state))
   const dispatch = useDispatch<Dispatch>()
-
+  console.log('candidates', candidates)
   return (
     <>
       {candidates
@@ -33,7 +35,7 @@ export function IpHostnameList(props: Props): JSX.Element {
             key={index}
             removeIp={() => dispatch(removeManualIp(candidate))}
             discovered={discovered}
-            justAdded={candidate === props.mostRecentAddition}
+            justAdded={candidate === mostRecentAddition}
             isLast={index === candidates.length - 1}
           />
         ))}

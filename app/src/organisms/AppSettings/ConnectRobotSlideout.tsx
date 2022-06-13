@@ -32,13 +32,13 @@ export interface ConnectRobotSlideoutProps {
   onCloseClick: () => void
 }
 
-export function ConnectRobotSlideout(
-  props: ConnectRobotSlideoutProps
-): JSX.Element | null {
+export function ConnectRobotSlideout({
+  isExpanded,
+  onCloseClick,
+}: ConnectRobotSlideoutProps): JSX.Element | null {
   const [mostRecentAddition, setMostRecentAddition] = React.useState<
     string | null
   >(null)
-  const { onCloseClick, isExpanded } = props
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const refreshDiscovery = (): unknown => dispatch(startDiscovery())

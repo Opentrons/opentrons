@@ -23,7 +23,7 @@ const IpItem = styled.div`
   outline: 0;
   line-height: 2rem;
 `
-export interface IpHostnameItemProps {
+interface IpHostnameItemProps {
   candidate: string
   discovered: boolean
   removeIp: (ip: string) => unknown
@@ -31,15 +31,21 @@ export interface IpHostnameItemProps {
   isLast: boolean
 }
 
-export function IpHostnameItem(props: IpHostnameItemProps): JSX.Element {
+export function IpHostnameItem({
+  candidate,
+  discovered,
+  removeIp,
+  justAdded,
+  isLast,
+}: IpHostnameItemProps): JSX.Element {
   const remove = (): void => {
-    props.removeIp(props.candidate)
+    removeIp(candidate)
   }
   const { t } = useTranslation('app_settings')
   const getDiscoveryText = (): string | null => {
-    if (props.discovered) {
+    if (discovered) {
       return t('ip_available')
-    } else if (props.justAdded) {
+    } else if (justAdded) {
       return null
     } else {
       return t('ip_not_found')
@@ -53,9 +59,9 @@ export function IpHostnameItem(props: IpHostnameItemProps): JSX.Element {
           <StyledText
             as="p"
             data-testid={`ip-hostname`}
-            color={props.discovered ? COLORS.darkBlack : COLORS.successDisabled}
+            color={discovered ? COLORS.darkBlack : COLORS.successDisabled}
           >
-            {props.candidate}
+            {candidate}
           </StyledText>
         </IpItem>
         <Text
@@ -81,7 +87,7 @@ export function IpHostnameItem(props: IpHostnameItemProps): JSX.Element {
           <Icon name="close" />
         </Btn>
       </Flex>
-      {!props.isLast && <Divider width="100%" />}
+      {!isLast && <Divider width="100%" />}
     </>
   )
 }
