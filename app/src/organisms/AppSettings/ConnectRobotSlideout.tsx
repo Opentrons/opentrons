@@ -5,12 +5,13 @@ import {
   Flex,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   SPACING,
   TYPOGRAPHY,
   COLORS,
   Icon,
-  SIZE_2,
   Link,
+  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { ManualIpHostnameForm } from './ManualIpHostnameForm'
 import { IpHostnameList } from './IpHostnameList'
@@ -38,7 +39,7 @@ export function ConnectRobotSlideout({
   const [mostRecentAddition, setMostRecentAddition] = React.useState<
     string | null
   >(null)
-  const { t } = useTranslation('app_settings')
+  const { t } = useTranslation(['app_settings', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const refreshDiscovery = (): unknown => dispatch(startDiscovery())
   const isScanning = useSelector<State>(getScanning)
@@ -51,6 +52,7 @@ export function ConnectRobotSlideout({
         color={COLORS.blue}
         onClick={refreshDiscovery}
         id="AppSettings_Connection_Button"
+        textTransform={TEXT_TRANSFORM_CAPITALIZE}
       >
         {buttonLabel}
       </Link>
@@ -103,11 +105,20 @@ export function ConnectRobotSlideout({
           justifyContent={ALIGN_FLEX_END}
         >
           {isScanning ? (
-            <Icon name="ot-spinner" size={SIZE_2} spin />
+            <Flex flexDirection={DIRECTION_ROW}>
+              <StyledText
+                as="p"
+                color={COLORS.darkGreyEnabled}
+                marginRight={SPACING.spacing3}
+              >
+                {t('searching')}
+              </StyledText>{' '}
+              <Icon name="ot-spinner" size="1.25rem" spin />
+            </Flex>
           ) : (
             [
-              mostRecentAddition !== null ? (
-                displayLinkButton(t('ip_refresh_button'))
+              mostRecentAddition != null ? (
+                displayLinkButton(t('shared:refresh'))
               ) : (
                 <>
                   <StyledText
@@ -115,9 +126,9 @@ export function ConnectRobotSlideout({
                     color={COLORS.darkGreyEnabled}
                     margin={`0 ${SPACING.spacing2}`}
                   >
-                    {t('ip_connect_timeout')}
+                    {t('discovery_timeout')}
                   </StyledText>
-                  {displayLinkButton(t('ip_reconnect_button'))}
+                  {displayLinkButton(t('try_again'))}
                 </>
               ),
             ]

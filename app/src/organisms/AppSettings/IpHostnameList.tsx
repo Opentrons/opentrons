@@ -19,7 +19,7 @@ export function IpHostnameList({
   )
   const robots = useSelector((state: State) => getViewableRobots(state))
   const dispatch = useDispatch<Dispatch>()
-  console.log('candidates', candidates)
+
   return (
     <>
       {candidates
