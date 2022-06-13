@@ -62,26 +62,31 @@
       "type": "string",
       "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/gripper/schemas/1 is a reference to this schema."
     },
-    "displayName": {"type": "string"},
+    "displayName": { "type": "string" },
     "model": {
       "type": "string",
       "pattern": "^gripperV[0-9]$"
     },
     "idleCurrent": {
       "type": "object",
-      "value": {"$ref": "#/definitions/idleCurrentRange" }},
+      "value": { "$ref": "#/definitions/idleCurrentRange" }
+    },
     "activeCurrent": {
       "type": "object",
-      "value": {"$ref": "#/definitions/activeCurrentRange" }},
+      "value": { "$ref": "#/definitions/activeCurrentRange" }
+    },
     "referenceVoltage": {
       "type": "object",
-      "value": {"$ref": "#/definitions/referenceVoltageRange"}},
+      "value": { "$ref": "#/definitions/referenceVoltageRange" }
+    },
     "pwmFrequency": {
       "type": "object",
-      "value": {"$ref": "#/definitions/pwmFrequencyRange"}},
+      "value": { "$ref": "#/definitions/pwmFrequencyRange" }
+    },
     "dutyCycle": {
       "type": "object",
-      "value": { "$ref": "#/definitions/percentage" }},
+      "value": { "$ref": "#/definitions/percentage" }
+    },
     "baseOffsetFromMount": { "$ref": "#/definitions/coordinates" },
     "jawCenterOffsetFromBase": { "$ref": "#/definitions/coordinates" },
     "pinOneOffsetFromBase": { "$ref": "#/definitions/coordinates" },
