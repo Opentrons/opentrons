@@ -8,6 +8,7 @@ import {
   getIsHeaterShakerEastWestWithLatchOpen,
   pipetteAdjacentHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
 } from '../../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { AspirateParams } from '@opentrons/shared-data/protocol/types/schemaV3'
@@ -118,6 +119,18 @@ export const aspirate: CommandCreator<AspirateParams> = (
     )
   ) {
     errors.push(errorCreators.heaterShakerEastWestOfMultiChannelPipette())
+  }
+  if (
+    getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]?.slot,
+      pipetteSpec,
+      invariantContext.labwareEntities[labware]
+    )
+  ) {
+    errors.push(
+      errorCreators.heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette()
+    )
   }
   if (errors.length === 0 && pipetteSpec && pipetteSpec.maxVolume < volume) {
     errors.push(

@@ -6,7 +6,6 @@ import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
-import { DeckCalibrationModal } from '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { useTrackEvent } from '../../../../redux/analytics'
 import * as RobotSelectors from '../../../../redux/robot/selectors'
 import * as Calibration from '../../../../redux/calibration'
@@ -40,6 +39,7 @@ import {
   useAttachedPipettes,
   useIsRobotBusy,
   useDeckCalibrationStatus,
+  useRunStartedOrLegacySessionInProgress,
 } from '../../hooks'
 
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
@@ -52,9 +52,6 @@ import type {
 } from '../../../../redux/pipettes/types'
 
 jest.mock('file-saver')
-jest.mock(
-  '../../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
-)
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/calibration/selectors')
@@ -85,10 +82,6 @@ const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = {
     tipLength: mockTipLengthCalibration2,
   },
 } as any
-
-const mockDeckCalibrationModal = DeckCalibrationModal as jest.MockedFunction<
-  typeof DeckCalibrationModal
->
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
 >
@@ -126,6 +119,9 @@ const mockGetAttachedPipettes = Pipettes.getAttachedPipettes as jest.MockedFunct
 const mockGetAttachedPipetteCalibrations = Pipettes.getAttachedPipetteCalibrations as jest.MockedFunction<
   typeof Pipettes.getAttachedPipetteCalibrations
 >
+const mockUseRunStartedOrLegacySessionInProgress = useRunStartedOrLegacySessionInProgress as jest.MockedFunction<
+  typeof useRunStartedOrLegacySessionInProgress
+>
 
 let mockTrackEvent: jest.Mock
 const mockUpdateRobotStatus = jest.fn()
@@ -160,10 +156,8 @@ describe('RobotSettingsCalibration', () => {
 
   beforeEach(() => {
     mockTrackEvent = jest.fn()
+    mockUseRunStartedOrLegacySessionInProgress.mockReturnValue(false)
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    mockDeckCalibrationModal.mockReturnValue(
-      <div>Mock DeckCalibrationModal</div>
-    )
     mockUseDeckCalibrationData.mockReturnValue({
       deckCalibrationData: mockDeckCalData,
       isDeckCalibrated: true,
@@ -199,14 +193,6 @@ describe('RobotSettingsCalibration', () => {
     getByText(
       'For the robot to move accurately and precisely, you need to calibrate it. Positional calibration happens in three parts: deck calibration, pipette offset calibration and tip length calibration.'
     )
-  })
-
-  it('renders a clickable link to the deck calibration modal', () => {
-    const [{ getByText, queryByText }] = render()
-    expect(queryByText('Mock DeckCalibrationModal')).toBeFalsy()
-    const modalLink = getByText('See how robot calibration works')
-    modalLink.click()
-    getByText('Mock DeckCalibrationModal')
   })
 
   it('renders a download calibration data button', () => {
@@ -306,6 +292,7 @@ describe('RobotSettingsCalibration', () => {
       deckCalibrationData: mockWarningDeckCalData,
       isDeckCalibrated: true,
     })
+    mockUseRunStartedOrLegacySessionInProgress.mockReturnValue(true)
     mockGetIsRunning.mockReturnValue(false)
     mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByRole }] = render()

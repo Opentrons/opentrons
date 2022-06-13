@@ -3,14 +3,15 @@ import asyncio
 import logging
 import json
 from typing import Any, Mapping, Optional
+
 from aiohttp import web
 
 from otupdate.common import (
     config,
-    control,
-    ssh_key_management,
-    name_management,
     constants,
+    control,
+    name_management,
+    ssh_key_management,
     update,
 )
 from . import update_actions
@@ -38,11 +39,11 @@ def get_version(version_file: str) -> Mapping[str, str]:
 
 
 def get_app(
+    name_synchronizer: name_management.NameSynchronizer,
     system_version_file: Optional[str] = None,
     config_file_override: Optional[str] = None,
     name_override: Optional[str] = None,
     boot_id_override: Optional[str] = None,
-    loop: Optional[asyncio.AbstractEventLoop] = None,
 ) -> web.Application:
     """Build and return the aiohttp.web.Application that runs the server
 
@@ -52,40 +53,17 @@ def get_app(
         system_version_file = BR_BUILTIN_VERSION_FILE
 
     version = get_version(system_version_file)
-    name = name_override or name_management.get_pretty_hostname()
     boot_id = boot_id_override or control.get_boot_id()
     config_obj = config.load(config_file_override)
 
-    LOG.info(
-        "Setup: "
-        + "\n\t".join(
-            [
-                f"Device name: {name}",
-                "Buildroot version:         "
-                f'{version.get("buildroot_version", "unknown")}',
-                "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
-                "API version:               "
-                f'{version.get("opentrons_api_version", "unknown")}',
-                "\t(from git sha      "
-                f'{version.get("opentrons_api_sha", "unknown")}',
-                "Update server version:     "
-                f'{version.get("update_server_version", "unknown")}',
-                "\t(from git sha      "
-                f'{version.get("update_server_sha", "unknown")}',
-                "Smoothie firmware version: TODO",
-            ]
-        )
-    )
-
-    if not loop:
-        loop = asyncio.get_event_loop()
-
     app = web.Application(middlewares=[log_error_middleware])
+
     app[config.CONFIG_VARNAME] = config_obj
     app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
     app[constants.DEVICE_BOOT_ID_NAME] = boot_id
-    app[constants.DEVICE_NAME_VARNAME] = name
     update_actions.OT2UpdateActions.build_and_insert(app)
+    name_management.install_name_synchronizer(name_synchronizer, app)
+
     app.router.add_routes(
         [
             web.get(
@@ -106,6 +84,28 @@ def get_app(
             web.get("/server/name", name_management.get_name_endpoint),
         ]
     )
+
+    LOG.info(
+        "Setup: "
+        + "\n\t".join(
+            [
+                f"Device name: {name_synchronizer.get_name()}",
+                "Buildroot version:         "
+                f'{version.get("buildroot_version", "unknown")}',
+                "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
+                "API version:               "
+                f'{version.get("opentrons_api_version", "unknown")}',
+                "\t(from git sha      "
+                f'{version.get("opentrons_api_sha", "unknown")}',
+                "Update server version:     "
+                f'{version.get("update_server_version", "unknown")}',
+                "\t(from git sha      "
+                f'{version.get("update_server_sha", "unknown")}',
+                "Smoothie firmware version: TODO",
+            ]
+        )
+    )
+
     return app
 
 

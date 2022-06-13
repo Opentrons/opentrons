@@ -13,7 +13,6 @@ import {
 } from '@opentrons/components'
 import {
   getAreSlotsAdjacent,
-  getIsLabwareAboveHeight,
   THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
@@ -21,7 +20,6 @@ import {
   THERMOCYCLER_MODULE_V1,
   ModuleType,
   ModuleModel,
-  MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
@@ -68,21 +66,6 @@ type EditModulesModalComponentProps = EditModulesModalProps & {
 export interface EditModulesFormValues {
   selectedModel: ModuleModel | null
   selectedSlot: string
-}
-
-// this util only works for outter slots (where we can safely place modules in PD)
-const getSlotNextTo = (slot: string): string | null => {
-  const SLOT_ADJACENT_MAP: Record<string, string> = {
-    '1': '2',
-    '3': '2',
-    '4': '5',
-    '6': '5',
-    '7': '8',
-    '9': '8',
-    '10': '11',
-  }
-
-  return SLOT_ADJACENT_MAP[slot] ?? null
 }
 
 export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
@@ -149,28 +132,12 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
         { selectedSlot }
       )
     } else if (selectedModel === HEATERSHAKER_MODULE_V1) {
-      const labwareNextToHeaterShaker = getLabwareOnSlot(
-        initialDeckSetup,
-        getSlotNextTo(selectedSlot) ?? ''
-      )
-
       const isHeaterShakerAdjacentToAnotherModule = some(
         initialDeckSetup.modules,
         hwModule => getAreSlotsAdjacent(hwModule.slot, selectedSlot)
       )
 
-      if (
-        labwareNextToHeaterShaker &&
-        getIsLabwareAboveHeight(
-          labwareNextToHeaterShaker.def,
-          MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
-        )
-      ) {
-        errors.selectedSlot = i18n.t(
-          'alert.module_placement.HEATER_SHAKER_ADJACENT_LABWARE_TOO_TALL.body',
-          { selectedSlot }
-        )
-      } else if (isHeaterShakerAdjacentToAnotherModule) {
+      if (isHeaterShakerAdjacentToAnotherModule) {
         errors.selectedSlot = i18n.t(
           'alert.module_placement.HEATER_SHAKER_ADJACENT_TO_ANOTHER_MODULE.body',
           { selectedSlot }
