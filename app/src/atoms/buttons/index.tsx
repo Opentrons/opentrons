@@ -104,7 +104,7 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
   &:enabled {
     background-color: ${COLORS.transparent};
   }
-  
+
   &:disabled {
     opacity: 50%;
   }
