@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+
+  "definitions": {
+    "idleCurrentRange": {
+      "type": "number",
+      "minimum": 0.01,
+      "maximum": 1.0
+    },
+    "activeCurrentRange": {
+      "type": "number",
+      "minimum": 0.02,
+      "maximum": 2.0
+    },
+    "referenceVoltageRange": {
+      "type": "number",
+      "minimum": 0.01,
+      "maximum": 3.3
+    },
+    "pwmFrequencyRange": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 32000
+    },
+    "percentage": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "coordinates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" }
+      }
+    }
+  },
+
+  "description": "Gripper specification",
+  "type": "object",
+  "required": [
+    "$otSharedSchema",
+    "displayName",
+    "model",
+    "idleCurrent",
+    "activeCurrent",
+    "referenceVoltage",
+    "pwmFrequency",
+    "dutyCycle",
+    "baseOffsetFromMount",
+    "jawCenterOffsetFromBase",
+    "pinOneOffsetFromBase",
+    "pinTwoOffsetFromBase",
+    "quirks"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$otSharedSchema": {
+      "type": "string",
+      "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/gripper/schemas/1 is a reference to this schema."
+    },
+    "displayName": {"type": "string"},
+    "model": {
+      "type": "string",
+      "pattern": "^gripperV[0-9]$"
+    },
+    "idleCurrent": {
+      "type": "object",
+      "value": {"$ref": "#/definitions/idleCurrentRange" }},
+    "activeCurrent": {
+      "type": "object",
+      "value": {"$ref": "#/definitions/activeCurrentRange" }},
+    "referenceVoltage": {
+      "type": "object",
+      "value": {"$ref": "#/definitions/referenceVoltageRange"}},
+    "pwmFrequency": {
+      "type": "object",
+      "value": {"$ref": "#/definitions/pwmFrequencyRange"}},
+    "dutyCycle": {
+      "type": "object",
+      "value": { "$ref": "#/definitions/percentage" }},
+    "baseOffsetFromMount": { "$ref": "#/definitions/coordinates" },
+    "jawCenterOffsetFromBase": { "$ref": "#/definitions/coordinates" },
+    "pinOneOffsetFromBase": { "$ref": "#/definitions/coordinates" },
+    "pinTwoOffsetFromBase": { "$ref": "#/definitions/coordinates" },
+    "quirks": {
+      "type": "array",
+      "description": "Array of valid quirks for a given gripper",
+      "items": { "type": "string" }
+    }
+  }
+}
