@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import {
   Btn,
   Icon,
@@ -21,6 +21,17 @@ const IpItem = styled.div`
   border-radius: 0;
   outline: 0;
   line-height: 2rem;
+`
+
+const CLOSE_ICON_STYLE = css`
+  border-radius: 50%;
+
+  &:hover {
+    background: #16212d26;
+  }
+  &:active {
+    background: #16212d40;
+  }
 `
 interface IpHostnameItemProps {
   candidate: string
@@ -79,7 +90,7 @@ export function IpHostnameItem({
           marginLeft={SPACING.spacing4}
           data-testid="close-button"
         >
-          <Icon name="close" />
+          <Icon name="close" css={CLOSE_ICON_STYLE} />
         </Btn>
       </Flex>
       {!isLast && <Divider width="100%" />}
