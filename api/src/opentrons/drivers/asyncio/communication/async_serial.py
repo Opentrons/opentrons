@@ -151,6 +151,10 @@ class AsyncSerial:
         """
         return self._serial.is_open is True
 
+    def reset_input_buffer(self) -> None:
+        """Reset the input buffer"""
+        self._serial.reset_input_buffer()
+
     @contextlib.asynccontextmanager
     async def timeout_override(
         self, timeout_property: TimeoutProperties, timeout: Optional[float]

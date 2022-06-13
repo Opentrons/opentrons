@@ -131,8 +131,8 @@ def test_maps_temperature_module_data(input_model: str, input_data: LiveData) ->
         usbPort=UsbPort(port=101, hub=202, path="/dev/null"),
         data=TemperatureModuleData(
             status=TemperatureStatus(input_data["status"]),
-            currentTemperature=input_data["data"]["currentTemp"],  # type: ignore[arg-type]  # noqa: E501
-            targetTemperature=input_data["data"]["targetTemp"],  # type: ignore[arg-type]   # noqa: E501
+            currentTemperature=input_data["data"]["currentTemp"],  # type: ignore[arg-type]
+            targetTemperature=input_data["data"]["targetTemp"],  # type: ignore[arg-type]
         ),
     )
 
@@ -214,17 +214,17 @@ def test_maps_thermocycler_module_data(input_model: str, input_data: LiveData) -
         usbPort=UsbPort(port=101, hub=202, path="/dev/null"),
         data=ThermocyclerModuleData(
             status=TemperatureStatus(input_data["status"]),
-            currentTemperature=input_data["data"]["currentTemp"],  # type: ignore[arg-type]  # noqa: E501
-            targetTemperature=input_data["data"]["targetTemp"],  # type: ignore[arg-type]   # noqa: E501
+            currentTemperature=input_data["data"]["currentTemp"],  # type: ignore[arg-type]
+            targetTemperature=input_data["data"]["targetTemp"],  # type: ignore[arg-type]
             lidStatus=input_data["data"]["lid"],  # type: ignore[arg-type]
             lidTemperature=input_data["data"]["lidTemp"],  # type: ignore[arg-type]
-            lidTargetTemperature=input_data["data"]["lidTarget"],  # type: ignore[arg-type]  # noqa: E501
+            lidTargetTemperature=input_data["data"]["lidTarget"],  # type: ignore[arg-type]
             holdTime=input_data["data"]["holdTime"],  # type: ignore[arg-type]
             rampRate=input_data["data"]["rampRate"],  # type: ignore[arg-type]
-            currentCycleIndex=input_data["data"]["currentCycleIndex"],  # type: ignore[arg-type]  # noqa: E501
-            totalCycleCount=input_data["data"]["totalCycleCount"],  # type: ignore[arg-type]  # noqa: E501
-            currentStepIndex=input_data["data"]["currentStepIndex"],  # type: ignore[arg-type]  # noqa: E501
-            totalStepCount=input_data["data"]["totalStepCount"],  # type: ignore[arg-type]  # noqa: E501
+            currentCycleIndex=input_data["data"]["currentCycleIndex"],  # type: ignore[arg-type]
+            totalCycleCount=input_data["data"]["totalCycleCount"],  # type: ignore[arg-type]
+            currentStepIndex=input_data["data"]["currentStepIndex"],  # type: ignore[arg-type]
+            totalStepCount=input_data["data"]["totalStepCount"],  # type: ignore[arg-type]
         ),
     )
 
@@ -300,13 +300,13 @@ def test_maps_heater_shaker_module_data(input_model: str, input_data: LiveData) 
         usbPort=UsbPort(port=101, hub=202, path="/dev/null"),
         data=HeaterShakerModuleData(
             status=HeaterShakerStatus(input_data["status"]),
-            labwareLatchStatus=input_data["data"]["labwareLatchStatus"],  # type: ignore[arg-type]  # noqa: E501
+            labwareLatchStatus=input_data["data"]["labwareLatchStatus"],  # type: ignore[arg-type]
             speedStatus=input_data["data"]["speedStatus"],  # type: ignore[arg-type]
             currentSpeed=input_data["data"]["currentSpeed"],  # type: ignore[arg-type]
             targetSpeed=input_data["data"]["targetSpeed"],  # type: ignore[arg-type]
-            temperatureStatus=input_data["data"]["temperatureStatus"],  # type: ignore[arg-type]  # noqa: E501
-            currentTemperature=input_data["data"]["currentTemp"],  # type: ignore[arg-type]  # noqa: E501
-            targetTemperature=input_data["data"]["targetTemp"],  # type: ignore[arg-type]  # noqa: E501
+            temperatureStatus=input_data["data"]["temperatureStatus"],  # type: ignore[arg-type]
+            currentTemperature=input_data["data"]["currentTemp"],  # type: ignore[arg-type]
+            targetTemperature=input_data["data"]["targetTemp"],  # type: ignore[arg-type]
             errorDetails=input_data["data"]["errorDetails"],  # type: ignore[arg-type]
         ),
     )

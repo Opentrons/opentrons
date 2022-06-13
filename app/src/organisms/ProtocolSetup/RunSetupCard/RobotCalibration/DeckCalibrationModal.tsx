@@ -1,141 +1,140 @@
 import * as React from 'react'
-import { useTranslation, Trans } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import {
-  Text,
   Flex,
-  Link,
   Box,
-  Icon,
-  BaseModal,
-  NewPrimaryBtn,
-  SPACING_3,
-  SPACING_4,
-  SIZE_1,
-  SIZE_2,
-  SIZE_4,
-  C_BLUE,
-  FONT_HEADER_DARK,
-  FONT_BODY_1_DARK,
-  DIRECTION_ROW,
-  FONT_WEIGHT_SEMIBOLD,
-  FONT_SIZE_BODY_1,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING_1,
+  DIRECTION_COLUMN,
+  TYPOGRAPHY,
+  SPACING,
+  ALIGN_FLEX_END,
+  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
+
 import RobotCalHelpImage from '../../../../assets/images/robot_calibration_help.png'
 import { Portal } from '../../../../App/portal'
+import { Modal } from '../../../../atoms/Modal'
+import { StyledText } from '../../../../atoms/text'
+import { PrimaryButton } from '../../../../atoms/buttons'
+import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
+import { Divider } from '../../../../atoms/structure'
 
-const robotCalHelpArticle =
+const ROBOT_CAL_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
 interface DeckCalibrationModalProps {
   onCloseClick: () => unknown
 }
 
-export const DeckCalibrationModal = (
-  props: DeckCalibrationModalProps
-): JSX.Element => {
+export function DeckCalibrationModal({
+  onCloseClick,
+}: DeckCalibrationModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'shared'])
-
   return (
-    <Portal level={'top'}>
-      <BaseModal borderRadius={SIZE_1}>
-        <Box>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            alignItems={ALIGN_CENTER}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-          >
-            <Text css={FONT_HEADER_DARK}>{t('robot_cal_help_title')}</Text>
-            <Box onClick={props.onCloseClick} id={'RobotCalModal_xButton'}>
-              <Icon name={'close'} size={SIZE_2} />
-            </Box>
-          </Flex>
-          <Text css={FONT_BODY_1_DARK} marginTop={SPACING_4}>
+    <Portal level="top">
+      <Modal
+        title={t('robot_cal_help_title')}
+        onClose={onCloseClick}
+        maxHeight="28.125rem"
+      >
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <StyledText as="p" marginBottom={SPACING.spacing4}>
             {t('robot_cal_description')}
-          </Text>
-          <Link
-            fontSize={FONT_SIZE_BODY_1}
-            color={C_BLUE}
-            href={robotCalHelpArticle}
+          </StyledText>
+          <ExternalLink
+            href={ROBOT_CAL_HELP_ARTICLE}
             id={'RobotCalModal_helpArticleLink'}
-            external
           >
             {t('learn_more_about_robot_cal_link')}
-            <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
-          </Link>
-          <Box textAlign={ALIGN_CENTER} marginTop={SPACING_4}>
+          </ExternalLink>
+          <Box textAlign={ALIGN_CENTER} marginTop={SPACING.spacing4}>
             <img src={RobotCalHelpImage} width="100%" />
           </Box>
-          <Text
-            fontWeight={FONT_WEIGHT_SEMIBOLD}
-            fontSize={FONT_SIZE_BODY_1}
-            marginTop={SPACING_3}
-            role={'heading'}
+          {/* deck calibration */}
+          <StyledText
+            as="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            marginTop={SPACING.spacing4}
+            role="heading"
           >
             {t('deck_calibration_title')}
-          </Text>
-          <Text fontSize={FONT_SIZE_BODY_1} marginTop={SPACING_3}>
-            {t('deck_cal_description')}
-          </Text>
-          <Text
-            fontWeight={FONT_WEIGHT_SEMIBOLD}
-            fontSize={FONT_SIZE_BODY_1}
-            marginTop={SPACING_3}
-            role={'heading'}
+          </StyledText>
+          <CalibrationSteps
+            description={t('deck_cal_description')}
+            steps={[
+              t('deck_cal_description_bullet_1'),
+              t('deck_cal_description_bullet_2'),
+            ]}
+          />
+          <StyledText
+            as="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            marginTop={SPACING.spacing4}
+            role="heading"
           >
             {t('tip_length_cal_title')}
-          </Text>
-          <Text fontSize={FONT_SIZE_BODY_1} marginTop={SPACING_3}>
-            {t('tip_length_cal_description')}
-          </Text>
-          <Text
-            fontWeight={FONT_WEIGHT_SEMIBOLD}
-            fontSize={FONT_SIZE_BODY_1}
-            marginTop={SPACING_3}
-            role={'heading'}
+          </StyledText>
+          <CalibrationSteps
+            description={t('tip_length_cal_description')}
+            steps={[t('tip_length_cal_description_bullet')]}
+          />
+          {/* pipette offset calibration */}
+          <StyledText
+            as="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            marginTop={SPACING.spacing4}
+            role="heading"
           >
             {t('pipette_offset_cal')}
-          </Text>
-          <Text fontSize={FONT_SIZE_BODY_1} marginTop={SPACING_3}>
-            <Trans
-              t={t}
-              i18nKey="pipette_offset_cal_description"
-              components={{
-                block: <Text marginBottom={SPACING_3} />,
-              }}
-            />
-            <Flex flexDirection={DIRECTION_ROW} marginLeft={SPACING_3}>
-              <Icon
-                name={'circle'}
-                marginRight={SPACING_1}
-                marginTop={'0.35rem'}
-                size="4px"
-              />
-              {t('pipette_offset_cal_description_bullet_1')}
-            </Flex>
-            <Flex flexDirection={DIRECTION_ROW} marginLeft={SPACING_3}>
-              <Icon
-                name={'circle'}
-                marginRight={SPACING_1}
-                marginTop={'0.35rem'}
-                size="4px"
-              />
-              {t('pipette_offset_cal_description_bullet_2')}
-            </Flex>
-          </Text>
-          <Box textAlign={ALIGN_CENTER} marginTop={SPACING_4}>
-            <NewPrimaryBtn
-              onClick={props.onCloseClick}
-              width={SIZE_4}
-              name="close"
-              id={'RobotCalModal_closeButton'}
-            >
-              {t('shared:close')}
-            </NewPrimaryBtn>
-          </Box>
-        </Box>
-      </BaseModal>
+          </StyledText>
+          <CalibrationSteps
+            description={t('pipette_offset_cal_description')}
+            steps={[
+              t('pipette_offset_cal_description_bullet_1'),
+              t('pipette_offset_cal_description_bullet_2'),
+              t('pipette_offset_cal_description_bullet_3'),
+            ]}
+          />
+          <Divider marginTop="2.5rem" marginBottom={SPACING.spacing4} />
+          <PrimaryButton
+            onClick={onCloseClick}
+            alignSelf={ALIGN_FLEX_END}
+            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          >
+            {t('shared:close')}
+          </PrimaryButton>
+        </Flex>
+      </Modal>
     </Portal>
+  )
+}
+
+interface CalibrationStepsProps {
+  description: string
+  steps: string[]
+}
+function CalibrationSteps({
+  description,
+  steps,
+}: CalibrationStepsProps): JSX.Element {
+  return (
+    <Box marginTop={SPACING.spacing2}>
+      <StyledText as="p" marginBottom={SPACING.spacing3}>
+        {description}
+      </StyledText>
+      <ul>
+        {steps.map(step => (
+          <li
+            css={css`
+              margin-left: ${SPACING.spacing5};
+            `}
+            key={step}
+          >
+            <StyledText as="p">{step}</StyledText>
+          </li>
+        ))}
+      </ul>
+    </Box>
   )
 }

@@ -18,7 +18,7 @@ import {
   ModuleType,
 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
 import { i18n } from '../../../../i18n'
 import { useLPCSuccessToast } from '../../../ProtocolSetup/hooks'
@@ -193,6 +193,8 @@ const render = () => {
         protocolRunHeaderRef={null}
         robotName={ROBOT_NAME}
         runId={RUN_ID}
+        nextStep={null}
+        expandStep={() => null}
       />
     </StaticRouter>,
     {
@@ -536,6 +538,18 @@ describe('LabwareSetup', () => {
     })
     fireEvent.click(button)
     expect(mockSetIsShowingLPCSuccessToast).toHaveBeenCalledWith(false)
+  })
+  it('should render a disabled LPC button when a robot-side protocol analysis is not complete', () => {
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        protocolData: null,
+      } as any)
+    const { getByRole } = render()
+    const button = getByRole('button', {
+      name: 'run labware position check',
+    })
+    expect(button).toBeDisabled()
   })
   it('should render a disabled LPC button when a protocol without a pipette AND without a labware is uploaded', () => {
     when(mockUseProtocolDetailsForRun)

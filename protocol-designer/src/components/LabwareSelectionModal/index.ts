@@ -1,5 +1,9 @@
 import { connect } from 'react-redux'
 import {
+  getAreSlotsHorizontallyAdjacent,
+  HEATERSHAKER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import {
   LabwareSelectionModal as LabwareSelectionModalComponent,
   Props as LabwareSelectionModalProps,
 } from './LabwareSelectionModal'
@@ -20,6 +24,7 @@ interface SP {
   parentSlot: LabwareSelectionModalProps['parentSlot']
   moduleType: LabwareSelectionModalProps['moduleType']
   permittedTipracks: LabwareSelectionModalProps['permittedTipracks']
+  isNextToHeaterShaker: boolean
 }
 
 function mapStateToProps(state: BaseState): SP {
@@ -33,11 +38,19 @@ function mapStateToProps(state: BaseState): SP {
     (slot != null &&
       initialModules.find(moduleOnDeck => moduleOnDeck.id === slot)) ||
     null
+  const parentSlot = parentModule != null ? parentModule.slot : null
+  const moduleType = parentModule != null ? parentModule.type : null
+  const isNextToHeaterShaker = initialModules.some(
+    hardwareModule =>
+      hardwareModule.type === HEATERSHAKER_MODULE_TYPE &&
+      getAreSlotsHorizontallyAdjacent(hardwareModule.slot, parentSlot ?? slot)
+  )
   return {
     customLabwareDefs: labwareDefSelectors.getCustomLabwareDefsByURI(state),
     slot,
-    parentSlot: parentModule != null ? parentModule.slot : null,
-    moduleType: parentModule != null ? parentModule.type : null,
+    parentSlot,
+    moduleType,
+    isNextToHeaterShaker,
     permittedTipracks: stepFormSelectors.getPermittedTipracks(state),
   }
 }

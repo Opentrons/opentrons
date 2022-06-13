@@ -11,8 +11,13 @@ import {
   getConnectedRobotPipettesCalibrated,
   getDeckCalibrationOk,
 } from '../../redux/nav'
+import { checkShellUpdate } from '../../redux/shell'
 import { getConnectedRobot } from '../../redux/discovery'
-import { useNavLocations, useRunLocation } from '../hooks'
+import {
+  useNavLocations,
+  useRunLocation,
+  useSoftwareUpdatePoll,
+} from '../hooks'
 import { useIsProtocolRunLoaded } from '../../organisms/ProtocolUpload/hooks'
 
 import type { Store } from 'redux'
@@ -45,10 +50,12 @@ const mockUseIsCurrentRunLoaded = useIsProtocolRunLoaded as jest.MockedFunction<
 
 describe('useRunLocation', () => {
   let wrapper: React.FunctionComponent<{}>
+  let store: Store<State>
 
   describe('run disabled reason', () => {
     beforeEach(() => {
-      const store: Store<State> = createStore(jest.fn(), {})
+      jest.useFakeTimers()
+      store = createStore(jest.fn(), {})
       store.dispatch = jest.fn()
       wrapper = ({ children }) => (
         <I18nextProvider i18n={i18n}>
@@ -62,6 +69,8 @@ describe('useRunLocation', () => {
       mockUseIsCurrentRunLoaded.mockReturnValue(true)
     })
     afterEach(() => {
+      jest.clearAllTimers()
+      jest.useRealTimers()
       jest.resetAllMocks()
     })
     it('should tell user to connect to a robot', () => {
@@ -110,6 +119,32 @@ describe('useRunLocation', () => {
       mockUseIsCurrentRunLoaded.mockReturnValue(true)
       const { result } = renderHook(useNavLocations, { wrapper })
       expect(result.current.length).toBe(4)
+    })
+  })
+
+  describe('useSoftwareUpdatePoll', () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+      store = createStore(jest.fn(), {})
+      store.dispatch = jest.fn()
+      wrapper = ({ children }) => (
+        <I18nextProvider i18n={i18n}>
+          <Provider store={store}>{children}</Provider>
+        </I18nextProvider>
+      )
+    })
+    afterEach(() => {
+      jest.clearAllTimers()
+      jest.useRealTimers()
+      jest.resetAllMocks()
+    })
+    it('checks for update availability on an interval', () => {
+      renderHook(useSoftwareUpdatePoll, { wrapper })
+
+      expect(store.dispatch).not.toHaveBeenCalledWith(checkShellUpdate())
+      jest.advanceTimersByTime(60001)
+      expect(store.dispatch).toHaveBeenCalledTimes(1)
+      expect(store.dispatch).toHaveBeenCalledWith(checkShellUpdate())
     })
   })
 })

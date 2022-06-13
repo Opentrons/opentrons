@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+opentrons = {editable = true, path = "./../api"}
+pyserial = "==3.5"
+
+[dev-packages]
+pytest = "==6.1.0"
+pytest-cov = "==2.10.1"
+mypy = "==0.910"
+black = "==22.3.0"
+flake8 = "~=3.9.0"
+flake8-annotations = "~=2.6.2"
+flake8-docstrings = "~=1.6.0"
+flake8-noqa = "~=1.2.1"
+
+[requires]
+python_version = "3.7"

@@ -16,9 +16,11 @@ export const getStoredProtocols: (
 
 export const getStoredProtocol: (
   state: State,
-  protocolKey: string
+  protocolKey?: string
 ) => StoredProtocolData | null = (state, protocolKey) =>
-  state.protocolStorage.filesByProtocolKey[protocolKey] ?? null
+  protocolKey != null
+    ? state.protocolStorage.filesByProtocolKey[protocolKey] ?? null
+    : null
 
 export const getIsProtocolAnalysisInProgress: (
   state: State,

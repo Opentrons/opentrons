@@ -8,6 +8,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
+  HEATERSHAKER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { Modal, InputField, OutlineButton } from '@opentrons/components'
 import { i18n } from '../../../../localization'
@@ -55,7 +56,7 @@ describe('FilePipettesModal', () => {
       [HEATERSHAKER_MODULE_TYPE]: {
         onDeck: false,
         slot: '',
-        model: null,
+        model: HEATERSHAKER_MODULE_V1,
       },
     }
 
@@ -167,6 +168,51 @@ describe('FilePipettesModal', () => {
             type: MAGNETIC_MODULE_TYPE,
             model: MAGNETIC_MODULE_V1,
             slot: initialModuleValues[MAGNETIC_MODULE_TYPE].slot,
+          },
+        ],
+        newProtocolFields: { name: '' },
+        pipettes: [
+          {
+            mount: 'left',
+            name: initialPipetteValues.left.pipetteName,
+            tiprackDefURI: initialPipetteValues.left.tiprackDefURI,
+          },
+        ],
+      })
+    })
+
+    it('updates the location of mag mod to slot 9 when a heater shaker is present', async () => {
+      props.initialPipetteValues = initialPipetteValues
+      props.initialModuleValues = {
+        ...initialModuleValues,
+        [HEATERSHAKER_MODULE_TYPE]: {
+          ...initialModuleValues[HEATERSHAKER_MODULE_TYPE],
+          slot: '1',
+          onDeck: true,
+        },
+      }
+
+      const wrapper = renderFormComponent(props)
+      const saveButton = wrapper
+        .find(OutlineButton)
+        .filterWhere(n => n.render().text() === 'save')
+      saveButton.simulate('click')
+      // issue #823 in enzyme where simulate events are sync so we cannot test
+      // the btn click -> component handleSubmit properly here since formik submit is async
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      // expect(moduleFields.prop('values')).toEqual({})
+      expect(props.onSave).toHaveBeenCalledWith({
+        modules: [
+          {
+            type: HEATERSHAKER_MODULE_TYPE,
+            model: HEATERSHAKER_MODULE_V1,
+            slot: '1',
+          },
+          {
+            type: MAGNETIC_MODULE_TYPE,
+            model: MAGNETIC_MODULE_V1,
+            slot: '9',
           },
         ],
         newProtocolFields: { name: '' },

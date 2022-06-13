@@ -10,6 +10,7 @@ from opentrons.config.robot_configs import (
     get_legacy_gantry_calibration,
     default_deck_calibration,
     default_pipette_offset,
+    default_gripper_calibration_offset,
 )
 from opentrons.config.types import OT3Config
 from opentrons.calibration_storage import modify, types, get
@@ -198,6 +199,22 @@ def load_pipette_offset(
         if pip_offset_data:
             return pip_offset_data
     return pip_cal_obj
+
+
+def load_gripper_calibration_offset(
+    gripper_id: Optional[str],
+) -> types.GripperCalibrationOffset:
+    # load default if gripper offset data do not exist
+    grip_cal_obj = types.GripperCalibrationOffset(
+        offset=default_gripper_calibration_offset(),
+        source=types.SourceType.default,
+        status=types.CalibrationStatus(),
+    )
+    if gripper_id:
+        grip_offset_data = get.get_gripper_calibration_offset(gripper_id)
+        if grip_offset_data:
+            return grip_offset_data
+    return grip_cal_obj
 
 
 def load() -> RobotCalibration:

@@ -1,15 +1,24 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
+
 import { renderWithProviders } from '@opentrons/components'
+
 import { i18n } from '../../../../../i18n'
 import { getRobotSettings } from '../../../../../redux/robot-settings'
+import { useIsRobotBusy } from '../../../hooks'
+
 import { ShortTrashBin } from '../ShortTrashBin'
 
 jest.mock('../../../../../redux/robot-settings/selectors')
+jest.mock('../../../hooks')
 
+const mockUpdateRobotStatus = jest.fn()
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
+>
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 
 const mockSettings = {
@@ -23,7 +32,11 @@ const mockSettings = {
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <ShortTrashBin settings={mockSettings} robotName="otie" />
+      <ShortTrashBin
+        settings={mockSettings}
+        robotName="otie"
+        updateIsRobotBusy={mockUpdateRobotStatus}
+      />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
@@ -32,6 +45,7 @@ const render = () => {
 describe('RobotSettings ShortTrashBin', () => {
   beforeEach(() => {
     mockGetRobotSettings.mockReturnValue([mockSettings])
+    mockUseIsRobotBusy.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -60,5 +74,15 @@ describe('RobotSettings ShortTrashBin', () => {
     })
     fireEvent.click(toggleButton)
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+  })
+
+  it('should call update robot status if a robot is busy', () => {
+    mockUseIsRobotBusy.mockReturnValue(true)
+    const [{ getByRole }] = render()
+    const toggleButton = getByRole('switch', {
+      name: 'short_trash_bin',
+    })
+    fireEvent.click(toggleButton)
+    expect(mockUpdateRobotStatus).toHaveBeenCalled()
   })
 })

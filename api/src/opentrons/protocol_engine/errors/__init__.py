@@ -10,6 +10,8 @@ from .exceptions import (
     LabwareDefinitionDoesNotExistError,
     LabwareOffsetDoesNotExistError,
     LabwareIsNotTipRackError,
+    LabwareIsTipRackError,
+    TouchTipDisabledError,
     WellDoesNotExistError,
     PipetteNotLoadedError,
     PipetteTipInfoNotFoundError,
@@ -18,7 +20,8 @@ from .exceptions import (
     SlotDoesNotExistError,
     FailedToPlanMoveError,
     MustHomeError,
-    ProtocolEngineStoppedError,
+    RunStoppedError,
+    SetupCommandNotAllowedError,
     WellOriginNotAllowedError,
     ModuleNotAttachedError,
     ModuleAlreadyPresentError,
@@ -29,6 +32,9 @@ from .exceptions import (
     NoTargetTemperatureSetError,
     InvalidTargetSpeedError,
     InvalidTargetTemperatureError,
+    InvalidBlockVolumeError,
+    PauseNotAllowedError,
+    ProtocolCommandFailedError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -44,6 +50,8 @@ __all__ = [
     "LabwareDefinitionDoesNotExistError",
     "LabwareOffsetDoesNotExistError",
     "LabwareIsNotTipRackError",
+    "LabwareIsTipRackError",
+    "TouchTipDisabledError",
     "WellDoesNotExistError",
     "PipetteNotLoadedError",
     "PipetteTipInfoNotFoundError",
@@ -52,7 +60,8 @@ __all__ = [
     "SlotDoesNotExistError",
     "FailedToPlanMoveError",
     "MustHomeError",
-    "ProtocolEngineStoppedError",
+    "RunStoppedError",
+    "SetupCommandNotAllowedError",
     "WellOriginNotAllowedError",
     "ModuleNotAttachedError",
     "ModuleAlreadyPresentError",
@@ -63,6 +72,9 @@ __all__ = [
     "NoTargetTemperatureSetError",
     "InvalidTargetTemperatureError",
     "InvalidTargetSpeedError",
+    "InvalidBlockVolumeError",
+    "PauseNotAllowedError",
+    "ProtocolCommandFailedError",
     # error occurrence models
     "ErrorOccurrence",
 ]

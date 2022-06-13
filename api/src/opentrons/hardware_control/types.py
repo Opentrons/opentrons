@@ -183,7 +183,11 @@ class OT3Axis(enum.Enum):
             checked_mount = OT3Mount.from_mount(mount)
         else:
             checked_mount = mount
-        pm = {OT3Mount.LEFT: cls.P_L, OT3Mount.RIGHT: cls.P_R, OT3Mount.GRIPPER: cls.G}
+        pm = {
+            OT3Mount.LEFT: cls.P_L,
+            OT3Mount.RIGHT: cls.P_R,
+            OT3Mount.GRIPPER: cls.Z_G,
+        }
         return pm[checked_mount]
 
     @classmethod
@@ -225,6 +229,26 @@ class OT3Axis(enum.Enum):
 
     def __str__(self) -> str:
         return self.name
+
+    def of_point(self, point: top_types.Point) -> float:
+        if OT3Axis.to_kind(self) == OT3AxisKind.Z:
+            return point.z
+        elif self == OT3Axis.X:
+            return point.x
+        elif self == OT3Axis.Y:
+            return point.y
+        else:
+            raise KeyError(self)
+
+    def set_in_point(self, point: top_types.Point, position: float) -> top_types.Point:
+        if OT3Axis.to_kind(self) == OT3AxisKind.Z:
+            return point._replace(z=position)
+        elif self == OT3Axis.X:
+            return point._replace(x=position)
+        elif self == OT3Axis.Y:
+            return point._replace(y=position)
+        else:
+            raise KeyError(self)
 
 
 class OT3SubSystem(enum.Enum):

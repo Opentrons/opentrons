@@ -1,6 +1,8 @@
 """Custom payload fields."""
 from __future__ import annotations
 
+from typing import Iterable, List, Iterator
+
 import binascii
 import enum
 
@@ -10,6 +12,8 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorType,
     PipetteName,
     SensorOutputBinding,
+    SensorThresholdMode,
+    PipetteTipActionType,
 )
 
 
@@ -124,8 +128,42 @@ class SerialField(utils.BinaryFieldBase[bytes]):
         return cls(binascii.unhexlify(t)[: cls.NUM_BYTES])
 
 
+class SensorThresholdModeField(utils.UInt8Field):
+    """sensor threshold mode."""
+
+    def __repr__(self) -> str:
+        """Print sensor."""
+        try:
+            sensor_val = SensorThresholdMode(self.value).name
+        except ValueError:
+            sensor_val = str(self.value)
+        return f"{self.__class__.__name__}(value={sensor_val})"
+
+
 class SensorOutputBindingField(utils.UInt8Field):
     """sensor type."""
+
+    @classmethod
+    def from_flags(
+        cls, flags: Iterable[SensorOutputBinding]
+    ) -> "SensorOutputBindingField":
+        """Build a binding with a set of flags."""
+        backing = 0
+        for flag in flags:
+            backing |= flag.value
+        return cls.build(backing)
+
+    def to_flags(self) -> List[SensorOutputBinding]:
+        """Get the list of flags in the binding."""
+
+        def _flags() -> Iterator[SensorOutputBinding]:
+            for flag in SensorOutputBinding:
+                if flag == SensorOutputBinding.none:
+                    continue
+                if bool(flag.value & self.value):
+                    yield flag
+
+        return list(_flags())
 
     def __repr__(self) -> str:
         """Print version flags."""
@@ -145,3 +183,15 @@ class EepromDataField(utils.BinaryFieldBase[bytes]):
     def from_string(cls, t: str) -> EepromDataField:
         """Create from a string."""
         return cls(binascii.unhexlify(t)[: cls.NUM_BYTES])
+
+
+class PipetteTipActionTypeField(utils.UInt8Field):
+    """pipette tip action type."""
+
+    def __repr__(self) -> str:
+        """Print tip action."""
+        try:
+            action_type = PipetteTipActionType(self.value).name
+        except ValueError:
+            action_type = str(self.value)
+        return f"{self.__class__.__name__}(value={action_type})"

@@ -6,7 +6,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV2, SlotDefV2
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
@@ -52,7 +52,7 @@ class LabwareState:
     labware_offsets_by_id: Dict[str, LabwareOffset]
 
     definitions_by_uri: Dict[str, LabwareDefinition]
-    deck_definition: DeckDefinitionV2
+    deck_definition: DeckDefinitionV3
 
 
 class LabwareStore(HasState[LabwareState], HandlesActions):
@@ -62,7 +62,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
     def __init__(
         self,
-        deck_definition: DeckDefinitionV2,
+        deck_definition: DeckDefinitionV3,
         deck_fixed_labware: Sequence[DeckFixedLabware],
     ) -> None:
         """Initialize a labware store and its state."""
@@ -187,11 +187,11 @@ class LabwareView(HasState[LabwareState]):
             LabwareUri(self.get(labware_id).definitionUri)
         )
 
-    def get_deck_definition(self) -> DeckDefinitionV2:
+    def get_deck_definition(self) -> DeckDefinitionV3:
         """Get the current deck definition."""
         return self._state.deck_definition
 
-    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV2:
+    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
         """Get the definition of a slot in the deck."""
         deck_def = self.get_deck_definition()
 

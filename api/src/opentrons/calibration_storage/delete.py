@@ -2,6 +2,8 @@
 remove single or multiple calibration files from the
 file system.
 """
+# TODO(mc, 2022-06-08): this module has no unit tests
+# add tests before making any additional changes
 from pathlib import Path
 
 from . import types as local_types, file_operators as io
@@ -141,17 +143,19 @@ def delete_pipette_offset_file(pipette: str, mount: Mount) -> None:
         pass
 
 
+def _remove_json_files_in_directories(p: Path) -> None:
+    """Delete json file by the path"""
+    for item in p.iterdir():
+        if item.is_dir():
+            _remove_json_files_in_directories(item)
+        elif item.suffix == ".json":
+            item.unlink()
+
+
 def clear_pipette_offset_calibrations() -> None:
     """
     Delete all pipette offset calibration files.
     """
-
-    def _remove_json_files_in_directories(p: Path) -> None:
-        for item in p.iterdir():
-            if item.is_dir():
-                _remove_json_files_in_directories(item)
-            elif item.suffix == ".json":
-                item.unlink()
 
     offset_dir = config.get_opentrons_path("pipette_calibration_dir")
     try:
@@ -164,8 +168,45 @@ def delete_robot_deck_attitude() -> None:
     """
     Delete the robot deck attitude calibration.
     """
-
+    legacy_deck_calibration_file = config.get_opentrons_path("deck_calibration_file")
     robot_dir = config.get_opentrons_path("robot_calibration_dir")
     gantry_path = robot_dir / "deck_calibration.json"
-    if gantry_path.exists():
-        gantry_path.unlink()
+
+    # TODO(mc, 2022-06-08): this leaves legacy deck calibration backup files in place
+    # we should eventually clean them up, too, because they can really crowd /data/
+    _delete_file(legacy_deck_calibration_file)
+    _delete_file(gantry_path)
+
+
+def delete_gripper_calibration_file(gripper: str) -> None:
+    """
+    Delete gripper calibration offset file based on gripper serial number
+
+    :param gripper: gripper serial number
+    """
+    offset_dir = config.get_opentrons_path("gripper_calibration_dir")
+    offset_path = offset_dir / f"{gripper}.json"
+
+    if offset_path.exists():
+        offset_path.unlink()
+
+
+def clear_gripper_calibration_offsets() -> None:
+    """
+    Delete all gripper calibration data files.
+    """
+
+    offset_dir = config.get_opentrons_path("gripper_calibration_dir")
+    try:
+        _remove_json_files_in_directories(offset_dir)
+    except FileNotFoundError:
+        pass
+
+
+# TODO(mc, 2022-06-07): replace with Path.unlink(missing_ok=True)
+# when we are on Python >= 3.8
+def _delete_file(path: Path) -> None:
+    try:
+        path.unlink()
+    except FileNotFoundError:
+        pass

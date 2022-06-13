@@ -2,6 +2,7 @@
 import logging
 from pathlib import Path
 from tempfile import mkdtemp
+import shutil
 
 import sqlalchemy
 from anyio import Path as AsyncPath
@@ -20,6 +21,7 @@ _protocol_directory_accessor = AppStateAccessor[Path]("protocol_directory")
 
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-robot-server-"
 _DATABASE_FILE: Final = "robot_server.db"
+_RESET_MARKER_FILE = "_TO_BE_DELETED_ON_REBOOT"
 
 _log = logging.getLogger(__name__)
 
@@ -43,6 +45,11 @@ async def get_persistence_directory(
             )
         else:
             persistence_dir = setting
+            # Reset persistence directory only if is not temporary dir and rebooted
+            if await AsyncPath(persistence_dir / _RESET_MARKER_FILE).exists():
+                _log.info("Persistence directory was marked for reset. Deleting it.")
+                shutil.rmtree(persistence_dir)
+
             await AsyncPath(persistence_dir).mkdir(parents=True, exist_ok=True)
             _log.info(f"Using directory {persistence_dir} for persistence.")
 
@@ -69,9 +76,42 @@ def get_sql_engine(
     # https://github.com/tiangolo/fastapi/issues/617
 
 
+class PersistenceResetter:
+    """Dependency class to handle robot server reset options."""
+
+    def __init__(self, persistence_directory: Path) -> None:
+        self._persistence_directory = persistence_directory
+
+    async def mark_directory_reset(self) -> None:
+        """Mark the persistence directory to be deleted (reset) on the next boot.
+
+        We defer deletions to the next boot instead of doing them immediately
+        to avoid potential problems with ongoing HTTP requests, runs,
+        background protocol analysis tasks, etc. trying to do stuff in here
+        during and after the deletion.
+        """
+        file = AsyncPath(self._persistence_directory / _RESET_MARKER_FILE)
+        await file.write_text(
+            encoding="utf-8",
+            data=(
+                "This file was placed here by robot-server.\n"
+                "It tells robot-server to clear this directory on the next boot."
+            ),
+        )
+
+
+def get_persistence_resetter(
+    persistence_directory: Path = Depends(get_persistence_directory),
+) -> PersistenceResetter:
+    """Get a `PersistenceResetter` to reset the robot-server's stored data."""
+    return PersistenceResetter(persistence_directory)
+
+
 __all__ = [
     "get_persistence_directory",
     "get_sql_engine",
+    "PersistenceResetter",
+    "get_persistence_resetter",
     # database tables
     "protocol_table",
     "analysis_table",

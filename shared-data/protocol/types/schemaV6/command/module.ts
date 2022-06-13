@@ -6,7 +6,7 @@ export type ModuleRunTimeCommand =
   | TemperatureModuleSetTargetTemperatureRunTimeCommand
   | TemperatureModuleDeactivateRunTimeCommand
   | TemperatureModuleAwaitTemperatureRunTimeCommand
-  | TCSetAndWaitForTargetBlockTemperatureRunTimeCommand
+  | TCSetTargetBlockTemperatureRunTimeCommand
   | TCSetTargetLidTemperatureRunTimeCommand
   | TCWaitForBlockTemperatureRunTimeCommand
   | TCWaitForLidTemperatureRunTimeCommand
@@ -17,8 +17,8 @@ export type ModuleRunTimeCommand =
   | TCRunProfileRunTimeCommand
   | TCAwaitProfileCompleteRunTimeCommand
   | HeaterShakerStartSetTargetTemperatureRunTimeCommand
-  | HeaterShakerAwaitTemperatureRunTimeCommand
-  | HeaterShakerSetTargetShakeSpeedRunTimeCommand
+  | HeaterShakerWaitForTemperatureRunTimeCommand
+  | HeaterShakerSetAndWaitForShakeSpeedRunTimeCommand
   | HeaterShakerOpenLatchRunTimeCommand
   | HeaterShakerCloseLatchRunTimeCommand
   | HeaterShakerDeactivateHeaterRunTimeCommand
@@ -29,7 +29,7 @@ export type ModuleCreateCommand =
   | TemperatureModuleSetTargetTemperatureCreateCommand
   | TemperatureModuleDeactivateCreateCommand
   | TemperatureModuleAwaitTemperatureCreateCommand
-  | TCSetAndWaitForBlockTemperatureCreateCommand
+  | TCSetTargetBlockTemperatureCreateCommand
   | TCSetTargetLidTemperatureCreateCommand
   | TCWaitForBlockTemperatureCreateCommand
   | TCWaitForLidTemperatureCreateCommand
@@ -39,12 +39,12 @@ export type ModuleCreateCommand =
   | TCDeactivateLidCreateCommand
   | TCRunProfileCreateCommand
   | TCAwaitProfileCompleteCreateCommand
-  | HeaterShakerAwaitTemperatureCreateCommand
-  | HeaterShakerSetTargetShakeSpeedCreateCommand
+  | HeaterShakerWaitForTemperatureCreateCommand
+  | HeaterShakerSetAndWaitForShakeSpeedCreateCommand
   | HeaterShakerOpenLatchCreateCommand
   | HeaterShakerCloseLatchCreateCommand
   | HeaterShakerDeactivateHeaterCreateCommand
-  | HeaterShakerStopShakeCreateCommand
+  | HeaterShakerDeactivateShakerCreateCommand
   | HeaterShakerStartSetTargetTemperatureCreateCommand
 
 export interface MagneticModuleEngageMagnetCreateCommand
@@ -97,14 +97,14 @@ export interface TemperatureModuleAwaitTemperatureRunTimeCommand
     TemperatureModuleAwaitTemperatureCreateCommand {
   result: any
 }
-export interface TCSetAndWaitForBlockTemperatureCreateCommand
+export interface TCSetTargetBlockTemperatureCreateCommand
   extends CommonCommandCreateInfo {
-  commandType: 'thermocycler/setAndWaitForBlockTemperature'
+  commandType: 'thermocycler/setTargetBlockTemperature'
   params: ThermocyclerSetTargetBlockTemperatureParams
 }
-export interface TCSetAndWaitForTargetBlockTemperatureRunTimeCommand
+export interface TCSetTargetBlockTemperatureRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    TCSetAndWaitForBlockTemperatureCreateCommand {
+    TCSetTargetBlockTemperatureCreateCommand {
   result: any
 }
 export interface TCSetTargetLidTemperatureCreateCommand
@@ -120,7 +120,7 @@ export interface TCSetTargetLidTemperatureRunTimeCommand
 export interface TCWaitForBlockTemperatureCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/waitForBlockTemperature'
-  params: TemperatureParams
+  params: ModuleOnlyParams
 }
 export interface TCWaitForBlockTemperatureRunTimeCommand
   extends CommonCommandRunTimeInfo,
@@ -130,7 +130,7 @@ export interface TCWaitForBlockTemperatureRunTimeCommand
 export interface TCWaitForLidTemperatureCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/waitForLidTemperature'
-  params: TemperatureParams
+  params: ModuleOnlyParams
 }
 export interface TCWaitForLidTemperatureRunTimeCommand
   extends CommonCommandRunTimeInfo,
@@ -195,7 +195,7 @@ export interface TCAwaitProfileCompleteRunTimeCommand
 }
 export interface HeaterShakerStartSetTargetTemperatureCreateCommand
   extends CommonCommandCreateInfo {
-  commandType: 'heaterShakerModule/startSetTargetTemperature'
+  commandType: 'heaterShaker/setTargetTemperature'
   params: TemperatureParams
 }
 export interface HeaterShakerStartSetTargetTemperatureRunTimeCommand
@@ -203,29 +203,29 @@ export interface HeaterShakerStartSetTargetTemperatureRunTimeCommand
     HeaterShakerStartSetTargetTemperatureCreateCommand {
   result: any
 }
-export interface HeaterShakerAwaitTemperatureCreateCommand
+export interface HeaterShakerWaitForTemperatureCreateCommand
   extends CommonCommandCreateInfo {
-  commandType: 'heaterShakerModule/awaitTemperature'
+  commandType: 'heaterShaker/waitForTemperature'
   params: ModuleOnlyParams
 }
-export interface HeaterShakerAwaitTemperatureRunTimeCommand
+export interface HeaterShakerWaitForTemperatureRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    HeaterShakerAwaitTemperatureCreateCommand {
+    HeaterShakerWaitForTemperatureCreateCommand {
   result: any
 }
-export interface HeaterShakerSetTargetShakeSpeedCreateCommand
+export interface HeaterShakerSetAndWaitForShakeSpeedCreateCommand
   extends CommonCommandCreateInfo {
-  commandType: 'heaterShakerModule/setTargetShakeSpeed'
+  commandType: 'heaterShaker/setAndWaitForShakeSpeed'
   params: ShakeSpeedParams
 }
-export interface HeaterShakerSetTargetShakeSpeedRunTimeCommand
+export interface HeaterShakerSetAndWaitForShakeSpeedRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    HeaterShakerSetTargetShakeSpeedCreateCommand {
+    HeaterShakerSetAndWaitForShakeSpeedCreateCommand {
   result: any
 }
 export interface HeaterShakerDeactivateHeaterCreateCommand
   extends CommonCommandCreateInfo {
-  commandType: 'heaterShakerModule/deactivateHeater'
+  commandType: 'heaterShaker/deactivateHeater'
   params: ModuleOnlyParams
 }
 export interface HeaterShakerDeactivateHeaterRunTimeCommand
@@ -235,7 +235,7 @@ export interface HeaterShakerDeactivateHeaterRunTimeCommand
 }
 export interface HeaterShakerOpenLatchCreateCommand
   extends CommonCommandCreateInfo {
-  commandType: 'heaterShakerModule/openLatch'
+  commandType: 'heaterShaker/openLabwareLatch'
   params: ModuleOnlyParams
 }
 export interface HeaterShakerOpenLatchRunTimeCommand
@@ -245,7 +245,7 @@ export interface HeaterShakerOpenLatchRunTimeCommand
 }
 export interface HeaterShakerCloseLatchCreateCommand
   extends CommonCommandCreateInfo {
-  commandType: 'heaterShakerModule/closeLatch'
+  commandType: 'heaterShaker/closeLabwareLatch'
   params: ModuleOnlyParams
 }
 export interface HeaterShakerCloseLatchRunTimeCommand
@@ -253,14 +253,14 @@ export interface HeaterShakerCloseLatchRunTimeCommand
     HeaterShakerCloseLatchCreateCommand {
   result: any
 }
-export interface HeaterShakerStopShakeCreateCommand
+export interface HeaterShakerDeactivateShakerCreateCommand
   extends CommonCommandCreateInfo {
-  commandType: 'heaterShakerModule/stopShake'
+  commandType: 'heaterShaker/deactivateShaker'
   params: ModuleOnlyParams
 }
-export interface HeaterShakerStopShakeRunTimeCommand
+export interface HeaterShakerDeactivateShakerRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    HeaterShakerStopShakeCreateCommand {
+    HeaterShakerDeactivateShakerCreateCommand {
   result: any
 }
 

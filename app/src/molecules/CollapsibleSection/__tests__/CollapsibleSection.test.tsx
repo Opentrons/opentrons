@@ -29,4 +29,12 @@ describe('CollapsibleSection', () => {
     collapseButton != null && fireEvent.click(collapseButton)
     expect(queryByText('section children')).toBeFalsy()
   })
+  it('initially collapsed if prop passed to override', () => {
+    const { queryByText } = render(
+      <CollapsibleSection title="fakeTitle" isExpandedInitially={false}>
+        section children
+      </CollapsibleSection>
+    )
+    expect(queryByText('section children')).toBeFalsy()
+  })
 })

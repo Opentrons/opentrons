@@ -6,6 +6,7 @@ import {
   useAttachedPipettes,
   useTipLengthCalibrations,
   useProtocolDetailsForRun,
+  useStoredProtocolAnalysis,
 } from '.'
 
 import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
@@ -38,8 +39,12 @@ export function useRunPipetteInfoByMount(
 ): {
   [mount in Mount]: PipetteInfo | null
 } {
-  const { protocolData } = useProtocolDetailsForRun(runId)
-  const attachedPipettes = useAttachedPipettes(robotName)
+  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
+    runId
+  )
+  const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
+  const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
+  const attachedPipettes = useAttachedPipettes()
   const attachedPipetteCalibrations =
     useAttachedPipetteCalibrations(robotName) ?? EMPTY_MOUNTS
   const tipLengthCalibrations = useTipLengthCalibrations(robotName) ?? []

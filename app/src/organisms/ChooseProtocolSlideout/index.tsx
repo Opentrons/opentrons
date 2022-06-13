@@ -93,10 +93,14 @@ export function ChooseProtocolSlideout(
               alignItems={ALIGN_CENTER}
             >
               <DeckThumbnail
-                commands={storedProtocol.mostRecentAnalysis.commands}
+                commands={storedProtocol.mostRecentAnalysis?.commands ?? []}
               />
             </Flex>
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <StyledText
+              as="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              css={{ 'overflow-wrap': 'anywhere' }}
+            >
               {storedProtocol.mostRecentAnalysis?.metadata?.protocolName ??
                 first(storedProtocol.srcFileNames) ??
                 storedProtocol.protocolKey}

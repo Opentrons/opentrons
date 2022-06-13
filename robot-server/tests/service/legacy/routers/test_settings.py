@@ -215,6 +215,7 @@ def test_available_resets(api_client):
             "pipetteOffsetCalibrations",
             "bootScripts",
             "tipLengthCalibrations",
+            "runsHistory",
         ]
     ) == sorted([item["id"] for item in options_list])
 
@@ -237,6 +238,7 @@ def mock_reset():
                 "bootScripts": False,
                 "pipetteOffsetCalibrations": False,
                 "tipLengthCalibrations": False,
+                "runsHistory": False,
             },
             set(),
         ],
@@ -247,12 +249,14 @@ def mock_reset():
                 "pipetteOffsetCalibrations": True,
                 "tipLengthCalibrations": True,
                 "deckCalibration": True,
+                "runsHistory": True,
             },
             {
                 ResetOptionId.boot_scripts,
                 ResetOptionId.deck_calibration,
                 ResetOptionId.pipette_offset,
                 ResetOptionId.tip_length_calibrations,
+                ResetOptionId.runs_history,
             },
         ],
         [{"bootScripts": True}, {ResetOptionId.boot_scripts}],
@@ -336,7 +340,7 @@ def test_set_log_level(
 @pytest.fixture
 def mock_get_all_adv_settings():
     with patch(
-        "robot_server.service.legacy.routers.settings.advanced_settings.get_all_adv_settings"  # noqa: E501
+        "robot_server.service.legacy.routers.settings.advanced_settings.get_all_adv_settings"
     ) as p:
         p.return_value = {
             s.id: advanced_settings.Setting(value=False, definition=s)
@@ -348,7 +352,7 @@ def mock_get_all_adv_settings():
 @pytest.fixture
 def mock_is_restart_required():
     with patch(
-        "robot_server.service.legacy.routers.settings.advanced_settings.is_restart_required"  # noqa: E501
+        "robot_server.service.legacy.routers.settings.advanced_settings.is_restart_required"
     ) as p:
         yield p
 

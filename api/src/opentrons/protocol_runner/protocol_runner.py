@@ -80,10 +80,7 @@ class ProtocolRunner:
                 labware_view=protocol_engine.state_view.labware,
             ),
         )
-        self._legacy_executor = legacy_executor or LegacyExecutor(
-            hardware_api=hardware_api
-        )
-        self._was_started = False
+        self._legacy_executor = legacy_executor or LegacyExecutor()
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
@@ -93,7 +90,7 @@ class ProtocolRunner:
 
         This value is latched; once it is True, it will never become False.
         """
-        return self._was_started
+        return self._protocol_engine.state_view.commands.has_been_played()
 
     def load(self, protocol_source: ProtocolSource) -> None:
         """Load a ProtocolSource into managed ProtocolEngine.
@@ -124,7 +121,6 @@ class ProtocolRunner:
 
     def play(self) -> None:
         """Start or resume the run."""
-        self._was_started = True
         self._protocol_engine.play()
 
     def pause(self) -> None:
@@ -133,7 +129,7 @@ class ProtocolRunner:
 
     async def stop(self) -> None:
         """Stop (cancel) the run."""
-        if self._was_started:
+        if self.was_started():
             await self._protocol_engine.stop()
         else:
             await self._protocol_engine.finish(
@@ -151,6 +147,7 @@ class ProtocolRunner:
         if protocol_source:
             self.load(protocol_source)
 
+        await self._hardware_api.home()
         self.play()
         self._task_queue.start()
         await self._task_queue.join()

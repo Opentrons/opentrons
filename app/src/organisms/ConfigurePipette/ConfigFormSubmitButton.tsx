@@ -7,7 +7,6 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
-
 export interface ConfigFormSubmitButtonProps {
   disabled: boolean
 }
@@ -23,6 +22,7 @@ export function ConfigFormSubmitButton(
       justifyContent={JUSTIFY_CENTER}
       flexDirection={DIRECTION_COLUMN}
       textTransform={TEXT_TRANSFORM_UPPERCASE}
+      boxShadow={'0px -4px 12px rgba(0, 0, 0, 0.15)'}
     >
       <PrimaryButton type={'submit'} disabled={disabled}>
         {t('confirm')}

@@ -6,6 +6,7 @@ import { Portal } from '../../../App/portal'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
 import { HEATERSHAKER_MODULE_TYPE } from '../../../redux/modules'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { useAttachedModules } from '../hooks'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
@@ -18,27 +19,28 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
-  Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 
+import type { ModuleModel } from '@opentrons/shared-data'
 import type { NavRouteParams } from '../../../App/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import type { ProtocolModuleInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
   moduleFromProtocol?: ProtocolModuleInfo
+  runId?: string
 }
 
 export const HeaterShakerWizard = (
   props: HeaterShakerWizardProps
 ): JSX.Element | null => {
-  const { onCloseClick, moduleFromProtocol } = props
+  const { onCloseClick, moduleFromProtocol, runId } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
   const { robotName } = useParams<NavRouteParams>()
-  const attachedModules = useAttachedModules(robotName)
+  const attachedModules = useAttachedModules()
   const [targetProps, tooltipProps] = useHoverTooltip()
   const heaterShaker =
     attachedModules.find(
@@ -48,11 +50,18 @@ export const HeaterShakerWizard = (
 
   let isPrimaryCTAEnabled: boolean = true
 
-  if (currentPage === 4) {
+  if (currentPage === 3) {
     isPrimaryCTAEnabled = Boolean(heaterShaker)
   }
   const labwareDef =
     moduleFromProtocol != null ? moduleFromProtocol.nestedLabwareDef : null
+
+  let heaterShakerModel: ModuleModel
+  if (heaterShaker != null) {
+    heaterShakerModel = heaterShaker.moduleModel
+  } else if (moduleFromProtocol != null) {
+    heaterShakerModel = moduleFromProtocol.moduleDef.model
+  }
 
   let buttonContent = null
   const getWizardDisplayPage = (): JSX.Element | null => {
@@ -62,6 +71,7 @@ export const HeaterShakerWizard = (
         return (
           <Introduction
             labwareDefinition={labwareDef}
+            moduleModel={heaterShakerModel}
             thermalAdapterName={
               labwareDef != null
                 ? getAdapterName(labwareDef.parameters.loadName)
@@ -73,14 +83,19 @@ export const HeaterShakerWizard = (
         buttonContent = t('btn_begin_attachment')
         return <KeyParts />
       case 2:
-        buttonContent = t('btn_thermal_adapter')
+        buttonContent = t('btn_power_module')
         return <AttachModule moduleFromProtocol={moduleFromProtocol} />
       case 3:
-        buttonContent = t('btn_power_module')
-        return <AttachAdapter />
+        buttonContent = t('btn_thermal_adapter')
+        return <PowerOn attachedModule={heaterShaker} />
       case 4:
         buttonContent = t('btn_test_shake')
-        return <PowerOn attachedModule={heaterShaker} />
+        return (
+          // heaterShaker should never be null because isPrimaryCTAEnabled would be disabled otherwise
+          heaterShaker != null ? (
+            <AttachAdapter module={heaterShaker} runId={runId} />
+          ) : null
+        )
       case 5:
         buttonContent = t('complete')
         return (
@@ -90,6 +105,7 @@ export const HeaterShakerWizard = (
               module={heaterShaker}
               setCurrentPage={setCurrentPage}
               moduleFromProtocol={moduleFromProtocol}
+              runId={runId}
             />
           ) : null
         )
@@ -138,7 +154,7 @@ export const HeaterShakerWizard = (
             >
               {buttonContent}
               {!isPrimaryCTAEnabled ? (
-                <Tooltip {...tooltipProps}>
+                <Tooltip tooltipProps={tooltipProps}>
                   {t('module_is_not_connected')}
                 </Tooltip>
               ) : null}

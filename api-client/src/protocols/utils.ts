@@ -1,7 +1,11 @@
 // set of functions that parse details out of a protocol record and it's internals
 import reduce from 'lodash/reduce'
 
-import type { PipetteName, ModuleModel } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  ModuleModel,
+  PipetteName,
+} from '@opentrons/shared-data'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
   LoadLabwareRunTimeCommand,
@@ -30,6 +34,44 @@ export function parseInitialPipetteNamesByMount(
   }
 }
 
+export interface PipetteNamesById {
+  [pipetteId: string]: { name: PipetteName }
+}
+
+export function parseInitialPipetteNamesById(
+  commands: RunTimeCommand[]
+): PipetteNamesById {
+  const rightPipette = commands.find(
+    (command): command is LoadPipetteRunTimeCommand =>
+      command.commandType === 'loadPipette' && command.params.mount === 'right'
+  )
+  const leftPipette = commands.find(
+    (command): command is LoadPipetteRunTimeCommand =>
+      command.commandType === 'loadPipette' && command.params.mount === 'left'
+  )
+
+  const rightPipetteById =
+    rightPipette != null
+      ? {
+          [rightPipette.result.pipetteId]: {
+            name: rightPipette.params.pipetteName,
+          },
+        }
+      : {}
+  const leftPipetteById =
+    leftPipette != null
+      ? {
+          [leftPipette.result.pipetteId]: {
+            name: leftPipette.params.pipetteName,
+          },
+        }
+      : {}
+  return {
+    ...rightPipetteById,
+    ...leftPipetteById,
+  }
+}
+
 export function parseAllRequiredModuleModels(
   commands: RunTimeCommand[]
 ): ModuleModel[] {
@@ -39,6 +81,25 @@ export function parseAllRequiredModuleModels(
         ? [...acc, command.params.model]
         : acc,
     []
+  )
+}
+
+export interface ModuleModelsById {
+  [moduleId: string]: { model: ModuleModel }
+}
+
+export function parseAllRequiredModuleModelsById(
+  commands: RunTimeCommand[]
+): ModuleModelsById {
+  return commands.reduce<ModuleModelsById>(
+    (acc, command) =>
+      command.commandType === 'loadModule'
+        ? {
+            ...acc,
+            [command.result?.moduleId]: { model: command.params.model },
+          }
+        : acc,
+    {}
   )
 }
 
@@ -85,6 +146,83 @@ export function parseInitialLoadedLabwareByModuleId(
     {}
   )
 }
+
+export interface LoadedLabwareById {
+  [labwareId: string]: {
+    definitionId: string
+    displayName?: string
+  }
+}
+
+export function parseInitialLoadedLabwareById(
+  commands: RunTimeCommand[]
+): LoadedLabwareById {
+  const loadLabwareCommandsReversed = commands
+    .filter(
+      (command): command is LoadLabwareRunTimeCommand =>
+        command.commandType === 'loadLabware'
+    )
+    .reverse()
+  return reduce<LoadLabwareRunTimeCommand, LoadedLabwareById>(
+    loadLabwareCommandsReversed,
+    (acc, command) => {
+      const quirks = command.result.definition.parameters.quirks ?? []
+      if (quirks.includes('fixedTrash')) {
+        return { ...acc }
+      }
+      const labwareId = command.result.labwareId ?? ''
+      const {
+        namespace,
+        version,
+        parameters: { loadName },
+      } = command.result.definition
+      const definitionId = `${namespace}/${loadName}/${version}_id`
+
+      return {
+        ...acc,
+        [labwareId]: {
+          definitionId,
+          displayName: command.params.displayName,
+        },
+      }
+    },
+    {}
+  )
+}
+
+export interface LoadedLabwareDefinitionsById {
+  [definitionId: string]: LabwareDefinition2
+}
+export function parseInitialLoadedLabwareDefinitionsById(
+  commands: RunTimeCommand[]
+): LoadedLabwareDefinitionsById {
+  const labware = parseInitialLoadedLabwareById(commands)
+  const loadLabwareCommandsReversed = commands
+    .filter(
+      (command): command is LoadLabwareRunTimeCommand =>
+        command.commandType === 'loadLabware'
+    )
+    .reverse()
+  return reduce<LoadLabwareRunTimeCommand, LoadedLabwareDefinitionsById>(
+    loadLabwareCommandsReversed,
+    (acc, command) => {
+      const quirks = command.result.definition.parameters.quirks ?? []
+      if (quirks.includes('fixedTrash')) {
+        return { ...acc }
+      }
+      const labwareDef: LabwareDefinition2 = command.result?.definition
+      const labwareId = command.result?.labwareId ?? ''
+      const definitionId = labware[labwareId]?.definitionId
+
+      return {
+        ...acc,
+        [definitionId]: labwareDef,
+      }
+    },
+    {}
+  )
+}
+
 interface LoadedModulesBySlot {
   [slotName: string]: LoadModuleRunTimeCommand
 }

@@ -81,7 +81,7 @@ class CommandExecutor:
             log.debug(
                 f"Executing {command.id}, {command.commandType}, {command.params}"
             )
-            result = await command_impl.execute(command.params)  # type: ignore[arg-type]  # noqa: E501
+            result = await command_impl.execute(command.params)  # type: ignore[arg-type]
 
         except Exception as error:
             log.warning(f"Execution of {command.id} failed", exc_info=error)

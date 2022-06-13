@@ -149,4 +149,4 @@ def validate_can_dispense(location: types.Location) -> None:
 # things a `types.Location` can be (i.e. module, labware, well, etc.)
 def _is_tiprack(location: types.Location) -> bool:
     labware = location.labware.as_labware()
-    return labware.parent and labware.parent.is_tiprack  # type: ignore[return-value, union-attr]  # noqa: E501
+    return labware.parent and labware.parent.is_tiprack  # type: ignore[return-value, union-attr]

@@ -155,16 +155,25 @@ Sets the `webPreferences.webSecurity` option of the Electron [BrowserWindow][ele
 - CLI argument: `--ui.width`
 - Environment variable: `OT_APP_UI__WIDTH`
 - JSON path: `ui.width`
-- Default: `1024`
+- Default: `800`
 
 [BrowserWindow][electron-docs-browser-window] width at launch.
+
+##### ui.minWidth
+
+- CLI argument: `--ui.minWidth`
+- Environment variable: `OT_APP_UI__MIN_WIDTH`
+- JSON path: `ui.minWidth`
+- Default: `600`
+
+[BrowserWindow][electron-docs-browser-window] minWidth at launch.
 
 ##### ui.height
 
 - CLI argument: `--ui.height`
 - Environment variable: `OT_APP_UI__HEIGHT`
 - JSON path: `ui.height`
-- Default: `768`
+- Default: `760`
 
 [BrowserWindow][electron-docs-browser-window] height at launch.
 

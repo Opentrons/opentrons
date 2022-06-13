@@ -7,13 +7,17 @@ from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerL
 class SimulatingDriver(AbstractThermocyclerDriver):
     DEFAULT_TEMP = 23
 
-    def __init__(self) -> None:
+    def __init__(self, model: Optional[str] = None) -> None:
         self._ramp_rate: Optional[float] = None
         self._lid_status = ThermocyclerLidStatus.OPEN
         self._lid_temperature = Temperature(current=self.DEFAULT_TEMP, target=None)
         self._plate_temperature = PlateTemperature(
             current=self.DEFAULT_TEMP, target=None, hold=None
         )
+        self._model = model if model else "thermocyclerModuleV1"
+
+    def model(self) -> str:
+        return self._model
 
     async def connect(self) -> None:
         pass

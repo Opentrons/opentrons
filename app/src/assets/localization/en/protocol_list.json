@@ -1,6 +1,5 @@
 {
   "delete_protocol": "Delete protocol",
-  "not_used": "Not used",
   "should_delete_this_protocol": "Delete this protocol?",
   "yes_delete_this_protocol": "Yes, delete protocol",
   "last_updated_at": "Updated {{date}}",

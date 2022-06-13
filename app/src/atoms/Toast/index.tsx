@@ -23,7 +23,7 @@ export interface ToastProps {
   icon?: IconProps
   closeButton?: boolean
   onClose: () => void
-  requiredTimeout?: boolean
+  disableTimeout?: boolean
 }
 
 const EXPANDED_STYLE = css`
@@ -71,9 +71,16 @@ const toastStyleByType: {
 }
 
 export function Toast(props: ToastProps): JSX.Element {
-  const { message, type, icon, closeButton, onClose, requiredTimeout } = props
+  const {
+    message,
+    type,
+    icon,
+    closeButton,
+    onClose,
+    disableTimeout = false,
+  } = props
 
-  if (!(requiredTimeout ?? false)) {
+  if (!disableTimeout) {
     setTimeout(() => {
       onClose()
     }, 3000)

@@ -112,13 +112,20 @@ async def test_create_run_command(
         params=pe_commands.PauseParams(message="Hello"),
     )
 
-    decoy.when(mock_protocol_engine.add_command(command_request)).then_return(
-        command_once_added
-    )
+    def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
+        decoy.when(
+            mock_protocol_engine.state_view.commands.get("command-id")
+        ).then_return(command_once_added)
+        return command_once_added
 
-    decoy.when(mock_protocol_engine.state_view.commands.get("command-id")).then_return(
-        command_once_added
-    )
+    decoy.when(
+        mock_protocol_engine.add_command(
+            pe_commands.PauseCreate(
+                params=pe_commands.PauseParams(message="Hello"),
+                intent=pe_commands.CommandIntent.SETUP,
+            )
+        )
+    ).then_do(_stub_queued_command_state)
 
     result = await create_run_command(
         request_body=RequestModel(data=command_request),
@@ -132,11 +139,13 @@ async def test_create_run_command(
 
 
 async def test_create_run_command_blocking_completion(
-    decoy: Decoy, mock_protocol_engine: ProtocolEngine
+    decoy: Decoy,
+    mock_protocol_engine: ProtocolEngine,
 ) -> None:
-    """It should return the completed command once the command is completed."""
+    """It should be able to create a command and wait for it to execute."""
     command_request = pe_commands.PauseCreate(
-        params=pe_commands.PauseParams(message="Hello")
+        params=pe_commands.PauseParams(message="Hello"),
+        intent=pe_commands.CommandIntent.PROTOCOL,
     )
 
     command_once_added = pe_commands.Pause(
@@ -153,12 +162,14 @@ async def test_create_run_command_blocking_completion(
         createdAt=datetime(year=2021, month=1, day=1),
         status=pe_commands.CommandStatus.SUCCEEDED,
         params=pe_commands.PauseParams(message="Hello"),
+        result=pe_commands.PauseResult(),
     )
 
     def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
         decoy.when(
             mock_protocol_engine.state_view.commands.get("command-id")
         ).then_return(command_once_added)
+
         return command_once_added
 
     def _stub_completed_command_state(*_a: object, **_k: object) -> None:
@@ -185,6 +196,31 @@ async def test_create_run_command_blocking_completion(
     assert result.status_code == 201
 
 
+async def test_add_conflicting_setup_command(
+    decoy: Decoy,
+    mock_protocol_engine: ProtocolEngine,
+) -> None:
+    """It should raise an error if the setup command cannot be added."""
+    command_request = pe_commands.PauseCreate(
+        params=pe_commands.PauseParams(message="Hello"),
+        intent=pe_commands.CommandIntent.SETUP,
+    )
+
+    decoy.when(mock_protocol_engine.add_command(command_request)).then_raise(
+        pe_errors.SetupCommandNotAllowedError("oh no")
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await create_run_command(
+            request_body=RequestModel(data=command_request),
+            waitUntilComplete=False,
+            protocol_engine=mock_protocol_engine,
+        )
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["detail"] == "oh no"
+
+
 async def test_get_run_commands(
     decoy: Decoy, mock_run_data_manager: RunDataManager
 ) -> None:
@@ -192,6 +228,7 @@ async def test_get_run_commands(
     command = pe_commands.Pause(
         id="command-id",
         key="command-key",
+        intent=pe_commands.CommandIntent.PROTOCOL,
         status=pe_commands.CommandStatus.FAILED,
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
@@ -233,6 +270,7 @@ async def test_get_run_commands(
             id="command-id",
             key="command-key",
             commandType="pause",
+            intent=pe_commands.CommandIntent.PROTOCOL,
             createdAt=datetime(year=2021, month=1, day=1),
             startedAt=datetime(year=2022, month=2, day=2),
             completedAt=datetime(year=2023, month=3, day=3),
