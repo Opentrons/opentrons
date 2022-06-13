@@ -19,8 +19,7 @@ import { TertiaryButton } from '../../../../atoms/buttons'
 import { getRobotApiVersion, UNREACHABLE } from '../../../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
-import { useIsRobotBusy } from '../../hooks/useIsRobotBusy'
-import { useRobot } from '../../hooks'
+import { useRobot, useRobotBusyAndUpdateAlertEnabled } from '../../hooks'
 import { UpdateBuildroot } from '../UpdateBuildroot'
 
 import type { State } from '../../../../redux/types'
@@ -37,11 +36,15 @@ export function RobotServerVersion({
 }: RobotServerVersionProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const robot = useRobot(robotName)
-  const isBusy = useIsRobotBusy()
   const [showVersionInfoModal, setShowVersionInfoModal] = React.useState(false)
+  const {
+    isRobotBusy,
+    isUpdateAlertEnabled,
+  } = useRobotBusyAndUpdateAlertEnabled()
   const { autoUpdateAction } = useSelector((state: State) => {
     return getBuildrootUpdateDisplayInfo(state, robotName)
   })
+
   const robotServerVersion =
     robot?.status != null ? getRobotApiVersion(robot) : null
 
@@ -55,7 +58,10 @@ export function RobotServerVersion({
           />
         </Portal>
       ) : null}
-      {autoUpdateAction !== 'reinstall' && robot != null && !isBusy ? (
+      {autoUpdateAction !== 'reinstall' &&
+      robot != null &&
+      !isRobotBusy &&
+      isUpdateAlertEnabled ? (
         <Box marginBottom={SPACING.spacing4} width="100%">
           <UpdateRobotBanner robot={robot} />
         </Box>
@@ -85,7 +91,10 @@ export function RobotServerVersion({
             >{` ${t('shared:github')}`}</Link>
           </StyledText>
         </Box>
-        {autoUpdateAction !== 'reinstall' && robot != null && !isBusy ? null : (
+        {autoUpdateAction !== 'reinstall' &&
+        robot != null &&
+        !isRobotBusy &&
+        isUpdateAlertEnabled ? null : (
           <Flex justifyContent={JUSTIFY_FLEX_END} alignItems="center">
             <StyledText
               as="label"

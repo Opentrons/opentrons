@@ -25,8 +25,8 @@ import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import {
   CURRENT_VERSION,
-  checkShellUpdate,
   getAvailableShellUpdate,
+  checkShellUpdate,
 } from '../../redux/shell'
 import {
   ALERT_APP_UPDATE_AVAILABLE,
@@ -65,7 +65,6 @@ export function GeneralSettings(): JSX.Element {
   const [showUpdateBanner, setShowUpdateBanner] = React.useState<boolean>(
     updateAvailable
   )
-
   const [
     showConnectRobotSlideout,
     setShowConnectRobotSlideout,
@@ -98,7 +97,6 @@ export function GeneralSettings(): JSX.Element {
   useMountEffect(() => {
     dispatch(checkShellUpdate())
   })
-
   return (
     <>
       <Box
@@ -125,7 +123,6 @@ export function GeneralSettings(): JSX.Element {
             </Banner>
           </Box>
         )}
-
         <Box>
           <Flex
             flexDirection={DIRECTION_ROW}
@@ -206,7 +203,6 @@ export function GeneralSettings(): JSX.Element {
           </Box>
         </Box>
         <Divider marginY={SPACING.spacing5} />
-
         <StyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing3}
@@ -228,9 +224,7 @@ export function GeneralSettings(): JSX.Element {
             id="GeneralSettings_softwareUpdateAlerts"
           />
         </Flex>
-
         <Divider marginY={SPACING.spacing5} />
-
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -255,7 +249,6 @@ export function GeneralSettings(): JSX.Element {
           <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />
         </Portal>
       ) : null}
-
       {showPreviousVersionModal ? (
         <PreviousVersionModal
           closeModal={() => setShowPreviousVersionModal(false)}

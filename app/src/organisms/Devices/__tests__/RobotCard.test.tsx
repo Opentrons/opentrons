@@ -17,7 +17,7 @@ import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import {
   useAttachedModules,
   useAttachedPipettes,
-  useIsRobotBusy,
+  useRobotBusyAndUpdateAlertEnabled,
   useProtocolDetailsForRun,
 } from '../hooks'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
@@ -58,8 +58,8 @@ const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction
 const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
   typeof UpdateRobotBanner
 >
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
+const mockRobotBusyAndUpdateAlertEnabled = useRobotBusyAndUpdateAlertEnabled as jest.MockedFunction<
+  typeof useRobotBusyAndUpdateAlertEnabled
 >
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
@@ -82,7 +82,10 @@ const render = () => {
 
 describe('RobotCard', () => {
   beforeEach(() => {
-    mockUseIsRobotBusy.mockReturnValue(false)
+    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
+      isRobotBusy: false,
+      isUpdateAlertEnabled: true,
+    })
     mockUseAttachedModules.mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
@@ -124,7 +127,18 @@ describe('RobotCard', () => {
   })
 
   it('does not render a UpdateRobotBanner component when robot is busy', () => {
-    mockUseIsRobotBusy.mockReturnValue(true)
+    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
+      isRobotBusy: true,
+      isUpdateAlertEnabled: true,
+    })
+    expect(screen.queryByText('Mock UpdateRobotBanner')).toBeNull()
+  })
+
+  it('does not render a UpdateRobotBanner component when isUpdateAlertEnabled is false', () => {
+    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
+      isRobotBusy: false,
+      isUpdateAlertEnabled: false,
+    })
     expect(screen.queryByText('Mock UpdateRobotBanner')).toBeNull()
   })
 

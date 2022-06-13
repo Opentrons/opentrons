@@ -10,7 +10,11 @@ import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useDispatchApiRequest } from '../../../redux/robot-api'
 import { fetchLights } from '../../../redux/robot-controls'
-import { useIsRobotBusy, useLights, useRobot } from '../hooks'
+import {
+  useLights,
+  useRobot,
+  useRobotBusyAndUpdateAlertEnabled,
+} from '../hooks'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 import { RobotOverview } from '../RobotOverview'
@@ -29,8 +33,8 @@ jest.mock('../RobotOverviewOverflowMenu')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
 
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
+const mockRobotBusyAndUpdateAlertEnabled = useRobotBusyAndUpdateAlertEnabled as jest.MockedFunction<
+  typeof useRobotBusyAndUpdateAlertEnabled
 >
 const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
@@ -72,7 +76,10 @@ describe('RobotOverview', () => {
 
   beforeEach(() => {
     dispatchApiRequest = jest.fn()
-    mockUseIsRobotBusy.mockReturnValue(false)
+    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
+      isRobotBusy: false,
+      isUpdateAlertEnabled: true,
+    })
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
     mockUseLights.mockReturnValue({
       lightsOn: false,
@@ -112,7 +119,18 @@ describe('RobotOverview', () => {
   })
 
   it('does not render a UpdateRobotBanner component when robot is busy', () => {
-    mockUseIsRobotBusy.mockReturnValue(true)
+    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
+      isRobotBusy: true,
+      isUpdateAlertEnabled: true,
+    })
+    expect(screen.queryByText('Mock UpdateRobotBanner')).toBeNull()
+  })
+
+  it('does not render a UpdateRobotBanner component when update alert is not enabled', () => {
+    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
+      isRobotBusy: false,
+      isUpdateAlertEnabled: false,
+    })
     expect(screen.queryByText('Mock UpdateRobotBanner')).toBeNull()
   })
 

@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { getRobotApiVersion } from '../../../../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../../../../redux/buildroot'
 import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
-import { useIsRobotBusy, useRobot } from '../../../hooks'
+import { useRobot, useRobotBusyAndUpdateAlertEnabled } from '../../../hooks'
 import { UpdateBuildroot } from '../../UpdateBuildroot'
 import { RobotServerVersion } from '../RobotServerVersion'
 
@@ -24,9 +24,10 @@ const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.
 
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
+const mockRobotBusyAndUpdateAlertEnabled = useRobotBusyAndUpdateAlertEnabled as jest.MockedFunction<
+  typeof useRobotBusyAndUpdateAlertEnabled
 >
+
 const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
   typeof UpdateBuildroot
 >
@@ -44,7 +45,10 @@ const render = () => {
 describe('RobotSettings RobotServerVersion', () => {
   beforeEach(() => {
     mockUpdateBuildroot.mockReturnValue(<div>mock update buildroot</div>)
-    mockUseIsRobotBusy.mockReturnValue(false)
+    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
+      isRobotBusy: false,
+      isUpdateAlertEnabled: true,
+    })
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: 'reinstall',
@@ -84,6 +88,36 @@ describe('RobotSettings RobotServerVersion', () => {
     const btn = getByText('View update')
     fireEvent.click(btn)
     getByText('mock update buildroot')
+  })
+
+  it('should not render the warning message if the robot server version needs to upgrade because robot is busy', () => {
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
+      isRobotBusy: true,
+      isUpdateAlertEnabled: true,
+    })
+    expect(
+      screen.queryByText('A software update is available for this robot.')
+    ).toBeNull()
+  })
+
+  it('should not render the warning message if the robot server version needs to upgrade because alert update is not enabled', () => {
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
+      isRobotBusy: false,
+      isUpdateAlertEnabled: false,
+    })
+    expect(
+      screen.queryByText('A software update is available for this robot.')
+    ).toBeNull()
   })
 
   it('should render the warning message if the robot server version needs to downgrade', () => {
