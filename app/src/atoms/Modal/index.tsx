@@ -58,7 +58,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
           <Flex>
             {['error', 'warning'].includes(type) ? (
               <Icon
-                name="alert-circle"
+                name="ot-alert"
                 color={type === 'error' ? COLORS.error : COLORS.warning}
                 size={SPACING.spacingM}
                 marginRight={SPACING.spacing3}

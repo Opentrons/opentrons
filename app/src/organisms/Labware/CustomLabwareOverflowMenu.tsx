@@ -88,7 +88,11 @@ export function CustomLabwareOverflowMenu(
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
-      <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
+      <OverflowBtn
+        aria-label="CustomLabwareOverflowMenu_button"
+        alignSelf={ALIGN_FLEX_END}
+        onClick={handleOverflowClick}
+      />
       {showOverflowMenu && (
         <Flex
           ref={overflowMenuRef}
