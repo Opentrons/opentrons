@@ -25,6 +25,7 @@ import {
   fetchResetConfigOptions,
 } from '../../../../../redux/robot-admin'
 import { useTrackEvent } from '../../../../../redux/analytics'
+import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../../redux/calibration'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
@@ -77,7 +78,7 @@ export function FactoryResetSlideout({
   const downloadCalibrationLogs: React.MouseEventHandler = e => {
     e.preventDefault()
     doTrackEvent({
-      name: 'EVENT_CALIBRATION_DOWNLOADED',
+      name: EVENT_CALIBRATION_DOWNLOADED,
       properties: {},
     })
     saveAs(
