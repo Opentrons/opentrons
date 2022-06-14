@@ -880,7 +880,6 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """
         return self._module.labware_latch_status.value
 
-    @publish(command=cmds.heater_shaker_set_and_wait_for_temperature)
     @requires_heatershaker_ff  # TODO: replace with API version requirement
     def set_and_wait_for_temperature(self, celsius: float) -> None:
         """Set and wait for target temperature.
@@ -941,7 +940,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         else:
             # TODO: Figure out whether to issue close latch behind the scenes instead
             raise CannotPerformModuleAction(
-                "Cannot start H/S shake unless labware" " latch is closed."
+                "Cannot start H/S shake unless labware latch is closed."
             )
 
     @publish(command=cmds.heater_shaker_open_labware_latch)

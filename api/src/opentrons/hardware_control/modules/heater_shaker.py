@@ -240,6 +240,7 @@ class HeaterShaker(mod_abc.AbstractModule):
     def is_simulated(self) -> bool:
         return isinstance(self._driver, SimulatingDriver)
 
+    # TODO(mc, 2022-06-14): not used, remove
     async def set_temperature(self, celsius: float) -> None:
         """
         Set temperature in degree Celsius
@@ -287,7 +288,13 @@ class HeaterShaker(mod_abc.AbstractModule):
 
         """
         await self.wait_for_is_running()
+
+        # TODO(mc, 2022-06-14); this common "set and wait for the next poll" pattern
+        # exists so `self.target_...`  immediately after a `_driver.set_...` works.
+        # This is fraught, and probably still open to race conditions.
+        # Re-think this pattern, potentially even at the driver/firmware level
         await self._driver.set_temperature(celsius)
+        await self.wait_next_poll()
 
     async def await_temperature(self, awaiting_temperature: float) -> None:
         """Await temperature in degree Celsius.
@@ -301,6 +308,8 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self.wait_for_is_running()
         await self.wait_next_poll()
 
+        # TODO(mc, 2022-06-14): wait logic disagrees with `self.set_temperature`.
+        # Resolve discrepency whichever way is most correct
         async def _await_temperature() -> None:
             if self.temperature_status == TemperatureStatus.HEATING:
                 while self.temperature < awaiting_temperature:
@@ -337,6 +346,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         self.make_cancellable(task)
         await task
 
+    # TODO(mc, 2022-06-14): not used, remove
     async def start_set_speed(self, rpm: int) -> None:
         """
         Set shake speed in RPM
@@ -353,6 +363,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self.wait_for_is_running()
         await self._driver.set_rpm(rpm)
 
+    # TODO(mc, 2022-06-14): not used, remove
     async def await_speed(self, awaiting_speed: int) -> None:
         """Wait until specified RPM speed is reached.
 
@@ -376,6 +387,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         self.make_cancellable(t)
         await t
 
+    # TODO(mc, 2022-06-14): not used, remove
     async def await_speed_and_temperature(self, temperature: float, speed: int) -> None:
         """Wait for previously-started speed and temperature commands to complete.
 
@@ -389,10 +401,9 @@ class HeaterShaker(mod_abc.AbstractModule):
     async def _wait_for_labware_latch(
         self, status: HeaterShakerLabwareLatchStatus
     ) -> None:
-        # TODO (spp, 2022-02-22): use the labware_latch_status property to get ll status
-        current_status = await self._driver.get_labware_latch_status()
-        while status != current_status:
-            current_status = await self._driver.get_labware_latch_status()
+        """Wait until the hardware reports the labware latch status matches."""
+        while self.labware_latch_status != status:
+            await self.wait_next_poll()
 
     async def deactivate(self) -> None:
         """Stop heating/cooling; stop shaking and home the plate"""

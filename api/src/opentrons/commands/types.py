@@ -40,9 +40,6 @@ MOVE_TO: Final = "command.MOVE_TO"
 
 # Modules #
 
-HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE: Final = (
-    "command.HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE"
-)
 HEATER_SHAKER_SET_TARGET_TEMPERATURE: Final = (
     "command.HEATER_SHAKER_SET_TARGET_TEMPERATURE"
 )
@@ -154,11 +151,6 @@ class ResumeCommand(TypedDict):
 
 class HeaterShakerSetAndWaitForTemperaturePayload(TextOnlyPayload):
     pass
-
-
-class HeaterShakerSetAndWaitForTemperatureCommand(TypedDict):
-    name: Literal["command.HEATER_SHAKER_SET_AND_WAIT_FOR_TEMPERATURE"]
-    payload: HeaterShakerSetAndWaitForTemperaturePayload
 
 
 class HeaterShakerSetTargetTemperaturePayload(TextOnlyPayload):
@@ -541,7 +533,6 @@ Command = Union[
     DispenseCommand,
     AspirateCommand,
     HomeCommand,
-    HeaterShakerSetAndWaitForTemperatureCommand,
     HeaterShakerSetTargetTemperatureCommand,
     HeaterShakerWaitForTemperatureCommand,
     HeaterShakerSetAndWaitForShakeSpeedCommand,
@@ -681,12 +672,6 @@ class AspirateMessage(CommandMessageFields, AspirateCommand):
 
 
 class HomeMessage(CommandMessageFields, HomeCommand):
-    pass
-
-
-class HeaterShakerSetAndWaitForTemperatureMessage(
-    CommandMessageFields, HeaterShakerSetAndWaitForTemperatureCommand
-):
     pass
 
 
@@ -848,7 +833,6 @@ CommandMessage = Union[
     DispenseMessage,
     AspirateMessage,
     HomeMessage,
-    HeaterShakerSetAndWaitForTemperatureMessage,
     HeaterShakerSetTargetTemperatureMessage,
     HeaterShakerWaitForTemperatureMessage,
     HeaterShakerSetAndWaitForShakeSpeedMessage,
