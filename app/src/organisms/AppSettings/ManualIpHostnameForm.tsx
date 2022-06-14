@@ -82,8 +82,9 @@ export function ManualIpHostnameForm({
       if (inputForm != null)
         inputForm.style.border = `1px solid ${COLORS.medGrey}`
       addManualIpAndHostname(ip)
+      // setMostRecentAddition(ip)
+      resetForm()
       setMostRecentAddition(ip)
-      resetForm({ values: undefined })
     },
     validate: values => {
       const errors: FormikErrors = {}
@@ -112,13 +113,14 @@ export function ManualIpHostnameForm({
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           value={formik.values.ip}
+          data-testid="manual-ip-hostname-input"
         />
         <TertiaryButton
           fontSize={TYPOGRAPHY.fontSizeH6}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={TYPOGRAPHY.lineHeight12}
           marginLeft={SPACING.spacing3}
-          padding={`6px 12px}`}
+          padding="0.375rem 0.75rem"
           type="submit"
         >
           {t('add_ip_button')}

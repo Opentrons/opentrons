@@ -42,6 +42,7 @@ interface IpHostnameItemProps {
   isLast: boolean
   mostRecentAddition: string | null
   setMostRecentAddition: (ip: string | null) => void
+  setMostRecentDiscovered: (discovered: boolean) => void
 }
 
 export function IpHostnameItem({
@@ -52,6 +53,7 @@ export function IpHostnameItem({
   isLast,
   mostRecentAddition,
   setMostRecentAddition,
+  setMostRecentDiscovered,
 }: IpHostnameItemProps): JSX.Element {
   const remove = (): void => {
     removeIp(candidate)
@@ -59,12 +61,14 @@ export function IpHostnameItem({
   const { t } = useTranslation('app_settings')
   const getDiscoveryText = (): string | null => {
     if (discovered) {
+      // setMostRecentDiscovered(true)
       return t('ip_available')
     } else if (candidate === mostRecentAddition) {
       // Note this is to avoid the case that not found but not display the message
       setMostRecentAddition('searching')
       return null
     } else {
+      // setMostRecentDiscovered(false)
       return t('not_found')
     }
   }

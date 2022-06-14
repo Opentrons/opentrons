@@ -28,10 +28,7 @@ export function IpHostnameList({
     <>
       {candidates
         .map<[string, boolean]>(candidate => {
-          const discovered = robots.some(robot => {
-            setMostRecentDiscovered(robot.ip === candidate)
-            return robot.ip === candidate
-          })
+          const discovered = robots.some(robot => robot.ip === candidate)
           return [candidate, discovered]
         })
         .sort(([_candidateA, aDiscovered], [_candidateB, bDiscovered]) =>
@@ -45,6 +42,7 @@ export function IpHostnameList({
             discovered={discovered}
             mostRecentAddition={mostRecentAddition}
             setMostRecentAddition={setMostRecentAddition}
+            setMostRecentDiscovered={setMostRecentDiscovered}
             isLast={index === candidates.length - 1}
           />
         ))}
