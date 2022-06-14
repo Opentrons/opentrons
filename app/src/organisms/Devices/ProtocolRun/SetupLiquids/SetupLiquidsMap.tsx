@@ -1,5 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
+import isEmpty from 'lodash/isEmpty'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -43,9 +44,7 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
     robotName,
     runId
   )
-  console.log(moduleRenderInfoById)
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
-  console.log(labwareRenderInfoById)
 
   const [hoverLabwareId, setHoverLabwareId] = React.useState('')
 
@@ -114,7 +113,7 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                     }
                   })
                 })
-                const labwareHasLiquid = wellFill != null
+                const labwareHasLiquid = !isEmpty(wellFill)
                 return (
                   <React.Fragment
                     key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
