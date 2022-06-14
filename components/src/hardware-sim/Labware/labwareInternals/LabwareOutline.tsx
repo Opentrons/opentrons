@@ -32,7 +32,6 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
 
   return (
     <>
-      <filter id="drop-shadow" />
       <rect
         x={OUTLINE_THICKNESS_MM}
         y={OUTLINE_THICKNESS_MM}
@@ -45,7 +44,6 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
           [styles.hover_outline]: hover,
         })}
         style={{ stroke }}
-        filter="url(#drop-shadow)"
       />
     </>
   )

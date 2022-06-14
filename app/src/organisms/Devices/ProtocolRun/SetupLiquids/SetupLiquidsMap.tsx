@@ -12,11 +12,11 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
 } from '../../hooks'
+import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import type { DeckDefinition } from '@opentrons/shared-data'
 import type { Liquid } from './getMockLiquidData'
 
@@ -43,7 +43,9 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
     robotName,
     runId
   )
+  console.log(moduleRenderInfoById)
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
+  console.log(labwareRenderInfoById)
 
   const [hoverLabwareId, setHoverLabwareId] = React.useState('')
 
