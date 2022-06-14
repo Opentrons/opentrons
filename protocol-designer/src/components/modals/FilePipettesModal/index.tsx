@@ -319,7 +319,10 @@ export class FilePipettesModal extends React.Component<Props, State> {
                     [
                       getPipetteNameSpecs(left.pipetteName as PipetteName),
                       getPipetteNameSpecs(right.pipetteName as PipetteName),
-                    ].some(pipetteSpecs => pipetteSpecs && pipetteSpecs.channels  !== 1)
+                    ].some(
+                      pipetteSpecs =>
+                        pipetteSpecs && pipetteSpecs.channels !== 1
+                    )
 
                   const showCrashInfoBox =
                     (getIsCrashablePipetteSelected(values.pipettesByMount) &&
