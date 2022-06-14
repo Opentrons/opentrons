@@ -10,7 +10,7 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
-from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
+from opentrons.drivers.heater_shaker import simulator
 
 
 @pytest.fixture
@@ -176,8 +176,8 @@ async def test_deactivated_updated_live_data(simulating_module):
 @pytest.fixture
 def mock_hs_driver():
     with unittest.mock.patch(
-        "SimulatingDriver",
-        mock.AsyncMock(spec=SimulatingDriver),
+        'simulator.SimulatingDriver',
+        mock.AsyncMock(spec=simulator.SimulatingDriver),
     ) as mock_driver:
         yield mock_driver
 
