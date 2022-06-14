@@ -358,6 +358,38 @@ def test_thermocycler_deactivate_lid(
     assert result == response
 
 
+def test_thermocycler_open_lid(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Thermocycler's open lid command."""
+    request = commands.thermocycler.OpenLidCreate(
+        params=commands.thermocycler.OpenLidParams(moduleId="module-id")
+    )
+    response = commands.thermocycler.OpenLidResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.thermocycler_open_lid(module_id="module-id")
+
+    assert result == response
+
+
+def test_thermocycler_close_lid(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Thermocycler's close lid command."""
+    request = commands.thermocycler.CloseLidCreate(
+        params=commands.thermocycler.CloseLidParams(moduleId="module-id")
+    )
+    response = commands.thermocycler.CloseLidResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.thermocycler_close_lid(module_id="module-id")
+
+    assert result == response
+
+
 def test_blow_out(
     decoy: Decoy,
     transport: AbstractSyncTransport,
