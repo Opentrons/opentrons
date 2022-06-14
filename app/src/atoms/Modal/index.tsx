@@ -53,7 +53,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           paddingX={SPACING.spacing5}
-          paddingY={SPACING.spacing4}
+          paddingY={SPACING.spacing5}
         >
           <Flex>
             {['error', 'warning'].includes(type) ? (
