@@ -114,24 +114,7 @@ export function ConnectRobotSlideout({
             </Flex>
           ) : (
             [
-              // mostRecentAddition != null && !(mostRecentDiscovered ?? false) ? (
-              //   <>
-              //     <StyledText
-              //       as="p"
-              //       color={COLORS.darkGreyEnabled}
-              //       margin={`0 ${SPACING.spacing2}`}
-              //     >
-              //       {t('discovery_timeout')}
-              //     </StyledText>
-              //     {displayLinkButton(t('try_again'))}
-              //   </>
-              // ) : (
-              //   displayLinkButton(t('shared:refresh'))
-              // ),
-
               mostRecentAddition != null && !(mostRecentDiscovered ?? false) ? (
-                displayLinkButton(t('shared:refresh'))
-              ) : (
                 <>
                   <StyledText
                     as="p"
@@ -142,6 +125,8 @@ export function ConnectRobotSlideout({
                   </StyledText>
                   {displayLinkButton(t('try_again'))}
                 </>
+              ) : (
+                displayLinkButton(t('shared:refresh'))
               ),
             ]
           )}

@@ -39,7 +39,6 @@ interface IpHostnameItemProps {
   candidate: string
   discovered: boolean
   removeIp: (ip: string) => unknown
-  // justAdded: boolean
   isLast: boolean
   mostRecentAddition: string | null
   setMostRecentAddition: (ip: string | null) => void
@@ -59,21 +58,16 @@ export function IpHostnameItem({
   }
   const { t } = useTranslation('app_settings')
   const getDiscoveryText = (): string | null => {
-    // console.log('justAdded in getDiscoveryText', justAdded)
-    console.log('mostRecentAddition', mostRecentAddition)
     if (discovered) {
       return t('ip_available')
     } else if (candidate === mostRecentAddition) {
-      setMostRecentAddition(null)
+      // Note this is to avoid the case that not found but not display the message
+      setMostRecentAddition('searching')
       return null
     } else {
       return t('not_found')
     }
   }
-
-  // React.useEffect(() => {
-  //   getDiscoveryText()
-  // }, [mostRecentAddition, discovered, candidate])
 
   return (
     <>

@@ -29,13 +29,8 @@ export function IpHostnameList({
       {candidates
         .map<[string, boolean]>(candidate => {
           const discovered = robots.some(robot => {
-            if (robot.ip === candidate) {
-              setMostRecentDiscovered(true)
-              return true
-            } else {
-              setMostRecentDiscovered(false)
-              return false
-            }
+            setMostRecentDiscovered(robot.ip === candidate)
+            return robot.ip === candidate
           })
           return [candidate, discovered]
         })

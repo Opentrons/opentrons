@@ -110,7 +110,7 @@ describe('ConnectRobotSlideout', () => {
   it('Clicking Add button with an IP address/hostname should display the IP address/hostname', async () => {
     mockGetConfig.mockReturnValue({
       discovery: {
-        candidates: ['localhost'],
+        candidates: ['localhost', '5.5.5.5'],
       },
     } as any)
     mockGetViewableRobots.mockReturnValue([
@@ -120,7 +120,7 @@ describe('ConnectRobotSlideout', () => {
         port: 31950,
       },
     ] as any[])
-    const { getByRole, getByText, queryByText } = render(props)
+    const { getByRole, getByText, queryByText, findByText } = render(props)
     const newIpAddress = 'localhost'
     const inputBox = getByRole('textbox')
     const addButton = getByRole('button', { name: 'Add' })
@@ -130,8 +130,12 @@ describe('ConnectRobotSlideout', () => {
     })
 
     expect(getByText(newIpAddress)).toBeInTheDocument()
-    expect(queryByText('Available')).toBeFalsy()
-    expect(queryByText('Not Found')).toBeFalsy()
+    expect(queryByText('1.1.1.1')).not.toBeInTheDocument()
+    act(() => {
+      jest.advanceTimersByTime(30000)
+    })
+    expect(findByText('Available')).toBeInTheDocument()
+    expect(findByText('Not Found')).toBeInTheDocument()
   })
 
   it('Clicking Add button with an IP address/hostname should display the IP address/hostname and Available label', async () => {
@@ -150,7 +154,7 @@ describe('ConnectRobotSlideout', () => {
   })
 
   it('Clicking Add button with an IP address/hostname should display the IP address/hostname and Not Found label', async () => {
-    const { getByRole, getByText } = render(props)
+    const { getByRole, getByText, findByText } = render(props)
     const notFoundIpAddress = '1.1.1.1'
     const inputBox = getByRole('textbox')
     const addButton = getByRole('button', { name: 'Add' })
@@ -161,7 +165,7 @@ describe('ConnectRobotSlideout', () => {
       await fireEvent.click(addButton)
     })
     expect(getByText(notFoundIpAddress)).toBeInTheDocument()
-    expect(getByText('Not Found')).toBeInTheDocument()
+    expect(findByText('Not Found')).toBeInTheDocument()
   })
 
   it('Clicking Close button in a row should remove an IP address/hostname', async () => {
