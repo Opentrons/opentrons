@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Icon } from '@opentrons/components'
+import { Icon, SPACING_3 } from '@opentrons/components'
 import collisionImage from '../../images/modules/module_pipette_collision_warning.png'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import styles from './styles.css'
@@ -22,10 +22,10 @@ const HeaterShakerPipetteCollisions = (): JSX.Element | null => {
         <strong>8-Channel</strong> pipettes cannot access slots to the left or
         right of a <strong>Heater-Shaker Module GEN1.</strong>
       </li>
-      <li>
+      <li style={{ marginTop: SPACING_3 }}>
         <strong>8-Channel</strong> pipettes can only access slots in front of or
-        behind a <strong>Heater-Shaker Module GEN1</strong> if that labware is a
-        tip rack
+        behind a <strong>Heater-Shaker Module GEN1</strong> if that slot
+        contains a tip rack.
       </li>
     </React.Fragment>
   )
@@ -35,9 +35,9 @@ const TempMagCollisions = (props: TempMagCollisonProps): JSX.Element | null => {
   if (!props.magnetOnDeck && !props.temperatureOnDeck) return null
   const moduleMessage = getCrashableModulesCopy(props) || ''
   return (
-    <li>
-      <strong>GEN1 8-Channel</strong> pipettes cannot access slots behind{' '}
-      <strong>GEN1 {moduleMessage} modules. </strong>
+    <li style={{ marginTop: SPACING_3 }}>
+      <strong>8-Channel GEN1</strong> pipettes cannot access slots in front of
+      or behind a {moduleMessage}.{' '}
       <KnowledgeBaseLink to="pipetteGen1MultiModuleCollision">
         Read more here
       </KnowledgeBaseLink>
@@ -126,14 +126,21 @@ export function CrashInfoBox(props: Props): JSX.Element {
   )
 }
 
-function getCrashableModulesCopy(props: TempMagCollisonProps): string | null {
+function getCrashableModulesCopy(
+  props: TempMagCollisonProps
+): JSX.Element | null {
   const { magnetOnDeck, temperatureOnDeck } = props
   if (magnetOnDeck && temperatureOnDeck) {
-    return 'Temperature or Magnetic'
+    return (
+      <span>
+        <strong>Temperature Module GEN1</strong> or a{' '}
+        <strong>Magnetic Module GEN1</strong>
+      </span>
+    )
   } else if (magnetOnDeck) {
-    return 'Magnetic'
+    return <strong>Magnetic Module GEN1</strong>
   } else if (temperatureOnDeck) {
-    return 'Temperature'
+    return <strong>Temperature Module GEN1</strong>
   }
   return null
 }

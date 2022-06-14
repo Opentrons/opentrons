@@ -155,6 +155,7 @@ describe('EditModulesCard', () => {
       magnetOnDeck: false,
       temperatureOnDeck: true,
       heaterShakerOnDeck: false,
+      showHeaterShakerPipetteCollisions: false,
     })
   })
 
