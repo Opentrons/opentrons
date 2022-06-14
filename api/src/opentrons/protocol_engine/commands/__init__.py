@@ -57,6 +57,14 @@ from .dispense import (
     DispenseCommandType,
 )
 
+from .dispense_in_place import (
+    DispenseInPlace,
+    DispenseInPlaceParams,
+    DispenseInPlaceCreate,
+    DispenseInPlaceResult,
+    DispenseInPlaceCommandType,
+)
+
 from .drop_tip import (
     DropTip,
     DropTipParams,
@@ -207,6 +215,12 @@ __all__ = [
     "DispenseParams",
     "DispenseResult",
     "DispenseCommandType",
+    # dispense in place command models
+    "DispenseInPlace",
+    "DispenseInPlaceCreate",
+    "DispenseInPlaceParams",
+    "DispenseInPlaceResult",
+    "DispenseInPlaceCommandType",
     # drop tip command models
     "DropTip",
     "DropTipCreate",
