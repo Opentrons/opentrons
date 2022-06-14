@@ -1,5 +1,6 @@
 import asyncio
 import pytest
+from unittest import mock
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.hardware_control.modules.types import (
     TemperatureStatus,
@@ -168,3 +169,41 @@ async def test_deactivated_updated_live_data(simulating_module):
         },
         "status": "idle",
     }
+
+
+@pytest.fixture
+def mock_hs_driver():
+    with mock.patch('opentrons.drivers.heater_shaker.simulator.SimulatingDriver', mock.AsyncMock(spec=opentrons.drivers.heater_shaker.simulator.SimulatingDriver)) as mock_driver:
+        yield mock_driver
+
+
+@pytest.fixture
+async def simulating_patched_module(usb_port, mock_hs_driver):
+    module = await modules.build(
+        port=usb_port.device_path,
+        usb_port=usb_port,
+        which="heatershaker",
+        simulating=True,
+        loop=asyncio.get_running_loop(),
+        execution_manager=ExecutionManager(),
+    )
+    assert isinstance(module, modules.AbstractModule)
+    try:
+        yield module
+    finally:
+        await module.cleanup()
+
+
+async def test_error_response(simulating_patched_module):
+    # now you can tell get_temperature to return something weird. you can use side_effect
+    # to run an arbitrary function or raise an exception; you can use return_value to change the
+    # return value
+    simulating_patched_module._driver.get_temperature.side_effect = RuntimeError()
+    with pytest.raises(RuntimeError):
+        simulating_patched_module.get_temperature()
+    assert simulating_patched_module.live_data['data']['errorDetails'] == 'RuntimeError' # or whatever
+
+    #simulating_module._error_status = "motor unable to move"
+    #await 
+
+    #And for the async error injection?
