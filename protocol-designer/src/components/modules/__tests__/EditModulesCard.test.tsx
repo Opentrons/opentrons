@@ -154,6 +154,7 @@ describe('EditModulesCard', () => {
     expect(wrapper.find(CrashInfoBox).props()).toEqual({
       magnetOnDeck: false,
       temperatureOnDeck: true,
+      heaterShakerOnDeck: false
     })
   })
 
