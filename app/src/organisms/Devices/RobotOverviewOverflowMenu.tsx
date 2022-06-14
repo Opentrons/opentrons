@@ -127,7 +127,6 @@ export const RobotOverviewOverflowMenu = (
             <>
               <MenuItem
                 onClick={handleClickRestart}
-                textTransform={TEXT_TRANSFORM_CAPITALIZE}
                 data-testid={`RobotOverviewOverflowMenu_restartRobot_${robot.name}`}
               >
                 {t('robot_controls:restart_label')}
@@ -145,7 +144,6 @@ export const RobotOverviewOverflowMenu = (
             onClick={() =>
               history.push(`/devices/${robot.name}/robot-settings`)
             }
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
             disabled={
               robot == null ||
               robot?.status === UNREACHABLE ||

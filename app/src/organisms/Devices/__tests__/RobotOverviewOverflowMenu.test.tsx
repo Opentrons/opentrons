@@ -80,9 +80,9 @@ describe('RobotOverviewOverflowMenu', () => {
     const updateRobotSoftwareBtn = getByRole('button', {
       name: 'Update robot software',
     })
-    const restartBtn = getByRole('button', { name: 'restart robot' })
+    const restartBtn = getByRole('button', { name: 'Restart robot' })
     const homeBtn = getByRole('button', { name: 'Home gantry' })
-    const settingsBtn = getByRole('button', { name: 'robot settings' })
+    const settingsBtn = getByRole('button', { name: 'Robot settings' })
 
     expect(updateRobotSoftwareBtn).toBeEnabled()
     expect(restartBtn).toBeEnabled()
@@ -104,9 +104,9 @@ describe('RobotOverviewOverflowMenu', () => {
     fireEvent.click(btn)
 
     expect(screen.queryByText('Update robot software')).toBeNull()
-    expect(screen.queryByText('restart robot')).toBeNull()
+    expect(screen.queryByText('Restart robot')).toBeNull()
     expect(screen.queryByText('Home gantry')).toBeNull()
-    getByRole('button', { name: 'robot settings' })
+    getByRole('button', { name: 'Robot settings' })
   })
 
   it('should not render menu items when the robot is not connectable', () => {
@@ -121,9 +121,9 @@ describe('RobotOverviewOverflowMenu', () => {
     fireEvent.click(btn)
 
     expect(screen.queryByText('Update robot software')).toBeNull()
-    expect(screen.queryByText('restart robot')).toBeNull()
+    expect(screen.queryByText('Restart robot')).toBeNull()
     expect(screen.queryByText('Home gantry')).toBeNull()
-    getByRole('button', { name: 'robot settings' })
+    getByRole('button', { name: 'Robot settings' })
   })
 
   it('clicking home gantry should home the gantry', () => {
@@ -144,7 +144,7 @@ describe('RobotOverviewOverflowMenu', () => {
     const btn = getByRole('button')
     fireEvent.click(btn)
 
-    const restartBtn = getByRole('button', { name: 'restart robot' })
+    const restartBtn = getByRole('button', { name: 'Restart robot' })
     fireEvent.click(restartBtn)
 
     expect(mockRestartRobot).toBeCalled()
@@ -158,8 +158,8 @@ describe('RobotOverviewOverflowMenu', () => {
     const { getByRole } = render(props)
     const btn = getByRole('button')
     fireEvent.click(btn)
-    getByRole('button', { name: 'restart robot' })
+    getByRole('button', { name: 'Restart robot' })
     getByRole('button', { name: 'Home gantry' })
-    getByRole('button', { name: 'robot settings' })
+    getByRole('button', { name: 'Robot settings' })
   })
 })
