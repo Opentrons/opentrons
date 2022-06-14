@@ -18,7 +18,7 @@
   "max_engage_height": "Max Engage Height",
   "labware_bottom": "Labware Bottom",
   "disengaged": "Disengaged",
-  "gen_2_num": "{{num}} mm",
+  "num_units": "{{num}} mm",
   "set_engage_height": "Set Engage Height",
   "tc_lid": "Lid",
   "tc_block": "Block",
