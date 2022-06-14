@@ -7,7 +7,6 @@ export function forLoadLiquid(
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { labwareId, liquidId, volumeByWell } = params
-  console.log('LOAD LICU')
   Object.entries(volumeByWell).forEach(([wellName, volume]) => {
     robotStateAndWarnings.robotState.liquidState.labware[labwareId][wellName][
       liquidId
