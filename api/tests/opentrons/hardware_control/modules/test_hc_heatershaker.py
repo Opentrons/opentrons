@@ -173,7 +173,10 @@ async def test_deactivated_updated_live_data(simulating_module):
 
 @pytest.fixture
 def mock_hs_driver():
-    with mock.patch('opentrons.drivers.heater_shaker.simulator.SimulatingDriver', mock.AsyncMock(spec=opentrons.drivers.heater_shaker.simulator.SimulatingDriver)) as mock_driver:
+    with mock.patch(
+        "opentrons.drivers.heater_shaker.simulator.SimulatingDriver",
+        mock.AsyncMock(spec=opentrons.drivers.heater_shaker.simulator.SimulatingDriver),
+    ) as mock_driver:
         yield mock_driver
 
 
@@ -201,9 +204,11 @@ async def test_error_response(simulating_patched_module):
     simulating_patched_module._driver.get_temperature.side_effect = RuntimeError()
     with pytest.raises(RuntimeError):
         simulating_patched_module.get_temperature()
-    assert simulating_patched_module.live_data['data']['errorDetails'] == 'RuntimeError' # or whatever
+    assert (
+        simulating_patched_module.live_data["data"]["errorDetails"] == "RuntimeError"
+    )  # or whatever
 
-    #simulating_module._error_status = "motor unable to move"
-    #await 
+    # simulating_module._error_status = "motor unable to move"
+    # await
 
-    #And for the async error injection?
+    # And for the async error injection?
