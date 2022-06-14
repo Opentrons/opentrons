@@ -11,6 +11,7 @@ describe('CrashInfoBox', () => {
     props = {
       ...props,
       heaterShakerOnDeck: true,
+      showHeaterShakerPipetteCollisions: true,
     }
     const { getByText } = render(<CrashInfoBox {...props} />)
     getByText('Potential pipette-module collisions')
