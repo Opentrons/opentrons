@@ -178,8 +178,6 @@ export function useRunTimestamps(runId: string | null): RunTimestamps {
     action => action.actionType === RUN_ACTION_TYPE_PLAY
   )
   const lastAction = last(actions)
-  console.log('lastAction.actionType:', lastAction?.actionType)
-
   const lastCommand = last(runCommands)
   const lastActionAt = lastAction?.createdAt ?? null
   const lastErrorAt = last(errors)?.createdAt
