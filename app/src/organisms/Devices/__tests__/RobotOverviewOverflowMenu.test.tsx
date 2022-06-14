@@ -106,9 +106,10 @@ describe('RobotOverviewOverflowMenu', () => {
     expect(screen.queryByText('Update robot software')).toBeNull()
     expect(screen.queryByText('restart robot')).toBeNull()
     expect(screen.queryByText('Home gantry')).toBeNull()
+    getByRole('button', { name: 'robot settings' })
   })
 
-  it('should rnot render menu items when the robot is not connectable', () => {
+  it('should not render menu items when the robot is not connectable', () => {
     when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
     when(mockUseCurrentRunStatus)
       .calledWith()
@@ -122,6 +123,7 @@ describe('RobotOverviewOverflowMenu', () => {
     expect(screen.queryByText('Update robot software')).toBeNull()
     expect(screen.queryByText('restart robot')).toBeNull()
     expect(screen.queryByText('Home gantry')).toBeNull()
+    getByRole('button', { name: 'robot settings' })
   })
 
   it('clicking home gantry should home the gantry', () => {
