@@ -1,6 +1,6 @@
 import asyncio
 import pytest
-from unittest import mock
+import unittest
 import mock
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.hardware_control.modules.types import (
@@ -175,7 +175,7 @@ async def test_deactivated_updated_live_data(simulating_module):
 
 @pytest.fixture
 def mock_hs_driver():
-    with mock.patch(
+    with unittest.mock.patch(
         "SimulatingDriver",
         mock.AsyncMock(spec=SimulatingDriver),
     ) as mock_driver:
