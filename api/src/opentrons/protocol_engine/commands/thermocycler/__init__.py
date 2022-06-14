@@ -56,6 +56,14 @@ from .open_lid import (
     OpenLidCreate,
 )
 
+from .close_lid import (
+    CloseLidCommandType,
+    CloseLidParams,
+    CloseLidResult,
+    CloseLid,
+    CloseLidCreate,
+)
+
 
 __all__ = [
     # Set target block temperature command models
@@ -100,4 +108,10 @@ __all__ = [
     "OpenLidResult",
     "OpenLid",
     "OpenLidCreate",
+    # Close lid command models
+    "CloseLidCommandType",
+    "CloseLidParams",
+    "CloseLidResult",
+    "CloseLid",
+    "CloseLidCreate",
 ]
