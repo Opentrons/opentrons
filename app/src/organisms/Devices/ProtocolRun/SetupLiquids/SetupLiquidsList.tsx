@@ -47,6 +47,7 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
       {liquids?.map(liquid => (
         <LiquidsListItem
           key={liquid.liquidId}
+          liquidId={liquid.liquidId}
           description={liquid.description}
           displayColor={liquid.displayColor}
           displayName={liquid.displayName}
@@ -58,6 +59,7 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
 }
 
 interface LiquidsListItemProps {
+  liquidId: string
   description: string | null
   displayColor: string
   displayName: string
@@ -69,7 +71,7 @@ interface LiquidsListItemProps {
 }
 
 export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
-  const { description, displayColor, displayName, locations } = props
+  const { liquidId, description, displayColor, displayName, locations } = props
   const [openItem, setOpenItem] = React.useState(false)
   const [
     showLiquidLabwareDetails,
@@ -151,6 +153,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       {showLiquidLabwareDetails && (
         <>
           <LiquidsLabwareDetailsModal
+            liquidId={liquidId}
             closeModal={() => setShowLiquidLabwareDetails(false)}
           />
           <Overlay
