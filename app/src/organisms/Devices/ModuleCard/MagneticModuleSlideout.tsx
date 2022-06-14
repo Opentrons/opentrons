@@ -160,7 +160,6 @@ export const MagneticModuleSlideout = (
       <StyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
-        color={COLORS.darkBlack}
         paddingTop={SPACING.spacing2}
         data-testid={`MagneticModuleSlideout_body_text_${module.serialNumber}`}
       >
