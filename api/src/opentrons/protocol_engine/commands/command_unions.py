@@ -169,6 +169,7 @@ Command = Union[
     thermocycler.WaitForLidTemperature,
     thermocycler.DeactivateBlock,
     thermocycler.DeactivateLid,
+    thermocycler.OpenLid,
 ]
 
 CommandParams = Union[
@@ -206,6 +207,7 @@ CommandParams = Union[
     thermocycler.WaitForLidTemperatureParams,
     thermocycler.DeactivateBlockParams,
     thermocycler.DeactivateLidParams,
+    thermocycler.OpenLidParams,
 ]
 
 CommandType = Union[
@@ -243,6 +245,7 @@ CommandType = Union[
     thermocycler.WaitForLidTemperatureCommandType,
     thermocycler.DeactivateBlockCommandType,
     thermocycler.DeactivateLidCommandType,
+    thermocycler.OpenLidCommandType,
 ]
 
 CommandCreate = Union[
@@ -279,6 +282,7 @@ CommandCreate = Union[
     thermocycler.WaitForLidTemperatureCreate,
     thermocycler.DeactivateBlockCreate,
     thermocycler.DeactivateLidCreate,
+    thermocycler.OpenLidCreate,
 ]
 
 CommandResult = Union[
@@ -316,4 +320,5 @@ CommandResult = Union[
     thermocycler.WaitForLidTemperatureResult,
     thermocycler.DeactivateBlockResult,
     thermocycler.DeactivateLidResult,
+    thermocycler.OpenLidResult,
 ]

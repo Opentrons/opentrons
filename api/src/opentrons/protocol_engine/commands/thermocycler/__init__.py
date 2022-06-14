@@ -48,6 +48,14 @@ from .deactivate_lid import (
     DeactivateLidCreate,
 )
 
+from .open_lid import (
+    OpenLidCommandType,
+    OpenLidParams,
+    OpenLidResult,
+    OpenLid,
+    OpenLidCreate,
+)
+
 
 __all__ = [
     # Set target block temperature command models
@@ -86,4 +94,10 @@ __all__ = [
     "DeactivateLidResult",
     "DeactivateLid",
     "DeactivateLidCreate",
+    # Open lid command models
+    "OpenLidCommandType",
+    "OpenLidParams",
+    "OpenLidResult",
+    "OpenLid",
+    "OpenLidCreate",
 ]
