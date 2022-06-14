@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
   Box,
@@ -54,6 +55,7 @@ export const LiquidsLabwareDetailsModal = (
   props: LiquidsLabwareDetailsModalProps
 ): JSX.Element => {
   const { liquidId, closeModal } = props
+  const { t } = useTranslation('protocol_setup')
   const [selectedValue, setSelectedValue] = React.useState<
     typeof liquidId | null
   >(liquidId)
@@ -97,7 +99,7 @@ export const LiquidsLabwareDetailsModal = (
               color={COLORS.darkGreyEnabled}
               marginX={SPACING.spacingL}
             >
-              {'Slot Number'}
+              {t('slot_number')}
             </StyledText>
             <StyledText
               as="p"
@@ -115,7 +117,7 @@ export const LiquidsLabwareDetailsModal = (
               color={COLORS.darkGreyEnabled}
               marginX={SPACING.spacingL}
             >
-              {'Labware Name'}
+              {t('labware_name')}
             </StyledText>
             <StyledText
               as="p"
