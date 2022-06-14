@@ -3,12 +3,13 @@ from decoy import Decoy
 
 from opentrons.hardware_control.modules import Thermocycler
 
+from opentrons.protocol_engine.types import MotorAxis
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.state.module_substates import (
     ThermocyclerModuleSubState,
     ThermocyclerModuleId,
 )
-from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 from opentrons.protocol_engine.commands import thermocycler as tc_commands
 from opentrons.protocol_engine.commands.thermocycler.open_lid import (
     OpenLidImpl,
@@ -19,9 +20,10 @@ async def test_open_lid(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
+    movement: MovementHandler,
 ) -> None:
     """It should be able to open the specified module's lid."""
-    subject = OpenLidImpl(state_view=state_view, equipment=equipment)
+    subject = OpenLidImpl(state_view=state_view, equipment=equipment, movement=movement)
 
     data = tc_commands.OpenLidParams(moduleId="input-thermocycler-id")
     expected_module_id = ThermocyclerModuleId("thermocycler-id")
@@ -43,5 +45,11 @@ async def test_open_lid(
 
     result = await subject.execute(data)
 
-    decoy.verify(await tc_hardware.open(), times=1)
+    decoy.verify(
+        await movement.home(
+            [MotorAxis.X, MotorAxis.Y, MotorAxis.RIGHT_Z, MotorAxis.LEFT_Z]
+        ),
+        await tc_hardware.open(),
+        times=1,
+    )
     assert result == expected_result
