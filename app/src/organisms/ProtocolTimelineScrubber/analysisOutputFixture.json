@@ -1904,6 +1904,24 @@
             "completedAt": "2022-06-09T20:00:59.913868+00:00"
         },
         {
+          "id": "FAKE-d4a6-400e-9f68-4d3d906bd9f3",
+          "createdAt": "2022-06-09T20:00:59.907872+00:00",
+          "commandType": "loadLiquid",
+          "key": "FAKE-d4a6-400e-9f68-4d3d906bd9f3",
+          "status": "succeeded",
+          "params": {
+              "volumeByWell": { "A1": 50 },
+              "liquidId": "blood",
+              "labwareId": "sourcePlateId",
+              "displayColor": "#aa0000"
+          },
+          "result": {
+            "liquidId": "blood"
+          },
+          "startedAt": "2022-06-09T20:00:59.913238+00:00",
+          "completedAt": "2022-06-09T20:00:59.913359+00:00"
+        },
+        {
             "id": "3bb64d91-d426-4a27-8322-fa8765dc175c",
             "createdAt": "2022-06-09T20:00:59.908000+00:00",
             "commandType": "home",

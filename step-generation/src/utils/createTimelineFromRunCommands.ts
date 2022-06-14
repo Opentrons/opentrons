@@ -1,6 +1,6 @@
 import { RunTimeCommand } from '@opentrons/shared-data'
 
-import { getNextRobotStateAndWarningsSingleCommand } from '../getNextRobotStateAndWarnings'
+import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 import { MODULE_INITIAL_STATE_BY_TYPE } from '../constants'
 import { constructInvariantContextFromRunCommands } from './constructInvariantContextFromRunCommands'
 import { makeInitialRobotState } from './misc'
@@ -81,9 +81,9 @@ export function createTimelineFromRunCommands(
     pipetteLocations,
   })
   return {
-    timeline: commands.map(command => ({
-      ...getNextRobotStateAndWarningsSingleCommand(
-        command,
+    timeline: commands.map((command, index) => ({
+      ...getNextRobotStateAndWarnings(
+        commands.slice(0, index + 1),
         invariantContext,
         initialRobotState
       ),

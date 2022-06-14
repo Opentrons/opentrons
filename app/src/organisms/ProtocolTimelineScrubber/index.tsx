@@ -1,5 +1,7 @@
 import * as React from 'react'
 import map from 'lodash/map'
+import reduce from 'lodash/reduce'
+import isEmpty from 'lodash/isEmpty'
 import {
   RobotWorkSpace,
   Module,
@@ -50,7 +52,7 @@ export function ProtocolTimelineScrubber(
   const { robotState, command } = currentCommandTimelineFrame
 
   return (
-    <Flex size="500px" flexDirection={DIRECTION_COLUMN}>
+    <Flex size="650px" flexDirection={DIRECTION_COLUMN}>
       <input
         type="range"
         min={0}
@@ -62,6 +64,16 @@ export function ProtocolTimelineScrubber(
       <Text as="h3">Current Command</Text>
       <Text marginLeft={SPACING.spacing3}>index: {currentCommandIndex}</Text>
       <Text marginLeft={SPACING.spacing3}>type: {command.commandType}</Text>
+      {/*
+      <ul marginLeft={SPACING.spacing3}>
+        props:
+        {Object.entries(command.result).map(([key, value]) => (
+          <li key={key}>
+            {key}: {value.toString()}
+          </li>
+        ))}
+      </ul> */}
+      {/* <Text>{JSON.stringify(robotState.liquidState.labware)}</Text> */}
       <RobotWorkSpace
         deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
         deckDef={deckDef}
@@ -75,6 +87,20 @@ export function ProtocolTimelineScrubber(
                 Object.entries(robotState.labware).find(
                   ([labwareId, labware]) => labware.slot === moduleId
                 )?.[0] ?? null
+              const wellFill = reduce(
+                robotState.liquidState.labware[labwareInModuleId] ?? {},
+                (acc, liquidLocation, wellName) => {
+                  if (!isEmpty(liquidLocation)) {
+                    return {
+                      ...acc,
+                      [wellName]:
+                        command.params.displayColor ?? 'rebeccapurple',
+                    }
+                  }
+                  return acc
+                },
+                {}
+              )
               return (
                 <Module
                   x={slot.position[0]}
@@ -92,6 +118,7 @@ export function ProtocolTimelineScrubber(
                       definition={
                         invariantContext.labwareEntities[labwareInModuleId].def
                       }
+                      wellFill={wellFill}
                     />
                   ) : null}
                 </Module>
@@ -105,11 +132,35 @@ export function ProtocolTimelineScrubber(
                 return null
               const slot = deckSlotsById[labware.slot]
               const definition = invariantContext.labwareEntities[labwareId].def
+
+              const missingTips = definition.parameters.isTiprack ? reduce(
+                robotState.tipState.tipracks[labwareId],
+                (acc, hasTip, wellName) => {
+                  if (!hasTip) return { ...acc, [wellName]: null }
+                  return acc
+                },
+                {}
+              ) : {}
+
+              const wellFill = reduce(
+                robotState.liquidState.labware[labwareId],
+                (acc, liquidLocation, wellName) => {
+                  if (!isEmpty(liquidLocation)) {
+                    return {
+                      ...acc,
+                      [wellName]:
+                        command.params.displayColor ?? 'rebeccapurple',
+                    }
+                  }
+                  return acc
+                },
+                {}
+              )
               return (
                 <g
                   transform={`translate(${slot.position[0]},${slot.position[1]})`}
                 >
-                  <LabwareRender definition={definition} />
+                  <LabwareRender definition={definition} wellFill={wellFill} missingTips={missingTips} />
                 </g>
               )
             })}

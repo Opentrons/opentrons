@@ -91,6 +91,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'touchTip':
     case 'delay':
     case 'moveToWell':
+    case 'custom':
       // these commands don't have any effects on the state
       break
 
