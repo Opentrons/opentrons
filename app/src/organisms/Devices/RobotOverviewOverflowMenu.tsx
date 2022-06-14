@@ -9,7 +9,6 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
   useMountEffect,
 } from '@opentrons/components'
 import { checkShellUpdate } from '../../redux/shell'
