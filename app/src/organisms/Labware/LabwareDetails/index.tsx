@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
+import { css } from 'styled-components'
+
 import {
   Box,
   Link,
@@ -31,6 +33,16 @@ import { Gallery } from './Gallery'
 import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
 import type { LabwareDefAndDate } from '../hooks'
 
+const CLOSE_ICON_STYLE = css`
+  border-radius: 50%;
+
+  &:hover {
+    background: #16212d26;
+  }
+  &:active {
+    background: #16212d40;
+  }
+`
 export interface LabwareDetailsProps {
   onClose: () => void
   labware: LabwareDefAndDate
@@ -66,7 +78,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           {props.labware.definition.metadata.displayName}
         </StyledText>
         <Link onClick={props.onClose} role="button">
-          <Icon name="close" height={SPACING.spacing5} />
+          <Icon name="close" height={SPACING.spacing5} css={CLOSE_ICON_STYLE} />
         </Link>
       </Flex>
       {!isCustomDefinition && (
