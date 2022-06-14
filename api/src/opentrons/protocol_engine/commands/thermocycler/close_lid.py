@@ -25,8 +25,6 @@ class CloseLidParams(BaseModel):
 class CloseLidResult(BaseModel):
     """Result data from closing a Thermocycler's lid."""
 
-    # TODO return lid status?
-
 
 class CloseLidImpl(AbstractCommandImpl[CloseLidParams, CloseLidResult]):
     """Execution implementation of a Thermocycler's close lid command."""
