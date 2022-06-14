@@ -308,10 +308,15 @@ export class FilePipettesModal extends React.Component<Props, State> {
                     values.modulesByType,
                     TEMPERATURE_MODULE_TYPE
                   )
+                  const hasHeaterShakerSelected = Boolean(
+                    values.modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck
+                  )
+
                   const showCrashInfoBox =
                     getIsCrashablePipetteSelected(values.pipettesByMount) &&
                     (hasCrashableMagnetModuleSelected ||
-                      hasCrashableTemperatureModuleSelected)
+                      hasCrashableTemperatureModuleSelected ||
+                      hasHeaterShakerSelected)
 
                   return (
                     <>
@@ -388,6 +393,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
                             temperatureOnDeck={
                               hasCrashableTemperatureModuleSelected
                             }
+                            heaterShakerOnDeck={hasHeaterShakerSelected}
                           />
                         )}
                         <div className={modalStyles.button_row}>

@@ -4,6 +4,7 @@ import { Card } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
   ModuleType,
 } from '@opentrons/shared-data'
 import {
@@ -36,6 +37,7 @@ export function EditModulesCard(props: Props): JSX.Element {
 
   const magneticModuleOnDeck = modules[MAGNETIC_MODULE_TYPE]
   const temperatureModuleOnDeck = modules[TEMPERATURE_MODULE_TYPE]
+  const heaterShakerOnDeck = modules[HEATERSHAKER_MODULE_TYPE]
 
   const hasCrashableMagneticModule =
     magneticModuleOnDeck &&
@@ -43,6 +45,7 @@ export function EditModulesCard(props: Props): JSX.Element {
   const hasCrashableTempModule =
     temperatureModuleOnDeck &&
     isModuleWithCollisionIssue(temperatureModuleOnDeck.model)
+  const isHeaterShakerOnDeck = Boolean(heaterShakerOnDeck)
 
   const moduleRestrictionsDisabled = Boolean(
     useSelector(featureFlagSelectors.getDisableModuleRestrictions)
@@ -54,7 +57,10 @@ export function EditModulesCard(props: Props): JSX.Element {
   const warningsEnabled =
     !moduleRestrictionsDisabled && crashablePipettesSelected
   const showCrashInfoBox =
-    warningsEnabled && (hasCrashableMagneticModule || hasCrashableTempModule)
+    warningsEnabled &&
+    (hasCrashableMagneticModule ||
+      hasCrashableTempModule ||
+      isHeaterShakerOnDeck)
 
   const SUPPORTED_MODULE_TYPES_FILTERED = enableHeaterShaker
     ? SUPPORTED_MODULE_TYPES
@@ -69,6 +75,7 @@ export function EditModulesCard(props: Props): JSX.Element {
           <CrashInfoBox
             magnetOnDeck={hasCrashableMagneticModule}
             temperatureOnDeck={hasCrashableTempModule}
+            heaterShakerOnDeck={isHeaterShakerOnDeck}
           />
         )}
         {SUPPORTED_MODULE_TYPES_FILTERED.map((moduleType, i) => {
