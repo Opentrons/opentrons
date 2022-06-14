@@ -10,6 +10,7 @@ import functools
 import logging
 import re
 from typing import Mapping, Optional, Union, TYPE_CHECKING
+from typing_extensions import Final
 
 import numpy as np
 import jsonschema  # type: ignore[import]
@@ -335,6 +336,9 @@ class ThermocyclerGeometry(ModuleGeometry):
 
 class HeaterShakerGeometry(ModuleGeometry):
     """Class holding the state of a heater-shaker's physical geometry."""
+
+    MAX_ADJACENT_ITEM_HEIGHT: Final = 53.0
+    MAX_ADJACENT_TIP_RACK_HEIGHT: Final = 70.0
 
     def __init__(
         self,
