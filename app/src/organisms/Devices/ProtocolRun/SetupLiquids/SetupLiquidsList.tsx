@@ -16,7 +16,6 @@ import {
   SIZE_AUTO,
   JUSTIFY_SPACE_BETWEEN,
   Box,
-  Overlay,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { StyledText } from '../../../../atoms/text'
@@ -94,10 +93,10 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       border: 1px solid ${COLORS.medGreyHover};
     }
   `
-  const handleClickOutside: React.MouseEventHandler<HTMLDivElement> = e => {
-    e.preventDefault()
-    setShowLiquidLabwareDetails(!showLiquidLabwareDetails)
-  }
+  // const handleClickOutside: React.MouseEventHandler<HTMLDivElement> = e => {
+  //   e.preventDefault()
+  //   setShowLiquidLabwareDetails(!showLiquidLabwareDetails)
+  // }
   return (
     <Box
       css={LIQUID_CARD_STYLE}
@@ -151,16 +150,10 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
         </Flex>
       </Flex>
       {showLiquidLabwareDetails && (
-        <>
-          <LiquidsLabwareDetailsModal
-            liquidId={liquidId}
-            closeModal={() => setShowLiquidLabwareDetails(false)}
-          />
-          <Overlay
-            onClick={handleClickOutside}
-            backgroundColor={COLORS.transparent}
-          />
-        </>
+        <LiquidsLabwareDetailsModal
+          liquidId={liquidId}
+          closeModal={() => setShowLiquidLabwareDetails(false)}
+        />
       )}
       {openItem && (
         <Flex flexDirection={DIRECTION_COLUMN}>

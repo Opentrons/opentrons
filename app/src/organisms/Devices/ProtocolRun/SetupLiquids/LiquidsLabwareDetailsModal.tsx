@@ -68,7 +68,8 @@ export const LiquidsLabwareDetailsModal = (
     <Modal
       onClose={closeModal}
       title={'Labware Name'}
-      backgroundColor={COLORS.background}
+      contentBackgroundColor={COLORS.background}
+      closeOnOutsideClick
     >
       <Box>
         <Flex flexDirection={DIRECTION_ROW}>
