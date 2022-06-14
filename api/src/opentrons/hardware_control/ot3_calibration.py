@@ -215,7 +215,7 @@ async def find_slot_center_binary(
         1,
     )
     LOG.info(f"Found -y edge at {minus_y_edge}mm")
-    return (plus_x_edge + minus_x_edge) / 2, (plus_y_edge + minus_y_edge)
+    return (plus_x_edge + minus_x_edge) / 2, (plus_y_edge + minus_y_edge) / 2
 
 
 async def find_axis_center(
@@ -296,7 +296,16 @@ def _edges_from_data(
     """
     now_str = datetime.datetime.now().strftime("%d-%m-%y-%H:%M:%S")
 
+    # The width of the averaging kernel defines how strong the averaging is - a wider
+    # kernel, or filter, has a lower rolloff frequency and will smooth more. This
+    # calculation sets the width at 5% of the length of the data, and then makes that
+    # value an even number
     average_width_samples = (int(floor(0.05 * len(data))) // 2) * 2
+    # an averaging kernel would be an array of length N with elements each set to 1/N;
+    # when convolved with a data stream, this will (ignoring edge effects) produce
+    # an N-sample rolling average. by inverting the sign of half the kernel, which is
+    # why we need it to be even, we do the same thing but while also taking a finite
+    # difference.
     average_difference_kernel = np.concatenate(  # type: ignore
         (
             np.full(average_width_samples // 2, 1 / average_width_samples),
