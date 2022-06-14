@@ -7,7 +7,6 @@ import {
   RUN_STATUS_IDLE,
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_PAUSED,
-  RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 import {
   Flex,
@@ -183,9 +182,7 @@ export function StepItemComponent(props: StepItemProps): JSX.Element | null {
                   runCommand={runCommandSummary}
                   runId={runId}
                 />
-                {runPausedAt != null &&
-                runStatus !== RUN_STATUS_STOP_REQUESTED &&
-                isMostRecentCommand ? (
+                {runPausedAt != null && isMostRecentCommand ? (
                   <Flex alignItems={ALIGN_CENTER}>
                     <Icon
                       name="pause-circle"
@@ -216,7 +213,7 @@ function PauseTimer({ pausedAt }: PauseTimerProps): JSX.Element {
   useInterval(() => setNow(Date()), 500, true)
 
   return (
-    <StyledText>{`${t('user_paused_protocol_for')} ${formatInterval(
+    <StyledText>{`${t('protocol_paused_for')} ${formatInterval(
       pausedAt,
       now
     )}`}</StyledText>
