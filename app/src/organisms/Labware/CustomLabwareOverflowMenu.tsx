@@ -134,14 +134,13 @@ export function CustomLabwareOverflowMenu(
               <Flex
                 justifyContent={JUSTIFY_FLEX_END}
                 alignItems={ALIGN_CENTER}
-                marginTop="24px"
+                marginTop={SPACING.spacing5}
               >
                 <Btn
                   onClick={handleCancelModal}
                   textTransform={TEXT_TRANSFORM_CAPITALIZE}
                   marginRight={SPACING.spacing5}
                   css={TYPOGRAPHY.linkPSemiBold}
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   {t('shared:cancel')}
                 </Btn>
