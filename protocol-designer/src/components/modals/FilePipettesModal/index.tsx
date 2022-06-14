@@ -26,6 +26,8 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   ModuleType,
   ModuleModel,
+  getPipetteNameSpecs,
+  PipetteName,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
@@ -312,6 +314,13 @@ export class FilePipettesModal extends React.Component<Props, State> {
                     values.modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck
                   )
 
+                  const showHeaterShakerPipetteCollisions =
+                    hasHeaterShakerSelected &&
+                    [
+                      getPipetteNameSpecs(left.pipetteName as PipetteName),
+                      getPipetteNameSpecs(right.pipetteName as PipetteName),
+                    ].some(pipetteSpecs => pipetteSpecs && pipetteSpecs.channels  !== 1)
+
                   const showCrashInfoBox =
                     (getIsCrashablePipetteSelected(values.pipettesByMount) &&
                       (hasCrashableMagnetModuleSelected ||
@@ -393,6 +402,9 @@ export class FilePipettesModal extends React.Component<Props, State> {
                               hasCrashableTemperatureModuleSelected
                             }
                             heaterShakerOnDeck={hasHeaterShakerSelected}
+                            showHeaterShakerPipetteCollisions={
+                              showHeaterShakerPipetteCollisions
+                            }
                           />
                         )}
                         <div className={modalStyles.button_row}>

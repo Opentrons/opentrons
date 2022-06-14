@@ -6,6 +6,8 @@ import {
   TEMPERATURE_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   ModuleType,
+  PipetteName,
+  getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
@@ -54,12 +56,18 @@ export function EditModulesCard(props: Props): JSX.Element {
     pipettesByMount
   )
 
-  const warningsEnabled =
-    !moduleRestrictionsDisabled && crashablePipettesSelected
+  const showHeaterShakerPipetteCollisions =
+    isHeaterShakerOnDeck &&
+    [
+      getPipetteNameSpecs(pipettesByMount.left.pipetteName as PipetteName),
+      getPipetteNameSpecs(pipettesByMount.right.pipetteName as PipetteName),
+    ].some(pipetteSpecs => pipetteSpecs?.channels !== 1)
+
+  const warningsEnabled = !moduleRestrictionsDisabled
   const showCrashInfoBox =
     warningsEnabled &&
-    (hasCrashableMagneticModule ||
-      hasCrashableTempModule ||
+    ((crashablePipettesSelected && hasCrashableMagneticModule) ||
+      (crashablePipettesSelected && hasCrashableTempModule) ||
       isHeaterShakerOnDeck)
 
   const SUPPORTED_MODULE_TYPES_FILTERED = enableHeaterShaker
@@ -76,6 +84,9 @@ export function EditModulesCard(props: Props): JSX.Element {
             magnetOnDeck={hasCrashableMagneticModule}
             temperatureOnDeck={hasCrashableTempModule}
             heaterShakerOnDeck={isHeaterShakerOnDeck}
+            showHeaterShakerPipetteCollisions={
+              showHeaterShakerPipetteCollisions
+            }
           />
         )}
         {SUPPORTED_MODULE_TYPES_FILTERED.map((moduleType, i) => {

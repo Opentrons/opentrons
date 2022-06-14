@@ -8,16 +8,14 @@ interface Props {
   showDiagram?: boolean
   magnetOnDeck?: boolean | null
   temperatureOnDeck?: boolean | null
-  heaterShakerOnDeck?: boolean | null
+  heaterShakerOnDeck?: boolean
+  showHeaterShakerPipetteCollisions?: boolean
 }
 
 type TempMagCollisonProps = Pick<Props, 'magnetOnDeck' | 'temperatureOnDeck'>
 type HeaterShakerCollisonProps = Pick<Props, 'heaterShakerOnDeck'>
 
-const HeaterShakerCollisions = (
-  props: Pick<Props, 'heaterShakerOnDeck'>
-): JSX.Element | null => {
-  if (props.heaterShakerOnDeck == null) return null
+const HeaterShakerPipetteCollisions = (): JSX.Element | null => {
   return (
     <React.Fragment>
       <li>
@@ -49,15 +47,15 @@ const TempMagCollisions = (props: TempMagCollisonProps): JSX.Element | null => {
 
 const PipetteModuleCollisions = (props: Props): JSX.Element | null => {
   if (
-    props.magnetOnDeck == null &&
-    props.temperatureOnDeck == null &&
-    props.heaterShakerOnDeck == null
+    !props.magnetOnDeck &&
+    !props.temperatureOnDeck &&
+    !props.showHeaterShakerPipetteCollisions
   )
     return null
 
   const body = (
     <React.Fragment>
-      <HeaterShakerCollisions heaterShakerOnDeck={props.heaterShakerOnDeck} />
+      <HeaterShakerPipetteCollisions />
       <TempMagCollisions
         magnetOnDeck={props.magnetOnDeck}
         temperatureOnDeck={props.temperatureOnDeck}
@@ -71,7 +69,7 @@ const PipetteModuleCollisions = (props: Props): JSX.Element | null => {
 const ModuleLabwareCollisions = (
   props: HeaterShakerCollisonProps
 ): JSX.Element | null => {
-  if (props.heaterShakerOnDeck == null) return null
+  if (!props.heaterShakerOnDeck) return null
   const title = 'Potential module-labware collisions'
   const body = (
     <li>
@@ -85,7 +83,7 @@ const ModuleLabwareCollisions = (
 const ModuleModuleCollisions = (
   props: HeaterShakerCollisonProps
 ): JSX.Element | null => {
-  if (props.heaterShakerOnDeck == null) return null
+  if (!props.heaterShakerOnDeck) return null
   const title = 'Potential module-module collisions'
   const body = (
     <li>
