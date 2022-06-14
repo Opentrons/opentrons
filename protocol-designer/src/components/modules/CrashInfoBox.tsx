@@ -34,7 +34,7 @@ const HeaterShakerCollisions = (
 }
 
 const TempMagCollisions = (props: TempMagCollisonProps): JSX.Element | null => {
-  if (props.magnetOnDeck == null && props.temperatureOnDeck == null) return null
+  if (!props.magnetOnDeck && !props.temperatureOnDeck) return null
   const moduleMessage = getCrashableModulesCopy(props) || ''
   return (
     <li>

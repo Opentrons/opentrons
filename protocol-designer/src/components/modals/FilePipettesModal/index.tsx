@@ -313,11 +313,10 @@ export class FilePipettesModal extends React.Component<Props, State> {
                   )
 
                   const showCrashInfoBox =
-                    getIsCrashablePipetteSelected(values.pipettesByMount) &&
-                    (hasCrashableMagnetModuleSelected ||
-                      hasCrashableTemperatureModuleSelected ||
-                      hasHeaterShakerSelected)
-
+                    (getIsCrashablePipetteSelected(values.pipettesByMount) &&
+                      (hasCrashableMagnetModuleSelected ||
+                        hasCrashableTemperatureModuleSelected)) ||
+                    hasHeaterShakerSelected
                   return (
                     <>
                       <form onSubmit={handleSubmit}>
