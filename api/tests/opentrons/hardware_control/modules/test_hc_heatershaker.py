@@ -1,6 +1,7 @@
 import asyncio
 import pytest
 from unittest import mock
+import mock
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.hardware_control.modules.types import (
     TemperatureStatus,
