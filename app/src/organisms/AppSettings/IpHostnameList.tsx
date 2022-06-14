@@ -9,11 +9,13 @@ import type { State, Dispatch } from '../../redux/types'
 
 interface IpHostnameListProps {
   mostRecentAddition: string | null
+  setMostRecentAddition: (ip: string | null) => void
   setMostRecentDiscovered: (discovered: boolean) => void
 }
 
 export function IpHostnameList({
   mostRecentAddition,
+  setMostRecentAddition,
   setMostRecentDiscovered,
 }: IpHostnameListProps): JSX.Element {
   const candidates = useSelector(
@@ -46,7 +48,8 @@ export function IpHostnameList({
             key={index}
             removeIp={() => dispatch(removeManualIp(candidate))}
             discovered={discovered}
-            justAdded={candidate === mostRecentAddition}
+            mostRecentAddition={mostRecentAddition}
+            setMostRecentAddition={setMostRecentAddition}
             isLast={index === candidates.length - 1}
           />
         ))}

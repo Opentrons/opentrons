@@ -39,30 +39,41 @@ interface IpHostnameItemProps {
   candidate: string
   discovered: boolean
   removeIp: (ip: string) => unknown
-  justAdded: boolean
+  // justAdded: boolean
   isLast: boolean
+  mostRecentAddition: string | null
+  setMostRecentAddition: (ip: string | null) => void
 }
 
 export function IpHostnameItem({
   candidate,
   discovered,
   removeIp,
-  justAdded,
+  // justAdded,
   isLast,
+  mostRecentAddition,
+  setMostRecentAddition,
 }: IpHostnameItemProps): JSX.Element {
   const remove = (): void => {
     removeIp(candidate)
   }
   const { t } = useTranslation('app_settings')
   const getDiscoveryText = (): string | null => {
+    // console.log('justAdded in getDiscoveryText', justAdded)
+    console.log('mostRecentAddition', mostRecentAddition)
     if (discovered) {
       return t('ip_available')
-    } else if (justAdded) {
+    } else if (candidate === mostRecentAddition) {
+      setMostRecentAddition(null)
       return null
     } else {
       return t('not_found')
     }
   }
+
+  // React.useEffect(() => {
+  //   getDiscoveryText()
+  // }, [mostRecentAddition, discovered, candidate])
 
   return (
     <>

@@ -62,16 +62,6 @@ export function ConnectRobotSlideout({
     )
   }
 
-  console.log('isScanning', isScanning)
-  console.log('mostRecentAddition', mostRecentAddition)
-  console.log('mostRecentDiscovered', mostRecentDiscovered)
-
-  // React.useEffect(() => {
-  //   if (!isScanning) {
-  //     setMostRecentAddition(null)
-  //   }
-  // }, [isScanning])
-
   React.useEffect(() => {
     dispatch(startDiscovery())
   }, [dispatch])
@@ -139,8 +129,7 @@ export function ConnectRobotSlideout({
               //   displayLinkButton(t('shared:refresh'))
               // ),
 
-              mostRecentAddition == null ||
-              (mostRecentAddition != null && mostRecentDiscovered === true) ? (
+              mostRecentAddition != null && !(mostRecentDiscovered ?? false) ? (
                 displayLinkButton(t('shared:refresh'))
               ) : (
                 <>
@@ -160,6 +149,7 @@ export function ConnectRobotSlideout({
         <IpHostnameList
           mostRecentAddition={mostRecentAddition}
           setMostRecentDiscovered={setMostRecentDiscovered}
+          setMostRecentAddition={setMostRecentAddition}
         />
       </Flex>
     </Slideout>
