@@ -25,7 +25,7 @@ log = logging.getLogger(__name__)
 POLL_PERIOD = 1.0
 
 # TODO(mc, 2022-06-14): this techinque copied from temperature module
-# to speed up simulation of heater/shaker protocols, but it's pretty silly
+# to speed up simulation of heater-shaker protocols, but it's pretty silly
 # module simulation in PAPIv2 needs to be seriously rethought
 SIMULATING_POLL_PERIOD = POLL_PERIOD / 20.0
 
@@ -259,7 +259,7 @@ class HeaterShaker(mod_abc.AbstractModule):
                may be unattainable but we do not limit input on the
                low side in case the user has this in a freezer.
 
-        This function will not complete until the heater/shaker is at
+        This function will not complete until the heater-shaker is at
         the requested temperature or an error occurs. To start heating
         but not wait until heating is complete, see start_set_temperature.
         """
@@ -336,7 +336,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         Range: 0-3000 RPM
                Any speed above or below these values will cause an error.
 
-        This function will not complete until the heater/shaker is at
+        This function will not complete until the heater-shaker is at
         the speed or an error occurs. To start spinning but not wait
         until the final speed is reached, see start_set_speed.
         """
@@ -362,7 +362,7 @@ class HeaterShaker(mod_abc.AbstractModule):
                 Any speed above or below these values will cause an
                 error
 
-         This function will complete after the heater/shaker begins
+         This function will complete after the heater-shaker begins
          to accelerate. To wait until the speed is reached, use
          await_speed. To set speed and wait in the same call, see
          set_speed.
@@ -374,7 +374,7 @@ class HeaterShaker(mod_abc.AbstractModule):
     async def await_speed(self, awaiting_speed: int) -> None:
         """Wait until specified RPM speed is reached.
 
-        Polls heater/shaker module's current speed until awaiting_speed is achieved.
+        Polls heater-shaker module's current speed until awaiting_speed is achieved.
         """
         if self.is_simulated:
             return
@@ -460,7 +460,7 @@ class PollerReader(Reader[PollResult]):
         self._driver = driver
 
     async def read(self) -> PollResult:
-        """Poll the heater/shaker."""
+        """Poll the heater-shaker."""
 
         return PollResult(
             temperature=await self._driver.get_temperature(),

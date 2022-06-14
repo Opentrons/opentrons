@@ -18,7 +18,6 @@ from typing import (
 )
 
 from opentrons import types as top_types
-from opentrons.config.feature_flags import enable_heater_shaker_python_api
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control.types import Axis
 
@@ -370,20 +369,6 @@ def requires_version(major: int, minor: int) -> Callable[[FuncT], FuncT]:
         return cast(FuncT, _check_version_wrapper)
 
     return _set_version
-
-
-def requires_heatershaker_ff(decorated_obj: FuncT) -> FuncT:
-    """Decorator that allows execution of API methods only when `enableHeaterShakerPAPI`
-    feature flag is set.
-    """
-
-    @functools.wraps(decorated_obj)
-    def wrapper(*args: Any, **kwargs: Any) -> Any:
-        if not enable_heater_shaker_python_api():
-            raise UnsupportedAPIError("This API feature is not available yet.")
-        return decorated_obj(*args, **kwargs)
-
-    return cast(FuncT, wrapper)
 
 
 class ModifiedList(list):

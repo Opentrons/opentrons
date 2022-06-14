@@ -193,7 +193,9 @@ def test_incorrect_module_error(ctx_with_tempdeck):
         ("heaterShakerModuleV1", papi.HeaterShakerContext, "heaterShakerModuleV1"),
     ],
 )
-def test_load_simulating_module(ctx, loadname, klass, model):
+def test_load_simulating_module(
+    ctx, loadname, klass, model, enable_heater_shaker_python_api
+):
     """Check that a known module will not throw an error if in simulation mode.
 
     Note: This is basically an integration test that checks that a module can be
@@ -518,10 +520,12 @@ def test_heater_shaker_loading(
     assert ctx_with_heater_shaker.deck[3] == mod.geometry
 
 
+# TODO(mc, 2022-06-14): remove this test for heater-shaker production release
 def test_loading_heater_shaker_fails_prerelease(
-    mock_hardware: mock.AsyncMock, mock_module_controller: mock.MagicMock
+    mock_hardware: mock.AsyncMock,
+    mock_module_controller: mock.MagicMock,
 ) -> None:
-    """It should raise an error if h/s command issued without feature flag enabled."""
+    """It should raise an error if h/s loaded without feature flag enabled."""
     mock_module_controller.model.return_value = "heaterShakerModuleV1"
 
     def find_modules(resolved_model: ModuleModel, resolved_type: ModuleType):
@@ -537,9 +541,8 @@ def test_loading_heater_shaker_fails_prerelease(
         implementation=ProtocolContextImplementation(sync_hardware=mock_hardware)
     )
 
-    hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
     with pytest.raises(api_util.UnsupportedAPIError):
-        hs_mod.set_target_temperature(celsius=50)  # type: ignore[union-attr]
+        ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
 
 
 def test_heater_shaker_set_target_temperature(
