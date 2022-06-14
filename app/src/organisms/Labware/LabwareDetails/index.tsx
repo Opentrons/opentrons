@@ -115,7 +115,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           onClick={() => navigator.clipboard.writeText(apiName)}
           role="button"
         >
-          <Flex alignItems={ALIGN_CENTER}>
+          <Flex alignItems={ALIGN_CENTER} css={{ 'overflow-wrap': 'anywhere' }}>
             {apiName} <Icon height={SIZE_1} name="copy-text" />
           </Flex>
         </Link>
