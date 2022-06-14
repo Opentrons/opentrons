@@ -175,7 +175,7 @@ async def test_deactivated_updated_live_data(simulating_module):
 @pytest.fixture
 def mock_hs_driver():
     with mock.patch(
-        "opentrons.drivers.heater_shaker.simulator.SimulatingDriver",
+        "SimulatingDriver",
         mock.AsyncMock(spec=SimulatingDriver),
     ) as mock_driver:
         yield mock_driver
