@@ -22,7 +22,12 @@ from opentrons.hardware_control.modules.types import (
 
 log = logging.getLogger(__name__)
 
-POLL_PERIOD = 1
+POLL_PERIOD = 1.0
+
+# TODO(mc, 2022-06-14): this techinque copied from temperature module
+# to speed up simulation of heater/shaker protocols, but it's pretty silly
+# module simulation in PAPIv2 needs to be seriously rethought
+SIMULATING_POLL_PERIOD = POLL_PERIOD / 20.0
 
 
 class HeaterShakerError(RuntimeError):
@@ -63,8 +68,11 @@ class HeaterShaker(mod_abc.AbstractModule):
         driver: AbstractHeaterShakerDriver
         if not simulating:
             driver = await HeaterShakerDriver.create(port=port, loop=loop)
+            polling_period = kwargs.get("polling_period", POLL_PERIOD)
         else:
             driver = SimulatingDriver()
+            polling_period = SIMULATING_POLL_PERIOD
+
         mod = cls(
             port=port,
             usb_port=usb_port,
@@ -72,7 +80,7 @@ class HeaterShaker(mod_abc.AbstractModule):
             driver=driver,
             device_info=await driver.get_device_info(),
             loop=loop,
-            polling_period=kwargs.get("polling_period"),
+            polling_period=polling_period,
         )
         return mod
 
@@ -83,19 +91,18 @@ class HeaterShaker(mod_abc.AbstractModule):
         execution_manager: ExecutionManager,
         driver: AbstractHeaterShakerDriver,
         device_info: Mapping[str, str],
+        polling_period: float,
         loop: Optional[asyncio.AbstractEventLoop] = None,
-        polling_period: Optional[float] = None,
     ):
         super().__init__(
             port=port, usb_port=usb_port, loop=loop, execution_manager=execution_manager
         )
-        poll_time_s = polling_period or POLL_PERIOD
         self._device_info = device_info
         self._driver = driver
         self._listener = HeaterShakerListener(loop=loop)
         self._poller = Poller(
             reader=PollerReader(driver=self._driver),
-            interval_seconds=poll_time_s,
+            interval_seconds=polling_period,
             listener=self._listener,
         )
         # TODO (spp, 2022-02-23): refine this to include user-facing error message.

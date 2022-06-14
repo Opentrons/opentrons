@@ -149,10 +149,6 @@ class ResumeCommand(TypedDict):
     payload: ResumeCommandPayload
 
 
-class HeaterShakerSetAndWaitForTemperaturePayload(TextOnlyPayload):
-    pass
-
-
 class HeaterShakerSetTargetTemperaturePayload(TextOnlyPayload):
     pass
 
@@ -568,7 +564,6 @@ Command = Union[
 CommandPayload = Union[
     CommentCommandPayload,
     ResumeCommandPayload,
-    HeaterShakerSetAndWaitForTemperaturePayload,
     HeaterShakerSetTargetTemperaturePayload,
     HeaterShakerWaitForTemperaturePayload,
     HeaterShakerSetAndWaitForShakeSpeedPayload,
