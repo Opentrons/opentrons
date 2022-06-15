@@ -65,12 +65,12 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
         style={{ width: '6rem' }}
         id={`RobotCard_${robotName}_robotImage`}
       />
-      <Box padding={SPACING.spacing3} width="100%">
+      <Box padding={SPACING.spacing4} width="100%">
         {!isRobotBusy ? (
           <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing3} />
         ) : null}
         <ReachableBanner robot={robot} />
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_START}>
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText
               as="h6"
@@ -127,7 +127,8 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
         as="h6"
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         color={COLORS.darkGreyEnabled}
-        marginBottom={SPACING.spacing1}
+        // marginBottom={SPACING.spacing1}
+        marginBottom={SPACING.spacing2}
       >
         {t('modules')}
       </StyledText>
@@ -156,6 +157,7 @@ function AttachedPipettes(props: { robotName: string }): JSX.Element {
           as="h6"
           textTransform={TEXT_TRANSFORM_UPPERCASE}
           color={COLORS.darkGreyEnabled}
+          marginBottom={SPACING.spacing2}
         >
           {t('left_mount')}
         </StyledText>
@@ -168,6 +170,7 @@ function AttachedPipettes(props: { robotName: string }): JSX.Element {
           as="h6"
           textTransform={TEXT_TRANSFORM_UPPERCASE}
           color={COLORS.darkGreyEnabled}
+          marginBottom={SPACING.spacing2}
         >
           {t('right_mount')}
         </StyledText>
