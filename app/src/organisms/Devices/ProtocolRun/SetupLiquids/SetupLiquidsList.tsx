@@ -93,10 +93,6 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       border: 1px solid ${COLORS.medGreyHover};
     }
   `
-  // const handleClickOutside: React.MouseEventHandler<HTMLDivElement> = e => {
-  //   e.preventDefault()
-  //   setShowLiquidLabwareDetails(!showLiquidLabwareDetails)
-  // }
   return (
     <Box
       css={LIQUID_CARD_STYLE}
