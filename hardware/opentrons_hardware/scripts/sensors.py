@@ -116,9 +116,7 @@ def prompt_message(
     minutes = prompt_int_input("script run time in minutes", get_user_input)
     output_to_csv = bool(prompt_int_input("output to csv?", get_user_input))
 
-    sensor_run = SensorRun(
-        sensor_type, serial_number, bool(auto_zero), minutes, mount
-    )
+    sensor_run = SensorRun(sensor_type, serial_number, bool(auto_zero), minutes, mount)
     return sensor_run, output_to_csv
 
 
