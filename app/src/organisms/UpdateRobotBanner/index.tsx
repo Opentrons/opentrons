@@ -30,6 +30,7 @@ export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
   const { autoUpdateAction } = useSelector((state: State) => {
     return getBuildrootUpdateDisplayInfo(state, robot?.name)
   })
+  const [showUpdateBanner, setShowUpdateBanner] = React.useState<boolean>(true)
   const [
     showSoftwareUpdateModal,
     setShowSoftwareUpdateModal,
@@ -40,17 +41,24 @@ export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
     e.stopPropagation()
     setShowSoftwareUpdateModal(true)
   }
-  const handleCloseBanner: React.MouseEventHandler = e => {
+
+  const handleCloseUpdateBanner: React.MouseEventHandler = e => {
     e.preventDefault()
     e.stopPropagation()
+    setShowUpdateBanner(false)
   }
 
   return (
     <Flex onClick={e => e.stopPropagation()} flexDirection={DIRECTION_COLUMN}>
       {(autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade') &&
       robot !== null &&
-      robot.healthStatus === 'ok' ? (
-        <Banner type="warning" onCloseClick={handleCloseBanner} {...styleProps}>
+      robot.healthStatus === 'ok' &&
+      showUpdateBanner ? (
+        <Banner
+          type="warning"
+          onCloseClick={handleCloseUpdateBanner}
+          {...styleProps}
+        >
           <StyledText as="p" marginRight={SPACING.spacing2}>
             {t('robot_server_versions_banner_title')}
           </StyledText>
