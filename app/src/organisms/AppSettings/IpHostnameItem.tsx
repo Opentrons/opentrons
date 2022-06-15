@@ -49,7 +49,6 @@ export function IpHostnameItem({
   candidate,
   discovered,
   removeIp,
-  // justAdded,
   isLast,
   mostRecentAddition,
   setMostRecentAddition,
@@ -59,19 +58,24 @@ export function IpHostnameItem({
     removeIp(candidate)
   }
   const { t } = useTranslation('app_settings')
+  const justAdded = candidate === mostRecentAddition
   const getDiscoveryText = (): string | null => {
     if (discovered) {
-      // setMostRecentDiscovered(true)
       return t('ip_available')
-    } else if (candidate === mostRecentAddition) {
-      // Note this is to avoid the case that not found but not display the message
-      setMostRecentAddition('searching')
+    } else if (justAdded) {
       return null
     } else {
-      // setMostRecentDiscovered(false)
       return t('not_found')
     }
   }
+
+  React.useEffect(() => {
+    if (justAdded) {
+      setMostRecentDiscovered(discovered)
+      // Note this is to avoid the case that not found but not display the message
+      setMostRecentAddition('searching')
+    }
+  }, [justAdded, discovered, setMostRecentDiscovered, setMostRecentAddition])
 
   return (
     <>
@@ -88,9 +92,9 @@ export function IpHostnameItem({
         <StyledText
           as="label"
           color={COLORS.darkGreyEnabled}
-          css={`
-            white-space: nowrap;
-          `}
+          css={{
+            'white-space': 'nowrap',
+          }}
         >
           {getDiscoveryText()}
         </StyledText>
