@@ -11,6 +11,7 @@ import {
   FONT_SIZE_BODY_2,
   FONT_BODY_2_DARK,
   DIRECTION_ROW,
+  SPACING,
   SPACING_3,
   SPACING_5,
   BORDER_SOLID_LIGHT,
@@ -218,6 +219,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
         }
         auxiliaryControl={allowHorizontal ? null : <AllowHorizontalPrompt />}
         width="100%"
+        marginBottom={SPACING.spacing5}
       />
       <Flex
         width="100%"
