@@ -1,0 +1,52 @@
+test_name: Upload, analyze, and validate protocol analysis failure for api level.
+
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload a python protocol with non-conforming api level 
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/non_conforming_api_level.py'
+    response:
+      strict:
+        - json:off
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolType: python
+          analysisSummaries:
+            - id: !anystr
+              status: pending
+  # uncomment once the bug is fixed
+  # with the bug this step will fail because the status remains pending forever
+  # - name: Retry until analyses status is completed.
+  #   max_retries: 20
+  #   delay_after: 2
+  #   request:
+  #     url: '{host:s}:{port:d}/protocols'
+  #     method: GET
+  #   response:
+  #     strict:
+  #       - json:off
+  #     status_code: 200
+  #     json:
+  #       data:
+  #         - id: '{protocol_id}'
+  #           analysisSummaries:
+  #             - id: '{analysis_id}'
+  #               status: completed
+  - name: Get protocol analyses and validate the correct error is present
+    request:
+      url: '{host:s}:{port:d}/protocols/{protocol_id}/analyses'
+      method: GET
+    response:
+      status_code: 200
+    # Here we need to match the response
