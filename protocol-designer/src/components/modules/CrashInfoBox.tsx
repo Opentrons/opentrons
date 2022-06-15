@@ -22,7 +22,7 @@ type TempMagCollisonProps = Pick<
 
 const HeaterShakerPipetteCollisions = (): JSX.Element | null => {
   return (
-    <React.Fragment>
+    <>
       <li>
         <strong>8-Channel</strong> {i18n.t(`alert.crash.pipettes_east_west`)}{' '}
         <strong>Heater-Shaker Module GEN1.</strong>
@@ -33,7 +33,7 @@ const HeaterShakerPipetteCollisions = (): JSX.Element | null => {
         <strong>Heater-Shaker Module GEN1</strong>{' '}
         {i18n.t(`alert.crash.slot_has_tiprack`)}
       </li>
-    </React.Fragment>
+    </>
   )
 }
 
@@ -60,7 +60,7 @@ const PipetteModuleCollisions = (props: Props): JSX.Element | null => {
     return null
 
   const body = (
-    <React.Fragment>
+    <>
       {props.showHeaterShakerPipetteCollisions && (
         <HeaterShakerPipetteCollisions />
       )}
@@ -71,7 +71,7 @@ const PipetteModuleCollisions = (props: Props): JSX.Element | null => {
           showTempPipetteCollisons={props.showTempPipetteCollisons}
         />
       )}
-    </React.Fragment>
+    </>
   )
   const title = 'Potential pipette-module collisions'
 
@@ -129,7 +129,7 @@ const CollisionCard = (props: {
 
 export function CrashInfoBox(props: Props): JSX.Element {
   return (
-    <React.Fragment>
+    <>
       <PipetteModuleCollisions {...props} />
       {/* the remaining collision warnings below are only relevant to a heater shaker */}
       <ModuleLabwareCollisions
@@ -142,7 +142,7 @@ export function CrashInfoBox(props: Props): JSX.Element {
           props.showHeaterShakerModuleCollisions
         }
       />
-    </React.Fragment>
+    </>
   )
 }
 
