@@ -6,9 +6,10 @@ import {
   NewSecondaryBtn,
   SPACING_3,
 } from '@opentrons/components'
+import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
-import { useStopRunMutation } from '@opentrons/react-api-client'
+import { useTrackEvent } from '../../redux/analytics'
 
 export interface ConfirmCancelModalProps {
   onClose: () => unknown
@@ -21,8 +22,13 @@ export function ConfirmCancelModal(
   const { onClose, runId } = props
   const { stopRun } = useStopRunMutation()
   const { t } = useTranslation('run_details')
+  const trackEvent = useTrackEvent()
 
   const cancel = (): void => {
+    if (runId != null) {
+      trackEvent({ name: 'runCancel', properties: {} })
+      stopRun(runId)
+    }
     runId != null && stopRun(runId)
     onClose()
   }

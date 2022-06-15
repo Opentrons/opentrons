@@ -237,7 +237,24 @@ export function ProtocolRunHeader({
       setShowIsShakingModal(true)
     } else if (isHeaterShakerInProtocol && !isShaking) {
       confirmAttachment()
-    } else play()
+    } else {
+      if (runStatus === RUN_STATUS_IDLE) {
+        trackEvent({ name: 'runStart', properties: {} })
+      } else {
+        trackEvent({ name: 'runResume', properties: {} })
+      }
+      play()
+    }
+  }
+
+  const handlePauseButtonClick = (): void => {
+    trackEvent({ name: 'runPause', properties: {} })
+    pause()
+  }
+
+  const handleResetButtonClick = (): void => {
+    trackEvent({ name: 'runAgain', properties: {} })
+    reset()
   }
 
   const isRunControlButtonDisabled =
@@ -267,12 +284,12 @@ export function ProtocolRunHeader({
     case RUN_STATUS_RUNNING:
       buttonIconName = 'pause'
       buttonText = t('pause_run')
-      handleButtonClick = pause
+      handleButtonClick = handlePauseButtonClick
       break
     case RUN_STATUS_STOP_REQUESTED:
       buttonIconName = null
       buttonText = t('canceling_run')
-      handleButtonClick = reset
+      handleButtonClick = handleResetButtonClick
       break
     case RUN_STATUS_STOPPED:
     case RUN_STATUS_FINISHING:
@@ -280,7 +297,7 @@ export function ProtocolRunHeader({
     case RUN_STATUS_SUCCEEDED:
       buttonIconName = 'play'
       buttonText = t('run_again')
-      handleButtonClick = reset
+      handleButtonClick = handleResetButtonClick
       break
   }
 
