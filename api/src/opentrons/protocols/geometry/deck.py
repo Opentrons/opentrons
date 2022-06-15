@@ -61,15 +61,15 @@ class Deck(UserDict):
         for f in self._definition["locations"]["fixtures"]:
             slot_name = self._check_name(f["slot"])  # type: ignore
             # TODO(mc, 2022-06-15): this loads the fixed trash as an instance of
-            # opentrons.protocol_api.labware.Labware instance
-            # However, all other labware will be added to the Deck as instances of
-            # opentrons.protocols.context.labware.AbstractLabware
+            # `opentrons.protocol_api.labware.Labware`
+            # However, all other labware will be added to the `Deck` as instances of
+            # `opentrons.protocols.context.labware.AbstractLabware`
             # And modules will be added as instances of
-            # opentrons.protocols.geometry.module_geometry.ModuleGeometry
-            # This mix of public and private interaces as members of a public
-            # Deck interface is confusing and should be resolved.
-            # Id Deck is public, all items in a Deck should be instances of
-            # other public APIs.
+            # `opentrons.protocols.geometry.module_geometry.ModuleGeometry`
+            # This mix of public and private interfaces as members of a public
+            # `Deck` interface is confusing and should be resolved.
+            # If `Deck` is public, all items in a `Deck` should be
+            # instances of other public APIs.
             loaded_f = load_lw(
                 f["labware"], self.position_for(slot_name)  # type: ignore
             )
