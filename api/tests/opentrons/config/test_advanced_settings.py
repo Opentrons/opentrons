@@ -1,68 +1,57 @@
 import pytest
-from typing import Any, Dict, Generator, Optional, Tuple
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from opentrons.config import advanced_settings, ARCHITECTURE, CONFIG
 
 
 @pytest.fixture
-def mock_settings_values() -> Dict[str, Optional[bool]]:
+def mock_settings_values():
     return {s.id: False for s in advanced_settings.settings}
 
 
 @pytest.fixture
-def mock_settings_version() -> int:
+def mock_settings_version():
     return 1
 
 
 @pytest.fixture
-def mock_settings(
-    mock_settings_values: Dict[str, Optional[bool]],
-    mock_settings_version: int,
-) -> advanced_settings.SettingsData:
+def mock_settings(mock_settings_values, mock_settings_version):
     return advanced_settings.SettingsData(
-        settings_map=mock_settings_values,
-        version=mock_settings_version,
+        settings_map=mock_settings_values, version=mock_settings_version
     )
 
 
 @pytest.fixture
-def mock_read_settings_file(
-    mock_settings: advanced_settings.SettingsData,
-) -> Generator[MagicMock, None, None]:
+def mock_read_settings_file(mock_settings):
     with patch("opentrons.config.advanced_settings._read_settings_file") as p:
         p.return_value = mock_settings
         yield p
 
 
 @pytest.fixture
-def mock_write_settings_file() -> Generator[MagicMock, None, None]:
+def mock_write_settings_file():
     with patch("opentrons.config.advanced_settings._write_settings_file") as p:
         yield p
 
 
 @pytest.fixture
-def restore_restart_required() -> Generator[None, None, None]:
+def restore_restart_required():
     yield
     advanced_settings._SETTINGS_RESTART_REQUIRED = False
 
 
 @pytest.fixture
-def clear_cache() -> None:
+def clear_cache():
     advanced_settings.get_all_adv_settings.cache_clear()
 
 
-def test_get_advanced_setting_not_found(
-    clear_cache: None, mock_read_settings_file: MagicMock
-) -> None:
+def test_get_advanced_setting_not_found(clear_cache, mock_read_settings_file):
     assert advanced_settings.get_adv_setting("unknown") is None
 
 
 def test_get_advanced_setting_found(
-    clear_cache: None,
-    mock_read_settings_file: MagicMock,
-    mock_settings_values: Dict[str, Optional[bool]],
-) -> None:
+    clear_cache, mock_read_settings_file, mock_settings_values
+):
     for k, v in mock_settings_values.items():
         s = advanced_settings.get_adv_setting(k)
         assert s is not None
@@ -71,10 +60,8 @@ def test_get_advanced_setting_found(
 
 
 def test_get_all_adv_settings(
-    clear_cache: None,
-    mock_read_settings_file: MagicMock,
-    mock_settings_values: MagicMock,
-) -> None:
+    clear_cache, mock_read_settings_file, mock_settings_values
+):
     s = advanced_settings.get_all_adv_settings()
     assert s.keys() == mock_settings_values.keys()
     for k, v in s.items():
@@ -82,22 +69,19 @@ def test_get_all_adv_settings(
         assert v.definition == advanced_settings.settings_by_id[k]
 
 
-def test_get_all_adv_settings_empty(
-    clear_cache: None,
-    mock_read_settings_file: MagicMock,
-) -> None:
+def test_get_all_adv_settings_empty(clear_cache, mock_read_settings_file):
     mock_read_settings_file.return_value = advanced_settings.SettingsData({}, 1)
     s = advanced_settings.get_all_adv_settings()
     assert s == {}
 
 
 async def test_set_adv_setting(
-    mock_read_settings_file: MagicMock,
-    mock_settings_values: MagicMock,
-    mock_write_settings_file: MagicMock,
-    mock_settings_version: int,
-    restore_restart_required: None,
-) -> None:
+    mock_read_settings_file,
+    mock_settings_values,
+    mock_write_settings_file,
+    mock_settings_version,
+    restore_restart_required,
+):
     for k, v in mock_settings_values.items():
         # Toggle the advanced setting
         await advanced_settings.set_adv_setting(k, not v)
@@ -110,19 +94,16 @@ async def test_set_adv_setting(
 
 
 async def test_set_adv_setting_unknown(
-    mock_read_settings_file: MagicMock,
-    mock_write_settings_file: MagicMock,
-) -> None:
+    mock_read_settings_file, mock_write_settings_file
+):
     mock_read_settings_file.return_value = advanced_settings.SettingsData({}, 1)
     with pytest.raises(ValueError, match="is not recognized"):
         await advanced_settings.set_adv_setting("no", False)
 
 
 async def test_get_all_adv_settings_lru_cache(
-    clear_cache: None,
-    mock_read_settings_file: MagicMock,
-    mock_write_settings_file: MagicMock,
-) -> None:
+    clear_cache, mock_read_settings_file, mock_write_settings_file
+):
     # Cache should not be used.
     advanced_settings.get_all_adv_settings()
     mock_read_settings_file.assert_called_once()
@@ -144,11 +125,11 @@ async def test_get_all_adv_settings_lru_cache(
 
 
 async def test_restart_required(
-    restore_restart_required: None,
-    mock_read_settings_file: MagicMock,
-    mock_write_settings_file: MagicMock,
-    mock_settings_version: int,
-) -> None:
+    restore_restart_required,
+    mock_read_settings_file,
+    mock_write_settings_file,
+    mock_settings_version,
+):
     _id = "restart_required"
     # Mock out the available settings
     available_settings = [
@@ -178,12 +159,10 @@ async def test_restart_required(
         [False, "info"],
     ],
 )
-async def test_disable_log_integration_side_effect(
-    v: bool, expected_level: str
-) -> None:
+async def test_disable_log_integration_side_effect(v, expected_level):
     with patch("opentrons.config.advanced_settings.log_control") as mock_log_control:
 
-        async def set_syslog_level(level: Any) -> Tuple[int, str, str]:
+        async def set_syslog_level(level):
             return 0, "", ""
 
         mock_log_control.set_syslog_level.side_effect = set_syslog_level
@@ -196,10 +175,10 @@ async def test_disable_log_integration_side_effect(
             mock_log_control.set_syslog_level.assert_called_once_with(expected_level)
 
 
-async def test_disable_log_integration_side_effect_error() -> None:
+async def test_disable_log_integration_side_effect_error():
     with patch("opentrons.config.advanced_settings.log_control") as mock_log_control:
 
-        async def set_syslog_level(level: Any) -> Tuple[int, str, str]:
+        async def set_syslog_level(level):
             return 1, "", ""
 
         mock_log_control.set_syslog_level.side_effect = set_syslog_level

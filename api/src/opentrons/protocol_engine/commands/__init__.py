@@ -145,14 +145,6 @@ from .set_rail_lights import (
     SetRailLightsCommandType,
 )
 
-from .touch_tip import (
-    TouchTip,
-    TouchTipParams,
-    TouchTipCreate,
-    TouchTipResult,
-    TouchTipCommandType,
-)
-
 from .blow_out import (
     BlowOutParams,
     BlowOutResult,
@@ -257,12 +249,6 @@ __all__ = [
     "SetRailLightsCreate",
     "SetRailLightsResult",
     "SetRailLightsCommandType",
-    # touch tip command models
-    "TouchTip",
-    "TouchTipParams",
-    "TouchTipCreate",
-    "TouchTipResult",
-    "TouchTipCommandType",
     # blow out command models
     "BlowOutResult",
     "BlowOutCreate",

@@ -59,14 +59,6 @@ class LabwareIsNotTipRackError(ProtocolEngineError):
     """An error raised when trying to use a regular labware as a tip rack."""
 
 
-class LabwareIsTipRackError(ProtocolEngineError):
-    """An error raised when trying to use a command not allowed on tip rack."""
-
-
-class TouchTipDisabledError(ProtocolEngineError):
-    """An error raised when touch tip is used on well with touchTipDisabled quirk."""
-
-
 class WellDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a well that does not exist."""
 

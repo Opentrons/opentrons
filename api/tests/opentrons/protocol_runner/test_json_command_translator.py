@@ -126,31 +126,6 @@ VALID_TEST_PARAMS = [
     ),
     (
         protocol_schema_v6.Command(
-            commandType="touchTip",
-            params=protocol_schema_v6.Params(
-                pipetteId="pipette-id-abc123",
-                labwareId="labware-id-def456",
-                wellName="A1",
-                wellLocation=protocol_schema_v6.WellLocation(
-                    origin="bottom",
-                    offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=-1.23),
-                ),
-            ),
-        ),
-        pe_commands.TouchTipCreate(
-            params=pe_commands.TouchTipParams(
-                pipetteId="pipette-id-abc123",
-                labwareId="labware-id-def456",
-                wellName="A1",
-                wellLocation=WellLocation(
-                    origin=WellOrigin.BOTTOM,
-                    offset=WellOffset(x=0, y=0, z=-1.23),
-                ),
-            )
-        ),
-    ),
-    (
-        protocol_schema_v6.Command(
             commandType="pause",
             params=protocol_schema_v6.Params(
                 wait=True,
