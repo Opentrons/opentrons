@@ -11,7 +11,7 @@ ConfigUnit = Literal[
     "amps",
     "hertz",  # PWM frequency
     "percentage",  # Duty cycle
-    "volt",  # Reference voltage
+    "volts",  # Reference voltage
 ]
 
 
@@ -24,13 +24,13 @@ class InvalidGripperDefinition(Exception):
 class GripperModel(str, Enum):
     """Gripper models."""
 
-    v1 = "gripperV1"
+    V1 = "gripperV1"
 
 
 class GripperSchemaVersion(str, Enum):
     """Gripper schema versions."""
 
-    v1 = "1"
+    V1 = "1"
 
 
 GripperSchema = Dict[str, Any]
@@ -44,29 +44,39 @@ class GripperOffset(NamedTuple):
     z: float
 
 
-@dataclass
+@dataclass(frozen=True)
 class GripperCustomizableFloat:
     """Customizable floats."""
 
-    value: float
+    default_value: float
     min: float
     max: float
     units: ConfigUnit
     type: Literal["float"]
 
+    @classmethod
+    def build(cls, defaultValue: float, **kwarg: Any) -> "GripperCustomizableFloat":
+        """Build frozen dataclass from json camelcase to python snakecase field."""
+        return cls(default_value=defaultValue, **kwarg)
 
-@dataclass
+
+@dataclass(frozen=True)
 class GripperCustomizableInt:
     """Customizable ints."""
 
-    value: int
+    default_value: int
     min: int
     max: int
     units: ConfigUnit
     type: Literal["int"]
 
+    @classmethod
+    def build(cls, defaultValue: int, **kwarg: Any) -> "GripperCustomizableInt":
+        """Build frozen dataclass from json camelcase to python snakecase field."""
+        return cls(default_value=defaultValue, **kwarg)
 
-@dataclass
+
+@dataclass(frozen=True)
 class GripperDefinitionV1:
     """Gripper v1 definition."""
 
@@ -90,11 +100,13 @@ class GripperDefinitionV1:
             return cls(
                 display_name=data["displayName"],
                 model=GripperModel(data["model"]),
-                idle_current=GripperCustomizableFloat(**data["idleCurrent"]),
-                active_current=GripperCustomizableFloat(**data["activeCurrent"]),
-                reference_voltage=GripperCustomizableFloat(**data["referenceVoltage"]),
-                pwm_frequency=GripperCustomizableInt(**data["pwmFrequency"]),
-                duty_cycle=GripperCustomizableInt(**data["dutyCycle"]),
+                idle_current=GripperCustomizableFloat.build(**data["idleCurrent"]),
+                active_current=GripperCustomizableFloat.build(**data["activeCurrent"]),
+                reference_voltage=GripperCustomizableFloat.build(
+                    **data["referenceVoltage"]
+                ),
+                pwm_frequency=GripperCustomizableInt.build(**data["pwmFrequency"]),
+                duty_cycle=GripperCustomizableInt.build(**data["dutyCycle"]),
                 base_offset_from_mount=GripperOffset(**data["baseOffsetFromMount"]),
                 jaw_center_offset_from_base=GripperOffset(
                     **data["jawCenterOffsetFromBase"]

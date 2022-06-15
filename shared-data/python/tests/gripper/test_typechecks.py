@@ -8,35 +8,35 @@ GRIPPER_DEF = {
     "model": "gripperV1",
     "displayName": "Gripper GEN1",
     "idleCurrent": {
-        "value": 0.1,
+        "defaultValue": 0.1,
         "min": 0.02,
         "max": 1.0,
         "units": "amps",
         "type": "float",
     },
     "activeCurrent": {
-        "value": 0.8,
+        "defaultValue": 0.8,
         "min": 0.02,
         "max": 2.0,
         "units": "amps",
         "type": "float",
     },
     "referenceVoltage": {
-        "value": 2.6,
+        "defaultValue": 2.6,
         "min": 0.5,
         "max": 3.3,
-        "units": "volt",
+        "units": "volts",
         "type": "float",
     },
     "pwmFrequency": {
-        "value": 32000,
+        "defaultValue": 32000,
         "min": 1000,
         "max": 32000,
         "units": "hertz",
         "type": "int",
     },
     "dutyCycle": {
-        "value": 50,
+        "defaultValue": 50,
         "min": 10,
         "max": 90,
         "units": "percentage",
@@ -52,7 +52,7 @@ GRIPPER_DEF = {
 
 def test_gripper_definition() -> None:
     gripper_def = gripper.load_definition(
-        dev_types.GripperSchemaVersion.v1, dev_types.GripperModel.v1
+        dev_types.GripperSchemaVersion.V1, dev_types.GripperModel.V1
     )
     assert isinstance(gripper_def, dev_types.GripperDefinitionV1)
 
@@ -67,7 +67,7 @@ def test_gripper_definition_type() -> None:
 
     # add back in missing values
     GRIPPER_DEF["idleCurrent"] = {
-        "value": 0.01,
+        "defaultValue": 0.01,
         "min": 0.02,
         "max": 1.0,
         "units": "amps",

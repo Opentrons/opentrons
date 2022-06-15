@@ -1,5 +1,5 @@
 """opentrons_shared_data.gripper: functions and types for gripper config."""
-from typing import cast, Any, Optional
+from typing import cast, Any
 import json
 from pathlib import Path
 
@@ -9,6 +9,7 @@ from .dev_types import (
     GripperSchema,
     GripperModel,
     GripperSchemaVersion,
+    InvalidGripperDefinition,
 )
 
 
@@ -25,11 +26,10 @@ def _load_definition_data(path: Path) -> Any:
 def load_definition(
     version: GripperSchemaVersion,
     model: GripperModel,
-) -> Optional[GripperDefinitionV1]:
+) -> GripperDefinitionV1:
     """Load gripper definition based on schema version and gripper model."""
-    if version == GripperSchemaVersion.v1:
+    if version == GripperSchemaVersion.V1:
         path = Path("gripper") / "definitions" / f"{version}" / f"{model}.json"
         data = _load_definition_data(path)
         return GripperDefinitionV1.from_dict(data)
-    else:
-        return None
+    raise InvalidGripperDefinition(f"Gripper definition for {version} does not exist.")
