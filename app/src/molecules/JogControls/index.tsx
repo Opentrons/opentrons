@@ -49,7 +49,6 @@ export function JogControls(props: JogControlsProps): JSX.Element {
     <Flex
       justifyContent={JUSTIFY_CENTER}
       alignSelf={ALIGN_STRETCH}
-      marginBottom={SPACING.spacing5}
       {...styleProps}
     >
       <StepSizeControl
