@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Icon, SPACING_3 } from '@opentrons/components'
+import { i18n } from '../../localization'
 import collisionImage from '../../images/modules/module_pipette_collision_warning.png'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import styles from './styles.css'
@@ -23,13 +24,14 @@ const HeaterShakerPipetteCollisions = (): JSX.Element | null => {
   return (
     <React.Fragment>
       <li>
-        <strong>8-Channel</strong> pipettes cannot access slots to the left or
-        right of a <strong>Heater-Shaker Module GEN1.</strong>
+        <strong>8-Channel</strong> {i18n.t(`alert.crash.pipettes_east_west`)}{' '}
+        <strong>Heater-Shaker Module GEN1.</strong>
       </li>
       <li style={{ marginTop: SPACING_3 }}>
-        <strong>8-Channel</strong> pipettes can only access slots in front of or
-        behind a <strong>Heater-Shaker Module GEN1</strong> if that slot
-        contains a tip rack.
+        <strong>8-Channel</strong>{' '}
+        {i18n.t(`alert.crash.pipettes_can_access_north_south`)}{' '}
+        <strong>Heater-Shaker Module GEN1</strong>{' '}
+        {i18n.t(`alert.crash.slot_has_tiprack`)}
       </li>
     </React.Fragment>
   )
@@ -39,10 +41,11 @@ const TempMagCollisions = (props: TempMagCollisonProps): JSX.Element => {
   const moduleMessage = getCrashableModulesCopy(props) || ''
   return (
     <li style={{ marginTop: SPACING_3 }}>
-      <strong>8-Channel GEN1</strong> pipettes cannot access slots in front of
-      or behind a {moduleMessage}.{' '}
+      <strong>8-Channel GEN1</strong>{' '}
+      {i18n.t(`alert.crash.pipettes_cannot_access_north_south`)} {moduleMessage}
+      .{' '}
       <KnowledgeBaseLink to="pipetteGen1MultiModuleCollision">
-        Read more here
+        {i18n.t(`alert.crash.read_more_here`)}
       </KnowledgeBaseLink>
     </li>
   )
@@ -81,9 +84,10 @@ const ModuleLabwareCollisions = (
   const title = 'Potential module-labware collisions'
   const body = (
     <li>
-      No labware over <strong>53 mm</strong> can be placed to the left or right
-      of a <strong>Heater-Shaker Module GEN1</strong> due to risk of collision
-      with the labware latch.
+      {i18n.t(`alert.crash.no_labware_over`)} <strong>53 mm</strong>{' '}
+      {i18n.t(`alert.crash.labware_east_west`)}{' '}
+      <strong>Heater-Shaker Module GEN1</strong>{' '}
+      {i18n.t(`alert.crash.latch_collision`)}{' '}
     </li>
   )
   return <CollisionCard title={title} body={body} />
@@ -95,7 +99,7 @@ const ModuleModuleCollisions = (
   const title = 'Potential module-module collisions'
   const body = (
     <li>
-      No modules can be placed in front of or behind a{' '}
+      {i18n.t(`alert.crash.modules_north_south`)}{' '}
       <strong>Heater-Shaker Module GEN1.</strong>
     </li>
   )
