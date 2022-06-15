@@ -247,3 +247,45 @@ class PipettingHandler:
         await self._hardware_api.dispense(mount=hw_pipette.mount, volume=volume)
 
         return volume
+
+    async def touch_tip(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+    ) -> None:
+        """Touch the pipette tip to the sides of a well."""
+        target_well = CurrentWell(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+        )
+
+        # get pipette mount and critical point for our touch tip moves
+        pipette_location = self._state_store.motion.get_pipette_location(
+            pipette_id=pipette_id,
+            current_well=target_well,
+        )
+
+        touch_points = self._state_store.geometry.get_well_edges(
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+        )
+
+        # this will handle raising if the thermocycler lid is in a bad state
+        # so we don't need to put that logic elsewhere
+        await self._movement_handler.move_to_well(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+        )
+
+        for position in touch_points:
+            await self._hardware_api.move_to(
+                mount=pipette_location.mount.to_hw_mount(),
+                critical_point=pipette_location.critical_point,
+                abs_position=position,
+            )
