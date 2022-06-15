@@ -23,7 +23,6 @@ import {
   ModuleIcon,
   POSITION_ABSOLUTE,
   TEXT_ALIGN_RIGHT,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useHistory } from 'react-router-dom'
 import {
